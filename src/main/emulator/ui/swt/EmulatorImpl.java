@@ -11,18 +11,18 @@ import emulator.graphics2D.swt.ImageSWT;
 import emulator.graphics3D.*;
 import org.eclipse.swt.graphics.*;
 
-public final class Class146 implements IEmulator
+public final class EmulatorImpl implements IEmulator
 {
-    private static Display aDisplay1378;
+    private static Display display;
     private Vector aVector1379;
-    private int anInt1380;
+    private int screenDepth;
     private Class46 aClass46_1381;
     private Class110 aClass110_1382;
     private Class5 aClass5_1377;
     private Class5 aClass5_1391;
-    private Class38 aClass38_1383;
-    private EmulatorScreen aClass93_1385;
-    private Class11 aClass11_1386;
+    private Property iproperty;
+    private EmulatorScreen iscreen;
+    private Class11 ilogstream;
     private Class161 aClass161_1387;
     private Class108 aClass108_1390;
     private Class90 aClass90_1384;
@@ -30,13 +30,13 @@ public final class Class146 implements IEmulator
     public Properties midletProps;
 	//private static Hashtable<String, a> swtFontsCache = new Hashtable<String, a>();
     
-    public Class146() {
+    public EmulatorImpl() {
         super();
-        Class146.aDisplay1378 = new Display();
+        EmulatorImpl.display = new Display();
         this.aVector1379 = new Vector();
-        this.anInt1380 = ((Device)Class146.aDisplay1378).getDepth();
-        this.aClass38_1383 = new Class38();
-        this.aClass11_1386 = new Class11();
+        this.screenDepth = ((Device)EmulatorImpl.display).getDepth();
+        this.iproperty = new Property();
+        this.ilogstream = new Class11();
         this.aClass83_1389 = new Class83();
         this.aClass108_1390 = new Class108();
         this.aClass161_1387 = new Class161();
@@ -48,36 +48,36 @@ public final class Class146 implements IEmulator
     }
     
     public static void dispose() {
-        if (!((Device)Class146.aDisplay1378).isDisposed()) {
-            ((Device)Class146.aDisplay1378).dispose();
+        if (!((Device)EmulatorImpl.display).isDisposed()) {
+            ((Device)EmulatorImpl.display).dispose();
         }
     }
     
     public static Display getDisplay() {
-        return Class146.aDisplay1378;
+        return EmulatorImpl.display;
     }
     
     public static void syncExec(final Runnable runnable) {
-        if (!((Device)Class146.aDisplay1378).isDisposed()) {
-            Class146.aDisplay1378.syncExec(runnable);
+        if (!((Device)EmulatorImpl.display).isDisposed()) {
+            EmulatorImpl.display.syncExec(runnable);
         }
     }
     
     public static void asyncExec(final Runnable runnable) {
-        if (!((Device)Class146.aDisplay1378).isDisposed()) {
-            Class146.aDisplay1378.asyncExec(runnable);
+        if (!((Device)EmulatorImpl.display).isDisposed()) {
+            EmulatorImpl.display.asyncExec(runnable);
         }
     }
     
     public final int getScreenDepth() {
-        return this.anInt1380;
+        return this.screenDepth;
     }
     
-    public final EmulatorScreen method821() {
-        if (this.aClass93_1385 == null) {
-            this.aClass93_1385 = new EmulatorScreen(Devices.method617("SCREEN_WIDTH"), Devices.method617("SCREEN_HEIGHT"));
+    public final EmulatorScreen getEmulatorScreen() {
+        if (this.iscreen == null) {
+            this.iscreen = new EmulatorScreen(Devices.method617("SCREEN_WIDTH"), Devices.method617("SCREEN_HEIGHT"));
         }
-        return this.aClass93_1385;
+        return this.iscreen;
     }
     
     public final Class5 method822() {
@@ -109,10 +109,10 @@ public final class Class146 implements IEmulator
     }
     
     public final void disposeSubWindows() {
-        Settings.showLogFrame = this.aClass11_1386.method327();
+        Settings.showLogFrame = this.ilogstream.method327();
         Settings.showInfoFrame = this.aClass108_1390.method610();
         this.aClass161_1387.method836();
-        this.aClass11_1386.method330();
+        this.ilogstream.method330();
         this.aClass83_1389.method482();
         this.aClass108_1390.method608();
         Settings.showMemViewFrame = this.aClass110_1382.method622();
@@ -134,15 +134,15 @@ public final class Class146 implements IEmulator
     }
     
     public final ILogStream getLogStream() {
-        return this.aClass11_1386;
+        return this.ilogstream;
     }
     
     public final IProperty getProperty() {
-        return this.aClass38_1383;
+        return this.iproperty;
     }
     
     public final IScreen getScreen() {
-        return this.aClass93_1385;
+        return this.iscreen;
     }
     
     public final IMessage getMessage() {
@@ -153,12 +153,12 @@ public final class Class146 implements IEmulator
         if (Settings.g2d == 0) {
         	//String s = this.aClass38_1383.getDefaultFontName() + "." + n + "." + n2;
         	//if(swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-            FontSWT f = new FontSWT(this.aClass38_1383.getDefaultFontName(), n, n2);
+            FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), n, n2);
             //swtFontsCache.put(s, f);
            // return f;
         }
         if (Settings.g2d == 1) {
-            return new emulator.graphics2D.awt.a(this.aClass38_1383.getDefaultFontName(), n, n2);
+            return new emulator.graphics2D.awt.a(this.iproperty.getDefaultFontName(), n, n2);
         }
         return null;
     }

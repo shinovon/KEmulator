@@ -4,7 +4,7 @@ import com.nokia.mid.ui.DeviceControl;
 
 import emulator.*;
 import emulator.lcdui.b;
-import emulator.ui.swt.Class38;
+import emulator.ui.swt.Property;
 
 public abstract class Canvas extends Displayable
 {

@@ -35,17 +35,17 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import emulator.custom.CustomClassLoader;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulator;
-import emulator.ui.swt.Class146;
+import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator
 {
-    static Class146 aClass146_498;
+    static EmulatorImpl emulatorimpl;
     private static MIDlet midlet;
-    private static Canvas aCanvas500;
-    private static Screen aScreen501;
+    private static Canvas currentCanvas;
+    private static Screen currentScreen;
     private static network.b netMonitor;
     private static EventQueue eventQueue;
-    private static KeyRecords ah505;
+    private static KeyRecords record;
     public static Vector jarLibrarys;
     public static Vector jarClasses;
     public static String midletJar;
@@ -72,6 +72,10 @@ public class Emulator
 	private static String imei;
 	public static boolean askPermissions = false;
 	public static boolean askImei = false;
+	
+	public static final String titleVersion = "v9";
+	public static final int numericVersion = 9;
+	public static final String propVersion = "v9";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -222,27 +226,27 @@ public class Emulator
     }
     
     public static IEmulator getEmulator() {
-        return Emulator.aClass146_498;
+        return Emulator.emulatorimpl;
     }
     
     public static KeyRecords getRobot() {
-        return Emulator.ah505;
+        return Emulator.record;
     }
     
     public static Canvas getCanvas() {
-        return Emulator.aCanvas500;
+        return Emulator.currentCanvas;
     }
     
     public static void setCanvas(final Canvas aCanvas500) {
-        Emulator.aCanvas500 = aCanvas500;
+        Emulator.currentCanvas = aCanvas500;
     }
     
     public static Screen getScreen() {
-        return Emulator.aScreen501;
+        return Emulator.currentScreen;
     }
     
     public static void setScreen(final Screen aScreen501) {
-        Emulator.aScreen501 = aScreen501;
+        Emulator.currentScreen = aScreen501;
     }
     
     public static MIDlet getMIDlet() {
@@ -273,7 +277,7 @@ public class Emulator
 		if(rpcCallbackThread != null)
 			rpcCallbackThread.interrupt();
         MMFPlayer.method200();
-        Emulator.aClass146_498.getProperty().saveProperties();
+        Emulator.emulatorimpl.getProperty().saveProperties();
         if (Settings.autoGenJad) {
             method280();
             return;
@@ -287,17 +291,17 @@ public class Emulator
         }
         try {
             final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad"), "UTF-8");
-            final Enumeration<Object> keys = (Emulator.aClass146_498.midletProps).keys();
+            final Enumeration<Object> keys = (Emulator.emulatorimpl.midletProps).keys();
             while (keys.hasMoreElements()) {
                 final String s;
                 if (!(s = (String) keys.nextElement()).equalsIgnoreCase("KEmu-Platform")) {
-                    outputStreamWriter.write(s + ": " + Emulator.aClass146_498.midletProps.getProperty(s) + "\r\n");
+                    outputStreamWriter.write(s + ": " + Emulator.emulatorimpl.midletProps.getProperty(s) + "\r\n");
                 }
             }
-            if (Emulator.aClass146_498.midletProps.getProperty("MIDlet-Jar-URL") == null) {
+            if (Emulator.emulatorimpl.midletProps.getProperty("MIDlet-Jar-URL") == null) {
                 outputStreamWriter.write("MIDlet-Jar-URL: " + new File(Emulator.midletJar).getName() + "\r\n");
             }
-            if (Emulator.aClass146_498.midletProps.getProperty("MIDlet-Jar-Size") == null) {
+            if (Emulator.emulatorimpl.midletProps.getProperty("MIDlet-Jar-Size") == null) {
                 outputStreamWriter.write("MIDlet-Jar-Size: " + new File(Emulator.midletJar).length() + "\r\n");
             }
             outputStreamWriter.write("KEmu-Platform: " + Emulator.deviceName + "\r\n");
@@ -308,7 +312,7 @@ public class Emulator
     }
     
     public static Properties getMidletProperties() {
-    	return Emulator.aClass146_498.midletProps;
+    	return Emulator.emulatorimpl.midletProps;
     }
     
     private static void method286() {
@@ -345,8 +349,8 @@ public class Emulator
     
     private static void method287() {
         final String property;
-        if ((property = Emulator.aClass146_498.midletProps.getProperty("KEmu-Platform")) != null) {
-            method282(property);
+        if ((property = Emulator.emulatorimpl.midletProps.getProperty("KEmu-Platform")) != null) {
+            tryToSetDevice(property);
             return;
         }
         if (Emulator.midletJar == null) {
@@ -372,18 +376,18 @@ public class Emulator
             fileInputStream.close();
             final String property2;
             if ((property2 = properties.getProperty(substring, null)) != null) {
-                method282(property2);
+                tryToSetDevice(property2);
             }
         }
         catch (Exception ex) {ex.printStackTrace();}
     }
     
     public static String getVersionString() {
-        return "KEmulator v1.0.3 mod nnproject v9 b9";
+        return "KEmulator v1.0.3 mod nnproject " + titleVersion;
     }
     
     public static String getInfoString() {
-        return "KEmulator v1.0.3" + "\n\tmod nnproject v9 b9\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n" + UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n\t" + "MIDP 2.0(JSR118)\n\tNokiaUI 1.4\n\tSamsung 1.0\n\tSprint 1.0\n\tWMA 1.0(JSR120)\n\tSensor(JSR256)\n\tM3G 1.1(JSR184)\n\tOpenGL ES(JSR239)";
+        return "KEmulator v1.0.3" + "\n\tmod nnproject "+titleVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n" + UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n\t" + "MIDP 2.0(JSR118)\n\tNokiaUI 1.4\n\tSamsung 1.0\n\tSprint 1.0\n\tWMA 1.0(JSR120)\n\tSensor(JSR256)\n\tM3G 1.1(JSR184)\n\tOpenGL ES(JSR239)";
     }
     
     public static void getLibraries() {
@@ -443,7 +447,7 @@ public class Emulator
                         ((Hashtable<String, String>)aProperties1368).put(s, new String(((Properties)aProperties1368).getProperty(s).getBytes("ISO-8859-1"), "UTF-8"));
                     }
                 }
-                Emulator.aClass146_498.getLogStream().println("Get classes from " + Emulator.midletJar);
+                Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
                 final ZipFile zipFile;
                 final Enumeration entries = (zipFile = new ZipFile(Emulator.midletJar)).getEntries();
                 while (entries.hasMoreElements()) {
@@ -451,7 +455,7 @@ public class Emulator
                     if ((zipEntry = (ZipEntry) entries.nextElement()).getName().endsWith(".class")) {
                         final String replace = zipEntry.getName().substring(0, zipEntry.getName().length() - 6).replace('/', '.');
                         Emulator.jarClasses.add(replace);
-                        Emulator.aClass146_498.getLogStream().println("Get class " + replace);
+                        Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
                     }
                 }
                 if (aProperties1368 == null) {
@@ -475,7 +479,7 @@ public class Emulator
                         }
                     }
                 }
-                Emulator.aClass146_498.midletProps = (Properties)aProperties1368;
+                Emulator.emulatorimpl.midletProps = (Properties)aProperties1368;
                 Emulator.midletClassName = ((Properties)aProperties1368).getProperty("MIDlet-1");
                 if (Emulator.midletClassName != null) {
                     Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
@@ -487,7 +491,7 @@ public class Emulator
                 }
                 final String[] split = Emulator.classPath.split(";");
                 for (int i = 0; i < split.length; ++i) {
-                    Emulator.aClass146_498.getLogStream().println("Get classes from " + split[i]);
+                    Emulator.emulatorimpl.getLogStream().println("Get classes from " + split[i]);
                     method281(new File(split[i]), null);
                 }
                 Properties aProperties1369 = null;
@@ -503,14 +507,14 @@ public class Emulator
                 if (aProperties1369 == null) {
                     aProperties1369 = new Properties();
                 }
-                Emulator.aClass146_498.midletProps = aProperties1369;
+                Emulator.emulatorimpl.midletProps = aProperties1369;
             }
         }
         catch (Exception ex) {
         	ex.printStackTrace();
-            Emulator.aClass146_498.getLogStream().println("3 "+ex.toString());
+            Emulator.emulatorimpl.getLogStream().println("3 "+ex.toString());
         	if(ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
-        		Emulator.aClass146_498.method821().method552(UILocale.uiText("LOAD_DRM_ERROR", "Input file isn't ZIP. Trying to load DRM Content?"));
+        		Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("LOAD_DRM_ERROR", "Input file isn't ZIP. Trying to load DRM Content?"));
         	}
             return false;
         }
@@ -528,7 +532,7 @@ public class Emulator
             }
             else if (string.endsWith(".class")) {
                 Emulator.jarClasses.add(string.substring(0, string.length() - 6));
-                Emulator.aClass146_498.getLogStream().println("Get class " + string.substring(0, string.length() - 6));
+                Emulator.emulatorimpl.getLogStream().println("Get class " + string.substring(0, string.length() - 6));
             }
         }
     }
@@ -663,8 +667,12 @@ public class Emulator
         			plat += ";sw_platform_version=" + c.getString("SW_PLATFORM_VERSION");
         		}
         	}
-        	String midlet = Emulator.aClass146_498.getAppProperty("MIDlet-Name");
-        	if(midlet != null && (midlet.equalsIgnoreCase("Shiza") || midlet.toLowerCase().startsWith("touch") || midlet.toLowerCase().startsWith("vika")))
+        	String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+        	if(midlet != null && (midlet.equalsIgnoreCase("vika touch"))) {
+        		// TODO: насрать
+        		
+        	}
+        	if(midlet != null && (midlet.equalsIgnoreCase("Shiza") || midlet.toLowerCase().startsWith("touch")/* || midlet.toLowerCase().startsWith("vika")*/))
         	plat += "/KEmulatorMod";
             System.setProperty("microedition.platform", plat);
             //System.out.println("paltform set: " + plat);
@@ -696,8 +704,8 @@ public class Emulator
         if (System.getProperty("wireless.messaging.version") == null) {
         	System.setProperty("wireless.messaging.version", "1.0");
         }
-        System.setProperty("kemulator.mod.version", "v8");
-        System.setProperty("kemulator.mod.versionint", "8");
+        System.setProperty("kemulator.mod.version", propVersion);
+        System.setProperty("kemulator.mod.versionint", "" + numericVersion);
         System.setProperty("com.nokia.mid.ui.softnotification", "true");
         System.setProperty("com.nokia.mid.ui.version", "1.4");
         System.setProperty("com.nokia.mid.ui.customfontsize", "true");
@@ -729,35 +737,35 @@ public class Emulator
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.method709();
-        Emulator.aClass146_498 = new Class146();
+        Emulator.emulatorimpl = new EmulatorImpl();
         i.a("emulator");
         Controllers.method750(true);
-        Emulator.aClass146_498.getLogStream().stdout(getVersionString() + " Running...");
+        Emulator.emulatorimpl.getLogStream().stdout(getVersionString() + " Running...");
         method283(commandLineArguments);
         Devices.load(Emulator.deviceFile);
-        method282(Emulator.deviceName);
+        tryToSetDevice(Emulator.deviceName);
         setupMRUList();
     	loadRichPresence();
         if (Emulator.midletClassName == null && Emulator.midletJar == null) {
-            Emulator.aClass146_498.method821().method553(false);
-            Class146.dispose();
+            Emulator.emulatorimpl.getEmulatorScreen().method553(false);
+            EmulatorImpl.dispose();
             return;
         }
-        Emulator.ah505 = new KeyRecords();
+        Emulator.record = new KeyRecords();
         getLibraries();
         if (!getJarClasses()) {
-            Emulator.aClass146_498.method821().method552(UILocale.uiText("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
             return;
         }
         InputStream inputStream = null;
         final String appProperty;
-        if ((appProperty = Emulator.aClass146_498.getAppProperty("MIDlet-Icon")) != null) {
+        if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
         	iconPath = appProperty;
             inputStream = emulator.custom.CustomJarResources.getResourceStream(appProperty);
         }
         else {
             final String appProperty2;
-            if ((appProperty2 = Emulator.aClass146_498.getAppProperty("MIDlet-1")) != null) {
+            if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
                 try {
                 	String s = appProperty2.split(",")[1].trim();
                 	iconPath = s;
@@ -771,12 +779,12 @@ public class Emulator
         	jar = jar.substring(jar.lastIndexOf("/")+1);
         if(jar.indexOf("\\") > -1)
         	jar = jar.substring(jar.lastIndexOf("\\")+1);
-        if(Emulator.aClass146_498.getAppProperty("MIDlet-Name") != null)
-        	Emulator.updatePresence("Running " + Emulator.aClass146_498.getAppProperty("MIDlet-Name"), "" + jar);
-        Emulator.aClass146_498.method821().method551(inputStream);
+        if(Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
+        	Emulator.updatePresence("Running " + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), "" + jar);
+        Emulator.emulatorimpl.getEmulatorScreen().method551(inputStream);
         method288();
         if (Emulator.midletClassName == null) {
-            Emulator.aClass146_498.method821().method552(UILocale.uiText("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
             return;
         }
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
@@ -786,12 +794,12 @@ public class Emulator
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            Emulator.aClass146_498.method821().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
         catch (Error error) {
             error.printStackTrace();
-            Emulator.aClass146_498.method821().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
         Emulator.eventQueue = new EventQueue();
@@ -802,31 +810,31 @@ public class Emulator
         catch (Exception ex2) {
             ex2.printStackTrace();
             Emulator.eventQueue.stop();
-            Emulator.aClass146_498.method821().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
         catch (Error error2) {
             error2.printStackTrace();
             Emulator.eventQueue.stop();
-            Emulator.aClass146_498.method821().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
-        Emulator.aClass146_498.method822().method302();
-        Emulator.aClass146_498.method829().method302();
+        Emulator.emulatorimpl.method822().method302();
+        Emulator.emulatorimpl.method829().method302();
         Emulator.eventQueue.queue(10);
-        Emulator.aClass146_498.method821().method553(true);
-        Class146.dispose();
+        Emulator.emulatorimpl.getEmulatorScreen().method553(true);
+        EmulatorImpl.dispose();
     }
     
-    private static void method282(final String deviceName) {
+    private static void tryToSetDevice(final String deviceName) {
         Emulator.deviceName = deviceName;
         if (!Devices.setPlatform(Emulator.deviceName)) {
             Devices.setPlatform(Emulator.deviceName = "SonyEricssonK800");
         }
-        Emulator.aClass146_498.getProperty().setCustomProperties();
-        Emulator.aClass146_498.getProperty().updateCustomProperties();
-        Emulator.aClass146_498.getProperty().resetDeviceName();
-        Keyboard.method599();
+        Emulator.emulatorimpl.getProperty().setCustomProperties();
+        Emulator.emulatorimpl.getProperty().updateCustomProperties();
+        Emulator.emulatorimpl.getProperty().resetDeviceName();
+        Keyboard.init();
     }
     
     static boolean method283(final String[] array) {
@@ -892,7 +900,7 @@ public class Emulator
                 getEmulator().getProperty().getFontLargeSize(Integer.parseInt(trim));
             }
             else if (lowerCase.equalsIgnoreCase("key")) {
-                Keyboard.method600(trim);
+                Keyboard.keyArg(trim);
             }
         }
         return true;
@@ -948,7 +956,7 @@ public class Emulator
         }
         else if (s.endsWith(".jad")) {
             sb.append(" -jad \"" + s + "\"");
-            sb.append(" -jar \"" + method285(s) + "\"");
+            sb.append(" -jar \"" + getMidletJarUrl(s) + "\"");
         }
         else {
             sb.append(" -jar \"" + s + "\"");
@@ -1015,7 +1023,7 @@ public class Emulator
         }
     }
     
-    private static String method285(final String s) {
+    private static String getMidletJarUrl(final String s) {
         try {
             final File file;
             if ((file = new File(s)).exists()) {
@@ -1052,7 +1060,7 @@ public class Emulator
         Emulator.deviceFile = "/res/plat";
     }
 
-	public static Info getDeviceInfo() throws MidiUnavailableException {
+	public static Info getMidiDeviceInfo() throws MidiUnavailableException {
 		for (int i = 0; i < midiDeviceInfo.length; ++i) {
 			if(midiDeviceInfo[i].getName().toLowerCase().contains("virtual")) {
 				return midiDeviceInfo[i];
@@ -1062,7 +1070,7 @@ public class Emulator
 	}
 
 	public static String getMidletName() {
-		String x = aClass146_498.getAppProperty("MIDlet-1").split(",")[2];
+		String x = emulatorimpl.getAppProperty("MIDlet-1").split(",")[2];
 		if(x.startsWith(" "))
 			x = x.substring(1);
 		if(x.endsWith(" "))

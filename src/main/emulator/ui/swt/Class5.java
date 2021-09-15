@@ -42,7 +42,7 @@ public final class Class5 implements Runnable, DisposeListener
         this.aButton558 = null;
         this.aTree554 = null;
         this.aTreeEditor555 = null;
-        this.aDisplay550 = Class146.getDisplay();
+        this.aDisplay550 = EmulatorImpl.getDisplay();
         this.anInt553 = anInt553;
         this.aHashtable552 = new Hashtable();
         this.aClass5_556 = this;
@@ -61,7 +61,7 @@ public final class Class5 implements Runnable, DisposeListener
         if (o == null) {
             return;
         }
-        this.aDisplay550 = Class146.getDisplay();
+        this.aDisplay550 = EmulatorImpl.getDisplay();
         this.anInt553 = 0;
         this.aHashtable552 = new Hashtable();
         final c c;
@@ -287,7 +287,7 @@ public final class Class5 implements Runnable, DisposeListener
             ((Widget)this.aShell557).addDisposeListener((DisposeListener)this);
             this.aBoolean561 = false;
             this.aBoolean560 = true;
-            Class146.asyncExec(this.aClass5_556);
+            EmulatorImpl.asyncExec(this.aClass5_556);
             Class5.aVector548.addElement(this);
             while (!((Widget)this.aShell557).isDisposed()) {
                 if (!this.aDisplay550.readAndDispatch()) {

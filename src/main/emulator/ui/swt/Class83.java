@@ -73,7 +73,7 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
             Class83.aString871 = sb.append(payloadText).toString();
         }
         Emulator.getEmulator().getLogStream().println(Class83.aString871);
-        Class146.syncExec(new Textout(this));
+        EmulatorImpl.syncExec(new Textout(this));
     }
     
     public final boolean method479() {

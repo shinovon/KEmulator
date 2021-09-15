@@ -5,18 +5,18 @@ import emulator.*;
 
 final class Class175 extends KeyAdapter
 {
-    private final Class38 aClass38_1444;
+    private final Property aClass38_1444;
     
-    Class175(final Class38 aClass38_1444) {
+    Class175(final Property aClass38_1444) {
         super();
         this.aClass38_1444 = aClass38_1444;
     }
     
     public final void keyPressed(final KeyEvent keyEvent) {
         keyEvent.keyCode &= 0xFEFFFFFF;
-        if (Class38.method376(this.aClass38_1444).getSelectionIndex() == 0 && Keyboard.method594(String.valueOf(keyEvent.keyCode)) != null) {
-            Class38.method405(this.aClass38_1444).setText(Keyboard.method594(String.valueOf(keyEvent.keyCode)));
-            Class38.method365()[0] = Class38.method405(this.aClass38_1444).getText().trim();
+        if (Property.method376(this.aClass38_1444).getSelectionIndex() == 0 && Keyboard.method594(String.valueOf(keyEvent.keyCode)) != null) {
+            Property.method405(this.aClass38_1444).setText(Keyboard.method594(String.valueOf(keyEvent.keyCode)));
+            Property.method365()[0] = Property.method405(this.aClass38_1444).getText().trim();
         }
     }
 }

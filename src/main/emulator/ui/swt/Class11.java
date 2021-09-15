@@ -72,7 +72,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     
     private void method326(final String aString572) {
         Class11.aString572 = aString572;
-        Class146.syncExec(new Textout(this));
+        EmulatorImpl.syncExec(new Textout(this));
     }
     
     private void method332() {

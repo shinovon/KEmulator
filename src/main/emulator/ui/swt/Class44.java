@@ -7,7 +7,7 @@ final class MyAuthenticator extends Authenticator
     private String aString780;
     private String aString781;
     
-    MyAuthenticator(final Class38 class38, final String aString780, final String aString781) {
+    MyAuthenticator(final Property class38, final String aString780, final String aString781) {
         super();
         this.aString780 = aString780;
         this.aString781 = aString781;

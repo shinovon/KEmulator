@@ -155,7 +155,7 @@ public final class Keyboard
         return Integer.parseInt((String) Keyboard.aHashtable1065.get("S2"));
     }
     
-    public static void method599() {
+    public static void init() {
         method602();
         method606();
     }
@@ -207,7 +207,7 @@ public final class Keyboard
         return (String)value2;
     }
     
-    public static void method600(final String s) {
+    public static void keyArg(final String s) {
         if (s == null) {
             return;
         }

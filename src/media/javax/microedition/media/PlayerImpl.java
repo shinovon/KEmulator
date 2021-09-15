@@ -228,7 +228,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             this.sequence = null;
         }
         try {
-    		device =  MidiSystem.getMidiDevice(Emulator.getDeviceInfo());
+    		device =  MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
     		device.open();
     		// First, get a Sequencer to play sequences of MIDI events
     		//That is, to send events to a Synthesizer at the right time.

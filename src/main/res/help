@@ -45,6 +45,11 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$v1.0.3 mod nnproject v9 [2021.09.15]
+Fixed custom screen resolution not changing
+Fixed some bugs
+Removed some debugging 
+
 $v1.0.3 mod nnproject v9 b9 [2021.09.06]
 Video player added (using vlcj)
 

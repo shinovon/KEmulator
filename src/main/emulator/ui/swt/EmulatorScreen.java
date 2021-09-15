@@ -153,7 +153,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         this.menu3dEngine = null;
         this.aMenu1018 = null;
         this.aStringArray981 = new String[] { emulator.UILocale.uiText("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), emulator.UILocale.uiText("MAIN_INFO_BAR_RUNNING", "RUNNING"), emulator.UILocale.uiText("MAIN_INFO_BAR_PAUSED", "PAUSED") };
-        EmulatorScreen.display = Class146.getDisplay();
+        EmulatorScreen.display = EmulatorImpl.getDisplay();
         this.method585();
         this.method550(n, n2);
         this.method587();
@@ -216,9 +216,9 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
             EmulatorScreen.locY = EmulatorScreen.display.getClientArea().height - this.shell.getSize().y >> 1;
         }
         ((Control)this.shell).setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
-        Class146.asyncExec(new WindowOpen(this, 0));
-        Class146.asyncExec(new WindowOpen(this, 1));
-        Class146.asyncExec(new WindowOpen(this, 2));
+        EmulatorImpl.asyncExec(new WindowOpen(this, 0));
+        EmulatorImpl.asyncExec(new WindowOpen(this, 1));
+        EmulatorImpl.asyncExec(new WindowOpen(this, 2));
         this.shell.open();
         ((Widget)this.shell).addDisposeListener((DisposeListener)this);
         ((Control)this.shell).addControlListener((ControlListener)this);
@@ -365,7 +365,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                 method580(Integer.parseInt(substring2));
             }
         }
-        Class146.asyncExec(this);
+        EmulatorImpl.asyncExec(this);
     }
     
     public final int getWidth() {
@@ -378,12 +378,12 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
     
     public final void setCommandLeft(final String aString983) {
         this.aString983 = aString983;
-        Class146.syncExec(new Class41(this));
+        EmulatorImpl.syncExec(new Class41(this));
     }
     
     public final void setCommandRight(final String aString989) {
         this.aString989 = aString989;
-        Class146.syncExec(new Class40(this));
+        EmulatorImpl.syncExec(new Class40(this));
     }
     
 
@@ -1051,7 +1051,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                 return;
             }
             if (menuItem.equals(this.aMenuItem950)) {
-                ((Class38)Emulator.getEmulator().getProperty()).method354(this.shell);
+                ((Property)Emulator.getEmulator().getProperty()).method354(this.shell);
                 return;
             }
             if (menuItem.equals(this.alwaysOnTopMenuItem)) {
@@ -1067,22 +1067,22 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                 ((Class11)Emulator.getEmulator().getLogStream()).method329(this.shell);
             }
             else if (menuItem.equals(this.aMenuItem956)) {
-                if (((Class146)Emulator.getEmulator()).method826().method834()) {
-                    ((Class146)Emulator.getEmulator()).method826().method836();
+                if (((EmulatorImpl)Emulator.getEmulator()).method826().method834()) {
+                    ((EmulatorImpl)Emulator.getEmulator()).method826().method836();
                     return;
                 }
-                ((Class146)Emulator.getEmulator()).method826().method835(this.shell);
+                ((EmulatorImpl)Emulator.getEmulator()).method826().method835(this.shell);
             }
             else if (menuItem.equals(this.infosMenuItem)) {
                 this.infosEnabled = this.infosMenuItem.getSelection();
                 if (this.infosEnabled) {
                     ((Control)this.canvas).setCursor(new Cursor((Device)EmulatorScreen.display, 2));
-                    ((Class146)Emulator.getEmulator()).method825().method607(this.shell);
+                    ((EmulatorImpl)Emulator.getEmulator()).method825().method607(this.shell);
                     return;
                 }
                 ((Control)this.canvas).setCursor(new Cursor((Device)EmulatorScreen.display, 0));
                 ((Control)this.canvas).redraw();
-                ((Class146)Emulator.getEmulator()).method825().method608();
+                ((EmulatorImpl)Emulator.getEmulator()).method825().method608();
             }
             else {
                 if (menuItem.equals(this.rotateScreenMenuItem)) {
@@ -1125,11 +1125,11 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                     ((Class83)Emulator.getEmulator().getMessage()).method481(this.shell);
                 }
                 else if (menuItem.equals(this.aMenuItem962)) {
-                    if (((Class146)Emulator.getEmulator()).method827().method494()) {
-                        ((Class146)Emulator.getEmulator()).method827().method507();
+                    if (((EmulatorImpl)Emulator.getEmulator()).method827().method494()) {
+                        ((EmulatorImpl)Emulator.getEmulator()).method827().method507();
                         return;
                     }
-                    ((Class146)Emulator.getEmulator()).method827().method493();
+                    ((EmulatorImpl)Emulator.getEmulator()).method827().method493();
                 }
                 else {
                     if (menuItem.equals(this.xrayViewMenuItem)) {
@@ -1137,32 +1137,32 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                         return;
                     }
                     if (menuItem.equals(this.aMenuItem958)) {
-                        if (((Class146)Emulator.getEmulator()).method822().method313()) {
-                            ((Class146)Emulator.getEmulator()).method822().method321();
+                        if (((EmulatorImpl)Emulator.getEmulator()).method822().method313()) {
+                            ((EmulatorImpl)Emulator.getEmulator()).method822().method321();
                             return;
                         }
-                        ((Class146)Emulator.getEmulator()).method822().method311(this.shell);
+                        ((EmulatorImpl)Emulator.getEmulator()).method822().method311(this.shell);
                     }
                     else if (menuItem.equals(this.aMenuItem959)) {
-                        if (((Class146)Emulator.getEmulator()).method829().method313()) {
-                            ((Class146)Emulator.getEmulator()).method829().method321();
+                        if (((EmulatorImpl)Emulator.getEmulator()).method829().method313()) {
+                            ((EmulatorImpl)Emulator.getEmulator()).method829().method321();
                             return;
                         }
-                        ((Class146)Emulator.getEmulator()).method829().method311(this.shell);
+                        ((EmulatorImpl)Emulator.getEmulator()).method829().method311(this.shell);
                     }
                     else if (menuItem.equals(this.aMenuItem960)) {
-                        if (((Class146)Emulator.getEmulator()).method824().method438()) {
-                            ((Class146)Emulator.getEmulator()).method824().method446();
+                        if (((EmulatorImpl)Emulator.getEmulator()).method824().method438()) {
+                            ((EmulatorImpl)Emulator.getEmulator()).method824().method446();
                             return;
                         }
-                        ((Class146)Emulator.getEmulator()).method824().method436();
+                        ((EmulatorImpl)Emulator.getEmulator()).method824().method436();
                     }
                     else if (menuItem.equals(this.aMenuItem961)) {
-                        if (((Class146)Emulator.getEmulator()).method823().method622()) {
-                            ((Class146)Emulator.getEmulator()).method823().method656();
+                        if (((EmulatorImpl)Emulator.getEmulator()).method823().method622()) {
+                            ((EmulatorImpl)Emulator.getEmulator()).method823().method656();
                             return;
                         }
-                        ((Class146)Emulator.getEmulator()).method823().method621();
+                        ((EmulatorImpl)Emulator.getEmulator()).method823().method621();
                     }
                 }
             }
@@ -1228,7 +1228,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         "(" + (int)(this.mouseXPress / this.zoom) + "," + 
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
         "," + (int)((this.mouseYRelease - this.mouseYPress) / this.zoom) + ")";
-        ((Class146)Emulator.getEmulator()).method825().method609(this.aString1008);
+        ((EmulatorImpl)Emulator.getEmulator()).method825().method609(this.aString1008);
     }
     
     private void method588() {
@@ -1495,7 +1495,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
             return;
         }
         if (Emulator.getCurrentDisplay().getCurrent() != null) {
-        	System.out.println(mouseEvent.button);
+        	//System.out.println(mouseEvent.button);
             if(Settings.fpsMode && mouseEvent.button == 3) {
             	handleKeyPress(57);
             	return;
@@ -1569,7 +1569,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         	int dx = mouseEvent.x - canvas.getSize().x / 2;
 
         	if(canvas.toControl(display.getCursorLocation()).x == canvas.getSize().x / 2) {
-        		System.out.println("stop");
+        		//System.out.println("stop");
         		if(fpsWasRight) {
                 	mr(-4);
                 	fpsWasRight = false;
@@ -1651,7 +1651,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
             EmulatorScreen.aviWriter.method842();
             EmulatorScreen.aviWriter = null;
         }
-        ((Class146)Emulator.getEmulator()).disposeSubWindows();
+        ((EmulatorImpl)Emulator.getEmulator()).disposeSubWindows();
         Emulator.notifyDestroyed();
         if (this.pauseState != 0) {
             Emulator.getEventQueue().queue(11);
@@ -1673,11 +1673,11 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
             }
         }
         final Shell method330;
-        if (((Class146)Emulator.getEmulator()).method825().method610() && !((Widget)(method330 = ((Class146)Emulator.getEmulator()).method825().method611())).isDisposed()) {
+        if (((EmulatorImpl)Emulator.getEmulator()).method825().method610() && !((Widget)(method330 = ((EmulatorImpl)Emulator.getEmulator()).method825().method611())).isDisposed()) {
             ((Control)method330).setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
         }
         final Shell method331;
-        if (((Class146)Emulator.getEmulator()).method826().method834() && !((Widget)(method331 = ((Class146)Emulator.getEmulator()).method826().method833())).isDisposed()) {
+        if (((EmulatorImpl)Emulator.getEmulator()).method826().method834() && !((Widget)(method331 = ((EmulatorImpl)Emulator.getEmulator()).method826().method833())).isDisposed()) {
             ((Control)method331).setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
         }
     }
@@ -1831,14 +1831,14 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
             final ShellPosition shellPosition = this.aClass93_1196.new ShellPosition(aClass93_1196, 0, 0, true);
             while (System.currentTimeMillis() - EmulatorScreen.method567(this.aClass93_1196) < EmulatorScreen.method575(this.aClass93_1196) && !this.aBoolean1194) {
                 if (EmulatorScreen.method566(this.aClass93_1196) != 2) {
-                    Class146.syncExec(shellPosition);
+                    EmulatorImpl.syncExec(shellPosition);
                     this.anInt1197 = shellPosition.anInt1478;
                     this.anInt1198 = shellPosition.anInt1481;
                     if (this.anInt1193++ > 10) {
-                        Class146.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197 + this.aRandom1195.nextInt() % 5, this.anInt1198 + this.aRandom1195.nextInt() % 5, false));
+                        EmulatorImpl.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197 + this.aRandom1195.nextInt() % 5, this.anInt1198 + this.aRandom1195.nextInt() % 5, false));
                         this.anInt1193 = 0;
                     }
-                    Class146.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197, this.anInt1198, false));
+                    EmulatorImpl.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197, this.anInt1198, false));
                 }
                 try {
                     Thread.sleep(1L);
@@ -1866,7 +1866,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                 case 0: {
                     if (Settings.showMemViewFrame) {
                         this.aClass93_1059.aMenuItem961.setSelection(true);
-                        ((Class146)Emulator.getEmulator()).method823().method621();
+                        ((EmulatorImpl)Emulator.getEmulator()).method823().method621();
                         return;
                     }
                     break;
@@ -1883,7 +1883,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                     if (Settings.showInfoFrame) {
                         this.aClass93_1059.infosMenuItem.setSelection(true);
                         ((Control)EmulatorScreen.method558(this.aClass93_1059)).setCursor(new Cursor((Device)EmulatorScreen.method564(), 2));
-                        ((Class146)Emulator.getEmulator()).method825().method607(EmulatorScreen.method561(this.aClass93_1059));
+                        ((EmulatorImpl)Emulator.getEmulator()).method825().method607(EmulatorScreen.method561(this.aClass93_1059));
                         break;
                     }
                     break;
@@ -1892,9 +1892,14 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         }
     }
 
-	@Override
 	public void mouseScrolled(MouseEvent arg0) {
-    	if(arg0.count < 0) {
+        if (this.pauseState == 0 || Settings.q) {
+            return;
+        }
+		int k = 0;
+    	if(arg0.count < 0) { 
+    		k = Integer.parseInt(Keyboard.method605(2));
+    		/*
     		Event e = new Event();
     		e.widget = this.canvas;
     		KeyEvent ke = new KeyEvent(e);
@@ -1904,8 +1909,10 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
     		ke.stateMask = 0;
     		this.keyPressed(ke);
     		this.keyReleased(ke);
-    	} else
-    	{
+    		*/
+    	} else if(arg0.count > 0) { 
+    		k = Integer.parseInt(Keyboard.method605(1));
+    		/*
     		Event e = new Event();
     		e.widget = this.canvas;
     		KeyEvent ke = new KeyEvent(e);
@@ -1915,6 +1922,11 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
     		ke.stateMask = 0;
     		this.keyPressed(ke);
     		this.keyReleased(ke);
+    		*/
+    	}
+    	if(k != 0) {
+    		mp(k);
+    		mr(k);
     	}
 		
 	}

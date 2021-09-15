@@ -4,7 +4,7 @@ import java.io.*;
 
 final class Class105 implements FileFilter
 {
-    Class105(final Class38 class38) {
+    Class105(final Property class38) {
         super();
     }
     

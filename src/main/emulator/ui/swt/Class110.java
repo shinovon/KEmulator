@@ -151,7 +151,7 @@ public final class Class110 implements DisposeListener
         this.aCLabel1155 = null;
         this.aProgressBar1092 = null;
         this.aButton1151 = null;
-        this.aDisplay1093 = Class146.getDisplay();
+        this.aDisplay1093 = EmulatorImpl.getDisplay();
         this.ana1079 = new a();
         this.aVector1112 = new Vector();
         this.anArrayList1110 = new ArrayList();
@@ -1017,7 +1017,7 @@ public final class Class110 implements DisposeListener
                 try {
                     if (System.currentTimeMillis() - this.aLong886 > this.aLong888 && !Class110.method671(this.aClass110_887)) {
                         Class110.method676(this.aClass110_887);
-                        Class146.syncExec(this.aClass110_887.new DoUpdate(aClass110_887));
+                        EmulatorImpl.syncExec(this.aClass110_887.new DoUpdate(aClass110_887));
                        
                         this.aLong886 = System.currentTimeMillis();
                     }

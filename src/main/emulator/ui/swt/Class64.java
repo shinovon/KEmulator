@@ -16,7 +16,7 @@ final class Refresher implements Runnable
             if (((Widget)Class90.method496(this.aClass90_830)).isDisposed()) {
                 return;
             }
-            Class146.syncExec(new Class10(this));
+            EmulatorImpl.syncExec(new Class10(this));
             try {
                 Thread.sleep(10L);
             }

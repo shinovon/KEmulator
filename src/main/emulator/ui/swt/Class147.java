@@ -6,7 +6,7 @@ final class SortProperties extends Properties
 {
     private static final long serialVersionUID = 1L;
     
-    private SortProperties(final Class38 class38) {
+    private SortProperties(final Property class38) {
         super();
     }
     
@@ -16,7 +16,7 @@ final class SortProperties extends Properties
         return Collections.enumeration((Collection)list);
     }
     
-    SortProperties(final Class38 class38, final Class117 class39) {
+    SortProperties(final Property class38, final Class117 class39) {
         this(class38);
     }
 }

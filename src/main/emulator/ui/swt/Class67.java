@@ -55,12 +55,12 @@ public final class Class67 implements ICaret
         this.anInt846 = 0;
         this.anInt847 = 0;
         this.anInt848 = 0;
-        Class146.syncExec(new Class121(this));
+        EmulatorImpl.syncExec(new Class121(this));
     }
     
     public final void defoucsItem(final TextField textField) {
         this.aTextField842 = null;
-        Class146.syncExec(new Class115(this));
+        EmulatorImpl.syncExec(new Class115(this));
     }
 
     public final void method474(int var1, int var2) {

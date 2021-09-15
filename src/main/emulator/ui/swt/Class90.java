@@ -621,7 +621,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
                 if (((Widget)Class90.method496(this.aClass90_830)).isDisposed()) {
                     return;
                 }
-                Class146.syncExec(new Class10(this));
+                EmulatorImpl.syncExec(new Class10(this));
                 try {
                     Thread.sleep(10L);
                 }

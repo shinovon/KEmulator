@@ -12,6 +12,6 @@ final class Class8 extends SelectionAdapter
     }
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        Class146.asyncExec(Class5.method308(this.aClass5_564));
+        EmulatorImpl.asyncExec(Class5.method308(this.aClass5_564));
     }
 }

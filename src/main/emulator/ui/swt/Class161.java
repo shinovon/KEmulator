@@ -175,11 +175,11 @@ public final class Class161 implements ControlListener, DisposeListener
     }
     
     private static void method832(final int n) {
-        ((Class146)Emulator.getEmulator()).method821().handleKeyPress(Integer.parseInt(Keyboard.aStringArray1064[n]));
+        ((EmulatorImpl)Emulator.getEmulator()).getEmulatorScreen().handleKeyPress(Integer.parseInt(Keyboard.aStringArray1064[n]));
     }
     
     private static void method839(final int n) {
-        ((Class146)Emulator.getEmulator()).method821().handleKeyRelease(Integer.parseInt(Keyboard.aStringArray1064[n]));
+        ((EmulatorImpl)Emulator.getEmulator()).getEmulatorScreen().handleKeyRelease(Integer.parseInt(Keyboard.aStringArray1064[n]));
     }
     
     public final Shell method833() {

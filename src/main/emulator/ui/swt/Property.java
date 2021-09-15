@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.*;
 
-public final class Class38 implements IProperty
+public final class Property implements IProperty
 {
     private static Display aDisplay656;
     private Shell aShell655;
@@ -172,7 +172,7 @@ public final class Class38 implements IProperty
 	private Button rpcBtn;
 	private Button antiAliasBtn;
     
-    public Class38() {
+    public Property() {
         super();
         this.aShell655 = null;
         this.aCombo657 = null;
@@ -310,15 +310,15 @@ public final class Class38 implements IProperty
     }
     
     public final void method354(final Shell shell) {
-        Class38.aDisplay656 = ((Widget)shell).getDisplay();
+        Property.aDisplay656 = ((Widget)shell).getDisplay();
         this.method372(shell);
         ((Control)this.aShell655).pack();
         ((Control)this.aShell655).setSize(480, this.aShell655.getSize().y);
         ((Control)this.aShell655).setLocation(shell.getLocation().x + (shell.getSize().x - this.aShell655.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aShell655.getSize().y >> 1));
         this.aShell655.open();
         while (!((Widget)this.aShell655).isDisposed()) {
-            if (!Class38.aDisplay656.readAndDispatch()) {
-                Class38.aDisplay656.sleep();
+            if (!Property.aDisplay656.readAndDispatch()) {
+                Property.aDisplay656.sleep();
             }
         }
         this.anIImage671 = null;
@@ -655,25 +655,25 @@ public final class Class38 implements IProperty
         this.down = this.aText718.getText().trim();
         this.left = this.aText723.getText().trim();
         this.right = this.aText727.getText().trim();
-        Keyboard.method596(17, Keyboard.method601(Class38.aStringArray661[17]));
-        Keyboard.method596(18, Keyboard.method601(Class38.aStringArray661[18]));
-        Keyboard.method596(14, Keyboard.method601(Class38.aStringArray661[14]));
-        Keyboard.method596(15, Keyboard.method601(Class38.aStringArray661[15]));
-        Keyboard.method596(12, Keyboard.method601(Class38.aStringArray661[12]));
-        Keyboard.method596(13, Keyboard.method601(Class38.aStringArray661[13]));
-        Keyboard.method596(16, Keyboard.method601(Class38.aStringArray661[16]));
-        Keyboard.method596(10, Keyboard.method601(Class38.aStringArray661[10]));
-        Keyboard.method596(11, Keyboard.method601(Class38.aStringArray661[11]));
-        Keyboard.method596(1, Keyboard.method601(Class38.aStringArray661[1]));
-        Keyboard.method596(2, Keyboard.method601(Class38.aStringArray661[2]));
-        Keyboard.method596(3, Keyboard.method601(Class38.aStringArray661[3]));
-        Keyboard.method596(4, Keyboard.method601(Class38.aStringArray661[4]));
-        Keyboard.method596(5, Keyboard.method601(Class38.aStringArray661[5]));
-        Keyboard.method596(6, Keyboard.method601(Class38.aStringArray661[6]));
-        Keyboard.method596(7, Keyboard.method601(Class38.aStringArray661[7]));
-        Keyboard.method596(8, Keyboard.method601(Class38.aStringArray661[8]));
-        Keyboard.method596(9, Keyboard.method601(Class38.aStringArray661[9]));
-        Keyboard.method596(0, Keyboard.method601(Class38.aStringArray661[0]));
+        Keyboard.method596(17, Keyboard.method601(Property.aStringArray661[17]));
+        Keyboard.method596(18, Keyboard.method601(Property.aStringArray661[18]));
+        Keyboard.method596(14, Keyboard.method601(Property.aStringArray661[14]));
+        Keyboard.method596(15, Keyboard.method601(Property.aStringArray661[15]));
+        Keyboard.method596(12, Keyboard.method601(Property.aStringArray661[12]));
+        Keyboard.method596(13, Keyboard.method601(Property.aStringArray661[13]));
+        Keyboard.method596(16, Keyboard.method601(Property.aStringArray661[16]));
+        Keyboard.method596(10, Keyboard.method601(Property.aStringArray661[10]));
+        Keyboard.method596(11, Keyboard.method601(Property.aStringArray661[11]));
+        Keyboard.method596(1, Keyboard.method601(Property.aStringArray661[1]));
+        Keyboard.method596(2, Keyboard.method601(Property.aStringArray661[2]));
+        Keyboard.method596(3, Keyboard.method601(Property.aStringArray661[3]));
+        Keyboard.method596(4, Keyboard.method601(Property.aStringArray661[4]));
+        Keyboard.method596(5, Keyboard.method601(Property.aStringArray661[5]));
+        Keyboard.method596(6, Keyboard.method601(Property.aStringArray661[6]));
+        Keyboard.method596(7, Keyboard.method601(Property.aStringArray661[7]));
+        Keyboard.method596(8, Keyboard.method601(Property.aStringArray661[8]));
+        Keyboard.method596(9, Keyboard.method601(Property.aStringArray661[9]));
+        Keyboard.method596(0, Keyboard.method601(Property.aStringArray661[0]));
         Devices.method618("KEY_S1", this.lsoft);
         Devices.method618("KEY_S2", this.rsoft);
         Devices.method618("KEY_FIRE", this.fire);
@@ -682,7 +682,7 @@ public final class Class38 implements IProperty
         Devices.method618("KEY_LEFT", this.left);
         Devices.method618("KEY_RIGHT", this.right);
         Devices.method619();
-        Keyboard.method599();
+        Keyboard.init();
         if (Settings.enableKeyCache != this.aButton696.getSelection()) {
             Keyboard.aStack1063.clear();
             Settings.enableKeyCache = this.aButton696.getSelection();
@@ -1293,25 +1293,25 @@ public final class Class38 implements IProperty
     }
     
     private void method404() {
-        Class38.aStringArray661[0] = this.aText627.getText().trim();
-        Class38.aStringArray661[1] = this.aText754.getText().trim();
-        Class38.aStringArray661[2] = this.aText757.getText().trim();
-        Class38.aStringArray661[3] = this.aText760.getText().trim();
-        Class38.aStringArray661[4] = this.aText763.getText().trim();
-        Class38.aStringArray661[5] = this.aText766.getText().trim();
-        Class38.aStringArray661[6] = this.aText768.getText().trim();
-        Class38.aStringArray661[7] = this.aText770.getText().trim();
-        Class38.aStringArray661[8] = this.aText772.getText().trim();
-        Class38.aStringArray661[9] = this.aText774.getText().trim();
-        Class38.aStringArray661[10] = this.aText629.getText().trim();
-        Class38.aStringArray661[11] = this.aText631.getText().trim();
-        Class38.aStringArray661[14] = this.aText739.getText().trim();
-        Class38.aStringArray661[15] = this.aText742.getText().trim();
-        Class38.aStringArray661[12] = this.aText745.getText().trim();
-        Class38.aStringArray661[13] = this.aText748.getText().trim();
-        Class38.aStringArray661[16] = this.aText751.getText().trim();
-        Class38.aStringArray661[17] = this.aText731.getText().trim();
-        Class38.aStringArray661[18] = this.aText735.getText().trim();
+        Property.aStringArray661[0] = this.aText627.getText().trim();
+        Property.aStringArray661[1] = this.aText754.getText().trim();
+        Property.aStringArray661[2] = this.aText757.getText().trim();
+        Property.aStringArray661[3] = this.aText760.getText().trim();
+        Property.aStringArray661[4] = this.aText763.getText().trim();
+        Property.aStringArray661[5] = this.aText766.getText().trim();
+        Property.aStringArray661[6] = this.aText768.getText().trim();
+        Property.aStringArray661[7] = this.aText770.getText().trim();
+        Property.aStringArray661[8] = this.aText772.getText().trim();
+        Property.aStringArray661[9] = this.aText774.getText().trim();
+        Property.aStringArray661[10] = this.aText629.getText().trim();
+        Property.aStringArray661[11] = this.aText631.getText().trim();
+        Property.aStringArray661[14] = this.aText739.getText().trim();
+        Property.aStringArray661[15] = this.aText742.getText().trim();
+        Property.aStringArray661[12] = this.aText745.getText().trim();
+        Property.aStringArray661[13] = this.aText748.getText().trim();
+        Property.aStringArray661[16] = this.aText751.getText().trim();
+        Property.aStringArray661[17] = this.aText731.getText().trim();
+        Property.aStringArray661[18] = this.aText735.getText().trim();
     }
     
     private void method406() {
@@ -1322,26 +1322,26 @@ public final class Class38 implements IProperty
         Text text;
         String method744;
         if (selectionIndex == 0) {
-            this.aText627.setText(Class38.aStringArray661[0]);
-            this.aText754.setText(Class38.aStringArray661[1]);
-            this.aText757.setText(Class38.aStringArray661[2]);
-            this.aText760.setText(Class38.aStringArray661[3]);
-            this.aText763.setText(Class38.aStringArray661[4]);
-            this.aText766.setText(Class38.aStringArray661[5]);
-            this.aText768.setText(Class38.aStringArray661[6]);
-            this.aText770.setText(Class38.aStringArray661[7]);
-            this.aText772.setText(Class38.aStringArray661[8]);
-            this.aText774.setText(Class38.aStringArray661[9]);
-            this.aText629.setText(Class38.aStringArray661[10]);
-            this.aText631.setText(Class38.aStringArray661[11]);
-            this.aText739.setText(Class38.aStringArray661[14]);
-            this.aText742.setText(Class38.aStringArray661[15]);
-            this.aText745.setText(Class38.aStringArray661[12]);
-            this.aText748.setText(Class38.aStringArray661[13]);
-            this.aText751.setText(Class38.aStringArray661[16]);
-            this.aText731.setText(Class38.aStringArray661[17]);
+            this.aText627.setText(Property.aStringArray661[0]);
+            this.aText754.setText(Property.aStringArray661[1]);
+            this.aText757.setText(Property.aStringArray661[2]);
+            this.aText760.setText(Property.aStringArray661[3]);
+            this.aText763.setText(Property.aStringArray661[4]);
+            this.aText766.setText(Property.aStringArray661[5]);
+            this.aText768.setText(Property.aStringArray661[6]);
+            this.aText770.setText(Property.aStringArray661[7]);
+            this.aText772.setText(Property.aStringArray661[8]);
+            this.aText774.setText(Property.aStringArray661[9]);
+            this.aText629.setText(Property.aStringArray661[10]);
+            this.aText631.setText(Property.aStringArray661[11]);
+            this.aText739.setText(Property.aStringArray661[14]);
+            this.aText742.setText(Property.aStringArray661[15]);
+            this.aText745.setText(Property.aStringArray661[12]);
+            this.aText748.setText(Property.aStringArray661[13]);
+            this.aText751.setText(Property.aStringArray661[16]);
+            this.aText731.setText(Property.aStringArray661[17]);
             text = this.aText735;
-            method744 = Class38.aStringArray661[18];
+            method744 = Property.aStringArray661[18];
         }
         else {
             final int n = selectionIndex - 1;
@@ -1373,7 +1373,7 @@ public final class Class38 implements IProperty
         if (this.aCombo699 == null || ((Widget)this.aCombo699).isDisposed()) {
             return false;
         }
-        Class146.asyncExec(new Class193(this));
+        EmulatorImpl.asyncExec(new Class193(this));
         return true;
     }
     
@@ -1498,14 +1498,14 @@ public final class Class38 implements IProperty
         layoutData.horizontalAlignment = 4;
         ((Control)(this.aCombo689 = new Combo(this.aComposite710, 8))).setLayoutData((Object)layoutData);
         this.aCombo689.addModifyListener((ModifyListener)new Class191(this));
-        final FontData[] fontList = ((Device)Class38.aDisplay656).getFontList((String)null, true);
+        final FontData[] fontList = ((Device)Property.aDisplay656).getFontList((String)null, true);
         final ArrayList<Comparable> list = new ArrayList<Comparable>();
         for (int i = 0; i < fontList.length; ++i) {
             if (!list.contains(fontList[i].getName()) && !fontList[i].getName().startsWith("@")) {
                 list.add(fontList[i].getName());
             }
         }
-        final FontData[] fontList2 = ((Device)Class38.aDisplay656).getFontList((String)null, false);
+        final FontData[] fontList2 = ((Device)Property.aDisplay656).getFontList((String)null, false);
         for (int j = 0; j < fontList2.length; ++j) {
             if (!list.contains(fontList2[j].getName()) && !fontList2[j].getName().startsWith("@")) {
                 list.add(fontList2[j].getName());
@@ -1859,192 +1859,192 @@ public final class Class38 implements IProperty
         Authenticator.setDefault(new MyAuthenticator(this, Settings.proxyUser, Settings.proxyPass));
     }
     
-    static Combo method361(final Class38 class38) {
+    static Combo method361(final Property class38) {
         return class38.aCombo657;
     }
     
-    static void method362(final Class38 class38) {
+    static void method362(final Property class38) {
         class38.method387();
     }
     
-    static void method375(final Class38 class38) {
+    static void method375(final Property class38) {
         class38.method358();
     }
     
-    static Shell method364(final Class38 class38) {
+    static Shell method364(final Property class38) {
         return class38.aShell655;
     }
     
-    static Scale method370(final Class38 class38) {
+    static Scale method370(final Property class38) {
         return class38.aScale669;
     }
     
-    static CLabel method363(final Class38 class38) {
+    static CLabel method363(final Property class38) {
         return class38.aCLabel738;
     }
     
-    static Combo method376(final Class38 class38) {
+    static Combo method376(final Property class38) {
         return class38.aCombo699;
     }
     
-    static Text method366(final Class38 class38) {
+    static Text method366(final Property class38) {
         return class38.aText731;
     }
     
     static String[] method365() {
-        return Class38.aStringArray661;
+        return Property.aStringArray661;
     }
     
-    static Text method377(final Class38 class38) {
+    static Text method377(final Property class38) {
         return class38.aText735;
     }
     
-    static Text method380(final Class38 class38) {
+    static Text method380(final Property class38) {
         return class38.aText754;
     }
     
-    static Text method385(final Class38 class38) {
+    static Text method385(final Property class38) {
         return class38.aText757;
     }
     
-    static Text method388(final Class38 class38) {
+    static Text method388(final Property class38) {
         return class38.aText760;
     }
     
-    static Text method391(final Class38 class38) {
+    static Text method391(final Property class38) {
         return class38.aText763;
     }
     
-    static Text method394(final Class38 class38) {
+    static Text method394(final Property class38) {
         return class38.aText766;
     }
     
-    static Text method397(final Class38 class38) {
+    static Text method397(final Property class38) {
         return class38.aText768;
     }
     
-    static Text method399(final Class38 class38) {
+    static Text method399(final Property class38) {
         return class38.aText770;
     }
     
-    static Text method401(final Class38 class38) {
+    static Text method401(final Property class38) {
         return class38.aText772;
     }
     
-    static Text method403(final Class38 class38) {
+    static Text method403(final Property class38) {
         return class38.aText774;
     }
     
-    static Text method405(final Class38 class38) {
+    static Text method405(final Property class38) {
         return class38.aText627;
     }
     
-    static Text method407(final Class38 class38) {
+    static Text method407(final Property class38) {
         return class38.aText629;
     }
     
-    static Text method409(final Class38 class38) {
+    static Text method409(final Property class38) {
         return class38.aText631;
     }
     
-    static Text method411(final Class38 class38) {
+    static Text method411(final Property class38) {
         return class38.aText739;
     }
     
-    static Text method413(final Class38 class38) {
+    static Text method413(final Property class38) {
         return class38.aText742;
     }
     
-    static Text method415(final Class38 class38) {
+    static Text method415(final Property class38) {
         return class38.aText745;
     }
     
-    static Text method417(final Class38 class38) {
+    static Text method417(final Property class38) {
         return class38.aText748;
     }
     
-    static Text method419(final Class38 class38) {
+    static Text method419(final Property class38) {
         return class38.aText751;
     }
     
-    static void method381(final Class38 class38) {
+    static void method381(final Property class38) {
         class38.method406();
     }
     
-    static void method386(final Class38 class38) {
+    static void method386(final Property class38) {
         class38.method402();
     }
     
-    static void method369(final Class38 class38, final int n) {
+    static void method369(final Property class38, final int n) {
         class38.method360(n);
     }
     
-    static IImage method356(final Class38 class38) {
+    static IImage method356(final Property class38) {
         return class38.anIImage671;
     }
     
-    static IImage method378(final Class38 class38) {
+    static IImage method378(final Property class38) {
         return class38.anIImage674;
     }
     
-    static IImage method382(final Class38 class38) {
+    static IImage method382(final Property class38) {
         return class38.anIImage693;
     }
     
-    static Table method367(final Class38 class38) {
+    static Table method367(final Property class38) {
         return class38.aTable665;
     }
     
-    static String method368(final Class38 class38) {
+    static String method368(final Property class38) {
         return class38.method374();
     }
     
-    static void method389(final Class38 class38) {
+    static void method389(final Property class38) {
         class38.method428();
     }
     
-    static Text method421(final Class38 class38) {
+    static Text method421(final Property class38) {
         return class38.aText662;
     }
     
-    static void method392(final Class38 class38) {
+    static void method392(final Property class38) {
         class38.method352();
     }
     
-    static Combo method383(final Class38 class38) {
+    static Combo method383(final Property class38) {
         return class38.aCombo706;
     }
     
-    static Text method423(final Class38 class38) {
+    static Text method423(final Property class38) {
         return class38.aText635;
     }
     
-    static Text method425(final Class38 class38) {
+    static Text method425(final Property class38) {
         return class38.aText637;
     }
     
-    static Text method427(final Class38 class38) {
+    static Text method427(final Property class38) {
         return class38.aText639;
     }
     
-    static Text method429(final Class38 class38) {
+    static Text method429(final Property class38) {
         return class38.aText641;
     }
     
-    static Text method431(final Class38 class38) {
+    static Text method431(final Property class38) {
         return class38.aText643;
     }
     
-    static Button method357(final Class38 class38) {
+    static Button method357(final Property class38) {
         return class38.aButton764;
     }
     
-    static void method395(final Class38 class38) {
+    static void method395(final Property class38) {
         method351();
     }
     
     static {
-        Class38.aStringArray661 = new String[19];
+        Property.aStringArray661 = new String[19];
     }
     
     private final class MyAuthenticator extends Authenticator
@@ -2052,7 +2052,7 @@ public final class Class38 implements IProperty
         private String aString780;
         private String aString781;
         
-        MyAuthenticator(final Class38 class38, final String aString780, final String aString781) {
+        MyAuthenticator(final Property class38, final String aString780, final String aString781) {
             super();
             this.aString780 = aString780;
             this.aString781 = aString781;
@@ -2067,7 +2067,7 @@ public final class Class38 implements IProperty
     {
         private static final long serialVersionUID = 1L;
         
-        private SortProperties(final Class38 class38) {
+        private SortProperties(final Property class38) {
             super();
         }
         
@@ -2077,7 +2077,7 @@ public final class Class38 implements IProperty
             return Collections.enumeration((Collection)list);
         }
         
-        SortProperties(final Class38 class38, final Class117 class39) {
+        SortProperties(final Property class38, final Class117 class39) {
             this(class38);
         }
     }

@@ -15,7 +15,7 @@ final class Class6 extends TreeAdapter
     public final void treeExpanded(final TreeEvent treeEvent) {
         if (!((TreeItem)((SelectionEvent)treeEvent).item).getExpanded()) {
             Class5.method316(this.aClass5_562, (TreeItem)((SelectionEvent)treeEvent).item);
-            Class146.asyncExec(Class5.method308(this.aClass5_562));
+            EmulatorImpl.asyncExec(Class5.method308(this.aClass5_562));
         }
     }
 }

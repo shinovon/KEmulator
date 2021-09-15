@@ -21,7 +21,7 @@ final class WindowOpen implements Runnable
             case 0: {
                 if (Settings.showMemViewFrame) {
                     this.aClass93_1059.aMenuItem961.setSelection(true);
-                    ((Class146)Emulator.getEmulator()).method823().method621();
+                    ((EmulatorImpl)Emulator.getEmulator()).method823().method621();
                     return;
                 }
                 break;
@@ -38,7 +38,7 @@ final class WindowOpen implements Runnable
                 if (Settings.showInfoFrame) {
                     this.aClass93_1059.infosMenuItem.setSelection(true);
                     ((Control)EmulatorScreen.method558(this.aClass93_1059)).setCursor(new Cursor((Device)EmulatorScreen.method564(), 2));
-                    ((Class146)Emulator.getEmulator()).method825().method607(EmulatorScreen.method561(this.aClass93_1059));
+                    ((EmulatorImpl)Emulator.getEmulator()).method825().method607(EmulatorScreen.method561(this.aClass93_1059));
                     break;
                 }
                 break;
