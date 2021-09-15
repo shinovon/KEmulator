@@ -1,0 +1,1356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<devices>
+	
+	<api name="J2ME">		
+		<define name="KEY_UP" 	    value="-1"/>
+		<define name="KEY_DOWN" 	value="-2"/>
+		<define name="KEY_LEFT" 	value="-3"/>
+		<define name="KEY_RIGHT" 	value="-4"/>
+		<define name="KEY_FIRE" 	value="-5"/>
+		<define name="KEY_S1" 	    value="21"/>
+		<define name="KEY_S2" 	    value="22"/>
+	</api>		
+	
+	<api name="Sprint" parent="J2ME">
+		<switch name="Sprint" 		value="1"/>		
+		<define name="KEY_UP" 	    value="-1"/>
+		<define name="KEY_DOWN" 	value="-2"/>
+		<define name="KEY_LEFT" 	value="-3"/>
+		<define name="KEY_RIGHT" 	value="-4"/>
+		<define name="KEY_FIRE" 	value="-5"/>
+		<define name="KEY_S1" 	    value="-8"/>
+		<define name="KEY_S2" 	    value="-7"/>
+	</api>
+	
+	<api name="Nokia" parent="J2ME">
+		<define name="NOKIA_UI" 	value="1"/>		
+		<define name="KEY_S1" 	    value="-6"/>
+		<define name="KEY_S2" 	    value="-7"/>
+	</api>
+				
+	<family name="Nokia_SERIES30" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="96"/>
+		<define name="SCREEN_HEIGHT" 	value="65"/>
+	</family>
+	
+	<device name="Sanyo_8100" parent="Sprint">
+		<define name="SCREEN_WIDTH" 	value="120"/>
+		<define name="SCREEN_HEIGHT" 	value="112"/>
+	</device>
+	
+	<device name="Sanyo_5500_7300_8200" parent="Sprint">
+		<define name="SCREEN_WIDTH" 	value="132"/>
+		<define name="SCREEN_HEIGHT" 	value="144"/>
+		
+        <define name="KEY_UP" 	    value="1"/>
+		<define name="KEY_DOWN" 	value="6"/>
+		<define name="KEY_LEFT" 	value="2"/>
+		<define name="KEY_RIGHT" 	value="5"/>
+		<define name="KEY_FIRE" 	value="8"/>
+		<define name="KEY_S1" 	    value="-6"/>
+		<define name="KEY_S2" 	    value="-7"/>
+	</device>
+	
+	<device name="Sanyo_5400" parent="Sprint">
+	</device>
+	
+	<device name="Sanyo_2300_4920_4930" parent="Sprint">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="96"/>
+		
+		<define name="KEY_UP" 	    value="1"/>
+		<define name="KEY_DOWN" 	value="6"/>
+		<define name="KEY_LEFT" 	value="2"/>
+		<define name="KEY_RIGHT" 	value="5"/>
+		<define name="KEY_FIRE" 	value="8"/>
+		<define name="KEY_S1" 	    value="21"/>
+		<define name="KEY_S2" 	    value="22"/>
+	</device>
+	
+	<device name="Sanyo_7400_7500_8300" parent="Sprint">
+		<define name="SCREEN_WIDTH" 	value="176"/>
+		<define name="SCREEN_HEIGHT" 	value="220"/>
+	</device>
+
+	<device name="Samsung_A620" parent="Sprint">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="146"/>
+	</device>
+	
+	<device name="Samsung_SGH-D600_SGH-D800" parent="Sprint">
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+	</device>
+	
+	<device name="Nokia_3510_3595" parent="Nokia_SERIES30">
+        <define name="OVERRIDE_NAME" value="Nokia3510i"/>
+        <define name="PLATFORM_VERSION" value="1.0"/>
+        <define name="MIDP10_CLDC10" value="1"/>
+	</device>
+
+	<family name="Nokia_SERIES40" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="128"/>
+	</family>
+	
+	<device name="Nokia_6610i_6030_6230_7250" parent="Nokia_SERIES40">
+        <define name="OVERRIDE_NAME" value="Nokia6230"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="03.15"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+	</device>
+				
+	<device name="Nokia_6270_6280" parent="Nokia">
+        <define name="OVERRIDE_NAME" value="Nokia6270"/>
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="3.53"/>
+	</device>
+
+	<family name="Nokia_SERIES60" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="176"/>
+		<define name="SCREEN_HEIGHT" 	value="208"/>
+	</family>
+
+	<family name="S603rdFP2" parent="Nokia_SERIES60">
+		<define name="SCREEN_WIDTH" 	value="320"/>
+		<define name="SCREEN_HEIGHT" 	value="240"/>
+		<define name="PLATFORM_VERSION" 	value="031.023"/>
+		<define name="SW_PLATFORM" 	value="S60"/>
+		<define name="SW_PLATFORM_VERSION" 	value="3.2"/>
+        <define name="S60_VERSION" value="3.2"/>
+		<define name="SYMBIANOS_VERSION" 	value="9.3"/>
+        <define name="MIDP21_CLDC11" value="1"/>
+	</family>
+	
+	<device name="NokiaE72" parent="S603rdFP2">
+        <define name="R" value="1"/>
+		<define name="SCREEN_WIDTH" 	value="320"/>
+		<define name="SCREEN_HEIGHT" 	value="240"/>
+	</device>
+
+	<family name="NokiaBelleRefresh" parent="S603rdFP2">
+		<define name="SCREEN_WIDTH" 	value="360"/>
+		<define name="SCREEN_HEIGHT" 	value="640"/>
+		<define name="PLATFORM_VERSION" 	value="111.040.1511"/>
+		<define name="SW_PLATFORM_VERSION" 	value="5.3"/>
+		<define name="SYMBIANOS_VERSION" 	value="3"/>
+        <define name="S60_VERSION" value="5.3"/>
+	</family>
+
+	<device name="NokiaE7" parent="NokiaBelleRefresh">
+        <define name="R" value="00"/>
+		<define name="SCREEN_WIDTH" 	value="360"/>
+		<define name="SCREEN_HEIGHT" 	value="640"/>
+	</device>
+
+	<device name="NokiaN8" parent="NokiaBelleRefresh">
+        <define name="R" value="00"/>
+		<define name="SCREEN_WIDTH" 	value="360"/>
+		<define name="SCREEN_HEIGHT" 	value="640"/>
+	</device>
+
+	<family name="NokiaBelleFP2" parent="NokiaBelleRefresh">
+		<define name="SCREEN_WIDTH" 	value="360"/>
+		<define name="SCREEN_HEIGHT" 	value="640"/>
+		<define name="PLATFORM_VERSION" 	value="113.010.1508"/>
+		<define name="SW_PLATFORM_VERSION" 	value="5.5"/>
+        <define name="S60_VERSION" value="5.5"/>
+	</family>
+
+	<device name="Nokia808PureView" parent="NokiaBelleFP2">
+		<define name="SCREEN_WIDTH" 	value="360"/>
+		<define name="SCREEN_HEIGHT" 	value="640"/>
+	</device>
+	
+	<device name="Nokia6700c" parent="Nokia_SERIES40">
+        <define name="R" value="1"/>
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+		<define name="PLATFORM_VERSION" 	value="13.10"/>
+        <define name="MIDP21_CLDC11" value="1"/>
+	</device>
+	
+	<family name="Jbed" parent="Nokia_SERIES40">
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+		<define name="PLATFORM_VERSION" 	value="Jbed-FastBCC"/>
+	</family>
+	
+	<device name="SpreadTrum6530" parent="Jbed">
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+	</device>
+	
+	<device name="Nokia7650" parent="Nokia_SERIES60">
+		<define name="PLATFORM_VERSION" 	value="1.0"/>
+		<define name="SYMBIANOS_VERSION" 	value="6.1"/>
+		<define name="S60_VERSION" 	value="0.9"/>
+        <define name="MIDP10_CLDC10" value="1"/>
+	</device>
+	
+    <device name="Nokia7260" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="128"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="03.36"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia7610" parent="Nokia_SERIES60">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="208"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="SYMBIANOS_VERSION" value="7.0"/>
+        <define name="S60_VERSION" value="2.1"/>
+        <define name="MIDP20_CLDC10" value="1"/>
+    </device>
+    <device name="NokiaN71" parent="Nokia_SERIES60">
+        <define name="R" value="1"/>
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0611"/>
+        <define name="S60_VERSION" value="3.0"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+	
+    <device name="Nokia3220" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="128"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="5.20"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6030" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="128"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6061" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="1.0"/>
+        <define name="PLATFORM_VERSION2" value="3.10"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6101" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="03.35"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>    
+    <device name="Nokia6102" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6102i" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6230" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="128"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="03.15"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6282" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6630" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="208"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="1.0"/>
+        <define name="PLATFORM_VERSION2" value="4.03.40"/>
+        <define name="SYMBIANOS_VERSION" value="8.0"/>
+        <define name="S60_VERSION" value="2.6"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+    <device name="Nokia6670" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="208"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="6.0522.0"/>
+        <define name="SYMBIANOS_VERSION" value="7.0s"/>
+        <define name="S60_VERSION" value="2.1"/>
+        <define name="MIDP20_CLDC10" value="1"/>
+    </device>
+    <device name="Nokia8801" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="208"/>
+        <define name="SCREEN_HEIGHT" value="208"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="PLATFORM_VERSION" value="2.0"/>
+        <define name="PLATFORM_VERSION2" value="03.60"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+
+    <device name="Samsung E700" parent="J2ME">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="144"/>
+	</device>
+	
+	<device name="Samsung SGH-E360_SGH-X640" parent="J2ME">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="160"/>
+	</device>
+
+	<family name="Motorola_Triplets" parent="J2ME">
+	
+		<define name="SCREEN_WIDTH" 	value="176"/>
+		<define name="SCREEN_HEIGHT" 	value="204"/>
+		
+        <define name="KEY_UP" 	    value="-1"/>
+        <define name="KEY_DOWN" 	value="-6"/>
+        <define name="KEY_LEFT" 	value="-2"/>
+        <define name="KEY_RIGHT" 	value="-5"/>
+        <define name="KEY_FIRE" 	value="-8"/>
+        <define name="KEY_S1" 	    value="-21"/>
+        <define name="KEY_S2" 	    value="-22"/>
+	</family>							
+	
+	<device name="Motorola i860" parent="Motorola_Triplets"/>
+	<device name="Motorola V360_V3_PEBL" parent="Motorola_Triplets"/>
+	<device name="Motorola U6_V500_V545_V547" parent="Motorola_Triplets"/>
+	
+	<device name="Motorola E1000" parent="Motorola_Triplets">
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+	</device>
+    
+    <device name="Audiovox CDM-8450" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="96"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="Sprint" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Audiovox CDM-8615" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="132"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="Sprint" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Audiovox CDM-8900" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="132"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="KEY_S1" value="-20"/>
+        <define name="KEY_S2" value="-21"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-10"/>
+        <define name="KEY_DOWN" value="-11"/>
+        <define name="KEY_LEFT" value="-12"/>
+        <define name="KEY_RIGHT" value="-13"/>
+    </device>
+    <device name="Audiovox CDM-8910" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="132"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="Sprint" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Audiovox PM-8920" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="132"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="Sprint" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="HTC Star Trek" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="266"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="57345"/>
+        <define name="KEY_S2" value="57346"/>
+        <define name="KEY_FIRE" value="13"/>
+        <define name="KEY_UP" value="-57377"/>
+        <define name="KEY_DOWN" value="-57378"/>
+        <define name="KEY_LEFT" value="-57379"/>
+        <define name="KEY_RIGHT" value="-57380"/>
+    </device>
+    <device name="LG C1500" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="128"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-202"/>
+        <define name="KEY_S2" value="-203"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="LG C2000" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-202"/>
+        <define name="KEY_S2" value="-203"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="LG CU400" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="LG F7200" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-202"/>
+        <define name="KEY_S2" value="-203"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="LG VX8100" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="203"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-20"/>
+        <define name="KEY_S2" value="-21"/>
+        <define name="KEY_FIRE" value="8"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Motorola C650" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="116"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola Capri" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="205"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>    
+    <device name="Motorola E398" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola i670" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="130"/>
+        <define name="SCREEN_HEIGHT" value="130"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-20"/>
+        <define name="KEY_S2" value="-21"/>
+        <define name="KEY_FIRE" value="-23"/>
+        <define name="KEY_UP" value="-10"/>
+        <define name="KEY_DOWN" value="-11"/>
+        <define name="KEY_LEFT" value="-13"/>
+        <define name="KEY_RIGHT" value="-12"/>
+    </device>
+    <device name="Motorola L2 (V270)" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="149"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola L6" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="149"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola PEBL U6 (V6)" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>    
+    <device name="Motorola RAZR V3" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>    
+    <device name="Motorola RAZR V3i" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola ROKR E1 (E790)" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>    
+    <device name="Motorola SLVR L7 (Royale_V8)" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V180" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="116"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V190" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="149"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V220" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="116"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="20"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>
+    <device name="Motorola V262" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="116"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-7"/>
+        <define name="KEY_S2" value="-8"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Motorola V300" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="21"/>
+        <define name="KEY_S2" value="22"/>
+        <define name="KEY_FIRE" value="20"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>    
+    <device name="Motorola V330" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V360" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V365" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V400" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="21"/>
+        <define name="KEY_S2" value="22"/>
+        <define name="KEY_FIRE" value="20"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>    
+    <device name="Motorola V550" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V551" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V557" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Motorola V600" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="21"/>
+        <define name="KEY_S2" value="22"/>
+        <define name="KEY_FIRE" value="20"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>
+    <device name="Motorola V635" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>    
+    <device name="Motorola V980" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="21"/>
+        <define name="KEY_S2" value="22"/>
+        <define name="KEY_FIRE" value="20"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>
+    <device name="Sagem myV-55" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="142"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-7"/>
+        <define name="KEY_S2" value="-6"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Sagem myX5" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="142"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-7"/>
+        <define name="KEY_S2" value="-6"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung C417" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung D807" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SCH-A950" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-D347" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-D357" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-D407" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-D500" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-E315" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-E316" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-E317" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-P207" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-T309" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-T719" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-X427m" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-X507" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-7"/>
+        <define name="KEY_S2" value="-6"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-ZX10" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="205"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung SGH-ZX20" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="205"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung T619" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Samsung T709" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="Samsung" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+    </device>
+    <device name="Sharp GX10" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="120"/>
+        <define name="SCREEN_HEIGHT" value="130"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="KEY_S1" value="21"/>
+        <define name="KEY_S2" value="22"/>
+        <define name="KEY_FIRE" value="8"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>
+    <device name="Sharp GX15" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="120"/>
+        <define name="SCREEN_HEIGHT" value="147"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-21"/>
+        <define name="KEY_S2" value="-22"/>
+        <define name="KEY_FIRE" value="-20"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-6"/>
+        <define name="KEY_LEFT" value="-2"/>
+        <define name="KEY_RIGHT" value="-5"/>
+    </device>
+    <device name="Sharp GX20" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="120"/>
+        <define name="SCREEN_HEIGHT" value="130"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="KEY_S1" value="21"/>
+        <define name="KEY_S2" value="22"/>
+        <define name="KEY_FIRE" value="8"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>
+    <device name="Sharp GX30" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="120"/>
+        <define name="SCREEN_HEIGHT" value="130"/>
+        <define name="MIDP_VERSION" value="10"/>
+        <define name="KEY_S1" value="21"/>
+        <define name="KEY_S2" value="22"/>
+        <define name="KEY_FIRE" value="8"/>
+        <define name="KEY_UP" value="1"/>
+        <define name="KEY_DOWN" value="6"/>
+        <define name="KEY_LEFT" value="2"/>
+        <define name="KEY_RIGHT" value="5"/>
+    </device>
+    <device name="Siemens C65" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="130"/>
+        <define name="SCREEN_HEIGHT" value="130"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-1"/>
+        <define name="KEY_S2" value="-4"/>
+        <define name="KEY_FIRE" value="-26"/>
+        <define name="KEY_UP" value="-59"/>
+        <define name="KEY_DOWN" value="-60"/>
+        <define name="KEY_LEFT" value="-61"/>
+        <define name="KEY_RIGHT" value="-62"/>
+    </device>
+    <device name="Siemens CV65" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="130"/>
+        <define name="SCREEN_HEIGHT" value="130"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-1"/>
+        <define name="KEY_S2" value="-4"/>
+        <define name="KEY_FIRE" value="-26"/>
+        <define name="KEY_UP" value="-59"/>
+        <define name="KEY_DOWN" value="-60"/>
+        <define name="KEY_LEFT" value="-61"/>
+        <define name="KEY_RIGHT" value="-62"/>
+    </device>
+    <device name="Siemens CX65" parent="J2ME">
+        <define name="SCREEN_WIDTH" value="132"/>
+        <define name="SCREEN_HEIGHT" value="176"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="KEY_S1" value="-1"/>
+        <define name="KEY_S2" value="-4"/>
+        <define name="KEY_FIRE" value="-26"/>
+        <define name="KEY_UP" value="-59"/>
+        <define name="KEY_DOWN" value="-60"/>
+        <define name="KEY_LEFT" value="-61"/>
+        <define name="KEY_RIGHT" value="-62"/>
+    </device>
+    <device name="SonyEricssonF500i" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonJ300a" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="128"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonK300a" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="128"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonK500i" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonK510i" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonK700i" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonK750" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonK800" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonS700i" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonV800" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonW600" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonW810i" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
+        <define name="MIDP_VERSION" value="20"/>
+    </device>
+    <device name="SonyEricssonZ500a" parent="Nokia">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+        <define name="MIDP_VERSION" value="10"/>   
+    </device>
+    
+    <device name="SonyEricssonK700" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="176"/>
+		<define name="SCREEN_HEIGHT" 	value="220"/>
+	</device>
+	
+	<device name="SonyEricssonJ300i" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="128"/>
+    </device>
+
+	<device name="SonyEricssonK500_Z520i" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="160"/>
+    </device>
+
+	<device name="SonyEricssonZ525" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="128"/>
+		<define name="SCREEN_HEIGHT" 	value="160"/>
+    </device>
+
+    <device name="SonyEricssonW900i" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+    </device>
+    
+    <device name="SonyEricssonS700" parent="Nokia">
+		<define name="SCREEN_WIDTH" 	value="240"/>
+		<define name="SCREEN_HEIGHT" 	value="320"/>
+    </device>
+    
+    <device name="320x480" parent="Nokia">
+        <define name="SCREEN_WIDTH"     value="320"/>
+        <define name="SCREEN_HEIGHT"    value="480"/>
+    </device>
+
+</devices>

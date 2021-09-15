@@ -1,0 +1,630 @@
+$KEmulator Usage
+==================
+
+$[Main Class]
+emulator.Emulator
+
+$[Program parameters]
+-jar    midlet jar path
+
+-cp     classes path [;]
+-midlet MIDlet class name
+-jad    jad path for -cp
+
+-device specify handset  e.g."SonyEricssonK750"
+
+-rec    specify key record
+
+-awt    use AWT Graphics 2D Engine
+-swt    use SWT GDI+ 2D Engine
+
+-lwj    use LWJ OpenGL 3D Engine
+-wgl    use SWT OpenGL 3D Engine
+
+-fontname	specify system font name
+-fontsmall	specify small font size
+-fontmedium	specify medium font size
+-fontlarge	specify large font size
+
+-log    open log frame on app start
+-key    custom key mapping [;]
+
+==================
+$[Files]
+KEmulator.jar    main jar
+KEmulator.exe    win32 launcher
+*.dll            win32 dlls
+
+\libs        auto-load libs
+\records     key records
+\capture     image & avi captures
+\rms         record store
+\file        file system
+property.txt properties of KEmulator
+log.txt      log file
+
+==================
+$[News & Log]
+$v1.0.3 mod nnproject v9 b9 [2021.09.06]
+Video player added (using vlcj)
+
+$v1.0.3 mod nnproject v9 b8 [2021.09.03]
+HTTP User-Agent changing depending on the device
+Added Nokia 808 PureView device
+
+$v1.0.3 mod nnproject v9 b7 [2021.08.18]
+Implemented setMediaTime at mp3 player
+Fixed mp3 player re-usage issues
+
+$v1.0.3 mod nnproject v9 b6 [2021.08.17]
+Fixed mp3 player restart causing NullPointerException
+
+$v1.0.3 mod nnproject v9 b4 [2021.07.14]
+Fixed not working Rotate Screen after yesterday build
+Fixed com.sprincpcs.media, com.samsung.util errors
+
+$v1.0.3 mod nnproject v9 b3 [2021.07.13]
+Added AWT Smooth drawing mode
+Fixed EventQueue overflow
+Additional thread for mouse events
+
+$v1.0.3 mod nnproject v9 b1 [2021.07.09]
+Fixed not working emulator hotkeys
+
+$v1.0.3 mod nnproject v8 [2021.07.07]
+Fixed NullPointerException when showing Alert without text
+
+$v1.0.3 mod nnproject v8 [2021.07.06]
+Implemented DataSource player
+
+$v1.0.3 mod nnproject v8 [2021.06.17]
+Added "Canvas keyboard" toggle
+
+$v1.0.3 mod nnproject v8 [2021.04.02]
+Fixed broken callSerially
+
+$v1.0.3 mod nnproject v8 [2021.03.22]
+Added discrod rich presence
+
+$v1.0.3 mod nnproject v7 [2021.01.31]
+Changed Class Watcher Combo Box size
+
+$v1.0.3 mod nnproject v7 [2021.01.20]
+Implemented NokiaUI 1.4 (partially)
+
+$v1.0.3 mod nnproject v7 [2021.01.18]
+Fixed MP3 Player
+Implemented getDuration at MP3 Player
+Fixed FileConnection bug
+Implemented capture://image
+
+$v1.0.3 mod nnproject v6 [2020.12.07]
+Some implementations for Vika Touch
+
+$v1.0.3 mod nnproject v5 [2020.12.05]
+Replaced cacerts to fix SSL errors
+Added NokiaN8, E7, E72, 6700c-1 devices. 
+
+$v1.0.3 mod nnproject v4 [2020.12.03]
+Fixed midi player delay
+Added VirtualMidiSynth support
+Fixed lcdui bugs
+
+$v1.0.3 mod nnproject v3 [2020.12.01]
+Fixed m3g, was broken by deobfuscation
+
+$v1.0.3 mod nnproject v2 [2020.11.24]
+Fixed not opening Profiler
+Fixed bugs created by deobfuscation
+
+$v1.0.3 modded by shinovon [2020.08.30]
+Fixed classes sort in MemoryView 
+Https connection fix
+Fixed IOException when response code is 401
+
+$v1.0.3 modded by max20091 [2015.08.26]
+Updated Java jre to ver 8 update 20
+Increase speed on low-end computers
+Fixed few bugs
+
+$v1.0.3 [2009.11.06]
+Partial BlackBerry support
+support MIDI,MP3 sound on samsung sound manager
+fixed JSR75 file connection bug
+
+$v1.0.2 [2009.09.02]
+sensor api(jsr 256)
+
+$v1.0.1 [2009.06.29]
+new feature,slow down the game
+sound mpeg(layer 1/2/3) is supported
+remain in focus when opening with extra windows
+fixed launching from share server path
+
+$v1.0.0 [2009.04.22]
+fixed sizeChange
+add Midlet->Open JAD with Notepad
+
+$v0.9.10 [2009.04.10]
+fixed MIDI VolumeControl
+fixed DataField.setInputMode
+remove multi-dims array mem calculation
+jad-open is supported on restart
+
+$v0.9.9 [2009.04.01]
+replace M3G implement with Swerve
+open game with JAD file
+support sizeChanged(rotation)
+keep frames open state
+add -log parameter
+add cumstom key mapping
+
+$v0.9.8 [2008.12.04]
+add some common used libs
+fixed Screen.setTitle(null)
+fixed END_OF_MEDIA
+
+$v0.9.7 [2008.10.18]
+pause system timer on pause/step
+fixed java.util.Timer as return type
+fixed textbox caret
+replace java.util.ZipFile(bugs)
+remove beanshell(rarely used)
+inside jre(for common users)
+
+$v0.9.6 [2008.08.30]
+add multi-language support
+jsr239(OpenGL ES) alpha
+
+$v0.9.5 [2008.07.06]
+add methods check for Vector
+fixed PlayerListener events
+optimized 3d rendering
+fixed MorphWeigths in AnimationTrack
+fixed java.util.Timer
+impl setFullScreenMode()
+
+$v0.9.4 [2008.04.02]
+suspend paint thread on interrupt
+add device identity for rms
+block paint after setCurrent
+fixed Object3D.addAnimationTrack
+fixed object instances track in memoryview
+fixed HttpConnection.close
+
+$v0.9.3 [2008.03.05]
+remove the section scheme check(M3G loading).
+refactor GameCanvas
+add texture view in MemoryView
+fixed luminance texture
+add font command line parameters
+add shortcut to right-click menu
+
+$v0.9.2 [2008.02.16]
+fixed Graphics.copyArea
+add BlueCove(jsr82) support
+
+$v0.9.1 [2008.01.15]
+fixed current display check
+fixed texture clamp wrapping
+
+$v0.9.0 [2007.12.13]
+add net-sync(for QA sync-testing)
+add force paint(for step debugging paint)
+
+$v0.8.9 [2007.12.09]
+fixed nokia rotation
+fixed getNextRecordID
+fixed Random
+update to lwjgl1.3
+new features in MemoryView(sort,save as)
+
+$v0.8.8 [2007.08.16]
+add kemulator.cfg to save platform info
+set min priority for repaint thread
+
+$v0.8.7 [2007.07.30]
+ignore png palette size check
+remove arithmetic check of matrix invert
+remove anti-aliasing in lwjgl(for texture error)
+fixed GameCanvas offscreen buffer
+
+$v0.8.6 [2007.06.25]
+fixed Manager.createPlayer
+fixed multi-thread rendering error in 3d
+[add context sync to LWJGL lib]
+[find out the solution from JOGL lib:)]
+
+$v0.8.5 [2007.06.18]
+ignore Image mutable check for nokia
+fxied Graphics.drawRGB()
+fixed method track
+fixed Player.getControl()
+fixed renderSprite3D
+fixed GameCanvas.getKeyStates()
+add missing microedition properties
+
+$v0.8.4 [2007.05.11]
+fixed alpha render of VertexArray
+fixed Group.removeChild(Node)
+fixed 32 color-depth in Graphics3D
+fixed method track
+fixed RecordStore.getRecord(int)
+fixed callSerially event
+optimized MorphingMesh
+optimized SkinnedMesh(cache bones)
+
+$v0.8.3 [2007.04.25]
+fixed fake currentTimeMillis
+add anchor check
+
+$v0.8.2 [2007.04.24]
+fixed MorphingMesh(missing scaleBias)
+fixed object[] in Watches
+fixed softkey error mapping
+update pim contacts
+add amr support from nokia
+add joystick support
+
+$v0.8.1 [2007.04.10]
+fixed Image2D(int,int,int)
+fixed avi FPS
+fixed drawPixels(alpha)
+add mascotv3 api definition
+
+$v0.8.0 [2007.04.05]
+fixed getResourceAsStream(relative)
+fixed drawPixels(Short)
+
+$v0.7.9 [2007.04.03]
+add keypad
+fixed repaint bug in 0.7.7
+fixed cnwap connection
+add proxy option
+
+$v0.7.8 [2007.03.26]
+add pre-check to Gdiplus.dll
+add emulator.ui.IPlugin interface
+update *.jar association
+
+$v0.7.7 [2007.03.25]
+fixed Group.duplicate()
+patch on m3g section load
+fixed Beanshell exit(0)
+add canvas rotation
+refactor Event delivery
+add methods view
+
+$v0.7.6 [2007.03.21]
+fixed media.player IOException
+fixed RecordStore idx update
+add track to operation new
+list all nodes in m3gview 
+fixed Graphics3D.render(Node,Transform)
+
+$v0.7.5 [2007.03.18]
+fixed SWTImage.createGraphics()
+fixed Image.createImage(Image,int,int,int,int,int)
+
+$v0.7.4 [2007.03.15]
+add SMS console
+fixed TextBox caret
+reset rms default folder
+add file connection api
+
+$v0.7.3 [2007.03.07]
+add cmwap connection support
+fixed failed launch with cn path
+add jsr75.jar
+
+$v0.7.2 [2007.03.04]
+fixed RecordStore.listRecordStores
+fixed auto-gen jad error encoding
+fixed textbox caret
+
+$v0.7.1 [2007.03.03]
+fixed createImage(width,height),fill with white
+fixed Object3D.addAnimationTrack
+fixed SkinnedMesh.getBoneVertices
+remove exception at Transformable.setTransform
+optimized MeshMorph & Transform3D
+add thread test in serviceRepaints
+new thread for canvas's invoke
+
+$v0.7.0 [2007.02.27]
+add KEmu-Platform property to jad
+update swt lib to version 3325
+
+$v0.6.9 [2007.02.09]
+fixed directGraphics from immutable image
+fixed appearance nullexception in meshrender
+
+$v0.6.8 [2007.02.06]
+patches on m3gview
+fixed Object3D.duplicate()
+fixed flushGraphics
+
+$v0.6.7 [2007.01.31]
+fixed Node.align
+revert the key accelerator
+
+$v0.6.6 [2007.01.24]
+fixed Random(), maxStack
+remove thread check in lwj Pbuffer
+fixed bg crop
+lcdui.TextField beta
+lcdui.TextBox
+lcdui.CustomItem
+lcdui.ImageItem
+
+$v0.6.5 [2007.01.22]
++pointer supported in List & Choice
+refactor m3gview bind
+
+$v0.6.4 [2007.01.16]
+fixed serviceRepaints
+fixed alpha data in swt convert
++lcdui.Ticker
++lcdui.StringItem
++lcdui.ChoiceGroup
++lcdui.List
+** add key record auto-play**
+
+$v0.6.3 [2007.01.10]
+fix 100% cpu utilization in some games
++load third party librarys from .\libs
+rework the AWTImage loading,fast
+
+$v0.6.2 [2007.01.05]
+fix BASELINE alignment in drawString
+fix non-static variable access in Watches
+fix callSerially overlapping in eventQueue
+add serviceRepaints block
+
+$v0.6.1 [2007.01.03]
+add wma interface
+add bluetooth interface
+M3GView beta
+
+$v0.6.0 [2007.01.02]
+remove the Background image format check
+associate deviceName with microedition.platform
+fixed memory calc in MemoryView & Watches
+list fields of superClasses in Watches
+
+$v0.5.9 [2006.12.27]
+fixed scale bug
+optimized databuffer for lwj
+inside java.library.path
+
+$v0.5.8 [2006.12.21]
+fixed x-ray in GameCanvas
+clear keys when lose focus
+fixed soundstop exception
+patch ASM in CR.readFrameType & MW.visitFrame
+
+$v0.5.7 [2006.12.19]
+add Pbuffer cache for LWJ binding
+fixed Font.substringWidth
+high level ui impl test
+fixed sound replay bug
+
+$v0.5.6 [2006.12.13]
+fixed graphics bind
+fixed object3D.find
+fixed g.drawString bug
+
+$v0.5.5 [2006.12.11]
+M3G api1.1 beta
+refactor the 3D engine
+fixed animation bug
+add rms option
+
+$v0.5.4 [2006.12.08]
+fixed directional Light
+texture transform
+add m3g loader
+fixed duplicate
+new infos show
+speed up/slow down ctrl
+
+$v0.5.3 [2006.12.03]
+mesh render
+fixed exec() bug
+fixed launch bug without new thread
+
+$v0.5.2 [2006.11.23]
+accomplished immediate mode render
+optimize SWT image draw
+add LWJGL 3D Engine for multiTexture
+optimized 3D binding
+fixed SWT drawString
+fixed subShells dispose crash
+
+$v0.5.1 [2006.11.17]
+rework Transform
+vertices render
+optimized Graphics3D
+lighting,texture
+add microedition.locale
+add gameAction impl
+
+$v0.5.0 [2006.11.12]
+m3g api
+11.12 SkinnedMesh,World
+11.11 RayIntersection,Mesh,MorphingMesh 
+11.10 PolygonMode,CompositingMode,Material,
+      Fog,Texture2D,Appearance,Sprite3D,
+      Light,Camera
+11.09 Node.align
+11.06 Node
+10.31 Transformable 
+10.29 IndexBuffer,TriangleStripArray,Transform
+10.27 VertexArray,VertexBuffer,
+10.25 AnimationController,AnimationTrack
+10.24 KeyframeSequence
+10.22 Background,Graphics3D+
+10.20 Image2D,Object3D+
+
+fixed restart bug
+set default encoding as ISO-8859-1
+fixed step running bug
+
+$v0.4.9 [2006.10.19]
+fixed mem leak when using swt-engine
+optimized SWTImage
+
+$v0.4.8 [2006.10.17]
+add x-ray parameters
+add font setting page
+optimized memoryView,more fast!
+mouseWheel supported in memoryView
+fixed bug in awt2swt image convert
+
+$v0.4.7 [2006.10.06]
+add avi record
+associate with *.jar files
+add MRUList
+
+$v0.4.6a [2006.09.30]
+add -jad param
+
+$v0.4.6 [2006.09.29]
+fixed AWTImage bug with byte buffer
+
+$v0.4.5b [2006.09.28]
+new icon, thanks to gao meng
+
+$v0.4.5a [2006.09.21]
+fixed HL ui command bug
+fixed rms excepiton
+fixed nokia sound loop bug
+
+$v0.4.5 [2006.09.21]
+implement sprintpcs api
+m3g step1
+
+$v0.4.4 [2006.09.17]
+add water effect:)
+
+$v0.4.3 [2006.09.16]
+fixed the midi bug in JDK1.5
+fixed empty rmsfolder bug
+pause tick while game paused
+
+$v0.4.2 [2006.09.13]
+add BeanShell Console
+
+$v0.4.1c [2006.09.12]
+implements the argb color for nokia apis
+sync the watches in step mode
+remove pause when minimized
+
+$v0.4.1b [2006.09.07]
+crack new String() for some multi-language version
+set encoding at FileEncoding in property.txt 
+  ( such as ISO8859_1, UTF8 )
+(do not need JVM param -Dfile.encoding now, 
+  escape from the bug of JDK1.4.2)
+
+$v0.4.1a [2006.09.05]
+implements the Class.getResourceAsStream with 
+ Relative path (relate to the Class path)
+add prefix for capture files
+add default fileEncoding property
+add system fontsize property
+
+$v0.4.1 [2006.09.02]
+add vibration
+add drag & drop for jar files
+
+$v0.4.0c [2006.08.30]
+faster launching
+msg alert
+
+$v0.4.0b [2006.08.29]
+redirect getResourceAsStream()
+inside the CustomClassLoader
+
+$v0.4.0a [2006.08.27]
+redirect gc() faster loading
+
+$v0.4.0 [2006.08.25]
+fixed the jad & manifest decoding 
+  with multibytes characters
+patch the RecordStore
+add empty high level api for MIDP2.0
+
+$v0.3.9c [2006.08.23]
+fixed the canvas flicker
+
+$v0.3.9b [2006.08.21]
+optimized the graphics engine
+remove the 32 color-depth limit
+fixed the random pause bug
+
+$v0.3.9a [2006.08.17]
+fixed the cmdbar bug
+add mmf memoryview
+
+$v0.3.9 [2006.08.16]
+-cp supports multi-path split with ";"
+add samsung AudioClip , support mmf(MA3) format
+
+$v0.3.7c [2006.08.13]
+add KeyMapping Option
+add KeyCache
+improved the infos' mode
+keep more properties
+add ticker
+
+$v0.3.7 [2006.08.03]
+optimized TileLayer
+add Always-on-top
+
+$v0.3.6 [2006.08.02]
+add sound monitor in memory view
+
+$v0.3.5 [2006.07.26]
+add memory view
+
+$v0.3.3 [2006.07.22]
+add class watcher
+
+$v0.3.1 [2006.07.20]
+fix the transparency bug of SWT Image
+
+$v0.3.0 [2006.07.18]
+add ott sound support for nokia api
+add eventQueue for painting & callserially
+
+$v0.2.7 [2006.07.15]
+add nokia ui api
+
+$v0.2.5 [2006.07.10]
+implements mid/wav player
+
+$v0.2.4 [2006.06.30]
+add awt implements
+
+v0.2.2 [2006.06.28]
+v0.2.0 [2006.06.23]
+v0.1.7 [2006.06.22]
+v0.1.6 [2006.06.21]
+v0.1.3 [2006.06.20]
+v0.1.0 [2006.06.15]
+
+==================
+$[Libs]
+swt-win-3.3.4.6
+asm-3.0
+lwjgl-1.1.3
+java-discord-rpc-2.0.1
+jna-4.4.0
+webcam-capture-0.3.12
+slf4j-api-1.7.2
+bridj-0.7.0
+
+==================
+$[Bug Report]
+vk @shinovon
