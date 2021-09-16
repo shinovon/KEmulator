@@ -510,7 +510,7 @@ public final class Property implements IProperty
             Emulator.rpcEnabled = Boolean.valueOf(properties.getProperty("DiscordRichPresence", "true"));
             Settings.awtAntiAliasing = Boolean.valueOf(properties.getProperty("AWTAntiAliasing", "false"));
             Settings.canvasKeyboard = Boolean.valueOf(properties.getProperty("CanvasKeyboardMode", "false"));
-            if(Emulator.getEmulator() == null && Emulator.getEmulator().getScreen() != null) {
+            if(Emulator.getEmulator() != null && Emulator.getEmulator().getScreen() != null) {
 	            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method570(!Settings.canvasKeyboard);
 	            ((EmulatorScreen)Emulator.getEmulator().getScreen()).setFpsMode(Settings.fpsMode);
             }
