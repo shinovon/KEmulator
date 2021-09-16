@@ -139,7 +139,7 @@ public final class Property implements IProperty
     private String right;
     private int fontSmallSize;
     private int fontMediumSIze;
-    private int anInt687;
+    private int fontLargeSize;
     private CLabel aCLabel646;
     private Combo aCombo699;
     private Button aButton755;
@@ -343,7 +343,7 @@ public final class Property implements IProperty
     }
     
     public final int getFontLargeSize() {
-        return this.anInt687;
+        return this.fontLargeSize;
     }
     
     public final void setDefaultFontName(final String aString682) {
@@ -359,7 +359,7 @@ public final class Property implements IProperty
     }
     
     public final void getFontLargeSize(final int anInt687) {
-        this.anInt687 = anInt687;
+        this.fontLargeSize = anInt687;
     }
     
     private String method355() {
@@ -435,7 +435,7 @@ public final class Property implements IProperty
             this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
             this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
             this.fontMediumSIze = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
-            this.anInt687 = Integer.parseInt(properties.getProperty("FontLargeSize", String.valueOf(16)));
+            this.fontLargeSize = Integer.parseInt(properties.getProperty("FontLargeSize", String.valueOf(16)));
             this.screenWidth = properties.getProperty("SCREEN_WIDTH", "240");
             this.screenHeight = properties.getProperty("SCREEN_HEIGHT", "320");
             this.lsoft = properties.getProperty("KEY_LSOFT", "-6");
@@ -510,11 +510,15 @@ public final class Property implements IProperty
             Emulator.rpcEnabled = Boolean.valueOf(properties.getProperty("DiscordRichPresence", "true"));
             Settings.awtAntiAliasing = Boolean.valueOf(properties.getProperty("AWTAntiAliasing", "false"));
             Settings.canvasKeyboard = Boolean.valueOf(properties.getProperty("CanvasKeyboardMode", "false"));
-            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method570(!Settings.canvasKeyboard);
-            ((EmulatorScreen)Emulator.getEmulator().getScreen()).setFpsMode(Settings.fpsMode);
+            if(Emulator.getEmulator() == null && Emulator.getEmulator().getScreen() != null) {
+	            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method570(!Settings.canvasKeyboard);
+	            ((EmulatorScreen)Emulator.getEmulator().getScreen()).setFpsMode(Settings.fpsMode);
+            }
             fileInputStream.close();
         }
         catch (Exception ex) {
+        	System.out.println("properties load failed");
+        	ex.printStackTrace();
             this.device = "SonyEricssonK800";
             this.defaultFont = "Tahoma";
             this.rmsFolder = "/rms";
@@ -535,7 +539,7 @@ public final class Property implements IProperty
             Settings.enableMethodTrack = false;
             this.fontSmallSize = 12;
             this.fontMediumSIze = 14;
-            this.anInt687 = 16;
+            this.fontLargeSize = 16;
             for (int j = 0; j < 5; ++j) {
                 Settings.aArray[j] = "";
             }
@@ -560,7 +564,7 @@ public final class Property implements IProperty
             sortProperties.setProperty("RMSFolder", this.rmsFolder);
             sortProperties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
             sortProperties.setProperty("FontMediumSize", String.valueOf(this.fontMediumSIze));
-            sortProperties.setProperty("FontLargeSize", String.valueOf(this.anInt687));
+            sortProperties.setProperty("FontLargeSize", String.valueOf(this.fontLargeSize));
             sortProperties.setProperty("SCREEN_WIDTH", this.screenWidth);
             sortProperties.setProperty("SCREEN_HEIGHT", this.screenHeight);
             sortProperties.setProperty("KEY_LSOFT", this.lsoft);
@@ -645,7 +649,7 @@ public final class Property implements IProperty
         Settings.fileEncoding = this.aCombo675.getText().trim();
         this.fontSmallSize = this.aSpinner690.getSelection();
         this.fontMediumSIze = this.aSpinner679.getSelection();
-        this.anInt687 = this.aSpinner670.getSelection();
+        this.fontLargeSize = this.aSpinner670.getSelection();
         this.screenWidth = this.aText672.getText().trim();
         this.screenHeight = this.aText684.getText().trim();
         this.lsoft = this.aText695.getText().trim();
@@ -1471,7 +1475,7 @@ public final class Property implements IProperty
         (this.aCLabel640 = new CLabel(this.aComposite710, 0)).setText(UILocale.uiText("OPTION_FONT_LARGE_SIZE", "Large Size:"));
         ((Control)this.aCLabel640).setLayoutData((Object)layoutData3);
         (this.aSpinner670 = new Spinner(this.aComposite710, 2048)).setMinimum(1);
-        this.aSpinner670.setSelection(this.anInt687);
+        this.aSpinner670.setSelection(this.fontLargeSize);
         this.aSpinner670.addModifyListener((ModifyListener)new Class186(this));
         this.method420();
         (this.aCLabel642 = new CLabel(this.aComposite710, 0)).setText(UILocale.uiText("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
