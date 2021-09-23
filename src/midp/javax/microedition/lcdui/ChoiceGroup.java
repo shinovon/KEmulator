@@ -205,8 +205,6 @@ implements Choice {
 	                ++i;
 	            }
         	}
-            System.out.println(this.label + " " + Arrays.toString(items.toArray()));
-            System.out.println("deb: " + ((a)this.items.get((int)n)).string);
             return;
         }
         ((a)this.items.get((int)n)).sel = flag;
