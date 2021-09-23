@@ -110,7 +110,7 @@ public final class Controllers
         if (n2 == 19) {
             return 10000;
         }
-        return method747(Keyboard.aStringArray1064[n2]);
+        return method747(Keyboard.deviceKeycodes[n2]);
     }
     
     private static int method747(final String s) {

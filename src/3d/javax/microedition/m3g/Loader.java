@@ -381,15 +381,6 @@ public class Loader
         return new Image2D(getImage2DEncoding(image), image);
     }
     
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
-    
     static {
         i.a("jsr184client");
         Engine.cacheFID(Loader.class, 2);

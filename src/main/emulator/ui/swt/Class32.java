@@ -35,7 +35,7 @@ final class Class32 implements Listener
                     screen = Emulator.getScreen();
                     n = 6;
                 }
-                screen.invokeKeyPressed(Keyboard.method595(n));
+                screen.invokeKeyPressed(Keyboard.getArrowKeyFromDevice(n));
                 break;
             }
         }

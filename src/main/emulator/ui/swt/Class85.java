@@ -9,6 +9,6 @@ final class Class85 implements Runnable
     }
     
     public final void run() {
-        Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(Keyboard.method604(), true);
+        Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(Keyboard.soft2(), true);
     }
 }

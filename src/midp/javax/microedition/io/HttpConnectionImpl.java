@@ -1,6 +1,8 @@
 package javax.microedition.io;
 
 import java.net.*;
+import java.util.Arrays;
+
 import emulator.*;
 import java.io.*;
 
@@ -27,8 +29,9 @@ final class HttpConnectionImpl implements HttpConnection {
 		}
 	}
 
-	public HttpConnectionImpl(final String url) throws IOException {
+	public HttpConnectionImpl(String url) throws IOException {
 		super();
+		//url = "http://global-4-lvs-lamport.opera-mini.net:/80";
 		this.url = url;
 		this.closed = false;
 		Emulator.getEmulator().getLogStream().println("Connect to: " + url);
@@ -83,12 +86,15 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final void setRequestProperty(final String s, final String s2) throws IOException {
+		System.out.println("setRequestProperty " + s +": " + s2);
 		if (s.equalsIgnoreCase("User-Agent")) {
 			setua(s2);
 			return;
 		}
 		if (s.equalsIgnoreCase("X-Online-Host")) {
 			this.method134(s2);
+			//this.connection.setRequestProperty("Host", s2);
+			//return;
 		}
 		this.connection.setRequestProperty(s, s2);
 	}
@@ -136,6 +142,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final String getHeaderField(final String s) throws IOException {
+		System.out.println("getHeaderField " + s);
 		return this.connection.getHeaderField(s);
 	}
 
@@ -148,10 +155,12 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final String getHeaderField(final int n) throws IOException {
+		System.out.println("getHeaderField " + n);
 		return this.connection.getHeaderField(n);
 	}
 
 	public final String getHeaderFieldKey(final int n) throws IOException {
+		System.out.println("getHeaderFieldKey " + n);
 		return this.connection.getHeaderFieldKey(n);
 	}
 
@@ -195,6 +204,8 @@ final class HttpConnectionImpl implements HttpConnection {
 			return;
 		try {
 			if (getRequestProperty("User-Agent") == null) {
+				Emulator.customUA = "Mozilla/5.0 (Linux; Android 11; SM-G770F Build/RP1A.200720.012; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.88 Mobile Safari/537.36";
+				System.out.println(Emulator.customUA);
 				if (Emulator.customUA != null) {
 					connection.setRequestProperty("User-Agent", 
 							Emulator.customUA);
@@ -214,6 +225,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
+		System.out.println(Arrays.toString(connection.getRequestProperties().entrySet().toArray()));
 		setUserAgent();
 		if (this.closed) {
 			throw new IOException();

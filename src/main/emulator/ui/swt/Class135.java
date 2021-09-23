@@ -14,8 +14,8 @@ final class Class135 extends KeyAdapter
     
     public final void keyPressed(final KeyEvent keyEvent) {
         keyEvent.keyCode &= 0xFEFFFFFF;
-        if (Property.method376(this.aClass38_1294).getSelectionIndex() == 0 && Keyboard.method594(String.valueOf(keyEvent.keyCode)) != null) {
-            Property.method380(this.aClass38_1294).setText(Keyboard.method594(String.valueOf(keyEvent.keyCode)));
+        if (Property.method376(this.aClass38_1294).getSelectionIndex() == 0 && Keyboard.keyToString(String.valueOf(keyEvent.keyCode)) != null) {
+            Property.method380(this.aClass38_1294).setText(Keyboard.keyToString(String.valueOf(keyEvent.keyCode)));
             Property.method365()[1] = Property.method380(this.aClass38_1294).getText().trim();
         }
     }

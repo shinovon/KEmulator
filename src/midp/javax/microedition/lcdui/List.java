@@ -15,7 +15,7 @@ public class List extends Screen implements Choice {
       } else {
          this.aChoiceGroup1304 = new ChoiceGroup((String)null, n, array, array2, true);
          super.aVector443.add(this.aChoiceGroup1304);
-         this.aChoiceGroup1304.aScreen176 = this;
+         this.aChoiceGroup1304.screen = this;
          this.aChoiceGroup1304.aBoolean541 = true;
          this.aChoiceGroup1304.aBoolean177 = true;
          this.aChoiceGroup1304.focus();
@@ -25,7 +25,7 @@ public class List extends Screen implements Choice {
    }
 
    public void setSelectCommand(Command aCommand540) {
-      if(this.aChoiceGroup1304.anInt349 == 3) {
+      if(this.aChoiceGroup1304.choiceType == 3) {
          super.removeCommand(this.aChoiceGroup1304.aCommand540);
          super.addCommand(this.aChoiceGroup1304.aCommand540 = aCommand540);
       }

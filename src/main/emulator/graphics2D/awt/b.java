@@ -12,16 +12,22 @@ import emulator.graphics2D.*;
 public final class b implements IGraphics2D
 {
     Graphics2D g;
-    int anInt10;
-    int anInt11;
+    int w;
+    int h;
     private int anInt12;
 	private a font;
     
     public b(final BufferedImage bufferedImage) {
         super();
         (g = bufferedImage.createGraphics()).setColor(new Color(0, 0, 0));
-        this.anInt10 = bufferedImage.getWidth();
-        this.anInt11 = bufferedImage.getHeight();
+        this.w = bufferedImage.getWidth();
+        this.h = bufferedImage.getHeight();
+        //гладкий шрифт всегда
+        if(Settings.textAntiAliasing)
+			g.setRenderingHint(
+					RenderingHints.KEY_TEXT_ANTIALIASING,
+					RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        //гладкая отрисовка в настрах
         if(Settings.awtAntiAliasing)
 			g.setRenderingHint(
 					RenderingHints.KEY_ANTIALIASING,
@@ -214,14 +220,14 @@ public final class b implements IGraphics2D
     
     public final int getClipHeight() {
         if (g.getClipBounds() == null) {
-            return this.anInt11;
+            return this.h;
         }
         return g.getClipBounds().height;
     }
     
     public final int getClipWidth() {
         if (g.getClipBounds() == null) {
-            return this.anInt10;
+            return this.w;
         }
         return g.getClipBounds().width;
     }
@@ -275,4 +281,8 @@ public final class b implements IGraphics2D
     public final void translate(final int n, final int n2) {
         g.translate(n, n2);
     }
+
+	public IFont getFont() {
+		return font;
+	}
 }

@@ -2,7 +2,6 @@ package javax.microedition.m3g;
 
 public class MorphingMesh extends Mesh
 {
-    static Class class$javax$microedition$m3g$MorphingMesh;
     
     MorphingMesh(final int n) {
         super(n);
@@ -11,7 +10,7 @@ public class MorphingMesh extends Mesh
     public MorphingMesh(final VertexBuffer vertexBuffer, final VertexBuffer[] array, final IndexBuffer[] array2, final Appearance[] array3) {
         this(createMultiSubmesh(vertexBuffer, Engine.getJavaPeerArrayHandles(array), Engine.getJavaPeerArrayHandles(array2), Engine.getJavaPeerArrayHandles(array3)));
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((MorphingMesh.class$javax$microedition$m3g$MorphingMesh == null) ? (MorphingMesh.class$javax$microedition$m3g$MorphingMesh = class$("javax.microedition.m3g.MorphingMesh")) : MorphingMesh.class$javax$microedition$m3g$MorphingMesh));
+        super.ii = (this.getClass() != MorphingMesh.class);
         Engine.addXOT(vertexBuffer);
         Engine.addXOT(array);
         Engine.addXOT(array2);
@@ -23,7 +22,7 @@ public class MorphingMesh extends Mesh
     public MorphingMesh(final VertexBuffer vertexBuffer, final VertexBuffer[] array, final IndexBuffer indexBuffer, final Appearance appearance) {
         this(createSingleSubmesh(vertexBuffer, Engine.getJavaPeerArrayHandles(array), indexBuffer, appearance));
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((MorphingMesh.class$javax$microedition$m3g$MorphingMesh == null) ? (MorphingMesh.class$javax$microedition$m3g$MorphingMesh = class$("javax.microedition.m3g.MorphingMesh")) : MorphingMesh.class$javax$microedition$m3g$MorphingMesh));
+        super.ii = (this.getClass() != MorphingMesh.class);
         Engine.addXOT(vertexBuffer);
         Engine.addXOT(array);
         Engine.addXOT(indexBuffer);
@@ -43,13 +42,4 @@ public class MorphingMesh extends Mesh
     public native void getWeights(final float[] p0);
     
     public native void setWeights(final float[] p0);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

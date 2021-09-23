@@ -6,7 +6,6 @@ public class Material extends Object3D
     public static final int DIFFUSE = 2048;
     public static final int EMISSIVE = 4096;
     public static final int SPECULAR = 8192;
-    static Class class$javax$microedition$m3g$Material;
     
     Material(final int n) {
         super(n);
@@ -15,7 +14,7 @@ public class Material extends Object3D
     public Material() {
         this(create());
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Material.class$javax$microedition$m3g$Material == null) ? (Material.class$javax$microedition$m3g$Material = class$("javax.microedition.m3g.Material")) : Material.class$javax$microedition$m3g$Material));
+        super.ii = (this.getClass() != Material.class);
     }
     
     private static native int create();
@@ -31,13 +30,4 @@ public class Material extends Object3D
     public native int getColor(final int p0);
     
     public native void setColor(final int p0, final int p1);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

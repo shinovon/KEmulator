@@ -7,22 +7,22 @@ import java.util.*;
  */
 public final class Keyboard
 {
-    private static Hashtable aHashtable1062;
-    private static Hashtable aHashtable1065;
+    private static Hashtable deviceKeyToStr;
+    private static Hashtable strToPCKey;
     private static Hashtable keysTable;
     private static Hashtable aHashtable1067;
     public static Stack aStack1063;
-    public static String[] aStringArray1064;
+    public static String[] deviceKeycodes;
     
     public Keyboard() {
         super();
     }
     
     public static String get(final int n) {
-        return method594(Keyboard.aStringArray1064[n]);
+        return keyToString(Keyboard.deviceKeycodes[n]);
     }
     
-    public static String method594(final String s) {
+    public static String keyToString(final String s) {
         final String s2;
         if ((s2 = (String) Keyboard.keysTable.get(s)) != null) {
             return s2;
@@ -53,7 +53,7 @@ public final class Keyboard
         return value;
     }
     
-    public static int method595(final int n) {
+    public static int getArrowKeyFromDevice(final int n) {
         int n2 = 0;
         switch (n) {
             case 1: {
@@ -81,78 +81,78 @@ public final class Keyboard
     }
     
     private static void method602() {
-        final int method595 = method595(8);
-        final int method596 = method595(1);
-        final int method597 = method595(2);
-        final int method598 = method595(6);
-        final int method599 = method595(5);
-        final int n = (Devices.method617("KEY_S1") != 0) ? Devices.method617("KEY_S1") : 21;
-        final int n2 = (Devices.method617("KEY_S2") != 0) ? Devices.method617("KEY_S2") : 22;
-        Keyboard.aHashtable1065.clear();
-        Keyboard.aHashtable1065.put("NUM_0", "48");
-        Keyboard.aHashtable1065.put("NUM_1", "49");
-        Keyboard.aHashtable1065.put("NUM_2", "50");
-        Keyboard.aHashtable1065.put("NUM_3", "51");
-        Keyboard.aHashtable1065.put("NUM_4", "52");
-        Keyboard.aHashtable1065.put("NUM_5", "53");
-        Keyboard.aHashtable1065.put("NUM_6", "54");
-        Keyboard.aHashtable1065.put("NUM_7", "55");
-        Keyboard.aHashtable1065.put("NUM_8", "56");
-        Keyboard.aHashtable1065.put("NUM_9", "57");
-        Keyboard.aHashtable1065.put("*", "42");
-        Keyboard.aHashtable1065.put("#", "35");
-        Keyboard.aHashtable1065.put("UP", String.valueOf(method596));
-        Keyboard.aHashtable1065.put("DOWN", String.valueOf(method598));
-        Keyboard.aHashtable1065.put("LEFT", String.valueOf(method597));
-        Keyboard.aHashtable1065.put("RIGHT", String.valueOf(method599));
-        Keyboard.aHashtable1065.put("MIDDLE", String.valueOf(method595));
-        Keyboard.aHashtable1065.put("S1", String.valueOf(n));
-        Keyboard.aHashtable1065.put("S2", String.valueOf(n2));
+        final int mid = getArrowKeyFromDevice(8);
+        final int up = getArrowKeyFromDevice(1);
+        final int left = getArrowKeyFromDevice(2);
+        final int down = getArrowKeyFromDevice(6);
+        final int right = getArrowKeyFromDevice(5);
+        final int s1 = (Devices.method617("KEY_S1") != 0) ? Devices.method617("KEY_S1") : 21;
+        final int s2 = (Devices.method617("KEY_S2") != 0) ? Devices.method617("KEY_S2") : 22;
+        Keyboard.strToPCKey.clear();
+        Keyboard.strToPCKey.put("NUM_0", "48");
+        Keyboard.strToPCKey.put("NUM_1", "49");
+        Keyboard.strToPCKey.put("NUM_2", "50");
+        Keyboard.strToPCKey.put("NUM_3", "51");
+        Keyboard.strToPCKey.put("NUM_4", "52");
+        Keyboard.strToPCKey.put("NUM_5", "53");
+        Keyboard.strToPCKey.put("NUM_6", "54");
+        Keyboard.strToPCKey.put("NUM_7", "55");
+        Keyboard.strToPCKey.put("NUM_8", "56");
+        Keyboard.strToPCKey.put("NUM_9", "57");
+        Keyboard.strToPCKey.put("*", "42");
+        Keyboard.strToPCKey.put("#", "35");
+        Keyboard.strToPCKey.put("UP", String.valueOf(up));
+        Keyboard.strToPCKey.put("DOWN", String.valueOf(down));
+        Keyboard.strToPCKey.put("LEFT", String.valueOf(left));
+        Keyboard.strToPCKey.put("RIGHT", String.valueOf(right));
+        Keyboard.strToPCKey.put("MIDDLE", String.valueOf(mid));
+        Keyboard.strToPCKey.put("S1", String.valueOf(s1));
+        Keyboard.strToPCKey.put("S2", String.valueOf(s2));
     }
     
     private static void method606() {
-        Keyboard.aHashtable1062.clear();
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[0], "NUM_0");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[1], "NUM_1");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[2], "NUM_2");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[3], "NUM_3");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[4], "NUM_4");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[5], "NUM_5");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[6], "NUM_6");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[7], "NUM_7");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[8], "NUM_8");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[9], "NUM_9");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[10], "*");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[11], "#");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[12], "UP");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[13], "DOWN");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[14], "LEFT");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[15], "RIGHT");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[16], "MIDDLE");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[17], "S1");
-        Keyboard.aHashtable1062.put(Keyboard.aStringArray1064[18], "S2");
+        Keyboard.deviceKeyToStr.clear();
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[0], "NUM_0");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[1], "NUM_1");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[2], "NUM_2");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[3], "NUM_3");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[4], "NUM_4");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[5], "NUM_5");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[6], "NUM_6");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[7], "NUM_7");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[8], "NUM_8");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[9], "NUM_9");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[10], "*");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[11], "#");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[12], "UP");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[13], "DOWN");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[14], "LEFT");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[15], "RIGHT");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[16], "MIDDLE");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[17], "S1");
+        Keyboard.deviceKeyToStr.put(Keyboard.deviceKeycodes[18], "S2");
     }
     
-    public static void method596(final int n, final String s) {
+    public static void mapDeviceKey(final int n, final String s) {
         if (s != null) {
-            Keyboard.aStringArray1064[n] = s;
+            Keyboard.deviceKeycodes[n] = s;
         }
     }
     
     public static boolean method597(final int n) {
-        return Integer.parseInt(method605(Integer.parseInt(Keyboard.aStringArray1064[17]))) == n;
+        return Integer.parseInt(method605(Integer.parseInt(Keyboard.deviceKeycodes[17]))) == n;
     }
     
     public static boolean method603(final int n) {
-        return Integer.parseInt(method605(Integer.parseInt(Keyboard.aStringArray1064[18]))) == n;
+        return Integer.parseInt(method605(Integer.parseInt(Keyboard.deviceKeycodes[18]))) == n;
     }
     
-    public static int method598() {
-        return Integer.parseInt((String) Keyboard.aHashtable1065.get("S1"));
+    public static int soft1() {
+        return Integer.parseInt((String) Keyboard.strToPCKey.get("S1"));
     }
     
-    public static int method604() {
-        return Integer.parseInt((String) Keyboard.aHashtable1065.get("S2"));
+    public static int soft2() {
+        return Integer.parseInt((String) Keyboard.strToPCKey.get("S2"));
     }
     
     public static void init() {
@@ -161,12 +161,17 @@ public final class Keyboard
     }
     
     public static String method605(int n) {
-        if (n == 80 && !Settings.canvasKeyboard) {
+        if (n == 80) {
             n = 13;
         }
+
+    	if(Settings.canvasKeyboard && (n >= '0' && n <= '9')) {
+
+        	return "" + n;
+    	}
         final Object value;
-        if ((value = Keyboard.aHashtable1062.get(String.valueOf(n))) != null) {
-            return (String)Keyboard.aHashtable1065.get(value);
+        if ((value = Keyboard.deviceKeyToStr.get(String.valueOf(n))) != null) {
+            return (String)Keyboard.strToPCKey.get(value);
         }
         /*
         if(Settings.fpsMode) {
@@ -192,7 +197,7 @@ public final class Keyboard
         }
         */
         final String method594;
-        if ((method594 = method594(String.valueOf(n))) == null) {
+        if ((method594 = keyToString(String.valueOf(n))) == null) {
             return null;
         }
         final Object value2;
@@ -219,8 +224,8 @@ public final class Keyboard
     }
     
     static {
-        Keyboard.aHashtable1062 = new Hashtable();
-        Keyboard.aHashtable1065 = new Hashtable();
+        Keyboard.deviceKeyToStr = new Hashtable();
+        Keyboard.strToPCKey = new Hashtable();
         Keyboard.keysTable = new Hashtable();
         Keyboard.aHashtable1067 = new Hashtable();
         Keyboard.aStack1063 = new Stack();
@@ -260,6 +265,6 @@ public final class Keyboard
         Keyboard.keysTable.put("9", "Insert");
         Keyboard.keysTable.put("13", "Enter");
         Keyboard.keysTable.put("80", "Enter");
-        Keyboard.aStringArray1064 = new String[] { "48", "55", "56", "57", "52", "53", "54", "49", "50", "51", "42", "47", "1", "2", "3", "4", "13", "10", "11" };
+        Keyboard.deviceKeycodes = new String[] { "48", "55", "56", "57", "52", "53", "54", "49", "50", "51", "42", "47", "1", "2", "3", "4", "13", "10", "11" };
     }
 }

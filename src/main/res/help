@@ -45,6 +45,10 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$v1.0.3 mod nnproject v10 [2021.09.23]
+lcdui improvements
+Text anti-aliasing
+
 $v1.0.3 mod nnproject v9 [2021.09.15]
 Fixed custom screen resolution not changing
 Fixed some bugs

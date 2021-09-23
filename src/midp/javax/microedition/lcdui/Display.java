@@ -271,10 +271,10 @@ public class Display
         if (item == null) {
             throw new NullPointerException();
         }
-        if (item.aScreen176 == null || item.aScreen176 instanceof Alert) {
+        if (item.screen == null || item.screen instanceof Alert) {
             throw new IllegalArgumentException();
         }
-        this.setCurrent(item.aScreen176);
+        this.setCurrent(item.screen);
     }
     
     static {

@@ -23,7 +23,6 @@ public class AnimationTrack extends Object3D
     public static final int SPOT_EXPONENT = 274;
     public static final int TRANSLATION = 275;
     public static final int VISIBILITY = 276;
-    static Class class$javax$microedition$m3g$AnimationTrack;
     
     AnimationTrack(final int n) {
         super(n);
@@ -32,7 +31,7 @@ public class AnimationTrack extends Object3D
     public AnimationTrack(final KeyframeSequence keyframeSequence, final int n) {
         this(create(keyframeSequence, n));
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((AnimationTrack.class$javax$microedition$m3g$AnimationTrack == null) ? (AnimationTrack.class$javax$microedition$m3g$AnimationTrack = class$("javax.microedition.m3g.AnimationTrack")) : AnimationTrack.class$javax$microedition$m3g$AnimationTrack));
+        super.ii = (getClass() != AnimationTrack.class);
         Engine.addXOT(keyframeSequence);
     }
     
@@ -58,13 +57,4 @@ public class AnimationTrack extends Object3D
     }
     
     private native void setControllerImpl(final AnimationController p0);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

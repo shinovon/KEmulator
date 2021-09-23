@@ -4,7 +4,6 @@ public class Background extends Object3D
 {
     public static final int BORDER = 32;
     public static final int REPEAT = 33;
-    static Class class$javax$microedition$m3g$Background;
     
     Background(final int n) {
         super(n);
@@ -13,7 +12,7 @@ public class Background extends Object3D
     public Background() {
         this(create());
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Background.class$javax$microedition$m3g$Background == null) ? (Background.class$javax$microedition$m3g$Background = class$("javax.microedition.m3g.Background")) : Background.class$javax$microedition$m3g$Background));
+        super.ii = (this.getClass() != Background.class);
     }
     
     private static native int create();
@@ -21,7 +20,7 @@ public class Background extends Object3D
     public native int getColor();
     
     public Image2D getImage() {
-        return (Image2D)Engine.instantiateJavaPeer(this.getImageImpl());
+        return (Image2D)Engine.instantiateJavaPeer(getImageImpl());
     }
     
     private native int getImageImpl();
@@ -58,13 +57,4 @@ public class Background extends Object3D
     public native void setImageMode(final int p0, final int p1);
     
     public native void setCrop(final int p0, final int p1, final int p2, final int p3);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

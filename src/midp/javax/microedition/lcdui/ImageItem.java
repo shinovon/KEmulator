@@ -24,7 +24,7 @@ public class ImageItem extends Item
             throw new IllegalArgumentException();
         }
         this.anImage427 = anImage427;
-        super.anInt178 = anInt178;
+        super.layout = anInt178;
         this.aString25 = aString25;
         this.anInt349 = anInt179;
     }
@@ -75,8 +75,8 @@ public class ImageItem extends Item
         super.layout();
         int n = 0;
         final int n2 = this.getPreferredWidth() - 8;
-        if (super.aString172 != null) {
-            super.aStringArray175 = c.method175(super.aString172, Item.aFont173, n2, n2);
+        if (super.label != null) {
+            super.aStringArray175 = c.method175(super.label, Item.aFont173, n2, n2);
             n = 0 + (Item.aFont173.getHeight() + 4) * super.aStringArray175.length;
         }
         else {
@@ -85,6 +85,6 @@ public class ImageItem extends Item
         if (this.anImage427 != null) {
             n += this.anImage427.getHeight() + 4;
         }
-        super.anIntArray21[3] = Math.min(n, super.aScreen176.anIntArray21[3]);
+        super.anIntArray21[3] = Math.min(n, super.screen.anIntArray21[3]);
     }
 }

@@ -1,46 +1,47 @@
 package javax.microedition.lcdui;
 
+import emulator.graphics2D.IFont;
 import emulator.lcdui.*;
 
 public class StringItem extends Item
 {
-    private String aString25;
-    private int anInt349;
-    private Font aFont358;
-    private String[] aStringArray359;
+    private String text;
+    private int mode;
+    private Font font;
+    private String[] textArr;
     
-    public StringItem(final String s, final String s2) {
-        this(s, s2, 0);
+    public StringItem(final String label, final String text) {
+        this(label, text, 0);
     }
     
-    public StringItem(final String s, final String aString25, final int anInt349) {
+    public StringItem(final String s, final String text, final int mode) {
         super(s);
-        if (anInt349 < 0 || anInt349 > 2) {
+        if (mode < 0 || mode > 2) {
             throw new IllegalArgumentException();
         }
-        this.aString25 = aString25;
-        this.anInt349 = anInt349;
-        this.aFont358 = null;
+        this.text = text;
+        this.mode = mode;
+        this.font = null;
     }
     
     public String getText() {
-        return this.aString25;
+        return this.text;
     }
     
     public void setText(final String aString25) {
-        this.aString25 = aString25;
+        this.text = aString25;
     }
     
     public int getAppearanceMode() {
-        return this.anInt349;
+        return this.mode;
     }
     
     public void setFont(final Font aFont358) {
-        this.aFont358 = aFont358;
+        this.font = aFont358;
     }
     
     public Font getFont() {
-        return this.aFont358;
+        return this.font;
     }
     
     public void setPreferredSize(final int n, final int n2) {
@@ -49,27 +50,55 @@ public class StringItem extends Item
     
     protected void paint(final Graphics graphics) {
         super.paint(graphics);
-        final Font font = (this.aFont358 != null) ? this.aFont358 : Screen.aFont173;
+        
+        final Font font = (this.font != null) ? this.font : Screen.aFont173;
         int n = super.anIntArray21[1];
         graphics.setFont(font);
-        for (int i = this.getcurPage(); i < this.aStringArray359.length; ++i) {
-            graphics.drawString(this.aStringArray359[i], super.anIntArray21[0] + 4, n + 2, 0);
-            if ((n += font.getHeight() + 4) > super.aScreen176.anIntArray21[3]) {
-                return;
-            }
+
+        if(mode == BUTTON) {
+        	//кнопка
+        	String str = null;
+        	// определение строки
+        	if(textArr != null) {
+        		str = textArr[0];
+        	}
+        	if(str == null) {
+        		str = text;
+        	}
+        	if(str == null) {
+        		str = "...";
+        	}
+	        graphics.drawString(str, super.anIntArray21[0] + 4, n + 2, 0);
+	        // определение размера строки
+	        int j = 0;
+	        IFont f = graphics.getImpl().getFont();
+	        if(f != null)
+	        	j = f.stringWidth(str);
+	        if(j > 0) {
+	        	//очертания кнопки
+	        	graphics.drawLine(super.anIntArray21[0] + 4, n + font.getHeight() + 2, super.anIntArray21[0] + 4 + j, n + font.getHeight() + 2); 
+	        	graphics.drawRect(super.anIntArray21[0] + 2, n, j + 4, font.getHeight() + 4); 
+	        }
+        } else {
+	        for (int i = this.getcurPage(); i < this.textArr.length; ++i) {
+	            graphics.drawString(this.textArr[i], super.anIntArray21[0] + 4, n + 2, 0);
+	            if ((n += font.getHeight() + 4) > super.screen.anIntArray21[3]) {
+	                return;
+	            }
+	        }
         }
     }
     
     protected void layout() {
         super.layout();
-        final Font font = (this.aFont358 != null) ? this.aFont358 : Screen.aFont173;
+        final Font font = (this.font != null) ? this.font : Screen.aFont173;
         final int n = this.getPreferredWidth() - 8;
-        this.aStringArray359 = c.method175((super.aString172 != null) ? (super.aString172 + " " + this.aString25) : this.aString25, font, n, n);
+        this.textArr = c.method175((super.label != null) ? (super.label + " " + this.text) : this.text, font, n, n);
         final int n3;
-        int n2 = (n3 = font.getHeight() + 4) * this.aStringArray359.length;
+        int n2 = (n3 = font.getHeight() + 4) * this.textArr.length;
         super.anIntArray179 = null;
-        final int n4 = super.aScreen176.anIntArray21[3] / n3 * n3;
-        if (n2 > super.aScreen176.anIntArray21[3] && n4 > 0) {
+        final int n4 = super.screen.anIntArray21[3] / n3 * n3;
+        if (n2 > super.screen.anIntArray21[3] && n4 > 0) {
             int n5 = n2 / n4;
             if (n2 % n4 != 0) {
                 ++n5;
@@ -78,11 +107,11 @@ public class StringItem extends Item
             for (int i = 0; i < n5; ++i) {
                 super.anIntArray179[i] = i * n4 / n3;
             }
-            if (super.anInt182 >= super.anIntArray179.length) {
-                super.anInt182 = 0;
+            if (super.currentPos >= super.anIntArray179.length) {
+                super.currentPos = 0;
             }
-            n2 = (this.aStringArray359.length - super.anIntArray179[super.anInt182]) * n3;
+            n2 = (this.textArr.length - super.anIntArray179[super.currentPos]) * n3;
         }
-        super.anIntArray21[3] = Math.min(n2, super.aScreen176.anIntArray21[3]);
+        super.anIntArray21[3] = Math.min(n2, super.screen.anIntArray21[3]);
     }
 }

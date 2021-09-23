@@ -2,7 +2,6 @@ package javax.microedition.m3g;
 
 public class Sprite3D extends Node
 {
-    static Class class$javax$microedition$m3g$Sprite3D;
     
     Sprite3D(final int n) {
         super(n);
@@ -11,7 +10,7 @@ public class Sprite3D extends Node
     public Sprite3D(final boolean b, final Image2D image2D, final Appearance appearance) {
         this(create(b, image2D, appearance));
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Sprite3D.class$javax$microedition$m3g$Sprite3D == null) ? (Sprite3D.class$javax$microedition$m3g$Sprite3D = class$("javax.microedition.m3g.Sprite3D")) : Sprite3D.class$javax$microedition$m3g$Sprite3D));
+        super.ii = (this.getClass() != Sprite3D.class);
         Engine.addXOT(image2D);
         Engine.addXOT(appearance);
     }
@@ -55,13 +54,4 @@ public class Sprite3D extends Node
     public native boolean isScaled();
     
     public native void setCrop(final int p0, final int p1, final int p2, final int p3);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

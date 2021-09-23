@@ -10,15 +10,15 @@ public class TextBoxOld extends Screen
         super(s);
         this.aTextField1305 = new TextField(null, s2, n, n2);
         super.aVector443.add(this.aTextField1305);
-        this.aTextField1305.aScreen176 = this;
+        this.aTextField1305.screen = this;
         this.aTextField1305.isTextBox = true;
         this.aTextField1305.aBoolean177 = true;
-        this.aTextField1305.aBoolean18 = true;
-        this.aTextField1305.aScreen176.setItemCommands(this.aTextField1305);
+        this.aTextField1305.inFocus = true;
+        this.aTextField1305.screen.setItemCommands(this.aTextField1305);
     }
     
     protected void focusCaret() {
-        this.aTextField1305.aScreen176.setItemCommands(this.aTextField1305);
+        this.aTextField1305.screen.setItemCommands(this.aTextField1305);
         Emulator.getEmulator().getScreen().getCaret().foucsItem(this.aTextField1305, super.anIntArray21[0] + 4, Screen.anInt181 + 4);
     }
     

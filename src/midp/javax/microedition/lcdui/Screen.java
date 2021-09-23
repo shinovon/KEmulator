@@ -43,19 +43,19 @@ public abstract class Screen extends Displayable
                     super.aBoolean18 = false;
                 }
             }
-            else if (n == Keyboard.method595(1)) {
+            else if (n == Keyboard.getArrowKeyFromDevice(1)) {
                 if (super.anInt28 > 0) {
                     --super.anInt28;
                 }
             }
-            else if (n == Keyboard.method595(6)) {
+            else if (n == Keyboard.getArrowKeyFromDevice(6)) {
                 if (super.anInt28 < super.aVector26.size() - 2) {
                     ++super.anInt28;
                 }
             }
             else {
                 final int n3;
-                if (n == Keyboard.method595(8) && (n3 = super.anInt28 + 1) < super.aVector26.size()) {
+                if (n == Keyboard.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.aVector26.size()) {
                     super.aCommandListener19.commandAction((Command)super.aVector26.get(n3), this);
                     super.aBoolean18 = false;
                 }
@@ -66,11 +66,11 @@ public abstract class Screen extends Displayable
         if (super.anItem20 != null && super.anItem20 instanceof CustomItem && ((CustomItem)super.anItem20).callTraverse(n)) {
             return;
         }
-        if (super.anItem20 != null && n == Keyboard.method595(8)) {
+        if (super.anItem20 != null && n == Keyboard.getArrowKeyFromDevice(8)) {
             super.anItem20.itemApplyCommand();
             return;
         }
-        if (n == Keyboard.method595(1)) {
+        if (n == Keyboard.getArrowKeyFromDevice(1)) {
             if (this.aVector443.size() > 0) {
                 final int index = this.aVector443.indexOf(super.anItem20);
                 if (super.anItem20 != null) {
@@ -105,7 +105,7 @@ public abstract class Screen extends Displayable
                 }
             }
         }
-        else if (n == Keyboard.method595(6) && this.aVector443.size() > 0) {
+        else if (n == Keyboard.getArrowKeyFromDevice(6) && this.aVector443.size() > 0) {
             final int index2 = this.aVector443.indexOf(super.anItem20);
             if (super.anItem20 != null) {
                 if (!super.anItem20.scrollDown()) {

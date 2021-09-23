@@ -2,7 +2,6 @@ package javax.microedition.m3g;
 
 public class Mesh extends Node
 {
-    static Class class$javax$microedition$m3g$Mesh;
     
     Mesh(final int n) {
         super(n);
@@ -11,7 +10,7 @@ public class Mesh extends Node
     public Mesh(final VertexBuffer vertexBuffer, final IndexBuffer[] array, final Appearance[] array2) {
         this(createMultiSubmesh(vertexBuffer, Engine.getJavaPeerArrayHandles(array), Engine.getJavaPeerArrayHandles(array2)));
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Mesh.class$javax$microedition$m3g$Mesh == null) ? (Mesh.class$javax$microedition$m3g$Mesh = class$("javax.microedition.m3g.Mesh")) : Mesh.class$javax$microedition$m3g$Mesh));
+        super.ii = (this.getClass() != Mesh.class);
         Engine.addXOT(vertexBuffer);
         Engine.addXOT(array);
         Engine.addXOT(array2);
@@ -22,7 +21,7 @@ public class Mesh extends Node
     public Mesh(final VertexBuffer vertexBuffer, final IndexBuffer indexBuffer, final Appearance appearance) {
         this(createSingleSubmesh(vertexBuffer, indexBuffer, appearance));
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Mesh.class$javax$microedition$m3g$Mesh == null) ? (Mesh.class$javax$microedition$m3g$Mesh = class$("javax.microedition.m3g.Mesh")) : Mesh.class$javax$microedition$m3g$Mesh));
+        super.ii = (this.getClass() != Mesh.class);
         Engine.addXOT(vertexBuffer);
         Engine.addXOT(indexBuffer);
         Engine.addXOT(appearance);
@@ -56,13 +55,4 @@ public class Mesh extends Node
     }
     
     private native void setAppearanceImpl(final int p0, final Appearance p1);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

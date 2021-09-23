@@ -67,4 +67,10 @@ public interface IGraphics2D
     void transform(final ITransform p0);
     
     void translate(final int p0, final int p1);
+    
+    /**
+     * @deprecated
+     * @return
+     */
+    IFont getFont();
 }

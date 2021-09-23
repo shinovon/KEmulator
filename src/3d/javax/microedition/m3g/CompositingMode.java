@@ -7,7 +7,6 @@ public class CompositingMode extends Object3D
     public static final int MODULATE = 66;
     public static final int MODULATE_X2 = 67;
     public static final int REPLACE = 68;
-    static Class class$javax$microedition$m3g$CompositingMode;
     
     CompositingMode(final int n) {
         super(n);
@@ -16,7 +15,7 @@ public class CompositingMode extends Object3D
     public CompositingMode() {
         this(create());
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((CompositingMode.class$javax$microedition$m3g$CompositingMode == null) ? (CompositingMode.class$javax$microedition$m3g$CompositingMode = class$("javax.microedition.m3g.CompositingMode")) : CompositingMode.class$javax$microedition$m3g$CompositingMode));
+        super.ii = (this.getClass() != CompositingMode.class);
     }
     
     private static native int create();
@@ -50,13 +49,4 @@ public class CompositingMode extends Object3D
     public native void setDepthTestEnable(final boolean p0);
     
     public native void setDepthOffset(final float p0, final float p1);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

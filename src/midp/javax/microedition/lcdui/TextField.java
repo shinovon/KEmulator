@@ -130,19 +130,19 @@ public class TextField extends Item
             n2 = n - 2;
         }
         final int n3 = super.anIntArray21[3] - n + super.anIntArray21[1] - 2;
-        if (super.aBoolean18) {
+        if (super.inFocus) {
             graphics.setColor(-8355712);
         }
         graphics.drawRect(2, n2, super.anIntArray21[2] - 4, n3);
         graphics.setFont(Screen.aFont173);
-        if (super.aBoolean18) {
+        if (super.inFocus) {
             graphics.setColor(8617456);
         }
         this.anInt29 = super.anIntArray21[0] + 4;
         this.anInt30 = n + 4;
         for (int j = 0; j < this.aStringArray359.length; ++j) {
             graphics.drawString(this.aStringArray359[j], super.anIntArray21[0] + 4, n + 2, 0);
-            if ((n += Screen.aFont173.getHeight() + 4) > super.aScreen176.anIntArray21[3]) {
+            if ((n += Screen.aFont173.getHeight() + 4) > super.screen.anIntArray21[3]) {
                 return;
             }
         }
@@ -152,8 +152,8 @@ public class TextField extends Item
         super.layout();
         int n = 4;
         final int n2 = this.getPreferredWidth() - 8;
-        if (super.aString172 != null) {
-            super.aStringArray175 = c.method175(super.aString172, Item.aFont173, n2, n2);
+        if (super.label != null) {
+            super.aStringArray175 = c.method175(super.label, Item.aFont173, n2, n2);
             n = 4 + (Item.aFont173.getHeight() + 4) * super.aStringArray175.length;
         }
         else {
@@ -161,6 +161,6 @@ public class TextField extends Item
         }
         final Font aFont173 = Screen.aFont173;
         this.aStringArray359 = c.method175((this.aString25 == null) ? "" : this.aString25, aFont173, n2, n2);
-        super.anIntArray21[3] = Math.min(n + (aFont173.getHeight() + 4) * this.aStringArray359.length, super.aScreen176.anIntArray21[3]);
+        super.anIntArray21[3] = Math.min(n + (aFont173.getHeight() + 4) * this.aStringArray359.length, super.screen.anIntArray21[3]);
     }
 }

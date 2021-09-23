@@ -6,7 +6,6 @@ public class Light extends Node
     public static final int DIRECTIONAL = 129;
     public static final int OMNI = 130;
     public static final int SPOT = 131;
-    static Class class$javax$microedition$m3g$Light;
     
     Light(final int n) {
         super(n);
@@ -15,7 +14,7 @@ public class Light extends Node
     public Light() {
         this(create());
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Light.class$javax$microedition$m3g$Light == null) ? (Light.class$javax$microedition$m3g$Light = class$("javax.microedition.m3g.Light")) : Light.class$javax$microedition$m3g$Light));
+        super.ii = (this.getClass() != Light.class);
     }
     
     private static native int create();
@@ -47,13 +46,4 @@ public class Light extends Node
     public native void setSpotExponent(final float p0);
     
     public native void setAttenuation(final float p0, final float p1, final float p2);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

@@ -25,49 +25,49 @@ public abstract class Item {
    static final int anInt24 = 32563;
    static final Font aFont173 = Font.getFont(0, 1, 8);
    int[] anIntArray21;
-   boolean aBoolean18;
+   boolean inFocus;
    boolean aBoolean177;
    Command aCommand174;
    public ItemCommandListener itemCommandListener;
    public Vector itemCommands;
-   String aString172;
+   String label;
    String[] aStringArray175;
-   Screen aScreen176;
-   int anInt178;
+   Screen screen;
+   int layout;
    int anInt180 = -1;
    int anInt181 = -1;
    int[] anIntArray179;
-   int anInt182;
+   int currentPos;
 
-   Item(String aString172) {
-      this.aString172 = aString172;
-      this.aScreen176 = null;
+   Item(String label) {
+      this.label = label;
+      this.screen = null;
       this.itemCommands = new Vector();
       this.anIntArray21 = new int[4];
    }
 
-   public void setLabel(String aString172) {
-      this.aString172 = aString172;
+   public void setLabel(String label) {
+      this.label = label;
    }
 
    public String getLabel() {
-      return this.aString172;
+      return this.label;
    }
 
    public int getLayout() {
-      return this.anInt178;
+      return this.layout;
    }
 
-   public void setLayout(int anInt178) {
-      if((anInt178 & ~anInt24) != 0) {
+   public void setLayout(int layout) {
+      if((layout & ~anInt24) != 0) {
          throw new IllegalArgumentException();
       } else {
-         this.anInt178 = anInt178;
+         this.layout = layout;
       }
    }
 
    public void addCommand(Command command) {
-      if(this.aScreen176 instanceof Alert) {
+      if(this.screen instanceof Alert) {
          throw new IllegalStateException();
       } else if(command == null) {
          throw new NullPointerException();
@@ -81,8 +81,8 @@ public abstract class Item {
          }
 
          this.itemCommands.add(i, command);
-         if(this.aScreen176 != null && Emulator.getCurrentDisplay().getCurrent() == this.aScreen176) {
-            this.aScreen176.updateCommands();
+         if(this.screen != null && Emulator.getCurrentDisplay().getCurrent() == this.screen) {
+            this.screen.updateCommands();
          }
 
       }
@@ -95,15 +95,15 @@ public abstract class Item {
          }
 
          this.itemCommands.remove(command);
-         if(this.aScreen176 != null && Emulator.getCurrentDisplay().getCurrent() == this.aScreen176) {
-            this.aScreen176.updateCommands();
+         if(this.screen != null && Emulator.getCurrentDisplay().getCurrent() == this.screen) {
+            this.screen.updateCommands();
          }
       }
 
    }
 
    public void setItemCommandListener(ItemCommandListener itemCommandListener) {
-      if(this.aScreen176 instanceof Alert) {
+      if(this.screen instanceof Alert) {
          throw new IllegalStateException();
       } else {
          this.itemCommandListener = itemCommandListener;
@@ -126,7 +126,7 @@ public abstract class Item {
    }
 
    public void setPreferredSize(int anInt180, int anInt181) {
-      if(this.aScreen176 instanceof Alert) {
+      if(this.screen instanceof Alert) {
          throw new IllegalStateException();
       } else {
          this.anInt180 = anInt180;
@@ -143,7 +143,7 @@ public abstract class Item {
    }
 
    public void setDefaultCommand(Command aCommand174) {
-      if(this.aScreen176 instanceof Alert) {
+      if(this.screen instanceof Alert) {
          throw new IllegalStateException();
       } else {
          if((this.aCommand174 = aCommand174) != null) {
@@ -154,32 +154,32 @@ public abstract class Item {
    }
 
    public void notifyStateChanged() {
-      if(!(this.aScreen176 instanceof Form)) {
+      if(!(this.screen instanceof Form)) {
          throw new IllegalStateException();
       } else {
-         ((Form)this.aScreen176).anItemStateListener858.itemStateChanged(this);
+         ((Form)this.screen).anItemStateListener858.itemStateChanged(this);
       }
    }
 
    protected void focus() {
-      this.aBoolean18 = true;
-      if(this.aScreen176 != null) {
-         this.aScreen176.setItemCommands(this);
+      this.inFocus = true;
+      if(this.screen != null) {
+         this.screen.setItemCommands(this);
       }
 
    }
 
    protected void defocus() {
-      this.aBoolean18 = false;
-      if(this.aScreen176 != null) {
-         this.aScreen176.removeItemCommands(this);
+      this.inFocus = false;
+      if(this.screen != null) {
+         this.screen.removeItemCommands(this);
       }
 
    }
 
    protected void paint(Graphics graphics) {
       graphics.setColor(-16777216);
-      if(this.aBoolean18) {
+      if(this.inFocus) {
          a.method178(graphics, this.anIntArray21[0], this.anIntArray21[1], this.anIntArray21[2], this.anIntArray21[3]);
       }
 
@@ -188,17 +188,17 @@ public abstract class Item {
    protected void layout() {
       this.anIntArray21[0] = 0;
       this.anIntArray21[1] = 0;
-      this.anIntArray21[2] = this.aScreen176.anIntArray21[2];
+      this.anIntArray21[2] = this.screen.anIntArray21[2];
       this.anIntArray21[3] = Screen.anInt181;
    }
 
    protected int getcurPage() {
-      return this.anIntArray179 != null && this.anIntArray179.length > 0?this.anIntArray179[this.anInt182]:0;
+      return this.anIntArray179 != null && this.anIntArray179.length > 0?this.anIntArray179[this.currentPos]:0;
    }
 
    protected boolean scrollUp() {
-      if(this.anIntArray179 != null && this.anIntArray179.length > 0 && this.anInt182 > 0) {
-         --this.anInt182;
+      if(this.anIntArray179 != null && this.anIntArray179.length > 0 && this.currentPos > 0) {
+         --this.currentPos;
          return false;
       } else {
          return true;
@@ -206,8 +206,8 @@ public abstract class Item {
    }
 
    protected boolean scrollDown() {
-      if(this.anIntArray179 != null && this.anIntArray179.length > 0 && this.anInt182 < this.anIntArray179.length - 1) {
-         ++this.anInt182;
+      if(this.anIntArray179 != null && this.anIntArray179.length > 0 && this.currentPos < this.anIntArray179.length - 1) {
+         ++this.currentPos;
          return false;
       } else {
          return true;

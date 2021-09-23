@@ -12,7 +12,6 @@ public class Texture2D extends Transformable
     public static final int FUNC_REPLACE = 228;
     public static final int WRAP_CLAMP = 240;
     public static final int WRAP_REPEAT = 241;
-    static Class class$javax$microedition$m3g$Texture2D;
     
     Texture2D(final int n) {
         super(n);
@@ -21,7 +20,7 @@ public class Texture2D extends Transformable
     public Texture2D(final Image2D image2D) {
         this(create(image2D));
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Texture2D.class$javax$microedition$m3g$Texture2D == null) ? (Texture2D.class$javax$microedition$m3g$Texture2D = class$("javax.microedition.m3g.Texture2D")) : Texture2D.class$javax$microedition$m3g$Texture2D));
+        super.ii = (getClass() != Texture2D.class);
         Engine.addXOT(image2D);
     }
     
@@ -59,13 +58,4 @@ public class Texture2D extends Transformable
     public native void setWrapping(final int p0, final int p1);
     
     public native void setFiltering(final int p0, final int p1);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

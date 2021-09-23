@@ -2,7 +2,6 @@ package javax.microedition.m3g;
 
 public class Appearance extends Object3D
 {
-    static Class class$javax$microedition$m3g$Appearance;
     
     Appearance(final int n) {
         super(n);
@@ -11,7 +10,7 @@ public class Appearance extends Object3D
     public Appearance() {
         this(create());
         Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != ((Appearance.class$javax$microedition$m3g$Appearance == null) ? (Appearance.class$javax$microedition$m3g$Appearance = class$("javax.microedition.m3g.Appearance")) : Appearance.class$javax$microedition$m3g$Appearance));
+        super.ii = (getClass() != Appearance.class);
     }
     
     private static native int create();
@@ -84,13 +83,4 @@ public class Appearance extends Object3D
     }
     
     private native void setTextureImpl(final int p0, final Texture2D p1);
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

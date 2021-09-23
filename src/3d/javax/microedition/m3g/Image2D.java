@@ -127,13 +127,4 @@ public class Image2D extends Object3D
     Image2D qonvertATITC(final int n) {
         return (Image2D)Engine.instantiateJavaPeer(this.qonvertATITCImpl(n));
     }
-    
-    static Class class$(final String s) {
-        try {
-            return Class.forName(s);
-        }
-        catch (ClassNotFoundException ex) {
-            throw new NoClassDefFoundError(ex.getMessage());
-        }
-    }
 }

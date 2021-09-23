@@ -5,7 +5,6 @@ import emulator.*;
 public class RayIntersection
 {
     int swerveHandle;
-    static Class class$javax$microedition$m3g$RayIntersection;
     
     protected native void finalize();
     

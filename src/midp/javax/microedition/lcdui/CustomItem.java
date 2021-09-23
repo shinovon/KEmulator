@@ -46,23 +46,23 @@ public abstract class CustomItem extends Item
                 break;
             }
             default: {
-                if (n == Keyboard.method595(1)) {
+                if (n == Keyboard.getArrowKeyFromDevice(1)) {
                     n3 = 1;
                     break;
                 }
-                if (n == Keyboard.method595(6)) {
+                if (n == Keyboard.getArrowKeyFromDevice(6)) {
                     n3 = 6;
                     break;
                 }
-                if (n == Keyboard.method595(2)) {
+                if (n == Keyboard.getArrowKeyFromDevice(2)) {
                     n3 = 2;
                     break;
                 }
-                if (n == Keyboard.method595(5)) {
+                if (n == Keyboard.getArrowKeyFromDevice(5)) {
                     n3 = 5;
                     break;
                 }
-                if (n == Keyboard.method595(8)) {
+                if (n == Keyboard.getArrowKeyFromDevice(8)) {
                     n3 = 8;
                     break;
                 }
@@ -132,7 +132,7 @@ public abstract class CustomItem extends Item
     
     protected void paint(final Graphics graphics) {
         this.aGraphics428.setColor(-1);
-        this.aGraphics428.fillRect(0, 0, super.aScreen176.w, super.aScreen176.h);
+        this.aGraphics428.fillRect(0, 0, super.screen.w, super.screen.h);
         this.aGraphics428.setColor(0);
         final int n = super.anIntArray21[0] + 2;
         int n2 = super.anIntArray21[1] + 2;
@@ -149,24 +149,24 @@ public abstract class CustomItem extends Item
         }
         graphics.setClip(n, n2, prefContentWidth, prefContentHeight);
         graphics.drawImage(this.anImage427, n, n2, 0);
-        graphics.setClip(0, 0, super.aScreen176.w, super.aScreen176.h);
+        graphics.setClip(0, 0, super.screen.w, super.screen.h);
     }
     
     protected void layout() {
         super.layout();
         int n = 0;
         final int n2 = this.getPreferredWidth() - 8;
-        if (super.aString172 != null) {
-            super.aStringArray175 = c.method175(super.aString172, Item.aFont173, n2, n2);
+        if (super.label != null) {
+            super.aStringArray175 = c.method175(super.label, Item.aFont173, n2, n2);
             n = 0 + (Item.aFont173.getHeight() + 4) * super.aStringArray175.length;
         }
         else {
             super.aStringArray175 = null;
         }
-        super.anIntArray21[3] = Math.min(n + (this.getPrefContentHeight(super.anIntArray21[3]) + 4), super.aScreen176.anIntArray21[3]);
+        super.anIntArray21[3] = Math.min(n + (this.getPrefContentHeight(super.anIntArray21[3]) + 4), super.screen.anIntArray21[3]);
     }
     
     protected boolean callTraverse(final int n) {
-        return this.traverse(this.getGameAction(n), super.aScreen176.w, super.aScreen176.h, this.anIntArray429);
+        return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
     }
 }

@@ -57,19 +57,19 @@ public abstract class Canvas extends Displayable
                     super.aBoolean18 = false;
                 }
             }
-            else if (n == Keyboard.method595(1)) {
+            else if (n == Keyboard.getArrowKeyFromDevice(1)) {
                 if (super.anInt28 > 0) {
                     --super.anInt28;
                 }
             }
-            else if (n == Keyboard.method595(6)) {
+            else if (n == Keyboard.getArrowKeyFromDevice(6)) {
                 if (super.anInt28 < super.aVector26.size() - 2) {
                     ++super.anInt28;
                 }
             }
             else {
                 final int n3;
-                if (n == Keyboard.method595(8) && (n3 = super.anInt28 + 1) < super.aVector26.size()) {
+                if (n == Keyboard.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.aVector26.size()) {
                     super.aCommandListener19.commandAction((Command)super.aVector26.get(n3), this);
                     super.aBoolean18 = false;
                 }
@@ -221,23 +221,23 @@ public abstract class Canvas extends Displayable
                 break;
             }
             default: {
-                if (n == Keyboard.method595(1) || n == 50) {
+                if (n == Keyboard.getArrowKeyFromDevice(1) || n == 50) {
                     n3 = 1;
                     break;
                 }
-                if (n == Keyboard.method595(6) || n == 56) {
+                if (n == Keyboard.getArrowKeyFromDevice(6) || n == 56) {
                     n3 = 6;
                     break;
                 }
-                if (n == Keyboard.method595(2) || n == 52) {
+                if (n == Keyboard.getArrowKeyFromDevice(2) || n == 52) {
                     n3 = 2;
                     break;
                 }
-                if (n == Keyboard.method595(5) || n == 54) {
+                if (n == Keyboard.getArrowKeyFromDevice(5) || n == 54) {
                     n3 = 5;
                     break;
                 }
-                if (n == Keyboard.method595(8) || n == 53) {
+                if (n == Keyboard.getArrowKeyFromDevice(8) || n == 53) {
                     n3 = 8;
                     break;
                 }
@@ -253,23 +253,23 @@ public abstract class Canvas extends Displayable
         int n3 = 0;
         switch (n) {
             case 1: {
-                n3 = Keyboard.method595(1);
+                n3 = Keyboard.getArrowKeyFromDevice(1);
                 break;
             }
             case 6: {
-                n3 = Keyboard.method595(6);
+                n3 = Keyboard.getArrowKeyFromDevice(6);
                 break;
             }
             case 2: {
-                n3 = Keyboard.method595(2);
+                n3 = Keyboard.getArrowKeyFromDevice(2);
                 break;
             }
             case 5: {
-                n3 = Keyboard.method595(5);
+                n3 = Keyboard.getArrowKeyFromDevice(5);
                 break;
             }
             case 8: {
-                n3 = Keyboard.method595(8);
+                n3 = Keyboard.getArrowKeyFromDevice(8);
                 break;
             }
             case 9: {
@@ -354,23 +354,23 @@ public abstract class Canvas extends Displayable
                 break;
             }
             default: {
-                if (n == Keyboard.method595(1)) {
+                if (n == Keyboard.getArrowKeyFromDevice(1)) {
                     s2 = "Up";
                     break;
                 }
-                if (n == Keyboard.method595(6)) {
+                if (n == Keyboard.getArrowKeyFromDevice(6)) {
                     s2 = "Down";
                     break;
                 }
-                if (n == Keyboard.method595(2)) {
+                if (n == Keyboard.getArrowKeyFromDevice(2)) {
                     s2 = "Left";
                     break;
                 }
-                if (n == Keyboard.method595(5)) {
+                if (n == Keyboard.getArrowKeyFromDevice(5)) {
                     s2 = "Right";
                     break;
                 }
-                if (n == Keyboard.method595(8)) {
+                if (n == Keyboard.getArrowKeyFromDevice(8)) {
                     s2 = "Select";
                     break;
                 }

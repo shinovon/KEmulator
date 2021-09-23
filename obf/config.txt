@@ -121,7 +121,7 @@
 
 -keep,allowshrinking class emulator.debug.ObjInstance
 
--keep,allowshrinking class javax.microedition.m3g.** {
+-keep class javax.microedition.m3g.** {
     <fields>;
     <methods>;
 }

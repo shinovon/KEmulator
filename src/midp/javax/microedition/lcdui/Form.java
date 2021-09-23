@@ -17,11 +17,11 @@ public class Form extends Screen
                 if (array[i] == null) {
                     throw new NullPointerException();
                 }
-                if (array[i].aScreen176 != null) {
+                if (array[i].screen != null) {
                     throw new IllegalStateException();
                 }
                 super.aVector443.add(array[i]);
-                array[i].aScreen176 = this;
+                array[i].screen = this;
             }
         }
     }
@@ -30,25 +30,25 @@ public class Form extends Screen
         if (item == null) {
             throw new NullPointerException();
         }
-        if (item.aScreen176 != null) {
+        if (item.screen != null) {
             throw new IllegalStateException();
         }
         super.aVector443.add(item);
-        item.aScreen176 = this;
+        item.screen = this;
         return super.aVector443.size() - 1;
     }
     
     public int append(final String s) {
         final StringItem stringItem = new StringItem(null, s);
         super.aVector443.add(stringItem);
-        stringItem.aScreen176 = this;
+        stringItem.screen = this;
         return super.aVector443.size() - 1;
     }
     
     public int append(final Image image) {
         final ImageItem imageItem = new ImageItem(null, image, 0, null);
         super.aVector443.add(imageItem);
-        imageItem.aScreen176 = this;
+        imageItem.screen = this;
         return super.aVector443.size() - 1;
     }
     
@@ -56,24 +56,24 @@ public class Form extends Screen
         if (item == null) {
             throw new NullPointerException();
         }
-        if (item.aScreen176 != null) {
+        if (item.screen != null) {
             throw new IllegalStateException();
         }
         super.aVector443.insertElementAt(item, n);
-        item.aScreen176 = this;
+        item.screen = this;
     }
     
     public void delete(final int n) {
         if (n < 0 || n >= super.aVector443.size()) {
             throw new IndexOutOfBoundsException();
         }
-        ((Item)super.aVector443.get(n)).aScreen176 = null;
+        ((Item)super.aVector443.get(n)).screen = null;
         super.aVector443.remove(n);
     }
     
     public void deleteAll() {
         for (int i = 0; i < super.aVector443.size(); ++i) {
-            ((Item)super.aVector443.get(i)).aScreen176 = null;
+            ((Item)super.aVector443.get(i)).screen = null;
         }
         super.aVector443.removeAllElements();
     }
@@ -85,12 +85,12 @@ public class Form extends Screen
         if (item == null) {
             throw new NullPointerException();
         }
-        if (item.aScreen176 != null) {
+        if (item.screen != null) {
             throw new IllegalStateException();
         }
-        ((Item)super.aVector443.get(n)).aScreen176 = null;
+        ((Item)super.aVector443.get(n)).screen = null;
         super.aVector443.set(n, item);
-        item.aScreen176 = null;
+        item.screen = null;
     }
     
     public Item get(final int n) {

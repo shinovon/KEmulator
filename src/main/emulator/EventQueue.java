@@ -8,10 +8,10 @@ import net.rim.device.api.system.*;
 import emulator.graphics2D.*;
 
 public final class EventQueue implements Runnable {
-	private ArrayList<Integer> events;
+	private int[] events;
 	private ArrayList<Integer> mouseEvents;
-	//private int anInt1215;
-	//private int anInt1220;
+	private int readed;
+	private int ind;
 	private int anInt1222;
 	private boolean running;
 	private ThreadCallSerially threadCallSerially = new ThreadCallSerially(this);
@@ -28,10 +28,11 @@ public final class EventQueue implements Runnable {
 
 	public EventQueue() {
 		super();
-		this.events = new ArrayList<Integer>(50);
-		this.mouseEvents = new ArrayList<Integer>(50);
-		//this.anInt1215 = 0;
-		//this.anInt1220 = 0;
+		this.events = new int[128];
+		//this.events = new ArrayList<Integer>(50);
+		//this.mouseEvents = new ArrayList<Integer>(50);
+		this.ind = 0;
+		this.readed = 0;
 		this.anInt1222 = 0;
 		this.canvasHidden = false;
 		this.running = true;
@@ -97,13 +98,24 @@ public final class EventQueue implements Runnable {
 				}
 			}
 		}).setPriority(1);
-		this.mouseThread.start();
+		//mouseThread.start();
 		
 	}
 
 	public final void stop() {
 		this.running = false;
 	}
+	
+	public final void keyRepeat(int n) {
+		method717(33554432, n);
+	}
+	public final void keyPress(int n) {
+		method717(67108864, n);
+	}
+	public final void keyRelease(int n) {
+		method717(134217728, n);
+	}
+
 
 	public final void method717(final int n, final int n2) {
 		final int n3 = n | method718(n2);
@@ -130,37 +142,37 @@ public final class EventQueue implements Runnable {
 	}
 
 	public final void mouseDown(final int x, final int y) {
-		//try {
-		//	if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-		//		Emulator.getCanvas().invokePointerPressed(x, y);
-		//	} else Emulator.getScreen().invokePointerPressed(x, y);
-		//} catch (Throwable e) {
-		//}
-		mouse(268435456, x, y);
+		try {
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				Emulator.getCanvas().invokePointerPressed(x, y);
+			} else Emulator.getScreen().invokePointerPressed(x, y);
+		} catch (Throwable e) {
+		}
+		//mouse(268435456, x, y);
 	}
 	
 	public final void mouseUp(final int x, final int y) {
-		//try {
-		//	if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-		//		Emulator.getCanvas().invokePointerReleased(x, y);
-		//	} else Emulator.getScreen().invokePointerReleased(x, y);
-		//} catch (Throwable e) {
-		//}
-		mouse(536870912, x, y);
+		try {
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				Emulator.getCanvas().invokePointerReleased(x, y);
+			} else Emulator.getScreen().invokePointerReleased(x, y);
+		} catch (Throwable e) {
+		}
+		//mouse(536870912, x, y);
 	}
 	
 	public final void mouseDrag(final int x, final int y) {
-		//try {
-		//	if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-		//		Emulator.getCanvas().invokePointerDragged(x, y);
-		//	} else Emulator.getScreen().invokePointerDragged(x, y);
-		//} catch (Throwable e) {
-		//}
+		try {
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				Emulator.getCanvas().invokePointerDragged(x, y);
+			} else Emulator.getScreen().invokePointerDragged(x, y);
+		} catch (Throwable e) {
+		}
 		//dx = x;
 		//dy = y;
 		//changed = true;
 		//resetTimer();
-		mouse(1073741824, x, y);
+		//mouse(1073741824, x, y);
 	}
 
 	public void queue(int n, int x, int y) {
@@ -174,8 +186,8 @@ public final class EventQueue implements Runnable {
 
 	public synchronized final void mouse(final int n, final int x, final int y) {
 		final int n4 = n | method718(x) | method718(y) << 12;
-		//this.queue(n4);
-		mouseEvents.add(n4);
+		this.queue(n4);
+		//mouseEvents.add(n4);
 		//Emulator.getNetMonitor().b(n4);
 	}
 	
@@ -192,7 +204,7 @@ public final class EventQueue implements Runnable {
 	 * queue event
 	 */
 	public synchronized final void queue(final int n) {
-		synchronized (events) {
+		//synchronized (events) {
 		if (n == 1) {
 			this.repainted2 = false;
 		}
@@ -202,17 +214,32 @@ public final class EventQueue implements Runnable {
 		if (n == 15) {
 			this.canvasHidden = false;
 		}
-		events.add(n);
+		//events.add(n);
+		this.events[this.ind++] = n;
+		if (this.ind >= events.length) {
+			this.ind = 0;
 		}
+		//}
 	}
 
 	private synchronized int nextEvent() {
-		synchronized (events) {
+		if (this.readed == this.ind) {
+			return 0;
+		}
+		int n = this.events[this.readed];
+		this.events[this.readed++] = 0;
+		if (this.readed >= events.length) {
+			this.readed = 0;
+		}
+		return n;
+		/*
+		//synchronized (events) {
 		if(events.size() == 0) return 0;
 		final int n = events.get(0);
 		events.remove(0);
 		return n;
-		}
+		//}
+		 */
 	}
 
 	public final void waitRepainted2() {

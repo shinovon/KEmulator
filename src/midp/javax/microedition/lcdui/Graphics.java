@@ -7,7 +7,7 @@ import emulator.graphics2D.*;
 
 public class Graphics
 {
-    IGraphics2D anIGraphics2D516;
+    IGraphics2D egraphics;
     IImage anIImage517;
     IImage anIImage522;
     IGraphics2D anIGraphics2D523;
@@ -33,7 +33,7 @@ public class Graphics
         this.anInt524 = 0;
         this.anIntArray521 = new int[6];
         this.anIImage517 = anIImage517;
-        this.anIGraphics2D516 = anIImage517.createGraphics();
+        this.egraphics = anIImage517.createGraphics();
         this.anIImage522 = Emulator.getEmulator().newImage(this.anIImage517.getWidth(), this.anIImage517.getHeight(), false);
         this.anIImage525 = anIImage518;
         (this.anIGraphics2D523 = anIImage518.createGraphics()).setAlpha(60);
@@ -44,7 +44,7 @@ public class Graphics
         if (Settings.xrayView) {
             return this.anIGraphics2D523;
         }
-        return this.anIGraphics2D516;
+        return this.egraphics;
     }
     
     public IImage getImage() {
@@ -52,33 +52,33 @@ public class Graphics
     }
     
     public void copyArea(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7) {
-        final ITransform transform = this.anIGraphics2D516.getTransform().newTransform(n3, n4, 0, n5, n6, n7);
+        final ITransform transform = this.egraphics.getTransform().newTransform(n3, n4, 0, n5, n6, n7);
         this.anIImage517.cloneImage(this.anIImage522);
         this.drawRegion(this.anIImage522, n, n2, n3, n4, transform, 16777215);
     }
     
     public void clipRect(final int n, final int n2, final int n3, final int n4) {
-        this.anIGraphics2D516.clipRect(n, n2, n3, n4);
+        this.egraphics.clipRect(n, n2, n3, n4);
         this.anIGraphics2D523.clipRect(n, n2, n3, n4);
     }
     
     public void drawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.anIGraphics2D516.drawArc(n, n2, n3 + 1, n4 + 1, n5, n6);
+        this.egraphics.drawArc(n, n2, n3 + 1, n4 + 1, n5, n6);
         this.method295(n, n2, n3 + 1, n4 + 1, n5, n6);
     }
     
     public void drawLine(final int n, final int n2, final int n3, final int n4) {
-        this.anIGraphics2D516.drawLine(n, n2, n3, n4);
+        this.egraphics.drawLine(n, n2, n3, n4);
         this.method296(n, n2, n3, n4);
     }
     
     public void drawRect(final int n, final int n2, final int n3, final int n4) {
-        this.anIGraphics2D516.drawRect(n, n2, n3, n4);
+        this.egraphics.drawRect(n, n2, n3, n4);
         this.method292(n, n2, n3, n4);
     }
     
     public void drawRoundRect(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.anIGraphics2D516.drawRoundRect(n, n2, n3, n4, n5, n6);
+        this.egraphics.drawRoundRect(n, n2, n3, n4, n5, n6);
         this.method292(n, n2, n3, n4);
     }
 
@@ -122,7 +122,7 @@ public class Graphics
              n2 = n5 - height;
           }
 
-          this.anIGraphics2D516.drawImage(image.getImpl(), n, n2);
+          this.egraphics.drawImage(image.getImpl(), n, n2);
           this.method289(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
           ++image.anInt1309;
           ++Profiler.drawImageCallCount;
@@ -132,10 +132,10 @@ public class Graphics
 
     
     public void drawRegion(final IImage image, final int n, final int n2, final int n3, final int n4, final ITransform transform, final int n5) {
-        final ITransform transform2 = this.anIGraphics2D516.getTransform();
-        this.anIGraphics2D516.transform(transform);
-        this.anIGraphics2D516.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
-        this.anIGraphics2D516.setTransform(transform2);
+        final ITransform transform2 = this.egraphics.getTransform();
+        this.egraphics.transform(transform);
+        this.egraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
+        this.egraphics.setTransform(transform2);
         if (n5 >= 0 && Settings.xrayView) {
             this.anIGraphics2D523.transform(transform);
             if (Settings.xrayOverlapScreen) {
@@ -159,11 +159,11 @@ public class Graphics
         if (!method294(n8, 64)) {
             throw new IllegalArgumentException();
         }
-        final ITransform transform = this.anIGraphics2D516.getTransform().newTransform(n3, n4, n5, n6, n7, n8);
-        final ITransform transform2 = this.anIGraphics2D516.getTransform();
-        this.anIGraphics2D516.transform(transform);
-        this.anIGraphics2D516.drawImage(image.getImpl(), n, n2, n3, n4, 0, 0, n3, n4);
-        this.anIGraphics2D516.setTransform(transform2);
+        final ITransform transform = this.egraphics.getTransform().newTransform(n3, n4, n5, n6, n7, n8);
+        final ITransform transform2 = this.egraphics.getTransform();
+        this.egraphics.transform(transform);
+        this.egraphics.drawImage(image.getImpl(), n, n2, n3, n4, 0, 0, n3, n4);
+        this.egraphics.setTransform(transform2);
         this.anIGraphics2D523.transform(transform);
         this.method289(image, n, n2, 0, 0, n3, n4);
         this.anIGraphics2D523.setTransform(transform2);
@@ -176,7 +176,7 @@ public class Graphics
         if (array == null) {
             throw new NullPointerException();
         }
-        this.drawRegion(emulator.graphics2D.b.method163(array, b, n, n2, n5, n6), 0, 0, n5, n6, this.anIGraphics2D516.getTransform().newTransform(n5, n6, 0, n3, n4, 0), 16711680);
+        this.drawRegion(emulator.graphics2D.b.method163(array, b, n, n2, n5, n6), 0, 0, n5, n6, this.egraphics.getTransform().newTransform(n5, n6, 0, n3, n4, 0), 16711680);
         ++Profiler.drawRGBCallCount;
         Profiler.drawRGBPixelCount += Math.abs(n5 * n6);
     }
@@ -239,22 +239,22 @@ public class Graphics
             }
             n2 = n6 - baselinePosition;
         }
-        this.anIGraphics2D516.drawString(s, n, n2 + font.getBaselinePosition());
+        this.egraphics.drawString(s, n, n2 + font.getBaselinePosition());
         this.method291(n, n2, stringWidth, height, 255);
     }
     
     public void fillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.anIGraphics2D516.fillArc(n, n2, n3, n4, n5, n6);
+        this.egraphics.fillArc(n, n2, n3, n4, n5, n6);
         this.method290(n, n2, n3, n4, n5, n6);
     }
     
     public void fillRect(final int n, final int n2, final int n3, final int n4) {
-        this.anIGraphics2D516.fillRect(n, n2, n3, n4);
+        this.egraphics.fillRect(n, n2, n3, n4);
         this.method291(n, n2, n3, n4, 16777215);
     }
     
     public void fillRoundRect(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.anIGraphics2D516.fillRoundRect(n, n2, n3, n4, n5, n6);
+        this.egraphics.fillRoundRect(n, n2, n3, n4, n5, n6);
         this.method291(n, n2, n3, n4, 16777215);
     }
     
@@ -265,7 +265,7 @@ public class Graphics
         this.anIntArray521[3] = n4;
         this.anIntArray521[4] = n5;
         this.anIntArray521[5] = n6;
-        this.anIGraphics2D516.fillPolygon(this.anIntArray521);
+        this.egraphics.fillPolygon(this.anIntArray521);
     }
     
     private void method289(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
@@ -380,23 +380,23 @@ public class Graphics
     }
     
     public int getClipHeight() {
-        return this.anIGraphics2D516.getClipHeight();
+        return this.egraphics.getClipHeight();
     }
     
     public int getClipWidth() {
-        return this.anIGraphics2D516.getClipWidth();
+        return this.egraphics.getClipWidth();
     }
     
     public int getClipX() {
-        return this.anIGraphics2D516.getClipX();
+        return this.egraphics.getClipX();
     }
     
     public int getClipY() {
-        return this.anIGraphics2D516.getClipY();
+        return this.egraphics.getClipY();
     }
     
     public int getColor() {
-        return this.anIGraphics2D516.getColor();
+        return this.egraphics.getColor();
     }
     
     public Font getFont() {
@@ -404,15 +404,15 @@ public class Graphics
     }
     
     public int getGreenComponent() {
-        return this.anIGraphics2D516.getColorGreen();
+        return this.egraphics.getColorGreen();
     }
     
     public int getRedComponent() {
-        return this.anIGraphics2D516.getColorRed();
+        return this.egraphics.getColorRed();
     }
     
     public int getBlueComponent() {
-        return this.anIGraphics2D516.getColorBlue();
+        return this.egraphics.getColorBlue();
     }
     
     public int getTranslateX() {
@@ -424,25 +424,25 @@ public class Graphics
     }
     
     public void setClip(final int n, final int n2, final int n3, final int n4) {
-        this.anIGraphics2D516.setClip(n, n2, n3, n4);
+        this.egraphics.setClip(n, n2, n3, n4);
         this.anIGraphics2D523.setClip(n, n2, n3, n4);
     }
     
     public void setColor(final int n) {
-        this.anIGraphics2D516.setColor(n, false);
+        this.egraphics.setColor(n, false);
     }
     
     public void setColor(final int n, final int n2, final int n3) {
-        this.anIGraphics2D516.setColor(n, n2, n3);
+        this.egraphics.setColor(n, n2, n3);
     }
     
     public void setFont(final Font font) {
         this.aFont520 = ((font == null) ? Font.getDefaultFont() : font);
-        this.anIGraphics2D516.setFont(this.aFont520.getImpl());
+        this.egraphics.setFont(this.aFont520.getImpl());
     }
     
     public int getGrayScale() {
-        return (int)(255.0f * this.anIGraphics2D516.RGBtoHSB(this.getRedComponent(), this.getGreenComponent(), this.getBlueComponent())[2]);
+        return (int)(255.0f * this.egraphics.RGBtoHSB(this.getRedComponent(), this.getGreenComponent(), this.getBlueComponent())[2]);
     }
     
     public void setGrayScale(final int n) {
@@ -455,7 +455,7 @@ public class Graphics
     public void translate(final int n, final int n2) {
         this.anInt519 += n;
         this.anInt524 += n2;
-        this.anIGraphics2D516.translate(n, n2);
+        this.egraphics.translate(n, n2);
         this.anIGraphics2D523.translate(n, n2);
     }
     
@@ -464,11 +464,11 @@ public class Graphics
     }
     
     public void setStrokeStyle(final int strokeStyle) {
-        this.anIGraphics2D516.setStrokeStyle(strokeStyle);
+        this.egraphics.setStrokeStyle(strokeStyle);
     }
     
     public int getStrokeStyle() {
-        return this.anIGraphics2D516.getStrokeStyle();
+        return this.egraphics.getStrokeStyle();
     }
     
     private static boolean method294(final int n, final int n2) {

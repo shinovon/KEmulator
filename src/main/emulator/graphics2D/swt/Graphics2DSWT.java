@@ -269,4 +269,8 @@ public final class Graphics2DSWT implements IGraphics2D
         final boolean b;
         return (b = (this.aGC529.getLineStyle() != 1)) ? 1 : 0;
     }
+
+	public IFont getFont() {
+		return null;
+	}
 }

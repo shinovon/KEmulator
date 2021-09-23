@@ -1403,7 +1403,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         }
         if (this.aBooleanArray978[n]) {
             if (Settings.enableKeyRepeat) {
-                Emulator.getEventQueue().method717(33554432, Integer.parseInt(method605));
+                Emulator.getEventQueue().keyRepeat(Integer.parseInt(method605));
             }
             return;
         }
@@ -1416,7 +1416,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         if (Settings.recordKeys && !Settings.q) {
             Emulator.getRobot().method697(EmulatorScreen.aLong982 + ":" + '0' + method605);
         }
-        Emulator.getEventQueue().method717(67108864, Integer.parseInt(method605));
+        Emulator.getEventQueue().keyPress(Integer.parseInt(method605));
     }
     
     protected final void handleKeyRelease(int n) {
@@ -1470,7 +1470,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         if (Settings.recordKeys && !Settings.q) {
             Emulator.getRobot().method697(EmulatorScreen.aLong982 + ":" + '1' + method605);
         }
-        Emulator.getEventQueue().method717(134217728, Integer.parseInt(method605));
+        Emulator.getEventQueue().keyRelease(Integer.parseInt(method605));
     }
     
     public final void mouseDoubleClick(final MouseEvent mouseEvent) {
@@ -1480,7 +1480,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         if (mouseEvent.button != 1 || Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
             return;
         }
-        Emulator.getScreen().invokeKeyPressed(Keyboard.method595(8));
+        Emulator.getScreen().invokeKeyPressed(Keyboard.getArrowKeyFromDevice(8));
     }
     
     public final void mouseDown(final MouseEvent mouseEvent) {
