@@ -31,7 +31,6 @@ final class HttpConnectionImpl implements HttpConnection {
 
 	public HttpConnectionImpl(String url) throws IOException {
 		super();
-		//url = "http://global-4-lvs-lamport.opera-mini.net:/80";
 		this.url = url;
 		this.closed = false;
 		Emulator.getEmulator().getLogStream().println("Connect to: " + url);
@@ -204,8 +203,6 @@ final class HttpConnectionImpl implements HttpConnection {
 			return;
 		try {
 			if (getRequestProperty("User-Agent") == null) {
-				Emulator.customUA = "Mozilla/5.0 (Linux; Android 11; SM-G770F Build/RP1A.200720.012; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.88 Mobile Safari/537.36";
-				System.out.println(Emulator.customUA);
 				if (Emulator.customUA != null) {
 					connection.setRequestProperty("User-Agent", 
 							Emulator.customUA);
