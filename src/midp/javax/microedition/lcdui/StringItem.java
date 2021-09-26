@@ -68,16 +68,25 @@ public class StringItem extends Item
         	if(str == null) {
         		str = "...";
         	}
-	        graphics.drawString(str, super.anIntArray21[0] + 4, n + 2, 0);
+        	int k = super.anIntArray21[0];
+	        graphics.drawString(str, k + 4, n + 1, 0);
 	        // определение размера строки
 	        int j = 0;
 	        IFont f = graphics.getImpl().getFont();
 	        if(f != null)
 	        	j = f.stringWidth(str);
 	        if(j > 0) {
+	        	int h = font.getHeight();
 	        	//очертания кнопки
-	        	graphics.drawLine(super.anIntArray21[0] + 4, n + font.getHeight() + 2, super.anIntArray21[0] + 4 + j, n + font.getHeight() + 2); 
-	        	graphics.drawRect(super.anIntArray21[0] + 2, n, j + 4, font.getHeight() + 4); 
+	        	int o = graphics.getColor();
+	        	graphics.setColor(0xababab);
+	        	k = k + 2;
+	        	int lx = k + 2 + j + 1;
+	        	int ly = n + h + 3;
+	        	graphics.drawLine(k + 1, ly, lx, ly); 
+	        	graphics.drawLine(lx, ly, lx, n + 1); 
+	        	graphics.setColor(o);
+	        	graphics.drawRect(k, n, j + 4, h + 4); 
 	        }
         } else {
 	        for (int i = this.getcurPage(); i < this.textArr.length; ++i) {

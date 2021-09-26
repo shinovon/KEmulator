@@ -141,7 +141,6 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final String getHeaderField(final String s) throws IOException {
-		System.out.println("getHeaderField " + s);
 		return this.connection.getHeaderField(s);
 	}
 
@@ -154,12 +153,10 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final String getHeaderField(final int n) throws IOException {
-		System.out.println("getHeaderField " + n);
 		return this.connection.getHeaderField(n);
 	}
 
 	public final String getHeaderFieldKey(final int n) throws IOException {
-		System.out.println("getHeaderFieldKey " + n);
 		return this.connection.getHeaderFieldKey(n);
 	}
 
