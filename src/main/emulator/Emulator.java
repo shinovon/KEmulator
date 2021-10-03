@@ -72,11 +72,12 @@ public class Emulator
 	private static String imei;
 	public static boolean askPermissions = false;
 	public static boolean askImei = false;
+	private static String midletName;
 	
-	public static final String titleVersion = "v2.10";
-	public static final String aboutVersion = "v10";
+	public static final String titleVersion = "v2.10.2";
+	public static final String aboutVersion = "v2.10";
 	public static final int numericVersion = 10;
-	public static final String propVersion = "v10";
+	public static final String propVersion = "v2.10";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -704,10 +705,17 @@ public class Emulator
         		}
         	}
         	String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-        	if(midlet != null && (midlet.equalsIgnoreCase("vika touch"))) {
-        		// TODO: насрать
-        		
+        	Emulator.midletName = midlet;
+        	if(midlet != null) {
+        		if(midlet.equalsIgnoreCase("vika touch")) {
+	        		// TODO: насрать
+	        	} else if(midlet.equalsIgnoreCase("bounce tales")) {
+	        		Settings.fpsGame = 1;
+	        	} else if(midlet.equalsIgnoreCase("micro counter strike")) {
+	        		Settings.fpsGame = 2;
+	        	} else Settings.fpsGame = 0;
         	}
+        	
         	if(midlet != null && (midlet.equalsIgnoreCase("Shiza") || midlet.toLowerCase().startsWith("touch")/* || midlet.toLowerCase().startsWith("vika")*/))
         	plat += "/KEmulatorMod";
             System.setProperty("microedition.platform", plat);
@@ -770,7 +778,6 @@ public class Emulator
     }
 
 	public static void main(final String[] commandLineArguments) {
-		System.out.println(System.getProperties().toString());
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.method709();

@@ -173,7 +173,7 @@ public final class Keyboard
         if ((value = Keyboard.deviceKeyToStr.get(String.valueOf(n))) != null) {
             return (String)Keyboard.strToPCKey.get(value);
         }
-        if(Settings.fpsMode) {
+        if(Settings.fpsMode && Settings.fpsGame == 2) {
         	//up
         	if(n == 'w') return "" + getArrowKeyFromDevice(1);
         	//down

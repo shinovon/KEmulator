@@ -10,18 +10,14 @@ public class Gauge extends Item
 	private int max;
 	private int value;
 	private boolean interact;
-	private int mode = -1;
     
 	private long lastIncrementTime;
 	private boolean continuosDir;
 	private int continuosValue;
-	private static long continousIncTime = 100;
+	private static long continousIncTime = 1;
 	
     public Gauge(String label, boolean interactive, int maxValue, int initialValue) {
         super(label);
-        if(max == INDEFINITE) {
-        	mode = initialValue;
-        }
     	value = initialValue;
     	max = maxValue;
     	interact = interactive;
@@ -52,15 +48,10 @@ public class Gauge extends Item
     }
     
     public void setValue(int value) {
-    	if(max == -1) {
-    		mode = value;
-    		return;
-    	}
     	this.value = value;
     }
     
     public int getValue() {
-    	if(mode != -1) return mode;
         return value;
     }
     
@@ -83,54 +74,71 @@ public class Gauge extends Item
     	if(!interact) {
     		int max = this.max;
     		int val = this.value;
-    		switch(mode) {
-    		case -1: {
-    			break;
-    		}
-    		default:
-    			//TODO INCREMENTAL
-    		case CONTINUOUS_RUNNING: {
-    			System.out.println("continous");
-    			max = 100;
-				if(System.currentTimeMillis() - lastIncrementTime > continousIncTime) {
-	    			if(continuosDir)
-	    				continuosValue++;
-	    			else
-	    				continuosValue--;
-					lastIncrementTime = System.currentTimeMillis();
-    			}
-    			if(continuosValue >= max || continuosValue <= 0) {
-    				continuosDir = !continuosDir;
-    			}
-    			val = continuosValue;
-    			break;
-    		}
+    		if(max == -1) {
+	    		switch(value) {
+	    		case -1: {
+	    			break;
+	    		}
+	    		default:
+	    			//TODO INCREMENTAL
+	    		case CONTINUOUS_RUNNING: {
+	    			max = 50;
+					//if(System.currentTimeMillis() - lastIncrementTime > continousIncTime) {
+		    			if(!continuosDir)
+		    				continuosValue++;
+		    			else
+		    				continuosValue--;
+						//lastIncrementTime = System.currentTimeMillis();
+	    			//}
+	    			if(continuosValue >= max || continuosValue < 0) {
+	    				continuosDir = !continuosDir;
+	    			}
+	    			val = continuosValue;
+	    			break;
+	    		}
+	    		}
     		}
         	int x = super.bounds[X];
             int y = super.bounds[Y];
 	        int w = super.bounds[W];
 	        int h = font.getHeight();
-    		if(label != null)
-            	g.drawString(label, x, y, 0);
-        	g.setColor(0xababab);
-        	g.drawRect(x, y + h + 4, w, h); 
-        	g.setColor(0x0000ff);
         	int off = 2;
-        	g.fillRect(x + off, y + h + 4 + off, (int)((double)w * ((double)val/(double)max)) - off - 1, h - off - 1); 
+        	int yoff = 0;
+    		if(label != null) {
+            	g.drawString(label, x, y, 0);
+            	yoff += h + 4;
+    		}
+        	g.setColor(0xababab);
+        	g.drawRect(x, y + yoff, w, h); 
+        	g.setColor(0x0000ff);
+        	g.fillRect(x + off, y + yoff + off, (int)((double)w * ((double)val/(double)max)) - off - 1, h - off - 1); 
     	} else {
     		//TODO
+        	int x = super.bounds[X];
+            int y = super.bounds[Y];
+	        int w = super.bounds[W];
+        	int h = font.getHeight();
+        	int yoff = 0;
+    		if(label != null) {
+            	g.drawString(label, x, y, 0);
+            	yoff += h + 4;
+    		}
+        	g.drawString("UNIMPLEMENTED", x, y + yoff, 0);
     	}
     }
     
     public void layout() {
     	super.layout();
+        final Font font = (this.font != null) ? this.font : Screen.font;
     	if(!interact) {
-	        final Font font = (this.font != null) ? this.font : Screen.font;
 	        int n2 = font.getHeight() + 4;
 	        if(label != null) n2 += font.getHeight() + 4;
 	        super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
     	} else {
     		//TODO
+	        int n2 = font.getHeight() + 4;
+	        if(label != null) n2 += font.getHeight() + 4;
+	        super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
     	}
     }
 }

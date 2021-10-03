@@ -82,6 +82,7 @@ public class Display
             else if (aDisplayable425 instanceof Screen) {
                 Emulator.setScreen((Screen)aDisplayable425);
                 Emulator.getEventQueue().queue(4);
+                ((Screen)aDisplayable425).shown();
                 if (aDisplayable425 instanceof TextBox) {
                     ((TextBox)aDisplayable425).focusCaret();
                 }
@@ -261,7 +262,7 @@ public class Display
             Display.current.defocus();
         }
         Display.current = alert;
-        alert.aDisplayable835 = aDisplayable835;
+        alert.lastDisplayed = aDisplayable835;
         Emulator.setScreen(alert);
         Emulator.getEventQueue().queue(4);
         alert.updateCommands();

@@ -4,78 +4,78 @@ import emulator.*;
 
 public class TextBox extends Screen
 {
-    private TextField aTextField1305;
+    private TextField textField;
     
     public TextBox(final String s, final String s2, final int n, final int n2) {
         super(s);
-        this.aTextField1305 = new TextField(null, s2, n, n2);
-        super.items.add(this.aTextField1305);
-        this.aTextField1305.screen = this;
-        this.aTextField1305.isTextBox = true;
-        this.aTextField1305.aBoolean177 = true;
-        this.aTextField1305.inFocus = true;
-        this.aTextField1305.screen.setItemCommands(this.aTextField1305);
+        this.textField = new TextField(null, s2, n, n2);
+        super.items.add(this.textField);
+        this.textField.screen = this;
+        this.textField.isTextBox = true;
+        this.textField.aBoolean177 = true;
+        this.textField.inFocus = true;
+        this.textField.screen.setItemCommands(this.textField);
     }
     
     protected void focusCaret() {
-        this.aTextField1305.screen.setItemCommands(this.aTextField1305);
-        Emulator.getEmulator().getScreen().getCaret().foucsItem(this.aTextField1305, super.bounds[0] + 4, Screen.fontHeight4 + 4);
+        this.textField.screen.setItemCommands(this.textField);
+        Emulator.getEmulator().getScreen().getCaret().foucsItem(this.textField, super.bounds[X] + 4, Screen.fontHeight4 + 4);
     }
     
     public String getString() {
-        return this.aTextField1305.getString();
+        return this.textField.getString();
     }
     
     public void setString(final String string) {
-        this.aTextField1305.setString(string);
+        this.textField.setString(string);
     }
     
     public int getChars(final char[] array) {
-        return this.aTextField1305.getChars(array);
+        return this.textField.getChars(array);
     }
     
     public void setChars(final char[] array, final int n, final int n2) {
-        this.aTextField1305.setChars(array, n, n2);
+        this.textField.setChars(array, n, n2);
     }
     
     public void insert(final String s, final int n) {
-        this.aTextField1305.insert(s, n);
+        this.textField.insert(s, n);
     }
     
     public void insert(final char[] array, final int n, final int n2, final int n3) {
-        this.aTextField1305.insert(array, n, n2, n3);
+        this.textField.insert(array, n, n2, n3);
     }
     
     public void delete(final int n, final int n2) {
-        this.aTextField1305.delete(n, n2);
+        this.textField.delete(n, n2);
     }
     
     public int getMaxSize() {
-        return this.aTextField1305.getMaxSize();
+        return this.textField.getMaxSize();
     }
     
     public int setMaxSize(final int maxSize) {
-        return this.aTextField1305.setMaxSize(maxSize);
+        return this.textField.setMaxSize(maxSize);
     }
     
     public int size() {
-        return this.aTextField1305.size();
+        return this.textField.size();
     }
     
     public int getCaretPosition() {
-        return this.aTextField1305.getCaretPosition();
+        return this.textField.getCaretPosition();
     }
     
     public void setConstraints(final int constraints) {
-        this.aTextField1305.setConstraints(constraints);
+        this.textField.setConstraints(constraints);
     }
     
     public int getConstraints() {
-        return this.aTextField1305.getConstraints();
+        return this.textField.getConstraints();
     }
     
     public void setInitialInputMode(final String initialInputMode) {
-        this.aTextField1305.setInitialInputMode(initialInputMode);
+        this.textField.setInitialInputMode(initialInputMode);
     }
     
     public void setTitle(final String title) {
@@ -88,12 +88,12 @@ public class TextBox extends Screen
     
     protected void paint(final Graphics graphics) {
         this.layout();
-        this.aTextField1305.paint(graphics);
+        this.textField.paint(graphics);
     }
     
     protected void layout() {
-        this.aTextField1305.layout();
-        this.aTextField1305.bounds[1] = Screen.fontHeight4;
+        this.textField.layout();
+        this.textField.bounds[Y] = Screen.fontHeight4;
     }
     
 }

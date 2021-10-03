@@ -246,4 +246,8 @@ public abstract class Screen extends Displayable
         fontHeight = Screen.font.getHeight();
         fontHeight4 = Screen.fontHeight + 4;
     }
+
+	protected void shown() {
+		
+	}
 }

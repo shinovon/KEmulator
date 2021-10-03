@@ -24,7 +24,11 @@ import javax.microedition.media.CapturePlayerImpl;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 
-public final class EmulatorScreen implements IScreen, Runnable, PaintListener, DisposeListener, ControlListener, KeyListener, MouseListener, MouseMoveListener, SelectionListener, MouseWheelListener
+public final class EmulatorScreen implements 
+IScreen, Runnable, PaintListener, DisposeListener, 
+ControlListener, KeyListener, MouseListener,
+MouseMoveListener, SelectionListener, MouseWheelListener,
+MouseTrackListener
 {
     private static Display display;
     private Shell shell;
@@ -137,6 +141,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
 	private boolean fpsWasLeft;
 	private boolean ignoreNextFps;
 	private boolean fpsWasnt;
+	private boolean mset;
     
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -1244,6 +1249,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         ((Control)this.canvas).addMouseListener((MouseListener)this);
         ((Control)this.canvas).addMouseWheelListener((MouseWheelListener)this);
         ((Control)this.canvas).addMouseMoveListener((MouseMoveListener)this);
+        this.canvas.getShell().addMouseTrackListener(this);
         ((Control)this.canvas).addPaintListener((PaintListener)this);
         ((Widget)this.canvas).addListener(37, (Listener)new Class32(this));
         this.aBooleanArray978 = new boolean[256];
@@ -1367,7 +1373,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         if (this.pauseState == 0 || Settings.q) {
             return;
         }
-        if(Settings.fpsMode) {
+        if(Settings.fpsMode && Settings.fpsGame == 2) {
         	boolean b = true;
         	//up
         	if(n == 'w') n = -1;
@@ -1426,7 +1432,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
             return;
         }
 
-        if(Settings.fpsMode) {
+        if(Settings.fpsMode && Settings.fpsGame == 2) {
         	boolean b = true;
         	//up
         	if(n == 'w') n = -1;
@@ -1501,11 +1507,26 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         if (Emulator.getCurrentDisplay().getCurrent() != null) {
         	//System.out.println(mouseEvent.button);
             if(Settings.fpsMode && mouseEvent.button == 3) {
-            	handleKeyPress(57);
+            	if(Settings.fpsGame == 2)
+            		handleKeyPress(57);
+            	else if(Settings.fpsGame == 1)
+            		mp(42);
+            	else if(Settings.fpsGame == 0)
+             		mp(Keyboard.soft2());
+            	return;
+            }
+            if(Settings.fpsMode && mouseEvent.button == 2) {
+            	if(Settings.fpsGame == 1)
+             		mp(Keyboard.soft2());
+            	else if(Settings.fpsGame == 0)
+             		mp(Keyboard.soft1());
             	return;
             }
             if(Settings.fpsMode && mouseEvent.button == 1) {
-            	handleKeyPress(13);
+            	if(Settings.fpsGame == 2)
+            		handleKeyPress(13);
+            	else
+            		mp(Keyboard.getArrowKeyFromDevice(8));
             	return;
             }
             final int n = (int)(mouseEvent.x / this.zoom);
@@ -1524,11 +1545,27 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         }
         if (Emulator.getCurrentDisplay().getCurrent() != null) {
             if(Settings.fpsMode && mouseEvent.button == 3) {
-            	handleKeyRelease(57);
+            	if(Settings.fpsGame == 2)
+            		handleKeyRelease(57);
+            	else if(Settings.fpsGame == 1)
+            		mr(42);
+            	else if(Settings.fpsGame == 0)
+             		mr(Keyboard.soft2());
+            	return;
+            }
+
+            if(Settings.fpsMode && mouseEvent.button == 2) {
+            	if(Settings.fpsGame == 1)
+             		mr(Keyboard.soft2());
+            	else if(Settings.fpsGame == 0)
+             		mr(Keyboard.soft1());
             	return;
             }
             if(Settings.fpsMode && mouseEvent.button == 1) {
-            	handleKeyRelease(13);
+            	if(Settings.fpsGame == 2)
+            		handleKeyRelease(13);
+            	else
+            		mr(Keyboard.getArrowKeyFromDevice(8));
             	return;
             }
             Emulator.getEventQueue().mouseUp((int)(mouseEvent.x / this.zoom), (int)(mouseEvent.y / this.zoom));
@@ -1555,6 +1592,28 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
 		} else {
 		}
     }
+    
+
+
+	@Override
+	public void mouseEnter(MouseEvent arg0) {
+		
+	}
+
+	@Override
+	public void mouseExit(MouseEvent e) {
+        if(Settings.fpsMode) {
+        	System.out.println("mouse exited");
+        	Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
+        	display.setCursorLocation(pt);
+        }
+	}
+
+	@Override
+	public void mouseHover(MouseEvent arg0) {
+		
+	}
+	
     public final void mouseMove(final MouseEvent mouseEvent) {
         if (this.infosEnabled) {
             if (this.mouseDownInfos) {
@@ -1569,6 +1628,16 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
             return;
         }
         if(Settings.fpsMode) {
+        	if(!mset) {
+        	    Color white = display.getSystemColor(SWT.COLOR_WHITE);
+        	    Color black = display.getSystemColor(SWT.COLOR_BLACK);
+        	    PaletteData palette = new PaletteData(new RGB[] { white.getRGB(), black.getRGB() });
+        	    ImageData sourceData = new ImageData(16, 16, 1, palette);
+        	    sourceData.transparentPixel = 0;
+        	    Cursor cursor = new Cursor(display, sourceData, 0, 0);
+                this.canvas.getShell().setCursor(cursor);
+                mset = true;
+        	}
         	Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
         	int dx = mouseEvent.x - canvas.getSize().x / 2;
         	if(canvas.toControl(display.getCursorLocation()).x == canvas.getSize().x / 2) {
@@ -1583,7 +1652,6 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         		}
         		return;
         	}
-        	display.getCursorControl().forceFocus();
         	display.setCursorLocation(pt);
         	if(dx > 1) {
         		// right
@@ -1630,6 +1698,12 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         	lastMouseMoveX = mouseEvent.x;
         	//if(canvas.getSize().x / 2 != mouseEvent.x) ignoreNextFps = true;
         	return;
+        } else {
+        	if(mset) {
+        	    Cursor cursor = new Cursor(display, SWT.CURSOR_ARROW);
+                this.canvas.getShell().setCursor(cursor);
+                mset = false;
+        	}
         }
         if ((mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
             Emulator.getEventQueue().mouseDrag((int)(mouseEvent.x / this.zoom), (int)(mouseEvent.y / this.zoom));
