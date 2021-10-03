@@ -99,37 +99,37 @@ Implemented DataSource player
 $v8 [2021.06.17]
 Added "Canvas keyboard" toggle
 
-$v8 [2021.04.02]
+$mod nnproject v8 [2021.04.02]
 Fixed broken callSerially
 
-$v8 [2021.03.22]
+$mod nnproject v8 [2021.03.22]
 Added discrod rich presence
 
-$v7 [2021.01.31]
+$mod nnproject v7 [2021.01.31]
 Changed Class Watcher Combo Box size
 
-$v7 [2021.01.20]
+$mod nnproject v7 [2021.01.20]
 Implemented NokiaUI 1.4 (partially)
 
-$v7 [2021.01.18]
+$mod nnproject v7 [2021.01.18]
 Fixed MP3 Player
 Implemented getDuration at MP3 Player
 Fixed FileConnection bug
 Implemented capture://image
 
-$v6 [2020.12.07]
-Some implementations for Vika Touch
+$mod nnproject v6 [2020.12.07]
+Compatibility improvements
 
-$v5 [2020.12.05]
+$mod nnproject v5 [2020.12.05]
 Replaced cacerts to fix SSL errors
 Added NokiaN8, E7, E72, 6700c-1 devices. 
 
-$v4 [2020.12.03]
+$mod nnproject v4 [2020.12.03]
 Fixed midi player delay
 Added VirtualMidiSynth support
 Fixed lcdui bugs
 
-$v3 [2020.12.01]
+$mod nnproject v3 [2020.12.01]
 Fixed m3g, was broken by deobfuscation
 
 $v1.0.3 mod nnproject v2 [2020.11.24]

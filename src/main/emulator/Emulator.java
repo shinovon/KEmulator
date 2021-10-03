@@ -637,7 +637,7 @@ public class Emulator
         array[n] = midletJar;
     }
     
-    private static void method288() {
+    private static void setProperties() {
         System.setProperty("microedition.configuration", "CDLC-1.1");
         System.setProperty("microedition.profiles", "MIDP-2.0");
         System.setProperty("microedition.m3g.version", "1.1");
@@ -713,7 +713,7 @@ public class Emulator
 	        		Settings.fpsGame = 1;
 	        	} else if(midlet.equalsIgnoreCase("micro counter strike")) {
 	        		Settings.fpsGame = 2;
-	        	} else Settings.fpsGame = 0;
+	        	}
         	}
         	
         	if(midlet != null && (midlet.equalsIgnoreCase("Shiza") || midlet.toLowerCase().startsWith("touch")/* || midlet.toLowerCase().startsWith("vika")*/))
@@ -826,7 +826,7 @@ public class Emulator
         if(Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
         	Emulator.updatePresence("Running " + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), "" + jar);
         Emulator.emulatorimpl.getEmulatorScreen().method551(inputStream);
-        method288();
+        setProperties();
         if (Emulator.midletClassName == null) {
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
             return;
