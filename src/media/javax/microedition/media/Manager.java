@@ -28,7 +28,7 @@ public class Manager
     }
     
     public static Player createPlayer(final InputStream inputStream, final String s) throws IOException, MediaException {
-    	System.out.println("createPlayer " + inputStream + " " + s);
+    	Emulator.getEmulator().getLogStream().println("createPlayer " + inputStream + " " + s);
         if (inputStream == null) {
             throw new IllegalArgumentException();
         }
@@ -44,7 +44,7 @@ public class Manager
     }
     
     public static Player createPlayer(final String s) throws IOException, MediaException {
-    	System.out.println("createPlayer " + s);
+    	Emulator.getEmulator().getLogStream().println("createPlayer " + s);
     	if(s.startsWith("rtps://")) {
     		return new VideoPlayerImpl(s);
     	}
@@ -79,7 +79,7 @@ public class Manager
     }
     
     public static Player createPlayer(final DataSource src) throws IOException, MediaException {
-    	System.out.println("createPlayer DataSource " + src);
+    	Emulator.getEmulator().getLogStream().println("createPlayer DataSource " + src);
     	//System.out.println("*** Manager.createPlayer(DataSource) is not implemented yet! ***");
     	//throw new MediaException("Not supported");
     	return new PlayerImpl(src);
