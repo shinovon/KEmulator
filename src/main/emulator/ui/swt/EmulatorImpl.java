@@ -17,7 +17,7 @@ public final class EmulatorImpl implements IEmulator
     private Vector aVector1379;
     private int screenDepth;
     private Class46 aClass46_1381;
-    private Class110 aClass110_1382;
+    private MemoryView aClass110_1382;
     private Class5 aClass5_1377;
     private Class5 aClass5_1391;
     private Property iproperty;
@@ -42,7 +42,7 @@ public final class EmulatorImpl implements IEmulator
         this.aClass161_1387 = new Class161();
         this.aClass5_1377 = new Class5(0);
         this.aClass5_1391 = new Class5(1);
-        this.aClass110_1382 = new Class110();
+        this.aClass110_1382 = new MemoryView();
         this.aClass46_1381 = new Class46();
         this.aClass90_1384 = new Class90();
     }
@@ -88,7 +88,7 @@ public final class EmulatorImpl implements IEmulator
         return this.aClass5_1391;
     }
     
-    public final Class110 method823() {
+    public final MemoryView method823() {
         return this.aClass110_1382;
     }
     

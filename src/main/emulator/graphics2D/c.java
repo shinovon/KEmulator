@@ -103,7 +103,7 @@ public final class c
     
     public static BufferedImage method171(final ImageData imageData) {
         final BufferedImage bufferedImage;
-        final int[] data = ((DataBufferInt)(bufferedImage = new BufferedImage(imageData.width, imageData.height, 2)).getRaster().getDataBuffer()).getData();
+        int[] data = ((DataBufferInt)(bufferedImage = new BufferedImage(imageData.width, imageData.height, 2)).getRaster().getDataBuffer()).getData();
         final int n = imageData.width * imageData.height;
         imageData.getPixels(0, 0, n, data, 0);
         if (imageData.alphaData != null) {
@@ -145,6 +145,8 @@ public final class c
                 data[l] = -16777216 + ((rgb4.red & 0xFF) << 16) + ((rgb4.green & 0xFF) << 8) + (rgb4.blue & 0xFF);
             }
         }
+        data = null;
+        System.gc();
         return bufferedImage;
     }
     

@@ -13,29 +13,29 @@ import emulator.lcdui.a;
 
 public class Displayable
 {
-    String aString25;
-    Vector aVector26;
+    String title;
+    Vector commands;
     boolean aBoolean18;
     int anInt28;
-    CommandListener aCommandListener19;
-    Item anItem20;
+    CommandListener cmdListener;
+    Item selectedItem;
     int w;
     int h;
-    int[] anIntArray21;
-    Ticker aTicker22;
-    int anInt31;
-    private static long aLong23;
-    private static long aLong27;
-    private static int anInt24;
+    int[] bounds;
+    Ticker ticker;
+    int tickerX;
+    private static long lastFrameTime;
+    private static long lastFpsUpdateTime;
+    private static int framesCount;
     
     public Displayable() {
         super();
-        this.anItem20 = null;
-        this.aCommandListener19 = null;
-        this.aVector26 = new Vector();
+        this.selectedItem = null;
+        this.cmdListener = null;
+        this.commands = new Vector();
         this.w = Emulator.getEmulator().getScreen().getWidth();
         this.h = Emulator.getEmulator().getScreen().getHeight();
-        this.anIntArray21 = new int[] { 0, Screen.anInt181, this.w - 4, this.h - Screen.anInt181 };
+        this.bounds = new int[] { 0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4 };
     }
     
     public int getWidth() {
@@ -47,7 +47,7 @@ public class Displayable
     }
     
     public String getTitle() {
-        return this.aString25;
+        return this.title;
     }
     
     public boolean isShown() {
@@ -55,14 +55,14 @@ public class Displayable
     }
     
     protected void defocus() {
-        if (this.anItem20 != null) {
-            this.anItem20.defocus();
-            this.anItem20 = null;
+        if (this.selectedItem != null) {
+            this.selectedItem.defocus();
+            this.selectedItem = null;
         }
     }
     
     protected void setItemCommands(final Item anItem20) {
-        this.anItem20 = anItem20;
+        this.selectedItem = anItem20;
         if (anItem20.itemCommands.size() > 0) {
             for (int i = 0; i < anItem20.itemCommands.size(); ++i) {
                 this.addCommand((Command)anItem20.itemCommands.get(i));
@@ -79,31 +79,31 @@ public class Displayable
                 this.removeCommand((Command)item.itemCommands.get(i));
             }
         }
-        this.anItem20 = null;
+        this.selectedItem = null;
     }
     
     protected void updateCommands() {
-        final String commandLeft = (this.aVector26.size() > 0) ? this.getLeftSoftCommand().getLongLabel() : "";
-        final String commandRight = (this.aVector26.size() > 2) ? "Menu" : ((this.aVector26.size() < 2) ? "" : this.getRightSoftCommand().getLongLabel());
+        final String commandLeft = (this.commands.size() > 0) ? this.getLeftSoftCommand().getLongLabel() : "";
+        final String commandRight = (this.commands.size() > 2) ? "Menu" : ((this.commands.size() < 2) ? "" : this.getRightSoftCommand().getLongLabel());
         Emulator.getEmulator().getScreen().setCommandLeft(commandLeft);
         Emulator.getEmulator().getScreen().setCommandRight(commandRight);
     }
     
     protected boolean isCommandsEmpty() {
-        return this.aVector26.isEmpty();
+        return this.commands.isEmpty();
     }
     
     public void addCommand(final Command command) {
-        if (command == null || this.aVector26.contains(command)) {
+        if (command == null || this.commands.contains(command)) {
             return;
         }
         int i;
-        for (i = 0; i < this.aVector26.size(); ++i) {
+        for (i = 0; i < this.commands.size(); ++i) {
             if (command.getCommandType() == 7) {
                 break;
             }
             final Command command2;
-            if ((command2 = (Command) this.aVector26.get(i)).getCommandType() != 7) {
+            if ((command2 = (Command) this.commands.get(i)).getCommandType() != 7) {
                 if (command.getCommandType() > command2.getCommandType()) {
                     break;
                 }
@@ -112,15 +112,15 @@ public class Displayable
                 }
             }
         }
-        this.aVector26.add(i, command);
+        this.commands.add(i, command);
         if (Emulator.getCurrentDisplay().getCurrent() == this) {
             this.updateCommands();
         }
     }
     
     public void removeCommand(final Command command) {
-        if (this.aVector26.contains(command)) {
-            this.aVector26.remove(command);
+        if (this.commands.contains(command)) {
+            this.commands.remove(command);
             if (Emulator.getCurrentDisplay().getCurrent() == this) {
                 this.updateCommands();
             }
@@ -128,21 +128,21 @@ public class Displayable
     }
     
     protected Command getLeftSoftCommand() {
-        if (this.aVector26.size() > 0) {
-            return (Command) this.aVector26.get(0);
+        if (this.commands.size() > 0) {
+            return (Command) this.commands.get(0);
         }
         return null;
     }
     
     protected Command getRightSoftCommand() {
-        if (this.aVector26.size() > 1) {
-            return (Command) this.aVector26.get(1);
+        if (this.commands.size() > 1) {
+            return (Command) this.commands.get(1);
         }
         return null;
     }
     
     public boolean handleSoftKeyAction(final int n, final boolean b) {
-        if (this.aCommandListener19 == null && this instanceof Canvas) {
+        if (this.cmdListener == null && this instanceof Canvas) {
             return false;
         }
         if (Keyboard.method597(n)) {
@@ -152,17 +152,17 @@ public class Displayable
                 if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
                     ((Alert)this).close();
                 }
-                else if (this.anItem20 != null && this.anItem20.itemCommands.contains(leftSoftCommand)) {
-                    this.anItem20.itemCommandListener.commandAction(leftSoftCommand, this.anItem20);
+                else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(leftSoftCommand)) {
+                    this.selectedItem.itemCommandListener.commandAction(leftSoftCommand, this.selectedItem);
                 }
-                else if (this.aCommandListener19 != null) {
-                    this.aCommandListener19.commandAction(leftSoftCommand, this);
+                else if (this.cmdListener != null) {
+                    this.cmdListener.commandAction(leftSoftCommand, this);
                 }
             }
             return true;
         }
         if (Keyboard.method603(n)) {
-            if (this.aVector26.size() > 2) {
+            if (this.commands.size() > 2) {
                 if (b && this.aBoolean18) {
                     this.aBoolean18 = false;
                     this.refreshSoftMenu();
@@ -180,11 +180,11 @@ public class Displayable
                     if (this instanceof Alert && rightSoftCommand == Alert.DISMISS_COMMAND) {
                         ((Alert)this).close();
                     }
-                    else if (this.anItem20 != null && this.anItem20.itemCommands.contains(rightSoftCommand)) {
-                        this.anItem20.itemCommandListener.commandAction(rightSoftCommand, this.anItem20);
+                    else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(rightSoftCommand)) {
+                        this.selectedItem.itemCommandListener.commandAction(rightSoftCommand, this.selectedItem);
                     }
-                    else if (this.aCommandListener19 != null) {
-                        this.aCommandListener19.commandAction(rightSoftCommand, this);
+                    else if (this.cmdListener != null) {
+                        this.cmdListener.commandAction(rightSoftCommand, this);
                     }
                 }
             }
@@ -194,48 +194,48 @@ public class Displayable
     }
     
     public void setCommandListener(final CommandListener aCommandListener19) {
-        this.aCommandListener19 = aCommandListener19;
+        this.cmdListener = aCommandListener19;
     }
     
     public void setTitle(final String aString25) {
-        this.aString25 = aString25;
+        this.title = aString25;
     }
     
     protected void sizeChanged(final int n, final int n2) {
     }
     
     public Ticker getTicker() {
-        return this.aTicker22;
+        return this.ticker;
     }
     
     public void setTicker(final Ticker aTicker22) {
-        this.aTicker22 = aTicker22;
-        final int[] anIntArray21 = this.anIntArray21;
+        this.ticker = aTicker22;
+        final int[] anIntArray21 = this.bounds;
         final int n = 3;
         int n2;
         int anInt181;
-        if (this.aTicker22 == null) {
+        if (this.ticker == null) {
             n2 = this.h;
-            anInt181 = Screen.anInt181;
+            anInt181 = Screen.fontHeight4;
         }
         else {
             n2 = this.h;
-            anInt181 = Screen.anInt181 * 2;
+            anInt181 = Screen.fontHeight4 * 2;
         }
         anIntArray21[n] = n2 - anInt181;
-        this.anInt31 = this.w;
+        this.tickerX = this.w;
     }
     
     protected void paintTicker(final Graphics graphics) {
-        if (this.aTicker22 == null) {
+        if (this.ticker == null) {
             return;
         }
-        a.method181(graphics, 0, Screen.anInt181 + this.anIntArray21[3] - 1, this.w, Screen.anInt181);
-        graphics.setFont(Screen.aFont173);
-        graphics.drawString(this.aTicker22.getString(), this.anInt31, Screen.anInt181 + this.anIntArray21[3] - 1 + 2, 0);
-        this.anInt31 -= 5;
-        if (this.anInt31 < -Screen.aFont173.stringWidth(this.aTicker22.getString())) {
-            this.anInt31 = this.w;
+        a.method181(graphics, 0, Screen.fontHeight4 + this.bounds[3] - 1, this.w, Screen.fontHeight4);
+        graphics.setFont(Screen.font);
+        graphics.drawString(this.ticker.getString(), this.tickerX, Screen.fontHeight4 + this.bounds[3] - 1 + 2, 0);
+        this.tickerX -= 5;
+        if (this.tickerX < -Screen.font.stringWidth(this.ticker.getString())) {
+            this.tickerX = this.w;
         }
     }
     
@@ -278,9 +278,9 @@ public class Displayable
         graphics.translate(-translateX, -translateY);
         graphics.setClip(0, 0, this.w, this.h);
         final int n = this.w >> 1;
-        final int anInt181 = Screen.anInt181;
+        final int anInt181 = Screen.fontHeight4;
         final int n3;
-        final int n2 = (n3 = this.aVector26.size() - 1) * anInt181;
+        final int n2 = (n3 = this.commands.size() - 1) * anInt181;
         final int n4 = n - 1;
         int n5 = this.h - n2 - 1;
         a.method177(graphics, n4, n5, n, n2, true);
@@ -289,7 +289,7 @@ public class Displayable
             if (i == this.anInt28) {
                 a.method178(graphics, n4, n5, n, anInt181);
             }
-            graphics.drawString(i + 1 + "." + ((Command)this.aVector26.get(i + 1)).getLongLabel(), n4 + 4, n5 + 2, 0);
+            graphics.drawString(i + 1 + "." + ((Command)this.commands.get(i + 1)).getLongLabel(), n4 + 4, n5 + 2, 0);
         }
         graphics.translate(translateX, translateY);
         graphics.setClip(clipX, clipY, clipWidth, clipHeight);
@@ -316,7 +316,7 @@ public class Displayable
 
     protected static void fpsLimiter() {
        if(Settings.f == 1 && Settings.frameRate <= 50) {
-          long var0 = System.currentTimeMillis() - aLong23;
+          long var0 = System.currentTimeMillis() - lastFrameTime;
           long var2 = (long)(1000 / Settings.frameRate);
 
           try {
@@ -326,12 +326,12 @@ public class Displayable
           }
        }
 
-       aLong23 = System.currentTimeMillis();
-       ++anInt24;
-       if(aLong23 - aLong27 > 2000L) {
-          Profiler.FPS = (int)((long)(anInt24 * 1000 + 500) / (aLong23 - aLong27));
-          aLong27 = aLong23;
-          anInt24 = 0;
+       lastFrameTime = System.currentTimeMillis();
+       ++framesCount;
+       if(lastFrameTime - lastFpsUpdateTime > 2000L) {
+          Profiler.FPS = (int)((long)(framesCount * 1000 + 500) / (lastFrameTime - lastFpsUpdateTime));
+          lastFpsUpdateTime = lastFrameTime;
+          framesCount = 0;
        }
 
     }
@@ -358,8 +358,8 @@ public class Displayable
     }
     
     static {
-        Displayable.aLong23 = System.currentTimeMillis();
-        Displayable.aLong27 = Displayable.aLong23;
-        Displayable.anInt24 = 0;
+        Displayable.lastFrameTime = System.currentTimeMillis();
+        Displayable.lastFpsUpdateTime = Displayable.lastFrameTime;
+        Displayable.framesCount = 0;
     }
 }

@@ -16,14 +16,15 @@ import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 import java.util.zip.*;
 
-public final class a
+public final class Memory
 {
-    public Hashtable aHashtable1458;
+    public Hashtable table;
     public Vector aVector1459;
     public Vector aVector1461;
     public Vector aVector1463;
-    public Vector aVector1465;
+    public Vector players;
     public Vector aVector1467;
+	private Vector checkClasses;
     static Class aClass1460;
     static Class aClass1462;
     static Class aClass1464;
@@ -32,19 +33,24 @@ public final class a
     static Class aClass1469;
     static Class aClass1470;
     static Class aClass1471;
-    static Class aClass1472;
-    static Class aClass1473;
-    static Class aClass1474;
-    static Class aClass1475;
+    static Class lStringCls;
+    static Class InputStreamCls;
+    static Class ImageCls;
+    static Class Image2DCls;
     
-    public a() {
+    public Memory() {
         super();
-        this.aHashtable1458 = new Hashtable();
+        this.table = new Hashtable();
         this.aVector1459 = new Vector();
         this.aVector1461 = new Vector();
         this.aVector1463 = new Vector();
-        this.aVector1465 = new Vector();
+        this.players = new Vector();
         this.aVector1467 = new Vector();
+        checkClasses = new Vector();
+        checkClasses.add("javax.microedition.lcdui.ImageItem");
+        checkClasses.add("javax.microedition.lcdui.CustomItem");
+        checkClasses.add("javax.microedition.lcdui.List");
+        checkClasses.add("javax.microedition.lcdui.ChoiceGroup");
     }
     
     public final void method846() {
@@ -55,30 +61,48 @@ public final class a
                 }
             }
         }
-        this.aHashtable1458.clear();
+        this.table.clear();
         this.aVector1459.clear();
         this.aVector1461.clear();
-        this.aVector1465.clear();
+        this.players.clear();
         this.aVector1467.clear();
         for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
             final String s = (String) Emulator.jarClasses.get(j);
-            a a;
+            Memory a;
             Class clazz = null;
             Object o;
             if (Emulator.getMIDlet().getClass().getName().equals(s)) {
                 a = this;
-                clazz = method862(s);
+                clazz = cls(s);
                 o = Emulator.getMIDlet();
             }
             else if (Emulator.getCurrentDisplay().getCurrent().getClass().getName().equals(s)) {
                 a = this;
-                clazz = method862(s);
+                clazz = cls(s);
                 o = Emulator.getCurrentDisplay().getCurrent();
             }
             else {
                 a = this;
                 try {
-                	clazz = method862(s);
+                	clazz = cls(s);
+                } catch (Exception e) {
+                	
+                } catch (Error e) {
+                	
+                }
+                o = null;
+            }
+            if(clazz != null)
+            	a.method847(clazz, o, s);
+        }
+        for (int j = 0; j < checkClasses.size(); ++j) {
+            Memory a;
+            Class clazz = null;
+            Object o;
+            final String s = (String) checkClasses.get(j);{
+                a = this;
+                try {
+                	clazz = cls(s);
                 } catch (Exception e) {
                 	
                 } catch (Error e) {
@@ -96,13 +120,13 @@ public final class a
         if (clazz.isArray()) {
             s2 = ClassTypes.method869(clazz);
         }
-        ClassInfo classInfo = (ClassInfo) this.aHashtable1458.get(s2);
+        ClassInfo classInfo = (ClassInfo) this.table.get(s2);
         if (clazz.isInterface()) {
             return;
         }
         if (classInfo == null) {
             classInfo = new ClassInfo(this, clazz.getName());
-            this.aHashtable1458.put(s2, classInfo);
+            this.table.put(s2, classInfo);
         }
         else if (o == null) {
             return;
@@ -113,7 +137,7 @@ public final class a
             }
             final ClassInfo classInfo2 = classInfo;
             ++classInfo2.anInt1485;
-            classInfo.aVector1486.add(new ObjInstance(this, s, o));
+            classInfo.objs.add(new ObjInstance(this, s, o));
             this.aVector1459.add(o);
             if (o instanceof Image) {
                 this.aVector1461.add(o);
@@ -122,7 +146,7 @@ public final class a
                 }
             }
             else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
-                this.aVector1465.add(o);
+                this.players.add(o);
             }
             else if (o instanceof Node) {
                 this.aVector1467.add(o);
@@ -185,7 +209,7 @@ public final class a
                 }
                 return;
             }
-            if (Emulator.jarClasses.contains(clazz.getName()) || ((a.aClass1473 != null) ? a.aClass1473 : (a.aClass1473 = method862("java.io.InputStream"))).isAssignableFrom(clazz)) {
+            if (Emulator.jarClasses.contains(clazz.getName()) || checkClasses.contains(clazz.getName()) || ((Memory.InputStreamCls != null) ? Memory.InputStreamCls : (Memory.InputStreamCls = cls("java.io.InputStream"))).isAssignableFrom(clazz)) {
                 final Field[] method847 = method845(clazz);
                 for (int k = 0; k < method847.length; ++k) {
                     final String name2 = method847[k].getName();
@@ -226,7 +250,7 @@ public final class a
         }
     }
     
-    public static int method850() {
+    public static int bytecodeSize() {
         int n = 0;
         try {
             if (Emulator.midletJar != null) {
@@ -235,7 +259,7 @@ public final class a
                 while (elements.hasMoreElements()) {
                     final String s;
                     try {
-	                    if (!method862(s = elements.nextElement()).isInterface()) {
+	                    if (!cls(s = elements.nextElement()).isInterface()) {
 	                        n += (int)((ZipEntry)zipFile.getEntry(s.replace('.', '/') + ".class")).getSize();
 	                    }
                     } catch (Exception e) {
@@ -249,7 +273,7 @@ public final class a
                 final Enumeration<String> elements2 = Emulator.jarClasses.elements();
                 while (elements2.hasMoreElements()) {
                     final String s2;
-                    if (!method862(s2 = elements2.nextElement()).isInterface()) {
+                    if (!cls(s2 = elements2.nextElement()).isInterface()) {
                         n += (int)Emulator.getFileFromClassPath(s2.replace('.', '/') + ".class").length();
                     }
                 }
@@ -259,16 +283,16 @@ public final class a
         return n;
     }
     
-    public final int method857() {
+    public final int objectsSize() {
         int n = 0;
-        final Enumeration<ClassInfo> elements = this.aHashtable1458.elements();
+        final Enumeration<ClassInfo> elements = this.table.elements();
         while (elements.hasMoreElements()) {
             n += elements.nextElement().method878();
         }
         return n;
     }
     
-    public static String method851(final Object o) {
+    public static String playerType(final Object o) {
         if (o instanceof Sound) {
             return ((Sound)o).getType();
         }
@@ -278,7 +302,7 @@ public final class a
         return ((Player)o).getContentType();
     }
     
-    public static String method858(final Object o) {
+    public static String playerStateStr(final Object o) {
         if (o instanceof Sound) {
             switch (((Sound)o).getState()) {
                 case 0: {
@@ -335,27 +359,36 @@ public final class a
         }
     }
     
-    public static int method852(final Object o) {
+    public static int loopCount(final Object o) {
         if (o instanceof Sound) {
             return ((Sound)o).m_player.loopCount;
         }
         if (o instanceof AudioClip) {
             return ((AudioClip)o).loopCount;
         }
+        if(!(o instanceof PlayerImpl)) {
+        	return 0;
+        }
         return ((PlayerImpl)o).loopCount;
     }
     
-    public static int method859(final Object o) {
+    public static int dataLen(final Object o) {
         if (o instanceof Sound) {
             return ((Sound)o).dataLen;
         }
         if (o instanceof AudioClip) {
             return ((AudioClip)o).dataLen;
         }
+        if(o instanceof VideoPlayerImpl) {
+        	return ((VideoPlayerImpl) o).dataLen;
+        }
+        if(!(o instanceof PlayerImpl)) {
+        	return 0;
+        }
         return ((PlayerImpl)o).dataLen;
     }
     
-    public static int method863(final Object o) {
+    public static int progress(final Object o) {
         try {
             if (o instanceof Sound) {
                 final Sound sound = (Sound)o;
@@ -364,21 +397,36 @@ public final class a
             if (o instanceof AudioClip) {
                 return 0;
             }
+
+            if(o instanceof VideoPlayerImpl) {
+                final VideoPlayerImpl v = (VideoPlayerImpl)o;
+                return (int)(((double)v.getMediaTime() / (double)v.getDuration()) * 100D);
+            }
+            if(!(o instanceof PlayerImpl)) {
+            	return 0;
+            }
             final PlayerImpl playerImpl = (PlayerImpl)o;
-            return (int)(playerImpl.getMediaTime() * 100L / (playerImpl.getDuration() / 1000L));
+            return (int)(((double)playerImpl.getMediaTime() / (double)playerImpl.getDuration()) * 100D);
         }
         catch (Exception ex) {
             return 0;
         }
     }
     
-    public static int method865(final Object o) {
+    public static int volume(final Object o) {
         try {
             if (o instanceof Sound) {
                 return ((Sound)o).getGain();
             }
             if (o instanceof AudioClip) {
                 return ((AudioClip)o).volume5 * 20;
+            }
+
+            if(o instanceof VideoPlayerImpl) {
+                return ((VolumeControlImpl)((VideoPlayerImpl)o).getControl("VolumeControl")).getLevel();
+            }
+            if(!(o instanceof PlayerImpl)) {
+            	return 0;
             }
             return ((VolumeControlImpl)((PlayerImpl)o).getControl("VolumeControl")).getLevel();
         }
@@ -387,30 +435,40 @@ public final class a
         }
     }
     
-    public static void method853(final Object o, final int n) {
+    public static void setVolume(final Object o, final int n) {
         try {
             if (o instanceof Sound) {
                 ((Sound)o).setGain(n);
             }
             else if (!(o instanceof AudioClip)) {
+
+                if(o instanceof VideoPlayerImpl) {
+                    ((VolumeControlImpl)((VideoPlayerImpl)o).getControl("VolumeControl")).setLevel(n);
+                    return;
+                }
+                if(!(o instanceof PlayerImpl)) {
+                	return;
+                }
                 ((VolumeControlImpl)((PlayerImpl)o).getControl("VolumeControl")).setLevel(n);
             }
         }
         catch (Exception ex) {}
     }
     
-    public static void method860(final Object o, final int n) {
+    public static void playerAct(final Object o, final int n) {
         if (o instanceof Sound) {
             final Sound sound = (Sound)o;
             try {
                 switch (n) {
                     case 0: {
                         sound.resume();
+	                    break;
                     }
                     case 1: {
                         final long mediaTime = sound.m_player.getMediaTime();
                         sound.stop();
                         sound.m_player.setMediaTime(mediaTime);
+	                    break;
                     }
                     case 2: {
                         sound.stop();
@@ -426,9 +484,11 @@ public final class a
             switch (n) {
                 case 0: {
                     audioClip.play(audioClip.loopCount, audioClip.volume5);
+                    break;
                 }
                 case 1: {
                     audioClip.pause();
+                    break;
                 }
                 case 2: {
                     audioClip.stop();
@@ -437,16 +497,43 @@ public final class a
             }
             return;
         }
+        if(o instanceof VideoPlayerImpl) {
+	        final VideoPlayerImpl v = (VideoPlayerImpl)o;
+	        try {
+	        	System.out.println(n);
+	            switch (n) {
+	                case 0: {
+	                    v.start();
+	                    break;
+	                }
+	                case 1: {
+	                    final long mediaTime2 = v.getMediaTime();
+	                    v.stop();
+	                    v.setMediaTime(mediaTime2);
+	                }
+	                case 2: {
+	                    v.stop();
+	                    break;
+	                }
+	            }
+	        }catch (Exception ex2) {ex2.printStackTrace();}
+	        return;
+        }
+        if(!(o instanceof PlayerImpl)) {
+        	return;
+        }
         final PlayerImpl playerImpl = (PlayerImpl)o;
         try {
             switch (n) {
                 case 0: {
                     playerImpl.start();
+                    break;
                 }
                 case 1: {
                     final long mediaTime2 = playerImpl.getMediaTime();
                     playerImpl.stop();
                     playerImpl.setMediaTime(mediaTime2);
+                    break;
                 }
                 case 2: {
                     playerImpl.stop();
@@ -460,7 +547,7 @@ public final class a
     public final int method866(final Object o) {
     	try
     	{
-        return ((ClassInfo)this.aHashtable1458.get(o)).anInt1485;
+        return ((ClassInfo)this.table.get(o)).anInt1485;
     	}
     	catch(NullPointerException e)
     	{
@@ -471,7 +558,7 @@ public final class a
     public final int method867(final Object o) {
     	try
     	{
-    		return ((ClassInfo)this.aHashtable1458.get(o)).method878();
+    		return ((ClassInfo)this.table.get(o)).method878();
     	}
     	catch(NullPointerException e)
     	{
@@ -479,23 +566,23 @@ public final class a
     	return 0;
     }
     
-    public final Vector method854(final Object o) {
-        return ((ClassInfo)this.aHashtable1458.get(o)).aVector1486;
+    public final Vector objs(final Object o) {
+        return ((ClassInfo)this.table.get(o)).objs;
     }
     
-    public static String method864(final Object o) {
-        return ((ObjInstance)o).aString1489;
+    public static String refs(final Object o) {
+        return ((ObjInstance)o).ref;
     }
     
-    public static Object method855(final Object o) {
-        return ((ObjInstance)o).anObject1490;
+    public static Object val(final Object o) {
+        return ((ObjInstance)o).val;
     }
     
-    public static int method868(final Object o) {
-        return ((ObjInstance)o).anInt1491;
+    public static int size(final Object o) {
+        return ((ObjInstance)o).size;
     }
     
-    public final int method856(final Class clazz, final Object o) {
+    public final int size(final Class clazz, final Object o) {
         final Field[] method845 = method845(clazz);
         int n = 0;
         for (int i = 0; i < method845.length; ++i) {
@@ -523,7 +610,7 @@ public final class a
                 n += 12;
                 int n3;
                 int length;
-                if (clazz == ((a.aClass1472 != null) ? a.aClass1472 : (a.aClass1472 = method862("java.lang.String")))) {
+                if (clazz == ((Memory.lStringCls != null) ? Memory.lStringCls : (Memory.lStringCls = cls("java.lang.String")))) {
                     n2 = n;
                     n3 = 2;
                     length = ((String)o).length();
@@ -531,14 +618,14 @@ public final class a
                 else {
                     int n4;
                     int n5;
-                    if (clazz == ((a.aClass1474 != null) ? a.aClass1474 : (a.aClass1474 = method862("javax.microedition.lcdui.Image")))) {
+                    if (clazz == ((Memory.ImageCls != null) ? Memory.ImageCls : (Memory.ImageCls = cls("javax.microedition.lcdui.Image")))) {
                         final Image image = (Image)o;
                         n2 = n;
                         n4 = image.getWidth();
                         n5 = image.getHeight();
                     }
                     else {
-                        if (clazz != ((a.aClass1475 != null) ? a.aClass1475 : (a.aClass1475 = method862("javax.microedition.m3g.Image2D")))) {
+                        if (clazz != ((Memory.Image2DCls != null) ? Memory.Image2DCls : (Memory.Image2DCls = cls("javax.microedition.m3g.Image2D")))) {
                             return n;
                         }
                         final Image2D image2D = (Image2D)o;
@@ -559,35 +646,35 @@ public final class a
     private int method861(final Class clazz, final Object o) {
         int n = 0;
         n += 16;
-        if (clazz == ((a.aClass1460 != null) ? a.aClass1460 : (a.aClass1460 = method862("[J")))) {
+        if (clazz == ((Memory.aClass1460 != null) ? Memory.aClass1460 : (Memory.aClass1460 = cls("[J")))) {
             n = 16 + 8 * Array.getLength(o);
         }
-        else if (clazz == ((a.aClass1462 != null) ? a.aClass1462 : (a.aClass1462 = method862("[I")))) {
+        else if (clazz == ((Memory.aClass1462 != null) ? Memory.aClass1462 : (Memory.aClass1462 = cls("[I")))) {
             n = 16 + 4 * Array.getLength(o);
         }
-        else if (clazz == ((a.aClass1464 != null) ? a.aClass1464 : (a.aClass1464 = method862("[S")))) {
+        else if (clazz == ((Memory.aClass1464 != null) ? Memory.aClass1464 : (Memory.aClass1464 = cls("[S")))) {
             n = 16 + 2 * Array.getLength(o);
         }
-        else if (clazz == ((a.aClass1466 != null) ? a.aClass1466 : (a.aClass1466 = method862("[B")))) {
+        else if (clazz == ((Memory.aClass1466 != null) ? Memory.aClass1466 : (Memory.aClass1466 = cls("[B")))) {
             n = 16 + 1 * Array.getLength(o);
         }
-        else if (clazz == ((a.aClass1468 != null) ? a.aClass1468 : (a.aClass1468 = method862("[Z")))) {
+        else if (clazz == ((Memory.aClass1468 != null) ? Memory.aClass1468 : (Memory.aClass1468 = cls("[Z")))) {
             n = 16 + 4 * Array.getLength(o);
         }
-        else if (clazz == ((a.aClass1470 != null) ? a.aClass1470 : (a.aClass1470 = method862("[D")))) {
+        else if (clazz == ((Memory.aClass1470 != null) ? Memory.aClass1470 : (Memory.aClass1470 = cls("[D")))) {
             n = 16 + 8 * Array.getLength(o);
         }
-        else if (clazz == ((a.aClass1469 != null) ? a.aClass1469 : (a.aClass1469 = method862("[F")))) {
+        else if (clazz == ((Memory.aClass1469 != null) ? Memory.aClass1469 : (Memory.aClass1469 = cls("[F")))) {
             n = 16 + 4 * Array.getLength(o);
         }
-        else if (clazz == ((a.aClass1471 != null) ? a.aClass1471 : (a.aClass1471 = method862("[C")))) {
+        else if (clazz == ((Memory.aClass1471 != null) ? Memory.aClass1471 : (Memory.aClass1471 = cls("[C")))) {
             n = 16 + 1 * Array.getLength(o);
         }
         else {
             for (int i = Array.getLength(o) - 1; i >= 0; --i) {
                 final Object value;
                 if ((value = Array.get(o, i)) != null && !ClassTypes.method871(clazz.getComponentType())) {
-                    n += this.method856(value.getClass(), value);
+                    n += this.size(value.getClass(), value);
                 }
                 else if (value != null && value.getClass().isArray()) {
                     n += 16;
@@ -600,34 +687,32 @@ public final class a
         return n;
     }
     
-    private static Class method862(final String s) {
+    private static Class cls(final String s) {
         Class<?> forName;
         try {
             forName = Class.forName(s, false, Emulator.getCustomClassLoader());
         }
         catch (ClassNotFoundException ex2) {
-            final ClassNotFoundException ex = ex2;
-            Emulator.AntiCrack(ex2);
-            throw new NoClassDefFoundError(ex.getMessage());
+            throw new NoClassDefFoundError(ex2.getMessage());
         }
         return forName;
     }
     
     static Class method848(final String s) {
-        return method862(s);
+        return cls(s);
     }
     
     private final class ObjInstance
     {
-        String aString1489;
-        Object anObject1490;
-        int anInt1491;
+        String ref;
+        Object val;
+        int size;
         
-        ObjInstance(final a a, final String aString1489, final Object anObject1490) {
+        ObjInstance(final Memory a, final String aString1489, final Object anObject1490) {
             super();
-            this.aString1489 = aString1489;
-            this.anObject1490 = anObject1490;
-            this.anInt1491 = a.method856(anObject1490.getClass(), anObject1490);
+            this.ref = aString1489;
+            this.val = anObject1490;
+            this.size = a.size(anObject1490.getClass(), anObject1490);
         }
     }
     
@@ -636,12 +721,12 @@ public final class a
         String aString1484;
         int anInt1485;
         int anInt1487;
-        Vector aVector1486;
+        Vector objs;
         
         public final int method878() {
             int anInt1487 = this.anInt1487;
-            for (int i = this.aVector1486.size() - 1; i >= 0; --i) {
-                anInt1487 += ((ObjInstance)this.aVector1486.get(i)).anInt1491;
+            for (int i = this.objs.size() - 1; i >= 0; --i) {
+                anInt1487 += ((ObjInstance)this.objs.get(i)).size;
             }
             return anInt1487;
         }
@@ -650,11 +735,11 @@ public final class a
             return this.aString1484.compareTo(((ClassInfo)o).aString1484);
         }
         
-        ClassInfo(final a a, final String aString1484) {
+        ClassInfo(final Memory a, final String aString1484) {
             super();
-            this.aVector1486 = new Vector();
+            this.objs = new Vector();
             this.anInt1485 = 0;
-            this.anInt1487 = a.method856(a.method848(aString1484), null);
+            this.anInt1487 = a.size(a.method848(aString1484), null);
             this.aString1484 = aString1484;
         }
     }

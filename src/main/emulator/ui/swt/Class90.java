@@ -8,7 +8,7 @@ import javax.microedition.m3g.Transform;
 
 import emulator.*;
 import emulator.UILocale;
-import emulator.debug.a;
+import emulator.debug.Memory;
 
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.*;
@@ -27,7 +27,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
     private Composite aComposite907;
     private Tree aTree896;
     private Canvas aCanvas897;
-    private a ana898;
+    private Memory ana898;
     private emulator.graphics3D.view.a m3gview;
     private Camera aCamera901;
     private Transform aTransform902;
@@ -89,7 +89,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
         this.ana892 = new emulator.graphics3D.a();
         this.aBackground900 = null;
         this.aNode904 = null;
-        this.ana898 = new a();
+        this.ana898 = new Memory();
         this.m3gview = emulator.graphics3D.view.a.acreate();
     }
     

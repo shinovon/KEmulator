@@ -45,81 +45,85 @@ log.txt      log file
 
 ==================
 $[News & Log]
-$v1.0.3 mod nnproject v10 [2021.09.23]
+$nnmod v2.10.1 [2021.10.03]
+Working Player.setLoopCount
+Fixed annoying keyboard bug
+
+$v10 [2021.09.23]
 lcdui improvements
 Text anti-aliasing
 
-$v1.0.3 mod nnproject v9 [2021.09.15]
+$v9 [2021.09.15]
 Fixed custom screen resolution not changing
 Fixed some bugs
 Removed some debugging 
 
-$v1.0.3 mod nnproject v9 b9 [2021.09.06]
+$v9 b9 [2021.09.06]
 Video player added (using vlcj)
 
-$v1.0.3 mod nnproject v9 b8 [2021.09.03]
+$v9 b8 [2021.09.03]
 HTTP User-Agent changing depending on the device
 Added Nokia 808 PureView device
 
-$v1.0.3 mod nnproject v9 b7 [2021.08.18]
+$v9 b7 [2021.08.18]
 Implemented setMediaTime at mp3 player
 Fixed mp3 player re-usage issues
 
-$v1.0.3 mod nnproject v9 b6 [2021.08.17]
+$v9 b6 [2021.08.17]
 Fixed mp3 player restart causing NullPointerException
 
-$v1.0.3 mod nnproject v9 b4 [2021.07.14]
+$v9 b4 [2021.07.14]
 Fixed not working Rotate Screen after yesterday build
 Fixed com.sprincpcs.media, com.samsung.util errors
 
-$v1.0.3 mod nnproject v9 b3 [2021.07.13]
+$v9 b3 [2021.07.13]
 Added AWT Smooth drawing mode
 Fixed EventQueue overflow
 Additional thread for mouse events
 
-$v1.0.3 mod nnproject v9 b1 [2021.07.09]
+$v9 b1 [2021.07.09]
 Fixed not working emulator hotkeys
 
-$v1.0.3 mod nnproject v8 [2021.07.07]
+$v8 [2021.07.07]
 Fixed NullPointerException when showing Alert without text
 
-$v1.0.3 mod nnproject v8 [2021.07.06]
+$v8 [2021.07.06]
 Implemented DataSource player
 
-$v1.0.3 mod nnproject v8 [2021.06.17]
+$v8 [2021.06.17]
 Added "Canvas keyboard" toggle
 
-$v1.0.3 mod nnproject v8 [2021.04.02]
+$v8 [2021.04.02]
 Fixed broken callSerially
 
-$v1.0.3 mod nnproject v8 [2021.03.22]
+$v8 [2021.03.22]
 Added discrod rich presence
 
-$v1.0.3 mod nnproject v7 [2021.01.31]
+$v7 [2021.01.31]
 Changed Class Watcher Combo Box size
 
-$v1.0.3 mod nnproject v7 [2021.01.20]
+$v7 [2021.01.20]
 Implemented NokiaUI 1.4 (partially)
 
-$v1.0.3 mod nnproject v7 [2021.01.18]
+$v7 [2021.01.18]
 Fixed MP3 Player
 Implemented getDuration at MP3 Player
 Fixed FileConnection bug
 Implemented capture://image
 
-$v1.0.3 mod nnproject v6 [2020.12.07]
+$v6 [2020.12.07]
 Some implementations for Vika Touch
 
-$v1.0.3 mod nnproject v5 [2020.12.05]
+$v5 [2020.12.05]
 Replaced cacerts to fix SSL errors
 Added NokiaN8, E7, E72, 6700c-1 devices. 
 
-$v1.0.3 mod nnproject v4 [2020.12.03]
+$v4 [2020.12.03]
 Fixed midi player delay
 Added VirtualMidiSynth support
 Fixed lcdui bugs
 
-$v1.0.3 mod nnproject v3 [2020.12.01]
+$v3 [2020.12.01]
 Fixed m3g, was broken by deobfuscation
 
 $v1.0.3 mod nnproject v2 [2020.11.24]
@@ -129,7 +133,7 @@ Fixed bugs created by deobfuscation
 $v1.0.3 modded by shinovon [2020.08.30]
 Fixed classes sort in MemoryView 
 Https connection fix
-Fixed IOException when response code is 401
+Fixed IOException at getInputStream for 401, etc responses
 
 $v1.0.3 modded by max20091 [2015.08.26]
 Updated Java jre to ver 8 update 20

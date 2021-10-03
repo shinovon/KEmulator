@@ -217,7 +217,7 @@ implements Choice {
     protected void itemApplyCommand() {
         super.itemApplyCommand();
         if (this.aBoolean541 && this.aCommand540 != null) {
-            this.screen.aCommandListener19.commandAction(this.aCommand540, (Displayable)this.screen);
+            this.screen.cmdListener.commandAction(this.aCommand540, (Displayable)this.screen);
         }
         if (this.choiceType == 1) {
             this.setSelectedIndex(this.currentPos, true);
@@ -243,11 +243,11 @@ implements Choice {
         }
         int n = this.anIntArray21[1];
         if (this.aStringArray175 != null && this.aStringArray175.length > 0) {
-            graphics.setFont(Item.aFont173);
+            graphics.setFont(Item.font);
             int i = 0;
             while (i < this.aStringArray175.length) {
                 graphics.drawString(this.aStringArray175[i], this.anIntArray21[0] + 4, n + 2, 0);
-                n += Item.aFont173.getHeight() + 4;
+                n += Item.font.getHeight() + 4;
                 ++i;
             }
         }
@@ -291,8 +291,8 @@ implements Choice {
         int n = 0;
         if (this.label != null) {
             int n2 = this.getPreferredWidth() - 8;
-            this.aStringArray175 = c.method175((String)this.label, (Font)Item.aFont173, (int)n2, (int)n2);
-            n = (Item.aFont173.getHeight() + 4) * this.aStringArray175.length;
+            this.aStringArray175 = c.method175((String)this.label, (Font)Item.font, (int)n2, (int)n2);
+            n = (Item.font.getHeight() + 4) * this.aStringArray175.length;
         } else {
             this.aStringArray175 = null;
         }
@@ -334,8 +334,8 @@ implements Choice {
                         a3.method212();
                         a3.anIntArray421[1] = n3;
                         n3 += a3.anIntArray421[3];
-                        a3.anIntArray421[0] = this.screen.anIntArray21[2] / 4;
-                        a3.anIntArray421[2] = this.screen.anIntArray21[2] / 2;
+                        a3.anIntArray421[0] = this.screen.bounds[2] / 4;
+                        a3.anIntArray421[2] = this.screen.bounds[2] / 2;
                         this.anIntArray179[k] = k++;
                     }
                     break;
@@ -345,7 +345,7 @@ implements Choice {
                 this.anInt28 = n - a2.anIntArray421[3];
             }
         }
-        this.anIntArray21[3] = Math.min((int)n, (int)this.screen.anIntArray21[3]);
+        this.anIntArray21[3] = Math.min((int)n, (int)this.screen.bounds[3]);
     }
 
     protected boolean scrollUp() {

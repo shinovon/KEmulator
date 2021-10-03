@@ -9,7 +9,7 @@ public class TextBoxOld extends Screen
     public TextBoxOld(final String s, final String s2, final int n, final int n2) {
         super(s);
         this.aTextField1305 = new TextField(null, s2, n, n2);
-        super.aVector443.add(this.aTextField1305);
+        super.items.add(this.aTextField1305);
         this.aTextField1305.screen = this;
         this.aTextField1305.isTextBox = true;
         this.aTextField1305.aBoolean177 = true;
@@ -19,7 +19,7 @@ public class TextBoxOld extends Screen
     
     protected void focusCaret() {
         this.aTextField1305.screen.setItemCommands(this.aTextField1305);
-        Emulator.getEmulator().getScreen().getCaret().foucsItem(this.aTextField1305, super.anIntArray21[0] + 4, Screen.anInt181 + 4);
+        Emulator.getEmulator().getScreen().getCaret().foucsItem(this.aTextField1305, super.bounds[0] + 4, Screen.fontHeight4 + 4);
     }
     
     public String getString() {
@@ -93,7 +93,7 @@ public class TextBoxOld extends Screen
     
     protected void layout() {
         this.aTextField1305.layout();
-        this.aTextField1305.anIntArray21[1] = Screen.anInt181;
+        this.aTextField1305.anIntArray21[1] = Screen.fontHeight4;
     }
     
 }

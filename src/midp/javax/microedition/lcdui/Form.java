@@ -4,7 +4,7 @@ import emulator.lcdui.*;
 
 public class Form extends Screen
 {
-    ItemStateListener anItemStateListener858;
+    ItemStateListener itemStateListener;
     
     public Form(final String s) {
         this(s, null);
@@ -20,7 +20,7 @@ public class Form extends Screen
                 if (array[i].screen != null) {
                     throw new IllegalStateException();
                 }
-                super.aVector443.add(array[i]);
+                super.items.add(array[i]);
                 array[i].screen = this;
             }
         }
@@ -33,23 +33,23 @@ public class Form extends Screen
         if (item.screen != null) {
             throw new IllegalStateException();
         }
-        super.aVector443.add(item);
+        super.items.add(item);
         item.screen = this;
-        return super.aVector443.size() - 1;
+        return super.items.size() - 1;
     }
     
     public int append(final String s) {
         final StringItem stringItem = new StringItem(null, s);
-        super.aVector443.add(stringItem);
+        super.items.add(stringItem);
         stringItem.screen = this;
-        return super.aVector443.size() - 1;
+        return super.items.size() - 1;
     }
     
     public int append(final Image image) {
         final ImageItem imageItem = new ImageItem(null, image, 0, null);
-        super.aVector443.add(imageItem);
+        super.items.add(imageItem);
         imageItem.screen = this;
-        return super.aVector443.size() - 1;
+        return super.items.size() - 1;
     }
     
     public void insert(final int n, final Item item) {
@@ -59,27 +59,27 @@ public class Form extends Screen
         if (item.screen != null) {
             throw new IllegalStateException();
         }
-        super.aVector443.insertElementAt(item, n);
+        super.items.insertElementAt(item, n);
         item.screen = this;
     }
     
     public void delete(final int n) {
-        if (n < 0 || n >= super.aVector443.size()) {
+        if (n < 0 || n >= super.items.size()) {
             throw new IndexOutOfBoundsException();
         }
-        ((Item)super.aVector443.get(n)).screen = null;
-        super.aVector443.remove(n);
+        ((Item)super.items.get(n)).screen = null;
+        super.items.remove(n);
     }
     
     public void deleteAll() {
-        for (int i = 0; i < super.aVector443.size(); ++i) {
-            ((Item)super.aVector443.get(i)).screen = null;
+        for (int i = 0; i < super.items.size(); ++i) {
+            ((Item)super.items.get(i)).screen = null;
         }
-        super.aVector443.removeAllElements();
+        super.items.removeAllElements();
     }
     
     public void set(final int n, final Item item) {
-        if (n < 0 || n >= super.aVector443.size()) {
+        if (n < 0 || n >= super.items.size()) {
             throw new IndexOutOfBoundsException();
         }
         if (item == null) {
@@ -88,24 +88,24 @@ public class Form extends Screen
         if (item.screen != null) {
             throw new IllegalStateException();
         }
-        ((Item)super.aVector443.get(n)).screen = null;
-        super.aVector443.set(n, item);
+        ((Item)super.items.get(n)).screen = null;
+        super.items.set(n, item);
         item.screen = null;
     }
     
     public Item get(final int n) {
-        if (n < 0 || n >= super.aVector443.size()) {
+        if (n < 0 || n >= super.items.size()) {
             throw new IndexOutOfBoundsException();
         }
-        return ((Item)super.aVector443.get(n));
+        return ((Item)super.items.get(n));
     }
     
     public void setItemStateListener(final ItemStateListener anItemStateListener858) {
-        this.anItemStateListener858 = anItemStateListener858;
+        this.itemStateListener = anItemStateListener858;
     }
     
     public int size() {
-        return super.aVector443.size();
+        return super.items.size();
     }
     
     public int getWidth() {
@@ -118,9 +118,9 @@ public class Form extends Screen
     
     protected void paint(final Graphics graphics) {
         this.layout();
-        for (int i = 0; i < super.aVector443.size(); ++i) {
+        for (int i = 0; i < super.items.size(); ++i) {
             final Item item;
-            if ((item = ((Item)super.aVector443.get(i))).aBoolean177) {
+            if ((item = ((Item)super.items.get(i))).aBoolean177) {
                 item.paint(graphics);
             }
         }
@@ -128,9 +128,9 @@ public class Form extends Screen
     
     protected void layout() {
         if (super.anInt182 != -1) {
-            int anInt181 = Screen.anInt181;
-            for (int i = 0; i < super.aVector443.size(); ++i) {
-                final Item item = ((Item)super.aVector443.get(i));
+            int anInt181 = Screen.fontHeight4;
+            for (int i = 0; i < super.items.size(); ++i) {
+                final Item item = ((Item)super.items.get(i));
                 Item item2;
                 boolean method173;
                 if (i < super.anInt182) {
@@ -142,15 +142,15 @@ public class Form extends Screen
                     item.anIntArray21[1] = anInt181;
                     anInt181 += item.anIntArray21[3];
                     item2 = item;
-                    method173 = b.method173(super.anIntArray21, item.anIntArray21);
+                    method173 = b.method173(super.bounds, item.anIntArray21);
                 }
                 item2.aBoolean177 = method173;
             }
             return;
         }
-        int n = Screen.anInt181 + super.anIntArray21[3];
-        for (int j = super.aVector443.size() - 1; j >= 0; --j) {
-            final Item item3 = ((Item)super.aVector443.get(j));
+        int n = Screen.fontHeight4 + super.bounds[3];
+        for (int j = super.items.size() - 1; j >= 0; --j) {
+            final Item item3 = ((Item)super.items.get(j));
             Item item4;
             boolean method174;
             if (j > super.anInt349) {
@@ -162,18 +162,18 @@ public class Form extends Screen
                 item3.anIntArray21[1] = n - item3.anIntArray21[3];
                 n -= item3.anIntArray21[3];
                 item4 = item3;
-                method174 = b.method173(super.anIntArray21, item3.anIntArray21);
+                method174 = b.method173(super.bounds, item3.anIntArray21);
             }
             item4.aBoolean177 = method174;
         }
-        int anInt182 = Screen.anInt181;
-        for (int k = 0; k < super.aVector443.size(); ++k) {
+        int anInt182 = Screen.fontHeight4;
+        for (int k = 0; k < super.items.size(); ++k) {
             final Item item5;
-            if ((item5 = ((Item)super.aVector443.get(k))).aBoolean177) {
+            if ((item5 = ((Item)super.items.get(k))).aBoolean177) {
                 item5.layout();
                 item5.anIntArray21[1] = anInt182;
                 anInt182 += item5.anIntArray21[3];
-                item5.aBoolean177 = b.method173(super.anIntArray21, item5.anIntArray21);
+                item5.aBoolean177 = b.method173(super.bounds, item5.anIntArray21);
             }
         }
     }

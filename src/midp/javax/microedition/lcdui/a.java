@@ -54,7 +54,7 @@ final class a
         if (!b2 || !b3) {
             emulator.lcdui.a.method180(graphics, n2, n + 3, this.sel, this.aChoiceGroup422.choiceType);
         }
-        final Font font = (this.font != null) ? this.font : Screen.aFont173;
+        final Font font = (this.font != null) ? this.font : Screen.font;
         graphics.setFont(font);
         if(this.aStringArray423 != null)
         for (int i = 0; i < this.aStringArray423.length; ++i) {
@@ -69,7 +69,7 @@ final class a
         this.anIntArray421[2] = this.aChoiceGroup422.anIntArray21[2];
         final int n2;
         final int n = (n2 = this.aChoiceGroup422.getPreferredWidth() - 8) - 12;
-        final Font font = (this.font != null) ? this.font : Screen.aFont173;
+        final Font font = (this.font != null) ? this.font : Screen.font;
         this.aStringArray423 = c.method175(this.string, font, n, n2);
         this.anIntArray421[3] = (font.getHeight() + 4) * this.aStringArray423.length;
     }

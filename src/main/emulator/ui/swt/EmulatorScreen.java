@@ -1394,23 +1394,25 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
 	        	return;
         	}
         }
-        if (n < 0 || n >= this.aBooleanArray978.length) {
+        if ((n < 0 || n >= this.aBooleanArray978.length) && !Settings.canvasKeyboard) {
             return;
         }
         final String method605;
         if ((method605 = Keyboard.method605(n)) == null) {
             return;
         }
-        if (this.aBooleanArray978[n]) {
-            if (Settings.enableKeyRepeat) {
-                Emulator.getEventQueue().keyRepeat(Integer.parseInt(method605));
-            }
-            return;
-        }
-        this.aBooleanArray978[n] = true;
-        if (Settings.enableKeyCache) {
-            Keyboard.aStack1063.push('0' + method605);
-            return;
+	    if(!Settings.canvasKeyboard) {
+	        if (this.aBooleanArray978[n]) {
+	            if (Settings.enableKeyRepeat) {
+	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(method605));
+	            }
+	            return;
+	        }
+	        this.aBooleanArray978[n] = true;
+	        if (Settings.enableKeyCache) {
+	            Keyboard.aStack1063.push('0' + method605);
+	            return;
+	        }
         }
         //System.out.println("method568 " + n);
         if (Settings.recordKeys && !Settings.q) {
@@ -1452,17 +1454,19 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         	}
         }
 
-        if (n < 0 || n >= this.aBooleanArray978.length) {
+        if ((n < 0 || n >= this.aBooleanArray978.length) && !Settings.canvasKeyboard) {
             return;
         }
         final String method605;
         if ((method605 = Keyboard.method605(n)) == null) {
             return;
         }
-        if (!this.aBooleanArray978[n]) {
-            return;
-        }
-        this.aBooleanArray978[n] = false;
+	    if(!Settings.canvasKeyboard) {
+	        if (!this.aBooleanArray978[n]) {
+	            return;
+	        }
+	        this.aBooleanArray978[n] = false;
+	    }
         if (Settings.enableKeyCache) {
             Keyboard.aStack1063.push('1' + method605);
             return;

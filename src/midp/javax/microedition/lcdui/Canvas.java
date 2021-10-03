@@ -52,8 +52,8 @@ public abstract class Canvas extends Displayable
         if (super.aBoolean18) {
             if (n >= 49 && n <= 57) {
                 final int n2;
-                if ((n2 = n - 49 + 1) < super.aVector26.size()) {
-                    super.aCommandListener19.commandAction((Command)super.aVector26.get(n2), this);
+                if ((n2 = n - 49 + 1) < super.commands.size()) {
+                    super.cmdListener.commandAction((Command)super.commands.get(n2), this);
                     super.aBoolean18 = false;
                 }
             }
@@ -63,14 +63,14 @@ public abstract class Canvas extends Displayable
                 }
             }
             else if (n == Keyboard.getArrowKeyFromDevice(6)) {
-                if (super.anInt28 < super.aVector26.size() - 2) {
+                if (super.anInt28 < super.commands.size() - 2) {
                     ++super.anInt28;
                 }
             }
             else {
                 final int n3;
-                if (n == Keyboard.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.aVector26.size()) {
-                    super.aCommandListener19.commandAction((Command)super.aVector26.get(n3), this);
+                if (n == Keyboard.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.commands.size()) {
+                    super.cmdListener.commandAction((Command)super.commands.get(n3), this);
                     super.aBoolean18 = false;
                 }
             }
@@ -146,7 +146,7 @@ public abstract class Canvas extends Displayable
                 return;
             }
             this.setTicker(new Ticker("setFullScreenMode(true) to remove me"));
-            super.h -= Screen.anInt181;
+            super.h -= Screen.fontHeight4;
         }
     }
     
@@ -166,9 +166,9 @@ public abstract class Canvas extends Displayable
     	DeviceControl._userActivity();
         if (super.aBoolean18) {
             final int n3 = super.w >> 1;
-            final int anInt181 = Screen.anInt181;
+            final int anInt181 = Screen.fontHeight4;
             final int n5;
-            final int n4 = (n5 = super.aVector26.size() - 1) * anInt181;
+            final int n4 = (n5 = super.commands.size() - 1) * anInt181;
             final int n6 = n3 - 1;
             final int n7 = super.h - n4 - 1;
             final int[] array;
@@ -181,7 +181,7 @@ public abstract class Canvas extends Displayable
                 int n8;
                 for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
                     if (b.method172(array, n, n2)) {
-                        super.aCommandListener19.commandAction((Command)super.aVector26.get(i + 1), this);
+                        super.cmdListener.commandAction((Command)super.commands.get(i + 1), this);
                         super.aBoolean18 = false;
                         return;
                     }

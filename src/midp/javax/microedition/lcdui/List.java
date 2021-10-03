@@ -2,7 +2,7 @@ package javax.microedition.lcdui;
 
 public class List extends Screen implements Choice {
    public static final Command SELECT_COMMAND = new Command("Select", 1, 0);
-   private ChoiceGroup aChoiceGroup1304;
+   private ChoiceGroup choiceGroup;
 
    public List(String s, int n) {
       this(s, n, new String[0], new Image[0]);
@@ -13,99 +13,99 @@ public class List extends Screen implements Choice {
       if(n != 2 && n != 1 && n != 3) {
          throw new IllegalArgumentException();
       } else {
-         this.aChoiceGroup1304 = new ChoiceGroup((String)null, n, array, array2, true);
-         super.aVector443.add(this.aChoiceGroup1304);
-         this.aChoiceGroup1304.screen = this;
-         this.aChoiceGroup1304.aBoolean541 = true;
-         this.aChoiceGroup1304.aBoolean177 = true;
-         this.aChoiceGroup1304.focus();
-         this.aChoiceGroup1304.aCommand540 = SELECT_COMMAND;
+         this.choiceGroup = new ChoiceGroup((String)null, n, array, array2, true);
+         super.items.add(this.choiceGroup);
+         this.choiceGroup.screen = this;
+         this.choiceGroup.aBoolean541 = true;
+         this.choiceGroup.aBoolean177 = true;
+         this.choiceGroup.focus();
+         this.choiceGroup.aCommand540 = SELECT_COMMAND;
          super.addCommand(SELECT_COMMAND);
       }
    }
 
    public void setSelectCommand(Command aCommand540) {
-      if(this.aChoiceGroup1304.choiceType == 3) {
-         super.removeCommand(this.aChoiceGroup1304.aCommand540);
-         super.addCommand(this.aChoiceGroup1304.aCommand540 = aCommand540);
+      if(this.choiceGroup.choiceType == 3) {
+         super.removeCommand(this.choiceGroup.aCommand540);
+         super.addCommand(this.choiceGroup.aCommand540 = aCommand540);
       }
    }
 
    public int append(String s, Image image) {
-      return this.aChoiceGroup1304.append(s, image);
+      return this.choiceGroup.append(s, image);
    }
 
    public void delete(int n) {
-      this.aChoiceGroup1304.delete(n);
+      this.choiceGroup.delete(n);
    }
 
    public void deleteAll() {
-      this.aChoiceGroup1304.deleteAll();
+      this.choiceGroup.deleteAll();
    }
 
    public int getFitPolicy() {
-      return this.aChoiceGroup1304.getFitPolicy();
+      return this.choiceGroup.getFitPolicy();
    }
 
    public Font getFont(int n) {
-      return this.aChoiceGroup1304.getFont(n);
+      return this.choiceGroup.getFont(n);
    }
 
    public Image getImage(int n) {
-      return this.aChoiceGroup1304.getImage(n);
+      return this.choiceGroup.getImage(n);
    }
 
    public int getSelectedFlags(boolean[] array) {
-      return this.aChoiceGroup1304.getSelectedFlags(array);
+      return this.choiceGroup.getSelectedFlags(array);
    }
 
    public int getSelectedIndex() {
-      return this.aChoiceGroup1304.getSelectedIndex();
+      return this.choiceGroup.getSelectedIndex();
    }
 
    public String getString(int n) {
-      return this.aChoiceGroup1304.getString(n);
+      return this.choiceGroup.getString(n);
    }
 
    public void insert(int n, String s, Image image) {
-      this.aChoiceGroup1304.insert(n, s, image);
+      this.choiceGroup.insert(n, s, image);
    }
 
    public boolean isSelected(int n) {
-      return this.aChoiceGroup1304.isSelected(n);
+      return this.choiceGroup.isSelected(n);
    }
 
    public void set(int n, String s, Image image) {
-      this.aChoiceGroup1304.set(n, s, image);
+      this.choiceGroup.set(n, s, image);
    }
 
    public void setFitPolicy(int fitPolicy) {
-      this.aChoiceGroup1304.setFitPolicy(fitPolicy);
+      this.choiceGroup.setFitPolicy(fitPolicy);
    }
 
    public void setFont(int n, Font font) {
-      this.aChoiceGroup1304.setFont(n, font);
+      this.choiceGroup.setFont(n, font);
    }
 
    public void setSelectedFlags(boolean[] selectedFlags) {
-      this.aChoiceGroup1304.setSelectedFlags(selectedFlags);
+      this.choiceGroup.setSelectedFlags(selectedFlags);
    }
 
    public void setSelectedIndex(int n, boolean b) {
-      this.aChoiceGroup1304.setSelectedIndex(n, b);
+      this.choiceGroup.setSelectedIndex(n, b);
    }
 
    public int size() {
-      return this.aChoiceGroup1304.size();
+      return this.choiceGroup.size();
    }
 
    protected void paint(Graphics graphics) {
       this.layout();
-      this.aChoiceGroup1304.paint(graphics);
+      this.choiceGroup.paint(graphics);
    }
 
    protected void layout() {
-      this.aChoiceGroup1304.layout();
-      this.aChoiceGroup1304.anIntArray21[1] = Screen.anInt181;
+      this.choiceGroup.layout();
+      this.choiceGroup.anIntArray21[1] = Screen.fontHeight4;
    }
 }

@@ -141,10 +141,10 @@ public abstract class CustomItem extends Item
         this.paint(this.aGraphics428, prefContentWidth, prefContentHeight);
         super.paint(graphics);
         if (super.aStringArray175 != null && super.aStringArray175.length > 0) {
-            graphics.setFont(Item.aFont173);
+            graphics.setFont(Item.font);
             for (int i = 0; i < super.aStringArray175.length; ++i) {
                 graphics.drawString(super.aStringArray175[i], super.anIntArray21[0] + 4, n2 + 2, 0);
-                n2 += Item.aFont173.getHeight() + 4;
+                n2 += Item.font.getHeight() + 4;
             }
         }
         graphics.setClip(n, n2, prefContentWidth, prefContentHeight);
@@ -157,13 +157,13 @@ public abstract class CustomItem extends Item
         int n = 0;
         final int n2 = this.getPreferredWidth() - 8;
         if (super.label != null) {
-            super.aStringArray175 = c.method175(super.label, Item.aFont173, n2, n2);
-            n = 0 + (Item.aFont173.getHeight() + 4) * super.aStringArray175.length;
+            super.aStringArray175 = c.method175(super.label, Item.font, n2, n2);
+            n = 0 + (Item.font.getHeight() + 4) * super.aStringArray175.length;
         }
         else {
             super.aStringArray175 = null;
         }
-        super.anIntArray21[3] = Math.min(n + (this.getPrefContentHeight(super.anIntArray21[3]) + 4), super.screen.anIntArray21[3]);
+        super.anIntArray21[3] = Math.min(n + (this.getPrefContentHeight(super.anIntArray21[3]) + 4), super.screen.bounds[3]);
     }
     
     protected boolean callTraverse(final int n) {

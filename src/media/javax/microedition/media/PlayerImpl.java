@@ -129,7 +129,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				}
 
 				public int seek(int p0) {
-					// TODO Auto-generated method stub
 					return 0;
 				}
 
@@ -138,7 +137,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 						return 0;
 					}
 					if(i == 0) return 0;
-					// TODO Auto-generated method stub
+					// TODO
 					return 0;
 				}
             	
@@ -487,6 +486,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
     
     public void setLoopCount(final int loopCount) {
+    	System.out.println("loopCount " + loopCount);
         if (loopCount == 0) {
             throw new IllegalArgumentException();
         }
@@ -644,13 +644,16 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 	}
                 }
             }
-           //try {
-			//	this.setMediaTime(0L);
-			//} catch (MediaException e) {
-			//	e.printStackTrace();
-			//}
-            if (loopCount <= 0) continue;
-            --loopCount;
+	        if(loopCount != -1) {
+	            if (loopCount <= 0) continue;
+	            --loopCount;
+            } else {
+                try {
+     				this.setMediaTime(0L);
+     			} catch (MediaException e) {
+     				e.printStackTrace();
+     			}
+            }
         } while (this.playerThread != null && loopCount != 0);
         this.playerThread = null;
         this.state = 300;

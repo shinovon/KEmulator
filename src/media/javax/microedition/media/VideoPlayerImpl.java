@@ -63,7 +63,7 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 	private String contentType;
 	private int state;
 	private FramePositioningControl frameControl;
-	private int dataLen;
+	public int dataLen;
 	private int loopCount;
 	private Vector listeners;
 	private TimeBase timeBase;
@@ -197,7 +197,9 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 					field = inputStream.getClass().getDeclaredField("path");
 					field.setAccessible(true);
 					String path = (String) field.get(inputStream);
+					File f = new File(path);
 					mediaUrl = path;
+					dataLen = (int) f.length();
 					prepared = true;
 					return;
 				} catch (Exception e) {
@@ -213,7 +215,9 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 				FileOutputStream fos = new FileOutputStream(f);
 				fos.write(b);
 				fos.close();
+				dataLen = (int) f.length();
 				this.mediaUrl = f.toString();
+				b = null;
 				System.gc();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -405,6 +409,16 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		return this.timeBase;
 	}
 
+	/**
+	 * @deprecated
+	 */
+	public void pause() {
+		if (this.state == 0) {
+			throw new IllegalStateException("closed");
+		}
+		mediaPlayer.controls().pause();
+	}
+
 	class FramePositioningControlI implements FramePositioningControl {
 
 		@Override
@@ -510,14 +524,20 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		public int getSourceHeight() {
 			if (released || mediaPlayer == null)
 				throw new IllegalStateException();
-			return srcw = mediaPlayer.video().videoDimension().height;
+			srch = mediaPlayer.video().videoDimension().height;
+			if(srch == 0)
+				srch = bh;
+			return srch;
 		}
 
 		@Override
 		public int getSourceWidth() {
 			if (released || mediaPlayer == null)
 				throw new IllegalStateException();
-			return srcw = mediaPlayer.video().videoDimension().width;
+			srcw = mediaPlayer.video().videoDimension().width;
+			if(srcw == 0)
+				srcw = bw;
+			return srcw;
 		}
 
 		@Override

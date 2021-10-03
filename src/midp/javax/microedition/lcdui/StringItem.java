@@ -51,7 +51,7 @@ public class StringItem extends Item
     protected void paint(final Graphics graphics) {
         super.paint(graphics);
         
-        final Font font = (this.font != null) ? this.font : Screen.aFont173;
+        final Font font = (this.font != null) ? this.font : Screen.font;
         int n = super.anIntArray21[1];
         graphics.setFont(font);
 
@@ -91,7 +91,7 @@ public class StringItem extends Item
         } else {
 	        for (int i = this.getcurPage(); i < this.textArr.length; ++i) {
 	            graphics.drawString(this.textArr[i], super.anIntArray21[0] + 4, n + 2, 0);
-	            if ((n += font.getHeight() + 4) > super.screen.anIntArray21[3]) {
+	            if ((n += font.getHeight() + 4) > super.screen.bounds[3]) {
 	                return;
 	            }
 	        }
@@ -100,14 +100,14 @@ public class StringItem extends Item
     
     protected void layout() {
         super.layout();
-        final Font font = (this.font != null) ? this.font : Screen.aFont173;
+        final Font font = (this.font != null) ? this.font : Screen.font;
         final int n = this.getPreferredWidth() - 8;
         this.textArr = c.method175((super.label != null) ? (super.label + " " + this.text) : this.text, font, n, n);
         final int n3;
         int n2 = (n3 = font.getHeight() + 4) * this.textArr.length;
         super.anIntArray179 = null;
-        final int n4 = super.screen.anIntArray21[3] / n3 * n3;
-        if (n2 > super.screen.anIntArray21[3] && n4 > 0) {
+        final int n4 = super.screen.bounds[3] / n3 * n3;
+        if (n2 > super.screen.bounds[3] && n4 > 0) {
             int n5 = n2 / n4;
             if (n2 % n4 != 0) {
                 ++n5;
@@ -121,6 +121,6 @@ public class StringItem extends Item
             }
             n2 = (this.textArr.length - super.anIntArray179[super.currentPos]) * n3;
         }
-        super.anIntArray21[3] = Math.min(n2, super.screen.anIntArray21[3]);
+        super.anIntArray21[3] = Math.min(n2, super.screen.bounds[3]);
     }
 }

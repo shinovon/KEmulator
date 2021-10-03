@@ -73,9 +73,10 @@ public class Emulator
 	public static boolean askPermissions = false;
 	public static boolean askImei = false;
 	
-	public static final String titleVersion = "v9";
-	public static final int numericVersion = 9;
-	public static final String propVersion = "v9";
+	public static final String titleVersion = "v2.10";
+	public static final String aboutVersion = "v10";
+	public static final int numericVersion = 10;
+	public static final String propVersion = "v10";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -383,11 +384,15 @@ public class Emulator
     }
     
     public static String getVersionString() {
-        return "KEmulator v1.0.3 mod nnproject " + titleVersion;
+        return "KEmulator nnmod " + titleVersion;
     }
     
     public static String getInfoString() {
-        return "KEmulator v1.0.3" + "\n\tmod nnproject "+titleVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n" + UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n\t" + "MIDP 2.0(JSR118)\n\tNokiaUI 1.4\n\tSamsung 1.0\n\tSprint 1.0\n\tWMA 1.0(JSR120)\n\tSensor(JSR256)\n\tM3G 1.1(JSR184)\n\tOpenGL ES(JSR239)";
+        return "KEmulator v1.0.3" + "\n\tmod nnproject "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n" + UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n\t" + "MIDP 2.0(JSR118)\n\tNokiaUI 1.4\n\tSamsung 1.0\n\tSprint 1.0\n\tWMA 1.0(JSR120)\n\tSensor(JSR256)\n\tM3G 1.1(JSR184)\n\tOpenGL ES(JSR239)";
+    }
+    
+    public static String getAboutString() {
+        return "KEmulator v1.0.3" + "\n\tmod nnproject "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     }
     
     public static void getLibraries() {
@@ -467,7 +472,6 @@ public class Emulator
                         }
                     }
                     catch (Exception ex2) {
-                    	ex2.printStackTrace();
                         final InputStream inputStream;
                         (inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
                         ((Properties)(aProperties1368 = new Properties())).load(inputStream);

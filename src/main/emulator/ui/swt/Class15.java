@@ -5,9 +5,9 @@ import javax.microedition.lcdui.*;
 
 final class Class15 implements Comparator
 {
-    private final Class110 aClass110_580;
+    private final MemoryView aClass110_580;
     
-    Class15(final Class110 aClass110_580) {
+    Class15(final MemoryView aClass110_580) {
         super();
         this.aClass110_580 = aClass110_580;
     }
@@ -19,14 +19,14 @@ final class Class15 implements Comparator
         Label_0142: {
             int usedCount = 0;
             int usedCount2 = 0;
-            switch (Class110.method645(this.aClass110_580)) {
+            switch (MemoryView.method645(this.aClass110_580)) {
                 case 0: {
-                    for (int i = 0; i < Class110.method634().size(); ++i) {
-                        if (o == Class110.method634().get(i)) {
+                    for (int i = 0; i < MemoryView.method634().size(); ++i) {
+                        if (o == MemoryView.method634().get(i)) {
                             n = 1;
                             break;
                         }
-                        if (o2 == Class110.method634().get(i)) {
+                        if (o2 == MemoryView.method634().get(i)) {
                             n = -1;
                             break;
                         }
@@ -46,7 +46,7 @@ final class Class15 implements Comparator
             }
             n = usedCount - usedCount2;
         }
-        if (Class110.method660(this.aClass110_580)) {
+        if (MemoryView.method660(this.aClass110_580)) {
             return n;
         }
         return -n;

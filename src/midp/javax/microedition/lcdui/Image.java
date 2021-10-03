@@ -102,6 +102,7 @@ public class Image
     }
     
     public static Image createImage(final int n, final int n2) {
+    	if(n <= 0 || n2 <= 0) throw new IllegalArgumentException();
         final Image image;
         (image = new Image(Emulator.getEmulator().newImage(n, n2, false))).aBoolean1307 = true;
         image.anIImage1310 = Emulator.getEmulator().newImage(n, n2, true);

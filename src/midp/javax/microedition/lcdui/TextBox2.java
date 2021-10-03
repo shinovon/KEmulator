@@ -102,7 +102,7 @@ public class TextBox2 extends Screen
     }
     
     public int getChars(final char[] array) {
-        if (this.aString25 == null) {
+        if (this.title == null) {
             return 0;
         }
         final char[] charArray;
@@ -117,7 +117,7 @@ public class TextBox2 extends Screen
     }
     
     public void insert(final String s, final int n) {
-        final String aString25 = this.aString25;
+        final String aString25 = this.title;
         this.setString(aString25.substring(0, n) + s + aString25.substring(n));
     }
     
@@ -128,7 +128,7 @@ public class TextBox2 extends Screen
     }
     
     public void delete(final int n, final int n2) {
-        final String aString25 = this.aString25;
+        final String aString25 = this.title;
         this.setString(aString25.substring(0, n) + aString25.substring(n + n2));
     }
     

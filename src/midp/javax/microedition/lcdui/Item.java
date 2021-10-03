@@ -23,7 +23,7 @@ public abstract class Item {
    public static final int HYPERLINK = 1;
    public static final int BUTTON = 2;
    static final int anInt24 = 32563;
-   static final Font aFont173 = Font.getFont(0, 1, 8);
+   static final Font font = Font.getFont(0, 1, 8);
    int[] anIntArray21;
    boolean inFocus;
    boolean aBoolean177;
@@ -157,7 +157,7 @@ public abstract class Item {
       if(!(this.screen instanceof Form)) {
          throw new IllegalStateException();
       } else {
-         ((Form)this.screen).anItemStateListener858.itemStateChanged(this);
+         ((Form)this.screen).itemStateListener.itemStateChanged(this);
       }
    }
 
@@ -188,8 +188,8 @@ public abstract class Item {
    protected void layout() {
       this.anIntArray21[0] = 0;
       this.anIntArray21[1] = 0;
-      this.anIntArray21[2] = this.screen.anIntArray21[2];
-      this.anIntArray21[3] = Screen.anInt181;
+      this.anIntArray21[2] = this.screen.bounds[2];
+      this.anIntArray21[3] = Screen.fontHeight4;
    }
 
    protected int getcurPage() {

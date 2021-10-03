@@ -88,13 +88,13 @@ public class Alert extends Screen
     }
     
     protected void paint(final Graphics graphics) {
-        final int n = super.anIntArray21[2] - 8;
-        this.aStringArray175 = c.method175(this.aString172, Screen.aFont173, n, n);
+        final int n = super.bounds[2] - 8;
+        this.aStringArray175 = c.method175(this.aString172, Screen.font, n, n);
         graphics.setColor(-16777216);
-        int anInt181 = Screen.anInt181;
+        int anInt181 = Screen.fontHeight4;
         for (int i = 0; i < this.aStringArray175.length; ++i) {
             graphics.drawString(this.aStringArray175[i], 4, anInt181 + 2, 0);
-            anInt181 += Screen.aFont173.getHeight() + 4;
+            anInt181 += Screen.font.getHeight() + 4;
         }
         if (this.anInt178 > 0) {
             this.anInt178 -= 100;

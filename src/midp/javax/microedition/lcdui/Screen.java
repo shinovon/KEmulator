@@ -9,13 +9,13 @@ import emulator.lcdui.*;
 
 public abstract class Screen extends Displayable
 {
-    static final Font aFont173;
-    static final int anInt180;
-    static final int anInt181;
-    Vector aVector443;
+    static final Font font;
+    static final int fontHeight;
+    static final int fontHeight4;
+    Vector items;
     int anInt182;
     int anInt349;
-    private long aLong23;
+    private long lastPressTime;
     
     Screen() {
         this("");
@@ -23,23 +23,23 @@ public abstract class Screen extends Displayable
     
     Screen(final String s) {
         super();
-        super.aString25 = ((s == null) ? "" : s);
-        this.aVector443 = new Vector();
+        super.title = ((s == null) ? "" : s);
+        this.items = new Vector();
         this.anInt182 = 0;
         this.anInt349 = -1;
     }
     
     public void invokeKeyPressed(final int n) {
         final long currentTimeMillis;
-        if ((currentTimeMillis = System.currentTimeMillis()) - this.aLong23 < 100L) {
+        if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
             return;
         }
-        this.aLong23 = currentTimeMillis;
+        this.lastPressTime = currentTimeMillis;
         if (super.aBoolean18) {
             if (n >= 49 && n <= 57) {
                 final int n2;
-                if ((n2 = n - 49 + 1) < super.aVector26.size()) {
-                    super.aCommandListener19.commandAction((Command)super.aVector26.get(n2), this);
+                if ((n2 = n - 49 + 1) < super.commands.size()) {
+                    super.cmdListener.commandAction((Command)super.commands.get(n2), this);
                     super.aBoolean18 = false;
                 }
             }
@@ -49,93 +49,93 @@ public abstract class Screen extends Displayable
                 }
             }
             else if (n == Keyboard.getArrowKeyFromDevice(6)) {
-                if (super.anInt28 < super.aVector26.size() - 2) {
+                if (super.anInt28 < super.commands.size() - 2) {
                     ++super.anInt28;
                 }
             }
             else {
                 final int n3;
-                if (n == Keyboard.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.aVector26.size()) {
-                    super.aCommandListener19.commandAction((Command)super.aVector26.get(n3), this);
+                if (n == Keyboard.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.commands.size()) {
+                    super.cmdListener.commandAction((Command)super.commands.get(n3), this);
                     super.aBoolean18 = false;
                 }
             }
             this.refreshSoftMenu();
             return;
         }
-        if (super.anItem20 != null && super.anItem20 instanceof CustomItem && ((CustomItem)super.anItem20).callTraverse(n)) {
+        if (super.selectedItem != null && super.selectedItem instanceof CustomItem && ((CustomItem)super.selectedItem).callTraverse(n)) {
             return;
         }
-        if (super.anItem20 != null && n == Keyboard.getArrowKeyFromDevice(8)) {
-            super.anItem20.itemApplyCommand();
+        if (super.selectedItem != null && n == Keyboard.getArrowKeyFromDevice(8)) {
+            super.selectedItem.itemApplyCommand();
             return;
         }
         if (n == Keyboard.getArrowKeyFromDevice(1)) {
-            if (this.aVector443.size() > 0) {
-                final int index = this.aVector443.indexOf(super.anItem20);
-                if (super.anItem20 != null) {
-                    if (!super.anItem20.scrollUp()) {
+            if (this.items.size() > 0) {
+                final int index = this.items.indexOf(super.selectedItem);
+                if (super.selectedItem != null) {
+                    if (!super.selectedItem.scrollUp()) {
                         return;
                     }
-                    super.anItem20.defocus();
+                    super.selectedItem.defocus();
                 }
                 Screen screen;
                 Vector vector;
                 int n4;
                 if (index == -1) {
                     screen = this;
-                    vector = this.aVector443;
-                    n4 = this.aVector443.size() - 1;
+                    vector = this.items;
+                    n4 = this.items.size() - 1;
                 }
                 else if (index > 0) {
                     screen = this;
-                    vector = this.aVector443;
+                    vector = this.items;
                     n4 = index - 1;
                 }
                 else {
                     screen = this;
-                    vector = this.aVector443;
+                    vector = this.items;
                     n4 = 0;
                 }
-                screen.anItem20 = (Item) vector.get(n4);
-                super.anItem20.focus();
-                if (!super.anItem20.aBoolean177) {
-                    this.anInt182 = this.aVector443.indexOf(super.anItem20);
+                screen.selectedItem = (Item) vector.get(n4);
+                super.selectedItem.focus();
+                if (!super.selectedItem.aBoolean177) {
+                    this.anInt182 = this.items.indexOf(super.selectedItem);
                     this.anInt349 = -1;
                 }
             }
         }
-        else if (n == Keyboard.getArrowKeyFromDevice(6) && this.aVector443.size() > 0) {
-            final int index2 = this.aVector443.indexOf(super.anItem20);
-            if (super.anItem20 != null) {
-                if (!super.anItem20.scrollDown()) {
+        else if (n == Keyboard.getArrowKeyFromDevice(6) && this.items.size() > 0) {
+            final int index2 = this.items.indexOf(super.selectedItem);
+            if (super.selectedItem != null) {
+                if (!super.selectedItem.scrollDown()) {
                     return;
                 }
-                super.anItem20.defocus();
+                super.selectedItem.defocus();
             }
             Screen screen2;
             Vector vector2;
             int n5;
             if (index2 == -1) {
                 screen2 = this;
-                vector2 = this.aVector443;
+                vector2 = this.items;
                 n5 = 0;
             }
-            else if (index2 < this.aVector443.size() - 1) {
+            else if (index2 < this.items.size() - 1) {
                 screen2 = this;
-                vector2 = this.aVector443;
+                vector2 = this.items;
                 n5 = index2 + 1;
             }
             else {
                 screen2 = this;
-                vector2 = this.aVector443;
-                n5 = this.aVector443.size() - 1;
+                vector2 = this.items;
+                n5 = this.items.size() - 1;
             }
-            screen2.anItem20 = (Item) vector2.get(n5);
-            super.anItem20.focus();
-            if (!super.anItem20.aBoolean177) {
+            screen2.selectedItem = (Item) vector2.get(n5);
+            super.selectedItem.focus();
+            if (!super.selectedItem.aBoolean177) {
                 this.anInt182 = -1;
-                this.anInt349 = this.aVector443.indexOf(super.anItem20);
+                this.anInt349 = this.items.indexOf(super.selectedItem);
             }
         }
     }
@@ -146,9 +146,9 @@ public abstract class Screen extends Displayable
     public void invokePointerPressed(final int n, final int n2) {
         if (super.aBoolean18) {
             final int n3 = super.w >> 1;
-            final int anInt181 = Screen.anInt181;
+            final int anInt181 = Screen.fontHeight4;
             final int n5;
-            final int n4 = (n5 = super.aVector26.size() - 1) * anInt181;
+            final int n4 = (n5 = super.commands.size() - 1) * anInt181;
             final int n6 = n3 - 1;
             final int n7 = super.h - n4 - 1;
             final int[] array;
@@ -161,7 +161,7 @@ public abstract class Screen extends Displayable
                 int n8;
                 for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
                     if (emulator.lcdui.b.method172(array, n, n2)) {
-                        super.aCommandListener19.commandAction((Command)super.aVector26.get(i + 1), this);
+                        super.cmdListener.commandAction((Command)super.commands.get(i + 1), this);
                         super.aBoolean18 = false;
                         return;
                     }
@@ -169,23 +169,23 @@ public abstract class Screen extends Displayable
             }
             return;
         }
-        if (super.anItem20 != null && super.anItem20 instanceof ChoiceGroup && ((ChoiceGroup)super.anItem20).aBoolean542) {
-            super.anItem20.pointerPressed(n, n2);
+        if (super.selectedItem != null && super.selectedItem instanceof ChoiceGroup && ((ChoiceGroup)super.selectedItem).aBoolean542) {
+            super.selectedItem.pointerPressed(n, n2);
             return;
         }
-        if (this.aVector443.size() > 0) {
+        if (this.items.size() > 0) {
             int j = 0;
-            while (j < this.aVector443.size()) {
+            while (j < this.items.size()) {
                 final Item anItem20;
-                if ((anItem20 = (Item) this.aVector443.get(j)).aBoolean177 && emulator.lcdui.b.method172(anItem20.anIntArray21, n, n2)) {
-                    if (anItem20 == super.anItem20) {
-                        super.anItem20.pointerPressed(n, n2);
+                if ((anItem20 = (Item) this.items.get(j)).aBoolean177 && emulator.lcdui.b.method172(anItem20.anIntArray21, n, n2)) {
+                    if (anItem20 == super.selectedItem) {
+                        super.selectedItem.pointerPressed(n, n2);
                         return;
                     }
-                    if (super.anItem20 != null) {
-                        super.anItem20.defocus();
+                    if (super.selectedItem != null) {
+                        super.selectedItem.defocus();
                     }
-                    (super.anItem20 = anItem20).focus();
+                    (super.selectedItem = anItem20).focus();
                 }
                 else {
                     ++j;
@@ -207,7 +207,7 @@ public abstract class Screen extends Displayable
         final int color = graphics.getColor();
         final int strokeStyle = graphics.getStrokeStyle();
         final Font font = graphics.getFont();
-        graphics.setFont(Screen.aFont173);
+        graphics.setFont(Screen.font);
         graphics.setStrokeStyle(0);
         emulator.lcdui.a.method177(graphics, 0, 0, super.w, super.h, false);
         this.drawTitleBar(graphics);
@@ -222,28 +222,28 @@ public abstract class Screen extends Displayable
     
     protected void drawTitleBar(final Graphics graphics) {
         final int n;
-        final String value = String.valueOf(n = ((super.anItem20 != null) ? (this.aVector443.indexOf(super.anItem20) + 1) : this.aVector443.size()));
-        final int n2 = (Screen.anInt181 >> 1) - 1;
-        final int stringWidth = Screen.aFont173.stringWidth(super.aString25);
-        final int stringWidth2 = Screen.aFont173.stringWidth(value);
+        final String value = String.valueOf(n = ((super.selectedItem != null) ? (this.items.indexOf(super.selectedItem) + 1) : this.items.size()));
+        final int n2 = (Screen.fontHeight4 >> 1) - 1;
+        final int stringWidth = Screen.font.stringWidth(super.title);
+        final int stringWidth2 = Screen.font.stringWidth(value);
         final int n3 = (super.w - stringWidth >> 1) + 2;
         final int n4 = super.w - stringWidth2 - 2;
         graphics.setColor(8617456);
         graphics.fillRect(2, n2, (super.w - stringWidth >> 1) - 2, 2);
         graphics.fillRect(n3 + stringWidth + 2, n2, n4 - n3 - stringWidth - 4, 2);
         graphics.setColor(-16777216);
-        graphics.setFont(Screen.aFont173);
-        graphics.drawString(super.aString25, n3, 1, 0);
+        graphics.setFont(Screen.font);
+        graphics.drawString(super.title, n3, 1, 0);
         graphics.drawString(value, n4, 1, 0);
     }
     
     protected void drawScrollBar(final Graphics graphics) {
-        emulator.lcdui.a.method179(graphics, super.anIntArray21[2] + 1, Screen.anInt181 - 1, 2, super.anIntArray21[3] - 2, this.aVector443.size(), (super.anItem20 != null) ? this.aVector443.indexOf(super.anItem20) : -1);
+        emulator.lcdui.a.method179(graphics, super.bounds[2] + 1, Screen.fontHeight4 - 1, 2, super.bounds[3] - 2, this.items.size(), (super.selectedItem != null) ? this.items.indexOf(super.selectedItem) : -1);
     }
     
     static {
-        aFont173 = Font.getDefaultFont();
-        anInt180 = Screen.aFont173.getHeight();
-        anInt181 = Screen.anInt180 + 4;
+        font = Font.getDefaultFont();
+        fontHeight = Screen.font.getHeight();
+        fontHeight4 = Screen.fontHeight + 4;
     }
 }

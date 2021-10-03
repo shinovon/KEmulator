@@ -89,7 +89,7 @@ public final class Class54 implements MouseListener, MouseMoveListener
         ((Composite)this.aShell806).setLayout((Layout)layout);
         ((Control)this.aShell806).setSize(new Point(355, 400));
         ((Control)(this.aCLabel805 = new CLabel((Composite)this.aShell806, 0))).setLayoutData((Object)layoutData5);
-        this.aCLabel805.setText(Emulator.getInfoString());
+        this.aCLabel805.setText(Emulator.getAboutString());
         this.method463();
         (this.aLink816 = new Link((Composite)this.aShell806, 0)).setText("<a>" + emulator.UILocale.uiText("ABOUT_CHACK_NEW_VER", "Check new version") + "</a>");
         ((Control)this.aLink816).setLayoutData((Object)gridData2);
