@@ -1,6 +1,6 @@
 package javax.microedition.lcdui;
 
-import emulator.lcdui.b;
+import emulator.lcdui.BoundsUtils;
 import emulator.lcdui.c;
 
 import java.util.Arrays;
@@ -39,7 +39,7 @@ implements Choice {
 
     ChoiceGroup(String label, int choiceType, String[] strs, Image[] imgs, boolean b) {
         super(label);
-        if (!(choiceType == 2 || choiceType == 1 || choiceType == 3 && b || choiceType == 4)) {
+        if (!(choiceType == MULTIPLE || choiceType == EXCLUSIVE || choiceType == IMPLICIT && b || choiceType == POPUP)) {
             throw new IllegalArgumentException();
         }
         int i = 0;
@@ -132,7 +132,7 @@ implements Choice {
         if (array.length < this.items.size()) {
             throw new IllegalArgumentException();
         }
-        if (this.choiceType != 2) {
+        if (this.choiceType != MULTIPLE) {
             int n = 0;
             int i = 0;
             while (i < this.items.size()) {
@@ -176,7 +176,7 @@ implements Choice {
     }
 
     public int getSelectedIndex() {
-        if (this.choiceType != 2) {
+        if (this.choiceType != MULTIPLE) {
             int i = 0;
             while (i < this.items.size()) {
                 if (((a)this.items.get((int)i)).sel) {
@@ -196,7 +196,7 @@ implements Choice {
         if (n < 0 || n >= this.items.size()) {
             throw new IndexOutOfBoundsException();
         }
-        if (this.choiceType != 2) {
+        if (this.choiceType != MULTIPLE) {
         	if(flag) {
         		currentSelect = n;
 	            int i = 0;
@@ -217,17 +217,18 @@ implements Choice {
     protected void itemApplyCommand() {
         super.itemApplyCommand();
         if (this.aBoolean541 && this.aCommand540 != null) {
+        	if(screen.cmdListener != null)
             this.screen.cmdListener.commandAction(this.aCommand540, (Displayable)this.screen);
         }
-        if (this.choiceType == 1) {
+        if (this.choiceType == EXCLUSIVE) {
             this.setSelectedIndex(this.currentPos, true);
             return;
         }
-        if (this.choiceType == 2) {
+        if (this.choiceType == MULTIPLE) {
             this.setSelectedIndex(this.currentPos, !this.isSelected(this.currentPos));
             return;
         }
-        if (this.choiceType == 4) {
+        if (this.choiceType == POPUP) {
             if (this.aBoolean542) {
                 this.setSelectedIndex(this.currentPos, true);
             }
@@ -241,21 +242,21 @@ implements Choice {
         } else {
             graphics.setColor(-16777216);
         }
-        int n = this.anIntArray21[1];
+        int n = this.bounds[1];
         if (this.aStringArray175 != null && this.aStringArray175.length > 0) {
             graphics.setFont(Item.font);
             int i = 0;
             while (i < this.aStringArray175.length) {
-                graphics.drawString(this.aStringArray175[i], this.anIntArray21[0] + 4, n + 2, 0);
+                graphics.drawString(this.aStringArray175[i], this.bounds[0] + 4, n + 2, 0);
                 n += Item.font.getHeight() + 4;
                 ++i;
             }
         }
         if (this.items.size() > 0) {
             switch (this.choiceType) {
-                case 1: 
-                case 2: 
-                case 3: {
+                case EXCLUSIVE: 
+                case MULTIPLE: 
+                case IMPLICIT: {
                     int j = 0;
                     while (j < this.items.size()) {
                         a a2 = (a)this.items.get(j);
@@ -265,11 +266,11 @@ implements Choice {
                         ++j;
                     }
                 }
-                case 4: {
+                case POPUP: {
                     if (this.aBoolean542 && this.anIntArray179 != null) {
-                        this.anInt28 = Math.max((int)(this.anIntArray21[1] - this.anInt29 / 2 - 4), (int)0);
+                        this.anInt28 = Math.max((int)(this.bounds[1] - this.anInt29 / 2 - 4), (int)0);
                         a a2 = (a)this.items.get(0);
-                        emulator.lcdui.a.method178((Graphics)graphics, (int)a2.anIntArray421[0], (int)(this.anInt28 - 2), (int)a2.anIntArray421[2], (int)(this.anInt29 + 2));
+                        emulator.lcdui.a.method178((Graphics)graphics, (int)a2.bounds[0], (int)(this.anInt28 - 2), (int)a2.bounds[2], (int)(this.anInt29 + 2));
                         int k = 0;
                         while (k < this.items.size()) {
                             a a3 = (a)this.items.get(k);
@@ -291,40 +292,40 @@ implements Choice {
         int n = 0;
         if (this.label != null) {
             int n2 = this.getPreferredWidth() - 8;
-            this.aStringArray175 = c.method175((String)this.label, (Font)Item.font, (int)n2, (int)n2);
+            this.aStringArray175 = c.textArr((String)this.label, (Font)Item.font, (int)n2, (int)n2);
             n = (Item.font.getHeight() + 4) * this.aStringArray175.length;
         } else {
             this.aStringArray175 = null;
         }
         switch (this.choiceType) {
-            case 1: 
-            case 2: 
-            case 3: {
+        case EXCLUSIVE: 
+        case MULTIPLE: 
+        case IMPLICIT: {
                 this.anIntArray179 = new int[this.items.size()];
                 int i = 0;
                 while (i < this.items.size()) {
                     a a2 = (a)this.items.get(i);
                     a2.method212();
-                    a2.anIntArray421[1] = n;
-                    n += a2.anIntArray421[3];
+                    a2.bounds[Y] = n;
+                    n += a2.bounds[H];
                     this.anIntArray179[i] = i;
-                    if (this.choiceType == 3 && i == this.currentPos) {
+                    if (this.choiceType == IMPLICIT && i == this.currentPos) {
                         this.setSelectedIndex(i, true);
                     }
                     ++i;
                 }
                 break;
             }
-            case 4: {
+            case POPUP: {
                 a a2 = (a)this.items.get(this.getSelectedIndex());
                 a2.method212();
-                n += a2.anIntArray421[3];
+                n += a2.bounds[H];
                 if (this.aBoolean542) {
                     this.anIntArray179 = new int[this.items.size()];
                     this.anInt29 = 0;
                     int j = 0;
                     while (j < this.items.size()) {
-                        this.anInt29 += ((a)this.items.get((int)j)).anIntArray421[3];
+                        this.anInt29 += ((a)this.items.get((int)j)).bounds[H];
                         ++j;
                     }
                     int n3 = 0;
@@ -332,20 +333,20 @@ implements Choice {
                     while (k < this.items.size()) {
                         a a3 = (a)this.items.get(k);
                         a3.method212();
-                        a3.anIntArray421[1] = n3;
-                        n3 += a3.anIntArray421[3];
-                        a3.anIntArray421[0] = this.screen.bounds[2] / 4;
-                        a3.anIntArray421[2] = this.screen.bounds[2] / 2;
+                        a3.bounds[Y] = n3;
+                        n3 += a3.bounds[H];
+                        a3.bounds[X] = this.screen.bounds[W] / 4;
+                        a3.bounds[W] = this.screen.bounds[W] / 2;
                         this.anIntArray179[k] = k++;
                     }
                     break;
                 }
                 this.anIntArray179 = null;
                 this.anInt29 = -1;
-                this.anInt28 = n - a2.anIntArray421[3];
+                this.anInt28 = n - a2.bounds[H];
             }
         }
-        this.anIntArray21[3] = Math.min((int)n, (int)this.screen.bounds[3]);
+        this.bounds[H] = Math.min((int)n, (int)this.screen.bounds[H]);
     }
 
     protected boolean scrollUp() {
@@ -355,6 +356,7 @@ implements Choice {
             }
             return false;
         }
+
         return super.scrollUp();
     }
 
@@ -368,17 +370,17 @@ implements Choice {
         return super.scrollDown();
     }
 
-    protected void pointerPressed(int n, int n2) {
+    protected void pointerPressed(int x, int y) {
         int[] array = new int[4];
         int i = 0;
         while (i < this.items.size()) {
             a a2 = (a)this.items.get(i);
-            System.arraycopy((Object)a2.anIntArray421, (int)0, (Object)array, (int)0, (int)4);
+            System.arraycopy((Object)a2.bounds, (int)0, (Object)array, (int)0, (int)4);
             int[] array2 = array;
             boolean n3 = true;
             int[] arrn = array2;
-            arrn[1] = arrn[1] + (this.aBoolean542 ? this.anInt28 : this.anIntArray21[1]);
-            if (a2.aBoolean424 && b.method172((int[])array, (int)n, (int)n2)) {
+            arrn[1] = arrn[1] + (this.aBoolean542 ? this.anInt28 : this.bounds[1]);
+            if (a2.aBoolean424 && BoundsUtils.collides((int[])array, (int)x, (int)y)) {
                 this.currentPos = i;
             }
             ++i;

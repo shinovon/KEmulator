@@ -69,7 +69,7 @@ public final class Class67 implements ICaret
           int var4 = (var2 - this.anInt845) / var3;
           int var5 = this.aTextField842.getPreferredWidth() - 8;
           String[] var7;
-          if((var7 = c.method175(this.aTextField842.getString() == null?"":this.aTextField842.getString(), aFont837, var5, var5)) != null && var4 >= 0 && var4 < var7.length) {
+          if((var7 = c.textArr(this.aTextField842.getString() == null?"":this.aTextField842.getString(), aFont837, var5, var5)) != null && var4 >= 0 && var4 < var7.length) {
              int var8 = var7[var4].length();
              int var9 = 0;
              int var10 = 0;
@@ -123,7 +123,7 @@ public final class Class67 implements ICaret
           int var2 = this.aTextField842.getPreferredWidth() - 8;
           String var3;
           String[] var4;
-          if((var4 = c.method175(var3 = this.aTextField842.getString() == null?"":this.aTextField842.getString(), aFont837, var2, var2)) != null && this.anInt848 >= 0 && this.anInt848 < var4.length) {
+          if((var4 = c.textArr(var3 = this.aTextField842.getString() == null?"":this.aTextField842.getString(), aFont837, var2, var2)) != null && this.anInt848 >= 0 && this.anInt848 < var4.length) {
              int var5 = aFont837.getHeight() + 4;
              String var6;
              int var7 = (var6 = var4[this.anInt848]).length();

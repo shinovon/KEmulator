@@ -128,52 +128,52 @@ public class Form extends Screen
     
     protected void layout() {
         if (super.anInt182 != -1) {
-            int anInt181 = Screen.fontHeight4;
+            int h = Screen.fontHeight4;
             for (int i = 0; i < super.items.size(); ++i) {
                 final Item item = ((Item)super.items.get(i));
                 Item item2;
-                boolean method173;
+                boolean c;
                 if (i < super.anInt182) {
                     item2 = item;
-                    method173 = false;
+                    c = false;
                 }
                 else {
                     item.layout();
-                    item.anIntArray21[1] = anInt181;
-                    anInt181 += item.anIntArray21[3];
+                    item.bounds[Y] = h;
+                    h += item.bounds[H];
                     item2 = item;
-                    method173 = b.method173(super.bounds, item.anIntArray21);
+                    c = BoundsUtils.collides(super.bounds, item.bounds);
                 }
-                item2.aBoolean177 = method173;
+                item2.aBoolean177 = c;
             }
             return;
         }
-        int n = Screen.fontHeight4 + super.bounds[3];
+        int n = Screen.fontHeight4 + super.bounds[H];
         for (int j = super.items.size() - 1; j >= 0; --j) {
             final Item item3 = ((Item)super.items.get(j));
             Item item4;
-            boolean method174;
+            boolean c;
             if (j > super.anInt349) {
                 item4 = item3;
-                method174 = true;
+                c = true;
             }
             else {
                 item3.layout();
-                item3.anIntArray21[1] = n - item3.anIntArray21[3];
-                n -= item3.anIntArray21[3];
+                item3.bounds[Y] = n - item3.bounds[H];
+                n -= item3.bounds[H];
                 item4 = item3;
-                method174 = b.method173(super.bounds, item3.anIntArray21);
+                c = BoundsUtils.collides(super.bounds, item3.bounds);
             }
-            item4.aBoolean177 = method174;
+            item4.aBoolean177 = c;
         }
-        int anInt182 = Screen.fontHeight4;
+        int h = Screen.fontHeight4;
         for (int k = 0; k < super.items.size(); ++k) {
             final Item item5;
             if ((item5 = ((Item)super.items.get(k))).aBoolean177) {
                 item5.layout();
-                item5.anIntArray21[1] = anInt182;
-                anInt182 += item5.anIntArray21[3];
-                item5.aBoolean177 = b.method173(super.bounds, item5.anIntArray21);
+                item5.bounds[Y] = h;
+                h += item5.bounds[H];
+                item5.aBoolean177 = BoundsUtils.collides(super.bounds, item5.bounds);
             }
         }
     }

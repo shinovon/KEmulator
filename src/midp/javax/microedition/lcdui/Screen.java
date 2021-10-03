@@ -63,21 +63,21 @@ public abstract class Screen extends Displayable
             this.refreshSoftMenu();
             return;
         }
-        if (super.selectedItem != null && super.selectedItem instanceof CustomItem && ((CustomItem)super.selectedItem).callTraverse(n)) {
+        if (selectedItem != null && selectedItem instanceof CustomItem && ((CustomItem)selectedItem).callTraverse(n)) {
             return;
         }
-        if (super.selectedItem != null && n == Keyboard.getArrowKeyFromDevice(8)) {
-            super.selectedItem.itemApplyCommand();
+        if (selectedItem != null && n == Keyboard.getArrowKeyFromDevice(8)) {
+            selectedItem.itemApplyCommand();
             return;
         }
         if (n == Keyboard.getArrowKeyFromDevice(1)) {
             if (this.items.size() > 0) {
-                final int index = this.items.indexOf(super.selectedItem);
-                if (super.selectedItem != null) {
-                    if (!super.selectedItem.scrollUp()) {
+                final int index = this.items.indexOf(selectedItem);
+                if (selectedItem != null) {
+                    if (!selectedItem.scrollUp()) {
                         return;
                     }
-                    super.selectedItem.defocus();
+                    selectedItem.defocus();
                 }
                 Screen screen;
                 Vector vector;
@@ -98,20 +98,20 @@ public abstract class Screen extends Displayable
                     n4 = 0;
                 }
                 screen.selectedItem = (Item) vector.get(n4);
-                super.selectedItem.focus();
-                if (!super.selectedItem.aBoolean177) {
-                    this.anInt182 = this.items.indexOf(super.selectedItem);
+                selectedItem.focus();
+                if (!selectedItem.aBoolean177) {
+                    this.anInt182 = this.items.indexOf(selectedItem);
                     this.anInt349 = -1;
                 }
             }
         }
         else if (n == Keyboard.getArrowKeyFromDevice(6) && this.items.size() > 0) {
-            final int index2 = this.items.indexOf(super.selectedItem);
-            if (super.selectedItem != null) {
-                if (!super.selectedItem.scrollDown()) {
+            final int index2 = this.items.indexOf(selectedItem);
+            if (selectedItem != null) {
+                if (!selectedItem.scrollDown()) {
                     return;
                 }
-                super.selectedItem.defocus();
+                selectedItem.defocus();
             }
             Screen screen2;
             Vector vector2;
@@ -132,10 +132,10 @@ public abstract class Screen extends Displayable
                 n5 = this.items.size() - 1;
             }
             screen2.selectedItem = (Item) vector2.get(n5);
-            super.selectedItem.focus();
-            if (!super.selectedItem.aBoolean177) {
+            selectedItem.focus();
+            if (!selectedItem.aBoolean177) {
                 this.anInt182 = -1;
-                this.anInt349 = this.items.indexOf(super.selectedItem);
+                this.anInt349 = this.items.indexOf(selectedItem);
             }
         }
     }
@@ -143,7 +143,7 @@ public abstract class Screen extends Displayable
     public void invokeKeyReleased(final int n) {
     }
     
-    public void invokePointerPressed(final int n, final int n2) {
+    public void invokePointerPressed(final int x, final int y) {
         if (super.aBoolean18) {
             final int n3 = super.w >> 1;
             final int anInt181 = Screen.fontHeight4;
@@ -152,7 +152,7 @@ public abstract class Screen extends Displayable
             final int n6 = n3 - 1;
             final int n7 = super.h - n4 - 1;
             final int[] array;
-            if (emulator.lcdui.b.method172(array = new int[] { n6, n7, n3, n4 }, n, n2)) {
+            if (BoundsUtils.collides(array = new int[] { n6, n7, n3, n4 }, x, y)) {
                 array[0] = n6;
                 array[1] = n7;
                 array[2] = n3;
@@ -160,7 +160,7 @@ public abstract class Screen extends Displayable
                 int[] array2;
                 int n8;
                 for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
-                    if (emulator.lcdui.b.method172(array, n, n2)) {
+                    if (BoundsUtils.collides(array, x, y)) {
                         super.cmdListener.commandAction((Command)super.commands.get(i + 1), this);
                         super.aBoolean18 = false;
                         return;
@@ -169,23 +169,23 @@ public abstract class Screen extends Displayable
             }
             return;
         }
-        if (super.selectedItem != null && super.selectedItem instanceof ChoiceGroup && ((ChoiceGroup)super.selectedItem).aBoolean542) {
-            super.selectedItem.pointerPressed(n, n2);
+        if (selectedItem != null && selectedItem instanceof ChoiceGroup && ((ChoiceGroup)selectedItem).aBoolean542) {
+            selectedItem.pointerPressed(x, y);
             return;
         }
         if (this.items.size() > 0) {
             int j = 0;
             while (j < this.items.size()) {
-                final Item anItem20;
-                if ((anItem20 = (Item) this.items.get(j)).aBoolean177 && emulator.lcdui.b.method172(anItem20.anIntArray21, n, n2)) {
-                    if (anItem20 == super.selectedItem) {
-                        super.selectedItem.pointerPressed(n, n2);
+                final Item futureSelect;
+                if ((futureSelect = (Item) this.items.get(j)).aBoolean177 && BoundsUtils.collides(futureSelect.bounds, x, y)) {
+                    if (futureSelect == selectedItem) {
+                        selectedItem.pointerPressed(x, y);
                         return;
                     }
-                    if (super.selectedItem != null) {
-                        super.selectedItem.defocus();
+                    if (selectedItem != null) {
+                        selectedItem.defocus();
                     }
-                    (super.selectedItem = anItem20).focus();
+                    (selectedItem = futureSelect).focus();
                 }
                 else {
                     ++j;
@@ -222,7 +222,7 @@ public abstract class Screen extends Displayable
     
     protected void drawTitleBar(final Graphics graphics) {
         final int n;
-        final String value = String.valueOf(n = ((super.selectedItem != null) ? (this.items.indexOf(super.selectedItem) + 1) : this.items.size()));
+        final String value = String.valueOf(n = ((selectedItem != null) ? (this.items.indexOf(selectedItem) + 1) : this.items.size()));
         final int n2 = (Screen.fontHeight4 >> 1) - 1;
         final int stringWidth = Screen.font.stringWidth(super.title);
         final int stringWidth2 = Screen.font.stringWidth(value);
@@ -238,7 +238,7 @@ public abstract class Screen extends Displayable
     }
     
     protected void drawScrollBar(final Graphics graphics) {
-        emulator.lcdui.a.method179(graphics, super.bounds[2] + 1, Screen.fontHeight4 - 1, 2, super.bounds[3] - 2, this.items.size(), (super.selectedItem != null) ? this.items.indexOf(super.selectedItem) : -1);
+        emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (selectedItem != null) ? this.items.indexOf(selectedItem) : -1);
     }
     
     static {

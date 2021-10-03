@@ -33,7 +33,7 @@ public class Spacer extends Item
     
     protected void layout() {
         super.layout();
-        super.anIntArray21[2] = Math.min(this.anInt349 + 4, super.screen.bounds[2]);
-        super.anIntArray21[3] = Math.min(this.anInt28 + 4, super.screen.bounds[3]);
+        super.bounds[2] = Math.min(this.anInt349 + 4, super.screen.bounds[2]);
+        super.bounds[3] = Math.min(this.anInt28 + 4, super.screen.bounds[3]);
     }
 }

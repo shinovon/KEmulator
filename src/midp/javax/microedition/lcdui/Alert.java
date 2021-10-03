@@ -10,8 +10,9 @@ public class Alert extends Screen
     int anInt24;
     int anInt178;
     String aString172;
-    private String[] aStringArray175;
+    private String[] textArr;
     Displayable aDisplayable835;
+	private Gauge gauge;
     
     public Alert(final String s) {
         this(s, null, null, null);
@@ -66,10 +67,12 @@ public class Alert extends Screen
     }
     
     public Gauge getIndicator() {
-        return null;
+        return gauge;
     }
     
     public void setIndicator(final Gauge gauge) {
+    	if(gauge.isInteractive()) throw new IllegalArgumentException();
+    	this.gauge = gauge;
     }
     
     public String getString() {
@@ -87,14 +90,21 @@ public class Alert extends Screen
         Emulator.getCurrentDisplay().setCurrent(this.aDisplayable835);
     }
     
-    protected void paint(final Graphics graphics) {
-        final int n = super.bounds[2] - 8;
-        this.aStringArray175 = c.method175(this.aString172, Screen.font, n, n);
-        graphics.setColor(-16777216);
-        int anInt181 = Screen.fontHeight4;
-        for (int i = 0; i < this.aStringArray175.length; ++i) {
-            graphics.drawString(this.aStringArray175[i], 4, anInt181 + 2, 0);
-            anInt181 += Screen.font.getHeight() + 4;
+    protected void paint(Graphics g) {
+        final int n = super.bounds[W] - 8;
+        this.textArr = c.textArr(this.aString172, Screen.font, n, n);
+        g.setColor(-16777216);
+        int h = Screen.fontHeight4;
+        for (int i = 0; i < this.textArr.length; ++i) {
+            g.drawString(this.textArr[i], 4, h + 2, 0);
+            h += Screen.font.getHeight() + 4;
+        }
+        if(gauge != null) {
+        	gauge.screen = this;
+        	gauge.bounds[X] = 0;
+        	gauge.bounds[Y] = h;
+        	gauge.bounds[W] = bounds[W];
+        	gauge.paint(g);
         }
         if (this.anInt178 > 0) {
             this.anInt178 -= 100;

@@ -134,16 +134,16 @@ public abstract class CustomItem extends Item
         this.aGraphics428.setColor(-1);
         this.aGraphics428.fillRect(0, 0, super.screen.w, super.screen.h);
         this.aGraphics428.setColor(0);
-        final int n = super.anIntArray21[0] + 2;
-        int n2 = super.anIntArray21[1] + 2;
-        final int prefContentWidth = this.getPrefContentWidth(super.anIntArray21[2]);
-        final int prefContentHeight = this.getPrefContentHeight(super.anIntArray21[3]);
+        final int n = super.bounds[0] + 2;
+        int n2 = super.bounds[1] + 2;
+        final int prefContentWidth = this.getPrefContentWidth(super.bounds[2]);
+        final int prefContentHeight = this.getPrefContentHeight(super.bounds[3]);
         this.paint(this.aGraphics428, prefContentWidth, prefContentHeight);
         super.paint(graphics);
         if (super.aStringArray175 != null && super.aStringArray175.length > 0) {
             graphics.setFont(Item.font);
             for (int i = 0; i < super.aStringArray175.length; ++i) {
-                graphics.drawString(super.aStringArray175[i], super.anIntArray21[0] + 4, n2 + 2, 0);
+                graphics.drawString(super.aStringArray175[i], super.bounds[0] + 4, n2 + 2, 0);
                 n2 += Item.font.getHeight() + 4;
             }
         }
@@ -157,13 +157,13 @@ public abstract class CustomItem extends Item
         int n = 0;
         final int n2 = this.getPreferredWidth() - 8;
         if (super.label != null) {
-            super.aStringArray175 = c.method175(super.label, Item.font, n2, n2);
+            super.aStringArray175 = c.textArr(super.label, Item.font, n2, n2);
             n = 0 + (Item.font.getHeight() + 4) * super.aStringArray175.length;
         }
         else {
             super.aStringArray175 = null;
         }
-        super.anIntArray21[3] = Math.min(n + (this.getPrefContentHeight(super.anIntArray21[3]) + 4), super.screen.bounds[3]);
+        super.bounds[3] = Math.min(n + (this.getPrefContentHeight(super.bounds[3]) + 4), super.screen.bounds[3]);
     }
     
     protected boolean callTraverse(final int n) {

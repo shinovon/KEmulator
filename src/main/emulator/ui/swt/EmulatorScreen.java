@@ -131,7 +131,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
     private long aLong1013;
     private long aLong1017;
 	private MenuItem canvasKeyboardMenuItem;
-	//private MenuItem fpsModeMenuItem;
+	private MenuItem fpsModeMenuItem;
 	private int lastMouseMoveX;
 	private boolean fpsWasRight;
 	private boolean fpsWasLeft;
@@ -571,11 +571,11 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         canvasKeyboardMenuItem.setText("Canvas Keyboard");
         canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
         canvasKeyboardMenuItem.addSelectionListener((SelectionListener)this);
-        //this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
-        //fpsModeMenuItem.setText("FPS Mode");
-        //fpsModeMenuItem.setSelection(Settings.fpsMode);
-        //fpsModeMenuItem.addSelectionListener((SelectionListener)this);
-        //fpsModeMenuItem.setAccelerator(SWT.MOD1 + 'F');
+        this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
+        fpsModeMenuItem.setText("FPS Mode");
+        fpsModeMenuItem.setSelection(Settings.fpsMode);
+        fpsModeMenuItem.addSelectionListener((SelectionListener)this);
+        fpsModeMenuItem.setAccelerator(SWT.MOD1 + 'F');
         menuItemTool.setMenu(this.menuTool);
         this.menuMidlet = new Menu(menuItemMidlet);
         (this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.uiText("MENU_MIDLET_LOAD_JAR", "Load jar ..."));
@@ -834,13 +834,13 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
                 	method570(!Settings.canvasKeyboard);
                 	return;
                 }
-                /*
+                
                 if(menuItem.equals(fpsModeMenuItem)) {
                 	Settings.fpsMode = fpsModeMenuItem.getSelection();
                 	setFpsMode(true);
                 	return;
                 }
-                */
+                
                 if (menuItem.equals(this.channelDownMenuItem)) {
                     Emulator.getNetMonitor().a(false);
                     this.method587();
@@ -1571,9 +1571,7 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         if(Settings.fpsMode) {
         	Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
         	int dx = mouseEvent.x - canvas.getSize().x / 2;
-
         	if(canvas.toControl(display.getCursorLocation()).x == canvas.getSize().x / 2) {
-        		//System.out.println("stop");
         		if(fpsWasRight) {
                 	mr(-4);
                 	fpsWasRight = false;
@@ -1585,18 +1583,9 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         		}
         		return;
         	}
+        	display.getCursorControl().forceFocus();
         	display.setCursorLocation(pt);
-        	//System.out.println(dx);
-			/*if(ignoreNextFps) {
-				ignoreNextFps = false;
-				if(fpsWasLeft) {
-					if(dx > 0) return;
-				} else if(fpsWasRight) {
-					if(dx < 0) return;
-				}
-			}*/
         	if(dx > 1) {
-            	//System.out.println("right");
         		// right
         		if(fpsWasLeft) {
                 	mr(-3);
@@ -1606,7 +1595,6 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         		else mrp(-4);
         		fpsWasRight = true;
         	} else if(dx < -1) {
-            	//System.out.println("left");
         		// left
         		if(fpsWasRight) {
                 	mr(-4);
@@ -1616,7 +1604,6 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         		else mrp(-3);
         		fpsWasLeft = true;
         	} else if(Math.abs(dx) == 1 && !fpsWasnt) {
-            	//System.out.println("d");
         		if(fpsWasRight) {
                 	mr(-4);
                 	fpsWasRight = false;
@@ -1628,7 +1615,6 @@ public final class EmulatorScreen implements IScreen, Runnable, PaintListener, D
         		}
         	}else if(dx == 0) {
         		fpsWasnt = true;
-            	//System.out.println("neutral");
         		if(fpsWasRight) {
                 	mr(-4);
                 	fpsWasRight = false;

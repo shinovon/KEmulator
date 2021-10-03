@@ -48,12 +48,12 @@ public class StringItem extends Item
         super.setPreferredSize(n, n2);
     }
     
-    protected void paint(final Graphics graphics) {
-        super.paint(graphics);
+    protected void paint(final Graphics g) {
+        super.paint(g);
         
         final Font font = (this.font != null) ? this.font : Screen.font;
-        int n = super.anIntArray21[1];
-        graphics.setFont(font);
+        int n = super.bounds[Y];
+        g.setFont(font);
 
         if(mode == BUTTON) {
         	//кнопка
@@ -68,30 +68,30 @@ public class StringItem extends Item
         	if(str == null) {
         		str = "...";
         	}
-        	int k = super.anIntArray21[0];
-	        graphics.drawString(str, k + 4, n + 1, 0);
+        	int k = super.bounds[X];
+	        g.drawString(str, k + 4, n + 1, 0);
 	        // определение размера строки
 	        int j = 0;
-	        IFont f = graphics.getImpl().getFont();
+	        IFont f = g.getImpl().getFont();
 	        if(f != null)
 	        	j = f.stringWidth(str);
 	        if(j > 0) {
 	        	int h = font.getHeight();
 	        	//очертания кнопки
-	        	int o = graphics.getColor();
-	        	graphics.setColor(0xababab);
+	        	int o = g.getColor();
+	        	g.setColor(0xababab);
 	        	k = k + 2;
 	        	int lx = k + 2 + j + 1;
 	        	int ly = n + h + 3;
-	        	graphics.drawLine(k + 1, ly, lx, ly); 
-	        	graphics.drawLine(lx, ly, lx, n + 1); 
-	        	graphics.setColor(o);
-	        	graphics.drawRect(k, n, j + 4, h + 4); 
+	        	g.drawLine(k + 1, ly, lx, ly); 
+	        	g.drawLine(lx, ly, lx, n + 1); 
+	        	g.setColor(o);
+	        	g.drawRect(k, n, j + 4, h + 4); 
 	        }
         } else {
 	        for (int i = this.getcurPage(); i < this.textArr.length; ++i) {
-	            graphics.drawString(this.textArr[i], super.anIntArray21[0] + 4, n + 2, 0);
-	            if ((n += font.getHeight() + 4) > super.screen.bounds[3]) {
+	            g.drawString(this.textArr[i], super.bounds[X] + 4, n + 2, 0);
+	            if ((n += font.getHeight() + 4) > super.screen.bounds[H]) {
 	                return;
 	            }
 	        }
@@ -102,12 +102,12 @@ public class StringItem extends Item
         super.layout();
         final Font font = (this.font != null) ? this.font : Screen.font;
         final int n = this.getPreferredWidth() - 8;
-        this.textArr = c.method175((super.label != null) ? (super.label + " " + this.text) : this.text, font, n, n);
+        this.textArr = c.textArr((super.label != null) ? (super.label + " " + this.text) : this.text, font, n, n);
         final int n3;
         int n2 = (n3 = font.getHeight() + 4) * this.textArr.length;
         super.anIntArray179 = null;
-        final int n4 = super.screen.bounds[3] / n3 * n3;
-        if (n2 > super.screen.bounds[3] && n4 > 0) {
+        final int n4 = super.screen.bounds[H] / n3 * n3;
+        if (n2 > super.screen.bounds[H] && n4 > 0) {
             int n5 = n2 / n4;
             if (n2 % n4 != 0) {
                 ++n5;
@@ -121,6 +121,6 @@ public class StringItem extends Item
             }
             n2 = (this.textArr.length - super.anIntArray179[super.currentPos]) * n3;
         }
-        super.anIntArray21[3] = Math.min(n2, super.screen.bounds[3]);
+        super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
     }
 }

@@ -93,7 +93,7 @@ public class TextBoxOld extends Screen
     
     protected void layout() {
         this.aTextField1305.layout();
-        this.aTextField1305.anIntArray21[1] = Screen.fontHeight4;
+        this.aTextField1305.bounds[1] = Screen.fontHeight4;
     }
     
 }

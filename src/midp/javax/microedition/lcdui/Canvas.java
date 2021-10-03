@@ -3,7 +3,7 @@ package javax.microedition.lcdui;
 import com.nokia.mid.ui.DeviceControl;
 
 import emulator.*;
-import emulator.lcdui.b;
+import emulator.lcdui.BoundsUtils;
 import emulator.ui.swt.Property;
 
 public abstract class Canvas extends Displayable
@@ -172,7 +172,7 @@ public abstract class Canvas extends Displayable
             final int n6 = n3 - 1;
             final int n7 = super.h - n4 - 1;
             final int[] array;
-            if (b.method172(array = new int[] { n6, n7, n3, n4 }, n, n2)) {
+            if (BoundsUtils.collides(array = new int[] { n6, n7, n3, n4 }, n, n2)) {
                 array[0] = n6;
                 array[1] = n7;
                 array[2] = n3;
@@ -180,7 +180,7 @@ public abstract class Canvas extends Displayable
                 int[] array2;
                 int n8;
                 for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
-                    if (b.method172(array, n, n2)) {
+                    if (BoundsUtils.collides(array, n, n2)) {
                         super.cmdListener.commandAction((Command)super.commands.get(i + 1), this);
                         super.aBoolean18 = false;
                         return;

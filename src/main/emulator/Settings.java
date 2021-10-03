@@ -56,7 +56,7 @@ public final class Settings
     public static boolean aBoolean1274;
 	public static boolean canvasKeyboard;
 	public static boolean awtAntiAliasing;
-	public static boolean fpsMode = true;
+	public static boolean fpsMode;
 	public static boolean textAntiAliasing = true;
     
     public Settings() {

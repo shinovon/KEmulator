@@ -59,12 +59,12 @@ public class ImageItem extends Item
     
     protected void paint(final Graphics graphics) {
         super.paint(graphics);
-        final int n = super.anIntArray21[0] + 2;
-        int n2 = super.anIntArray21[1] + 2;
+        final int n = super.bounds[0] + 2;
+        int n2 = super.bounds[1] + 2;
         if (super.aStringArray175 != null && super.aStringArray175.length > 0) {
             graphics.setFont(Item.font);
             for (int i = 0; i < super.aStringArray175.length; ++i) {
-                graphics.drawString(super.aStringArray175[i], super.anIntArray21[0] + 4, n2 + 2, 0);
+                graphics.drawString(super.aStringArray175[i], super.bounds[0] + 4, n2 + 2, 0);
                 n2 += Item.font.getHeight() + 4;
             }
         }
@@ -77,7 +77,7 @@ public class ImageItem extends Item
         int n = 0;
         final int n2 = this.getPreferredWidth() - 8;
         if (super.label != null) {
-            super.aStringArray175 = c.method175(super.label, Item.font, n2, n2);
+            super.aStringArray175 = c.textArr(super.label, Item.font, n2, n2);
             n = 0 + (Item.font.getHeight() + 4) * super.aStringArray175.length;
         }
         else {
@@ -86,6 +86,6 @@ public class ImageItem extends Item
         if (this.image != null) {
             n += this.image.getHeight() + 4;
         }
-        super.anIntArray21[3] = Math.min(n, super.screen.bounds[3]);
+        super.bounds[3] = Math.min(n, super.screen.bounds[3]);
     }
 }

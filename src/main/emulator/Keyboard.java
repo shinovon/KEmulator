@@ -173,12 +173,11 @@ public final class Keyboard
         if ((value = Keyboard.deviceKeyToStr.get(String.valueOf(n))) != null) {
             return (String)Keyboard.strToPCKey.get(value);
         }
-        /*
         if(Settings.fpsMode) {
         	//up
-        	if(n == 'w') return "" + method595(1);
+        	if(n == 'w') return "" + getArrowKeyFromDevice(1);
         	//down
-        	if(n == 's') return "" + method595(6);
+        	if(n == 's') return "" + getArrowKeyFromDevice(6);
         	
         	//num1
         	if(n == 'a') return "" + 49;
@@ -195,7 +194,6 @@ public final class Keyboard
         	//hash
         	if(n == 'z') return "" + 35;
         }
-        */
         final String method594;
         if ((method594 = keyToString(String.valueOf(n))) == null) {
             return null;

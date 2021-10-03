@@ -432,7 +432,7 @@ public class Emulator
     public static boolean getJarClasses() {
         try {
             if (Emulator.midletClassName == null) {
-                Cloneable aProperties1368 = null;
+                Properties props = null;
                 File file2;
                 File file;
                 if (Emulator.jadPath != null) {
@@ -445,11 +445,11 @@ public class Emulator
                 }
                 final File file3 = file2;
                 if (file.exists()) {
-                    ((Properties)(aProperties1368 = new Properties())).load(new FileInputStream(file3));
-                    final Enumeration<String> keys = ((Hashtable<String, String>)aProperties1368).keys();
+                    ((Properties)(props = new Properties())).load(new FileInputStream(file3));
+                    final Enumeration<Object> keys = props.keys();
                     while (keys.hasMoreElements()) {
-                        final String s = keys.nextElement();
-                        ((Hashtable<String, String>)aProperties1368).put(s, new String(((Properties)aProperties1368).getProperty(s).getBytes("ISO-8859-1"), "UTF-8"));
+                        final String s = (String) keys.nextElement();
+                        props.put(s, new String(props.getProperty(s).getBytes("ISO-8859-1"), "UTF-8"));
                     }
                 }
                 Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
@@ -463,30 +463,62 @@ public class Emulator
                         Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
                     }
                 }
-                if (aProperties1368 == null) {
+                if (props == null) {
                     try {
                         final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
-                        aProperties1368 = new Properties();
+                        props = new Properties();
                         for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
-                            ((Hashtable<String, String>)aProperties1368).put(entry.getKey().toString(), (String) entry.getValue());
+                            props.put(entry.getKey().toString(), (String) entry.getValue());
                         }
                     }
                     catch (Exception ex2) {
                         final InputStream inputStream;
                         (inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
-                        ((Properties)(aProperties1368 = new Properties())).load(inputStream);
+                        ((Properties)(props = new Properties())).load(inputStream);
                         inputStream.close();
-                        final Enumeration<String> keys2 = ((Hashtable<String, String>)aProperties1368).keys();
+                        final Enumeration<Object> keys2 = props.keys();
                         while (keys2.hasMoreElements()) {
-                            final String s2 = keys2.nextElement();
-                            ((Hashtable<String, String>)aProperties1368).put(s2, new String(((Properties)aProperties1368).getProperty(s2).getBytes("ISO-8859-1"), "UTF-8"));
+                            final String s2 = (String) keys2.nextElement();
+                            props.put(s2, new String(props.getProperty(s2).getBytes("ISO-8859-1"), "UTF-8"));
                         }
                     }
                 }
-                Emulator.emulatorimpl.midletProps = (Properties)aProperties1368;
-                Emulator.midletClassName = ((Properties)aProperties1368).getProperty("MIDlet-1");
-                if (Emulator.midletClassName != null) {
-                    Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
+                Emulator.emulatorimpl.midletProps = (Properties)props;
+                if(props.containsKey("MIDlet-2") && props.containsKey("MIDlet-1")) {
+                	// find all midlets and show choice window
+                	Vector<String> midletKeys = new Vector<String>();
+                	final Enumeration<Object> keys = props.keys();
+                    while (keys.hasMoreElements()) {
+                        final String s = (String) keys.nextElement();
+                        if(s.startsWith("MIDlet-")) {
+                        	String num = s.substring("MIDlet-".length());
+                        	try {
+                        		int n = Integer.parseInt(num);
+                        		String v = props.getProperty(s);
+                        		v = v.substring(0, v.indexOf(","));
+                        		midletKeys.add(n + " (" + v + ")");
+                        	} catch (Exception e) {
+                        	}
+                        }
+                    }
+                    if(midletKeys.size() > 0) {
+                        String[] arr = midletKeys.toArray(new String[0]);
+                        String c = (String) JOptionPane.showInputDialog(null, "Choose MIDlet to run", "KEmulator", JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
+                        if(c == null) {
+                        	System.exit(0);
+                        	return false;
+                        }
+                        c = "MIDlet-" + c.substring(0, c.indexOf(' '));
+                        c = props.getProperty(c);
+    	                Emulator.midletClassName = 
+    	                		c.substring(c.lastIndexOf(",") + 1)
+    	                		.trim();
+                    }
+                } else {
+	                Emulator.midletClassName = props.getProperty("MIDlet-1");
+	                if (Emulator.midletClassName != null) {
+	                    Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
+	                }
                 }
             }
             else {
@@ -738,6 +770,7 @@ public class Emulator
     }
 
 	public static void main(final String[] commandLineArguments) {
+		System.out.println(System.getProperties().toString());
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.method709();

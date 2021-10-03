@@ -36,7 +36,7 @@ public final class c
        }
     }
 
-    public static String[] method175(String var0, Font var1, int var2, int var3) {
+    public static String[] textArr(String var0, Font var1, int var2, int var3) {
     	if(var0 == null) return new String[0];
        if(var2 > 0 && var3 > 0) {
           boolean var4 = var0.indexOf(10) != -1;

@@ -119,29 +119,29 @@ public class TextField extends Item
         else {
             graphics.setColor(-16777216);
         }
-        int n = super.anIntArray21[1];
-        int n2 = super.anIntArray21[1];
+        int n = super.bounds[1];
+        int n2 = super.bounds[1];
         if (super.aStringArray175 != null && super.aStringArray175.length > 0) {
             graphics.setFont(Item.font);
             for (int i = 0; i < super.aStringArray175.length; ++i) {
-                graphics.drawString(super.aStringArray175[i], super.anIntArray21[0] + 4, n + 2, 0);
+                graphics.drawString(super.aStringArray175[i], super.bounds[0] + 4, n + 2, 0);
                 n += Item.font.getHeight() + 4;
             }
             n2 = n - 2;
         }
-        final int n3 = super.anIntArray21[3] - n + super.anIntArray21[1] - 2;
+        final int n3 = super.bounds[3] - n + super.bounds[1] - 2;
         if (super.inFocus) {
             graphics.setColor(-8355712);
         }
-        graphics.drawRect(2, n2, super.anIntArray21[2] - 4, n3);
+        graphics.drawRect(2, n2, super.bounds[2] - 4, n3);
         graphics.setFont(Screen.font);
         if (super.inFocus) {
             graphics.setColor(8617456);
         }
-        this.anInt29 = super.anIntArray21[0] + 4;
+        this.anInt29 = super.bounds[0] + 4;
         this.anInt30 = n + 4;
         for (int j = 0; j < this.aStringArray359.length; ++j) {
-            graphics.drawString(this.aStringArray359[j], super.anIntArray21[0] + 4, n + 2, 0);
+            graphics.drawString(this.aStringArray359[j], super.bounds[0] + 4, n + 2, 0);
             if ((n += Screen.font.getHeight() + 4) > super.screen.bounds[3]) {
                 return;
             }
@@ -153,14 +153,14 @@ public class TextField extends Item
         int n = 4;
         final int n2 = this.getPreferredWidth() - 8;
         if (super.label != null) {
-            super.aStringArray175 = c.method175(super.label, Item.font, n2, n2);
+            super.aStringArray175 = c.textArr(super.label, Item.font, n2, n2);
             n = 4 + (Item.font.getHeight() + 4) * super.aStringArray175.length;
         }
         else {
             super.aStringArray175 = null;
         }
         final Font aFont173 = Screen.font;
-        this.aStringArray359 = c.method175((this.aString25 == null) ? "" : this.aString25, aFont173, n2, n2);
-        super.anIntArray21[3] = Math.min(n + (aFont173.getHeight() + 4) * this.aStringArray359.length, super.screen.bounds[3]);
+        this.aStringArray359 = c.textArr((this.aString25 == null) ? "" : this.aString25, aFont173, n2, n2);
+        super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.aStringArray359.length, super.screen.bounds[3]);
     }
 }

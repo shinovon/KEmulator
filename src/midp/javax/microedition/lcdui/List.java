@@ -13,99 +13,104 @@ public class List extends Screen implements Choice {
       if(n != 2 && n != 1 && n != 3) {
          throw new IllegalArgumentException();
       } else {
-         this.choiceGroup = new ChoiceGroup((String)null, n, array, array2, true);
-         super.items.add(this.choiceGroup);
-         this.choiceGroup.screen = this;
-         this.choiceGroup.aBoolean541 = true;
-         this.choiceGroup.aBoolean177 = true;
-         this.choiceGroup.focus();
-         this.choiceGroup.aCommand540 = SELECT_COMMAND;
+         choiceGroup = new ChoiceGroup((String)null, n, array, array2, true);
+         super.items.add(choiceGroup);
+         choiceGroup.screen = this;
+         choiceGroup.aBoolean541 = true;
+         choiceGroup.aBoolean177 = true;
+         choiceGroup.focus();
+         choiceGroup.aCommand540 = SELECT_COMMAND;
          super.addCommand(SELECT_COMMAND);
       }
    }
 
    public void setSelectCommand(Command aCommand540) {
-      if(this.choiceGroup.choiceType == 3) {
-         super.removeCommand(this.choiceGroup.aCommand540);
-         super.addCommand(this.choiceGroup.aCommand540 = aCommand540);
+      if(choiceGroup.choiceType == 3) {
+         super.removeCommand(choiceGroup.aCommand540);
+         super.addCommand(choiceGroup.aCommand540 = aCommand540);
       }
    }
 
    public int append(String s, Image image) {
-      return this.choiceGroup.append(s, image);
+      return choiceGroup.append(s, image);
    }
 
    public void delete(int n) {
-      this.choiceGroup.delete(n);
+      choiceGroup.delete(n);
    }
 
    public void deleteAll() {
-      this.choiceGroup.deleteAll();
+      choiceGroup.deleteAll();
    }
 
    public int getFitPolicy() {
-      return this.choiceGroup.getFitPolicy();
+      return choiceGroup.getFitPolicy();
    }
 
    public Font getFont(int n) {
-      return this.choiceGroup.getFont(n);
+      return choiceGroup.getFont(n);
    }
 
    public Image getImage(int n) {
-      return this.choiceGroup.getImage(n);
+      return choiceGroup.getImage(n);
    }
 
    public int getSelectedFlags(boolean[] array) {
-      return this.choiceGroup.getSelectedFlags(array);
+      return choiceGroup.getSelectedFlags(array);
    }
 
    public int getSelectedIndex() {
-      return this.choiceGroup.getSelectedIndex();
+      return choiceGroup.getSelectedIndex();
    }
 
    public String getString(int n) {
-      return this.choiceGroup.getString(n);
+      return choiceGroup.getString(n);
    }
 
    public void insert(int n, String s, Image image) {
-      this.choiceGroup.insert(n, s, image);
+      choiceGroup.insert(n, s, image);
    }
 
    public boolean isSelected(int n) {
-      return this.choiceGroup.isSelected(n);
+      return choiceGroup.isSelected(n);
    }
 
    public void set(int n, String s, Image image) {
-      this.choiceGroup.set(n, s, image);
+      choiceGroup.set(n, s, image);
    }
 
    public void setFitPolicy(int fitPolicy) {
-      this.choiceGroup.setFitPolicy(fitPolicy);
+      choiceGroup.setFitPolicy(fitPolicy);
    }
 
    public void setFont(int n, Font font) {
-      this.choiceGroup.setFont(n, font);
+      choiceGroup.setFont(n, font);
    }
 
    public void setSelectedFlags(boolean[] selectedFlags) {
-      this.choiceGroup.setSelectedFlags(selectedFlags);
+      choiceGroup.setSelectedFlags(selectedFlags);
    }
 
    public void setSelectedIndex(int n, boolean b) {
-      this.choiceGroup.setSelectedIndex(n, b);
+      choiceGroup.setSelectedIndex(n, b);
    }
 
    public int size() {
-      return this.choiceGroup.size();
+      return choiceGroup.size();
+   }
+
+   @Override
+   protected void drawScrollBar(final Graphics graphics) {
+       emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, choiceGroup.size(), (choiceGroup.getSelectedIndex() != 0) ? choiceGroup.getSelectedIndex() : -1);
    }
 
    protected void paint(Graphics graphics) {
       this.layout();
-      this.choiceGroup.paint(graphics);
+      choiceGroup.paint(graphics);
    }
 
    protected void layout() {
-      this.choiceGroup.layout();
-      this.choiceGroup.anIntArray21[1] = Screen.fontHeight4;
+      choiceGroup.layout();
+      choiceGroup.bounds[1] = Screen.fontHeight4;
    }
 }
