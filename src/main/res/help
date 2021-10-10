@@ -46,7 +46,9 @@ log.txt      log file
 ==================
 $[News & Log]
 $nnmod v2.10.4 [2021.10.10]
-
+Added 50% scale in MemoryView images
+Alert commands fixed
+Removed unusual debugging
 
 $nnmod v2.10.3 [2021.10.08]
 MemoryView now stores more objects and arrays
