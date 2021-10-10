@@ -6,11 +6,11 @@ public final class c
         super();
     }
     
-    public static int a() {
-        return 0;
+    public static int getNumActions() {
+        return 1;
     }
     
-    public static int b() {
-        return 0;
+    public static int getNumFrames() {
+        return 60;
     }
 }

@@ -4,142 +4,108 @@
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
 
 -target 1.8
--dontshrink
+#-dontshrink
 -dontoptimize
 -printmapping '.\mapping.txt'
 -overloadaggressively
--keeppackagenames **
--keepattributes SourceFile,LineNumberTable,Signature
--keepparameternames
+#-keeppackagenames **
+-keepattributes SourceFile,LineNumberTable
+#-keepparameternames
 -dontnote
 -dontwarn
-
-
+-defaultpackage 'kemnn'
+-renamesourcefileattribute A
 
 # Interfaces
--keep,allowshrinking public interface  ** {
-    <fields>;
-    <methods>;
-}
+#-keep,allowshrinking public interface ** { *; }
 
 # Abstracts
--keep,allowshrinking public abstract class ** {
-    public <fields>;
-    protected <fields>;
-    public <methods>;
-    protected <methods>;
-    public static <methods>;
-    native <methods>;
-    protected static <methods>;
-    abstract <methods>;
-}
+#-keep,allowshrinking public abstract class ** {
+#    public <fields>;
+#    protected <fields>;
+#    public <methods>;
+#    protected <methods>;
+#    public static <methods>;
+#    native <methods>;
+#    protected static <methods>;
+#    abstract <methods>;
+#}
 
--keep,allowshrinking class org.** {
-    <fields>;
-    <methods>;
-}
+# APIS
+-keep public class javax.microedition.** { public protected *; }
 
--keep class emulator.i {
-    <fields>;
-    <methods>;
-}
+-keep public class com.mascotcapsule.micro3d.v3 { public protected *; }
+
+-keep public class com.nokia.mid.impl.** { public protected *; }
+-keep public class com.nokia.mid.location.* { public protected *; }
+-keep public class com.nokia.mid.payments.* { public protected *; }
+-keep public class com.nokia.mid.s40.location.* { public protected *; }
+-keep public class com.nokia.mid.sound.* { public protected *; }
+-keep public class com.nokia.mid.ui.* { public protected *; }
+-keep public class com.nokia.mid.ui.utils.* { public protected *; }
+-keep public class com.nokia.mj.impl.utils.* { public protected *; }
+
+-keep public class com.samsung.util.* { public protected *; }
+
+-keep public class com.sprintpcs.** { public protected *; }
+
+-keep public class com.sun.cdc.** { public protected *; }
+
+-keep public class org.apache.tools.zip.* { *; }
+
+-keep public class javax.wireless.** { public protected *; }
+
+-keep public class javax.obex.** { public protected *; }
+
+-keep public class javax.bluetooth.** { public protected *; }
+
+-keep public class ru.nnproject.kemulator.** { *; }
+
+-keep class javax.microedition.m3g.** { *; }
+
+-keep class net.rim.device.api.** { *; }
+
+-keep class net.java.games.input.** { *; }
+
+# LIBRARIES
+-keep class club.minnced.discord.rpc.** { *; }
+
+-keep class com.sun.jna.** { *; }
+
+-keep class com.sun.jna.Native { *; }
+
+-keep,allowshrinking class com.github.** { *; }
+
+-keep class org.eclipse.swt.** { *; }
+
+-keep class org.eclipse.opengl.* { *; }
+
+-keep class org.lwjgl.opengl.* { *; }
+
+-keep,allowshrinking public class uk.co.caprica.vlcj.** { *; }
+
+-keep,allowshrinking class org.bridj.** { *; }
+
+-keep,allowshrinking class org.slf4j.** { *; }
+
+-keep,allowshrinking public class org.objectweb.** { *; }
+
+-keep class org.lwjgl.* { *; }
+
+# EMULATOR CLASSES
+-keep public class emulator.graphics2D.awt.* { public protected *; }
+
+-keep class emulator.custom.subclass.* { *; }
+
+-keep class emulator.custom.CustomMethod { public *; }
+
+-keep class emulator.debug.Profiler { *; }
 
 -keep class javazoom.jl.player.JavaSoundAudioDevice
 
--keep,allowshrinking public class uk.co.** {
-    <fields>;
-    <methods>;
-}
+-keep class emulator.i { *; }
 
--keep,allowshrinking public class javax.microedition.** {
-    public <fields>;
-    protected <fields>;
-    public static final <fields>;
-    public <methods>;
-    protected <methods>;
-    native <methods>;
-    !private abstract <methods>;
-}
-
--keep,allowshrinking public class com.** {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking class club.** {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking public class ru.nnproject.kemulator.** {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking public class javax.wireless.** {
-    <fields>;
-    public <methods>;
-    public static <methods>;
-    abstract <methods>;
-    native <methods>;
-    public static <methods>;
-    protected static <methods>;
-}
-
--keep public class emulator.graphics2D.awt.* {
-	public <methods>;
-}
-
--keep,allowshrinking public class javax.obex.** {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking public class javax.bluetooth.** {
-    <fields>;
-    public <methods>;
-    abstract <methods>;
-    public static <methods>;
-    protected <methods>;
-    native <methods>;
-}
-
--keep,allowshrinking class emulator.custom.subclass.* {
-    <methods>;
-}
-
--keep,allowshrinking class emulator.custom.CustomMethod {
-    <methods>;
-}
-
--keep,allowshrinking class emulator.debug.Profiler {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking class emulator.debug.ClassInfo
-
--keep,allowshrinking class emulator.debug.ObjInstance
-
--keep class javax.microedition.m3g.** {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking class net.** {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking class com.sun.jna.** {
-    <fields>;
-    <methods>;
-}
-
--keep,allowshrinking class com.github.** {
-    <fields>;
-    <methods>;
-}
+-keep class emulator.Emulator { public static *; }
 
 # Keep - Applications. Keep all application classes, along with their 'main' methods.
 -keepclasseswithmembers public class * {

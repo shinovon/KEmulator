@@ -85,7 +85,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final void setRequestProperty(final String s, final String s2) throws IOException {
-		System.out.println("setRequestProperty " + s +": " + s2);
+		//System.out.println("setRequestProperty " + s +": " + s2);
 		if (s.equalsIgnoreCase("User-Agent")) {
 			setua(s2);
 			return;
@@ -219,7 +219,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
-		System.out.println(Arrays.toString(connection.getRequestProperties().entrySet().toArray()));
+		//System.out.println(Arrays.toString(connection.getRequestProperties().entrySet().toArray()));
 		setUserAgent();
 		if (this.closed) {
 			throw new IOException();

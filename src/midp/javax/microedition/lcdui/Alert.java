@@ -21,7 +21,7 @@ public class Alert extends Screen {
 	public Alert(final String s, final String aString172, final Image image, final AlertType alertType) {
 		super(s);
 		this.string = aString172;
-		final int n = 1000;
+		final int n = getDefaultTimeout();
 		this.time = n;
 		this.timeout = n;
 		this.lastDisplayed = Display.current;

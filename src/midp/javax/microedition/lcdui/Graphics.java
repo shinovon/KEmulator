@@ -8,14 +8,14 @@ import emulator.graphics2D.*;
 public class Graphics
 {
     IGraphics2D egraphics;
-    IImage anIImage517;
-    IImage anIImage522;
-    IGraphics2D anIGraphics2D523;
-    IImage anIImage525;
+    IImage image;
+    IImage copyimage;
+    IGraphics2D xrayGraphics;
+    IImage xrayImage;
     static Vector aVector518;
-    int anInt519;
-    int anInt524;
-    Font aFont520;
+    int tx;
+    int ty;
+    Font font;
     int[] anIntArray521;
     public static final int HCENTER = 1;
     public static final int VCENTER = 2;
@@ -27,39 +27,52 @@ public class Graphics
     public static final int SOLID = 0;
     public static final int DOTTED = 1;
     
-    public Graphics(final IImage anIImage517, final IImage anIImage518) {
+    public Graphics(final IImage i1, final IImage i2) {
         super();
-        this.anInt519 = 0;
-        this.anInt524 = 0;
+        this.tx = 0;
+        this.ty = 0;
         this.anIntArray521 = new int[6];
-        this.anIImage517 = anIImage517;
-        this.egraphics = anIImage517.createGraphics();
-        this.anIImage522 = Emulator.getEmulator().newImage(this.anIImage517.getWidth(), this.anIImage517.getHeight(), false);
-        this.anIImage525 = anIImage518;
-        (this.anIGraphics2D523 = anIImage518.createGraphics()).setAlpha(60);
+        this.image = i1;
+        this.egraphics = i1.createGraphics();
+        //this.copyimage = Emulator.getEmulator().newImage(this.image.getWidth(), this.image.getHeight(), false);
+        this.xrayImage = i2;
+        (this.xrayGraphics = i2.createGraphics()).setAlpha(60);
         this.setFont(Font.getDefaultFont());
     }
     
-    public IGraphics2D getImpl() {
+    public Graphics(final IImage anIImage517) {
+        this.tx = 0;
+        this.ty = 0;
+        this.anIntArray521 = new int[6];
+        this.image = anIImage517;
+        this.egraphics = anIImage517.createGraphics();
+        //this.copyimage = Emulator.getEmulator().newImage(this.image.getWidth(), this.image.getHeight(), false);
+        this.setFont(Font.getDefaultFont());
+	}
+
+	public IGraphics2D getImpl() {
         if (Settings.xrayView) {
-            return this.anIGraphics2D523;
+            return this.xrayGraphics;
         }
         return this.egraphics;
     }
     
     public IImage getImage() {
-        return this.anIImage517;
+        return this.image;
     }
     
     public void copyArea(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7) {
         final ITransform transform = this.egraphics.getTransform().newTransform(n3, n4, 0, n5, n6, n7);
-        this.anIImage517.cloneImage(this.anIImage522);
-        this.drawRegion(this.anIImage522, n, n2, n3, n4, transform, 16777215);
+        if(copyimage == null) {
+            this.copyimage = Emulator.getEmulator().newImage(this.image.getWidth(), this.image.getHeight(), false);
+        }
+        this.image.cloneImage(this.copyimage);
+        this.drawRegion(this.copyimage, n, n2, n3, n4, transform, 16777215);
     }
     
     public void clipRect(final int n, final int n2, final int n3, final int n4) {
         this.egraphics.clipRect(n, n2, n3, n4);
-        this.anIGraphics2D523.clipRect(n, n2, n3, n4);
+        this.xrayGraphics.clipRect(n, n2, n3, n4);
     }
     
     public void drawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
@@ -124,7 +137,7 @@ public class Graphics
 
           this.egraphics.drawImage(image.getImpl(), n, n2);
           this.method289(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
-          ++image.anInt1309;
+          ++image.usedCount;
           ++Profiler.drawImageCallCount;
           Profiler.drawImagePixelCount += image.getWidth() * image.getHeight();
        }
@@ -137,12 +150,12 @@ public class Graphics
         this.egraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
         this.egraphics.setTransform(transform2);
         if (n5 >= 0 && Settings.xrayView) {
-            this.anIGraphics2D523.transform(transform);
+            this.xrayGraphics.transform(transform);
             if (Settings.xrayOverlapScreen) {
-                this.anIGraphics2D523.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
+                this.xrayGraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
             }
             this.method291(0, 0, n3, n4, n5);
-            this.anIGraphics2D523.setTransform(transform2);
+            this.xrayGraphics.setTransform(transform2);
         }
     }
     
@@ -153,7 +166,7 @@ public class Graphics
         if (n < 0 || n + n3 > image.getWidth() || n2 < 0 || n2 + n4 > image.getHeight()) {
             throw new IllegalArgumentException("region exceeds the bounds of the source image");
         }
-        if (image.getImpl() == this.anIImage517) {
+        if (image.getImpl() == this.image) {
             throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
         }
         if (!method294(n8, 64)) {
@@ -164,10 +177,10 @@ public class Graphics
         this.egraphics.transform(transform);
         this.egraphics.drawImage(image.getImpl(), n, n2, n3, n4, 0, 0, n3, n4);
         this.egraphics.setTransform(transform2);
-        this.anIGraphics2D523.transform(transform);
+        this.xrayGraphics.transform(transform);
         this.method289(image, n, n2, 0, 0, n3, n4);
-        this.anIGraphics2D523.setTransform(transform2);
-        ++image.anInt1309;
+        this.xrayGraphics.setTransform(transform2);
+        ++image.usedCount;
         ++Profiler.drawRegionCallCount;
         Profiler.drawRegionPixelCount += Math.abs(n3 * n4);
     }
@@ -306,63 +319,63 @@ public class Graphics
             return;
         }
         if (Settings.xrayOverlapScreen) {
-            this.anIGraphics2D523.drawImage(image.getImpl(), n, n2, n5, n6, n3, n4, n5, n6);
+            this.xrayGraphics.drawImage(image.getImpl(), n, n2, n5, n6, n3, n4, n5, n6);
         }
         if (image.isMutable()) {
-            this.anIGraphics2D523.drawImage(image.getXRayBuffer(), n3, n4);
+            this.xrayGraphics.drawImage(image.getXRayBuffer(), n3, n4);
         }
         this.method291(n3, n4, n5, n6, 16777215);
         if (Settings.xrayShowClipBorder) {
-            this.anIGraphics2D523.setColor(255, false);
-            this.anIGraphics2D523.drawRect(n9 + n3 - n, n10 + n4 - n2, n7 - 1, n8 - 1);
-            this.anIGraphics2D523.setColor(0, false);
-            this.anIGraphics2D523.fillRect(n9 - 1 + n3 - n, n10 - 1 + n4 - n2, 3, 3);
+            this.xrayGraphics.setColor(255, false);
+            this.xrayGraphics.drawRect(n9 + n3 - n, n10 + n4 - n2, n7 - 1, n8 - 1);
+            this.xrayGraphics.setColor(0, false);
+            this.xrayGraphics.fillRect(n9 - 1 + n3 - n, n10 - 1 + n4 - n2, 3, 3);
         }
     }
     
     private void method290(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
         if (Settings.xrayView) {
-            this.anIGraphics2D523.setColor(16777215, false);
-            this.anIGraphics2D523.fillArc(n, n2, n3, n4, n5, n6);
+            this.xrayGraphics.setColor(16777215, false);
+            this.xrayGraphics.fillArc(n, n2, n3, n4, n5, n6);
             this.method293();
         }
     }
     
     private void method295(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
         if (Settings.xrayView) {
-            this.anIGraphics2D523.setColor(16777215, false);
-            this.anIGraphics2D523.drawArc(n, n2, n3, n4, n5, n6);
+            this.xrayGraphics.setColor(16777215, false);
+            this.xrayGraphics.drawArc(n, n2, n3, n4, n5, n6);
             this.method293();
         }
     }
     
     private void method291(final int n, final int n2, final int n3, final int n4, final int n5) {
         if (Settings.xrayView) {
-            this.anIGraphics2D523.setColor(n5, false);
-            this.anIGraphics2D523.fillRect(n, n2, n3, n4);
+            this.xrayGraphics.setColor(n5, false);
+            this.xrayGraphics.fillRect(n, n2, n3, n4);
             this.method293();
         }
     }
     
     private void method292(final int n, final int n2, final int n3, final int n4) {
         if (Settings.xrayView) {
-            this.anIGraphics2D523.setColor(16777215, false);
-            this.anIGraphics2D523.drawRect(n, n2, n3, n4);
+            this.xrayGraphics.setColor(16777215, false);
+            this.xrayGraphics.drawRect(n, n2, n3, n4);
             this.method293();
         }
     }
     
     private void method296(final int n, final int n2, final int n3, final int n4) {
         if (Settings.xrayView) {
-            this.anIGraphics2D523.setColor(16777215, false);
-            this.anIGraphics2D523.drawLine(n, n2, n3, n4);
+            this.xrayGraphics.setColor(16777215, false);
+            this.xrayGraphics.drawLine(n, n2, n3, n4);
             this.method293();
         }
     }
     
     private void method293() {
-        if (!Graphics.aVector518.contains(this.anIImage525)) {
-            Graphics.aVector518.add(this.anIImage525);
+        if (!Graphics.aVector518.contains(this.xrayImage)) {
+            Graphics.aVector518.add(this.xrayImage);
         }
     }
     
@@ -400,7 +413,7 @@ public class Graphics
     }
     
     public Font getFont() {
-        return this.aFont520;
+        return this.font;
     }
     
     public int getGreenComponent() {
@@ -416,16 +429,16 @@ public class Graphics
     }
     
     public int getTranslateX() {
-        return this.anInt519;
+        return this.tx;
     }
     
     public int getTranslateY() {
-        return this.anInt524;
+        return this.ty;
     }
     
     public void setClip(final int n, final int n2, final int n3, final int n4) {
         this.egraphics.setClip(n, n2, n3, n4);
-        this.anIGraphics2D523.setClip(n, n2, n3, n4);
+        this.xrayGraphics.setClip(n, n2, n3, n4);
     }
     
     public void setColor(final int n) {
@@ -437,8 +450,8 @@ public class Graphics
     }
     
     public void setFont(final Font font) {
-        this.aFont520 = ((font == null) ? Font.getDefaultFont() : font);
-        this.egraphics.setFont(this.aFont520.getImpl());
+        this.font = ((font == null) ? Font.getDefaultFont() : font);
+        this.egraphics.setFont(this.font.getImpl());
     }
     
     public int getGrayScale() {
@@ -453,10 +466,10 @@ public class Graphics
     }
     
     public void translate(final int n, final int n2) {
-        this.anInt519 += n;
-        this.anInt524 += n2;
+        this.tx += n;
+        this.ty += n2;
         this.egraphics.translate(n, n2);
-        this.anIGraphics2D523.translate(n, n2);
+        this.xrayGraphics.translate(n, n2);
     }
     
     public int getDisplayColor(final int n) {

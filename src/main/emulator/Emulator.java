@@ -74,8 +74,8 @@ public class Emulator
 	public static boolean askImei = false;
 	private static String midletName;
 	
-	public static final String titleVersion = "v2.10.2";
-	public static final String aboutVersion = "v2.10";
+	public static final String titleVersion = "v2.10.4";
+	public static final String aboutVersion = "v2.10.4";
 	public static final int numericVersion = 10;
 	public static final String propVersion = "v2.10";
 

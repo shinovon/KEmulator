@@ -5,35 +5,35 @@ import emulator.graphics3D.micro3d.a;
 import java.io.IOException;
 
 public class Texture {
-	boolean jdField_a_of_type_Boolean;
-	a jdField_a_of_type_EmulatorGraphics3DMicro3dA;
+	boolean isModel;
+	a impl;
 
-	public Texture(byte[] paramArrayOfByte, boolean paramBoolean) {
-		if (paramArrayOfByte == null) {
+	public Texture(byte[] b, boolean forModel) {
+		if (b == null) {
 			throw new NullPointerException();
 		}
-		jdField_a_of_type_EmulatorGraphics3DMicro3dA = new a();
-		jdField_a_of_type_Boolean = paramBoolean;
+		impl = new a();
+		isModel = forModel;
 	}
 
-	public Texture(String paramString, boolean paramBoolean) throws IOException {
-		if (paramString == null) {
+	public Texture(String name, boolean forModel) throws IOException {
+		if (name == null) {
 			throw new NullPointerException();
 		}
-		CustomJarResources.a(paramString);
-		jdField_a_of_type_EmulatorGraphics3DMicro3dA = new a();
-		jdField_a_of_type_Boolean = paramBoolean;
+		CustomJarResources.getResourceStream(name);
+		impl = new a();
+		isModel = forModel;
 	}
 
 	public final void dispose() {
-		jdField_a_of_type_EmulatorGraphics3DMicro3dA = null;
+		impl = null;
 	}
 
 	protected boolean isDisposed() {
-		return jdField_a_of_type_EmulatorGraphics3DMicro3dA == null;
+		return impl == null;
 	}
 
 	public a getImpl() {
-		return jdField_a_of_type_EmulatorGraphics3DMicro3dA;
+		return impl;
 	}
 }

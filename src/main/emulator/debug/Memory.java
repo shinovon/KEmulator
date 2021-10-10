@@ -25,14 +25,14 @@ public final class Memory
     public Vector players;
     public Vector aVector1467;
 	private Vector checkClasses;
-    static Class aClass1460;
-    static Class aClass1462;
-    static Class aClass1464;
-    static Class aClass1466;
-    static Class aClass1468;
-    static Class aClass1469;
-    static Class aClass1470;
-    static Class aClass1471;
+    static Class _J;
+    static Class _I;
+    static Class _S;
+    static Class _B;
+    static Class _Z;
+    static Class _F;
+    static Class _D;
+    static Class _C;
     static Class lStringCls;
     static Class InputStreamCls;
     static Class ImageCls;
@@ -51,6 +51,9 @@ public final class Memory
         checkClasses.add("javax.microedition.lcdui.CustomItem");
         checkClasses.add("javax.microedition.lcdui.List");
         checkClasses.add("javax.microedition.lcdui.ChoiceGroup");
+        checkClasses.add("javax.microedition.lcdui.Display");
+        checkClasses.add("javax.microedition.lcdui.Form");
+        checkClasses.add("javax.microedition.lcdui.Graphics");
     }
     
     public final void method846() {
@@ -93,7 +96,7 @@ public final class Memory
                 o = null;
             }
             if(clazz != null)
-            	a.method847(clazz, o, s);
+            	a.method847(clazz, o, s, false);
         }
         for (int j = 0; j < checkClasses.size(); ++j) {
             Memory a;
@@ -111,11 +114,15 @@ public final class Memory
                 o = null;
             }
             if(clazz != null)
-            	a.method847(clazz, o, s);
+            	a.method847(clazz, o, s, false);
         }
     }
     
-    private void method847(final Class clazz, final Object o, final String s) {
+    private static Class strC() {
+    	return lStringCls != null ? lStringCls : (lStringCls = cls("java.lang.String"));
+    }
+    
+    private void method847(final Class clazz, final Object o, final String s, boolean vector) {
         String s2 = clazz.getName();
         if (clazz.isArray()) {
             s2 = ClassTypes.method869(clazz);
@@ -164,13 +171,13 @@ public final class Memory
             while ((componentType = clazz2.getComponentType()).getComponentType() != null) {
                 clazz2 = componentType;
             }
-            if (!ClassTypes.method871(componentType)) {
-                return;
-            }
+            //if (!ClassTypes.method871(componentType) && componentType != strC()) {
+            //    return;
+            //}
             for (int i = 0; i < Array.getLength(o); ++i) {
                 final Object value;
                 if ((value = Array.get(o, i)) != null) {
-                    this.method847(value.getClass(), value, s + '[' + i + ']');
+                    this.method847(value.getClass(), value, s + '[' + i + ']', true);
                 }
             }
         }
@@ -180,7 +187,7 @@ public final class Memory
                 while (elements.hasMoreElements()) {
                     final Object nextElement;
                     if ((nextElement = elements.nextElement()) != null) {
-                        this.method847(nextElement.getClass(), nextElement, s + "(VectorElement)");
+                        this.method847(nextElement.getClass(), nextElement, s + "(VectorElement)", true);
                     }
                 }
                 return;
@@ -191,34 +198,35 @@ public final class Memory
                     final Object nextElement2 = keys.nextElement();
                     final Object value2;
                     if ((value2 = ((Hashtable)o).get(nextElement2)) != null) {
-                        this.method847(value2.getClass(), value2, s + "(HashtableKey=" + nextElement2 + ")");
+                        this.method847(value2.getClass(), value2, s + "(HashtableKey=" + nextElement2 + ")", true);
                     }
                 }
                 return;
             }
             if (o instanceof Object3D) {
-                final Field[] method845 = method845(clazz);
+                final Field[] method845 = fields(clazz);
                 for (int j = 0; j < method845.length; ++j) {
                     final String name = method845[j].getName();
                     method845[j].setAccessible(true);
                     final Object method846 = ClassTypes.method876(o, method845[j]);
                     final String string = s + '.' + name;
                     if (!method845[j].getType().isPrimitive() && method846 != null) {
-                        this.method847(method846.getClass(), method846, string);
+                        this.method847(method846.getClass(), method846, string, false);
                     }
                 }
                 return;
             }
-            if (Emulator.jarClasses.contains(clazz.getName()) || checkClasses.contains(clazz.getName()) || ((Memory.InputStreamCls != null) ? Memory.InputStreamCls : (Memory.InputStreamCls = cls("java.io.InputStream"))).isAssignableFrom(clazz)) {
-                final Field[] method847 = method845(clazz);
-                for (int k = 0; k < method847.length; ++k) {
-                    final String name2 = method847[k].getName();
-                    if (!Modifier.isFinal(method847[k].getModifiers()) || !method847[k].getType().isPrimitive()) {
-                        method847[k].setAccessible(true);
-                        final Object method848 = ClassTypes.method876(o, method847[k]);
+            if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || ((Memory.InputStreamCls != null) ? Memory.InputStreamCls : (Memory.InputStreamCls = cls("java.io.InputStream"))).isAssignableFrom(clazz)) {
+                final Field[] f = fields(clazz);
+                for (int k = 0; k < f.length; ++k) {
+                    final String name2 = f[k].getName();
+                    //if((o instanceof Item || o instanceof Screen) && f[k].getType() == int[].class) continue;
+                    if (!Modifier.isFinal(f[k].getModifiers()) || !f[k].getType().isPrimitive()) {
+                        f[k].setAccessible(true);
+                        final Object method848 = ClassTypes.method876(o, f[k]);
                         final String string2 = s + '.' + name2;
-                        if (!method847[k].getType().isPrimitive() && method848 != null) {
-                            this.method847(method848.getClass(), method848, string2);
+                        if (!f[k].getType().isPrimitive() && method848 != null) {
+                            this.method847(method848.getClass(), method848, string2, false);
                         }
                     }
                 }
@@ -226,7 +234,7 @@ public final class Memory
         }
     }
     
-    private static Field[] method845(final Class clazz) {
+    private static Field[] fields(final Class clazz) {
         final Vector vector = new Vector<Field>();
         method849(clazz, vector);
         final Field[] array = new Field[vector.size()];
@@ -287,7 +295,7 @@ public final class Memory
         int n = 0;
         final Enumeration<ClassInfo> elements = this.table.elements();
         while (elements.hasMoreElements()) {
-            n += elements.nextElement().method878();
+            n += elements.nextElement().size();
         }
         return n;
     }
@@ -558,7 +566,7 @@ public final class Memory
     public final int method867(final Object o) {
     	try
     	{
-    		return ((ClassInfo)this.table.get(o)).method878();
+    		return ((ClassInfo)this.table.get(o)).size();
     	}
     	catch(NullPointerException e)
     	{
@@ -581,93 +589,89 @@ public final class Memory
     public static int size(final Object o) {
         return ((ObjInstance)o).size;
     }
-    
-    public final int size(final Class clazz, final Object o) {
-        final Field[] method845 = method845(clazz);
-        int n = 0;
-        for (int i = 0; i < method845.length; ++i) {
+
+    public final int size(Class c, Object o, String s) {
+    	int i = size(c, o);
+    	return i;
+    }
+    public final int size(final Class cls, final Object o) {
+        final Field[] fields = fields(cls);
+        int res = 0;
+        for (int i = 0; i < fields.length; ++i) {
             final Field field;
-            final Class<?> type = (field = method845[i]).getType();
+            final Class<?> type = (field = fields[i]).getType();
             if ((!Modifier.isFinal(field.getModifiers()) || !type.isPrimitive()) && (!Modifier.isStatic(field.getModifiers()) || o == null)) {
                 if (Modifier.isStatic(field.getModifiers()) || o != null) {
                     if (type == Long.TYPE || type == Double.TYPE) {
-                        n += 8;
+                        res += 24;
                     }
                     else {
-                        n += 4;
+                        res += 16;
                     }
                 }
             }
         }
         if (o != null) {
-            int n2;
-            int method846;
-            if (clazz.isArray()) {
-                n2 = n;
-                method846 = this.method861(clazz, o);
+            int len;
+            int size2;
+            if (cls.isArray()) {
+                len = res;
+                size2 = this.arraySize(cls, o);
             }
             else {
-                n += 12;
-                int n3;
-                int length;
-                if (clazz == ((Memory.lStringCls != null) ? Memory.lStringCls : (Memory.lStringCls = cls("java.lang.String")))) {
-                    n2 = n;
-                    n3 = 2;
-                    length = ((String)o).length();
+                res += 12;
+                if (cls == ((Memory.lStringCls != null) ? Memory.lStringCls : (Memory.lStringCls = cls("java.lang.String")))) {
+                    len = res + 2 + ((String)o).length();
                 }
                 else {
-                    int n4;
-                    int n5;
-                    if (clazz == ((Memory.ImageCls != null) ? Memory.ImageCls : (Memory.ImageCls = cls("javax.microedition.lcdui.Image")))) {
+                    if (cls == ((Memory.ImageCls != null) ? Memory.ImageCls : (Memory.ImageCls = cls("javax.microedition.lcdui.Image")))) {
                         final Image image = (Image)o;
-                        n2 = n;
-                        n4 = image.getWidth();
-                        n5 = image.getHeight();
+                        len = res + image.size();
                     }
                     else {
-                        if (clazz != ((Memory.Image2DCls != null) ? Memory.Image2DCls : (Memory.Image2DCls = cls("javax.microedition.m3g.Image2D")))) {
-                            return n;
+                        if (cls != ((Memory.Image2DCls != null) ? Memory.Image2DCls : (Memory.Image2DCls = cls("javax.microedition.m3g.Image2D")))) {
+                            if(!(cls == Vector.class || cls == Hashtable.class 
+                            		|| cls == StringItem.class || cls == Command.class 
+                            		|| cls == cls("javax.microedition.lcdui.a")
+                            		))
+                            	return res + o.toString().length();
+                            else return res;
                         }
                         final Image2D image2D = (Image2D)o;
-                        n2 = n;
-                        n4 = image2D.getWidth();
-                        n5 = image2D.getHeight();
+                        len = res + image2D.size();
                     }
-                    n3 = n4 * n5;
-                    length = 2;
                 }
-                method846 = n3 * length;
             }
-            n = n2 + method846;
+            res = len;
         }
-        return n;
+        return res;
     }
     
-    private int method861(final Class clazz, final Object o) {
+    private int arraySize(final Class clazz, final Object o) {
         int n = 0;
         n += 16;
-        if (clazz == ((Memory.aClass1460 != null) ? Memory.aClass1460 : (Memory.aClass1460 = cls("[J")))) {
+        if (clazz == ((Memory._J != null) ? Memory._J : (Memory._J = cls("[J")))) {
             n = 16 + 8 * Array.getLength(o);
         }
-        else if (clazz == ((Memory.aClass1462 != null) ? Memory.aClass1462 : (Memory.aClass1462 = cls("[I")))) {
+        else if (clazz == ((Memory._I != null) ? Memory._I : (Memory._I = cls("[I")))) {
             n = 16 + 4 * Array.getLength(o);
         }
-        else if (clazz == ((Memory.aClass1464 != null) ? Memory.aClass1464 : (Memory.aClass1464 = cls("[S")))) {
+        else if (clazz == ((Memory._S != null) ? Memory._S : (Memory._S = cls("[S")))) {
             n = 16 + 2 * Array.getLength(o);
         }
-        else if (clazz == ((Memory.aClass1466 != null) ? Memory.aClass1466 : (Memory.aClass1466 = cls("[B")))) {
+        else if (clazz == ((Memory._B != null) ? Memory._B : (Memory._B = cls("[B")))) {
             n = 16 + 1 * Array.getLength(o);
         }
-        else if (clazz == ((Memory.aClass1468 != null) ? Memory.aClass1468 : (Memory.aClass1468 = cls("[Z")))) {
+        else if (clazz == ((Memory._Z != null) ? Memory._Z : (Memory._Z = cls("[Z")))) {
             n = 16 + 4 * Array.getLength(o);
         }
-        else if (clazz == ((Memory.aClass1470 != null) ? Memory.aClass1470 : (Memory.aClass1470 = cls("[D")))) {
+        else if (clazz == ((Memory._D != null) ? Memory._D : (Memory._D = cls("[D")))) {
             n = 16 + 8 * Array.getLength(o);
         }
-        else if (clazz == ((Memory.aClass1469 != null) ? Memory.aClass1469 : (Memory.aClass1469 = cls("[F")))) {
+        else if (clazz == ((Memory._F != null) ? Memory._F : (Memory._F = cls("[F")))) {
             n = 16 + 4 * Array.getLength(o);
         }
-        else if (clazz == ((Memory.aClass1471 != null) ? Memory.aClass1471 : (Memory.aClass1471 = cls("[C")))) {
+        else if (clazz == ((Memory._C != null) ? Memory._C : (Memory._C = cls("[C")))) {
             n = 16 + 1 * Array.getLength(o);
         }
         else {
@@ -708,22 +712,22 @@ public final class Memory
         Object val;
         int size;
         
-        ObjInstance(final Memory a, final String aString1489, final Object anObject1490) {
+        ObjInstance(final Memory a, final String s, final Object o) {
             super();
-            this.ref = aString1489;
-            this.val = anObject1490;
-            this.size = a.size(anObject1490.getClass(), anObject1490);
+            this.ref = s;
+            this.val = o;
+            this.size = a.size(o.getClass(), o, s);
         }
     }
     
     private final class ClassInfo implements Comparable
     {
-        String aString1484;
+        String s;
         int anInt1485;
         int anInt1487;
         Vector objs;
         
-        public final int method878() {
+        public final int size() {
             int anInt1487 = this.anInt1487;
             for (int i = this.objs.size() - 1; i >= 0; --i) {
                 anInt1487 += ((ObjInstance)this.objs.get(i)).size;
@@ -732,7 +736,7 @@ public final class Memory
         }
         
         public final int compareTo(final Object o) {
-            return this.aString1484.compareTo(((ClassInfo)o).aString1484);
+            return this.s.compareTo(((ClassInfo)o).s);
         }
         
         ClassInfo(final Memory a, final String aString1484) {
@@ -740,7 +744,7 @@ public final class Memory
             this.objs = new Vector();
             this.anInt1485 = 0;
             this.anInt1487 = a.size(a.method848(aString1484), null);
-            this.aString1484 = aString1484;
+            this.s = aString1484;
         }
     }
 }

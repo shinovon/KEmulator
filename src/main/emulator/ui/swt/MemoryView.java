@@ -40,7 +40,7 @@ public final class MemoryView implements DisposeListener
     private Composite aComposite1098;
     private Composite aComposite1106;
     private CLabel aCLabel1143;
-    private Combo aCombo1101;
+    private Combo imageScaleCombo;
     private CLabel aCLabel1146;
     private Combo aCombo1107;
     private Button aButton1115;
@@ -58,7 +58,7 @@ public final class MemoryView implements DisposeListener
     private Table classTable;
     private CLabel aCLabel1149;
     private CLabel aCLabel1152;
-    private int anInt1102;
+    private double imageScaling;
     private int anInt1109;
     private boolean aBoolean1111;
     private Menu aMenu1084;
@@ -120,7 +120,7 @@ public final class MemoryView implements DisposeListener
         this.aComposite1098 = null;
         this.aComposite1106 = null;
         this.aCLabel1143 = null;
-        this.aCombo1101 = null;
+        this.imageScaleCombo = null;
         this.aCLabel1146 = null;
         this.aCombo1107 = null;
         this.aButton1115 = null;
@@ -365,13 +365,15 @@ public final class MemoryView implements DisposeListener
     }
     
     private void method684() {
-        (this.aCombo1101 = new Combo(this.aComposite1098, 8)).add("100%");
-        this.aCombo1101.add("200%");
-        this.aCombo1101.add("300%");
-        this.aCombo1101.add("400%");
-        this.aCombo1101.setText("100%");
-        this.anInt1102 = 1;
-        this.aCombo1101.addModifyListener((ModifyListener)new Class35(this));
+       this.imageScaleCombo = new Combo(this.aComposite1098, 8);
+       this.imageScaleCombo.add("50%");
+        this.imageScaleCombo.add("100%");
+        this.imageScaleCombo.add("200%");
+        this.imageScaleCombo.add("300%");
+        this.imageScaleCombo.add("400%");
+        this.imageScaleCombo.setText("100%");
+        this.imageScaling = 1;
+        this.imageScaleCombo.addModifyListener((ModifyListener)new Class35(this));
     }
     
     private void method685() {
@@ -503,11 +505,21 @@ public final class MemoryView implements DisposeListener
         catch (Exception ex) {}
         this.bytecodeSizeLbl.setText(this.bytecodeSize + " bytes");
         this.objectsSizeLbl.setText(this.objectsSize + " bytes");
-        this.totalmemLbl.setText(this.bytecodeSize + this.objectsSize + " bytes");
+        int usedmidp = this.bytecodeSize + this.objectsSize;
+        this.totalmemLbl.setText(usedmidp + " bytes");
         this.aCLabel1140.setText(this.anInt1130 + " bytes");
         long t = Runtime.getRuntime().totalMemory();
         long f = Runtime.getRuntime().freeMemory();
-        this.jvmmemLabel.setText((t - f) / 1024L + "/" + t / 1024L + " kb");
+        int usedmidpk = usedmidp / 1024;
+        long usedem = (t - f) / 1024L;
+        long totalem = t / 1024L;
+        this.jvmmemLabel.setText(usedem + "/" + totalem + " kb");
+        
+        //System.out.println("Использовано эмулятором: " + usedem + "K");
+        //System.out.println("Использовано приложением: " + usedmidpk + "K");
+        //System.out.println("Пропорции юзания памяти (эмуль/прога): " + (int) ((((double) usedem / (double) usedmidpk) * 100) * 100D) / 100D + "%");
+        //System.out.println("Пропорции юзания памяти (прога/эмуль): " + (int) ((((double) usedmidpk / (double) usedem) * 100) * 100D) / 100D + "%");
+    	
     	sort();
     }
     
@@ -592,8 +604,8 @@ public final class MemoryView implements DisposeListener
             catch (Exception ex) {
                 break;
             }
-            final int n3 = image.getWidth() * this.anInt1102;
-            final int n4 = image.getHeight() * this.anInt1102;
+            final int n3 = (int) (image.getWidth() * this.imageScaling);
+            final int n4 = (int) (image.getHeight() * this.imageScaling);
             if (n2 + n3 + 30 > this.anInt1138) {
                 n2 = 10;
                 n += max + 12;
@@ -872,12 +884,12 @@ public final class MemoryView implements DisposeListener
         return class110.aProgressBar1092;
     }
     
-    static int method651(final MemoryView class110, final int anInt1102) {
-        return class110.anInt1102 = anInt1102;
+    static double method651(final MemoryView class110, final double anInt1102) {
+        return class110.imageScaling = anInt1102;
     }
     
     static Combo method631(final MemoryView class110) {
-        return class110.aCombo1101;
+        return class110.imageScaleCombo;
     }
     
     static int method662(final MemoryView class110, final int anInt1109) {

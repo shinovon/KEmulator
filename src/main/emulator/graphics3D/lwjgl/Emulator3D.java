@@ -428,6 +428,7 @@ public final class Emulator3D implements IGraphics3D
     }
     
     public final void v3bind(final Graphics graphics) {
+    	
     }
     
     public final void v3flush() {

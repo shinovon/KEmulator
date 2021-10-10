@@ -6,7 +6,7 @@ public final class b
         super();
     }
     
-    public static int a() {
+    public static int getNumPattern() {
         return 0;
     }
 }

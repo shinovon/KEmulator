@@ -18,7 +18,7 @@ public class ActionTable {
 		if (paramString == null) {
 			throw new NullPointerException();
 		}
-		CustomJarResources.a(paramString);
+		CustomJarResources.getResourceStream(paramString);
 		a = new c();
 	}
 
@@ -38,7 +38,7 @@ public class ActionTable {
 		if (a == null) {
 			return 0;
 		}
-		return c.a();
+		return c.getNumActions();
 	}
 
 	public final int getNumFrame(int paramInt) {
@@ -52,6 +52,6 @@ public class ActionTable {
 		if (a == null) {
 			return 0;
 		}
-		return c.b();
+		return c.getNumFrames();
 	}
 }

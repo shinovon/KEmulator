@@ -23,4 +23,6 @@ public interface IImage
     void copyToClipBoard();
     
     void cloneImage(final IImage p0);
+
+	int size();
 }

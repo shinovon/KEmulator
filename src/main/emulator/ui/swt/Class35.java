@@ -12,7 +12,11 @@ final class Class35 implements ModifyListener
     }
     
     public final void modifyText(final ModifyEvent modifyEvent) {
-        MemoryView.method651(this.aClass110_620, MemoryView.method631(this.aClass110_620).getSelectionIndex() + 1);
+    	double i = MemoryView.method631(this.aClass110_620).getSelectionIndex();
+    	if(i == 0) {
+    		i = 0.5d;
+    	}
+        MemoryView.method651(this.aClass110_620, i);
         MemoryView.method668(this.aClass110_620);
     }
 }

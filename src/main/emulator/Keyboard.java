@@ -139,11 +139,11 @@ public final class Keyboard
         }
     }
     
-    public static boolean method597(final int n) {
+    public static boolean isLeftSoft(final int n) {
         return Integer.parseInt(method605(Integer.parseInt(Keyboard.deviceKeycodes[17]))) == n;
     }
     
-    public static boolean method603(final int n) {
+    public static boolean isRightSoft(final int n) {
         return Integer.parseInt(method605(Integer.parseInt(Keyboard.deviceKeycodes[18]))) == n;
     }
     

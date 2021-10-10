@@ -127,4 +127,25 @@ public class Image2D extends Object3D
     Image2D qonvertATITC(final int n) {
         return (Image2D)Engine.instantiateJavaPeer(this.qonvertATITCImpl(n));
     }
+
+	public int size() {
+		int i = getWidth() * getHeight();
+		int m = 1;
+		switch(getFormat()) {
+		case ALPHA:
+		case LUMINANCE:
+			m = 1;
+			break;
+		case LUMINANCE_ALPHA:
+			m = 2;
+			break;
+		case RGB:
+			m = 3;
+			break;
+		case RGBA:
+			m = 4;
+			break;
+		}
+		return i * m + 4;
+	}
 }

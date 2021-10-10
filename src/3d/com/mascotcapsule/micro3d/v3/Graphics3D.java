@@ -1,6 +1,6 @@
 package com.mascotcapsule.micro3d.v3;
 
-import emulator.graphics3D.micro3d.d;
+import emulator.graphics3D.micro3d.Graphics3DImpl;
 import javax.microedition.lcdui.Graphics;
 
 public class Graphics3D {
@@ -51,18 +51,18 @@ public class Graphics3D {
 	public static final int PDATA_POINT_SPRITE_PARAMS_PER_FACE = 8192;
 	public static final int PDATA_POINT_SPRITE_PARAMS_PER_VERTEX = 12288;
 	public static final int PDATA_TEXURE_COORD = 12288;
-	private d a = new d();
+	private Graphics3DImpl impl = new Graphics3DImpl();
 
 	public final synchronized void bind(Graphics paramGraphics) throws IllegalStateException, NullPointerException {
-		a.a(paramGraphics);
+		impl.bind(paramGraphics);
 	}
 
 	public final synchronized void release(Graphics paramGraphics)
 			throws IllegalArgumentException, NullPointerException {
-		a.b(paramGraphics);
+		impl.release(paramGraphics);
 	}
 
-	public final void renderPrimitives(Texture paramTexture, int paramInt1, int paramInt2,
+	public void renderPrimitives(Texture paramTexture, int paramInt1, int paramInt2,
 			FigureLayout paramFigureLayout, Effect3D paramEffect3D, int paramInt3, int paramInt4,
 			int[] paramArrayOfInt1, int[] paramArrayOfInt2, int[] paramArrayOfInt3, int[] paramArrayOfInt4) {
 		if ((paramFigureLayout == null) || (paramEffect3D == null)) {
@@ -81,10 +81,10 @@ public class Graphics3D {
 		if ((paramTexture != null) && (paramTexture.isDisposed())) {
 			throw new RuntimeException("Object already disposed");
 		}
-		a();
+		check();
 	}
 
-	public final void drawCommandList(Texture[] paramArrayOfTexture, int paramInt1, int paramInt2,
+	public void drawCommandList(Texture[] paramArrayOfTexture, int paramInt1, int paramInt2,
 			FigureLayout paramFigureLayout, Effect3D paramEffect3D, int[] paramArrayOfInt) {
 		if ((paramFigureLayout == null) || (paramEffect3D == null)) {
 			throw new NullPointerException();
@@ -104,10 +104,10 @@ public class Graphics3D {
 		if (paramArrayOfInt == null) {
 			throw new NullPointerException();
 		}
-		a();
+		check();
 	}
 
-	public final void drawCommandList(Texture paramTexture, int paramInt1, int paramInt2,
+	public void drawCommandList(Texture paramTexture, int paramInt1, int paramInt2,
 			FigureLayout paramFigureLayout, Effect3D paramEffect3D, int[] paramArrayOfInt) {
 		Texture[] arrayOfTexture = null;
 		if (paramTexture != null) {
@@ -116,36 +116,36 @@ public class Graphics3D {
 		drawCommandList(arrayOfTexture, paramInt1, paramInt2, paramFigureLayout, paramEffect3D, paramArrayOfInt);
 	}
 
-	public final void renderFigure(Figure paramFigure, int paramInt1, int paramInt2, FigureLayout paramFigureLayout,
+	public void renderFigure(Figure paramFigure, int paramInt1, int paramInt2, FigureLayout paramFigureLayout,
 			Effect3D paramEffect3D) throws IllegalStateException {
-		a();
+		check();
 		if ((paramFigure == null) || (paramFigureLayout == null) || (paramEffect3D == null)) {
 			throw new NullPointerException();
 		}
 	}
 
-	public final void drawFigure(Figure paramFigure, int paramInt1, int paramInt2, FigureLayout paramFigureLayout,
+	public void drawFigure(Figure paramFigure, int paramInt1, int paramInt2, FigureLayout paramFigureLayout,
 			Effect3D paramEffect3D) throws IllegalStateException {
-		a();
+		check();
 		if ((paramFigure == null) || (paramFigureLayout == null) || (paramEffect3D == null)) {
 			throw new NullPointerException();
 		}
 	}
 
-	public final void flush() throws IllegalStateException {
-		a();
-		a.a();
+	public void flush() throws IllegalStateException {
+		check();
+		impl.flush();
 	}
 
-	public final void dispose() {
-		a = null;
+	public void dispose() {
+		impl = null;
 	}
 
-	private final void a() throws IllegalStateException {
-		if (a == null) {
+	private void check() throws IllegalStateException {
+		if (impl == null) {
 			throw new IllegalArgumentException();
 		}
-		if (!a.bound()) {
+		if (!impl.bound()) {
 			throw new IllegalStateException("No target is bound");
 		}
 	}

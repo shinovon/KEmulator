@@ -150,12 +150,15 @@ public class Displayable {
 		if (this.cmdListener == null && this instanceof Canvas) {
 			return false;
 		}
-		if (Keyboard.method597(n)) {
+		if (Keyboard.isLeftSoft(n)) {
 			final Command leftSoftCommand = this.getLeftSoftCommand();
 			if (b && leftSoftCommand != null) {
 				Emulator.getEmulator().getLogStream().println("Left command: " + leftSoftCommand);
 				if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
-					((Alert) this).close();
+					// XXX
+					if (this.cmdListener != null)
+						this.cmdListener.commandAction(leftSoftCommand, this);
+					else ((Alert) this).close();
 				} else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(leftSoftCommand)) {
 					this.selectedItem.itemCommandListener.commandAction(leftSoftCommand, this.selectedItem);
 				} else if (this.cmdListener != null) {
@@ -164,7 +167,7 @@ public class Displayable {
 			}
 			return true;
 		}
-		if (Keyboard.method603(n)) {
+		if (Keyboard.isRightSoft(n)) {
 			if (this.commands.size() > 2) {
 				if (b && this.aBoolean18) {
 					this.aBoolean18 = false;
@@ -179,7 +182,10 @@ public class Displayable {
 				if (b && rightSoftCommand != null) {
 					Emulator.getEmulator().getLogStream().println("Right command: " + rightSoftCommand);
 					if (this instanceof Alert && rightSoftCommand == Alert.DISMISS_COMMAND) {
-						((Alert) this).close();
+						// XXX
+						if (this.cmdListener != null)
+							this.cmdListener.commandAction(rightSoftCommand, this);
+						else ((Alert) this).close();
 					} else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(rightSoftCommand)) {
 						this.selectedItem.itemCommandListener.commandAction(rightSoftCommand, this.selectedItem);
 					} else if (this.cmdListener != null) {

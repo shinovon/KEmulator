@@ -1,14 +1,14 @@
 package com.mascotcapsule.micro3d.v3;
 
 public class FigureLayout {
-	private AffineTrans[] jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans;
-	private AffineTrans affineTrans;
-	private int jdField_a_of_type_Int;
-	private int b;
-	private int c;
-	private int d;
-	private int e;
-	private int f;
+	private AffineTrans[] affineArray;
+	private AffineTrans affineNow;
+	private int scaleX;
+	private int scaleY;
+	private int centerX;
+	private int centerY;
+	private int paraWidth;
+	private int paraHeight;
 	public int mPersNear;
 	public int mPersFar;
 	public int mPersAngle;
@@ -18,121 +18,121 @@ public class FigureLayout {
 
 	public FigureLayout() {
 		setAffineTrans((AffineTrans) null);
-		jdField_a_of_type_Int = 512;
-		b = 512;
+		scaleX = 512;
+		scaleY = 512;
 	}
 
-	public FigureLayout(AffineTrans paramAffineTrans, int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
+	public FigureLayout(AffineTrans paramAffineTrans, int scx, int scy, int cx, int cy) {
 		setAffineTrans(paramAffineTrans);
-		jdField_a_of_type_Int = paramInt1;
-		b = paramInt2;
-		c = paramInt3;
-		d = paramInt4;
+		scaleX = scx;
+		scaleY = scy;
+		centerX = cx;
+		centerY = cy;
 	}
 
 	public final AffineTrans getAffineTrans() {
-		return affineTrans;
+		return affineNow;
 	}
 
 	public final void setAffineTrans(AffineTrans paramAffineTrans) {
 		if (paramAffineTrans == null) {
 			(paramAffineTrans = new AffineTrans()).setIdentity();
 		}
-		if (jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans == null) {
-			jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans = new AffineTrans[1];
-			jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans[0] = paramAffineTrans;
+		if (affineArray == null) {
+			affineArray = new AffineTrans[1];
+			affineArray[0] = paramAffineTrans;
 		}
-		affineTrans = paramAffineTrans;
+		affineNow = paramAffineTrans;
 	}
 
-	public final void setAffineTransArray(AffineTrans[] paramArrayOfAffineTrans) {
-		setAffineTrans(paramArrayOfAffineTrans);
+	public final void setAffineTransArray(AffineTrans[] affine) {
+		setAffineTrans(affine);
 	}
 
-	public final void setAffineTrans(AffineTrans[] paramArrayOfAffineTrans) {
-		if ((paramArrayOfAffineTrans == null) || (paramArrayOfAffineTrans.length == 0)) {
+	public final void setAffineTrans(AffineTrans[] affine) {
+		if ((affine == null) || (affine.length == 0)) {
 			throw new NullPointerException();
 		}
-		for (int i = 0; i < paramArrayOfAffineTrans.length; i++) {
-			if (paramArrayOfAffineTrans[i] == null) {
+		for (int i = 0; i < affine.length; i++) {
+			if (affine[i] == null) {
 				throw new NullPointerException();
 			}
 		}
-		jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans = paramArrayOfAffineTrans;
+		affineArray = affine;
 	}
 
-	public final void selectAffineTrans(int paramInt) {
-		if ((jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans == null) || (paramInt < 0)
-				|| (paramInt >= jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans.length)) {
+	public final void selectAffineTrans(int i) {
+		if ((affineArray == null) || (i < 0)
+				|| (i >= affineArray.length)) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
-		affineTrans = jdField_a_of_type_ArrayOfComMascotcapsuleMicro3dV3AffineTrans[paramInt];
+		affineNow = affineArray[i];
 	}
 
 	public final int getScaleX() {
-		return jdField_a_of_type_Int;
+		return scaleX;
 	}
 
 	public final int getScaleY() {
-		return b;
+		return scaleY;
 	}
 
-	public final void setScale(int paramInt1, int paramInt2) {
-		jdField_a_of_type_Int = paramInt1;
-		b = paramInt2;
+	public final void setScale(int x, int y) {
+		scaleX = x;
+		scaleY = y;
 		mLayoutType = 0;
 	}
 
 	public final int getParallelWidth() {
-		return e;
+		return paraWidth;
 	}
 
 	public final int getParallelHeight() {
-		return f;
+		return paraHeight;
 	}
 
 	public final void setParallelSize(int paramInt1, int paramInt2) {
 		if ((paramInt1 < 0) || (paramInt2 < 0)) {
 			throw new IllegalArgumentException();
 		}
-		e = paramInt1;
-		f = paramInt2;
+		paraWidth = paramInt1;
+		paraHeight = paramInt2;
 		mLayoutType = 1;
 	}
 
 	public final int getCenterX() {
-		return c;
+		return centerX;
 	}
 
 	public final int getCenterY() {
-		return d;
+		return centerY;
 	}
 
-	public final void setCenter(int paramInt1, int paramInt2) {
-		c = paramInt1;
-		d = paramInt2;
+	public final void setCenter(int x, int y) {
+		centerX = x;
+		centerY = y;
 	}
 
-	public final void setPerspective(int paramInt1, int paramInt2, int paramInt3) {
-		if ((paramInt1 >= paramInt2) || (paramInt1 < 1) || (paramInt1 > 32766) || (paramInt2 < 2) || (paramInt2 > 32767)
-				|| (paramInt3 <= 0) || (paramInt3 >= 2048)) {
+	public final void setPerspective(int near, int far, int angle) {
+		if ((near >= far) || (near < 1) || (near > 32766) || (far < 2) || (far > 32767)
+				|| (angle <= 0) || (angle >= 2048)) {
 			throw new IllegalArgumentException();
 		}
-		mPersNear = paramInt1;
-		mPersFar = paramInt2;
-		mPersAngle = paramInt3;
+		mPersNear = near;
+		mPersFar = far;
+		mPersAngle = angle;
 		mLayoutType = 2;
 	}
 
-	public final void setPerspective(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
-		if ((paramInt1 >= paramInt2) || (paramInt1 < 1) || (paramInt1 > 32766) || (paramInt2 < 2) || (paramInt2 > 32767)
-				|| (paramInt3 < 0) || (paramInt4 < 0)) {
+	public final void setPerspective(int near, int far, int w, int h) {
+		if ((near >= far) || (near < 1) || (near > 32766) || (far < 2) || (far > 32767)
+				|| (w < 0) || (h < 0)) {
 			throw new IllegalArgumentException();
 		}
-		mPersNear = paramInt1;
-		mPersFar = paramInt2;
-		mPersWidth = paramInt3;
-		mPersHeight = paramInt4;
+		mPersNear = near;
+		mPersFar = far;
+		mPersWidth = w;
+		mPersHeight = h;
 		mLayoutType = 3;
 	}
 }

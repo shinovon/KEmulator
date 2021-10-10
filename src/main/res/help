@@ -45,6 +45,12 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$nnmod v2.10.4 [2021.10.10]
+
+
+$nnmod v2.10.3 [2021.10.08]
+MemoryView now stores more objects and arrays
+
 $nnmod v2.10.2 [2021.10.03]
 Gauge added
 FPS mode added (Experimental)

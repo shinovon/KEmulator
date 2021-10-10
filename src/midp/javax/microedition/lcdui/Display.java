@@ -62,32 +62,32 @@ public class Display
         return Display.current;
     }
     
-    public void setCurrent(final Displayable aDisplayable425) {
-        if (aDisplayable425 == Display.current) {
+    public void setCurrent(Displayable d) {
+        if (d == Display.current) {
             return;
         }
         if (Display.current != null) {
             Display.current.defocus();
         }
-        if ((Display.current = aDisplayable425) != null) {
-            if (aDisplayable425 instanceof Canvas) {
+        if ((Display.current = d) != null) {
+            if (d instanceof Canvas) {
                 if (Settings.aBoolean1274) {
-                    ((Canvas)aDisplayable425).setFullScreenMode(true);
+                    ((Canvas)d).setFullScreenMode(true);
                 }
-                Emulator.setCanvas((Canvas)aDisplayable425);
+                Emulator.setCanvas((Canvas)d);
                 Emulator.getEventQueue().queue(15);
                 Emulator.getEventQueue().queue(1);
                 Emulator.getEventQueue().waitRepainted2();
             }
-            else if (aDisplayable425 instanceof Screen) {
-                Emulator.setScreen((Screen)aDisplayable425);
+            else if (d instanceof Screen) {
+                Emulator.setScreen((Screen)d);
                 Emulator.getEventQueue().queue(4);
-                ((Screen)aDisplayable425).shown();
-                if (aDisplayable425 instanceof TextBox) {
-                    ((TextBox)aDisplayable425).focusCaret();
+                ((Screen)d).shown();
+                if (d instanceof TextBox) {
+                    ((TextBox)d).focusCaret();
                 }
             }
-            aDisplayable425.updateCommands();
+            d.updateCommands();
         }
     }
     
@@ -251,18 +251,18 @@ public class Display
         Display.displays.put(midlet, null);
     }
     
-    public void setCurrent(final Alert alert, final Displayable aDisplayable835) {
-        if (alert == null || aDisplayable835 == null) {
+    public void setCurrent(final Alert alert, final Displayable ret) {
+        if (alert == null || ret == null) {
             throw new NullPointerException();
         }
-        if (aDisplayable835 instanceof Alert) {
+        if (ret instanceof Alert) {
             throw new IllegalArgumentException();
         }
         if (Display.current != null) {
             Display.current.defocus();
         }
         Display.current = alert;
-        alert.lastDisplayed = aDisplayable835;
+        alert.lastDisplayed = ret;
         Emulator.setScreen(alert);
         Emulator.getEventQueue().queue(4);
         alert.updateCommands();

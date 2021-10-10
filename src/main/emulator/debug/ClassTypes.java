@@ -5,7 +5,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 public final class ClassTypes {
-   static Class aClass1482;
+   static Class strCls;
 
    public static String method869(Class var0) {
       return !var0.isArray()?var0.getName():method870(var0.getName());
@@ -83,13 +83,13 @@ public final class ClassTypes {
    }
 
    public static boolean method871(Class var0) {
-      return var0 == Integer.TYPE?false:(var0 == Boolean.TYPE?false:(var0 == Byte.TYPE?false:(var0 == Short.TYPE?false:(var0 == Long.TYPE?false:(var0 == Float.TYPE?false:(var0 == Double.TYPE?false:(var0 == Character.TYPE?false:(var0 == (aClass1482 != null?aClass1482:(aClass1482 = method877("java.lang.String")))?false:!var0.isArray()))))))));
+      return var0 == Integer.TYPE?false:(var0 == Boolean.TYPE?false:(var0 == Byte.TYPE?false:(var0 == Short.TYPE?false:(var0 == Long.TYPE?false:(var0 == Float.TYPE?false:(var0 == Double.TYPE?false:(var0 == Character.TYPE?false:(var0 == (strCls != null?strCls:(strCls = cls("java.lang.String")))?false:!var0.isArray()))))))));
    }
 
    public static String method872(Object var0, int var1, boolean var2) {
       Object var3;
       Class var4;
-      return var0 != null && var0.getClass().isArray()?((var3 = Array.get(var0, var1)) == null?"null":((var4 = var0.getClass().getComponentType()) == Integer.TYPE?(var2?"0x" + Integer.toHexString(Array.getInt(var0, var1)):String.valueOf(Array.getInt(var0, var1))):(var4 == Boolean.TYPE?String.valueOf(Array.getBoolean(var0, var1)):(var4 == Byte.TYPE?(var2?"0x" + Integer.toHexString(Array.getByte(var0, var1)):String.valueOf(Array.getByte(var0, var1))):(var4 == Short.TYPE?(var2?"0x" + Integer.toHexString(Array.getShort(var0, var1)):String.valueOf(Array.getShort(var0, var1))):(var4 == Long.TYPE?(var2?"0x" + Long.toHexString(Array.getLong(var0, var1)):String.valueOf(Array.getLong(var0, var1))):(var4 == Float.TYPE?String.valueOf(Array.getFloat(var0, var1)):(var4 == Double.TYPE?String.valueOf(Array.getDouble(var0, var1)):(var4 == Character.TYPE?String.valueOf(Array.getChar(var0, var1)):(var4 == (aClass1482 != null?aClass1482:(aClass1482 = method877("java.lang.String")))?String.valueOf(var3):(!var4.isArray()?var3.toString():"[" + Array.getLength(var3) + "]"))))))))))):"null";
+      return var0 != null && var0.getClass().isArray()?((var3 = Array.get(var0, var1)) == null?"null":((var4 = var0.getClass().getComponentType()) == Integer.TYPE?(var2?"0x" + Integer.toHexString(Array.getInt(var0, var1)):String.valueOf(Array.getInt(var0, var1))):(var4 == Boolean.TYPE?String.valueOf(Array.getBoolean(var0, var1)):(var4 == Byte.TYPE?(var2?"0x" + Integer.toHexString(Array.getByte(var0, var1)):String.valueOf(Array.getByte(var0, var1))):(var4 == Short.TYPE?(var2?"0x" + Integer.toHexString(Array.getShort(var0, var1)):String.valueOf(Array.getShort(var0, var1))):(var4 == Long.TYPE?(var2?"0x" + Long.toHexString(Array.getLong(var0, var1)):String.valueOf(Array.getLong(var0, var1))):(var4 == Float.TYPE?String.valueOf(Array.getFloat(var0, var1)):(var4 == Double.TYPE?String.valueOf(Array.getDouble(var0, var1)):(var4 == Character.TYPE?String.valueOf(Array.getChar(var0, var1)):(var4 == (strCls != null?strCls:(strCls = cls("java.lang.String")))?String.valueOf(var3):(!var4.isArray()?var3.toString():"[" + Array.getLength(var3) + "]"))))))))))):"null";
    }
 
    public static void method873(Object var0, int var1, String var2) {
@@ -118,7 +118,7 @@ public final class ClassTypes {
             } else if(var5 == Character.TYPE) {
                Array.setChar(var0, var1, var2.charAt(0));
             } else {
-               if(var5 == (aClass1482 != null?aClass1482:(aClass1482 = method877("java.lang.String")))) {
+               if(var5 == (strCls != null?strCls:(strCls = cls("java.lang.String")))) {
                   Array.set(var0, var1, var2);
                }
 
@@ -129,7 +129,7 @@ public final class ClassTypes {
 
    public static String method874(Object var0, Field var1, boolean var2) {
       try {
-         return var1.get(var0) == null?"null":(var1.getType() == Integer.TYPE?(var2?"0x" + Integer.toHexString(var1.getInt(var0)):String.valueOf(var1.getInt(var0))):(var1.getType() == Boolean.TYPE?String.valueOf(var1.getBoolean(var0)):(var1.getType() == Byte.TYPE?(var2?"0x" + Integer.toHexString(var1.getByte(var0)):String.valueOf(var1.getByte(var0))):(var1.getType() == Short.TYPE?(var2?"0x" + Integer.toHexString(var1.getShort(var0)):String.valueOf(var1.getShort(var0))):(var1.getType() == Long.TYPE?(var2?"0x" + Long.toHexString(var1.getLong(var0)):String.valueOf(var1.getLong(var0))):(var1.getType() == Float.TYPE?String.valueOf(var1.getFloat(var0)):(var1.getType() == Double.TYPE?String.valueOf(var1.getDouble(var0)):(var1.getType() == Character.TYPE?String.valueOf(var1.getChar(var0)):(var1.getType() == (aClass1482 != null?aClass1482:(aClass1482 = method877("java.lang.String")))?String.valueOf(var1.get(var0)):(!var1.getType().isArray()?var1.get(var0).toString():"[" + Array.getLength(var1.get(var0)) + "]"))))))))));
+         return var1.get(var0) == null?"null":(var1.getType() == Integer.TYPE?(var2?"0x" + Integer.toHexString(var1.getInt(var0)):String.valueOf(var1.getInt(var0))):(var1.getType() == Boolean.TYPE?String.valueOf(var1.getBoolean(var0)):(var1.getType() == Byte.TYPE?(var2?"0x" + Integer.toHexString(var1.getByte(var0)):String.valueOf(var1.getByte(var0))):(var1.getType() == Short.TYPE?(var2?"0x" + Integer.toHexString(var1.getShort(var0)):String.valueOf(var1.getShort(var0))):(var1.getType() == Long.TYPE?(var2?"0x" + Long.toHexString(var1.getLong(var0)):String.valueOf(var1.getLong(var0))):(var1.getType() == Float.TYPE?String.valueOf(var1.getFloat(var0)):(var1.getType() == Double.TYPE?String.valueOf(var1.getDouble(var0)):(var1.getType() == Character.TYPE?String.valueOf(var1.getChar(var0)):(var1.getType() == (strCls != null?strCls:(strCls = cls("java.lang.String")))?String.valueOf(var1.get(var0)):(!var1.getType().isArray()?var1.get(var0).toString():"[" + Array.getLength(var1.get(var0)) + "]"))))))))));
       } catch (Exception var3) {
          return "!!error!!";
       }
@@ -158,7 +158,7 @@ public final class ClassTypes {
             var1.setDouble(var0, Double.parseDouble(var2));
          } else {
             if(var1.getType() != Character.TYPE) {
-               if(var1.getType() == (aClass1482 != null?aClass1482:(aClass1482 = method877("java.lang.String")))) {
+               if(var1.getType() == (strCls != null?strCls:(strCls = cls("java.lang.String")))) {
                   var1.set(var0, var2);
                }
 
@@ -181,7 +181,7 @@ public final class ClassTypes {
       }
    }
 
-   private static Class method877(String var0) {
+   private static Class cls(String var0) {
       try {
          Class var1 = Class.forName(var0);
          return var1;
