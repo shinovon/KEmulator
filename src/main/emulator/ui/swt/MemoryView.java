@@ -484,8 +484,8 @@ public final class MemoryView implements DisposeListener
             this.objectsSize = this.memoryMgr.objectsSize();
             this.anInt1130 = Math.max(this.anInt1130, this.objectsSize);
         }
-        catch (Exception ex) {}
-        catch (Error ex) {}
+        catch (Exception ex) {ex.printStackTrace();}
+        catch (Error ex) {ex.printStackTrace();}
         this.aBoolean1118 = false;
     }
     

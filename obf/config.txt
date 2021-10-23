@@ -16,21 +16,6 @@
 -defaultpackage 'kemnn'
 -renamesourcefileattribute A
 
-# Interfaces
-#-keep,allowshrinking public interface ** { *; }
-
-# Abstracts
-#-keep,allowshrinking public abstract class ** {
-#    public <fields>;
-#    protected <fields>;
-#    public <methods>;
-#    protected <methods>;
-#    public static <methods>;
-#    native <methods>;
-#    protected static <methods>;
-#    abstract <methods>;
-#}
-
 # APIS
 -keep public class javax.microedition.** { public protected *; }
 

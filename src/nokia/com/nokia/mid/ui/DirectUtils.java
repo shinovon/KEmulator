@@ -20,4 +20,8 @@ public class DirectUtils {
 	public static Font getFont(int face, int style, int height) {
 		return FreeSizeFontInvoker.getFont(face, style, height);
 	}
+
+	public static Font getFont(int s) {
+		return Font.getDefaultFont();
+	}
 }

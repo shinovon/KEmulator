@@ -152,7 +152,9 @@ public class Image
     }
 
 	public int size() {
-		int i = 5 + imageImpl.size() + xrayBuffer.size() + usedRegion.size();
+		int i = 5 + imageImpl.size();
+		if(xrayBuffer != null) i += xrayBuffer.size();
+		if(usedRegion != null) i += usedRegion.size();
 		return i;
 	}
 }

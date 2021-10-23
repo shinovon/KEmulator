@@ -79,7 +79,7 @@ public final class Memory
                 clazz = cls(s);
                 o = Emulator.getMIDlet();
             }
-            else if (Emulator.getCurrentDisplay().getCurrent().getClass().getName().equals(s)) {
+            else if (Emulator.getCurrentDisplay() != null && Emulator.getCurrentDisplay().getCurrent() != null && Emulator.getCurrentDisplay().getCurrent().getClass().getName().equals(s)) {
                 a = this;
                 clazz = cls(s);
                 o = Emulator.getCurrentDisplay().getCurrent();
@@ -139,9 +139,13 @@ public final class Memory
             return;
         }
         if (o != null) {
+        	try {
             if (this.aVector1459.contains(o)) {
                 return;
             }
+        	} catch(Exception e) {
+        		
+        	}
             final ClassInfo classInfo2 = classInfo;
             ++classInfo2.anInt1485;
             classInfo.objs.add(new ObjInstance(this, s, o));
@@ -630,12 +634,12 @@ public final class Memory
                     }
                     else {
                         if (cls != ((Memory.Image2DCls != null) ? Memory.Image2DCls : (Memory.Image2DCls = cls("javax.microedition.m3g.Image2D")))) {
-                            if(!(cls == Vector.class || cls == Hashtable.class 
+                            /*if(!(cls == Vector.class || cls == Hashtable.class 
                             		|| cls == StringItem.class || cls == Command.class 
                             		|| cls == cls("javax.microedition.lcdui.a")
                             		))
                             	return res + o.toString().length();
-                            else return res;
+                            else */return res;
                         }
                         final Image2D image2D = (Image2D)o;
                         len = res + image2D.size();
