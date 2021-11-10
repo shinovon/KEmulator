@@ -7,22 +7,30 @@ import java.io.IOException;
 public class Texture {
 	boolean isModel;
 	a impl;
+	private byte[] bytes;
 
 	public Texture(byte[] b, boolean forModel) {
 		if (b == null) {
 			throw new NullPointerException();
 		}
 		impl = new a();
+		bytes = b;
 		isModel = forModel;
+		init();
+	}
+
+	private void init() {
+		
 	}
 
 	public Texture(String name, boolean forModel) throws IOException {
 		if (name == null) {
 			throw new NullPointerException();
 		}
-		CustomJarResources.getResourceStream(name);
+		bytes = CustomJarResources.getBytes(CustomJarResources.getResourceStream(name));
 		impl = new a();
 		isModel = forModel;
+		init();
 	}
 
 	public final void dispose() {

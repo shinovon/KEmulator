@@ -8,8 +8,10 @@ public final class i
     
     /**
      * loadLibrary
+     * x32
      */
     public static void a(final String s) {
+    	if(Emulator._X64_VERSION) throw new UnsatisfiedLinkError("x64 version!");
         try {
             try {
             	//String arch = System.getProperty("os.arch");
@@ -26,5 +28,9 @@ public final class i
         catch (UnsatisfiedLinkError unsatisfiedLinkError) {
             throw unsatisfiedLinkError;
         }
+    }
+    
+    public static void x64(String s) {
+    	
     }
 }

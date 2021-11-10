@@ -647,7 +647,8 @@ public class GL10Impl implements GL10, GL10Ext
             return;
         }
         if (n == 5122) {
-            GL11.glNormalPointer(n2, (ShortBuffer)buffer);
+        	// XXX
+            //GL11.glNormalPointer(n2, (ShortBuffer)buffer);
             return;
         }
         int n3;

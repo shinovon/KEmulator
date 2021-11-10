@@ -36,7 +36,7 @@ public final class d implements IImage
         graphics.fillRect(0, 0, n, n2);
     }
     
-    public final BufferedImage method11() {
+    public final BufferedImage getBufferedImage() {
         return this.img;
     }
     
@@ -127,10 +127,15 @@ public final class d implements IImage
     
     public final void cloneImage(final IImage image) {
         final int[] data = ((DataBufferInt)this.img.getRaster().getDataBuffer()).getData();
-        System.arraycopy(data, 0, ((DataBufferInt)((d)image).method11().getRaster().getDataBuffer()).getData(), 0, data.length);
+        System.arraycopy(data, 0, ((DataBufferInt)((d)image).getBufferedImage().getRaster().getDataBuffer()).getData(), 0, data.length);
     }
 
 	public int size() {
 		return img.getData().getDataBuffer().getSize();
+	}
+
+	@Override
+	public Object getNative() {
+		return getBufferedImage();
 	}
 }

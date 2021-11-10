@@ -5,12 +5,15 @@ import emulator.custom.*;
 import emulator.custom.CustomJarResources;
 import emulator.media.amr.*;
 import java.io.*;
+import java.lang.reflect.Method;
+
 import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
 import javax.microedition.media.protocol.SourceStream;
 
 import java.util.*;
 import javax.sound.sampled.*;
+import javax.sound.sampled.spi.AudioFileReader;
 import javax.sound.midi.*;
 import javax.sound.midi.MidiDevice.Info;
 
@@ -42,68 +45,28 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	private FramePositioningControl frameControl;
 	static Class clipCls;
 
-	public PlayerImpl(DataSource src) throws IOException, MediaException {
+	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
 		super();
-		this.contentType = src.getContentType();
+		this.contentType = contentType;
 		this.dataSource = src;
-		src.connect();
-		boolean mp3 = false;
-
-		SourceStream stream = src.getStreams()[0];
-		String streamContentType = stream.getContentDescriptor().getContentType();
-		if (streamContentType != null) {
-			if (streamContentType.equalsIgnoreCase("audio/mpeg") || contentType.equalsIgnoreCase("audio/mp3")) {
-				mp3 = true;
-				if (contentType == null)
-					contentType = "audio/mpeg";
-			}
-		}
-		if (mp3 || contentType.equalsIgnoreCase("audio/mpeg") || contentType.equalsIgnoreCase("audio/mp3")) {
-			dataLen = (int) stream.getContentLength();
-			try {
-				this.sequence = new Player(new InputStream() {
-
-					public int read() throws IOException {
-						byte[] b = new byte[1];
-						int i = read(b, 0, 1);
-						if (i == 1) {
-							return b[0] & 0xFF;
-						}
-						return -1;
-					}
-
-					public int read(byte[] b, int i, int j) throws IOException {
-						return stream.read(b, i, j);
-					}
-
-				});
-			} catch (JavaLayerException e) {
-				throw new IOException(e.toString());
-			}
-			this.volumeControl = new VolumeControlImpl(this);
-			this.controls = new Control[] { this.volumeControl };
-			this.setLevel(this.state = 100);
-			this.listeners = new Vector();
-			this.timeBase = Manager.getSystemTimeBase();
-		} else {
-			throw new MediaException("Invalid content type: " + contentType);
-		}
+		
 	}
 
 	public PlayerImpl(final InputStream inputStream, String contentType) throws IOException {
 		super();
 		if (contentType == null)
 			contentType = "";
+		contentType = contentType.toLowerCase();
 		this.contentType = contentType;
 		this.loopCount = 1;
 		this.dataLen = inputStream.available();
-		if (contentType.equalsIgnoreCase("audio/amr")) {
+		if (contentType.equals("audio/amr")) {
 			this.amr(inputStream);
-		} else if (contentType.equalsIgnoreCase("audio/x-wav") || contentType.equalsIgnoreCase("audio/wav")) {
+		} else if (contentType.equals("audio/x-wav") || contentType.equals("audio/wav")) {
 			this.wav(inputStream);
-		} else if (contentType.equalsIgnoreCase("audio/x-midi") || contentType.equalsIgnoreCase("audio/midi")) {
+		} else if (contentType.equals("audio/x-midi") || contentType.equals("audio/midi")) {
 			this.midi(inputStream);
-		} else if (contentType.equalsIgnoreCase("audio/mpeg")) {
+		} else if (contentType.equals("audio/mpeg")) {
 			try {
 				this.sequence = new Player(inputStream);
 			} catch (JavaLayerException e) {
@@ -162,6 +125,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		this.timeBase = Manager.getSystemTimeBase();
 	}
 
+	public PlayerImpl(String locator, String contentType, DataSource src) {
+		
+	}
+
 	private void amr(final InputStream inputStream) throws IOException {
 		try {
 			final byte[] method476;
@@ -177,17 +144,18 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.sequence = anObject298;
 		} catch (Exception ex) {
 			this.sequence = null;
-			throw new IOException("AMR realize error!");
+			throw new IOException("AMR realize error!", ex);
 		}
 		this.toneControl = new ToneControlImpl();
 		this.volumeControl = new VolumeControlImpl(this);
 		this.controls = new Control[] { this.toneControl, this.volumeControl };
 	}
-
+	
 	private void wav(final InputStream inputStream) throws IOException {
 		try {
 			this.sequence = AudioSystem.getAudioInputStream(inputStream);
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			this.sequence = null;
 			throw new IOException("WAV realize error!");
 		}
@@ -330,6 +298,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} else if (this.sequence instanceof Player) {
 			((Player) this.sequence).close();
 		}
+		if(dataSource != null) {
+			dataSource.disconnect();
+		}
 		this.sequence = null;
 		this.state = 0;
 		this.notifyListeners("closed", null);
@@ -360,8 +331,11 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			anInt303 = 100;
 		}
 		playerImpl.state = anInt303;
-		if (dataSource != null)
-			dataSource.disconnect();
+		if (dataSource != null && dataSource.getStreams() != null && dataSource.getStreams()[0] != null) {
+			if (dataSource.getStreams()[0].getSeekType() == 0) {
+				dataSource.disconnect();
+			}
+		}
 	}
 
 	public String getContentType() {
@@ -457,6 +431,14 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} else if (this.state != 200) {
 			return;
 		}
+		if(this.dataSource != null) {
+			try {
+				this.dataSource.connect();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new MediaException(e);
+			}
+		}
 		this.state = 300;
 	}
 
@@ -473,6 +455,47 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				//dataSource.start();
 			} catch (IOException e) {
 				throw new MediaException(e.toString());
+			}
+			boolean mp3 = false;
+
+			SourceStream stream = dataSource.getStreams()[0];
+			String streamContentType = stream.getContentDescriptor().getContentType();
+			if (streamContentType != null) {
+				if (streamContentType.equalsIgnoreCase("audio/mpeg") || this.contentType.equalsIgnoreCase("audio/mp3")) {
+					mp3 = true;
+					if (this.contentType == null)
+						this.contentType = "audio/mpeg";
+				}
+			}
+			if (mp3 || this.contentType.equalsIgnoreCase("audio/mpeg") || this.contentType.equalsIgnoreCase("audio/mp3")) {
+				dataLen = (int) stream.getContentLength();
+				try {
+					this.sequence = new Player(new InputStream() {
+
+						public int read() throws IOException {
+							byte[] b = new byte[1];
+							int i = read(b, 0, 1);
+							if (i == 1) {
+								return b[0] & 0xFF;
+							}
+							return -1;
+						}
+
+						public int read(byte[] b, int i, int j) throws IOException {
+							return stream.read(b, i, j);
+						}
+
+					});
+				} catch (JavaLayerException e) {
+					throw new MediaException(e);
+				}
+				this.volumeControl = new VolumeControlImpl(this);
+				this.controls = new Control[] { this.volumeControl };
+				this.setLevel(this.state = 100);
+				this.listeners = new Vector();
+				this.timeBase = Manager.getSystemTimeBase();
+			} else {
+				throw new MediaException("Invalid content type: " + contentType);
 			}
 		}
 	}
@@ -591,7 +614,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 
 	public void run() {
 		PlayerImpl playerImpl;
-		Long n;
+		Object n;
 		String s;
 		int loopCount = this.loopCount;
 		do {
@@ -639,25 +662,26 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 					continue;
 				--loopCount;
 			}
-			if(loopCount != 0)
+			if(loopCount != 0) {
 				try {
 					this.setMediaTime(0L);
 				} catch (MediaException e) {
 					e.printStackTrace();
 				}
+			}
 		} while (this.playerThread != null && loopCount != 0);
 		this.playerThread = null;
 		this.state = 300;
 		if (this.soundCompleted || this.midiCompleted || this.mp3Complete) {
 			playerImpl = this;
 			s = "endOfMedia";
-			n = new Long(0L);
+			n = getMediaTime();
 		} else {
 			playerImpl = this;
 			s = "stopped";
-			n = new Long(0L);
+			n = getMediaTime();
 		}
-		playerImpl.notifyListeners(s, (Object) n);
+		playerImpl.notifyListeners(s, n);
 	}
 
 	public void update(final LineEvent lineEvent) {

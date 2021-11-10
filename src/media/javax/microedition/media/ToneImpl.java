@@ -4,15 +4,15 @@ import javax.microedition.media.control.*;
 
 public class ToneImpl implements Player
 {
-    Control aControl306;
-    Control aControl310;
-    Control[] aControlArray307;
+    Control toneControl;
+    Control volumeControl;
+    Control[] controls;
     
     public ToneImpl() {
         super();
-        this.aControl306 = new ToneControlImpl();
-        this.aControl310 = new VolumeControlImpl(this);
-        this.aControlArray307 = new Control[] { this.aControl306, this.aControl310 };
+        this.toneControl = new ToneControlImpl();
+        this.volumeControl = new VolumeControlImpl(this);
+        this.controls = new Control[] { this.toneControl, this.volumeControl };
     }
     
     public void addPlayerListener(final PlayerListener playerListener) throws IllegalStateException {
@@ -57,7 +57,6 @@ public class ToneImpl implements Player
     }
     
     public void start() throws IllegalStateException, MediaException {
-    	System.out.print('\7');
     }
     
     public void stop() throws IllegalStateException, MediaException {
@@ -65,16 +64,16 @@ public class ToneImpl implements Player
     
     public Control getControl(final String s) {
         if (s == "VolumeControl") {
-            return this.aControl310;
+            return this.volumeControl;
         }
         if (s == "ToneControl") {
-            return this.aControl306;
+            return this.toneControl;
         }
         return null;
     }
     
     public Control[] getControls() {
-        return this.aControlArray307;
+        return this.controls;
     }
     
     public TimeBase getTimeBase() {

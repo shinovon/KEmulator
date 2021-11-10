@@ -34,7 +34,7 @@ public interface IGraphics3D
     
     void v3bind(final Graphics p0);
     
-    void v3release(final Graphics p0);
+   void v3release(final Graphics p0);
     
     void v3flush();
 }

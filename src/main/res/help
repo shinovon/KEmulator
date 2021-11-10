@@ -45,6 +45,24 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$nnmod v2.11.1 [2021.10.31]
+Removed inactivity timer
+
+$nnmod v2.11 [2021.10.24]
+RTSP Player protocol support for audio & video (via libvlc)
+Better DataSource support
+Better Player Content-Type detection
+Fixed NullPointerException in camera capture init if there is no web camera connected
+Video player setLoopCount implemented (Always repeat only)
+LibVLC events in video player
+Better video player view, scaling
+Fixed NullPointerException at video player's getSourceWidth,getSourceHeight methods
+Fixed Wrong values in video player's getMediaTime, getDuration
+Added stub for AMMS (JSR-234) API
+Emulator logs redirecting to stdout
+Fixed MemoryView bug with image size calculating
+Camera resolutions & orientations properties added
+
 $nnmod v2.10.4 [2021.10.10]
 Added 50% scale in MemoryView images
 Alert commands fixed
@@ -73,7 +91,7 @@ Fixed some bugs
 Removed some debugging 
 
 $v9 b9 [2021.09.06]
-Video player added (using vlcj)
+Video player added (using vlcj) (alpha)
 
 $v9 b8 [2021.09.03]
 HTTP User-Agent changing depending on the device
@@ -654,4 +672,5 @@ bridj-0.7.0
 
 ==================
 $[Bug Report]
-vk @shinovon
+vk.com @shinovon
+telegram @shinnn1

@@ -1,6 +1,8 @@
 package javax.microedition.media;
 
 import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ComponentSampleModel;
 import java.awt.image.DataBuffer;
@@ -9,6 +11,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.DirectColorModel;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -19,14 +22,21 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Vector;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.ImageOutputStreamImpl;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.media.control.FramePositioningControl;
 import javax.microedition.media.control.VideoControl;
 import javax.microedition.media.control.VolumeControl;
+import javax.microedition.media.protocol.DataSource;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -45,6 +55,9 @@ import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.media.MediaRef;
 import uk.co.caprica.vlcj.media.TrackType;
+import uk.co.caprica.vlcj.media.callback.CallbackMedia;
+import uk.co.caprica.vlcj.media.callback.nonseekable.NonSeekableInputStreamMedia;
+import uk.co.caprica.vlcj.media.callback.seekable.RandomAccessFileMedia;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
@@ -57,7 +70,7 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32Buffe
 import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters;
 import uk.co.caprica.vlcj.support.version.LibVlcVersion;
 
-public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
+public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	private Control[] controls;
 	private String contentType;
@@ -92,47 +105,61 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 	public BufferedImage img;
 	public ByteBuffer bb;
 	private boolean released;
-	private static VideoPlayerImpl inst;
+	private DataSource dataSource;
+	private boolean lengthNotified;
+	private int vol = -1;
+	private CallbackMedia mediaCallback;
+	private File tempFile;
+	private static VLCPlayerImpl inst;
 
 	static {
 	}
 
 	public static void draw(Graphics g, Object obj) {
 		if (inst != null) {
-			if (inst.canvas == null || obj == inst.canvas) {
+			if (obj == inst.canvas) {
 				inst.paint(g);
 			}
 		}
 	}
 
 	private void paint(Graphics g) {
-		if (visible && img != null) {
+		if (visible && img != null && playing) {
 			if (w == 0 || h == 0) {
 				w = Emulator.getEmulator().getScreen().getWidth();
 				h = Emulator.getEmulator().getScreen().getHeight();
 				fullscreen = true;
 			}
 			try {
-				ByteArrayOutputStream os = new ByteArrayOutputStream();
-				ImageIO.write(img, "JPEG", os);
-				byte[] bytes = os.toByteArray();
-				os.close();
 				if (fullscreen) {
 					if (w != Emulator.getEmulator().getScreen().getWidth()
 							|| h != Emulator.getEmulator().getScreen().getHeight()) {
 						w = Emulator.getEmulator().getScreen().getWidth();
 						h = Emulator.getEmulator().getScreen().getHeight();
 					}
-					Image i = resizeProportional(new Image(new d(bytes)), w, h);
+					BufferedImage bi = resizeProportional(img, w, h);
+					Image draw = awtImgToLcdui(bi);
 					int x = 0;
 					int y = 0;
-					if (i.getWidth() < w)
-						x = (w - i.getWidth()) / 2;
-					if (i.getHeight() < h)
-						y = (h - i.getHeight()) / 2;
-					g.drawImage(i, x, y, 0);
+					if (draw.getWidth() < w)
+						x = (w - draw.getWidth()) / 2;
+					if (draw.getHeight() < h)
+						y = (h - draw.getHeight()) / 2;
+					g.drawImage(draw, x, y, 0);
 				} else {
-					g.drawImage(resize(new Image(new d(bytes)), w, h), locx, locy, 0);
+					g.setColor(0);
+					g.fillRect(locx, locy, w, h);
+					BufferedImage bi;
+					bi = resize(img, w, h);
+					//bi = resizeProportional(img, w, h);
+					Image draw = awtImgToLcdui(bi);
+					int x = locx;
+					int y = locy;
+					//if (draw.getWidth() < w)
+					//	x = (w - draw.getWidth()) / 2;
+					//if (draw.getHeight() < h)
+					//	y = (h - draw.getHeight()) / 2;
+					g.drawImage(draw, x, y, 0);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -140,21 +167,47 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		}
 	}
 
-	public VideoPlayerImpl(String url) throws IOException {
+	private static Image awtImgToLcdui(BufferedImage img) {
+		return new Image(new d(img));
+		//return new Image(new d(imgToBytes(img)));
+	}
+
+	private static byte[] imgToBytes(BufferedImage img) {
+		try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+			Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
+			ImageWriter writer = iter.next();
+			ImageWriteParam iwp = writer.getDefaultWriteParam();
+			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+			iwp.setCompressionQuality(0.5f);
+			writer.setOutput(ios);
+			writer.write(null, new IIOImage(img, null, null), iwp);
+			writer.dispose();
+			byte[] bytes = os.toByteArray();
+			os.close();
+			return bytes;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public VLCPlayerImpl(String url) throws IOException {
 		this();
 		this.url = url;
 		this.mediaUrl = url;
 		this.state = 100;
 	}
 
-	public VideoPlayerImpl(InputStream inputStream, String type) throws IOException {
+	public VLCPlayerImpl(InputStream inputStream, String type) throws IOException {
 		this();
 		this.contentType = type;
 		this.inputStream = inputStream;
 		this.state = 100;
 	}
 
-	private VideoPlayerImpl() throws IOException {
+	private VLCPlayerImpl() throws IOException {
 		this.loopCount = 1;
 		this.listeners = new Vector();
 		frameControl = new FramePositioningControlI();
@@ -162,6 +215,29 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		volumeControl = new VolumeControlI();
 		controls = new Control[] { frameControl, videoControl, volumeControl };
 		this.timeBase = Manager.getSystemTimeBase();
+	}
+
+	public VLCPlayerImpl(String contentType, DataSource src) throws MediaException {
+		// только если все содержимое записывать в файл
+		Emulator.getEmulator().getLogStream().println("Streaming video player not supported!!");
+		this.dataSource = src;
+		throw new MediaException("Video from DataStream not supported!");
+	}
+
+	public VLCPlayerImpl(String locator, String contentType, DataSource src) throws IOException {
+		this();
+		this.url = locator;
+		this.mediaUrl = locator;
+		this.state = 100;
+		this.dataSource = src;
+	}
+
+	public VLCPlayerImpl(String url, String contentType) throws IOException {
+		this();
+		this.url = url;
+		this.mediaUrl = url;
+		this.contentType = contentType;
+		this.state = 100;
 	}
 
 	public Control getControl(String s) {
@@ -206,7 +282,31 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 					e.printStackTrace();
 				}
 			}
+			boolean bufferToFile = inputStream instanceof ByteArrayInputStream;
+			if(!bufferToFile) {
+				try {
+					//mediaCallback = new NonSeekableInputStreamMedia();
+					//return;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			try {
+				Manager.log("buffering to file");
+				File d = new File(System.getProperty("java.io.tmpdir"));
+				tempFile = new File(d.getPath() + File.separator + "kemtempmedia");
+				tempFile.deleteOnExit();
+				if (tempFile.exists())
+					tempFile.delete();
+				FileOutputStream fos = new FileOutputStream(tempFile);
+				CustomJarResources.write(inputStream, fos);
+				fos.close();
+				//System.gc();
+				dataLen = (int) tempFile.length();
+				this.mediaUrl = tempFile.toString();
+				mediaCallback = new RandomAccessFileMedia(tempFile);
+				Manager.log("buffered " + mediaUrl);
+				/*
 				byte[] b = CustomJarResources.getBytes(inputStream);
 				File d = new File(System.getProperty("java.io.tmpdir"));
 				File f = new File(d.getPath() + File.separator + "kemtempvideo");
@@ -218,7 +318,9 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 				dataLen = (int) f.length();
 				this.mediaUrl = f.toString();
 				b = null;
+				Manager.log("buffered");
 				System.gc();
+				*/
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new MediaException("failed to write temp file");
@@ -228,6 +330,7 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	public void prefetch() throws IllegalStateException, MediaException {
+		//System.out.println("prefetch");
 		if (this.state == 0) {
 			throw new IllegalStateException("closed");
 		}
@@ -238,8 +341,23 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		}
 		if (!prepared) {
 			load();
-			if (!mediaPlayer.media().prepare(mediaUrl))
-				throw new MediaException("failed to prepare");
+			// startPaused() вместо prepare()
+			try {
+				if (mediaCallback != null) {
+					if (!mediaPlayer.media().startPaused(mediaCallback)) {
+						Manager.log("Failed to prepare");
+						throw new MediaException("failed to prepare");
+					}
+				} else {
+					if (!mediaPlayer.media().startPaused(mediaUrl)) {
+						Manager.log("Failed to prepare");
+						throw new MediaException("failed to prepare");
+					}
+				}
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+			//System.out.println("prepared");
 			prepared = true;
 		}
 		this.state = 300;
@@ -281,11 +399,15 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 			}
 		}
 		try {
-			if (!released)
-				mediaPlayer.release();
-			released = true;
+			if(mediaPlayer == null) {
+				released = true;
+			} else {
+				if (!released)
+					mediaPlayer.release();
+				released = true;
+			}
 		} catch (Error e) {
-
+			e.printStackTrace();
 		}
 		this.state = 0;
 		this.notifyListeners("closed", null);
@@ -320,16 +442,21 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		if (this.state == 0) {
 			throw new IllegalStateException("closed");
 		}
+
+		if (this.state == 100) {
+			realize();
+		}
 		if (released)
 			throw new IllegalStateException("mediaPlayer released");
 		if (this.state != 400) {
 			if (!prepared) {
-				load();
-				if (!mediaPlayer.media().start(mediaUrl))
-					throw new MediaException("failed to start");
-				mediaPlayer.audio().setVolume(50);
+				prefetch();
 			} else {
 				mediaPlayer.controls().play();
+			}
+			if(vol == -1) {
+				notifyListeners("volumeChanged", vol = 50);
+				mediaPlayer.audio().setVolume(vol);
 			}
 			playing = true;
 			this.state = 400;
@@ -355,11 +482,15 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	public long getDuration() {
-		return mediaPlayer.status().length();
+		if(mediaPlayer == null) return 0;
+		if(mediaPlayer.status() == null) return 0;
+		return mediaPlayer.status().length() * 1000L;
 	}
 
 	public long getMediaTime() {
-		return mediaPlayer.status().time();
+		if(mediaPlayer == null) return 0;
+		if(mediaPlayer.status() == null) return 0;
+		return mediaPlayer.status().time() * 1000L;
 	}
 
 	public int getState() {
@@ -375,7 +506,7 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	public long setMediaTime(long p0) throws MediaException {
-		mediaPlayer.controls().setTime(p0);
+		mediaPlayer.controls().setTime(p0 / 1000L);
 		return mediaPlayer.status().time();
 	}
 
@@ -384,16 +515,23 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	protected void notifyListeners(final String s, final Object o) {
-		//System.out.println("notifyListeners " + s);
+		//System.out.println("notifyListeners " + s + " " + o);
 		if (listeners == null)
 			return;
-		final Enumeration<PlayerListener> elements = this.listeners.elements();
-		while (elements.hasMoreElements()) {
-			elements.nextElement().playerUpdate(this, s.intern(), o);
+		try {
+			final Enumeration<PlayerListener> elements = this.listeners.elements();
+			while (elements.hasMoreElements()) {
+				elements.nextElement().playerUpdate(this, s.intern(), o);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 	}
 
 	public void setLoopCount(int p0) {
+		if(p0 == -1) {
+			mediaPlayer.controls().setRepeat(true);
+		}
 	}
 
 	public void setTimeBase(TimeBase tb) throws MediaException {
@@ -452,7 +590,8 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		public int getLevel() {
 			if (released || mediaPlayer == null)
 				throw new IllegalStateException();
-			return mediaPlayer.audio().volume();
+			if(isMuted()) return 0;
+			return vol = mediaPlayer.audio().volume();
 		}
 
 		public boolean isMuted() {
@@ -464,8 +603,10 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		public int setLevel(int p0) {
 			if (released || mediaPlayer == null)
 				throw new IllegalStateException();
+			if(isMuted()) return 0;
 			mediaPlayer.audio().setVolume(p0);
-			return mediaPlayer.audio().volume();
+			notifyListeners("volumeChanged", mediaPlayer.audio().volume());
+			return vol = mediaPlayer.audio().volume();
 		}
 
 		public void setMute(boolean p0) {
@@ -522,8 +663,16 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 
 		@Override
 		public int getSourceHeight() {
-			if (released || mediaPlayer == null)
+			if (released || mediaPlayer == null) {
 				throw new IllegalStateException();
+			}
+			if(mediaPlayer.video().videoDimension() == null) {
+				mediaPlayer.media().parsing().parse();
+				try {
+					Thread.sleep(100L);
+				} catch (Exception e) {
+				}
+			}
 			srch = mediaPlayer.video().videoDimension().height;
 			if(srch == 0)
 				srch = bh;
@@ -532,8 +681,16 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 
 		@Override
 		public int getSourceWidth() {
-			if (released || mediaPlayer == null)
+			if (released || mediaPlayer == null) {
 				throw new IllegalStateException();
+			}
+			if(mediaPlayer.video().videoDimension() == null) {
+				mediaPlayer.media().parsing().parse();
+				try {
+					Thread.sleep(100L);
+				} catch (Exception e) {
+				}
+			}
 			srcw = mediaPlayer.video().videoDimension().width;
 			if(srcw == 0)
 				srcw = bw;
@@ -544,6 +701,9 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		public byte[] getSnapshot(String p0) throws MediaException {
 			if (released || mediaPlayer == null)
 				throw new IllegalStateException();
+			if(img != null) {
+				return imgToBytes(img);
+			}
 			try {
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
 				ImageIO.write(mediaPlayer.snapshots().get(), "JPEG", os);
@@ -558,6 +718,7 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 
 		@Override
 		public Object initDisplayMode(int p0, Object p1) {
+			//System.out.println("initDisplayMode " + p0 + " " + p1);
 			if (p0 == 0) {
 				isItem = true;
 				return getItem();
@@ -610,28 +771,7 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 			update();
 		}
 	}
-
-	private static Image resize(Image src_i, int tw, int th) {
-		// set source size
-		int w = src_i.getWidth();
-		int h = src_i.getHeight();
-		if (tw == -1)
-			tw = (w / h) * th;
-		// no change??
-		if (tw == w && th == h)
-			return src_i;
-
-		int[] dst = new int[tw * th];
-
-		resize_rgb_filtered(src_i, dst, w, h, tw, th);
-
-		// not needed anymore
-		src_i = null;
-
-		return Image.createRGBImage(dst, tw, th, true);
-	}
-
-	private static Image resizeProportional(Image img, int sw, int sh) {
+	private static BufferedImage resizeProportional(BufferedImage img, int sw, int sh) {
 		int iw = img.getWidth();
 		int ih = img.getHeight();
 		if (sw == iw && sh == ih)
@@ -641,108 +781,28 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 		double ratio = Math.min(widthRatio, heightRatio);
 		int tw = (int) (iw * ratio);
 		int th = (int) (ih * ratio);
-		int[] dst = new int[tw * th];
-
-		resize_rgb_filtered(img, dst, iw, ih, tw, th);
-
-		// not needed anymore
-		img = null;
-
-		return Image.createRGBImage(dst, sw, sh, true);
+		return resize(img, tw, th);
 	}
 
-	private static final void resize_rgb_filtered(Image src_i, int[] dst, int w0, int h0, int w1, int h1) {
-		int[] buffer1 = new int[w0];
-		int[] buffer2 = new int[w0];
-
-		// UNOPTIMIZED bilinear filtering:
-		//
-		// The pixel position is defined by y_a and y_b,
-		// which are 24.8 fixed point numbers
-		//
-		// for bilinear interpolation, we use y_a1 <= y_a <= y_b1
-		// and x_a1 <= x_a <= x_b1, with y_d and x_d defining how long
-		// from x/y_b1 we are.
-		//
-		// since we are resizing one line at a time, we will at most
-		// need two lines from the source image (y_a1 and y_b1).
-		// this will save us some memory but will make the algorithm
-		// noticeably slower
-
-		for (int index1 = 0, y = 0; y < h1; y++) {
-
-			final int y_a = ((y * h0) << 8) / h1;
-			final int y_a1 = y_a >> 8;
-			int y_d = y_a & 0xFF;
-
-			int y_b1 = y_a1 + 1;
-			if (y_b1 >= h0) {
-				y_b1 = h0 - 1;
-				y_d = 0;
-			}
-
-			// get the two affected lines:
-			src_i.getRGB(buffer1, 0, w0, 0, y_a1, w0, 1);
-			if (y_d != 0)
-				src_i.getRGB(buffer2, 0, w0, 0, y_b1, w0, 1);
-
-			for (int x = 0; x < w1; x++) {
-				// get this and the next point
-				int x_a = ((x * w0) << 8) / w1;
-				int x_a1 = x_a >> 8;
-				int x_d = x_a & 0xFF;
-
-				int x_b1 = x_a1 + 1;
-				if (x_b1 >= w0) {
-					x_b1 = w0 - 1;
-					x_d = 0;
-				}
-
-				// interpolate in x
-				int c12, c34;
-				int c1 = buffer1[x_a1];
-				int c3 = buffer1[x_b1];
-
-				// interpolate in y:
-				if (y_d == 0) {
-					c12 = c1;
-					c34 = c3;
-				} else {
-					int c2 = buffer2[x_a1];
-					int c4 = buffer2[x_b1];
-
-					c12 = blend(c2, c1, y_d);
-					c34 = blend(c4, c3, y_d);
-				}
-
-				// final result
-				dst[index1++] = blend(c34, c12, x_d);
-			}
+	private static BufferedImage resize(BufferedImage original, int w, int h) {
+		try {
+			BufferedImage resized = new BufferedImage(w, h, original.getType());
+			Graphics2D g = resized.createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+			RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g.drawImage(original, 0, 0, w, h, 0, 0, original.getWidth(),
+			original.getHeight(), null);
+			g.dispose();
+			return resized;
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
-
-	}
-
-	public static final int blend(final int c1, final int c2, final int value256) {
-
-		final int v1 = value256 & 0xFF;
-		final int c1_RB = c1 & 0x00FF00FF;
-		final int c2_RB = c2 & 0x00FF00FF;
-
-		final int c1_AG = (c1 >>> 8) & 0x00FF00FF;
-
-		final int c2_AG_org = c2 & 0xFF00FF00;
-		final int c2_AG = (c2_AG_org) >>> 8;
-
-		// the world-famous tube42 blend with one mult per two components:
-		final int rb = (c2_RB + (((c1_RB - c2_RB) * v1) >> 8)) & 0x00FF00FF;
-		final int ag = (c2_AG_org + ((c1_AG - c2_AG) * v1)) & 0xFF00FF00;
-		return ag | rb;
-
+		return null;
 	}
 
 	@Override
 	public void audioDeviceChanged(MediaPlayer arg0, String arg1) {
-		// TODO Auto-generated method stub
+		notifyListeners("vlc.audioDeviceChanged", arg1);
 
 	}
 
@@ -754,13 +814,13 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 
 	@Override
 	public void buffering(MediaPlayer arg0, float arg1) {
-		// TODO Auto-generated method stub
+		notifyListeners("vlc.buffering", new Double(arg1));
 
 	}
 
 	@Override
 	public void chapterChanged(MediaPlayer arg0, int arg1) {
-		// TODO Auto-generated method stub
+		notifyListeners("vlc.chapterChanged", arg1);
 
 	}
 
@@ -796,20 +856,25 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 
 	@Override
 	public void lengthChanged(MediaPlayer arg0, long arg1) {
+		if(!lengthNotified) {
+			lengthNotified = true;
+			return;
+		}
 		// TODO Auto-generated method stub
-
+		notifyListeners("durationChanged", arg1);
 	}
 
 	@Override
 	public void mediaChanged(MediaPlayer arg0, MediaRef arg1) {
 		// TODO Auto-generated method stub
+		notifyListeners("vlc.mediaChanged", arg1.toString());
 
 	}
 
 	@Override
 	public void mediaPlayerReady(MediaPlayer arg0) {
 		// TODO Auto-generated method stub
-
+		notifyListeners("vlc.mediaPlayerReady", null);
 	}
 
 	@Override
@@ -833,13 +898,13 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 	@Override
 	public void paused(MediaPlayer arg0) {
 		this.state = 300;
-		notifyListeners("stopped", null);
+		notifyListeners("stopped", getMediaTime());
 	}
 
 	@Override
 	public void positionChanged(MediaPlayer arg0, float arg1) {
 		// TODO Auto-generated method stub
-
+		//notifyListeners("positionChanged", new Double(arg1));
 	}
 
 	@Override
@@ -856,14 +921,14 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 
 	@Override
 	public void snapshotTaken(MediaPlayer arg0, String arg1) {
-		// TODO Auto-generated method stub
+		notifyListeners("snapshotTaken", arg1);
 
 	}
 
 	@Override
 	public void stopped(MediaPlayer arg0) {
 		this.state = 300;
-		notifyListeners("stopped", null);
+		notifyListeners("stopped", getMediaTime());
 	}
 
 	@Override
@@ -874,33 +939,35 @@ public class VideoPlayerImpl implements Player, MediaPlayerEventListener {
 
 	@Override
 	public void titleChanged(MediaPlayer arg0, int arg1) {
-		// TODO Auto-generated method stub
+		notifyListeners("titleChanged", arg1);
 
 	}
 
 	@Override
 	public void videoOutput(MediaPlayer arg0, int arg1) {
-		// TODO Auto-generated method stub
-
+		srch = mediaPlayer.video().videoDimension().height;
+		srcw = mediaPlayer.video().videoDimension().width;
 	}
 
 	@Override
 	public void volumeChanged(MediaPlayer arg0, float arg1) {
-		// TODO Auto-generated method stub
+		notifyListeners("com.nokia.external.volume.event", (int) (arg1 * 100F));
 
 	}
 
 	public void finished(MediaPlayer mediaPlayer) {
 		this.state = 300;
-		notifyListeners("endOfMedia", null);
+		notifyListeners("endOfMedia", getMediaTime());
 	}
 
 	public void error(MediaPlayer mediaPlayer) {
+		Manager.log("mediaPlayer error");
 		notifyListeners("error", null);
 	}
 
 	public void playing(MediaPlayer mediaPlayer) {
-		notifyListeners("started", new Long(0L));
+		Manager.log("started");
+		notifyListeners("started", getMediaTime());
 	}
 
 }

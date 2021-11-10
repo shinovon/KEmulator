@@ -11,6 +11,10 @@ import java.io.Reader;
 import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
+import javax.microedition.amms.control.camera.CameraControl;
+import javax.microedition.amms.control.camera.FlashControl;
+import javax.microedition.amms.control.camera.FocusControl;
+import javax.microedition.amms.control.imageeffect.ImageTransformControl;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
@@ -46,17 +50,203 @@ public class CapturePlayerImpl implements Player {
 
 	private Item item;
 
+	private FocusControl focusControl;
+
+	private FlashControl flashControl;
+
+	private CameraControl cameraControl;
+	
+	CapturePlayerImpl() throws MediaException {
+		webcam = Webcam.getDefault();
+		if(webcam == null) throw new MediaException("No capture devices found!");
+		videoControl = new CameraVideoControlImpl(this);
+		focusControl = new FocusControlI();
+		flashControl = new FlashControlI();
+		cameraControl = new CameraControlI();
+	}
+	
+	class FocusControlI implements FocusControl {
+
+		@Override
+		public int setFocus(int paramInt) throws MediaException {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public int getFocus() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public int getMinFocus() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public int getFocusSteps() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public boolean isManualFocusSupported() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isAutoFocusSupported() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isMacroSupported() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void setMacro(boolean paramBoolean) throws MediaException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean getMacro() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+	}
+	
+	class FlashControlI implements FlashControl {
+
+		@Override
+		public int[] getSupportedModes() {
+			// TODO Auto-generated method stub
+			return new int[] { 1 } ;
+		}
+
+		@Override
+		public void setMode(int paramInt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getMode() {
+			// TODO Auto-generated method stub
+			return 1;
+		}
+
+		@Override
+		public boolean isFlashReady() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+	}
+	
+	class CameraControlI implements CameraControl {
+
+		@Override
+		public int getCameraRotation() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void enableShutterFeedback(boolean paramBoolean) throws MediaException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean isShutterFeedbackEnabled() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public String[] getSupportedExposureModes() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setExposureMode(String paramString) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public String getExposureMode() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public int[] getSupportedVideoResolutions() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public int[] getSupportedStillResolutions() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setVideoResolution(int paramInt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setStillResolution(int paramInt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getVideoResolution() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public int getStillResolution() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+	}
+
 	@Override
 	public Control getControl(String s) {
         if (s.indexOf("VideoControl") != -1 || s.indexOf("GUIControl") != -1) {
             return this.videoControl;
+        }
+        if(s.indexOf("FocusControl") != -1) {
+        	return focusControl;
+        }
+        if(s.indexOf("FlashControl") != -1) {
+        	return flashControl;
+        }
+        if(s.indexOf("CameraControl") != -1) {
+        	return cameraControl;
         }
 		return null;
 	}
 
 	@Override
 	public Control[] getControls() {
-		return new Control[] { videoControl };
+		return new Control[] { videoControl, focusControl, flashControl, cameraControl };
 	}
 
 	@Override
@@ -103,9 +293,7 @@ public class CapturePlayerImpl implements Player {
 
 	@Override
 	public void realize() throws IllegalStateException, MediaException {
-		webcam = Webcam.getDefault();
 		inst = this;
-		videoControl = new CameraVideoControlImpl(this);
 	}
 
 	@Override
@@ -347,7 +535,7 @@ public class CapturePlayerImpl implements Player {
 				inst.paint(g);
 			}
 		} else {
-			VideoPlayerImpl.draw(g, obj);
+			VLCPlayerImpl.draw(g, obj);
 		}
 		
 	}

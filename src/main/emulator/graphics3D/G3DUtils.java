@@ -1,8 +1,8 @@
 package emulator.graphics3D;
 
-public final class c
+public final class G3DUtils
 {
-    public c() {
+    public G3DUtils() {
         super();
     }
     

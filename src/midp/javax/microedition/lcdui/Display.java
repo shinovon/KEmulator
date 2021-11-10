@@ -110,6 +110,7 @@ public class Display
     }
 
 	public void fadeOut() {
+    	if(true) return;
     	if(fadeComplete) {
 			Emulator.screenBrightness = 15;
 			new Thread() {
@@ -134,6 +135,7 @@ public class Display
 	}
     
     public void resetTimer() {
+    	if(true) return;
 		from = System.currentTimeMillis(); 
     	fadeComplete = false;
     	if(pausd) {
@@ -146,6 +148,7 @@ public class Display
 	}
     
     public int getInactiveTime() {
+    	if(true) return 0;
 		return (int) (System.currentTimeMillis() - from);
 	}
     
@@ -154,6 +157,7 @@ public class Display
 	}
     
     private void timerTick() {
+    	if(true) return;
 		int i = (int) (System.currentTimeMillis() - from);
 		if(Emulator.inactivityTimer <= 0) {
 			return;
@@ -195,6 +199,7 @@ public class Display
 	}
     
     private void p() {
+    	if(true) return;
     	 if (Display.current != null) {
 	            if (Display.current instanceof Canvas) {
 	                if (Settings.aBoolean1274) {

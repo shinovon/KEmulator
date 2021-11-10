@@ -47,4 +47,8 @@ public final class FontSWT implements IFont
     public final int getAscent() {
         return this.gc.getFontMetrics().getAscent();
     }
+    
+    public final int getLeading() {
+        return this.gc.getFontMetrics().getLeading();
+    }
 }

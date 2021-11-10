@@ -69,7 +69,7 @@
 
 -keep,allowshrinking public class uk.co.caprica.vlcj.** { *; }
 
--keep,allowshrinking class org.bridj.** { *; }
+-keep class org.bridj.** { *; }
 
 -keep,allowshrinking class org.slf4j.** { *; }
 

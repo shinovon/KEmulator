@@ -80,17 +80,26 @@ public final class Class90 implements MouseMoveListener, DisposeListener
         this.aComposite907 = null;
         this.aTree896 = null;
         this.aCanvas897 = null;
-        this.aCamera901 = new Camera();
-        this.aTransform902 = new Transform();
+	    try {
+	        this.aCamera901 = new Camera();
+	        this.aTransform902 = new Transform();
+        } catch (Error e) {
+        }
         this.aMenu908 = null;
         this.aMenu913 = null;
         this.aMenu918 = null;
         this.aMenu923 = null;
+	    try {
         this.ana892 = new emulator.graphics3D.a();
+        } catch (Error e) {
+        }
         this.aBackground900 = null;
         this.aNode904 = null;
         this.ana898 = new Memory();
+	    try {
         this.m3gview = emulator.graphics3D.view.a.acreate();
+        } catch (Error e) {
+        }
     }
     
     private void method516() {
@@ -120,6 +129,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
         this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
         this.aTransform902.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
     }
+    
     
     private void method531() {
         final Rectangle clientArea;

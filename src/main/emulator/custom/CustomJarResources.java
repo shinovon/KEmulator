@@ -91,6 +91,22 @@ public final class CustomJarResources
         inputStream.close();
         return byteArray;
     }
+    
+    public static void write(final InputStream i, OutputStream o) throws IOException {
+        if (i == null) {
+            throw new IllegalArgumentException("input = null");
+        }
+        int available;
+        if ((available = i.available()) <= 0) {
+            available = 128;
+        }
+        final byte[] buf = new byte[available];
+        int read;
+        while ((read = i.read(buf)) > 0) {
+            o.write(buf, 0, read);
+        }
+        i.close();
+    }
 
 	public static InputStream a(String paramString) {
 		return getResourceStream(paramString);

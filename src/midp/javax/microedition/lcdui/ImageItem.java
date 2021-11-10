@@ -12,7 +12,7 @@ public class ImageItem extends Item
     public static final int LAYOUT_NEWLINE_AFTER = 512;
     private Image image;
     private String altText;
-    private int anInt349;
+    private int appearanceMode;
     
     public ImageItem(final String s, final Image image, final int n, final String s2) {
         this(s, image, n, s2, 0);
@@ -26,7 +26,7 @@ public class ImageItem extends Item
         this.image = anImage427;
         super.layout = anInt178;
         this.altText = aString25;
-        this.anInt349 = anInt179;
+        this.appearanceMode = anInt179;
     }
     
     public Image getImage() {
@@ -54,7 +54,7 @@ public class ImageItem extends Item
     }
     
     public int getAppearanceMode() {
-        return this.anInt349;
+        return this.appearanceMode;
     }
     
     protected void paint(final Graphics graphics) {

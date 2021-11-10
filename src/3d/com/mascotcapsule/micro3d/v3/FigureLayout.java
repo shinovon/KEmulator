@@ -3,10 +3,10 @@ package com.mascotcapsule.micro3d.v3;
 public class FigureLayout {
 	private AffineTrans[] affineArray;
 	private AffineTrans affineNow;
-	private int scaleX;
-	private int scaleY;
-	private int centerX;
-	private int centerY;
+	private int mScaleX;
+	private int mScaleY;
+	private int mCenterX;
+	private int mCenterY;
 	private int paraWidth;
 	private int paraHeight;
 	public int mPersNear;
@@ -18,16 +18,16 @@ public class FigureLayout {
 
 	public FigureLayout() {
 		setAffineTrans((AffineTrans) null);
-		scaleX = 512;
-		scaleY = 512;
+		mScaleX = 512;
+		mScaleY = 512;
 	}
 
 	public FigureLayout(AffineTrans paramAffineTrans, int scx, int scy, int cx, int cy) {
 		setAffineTrans(paramAffineTrans);
-		scaleX = scx;
-		scaleY = scy;
-		centerX = cx;
-		centerY = cy;
+		mScaleX = scx;
+		mScaleY = scy;
+		mCenterX = cx;
+		mCenterY = cy;
 	}
 
 	public final AffineTrans getAffineTrans() {
@@ -70,16 +70,16 @@ public class FigureLayout {
 	}
 
 	public final int getScaleX() {
-		return scaleX;
+		return mScaleX;
 	}
 
 	public final int getScaleY() {
-		return scaleY;
+		return mScaleY;
 	}
 
 	public final void setScale(int x, int y) {
-		scaleX = x;
-		scaleY = y;
+		mScaleX = x;
+		mScaleY = y;
 		mLayoutType = 0;
 	}
 
@@ -101,16 +101,16 @@ public class FigureLayout {
 	}
 
 	public final int getCenterX() {
-		return centerX;
+		return mCenterX;
 	}
 
 	public final int getCenterY() {
-		return centerY;
+		return mCenterY;
 	}
 
 	public final void setCenter(int x, int y) {
-		centerX = x;
-		centerY = y;
+		mCenterX = x;
+		mCenterY = y;
 	}
 
 	public final void setPerspective(int near, int far, int angle) {

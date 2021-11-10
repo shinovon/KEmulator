@@ -28,7 +28,7 @@ public final class EmulatorImpl implements IEmulator
     private Class90 aClass90_1384;
     private Class83 aClass83_1389;
     public Properties midletProps;
-	//private static Hashtable<String, a> swtFontsCache = new Hashtable<String, a>();
+	private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
     
     public EmulatorImpl() {
         super();
@@ -151,11 +151,11 @@ public final class EmulatorImpl implements IEmulator
     
     public final IFont newFont(final int n, final int n2) {
         if (Settings.g2d == 0) {
-        	//String s = this.aClass38_1383.getDefaultFontName() + "." + n + "." + n2;
-        	//if(swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
+        	String s = this.iproperty.getDefaultFontName() + "." + n + "." + n2;
+        	if(swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
             FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), n, n2);
-            //swtFontsCache.put(s, f);
-           // return f;
+            swtFontsCache.put(s, f);
+            return f;
         }
         if (Settings.g2d == 1) {
             return new emulator.graphics2D.awt.a(this.iproperty.getDefaultFontName(), n, n2);

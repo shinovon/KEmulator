@@ -241,6 +241,10 @@ public abstract class Screen extends Displayable
         emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (selectedItem != null) ? this.items.indexOf(selectedItem) : -1);
     }
     
+    void stateChanged(Item i) {
+    	
+    }
+    
     static {
         font = Font.getDefaultFont();
         fontHeight = Screen.font.getHeight();

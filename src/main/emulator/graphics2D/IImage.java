@@ -25,4 +25,6 @@ public interface IImage
     void cloneImage(final IImage p0);
 
 	int size();
+
+	Object getNative();
 }

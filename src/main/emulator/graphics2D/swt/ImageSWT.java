@@ -52,18 +52,20 @@ public final class ImageSWT implements IImage
         }
     }
     
-    public ImageSWT(final int n, final int n2, final boolean aBoolean536, final int n3) {
+    public ImageSWT(final int n, final int n2, final boolean t, final int n3) {
     	this.img = new Image((Device)null, n, n2);
+    	if(!t) {
         GC gc = new GC(this.img);
         Color background = new Color((Device)null, n3 >> 16 & 255, n3 >> 8 & 255, n3 & 255);
         gc.setBackground(background);
         gc.fillRectangle(0, 0, n, n2);
         gc.dispose();
         background.dispose();
+    	}
         this.imgdata = this.img.getImageData();
         this.img.dispose();
         this.disposed = false;
-        this.transparent = aBoolean536;
+        this.transparent = t;
         this.len = n * n2;
         this.rgb = new int[this.len];
     }
@@ -297,5 +299,9 @@ public final class ImageSWT implements IImage
 
 	public int size() {
 		return len * 4;
+	}
+
+	public Object getNative() {
+		return img;
 	}
 }

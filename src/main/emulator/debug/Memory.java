@@ -391,8 +391,8 @@ public final class Memory
         if (o instanceof AudioClip) {
             return ((AudioClip)o).dataLen;
         }
-        if(o instanceof VideoPlayerImpl) {
-        	return ((VideoPlayerImpl) o).dataLen;
+        if(o instanceof VLCPlayerImpl) {
+        	return ((VLCPlayerImpl) o).dataLen;
         }
         if(!(o instanceof PlayerImpl)) {
         	return 0;
@@ -410,8 +410,8 @@ public final class Memory
                 return 0;
             }
 
-            if(o instanceof VideoPlayerImpl) {
-                final VideoPlayerImpl v = (VideoPlayerImpl)o;
+            if(o instanceof VLCPlayerImpl) {
+                final VLCPlayerImpl v = (VLCPlayerImpl)o;
                 return (int)(((double)v.getMediaTime() / (double)v.getDuration()) * 100D);
             }
             if(!(o instanceof PlayerImpl)) {
@@ -434,8 +434,8 @@ public final class Memory
                 return ((AudioClip)o).volume5 * 20;
             }
 
-            if(o instanceof VideoPlayerImpl) {
-                return ((VolumeControlImpl)((VideoPlayerImpl)o).getControl("VolumeControl")).getLevel();
+            if(o instanceof VLCPlayerImpl) {
+                return ((VolumeControlImpl)((VLCPlayerImpl)o).getControl("VolumeControl")).getLevel();
             }
             if(!(o instanceof PlayerImpl)) {
             	return 0;
@@ -454,8 +454,8 @@ public final class Memory
             }
             else if (!(o instanceof AudioClip)) {
 
-                if(o instanceof VideoPlayerImpl) {
-                    ((VolumeControlImpl)((VideoPlayerImpl)o).getControl("VolumeControl")).setLevel(n);
+                if(o instanceof VLCPlayerImpl) {
+                    ((VolumeControlImpl)((VLCPlayerImpl)o).getControl("VolumeControl")).setLevel(n);
                     return;
                 }
                 if(!(o instanceof PlayerImpl)) {
@@ -509,8 +509,8 @@ public final class Memory
             }
             return;
         }
-        if(o instanceof VideoPlayerImpl) {
-	        final VideoPlayerImpl v = (VideoPlayerImpl)o;
+        if(o instanceof VLCPlayerImpl) {
+	        final VLCPlayerImpl v = (VLCPlayerImpl)o;
 	        try {
 	        	System.out.println(n);
 	            switch (n) {

@@ -169,11 +169,11 @@ public final class b implements IGraphics2D
     }
     
     public final void drawImage(final IImage image, final int n, final int n2) {
-        g.drawImage(((d)image).method11(), n, n2, null);
+        g.drawImage(((d)image).getBufferedImage(), n, n2, null);
     }
     
     public final void drawImage(final IImage image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-        g.drawImage(((d)image).method11(), n5, n6, n5 + n7, n6 + n8, n, n2, n + n3, n2 + n4, null);
+        g.drawImage(((d)image).getBufferedImage(), n5, n6, n5 + n7, n6 + n8, n, n2, n + n3, n2 + n4, null);
     }
     
     public final void setClip(final int n, final int n2, final int n3, final int n4) {

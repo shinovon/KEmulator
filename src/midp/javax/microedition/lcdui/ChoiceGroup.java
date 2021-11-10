@@ -221,15 +221,18 @@ implements Choice {
             this.screen.cmdListener.commandAction(this.aCommand540, (Displayable)this.screen);
         }
         if (this.choiceType == EXCLUSIVE) {
+        	screen.stateChanged(this);
             this.setSelectedIndex(this.currentPos, true);
             return;
         }
         if (this.choiceType == MULTIPLE) {
+        	screen.stateChanged(this);
             this.setSelectedIndex(this.currentPos, !this.isSelected(this.currentPos));
             return;
         }
         if (this.choiceType == POPUP) {
             if (this.aBoolean542) {
+            	screen.stateChanged(this);
                 this.setSelectedIndex(this.currentPos, true);
             }
             this.aBoolean542 = !this.aBoolean542;

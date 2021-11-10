@@ -260,7 +260,7 @@ public class Displayable {
 	}
 
 	protected void paintSoftMenu(final Graphics graphics) {
-		CapturePlayerImpl.draw(graphics, this);
+		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
 		final int translateX = graphics.getTranslateX();
 		final int translateY = graphics.getTranslateY();
 		if (Emulator.screenBrightness < 100) {

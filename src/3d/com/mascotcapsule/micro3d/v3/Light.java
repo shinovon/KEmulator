@@ -1,23 +1,23 @@
 package com.mascotcapsule.micro3d.v3;
 
 public class Light {
-	private Vector3D jdField_a_of_type_ComMascotcapsuleMicro3dV3Vector3D;
-	private int jdField_a_of_type_Int;
-	private int b;
+	private Vector3D mDirVector;
+	private int mDirIntensity;
+	private int mAmbIntensity;
 
 	public Light() {
-		jdField_a_of_type_ComMascotcapsuleMicro3dV3Vector3D = new Vector3D(0, 0, 4096);
-		jdField_a_of_type_Int = 4096;
-		b = 0;
+		mDirVector = new Vector3D(0, 0, 4096);
+		mDirIntensity = 4096;
+		mAmbIntensity = 0;
 	}
 
 	public Light(Vector3D paramVector3D, int paramInt1, int paramInt2) {
 		if (paramVector3D == null) {
 			throw new NullPointerException();
 		}
-		jdField_a_of_type_ComMascotcapsuleMicro3dV3Vector3D = paramVector3D;
-		jdField_a_of_type_Int = paramInt1;
-		b = paramInt2;
+		mDirVector = paramVector3D;
+		mDirIntensity = paramInt1;
+		mAmbIntensity = paramInt2;
 	}
 
 	public final int getDirIntensity() {
@@ -25,7 +25,7 @@ public class Light {
 	}
 
 	public final int getParallelLightIntensity() {
-		return jdField_a_of_type_Int;
+		return mDirIntensity;
 	}
 
 	public final void setDirIntensity(int paramInt) {
@@ -33,7 +33,7 @@ public class Light {
 	}
 
 	public final void setParallelLightIntensity(int paramInt) {
-		jdField_a_of_type_Int = paramInt;
+		mDirIntensity = paramInt;
 	}
 
 	public final int getAmbIntensity() {
@@ -41,7 +41,7 @@ public class Light {
 	}
 
 	public final int getAmbientIntensity() {
-		return b;
+		return mAmbIntensity;
 	}
 
 	public final void setAmbIntensity(int paramInt) {
@@ -49,7 +49,7 @@ public class Light {
 	}
 
 	public final void setAmbientIntensity(int paramInt) {
-		b = paramInt;
+		mAmbIntensity = paramInt;
 	}
 
 	public final Vector3D getDirection() {
@@ -57,7 +57,7 @@ public class Light {
 	}
 
 	public final Vector3D getParallelLightDirection() {
-		return jdField_a_of_type_ComMascotcapsuleMicro3dV3Vector3D;
+		return mDirVector;
 	}
 
 	public final void setDirection(Vector3D paramVector3D) {
@@ -68,6 +68,6 @@ public class Light {
 		if (paramVector3D == null) {
 			throw new NullPointerException();
 		}
-		jdField_a_of_type_ComMascotcapsuleMicro3dV3Vector3D = paramVector3D;
+		mDirVector = paramVector3D;
 	}
 }

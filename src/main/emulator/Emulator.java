@@ -1,11 +1,21 @@
 package emulator;
 
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.HeadlessException;
+import java.awt.Window;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.Enumeration;
@@ -22,12 +32,19 @@ import javax.microedition.midlet.MIDlet;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
+import javax.swing.Icon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
+
+import com.github.sarxos.webcam.Webcam;
 
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
@@ -39,6 +56,10 @@ import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator
 {
+	// is 64 bit version
+	public static final boolean _X64_VERSION = false;
+	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
+	
     static EmulatorImpl emulatorimpl;
     private static MIDlet midlet;
     private static Canvas currentCanvas;
@@ -74,10 +95,10 @@ public class Emulator
 	public static boolean askImei = false;
 	private static String midletName;
 	
-	public static final String titleVersion = "v2.10.4";
-	public static final String aboutVersion = "v2.10.4";
-	public static final int numericVersion = 10;
-	public static final String propVersion = "v2.10";
+	public static final String titleVersion = "2.12";
+	public static final String aboutVersion = "v2.12";
+	public static final int numericVersion = 12;
+	public static final String propVersion = "v2.12";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -133,6 +154,70 @@ public class Emulator
 		}
 	}
 	
+	private static int showOptionDialog(JFrame parentComponent, Object message, String title, int optionType,
+			int messageType, Icon icon, Object[] options, Object initialValue) throws HeadlessException {
+		JOptionPane2 pane = new JOptionPane2(message, messageType, optionType, icon, options, initialValue);
+
+		pane.setInitialValue(initialValue);
+		pane.setComponentOrientation(((parentComponent == null) ? JOptionPane.getRootFrame() : parentComponent)
+				.getComponentOrientation());
+
+		JDialog dialog = pane.createDialog(parentComponent, title, JRootPane.QUESTION_DIALOG);
+
+		pane.selectInitialValue();
+		dialog.show();
+		dialog.dispose();
+		dialog.setAlwaysOnTop(true);
+
+		Object selectedValue = pane.getValue();
+
+		if (selectedValue == null)
+			return JOptionPane.CLOSED_OPTION;
+		if (options == null) {
+			if (selectedValue instanceof Integer)
+				return ((Integer) selectedValue).intValue();
+			return JOptionPane.CLOSED_OPTION;
+		}
+		for (int counter = 0, maxCounter = options.length; counter < maxCounter; counter++) {
+			if (options[counter].equals(selectedValue))
+				return counter;
+		}
+		return JOptionPane.CLOSED_OPTION;
+	}
+
+    public static Object showInputDialog(JFrame parentComponent,
+        Object message, String title, int messageType, Icon icon,
+        Object[] selectionValues, Object initialSelectionValue)
+        throws HeadlessException {
+        JOptionPane2    pane = new JOptionPane2(message, messageType,
+                                              JOptionPane.OK_CANCEL_OPTION, icon,
+                                              null, null);
+
+        pane.setWantsInput(true);
+        pane.setSelectionValues(selectionValues);
+        pane.setInitialSelectionValue(initialSelectionValue);
+        pane.setComponentOrientation(((parentComponent == null) ?
+        		JOptionPane.getRootFrame() : parentComponent).getComponentOrientation());
+
+        int style = JRootPane.WARNING_DIALOG;
+        JDialog dialog = pane.createDialog(parentComponent, title, style);
+
+        pane.selectInitialValue();
+        dialog.show();
+        dialog.dispose();
+
+        Object value = pane.getInputValue();
+
+        if (value == JOptionPane.UNINITIALIZED_VALUE) {
+            return null;
+        }
+        return value;
+    }
+    
+	public static String showInputDialog(JFrame parentComponent, Object message, String title, int messageType)
+			throws HeadlessException {
+		return (String) showInputDialog(parentComponent, message, title, messageType, null, null, null);
+	}
 	public static String askIMEI() {
 		if(notAllowPerms.contains("imei"))
 			return null;
@@ -140,7 +225,7 @@ public class Emulator
 		if(imei != null) return imei;
 		JFrame parent = new JFrame();
 		parent.setAlwaysOnTop(true);
-		String s = JOptionPane.showInputDialog(parent, "Application asks for IMEI", "", JOptionPane.WARNING_MESSAGE);
+		String s = showInputDialog(parent, "Application asks for IMEI", "", JOptionPane.WARNING_MESSAGE);
 		if(s == null) {
 			notAllowPerms.add("imei");
 			return null;
@@ -148,7 +233,14 @@ public class Emulator
 		allowPerms.add("imei");
 		return imei = s;
 	}
-	
+
+    public static int showConfirmDialog(JFrame parentComponent,
+        Object message, String title, int optionType)
+        throws HeadlessException {
+        return showOptionDialog(parentComponent, message, title, optionType,
+                                 JOptionPane.QUESTION_MESSAGE, null, null, null);
+    }
+    
 	public static void checkPermission(String x) {
 		int p = getAppPermissionLevel(x);
 		JFrame parent = new JFrame();
@@ -161,7 +253,7 @@ public class Emulator
 		//5: ask once
 		if(p == 0) {
 			// always ask
-			int i = JOptionPane.showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
+			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
 			if(i == JOptionPane.NO_OPTION)
 				throw new SecurityException(x);
 			allowPerms.add(x);
@@ -169,7 +261,7 @@ public class Emulator
 			// ask once
 			if(allowPerms.contains(x))
 				return;
-			int i = JOptionPane.showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
+			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
 			if(i == JOptionPane.NO_OPTION) {
 				throw new SecurityException(x);
 			}
@@ -183,7 +275,7 @@ public class Emulator
 			// always ask until "no" is pressed
 			if(notAllowPerms.contains(x))
 				return;
-			int i = JOptionPane.showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
+			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
 			if(i == JOptionPane.NO_OPTION) {
 				notAllowPerms.add(x);
 				throw new SecurityException(x);
@@ -195,7 +287,7 @@ public class Emulator
 				throw new SecurityException(x);
 			if(allowPerms.contains(x))
 				return;
-			int i = JOptionPane.showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
+			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
 			if(i == JOptionPane.NO_OPTION) {
 				notAllowPerms.add(x);
 				throw new SecurityException(x);
@@ -384,12 +476,38 @@ public class Emulator
         catch (Exception ex) {ex.printStackTrace();}
     }
     
-    public static String getVersionString() {
-        return "KEmulator nnmod " + titleVersion;
+    public static String getTitleVersionString() {
+        return "KEmulator" + (_X64_VERSION ? " nnX64" : " nnmod")+ " " + titleVersion;
+    }
+    
+    public static String getCmdVersionString() {
+        return (_X64_VERSION ? "kemulatornnx64" : "KEmulator nnmod")+ " " + titleVersion;
     }
     
     public static String getInfoString() {
-        return "KEmulator v1.0.3" + "\n\tmod nnproject "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n" + UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n\t" + "MIDP 2.0(JSR118)\n\tNokiaUI 1.4\n\tSamsung 1.0\n\tSprint 1.0\n\tWMA 1.0(JSR120)\n\tSensor(JSR256)\n\tM3G 1.1(JSR184)\n\tOpenGL ES(JSR239)";
+    	if(_X64_VERSION) {
+            return "kemulator nnx64 " + aboutVersion+"\n\n"
+            		+ "\tMulti-Platform\n"
+            		+ "\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n"
+                	+ UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
+                	+ "\tMIDP 2.0 (JSR118)\n"
+                	+ "\tNokiaUI 1.4\n"
+                	+ "\tSamsung 1.0\n"
+                	+ "\tSprint 1.0\n"
+                	+ "\tWMA 1.0 (JSR120)\n"
+                	+ "\tSensor (JSR256)\n(no 3d support)";
+    	}
+        return "KEmulator v1.0.3" + "\n\tmod nnproject "+aboutVersion+"\n\n\t" + 
+    	UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" + 
+    	UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
+    	+ "\tMIDP 2.0(JSR118)\n"
+    	+ "\tNokiaUI 1.4\n"
+    	+ "\tSamsung 1.0\n"
+    	+ "\tSprint 1.0\n"
+    	+ "\tWMA 1.0(JSR120)\n"
+    	+ "\tSensor(JSR256)\n"
+    	+ "\tM3G 1.1(JSR184)\n"
+    	+ "\tOpenGL ES(JSR239)";
     }
     
     public static String getAboutString() {
@@ -640,7 +758,7 @@ public class Emulator
     private static void setProperties() {
         System.setProperty("microedition.configuration", "CDLC-1.1");
         System.setProperty("microedition.profiles", "MIDP-2.0");
-        System.setProperty("microedition.m3g.version", "1.1");
+    	if(!_X64_VERSION) System.setProperty("microedition.m3g.version", "1.1");
         System.setProperty("microedition.encoding", Settings.fileEncoding);
         if (System.getProperty("microedition.locale") == null) {
             System.setProperty("microedition.locale", "ru-RU");
@@ -713,6 +831,8 @@ public class Emulator
 	        		Settings.fpsGame = 1;
 	        	} else if(midlet.equalsIgnoreCase("micro counter strike")) {
 	        		Settings.fpsGame = 2;
+	        	} else if(midlet.equalsIgnoreCase("quantum")) {
+	        		Settings.fpsGame = 3;
 	        	}
         	}
         	
@@ -755,7 +875,19 @@ public class Emulator
         System.setProperty("com.nokia.mid.ui.customfontsize", "true");
         System.setProperty("com.nokia.pointer.number", "1");
         System.setProperty("kemulator.hwid", getHWID());
-        
+        System.setProperty("microedition.amms.version", "1.0");
+        System.setProperty("supports.mediacapabilities", "camera");
+	    try {
+	        Webcam w = Webcam.getDefault();
+	        if(w != null) {
+	        	System.setProperty("camera.orientations", "devcam0:inwards");
+	        	Dimension d = w.getViewSize();
+	        	System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
+	        } else {
+	        	
+	        }
+        } catch (Exception e) {
+        }
     }
 
 	private static String getHWID() {
@@ -778,13 +910,23 @@ public class Emulator
     }
 
 	public static void main(final String[] commandLineArguments) {
+        if(!_X64_VERSION && JAVA_64) {
+        	JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
+        	return;
+        }
+		if(_X64_VERSION) {
+			loadSWTLibrary();
+		}
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.method709();
         Emulator.emulatorimpl = new EmulatorImpl();
-        i.a("emulator");
+        try {
+        	i.a("emulator");
+        } catch (Error e) {
+        }
         Controllers.method750(true);
-        Emulator.emulatorimpl.getLogStream().stdout(getVersionString() + " Running...");
+        Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
         method283(commandLineArguments);
         Devices.load(Emulator.deviceFile);
         tryToSetDevice(Emulator.deviceName);
@@ -870,7 +1012,36 @@ public class Emulator
         EmulatorImpl.dispose();
     }
     
-    private static void tryToSetDevice(final String deviceName) {
+    private static void loadSWTLibrary() {
+    	String osn = System.getProperty("os.name").toLowerCase();
+        String osa = System.getProperty("os.arch").toLowerCase();
+        String os = 
+            osn.contains("win") ? "win32" :
+            osn.contains("mac") ? "macosx" :
+            osn.contains("linux") || osn.contains("nix") ? "linux-gtk" :
+            null;
+        if(os == null) {
+        	throw new RuntimeException("unsupported os: " + osn);
+        }
+
+        String arch = osa.contains("64") ? "x86_64" : "x86";
+        String swtFileName = "swt-" + os + "-" + arch + ".jar";
+
+        try {
+            URLClassLoader classLoader = (URLClassLoader) Emulator.class.getClassLoader();
+            Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            addUrlMethod.setAccessible(true);
+            File f = new File("./"+swtFileName);
+            System.out.println(f.exists() + " " + f.getCanonicalPath());
+            URL swtFileUrl = f.toURL();
+            addUrlMethod.invoke(classLoader, swtFileUrl);
+        }
+        catch(Exception e) {
+            throw new RuntimeException(swtFileName, e);
+        }
+	}
+
+	private static void tryToSetDevice(final String deviceName) {
         Emulator.deviceName = deviceName;
         if (!Devices.setPlatform(Emulator.deviceName)) {
             Devices.setPlatform(Emulator.deviceName = "SonyEricssonK800");

@@ -46,6 +46,11 @@ MouseTrackListener
     private Menu menuInterpolation;
     public static int locX;
     public static int locY;
+    private Transform jdField_a_of_type_OrgEclipseSwtGraphicsTransform;
+    private Transform jdField_b_of_type_OrgEclipseSwtGraphicsTransform;
+    private int jdField_c_of_type_Int;
+    private int jdField_d_of_type_Int;
+    private int jdField_e_of_type_Int;
     private float zoom;
     private int anInt996;
     private int anInt1003;
@@ -54,7 +59,7 @@ MouseTrackListener
     private ImageSWT screenImageSwt;
     private ImageSWT backBufferImageSwt;
     private ImageSWT xrayScreenImageSwt;
-    private emulator.graphics2D.awt.d ad980;
+    private emulator.graphics2D.awt.d screenImgAwtClone;
     private emulator.graphics2D.awt.d screenImageAwt;
     private emulator.graphics2D.awt.d backBufferImageAwt;
     private emulator.graphics2D.awt.d xrayScreenImageAwt;
@@ -123,7 +128,7 @@ MouseTrackListener
     private final String[] aStringArray981;
     private boolean infosEnabled;
     private String aString1008;
-    private Class67 aClass67_973;
+    private CaretImpl caret;
     private int anInt1020;
     private boolean[] aBooleanArray978;
     private int mouseXPress;
@@ -140,8 +145,12 @@ MouseTrackListener
 	private boolean fpsWasRight;
 	private boolean fpsWasLeft;
 	private boolean ignoreNextFps;
-	private boolean fpsWasnt;
+	private boolean fpsWasntHor;
 	private boolean mset;
+	private boolean fpsWasUp;
+	private boolean fpsWasBottom;
+	private boolean fpsWasntVer;
+	private MenuItem rotate90MenuItem;
     
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -173,7 +182,7 @@ MouseTrackListener
             return;
         }
         if (Settings.g2d == 1) {
-            this.ad980 = new emulator.graphics2D.awt.d(n, n2, false, 9934483);
+            this.screenImgAwtClone = new emulator.graphics2D.awt.d(n, n2, false, 9934483);
             this.screenImageAwt = new emulator.graphics2D.awt.d(n, n2, false, 9934483);
             this.backBufferImageAwt = new emulator.graphics2D.awt.d(n, n2, false, 9934483);
             this.xrayScreenImageAwt = new emulator.graphics2D.awt.d(n, n2, true, -16777216);
@@ -245,32 +254,90 @@ MouseTrackListener
     }
     
 
-    private void method569(int var1, int var2) {
+    private void rotate(int var1, int var2) {
        if(this.pauseState == 1 && Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
           this.method550(var1, var2);
           this.zoom(this.zoom);
           Emulator.getEventQueue().queue(Integer.MIN_VALUE, var1, var2);
        }
     }
-
+    
+    private void rotate90degrees(boolean paramBoolean)
+    {
+      if (this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform == null) {
+        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform = new Transform(null);
+      }
+      if (this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform == null) {
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform = new Transform(null);
+      }
+      if (!paramBoolean)
+      {
+        this.jdField_c_of_type_Int += 1;
+        this.jdField_c_of_type_Int %= 4;
+      }
+      this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
+      this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
+      int i1 = getWidth();
+      int i2 = getHeight();
+      switch (this.jdField_c_of_type_Int)
+      {
+      case 0: 
+        this.jdField_d_of_type_Int = i1;
+        this.jdField_e_of_type_Int = i2;
+        break;
+      case 1: 
+        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.translate(i2 * zoom, 0.0F);
+        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.rotate(90.0F);
+        this.jdField_d_of_type_Int = i2;
+        this.jdField_e_of_type_Int = i1;
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.translate(i2 * zoom, 0.0F);
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.rotate(90.0F);
+        break;
+      case 2: 
+        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.translate(i1 * zoom, i2 * zoom);
+        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.rotate(180.0F);
+        this.jdField_d_of_type_Int = i1;
+        this.jdField_e_of_type_Int = i2;
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.translate(i1 * zoom, i2 * zoom);
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.rotate(180.0F);
+        break;
+      case 3: 
+        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.translate(0.0F, i1 * zoom);
+        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.rotate(270.0F);
+        this.jdField_d_of_type_Int = i2;
+        this.jdField_e_of_type_Int = i1;
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.translate(0.0F, i1 * zoom);
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.rotate(270.0F);
+      }
+      try
+      {
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.invert();
+      }
+      catch (Exception localException) {}
+      this.caret.a(this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform, this.jdField_c_of_type_Int);
+      if (!paramBoolean) {
+        d();
+      }
+    }
     
 
     private void zoom(float var1) {
        this.zoom = var1;
        this.anInt996 = (int)((float)this.getWidth() * this.zoom);
        this.anInt1003 = (int)((float)this.getHeight() * this.zoom);
+       rotate90degrees(true);
        Settings.canvasScale = (int)(this.zoom * 100.0F);
-       this.aClass67_973.method469(this.zoom);
-       this.method579();
-       this.method584();
+       this.caret.setWindowZoom(this.zoom);
+       this.d();
+       this.h();
     }
 
     
-    private void method579() {
-        int var1 = this.shell.getSize().x - this.canvas.getSize().x;
-        int var2 = this.shell.getSize().y - this.canvas.getSize().y;
-        this.canvas.setSize((int)((float)this.getWidth() * this.zoom) + this.canvas.getBorderWidth() * 2, (int)((float)this.getHeight() * this.zoom) + this.canvas.getBorderWidth() * 2);
-        this.shell.setSize(this.canvas.getSize().x + var1, this.canvas.getSize().y + var2);
+    private void d() {
+        int i1 = this.shell.getSize().x - this.canvas.getSize().x;
+        int i2 = this.shell.getSize().y - this.canvas.getSize().y;
+        this.canvas.setSize((int)(this.jdField_d_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2, (int)((float)this.jdField_e_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2);
+        this.shell.setSize(this.canvas.getSize().x + i1, this.canvas.getSize().y + i2);
         this.canvas.redraw();
      }
 
@@ -392,7 +459,7 @@ MouseTrackListener
     }
     
 
-    private void method584() {
+    private void h() {
        long var1 = 0L;
        long var3;
        long var5 = (var3 = ((aBoolean967?aLong1007:System.currentTimeMillis()) - aLong1000) / 1000L) / 60L;
@@ -448,7 +515,7 @@ MouseTrackListener
         layout.marginHeight = 0;
         layout.verticalSpacing = 0;
         layout.makeColumnsEqualWidth = false;
-        ((Decorations)(this.shell = new Shell(224))).setText(Emulator.getVersionString());
+        ((Decorations)(this.shell = new Shell(224))).setText(Emulator.getTitleVersionString());
         ((Composite)this.shell).setLayout((Layout)layout);
         this.method588();
         (this.aCLabel970 = new CLabel((Composite)this.shell, 0)).setText("\t");
@@ -482,6 +549,10 @@ MouseTrackListener
         this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
         (this.rotateScreenMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_ROTATE", "Rotate Screen") + "\tY");
         this.rotateScreenMenuItem.addSelectionListener((SelectionListener)this);
+
+        this.rotate90MenuItem = new MenuItem(this.menuView, 8);
+        this.rotate90MenuItem.setText(emulator.UILocale.uiText("MENU_VIEW_ROTATE90", "Rotate 90°") + "");
+        this.rotate90MenuItem.addSelectionListener(this);
         (this.forecPaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tF");
         this.forecPaintMenuItem.addSelectionListener((SelectionListener)this);
         method557(((Control)this.shell).handle, Settings.alwaysOnTop);
@@ -670,14 +741,14 @@ MouseTrackListener
         this.exitMenuItem.setAccelerator(27);
         this.exitMenuItem.addSelectionListener((SelectionListener)this);
         menuItemMidlet.setMenu(this.menuMidlet);
-        this.method570(!Settings.canvasKeyboard);
+        this.toggleMenuAccelerators(!Settings.canvasKeyboard);
         setFpsMode(Settings.fpsMode);
         ((Decorations)this.shell).setMenuBar(this.aMenu971);
     }
     
     
     
-    protected final void method570(final boolean b) {
+    protected final void toggleMenuAccelerators(final boolean b) {
         MenuItem menuItem;
         int accelerator;
         if (b) {
@@ -767,7 +838,7 @@ MouseTrackListener
                         this.ad979.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
                     }
                     else if (Settings.g2d == 1) {
-                        this.ad980.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
+                        this.screenImgAwtClone.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
                     }
                     ++EmulatorScreen.anInt1012;
                 }
@@ -779,7 +850,7 @@ MouseTrackListener
                         return;
                     }
                     if (Settings.g2d == 1) {
-                        this.ad980.copyToClipBoard();
+                        this.screenImgAwtClone.copyToClipBoard();
                     }
                 }
             }
@@ -836,7 +907,7 @@ MouseTrackListener
                 }
                 if(menuItem.equals(canvasKeyboardMenuItem)) {
                 	Settings.canvasKeyboard = canvasKeyboardMenuItem.getSelection();
-                	method570(!Settings.canvasKeyboard);
+                	toggleMenuAccelerators(!Settings.canvasKeyboard);
                 	return;
                 }
                 
@@ -872,7 +943,7 @@ MouseTrackListener
                         EmulatorScreen.aLong1000 = System.currentTimeMillis();
                         EmulatorScreen.aBoolean992 = false;
                     }
-                    this.method584();
+                    this.h();
                     return;
                 }
                 if (menuItem.equals(this.resetTickMenuItem)) {
@@ -880,29 +951,29 @@ MouseTrackListener
                     EmulatorScreen.aLong991 = 0L;
                     EmulatorScreen.aBoolean967 = true;
                     EmulatorScreen.aBoolean992 = true;
-                    this.method584();
+                    this.h();
                     return;
                 }
                 if (menuItem.equals(this.speedUpMenuItem)) {
                     if (Settings.f == -1) {
                         Settings.f = 1;
-                        this.method584();
+                        this.h();
                         return;
                     }
                     if (Settings.f < 100) {
                         ++Settings.f;
-                        this.method584();
+                        this.h();
                     }
                 }
                 else if (menuItem.equals(this.slowDownMenuItem)) {
                     if (Settings.f == 1) {
                         Settings.f = -1;
-                        this.method584();
+                        this.h();
                         return;
                     }
                     if (Settings.f > -100) {
                         --Settings.f;
-                        this.method584();
+                        this.h();
                     }
                 }
                 else {
@@ -1091,8 +1162,14 @@ MouseTrackListener
             }
             else {
                 if (menuItem.equals(this.rotateScreenMenuItem)) {
-                    this.method569(this.getHeight(), this.getWidth());
+                    this.rotate(this.getHeight(), this.getWidth());
                     return;
+                }
+
+                if (menuItem.equals(this.rotate90MenuItem))
+                {
+                  rotate90degrees(false);
+                  return;
                 }
                 if (menuItem.equals(this.forecPaintMenuItem)) {
                     if (Settings.g2d == 0) {
@@ -1104,7 +1181,7 @@ MouseTrackListener
                         }
                     }
                     else if (Settings.g2d == 1) {
-                        (Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.ad980);
+                        (Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenImgAwtClone);
                     }
                     ((Control)this.canvas).redraw();
                     return;
@@ -1174,8 +1251,13 @@ MouseTrackListener
         }
     }
     
-    private static void method557(final int n, final boolean b) {
-        OS.SetWindowPos(n, b ? -1 : -2, 0, 0, 0, 0, 19);
+    private static void method557(final long handle, final boolean b) {
+    	// XXX: SWT VERSION
+    	try {
+    		OS.SetWindowPos((int) handle, b ? -1 : -2, 0, 0, 0, 0, 19);
+    	} catch(Throwable e) {
+    		
+    	}
     }
     
     private void method587() {
@@ -1198,15 +1280,19 @@ MouseTrackListener
         this.disconnectNetworkMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
         this.channelUpMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
         this.channelDownMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
-        this.method584();
+        this.h();
     }
     
     public final void widgetDefaultSelected(final SelectionEvent selectionEvent) {
     }
     
     private void updateInfos(final int n, final int n2) {
-        final int n3 = (int)(n / this.zoom);
-        final int n4 = (int)(n2 / this.zoom);
+        float[] arrayOfFloat;
+        (arrayOfFloat = new float[4])[0] = n;
+        arrayOfFloat[1] = n2;
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
+        final int n3 = (int)(arrayOfFloat[0] / this.zoom);
+        final int n4 = (int)(arrayOfFloat[1] / this.zoom);
         if (n3 < 0 || n4 < 0 || n3 > this.getWidth() - 1 || n4 > this.getHeight() - 1) {
             return;
         }
@@ -1228,11 +1314,22 @@ MouseTrackListener
             sb2 = sb3.append(this.aString1008).append("0x").append(Integer.toHexString(rgb).toUpperCase());
         }
         class93.aString1008 = sb2.toString();
+        arrayOfFloat[0] = mouseXPress;
+        arrayOfFloat[1] = mouseYPress;
+        arrayOfFloat[2] = mouseXRelease;
+        arrayOfFloat[3] = mouseYRelease;
+        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
         this.aString1008 = this.aString1008 + ")\n" + 
-        emulator.UILocale.uiText("INFO_FRAME_RECT", "R") + 
+        emulator.UILocale.uiText("INFO_FRAME_RECT", "R")
+
+        + "(" + (int)(arrayOfFloat[0] / zoom) + "," + 
+        (int)(arrayOfFloat[1] / zoom) + "," + (int)((arrayOfFloat[2] - arrayOfFloat[0]) / zoom) + 
+        "," + (int)((arrayOfFloat[3] - arrayOfFloat[1]) / zoom) + ")";
+        /*
         "(" + (int)(this.mouseXPress / this.zoom) + "," + 
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
         "," + (int)((this.mouseYRelease - this.mouseYPress) / this.zoom) + ")";
+        */
         ((EmulatorImpl)Emulator.getEmulator()).method825().method609(this.aString1008);
     }
     
@@ -1254,12 +1351,13 @@ MouseTrackListener
         ((Widget)this.canvas).addListener(37, (Listener)new Class32(this));
         this.aBooleanArray978 = new boolean[256];
         this.method589();
-        this.aClass67_973 = new Class67(this.canvas);
+        this.caret = new CaretImpl(this.canvas);
     }
     
     public final void paintControl(final PaintEvent paintEvent) {
         final GC gc;
         (gc = paintEvent.gc).setInterpolation(this.anInt1020);
+        gc.setTransform(this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform);
         try {
             if (this.anImage974 == null || this.anImage974.isDisposed()) {
                 if (this.pauseState == 0) {
@@ -1272,7 +1370,7 @@ MouseTrackListener
                     this.ad979.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
                 }
                 else if (Settings.g2d == 1) {
-                    this.ad980.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
+                    this.screenImgAwtClone.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
                 }
             }
             else {
@@ -1286,10 +1384,14 @@ MouseTrackListener
     
     private void method565(final GC gc) {
         if (this.infosEnabled && (this.mouseXPress != this.mouseXRelease || this.mouseYPress != this.mouseYRelease)) {
-            OS.SetROP2(gc.handle, 7);
-            gc.setForeground(EmulatorScreen.display.getSystemColor(1));
-            gc.drawRectangle(this.mouseXPress, this.mouseYPress, this.mouseXRelease - this.mouseXPress, this.mouseYRelease - this.mouseYPress);
-            OS.SetROP2(gc.handle, 13);
+        	try {
+	            OS.SetROP2(gc.handle, 7);
+	            gc.setForeground(EmulatorScreen.display.getSystemColor(1));
+	            gc.drawRectangle(this.mouseXPress, this.mouseYPress, this.mouseXRelease - this.mouseXPress, this.mouseYRelease - this.mouseYPress);
+	            OS.SetROP2(gc.handle, 13);
+        	} catch (Throwable e) {
+        		
+        	}
         }
     }
     
@@ -1301,14 +1403,14 @@ MouseTrackListener
             this.screenImageSwt.cloneImage(this.ad979);
         }
         else if (Settings.g2d == 1) {
-            this.screenImageAwt.cloneImage(this.ad980);
+            this.screenImageAwt.cloneImage(this.screenImgAwtClone);
         }
         if (EmulatorScreen.aviWriter != null) {
-            EmulatorScreen.aviWriter.method843(this.ad980.getData());
+            EmulatorScreen.aviWriter.method843(this.screenImgAwtClone.getData());
         }
         ((Control)this.canvas).redraw();
         if (!EmulatorScreen.aBoolean967 && !EmulatorScreen.aBoolean992) {
-            this.method584();
+            this.h();
         }
         ++EmulatorScreen.aLong982;
         Emulator.getEmulator().syncValues();
@@ -1351,7 +1453,7 @@ MouseTrackListener
             this.zoomIn();
             return;
         }
-        this.aClass67_973.method470(keyEvent);
+        this.caret.method470(keyEvent);
         int n;
         if ((n = (keyEvent.keyCode & 0xFEFFFFFF)) == 13 && (keyEvent.keyCode & 0x1000000) != 0x0) {
             n = 22;
@@ -1373,31 +1475,11 @@ MouseTrackListener
         if (this.pauseState == 0 || Settings.q) {
             return;
         }
-        if(Settings.fpsMode && Settings.fpsGame == 2) {
-        	boolean b = true;
-        	//up
-        	if(n == 'w') n = -1;
-        	//down
-        	else if(n == 's') n = -2;
-        	
-        	//num1
-        	else if(n == 'a') n = 49;
-        	//num3
-        	else if(n == 'd') n = 51;
-        	//num7
-        	else if(n == 'q') n = 55;
-        	//num9
-        	else if(n == 'e') n = 57;
-        	//num0
-        	else if(n == 'c') n = 48;
-        	//star
-        	else if(n == 'x') n = 42;
-        	//hash
-        	else if(n == 'z') n = 35;
-        	else b = false;
-	        if(b) {
-	        	mp(n);
-	        	return;
+        if(Settings.fpsMode) {
+        	int g = Keyboard.fpsKey(n);
+        	if(g != 0) {
+        		mp(n);
+        		return;
         	}
         }
         if ((n < 0 || n >= this.aBooleanArray978.length) && !Settings.canvasKeyboard) {
@@ -1431,32 +1513,11 @@ MouseTrackListener
         if (this.pauseState == 0 || Settings.q) {
             return;
         }
-
-        if(Settings.fpsMode && Settings.fpsGame == 2) {
-        	boolean b = true;
-        	//up
-        	if(n == 'w') n = -1;
-        	//down
-        	else if(n == 's') n = -2;
-        	
-        	//num1
-        	else if(n == 'a') n = 49;
-        	//num3
-        	else if(n == 'd') n = 51;
-        	//num7
-        	else if(n == 'q') n = 55;
-        	//num9
-        	else if(n == 'e') n = 57;
-        	//num0
-        	else if(n == 'c') n = 48;
-        	//star
-        	else if(n == 'x') n = 42;
-        	//hash
-        	else if(n == 'z') n = 35;
-        	else b = false;
-	        if(b) {
-	        	mr(n);
-	        	return;
+        if(Settings.fpsMode) {
+        	int g = Keyboard.fpsKey(n);
+        	if(g != 0) {
+        		mr(n);
+        		return;
         	}
         }
 
@@ -1513,6 +1574,8 @@ MouseTrackListener
             		mp(42);
             	else if(Settings.fpsGame == 0)
              		mp(Keyboard.soft2());
+            	else if(Settings.fpsGame == 3)
+             		mp(Keyboard.soft1());
             	return;
             }
             if(Settings.fpsMode && mouseEvent.button == 2) {
@@ -1529,11 +1592,16 @@ MouseTrackListener
             		mp(Keyboard.getArrowKeyFromDevice(8));
             	return;
             }
-            final int n = (int)(mouseEvent.x / this.zoom);
-            final int n2 = (int)(mouseEvent.y / this.zoom);
+
+            float[] arrayOfFloat;
+            (arrayOfFloat = new float[2])[0] = mouseEvent.x;
+            arrayOfFloat[1] = mouseEvent.y;
+            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
+            final int n = (int)(arrayOfFloat[0] / this.zoom);
+            final int n2 = (int)(arrayOfFloat[1] / this.zoom);
             Emulator.getEventQueue().mouseDown(n, n2);
             if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getScreen()) {
-                this.aClass67_973.method474(n, n2);
+                this.caret.method474(n, n2);
             }
         }
     }
@@ -1551,6 +1619,8 @@ MouseTrackListener
             		mr(42);
             	else if(Settings.fpsGame == 0)
              		mr(Keyboard.soft2());
+            	else if(Settings.fpsGame == 3)
+             		mr(Keyboard.soft1());
             	return;
             }
 
@@ -1568,7 +1638,11 @@ MouseTrackListener
             		mr(Keyboard.getArrowKeyFromDevice(8));
             	return;
             }
-            Emulator.getEventQueue().mouseUp((int)(mouseEvent.x / this.zoom), (int)(mouseEvent.y / this.zoom));
+            float[] arrayOfFloat;
+            (arrayOfFloat = new float[2])[0] = mouseEvent.x;
+            arrayOfFloat[1] = mouseEvent.y;
+            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
+            Emulator.getEventQueue().mouseUp((int)(arrayOfFloat[0] / this.zoom), (int)(arrayOfFloat[1] / this.zoom));
         }
     }
     
@@ -1622,11 +1696,14 @@ MouseTrackListener
                 ((Control)this.canvas).redraw();
             }
             this.updateInfos(mouseEvent.x, mouseEvent.y);
-            return;
+            //return;
         }
         if (this.pauseState == 0) {
             return;
         }
+        final int xoff = 1;
+        final int yoff = 1;
+        final boolean d = true;
         if(Settings.fpsMode) {
         	if(!mset) {
         	    Color white = display.getSystemColor(SWT.COLOR_WHITE);
@@ -1638,9 +1715,10 @@ MouseTrackListener
                 this.canvas.getShell().setCursor(cursor);
                 mset = true;
         	}
-        	Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
+        	Point center = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
         	int dx = mouseEvent.x - canvas.getSize().x / 2;
-        	if(canvas.toControl(display.getCursorLocation()).x == canvas.getSize().x / 2) {
+        	int dy = mouseEvent.y - (canvas.getSize().y / 2 - 1);
+        	if(canvas.toControl(display.getCursorLocation()).x == canvas.getSize().x / 2 && d) {
         		if(fpsWasRight) {
                 	mr(-4);
                 	fpsWasRight = false;
@@ -1650,10 +1728,18 @@ MouseTrackListener
                 	mr(-3);
                 	fpsWasLeft = false;
         		}
+        		if(fpsWasUp) {
+                	mr('3');
+                	fpsWasUp = false;
+        		}
+        		if(fpsWasBottom) {
+                	mr('1');
+                	fpsWasBottom = false;
+        		}
         		return;
         	}
-        	display.setCursorLocation(pt);
-        	if(dx > 1) {
+        	display.setCursorLocation(center);
+        	if(dx > xoff) {
         		// right
         		if(fpsWasLeft) {
                 	mr(-3);
@@ -1662,7 +1748,7 @@ MouseTrackListener
         		if(!fpsWasRight) mp(-4);
         		else mrp(-4);
         		fpsWasRight = true;
-        	} else if(dx < -1) {
+        	} else if(dx < -xoff) {
         		// left
         		if(fpsWasRight) {
                 	mr(-4);
@@ -1671,7 +1757,8 @@ MouseTrackListener
         		if(!fpsWasLeft) mp(-3);
         		else mrp(-3);
         		fpsWasLeft = true;
-        	} else if(Math.abs(dx) == 1 && !fpsWasnt) {
+        	} else if(dx == 0) {
+        		fpsWasntHor = true;
         		if(fpsWasRight) {
                 	mr(-4);
                 	fpsWasRight = false;
@@ -1681,8 +1768,7 @@ MouseTrackListener
                 	mr(-3);
                 	fpsWasLeft = false;
         		}
-        	}else if(dx == 0) {
-        		fpsWasnt = true;
+        	} else if(Math.abs(dx) <= xoff && !fpsWasntHor) {
         		if(fpsWasRight) {
                 	mr(-4);
                 	fpsWasRight = false;
@@ -1692,21 +1778,65 @@ MouseTrackListener
                 	mr(-3);
                 	fpsWasLeft = false;
         		}
-        		return;
         	}
-        	fpsWasnt = false;
-        	lastMouseMoveX = mouseEvent.x;
+        	if(dx != 0) fpsWasntHor = false;
+        	if(Settings.fpsGame == 3) {
+        		if(dy > yoff) {
+        			// bottom
+            		if(fpsWasUp) {
+                    	mr('3');
+                    	fpsWasUp = false;
+            		}
+            		if(!fpsWasBottom) mp('1');
+            		else mrp('1');
+            		fpsWasBottom = true;
+        		} else if(dy < -yoff) {
+        			// up
+            		if(fpsWasBottom) {
+                    	mr('1');
+                    	fpsWasBottom = false;
+            		}
+            		if(!fpsWasUp) mp('3');
+            		else mrp('3');
+            		fpsWasUp = true;
+        		} else if(dy == 0) {
+            		fpsWasntVer = true;
+            		if(fpsWasBottom) {
+                    	mr('1');
+                    	fpsWasBottom = false;
+            		}
+
+            		if(fpsWasUp) {
+                    	mr('3');
+                    	fpsWasUp = false;
+            		}
+        		} else if(Math.abs(dy) <= yoff && !fpsWasntVer) {
+            		if(fpsWasBottom) {
+                    	mr('1');
+                    	fpsWasBottom = false;
+            		}
+
+            		if(fpsWasUp) {
+                    	mr('3');
+                    	fpsWasUp = false;
+            		}
+            	} 
+            	if(dy != 0) fpsWasntVer = false;
+        	}
+        	lastMouseMoveX = dx;
         	//if(canvas.getSize().x / 2 != mouseEvent.x) ignoreNextFps = true;
         	return;
-        } else {
-        	if(mset) {
-        	    Cursor cursor = new Cursor(display, SWT.CURSOR_ARROW);
-                this.canvas.getShell().setCursor(cursor);
-                mset = false;
-        	}
+        } else if(mset) {
+	Cursor cursor = new Cursor(display, SWT.CURSOR_ARROW);
+	this.canvas.getShell().setCursor(cursor);
+	mset = false;
         }
         if ((mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
-            Emulator.getEventQueue().mouseDrag((int)(mouseEvent.x / this.zoom), (int)(mouseEvent.y / this.zoom));
+            float[] arrayOfFloat;
+            (arrayOfFloat = new float[2])[0] = mouseEvent.x;
+            arrayOfFloat[1] = mouseEvent.y;
+            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
+            Emulator.getEventQueue().mouseDrag((int)(arrayOfFloat[0] / this.zoom), (int)(arrayOfFloat[1] / this.zoom));
         }
     }
     
@@ -1780,7 +1910,7 @@ MouseTrackListener
     }
     
     public final ICaret getCaret() {
-        return this.aClass67_973;
+        return this.caret;
     }
     
     static Shell method561(final EmulatorScreen class93) {

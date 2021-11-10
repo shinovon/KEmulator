@@ -75,6 +75,8 @@ public class CustomMethod
     	} else if(prop.equals("com.nokia.mid.imei") || prop.equals("com.nokia.imei")) {
     		b = false;
     		res = Emulator.askIMEI();
+    	} else if(prop.equals("user.country")) {
+    		res = "RU";
     	}
     	if(b)
             Emulator.getEmulator().getLogStream().println("System.getProperty#" + prop + "=" + res);

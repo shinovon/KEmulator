@@ -36,22 +36,33 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         }
         catch (Exception ex) {}
     }
-    
-    public final void print(final String s) {
+
+	public void print1(String s) {
         this.aPrintStream569.print(s);
         if (this.aBoolean573) {
             this.method326(s);
         }
-    }
-    
-    public final void println(final String s) {
+	}
+
+	public void println1(String s) {
         this.aPrintStream569.println(s);
         if (this.aBoolean573) {
             this.method326(s + "\n");
         }
+	}
+    
+    public final void print(final String s) {
+        aClass159_570.orig.print(s);
+        print1(s);
+    }
+    
+    public final void println(final String s) {
+        aClass159_570.orig.println(s);
+        println1(s);
     }
     
     public final void println() {
+        aClass159_570.orig.println();
         this.aPrintStream569.println();
         if (this.aBoolean573) {
             this.method326("\n");
@@ -190,44 +201,44 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     
     private final class LogStream extends PrintStream
     {
-        PrintStream aPrintStream1401;
+        PrintStream orig;
         private final Class11 aClass11_1402;
         
         LogStream(final Class11 aClass11_1402) {
             super(System.out, true);
             this.aClass11_1402 = aClass11_1402;
-            this.aPrintStream1401 = System.out;
+            this.orig = System.out;
             System.setOut(this);
             System.setErr(this);
         }
         
         public final void print(final String s) {
-            this.aClass11_1402.aClass11_571.print(">>" + s);
-            this.aPrintStream1401.print(s);
+            this.aClass11_1402.aClass11_571.print1(">>" + s);
+            this.orig.print(s);
         }
         
         public final void println(final String s) {
-            this.aClass11_1402.aClass11_571.println(">>" + s);
-            this.aPrintStream1401.println(s);
+            this.aClass11_1402.aClass11_571.println1(">>" + s);
+            this.orig.println(s);
         }
         
         public final void print(final Object o) {
-            this.aClass11_1402.aClass11_571.print(">>" + o);
-            this.aPrintStream1401.print(o);
+            this.aClass11_1402.aClass11_571.print1(">>" + o);
+            this.orig.print(o);
         }
         
         public final void println(final Object o) {
-            this.aClass11_1402.aClass11_571.println(">>" + o);
-            this.aPrintStream1401.println(o);
+            this.aClass11_1402.aClass11_571.println1(">>" + o);
+            this.orig.println(o);
         }
         
         public final void println() {
-            this.aClass11_1402.aClass11_571.println(">>");
-            this.aPrintStream1401.println();
+            this.aClass11_1402.aClass11_571.println1(">>");
+            this.orig.println();
         }
         
         public final void method831(final String s) {
-            this.aPrintStream1401.println(s);
+            this.orig.println(s);
         }
     }
 }

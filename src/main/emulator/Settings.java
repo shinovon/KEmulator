@@ -58,8 +58,10 @@ public final class Settings
 	public static boolean awtAntiAliasing;
 	public static boolean fpsMode;
 	public static boolean textAntiAliasing = true;
-	// 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS
+	// 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS, 3 - QUANTUM
 	public static int fpsGame;
+	public static boolean playerBufferAll = false;
+	public static String vlcDir = "";
     
     public Settings() {
         super();

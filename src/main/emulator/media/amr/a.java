@@ -4,7 +4,7 @@ import java.io.*;
 
 public final class a
 {
-    public static boolean aBoolean;
+    public static boolean aBoolean = true;
     public static final int[] arrayint;
     
     public a() {
@@ -499,7 +499,7 @@ public final class a
         }
         catch (Exception localException2)
         {
-          throw new Exception("Cannot parse this type of AMR");
+          throw new Exception("Cannot parse this type of AMR", localException2);
         }
         return arrayOfByte1;
       }

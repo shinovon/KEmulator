@@ -151,7 +151,12 @@ public final class Emulator3D implements IGraphics3D
         this.method192();
         this.anObject385 = null;
         if (Emulator3D.aPbuffer390 != null) {
-            Emulator3D.aPbuffer390.release();
+            try {
+				Emulator3D.aPbuffer390.releaseContext();
+			} catch (LWJGLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             return;
         }
         this.method194();
@@ -350,7 +355,7 @@ public final class Emulator3D implements IGraphics3D
         GL11.glDepthMask(true);
         GL11.glColorMask(true, true, true, true);
         final int n;
-        GL11.glClearColor(emulator.graphics3D.c.method817(n = ((background == null || Settings.xrayView) ? 0 : background.getColor()), 16), emulator.graphics3D.c.method817(n, 8), emulator.graphics3D.c.method817(n, 0), emulator.graphics3D.c.method817(n, 24));
+        GL11.glClearColor(emulator.graphics3D.G3DUtils.method817(n = ((background == null || Settings.xrayView) ? 0 : background.getColor()), 16), emulator.graphics3D.G3DUtils.method817(n, 8), emulator.graphics3D.G3DUtils.method817(n, 0), emulator.graphics3D.G3DUtils.method817(n, 24));
         if (background != null && !Settings.xrayView) {
             GL11.glClear((background.isColorClearEnabled() ? 16384 : 0) | ((this.aBoolean382 && background.isDepthClearEnabled()) ? 256 : 0));
             this.method193(background);

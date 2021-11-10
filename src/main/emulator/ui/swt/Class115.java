@@ -4,16 +4,16 @@ import emulator.*;
 
 final class Class115 implements Runnable
 {
-    private final Class67 aClass67_1166;
+    private final CaretImpl aClass67_1166;
     
-    Class115(final Class67 aClass67_1166) {
+    Class115(final CaretImpl aClass67_1166) {
         super();
         this.aClass67_1166 = aClass67_1166;
     }
     
     public final void run() {
-        Class67.method472(this.aClass67_1166).setVisible(false);
+        CaretImpl.caret(this.aClass67_1166).setVisible(false);
         if(!Settings.canvasKeyboard)
-        	((EmulatorScreen)Emulator.getEmulator().getScreen()).method570(true);
+        	((EmulatorScreen)Emulator.getEmulator().getScreen()).toggleMenuAccelerators(true);
     }
 }
