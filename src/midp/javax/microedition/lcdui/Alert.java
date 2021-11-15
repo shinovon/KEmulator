@@ -75,7 +75,7 @@ public class Alert extends Screen {
 	}
 
 	public void setIndicator(final Gauge gauge) {
-		if (gauge.isInteractive())
+		if (gauge != null && gauge.isInteractive())
 			throw new IllegalArgumentException();
 		this.gauge = gauge;
 	}

@@ -45,6 +45,9 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$nnmod v2.12 [2021.11.15]
+Alert setIndicator NullPointer fix
+
 $nnmod v2.11.1 [2021.10.31]
 Removed inactivity timer
 

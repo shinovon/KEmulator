@@ -32,6 +32,12 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes
                     super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getProperty", sign);
                     return;
                 }
+                if (name.equals("exit")) {
+                    if (sign.equals("(I)V")) {
+	                    super.visitMethodInsn(184, "emulator/custom/CustomMethod", "exit", sign);
+	                    return;
+                    }
+                }
             }
             else if (cls.equals("java/util/Random") && (Settings.recordKeys || Settings.q)) {
                 if (name.equals("<init>")) {

@@ -1,6 +1,7 @@
 package javax.microedition.midlet;
 
 import emulator.*;
+import emulator.custom.CustomMethod;
 
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
@@ -29,6 +30,7 @@ public abstract class MIDlet
         Emulator.getEmulator().getLogStream().println("Notify Destroyed");
         Emulator.notifyDestroyed();
         Emulator.getEmulator().getLogStream().println("Exiting Emulator");
+    	CustomMethod.close();
         System.exit(0);
     }
     

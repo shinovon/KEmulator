@@ -7,6 +7,7 @@ import emulator.media.*;
 import emulator.graphics2D.*;
 import emulator.debug.*;
 import emulator.*;
+import emulator.custom.CustomMethod;
 
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.*;
@@ -248,6 +249,7 @@ MouseTrackListener
     	catch (Exception e)
     	{
     		e.printStackTrace();
+        	CustomMethod.close();
     		System.exit(-1);
     	}
         this.pauseState = 0;
@@ -516,6 +518,11 @@ MouseTrackListener
         layout.verticalSpacing = 0;
         layout.makeColumnsEqualWidth = false;
         ((Decorations)(this.shell = new Shell(224))).setText(Emulator.getTitleVersionString());
+        shell.addListener(SWT.Close, new Listener() {
+            public void handleEvent(Event event) {
+            	CustomMethod.close();
+            }
+          });
         ((Composite)this.shell).setLayout((Layout)layout);
         this.method588();
         (this.aCLabel970 = new CLabel((Composite)this.shell, 0)).setText("\t");

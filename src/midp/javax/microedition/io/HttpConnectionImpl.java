@@ -205,7 +205,7 @@ final class HttpConnectionImpl implements HttpConnection {
 							Emulator.customUA);
 				} else {
 					connection.setRequestProperty("User-Agent", 
-							Emulator.deviceName +" (KEmulator/1.0.3; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
+							Emulator.deviceName + " (KEmulator/" + Emulator.titleVersion + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
 				}
 			}
 		} catch (Exception e) {

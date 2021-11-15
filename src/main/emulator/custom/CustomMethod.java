@@ -2,6 +2,8 @@ package emulator.custom;
 
 import java.util.*;
 
+import javax.microedition.media.Manager;
+
 import com.nokia.mj.impl.utils.DebugUtils;
 
 import emulator.debug.*;
@@ -16,7 +18,10 @@ public class CustomMethod
     private static long aLong17;
     private static Hashtable aHashtable14;
     private static Thread aThread15;
-    static StringBuffer aStringBuffer16;
+    //static StringBuffer aStringBuffer16;
+	static String trackStr;
+	private static BufferedWriter trackWriter;
+	private static FileWriter fw;
     
     public CustomMethod() {
         super();
@@ -71,12 +76,12 @@ public class CustomMethod
         	}
     	} else if(prop.equalsIgnoreCase("kemulator.threadtrace")) {
     		b = false;
-    		res = DebugUtils.getStackTrace(new Exception("Trace")).replace('\t', '\0').replace('\r', '\0');
+    		res = DebugUtils.getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
     	} else if(prop.equals("com.nokia.mid.imei") || prop.equals("com.nokia.imei")) {
     		b = false;
     		res = Emulator.askIMEI();
-    	} else if(prop.equals("user.country")) {
-    		res = "RU";
+    	} else if(prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
+    		res = "" + Manager.isLibVlcSupported();
     	}
     	if(b)
             Emulator.getEmulator().getLogStream().println("System.getProperty#" + prop + "=" + res);
@@ -107,6 +112,13 @@ public class CustomMethod
     public static void showTrackInfo(final String s) {
         if (Settings.threadMethodTrack) {
             System.out.print(s);
+    		if(trackWriter != null) {
+    			try {
+					trackWriter.append(s);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+    		}
         }
     }
     
@@ -115,9 +127,8 @@ public class CustomMethod
         int n;
         if (CustomMethod.aThread15 != null && CustomMethod.aThread15 != currentThread) {
             n = 0;
-            CustomMethod.aStringBuffer16.setLength(0);
-            CustomMethod.aStringBuffer16.append("=====" + currentThread.toString() + "=====\n");
-            showTrackInfo(CustomMethod.aStringBuffer16.toString());
+            trackStr = "=====" + currentThread.toString() + "=====\n";
+            showTrackInfo(trackStr);
         }
         else {
             final Integer value;
@@ -146,13 +157,12 @@ public class CustomMethod
             final int method16 = method16();
             final h.MethodInfo methodInfo2 = methodInfo;
             ++methodInfo2.anInt1182;
-            CustomMethod.aStringBuffer16.setLength(0);
+            trackStr = "";
             for (int i = 0; i < method16; ++i) {
-                CustomMethod.aStringBuffer16.append("  ");
+            	trackStr += ("  ");
             }
-            CustomMethod.aStringBuffer16.append(s);
-            CustomMethod.aStringBuffer16.append("\n");
-            showTrackInfo(CustomMethod.aStringBuffer16.toString());
+            trackStr += s + "\n";
+            showTrackInfo(trackStr);
             methodInfo.aLong1174 = System.currentTimeMillis();
         }
     }
@@ -169,8 +179,29 @@ public class CustomMethod
         }
     }
     
+    public static void exit(int i) {
+    	close();
+    	System.exit(i);
+    }
+    
+    public static void close() {
+		if(trackWriter != null)
+    	try {
+			trackWriter.close();
+			trackWriter = null;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
     static {
         CustomMethod.aHashtable14 = new Hashtable();
-        CustomMethod.aStringBuffer16 = new StringBuffer();
+		try {
+			fw = new FileWriter(Emulator.getAbsolutePath() + "/track.txt", false);
+			trackWriter = new BufferedWriter(fw);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        trackStr = "";
     }
 }

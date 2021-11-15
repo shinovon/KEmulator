@@ -50,6 +50,7 @@ import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
 import emulator.custom.CustomClassLoader;
+import emulator.custom.CustomMethod;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
@@ -624,6 +625,7 @@ public class Emulator
                         String[] arr = midletKeys.toArray(new String[0]);
                         String c = (String) JOptionPane.showInputDialog(null, "Choose MIDlet to run", "KEmulator", JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
                         if(c == null) {
+                        	CustomMethod.close();
                         	System.exit(0);
                         	return false;
                         }
@@ -1221,6 +1223,7 @@ public class Emulator
         	ex.printStackTrace();
             AntiCrack(ex);
         }
+    	CustomMethod.close();
         System.exit(0);
     }
     

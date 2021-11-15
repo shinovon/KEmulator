@@ -1,6 +1,7 @@
 package com.nokia.mid.impl.isa.ui;
 
 import emulator.Emulator;
+import emulator.custom.CustomMethod;
 
 import java.util.Timer;
 import java.util.Vector;
@@ -34,6 +35,7 @@ final class MIDletManager implements MIDletAccess {
 	}
 
 	public final void exit() {
+    	CustomMethod.close();
 		System.exit(0);
 	}
 
