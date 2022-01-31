@@ -45,8 +45,8 @@ log.txt      log file
 
 ==================
 $[News & Log]
-$nnmod v2.12.1 [2022.01.31]
-Fixed keyboard release events
+$nnmod v2.12.2 [2022.01.31]
+Fixed keyboard input events
 Fixed keys cache
 
 $nnmod v2.12.1 [2022.01.30]
