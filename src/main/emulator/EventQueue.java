@@ -500,8 +500,8 @@ public final class EventQueue implements Runnable {
 		}
 		
 		private void append(Object o) {
-			if(writeIdx >= inputTasks.length) writeIdx = 0;
 			inputTasks[writeIdx++] = o;
+			if(writeIdx >= inputTasks.length) writeIdx = 0;
 			synchronized(inputLock) {
 				inputLock.notify();
 			}

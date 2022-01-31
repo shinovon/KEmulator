@@ -337,8 +337,9 @@ public class Displayable {
 
 		lastFrameTime = System.currentTimeMillis();
 		++framesCount;
-		if (lastFrameTime - lastFpsUpdateTime > 2000L) {
-			Profiler.FPS = (int) ((long) (framesCount * 1000 + 500) / (lastFrameTime - lastFpsUpdateTime));
+		long l = lastFrameTime - lastFpsUpdateTime;
+		if (l > 2000L) {
+			Profiler.FPS = (int) ((long) (framesCount * 1000 + 500) / l);
 			lastFpsUpdateTime = lastFrameTime;
 			framesCount = 0;
 		}
