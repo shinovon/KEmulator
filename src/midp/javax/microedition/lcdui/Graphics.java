@@ -12,7 +12,7 @@ public class Graphics
     IImage copyimage;
     IGraphics2D xrayGraphics;
     IImage xrayImage;
-    static Vector aVector518;
+    static Vector xrayCache;
     int tx;
     int ty;
     Font font;
@@ -49,6 +49,11 @@ public class Graphics
         //this.copyimage = Emulator.getEmulator().newImage(this.image.getWidth(), this.image.getHeight(), false);
         this.setFont(Font.getDefaultFont());
 	}
+    
+    void dispose() {
+    	image = null;
+    	egraphics = null;
+    }
 
 	public IGraphics2D getImpl() {
         if (Settings.xrayView) {
@@ -374,22 +379,22 @@ public class Graphics
     }
     
     private void method293() {
-        if (!Graphics.aVector518.contains(this.xrayImage)) {
-            Graphics.aVector518.add(this.xrayImage);
+        if (!Graphics.xrayCache.contains(this.xrayImage)) {
+            Graphics.xrayCache.add(this.xrayImage);
         }
     }
     
     protected static void resetXRayCache() {
-        for (int i = Graphics.aVector518.size() - 1; i >= 0; --i) {
+        for (int i = Graphics.xrayCache.size() - 1; i >= 0; --i) {
             final IImage image;
             final IGraphics2D graphics;
-            (graphics = (image = (IImage)Graphics.aVector518.get(i)).getGraphics()).setColor(0, false);
+            (graphics = (image = (IImage)Graphics.xrayCache.get(i)).getGraphics()).setColor(0, false);
             graphics.setAlpha(255);
             graphics.setClip(0, 0, image.getWidth(), image.getHeight());
             graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
             graphics.setAlpha(60);
         }
-        Graphics.aVector518.clear();
+        Graphics.xrayCache.clear();
     }
     
     public int getClipHeight() {
@@ -501,6 +506,6 @@ public class Graphics
     }
     
     static {
-        Graphics.aVector518 = new Vector();
+        Graphics.xrayCache = new Vector();
     }
 }

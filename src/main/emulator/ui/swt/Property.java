@@ -695,7 +695,7 @@ public final class Property implements IProperty
         Devices.method619();
         Keyboard.init();
         if (Settings.enableKeyCache != this.aButton696.getSelection()) {
-            Keyboard.aStack1063.clear();
+            Keyboard.keyCacheStack.clear();
             Settings.enableKeyCache = this.aButton696.getSelection();
         }
         if (Settings.enableVibration != this.aButton724.getSelection() && !(Settings.enableVibration = this.aButton724.getSelection())) {
@@ -1541,6 +1541,7 @@ public final class Property implements IProperty
         this.aCombo689.addModifyListener((ModifyListener)new Class191(this));
         final FontData[] fontList = ((Device)Property.aDisplay656).getFontList((String)null, true);
         final ArrayList<Comparable> list = new ArrayList<Comparable>();
+        list.add("Nokia");
         for (int i = 0; i < fontList.length; ++i) {
             if (!list.contains(fontList[i].getName()) && !fontList[i].getName().startsWith("@")) {
                 list.add(fontList[i].getName());

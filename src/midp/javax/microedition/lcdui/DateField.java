@@ -41,4 +41,16 @@ public class DateField extends Item
     protected void paint(final Graphics graphics) {
         super.paint(graphics);
     }
+
+    protected int getItemWidth() {
+		return 0;
+	}
+
+	protected boolean allowNextItemPlaceSameRow() {
+		return false;
+	}
+
+	protected boolean isFullWidthItem() {
+		return true;
+	}
 }

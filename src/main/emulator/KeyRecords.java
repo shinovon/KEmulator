@@ -14,8 +14,8 @@ public final class KeyRecords
     
     public KeyRecords() {
         super();
-        if (Settings.q) {
-            this.aString1156 = Settings.bString;
+        if (Settings.playingRecordedKeys) {
+            this.aString1156 = Settings.recordedKeysFile;
             try {
                 (this.aBufferedReader1158 = new BufferedReader(new FileReader(this.aString1156))).readLine();
                 Settings.recordedRandomSeed = Long.parseLong(this.aBufferedReader1158.readLine());
@@ -24,7 +24,7 @@ public final class KeyRecords
             }
             catch (Exception ex) {
                 Emulator.getEmulator().getLogStream().println("4 "+ ex.toString());
-                Settings.q = false;
+                Settings.playingRecordedKeys = false;
                 return;
             }
         }
@@ -45,7 +45,7 @@ public final class KeyRecords
         }
     }
     
-    public final void method697(final String s) {
+    public final void print(final String s) {
         if (this.aPrintStream1157 == null) {
             return;
         }
@@ -53,7 +53,7 @@ public final class KeyRecords
     }
     
     public final String method698(final long n) {
-        if (this.aBufferedReader1158 == null || !Settings.q) {
+        if (this.aBufferedReader1158 == null || !Settings.playingRecordedKeys) {
             return null;
         }
         String s = null;
@@ -61,7 +61,7 @@ public final class KeyRecords
             try {
                 final String line;
                 if ((line = this.aBufferedReader1158.readLine()) == null) {
-                    Settings.q = false;
+                    Settings.playingRecordedKeys = false;
                 }
                 else {
                     final String[] split;
@@ -95,7 +95,7 @@ public final class KeyRecords
                 }
                 return;
             }
-            Settings.q = false;
+            Settings.playingRecordedKeys = false;
         }
         catch (IOException ex) {}
     }

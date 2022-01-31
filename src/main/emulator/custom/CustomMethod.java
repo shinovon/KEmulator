@@ -45,7 +45,7 @@ public class CustomMethod
     	} else if(prop.equalsIgnoreCase("console.encoding")) {
     		res = System.getProperty("file.encoding");
     	} else if(prop.equalsIgnoreCase("user.language")) {
-    		res = "ru";
+    		//res = "en";
     	} else if(prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
     		if(!Settings.networkNotAvailable)
     			res = "available";
@@ -54,7 +54,7 @@ public class CustomMethod
     	} else if(prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {
     		res = "50";
     	} else if(prop.equalsIgnoreCase("user.region")) {
-    		res = "RU";
+    		//res = "US";
     	} else if(prop.equalsIgnoreCase("os.name")) {
     		if(System.getProperty("microedition.platform").indexOf("S60") > -1)
     			res = "Symbian";
@@ -77,7 +77,7 @@ public class CustomMethod
     	} else if(prop.equalsIgnoreCase("kemulator.threadtrace")) {
     		b = false;
     		res = DebugUtils.getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
-    	} else if(prop.equals("com.nokia.mid.imei") || prop.equals("com.nokia.imei")) {
+    	} else if(prop.equalsIgnoreCase("com.nokia.mid.imei") || prop.equalsIgnoreCase("com.nokia.imei") || prop.equalsIgnoreCase("device.imei")) {
     		b = false;
     		res = Emulator.askIMEI();
     	} else if(prop.equalsIgnoreCase("kemulator.libvlc.supported")) {

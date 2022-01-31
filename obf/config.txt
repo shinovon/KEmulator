@@ -29,6 +29,7 @@
 -keep public class com.nokia.mid.ui.* { public protected *; }
 -keep public class com.nokia.mid.ui.utils.* { public protected *; }
 -keep public class com.nokia.mj.impl.utils.* { public protected *; }
+-keep public class com.nokia.microedition.media.* { public protected *; }
 
 -keep public class com.samsung.util.* { public protected *; }
 
@@ -67,7 +68,7 @@
 
 -keep class org.lwjgl.opengl.* { *; }
 
--keep,allowshrinking public class uk.co.caprica.vlcj.** { *; }
+-keep public class uk.co.caprica.vlcj.** { *; }
 
 -keep class org.bridj.** { *; }
 

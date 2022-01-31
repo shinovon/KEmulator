@@ -13,7 +13,7 @@ final class Class45 extends SelectionAdapter
     }
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        Settings.bString = null;
+        Settings.recordedKeysFile = null;
         Emulator.loadGame(Settings.aArray[this.anInt782], Settings.g2d, Settings.g3d, false);
     }
 }

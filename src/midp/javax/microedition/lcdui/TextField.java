@@ -121,10 +121,10 @@ public class TextField extends Item
         }
         int n = super.bounds[1];
         int n2 = super.bounds[1];
-        if (super.aStringArray175 != null && super.aStringArray175.length > 0) {
+        if (super.labelArr != null && super.labelArr.length > 0) {
             graphics.setFont(Item.font);
-            for (int i = 0; i < super.aStringArray175.length; ++i) {
-                graphics.drawString(super.aStringArray175[i], super.bounds[0] + 4, n + 2, 0);
+            for (int i = 0; i < super.labelArr.length; ++i) {
+                graphics.drawString(super.labelArr[i], super.bounds[0] + 4, n + 2, 0);
                 n += Item.font.getHeight() + 4;
             }
             n2 = n - 2;
@@ -153,14 +153,26 @@ public class TextField extends Item
         int n = 4;
         final int n2 = this.getPreferredWidth() - 8;
         if (super.label != null) {
-            super.aStringArray175 = c.textArr(super.label, Item.font, n2, n2);
-            n = 4 + (Item.font.getHeight() + 4) * super.aStringArray175.length;
+            super.labelArr = c.textArr(super.label, Item.font, n2, n2);
+            n = 4 + (Item.font.getHeight() + 4) * super.labelArr.length;
         }
         else {
-            super.aStringArray175 = null;
+            super.labelArr = null;
         }
         final Font aFont173 = Screen.font;
         this.aStringArray359 = c.textArr((this.aString25 == null) ? "" : this.aString25, aFont173, n2, n2);
         super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.aStringArray359.length, super.screen.bounds[3]);
     }
+
+    protected int getItemWidth() {
+		return getPreferredWidth();
+	}
+
+	protected boolean allowNextItemPlaceSameRow() {
+		return false;
+	}
+
+	protected boolean isFullWidthItem() {
+		return true;
+	}
 }

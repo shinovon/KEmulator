@@ -3,6 +3,7 @@ package emulator.graphics2D.awt;
 import emulator.graphics2D.*;
 import java.awt.*;
 import java.awt.image.*;
+import java.io.IOException;
 
 /**
  * FontAWT
@@ -13,10 +14,20 @@ public final class a implements IFont
     private Font emoji;
     private FontMetrics metrics;
 	private FontMetrics emojimetrics;
+	private static Font nokiaFont;
     
     public a(final String s, final int n, final int n2) {
         super();
-        this.font = new Font(s, n2, n);
+        if(s.equals("Nokia")) {
+        	if(nokiaFont == null) {
+        		try {
+					nokiaFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/res/Nokia.ttf"));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+        	}
+        	this.font = nokiaFont.deriveFont(n2, n);
+        } else this.font = new Font(s, n2, n);
         this.emoji = new Font("Segoe UI Emoji", n2, n);
         this.metrics = new BufferedImage(1, 1, 1).getGraphics().getFontMetrics(this.font);
         this.emojimetrics = new BufferedImage(1, 1, 1).getGraphics().getFontMetrics(this.emoji);

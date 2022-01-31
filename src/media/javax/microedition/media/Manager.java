@@ -9,7 +9,9 @@ import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
 import uk.co.caprica.vlcj.factory.discovery.strategy.BaseNativeDiscoveryStrategy;
+import uk.co.caprica.vlcj.factory.discovery.strategy.LinuxNativeDiscoveryStrategy;
 import uk.co.caprica.vlcj.factory.discovery.strategy.NativeDiscoveryStrategy;
+import uk.co.caprica.vlcj.factory.discovery.strategy.OsxNativeDiscoveryStrategy;
 import uk.co.caprica.vlcj.factory.discovery.strategy.WindowsNativeDiscoveryStrategy;
 
 import java.io.*;
@@ -432,13 +434,30 @@ public class Manager
 	}
 	
 	public static boolean isLibVlcSupported() {
-		if(libVlcState != 0) {
-			return libVlcState == 1;
+		while(libVlcState == 0) {
+			Thread.yield();
 		}
+		return libVlcState == 1;
+	}
+
+	public static void checkLibVlcSupport() {
+		/*
+		if(Settings.vlcDir == null) {
+			try {
+				File f = new File("./libvlc.dll");
+				if(!f.exists()) {
+					log("Vlc path not set");
+					libVlcState = -1;
+					return;
+				}
+			} catch (Exception e) {
+			}
+		}
+		*/
 		try {
 			List<NativeDiscoveryStrategy> list = new ArrayList<NativeDiscoveryStrategy>();
 			if(Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
-				NativeDiscoveryStrategy nds = new BaseNativeDiscoveryStrategy(new String[] {
+				NativeDiscoveryStrategy win = new BaseNativeDiscoveryStrategy(new String[] {
 			        "libvlc\\.dll",
 			        "libvlccore\\.dll"
 			    }, new String[] {
@@ -449,7 +468,7 @@ public class Manager
 					@Override
 					public boolean supported() {
 						// kemulator is windows only
-						return true;
+						return Emulator._X64_VERSION ? RuntimeUtil.isWindows() : true;
 					}
 					
 					@Override
@@ -469,23 +488,27 @@ public class Manager
 					}
 					
 				};
-				list.add(nds);
+				list.add(win);
 			}
 			list.add(new WindowsNativeDiscoveryStrategy());
+			if(Emulator._X64_VERSION) {
+				list.add(new OsxNativeDiscoveryStrategy());
+				list.add(new LinuxNativeDiscoveryStrategy());
+			}
 			NativeDiscovery nd = new NativeDiscovery(list.toArray(new NativeDiscoveryStrategy[0]));
 			boolean b = nd.discover();
 			if(b) libVlcState = 1;
 			else libVlcState = -1;
 			if(b) {
-				log("LibVlc loaded!");
-				return true;
+				log("LibVlc loaded");
+				return;
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		log("LibVlc not loaded!");
+		log("LibVlc not loaded");
 		libVlcState = -1;
-		return false;
+		return;
 	}
 
     public static void playTone(final int n, final int n2, final int n3) throws MediaException {

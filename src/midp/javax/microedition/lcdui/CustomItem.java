@@ -14,15 +14,13 @@ public abstract class CustomItem extends Item
     protected static final int POINTER_RELEASE = 64;
     protected static final int POINTER_DRAG = 128;
     protected static final int NONE = 0;
-    private Image anImage427;
-    private Graphics aGraphics428;
+    private Image img;
+    private Graphics g;
     int[] anIntArray429;
     
     protected CustomItem(final String s) {
         super(s);
         this.anIntArray429 = new int[4];
-        this.anImage427 = Image.createImage(Emulator.getEmulator().getScreen().getWidth(), Emulator.getEmulator().getScreen().getHeight());
-        this.aGraphics428 = this.anImage427.getGraphics();
     }
     
     public int getGameAction(final int n) {
@@ -130,25 +128,37 @@ public abstract class CustomItem extends Item
     protected void hideNotify() {
     }
     
+    void updateHidden() {
+    	if(img == null) return;
+    	g.dispose();
+    	g = null;
+    	img.dispose();
+    	img = null;
+    }
+    
     protected void paint(final Graphics graphics) {
-        this.aGraphics428.setColor(-1);
-        this.aGraphics428.fillRect(0, 0, super.screen.w, super.screen.h);
-        this.aGraphics428.setColor(0);
+    	if(img == null) {
+            img = Image.createImage(Emulator.getEmulator().getScreen().getWidth(), Emulator.getEmulator().getScreen().getHeight());
+            g = this.img.getGraphics();
+    	}
+        this.g.setColor(-1);
+        this.g.fillRect(0, 0, super.screen.w, super.screen.h);
+        this.g.setColor(0);
         final int n = super.bounds[0] + 2;
         int n2 = super.bounds[1] + 2;
         final int prefContentWidth = this.getPrefContentWidth(super.bounds[2]);
         final int prefContentHeight = this.getPrefContentHeight(super.bounds[3]);
-        this.paint(this.aGraphics428, prefContentWidth, prefContentHeight);
+        this.paint(this.g, prefContentWidth, prefContentHeight);
         super.paint(graphics);
-        if (super.aStringArray175 != null && super.aStringArray175.length > 0) {
+        if (super.labelArr != null && super.labelArr.length > 0) {
             graphics.setFont(Item.font);
-            for (int i = 0; i < super.aStringArray175.length; ++i) {
-                graphics.drawString(super.aStringArray175[i], super.bounds[0] + 4, n2 + 2, 0);
+            for (int i = 0; i < super.labelArr.length; ++i) {
+                graphics.drawString(super.labelArr[i], super.bounds[0] + 4, n2 + 2, 0);
                 n2 += Item.font.getHeight() + 4;
             }
         }
         graphics.setClip(n, n2, prefContentWidth, prefContentHeight);
-        graphics.drawImage(this.anImage427, n, n2, 0);
+        graphics.drawImage(this.img, n, n2, 0);
         graphics.setClip(0, 0, super.screen.w, super.screen.h);
     }
     
@@ -157,16 +167,18 @@ public abstract class CustomItem extends Item
         int n = 0;
         final int n2 = this.getPreferredWidth() - 8;
         if (super.label != null) {
-            super.aStringArray175 = c.textArr(super.label, Item.font, n2, n2);
-            n = 0 + (Item.font.getHeight() + 4) * super.aStringArray175.length;
+            super.labelArr = c.textArr(super.label, Item.font, n2, n2);
+            n = 0 + (Item.font.getHeight() + 4) * super.labelArr.length;
         }
         else {
-            super.aStringArray175 = null;
+            super.labelArr = null;
         }
         super.bounds[3] = Math.min(n + (this.getPrefContentHeight(super.bounds[3]) + 4), super.screen.bounds[3]);
     }
     
     protected boolean callTraverse(final int n) {
+    	if(screen == null) return false;
+    	if(this.anIntArray429 == null) return false;
         return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
     }
 }

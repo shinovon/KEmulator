@@ -221,18 +221,18 @@ implements Choice {
             this.screen.cmdListener.commandAction(this.aCommand540, (Displayable)this.screen);
         }
         if (this.choiceType == EXCLUSIVE) {
-        	screen.stateChanged(this);
+        	notifyStateChanged();
             this.setSelectedIndex(this.currentPos, true);
             return;
         }
         if (this.choiceType == MULTIPLE) {
-        	screen.stateChanged(this);
+        	notifyStateChanged();
             this.setSelectedIndex(this.currentPos, !this.isSelected(this.currentPos));
             return;
         }
         if (this.choiceType == POPUP) {
             if (this.aBoolean542) {
-            	screen.stateChanged(this);
+            	notifyStateChanged();
                 this.setSelectedIndex(this.currentPos, true);
             }
             this.aBoolean542 = !this.aBoolean542;
@@ -246,11 +246,11 @@ implements Choice {
             graphics.setColor(-16777216);
         }
         int n = this.bounds[1];
-        if (this.aStringArray175 != null && this.aStringArray175.length > 0) {
+        if (this.labelArr != null && this.labelArr.length > 0) {
             graphics.setFont(Item.font);
             int i = 0;
-            while (i < this.aStringArray175.length) {
-                graphics.drawString(this.aStringArray175[i], this.bounds[0] + 4, n + 2, 0);
+            while (i < this.labelArr.length) {
+                graphics.drawString(this.labelArr[i], this.bounds[0] + 4, n + 2, 0);
                 n += Item.font.getHeight() + 4;
                 ++i;
             }
@@ -295,10 +295,10 @@ implements Choice {
         int n = 0;
         if (this.label != null) {
             int n2 = this.getPreferredWidth() - 8;
-            this.aStringArray175 = c.textArr((String)this.label, (Font)Item.font, (int)n2, (int)n2);
-            n = (Item.font.getHeight() + 4) * this.aStringArray175.length;
+            this.labelArr = c.textArr((String)this.label, (Font)Item.font, (int)n2, (int)n2);
+            n = (Item.font.getHeight() + 4) * this.labelArr.length;
         } else {
-            this.aStringArray175 = null;
+            this.labelArr = null;
         }
         switch (this.choiceType) {
         case EXCLUSIVE: 
@@ -389,4 +389,12 @@ implements Choice {
             ++i;
         }
     }
+
+    protected int getItemWidth() {
+		return -1;
+	}
+
+	protected boolean isFullWidthItem() {
+		return true;
+	}
 }

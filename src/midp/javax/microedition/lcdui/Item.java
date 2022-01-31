@@ -30,12 +30,12 @@ public abstract class Item {
 	static final Font font = Font.getFont(0, 1, 8);
 	int[] bounds;
 	boolean inFocus;
-	boolean aBoolean177;
+	boolean shownOnForm;
 	Command aCommand174;
 	public ItemCommandListener itemCommandListener;
 	public Vector itemCommands;
 	String label;
-	String[] aStringArray175;
+	String[] labelArr;
 	Screen screen;
 	int layout;
 	int preferredW = -1;
@@ -68,6 +68,38 @@ public abstract class Item {
 		} else {
 			this.layout = layout;
 		}
+	}
+	
+	protected boolean isLayoutDefault() {
+		return layout == 0;
+	}
+	
+	protected boolean isLayoutAlignDefault() {
+		return !isLayoutLeft() && !isLayoutCenter() && !isLayoutRight();
+	}
+	
+	protected boolean isLayoutLeft() {
+		return (layout & LAYOUT_LEFT) == LAYOUT_LEFT;
+	}
+	
+	protected boolean isLayoutCenter() {
+		return (layout & LAYOUT_CENTER) == LAYOUT_CENTER;
+	}
+	
+	protected boolean isLayoutRight() {
+		return (layout & LAYOUT_RIGHT) == LAYOUT_RIGHT;
+	}
+	
+	protected boolean isLayoutExpand() {
+		return (layout & LAYOUT_EXPAND) == LAYOUT_EXPAND;
+	}
+
+	protected boolean isLayoutNewLineBefore() {
+		return (layout & LAYOUT_NEWLINE_BEFORE) == LAYOUT_NEWLINE_BEFORE;
+	}
+
+	protected boolean isLayoutNewLineAfter() {
+		return (layout & LAYOUT_NEWLINE_AFTER) == LAYOUT_NEWLINE_AFTER;
 	}
 
 	public void addCommand(Command command) {
@@ -160,9 +192,11 @@ public abstract class Item {
 	}
 
 	public void notifyStateChanged() {
+		if(screen == null) return;
 		if (!(this.screen instanceof Form)) {
-			throw new IllegalStateException();
+			//throw new IllegalStateException();
 		} else {
+			if(((Form) this.screen).itemStateListener == null) return;
 			((Form) this.screen).itemStateListener.itemStateChanged(this);
 		}
 	}
@@ -186,7 +220,8 @@ public abstract class Item {
 	protected void paint(Graphics graphics) {
 		graphics.setColor(-16777216);
 		if (this.inFocus) {
-			a.method178(graphics, bounds[X], bounds[Y], bounds[W], bounds[H]);
+			int w = getItemWidth() > 0 ? getItemWidth() + 1 : bounds[W];
+			a.method178(graphics, bounds[X], bounds[Y], w, bounds[H]);
 		}
 
 	}
@@ -222,5 +257,25 @@ public abstract class Item {
 	}
 
 	protected void pointerPressed(int n, int n2) {
+	}
+
+	void updateHidden() {
+		
+	}
+
+	protected boolean allowNextItemPlaceSameRow() {
+		return false;
+	}
+
+	protected int getItemWidth() {
+		return 0;
+	}
+
+	protected boolean isFullWidthItem() {
+		return false;
+	}
+
+	protected void setInRow(boolean b) {
+		
 	}
 }

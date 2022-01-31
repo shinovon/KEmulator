@@ -36,4 +36,8 @@ public class Spacer extends Item
         super.bounds[2] = Math.min(this.anInt349 + 4, super.screen.bounds[2]);
         super.bounds[3] = Math.min(this.anInt28 + 4, super.screen.bounds[3]);
     }
+    
+	public int getItemWidth() {
+		return getMinimumWidth();
+	}
 }

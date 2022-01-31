@@ -12,6 +12,9 @@ import emulator.custom.CustomMethod;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.*;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.internal.win32.*;
 import org.eclipse.swt.dnd.*;
@@ -131,7 +134,7 @@ MouseTrackListener
     private String aString1008;
     private CaretImpl caret;
     private int anInt1020;
-    private boolean[] aBooleanArray978;
+    private boolean[] keysState;
     private int mouseXPress;
     private int mouseXRelease;
     private int mouseYPress;
@@ -201,14 +204,24 @@ MouseTrackListener
     }
     
     public final void method552(final String message) {
-        method557(((Control)this.shell).handle, true);
+        method557(getHandle(shell), true);
         final MessageBox messageBox;
         ((Dialog)(messageBox = new MessageBox(this.shell))).setText(emulator.UILocale.uiText("MESSAGE_BOX_TITLE", "KEmulator Alert"));
         messageBox.setMessage(message);
         messageBox.open();
     }
     
-    private void method576() {
+    private static long getHandle(Control c) {
+    	try {
+    		Class<?> cl = c.getClass();
+    		Field f = cl.getField("handle");
+    		return f.getLong(c);
+    	} catch (Exception e) {
+    		throw new Error(e);
+    	}
+	}
+
+	private void method576() {
         EmulatorScreen.locX = this.shell.getLocation().x;
         EmulatorScreen.locY = this.shell.getLocation().y;
     }
@@ -245,6 +258,9 @@ MouseTrackListener
 	                EmulatorScreen.display.sleep();
 	            }
 	        }
+    	} catch (Error e)
+    	{
+    		e.printStackTrace();
     	}
     	catch (Exception e)
     	{
@@ -257,7 +273,7 @@ MouseTrackListener
     
 
     private void rotate(int var1, int var2) {
-       if(this.pauseState == 1 && Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+       if(this.pauseState == 1/* && Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()*/) {
           this.method550(var1, var2);
           this.zoom(this.zoom);
           Emulator.getEventQueue().queue(Integer.MIN_VALUE, var1, var2);
@@ -410,7 +426,7 @@ MouseTrackListener
         if (Emulator.getCurrentDisplay().getCurrent() == null || this.pauseState == 0) {
             return;
         }
-        if (Settings.q) {
+        if (Settings.playingRecordedKeys) {
             KeyRecords h = Emulator.getRobot();
             String method698;
             while ((method698 = h.method698(EmulatorScreen.aLong982)) != null && method698.length() > 1) {
@@ -425,10 +441,10 @@ MouseTrackListener
                 h = Emulator.getRobot();
             }
         }
-        else if (Settings.enableKeyCache && !Keyboard.aStack1063.empty()) {
-            final String s = (String) Keyboard.aStack1063.pop();
-            if (Settings.recordKeys && !Settings.q) {
-                Emulator.getRobot().method697(EmulatorScreen.aLong982 + ":" + s);
+        else if (Settings.enableKeyCache && !Keyboard.keyCacheStack.empty()) {
+            final String s = (String) Keyboard.keyCacheStack.pop();
+            if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+                Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + s);
             }
             final char char2 = s.charAt(0);
             final String substring2 = s.substring(1);
@@ -562,7 +578,7 @@ MouseTrackListener
         this.rotate90MenuItem.addSelectionListener(this);
         (this.forecPaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tF");
         this.forecPaintMenuItem.addSelectionListener((SelectionListener)this);
-        method557(((Control)this.shell).handle, Settings.alwaysOnTop);
+        method557(getHandle(shell), Settings.alwaysOnTop);
         new MenuItem(this.menuView, 2);
         (this.aMenuItem956 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_KEYPAD", "Keypad"));
         this.aMenuItem956.addSelectionListener((SelectionListener)this);
@@ -618,11 +634,11 @@ MouseTrackListener
         (this.recordKeysMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.uiText("MENU_TOOL_RECORD_KEY", "Record Keys"));
         this.recordKeysMenuItem.addSelectionListener((SelectionListener)this);
         this.recordKeysMenuItem.setSelection(Settings.recordKeys);
-        this.recordKeysMenuItem.setEnabled(!Settings.q);
+        this.recordKeysMenuItem.setEnabled(!Settings.playingRecordedKeys);
         (this.enableAutoplayMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.uiText("MENU_TOOL_AUTO_PLAY", "Enable Autoplay"));
         this.enableAutoplayMenuItem.addSelectionListener((SelectionListener)this);
-        this.enableAutoplayMenuItem.setSelection(Settings.q);
-        this.enableAutoplayMenuItem.setEnabled(Settings.q);
+        this.enableAutoplayMenuItem.setSelection(Settings.playingRecordedKeys);
+        this.enableAutoplayMenuItem.setEnabled(Settings.playingRecordedKeys);
         new MenuItem(this.menuTool, 2);
         (this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.uiText("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tC");
         this.captureToFileMenuItem.addSelectionListener((SelectionListener)this);
@@ -989,7 +1005,7 @@ MouseTrackListener
                         return;
                     }
                     if (menuItem.equals(this.enableAutoplayMenuItem)) {
-                        Settings.q = !Settings.q;
+                        Settings.playingRecordedKeys = !Settings.playingRecordedKeys;
                     }
                 }
             }
@@ -1010,7 +1026,7 @@ MouseTrackListener
                 fileDialog2.setFilterExtensions(new String[] { "*.jar;*.jad", "*.*" });
                 final String open2;
                 if ((open2 = fileDialog2.open()) != null) {
-                    Settings.bString = null;
+                    Settings.recordedKeysFile = null;
                     Emulator.loadGame(open2, Settings.g2d, Settings.g3d, equals);
                 }
                 this.method571();
@@ -1034,7 +1050,7 @@ MouseTrackListener
                                 break Label_1321;
                             }
                         }
-                        Settings.bString = open3;
+                        Settings.recordedKeysFile = open3;
                         Emulator.loadGame(s, Settings.g2d, Settings.g3d, false);
                     }
                 }
@@ -1139,7 +1155,7 @@ MouseTrackListener
             }
             if (menuItem.equals(this.alwaysOnTopMenuItem)) {
                 Settings.alwaysOnTop = this.alwaysOnTopMenuItem.getSelection();
-                method557(((Control)this.shell).handle, Settings.alwaysOnTop);
+                method557(getHandle(shell), Settings.alwaysOnTop);
                 return;
             }
             if (menuItem.equals(this.aMenuItem957)) {
@@ -1356,7 +1372,7 @@ MouseTrackListener
         this.canvas.getShell().addMouseTrackListener(this);
         ((Control)this.canvas).addPaintListener((PaintListener)this);
         ((Widget)this.canvas).addListener(37, (Listener)new Class32(this));
-        this.aBooleanArray978 = new boolean[256];
+        this.keysState = new boolean[256];
         this.method589();
         this.caret = new CaretImpl(this.canvas);
     }
@@ -1392,15 +1408,42 @@ MouseTrackListener
     private void method565(final GC gc) {
         if (this.infosEnabled && (this.mouseXPress != this.mouseXRelease || this.mouseYPress != this.mouseYRelease)) {
         	try {
-	            OS.SetROP2(gc.handle, 7);
+	            OS_SetROP2(gc, 7);
 	            gc.setForeground(EmulatorScreen.display.getSystemColor(1));
 	            gc.drawRectangle(this.mouseXPress, this.mouseYPress, this.mouseXRelease - this.mouseXPress, this.mouseYRelease - this.mouseYPress);
-	            OS.SetROP2(gc.handle, 13);
+	            OS_SetROP2(gc, 13);
         	} catch (Throwable e) {
         		
         	}
         }
     }
+    
+    private static void OS_SetROP2(GC gc, int j) {
+    	try {
+    		long i = getHandle(gc);
+    		Class<?> os = OS.class;
+    		Method m = null;
+    		try {
+    			m = os.getMethod("SetROP2", int.class, int.class);
+    			m.invoke(null, (int)i, j);
+    		} catch (Exception e) {
+    			m = os.getMethod("SetROP2", long.class, int.class);
+    			m.invoke(null, i, j);
+    		}
+    	} catch (Exception e) {
+    		throw new Error(e);
+    	}
+	}
+    
+    private static long getHandle(GC c) {
+    	try {
+    		Class<?> cl = c.getClass();
+    		Field f = cl.getField("handle");
+    		return f.getLong(c);
+    	} catch (Exception e) {
+    		throw new Error(e);
+    	}
+	}
     
     public final void run() {
         if (this.pauseState != 1) {
@@ -1479,7 +1522,7 @@ MouseTrackListener
     }
     
     protected final void handleKeyPress(int n) {
-        if (this.pauseState == 0 || Settings.q) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
         if(Settings.fpsMode) {
@@ -1489,35 +1532,35 @@ MouseTrackListener
         		return;
         	}
         }
-        if ((n < 0 || n >= this.aBooleanArray978.length) && !Settings.canvasKeyboard) {
+        if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
             return;
         }
-        final String method605;
-        if ((method605 = Keyboard.method605(n)) == null) {
+        final String replaced;
+        if ((replaced = Keyboard.replaceKey(n)) == null) {
             return;
         }
 	    if(!Settings.canvasKeyboard) {
-	        if (this.aBooleanArray978[n]) {
+	        if (this.keysState[n]) {
 	            if (Settings.enableKeyRepeat) {
-	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(method605));
+	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(replaced));
 	            }
 	            return;
 	        }
-	        this.aBooleanArray978[n] = true;
+	        this.keysState[n] = true;
 	        if (Settings.enableKeyCache) {
-	            Keyboard.aStack1063.push('0' + method605);
+	            Keyboard.keyCacheStack.push('0' + replaced);
 	            return;
 	        }
         }
         //System.out.println("method568 " + n);
-        if (Settings.recordKeys && !Settings.q) {
-            Emulator.getRobot().method697(EmulatorScreen.aLong982 + ":" + '0' + method605);
+        if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + replaced);
         }
-        Emulator.getEventQueue().keyPress(Integer.parseInt(method605));
+        Emulator.getEventQueue().keyPress(Integer.parseInt(replaced));
     }
     
     protected final void handleKeyRelease(int n) {
-        if (this.pauseState == 0 || Settings.q) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
         if(Settings.fpsMode) {
@@ -1528,25 +1571,25 @@ MouseTrackListener
         	}
         }
 
-        if ((n < 0 || n >= this.aBooleanArray978.length) && !Settings.canvasKeyboard) {
+        if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
             return;
         }
         final String method605;
-        if ((method605 = Keyboard.method605(n)) == null) {
+        if ((method605 = Keyboard.replaceKey(n)) == null) {
             return;
         }
 	    if(!Settings.canvasKeyboard) {
-	        if (!this.aBooleanArray978[n]) {
+	        if (!this.keysState[n]) {
 	            return;
 	        }
-	        this.aBooleanArray978[n] = false;
+	        this.keysState[n] = false;
 	    }
         if (Settings.enableKeyCache) {
-            Keyboard.aStack1063.push('1' + method605);
+            Keyboard.keyCacheStack.push('1' + method605);
             return;
         }
-        if (Settings.recordKeys && !Settings.q) {
-            Emulator.getRobot().method697(EmulatorScreen.aLong982 + ":" + '1' + method605);
+        if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + method605);
         }
         Emulator.getEventQueue().keyRelease(Integer.parseInt(method605));
     }
@@ -1953,7 +1996,7 @@ MouseTrackListener
     }
     
     static boolean[] method556(final EmulatorScreen class93) {
-        return class93.aBooleanArray978;
+        return class93.keysState;
     }
     
     static int method562(final EmulatorScreen class93, final int anInt1020) {
@@ -2094,12 +2137,12 @@ MouseTrackListener
     }
 
 	public void mouseScrolled(MouseEvent arg0) {
-        if (this.pauseState == 0 || Settings.q) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
 		int k = 0;
     	if(arg0.count < 0) { 
-    		k = Integer.parseInt(Keyboard.method605(2));
+    		k = Integer.parseInt(Keyboard.replaceKey(2));
     		/*
     		Event e = new Event();
     		e.widget = this.canvas;
@@ -2112,7 +2155,7 @@ MouseTrackListener
     		this.keyReleased(ke);
     		*/
     	} else if(arg0.count > 0) { 
-    		k = Integer.parseInt(Keyboard.method605(1));
+    		k = Integer.parseInt(Keyboard.replaceKey(1));
     		/*
     		Event e = new Event();
     		e.widget = this.canvas;

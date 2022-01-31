@@ -6,11 +6,11 @@ public class ConnectionNotFoundException extends IOException
 {
     private static final long serialVersionUID = 1L;
     
-    public ConnectionNotFoundException() {
-        super();
+    public ConnectionNotFoundException(Exception e) {
+        super(e);
     }
     
-    public ConnectionNotFoundException(final String s) {
+    public ConnectionNotFoundException(String s) {
         super(s);
     }
 }

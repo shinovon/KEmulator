@@ -99,7 +99,7 @@ public abstract class Screen extends Displayable
                 }
                 screen.selectedItem = (Item) vector.get(n4);
                 selectedItem.focus();
-                if (!selectedItem.aBoolean177) {
+                if (!selectedItem.shownOnForm) {
                     this.anInt182 = this.items.indexOf(selectedItem);
                     this.anInt349 = -1;
                 }
@@ -133,7 +133,7 @@ public abstract class Screen extends Displayable
             }
             screen2.selectedItem = (Item) vector2.get(n5);
             selectedItem.focus();
-            if (!selectedItem.aBoolean177) {
+            if (!selectedItem.shownOnForm) {
                 this.anInt182 = -1;
                 this.anInt349 = this.items.indexOf(selectedItem);
             }
@@ -177,7 +177,7 @@ public abstract class Screen extends Displayable
             int j = 0;
             while (j < this.items.size()) {
                 final Item futureSelect;
-                if ((futureSelect = (Item) this.items.get(j)).aBoolean177 && BoundsUtils.collides(futureSelect.bounds, x, y)) {
+                if ((futureSelect = (Item) this.items.get(j)).shownOnForm && BoundsUtils.collides(futureSelect.bounds, x, y)) {
                     if (futureSelect == selectedItem) {
                         selectedItem.pointerPressed(x, y);
                         return;
@@ -237,12 +237,11 @@ public abstract class Screen extends Displayable
         graphics.drawString(value, n4, 1, 0);
     }
     
+    protected void sizeChanged(final int w, final int h) {
+	}
+    
     protected void drawScrollBar(final Graphics graphics) {
         emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (selectedItem != null) ? this.items.indexOf(selectedItem) : -1);
-    }
-    
-    void stateChanged(Item i) {
-    	
     }
     
     static {

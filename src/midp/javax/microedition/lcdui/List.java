@@ -17,7 +17,7 @@ public class List extends Screen implements Choice {
          super.items.add(choiceGroup);
          choiceGroup.screen = this;
          choiceGroup.aBoolean541 = true;
-         choiceGroup.aBoolean177 = true;
+         choiceGroup.shownOnForm = true;
          choiceGroup.focus();
          choiceGroup.aCommand540 = SELECT_COMMAND;
          super.addCommand(SELECT_COMMAND);
@@ -111,6 +111,7 @@ public class List extends Screen implements Choice {
 
    protected void layout() {
       choiceGroup.layout();
-      choiceGroup.bounds[1] = Screen.fontHeight4;
+      choiceGroup.bounds[Y] = Screen.fontHeight4;
+      choiceGroup.bounds[H] = bounds[H];
    }
 }

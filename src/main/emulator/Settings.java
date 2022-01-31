@@ -40,9 +40,9 @@ public final class Settings
     private static final Random aRandom1238;
     public static final long aLong1241;
     public static long recordedRandomSeed;
-    public static boolean q;
+    public static boolean playingRecordedKeys;
     public static boolean recordKeys;
-    public static String bString;
+    public static String recordedKeysFile;
     public static int proxyType;
     public static String proxyHost;
     public static String proxyPort;

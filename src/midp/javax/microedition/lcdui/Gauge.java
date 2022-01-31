@@ -141,4 +141,16 @@ public class Gauge extends Item
 	        super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
     	}
     }
+
+    protected int getItemWidth() {
+		return 0;
+	}
+
+    protected boolean allowNextItemPlaceSameRow() {
+		return false;
+	}
+
+    protected boolean isFullWidthItem() {
+		return true;
+	}
 }

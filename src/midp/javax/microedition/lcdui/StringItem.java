@@ -9,6 +9,7 @@ public class StringItem extends Item
     private int mode;
     private Font font;
     private String[] textArr;
+	private int maxTextWidth;
     
     public StringItem(final String label, final String text) {
         this(label, text, 0);
@@ -50,9 +51,11 @@ public class StringItem extends Item
     
     protected void paint(final Graphics g) {
         super.paint(g);
+        int by = super.bounds[Y];
+    	int bx = super.bounds[X];
+    	int bw = super.bounds[W];
         
         final Font font = (this.font != null) ? this.font : Screen.font;
-        int n = super.bounds[Y];
         g.setFont(font);
 
         if(mode == BUTTON) {
@@ -68,30 +71,48 @@ public class StringItem extends Item
         	if(str == null) {
         		str = "...";
         	}
-        	int k = super.bounds[X];
-	        g.drawString(str, k + 4, n + 1, 0);
 	        // определение размера строки
 	        int j = 0;
 	        IFont f = g.getImpl().getFont();
-	        if(f != null)
+	        if(f != null && str != null)
 	        	j = f.stringWidth(str);
+
+            if((isLayoutExpand() && isLayoutAlignDefault()) || isLayoutCenter()) { 
+	        	bx = (bw - j) / 2 - 2;
+    	        g.drawString(str, bx + 4, by + 1, 0);
+            } else if(isLayoutLeft() || isLayoutDefault()) {
+    	        g.drawString(str, bx + 4, by + 1, 0);
+	        } else if(isLayoutRight()) {
+	        	//bx = (bw - j) - 8;
+    	        g.drawString(str, bx + 4, by + 1, 0);
+	        }
 	        if(j > 0) {
+	            if(isLayoutExpand()) {
+	            	j = bounds[W] - 8;
+	            	bx = super.bounds[X];
+	            }
 	        	int h = font.getHeight();
 	        	//очертания кнопки
 	        	int o = g.getColor();
 	        	g.setColor(0xababab);
-	        	k = k + 2;
-	        	int lx = k + 2 + j + 1;
-	        	int ly = n + h + 3;
-	        	g.drawLine(k + 1, ly, lx, ly); 
-	        	g.drawLine(lx, ly, lx, n + 1); 
+	        	bx = bx + 2;
+	        	int lx = bx + 2 + j + 1;
+	        	int ly = by + h + 3;
+	        	g.drawLine(bx + 1, ly, lx, ly); 
+	        	g.drawLine(lx, ly, lx, by + 1); 
 	        	g.setColor(o);
-	        	g.drawRect(k, n, j + 4, h + 4); 
+	        	g.drawRect(bx, by, j + 4, h + 4); 
 	        }
         } else {
 	        for (int i = this.getcurPage(); i < this.textArr.length; ++i) {
-	            g.drawString(this.textArr[i], super.bounds[X] + 4, n + 2, 0);
-	            if ((n += font.getHeight() + 4) > super.screen.bounds[H]) {
+	        	int x= super.bounds[X] + 4;
+	        	String s = textArr[i];
+	        	int w = bounds[W];
+	        	int tw = font.stringWidth(s);
+	            if(isLayoutCenter()) x = ((w - x) - tw) / 2 + x;
+	            else if(isLayoutRight()) x = ((w - x) - tw) + x;
+	            g.drawString(s, x, by + 2, 0);
+	            if ((by += font.getHeight() + 4) > super.screen.bounds[H]) {
 	                return;
 	            }
 	        }
@@ -102,7 +123,19 @@ public class StringItem extends Item
         super.layout();
         final Font font = (this.font != null) ? this.font : Screen.font;
         final int n = this.getPreferredWidth() - 8;
-        this.textArr = c.textArr((super.label != null) ? (super.label + " " + this.text) : this.text, font, n, n);
+        int[] maxw = new int[1];
+        this.textArr = c.textArr((super.label != null) ? (super.label + " " + this.text) : this.text, font, n, n, maxw);
+       if(textArr.length == 1) maxTextWidth = maxw[0] + 4;
+       else if(textArr.length == 0) maxTextWidth = 4;
+       else {
+    	   maxTextWidth = n + 4;
+       }
+       if(mode == BUTTON && isLayoutRight()) {
+       	int j = 0;
+	        if(font != null && textArr != null && textArr.length > 0)
+	        	j = font.stringWidth(textArr[0]);
+       	bounds[X] = (bounds[W] - j) - 8;
+       }
         final int n3;
         int n2 = (n3 = font.getHeight() + 4) * this.textArr.length;
         super.anIntArray179 = null;
@@ -123,4 +156,12 @@ public class StringItem extends Item
         }
         super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
     }
+
+	public int getItemWidth() {
+		return isLayoutExpand() ? this.getPreferredWidth() - 1 : maxTextWidth;
+	}
+	
+	public boolean allowNextItemPlaceSameRow() {
+		return !isLayoutExpand();
+	}
 }

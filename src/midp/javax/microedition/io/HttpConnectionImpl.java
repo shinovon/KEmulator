@@ -117,7 +117,11 @@ final class HttpConnectionImpl implements HttpConnection {
 		if (this.connection == null) {
 			return 200;
 		}
-		return this.connection.getResponseCode();
+		try {
+			return this.connection.getResponseCode();
+		} catch (ConnectException e) {
+			throw new IOException(e);
+		}
 	}
 
 	public final String getResponseMessage() throws IOException {

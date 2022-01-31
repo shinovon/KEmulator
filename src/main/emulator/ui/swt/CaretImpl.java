@@ -286,6 +286,7 @@ public final class CaretImpl implements ICaret
              this.setCaretLocation(this.caretX + var10, this.caretY + this.anInt848 * var5);
              if(var1.character != 0) {
                 this.lcduiTextField.setString(var3);
+           	 	this.lcduiTextField.notifyStateChanged();
              }
 
              this.caretPosition = this.anInt847;

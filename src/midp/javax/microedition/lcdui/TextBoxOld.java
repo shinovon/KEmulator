@@ -12,7 +12,7 @@ public class TextBoxOld extends Screen
         super.items.add(this.aTextField1305);
         this.aTextField1305.screen = this;
         this.aTextField1305.isTextBox = true;
-        this.aTextField1305.aBoolean177 = true;
+        this.aTextField1305.shownOnForm = true;
         this.aTextField1305.inFocus = true;
         this.aTextField1305.screen.setItemCommands(this.aTextField1305);
     }

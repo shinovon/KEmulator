@@ -50,4 +50,4 @@ plugins
 
 # obfuscation dir
 obf/*.jar
-obf/mapping.txt
+obf/mapping*.txt

@@ -11,7 +11,7 @@ public final class Keyboard
     private static Hashtable strToPCKey;
     private static Hashtable keysTable;
     private static Hashtable aHashtable1067;
-    public static Stack aStack1063;
+    public static Stack keyCacheStack;
     public static String[] deviceKeycodes;
     
     public Keyboard() {
@@ -140,11 +140,11 @@ public final class Keyboard
     }
     
     public static boolean isLeftSoft(final int n) {
-        return Integer.parseInt(method605(Integer.parseInt(Keyboard.deviceKeycodes[17]))) == n;
+        return Integer.parseInt(replaceKey(Integer.parseInt(Keyboard.deviceKeycodes[17]))) == n;
     }
     
     public static boolean isRightSoft(final int n) {
-        return Integer.parseInt(method605(Integer.parseInt(Keyboard.deviceKeycodes[18]))) == n;
+        return Integer.parseInt(replaceKey(Integer.parseInt(Keyboard.deviceKeycodes[18]))) == n;
     }
     
     public static int soft1() {
@@ -205,7 +205,7 @@ public final class Keyboard
         return 0;
     }
     
-    public static String method605(int n) {
+    public static String replaceKey(int n) {
         if (n == 80) {
             n = 13;
         }
@@ -253,7 +253,7 @@ public final class Keyboard
         Keyboard.strToPCKey = new Hashtable();
         Keyboard.keysTable = new Hashtable();
         Keyboard.aHashtable1067 = new Hashtable();
-        Keyboard.aStack1063 = new Stack();
+        Keyboard.keyCacheStack = new Stack();
         Keyboard.keysTable.put("48", "NUM_0");
         Keyboard.keysTable.put("49", "NUM_1");
         Keyboard.keysTable.put("50", "NUM_2");

@@ -13,6 +13,7 @@ public class Image
     private IImage xrayBuffer;
     private IImage usedRegion;
     int usedCount;
+	private boolean disposed;
     
     public Image(final IImage img) {
         super();
@@ -150,8 +151,15 @@ public class Image
     public void getRGB(final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
         emulator.graphics2D.b.method165(this.imageImpl, array, n, n2, n3, n4, n5, n6);
     }
+    
+    void dispose() {
+    	imageImpl = null;
+    	usedRegion = null;
+    	disposed = true;
+    }
 
 	public int size() {
+		if(disposed) return 5;
 		int i = 5 + imageImpl.size();
 		if(xrayBuffer != null) i += xrayBuffer.size();
 		if(usedRegion != null) i += usedRegion.size();

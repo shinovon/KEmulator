@@ -114,7 +114,7 @@ public final class Controllers
     }
     
     private static int method747(final String s) {
-        return Integer.parseInt(Keyboard.method605(Integer.parseInt(s)));
+        return Integer.parseInt(Keyboard.replaceKey(Integer.parseInt(s)));
     }
     
     private static boolean method748(final String aString1292) {

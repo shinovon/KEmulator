@@ -47,6 +47,7 @@ public abstract class MIDlet
             if(s.startsWith("file:///root/")) {
             	s = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
             }
+            // Vika touch support
             if(s.startsWith("vlc.exe")) {
             	s = "C:/PROGRA~1/VideoLAN/VLC/vlc.exe" + s.substring("vlc.exe".length());
                 Runtime.getRuntime().exec(s);
@@ -65,7 +66,7 @@ public abstract class MIDlet
         }
         catch (Exception ex) {
         	ex.printStackTrace();
-            throw new ConnectionNotFoundException(ex.toString());
+            throw new ConnectionNotFoundException(ex);
         }
     }
     

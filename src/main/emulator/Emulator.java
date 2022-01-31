@@ -28,6 +28,7 @@ import java.util.jar.Attributes;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Screen;
+import javax.microedition.media.Manager;
 import javax.microedition.midlet.MIDlet;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiSystem;
@@ -95,9 +96,10 @@ public class Emulator
 	public static boolean askPermissions = false;
 	public static boolean askImei = false;
 	private static String midletName;
+	private static Thread vlcCheckerThread;
 	
-	public static final String titleVersion = "2.12";
-	public static final String aboutVersion = "v2.12";
+	public static final String titleVersion = "2.12.1";
+	public static final String aboutVersion = "v2.12.1";
 	public static final int numericVersion = 12;
 	public static final String propVersion = "v2.12";
 
@@ -496,7 +498,7 @@ public class Emulator
                 	+ "\tSamsung 1.0\n"
                 	+ "\tSprint 1.0\n"
                 	+ "\tWMA 1.0 (JSR120)\n"
-                	+ "\tSensor (JSR256)\n(no 3d support)";
+                	+ "(no 3d support)";
     	}
         return "KEmulator v1.0.3" + "\n\tmod nnproject "+aboutVersion+"\n\n\t" + 
     	UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" + 
@@ -827,9 +829,9 @@ public class Emulator
         	String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
         	Emulator.midletName = midlet;
         	if(midlet != null) {
-        		if(midlet.equalsIgnoreCase("vika touch")) {
+        		/*if(midlet.equalsIgnoreCase("vika touch")) {
 	        		// TODO: насрать
-	        	} else if(midlet.equalsIgnoreCase("bounce tales")) {
+	        	} else */if(midlet.equalsIgnoreCase("bounce tales")) {
 	        		Settings.fpsGame = 1;
 	        	} else if(midlet.equalsIgnoreCase("micro counter strike")) {
 	        		Settings.fpsGame = 2;
@@ -838,8 +840,8 @@ public class Emulator
 	        	}
         	}
         	
-        	if(midlet != null && (midlet.equalsIgnoreCase("Shiza") || midlet.toLowerCase().startsWith("touch")/* || midlet.toLowerCase().startsWith("vika")*/))
-        	plat += "/KEmulatorMod";
+        	//if(midlet != null && (midlet.equalsIgnoreCase("Shiza") || midlet.toLowerCase().startsWith("touch") || midlet.toLowerCase().startsWith("vika")))
+        	//plat += "/KEmulatorMod";
             System.setProperty("microedition.platform", plat);
             //System.out.println("paltform set: " + plat);
             //System.out.println("ua: " + Emulator.customUA);
@@ -917,16 +919,19 @@ public class Emulator
         	return;
         }
 		if(_X64_VERSION) {
+			System.out.println("loading swt libary");
 			loadSWTLibrary();
 		}
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.method709();
         Emulator.emulatorimpl = new EmulatorImpl();
+        
         try {
         	i.a("emulator");
         } catch (Error e) {
         }
+        vlcCheckerThread.start();
         Controllers.method750(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
         method283(commandLineArguments);
@@ -1020,7 +1025,7 @@ public class Emulator
         String os = 
             osn.contains("win") ? "win32" :
             osn.contains("mac") ? "macosx" :
-            osn.contains("linux") || osn.contains("nix") ? "linux-gtk" :
+            osn.contains("linux") || osn.contains("nix") ? "gtk-linux" :
             null;
         if(os == null) {
         	throw new RuntimeException("unsupported os: " + osn);
@@ -1094,9 +1099,9 @@ public class Emulator
             }
             else if (lowerCase.equalsIgnoreCase("rec")) {
             	File localFile;
-                Settings.bString = trim;
-                Settings.bString = null;
-                Settings.q = (localFile = new File(trim)).exists();
+                Settings.recordedKeysFile = trim;
+                Settings.recordedKeysFile = null;
+                Settings.playingRecordedKeys = (localFile = new File(trim)).exists();
             }
             else if (lowerCase.equalsIgnoreCase("device")) {
                 Emulator.deviceName = trim;
@@ -1178,8 +1183,8 @@ public class Emulator
         else {
             sb.append(" -jar \"" + s + "\"");
         }
-        if (Settings.bString != null) {
-            sb.append(" -rec \"" + Settings.bString + "\"");
+        if (Settings.recordedKeysFile != null) {
+            sb.append(" -rec \"" + Settings.recordedKeysFile + "\"");
         }
         if (n == 1) {
             sb.append(" -awt");
@@ -1276,6 +1281,11 @@ public class Emulator
         Emulator.jarClasses = new Vector();
         Emulator.deviceName = "SonyEricssonK800";
         Emulator.deviceFile = "/res/plat";
+        vlcCheckerThread = new Thread() {
+        	public void run() {
+        		Manager.checkLibVlcSupport();
+        	}
+        };
     }
 
 	public static Info getMidiDeviceInfo() throws MidiUnavailableException {

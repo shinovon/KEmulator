@@ -45,8 +45,19 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$nnmod v2.12.1 [2022.01.30]
+Added JSR75 PIM stub
+Fixed MP3 decoder IOException
+
+$nnmod v2.12 [2022.01.22]
+Added lcdui Item align layouts support
+Checking libvlc location on start
+
 $nnmod v2.12 [2021.11.15]
-Alert setIndicator NullPointer fix
+Updated SWT library
+Updated LWJGL library
+Alert setIndicator NullPointerException fix
+Added trace info logging into trace.txt 
 
 $nnmod v2.11.1 [2021.10.31]
 Removed inactivity timer
@@ -664,9 +675,9 @@ v0.1.0 [2006.06.15]
 
 ==================
 $[Libs]
-swt-win-3.3.4.6
+swt-4.5.2
 asm-3.0
-lwjgl-1.1.3
+lwjgl-2.9.4
 java-discord-rpc-2.0.1
 jna-4.4.0
 webcam-capture-0.3.12

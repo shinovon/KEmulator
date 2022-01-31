@@ -117,7 +117,7 @@ public abstract class Canvas extends Displayable
         }
         Displayable.checkForSteps();
         Displayable.fpsLimiter();
-        Displayable.resetXRayGraphics();
+        if(Settings.xrayView) Displayable.resetXRayGraphics();
         Emulator.getEventQueue().queue(1);
     }
     

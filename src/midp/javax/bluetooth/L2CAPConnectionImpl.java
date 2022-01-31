@@ -6,41 +6,41 @@ import javax.microedition.io.*;
 
 public class L2CAPConnectionImpl implements L2CAPConnection
 {
-    Socket aSocket315;
-    InputStream anInputStream436;
-    OutputStream anOutputStream437;
+    Socket socket;
+    InputStream in;
+    OutputStream out;
     
     protected L2CAPConnectionImpl(final Socket aSocket315) throws IOException {
         super();
-        this.aSocket315 = aSocket315;
-        this.anInputStream436 = aSocket315.getInputStream();
-        this.anOutputStream437 = aSocket315.getOutputStream();
+        this.socket = aSocket315;
+        this.in = aSocket315.getInputStream();
+        this.out = aSocket315.getOutputStream();
         aSocket315.setReceiveBufferSize(672);
         aSocket315.setSendBufferSize(672);
     }
     
     public int getTransmitMTU() throws IOException {
-        return this.aSocket315.getSendBufferSize();
+        return this.socket.getSendBufferSize();
     }
     
     public int getReceiveMTU() throws IOException {
-        return this.aSocket315.getReceiveBufferSize();
+        return this.socket.getReceiveBufferSize();
     }
     
     public void send(final byte[] array) throws IOException {
-        this.anOutputStream437.write(array, 0, Math.min(672, array.length));
+        this.out.write(array, 0, Math.min(672, array.length));
     }
     
     public int receive(final byte[] array) throws IOException {
-        return this.anInputStream436.read(array, 0, Math.min(672, array.length));
+        return this.in.read(array, 0, Math.min(672, array.length));
     }
     
     public boolean ready() throws IOException {
-        return this.anInputStream436.available() > 0;
+        return this.in.available() > 0;
     }
     
     public void close() throws IOException {
-        this.aSocket315.close();
+        this.socket.close();
     }
     
     public static Connection open(final String s) throws IOException {

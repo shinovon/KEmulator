@@ -33,7 +33,7 @@ public abstract class FullCanvas extends Canvas {
 
 	public void setFullScreenMode(boolean aMode) {
 		if (!aMode) {
-			throw new IllegalArgumentException("Not supported in com.nokia.mid.ui.FullCanvas");
+			//throw new IllegalArgumentException("Not supported in com.nokia.mid.ui.FullCanvas");
 		}
 	}
 }

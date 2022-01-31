@@ -13,6 +13,7 @@ public class ImageItem extends Item
     private Image image;
     private String altText;
     private int appearanceMode;
+	private int width;
     
     public ImageItem(final String s, final Image image, final int n, final String s2) {
         this(s, image, n, s2, 0);
@@ -59,33 +60,48 @@ public class ImageItem extends Item
     
     protected void paint(final Graphics graphics) {
         super.paint(graphics);
-        final int n = super.bounds[0] + 2;
-        int n2 = super.bounds[1] + 2;
-        if (super.aStringArray175 != null && super.aStringArray175.length > 0) {
+        final int x = super.bounds[X] + 2;
+        int y = super.bounds[Y] + 2;
+        if (super.labelArr != null && super.labelArr.length > 0) {
             graphics.setFont(Item.font);
-            for (int i = 0; i < super.aStringArray175.length; ++i) {
-                graphics.drawString(super.aStringArray175[i], super.bounds[0] + 4, n2 + 2, 0);
-                n2 += Item.font.getHeight() + 4;
+            for (int i = 0; i < super.labelArr.length; ++i) {
+                graphics.drawString(super.labelArr[i], super.bounds[X] + 4, y + 2, 0);
+                y += Item.font.getHeight() + 4;
             }
         }
-        if(image != null)
-        graphics.drawImage(this.image, n, n2, 0);
+        if(image != null)  graphics.drawImage(this.image, x, y, 0);
     }
     
     protected void layout() {
         super.layout();
         int n = 0;
         final int n2 = this.getPreferredWidth() - 8;
+        int[] tw = new int[1];
         if (super.label != null) {
-            super.aStringArray175 = c.textArr(super.label, Item.font, n2, n2);
-            n = 0 + (Item.font.getHeight() + 4) * super.aStringArray175.length;
+            super.labelArr = c.textArr(super.label, Item.font, n2, n2, tw);
+            n = 0 + (Item.font.getHeight() + 4) * super.labelArr.length;
         }
         else {
-            super.aStringArray175 = null;
+            super.labelArr = null;
         }
+        int iw = 0;
         if (this.image != null) {
+        	iw = image.getWidth();
             n += this.image.getHeight() + 4;
         }
-        super.bounds[3] = Math.min(n, super.screen.bounds[3]);
+        width = Math.max(iw + 2, tw[0] + 5);
+        super.bounds[H] = Math.min(n, super.screen.bounds[H]);
     }
+
+    protected int getItemWidth() {
+		return width;
+	}
+
+    protected boolean allowNextItemPlaceSameRow() {
+		return !isLayoutExpand() && !isLayoutCenter();
+	}
+
+	protected boolean isFullWidthItem() {
+		return isLayoutExpand();
+	}
 }

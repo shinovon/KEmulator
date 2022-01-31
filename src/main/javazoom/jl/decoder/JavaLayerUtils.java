@@ -191,16 +191,16 @@ public class JavaLayerUtils
 	static synchronized public InputStream getResourceAsStream(String name)
 	{
 		InputStream is = null;
-		
+		/*
 		if (hook!=null)
 		{
 			is = hook.getResourceAsStream(name);	
 		}
 		else
-		{
+		{*/
 			Class cls = JavaLayerUtils.class;
-			is = cls.getResourceAsStream(name);
-		}
+			is = cls.getResourceAsStream("/javazoom/jl/decoder/" +name);
+		//}
 		
 		return is;		
 	}

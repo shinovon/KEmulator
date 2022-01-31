@@ -36,7 +36,51 @@ public final class c
        }
     }
 
-    public static String[] textArr(String var0, Font var1, int var2, int var3) {
+    public static String[] textArr(String orig, Font f, int max, int var3, int[] w) {
+    	w[0] = 0;
+    	if(orig == null) return new String[0];
+       if(max > 0 && var3 > 0) {
+          boolean var4 = orig.indexOf(10) != -1;
+          if(f.stringWidth(orig) <= max) {
+        	  setWidth(w, f.stringWidth(orig));
+             return var4?method174(orig, '\n'):new String[]{orig};
+          } else {
+             ArrayList var6 = new ArrayList();
+             if(!var4) {
+                method176(orig, f, max, var3, var6, w);
+             } else {
+                char[] var7 = orig.toCharArray();
+                int var8 = 0;
+
+                for(int var9 = 0; var9 < var7.length; ++var9) {
+                   if(var7[var9] == 10 || var9 == var7.length - 1) {
+                      String var11 = var9 == var7.length - 1?new String(var7, var8, var9 + 1 - var8):new String(var7, var8, var9 - var8);
+                      if(setWidth(w, f.stringWidth(var11)) <= max) {
+                         var6.add(var11);
+                      } else {
+                         method176(var11, f, max, var3, var6, w);
+                      }
+
+                      var8 = var9 + 1;
+                      max = var3;
+                   }
+                }
+             }
+
+             return (String[])((String[])var6.toArray(new String[var6.size()]));
+          }
+       } else {
+          return new String[]{orig};
+       }
+    }
+
+    private static int setWidth(int[] w, int stringWidth) {
+    	if(stringWidth > w[0]) w[0] = stringWidth;
+		return stringWidth;
+	}
+
+	public static String[] textArr(String var0, Font var1, int var2, int var3) {
+    	int[] maxw = new int[1];
     	if(var0 == null) return new String[0];
        if(var2 > 0 && var3 > 0) {
           boolean var4 = var0.indexOf(10) != -1;
@@ -45,7 +89,7 @@ public final class c
           } else {
              ArrayList var6 = new ArrayList();
              if(!var4) {
-                method176(var0, var1, var2, var3, var6);
+                method176(var0, var1, var2, var3, var6, maxw);
              } else {
                 char[] var7 = var0.toCharArray();
                 int var8 = 0;
@@ -56,7 +100,7 @@ public final class c
                       if(var1.stringWidth(var11) <= var2) {
                          var6.add(var11);
                       } else {
-                         method176(var11, var1, var2, var3, var6);
+                         method176(var11, var1, var2, var3, var6, maxw);
                       }
 
                       var8 = var9 + 1;
@@ -72,7 +116,7 @@ public final class c
        }
     }
 
-    private static void method176(String var0, Font var1, int var2, int var3, ArrayList var4) {
+    private static void method176(String var0, Font var1, int var2, int var3, ArrayList var4, int[] _w) {
        char[] var5 = var0.toCharArray();
        int var6 = 0;
        int var7 = 0;

@@ -39,7 +39,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes
                     }
                 }
             }
-            else if (cls.equals("java/util/Random") && (Settings.recordKeys || Settings.q)) {
+            else if (cls.equals("java/util/Random") && (Settings.recordKeys || Settings.playingRecordedKeys)) {
                 if (name.equals("<init>")) {
                     if (sign.equals("()V")) {
                         this.method707(2);

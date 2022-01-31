@@ -8,6 +8,8 @@ import org.lwjgl.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.internal.opengl.win32.*;
+import org.eclipse.swt.internal.win32.OS;
+import org.eclipse.swt.widgets.Control;
 import org.lwjgl.opengl.*;
 import org.lwjgl.opengl.Drawable;
 
@@ -15,6 +17,8 @@ import emulator.graphics2D.swt.*;
 import emulator.graphics2D.swt.Graphics2DSWT;
 
 import java.awt.image.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.*;
 import javax.microedition.m3g.*;
 import javax.microedition.m3g.Transform;
@@ -35,7 +39,7 @@ public final class Emulator3D implements IGraphics3D
     private static final PaletteData aPaletteData394;
     private static Hashtable m3gProps;
     private static PixelFormat aPixelFormat395;
-    private int anInt400;
+    private long anInt400;
     private Image anImage384;
     private GC aGC389;
     private float aFloat386;
@@ -167,7 +171,7 @@ public final class Emulator3D implements IGraphics3D
             if (this.anImage384 != null) {
                 this.anImage384.dispose();
                 this.aGC389.dispose();
-                WGL.wglDeleteContext(this.anInt400);
+                WGL_wglDeleteContext(this.anInt400);
             }
             this.anImage384 = new Image((Device)null, new ImageData(n, n2, 32, Emulator3D.aPaletteData394));
             this.aGC389 = new GC((org.eclipse.swt.graphics.Drawable)this.anImage384);
@@ -178,24 +182,24 @@ public final class Emulator3D implements IGraphics3D
             pixelformatdescriptor.iPixelType = 0;
             pixelformatdescriptor.cColorBits = (byte)Emulator.getEmulator().getScreenDepth();
             pixelformatdescriptor.iLayerType = 0;
-            final int choosePixelFormat;
-            if ((choosePixelFormat = WGL.ChoosePixelFormat(this.aGC389.handle, pixelformatdescriptor)) == 0 || !WGL.SetPixelFormat(this.aGC389.handle, choosePixelFormat, pixelformatdescriptor)) {
+            final long choosePixelFormat;
+            if ((choosePixelFormat = WGL_ChoosePixelFormat(getHandle(aGC389), pixelformatdescriptor)) == 0 || !WGL_SetPixelFormat(getHandle(aGC389), choosePixelFormat, pixelformatdescriptor)) {
                 this.aGC389.dispose();
                 this.anImage384.dispose();
                 throw new IllegalArgumentException();
             }
-            this.anInt400 = WGL.wglCreateContext(this.aGC389.handle);
+            this.anInt400 = WGL_wglCreateContext(getHandle(aGC389));
             if (this.anInt400 == 0) {
                 this.aGC389.dispose();
                 this.anImage384.dispose();
                 throw new IllegalArgumentException();
             }
         }
-        if (WGL.wglGetCurrentContext() == this.anImage384.handle) {
+        if (WGL_wglGetCurrentContext() == getHandle(anImage384)) {
             return;
         }
-        while (WGL.wglGetCurrentContext() > 0) {}
-        WGL.wglMakeCurrent(this.aGC389.handle, this.anInt400);
+        while (WGL_wglGetCurrentContext() > 0) {}
+        WGL_wglMakeCurrent(getHandle(aGC389), this.anInt400);
         try {
             GLContext.useContext((Object)this.anImage384);
         }
@@ -206,7 +210,7 @@ public final class Emulator3D implements IGraphics3D
     }
     
     private void method194() {
-        WGL.wglMakeCurrent(this.aGC389.handle, -1);
+        WGL_wglMakeCurrent(getHandle(aGC389), -1);
         try {
             GLContext.useContext((Object)null);
         }
@@ -447,4 +451,116 @@ public final class Emulator3D implements IGraphics3D
         aPaletteData394 = new PaletteData(-16777216, 16711680, 65280);
         Emulator3D.m3gProps = new Hashtable();
     }
+    
+    private static long OS(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
+    	try {
+    		Class<?> os = OS.class;
+    		Method m = null;
+    		try {
+    			m = os.getMethod(n, t);
+    			return (long) m.invoke(null, p);
+    		} catch (Exception e) {
+    			m = os.getMethod(n, t64);
+    			return (long) m.invoke(null, p64);
+    		}
+    	} catch (Exception e) {
+    		throw new Error(e);
+    	}
+	}
+    
+    private static Object WGL(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
+    	try {
+    		Class<?> os = WGL.class;
+    		Method m = null;
+    		try {
+    			m = os.getMethod(n, t);
+    			return m.invoke(null, p);
+    		} catch (Exception e) {
+    			m = os.getMethod(n, t64);
+    			return m.invoke(null, p64);
+    		}
+    	} catch (Exception e) {
+    		throw new Error(e);
+    	}
+	}
+    
+    private static long OS_ReleaseDC(long h, long i) {
+    	return OS("ReleaseDC",
+    			new Class[] { int.class, int.class }, 
+    			new Object[] { (int)h, (int)i }, 
+    			new Class[] { long.class, long.class }, 
+    			new Object[] { h, i } );
+    }
+    
+    private static long OS_GetDC(long h) {
+    	return OS("GetDC",
+    			new Class[] { int.class}, 
+    			new Object[] { (int) h}, 
+    			new Class[] { long.class}, 
+    			new Object[] { h } );
+    }
+    
+    private static long WGL_wglMakeCurrent(long i, long d) {
+    	return (long) WGL("wglMakeCurrent",
+    			new Class[] { int.class, int.class }, 
+    			new Object[] { (int)i, (int)d }, 
+    			new Class[] { long.class, long.class }, 
+    			new Object[] { i, d } );
+    }
+    
+    private static long WGL_wglCreateContext(long i) {
+    	return (long) WGL("wglCreateContext",
+    			new Class[] { int.class }, 
+    			new Object[] { (int)i }, 
+    			new Class[] { long.class }, 
+    			new Object[] { i } );
+    }
+    
+    private static boolean WGL_SetPixelFormat(long i, long j, PIXELFORMATDESCRIPTOR k) {
+    	return (boolean) WGL("SetPixelFormat",
+    			new Class[] { int.class, int.class, PIXELFORMATDESCRIPTOR.class }, 
+    			new Object[] { (int)i, (int)j, k }, 
+    			new Class[] { long.class, int.class, PIXELFORMATDESCRIPTOR.class }, 
+    			new Object[] { i, (int)j, k } );
+    }
+    
+    private static long WGL_ChoosePixelFormat(long i, PIXELFORMATDESCRIPTOR k) {
+    	return (long) WGL("ChoosePixelFormat",
+    			new Class[] { int.class, PIXELFORMATDESCRIPTOR.class }, 
+    			new Object[] { (int)i, k }, 
+    			new Class[] { long.class, PIXELFORMATDESCRIPTOR.class }, 
+    			new Object[] { i, k } );
+    }
+    
+    private static long WGL_wglGetCurrentContext() {
+    	return (long) WGL("wglGetCurrentContext", null, null, null, null);
+    }
+    
+    private static long WGL_wglDeleteContext(long i) {
+    	return (long) WGL("wglDeleteContext",
+    			new Class[] { int.class }, 
+    			new Object[] { (int)i }, 
+    			new Class[] { long.class }, 
+    			new Object[] { i } );
+    }
+    
+    private static long getHandle(GC c) {
+    	try {
+    		Class<?> cl = c.getClass();
+    		Field f = cl.getField("handle");
+    		return f.getLong(c);
+    	} catch (Exception e) {
+    		throw new Error(e);
+    	}
+	}
+    
+    private static long getHandle(Image c) {
+    	try {
+    		Class<?> cl = c.getClass();
+    		Field f = cl.getField("handle");
+    		return f.getLong(c);
+    	} catch (Exception e) {
+    		throw new Error(e);
+    	}
+	}
 }
