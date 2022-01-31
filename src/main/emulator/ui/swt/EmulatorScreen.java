@@ -155,6 +155,8 @@ MouseTrackListener
 	private boolean fpsWasBottom;
 	private boolean fpsWasntVer;
 	private MenuItem rotate90MenuItem;
+	private int keysPressed;
+	private Vector<Integer> keysVector = new Vector<Integer>();
     
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -1535,28 +1537,38 @@ MouseTrackListener
         if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
             return;
         }
-        final String replaced;
-        if ((replaced = Keyboard.replaceKey(n)) == null) {
+        final String r;
+        if ((r = Keyboard.replaceKey(n)) == null) {
             return;
         }
 	    if(!Settings.canvasKeyboard) {
 	        if (this.keysState[n]) {
 	            if (Settings.enableKeyRepeat) {
-	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(replaced));
+	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
 	            }
 	            return;
 	        }
+	        keysPressed++;
 	        this.keysState[n] = true;
-	        if (Settings.enableKeyCache) {
-	            Keyboard.keyCacheStack.push('0' + replaced);
+        } else {
+	        keysPressed++;
+	        if (keysVector.contains(n)) {
+	            if (Settings.enableKeyRepeat) {
+	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
+	            }
 	            return;
 	        }
+	        keysVector.add(n);
+        }
+        if (Settings.enableKeyCache) {
+            Keyboard.keyCacheStack.push('0' + r);
+            return;
         }
         //System.out.println("method568 " + n);
         if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + replaced);
+            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
         }
-        Emulator.getEventQueue().keyPress(Integer.parseInt(replaced));
+        Emulator.getEventQueue().keyPress(Integer.parseInt(r));
     }
     
     protected final void handleKeyRelease(int n) {
@@ -1574,24 +1586,53 @@ MouseTrackListener
         if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
             return;
         }
-        final String method605;
-        if ((method605 = Keyboard.replaceKey(n)) == null) {
+        final String r;
+        if ((r = Keyboard.replaceKey(n)) == null) {
             return;
         }
 	    if(!Settings.canvasKeyboard) {
 	        if (!this.keysState[n]) {
 	            return;
 	        }
+	    	if(keysPressed > 1) {
+	    		for(int i = 0; i < keysState.length; i++) {
+	    			if(keysState[i]) {
+	    		        final String ir;
+	    		        if ((ir = Keyboard.replaceKey(i)) == null) {
+	    		            return;
+	    		        }
+	    		        if (Settings.enableKeyCache) Keyboard.keyCacheStack.push('1' + ir);
+	    		        else Emulator.getEventQueue().keyRelease(Integer.parseInt(ir));
+	    			}
+	    			keysState[i] = false;
+	    		}
+		        keysPressed = 0;
+	    		return;
+	    	}
+	        keysPressed = 0;
 	        this.keysState[n] = false;
+	    } else {
+	    	if(keysPressed > 1) {
+	    		for(Integer i: keysVector) {
+    		        final String ir;
+    		        if ((ir = Keyboard.replaceKey((int)i)) == null) {
+    		            return;
+    		        }
+    		        if (Settings.enableKeyCache) Keyboard.keyCacheStack.push('1' + ir);
+    		        else Emulator.getEventQueue().keyRelease(Integer.parseInt(ir));
+	    		}
+	    	}
+	        keysPressed = 0;
+	        keysVector.clear();
 	    }
         if (Settings.enableKeyCache) {
-            Keyboard.keyCacheStack.push('1' + method605);
+            Keyboard.keyCacheStack.push('1' + r);
             return;
         }
         if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + method605);
+            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
         }
-        Emulator.getEventQueue().keyRelease(Integer.parseInt(method605));
+        Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
     }
     
     public final void mouseDoubleClick(final MouseEvent mouseEvent) {

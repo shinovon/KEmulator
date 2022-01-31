@@ -5,7 +5,7 @@
 
 -target 1.8
 #-dontshrink
--dontoptimize
+#-dontoptimize
 -printmapping '.\mapping.txt'
 -overloadaggressively
 #-keeppackagenames **

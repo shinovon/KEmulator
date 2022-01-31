@@ -98,8 +98,8 @@ public class Emulator
 	private static String midletName;
 	private static Thread vlcCheckerThread;
 	
-	public static final String titleVersion = "2.12.1";
-	public static final String aboutVersion = "v2.12.1";
+	public static final String titleVersion = "2.12.2";
+	public static final String aboutVersion = "v2.12.2";
 	public static final int numericVersion = 12;
 	public static final String propVersion = "v2.12";
 

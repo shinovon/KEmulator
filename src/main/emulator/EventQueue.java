@@ -496,11 +496,11 @@ public final class EventQueue implements Runnable {
 		}
 		
 		public void queue(int state, int arg1, int arg2, boolean key) {
-			append(new Object[] { state, arg1,arg2, key });
+			append(new Object[] { state, arg1, arg2, key });
 		}
 		
 		private void append(Object o) {
-			if(writeIdx == inputTasks.length) writeIdx = 0;
+			if(writeIdx >= inputTasks.length) writeIdx = 0;
 			inputTasks[writeIdx++] = o;
 			synchronized(inputLock) {
 				inputLock.notify();
@@ -515,7 +515,8 @@ public final class EventQueue implements Runnable {
 					}
 					Object[] o;
 					while(readIdx != writeIdx && (o = (Object[]) inputTasks[readIdx++]) != null) {
-						if(readIdx == inputTasks.length) readIdx = 0;
+						if(readIdx >= inputTasks.length) readIdx = 0;
+
 						Displayable d = Emulator.getCurrentDisplay().getCurrent();
 						boolean canv = d == Emulator.getCanvas();
 						if((boolean)o[3]) {
