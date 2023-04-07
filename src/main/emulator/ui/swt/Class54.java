@@ -84,11 +84,13 @@ public final class Class54 implements MouseListener, MouseMoveListener
         gridData2.verticalAlignment = 4;
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 2;
+        layout.horizontalSpacing = 0;
         ((Decorations)(this.aShell806 = new Shell(shell, 67680))).setText(emulator.UILocale.uiText("ABOUT_FRAME_TITLE", "About & Help"));
         ((Decorations)this.aShell806).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Composite)this.aShell806).setLayout((Layout)layout);
-        ((Control)this.aShell806).setSize(new Point(355, 400));
+        ((Control)this.aShell806).setSize(new Point(360, 400));
         ((Control)(this.aCLabel805 = new CLabel((Composite)this.aShell806, 0))).setLayoutData((Object)layoutData5);
+        aCLabel805.setFont(EmulatorScreen.f);
         this.aCLabel805.setText(Emulator.getAboutString());
         this.method463();
         (this.aLink816 = new Link((Composite)this.aShell806, 0)).setText("<a>" + emulator.UILocale.uiText("ABOUT_CHACK_NEW_VER", "Check new version") + "</a>");
@@ -106,6 +108,7 @@ public final class Class54 implements MouseListener, MouseMoveListener
         ((Composite)this.aStyledText808).setFocus();
         this.aStyledText808.setEditable(false);
         this.aStyledText808.setIndent(5);
+        aStyledText808.setFont(EmulatorScreen.f);
         (this.aButton819 = new Button((Composite)this.aShell806, 8388608)).setText(emulator.UILocale.uiText("ABOUT_ONLINE_MANUAL", "Online Manual"));
         ((Control)this.aButton819).setLayoutData((Object)layoutData2);
         ((Control)this.aButton819).setEnabled(false);

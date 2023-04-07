@@ -62,6 +62,7 @@ public final class Settings
 	public static int fpsGame;
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
+	public static String locale = "en-US";
     
     public Settings() {
         super();

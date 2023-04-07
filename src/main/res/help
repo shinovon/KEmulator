@@ -45,6 +45,30 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$nnmod v2.12.7 [2022.10.02]
+Increased file path size limit to 300
+Fixed player initialization from file
+Fixed IOException when creating wav player from url
+
+$nnmod v2.12.6.1 [2022.09.25]
+Mascot Capsule fix
+
+$nnmod v2.12.6 [2022.09.12]
+
+$nnmod v2.12.6 [2022.06.06]
+Added Mascot Capsule patch by woesss
+
+$nnmod v2.12.5 [2022.05.27]
+Fixed sticky numpad keys
+Added Streaming Data Source support for VLC player
+Fixed Options UI scaling
+
+$nnmod v2.12.4 [2022.02.08]
+Keys repeating fix
+
+$nnmod v2.12.3 [2022.02.08]
+Fixed "NoSuchMethodException" on 3D use
+
 $nnmod v2.12.2 [2022.01.31]
 Fixed keyboard input events
 Fixed keys cache
@@ -691,4 +715,4 @@ bridj-0.7.0
 ==================
 $[Bug Report]
 vk.com @shinovon
-telegram @shinnn1
+telegram @shinovon

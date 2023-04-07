@@ -8,7 +8,7 @@ public class Vibration
 {
   public static boolean isSupported()
   {
-    return false;
+    return true;
   }
   
   public static void start(int paramInt1, int paramInt2)

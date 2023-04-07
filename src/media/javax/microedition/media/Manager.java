@@ -112,6 +112,13 @@ public class Manager
         		requireLibVlc();
         		return new VLCPlayerImpl(s, contentType);
         	}
+        	if(s.startsWith("file:///")) {
+        		String f = null;
+        		FileConnectionImpl fc = (FileConnectionImpl)Connector.open(s);
+        		f = fc.getRealPath();
+        		fc.close();
+        		return new PlayerImpl(f, contentType);
+        	}
             if (s.indexOf(58) != -1) {
                 return createPlayer(((InputConnection)Connector.open(s)).openInputStream(), contentType);
             }
@@ -145,8 +152,8 @@ public class Manager
     				// streaming datasource
     				player = new PlayerImpl(contentType, src);
     			}
-    			   // Videos
-    		} else if(contentType.startsWith("video/")) {
+    			// Videos
+    		} else if(contentType.startsWith("video/") || Manager.isLibVlcSupported()) {
     			requireLibVlc();
     			if(locator != null) {
     				// located
@@ -169,7 +176,7 @@ public class Manager
     		contentType = getContentTypeFromLocation(src.getLocator());
 
         	log("getContentType(): " + contentType);
-    		if(contentType.startsWith("video/")) {
+    		if(contentType != null && contentType.startsWith("video/")) {
     			requireLibVlc();
     			player = new VLCPlayerImpl(locator, contentType, src);
     		} else {
@@ -429,6 +436,9 @@ public class Manager
 		}
 		if (url.endsWith(".mpga")) {
 			return "audio/mpga";
+		}
+		if (url.endsWith(".wav")) {
+			return "audio/wav";
 		}
 		return null;
 	}

@@ -192,9 +192,9 @@ public final class Keyboard
         	//num3
         	//if(n == 'd') return 51;
         	//num7
-        	if(n == 'a') return 55;
+        	if(n == 'a' || n == 3) return 55;
         	//num9
-        	if(n == 'd') return 57;
+        	if(n == 'd' || n == 4) return 57;
         	//num0
         	if(n == 'c') return 48;
         	//star

@@ -2,8 +2,11 @@ package emulator.graphics2D.awt;
 
 import emulator.graphics2D.*;
 import java.awt.*;
+import java.awt.font.TextAttribute;
 import java.awt.image.*;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * FontAWT
@@ -11,13 +14,14 @@ import java.io.IOException;
 public final class a implements IFont
 {
     private Font font;
-    private Font emoji;
+    //private Font emoji;
     private FontMetrics metrics;
-	private FontMetrics emojimetrics;
+	//private FontMetrics emojimetrics;
 	private static Font nokiaFont;
     
-    public a(final String s, final int n, final int n2) {
+    public a(final String s, final int size, final int style, boolean height) {
         super();
+        Map<TextAttribute, Object> attributes = new HashMap<>();
         if(s.equals("Nokia")) {
         	if(nokiaFont == null) {
         		try {
@@ -26,22 +30,33 @@ public final class a implements IFont
 					e.printStackTrace();
 				}
         	}
-        	this.font = nokiaFont.deriveFont(n2, n);
-        } else this.font = new Font(s, n2, n);
-        this.emoji = new Font("Segoe UI Emoji", n2, n);
+        	this.font = nokiaFont.deriveFont(style, size);
+        } else {
+        	this.font = new Font(s, style, size);
+        }
+        //this.emoji = new Font("Segoe UI Emoji", style, size);
+        metrics();
+        if(height && metrics.getHeight() != size) {
+        	float f = ((float)metrics.charWidth('W') / (float)metrics.getHeight()) * (float)size;
+        	font = font.deriveFont(f);
+        	metrics();
+        }
+        //this.emojimetrics = new BufferedImage(1, 1, 1).getGraphics().getFontMetrics(this.emoji);
+    }
+    
+    private void metrics() {
         this.metrics = new BufferedImage(1, 1, 1).getGraphics().getFontMetrics(this.font);
-        this.emojimetrics = new BufferedImage(1, 1, 1).getGraphics().getFontMetrics(this.emoji);
     }
     
     public final int stringWidth(final String s) {
-		if(b.isEmojiString(s)) { 
+		/*if(b.isEmojiString(s)) { 
 			return emojimetrics.stringWidth(s);
-		}
+		}*/
         return this.metrics.stringWidth(s);
     }
-    public final int emojistringWidth(final String s) {
+   /* public final int emojistringWidth(final String s) {
 		return emojimetrics.stringWidth(s);
-    }
+    }*/
     
     public final Font getAWTFont() {
         return this.font;
@@ -59,7 +74,7 @@ public final class a implements IFont
         return this.metrics.getAscent();
     }
 
-	public Font getEmojiFont() {
+	/*public Font getEmojiFont() {
 		return emoji;
-	}
+	}*/
 }

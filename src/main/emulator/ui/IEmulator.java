@@ -19,7 +19,9 @@ public interface IEmulator
     
     void disposeSubWindows();
     
-    IFont newFont(final int p0, final int p1);
+    IFont newFont(final int size, final int style);
+    
+    IFont newCustomFont(final int height, final int style);
     
     IImage newImage(final int p0, final int p1, final boolean p2);
     

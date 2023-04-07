@@ -14,7 +14,7 @@ public class BufferSourceStream extends InputStreamSourceStream {
 	}
 
 	public byte[] getHeader() throws IOException {
-		byte[] tmpBuffer = new byte['?'];
+		byte[] tmpBuffer = new byte[5120];
 		int bytesInBuffer = 5120;
 		if (this.iBuffer == null) {
 			bytesInBuffer = readAndBuffer(tmpBuffer, 0, 256);

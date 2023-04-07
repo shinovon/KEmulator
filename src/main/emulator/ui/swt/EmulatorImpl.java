@@ -149,16 +149,30 @@ public final class EmulatorImpl implements IEmulator
         return this.aClass83_1389;
     }
     
-    public final IFont newFont(final int n, final int n2) {
+    public final IFont newFont(final int size, final int style) {
         if (Settings.g2d == 0) {
-        	String s = this.iproperty.getDefaultFontName() + "." + n + "." + n2;
+        	String s = this.iproperty.getDefaultFontName() + "." + size + "." + style;
         	if(swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-            FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), n, n2);
+            FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), size, style);
             swtFontsCache.put(s, f);
             return f;
         }
         if (Settings.g2d == 1) {
-            return new emulator.graphics2D.awt.a(this.iproperty.getDefaultFontName(), n, n2);
+            return new emulator.graphics2D.awt.a(this.iproperty.getDefaultFontName(), size, style, false);
+        }
+        return null;
+    }
+    
+    public final IFont newCustomFont(final int height, final int style) {
+        if (Settings.g2d == 0) {
+        	String s = this.iproperty.getDefaultFontName() + ".-" + height + "." + style;
+        	if(swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
+            FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), height, style);
+            swtFontsCache.put(s, f);
+            return f;
+        }
+        if (Settings.g2d == 1) {
+            return new emulator.graphics2D.awt.a(this.iproperty.getDefaultFontName(), height, style, true);
         }
         return null;
     }

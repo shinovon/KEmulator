@@ -141,12 +141,14 @@ public abstract class Canvas extends Displayable
     public void setFullScreenMode(final boolean b) {
         if (!Settings.ignoreFullScreen) {
             super.h = Emulator.getEmulator().getScreen().getHeight();
+            /*
             if (b) {
                 this.setTicker(null);
                 return;
             }
             this.setTicker(new Ticker("setFullScreenMode(true) to remove me"));
             super.h -= Screen.fontHeight4;
+            */
         }
     }
     
@@ -383,7 +385,7 @@ public abstract class Canvas extends Displayable
     
     public boolean hasPointerEvents() {
     	if(h < 320) return false;
-        return true;
+    	return true;
     }
     
     public boolean hasPointerMotionEvents() {

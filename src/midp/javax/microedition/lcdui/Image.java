@@ -138,6 +138,7 @@ public class Image
             return createImage(emulator.custom.CustomJarResources.getResourceStream(string));
         }
         catch (Exception ex) {
+        	ex.printStackTrace();
             throw new IOException(string);
         }
     }

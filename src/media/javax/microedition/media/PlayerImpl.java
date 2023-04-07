@@ -6,7 +6,10 @@ import emulator.custom.CustomJarResources;
 import emulator.media.amr.*;
 import java.io.*;
 import java.lang.reflect.Method;
+import java.net.URL;
 
+import javax.microedition.io.Connector;
+import javax.microedition.io.InputConnection;
 import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
 import javax.microedition.media.protocol.SourceStream;
@@ -43,6 +46,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	private boolean mp3Complete;
 	private DataSource dataSource;
 	private FramePositioningControl frameControl;
+	private boolean dataSourceDisconnected;
 	static Class clipCls;
 
 	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
@@ -56,10 +60,14 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		super();
 		if (contentType == null)
 			contentType = "";
+		a(inputStream, contentType);
+	}
+	
+	private void a(final InputStream inputStream, String contentType) throws IOException {
 		contentType = contentType.toLowerCase();
 		this.contentType = contentType;
 		this.loopCount = 1;
-		this.dataLen = inputStream.available();
+		if(dataLen == 0) this.dataLen = inputStream.available();
 		if (contentType.equals("audio/amr")) {
 			this.amr(inputStream);
 		} else if (contentType.equals("audio/x-wav") || contentType.equals("audio/wav")) {
@@ -86,7 +94,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				public int mapTimeToFrame(long p0) {
 					if (((Player) sequencer).framesPerSecond() == 0)
 						return -1;
-					return 0;
+					return (int)(((float)p0 / 1000.0F) * ((Player) sequencer).framesPerSecond());
 				}
 
 				public int seek(int p0) {
@@ -129,6 +137,24 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		
 	}
 
+	public PlayerImpl(String src, String contentType) throws IOException {
+		if (contentType == null)
+			contentType = "";
+		if (contentType.equals("audio/wav")) {
+			contentType = contentType.toLowerCase();
+			this.contentType = contentType;
+			this.loopCount = 1;
+			this.dataLen = (int) new File(src).length();
+			wav(new URL("file:///" + src));
+			this.setLevel(this.state = 100);
+			this.listeners = new Vector();
+			this.timeBase = Manager.getSystemTimeBase();
+		} else {
+			this.dataLen = (int) new File(src).length();
+			a(new FileInputStream(src), contentType);
+		}
+	}
+
 	private void amr(final InputStream inputStream) throws IOException {
 		try {
 			final byte[] method476;
@@ -157,7 +183,43 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			this.sequence = null;
-			throw new IOException("WAV realize error!");
+			throw new IOException("WAV realize error!", ex);
+		}
+		try {
+			AudioInputStream audioInputStream;
+			AudioFormat format;
+			if ((format = (audioInputStream = (AudioInputStream) this.sequence).getFormat())
+					.getEncoding() == AudioFormat.Encoding.ULAW || format.getEncoding() == AudioFormat.Encoding.ALAW) {
+				final AudioFormat audioFormat;
+				audioInputStream = AudioSystem
+						.getAudioInputStream(audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, format
+								.getSampleRate(), format.getSampleSizeInBits() * 2, format
+										.getChannels(), format.getFrameSize()
+												* 2, format.getFrameRate(), true), audioInputStream);
+				format = audioFormat;
+			}
+			final Clip anObject298;
+			(anObject298 = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioInputStream
+					.getFormat(), (int) audioInputStream.getFrameLength() * format.getFrameSize())))
+							.addLineListener(this);
+			anObject298.open(audioInputStream);
+			this.sequence = anObject298;
+		} catch (Exception ex2) {
+			this.sequence = null;
+			throw new IOException();
+		}
+		this.toneControl = new ToneControlImpl();
+		this.volumeControl = new VolumeControlImpl(this);
+		this.controls = new Control[] { this.toneControl, this.volumeControl };
+	}
+	
+	private void wav(final URL url) throws IOException {
+		try {
+			this.sequence = AudioSystem.getAudioInputStream(url);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			this.sequence = null;
+			throw new IOException("WAV realize error!", ex);
 		}
 		try {
 			AudioInputStream audioInputStream;
@@ -298,8 +360,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} else if (this.sequence instanceof Player) {
 			((Player) this.sequence).close();
 		}
-		if(dataSource != null) {
+		if(dataSource != null && !dataSourceDisconnected) {
 			dataSource.disconnect();
+			dataSourceDisconnected = true;
 		}
 		this.sequence = null;
 		this.state = 0;
@@ -331,9 +394,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			anInt303 = 100;
 		}
 		playerImpl.state = anInt303;
-		if (dataSource != null && dataSource.getStreams() != null && dataSource.getStreams()[0] != null) {
+		if (dataSource != null && dataSource.getStreams() != null && dataSource.getStreams()[0] != null && !dataSourceDisconnected) {
 			if (dataSource.getStreams()[0].getSeekType() == 0) {
 				dataSource.disconnect();
+				dataSourceDisconnected = true;
 			}
 		}
 	}
@@ -512,6 +576,11 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			throw new IllegalStateException();
 		}
 		if (this.state != 400) {
+			if (this.sequence instanceof Sequence && midiCompleted) {
+				setMediaTime(0);
+			} else if (this.sequence instanceof Player && mp3Complete) {
+				setMediaTime(0);
+			}
 			(this.playerThread = new Thread(this)).start();
 			this.state = 400;
 			this.notifyListeners("started", new Long(0L));
@@ -535,7 +604,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}
 
 	public Control getControl(final String s) {
-		//System.out.println("getControl " + s);
 		if (s.indexOf("VolumeControl") != -1) {
 			return this.volumeControl;
 		}
@@ -617,7 +685,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		Object n;
 		String s;
 		int loopCount = this.loopCount;
-		do {
+		while (this.playerThread != null && loopCount != 0) {
 			boolean b2 = false;
 			this.soundCompleted = false;
 			this.midiCompleted = false;
@@ -626,7 +694,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				this.sequencer.start();
 				while (!this.midiCompleted && this.playerThread != null) {
 					try {
-						Thread.sleep((long) 99L);
+						Thread.sleep(1);
+						Thread.yield();
 					} catch (Exception exception) {
 						break;
 					}
@@ -669,7 +738,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 					e.printStackTrace();
 				}
 			}
-		} while (this.playerThread != null && loopCount != 0);
+		}
 		this.playerThread = null;
 		this.state = 300;
 		if (this.soundCompleted || this.midiCompleted || this.mp3Complete) {

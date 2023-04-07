@@ -452,16 +452,26 @@ public final class Emulator3D implements IGraphics3D
         Emulator3D.m3gProps = new Hashtable();
     }
     
+    private static long toLong(Object o) {
+    	if(o instanceof Integer) {
+    		return ((Integer) o).longValue();
+    	}
+    	if(o instanceof Long) {
+    		return ((Long) o).longValue();
+    	}
+    	throw new Error("Not number: " + o.getClass());
+	}
+    
     private static long OS(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
     	try {
     		Class<?> os = OS.class;
     		Method m = null;
     		try {
     			m = os.getMethod(n, t);
-    			return (long) m.invoke(null, p);
+    			return toLong(m.invoke(null, p));
     		} catch (Exception e) {
     			m = os.getMethod(n, t64);
-    			return (long) m.invoke(null, p64);
+    			return toLong(m.invoke(null, p64));
     		}
     	} catch (Exception e) {
     		throw new Error(e);
@@ -501,19 +511,19 @@ public final class Emulator3D implements IGraphics3D
     }
     
     private static long WGL_wglMakeCurrent(long i, long d) {
-    	return (long) WGL("wglMakeCurrent",
+    	return toLong(WGL("wglMakeCurrent",
     			new Class[] { int.class, int.class }, 
     			new Object[] { (int)i, (int)d }, 
     			new Class[] { long.class, long.class }, 
-    			new Object[] { i, d } );
+    			new Object[] { i, d } ));
     }
     
     private static long WGL_wglCreateContext(long i) {
-    	return (long) WGL("wglCreateContext",
+    	return toLong(WGL("wglCreateContext",
     			new Class[] { int.class }, 
     			new Object[] { (int)i }, 
     			new Class[] { long.class }, 
-    			new Object[] { i } );
+    			new Object[] { i } ));
     }
     
     private static boolean WGL_SetPixelFormat(long i, long j, PIXELFORMATDESCRIPTOR k) {
@@ -525,23 +535,23 @@ public final class Emulator3D implements IGraphics3D
     }
     
     private static long WGL_ChoosePixelFormat(long i, PIXELFORMATDESCRIPTOR k) {
-    	return (long) WGL("ChoosePixelFormat",
+    	return toLong(WGL("ChoosePixelFormat",
     			new Class[] { int.class, PIXELFORMATDESCRIPTOR.class }, 
     			new Object[] { (int)i, k }, 
     			new Class[] { long.class, PIXELFORMATDESCRIPTOR.class }, 
-    			new Object[] { i, k } );
+    			new Object[] { i, k } ));
     }
     
     private static long WGL_wglGetCurrentContext() {
-    	return (long) WGL("wglGetCurrentContext", null, null, null, null);
+    	return toLong(WGL("wglGetCurrentContext", null, null, null, null));
     }
     
     private static long WGL_wglDeleteContext(long i) {
-    	return (long) WGL("wglDeleteContext",
+    	return toLong(WGL("wglDeleteContext",
     			new Class[] { int.class }, 
     			new Object[] { (int)i }, 
     			new Class[] { long.class }, 
-    			new Object[] { i } );
+    			new Object[] { i } ));
     }
     
     private static long getHandle(GC c) {

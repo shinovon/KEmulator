@@ -150,17 +150,50 @@ public final class EventQueue implements Runnable {
 	}
 
 	public final void mouseDown(final int x, final int y) {
-		input.queue(0, x, y, false);
+		try {
+			if (Emulator.getCurrentDisplay().getCurrent() == null) {
+				return;
+			}
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				Emulator.getCanvas().invokePointerPressed(x, y);
+				return;
+			}
+			Emulator.getScreen().invokePointerPressed(x, y);
+		} catch (Throwable e) {
+		}
+		//input.queue(0, x, y, false);
 		//mouse(268435456, x, y);
 	}
 	
 	public final void mouseUp(final int x, final int y) {
-		input.queue(1, x, y, false);
+		try {
+			if (Emulator.getCurrentDisplay().getCurrent() == null) {
+				return;
+			}
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				Emulator.getCanvas().invokePointerReleased(x, y);
+				return;
+			}
+			Emulator.getScreen().invokePointerReleased(x, y);
+		} catch (Throwable e) {
+		}
+		//input.queue(1, x, y, false);
 		//mouse(536870912, x, y);
 	}
 	
 	public final void mouseDrag(final int x, final int y) {
-		input.queue(2, x, y, false);
+		try {
+			if (Emulator.getCurrentDisplay().getCurrent() == null) {
+				return;
+			}
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				Emulator.getCanvas().invokePointerDragged(x, y);
+				return;
+			}
+			Emulator.getScreen().invokePointerDragged(x, y);
+		} catch (Throwable e) {
+		}
+		//input.queue(2, x, y, false);
 		//dx = x;
 		//dy = y;
 		//changed = true;
@@ -461,10 +494,10 @@ public final class EventQueue implements Runnable {
 						}
 						this.anInt1222 = 0;
 						Controllers.method751();
-						try {
+						/*try {
 							Thread.sleep(1L);
 						} catch (Exception ex3) {
-						}
+						}*/
 						continue;
 					}
 				}
@@ -484,90 +517,107 @@ public final class EventQueue implements Runnable {
 	}
 	
 	private class InputThread implements Runnable {
-		private int readIdx;
-		private int writeIdx;
-		private Object[] inputTasks;
-		
-		private Object inputLock = new Object();
+		//private int readIdx;
+		//private int writeIdx;
+		private Object[] elements;
+
+		private Object writeLock = new Object();
+		private Object readLock = new Object();
 		//private Object inputWriteLock = new Object();
+		private int length;
+		private int count;
 		
 		private InputThread() {
-			inputTasks = new Object[128];
+			elements = new Object[length = 16];
 		}
 		
 		public void queue(int state, int arg1, int arg2, boolean key) {
-			append(new Object[] { state, arg1, arg2, key });
+			append(new int[] { state, arg1, arg2, key?1:0 });
 		}
 		
 		private void append(Object o) {
-			inputTasks[writeIdx++] = o;
-			if(writeIdx >= inputTasks.length) writeIdx = 0;
-			synchronized(inputLock) {
-				inputLock.notify();
+			if(count + 1 >= length) {
+				// увеличивание массива
+				Object[] tmp = elements;
+				elements = new Object[length += 16];
+				System.arraycopy(tmp, 0, elements, 0, count);
+				//System.out.println("Growed input buffer from " + (count + 1) + " to " + length);
+			}
+			elements[count++] = o;
+			synchronized(readLock) {
+				readLock.notify();
 			}
 		}
 
 		public void run() {
 			try {
 				while(running) {
-					synchronized(inputLock) {
-						inputLock.wait();
+					synchronized(readLock) {
+						readLock.wait();
 					}
-					Object[] o;
-					while(readIdx != writeIdx && (o = (Object[]) inputTasks[readIdx++]) != null) {
-						if(readIdx >= inputTasks.length) readIdx = 0;
-
-						Displayable d = Emulator.getCurrentDisplay().getCurrent();
-						boolean canv = d == Emulator.getCanvas();
-						if((boolean)o[3]) {
-							// keyboard
-							int n = (int) o[1];
-							switch((int) o[0]) {
-							case 0: {
-								int k = Application.internalKeyPress(n);
-								if(!d.handleSoftKeyAction(k, true)) {
-									if (canv) ((Canvas)d).invokeKeyPressed(k);
-									else ((Screen)d).invokeKeyPressed(k);
-								}
-								break;
-							}
-							case 1: {
-								int k = Application.internalKeyRelease(n);
-								if(!d.handleSoftKeyAction(k, false)) {
-									if (canv) ((Canvas)d).invokeKeyReleased(k);
-									else ((Screen)d).invokeKeyReleased(k);
-								}
-								break;
-							}
-							case 2:
-								if(!canv) return;
-								((Canvas)d).invokeKeyRepeated(n);
-								break;
-							}
-						} else {
-							// mouse
-							int x = (int) o[1];
-							int y = (int) o[2];
-							switch((int) o[0]) {
-							case 0:
-								if(canv) ((Canvas)d).invokePointerPressed(x, y);
-								else ((Screen)d).invokePointerPressed(x, y);
-								break;
-							case 1:
-								if(canv) ((Canvas)d).invokePointerReleased(x, y);
-								else ((Screen)d).invokePointerReleased(x, y);
-								break;
-							case 2:
-								if(canv) ((Canvas)d).invokePointerDragged(x, y);
-								else ((Screen)d).invokePointerDragged(x, y);
-								break;
-							}
-						}
+					while(count > 0) {
+						parseAction((int[]) elements[0]);
+						System.arraycopy(elements, 1, elements, 0, length-1);
+						elements[--count] = null;
 					}
+					synchronized(writeLock) {
+						writeLock.notify();
+					}
+					Thread.sleep(1);
 				}
 			} catch (Throwable e) {
 				System.out.println("Exception in Input Thread!");
 				e.printStackTrace();
+			}
+		}
+		
+		private void parseAction(int[] o) {
+			if(o == null) return;
+			Displayable d = Emulator.getCurrentDisplay().getCurrent();
+			boolean canv = d == Emulator.getCanvas();
+			if(o[3] > 0) {
+				// keyboard
+				int n = (int) o[1];
+				switch((int) o[0]) {
+				case 0: {
+					int k = Application.internalKeyPress(n);
+					if(!d.handleSoftKeyAction(k, true)) {
+						if (canv) ((Canvas)d).invokeKeyPressed(k);
+						else ((Screen)d).invokeKeyPressed(k);
+					}
+					break;
+				}
+				case 1: {
+					int k = Application.internalKeyRelease(n);
+					if(!d.handleSoftKeyAction(k, false)) {
+						if (canv) ((Canvas)d).invokeKeyReleased(k);
+						else ((Screen)d).invokeKeyReleased(k);
+					}
+					break;
+				}
+				case 2:
+					if(!canv) return;
+					((Canvas)d).invokeKeyRepeated(n);
+					break;
+				}
+			} else {
+				// mouse
+				int x = (int) o[1];
+				int y = (int) o[2];
+				switch((int) o[0]) {
+				case 0:
+					if(canv) ((Canvas)d).invokePointerPressed(x, y);
+					else ((Screen)d).invokePointerPressed(x, y);
+					break;
+				case 1:
+					if(canv) ((Canvas)d).invokePointerReleased(x, y);
+					else ((Screen)d).invokePointerReleased(x, y);
+					break;
+				case 2:
+					if(canv) ((Canvas)d).invokePointerDragged(x, y);
+					else ((Screen)d).invokePointerDragged(x, y);
+					break;
+				}
 			}
 		}
 	}

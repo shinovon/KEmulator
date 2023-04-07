@@ -77,7 +77,7 @@ public class Display
                 Emulator.setCanvas((Canvas)d);
                 Emulator.getEventQueue().queue(15);
                 Emulator.getEventQueue().queue(1);
-                Emulator.getEventQueue().waitRepainted2();
+                //Emulator.getEventQueue().waitRepainted2();
             }
             else if (d instanceof Screen) {
                 Emulator.setScreen((Screen)d);

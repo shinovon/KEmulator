@@ -62,9 +62,9 @@ public class Font
     	return this;
     }
     
-    public Font deriveFont(int style, int size) {
+    public Font deriveFont(int style, int height) {
     	this.style = 0;
-        this.font = Emulator.getEmulator().newFont(size, 0);
+        this.font = Emulator.getEmulator().newCustomFont(height, 0);
     	return this;
     }
     

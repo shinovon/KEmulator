@@ -156,7 +156,12 @@ MouseTrackListener
 	private boolean fpsWasntVer;
 	private MenuItem rotate90MenuItem;
 	private int keysPressed;
-	private Vector<Integer> keysVector = new Vector<Integer>();
+	private Vector<Integer> pressedKeys = new Vector<Integer>();
+	private int lastDragTime;
+	private int lastMouseX;
+	private int lastMouseY;
+	private boolean shifted;
+	static Font f;
     
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -256,6 +261,7 @@ MouseTrackListener
     	try
     	{
 	        while (this.shell != null && !((Widget)this.shell).isDisposed()) {
+	        	pollKeyboard(canvas);
 	            if (!EmulatorScreen.display.readAndDispatch()) {
 	                EmulatorScreen.display.sleep();
 	            }
@@ -272,6 +278,200 @@ MouseTrackListener
     	}
         this.pauseState = 0;
     }
+    
+    public static final Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
+		for(Method method : clazz.getDeclaredMethods()) {
+			Class<?>[] checkParamTypes = method.getParameterTypes();
+			if(method.getName().equals(name) && checkParamTypes.length == parameterTypes.length) {
+				boolean matches = true;
+				for(int i = 0; i < parameterTypes.length; i++) {
+					Class<?> paramType = parameterTypes[i];
+					Class<?> checkParamType = checkParamTypes[i];
+					
+					if(!equals(paramType, checkParamType)) {
+						matches = false;
+						break;
+					}
+				}
+				if(!matches) {
+					continue;
+				}
+				return method;
+			}
+		}
+		return null;
+	}
+    
+    public static final boolean equals(Class<?> class1, Class<?> class2) {
+		if(class1 == null) {
+			if(class2 == null) {
+				return true;
+			}
+			return false;
+		}
+		if(class2 == null) {
+			return false;
+		}
+		return class1.isAssignableFrom(class2) && class2.isAssignableFrom(class1);
+	}
+    
+    // KEYBOARD
+
+	protected static volatile boolean[] lastKeyboardButtonStates = new boolean[256];
+	protected static volatile boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
+	protected static volatile long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];
+	protected static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
+	private static Class win32OS;
+	private static Method win32OSGetKeyState;
+    public boolean pollKeyboard(Canvas canvas) {
+    	if(Settings.canvasKeyboard) return false;
+		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() == Thread.currentThread()) {
+			final boolean active = false ? true : (canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible());
+			/*switch(Platform.get()) {
+			case WINDOWS: */{
+				canvas.getDisplay().readAndDispatch();
+				if(canvas.isDisposed()) {
+					return false;
+				}
+				if(win32OS == null) {
+					try {
+						win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
+					} catch (Exception e) {
+					}
+					if(win32OS == null) {
+						return false;
+					}
+				}
+				if(win32OSGetKeyState == null) {
+					win32OSGetKeyState = getMethod(win32OS, "GetKeyState", Integer.TYPE);
+					if(win32OSGetKeyState == null) {
+						return false;
+					}
+				}
+				
+				for(int i = 0; i < keyboardButtonStates.length; i++) {
+					lastKeyboardButtonStates[i] = keyboardButtonStates[i];
+					short keyState;
+					try {
+						keyState = ((Short) win32OSGetKeyState.invoke(null, Integer.valueOf(i))).shortValue();
+					} catch(Exception e) {
+						e.printStackTrace();
+						return false;
+					}
+					keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ < 0 : false;
+				}
+			}
+			/*
+			case LINUX: {
+				// The following code was adapted from JNA's KeyboardUtils class.
+				
+				// KeyboardUtils start
+				
+				X11 lib = X11.INSTANCE;
+				X11.Display dpy = lib.XOpenDisplay(null);
+				if(dpy == null) {
+					//throw new Error("Can't open X Display");
+					System.err.println("Failed to poll Keyboard: Can't open X Display!");
+					System.err.flush();
+					return false;
+				}
+				
+				// KeyboardUtils end
+				
+				try {
+					for(int i = 0; i < keyboardButtonStates.length; i++) {
+						lastKeyboardButtonStates[i] = keyboardButtonStates[i];
+						
+						// KeyboardUtils start
+						
+						byte[] keys = new byte[32];
+						lib.XQueryKeymap(dpy, keys);
+						
+						int keysym = toX11KeySym(i, Keys.getLocationForKey(i));
+						boolean pressed = false;
+						for(int code = 5; code < 256; code++) {
+							int idx = code / 8;
+							int shift = code % 8;
+							if((keys[idx] & (1 << shift)) != 0) {
+								int sym = lib.XKeycodeToKeysym(dpy, (byte) code, 0).intValue();
+								if(sym == keysym) {
+									pressed = true; // Brian_Entei
+									break;
+								}
+							}
+						}
+						
+						//KeyboardUtils end
+						
+						keyboardButtonStates[i] = active ? pressed : false;
+					}
+					
+					// KeyboardUtils start
+					
+				} finally {
+					lib.XCloseDisplay(dpy);
+					dpy = null;
+					
+					//KeyboardUtils end
+					
+				}
+				
+				for(int i = 0; i < keyboardButtonStates.length; i++) {
+					lastKeyboardButtonStates[i] = keyboardButtonStates[i];
+					keyboardButtonStates[i] = active ? KeyboardUtils.isPressed(i) : false;
+				}
+				break;
+			}
+			case MACOSX: {
+				// TODO Find a way to dynamically poll the keyboard as is done above for Windows platforms
+				break;
+			}
+			case UNKNOWN:
+			default: {
+				return false;
+			}
+			}
+			*/
+			
+			long now = System.currentTimeMillis();
+			for(int button = 0; button < keyboardButtonStates.length; button++) {
+				if(!lastKeyboardButtonStates[button] && keyboardButtonStates[button]) {
+					keyboardButtonHoldTimes[button] = 0;
+					keyboardButtonDownTimes[button] = now;
+					onKeyDown(button);
+				}
+				if(lastKeyboardButtonStates[button] && keyboardButtonStates[button] && now - keyboardButtonDownTimes[button] >= 460) {
+					if(keyboardButtonHoldTimes[button] == 0 || keyboardButtonDownTimes[button] > keyboardButtonHoldTimes[button]) {
+						keyboardButtonHoldTimes[button] = now;
+					}
+					if(now - keyboardButtonHoldTimes[button] >= 40) {
+						keyboardButtonHoldTimes[button] = now;
+						onKeyHeld(button);
+					}
+				}
+				if(lastKeyboardButtonStates[button] && !keyboardButtonStates[button]) {
+					keyboardButtonHoldTimes[button] = 0;
+					onKeyUp(button);
+				}
+			}
+			
+			return true;
+		}
+		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() != Thread.currentThread()) {
+			final Boolean[] rtrn = {null};
+			canvas.getDisplay().asyncExec(() -> {
+				rtrn[0] = Boolean.valueOf(pollKeyboard(canvas));
+			});
+			while(rtrn[0] == null) {
+				try {
+					Thread.sleep(10L);
+				} catch (Exception e) {
+				}
+			}
+			return rtrn[0].booleanValue();
+		}
+		return false;
+	}
     
 
     private void rotate(int var1, int var2) {
@@ -542,6 +742,10 @@ MouseTrackListener
             }
           });
         ((Composite)this.shell).setLayout((Layout)layout);
+        FontData fd = shell.getFont().getFontData()[0];
+        fd.height = (fd.height / -fd.data.lfHeight) * 12;
+        f = new Font(shell.getDisplay(), fd);
+        shell.setFont(f);
         this.method588();
         (this.aCLabel970 = new CLabel((Composite)this.shell, 0)).setText("\t");
         ((Control)this.aCLabel970).setLayoutData((Object)layoutData3);
@@ -774,8 +978,6 @@ MouseTrackListener
     
     
     protected final void toggleMenuAccelerators(final boolean b) {
-        MenuItem menuItem;
-        int accelerator;
         if (b) {
             this.infosMenuItem.setAccelerator(73);
             this.xrayViewMenuItem.setAccelerator(88);
@@ -793,10 +995,8 @@ MouseTrackListener
             this.resumeMenuItem.setAccelerator(69);
             this.openJadMenuItem.setAccelerator(68);
             this.pausestepMenuItem.setAccelerator(84);
-            menuItem = this.playResumeMenuItem;
-            accelerator = 82;
-        }
-        else {
+            this.playResumeMenuItem.setAccelerator(82);
+        } else {
             this.infosMenuItem.setAccelerator(0);
             this.xrayViewMenuItem.setAccelerator(0);
             this.alwaysOnTopMenuItem.setAccelerator(0);
@@ -813,10 +1013,8 @@ MouseTrackListener
             this.resumeMenuItem.setAccelerator(0);
             this.openJadMenuItem.setAccelerator(0);
             this.pausestepMenuItem.setAccelerator(0);
-            menuItem = this.playResumeMenuItem;
-            accelerator = 0;
+            this.playResumeMenuItem.setAccelerator(0);
         }
-        menuItem.setAccelerator(accelerator);
     }
     
 
@@ -1389,6 +1587,7 @@ MouseTrackListener
                     gc.setBackground(EmulatorScreen.display.getSystemColor(22));
                     gc.fillRectangle(0, 0, this.anInt996, this.anInt1003);
                     gc.setForeground(EmulatorScreen.display.getSystemColor(21));
+                    gc.setFont(f);
                     gc.drawText(Emulator.getInfoString(), this.anInt996 >> 3, this.anInt1003 >> 3, true);
                 }
                 else if (Settings.g2d == 0) {
@@ -1496,7 +1695,6 @@ MouseTrackListener
     }
     
     public final void keyPressed(final KeyEvent keyEvent) {
-    	//System.out.println(keyEvent.character + " " + keyEvent.keyCode);
         if (keyEvent.keyCode == 16777261) {
             this.zoomOut();
             return;
@@ -1505,35 +1703,76 @@ MouseTrackListener
             this.zoomIn();
             return;
         }
-        this.caret.method470(keyEvent);
-        int n;
-        if ((n = (keyEvent.keyCode & 0xFEFFFFFF)) == 13 && (keyEvent.keyCode & 0x1000000) != 0x0) {
-            n = 22;
-        }
-        if(keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard) n = keyEvent.character;
-        this.handleKeyPress(n);
+        this.caret.keyPressed(keyEvent);
+    	if(!Settings.canvasKeyboard) return;
+        int n = keyEvent.keyCode & 0xFEFFFFFF;
+        if(keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
+        	n = keyEvent.character;
+        handleKeyPress(n);
     }
     
     public final void keyReleased(final KeyEvent keyEvent) {
-        int n;
-        if ((n = (keyEvent.keyCode & 0xFEFFFFFF)) == 13 && (keyEvent.keyCode & 0x1000000) != 0x0) {
-            n = 22;
-        }
-        if(keyEvent.character >= 33 && keyEvent.character <= 90) n = keyEvent.character;
-        this.handleKeyRelease(n);
+    	if(!Settings.canvasKeyboard) return;
+        int n = keyEvent.keyCode & 0xFEFFFFFF;
+        if(keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
+        	n = keyEvent.character;
+    	handleKeyRelease(n);
     }
     
-    protected final void handleKeyPress(int n) {
+    
+    
+	protected final void handleKeyPress(int n) {
+		if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+			return;
+		}
+		/*
+		if (Settings.fpsMode) {
+			int g = Keyboard.fpsKey(n);
+			if (g != 0) {
+				mp(n);
+				return;
+			}
+		}*/
+		if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
+			return;
+		}
+		final String r;
+		if ((r = Keyboard.replaceKey(n)) == null) {
+			return;
+		}
+		if (pressedKeys.contains(n)) {
+			if (Settings.enableKeyRepeat) {
+				Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
+			}
+			return;
+		}
+		synchronized(pressedKeys) {
+			if (!pressedKeys.contains(n)) {
+				pressedKeys.add(n);
+				keysPressed++;
+			}
+		}
+		if (Settings.enableKeyCache) {
+			Keyboard.keyCacheStack.push('0' + r);
+			return;
+		}
+		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+			Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
+		}
+		Emulator.getEventQueue().keyPress(Integer.parseInt(r));
+	}
+
+    protected final void handleKeyRelease(int n) {
         if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
-        }
+        }/*
         if(Settings.fpsMode) {
         	int g = Keyboard.fpsKey(n);
         	if(g != 0) {
-        		mp(n);
+        		mr(n);
         		return;
         	}
-        }
+        }*/
         if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
             return;
         }
@@ -1541,37 +1780,209 @@ MouseTrackListener
         if ((r = Keyboard.replaceKey(n)) == null) {
             return;
         }
-	    if(!Settings.canvasKeyboard) {
-	        if (this.keysState[n]) {
-	            if (Settings.enableKeyRepeat) {
-	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
-	            }
-	            return;
-	        }
-	        keysPressed++;
-	        this.keysState[n] = true;
-        } else {
-	        keysPressed++;
-	        if (keysVector.contains(n)) {
-	            if (Settings.enableKeyRepeat) {
-	                Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
-	            }
-	            return;
-	        }
-	        keysVector.add(n);
-        }
-        if (Settings.enableKeyCache) {
-            Keyboard.keyCacheStack.push('0' + r);
+    	Integer in = new Integer(n);
+		synchronized(pressedKeys) {
+	    	if(!pressedKeys.contains(in)) {
+	    		return;
+	    	}
+	    	pressedKeys.remove(in);
+	    	keysPressed--;
+		}
+    
+	    if (Settings.enableKeyCache) {
+	        Keyboard.keyCacheStack.push('1' + r);
+	        return;
+	    }
+	    if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+	        Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
+	    }
+	    Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
+	}
+    
+    
+
+    
+    private int key(int n) {
+    	if(n <= 7) return -1;
+    	if(n >= 14 && n <= 31) return -1;
+    	if(n >= 91 && n <= 95) return -1;
+    	if(n >= 41 && n <= 47) return -1;
+    	if(n >= 124 && n <= 186) return -1;
+    	if(n > 190) return -1;
+    	if(n >= 'A' && n <= 'Z') n -= 'A' - 'a';
+    	else if(n >= 96 && n <= 105) n = n-96+'0';
+    	else if(n >= 112 && n <= 123) n = n-112+10;
+    	else switch(n) {
+    	case 33:
+    		n = 5;
+    		break;
+    	case 34:
+    		n = 6;
+    		break;
+    	case 35:
+    		n = 7;
+    		break;
+    	case 36:
+    		n = 8;
+    		break;
+    	case 37:
+    		n = 3;
+    		break;
+    	case 38:
+    		n = 1;
+    		break;
+    	case 39:
+    		n = 4;
+    		break;
+    	case 40:
+    		n = 2;
+    		break;
+    	case 106:
+    		n = '*';
+    		break;
+    	case 107:
+    		n = '+';
+    		break;
+    	case 109:
+    		n = '-';
+    		break;
+    	case 110:
+    		n = '.';
+    		break;
+    	case 111:
+    		n = '/';
+    		break;
+    	case 187:
+    		n = '=';
+    		break;
+    	case 188:
+    		n = ',';
+    		break;
+    	case 189:
+    		n = '-';
+    		break;
+    	case 190:
+    		n = '.';
+    		break;
+    	}
+		return n;
+	}
+    
+    private void onKeyDown(int n) {
+    	if(Settings.canvasKeyboard) return;
+    	n = key(n);
+    	if(n <= 0) return;
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
-        //System.out.println("method568 " + n);
-        if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
+		final String r;
+		if ((r = Keyboard.replaceKey(n)) == null) {
+			return;
+		}
+		if (Settings.enableKeyCache) {
+			Keyboard.keyCacheStack.push('0' + r);
+			return;
+		}
+		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+			Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
+		}
+		Emulator.getEventQueue().keyPress(Integer.parseInt(r));
+    }
+
+	private void onKeyHeld(int n) {
+    	if(Settings.canvasKeyboard) return;
+    	n = key(n);
+    	if(n <= 0) return;
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+            return;
         }
-        Emulator.getEventQueue().keyPress(Integer.parseInt(r));
+		if (!Settings.enableKeyRepeat) {
+			return;
+		}
+		String r = Keyboard.replaceKey(n);
+		if (r == null) {
+			return;
+		}
+		Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
     }
     
-    protected final void handleKeyRelease(int n) {
+    private void onKeyUp(int n) {
+    	if(Settings.canvasKeyboard) return;
+    	n = key(n);
+    	if(n <= 0) return;
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+            return;
+        }
+        final String r;
+        if ((r = Keyboard.replaceKey(n)) == null) {
+            return;
+        }
+    	if (Settings.enableKeyCache) {
+	        Keyboard.keyCacheStack.push('1' + r);
+	        return;
+	    }
+	    if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+	        Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
+	    }
+	    Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
+    }
+    
+    
+    
+    
+    
+    
+
+    protected final void handleKeyPress0(int n) {
+	        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+	            return;
+	        }
+	        if(Settings.fpsMode) {
+	        	int g = Keyboard.fpsKey(n);
+	        	if(g != 0) {
+	        		mp(n);
+	        		return;
+	        	}
+	        }
+	        if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
+	            return;
+	        }
+	        final String r;
+	        if ((r = Keyboard.replaceKey(n)) == null) {
+	            return;
+	        }
+	       /* 
+		    if(!Settings.canvasKeyboard) {
+		        if (this.keysState[n]) {
+		            if (Settings.enableKeyRepeat) {
+		                Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
+		            }
+		            return;
+		        }
+		        keysPressed++;
+		        this.keysState[n] = true;
+	        } else {*/
+		        if (pressedKeys.contains(n)) {
+		            if (Settings.enableKeyRepeat) {
+		                Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
+		            }
+		            return;
+		        }
+		        keysPressed++;
+		        pressedKeys.add(n);
+	       // }
+	        if (Settings.enableKeyCache) {
+	            Keyboard.keyCacheStack.push('0' + r);
+	            return;
+	        }
+	        //System.out.println("method568 " + n);
+	        if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+	            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
+	        }
+	        Emulator.getEventQueue().keyPress(Integer.parseInt(r));
+    }
+        
+    protected final void handleKeyRelease0(int n) {
         if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
@@ -1590,7 +2001,17 @@ MouseTrackListener
         if ((r = Keyboard.replaceKey(n)) == null) {
             return;
         }
-	    if(!Settings.canvasKeyboard) {
+        // XXX: костыль с релизом клавиш
+        /*
+        if(!Settings.canvasKeyboard) {
+	        if (!this.keysState[n]) {
+	            return;
+	        }
+	        keysPressed--;
+	        this.keysState[n] = false;
+	    }
+	    */
+	   /* if(!Settings.canvasKeyboard) {
 	        if (!this.keysState[n]) {
 	            return;
 	        }
@@ -1610,10 +2031,25 @@ MouseTrackListener
 	    		return;
 	    	}
 	        keysPressed = 0;
-	        this.keysState[n] = false;
-	    } else {
-	    	if(keysPressed > 1) {
-	    		for(Integer i: keysVector) {
+	       keysState[n] = false;
+	    } else {*/
+	    	Integer in = new Integer(n);
+	    	if(!pressedKeys.contains(in)) {
+	    		//return;
+	    	}
+	    	/*
+	    	if(keysPressed > 1 && false) {
+	    		Vector<Integer> v = (Vector<Integer>) pressedKeys.clone();
+	    		for(Integer i: v) {
+	    			if((int) i == n) {
+	    				continue;
+	    			}
+	    			// ignore arrows and numbers
+	    			if((i >= 1 && i <= 4) || (i >= 48 && i <= 57)) {
+	    				continue;
+	    			}
+    		        pressedKeys.remove((Object) i);
+    		        keysPressed--;
     		        final String ir;
     		        if ((ir = Keyboard.replaceKey((int)i)) == null) {
     		            return;
@@ -1622,9 +2058,11 @@ MouseTrackListener
     		        else Emulator.getEventQueue().keyRelease(Integer.parseInt(ir));
 	    		}
 	    	}
-	        keysPressed = 0;
-	        keysVector.clear();
-	    }
+	    	*/
+	        pressedKeys.remove(in);
+	    	keysPressed--;
+	   //}
+	    
         if (Settings.enableKeyCache) {
             Keyboard.keyCacheStack.push('1' + r);
             return;
@@ -1636,6 +2074,9 @@ MouseTrackListener
     }
     
     public final void mouseDoubleClick(final MouseEvent mouseEvent) {
+		if (Settings.playingRecordedKeys) {
+			return;
+		}
         if (this.pauseState == 0 || Emulator.getCurrentDisplay().getCurrent() == null) {
             return;
         }
@@ -1656,6 +2097,9 @@ MouseTrackListener
         if (this.pauseState == 0) {
             return;
         }
+		if (Settings.playingRecordedKeys) {
+			return;
+		}
         if (Emulator.getCurrentDisplay().getCurrent() != null) {
         	//System.out.println(mouseEvent.button);
             if(Settings.fpsMode && mouseEvent.button == 3) {
@@ -1684,15 +2128,17 @@ MouseTrackListener
             	return;
             }
 
-            float[] arrayOfFloat;
-            (arrayOfFloat = new float[2])[0] = mouseEvent.x;
-            arrayOfFloat[1] = mouseEvent.y;
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
-            final int n = (int)(arrayOfFloat[0] / this.zoom);
-            final int n2 = (int)(arrayOfFloat[1] / this.zoom);
-            Emulator.getEventQueue().mouseDown(n, n2);
+            float[] zoom;
+            (zoom = new float[2])[0] = mouseEvent.x;
+            zoom[1] = mouseEvent.y;
+            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
+            final int x = (int)(zoom[0] / this.zoom);
+            final int y = (int)(zoom[1] / this.zoom);
+        	lastMouseX = x;
+        	lastMouseY = y;
+            Emulator.getEventQueue().mouseDown(x, y);
             if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getScreen()) {
-                this.caret.method474(n, n2);
+                this.caret.mouseDown(x, y);
             }
         }
     }
@@ -1702,6 +2148,10 @@ MouseTrackListener
         if (this.pauseState == 0) {
             return;
         }
+
+		if (Settings.playingRecordedKeys) {
+			return;
+		}
         if (Emulator.getCurrentDisplay().getCurrent() != null) {
             if(Settings.fpsMode && mouseEvent.button == 3) {
             	if(Settings.fpsGame == 2)
@@ -1729,11 +2179,15 @@ MouseTrackListener
             		mr(Keyboard.getArrowKeyFromDevice(8));
             	return;
             }
-            float[] arrayOfFloat;
-            (arrayOfFloat = new float[2])[0] = mouseEvent.x;
-            arrayOfFloat[1] = mouseEvent.y;
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
-            Emulator.getEventQueue().mouseUp((int)(arrayOfFloat[0] / this.zoom), (int)(arrayOfFloat[1] / this.zoom));
+            float[] zoom;
+            (zoom = new float[2])[0] = mouseEvent.x;
+            zoom[1] = mouseEvent.y;
+            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
+            final int x = (int)(zoom[0] / this.zoom);
+            final int y = (int)(zoom[1] / this.zoom);
+        	lastMouseX = x;
+        	lastMouseY = y;
+            Emulator.getEventQueue().mouseUp(x, y);
         }
     }
     
@@ -1768,7 +2222,6 @@ MouseTrackListener
 	@Override
 	public void mouseExit(MouseEvent e) {
         if(Settings.fpsMode) {
-        	System.out.println("mouse exited");
         	Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
         	display.setCursorLocation(pt);
         }
@@ -1918,16 +2371,25 @@ MouseTrackListener
         	//if(canvas.getSize().x / 2 != mouseEvent.x) ignoreNextFps = true;
         	return;
         } else if(mset) {
-	Cursor cursor = new Cursor(display, SWT.CURSOR_ARROW);
-	this.canvas.getShell().setCursor(cursor);
-	mset = false;
+			Cursor cursor = new Cursor(display, SWT.CURSOR_ARROW);
+			this.canvas.getShell().setCursor(cursor);
+			mset = false;
         }
         if ((mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
-            float[] arrayOfFloat;
-            (arrayOfFloat = new float[2])[0] = mouseEvent.x;
-            arrayOfFloat[1] = mouseEvent.y;
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
-            Emulator.getEventQueue().mouseDrag((int)(arrayOfFloat[0] / this.zoom), (int)(arrayOfFloat[1] / this.zoom));
+            float[] zoom;
+            (zoom = new float[2])[0] = mouseEvent.x;
+            zoom[1] = mouseEvent.y;
+            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
+            int x = (int)(zoom[0] / this.zoom);
+            int y = (int)(zoom[1] / this.zoom);
+            // Drag filter
+        	//if(mouseEvent.time - lastDragTime < 5 && Math.abs(x-lastMouseX) < 4 && Math.abs(y-lastMouseY) < 4) {
+        	//	return;
+        	//}
+        	lastMouseX = x;
+        	lastMouseY = y;
+        	lastDragTime = mouseEvent.time;
+            Emulator.getEventQueue().mouseDrag(x, y);
         }
     }
     

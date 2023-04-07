@@ -8,6 +8,6 @@ public abstract class FreeSizeFontInvoker {
 	}
 
 	public static Font getFont(int aFace, int aStyle, int aHeight) {
-		return Font.getFont(aFace, 0, 0).deriveFont(aStyle, (int) ((float)aHeight * 0.78F));
+		return Font.getFont(aFace, 0, 0).deriveFont(aStyle, aHeight);
 	}
 }

@@ -9,56 +9,56 @@ public final class c
         super();
     }
 
-    private static String[] method174(String var0, char var1) {
-       char[] var2 = var0.toCharArray();
-       int var3 = 0;
-       ArrayList var4 = null;
+    private static String[] split(String s, char c) {
+       char[] arr = s.toCharArray();
+       int i = 0;
+       ArrayList list = null;
 
-       for(int var5 = 0; var5 < var2.length; ++var5) {
-          if(var2[var5] == var1) {
-             if(var4 == null) {
-                var4 = new ArrayList();
+       for(int j = 0; j < arr.length; ++j) {
+          if(arr[j] == c) {
+             if(list == null) {
+                list = new ArrayList();
              }
 
-             var4.add(new String(var2, var3, var5 - var3));
-             var3 = var5 + 1;
+             list.add(new String(arr, i, j - i));
+             i = j + 1;
           }
        }
 
-       if(var4 == null) {
-          return new String[]{var0};
+       if(list == null) {
+          return new String[]{s};
        } else {
-          if(var3 < var2.length) {
-             var4.add(new String(var2, var3, var2.length - var3));
+          if(i < arr.length) {
+             list.add(new String(arr, i, arr.length - i));
           }
 
-          return (String[])((String[])var4.toArray(new String[var4.size()]));
+          return (String[])((String[])list.toArray(new String[list.size()]));
        }
     }
 
-    public static String[] textArr(String orig, Font f, int max, int var3, int[] w) {
+    public static String[] textArr(String s, Font font, int max, int var3, int[] w) {
     	w[0] = 0;
-    	if(orig == null) return new String[0];
+    	if(s == null) return new String[0];
        if(max > 0 && var3 > 0) {
-          boolean var4 = orig.indexOf(10) != -1;
-          if(f.stringWidth(orig) <= max) {
-        	  setWidth(w, f.stringWidth(orig));
-             return var4?method174(orig, '\n'):new String[]{orig};
+          boolean var4 = s.indexOf(10) != -1;
+          if(font.stringWidth(s) <= max) {
+        	  setWidth(w, font.stringWidth(s));
+             return var4?split(s, '\n'):new String[]{s};
           } else {
-             ArrayList var6 = new ArrayList();
+             ArrayList list = new ArrayList();
              if(!var4) {
-                method176(orig, f, max, var3, var6, w);
+                splitToWidth(s, font, max, var3, list);
              } else {
-                char[] var7 = orig.toCharArray();
+                char[] var7 = s.toCharArray();
                 int var8 = 0;
 
                 for(int var9 = 0; var9 < var7.length; ++var9) {
                    if(var7[var9] == 10 || var9 == var7.length - 1) {
                       String var11 = var9 == var7.length - 1?new String(var7, var8, var9 + 1 - var8):new String(var7, var8, var9 - var8);
-                      if(setWidth(w, f.stringWidth(var11)) <= max) {
-                         var6.add(var11);
+                      if(setWidth(w, font.stringWidth(var11)) <= max) {
+                         list.add(var11);
                       } else {
-                         method176(var11, f, max, var3, var6, w);
+                         splitToWidth(var11, font, max, var3, list);
                       }
 
                       var8 = var9 + 1;
@@ -67,10 +67,10 @@ public final class c
                 }
              }
 
-             return (String[])((String[])var6.toArray(new String[var6.size()]));
+             return (String[])((String[])list.toArray(new String[list.size()]));
           }
        } else {
-          return new String[]{orig};
+          return new String[]{s};
        }
     }
 
@@ -79,73 +79,72 @@ public final class c
 		return stringWidth;
 	}
 
-	public static String[] textArr(String var0, Font var1, int var2, int var3) {
-    	int[] maxw = new int[1];
-    	if(var0 == null) return new String[0];
-       if(var2 > 0 && var3 > 0) {
-          boolean var4 = var0.indexOf(10) != -1;
-          if(var1.stringWidth(var0) <= var2) {
-             return var4?method174(var0, '\n'):new String[]{var0};
+	public static String[] textArr(String s, Font font, int x1, int x2) {
+    	if(s == null) return new String[0];
+       if(x1 > 0 && x2 > 0) {
+          boolean var4 = s.indexOf('\n') != -1;
+          if(font.stringWidth(s) <= x1) {
+             return var4?split(s, '\n'):new String[]{s};
           } else {
-             ArrayList var6 = new ArrayList();
+             ArrayList list = new ArrayList();
              if(!var4) {
-                method176(var0, var1, var2, var3, var6, maxw);
+                splitToWidth(s, font, x1, x2, list);
              } else {
-                char[] var7 = var0.toCharArray();
+                char[] var7 = s.toCharArray();
                 int var8 = 0;
 
                 for(int var9 = 0; var9 < var7.length; ++var9) {
                    if(var7[var9] == 10 || var9 == var7.length - 1) {
                       String var11 = var9 == var7.length - 1?new String(var7, var8, var9 + 1 - var8):new String(var7, var8, var9 - var8);
-                      if(var1.stringWidth(var11) <= var2) {
-                         var6.add(var11);
+                      if(font.stringWidth(var11) <= x1) {
+                         list.add(var11);
                       } else {
-                         method176(var11, var1, var2, var3, var6, maxw);
+                         splitToWidth(var11, font, x1, x2, list);
                       }
 
                       var8 = var9 + 1;
-                      var2 = var3;
+                      x1 = x2;
                    }
                 }
              }
 
-             return (String[])((String[])var6.toArray(new String[var6.size()]));
+             return (String[])((String[])list.toArray(new String[list.size()]));
           }
        } else {
-          return new String[]{var0};
+          return new String[]{s};
        }
     }
 
-    private static void method176(String var0, Font var1, int var2, int var3, ArrayList var4, int[] _w) {
-       char[] var5 = var0.toCharArray();
-       int var6 = 0;
-       int var7 = 0;
-       int var8 = 0;
+    private static void splitToWidth(String s, Font font, int x1, int x2, ArrayList list) {
+       char[] arr = s.toCharArray();
+       int k = 0;
+       int i = 0;
+       int w = 0;
 
        while(true) {
-          while(var7 < var5.length) {
-             if((var8 += var1.charWidth(var5[var7])) > var2) {
-                int var9 = var7;
+          while(i < arr.length) {
+             if((w += font.charWidth(arr[i])) > x1) {
+                int j = i;
 
-                while(var5[var9] != 32) {
-                   --var9;
-                   if(var9 < var6) {
-                      var9 = var7;
+                while(arr[j] != ' ') {
+                   --j;
+                   if(j < k) {
+                      j = i;
                       break;
                    }
                 }
 
-                var4.add(new String(var5, var6, var9 - var6));
-                var6 = var5[var9] != 32 && var5[var9] != 9?var9:var9 + 1;
-                var8 = 0;
-                var7 = var6;
-                var2 = var3;
+                list.add(new String(arr, k, j - k));
+                k = arr[j] != ' ' && arr[j] != '\n' ?j:j + 1;
+                w = 0;
+                i = k;
+                x1 = x2;
              } else {
-                ++var7;
+                ++i;
              }
           }
 
-          var4.add(new String(var5, var6, var7 - var6));
+          list.add(new String(arr, k, i - k));
           return;
        }
     }

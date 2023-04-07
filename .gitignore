@@ -51,3 +51,4 @@ plugins
 # obfuscation dir
 obf/*.jar
 obf/mapping*.txt
+x64home/track.txt

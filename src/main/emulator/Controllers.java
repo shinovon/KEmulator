@@ -10,7 +10,7 @@ public final class Controllers
     private static int count;
     private static boolean loaded;
     private static String[][] stringMultiArr;
-    private static boolean[][] aBooleanArrayArray1291;
+    private static boolean[][] s;
     private static String aString1292;
     
     public Controllers() {
@@ -131,7 +131,7 @@ public final class Controllers
             try {
                 init();
                 if (Controllers.count > 0) {
-                    Controllers.aBooleanArrayArray1291 = new boolean[Controllers.count][4];
+                    Controllers.s = new boolean[Controllers.count][4];
                     method755();
                 }
                 return;
@@ -148,7 +148,7 @@ public final class Controllers
         Controllers.anArrayList1287.clear();
         Controllers.count = 0;
         Controllers.anArrayList1293.clear();
-        Controllers.aBooleanArrayArray1291 = null;
+        Controllers.s = null;
         Controllers.stringMultiArr = null;
     }
     
@@ -217,7 +217,7 @@ public final class Controllers
                 return;
             }
             Emulator.getEventQueue().method717(67108864, method746(n, "LEFT"));
-            array = Controllers.aBooleanArrayArray1291[n];
+            array = Controllers.s[n];
             n3 = 0;
             b = true;
         }
@@ -226,22 +226,22 @@ public final class Controllers
                 return;
             }
             Emulator.getEventQueue().method717(67108864, method746(n, "RIGHT"));
-            array = Controllers.aBooleanArrayArray1291[n];
+            array = Controllers.s[n];
             n3 = 1;
             b = true;
         }
         else {
-            if (Controllers.aBooleanArrayArray1291[n][0]) {
+            if (Controllers.s[n][0]) {
                 Emulator.getEventQueue().method717(134217728, method746(n, "LEFT"));
-                array = Controllers.aBooleanArrayArray1291[n];
+                array = Controllers.s[n];
                 n3 = 0;
             }
             else {
-                if (!Controllers.aBooleanArrayArray1291[n][1]) {
+                if (!Controllers.s[n][1]) {
                     return;
                 }
                 Emulator.getEventQueue().method717(134217728, method746(n, "RIGHT"));
-                array = Controllers.aBooleanArrayArray1291[n];
+                array = Controllers.s[n];
                 n3 = 1;
             }
             b = false;
@@ -258,7 +258,7 @@ public final class Controllers
                 return;
             }
             Emulator.getEventQueue().method717(67108864, method746(n, "UP"));
-            array = Controllers.aBooleanArrayArray1291[n];
+            array = Controllers.s[n];
             n3 = 2;
             b = true;
         }
@@ -267,22 +267,22 @@ public final class Controllers
                 return;
             }
             Emulator.getEventQueue().method717(67108864, method746(n, "DOWN"));
-            array = Controllers.aBooleanArrayArray1291[n];
+            array = Controllers.s[n];
             n3 = 3;
             b = true;
         }
         else {
-            if (Controllers.aBooleanArrayArray1291[n][2]) {
+            if (Controllers.s[n][2]) {
                 Emulator.getEventQueue().method717(134217728, method746(n, "UP"));
-                array = Controllers.aBooleanArrayArray1291[n];
+                array = Controllers.s[n];
                 n3 = 2;
             }
             else {
-                if (!Controllers.aBooleanArrayArray1291[n][3]) {
+                if (!Controllers.s[n][3]) {
                     return;
                 }
                 Emulator.getEventQueue().method717(134217728, method746(n, "DOWN"));
-                array = Controllers.aBooleanArrayArray1291[n];
+                array = Controllers.s[n];
                 n3 = 3;
             }
             b = false;

@@ -94,14 +94,14 @@ public class Emulator
 	public static String customUA;
 	private static String imei;
 	public static boolean askPermissions = false;
-	public static boolean askImei = false;
+	public static boolean askImei = true;
 	private static String midletName;
 	private static Thread vlcCheckerThread;
 	
-	public static final String titleVersion = "2.12.2";
-	public static final String aboutVersion = "v2.12.2";
+	public static final String titleVersion = "2.12.7";
+	public static final String aboutVersion = "v2.12.7";
 	public static final int numericVersion = 12;
-	public static final String propVersion = "v2.12";
+	public static final String propVersion = "2.12.7";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -224,11 +224,11 @@ public class Emulator
 	public static String askIMEI() {
 		if(notAllowPerms.contains("imei"))
 			return null;
-		if(!askImei) return "0";
+		if(!askImei) return "0000000000000000";
 		if(imei != null) return imei;
 		JFrame parent = new JFrame();
 		parent.setAlwaysOnTop(true);
-		String s = showInputDialog(parent, "Application asks for IMEI", "", JOptionPane.WARNING_MESSAGE);
+		String s = showInputDialog(parent, "Application asks for IMEI", "0000000000000000", JOptionPane.WARNING_MESSAGE);
 		if(s == null) {
 			notAllowPerms.add("imei");
 			return null;
@@ -453,19 +453,10 @@ public class Emulator
         if (Emulator.midletJar == null) {
             return;
         }
-        String s;
-        String s2;
-        if (Emulator.midletJar.lastIndexOf("\\") != -1) {
-            s = Emulator.midletJar;
-            s2 = "\\";
-        }
-        else {
-            s = Emulator.midletJar;
-            s2 = "/";
-        }
-        final int lastIndex = s.lastIndexOf(s2);
-        final String string = Emulator.midletJar.substring(0, lastIndex) + "/kemulator.cfg";
-        final String substring = Emulator.midletJar.substring(lastIndex + 1, Emulator.midletJar.lastIndexOf("."));
+        String parent = new File(Emulator.midletJar).getParentFile().getAbsolutePath();
+        final String string = parent + "/kemulator.cfg";
+        String name = new File(Emulator.midletJar).getName();
+        final String substring = name.substring(0, name.lastIndexOf("."));
         try {
             final FileInputStream fileInputStream = new FileInputStream(string);
             final Properties properties;
@@ -495,12 +486,9 @@ public class Emulator
                 	+ UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
                 	+ "\tMIDP 2.0 (JSR118)\n"
                 	+ "\tNokiaUI 1.4\n"
-                	+ "\tSamsung 1.0\n"
-                	+ "\tSprint 1.0\n"
-                	+ "\tWMA 1.0 (JSR120)\n"
                 	+ "(no 3d support)";
     	}
-        return "KEmulator v1.0.3" + "\n\tmod nnproject "+aboutVersion+"\n\n\t" + 
+        return "KEmulator v1.0.3" + "\n\tnnmod "+aboutVersion+"\n\n\t" + 
     	UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" + 
     	UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
     	+ "\tMIDP 2.0(JSR118)\n"
@@ -514,7 +502,10 @@ public class Emulator
     }
     
     public static String getAboutString() {
-        return "KEmulator v1.0.3" + "\n\tmod nnproject "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+    	if(_X64_VERSION) {
+            return "KEmulator v1.0.3" + "\nmulti-platform mod\n by nnmidlets (Shinovon)\n\t\t"+aboutVersion+"\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+    	}
+        return "KEmulator v1.0.3" + "\n\tmod by shinovon "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     }
     
     public static void getLibraries() {
@@ -760,12 +751,12 @@ public class Emulator
     }
     
     private static void setProperties() {
-        System.setProperty("microedition.configuration", "CDLC-1.1");
+        System.setProperty("microedition.configuration", "CLDC-1.1");
         System.setProperty("microedition.profiles", "MIDP-2.0");
     	if(!_X64_VERSION) System.setProperty("microedition.m3g.version", "1.1");
         System.setProperty("microedition.encoding", Settings.fileEncoding);
         if (System.getProperty("microedition.locale") == null) {
-            System.setProperty("microedition.locale", "ru-RU");
+            System.setProperty("microedition.locale", Settings.locale);
         }
         if (System.getProperty("microedition.platform") == null) {
         	String plat = Emulator.deviceName;
@@ -799,7 +790,7 @@ public class Emulator
         		boolean x = c.exists("SW_PLATFORM") || c.exists("SW_PLATFORM_VERSION");
         		if(c.exists("SYMBIANOS_VERSION") && x)
         			if(c.getString("SYMBIANOS_VERSION").equals("9.3") || c.getString("SYMBIANOS_VERSION").equals("3"))
-        				Emulator.customUA = s2 + " (Java/1.8.0_60; KEmulator/1.0.3) UNTRUSTED/1.0";
+        				Emulator.customUA = s2 + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + propVersion + ") UNTRUSTED/1.0";
         		else if(c.exists("CUSTOM_UA")) {
         			Emulator.customUA = c.getString("CUSTOM_UA");
         		} else if(c.exists("MIDP20_CLDC11")) {
@@ -827,15 +818,14 @@ public class Emulator
         		}
         	}
         	String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+        	String midletVendor = Emulator.emulatorimpl.getAppProperty("MIDlet-Vendor");
         	Emulator.midletName = midlet;
         	if(midlet != null) {
-        		/*if(midlet.equalsIgnoreCase("vika touch")) {
-	        		// TODO: насрать
-	        	} else */if(midlet.equalsIgnoreCase("bounce tales")) {
+        		if(midlet.equalsIgnoreCase("bounce tales")) {
 	        		Settings.fpsGame = 1;
 	        	} else if(midlet.equalsIgnoreCase("micro counter strike")) {
 	        		Settings.fpsGame = 2;
-	        	} else if(midlet.equalsIgnoreCase("quantum")) {
+	        	} else if(midlet.equalsIgnoreCase("quantum") || (midletVendor != null && midletVendor.toLowerCase().contains("ae-mods"))) {
 	        		Settings.fpsGame = 3;
 	        	}
         	}
@@ -849,8 +839,8 @@ public class Emulator
         System.setProperty("microedition.media.version", "1.0");
         System.setProperty("supports.mixing", "true");
         System.setProperty("supports.audio.capture", "false");
-        System.setProperty("supports.video.capture", "true");
-        System.setProperty("supports.photo.capture", "true");
+        System.setProperty("supports.video.capture", "false");
+        System.setProperty("supports.photo.capture", "false");
         System.setProperty("supports.recording", "false");
         System.setProperty("microedition.io.file.FileConnection.version", "1.0");
         System.setProperty("microedition.pim.version", "1.0");
@@ -877,20 +867,22 @@ public class Emulator
         System.setProperty("com.nokia.mid.ui.softnotification", "true");
         System.setProperty("com.nokia.mid.ui.version", "1.4");
         System.setProperty("com.nokia.mid.ui.customfontsize", "true");
-        System.setProperty("com.nokia.pointer.number", "1");
+        System.setProperty("com.nokia.pointer.number", "0");
         System.setProperty("kemulator.hwid", getHWID());
         System.setProperty("microedition.amms.version", "1.0");
-        System.setProperty("supports.mediacapabilities", "camera");
 	    try {
 	        Webcam w = Webcam.getDefault();
 	        if(w != null) {
+	            System.setProperty("supports.video.capture", "true");
+	            System.setProperty("supports.photo.capture", "true");
+	            System.setProperty("supports.mediacapabilities", "camera");
 	        	System.setProperty("camera.orientations", "devcam0:inwards");
 	        	Dimension d = w.getViewSize();
 	        	System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
 	        } else {
 	        	
 	        }
-        } catch (Exception e) {
+        } catch (Throwable e) {
         }
     }
 
@@ -1030,7 +1022,9 @@ public class Emulator
         if(os == null) {
         	throw new RuntimeException("unsupported os: " + osn);
         }
-
+        if(!osa.contains("amd64") && !osa.contains("86")) {
+        	throw new RuntimeException("unsupported arch: " + osa);
+        }
         String arch = osa.contains("64") ? "x86_64" : "x86";
         String swtFileName = "swt-" + os + "-" + arch + ".jar";
 
@@ -1060,69 +1054,72 @@ public class Emulator
     }
     
     static boolean method283(final String[] array) {
-        String lowerCase = "";
+        String key = "";
         if (array.length < 1) {
             return false;
         }
         for (int i = 0; i < array.length; ++i) {
-            final String trim;
-            if ((trim = array[i].trim()).startsWith("-")) {
-                if ((lowerCase = trim.substring(1).toLowerCase()).equals("awt")) {
+            final String value;
+            if ((value = array[i].trim()).startsWith("-")) {
+                if ((key = value.substring(1).toLowerCase()).equals("awt")) {
                     Settings.g2d = 1;
                     Emulator.commandLineArguments[i] = "";
                 }
-                else if (lowerCase.equals("swt")) {
+                else if (key.equals("swt")) {
                     Settings.g2d = 0;
                     Emulator.commandLineArguments[i] = "";
                 }
-                else if (lowerCase.equals("wgl")) {
+                else if (key.equals("wgl")) {
                     Settings.g3d = 0;
                 }
-                else if (lowerCase.equals("lwj")) {
+                else if (key.equals("lwj")) {
                     Settings.g3d = 1;
                 }
-                else if (lowerCase.equalsIgnoreCase("log")) {
+                else if (key.equalsIgnoreCase("log")) {
                     Settings.showLogFrame = true;
                 }
             }
-            else if (lowerCase.equalsIgnoreCase("jar")) {
-                Emulator.midletJar = trim;
+            else if (key.equalsIgnoreCase("jar")) {
+            	try {
+            		Emulator.midletJar = new File(value).getAbsolutePath();
+            	} catch (Exception e) {
+            		Emulator.midletJar = value;
+            	}
             }
-            else if (lowerCase.equalsIgnoreCase("midlet")) {
+            else if (key.equalsIgnoreCase("midlet")) {
                 Emulator.midletClassName = array[i];
             }
-            else if (lowerCase.equalsIgnoreCase("cp")) {
-                Emulator.classPath = trim;
+            else if (key.equalsIgnoreCase("cp")) {
+                Emulator.classPath = value;
             }
-            else if (lowerCase.equalsIgnoreCase("jad")) {
-                Emulator.jadPath = trim;
+            else if (key.equalsIgnoreCase("jad")) {
+                Emulator.jadPath = value;
             }
-            else if (lowerCase.equalsIgnoreCase("rec")) {
+            else if (key.equalsIgnoreCase("rec")) {
             	File localFile;
-                Settings.recordedKeysFile = trim;
-                Settings.recordedKeysFile = null;
-                Settings.playingRecordedKeys = (localFile = new File(trim)).exists();
+                Settings.recordedKeysFile = value;
+                Settings.playingRecordedKeys = (localFile = new File(value)).exists();
             }
-            else if (lowerCase.equalsIgnoreCase("device")) {
-                Emulator.deviceName = trim;
+            else if (key.equalsIgnoreCase("device")) {
+                Emulator.deviceName = value;
             }
-            else if (lowerCase.equalsIgnoreCase("devicefile")) {
-                Emulator.deviceFile = trim;
+            else if (key.equalsIgnoreCase("devicefile")) {
+                Emulator.deviceFile = value;
             }
-            else if (lowerCase.equalsIgnoreCase("fontname")) {
-                getEmulator().getProperty().setDefaultFontName(trim);
+            else if (key.equalsIgnoreCase("fontname")) {
+                getEmulator().getProperty().setDefaultFontName(value);
             }
-            else if (lowerCase.equalsIgnoreCase("fontsmall")) {
-                getEmulator().getProperty().setFontSmallSize(Integer.parseInt(trim));
+            else if (key.equalsIgnoreCase("fontsmall")) {
+                getEmulator().getProperty().setFontSmallSize(Integer.parseInt(value));
             }
-            else if (lowerCase.equalsIgnoreCase("fontmedium")) {
-                getEmulator().getProperty().getFontMediumSize(Integer.parseInt(trim));
+            else if (key.equalsIgnoreCase("fontmedium")) {
+                getEmulator().getProperty().getFontMediumSize(Integer.parseInt(value));
             }
-            else if (lowerCase.equalsIgnoreCase("fontlarge")) {
-                getEmulator().getProperty().getFontLargeSize(Integer.parseInt(trim));
+            else if (key.equalsIgnoreCase("fontlarge")) {
+                getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
             }
-            else if (lowerCase.equalsIgnoreCase("key")) {
-                Keyboard.keyArg(trim);
+            else if (key.equalsIgnoreCase("key")) {
+                Keyboard.keyArg(value);
             }
         }
         return true;
@@ -1154,75 +1151,76 @@ public class Emulator
     }
     
     public static void loadGame(final String s, final int n, final int n2, final boolean b) {
-        final String property;
-        String s2;
-        if ((property = System.getProperty("java.home")) == null || property.length() < 1) {
-            s2 = "java";
-        }
-        else {
-            final String string = property + "\\bin\\java.exe";
+        final String javahome = System.getProperty("java.home");
+        String javaexec;
+        if (javahome == null || javahome.length() < 1) {
+            javaexec = "java";
+        } else {
+            final String string = javahome + (System.getProperty("os.name").toLowerCase().indexOf("win") == -1 ? "\\bin\\java" : "\\bin\\java.exe");
             final File file;
-            s2 = (((file = new File(string)).exists() && file.isFile()) ? ("\"" + string + "\"") : "java");
+            javaexec = (((file = new File(string)).exists() && file.isFile()) ? ("\"" + string + "\"") : "java");
         }
-        final String s3 = s2;
-        final String string2 = " -cp \"" + System.getProperty("java.class.path") + "\"";
-        final String s4 = " emulator.Emulator";
-        final StringBuffer sb = new StringBuffer(100);
+        final String cp = " -cp \"" + System.getProperty("java.class.path") + "\"";
+        final String maincls = " emulator.Emulator";
+        final StringBuffer args = new StringBuffer(100);
         if (s == null) {
             for (int i = 0; i < Emulator.commandLineArguments.length; ++i) {
-                sb.append(" " + Emulator.commandLineArguments[i]);
+                args.append(" " + Emulator.commandLineArguments[i]);
             }
-            method284(sb, "-jar");
-            method284(sb, "-cp");
-            method284(sb, "-jad");
+            method284(args, "-jar");
+            method284(args, "-cp");
+            method284(args, "-jad");
         }
         else if (s.endsWith(".jad")) {
-            sb.append(" -jad \"" + s + "\"");
-            sb.append(" -jar \"" + getMidletJarUrl(s) + "\"");
+            args.append(" -jad \"" + s + "\"");
+            args.append(" -jar \"" + getMidletJarUrl(s) + "\"");
         }
         else {
-            sb.append(" -jar \"" + s + "\"");
+            args.append(" -jar \"" + s + "\"");
         }
         if (Settings.recordedKeysFile != null) {
-            sb.append(" -rec \"" + Settings.recordedKeysFile + "\"");
+            args.append(" -rec \"" + Settings.recordedKeysFile + "\"");
         }
         if (n == 1) {
-            sb.append(" -awt");
+            args.append(" -awt");
         }
         else if (n == 0) {
-            sb.append(" -swt");
+            args.append(" -swt");
         }
         if (n2 == 1) {
-            sb.append(" -lwj");
+            args.append(" -lwj");
         }
         else if (n2 == 0) {
-            sb.append(" -wgl");
+            args.append(" -wgl");
         }
-        final String[] array;
-        (array = new String[2])[0] = "cmd.exe";
-        array[1] = s3 + string2 + s4 + (Object)sb;
-        String[] array2;
-        int n3;
-        StringBuffer sb2;
-        String s5;
-        if (b) {
-            array2 = array;
-            n3 = 1;
-            sb2 = new StringBuffer().append("/c start cmd.exe /c \"").append(array[1]);
-            s5 = " && pause \"";
+        final String[] cmd;
+        if(System.getProperty("os.name").toLowerCase().indexOf("win") == -1) {
+            cmd = new String[] { javaexec + cp + maincls + args.toString() };
+            getEmulator().getLogStream().print(cmd[0]);
+        } else {
+            (cmd = new String[2])[0] = "cmd.exe";
+            cmd[1] = javaexec + cp + maincls + (Object)args;
+            String[] array2;
+            int n3;
+            StringBuffer sb2;
+            String s5;
+        	if (b) {
+	            n3 = 1;
+	            sb2 = new StringBuffer().append("/c start cmd.exe /c \"").append(cmd[1]);
+	            s5 = " && pause \"";
+	        }
+	        else {
+	            n3 = 1;
+	            sb2 = new StringBuffer().append("/c \"").append(cmd[1]);
+	            s5 = "\"";
+	        }
+            cmd[n3] = sb2.append(s5).toString();
+            getEmulator().getLogStream().print(cmd[0] + " " + cmd[1]);
         }
-        else {
-            array2 = array;
-            n3 = 1;
-            sb2 = new StringBuffer().append("/c \"").append(array[1]);
-            s5 = "\"";
-        }
-        array2[n3] = sb2.append(s5).toString();
-        getEmulator().getLogStream().print(array[0] + " " + array[1]);
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {
-            Runtime.getRuntime().exec(array);
+            Runtime.getRuntime().exec(cmd);
         }
         catch (Exception ex) {
         	ex.printStackTrace();
@@ -1246,7 +1244,7 @@ public class Emulator
         }
     }
     
-    private static String getMidletJarUrl(final String s) {
+    static String getMidletJarUrl(final String s) {
         try {
             final File file;
             if ((file = new File(s)).exists()) {

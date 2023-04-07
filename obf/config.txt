@@ -2,10 +2,11 @@
 -outjars '.\KEmulator.jar'
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
+-libraryjars 'F:\Old stuff\KEmulator\x64home\swt-win32-x86.jar'
 
 -target 1.8
 #-dontshrink
-#-dontoptimize
+-dontoptimize
 -printmapping '.\mapping.txt'
 -overloadaggressively
 #-keeppackagenames **
@@ -28,6 +29,7 @@
 -keep public class com.nokia.mid.sound.* { public protected *; }
 -keep public class com.nokia.mid.ui.* { public protected *; }
 -keep public class com.nokia.mid.ui.utils.* { public protected *; }
+-keep public class com.nokia.mid.ui.lcdui.* { public protected *; }
 -keep public class com.nokia.mj.impl.utils.* { public protected *; }
 -keep public class com.nokia.microedition.media.* { public protected *; }
 
@@ -52,6 +54,10 @@
 -keep class net.rim.device.api.** { *; }
 
 -keep class net.java.games.input.** { *; }
+
+-keep class com.mascotcapsule.** { *; }
+
+-keep class ru.woesss.** { *; }
 
 # LIBRARIES
 -keep class club.minnced.discord.rpc.** { *; }

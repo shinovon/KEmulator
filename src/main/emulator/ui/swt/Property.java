@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.*;
 public final class Property implements IProperty
 {
     private static Display aDisplay656;
-    private Shell aShell655;
+    private Shell setsShell;
     private Combo aCombo657;
     private CLabel aCLabel658;
     private CLabel aCLabel673;
@@ -176,10 +176,13 @@ public final class Property implements IProperty
 	private Composite mediaComp;
 	private Group mediaGroup;
 	private Text vlcDirText;
+	private Font f;
+	private CLabel labelLocale;
+	private Text localeText;
     
     public Property() {
         super();
-        this.aShell655 = null;
+        this.setsShell = null;
         this.aCombo657 = null;
         this.aCLabel658 = null;
         this.aCLabel673 = null;
@@ -317,11 +320,11 @@ public final class Property implements IProperty
     public final void method354(final Shell shell) {
         Property.aDisplay656 = ((Widget)shell).getDisplay();
         this.method372(shell);
-        ((Control)this.aShell655).pack();
-        ((Control)this.aShell655).setSize(480, this.aShell655.getSize().y);
-        ((Control)this.aShell655).setLocation(shell.getLocation().x + (shell.getSize().x - this.aShell655.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aShell655.getSize().y >> 1));
-        this.aShell655.open();
-        while (!((Widget)this.aShell655).isDisposed()) {
+        ((Control)this.setsShell).pack();
+        ((Control)this.setsShell).setSize(480, this.setsShell.getSize().y);
+        ((Control)this.setsShell).setLocation(shell.getLocation().x + (shell.getSize().x - this.setsShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.setsShell.getSize().y >> 1));
+        this.setsShell.open();
+        while (!((Widget)this.setsShell).isDisposed()) {
             if (!Property.aDisplay656.readAndDispatch()) {
                 Property.aDisplay656.sleep();
             }
@@ -430,6 +433,9 @@ public final class Property implements IProperty
     
     public final void loadProperties() {
         try {
+        	if(!new File(Emulator.getAbsolutePath() + "/property.txt").exists()) {
+        		throw new FileNotFoundException();
+        	}
             final FileInputStream fileInputStream = new FileInputStream(Emulator.getAbsolutePath() + "/property.txt");
             final Properties properties;
             (properties = new Properties()).load(fileInputStream);
@@ -520,11 +526,14 @@ public final class Property implements IProperty
 	            ((EmulatorScreen)Emulator.getEmulator().getScreen()).setFpsMode(Settings.fpsMode);
             }
             Settings.vlcDir = properties.getProperty("VlcDir", "");
+            Settings.locale = properties.getProperty("MIDPLocale", "en-US");
             fileInputStream.close();
         }
         catch (Exception ex) {
-        	System.out.println("properties load failed");
-        	ex.printStackTrace();
+        	if(!(ex instanceof FileNotFoundException)) {
+	        	System.out.println("properties load failed");
+	        	ex.printStackTrace();
+        	}
             this.device = "SonyEricssonK800";
             this.defaultFont = "Tahoma";
             this.rmsFolder = "/rms";
@@ -640,6 +649,7 @@ public final class Property implements IProperty
             sortProperties.setProperty("AWTAntiAliasing", String.valueOf(Settings.awtAntiAliasing));
             sortProperties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
             sortProperties.setProperty("VlcDir", Settings.vlcDir);
+            sortProperties.setProperty("MIDPLocale", Settings.locale);
             sortProperties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         }
@@ -727,6 +737,7 @@ public final class Property implements IProperty
         Emulator.rpcEnabled = this.rpcBtn.getSelection();
         Settings.awtAntiAliasing = this.antiAliasBtn.getSelection();
         Settings.vlcDir = vlcDirText.getText().trim();
+        Settings.locale = localeText.getText().trim();
         this.method353();
     }
     
@@ -762,11 +773,18 @@ public final class Property implements IProperty
     }
     
     private void method372(final Shell shell) {
-        ((Decorations)(this.aShell655 = new Shell(shell, 67680))).setText(UILocale.uiText("OPTION_FRAME_TITLE", "Options & Properties"));
-        ((Decorations)this.aShell655).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        ((Decorations)(this.setsShell = new Shell(shell, 67680))).setText(UILocale.uiText("OPTION_FRAME_TITLE", "Options & Properties"));
+        ((Decorations)this.setsShell).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        // 1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI
+        //setsShell.setFont(setsShell.getFont().getFontData()[0]);
+        
+        FontData fd = setsShell.getFont().getFontData()[0];
+        fd.height = (fd.height / -fd.data.lfHeight) * 12;
+        f = new Font(shell.getDisplay(), fd);
+        setsShell.setFont(f);
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 2;
-        ((Composite)this.aShell655).setLayout((Layout)layout);
+        ((Composite)this.setsShell).setLayout((Layout)layout);
         this.method393();
         this.method390();
     }
@@ -869,8 +887,8 @@ public final class Property implements IProperty
         (layoutData12 = new GridData()).horizontalAlignment = 4;
         layoutData12.horizontalSpan = 3;
         layoutData12.grabExcessHorizontalSpace = true;
-        layoutData12.grabExcessVerticalSpace = false;
-        layoutData12.heightHint = 140;
+        layoutData12.grabExcessVerticalSpace = true;
+        //layoutData12.heightHint = 140;
         layoutData12.verticalAlignment = 4;
         (this.aGroup660 = new Group(this.customComp, 0)).setText(UILocale.uiText("OPTION_CUSTOM_PROPERTIES", "Custom Properties"));
         ((Composite)this.aGroup660).setLayout((Layout)layout);
@@ -919,7 +937,7 @@ public final class Property implements IProperty
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = 2;
         int x = (480-320)/2;
-        ((Control)(this.aComposite667 = new Composite((Composite)this.aShell655, 0))).setLayoutData((Object)layoutData);
+        ((Control)(this.aComposite667 = new Composite((Composite)this.setsShell, 0))).setLayoutData((Object)layoutData);
         ((Control)(this.aButton676 = new Button(this.aComposite667, 8388616))).setBounds(new Rectangle(62+x, 1, 68, 19));
         this.aButton676.setSelection(false);
         this.aButton676.setText(UILocale.uiText("DIALOG_OK", "OK"));
@@ -935,8 +953,9 @@ public final class Property implements IProperty
         layoutData.horizontalSpan = 2;
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = 2;
-        (this.tabFolder = new CTabFolder((Composite)this.aShell655, 8390656)).setSelectionBackground(Display.getCurrent().getSystemColor(22));
+        (this.tabFolder = new CTabFolder((Composite)this.setsShell, 8390656)).setSelectionBackground(Display.getCurrent().getSystemColor(22));
         this.tabFolder.setSimple(true);
+        tabFolder.setFont(f);
         this.tabFolder.setMRUVisible(false);
         this.tabFolder.setUnselectedCloseVisible(false);
         this.tabFolder.setUnselectedImageVisible(false);
@@ -991,16 +1010,30 @@ public final class Property implements IProperty
         final GridData layoutData4;
         (layoutData4 = new GridData()).horizontalAlignment = 4;
         layoutData4.verticalAlignment = 2;
+        final GridData layoutData5;
+        (layoutData5 = new GridData()).horizontalAlignment = 4;
+        layoutData5.verticalAlignment = 2;
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 3;
         layout.marginWidth = 5;
         this.customComp.setLayout((Layout)layout);
+        customComp.setFont(f);
         (this.aCLabel658 = new CLabel(this.customComp, 0)).setText(UILocale.uiText("OPTION_CUSTOM_DEVICE", "Device Select:"));
         ((Control)this.aCLabel658).setLayoutData((Object)layoutData3);
         this.method373();
         (this.aCLabel673 = new CLabel(this.customComp, 0)).setText(UILocale.uiText("OPTION_CUSTOM_ENCODING", "Default Encoding:"));
         ((Control)this.aCLabel673).setLayoutData((Object)layoutData4);
         this.method379();
+        (this.labelLocale = new CLabel(this.customComp, 0)).setText(UILocale.uiText("OPTION_LOCALE", "MIDP Locale:"));
+        ((Control)this.labelLocale).setLayoutData((Object)layoutData5);
+        final GridData layoutData333;
+        (layoutData333 = new GridData()).horizontalAlignment = 4;
+        layoutData333.horizontalSpan = 2;
+        layoutData333.grabExcessHorizontalSpace = true;
+        layoutData333.verticalAlignment = 2;
+        localeText = new Text(this.customComp, 2048);
+        localeText.setLayoutData(layoutData333);
+        localeText.setText(Settings.locale);
         this.method384();
         (this.aCLabel738 = new CLabel(this.customComp, 0)).setText(UILocale.uiText("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 50) ? "\u221e" : String.valueOf(Settings.frameRate)));
         ((Control)this.aCLabel738).setLayoutData((Object)layoutData);
@@ -1018,84 +1051,85 @@ public final class Property implements IProperty
         (layoutData = new GridData()).horizontalAlignment = 4;
         layoutData.verticalAlignment = 2;
         final GridData layoutData2;
-        (layoutData2 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData2 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData2.verticalAlignment = 2;
         layoutData2.horizontalAlignment = 4;
         final GridData layoutData3;
-        (layoutData3 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData3 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData3.verticalAlignment = 2;
         layoutData3.horizontalAlignment = 4;
         final GridData layoutData4;
-        (layoutData4 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData4 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData4.verticalAlignment = 2;
         layoutData4.horizontalAlignment = 4;
         final GridData layoutData5;
-        (layoutData5 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData5 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData5.verticalAlignment = 2;
         layoutData5.horizontalAlignment = 4;
         final GridData layoutData6;
-        (layoutData6 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData6 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData6.verticalAlignment = 2;
         layoutData6.horizontalAlignment = 4;
         final GridData layoutData7;
-        (layoutData7 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData7 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData7.verticalAlignment = 2;
         layoutData7.horizontalAlignment = 4;
         final GridData layoutData8;
-        (layoutData8 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData8 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData8.verticalAlignment = 2;
         layoutData8.horizontalAlignment = 4;
         final GridData layoutData9;
-        (layoutData9 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData9 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData9.verticalAlignment = 2;
         layoutData9.horizontalAlignment = 4;
         final GridData layoutData10;
-        (layoutData10 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData10 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData10.verticalAlignment = 2;
         layoutData10.horizontalAlignment = 4;
         final GridData layoutData11;
-        (layoutData11 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData11 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData11.verticalAlignment = 2;
         layoutData11.horizontalAlignment = 4;
         final GridData layoutData12;
-        (layoutData12 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData12 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData12.verticalAlignment = 2;
         layoutData12.horizontalAlignment = 4;
         final GridData layoutData13;
-        (layoutData13 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData13 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData13.verticalAlignment = 2;
         layoutData13.horizontalAlignment = 4;
         final GridData layoutData14;
-        (layoutData14 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData14 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData14.verticalAlignment = 2;
         layoutData14.horizontalAlignment = 4;
         final GridData layoutData15;
-        (layoutData15 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData15 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData15.verticalAlignment = 2;
         layoutData15.horizontalAlignment = 4;
         final GridData layoutData16;
-        (layoutData16 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData16 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData16.verticalAlignment = 2;
         layoutData16.horizontalAlignment = 4;
         final GridData layoutData17;
-        (layoutData17 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData17 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData17.verticalAlignment = 2;
         layoutData17.horizontalAlignment = 4;
         final GridData layoutData18;
-        (layoutData18 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData18 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData18.verticalAlignment = 2;
         layoutData18.horizontalAlignment = 4;
         final GridData layoutData19;
-        (layoutData19 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData19 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData19.verticalAlignment = 2;
         layoutData19.horizontalAlignment = 4;
         final GridData layoutData20;
-        (layoutData20 = new GridData()).grabExcessHorizontalSpace = true;
+        (layoutData20 = new GridData()).grabExcessHorizontalSpace = false;
         layoutData20.verticalAlignment = 2;
         layoutData20.horizontalAlignment = 4;
         final GridData layoutData21;
         (layoutData21 = new GridData()).horizontalAlignment = 4;
         layoutData21.verticalAlignment = 2;
+        layoutData21.widthHint = 30;
         final GridData layoutData22;
         (layoutData22 = new GridData()).horizontalAlignment = 4;
         layoutData22.verticalAlignment = 2;
@@ -1108,6 +1142,7 @@ public final class Property implements IProperty
         final GridData layoutData25;
         (layoutData25 = new GridData()).horizontalAlignment = 4;
         layoutData25.verticalAlignment = 2;
+        layoutData25.widthHint = 30;
         final GridData layoutData26;
         (layoutData26 = new GridData()).horizontalAlignment = 4;
         layoutData26.verticalAlignment = 2;
@@ -1117,7 +1152,7 @@ public final class Property implements IProperty
         final GridData layoutData28;
         (layoutData28 = new GridData()).horizontalSpan = 2;
         layoutData28.verticalAlignment = 2;
-        layoutData28.horizontalAlignment = 2;
+        layoutData28.horizontalAlignment = 4;
         final GridData layoutData29;
         (layoutData29 = new GridData()).horizontalAlignment = 4;
         layoutData29.verticalAlignment = 2;
@@ -1138,7 +1173,6 @@ public final class Property implements IProperty
         layoutData34.verticalAlignment = 2;
         final GridData layoutData35;
         (layoutData35 = new GridData()).horizontalAlignment = 4;
-        layoutData35.verticalAlignment = 2;
         final GridData layoutData36;
         (layoutData36 = new GridData()).horizontalAlignment = 4;
         layoutData36.verticalAlignment = 2;
@@ -1156,8 +1190,11 @@ public final class Property implements IProperty
         layoutData40.grabExcessHorizontalSpace = false;
         layoutData40.verticalAlignment = 2;
         this.keyMapComp = new Composite((Composite)this.tabFolder, 0);
+        keyMapComp.setFont(f);
         final GridLayout layout;
+        
         (layout = new GridLayout()).numColumns = 4;
+        layout.horizontalSpacing = 45;
         this.keyMapComp.setLayout((Layout)layout);
         (this.aCLabel646 = new CLabel(this.keyMapComp, 0)).setText(UILocale.uiText("OPTION_KEYMAP_CONTROLLER", "Controller:"));
         ((Control)this.aCLabel646).setLayoutData((Object)layoutData);
@@ -1286,7 +1323,7 @@ public final class Property implements IProperty
         final GridData layoutData;
         (layoutData = new GridData()).horizontalSpan = 2;
         layoutData.verticalAlignment = 2;
-        layoutData.grabExcessHorizontalSpace = false;
+        layoutData.grabExcessHorizontalSpace = true;
         layoutData.horizontalAlignment = 4;
         ((Control)(this.aCombo699 = new Combo(this.keyMapComp, 8))).setLayoutData((Object)layoutData);
         this.aCombo699.addModifyListener((ModifyListener)new Class185(this));
@@ -1593,7 +1630,7 @@ public final class Property implements IProperty
     }
     
     private void method360(final int n) {
-        if (!this.aShell655.isVisible()) {
+        if (!this.setsShell.isVisible()) {
             return;
         }
         IFont font = null;
@@ -1607,7 +1644,7 @@ public final class Property implements IProperty
                     if (Settings.g2d != 1) {
                         break Label_0080;
                     }
-                    font2 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0);
+                    font2 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0, false);
                 }
                 font = font2;
             }
@@ -1630,7 +1667,7 @@ public final class Property implements IProperty
                     if (Settings.g2d != 1) {
                         break Label_0242;
                     }
-                    font3 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0);
+                    font3 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0, false);
                 }
                 font = font3;
             }
@@ -1653,7 +1690,7 @@ public final class Property implements IProperty
                     if (Settings.g2d != 1) {
                         break Label_0404;
                     }
-                    font4 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0);
+                    font4 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0, false);
                 }
                 font = font4;
             }
@@ -1868,13 +1905,13 @@ public final class Property implements IProperty
         EmulatorScreen.method554();
         if (this.aText635.getText().trim().length() < 1) {
             final MessageBox messageBox;
-            ((Dialog)(messageBox = new MessageBox(this.aShell655))).setText(UILocale.uiText("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
+            ((Dialog)(messageBox = new MessageBox(this.setsShell))).setText(UILocale.uiText("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
             messageBox.setMessage(UILocale.uiText("OPTION_NETWORK_PROXY_EMPTY", "Empty proxy host!"));
             messageBox.open();
         }
         else {
             final MessageBox messageBox2;
-            ((Dialog)(messageBox2 = new MessageBox(this.aShell655))).setText(UILocale.uiText("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
+            ((Dialog)(messageBox2 = new MessageBox(this.setsShell))).setText(UILocale.uiText("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
             messageBox2.setMessage(UILocale.uiText("OPTION_NETWORK_PROXY_UNIMP", "Proxy test is underimplemented!"));
             messageBox2.open();
         }
@@ -1914,7 +1951,7 @@ public final class Property implements IProperty
     }
     
     static Shell method364(final Property class38) {
-        return class38.aShell655;
+        return class38.setsShell;
     }
     
     static Scale method370(final Property class38) {

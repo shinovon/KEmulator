@@ -217,11 +217,12 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		this.timeBase = Manager.getSystemTimeBase();
 	}
 
-	public VLCPlayerImpl(String contentType, DataSource src) throws MediaException {
-		// только если все содержимое записывать в файл
-		Emulator.getEmulator().getLogStream().println("Streaming video player not supported!!");
+	public VLCPlayerImpl(String contentType, DataSource src) throws IOException {
+		this();
+		this.contentType = contentType;
 		this.dataSource = src;
-		throw new MediaException("Video from DataStream not supported!");
+		this.state = 100;
+		//throw new MediaException("Video from DataStream not supported!");
 	}
 
 	public VLCPlayerImpl(String locator, String contentType, DataSource src) throws IOException {
@@ -266,64 +267,72 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	private void load() throws MediaException {
-		if (mediaUrl == null && inputStream != null) {
-			if (inputStream instanceof FileInputStream) {
-				Field field;
+		if(mediaUrl == null) {
+			if(this.dataSource != null) {
 				try {
-					field = inputStream.getClass().getDeclaredField("path");
-					field.setAccessible(true);
-					String path = (String) field.get(inputStream);
-					File f = new File(path);
-					mediaUrl = path;
-					dataLen = (int) f.length();
-					prepared = true;
-					return;
-				} catch (Exception e) {
+					this.dataSource.connect();
+				} catch (IOException e) {
 					e.printStackTrace();
+					throw new MediaException(e);
 				}
 			}
-			boolean bufferToFile = inputStream instanceof ByteArrayInputStream;
-			if(!bufferToFile) {
-				try {
-					//mediaCallback = new NonSeekableInputStreamMedia();
-					//return;
-				} catch (Exception e) {
-					e.printStackTrace();
+			if(inputStream != null) {
+				if (inputStream instanceof FileInputStream) {
+					Field field;
+					try {
+						field = inputStream.getClass().getDeclaredField("path");
+						field.setAccessible(true);
+						String path = (String) field.get(inputStream);
+						File f = new File(path);
+						mediaUrl = path;
+						dataLen = (int) f.length();
+						prepared = true;
+						return;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-			}
-			try {
-				Manager.log("buffering to file");
-				File d = new File(System.getProperty("java.io.tmpdir"));
-				tempFile = new File(d.getPath() + File.separator + "kemtempmedia");
-				tempFile.deleteOnExit();
-				if (tempFile.exists())
-					tempFile.delete();
-				FileOutputStream fos = new FileOutputStream(tempFile);
-				CustomJarResources.write(inputStream, fos);
-				fos.close();
-				//System.gc();
-				dataLen = (int) tempFile.length();
-				this.mediaUrl = tempFile.toString();
-				mediaCallback = new RandomAccessFileMedia(tempFile);
-				Manager.log("buffered " + mediaUrl);
-				/*
-				byte[] b = CustomJarResources.getBytes(inputStream);
-				File d = new File(System.getProperty("java.io.tmpdir"));
-				File f = new File(d.getPath() + File.separator + "kemtempvideo");
-				if (f.exists())
-					f.delete();
-				FileOutputStream fos = new FileOutputStream(f);
-				fos.write(b);
-				fos.close();
-				dataLen = (int) f.length();
-				this.mediaUrl = f.toString();
-				b = null;
-				Manager.log("buffered");
-				System.gc();
-				*/
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new MediaException("failed to write temp file");
+				boolean bufferToFile = inputStream instanceof ByteArrayInputStream && false;
+				if(!bufferToFile) {
+					mediaCallback = new VLCCallbackStream(inputStream, dataLen);
+				} else {
+					try {
+						Manager.log("buffering to file");
+						File d = new File(System.getProperty("java.io.tmpdir"));
+						tempFile = new File(d.getPath() + File.separator + "kemtempmedia");
+						tempFile.deleteOnExit();
+						if (tempFile.exists())
+							tempFile.delete();
+						FileOutputStream fos = new FileOutputStream(tempFile);
+						CustomJarResources.write(inputStream, fos);
+						fos.close();
+						//System.gc();
+						dataLen = (int) tempFile.length();
+						this.mediaUrl = tempFile.toString();
+						mediaCallback = new RandomAccessFileMedia(tempFile);
+						Manager.log("buffered " + mediaUrl);
+						/*
+						byte[] b = CustomJarResources.getBytes(inputStream);
+						File d = new File(System.getProperty("java.io.tmpdir"));
+						File f = new File(d.getPath() + File.separator + "kemtempvideo");
+						if (f.exists())
+							f.delete();
+						FileOutputStream fos = new FileOutputStream(f);
+						fos.write(b);
+						fos.close();
+						dataLen = (int) f.length();
+						this.mediaUrl = f.toString();
+						b = null;
+						Manager.log("buffered");
+						System.gc();
+						*/
+					} catch (Exception e) {
+						e.printStackTrace();
+						throw new MediaException("failed to write temp file");
+					}
+				}
+			} else if (dataSource != null) {
+				mediaCallback = new VLCCallbackSourceStream(dataSource);
 			}
 		}
 		prepared = true;
@@ -409,6 +418,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		} catch (Error e) {
 			e.printStackTrace();
 		}
+		if(dataSource != null) {
+			dataSource.disconnect();
+		}
 		this.state = 0;
 		this.notifyListeners("closed", null);
 	}
@@ -436,6 +448,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			}
 			state = 100;
 		}
+		dataSource = null;
 	}
 
 	public void start() throws IllegalStateException, MediaException {
