@@ -2,7 +2,7 @@
 -outjars '.\KEmulator.jar'
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
--libraryjars 'F:\Old stuff\KEmulator\x64home\swt-win32-x86.jar'
+-libraryjars '..\x64home\swt-win32-x86.jar'
 
 -target 1.8
 #-dontshrink

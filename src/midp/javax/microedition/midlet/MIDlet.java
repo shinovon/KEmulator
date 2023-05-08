@@ -5,6 +5,7 @@ import emulator.custom.CustomMethod;
 
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
+import java.io.File;
 import java.net.URI;
 
 import javax.microedition.io.*;
@@ -53,6 +54,11 @@ public abstract class MIDlet
             }
             // Vika touch support
             if(s.startsWith("vlc.exe")) {
+            	if(Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
+                	s = new File(Settings.vlcDir).getCanonicalPath() + "/vlc.exe" + s.substring("vlc.exe".length());
+                    Runtime.getRuntime().exec(s);
+                	return true;
+            	}
             	s = "C:/PROGRA~1/VideoLAN/VLC/vlc.exe" + s.substring("vlc.exe".length());
                 Runtime.getRuntime().exec(s);
             	return true;
