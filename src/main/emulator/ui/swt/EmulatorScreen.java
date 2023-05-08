@@ -26,6 +26,10 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.media.CapturePlayerImpl;
 
 import org.eclipse.swt.widgets.*;
+
+import com.sun.jna.platform.KeyboardUtils;
+import com.sun.jna.platform.unix.X11;
+
 import org.eclipse.swt.events.*;
 
 public final class EmulatorScreen implements 
@@ -323,12 +327,37 @@ MouseTrackListener
 	protected static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
 	private static Class win32OS;
 	private static Method win32OSGetKeyState;
+	
+	private static final int toX11KeySym(int code, int location) {
+		if(code >= java.awt.event.KeyEvent.VK_A && code <= java.awt.event.KeyEvent.VK_Z) return X11.XK_a + (code - java.awt.event.KeyEvent.VK_A);
+		if(code >= java.awt.event.KeyEvent.VK_0 && code <= java.awt.event.KeyEvent.VK_9) return X11.XK_0 + (code - java.awt.event.KeyEvent.VK_0);
+		if(code == java.awt.event.KeyEvent.VK_SHIFT) {
+			if((location & java.awt.event.KeyEvent.KEY_LOCATION_RIGHT) != 0) return X11.XK_Shift_R;
+			return X11.XK_Shift_L;
+		}
+		if(code == java.awt.event.KeyEvent.VK_CONTROL) {
+			if((location & java.awt.event.KeyEvent.KEY_LOCATION_RIGHT) != 0) return X11.XK_Control_R;
+			return X11.XK_Control_L;
+		}
+		if(code == java.awt.event.KeyEvent.VK_ALT) {
+			if((location & java.awt.event.KeyEvent.KEY_LOCATION_RIGHT) != 0) return X11.XK_Alt_R;
+			return X11.XK_Alt_L;
+		}
+		if(code == java.awt.event.KeyEvent.VK_META) {
+			if((location & java.awt.event.KeyEvent.KEY_LOCATION_RIGHT) != 0) return X11.XK_Meta_R;
+			return X11.XK_Meta_L;
+		}
+		return code >= 5 && code < 256 ? code : 0;
+	}
+	
     public boolean pollKeyboard(Canvas canvas) {
     	if(Settings.canvasKeyboard) return false;
 		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() == Thread.currentThread()) {
 			final boolean active = false ? true : (canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible());
 			/*switch(Platform.get()) {
-			case WINDOWS: */{
+			case WINDOWS: */
+			String os = System.getProperty("os.name").toLowerCase();
+			if(os.startsWith("win")) {
 				canvas.getDisplay().readAndDispatch();
 				if(canvas.isDisposed()) {
 					return false;
@@ -360,9 +389,7 @@ MouseTrackListener
 					}
 					keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ < 0 : false;
 				}
-			}
-			/*
-			case LINUX: {
+			} else if(os.contains("nux") || os.contains("nax") || os.contains("nix")) {
 				// The following code was adapted from JNA's KeyboardUtils class.
 				
 				// KeyboardUtils start
@@ -387,7 +414,7 @@ MouseTrackListener
 						byte[] keys = new byte[32];
 						lib.XQueryKeymap(dpy, keys);
 						
-						int keysym = toX11KeySym(i, Keys.getLocationForKey(i));
+						int keysym = toX11KeySym(i, 0);
 						boolean pressed = false;
 						for(int code = 5; code < 256; code++) {
 							int idx = code / 8;
@@ -420,8 +447,8 @@ MouseTrackListener
 					lastKeyboardButtonStates[i] = keyboardButtonStates[i];
 					keyboardButtonStates[i] = active ? KeyboardUtils.isPressed(i) : false;
 				}
-				break;
 			}
+			/*
 			case MACOSX: {
 				// TODO Find a way to dynamically poll the keyboard as is done above for Windows platforms
 				break;

@@ -48,7 +48,7 @@ $[News & Log]
 $nnmod v2.12.7 [2023.04.08]
 Using win32 api to obtain key states
 
-$nnmod v2.12.7 [2022.10.02]
+$nnmod v2.12.7 pre [2022.10.02]
 Increased file path size limit
 Fixed player initialization from file
 Fixed IOException when creating wav player from url
