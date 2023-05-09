@@ -347,17 +347,20 @@ MouseTrackListener
 			if((location & java.awt.event.KeyEvent.KEY_LOCATION_RIGHT) != 0) return X11.XK_Meta_R;
 			return X11.XK_Meta_L;
 		}
+		// XXX
 		return code >= 5 && code < 256 ? code : 0;
 	}
+
+	String os = System.getProperty("os.name").toLowerCase();
+	boolean win = os.startsWith("win");
+	boolean linux = os.contains("nux") || os.contains("nax") || os.contains("nix");
 	
     public boolean pollKeyboard(Canvas canvas) {
     	if(Settings.canvasKeyboard) return false;
+    	if(!win) return false;
 		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() == Thread.currentThread()) {
 			final boolean active = false ? true : (canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible());
-			/*switch(Platform.get()) {
-			case WINDOWS: */
-			String os = System.getProperty("os.name").toLowerCase();
-			if(os.startsWith("win")) {
+			//if(win) {
 				canvas.getDisplay().readAndDispatch();
 				if(canvas.isDisposed()) {
 					return false;
@@ -389,11 +392,10 @@ MouseTrackListener
 					}
 					keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ < 0 : false;
 				}
-			} else if(os.contains("nux") || os.contains("nax") || os.contains("nix")) {
+			//} else if(linux) {
+				/*
 				// The following code was adapted from JNA's KeyboardUtils class.
-				
 				// KeyboardUtils start
-				
 				X11 lib = X11.INSTANCE;
 				X11.Display dpy = lib.XOpenDisplay(null);
 				if(dpy == null) {
@@ -402,15 +404,11 @@ MouseTrackListener
 					System.err.flush();
 					return false;
 				}
-				
 				// KeyboardUtils end
-				
 				try {
 					for(int i = 0; i < keyboardButtonStates.length; i++) {
 						lastKeyboardButtonStates[i] = keyboardButtonStates[i];
-						
 						// KeyboardUtils start
-						
 						byte[] keys = new byte[32];
 						lib.XQueryKeymap(dpy, keys);
 						
@@ -427,39 +425,22 @@ MouseTrackListener
 								}
 							}
 						}
-						
 						//KeyboardUtils end
-						
 						keyboardButtonStates[i] = active ? pressed : false;
 					}
-					
 					// KeyboardUtils start
-					
 				} finally {
 					lib.XCloseDisplay(dpy);
 					dpy = null;
-					
 					//KeyboardUtils end
-					
 				}
 				
 				for(int i = 0; i < keyboardButtonStates.length; i++) {
 					lastKeyboardButtonStates[i] = keyboardButtonStates[i];
 					keyboardButtonStates[i] = active ? KeyboardUtils.isPressed(i) : false;
 				}
-			}
-			/*
-			case MACOSX: {
-				// TODO Find a way to dynamically poll the keyboard as is done above for Windows platforms
-				break;
-			}
-			case UNKNOWN:
-			default: {
-				return false;
-			}
-			}
-			*/
-			
+				*/
+			//}
 			long now = System.currentTimeMillis();
 			for(int button = 0; button < keyboardButtonStates.length; button++) {
 				if(!lastKeyboardButtonStates[button] && keyboardButtonStates[button]) {
@@ -769,10 +750,13 @@ MouseTrackListener
             }
           });
         ((Composite)this.shell).setLayout((Layout)layout);
-        FontData fd = shell.getFont().getFontData()[0];
-        fd.height = (fd.height / -fd.data.lfHeight) * 12;
-        f = new Font(shell.getDisplay(), fd);
-        shell.setFont(f);
+        try {
+        	FontData fd = shell.getFont().getFontData()[0];
+        	fd.height = (fd.height / -fd.data.lfHeight) * 12;
+        	f = new Font(shell.getDisplay(), fd);
+        	shell.setFont(f);
+        } catch (Error e) {
+        }
         this.method588();
         (this.aCLabel970 = new CLabel((Composite)this.shell, 0)).setText("\t");
         ((Control)this.aCLabel970).setLayoutData((Object)layoutData3);
@@ -1731,7 +1715,7 @@ MouseTrackListener
             return;
         }
         this.caret.keyPressed(keyEvent);
-    	if(!Settings.canvasKeyboard) return;
+    	if(!Settings.canvasKeyboard && win) return;
         int n = keyEvent.keyCode & 0xFEFFFFFF;
         if(keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
         	n = keyEvent.character;
@@ -1739,7 +1723,7 @@ MouseTrackListener
     }
     
     public final void keyReleased(final KeyEvent keyEvent) {
-    	if(!Settings.canvasKeyboard) return;
+    	if(!Settings.canvasKeyboard && win) return;
         int n = keyEvent.keyCode & 0xFEFFFFFF;
         if(keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
         	n = keyEvent.character;
@@ -1830,6 +1814,8 @@ MouseTrackListener
 
     
     private int key(int n) {
+    	System.out.println("key: " + n);
+    	//XXX
     	if(n <= 7) return -1;
     	if(n >= 14 && n <= 31) return -1;
     	if(n >= 91 && n <= 95) return -1;
@@ -1924,6 +1910,9 @@ MouseTrackListener
             return;
         }
 		if (!Settings.enableKeyRepeat) {
+			return;
+		}
+		if (Settings.enableKeyCache) {
 			return;
 		}
 		String r = Keyboard.replaceKey(n);

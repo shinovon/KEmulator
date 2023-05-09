@@ -59,7 +59,7 @@ import emulator.ui.swt.EmulatorImpl;
 public class Emulator
 {
 	// is 64 bit version
-	public static final boolean _X64_VERSION = false;
+	public static final boolean _X64_VERSION = true;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -471,22 +471,26 @@ public class Emulator
     }
     
     public static String getTitleVersionString() {
-        return "KEmulator" + (_X64_VERSION ? " nnX64" : " nnmod")+ " " + titleVersion;
+        return "KEm" + (_X64_VERSION ? " nnX64" : "nnmod")+ " " + titleVersion;
     }
     
     public static String getCmdVersionString() {
-        return (_X64_VERSION ? "kemulatornnx64" : "KEmulator nnmod")+ " " + titleVersion;
+        return (_X64_VERSION ? "KEmnnX64" : "KEmnnmod")+ " " + titleVersion;
     }
     
     public static String getInfoString() {
     	if(_X64_VERSION) {
-            return "kemulator nnx64 " + aboutVersion+"\n\n"
+            return "KEmulatorNNx64 " + aboutVersion+"\n\n"
             		+ "\tMulti-Platform\n"
             		+ "\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n"
                 	+ UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
                 	+ "\tMIDP 2.0 (JSR118)\n"
                 	+ "\tNokiaUI 1.4\n"
-                	+ "(no 3d support)";
+                	+ "\tSamsung 1.0\n"
+                	+ "\tSprint 1.0\n"
+                	+ "\tWMA 1.0(JSR120)\n"
+                	+ "(no 3d support)"
+                	;
     	}
         return "KEmulator v1.0.3" + "\n\tnnmod "+aboutVersion+"\n\n\t" + 
     	UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" + 
@@ -498,7 +502,9 @@ public class Emulator
     	+ "\tWMA 1.0(JSR120)\n"
     	+ "\tSensor(JSR256)\n"
     	+ "\tM3G 1.1(JSR184)\n"
-    	+ "\tOpenGL ES(JSR239)";
+    	+ "\tOpenGL ES(JSR239)\n"
+    	+ "\tMascot Capsule"
+    	;
     }
     
     public static String getAboutString() {

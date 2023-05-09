@@ -777,11 +777,14 @@ public final class Property implements IProperty
         ((Decorations)this.setsShell).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         // 1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI
         //setsShell.setFont(setsShell.getFont().getFontData()[0]);
-        
-        FontData fd = setsShell.getFont().getFontData()[0];
-        fd.height = (fd.height / -fd.data.lfHeight) * 12;
-        f = new Font(shell.getDisplay(), fd);
-        setsShell.setFont(f);
+        try {
+	        FontData fd = setsShell.getFont().getFontData()[0];
+	        fd.height = (fd.height / -fd.data.lfHeight) * 12;
+	        f = new Font(shell.getDisplay(), fd);
+	        setsShell.setFont(f);
+        } catch (Error e) {
+        	
+        }
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 2;
         ((Composite)this.setsShell).setLayout((Layout)layout);

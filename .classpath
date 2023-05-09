@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/3d"/>
 	<classpathentry kind="src" path="src/nnapi"/>
 	<classpathentry kind="src" path="src/media"/>
 	<classpathentry kind="src" path="src/main"/>
 	<classpathentry kind="src" path="src/nokia"/>
 	<classpathentry kind="src" path="src/midp"/>
 	<classpathentry kind="src" path="src/3d_woess"/>
+	<classpathentry kind="src" path="src/3d_gl"/>
+	<classpathentry kind="src" path="src/3d"/>
+	<classpathentry kind="src" path="src/3d2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/KEmulator103mod"/>
 	<classpathentry exported="true" kind="lib" path="lib/bridj-0.7.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/java-discord-rpc-2.0.1-all.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jna-5.2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jna-platform-5.2.0.jar" sourcepath="G:/temp/.org.sf.feeling.decompiler1635362350225/source/jna-platform-5.2.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/kemlib.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/vlcj-4.7.1.jar" sourcepath="G:/temp/.org.sf.feeling.decompiler1651682998843/source/vlcj-4.7.1-sources-1651764455749.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/KEmulator/lib/vlcj-4.7.1-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/vlcj-natives-4.1.0.jar" sourcepath="G:/temp/.org.sf.feeling.decompiler1634658902669/source/vlcj-natives-4.1.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/webcam-capture-0.3.12.jar" sourcepath="G:/temp/.org.sf.feeling.decompiler1634658902669/source/webcam-capture-0.3.12-sources.jar"/>
 	<classpathentry kind="lib" path="x64home/swt-win32-x86.jar"/>
@@ -26,5 +21,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/jutils.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lwjgl_util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oldgl.jar"/>
+	<classpathentry kind="lib" path="lib/jna-5.13.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-platform-5.13.0.jar"/>
+	<classpathentry kind="lib" path="lib/vlcj-4.7.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
