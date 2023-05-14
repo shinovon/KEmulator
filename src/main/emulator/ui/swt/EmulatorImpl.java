@@ -207,6 +207,9 @@ public final class EmulatorImpl implements IEmulator
     }
     
     public final void syncValues() {
+    	if(Class5.profiler != null) {
+    		syncExec(Class5.profiler);
+    	}
         for (int i = 0; i < Class5.aVector548.size(); ++i) {
             asyncExec((Runnable)Class5.aVector548.get(i));
         }

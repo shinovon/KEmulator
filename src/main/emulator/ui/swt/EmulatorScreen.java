@@ -261,11 +261,25 @@ MouseTrackListener
         this.shell.open();
         ((Widget)this.shell).addDisposeListener((DisposeListener)this);
         ((Control)this.shell).addControlListener((ControlListener)this);
-
+        if(win) {
+        new Thread("Keyboard poller thread") {
+        	public void run() {
+        		try {
+    	        while (shell != null && !((Widget)shell).isDisposed()) {
+    	        	canvas.getDisplay().syncExec(() -> {
+    					pollKeyboard(canvas);
+    				});
+    	        	Thread.sleep(10);
+    	        }
+        		} catch (Exception e) {
+        		}
+        	}
+        }.start();
+        }
     	try
     	{
 	        while (this.shell != null && !((Widget)this.shell).isDisposed()) {
-	        	pollKeyboard(canvas);
+	        	//pollKeyboard(canvas);
 	            if (!EmulatorScreen.display.readAndDispatch()) {
 	                EmulatorScreen.display.sleep();
 	            }
@@ -327,7 +341,7 @@ MouseTrackListener
 	protected static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
 	private static Class win32OS;
 	private static Method win32OSGetKeyState;
-	
+	/*
 	private static final int toX11KeySym(int code, int location) {
 		if(code >= java.awt.event.KeyEvent.VK_A && code <= java.awt.event.KeyEvent.VK_Z) return X11.XK_a + (code - java.awt.event.KeyEvent.VK_A);
 		if(code >= java.awt.event.KeyEvent.VK_0 && code <= java.awt.event.KeyEvent.VK_9) return X11.XK_0 + (code - java.awt.event.KeyEvent.VK_0);
@@ -350,20 +364,20 @@ MouseTrackListener
 		// XXX
 		return code >= 5 && code < 256 ? code : 0;
 	}
-
+*/
 	String os = System.getProperty("os.name").toLowerCase();
 	boolean win = os.startsWith("win");
-	boolean linux = os.contains("nux") || os.contains("nax") || os.contains("nix");
+	//boolean linux = os.contains("nux") || os.contains("nix");
 	
-    public boolean pollKeyboard(Canvas canvas) {
-    	if(Settings.canvasKeyboard) return false;
-    	if(!win) return false;
+    public void pollKeyboard(Canvas canvas) {
+    	if(Settings.canvasKeyboard) return;
+    	if(!win) return;
 		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() == Thread.currentThread()) {
 			final boolean active = false ? true : (canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible());
 			//if(win) {
 				canvas.getDisplay().readAndDispatch();
 				if(canvas.isDisposed()) {
-					return false;
+					return;
 				}
 				if(win32OS == null) {
 					try {
@@ -371,13 +385,13 @@ MouseTrackListener
 					} catch (Exception e) {
 					}
 					if(win32OS == null) {
-						return false;
+						return;
 					}
 				}
 				if(win32OSGetKeyState == null) {
 					win32OSGetKeyState = getMethod(win32OS, "GetKeyState", Integer.TYPE);
 					if(win32OSGetKeyState == null) {
-						return false;
+						return;
 					}
 				}
 				
@@ -388,7 +402,7 @@ MouseTrackListener
 						keyState = ((Short) win32OSGetKeyState.invoke(null, Integer.valueOf(i))).shortValue();
 					} catch(Exception e) {
 						e.printStackTrace();
-						return false;
+						return;
 					}
 					keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ < 0 : false;
 				}
@@ -463,22 +477,12 @@ MouseTrackListener
 				}
 			}
 			
-			return true;
 		}
 		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() != Thread.currentThread()) {
-			final Boolean[] rtrn = {null};
 			canvas.getDisplay().asyncExec(() -> {
-				rtrn[0] = Boolean.valueOf(pollKeyboard(canvas));
+				pollKeyboard(canvas);
 			});
-			while(rtrn[0] == null) {
-				try {
-					Thread.sleep(10L);
-				} catch (Exception e) {
-				}
-			}
-			return rtrn[0].booleanValue();
 		}
-		return false;
 	}
     
 
@@ -636,6 +640,7 @@ MouseTrackListener
         if (Emulator.getCurrentDisplay().getCurrent() == null || this.pauseState == 0) {
             return;
         }
+		pollKeyboard(canvas);
         if (Settings.playingRecordedKeys) {
             KeyRecords h = Emulator.getRobot();
             String method698;
@@ -1715,7 +1720,10 @@ MouseTrackListener
             return;
         }
         this.caret.keyPressed(keyEvent);
-    	if(!Settings.canvasKeyboard && win) return;
+    	if(!Settings.canvasKeyboard && win) {
+    		pollKeyboard(canvas);
+    		return;
+    	}
         int n = keyEvent.keyCode & 0xFEFFFFFF;
         if(keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
         	n = keyEvent.character;
@@ -1723,7 +1731,10 @@ MouseTrackListener
     }
     
     public final void keyReleased(final KeyEvent keyEvent) {
-    	if(!Settings.canvasKeyboard && win) return;
+    	if(!Settings.canvasKeyboard && win) {
+    		pollKeyboard(canvas);
+    		return;
+    	}
         int n = keyEvent.keyCode & 0xFEFFFFFF;
         if(keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
         	n = keyEvent.character;
@@ -1814,7 +1825,7 @@ MouseTrackListener
 
     
     private int key(int n) {
-    	System.out.println("key: " + n);
+    	//System.out.println("key: " + n);
     	//XXX
     	if(n <= 7) return -1;
     	if(n >= 14 && n <= 31) return -1;

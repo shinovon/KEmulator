@@ -58,6 +58,9 @@ public class CustomMethod
     	} else if(prop.equalsIgnoreCase("os.name")) {
     		if(System.getProperty("microedition.platform").indexOf("S60") > -1)
     			res = "Symbian";
+    	} else if(prop.equalsIgnoreCase("os.version")) {
+    		if(System.getProperty("microedition.platform").indexOf("S60") > -1)
+    			res = "9.x";
     	} else if(prop.startsWith("com.nokia.gpu.memory")) {
     		b = false;
     		/*
@@ -69,10 +72,11 @@ public class CustomMethod
         	*/
     	} else if(prop.startsWith("com.nokia.memoryram")) {
     		b = false;
+    		Runtime r = Runtime.getRuntime();
     		if(prop.equals("com.nokia.memoryramfree")) {
-        		res = "" + Runtime.getRuntime().freeMemory();
+        		res = "" + (r.freeMemory() + r.maxMemory() - r.totalMemory());
         	} else if(prop.equals("com.nokia.memoryramtotal")) {
-        		res = "" + Runtime.getRuntime().maxMemory();
+        		res = "" + r.maxMemory();
         	}
     	} else if(prop.equalsIgnoreCase("kemulator.threadtrace")) {
     		b = false;

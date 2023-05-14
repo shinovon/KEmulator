@@ -1038,10 +1038,10 @@ public final class Property implements IProperty
         localeText.setLayoutData(layoutData333);
         localeText.setText(Settings.locale);
         this.method384();
-        (this.aCLabel738 = new CLabel(this.customComp, 0)).setText(UILocale.uiText("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 50) ? "\u221e" : String.valueOf(Settings.frameRate)));
+        (this.aCLabel738 = new CLabel(this.customComp, 0)).setText(UILocale.uiText("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
         ((Control)this.aCLabel738).setLayoutData((Object)layoutData);
         (this.aScale669 = new Scale(this.customComp, 256)).setIncrement(1);
-        this.aScale669.setMaximum(51);
+        this.aScale669.setMaximum(121);
         this.aScale669.setPageIncrement(5);
         this.aScale669.setSelection(Settings.frameRate);
         this.aScale669.setMinimum(1);

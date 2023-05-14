@@ -28,6 +28,7 @@ public final class Class5 implements Runnable, DisposeListener
     private Class5 aClass5_556;
     private String aString551;
     public static Vector aVector548;
+	public static Class5 profiler;
     private boolean aBoolean561;
     boolean aBoolean545;
     boolean aBoolean559;
@@ -281,6 +282,9 @@ public final class Class5 implements Runnable, DisposeListener
                 n = aShell544.getLocation().x - this.aShell557.getSize().x;
                 y = aShell544.getLocation().y;
             }
+            if(anInt553 == 1) {
+            	profiler = this;
+            }
             ((Control)shell).setLocation(n, y);
             this.aShell544 = aShell544;
             this.aShell557.open();
@@ -288,7 +292,7 @@ public final class Class5 implements Runnable, DisposeListener
             this.aBoolean561 = false;
             this.aBoolean560 = true;
             EmulatorImpl.asyncExec(this.aClass5_556);
-            Class5.aVector548.addElement(this);
+            if(anInt553 != 1) Class5.aVector548.addElement(this);
             while (!((Widget)this.aShell557).isDisposed()) {
                 if (!this.aDisplay550.readAndDispatch()) {
                     this.aDisplay550.sleep();

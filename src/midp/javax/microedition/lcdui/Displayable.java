@@ -324,14 +324,15 @@ public class Displayable {
 	*/
 
 	protected static void fpsLimiter() {
-		if (Settings.f == 1 && Settings.frameRate <= 50) {
+		if (Settings.f == 1 && Settings.frameRate <= 120) {
 			long var0 = System.currentTimeMillis() - lastFrameTime;
 			long var2 = (long) (1000 / Settings.frameRate);
-
-			try {
-				Thread.sleep(var2 - var0);
-			} catch (Exception var4) {
-				;
+			if(var2 - var0 > 0) { 
+				try {
+					Thread.sleep(var2 - var0);
+				} catch (Exception var4) {
+					;
+				}
 			}
 		}
 

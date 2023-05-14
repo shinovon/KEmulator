@@ -36,10 +36,7 @@ KEmulator.jar
 *.dll
 
 # emulator dirs
-capture
-rms
-file
-home
+*home
 
 # emulator files
 log.txt

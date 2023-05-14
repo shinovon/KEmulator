@@ -17,6 +17,7 @@ public class Profiler
     public static int totalImagePixelCount;
     public static int gcCallCount;
     public static int currentTimeMillisCallCount;
+	public static int drawCallCount;
     
     public Profiler() {
         super();
@@ -35,5 +36,6 @@ public class Profiler
         Profiler.nokiaDrawPixelPixelCount = 0;
         Profiler.gcCallCount = 0;
         Profiler.currentTimeMillisCallCount = 0;
+        Profiler.drawCallCount = 0;
     }
 }
