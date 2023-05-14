@@ -18,7 +18,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jinput.jar" sourcepath="G:/temp/.org.sf.feeling.decompiler1650024368065/source/jinput-2.0.5-sources-1650050082415.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jutils.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lwjgl_util.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/oldgl.jar"/>
 	<classpathentry kind="lib" path="lib/jna-5.13.0.jar"/>
 	<classpathentry kind="lib" path="lib/jna-platform-5.13.0.jar"/>
 	<classpathentry kind="lib" path="lib/vlcj-4.7.1.jar"/>
