@@ -1,0 +1,22 @@
+<component name="libraryTable">
+  <library name="libraries">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/vlcj-natives-4.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jna-5.13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/java-discord-rpc-2.0.1-all.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/webcam-capture-0.3.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl_util.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jna-platform-5.13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/kemlib.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jinput.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/bridj-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jutils.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/vlcj-4.7.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/x64home/swt-win32-x86.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
