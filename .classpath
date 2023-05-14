@@ -6,9 +6,7 @@
 	<classpathentry kind="src" path="src/nokia"/>
 	<classpathentry kind="src" path="src/midp"/>
 	<classpathentry kind="src" path="src/3d_woess"/>
-	<classpathentry kind="src" path="src/3d_gl"/>
 	<classpathentry kind="src" path="src/3d"/>
-	<classpathentry kind="src" path="src/3d2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/KEmulator103mod"/>
 	<classpathentry exported="true" kind="lib" path="lib/bridj-0.7.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/java-discord-rpc-2.0.1-all.jar"/>
