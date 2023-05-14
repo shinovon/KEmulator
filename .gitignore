@@ -45,4 +45,4 @@ obf/*.jar
 obf/mapping*.txt
 x64home/track.txt
 
-out/
+MANIFEST.MF
