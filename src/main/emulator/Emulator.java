@@ -1160,11 +1160,11 @@ public class Emulator
         final String javahome = System.getProperty("java.home");
         String javaexec;
         if (javahome == null || javahome.length() < 1) {
-            javaexec = "java";
+            javaexec = "javaw";
         } else {
-            final String string = javahome + (System.getProperty("os.name").toLowerCase().indexOf("win") == -1 ? "\\bin\\java" : "\\bin\\java.exe");
+            final String string = javahome + (System.getProperty("os.name").toLowerCase().indexOf("win") == -1 ? "/bin/javaw" : "/bin/javaw.exe");
             final File file;
-            javaexec = (((file = new File(string)).exists() && file.isFile()) ? ("\"" + string + "\"") : "java");
+            javaexec = (((file = new File(string)).exists() && file.isFile()) ? ("\"" + string + "\"") : "javaw");
         }
         final String cp = " -cp \"" + System.getProperty("java.class.path") + "\"";
         final String maincls = " emulator.Emulator";
@@ -1200,8 +1200,8 @@ public class Emulator
             args.append(" -wgl");
         }
         final String[] cmd;
-        if(System.getProperty("os.name").toLowerCase().indexOf("win") == -1) {
-            cmd = new String[] { javaexec + cp + maincls + args.toString() };
+        if(!System.getProperty("os.name").toLowerCase().contains("win")) {
+            cmd = new String[] { "start " + javaexec + cp + maincls + args.toString() };
             getEmulator().getLogStream().print(cmd[0]);
         } else {
             (cmd = new String[2])[0] = "cmd.exe";
