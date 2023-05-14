@@ -32,15 +32,10 @@ hs_err_pid*
 bin
 KEmulator.jar
 
-# natives
-*.dll
-
-# emulator dirs
-*home
-
 # emulator files
 log.txt
 property.txt
+track.txt
 
 # vlc dirs
 plugins
@@ -50,4 +45,4 @@ obf/*.jar
 obf/mapping*.txt
 x64home/track.txt
 
-.idea
+MANIFEST.MF
