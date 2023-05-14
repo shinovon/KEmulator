@@ -1160,11 +1160,11 @@ public class Emulator
         final String javahome = System.getProperty("java.home");
         String javaexec;
         if (javahome == null || javahome.length() < 1) {
-            javaexec = "javaw";
+            javaexec = "java";
         } else {
-            final String string = javahome + (System.getProperty("os.name").toLowerCase().indexOf("win") == -1 ? "/bin/javaw" : "/bin/javaw.exe");
+            final String string = javahome + (System.getProperty("os.name").toLowerCase().indexOf("win") == -1 ? "/bin/java" : "/bin/javaw.exe");
             final File file;
-            javaexec = (((file = new File(string)).exists() && file.isFile()) ? ("\"" + string + "\"") : "javaw");
+            javaexec = (((file = new File(string)).exists() && file.isFile()) ? ("\"" + string + "\"") : "java");
         }
         final String cp = " -cp \"" + System.getProperty("java.class.path") + "\"";
         final String maincls = " emulator.Emulator";
