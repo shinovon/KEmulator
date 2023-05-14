@@ -8,11 +8,12 @@ public class RecordStore
 {
     public static final int AUTHMODE_PRIVATE = 0;
     public static final int AUTHMODE_ANY = 1;
-    static String aString368;
+    static String rmsDir;
     String name;
     Vector records;
     Vector aVector372;
     int count;
+	private boolean closed;
     
     RecordStore(final String aString371, final boolean b) throws RecordStoreException, RecordStoreNotFoundException, RecordStoreFullException {
         super();
@@ -21,14 +22,14 @@ public class RecordStore
         this.name = aString371;
         try {
             final File file;
-            if (!(file = new File(RecordStore.aString368 + this.fileName())).exists() || !file.isDirectory()) {
+            if (!(file = new File(RecordStore.rmsDir + this.fileName())).exists() || !file.isDirectory()) {
                 file.mkdir();
             }
             if (!b) {
                 this.count = 1;
                 return;
             }
-            final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(RecordStore.aString368 + this.fileName() + this.name + ".idx"));
+            final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(RecordStore.rmsDir + this.fileName() + this.name + ".idx"));
             this.count = dataInputStream.readInt();
             for (int int1 = dataInputStream.readInt(), i = 0; i < int1; ++i) {
                 this.records.add(new Integer(dataInputStream.readInt()));
@@ -36,22 +37,18 @@ public class RecordStore
             dataInputStream.close();
         }
         catch (Exception ex) {
-        	ex.printStackTrace();
             throw new RecordStoreNotFoundException(this.name);
         }
     }
     
     public void setMode(final int n, final boolean b) throws RecordStoreException {
-    	logln("setMode");
     }
     
     public long getLastModified() throws RecordStoreNotOpenException {
-    	logln("getLastModified");
         return 0L;
     }
     
     public int getVersion() throws RecordStoreNotOpenException {
-    	logln("getVersion");
         return 0;
     }
     
@@ -72,7 +69,7 @@ public class RecordStore
             throw new InvalidRecordIDException();
         }
         try {
-            return (int)new File(RecordStore.aString368 + this.fileName() + this.name + "_" + n + ".rms").length();
+            return (int)new File(RecordStore.rmsDir + this.fileName() + this.name + "_" + n + ".rms").length();
         }
         catch (Exception ex) {
             throw new RecordStoreException();
@@ -112,8 +109,8 @@ public class RecordStore
         logln("openRecordStore " + substring);
         boolean exists = false;
         final File file;
-        if ((file = new File(RecordStore.aString368 + "." + substring)).exists() && file.isDirectory()) {
-            exists = new File(RecordStore.aString368 + "." + substring + "/" + substring + ".idx").exists();
+        if ((file = new File(RecordStore.rmsDir + "." + substring)).exists() && file.isDirectory()) {
+            exists = new File(RecordStore.rmsDir + "." + substring + "/" + substring + ".idx").exists();
         }
         if (exists || b) {
             return new RecordStore(substring, exists);
@@ -138,10 +135,10 @@ public class RecordStore
             this.deleteRecord((int)this.records.get(i));
         }
         try {
-            if (new File(RecordStore.aString368 + this.fileName()).exists()) {
-                new File(RecordStore.aString368 + this.fileName() + this.name + ".idx").delete();
+            if (new File(RecordStore.rmsDir + this.fileName()).exists()) {
+                new File(RecordStore.rmsDir + this.fileName() + this.name + ".idx").delete();
             }
-            new File(RecordStore.aString368 + this.fileName()).delete();
+            new File(RecordStore.rmsDir + this.fileName()).delete();
         }
         catch (Exception ex) {
             throw new RecordStoreNotFoundException(this.name);
@@ -150,7 +147,7 @@ public class RecordStore
     
     public static String[] listRecordStores() {
         final String[] list;
-        if ((list = new File(RecordStore.aString368).list(new RMSListFileNameFilter())) != null) {
+        if ((list = new File(RecordStore.rmsDir).list(new RMSListFileNameFilter())) != null) {
             for (int i = list.length - 1; i >= 0; --i) {
                 list[i] = list[i].substring(1);
             }
@@ -166,8 +163,8 @@ public class RecordStore
             while (i >= 0) {
                 if ((int)this.records.get(i) == n) {
                     this.records.remove(i);
-                    if (new File(RecordStore.aString368 + this.fileName()).exists()) {
-                        new File(RecordStore.aString368 + this.fileName() + this.name + "_" + n + ".rms").delete();
+                    if (new File(RecordStore.rmsDir + this.fileName()).exists()) {
+                        new File(RecordStore.rmsDir + this.fileName() + this.name + "_" + n + ".rms").delete();
                     }
                     this.method186();
                     logendln("OK");
@@ -189,7 +186,7 @@ public class RecordStore
             throw new InvalidRecordIDException("recordId=" + n);
         }
         try {
-            final File file = new File(RecordStore.aString368 + this.fileName() + this.name + "_" + n + ".rms");
+            final File file = new File(RecordStore.rmsDir + this.fileName() + this.name + "_" + n + ".rms");
             final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
             final int n3 = (int)file.length();
             dataInputStream.readFully(array, n2, n3);
@@ -207,7 +204,7 @@ public class RecordStore
         }
         try {
             final File file;
-            if ((file = new File(RecordStore.aString368 + this.fileName() + this.name + "_" + n + ".rms")).length() > 0L) {
+            if ((file = new File(RecordStore.rmsDir + this.fileName() + this.name + "_" + n + ".rms")).length() > 0L) {
                 final byte[] array = new byte[(int)file.length()];
                 new DataInputStream(new FileInputStream(file)).readFully(array);
                 return array;
@@ -239,10 +236,10 @@ public class RecordStore
         this.records.add(new Integer(this.count));
         try {
             final File file;
-            if (!(file = new File(RecordStore.aString368 + this.fileName())).exists() && !file.isDirectory()) {
+            if (!(file = new File(RecordStore.rmsDir + this.fileName())).exists() && !file.isDirectory()) {
                 file.mkdir();
             }
-            final FileOutputStream fileOutputStream = new FileOutputStream(RecordStore.aString368 + this.fileName() + this.name + "_" + this.count + ".rms");
+            final FileOutputStream fileOutputStream = new FileOutputStream(RecordStore.rmsDir + this.fileName() + this.name + "_" + this.count + ".rms");
             if (array != null) {
                 fileOutputStream.write(array, n, n2);
             }
@@ -264,10 +261,10 @@ public class RecordStore
         }
         try {
             final File file;
-            if (!(file = new File(RecordStore.aString368 + this.fileName())).exists() && !file.isDirectory()) {
+            if (!(file = new File(RecordStore.rmsDir + this.fileName())).exists() && !file.isDirectory()) {
                 file.mkdir();
             }
-            final FileOutputStream fileOutputStream = new FileOutputStream(RecordStore.aString368 + this.fileName() + this.name + "_" + n + ".rms");
+            final FileOutputStream fileOutputStream = new FileOutputStream(RecordStore.rmsDir + this.fileName() + this.name + "_" + n + ".rms");
             if (array != null) {
                 fileOutputStream.write(array, n2, n3);
             }
@@ -281,6 +278,8 @@ public class RecordStore
     }
     
     public void closeRecordStore() throws RecordStoreNotOpenException, RecordStoreException {
+    	if(closed) throw new RecordStoreNotOpenException();
+    	closed = true;
     	logln("closeRecordStore " + this.name);
         if (!this.aVector372.isEmpty()) {
             this.aVector372.removeAllElements();
@@ -291,11 +290,11 @@ public class RecordStore
     private void method186() throws RecordStoreException {
         try {
             final File file;
-            if (!(file = new File(RecordStore.aString368 + this.fileName())).exists() && !file.isDirectory()) {
+            if (!(file = new File(RecordStore.rmsDir + this.fileName())).exists() && !file.isDirectory()) {
                 file.mkdir();
             }
             final DataOutputStream dataOutputStream;
-            (dataOutputStream = new DataOutputStream(new FileOutputStream(RecordStore.aString368 + this.fileName() + this.name + ".idx"))).writeInt(this.count);
+            (dataOutputStream = new DataOutputStream(new FileOutputStream(RecordStore.rmsDir + this.fileName() + this.name + ".idx"))).writeInt(this.count);
             dataOutputStream.writeInt(this.records.size());
             for (int i = 0; i < this.records.size(); ++i) {
                 dataOutputStream.writeInt((int)this.records.get(i));
@@ -348,6 +347,6 @@ public class RecordStore
 	}
     
     static {
-        RecordStore.aString368 = Emulator.getEmulator().getProperty().getRmsFolderPath();
+        RecordStore.rmsDir = Emulator.getEmulator().getProperty().getRmsFolderPath();
     }
 }

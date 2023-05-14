@@ -28,8 +28,6 @@ import javazoom.jl.player.Player;
 public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener, MetaEventListener {
 	Object sequence;
 	Thread playerThread;
-	Sequencer sequencer;
-	Synthesizer synthesizer;
 	boolean midiCompleted;
 	boolean soundCompleted;
 	private int state;
@@ -42,12 +40,13 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	TimeBase timeBase;
 	public int loopCount;
 	public int dataLen;
-	private MidiDevice device;
 	private boolean mp3Complete;
 	private DataSource dataSource;
 	private FramePositioningControl frameControl;
 	private boolean dataSourceDisconnected;
+	private InputStream inputStream;
 	static Class clipCls;
+
 
 	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
 		super();
@@ -68,6 +67,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		this.contentType = contentType;
 		this.loopCount = 1;
 		if(dataLen == 0) this.dataLen = inputStream.available();
+		this.inputStream = inputStream;
 		if (contentType.equals("audio/amr")) {
 			this.amr(inputStream);
 		} else if (contentType.equals("audio/x-wav") || contentType.equals("audio/wav")) {
@@ -249,6 +249,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		this.controls = new Control[] { this.toneControl, this.volumeControl };
 	}
 
+	private static MidiDevice device;
+	Sequencer sequencer;
+	static Synthesizer synthesizer;
+	
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
 			this.sequence = MidiSystem.getSequence(inputStream);
@@ -256,49 +260,70 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.sequence = null;
 		}
 		try {
-			device = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
-			device.open();
-			// First, get a Sequencer to play sequences of MIDI events
-			//That is, to send events to a Synthesizer at the right time.
-			sequencer = MidiSystem.getSequencer(); // Used to play sequences
-			//sequencer.open(); // Turn it on.
-			//The Sequencer obtained above may be connected to a Synthesizer
-			//by default, or it may not. Therefore, we explicitly connect it.
-			for (Transmitter t : sequencer.getTransmitters()) {
-				t.setReceiver(device.getReceiver());
+			/*
+			if(device == null || sequencer == null || synthesizer == null) {
+				device = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
+				device.open();
+				sequencer = MidiSystem.getSequencer();
+				for (Transmitter t : sequencer.getTransmitters()) {
+					t.setReceiver(device.getReceiver());
+				}
+				if(sequencer instanceof Synthesizer) {
+					synthesizer = (Synthesizer) sequencer;
+				} else {
+					synthesizer = MidiSystem.getSynthesizer();
+					synthesizer.open();
+					for (Transmitter t : synthesizer.getTransmitters()) {
+						t.setReceiver(device.getReceiver());
+					}
+				}
 			}
-			synthesizer = MidiSystem.getSynthesizer();
-			synthesizer.open();
-			for (Transmitter t : synthesizer.getTransmitters()) {
-				t.setReceiver(device.getReceiver());
-			}
+			*/
+			
 			/*
 			this.sequencer = MidiSystem.getSequencer();
 			
 			(this.synthesizer = MidiSystem.getSynthesizer()).open();
 			
+			
+			
 			if (this.synthesizer.getDefaultSoundbank() == null) {
 			    this.sequencer.getTransmitter().setReceiver(MidiSystem.getReceiver());
 			}
 			else {
-			   // this.sequencer.getTransmitter().setReceiver(this.synthesizer.getReceiver());
-			}*/
-			/*
-			this.aSequencer299.getTransmitter().setReceiver(MidiSystem.getReceiver());
-			if(MidiSystem.getReceiver() instanceof Sequencer) {
-				this.aSequencer299 = (Sequencer) MidiSystem.getReceiver();
+			    this.sequencer.getTransmitter().setReceiver(this.synthesizer.getReceiver());
 			}
-			if(this.aSequencer299 instanceof Synthesizer) {
-				this.aSynthesizer300 = (Synthesizer) this.aSequencer299;
+			
+			this.sequencer.getTransmitter().setReceiver(MidiSystem.getReceiver());
+			if(MidiSystem.getReceiver() instanceof Sequencer) {
+				this.sequencer = (Sequencer) MidiSystem.getReceiver();
+			}
+			if(this.sequencer instanceof Synthesizer) {
+				this.synthesizer = (Synthesizer) this.sequencer;
 			}
 			else if(MidiSystem.getReceiver() instanceof Synthesizer) {
-				this.aSynthesizer300 = (Synthesizer) MidiSystem.getReceiver();
+				this.synthesizer = (Synthesizer) MidiSystem.getReceiver();
 			} else {
-				//this.aSynthesizer300 = MidiSystem.getSynthesizer();
-				//this.aSynthesizer300.open();
-				//this.aSequencer299.getTransmitter().setReceiver(this.aSynthesizer300.getReceiver());
-				//this.aSynthesizer300.getTransmitter().setReceiver(MidiSystem.getReceiver());
-			}*/
+				this.synthesizer = MidiSystem.getSynthesizer();
+				this.synthesizer.open();
+				this.sequencer.getTransmitter().setReceiver(this.synthesizer.getReceiver());
+			//	this.synthesizer.getTransmitter().setReceiver(MidiSystem.getReceiver());
+			}
+			*/
+			
+			if(synthesizer == null) {
+				device = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
+				device.open();
+				synthesizer = MidiSystem.getSynthesizer();
+				for (Transmitter t : synthesizer.getTransmitters()) {
+					t.setReceiver(device.getReceiver());
+				}
+				synthesizer.open();
+			}
+			sequencer = MidiSystem.getSequencer();
+			for (Transmitter t : sequencer.getTransmitters()) {
+				t.setReceiver(device.getReceiver());
+			}
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 			this.sequence = null;

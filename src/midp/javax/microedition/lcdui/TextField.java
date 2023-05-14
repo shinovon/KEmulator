@@ -18,35 +18,35 @@ public class TextField extends Item
     public static final int INITIAL_CAPS_WORD = 1048576;
     public static final int INITIAL_CAPS_SENTENCE = 2097152;
     public static final int CONSTRAINT_MASK = 65535;
-    private String aString25;
-    private int anInt349;
-    private int anInt28;
-    private String[] aStringArray359;
+    private String string;
+    private int maxSize;
+    private int constraints;
+    private String[] textArr;
     private int anInt29;
     private int anInt30;
     protected boolean isTextBox;
     
     public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
         super(s);
-        this.aString25 = aString25;
-        this.anInt349 = anInt349;
-        this.anInt28 = anInt350;
+        this.string = aString25;
+        this.maxSize = anInt349;
+        this.constraints = anInt350;
     }
     
     public String getString() {
-        return this.aString25;
+        return this.string;
     }
     
     public void setString(final String aString25) {
-        this.aString25 = aString25;
+        this.string = aString25;
     }
     
     public int getChars(final char[] array) {
-        if (this.aString25 == null) {
+        if (this.string == null) {
             return 0;
         }
         final char[] charArray;
-        System.arraycopy(charArray = this.aString25.toCharArray(), 0, array, 0, charArray.length);
+        System.arraycopy(charArray = this.string.toCharArray(), 0, array, 0, charArray.length);
         return charArray.length;
     }
     
@@ -57,7 +57,7 @@ public class TextField extends Item
     }
     
     public void insert(final String s, final int n) {
-        final String aString25 = this.aString25;
+        final String aString25 = this.string;
         this.setString(aString25.substring(0, n) + s + aString25.substring(n));
     }
     
@@ -68,23 +68,23 @@ public class TextField extends Item
     }
     
     public void delete(final int n, final int n2) {
-        final String aString25 = this.aString25;
+        final String aString25 = this.string;
         this.setString(aString25.substring(0, n) + aString25.substring(n + n2));
     }
     
     public int getMaxSize() {
-        return this.anInt349;
+        return this.maxSize;
     }
     
     public int setMaxSize(final int anInt349) {
-        return this.anInt349 = anInt349;
+        return this.maxSize = anInt349;
     }
     
     public int size() {
-        if (this.aString25 == null) {
+        if (this.string == null) {
             return 0;
         }
-        return this.aString25.length();
+        return this.string.length();
     }
     
     public int getCaretPosition() {
@@ -92,11 +92,11 @@ public class TextField extends Item
     }
     
     public void setConstraints(final int anInt28) {
-        this.anInt28 = anInt28;
+        this.constraints = anInt28;
     }
     
     public int getConstraints() {
-        return this.anInt28;
+        return this.constraints;
     }
     
     public void setInitialInputMode(final String s) {
@@ -140,8 +140,8 @@ public class TextField extends Item
         }
         this.anInt29 = super.bounds[0] + 4;
         this.anInt30 = n + 4;
-        for (int j = 0; j < this.aStringArray359.length; ++j) {
-            graphics.drawString(this.aStringArray359[j], super.bounds[0] + 4, n + 2, 0);
+        for (int j = 0; j < this.textArr.length; ++j) {
+            graphics.drawString(this.textArr[j], super.bounds[0] + 4, n + 2, 0);
             if ((n += Screen.font.getHeight() + 4) > super.screen.bounds[3]) {
                 return;
             }
@@ -160,8 +160,8 @@ public class TextField extends Item
             super.labelArr = null;
         }
         final Font aFont173 = Screen.font;
-        this.aStringArray359 = c.textArr((this.aString25 == null) ? "" : this.aString25, aFont173, n2, n2);
-        super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.aStringArray359.length, super.screen.bounds[3]);
+        this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, n2, n2);
+        super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, super.screen.bounds[3]);
     }
 
     protected int getItemWidth() {

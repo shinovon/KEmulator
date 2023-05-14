@@ -396,12 +396,12 @@ public final class Property implements IProperty
         if (!(file = new File(s)).exists() || !file.isDirectory()) {
             file.mkdirs();
         }
-        final String string = s + "\\" + this.method355();
+        final String string = s + "/" + this.method355();
         final File file2;
         if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
             file2.mkdirs();
         }
-        return string + "\\";
+        return string + "/";
     }
     
     public final void setCustomProperties() {
@@ -1777,12 +1777,12 @@ public final class Property implements IProperty
         if (!(file = new File(s)).exists() || !file.isDirectory()) {
             file.mkdirs();
         }
-        final String string = s + "\\" + this.method355();
+        final String string = s + "/" + this.method355();
         final File file2;
         if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
             file2.mkdirs();
         }
-        return string + "\\";
+        return string + "/";
     }
     
     private void method428() {

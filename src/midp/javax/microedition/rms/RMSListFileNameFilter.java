@@ -9,6 +9,6 @@ final class RMSListFileNameFilter implements FilenameFilter
     }
     
     public final boolean accept(final File file, final String s) {
-        return s.startsWith(".") && new File(RecordStore.aString368 + "/" + s + "/" + s.substring(1) + ".idx").exists();
+        return s.startsWith(".") && new File(RecordStore.rmsDir + "/" + s + "/" + s.substring(1) + ".idx").exists();
     }
 }
