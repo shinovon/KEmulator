@@ -296,214 +296,214 @@ public final class EventQueue implements Runnable {
 		new Thread(this.threadCallSerially).start();
 			while (this.running) {
 				try {
-				if (Emulator.getMIDlet() != null) {
-					if (!this.canvasHidden) {
-						switch (this.anInt1222 = this.nextEvent()) {
-						case 1: {
-							if (Emulator.getCanvas() == null
-									|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-								this.repainted2 = true;
-								break;
-							}
-							Displayable.checkForSteps();
-							Displayable.fpsLimiter();
-							if(Settings.xrayView) Displayable.resetXRayGraphics();
-							final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
-							final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
-							try {
-								Emulator.getCanvas().invokePaint(new Graphics(backBufferImage, xRayScreenImage));
-							} catch (Exception ex) {
-								ex.printStackTrace();
-							}
-							(Settings.xrayView ? xRayScreenImage : backBufferImage)
-									.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
-							Emulator.getEmulator().getScreen().repaint();
-							this.repainted2 = true;
+				if (Emulator.getMIDlet() == null || this.canvasHidden) {
+					try {
+						Thread.sleep(5L);
+					} catch (Exception ex4) {
+					}
+					continue;
+				}
+				switch (this.anInt1222 = this.nextEvent()) {
+				case 1: {
+					if (Emulator.getCanvas() == null
+							|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+						this.repainted2 = true;
+						break;
+					}
+					Displayable.checkForSteps();
+					if(Settings.xrayView) Displayable.resetXRayGraphics();
+					final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
+					final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
+					try {
+						Emulator.getCanvas().invokePaint(new Graphics(backBufferImage, xRayScreenImage));
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+					(Settings.xrayView ? xRayScreenImage : backBufferImage)
+							.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+					Emulator.getEmulator().getScreen().repaint();
+					Displayable.fpsLimiter();
+					this.repainted2 = true;
+					break;
+				}
+				case 2: {
+					this.threadCallSerially.method590(EventQueue.aRunnable1219);
+					break;
+				}
+				case 3: {
+					if (Emulator.getCanvas() == null
+							|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+						this.repainted = true;
+						break;
+					}
+					final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImage();
+					final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
+					final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
+					(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+					Emulator.getEmulator().getScreen().repaint();
+					this.repainted = true;
+					break;
+				}
+				case 10: {
+					if (Emulator.getMIDlet() != null) {
+						new Thread(new InvokeStartAppRunnable(this)).start();
+						break;
+					}
+					break;
+				}
+				case 11: {
+					Emulator.getNetMonitor().a();
+					this.stop();
+					if (Emulator.getMIDlet() != null) {
+						this.repainted2 = true;
+						this.repainted = true;
+						new Thread(new InvokeDestroyAppRunnable(this)).start();
+						break;
+					}
+					break;
+				}
+				case 4: {
+					if (Emulator.getScreen() == null) {
+						break;
+					}
+					if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getScreen()) {
+						break;
+					}
+					final IImage backBufferImage3 = Emulator.getEmulator().getScreen().getBackBufferImage();
+					final IImage xRayScreenImage3 = Emulator.getEmulator().getScreen().getXRayScreenImage();
+					Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
+					(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
+							.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+					Emulator.getEmulator().getScreen().repaint();
+					try {
+						Thread.sleep(100L);
+					} catch (Exception ex2) {
+					}
+					this.queue(4);
+					break;
+				}
+				case 15: {
+					if (Emulator.getCanvas() == null) {
+						break;
+					}
+					if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+						break;
+					}
+					Emulator.getCanvas().invokeShowNotify();
+					break;
+				}
+				case 16: {
+					if (Emulator.getCanvas() == null) {
+						break;
+					}
+					if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+						break;
+					}
+					Emulator.getCanvas().invokeHideNotify();
+					this.canvasHidden = true;
+					break;
+				}
+				case 0: {
+					break;
+				}
+				/*
+				default: {
+					if ((this.anInt1222 & 0x4000000) != 0x0) {
+						if (Emulator.getCurrentDisplay().getCurrent() == null) {
 							break;
 						}
-						case 2: {
-							this.threadCallSerially.method590(EventQueue.aRunnable1219);
-							break;
-						}
-						case 3: {
-							if (Emulator.getCanvas() == null
-									|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-								this.repainted = true;
-								break;
-							}
-							final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImage();
-							final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
-							final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
-							(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
-							Emulator.getEmulator().getScreen().repaint();
-							this.repainted = true;
-							break;
-						}
-						case 10: {
-							if (Emulator.getMIDlet() != null) {
-								new Thread(new InvokeStartAppRunnable(this)).start();
-								break;
-							}
-							break;
-						}
-						case 11: {
-							Emulator.getNetMonitor().a();
-							this.stop();
-							if (Emulator.getMIDlet() != null) {
-								this.repainted2 = true;
-								this.repainted = true;
-								new Thread(new InvokeDestroyAppRunnable(this)).start();
-								break;
-							}
-							break;
-						}
-						case 4: {
-							if (Emulator.getScreen() == null) {
-								break;
-							}
-							if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getScreen()) {
-								break;
-							}
-							final IImage backBufferImage3 = Emulator.getEmulator().getScreen().getBackBufferImage();
-							final IImage xRayScreenImage3 = Emulator.getEmulator().getScreen().getXRayScreenImage();
-							Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
-							(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
-									.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
-							Emulator.getEmulator().getScreen().repaint();
-							try {
-								Thread.sleep(100L);
-							} catch (Exception ex2) {
-							}
-							this.queue(4);
-							break;
-						}
-						case 15: {
-							if (Emulator.getCanvas() == null) {
-								break;
-							}
-							if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-								break;
-							}
-							Emulator.getCanvas().invokeShowNotify();
-							break;
-						}
-						case 16: {
-							if (Emulator.getCanvas() == null) {
-								break;
-							}
-							if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-								break;
-							}
-							Emulator.getCanvas().invokeHideNotify();
-							this.canvasHidden = true;
-							break;
-						}
-						case 0: {
-							break;
-						}
-						default: {
-							if ((this.anInt1222 & 0x4000000) != 0x0) {
-								if (Emulator.getCurrentDisplay().getCurrent() == null) {
-									break;
-								}
-								final int internalKeyPress = Application
-										.internalKeyPress(this.method719(this.anInt1222, this.anInt1222, true));
-								if (!Emulator.getCurrentDisplay().getCurrent()
-										.handleSoftKeyAction(internalKeyPress, true)) {
-									if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-										Emulator.getCanvas().invokeKeyPressed(internalKeyPress);
-									} else {
-										Emulator.getScreen().invokeKeyPressed(internalKeyPress);
-									}
-								}
-								break;
-							} else if ((this.anInt1222 & 0x8000000) != 0x0) {
-								if (Emulator.getCurrentDisplay().getCurrent() == null) {
-									break;
-								}
-								final int internalKeyRelease = Application
-										.internalKeyRelease(this.method719(this.anInt1222, this.anInt1222, true));
-								if (!Emulator.getCurrentDisplay().getCurrent()
-										.handleSoftKeyAction(internalKeyRelease, false)) {
-									if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-										Emulator.getCanvas().invokeKeyReleased(internalKeyRelease);
-									} else {
-										Emulator.getScreen().invokeKeyReleased(internalKeyRelease);
-									}
-								}
-								break;
-							} else if ((this.anInt1222 & 0x2000000) != 0x0) {
-								if (Emulator.getCanvas() == null) {
-									break;
-								}
-								if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-									break;
-								}
-								Emulator.getCanvas().invokeKeyRepeated(this.method719(this.anInt1222, this.anInt1222, true));
-								break;
-							} else if ((this.anInt1222 & Integer.MIN_VALUE) != 0x0) {
-								if (Emulator.getCanvas() == null) {
-									if(Emulator.getScreen() != null) Emulator.getScreen().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
-											.method719(this.anInt1222, this.anInt1222 >> 12, false));
-									break;
-								}
-								if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-									break;
-								}
-								Emulator.getCanvas().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
-										.method719(this.anInt1222, this.anInt1222 >> 12, false));
-								break;
-							} else if ((this.anInt1222 & 0x10000000) != 0x0) {
-								if (Emulator.getCurrentDisplay().getCurrent() == null) {
-									break;
-								}
-								final int method719 = this.method719(this.anInt1222, this.anInt1222, false);
-								final int method720 = this.method719(this.anInt1222, this.anInt1222 >> 12, false);
-								if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-									Emulator.getCanvas().invokePointerPressed(method719, method720);
-									break;
-								}
-								Emulator.getScreen().invokePointerPressed(method719, method720);
-								break;
-							} else if ((this.anInt1222 & 0x20000000) != 0x0) {
-								if (Emulator.getCurrentDisplay().getCurrent() == null) {
-									break;
-								}
-								final int method721 = this.method719(this.anInt1222, this.anInt1222, false);
-								final int method722 = this.method719(this.anInt1222, this.anInt1222 >> 12, false);
-								if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-									Emulator.getCanvas().invokePointerReleased(method721, method722);
-									break;
-								}
-								Emulator.getScreen().invokePointerReleased(method721, method722);
-								break;
+						final int internalKeyPress = Application
+								.internalKeyPress(this.method719(this.anInt1222, this.anInt1222, true));
+						if (!Emulator.getCurrentDisplay().getCurrent()
+								.handleSoftKeyAction(internalKeyPress, true)) {
+							if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+								Emulator.getCanvas().invokeKeyPressed(internalKeyPress);
 							} else {
-								if ((this.anInt1222 & 0x40000000) == 0x0) {
-									break;
-								}
-								if (Emulator.getCurrentDisplay().getCurrent() == null) {
-									break;
-								}
-								final int method723 = this.method719(this.anInt1222, this.anInt1222, false);
-								final int method724 = this.method719(this.anInt1222, this.anInt1222 >> 12, false);
-								if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-									Emulator.getCanvas().invokePointerDragged(method723, method724);
-									break;
-								}
-								Emulator.getScreen().invokePointerDragged(method723, method724);
-								break;
+								Emulator.getScreen().invokeKeyPressed(internalKeyPress);
 							}
 						}
+						break;
+					} else if ((this.anInt1222 & 0x8000000) != 0x0) {
+						if (Emulator.getCurrentDisplay().getCurrent() == null) {
+							break;
 						}
-						this.anInt1222 = 0;
-						Controllers.method751();
-						/*try {
-							Thread.sleep(1L);
-						} catch (Exception ex3) {
-						}*/
-						continue;
+						final int internalKeyRelease = Application
+								.internalKeyRelease(this.method719(this.anInt1222, this.anInt1222, true));
+						if (!Emulator.getCurrentDisplay().getCurrent()
+								.handleSoftKeyAction(internalKeyRelease, false)) {
+							if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+								Emulator.getCanvas().invokeKeyReleased(internalKeyRelease);
+							} else {
+								Emulator.getScreen().invokeKeyReleased(internalKeyRelease);
+							}
+						}
+						break;
+					} else if ((this.anInt1222 & 0x2000000) != 0x0) {
+						if (Emulator.getCanvas() == null) {
+							break;
+						}
+						if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+							break;
+						}
+						Emulator.getCanvas().invokeKeyRepeated(this.method719(this.anInt1222, this.anInt1222, true));
+						break;
+					} else if ((this.anInt1222 & Integer.MIN_VALUE) != 0x0) {
+						if (Emulator.getCanvas() == null) {
+							if(Emulator.getScreen() != null) Emulator.getScreen().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
+									.method719(this.anInt1222, this.anInt1222 >> 12, false));
+							break;
+						}
+						if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+							break;
+						}
+						Emulator.getCanvas().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
+								.method719(this.anInt1222, this.anInt1222 >> 12, false));
+						break;
+					} else if ((this.anInt1222 & 0x10000000) != 0x0) {
+						if (Emulator.getCurrentDisplay().getCurrent() == null) {
+							break;
+						}
+						final int method719 = this.method719(this.anInt1222, this.anInt1222, false);
+						final int method720 = this.method719(this.anInt1222, this.anInt1222 >> 12, false);
+						if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+							Emulator.getCanvas().invokePointerPressed(method719, method720);
+							break;
+						}
+						Emulator.getScreen().invokePointerPressed(method719, method720);
+						break;
+					} else if ((this.anInt1222 & 0x20000000) != 0x0) {
+						if (Emulator.getCurrentDisplay().getCurrent() == null) {
+							break;
+						}
+						final int method721 = this.method719(this.anInt1222, this.anInt1222, false);
+						final int method722 = this.method719(this.anInt1222, this.anInt1222 >> 12, false);
+						if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+							Emulator.getCanvas().invokePointerReleased(method721, method722);
+							break;
+						}
+						Emulator.getScreen().invokePointerReleased(method721, method722);
+						break;
+					} else {
+						if ((this.anInt1222 & 0x40000000) == 0x0) {
+							break;
+						}
+						if (Emulator.getCurrentDisplay().getCurrent() == null) {
+							break;
+						}
+						final int method723 = this.method719(this.anInt1222, this.anInt1222, false);
+						final int method724 = this.method719(this.anInt1222, this.anInt1222 >> 12, false);
+						if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+							Emulator.getCanvas().invokePointerDragged(method723, method724);
+							break;
+						}
+						Emulator.getScreen().invokePointerDragged(method723, method724);
+						break;
 					}
 				}
+				 */
+				}
+				this.anInt1222 = 0;
+				Controllers.method751();
 				try {
 					Thread.sleep(1L);
 				} catch (Exception ex4) {
