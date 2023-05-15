@@ -40,12 +40,15 @@ public abstract class MIDlet
     
     public boolean platformRequest(String s) throws ConnectionNotFoundException {
         try {
+            /*
         	String s2 = s;
         	if(s2.length() > 100) {
         		s2 = s2.substring(0, 90) + "...";
         	}
+        	*/
             System.out.println("platformRequest(" + s + ")");
-            if (Settings.networkNotAvailable || JOptionPane.showConfirmDialog(new JPanel(), "MIDlet wants to open URL:\n" + s2, "Security", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+
+            if (Settings.networkNotAvailable || !Emulator.requestURLAccess(s)/*JOptionPane.showConfirmDialog(new JPanel(), "MIDlet wants to open URL:\n" + s2, "Security", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION*/) {
                 return false;
             }
         	//Emulator.checkPermission("midlet.platformrequest");

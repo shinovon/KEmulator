@@ -38,6 +38,7 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import emulator.ui.swt.InputDialog;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -51,6 +52,8 @@ import emulator.custom.CustomMethod;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 
 public class Emulator
 {
@@ -152,71 +155,9 @@ public class Emulator
 			return 4;
 		}
 	}
-	
-	private static int showOptionDialog(JFrame parentComponent, Object message, String title, int optionType,
-			int messageType, Icon icon, Object[] options, Object initialValue) throws HeadlessException {
-		JOptionPane2 pane = new JOptionPane2(message, messageType, optionType, icon, options, initialValue);
 
-		pane.setInitialValue(initialValue);
-		pane.setComponentOrientation(((parentComponent == null) ? JOptionPane.getRootFrame() : parentComponent)
-				.getComponentOrientation());
 
-		JDialog dialog = pane.createDialog(parentComponent, title, JRootPane.QUESTION_DIALOG);
 
-		pane.selectInitialValue();
-		dialog.show();
-		dialog.dispose();
-		dialog.setAlwaysOnTop(true);
-
-		Object selectedValue = pane.getValue();
-
-		if (selectedValue == null)
-			return JOptionPane.CLOSED_OPTION;
-		if (options == null) {
-			if (selectedValue instanceof Integer)
-				return ((Integer) selectedValue).intValue();
-			return JOptionPane.CLOSED_OPTION;
-		}
-		for (int counter = 0, maxCounter = options.length; counter < maxCounter; counter++) {
-			if (options[counter].equals(selectedValue))
-				return counter;
-		}
-		return JOptionPane.CLOSED_OPTION;
-	}
-
-    public static Object showInputDialog(JFrame parentComponent,
-        Object message, String title, int messageType, Icon icon,
-        Object[] selectionValues, Object initialSelectionValue)
-        throws HeadlessException {
-        JOptionPane2    pane = new JOptionPane2(message, messageType,
-                                              JOptionPane.OK_CANCEL_OPTION, icon,
-                                              null, null);
-
-        pane.setWantsInput(true);
-        pane.setSelectionValues(selectionValues);
-        pane.setInitialSelectionValue(initialSelectionValue);
-        pane.setComponentOrientation(((parentComponent == null) ?
-        		JOptionPane.getRootFrame() : parentComponent).getComponentOrientation());
-
-        int style = JRootPane.WARNING_DIALOG;
-        JDialog dialog = pane.createDialog(parentComponent, title, style);
-
-        pane.selectInitialValue();
-        dialog.show();
-        dialog.dispose();
-
-        Object value = pane.getInputValue();
-
-        if (value == JOptionPane.UNINITIALIZED_VALUE) {
-            return null;
-        }
-        return value;
-    }
-    
-	public static String showInputDialog(JFrame parentComponent, Object message, String title, int messageType)
-			throws HeadlessException {
-		return (String) showInputDialog(parentComponent, message, title, messageType, null, null, null);
-	}
 	public static String askIMEI() {
 		if(notAllowPerms.contains("imei"))
 			return null;
@@ -224,7 +165,11 @@ public class Emulator
 		if(imei != null) return imei;
 		JFrame parent = new JFrame();
 		parent.setAlwaysOnTop(true);
-		String s = showInputDialog(parent, "Application asks for IMEI", "0000000000000000", JOptionPane.WARNING_MESSAGE);
+        InputDialog dialog = new InputDialog(emulatorimpl.getEmulatorScreen().getShell());
+        dialog.setMessage("Application asks for IMEI");
+        dialog.setInput("0000000000000000");
+		//String s = showInputDialog(parent, "Application asks for IMEI", "0000000000000000", JOptionPane.WARNING_MESSAGE);
+        String s = dialog.open();
 		if(s == null) {
 			notAllowPerms.add("imei");
 			return null;
@@ -233,17 +178,15 @@ public class Emulator
 		return imei = s;
 	}
 
-    public static int showConfirmDialog(JFrame parentComponent,
-        Object message, String title, int optionType)
-        throws HeadlessException {
-        return showOptionDialog(parentComponent, message, title, optionType,
-                                 JOptionPane.QUESTION_MESSAGE, null, null, null);
+    public static boolean showConfirmDialog(String message, String title) {
+        MessageBox messageBox = new MessageBox(emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
+        messageBox.setMessage(message);
+        messageBox.setText(title);
+        return messageBox.open() == SWT.YES;
     }
     
 	public static void checkPermission(String x) {
 		int p = getAppPermissionLevel(x);
-		JFrame parent = new JFrame();
-		parent.setAlwaysOnTop(true);
 		//0: always ask
 		//1: ask once if yes, ask next time if no is pressed
 		//2: always allowed
@@ -252,18 +195,15 @@ public class Emulator
 		//5: ask once
 		if(p == 0) {
 			// always ask
-			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
-			if(i == JOptionPane.NO_OPTION)
+			if(!showConfirmDialog(localizePerm(x), ""))
 				throw new SecurityException(x);
 			allowPerms.add(x);
 		} else if(p == 1) {
 			// ask once
 			if(allowPerms.contains(x))
 				return;
-			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
-			if(i == JOptionPane.NO_OPTION) {
+            if(!showConfirmDialog(localizePerm(x), ""))
 				throw new SecurityException(x);
-			}
 			allowPerms.add(x);
 		} else if(p == 2) {
 			// allowed
@@ -274,8 +214,7 @@ public class Emulator
 			// always ask until "no" is pressed
 			if(notAllowPerms.contains(x))
 				return;
-			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
-			if(i == JOptionPane.NO_OPTION) {
+            if(!showConfirmDialog(localizePerm(x), "")) {
 				notAllowPerms.add(x);
 				throw new SecurityException(x);
 			}
@@ -286,8 +225,7 @@ public class Emulator
 				throw new SecurityException(x);
 			if(allowPerms.contains(x))
 				return;
-			int i = showConfirmDialog(parent, localizePerm(x), "", JOptionPane.YES_NO_OPTION);
-			if(i == JOptionPane.NO_OPTION) {
+            if(!showConfirmDialog(localizePerm(x), "")) {
 				notAllowPerms.add(x);
 				throw new SecurityException(x);
 			}
@@ -313,6 +251,16 @@ public class Emulator
 			return "Allow the application to use \'" + x + "\'?";
 		}
 	}
+
+    public static boolean requestURLAccess(String s) {
+        MessageBox messageBox = new MessageBox(emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
+        if(s.length() > 100) {
+            s = s.substring(0, 100) + "...";
+        }
+        messageBox.setMessage("MIDlet wants to open URL: " + s);
+        messageBox.setText("Security");
+        return messageBox.open() == SWT.YES;
+    }
 
 	public Emulator() {
         super();
@@ -1347,4 +1295,5 @@ public class Emulator
 			x = x.substring(0, x.length() - 1);
 		return x;
 	}
+
 }

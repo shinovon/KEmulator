@@ -39,6 +39,11 @@ MouseMoveListener, SelectionListener, MouseWheelListener,
 MouseTrackListener
 {
     private static Display display;
+
+    public Shell getShell() {
+        return shell;
+    }
+
     private Shell shell;
     private Canvas canvas;
     private CLabel aCLabel970;
