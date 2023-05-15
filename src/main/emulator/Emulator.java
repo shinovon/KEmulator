@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.MessageBox;
 public class Emulator
 {
 	// is 64 bit version
-	public static final boolean _X64_VERSION = true;
+	public static final boolean _X64_VERSION = false;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -1031,7 +1031,7 @@ public class Emulator
             }
             else if (key.equalsIgnoreCase("jar")) {
             	try {
-            		Emulator.midletJar = new File(value).getAbsolutePath();
+            		Emulator.midletJar = new File(value).getCanonicalPath();
             	} catch (Exception e) {
             		Emulator.midletJar = value;
             	}
