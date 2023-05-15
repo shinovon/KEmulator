@@ -2,10 +2,8 @@ package com.nokia.mid.sound;
 
 import emulator.Emulator;
 import emulator.media.b;
-import emulator.ui.IEmulator;
-import emulator.ui.ILogStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import javax.microedition.media.PlayerImpl;
 import javax.microedition.media.control.VolumeControlImpl;
 
@@ -20,12 +18,12 @@ public class Sound
   private Sound jdField_a_of_type_ComNokiaMidSoundSound;
   private SoundListener jdField_a_of_type_ComNokiaMidSoundSoundListener;
   private int jdField_a_of_type_Int;
-  private int b;
+  private int type;
   public int dataLen;
   
   public Sound(byte[] paramArrayOfByte, int paramInt)
   {
-    this.b = paramInt;
+    this.type = paramInt;
     this.dataLen = paramArrayOfByte.length;
     this.jdField_a_of_type_ComNokiaMidSoundSound = this;
     init(paramArrayOfByte, paramInt);
@@ -33,10 +31,10 @@ public class Sound
   
   public String getType()
   {
-    if (this.b == 1) {
+    if (this.type == 1) {
       return "FORMAT_TONE";
     }
-    if (this.b == 5) {
+    if (this.type == 5) {
       return "FORMAT_WAV";
     }
     return null;
@@ -79,7 +77,7 @@ public class Sound
     try
     {
       ByteArrayInputStream localByteArrayInputStream = new ByteArrayInputStream(paramArrayOfByte);
-      this.m_player = new PlayerImpl(localByteArrayInputStream, "");
+      this.m_player = new PlayerImpl(localByteArrayInputStream, type == FORMAT_WAV ? "audio/wav" : null);
       this.m_player.addPlayerListener(new a(this));
       localByteArrayInputStream.close();
     }
@@ -105,7 +103,7 @@ public class Sound
     }
     if (this.jdField_a_of_type_Int != 3)
     {
-      this.m_player.deallocate();
+      if(m_player != null)this.m_player.deallocate();
       this.jdField_a_of_type_Int = 3;
       if (this.jdField_a_of_type_ComNokiaMidSoundSoundListener != null) {
         this.jdField_a_of_type_ComNokiaMidSoundSoundListener.soundStateChanged(this, 3);

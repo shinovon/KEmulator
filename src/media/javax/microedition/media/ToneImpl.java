@@ -7,6 +7,8 @@ public class ToneImpl implements Player
     Control toneControl;
     Control volumeControl;
     Control[] controls;
+
+    private int state = Player.UNREALIZED;
     
     public ToneImpl() {
         super();
@@ -16,12 +18,15 @@ public class ToneImpl implements Player
     }
     
     public void addPlayerListener(final PlayerListener playerListener) throws IllegalStateException {
+        if(state == Player.CLOSED) throw new IllegalStateException();
     }
     
     public void close() {
+        state = Player.CLOSED;
     }
     
     public void deallocate() throws IllegalStateException {
+        if(state == Player.CLOSED) throw new IllegalStateException();
     }
     
     public String getContentType() {
@@ -37,16 +42,25 @@ public class ToneImpl implements Player
     }
     
     public int getState() {
-        return 0;
+        return state;
     }
     
     public void prefetch() throws IllegalStateException, MediaException {
+        if(state == Player.CLOSED) throw new IllegalStateException();
+        if(state < Player.PREFETCHED) {
+            state = Player.PREFETCHED;
+        }
     }
     
     public void realize() throws IllegalStateException, MediaException {
+        if(state == Player.CLOSED) throw new IllegalStateException();
+        if(state < Player.REALIZED) {
+            state = Player.REALIZED;
+        }
     }
     
     public void removePlayerListener(final PlayerListener playerListener) throws IllegalStateException {
+        if(state == Player.CLOSED) throw new IllegalStateException();
     }
     
     public void setLoopCount(final int n) {
@@ -57,9 +71,13 @@ public class ToneImpl implements Player
     }
     
     public void start() throws IllegalStateException, MediaException {
+        if(state == Player.CLOSED) throw new IllegalStateException();
+        state = Player.STARTED;
     }
     
     public void stop() throws IllegalStateException, MediaException {
+        if(state == Player.CLOSED) throw new IllegalStateException();
+        state = Player.PREFETCHED;
     }
     
     public Control getControl(final String s) {
