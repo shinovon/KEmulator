@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="KEmulator" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="emulator.Emulator" />
+    <module name="KEmulator" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/home" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
