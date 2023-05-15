@@ -55,7 +55,7 @@ import emulator.ui.swt.EmulatorImpl;
 public class Emulator
 {
 	// is 64 bit version
-	public static final boolean _X64_VERSION = false;
+	public static final boolean _X64_VERSION = true;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -1024,10 +1024,10 @@ public class Emulator
         if(os == null) {
         	throw new RuntimeException("unsupported os: " + osn);
         }
-        if(!osa.contains("amd64") && !osa.contains("86")) {
+        if(!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64")) {
         	throw new RuntimeException("unsupported arch: " + osa);
         }
-        String arch = osa.contains("64") ? "x86_64" : "x86";
+        String arch = osa.contains("amd64") ? "x86_64" : osa.contains("86") ? "x86" : osa;
         String swtFileName = "swt-" + os + "-" + arch + ".jar";
 
         try {
