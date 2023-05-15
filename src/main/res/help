@@ -45,12 +45,15 @@ log.txt      log file
 
 ==================
 $[News & Log]
-$nnmod v2.12.7 [2023.05.14]
+$nnmod v2.12.7 [2023.05.15]
 Using win32 api to obtain key states
 Updated swt library to 4.7
-Fixes for linux (nnx64)
+Fixed for linux (nnx64)
 Fixed profiler
 Fixed RecordStore.listRecordStores (Doom 2 RPG fix)
+Canvas fps limiter fix
+Improved performance
+com.nokia.mid.sound fixes
 
 $nnmod v2.12.7 pre [2022.10.02]
 Increased file path size limit
