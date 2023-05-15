@@ -18,11 +18,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 import java.util.jar.Attributes;
 
 import javax.microedition.lcdui.Canvas;
@@ -1157,25 +1153,64 @@ public class Emulator
     }
     
     public static void loadGame(final String s, final int n, final int n2, final boolean b) {
+        ArrayList<String> cmd = new ArrayList<String>();
+        getEmulator().getLogStream().println("loadGame: " + s);
         final String javahome = System.getProperty("java.home");
+        boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");
         String javaexec;
         if (javahome == null || javahome.length() < 1) {
             javaexec = "java";
         } else {
-            final String string = javahome + (System.getProperty("os.name").toLowerCase().indexOf("win") == -1 ? "/bin/java" : "/bin/javaw.exe");
-            final File file;
-            javaexec = (((file = new File(string)).exists() && file.isFile()) ? ("\"" + string + "\"") : "java");
+            javaexec = javahome + (!win ? "/bin/java" : "/bin/java.exe");
         }
+        cmd.add(javaexec);
+        cmd.add("-cp");
+        cmd.add(System.getProperty("java.class.path"));
+        cmd.add("-Xmx1G");
+        cmd.add("emulator.Emulator");
+        if (s == null) {
+            for (int i = 0; i < Emulator.commandLineArguments.length; ++i) {
+                cmd.add(Emulator.commandLineArguments[i]);
+            }
+        }
+        else if (s.endsWith(".jad")) {
+            cmd.add("-jad");
+            cmd.add(s);
+            cmd.add("-jar");
+            cmd.add(getMidletJarUrl(s));
+        }
+        else {
+            cmd.add("-jar");
+            cmd.add(s);
+        }
+        if (Settings.recordedKeysFile != null) {
+            cmd.add("-rec");
+            cmd.add(Settings.recordedKeysFile);
+        }
+        if (n == 1) {
+            cmd.add("-awt");
+        }
+        else if (n == 0) {
+            cmd.add("-swt");
+        }
+        if (n2 == 1) {
+            cmd.add("-lwj");
+        }
+        else if (n2 == 0) {
+            cmd.add("-wgl");
+        }
+        /*
         final String cp = " -cp \"" + System.getProperty("java.class.path") + "\"";
         final String maincls = " emulator.Emulator";
         final StringBuffer args = new StringBuffer(100);
         if (s == null) {
             for (int i = 0; i < Emulator.commandLineArguments.length; ++i) {
-                args.append(" " + Emulator.commandLineArguments[i]);
+                String a = Emulator.commandLineArguments[i];
+                args.append(a.startsWith("-") ? " " + a : " \"" + a + "\"");
             }
-            method284(args, "-jar");
-            method284(args, "-cp");
-            method284(args, "-jad");
+            //method284(args, "-jar");
+            //method284(args, "-cp");
+            //method284(args, "-jad");
         }
         else if (s.endsWith(".jad")) {
             args.append(" -jad \"" + s + "\"");
@@ -1200,8 +1235,8 @@ public class Emulator
             args.append(" -wgl");
         }
         final String[] cmd;
-        if(!System.getProperty("os.name").toLowerCase().contains("win")) {
-            cmd = new String[] { "start " + javaexec + cp + maincls + args.toString() };
+        if(!win) {
+            cmd = new String[] { javaexec + cp + maincls + args.toString() };
             getEmulator().getLogStream().print(cmd[0]);
         } else {
             (cmd = new String[2])[0] = "cmd.exe";
@@ -1221,12 +1256,15 @@ public class Emulator
 	            s5 = "\"";
 	        }
             cmd[n3] = sb2.append(s5).toString();
-            getEmulator().getLogStream().print(cmd[0] + " " + cmd[1]);
+            getEmulator().getLogStream().println(cmd[0] + " " + cmd[1]);
         }
+        */
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {
-            Runtime.getRuntime().exec(cmd);
+            //if(win) Runtime.getRuntime().exec(cmd);
+            //else Runtime.getRuntime().exec(cmd[0]);
+            new ProcessBuilder(new String[0]).command(cmd).inheritIO().start();
         }
         catch (Exception ex) {
         	ex.printStackTrace();
