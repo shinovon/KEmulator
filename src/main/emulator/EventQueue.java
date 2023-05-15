@@ -305,6 +305,9 @@ public final class EventQueue implements Runnable {
 								this.repainted2 = true;
 								break;
 							}
+							Displayable.checkForSteps();
+							Displayable.fpsLimiter();
+							if(Settings.xrayView) Displayable.resetXRayGraphics();
 							final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
 							final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
 							try {

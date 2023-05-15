@@ -115,9 +115,6 @@ public abstract class Canvas extends Displayable
         if (this != Emulator.getCurrentDisplay().getCurrent()) {
             return;
         }
-        Displayable.checkForSteps();
-        Displayable.fpsLimiter();
-        if(Settings.xrayView) Displayable.resetXRayGraphics();
         Emulator.getEventQueue().queue(1);
     }
     

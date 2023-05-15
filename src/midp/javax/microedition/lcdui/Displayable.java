@@ -323,7 +323,7 @@ public class Displayable {
 	}
 	*/
 
-	protected static void fpsLimiter() {
+	public static void fpsLimiter() {
 		if (Settings.f == 1 && Settings.frameRate <= 120) {
 			long var0 = System.currentTimeMillis() - lastFrameTime;
 			long var2 = (long) (1000 / Settings.frameRate);
@@ -347,7 +347,7 @@ public class Displayable {
 
 	}
 
-	protected static void checkForSteps() {
+	public static void checkForSteps() {
 		if (Settings.e >= 0) {
 			if (Settings.e == 0) {
 				final long currentTimeMillis = System.currentTimeMillis();
@@ -364,7 +364,7 @@ public class Displayable {
 		}
 	}
 
-	protected static void resetXRayGraphics() {
+	public static void resetXRayGraphics() {
 		Graphics.resetXRayCache();
 	}
 
