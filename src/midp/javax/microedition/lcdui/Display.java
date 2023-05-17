@@ -102,6 +102,11 @@ public class Display
         EventQueue.aRunnable1219 = aRunnable1219;
         Emulator.getEventQueue().queue(2);
     }
+	public boolean flashBacklight(int n) {
+		Emulator.screenBrightness = 100;
+		resetTimer();
+		return false;
+	}
     
     public boolean flashBacklight(final long n) {
     	Emulator.screenBrightness = 100;
