@@ -46,7 +46,9 @@ log.txt      log file
 ==================
 $[News & Log]
 $nnmod v2.12.8 [2023.05.17]
-Fixed keyboard poller
+Fixed keyboard polling
+Added Display.flashBacklight(int)
+libvlc loading fix
 
 $nnmod v2.12.7 [2023.05.15]
 Using win32 api to obtain key states
