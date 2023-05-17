@@ -374,7 +374,7 @@ MouseTrackListener
 	boolean win = os.startsWith("win");
 	//boolean linux = os.contains("nux") || os.contains("nix");
 	
-    public void pollKeyboard(Canvas canvas) {
+    public synchronized void pollKeyboard(Canvas canvas) {
     	if(Settings.canvasKeyboard) return;
     	if(!win) return;
 		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() == Thread.currentThread()) {
