@@ -399,7 +399,8 @@ MouseTrackListener
 						return;
 					}
 				}
-				
+
+                long now = System.currentTimeMillis();
 				for(int i = 0; i < keyboardButtonStates.length; i++) {
 					lastKeyboardButtonStates[i] = keyboardButtonStates[i];
 					short keyState;
@@ -410,7 +411,28 @@ MouseTrackListener
 						return;
 					}
                     //keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ > 0 : false;
-					keyboardButtonStates[i] = active ? (keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1) : false;
+                    boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
+                    if(!keyboardButtonStates[i]) {
+                        if(pressed) {
+                            keyboardButtonStates[i] = true;
+                            keyboardButtonHoldTimes[i] = 0;
+                            keyboardButtonDownTimes[i] = now;
+                            onKeyDown(i);
+                        }
+                    } else if(!pressed) {
+                        keyboardButtonStates[i] = false;
+                        keyboardButtonHoldTimes[i] = 0;
+                        onKeyUp(i);
+                    }
+                    if(lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
+                        if(keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
+                            keyboardButtonHoldTimes[i] = now;
+                        }
+                        if(now - keyboardButtonHoldTimes[i] >= 40) {
+                            keyboardButtonHoldTimes[i] = now;
+                            onKeyHeld(i);
+                        }
+                    }
 				}
 			//} else if(linux) {
 				/*
@@ -461,7 +483,7 @@ MouseTrackListener
 				}
 				*/
 			//}
-			long now = System.currentTimeMillis();
+            /*
 			for(int button = 0; button < keyboardButtonStates.length; button++) {
 				if(!lastKeyboardButtonStates[button] && keyboardButtonStates[button]) {
 					keyboardButtonHoldTimes[button] = 0;
@@ -482,7 +504,7 @@ MouseTrackListener
 					onKeyUp(button);
 				}
 			}
-			
+			*/
 		}
 		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() != Thread.currentThread()) {
 			canvas.getDisplay().asyncExec(() -> {
@@ -646,7 +668,6 @@ MouseTrackListener
         if (Emulator.getCurrentDisplay().getCurrent() == null || this.pauseState == 0) {
             return;
         }
-		pollKeyboard(canvas);
         if (Settings.playingRecordedKeys) {
             KeyRecords h = Emulator.getRobot();
             String method698;
@@ -1727,7 +1748,6 @@ MouseTrackListener
         }
         this.caret.keyPressed(keyEvent);
     	if(!Settings.canvasKeyboard && win) {
-    		pollKeyboard(canvas);
     		return;
     	}
         int n = keyEvent.keyCode & 0xFEFFFFFF;
@@ -1738,7 +1758,6 @@ MouseTrackListener
     
     public final void keyReleased(final KeyEvent keyEvent) {
     	if(!Settings.canvasKeyboard && win) {
-    		pollKeyboard(canvas);
     		return;
     	}
         int n = keyEvent.keyCode & 0xFEFFFFFF;
