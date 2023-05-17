@@ -527,7 +527,7 @@ public final class Property implements IProperty
             }
             Settings.vlcDir = properties.getProperty("VlcDir", "");
             Settings.locale = properties.getProperty("MIDPLocale", "en-US");
-            Settings.textAntiAliasing = Boolean.valueOf(properties.getProperty("TextAntialiasing", "true"));
+            Settings.textAntiAliasing = Boolean.valueOf(properties.getProperty("TextAntiAliasing", "true"));
             fileInputStream.close();
         }
         catch (Exception ex) {
