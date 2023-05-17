@@ -527,6 +527,7 @@ public final class Property implements IProperty
             }
             Settings.vlcDir = properties.getProperty("VlcDir", "");
             Settings.locale = properties.getProperty("MIDPLocale", "en-US");
+            Settings.textAntiAliasing = Boolean.valueOf(properties.getProperty("TextAntialiasing", "true"));
             fileInputStream.close();
         }
         catch (Exception ex) {
@@ -650,6 +651,7 @@ public final class Property implements IProperty
             sortProperties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
             sortProperties.setProperty("VlcDir", Settings.vlcDir);
             sortProperties.setProperty("MIDPLocale", Settings.locale);
+            sortProperties.setProperty("TextAntiAliasing", "" + Settings.textAntiAliasing);
             sortProperties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         }
