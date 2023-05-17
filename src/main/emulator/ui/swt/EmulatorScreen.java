@@ -385,16 +385,16 @@ MouseTrackListener
 					return;
 				}
 				if(win32OS == null) {
-					try {
-						win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
-					} catch (Exception e) {
-					}
-					if(win32OS == null) {
-						return;
-					}
-				}
+                    try {
+                        win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
+                    } catch (Exception e) {
+                    }
+                    if (win32OS == null) {
+                        return;
+                    }
+                }
 				if(win32OSGetKeyState == null) {
-					win32OSGetKeyState = getMethod(win32OS, "GetKeyState", Integer.TYPE);
+					win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", Integer.TYPE);
 					if(win32OSGetKeyState == null) {
 						return;
 					}
@@ -409,7 +409,8 @@ MouseTrackListener
 						e.printStackTrace();
 						return;
 					}
-					keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ < 0 : false;
+                    //keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ > 0 : false;
+					keyboardButtonStates[i] = active ? (keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1) : false;
 				}
 			//} else if(linux) {
 				/*
@@ -1849,10 +1850,10 @@ MouseTrackListener
     		n = 6;
     		break;
     	case 35:
-    		n = 7;
+    		n = 8;
     		break;
     	case 36:
-    		n = 8;
+    		n = 7;
     		break;
     	case 37:
     		n = 3;

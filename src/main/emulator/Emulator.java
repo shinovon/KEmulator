@@ -97,10 +97,10 @@ public class Emulator
 	private static String midletName;
 	private static Thread vlcCheckerThread;
 	
-	public static final String titleVersion = "2.12.7";
-	public static final String aboutVersion = "v2.12.7";
+	public static final String titleVersion = "2.12.8";
+	public static final String aboutVersion = "v2.12.8";
 	public static final int numericVersion = 12;
-	public static final String propVersion = "2.12.7";
+	public static final String propVersion = "2.12.8";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -860,6 +860,7 @@ public class Emulator
         	JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
         	return;
         }
+        System.setProperty("jna.nosys", "true");
 		if(_X64_VERSION) {
 			System.out.println("loading swt libary");
 			loadSWTLibrary();
