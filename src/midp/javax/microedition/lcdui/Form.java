@@ -90,7 +90,7 @@ public class Form extends Screen
         }
         ((Item)super.items.get(n)).screen = null;
         super.items.set(n, item);
-        item.screen = null;
+        item.screen = this;
     }
     
     public Item get(final int n) {
