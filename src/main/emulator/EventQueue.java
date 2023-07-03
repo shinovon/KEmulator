@@ -406,6 +406,22 @@ public final class EventQueue implements Runnable {
 				case 0: {
 					break;
 				}
+					default:
+						if ((this.anInt1222 & Integer.MIN_VALUE) != 0x0) {
+							if (Emulator.getCanvas() == null) {
+								if (Emulator.getScreen() != null)
+									Emulator.getScreen().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
+											.method719(this.anInt1222, this.anInt1222 >> 12, false));
+								break;
+							}
+							if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+								break;
+							}
+							Emulator.getCanvas().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
+									.method719(this.anInt1222, this.anInt1222 >> 12, false));
+							break;
+						}
+						break;
 				/*
 				default: {
 					if ((this.anInt1222 & 0x4000000) != 0x0) {
