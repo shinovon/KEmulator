@@ -82,7 +82,7 @@ public final class CustomClassLoader extends ClassLoader
             defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
         }
         catch (Exception ex2) {
-            ex2.printStackTrace();
+            //ex2.printStackTrace();
             return super.findClass(s);
         }
         return defineClass;

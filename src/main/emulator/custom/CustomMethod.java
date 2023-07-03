@@ -55,13 +55,13 @@ public class CustomMethod
     		res = "50";
     	} else if(prop.equalsIgnoreCase("user.region")) {
     		//res = "US";
-    	} else if(prop.equalsIgnoreCase("os.name")) {
+    	} else /*if(prop.equalsIgnoreCase("os.name")) {
     		if(System.getProperty("microedition.platform").indexOf("S60") > -1)
     			res = "Symbian";
     	} else if(prop.equalsIgnoreCase("os.version")) {
     		if(System.getProperty("microedition.platform").indexOf("S60") > -1)
     			res = "9.x";
-    	} else if(prop.startsWith("com.nokia.gpu.memory")) {
+    	} else */if(prop.startsWith("com.nokia.gpu.memory")) {
     		b = false;
     		/*
     		if(prop.equals("com.nokia.gpu.memory.total")) {
@@ -82,7 +82,6 @@ public class CustomMethod
     		b = false;
     		res = DebugUtils.getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
     	} else if(prop.equalsIgnoreCase("com.nokia.mid.imei") || prop.equalsIgnoreCase("com.nokia.imei") || prop.equalsIgnoreCase("device.imei")) {
-    		b = false;
     		res = Emulator.askIMEI();
     	} else if(prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
     		res = "" + Manager.isLibVlcSupported();
