@@ -183,7 +183,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			this.sequence = null;
-			throw new IOException("WAV realize error!", ex);
+			//throw new IOException("WAV realize error!", ex);
+			return;
 		}
 		try {
 			AudioInputStream audioInputStream;
@@ -219,7 +220,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			this.sequence = null;
-			throw new IOException("WAV realize error!", ex);
+			//throw new IOException("WAV realize error!", ex);
+			return;
 		}
 		try {
 			AudioInputStream audioInputStream;
@@ -434,6 +436,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	public long getDuration() {
 		double n = 0.0;
 		double n2;
+		if(sequence == null) return 0;
 		if (this.sequence instanceof Sequence) {
 			n2 = ((Sequence) this.sequence).getMicrosecondLength() / 1000000.0;
 		} else if (this.sequence instanceof Clip) {
@@ -454,6 +457,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}
 
 	public long getMediaTime() {
+		if(sequence == null) return 0;
 		if (this.sequence instanceof Clip) {
 			return ((Clip) this.sequence).getMicrosecondPosition();
 		}
@@ -467,6 +471,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}
 
 	public long setMediaTime(final long t) throws MediaException {
+		if(sequence == null) return 0;
 		long microsecondPosition2 = 0L;
 		if (this.sequence instanceof Clip) {
 			microsecondPosition2 = ((Clip) this.sequence).getMicrosecondPosition();
@@ -601,14 +606,20 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			throw new IllegalStateException();
 		}
 		if (this.state != 400) {
-			if (this.sequence instanceof Sequence && midiCompleted) {
-				setMediaTime(0);
-			} else if (this.sequence instanceof Player && mp3Complete) {
-				setMediaTime(0);
+			if(sequence != null) {
+				if (this.sequence instanceof Sequence && midiCompleted) {
+					setMediaTime(0);
+				} else if (this.sequence instanceof Player && mp3Complete) {
+					setMediaTime(0);
+				}
+				(this.playerThread = new Thread(this)).start();
 			}
-			(this.playerThread = new Thread(this)).start();
 			this.state = 400;
 			this.notifyListeners("started", new Long(0L));
+			if(sequence == null) {
+				this.state = 300;
+				this.notifyListeners("stopped", new Long(0L));
+			}
 		}
 	}
 
@@ -616,6 +627,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		if (this.state == 0) {
 			throw new IllegalStateException();
 		}
+		if(sequence == null) return;
 		if (this.sequence instanceof Player) {
 			((Player) this.sequence).stop();
 			return;

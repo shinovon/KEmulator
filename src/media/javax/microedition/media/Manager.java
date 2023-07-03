@@ -67,12 +67,12 @@ public class Manager
         if(s.equals("audio/amr") && isLibVlcSupported()) {
         	return new VLCPlayerImpl(inputStream, s);
         }
-        // buffer
-        boolean buf = Settings.playerBufferAll;
-        if(buf)
-        	return new PlayerImpl(new ByteArrayInputStream(CustomJarResources.getBytes(inputStream)), s);
-        else
-        	return new PlayerImpl(inputStream, s);
+		// buffer
+		boolean buf = Settings.playerBufferAll;
+		if (buf)
+			return new PlayerImpl(new ByteArrayInputStream(CustomJarResources.getBytes(inputStream)), s);
+		else
+			return new PlayerImpl(inputStream, s);
     }
     
     public static Player createPlayer(String s) throws IOException, MediaException {
