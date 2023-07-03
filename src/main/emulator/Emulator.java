@@ -97,10 +97,10 @@ public class Emulator
 	private static String midletName;
 	private static Thread vlcCheckerThread;
 	
-	public static final String titleVersion = "2.12.8";
-	public static final String aboutVersion = "v2.12.8";
+	public static final String titleVersion = "2.12.9";
+	public static final String aboutVersion = "v2.12.9";
 	public static final int numericVersion = 12;
-	public static final String propVersion = "2.12.8";
+	public static final String propVersion = "2.12.9";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -157,23 +157,23 @@ public class Emulator
 	}
 
 
-
-	public static String askIMEI() {
+    static InputDialog imeiDialog;
+	public synchronized static String askIMEI() {
 		if(notAllowPerms.contains("imei"))
 			return null;
 		if(!askImei) return "0000000000000000";
 		if(imei != null) return imei;
-		JFrame parent = new JFrame();
-		parent.setAlwaysOnTop(true);
-        InputDialog dialog = new InputDialog(emulatorimpl.getEmulatorScreen().getShell());
-        dialog.setMessage("Application asks for IMEI");
-        dialog.setInput("0000000000000000");
-		//String s = showInputDialog(parent, "Application asks for IMEI", "0000000000000000", JOptionPane.WARNING_MESSAGE);
-        String s = dialog.open();
-		if(s == null) {
-			notAllowPerms.add("imei");
-			return null;
-		}
+        emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
+            imeiDialog = new InputDialog(emulatorimpl.getEmulatorScreen().getShell());
+            imeiDialog.setMessage("Application asks for IMEI");
+            imeiDialog.setInput("0000000000000000");
+            imeiDialog.open();
+        });
+        String s = imeiDialog.getInput();
+        //String s = showInputDialog(parent, "Application asks for IMEI", "0000000000000000", JOptionPane.WARNING_MESSAGE);
+        if(s == null) {
+            notAllowPerms.add("imei");
+        }
 		allowPerms.add("imei");
 		return imei = s;
 	}
@@ -385,7 +385,9 @@ public class Emulator
             properties.store(fileOutputStream, "KEmulator platforms");
             fileOutputStream.close();
         }
-        catch (Exception ex) { ex.printStackTrace();}
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
     private static void method287() {
@@ -401,17 +403,20 @@ public class Emulator
         final String string = parent + "/kemulator.cfg";
         String name = new File(Emulator.midletJar).getName();
         final String substring = name.substring(0, name.lastIndexOf("."));
-        try {
-            final FileInputStream fileInputStream = new FileInputStream(string);
-            final Properties properties;
-            (properties = new Properties()).load(fileInputStream);
-            fileInputStream.close();
-            final String property2;
-            if ((property2 = properties.getProperty(substring, null)) != null) {
-                tryToSetDevice(property2);
+        if(new File(string).exists()) {
+            try {
+                final FileInputStream fileInputStream = new FileInputStream(string);
+                final Properties properties;
+                (properties = new Properties()).load(fileInputStream);
+                fileInputStream.close();
+                final String property2;
+                if ((property2 = properties.getProperty(substring, null)) != null) {
+                    tryToSetDevice(property2);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
-        catch (Exception ex) {ex.printStackTrace();}
     }
     
     public static String getTitleVersionString() {

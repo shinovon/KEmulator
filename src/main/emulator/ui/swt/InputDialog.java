@@ -69,19 +69,18 @@ public class InputDialog extends Dialog {
   public void setInput(String input) {
     this.input = input;
   }
-
   /**
    * Opens the dialog and returns the input
-   * 
+   *
    * @return String
    */
   public String open() {
-    // Create the dialog window
     Shell shell = new Shell(getParent(), getStyle());
     shell.setText(getText());
     createContents(shell);
     shell.pack();
     shell.open();
+    // Create the dialog window
     Display display = getParent().getDisplay();
     while (!shell.isDisposed()) {
       if (!display.readAndDispatch()) {
