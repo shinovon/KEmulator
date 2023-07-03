@@ -104,12 +104,12 @@ public class TextField extends Item
     
     protected void focus() {
         super.focus();
-        Emulator.getEmulator().getScreen().getCaret().foucsItem(this, this.anInt29, this.anInt30);
+        Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.anInt29, this.anInt30);
     }
     
     protected void defocus() {
         super.defocus();
-        Emulator.getEmulator().getScreen().getCaret().defoucsItem(this);
+        Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
     }
     
     protected void paint(final Graphics graphics) {

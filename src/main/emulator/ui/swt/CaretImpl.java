@@ -63,7 +63,7 @@ public final class CaretImpl implements ICaret
         }
     }
     
-    public final void foucsItem(final TextField aTextField842, final int anInt844, final int anInt845) {
+    public final void focusItem(final TextField aTextField842, final int anInt844, final int anInt845) {
         this.lcduiTextField = aTextField842;
         this.caretX = anInt844;
         this.caretY = anInt845;
@@ -73,7 +73,7 @@ public final class CaretImpl implements ICaret
         EmulatorImpl.syncExec(new Class121(this));
     }
     
-    public final void defoucsItem(final TextField textField) {
+    public final void defocusItem(final TextField textField) {
         this.lcduiTextField = null;
         EmulatorImpl.syncExec(new Class115(this));
     }

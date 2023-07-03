@@ -19,7 +19,7 @@ public class TextBox extends Screen
     
     protected void focusCaret() {
         this.textField.screen.setItemCommands(this.textField);
-        Emulator.getEmulator().getScreen().getCaret().foucsItem(this.textField, super.bounds[X] + 4, Screen.fontHeight4 + 4);
+        Emulator.getEmulator().getScreen().getCaret().focusItem(this.textField, super.bounds[X] + 4, Screen.fontHeight4 + 4);
     }
     
     public String getString() {
@@ -94,6 +94,10 @@ public class TextBox extends Screen
     protected void layout() {
         this.textField.layout();
         this.textField.bounds[Y] = Screen.fontHeight4;
+    }
+
+    protected void defocus() {
+        this.textField.defocus();
     }
     
 }

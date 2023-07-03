@@ -19,7 +19,7 @@ public class TextBoxOld extends Screen
     
     protected void focusCaret() {
         this.aTextField1305.screen.setItemCommands(this.aTextField1305);
-        Emulator.getEmulator().getScreen().getCaret().foucsItem(this.aTextField1305, super.bounds[0] + 4, Screen.fontHeight4 + 4);
+        Emulator.getEmulator().getScreen().getCaret().focusItem(this.aTextField1305, super.bounds[0] + 4, Screen.fontHeight4 + 4);
     }
     
     public String getString() {
