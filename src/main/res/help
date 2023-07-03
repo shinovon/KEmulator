@@ -45,6 +45,15 @@ log.txt      log file
 
 ==================
 $[News & Log]
+$nnmod v2.12.9 [2021.07.03]
+Added network kill switch in Tool menu
+ConnectionNotFoundException() no such method error fix
+Form.set() NullPointerException fix
+sizeChanged() not calling fix
+IMEI dialog fix
+Added TextAntiAliasing property
+Ignoring WAV realize error
+
 $nnmod v2.12.8 [2023.05.17]
 Fixed keyboard polling
 Added Display.flashBacklight(int)
