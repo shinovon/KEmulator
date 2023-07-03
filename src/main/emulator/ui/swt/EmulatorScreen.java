@@ -129,6 +129,7 @@ MouseTrackListener
     MenuItem aMenuItem962;
     MenuItem aMenuItem963;
     MenuItem aMenuItem964;
+    MenuItem networkKillswitchMenuItem;
     private static AVIWriter aviWriter;
     private static int anInt1012;
     private static String aString993;
@@ -925,6 +926,10 @@ MouseTrackListener
         fpsModeMenuItem.addSelectionListener((SelectionListener)this);
         fpsModeMenuItem.setAccelerator(SWT.MOD1 + 'F');
         menuItemTool.setMenu(this.menuTool);
+        this.networkKillswitchMenuItem = new MenuItem(this.menuTool, 32);
+        networkKillswitchMenuItem.setText("Network not available");
+        networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
+        networkKillswitchMenuItem.addSelectionListener((SelectionListener)this);
         this.menuMidlet = new Menu(menuItemMidlet);
         (this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.uiText("MENU_MIDLET_LOAD_JAR", "Load jar ..."));
         this.loadJarMenuItem.addSelectionListener((SelectionListener)this);
@@ -1181,6 +1186,12 @@ MouseTrackListener
                 	Settings.fpsMode = fpsModeMenuItem.getSelection();
                 	setFpsMode(true);
                 	return;
+                }
+
+                if(menuItem.equals(networkKillswitchMenuItem)) {
+                    Settings.networkNotAvailable = !Settings.networkNotAvailable;
+                    networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
+                    return;
                 }
                 
                 if (menuItem.equals(this.channelDownMenuItem)) {
