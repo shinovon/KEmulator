@@ -1,6 +1,5 @@
 package emulator.graphics3D.egl;
 
-import emulator.graphics3D.lwjgl.*;
 import javax.microedition.khronos.egl.*;
 import javax.microedition.lcdui.*;
 import org.lwjgl.opengl.*;
@@ -168,7 +167,7 @@ public class EGL10Impl implements EGL10
     public EGLDisplay eglGetCurrentDisplay() {
         final EGLContextImpl c;
         if ((c = (EGLContextImpl)this.eglGetCurrentContext()) != EGL10.EGL_NO_CONTEXT) {
-            return c.method760();
+            return c.getDisplay();
         }
         return EGL10.EGL_NO_DISPLAY;
     }
@@ -233,9 +232,9 @@ public class EGL10Impl implements EGL10
             if ((value = GL10Impl.threadToContext.get(currentThread)) != null) {
                 final EGLContextImpl c;
                 if ((c = (EGLContextImpl)value).method764()) {
-                    this.eglDestroyContext(c.method760(), c);
+                    this.eglDestroyContext(c.getDisplay(), c);
                 }
-                c.method761(null);
+                c.setDisplay(null);
                 c.method763(null);
                 c.method767(null);
                 GL10Impl.contextToThread.remove(c);
@@ -248,7 +247,7 @@ public class EGL10Impl implements EGL10
         }
         else {
             final EGLContextImpl c2;
-            (c2 = (EGLContextImpl)context).method761((EGLDisplayImpl)display);
+            (c2 = (EGLContextImpl)context).setDisplay((EGLDisplayImpl)display);
             c2.method763((EGLSurfaceImpl)draw);
             c2.method767((EGLSurfaceImpl)read);
             GL10Impl.contextToThread.put(c2, currentThread);

@@ -11,7 +11,7 @@ public final class EGLContextImpl extends EGLContext
 {
     private static Hashtable aHashtable1319;
     private GL gl;
-    private EGLDisplayImpl ag1321;
+    private EGLDisplayImpl display;
     private EGLSurfaceImpl ana1322;
     private EGLSurfaceImpl ana1324;
     private boolean aBoolean1323;
@@ -19,7 +19,7 @@ public final class EGLContextImpl extends EGLContext
     private EGLContextImpl(final int n) {
         super();
         this.gl = null;
-        this.ag1321 = null;
+        this.display = null;
         this.ana1322 = null;
         this.ana1324 = null;
         this.aBoolean1323 = false;
@@ -28,12 +28,12 @@ public final class EGLContextImpl extends EGLContext
         }
     }
     
-    public final EGLDisplayImpl method760() {
-        return this.ag1321;
+    public final EGLDisplayImpl getDisplay() {
+        return this.display;
     }
     
-    public final void method761(final EGLDisplayImpl ag1321) {
-        this.ag1321 = ag1321;
+    public final void setDisplay(final EGLDisplayImpl ag1321) {
+        this.display = ag1321;
     }
     
     public final EGLSurfaceImpl method762() {
