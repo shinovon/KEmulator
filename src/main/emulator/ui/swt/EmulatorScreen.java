@@ -917,7 +917,7 @@ MouseTrackListener
         this.showTrackInfoMenuItem.addSelectionListener((SelectionListener)this);
         this.showTrackInfoMenuItem.setAccelerator(16777228);
         this.canvasKeyboardMenuItem = new MenuItem(this.menuTool, 32);
-        canvasKeyboardMenuItem.setText("Canvas Keyboard");
+        canvasKeyboardMenuItem.setText("QWERTY Mode");
         canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
         canvasKeyboardMenuItem.addSelectionListener((SelectionListener)this);
         this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
