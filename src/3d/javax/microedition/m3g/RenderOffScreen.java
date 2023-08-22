@@ -184,7 +184,7 @@ class RenderOffScreen
                     BufferedImage.TYPE_4BYTE_ABGR);
 
             this.db = (DataBufferByte) this.bufferedImage.getRaster().getDataBuffer();
-            buf = BufferUtils.createByteBuffer(w * h * 4);
+            buf = ByteBuffer.allocateDirect(w * h * 4).order(ByteOrder.nativeOrder());
             for (int i = 0; i < this.listeners.size(); i++) {
                 GLEventListener listener = (GLEventListener) this.listeners.get(i);
                 this.glDrawable.addGLEventListener(listener);
