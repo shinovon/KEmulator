@@ -114,8 +114,10 @@ class M3gRender implements GLEventListener
      */
     public void bindTarget(Object renderingTarget, int hints) {
         this.renderingTarget = renderingTarget;
-        this.hints = hints;
-        this.renderOffScreen.setSize(viewPortWidth, viewPortHeight, hints);
+        if(hints != this.hints) {
+            this.hints = hints;
+            this.renderOffScreen.setSize(viewPortWidth, viewPortHeight, hints);
+        }
     };
     
     /**
@@ -348,13 +350,16 @@ class M3gRender implements GLEventListener
             gl.glDisable(GL_LIGHT4);
             gl.glDisable(GL_LIGHT5);
             gl.glDisable(GL_LIGHT6);
-            gl.glDisable(GL_LIGHT7);             
+            gl.glDisable(GL_LIGHT7);
             gl.glDisable(GL_LIGHTING);
             return;
         }
-        
-        light.getIntensity();
-        float color[] = RenderVertices.getColorArray(light.getColor() );
+        for(int i = 0; i < count; i++) {
+            if(i >= 8) break;
+            int gllight = GL_LIGHT0+i;
+            light = g3d.getLight(i);
+            light.getIntensity();
+            float color[] = RenderVertices.getColorArray(light.getColor());
 //        color[0] = light.getIntensity();
 //        color[1] = light.getIntensity();
 //        color[2] = light.getIntensity();
@@ -363,85 +368,78 @@ class M3gRender implements GLEventListener
 //        color[1] = 0;
 //        color[2] = 0;
 
- 
-        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, color, 0);
-        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, color, 0);
-        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, color, 0);
+
+            gl.glLightfv(gllight, GL_AMBIENT, color, 0);
+            gl.glLightfv(gllight, GL_DIFFUSE, color, 0);
+            gl.glLightfv(gllight, GL_SPECULAR, color, 0);
 
 
-		
-        Transform lightTransformArray = g3d.getLightTransformArray(0);
-        Transform transform = new Transform ();
-        if (lightTransformArray != null)
-        {
-            transform = new Transform (lightTransformArray);
-        }
-        if(this.transform != null){
-        	transform.postMultiply(this.transform);
-        }
-        
-        float position[] = 
-        {
-            transform.matrix[3] , 
-            transform.matrix[7] , 
-            transform.matrix[11],
-            0
-        };      
-		
+            Transform lightTransformArray = g3d.getLightTransformArray(0);
+            Transform transform = new Transform();
+            if (lightTransformArray != null) {
+                transform = new Transform(lightTransformArray);
+            }
+            if (this.transform != null) {
+                transform.postMultiply(this.transform);
+            }
+
+            float position[] =
+                    {
+                            transform.matrix[3],
+                            transform.matrix[7],
+                            transform.matrix[11],
+                            0
+                    };
+
 //        light.setMode( light.AMBIENT );
-        switch(light.getMode())
-        {
-        	case Light.AMBIENT:
-        	{
-        		float settingColor[] = new float[]{1,1,1,1};
-         		gl.glLightfv(GL_LIGHT0, GL_AMBIENT, settingColor, 0);
-         		gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, settingColor, 0);
-         	
-        	}
-        
-        	case Light.DIRECTIONAL:
-        	{
-        		position[3] = 0; // directional
-        		gl.glLightfv(GL_LIGHT0, GL_POSITION, position, 0);
-        		break;
-        	}
-        
-        	case Light.OMNI:
-        	{
-        		position[3] = 1; // positional
-        		gl.glLightfv(GL_LIGHT0, GL_POSITION, position, 0);
-  
-           		gl.glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, light.attenuationConstant);
-        		gl.glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, light.getLinearAttenuation());//linearAttenuation
-        		gl.glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, light.getQuadraticAttenuation());//quadraticAttenuation
+            switch (light.getMode()) {
+                case Light.AMBIENT: {
+                    float settingColor[] = new float[]{1, 1, 1, 1};
+                    gl.glLightfv(gllight, GL_AMBIENT, settingColor, 0);
+                    gl.glLightfv(gllight, GL_DIFFUSE, settingColor, 0);
 
-        		break;
-        	}
-        	  
-        	
-        	case Light.SPOT:
-        	{
-        		
-        		gl.glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, light.attenuationConstant);
-        		gl.glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, light.getLinearAttenuation());//linearAttenuation
-        		gl.glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, light.getQuadraticAttenuation());//quadraticAttenuation
+                }
 
-        		
+                case Light.DIRECTIONAL: {
+                    position[3] = 0; // directional
+                    gl.glLightfv(gllight, GL_POSITION, position, 0);
+                    break;
+                }
+
+                case Light.OMNI: {
+                    position[3] = 1; // positional
+                    gl.glLightfv(gllight, GL_POSITION, position, 0);
+
+                    gl.glLightf(gllight, GL_CONSTANT_ATTENUATION, light.attenuationConstant);
+                    gl.glLightf(gllight, GL_LINEAR_ATTENUATION, light.getLinearAttenuation());//linearAttenuation
+                    gl.glLightf(gllight, GL_QUADRATIC_ATTENUATION, light.getQuadraticAttenuation());//quadraticAttenuation
+
+                    break;
+                }
+
+
+                case Light.SPOT: {
+
+                    gl.glLightf(gllight, GL_CONSTANT_ATTENUATION, light.attenuationConstant);
+                    gl.glLightf(gllight, GL_LINEAR_ATTENUATION, light.getLinearAttenuation());//linearAttenuation
+                    gl.glLightf(gllight, GL_QUADRATIC_ATTENUATION, light.getQuadraticAttenuation());//quadraticAttenuation
+
+
 //              //      spot direction
 //              float xSpotDir = 0 , ySpotDir = 0, zOffset = 0;
 //              float direction[] = {xSpotDir, ySpotDir, zOffset};
-//              gl.glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, direction);
-        		
-                gl.glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, light.getSpotExponent());
-                gl.glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, light.getSpotAngle());  // value between 0 to 180
-        		break;
-        	}        	 
+//              gl.glLightfv(gllight, GL_SPOT_DIRECTION, direction);
+
+                    gl.glLightf(gllight, GL_SPOT_EXPONENT, light.getSpotExponent());
+                    gl.glLightf(gllight, GL_SPOT_CUTOFF, light.getSpotAngle());  // value between 0 to 180
+                    break;
+                }
+            }
+
+
+//      gl.glLightfv(gllight, GL_SPECULAR, new float[]{1,1,1,1});
+        gl.glEnable(gllight);
         }
- 
-        
-//      gl.glLightfv(GL_LIGHT0, GL_SPECULAR, new float[]{1,1,1,1});   
- 
-        gl.glEnable(GL_LIGHT0);
         gl.glEnable(GL_LIGHTING);
     }
 
@@ -455,8 +453,8 @@ class M3gRender implements GLEventListener
         GL2 gl = drawable.getGL().getGL2();
         
    //     gl.glEnable(GL_BLEND);
-        if((hints & Graphics3D.ANTIALIAS) == Graphics3D.ANTIALIAS)
-            gl.glEnable(GL_MULTISAMPLE);
+        //if((hints & Graphics3D.ANTIALIAS) == Graphics3D.ANTIALIAS)
+        //    gl.glEnable(GL_MULTISAMPLE);
         gl.glViewport(0, 0, this.viewPortWidth, this.viewPortHeight);
         gl.glMatrixMode(GL_PROJECTION); 
   
@@ -539,8 +537,8 @@ class M3gRender implements GLEventListener
          listRender.clear();
         // if (!this.renderOffScreen.RENDER_IN_FRAME)
          //{
-	         this.image = this.renderOffScreen.getImage();
-	         comitImageInTarget();
+            this.image = this.renderOffScreen.getImage();
+            comitImageInTarget();
          //}
          gl.glFlush();
          

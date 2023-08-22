@@ -49,6 +49,8 @@ class RenderOffScreen
   //  private GLCanvas canvas = null;
     
     private Window tempWindow = null;
+    private Object lock = new Object();
+
     /**
      * @param w 
      * @param h 
@@ -133,38 +135,40 @@ class RenderOffScreen
      */
     public void setSize(int w, int h, int hints)
     {
-        if (!(GLProfile.isAvailable(GLProfile.GL2))) {
-            throw new RuntimeException("OpenGL 2 is required");
-        }
-        if (this.glPBuffer != null)
-        {
-            this.glPBuffer.destroy();
-        }
-            
-        w = w & Integer.parseInt("11111111100",2);
-        h = h & Integer.parseInt("11111111100",2);
-        
-        this.maxPbufferWidth  = w;
-        this.maxPbufferHeight = h;
-        GLProfile profile = GLProfile.get(GLProfile.GL2);
-        GLCapabilities pbCaps = new GLCapabilities(profile);
-        pbCaps.setAlphaBits( 8 );
-        if((hints & Graphics3D.ANTIALIAS) == Graphics3D.ANTIALIAS) {
-            pbCaps.setNumSamples(4);
-            pbCaps.setSampleBuffers(true);
-        }
-        pbCaps.setDoubleBuffered( false );
+        synchronized(lock) {
+            if (!(GLProfile.isAvailable(GLProfile.GL2))) {
+                throw new RuntimeException("OpenGL 2 is required");
+            }
+            if (this.glPBuffer != null) {
+                this.glPBuffer.destroy();
+            }
 
-        //this.glPBuffer = GLDrawableFactory.getFactory(glDrawable.getGLProfile()).createGLPbuffer(pbCaps, null, this.maxPbufferWidth,
-        //        this.maxPbufferHeight, null );
-        
-        //this.glDrawable = this.glPBuffer;
+            w = w & Integer.parseInt("11111111100", 2);
+            h = h & Integer.parseInt("11111111100", 2);
+
+            this.maxPbufferWidth = w;
+            this.maxPbufferHeight = h;
+            GLProfile profile = GLProfile.get(GLProfile.GL2);
+            GLCapabilities pbCaps = new GLCapabilities(profile);
+            pbCaps.setAlphaBits(8);
+            if ((hints & Graphics3D.ANTIALIAS) == Graphics3D.ANTIALIAS) {
+                pbCaps.setNumSamples(4);
+                pbCaps.setSampleBuffers(true);
+            }
+            pbCaps.setDoubleBuffered(false);
+
+            //this.glPBuffer = GLDrawableFactory.getFactory(glDrawable.getGLProfile()).createGLPbuffer(pbCaps, null, this.maxPbufferWidth,
+            //        this.maxPbufferHeight, null );
+
+            //this.glDrawable = this.glPBuffer;
 
 
-        final GLDrawableFactory fac = GLDrawableFactory.getFactory(profile);
-       // System.out.println(fac.canCreateGLPbuffer(profile.));
-        glDrawable = glPBuffer = fac.createGLPbuffer(null, pbCaps, null, this.maxPbufferWidth, this.maxPbufferHeight, null);
-       // System.out.println(glDrawable);
+            final GLDrawableFactory fac = GLDrawableFactory.getFactory(profile);
+            // System.out.println(fac.canCreateGLPbuffer(profile.));
+            glDrawable = glPBuffer = fac.createGLPbuffer(null, pbCaps, null, this.maxPbufferWidth, this.maxPbufferHeight, null);
+
+            gl = null;
+            // System.out.println(glDrawable);
         	
         /*	
         	this.glPBuffer = this.canvas.createOffscreenDrawable( 
@@ -175,21 +179,20 @@ class RenderOffScreen
         }
          
          */
-        //this.glDrawable.display();
+            //this.glDrawable.display();
 
-        this.bufferedImage = new BufferedImage(
-                this.maxPbufferWidth, 
-                this.maxPbufferHeight,  
-                BufferedImage.TYPE_4BYTE_ABGR);
-        
-        this.dbByte = (DataBufferByte) this.bufferedImage.getRaster().getDataBuffer();
-        
-        for (int i = 0 ; i < this.listeners.size(); i++)
-        {
-            GLEventListener listener = (GLEventListener) this.listeners.get(i);
-            this.glDrawable.addGLEventListener( listener );
+            this.bufferedImage = new BufferedImage(
+                    this.maxPbufferWidth,
+                    this.maxPbufferHeight,
+                    BufferedImage.TYPE_4BYTE_ABGR);
+
+            this.dbByte = (DataBufferByte) this.bufferedImage.getRaster().getDataBuffer();
+
+            for (int i = 0; i < this.listeners.size(); i++) {
+                GLEventListener listener = (GLEventListener) this.listeners.get(i);
+                this.glDrawable.addGLEventListener(listener);
+            }
         }
-        
     }
     
     /**
@@ -197,50 +200,51 @@ class RenderOffScreen
      */
     public BufferedImage getImage()
     {
-        if(gl == null)
-            this.gl   = this.glDrawable.getGL().getGL2();
-        int[] view = new int[4];
-        this.gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
-        int originalW = view[2], originalH = view[3];
+        synchronized(lock) {
+            if (gl == null)
+                this.gl = this.glDrawable.getGL().getGL2();
+            int[] view = new int[4];
+            this.gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
+            int originalW = view[2], originalH = view[3];
 
-        this.gl.glReadBuffer( GL.GL_FRONT);
-                
+            this.gl.glReadBuffer(GL.GL_FRONT);
+
 //        // set viewport to full buffer
 //        this.gl.glViewport(
 //                0,
 //                0,
 //                this.maxPbufferWidth,
 //                this.maxPbufferHeight);
-        
-        // read full buffer 
-        
-        //ByteBuffer buf = BufferUtil.newByteBuffer(this.dbByte.getData().length);
-        ByteBuffer buf = ByteBuffer.allocateDirect(this.dbByte.getData().length);
-        buf.order(ByteOrder.nativeOrder());
-        try{
-        	this.gl.glReadPixels(
-                0, 
-                0,
-                this.maxPbufferWidth,
-                this.maxPbufferHeight, 
-                GL_ABGR_EXT,
-                GL.GL_UNSIGNED_BYTE, 
-                buf);
 
-        	buf.get(this.dbByte.getData());
-        }
-        catch(GLException e){
-        	e.printStackTrace();
-        }
+            // read full buffer
+
+            //ByteBuffer buf = BufferUtil.newByteBuffer(this.dbByte.getData().length);
+            ByteBuffer buf = ByteBuffer.allocateDirect(this.dbByte.getData().length);
+            buf.order(ByteOrder.nativeOrder());
+            try {
+                this.gl.glReadPixels(
+                        0,
+                        0,
+                        this.maxPbufferWidth,
+                        this.maxPbufferHeight,
+                        GL_ABGR_EXT,
+                        GL.GL_UNSIGNED_BYTE,
+                        buf);
+
+                buf.get(this.dbByte.getData());
+            } catch (GLException e) {
+                e.printStackTrace();
+            }
 //        // set original viewport
 //        this.gl.glViewport(
 //                0,
 //                0,
 //                originalW, 
 //                originalH );
-        
-        // return viewport
-        return bufferedImage;
+
+            // return viewport
+            return bufferedImage;
+        }
 //        return this.bufferedImage.getSubimage(
 //                0,
 //                0,
