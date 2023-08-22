@@ -16,7 +16,8 @@ import javax.media.opengl.*;
 public class Graphics3D {
 
     M3gRender m3gRender = new M3gRender();
-    
+	private int hints;
+
 	private class ViewPort {
 
 		private int height;
@@ -88,20 +89,20 @@ public class Graphics3D {
     		if (properties == null) {
     			properties = new Hashtable();
     			properties.put("supportAntialiasing", new Boolean(true));
-    			properties.put("supportTrueColor", new Boolean(false));
-    			properties.put("supportDithering", new Boolean(false));
-    			properties.put("supportMipmapping", new Boolean(false));
+    			properties.put("supportTrueColor", new Boolean(true));
+    			properties.put("supportDithering", new Boolean(true));
+    			properties.put("supportMipmapping", new Boolean(true));
     			properties.put("supportPerspectiveCorrection", new Boolean(false));
     			properties.put("supportLocalCameraLighting", new Boolean(false));
     			properties.put("maxLights", new Integer(8));
-    			properties.put("maxViewportDimension", new Integer(1024));
+    			properties.put("maxViewportDimension", new Integer(2048));
     			properties.put("maxTextureDimension", new Integer(1024));
     			properties.put("maxSpriteCropDimension", new Integer(1024));
-    			properties.put("maxTransformsPerVertex", new Integer(2));
-    			properties.put("numTextureUnits", new Integer(2));
+    			properties.put("maxTransformsPerVertex", new Integer(1000));
+    			properties.put("numTextureUnits", new Integer(10));
                 
-    			properties.put("maxViewportHeight", new Integer(1024)); //256
-    			properties.put("maxViewportWidth", new Integer(1024));  //256
+    			properties.put("maxViewportHeight", new Integer(2048));
+    			properties.put("maxViewportWidth", new Integer(2048));
                 
                 singleton.maxViewportHeight = ((Integer) properties.get("maxViewportHeight")).intValue();
                 singleton.maxViewportWidth = ((Integer) properties.get("maxViewportWidth")).intValue();
@@ -170,10 +171,11 @@ public class Graphics3D {
 			IllegalArgumentException {
 
 		// Validates the given target
-		validateTarget(target);
+		//validateTarget(target);
         
-		this.m3gRender.bindTarget(target, 0);
-		this.renderingTarget = target;
+		//this.m3gRender.bindTarget(target, hints);
+		//this.renderingTarget = target;
+		bindTarget(target, true, 0);
 	}
 
 	// Binds the given Graphics or mutable Image2D as the rendering target of
@@ -190,7 +192,8 @@ public class Graphics3D {
 						"hints must be 0 or ANTIALIAS|DITHER|TRUE_COLOR|OVERWRITE");
 			}
 		}
-        this.m3gRender.bindTarget(target, hints);
+		this.hints = hints;
+        this.m3gRender.bindTarget(target, depthBuffer, hints);
 		this.renderingTarget = target;
 	}
 

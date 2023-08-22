@@ -6,20 +6,16 @@
  */
 package javax.microedition.m3g;
 
-import java.awt.Frame;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.Vector;
 
-import javax.swing.JFrame;
-
 import javax.media.opengl.*;
-import javax.media.opengl.glu.GLU;
-
-import static javax.media.opengl.GL2.GL_ABGR_EXT;
 
 /**
  * [Description for RenderOffScreen]
@@ -40,7 +36,7 @@ class RenderOffScreen
     
     private BufferedImage bufferedImage = null;
     
-    private DataBufferByte dbByte = null;
+    private DataBufferByte db = null;
     
     private int maxPbufferHeight = 512;
 
@@ -50,6 +46,7 @@ class RenderOffScreen
     
     private Window tempWindow = null;
     private Object lock = new Object();
+    private ByteBuffer buf;
 
     /**
      * @param w 
@@ -182,12 +179,12 @@ class RenderOffScreen
             //this.glDrawable.display();
 
             this.bufferedImage = new BufferedImage(
-                    this.maxPbufferWidth,
-                    this.maxPbufferHeight,
+                    w,
+                    h,
                     BufferedImage.TYPE_4BYTE_ABGR);
 
-            this.dbByte = (DataBufferByte) this.bufferedImage.getRaster().getDataBuffer();
-
+            this.db = (DataBufferByte) this.bufferedImage.getRaster().getDataBuffer();
+            buf = BufferUtils.createByteBuffer(w * h * 4);
             for (int i = 0; i < this.listeners.size(); i++) {
                 GLEventListener listener = (GLEventListener) this.listeners.get(i);
                 this.glDrawable.addGLEventListener(listener);
@@ -219,19 +216,17 @@ class RenderOffScreen
             // read full buffer
 
             //ByteBuffer buf = BufferUtil.newByteBuffer(this.dbByte.getData().length);
-            ByteBuffer buf = ByteBuffer.allocateDirect(this.dbByte.getData().length);
-            buf.order(ByteOrder.nativeOrder());
+            buf.rewind();
             try {
                 this.gl.glReadPixels(
                         0,
                         0,
                         this.maxPbufferWidth,
                         this.maxPbufferHeight,
-                        GL_ABGR_EXT,
+                        GL2.GL_ABGR_EXT,
                         GL.GL_UNSIGNED_BYTE,
                         buf);
-
-                buf.get(this.dbByte.getData());
+                buf.get(db.getData());
             } catch (GLException e) {
                 e.printStackTrace();
             }
@@ -248,7 +243,7 @@ class RenderOffScreen
 //        return this.bufferedImage.getSubimage(
 //                0,
 //                0,
-//                originalW, 
+//                originalW,
 //                originalH);
     }
 

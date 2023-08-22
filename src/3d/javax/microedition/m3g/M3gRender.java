@@ -58,6 +58,9 @@ class M3gRender implements GLEventListener
          
     private int dataImage[];
     private int hints;
+    private boolean depthBuffer;
+    private int targetWidth;
+    private int targetHeight;
 
     class RenderWorldModel
     {
@@ -112,8 +115,16 @@ class M3gRender implements GLEventListener
     /**
      * @param renderingTarget
      */
-    public void bindTarget(Object renderingTarget, int hints) {
+    public void bindTarget(Object renderingTarget, boolean depthBuffer, int hints) {
         this.renderingTarget = renderingTarget;
+        this.depthBuffer = depthBuffer;
+        if(renderingTarget instanceof Graphics) {
+            this.targetWidth = ((Graphics) renderingTarget).getImage().getWidth();
+            this.targetHeight = ((Graphics) renderingTarget).getImage().getHeight();
+        } else if(renderingTarget instanceof Image2D) {
+            this.targetWidth = ((Image2D) renderingTarget).getWidth();
+            this.targetHeight = ((Image2D) renderingTarget).getHeight();
+        }
         if(hints != this.hints) {
             this.hints = hints;
             this.renderOffScreen.setSize(viewPortWidth, viewPortHeight, hints);
@@ -191,10 +202,11 @@ class M3gRender implements GLEventListener
                     int red     = color[0];  
                     int green   = color[1]; 
                     int blue    = color[2];      
-                    int alpha = color[3];
+                   // int alpha = color[3];
                     
                     dataImage[loc] = 
-                    	(alpha << 24) +
+                    //	(alpha << 24) +
+                        0xFF000000 +
                         (red   << 16) +   
                         (green << 8) +
                         (blue);
@@ -322,7 +334,7 @@ class M3gRender implements GLEventListener
      * @param world
      */
     public void render(World world) {
-        
+
         RenderWorldModel renderWorldModel   = new RenderWorldModel();
         renderWorldModel.world              = (World)world;//.duplicate();
         listRender.add(renderWorldModel);        
@@ -453,10 +465,22 @@ class M3gRender implements GLEventListener
         GL2 gl = drawable.getGL().getGL2();
         
    //     gl.glEnable(GL_BLEND);
-        //if((hints & Graphics3D.ANTIALIAS) == Graphics3D.ANTIALIAS)
-        //    gl.glEnable(GL_MULTISAMPLE);
-        gl.glViewport(0, 0, this.viewPortWidth, this.viewPortHeight);
-        gl.glMatrixMode(GL_PROJECTION); 
+        if((hints & Graphics3D.ANTIALIAS) == Graphics3D.ANTIALIAS) {
+            gl.glEnable(GL_LINE_SMOOTH);
+            gl.glEnable(GL_MULTISAMPLE);
+        } else {
+            gl.glDisable(GL_LINE_SMOOTH);
+            gl.glDisable(GL_MULTISAMPLE);
+        }
+        if((hints & Graphics3D.DITHER) == Graphics3D.DITHER)
+            gl.glEnable(GL_DITHER);
+        else
+            gl.glDisable(GL_DITHER);
+        gl.glViewport(this.viewPortX, this.targetHeight - this.viewPortY - this.viewPortHeight, this.viewPortWidth, this.viewPortHeight);
+        gl.glScissor(this.viewPortX, this.targetHeight - this.viewPortY - this.viewPortHeight, this.viewPortWidth, this.viewPortHeight);
+
+        gl.glDepthRange(this.near,this.far);
+        gl.glMatrixMode(GL_PROJECTION);
   
         gl.glOrtho(
             -this.viewPortWidth,  // left
@@ -466,13 +490,10 @@ class M3gRender implements GLEventListener
              this.near,           // near_val
              this.far);           // far_val
 
-        
-//        gl.glDepthRange(this.near,this.far);
-        
-        
+
         if (this.listRender.size() > 0)
         {
-            RenderClear.renderClear (drawable, new Background());
+            RenderClear.renderClear (drawable, depthBuffer, hints, new Background());
             renderLight(drawable);
         }
         
@@ -497,7 +518,7 @@ class M3gRender implements GLEventListener
                 RenderWorld.addLights(drawable.getGL(), world, transformWorld ); // TODO add Graphics3D.getInstance().addLight() 
                 renderLight(drawable);
                 
-                RenderClear.renderClear (drawable, world.getBackground());
+                RenderClear.renderClear (drawable, depthBuffer, hints, world.getBackground());
                 
                 RenderNode.render(drawable, world, transformWorld , this.transform, SURFACE_OPAQUE);
                 RenderNode.render(drawable, world, transformWorld , this.transform, SURFACE_TRANSPARENT);
@@ -531,7 +552,7 @@ class M3gRender implements GLEventListener
             else if (objectRender instanceof RenderClearModel)
             {
                 RenderClearModel renderClearModel = (RenderClearModel)objectRender;
-                RenderClear.renderClear(drawable, renderClearModel.background);
+                RenderClear.renderClear(drawable, depthBuffer, hints, renderClearModel.background);
             }
          }  
          listRender.clear();

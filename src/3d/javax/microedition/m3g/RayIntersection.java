@@ -11,8 +11,8 @@ public class RayIntersection {
     // members are set directly in Node.pick();
     
 	
-	float[] textureS = new float[2];
-	float[] textureT = new float[2];
+	float[] textureS = new float[10];
+	float[] textureT = new float[10];
 	
     Node intersected;
     float distance;
@@ -68,8 +68,8 @@ public class RayIntersection {
 	{
 		if (index < 0 || index >= textureS.length)
 		{
-			return 0;
-			//throw new IndexOutOfBoundsException();
+			//return 0;
+			throw new IndexOutOfBoundsException();
 		}
 
 		return textureS[index];
@@ -79,8 +79,8 @@ public class RayIntersection {
 	{
 		if (index < 0 || index >= textureT.length)
 		{
-			return 0;
-		//	throw new IndexOutOfBoundsException();
+		//	return 0;
+			throw new IndexOutOfBoundsException();
 		}
 
 		return textureT[index];

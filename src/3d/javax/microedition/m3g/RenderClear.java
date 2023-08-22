@@ -19,19 +19,24 @@ import javax.media.opengl.GLDrawable;
 public class RenderClear {
 
     
-    static void renderClear( GLAutoDrawable drawable, Background background)
+    static void renderClear( GLAutoDrawable drawable, boolean depthBuffer, int hints, Background background)
     {
         GL2 gl = drawable.getGL().getGL2();
         if (background == null) {
-            gl.glColor4f(0,0,0, 0); 
-            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-            gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+            gl.glClearDepth(1.0d);
+            gl.glDepthMask(true);
+            gl.glColorMask(true, true, true, true);
+            gl.glClearColor(0,0,0, 0);
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT | (depthBuffer ? GL.GL_DEPTH_BUFFER_BIT : 0));
         
           //  gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+            return;
         }
-        else {
-        	if(background.isColorClearEnabled()){
-                
+        //else {
+            gl.glClearDepth(1.0d);
+            gl.glDepthMask(true);
+            gl.glColorMask(true, true, true, true);
+        	//if(background.isColorClearEnabled()){
                 int color = background.getColor();
                 int alfa  = (color >> 24) & 255 ;
                 int red   = (color >> 16) & 255 ;
@@ -39,19 +44,19 @@ public class RenderClear {
                 int blue  = (color      ) & 255 ;
                 
                 gl.glClearColor(red/255.0f, green/255.0f, blue/255.0f, alfa/255.0f);
-                gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-        	}
+
+        	//}
                 
-        	if(background.isDepthClearEnabled()){
-                gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-        	}
+
+            gl.glClear((background.isColorClearEnabled() ? GL.GL_COLOR_BUFFER_BIT : 0) |
+                    (background.isDepthClearEnabled() && depthBuffer ? GL.GL_DEPTH_BUFFER_BIT : 0));
         	
 //       	System.out.println("Clear -- bg image: "+background.getImage());
         	
         	if(background.getImage() != null){
             	renderBackground(drawable, background);
         	}
-        }
+        //}
 /*        else {
         	gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         	gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
