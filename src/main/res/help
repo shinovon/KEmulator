@@ -44,8 +44,13 @@ property.txt properties of KEmulator
 log.txt      log file
 
 ==================
-$[News & Log]
-$nnmod v2.12.9 [2021.07.03]
+$[Changelog]
+$nnmod v2.13 [2023.08.22]
+Moved to M3G on JOGL Implementation
+Removed JSR 239 support
+Removed M3G View and 3D engine choice
+
+$nnmod v2.12.9 [2023.07.03]
 Added network kill switch in Tool menu
 ConnectionNotFoundException() no such method error fix
 Form.set() NullPointerException fix
