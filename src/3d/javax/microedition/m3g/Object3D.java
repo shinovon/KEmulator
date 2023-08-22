@@ -13,7 +13,10 @@ public abstract class Object3D {
 	int userID;
 	Object userObject;
     int id;
-	
+	private boolean twoSidedLighting;
+	private boolean localCameraLighting;
+	private boolean perspectiveCorrection;
+
 	abstract void load(M3gInputStream is) throws IOException;
 	
 	int addRef(Object3D[] refs, int count, Object3D ref){
@@ -235,5 +238,29 @@ public abstract class Object3D {
         
         return props;
     }
+
+	public void setTwoSidedLightingEnable(boolean enable) {
+		 twoSidedLighting = enable;
+	}
+
+	public boolean isTwoSidedLightingEnabled() {
+		 return twoSidedLighting;
+	}
+
+	public void setLocalCameraLightingEnable(boolean enable) {
+		 localCameraLighting = enable;
+	}
+
+	public boolean isLocalCameraLightingEnabled() {
+		 return localCameraLighting;
+	}
+
+	public void setPerspectiveCorrectionEnable(boolean enable) {
+		 perspectiveCorrection = enable;
+	}
+
+	public boolean isPerspectiveCorrectionEnabled() {
+		 return perspectiveCorrection;
+	}
     
 }

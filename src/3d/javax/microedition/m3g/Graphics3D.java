@@ -16,7 +16,6 @@ import javax.media.opengl.*;
 public class Graphics3D {
 
     M3gRender m3gRender = new M3gRender();
-	private int hints;
 
 	private class ViewPort {
 
@@ -182,7 +181,6 @@ public class Graphics3D {
 	// this Graphics3D.
 	public void bindTarget(java.lang.Object target, boolean depthBuffer,
 			int hints) {
-
 		// Validates the given target
 		validateTarget(target);
 
@@ -192,7 +190,6 @@ public class Graphics3D {
 						"hints must be 0 or ANTIALIAS|DITHER|TRUE_COLOR|OVERWRITE");
 			}
 		}
-		this.hints = hints;
         this.m3gRender.bindTarget(target, depthBuffer, hints);
 		this.renderingTarget = target;
 	}
@@ -238,6 +235,38 @@ public class Graphics3D {
 
 	public Object getTarget() {
 		return this.renderingTarget;
+	}
+
+	public int getHints() {
+		return m3gRender.hints;
+	}
+	
+	public boolean isDepthBufferEnabled() {
+		return m3gRender.depthBuffer;
+	}
+
+	public int getViewportX() {
+		return m3gRender.viewPortX;
+	}
+
+	public int getViewportY() {
+		return m3gRender.viewPortY;
+	}
+
+	public int getViewportWidth() {
+		return m3gRender.viewPortWidth;
+	}
+
+	public int getViewportHeight() {
+		return m3gRender.viewPortHeight;
+	}
+
+	public float getDepthRangeNear() {
+		return (float) m3gRender.near;
+	}
+
+	public float getDepthRangeFar() {
+		return (float) m3gRender.near;
 	}
 
 	// Flushes the rendered 3D image to the currently bound target and then
@@ -373,7 +402,6 @@ public class Graphics3D {
 			throw new IllegalArgumentException(
 					"both width and height must be smaller than the viewport's dimensions.");
 		} else {
-
             m3gRender.setViewPort(x, y, width, height);
 		}
 

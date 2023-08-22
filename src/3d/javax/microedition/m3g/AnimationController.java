@@ -121,5 +121,9 @@ public class AnimationController extends Object3D {
 		target.referenceWorldTime = referenceWorldTime;
 		return target;
 	}
-	
+
+	public int getRefWorldTime() {
+		return referenceWorldTime;
+	}
+
 }

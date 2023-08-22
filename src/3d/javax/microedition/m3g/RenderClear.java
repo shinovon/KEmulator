@@ -36,7 +36,7 @@ public class RenderClear {
             gl.glClearDepth(1.0d);
             gl.glDepthMask(true);
             gl.glColorMask(true, true, true, true);
-        	//if(background.isColorClearEnabled()){
+        	if(background.isColorClearEnabled()){
                 int color = background.getColor();
                 int alfa  = (color >> 24) & 255 ;
                 int red   = (color >> 16) & 255 ;
@@ -45,11 +45,11 @@ public class RenderClear {
                 
                 gl.glClearColor(red/255.0f, green/255.0f, blue/255.0f, alfa/255.0f);
 
-        	//}
+        	}
                 
 
             gl.glClear((background.isColorClearEnabled() ? GL.GL_COLOR_BUFFER_BIT : 0) |
-                    (background.isDepthClearEnabled() && depthBuffer ? GL.GL_DEPTH_BUFFER_BIT : 0));
+                    (background.isDepthClearEnabled() ? GL.GL_DEPTH_BUFFER_BIT : 0));
         	
 //       	System.out.println("Clear -- bg image: "+background.getImage());
         	

@@ -390,4 +390,32 @@ public class KeyframeSequence extends Object3D {
         return props;
     }
 
+	public int getComponentCount() {
+		return componentCount;
+	}
+
+	public int getKeyframeCount() {
+		return keyframeCount;
+	}
+
+	public int getInterpolationType() {
+		return interpolation;
+	}
+
+	public int getKeyframe(int index,
+						   float[] value) {
+		for(int i = 0; i < componentCount; i++) {
+			value[i] = values[index+i];
+		}
+		return times[index];
+	}
+
+	public int getValidRangeFirst() {
+		return validRangeFirst;
+	}
+
+	public int getValidRangeLast() {
+		return validRangeLast;
+	}
+
 }

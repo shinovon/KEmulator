@@ -40,13 +40,13 @@ class M3gRender implements GLEventListener
     
     private Vector listRender   = new Vector();
     
-    private int viewPortX       = 0;
-    private int viewPortY       = 0;
-    private int viewPortWidth   = 255;
-    private int viewPortHeight  = 255;
+    int viewPortX       = 0;
+    int viewPortY       = 0;
+    int viewPortWidth   = 255;
+    int viewPortHeight  = 255;
     
-    private double near = 0;
-    private double far  = 1;
+    double near = 0;
+    double far  = 1;
     
     private Camera camera;
     private Transform transform;
@@ -57,8 +57,8 @@ class M3gRender implements GLEventListener
     private Object          renderingTarget ;
          
     private int dataImage[];
-    private int hints;
-    private boolean depthBuffer;
+    int hints;
+    boolean depthBuffer;
     private int targetWidth;
     private int targetHeight;
 
@@ -205,7 +205,7 @@ class M3gRender implements GLEventListener
                    // int alpha = color[3];
                     
                     dataImage[loc] = 
-                    //	(alpha << 24) +
+                    	//(alpha << 24) +
                         0xFF000000 +
                         (red   << 16) +   
                         (green << 8) +
@@ -465,6 +465,7 @@ class M3gRender implements GLEventListener
         GL2 gl = drawable.getGL().getGL2();
         
    //     gl.glEnable(GL_BLEND);
+
         if((hints & Graphics3D.ANTIALIAS) == Graphics3D.ANTIALIAS) {
             gl.glEnable(GL_LINE_SMOOTH);
             gl.glEnable(GL_MULTISAMPLE);
