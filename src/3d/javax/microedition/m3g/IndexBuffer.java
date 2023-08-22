@@ -1,20 +1,15 @@
+/*
+ * Created on 15.06.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
 package javax.microedition.m3g;
 
-public abstract class IndexBuffer extends Object3D
-{
-    IndexBuffer(final int n) {
-        super(n);
-    }
-    
-    IndexBuffer() {
-        super();
-    }
-    
-    public abstract int getIndexCount();
-    
-    native int getIndexCountImpl();
-    
-    public abstract void getIndices(final int[] p0);
-    
-    native void getIndicesImpl(final int[] p0);
+/**
+ * @author stefan.haustein
+ */
+public abstract class IndexBuffer extends Object3D {
+	
+
 }

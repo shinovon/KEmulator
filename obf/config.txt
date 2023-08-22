@@ -2,7 +2,9 @@
 -outjars '.\KEmulator.jar'
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
-#-libraryjars '..\x64home\swt-win32-x86.jar'
+-libraryjars '..\x64home\swt-win32-x86.jar'
+-libraryjars '..\x64home\jogl-all.jar'
+-libraryjars '..\x64home\gluegen-rt.jar'
 
 -target 1.8
 #-dontshrink
@@ -83,6 +85,11 @@
 -keep,allowshrinking public class org.objectweb.** { *; }
 
 -keep class org.lwjgl.* { *; }
+
+-keep class com.sun.** { *; }
+-keep class javax.** { *; }
+-keep class com.jogamp.** { *; }
+-keep class gluegen.** { *; }
 
 # EMULATOR CLASSES
 -keep public class emulator.graphics2D.awt.* { public protected *; }

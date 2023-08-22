@@ -14,5 +14,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="libraries" level="project" />
+    <orderEntry type="library" name="jogl" level="project" />
   </component>
 </module>

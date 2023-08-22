@@ -16,6 +16,10 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/webcam-capture-0.3.12.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/kemlib.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/x64home/swt-win32-x86.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/x64home/jogl-all-natives-windows-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/x64home/jogl-all.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/x64home/gluegen-rt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/x64home/gluegen-rt-natives-windows-i586.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

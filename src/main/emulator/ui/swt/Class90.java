@@ -28,7 +28,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
     private Tree aTree896;
     private Canvas aCanvas897;
     private Memory ana898;
-    private emulator.graphics3D.view.a m3gview;
+  //  private emulator.graphics3D.view.a m3gview;
     private Camera aCamera901;
     private Transform aTransform902;
     private Menu aMenu908;
@@ -96,10 +96,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener
         this.aBackground900 = null;
         this.aNode904 = null;
         this.ana898 = new Memory();
-	    try {
+	    /*try {
         this.m3gview = emulator.graphics3D.view.a.acreate();
         } catch (Error e) {
-        }
+        }*/
     }
     
     private void method516() {
@@ -150,7 +150,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
     }
     
     public final void method493() {
-        this.method543();
+       // this.method543();
         final Display current = Display.getCurrent();
         ((Control)this.aShell889).setLocation(current.getClientArea().width - this.aShell889.getSize().x >> 1, current.getClientArea().height - this.aShell889.getSize().y >> 1);
         this.aShell889.open();
@@ -193,13 +193,13 @@ public final class Class90 implements MouseMoveListener, DisposeListener
     
     private void method540() {
 
-        if (!emulator.graphics3D.view.a.abool()) {
+      /*  if (!emulator.graphics3D.view.a.abool()) {
           this.m3gview.a1();
-        }
+        }*/
         this.aTransform902.setIdentity();
         this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
         this.aTransform902.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
-        emulator.graphics3D.view.a.a(this.aCamera901, this.aTransform902);
+        //emulator.graphics3D.view.a.a(this.aCamera901, this.aTransform902);
         //m3gview.a(this.aBackground900);
         if (this.aBoolean914) {
             new Camera().setPerspective(50.0f, (this.aRectangle903.width >> 1) / (this.aRectangle903.height >> 1), 1.0f, 1000.0f);
@@ -208,7 +208,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
             transform.postTranslate(0.0f, 0.0f, 6.0f);
         }
     }
-    
+    /*
     private void method543() {
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 1;
@@ -287,7 +287,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener
         ((Decorations)this.aShell889).setMenuBar(this.aMenu895);
         this.aShell889.addShellListener((ShellListener)new Class49(this));
     }
-    
+    */
     private void method545() {
         final GridData layoutData;
         (layoutData = new GridData()).horizontalAlignment = 4;
@@ -593,7 +593,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener
         }
         
         public final void run() {
-            Class90.method497(this.aClass90_1207, emulator.graphics3D.view.a.abool());
+           // Class90.method497(this.aClass90_1207, emulator.graphics3D.view.a.abool());
+            Class90.method497(this.aClass90_1207, false);
             while (Class90.method496(this.aClass90_1207) != null) {
                 if (((Widget)Class90.method496(this.aClass90_1207)).isDisposed()) {
                     return;

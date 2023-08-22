@@ -13,7 +13,7 @@ public final class Settings
      * 1 - lwj
      * 0 - wgl
      */
-    public static int g3d;
+   // public static int g3d;
     public static boolean enableVibration;
     public static boolean enableKeyRepeat;
     public static boolean ignoreFullScreen;
@@ -70,7 +70,7 @@ public final class Settings
     
     static {
         Settings.g2d = 1;
-        Settings.g3d = 1;
+       // Settings.g3d = 1;
         Settings.canvasScale = 100;
         Settings.frameRate = 30;
         Settings.e = -1;

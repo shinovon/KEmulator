@@ -1,49 +1,89 @@
+/*
+ * Created on Oct 23, 2005 by Stefan Haustein
+ */
 package javax.microedition.m3g;
 
-import emulator.*;
 
-public class RayIntersection
-{
-    int swerveHandle;
+public class RayIntersection {
+
+    // This is just a storage class for call-by-reference 
+    // value return from pick
+    // members are set directly in Node.pick();
     
-    protected native void finalize();
+	
+	float[] textureS = new float[2];
+	float[] textureT = new float[2];
+	
+    Node intersected;
+    float distance;
+    float normalX;
+    float normalY;
+    float normalZ = 1;
+    float[] ray = new float[6]; 
+    float dz = 1;
+    int submeshIndex = 0;
+
+	public RayIntersection()
+	{
+
+		ray[0] = 0.f;
+		ray[1] = 0.f;
+		ray[2] = 0.f;
+		ray[3] = 0.f;
+		ray[4] = 0.f;
+		ray[5] = 1.f;
+	}
     
-    RayIntersection(final int swerveHandle) {
-        super();
-        this.swerveHandle = swerveHandle;
+	public float 	getDistance(){
+	    return distance;
+	}
+	
+	public Node 	getIntersected(){
+	    return intersected;
+	}
+	
+	public float 	getNormalX(){
+	    return normalX;
+	}
+	
+	public float getNormalY(){
+        return normalY;
+	}
+	
+	public float 	getNormalZ(){
+	    return normalZ;
+	}
+
+	public void 	getRay(float[] ray){
+//    Retrieves the origin (ox oy oz) and direction (dx dy dz) of the pick ray, in that order.
+		System.arraycopy(this.ray, 0, ray, 0, 6);
+
+	}
+
+    public int 	getSubmeshIndex(){
+        return submeshIndex;
     }
-    
-    public RayIntersection() {
-        super();
-        Engine.addJavaPeer(this.swerveHandle = create(), this);
-    }
-    
-    private static native int create();
-    
-    public native float getDistance();
-    
-    public Node getIntersected() {
-        return (Node)Engine.instantiateJavaPeer(this.getIntersectedImpl());
-    }
-    
-    private native int getIntersectedImpl();
-    
-    public native int getSubmeshIndex();
-    
-    public native float getNormalX();
-    
-    public native float getNormalY();
-    
-    public native float getNormalZ();
-    
-    public native float getTextureS(final int p0);
-    
-    public native float getTextureT(final int p0);
-    
-    public native void getRay(final float[] p0);
-    
-    static {
-        i.a("jsr184client");
-        Engine.cacheFID(RayIntersection.class, 3);
-    }
+
+	public float getTextureS(int index)
+	{
+		if (index < 0 || index >= textureS.length)
+		{
+			return 0;
+			//throw new IndexOutOfBoundsException();
+		}
+
+		return textureS[index];
+	}
+
+	public float getTextureT(int index)
+	{
+		if (index < 0 || index >= textureT.length)
+		{
+			return 0;
+		//	throw new IndexOutOfBoundsException();
+		}
+
+		return textureT[index];
+	}
+
 }

@@ -51,17 +51,7 @@ class Helpers
         return graphics.getClipHeight();
     }
     
-    static void bindTarget(final Graphics3D graphics3D, final Graphics graphics, final int n, final int n2, final int n3, final int n4) {
-        bindTarget(graphics3D, graphics.getImage().getWidth(), graphics.getImage().getHeight(), Helpers.pixels = graphics.getImage().getData(), n, n2, n3, n4);
-    }
-    
-    static void releaseTarget(final Graphics3D graphics3D, final Graphics graphics) {
-        graphics.getImage().setData(Helpers.pixels);
-        Helpers.pixels = null;
-    }
-    
-    private static native void bindTarget(final Graphics3D p0, final int p1, final int p2, final int[] p3, final int p4, final int p5, final int p6, final int p7);
-    
+
     static Image createImage(final byte[] array, final int n, final int n2) throws IOException {
         throw new IOException("Corrupt PNG or unsupported image type");
     }

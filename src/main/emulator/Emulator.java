@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.MessageBox;
 public class Emulator
 {
 	// is 64 bit version
-	public static final boolean _X64_VERSION = false;
+	public static final boolean _X64_VERSION = true;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -97,10 +97,10 @@ public class Emulator
 	private static String midletName;
 	private static Thread vlcCheckerThread;
 	
-	public static final String titleVersion = "2.12.9";
-	public static final String aboutVersion = "v2.12.9";
-	public static final int numericVersion = 12;
-	public static final String propVersion = "2.12.9";
+	public static final String titleVersion = "2.13";
+	public static final String aboutVersion = "v2.13";
+	public static final int numericVersion = 13;
+	public static final String propVersion = "2.13";
 
 	private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -429,19 +429,18 @@ public class Emulator
     
     public static String getInfoString() {
     	if(_X64_VERSION) {
-            return "KEmulatorNNx64 " + aboutVersion+"\n\n"
+            return "KEmulator nnmod " + aboutVersion+"\n\n"
             		+ "\tMulti-Platform\n"
             		+ "\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n"
                 	+ UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
                 	+ "\tMIDP 2.0 (JSR118)\n"
                 	+ "\tNokiaUI 1.4\n"
-                	+ "\tSamsung 1.0\n"
                 	+ "\tSprint 1.0\n"
                 	+ "\tWMA 1.0(JSR120)\n"
-                	+ "(no 3d support)"
+                    + "\tM3G 1.1(JSR184)"
                 	;
     	}
-        return "KEmulator v1.0.3" + "\n\tnnmod "+aboutVersion+"\n\n\t" + 
+        return "KEmulator nnmod "+aboutVersion+"\n\n\t" +
     	UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" + 
     	UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
     	+ "\tMIDP 2.0(JSR118)\n"
@@ -451,7 +450,6 @@ public class Emulator
     	+ "\tWMA 1.0(JSR120)\n"
     	+ "\tSensor(JSR256)\n"
     	+ "\tM3G 1.1(JSR184)\n"
-    	+ "\tOpenGL ES(JSR239)\n"
     	+ "\tMascot Capsule"
     	;
     }
@@ -708,7 +706,7 @@ public class Emulator
     private static void setProperties() {
         System.setProperty("microedition.configuration", "CLDC-1.1");
         System.setProperty("microedition.profiles", "MIDP-2.0");
-    	if(!_X64_VERSION) System.setProperty("microedition.m3g.version", "1.1");
+    	System.setProperty("microedition.m3g.version", "1.1");
         System.setProperty("microedition.encoding", Settings.fileEncoding);
         if (System.getProperty("microedition.locale") == null) {
             System.setProperty("microedition.locale", Settings.locale);
@@ -825,6 +823,7 @@ public class Emulator
         System.setProperty("com.nokia.pointer.number", "0");
         System.setProperty("kemulator.hwid", getHWID());
         System.setProperty("microedition.amms.version", "1.0");
+        if(_X64_VERSION) System.setProperty("kemulator.x64", "true");
 	    try {
 	        Webcam w = Webcam.getDefault();
 	        if(w != null) {
@@ -869,7 +868,29 @@ public class Emulator
 		if(_X64_VERSION) {
 			System.out.println("loading swt libary");
 			loadSWTLibrary();
+            loadJOGLLibrary();
 		}
+        /*
+        NativeLibLoader.setLoadingAction(new NativeLibLoader.LoaderAction() {
+
+            public void loadLibrary(String s, String[] strings, boolean b, boolean b1) {
+                if (b) {
+                    for(int var5 = 0; var5 < strings.length; ++var5) {
+                        try {
+                            System.loadLibrary(strings[var5]);
+                        } catch (UnsatisfiedLinkError var7) {
+                            if (!b1 && var7.getMessage().indexOf("already loaded") < 0) {
+                                throw var7;
+                            }
+                        }
+                    }
+                }
+
+                System.loadLibrary(s);
+            }
+        });
+
+         */
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.method709();
@@ -966,7 +987,32 @@ public class Emulator
         Emulator.emulatorimpl.getEmulatorScreen().method553(true);
         EmulatorImpl.dispose();
     }
-    
+
+    private static void loadJOGLLibrary() {
+        String osn = System.getProperty("os.name").toLowerCase();
+        String osa = System.getProperty("os.arch").toLowerCase();
+        String os =
+                osn.contains("win") ? "windows" :
+                        osn.contains("mac") ? "macosx" :
+                                osn.contains("linux") || osn.contains("nix") ? "linux" :
+                                        null;
+        if(os == null) {
+        //    throw new RuntimeException("unsupported os: " + osn);
+            return;
+        }
+        if(!osa.contains("amd64") && !osa.contains("86") && !osa.contains("armv6")) {
+        //    throw new RuntimeException("unsupported arch: " + osa);
+            return;
+        }
+        String arch = osn.contains("macosx") ? "universal" : osa.contains("amd64") ? "amd64" : osa.contains("86") ? "i586" : osa;
+        String suffix = "-natives-" + os + "-" + arch + ".jar";
+
+        addToClassPath("gluegen-rt.jar");
+        addToClassPath("gluegen-rt" + suffix);
+        addToClassPath("jogl-all.jar");
+        addToClassPath("jogl-all" + suffix);
+    }
+
     private static void loadSWTLibrary() {
     	String osn = System.getProperty("os.name").toLowerCase();
         String osa = System.getProperty("os.arch").toLowerCase();
@@ -983,21 +1029,24 @@ public class Emulator
         }
         String arch = osa.contains("amd64") ? "x86_64" : osa.contains("86") ? "x86" : osa;
         String swtFileName = "swt-" + os + "-" + arch + ".jar";
+        addToClassPath(swtFileName);
 
+	}
+
+    private static void addToClassPath(String s) {
         try {
             URLClassLoader classLoader = (URLClassLoader) Emulator.class.getClassLoader();
             Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             addUrlMethod.setAccessible(true);
-            File f = new File("./"+swtFileName);
+            File f = new File("./"+s);
             System.out.println(f.exists() + " " + f.getCanonicalPath());
             URL swtFileUrl = f.toURL();
             addUrlMethod.invoke(classLoader, swtFileUrl);
         }
         catch(Exception e) {
-            throw new RuntimeException(swtFileName, e);
+            throw new RuntimeException(s, e);
         }
-	}
-
+    }
 	private static void tryToSetDevice(final String deviceName) {
         Emulator.deviceName = deviceName;
         if (!Devices.setPlatform(Emulator.deviceName)) {
@@ -1026,10 +1075,10 @@ public class Emulator
                     Emulator.commandLineArguments[i] = "";
                 }
                 else if (key.equals("wgl")) {
-                    Settings.g3d = 0;
+                 //   Settings.g3d = 0;
                 }
                 else if (key.equals("lwj")) {
-                    Settings.g3d = 1;
+                 //   Settings.g3d = 1;
                 }
                 else if (key.equalsIgnoreCase("log")) {
                     Settings.showLogFrame = true;

@@ -54,7 +54,7 @@ MouseTrackListener
     private Menu menuTool;
     private Menu menuView;
     private Menu menu2dEngine;
-    private Menu menu3dEngine;
+   // private Menu menu3dEngine;
     private Menu aMenu1018;
     private Menu menuInterpolation;
     public static int locX;
@@ -81,8 +81,8 @@ MouseTrackListener
     private String aString989;
     MenuItem awt2dMenuItem;
     MenuItem swt2dMenuItem;
-    MenuItem swt3dMenuItem;
-    MenuItem lwj3dMenuItem;
+    //MenuItem swt3dMenuItem;
+ //   MenuItem lwj3dMenuItem;
     MenuItem loadJarMenuItem;
     MenuItem loadWithConsoleMenuItem;
     MenuItem loadAutoPlayMenuItem;
@@ -126,7 +126,7 @@ MouseTrackListener
     MenuItem aMenuItem959;
     MenuItem aMenuItem960;
     MenuItem aMenuItem961;
-    MenuItem aMenuItem962;
+   // MenuItem aMenuItem962;
     MenuItem aMenuItem963;
     MenuItem aMenuItem964;
     MenuItem networkKillswitchMenuItem;
@@ -185,7 +185,7 @@ MouseTrackListener
         this.menuTool = null;
         this.menuView = null;
         this.menu2dEngine = null;
-        this.menu3dEngine = null;
+       // this.menu3dEngine = null;
         this.aMenu1018 = null;
         this.aStringArray981 = new String[] { emulator.UILocale.uiText("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), emulator.UILocale.uiText("MAIN_INFO_BAR_RUNNING", "RUNNING"), emulator.UILocale.uiText("MAIN_INFO_BAR_PAUSED", "PAUSED") };
         EmulatorScreen.display = EmulatorImpl.getDisplay();
@@ -840,8 +840,8 @@ MouseTrackListener
         this.aMenuItem960.addSelectionListener((SelectionListener)this);
         (this.aMenuItem961 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_MEMORY", "Memory View"));
         this.aMenuItem961.addSelectionListener((SelectionListener)this);
-        (this.aMenuItem962 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_M3GVIEW", "M3G View"));
-        this.aMenuItem962.addSelectionListener((SelectionListener)this);
+      //  (this.aMenuItem962 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_M3GVIEW", "M3G View"));
+      //  this.aMenuItem962.addSelectionListener((SelectionListener)this);
         (this.aMenuItem963 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_SMS", "SMS Console"));
         this.aMenuItem963.addSelectionListener((SelectionListener)this);
         (this.aMenuItem964 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_SENSOR", "Sensor Simulator"));
@@ -988,6 +988,7 @@ MouseTrackListener
         this.swt2dMenuItem.setSelection(Settings.g2d == 0);
         this.swt2dMenuItem.addSelectionListener((SelectionListener)this);
         menuItem7.setMenu(this.menu2dEngine);
+      /*
         final MenuItem menuItem8;
         (menuItem8 = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.uiText("MENU_MDILET_3DENGINE", "3D Graphics Engine"));
         menuItem8.setMenu(this.menu3dEngine = new Menu((Decorations)this.shell, 4194308));
@@ -1000,6 +1001,8 @@ MouseTrackListener
         this.swt3dMenuItem.addSelectionListener((SelectionListener)this);
         this.swt3dMenuItem.setEnabled(false);
         menuItem8.setMenu(this.menu3dEngine);
+
+       */
         new MenuItem(this.menuMidlet, 2);
         (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.uiText("MENU_MIDLET_SUSPEND", "Suspend") + "\tS");
         this.suspendMenuItem.addSelectionListener((SelectionListener)this);
@@ -1271,7 +1274,7 @@ MouseTrackListener
                 return;
             }
             if (menuItem.equals(this.restartMenuItem)) {
-                Emulator.loadGame(null, Settings.g2d, Settings.g3d, false);
+                Emulator.loadGame(null, Settings.g2d, 1, false);
             }
             else if (menuItem.equals(this.loadJarMenuItem) || (equals = menuItem.equals(this.loadWithConsoleMenuItem))) {
                 method554();
@@ -1281,7 +1284,7 @@ MouseTrackListener
                 final String open2;
                 if ((open2 = fileDialog2.open()) != null) {
                     Settings.recordedKeysFile = null;
-                    Emulator.loadGame(open2, Settings.g2d, Settings.g3d, equals);
+                    Emulator.loadGame(open2, Settings.g2d, 1, equals);
                 }
                 this.method571();
             }
@@ -1305,7 +1308,7 @@ MouseTrackListener
                             }
                         }
                         Settings.recordedKeysFile = open3;
-                        Emulator.loadGame(s, Settings.g2d, Settings.g3d, false);
+                        Emulator.loadGame(s, Settings.g2d, 1, false);
                     }
                 }
                 this.method571();
@@ -1361,7 +1364,7 @@ MouseTrackListener
         else if (parent.equals(this.menu2dEngine)) {
             if (menuItem.equals(this.awt2dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g2d != 1) {
-                    Emulator.loadGame(null, 1, Settings.g3d, false);
+                    Emulator.loadGame(null, 1, 1, false);
                     return;
                 }
                 Settings.g2d = 1;
@@ -1370,7 +1373,7 @@ MouseTrackListener
             }
             else if (menuItem.equals(this.swt2dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g2d != 0) {
-                    Emulator.loadGame(null, 0, Settings.g3d, false);
+                    Emulator.loadGame(null, 0, 1, false);
                     return;
                 }
                 Settings.g2d = 0;
@@ -1378,7 +1381,7 @@ MouseTrackListener
                 this.swt2dMenuItem.setSelection(true);
             }
         }
-        else if (parent.equals(this.menu3dEngine)) {
+        else /*if (parent.equals(this.menu3dEngine)) {
             if (menuItem.equals(this.swt3dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g3d != 0) {
                     Emulator.loadGame(null, Settings.g2d, 0, false);
@@ -1398,7 +1401,7 @@ MouseTrackListener
                 this.lwj3dMenuItem.setSelection(true);
             }
         }
-        else if (parent.equals(this.menuView)) {
+        else */if (parent.equals(this.menuView)) {
             if (menuItem.equals(this.aMenuItem949)) {
                 new Class54().method454(this.shell);
                 return;
@@ -1483,14 +1486,14 @@ MouseTrackListener
                     }
                     ((Class83)Emulator.getEmulator().getMessage()).method481(this.shell);
                 }
-                else if (menuItem.equals(this.aMenuItem962)) {
+                else/* if (menuItem.equals(this.aMenuItem962)) {
                     if (((EmulatorImpl)Emulator.getEmulator()).method827().method494()) {
                         ((EmulatorImpl)Emulator.getEmulator()).method827().method507();
                         return;
                     }
                     ((EmulatorImpl)Emulator.getEmulator()).method827().method493();
                 }
-                else {
+                else*/ {
                     if (menuItem.equals(this.xrayViewMenuItem)) {
                         Settings.xrayView = this.xrayViewMenuItem.getSelection();
                         return;
@@ -1550,7 +1553,7 @@ MouseTrackListener
         this.aMenuItem959.setEnabled(this.pauseState != 0);
         this.aMenuItem961.setEnabled(this.pauseState != 0);
         this.aMenuItem960.setEnabled(this.pauseState != 0);
-        this.aMenuItem962.setEnabled(this.pauseState != 0);
+        //this.aMenuItem962.setEnabled(this.pauseState != 0);
         this.startRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter == null);
         this.stopRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter != null);
         this.connectNetworkMenuItem.setEnabled(this.pauseState != 0 && !Emulator.getNetMonitor().b());

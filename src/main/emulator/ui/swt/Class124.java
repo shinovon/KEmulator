@@ -1,6 +1,6 @@
 package emulator.ui.swt;
 
-import emulator.graphics3D.view.*;
+//import emulator.graphics3D.view.*;
 import org.eclipse.swt.widgets.*;
 
 final class Flusher implements Runnable
@@ -13,7 +13,8 @@ final class Flusher implements Runnable
     }
     
     public final void run() {
-        Class90.method497(this.aClass90_1207, a.abool());
+       // Class90.method497(this.aClass90_1207, a.abool());
+        Class90.method497(this.aClass90_1207, false);
         while (Class90.method496(this.aClass90_1207) != null) {
             if (((Widget)Class90.method496(this.aClass90_1207)).isDisposed()) {
                 return;
