@@ -99,7 +99,6 @@ public class Graphics3D {
     			properties.put("maxSpriteCropDimension", new Integer(1024));
     			properties.put("maxTransformsPerVertex", new Integer(1000));
     			properties.put("numTextureUnits", new Integer(10));
-                
     			properties.put("maxViewportHeight", new Integer(2048));
     			properties.put("maxViewportWidth", new Integer(2048));
                 

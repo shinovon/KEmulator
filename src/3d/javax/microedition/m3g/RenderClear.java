@@ -27,7 +27,7 @@ public class RenderClear {
             gl.glDepthMask(true);
             gl.glColorMask(true, true, true, true);
             gl.glClearColor(0,0,0, 0);
-            gl.glClear(GL.GL_COLOR_BUFFER_BIT | (depthBuffer ? GL.GL_DEPTH_BUFFER_BIT : 0));
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT /*| (depthBuffer ? GL.GL_DEPTH_BUFFER_BIT : 0)*/);
         
           //  gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
             return;
