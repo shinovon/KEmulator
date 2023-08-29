@@ -590,10 +590,11 @@ public final class EventQueue implements Runnable {
 			}
 		}
 		
-		private void parseAction(int[] o) {
+		private void parseAction(int[] o) { 
 			if(o == null) return;
 			Displayable d = Emulator.getCurrentDisplay().getCurrent();
-			boolean canv = d == Emulator.getCanvas();
+			if(d == null) return;
+			boolean canv = d instanceof Canvas;
 			if(o[3] > 0) {
 				// keyboard
 				int n = (int) o[1];
