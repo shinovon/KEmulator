@@ -53,7 +53,7 @@ public abstract class MIDlet
             }
         	//Emulator.checkPermission("midlet.platformrequest");
             if(s.startsWith("file:///root/")) {
-            	s = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
+            	s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
             }
             // Vika touch support
             if(s.startsWith("vlc.exe")) {

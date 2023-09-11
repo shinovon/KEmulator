@@ -101,8 +101,9 @@ public class Emulator
 	public static final String aboutVersion = "v2.13";
 	public static final int numericVersion = 13;
 	public static final String propVersion = "2.13";
+    private static int dialogResult;
 
-	private static void loadRichPresence() {
+    private static void loadRichPresence() {
 		if(!rpcEnabled)
 			return;
 		rpc = DiscordRPC.INSTANCE;
@@ -179,10 +180,13 @@ public class Emulator
 	}
 
     public static boolean showConfirmDialog(String message, String title) {
+        emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
         MessageBox messageBox = new MessageBox(emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
         messageBox.setMessage(message);
         messageBox.setText(title);
-        return messageBox.open() == SWT.YES;
+        dialogResult = messageBox.open();
+        });
+        return dialogResult == SWT.YES;
     }
     
 	public static void checkPermission(String x) {
@@ -252,14 +256,18 @@ public class Emulator
 		}
 	}
 
-    public static boolean requestURLAccess(String s) {
-        MessageBox messageBox = new MessageBox(emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
-        if(s.length() > 100) {
-            s = s.substring(0, 100) + "...";
-        }
-        messageBox.setMessage("MIDlet wants to open URL: " + s);
-        messageBox.setText("Security");
-        return messageBox.open() == SWT.YES;
+    public static boolean requestURLAccess(final String url) {
+        emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
+            MessageBox messageBox = new MessageBox(emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
+            String s = url;
+            if (s.length() > 100) {
+                s = s.substring(0, 100) + "...";
+            }
+            messageBox.setMessage("MIDlet wants to open URL: " + s);
+            messageBox.setText("Security");
+            dialogResult = messageBox.open();
+        });
+        return dialogResult == SWT.YES;
     }
 
 	public Emulator() {
