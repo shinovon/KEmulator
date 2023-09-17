@@ -1,19 +1,16 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.custom.*;
-import emulator.debug.*;
+
 import javax.microedition.m3g.*;
 import javax.microedition.m3g.Group;
 import javax.microedition.m3g.Transform;
 
-import emulator.*;
-import emulator.UILocale;
 import emulator.debug.Memory;
 
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.*;
 import emulator.graphics3D.*;
-import emulator.graphics3D.b;
 
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;

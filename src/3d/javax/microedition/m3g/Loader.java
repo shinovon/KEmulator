@@ -1,249 +1,391 @@
-/*
- * Created on Oct 22, 2005 by Stefan Haustein
- */
 package javax.microedition.m3g;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
+import javax.microedition.lcdui.*;
+import java.io.*;
+import java.util.*;
+import emulator.*;
 
-import javax.microedition.lcdui.Image;
-
-public class Loader {
-
-	static private byte[] FILE_IDENTIFIER = { 
-		(byte)0xAB, 0x4A, 0x53, 0x52, 0x31, 0x38, 0x34, (byte)0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
-
-	private int verMajor;
-	private int verMinor;
-	boolean hasExternalReferences;
-	private int totalFileSize;
-	private int approximateContentSize;
-	private String authoringField;
-	Vector objects = new Vector();
-    Hashtable roots = new Hashtable();
-    String uri;
-	
-	
-	public static Object3D[] load(byte[] data, int offset){
-//    Deserializes Object3D instances from the given byte array, starting at the given offset.
-		try{
-			return new Loader(null).load(new ByteArrayInputStream(data, offset, data.length-offset));
-		} catch (IOException e) {
-			throw new RuntimeException("Error loading m3g file from byte array: "+e.toString());
-		}
-	}
-	
-	
-	public static Object3D[] load(String name){
-//    Deserializes Object3D instances from the named resource.
-		try {
-			InputStream inputStream = Loader.class.getResourceAsStream(name);
-			if (inputStream == null) {
-				inputStream = openInputStream(name);
-			}
-			return new Loader(name).load(inputStream);
-		} catch (IOException e) {
-			throw new RuntimeException("Error loading m3g file from "+name+": "+e.toString());
-		}
-	}
-
-	static InputStream openInputStream(final String s) throws IOException {
-		return Helpers.openInputStream(s);
-	}
-
-	private Loader(String uri){
-		this.uri = uri;
-	}
-	
-	
-	
-	private Object3D[] load(InputStream ris) throws IOException {
-		PushbackInputStream pis = new PushbackInputStream(ris);
-		
-		int c = pis.read();
-		pis.unread(c);
-		
-		if(c == 137){
-			Image image = Image.createImage(pis);
-
-			Image2D i2d = new Image2D(Image2D.RGBA, image);
-			
-			return new Object3D[]{ i2d};
-		}
-		
-		M3gInputStream is = new M3gInputStream(this,pis);
-		for(int i = 0; i < FILE_IDENTIFIER.length; i++){
-			if((byte) is.read() != FILE_IDENTIFIER[i]){
-				throw new RuntimeException("File Identifier mismatch at position "+i);
-			}
-		}
-		
-		// read sections
-		while(true){
-			
-			//Byte   CompressionScheme       1
-			//UInt32 TotalSectionLength      4
-			//UInt32 UncompressedLength      4
-			//Byte[] Objects
-			//UInt32 Checksum                4
-			
-			int compressionScheme = is.read();
-			if(compressionScheme == -1) break;
-			
-			int totalSectionLength = is.readInt32();
-			int uncompressedLength = is.readInt32();
-			
-			byte[] data = new byte[totalSectionLength - 13];
-			
-			is.readFully(data);
-			
-			byte[] uncompressed;
-			
-			switch(compressionScheme){
-			case 0:
-				uncompressed = data;
-				break;
-			case 1:
-                try{
-                    Inflater decompresser = new Inflater();
-                    decompresser.setInput(data, 0, data.length);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                
-                    byte[] buf = new byte[8096];
-                    while(!decompresser.finished()){
-                        baos.write(buf, 0, decompresser.inflate(buf));
-                    }                
-                    uncompressed = baos.toByteArray(); 
-                 } catch (DataFormatException e) {
-                    throw new IOException(e.toString());
-                 }
-                break;
-                    default:
-				throw new RuntimeException("Unsupported compression scheme: "+compressionScheme);
-			}
-			
-			readSection(new M3gInputStream(this, new ByteArrayInputStream(uncompressed)));
-			
-			
-			int checksum = is.readInt32();
-		}
-        
-        
-        Object3D[] result = new Object3D[roots.size()];
-        Enumeration e = roots.elements();
-        for(int i = 0; i < result.length; i++){
-            result[i] = (Object3D) e.nextElement();
-        }
-		return result;
-	}
-	
-	Object3D createObject(int type){
-	switch(type){
-	case 1: return new AnimationController();
-	case 2: return new AnimationTrack();
-	case 3: return new Appearance();
-	case 4: return new Background();
-	case 5: return new Camera();
-    case 6: return new CompositingMode();
-    case 7: return new Fog();
-    case 8: return new PolygonMode();
-    case 9: return new Group();
-    case 10: return new Image2D();
-    case 11: return new TriangleStripArray();
-    case 12: return new Light();
-    case 13: return new Material();
-    case 14: return new Mesh();
-    case 15: return new MorphingMesh();
-    case 16: return new SkinnedMesh();
-    case 17: return new Texture2D();
-    case 18: return new Sprite3D();
-    case 19: return new KeyframeSequence();
-    case 20: return new VertexArray();
-    case 21: return new VertexBuffer();
-    case 22: return new World();
+public class Loader
+{
+    int swerveHandle;
+    static final int ERROR_NONE = -1;
+    static final int ERROR_ABORT = -2;
+    static final int ERROR_NOTFOUND = -3;
+    static final int ERROR_READ = -4;
+    static final int ERROR_UNABLETOCREATE = -5;
+    static final int ERROR_UNABLETOFREE = -6;
+    static final int ERROR_INVALIDHEADER = -7;
+    static final int ERROR_INVALIDBODY = -8;
+    static final int ERROR_INVALIDCHECKSUM = -9;
+    static final int ERROR_UNKNOWN = -10;
+    static final int ERROR_DATAPASTEOF = -11;
+    static byte[] pngIdentifier;
+    static int m3gIdentifierLength;
+    static int BLOCK_SIZE;
     
-	default: throw new RuntimeException("Unrecognized object type:"+type);
-	}
-	}
-	
-	
-	private void readSection(M3gInputStream is) throws IOException{
-        
-		Object3D object;
-		while(true){
-			// Byte   ObjectType
-			// UInt32 Length
-		    // Byte[] Data
-			
-			int objectType = is.read();
-			if(objectType == -1) break;
-			int length = is.readInt32();
-			
-			switch(objectType){
-			case 0: 
-				//Byte[2] VersionNumber
-				//Boolean hasExternalReferences
-				//UInt32  TotalFileSize
-				//UInt32  ApproximateContentSize
-				//String  AuthoringField
-				
-				verMajor = is.read();
-				verMinor = is.read();
-				hasExternalReferences = is.readBoolean();
-				totalFileSize = is.readInt32();
-				approximateContentSize = is.readInt32();
-				authoringField = is.readString();
-				
-				objects.addElement("Header");
-				
-				break;
-			case 255:
-				String uri = is.readString();
-				uri = concatPath(this.uri, uri);
-				
-				
-				object = new Loader(uri).load(openInputStream(uri))[0];
-
-                objects.addElement(object);
-                object.id = objects.size();
-                roots.put(new Integer(object.id), object);
-				
-				break;
-			default:
-//                System.out.println("Reading object type: "+objectType);
-				object = createObject(objectType);
-                 objects.addElement(object);
-                 object.id = objects.size();
-				object.load(is);
-                 roots.put(new Integer(object.id), object);
-//				System.out.println("loaded: "+object+": "+object.getProperties());   
-			}
-
-
-		}
-	}
-	private static String concatPath(String base, String file) {
-		if (base == null || file.startsWith("/") || file.startsWith("\\")
-				|| (file.length() >= 2 && file.charAt(1) == ':') || isUrl(file))
-			return file;
-
-		int cut = Math.max(base.lastIndexOf('/'), base.lastIndexOf('\\'));
-
-		return base.substring(0, cut + 1) + file;
-	}
-
-
-	private static boolean isUrl(String path) {
-		String test = path.toLowerCase();
-		return test.startsWith("http://") || test.startsWith("https://") || test.startsWith("file:");
-	}
-
+    protected native void finalize();
+    
+    Loader() {
+        super();
+    }
+    
+    Loader(final int swerveHandle) {
+        super();
+        this.swerveHandle = swerveHandle;
+    }
+    
+    private static native int createImpl();
+    
+    native boolean getbContainsExtensions();
+    
+    native int onDataStart(final boolean p0);
+    
+    native int onDataEnd();
+    
+    native int onData(final byte[] p0, final int p1, final int p2);
+    
+    native void onError(final int p0);
+    
+    native int getRootCount();
+    
+    private native int getRootImpl(final int p0);
+    
+    native int getXREFName(final byte[] p0);
+    
+    native void resolveXREF(final Object3D p0);
+    
+    private static native int getImage2DEncoding(final Image p0);
+    
+    native int getAuthoringField(final byte[] p0);
+    
+    public static Object3D[] load(final byte[] array, final int n) throws IOException {
+        if (n < 0 || n >= array.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        return loadHelper(array, n, true);
+    }
+    
+    private static Object3D[] loadHelper(final byte[] array, int n, final boolean b) throws IOException {
+        try {
+            final Loader loader = (Loader)Engine.instantiateJavaPeer(createImpl());
+            final int n2 = n;
+            final byte[] array2 = new byte[Loader.m3gIdentifierLength];
+            int n3;
+            try {
+                n3 = loader.onDataStart(b);
+                int n4 = array.length - n;
+                if (n3 == -1 && n4 > Loader.m3gIdentifierLength) {
+                    if ((n3 = loader.onData(array, n, Loader.m3gIdentifierLength)) == -1) {
+                        System.arraycopy(array, n, array2, 0, Loader.m3gIdentifierLength);
+                    }
+                    n4 -= Loader.m3gIdentifierLength;
+                    n += Loader.m3gIdentifierLength;
+                }
+                if (n3 == -1) {
+                    n3 = loader.onData(array, n, n4);
+                }
+                if (n3 >= 0) {
+                    loader.processXREFs(null);
+                    n += n3;
+                    n3 = loader.onData(array, n, n4 - n3);
+                }
+                if (n3 == -11) {
+                    n3 = -1;
+                }
+                if (n3 == -1) {
+                    n3 = loader.onDataEnd();
+                }
+            }
+            catch (SecurityException ex) {
+                loader.onError(-10);
+                if (ex.getMessage() != null) {
+                    throw new SecurityException(ex.getMessage());
+                }
+                throw new SecurityException();
+            }
+            catch (Exception ex2) {
+          	  ex2.printStackTrace();
+                loader.onError(-10);
+                if (ex2.getMessage() != null) {
+                    throw new IOException(ex2.getMessage());
+                }
+                throw new IOException();
+            }
+            if (n3 == -1) {
+                final Object3D[] roots;
+                if ((roots = loader.createRoots()) != null) {
+                    adjustUserObject(roots[0], "javax.microedition.m3g.Loader.Header", array2);
+                }
+                return roots;
+            }
+            Image2D image2D;
+            if ((image2D = createPNGImage2D(array, n2, array.length)) == null) {
+                image2D = createImage2D(array, n2, array.length);
+            }
+            if (image2D != null) {
+                return new Object3D[] { image2D };
+            }
+            return null;
+        }
+        catch (SecurityException ex4) {
+            final SecurityException ex3 = ex4;
+            if (ex4.getMessage() != null) {
+                throw new SecurityException(ex3.getMessage());
+            }
+            throw new SecurityException();
+        }
+        catch (Exception ex6) {
+        	  ex6.printStackTrace();
+            final Exception ex5 = ex6;
+            if (ex6.getMessage() != null) {
+                throw new IOException(ex5.getMessage());
+            }
+            throw new IOException();
+        }
+    }
+    
+    public static Object3D[] load(final String s) throws IOException {
+        if (s == null) {
+            throw new NullPointerException();
+        }
+        return loadHelper(s, true);
+    }
+    
+    private static Object3D[] loadHelper(final String s, final boolean b) throws IOException {
+        InputStream inputStream = null;
+        try {
+            final Loader loader = (Loader)Engine.instantiateJavaPeer(createImpl());
+            final byte[] array = new byte[Loader.m3gIdentifierLength];
+            int n;
+            try {
+                if ((inputStream = loader.getClass().getResourceAsStream(s)) == null) {
+                    inputStream = openInputStream(s);
+                }
+                n = loader.onDataStart(b);
+                final byte[] array2 = new byte[Loader.BLOCK_SIZE];
+                final int read;
+                if (n == -1 && (read = inputStream.read(array2, 0, Loader.m3gIdentifierLength)) != -1 && (n = loader.onData(array2, 0, read)) == -1) {
+                    System.arraycopy(array2, 0, array, 0, Loader.m3gIdentifierLength);
+                }
+                int read2;
+                while (n == -1 && (read2 = inputStream.read(array2, 0, Loader.BLOCK_SIZE)) != -1) {
+                    if ((n = loader.onData(array2, 0, read2)) >= 0) {
+                        loader.processXREFs(s);
+                        n = loader.onData(array2, n, read2 - n);
+                    }
+                }
+                if (n == -1) {
+                    n = loader.onDataEnd();
+                }
+            }
+            catch (SecurityException ex) {
+                loader.onError(-10);
+                if (ex.getMessage() != null) {
+                    throw new SecurityException(ex.getMessage());
+                }
+                throw new SecurityException();
+            }
+            catch (Exception ex2) {
+            	  ex2.printStackTrace();
+                loader.onError(-10);
+                ex2.printStackTrace();
+                if (ex2.getMessage() != null) {
+                    throw new IOException(ex2.getMessage());
+                }
+                throw new IOException();
+            }
+            if (n == -1) {
+                final Object3D[] roots;
+                if ((roots = loader.createRoots()) != null) {
+                    adjustUserObject(roots[0], "javax.microedition.m3g.Loader.Header", array);
+                }
+                return roots;
+            }
+            if (inputStream != null) {
+                inputStream.close();
+                inputStream = null;
+            }
+            Image2D image2D;
+            if ((image2D = createPNGImage2D(s)) == null) {
+                image2D = createImage2D(s);
+            }
+            if (image2D != null) {
+                return new Object3D[] { image2D };
+            }
+            return null;
+        }
+        catch (SecurityException ex4) {
+            final SecurityException ex3 = ex4;
+            if (ex4.getMessage() != null) {
+                throw new SecurityException(ex3.getMessage());
+            }
+            throw new SecurityException();
+        }
+        catch (Exception ex6) {
+        	  ex6.printStackTrace();
+            final Exception ex5 = ex6;
+            if (ex6.getMessage() != null) {
+                throw new IOException(ex5.getMessage());
+            }
+            throw new IOException();
+        }
+        finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+    }
+    
+    private void processXREFs(final String s) throws IOException {
+        byte[] array = null;
+        int i;
+        do {
+            if ((i = this.getXREFName(null)) != -1) {
+                if (array == null || array.length != i) {
+                    array = new byte[i];
+                }
+                this.getXREFName(array);
+                String resolveURI;
+                if (isRelative(resolveURI = new String(array, "UTF-8"))) {
+                    if (s == null) {
+                        throw new IOException("XREF resource [" + resolveURI + "] has relative URI.");
+                    }
+                    resolveURI = resolveURI(s, resolveURI);
+                }
+                final Object3D[] loadHelper;
+                if ((loadHelper = loadHelper(resolveURI, this.getbContainsExtensions())) == null) {
+                    throw new IOException("XREF resource [" + resolveURI + "] contained no roots.");
+                }
+                adjustUserObject(loadHelper[0], "javax.microedition.m3g.Loader.ExternalReference.URI", array);
+                this.resolveXREF(loadHelper[0]);
+            }
+        } while (i != -1);
+    }
+    
+    private static boolean isRelative(final String s) {
+        final int length;
+        if ((length = s.length()) == 0 || s.startsWith("//")) {
+            return true;
+        }
+        if (s.startsWith("/")) {
+            return false;
+        }
+        int n = 0;
+        char char1;
+        while ((char1 = s.charAt(n)) != ':' && char1 != '/' && char1 != '?' && char1 != '#' && ++n != length) {}
+        return char1 != ':';
+    }
+    
+    private static String resolveURI(final String s, final String s2) {
+        int length;
+        for (length = s.length(); length > 0 && s.charAt(length - 1) != '/'; --length) {}
+        if (length > 0) {
+            return s.substring(0, length) + s2;
+        }
+        return '/' + s2;
+    }
+    
+    private Object3D[] createRoots() {
+        int rootCount;
+        if ((rootCount = this.getRootCount()) == 0) {
+            return null;
+        }
+        final Object3D[] array = new Object3D[rootCount];
+        while (rootCount-- > 0) {
+            array[rootCount] = (Object3D)Engine.instantiateJavaPeer(this.getRootImpl(rootCount));
+        }
+        final byte[] array2 = new byte[this.getAuthoringField(null)];
+        this.getAuthoringField(array2);
+        adjustUserObject(array[0], "javax.microedition.m3g.Loader.HeaderObject.AuthoringField", array2);
+        return array;
+    }
+    
+    static void adjustUserObject(final Object3D object3D, final String s, final Object o) {
+        Object userObject;
+        if ((userObject = object3D.getUserObject()) == null) {
+            userObject = new Hashtable<String, Object>();
+            object3D.setUserObject(userObject);
+        }
+        ((Hashtable<String, Object>)userObject).put(s, o);
+    }
+    
+    static InputStream openInputStream(final String s) throws IOException {
+        return Helpers.openInputStream(s);
+    }
+    
+    private static boolean hasPNGIdentifier(final byte[] array, final int n, final int n2) {
+        if (Loader.pngIdentifier.length > n2) {
+            return false;
+        }
+        for (int i = 0; i < Loader.pngIdentifier.length; ++i) {
+            if (Loader.pngIdentifier[i] != array[n + i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    static Image2D createPNGImage2D(final String s) throws IOException {
+        InputStream inputStream = null;
+        try {
+            if ((inputStream = (Loader.class.getResourceAsStream(s))) == null) {
+                inputStream = openInputStream(s);
+            }
+            final byte[] array = new byte[Loader.BLOCK_SIZE];
+            final int read;
+            if ((read = inputStream.read(array, 0, Loader.pngIdentifier.length)) != -1 && !hasPNGIdentifier(array, 0, read)) {
+                return null;
+            }
+            byte[] array2 = new byte[read];
+            System.arraycopy(array, 0, array2, 0, read);
+            int read2;
+            while ((read2 = inputStream.read(array, 0, Loader.BLOCK_SIZE)) != -1) {
+                final byte[] array3 = new byte[array2.length + read2];
+                System.arraycopy(array2, 0, array3, 0, array2.length);
+                System.arraycopy(array, 0, array3, array2.length, read2);
+                array2 = array3;
+            }
+            return new Image2D(array2, 0, array2.length);
+        }
+        finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+    }
+    
+    static Image2D createPNGImage2D(final byte[] array, final int n, final int n2) {
+        if (!hasPNGIdentifier(array, n, n2)) {
+            return null;
+        }
+        return new Image2D(array, n, n2);
+    }
+    
+    static Image2D createImage2D(final String s) throws IOException {
+        final Image image;
+        if ((image = Helpers.createImage(s)) != null) {
+            return createImage2D(image);
+        }
+        return null;
+    }
+    
+    static Image2D createImage2D(final byte[] array, final int n, final int n2) throws IOException {
+        final Image image;
+        if ((image = Helpers.createImage(array, n, n2)) != null) {
+            return createImage2D(image);
+        }
+        return null;
+    }
+    
+    static Image2D createImage2D(final Image image) {
+        return new Image2D(getImage2DEncoding(image), image);
+    }
+    
+    static {
+        i.a("jsr184client");
+        Engine.cacheFID(Loader.class, 2);
+        Loader.pngIdentifier = new byte[] { -119, 80, 78, 71, 13, 10, 26, 10 };
+        Loader.m3gIdentifierLength = 12;
+        Loader.BLOCK_SIZE = 4096;
+    }
 }

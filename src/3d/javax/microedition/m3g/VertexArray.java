@@ -1,120 +1,45 @@
 package javax.microedition.m3g;
 
-import java.io.IOException;
-
-/*
- * Created on 30.06.2005 by Stefan Haustein
- */
-
-/**
- * @author Stefan Haustein
- */
 public class VertexArray extends Object3D {
-
-    int numComponents;
-    int numVertices;
-	int componentSize;
-	byte[] data1;
-	short[] data2;
-	
-	public VertexArray(int numVertices, int numComponents, int componentSize) {
-        this.numVertices = numVertices;
-        this.numComponents = numComponents;
-		this.componentSize = componentSize;
-		switch(componentSize){
-		case 1: data1 = new byte[numVertices*numComponents];break;
-		case 2: data2 = new short[numVertices*numComponents]; break;
-		default: throw new IllegalArgumentException();
-		}
+	VertexArray(int n) {
+		super(n);
 	}
 
-	VertexArray() {
-    }
-
-    public void set(int firstVertex, int numVertices, short[] vert) {
-		System.arraycopy(vert, 0, data2, firstVertex, numVertices * numComponents );
+	public VertexArray(int n, int n2, int n3) {
+		this(create(n, n2, n3));
+		Engine.addJavaPeer(this.swerveHandle, this);
+		this.ii = (getClass() != VertexArray.class);
 	}
 
-	public void set(int firstVertex, int numVertices, byte[] vert) {
-		System.arraycopy(vert, 0, data1, firstVertex, numVertices * numComponents);
+	private static native int create(int paramInt1, int paramInt2, int paramInt3);
+
+	public native int getVertexCount();
+
+	public native int getComponentCount();
+
+	public native int getComponentType();
+
+	public void get(int n, int n2, short[] array) {
+		get16(n, n2, array);
 	}
 
-//    @Override
-    void load(M3gInputStream is) throws IOException {
-        //Byte          componentSize;
-        //Byte          componentCount;
-        //Byte          encoding;
-        //UInt16        vertexCount;
-        //FOR each vertex...
-//            IF componentSize==1, THEN
-//                IF encoding==0, THEN
-//                      Byte[componentCount] components;
-//                ELSE IF encoding==1, THEN
-//                      Byte[componentCount] componentDeltas;
-//                END
-//            ELSE
-//                IF encoding==0, THEN
-//                      Int16[componentCount] components;
-//                ELSE IF encoding==1, THEN
-//                      Int16[componentCount] componentDeltas;
-//                END
-//            END
-//        END        
-        
-        _load(is);
-        componentSize = is.read();
-        numComponents = is.read();
-        int encoding = is.read();
-        numVertices = is.readUInt16();
-        
-        if(componentSize == 1){
-            data1 = new byte[numVertices*numComponents];
-        }
-        else{
-            data2 = new short[numVertices*numComponents];
-        }
-        
-        int pos = 0;
-        for(int i = 0; i < numVertices; i++){
-            for(int j = 0; j < numComponents; j++){
-                int v = componentSize == 1 ? is.read(): is.readInt16();
-                if(i == 0 || encoding == 0){
-                    if(componentSize == 1){
-                        data1[pos] = (byte) v;
-                    }
-                    else{
-                        data2[pos] = (short) v;
-                    }
-                }
-                else{
-                    if(componentSize == 1){
-                        data1[pos] = (byte) (data1[pos-componentSize] + v);
-                    }
-                    else{
-                        data2[pos] = (byte) (data2[pos-componentSize] + v);
-                    }
-                }
-                pos++;
-            }
-        }
-    }
+	private native void get16(int paramInt1, int paramInt2, short[] paramArrayOfShort);
 
-//    @Override
-    public Object3D duplicate() {
-        VertexArray dup = new VertexArray(numVertices, numComponents, componentSize);
-        if(componentSize == 1){
-            System.arraycopy(data1, 0, dup.data1, 0, data1.length);
-        }
-        else{
-            System.arraycopy(data2, 0, dup.data2, 0, data2.length);
-        }
+	public void set(int n, int n2, short[] array) {
+		set16(n, n2, array);
+	}
 
-        return _duplicate(dup);
-    }
+	private native void set16(int paramInt1, int paramInt2, short[] paramArrayOfShort);
 
-//    @Override
-    public int getReferences(Object3D[] refs) {
-        return _getReferences(refs);
-    }
-	
+	public void get(int n, int n2, byte[] array) {
+		get8(n, n2, array);
+	}
+
+	private native void get8(int paramInt1, int paramInt2, byte[] paramArrayOfByte);
+
+	public void set(int n, int n2, byte[] array) {
+		set8(n, n2, array);
+	}
+
+	private native void set8(int paramInt1, int paramInt2, byte[] paramArrayOfByte);
 }
