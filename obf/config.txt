@@ -2,9 +2,9 @@
 -outjars '.\KEmulator.jar'
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
--libraryjars '..\x64home\swt-win32-x86.jar'
--libraryjars '..\x64home\jogl-all.jar'
--libraryjars '..\x64home\gluegen-rt.jar'
+#-libraryjars '..\x64home\swt-win32-x86.jar'
+#-libraryjars '..\x64home\jogl-all.jar'
+#-libraryjars '..\x64home\gluegen-rt.jar'
 
 -target 1.8
 #-dontshrink
@@ -24,16 +24,9 @@
 
 -keep public class com.mascotcapsule.micro3d.v3 { public protected *; }
 
--keep public class com.nokia.mid.impl.** { public protected *; }
--keep public class com.nokia.mid.location.* { public protected *; }
--keep public class com.nokia.mid.payments.* { public protected *; }
--keep public class com.nokia.mid.s40.location.* { public protected *; }
--keep public class com.nokia.mid.sound.* { public protected *; }
--keep public class com.nokia.mid.ui.* { public protected *; }
--keep public class com.nokia.mid.ui.utils.* { public protected *; }
--keep public class com.nokia.mid.ui.lcdui.* { public protected *; }
--keep public class com.nokia.mj.impl.utils.* { public protected *; }
--keep public class com.nokia.microedition.media.* { public protected *; }
+-keep public class com.nokia.mid.** { public protected *; }
+-keep public class com.nokia.mj.** { public protected *; }
+-keep public class com.nokia.microedition.** { public protected *; }
 
 -keep public class com.samsung.util.* { public protected *; }
 
@@ -87,7 +80,7 @@
 -keep class org.lwjgl.* { *; }
 
 -keep class com.sun.** { *; }
--keep class javax.** { *; }
+#-keep class javax.** { *; }
 -keep class com.jogamp.** { *; }
 -keep class gluegen.** { *; }
 
