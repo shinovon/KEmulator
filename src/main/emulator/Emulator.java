@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.MessageBox;
 public class Emulator
 {
 	// is 64 bit version
-	public static final boolean _X64_VERSION = true;
+	public static final boolean _X64_VERSION = false;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -428,11 +428,11 @@ public class Emulator
     }
     
     public static String getTitleVersionString() {
-        return "KEm" + (_X64_VERSION ? " nnX64" : "nnmod")+ " " + titleVersion;
+        return "KEm" + (_X64_VERSION ? " nnX64" : "NN")+ " " + titleVersion;
     }
     
     public static String getCmdVersionString() {
-        return (_X64_VERSION ? "KEmnnX64" : "KEmnnmod")+ " " + titleVersion;
+        return (_X64_VERSION ? "KEmulator nnX64" : "KEmulator nnmod") + " " + titleVersion;
     }
     
     public static String getInfoString() {
@@ -464,9 +464,9 @@ public class Emulator
     
     public static String getAboutString() {
     	if(_X64_VERSION) {
-            return "KEmulator v1.0.3" + "\nmulti-platform mod\n by nnmidlets (Shinovon)\n\t\t"+aboutVersion+"\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+            return "KEmulator v1.0.3" + "\nmulti-platform mod\n by nnproject (Shinovon)\n\t\t"+aboutVersion+"\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     	}
-        return "KEmulator v1.0.3" + "\n\tmod by shinovon "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+        return "KEmulator v1.0.3" + "\n\tnnmod "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     }
     
     public static void getLibraries() {

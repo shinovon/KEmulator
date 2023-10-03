@@ -18,9 +18,6 @@ $[Program parameters]
 -awt    use AWT Graphics 2D Engine
 -swt    use SWT GDI+ 2D Engine
 
--lwj    use LWJ OpenGL 3D Engine
--wgl    use SWT OpenGL 3D Engine
-
 -fontname	specify system font name
 -fontsmall	specify small font size
 -fontmedium	specify medium font size
@@ -45,10 +42,9 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.13 [2023.08.22]
-Moved to M3G on JOGL Implementation
-Removed JSR 239 support
-Removed M3G View and 3D engine choice
+$nnmod v2.13 [2023.10.03]
+MIDlet.platformRequest fix
+Multi-platform m3g test (nnx64)
 
 $nnmod v2.12.9 [2023.07.03]
 Added network kill switch in Tool menu
@@ -70,7 +66,7 @@ Updated swt library to 4.7
 Increased file path size limit
 Fixed player initialization from file
 Fixed IOException when creating wav player from url
-Fixed for linux (nnx64)
+Fixes for linux (nnx64)
 Fixed profiler
 Fixed RecordStore.listRecordStores (Doom 2 RPG fix)
 Canvas fps limiter fix
