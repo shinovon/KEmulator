@@ -428,7 +428,7 @@ public class Emulator
     }
     
     public static String getTitleVersionString() {
-        return "KEm" + (_X64_VERSION ? " nnX64" : "NN")+ " " + titleVersion;
+        return "KEm" + (_X64_VERSION ? " nnX64" : "od")+ " " + titleVersion;
     }
     
     public static String getCmdVersionString() {

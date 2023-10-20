@@ -42,9 +42,9 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.13 [2023.10.03]
+$nnmod v2.13 [2023.10.20]
 MIDlet.platformRequest fix
-Multi-platform m3g test (nnx64)
+UI fixes
 
 $nnmod v2.12.9 [2023.07.03]
 Added network kill switch in Tool menu
