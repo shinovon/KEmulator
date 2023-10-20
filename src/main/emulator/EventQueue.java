@@ -545,7 +545,8 @@ public final class EventQueue implements Runnable {
 		//private Object inputWriteLock = new Object();
 		private int length;
 		private int count;
-		
+		private boolean flag;
+
 		private InputThread() {
 			elements = new Object[length = 16];
 		}
@@ -563,6 +564,7 @@ public final class EventQueue implements Runnable {
 				//System.out.println("Growed input buffer from " + (count + 1) + " to " + length);
 			}
 			elements[count++] = o;
+			flag = true;
 			synchronized(readLock) {
 				readLock.notify();
 			}
@@ -571,6 +573,7 @@ public final class EventQueue implements Runnable {
 		public void run() {
 			try {
 				while(running) {
+					if(!flag)
 					synchronized(readLock) {
 						readLock.wait();
 					}
@@ -578,11 +581,12 @@ public final class EventQueue implements Runnable {
 						parseAction((int[]) elements[0]);
 						System.arraycopy(elements, 1, elements, 0, length-1);
 						elements[--count] = null;
+						flag = false;
 					}
 					synchronized(writeLock) {
 						writeLock.notify();
 					}
-					Thread.sleep(1);
+					//Thread.sleep(1);
 				}
 			} catch (Throwable e) {
 				System.out.println("Exception in Input Thread!");

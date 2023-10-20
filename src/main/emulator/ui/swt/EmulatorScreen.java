@@ -278,6 +278,8 @@ MouseTrackListener
     	        	Thread.sleep(10);
     	        }
         		} catch (Exception e) {
+                    System.out.println("Exception in keyboard poll thread");
+                    e.printStackTrace();
         		}
         	}
         }.start();
