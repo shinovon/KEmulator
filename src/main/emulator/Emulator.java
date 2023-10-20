@@ -97,10 +97,10 @@ public class Emulator
 	private static String midletName;
 	private static Thread vlcCheckerThread;
 	
-	public static final String titleVersion = "2.13";
-	public static final String aboutVersion = "v2.13";
+	public static final String titleVersion = "2.13.1";
+	public static final String aboutVersion = "v2.13.1";
 	public static final int numericVersion = 13;
-	public static final String propVersion = "2.13";
+	public static final String propVersion = "2.13.1";
     private static int dialogResult;
 
     private static void loadRichPresence() {

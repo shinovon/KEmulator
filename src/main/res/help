@@ -42,6 +42,10 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$nnmod v2.13.1 [2023.10.21]
+Input event queue fix
+m3g fix
+
 $nnmod v2.13 [2023.10.20]
 MIDlet.platformRequest fix
 UI fixes
