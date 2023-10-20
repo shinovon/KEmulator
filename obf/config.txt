@@ -22,7 +22,7 @@
 # APIS
 -keep public class javax.microedition.** { public protected *; }
 
--keep public class com.mascotcapsule.micro3d.v3 { public protected *; }
+-keep class com.mascotcapsule.micro3d.v3 { public protected *; }
 
 -keep public class com.nokia.mid.** { public protected *; }
 -keep public class com.nokia.mj.** { public protected *; }
@@ -55,34 +55,34 @@
 -keep class ru.woesss.** { *; }
 
 # LIBRARIES
--keep class club.minnced.discord.rpc.** { *; }
+-keep public class club.minnced.discord.rpc.** { public protected *; }
 
 -keep class com.sun.jna.** { *; }
 
 -keep class com.sun.jna.Native { *; }
 
--keep,allowshrinking class com.github.** { *; }
+-keep,allowshrinking public class com.github.** { *; }
 
 -keep class org.eclipse.swt.** { *; }
 
--keep class org.eclipse.opengl.* { *; }
+-keep public class org.eclipse.opengl.** { public protected *; }
 
--keep class org.lwjgl.opengl.* { *; }
+-keep public class org.lwjgl.opengl.** { public protected *; }
 
--keep public class uk.co.caprica.vlcj.** { *; }
+-keep public class uk.co.caprica.vlcj.** { public protected *; }
 
 -keep class org.bridj.** { *; }
 
--keep,allowshrinking class org.slf4j.** { *; }
+-keep,allowshrinking public class org.slf4j.** { public protected *; }
 
 -keep,allowshrinking public class org.objectweb.** { *; }
 
--keep class org.lwjgl.* { *; }
+-keep,allowshrinking public class org.lwjgl.** { public protected *; }
 
--keep class com.sun.** { *; }
+#-keep class com.sun.** { *; }
 #-keep class javax.** { *; }
--keep class com.jogamp.** { *; }
--keep class gluegen.** { *; }
+-keep public class com.jogamp.** { *; }
+-keep public class gluegen.** { *; }
 
 # EMULATOR CLASSES
 -keep public class emulator.graphics2D.awt.* { public protected *; }
