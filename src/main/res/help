@@ -734,10 +734,11 @@ swt-4.5.2
 asm-3.0
 lwjgl-2.9.4
 java-discord-rpc-2.0.1
-jna-4.4.0
+jna-5.2.0
 webcam-capture-0.3.12
 slf4j-api-1.7.2
 bridj-0.7.0
+vlcj-4.7.1
 
 ==================
 $[Bug Report]
