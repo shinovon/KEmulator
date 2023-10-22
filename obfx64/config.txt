@@ -1,0 +1,110 @@
+-injars '.\..\KEmulator.jar'
+-outjars '.\KEmulator.jar'
+
+-libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
+-libraryjars '..\x64home\swt-win32-x86.jar'
+-libraryjars '..\x64home\jogl-all.jar'
+-libraryjars '..\x64home\gluegen-rt.jar'
+
+-target 1.8
+#-dontshrink
+-dontoptimize
+-printmapping '.\mapping.txt'
+-overloadaggressively
+#-keeppackagenames **
+-keepattributes SourceFile,LineNumberTable
+#-keepparameternames
+-dontnote
+-dontwarn
+-defaultpackage 'kemnn'
+-renamesourcefileattribute A
+
+# APIS
+-keep public class javax.microedition.** { public protected *; }
+
+-keep class com.mascotcapsule.micro3d.v3 { public protected *; }
+
+-keep public class com.nokia.mid.** { public protected *; }
+-keep public class com.nokia.mj.** { public protected *; }
+-keep public class com.nokia.microedition.** { public protected *; }
+
+-keep public class com.samsung.util.* { public protected *; }
+
+-keep public class com.sprintpcs.** { public protected *; }
+
+-keep public class com.sun.cdc.** { public protected *; }
+
+-keep public class org.apache.tools.zip.* { *; }
+
+-keep public class javax.wireless.** { public protected *; }
+
+-keep public class javax.obex.** { public protected *; }
+
+-keep public class javax.bluetooth.** { public protected *; }
+
+-keep public class ru.nnproject.kemulator.** { *; }
+
+-keep class javax.microedition.m3g.** { *; }
+
+-keep class net.rim.device.api.** { *; }
+
+-keep class net.java.games.input.** { *; }
+
+-keep class com.mascotcapsule.** { *; }
+
+-keep class ru.woesss.** { *; }
+
+# LIBRARIES
+-keep public class club.minnced.discord.rpc.** { public protected *; }
+
+-keep class com.sun.jna.** { *; }
+
+-keep class com.sun.jna.Native { *; }
+
+-keep,allowshrinking public class com.github.** { *; }
+
+-keep class org.eclipse.swt.** { *; }
+
+-keep public class org.eclipse.opengl.** { public protected *; }
+
+-keep public class org.lwjgl.opengl.** { public protected *; }
+
+-keep public class uk.co.caprica.vlcj.** { public protected *; }
+
+-keep class org.bridj.** { *; }
+
+-keep,allowshrinking public class org.slf4j.** { public protected *; }
+
+-keep,allowshrinking public class org.objectweb.** { *; }
+
+-keep,allowshrinking public class org.lwjgl.** { public protected *; }
+
+#-keep class com.sun.** { *; }
+#-keep class javax.** { *; }
+-keep public class com.jogamp.** { *; }
+-keep public class gluegen.** { *; }
+
+# EMULATOR CLASSES
+-keep public class emulator.graphics2D.awt.* { public protected *; }
+
+-keep class emulator.custom.subclass.* { *; }
+
+-keep class emulator.custom.CustomMethod { public *; }
+
+-keep class emulator.debug.Profiler { *; }
+
+-keep class javazoom.jl.player.JavaSoundAudioDevice
+
+-keep class emulator.i { *; }
+
+-keep class emulator.Emulator { public static *; }
+
+# Keep - Applications. Keep all application classes, along with their 'main' methods.
+-keepclasseswithmembers public class * {
+    public static void main(java.lang.String[]);
+}
+
+# Keep - Native method names. Keep all native class/method names.
+-keepclasseswithmembers,includedescriptorclasses,allowshrinking class * {
+    native <methods>;
+}

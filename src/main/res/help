@@ -42,6 +42,9 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$nnmod v2.13.1 (nnx64) [2023.10.22]
+Edited links in about window
+
 $nnmod v2.13.1 [2023.10.21]
 Input event queue fix
 m3g fix
