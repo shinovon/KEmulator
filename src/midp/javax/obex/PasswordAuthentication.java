@@ -2,20 +2,20 @@ package javax.obex;
 
 public class PasswordAuthentication
 {
-    private byte[] aByteArray514;
-    private byte[] aByteArray515;
+    private byte[] username;
+    private byte[] password;
     
-    public PasswordAuthentication(final byte[] aByteArray514, final byte[] aByteArray515) {
+    public PasswordAuthentication(final byte[] username, final byte[] password) {
         super();
-        this.aByteArray514 = aByteArray514;
-        this.aByteArray515 = aByteArray515;
+        this.username = username;
+        this.password = password;
     }
     
     public byte[] getUserName() {
-        return this.aByteArray514;
+        return this.username;
     }
     
     public byte[] getPassword() {
-        return this.aByteArray515;
+        return this.password;
     }
 }

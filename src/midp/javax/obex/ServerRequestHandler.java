@@ -2,7 +2,7 @@ package javax.obex;
 
 public class ServerRequestHandler
 {
-    private long aLong1168;
+    private long connectionID;
     
     protected ServerRequestHandler() {
         super();
@@ -13,11 +13,11 @@ public class ServerRequestHandler
     }
     
     public void setConnectionID(final long aLong1168) {
-        this.aLong1168 = aLong1168;
+        this.connectionID = aLong1168;
     }
     
     public long getConnectionID() {
-        return this.aLong1168;
+        return this.connectionID;
     }
     
     public int onConnect(final HeaderSet set, final HeaderSet set2) {
