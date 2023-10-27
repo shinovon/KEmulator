@@ -310,7 +310,7 @@ public final class a
         try
         {
           c localc;
-		if (a(localc = new c(arrayOfByte1)))
+		if (a(localc = new c(array)))
           {
             if (aBoolean) {
               System.out.println("AMR mode");
