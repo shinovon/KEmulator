@@ -64,9 +64,9 @@ public class Manager
     		requireLibVlc();
         	return new VLCPlayerImpl(inputStream, s);
         }
-//        if(s.equals("audio/amr") && isLibVlcSupported()) {
-//        	return new VLCPlayerImpl(inputStream, s);
-//        }
+        if(s.equals("audio/amr") && isLibVlcSupported() && Emulator._X64_VERSION) {
+        	return new VLCPlayerImpl(inputStream, s);
+        }
 		// buffer
 		boolean buf = Settings.playerBufferAll;
 		if (buf)
