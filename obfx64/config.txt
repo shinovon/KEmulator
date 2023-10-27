@@ -54,6 +54,12 @@
 
 -keep class ru.woesss.** { *; }
 
+-keep class com.motorola.** { *; }
+
+-keep class com.nec.** { *; }
+
+-keep class com.siemens.** { *; }
+
 # LIBRARIES
 -keep public class club.minnced.discord.rpc.** { public protected *; }
 
