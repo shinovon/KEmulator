@@ -25,7 +25,7 @@ public class Sound {
     private PlayerListener playerListener = new PlayerListener() {
         public void playerUpdate(Player p0, String p1, Object p2) {
             if (Sound.this.soundListener == null) return;
-            if ("stopped".equals(p1) || "endOfMedia".equals(p1)) {
+            if ("endOfMedia".equals(p1)) {
                 Sound.this.soundListener.soundStateChanged(Sound.this, 1);
             }
         }
