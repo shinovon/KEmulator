@@ -42,8 +42,10 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.13.1 (nnx64) [2023.10.22]
+$nnmod v2.13.2 [2023.]
 Edited links in about window
+Added stub api classes from thirdparty.jar
+WAV player repeat fix
 
 $nnmod v2.13.1 [2023.10.21]
 Input event queue fix
