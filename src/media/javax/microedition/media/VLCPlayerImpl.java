@@ -115,6 +115,8 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	static {
 	}
 
+	private boolean started;
+
 	public static void draw(Graphics g, Object obj) {
 		if (inst != null) {
 			if (obj == inst.canvas) {
@@ -539,6 +541,13 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	protected void notifyListeners(final String s, final Object o) {
+		if("started".equals(s)) {
+			if(started) return;
+			started = true;
+		}
+		if("stopped".equals(s) || "endOfMedia".equals(s)) {
+			started = false;
+		}
 		//System.out.println("notifyListeners " + s + " " + o);
 		if (listeners == null)
 			return;
@@ -985,12 +994,12 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	public void error(MediaPlayer mediaPlayer) {
-		Manager.log("mediaPlayer error");
+		Manager.log("vlcplayer error");
 		notifyListeners("error", null);
 	}
 
 	public void playing(MediaPlayer mediaPlayer) {
-		Manager.log("started");
+		Manager.log("vlcplayer started");
 		notifyListeners("started", getMediaTime());
 	}
 
