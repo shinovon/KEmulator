@@ -607,9 +607,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		}
 		if (this.state != 400) {
 			if(sequence != null) {
-				if (this.sequence instanceof Sequence && midiCompleted) {
-					setMediaTime(0);
-				} else if (this.sequence instanceof Player && mp3Complete) {
+				if ((this.sequence instanceof Sequence && midiCompleted)
+				|| (this.sequence instanceof Player && mp3Complete)
+				|| (this.sequence instanceof Clip && soundCompleted)) {
 					setMediaTime(0);
 				}
 				(this.playerThread = new Thread(this)).start();
