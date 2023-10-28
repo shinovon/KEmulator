@@ -589,7 +589,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				this.listeners = new Vector();
 				this.timeBase = Manager.getSystemTimeBase();
 			} else {
-				throw new MediaException("Invalid content type: " + contentType);
+				throw new MediaException("Unsupported content type: " + contentType);
 			}
 		}
 	}
