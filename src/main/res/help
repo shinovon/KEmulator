@@ -42,12 +42,11 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.13.2 [2023.]
-Edited links in about window
+$nnmod v2.13.2 [2023.10.28]
 Added stub api classes from thirdparty.jar
-WAV player repeat fix
+WAV player restart fix
 AMR decoder fix, was broken after decompiling
-VLCPlayer started notify duplicate fix
+VLC player start event duplicate fix
 com.nokia.mid.sound.Sound not handling endOfMedia event fix
 
 $nnmod v2.13.1 [2023.10.21]
@@ -750,5 +749,4 @@ vlcj-4.7.1
 
 ==================
 $[Bug Report]
-vk.com @shinovon
-telegram @shinovon
+telegram @nnmidletschat / @shinovon
