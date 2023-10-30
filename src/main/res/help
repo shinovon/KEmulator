@@ -51,23 +51,23 @@ com.nokia.mid.sound.Sound not handling endOfMedia event fix
 
 $nnmod v2.13.1 [2023.10.21]
 Input event queue fix
-m3g fix
+m3g fix (v2.13 bug)
 
 $nnmod v2.13 [2023.10.20]
-MIDlet.platformRequest fix
+MIDlet.platformRequest fix (v2.12.8 bug)
 UI fixes
 
 $nnmod v2.12.9 [2023.07.03]
 Added network kill switch in Tool menu
 ConnectionNotFoundException() no such method error fix
 Form.set() NullPointerException fix
-sizeChanged() not calling fix
-IMEI dialog fix
+Canvas.sizeChanged() not calling fix (v2.12.8 bug)
+IMEI dialog fix (v2.12.8 bug)
 Added TextAntiAliasing property
 Ignoring WAV realize error
 
 $nnmod v2.12.8 [2023.05.17]
-Fixed keyboard polling
+Keyboard polling fix (v2.12.7 bug)
 Added Display.flashBacklight(int)
 libvlc loading fix
 
@@ -93,19 +93,19 @@ $nnmod v2.12.6 [2022.06.06]
 Added Mascot Capsule patch by woesss
 
 $nnmod v2.12.5 [2022.05.27]
-Fixed sticky numpad keys
+Sticky numpad keys fix attempt
 Added Streaming Data Source support for VLC player
 Fixed Options UI scaling
 
 $nnmod v2.12.4 [2022.02.08]
-Keys repeating fix
+Repeating keys fix attempt
 
 $nnmod v2.12.3 [2022.02.08]
 Fixed "NoSuchMethodException" on 3D use
 
 $nnmod v2.12.2 [2022.01.31]
-Fixed keyboard input events
-Fixed keys cache
+Keyboard input events fix attempt
+Fixed keys cache (v2.12 bug)
 
 $nnmod v2.12.1 [2022.01.30]
 Added JSR75 PIM stub
@@ -142,7 +142,7 @@ Camera resolutions & orientations properties added
 $nnmod v2.10.4 [2021.10.10]
 Added 50% scale in MemoryView images
 Alert commands fixed
-Removed unusual debugging
+Removed unnecessary debugging
 
 $nnmod v2.10.3 [2021.10.08]
 MemoryView now stores more objects and arrays
