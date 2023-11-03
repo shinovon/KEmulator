@@ -81,8 +81,8 @@ public class Emulator
 	private static Info[] midiDeviceInfo;
 	public static String midipath;
 	public static String iconPath;
-	public static int screenBrightness = 100;
-	public static int inactivityTimer = 0;
+	//public static int screenBrightness = 100;
+	//public static int inactivityTimer = 0;
 
 	protected static DiscordRPC rpc;
 	private static long presenceStartTimestamp;
@@ -444,20 +444,21 @@ public class Emulator
                 	+ "\tMIDP 2.0 (JSR118)\n"
                 	+ "\tNokiaUI 1.4\n"
                 	+ "\tSprint 1.0\n"
-                	+ "\tWMA 1.0(JSR120)\n"
-                    + "\tM3G 1.1(JSR184)"
+                	+ "\tWMA 1.0 (JSR120)\n"
+                    + "\t(no 3d support)"
                 	;
     	}
         return "KEmulator nnmod "+aboutVersion+"\n\n\t" +
     	UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" + 
     	UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
-    	+ "\tMIDP 2.0(JSR118)\n"
+    	+ "\tMIDP 2.0 (JSR118)\n"
     	+ "\tNokiaUI 1.4\n"
     	+ "\tSamsung 1.0\n"
     	+ "\tSprint 1.0\n"
-    	+ "\tWMA 1.0(JSR120)\n"
-    	+ "\tSensor(JSR256)\n"
-    	+ "\tM3G 1.1(JSR184)\n"
+    	+ "\tWMA 1.0 (JSR120)\n"
+    	+ "\tSensor (JSR256)\n"
+    	+ "\tM3G 1.1 (JSR184)\n"
+        + "\tOpenGL ES (JSR239)\n"
     	+ "\tMascot Capsule"
     	;
     }

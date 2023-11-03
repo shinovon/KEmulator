@@ -269,6 +269,7 @@ public class Displayable {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
 		final int translateX = graphics.getTranslateX();
 		final int translateY = graphics.getTranslateY();
+		/*
 		if (Emulator.screenBrightness < 100) {
 			graphics.translate(-translateX, -translateY);
 			int alpha = (int) (((double) (100 - Emulator.screenBrightness) / 100d) * 255d);
@@ -277,6 +278,7 @@ public class Displayable {
 			graphics.fillRect(0, 0, getWidth(), getHeight());
 			graphics.translate(translateX, translateY);
 		}
+		 */
 		if (!this.aBoolean18) {
 			return;
 		}

@@ -33,12 +33,14 @@ public class DeviceControl {
 	}
 
 	public static void setLights(int paramInt1, int paramInt2) {
+		/*
 		if (paramInt2 != Emulator.screenBrightness) {
 			Emulator.getEmulator().getLogStream()
 			.println("*** com.nokia.mid.ui.DeviceControl.setLights(" + paramInt1 + "," + paramInt2 + ") ***");
 		}
+		 */
 		_resetInactivity();
-		Emulator.screenBrightness = paramInt2;
+		//Emulator.screenBrightness = paramInt2;
 	}
 
 	public static void startVibra(int paramInt, long paramLong) {

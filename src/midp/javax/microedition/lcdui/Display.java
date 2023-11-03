@@ -103,18 +103,19 @@ public class Display
         Emulator.getEventQueue().queue(2);
     }
 	public boolean flashBacklight(int n) {
-		Emulator.screenBrightness = 100;
+		//Emulator.screenBrightness = 100;
 		resetTimer();
 		return false;
 	}
     
     public boolean flashBacklight(final long n) {
-    	Emulator.screenBrightness = 100;
+    	//Emulator.screenBrightness = 100;
     	resetTimer();
         return false;
     }
 
 	public void fadeOut() {
+		/*
     	if(true) return;
     	if(fadeComplete) {
 			Emulator.screenBrightness = 15;
@@ -137,9 +138,12 @@ public class Display
     	} else {
 			Emulator.screenBrightness = 100;
     	}
+
+		 */
 	}
     
     public void resetTimer() {
+		/*
     	if(true) return;
 		from = System.currentTimeMillis(); 
     	fadeComplete = false;
@@ -150,19 +154,22 @@ public class Display
     		 }
     	}
     	pausd = false;
+
+		 */
 	}
     
     public int getInactiveTime() {
     	if(true) return 0;
 		return (int) (System.currentTimeMillis() - from);
 	}
-    
+    /*
 	private static int lerp(final int start, final int target, final int mul, final int div) {
 		return start + ((target - start) * mul / div);
 	}
-    
+    */
     private void timerTick() {
     	if(true) return;
+		/*
 		int i = (int) (System.currentTimeMillis() - from);
 		if(Emulator.inactivityTimer <= 0) {
 			return;
@@ -201,6 +208,8 @@ public class Display
             }
             Emulator.getCanvas().invokeHideNotify();
 		}
+
+		 */
 	}
     
     private void p() {
