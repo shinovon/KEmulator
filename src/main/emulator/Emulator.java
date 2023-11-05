@@ -1048,7 +1048,7 @@ public class Emulator
             Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             addUrlMethod.setAccessible(true);
             File f = new File("./"+s);
-            System.out.println(f.exists() + " " + f.getCanonicalPath());
+            //System.out.println(f.exists() + " " + f.getCanonicalPath());
             URL swtFileUrl = f.toURL();
             addUrlMethod.invoke(classLoader, swtFileUrl);
         }
