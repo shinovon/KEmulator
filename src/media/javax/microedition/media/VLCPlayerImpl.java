@@ -1,19 +1,15 @@
 package javax.microedition.media;
 
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ComponentSampleModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DirectColorModel;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,37 +26,23 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.stream.ImageOutputStreamImpl;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.media.control.FramePositioningControl;
 import javax.microedition.media.control.VideoControl;
 import javax.microedition.media.control.VolumeControl;
 import javax.microedition.media.protocol.DataSource;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
-import com.sun.jna.StringArray;
 
 import emulator.Emulator;
-import emulator.i;
 import emulator.custom.CustomJarResources;
 import emulator.graphics2D.awt.d;
-import uk.co.caprica.vlcj.binding.LibVlc;
-import uk.co.caprica.vlcj.binding.RuntimeUtil;
-import uk.co.caprica.vlcj.binding.internal.libvlc_instance_t;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
-import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.media.MediaRef;
 import uk.co.caprica.vlcj.media.TrackType;
 import uk.co.caprica.vlcj.media.callback.CallbackMedia;
-import uk.co.caprica.vlcj.media.callback.nonseekable.NonSeekableInputStreamMedia;
 import uk.co.caprica.vlcj.media.callback.seekable.RandomAccessFileMedia;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventListener;
-import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.videosurface.CallbackVideoSurface;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
@@ -68,7 +50,6 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCall
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.RenderCallback;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32BufferFormat;
 import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters;
-import uk.co.caprica.vlcj.support.version.LibVlcVersion;
 
 public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
@@ -490,7 +471,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	private void update() {
-		Emulator.getEventQueue().queue(1);
+		Emulator.getEventQueue().queueRepaint();
 	}
 
 	public void stop() throws IllegalStateException, MediaException {

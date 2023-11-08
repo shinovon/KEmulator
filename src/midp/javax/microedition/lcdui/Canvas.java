@@ -4,7 +4,6 @@ import com.nokia.mid.ui.DeviceControl;
 
 import emulator.*;
 import emulator.lcdui.BoundsUtils;
-import emulator.ui.swt.Property;
 
 public abstract class Canvas extends Displayable
 {
@@ -97,7 +96,7 @@ public abstract class Canvas extends Displayable
         super.w = Emulator.getEmulator().getScreen().getWidth();
         super.h = Emulator.getEmulator().getScreen().getHeight();
         this.sizeChanged(n, n2);
-        Emulator.getEventQueue().queue(1);
+        Emulator.getEventQueue().queueRepaint();
     }
     
     protected abstract void paint(final Graphics p0);
@@ -115,7 +114,7 @@ public abstract class Canvas extends Displayable
         if (this != Emulator.getCurrentDisplay().getCurrent()) {
             return;
         }
-        Emulator.getEventQueue().queue(1);
+        Emulator.getEventQueue().queueRepaint();
     }
     
     public void repaint(final int n, final int n2, final int n3, final int n4) {

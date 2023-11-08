@@ -3,7 +3,6 @@ package javax.microedition.lcdui;
 import java.util.*;
 import javax.microedition.midlet.*;
 import emulator.*;
-import emulator.ui.swt.EmulatorScreen;
 
 public class Display
 {
@@ -76,7 +75,7 @@ public class Display
                 }
                 Emulator.setCanvas((Canvas)d);
                 Emulator.getEventQueue().queue(15);
-                Emulator.getEventQueue().queue(1);
+                Emulator.getEventQueue().queueRepaint();
                 //Emulator.getEventQueue().waitRepainted2();
             }
             else if (d instanceof Screen) {
@@ -220,7 +219,7 @@ public class Display
 	                    ((Canvas)Display.current).setFullScreenMode(true);
 	                }
 	                Emulator.getEventQueue().queue(15);
-	                Emulator.getEventQueue().queue(1);
+	                Emulator.getEventQueue().queueRepaint();
 	                Emulator.getEventQueue().waitRepainted2();
 	            }
 	            else if (Display.current instanceof Screen) {

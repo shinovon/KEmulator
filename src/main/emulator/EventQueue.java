@@ -1,8 +1,5 @@
 package emulator;
 
-import java.util.ArrayList;
-import java.util.Vector;
-
 import javax.microedition.lcdui.*;
 import net.rim.device.api.system.*;
 import emulator.graphics2D.*;
@@ -26,7 +23,9 @@ public final class EventQueue implements Runnable {
 	protected long last;
 	public static Runnable aRunnable1219;
 	private InputThread input = new InputThread();
+	private RepaintThread repaint = new RepaintThread();
 	private Thread inputThread;
+	private Thread repaintThread;
 
 	public EventQueue() {
 		super();
@@ -42,6 +41,8 @@ public final class EventQueue implements Runnable {
 		this.repainted = true;
 		(this.eventThread = new Thread(this)).setPriority(2);
 		this.eventThread.start();
+		(this.repaintThread = new Thread(repaint)).setPriority(2);
+		this.repaintThread.start();
 		(this.inputThread = new Thread(input)).setPriority(3);
 		this.inputThread.start();
 		/*
@@ -233,9 +234,13 @@ public final class EventQueue implements Runnable {
 		//synchronized (events) {
 		if (n == 1) {
 			this.repainted2 = false;
+			repaint.queue(n);
+			return;
 		}
 		if (n == 3) {
 			this.repainted = false;
+			repaint.queue(n);
+			return;
 		}
 		if (n == 15) {
 			this.canvasHidden = false;
@@ -246,6 +251,16 @@ public final class EventQueue implements Runnable {
 			this.ind = 0;
 		}
 		//}
+	}
+
+	public void queueRepaint() {
+		this.repainted2 = false;
+		repaint.queue(1);
+	}
+
+	public void queueGraphicsFlush() {
+		this.repainted = false;
+		repaint.queue(3);
 	}
 
 	private synchronized int nextEvent() {
@@ -284,6 +299,7 @@ public final class EventQueue implements Runnable {
 		if (Thread.currentThread() == this.eventThread) {
 			return;
 		}
+
 		while (!this.repainted && this.running) {
 			try {
 				Thread.sleep(1L);
@@ -534,6 +550,87 @@ public final class EventQueue implements Runnable {
 	static boolean method723(final EventQueue j) {
 		return j.running;
 	}
+
+	private class RepaintThread implements Runnable {
+		private int[] events;
+		private Object readLock = new Object();
+		private int length;
+		private int count;
+		private boolean added;
+		private RepaintThread() {
+			events = new int[length = 16];
+		}
+		public void queue(int i) {
+			if(count + 1 >= length) {
+				int[] tmp = events;
+				events = new int[length += 16];
+				System.arraycopy(tmp, 0, events, 0, count);
+			}
+			events[count++] = i;
+			added = true;
+			synchronized(readLock) {
+				readLock.notify();
+			}
+		}
+		public void run() {
+			try {
+				while(running) {
+					if(!added)
+						synchronized(readLock) {
+							readLock.wait();
+						}
+					while(count > 0) {
+						int i = events[0];
+						switch(i) {
+							case 1: {
+								if (Emulator.getCanvas() == null
+										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+									repainted2 = true;
+									break;
+								}
+								Displayable.checkForSteps();
+								if(Settings.xrayView) Displayable.resetXRayGraphics();
+								final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
+								final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
+								try {
+									Emulator.getCanvas().invokePaint(new Graphics(backBufferImage, xRayScreenImage));
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+								(Settings.xrayView ? xRayScreenImage : backBufferImage)
+										.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+								Emulator.getEmulator().getScreen().repaint();
+								Displayable.fpsLimiter();
+								repainted2 = true;
+								break;
+							}
+							case 3: {
+								if (Emulator.getCanvas() == null
+										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+									repainted = true;
+									break;
+								}
+								final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImage();
+								final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
+								final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
+								(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+								Emulator.getEmulator().getScreen().repaint();
+								repainted = true;
+								break;
+							}
+						}
+						System.arraycopy(events, 1, events, 0, length-1);
+						events[--count] = 0;
+						added = false;
+					}
+					//Thread.sleep(1);
+				}
+			} catch (Throwable e) {
+				System.out.println("Exception in Repaint Thread!");
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	private class InputThread implements Runnable {
 		//private int readIdx;
@@ -545,7 +642,7 @@ public final class EventQueue implements Runnable {
 		//private Object inputWriteLock = new Object();
 		private int length;
 		private int count;
-		private boolean flag;
+		private boolean added;
 
 		private InputThread() {
 			elements = new Object[length = 16];
@@ -564,7 +661,7 @@ public final class EventQueue implements Runnable {
 				//System.out.println("Growed input buffer from " + (count + 1) + " to " + length);
 			}
 			elements[count++] = o;
-			flag = true;
+			added = true;
 			synchronized(readLock) {
 				readLock.notify();
 			}
@@ -573,15 +670,20 @@ public final class EventQueue implements Runnable {
 		public void run() {
 			try {
 				while(running) {
-					if(!flag)
+					if(!added)
 					synchronized(readLock) {
 						readLock.wait();
 					}
 					while(count > 0) {
-						parseAction((int[]) elements[0]);
+						try {
+							parseAction((int[]) elements[0]);
+						} catch (Throwable e) {
+							System.out.println("Exception in Input Thread!");
+							e.printStackTrace();
+						}
 						System.arraycopy(elements, 1, elements, 0, length-1);
 						elements[--count] = null;
-						flag = false;
+						added = false;
 					}
 					synchronized(writeLock) {
 						writeLock.notify();

@@ -4,8 +4,6 @@ import java.util.*;
 
 import javax.microedition.media.CapturePlayerImpl;
 
-import com.nokia.mid.ui.DirectGraphicsInvoker;
-
 import emulator.*;
 import emulator.debug.*;
 import emulator.lcdui.a;
@@ -212,7 +210,7 @@ public class Displayable {
         w = Emulator.getEmulator().getScreen().getWidth();
         h = Emulator.getEmulator().getScreen().getHeight();
         this.sizeChanged(n, n2);
-        Emulator.getEventQueue().queue(1);
+        Emulator.getEventQueue().queueRepaint();
     }
 
 	public Ticker getTicker() {

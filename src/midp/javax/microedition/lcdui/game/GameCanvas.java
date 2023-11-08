@@ -47,7 +47,7 @@ public abstract class GameCanvas extends Canvas
         Displayable.checkForSteps();
         Displayable.fpsLimiter();
         this.paintSoftMenu(this.getGraphics());
-        Emulator.getEventQueue().queue(3);
+        Emulator.getEventQueue().queueGraphicsFlush();
         Emulator.getEventQueue().waitRepainted();
         Displayable.resetXRayGraphics();
     }
