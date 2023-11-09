@@ -181,7 +181,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		try {
 			this.sequence = AudioSystem.getAudioInputStream(inputStream);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			System.out.println(ex.toString());
+			//ex.printStackTrace();
 			this.sequence = null;
 			//throw new IOException("WAV realize error!", ex);
 			return;
