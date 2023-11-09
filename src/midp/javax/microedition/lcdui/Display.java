@@ -28,6 +28,7 @@ public class Display
     
     public Display(MIDlet midlet) {
 		this.midlet = midlet;
+        /*
 		resetTimer();
 		new Thread() {
 			public void run() {
@@ -43,6 +44,8 @@ public class Display
 				}
 			}
 		}.start();
+
+         */
 	}
 
 	public boolean isColor() {
@@ -50,7 +53,7 @@ public class Display
     }
     
     public int numColors() {
-        return 65536;
+        return Integer.MAX_VALUE;
     }
     
     public int numAlphaLevels() {
@@ -108,7 +111,7 @@ public class Display
     
     public boolean flashBacklight(final long n) {
     	//Emulator.screenBrightness = 100;
-    	resetTimer();
+    	//resetTimer();
         return false;
     }
 
@@ -140,7 +143,7 @@ public class Display
 		 */
 	}
     
-    public void resetTimer() {
+   // public void resetTimer() {
 		/*
     	if(true) return;
 		from = System.currentTimeMillis(); 
@@ -154,17 +157,19 @@ public class Display
     	pausd = false;
 
 		 */
-	}
-    
+	//}
+    /*
     public int getInactiveTime() {
     	if(true) return 0;
 		return (int) (System.currentTimeMillis() - from);
 	}
+	*/
     /*
 	private static int lerp(final int start, final int target, final int mul, final int div) {
 		return start + ((target - start) * mul / div);
 	}
     */
+    /*
     private void timerTick() {
     	if(true) return;
 		/*
@@ -208,8 +213,8 @@ public class Display
 		}
 
 		 */
-	}
-    
+	//}
+    /*
     private void p() {
     	if(true) return;
     	 if (Display.current != null) {
@@ -226,9 +231,9 @@ public class Display
 	            }
 	        }
     }
-
+*/
 	public boolean vibrate(final int n) {
-		resetTimer();
+		//resetTimer();
     	if(n == 0)
     		Emulator.getEmulator().getScreen().stopVibra();
     	else
