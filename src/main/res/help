@@ -42,7 +42,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.13.3 []
+$nnmod v2.13.3 [2023.11.09]
 Fix in nokiaui DeviceControl
 Separate thread for repaints
 Fix Display.callSerially
@@ -283,7 +283,7 @@ open game with JAD file
 support sizeChanged(rotation)
 keep frames open state
 add -log parameter
-add cumstom key mapping
+add custom key mapping
 
 $v0.9.8 [2008.12.04]
 add some common used libs
