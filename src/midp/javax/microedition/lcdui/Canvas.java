@@ -47,7 +47,6 @@ public abstract class Canvas extends Displayable
     }
     
     public void invokeKeyPressed(final int n) {
-    	DeviceControl._userActivity();
         if (super.aBoolean18) {
             if (n >= 49 && n <= 57) {
                 final int n2;
@@ -161,7 +160,6 @@ public abstract class Canvas extends Displayable
     }
     
     public void invokePointerPressed(final int n, final int n2) {
-    	DeviceControl._userActivity();
         if (super.aBoolean18) {
             final int n3 = super.w >> 1;
             final int anInt181 = Screen.fontHeight4;

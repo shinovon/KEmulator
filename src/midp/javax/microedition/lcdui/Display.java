@@ -28,24 +28,6 @@ public class Display
     
     public Display(MIDlet midlet) {
 		this.midlet = midlet;
-        /*
-		resetTimer();
-		new Thread() {
-			public void run() {
-				this.setPriority(2);
-				while(Display.this.midlet != null) {
-					timerTick();
-					Thread.yield();
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						return;
-					}
-				}
-			}
-		}.start();
-
-         */
 	}
 
 	public boolean isColor() {
@@ -104,136 +86,13 @@ public class Display
         Emulator.getEventQueue().callSerially(run);
     }
 	public boolean flashBacklight(int n) {
-		//Emulator.screenBrightness = 100;
-		//resetTimer();
 		return false;
 	}
     
     public boolean flashBacklight(final long n) {
-    	//Emulator.screenBrightness = 100;
-    	//resetTimer();
         return false;
     }
-
-	public void fadeOut() {
-		/*
-    	if(true) return;
-    	if(fadeComplete) {
-			Emulator.screenBrightness = 15;
-			new Thread() {
-				public void run() {
-					while(true) {
-						Emulator.screenBrightness = lerp(Emulator.screenBrightness, 100, 15, 100);
-						p();
-						if(Emulator.screenBrightness > 80)
-							break;
-						try {
-							Thread.sleep(1000 / 24);
-						} catch (InterruptedException e) {
-							return;
-						}
-					}
-					Emulator.screenBrightness = 100;
-				}
-			}.start();
-    	} else {
-			Emulator.screenBrightness = 100;
-    	}
-
-		 */
-	}
-    
-   // public void resetTimer() {
-		/*
-    	if(true) return;
-		from = System.currentTimeMillis(); 
-    	fadeComplete = false;
-    	if(pausd) {
-			 Emulator.getMIDlet().invokeStartApp();
-    		 if (Emulator.getCanvas() != null && Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-    			// Emulator.getCanvas().invokeShowNotify();
-    		 }
-    	}
-    	pausd = false;
-
-		 */
-	//}
-    /*
-    public int getInactiveTime() {
-    	if(true) return 0;
-		return (int) (System.currentTimeMillis() - from);
-	}
-	*/
-    /*
-	private static int lerp(final int start, final int target, final int mul, final int div) {
-		return start + ((target - start) * mul / div);
-	}
-    */
-    /*
-    private void timerTick() {
-    	if(true) return;
-		/*
-		int i = (int) (System.currentTimeMillis() - from);
-		if(Emulator.inactivityTimer <= 0) {
-			return;
-		}
-		if(i > Emulator.inactivityTimer && !fadeComplete) {
-			Emulator.screenBrightness = 80;
-		}
-		if(i > Emulator.inactivityTimer + 5000 && !fadeComplete) {
-			Emulator.screenBrightness = 80;
-			new Thread() {
-				public void run() {
-					fadeComplete = true;
-					while(Emulator.screenBrightness <= 99 && Emulator.screenBrightness > 15) {
-						Emulator.screenBrightness = lerp(Emulator.screenBrightness, 1, 15, 100);
-						p();
-						try {
-							Thread.sleep(1000 / 24);
-						} catch (InterruptedException e) {
-							return;
-						}
-					}
-				}
-			}.start();
-		}
-		if(i > Emulator.inactivityTimer + 6000) {
-			Emulator.screenBrightness = 1;
-		}
-		if(i > Emulator.inactivityTimer + 7500 && !pausd) {
-			Emulator.getMIDlet().invokePauseApp();
-	    	pausd = true;
-            if (Emulator.getCanvas() == null) {
-                return;
-            }
-            if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-                return;
-            }
-            Emulator.getCanvas().invokeHideNotify();
-		}
-
-		 */
-	//}
-    /*
-    private void p() {
-    	if(true) return;
-    	 if (Display.current != null) {
-	            if (Display.current instanceof Canvas) {
-	                if (Settings.aBoolean1274) {
-	                    ((Canvas)Display.current).setFullScreenMode(true);
-	                }
-	                Emulator.getEventQueue().queue(15);
-	                Emulator.getEventQueue().queueRepaint();
-	                Emulator.getEventQueue().waitRepainted2();
-	            }
-	            else if (Display.current instanceof Screen) {
-	                Emulator.getEventQueue().queue(4);
-	            }
-	        }
-    }
-*/
 	public boolean vibrate(final int n) {
-		//resetTimer();
     	if(n == 0)
     		Emulator.getEmulator().getScreen().stopVibra();
     	else

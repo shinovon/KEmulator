@@ -10,7 +10,6 @@ public class LCDLight {
 	}
 
 	public static void on(int paramInt) {
-		DeviceControl._resetInactivity();
 		//Emulator.screenBrightness = paramInt;
 	}
 

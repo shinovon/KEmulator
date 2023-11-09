@@ -6,25 +6,11 @@ public class DeviceControl {
 
 	public static int getUserInactivityTime() {
 		Emulator.getEmulator().getLogStream().println("*** com.nokia.mid.ui.DeviceControl.getUserInactivityTime() ***");
-		return DirectGraphicsInvoker.getDisplay().getInactiveTime();
+		return 0;
 	}
 
 	public static void resetUserInactivityTime() {
 		Emulator.getEmulator().getLogStream().println("*** com.nokia.mid.ui.DeviceControl.resetUserInactivityTime() ***");
-		_resetInactivity();
-	}
-
-	public static void _resetInactivity() {
-		DirectGraphicsInvoker.getDisplay().resetTimer();
-	}
-
-	public static void _fadeOut() {
-		DirectGraphicsInvoker.getDisplay().fadeOut();
-	}
-
-	public static void _userActivity() {
-		_fadeOut();
-		_resetInactivity();
 	}
 
 	public static void flashLights(long paramLong) {
@@ -39,7 +25,6 @@ public class DeviceControl {
 			.println("*** com.nokia.mid.ui.DeviceControl.setLights(" + paramInt1 + "," + paramInt2 + ") ***");
 		}
 		 */
-		_resetInactivity();
 		//Emulator.screenBrightness = paramInt2;
 	}
 

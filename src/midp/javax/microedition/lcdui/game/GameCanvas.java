@@ -30,7 +30,6 @@ public abstract class GameCanvas extends Canvas
     }
     
     public void paint(final Graphics graphics) {
-		DeviceControl._resetInactivity();
         graphics.getImpl().drawImage(Emulator.getEmulator().getScreen().getBackBufferImage(), 0, 0);
     }
     
@@ -43,7 +42,6 @@ public abstract class GameCanvas extends Canvas
     }
     
     private void method220() {
-		DeviceControl._resetInactivity();  
         Displayable.checkForSteps();
         Displayable.fpsLimiter();
         this.paintSoftMenu(this.getGraphics());
