@@ -4,6 +4,9 @@ import javax.microedition.lcdui.*;
 import net.rim.device.api.system.*;
 import emulator.graphics2D.*;
 
+import java.util.Stack;
+import java.util.Vector;
+
 public final class EventQueue implements Runnable {
 	private int[] events;
 	//private ArrayList<Integer> mouseEvents;
@@ -11,6 +14,7 @@ public final class EventQueue implements Runnable {
 	private int ind;
 	private int anInt1222;
 	private boolean running;
+	private Vector serialEvents = new Vector();
 	private ThreadCallSerially threadCallSerially = new ThreadCallSerially(this);
 	private Thread eventThread;
 	private boolean canvasHidden;
@@ -242,6 +246,10 @@ public final class EventQueue implements Runnable {
 			repaint.queue(n);
 			return;
 		}
+		if (n == 4) {
+			repaint.queue(n);
+			return;
+		}
 		if (n == 15) {
 			this.canvasHidden = false;
 		}
@@ -284,7 +292,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public final void waitRepainted2() {
-		if (Thread.currentThread() == this.eventThread) {
+		if (Thread.currentThread() == this.repaintThread) {
 			return;
 		}
 		while (!this.repainted2 && this.running) {
@@ -296,10 +304,9 @@ public final class EventQueue implements Runnable {
 	}
 
 	public final void waitRepainted() {
-		if (Thread.currentThread() == this.eventThread) {
+		if (Thread.currentThread() == this.repaintThread) {
 			return;
 		}
-
 		while (!this.repainted && this.running) {
 			try {
 				Thread.sleep(1L);
@@ -343,7 +350,7 @@ public final class EventQueue implements Runnable {
 					break;
 				}
 				case 2: {
-					this.threadCallSerially.method590(EventQueue.aRunnable1219);
+					//this.threadCallSerially.method590(!serialEvents.isEmpty() ? (Runnable) serialEvents.remove(0) : EventQueue.aRunnable1219);
 					break;
 				}
 				case 3: {
@@ -551,6 +558,11 @@ public final class EventQueue implements Runnable {
 		return j.running;
 	}
 
+	public void callSerially(Runnable run) {
+		serialEvents.add(EventQueue.aRunnable1219 = run);
+	//	queue(2);
+	}
+
 	private class RepaintThread implements Runnable {
 		private int[] events;
 		private Object readLock = new Object();
@@ -560,7 +572,7 @@ public final class EventQueue implements Runnable {
 		private RepaintThread() {
 			events = new int[length = 16];
 		}
-		public void queue(int i) {
+		public synchronized void queue(int i) {
 			if(count + 1 >= length) {
 				int[] tmp = events;
 				events = new int[length += 16];
@@ -576,11 +588,17 @@ public final class EventQueue implements Runnable {
 			try {
 				while(running) {
 					if(!added)
-						synchronized(readLock) {
-							readLock.wait();
-						}
+					synchronized(readLock) {
+						readLock.wait();
+					}
+					added = false;
+					while(Emulator.getMIDlet() == null || canvasHidden) {
+						Thread.sleep(5);
+					}
 					while(count > 0) {
 						int i = events[0];
+						System.arraycopy(events, 1, events, 0, length-1);
+						events[--count] = 0;
 						switch(i) {
 							case 1: {
 								if (Emulator.getCanvas() == null
@@ -618,10 +636,27 @@ public final class EventQueue implements Runnable {
 								repainted = true;
 								break;
 							}
+							case 4: {
+								if (Emulator.getScreen() == null) {
+									break;
+								}
+								if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getScreen()) {
+									break;
+								}
+								final IImage backBufferImage3 = Emulator.getEmulator().getScreen().getBackBufferImage();
+								final IImage xRayScreenImage3 = Emulator.getEmulator().getScreen().getXRayScreenImage();
+								Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
+								(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
+										.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+								Emulator.getEmulator().getScreen().repaint();
+								try {
+									Thread.sleep(100L);
+								} catch (Exception ex2) {
+								}
+								this.queue(4);
+								break;
+							}
 						}
-						System.arraycopy(events, 1, events, 0, length-1);
-						events[--count] = 0;
-						added = false;
 					}
 					//Thread.sleep(1);
 				}
@@ -668,11 +703,15 @@ public final class EventQueue implements Runnable {
 		}
 
 		public void run() {
-			try {
-				while(running) {
+			while(running) {
+				try {
 					if(!added)
 					synchronized(readLock) {
 						readLock.wait();
+					}
+					added = false;
+					while(Emulator.getMIDlet() == null || canvasHidden) {
+						Thread.sleep(5);
 					}
 					while(count > 0) {
 						try {
@@ -683,16 +722,15 @@ public final class EventQueue implements Runnable {
 						}
 						System.arraycopy(elements, 1, elements, 0, length-1);
 						elements[--count] = null;
-						added = false;
 					}
 					synchronized(writeLock) {
 						writeLock.notify();
 					}
 					//Thread.sleep(1);
+				} catch (Throwable e) {
+					System.out.println("Exception in Input Thread!");
+					e.printStackTrace();
 				}
-			} catch (Throwable e) {
-				System.out.println("Exception in Input Thread!");
-				e.printStackTrace();
 			}
 		}
 		
@@ -751,27 +789,30 @@ public final class EventQueue implements Runnable {
 	private final class ThreadCallSerially implements Runnable {
 		private boolean aBoolean1048;
 		private Runnable aRunnable1049;
-		private final EventQueue aj1050;
 
 		private ThreadCallSerially(final EventQueue aj1050) {
 			super();
-			this.aj1050 = aj1050;
 		}
-
+		/*
 		public final void method590(final Runnable aRunnable1049) {
 			if (aRunnable1049 != null) {
 				this.aRunnable1049 = aRunnable1049;
 				this.aBoolean1048 = true;
 			}
 		}
-
+*/
 		public final void run() {
-			while (EventQueue.method723(this.aj1050)) {
+			while (running) {
+				/*
 				if (this.aBoolean1048) {
 					this.aBoolean1048 = false;
 
 					// new Thread(this.aj1050).start();
 					this.aRunnable1049.run();
+				}
+				 */
+				if(!serialEvents.isEmpty()) {
+					((Runnable)serialEvents.remove(0)).run();
 				}
 				try {
 					Thread.sleep(1L);

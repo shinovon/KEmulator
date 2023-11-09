@@ -45,6 +45,7 @@ $[Changelog]
 $nnmod v2.13.3 []
 Fix in nokiaui DeviceControl
 Separate thread for repaints
+Fix Display.callSerially
 
 $nnmod v2.13.2 [2023.10.28]
 Added stub api classes from thirdparty.jar

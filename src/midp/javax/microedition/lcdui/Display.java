@@ -97,13 +97,12 @@ public class Display
         return (Display) Display.displays.get(midlet);
     }
     
-    public void callSerially(final Runnable aRunnable1219) {
-        EventQueue.aRunnable1219 = aRunnable1219;
-        Emulator.getEventQueue().queue(2);
+    public void callSerially(final Runnable run) {
+        Emulator.getEventQueue().callSerially(run);
     }
 	public boolean flashBacklight(int n) {
 		//Emulator.screenBrightness = 100;
-		resetTimer();
+		//resetTimer();
 		return false;
 	}
     
