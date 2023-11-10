@@ -7,7 +7,7 @@ public class Alert extends Screen {
 	public static final Command DISMISS_COMMAND;
 	public static final int FOREVER = -2;
 	int timeout;
-	int time;
+	int time = 2000;
 	String string;
 	private String[] textArr;
 	Displayable lastDisplayed;
@@ -111,7 +111,7 @@ public class Alert extends Screen {
 			gauge.bounds[W] = bounds[W];
 			gauge.paint(g);
 		}
-		if (this.time > 0 && this.timeout != -2) {
+		if (this.time > 0 && this.timeout != -2 && commands.size() <= 1) {
 			if (System.currentTimeMillis() - timeShown > time) {
 				this.close();
 			}
