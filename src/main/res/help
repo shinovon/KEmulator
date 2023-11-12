@@ -42,7 +42,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.13.3 [2023.11.09]
+$nnmod v2.13.3 [2023.11.11]
 Fix in nokiaui DeviceControl
 Separate thread for repaints
 Fix Display.callSerially on 2 and more threads
