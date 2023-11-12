@@ -778,7 +778,9 @@ MouseTrackListener
         layout.marginHeight = 0;
         layout.verticalSpacing = 0;
         layout.makeColumnsEqualWidth = false;
-        ((Decorations)(this.shell = new Shell(224))).setText(Emulator.getTitleVersionString());
+        // 224
+        // TODO: Free resize
+        ((Decorations)(this.shell = new Shell(SWT.CLOSE | SWT.TITLE /*| SWT.RESIZE | SWT.MAX */| SWT.MIN))).setText(Emulator.getTitleVersionString());
         shell.addListener(SWT.Close, new Listener() {
             public void handleEvent(Event event) {
             	CustomMethod.close();
