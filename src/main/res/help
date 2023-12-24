@@ -42,6 +42,10 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$nnmod v2.13.4 [2023.12.25]
+Canvas.repaint() freeze fix
+HttpConnection.openInputStream() now throws IOException if input stream is not available
+
 $nnmod v2.13.3 [2023.11.11]
 Fix in nokiaui DeviceControl
 Separate thread for repaints
