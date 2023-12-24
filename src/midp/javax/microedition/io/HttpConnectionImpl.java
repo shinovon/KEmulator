@@ -195,7 +195,9 @@ final class HttpConnectionImpl implements HttpConnection {
 		try {
 			return this.connection.getInputStream();
 		} catch (IOException e) {
-			return this.connection.getErrorStream();
+			InputStream i = this.connection.getErrorStream();
+			if(i != null) return i;
+			throw e;
 		}
 	}
 

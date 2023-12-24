@@ -330,7 +330,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 			this.sequence = null;
-			throw new IOException();
+			throw new IOException(ex2.toString());
 		}
 		this.sequencer.addMetaEventListener(this);
 		try {
@@ -341,7 +341,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		} catch (Exception ex3) {
 			ex3.printStackTrace();
 			this.sequence = null;
-			throw new IOException();
+			throw new IOException(ex3.toString());
 		}
 		this.midiControl = new MIDIControlImpl(this);
 		this.toneControl = new ToneControlImpl();
