@@ -569,14 +569,18 @@ public final class EventQueue implements Runnable {
 		private int length;
 		private int count;
 		private boolean added;
+		private Object sync = new Object();
 		private RepaintThread() {
 			events = new int[length = 16];
 		}
 		public synchronized void queue(int i) {
-			if(count + 1 >= length) {
-				int[] tmp = events;
-				events = new int[length += 16];
-				System.arraycopy(tmp, 0, events, 0, count);
+			if(i == 1 && events[0] == 1) return;
+			synchronized(sync) {
+				if (count + 1 >= length) {
+					int[] tmp = events;
+					events = new int[length += 16];
+					System.arraycopy(tmp, 0, events, 0, count);
+				}
 			}
 			events[count++] = i;
 			added = true;
@@ -597,8 +601,10 @@ public final class EventQueue implements Runnable {
 					}
 					while(count > 0) {
 						int i = events[0];
-						System.arraycopy(events, 1, events, 0, length-1);
-						events[--count] = 0;
+						synchronized(sync) {
+							System.arraycopy(events, 1, events, 0, length - 1);
+							events[--count] = 0;
+						}
 						switch(i) {
 							case 1: {
 								if (Emulator.getCanvas() == null
@@ -668,16 +674,13 @@ public final class EventQueue implements Runnable {
 	}
 	
 	private class InputThread implements Runnable {
-		//private int readIdx;
-		//private int writeIdx;
 		private Object[] elements;
 
-		private Object writeLock = new Object();
 		private Object readLock = new Object();
-		//private Object inputWriteLock = new Object();
 		private int length;
 		private int count;
 		private boolean added;
+		private Object sync = new Object();
 
 		private InputThread() {
 			elements = new Object[length = 16];
@@ -688,12 +691,14 @@ public final class EventQueue implements Runnable {
 		}
 		
 		private void append(Object o) {
-			if(count + 1 >= length) {
-				// увеличивание массива
-				Object[] tmp = elements;
-				elements = new Object[length += 16];
-				System.arraycopy(tmp, 0, elements, 0, count);
-				//System.out.println("Growed input buffer from " + (count + 1) + " to " + length);
+			synchronized(sync) {
+				if (count + 1 >= length) {
+					// увеличивание массива
+					Object[] tmp = elements;
+					elements = new Object[length += 16];
+					System.arraycopy(tmp, 0, elements, 0, count);
+					//System.out.println("Growed input buffer from " + (count + 1) + " to " + length);
+				}
 			}
 			elements[count++] = o;
 			added = true;
@@ -720,11 +725,10 @@ public final class EventQueue implements Runnable {
 							System.out.println("Exception in Input Thread!");
 							e.printStackTrace();
 						}
-						System.arraycopy(elements, 1, elements, 0, length-1);
-						elements[--count] = null;
-					}
-					synchronized(writeLock) {
-						writeLock.notify();
+						synchronized(sync) {
+							System.arraycopy(elements, 1, elements, 0, length - 1);
+							elements[--count] = null;
+						}
 					}
 					//Thread.sleep(1);
 				} catch (Throwable e) {
