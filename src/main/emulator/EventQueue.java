@@ -574,7 +574,7 @@ public final class EventQueue implements Runnable {
 			events = new int[length = 16];
 		}
 		public synchronized void queue(int i) {
-			if(i == 1 && events[0] == 1) return;
+			if(events[0] == i) return;
 			synchronized(sync) {
 				if (count + 1 >= length) {
 					int[] tmp = events;
