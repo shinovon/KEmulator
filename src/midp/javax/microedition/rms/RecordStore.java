@@ -256,6 +256,10 @@ public class RecordStore
     
     public void setRecord(final int n, final byte[] array, final int n2, final int n3) throws RecordStoreNotOpenException, RecordStoreException, RecordStoreFullException {
     	logln("setRecord " + this.name + " " + n);
+        if(n == count) {
+            addRecord(array, n2, n3);
+            return;
+        }
     	if (!this.method184(n)) {
             throw new InvalidRecordIDException("recordId=" + n);
         }
