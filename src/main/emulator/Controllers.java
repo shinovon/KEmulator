@@ -128,7 +128,6 @@ public class Controllers
     }
     
     public static void refresh(boolean b) {
-        System.out.println("refresh " + b);
         reset();
         if (b) {
             try {
