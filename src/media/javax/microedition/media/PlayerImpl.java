@@ -719,18 +719,13 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}*/
 
 	public void run() {
-		PlayerImpl playerImpl;
-		Object n;
-		String s;
 		int loopCount = this.loopCount;
-		while (this.playerThread != null && loopCount != 0) {
+		while (playerThread != null && loopCount != 0) {
 			boolean b2 = false;
-			this.soundCompleted = false;
-			this.midiCompleted = false;
-			this.mp3Complete = false;
-			if (this.sequence instanceof Sequence && this.playerThread != null) {
-				this.sequencer.start();
-				while (!this.midiCompleted && this.playerThread != null) {
+			mp3Complete = midiCompleted = soundCompleted = false;
+			if (sequence instanceof Sequence && playerThread != null) {
+				sequencer.start();
+				while (!midiCompleted && playerThread != null) {
 					try {
 						Thread.sleep(1);
 						Thread.yield();
@@ -739,24 +734,24 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 					}
 				}
 				this.sequencer.stop();
-			} else if (this.sequence instanceof Clip && this.playerThread != null) {
+			} else if (sequence instanceof Clip && playerThread != null) {
 				Clip clip = (Clip) this.sequence;
 				clip.start();
-				while (!this.soundCompleted && this.playerThread != null) {
+				while (!soundCompleted && playerThread != null) {
 					try {
-						Thread.sleep((long) 99L);
+						Thread.sleep(99);
 					} catch (Exception exception) {
 						break;
 					}
 				}
 				clip.stop();
-			} else if (this.sequence instanceof Player) {
+			} else if (sequence instanceof Player) {
 				try {
-					((Player) this.sequence).play();
+					((Player) sequence).play();
 				} catch (JavaLayerException e) {
 					e.printStackTrace();
 				}
-				if (this.sequence != null && ((Player) this.sequence).isComplete()) {
+				if (sequence != null && ((Player) sequence).isComplete()) {
 					mp3Complete = true;
 					if (dataSource != null) {
 						//dataSource.stop();
@@ -765,13 +760,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				}
 			}
 			if (loopCount != -1) {
-				if (loopCount <= 0)
-					continue;
+				if (loopCount <= 0) continue;
 				--loopCount;
 			}
 			if(loopCount != 0) {
 				try {
-					this.setMediaTime(0L);
+					setMediaTime(0L);
 				} catch (MediaException e) {
 					e.printStackTrace();
 				}
@@ -779,16 +773,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		}
 		this.playerThread = null;
 		this.state = 300;
-		if (this.soundCompleted || this.midiCompleted || this.mp3Complete) {
-			playerImpl = this;
-			s = "endOfMedia";
-			n = getMediaTime();
-		} else {
-			playerImpl = this;
-			s = "stopped";
-			n = getMediaTime();
-		}
-		playerImpl.notifyListeners(s, n);
+		notifyListeners(this.soundCompleted || this.midiCompleted || this.mp3Complete ? "endOfMedia" : "stopped", getMediaTime());
 	}
 
 	public void update(final LineEvent lineEvent) {
