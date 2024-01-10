@@ -63,7 +63,9 @@ public final class Settings
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
 	public static String locale = "en-US";
-    
+
+    public static int debugPort = 29292;
+
     public Settings() {
         super();
     }

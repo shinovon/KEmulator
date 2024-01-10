@@ -103,6 +103,7 @@ public class Emulator
 	public static final String aboutVersion = "v" + version;
 	public static final String propVersion = version;
     private static int dialogResult;
+    private static boolean jdwpDebug;
 
     private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -1168,31 +1169,26 @@ public class Emulator
     public static void loadGame(final String s, final int n, final int n2, final boolean b) {
         ArrayList<String> cmd = new ArrayList<String>();
         getEmulator().getLogStream().println("loadGame: " + s);
-        final String javahome = System.getProperty("java.home");
+        String javahome = System.getProperty("java.home");
         boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");
-        String javaexec;
-        if (javahome == null || javahome.length() < 1) {
-            javaexec = "java";
-        } else {
-            javaexec = javahome + (!win ? "/bin/java" : "/bin/java.exe");
-        }
-        cmd.add(javaexec);
+        cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
         cmd.add("-cp");
         cmd.add(System.getProperty("java.class.path"));
         cmd.add("-Xmx1G");
+        if(Emulator.jdwpDebug) {
+            cmd.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + Settings.debugPort);
+        }
         cmd.add("emulator.Emulator");
         if (s == null) {
             for (int i = 0; i < Emulator.commandLineArguments.length; ++i) {
                 cmd.add(Emulator.commandLineArguments[i]);
             }
-        }
-        else if (s.endsWith(".jad")) {
+        } else if (s.endsWith(".jad")) {
             cmd.add("-jad");
             cmd.add(s);
             cmd.add("-jar");
             cmd.add(getMidletJarUrl(s));
-        }
-        else {
+        } else {
             cmd.add("-jar");
             cmd.add(s);
         }
@@ -1200,18 +1196,8 @@ public class Emulator
             cmd.add("-rec");
             cmd.add(Settings.recordedKeysFile);
         }
-        if (n == 1) {
-            cmd.add("-awt");
-        }
-        else if (n == 0) {
-            cmd.add("-swt");
-        }
-        if (n2 == 1) {
-            cmd.add("-lwj");
-        }
-        else if (n2 == 0) {
-            cmd.add("-wgl");
-        }
+        cmd.add(n == 1 ? "-swt" : "-awt");
+        cmd.add(n2 == 1 ? "-lwj" : "-wgl");
         /*
         final String cp = " -cp \"" + System.getProperty("java.class.path") + "\"";
         final String maincls = " emulator.Emulator";
@@ -1278,8 +1264,7 @@ public class Emulator
             //if(win) Runtime.getRuntime().exec(cmd);
             //else Runtime.getRuntime().exec(cmd[0]);
             new ProcessBuilder(new String[0]).command(cmd).inheritIO().start();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
         	ex.printStackTrace();
             AntiCrack(ex);
         }
