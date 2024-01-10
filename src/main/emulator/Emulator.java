@@ -81,8 +81,8 @@ public class Emulator
 	public static boolean askImei = true;
 	private static Thread vlcCheckerThread;
 
-    public static final String version = "2.13.4";
-    public static final int numericVersion = 13;
+    public static final String version = "2.14";
+    public static final int numericVersion = 14;
 	public static final String titleVersion = version;
 	public static final String aboutVersion = "v" + version;
 	public static final String propVersion = version;
