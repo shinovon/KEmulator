@@ -79,7 +79,6 @@ public class Emulator
     public static String[] commandLineArguments;
 	public static emulator.custom.CustomClassLoader customClassLoader;
 	private static Info[] midiDeviceInfo;
-	public static String midipath;
 	public static String iconPath;
 	//public static int screenBrightness = 100;
 	//public static int inactivityTimer = 0;
@@ -94,7 +93,6 @@ public class Emulator
 	private static String imei;
 	public static boolean askPermissions = false;
 	public static boolean askImei = true;
-	private static String midletName;
 	private static Thread vlcCheckerThread;
 
     public static final String version = "2.13.4";
@@ -781,9 +779,8 @@ public class Emulator
         			plat += ";sw_platform_version=" + c.getString("SW_PLATFORM_VERSION");
         		}
         	}
-        	String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+            String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
         	String midletVendor = Emulator.emulatorimpl.getAppProperty("MIDlet-Vendor");
-        	Emulator.midletName = midlet;
         	if(midlet != null) {
         		if(midlet.equalsIgnoreCase("bounce tales")) {
 	        		Settings.fpsGame = 1;
@@ -793,12 +790,7 @@ public class Emulator
 	        		Settings.fpsGame = 3;
 	        	}
         	}
-        	
-        	//if(midlet != null && (midlet.equalsIgnoreCase("Shiza") || midlet.toLowerCase().startsWith("touch") || midlet.toLowerCase().startsWith("vika")))
-        	//plat += "/KEmulatorMod";
             System.setProperty("microedition.platform", plat);
-            //System.out.println("paltform set: " + plat);
-            //System.out.println("ua: " + Emulator.customUA);
         }
         System.setProperty("microedition.media.version", "1.0");
         System.setProperty("supports.mixing", "true");

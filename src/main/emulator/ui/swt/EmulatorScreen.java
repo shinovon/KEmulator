@@ -1,7 +1,6 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.custom.*;
-import emulator.graphics2D.swt.*;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.media.*;
 import emulator.graphics2D.*;
@@ -22,13 +21,7 @@ import emulator.ui.*;
 import java.text.*;
 import java.util.*;
 
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.media.CapturePlayerImpl;
-
 import org.eclipse.swt.widgets.*;
-
-import com.sun.jna.platform.KeyboardUtils;
-import com.sun.jna.platform.unix.X11;
 
 import org.eclipse.swt.events.*;
 

@@ -55,7 +55,6 @@ public abstract class MIDlet
             if(s.startsWith("file:///root/")) {
             	s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
             }
-            // Vika touch support
             if(s.startsWith("vlc.exe")) {
             	if(Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
                 	s = new File(Settings.vlcDir).getCanonicalPath() + "/vlc.exe" + s.substring("vlc.exe".length());
