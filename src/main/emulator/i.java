@@ -29,8 +29,4 @@ public final class i
             throw unsatisfiedLinkError;
         }
     }
-    
-    public static void x64(String s) {
-    	
-    }
 }

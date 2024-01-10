@@ -43,8 +43,8 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class Emulator
 {
-	// is 64 bit version
-	public static final boolean _X64_VERSION = false;
+	// x64 build
+	public static final boolean _X64_VERSION = true;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -859,27 +859,6 @@ public class Emulator
 			loadSWTLibrary();
             loadJOGLLibrary();
 		}
-        /*
-        NativeLibLoader.setLoadingAction(new NativeLibLoader.LoaderAction() {
-
-            public void loadLibrary(String s, String[] strings, boolean b, boolean b1) {
-                if (b) {
-                    for(int var5 = 0; var5 < strings.length; ++var5) {
-                        try {
-                            System.loadLibrary(strings[var5]);
-                        } catch (UnsatisfiedLinkError var7) {
-                            if (!b1 && var7.getMessage().indexOf("already loaded") < 0) {
-                                throw var7;
-                            }
-                        }
-                    }
-                }
-
-                System.loadLibrary(s);
-            }
-        });
-
-         */
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.method709();
@@ -986,11 +965,9 @@ public class Emulator
                                 osn.contains("linux") || osn.contains("nix") ? "linux" :
                                         null;
         if(os == null) {
-        //    throw new RuntimeException("unsupported os: " + osn);
             return;
         }
         if(!osa.contains("amd64") && !osa.contains("86") && !osa.contains("armv6")) {
-        //    throw new RuntimeException("unsupported arch: " + osa);
             return;
         }
         String arch = osn.contains("macosx") ? "universal" : osa.contains("amd64") ? "amd64" : osa.contains("86") ? "i586" : osa;
@@ -1028,7 +1005,6 @@ public class Emulator
             Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             addUrlMethod.setAccessible(true);
             File f = new File("./"+s);
-            //System.out.println(f.exists() + " " + f.getCanonicalPath());
             URL swtFileUrl = f.toURL();
             addUrlMethod.invoke(classLoader, swtFileUrl);
         }
@@ -1063,12 +1039,12 @@ public class Emulator
                     Settings.g2d = 0;
                     Emulator.commandLineArguments[i] = "";
                 }
-                else if (key.equals("wgl")) {
-                 //   Settings.g3d = 0;
-                }
-                else if (key.equals("lwj")) {
-                 //   Settings.g3d = 1;
-                }
+//                else if (key.equals("wgl")) {
+//                    Settings.g3d = 0;
+//                }
+//                else if (key.equals("lwj")) {
+//                    Settings.g3d = 1;
+//                }
                 else if (key.equalsIgnoreCase("log")) {
                     Settings.showLogFrame = true;
                 }
@@ -1136,12 +1112,6 @@ public class Emulator
     
     public static String getAbsolutePath() {
     	return getAbsoluteFile();
-       // final String absoluteFile = getAbsoluteFile();
-        //String s;
-       // if ((s = absoluteFile.substring(0, absoluteFile.lastIndexOf(47))).charAt(0) == '/') {
-        //    s = "/" + s;
-        //}
-       // return s;
     }
     
     public static void loadGame(final String s, final int n, final int n2, final boolean b) {
@@ -1176,71 +1146,9 @@ public class Emulator
         }
         cmd.add(n == 0 ? "-swt" : "-awt");
         cmd.add(n2 == 0 ? "-wgl" : "-lwj");
-        /*
-        final String cp = " -cp \"" + System.getProperty("java.class.path") + "\"";
-        final String maincls = " emulator.Emulator";
-        final StringBuffer args = new StringBuffer(100);
-        if (s == null) {
-            for (int i = 0; i < Emulator.commandLineArguments.length; ++i) {
-                String a = Emulator.commandLineArguments[i];
-                args.append(a.startsWith("-") ? " " + a : " \"" + a + "\"");
-            }
-            //method284(args, "-jar");
-            //method284(args, "-cp");
-            //method284(args, "-jad");
-        }
-        else if (s.endsWith(".jad")) {
-            args.append(" -jad \"" + s + "\"");
-            args.append(" -jar \"" + getMidletJarUrl(s) + "\"");
-        }
-        else {
-            args.append(" -jar \"" + s + "\"");
-        }
-        if (Settings.recordedKeysFile != null) {
-            args.append(" -rec \"" + Settings.recordedKeysFile + "\"");
-        }
-        if (n == 1) {
-            args.append(" -awt");
-        }
-        else if (n == 0) {
-            args.append(" -swt");
-        }
-        if (n2 == 1) {
-            args.append(" -lwj");
-        }
-        else if (n2 == 0) {
-            args.append(" -wgl");
-        }
-        final String[] cmd;
-        if(!win) {
-            cmd = new String[] { javaexec + cp + maincls + args.toString() };
-            getEmulator().getLogStream().print(cmd[0]);
-        } else {
-            (cmd = new String[2])[0] = "cmd.exe";
-            cmd[1] = javaexec + cp + maincls + (Object)args;
-            String[] array2;
-            int n3;
-            StringBuffer sb2;
-            String s5;
-        	if (b) {
-	            n3 = 1;
-	            sb2 = new StringBuffer().append("/c start cmd.exe /c \"").append(cmd[1]);
-	            s5 = " && pause \"";
-	        }
-	        else {
-	            n3 = 1;
-	            sb2 = new StringBuffer().append("/c \"").append(cmd[1]);
-	            s5 = "\"";
-	        }
-            cmd[n3] = sb2.append(s5).toString();
-            getEmulator().getLogStream().println(cmd[0] + " " + cmd[1]);
-        }
-        */
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {
-            //if(win) Runtime.getRuntime().exec(cmd);
-            //else Runtime.getRuntime().exec(cmd[0]);
             new ProcessBuilder(new String[0]).command(cmd).inheritIO().start();
         } catch (Exception ex) {
         	ex.printStackTrace();
