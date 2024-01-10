@@ -13,7 +13,6 @@ final class Class184 extends SelectionAdapter
     }
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        Controllers.refresh(false);
         Controllers.refresh(true);
         Property.method386(this.aClass38_1455);
     }
