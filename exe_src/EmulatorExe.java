@@ -32,7 +32,7 @@ public class EmulatorExe {
 			return;
 		}
 		if(args[0].equals("-version")) {
-			System.out.println("KEmulator nnmod v2.14");
+			System.out.println("KEmulator nnmod");
 			System.out.println("Profile: MIDP-2.1");
 			System.out.println("Configuration: CLDC-1.1");
 			System.out.println("Optional: JSR75-1.0, JSR82-1.0, JSR120-1.0, JSR135-1.0, JSR177-1.0, JSR179-1.0, JSR205-1.0, JSR234-1.0, JSR256-1.0, NOKIAUI-1.4");
