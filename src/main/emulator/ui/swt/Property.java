@@ -1344,8 +1344,8 @@ public final class Property implements IProperty
     private void method402() {
         this.aCombo699.removeAll();
         this.aCombo699.add("Keyboard");
-        for (int method740 = Controllers.method740(), i = 0; i < method740; ++i) {
-            this.aCombo699.add(Controllers.method741(i).getName());
+        for (int method740 = Controllers.getControllersCount(), i = 0; i < method740; ++i) {
+            this.aCombo699.add(Controllers.getController(i).getName());
         }
         this.aCombo699.setText("Keyboard");
     }
@@ -1403,26 +1403,26 @@ public final class Property implements IProperty
         }
         else {
             final int n = selectionIndex - 1;
-            this.aText627.setText(Controllers.method744(n, 0));
-            this.aText754.setText(Controllers.method744(n, 1));
-            this.aText757.setText(Controllers.method744(n, 2));
-            this.aText760.setText(Controllers.method744(n, 3));
-            this.aText763.setText(Controllers.method744(n, 4));
-            this.aText766.setText(Controllers.method744(n, 5));
-            this.aText768.setText(Controllers.method744(n, 6));
-            this.aText770.setText(Controllers.method744(n, 7));
-            this.aText772.setText(Controllers.method744(n, 8));
-            this.aText774.setText(Controllers.method744(n, 9));
-            this.aText629.setText(Controllers.method744(n, 10));
-            this.aText631.setText(Controllers.method744(n, 11));
-            this.aText739.setText(Controllers.method744(n, 14));
-            this.aText742.setText(Controllers.method744(n, 15));
-            this.aText745.setText(Controllers.method744(n, 12));
-            this.aText748.setText(Controllers.method744(n, 13));
-            this.aText751.setText(Controllers.method744(n, 16));
-            this.aText731.setText(Controllers.method744(n, 17));
+            this.aText627.setText(Controllers.getBind(n, 0));
+            this.aText754.setText(Controllers.getBind(n, 1));
+            this.aText757.setText(Controllers.getBind(n, 2));
+            this.aText760.setText(Controllers.getBind(n, 3));
+            this.aText763.setText(Controllers.getBind(n, 4));
+            this.aText766.setText(Controllers.getBind(n, 5));
+            this.aText768.setText(Controllers.getBind(n, 6));
+            this.aText770.setText(Controllers.getBind(n, 7));
+            this.aText772.setText(Controllers.getBind(n, 8));
+            this.aText774.setText(Controllers.getBind(n, 9));
+            this.aText629.setText(Controllers.getBind(n, 10));
+            this.aText631.setText(Controllers.getBind(n, 11));
+            this.aText739.setText(Controllers.getBind(n, 14));
+            this.aText742.setText(Controllers.getBind(n, 15));
+            this.aText745.setText(Controllers.getBind(n, 12));
+            this.aText748.setText(Controllers.getBind(n, 13));
+            this.aText751.setText(Controllers.getBind(n, 16));
+            this.aText731.setText(Controllers.getBind(n, 17));
             text = this.aText735;
-            method744 = Controllers.method744(n, 18);
+            method744 = Controllers.getBind(n, 18);
         }
         text.setText(method744);
     }

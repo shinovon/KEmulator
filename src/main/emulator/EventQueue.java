@@ -4,7 +4,6 @@ import javax.microedition.lcdui.*;
 import net.rim.device.api.system.*;
 import emulator.graphics2D.*;
 
-import java.util.Stack;
 import java.util.Vector;
 
 public final class EventQueue implements Runnable {
@@ -130,9 +129,22 @@ public final class EventQueue implements Runnable {
 	}
 
 
-	public final void method717(final int n, final int n2) {
+	public final void controllerEvent(final int n, final int n2) {
+		System.out.println("controller event " + n + " " + n2);
 		final int n3 = n | method718(n2);
-		this.queue(n3);
+		switch(n) {
+			case 67108864:
+				keyPress(n2);
+				break;
+			case 134217728:
+				keyRelease(n2);
+				break;
+			case 33554432:
+				keyRepeat(n2);
+				break;
+			default:
+				this.queue(n3);
+		}
 		Emulator.getNetMonitor().b(n3);
 	}
 
@@ -542,7 +554,7 @@ public final class EventQueue implements Runnable {
 				 */
 				}
 				this.anInt1222 = 0;
-				Controllers.method751();
+				Controllers.poll();
 				try {
 					Thread.sleep(1L);
 				} catch (Exception ex4) {

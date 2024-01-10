@@ -1,22 +1,14 @@
 package emulator;
 
-import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.HeadlessException;
-import java.awt.Window;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -29,14 +21,8 @@ import javax.microedition.midlet.MIDlet;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
-import javax.swing.Icon;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import emulator.ui.swt.InputDialog;
 import org.apache.tools.zip.ZipEntry;
@@ -904,7 +890,7 @@ public class Emulator
         } catch (Error e) {
         }
         vlcCheckerThread.start();
-        Controllers.method750(true);
+        Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
         method283(commandLineArguments);
         Devices.load(Emulator.deviceFile);
@@ -1188,8 +1174,8 @@ public class Emulator
             cmd.add("-rec");
             cmd.add(Settings.recordedKeysFile);
         }
-        cmd.add(n == 1 ? "-swt" : "-awt");
-        cmd.add(n2 == 1 ? "-lwj" : "-wgl");
+        cmd.add(n == 0 ? "-swt" : "-awt");
+        cmd.add(n2 == 0 ? "-wgl" : "-lwj");
         /*
         final String cp = " -cp \"" + System.getProperty("java.class.path") + "\"";
         final String maincls = " emulator.Emulator";

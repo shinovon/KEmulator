@@ -5,12 +5,12 @@ import net.java.games.input.*;
 
 public final class Controllers
 {
-    private static ArrayList anArrayList1287;
+    private static ArrayList controllers;
     private static ArrayList anArrayList1293;
     private static int count;
     private static boolean loaded;
-    private static String[][] stringMultiArr;
-    private static boolean[][] s;
+    private static String[][] binds;
+    private static boolean[][] dpad;
     private static String aString1292;
     
     public Controllers() {
@@ -32,73 +32,77 @@ public final class Controllers
                 	String s = controller.getName();
                 	if(s.contains("tablet")) continue;
                 	if(s.contains("STAR")) continue;
+                    if(s.contains("Gaming Keyboard")) continue;
+                    if(s.contains("Gaming Mouse")) continue;
                     list.add(controller);
                 }
             }
+            System.out.println(list);
             for (int size = list.size(), j = 0; j < size; ++j) {
-                method739((Controller) list.get(j));
+                addController((Controller) list.get(j));
             }
             Controllers.loaded = true;
         }
-        catch (Throwable t) {t.printStackTrace();
+        catch (Throwable t) {
+            t.printStackTrace();
             throw new Exception("Failed to initialise controllers", t);
         }
     }
     
-    private static void method739(final Controller controller) {
-        final Controller[] controllers;
-        if ((controllers = controller.getControllers()).length == 0) {
-            Controllers.anArrayList1287.add(controller);
+    private static void addController(final Controller controller) {
+        final Controller[] controllers = controller.getControllers();
+        if (controllers.length == 0) {
+            Controllers.controllers.add(controller);
             ++Controllers.count;
             //l.anArrayList1293.add(null);
             return;
         }
         for (int i = 0; i < controllers.length; ++i) {
         	//System.out.println(controller.toString() + ">PARENT>" + controllers[i]);
-            method739(controllers[i]);
+            addController(controllers[i]);
         }
     }
     
-    public static int method740() {
+    public static int getControllersCount() {
         return Controllers.count;
     }
     
-    public static Controller method741(final int n) {
-        return (Controller) Controllers.anArrayList1287.get(n);
+    public static Controller getController(final int n) {
+        return (Controller) Controllers.controllers.get(n);
     }
     
-    private static void method755() {
-        Controllers.stringMultiArr = new String[Controllers.count][19];
+    private static void initBinds() {
+        Controllers.binds = new String[Controllers.count][19];
         for (int i = 0; i < Controllers.count; ++i) {
-            Controllers.stringMultiArr[i][0] = "0";
-            Controllers.stringMultiArr[i][1] = "1";
-            Controllers.stringMultiArr[i][2] = "2";
-            Controllers.stringMultiArr[i][3] = "3";
-            Controllers.stringMultiArr[i][4] = "4";
-            Controllers.stringMultiArr[i][5] = "5";
-            Controllers.stringMultiArr[i][6] = "6";
-            Controllers.stringMultiArr[i][7] = "7";
-            Controllers.stringMultiArr[i][8] = "8";
-            Controllers.stringMultiArr[i][9] = "12";
-            Controllers.stringMultiArr[i][10] = "13";
-            Controllers.stringMultiArr[i][11] = "14";
-            Controllers.stringMultiArr[i][12] = "UP";
-            Controllers.stringMultiArr[i][13] = "DOWN";
-            Controllers.stringMultiArr[i][14] = "LEFT";
-            Controllers.stringMultiArr[i][15] = "RIGHT";
-            Controllers.stringMultiArr[i][16] = "9";
-            Controllers.stringMultiArr[i][17] = "10";
-            Controllers.stringMultiArr[i][18] = "11";
+            Controllers.binds[i][0] = "0";
+            Controllers.binds[i][1] = "1";
+            Controllers.binds[i][2] = "2";
+            Controllers.binds[i][3] = "3";
+            Controllers.binds[i][4] = "4";
+            Controllers.binds[i][5] = "5";
+            Controllers.binds[i][6] = "6";
+            Controllers.binds[i][7] = "7";
+            Controllers.binds[i][8] = "8";
+            Controllers.binds[i][9] = "12";
+            Controllers.binds[i][10] = "13";
+            Controllers.binds[i][11] = "14";
+            Controllers.binds[i][12] = "UP";
+            Controllers.binds[i][13] = "DOWN";
+            Controllers.binds[i][14] = "LEFT";
+            Controllers.binds[i][15] = "RIGHT";
+            Controllers.binds[i][16] = "9";
+            Controllers.binds[i][17] = "10";
+            Controllers.binds[i][18] = "11";
         }
     }
     
-    public static void method743(final int n, final int n2, final String s) {
-        Controllers.stringMultiArr[n][n2] = s;
+    public static void bind(final int controllerId, final int n2, final String s) {
+        Controllers.binds[controllerId][n2] = s;
     }
     
-    public static String method744(final int n, final int n2) {
+    public static String getBind(final int controllerId, final int n2) {
         String string;
-        if (!(string = Controllers.stringMultiArr[n][n2]).equalsIgnoreCase("LEFT") && !string.equalsIgnoreCase("RIGHT") && !string.equalsIgnoreCase("UP") && !string.equalsIgnoreCase("DOWN")) {
+        if (!(string = Controllers.binds[controllerId][n2]).equalsIgnoreCase("LEFT") && !string.equalsIgnoreCase("RIGHT") && !string.equalsIgnoreCase("UP") && !string.equalsIgnoreCase("DOWN")) {
             string = "B_" + string;
         }
         return string;
@@ -106,7 +110,7 @@ public final class Controllers
     
     private static int method746(final int n, final String s) {
         int n2;
-        for (n2 = 0; n2 < 19 && !s.equalsIgnoreCase(Controllers.stringMultiArr[n][n2]); ++n2) {}
+        for (n2 = 0; n2 < 19 && !s.equalsIgnoreCase(Controllers.binds[n][n2]); ++n2) {}
         if (n2 == 19) {
             return 10000;
         }
@@ -126,33 +130,33 @@ public final class Controllers
         return Controllers.aString1292;
     }
     
-    public static void method750(final boolean b) {
+    public static void refresh(final boolean b) {
+        System.out.println("refresh " + b);
         if (b) {
             try {
                 init();
                 if (Controllers.count > 0) {
-                    Controllers.s = new boolean[Controllers.count][4];
-                    method755();
+                    Controllers.dpad = new boolean[Controllers.count][4];
+                    initBinds();
                 }
                 return;
-            }
-            catch (Exception ex) {ex.printStackTrace();
-                Emulator.getEmulator().getLogStream().println("6 "+ex.toString());
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
-        method756();
+        reset();
     }
     
-    private static void method756() {
+    private static void reset() {
         Controllers.loaded = false;
-        Controllers.anArrayList1287.clear();
+        Controllers.controllers.clear();
         Controllers.count = 0;
         Controllers.anArrayList1293.clear();
-        Controllers.s = null;
-        Controllers.stringMultiArr = null;
+        Controllers.dpad = null;
+        Controllers.binds = null;
     }
     
-    public static void method751() {
+    public static void poll() {
         if (!Controllers.loaded) {
             return;
         }
@@ -160,10 +164,18 @@ public final class Controllers
             return;
         }
         for (int i = 0; i < Controllers.count; ++i) {
-            final Controller method741;
-            (method741 = method741(i)).poll();
+            final Controller controller = getController(i);
+            try {
+                if(!controller.poll()) {
+
+                } else {
+                    System.out.println(i + " " + controller);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             final Event event = new Event();
-            if (method741.getEventQueue().getNextEvent(event)) {
+            if (controller.getEventQueue().getNextEvent(event)) {
                 final Component.Identifier identifier;
                 final String name = (identifier = event.getComponent().getIdentifier()).getName();
                 float value = event.getValue();
@@ -174,8 +186,9 @@ public final class Controllers
                     if (n == 67108864) {
                         method743 = method748(identifier.getName());
                     }
+                    System.out.println("button " + method742 + " " + method743);
                     if (!method743 && method742 != 10000) {
-                        Emulator.getEventQueue().method717(n, method742);
+                        Emulator.getEventQueue().controllerEvent(n, method742);
                     }
                 }
                 else {
@@ -216,8 +229,8 @@ public final class Controllers
             if (method748("LEFT")) {
                 return;
             }
-            Emulator.getEventQueue().method717(67108864, method746(n, "LEFT"));
-            array = Controllers.s[n];
+            Emulator.getEventQueue().controllerEvent(67108864, method746(n, "LEFT"));
+            array = Controllers.dpad[n];
             n3 = 0;
             b = true;
         }
@@ -225,23 +238,23 @@ public final class Controllers
             if (method748("RIGHT")) {
                 return;
             }
-            Emulator.getEventQueue().method717(67108864, method746(n, "RIGHT"));
-            array = Controllers.s[n];
+            Emulator.getEventQueue().controllerEvent(67108864, method746(n, "RIGHT"));
+            array = Controllers.dpad[n];
             n3 = 1;
             b = true;
         }
         else {
-            if (Controllers.s[n][0]) {
-                Emulator.getEventQueue().method717(134217728, method746(n, "LEFT"));
-                array = Controllers.s[n];
+            if (Controllers.dpad[n][0]) {
+                Emulator.getEventQueue().controllerEvent(134217728, method746(n, "LEFT"));
+                array = Controllers.dpad[n];
                 n3 = 0;
             }
             else {
-                if (!Controllers.s[n][1]) {
+                if (!Controllers.dpad[n][1]) {
                     return;
                 }
-                Emulator.getEventQueue().method717(134217728, method746(n, "RIGHT"));
-                array = Controllers.s[n];
+                Emulator.getEventQueue().controllerEvent(134217728, method746(n, "RIGHT"));
+                array = Controllers.dpad[n];
                 n3 = 1;
             }
             b = false;
@@ -257,8 +270,8 @@ public final class Controllers
             if (method748("UP")) {
                 return;
             }
-            Emulator.getEventQueue().method717(67108864, method746(n, "UP"));
-            array = Controllers.s[n];
+            Emulator.getEventQueue().controllerEvent(67108864, method746(n, "UP"));
+            array = Controllers.dpad[n];
             n3 = 2;
             b = true;
         }
@@ -266,23 +279,23 @@ public final class Controllers
             if (method748("DOWN")) {
                 return;
             }
-            Emulator.getEventQueue().method717(67108864, method746(n, "DOWN"));
-            array = Controllers.s[n];
+            Emulator.getEventQueue().controllerEvent(67108864, method746(n, "DOWN"));
+            array = Controllers.dpad[n];
             n3 = 3;
             b = true;
         }
         else {
-            if (Controllers.s[n][2]) {
-                Emulator.getEventQueue().method717(134217728, method746(n, "UP"));
-                array = Controllers.s[n];
+            if (Controllers.dpad[n][2]) {
+                Emulator.getEventQueue().controllerEvent(134217728, method746(n, "UP"));
+                array = Controllers.dpad[n];
                 n3 = 2;
             }
             else {
-                if (!Controllers.s[n][3]) {
+                if (!Controllers.dpad[n][3]) {
                     return;
                 }
-                Emulator.getEventQueue().method717(134217728, method746(n, "DOWN"));
-                array = Controllers.s[n];
+                Emulator.getEventQueue().controllerEvent(134217728, method746(n, "DOWN"));
+                array = Controllers.dpad[n];
                 n3 = 3;
             }
             b = false;
@@ -311,7 +324,7 @@ public final class Controllers
     }
     
     static {
-        Controllers.anArrayList1287 = new ArrayList();
+        Controllers.controllers = new ArrayList();
         Controllers.anArrayList1293 = new ArrayList();
     }
 }
