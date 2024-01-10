@@ -1797,7 +1797,9 @@ public final class Property implements IProperty
     
     private void method428() {
         aTable665.removeAll();
-        for(String s: RecordStore.listRecordStores()) {
+        String[] rms = RecordStore.listRecordStores();
+        if(rms == null) return;
+        for(String s: rms) {
             TableItem ti = new TableItem(this.aTable665, 0);
             ti.setText(0, s);
             ti.setChecked(false);
