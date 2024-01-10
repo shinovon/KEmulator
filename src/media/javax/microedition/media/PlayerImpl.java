@@ -46,6 +46,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	private boolean dataSourceDisconnected;
 	private InputStream inputStream;
 	static Class clipCls;
+	private static int count;
 
 
 	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
@@ -613,7 +614,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				|| (this.sequence instanceof Clip && soundCompleted)) {
 					setMediaTime(0);
 				}
-				(this.playerThread = new Thread(this)).start();
+				(this.playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
 			}
 			this.state = 400;
 			this.notifyListeners("started", new Long(0L));

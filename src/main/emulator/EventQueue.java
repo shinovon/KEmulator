@@ -39,11 +39,11 @@ public final class EventQueue implements Runnable {
 		this.running = true;
 		this.repainted2 = true;
 		this.repainted = true;
-		(this.eventThread = new Thread(this, "MIDP event thread")).setPriority(2);
+		(this.eventThread = new Thread(this, "KEmulator MIDP event queue")).setPriority(2);
 		this.eventThread.start();
-		(this.repaintThread = new Thread(repaint, "Repaint thread")).setPriority(2);
+		(this.repaintThread = new Thread(repaint, "KEmulator repaint queue")).setPriority(2);
 		this.repaintThread.start();
-		(this.inputThread = new Thread(input, "Input thread")).setPriority(3);
+		(this.inputThread = new Thread(input, "KEmulator input queue")).setPriority(3);
 		this.inputThread.start();
 	}
 
@@ -244,7 +244,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public final void run() {
-		new Thread(this.threadCallSerially, "Serial event thread").start();
+		new Thread(this.threadCallSerially, "KEmulator serial calls thread").start();
 			while (this.running) {
 				try {
 				if (Emulator.getMIDlet() == null || this.canvasHidden) {

@@ -32,6 +32,7 @@ MouseMoveListener, SelectionListener, MouseWheelListener,
 MouseTrackListener
 {
     private static Display display;
+    private static int threadCount;
 
     public Shell getShell() {
         return shell;
@@ -261,7 +262,7 @@ MouseTrackListener
         ((Widget)this.shell).addDisposeListener((DisposeListener)this);
         ((Control)this.shell).addControlListener((ControlListener)this);
         if(win) {
-        new Thread("Keyboard poller thread") {
+        new Thread("KEmulator keyboard poll thread") {
         	public void run() {
         		try {
     	        while (shell != null && !((Widget)shell).isDisposed()) {
@@ -2507,7 +2508,7 @@ MouseTrackListener
         }
         if (this.aClass119_976 == null) {
             this.aClass119_976 = new Vibrate(this);
-            new Thread(this.aClass119_976).start();
+            new Thread(this.aClass119_976, "KEmulator vibrate-" + (++threadCount)).start();
             return;
         }
         this.aLong1017 = System.currentTimeMillis();

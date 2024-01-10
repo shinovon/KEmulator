@@ -100,7 +100,7 @@ public class Emulator
 		presence.startTimestamp = presenceStartTimestamp = System.currentTimeMillis() / 1000;
 		presence.state = "No Jar";
 		rpc.Discord_UpdatePresence(presence);
-		rpcCallbackThread = new Thread("RPC-Callback-Handler") {
+		rpcCallbackThread = new Thread("KEmulator RPC-Callback-Handler") {
 			public void run() {
 				while (!Thread.currentThread().isInterrupted()) {
 					rpc.Discord_RunCallbacks();
