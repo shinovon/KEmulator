@@ -31,4 +31,6 @@ public interface IProperty
     void loadProperties();
     
     boolean updateController();
+
+    String getOldRmsPath();
 }

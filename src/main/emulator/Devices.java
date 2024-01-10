@@ -10,7 +10,7 @@ public final class Devices
     public static DevicePlatform curPlatform;
     private static Hashtable aHashtable1074;
     private static ArrayList anArrayList1075;
-    private static Properties aProperties1076;
+    private static Properties properties;
     private static final String[] aStringArray1077;
     
     public Devices() {
@@ -73,15 +73,15 @@ public final class Devices
         return Devices.curPlatform.getInt(s);
     }
     
-    public static void method618(final String s, final String s2) {
-        Devices.aProperties1076.setProperty(s.toUpperCase(), s2);
+    public static void setProperty(final String s, final String s2) {
+        Devices.properties.setProperty(s.toUpperCase(), s2);
     }
     
-    public static void method619() {
-        final Enumeration<?> propertyNames = Devices.aProperties1076.propertyNames();
+    public static void writeProperties() {
+        final Enumeration<?> propertyNames = Devices.properties.propertyNames();
         while (propertyNames.hasMoreElements()) {
             final String s = (String)propertyNames.nextElement();
-            Devices.curPlatform.properties.setProperty(s, (String)Devices.aProperties1076.get(s));
+            Devices.curPlatform.properties.setProperty(s, (String)Devices.properties.get(s));
         }
     }
     
@@ -92,7 +92,7 @@ public final class Devices
     static {
         Devices.aHashtable1074 = new Hashtable();
         Devices.anArrayList1075 = new ArrayList();
-        Devices.aProperties1076 = new Properties();
+        Devices.properties = new Properties();
         aStringArray1077 = new String[] { "api", "family", "device" };
     }
 }

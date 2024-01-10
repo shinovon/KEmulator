@@ -1,6 +1,8 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.events.*;
+
+import javax.microedition.rms.RecordStore;
 import java.io.*;
 
 final class Class103 extends SelectionAdapter
@@ -13,15 +15,16 @@ final class Class103 extends SelectionAdapter
     }
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
+        // TODO: rms delete
         final String string = Property.method368(this.aClass38_1057) + ".";
         for (int i = 0; i < Property.method367(this.aClass38_1057).getItemCount(); ++i) {
             final File file;
-            if (Property.method367(this.aClass38_1057).getItem(i).getChecked() && (file = new File(string + Property.method367(this.aClass38_1057).getItem(i).getText().trim())).exists()) {
-                final File[] listFiles = file.listFiles();
-                for (int j = 0; j < listFiles.length; ++j) {
-                    listFiles[j].delete();
+            if (Property.method367(this.aClass38_1057).getItem(i).getChecked()) {
+                try {
+                    RecordStore.deleteRecordStore(Property.method367(this.aClass38_1057).getItem(i).getText().trim());
+                } catch (Exception e) {
+
                 }
-                file.delete();
             }
         }
         Property.method389(this.aClass38_1057);

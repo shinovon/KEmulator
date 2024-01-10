@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.*;
 
+import javax.microedition.rms.RecordStore;
+
 public final class Property implements IProperty
 {
     private static Display aDisplay656;
@@ -374,7 +376,7 @@ public final class Property implements IProperty
         return this.device + "_" + this.screenWidth + "x" + this.screenHeight;
     }
     
-    public final String getRmsFolderPath() {
+    public String getRmsFolderPath() {
         String s = null;
         Label_0077: {
             StringBuffer sb;
@@ -396,26 +398,32 @@ public final class Property implements IProperty
         if (!(file = new File(s)).exists() || !file.isDirectory()) {
             file.mkdirs();
         }
+        /*
         final String string = s + "/" + this.method355();
         final File file2;
         if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
             file2.mkdirs();
         }
-        return string + "/";
+        */
+        return s + "/";
+    }
+
+    public String getOldRmsPath() {
+        return getRmsFolderPath() + method355() + "/";
     }
     
     public final void setCustomProperties() {
         if (this.device.equalsIgnoreCase(Emulator.deviceName)) {
-            Devices.method618("SCREEN_WIDTH", this.screenWidth);
-            Devices.method618("SCREEN_HEIGHT", this.screenHeight);
-            Devices.method618("KEY_S1", this.lsoft);
-            Devices.method618("KEY_S2", this.rsoft);
-            Devices.method618("KEY_FIRE", this.fire);
-            Devices.method618("KEY_UP", this.up);
-            Devices.method618("KEY_DOWN", this.down);
-            Devices.method618("KEY_LEFT", this.left);
-            Devices.method618("KEY_RIGHT", this.right);
-            Devices.method619();
+            Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
+            Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
+            Devices.setProperty("KEY_S1", this.lsoft);
+            Devices.setProperty("KEY_S2", this.rsoft);
+            Devices.setProperty("KEY_FIRE", this.fire);
+            Devices.setProperty("KEY_UP", this.up);
+            Devices.setProperty("KEY_DOWN", this.down);
+            Devices.setProperty("KEY_LEFT", this.left);
+            Devices.setProperty("KEY_RIGHT", this.right);
+            Devices.writeProperties();
         }
     }
     
@@ -697,14 +705,14 @@ public final class Property implements IProperty
         Keyboard.mapDeviceKey(8, Keyboard.method601(Property.aStringArray661[8]));
         Keyboard.mapDeviceKey(9, Keyboard.method601(Property.aStringArray661[9]));
         Keyboard.mapDeviceKey(0, Keyboard.method601(Property.aStringArray661[0]));
-        Devices.method618("KEY_S1", this.lsoft);
-        Devices.method618("KEY_S2", this.rsoft);
-        Devices.method618("KEY_FIRE", this.fire);
-        Devices.method618("KEY_UP", this.up);
-        Devices.method618("KEY_DOWN", this.down);
-        Devices.method618("KEY_LEFT", this.left);
-        Devices.method618("KEY_RIGHT", this.right);
-        Devices.method619();
+        Devices.setProperty("KEY_S1", this.lsoft);
+        Devices.setProperty("KEY_S2", this.rsoft);
+        Devices.setProperty("KEY_FIRE", this.fire);
+        Devices.setProperty("KEY_UP", this.up);
+        Devices.setProperty("KEY_DOWN", this.down);
+        Devices.setProperty("KEY_LEFT", this.left);
+        Devices.setProperty("KEY_RIGHT", this.right);
+        Devices.writeProperties();
         Keyboard.init();
         if (Settings.enableKeyCache != this.aButton696.getSelection()) {
             Keyboard.keyCacheStack.clear();
@@ -1742,7 +1750,7 @@ public final class Property implements IProperty
         ((Control)this.aText662).setLayoutData((Object)layoutData4);
         this.aText662.setText(this.rmsFolder);
         (this.aButton666 = new Button(this.recordsComp, 8388616)).setText("...");
-        (this.aCLabel647 = new CLabel(this.recordsComp, 0)).setText(UILocale.uiText("OPTION_RECORDS_RMS_TEXT", "All Records in current folder:"));
+        (this.aCLabel647 = new CLabel(this.recordsComp, 0)).setText(UILocale.uiText("OPTION_RECORDS_RMS_TEXT", "All Records in current midlet:"));
         ((Control)this.aCLabel647).setLayoutData((Object)layoutData2);
         (this.aTable665 = new Table(this.recordsComp, 2080)).setHeaderVisible(false);
         ((Control)this.aTable665).setLayoutData((Object)layoutData3);
@@ -1788,6 +1796,13 @@ public final class Property implements IProperty
     }
     
     private void method428() {
+        aTable665.removeAll();
+        for(String s: RecordStore.listRecordStores()) {
+            TableItem ti = new TableItem(this.aTable665, 0);
+            ti.setText(0, s);
+            ti.setChecked(false);
+        }
+        /*
         final File file;
         if (!(file = new File(this.method374())).exists() || !file.isDirectory()) {
             return;
@@ -1808,6 +1823,7 @@ public final class Property implements IProperty
             (item = this.aTable665.getItem(j)).setText(0, listFiles[j].getName().substring(1));
             item.setChecked(false);
         }
+         */
     }
     
     private void setupNetworkComp() {
