@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.MessageBox;
 public class Emulator
 {
 	// x64 build
-	public static final boolean _X64_VERSION = true;
+	public static final boolean _X64_VERSION = false;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -88,6 +88,7 @@ public class Emulator
 	public static final String propVersion = version;
     private static int dialogResult;
     private static boolean jdwpDebug;
+    private static boolean uei;
 
     private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -1090,6 +1091,9 @@ public class Emulator
             }
             else if (key.equalsIgnoreCase("key")) {
                 Keyboard.keyArg(value);
+            }
+            else if (key.equalsIgnoreCase("uei")) {
+                Emulator.uei = true;
             }
         }
         return true;

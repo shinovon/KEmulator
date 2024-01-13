@@ -50,7 +50,7 @@ public class EmulatorExe {
 				} catch (IOException e) {}
 			}
 			if(cp.length() > 0) cp.setLength(cp.length() - 1);
-			
+
 			System.out.println("device.list: KEmulator");
 			System.out.println("uei.version: 1.0.2");
 			System.out.println("uei.arguments: Xquery,Xdebug,Xrunjdwp:transport,Xrunjdwp:address,Xrunjdwp:server,Xdescriptor,Xdevice");
@@ -69,15 +69,15 @@ public class EmulatorExe {
 		if(new File("./jre/bin/java.exe").exists()) {
 			cmd.add("./jre/bin/java.exe");
 		} else {
-	        String javahome = System.getProperty("java.home");
-	        boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");
-	        cmd.add(javahome == null || javahome.isEmpty() ? "java" : (javahome + "/bin/java" + (win ? ".exe" : "")));
+			String javahome = System.getProperty("java.home");
+			boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");
+			cmd.add(javahome == null || javahome.isEmpty() ? "java" : (javahome + "/bin/java" + (win ? ".exe" : "")));
 		}
-		
+
 		// classpath
 		cmd.add("-cp");
 		cmd.add(path + "/KEmulator.jar");
-		
+
 		// jvm args
 		boolean xmxSet = false;
 		for(int i = 0; i < args.length; i++) {
@@ -107,13 +107,13 @@ public class EmulatorExe {
 		if(!xmxSet) {
 			cmd.add("-Xmx1G");
 		}
-		
+
 		// main class
-        cmd.add("emulator.Emulator");
-        
-        // emulator args
-        boolean classpathSet = false;
-        String jad = null;
+		cmd.add("emulator.Emulator");
+
+		// emulator args
+		boolean classpathSet = false;
+		String jad = null;
 		for(int i = 0; i < args.length; i++) {
 			String arg = args[i];
 			if(arg.startsWith("-Xdescriptor:")) {
@@ -146,7 +146,7 @@ public class EmulatorExe {
 				cmd.add(arg);
 			}
 		}
-		
+
 		if(!classpathSet) {
 			if(jad == null) {
 				System.err.println("No classpath set");
@@ -155,7 +155,9 @@ public class EmulatorExe {
 			cmd.add("-jar");
 			cmd.add(getMidletJarUrl(jad));
 		}
-		
+
+		cmd.add("-uei");
+
 		try {
 			Process process = new ProcessBuilder(new String[0]).directory(new File(path)).command(cmd).inheritIO().start();
 			new InputStreamCopier(process.getInputStream(), System.out).start();
