@@ -822,7 +822,7 @@ MouseTrackListener
         this.rotateScreenMenuItem.addSelectionListener((SelectionListener)this);
 
         this.rotate90MenuItem = new MenuItem(this.menuView, 8);
-        this.rotate90MenuItem.setText(emulator.UILocale.uiText("MENU_VIEW_ROTATE90", "Rotate 90°") + "");
+        this.rotate90MenuItem.setText("Rotate 90 Degrees");
         this.rotate90MenuItem.addSelectionListener(this);
         (this.forecPaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.uiText("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tF");
         this.forecPaintMenuItem.addSelectionListener((SelectionListener)this);
