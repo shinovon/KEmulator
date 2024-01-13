@@ -87,8 +87,8 @@ public class Emulator
 	public static final String aboutVersion = "v" + version;
 	public static final String propVersion = version;
     private static int dialogResult;
-    private static boolean jdwpDebug;
-    private static boolean uei;
+    public static boolean jdwpDebug;
+    public static boolean uei;
 
     private static void loadRichPresence() {
 		if(!rpcEnabled)
