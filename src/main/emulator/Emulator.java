@@ -1171,22 +1171,19 @@ public class Emulator
             sb.append("\"");
         }
     }
-    
-    static String getMidletJarUrl(final String s) {
+
+    static String getMidletJarUrl(String jadPath) {
         try {
-            final File file;
-            if ((file = new File(s)).exists()) {
-                final Properties properties;
-                (properties = new Properties()).load(new FileInputStream(file));
-                final String s2 = new String(properties.getProperty("MIDlet-Jar-URL").getBytes("ISO-8859-1"), "UTF-8");
-                final String absolutePath = file.getAbsolutePath();
-                return absolutePath.substring(0, absolutePath.lastIndexOf(92)) + "\\" + s2;
+            File file = new File(jadPath);
+            if (file.exists()) {
+                Properties properties = new Properties();
+                properties.load(new FileInputStream(file));
+                String absolutePath = file.getAbsolutePath().replace('\\', '/');
+                return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + new String(properties.getProperty("MIDlet-Jar-URL").getBytes("ISO-8859-1"), "UTF-8");
             }
-            return null;
+        } catch (Exception e) {
         }
-        catch (Exception ex) {ex.printStackTrace();
-            return null;
-        }
+        return null;
     }
     
     public static void AntiCrack(final Exception ex) {

@@ -172,8 +172,8 @@ public class EmulatorExe {
 			if (file.exists()) {
 				Properties properties = new Properties();
 				properties.load(new FileInputStream(file));
-				String absolutePath = file.getAbsolutePath();
-				return absolutePath.substring(0, absolutePath.lastIndexOf(92)) + "\\" + new String(properties.getProperty("MIDlet-Jar-URL").getBytes("ISO-8859-1"), "UTF-8");
+				String absolutePath = file.getAbsolutePath().replace('\\', '/');
+				return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + new String(properties.getProperty("MIDlet-Jar-URL").getBytes("ISO-8859-1"), "UTF-8");
 			}
 		} catch (Exception e) {
 		}
