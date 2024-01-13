@@ -911,7 +911,7 @@ public class Emulator
         if(jar.indexOf("\\") > -1)
         	jar = jar.substring(jar.lastIndexOf("\\")+1);
         if(Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
-        	Emulator.updatePresence("Running " + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), "" + jar);
+        	Emulator.updatePresence((uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), "" + jar);
         Emulator.emulatorimpl.getEmulatorScreen().method551(inputStream);
         setProperties();
         if (Emulator.midletClassName == null) {
