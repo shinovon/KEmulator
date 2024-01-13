@@ -1,8 +1,6 @@
 package emulator.ui.swt;
 
-import emulator.ui.effect.*;
 import emulator.ui.effect.a;
-import emulator.graphics2D.swt.*;
 import emulator.graphics2D.swt.ImageSWT;
 
 import org.eclipse.swt.layout.*;
@@ -85,7 +83,7 @@ public final class Class54 implements MouseListener, MouseMoveListener
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 2;
         layout.horizontalSpacing = 0;
-        ((Decorations)(this.aShell806 = new Shell(shell, 67680))).setText(emulator.UILocale.uiText("ABOUT_FRAME_TITLE", "About & Help"));
+        ((Decorations)(this.aShell806 = new Shell(shell, 67680))).setText(emulator.UILocale.get("ABOUT_FRAME_TITLE", "About & Help"));
         ((Decorations)this.aShell806).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Composite)this.aShell806).setLayout((Layout)layout);
         ((Control)this.aShell806).setSize(new Point(360, 400));
@@ -101,7 +99,7 @@ public final class Class54 implements MouseListener, MouseMoveListener
         ((Control)this.aLink820).setLayoutData((Object)gridData2);
      //   ((Control)this.aLink820).setEnabled(false);
         this.aLink820.addSelectionListener((SelectionListener)new Class157(this));
-        (this.aLink807 = new Link((Composite)this.aShell806, 0)).setText("Mod by shinovon\n" + emulator.UILocale.uiText("ABOUT_AUTHOR", "Author") + ": <a>Wu.Liang</a>  (c) 2006,2008");
+        (this.aLink807 = new Link((Composite)this.aShell806, 0)).setText("Mod by shinovon\n" + emulator.UILocale.get("ABOUT_AUTHOR", "Author") + ": <a>Wu.Liang</a>  (c) 2006,2008");
         ((Control)this.aLink807).setLayoutData((Object)layoutData);
         this.aLink807.addSelectionListener((SelectionListener)new Class156(this));
         ((Control)(this.aStyledText808 = new StyledText((Composite)this.aShell806, 2562))).setLayoutData((Object)layoutData4);
@@ -109,11 +107,11 @@ public final class Class54 implements MouseListener, MouseMoveListener
         this.aStyledText808.setEditable(false);
         this.aStyledText808.setIndent(5);
         aStyledText808.setFont(EmulatorScreen.f);
-        (this.aButton819 = new Button((Composite)this.aShell806, 8388608)).setText(emulator.UILocale.uiText("ABOUT_ONLINE_MANUAL", "Online Manual"));
+        (this.aButton819 = new Button((Composite)this.aShell806, 8388608)).setText(emulator.UILocale.get("ABOUT_ONLINE_MANUAL", "Online Manual"));
         ((Control)this.aButton819).setLayoutData((Object)layoutData2);
         ((Control)this.aButton819).setEnabled(false);
         this.aButton819.addSelectionListener((SelectionListener)new Class162(this));
-        (this.aButton809 = new Button((Composite)this.aShell806, 8388616)).setText(emulator.UILocale.uiText("DIALOG_OK", "OK"));
+        (this.aButton809 = new Button((Composite)this.aShell806, 8388616)).setText(emulator.UILocale.get("DIALOG_OK", "OK"));
         ((Control)this.aButton809).setLayoutData((Object)layoutData3);
         layoutData3.heightHint = 20;
         layoutData3.widthHint = 70;

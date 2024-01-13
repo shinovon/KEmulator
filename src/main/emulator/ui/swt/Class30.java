@@ -65,7 +65,7 @@ public final class Class30 extends Dialog
         float n;
         if (this.anInt604 == 0) {
             final Group group;
-            (group = new Group((Composite)shell, 0)).setText(UILocale.uiText("M3G_VIEW_DIALOG_FOVY", "Fovy"));
+            (group = new Group((Composite)shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_FOVY", "Fovy"));
             layoutData.horizontalSpan = 2;
             ((Control)group).setLayoutData((Object)layoutData);
             ((Composite)group).setLayout((Layout)new GridLayout(1, true));
@@ -75,13 +75,13 @@ public final class Class30 extends Dialog
         }
         else if (this.anInt604 == 1) {
             final Group group2;
-            (group2 = new Group((Composite)shell, 0)).setText(UILocale.uiText("M3G_VIEW_DIALOG_NEAR", "Near"));
+            (group2 = new Group((Composite)shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_NEAR", "Near"));
             ((Control)group2).setLayoutData((Object)layoutData);
             ((Composite)group2).setLayout((Layout)new GridLayout(1, true));
             ((Control)(this.aText607 = new Text((Composite)group2, 133120))).setLayoutData((Object)layoutData);
             this.aText607.setText(String.valueOf(this.aFloat606));
             final Group group3;
-            (group3 = new Group((Composite)shell, 0)).setText(UILocale.uiText("M3G_VIEW_DIALOG_FAR", "Far"));
+            (group3 = new Group((Composite)shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_FAR", "Far"));
             ((Control)group3).setLayoutData((Object)layoutData);
             ((Composite)group3).setLayout((Layout)new GridLayout(1, true));
             ((Control)(this.aText609 = new Text((Composite)group3, 133120))).setLayoutData((Object)layoutData);
@@ -113,13 +113,13 @@ public final class Class30 extends Dialog
         }
         text.setText(String.valueOf(n));
         final Button button;
-        (button = new Button((Composite)shell, 8388616)).setText(UILocale.uiText("DIALOG_OK", "OK"));
+        (button = new Button((Composite)shell, 8388616)).setText(UILocale.get("DIALOG_OK", "OK"));
         final GridData layoutData3;
         (layoutData3 = new GridData(768)).widthHint = 80;
         ((Control)button).setLayoutData((Object)layoutData3);
         button.addSelectionListener((SelectionListener)new Class80(this, shell));
         final Button button2;
-        (button2 = new Button((Composite)shell, 8388616)).setText(UILocale.uiText("DIALOG_CANCEL", "Cancel"));
+        (button2 = new Button((Composite)shell, 8388616)).setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
         final GridData layoutData4;
         (layoutData4 = new GridData(768)).widthHint = 80;
         ((Control)button2).setLayoutData((Object)layoutData4);

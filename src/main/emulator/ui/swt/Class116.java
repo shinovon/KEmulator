@@ -14,7 +14,7 @@ final class Class116 extends SelectionAdapter
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         final Class30 class30;
-        (class30 = new Class30(Class90.method499(this.aClass90_1167), 1)).setText(UILocale.uiText("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes"));
+        (class30 = new Class30(Class90.method499(this.aClass90_1167), 1)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes"));
         class30.method338(Class90.method503(this.aClass90_1167), Class90.method512(this.aClass90_1167));
         class30.method340();
         if (Class90.method500(this.aClass90_1167) == 0) {

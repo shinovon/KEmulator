@@ -426,8 +426,8 @@ public class Emulator
     	if(_X64_VERSION) {
             return "KEmulator nnmod " + aboutVersion+"\n\n"
             		+ "\tMulti-Platform\n"
-            		+ "\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n"
-                	+ UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
+            		+ "\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n"
+                	+ UILocale.get("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
                 	+ "\tMIDP 2.0 (JSR118)\n"
                 	+ "\tNokiaUI 1.4\n"
                 	+ "\tSprint 1.0\n"
@@ -436,8 +436,8 @@ public class Emulator
                 	;
     	}
         return "KEmulator nnmod "+aboutVersion+"\n\n\t" +
-    	UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" + 
-    	UILocale.uiText("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
+    	UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" +
+    	UILocale.get("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
     	+ "\tMIDP 2.0 (JSR118)\n"
     	+ "\tNokiaUI 1.4\n"
     	+ "\tSamsung 1.0\n"
@@ -452,9 +452,9 @@ public class Emulator
     
     public static String getAboutString() {
     	if(_X64_VERSION) {
-            return "KEmulator v1.0.3" + "\nmulti-platform mod\n by nnproject (Shinovon)\n\t\t"+aboutVersion+"\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+            return "KEmulator v1.0.3" + "\nmulti-platform mod\n by nnproject (Shinovon)\n\t\t"+aboutVersion+"\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     	}
-        return "KEmulator v1.0.3" + "\n\tnnmod "+aboutVersion+"\n\n\t" + UILocale.uiText("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+        return "KEmulator v1.0.3" + "\n\tnnmod "+aboutVersion+"\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     }
     
     public static void getLibraries() {
@@ -613,7 +613,7 @@ public class Emulator
         	ex.printStackTrace();
             Emulator.emulatorimpl.getLogStream().println("3 "+ex.toString());
         	if(ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
-        		Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("LOAD_DRM_ERROR", "Input file isn't ZIP. Trying to load DRM Content?"));
+        		Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_DRM_ERROR", "Input file isn't ZIP. Trying to load DRM Content?"));
         	}
             return false;
         }
@@ -862,7 +862,7 @@ public class Emulator
 		}
     	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
-        UILocale.method709();
+        UILocale.initLocale();
         Emulator.emulatorimpl = new EmulatorImpl();
         
         try {
@@ -885,7 +885,7 @@ public class Emulator
         Emulator.record = new KeyRecords();
         getLibraries();
         if (!getJarClasses()) {
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
             return;
         }
         InputStream inputStream = null;
@@ -915,7 +915,7 @@ public class Emulator
         Emulator.emulatorimpl.getEmulatorScreen().method551(inputStream);
         setProperties();
         if (Emulator.midletClassName == null) {
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
             return;
         }
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
@@ -925,12 +925,12 @@ public class Emulator
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
         catch (Error error) {
             error.printStackTrace();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
         Emulator.eventQueue = new EventQueue();
@@ -941,13 +941,13 @@ public class Emulator
         catch (Exception ex2) {
             ex2.printStackTrace();
             Emulator.eventQueue.stop();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
         catch (Error error2) {
             error2.printStackTrace();
             Emulator.eventQueue.stop();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.uiText("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             return;
         }
         Emulator.emulatorimpl.method822().method302();

@@ -15,7 +15,7 @@ final class Class36 extends SelectionAdapter
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         final FileDialog fileDialog;
-        ((Dialog)(fileDialog = new FileDialog(MemoryView.method632(this.aClass110_621), 8192))).setText(UILocale.uiText("MEMORY_VIEW_SAVE_TO_FILE", "Save to file"));
+        ((Dialog)(fileDialog = new FileDialog(MemoryView.method632(this.aClass110_621), 8192))).setText(UILocale.get("MEMORY_VIEW_SAVE_TO_FILE", "Save to file"));
         fileDialog.setFilterExtensions(new String[] { "*.png" });
         final String open;
         if ((open = fileDialog.open()) != null && MemoryView.method640(this.aClass110_621) != null) {

@@ -3,7 +3,6 @@ package emulator.ui.swt;
 import org.eclipse.swt.events.*;
 import emulator.*;
 import emulator.UILocale;
-import emulator.custom.*;
 import emulator.custom.h;
 
 import java.io.*;
@@ -23,7 +22,7 @@ final class Class164 extends SelectionAdapter
         Emulator.getEmulator().getScreen();
         EmulatorScreen.method554();
         final FileDialog fileDialog;
-        ((Dialog)(fileDialog = new FileDialog(Class46.method442(this.aClass46_1432), 8192))).setText(UILocale.uiText("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
+        ((Dialog)(fileDialog = new FileDialog(Class46.method442(this.aClass46_1432), 8192))).setText(UILocale.get("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
         fileDialog.setFileName("bytecode.txt");
         final String open;
         if ((open = fileDialog.open()) != null) {

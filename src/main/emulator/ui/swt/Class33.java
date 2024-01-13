@@ -16,8 +16,8 @@ final class Class33 extends SelectionAdapter
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         final DirectoryDialog directoryDialog;
-        ((Dialog)(directoryDialog = new DirectoryDialog(MemoryView.method632(this.aClass110_618)))).setText(UILocale.uiText("MEMORY_VIEW_SAVE_ALL_IMAGES", "Save all images"));
-        directoryDialog.setMessage(UILocale.uiText("MEMORY_VIEW_CHOOSE_DIRECTORY", "Choose a directory"));
+        ((Dialog)(directoryDialog = new DirectoryDialog(MemoryView.method632(this.aClass110_618)))).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL_IMAGES", "Save all images"));
+        directoryDialog.setMessage(UILocale.get("MEMORY_VIEW_CHOOSE_DIRECTORY", "Choose a directory"));
         directoryDialog.setFilterPath(System.getProperty("user.dir"));
         final String open;
         if ((open = directoryDialog.open()) != null) {

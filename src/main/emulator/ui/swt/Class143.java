@@ -14,7 +14,7 @@ final class Class143 extends SelectionAdapter
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         final Class30 class30;
-        (class30 = new Class30(Class90.method499(this.aClass90_1302), 2)).setText(UILocale.uiText("M3G_VIEW_CAMEAR_POSITION", "Camera Position"));
+        (class30 = new Class30(Class90.method499(this.aClass90_1302), 2)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position"));
         class30.method339(Class90.method525(this.aClass90_1302), Class90.method532(this.aClass90_1302), Class90.method537(this.aClass90_1302));
         class30.method340();
         Class90.method526(this.aClass90_1302, class30.aFloat610);

@@ -14,7 +14,7 @@ final class Class37 extends SelectionAdapter
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         final Class30 class30;
-        (class30 = new Class30(Class90.method499(this.aClass90_625), 0)).setText(UILocale.uiText("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View"));
+        (class30 = new Class30(Class90.method499(this.aClass90_625), 0)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View"));
         class30.method337(Class90.method517(this.aClass90_625));
         class30.method340();
         if (class30.aFloat603 > 0.0f) {

@@ -111,7 +111,7 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
     }
     
     private void method487() {
-        ((Decorations)(this.aShell868 = new Shell())).setText(UILocale.uiText("SMS_CONSOLE_TITLE", "SMS Console"));
+        ((Decorations)(this.aShell868 = new Shell())).setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
         ((Decorations)this.aShell868).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Composite)this.aShell868).setLayout((Layout)new GridLayout());
         ((Control)this.aShell868).setSize(new Point(100, 200));
@@ -140,13 +140,13 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 2;
         ((Composite)(this.aGroup872 = new Group((Composite)this.aShell868, 0))).setLayout((Layout)layout);
-        this.aGroup872.setText(UILocale.uiText("SMS_CONSOLE_SEND_TO", "Send to midlet"));
+        this.aGroup872.setText(UILocale.get("SMS_CONSOLE_SEND_TO", "Send to midlet"));
         ((Control)this.aGroup872).setLayoutData((Object)layoutData);
         ((Control)(this.aStyledText874 = new StyledText((Composite)this.aGroup872, 2624))).setLayoutData((Object)layoutData2);
-        (this.aButton878 = new Button((Composite)this.aGroup872, 8388616)).setText(UILocale.uiText("SMS_CONSOLE_CLEAR", "Clear"));
+        (this.aButton878 = new Button((Composite)this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_CLEAR", "Clear"));
         ((Control)this.aButton878).setLayoutData((Object)gridData);
         this.aButton878.addSelectionListener((SelectionListener)new Class84(this));
-        (this.aButton880 = new Button((Composite)this.aGroup872, 8388616)).setText(UILocale.uiText("SMS_CONSOLE_SEND", "Send"));
+        (this.aButton880 = new Button((Composite)this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_SEND", "Send"));
         ((Control)this.aButton880).setLayoutData((Object)gridData);
         this.aButton880.addSelectionListener((SelectionListener)new Class87(this));
     }
@@ -158,9 +158,9 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
         gridData.grabExcessVerticalSpace = true;
         gridData.verticalAlignment = 4;
         ((Composite)(this.aGroup876 = new Group((Composite)this.aShell868, 0))).setLayout((Layout)new GridLayout());
-        this.aGroup876.setText(UILocale.uiText("SMS_CONSOLE_RECEIVE", "Receive from midlet"));
+        this.aGroup876.setText(UILocale.get("SMS_CONSOLE_RECEIVE", "Receive from midlet"));
         ((Control)this.aGroup876).setLayoutData((Object)gridData);
-        (this.aButton873 = new Button((Composite)this.aGroup876, 32)).setText(UILocale.uiText("SMS_CONSOLE_BLOCK", "Block the received message"));
+        (this.aButton873 = new Button((Composite)this.aGroup876, 32)).setText(UILocale.get("SMS_CONSOLE_BLOCK", "Block the received message"));
         this.aButton873.setSelection(this.aBoolean869);
         this.aButton873.addSelectionListener((SelectionListener)new Class86(this));
         ((Control)(this.aStyledText877 = new StyledText((Composite)this.aGroup876, 2624))).setLayoutData((Object)gridData);

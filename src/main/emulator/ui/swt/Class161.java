@@ -101,15 +101,15 @@ public final class Class161 implements ControlListener, DisposeListener
         layout.marginHeight = 15;
         layout.horizontalSpacing = 5;
         layout.marginWidth = 5;
-        ((Decorations)(this.aShell1404 = new Shell(224))).setText(UILocale.uiText("KEYPAD_FRAME_TITLE", "Keypad"));
+        ((Decorations)(this.aShell1404 = new Shell(224))).setText(UILocale.get("KEYPAD_FRAME_TITLE", "Keypad"));
         ((Decorations)this.aShell1404).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Composite)this.aShell1404).setLayout((Layout)layout);
         ((Control)this.aShell1404).setSize(new Point(259, 280));
-        (this.aButton1405 = new Button((Composite)this.aShell1404, 8388608)).setText(UILocale.uiText("KEYPAD_FRAME_LSK", "Left Soft Key"));
+        (this.aButton1405 = new Button((Composite)this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_LSK", "Left Soft Key"));
         ((Control)this.aButton1405).addMouseListener((MouseListener)new Class155(this));
         ((Control)(this.aButton1428 = new Button((Composite)this.aShell1404, 8388608))).setEnabled(false);
         ((Control)this.aButton1428).setVisible(false);
-        (this.aButton1407 = new Button((Composite)this.aShell1404, 8388608)).setText(UILocale.uiText("KEYPAD_FRAME_RSK", "Right Soft Key"));
+        (this.aButton1407 = new Button((Composite)this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_RSK", "Right Soft Key"));
         ((Control)this.aButton1407).setLayoutData((Object)layoutData6);
         ((Control)this.aButton1407).addMouseListener((MouseListener)new Class154(this));
         ((Control)(this.aButton1429 = new Button((Composite)this.aShell1404, 8388608))).setEnabled(false);

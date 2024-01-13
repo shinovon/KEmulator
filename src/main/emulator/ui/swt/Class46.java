@@ -2,7 +2,7 @@ package emulator.ui.swt;
 
 import org.eclipse.swt.custom.*;
 import java.text.*;
-import emulator.custom.*;
+
 import emulator.custom.h;
 import emulator.custom.h.MethodInfo;
 
@@ -159,7 +159,7 @@ public final class Class46 implements Runnable, DisposeListener
     }
     
     private void method449() {
-        ((Decorations)(this.aShell784 = new Shell(1264))).setText(UILocale.uiText("METHOD_FRAME_TITLE", "Methods"));
+        ((Decorations)(this.aShell784 = new Shell(1264))).setText(UILocale.get("METHOD_FRAME_TITLE", "Methods"));
         ((Decorations)this.aShell784).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Control)this.aShell784).setSize(new Point(752, 483));
         ((Composite)this.aShell784).setLayout((Layout)new GridLayout());
@@ -190,9 +190,9 @@ public final class Class46 implements Runnable, DisposeListener
         layout.marginHeight = 3;
         layout.marginWidth = 3;
         (this.aComposite787 = new Composite((Composite)this.aSashForm785, 0)).setLayout((Layout)layout);
-        (this.aButton783 = new Button(this.aComposite787, 8388608)).setText(UILocale.uiText("METHOD_FRAME_RESET_CALLS", "Reset Calls"));
+        (this.aButton783 = new Button(this.aComposite787, 8388608)).setText(UILocale.get("METHOD_FRAME_RESET_CALLS", "Reset Calls"));
         this.aButton783.addSelectionListener((SelectionListener)new Class170(this));
-        (this.aButton795 = new Button(this.aComposite787, 8388608)).setText(UILocale.uiText("METHOD_FRAME_EXPORT_BYTECODE", "Export ByteCode"));
+        (this.aButton795 = new Button(this.aComposite787, 8388608)).setText(UILocale.get("METHOD_FRAME_EXPORT_BYTECODE", "Export ByteCode"));
         this.aButton795.addSelectionListener((SelectionListener)new Class164(this));
         if(!Settings.enableMethodTrack)
         	new Label(this.aComposite787, 8388608).setText("To track calls, enable it in System settings");
@@ -269,7 +269,7 @@ public final class Class46 implements Runnable, DisposeListener
         (this.aButton798 = new Button(this.aComposite796, 32)).setText("Show Frames    ");
         this.aButton798.addSelectionListener((SelectionListener)new Class76(this));
         ((Control)(this.aText789 = new Text(this.aComposite796, 2048))).setLayoutData((Object)layoutData);
-        (this.aButton799 = new Button(this.aComposite796, 8388608)).setText(UILocale.uiText("METHOD_FRAME_SEARCH", "Search"));
+        (this.aButton799 = new Button(this.aComposite796, 8388608)).setText(UILocale.get("METHOD_FRAME_SEARCH", "Search"));
         this.aButton799.addSelectionListener((SelectionListener)new Class79(this));
         ((Control)this.aButton799).addFocusListener((FocusListener)new Class78(this));
         ((Control)(this.aStyledText790 = new StyledText(this.aComposite796, 2562))).setLayoutData((Object)layoutData2);

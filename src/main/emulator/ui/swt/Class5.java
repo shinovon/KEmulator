@@ -260,7 +260,7 @@ public final class Class5 implements Runnable, DisposeListener
             Label_0172: {
                 switch (this.anInt553) {
                     case 0: {
-                        ((Decorations)this.aShell557).setText(emulator.UILocale.uiText("WATCHES_FRAME_TITLE", "Class Watcher"));
+                        ((Decorations)this.aShell557).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
                         if (aShell544 != null) {
                             break;
                         }
@@ -270,7 +270,7 @@ public final class Class5 implements Runnable, DisposeListener
                         break Label_0172;
                     }
                     case 1: {
-                        ((Decorations)this.aShell557).setText(emulator.UILocale.uiText("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
+                        ((Decorations)this.aShell557).setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
                         break;
                     }
                     default: {
@@ -398,7 +398,7 @@ public final class Class5 implements Runnable, DisposeListener
         layoutData2.verticalAlignment = 2;
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 5;
-        ((Decorations)(this.aShell557 = new Shell())).setText(emulator.UILocale.uiText("WATCHES_FRAME_TITLE", "Watches"));
+        ((Decorations)(this.aShell557 = new Shell())).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
         ((Decorations)this.aShell557).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Composite)this.aShell557).setLayout((Layout)layout);
         (this.aCLabel547 = new CLabel((Composite)this.aShell557, 0)).setText("Classes:");
