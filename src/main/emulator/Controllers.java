@@ -74,18 +74,18 @@ public class Controllers
         Controllers.binds = new String[Controllers.count][19];
         for (int i = 0; i < Controllers.count; ++i) {
             String name = ((Controller) controllers.get(i)).getName();
-            Controllers.binds[i][0] = "0";
-            Controllers.binds[i][1] = "1";
-            Controllers.binds[i][2] = "2";
-            Controllers.binds[i][3] = "3";
-            Controllers.binds[i][4] = "4";
-            Controllers.binds[i][5] = "5";
-            Controllers.binds[i][6] = "6";
-            Controllers.binds[i][7] = "7";
-            Controllers.binds[i][8] = "8";
-            Controllers.binds[i][9] = "12";
-            Controllers.binds[i][10] = "13";
-            Controllers.binds[i][11] = "14";
+            Controllers.binds[i][0] = "";
+            Controllers.binds[i][1] = "";
+            Controllers.binds[i][2] = "";
+            Controllers.binds[i][3] = "";
+            Controllers.binds[i][4] = "";
+            Controllers.binds[i][5] = "";
+            Controllers.binds[i][6] = "";
+            Controllers.binds[i][7] = "";
+            Controllers.binds[i][8] = "";
+            Controllers.binds[i][9] = "";
+            Controllers.binds[i][10] = "";
+            Controllers.binds[i][11] = "";
             Controllers.binds[i][12] = "UP";
             Controllers.binds[i][13] = "DOWN";
             Controllers.binds[i][14] = "LEFT";
@@ -112,16 +112,16 @@ public class Controllers
     }
     
     public static String getBind(int controllerId, int n2) {
-        String string;
-        if (!(string = Controllers.binds[controllerId][n2]).equalsIgnoreCase("LEFT") && !string.equalsIgnoreCase("RIGHT") && !string.equalsIgnoreCase("UP") && !string.equalsIgnoreCase("DOWN")) {
-            string = "B_" + string;
+        String s = Controllers.binds[controllerId][n2];
+        if (!s.isEmpty() && !s.equalsIgnoreCase("LEFT") && !s.equalsIgnoreCase("RIGHT") && !s.equalsIgnoreCase("UP") && !s.equalsIgnoreCase("DOWN")) {
+            s = "B_" + s;
         }
-        return string;
+        return s;
     }
     
     private static int map(int n, String s) {
         int n2;
-        for (n2 = 0; n2 < 19 && !s.equalsIgnoreCase(Controllers.binds[n][n2]); ++n2) {}
+        for (n2 = 0; n2 < 19 && !s.equalsIgnoreCase(Controllers.binds[n][n2]); ++n2);
         if (n2 == 19) {
             return 10000;
         }

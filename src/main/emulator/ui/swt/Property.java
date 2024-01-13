@@ -58,7 +58,7 @@ public final class Property implements IProperty
     private CLabel aCLabel738;
     private CTabFolder tabFolder;
     private Composite customComp;
-    private Composite keyMapComp;
+    private Composite keyMapBindsComp;
     private CLabel aCLabel741;
     private Text aText731;
     private CLabel aCLabel744;
@@ -145,8 +145,8 @@ public final class Property implements IProperty
     private int fontMediumSIze;
     private int fontLargeSize;
     private CLabel aCLabel646;
-    private Combo aCombo699;
-    private Button aButton755;
+    private Combo controllerCombo;
+    private Button keymapRefreshBtn;
     private static String[] aStringArray661;
     private IImage anIImage671;
     private IImage anIImage674;
@@ -181,6 +181,9 @@ public final class Property implements IProperty
 	private Font f;
 	private CLabel labelLocale;
 	private Text localeText;
+    private Button keymapClearBtn;
+    private Composite keyMapControllerComp;
+    private Composite keyMapTabComp;
 
     public Property() {
         super();
@@ -218,7 +221,7 @@ public final class Property implements IProperty
         this.aCLabel738 = null;
         this.tabFolder = null;
         this.customComp = null;
-        this.keyMapComp = null;
+        this.keyMapBindsComp = null;
         this.aCLabel741 = null;
         this.aText731 = null;
         this.aCLabel744 = null;
@@ -290,8 +293,8 @@ public final class Property implements IProperty
         this.aCLabel645 = null;
         this.aText633 = null;
         this.aCLabel646 = null;
-        this.aCombo699 = null;
-        this.aButton755 = null;
+        this.controllerCombo = null;
+        this.keymapRefreshBtn = null;
         this.recordsComp = null;
         this.aTable665 = null;
         this.aCLabel647 = null;
@@ -994,7 +997,7 @@ public final class Property implements IProperty
         cTabItem.setControl((Control)this.customComp);
         final CTabItem cTabItem2;
         (cTabItem2 = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
-        cTabItem2.setControl((Control)this.keyMapComp);
+        cTabItem2.setControl((Control)this.keyMapTabComp);
         final CTabItem cTabItem3;
         (cTabItem3 = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSFONT", "SysFont"));
         cTabItem3.setControl((Control)this.sysFontComp);
@@ -1210,131 +1213,145 @@ public final class Property implements IProperty
         (layoutData40 = new GridData()).horizontalAlignment = 4;
         layoutData40.grabExcessHorizontalSpace = false;
         layoutData40.verticalAlignment = 2;
-        this.keyMapComp = new Composite((Composite)this.tabFolder, 0);
-        keyMapComp.setFont(f);
+
+        keyMapTabComp = new Composite((Composite)this.tabFolder, 0);
+        keyMapTabComp.setFont(f);
+        GridLayout l = new GridLayout();
+        l.marginWidth = 0;
+        l.marginHeight = 0;
+        keyMapTabComp.setLayout(l);
+
+        keyMapControllerComp = new Composite(keyMapTabComp, 0);
+        keyMapControllerComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        l = new GridLayout();
+        l.numColumns = 5;
+        keyMapControllerComp.setLayout(l);
+
+        keyMapBindsComp = new Composite(keyMapTabComp, 0);
         final GridLayout layout;
+        keyMapBindsComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         
         (layout = new GridLayout()).numColumns = 4;
         layout.horizontalSpacing = 45;
-        this.keyMapComp.setLayout((Layout)layout);
-        (this.aCLabel646 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_CONTROLLER", "Controller:"));
+        this.keyMapBindsComp.setLayout((Layout)layout);
+        (this.aCLabel646 = new CLabel(this.keyMapControllerComp, 0)).setText(UILocale.get("OPTION_KEYMAP_CONTROLLER", "Controller:"));
         ((Control)this.aCLabel646).setLayoutData((Object)layoutData);
         this.method400();
-        (this.aCLabel741 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_LSK", "LeftSoftKey:"));
+        (this.aCLabel741 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_LSK", "LeftSoftKey:"));
         ((Control)this.aCLabel741).setLayoutData((Object)layoutData38);
-        (this.aText731 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText731 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText731).setLayoutData((Object)layoutData20);
         this.aText731.setText(Keyboard.get(17));
         ((Control)this.aText731).addKeyListener((KeyListener)new Class107(this));
-        (this.aCLabel744 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_RSK", "RightSoftKey:"));
+        (this.aCLabel744 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_RSK", "RightSoftKey:"));
         ((Control)this.aCLabel744).setLayoutData((Object)layoutData37);
-        (this.aText735 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText735 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText735).setLayoutData((Object)layoutData2);
         this.aText735.setText(Keyboard.get(18));
         ((Control)this.aText735).addKeyListener((KeyListener)new Class137(this));
-        (this.aCLabel762 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_1", "Num_1:"));
+        (this.aCLabel762 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_1", "Num_1:"));
         ((Control)this.aCLabel762).setLayoutData((Object)layoutData40);
-        (this.aText754 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText754 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText754).setLayoutData((Object)layoutData16);
         this.aText754.setText(Keyboard.get(1));
         ((Control)this.aText754).addKeyListener((KeyListener)new Class135(this));
-        (this.aCLabel765 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_2", "Num_2:"));
+        (this.aCLabel765 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_2", "Num_2:"));
         ((Control)this.aCLabel765).setLayoutData((Object)layoutData32);
-        (this.aText757 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText757 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText757).setLayoutData((Object)layoutData5);
         this.aText757.setText(Keyboard.get(2));
         ((Control)this.aText757).addKeyListener((KeyListener)new Class133(this));
-        (this.aCLabel767 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_3", "Num_3:"));
+        (this.aCLabel767 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_3", "Num_3:"));
         ((Control)this.aCLabel767).setLayoutData((Object)layoutData31);
-        (this.aText760 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText760 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText760).setLayoutData((Object)layoutData15);
         this.aText760.setText(Keyboard.get(3));
         ((Control)this.aText760).addKeyListener((KeyListener)new Class131(this));
-        (this.aCLabel769 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_4", "Num_4:"));
+        (this.aCLabel769 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_4", "Num_4:"));
         ((Control)this.aCLabel769).setLayoutData((Object)layoutData27);
-        (this.aText763 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText763 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText763).setLayoutData((Object)layoutData6);
         this.aText763.setText(Keyboard.get(4));
         ((Control)this.aText763).addKeyListener((KeyListener)new Class177(this));
-        (this.aCLabel771 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_5", "Num_5:"));
+        (this.aCLabel771 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_5", "Num_5:"));
         ((Control)this.aCLabel771).setLayoutData((Object)layoutData25);
-        (this.aText766 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText766 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText766).setLayoutData((Object)layoutData14);
         this.aText766.setText(Keyboard.get(5));
         ((Control)this.aText766).addKeyListener((KeyListener)new Class168(this));
-        (this.aCLabel773 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_6", "Num_6:"));
+        (this.aCLabel773 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_6", "Num_6:"));
         ((Control)this.aCLabel773).setLayoutData((Object)layoutData26);
-        (this.aText768 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText768 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText768).setLayoutData((Object)layoutData7);
         this.aText768.setText(Keyboard.get(6));
         ((Control)this.aText768).addKeyListener((KeyListener)new Class173(this));
-        (this.aCLabel626 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_7", "Num_7:"));
+        (this.aCLabel626 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_7", "Num_7:"));
         ((Control)this.aCLabel626).setLayoutData((Object)layoutData24);
-        (this.aText770 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText770 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText770).setLayoutData((Object)layoutData13);
         this.aText770.setText(Keyboard.get(7));
         ((Control)this.aText770).addKeyListener((KeyListener)new Class172(this));
-        (this.aCLabel628 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_8", "Num_8:"));
+        (this.aCLabel628 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_8", "Num_8:"));
         ((Control)this.aCLabel628).setLayoutData((Object)layoutData23);
-        (this.aText772 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText772 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText772).setLayoutData((Object)layoutData8);
         this.aText772.setText(Keyboard.get(8));
         ((Control)this.aText772).addKeyListener((KeyListener)new Class171(this));
-        (this.aCLabel630 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_9", "Num_9:"));
+        (this.aCLabel630 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_9", "Num_9:"));
         ((Control)this.aCLabel630).setLayoutData((Object)layoutData21);
-        (this.aText774 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText774 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText774).setLayoutData((Object)layoutData12);
         this.aText774.setText(Keyboard.get(9));
         ((Control)this.aText774).addKeyListener((KeyListener)new Class174(this));
-        (this.aCLabel632 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_0", "Num_0:"));
+        (this.aCLabel632 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_NUM_0", "Num_0:"));
         ((Control)this.aCLabel632).setLayoutData((Object)layoutData22);
-        (this.aText627 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText627 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText627).setLayoutData((Object)layoutData9);
         this.aText627.setText(Keyboard.get(0));
         ((Control)this.aText627).addKeyListener((KeyListener)new Class175(this));
-        (this.aCLabel634 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_KEY_*", "Key *:"));
+        (this.aCLabel634 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_KEY_*", "Key *:"));
         ((Control)this.aCLabel634).setLayoutData((Object)layoutData30);
-        (this.aText629 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText629 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText629).setLayoutData((Object)layoutData11);
         this.aText629.setText(Keyboard.get(10));
         ((Control)this.aText629).addKeyListener((KeyListener)new Class180(this));
-        (this.aCLabel636 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_KEY_#", "Key #:"));
+        (this.aCLabel636 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_KEY_#", "Key #:"));
         ((Control)this.aCLabel636).setLayoutData((Object)layoutData29);
-        (this.aText631 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText631 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText631).setLayoutData((Object)layoutData10);
         this.aText631.setText(Keyboard.get(11));
         ((Control)this.aText631).addKeyListener((KeyListener)new Class181(this));
-        (this.aCLabel747 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_LEFT", "Pad_Left:"));
+        (this.aCLabel747 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_LEFT", "Pad_Left:"));
         ((Control)this.aCLabel747).setLayoutData((Object)layoutData35);
-        (this.aText739 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText739 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText739).setLayoutData((Object)layoutData19);
         this.aText739.setText(Keyboard.get(14));
         ((Control)this.aText739).addKeyListener((KeyListener)new Class176(this));
-        (this.aCLabel750 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_RIGHT", "Pad_Right:"));
+        (this.aCLabel750 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_RIGHT", "Pad_Right:"));
         ((Control)this.aCLabel750).setLayoutData((Object)layoutData36);
-        (this.aText742 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText742 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText742).setLayoutData((Object)layoutData3);
         this.aText742.setText(Keyboard.get(15));
         ((Control)this.aText742).addKeyListener((KeyListener)new Class179(this));
-        (this.aCLabel753 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_UP", "Pad_Up:"));
+        (this.aCLabel753 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_UP", "Pad_Up:"));
         ((Control)this.aCLabel753).setLayoutData((Object)layoutData34);
-        (this.aText745 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText745 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText745).setLayoutData((Object)layoutData18);
         this.aText745.setText(Keyboard.get(12));
         ((Control)this.aText745).addKeyListener((KeyListener)new Class178(this));
-        (this.aCLabel756 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_DOWN", "Pad_Down:"));
+        (this.aCLabel756 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_DOWN", "Pad_Down:"));
         ((Control)this.aCLabel756).setLayoutData((Object)layoutData33);
-        (this.aText748 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText748 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText748).setLayoutData((Object)layoutData4);
         this.aText748.setText(Keyboard.get(13));
         ((Control)this.aText748).addKeyListener((KeyListener)new Class183(this));
-        (this.aCLabel759 = new CLabel(this.keyMapComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_MIDDLE", "Pad_Middle:"));
+        (this.aCLabel759 = new CLabel(this.keyMapBindsComp, 0)).setText(UILocale.get("OPTION_KEYMAP_PAD_MIDDLE", "Pad_Middle:"));
         ((Control)this.aCLabel759).setLayoutData((Object)layoutData39);
-        (this.aText751 = new Text(this.keyMapComp, 2048)).setEditable(false);
+        (this.aText751 = new Text(this.keyMapBindsComp, 2048)).setEditable(false);
         ((Control)this.aText751).setLayoutData((Object)layoutData17);
         this.aText751.setText(Keyboard.get(16));
         ((Control)this.aText751).addKeyListener((KeyListener)new Class182(this));
-        (this.aButton696 = new Button(this.keyMapComp, 32)).setText(UILocale.get("OPTION_KEYMAP_KEY_CACHE", "Enable Key Cache"));
+        (this.aButton696 = new Button(this.keyMapBindsComp, 32)).setText(UILocale.get("OPTION_KEYMAP_KEY_CACHE", "Enable Key Cache"));
         ((Control)this.aButton696).setLayoutData((Object)layoutData28);
         this.aButton696.setSelection(Settings.enableKeyCache);
         this.method404();
@@ -1346,24 +1363,61 @@ public final class Property implements IProperty
         layoutData.verticalAlignment = 2;
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.horizontalAlignment = 4;
-        ((Control)(this.aCombo699 = new Combo(this.keyMapComp, 8))).setLayoutData((Object)layoutData);
-        this.aCombo699.addModifyListener((ModifyListener)new Class185(this));
+        ((Control)(this.controllerCombo = new Combo(this.keyMapControllerComp, 8))).setLayoutData((Object)layoutData);
+        this.controllerCombo.addModifyListener((ModifyListener)new Class185(this));
         final GridData layoutData2;
         (layoutData2 = new GridData()).horizontalAlignment = 2;
         layoutData2.verticalAlignment = 2;
-        (this.aButton755 = new Button(this.keyMapComp, 8388616)).setText(UILocale.get("OPTION_KEYMAP_REFRESH", "Refresh"));
-        ((Control)this.aButton755).setLayoutData((Object)layoutData2);
-        this.aButton755.addSelectionListener((SelectionListener)new Class184(this));
+        (this.keymapRefreshBtn = new Button(this.keyMapControllerComp, 8388616)).setText(UILocale.get("OPTION_KEYMAP_REFRESH", "Refresh"));
+        ((Control)this.keymapRefreshBtn).setLayoutData((Object)layoutData2);
+        this.keymapRefreshBtn.addSelectionListener((SelectionListener)new Class184(this));
+        (this.keymapClearBtn = new Button(this.keyMapControllerComp, 8388616)).setText(UILocale.get("OPTION_KEYMAP_CLEAR", "Clear"));
+        GridData layoutData3 = new GridData();
+        layoutData3.horizontalAlignment = 2;
+        layoutData3.verticalAlignment = 2;
+        ((Control)this.keymapClearBtn).setLayoutData((Object)layoutData3);
+        this.keymapClearBtn.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                aText627.setText("");
+                aText754.setText("");
+                aText757.setText("");
+                aText760.setText("");
+                aText763.setText("");
+                aText766.setText("");
+                aText768.setText("");
+                aText770.setText("");
+                aText772.setText("");
+                aText774.setText("");
+                aText629.setText("");
+                aText631.setText("");
+                aText739.setText("");
+                aText742.setText("");
+                aText745.setText("");
+                aText748.setText("");
+                aText751.setText("");
+                aText731.setText("");
+                aText735.setText("");
+                if(controllerCombo.getText().equals("Keyboard")) {
+                    for(int i = 0; i < Property.aStringArray661.length; i++) {
+                        Property.aStringArray661[i] = "";
+                    }
+                } else {
+                    for(int i = 0; i < 19; i++) {
+                        Controllers.bind(controllerCombo.getSelectionIndex()-1, i, "");
+                    }
+                }
+            }
+        });
         this.method402();
     }
     
     private void method402() {
-        this.aCombo699.removeAll();
-        this.aCombo699.add("Keyboard");
+        this.controllerCombo.removeAll();
+        this.controllerCombo.add("Keyboard");
         for (int method740 = Controllers.getControllersCount(), i = 0; i < method740; ++i) {
-            this.aCombo699.add(Controllers.getController(i).getName());
+            this.controllerCombo.add(Controllers.getController(i).getName());
         }
-        this.aCombo699.setText("Keyboard");
+        this.controllerCombo.setText("Keyboard");
     }
     
     private void method404() {
@@ -1390,7 +1444,7 @@ public final class Property implements IProperty
     
     private void method406() {
         final int selectionIndex;
-        if ((selectionIndex = this.aCombo699.getSelectionIndex()) < 0 || this.aText627 == null || ((Widget)this.aText627).isDisposed()) {
+        if ((selectionIndex = this.controllerCombo.getSelectionIndex()) < 0 || this.aText627 == null || ((Widget)this.aText627).isDisposed()) {
             return;
         }
         Text text;
@@ -1444,7 +1498,7 @@ public final class Property implements IProperty
     }
     
     public final boolean updateController() {
-        if (this.aCombo699 == null || ((Widget)this.aCombo699).isDisposed()) {
+        if (this.controllerCombo == null || ((Widget)this.controllerCombo).isDisposed()) {
             return false;
         }
         EmulatorImpl.asyncExec(new Class193(this));
@@ -1994,7 +2048,7 @@ public final class Property implements IProperty
     }
     
     static Combo method376(final Property class38) {
-        return class38.aCombo699;
+        return class38.controllerCombo;
     }
     
     static Text method366(final Property class38) {
