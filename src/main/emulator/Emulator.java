@@ -122,8 +122,7 @@ public class Emulator
 		DiscordRichPresence presence = new DiscordRichPresence();
 		presence.state = state;
 		presence.startTimestamp = presenceStartTimestamp;
-		presence.details = details;
-		if (details != null && details != "")
+		if (details != null && !details.isEmpty())
 			presence.details = details;
 		rpc.Discord_UpdatePresence(presence);
 	}
@@ -872,7 +871,7 @@ public class Emulator
         vlcCheckerThread.start();
         Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
-        method283(commandLineArguments);
+        parseLaunchArgs(commandLineArguments);
         Devices.load(Emulator.deviceFile);
         tryToSetDevice(Emulator.deviceName);
         setupMRUList();
@@ -911,7 +910,7 @@ public class Emulator
         if(jar.indexOf("\\") > -1)
         	jar = jar.substring(jar.lastIndexOf("\\")+1);
         if(Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
-        	Emulator.updatePresence((uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), "" + jar);
+        	Emulator.updatePresence((uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), uei ? "UEI" : jar);
         Emulator.emulatorimpl.getEmulatorScreen().method551(inputStream);
         setProperties();
         if (Emulator.midletClassName == null) {
@@ -1024,76 +1023,78 @@ public class Emulator
         Keyboard.init();
     }
     
-    static boolean method283(final String[] array) {
-        String key = "";
+    static boolean parseLaunchArgs(final String[] array) {
         if (array.length < 1) {
             return false;
         }
         for (int i = 0; i < array.length; ++i) {
-            final String value;
-            if ((value = array[i].trim()).startsWith("-")) {
-                if ((key = value.substring(1).toLowerCase()).equals("awt")) {
-                    Settings.g2d = 1;
-                    Emulator.commandLineArguments[i] = "";
-                }
-                else if (key.equals("swt")) {
-                    Settings.g2d = 0;
-                    Emulator.commandLineArguments[i] = "";
-                }
-//                else if (key.equals("wgl")) {
-//                    Settings.g3d = 0;
-//                }
-//                else if (key.equals("lwj")) {
-//                    Settings.g3d = 1;
-//                }
-                else if (key.equalsIgnoreCase("log")) {
-                    Settings.showLogFrame = true;
-                }
+            String key = array[i].trim();
+            if (key.startsWith("-")) {
+                key = key.substring(1).toLowerCase();
             }
-            else if (key.equalsIgnoreCase("jar")) {
-            	try {
-            		Emulator.midletJar = new File(value).getCanonicalPath();
-            	} catch (Exception e) {
-            		Emulator.midletJar = value;
-            	}
+            String value = null;
+            if(i < array.length-1) {
+                value = array[i+1].trim();
+                if(!value.startsWith("-")) i++;
+                else value = null;
             }
-            else if (key.equalsIgnoreCase("midlet")) {
-                Emulator.midletClassName = array[i];
+            if (key.equals("awt")) {
+                Settings.g2d = 1;
+                Emulator.commandLineArguments[i] = "";
             }
-            else if (key.equalsIgnoreCase("cp")) {
-                Emulator.classPath = value;
+            else if (key.equals("swt")) {
+                Settings.g2d = 0;
+                Emulator.commandLineArguments[i] = "";
             }
-            else if (key.equalsIgnoreCase("jad")) {
-                Emulator.jadPath = value;
-            }
-            else if (key.equalsIgnoreCase("rec")) {
-            	File localFile;
-                Settings.recordedKeysFile = value;
-                Settings.playingRecordedKeys = (localFile = new File(value)).exists();
-            }
-            else if (key.equalsIgnoreCase("device")) {
-                Emulator.deviceName = value;
-            }
-            else if (key.equalsIgnoreCase("devicefile")) {
-                Emulator.deviceFile = value;
-            }
-            else if (key.equalsIgnoreCase("fontname")) {
-                getEmulator().getProperty().setDefaultFontName(value);
-            }
-            else if (key.equalsIgnoreCase("fontsmall")) {
-                getEmulator().getProperty().setFontSmallSize(Integer.parseInt(value));
-            }
-            else if (key.equalsIgnoreCase("fontmedium")) {
-                getEmulator().getProperty().getFontMediumSize(Integer.parseInt(value));
-            }
-            else if (key.equalsIgnoreCase("fontlarge")) {
-                getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
-            }
-            else if (key.equalsIgnoreCase("key")) {
-                Keyboard.keyArg(value);
+            else if (key.equalsIgnoreCase("log")) {
+                Settings.showLogFrame = true;
             }
             else if (key.equalsIgnoreCase("uei")) {
                 Emulator.uei = true;
+            }
+            else if(value != null) {
+                if (key.equalsIgnoreCase("jar")) {
+                    try {
+                        Emulator.midletJar = new File(value).getCanonicalPath();
+                    } catch (Exception e) {
+                        Emulator.midletJar = value;
+                    }
+                }
+                else if (key.equalsIgnoreCase("midlet")) {
+                    Emulator.midletClassName = array[i];
+                }
+                else if (key.equalsIgnoreCase("cp")) {
+                    Emulator.classPath = value;
+                }
+                else if (key.equalsIgnoreCase("jad")) {
+                    Emulator.jadPath = value;
+                }
+                else if (key.equalsIgnoreCase("rec")) {
+                    File localFile;
+                    Settings.recordedKeysFile = value;
+                    Settings.playingRecordedKeys = (localFile = new File(value)).exists();
+                }
+                else if (key.equalsIgnoreCase("device")) {
+                    Emulator.deviceName = value;
+                }
+                else if (key.equalsIgnoreCase("devicefile")) {
+                    Emulator.deviceFile = value;
+                }
+                else if (key.equalsIgnoreCase("fontname")) {
+                    getEmulator().getProperty().setDefaultFontName(value);
+                }
+                else if (key.equalsIgnoreCase("fontsmall")) {
+                    getEmulator().getProperty().setFontSmallSize(Integer.parseInt(value));
+                }
+                else if (key.equalsIgnoreCase("fontmedium")) {
+                    getEmulator().getProperty().getFontMediumSize(Integer.parseInt(value));
+                }
+                else if (key.equalsIgnoreCase("fontlarge")) {
+                    getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
+                }
+                else if (key.equalsIgnoreCase("key")) {
+                    Keyboard.keyArg(value);
+                }
             }
         }
         return true;
