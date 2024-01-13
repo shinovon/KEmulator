@@ -45,6 +45,7 @@ $[Changelog]
 $nnmod v2.14.1 [2024.01.13]
 Add controller mapping saves
 Renamed some menu options
+Add clear key mappings button
 
 $nnmod v2.14 [2024.01.10]
 Controller support fix
