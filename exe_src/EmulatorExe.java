@@ -124,21 +124,13 @@ public class EmulatorExe {
 			}
 			if(arg.startsWith("-Xclasspath:")) {
 				String jar = arg.substring("-Xclasspath:".length());
-				if(jar.contains(";")) {
-					System.err.println("Multiple jar files in classpath are not supported");
-					return;
-				}
-				cmd.add("-jar");
+				cmd.add(jar.contains(";") ? "-cp" : "-jar");
 				cmd.add(jar);
 				classpathSet = true;
 			}
 			if(arg.startsWith("-classpath")) {
 				String jar = args[i+1];
-				if(jar.contains(";")) {
-					System.err.println("Multiple jar files in classpath are not supported");
-					return;
-				}
-				cmd.add("-jar");
+				cmd.add(jar.contains(";") ? "-cp" : "-jar");
 				cmd.add(jar);
 				classpathSet = true;
 			}
