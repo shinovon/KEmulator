@@ -1400,6 +1400,7 @@ public final class Property implements IProperty
                 if(controllerCombo.getText().equals("Keyboard")) {
                     for(int i = 0; i < Property.aStringArray661.length; i++) {
                         Property.aStringArray661[i] = "";
+                        Keyboard.mapDeviceKey(i, "");
                     }
                 } else {
                     for(int i = 0; i < 19; i++) {

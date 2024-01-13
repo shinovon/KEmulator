@@ -23,6 +23,7 @@ public final class Keyboard
     }
     
     public static String keyToString(final String s) {
+        if(s.isEmpty()) return "";
         final String s2;
         if ((s2 = (String) Keyboard.keysTable.get(s)) != null) {
             return s2;
@@ -35,6 +36,7 @@ public final class Keyboard
     }
     
     public static String method601(final String s) {
+        if(s.isEmpty()) return "";
         final Enumeration<String> keys = Keyboard.keysTable.keys();
         String value = null;
         while (keys.hasMoreElements()) {
@@ -140,10 +142,12 @@ public final class Keyboard
     }
     
     public static boolean isLeftSoft(final int n) {
+        if(Keyboard.deviceKeycodes[17].isEmpty()) return false;
         return Integer.parseInt(replaceKey(Integer.parseInt(Keyboard.deviceKeycodes[17]))) == n;
     }
     
     public static boolean isRightSoft(final int n) {
+        if(Keyboard.deviceKeycodes[18].isEmpty()) return false;
         return Integer.parseInt(replaceKey(Integer.parseInt(Keyboard.deviceKeycodes[18]))) == n;
     }
     
