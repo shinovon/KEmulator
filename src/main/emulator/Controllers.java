@@ -1,6 +1,8 @@
 package emulator;
 
 import java.util.*;
+
+import emulator.ui.swt.Property;
 import net.java.games.input.*;
 
 public class Controllers
@@ -71,6 +73,7 @@ public class Controllers
     private static void initBinds() {
         Controllers.binds = new String[Controllers.count][19];
         for (int i = 0; i < Controllers.count; ++i) {
+            String name = ((Controller) controllers.get(i)).getName();
             Controllers.binds[i][0] = "0";
             Controllers.binds[i][1] = "1";
             Controllers.binds[i][2] = "2";
@@ -90,11 +93,22 @@ public class Controllers
             Controllers.binds[i][16] = "9";
             Controllers.binds[i][17] = "10";
             Controllers.binds[i][18] = "11";
+            if(Settings.controllerBinds.containsKey(name + ".0")) {
+                for(int j = 0; j < 19; j++) {
+                    String s = Settings.controllerBinds.get(name + "." + j);
+                    if(s != null) Controllers.binds[i][j] = s;
+                }
+            }
         }
     }
     
     public static void bind(int controllerId, int n2, String s) {
         Controllers.binds[controllerId][n2] = s;
+        try {
+            Settings.controllerBinds.put(((Controller) controllers.get(controllerId)).getName() + "." + n2, s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public static String getBind(int controllerId, int n2) {

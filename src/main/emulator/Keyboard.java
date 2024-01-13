@@ -57,23 +57,23 @@ public final class Keyboard
         int n2 = 0;
         switch (n) {
             case 1: {
-                n2 = ((Devices.method617("KEY_UP") != 0) ? Devices.method617("KEY_UP") : 1);
+                n2 = ((Devices.getPropertyInt("KEY_UP") != 0) ? Devices.getPropertyInt("KEY_UP") : 1);
                 break;
             }
             case 6: {
-                n2 = ((Devices.method617("KEY_DOWN") != 0) ? Devices.method617("KEY_DOWN") : 6);
+                n2 = ((Devices.getPropertyInt("KEY_DOWN") != 0) ? Devices.getPropertyInt("KEY_DOWN") : 6);
                 break;
             }
             case 2: {
-                n2 = ((Devices.method617("KEY_LEFT") != 0) ? Devices.method617("KEY_LEFT") : 2);
+                n2 = ((Devices.getPropertyInt("KEY_LEFT") != 0) ? Devices.getPropertyInt("KEY_LEFT") : 2);
                 break;
             }
             case 5: {
-                n2 = ((Devices.method617("KEY_RIGHT") != 0) ? Devices.method617("KEY_RIGHT") : 5);
+                n2 = ((Devices.getPropertyInt("KEY_RIGHT") != 0) ? Devices.getPropertyInt("KEY_RIGHT") : 5);
                 break;
             }
             case 8: {
-                n2 = ((Devices.method617("KEY_FIRE") != 0) ? Devices.method617("KEY_FIRE") : 8);
+                n2 = ((Devices.getPropertyInt("KEY_FIRE") != 0) ? Devices.getPropertyInt("KEY_FIRE") : 8);
                 break;
             }
         }
@@ -86,8 +86,8 @@ public final class Keyboard
         final int left = getArrowKeyFromDevice(2);
         final int down = getArrowKeyFromDevice(6);
         final int right = getArrowKeyFromDevice(5);
-        final int s1 = (Devices.method617("KEY_S1") != 0) ? Devices.method617("KEY_S1") : 21;
-        final int s2 = (Devices.method617("KEY_S2") != 0) ? Devices.method617("KEY_S2") : 22;
+        final int s1 = (Devices.getPropertyInt("KEY_S1") != 0) ? Devices.getPropertyInt("KEY_S1") : 21;
+        final int s2 = (Devices.getPropertyInt("KEY_S2") != 0) ? Devices.getPropertyInt("KEY_S2") : 22;
         Keyboard.strToPCKey.clear();
         Keyboard.strToPCKey.put("NUM_0", "48");
         Keyboard.strToPCKey.put("NUM_1", "49");

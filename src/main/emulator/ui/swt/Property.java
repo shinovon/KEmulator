@@ -181,7 +181,7 @@ public final class Property implements IProperty
 	private Font f;
 	private CLabel labelLocale;
 	private Text localeText;
-    
+
     public Property() {
         super();
         this.setsShell = null;
@@ -428,15 +428,15 @@ public final class Property implements IProperty
     }
     
     public final void updateCustomProperties() {
-        this.screenWidth = Devices.method616("SCREEN_WIDTH");
-        this.screenHeight = Devices.method616("SCREEN_HEIGHT");
-        this.lsoft = Devices.method616("KEY_S1");
-        this.rsoft = Devices.method616("KEY_S2");
-        this.fire = Devices.method616("KEY_FIRE");
-        this.up = Devices.method616("KEY_UP");
-        this.down = Devices.method616("KEY_DOWN");
-        this.left = Devices.method616("KEY_LEFT");
-        this.right = Devices.method616("KEY_RIGHT");
+        this.screenWidth = Devices.getProperty("SCREEN_WIDTH");
+        this.screenHeight = Devices.getProperty("SCREEN_HEIGHT");
+        this.lsoft = Devices.getProperty("KEY_S1");
+        this.rsoft = Devices.getProperty("KEY_S2");
+        this.fire = Devices.getProperty("KEY_FIRE");
+        this.up = Devices.getProperty("KEY_UP");
+        this.down = Devices.getProperty("KEY_DOWN");
+        this.left = Devices.getProperty("KEY_LEFT");
+        this.right = Devices.getProperty("KEY_RIGHT");
     }
     
     public final void loadProperties() {
@@ -536,6 +536,11 @@ public final class Property implements IProperty
             Settings.vlcDir = properties.getProperty("VlcDir", "");
             Settings.locale = properties.getProperty("MIDPLocale", "en-US");
             Settings.textAntiAliasing = Boolean.valueOf(properties.getProperty("TextAntiAliasing", "true"));
+            for(Object k: properties.keySet()) {
+                if(((String)k).startsWith("ControllerMap.")) {
+                    Settings.controllerBinds.put(((String)k).substring("ControllerMap.".length()), properties.getProperty((String)k));
+                }
+            }
             fileInputStream.close();
         }
         catch (Exception ex) {
@@ -582,85 +587,88 @@ public final class Property implements IProperty
     public final void saveProperties() {
         try {
             final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getAbsolutePath() + "/property.txt");
-            final SortProperties sortProperties;
-            (sortProperties = new SortProperties(this)).setProperty("Device", this.device);
-            sortProperties.setProperty("DefaultFont", this.defaultFont);
-            sortProperties.setProperty("RMSFolder", this.rmsFolder);
-            sortProperties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
-            sortProperties.setProperty("FontMediumSize", String.valueOf(this.fontMediumSIze));
-            sortProperties.setProperty("FontLargeSize", String.valueOf(this.fontLargeSize));
-            sortProperties.setProperty("SCREEN_WIDTH", this.screenWidth);
-            sortProperties.setProperty("SCREEN_HEIGHT", this.screenHeight);
-            sortProperties.setProperty("KEY_LSOFT", this.lsoft);
-            sortProperties.setProperty("KEY_RSOFT", this.rsoft);
-            sortProperties.setProperty("KEY_FIRE", this.fire);
-            sortProperties.setProperty("KEY_UP", this.up);
-            sortProperties.setProperty("KEY_DOWN", this.down);
-            sortProperties.setProperty("KEY_LEFT", this.left);
-            sortProperties.setProperty("KEY_RIGHT", this.right);
-            sortProperties.setProperty("2D_Graphics_Enginge", (Settings.g2d == 0) ? "SWT" : "AWT");
-            sortProperties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
-            sortProperties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
-            sortProperties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
+            final SortProperties properties;
+            (properties = new SortProperties(this)).setProperty("Device", this.device);
+            properties.setProperty("DefaultFont", this.defaultFont);
+            properties.setProperty("RMSFolder", this.rmsFolder);
+            properties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
+            properties.setProperty("FontMediumSize", String.valueOf(this.fontMediumSIze));
+            properties.setProperty("FontLargeSize", String.valueOf(this.fontLargeSize));
+            properties.setProperty("SCREEN_WIDTH", this.screenWidth);
+            properties.setProperty("SCREEN_HEIGHT", this.screenHeight);
+            properties.setProperty("KEY_LSOFT", this.lsoft);
+            properties.setProperty("KEY_RSOFT", this.rsoft);
+            properties.setProperty("KEY_FIRE", this.fire);
+            properties.setProperty("KEY_UP", this.up);
+            properties.setProperty("KEY_DOWN", this.down);
+            properties.setProperty("KEY_LEFT", this.left);
+            properties.setProperty("KEY_RIGHT", this.right);
+            properties.setProperty("2D_Graphics_Enginge", (Settings.g2d == 0) ? "SWT" : "AWT");
+            properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
+            properties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
+            properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
           //  sortProperties.setProperty("3D_Graphics_Enginge", (Settings.g3d == 0) ? "WGL" : "LWJ");
-            sortProperties.setProperty("MAP_KEY_NUM_0", Keyboard.get(0));
-            sortProperties.setProperty("MAP_KEY_NUM_1", Keyboard.get(1));
-            sortProperties.setProperty("MAP_KEY_NUM_2", Keyboard.get(2));
-            sortProperties.setProperty("MAP_KEY_NUM_3", Keyboard.get(3));
-            sortProperties.setProperty("MAP_KEY_NUM_4", Keyboard.get(4));
-            sortProperties.setProperty("MAP_KEY_NUM_5", Keyboard.get(5));
-            sortProperties.setProperty("MAP_KEY_NUM_6", Keyboard.get(6));
-            sortProperties.setProperty("MAP_KEY_NUM_7", Keyboard.get(7));
-            sortProperties.setProperty("MAP_KEY_NUM_8", Keyboard.get(8));
-            sortProperties.setProperty("MAP_KEY_NUM_9", Keyboard.get(9));
-            sortProperties.setProperty("MAP_KEY_STAR", Keyboard.get(10));
-            sortProperties.setProperty("MAP_KEY_POUND", Keyboard.get(11));
-            sortProperties.setProperty("MAP_KEY_UP", Keyboard.get(12));
-            sortProperties.setProperty("MAP_KEY_DOWN", Keyboard.get(13));
-            sortProperties.setProperty("MAP_KEY_LEFT", Keyboard.get(14));
-            sortProperties.setProperty("MAP_KEY_RIGHT", Keyboard.get(15));
-            sortProperties.setProperty("MAP_KEY_MIDDLE", Keyboard.get(16));
-            sortProperties.setProperty("MAP_KEY_LSOFT", Keyboard.get(17));
-            sortProperties.setProperty("MAP_KEY_RSOFT", Keyboard.get(18));
-            sortProperties.setProperty("EnableKeyCache", String.valueOf(Settings.enableKeyCache));
-            sortProperties.setProperty("EnableVibration", String.valueOf(Settings.enableVibration));
+            properties.setProperty("MAP_KEY_NUM_0", Keyboard.get(0));
+            properties.setProperty("MAP_KEY_NUM_1", Keyboard.get(1));
+            properties.setProperty("MAP_KEY_NUM_2", Keyboard.get(2));
+            properties.setProperty("MAP_KEY_NUM_3", Keyboard.get(3));
+            properties.setProperty("MAP_KEY_NUM_4", Keyboard.get(4));
+            properties.setProperty("MAP_KEY_NUM_5", Keyboard.get(5));
+            properties.setProperty("MAP_KEY_NUM_6", Keyboard.get(6));
+            properties.setProperty("MAP_KEY_NUM_7", Keyboard.get(7));
+            properties.setProperty("MAP_KEY_NUM_8", Keyboard.get(8));
+            properties.setProperty("MAP_KEY_NUM_9", Keyboard.get(9));
+            properties.setProperty("MAP_KEY_STAR", Keyboard.get(10));
+            properties.setProperty("MAP_KEY_POUND", Keyboard.get(11));
+            properties.setProperty("MAP_KEY_UP", Keyboard.get(12));
+            properties.setProperty("MAP_KEY_DOWN", Keyboard.get(13));
+            properties.setProperty("MAP_KEY_LEFT", Keyboard.get(14));
+            properties.setProperty("MAP_KEY_RIGHT", Keyboard.get(15));
+            properties.setProperty("MAP_KEY_MIDDLE", Keyboard.get(16));
+            properties.setProperty("MAP_KEY_LSOFT", Keyboard.get(17));
+            properties.setProperty("MAP_KEY_RSOFT", Keyboard.get(18));
+            properties.setProperty("EnableKeyCache", String.valueOf(Settings.enableKeyCache));
+            properties.setProperty("EnableVibration", String.valueOf(Settings.enableVibration));
             //sortProperties.setProperty("InactivityTimer", String.valueOf(Emulator.inactivityTimer));
-            sortProperties.setProperty("EnableKeyRepeat", String.valueOf(Settings.enableKeyRepeat));
-            sortProperties.setProperty("IgnoreFullScreenMode", String.valueOf(Settings.ignoreFullScreen));
-            sortProperties.setProperty("NetworkNotAvailable", String.valueOf(Settings.networkNotAvailable));
-            sortProperties.setProperty("AssociateWithJar", String.valueOf(Settings.associateWithJar));
-            sortProperties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
-            sortProperties.setProperty("XRayOverLapScreen", String.valueOf(Settings.xrayOverlapScreen));
-            sortProperties.setProperty("XRayShowClipBorder", String.valueOf(Settings.xrayShowClipBorder));
-            sortProperties.setProperty("InfoColorHex", String.valueOf(Settings.infoColorHex));
-            sortProperties.setProperty("RecordReleasedImg", String.valueOf(Settings.recordReleasedImg));
-            sortProperties.setProperty("AutoGenJad", String.valueOf(Settings.autoGenJad));
-            sortProperties.setProperty("EnableNewTrack", String.valueOf(Settings.enableNewTrack));
-            sortProperties.setProperty("EnableMethodTrack", String.valueOf(Settings.enableMethodTrack));
-            sortProperties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
-            sortProperties.setProperty("LocationX", String.valueOf(EmulatorScreen.locX));
-            sortProperties.setProperty("LocationY", String.valueOf(EmulatorScreen.locY));
-            sortProperties.setProperty("FileEncoding", Settings.fileEncoding);
-            sortProperties.setProperty("RecordKeys", String.valueOf(Settings.recordKeys));
+            properties.setProperty("EnableKeyRepeat", String.valueOf(Settings.enableKeyRepeat));
+            properties.setProperty("IgnoreFullScreenMode", String.valueOf(Settings.ignoreFullScreen));
+            properties.setProperty("NetworkNotAvailable", String.valueOf(Settings.networkNotAvailable));
+            properties.setProperty("AssociateWithJar", String.valueOf(Settings.associateWithJar));
+            properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
+            properties.setProperty("XRayOverLapScreen", String.valueOf(Settings.xrayOverlapScreen));
+            properties.setProperty("XRayShowClipBorder", String.valueOf(Settings.xrayShowClipBorder));
+            properties.setProperty("InfoColorHex", String.valueOf(Settings.infoColorHex));
+            properties.setProperty("RecordReleasedImg", String.valueOf(Settings.recordReleasedImg));
+            properties.setProperty("AutoGenJad", String.valueOf(Settings.autoGenJad));
+            properties.setProperty("EnableNewTrack", String.valueOf(Settings.enableNewTrack));
+            properties.setProperty("EnableMethodTrack", String.valueOf(Settings.enableMethodTrack));
+            properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
+            properties.setProperty("LocationX", String.valueOf(EmulatorScreen.locX));
+            properties.setProperty("LocationY", String.valueOf(EmulatorScreen.locY));
+            properties.setProperty("FileEncoding", Settings.fileEncoding);
+            properties.setProperty("RecordKeys", String.valueOf(Settings.recordKeys));
             for (int i = 0; i < 5; ++i) {
-                sortProperties.setProperty("MRUList" + i, Settings.aArray[i]);
+                properties.setProperty("MRUList" + i, Settings.aArray[i]);
             }
-            sortProperties.setProperty("ProxyType", String.valueOf(Settings.proxyType));
-            sortProperties.setProperty("ProxyHost", Settings.proxyHost);
-            sortProperties.setProperty("ProxyPort", Settings.proxyPort);
-            sortProperties.setProperty("ProxyUsername", Settings.proxyUser);
-            sortProperties.setProperty("ProxyPassword", Settings.proxyPass);
-            sortProperties.setProperty("ProxyDomain", Settings.proxyDomain);
-            sortProperties.setProperty("ShowLogFrame", String.valueOf(Settings.showLogFrame));
-            sortProperties.setProperty("ShowInfoFrame", String.valueOf(Settings.showInfoFrame));
-            sortProperties.setProperty("ShowMemViewFrame", String.valueOf(Settings.showMemViewFrame));
-            sortProperties.setProperty("DiscordRichPresence", String.valueOf(Emulator.rpcEnabled));
-            sortProperties.setProperty("AWTAntiAliasing", String.valueOf(Settings.awtAntiAliasing));
-            sortProperties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
-            sortProperties.setProperty("VlcDir", Settings.vlcDir);
-            sortProperties.setProperty("MIDPLocale", Settings.locale);
-            sortProperties.setProperty("TextAntiAliasing", "" + Settings.textAntiAliasing);
-            sortProperties.store(fileOutputStream, "KEmulator properties");
+            properties.setProperty("ProxyType", String.valueOf(Settings.proxyType));
+            properties.setProperty("ProxyHost", Settings.proxyHost);
+            properties.setProperty("ProxyPort", Settings.proxyPort);
+            properties.setProperty("ProxyUsername", Settings.proxyUser);
+            properties.setProperty("ProxyPassword", Settings.proxyPass);
+            properties.setProperty("ProxyDomain", Settings.proxyDomain);
+            properties.setProperty("ShowLogFrame", String.valueOf(Settings.showLogFrame));
+            properties.setProperty("ShowInfoFrame", String.valueOf(Settings.showInfoFrame));
+            properties.setProperty("ShowMemViewFrame", String.valueOf(Settings.showMemViewFrame));
+            properties.setProperty("DiscordRichPresence", String.valueOf(Emulator.rpcEnabled));
+            properties.setProperty("AWTAntiAliasing", String.valueOf(Settings.awtAntiAliasing));
+            properties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
+            properties.setProperty("VlcDir", Settings.vlcDir);
+            properties.setProperty("MIDPLocale", Settings.locale);
+            properties.setProperty("TextAntiAliasing", "" + Settings.textAntiAliasing);
+            for(Map.Entry<String, String> e: Settings.controllerBinds.entrySet()) {
+                properties.setProperty("ControllerMap."+e.getKey(), e.getValue());
+            }
+            properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         }
         catch (Exception ex) {}

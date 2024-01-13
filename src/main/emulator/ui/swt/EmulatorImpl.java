@@ -5,7 +5,6 @@ import java.util.*;
 import emulator.*;
 import emulator.ui.*;
 import emulator.graphics2D.*;
-import emulator.graphics2D.swt.*;
 import emulator.graphics2D.swt.FontSWT;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.graphics3D.*;
@@ -75,7 +74,7 @@ public final class EmulatorImpl implements IEmulator
     
     public final EmulatorScreen getEmulatorScreen() {
         if (this.iscreen == null) {
-            this.iscreen = new EmulatorScreen(Devices.method617("SCREEN_WIDTH"), Devices.method617("SCREEN_HEIGHT"));
+            this.iscreen = new EmulatorScreen(Devices.getPropertyInt("SCREEN_WIDTH"), Devices.getPropertyInt("SCREEN_HEIGHT"));
         }
         return this.iscreen;
     }

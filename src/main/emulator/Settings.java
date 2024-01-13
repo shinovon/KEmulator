@@ -65,6 +65,7 @@ public final class Settings
 	public static String locale = "en-US";
 
     public static int debugPort = 29292;
+    public static Map<String, String> controllerBinds = new HashMap<String, String>();
 
     public Settings() {
         super();

@@ -62,11 +62,11 @@ public final class Devices
         return (DevicePlatform) Devices.aHashtable1074.get(s.toLowerCase());
     }
     
-    public static String method616(final String s) {
+    public static String getProperty(final String s) {
         return Devices.curPlatform.getString(s);
     }
     
-    public static int method617(final String s) {
+    public static int getPropertyInt(final String s) {
         if (Devices.curPlatform == null) {
             return 0;
         }
