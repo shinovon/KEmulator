@@ -69,6 +69,8 @@ public final class Memory
         this.aVector1461.clear();
         this.players.clear();
         this.aVector1467.clear();
+        for(Player p: PlayerImpl.players)
+            this.players.add(p);
         for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
             final String s = (String) Emulator.jarClasses.get(j);
             Memory a;
@@ -157,6 +159,7 @@ public final class Memory
                 }
             }
             else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
+                if(!PlayerImpl.players.contains(o))
                 this.players.add(o);
             }
             else if (o instanceof Node) {

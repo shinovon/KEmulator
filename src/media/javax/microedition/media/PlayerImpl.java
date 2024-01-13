@@ -26,6 +26,8 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
 public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener, MetaEventListener {
+
+	public static List<javax.microedition.media.Player> players = new ArrayList<javax.microedition.media.Player>();
 	Object sequence;
 	Thread playerThread;
 	boolean midiCompleted;
@@ -53,7 +55,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		super();
 		this.contentType = contentType;
 		this.dataSource = src;
-		
+		players.add(this);
 	}
 
 	public PlayerImpl(final InputStream inputStream, String contentType) throws IOException {
@@ -61,6 +63,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		if (contentType == null)
 			contentType = "";
 		a(inputStream, contentType);
+		players.add(this);
 	}
 	
 	private void a(final InputStream inputStream, String contentType) throws IOException {
@@ -135,7 +138,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}
 
 	public PlayerImpl(String locator, String contentType, DataSource src) {
-		
+		players.add(this);
 	}
 
 	public PlayerImpl(String src, String contentType) throws IOException {
@@ -154,6 +157,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.dataLen = (int) new File(src).length();
 			a(new FileInputStream(src), contentType);
 		}
+		players.add(this);
 	}
 
 	private void amr(final InputStream inputStream) throws IOException {
@@ -378,6 +382,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}
 
 	public void close() {
+		players.remove(this);
 		if (this.playerThread != null) {
 			try {
 				this.stop();
