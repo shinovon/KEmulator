@@ -925,7 +925,7 @@ MouseTrackListener
         fpsModeMenuItem.setAccelerator(SWT.MOD1 + 'F');
         menuItemTool.setMenu(this.menuTool);
         this.networkKillswitchMenuItem = new MenuItem(this.menuTool, 32);
-        networkKillswitchMenuItem.setText("Network not available");
+        networkKillswitchMenuItem.setText("Disable network access");
         networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
         networkKillswitchMenuItem.addSelectionListener((SelectionListener)this);
         this.menuMidlet = new Menu(menuItemMidlet);
