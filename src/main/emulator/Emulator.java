@@ -1054,6 +1054,18 @@ public class Emulator
             String key = array[i].trim();
             if (key.startsWith("-")) {
                 key = key.substring(1).toLowerCase();
+            } else if(i == array.length-1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad"))) {
+                String path = array[0];
+                if(path.endsWith(".jar")) {
+                    try {
+                        Emulator.midletJar = new File(path).getCanonicalPath();
+                    } catch (Exception e) {
+                        Emulator.midletJar = path;
+                    }
+                } else {
+                    Emulator.jadPath = path;
+                    Emulator.midletJar = getMidletJarUrl(path);
+                }
             }
             String value = null;
             if(i < array.length-1) {
