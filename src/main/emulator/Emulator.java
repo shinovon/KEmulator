@@ -887,7 +887,7 @@ public class Emulator
         getLibraries();
         if (!getJarClasses()) {
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
-            System.exit(0);
+            System.exit(1);
             return;
         }
         InputStream inputStream = null;
@@ -918,7 +918,7 @@ public class Emulator
         setProperties();
         if (Emulator.midletClassName == null) {
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
-            System.exit(0);
+            System.exit(1);
             return;
         }
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
@@ -929,13 +929,13 @@ public class Emulator
         catch (Exception ex) {
             ex.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
-            System.exit(0);
+            System.exit(1);
             return;
         }
         catch (Error error) {
             error.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
-            System.exit(0);
+            System.exit(1);
             return;
         }
         Emulator.eventQueue = new EventQueue();
@@ -947,14 +947,14 @@ public class Emulator
             ex2.printStackTrace();
             Emulator.eventQueue.stop();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
-            System.exit(0);
+            System.exit(1);
             return;
         }
         catch (Error error2) {
             error2.printStackTrace();
             Emulator.eventQueue.stop();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
-            System.exit(0);
+            System.exit(1);
             return;
         }
         Emulator.emulatorimpl.method822().method302();

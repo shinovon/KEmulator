@@ -244,6 +244,7 @@ MouseTrackListener
         catch (Exception ex) {
             ex.printStackTrace();
             this.method552(emulator.UILocale.get("LOAD_GDIPLUS_ERROR", "Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path."));
+            System.exit(1);
             return;
         }
         this.pauseState = (anInt1016 ? 1 : 0);
@@ -294,7 +295,7 @@ MouseTrackListener
     	{
     		e.printStackTrace();
         	CustomMethod.close();
-    		System.exit(-1);
+    		System.exit(1);
     	}
         this.pauseState = 0;
     }
