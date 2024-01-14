@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 public abstract class MIDlet
 {
+    private boolean destroyed;
     public MIDlet() {
         super();
         Emulator.setMIDlet(this);
@@ -28,6 +29,8 @@ public abstract class MIDlet
     }
     
     public void notifyDestroyed() {
+        if(destroyed) return;
+        destroyed = true;
         Emulator.getEmulator().getLogStream().println("Notify Destroyed");
         Emulator.notifyDestroyed();
         Emulator.getEmulator().getLogStream().println("Exiting Emulator");
@@ -40,12 +43,6 @@ public abstract class MIDlet
     
     public boolean platformRequest(String s) throws ConnectionNotFoundException {
         try {
-            /*
-        	String s2 = s;
-        	if(s2.length() > 100) {
-        		s2 = s2.substring(0, 90) + "...";
-        	}
-        	*/
             System.out.println("platformRequest(" + s + ")");
 
             if (Settings.networkNotAvailable || !Emulator.requestURLAccess(s)/*JOptionPane.showConfirmDialog(new JPanel(), "MIDlet wants to open URL:\n" + s2, "Security", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION*/) {
