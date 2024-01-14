@@ -42,6 +42,9 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$nnmod v2.14.2 [2024.01.15]
+Updated KEmulator.exe
+
 $nnmod v2.14.1 [2024.01.14]
 Add controller mapping saves
 Renamed some menu options
