@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -863,7 +864,6 @@ public class Emulator
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.initLocale();
         Emulator.emulatorimpl = new EmulatorImpl();
-        
         try {
         	i.a("emulator");
         } catch (Error e) {
@@ -1101,22 +1101,25 @@ public class Emulator
     }
     
     public static String getAbsoluteFile() {
-    	return System.getProperty("user.dir");
-        /*
-    	String substring = new Emulator().getClass().getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
-        if(substring.endsWith("bin/"))
-        	substring = substring.substring(0, substring.length() - 4);
+        String s = System.getProperty("user.dir");
+        if(new File(s + "/KEmulator.jar").exists() || new File(s + "/emulator.dll").exists()) {
+            return s + "/KEmulator.jar";
+        }
+    	s = new Emulator().getClass().getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
+        if(s.endsWith("bin/"))
+        	s = s.substring(0, s.length() - 4);
         try {
-            return URLDecoder.decode(substring, "UTF-8");
+            return URLDecoder.decode(s, "UTF-8");
         }
-        catch (UnsupportedEncodingException ex) {
-            return substring;
+        catch (Exception ex) {
+            return s;
         }
-        */
     }
     
     public static String getAbsolutePath() {
-    	return getAbsoluteFile();
+    	String s = getAbsoluteFile().replace('\\', '/');
+        s = s.substring(0, s.lastIndexOf('/')).replace('/', '\\');
+        return s;
     }
     
     public static void loadGame(final String s, final int n, final int n2, final boolean b) {
