@@ -811,20 +811,20 @@ MouseTrackListener
         final MenuItem menuItemView;
         (menuItemView = new MenuItem(this.aMenu971, 64)).setText(emulator.UILocale.get("MENU_VIEW", "View"));
         this.menuView = new Menu(menuItemView);
-        (this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_INFO", "Infos") + "\tI");
+        (this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
         this.infosMenuItem.addSelectionListener((SelectionListener)this);
-        (this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tX");
+        (this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tCtrl+X");
         this.xrayViewMenuItem.addSelectionListener((SelectionListener)this);
-        (this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tO");
+        (this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
         this.alwaysOnTopMenuItem.addSelectionListener((SelectionListener)this);
         this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
-        (this.rotateScreenMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_ROTATE", "Rotate Screen") + "\tY");
+        (this.rotateScreenMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_ROTATE", "Rotate Screen") + "\tCtrl+Y");
         this.rotateScreenMenuItem.addSelectionListener((SelectionListener)this);
 
         this.rotate90MenuItem = new MenuItem(this.menuView, 8);
         this.rotate90MenuItem.setText("Rotate 90 Degrees");
         this.rotate90MenuItem.addSelectionListener(this);
-        (this.forecPaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tF");
+        (this.forecPaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
         this.forecPaintMenuItem.addSelectionListener((SelectionListener)this);
         method557(getHandle(shell), Settings.alwaysOnTop);
         new MenuItem(this.menuView, 2);
@@ -853,9 +853,9 @@ MouseTrackListener
         this.aMenuItem949.addSelectionListener((SelectionListener)this);
         menuItemView.setMenu(this.menuView);
         this.menuTool = new Menu(menuItemTool);
-        (this.zoomInMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_ZOOMIN", "Zoom In") + "\tPad +");
+        (this.zoomInMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_ZOOMIN", "Zoom In") + "\tPad+");
         this.zoomInMenuItem.addSelectionListener((SelectionListener)this);
-        (this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tPad -");
+        (this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tPad-");
         this.zoomOutMenuItem.addSelectionListener((SelectionListener)this);
         final MenuItem menuItem4;
         (menuItem4 = new MenuItem(this.menuTool, 64)).setText(emulator.UILocale.get("MENU_TOOL_INTERPOSE", "Interpolation"));
@@ -869,14 +869,14 @@ MouseTrackListener
         this.interposeHightMenuItem.addSelectionListener((SelectionListener)new Class42(this));
         menuItem4.setMenu(this.menuInterpolation);
         new MenuItem(this.menuTool, 2);
-        (this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPPEDUP", "Speed Up") + "\t>");
+        (this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPPEDUP", "Speed Up") + "\tAlt+>");
         this.speedUpMenuItem.addSelectionListener((SelectionListener)this);
-        (this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPPEDDONW", "Slow Down") + "\t<");
+        (this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPPEDDONW", "Slow Down") + "\tAlt+<");
         this.slowDownMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuTool, 2);
-        (this.startpauseTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKSTART", "Start/Pause Tick") + "\tK");
+        (this.startpauseTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKSTART", "Start/Pause Tick") + "\tCtrl+K");
         this.startpauseTickMenuItem.addSelectionListener((SelectionListener)this);
-        (this.resetTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKRESET", "Reset Tick") + "\tL");
+        (this.resetTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKRESET", "Reset Tick") + "\tCtrl+L");
         this.resetTickMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuTool, 2);
         (this.recordKeysMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.get("MENU_TOOL_RECORD_KEY", "Record Keys"));
@@ -888,15 +888,15 @@ MouseTrackListener
         this.enableAutoplayMenuItem.setSelection(Settings.playingRecordedKeys);
         this.enableAutoplayMenuItem.setEnabled(Settings.playingRecordedKeys);
         new MenuItem(this.menuTool, 2);
-        (this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tC");
+        (this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tCtrl+C");
         this.captureToFileMenuItem.addSelectionListener((SelectionListener)this);
         (this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+C");
         this.captureToClipboardMenuItem.setAccelerator(65603);
         this.captureToClipboardMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuTool, 2);
-        (this.startRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_START_RECORD_AVI", "Start Record AVI") + "\tV");
+        (this.startRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_START_RECORD_AVI", "Start Record AVI") + "\tCtrl+V");
         this.startRecordAviMenuItem.addSelectionListener((SelectionListener)this);
-        (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tB");
+        (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
         this.stopRecordAviMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuTool, 2);
         (this.connectNetworkMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CONN_NETWORK", "Connect to Network"));
@@ -919,10 +919,10 @@ MouseTrackListener
         canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
         canvasKeyboardMenuItem.addSelectionListener((SelectionListener)this);
         this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
-        fpsModeMenuItem.setText("FPS Mode");
+        fpsModeMenuItem.setText("FPS Mode\tAlt+F");
         fpsModeMenuItem.setSelection(Settings.fpsMode);
         fpsModeMenuItem.addSelectionListener((SelectionListener)this);
-        fpsModeMenuItem.setAccelerator(SWT.MOD1 + 'F');
+        fpsModeMenuItem.setAccelerator(SWT.ALT + 'F');
         menuItemTool.setMenu(this.menuTool);
         this.networkKillswitchMenuItem = new MenuItem(this.menuTool, 32);
         networkKillswitchMenuItem.setText("Disable network access");
@@ -973,7 +973,7 @@ MouseTrackListener
         }
         menuItem5.setMenu(this.aMenu1018);
         new MenuItem(this.menuMidlet, 2);
-        (this.openJadMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_JAD", "Open JAD with Notepad") + "\tD");
+        (this.openJadMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_JAD", "Open JAD with Notepad") + "\tCtrl+D");
         this.openJadMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuMidlet, 2);
         final MenuItem menuItem7;
@@ -1002,14 +1002,14 @@ MouseTrackListener
 
        */
         new MenuItem(this.menuMidlet, 2);
-        (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_SUSPEND", "Suspend") + "\tS");
+        (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_SUSPEND", "Suspend") + "\tCtrl+S");
         this.suspendMenuItem.addSelectionListener((SelectionListener)this);
-        (this.resumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_RESUME", "Resume") + "\tE");
+        (this.resumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_RESUME", "Resume") + "\tCtrl+E");
         this.resumeMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuMidlet, 2);
-        (this.pausestepMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_PAUSE_STEP", "Pause/Step") + "\tT");
+        (this.pausestepMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_PAUSE_STEP", "Pause/Step") + "\tCtrl+T");
         this.pausestepMenuItem.addSelectionListener((SelectionListener)this);
-        (this.playResumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_PLAY_RESUME", "Play/Resume") + "\tR");
+        (this.playResumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_PLAY_RESUME", "Play/Resume") + "\tCtrl+R");
         this.playResumeMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuMidlet, 2);
         (this.restartMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_RESTART", "Restart") + "\tAlt+R");
@@ -1020,6 +1020,25 @@ MouseTrackListener
         this.exitMenuItem.addSelectionListener((SelectionListener)this);
         menuItemMidlet.setMenu(this.menuMidlet);
         this.toggleMenuAccelerators(!Settings.canvasKeyboard);
+
+        this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
+        this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
+        this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
+        this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
+        this.forecPaintMenuItem.setAccelerator(SWT.CONTROL | 70);
+        this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
+        this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
+        this.startpauseTickMenuItem.setAccelerator(SWT.CONTROL | 75);
+        this.resetTickMenuItem.setAccelerator(SWT.CONTROL | 76);
+        this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
+        this.startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
+        this.stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
+        this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
+        this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
+        this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
+        this.pausestepMenuItem.setAccelerator(SWT.CONTROL | 84);
+        this.playResumeMenuItem.setAccelerator(SWT.CONTROL | 82);
+
         setFpsMode(Settings.fpsMode);
         ((Decorations)this.shell).setMenuBar(this.aMenu971);
     }
@@ -1027,24 +1046,25 @@ MouseTrackListener
     
     
     protected final void toggleMenuAccelerators(final boolean b) {
+        /*
         if (b) {
-            this.infosMenuItem.setAccelerator(73);
-            this.xrayViewMenuItem.setAccelerator(88);
-            this.alwaysOnTopMenuItem.setAccelerator(79);
-            this.rotateScreenMenuItem.setAccelerator(89);
-            this.forecPaintMenuItem.setAccelerator(70);
-            this.speedUpMenuItem.setAccelerator(46);
-            this.slowDownMenuItem.setAccelerator(44);
-            this.startpauseTickMenuItem.setAccelerator(75);
-            this.resetTickMenuItem.setAccelerator(76);
-            this.captureToFileMenuItem.setAccelerator(67);
-            this.startRecordAviMenuItem.setAccelerator(86);
-            this.stopRecordAviMenuItem.setAccelerator(66);
-            this.suspendMenuItem.setAccelerator(83);
-            this.resumeMenuItem.setAccelerator(69);
-            this.openJadMenuItem.setAccelerator(68);
-            this.pausestepMenuItem.setAccelerator(84);
-            this.playResumeMenuItem.setAccelerator(82);
+            this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
+            this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
+            this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
+            this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
+            this.forecPaintMenuItem.setAccelerator(SWT.CONTROL | 70);
+            this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
+            this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
+            this.startpauseTickMenuItem.setAccelerator(SWT.CONTROL | 75);
+            this.resetTickMenuItem.setAccelerator(SWT.CONTROL | 76);
+            this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
+            this.startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
+            this.stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
+            this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
+            this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
+            this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
+            this.pausestepMenuItem.setAccelerator(SWT.CONTROL | 84);
+            this.playResumeMenuItem.setAccelerator(SWT.CONTROL | 82);
         } else {
             this.infosMenuItem.setAccelerator(0);
             this.xrayViewMenuItem.setAccelerator(0);
@@ -1064,6 +1084,7 @@ MouseTrackListener
             this.pausestepMenuItem.setAccelerator(0);
             this.playResumeMenuItem.setAccelerator(0);
         }
+         */
     }
     
 
