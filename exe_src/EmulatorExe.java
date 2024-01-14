@@ -17,6 +17,7 @@ public class EmulatorExe {
 			e.printStackTrace();
 		}
 		if(args.length == 0 || args[0].equals("-help")) {
+			System.out.println("KEmulator nnmod UEI starter v1.3");
 			System.out.println("Usage: emulator [arguments] <application>");
 			System.out.println(" -classpath <jar file> <MIDlet class>   Path to jar file and MIDlet class");
 			System.out.println(" -version       Display version information of the Emulator, Profile and Configuration");
@@ -128,10 +129,15 @@ public class EmulatorExe {
 				cmd.add(jar);
 				classpathSet = true;
 			}
-			if(arg.startsWith("-classpath")) {
+			if(arg.equals("-classpath") || arg.equals("-cp")) {
 				String jar = args[i+1];
 				cmd.add(jar.contains(";") ? "-cp" : "-jar");
 				cmd.add(jar);
+				try {
+					String midlet = args[i+2];
+					cmd.add("-midlet");
+					cmd.add(midlet);
+				} catch (Exception e) {}
 				classpathSet = true;
 			}
 			if(arg.startsWith("-Xdevice:") || arg.startsWith("-Xdomain:")) {
