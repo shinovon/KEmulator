@@ -852,7 +852,8 @@ public class Emulator
 	public static void main(final String[] commandLineArguments) {
         if(!_X64_VERSION && JAVA_64) {
         	JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
-        	return;
+            System.exit(0);
+            return;
         }
         System.setProperty("jna.nosys", "true");
 		if(_X64_VERSION) {
@@ -879,12 +880,14 @@ public class Emulator
         if (Emulator.midletClassName == null && Emulator.midletJar == null) {
             Emulator.emulatorimpl.getEmulatorScreen().method553(false);
             EmulatorImpl.dispose();
+            System.exit(0);
             return;
         }
         Emulator.record = new KeyRecords();
         getLibraries();
         if (!getJarClasses()) {
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
+            System.exit(0);
             return;
         }
         InputStream inputStream = null;
@@ -915,6 +918,7 @@ public class Emulator
         setProperties();
         if (Emulator.midletClassName == null) {
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+            System.exit(0);
             return;
         }
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
@@ -925,11 +929,13 @@ public class Emulator
         catch (Exception ex) {
             ex.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            System.exit(0);
             return;
         }
         catch (Error error) {
             error.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            System.exit(0);
             return;
         }
         Emulator.eventQueue = new EventQueue();
@@ -941,12 +947,14 @@ public class Emulator
             ex2.printStackTrace();
             Emulator.eventQueue.stop();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            System.exit(0);
             return;
         }
         catch (Error error2) {
             error2.printStackTrace();
             Emulator.eventQueue.stop();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            System.exit(0);
             return;
         }
         Emulator.emulatorimpl.method822().method302();
@@ -954,6 +962,7 @@ public class Emulator
         Emulator.eventQueue.queue(10);
         Emulator.emulatorimpl.getEmulatorScreen().method553(true);
         EmulatorImpl.dispose();
+        System.exit(0);
     }
 
     private static void loadJOGLLibrary() {
