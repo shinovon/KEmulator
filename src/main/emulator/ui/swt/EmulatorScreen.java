@@ -1019,7 +1019,6 @@ MouseTrackListener
         this.exitMenuItem.setAccelerator(27);
         this.exitMenuItem.addSelectionListener((SelectionListener)this);
         menuItemMidlet.setMenu(this.menuMidlet);
-        this.toggleMenuAccelerators(!Settings.canvasKeyboard);
 
         this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
         this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
@@ -1037,13 +1036,15 @@ MouseTrackListener
         this.pausestepMenuItem.setAccelerator(SWT.CONTROL | 84);
         this.playResumeMenuItem.setAccelerator(SWT.CONTROL | 82);
 
+        toggleMenuAccelerators(!Settings.canvasKeyboard);
+
         setFpsMode(Settings.fpsMode);
         ((Decorations)this.shell).setMenuBar(this.aMenu971);
     }
     
     
     
-    protected final void toggleMenuAccelerators(final boolean b) {
+    protected void toggleMenuAccelerators(final boolean b) {
         if (b) {
 
             this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
@@ -1093,7 +1094,7 @@ MouseTrackListener
     }
     
 
-    protected final void setFpsMode(final boolean b) {
+    protected void setFpsMode(boolean b) {
         if (b) {
         	Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2);
         	display.setCursorLocation(pt);
