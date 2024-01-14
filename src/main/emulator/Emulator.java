@@ -100,7 +100,7 @@ public class Emulator
 		rpc.Discord_Initialize("823522436444192818", handlers, true, "");
 		DiscordRichPresence presence = new DiscordRichPresence();
 		presence.startTimestamp = presenceStartTimestamp = System.currentTimeMillis() / 1000;
-		presence.state = "No Jar";
+		presence.state = "No MIDlet loaded";
 		rpc.Discord_UpdatePresence(presence);
 		rpcCallbackThread = new Thread("KEmulator RPC-Callback-Handler") {
 			public void run() {
