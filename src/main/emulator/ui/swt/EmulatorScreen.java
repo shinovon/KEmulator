@@ -849,7 +849,7 @@ MouseTrackListener
         new MenuItem(this.menuView, 2);
         (this.aMenuItem950 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
         this.aMenuItem950.addSelectionListener((SelectionListener)this);
-        (this.aMenuItem949 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_HELP", "Help"));
+        (this.aMenuItem949 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_HELP", "About"));
         this.aMenuItem949.addSelectionListener((SelectionListener)this);
         menuItemView.setMenu(this.menuView);
         this.menuTool = new Menu(menuItemTool);
@@ -929,14 +929,14 @@ MouseTrackListener
         networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
         networkKillswitchMenuItem.addSelectionListener((SelectionListener)this);
         this.menuMidlet = new Menu(menuItemMidlet);
-        (this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar ..."));
+        (this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar..."));
         this.loadJarMenuItem.addSelectionListener((SelectionListener)this);
-        (this.loadWithConsoleMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_LOAD_WITH_CONSOLE", "Load with console"));
-        this.loadWithConsoleMenuItem.addSelectionListener((SelectionListener)this);
+//        (this.loadWithConsoleMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_LOAD_WITH_CONSOLE", "Load with console"));
+//        this.loadWithConsoleMenuItem.addSelectionListener((SelectionListener)this);
         (this.loadAutoPlayMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_LOAD_AUTO_PLAY", "Load auto-play record"));
         this.loadAutoPlayMenuItem.addSelectionListener((SelectionListener)this);
         final MenuItem menuItem5;
-        (menuItem5 = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.get("MENU_MIDLET_RECENTLY", "Recently jarfiles"));
+        (menuItem5 = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.get("MENU_MIDLET_RECENTLY", "Recent jarfiles"));
         this.aMenu1018 = new Menu((Decorations)this.shell, 4194308);
         for (int n = 1; n < 5 && !Settings.aArray[n].equals(""); ++n) {
             final String s;
@@ -1030,8 +1030,6 @@ MouseTrackListener
         this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
         this.startpauseTickMenuItem.setAccelerator(SWT.CONTROL | 75);
         this.resetTickMenuItem.setAccelerator(SWT.CONTROL | 76);
-        this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
-        this.startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
         this.stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
         this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
         this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
@@ -1046,8 +1044,11 @@ MouseTrackListener
     
     
     protected final void toggleMenuAccelerators(final boolean b) {
-        /*
         if (b) {
+
+            this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
+            this.startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
+            /*
             this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
             this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
             this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
@@ -1065,7 +1066,11 @@ MouseTrackListener
             this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
             this.pausestepMenuItem.setAccelerator(SWT.CONTROL | 84);
             this.playResumeMenuItem.setAccelerator(SWT.CONTROL | 82);
+            */
         } else {
+            this.captureToFileMenuItem.setAccelerator(0);
+            this.startRecordAviMenuItem.setAccelerator(0);
+            /*
             this.infosMenuItem.setAccelerator(0);
             this.xrayViewMenuItem.setAccelerator(0);
             this.alwaysOnTopMenuItem.setAccelerator(0);
@@ -1083,8 +1088,8 @@ MouseTrackListener
             this.openJadMenuItem.setAccelerator(0);
             this.pausestepMenuItem.setAccelerator(0);
             this.playResumeMenuItem.setAccelerator(0);
+            */
         }
-         */
     }
     
 
@@ -1295,7 +1300,7 @@ MouseTrackListener
             if (menuItem.equals(this.restartMenuItem)) {
                 Emulator.loadGame(null, Settings.g2d, 1, false);
             }
-            else if (menuItem.equals(this.loadJarMenuItem) || (equals = menuItem.equals(this.loadWithConsoleMenuItem))) {
+            else if (menuItem.equals(this.loadJarMenuItem) /*|| (equals = menuItem.equals(this.loadWithConsoleMenuItem))*/) {
                 method554();
                 final FileDialog fileDialog2;
                 ((Dialog)(fileDialog2 = new FileDialog(this.shell, 4096))).setText(emulator.UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
