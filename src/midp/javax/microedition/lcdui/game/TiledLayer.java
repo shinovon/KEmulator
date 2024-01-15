@@ -4,16 +4,16 @@ import javax.microedition.lcdui.*;
 
 public class TiledLayer extends Layer
 {
-    private int anInt269;
-    private int anInt270;
-    private int anInt271;
-    private int anInt272;
-    private int[][] anIntArrayArray264;
+    private int cellHeight;
+    private int cellWidth;
+    private int rows;
+    private int columns;
+    private int[][] cells;
     Image anImage265;
     private int anInt273;
     int[] anIntArray266;
     int[] anIntArray267;
-    private int[] anIntArray268;
+    private int[] animatedTiles;
     private int anInt274;
     
     public TiledLayer(final int anInt272, final int anInt273, final Image image, final int n, final int n2) {
@@ -21,9 +21,9 @@ public class TiledLayer extends Layer
         if (image.getWidth() % n != 0 || image.getHeight() % n2 != 0) {
             throw new IllegalArgumentException();
         }
-        this.anInt272 = anInt272;
-        this.anInt271 = anInt273;
-        this.anIntArrayArray264 = new int[anInt273][anInt272];
+        this.columns = anInt272;
+        this.rows = anInt273;
+        this.cells = new int[anInt273][anInt272];
         this.method111(image, image.getWidth() / n * (image.getHeight() / n2) + 1, n, n2, true);
     }
     
@@ -31,16 +31,16 @@ public class TiledLayer extends Layer
         if (n < 0 || n >= this.anInt273) {
             throw new IndexOutOfBoundsException();
         }
-        if (this.anIntArray268 == null) {
-            this.anIntArray268 = new int[4];
+        if (this.animatedTiles == null) {
+            this.animatedTiles = new int[4];
             this.anInt274 = 1;
         }
-        else if (this.anInt274 == this.anIntArray268.length) {
-            final int[] anIntArray268 = new int[this.anIntArray268.length * 2];
-            System.arraycopy(this.anIntArray268, 0, anIntArray268, 0, this.anIntArray268.length);
-            this.anIntArray268 = anIntArray268;
+        else if (this.anInt274 == this.animatedTiles.length) {
+            final int[] anIntArray268 = new int[this.animatedTiles.length * 2];
+            System.arraycopy(this.animatedTiles, 0, anIntArray268, 0, this.animatedTiles.length);
+            this.animatedTiles = anIntArray268;
         }
-        this.anIntArray268[this.anInt274] = n;
+        this.animatedTiles[this.anInt274] = n;
         ++this.anInt274;
         return -(this.anInt274 - 1);
     }
@@ -50,22 +50,22 @@ public class TiledLayer extends Layer
             throw new IndexOutOfBoundsException();
         }
         n = -n;
-        if (this.anIntArray268 == null || n <= 0 || n >= this.anInt274) {
+        if (this.animatedTiles == null || n <= 0 || n >= this.anInt274) {
             throw new IndexOutOfBoundsException();
         }
-        this.anIntArray268[n] = n2;
+        this.animatedTiles[n] = n2;
     }
     
     public int getAnimatedTile(int n) {
         n = -n;
-        if (this.anIntArray268 == null || n <= 0 || n >= this.anInt274) {
+        if (this.animatedTiles == null || n <= 0 || n >= this.anInt274) {
             throw new IndexOutOfBoundsException();
         }
-        return this.anIntArray268[n];
+        return this.animatedTiles[n];
     }
     
     public void setCell(final int n, final int n2, final int n3) {
-        if (n < 0 || n >= this.anInt272 || n2 < 0 || n2 >= this.anInt271) {
+        if (n < 0 || n >= this.columns || n2 < 0 || n2 >= this.rows) {
             throw new IndexOutOfBoundsException();
         }
         if (n3 > 0) {
@@ -73,21 +73,21 @@ public class TiledLayer extends Layer
                 throw new IndexOutOfBoundsException();
             }
         }
-        else if (n3 < 0 && (this.anIntArray268 == null || -n3 >= this.anInt274)) {
+        else if (n3 < 0 && (this.animatedTiles == null || -n3 >= this.anInt274)) {
             throw new IndexOutOfBoundsException();
         }
-        this.anIntArrayArray264[n2][n] = n3;
+        this.cells[n2][n] = n3;
     }
     
     public int getCell(final int n, final int n2) {
-        if (n < 0 || n >= this.anInt272 || n2 < 0 || n2 >= this.anInt271) {
+        if (n < 0 || n >= this.columns || n2 < 0 || n2 >= this.rows) {
             throw new IndexOutOfBoundsException();
         }
-        return this.anIntArrayArray264[n2][n];
+        return this.cells[n2][n];
     }
     
     public void fillCells(final int n, final int n2, final int n3, final int n4, final int n5) {
-        if (n < 0 || n >= this.anInt272 || n2 < 0 || n2 >= this.anInt271 || n3 < 0 || n + n3 > this.anInt272 || n4 < 0 || n2 + n4 > this.anInt271) {
+        if (n < 0 || n >= this.columns || n2 < 0 || n2 >= this.rows || n3 < 0 || n + n3 > this.columns || n4 < 0 || n2 + n4 > this.rows) {
             throw new IndexOutOfBoundsException();
         }
         if (n5 > 0) {
@@ -95,82 +95,67 @@ public class TiledLayer extends Layer
                 throw new IndexOutOfBoundsException();
             }
         }
-        else if (n5 < 0 && (this.anIntArray268 == null || -n5 >= this.anInt274)) {
+        else if (n5 < 0 && (this.animatedTiles == null || -n5 >= this.anInt274)) {
             throw new IndexOutOfBoundsException();
         }
         for (int i = n2; i < n2 + n4; ++i) {
             for (int j = n; j < n + n3; ++j) {
-                this.anIntArrayArray264[i][j] = n5;
+                this.cells[i][j] = n5;
             }
         }
     }
     
     public final int getCellWidth() {
-        return this.anInt270;
+        return this.cellWidth;
     }
     
     public final int getCellHeight() {
-        return this.anInt269;
+        return this.cellHeight;
     }
     
     public final int getColumns() {
-        return this.anInt272;
+        return this.columns;
     }
     
     public final int getRows() {
-        return this.anInt271;
+        return this.rows;
     }
     
     public void setStaticTileSet(final Image image, final int n, final int n2) {
         if (n < 1 || n2 < 1 || image.getWidth() % n != 0 || image.getHeight() % n2 != 0) {
             throw new IllegalArgumentException();
         }
-        this.method335(this.anInt272 * n);
-        this.method336(this.anInt271 * n2);
+        this._setWidth(this.columns * n);
+        this._setHeight(this.rows * n2);
         final int n3;
-        TiledLayer tiledLayer;
-        Image image2;
-        int n4;
-        int n5;
-        int n6;
         boolean b;
         if ((n3 = image.getWidth() / n * (image.getHeight() / n2)) >= this.anInt273 - 1) {
-            tiledLayer = this;
-            image2 = image;
-            n4 = n3 + 1;
-            n5 = n;
-            n6 = n2;
             b = true;
         }
         else {
-            tiledLayer = this;
-            image2 = image;
-            n4 = n3 + 1;
-            n5 = n;
-            n6 = n2;
             b = false;
         }
-        tiledLayer.method111(image2, n4, n5, n6, b);
+        method111(image, n3 + 1, n, n2, b);
     }
     
     public final void paint(final Graphics graphics) {
         if (graphics == null) {
             throw new NullPointerException();
         }
-        if (super.aBoolean599) {
-            final int n = graphics.getClipX() - this.anInt270;
-            final int n2 = graphics.getClipY() - this.anInt269;
-            final int n3 = graphics.getClipX() + graphics.getClipWidth() + this.anInt270;
-            final int n4 = graphics.getClipY() + graphics.getClipHeight() + this.anInt269;
-            for (int anInt600 = super.anInt600, i = 0; i < this.anIntArrayArray264.length; ++i, anInt600 += this.anInt269) {
-                for (int anInt601 = super.anInt598, length = this.anIntArrayArray264[i].length, j = 0; j < length; ++j, anInt601 += this.anInt270) {
+        if (super.visible) {
+            final int n = graphics.getClipX() - this.cellWidth;
+            final int n2 = graphics.getClipY() - this.cellHeight;
+            final int n3 = graphics.getClipX() + graphics.getClipWidth() + this.cellWidth;
+            final int n4 = graphics.getClipY() + graphics.getClipHeight() + this.cellHeight;
+            for (int anInt600 = super.y, i = 0; i < this.cells.length; ++i, anInt600 += this.cellHeight) {
+                for (int anInt601 = super.x, length = this.cells[i].length, j = 0; j < length; ++j, anInt601 += this.cellWidth) {
                     int animatedTile;
-                    if ((animatedTile = this.anIntArrayArray264[i][j]) != 0 && anInt601 >= n && anInt601 <= n3 && anInt600 >= n2) {
+                    if ((animatedTile = this.cells[i][j]) != 0 && anInt601 >= n && anInt601 <= n3 && anInt600 >= n2) {
                         if (anInt600 <= n4) {
                             if (animatedTile < 0) {
                                 animatedTile = this.getAnimatedTile(animatedTile);
                             }
-                            graphics.drawRegion(this.anImage265, this.anIntArray266[animatedTile], this.anIntArray267[animatedTile], this.anInt270, this.anInt269, 0, anInt601, anInt600, 20);
+                            graphics.drawRegion(this.anImage265, this.anIntArray266[animatedTile], this.anIntArray267[animatedTile], this.cellWidth, this.cellHeight, 0, anInt601, anInt600, 20);
                         }
                     }
                 }
@@ -179,8 +164,8 @@ public class TiledLayer extends Layer
     }
     
     private void method111(final Image anImage265, final int anInt273, final int anInt274, final int anInt275, final boolean b) {
-        this.anInt270 = anInt274;
-        this.anInt269 = anInt275;
+        this.cellWidth = anInt274;
+        this.cellHeight = anInt275;
         final int width = anImage265.getWidth();
         final int height = anImage265.getHeight();
         this.anImage265 = anImage265;
@@ -191,26 +176,26 @@ public class TiledLayer extends Layer
             TiledLayer tiledLayer = this;
             int anInt276 = 0;
             while (true) {
-                tiledLayer.anInt271 = anInt276;
-                if (this.anInt271 >= this.anIntArrayArray264.length) {
+                tiledLayer.rows = anInt276;
+                if (this.rows >= this.cells.length) {
                     break;
                 }
-                final int length = this.anIntArrayArray264[this.anInt271].length;
+                final int length = this.cells[this.rows].length;
                 TiledLayer tiledLayer2 = this;
                 int anInt277 = 0;
                 while (true) {
-                    tiledLayer2.anInt272 = anInt277;
-                    if (this.anInt272 >= length) {
+                    tiledLayer2.columns = anInt277;
+                    if (this.columns >= length) {
                         break;
                     }
-                    this.anIntArrayArray264[this.anInt271][this.anInt272] = 0;
+                    this.cells[this.rows][this.columns] = 0;
                     tiledLayer2 = this;
-                    anInt277 = this.anInt272 + 1;
+                    anInt277 = this.columns + 1;
                 }
                 tiledLayer = this;
-                anInt276 = this.anInt271 + 1;
+                anInt276 = this.rows + 1;
             }
-            this.anIntArray268 = null;
+            this.animatedTiles = null;
         }
         int n = 1;
         int n3;

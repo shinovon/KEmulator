@@ -4,45 +4,56 @@ import javax.microedition.lcdui.*;
 
 public class LayerManager
 {
-    private int anInt430;
-    private Layer[] aLayerArray431;
-    private int anInt432;
-    private int anInt433;
-    private int anInt434;
-    private int anInt435;
+    private int size;
+    private Layer[] layers;
+    private int x;
+    private int y;
+    private int width;
+    private int height;
     
     public LayerManager() {
         super();
-        this.aLayerArray431 = new Layer[4];
+        this.layers = new Layer[4];
         this.setViewWindow(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
     
     public void append(final Layer layer) {
-        this.method214(layer);
-        this.method213(layer, this.anInt430);
+        remove(layer);
+        insert(layer, this.size);
     }
     
     public void insert(final Layer layer, final int n) {
-        if (n < 0 || n > this.anInt430) {
+        if (n < 0 || n > this.size) {
             throw new IndexOutOfBoundsException();
         }
-        this.method214(layer);
-        this.method213(layer, n);
+        remove(layer);
+        System.arraycopy(this.layers, n + 1, this.layers, n, this.size - n - 1);
+        this.layers[--this.size] = null;
     }
     
     public Layer getLayerAt(final int n) {
-        if (n < 0 || n >= this.anInt430) {
+        if (n < 0 || n >= this.size) {
             throw new IndexOutOfBoundsException();
         }
-        return this.aLayerArray431[n];
+        return this.layers[n];
     }
     
     public int getSize() {
-        return this.anInt430;
+        return this.size;
     }
     
     public void remove(final Layer layer) {
-        this.method214(layer);
+        if (layer == null) {
+            throw new NullPointerException();
+        }
+        int anInt430 = this.size;
+        while (--anInt430 >= 0) {
+            if (this.layers[anInt430] == layer) {
+                System.arraycopy(this.layers, anInt430 + 1, this.layers, anInt430, this.size - anInt430 - 1);
+                this.layers[--this.size] = null;
+                break;
+            }
+        }
     }
     
     public void paint(final Graphics graphics, final int n, final int n2) {
@@ -50,16 +61,16 @@ public class LayerManager
         final int clipY = graphics.getClipY();
         final int clipWidth = graphics.getClipWidth();
         final int clipHeight = graphics.getClipHeight();
-        graphics.translate(n - this.anInt432, n2 - this.anInt433);
-        graphics.clipRect(this.anInt432, this.anInt433, this.anInt434, this.anInt435);
-        int anInt430 = this.anInt430;
+        graphics.translate(n - this.x, n2 - this.y);
+        graphics.clipRect(this.x, this.y, this.width, this.height);
+        int anInt430 = this.size;
         while (--anInt430 >= 0) {
             final Layer layer;
-            if ((layer = this.aLayerArray431[anInt430]).aBoolean599) {
+            if ((layer = this.layers[anInt430]).visible) {
                 layer.paint(graphics);
             }
         }
-        graphics.translate(-n + this.anInt432, -n2 + this.anInt433);
+        graphics.translate(-n + this.x, -n2 + this.y);
         graphics.setClip(clipX, clipY, clipWidth, clipHeight);
     }
     
@@ -67,40 +78,23 @@ public class LayerManager
         if (anInt434 < 0 || anInt435 < 0) {
             throw new IllegalArgumentException();
         }
-        this.anInt432 = anInt432;
-        this.anInt433 = anInt433;
-        this.anInt434 = anInt434;
-        this.anInt435 = anInt435;
+        this.x = anInt432;
+        this.y = anInt433;
+        this.width = anInt434;
+        this.height = anInt435;
     }
     
     private void method213(final Layer layer, final int n) {
-        if (this.anInt430 == this.aLayerArray431.length) {
-            final Layer[] aLayerArray431 = new Layer[this.anInt430 + 4];
-            System.arraycopy(this.aLayerArray431, 0, aLayerArray431, 0, this.anInt430);
-            System.arraycopy(this.aLayerArray431, n, aLayerArray431, n + 1, this.anInt430 - n);
-            this.aLayerArray431 = aLayerArray431;
+        if (this.size == this.layers.length) {
+            final Layer[] aLayerArray431 = new Layer[this.size + 4];
+            System.arraycopy(this.layers, 0, aLayerArray431, 0, this.size);
+            System.arraycopy(this.layers, n, aLayerArray431, n + 1, this.size - n);
+            this.layers = aLayerArray431;
         }
         else {
-            System.arraycopy(this.aLayerArray431, n, this.aLayerArray431, n + 1, this.anInt430 - n);
+            System.arraycopy(this.layers, n, this.layers, n + 1, this.size - n);
         }
-        this.aLayerArray431[n] = layer;
-        ++this.anInt430;
-    }
-    
-    private void method214(final Layer layer) {
-        if (layer == null) {
-            throw new NullPointerException();
-        }
-        int anInt430 = this.anInt430;
-        while (--anInt430 >= 0) {
-            if (this.aLayerArray431[anInt430] == layer) {
-                this.method215(anInt430);
-            }
-        }
-    }
-    
-    private void method215(final int n) {
-        System.arraycopy(this.aLayerArray431, n + 1, this.aLayerArray431, n, this.anInt430 - n - 1);
-        this.aLayerArray431[--this.anInt430] = null;
+        this.layers[n] = layer;
+        ++this.size;
     }
 }

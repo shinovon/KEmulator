@@ -4,71 +4,71 @@ import javax.microedition.lcdui.*;
 
 public abstract class Layer
 {
-    int anInt598;
-    int anInt600;
-    int anInt601;
-    int anInt602;
-    boolean aBoolean599;
+    int x;
+    int y;
+    int width;
+    int height;
+    boolean visible;
     
     Layer() {
         super();
-        this.aBoolean599 = true;
+        this.visible = true;
     }
     
     Layer(final int n, final int n2) {
         super();
-        this.aBoolean599 = true;
-        this.method335(n);
-        this.method336(n2);
+        this.visible = true;
+        this._setWidth(n);
+        this._setHeight(n2);
     }
     
     public void setPosition(final int anInt598, final int anInt599) {
-        this.anInt598 = anInt598;
-        this.anInt600 = anInt599;
+        this.x = anInt598;
+        this.y = anInt599;
     }
     
     public void move(final int n, final int n2) {
-        this.anInt598 += n;
-        this.anInt600 += n2;
+        this.x += n;
+        this.y += n2;
     }
     
     public final int getX() {
-        return this.anInt598;
+        return this.x;
     }
     
     public final int getY() {
-        return this.anInt600;
+        return this.y;
     }
     
     public final int getWidth() {
-        return this.anInt601;
+        return this.width;
     }
     
     public final int getHeight() {
-        return this.anInt602;
+        return this.height;
     }
     
     public void setVisible(final boolean aBoolean599) {
-        this.aBoolean599 = aBoolean599;
+        this.visible = aBoolean599;
     }
     
     public final boolean isVisible() {
-        return this.aBoolean599;
+        return this.visible;
     }
     
     public abstract void paint(final Graphics p0);
     
-    final void method335(final int anInt601) {
+    final void _setWidth(final int anInt601) {
         if (anInt601 < 0) {
             throw new IllegalArgumentException();
         }
-        this.anInt601 = anInt601;
+        this.width = anInt601;
     }
     
-    final void method336(final int anInt602) {
+    final void _setHeight(final int anInt602) {
         if (anInt602 < 0) {
             throw new IllegalArgumentException();
         }
-        this.anInt602 = anInt602;
+        this.height = anInt602;
     }
 }
