@@ -12,22 +12,22 @@ public class Sprite extends Layer {
    public static final int TRANS_MIRROR_ROT90 = 7;
    public static final int TRANS_MIRROR_ROT180 = 1;
    public static final int TRANS_MIRROR_ROT270 = 4;
-   Image anImage265;
+   Image image;
    int rawFrameCount;
    int[] anIntArray266;
    int[] anIntArray267;
-   int anInt270;
-   int anInt271;
+   int frameWidth;
+   int frameHeight;
    int[] frameSequence;
    private int frame;
    private boolean aBoolean407;
    int refX;
    int refY;
-   int anInt274;
-   int anInt408;
-   int anInt409;
-   int anInt410;
-   int anInt411;
+   int collisionX;
+   int collisionY;
+   int collisionW;
+   int collisionH;
+   int transform;
    int anInt412;
    int anInt413;
    int anInt414;
@@ -56,7 +56,7 @@ public class Sprite extends Layer {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.anImage265 = Image.createImage(var1.anImage265);
+         this.image = Image.createImage(var1.image);
          this.rawFrameCount = var1.rawFrameCount;
          this.anIntArray266 = new int[this.rawFrameCount];
          this.anIntArray267 = new int[this.rawFrameCount];
@@ -66,13 +66,13 @@ public class Sprite extends Layer {
          super.y = var1.getY();
          this.refX = var1.refX;
          this.refY = var1.refY;
-         this.anInt274 = var1.anInt274;
-         this.anInt408 = var1.anInt408;
-         this.anInt409 = var1.anInt409;
-         this.anInt410 = var1.anInt410;
-         this.anInt270 = var1.anInt270;
-         this.anInt271 = var1.anInt271;
-         this.method209(var1.anInt411);
+         this.collisionX = var1.collisionX;
+         this.collisionY = var1.collisionY;
+         this.collisionW = var1.collisionW;
+         this.collisionH = var1.collisionH;
+         this.frameWidth = var1.frameWidth;
+         this.frameHeight = var1.frameHeight;
+         this.method209(var1.transform);
          this.setVisible(var1.isVisible());
          this.frameSequence = new int[var1.getFrameSequenceLength()];
          this.setFrameSequence(var1.frameSequence);
@@ -87,16 +87,16 @@ public class Sprite extends Layer {
    }
 
    public void setRefPixelPosition(int var1, int var2) {
-      super.x = var1 - this.method206(this.refX, this.refY, this.anInt411);
-      super.y = var2 - this.method208(this.refX, this.refY, this.anInt411);
+      super.x = var1 - this.method206(this.refX, this.refY, this.transform);
+      super.y = var2 - this.method208(this.refX, this.refY, this.transform);
    }
 
    public int getRefPixelX() {
-      return super.x + this.method206(this.refX, this.refY, this.anInt411);
+      return super.x + this.method206(this.refX, this.refY, this.transform);
    }
 
    public int getRefPixelY() {
-      return super.y + this.method208(this.refX, this.refY, this.anInt411);
+      return super.y + this.method208(this.refX, this.refY, this.transform);
    }
 
    public void setFrame(int var1) {
@@ -139,7 +139,7 @@ public class Sprite extends Layer {
          throw new NullPointerException();
       } else {
          if(super.visible) {
-            var1.drawRegion(this.anImage265, this.anIntArray266[this.frameSequence[this.frame]], this.anIntArray267[this.frameSequence[this.frame]], this.anInt270, this.anInt271, this.anInt411, super.x, super.y, 20);
+            var1.drawRegion(this.image, this.anIntArray266[this.frameSequence[this.frame]], this.anIntArray267[this.frameSequence[this.frame]], this.frameWidth, this.frameHeight, this.transform, super.x, super.y, 20);
          }
 
       }
@@ -181,18 +181,18 @@ public class Sprite extends Layer {
             this.aBoolean407 = false;
          }
 
-         if(this.anInt270 == var2 && this.anInt271 == var3) {
+         if(this.frameWidth == var2 && this.frameHeight == var3) {
             this.method201(var1, var2, var3, var5);
          } else {
-            int var6 = super.x + this.method206(this.refX, this.refY, this.anInt411);
-            int var7 = super.y + this.method208(this.refX, this.refY, this.anInt411);
+            int var6 = super.x + this.method206(this.refX, this.refY, this.transform);
+            int var7 = super.y + this.method208(this.refX, this.refY, this.transform);
             this._setWidth(var2);
             this._setHeight(var3);
             this.method201(var1, var2, var3, var5);
             this.method202();
-            super.x = var6 - this.method206(this.refX, this.refY, this.anInt411);
-            super.y = var7 - this.method208(this.refX, this.refY, this.anInt411);
-            this.method210(this.anInt411);
+            super.x = var6 - this.method206(this.refX, this.refY, this.transform);
+            super.y = var7 - this.method208(this.refX, this.refY, this.transform);
+            this.method210(this.transform);
          }
       } else {
          throw new IllegalArgumentException();
@@ -201,11 +201,11 @@ public class Sprite extends Layer {
 
    public void defineCollisionRectangle(int var1, int var2, int var3, int var4) {
       if(var3 >= 0 && var4 >= 0) {
-         this.anInt274 = var1;
-         this.anInt408 = var2;
-         this.anInt409 = var3;
-         this.anInt410 = var4;
-         this.method209(this.anInt411);
+         this.collisionX = var1;
+         this.collisionY = var2;
+         this.collisionW = var3;
+         this.collisionH = var4;
+         this.method209(this.transform);
       } else {
          throw new IllegalArgumentException();
       }
@@ -272,7 +272,7 @@ public class Sprite extends Layer {
                   int var18 = this.method207(var11, var12, var13, var14);
                   int var19 = var1.method205(var11, var12, var13, var14);
                   int var20 = var1.method207(var11, var12, var13, var14);
-                  return method204(var17, var18, var19, var20, this.anImage265, this.anInt411, var1.anImage265, var1.anInt411, var15, var16);
+                  return method204(var17, var18, var19, var20, this.image, this.transform, var1.image, var1.transform, var15, var16);
                }
             } else {
                return true;
@@ -374,7 +374,7 @@ public class Sprite extends Layer {
                            int var33 = this.method207(var26, var27, var28, var29);
                            int var34 = var1.anIntArray266[var25] + (var26 - var22);
                            int var35 = var1.anIntArray267[var25] + (var27 - var19);
-                           if(method204(var32, var33, var34, var35, this.anImage265, this.anInt411, var1.anImage265, 0, var30, var31)) {
+                           if(method204(var32, var33, var34, var35, this.image, this.transform, var1.anImage265, 0, var30, var31)) {
                               return true;
                            }
                         }
@@ -437,7 +437,7 @@ public class Sprite extends Layer {
                   int var20 = this.method207(var13, var14, var15, var16);
                   int var21 = var13 - var2;
                   int var22 = var14 - var3;
-                  return method204(var19, var20, var21, var22, this.anImage265, this.anInt411, var1, 0, var17, var18);
+                  return method204(var19, var20, var21, var22, this.image, this.transform, var1, 0, var17, var18);
                }
             } else {
                return true;
@@ -453,9 +453,9 @@ public class Sprite extends Layer {
       int var6 = var1.getHeight();
       int var7 = var5 / var2;
       int var8 = var6 / var3;
-      this.anImage265 = var1;
-      this.anInt270 = var2;
-      this.anInt271 = var3;
+      this.image = var1;
+      this.frameWidth = var2;
+      this.frameHeight = var3;
       this.rawFrameCount = var7 * var8;
       this.anIntArray266 = new int[this.rawFrameCount];
       this.anIntArray267 = new int[this.rawFrameCount];
@@ -498,10 +498,10 @@ public class Sprite extends Layer {
    }
 
    private void method202() {
-      this.anInt274 = 0;
-      this.anInt408 = 0;
-      this.anInt409 = super.width;
-      this.anInt410 = super.height;
+      this.collisionX = 0;
+      this.collisionY = 0;
+      this.collisionW = super.width;
+      this.collisionH = super.height;
    }
 
    private static boolean method203(int var0, int var1, int var2, int var3, int var4, int var5, int var6, int var7) {
@@ -660,7 +660,7 @@ public class Sprite extends Layer {
       int var5 = 0;
       int var10000;
       int var10001;
-      switch(this.anInt411) {
+      switch(this.transform) {
       case 0:
       case 1:
          var10000 = var1;
@@ -693,7 +693,7 @@ public class Sprite extends Layer {
       int var5 = 0;
       int var10000;
       int var10001;
-      switch(this.anInt411) {
+      switch(this.transform) {
       case 0:
       case 2:
          var10000 = var2;
@@ -723,77 +723,77 @@ public class Sprite extends Layer {
    }
 
    private void method209(int var1) {
-      super.x = super.x + this.method206(this.refX, this.refY, this.anInt411) - this.method206(this.refX, this.refY, var1);
-      super.y = super.y + this.method208(this.refX, this.refY, this.anInt411) - this.method208(this.refX, this.refY, var1);
+      super.x = super.x + this.method206(this.refX, this.refY, this.transform) - this.method206(this.refX, this.refY, var1);
+      super.y = super.y + this.method208(this.refX, this.refY, this.transform) - this.method208(this.refX, this.refY, var1);
       this.method210(var1);
-      this.anInt411 = var1;
+      this.transform = var1;
    }
 
    private void method210(int var1) {
       switch(var1) {
       case 0:
-         this.anInt412 = this.anInt274;
-         this.anInt413 = this.anInt408;
-         this.anInt414 = this.anInt409;
-         this.anInt415 = this.anInt410;
-         super.width = this.anInt270;
-         super.height = this.anInt271;
+         this.anInt412 = this.collisionX;
+         this.anInt413 = this.collisionY;
+         this.anInt414 = this.collisionW;
+         this.anInt415 = this.collisionH;
+         super.width = this.frameWidth;
+         super.height = this.frameHeight;
          return;
       case 1:
-         this.anInt413 = this.anInt271 - (this.anInt408 + this.anInt410);
-         this.anInt412 = this.anInt274;
-         this.anInt414 = this.anInt409;
-         this.anInt415 = this.anInt410;
-         super.width = this.anInt270;
-         super.height = this.anInt271;
+         this.anInt413 = this.frameHeight - (this.collisionY + this.collisionH);
+         this.anInt412 = this.collisionX;
+         this.anInt414 = this.collisionW;
+         this.anInt415 = this.collisionH;
+         super.width = this.frameWidth;
+         super.height = this.frameHeight;
          return;
       case 2:
-         this.anInt412 = this.anInt270 - (this.anInt274 + this.anInt409);
-         this.anInt413 = this.anInt408;
-         this.anInt414 = this.anInt409;
-         this.anInt415 = this.anInt410;
-         super.width = this.anInt270;
-         super.height = this.anInt271;
+         this.anInt412 = this.frameWidth - (this.collisionX + this.collisionW);
+         this.anInt413 = this.collisionY;
+         this.anInt414 = this.collisionW;
+         this.anInt415 = this.collisionH;
+         super.width = this.frameWidth;
+         super.height = this.frameHeight;
          return;
       case 3:
-         this.anInt412 = this.anInt270 - (this.anInt409 + this.anInt274);
-         this.anInt413 = this.anInt271 - (this.anInt410 + this.anInt408);
-         this.anInt414 = this.anInt409;
-         this.anInt415 = this.anInt410;
-         super.width = this.anInt270;
-         super.height = this.anInt271;
+         this.anInt412 = this.frameWidth - (this.collisionW + this.collisionX);
+         this.anInt413 = this.frameHeight - (this.collisionH + this.collisionY);
+         this.anInt414 = this.collisionW;
+         this.anInt415 = this.collisionH;
+         super.width = this.frameWidth;
+         super.height = this.frameHeight;
          return;
       case 4:
-         this.anInt413 = this.anInt274;
-         this.anInt412 = this.anInt408;
-         this.anInt415 = this.anInt409;
-         this.anInt414 = this.anInt410;
-         super.width = this.anInt271;
-         super.height = this.anInt270;
+         this.anInt413 = this.collisionX;
+         this.anInt412 = this.collisionY;
+         this.anInt415 = this.collisionW;
+         this.anInt414 = this.collisionH;
+         super.width = this.frameHeight;
+         super.height = this.frameWidth;
          return;
       case 5:
-         this.anInt412 = this.anInt271 - (this.anInt410 + this.anInt408);
-         this.anInt413 = this.anInt274;
-         this.anInt415 = this.anInt409;
-         this.anInt414 = this.anInt410;
-         super.width = this.anInt271;
-         super.height = this.anInt270;
+         this.anInt412 = this.frameHeight - (this.collisionH + this.collisionY);
+         this.anInt413 = this.collisionX;
+         this.anInt415 = this.collisionW;
+         this.anInt414 = this.collisionH;
+         super.width = this.frameHeight;
+         super.height = this.frameWidth;
          return;
       case 6:
-         this.anInt412 = this.anInt408;
-         this.anInt413 = this.anInt270 - (this.anInt409 + this.anInt274);
-         this.anInt415 = this.anInt409;
-         this.anInt414 = this.anInt410;
-         super.width = this.anInt271;
-         super.height = this.anInt270;
+         this.anInt412 = this.collisionY;
+         this.anInt413 = this.frameWidth - (this.collisionW + this.collisionX);
+         this.anInt415 = this.collisionW;
+         this.anInt414 = this.collisionH;
+         super.width = this.frameHeight;
+         super.height = this.frameWidth;
          return;
       case 7:
-         this.anInt412 = this.anInt271 - (this.anInt410 + this.anInt408);
-         this.anInt413 = this.anInt270 - (this.anInt409 + this.anInt274);
-         this.anInt415 = this.anInt409;
-         this.anInt414 = this.anInt410;
-         super.width = this.anInt271;
-         super.height = this.anInt270;
+         this.anInt412 = this.frameHeight - (this.collisionH + this.collisionY);
+         this.anInt413 = this.frameWidth - (this.collisionW + this.collisionX);
+         this.anInt415 = this.collisionW;
+         this.anInt414 = this.collisionH;
+         super.width = this.frameHeight;
+         super.height = this.frameWidth;
          return;
       default:
          throw new IllegalArgumentException();
@@ -811,22 +811,22 @@ public class Sprite extends Layer {
          var5 = var1;
          break;
       case 2:
-         var5 = this.anInt270 - var1 - 1;
+         var5 = this.frameWidth - var1 - 1;
          break;
       case 3:
-         var5 = this.anInt270 - var1 - 1;
+         var5 = this.frameWidth - var1 - 1;
          break;
       case 4:
          var5 = var2;
          break;
       case 5:
-         var5 = this.anInt271 - var2 - 1;
+         var5 = this.frameHeight - var2 - 1;
          break;
       case 6:
          var5 = var2;
          break;
       case 7:
-         var5 = this.anInt271 - var2 - 1;
+         var5 = this.frameHeight - var2 - 1;
          break;
       default:
          throw new IllegalArgumentException();
@@ -843,13 +843,13 @@ public class Sprite extends Layer {
          var5 = var2;
          break;
       case 1:
-         var5 = this.anInt271 - var2 - 1;
+         var5 = this.frameHeight - var2 - 1;
          break;
       case 2:
          var5 = var2;
          break;
       case 3:
-         var5 = this.anInt271 - var2 - 1;
+         var5 = this.frameHeight - var2 - 1;
          break;
       case 4:
          var5 = var1;
@@ -858,10 +858,10 @@ public class Sprite extends Layer {
          var5 = var1;
          break;
       case 6:
-         var5 = this.anInt270 - var1 - 1;
+         var5 = this.frameWidth - var1 - 1;
          break;
       case 7:
-         var5 = this.anInt270 - var1 - 1;
+         var5 = this.frameWidth - var1 - 1;
          break;
       default:
          throw new IllegalArgumentException();
