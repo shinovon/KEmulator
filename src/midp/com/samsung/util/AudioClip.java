@@ -111,6 +111,9 @@ public class AudioClip {
     }
 
     public void play(int n, int n2) {
+        if(n == -1) {
+            n = 255;
+        }
         if (n < 0 || n > 255) {
             throw new IllegalArgumentException("loop must be in range 0 to 255: " + n);
         }
