@@ -1256,7 +1256,7 @@ public class Emulator
 
 	public static Info getMidiDeviceInfo() throws MidiUnavailableException {
 		for (int i = 0; i < midiDeviceInfo.length; ++i) {
-			if(midiDeviceInfo[i].getName().toLowerCase().contains("virtual")) {
+			if(midiDeviceInfo[i].getName().toLowerCase().contains("virtualmidisynth")) {
 				return midiDeviceInfo[i];
 			}
 		}

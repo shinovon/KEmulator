@@ -49,6 +49,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	private InputStream inputStream;
 	static Class clipCls;
 	private static int count;
+	private int level = 100;
 
 
 	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
@@ -132,7 +133,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				}
 			}
 		}
-		this.setLevel(this.state = 100);
+		this.state = 100;
+		this.setLevel(level);
 		this.listeners = new Vector();
 		this.timeBase = Manager.getSystemTimeBase();
 	}
@@ -150,7 +152,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.loopCount = 1;
 			this.dataLen = (int) new File(src).length();
 			wav(new URL("file:///" + src));
-			this.setLevel(this.state = 100);
+			this.state = 100;
+			this.setLevel(level);
 			this.listeners = new Vector();
 			this.timeBase = Manager.getSystemTimeBase();
 		} else {
@@ -186,7 +189,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		try {
 			this.sequence = AudioSystem.getAudioInputStream(inputStream);
 		} catch (Exception ex) {
-			System.out.println(ex.toString());
+			System.out.println("WAV realize error: " + ex.toString());
 			//ex.printStackTrace();
 			this.sequence = null;
 			//throw new IOException("WAV realize error!", ex);
@@ -259,74 +262,17 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 
 	private static MidiDevice device;
 	Sequencer sequencer;
-	static Synthesizer synthesizer;
 	
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
 			this.sequence = MidiSystem.getSequence(inputStream);
-		} catch (Exception ex) {
+		} catch (Exception e) {
 			this.sequence = null;
 		}
 		try {
-			/*
-			if(device == null || sequencer == null || synthesizer == null) {
+			if(device == null) {
 				device = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
 				device.open();
-				sequencer = MidiSystem.getSequencer();
-				for (Transmitter t : sequencer.getTransmitters()) {
-					t.setReceiver(device.getReceiver());
-				}
-				if(sequencer instanceof Synthesizer) {
-					synthesizer = (Synthesizer) sequencer;
-				} else {
-					synthesizer = MidiSystem.getSynthesizer();
-					synthesizer.open();
-					for (Transmitter t : synthesizer.getTransmitters()) {
-						t.setReceiver(device.getReceiver());
-					}
-				}
-			}
-			*/
-			
-			/*
-			this.sequencer = MidiSystem.getSequencer();
-			
-			(this.synthesizer = MidiSystem.getSynthesizer()).open();
-			
-			
-			
-			if (this.synthesizer.getDefaultSoundbank() == null) {
-			    this.sequencer.getTransmitter().setReceiver(MidiSystem.getReceiver());
-			}
-			else {
-			    this.sequencer.getTransmitter().setReceiver(this.synthesizer.getReceiver());
-			}
-			
-			this.sequencer.getTransmitter().setReceiver(MidiSystem.getReceiver());
-			if(MidiSystem.getReceiver() instanceof Sequencer) {
-				this.sequencer = (Sequencer) MidiSystem.getReceiver();
-			}
-			if(this.sequencer instanceof Synthesizer) {
-				this.synthesizer = (Synthesizer) this.sequencer;
-			}
-			else if(MidiSystem.getReceiver() instanceof Synthesizer) {
-				this.synthesizer = (Synthesizer) MidiSystem.getReceiver();
-			} else {
-				this.synthesizer = MidiSystem.getSynthesizer();
-				this.synthesizer.open();
-				this.sequencer.getTransmitter().setReceiver(this.synthesizer.getReceiver());
-			//	this.synthesizer.getTransmitter().setReceiver(MidiSystem.getReceiver());
-			}
-			*/
-			
-			if(synthesizer == null) {
-				device = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
-				device.open();
-				synthesizer = MidiSystem.getSynthesizer();
-				for (Transmitter t : synthesizer.getTransmitters()) {
-					t.setReceiver(device.getReceiver());
-				}
-				synthesizer.open();
 			}
 			sequencer = MidiSystem.getSequencer();
 			for (Transmitter t : sequencer.getTransmitters()) {
@@ -343,10 +289,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			if (this.sequence != null) {
 				this.sequencer.setSequence((Sequence) this.sequence);
 			}
-		} catch (Exception ex3) {
-			ex3.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 			this.sequence = null;
-			throw new IOException(ex3.toString());
+			throw new IOException(e.toString());
 		}
 		this.midiControl = new MIDIControlImpl(this);
 		this.toneControl = new ToneControlImpl();
@@ -415,19 +361,15 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				return;
 			}
 		}
-		PlayerImpl playerImpl;
 		int anInt303;
 		if (this.state == 300) {
-			playerImpl = this;
 			anInt303 = 200;
-		} else {
-			if (this.state != 200) {
-				return;
-			}
-			playerImpl = this;
+		} else if (this.state == 200) {
 			anInt303 = 100;
+		} else {
+			return;
 		}
-		playerImpl.state = anInt303;
+		state = anInt303;
 		if (dataSource != null && dataSource.getStreams() != null && dataSource.getStreams()[0] != null && !dataSourceDisconnected) {
 			if (dataSource.getStreams()[0].getSeekType() == 0) {
 				dataSource.disconnect();
@@ -592,7 +534,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				}
 				this.volumeControl = new VolumeControlImpl(this);
 				this.controls = new Control[] { this.volumeControl };
-				this.setLevel(this.state = 100);
+				this.state = 100;
+				this.setLevel(level);
 				this.listeners = new Vector();
 				this.timeBase = Manager.getSystemTimeBase();
 			} else {
@@ -621,6 +564,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				}
 				(this.playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
 			}
+			setLevel(level);
 			this.state = 400;
 			this.notifyListeners("started", new Long(0L));
 			if(sequence == null) {
@@ -642,8 +586,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		if (this.playerThread != null) {
 			final Thread aThread297 = this.playerThread;
 			this.playerThread = null;
-			while (aThread297.isAlive()) {
-			}
+			while (aThread297.isAlive());
 		}
 	}
 
@@ -794,8 +737,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		}
 	}
 
-	public void setLevel(final int n) {
-		notifyListeners("volumeChanged", n);
+	public void setLevel(int n) {
+		if(level != n) notifyListeners("volumeChanged", n);
+		level = n;
+		if(sequence == null) return;
 		final double n2 = n / 100.0;
 		if (this.sequence instanceof Clip) {
 			try {
@@ -807,17 +752,11 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		}
 		if (this.sequence instanceof Sequence) {
 			try {
-				if (this.synthesizer.getDefaultSoundbank() == null) {
-					final ShortMessage shortMessage = new ShortMessage();
-					for (int i = 0; i < 16; ++i) {
-						shortMessage.setMessage(176, i, 7, (int) (n2 * 127.0));
-						MidiSystem.getReceiver().send(shortMessage, -1L);
-					}
-					return;
-				}
-				final MidiChannel[] channels = this.synthesizer.getChannels();
-				for (int j = 0; j < channels.length; ++j) {
-					channels[j].controlChange(7, (int) (n2 * 127.0));
+				Receiver r = sequencer.getTransmitters().iterator().next().getReceiver();
+				final ShortMessage shortMessage = new ShortMessage();
+				for (int i = 0; i < 16; ++i) {
+					shortMessage.setMessage(ShortMessage.CONTROL_CHANGE, i, 7, (int) (n2 * 127.0));
+					r.send(shortMessage, -1L);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -830,20 +769,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}
 
 	public void setMIDIChannelVolume(final int n, final int n2) {
+		if(sequence == null) return;
 		if (this.sequence instanceof Sequence) {
 			try {
-				if (this.synthesizer.getDefaultSoundbank() != null) {
-					final MidiChannel[] channels = this.synthesizer.getChannels();
-					for (int i = 0; i < channels.length; ++i) {
-						channels[i].controlChange(n, n2);
-					}
-					return;
-				}
-				final ShortMessage shortMessage = new ShortMessage();
-				for (int j = 0; j < 16; ++j) {
-					shortMessage.setMessage(176, n, 7, n2);
-					MidiSystem.getReceiver().send(shortMessage, -1L);
-				}
+				Receiver r = sequencer.getTransmitters().iterator().next().getReceiver();
+				ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, (int) (n2 * 127.0));
+				r.send(shortMessage, -1L);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
