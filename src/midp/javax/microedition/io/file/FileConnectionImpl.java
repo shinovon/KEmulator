@@ -17,7 +17,6 @@ public class FileConnectionImpl implements FileConnection
     public FileConnectionImpl(String url) throws IOException {
         super();
     	if(url.length() > 300) {
-    		Thread.dumpStack();
     		throw new IOException("Path too long");
     	}
         this.origUrl = url;
