@@ -4,52 +4,38 @@ import javax.microedition.media.*;
 
 public class VolumeControlImpl implements VolumeControl
 {
-    Player aPlayer364;
-    int anInt365;
-    boolean aBoolean366;
+    Player player;
+    int volume;
+    boolean mute;
     
     public VolumeControlImpl(final Object o) {
         super();
-        this.aPlayer364 = (Player)o;
-        this.anInt365 = 100;
+        this.player = (Player)o;
+        this.volume = 100;
     }
     
     public int getLevel() {
-        return this.anInt365;
+        return this.volume;
     }
     
     public boolean isMuted() {
-        return this.aBoolean366;
+        return this.mute;
     }
     
     public int setLevel(final int anInt365) {
         if (anInt365 >= 0 && anInt365 <= 100) {
-            this.anInt365 = anInt365;
-            if (this.aPlayer364 instanceof PlayerImpl) {
-                ((PlayerImpl)this.aPlayer364).setLevel(this.anInt365);
+            this.volume = anInt365;
+            if (this.player instanceof PlayerImpl) {
+                ((PlayerImpl)this.player).setLevel(this.volume);
             }
         }
-        return this.anInt365;
+        return this.volume;
     }
     
     public void setMute(final boolean aBoolean366) {
-        this.aBoolean366 = aBoolean366;
-        PlayerImpl playerImpl;
-        int anInt365;
-        if (this.aBoolean366) {
-            if (!(this.aPlayer364 instanceof PlayerImpl)) {
-                return;
-            }
-            playerImpl = (PlayerImpl)this.aPlayer364;
-            anInt365 = 0;
-        }
-        else {
-            if (!(this.aPlayer364 instanceof PlayerImpl)) {
-                return;
-            }
-            playerImpl = (PlayerImpl)this.aPlayer364;
-            anInt365 = this.anInt365;
-        }
-        playerImpl.setLevel(anInt365);
+        this.mute = aBoolean366;
+        if (!(this.player instanceof PlayerImpl))
+            return;
+        ((PlayerImpl)player).setLevel(this.mute ? 0 : this.volume);
     }
 }

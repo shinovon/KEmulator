@@ -801,10 +801,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			try {
 				((FloatControl) ((Clip) this.sequence).getControl(FloatControl.Type.MASTER_GAIN))
 						.setValue((float) (Math.log((n2 == 0.0) ? 1.0E-4 : n2) / Math.log(10.0) * 20.0));
-				return;
-			} catch (Exception ex2) {
-				return;
+			} catch (Exception e) {
 			}
+			return;
 		}
 		if (this.sequence instanceof Sequence) {
 			try {
@@ -820,11 +819,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				for (int j = 0; j < channels.length; ++j) {
 					channels[j].controlChange(7, (int) (n2 * 127.0));
 				}
-				return;
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				return;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+			return;
 		}
 		if (this.sequence instanceof Player) {
 			((Player) this.sequence).setLevel(n);
