@@ -677,8 +677,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 				while (!midiCompleted && playerThread != null) {
 					try {
 						Thread.sleep(1);
-						Thread.yield();
-					} catch (Exception exception) {
+					} catch (Exception e) {
 						break;
 					}
 				}
@@ -751,6 +750,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			return;
 		}
 		if (this.sequence instanceof Sequence) {
+			/*
 			try {
 				Receiver r = sequencer.getTransmitters().iterator().next().getReceiver();
 				final ShortMessage shortMessage = new ShortMessage();
@@ -761,6 +761,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			 */
 			return;
 		}
 		if (this.sequence instanceof Player) {
