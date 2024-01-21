@@ -189,17 +189,18 @@ MouseTrackListener
     }
     
     private void method550(final int n, final int n2) {
+        final int bgcolor = 0xffffff; // 9934483
         if (Settings.g2d == 0) {
-            this.ad979 = new ImageSWT(n, n2, false, 9934483);
-            this.screenImageSwt = new ImageSWT(n, n2, false, 9934483);
-            this.backBufferImageSwt = new ImageSWT(n, n2, false, 9934483);
-            this.xrayScreenImageSwt = new ImageSWT(n, n2, true, 9934483);
+            this.ad979 = new ImageSWT(n, n2, false, bgcolor);
+            this.screenImageSwt = new ImageSWT(n, n2, false, bgcolor);
+            this.backBufferImageSwt = new ImageSWT(n, n2, false, bgcolor);
+            this.xrayScreenImageSwt = new ImageSWT(n, n2, true, bgcolor);
             return;
         }
         if (Settings.g2d == 1) {
-            this.screenImgAwtClone = new emulator.graphics2D.awt.d(n, n2, false, 9934483);
-            this.screenImageAwt = new emulator.graphics2D.awt.d(n, n2, false, 9934483);
-            this.backBufferImageAwt = new emulator.graphics2D.awt.d(n, n2, false, 9934483);
+            this.screenImgAwtClone = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
+            this.screenImageAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
+            this.backBufferImageAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
             this.xrayScreenImageAwt = new emulator.graphics2D.awt.d(n, n2, true, -16777216);
         }
     }
