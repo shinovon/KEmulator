@@ -312,7 +312,7 @@ public class Emulator
     public static void notifyDestroyed() {
 		if(rpcCallbackThread != null)
 			rpcCallbackThread.interrupt();
-        MMFPlayer.method200();
+        MMFPlayer.close();
         Emulator.emulatorimpl.getProperty().saveProperties();
         if (Settings.autoGenJad) {
             method280();

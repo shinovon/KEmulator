@@ -1,12 +1,12 @@
 package com.samsung.util;
 
-import com.samsung.util.Class47;
 import emulator.custom.CustomJarResources;
 import emulator.media.MMFPlayer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.microedition.media.PlayerListener;
 
@@ -17,75 +17,64 @@ public class AudioClip {
     public PlayerImpl m_player;
     public int dataLen;
     public int loopCount;
-    public int volume5;
-    private int anInt955;
-    private byte[] aByteArray956;
-    private boolean aBoolean957;
+    public int volume;
+    private int type;
+    private byte[] data;
+    private boolean mmfInit;
     public static final int STATUS_STOP = 0;
     public static final int STATUS_PLAY = 1;
     public static final int STATUS_PAUSE = 2;
-    private int anInt958;
+    private int status;
 
-    public AudioClip(int n, byte[] arrby, int n2, int n3) {
-        byte[] arrby2 = new byte[n3];
-        System.arraycopy((Object)arrby, (int)n2, (Object)arrby2, (int)0, (int)n3);
-        this.method357(arrby2, n);
+    public AudioClip(int n, byte[] b, int n2, int n3) {
+        byte[] t = new byte[n3];
+        System.arraycopy((Object)b, (int)n2, (Object)t, (int)0, (int)n3);
+        this.init(t, n);
     }
 
-    public AudioClip(int n, String string) throws IOException {
-        InputStream inputStream = CustomJarResources.getResourceStream((String)string);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        byte[] arrby = new byte[512];
-        while (inputStream.available() > 0) {
-            int n2 = inputStream.read(arrby);
-            byteArrayOutputStream.write(arrby, 0, n2);
+    public AudioClip(int type, String s) throws IOException {
+        InputStream is = CustomJarResources.getResourceStream(s);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] b = new byte[512];
+        while (is.available() > 0) {
+            int n2 = is.read(b);
+            baos.write(b, 0, n2);
         }
-        byte[] arrby2 = new byte[byteArrayOutputStream.toByteArray().length];
-        System.arraycopy((Object)byteArrayOutputStream.toByteArray(), (int)0, (Object)arrby2, (int)0, (int)arrby2.length);
-        this.method357(arrby2, n);
+        byte[] t = new byte[baos.size()];
+        System.arraycopy((Object)baos.toByteArray(), (int)0, (Object)t, (int)0, (int)t.length);
+        this.init(t, type);
     }
 
-    private void method357(byte[] arrby, int n) {
-        block6 : {
-            block7 : {
-                if (arrby == null) {
-                    throw new NullPointerException();
-                }
-                this.anInt955 = n;
-                if (n != 1) break block7;
-                this.aBoolean957 = MMFPlayer.a();
-                this.aByteArray956 = arrby;
-                this.dataLen = arrby.length;
-                break block6;
-            }
-            try {
-                String string;
-                block10 : {
-                    String string2;
-                    block9 : {
-                        block8 : {
-                            string = "";
-                            if (n != 3) break block8;
-                            string2 = "audio/midi";
-                            break block9;
-                        }
-                        if (n != 2) break block10;
-                        string2 = "audio/mpeg";
-                    }
-                    string = string2;
-                }
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(arrby);
-                this.m_player = new PlayerImpl((InputStream)byteArrayInputStream, string);
-                this.m_player.addPlayerListener((PlayerListener)new Class47(this));
-                byteArrayInputStream.close();
-            }
-            catch (Exception exception) {}
+    private void init(byte[] b, int type) {
+        if (b == null) {
+            throw new NullPointerException();
         }
-        this.anInt958 = 0;
+        this.type = type;
+        if (type == 1) {
+            this.mmfInit = MMFPlayer.a();
+            this.data = b;
+            this.dataLen = b.length;
+            this.status = 0;
+            return;
+        }
+        try {
+            String string = "";
+            if (type == 3) {
+                string = "audio/midi";
+            } else if (type == 2) {
+                string = "audio/mpeg";
+            }
+            ByteArrayInputStream bais = new ByteArrayInputStream(b);
+            this.m_player = new PlayerImpl(bais, string);
+            this.m_player.addPlayerListener(new MMAPIListener());
+            bais.close();
+        }
+        catch (Exception exception) {}
+        this.status = 0;
     }
 
     public int getStatus() {
-        return this.anInt958;
+        return this.status;
     }
 
     public static boolean isSupported() {
@@ -93,10 +82,10 @@ public class AudioClip {
     }
 
     public void pause() {
-        if (this.anInt955 == 1) {
-            if (this.aBoolean957 && MMFPlayer.isPlaying()) {
+        if (this.type == 1) {
+            if (this.mmfInit && MMFPlayer.isPlaying()) {
                 MMFPlayer.pause();
-                this.anInt958 = 2;
+                this.status = 2;
                 return;
             }
         } else if (this.m_player != null) {
@@ -106,45 +95,45 @@ public class AudioClip {
                 this.m_player.setMediaTime(l);
             }
             catch (Exception exception) {}
-            this.anInt958 = 2;
+            this.status = 2;
         }
     }
 
-    public void play(int n, int n2) {
-        if(n == -1) {
-            n = 255;
+    public void play(int l, int v) {
+        if(l == -1) {
+            l = 255;
         }
-        if (n < 0 || n > 255) {
-            throw new IllegalArgumentException("loop must be in range 0 to 255: " + n);
+        if (l < 0 || l > 255) {
+            throw new IllegalArgumentException("loop must be in range 0 to 255: " + l);
         }
-        if (n2 < 0 || n2 > 5) {
-            throw new IllegalArgumentException("volume must be in range from 0 to 5: " + n2);
+        if (v < 0 || v > 5) {
+            throw new IllegalArgumentException("volume must be in range from 0 to 5: " + v);
         }
-        if (this.anInt955 == 1) {
-            this.loopCount = n;
-            this.volume5 = n2;
-            if (this.aBoolean957) {
-                MMFPlayer.initPlayer((byte[])this.aByteArray956);
-                MMFPlayer.play((int)n, (int)n2);
-                this.anInt958 = 1;
+        if (this.type == 1) {
+            this.loopCount = l;
+            this.volume = v;
+            if (this.mmfInit) {
+                MMFPlayer.initPlayer((byte[])this.data);
+                MMFPlayer.play((int)l, (int)v);
+                this.status = 1;
                 return;
             }
         } else if (this.m_player != null) {
-            this.m_player.setLoopCount(n);
-            this.m_player.setLevel(n2 * 20);
+            this.m_player.setLoopCount(l);
+            this.m_player.setLevel(v * 20);
             try {
                 this.m_player.start();
             }
             catch (Exception exception) {}
-            this.anInt958 = 1;
+            this.status = 1;
         }
     }
 
     public void resume() {
-        if (this.anInt955 == 1) {
-            if (this.aBoolean957) {
+        if (this.type == 1) {
+            if (this.mmfInit) {
                 MMFPlayer.resume();
-                this.anInt958 = 1;
+                this.status = 1;
                 return;
             }
         } else if (this.m_player != null) {
@@ -152,15 +141,15 @@ public class AudioClip {
                 this.m_player.start();
             }
             catch (Exception exception) {}
-            this.anInt958 = 1;
+            this.status = 1;
         }
     }
 
     public void stop() {
-        if (this.anInt955 == 1) {
-            if (this.aBoolean957 && MMFPlayer.isPlaying()) {
+        if (this.type == 1) {
+            if (this.mmfInit && MMFPlayer.isPlaying()) {
                 MMFPlayer.stop();
-                this.anInt958 = 0;
+                this.status = 0;
                 return;
             }
         } else if (this.m_player != null) {
@@ -168,12 +157,15 @@ public class AudioClip {
                 this.m_player.stop();
             }
             catch (Exception exception) {}
-            this.anInt958 = 0;
+            this.status = 0;
         }
     }
 
-    static int method358(AudioClip audioClip, int n) {
-        audioClip.anInt958 = n;
-        return audioClip.anInt958;
+    class MMAPIListener implements PlayerListener {
+        public void playerUpdate(Player p, String s, Object o) {
+            if ("stopped".equals(s)) {
+                AudioClip.this.status = 0;
+            }
+        }
     }
 }

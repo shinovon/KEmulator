@@ -4,33 +4,31 @@ import emulator.*;
 
 public class MMFPlayer
 {
-    static boolean aBoolean406;
+    static boolean initialized;
     
     public MMFPlayer() {
         super();
     }
     
     public static boolean a() {
-        if (MMFPlayer.aBoolean406) {
+        if (MMFPlayer.initialized) {
             return true;
         }
         try {
             i.a("mmfplayer");
             initMMFLibrary(Emulator.getAbsolutePath() + "/ma3smwemu.dll");
-            MMFPlayer.aBoolean406 = true;
-            return MMFPlayer.aBoolean406;
+            return MMFPlayer.initialized = true;
         }
         catch (UnsatisfiedLinkError unsatisfiedLinkError) {}
         catch (Exception ex) {}
-        MMFPlayer.aBoolean406 = false;
-        return MMFPlayer.aBoolean406;
+        return MMFPlayer.initialized = false;
     }
     
-    public static void method200() {
-        if (MMFPlayer.aBoolean406) {
+    public static void close() {
+        if (MMFPlayer.initialized) {
             stop();
             destroy();
-            MMFPlayer.aBoolean406 = false;
+            MMFPlayer.initialized = false;
         }
     }
     

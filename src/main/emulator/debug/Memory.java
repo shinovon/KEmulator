@@ -8,13 +8,12 @@ import javax.microedition.m3g.*;
 import emulator.graphics2D.*;
 import java.util.*;
 import java.lang.reflect.*;
-import org.apache.tools.zip.*;
+
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
-import java.util.zip.*;
 
 public final class Memory
 {
@@ -434,7 +433,7 @@ public final class Memory
                 return ((Sound)o).getGain();
             }
             if (o instanceof AudioClip) {
-                return ((AudioClip)o).volume5 * 20;
+                return ((AudioClip)o).volume * 20;
             }
 
             if(o instanceof VLCPlayerImpl) {
@@ -498,7 +497,7 @@ public final class Memory
             final AudioClip audioClip = (AudioClip)o;
             switch (n) {
                 case 0: {
-                    audioClip.play(audioClip.loopCount, audioClip.volume5);
+                    audioClip.play(audioClip.loopCount, audioClip.volume);
                     break;
                 }
                 case 1: {
