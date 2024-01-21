@@ -28,7 +28,7 @@ public class AudioClip {
 
     public AudioClip(int n, byte[] b, int n2, int n3) {
         byte[] t = new byte[n3];
-        System.arraycopy((Object)b, (int)n2, (Object)t, (int)0, (int)n3);
+        System.arraycopy(b, n2, t, 0, n3);
         this.init(t, n);
     }
 
@@ -41,7 +41,7 @@ public class AudioClip {
             baos.write(b, 0, n2);
         }
         byte[] t = new byte[baos.size()];
-        System.arraycopy((Object)baos.toByteArray(), (int)0, (Object)t, (int)0, (int)t.length);
+        System.arraycopy(baos.toByteArray(), 0, t, 0, t.length);
         this.init(t, type);
     }
 
@@ -58,14 +58,14 @@ public class AudioClip {
             return;
         }
         try {
-            String string = "";
+            String ct = "";
             if (type == 3) {
-                string = "audio/midi";
+                ct = "audio/midi";
             } else if (type == 2) {
-                string = "audio/mpeg";
+                ct = "audio/mpeg";
             }
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
-            this.m_player = new PlayerImpl(bais, string);
+            this.m_player = new PlayerImpl(bais, ct);
             this.m_player.addPlayerListener(new MMAPIListener());
             bais.close();
         }
@@ -113,8 +113,8 @@ public class AudioClip {
             this.loopCount = l;
             this.volume = v;
             if (this.mmfInit) {
-                MMFPlayer.initPlayer((byte[])this.data);
-                MMFPlayer.play((int)l, (int)v);
+                MMFPlayer.initPlayer(this.data);
+                MMFPlayer.play(l, v);
                 this.status = 1;
                 return;
             }

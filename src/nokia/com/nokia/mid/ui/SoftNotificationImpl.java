@@ -10,18 +10,18 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.nokia.mid.ui.SoftNotification;
-
 import emulator.Emulator;
+import org.pigler.api.PiglerAPI;
 
 public class SoftNotificationImpl extends SoftNotification {
 
+	private static PiglerAPI pigler;
 	private SoftNotificationListener[] iListener;
 	private String groupText;
 	private String text;
 	private boolean hasImage;
-	private static TrayIcon trayIcon;
-	private static SystemTray tray;
+	public static TrayIcon trayIcon;
+	public static SystemTray tray;
 	private static SoftNotificationImpl lastInst;
 
 	public SoftNotificationImpl(int aNotificationId) {
@@ -30,6 +30,11 @@ public class SoftNotificationImpl extends SoftNotification {
 
 	public SoftNotificationImpl() {
 		initialize(-1);
+	}
+
+	public static void setPigler(PiglerAPI piglerAPI) {
+		if(pigler != null && piglerAPI != null) throw new IllegalStateException();
+		pigler = piglerAPI;
 	}
 
 	protected void initialize(int aNotificationId) {
@@ -108,5 +113,7 @@ public class SoftNotificationImpl extends SoftNotification {
 	protected static void action(int i) {
 		if(lastInst != null)
 			lastInst.notificationCallback(i);
+		else if(pigler != null)
+			pigler._callback(i);
 	}
 }
