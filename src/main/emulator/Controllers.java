@@ -35,6 +35,7 @@ public class Controllers
                 	if(s.contains("STAR")) continue;
                     if(s.contains("Gaming Keyboard")) continue;
                     if(s.contains("Gaming Mouse")) continue;
+                    if(s.contains("Microphone")) continue;
                     list.add(controller);
                 }
             }
