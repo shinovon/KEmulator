@@ -46,6 +46,8 @@ $nnmod v2.14.2 [2024.01.21]
 Updated KEmulator.exe
 Samsung API AudioClip loop count fix
 Updated jre to 8 upd 202
+Changed Canvas default background color
+Changed nokia tone midi instrument
 
 $nnmod v2.14.1 [2024.01.14]
 Add controller mapping saves
