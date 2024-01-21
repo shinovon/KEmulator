@@ -111,7 +111,7 @@ public final class a
         this.method731(0, 4);
         this.method735(0);
         this.method731(192, 1);
-        this.method731(64, 1);
+        this.method731(80, 1); // replaced from 64
         this.method737();
     }
     
