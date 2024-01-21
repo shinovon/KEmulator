@@ -42,8 +42,10 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.14.2 [2024.01.15]
+$nnmod v2.14.2 [2024.01.21]
 Updated KEmulator.exe
+Samsung API AudioClip loop count fix
+Updated jre to 8 upd 202
 
 $nnmod v2.14.1 [2024.01.14]
 Add controller mapping saves
