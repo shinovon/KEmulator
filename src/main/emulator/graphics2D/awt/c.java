@@ -30,68 +30,38 @@ public final class c implements ITransform
     public final void transform(final float[] array, final int n, final float[] array2, final int n2, final int n3) {
         this.anAffineTransform4.transform(array, n, array2, n2, n3);
     }
-    
-    public final ITransform newTransform(final int n, final int n2, final int n3, int n4, int n5, final int n6) {
-        n4 += method9(n, n2, n3, n6);
-        n5 += method10(n, n2, n3, n6);
-        final AffineTransform affineTransform;
-        (affineTransform = new AffineTransform()).translate(n4, n5);
-        if (n3 == 6) {
-            affineTransform.translate(0.0, n);
-            affineTransform.rotate(-1.5707963267948966);
+
+    public final ITransform newTransform(int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6)
+    {
+        paramInt4 += a(paramInt1, paramInt2, paramInt3, paramInt6);
+        paramInt5 += b(paramInt1, paramInt2, paramInt3, paramInt6);
+        AffineTransform localAffineTransform;
+        (localAffineTransform = new AffineTransform()).translate(paramInt4, paramInt5);
+        if (paramInt3 == 6)
+        {
+            localAffineTransform.translate(0.0D, paramInt1);
+            localAffineTransform.rotate(-1.5707963267948966D);
         }
-        else {
-            AffineTransform affineTransform2;
-            double n7;
-            double n8;
-            if (n3 == 4) {
-                affineTransform.rotate(-1.5707963267948966);
-                affineTransform2 = affineTransform;
-                n7 = -1.0;
-                n8 = 1.0;
+        else
+        {
+            localAffineTransform.rotate(-1.5707963267948966D);
+            localAffineTransform.translate(paramInt2, 0.0D);
+            localAffineTransform.rotate(1.5707963267948966D);
+            localAffineTransform.translate(paramInt2, paramInt1);
+            localAffineTransform.rotate(1.5707963267948966D);
+            localAffineTransform.translate(paramInt1, paramInt2);
+            localAffineTransform.rotate(3.141592653589793D);
+            localAffineTransform.translate(paramInt1, 0.0D);
+            if (paramInt3 == 1)
+            {
+                localAffineTransform.translate(0.0D, paramInt2);
+                localAffineTransform.scale(1.0D, paramInt3 == 2 ? 1.0D : paramInt3 == 7 ? 1.0D : paramInt3 == 4 ? 1.0D : -1.0D);
             }
-            else {
-                if (n3 == 5) {
-                    affineTransform.translate(n2, 0.0);
-                    affineTransform.rotate(1.5707963267948966);
-                    return new c(affineTransform);
-                }
-                if (n3 == 7) {
-                    affineTransform.translate(n2, n);
-                    affineTransform.rotate(1.5707963267948966);
-                    affineTransform2 = affineTransform;
-                    n7 = -1.0;
-                    n8 = 1.0;
-                }
-                else {
-                    if (n3 == 3) {
-                        affineTransform.translate(n, n2);
-                        affineTransform.rotate(3.141592653589793);
-                        return new c(affineTransform);
-                    }
-                    if (n3 == 2) {
-                        affineTransform.translate(n, 0.0);
-                        affineTransform2 = affineTransform;
-                        n7 = -1.0;
-                        n8 = 1.0;
-                    }
-                    else {
-                        if (n3 != 1) {
-                            return new c(affineTransform);
-                        }
-                        affineTransform.translate(0.0, n2);
-                        affineTransform2 = affineTransform;
-                        n7 = 1.0;
-                        n8 = -1.0;
-                    }
-                }
-            }
-            affineTransform2.scale(n7, n8);
         }
-        return new c(affineTransform);
+        return new c(localAffineTransform);
     }
     
-    private static int method9(final int n, final int n2, final int n3, final int n4) {
+    private static int a(final int n, final int n2, final int n3, final int n4) {
         if (n3 <= 3) {
             if ((n4 & 0x1) != 0x0) {
                 return -(n >> 1);
@@ -111,7 +81,7 @@ public final class c implements ITransform
         return 0;
     }
     
-    private static int method10(final int n, final int n2, final int n3, final int n4) {
+    private static int b(final int n, final int n2, final int n3, final int n4) {
         if (n3 <= 3) {
             if ((n4 & 0x2) != 0x0) {
                 return -(n2 >> 1);

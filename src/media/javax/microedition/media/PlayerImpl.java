@@ -75,8 +75,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.midi(inputStream);
 		} else if (contentType.equals("audio/mpeg")) {
 			try {
-				this.data = CustomJarResources.getBytes(inputStream);
-				this.sequence = new Player(new ByteArrayInputStream(data));
+				InputStream i = inputStream;
+				if(i instanceof ByteArrayInputStream) {
+					this.data = CustomJarResources.getBytes(i);
+					i = new ByteArrayInputStream(data);
+				}
+				this.sequence = new Player(i);
 			} catch (JavaLayerException e) {
 				e.printStackTrace();
 				throw new IOException(e);
