@@ -1,10 +1,10 @@
 package emulator.graphics2D.swt;
 
+import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
 import emulator.graphics2D.*;
 import java.io.*;
 import javax.imageio.*;
-import java.awt.image.*;
 
 /*
  * swt image
@@ -13,7 +13,7 @@ public final class ImageSWT implements IImage
 {
     Image img;
     ImageData imgdata;
-    Graphics2DSWT ac533;
+    Graphics2DSWT graphics;
     int[] rgb;
     int len;
     boolean transparent;
@@ -71,23 +71,27 @@ public final class ImageSWT implements IImage
     }
     
     public final void finalize() {
-        if (this.img != null && !this.img.isDisposed()) {
-            this.img.dispose();
-        }
-        if (this.ac533 != null) {
-            this.ac533.finalize();
-            this.ac533 = null;
-        }
-        this.disposed = false;
+        EmulatorImpl.asyncExec(new Runnable() {
+            public void run() {
+                if (img != null && !img.isDisposed()) {
+                    img.dispose();
+                }
+                if (graphics != null) {
+                    graphics.finalize();
+                    graphics = null;
+                }
+                disposed = false;
+            }
+        });
     }
     
     public final IGraphics2D createGraphics() {
         if (this.disposed) {
-            if (this.ac533 == null) {
-                this.ac533 = new Graphics2DSWT(this.img);
+            if (this.graphics == null) {
+                this.graphics = new Graphics2DSWT(this.img);
             }
             else {
-                this.ac533.setTransform(new TransformSWT());
+                this.graphics.setTransform(new TransformSWT());
             }
         }
         else {
@@ -97,18 +101,18 @@ public final class ImageSWT implements IImage
             gc.drawImage(image, 0, 0);
             gc.dispose();
             image.dispose();
-            if (this.ac533 != null) {
-                this.ac533.finalize();
-                this.ac533 = null;
+            if (this.graphics != null) {
+                this.graphics.finalize();
+                this.graphics = null;
             }
-            this.ac533 = new Graphics2DSWT(this.img);
+            this.graphics = new Graphics2DSWT(this.img);
             this.disposed = true;
         }
-        return this.ac533;
+        return this.graphics;
     }
     
     public final IGraphics2D getGraphics() {
-        return this.ac533;
+        return this.graphics;
     }
     
     public final void method12(final GC gc, final int n, final int n2) {
@@ -207,9 +211,9 @@ public final class ImageSWT implements IImage
             if (this.img != null && !this.img.isDisposed()) {
                 this.img.dispose();
             }
-            if (this.ac533 != null) {
-                this.ac533.finalize();
-                this.ac533 = null;
+            if (this.graphics != null) {
+                this.graphics.finalize();
+                this.graphics = null;
             }
         }
     }
@@ -242,9 +246,9 @@ public final class ImageSWT implements IImage
             if (this.img != null && !this.img.isDisposed()) {
                 this.img.dispose();
             }
-            if (this.ac533 != null) {
-                this.ac533.finalize();
-                this.ac533 = null;
+            if (this.graphics != null) {
+                this.graphics.finalize();
+                this.graphics = null;
             }
         }
     }

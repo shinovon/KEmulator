@@ -224,55 +224,32 @@ public class Graphics
         this.drawString(s.substring(n, n + n2), n3, n4, n5);
     }
     
-    public void drawString(final String s, int n, int n2, final int n3) {
+    public void drawString(final String s, int x, int y, final int a) {
         ++Profiler.drawCallCount;
         if (s == null) {
             throw new NullPointerException();
         }
-        if (!method294(n3, 2)) {
+        if (!method294(a, 2)) {
             throw new IllegalArgumentException();
         }
-        final Font font;
-        final int stringWidth = (font = this.getFont()).stringWidth(s);
+        final Font font = this.font;
+        final int stringWidth = font.stringWidth(s);
         final int height = font.getHeight();
-        Label_0077: {
-            int n4;
-            int n5;
-            if ((n3 & 0x8) != 0x0) {
-                n4 = n;
-                n5 = stringWidth;
-            }
-            else {
-                if ((n3 & 0x1) == 0x0) {
-                    break Label_0077;
-                }
-                n4 = n;
-                n5 = stringWidth / 2;
-            }
-            n = n4 - n5;
+        egraphics.setFont(font.getImpl());
+        if ((a & 0x8) != 0x0) {
+            x -= stringWidth;
+        } else if ((a & 0x1) != 0x0) {
+            x -= stringWidth / 2;
         }
-        Label_0122: {
-            int n6;
-            int baselinePosition;
-            if ((n3 & 0x20) != 0x0) {
-                n6 = n2;
-                baselinePosition = height;
-            }
-            else if ((n3 & 0x2) != 0x0) {
-                n6 = n2;
-                baselinePosition = height / 2;
-            }
-            else {
-                if ((n3 & 0x40) == 0x0) {
-                    break Label_0122;
-                }
-                n6 = n2;
-                baselinePosition = font.getBaselinePosition();
-            }
-            n2 = n6 - baselinePosition;
+        if ((a & 0x20) != 0x0) {
+            y -= height;
+        } else if ((a & 0x2) != 0x0) {
+            y -= height / 2;
+        } else if ((a & 0x40) != 0x0) {
+            y -= font.getBaselinePosition();
         }
-        this.egraphics.drawString(s, n, n2 + font.getBaselinePosition());
-        this.xrayFillRect(n, n2, stringWidth, height, 255);
+        this.egraphics.drawString(s, x, y + font.getBaselinePosition());
+        this.xrayFillRect(x, y, stringWidth, height, 255);
     }
     
     public void fillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
@@ -476,6 +453,7 @@ public class Graphics
     }
     
     public void setFont(final Font font) {
+        //System.out.println("setFont "+font);
         ++Profiler.drawCallCount;
         this.font = ((font == null) ? Font.getDefaultFont() : font);
         this.egraphics.setFont(this.font.getImpl());

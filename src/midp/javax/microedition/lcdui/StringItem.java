@@ -73,9 +73,8 @@ public class StringItem extends Item
         	}
 	        // определение размера строки
 	        int j = 0;
-	        IFont f = g.getImpl().getFont();
-	        if(f != null && str != null)
-	        	j = f.stringWidth(str);
+	        if(font != null && str != null)
+	        	j = font.stringWidth(str);
 
             if((isLayoutExpand() && isLayoutAlignDefault()) || isLayoutCenter()) { 
 	        	bx = (bw - j) / 2 - 2;

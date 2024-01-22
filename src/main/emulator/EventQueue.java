@@ -271,7 +271,7 @@ public final class EventQueue implements Runnable {
 						ex.printStackTrace();
 					}
 					(Settings.xrayView ? xRayScreenImage : backBufferImage)
-							.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+							.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
 					Emulator.getEmulator().getScreen().repaint();
 					Displayable.fpsLimiter();
 					this.repainted2 = true;
@@ -283,7 +283,7 @@ public final class EventQueue implements Runnable {
 						this.repainted = true;
 						break;
 					}
-					final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImage();
+					final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
 					final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
 					final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
 					(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
@@ -320,7 +320,7 @@ public final class EventQueue implements Runnable {
 					final IImage xRayScreenImage3 = Emulator.getEmulator().getScreen().getXRayScreenImage();
 					Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
 					(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
-							.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+							.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
 					Emulator.getEmulator().getScreen().repaint();
 					try {
 						Thread.sleep(100L);
@@ -450,7 +450,7 @@ public final class EventQueue implements Runnable {
 									ex.printStackTrace();
 								}
 								(Settings.xrayView ? xRayScreenImage : backBufferImage)
-										.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+										.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
 								Emulator.getEmulator().getScreen().repaint();
 								Displayable.fpsLimiter();
 								repainted2 = true;
@@ -462,7 +462,7 @@ public final class EventQueue implements Runnable {
 									repainted = true;
 									break;
 								}
-								final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImage();
+								final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
 								final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
 								final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
 								(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
@@ -481,7 +481,7 @@ public final class EventQueue implements Runnable {
 								final IImage xRayScreenImage3 = Emulator.getEmulator().getScreen().getXRayScreenImage();
 								Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
 								(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
-										.cloneImage(Emulator.getEmulator().getScreen().getScreenImage());
+										.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
 								Emulator.getEmulator().getScreen().repaint();
 								try {
 									Thread.sleep(100L);

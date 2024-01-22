@@ -238,4 +238,12 @@ public final class Class54 implements MouseListener, MouseMoveListener
             return waterTask.aClass54_775;
         }
     }
+
+    public void finalize() {
+        EmulatorImpl.asyncExec(new Runnable() {
+            public void run() {
+                if (!aGC814.isDisposed()) aGC814.dispose();
+            }
+        });
+    }
 }

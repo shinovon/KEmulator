@@ -1,5 +1,6 @@
 package emulator.graphics2D.swt;
 
+import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
 import emulator.graphics2D.*;
 
@@ -26,12 +27,16 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void finalize() {
-        if (!this.gc.isDisposed()) {
-            this.gc.dispose();
-        }
-        if (!this.color.isDisposed()) {
-            this.color.dispose();
-        }
+        EmulatorImpl.asyncExec(new Runnable() {
+            public void run() {
+                if (!gc.isDisposed()) {
+                    gc.dispose();
+                }
+                if (!color.isDisposed()) {
+                    color.dispose();
+                }
+            }
+        });
     }
     
     public final void setAlpha(final int alpha) {
@@ -69,7 +74,6 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void fillRect(final int n, final int n2, final int n3, final int n4) {
-        Thread.yield();
     	this.gc.setBackground(this.color);
         this.gc.fillRectangle(n, n2, n3, n4);
     }
@@ -88,10 +92,15 @@ public final class Graphics2DSWT implements IGraphics2D
         this.gc.setForeground(this.color);
         this.gc.drawPolygon(array);
     }
-    
+
+    public final void setFont(final IFont font) {
+        this.gc.setFont(((FontSWT)font).method297());
+    }
+
     public final void drawString(final String s, final int n, final int n2) {
         this.gc.setForeground(this.color);
-        this.gc.drawString(s, n, n2 - (this.gc.getFontMetrics().getLeading()) - this.gc.getFontMetrics().getAscent(), true);
+        FontMetrics f = gc.getFontMetrics();
+        this.gc.drawString(s, n, n2-f.getAscent()-1, true);
     }
     
     public final void drawImage(final IImage image, final int n, final int n2) {
@@ -107,20 +116,18 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void setColor(final int n, final boolean b) {
+        final int a = n >> 24 & 0xFF;
         final int n2 = n >> 16 & 0xFF;
         final int n3 = n >> 8 & 0xFF;
         final int n4 = n & 0xFF;
         this.color.dispose();
         this.color = new Color((Device)null, n2, n3, n4);
+        gc.setAlpha(b? a : 255);
     }
     
     public final void setColor(final int n, final int n2, final int n3) {
         this.color.dispose();
         this.color = new Color((Device)null, n, n2, n3);
-    }
-    
-    public final void setFont(final IFont font) {
-        this.gc.setFont(((FontSWT)font).method297());
     }
     
     public final int getClipHeight() {
@@ -152,7 +159,11 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final int getColor() {
-        return ((this.color.getRed() & 0xFF) << 16) + ((this.color.getGreen() & 0xFF) << 8) + (this.color.getBlue() & 0xFF);
+        return
+                ((gc.getAlpha() & 0xFF) << 24) +
+                ((this.color.getRed() & 0xFF) << 16) +
+                ((this.color.getGreen() & 0xFF) << 8) +
+                (this.color.getBlue() & 0xFF);
     }
     
     public final int getColorRed() {

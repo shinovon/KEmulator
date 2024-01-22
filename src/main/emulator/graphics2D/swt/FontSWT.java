@@ -1,26 +1,50 @@
 package emulator.graphics2D.swt;
 
 import emulator.graphics2D.*;
+import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
 
 public final class FontSWT implements IFont
 {
     private Font font;
     private GC gc;
-    
-    public FontSWT(final String s, final int n, final int n2) {
-        super();
-        this.font = new Font((Device)null, s, n, n2);
-        (this.gc = new GC((Drawable)new Image((Device)null, 1, 1))).setFont(this.font);
+
+    public FontSWT(String s, int n, int n2) {
+        this(s,n,n2,false);
     }
     
+    public FontSWT(final String s, final int size, final int n2, boolean height) {
+        super();
+        this.font = new Font((Device)null, s, size, n2);
+        metrics();
+        if(height && getHeight() != size) {
+            float f = ((float)charWidth('W') / (float)getHeight()) * (float)size;
+            font.dispose();
+            this.font = new Font((Device)null, s, (int)f, n2);
+            metrics();
+        }
+    }
+
+    private void metrics() {
+        if(gc != null && !gc.isDisposed())
+            gc.dispose();
+        (this.gc = new GC((Drawable)new Image((Device)null, 1, 1))).setFont(this.font);
+
+
+    }
+
+
     public final void finalize() {
-        if (this.font != null && !this.font.isDisposed()) {
-            this.font.dispose();
-        }
-        if (this.gc != null && !this.gc.isDisposed()) {
-            this.gc.dispose();
-        }
+        EmulatorImpl.asyncExec(new Runnable() {
+            public void run() {
+                if (font != null && !font.isDisposed()) {
+                    font.dispose();
+                }
+                if (gc != null && !gc.isDisposed()) {
+                    gc.dispose();
+                }
+            }
+        });
     }
     
     public final Font method297() {

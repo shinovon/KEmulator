@@ -799,9 +799,12 @@ public final class Property implements IProperty
         // 1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI
         //setsShell.setFont(setsShell.getFont().getFontData()[0]);
         try {
-	        FontData fd = setsShell.getFont().getFontData()[0];
-	        fd.height = (fd.height / -fd.data.lfHeight) * 12;
-	        f = new Font(shell.getDisplay(), fd);
+            if(f == null) {
+                FontData fd = setsShell.getFont().getFontData()[0];
+                fd.height = (fd.height / -fd.data.lfHeight) * 12;
+                f = new Font(shell.getDisplay(), fd);
+            }
+
 	        setsShell.setFont(f);
         } catch (Error e) {
         	

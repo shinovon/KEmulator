@@ -4,7 +4,7 @@ import emulator.graphics2D.*;
 
 public interface IScreen
 {
-    IImage getScreenImage();
+    IImage getScreenImg();
     
     IImage getBackBufferImage();
     

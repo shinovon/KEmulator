@@ -61,12 +61,12 @@ MouseTrackListener
     private float zoom;
     private int anInt996;
     private int anInt1003;
-    private Image anImage974;
-    private ImageSWT ad979;
+    private Image screenImg;
+    private ImageSWT screenCopySwt;
     private ImageSWT screenImageSwt;
     private ImageSWT backBufferImageSwt;
     private ImageSWT xrayScreenImageSwt;
-    private emulator.graphics2D.awt.d screenImgAwtClone;
+    private emulator.graphics2D.awt.d screenCopyAwt;
     private emulator.graphics2D.awt.d screenImageAwt;
     private emulator.graphics2D.awt.d backBufferImageAwt;
     private emulator.graphics2D.awt.d xrayScreenImageAwt;
@@ -191,14 +191,14 @@ MouseTrackListener
     private void method550(final int n, final int n2) {
         final int bgcolor = 0xffffff; // 9934483
         if (Settings.g2d == 0) {
-            this.ad979 = new ImageSWT(n, n2, false, bgcolor);
+            this.screenCopySwt = new ImageSWT(n, n2, false, bgcolor);
             this.screenImageSwt = new ImageSWT(n, n2, false, bgcolor);
             this.backBufferImageSwt = new ImageSWT(n, n2, false, bgcolor);
             this.xrayScreenImageSwt = new ImageSWT(n, n2, true, bgcolor);
             return;
         }
         if (Settings.g2d == 1) {
-            this.screenImgAwtClone = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
+            this.screenCopyAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
             this.screenImageAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
             this.backBufferImageAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
             this.xrayScreenImageAwt = new emulator.graphics2D.awt.d(n, n2, true, -16777216);
@@ -614,11 +614,11 @@ MouseTrackListener
     }
     
     private void method583() {
-        if (this.anImage974 != null && !this.anImage974.isDisposed()) {
-            this.anImage974.dispose();
+        if (this.screenImg != null && !this.screenImg.isDisposed()) {
+            this.screenImg.dispose();
         }
-        this.anImage974 = new Image((Device)null, this.getWidth(), this.getHeight());
-        final GC gc = new GC((Drawable)this.anImage974);
+        this.screenImg = new Image((Device)null, this.getWidth(), this.getHeight());
+        final GC gc = new GC((Drawable)this.screenImg);
         if (Settings.g2d == 0) {
             this.screenImageSwt.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.getWidth(), this.getHeight());
         }
@@ -633,7 +633,7 @@ MouseTrackListener
         gc.dispose();
     }
     
-    public final IImage getScreenImage() {
+    public final IImage getScreenImg() {
         if (Settings.g2d == 0) {
             return this.screenImageSwt;
         }
@@ -700,11 +700,11 @@ MouseTrackListener
     }
     
     public final int getWidth() {
-        return this.getScreenImage().getWidth();
+        return this.getScreenImg().getWidth();
     }
     
     public final int getHeight() {
-        return this.getScreenImage().getHeight();
+        return this.getScreenImg().getHeight();
     }
     
     public final void setCommandLeft(final String aString983) {
@@ -784,9 +784,11 @@ MouseTrackListener
           });
         ((Composite)this.shell).setLayout((Layout)layout);
         try {
-        	FontData fd = shell.getFont().getFontData()[0];
-        	fd.height = (fd.height / -fd.data.lfHeight) * 12;
-        	f = new Font(shell.getDisplay(), fd);
+            if(f == null) {
+                FontData fd = shell.getFont().getFontData()[0];
+                fd.height = (fd.height / -fd.data.lfHeight) * 12;
+                f = new Font(shell.getDisplay(), fd);
+            }
         	shell.setFont(f);
         } catch (Error e) {
         }
@@ -1115,8 +1117,8 @@ MouseTrackListener
     
     protected final void method571() {
         Settings.e = -1;
-        if (this.anImage974 != null && !this.anImage974.isDisposed()) {
-            this.anImage974.dispose();
+        if (this.screenImg != null && !this.screenImg.isDisposed()) {
+            this.screenImg.dispose();
         }
         if (!EmulatorScreen.aBoolean992 && this.pauseState == 1 && EmulatorScreen.aLong991 != 0L) {
             EmulatorScreen.aLong1000 += System.currentTimeMillis() - EmulatorScreen.aLong991;
@@ -1136,10 +1138,10 @@ MouseTrackListener
                         file.mkdir();
                     }
                     if (Settings.g2d == 0) {
-                        this.ad979.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
+                        this.screenCopySwt.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
                     }
                     else if (Settings.g2d == 1) {
-                        this.screenImgAwtClone.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
+                        this.screenCopyAwt.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
                     }
                     ++EmulatorScreen.anInt1012;
                 }
@@ -1147,11 +1149,11 @@ MouseTrackListener
             else if (menuItem.equals(this.captureToClipboardMenuItem)) {
                 if (this.pauseState != 0) {
                     if (Settings.g2d == 0) {
-                        this.ad979.copyToClipBoard();
+                        this.screenCopySwt.copyToClipBoard();
                         return;
                     }
                     if (Settings.g2d == 1) {
-                        this.screenImgAwtClone.copyToClipBoard();
+                        this.screenCopyAwt.copyToClipBoard();
                     }
                 }
             }
@@ -1358,7 +1360,7 @@ MouseTrackListener
                 }
                 this.pauseState = 1;
                 Emulator.getEventQueue().queue(15);
-                this.anImage974.dispose();
+                this.screenImg.dispose();
                 if (Settings.e == 0) {
                     this.method583();
                     ((Control)this.canvas).redraw();
@@ -1481,14 +1483,14 @@ MouseTrackListener
                 if (menuItem.equals(this.forecPaintMenuItem)) {
                     if (Settings.g2d == 0) {
                         if (Settings.xrayView) {
-                            this.xrayScreenImageSwt.cloneImage(this.ad979);
+                            this.xrayScreenImageSwt.cloneImage(this.screenCopySwt);
                         }
                         else {
-                            this.backBufferImageSwt.cloneImage(this.ad979);
+                            this.backBufferImageSwt.cloneImage(this.screenCopySwt);
                         }
                     }
                     else if (Settings.g2d == 1) {
-                        (Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenImgAwtClone);
+                        (Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenCopyAwt);
                     }
                     ((Control)this.canvas).redraw();
                     return;
@@ -1604,7 +1606,7 @@ MouseTrackListener
             return;
         }
         final int rgb;
-        final int n5 = (rgb = this.getScreenImage().getRGB(n3, n4)) >> 16 & 0xFF;
+        final int n5 = (rgb = this.getScreenImg().getRGB(n3, n4)) >> 16 & 0xFF;
         final int n6 = rgb >> 8 & 0xFF;
         final int n7 = rgb & 0xFF;
         this.aString1008 = emulator.UILocale.get("INFO_FRAME_POS", "Pos") + "(" + n3 + "," + n4 + ")\n" + emulator.UILocale.get("INFO_FRAME_COLOR", "Color") + "(";
@@ -1655,10 +1657,11 @@ MouseTrackListener
         ((Control)this.canvas).addMouseMoveListener((MouseMoveListener)this);
         this.canvas.getShell().addMouseTrackListener(this);
         ((Control)this.canvas).addPaintListener((PaintListener)this);
-        ((Widget)this.canvas).addListener(37, (Listener)new Class32(this));
+        ((Widget)this.canvas).addListener(SWT.MouseVerticalWheel, (Listener)new Class32(this));
         this.keysState = new boolean[256];
         this.method589();
         this.caret = new CaretImpl(this.canvas);
+        shell.layout();
     }
     
     public final void paintControl(final PaintEvent paintEvent) {
@@ -1666,7 +1669,7 @@ MouseTrackListener
         (gc = paintEvent.gc).setInterpolation(this.anInt1020);
         gc.setTransform(this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform);
         try {
-            if (this.anImage974 == null || this.anImage974.isDisposed()) {
+            if (this.screenImg == null || this.screenImg.isDisposed()) {
                 if (this.pauseState == 0) {
                     gc.setBackground(EmulatorScreen.display.getSystemColor(22));
                     gc.fillRectangle(0, 0, this.anInt996, this.anInt1003);
@@ -1675,14 +1678,14 @@ MouseTrackListener
                     gc.drawText(Emulator.getInfoString(), this.anInt996 >> 3, this.anInt1003 >> 3, true);
                 }
                 else if (Settings.g2d == 0) {
-                    this.ad979.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
+                    this.screenCopySwt.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
                 }
                 else if (Settings.g2d == 1) {
-                    this.screenImgAwtClone.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
+                    this.screenCopyAwt.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
                 }
             }
             else {
-                gc.drawImage(this.anImage974, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
+                gc.drawImage(this.screenImg, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.anInt996, this.anInt1003);
             }
         }
         catch (Exception ex) {}
@@ -1735,13 +1738,13 @@ MouseTrackListener
             return;
         }
         if (Settings.g2d == 0) {
-            this.screenImageSwt.cloneImage(this.ad979);
+            this.screenImageSwt.cloneImage(this.screenCopySwt);
         }
         else if (Settings.g2d == 1) {
-            this.screenImageAwt.cloneImage(this.screenImgAwtClone);
+            this.screenImageAwt.cloneImage(this.screenCopyAwt);
         }
         if (EmulatorScreen.aviWriter != null) {
-            EmulatorScreen.aviWriter.method843(this.screenImgAwtClone.getData());
+            EmulatorScreen.aviWriter.method843(this.screenCopyAwt.getData());
         }
         ((Control)this.canvas).redraw();
         if (!EmulatorScreen.aBoolean967 && !EmulatorScreen.aBoolean992) {

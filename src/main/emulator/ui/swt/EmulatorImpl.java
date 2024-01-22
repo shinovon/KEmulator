@@ -163,10 +163,11 @@ public final class EmulatorImpl implements IEmulator
     }
     
     public final IFont newCustomFont(final int height, final int style) {
+        System.out.println(height);
         if (Settings.g2d == 0) {
         	String s = this.iproperty.getDefaultFontName() + ".-" + height + "." + style;
         	if(swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-            FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), height, style);
+            FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), height, style, true);
             swtFontsCache.put(s, f);
             return f;
         }
