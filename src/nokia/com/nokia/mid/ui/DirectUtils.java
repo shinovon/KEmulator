@@ -10,7 +10,7 @@ public class DirectUtils {
 	}
 
 	public static Image createImage(int paramInt1, int paramInt2, int paramInt3) {
-		return Image.createImage(paramInt1, paramInt2);
+		return Image.createImage(paramInt1, paramInt2, paramInt3);
 	}
 
 	public static DirectGraphics getDirectGraphics(Graphics paramGraphics) {
