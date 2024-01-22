@@ -1,31 +1,24 @@
 package javax.microedition.media;
 
 import emulator.*;
-import emulator.custom.*;
 import emulator.custom.CustomJarResources;
-import emulator.media.amr.*;
+
 import java.io.*;
-import java.lang.reflect.Method;
 import java.net.URL;
 
-import javax.microedition.io.Connector;
-import javax.microedition.io.InputConnection;
 import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
 import javax.microedition.media.protocol.SourceStream;
 
 import java.util.*;
 import javax.sound.sampled.*;
-import javax.sound.sampled.spi.AudioFileReader;
 import javax.sound.midi.*;
-import javax.sound.midi.MidiDevice.Info;
 
-import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
-public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener, MetaEventListener {
+public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener {
 
 	public static List<javax.microedition.media.Player> players = new ArrayList<javax.microedition.media.Player>();
 	Object sequence;
@@ -91,15 +84,15 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			frameControl = new FramePositioningControl() {
 
 				public long mapFrameToTime(int p0) {
-					if (((Player) sequencer).framesPerSecond() == 0)
+					if (((Player) sequence).framesPerSecond() == 0)
 						return -1;
-					return ((int) (((Player) sequencer).framesPerSecond() * p0)) * 1000L;
+					return ((int) (((Player) sequence).framesPerSecond() * p0)) * 1000L;
 				}
 
 				public int mapTimeToFrame(long p0) {
-					if (((Player) sequencer).framesPerSecond() == 0)
+					if (((Player) sequence).framesPerSecond() == 0)
 						return -1;
-					return (int)(((float)p0 / 1000.0F) * ((Player) sequencer).framesPerSecond());
+					return (int)(((float)p0 / 1000.0F) * ((Player) sequence).framesPerSecond());
 				}
 
 				public int seek(int p0) {
@@ -260,8 +253,11 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		this.controls = new Control[] { this.toneControl, this.volumeControl };
 	}
 
-	private static MidiDevice device;
-	Sequencer sequencer;
+	private static MidiDevice midiDevice;
+	private static Sequencer midiSequencer;
+	private static PlayerImpl currentMidiPlayer;
+	private static boolean midiPlaying;
+	private long midiPosition;
 	
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
@@ -270,29 +266,31 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.sequence = null;
 		}
 		try {
-			if(device == null) {
-				device = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
-				device.open();
+			if(midiDevice == null) {
+				midiDevice = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
+				midiDevice.open();
 			}
-			sequencer = MidiSystem.getSequencer();
-			for (Transmitter t : sequencer.getTransmitters()) {
-				t.setReceiver(device.getReceiver());
+			if(midiSequencer == null) {
+				midiSequencer = MidiSystem.getSequencer();
+				for (Transmitter t : midiSequencer.getTransmitters()) {
+					t.setReceiver(midiDevice.getReceiver());
+				}
+				midiSequencer.addMetaEventListener(new MetaEventListener() {
+					@Override
+					public void meta(MetaMessage meta) {
+						if (meta.getType() == 47) {
+							if(currentMidiPlayer != null) {
+								currentMidiPlayer.midiCompleted = true;
+							}
+						}
+					}
+				});
+				midiSequencer.open();
 			}
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 			this.sequence = null;
 			throw new IOException(ex2.toString());
-		}
-		this.sequencer.addMetaEventListener(this);
-		try {
-			this.sequencer.open();
-			if (this.sequence != null) {
-				this.sequencer.setSequence((Sequence) this.sequence);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.sequence = null;
-			throw new IOException(e.toString());
 		}
 		this.midiControl = new MIDIControlImpl(this);
 		this.toneControl = new ToneControlImpl();
@@ -336,7 +334,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			}
 		}
 		if (this.sequence instanceof Sequence) {
-			this.sequencer.close();
+			//this.midiSequencer.close();
 		} else if (this.sequence instanceof Player) {
 			((Player) this.sequence).close();
 		}
@@ -411,7 +409,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			return ((Clip) this.sequence).getMicrosecondPosition();
 		}
 		if (this.sequence instanceof Sequence) {
-			return this.sequencer.getMicrosecondPosition();
+			if(currentMidiPlayer == this && midiPlaying)
+				return this.midiSequencer.getMicrosecondPosition();
+			return midiPosition;
 		}
 		if (this.sequence instanceof Player) {
 			return ((Player) this.sequence).getPosition() * 1000;
@@ -421,19 +421,21 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 
 	public long setMediaTime(final long t) throws MediaException {
 		if(sequence == null) return 0;
-		long microsecondPosition2 = 0L;
+		long ms = 0L;
 		if (this.sequence instanceof Clip) {
-			microsecondPosition2 = ((Clip) this.sequence).getMicrosecondPosition();
-			if (t < microsecondPosition2) {
-				microsecondPosition2 = t;
+			ms = ((Clip) this.sequence).getMicrosecondPosition();
+			if (t < ms) {
+				ms = t;
 			}
 			((Clip) this.sequence).setMicrosecondPosition(t);
 		} else if (this.sequence instanceof Sequence) {
-			microsecondPosition2 = ((Sequence) this.sequence).getMicrosecondLength();
-			if (t < microsecondPosition2) {
-				microsecondPosition2 = t;
+			ms = ((Sequence) this.sequence).getMicrosecondLength();
+			if (t < ms) {
+				ms = t;
 			}
-			this.sequencer.setMicrosecondPosition(microsecondPosition2);
+			midiPosition = ms;
+			if(currentMidiPlayer == this)
+				this.midiSequencer.setMicrosecondPosition(ms);
 		} else if (this.sequence instanceof Player) {
 			long l = getMediaTime();
 			if (t == 0 && l == t)
@@ -443,7 +445,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 					Header old = ((Player) sequence).bitstream().header;
 					((Player) sequence).reset();
 					((Player) sequence).skip((int) (t / 1000L), old);
-					microsecondPosition2 = ((Player) sequence).getPosition();
+					ms = ((Player) sequence).getPosition();
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
 				}
@@ -452,13 +454,13 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 					Header old = ((Player) sequence).bitstream().header;
 					((Player) sequence).reset();
 					((Player) sequence).skip((int) (t / 1000L), old);
-					microsecondPosition2 = ((Player) sequence).getPosition();
+					ms = ((Player) sequence).getPosition();
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
 				}
 			}
 		}
-		return microsecondPosition2;
+		return ms;
 	}
 
 	public int getState() {
@@ -491,6 +493,18 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		}
 		if (this.state == 100) {
 			this.state = 200;
+		}
+		if(sequence instanceof Sequence) {
+			try {
+				this.midiSequencer.open();
+				if (this.sequence != null) {
+					this.midiSequencer.setSequence((Sequence) this.sequence);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				this.sequence = null;
+				throw new MediaException(e.toString());
+			}
 		}
 		if (dataSource != null) {
 			try {
@@ -557,6 +571,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		}
 		if (this.state != 400) {
 			if(sequence != null) {
+				if (this.sequence instanceof Sequence && midiPlaying && currentMidiPlayer != this) {
+					throw new MediaException("MIDI is currently playing");
+				}
 				if ((this.sequence instanceof Sequence && midiCompleted)
 				|| (this.sequence instanceof Player && mp3Complete)
 				|| (this.sequence instanceof Clip && soundCompleted)) {
@@ -600,7 +617,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		if (s.indexOf("MIDIControl") != -1) {
 			return this.midiControl;
 		}
-		if (s.contains("FramePositioningControl") && sequencer instanceof Player) {
+		if (s.contains("FramePositioningControl") && sequence instanceof Player) {
 			return this.frameControl;
 		}
 		return null;
@@ -609,63 +626,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	public Control[] getControls() {
 		return this.controls;
 	}
-	/*
-	public void run() {
-	    int loopCount = this.loopCount;
-	    do {
-	        final boolean b = false;
-	        this.aBoolean309 = b;
-	        this.aBoolean302 = b;
-	        if (this.sequence instanceof Sequence && this.aThread297 != null) {
-	            this.sequencer.start();
-	            while (!this.aBoolean302 && this.aThread297 != null) {
-	                try {
-	                    Thread.sleep(99L);
-	                    continue;
-	                }
-	                catch (Exception ex) {}
-	                break;
-	            }
-	            this.sequencer.stop();
-	        }
-	        else if (this.sequence instanceof Clip && this.aThread297 != null) {
-	            final Clip clip;
-	            (clip = (Clip)this.sequence).start();
-	            while (!this.aBoolean309 && this.aThread297 != null) {
-	                try {
-	                    Thread.sleep(99L);
-	                    continue;
-	                }
-	                catch (Exception ex2) {}
-	                break;
-	            }
-	            clip.stop();
-	        }
-	        else if (this.sequence instanceof c) {
-	            ((c)this.sequence).method785();
-	        }
-	        this.setMediaTime(0L);
-	        if (loopCount > 0) {
-	            --loopCount;
-	        }
-	    } while (this.aThread297 != null && loopCount != 0);
-	    this.aThread297 = null;
-	    this.anInt303 = 300;
-	    PlayerImpl playerImpl;
-	    String s;
-	    Long n;
-	    if (this.aBoolean309 || this.aBoolean302) {
-	        playerImpl = this;
-	        s = "endOfMedia";
-	        n = new Long(0L);
-	    }
-	    else {
-	        playerImpl = this;
-	        s = "stopped";
-	        n = new Long(0L);
-	    }
-	    playerImpl.notifyListeners(s, n);
-	}*/
 
 	public void run() {
 		int loopCount = this.loopCount;
@@ -673,15 +633,24 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			boolean b2 = false;
 			mp3Complete = midiCompleted = soundCompleted = false;
 			if (sequence instanceof Sequence && playerThread != null) {
-				sequencer.start();
-				while (!midiCompleted && playerThread != null) {
-					try {
-						Thread.sleep(1);
-					} catch (Exception e) {
-						break;
+				try {
+					midiSequencer.setSequence((Sequence) sequence);
+					currentMidiPlayer = this;
+					midiSequencer.setMicrosecondPosition(midiPosition);
+					midiSequencer.start();
+					midiPlaying = true;
+					while (!midiCompleted && playerThread != null) {
+						try {
+							Thread.sleep(1);
+						} catch (Exception e) {
+							break;
+						}
 					}
+					midiPosition = midiSequencer.getMicrosecondPosition();
+				} catch (InvalidMidiDataException e) {
 				}
-				this.sequencer.stop();
+				midiPlaying = false;
+				this.midiSequencer.stop();
 			} else if (sequence instanceof Clip && playerThread != null) {
 				Clip clip = (Clip) this.sequence;
 				clip.start();
@@ -729,13 +698,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.soundCompleted = true;
 		}
 	}
-
-	public void meta(final MetaMessage metaMessage) {
-		if (metaMessage.getType() == 47) {
-			this.midiCompleted = true;
-		}
-	}
-
 	public void setLevel(int n) {
 		if(level != n) notifyListeners("volumeChanged", n);
 		level = n;
@@ -773,7 +735,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		if(sequence == null) return;
 		if (this.sequence instanceof Sequence) {
 			try {
-				Receiver r = sequencer.getTransmitters().iterator().next().getReceiver();
+				Receiver r = midiSequencer.getTransmitters().iterator().next().getReceiver();
 				ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, (int) (n2 * 127.0));
 				r.send(shortMessage, -1L);
 			} catch (Exception ex) {
