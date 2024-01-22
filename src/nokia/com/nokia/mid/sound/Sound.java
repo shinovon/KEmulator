@@ -30,6 +30,7 @@ public class Sound {
             }
         }
     };
+    private byte[] data;
 
     public Sound(byte[] paramArrayOfByte, int paramInt) {
         this.type = paramInt;
@@ -75,6 +76,8 @@ public class Sound {
         }
         if (paramInt == 1) {
             paramArrayOfByte = new b(paramArrayOfByte).method726();
+        } else {
+            data = paramArrayOfByte;
         }
         try {
             ByteArrayInputStream localByteArrayInputStream = new ByteArrayInputStream(paramArrayOfByte);
@@ -136,5 +139,21 @@ public class Sound {
         if (this.soundListener != null) {
             this.soundListener.soundStateChanged(this, 1);
         }
+    }
+
+    public byte[] getData() {
+        if(m_player == null) return null;
+        if(data != null) return data.clone();
+        return m_player.getData();
+    }
+
+    public String getExportName() {
+        switch(type) {
+            case FORMAT_TONE:
+                return "nokiatoneconverted" + hashCode() + ".mid";
+            case FORMAT_WAV:
+                return "nokiaaudio" + hashCode() + ".wav";
+        }
+        return "nokiaaudio" + m_player.getExportName();
     }
 }

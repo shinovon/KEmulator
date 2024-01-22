@@ -38,7 +38,7 @@ public final class MemoryView implements DisposeListener
     private boolean aBoolean1094;
     private TabFolder aTabFolder1097;
     private Composite aComposite1098;
-    private Composite aComposite1106;
+    private Composite audioControlComp;
     private CLabel aCLabel1143;
     private Combo imageScaleCombo;
     private CLabel aCLabel1146;
@@ -88,19 +88,20 @@ public final class MemoryView implements DisposeListener
     private Vector classRefsVector;
     private AutoUpdate aClass88_1100;
     private Thread aThread1085;
-    private Button aButton1145;
-    private Button aButton1148;
+    private Button startAudioBtn;
+    private Button stopAudioBtn;
     private CLabel aCLabel1153;
     private Scale aScale1089;
     private CLabel aCLabel1154;
     private Table soundsTable;
     private CLabel aCLabel1155;
     private ProgressBar aProgressBar1092;
-    private Button aButton1151;
+    private Button pauseAudioBtn;
 	private CLabel jvmmem1Label;
 	private CLabel jvmmemLabel;
 	private int sortColumn = -1;
-    
+    private Button exportAudioBtn;
+
     public MemoryView() {
         super();
         this.aShell1080 = null;
@@ -118,7 +119,7 @@ public final class MemoryView implements DisposeListener
         this.aCLabel1140 = null;
         this.aTabFolder1097 = null;
         this.aComposite1098 = null;
-        this.aComposite1106 = null;
+        this.audioControlComp = null;
         this.aCLabel1143 = null;
         this.imageScaleCombo = null;
         this.aCLabel1146 = null;
@@ -141,15 +142,15 @@ public final class MemoryView implements DisposeListener
         this.aBoolean1123 = true;
         this.aBoolean1127 = true;
         this.aHashtable1091 = new Hashtable();
-        this.aButton1145 = null;
-        this.aButton1148 = null;
+        this.startAudioBtn = null;
+        this.stopAudioBtn = null;
         this.aCLabel1153 = null;
         this.aScale1089 = null;
         this.aCLabel1154 = null;
         this.soundsTable = null;
         this.aCLabel1155 = null;
         this.aProgressBar1092 = null;
-        this.aButton1151 = null;
+        this.pauseAudioBtn = null;
         this.aDisplay1093 = EmulatorImpl.getDisplay();
         this.memoryMgr = new Memory();
         this.classRefsVector = new Vector();
@@ -275,7 +276,7 @@ public final class MemoryView implements DisposeListener
         tabItem.setControl((Control)this.aComposite1098);
         final TabItem tabItem2;
         (tabItem2 = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
-        tabItem2.setControl((Control)this.aComposite1106);
+        tabItem2.setControl((Control)this.audioControlComp);
     }
     
     private void method677() {
@@ -327,23 +328,35 @@ public final class MemoryView implements DisposeListener
         layoutData.grabExcessVerticalSpace = true;
         layoutData.horizontalAlignment = 4;
         final GridLayout layout;
-        (layout = new GridLayout()).numColumns = 8;
-        (this.aComposite1106 = new Composite((Composite)this.aTabFolder1097, 0)).setLayout((Layout)layout);
-        (this.aButton1145 = new Button(this.aComposite1106, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Start"));
-        (this.aButton1151 = new Button(this.aComposite1106, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
-        this.aButton1151.addSelectionListener((SelectionListener)new Class28(this));
-        this.aButton1145.addSelectionListener((SelectionListener)new Class7(this));
-        (this.aButton1148 = new Button(this.aComposite1106, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_STOP", "Stop"));
-        this.aButton1148.addSelectionListener((SelectionListener)new Class27(this));
-        (this.aCLabel1153 = new CLabel(this.aComposite1106, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_VOLUME", "Volume:"));
-        (this.aCLabel1154 = new CLabel(this.aComposite1106, 0)).setText("0   ");
-        (this.aScale1089 = new Scale(this.aComposite1106, 0)).addSelectionListener((SelectionListener)new Class21(this));
-        (this.aCLabel1155 = new CLabel(this.aComposite1106, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_PROGRESS", "Progress:"));
-        (this.aProgressBar1092 = new ProgressBar(this.aComposite1106, 65536)).setSelection(0);
+        (layout = new GridLayout()).numColumns = 9;
+        (this.audioControlComp = new Composite((Composite)this.aTabFolder1097, 0)).setLayout((Layout)layout);
+        (this.startAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Start"));
+        (this.pauseAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
+        this.pauseAudioBtn.addSelectionListener((SelectionListener)new Class28(this));
+        this.startAudioBtn.addSelectionListener((SelectionListener)new Class7(this));
+        (this.stopAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_STOP", "Stop"));
+        this.stopAudioBtn.addSelectionListener((SelectionListener)new Class27(this));
+        (this.aCLabel1153 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_VOLUME", "Volume:"));
+        (this.aCLabel1154 = new CLabel(this.audioControlComp, 0)).setText("0   ");
+        (this.aScale1089 = new Scale(this.audioControlComp, 0)).addSelectionListener((SelectionListener)new Class21(this));
+        (this.aCLabel1155 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_PROGRESS", "Progress:"));
+        (this.aProgressBar1092 = new ProgressBar(this.audioControlComp, 65536)).setSelection(0);
+
+        (this.exportAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_EXPORT", "Export"));
+        this.exportAudioBtn.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(final SelectionEvent selectionEvent) {
+                Object value;
+                if (soundsTable.getSelectionIndex() != -1 &&
+                        soundsTable.getSelectionIndex() < memoryMgr.players.size() &&
+                        (value = memoryMgr.players.get(soundsTable.getSelectionIndex())) != null) {
+                    Memory.playerAct(value, 3);
+                }
+            }
+        });
         final Color foreground = new Color((Device)Display.getCurrent(), 217, 108, 0);
         ((Control)this.aProgressBar1092).setForeground(foreground);
         foreground.dispose();
-        (this.soundsTable = new Table(this.aComposite1106, 67584)).setHeaderVisible(true);
+        (this.soundsTable = new Table(this.audioControlComp, 67584)).setHeaderVisible(true);
         ((Control)this.soundsTable).setLayoutData((Object)layoutData);
         this.soundsTable.setLinesVisible(true);
         this.soundsTable.addSelectionListener((SelectionListener)new Class24(this));

@@ -168,4 +168,25 @@ public class AudioClip {
             }
         }
     }
+
+    public byte[] getData() {
+        if(data == null) return null;
+        return data.clone();
+    }
+
+    public String getExportName() {
+        String ext = "";
+        switch(type) {
+            case TYPE_MMF:
+                ext = "mmf";
+                break;
+            case TYPE_MP3:
+                ext = "mp3";
+                break;
+            case TYPE_MIDI:
+                ext = "mid";
+                break;
+        }
+        return "audioclip" + hashCode() + "." + ext;
+    }
 }

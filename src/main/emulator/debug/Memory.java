@@ -6,9 +6,12 @@ import com.nokia.mid.sound.*;
 import com.samsung.util.*;
 import javax.microedition.m3g.*;
 import emulator.graphics2D.*;
+
+import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
 
+import emulator.ui.swt.EmulatorScreen;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -488,6 +491,21 @@ public final class Memory
                         sound.stop();
                         break;
                     }
+                    case 3: {
+                        try {
+                            byte[] b = sound.getData();
+                            String s = sound.getExportName();
+                            if(b != null) {
+                                exportAudio(b, sound.getExportName());
+                                ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Saved: " + s);
+                            } else {
+                                ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: unsupported stream type");
+                            }
+                        } catch (Exception e) {
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: " + e.toString());
+                        }
+                        break;
+                    }
                 }
             }
             catch (Exception ex) {}
@@ -506,6 +524,21 @@ public final class Memory
                 }
                 case 2: {
                     audioClip.stop();
+                    break;
+                }
+                case 3: {
+                    try {
+                        byte[] b = audioClip.getData();
+                        String s = audioClip.getExportName();
+                        if(b != null) {
+                            exportAudio(b, s);
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Saved: " + s);
+                        } else {
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: unsupported stream type");
+                        }
+                    } catch (Exception e) {
+                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: " + e.toString());
+                    }
                     break;
                 }
             }
@@ -529,6 +562,10 @@ public final class Memory
 	                    v.stop();
 	                    break;
 	                }
+                    case 3: {
+                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export not supported!");
+                        break;
+                    }
 	            }
 	        }catch (Exception ex2) {ex2.printStackTrace();}
 	        return;
@@ -553,9 +590,32 @@ public final class Memory
                     playerImpl.stop();
                     break;
                 }
+                case 3: {
+                    try {
+                        byte[] b = playerImpl.getData();
+                        String s = "audio" + playerImpl.getExportName();
+                        if(b != null) {
+                            exportAudio(b, s);
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Saved: " + s);
+                        } else {
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: unsupported stream type");
+                        }
+                    } catch (Exception e) {
+                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: " + e.toString());
+                    }
+                }
             }
         }
         catch (Exception ex2) {}
+    }
+
+    public static void exportAudio(byte[] b, String name) throws IOException {
+        File f = new File(Emulator.getAbsolutePath() + "/" +  name);
+        if(f.exists()) return;
+        f.createNewFile();
+        DataOutputStream o = new DataOutputStream(new FileOutputStream(f));
+        o.write(b);
+        o.close();
     }
     
     public final int method866(final Object o) {

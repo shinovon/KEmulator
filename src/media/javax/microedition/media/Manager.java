@@ -69,7 +69,7 @@ public class Manager
         }
 		// buffer
 		boolean buf = Settings.playerBufferAll;
-		if (buf)
+		if (buf && !(inputStream instanceof ByteArrayInputStream))
 			return new PlayerImpl(new ByteArrayInputStream(CustomJarResources.getBytes(inputStream)), s);
 		else
 			return new PlayerImpl(inputStream, s);

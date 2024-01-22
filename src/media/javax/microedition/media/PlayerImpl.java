@@ -43,6 +43,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	static Class clipCls;
 	private static int count;
 	private int level = 100;
+	private byte[] data;
 
 
 	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
@@ -74,7 +75,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			this.midi(inputStream);
 		} else if (contentType.equals("audio/mpeg")) {
 			try {
-				this.sequence = new Player(inputStream);
+				this.data = CustomJarResources.getBytes(inputStream);
+				this.sequence = new Player(new ByteArrayInputStream(data));
 			} catch (JavaLayerException e) {
 				e.printStackTrace();
 				throw new IOException(e);
@@ -159,11 +161,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	private void amr(final InputStream inputStream) throws IOException {
 		try {
 			final byte[] method476;
-			if ((method476 = emulator.media.amr.a.method476(CustomJarResources.getBytes(inputStream))) == null) {
+			if ((data = method476 = emulator.media.amr.a.method476(CustomJarResources.getBytes(inputStream))) == null) {
 				throw new MediaException("Cannot parse AMR data");
 			}
+			InputStream i = new ByteArrayInputStream(method476);
 			final AudioFormat audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 8000.0f, 16, 1, 2, 8000.0f, false);
-			final AudioInputStream audioInputStream = new AudioInputStream(new ByteArrayInputStream(method476), audioFormat, -1L);
+			final AudioInputStream audioInputStream = new AudioInputStream(i, audioFormat, -1L);
 			final Clip anObject298;
 			(anObject298 = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioFormat)))
 					.addLineListener(this);
@@ -261,7 +264,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
-			this.sequence = MidiSystem.getSequence(inputStream);
+			this.data = CustomJarResources.getBytes(inputStream);
+			this.sequence = MidiSystem.getSequence(new ByteArrayInputStream(data));
 		} catch (Exception e) {
 			this.sequence = null;
 		}
@@ -756,5 +760,40 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			throw new IllegalStateException();
 		}
 		throw new MediaException("TimeBase can't be set on this player.");
+	}
+
+	public byte[] getData() {
+		if(data == null) return null;
+		return data.clone();
+	}
+
+	public String getExportName() {
+		String ext = "";
+		if(sequence instanceof Sequence) {
+			ext = "mid";
+		} else if(sequence instanceof Clip) {
+			ext = "amr";
+		} else if(sequence instanceof Player) {
+			ext = "mp3";
+		} else if(contentType != null) {
+			switch (contentType.toLowerCase()) {
+				case "audio/wav":
+				case "audio/wave":
+				case "audio/x-wav":
+					ext = "wav";
+					break;
+				case "audio/x-mid":
+				case "audio/mid":
+				case "audio/midi":
+					ext = "mid";
+					break;
+				case "audio/mpeg":
+				case "audio/mp3":
+					ext = "mp3";
+					break;
+			}
+		}
+		if(ext.isEmpty()) return "audio" + hashCode();
+		return hashCode()+"."+ext;
 	}
 }
