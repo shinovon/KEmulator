@@ -23,7 +23,7 @@ public interface IEmulator
     
     IFont newCustomFont(final int height, final int style);
     
-    IImage newImage(final int p0, final int p1, final boolean p2);
+    IImage newImage(final int p0, final int p1, final boolean transparent);
     
     IImage newImage(final int p0, final int p1, final boolean p2, final int p3);
     

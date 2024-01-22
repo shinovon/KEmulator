@@ -122,7 +122,7 @@ public final class Graphics2DSWT implements IGraphics2D
         final int n4 = n & 0xFF;
         this.color.dispose();
         this.color = new Color((Device)null, n2, n3, n4);
-        gc.setAlpha(b? a : 255);
+        gc.setAlpha(b ? a : a > 0 ? a : 255);
     }
     
     public final void setColor(final int n, final int n2, final int n3) {

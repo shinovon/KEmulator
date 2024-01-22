@@ -110,6 +110,18 @@ public class Image
         image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
         return image;
     }
+
+    public static Image createImage(final int n, final int n2, int color) {
+        if(n <= 0 || n2 <= 0) throw new IllegalArgumentException();
+        final Image image;
+        (image = new Image(Emulator.getEmulator().newImage(n, n2, true))).mutable = true;
+        image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
+        IGraphics2D g = image.getImpl().getGraphics();
+        if((color >> 24 & 0xFF) == 0) color |= 0xFF000000;
+        g.setColor(color, true);
+        g.fillRect(0, 0, n, n2);
+        return image;
+    }
     
     public static Image createImage(final Image image) {
         return createImage(image, 0, 0, image.getWidth(), image.getHeight(), 0);

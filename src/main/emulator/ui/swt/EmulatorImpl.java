@@ -177,12 +177,12 @@ public final class EmulatorImpl implements IEmulator
         return null;
     }
     
-    public final IImage newImage(final int n, final int n2, final boolean b) {
+    public final IImage newImage(final int n, final int n2, final boolean transparent) {
         if (Settings.g2d == 0) {
-            return new ImageSWT(n, n2, b, -1);
+            return new ImageSWT(n, n2, transparent, -1);
         }
         if (Settings.g2d == 1) {
-            return new emulator.graphics2D.awt.d(n, n2, b, -1);
+            return new emulator.graphics2D.awt.d(n, n2, transparent, -1);
         }
         return null;
     }
