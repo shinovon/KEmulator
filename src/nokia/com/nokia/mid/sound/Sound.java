@@ -99,6 +99,7 @@ public class Sound {
     }
 
     public void release() {
+        data = null;
         if (this.state == 0) {
             stop();
         }

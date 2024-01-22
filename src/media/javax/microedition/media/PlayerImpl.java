@@ -352,6 +352,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 	}
 
 	public void deallocate() throws IllegalStateException {
+		data = null;
 		if (this.state == 0) {
 			throw new IllegalStateException();
 		}
