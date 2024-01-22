@@ -40,12 +40,10 @@ public final class c implements ITransform
             var7.translate(0.0D, (double)var1);
             var7.rotate(-1.5707963267948966D);
         } else {
-            AffineTransform var10000;
             double var10001;
             double var10002;
             if(var3 == 4) {
                 var7.rotate(-1.5707963267948966D);
-                var10000 = var7;
                 var10001 = -1.0D;
                 var10002 = 1.0D;
             } else {
@@ -58,7 +56,6 @@ public final class c implements ITransform
                 if(var3 == 7) {
                     var7.translate((double)var2, (double)var1);
                     var7.rotate(1.5707963267948966D);
-                    var10000 = var7;
                     var10001 = -1.0D;
                     var10002 = 1.0D;
                 } else {
@@ -70,7 +67,6 @@ public final class c implements ITransform
 
                     if(var3 == 2) {
                         var7.translate((double)var1, 0.0D);
-                        var10000 = var7;
                         var10001 = -1.0D;
                         var10002 = 1.0D;
                     } else {
@@ -79,14 +75,13 @@ public final class c implements ITransform
                         }
 
                         var7.translate(0.0D, (double)var2);
-                        var10000 = var7;
                         var10001 = 1.0D;
                         var10002 = -1.0D;
                     }
                 }
             }
 
-            var10000.scale(var10001, var10002);
+            var7.scale(var10001, var10002);
         }
 
         return new c(var7);

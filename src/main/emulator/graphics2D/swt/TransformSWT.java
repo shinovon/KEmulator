@@ -23,59 +23,92 @@ public final class TransformSWT implements ITransform {
         return new Transform((Device)null, this.a);
     }
 
-    public final void transform(float[] var1, int var2, float[] var3, int var4, int var5) {
-        System.arraycopy(var1, var2, var3, var4, var5 << 1);
-        Transform var6;
-        (var6 = new Transform((Device)null, this.a)).transform(var3);
-        var6.dispose();
+    public final Transform a() {
+        return new Transform((Device)null, this.a);
     }
 
-    public final void transform(ITransform var1) {
-        Transform var2 = new Transform((Device)null, this.a);
-        Transform var3 = ((TransformSWT)var1).method298();
-        float[] var4 = new float[6];
-        var3.getElements(var4);
-        float var5 = (float)Math.asin((double)var4[1]);
-        float var6 = (float)((double)var4[0] / Math.cos((double)var5));
-        float var7 = (float)((double)var4[3] / Math.cos((double)var5));
-        var2.translate(var4[4], var4[5]);
-        var2.scale(var6, var7);
-        var2.rotate(var5);
-        var2.getElements(this.a);
-        var2.dispose();
-        var3.dispose();
+    public final void transform(float[] arrf, int n, float[] arrf2, int n2, int n3) {
+        System.arraycopy((Object)arrf, (int)n, (Object)arrf2, (int)n2, (int)(n3 << 1));
+        Transform transform = new Transform(null, this.a);
+        transform.transform(arrf2);
+        transform.dispose();
     }
 
-    public final ITransform newTransform(int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6)
+    public final void transform(ITransform paramITransform)
     {
-        paramInt4 += a(paramInt1, paramInt2, paramInt3, paramInt6);
-        paramInt5 += b(paramInt1, paramInt2, paramInt3, paramInt6);
-        Transform localTransform;
-        (localTransform = new Transform(null)).translate(paramInt4, paramInt5);
-        if (paramInt3 == 6)
-        {
-            localTransform.translate(0.0F, paramInt1);
-            localTransform.rotate(270.0F);
-        }
-        else
-        {
-            localTransform.rotate(270.0F);
-            localTransform.translate(paramInt2, 0.0F);
-            localTransform.rotate(90.0F);
-            localTransform.translate(paramInt2, paramInt1);
-            localTransform.rotate(90.0F);
-            localTransform.translate(paramInt1, paramInt2);
-            localTransform.rotate(180.0F);
-            localTransform.translate(paramInt1, 0.0F);
-            if (paramInt3 == 1)
-            {
-                localTransform.translate(0.0F, paramInt2);
-                localTransform.scale(1.0F, paramInt3 == 2 ? 1.0F : paramInt3 == 7 ? 1.0F : paramInt3 == 4 ? 1.0F : -1.0F);
+        Transform localTransform1 = new Transform(null, this.a);
+        Transform localTransform2 = ((TransformSWT)paramITransform).a();
+        float[] arrayOfFloat = new float[6];
+        localTransform2.getElements(arrayOfFloat);
+        float f1 = (float)Math.asin(arrayOfFloat[1]);
+        float f2 = (float)(arrayOfFloat[0] / Math.cos(f1));
+        float f3 = (float)(arrayOfFloat[3] / Math.cos(f1));
+        localTransform1.translate(arrayOfFloat[4], arrayOfFloat[5]);
+        localTransform1.scale(f2, f3);
+        localTransform1.rotate(f1);
+        localTransform1.getElements(this.a);
+        localTransform1.dispose();
+        localTransform2.dispose();
+    }
+
+    public final ITransform newTransform(final int n, final int n2, final int n3, int n4, int n5, final int n6) {
+        n4 += a(n, n2, n3, n6);
+        n5 += b(n, n2, n3, n6);
+        System.out.println("newTransform " + n3);
+        final Transform transform;
+        (transform = new Transform((Device)null)).translate((float)n4, (float)n5);
+        Label_0209: {
+            if (n3 == 6) {
+                transform.translate(0.0f, (float)n);
+                transform.rotate(270f);
+            }
+            else {
+                float n7;
+                float n8;
+                if (n3 == 4) {
+                    transform.rotate(270f);
+                    n7 = -1.0f;
+                    n8 = 1.0f;
+                }
+                else {
+                    if (n3 == 5) {
+                        transform.translate((float)n2, 0.0f);
+                        transform.rotate(90.0f);
+                        break Label_0209;
+                    }
+                    if (n3 == 7) {
+                        transform.translate((float)n2, (float)n);
+                        transform.rotate(90.0f);
+                        n7 = -1.0f;
+                        n8 = 1.0f;
+                    }
+                    else {
+                        if (n3 == 3) {
+                            transform.translate((float)n, (float)n2);
+                            transform.rotate(180.0f);
+                            break Label_0209;
+                        }
+                        if (n3 == 2) {
+                            transform.translate((float)n, 0.0f);
+                            n7 = -1.0f;
+                            n8 = 1.0f;
+                        }
+                        else {
+                            if (n3 != 1) {
+                                break Label_0209;
+                            }
+                            transform.translate(0.0f, (float)n2);
+                            n7 = 1.0f;
+                            n8 = -1.0f;
+                        }
+                    }
+                }
+                transform.scale(n7, n8);
             }
         }
-        TransformSWT locala = new TransformSWT(localTransform);
-        localTransform.dispose();
-        return locala;
+        final TransformSWT a = new TransformSWT(transform);
+        transform.dispose();
+        return (ITransform)a;
     }
 
     private static int a(int var0, int var1, int var2, int var3) {
@@ -121,4 +154,5 @@ public final class TransformSWT implements ITransform {
 
         return 0;
     }
+
 }
