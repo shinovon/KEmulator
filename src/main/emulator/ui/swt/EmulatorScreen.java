@@ -377,7 +377,7 @@ MouseTrackListener
     	if(Settings.canvasKeyboard) return;
     	if(!win) return;
 		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() == Thread.currentThread()) {
-			final boolean active = false ? true : (canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible());
+			final boolean active = canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
 			//if(win) {
 				canvas.getDisplay().readAndDispatch();
 				if(canvas.isDisposed()) {
