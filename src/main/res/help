@@ -45,8 +45,10 @@ $[Changelog]
 $nnmod v2.14.3 [2024.01.23]
 Audio export feature
 Allow only one midi to play at time
-SWT lcdui engine drawString, setARGBColor fix
+SWT lcdui engine: drawString, setARGBColor fix
 Updated UEI libraries
+Fixed keyboard polling when window is not focused
+RMS bug fix
 
 $nnmod v2.14.2 [2024.01.21]
 Updated KEmulator.exe
