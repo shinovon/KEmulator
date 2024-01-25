@@ -39,6 +39,7 @@ public class RecordStore {
             if (!existing) {
                 count = 1;
                 writeIndex();
+                openRecordStores.addElement(this);
                 return;
             }
             boolean convert = false;
@@ -53,6 +54,12 @@ public class RecordStore {
                 } else {
                     throw new RecordStoreNotFoundException(name);
                 }
+            }
+            if(file.length() == 0) {
+                count = 1;
+                writeIndex();
+                openRecordStores.addElement(this);
+                return;
             }
             DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
             count = dataInputStream.readInt();
@@ -89,6 +96,7 @@ public class RecordStore {
             }
             openRecordStores.addElement(this);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RecordStoreNotFoundException(name);
         }
     }
@@ -171,7 +179,7 @@ public class RecordStore {
             return rs;
         }
         File file = new File(rootPath);
-        boolean exists = file.exists() && file.isDirectory() && new File(rootPath + "idx").exists();
+        boolean exists = file.exists() && file.isDirectory() && (file = new File(rootPath + "idx")).exists();
         if(!exists) {
             String oldPath = Emulator.getEmulator().getProperty().getOldRmsPath() + "." + name + "/" + name + ".idx";
             file = new File(oldPath);
