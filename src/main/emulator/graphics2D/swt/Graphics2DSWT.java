@@ -8,8 +8,8 @@ public final class Graphics2DSWT implements IGraphics2D
 {
     GC gc;
     Color color;
-    int anInt10;
-    int anInt11;
+    int width;
+    int height;
     
     public Graphics2DSWT(final Image image) {
         super();
@@ -18,8 +18,8 @@ public final class Graphics2DSWT implements IGraphics2D
         this.gc.getTransform(transform);
         transform.dispose();
         this.color = new Color((Device)null, 0, 0, 0);
-        this.anInt10 = image.getImageData().width;
-        this.anInt11 = image.getImageData().height;
+        this.width = image.getImageData().width;
+        this.height = image.getImageData().height;
     }
     
     public final GC method299() {
@@ -134,14 +134,14 @@ public final class Graphics2DSWT implements IGraphics2D
         if (this.gc.isClipped()) {
             return this.gc.getClipping().height;
         }
-        return this.anInt11;
+        return this.height;
     }
     
     public final int getClipWidth() {
         if (this.gc.isClipped()) {
             return this.gc.getClipping().width;
         }
-        return this.anInt10;
+        return this.width;
     }
     
     public final int getClipX() {

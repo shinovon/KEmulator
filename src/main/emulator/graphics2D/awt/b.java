@@ -1,10 +1,13 @@
 package emulator.graphics2D.awt;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.*;
 
 import emulator.Settings;
 import emulator.graphics2D.*;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Transform;
 
 /**
  * Graphics2DAWT
@@ -278,8 +281,8 @@ public final class b implements IGraphics2D
         g.transform(((c)transform).method8());
     }
     
-    public final void translate(final int n, final int n2) {
-        g.translate(n, n2);
+    public final void translate(final int x, final int y) {
+        g.translate(x, y);
     }
 
 	public IFont getFont() {
