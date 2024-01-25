@@ -177,6 +177,9 @@ public class RecordStore {
             file = new File(oldPath);
             exists = file.exists();
         }
+        if(exists && !createIfNecessary && file.length() == 0) { // check if index is broken
+            throw new RecordStoreNotFoundException(name);
+        }
         if (exists || createIfNecessary) {
             rs = new RecordStore(name, rootPath, true, exists);
             rs.setMode(authmode, writable);
@@ -231,12 +234,17 @@ public class RecordStore {
             IEmulator em = Emulator.getEmulator();
             File file = new File(getRootPath(null, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name")));
             list = file.list();
+            ArrayList<String> tmp = new ArrayList<String>();
             if(list != null) {
-                for(int i = 0; i < list.length; i++) {
-                    list[i] = decodeBase64(list[i]);
+                for(String s: list) {
+                    if(!new File(file.getAbsolutePath() + "/" + s + "/.idx").exists())
+                        continue;
+                    tmp.add(decodeBase64(s));
                 }
             }
+            list = tmp.toArray(new String[0]);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
