@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/midp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/nnapi" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/nokia" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/swtx86patch" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
