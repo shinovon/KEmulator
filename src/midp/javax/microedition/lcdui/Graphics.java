@@ -60,7 +60,7 @@ public class Graphics
     }
 
 	public IGraphics2D getImpl() {
-        if (Settings.xrayView) {
+        if (Settings.xrayView && xrayGraphics != null) {
             return this.xrayGraphics;
         }
         return this.impl;
@@ -82,7 +82,8 @@ public class Graphics
     
     public void clipRect(final int n, final int n2, final int n3, final int n4) {
         this.impl.clipRect(n, n2, n3, n4);
-        this.xrayGraphics.clipRect(n, n2, n3, n4);
+        if(xrayGraphics != null)
+            this.xrayGraphics.clipRect(n, n2, n3, n4);
     }
     
     public void drawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
@@ -169,7 +170,7 @@ public class Graphics
         this.impl.transform(transform);
         this.impl.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
         this.impl.setTransform(transform2);
-        if (n5 >= 0 && Settings.xrayView) {
+        if (n5 >= 0 && Settings.xrayView && xrayGraphics != null) {
             this.xrayGraphics.transform(transform);
             if (Settings.xrayOverlapScreen) {
                 this.xrayGraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
@@ -193,14 +194,16 @@ public class Graphics
         if (!method294(n8, 64)) {
             throw new IllegalArgumentException();
         }
-        final ITransform transform = this.impl.getTransform().newTransform(n3, n4, n5, n6, n7, n8);
         final ITransform transform2 = this.impl.getTransform();
+        final ITransform transform = transform2.newTransform(n3, n4, n5, n6, n7, n8);
         this.impl.transform(transform);
         this.impl.drawImage(image.getImpl(), n, n2, n3, n4, 0, 0, n3, n4);
         this.impl.setTransform(transform2);
-        this.xrayGraphics.transform(transform);
-        this.method289(image, n, n2, 0, 0, n3, n4);
-        this.xrayGraphics.setTransform(transform2);
+        if(xrayGraphics != null) {
+            this.xrayGraphics.transform(transform);
+            this.method289(image, n, n2, 0, 0, n3, n4);
+            this.xrayGraphics.setTransform(transform2);
+        }
         ++image.usedCount;
         ++Profiler.drawRegionCallCount;
         Profiler.drawRegionPixelCount += Math.abs(n3 * n4);
@@ -253,25 +256,29 @@ public class Graphics
             y -= font.getBaselinePosition();
         }
         this.impl.drawString(s, x, y + font.getBaselinePosition());
-        this.xrayFillRect(x, y, stringWidth, height, 255);
+        if(xrayGraphics != null)
+            this.xrayFillRect(x, y, stringWidth, height, 255);
     }
     
     public void fillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
         ++Profiler.drawCallCount;
         this.impl.fillArc(n, n2, n3, n4, n5, n6);
-        this.xrayFillArc(n, n2, n3, n4, n5, n6);
+        if(xrayGraphics != null)
+            this.xrayFillArc(n, n2, n3, n4, n5, n6);
     }
     
     public void fillRect(final int n, final int n2, final int n3, final int n4) {
         ++Profiler.drawCallCount;
         this.impl.fillRect(n, n2, n3, n4);
-        this.xrayFillRect(n, n2, n3, n4, 16777215);
+        if(xrayGraphics != null)
+            this.xrayFillRect(n, n2, n3, n4, 16777215);
     }
     
     public void fillRoundRect(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
         ++Profiler.drawCallCount;
         this.impl.fillRoundRect(n, n2, n3, n4, n5, n6);
-        this.xrayFillRect(n, n2, n3, n4, 16777215);
+        if(xrayGraphics != null)
+            this.xrayFillRect(n, n2, n3, n4, 16777215);
     }
     
     public void fillTriangle(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
@@ -319,7 +326,7 @@ public class Graphics
         final int n9 = clipX - (n3 - n);
         final int n10 = clipY - (n4 - n2);
         image.getUsedRegion().setAlpha(n9, n10, n7, n8, 0);
-        if (!Settings.xrayView) {
+        if (!Settings.xrayView || xrayGraphics == null) {
             return;
         }
         if (Settings.xrayOverlapScreen) {
@@ -338,7 +345,7 @@ public class Graphics
     }
     
     private void xrayFillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        if (Settings.xrayView) {
+        if (Settings.xrayView && xrayGraphics != null) {
             this.xrayGraphics.setColor(16777215, false);
             this.xrayGraphics.fillArc(n, n2, n3, n4, n5, n6);
             this.xrayUpdate();
@@ -346,7 +353,7 @@ public class Graphics
     }
     
     private void xrayDrawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        if (Settings.xrayView) {
+        if (Settings.xrayView && xrayGraphics != null) {
             this.xrayGraphics.setColor(16777215, false);
             this.xrayGraphics.drawArc(n, n2, n3, n4, n5, n6);
             this.xrayUpdate();
@@ -354,7 +361,7 @@ public class Graphics
     }
     
     private void xrayFillRect(final int n, final int n2, final int n3, final int n4, final int n5) {
-        if (Settings.xrayView) {
+        if (Settings.xrayView && xrayGraphics != null) {
             this.xrayGraphics.setColor(n5, false);
             this.xrayGraphics.fillRect(n, n2, n3, n4);
             this.xrayUpdate();
@@ -362,7 +369,7 @@ public class Graphics
     }
     
     private void xrayDrawRect(final int n, final int n2, final int n3, final int n4) {
-        if (Settings.xrayView) {
+        if (Settings.xrayView && xrayGraphics != null) {
             this.xrayGraphics.setColor(16777215, false);
             this.xrayGraphics.drawRect(n, n2, n3, n4);
             this.xrayUpdate();
@@ -370,7 +377,7 @@ public class Graphics
     }
     
     private void xrayDrawLine(final int n, final int n2, final int n3, final int n4) {
-        if (Settings.xrayView) {
+        if (Settings.xrayView && xrayGraphics != null) {
             this.xrayGraphics.setColor(16777215, false);
             this.xrayGraphics.drawLine(n, n2, n3, n4);
             this.xrayUpdate();
@@ -443,7 +450,8 @@ public class Graphics
     public void setClip(final int n, final int n2, final int n3, final int n4) {
         ++Profiler.drawCallCount;
         this.impl.setClip(n, n2, n3, n4);
-        this.xrayGraphics.setClip(n, n2, n3, n4);
+        if(xrayGraphics != null)
+            this.xrayGraphics.setClip(n, n2, n3, n4);
     }
     
     public void setColor(final int n) {
@@ -478,7 +486,8 @@ public class Graphics
         this.tx += x;
         this.ty += y;
         this.impl.translate(x, y);
-        this.xrayGraphics.translate(x, y);
+        if(xrayGraphics != null)
+            this.xrayGraphics.translate(x, y);
     }
     
     public int getDisplayColor(final int n) {
