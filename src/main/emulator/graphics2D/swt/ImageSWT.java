@@ -17,7 +17,7 @@ public final class ImageSWT implements IImage
     int[] rgb;
     int len;
     boolean transparent;
-    boolean disposed;
+    boolean mutable;
     private static final PaletteData aPaletteData537;
     
     public ImageSWT(final byte[] array) {
@@ -28,9 +28,10 @@ public final class ImageSWT implements IImage
         super();
         this.imgdata = new ImageData(inputStream);
         this.transparent = (this.imgdata.getTransparencyType() != 0);
-        this.disposed = false;
+        this.mutable = false;
         this.len = this.imgdata.width * this.imgdata.height;
         this.rgb = new int[this.len];
+        System.out.println(imgdata.alphaData + " " + imgdata.getTransparencyType());
         if (this.transparent && !this.imgdata.palette.isDirect && this.imgdata.transparentPixel != -1) {
             final RGB rgb = this.imgdata.palette.colors[this.imgdata.transparentPixel];
             for (int i = this.imgdata.palette.colors.length - 1; i >= 0; --i) {
@@ -50,6 +51,8 @@ public final class ImageSWT implements IImage
                 }
             }
         }
+        this.img = new Image((Device)null, this.imgdata);
+        mutable = true;
     }
     
     public ImageSWT(final int n, final int n2, final boolean transparent, final int n3) {
@@ -69,7 +72,7 @@ public final class ImageSWT implements IImage
         }
         this.imgdata = this.img.getImageData();
         this.img.dispose();
-        this.disposed = false;
+        this.mutable = false;
         this.transparent = transparent;
         this.len = n * n2;
         this.rgb = new int[this.len];
@@ -85,13 +88,13 @@ public final class ImageSWT implements IImage
                     graphics.finalize();
                     graphics = null;
                 }
-                disposed = false;
+                mutable = false;
             }
         });
     }
     
     public final IGraphics2D createGraphics() {
-        if (this.disposed) {
+        if (this.mutable) {
             if (this.graphics == null) {
                 this.graphics = new Graphics2DSWT(this.img);
             }
@@ -111,7 +114,7 @@ public final class ImageSWT implements IImage
                 this.graphics = null;
             }
             this.graphics = new Graphics2DSWT(this.img);
-            this.disposed = true;
+            this.mutable = true;
         }
         return this.graphics;
     }
@@ -121,7 +124,7 @@ public final class ImageSWT implements IImage
     }
     
     public final void method12(final GC gc, final int n, final int n2) {
-        if (this.disposed) {
+        if (this.mutable) {
             gc.drawImage(this.img, n, n2);
             return;
         }
@@ -130,7 +133,7 @@ public final class ImageSWT implements IImage
     }
     
     public final void method13(final GC gc, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-        if (this.disposed) {
+        if (this.mutable) {
             gc.drawImage(this.img, n, n2, n3, n4, n5, n6, n7, n8);
             return;
         }
@@ -147,7 +150,7 @@ public final class ImageSWT implements IImage
     }
     
     public final int[] getData() {
-        if (this.disposed) {
+        if (this.mutable) {
             this.imgdata = this.img.getImageData();
         }
         this.imgdata.getPixels(0, 0, this.len, this.rgb, 0);
@@ -174,6 +177,12 @@ public final class ImageSWT implements IImage
                     n2 = -16777216 + ((rgb2.red & 0xFF) << 16) + ((rgb2.green & 0xFF) << 8) + (rgb2.blue & 0xFF);
                 }
                 array[n] = n2;
+            }
+        }
+        else if(imgdata.palette.isDirect && imgdata.depth == 32) {
+            for (int k = this.len - 1; k >= 0; --k) {
+                final RGB rgb3 = this.imgdata.palette.getRGB(this.rgb[k]);
+                this.rgb[k] = ((rgb[k] & 0xff) << 24) + ((rgb3.red & 0xFF) << 16) + ((rgb3.green & 0xFF) << 8) + (rgb3.blue & 0xFF);
             }
         }
         else {
@@ -211,8 +220,8 @@ public final class ImageSWT implements IImage
         for (int j = n2; j < n2 + n4; ++j) {
             System.arraycopy(array, 0, this.imgdata.alphaData, j * this.imgdata.width + n, n3);
         }
-        if (this.disposed) {
-            this.disposed = false;
+        if (this.mutable) {
+            this.mutable = false;
             if (this.img != null && !this.img.isDisposed()) {
                 this.img.dispose();
             }
@@ -246,8 +255,8 @@ public final class ImageSWT implements IImage
                 this.imgdata.data[n--] = (byte)(array[j] & 0xFF);
             }
         }
-        if (this.disposed) {
-            this.disposed = false;
+        if (this.mutable) {
+            this.mutable = false;
             if (this.img != null && !this.img.isDisposed()) {
                 this.img.dispose();
             }
@@ -259,30 +268,31 @@ public final class ImageSWT implements IImage
     }
     
     public final int getRGB(final int n, final int n2) {
-        if (this.disposed) {
+        if (this.mutable) {
             try {
-                return this.method300(this.img.getImageData().getPixel(n, n2));
+                return this.method300(n, n2, this.img.getImageData());
             }
             catch (Exception ex) {
                 ex.printStackTrace();
-                return this.method300(this.imgdata.getPixel(n, n2));
+                return this.method300(n, n2, this.imgdata);
             }
         }
-        return this.method300(this.imgdata.getPixel(n, n2));
+        return this.method300(n, n2, this.imgdata);
     }
     
-    private int method300(final int n) {
-        final RGB rgb = this.imgdata.palette.getRGB(n);
-        return -16777216 + ((rgb.red & 0xFF) << 16) + ((rgb.green & 0xFF) << 8) + (rgb.blue & 0xFF);
+    private int method300(int x, int y, ImageData imgdata) {
+        final RGB rgb = imgdata.palette.getRGB(imgdata.getPixel(x, y));
+        return ((imgdata.getAlpha(x, y) & 0xFF) << 24) + ((rgb.red & 0xFF) << 16) + ((rgb.green & 0xFF) << 8) + (rgb.blue & 0xFF);
     }
     
     public final void saveToFile(final String s) {
-        if (this.disposed) {
+        if (this.mutable) {
             try {
                 this.imgdata = this.img.getImageData();
             }
             catch (Exception ex) {
-                ex.printStackTrace();}
+                ex.printStackTrace();
+            }
         }
         try {
             ImageIO.write(emulator.graphics2D.c.method167(this.imgdata), "png", new File(s));
@@ -292,7 +302,7 @@ public final class ImageSWT implements IImage
     }
     
     public final void copyToClipBoard() {
-        if (this.disposed) {
+        if (this.mutable) {
             this.imgdata = this.img.getImageData();
         }
         emulator.graphics2D.c.method169(emulator.graphics2D.c.method167(this.imgdata));

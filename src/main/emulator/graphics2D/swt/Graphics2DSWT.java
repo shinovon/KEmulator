@@ -49,47 +49,46 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void drawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.gc.setForeground(this.color);
+//        this.gc.setForeground(this.color);
         this.gc.drawArc(n, n2, n3, n4, n5, n6);
     }
     
     public final void drawLine(final int n, final int n2, final int n3, final int n4) {
-        this.gc.setForeground(this.color);
+//        this.gc.setForeground(this.color);
         this.gc.drawLine(n, n2, n3, n4);
     }
     
     public final void drawRect(final int n, final int n2, final int n3, final int n4) {
-        this.gc.setForeground(this.color);
+//        this.gc.setForeground(this.color);
         this.gc.drawRectangle(n, n2, n3, n4);
     }
     
     public final void drawRoundRect(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.gc.setForeground(this.color);
+//        this.gc.setForeground(this.color);
         this.gc.drawRoundRectangle(n, n2, n3, n4, n5, n6);
     }
     
     public final void fillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.gc.setBackground(this.color);
+//        this.gc.setBackground(this.color);
         this.gc.fillArc(n, n2, n3, n4, n5, n6);
     }
     
     public final void fillRect(final int n, final int n2, final int n3, final int n4) {
-    	this.gc.setBackground(this.color);
+//    	this.gc.setBackground(this.color);
         this.gc.fillRectangle(n, n2, n3, n4);
     }
     
     public final void fillRoundRect(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        this.gc.setBackground(this.color);
+//        this.gc.setBackground(this.color);
         this.gc.fillRoundRectangle(n, n2, n3, n4, n5, n6);
     }
     
     public final void fillPolygon(final int[] array) {
-        this.gc.setBackground(this.color);
+//        this.gc.setBackground(this.color);
         this.gc.fillPolygon(array);
     }
     
     public final void drawPolygon(final int[] array) {
-        this.gc.setForeground(this.color);
         this.gc.drawPolygon(array);
     }
 
@@ -98,7 +97,6 @@ public final class Graphics2DSWT implements IGraphics2D
     }
 
     public final void drawString(final String s, final int n, final int n2) {
-        this.gc.setForeground(this.color);
         FontMetrics f = gc.getFontMetrics();
         this.gc.drawString(s, n, n2-f.getAscent()-1, true);
     }
@@ -123,11 +121,15 @@ public final class Graphics2DSWT implements IGraphics2D
         this.color.dispose();
         this.color = new Color((Device)null, n2, n3, n4);
         gc.setAlpha(b ? a : a > 0 ? a : 255);
+        gc.setBackground(this.color);
+        gc.setForeground(this.color);
     }
     
     public final void setColor(final int n, final int n2, final int n3) {
         this.color.dispose();
         this.color = new Color((Device)null, n, n2, n3);
+        gc.setBackground(this.color);
+        gc.setForeground(this.color);
     }
     
     public final int getClipHeight() {
