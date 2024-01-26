@@ -35,9 +35,11 @@ public class Graphics
         this.image = i1;
         this.impl = i1.createGraphics();
         //this.copyimage = Emulator.getEmulator().newImage(this.image.getWidth(), this.image.getHeight(), false);
-        this.xrayImage = i2;
-        (this.xrayGraphics = i2.createGraphics()).setAlpha(60);
-        this.setFont(Font.getDefaultFont());
+        if(i2 != null) {
+            this.xrayImage = i2;
+            (this.xrayGraphics = i2.createGraphics()).setAlpha(60);
+            this.setFont(Font.getDefaultFont());
+        }
     }
     
     public Graphics(final IImage anIImage517) {
@@ -51,6 +53,8 @@ public class Graphics
 	}
     
     void dispose() {
+        xrayImage = null;
+        xrayGraphics = null;
     	image = null;
     	impl = null;
     }
@@ -508,5 +512,24 @@ public class Graphics
     
     static {
         Graphics.xrayCache = new Vector();
+    }
+
+    public void reset(IImage i1, IImage i2) {
+        if(i1 != image) {
+            this.image = i1;
+            this.impl = i1.createGraphics();
+        }
+        if(i2 != xrayImage) {
+            this.xrayImage = i2;
+            (this.xrayGraphics = i2.createGraphics()).setAlpha(60);
+        }
+        this.setFont(Font.getDefaultFont());
+        setColor(0);
+        setFont(Font.getDefaultFont());
+        setStrokeStyle(SOLID);
+        ty = tx = 0;
+        impl.reset();
+        if(xrayGraphics != null)
+            xrayGraphics.reset();
     }
 }

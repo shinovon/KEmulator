@@ -34,8 +34,7 @@ public final class TransformSWT implements ITransform {
         transform.dispose();
     }
 
-    public final void transform(ITransform paramITransform)
-    {
+    public final void transform(ITransform paramITransform) {
         Transform localTransform1 = new Transform(null, this.a);
         Transform localTransform2 = ((TransformSWT)paramITransform).a();
         float[] arrayOfFloat = new float[6];
@@ -54,7 +53,6 @@ public final class TransformSWT implements ITransform {
     public final ITransform newTransform(final int n, final int n2, final int n3, int n4, int n5, final int n6) {
         n4 += a(n, n2, n3, n6);
         n5 += b(n, n2, n3, n6);
-        System.out.println("newTransform " + n3);
         final Transform transform;
         (transform = new Transform((Device)null)).translate((float)n4, (float)n5);
         Label_0209: {

@@ -73,4 +73,6 @@ public interface IGraphics2D
      * @return
      */
     IFont getFont();
+
+    void reset();
 }

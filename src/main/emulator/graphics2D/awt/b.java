@@ -1,13 +1,10 @@
 package emulator.graphics2D.awt;
 
-import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.*;
 
 import emulator.Settings;
 import emulator.graphics2D.*;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.Transform;
 
 /**
  * Graphics2DAWT
@@ -15,16 +12,16 @@ import org.eclipse.swt.graphics.Transform;
 public final class b implements IGraphics2D
 {
     Graphics2D g;
-    int w;
-    int h;
+    int width;
+    int height;
     private int anInt12;
 	private a font;
     
     public b(final BufferedImage bufferedImage) {
         super();
         (g = bufferedImage.createGraphics()).setColor(new Color(0, 0, 0));
-        this.w = bufferedImage.getWidth();
-        this.h = bufferedImage.getHeight();
+        this.width = bufferedImage.getWidth();
+        this.height = bufferedImage.getHeight();
         //гладкий шрифт всегда
         if(Settings.textAntiAliasing)
 			g.setRenderingHint(
@@ -223,14 +220,14 @@ public final class b implements IGraphics2D
     
     public final int getClipHeight() {
         if (g.getClipBounds() == null) {
-            return this.h;
+            return this.height;
         }
         return g.getClipBounds().height;
     }
     
     public final int getClipWidth() {
         if (g.getClipBounds() == null) {
-            return this.w;
+            return this.width;
         }
         return g.getClipBounds().width;
     }
@@ -288,4 +285,8 @@ public final class b implements IGraphics2D
 	public IFont getFont() {
 		return font;
 	}
+
+    public void reset() {
+        g.setClip(0, 0, width, height);
+    }
 }

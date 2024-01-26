@@ -3,6 +3,7 @@ package javax.microedition.lcdui;
 import com.nokia.mid.ui.DeviceControl;
 
 import emulator.*;
+import emulator.graphics2D.IImage;
 import emulator.lcdui.BoundsUtils;
 
 public abstract class Canvas extends Displayable
@@ -29,13 +30,19 @@ public abstract class Canvas extends Displayable
     public static final int KEY_STAR = 42;
     public static final int KEY_POUND = 35;
     protected int m_keyStates;
-    
+    private Graphics graphics;
+
     protected Canvas() {
         super();
         this.setFullScreenMode(false);
     }
     
-    public void invokePaint(final Graphics graphics) {
+    public void invokePaint(IImage buffer, IImage xray) {
+        if(!Settings.xrayView) xray = null;
+        if(graphics == null) {
+            graphics = new Graphics(buffer, xray);
+        }
+        graphics.reset(buffer, xray);
         this.paint(graphics);
         this.paintTicker(graphics);
         this.paintSoftMenu(graphics);

@@ -285,4 +285,9 @@ public final class Graphics2DSWT implements IGraphics2D
 	public IFont getFont() {
 		return null;
 	}
+
+    public void reset() {
+        this.gc.setTransform(new Transform(null));
+        this.gc.setClipping(0, 0, width, height);
+    }
 }

@@ -266,7 +266,7 @@ public final class EventQueue implements Runnable {
 					final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
 					final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
 					try {
-						Emulator.getCanvas().invokePaint(new Graphics(backBufferImage, xRayScreenImage));
+						Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -445,7 +445,7 @@ public final class EventQueue implements Runnable {
 								final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
 								final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
 								try {
-									Emulator.getCanvas().invokePaint(new Graphics(backBufferImage, xRayScreenImage));
+									Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}
