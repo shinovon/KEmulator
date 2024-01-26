@@ -10,6 +10,6 @@ final class Class157 extends SelectionAdapter
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        Program.launch("https://t.me/nnmidletschat");
+        Program.launch("https://t.me/nnmidlets");
     }
 }

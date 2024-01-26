@@ -95,7 +95,7 @@ public final class Class54 implements MouseListener, MouseMoveListener
         ((Control)this.aLink816).setLayoutData((Object)gridData2);
         //((Control)this.aLink816).setEnabled(false);
         this.aLink816.addSelectionListener((SelectionListener)new Class158(this));
-        (this.aLink820 = new Link((Composite)this.aShell806, 0)).setText("<a>" + "Discussion chat (ru && en)" + "</a>");
+        (this.aLink820 = new Link((Composite)this.aShell806, 0)).setText("<a>" + "News && chat (en/ru)" + "</a>");
         ((Control)this.aLink820).setLayoutData((Object)gridData2);
      //   ((Control)this.aLink820).setEnabled(false);
         this.aLink820.addSelectionListener((SelectionListener)new Class157(this));
