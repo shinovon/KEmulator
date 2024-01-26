@@ -42,7 +42,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.14.3 [2024.01.23]
+$nnmod v2.14.3 [2024.01.26]
 Audio export feature
 Allow only one midi to play at time
 SWT LCDUI engine fixes

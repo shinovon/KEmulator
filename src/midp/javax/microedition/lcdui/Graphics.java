@@ -532,10 +532,10 @@ public class Graphics
             this.xrayImage = i2;
             (this.xrayGraphics = i2.createGraphics()).setAlpha(60);
         }
-        this.setFont(Font.getDefaultFont());
         setColor(0);
         setFont(Font.getDefaultFont());
         setStrokeStyle(SOLID);
+        translate(-tx, -ty);
         ty = tx = 0;
         impl.reset();
         if(xrayGraphics != null)

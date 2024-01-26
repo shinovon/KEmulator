@@ -1,5 +1,6 @@
 package emulator.graphics2D.awt;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.*;
 
@@ -287,6 +288,7 @@ public final class b implements IGraphics2D
 	}
 
     public void reset() {
+        g.setTransform(new AffineTransform());
         g.setClip(0, 0, width, height);
     }
 }
