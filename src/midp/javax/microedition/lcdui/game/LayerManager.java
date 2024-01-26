@@ -18,8 +18,7 @@ public class LayerManager
     }
     
     public void append(final Layer layer) {
-        remove(layer);
-        insert(layer, this.size);
+        insert(layer, size);
     }
     
     public void insert(final Layer layer, final int n) {
@@ -27,8 +26,17 @@ public class LayerManager
             throw new IndexOutOfBoundsException();
         }
         remove(layer);
-        System.arraycopy(this.layers, n + 1, this.layers, n, this.size - n - 1);
-        this.layers[--this.size] = null;
+        if (this.size == this.layers.length) {
+            final Layer[] aLayerArray431 = new Layer[this.size + 4];
+            System.arraycopy(this.layers, 0, aLayerArray431, 0, this.size);
+            System.arraycopy(this.layers, n, aLayerArray431, n + 1, this.size - n);
+            this.layers = aLayerArray431;
+        }
+        else {
+            System.arraycopy(this.layers, n, this.layers, n + 1, this.size - n);
+        }
+        this.layers[n] = layer;
+        ++this.size;
     }
     
     public Layer getLayerAt(final int n) {
