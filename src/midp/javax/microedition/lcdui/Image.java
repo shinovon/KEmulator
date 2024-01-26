@@ -116,10 +116,14 @@ public class Image
         final Image image;
         (image = new Image(Emulator.getEmulator().newImage(n, n2, true))).mutable = true;
         image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
-        IGraphics2D g = image.getImpl().getGraphics();
-        if((color >> 24 & 0xFF) == 0) color |= 0xFF000000;
-        g.setColor(color, true);
-        g.fillRect(0, 0, n, n2);
+        if(image.getImpl() != null) {
+            IGraphics2D g = image.getImpl().getGraphics();
+            if (g != null) {
+                if ((color >> 24 & 0xFF) == 0) color |= 0xFF000000;
+                g.setColor(color, true);
+                g.fillRect(0, 0, n, n2);
+            }
+        }
         return image;
     }
     
