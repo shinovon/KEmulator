@@ -580,8 +580,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 		}
 		if (this.state != 400) {
 			if(sequence != null) {
-				if (this.sequence instanceof Sequence && midiPlaying && currentMidiPlayer != this) {
-					throw new MediaException("MIDI is currently playing");
+				if (this.sequence instanceof Sequence && midiPlaying && currentMidiPlayer != this && currentMidiPlayer != null) {
+					try {
+						currentMidiPlayer.stop();
+					} catch (Exception e) {
+					}
+//					throw new MediaException("MIDI is currently playing");
 				}
 				if ((this.sequence instanceof Sequence && midiCompleted)
 				|| (this.sequence instanceof Player && mp3Complete)
