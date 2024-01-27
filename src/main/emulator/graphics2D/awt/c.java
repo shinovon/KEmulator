@@ -8,27 +8,28 @@ import java.awt.geom.*;
  */
 public final class c implements ITransform
 {
-    private AffineTransform anAffineTransform4;
+    private AffineTransform transform;
     
     public c() {
         super();
-        this.anAffineTransform4 = new AffineTransform();
+        this.transform = new AffineTransform();
     }
     
     public c(final AffineTransform anAffineTransform4) {
         super();
-        this.anAffineTransform4 = anAffineTransform4;
+        this.transform = anAffineTransform4;
     }
     
     public final AffineTransform method8() {
-        return this.anAffineTransform4;
+        return this.transform;
     }
     
     public final void transform(final ITransform transform) {
+        this.transform.concatenate(((c)transform).method8());
     }
     
     public final void transform(final float[] array, final int n, final float[] array2, final int n2, final int n3) {
-        this.anAffineTransform4.transform(array, n, array2, n2, n3);
+        this.transform.transform(array, n, array2, n2, n3);
     }
 
     public final ITransform newTransform(int var1, int var2, int var3, int var4, int var5, int var6) {

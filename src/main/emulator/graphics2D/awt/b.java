@@ -15,7 +15,7 @@ public final class b implements IGraphics2D
     Graphics2D g;
     int width;
     int height;
-    private int anInt12;
+    private int strokeStyle;
 	private a font;
     
     public b(final BufferedImage bufferedImage) {
@@ -97,76 +97,8 @@ public final class b implements IGraphics2D
         g.drawPolygon(array2, array3, n);
     }
     
-    public static boolean isEmojiChar(char c) {
-    	return (c >= '\u2011' && c <= '\u26FF') || (c >= '\u2700' && c <= '\u27BF') || (c >= '\uE000' && c <= '\uF8FF');
-    }
-    
-    public static boolean isEmojiString(String s) {
-    	return s.contains("\u26a0") || s.contains("\u26a1") || s.contains("\ud83d") || s.contains("\ud83e") || s.contains("\ud83c") || (s.length() > 1 && isEmojiChar(s.charAt(1))) || (s.length() > 0 && isEmojiChar(s.charAt(0)));
-    }
-    
     public final void drawString(final String s, final int x, final int y) {
-    	//s.matches("([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])")
-    	/*if(isEmojiString(s)) {
-	        try {
-	    		Font f = g.getFont();
-	    		char[] chars = s.toCharArray();
-	    		int _x = x;
-	    		for(int i = 0; i < chars.length;) {
-	    			//if(chars[i] == '\ud83d' && i + 2 < chars.length && chars[i + 2] == '\ud83c') {
-	    			//	StringBuilder sb = new StringBuilder();
-	    			//	String _s = sb.append(chars[i]).append(chars[i + 1]).append(chars[i + 2]).append(chars[i + 3]).toString();
-	    	    	//	g.setFont(font.getEmojiFont());
-	    			//	g.drawString(_s, _x, y);
-	    			//	_x += font.emojistringWidth(_s);
-	    			//	g.setFont(f);
-	    			//	i += 4;
-	    			//} else 
-	    			if(chars[i] == '\ud83d' || chars[i] == '\ud83e') {
-	    				String _s = "";
-	    				StringBuilder sb = new StringBuilder();
-	    				if(i + 2 < chars.length && chars[i + 2] == '\ud83c') {
-		    				_s = sb.append(chars[i]).append(chars[i + 1]).append(chars[i + 2]).append(chars[i + 3]).toString();
-		    				i += 4;
-		    			} else {
-		    				_s = sb.append(chars[i]).append(chars[i + 1]).toString();
-		    				i += 2;
-	    				}
-	    	    		g.setFont(font.getEmojiFont());
-	    				g.drawString(_s, _x, y);
-	    				_x += font.emojistringWidth(_s);
-	    				g.setFont(f);
-	    			} else if(isEmojiChar(chars[i])){
-	    	    		g.setFont(font.getEmojiFont());
-	    	    		String _s = "" + chars[i];
-	    				g.drawString(_s, _x, y);
-	    				_x += font.emojistringWidth(_s);
-	    				g.setFont(f);
-	    				i += 1;
-	    			} else {
-	    				int j = 0;
-	    				for(; j + i < chars.length && chars[j + i] != '\ud83d' && chars[i] != '\ud83e' && !isEmojiChar(chars[j + i]); j++);
-	    				String _s = s.substring(i, j + i);
-	    				g.drawString(_s, _x, y);
-	    				_x += font.stringWidth(_s);
-	    				i += j;
-	    			}
-	    		}
-        	} catch (Throwable e) {
-        		e.printStackTrace();
-        	}
-    	} else */g.drawString(s, x, y);
-    	/*
-    	boolean b = false;
-    	Font f = null;
-    	if(isEmojiString(s)) {
-    		b = true;
-    		f = g.getFont();
-    		g.setFont(font.getEmojiFont());
-    	}
-        g.drawString(s, n, n2);
-        if(b) g.setFont(f);
-        */
+    	g.drawString(s, x, y);
     }
     
     public final void drawImage(final IImage image, final int n, final int n2) {
@@ -212,11 +144,11 @@ public final class b implements IGraphics2D
             }
             graphics2D.setStroke(stroke);
         }
-        this.anInt12 = anInt12;
+        this.strokeStyle = anInt12;
     }
     
     public final int getStrokeStyle() {
-        return this.anInt12;
+        return this.strokeStyle;
     }
     
     public final int getClipHeight() {
