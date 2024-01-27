@@ -31,7 +31,6 @@ public final class ImageSWT implements IImage
         this.mutable = false;
         this.len = this.imgdata.width * this.imgdata.height;
         this.rgb = new int[this.len];
-        System.out.println(imgdata.alphaData + " " + imgdata.getTransparencyType());
         if (this.transparent && !this.imgdata.palette.isDirect && this.imgdata.transparentPixel != -1) {
             final RGB rgb = this.imgdata.palette.colors[this.imgdata.transparentPixel];
             for (int i = this.imgdata.palette.colors.length - 1; i >= 0; --i) {

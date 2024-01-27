@@ -4,6 +4,8 @@ import emulator.graphics2D.ITransform;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Transform;
 
+import java.awt.geom.AffineTransform;
+
 public final class TransformSWT implements ITransform {
     float[] a;
 
@@ -23,10 +25,6 @@ public final class TransformSWT implements ITransform {
         return new Transform((Device)null, this.a);
     }
 
-    public final Transform a() {
-        return new Transform((Device)null, this.a);
-    }
-
     public final void transform(float[] arrf, int n, float[] arrf2, int n2, int n3) {
         System.arraycopy((Object)arrf, (int)n, (Object)arrf2, (int)n2, (int)(n3 << 1));
         Transform transform = new Transform(null, this.a);
@@ -34,20 +32,13 @@ public final class TransformSWT implements ITransform {
         transform.dispose();
     }
 
-    public final void transform(ITransform paramITransform) {
-        Transform localTransform1 = new Transform(null, this.a);
-        Transform localTransform2 = ((TransformSWT)paramITransform).a();
-        float[] arrayOfFloat = new float[6];
-        localTransform2.getElements(arrayOfFloat);
-        float f1 = (float)Math.asin(arrayOfFloat[1]);
-        float f2 = (float)(arrayOfFloat[0] / Math.cos(f1));
-        float f3 = (float)(arrayOfFloat[3] / Math.cos(f1));
-        localTransform1.translate(arrayOfFloat[4], arrayOfFloat[5]);
-        localTransform1.scale(f2, f3);
-        localTransform1.rotate(f1);
-        localTransform1.getElements(this.a);
-        localTransform1.dispose();
-        localTransform2.dispose();
+    public final void transform(ITransform t) {
+        Transform t1 = new Transform(null, this.a);
+        Transform t2 = ((TransformSWT)t).method298();
+        t1.multiply(t2);
+        t1.getElements(this.a);
+        t1.dispose();
+        t2.dispose();
     }
 
     public final ITransform newTransform(final int n, final int n2, final int n3, int n4, int n5, final int n6) {
