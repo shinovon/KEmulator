@@ -26,11 +26,11 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         this.aShell568 = null;
         this.aStyledText574 = null;
         try {
-            this.aClass159_570 = new LogStream(this);
             final File file;
             if (!(file = new File(Emulator.getAbsolutePath() + "/log.txt")).exists()) {
                 file.createNewFile();
             }
+            this.aClass159_570 = new LogStream(this);
             this.aPrintStream569 = new PrintStream(new FileOutputStream(file));
             this.aClass11_571 = this;
         }

@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.MessageBox;
 public class Emulator
 {
 	// x64 build
-	public static final boolean _X64_VERSION = false;
+	public static final boolean _X64_VERSION = true;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -82,7 +82,7 @@ public class Emulator
 	public static boolean askImei = true;
 	private static Thread vlcCheckerThread;
 
-    public static final String version = "2.14.3";
+    public static final String version = "2.14.4";
     public static final int numericVersion = 14;
 	public static final String titleVersion = version;
 	public static final String aboutVersion = "v" + version;
@@ -850,23 +850,26 @@ public class Emulator
     }
 
 	public static void main(final String[] commandLineArguments) {
-        if(!_X64_VERSION && JAVA_64) {
-        	JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
+        if (!_X64_VERSION && JAVA_64) {
+            JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
             System.exit(0);
             return;
         }
+        System.out.println("-3");
         System.setProperty("jna.nosys", "true");
-		if(_X64_VERSION) {
-			System.out.println("loading swt libary");
-			loadSWTLibrary();
+        if (_X64_VERSION) {
+            System.out.println("loading swt libary");
+            System.out.println("-2");
+            loadSWTLibrary();
+            System.out.println("-1");
             loadJOGLLibrary();
-		}
-    	midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
+        }
+        midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.initLocale();
         Emulator.emulatorimpl = new EmulatorImpl();
         try {
-        	i.a("emulator");
+            i.a("emulator");
         } catch (Error e) {
         }
         vlcCheckerThread.start();
@@ -876,7 +879,7 @@ public class Emulator
         Devices.load(Emulator.deviceFile);
         tryToSetDevice(Emulator.deviceName);
         setupMRUList();
-    	loadRichPresence();
+        loadRichPresence();
         if (Emulator.midletClassName == null && Emulator.midletJar == null) {
             Emulator.emulatorimpl.getEmulatorScreen().method553(false);
             EmulatorImpl.dispose();
@@ -893,27 +896,27 @@ public class Emulator
         InputStream inputStream = null;
         final String appProperty;
         if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
-        	iconPath = appProperty;
+            iconPath = appProperty;
             inputStream = emulator.custom.CustomJarResources.getResourceStream(appProperty);
-        }
-        else {
+        } else {
             final String appProperty2;
             if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
                 try {
-                	String s = appProperty2.split(",")[1].trim();
-                	iconPath = s;
+                    String s = appProperty2.split(",")[1].trim();
+                    iconPath = s;
                     inputStream = emulator.custom.CustomJarResources.getResourceStream(s);
+                } catch (Exception ex3) {
+                    ex3.printStackTrace();
                 }
-                catch (Exception ex3) {ex3.printStackTrace();}
             }
         }
         String jar = midletJar;
-        if(jar.indexOf("/") > -1)
-        	jar = jar.substring(jar.lastIndexOf("/")+1);
-        if(jar.indexOf("\\") > -1)
-        	jar = jar.substring(jar.lastIndexOf("\\")+1);
-        if(Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
-        	Emulator.updatePresence((uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), uei ? "UEI" : jar);
+        if (jar.indexOf("/") > -1)
+            jar = jar.substring(jar.lastIndexOf("/") + 1);
+        if (jar.indexOf("\\") > -1)
+            jar = jar.substring(jar.lastIndexOf("\\") + 1);
+        if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
+            Emulator.updatePresence((uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), uei ? "UEI" : jar);
         Emulator.emulatorimpl.getEmulatorScreen().method551(inputStream);
         setProperties();
         if (Emulator.midletClassName == null) {
@@ -924,15 +927,13 @@ public class Emulator
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
         Class<?> forName;
         try {
-            forName = Class.forName(Emulator.midletClassName, true, (ClassLoader)Emulator.customClassLoader);
-        }
-        catch (Exception ex) {
+            forName = Class.forName(Emulator.midletClassName, true, (ClassLoader) Emulator.customClassLoader);
+        } catch (Exception ex) {
             ex.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
-        }
-        catch (Error error) {
+        } catch (Error error) {
             error.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
@@ -942,15 +943,13 @@ public class Emulator
         Emulator.netMonitor = new network.b();
         try {
             forName.newInstance();
-        }
-        catch (Exception ex2) {
+        } catch (Exception ex2) {
             ex2.printStackTrace();
             Emulator.eventQueue.stop();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
-        }
-        catch (Error error2) {
+        } catch (Error error2) {
             error2.printStackTrace();
             Emulator.eventQueue.stop();
             Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
@@ -1140,19 +1139,22 @@ public class Emulator
         if(new File(s + "/KEmulator.jar").exists() || new File(s + "/emulator.dll").exists()) {
             return s + "/KEmulator.jar";
         }
-    	s = new Emulator().getClass().getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
-        if(s.endsWith("bin/"))
-        	s = s.substring(0, s.length() - 4);
+        s = new Emulator().getClass().getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
+        if (s.endsWith("bin/"))
+            s = s.substring(0, s.length() - 4);
         try {
             return URLDecoder.decode(s, "UTF-8");
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             return s;
         }
     }
     
     public static String getAbsolutePath() {
-    	String s = getAbsoluteFile().replace('\\', '/');
+        String s = System.getProperty("user.dir");
+        if(new File(s + "/KEmulator.jar").exists() || new File(s + "/emulator.dll").exists()) {
+            return s;
+        }
+    	s = getAbsoluteFile().replace('\\', '/');
         s = s.substring(0, s.lastIndexOf('/')).replace('/', '\\');
         return s;
     }
