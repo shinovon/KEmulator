@@ -547,7 +547,6 @@ public final class Memory
         if(o instanceof VLCPlayerImpl) {
 	        final VLCPlayerImpl v = (VLCPlayerImpl)o;
 	        try {
-	        	System.out.println(n);
 	            switch (n) {
 	                case 0: {
 	                    v.start();
