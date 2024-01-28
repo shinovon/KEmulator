@@ -1,6 +1,7 @@
 package emulator.graphics2D.swt;
 
 import emulator.ui.swt.EmulatorImpl;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.*;
 import emulator.graphics2D.*;
 
@@ -14,6 +15,7 @@ public final class Graphics2DSWT implements IGraphics2D
     public Graphics2DSWT(final Image image) {
         super();
         this.gc = new GC(image);
+        gc.setAntialias(SWT.OFF);
         final Transform transform = new Transform((Device)null);
         this.gc.getTransform(transform);
         transform.dispose();
@@ -29,11 +31,14 @@ public final class Graphics2DSWT implements IGraphics2D
     public final void finalize() {
         EmulatorImpl.asyncExec(new Runnable() {
             public void run() {
-                if (!gc.isDisposed()) {
-                    gc.dispose();
-                }
-                if (!color.isDisposed()) {
-                    color.dispose();
+                try {
+                    if (!gc.isDisposed()) {
+                        gc.dispose();
+                    }
+                    if (!color.isDisposed()) {
+                        color.dispose();
+                    }
+                } catch (Exception e) {
                 }
             }
         });

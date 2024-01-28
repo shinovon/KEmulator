@@ -242,7 +242,10 @@ public final class Class54 implements MouseListener, MouseMoveListener
     public void finalize() {
         EmulatorImpl.asyncExec(new Runnable() {
             public void run() {
-                if (!aGC814.isDisposed()) aGC814.dispose();
+                try {
+                    if (!aGC814.isDisposed()) aGC814.dispose();
+                } catch (Exception e) {
+                }
             }
         });
     }

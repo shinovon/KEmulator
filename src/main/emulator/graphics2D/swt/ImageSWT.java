@@ -4,6 +4,7 @@ import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
 import emulator.graphics2D.*;
 import java.io.*;
+import java.util.Arrays;
 import javax.imageio.*;
 
 /*
@@ -80,12 +81,15 @@ public final class ImageSWT implements IImage
     public final void finalize() {
         EmulatorImpl.asyncExec(new Runnable() {
             public void run() {
-                if (img != null && !img.isDisposed()) {
-                    img.dispose();
-                }
-                if (graphics != null) {
-                    graphics.finalize();
-                    graphics = null;
+                try {
+                    if (img != null && !img.isDisposed()) {
+                        img.dispose();
+                    }
+                    if (graphics != null) {
+                        graphics.finalize();
+                        graphics = null;
+                    }
+                } catch (Exception e) {
                 }
                 mutable = false;
             }
@@ -153,6 +157,7 @@ public final class ImageSWT implements IImage
             this.imgdata = this.img.getImageData();
         }
         this.imgdata.getPixels(0, 0, this.len, this.rgb, 0);
+        boolean b = Arrays.toString(new Exception().getStackTrace()).contains("getRGB");
         if (this.imgdata.alphaData != null) {
             for (int i = this.len - 1; i >= 0; --i) {
                 final RGB rgb = this.imgdata.palette.getRGB(this.rgb[i]);
@@ -178,16 +183,16 @@ public final class ImageSWT implements IImage
                 array[n] = n2;
             }
         }
-        else if(imgdata.palette.isDirect && imgdata.depth == 32) {
+        else if(imgdata.palette.isDirect && imgdata.depth == 32 && imgdata.palette.blueShift != 0) {
             for (int k = this.len - 1; k >= 0; --k) {
-                final RGB rgb3 = this.imgdata.palette.getRGB(this.rgb[k]);
-                this.rgb[k] = ((rgb[k] & 0xff) << 24) + ((rgb3.red & 0xFF) << 16) + ((rgb3.green & 0xFF) << 8) + (rgb3.blue & 0xFF);
+                final RGB rgb = this.imgdata.palette.getRGB(this.rgb[k]);
+                this.rgb[k] = ((this.rgb[k] & 0xFF) << 24) + ((rgb.red & 0xFF) << 16) + ((rgb.green & 0xFF) << 8) + (rgb.blue & 0xFF);
             }
         }
         else {
             for (int k = this.len - 1; k >= 0; --k) {
-                final RGB rgb3 = this.imgdata.palette.getRGB(this.rgb[k]);
-                this.rgb[k] = -16777216 + ((rgb3.red & 0xFF) << 16) + ((rgb3.green & 0xFF) << 8) + (rgb3.blue & 0xFF);
+                final RGB rgb = this.imgdata.palette.getRGB(this.rgb[k]);
+                this.rgb[k] = -16777216 + ((rgb.red & 0xFF) << 16) + ((rgb.green & 0xFF) << 8) + (rgb.blue & 0xFF);
             }
         }
         return this.rgb;

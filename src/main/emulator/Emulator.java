@@ -855,13 +855,10 @@ public class Emulator
             System.exit(0);
             return;
         }
-        System.out.println("-3");
         System.setProperty("jna.nosys", "true");
         if (_X64_VERSION) {
             System.out.println("loading swt libary");
-            System.out.println("-2");
             loadSWTLibrary();
-            System.out.println("-1");
             loadJOGLLibrary();
         }
         midiDeviceInfo = MidiSystem.getMidiDeviceInfo();

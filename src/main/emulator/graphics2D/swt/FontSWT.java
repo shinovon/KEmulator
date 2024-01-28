@@ -37,11 +37,14 @@ public final class FontSWT implements IFont
     public final void finalize() {
         EmulatorImpl.asyncExec(new Runnable() {
             public void run() {
-                if (font != null && !font.isDisposed()) {
-                    font.dispose();
-                }
-                if (gc != null && !gc.isDisposed()) {
-                    gc.dispose();
+                try {
+                    if (font != null && !font.isDisposed()) {
+                        font.dispose();
+                    }
+                    if (gc != null && !gc.isDisposed()) {
+                        gc.dispose();
+                    }
+                } catch (Exception e) {
                 }
             }
         });
