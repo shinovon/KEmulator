@@ -133,6 +133,10 @@ public class EmulatorExe {
 			cmd.add(WINE ? "-Xmx512M" : "-Xmx1G");
 		}
 
+		if("false".equals(System.getProperty("sun.java3d.d3d"))) {
+			cmd.add("-Dsun.java3d.d3d=false");
+		}
+
 		// main class
 		cmd.add("emulator.Emulator");
 
@@ -152,20 +156,48 @@ public class EmulatorExe {
 				cmd.add(jar.contains(";") ? "-cp" : "-jar");
 				cmd.add(jar);
 				classpathSet = true;
+				continue;
 			}
 			if(arg.equals("-classpath") || arg.equals("-cp")) {
-				String jar = args[i+1];
+				String jar = args[i+=1];
 				cmd.add(jar.contains(";") ? "-cp" : "-jar");
 				cmd.add(jar);
 				try {
 					String midlet = args[i+2];
 					cmd.add("-midlet");
 					cmd.add(midlet);
+					i++;
 				} catch (Exception e) {}
 				classpathSet = true;
+				continue;
 			}
 			if(arg.startsWith("-Xdevice:") || arg.startsWith("-Xdomain:")) {
 				cmd.add(arg);
+				continue;
+			}
+			if(!arg.startsWith("-")) continue;
+			switch(arg) {
+				case "-awt":
+				case "-swt":
+				case "-log":
+					cmd.add(arg);
+					continue;
+				case "-rec":
+				case "-device":
+				case "-devicefile":
+				case "-fontname":
+				case "-fontsmall":
+				case "-fontmedium":
+				case "-fontlarge":
+				case "-key":
+					cmd.add(arg);
+					cmd.add(args[i+=1]);
+					continue;
+				case "-keepinstalled": // ignore
+					continue;
+				default:
+					System.out.println("Unknown argument: " + arg);
+					continue;
 			}
 		}
 
