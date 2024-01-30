@@ -144,9 +144,9 @@ MouseTrackListener
     private int mouseYPress;
     private int mouseYRelease;
     private boolean mouseDownInfos;
-    private Vibrate aClass119_976;
-    private long aLong1013;
-    private long aLong1017;
+    private Vibrate vibraThread;
+    private long vibra;
+    private long vibraStart;
 	private MenuItem canvasKeyboardMenuItem;
 	private MenuItem fpsModeMenuItem;
 	private int lastMouseMoveX;
@@ -2537,22 +2537,22 @@ MouseTrackListener
         if (!Settings.enableVibration) {
             return;
         }
-        this.aLong1013 = aLong1013;
-        if (this.aLong1013 == 0L) {
+        this.vibra = aLong1013;
+        if (this.vibra == 0L) {
             this.stopVibra();
             return;
         }
-        if (this.aClass119_976 == null) {
-            this.aClass119_976 = new Vibrate(this);
-            new Thread(this.aClass119_976, "KEmulator vibrate-" + (++threadCount)).start();
+        if (this.vibraThread == null) {
+            this.vibraThread = new Vibrate(this);
+            new Thread(this.vibraThread, "KEmulator vibrate-" + (++threadCount)).start();
             return;
         }
-        this.aLong1017 = System.currentTimeMillis();
+        this.vibraStart = System.currentTimeMillis();
     }
     
     public final void stopVibra() {
-        if (this.aClass119_976 != null) {
-            this.aClass119_976.aBoolean1194 = true;
+        if (this.vibraThread != null) {
+            this.vibraThread.aBoolean1194 = true;
         }
     }
     
@@ -2607,19 +2607,19 @@ MouseTrackListener
     }
     
     static long method559(final EmulatorScreen class93, final long aLong1017) {
-        return class93.aLong1017 = aLong1017;
+        return class93.vibraStart = aLong1017;
     }
     
     static long method567(final EmulatorScreen class93) {
-        return class93.aLong1017;
+        return class93.vibraStart;
     }
     
     static long method575(final EmulatorScreen class93) {
-        return class93.aLong1013;
+        return class93.vibra;
     }
     
     static Vibrate method555(final EmulatorScreen class93, final Vibrate aClass119_976) {
-        return class93.aClass119_976 = aClass119_976;
+        return class93.vibraThread = aClass119_976;
     }
     
     static {
@@ -2692,7 +2692,7 @@ MouseTrackListener
                 }
                 catch (InterruptedException ex) {}
             }
-            EmulatorScreen.method555(this.aClass93_1196, this);
+            EmulatorScreen.method555(this.aClass93_1196, null);
         }
     }
     
