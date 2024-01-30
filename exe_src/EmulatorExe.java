@@ -85,9 +85,15 @@ public class EmulatorExe {
 			return;
 		}
 		ArrayList<String> cmd = new ArrayList<String>();
-		if(new File("../jre/bin/java.exe").exists()) {
-			cmd.add("../jre/bin/java.exe");
-		} else {
+		java: {
+			try {
+				File file = new File("../jre/bin/java.exe");
+				if(file.exists()) {
+					cmd.add(file.getCanonicalPath().replace("\\", "/"));
+					break java;
+				}
+			} catch (IOException e) {
+			}
 			String javahome = System.getProperty("java.home");
 			boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");
 			cmd.add(javahome == null || javahome.isEmpty() ? "java" : (javahome + "/bin/java" + (win ? ".exe" : "")));
@@ -124,7 +130,7 @@ public class EmulatorExe {
 			}
 		}
 		if(!xmxSet) {
-			cmd.add("-Xmx1G");
+			cmd.add(WINE_VERSION ? "-Xmx512M" : "-Xmx1G");
 		}
 
 		// main class

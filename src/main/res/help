@@ -42,6 +42,13 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$nnmod v2.14.4 [2024.01.30]
+Stop previously played midi player instead of throwing MediaException
+SWT lcdui image rotation fix
+"SWTException object already disposed" crash fix
+Fixes for wine
+UEI for nnx64
+
 $nnmod v2.14.3 [2024.01.26]
 Audio export feature
 Allow only one midi to play at time
