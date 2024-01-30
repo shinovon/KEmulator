@@ -1,3 +1,4 @@
 package com.siemens.mp.media;
 
-public abstract interface Control {}
+public abstract interface Control {
+}

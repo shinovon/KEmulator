@@ -10,8 +10,8 @@ import java.util.Properties;
 public class EmulatorExe {
 
 	public static final String version = "1.4";
-	public static final boolean WINE_VERSION = false;
-	public static final boolean X64_VERSION = false;
+	public static final boolean WINE = false;
+	public static final boolean NNX64 = false;
 
 	public static void main(String[] args) {
 		String path = ".";
@@ -21,9 +21,9 @@ public class EmulatorExe {
 			e.printStackTrace();
 		}
 		if(args.length == 0 || args[0].equals("-help")) {
-			if(WINE_VERSION)
+			if(WINE)
 				System.out.println("KEmulator nnmod UEI starter v" + version + " for wine");
-			else if(X64_VERSION)
+			else if(NNX64)
 				System.out.println("KEmulator nnx64 UEI starter v" + version);
 			else
 				System.out.println("KEmulator nnmod UEI starter v" + version);
@@ -42,13 +42,13 @@ public class EmulatorExe {
 			return;
 		}
 		if(args[0].equals("-version")) {
-			if(X64_VERSION)
+			if(NNX64)
 				System.out.println("KEmulator nnx64");
 			else
 				System.out.println("KEmulator nnmod");
 			System.out.println("Profile: MIDP-2.1");
 			System.out.println("Configuration: CLDC-1.1");
-			System.out.println("Optional: JSR75-1.0, JSR82-1.0, JSR120-1.0, JSR135-1.0, JSR177-1.0, JSR179-1.0, JSR205-1.0, JSR234-1.0, JSR256-1.0, NOKIAUI-1.4");
+			System.out.println("Optional: JSR75-1.0, JSR82-1.0, JSR120-1.0, JSR135-1.0, JSR177_crypto-1.0, JSR179-1.0, JSR205-1.0, JSR234-1.0, JSR256-1.0, NOKIAUI-1.4, SAMSUNGAPI-1.0");
 			return;
 		}
 		if(args[0].equals("-Xquery")) {
@@ -67,8 +67,8 @@ public class EmulatorExe {
 			System.out.println("device.list: KEmulator");
 			System.out.println("uei.version: 1.0.2");
 			System.out.println("uei.arguments: Xquery,Xdebug,Xrunjdwp:transport,Xrunjdwp:address,Xrunjdwp:server,Xdescriptor,Xdevice");
-			if(WINE_VERSION)
-				System.out.println("KEmulator.bootclasspath: " + cp.toString().replace("Z:", ""));
+			if(WINE)
+				System.out.println("sdk.home: " + path.replace("Z:", ""));
 			else
 				System.out.println("sdk.home: " + path);
 			System.out.println("KEmulator.screen.width: 240");
@@ -77,7 +77,7 @@ public class EmulatorExe {
 			System.out.println("KEmulator.screen.bitDepth: 16");
 			System.out.println("KEmulator.screen.isTouch: true");
 			System.out.println("KEmulator.security.domains: Trusted, Untrusted");
-			if(WINE_VERSION)
+			if(WINE)
 				System.out.println("KEmulator.bootclasspath: " + cp.toString().replace("Z:", ""));
 			else
 				System.out.println("KEmulator.bootclasspath: " + cp.toString());
@@ -130,7 +130,7 @@ public class EmulatorExe {
 			}
 		}
 		if(!xmxSet) {
-			cmd.add(WINE_VERSION ? "-Xmx512M" : "-Xmx1G");
+			cmd.add(WINE ? "-Xmx512M" : "-Xmx1G");
 		}
 
 		// main class

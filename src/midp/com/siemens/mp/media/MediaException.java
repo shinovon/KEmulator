@@ -1,9 +1,10 @@
 package com.siemens.mp.media;
 
 public class MediaException
-  extends Exception
-{
-  public MediaException() {}
-  
-  public MediaException(String s) {}
+        extends Exception {
+    public MediaException() {
+    }
+
+    public MediaException(String s) {
+    }
 }

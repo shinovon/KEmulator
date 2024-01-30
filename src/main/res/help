@@ -48,6 +48,7 @@ SWT lcdui image rotation fix
 "SWTException object already disposed" crash fix
 Fixes for wine
 UEI for nnx64
+Updated UEI libraries
 
 $nnmod v2.14.3 [2024.01.26]
 Audio export feature

@@ -48,3 +48,5 @@ x64home/track.txt
 kemulator.cfg
 obfx64/mapping.txt
 .idea/uiDesigner.xml
+*.exe
+home/uei/emulator.jar
