@@ -34,7 +34,7 @@ public class Player {
         new com.sprintpcs.media.Class55(playerListener);
     }
 
-    public static void method311(Clip clip, int n) throws IllegalArgumentException {
+    public static void play(Clip clip, int n) throws IllegalArgumentException {
         if (n < -1) {
             throw new IllegalArgumentException("Repeat must be -1 or greater");
         }
@@ -111,7 +111,7 @@ public class Player {
         }
     }
 
-    public static void method312(DualTone dualTone, int n) throws IllegalArgumentException {
+    public static void play(DualTone dualTone, int n) throws IllegalArgumentException {
         if (n < -1) {
             throw new IllegalArgumentException("Repeat must be -1 or greater");
         }
@@ -311,7 +311,7 @@ public class Player {
         }
     }
 
-    public static void method322() {
+    public static void stop() {
         switch (anInt905) {
             case 1: {
                 if (aPlayer907 == null) break;
