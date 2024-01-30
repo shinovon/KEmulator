@@ -11,7 +11,7 @@ public class EmulatorExe {
 
 	public static final String version = "1.4";
 	public static final boolean WINE_VERSION = false;
-	public static final boolean X64_VERSION = false
+	public static final boolean X64_VERSION = false;
 
 	public static void main(String[] args) {
 		String path = ".";
