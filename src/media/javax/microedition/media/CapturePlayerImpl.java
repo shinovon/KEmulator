@@ -363,6 +363,7 @@ public class CapturePlayerImpl implements Player {
 	}
 
 	public byte[] getSnapshot(String p0) throws MediaException {
+		if(!visible) throw new MediaException("Not visible");
 		if(p0 != null) {
 			String[] ar = p0.split("&");
 			int w = Integer.parseInt(ar[0].replace("width=", ""));

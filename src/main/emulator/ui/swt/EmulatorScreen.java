@@ -2179,7 +2179,11 @@ MouseTrackListener
         if (mouseEvent.button != 1 || Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
             return;
         }
-        Emulator.getScreen().invokeKeyPressed(Keyboard.getArrowKeyFromDevice(8));
+        try {
+            Emulator.getScreen().invokeKeyPressed(Keyboard.getArrowKeyFromDevice(8));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public final void mouseDown(final MouseEvent mouseEvent) {

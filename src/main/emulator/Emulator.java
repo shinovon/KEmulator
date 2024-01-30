@@ -813,6 +813,7 @@ public class Emulator
         System.setProperty("com.nokia.pointer.number", "0");
         System.setProperty("kemulator.hwid", getHWID());
         System.setProperty("microedition.amms.version", "1.0");
+        System.setProperty("org.pigler.api.version", "1.2-kemulator");
         if(_X64_VERSION) System.setProperty("kemulator.x64", "true");
 	    try {
 	        Webcam w = Webcam.getDefault();
@@ -823,8 +824,6 @@ public class Emulator
 	        	System.setProperty("camera.orientations", "devcam0:inwards");
 	        	Dimension d = w.getViewSize();
 	        	System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
-	        } else {
-	        	
 	        }
         } catch (Throwable e) {
         }
@@ -1266,7 +1265,7 @@ public class Emulator
 	}
 
 	public static String getMidletName() {
-		String x = emulatorimpl.getAppProperty("MIDlet-1").split(",")[2];
+		String x = emulatorimpl.getAppProperty("MIDlet-1").split(",")[0];
 		if(x.startsWith(" "))
 			x = x.substring(1);
 		if(x.endsWith(" "))

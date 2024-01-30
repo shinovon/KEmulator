@@ -60,6 +60,8 @@
 
 -keep class com.siemens.** { *; }
 
+-keep public class org.pigler.** { public protected *; }
+
 # LIBRARIES
 -keep public class club.minnced.discord.rpc.** { public protected *; }
 
