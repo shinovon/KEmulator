@@ -9,6 +9,10 @@ import java.util.Properties;
 
 public class EmulatorExe {
 
+	public static final String version = "1.4";
+	public static final boolean WINE_VERSION = false;
+	public static final boolean X64_VERSION = false
+
 	public static void main(String[] args) {
 		String path = ".";
 		try {
@@ -17,7 +21,12 @@ public class EmulatorExe {
 			e.printStackTrace();
 		}
 		if(args.length == 0 || args[0].equals("-help")) {
-			System.out.println("KEmulator nnmod UEI starter v1.3");
+			if(WINE_VERSION)
+				System.out.println("KEmulator nnmod UEI starter v" + version + " for wine");
+			else if(X64_VERSION)
+				System.out.println("KEmulator nnx64 UEI starter v" + version);
+			else
+				System.out.println("KEmulator nnmod UEI starter v" + version);
 			System.out.println("Usage: emulator [arguments] <application>");
 			System.out.println(" -classpath <jar file> <MIDlet class>   Path to jar file and MIDlet class");
 			System.out.println(" -version       Display version information of the Emulator, Profile and Configuration");
@@ -33,7 +42,10 @@ public class EmulatorExe {
 			return;
 		}
 		if(args[0].equals("-version")) {
-			System.out.println("KEmulator nnmod");
+			if(X64_VERSION)
+				System.out.println("KEmulator nnx64");
+			else
+				System.out.println("KEmulator nnmod");
 			System.out.println("Profile: MIDP-2.1");
 			System.out.println("Configuration: CLDC-1.1");
 			System.out.println("Optional: JSR75-1.0, JSR82-1.0, JSR120-1.0, JSR135-1.0, JSR177-1.0, JSR179-1.0, JSR205-1.0, JSR234-1.0, JSR256-1.0, NOKIAUI-1.4");
@@ -55,20 +67,26 @@ public class EmulatorExe {
 			System.out.println("device.list: KEmulator");
 			System.out.println("uei.version: 1.0.2");
 			System.out.println("uei.arguments: Xquery,Xdebug,Xrunjdwp:transport,Xrunjdwp:address,Xrunjdwp:server,Xdescriptor,Xdevice");
-			System.out.println("sdk.home: " + path);
+			if(WINE_VERSION)
+				System.out.println("KEmulator.bootclasspath: " + cp.toString().replace("Z:", ""));
+			else
+				System.out.println("sdk.home: " + path);
 			System.out.println("KEmulator.screen.width: 240");
 			System.out.println("KEmulator.screen.height: 320");
 			System.out.println("KEmulator.screen.isColor: true");
 			System.out.println("KEmulator.screen.bitDepth: 16");
 			System.out.println("KEmulator.screen.isTouch: true");
 			System.out.println("KEmulator.security.domains: Trusted, Untrusted");
-			System.out.println("KEmulator.bootclasspath: " + cp.toString());
+			if(WINE_VERSION)
+				System.out.println("KEmulator.bootclasspath: " + cp.toString().replace("Z:", ""));
+			else
+				System.out.println("KEmulator.bootclasspath: " + cp.toString());
 //			System.out.println("KEmulator.bootclasspath: " + path + "/KEmulator.jar");
 			return;
 		}
 		ArrayList<String> cmd = new ArrayList<String>();
-		if(new File("./jre/bin/java.exe").exists()) {
-			cmd.add("./jre/bin/java.exe");
+		if(new File("../jre/bin/java.exe").exists()) {
+			cmd.add("../jre/bin/java.exe");
 		} else {
 			String javahome = System.getProperty("java.home");
 			boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");

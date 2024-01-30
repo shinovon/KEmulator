@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.MessageBox;
 public class Emulator
 {
 	// x64 build
-	public static final boolean _X64_VERSION = true;
+	public static final boolean _X64_VERSION = false;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -1167,6 +1167,9 @@ public class Emulator
         cmd.add("-Xmx1G");
         if(Emulator.jdwpDebug) {
             cmd.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + Settings.debugPort);
+        }
+        if("false".equals(System.getProperty("sun.java3d.d3d"))) {
+            cmd.add("-Dsun.java3d.d3d=false");
         }
         cmd.add("emulator.Emulator");
         if (s == null) {
