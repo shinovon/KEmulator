@@ -49,6 +49,8 @@ SWT lcdui image rotation fix
 Fixes for wine
 UEI for nnx64
 Updated UEI libraries
+sprintpcs media api fix
+Vibration api fix
 
 $nnmod v2.14.3 [2024.01.26]
 Audio export feature
