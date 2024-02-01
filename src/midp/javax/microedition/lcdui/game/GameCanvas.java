@@ -16,13 +16,14 @@ public abstract class GameCanvas extends Canvas
     public static final int GAME_B_PRESSED = 1024;
     public static final int GAME_C_PRESSED = 2048;
     public static final int GAME_D_PRESSED = 4096;
-    
+    private Graphics graphics;
+
     protected GameCanvas(final boolean b) {
         super();
     }
     
     protected Graphics getGraphics() {
-        return new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
+        return graphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
     }
     
     public int getKeyStates() {
@@ -45,7 +46,8 @@ public abstract class GameCanvas extends Canvas
         if(this != Emulator.getCanvas()) return;
         Displayable.checkForSteps();
         Displayable.fpsLimiter();
-        this.paintSoftMenu(this.getGraphics());
+        if(graphics == null) getGraphics();
+        this.paintSoftMenu(graphics);
         Emulator.getEventQueue().queueGraphicsFlush();
         Emulator.getEventQueue().waitRepainted();
         Displayable.resetXRayGraphics();
