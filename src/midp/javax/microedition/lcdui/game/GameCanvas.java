@@ -42,6 +42,7 @@ public abstract class GameCanvas extends Canvas
     }
     
     private void method220() {
+        if(this != Emulator.getCanvas()) return;
         Displayable.checkForSteps();
         Displayable.fpsLimiter();
         this.paintSoftMenu(this.getGraphics());

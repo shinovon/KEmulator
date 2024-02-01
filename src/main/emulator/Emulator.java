@@ -356,17 +356,8 @@ public class Emulator
             return;
         }
         try {
-            String s;
-            String s2;
-            if (Emulator.midletJar.lastIndexOf("\\") != -1) {
-                s = Emulator.midletJar;
-                s2 = "\\";
-            }
-            else {
-                s = Emulator.midletJar;
-                s2 = "/";
-            }
-            final int lastIndex = s.lastIndexOf(s2);
+            String s = Emulator.midletJar;
+            final int lastIndex = s.lastIndexOf(Emulator.midletJar.lastIndexOf("\\") != -1 ? "\\" : "/");
             final String string = Emulator.midletJar.substring(0, lastIndex) + "/kemulator.cfg";
             final String substring = Emulator.midletJar.substring(lastIndex + 1, Emulator.midletJar.lastIndexOf("."));
             final Properties properties = new Properties();
