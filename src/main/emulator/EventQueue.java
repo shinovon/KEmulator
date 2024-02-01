@@ -336,6 +336,11 @@ public final class EventQueue implements Runnable {
 					if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 						break;
 					}
+					try {
+						Emulator.getMIDlet().invokeStartApp();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					Emulator.getCanvas().invokeShowNotify();
 					break;
 				}
@@ -348,6 +353,11 @@ public final class EventQueue implements Runnable {
 					}
 					Emulator.getCanvas().invokeHideNotify();
 					this.canvasHidden = true;
+					try {
+						Emulator.getMIDlet().invokePauseApp();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					break;
 				}
 				case 0:
