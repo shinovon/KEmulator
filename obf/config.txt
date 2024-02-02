@@ -8,7 +8,7 @@
 
 -target 1.8
 #-dontshrink
--dontoptimize
+#-dontoptimize
 -printmapping '.\mapping.txt'
 -overloadaggressively
 #-keeppackagenames **
@@ -18,6 +18,8 @@
 -dontwarn
 -defaultpackage 'kemnn'
 -renamesourcefileattribute A
+
+-optimizations !library/*,!class/*,!code/simplification/object
 
 # APIS
 -keep public class javax.microedition.** { public protected *; }

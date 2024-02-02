@@ -42,12 +42,13 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.14.4 [2024.01.30]
+$nnmod v2.14.4 [2024.02.02]
 Stop previously played midi player instead of throwing MediaException
 SWT lcdui image rotation fix
 "SWTException object already disposed" crash fix
 Ignore GameCanvas.flushGraphics() if canvas is not shown
 Call MIDlet.pauseApp() on suspend
+Keyboard polling on high fps fix
 Updated UEI libraries
 sprintpcs media api fix
 Vibration api fix
