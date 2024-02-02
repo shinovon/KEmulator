@@ -7,8 +7,6 @@
 #-libraryjars '..\x64home\gluegen-rt.jar'
 
 -target 1.8
-#-dontshrink
-#-dontoptimize
 -printmapping '.\mapping.txt'
 -overloadaggressively
 #-keeppackagenames **
@@ -19,7 +17,11 @@
 -defaultpackage 'kemnn'
 -renamesourcefileattribute A
 
+#-dontshrink
+#-dontoptimize
 -optimizations !library/*,!class/*,!code/simplification/object
+-allowaccessmodification
+-optimizationpasses 2
 
 # APIS
 -keep public class javax.microedition.** { public protected *; }

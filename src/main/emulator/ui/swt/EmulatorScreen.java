@@ -354,9 +354,6 @@ MouseTrackListener
         if(time - lastPollTime < 10) return;
         lastPollTime = time;
         final boolean active = canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
-        if(canvas.isDisposed()) {
-            return;
-        }
         if(win32OS == null) {
             try {
                 win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
