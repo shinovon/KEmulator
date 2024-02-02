@@ -66,6 +66,7 @@ public final class Settings
 
     public static int debugPort = 29292;
     public static Map<String, String> controllerBinds = new HashMap<String, String>();
+    public static boolean pollKeyboardOnRepaint = true;
 
     public Settings() {
         super();

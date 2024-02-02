@@ -604,7 +604,7 @@ public class Emulator
         	ex.printStackTrace();
             Emulator.emulatorimpl.getLogStream().println("3 "+ex.toString());
         	if(ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
-        		Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_DRM_ERROR", "Input file isn't ZIP. Trying to load DRM Content?"));
+        		Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_DRM_ERROR", "Input file isn't ZIP. Trying to load DRM Content?"));
         	}
             return false;
         }
@@ -868,7 +868,7 @@ public class Emulator
         setupMRUList();
         loadRichPresence();
         if (Emulator.midletClassName == null && Emulator.midletJar == null) {
-            Emulator.emulatorimpl.getEmulatorScreen().method553(false);
+            Emulator.emulatorimpl.getEmulatorScreen().start(false);
             EmulatorImpl.dispose();
             System.exit(0);
             return;
@@ -876,7 +876,7 @@ public class Emulator
         Emulator.record = new KeyRecords();
         getLibraries();
         if (!getJarClasses()) {
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
+            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
             System.exit(1);
             return;
         }
@@ -904,10 +904,10 @@ public class Emulator
             jar = jar.substring(jar.lastIndexOf("\\") + 1);
         if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
             Emulator.updatePresence((uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), uei ? "UEI" : jar);
-        Emulator.emulatorimpl.getEmulatorScreen().method551(inputStream);
+        Emulator.emulatorimpl.getEmulatorScreen().setWindowIcon(inputStream);
         setProperties();
         if (Emulator.midletClassName == null) {
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
             System.exit(1);
             return;
         }
@@ -917,12 +917,12 @@ public class Emulator
             forName = Class.forName(Emulator.midletClassName, true, (ClassLoader) Emulator.customClassLoader);
         } catch (Exception ex) {
             ex.printStackTrace();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
         } catch (Error error) {
             error.printStackTrace();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
         }
@@ -933,20 +933,20 @@ public class Emulator
         } catch (Exception ex2) {
             ex2.printStackTrace();
             Emulator.eventQueue.stop();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
         } catch (Error error2) {
             error2.printStackTrace();
             Emulator.eventQueue.stop();
-            Emulator.emulatorimpl.getEmulatorScreen().method552(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
         }
         Emulator.emulatorimpl.method822().method302();
         Emulator.emulatorimpl.method829().method302();
         Emulator.eventQueue.queue(10);
-        Emulator.emulatorimpl.getEmulatorScreen().method553(true);
+        Emulator.emulatorimpl.getEmulatorScreen().start(true);
         EmulatorImpl.dispose();
         System.exit(0);
     }

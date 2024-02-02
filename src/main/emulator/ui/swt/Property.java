@@ -159,7 +159,7 @@ public final class Property implements IProperty
     private Composite networkComp;
     private Group aGroup700;
     private CLabel aCLabel648;
-    private Combo aCombo706;
+    private Combo proxyTypeCombo;
     private CLabel aCLabel649;
     private Text aText635;
     private CLabel aCLabel650;
@@ -184,6 +184,7 @@ public final class Property implements IProperty
     private Button keymapClearBtn;
     private Composite keyMapControllerComp;
     private Composite keyMapTabComp;
+//    private Button pollOnRepaintBtn;
 
     public Property() {
         super();
@@ -303,7 +304,7 @@ public final class Property implements IProperty
         this.networkComp = null;
         this.aGroup700 = null;
         this.aCLabel648 = null;
-        this.aCombo706 = null;
+        this.proxyTypeCombo = null;
         this.aCLabel649 = null;
         this.aText635 = null;
         this.aCLabel650 = null;
@@ -319,7 +320,7 @@ public final class Property implements IProperty
         rpcBtn = null;
         antiAliasBtn = null;
         this.loadProperties();
-        this.method353();
+        this.updateProxy();
     }
     
     public final void method354(final Shell shell) {
@@ -544,6 +545,7 @@ public final class Property implements IProperty
                     Settings.controllerBinds.put(((String)k).substring("ControllerMap.".length()), properties.getProperty((String)k));
                 }
             }
+            Settings.pollKeyboardOnRepaint = Boolean.valueOf(properties.getProperty("PollKeyboardOnRepaint", "true"));
             fileInputStream.close();
         }
         catch (Exception ex) {
@@ -671,6 +673,7 @@ public final class Property implements IProperty
             for(Map.Entry<String, String> e: Settings.controllerBinds.entrySet()) {
                 properties.setProperty("ControllerMap."+e.getKey(), e.getValue());
             }
+            properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         }
@@ -748,7 +751,7 @@ public final class Property implements IProperty
         Settings.autoGenJad = this.aButton709.getSelection();
         Settings.enableNewTrack = this.aButton714.getSelection();
         Settings.enableMethodTrack = this.aButton719.getSelection();
-        Settings.proxyType = this.aCombo706.getSelectionIndex();
+        Settings.proxyType = this.proxyTypeCombo.getSelectionIndex();
         Settings.proxyHost = this.aText635.getText().trim();
         Settings.proxyPort = this.aText637.getText().trim();
         Settings.proxyUser = this.aText639.getText().trim();
@@ -757,9 +760,10 @@ public final class Property implements IProperty
         //Emulator.inactivityTimer = this.inactiveTimerSpinner.getSelection();
         Emulator.rpcEnabled = this.rpcBtn.getSelection();
         Settings.awtAntiAliasing = this.antiAliasBtn.getSelection();
+//        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
         Settings.vlcDir = vlcDirText.getText().trim();
         Settings.locale = localeText.getText().trim();
-        this.method353();
+        this.updateProxy();
     }
     
     private static void method359(final boolean b) {
@@ -1004,9 +1008,9 @@ public final class Property implements IProperty
         final CTabItem cTabItem3;
         (cTabItem3 = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSFONT", "SysFont"));
         cTabItem3.setControl((Control)this.sysFontComp);
-        final CTabItem cTabItem4;
-        (cTabItem4 = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM", "System"));
-        cTabItem4.setControl((Control)this.systemComp);
+        final CTabItem systemTabItem;
+        (systemTabItem = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM", "System"));
+        systemTabItem.setControl((Control)this.systemComp);
         final CTabItem coreApiTab;
         (coreApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_COREAPI", "CoreAPI"));
         coreApiTab.setControl((Control)this.coreApiComp);
@@ -1604,6 +1608,8 @@ public final class Property implements IProperty
         this.rpcBtn.setSelection(Emulator.rpcEnabled);
         (this.antiAliasBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_AWT_ANTIALIASING", "AWT Smooth drawing"));
         this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
+//        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_POLL_ON_REPAINT", "Poll keyboard on repaint"));
+//        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
     }
     
     private void setupSysFontComp() {
@@ -1965,8 +1971,8 @@ public final class Property implements IProperty
         (this.aButton764 = new Button((Composite)this.aGroup700, 8388608)).setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
         ((Control)this.aButton764).setLayoutData((Object)layoutData);
         this.aButton764.addSelectionListener((SelectionListener)new Class97(this));
-        this.aCombo706.addModifyListener((ModifyListener)new Class65(this));
-        this.aCombo706.select(Settings.proxyType);
+        this.proxyTypeCombo.addModifyListener((ModifyListener)new Class65(this));
+        this.proxyTypeCombo.select(Settings.proxyType);
     }
     
     private void method350() {
@@ -1975,13 +1981,13 @@ public final class Property implements IProperty
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.horizontalSpan = 2;
         layoutData.verticalAlignment = 2;
-        ((Control)(this.aCombo706 = new Combo((Composite)this.aGroup700, 8))).setLayoutData((Object)layoutData);
-        this.aCombo706.add("None Proxy");
-        this.aCombo706.add("HTTP Proxy");
-        this.aCombo706.add("Socks5 Proxy");
+        ((Control)(this.proxyTypeCombo = new Combo((Composite)this.aGroup700, 8))).setLayoutData((Object)layoutData);
+        this.proxyTypeCombo.add("None Proxy");
+        this.proxyTypeCombo.add("HTTP Proxy");
+        this.proxyTypeCombo.add("Socks5 Proxy");
     }
     
-    private static void method351() {
+    private static void removeProxyProperties() {
         System.getProperties().remove("http.proxyHost");
         System.getProperties().remove("http.proxyPort");
         System.getProperties().remove("http.auth.ntlm.domain");
@@ -2007,8 +2013,8 @@ public final class Property implements IProperty
         ((EmulatorScreen)Emulator.getEmulator().getScreen()).method571();
     }
     
-    private void method353() {
-        method351();
+    private void updateProxy() {
+        removeProxyProperties();
         final int anInt1257;
         if ((anInt1257 = Settings.proxyType) == 0) {
             return;
@@ -2180,7 +2186,7 @@ public final class Property implements IProperty
     }
     
     static Combo method383(final Property class38) {
-        return class38.aCombo706;
+        return class38.proxyTypeCombo;
     }
     
     static Text method423(final Property class38) {
@@ -2208,7 +2214,7 @@ public final class Property implements IProperty
     }
     
     static void method395(final Property class38) {
-        method351();
+        removeProxyProperties();
     }
     
     static {

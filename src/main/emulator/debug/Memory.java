@@ -497,12 +497,12 @@ public final class Memory
                             String s = sound.getExportName();
                             if(b != null) {
                                 exportAudio(b, sound.getExportName());
-                                ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Saved: " + s);
+                                ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Saved: " + s);
                             } else {
-                                ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: unsupported stream type");
+                                ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Export failed: unsupported stream type");
                             }
                         } catch (Exception e) {
-                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: " + e.toString());
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Export failed: " + e.toString());
                         }
                         break;
                     }
@@ -532,12 +532,12 @@ public final class Memory
                         String s = audioClip.getExportName();
                         if(b != null) {
                             exportAudio(b, s);
-                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Saved: " + s);
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Saved: " + s);
                         } else {
-                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: unsupported stream type");
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Export failed: unsupported stream type");
                         }
                     } catch (Exception e) {
-                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: " + e.toString());
+                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Export failed: " + e.toString());
                     }
                     break;
                 }
@@ -562,7 +562,7 @@ public final class Memory
 	                    break;
 	                }
                     case 3: {
-                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export not supported!");
+                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Export not supported!");
                         break;
                     }
 	            }
@@ -595,12 +595,12 @@ public final class Memory
                         String s = "audio" + playerImpl.getExportName();
                         if(b != null) {
                             exportAudio(b, s);
-                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Saved: " + s);
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Saved: " + s);
                         } else {
-                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: unsupported stream type");
+                            ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Export failed: unsupported stream type");
                         }
                     } catch (Exception e) {
-                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method552("Export failed: " + e.toString());
+                        ((EmulatorScreen)Emulator.getEmulator().getScreen()).showMessage("Export failed: " + e.toString());
                     }
                 }
             }
