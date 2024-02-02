@@ -33,6 +33,7 @@ MouseTrackListener
 {
     private static Display display;
     private static int threadCount;
+    private long lastPollTime;
 
     public Shell getShell() {
         return shell;
@@ -265,13 +266,17 @@ MouseTrackListener
         ((Control)this.shell).addControlListener((ControlListener)this);
         if(win) {
             new Thread("KEmulator keyboard poll thread") {
+                boolean b;
                 public void run() {
                     try {
+                        if(b) {
+                            pollKeyboard(canvas);
+                            return;
+                        }
+                        b = true;
                         while (shell != null && !((Widget)shell).isDisposed()) {
-                            canvas.getDisplay().syncExec(() -> {
-                                pollKeyboard(canvas);
-                            });
-                            Thread.sleep(10);
+                            display.asyncExec(this);
+                            Thread.sleep(20);
                         }
                     } catch (Exception e) {
                         System.out.println("Exception in keyboard poll thread");
@@ -280,20 +285,16 @@ MouseTrackListener
                 }
             }.start();
         }
-    	try
-    	{
+    	try {
 	        while (this.shell != null && !((Widget)this.shell).isDisposed()) {
 	        	//pollKeyboard(canvas);
 	            if (!EmulatorScreen.display.readAndDispatch()) {
 	                EmulatorScreen.display.sleep();
 	            }
 	        }
-    	} catch (Error e)
-    	{
+    	} catch (Error e) {
     		e.printStackTrace();
-    	}
-    	catch (Exception e)
-    	{
+    	} catch (Exception e) {
     		e.printStackTrace();
         	CustomMethod.close();
     		System.exit(1);
@@ -345,76 +346,65 @@ MouseTrackListener
 	protected static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
 	private static Class win32OS;
 	private static Method win32OSGetKeyState;
-
-//	String os = System.getProperty("os.name").toLowerCase();
 	boolean win = System.getProperty("os.name").startsWith("Win");
-	//boolean linux = os.contains("nux") || os.contains("nix");
 	
     public synchronized void pollKeyboard(Canvas canvas) {
-    	if(Settings.canvasKeyboard || !win) return;
-        /*
-        if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() != Thread.currentThread()) {
-            canvas.getDisplay().asyncExec(() -> {
-                pollKeyboard(canvas);
-            });
+    	if(Settings.canvasKeyboard || !win || canvas == null || canvas.isDisposed()) return;
+        long time = System.currentTimeMillis();
+        if(time - lastPollTime < 10) return;
+        lastPollTime = time;
+        final boolean active = canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
+        if(canvas.isDisposed()) {
             return;
         }
-        */
-		if(canvas != null && !canvas.isDisposed() && canvas.getDisplay().getThread() == Thread.currentThread()) {
-			final boolean active = canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
-//            canvas.getDisplay().readAndDispatch();
-            if(canvas.isDisposed()) {
+        if(win32OS == null) {
+            try {
+                win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
+            } catch (Exception e) {
+            }
+            if (win32OS == null)
+                return;
+        }
+        if(win32OSGetKeyState == null) {
+            win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", Integer.TYPE);
+            if(win32OSGetKeyState == null)
+                return;
+        }
+
+        long now = System.currentTimeMillis();
+        for(int i = 0; i < keyboardButtonStates.length; i++) {
+            lastKeyboardButtonStates[i] = keyboardButtonStates[i];
+            short keyState;
+            try {
+                keyState = ((Short) win32OSGetKeyState.invoke(null, Integer.valueOf(i))).shortValue();
+            } catch(Exception e) {
+                e.printStackTrace();
                 return;
             }
-            if(win32OS == null) {
-                try {
-                    win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
-                } catch (Exception e) {
-                }
-                if (win32OS == null)
-                    return;
-            }
-            if(win32OSGetKeyState == null) {
-                win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", Integer.TYPE);
-                if(win32OSGetKeyState == null)
-                    return;
-            }
-
-            long now = System.currentTimeMillis();
-            for(int i = 0; i < keyboardButtonStates.length; i++) {
-                lastKeyboardButtonStates[i] = keyboardButtonStates[i];
-                short keyState;
-                try {
-                    keyState = ((Short) win32OSGetKeyState.invoke(null, Integer.valueOf(i))).shortValue();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                    return;
-                }
-                //keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ > 0 : false;
-                boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
-                if(!keyboardButtonStates[i]) {
-                    if(pressed) {
-                        keyboardButtonStates[i] = true;
-                        keyboardButtonHoldTimes[i] = 0;
-                        keyboardButtonDownTimes[i] = now;
-                        onKeyDown(i);
-                    }
-                } else if(!pressed) {
-                    keyboardButtonStates[i] = false;
+            //keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ > 0 : false;
+            boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
+            if(!keyboardButtonStates[i]) {
+                if(pressed) {
+                    keyboardButtonStates[i] = true;
                     keyboardButtonHoldTimes[i] = 0;
-                    onKeyUp(i);
+                    keyboardButtonDownTimes[i] = now;
+                    onKeyDown(i);
                 }
-                if(lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
-                    if(keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
-                        keyboardButtonHoldTimes[i] = now;
-                    }
-                    if(now - keyboardButtonHoldTimes[i] >= 40) {
-                        keyboardButtonHoldTimes[i] = now;
-                        onKeyHeld(i);
-                    }
+            } else if(!pressed) {
+                keyboardButtonStates[i] = false;
+                keyboardButtonHoldTimes[i] = 0;
+                onKeyUp(i);
+            }
+            if(lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
+                if(keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
+                    keyboardButtonHoldTimes[i] = now;
+                }
+                if(now - keyboardButtonHoldTimes[i] >= 40) {
+                    keyboardButtonHoldTimes[i] = now;
+                    onKeyHeld(i);
                 }
             }
-		}
+        }
 	}
     
 

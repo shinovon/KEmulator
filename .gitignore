@@ -46,7 +46,8 @@ obf/mapping*.txt
 x64home/track.txt
 
 kemulator.cfg
-obfx64/mapping.txt
+mapping.txt
 .idea/uiDesigner.xml
 *.exe
 home/uei/emulator.jar
+config_fast.txt
