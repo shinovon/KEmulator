@@ -7,6 +7,7 @@ import java.util.*;
 import emulator.*;
 import emulator.ui.IEmulator;
 import emulator.ui.IProperty;
+import emulator.ui.swt.EmulatorImpl;
 
 import java.io.*;
 
@@ -240,6 +241,8 @@ public class RecordStore {
         String[] list = null;
         try {
             IEmulator em = Emulator.getEmulator();
+            if (((EmulatorImpl) em).midletProps == null)
+                return null;
             File file = new File(getRootPath(null, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name")));
             list = file.list();
             ArrayList<String> tmp = new ArrayList<String>();
