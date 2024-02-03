@@ -321,6 +321,7 @@ public final class Property implements IProperty
         antiAliasBtn = null;
         this.loadProperties();
         this.updateProxy();
+        UILocale.initLocale();
     }
     
     public final void method354(final Shell shell) {
@@ -546,6 +547,7 @@ public final class Property implements IProperty
                 }
             }
             Settings.pollKeyboardOnRepaint = Boolean.valueOf(properties.getProperty("PollKeyboardOnRepaint", "true"));
+            Settings.uiLanguage = properties.getProperty("UILanguage", "en");
             fileInputStream.close();
         }
         catch (Exception ex) {
@@ -674,6 +676,7 @@ public final class Property implements IProperty
                 properties.setProperty("ControllerMap."+e.getKey(), e.getValue());
             }
             properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
+            properties.setProperty("UILanguage", Settings.uiLanguage);
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         }
@@ -1055,7 +1058,7 @@ public final class Property implements IProperty
         (this.aCLabel673 = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_ENCODING", "Default Encoding:"));
         ((Control)this.aCLabel673).setLayoutData((Object)layoutData4);
         this.method379();
-        (this.labelLocale = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_LOCALE", "MIDP Locale:"));
+        (this.labelLocale = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_LOCALE", "MIDP Locale:"));
         ((Control)this.labelLocale).setLayoutData((Object)layoutData5);
         final GridData layoutData333;
         (layoutData333 = new GridData()).horizontalAlignment = 4;
@@ -1566,7 +1569,7 @@ public final class Property implements IProperty
         mediaGroup = new Group(this.mediaComp, 0);
         mediaGroup.setLayout(new GridLayout());
         mediaGroup.setLayoutData(fill);
-        new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Folder " + (Emulator.JAVA_64 ? "(64-bit only)" : " (32-bit only)") + ":"));
+        new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") + (Emulator.JAVA_64 ? " (64-bit only)" : " (32-bit only)") + ":");
         vlcDirText = new Text(mediaGroup, SWT.DEFAULT);
         vlcDirText.setEditable(true);
         vlcDirText.setEnabled(true);
@@ -1606,9 +1609,9 @@ public final class Property implements IProperty
         //inactiveTimerSpinner.setSelection(Emulator.inactivityTimer);
         (this.rpcBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_DISCORD_RICHPRESENCE", "Discord Rich Presence"));
         this.rpcBtn.setSelection(Emulator.rpcEnabled);
-        (this.antiAliasBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_AWT_ANTIALIASING", "AWT Smooth drawing"));
+        (this.antiAliasBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
         this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
-//        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_POLL_ON_REPAINT", "Poll keyboard on repaint"));
+//        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
 //        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
     }
     
@@ -1997,7 +2000,7 @@ public final class Property implements IProperty
     
     private void method352() {
         Emulator.getEmulator().getScreen();
-        EmulatorScreen.method554();
+        EmulatorScreen.pauseStep();
         if (this.aText635.getText().trim().length() < 1) {
             final MessageBox messageBox;
             ((Dialog)(messageBox = new MessageBox(this.setsShell))).setText(UILocale.get("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
@@ -2010,7 +2013,7 @@ public final class Property implements IProperty
             messageBox2.setMessage(UILocale.get("OPTION_NETWORK_PROXY_UNIMP", "Proxy test is underimplemented!"));
             messageBox2.open();
         }
-        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method571();
+        ((EmulatorScreen)Emulator.getEmulator().getScreen()).resumeStep();
     }
     
     private void updateProxy() {

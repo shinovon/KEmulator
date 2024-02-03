@@ -1187,7 +1187,6 @@ public class Emulator
             new ProcessBuilder(new String[0]).directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
         } catch (Exception ex) {
         	ex.printStackTrace();
-            AntiCrack(ex);
         }
     	CustomMethod.close();
         System.exit(0);
@@ -1220,7 +1219,7 @@ public class Emulator
         }
         return null;
     }
-    
+
     public static void AntiCrack(final Exception ex) {
         ex.toString();
     }

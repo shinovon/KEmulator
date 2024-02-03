@@ -413,7 +413,7 @@ public final class Class5 implements Runnable, DisposeListener
         (this.aTree554 = new Tree((Composite)this.aShell557, 67584)).setHeaderVisible(true);
         this.aTree554.setLinesVisible(true);
         ((Control)this.aTree554).setLayoutData((Object)layoutData);
-        ((Control)this.aTree554).setToolTipText("Rigth click to open a Object Watcher");
+        ((Control)this.aTree554).setToolTipText("Right click to open a Object Watcher");
         this.aTree554.addTreeListener((TreeListener)new Class6(this));
         ((Control)this.aTree554).addMouseListener((MouseListener)new Class12(this));
         final TreeColumn treeColumn;

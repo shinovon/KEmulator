@@ -20,7 +20,7 @@ final class Class164 extends SelectionAdapter
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         Emulator.getEmulator().getScreen();
-        EmulatorScreen.method554();
+        EmulatorScreen.pauseStep();
         final FileDialog fileDialog;
         ((Dialog)(fileDialog = new FileDialog(Class46.method442(this.aClass46_1432), 8192))).setText(UILocale.get("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
         fileDialog.setFileName("bytecode.txt");
@@ -38,6 +38,6 @@ final class Class164 extends SelectionAdapter
                 ex.printStackTrace();
             }
         }
-        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method571();
+        ((EmulatorScreen)Emulator.getEmulator().getScreen()).resumeStep();
     }
 }

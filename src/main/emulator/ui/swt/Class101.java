@@ -15,7 +15,7 @@ final class Class101 extends SelectionAdapter
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         Emulator.getEmulator().getScreen();
-        EmulatorScreen.method554();
+        EmulatorScreen.pauseStep();
         final DirectoryDialog directoryDialog;
         ((Dialog)(directoryDialog = new DirectoryDialog(Property.method364(this.aClass38_1055)))).setText(UILocale.get("OPTION_RECORDS_OPEN_DIRECTORY", "Select a directory for rms"));
         directoryDialog.setMessage(UILocale.get("OPTION_RECORDS_CHOOSE_DIR", "Choose a directory"));
@@ -25,6 +25,6 @@ final class Class101 extends SelectionAdapter
             Property.method421(this.aClass38_1055).setText(open);
             Property.method389(this.aClass38_1055);
         }
-        ((EmulatorScreen)Emulator.getEmulator().getScreen()).method571();
+        ((EmulatorScreen)Emulator.getEmulator().getScreen()).resumeStep();
     }
 }

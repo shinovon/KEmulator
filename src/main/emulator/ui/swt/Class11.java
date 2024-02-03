@@ -140,7 +140,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         (layout = new FillLayout()).spacing = 0;
         layout.marginWidth = 1;
         layout.marginHeight = 1;
-        ((Decorations)(this.aShell568 = new Shell())).setText(UILocale.get("LOG_FRAME_TITLE", "LogFrame"));
+        ((Decorations)(this.aShell568 = new Shell())).setText(UILocale.get("LOG_FRAME_TITLE", "Log"));
         ((Decorations)this.aShell568).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Composite)this.aShell568).setLayout((Layout)layout);
         ((Control)this.aShell568).setSize(new Point(310, 254));

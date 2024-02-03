@@ -95,18 +95,18 @@ MouseTrackListener
     MenuItem interposeHightMenuItem;
     MenuItem speedUpMenuItem;
     MenuItem slowDownMenuItem;
-    MenuItem startpauseTickMenuItem;
-    MenuItem resetTickMenuItem;
+//    MenuItem startpauseTickMenuItem;
+//    MenuItem resetTickMenuItem;
     MenuItem recordKeysMenuItem;
     MenuItem enableAutoplayMenuItem;
     MenuItem captureToFileMenuItem;
     MenuItem captureToClipboardMenuItem;
     MenuItem startRecordAviMenuItem;
     MenuItem stopRecordAviMenuItem;
-    MenuItem connectNetworkMenuItem;
-    MenuItem disconnectNetworkMenuItem;
-    MenuItem channelUpMenuItem;
-    MenuItem channelDownMenuItem;
+//    MenuItem connectNetworkMenuItem;
+//    MenuItem disconnectNetworkMenuItem;
+//    MenuItem channelUpMenuItem;
+//    MenuItem channelDownMenuItem;
     MenuItem showTrackInfoMenuItem;
     MenuItem aMenuItem949;
     MenuItem aMenuItem950;
@@ -128,11 +128,11 @@ MouseTrackListener
     private static AVIWriter aviWriter;
     private static int anInt1012;
     private static String aString993;
-    private static long aLong991;
-    private static long aLong1000;
-    private static long aLong1007;
-    private static boolean aBoolean967;
-    private static boolean aBoolean992;
+//    private static long aLong991;
+//    private static long aLong1000;
+//    private static long aLong1007;
+//    private static boolean aBoolean967;
+//    private static boolean aBoolean992;
     private int pauseState;
     private final String[] aStringArray981;
     private boolean infosEnabled;
@@ -480,7 +480,7 @@ MouseTrackListener
        Settings.canvasScale = (int)(this.zoom * 100.0F);
        this.caret.setWindowZoom(this.zoom);
        this.d();
-       this.h();
+       this.updateStatus();
     }
 
     
@@ -505,7 +505,7 @@ MouseTrackListener
         }
     }
     
-    private void method583() {
+    private void pauseScreen() {
         if (this.screenImg != null && !this.screenImg.isDisposed()) {
             this.screenImg.dispose();
         }
@@ -610,34 +610,17 @@ MouseTrackListener
     }
     
 
-    private void h() {
-       long var1 = 0L;
-       long var3;
-       long var5 = (var3 = ((aBoolean967?aLong1007:System.currentTimeMillis()) - aLong1000) / 1000L) / 60L;
-       var3 %= 60L;
-       String var7 = var5 < 10L?0 + String.valueOf(var5):String.valueOf(var5);
-       var7 = var7 + ":" + (var3 < 10L?0 + String.valueOf(var3):String.valueOf(var3));
+    private void updateStatus() {
        String var8 = this.zoom == 1.0F?" ":"  ";
-       StringBuffer var9;
-       (var9 = new StringBuffer()).append((int)(this.zoom * 100.0F));
+       StringBuffer var9  = new StringBuffer();
+       var9.append((int)(this.zoom * 100.0F));
        var9.append("%");
        var9.append(var8);
-       if(this.pauseState != 0 && Emulator.getNetMonitor().b()) {
-          var9.append(emulator.UILocale.get("MAIN_INFO_BAR_NET", "NET"));
-          var9.append("(");
-          var9.append(Emulator.getNetMonitor().aInt());
-          var9.append(")");
-       } else {
-          var9.append(this.aStringArray981[this.pauseState]);
-       }
-
-       var9.append(var8);
-       var9.append(var7);
+       var9.append(this.aStringArray981[this.pauseState]);
        var9.append(var8);
        if(Settings.f > 0) {
           var9.append("x");
        }
-
        var9.append(Settings.f);
        this.aCLabel994.setText(var9.toString());
     }
@@ -718,7 +701,7 @@ MouseTrackListener
         this.rotateScreenMenuItem.addSelectionListener((SelectionListener)this);
 
         this.rotate90MenuItem = new MenuItem(this.menuView, 8);
-        this.rotate90MenuItem.setText("Rotate 90 Degrees");
+        this.rotate90MenuItem.setText(emulator.UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees"));
         this.rotate90MenuItem.addSelectionListener(this);
         (this.forecPaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
         this.forecPaintMenuItem.addSelectionListener((SelectionListener)this);
@@ -765,16 +748,16 @@ MouseTrackListener
         this.interposeHightMenuItem.addSelectionListener((SelectionListener)new Class42(this));
         menuItem4.setMenu(this.menuInterpolation);
         new MenuItem(this.menuTool, 2);
-        (this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPPEDUP", "Speed Up") + "\tAlt+>");
+        (this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPEEDUP", "Speed Up") + "\tAlt+>");
         this.speedUpMenuItem.addSelectionListener((SelectionListener)this);
-        (this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPPEDDONW", "Slow Down") + "\tAlt+<");
+        (this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPEEDDOWN", "Slow Down") + "\tAlt+<");
         this.slowDownMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuTool, 2);
-        (this.startpauseTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKSTART", "Start/Pause Tick") + "\tCtrl+K");
-        this.startpauseTickMenuItem.addSelectionListener((SelectionListener)this);
-        (this.resetTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKRESET", "Reset Tick") + "\tCtrl+L");
-        this.resetTickMenuItem.addSelectionListener((SelectionListener)this);
-        new MenuItem(this.menuTool, 2);
+//        (this.startpauseTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKSTART", "Start/Pause Tick") + "\tCtrl+K");
+//        this.startpauseTickMenuItem.addSelectionListener((SelectionListener)this);
+//        (this.resetTickMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_TICKRESET", "Reset Tick") + "\tCtrl+L");
+//        this.resetTickMenuItem.addSelectionListener((SelectionListener)this);
+//        new MenuItem(this.menuTool, 2);
         (this.recordKeysMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.get("MENU_TOOL_RECORD_KEY", "Record Keys"));
         this.recordKeysMenuItem.addSelectionListener((SelectionListener)this);
         this.recordKeysMenuItem.setSelection(Settings.recordKeys);
@@ -795,23 +778,23 @@ MouseTrackListener
         (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
         this.stopRecordAviMenuItem.addSelectionListener((SelectionListener)this);
         new MenuItem(this.menuTool, 2);
-        (this.connectNetworkMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CONN_NETWORK", "Connect to Network"));
-        this.connectNetworkMenuItem.addSelectionListener((SelectionListener)this);
-        (this.disconnectNetworkMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_DISCONN_NETWORK", "Disconnect to Network"));
-        this.disconnectNetworkMenuItem.addSelectionListener((SelectionListener)this);
-        (this.channelUpMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CHANNEL_UP", "Channel up") + "\tCtrl+>");
-        this.channelUpMenuItem.addSelectionListener((SelectionListener)this);
-        this.channelUpMenuItem.setAccelerator(262206);
-        (this.channelDownMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CHANNEL_DOWN", "Channel down") + "\tCtrl+<");
-        this.channelDownMenuItem.addSelectionListener((SelectionListener)this);
-        this.channelDownMenuItem.setAccelerator(262204);
-        new MenuItem(this.menuTool, 2);
+//        (this.connectNetworkMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CONN_NETWORK", "Connect to Network"));
+//        this.connectNetworkMenuItem.addSelectionListener((SelectionListener)this);
+//        (this.disconnectNetworkMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_DISCONN_NETWORK", "Disconnect to Network"));
+//        this.disconnectNetworkMenuItem.addSelectionListener((SelectionListener)this);
+//        (this.channelUpMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CHANNEL_UP", "Channel up") + "\tCtrl+>");
+//        this.channelUpMenuItem.addSelectionListener((SelectionListener)this);
+//        this.channelUpMenuItem.setAccelerator(262206);
+//        (this.channelDownMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CHANNEL_DOWN", "Channel down") + "\tCtrl+<");
+//        this.channelDownMenuItem.addSelectionListener((SelectionListener)this);
+//        this.channelDownMenuItem.setAccelerator(262204);
+//        new MenuItem(this.menuTool, 2);
         (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
         this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
         this.showTrackInfoMenuItem.addSelectionListener((SelectionListener)this);
         this.showTrackInfoMenuItem.setAccelerator(16777228);
         this.canvasKeyboardMenuItem = new MenuItem(this.menuTool, 32);
-        canvasKeyboardMenuItem.setText("QWERTY Mode");
+        canvasKeyboardMenuItem.setText(emulator.UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
         canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
         canvasKeyboardMenuItem.addSelectionListener((SelectionListener)this);
         this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
@@ -821,7 +804,7 @@ MouseTrackListener
         fpsModeMenuItem.setAccelerator(SWT.ALT + 'F');
         menuItemTool.setMenu(this.menuTool);
         this.networkKillswitchMenuItem = new MenuItem(this.menuTool, 32);
-        networkKillswitchMenuItem.setText("Disable network access");
+        networkKillswitchMenuItem.setText(emulator.UILocale.get("MENU_TOOL_DISABLE_NETWORK_ACCESS", "Disable network access"));
         networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
         networkKillswitchMenuItem.addSelectionListener((SelectionListener)this);
         this.menuMidlet = new Menu(menuItemMidlet);
@@ -895,7 +878,6 @@ MouseTrackListener
         this.swt3dMenuItem.addSelectionListener((SelectionListener)this);
         this.swt3dMenuItem.setEnabled(false);
         menuItem8.setMenu(this.menu3dEngine);
-
        */
         new MenuItem(this.menuMidlet, 2);
         (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_SUSPEND", "Suspend") + "\tCtrl+S");
@@ -923,8 +905,8 @@ MouseTrackListener
         this.forecPaintMenuItem.setAccelerator(SWT.CONTROL | 70);
         this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
         this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
-        this.startpauseTickMenuItem.setAccelerator(SWT.CONTROL | 75);
-        this.resetTickMenuItem.setAccelerator(SWT.CONTROL | 76);
+//        this.startpauseTickMenuItem.setAccelerator(SWT.CONTROL | 75);
+//        this.resetTickMenuItem.setAccelerator(SWT.CONTROL | 76);
         this.stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
         this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
         this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
@@ -1000,22 +982,22 @@ MouseTrackListener
         }
     }
     
-    protected static void method554() {
-        Settings.e = 1;
-        if (!EmulatorScreen.aBoolean992 && EmulatorScreen.aLong991 == 0L) {
-            EmulatorScreen.aLong991 = System.currentTimeMillis();
-        }
+    protected static void pauseStep() {
+        Settings.steps = 1;
+//        if (!EmulatorScreen.aBoolean992 && EmulatorScreen.aLong991 == 0L) {
+//            EmulatorScreen.aLong991 = System.currentTimeMillis();
+//        }
     }
     
-    protected final void method571() {
-        Settings.e = -1;
+    protected final void resumeStep() {
+        Settings.steps = -1;
         if (this.screenImg != null && !this.screenImg.isDisposed()) {
             this.screenImg.dispose();
         }
-        if (!EmulatorScreen.aBoolean992 && this.pauseState == 1 && EmulatorScreen.aLong991 != 0L) {
-            EmulatorScreen.aLong1000 += System.currentTimeMillis() - EmulatorScreen.aLong991;
-            EmulatorScreen.aLong991 = 0L;
-        }
+//        if (!EmulatorScreen.aBoolean992 && this.pauseState == 1 && EmulatorScreen.aLong991 != 0L) {
+//            EmulatorScreen.aLong1000 += System.currentTimeMillis() - EmulatorScreen.aLong991;
+//            EmulatorScreen.aLong991 = 0L;
+//        }
     }
     
     public final void widgetSelected(final SelectionEvent selectionEvent) {
@@ -1051,7 +1033,7 @@ MouseTrackListener
             }
             else {
                 if (menuItem.equals(this.startRecordAviMenuItem)) {
-                    method554();
+                    pauseStep();
                     final String string2 = Emulator.getAbsolutePath() + "/capture/";
                     final File file2;
                     if (!(file2 = new File(string2)).exists() || !file2.isDirectory()) {
@@ -1072,7 +1054,7 @@ MouseTrackListener
                         ++EmulatorScreen.anInt1012;
                         this.updatePauseState();
                     }
-                    this.method571();
+                    this.resumeStep();
                     return;
                 }
                 if (menuItem.equals(this.stopRecordAviMenuItem)) {
@@ -1083,23 +1065,23 @@ MouseTrackListener
                     this.updatePauseState();
                     return;
                 }
-                if (menuItem.equals(this.connectNetworkMenuItem)) {
-                    Emulator.getNetMonitor().a();
-                    Emulator.getEmulator().getLogStream().println("!!!Emulator connect to network " + (true ? "Successful!" : "failed!"));
-                    this.updatePauseState();
-                    return;
-                }
-                if (menuItem.equals(this.disconnectNetworkMenuItem)) {
-                    Emulator.getNetMonitor().a();
-                    Emulator.getEmulator().getLogStream().println("!!!Emulator disconnect to network!");
-                    this.updatePauseState();
-                    return;
-                }
-                if (menuItem.equals(this.channelUpMenuItem)) {
-                    Emulator.getNetMonitor().a(true);
-                    this.updatePauseState();
-                    return;
-                }
+//                if (menuItem.equals(this.connectNetworkMenuItem)) {
+//                    boolean bool = Emulator.getNetMonitor().aBoolean();
+//                    Emulator.getEmulator().getLogStream().println("!!!Emulator connect to network " + (bool ? "Successful!" : "failed!"));
+//                    this.updatePauseState();
+//                    return;
+//                }
+//                if (menuItem.equals(this.disconnectNetworkMenuItem)) {
+//                    Emulator.getNetMonitor().a();
+//                    Emulator.getEmulator().getLogStream().println("!!!Emulator disconnect to network!");
+//                    this.updatePauseState();
+//                    return;
+//                }
+//                if (menuItem.equals(this.channelUpMenuItem)) {
+//                    Emulator.getNetMonitor().a(true);
+//                    this.updatePauseState();
+//                    return;
+//                }
                 if(menuItem.equals(canvasKeyboardMenuItem)) {
                 	Settings.canvasKeyboard = canvasKeyboardMenuItem.getSelection();
                 	toggleMenuAccelerators(!Settings.canvasKeyboard);
@@ -1118,11 +1100,11 @@ MouseTrackListener
                     return;
                 }
                 
-                if (menuItem.equals(this.channelDownMenuItem)) {
-                    Emulator.getNetMonitor().a(false);
-                    this.updatePauseState();
-                    return;
-                }
+//                if (menuItem.equals(this.channelDownMenuItem)) {
+//                    Emulator.getNetMonitor().a(false);
+//                    this.updatePauseState();
+//                    return;
+//                }
                 if (menuItem.equals(this.showTrackInfoMenuItem)) {
                     Settings.threadMethodTrack = !Settings.threadMethodTrack;
                     return;
@@ -1135,46 +1117,46 @@ MouseTrackListener
                     this.zoomOut();
                     return;
                 }
-                if (menuItem.equals(this.startpauseTickMenuItem)) {
-                    EmulatorScreen.aBoolean967 = !EmulatorScreen.aBoolean967;
-                    if (EmulatorScreen.aBoolean967) {
-                        EmulatorScreen.aLong1007 = System.currentTimeMillis();
-                    }
-                    if (EmulatorScreen.aBoolean992) {
-                        EmulatorScreen.aLong1000 = System.currentTimeMillis();
-                        EmulatorScreen.aBoolean992 = false;
-                    }
-                    this.h();
-                    return;
-                }
-                if (menuItem.equals(this.resetTickMenuItem)) {
-                    EmulatorScreen.aLong1007 = System.currentTimeMillis();
-                    EmulatorScreen.aLong991 = 0L;
-                    EmulatorScreen.aBoolean967 = true;
-                    EmulatorScreen.aBoolean992 = true;
-                    this.h();
-                    return;
-                }
+//                if (menuItem.equals(this.startpauseTickMenuItem)) {
+//                    EmulatorScreen.aBoolean967 = !EmulatorScreen.aBoolean967;
+//                    if (EmulatorScreen.aBoolean967) {
+//                        EmulatorScreen.aLong1007 = System.currentTimeMillis();
+//                    }
+//                    if (EmulatorScreen.aBoolean992) {
+//                        EmulatorScreen.aLong1000 = System.currentTimeMillis();
+//                        EmulatorScreen.aBoolean992 = false;
+//                    }
+//                    this.updateStatus();
+//                    return;
+//                }
+//                if (menuItem.equals(this.resetTickMenuItem)) {
+//                    EmulatorScreen.aLong1007 = System.currentTimeMillis();
+//                    EmulatorScreen.aLong991 = 0L;
+//                    EmulatorScreen.aBoolean967 = true;
+//                    EmulatorScreen.aBoolean992 = true;
+//                    this.updateStatus();
+//                    return;
+//                }
                 if (menuItem.equals(this.speedUpMenuItem)) {
                     if (Settings.f == -1) {
                         Settings.f = 1;
-                        this.h();
+                        this.updateStatus();
                         return;
                     }
                     if (Settings.f < 100) {
                         ++Settings.f;
-                        this.h();
+                        this.updateStatus();
                     }
                 }
                 else if (menuItem.equals(this.slowDownMenuItem)) {
                     if (Settings.f == 1) {
                         Settings.f = -1;
-                        this.h();
+                        this.updateStatus();
                         return;
                     }
                     if (Settings.f > -100) {
                         --Settings.f;
-                        this.h();
+                        this.updateStatus();
                     }
                 }
                 else {
@@ -1198,7 +1180,7 @@ MouseTrackListener
                 Emulator.loadGame(null, Settings.g2d, 1, false);
             }
             else if (menuItem.equals(this.loadJarMenuItem) /*|| (equals = menuItem.equals(this.loadWithConsoleMenuItem))*/) {
-                method554();
+                pauseStep();
                 final FileDialog fileDialog2;
                 ((Dialog)(fileDialog2 = new FileDialog(this.shell, 4096))).setText(emulator.UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
                 fileDialog2.setFilterExtensions(new String[] { "*.jar;*.jad", "*.*" });
@@ -1207,10 +1189,10 @@ MouseTrackListener
                     Settings.recordedKeysFile = null;
                     Emulator.loadGame(open2, Settings.g2d, 1, equals);
                 }
-                this.method571();
+                this.resumeStep();
             }
             else if (menuItem.equals(this.loadAutoPlayMenuItem)) {
-                method554();
+                pauseStep();
                 final FileDialog fileDialog3;
                 ((Dialog)(fileDialog3 = new FileDialog(this.shell, 4096))).setText(emulator.UILocale.get("OPEN_REC_FILE", "Open a record file"));
                 fileDialog3.setFilterPath(Emulator.getAbsolutePath());
@@ -1232,7 +1214,7 @@ MouseTrackListener
                         Emulator.loadGame(s, Settings.g2d, 1, false);
                     }
                 }
-                this.method571();
+                this.resumeStep();
             }
             else if (menuItem.equals(this.suspendMenuItem)) {
                 if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
@@ -1240,11 +1222,11 @@ MouseTrackListener
                 }
                 this.pauseState = 2;
                 Emulator.getEventQueue().queue(16);
-                this.method583();
+                this.pauseScreen();
                 ((Control)this.canvas).redraw();
-                if (!EmulatorScreen.aBoolean992 && EmulatorScreen.aLong991 == 0L) {
-                    EmulatorScreen.aLong991 = System.currentTimeMillis();
-                }
+//                if (!EmulatorScreen.aBoolean992 && EmulatorScreen.aLong991 == 0L) {
+//                    EmulatorScreen.aLong991 = System.currentTimeMillis();
+//                }
             }
             else if (menuItem.equals(this.resumeMenuItem)) {
                 if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
@@ -1253,23 +1235,23 @@ MouseTrackListener
                 this.pauseState = 1;
                 Emulator.getEventQueue().queue(15);
                 this.screenImg.dispose();
-                if (Settings.e == 0) {
-                    this.method583();
+                if (Settings.steps == 0) {
+                    this.pauseScreen();
                     ((Control)this.canvas).redraw();
                 }
                 else {
                     Emulator.getCanvas().repaint();
                 }
-                if (!EmulatorScreen.aBoolean992 && Settings.e == -1 && EmulatorScreen.aLong991 != 0L) {
-                    EmulatorScreen.aLong1000 += System.currentTimeMillis() - EmulatorScreen.aLong991;
-                    EmulatorScreen.aLong991 = 0L;
-                }
+//                if (!EmulatorScreen.aBoolean992 && Settings.e == -1 && EmulatorScreen.aLong991 != 0L) {
+//                    EmulatorScreen.aLong1000 += System.currentTimeMillis() - EmulatorScreen.aLong991;
+//                    EmulatorScreen.aLong991 = 0L;
+//                }
             }
             else if (menuItem.equals(this.pausestepMenuItem)) {
-                method554();
+                pauseStep();
             }
             else if (menuItem.equals(this.playResumeMenuItem)) {
-                this.method571();
+                this.resumeStep();
             }
             else if (menuItem.equals(this.openJadMenuItem)) {
                 try {
@@ -1468,7 +1450,7 @@ MouseTrackListener
         this.xrayViewMenuItem.setSelection(Settings.xrayView);
         this.forecPaintMenuItem.setEnabled(this.pauseState != 0);
         this.pausestepMenuItem.setEnabled(this.pauseState != 0);
-        this.playResumeMenuItem.setEnabled(Settings.e >= 0 && this.pauseState != 0);
+        this.playResumeMenuItem.setEnabled(Settings.steps >= 0 && this.pauseState != 0);
         this.openJadMenuItem.setEnabled(this.pauseState != 0);
         this.aMenuItem958.setEnabled(this.pauseState != 0);
         this.aMenuItem959.setEnabled(this.pauseState != 0);
@@ -1477,11 +1459,11 @@ MouseTrackListener
         //this.aMenuItem962.setEnabled(this.pauseState != 0);
         this.startRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter == null);
         this.stopRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter != null);
-        this.connectNetworkMenuItem.setEnabled(this.pauseState != 0 && !Emulator.getNetMonitor().b());
-        this.disconnectNetworkMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
-        this.channelUpMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
-        this.channelDownMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
-        this.h();
+//        this.connectNetworkMenuItem.setEnabled(this.pauseState != 0 && !Emulator.getNetMonitor().b());
+//        this.disconnectNetworkMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
+//        this.channelUpMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
+//        this.channelDownMenuItem.setEnabled(this.pauseState != 0 && Emulator.getNetMonitor().b());
+        this.updateStatus();
     }
     
     public final void widgetDefaultSelected(final SelectionEvent selectionEvent) {
@@ -1640,9 +1622,9 @@ MouseTrackListener
             EmulatorScreen.aviWriter.method843(this.screenCopyAwt.getData());
         }
         ((Control)this.canvas).redraw();
-        if (!EmulatorScreen.aBoolean967 && !EmulatorScreen.aBoolean992) {
-            this.h();
-        }
+//        if (!EmulatorScreen.aBoolean967 && !EmulatorScreen.aBoolean992) {
+        this.updateStatus();
+//        }
         ++EmulatorScreen.aLong982;
         Emulator.getEmulator().syncValues();
         Profiler.reset();
@@ -2518,11 +2500,11 @@ MouseTrackListener
     static {
         EmulatorScreen.anInt1012 = 1;
         EmulatorScreen.aString993 = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss", Locale.ENGLISH).format(Calendar.getInstance().getTime()) + "_";
-        EmulatorScreen.aLong991 = 0L;
-        EmulatorScreen.aLong1000 = 0L;
-        EmulatorScreen.aLong1007 = 0L;
-        EmulatorScreen.aBoolean967 = true;
-        EmulatorScreen.aBoolean992 = true;
+//        EmulatorScreen.aLong991 = 0L;
+//        EmulatorScreen.aLong1000 = 0L;
+//        EmulatorScreen.aLong1007 = 0L;
+//        EmulatorScreen.aBoolean967 = true;
+//        EmulatorScreen.aBoolean992 = true;
     }
     
     final class ShellPosition implements Runnable

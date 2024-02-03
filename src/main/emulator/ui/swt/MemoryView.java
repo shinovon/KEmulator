@@ -300,7 +300,7 @@ public final class MemoryView implements DisposeListener
         this.aButton1129.addSelectionListener((SelectionListener)new Class125(this));
         (this.aButton1137 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_RESET_IMAGE", "Reset Image Usage"));
         this.aButton1137.addSelectionListener((SelectionListener)new Class123(this));
-        (this.aCLabel1149 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SIZE", "Size:"));
+        (this.aCLabel1149 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SIZE", "Size") + ":");
         (this.aCLabel1152 = new CLabel(this.aComposite1098, 0)).setText("");
         ((Control)this.aCLabel1152).setLayoutData((Object)layoutData);
         (this.aButton1115 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_ASCEND", "Ascending"));
@@ -418,11 +418,11 @@ public final class MemoryView implements DisposeListener
         ((Scrollable)this.aCanvas1095).getVerticalBar().addSelectionListener((SelectionListener)new Class23(this));
         this.aMenu1084 = new Menu((Decorations)this.aShell1080, 8);
         final MenuItem menuItem;
-        (menuItem = new MenuItem(this.aMenu1084, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_AS", "Save As ..."));
+        (menuItem = new MenuItem(this.aMenu1084, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_AS", "Save As..."));
         menuItem.addSelectionListener((SelectionListener)new Class36(this));
         this.aMenu1113 = new Menu((Decorations)this.aShell1080, 8);
         final MenuItem menuItem2;
-        (menuItem2 = new MenuItem(this.aMenu1113, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Save All Images ..."));
+        (menuItem2 = new MenuItem(this.aMenu1113, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Save All Images..."));
         menuItem2.addSelectionListener((SelectionListener)new Class33(this));
     }
     

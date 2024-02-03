@@ -23,7 +23,7 @@ public final class Settings
     public static boolean rightClickMenu;
     public static int canvasScale;
     public static int frameRate;
-    public static int e;
+    public static int steps;
     public static long aLong1235;
     public static String fileEncoding;
     public static String[] aArray;
@@ -67,6 +67,7 @@ public final class Settings
     public static int debugPort = 29292;
     public static Map<String, String> controllerBinds = new HashMap<String, String>();
     public static boolean pollKeyboardOnRepaint = true;
+    public static String uiLanguage = "en";
 
     public Settings() {
         super();
@@ -76,8 +77,8 @@ public final class Settings
         Settings.g2d = 1;
        // Settings.g3d = 1;
         Settings.canvasScale = 100;
-        Settings.frameRate = 30;
-        Settings.e = -1;
+        Settings.frameRate = 60;
+        Settings.steps = -1;
         Settings.aArray = new String[5];
         Settings.f = 1;
         aRandom1238 = new Random();

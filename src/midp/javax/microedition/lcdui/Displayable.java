@@ -348,11 +348,11 @@ public class Displayable {
 	}
 
 	public static void checkForSteps() {
-		if (Settings.e >= 0) {
-			if (Settings.e == 0) {
+		if (Settings.steps >= 0) {
+			if (Settings.steps == 0) {
 				final long currentTimeMillis = System.currentTimeMillis();
 				try {
-					while (Settings.e == 0) {
+					while (Settings.steps == 0) {
 						Thread.sleep(250L);
 					}
 				} catch (Exception ex) {
@@ -360,7 +360,7 @@ public class Displayable {
 				}
 				Settings.aLong1235 += System.currentTimeMillis() - currentTimeMillis;
 			}
-			--Settings.e;
+			--Settings.steps;
 		}
 	}
 
