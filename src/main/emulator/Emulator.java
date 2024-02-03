@@ -1184,7 +1184,7 @@ public class Emulator
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {
-            new ProcessBuilder(new String[0]).command(cmd).inheritIO().start();
+            new ProcessBuilder(new String[0]).directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
         } catch (Exception ex) {
         	ex.printStackTrace();
             AntiCrack(ex);
