@@ -739,10 +739,10 @@ public final class Property implements IProperty
             Emulator.getEmulator().getScreen().stopVibra();
         }
         if (Settings.associateWithJar != this.aButton740.getSelection()) {
-            method371(Settings.associateWithJar = this.aButton740.getSelection());
+            associateJar(Settings.associateWithJar = this.aButton740.getSelection());
         }
         if (Settings.rightClickMenu != this.aButton743.getSelection()) {
-            method359(Settings.rightClickMenu = this.aButton743.getSelection());
+            regRightMenu(Settings.rightClickMenu = this.aButton743.getSelection());
         }
         Settings.enableKeyRepeat = this.aButton728.getSelection();
         Settings.ignoreFullScreen = this.aButton732.getSelection();
@@ -769,7 +769,7 @@ public final class Property implements IProperty
         this.updateProxy();
     }
     
-    private static void method359(final boolean b) {
+    private static void regRightMenu(final boolean b) {
         try {
             if (!b) {
                 Emulator.unregRightMenu();
@@ -784,7 +784,7 @@ public final class Property implements IProperty
         catch (Exception ex) {}
     }
     
-    private static void method371(final boolean b) {
+    private static void associateJar(final boolean b) {
         try {
             if (!b) {
                 Emulator.unregAssociateJar("KEmulator");

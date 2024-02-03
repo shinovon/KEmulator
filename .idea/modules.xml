@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/KEmulator.iml" filepath="$PROJECT_DIR$/KEmulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/KEmulator_base.iml" filepath="$PROJECT_DIR$/KEmulator_base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/win/KEmulator_win.iml" filepath="$PROJECT_DIR$/win/KEmulator_win.iml" />
+      <module fileurl="file://$PROJECT_DIR$/x64/KEmulator_x64.iml" filepath="$PROJECT_DIR$/x64/KEmulator_x64.iml" />
     </modules>
   </component>
 </project>

@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.widgets.*;
-import javax.microedition.m3g.*;
+
+import javax.microedition.m3g.Node;
 import javax.microedition.m3g.Group;
 
 final class Class48 implements Listener

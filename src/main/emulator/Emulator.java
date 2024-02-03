@@ -44,8 +44,6 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class Emulator
 {
-	// x64 build
-	public static final boolean _X64_VERSION = false;
 	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
 	
     static EmulatorImpl emulatorimpl;
@@ -84,12 +82,10 @@ public class Emulator
 
     public static final String version = "2.14.4";
     public static final int numericVersion = 14;
-	public static final String titleVersion = version;
-	public static final String aboutVersion = "v" + version;
-	public static final String propVersion = version;
     private static int dialogResult;
     public static boolean jdwpDebug;
     public static boolean uei;
+    private static IEmulatorPlatform platform;
 
     private static void loadRichPresence() {
 		if(!rpcEnabled)
@@ -406,46 +402,19 @@ public class Emulator
     }
     
     public static String getTitleVersionString() {
-        return "KEm" + (_X64_VERSION ? "nn64" : "nn")+ " " + titleVersion;
+        return platform.getTitleName() + " " + version;
     }
     
     public static String getCmdVersionString() {
-        return (_X64_VERSION ? "KEmulator nnX64" : "KEmulator nnmod") + " " + titleVersion;
+        return platform.getName() + " " + version;
     }
     
     public static String getInfoString() {
-    	if(_X64_VERSION) {
-            return "KEmulator nnmod " + aboutVersion+"\n\n"
-            		+ "\tMulti-Platform\n"
-            		+ "\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n"
-                	+ UILocale.get("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
-                	+ "\tMIDP 2.0 (JSR118)\n"
-                	+ "\tNokiaUI 1.4\n"
-                	+ "\tSprint 1.0\n"
-                	+ "\tWMA 1.0 (JSR120)\n"
-                    + "\t(no 3d support)"
-                	;
-    	}
-        return "KEmulator nnmod "+aboutVersion+"\n\n\t" +
-    	UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" +
-    	UILocale.get("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
-    	+ "\tMIDP 2.0 (JSR118)\n"
-    	+ "\tNokiaUI 1.4\n"
-    	+ "\tSamsung 1.0\n"
-    	+ "\tSprint 1.0\n"
-    	+ "\tWMA 1.0 (JSR120)\n"
-    	+ "\tSensor (JSR256)\n"
-    	+ "\tM3G 1.1 (JSR184)\n"
-        + "\tOpenGL ES (JSR239)\n"
-    	+ "\tMascot Capsule"
-    	;
+        return platform.getInfoString("v" + version);
     }
     
     public static String getAboutString() {
-    	if(_X64_VERSION) {
-            return "KEmulator v1.0.3" + "\nmulti-platform mod\n by nnproject (Shinovon)\n\t\t"+aboutVersion+"\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
-    	}
-        return "KEmulator v1.0.3" + "\n\tnnmod "+aboutVersion+"\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+        return "KEmulator nnmod "+version+"\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     }
     
     public static void getLibraries() {
@@ -730,7 +699,7 @@ public class Emulator
         		boolean x = c.exists("SW_PLATFORM") || c.exists("SW_PLATFORM_VERSION");
         		if(c.exists("SYMBIANOS_VERSION") && x)
         			if(c.getString("SYMBIANOS_VERSION").equals("9.3") || c.getString("SYMBIANOS_VERSION").equals("3"))
-        				Emulator.customUA = s2 + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + propVersion + ") UNTRUSTED/1.0";
+        				Emulator.customUA = s2 + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ") UNTRUSTED/1.0";
         		else if(c.exists("CUSTOM_UA")) {
         			Emulator.customUA = c.getString("CUSTOM_UA");
         		} else if(c.exists("MIDP20_CLDC11")) {
@@ -796,7 +765,7 @@ public class Emulator
         if (System.getProperty("wireless.messaging.version") == null) {
         	System.setProperty("wireless.messaging.version", "1.0");
         }
-        System.setProperty("kemulator.mod.version", propVersion);
+        System.setProperty("kemulator.mod.version", version);
         System.setProperty("kemulator.mod.versionint", "" + numericVersion);
         System.setProperty("com.nokia.mid.ui.softnotification", "true");
         System.setProperty("com.nokia.mid.ui.version", "1.4");
@@ -805,7 +774,7 @@ public class Emulator
         System.setProperty("kemulator.hwid", getHWID());
         System.setProperty("microedition.amms.version", "1.0");
         System.setProperty("org.pigler.api.version", "1.2-kemulator");
-        if(_X64_VERSION) System.setProperty("kemulator.x64", "true");
+        if(platform.isX64()) System.setProperty("kemulator.x64", "true");
 	    try {
 	        Webcam w = Webcam.getDefault();
 	        if(w != null) {
@@ -840,17 +809,17 @@ public class Emulator
     }
 
 	public static void main(final String[] commandLineArguments) {
-        if (!_X64_VERSION && JAVA_64) {
+        try {
+            platform = ((IEmulatorPlatform) Class.forName("emulator.EmulatorPlatform").newInstance());
+        } catch (Exception e) {
+            return;
+        }
+        if (!platform.isX64() && JAVA_64) {
             JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
             System.exit(0);
             return;
         }
-        System.setProperty("jna.nosys", "true");
-        if (_X64_VERSION) {
-            System.out.println("loading swt libary");
-            loadSWTLibrary();
-            loadJOGLLibrary();
-        }
+        platform.loadLibraries();
         midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.initLocale();
@@ -949,63 +918,6 @@ public class Emulator
         Emulator.emulatorimpl.getEmulatorScreen().start(true);
         EmulatorImpl.dispose();
         System.exit(0);
-    }
-
-    private static void loadJOGLLibrary() {
-        String osn = System.getProperty("os.name").toLowerCase();
-        String osa = System.getProperty("os.arch").toLowerCase();
-        String os =
-                osn.contains("win") ? "windows" :
-                        osn.contains("mac") ? "macosx" :
-                                osn.contains("linux") || osn.contains("nix") ? "linux" :
-                                        null;
-        if(os == null) {
-            return;
-        }
-        if(!osa.contains("amd64") && !osa.contains("86") && !osa.contains("armv6")) {
-            return;
-        }
-        String arch = osn.contains("macosx") ? "universal" : osa.contains("amd64") ? "amd64" : osa.contains("86") ? "i586" : osa;
-        String suffix = "-natives-" + os + "-" + arch + ".jar";
-
-        addToClassPath("gluegen-rt.jar");
-        addToClassPath("gluegen-rt" + suffix);
-        addToClassPath("jogl-all.jar");
-        addToClassPath("jogl-all" + suffix);
-    }
-
-    private static void loadSWTLibrary() {
-    	String osn = System.getProperty("os.name").toLowerCase();
-        String osa = System.getProperty("os.arch").toLowerCase();
-        String os = 
-            osn.contains("win") ? "win32" :
-            osn.contains("mac") ? "macosx" :
-            osn.contains("linux") || osn.contains("nix") ? "gtk-linux" :
-            null;
-        if(os == null) {
-        	throw new RuntimeException("unsupported os: " + osn);
-        }
-        if(!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64")) {
-        	throw new RuntimeException("unsupported arch: " + osa);
-        }
-        String arch = osa.contains("amd64") ? "x86_64" : osa.contains("86") ? "x86" : osa;
-        String swtFileName = "swt-" + os + "-" + arch + ".jar";
-        addToClassPath(swtFileName);
-
-	}
-
-    private static void addToClassPath(String s) {
-        try {
-            URLClassLoader classLoader = (URLClassLoader) Emulator.class.getClassLoader();
-            Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            addUrlMethod.setAccessible(true);
-            File f = new File("./"+s);
-            URL swtFileUrl = f.toURL();
-            addUrlMethod.invoke(classLoader, swtFileUrl);
-        }
-        catch(Exception e) {
-            throw new RuntimeException(s, e);
-        }
     }
 	private static void tryToSetDevice(final String deviceName) {
         Emulator.deviceName = deviceName;
@@ -1263,4 +1175,7 @@ public class Emulator
 		return x;
 	}
 
+    public static boolean isX64() {
+        return platform.isX64();
+    }
 }

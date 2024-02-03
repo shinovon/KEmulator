@@ -3,10 +3,6 @@ package emulator.graphics3D.view;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.microedition.m3g.Camera;
-import javax.microedition.m3g.Transform;
-
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
 import org.eclipse.swt.internal.opengl.win32.WGL;
 import org.eclipse.swt.internal.win32.OS;
@@ -14,6 +10,9 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 
 import emulator.Emulator;
+
+import javax.microedition.m3g.Camera;
+import javax.microedition.m3g.Transform;
 
 public final class a
 {

@@ -216,7 +216,7 @@ public final class Emulator3D implements IGraphics3D
     }
 
     private static boolean useWgl() {
-        return !Emulator._X64_VERSION || System.getProperty("os.name").toLowerCase().startsWith("win");
+        return !Emulator.isX64() || System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 
     private void releaseGl() {

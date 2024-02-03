@@ -10,7 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Package Files
 *.war
 *.nar
 *.ear
@@ -19,7 +19,7 @@
 *.rar
 *.jar0
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# virtual machine crash logs
 hs_err_pid*
 
 # eclipse dirs
@@ -28,26 +28,21 @@ hs_err_pid*
 *.cmd
 *.bat
 
-# compiled output
+# compiled binaries
 bin
 KEmulator.jar
+emulator.jar
+mapping*.txt
+*.exe
 
 # emulator files
 log.txt
 property.txt
 track.txt
+kemulator.cfg
 
 # vlc dirs
 plugins
 
-# obfuscation dir
-obf/*.jar
-obf/mapping*.txt
-x64home/track.txt
-
-kemulator.cfg
-mapping.txt
 .idea/uiDesigner.xml
-*.exe
-home/uei/emulator.jar
 config_fast.txt

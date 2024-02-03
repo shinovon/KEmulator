@@ -11,7 +11,7 @@ public final class i
      * x32
      */
     public static void a(final String s) {
-    	if(Emulator._X64_VERSION) throw new UnsatisfiedLinkError("x64 version!");
+    	if(Emulator.isX64()) throw new UnsatisfiedLinkError("x64 version!");
         try {
             try {
             	//String arch = System.getProperty("os.arch");

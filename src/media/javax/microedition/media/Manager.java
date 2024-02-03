@@ -64,7 +64,7 @@ public class Manager
     		requireLibVlc();
         	return new VLCPlayerImpl(inputStream, s);
         }
-        if(s.equals("audio/amr") && isLibVlcSupported() && Emulator._X64_VERSION) {
+        if(s.equals("audio/amr") && isLibVlcSupported() && Emulator.isX64()) {
         	return new VLCPlayerImpl(inputStream, s);
         }
 		// buffer
@@ -478,7 +478,7 @@ public class Manager
 					@Override
 					public boolean supported() {
 						// kemulator is windows only
-						return Emulator._X64_VERSION ? RuntimeUtil.isWindows() : true;
+						return  Emulator.isX64() ? RuntimeUtil.isWindows() : true;
 					}
 					
 					@Override
@@ -501,7 +501,7 @@ public class Manager
 				list.add(win);
 			}
 			list.add(new WindowsNativeDiscoveryStrategy());
-			if(Emulator._X64_VERSION) {
+			if(Emulator.isX64()) {
 				list.add(new OsxNativeDiscoveryStrategy());
 				list.add(new LinuxNativeDiscoveryStrategy());
 			}
