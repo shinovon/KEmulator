@@ -1,0 +1,306 @@
+#KEmulator nnmod localization file
+#Russian
+#by shinovon / nnproject MIDlets
+
+#Main Frame
+
+MENU_MIDLET=Мидлет
+MENU_TOOL=Функции
+MENU_VIEW=Вид
+
+MENU_MIDLET_LOAD_JAR=Открыть jar...
+MENU_MIDLET_LOAD_AUTO_PLAY=Открыть запись
+MENU_MIDLET_RECENTLY=Последние файлы
+MENU_MIDLET_2DENGINE=Движок 2D
+
+MENU_MIDLET_JAD=Открыть JAD в блокноте
+MENU_MIDLET_SUSPEND=Приостановить
+MENU_MIDLET_RESUME=Возобновить
+MENU_MIDLET_PAUSE_STEP=Пауза/Шаг
+MENU_MIDLET_PLAY_RESUME=Продолжить
+
+MENU_MIDLET_RESTART=Перезапуск
+MENU_MIDLET_EXIT=Выход
+
+
+MENU_VIEW_INFO=Инфо
+MENU_VIEW_XRAY=X-Ray
+MENU_VIEW_TOP=Поверх всех окон
+MENU_VIEW_ROTATE=Повернуть экран
+MENU_VIEW_FORCE_PAINT=Принудительно обновить
+MENU_VIEW_ROTATE_90=Повернуть экран на 90 гр.
+
+MENU_VIEW_KEYPAD=Окно кейпада
+MENU_VIEW_WATCHES=Классы
+MENU_VIEW_PROFILER=Профайлер
+MENU_VIEW_METHODS=Методы
+MENU_VIEW_MEMORY=Просмотр памяти
+MENU_VIEW_SMS=SMS консоль
+MENU_VIEW_SENSOR=Симулятор акселерометра
+MENU_VIEW_LOG=Логи
+
+MENU_VIEW_OPTIONS=Опции...
+MENU_VIEW_HELP=О Программе
+
+MENU_TOOL_ZOOMIN=Увеличить
+MENU_TOOL_ZOOMOUT=Уменьшить
+MENU_TOOL_INTERPOSE=Интерполяция
+MENU_TOOL_INTER_NEAREST=NearestNeighbor
+MENU_TOOL_INTER_HIGH=HighQuality
+MENU_TOOL_INTER_LOW=LowQuality
+
+MENU_TOOL_SPEEDUP=Ускорить
+MENU_TOOL_SPEEDDOWN=Замедлить
+
+MENU_TOOL_RECORD_KEY=Запись клавиш
+MENU_TOOL_AUTO_PLAY=Прогр. записи
+MENU_TOOL_CAPTURE_FILE=Скриншот в файл
+MENU_TOOL_CAPTURE_CLIP=Скриншот в буфер обмена
+
+MENU_TOOL_START_RECORD_AVI=Начать запись AVI
+MENU_TOOL_STOP_RECORD_AVI=Остановить запись AVI
+
+MENU_TOOL_SHOW_TRACK_INFO=Отображение трэка
+
+MENU_TOOL_QWERTY_MODE=Режим QWERTY
+MENU_TOOL_DISABLE_NETWORK_ACCESS=Отключить доступ к сети
+
+#Command bar
+
+MAIN_INFO_BAR_UNLOADED=ОЖИДАНИЕ
+MAIN_INFO_BAR_RUNNING=ЗАПУЩЕН
+MAIN_INFO_BAR_PAUSED=ПАУЗА
+
+#Dialog
+
+SAVE_TO_FILE=Сохранить
+OPEN_JAR_FILE=Открыть JAR
+OPEN_REC_FILE=Открыть запись
+LINK_JAR_FILE=Открыть JAR
+
+DIALOG_OK=OK
+DIALOG_CANCEL=Отмена
+
+
+#Info show
+
+INFO_FRAME_POS=Pos
+INFO_FRAME_COLOR=Color
+INFO_FRAME_RECT=R
+
+
+#About Frame
+
+ABOUT_FRAME_TITLE=О программе
+ABOUT_INFO_EMULATOR=Эмулятор J2ME
+ABOUT_INFO_APIS=Поддерживаемые API
+
+ABOUT_AUTHOR=Автор
+ABOUT_CHACK_NEW_VER=Check new version
+ABOUT_ONLINE_MANUAL=Online Manual
+
+
+#Keypad
+
+KEYPAD_FRAME_TITLE=Кейпад
+KEYPAD_FRAME_LSK=ЛСК
+KEYPAD_FRAME_RSK=ПСК
+
+
+#Log Frame
+
+LOG_FRAME_TITLE=Логи
+
+
+#MemoryView
+
+MEMORY_VIEW_TITLE=MemoryView
+MEMORY_VIEW_UPDATE=Обновить
+MEMORY_VIEW_AUTO_UPDATE=Авто обновление
+MEMORY_VIEW_BYTECODE_SIZE=Размер байткода:
+MEMORY_VIEW_TOTALMEM_SIZE=Общий размер:
+MEMORY_VIEW_OBJECT_SIZE=Размер объектов:
+MEMORY_VIEW_MAX_OBJECT_SIZE=Макс. размер объектов:
+MEMORY_VIEW_INTERVAL=Интервал (мс):
+
+MEMORY_VIEW_IMAGES=Изображения
+MEMORY_VIEW_SOUNDS=Плееры
+
+MEMORY_VIEW_ZOOM=Масш.:
+MEMORY_VIEW_SORT=Сорт.:
+MEMORY_VIEW_SIZE=Размер
+MEMORY_VIEW_ASCEND=По возрастанию
+MEMORY_VIEW_IMAGES_DRAWN=Отрисованные изобр.
+MEMORY_VIEW_UNUSED_REGION=Затемнять неисп. области
+MEMORY_VIEW_RESET_IMAGE=Сброс истории исп.
+MEMORY_VIEW_IMAGE_NEVER_DRAW=Неотрисованные изобр.
+MEMORY_VIEW_RELEASED_IMAGES=Удаленные изобр.
+MEMORY_VIEW_CLEAR_RELEASED_IMAGES=Очис. удален. изобр.
+
+MEMORY_VIEW_SORT_REFERENCE=По референсу
+MEMORY_VIEW_SORT_SIZE=По размеру
+MEMORY_VIEW_SORT_DRAW_COUNT=По кол-ву отрисовок
+
+MEMORY_VIEW_SAVE_AS=Сохранить как...
+MEMORY_VIEW_SAVE_TO_FILE=Сохранить в файл
+MEMORY_VIEW_SAVE_ALL=Сохранить все изображения...
+MEMORY_VIEW_SAVE_ALL_IMAGES=Сохранить все
+MEMORY_VIEW_CHOOSE_DIRECTORY=Выбор папки
+
+MEMORY_VIEW_SOUND_START=Старт
+MEMORY_VIEW_SOUND_PAUSE=Пауза
+MEMORY_VIEW_SOUND_STOP=Стоп
+MEMORY_VIEW_SOUND_VOLUME=Уровень:
+MEMORY_VIEW_SOUND_PROGRESS=Прогресс:
+MEMORY_VIEW_SOUND_EXPORT=Экспорт
+
+MEMORY_VIEW_INSTANCE=Instance
+MEMORY_VIEW_CONTENT_TYPE=ContentType
+MEMORY_VIEW_STATE=Состояние
+MEMORY_VIEW_LOOP_COUNT=LoopCount
+MEMORY_VIEW_DATA_SIZE=Размер данных
+
+MEMORY_VIEW_CLASS=Class
+MEMORY_VIEW_INSTANCES=Instances
+MEMORY_VIEW_TOTAL_HEAP_SIZE=Total Heap Size
+MEMORY_VIEW_REFERENCE=Reference
+
+
+#SMS Console
+
+SMS_CONSOLE_TITLE=SMS консоль
+
+SMS_CONSOLE_SEND_TO=Отправить в мидлет
+SMS_CONSOLE_CLEAR=Очистить
+SMS_CONSOLE_SEND=Отправить
+SMS_CONSOLE_RECEIVE=Получить от мидлета
+SMS_CONSOLE_BLOCK=Заблокировать полученное
+
+
+#Methods Frame
+
+METHOD_FRAME_TITLE=Методы
+
+METHOD_FRAME_RESET_CALLS=Reset Calls
+METHOD_FRAME_EXPORT_BYTECODE=Export ByteCode
+METHOD_FRAME_SAVE_BYTECODE=Save all the methods bytecode:
+METHOD_FRAME_SEARCH=Поиск
+
+#Waches Frame
+
+WATCHES_FRAME_TITLE=Class Watcher
+WATCHES_FRAME_PROFILER=Профайлер
+
+
+#Option Frame
+
+OPTION_FRAME_TITLE=Опции
+
+OPTION_TAB_CUSTOM=Общее
+OPTION_TAB_KEYMAP=Клавиши
+OPTION_TAB_SYSFONT=Шрифт
+OPTION_TAB_SYSTEM=System
+OPTION_TAB_COREAPI=CoreAPI
+OPTION_TAB_RECORDS=Сохранения
+OPTION_TAB_NETWORK=Сеть
+OPTION_TAB_MEDIA=Медиа
+
+OPTION_CUSTOM_DEVICE=Пресет устройства:
+OPTION_CUSTOM_ENCODING=Кодировка MIDP:
+OPTION_CUSTOM_LOCALE=Локаль MIDP:
+OPTION_CUSTOM_MAX_FPS=Лимит FPS:
+
+OPTION_CUSTOM_PROPERTIES=Настройки канваса
+OPTION_CUSTOM_SCREEN_WIDTH=Ширина:
+OPTION_CUSTOM_SCREEN_HEIGHT=Высота:
+OPTION_CUSTOM_KEY_LSK=ЛСК:
+OPTION_CUSTOM_KEY_RSK=ПСК:
+OPTION_CUSTOM_KEY_MIDDLE=Центр:
+OPTION_CUSTOM_KEY_UP=Вверх:
+OPTION_CUSTOM_KEY_DOWN=Вниз:
+OPTION_CUSTOM_KEY_LEFT=Влево:
+OPTION_CUSTOM_KEY_RIGHT=Вправо:
+
+OPTION_KEYMAP_CONTROLLER=Контроллер:
+OPTION_KEYMAP_REFRESH=Обновить
+OPTION_KEYMAP_KEY_CACHE=Кэш событий
+OPTION_KEYMAP_LSK=ЛСК:
+OPTION_KEYMAP_RSK=ПСК:
+OPTION_KEYMAP_NUM_1=Num_1:
+OPTION_KEYMAP_NUM_2=Num_2:
+OPTION_KEYMAP_NUM_3=Num_3:
+OPTION_KEYMAP_NUM_4=Num_4:
+OPTION_KEYMAP_NUM_5=Num_5:
+OPTION_KEYMAP_NUM_6=Num_6:
+OPTION_KEYMAP_NUM_7=Num_7:
+OPTION_KEYMAP_NUM_8=Num_8:
+OPTION_KEYMAP_NUM_9=Num_9:
+OPTION_KEYMAP_NUM_0=Num_0:
+OPTION_KEYMAP_KEY_*=Key *:
+OPTION_KEYMAP_KEY_#=Key #:
+OPTION_KEYMAP_PAD_LEFT=Влево:
+OPTION_KEYMAP_PAD_RIGHT=Вправо:
+OPTION_KEYMAP_PAD_UP=Вверх:
+OPTION_KEYMAP_PAD_DOWN=Вниз:
+OPTION_KEYMAP_PAD_MIDDLE=Центр:
+OPTION_KEYMAP_CLEAR=Очистить
+
+OPTION_FONT_DEFAULT_FONT=Шрифт:
+OPTION_FONT_LARGE_SIZE=Большой:
+OPTION_FONT_MIDDLE_SIZE=Средний:
+OPTION_FONT_SMALL_SIZE=Мелкий:
+OPTION_FONT_TEST_TEXT=Пример:
+OPTION_FONT_TEST_TEXT_TXT=This is an Example.
+
+OPTION_SYSTEM_ASSOCIATE=Ассоциировать с *.jar файлами.
+OPTION_SYSTEM_SHORTCUT=Добавить ярлык в контекстное меню.
+OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images.
+OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region.
+OPTION_SYSTEM_INFO_COLOR=Info View: Показывать цвет в формате (R,G,B).
+OPTION_SYSTEM_RELEASED_IMG=Memory View: Запоминать удаленные изобр.
+OPTION_SYSTEM_AUTOGEN_JAD=Генерировать \"KEmu-Platform\".
+OPTION_SYSTEM_TRACK_NEW=Отслеживать операции \"new/new[]...\".
+OPTION_SYSTEM_TRACK_METHOD=Отслеживать вызовы методов
+OPTION_SYSTEM_DISCORD_RICHPRESENCE=Discord Rich Presence
+OPTION_SYSTEM_AWT_ANTIALIASING=Сглаживание AWT
+
+OPTION_COREAPI_VIBRATION=Включить вибрацию
+OPTION_COREAPI_KEY_REPEAT=Включить Canvas.keyRepeated().
+OPTION_COREAPI_FULLSCREEN=Игнорировать Canvas.setFullScreenMode().
+OPTION_COREAPI_NO_NETWORK=Отключить доступ к сети
+
+OPTION_RECORDS_RMS_FOLDER=Папка RMS:
+OPTION_RECORDS_RMS_TEXT=Записи текущего мидлета:
+OPTION_RECORDS_SELECT_ALL=Выбрать все
+OPTION_RECORDS_CLEAR_RECORD=Удалить выбранное
+OPTION_RECORDS_OPEN_DIRECTORY=Выбор папки для RMS
+OPTION_RECORDS_CHOOSE_DIR=Выберите папку
+
+OPTION_NETWORK_PROXY=Прокси
+OPTION_NETWORK_PROXY_TYPE=Тип прокси:
+OPTION_NETWORK_HOST=Хост:
+OPTION_NETWORK_PORT=Порт:
+OPTION_NETWORK_USERNAME=Логин:
+OPTION_NETWORK_PASSWORD=Пароль:
+OPTION_NETWORK_DOMAIN=Домен:
+OPTION_NETWORK_CONNECT=Проверить
+
+OPTION_NETWORK_PROXY_TEST=Proxy Test
+OPTION_NETWORK_PROXY_EMPTY=Пустой хост!
+OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
+
+OPTION_MEDIA_VLC_DIR=Путь к VLC
+
+
+#Message
+
+MESSAGE_BOX_TITLE=KEmulator Alert
+
+LOAD_CLASSES_ERROR=Не удалось загрузить классы! Проверьте параметры запуска.
+LOAD_MIDLET_ERROR=Не удалось найти класс мидлета. Проверьте jad дескриптор и параметры запуска.
+FAIL_LAUNCH_MIDLET=Не удалось запустить класс мидлета:
+
+LOAD_DRM_ERROR=Файл не является ZIP архивом. Попытка запустить DRM файл?
+
+LOAD_GDIPLUS_ERROR=Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path.
+
