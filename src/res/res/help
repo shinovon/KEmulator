@@ -42,11 +42,12 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.15 [2024.02.03]
+$nnmod v2.15 [2024.02.04]
 Set default fps limit to 60
 Added UI language property
 Added ru localization
 Removed "Connect to Network" menu item
+Implemented Canvas.repaint(IIII)
 Fixed restart
 
 $nnmod v2.14.4 [2024.02.02]

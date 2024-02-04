@@ -1569,7 +1569,7 @@ public final class Property implements IProperty
         mediaGroup = new Group(this.mediaComp, 0);
         mediaGroup.setLayout(new GridLayout());
         mediaGroup.setLayoutData(fill);
-        new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") + (Emulator.JAVA_64 ? " (64-bit only)" : " (32-bit only)") + ":");
+        new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") + (System.getProperty("os.arch").equals("amd64") ? " (64-bit only)" : " (32-bit only)") + ":");
         vlcDirText = new Text(mediaGroup, SWT.DEFAULT);
         vlcDirText.setEditable(true);
         vlcDirText.setEnabled(true);

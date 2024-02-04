@@ -44,8 +44,9 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class Emulator
 {
-	public static final boolean JAVA_64 = System.getProperty("os.arch").equals("amd64");
-	
+    public static final String version = "2.14.4";
+    public static final int numericVersion = 14;
+
     static EmulatorImpl emulatorimpl;
     private static MIDlet midlet;
     private static Canvas currentCanvas;
@@ -79,9 +80,6 @@ public class Emulator
 	public static boolean askPermissions = false;
 	public static boolean askImei = true;
 	private static Thread vlcCheckerThread;
-
-    public static final String version = "2.14.4";
-    public static final int numericVersion = 14;
     private static int dialogResult;
     public static boolean jdwpDebug;
     public static boolean uei;
@@ -814,7 +812,7 @@ public class Emulator
         } catch (Exception e) {
             return;
         }
-        if (!platform.isX64() && JAVA_64) {
+        if (!platform.isX64() && System.getProperty("os.arch").equals("amd64")) {
             JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
             System.exit(0);
             return;
