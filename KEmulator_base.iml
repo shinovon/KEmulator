@@ -9,6 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/nnapi" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/nokia" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/3d_stub" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/res" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
