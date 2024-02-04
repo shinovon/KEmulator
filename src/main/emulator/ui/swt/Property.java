@@ -410,7 +410,7 @@ public final class Property implements IProperty
             file2.mkdirs();
         }
         */
-        return s + "/";
+        return s.replace('\\', '/') + "/";
     }
 
     public String getOldRmsPath() {

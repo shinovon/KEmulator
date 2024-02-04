@@ -14,6 +14,7 @@ import java.io.*;
 public class RecordStore {
     private static Vector openRecordStores = new Vector();
     static String rmsRootDir = Emulator.getEmulator().getProperty().getRmsFolderPath();
+    static String homeRootPath;
 
     public static final int AUTHMODE_PRIVATE = 0;
     public static final int AUTHMODE_ANY = 1;
@@ -29,6 +30,18 @@ public class RecordStore {
     private boolean homeSuite;
     private int authmode;
     private boolean writable;
+
+
+    static {
+        try {
+            IEmulator em = Emulator.getEmulator();
+            if (((EmulatorImpl) em).midletProps != null) {
+                homeRootPath = getRootPath(null, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name"));
+                logln("midlet rms path: " + homeRootPath);
+            }
+        } catch (Exception e) {
+        }
+    }
 
     RecordStore(String aName, String aRootPath, boolean aHomeSuite, boolean existing) throws RecordStoreException, RecordStoreNotFoundException, RecordStoreFullException {
         records = new Vector();
@@ -172,8 +185,7 @@ public class RecordStore {
     public static RecordStore openRecordStore(String name, boolean createIfNecessary, int authmode, boolean writable) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
         if(name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
         logln("openRecordStore " + name);
-        IEmulator em = Emulator.getEmulator();
-        String rootPath = getRootPath(name, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name")) + encodeBase64(name) + "/";
+        String rootPath = homeRootPath + encodeBase64(name) + "/";
         RecordStore rs = findRecordStore(rootPath);
         if(rs != null) {
             rs.setMode(authmode, writable);
@@ -214,8 +226,7 @@ public class RecordStore {
     public static void deleteRecordStore(String name) throws RecordStoreException, RecordStoreNotFoundException {
         if(name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
         logln("deleteRecordStore " + name);
-        IEmulator em = Emulator.getEmulator();
-        String rootPath = getRootPath(name, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name")) + encodeBase64(name) + "/";
+        String rootPath = homeRootPath + encodeBase64(name) + "/";
         if(findRecordStore(rootPath) != null) {
             logln("open");
             throw new RecordStoreException("Cannot delete currently opened record store: " + name);
@@ -240,10 +251,9 @@ public class RecordStore {
     public static String[] listRecordStores() {
         String[] list = null;
         try {
-            IEmulator em = Emulator.getEmulator();
-            if (((EmulatorImpl) em).midletProps == null)
+            if (homeRootPath == null)
                 return null;
-            File file = new File(getRootPath(null, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name")));
+            File file = new File(homeRootPath);
             list = file.list();
             ArrayList<String> tmp = new ArrayList<String>();
             if(list != null) {
