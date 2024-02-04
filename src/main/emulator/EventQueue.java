@@ -1,9 +1,11 @@
 package emulator;
 
 import javax.microedition.lcdui.*;
+
 import net.rim.device.api.system.*;
 import emulator.graphics2D.*;
 
+import java.util.Stack;
 import java.util.Vector;
 
 public final class EventQueue implements Runnable {
@@ -194,9 +196,21 @@ public final class EventQueue implements Runnable {
 		repaint.queue(1);
 	}
 
+	public void queueRepaint(int x, int y, int w, int h) {
+		this.repainted2 = false;
+		repaint.region.push(new int[] {x, y, w, h});
+		repaint.queue(5);
+	}
+
 	public void queueGraphicsFlush() {
 		this.repainted = false;
 		repaint.queue(3);
+	}
+
+	public void queueGraphicsFlush(int x, int y, int w, int h) {
+		this.repainted = false;
+		repaint.region.push(new int[] {x, y, w, h});
+		repaint.queue(6);
 	}
 
 	private synchronized int nextEvent() {
@@ -408,6 +422,8 @@ public final class EventQueue implements Runnable {
 		private int count;
 		private boolean added;
 		private Object sync = new Object();
+		private Stack<int[]> region = new Stack<int[]>();
+
 		private RepaintThread() {
 			events = new int[length = 16];
 		}
@@ -444,7 +460,7 @@ public final class EventQueue implements Runnable {
 							events[--count] = 0;
 						}
 						switch(i) {
-							case 1: {
+							case 1: { // Canvas repaint
 								if (Emulator.getCanvas() == null
 										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 									repainted2 = true;
@@ -466,7 +482,7 @@ public final class EventQueue implements Runnable {
 								repainted2 = true;
 								break;
 							}
-							case 3: {
+							case 3: { // GameCanvas flush
 								if (Emulator.getCanvas() == null
 										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 									repainted = true;
@@ -498,6 +514,44 @@ public final class EventQueue implements Runnable {
 								} catch (Exception ex2) {
 								}
 								this.queue(4);
+								break;
+							}
+							case 5: { // Canvas partial repaint
+								int[] r = region.pop();
+								if (Emulator.getCanvas() == null
+										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+									repainted2 = true;
+									break;
+								}
+								Displayable.checkForSteps();
+								if(Settings.xrayView) Displayable.resetXRayGraphics();
+								final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
+								final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
+								try {
+									Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage, r);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+								(Settings.xrayView ? xRayScreenImage : backBufferImage)
+										.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
+								Emulator.getEmulator().getScreen().repaint();
+								Displayable.fpsLimiter();
+								repainted2 = true;
+								break;
+							}
+							case 6: { // GameCanvas partial flush TODO
+								int[] r = region.pop();
+								if (Emulator.getCanvas() == null
+										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+									repainted = true;
+									break;
+								}
+								final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
+								final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
+								final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
+								(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+								Emulator.getEmulator().getScreen().repaint();
+								repainted = true;
 								break;
 							}
 						}

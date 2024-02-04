@@ -47,6 +47,18 @@ public abstract class Canvas extends Displayable
         this.paintTicker(graphics);
         this.paintSoftMenu(graphics);
     }
+
+    public void invokePaint(IImage buffer, IImage xray, int[] region) {
+        if(!Settings.xrayView) xray = null;
+        if(graphics == null) {
+            graphics = new Graphics(buffer, xray);
+        }
+        graphics.reset(buffer, xray);
+        graphics.setClip(region[0], region[1], region[2], region[3]);
+        this.paint(graphics);
+        this.paintTicker(graphics);
+        this.paintSoftMenu(graphics);
+    }
     
     public void invokeKeyReleased(final int n) {
         this.m_keyStates &= ~(1 << this.getGameAction(n));
@@ -123,8 +135,11 @@ public abstract class Canvas extends Displayable
         Emulator.getEventQueue().queueRepaint();
     }
     
-    public void repaint(final int n, final int n2, final int n3, final int n4) {
-        this.repaint();
+    public void repaint(final int x, final int y, final int w, final int h) {
+        if (this != Emulator.getCurrentDisplay().getCurrent()) {
+            return;
+        }
+        Emulator.getEventQueue().queueRepaint(x, y, w, h);
     }
     
     public void serviceRepaints() {
