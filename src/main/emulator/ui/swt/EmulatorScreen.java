@@ -43,7 +43,7 @@ MouseTrackListener
     private Canvas canvas;
     private CLabel aCLabel970;
     private CLabel aCLabel984;
-    private CLabel aCLabel994;
+    private CLabel statusLabel;
     private Menu aMenu971;
     private Menu menuMidlet;
     private Menu menuTool;
@@ -134,7 +134,7 @@ MouseTrackListener
 //    private static boolean aBoolean967;
 //    private static boolean aBoolean992;
     private int pauseState;
-    private final String[] aStringArray981;
+    private final String[] pauseStateStrings;
     private boolean infosEnabled;
     private String aString1008;
     private CaretImpl caret;
@@ -174,7 +174,7 @@ MouseTrackListener
         this.canvas = null;
         this.aCLabel970 = null;
         this.aCLabel984 = null;
-        this.aCLabel994 = null;
+        this.statusLabel = null;
         this.aMenu971 = null;
         this.menuMidlet = null;
         this.menuTool = null;
@@ -182,7 +182,7 @@ MouseTrackListener
         this.menu2dEngine = null;
        // this.menu3dEngine = null;
         this.aMenu1018 = null;
-        this.aStringArray981 = new String[] { emulator.UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), emulator.UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), emulator.UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED") };
+        this.pauseStateStrings = new String[] { emulator.UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), emulator.UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), emulator.UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED") };
         EmulatorScreen.display = EmulatorImpl.getDisplay();
         this.initShell();
         this.initScreenBuffer(n, n2);
@@ -611,18 +611,21 @@ MouseTrackListener
     
 
     private void updateStatus() {
-       String var8 = this.zoom == 1.0F?" ":"  ";
-       StringBuffer var9  = new StringBuffer();
-       var9.append((int)(this.zoom * 100.0F));
-       var9.append("%");
-       var9.append(var8);
-       var9.append(this.aStringArray981[this.pauseState]);
-       var9.append(var8);
-       if(Settings.f > 0) {
+        String var8 = this.zoom == 1.0F?" ":"  ";
+        StringBuffer var9  = new StringBuffer();
+        var9.append((int)(this.zoom * 100.0F));
+        var9.append("%");
+        var9.append(var8);
+        var9.append(this.pauseStateStrings[this.pauseState]);
+        var9.append(var8);
+        var9.append(Profiler.FPS);
+        var9.append(" FPS");
+        var9.append(var8);
+        if(Settings.speedModifier > 0) {
           var9.append("x");
-       }
-       var9.append(Settings.f);
-       this.aCLabel994.setText(var9.toString());
+        }
+        var9.append(Settings.speedModifier);
+        this.statusLabel.setText(var9.toString());
     }
 
     
@@ -671,8 +674,8 @@ MouseTrackListener
         (this.aCLabel970 = new CLabel((Composite)this.shell, 0)).setText("\t");
         ((Control)this.aCLabel970).setLayoutData((Object)layoutData3);
         ((Control)this.aCLabel970).addMouseListener((MouseListener)new Class43(this));
-        (this.aCLabel994 = new CLabel((Composite)this.shell, 16777216)).setText("");
-        ((Control)this.aCLabel994).setLayoutData((Object)layoutData);
+        (this.statusLabel = new CLabel((Composite)this.shell, 16777216)).setText("");
+        ((Control)this.statusLabel).setLayoutData((Object)layoutData);
         (this.aCLabel984 = new CLabel((Composite)this.shell, 131072)).setText("\t");
         ((Control)this.aCLabel984).setLayoutData((Object)layoutData2);
         ((Control)this.aCLabel984).addMouseListener((MouseListener)new Class50(this));
@@ -1138,24 +1141,24 @@ MouseTrackListener
 //                    return;
 //                }
                 if (menuItem.equals(this.speedUpMenuItem)) {
-                    if (Settings.f == -1) {
-                        Settings.f = 1;
+                    if (Settings.speedModifier == -1) {
+                        Settings.speedModifier = 1;
                         this.updateStatus();
                         return;
                     }
-                    if (Settings.f < 100) {
-                        ++Settings.f;
+                    if (Settings.speedModifier < 100) {
+                        ++Settings.speedModifier;
                         this.updateStatus();
                     }
                 }
                 else if (menuItem.equals(this.slowDownMenuItem)) {
-                    if (Settings.f == 1) {
-                        Settings.f = -1;
+                    if (Settings.speedModifier == 1) {
+                        Settings.speedModifier = -1;
                         this.updateStatus();
                         return;
                     }
-                    if (Settings.f > -100) {
-                        --Settings.f;
+                    if (Settings.speedModifier > -100) {
+                        --Settings.speedModifier;
                         this.updateStatus();
                     }
                 }
@@ -2615,7 +2618,7 @@ MouseTrackListener
     }
 
 	public void mouseScrolled(MouseEvent arg0) {
-        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys || !Settings.fpsMode) {
             return;
         }
 		int k = 0;

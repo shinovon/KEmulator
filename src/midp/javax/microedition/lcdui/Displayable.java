@@ -324,7 +324,7 @@ public class Displayable {
 	*/
 
 	public static void fpsLimiter() {
-		if (Settings.f == 1 && Settings.frameRate <= 120) {
+		if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
 			long var0 = System.currentTimeMillis() - lastFrameTime;
 			long var2 = (long) (1000 / Settings.frameRate);
 			if(var2 - var0 > 0) { 

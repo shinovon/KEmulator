@@ -32,7 +32,7 @@ public final class Settings
     public static boolean xrayView;
     public static boolean xrayOverlapScreen;
     public static boolean xrayShowClipBorder;
-    public static int f;
+    public static int speedModifier;
     public static boolean autoGenJad;
     public static boolean enableMethodTrack;
     public static boolean enableNewTrack;
@@ -80,7 +80,7 @@ public final class Settings
         Settings.frameRate = 60;
         Settings.steps = -1;
         Settings.aArray = new String[5];
-        Settings.f = 1;
+        Settings.speedModifier = 1;
         aRandom1238 = new Random();
         aLong1241 = Settings.aRandom1238.nextLong();
         Settings.recordedRandomSeed = Settings.aLong1241;

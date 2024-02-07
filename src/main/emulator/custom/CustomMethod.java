@@ -95,7 +95,7 @@ public class CustomMethod
         ++Profiler.currentTimeMillisCallCount;
         final long currentTimeMillis = System.currentTimeMillis();
         final long n2;
-        final long n = ((n2 = Settings.f) < 0L) ? ((100L + n2 << 10) / 100L) : (n2 << 10);
+        final long n = ((n2 = Settings.speedModifier) < 0L) ? ((100L + n2 << 10) / 100L) : (n2 << 10);
         if (Settings.aLong1235 > 0L) {
             CustomMethod.aLong13 += n * (currentTimeMillis - CustomMethod.aLong17 - Settings.aLong1235) >> 10;
             CustomMethod.aLong17 = currentTimeMillis;
