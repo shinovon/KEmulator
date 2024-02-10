@@ -51,6 +51,7 @@ public class Permission {
             imeiDialog = new InputDialog(Emulator.emulatorimpl.getEmulatorScreen().getShell());
             imeiDialog.setMessage("Application asks for IMEI");
             imeiDialog.setInput("0000000000000000");
+            imeiDialog.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
             imeiDialog.open();
         });
         String s = imeiDialog.getInput();
@@ -62,10 +63,11 @@ public class Permission {
     }
 
     public static boolean showConfirmDialog(String message, String title) {
+
         Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
             MessageBox messageBox = new MessageBox(Emulator.emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
             messageBox.setMessage(message);
-            messageBox.setText(title);
+            messageBox.setText(title == null ? UILocale.get("SECURITY_ALERT_TITLE", "Security") : title);
             dialogResult = messageBox.open();
         });
         return dialogResult == SWT.YES;
@@ -80,14 +82,14 @@ public class Permission {
         //5: ask once
         switch(getAppPermissionLevel(x)) {
             case ask_always:
-                if(!showConfirmDialog(localizePerm(x), "Security"))
+                if(!showConfirmDialog(localizePerm(x), null))
                     throw new SecurityException(x);
                 allowPerms.add(x);
                 break;
             case ask_always_until_yes:
                 if(allowPerms.contains(x))
                     return;
-                if(!showConfirmDialog(localizePerm(x), "Security"))
+                if(!showConfirmDialog(localizePerm(x), null))
                     throw new SecurityException(x);
                 allowPerms.add(x);
             case allowed:
@@ -98,7 +100,7 @@ public class Permission {
             case ask_always_until_no:
                 if(notAllowPerms.contains(x))
                     return;
-                if(!showConfirmDialog(localizePerm(x), "Security")) {
+                if(!showConfirmDialog(localizePerm(x), null)) {
                     notAllowPerms.add(x);
                     throw new SecurityException(x);
                 }
@@ -109,7 +111,7 @@ public class Permission {
                     throw new SecurityException(x);
                 if(allowPerms.contains(x))
                     return;
-                if(!showConfirmDialog(localizePerm(x), "Security")) {
+                if(!showConfirmDialog(localizePerm(x), null)) {
                     notAllowPerms.add(x);
                     throw new SecurityException(x);
                 }
@@ -129,7 +131,7 @@ public class Permission {
             case "connector.open.serversocket":
                 return "Allow the application to open server socket connections?";
             case "camera":
-                return "Allow the application to use camera?";
+                return UILocale.get("PERMISSION_CAMERA", "Allow the application to use camera?");
             default:
                 return "Allow the application to use \'" + x + "\'?";
         }
@@ -144,11 +146,13 @@ public class Permission {
             }
             if(s.startsWith("vlc:")) {
                 s = s.substring(4);
-                messageBox.setMessage("MIDlet wants to open URL in VLC: " + s);
+                messageBox.setMessage(UILocale.get("PLATFORMREQUEST_VLC_ALERT", "Application wants to open URL in VLC") +
+                        ": " + s);
             } else {
-                messageBox.setMessage("MIDlet wants to open URL: " + s);
+                messageBox.setMessage(UILocale.get("PLATFORMREQUEST_ALERT", "Application wants to open URL") +
+                        ": " + s);
             }
-            messageBox.setText("Security");
+            messageBox.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
             dialogResult = messageBox.open();
         });
         return dialogResult == SWT.YES;

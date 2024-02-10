@@ -294,13 +294,20 @@ OPTION_MEDIA_VLC_DIR=Путь к VLC
 
 #Message
 
-MESSAGE_BOX_TITLE=KEmulator Alert
+MESSAGE_BOX_TITLE=KEmulator
 
 LOAD_CLASSES_ERROR=Не удалось загрузить классы! Проверьте параметры запуска.
 LOAD_MIDLET_ERROR=Не удалось найти класс мидлета. Проверьте jad дескриптор и параметры запуска.
 FAIL_LAUNCH_MIDLET=Не удалось запустить класс мидлета:
 
-LOAD_DRM_ERROR=Файл не является ZIP архивом. Попытка запустить DRM файл?
+LOAD_ZIP_ERROR=Файл не является ZIP архивом.
 
-LOAD_GDIPLUS_ERROR=Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path.
+LOAD_GDIPLUS_ERROR=Не удалось загрузить gdiplus.dll
+
+PLATFORMREQUEST_ALERT=Приложение хочет открыть URL
+PLATFORMREQUEST_VLC_ALERT=Приложение хочет открыть URL в VLC
+
+PERMISSION_CAMERA=Разрешить приложению использовать камеру?
+
+SECURITY_ALERT_TITLE=Безопасность
 

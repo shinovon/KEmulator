@@ -31,13 +31,11 @@ import emulator.custom.CustomMethod;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
 
 public class Emulator
 {
-    public static final String version = "2.14.4";
-    public static final int numericVersion = 14;
+    public static final String version = "2.15";
+    public static final int numericVersion = 15;
 
     static EmulatorImpl emulatorimpl;
     private static MIDlet midlet;
@@ -425,7 +423,7 @@ public class Emulator
         	ex.printStackTrace();
             Emulator.emulatorimpl.getLogStream().println("3 "+ex.toString());
         	if(ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
-        		Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_DRM_ERROR", "Input file isn't ZIP. Trying to load DRM Content?"));
+        		Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file isn't ZIP archive."));
         	}
             return false;
         }

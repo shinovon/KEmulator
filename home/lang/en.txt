@@ -300,7 +300,14 @@ LOAD_CLASSES_ERROR=Get Classes Failed!! Plz check the input jar or classpath.
 LOAD_MIDLET_ERROR=Can not find MIDlet class. Plz check jad or use -midlet param.
 FAIL_LAUNCH_MIDLET=Fail to launch the MIDlet class:
 
-LOAD_DRM_ERROR=Input file isn't ZIP. Trying to load DRM Content?
+LOAD_ZIP_ERROR=Input file isn't ZIP archive.
 
 LOAD_GDIPLUS_ERROR=Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path.
+
+PLATFORMREQUEST_ALERT=Application wants to open URL
+PLATFORMREQUEST_VLC_ALERT=Application wants to open URL in VLC
+
+PERMISSION_CAMERA=Allow the application to use camera?
+
+SECURITY_ALERT_TITLE=Security
 
