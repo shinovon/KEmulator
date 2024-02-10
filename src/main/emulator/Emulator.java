@@ -1,11 +1,7 @@
 package emulator;
 
 import java.awt.Dimension;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -460,11 +456,11 @@ public class Emulator
                 }
                 final File file3 = file2;
                 if (file.exists()) {
-                    ((Properties)(props = new Properties())).load(new FileInputStream(file3));
+                    ((Properties)(props = new Properties())).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
                     final Enumeration<Object> keys = props.keys();
                     while (keys.hasMoreElements()) {
                         final String s = (String) keys.nextElement();
-                        props.put(s, new String(props.getProperty(s).getBytes("ISO-8859-1"), "UTF-8"));
+                        props.put(s, props.getProperty(s));
                     }
                 }
                 Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
@@ -489,12 +485,12 @@ public class Emulator
                     catch (Exception ex2) {
                         final InputStream inputStream;
                         (inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
-                        ((Properties)(props = new Properties())).load(inputStream);
+                        ((Properties)(props = new Properties())).load(new InputStreamReader(inputStream, "UTF-8"));
                         inputStream.close();
                         final Enumeration<Object> keys2 = props.keys();
                         while (keys2.hasMoreElements()) {
                             final String s2 = (String) keys2.nextElement();
-                            props.put(s2, new String(props.getProperty(s2).getBytes("ISO-8859-1"), "UTF-8"));
+                            props.put(s2, props.getProperty(s2));
                         }
                     }
                 }
@@ -549,11 +545,11 @@ public class Emulator
                 Properties aProperties1369 = null;
                 final File file4;
                 if (Emulator.jadPath != null && (file4 = new File(Emulator.jadPath)).exists()) {
-                    (aProperties1369 = new Properties()).load(new FileInputStream(file4));
+                    (aProperties1369 = new Properties()).load(new InputStreamReader(new FileInputStream(file4), "UTF-8"));
                     final Enumeration keys3 = (aProperties1369).keys();
                     while (keys3.hasMoreElements()) {
                         final String s3 = (String) keys3.nextElement();
-                        aProperties1369.put(s3, new String(aProperties1369.getProperty(s3).getBytes("ISO-8859-1"), "UTF-8"));
+                        aProperties1369.put(s3, aProperties1369.getProperty(s3));
                     }
                 }
                 if (aProperties1369 == null) {
@@ -1115,9 +1111,9 @@ public class Emulator
             File file = new File(jadPath);
             if (file.exists()) {
                 Properties properties = new Properties();
-                properties.load(new FileInputStream(file));
+                properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
                 String absolutePath = file.getAbsolutePath().replace('\\', '/');
-                return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + new String(properties.getProperty("MIDlet-Jar-URL").getBytes("ISO-8859-1"), "UTF-8");
+                return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + properties.getProperty("MIDlet-Jar-URL");
             }
         } catch (Exception e) {
         }

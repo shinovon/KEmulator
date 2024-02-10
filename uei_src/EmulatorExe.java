@@ -3,13 +3,14 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
 public class EmulatorExe {
 
-	public static final String version = "1.4";
+	public static final String version = "1.5";
 	public static final boolean WINE = false;
 	public static final boolean NNX64 = false;
 
@@ -214,8 +215,13 @@ public class EmulatorExe {
 				System.err.println("No classpath set");
 				return;
 			}
+			String jar = getMidletJarUrl(jad);
+			if(jar == null) {
+				System.err.println("JAD file not found: " + jad);
+				return;
+			}
 			cmd.add("-jar");
-			cmd.add(getMidletJarUrl(jad));
+			cmd.add(jar);
 		}
 
 		cmd.add("-uei");
@@ -235,11 +241,12 @@ public class EmulatorExe {
 			File file = new File(jadPath);
 			if (file.exists()) {
 				Properties properties = new Properties();
-				properties.load(new FileInputStream(file));
+				properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 				String absolutePath = file.getAbsolutePath().replace('\\', '/');
-				return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + new String(properties.getProperty("MIDlet-Jar-URL").getBytes("ISO-8859-1"), "UTF-8");
+				return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + properties.getProperty("MIDlet-Jar-URL");
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}

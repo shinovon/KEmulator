@@ -45,39 +45,45 @@ public abstract class MIDlet
     public boolean platformRequest(String s) throws ConnectionNotFoundException {
         try {
             System.out.println("platformRequest(" + s + ")");
-
             if (Settings.networkNotAvailable || !Emulator.requestURLAccess(s)) {
                 return false;
             }
             if(s.startsWith("file:///root/")) {
-            	s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
+            	s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") +
+                        "/file/root/" + s.substring(13)).replace(" ", "%20");
             } else if(s.startsWith("file:")) {
                 throw new SecurityException();
             }
+            if(s.startsWith("vlc.exe \"")) {
+                s = "vlc:"+s.substring(9, s.length()-1);
+            }
             if(s.startsWith("vlc:")) {
+                s = s.substring(4);
+                if(s.indexOf(':') == -1) {
+                    throw new ConnectionNotFoundException("Invalid URL");
+                }
+                if(s.startsWith("file:///root/")) {
+                    s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") +
+                            "/file" + s.substring(13)).replace(" ", "%20");
+                }
             	if(Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
-                    s = s.substring(4);
-                    if(s.startsWith("file:///root/")) {
-                        s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
-                    } else if(s.startsWith("file:")) {
-                        throw new SecurityException();
-                    }
-                	s = new File(Settings.vlcDir).getCanonicalPath() + "/vlc \"" + s + "\"";
-                    Runtime.getRuntime().exec(s);
+                    Runtime.getRuntime().exec(new File(Settings.vlcDir).getCanonicalPath() + "/vlc \"" + s + "\"");
                 	return false;
             	}
+                String vlcdir = "C:/Program Files/VideoLAN/VLC/vlc.exe";
+                if(!Emulator.isX64() && new File(vlcdir).exists()) {
+                    Runtime.getRuntime().exec(vlcdir + " \"" + s + "\"");
+                    return false;
+                }
                 throw new ConnectionNotFoundException("vlc dir not set");
             }
-            try {
-	            if(Desktop.getDesktop().isDesktopSupported()) {
-	            	Desktop.getDesktop().browse(new URI(s));
-	            }
-            } catch (Exception e) {
-                Emulator.getEmulator().getLogStream().println(e.toString());
+            if(Desktop.getDesktop().isDesktopSupported()) {
+                Desktop.getDesktop().browse(new URI(s));
+            } else {
                 if(Emulator.isX64()) {
                     throw new ConnectionNotFoundException("not supported");
                 }
-            	Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + s);
+                Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + s);
             }
             return false;
         } catch (ConnectionNotFoundException e) {
