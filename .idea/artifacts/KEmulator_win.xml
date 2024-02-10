@@ -2,6 +2,7 @@
   <artifact type="jar" name="KEmulator_win">
     <output-path>$PROJECT_DIR$/win</output-path>
     <root id="archive" name="KEmulator.jar">
+      <element id="module-output" name="KEmulator_win" />
       <element id="module-output" name="KEmulator_base" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl_util.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/vlcj-4.7.1.jar" path-in-jar="/" />
@@ -16,7 +17,6 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/java-discord-rpc-2.0.1-win32.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jna-5.2.0-win32.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/webcam-capture-0.3.12-win32.jar" path-in-jar="/" />
-      <element id="module-output" name="KEmulator_win" />
     </root>
   </artifact>
 </component>

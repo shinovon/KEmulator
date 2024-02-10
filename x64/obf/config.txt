@@ -2,9 +2,9 @@
 -outjars '.\KEmulator.jar'
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
--libraryjars '..\x64home\swt-win32-x86.jar'
--libraryjars '..\x64home\jogl-all.jar'
--libraryjars '..\x64home\gluegen-rt.jar'
+-libraryjars '..\..\natives\swt-win32-x86.jar'
+-libraryjars '..\..\natives\jogl-all.jar'
+-libraryjars '..\..\natives\gluegen-rt.jar'
 
 -target 1.8
 #-dontshrink
