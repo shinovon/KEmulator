@@ -421,7 +421,6 @@ public class Emulator
         }
         catch (Exception ex) {
         	ex.printStackTrace();
-            Emulator.emulatorimpl.getLogStream().println("3 "+ex.toString());
         	if(ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
         		Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file isn't ZIP archive."));
         	}
