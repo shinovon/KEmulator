@@ -4,38 +4,39 @@ import org.objectweb.asm.*;
 
 public final class CustomClassAdapter extends ClassAdapter implements Opcodes
 {
-    private String aString1165;
+    private String className;
     
-    public final MethodVisitor visitMethod(final int n, final String s, String cls, final String s2, final String[] array) {
+    public final MethodVisitor visitMethod(int acc, final String name, String desc, final String sign, final String[] array) {
         Label_0037: {
-            String s3;
             String s4;
             String s5;
-            if (cls.indexOf("java/util/TimerTask") != -1) {
-                s3 = cls;
+            if (desc.indexOf("java/util/TimerTask") != -1) {
                 s4 = "java/util/TimerTask";
                 s5 = "emulator/custom/subclass/SubTimerTask";
             }
             else {
-                if (cls.indexOf("java/util/Timer") == -1) {
+                if (desc.indexOf("java/util/Timer") == -1) {
                     break Label_0037;
                 }
-                s3 = cls;
                 s4 = "java/util/Timer";
                 s5 = "emulator/custom/subclass/Timer";
             }
-            cls = s3.replaceAll(s4, s5);
+            desc = desc.replaceAll(s4, s5);
+        }
+        if("paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc)) {
+            if((acc & Opcodes.ACC_SYNCHRONIZED) != 0)
+                acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
         }
         final MethodVisitor visitMethod;
-        if ((visitMethod = super.visitMethod(n, s, cls, s2, array)) != null) {
-            return (MethodVisitor)new CustomMethodAdapter(visitMethod, this.aString1165, s, cls);
+        if ((visitMethod = super.visitMethod(acc, name, desc, sign, array)) != null) {
+            return (MethodVisitor)new CustomMethodAdapter(visitMethod, this.className, name, desc);
         }
         return null;
     }
     
     public CustomClassAdapter(final ClassVisitor classVisitor, final String aString1165) {
         super(classVisitor);
-        this.aString1165 = aString1165;
+        this.className = aString1165;
     }
     
     public final void visit(final int n, final int n2, final String s, final String s2, final String s3, final String[] array) {

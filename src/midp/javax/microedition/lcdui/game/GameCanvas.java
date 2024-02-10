@@ -3,8 +3,6 @@ package javax.microedition.lcdui.game;
 import emulator.*;
 import javax.microedition.lcdui.*;
 
-import com.nokia.mid.ui.DeviceControl;
-
 public abstract class GameCanvas extends Canvas
 {
     public static final int UP_PRESSED = 2;
@@ -49,7 +47,7 @@ public abstract class GameCanvas extends Canvas
         if(graphics == null) getGraphics();
         this.paintSoftMenu(graphics);
         Emulator.getEventQueue().queueGraphicsFlush();
-        Emulator.getEventQueue().waitRepainted();
+        Emulator.getEventQueue().waitGameRepaint();
         Displayable.resetXRayGraphics();
     }
 }

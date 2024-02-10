@@ -18,8 +18,8 @@ public final class EventQueue implements Runnable {
 	private ThreadCallSerially threadCallSerially = new ThreadCallSerially(this);
 	private Thread eventThread;
 	private boolean canvasHidden;
-	private boolean repainted2;
 	private boolean repainted;
+	private boolean gameRepainted;
 	private Thread mouseThread;
 	private int dx;
 	private int dy;
@@ -39,8 +39,8 @@ public final class EventQueue implements Runnable {
 		this.anInt1222 = 0;
 		this.canvasHidden = false;
 		this.running = true;
-		this.repainted2 = true;
 		this.repainted = true;
+		this.gameRepainted = true;
 		(this.eventThread = new Thread(this, "KEmulator MIDP event queue")).setPriority(2);
 		this.eventThread.start();
 		(this.repaintThread = new Thread(repaint, "KEmulator repaint queue")).setPriority(2);
@@ -167,12 +167,12 @@ public final class EventQueue implements Runnable {
 	public synchronized final void queue(final int n) {
 		//synchronized (events) {
 		if (n == 1) {
-			this.repainted2 = false;
+			this.repainted = false;
 			repaint.queue(n);
 			return;
 		}
 		if (n == 3) {
-			this.repainted = false;
+			this.gameRepainted = false;
 			repaint.queue(n);
 			return;
 		}
@@ -192,23 +192,23 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void queueRepaint() {
-		this.repainted2 = false;
+		this.repainted = false;
 		repaint.queue(1);
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
-		this.repainted2 = false;
+		this.repainted = false;
 		repaint.region.push(new int[] {x, y, w, h});
 		repaint.queue(5);
 	}
 
 	public void queueGraphicsFlush() {
-		this.repainted = false;
+		this.gameRepainted = false;
 		repaint.queue(3);
 	}
 
 	public void queueGraphicsFlush(int x, int y, int w, int h) {
-		this.repainted = false;
+		this.gameRepainted = false;
 		repaint.region.push(new int[] {x, y, w, h});
 		repaint.queue(6);
 	}
@@ -223,21 +223,13 @@ public final class EventQueue implements Runnable {
 			this.readed = 0;
 		}
 		return n;
-		/*
-		//synchronized (events) {
-		if(events.size() == 0) return 0;
-		final int n = events.get(0);
-		events.remove(0);
-		return n;
-		//}
-		 */
 	}
 
-	public final void waitRepainted2() {
+	public final void serviceRepaints() {
 		if (Thread.currentThread() == this.repaintThread) {
 			return;
 		}
-		while (!this.repainted2 && this.running) {
+		while (!this.repainted && this.running) {
 			try {
 				Thread.sleep(1L);
 			} catch (Exception ex) {
@@ -245,11 +237,11 @@ public final class EventQueue implements Runnable {
 		}
 	}
 
-	public final void waitRepainted() {
+	public final void waitGameRepaint() {
 		if (Thread.currentThread() == this.repaintThread) {
 			return;
 		}
-		while (!this.repainted && this.running) {
+		while (!this.gameRepainted && this.running) {
 			try {
 				Thread.sleep(1L);
 			} catch (Exception ex) {
@@ -272,7 +264,7 @@ public final class EventQueue implements Runnable {
 				case 1: {
 					if (Emulator.getCanvas() == null
 							|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-						this.repainted2 = true;
+						this.repainted = true;
 						break;
 					}
 					Displayable.checkForSteps();
@@ -288,13 +280,13 @@ public final class EventQueue implements Runnable {
 							.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
 					Emulator.getEmulator().getScreen().repaint();
 					Displayable.fpsLimiter();
-					this.repainted2 = true;
+					this.repainted = true;
 					break;
 				}
 				case 3: {
 					if (Emulator.getCanvas() == null
 							|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-						this.repainted = true;
+						this.gameRepainted = true;
 						break;
 					}
 					final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
@@ -302,7 +294,7 @@ public final class EventQueue implements Runnable {
 					final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
 					(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
 					Emulator.getEmulator().getScreen().repaint();
-					this.repainted = true;
+					this.gameRepainted = true;
 					break;
 				}
 				case 10: {
@@ -316,8 +308,8 @@ public final class EventQueue implements Runnable {
 					Emulator.getNetMonitor().a();
 					this.stop();
 					if (Emulator.getMIDlet() != null) {
-						this.repainted2 = true;
 						this.repainted = true;
+						this.gameRepainted = true;
 						new Thread(new InvokeDestroyAppRunnable(this)).start();
 						break;
 					}
@@ -463,7 +455,7 @@ public final class EventQueue implements Runnable {
 							case 1: { // Canvas repaint
 								if (Emulator.getCanvas() == null
 										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-									repainted2 = true;
+									repainted = true;
 									break;
 								}
 								Displayable.checkForSteps();
@@ -479,13 +471,13 @@ public final class EventQueue implements Runnable {
 										.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
 								Emulator.getEmulator().getScreen().repaint();
 								Displayable.fpsLimiter();
-								repainted2 = true;
+								repainted = true;
 								break;
 							}
 							case 3: { // GameCanvas flush
 								if (Emulator.getCanvas() == null
 										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-									repainted = true;
+									gameRepainted = true;
 									break;
 								}
 								final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
@@ -493,7 +485,7 @@ public final class EventQueue implements Runnable {
 								final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
 								(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
 								Emulator.getEmulator().getScreen().repaint();
-								repainted = true;
+								gameRepainted = true;
 								break;
 							}
 							case 4: {
@@ -520,7 +512,7 @@ public final class EventQueue implements Runnable {
 								int[] r = region.pop();
 								if (Emulator.getCanvas() == null
 										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-									repainted2 = true;
+									repainted = true;
 									break;
 								}
 								Displayable.checkForSteps();
@@ -536,14 +528,14 @@ public final class EventQueue implements Runnable {
 										.cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
 								Emulator.getEmulator().getScreen().repaint();
 								Displayable.fpsLimiter();
-								repainted2 = true;
+								repainted = true;
 								break;
 							}
 							case 6: { // GameCanvas partial flush TODO
 								int[] r = region.pop();
 								if (Emulator.getCanvas() == null
 										|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-									repainted = true;
+									gameRepainted = true;
 									break;
 								}
 								final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
@@ -551,7 +543,7 @@ public final class EventQueue implements Runnable {
 								final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
 								(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
 								Emulator.getEmulator().getScreen().repaint();
-								repainted = true;
+								gameRepainted = true;
 								break;
 							}
 						}

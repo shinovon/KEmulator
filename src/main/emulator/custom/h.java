@@ -74,10 +74,10 @@ public final class h
             super.visit(n, n2, this.aString1366 = aString1366, s, s2, array);
         }
         
-        public final MethodVisitor visitMethod(final int n, final String s, final String s2, final String s3, final String[] array) {
+        public final MethodVisitor visitMethod(int acc, final String name, final String desc, final String s3, final String[] array) {
             final MethodVisitor visitMethod;
-            if ((visitMethod = super.visitMethod(n, s, s2, s3, array)) != null) {
-                return (MethodVisitor)new TraceMethodAdapter(visitMethod, (MethodInfo)h.aHashtable1061.get(this.aString1366 + '.' + s + s2));
+            if ((visitMethod = super.visitMethod(acc, name, desc, s3, array)) != null) {
+                return (MethodVisitor)new TraceMethodAdapter(visitMethod, (MethodInfo)h.aHashtable1061.get(this.aString1366 + '.' + name + desc));
             }
             return null;
         }

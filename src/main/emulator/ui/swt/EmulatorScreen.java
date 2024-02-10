@@ -114,7 +114,7 @@ MouseTrackListener
     MenuItem infosMenuItem;
     MenuItem alwaysOnTopMenuItem;
     MenuItem rotateScreenMenuItem;
-    MenuItem forecPaintMenuItem;
+    MenuItem forcePaintMenuItem;
     MenuItem aMenuItem956;
     MenuItem aMenuItem957;
     MenuItem aMenuItem958;
@@ -708,8 +708,8 @@ MouseTrackListener
         this.rotate90MenuItem = new MenuItem(this.menuView, 8);
         this.rotate90MenuItem.setText(emulator.UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees"));
         this.rotate90MenuItem.addSelectionListener(this);
-        (this.forecPaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
-        this.forecPaintMenuItem.addSelectionListener((SelectionListener)this);
+        (this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
+        this.forcePaintMenuItem.addSelectionListener((SelectionListener)this);
         setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
         new MenuItem(this.menuView, 2);
         (this.aMenuItem956 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
@@ -907,7 +907,7 @@ MouseTrackListener
         this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
         this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
         this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
-        this.forecPaintMenuItem.setAccelerator(SWT.CONTROL | 70);
+        this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
         this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
         this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
 //        this.startpauseTickMenuItem.setAccelerator(SWT.CONTROL | 75);
@@ -1359,7 +1359,7 @@ MouseTrackListener
                   rotate90degrees(false);
                   return;
                 }
-                if (menuItem.equals(this.forecPaintMenuItem)) {
+                if (menuItem.equals(this.forcePaintMenuItem)) {
                     if (Settings.g2d == 0) {
                         if (Settings.xrayView) {
                             this.xrayScreenImageSwt.cloneImage(this.screenCopySwt);
@@ -1453,7 +1453,7 @@ MouseTrackListener
         this.resumeMenuItem.setEnabled(this.pauseState == 2);
         this.restartMenuItem.setEnabled(this.pauseState != 0);
         this.xrayViewMenuItem.setSelection(Settings.xrayView);
-        this.forecPaintMenuItem.setEnabled(this.pauseState != 0);
+        this.forcePaintMenuItem.setEnabled(this.pauseState != 0);
         this.pausestepMenuItem.setEnabled(this.pauseState != 0);
         this.playResumeMenuItem.setEnabled(Settings.steps >= 0 && this.pauseState != 0);
         this.openJadMenuItem.setEnabled(this.pauseState != 0);

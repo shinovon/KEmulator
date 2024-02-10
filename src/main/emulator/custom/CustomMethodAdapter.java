@@ -17,7 +17,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes
         this.anInt1185 = Math.max(this.anInt1185, n);
     }
     
-    public final void visitMethodInsn(final int n, final String cls, final String name, String sign) {
+    public final void visitMethodInsn(final int acc, final String cls, final String name, String sign) {
         Label_0576: {
             if (cls.equals("java/lang/System")) {
                 if (name.equals("gc")) {
@@ -44,12 +44,12 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes
                     if (sign.equals("()V")) {
                         this.method707(2);
                         super.visitLdcInsn((Object)new Long(Settings.recordedRandomSeed));
-                        super.visitMethodInsn(n, cls, name, "(J)V");
+                        super.visitMethodInsn(acc, cls, name, "(J)V");
                         return;
                     }
                     super.visitInsn(88);
                     super.visitLdcInsn((Object)new Long(Settings.recordedRandomSeed));
-                    super.visitMethodInsn(n, cls, name, sign);
+                    super.visitMethodInsn(acc, cls, name, sign);
                     return;
                 }
             }
@@ -69,13 +69,13 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes
                 if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
                     this.method707(1);
                     super.visitLdcInsn((Object)Settings.fileEncoding);
-                    super.visitMethodInsn(n, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
+                    super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
                     return;
                 }
                 if (name.equals("getBytes") && sign.startsWith("()")) {
                     this.method707(1);
                     super.visitLdcInsn((Object)Settings.fileEncoding);
-                    super.visitMethodInsn(n, cls, name, "(Ljava/lang/String;)[B");
+                    super.visitMethodInsn(acc, cls, name, "(Ljava/lang/String;)[B");
                     return;
                 }
             }
@@ -89,11 +89,11 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes
                     if (sign.indexOf("java/util/TimerTask") != -1) {
                         sign = sign.replaceAll("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
                     }
-                    super.visitMethodInsn(n, "emulator/custom/subclass/Timer", name, sign);
+                    super.visitMethodInsn(acc, "emulator/custom/subclass/Timer", name, sign);
                     return;
                 }
                 if (cls.equals("java/util/TimerTask")) {
-                    super.visitMethodInsn(n, "emulator/custom/subclass/SubTimerTask", name, sign);
+                    super.visitMethodInsn(acc, "emulator/custom/subclass/SubTimerTask", name, sign);
                     return;
                 }
                 String s4;
@@ -115,7 +115,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes
                 sign = s4.replaceAll(s5, s6);
             }
         }
-        super.visitMethodInsn(n, cls, name, sign);
+        super.visitMethodInsn(acc, cls, name, sign);
     }
     
     public final void visitFieldInsn(final int n, final String s, final String s2, String s3) {

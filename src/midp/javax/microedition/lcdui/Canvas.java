@@ -1,7 +1,5 @@
 package javax.microedition.lcdui;
 
-import com.nokia.mid.ui.DeviceControl;
-
 import emulator.*;
 import emulator.graphics2D.IImage;
 import emulator.lcdui.BoundsUtils;
@@ -146,7 +144,7 @@ public abstract class Canvas extends Displayable
         if (this != Emulator.getCurrentDisplay().getCurrent()) {
             return;
         }
-        Emulator.getEventQueue().waitRepainted2();
+        Emulator.getEventQueue().serviceRepaints();
     }
     
     protected void hideNotify() {
