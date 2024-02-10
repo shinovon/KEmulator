@@ -51,7 +51,6 @@ public class Emulator
     private static MIDlet midlet;
     private static Canvas currentCanvas;
     private static Screen currentScreen;
-    private static network.b netMonitor;
     private static EventQueue eventQueue;
     private static KeyRecords record;
     public static Vector jarLibrarys;
@@ -289,10 +288,6 @@ public class Emulator
     
     public static Display getCurrentDisplay() {
         return Display.getDisplay(Emulator.midlet);
-    }
-    
-    public static network.b getNetMonitor() {
-        return Emulator.netMonitor;
     }
     
     public static EventQueue getEventQueue() {
@@ -894,7 +889,6 @@ public class Emulator
             return;
         }
         Emulator.eventQueue = new EventQueue();
-        Emulator.netMonitor = new network.b();
         try {
             forName.newInstance();
         } catch (Exception ex2) {

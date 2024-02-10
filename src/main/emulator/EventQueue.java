@@ -82,7 +82,6 @@ public final class EventQueue implements Runnable {
 			default:
 				this.queue(n3);
 		}
-		Emulator.getNetMonitor().b(n3);
 	}
 
 	private static int method718(final int n) {
@@ -305,7 +304,6 @@ public final class EventQueue implements Runnable {
 					break;
 				}
 				case 11: {
-					Emulator.getNetMonitor().a();
 					this.stop();
 					if (Emulator.getMIDlet() != null) {
 						this.repainted = true;
