@@ -42,13 +42,14 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.15 [2024.02.04]
+$nnmod v2.15 [2024.02.10]
 Set default fps limit to 60
 Added UI language property
-Added ru localization
 Removed "Connect to Network" menu item
 Implemented Canvas.repaint(IIII)
-Fixed restart
+Patching midlet's paint() method (Ratatouille freeze fix)
+Added fps counter in status bar
+Fixed restart function
 
 $nnmod v2.14.4 [2024.02.02]
 Stop previously played midi player instead of throwing MediaException
