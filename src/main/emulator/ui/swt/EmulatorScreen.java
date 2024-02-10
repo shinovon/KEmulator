@@ -612,15 +612,17 @@ MouseTrackListener
 
     private void updateStatus() {
         String var8 = this.zoom == 1.0F?" ":"  ";
-        StringBuffer var9  = new StringBuffer();
+        StringBuffer var9 = new StringBuffer();
         var9.append((int)(this.zoom * 100.0F));
         var9.append("%");
         var9.append(var8);
         var9.append(this.pauseStateStrings[this.pauseState]);
         var9.append(var8);
-        var9.append(Profiler.FPS);
-        var9.append(" FPS");
-        var9.append(var8);
+        if(this.pauseState == 1) {
+            var9.append(Profiler.FPS);
+            var9.append(" FPS");
+            var9.append(var8);
+        }
         if(Settings.speedModifier > 0) {
           var9.append("x");
         }
