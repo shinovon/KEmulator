@@ -26,7 +26,7 @@ public final class Settings
     public static int steps;
     public static long aLong1235;
     public static String fileEncoding;
-    public static String[] aArray;
+    public static String[] recentJars;
     public static boolean infoColorHex;
     public static boolean recordReleasedImg;
     public static boolean xrayView;
@@ -37,8 +37,8 @@ public final class Settings
     public static boolean enableMethodTrack;
     public static boolean enableNewTrack;
     public static boolean threadMethodTrack;
-    private static final Random aRandom1238;
-    public static final long aLong1241;
+    private static final Random rng;
+    public static final long rngSeed;
     public static long recordedRandomSeed;
     public static boolean playingRecordedKeys;
     public static boolean recordKeys;
@@ -63,11 +63,14 @@ public final class Settings
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
 	public static String locale = "en-US";
-
+    public static boolean jdwpDebug;
     public static int debugPort = 29292;
     public static Map<String, String> controllerBinds = new HashMap<String, String>();
     public static boolean pollKeyboardOnRepaint = true;
     public static String uiLanguage = "en";
+    public static boolean rpc;
+
+    public static boolean uei;
 
     public Settings() {
         super();
@@ -79,11 +82,11 @@ public final class Settings
         Settings.canvasScale = 100;
         Settings.frameRate = 60;
         Settings.steps = -1;
-        Settings.aArray = new String[5];
+        Settings.recentJars = new String[5];
         Settings.speedModifier = 1;
-        aRandom1238 = new Random();
-        aLong1241 = Settings.aRandom1238.nextLong();
-        Settings.recordedRandomSeed = Settings.aLong1241;
+        rng = new Random();
+        rngSeed = Settings.rng.nextLong();
+        Settings.recordedRandomSeed = Settings.rngSeed;
         Settings.aBoolean1274 = false;
     }
 }

@@ -517,7 +517,7 @@ public final class Property implements IProperty
             Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
             Settings.recordKeys = Boolean.valueOf(properties.getProperty("RecordKeys", "false"));
             for (int i = 0; i < 5; ++i) {
-                Settings.aArray[i] = properties.getProperty("MRUList" + i, "");
+                Settings.recentJars[i] = properties.getProperty("MRUList" + i, "");
             }
             Settings.proxyType = Integer.parseInt(properties.getProperty("ProxyType", "0"));
             if (Settings.proxyType < 0 || Settings.proxyType > 2) {
@@ -531,7 +531,7 @@ public final class Property implements IProperty
             Settings.showLogFrame = Boolean.valueOf(properties.getProperty("ShowLogFrame", "false"));
             Settings.showInfoFrame = Boolean.valueOf(properties.getProperty("ShowInfoFrame", "false"));
             Settings.showMemViewFrame = Boolean.valueOf(properties.getProperty("ShowMemViewFrame", "false"));
-            Emulator.rpcEnabled = Boolean.valueOf(properties.getProperty("DiscordRichPresence", "true"));
+            Settings.rpc = Boolean.valueOf(properties.getProperty("DiscordRichPresence", "true"));
             Settings.awtAntiAliasing = Boolean.valueOf(properties.getProperty("AWTAntiAliasing", "false"));
             Settings.canvasKeyboard = Boolean.valueOf(properties.getProperty("CanvasKeyboardMode", "true"));
             if(Emulator.getEmulator() != null && Emulator.getEmulator().getScreen() != null) {
@@ -577,7 +577,7 @@ public final class Property implements IProperty
             this.fontMediumSIze = 14;
             this.fontLargeSize = 16;
             for (int j = 0; j < 5; ++j) {
-                Settings.aArray[j] = "";
+                Settings.recentJars[j] = "";
             }
             Settings.proxyType = 0;
             Settings.proxyHost = "";
@@ -655,7 +655,7 @@ public final class Property implements IProperty
             properties.setProperty("FileEncoding", Settings.fileEncoding);
             properties.setProperty("RecordKeys", String.valueOf(Settings.recordKeys));
             for (int i = 0; i < 5; ++i) {
-                properties.setProperty("MRUList" + i, Settings.aArray[i]);
+                properties.setProperty("MRUList" + i, Settings.recentJars[i]);
             }
             properties.setProperty("ProxyType", String.valueOf(Settings.proxyType));
             properties.setProperty("ProxyHost", Settings.proxyHost);
@@ -666,7 +666,7 @@ public final class Property implements IProperty
             properties.setProperty("ShowLogFrame", String.valueOf(Settings.showLogFrame));
             properties.setProperty("ShowInfoFrame", String.valueOf(Settings.showInfoFrame));
             properties.setProperty("ShowMemViewFrame", String.valueOf(Settings.showMemViewFrame));
-            properties.setProperty("DiscordRichPresence", String.valueOf(Emulator.rpcEnabled));
+            properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
             properties.setProperty("AWTAntiAliasing", String.valueOf(Settings.awtAntiAliasing));
             properties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
             properties.setProperty("VlcDir", Settings.vlcDir);
@@ -761,7 +761,7 @@ public final class Property implements IProperty
         Settings.proxyPass = this.aText641.getText();
         Settings.proxyDomain = this.aText643.getText().trim();
         //Emulator.inactivityTimer = this.inactiveTimerSpinner.getSelection();
-        Emulator.rpcEnabled = this.rpcBtn.getSelection();
+        Settings.rpc = this.rpcBtn.getSelection();
         Settings.awtAntiAliasing = this.antiAliasBtn.getSelection();
 //        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
         Settings.vlcDir = vlcDirText.getText().trim();
@@ -1608,7 +1608,7 @@ public final class Property implements IProperty
         //inactiveTimerSpinner.setValues(0, 0, Integer.MAX_VALUE, 0, 1, 10);
         //inactiveTimerSpinner.setSelection(Emulator.inactivityTimer);
         (this.rpcBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_DISCORD_RICHPRESENCE", "Discord Rich Presence"));
-        this.rpcBtn.setSelection(Emulator.rpcEnabled);
+        this.rpcBtn.setSelection(Settings.rpc);
         (this.antiAliasBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
         this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
 //        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));

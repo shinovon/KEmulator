@@ -71,14 +71,15 @@ public class Connector
                 return new SocketConnectionImpl(s);
             }
             Connection openPrim = null;
-            String ss = s;
-            if(s.indexOf(":") > 0) {
-            	ss = s.substring(s.indexOf(":"));
+            String protocol = s;
+            if(s.indexOf(':') != -1) {
+            	protocol = s.substring(s.indexOf(':'));
             }
             try {
                 openPrim = ((ConnectionBaseInterface)Class.forName("com.sun.cdc.io.j2me." + s.substring(0, s.indexOf(58)) + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(58) + 1), n, b);
+            } catch (Exception ex) {
+                throw new IOException("unknown protocol: " + protocol);
             }
-            catch (Exception ex) { throw new IOException("unknown protocol: " + ss ); }
             return openPrim;
         }
     }

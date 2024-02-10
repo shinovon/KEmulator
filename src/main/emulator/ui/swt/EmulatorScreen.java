@@ -822,12 +822,12 @@ MouseTrackListener
         final MenuItem menuItem5;
         (menuItem5 = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.get("MENU_MIDLET_RECENTLY", "Recent jarfiles"));
         this.aMenu1018 = new Menu((Decorations)this.shell, 4194308);
-        for (int n = 1; n < 5 && !Settings.aArray[n].equals(""); ++n) {
+        for (int n = 1; n < 5 && !Settings.recentJars[n].equals(""); ++n) {
             final String s;
             String s2;
             String s3;
             int n2;
-            if ((s = Settings.aArray[n]).lastIndexOf(92) > 0) {
+            if ((s = Settings.recentJars[n]).lastIndexOf(92) > 0) {
                 s2 = s;
                 s3 = s;
                 n2 = 92;

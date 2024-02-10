@@ -2,9 +2,6 @@ package emulator;
 
 import java.awt.Dimension;
 import java.io.*;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
@@ -21,7 +18,6 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import emulator.ui.swt.InputDialog;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -61,33 +57,34 @@ public class Emulator
 	public static emulator.custom.CustomClassLoader customClassLoader;
 	private static Info[] midiDeviceInfo;
 	public static String iconPath;
-	//public static int screenBrightness = 100;
-	//public static int inactivityTimer = 0;
 
 	protected static DiscordRPC rpc;
-	private static long presenceStartTimestamp;
-	private static Thread rpcCallbackThread;
-	public static boolean rpcEnabled;
+    private static Thread rpcCallbackThread;
+    public static long rpcStartTimestamp;
+    public static long rpcEndTimestamp;
+    public static String rpcState;
+    public static String rpcDetails;
+    public static int rpcPartySize;
+    public static int rpcPartyMax;
+
 	public static String customUA;
 	private static Thread vlcCheckerThread;
-    public static boolean jdwpDebug;
-    public static boolean uei;
     private static IEmulatorPlatform platform;
 
-    private static void loadRichPresence() {
-		if(!rpcEnabled)
+    private static void initRichPresence() {
+		if(!Settings.rpc)
 			return;
 		rpc = DiscordRPC.INSTANCE;
 		DiscordEventHandlers handlers = new DiscordEventHandlers();
 		handlers.ready = (user) -> {};
 		rpc.Discord_Initialize("823522436444192818", handlers, true, "");
 		DiscordRichPresence presence = new DiscordRichPresence();
-		presence.startTimestamp = presenceStartTimestamp = System.currentTimeMillis() / 1000;
+		presence.startTimestamp = rpcStartTimestamp = System.currentTimeMillis() / 1000;
 		presence.state = "No MIDlet loaded";
 		rpc.Discord_UpdatePresence(presence);
 		rpcCallbackThread = new Thread("KEmulator RPC-Callback-Handler") {
 			public void run() {
-				while (!Thread.currentThread().isInterrupted()) {
+				while (true) {
 					rpc.Discord_RunCallbacks();
 					try {
 						Thread.sleep(2000);
@@ -100,16 +97,18 @@ public class Emulator
 		rpcCallbackThread.start();
 	}
 
-	public static void updatePresence(String state, String details) {
-		if(rpc == null)
-			return;
-		DiscordRichPresence presence = new DiscordRichPresence();
-		presence.state = state;
-		presence.startTimestamp = presenceStartTimestamp;
-		if (details != null && !details.isEmpty())
-			presence.details = details;
-		rpc.Discord_UpdatePresence(presence);
-	}
+    public static void updatePresence() {
+        if(rpc == null)
+            return;
+        DiscordRichPresence presence = new DiscordRichPresence();
+        presence.state = rpcState;
+        presence.details = rpcDetails;
+        presence.startTimestamp = rpcStartTimestamp;
+        presence.endTimestamp = rpcEndTimestamp;
+        presence.partySize = rpcPartySize;
+        presence.partyMax = rpcPartyMax;
+        rpc.Discord_UpdatePresence(presence);
+    }
 
 	public Emulator() {
         super();
@@ -127,24 +126,24 @@ public class Emulator
         return Emulator.currentCanvas;
     }
     
-    public static void setCanvas(final Canvas aCanvas500) {
-        Emulator.currentCanvas = aCanvas500;
+    public static void setCanvas(final Canvas canvas) {
+        Emulator.currentCanvas = canvas;
     }
     
     public static Screen getScreen() {
         return Emulator.currentScreen;
     }
     
-    public static void setScreen(final Screen aScreen501) {
-        Emulator.currentScreen = aScreen501;
+    public static void setScreen(final Screen screen) {
+        Emulator.currentScreen = screen;
     }
     
     public static MIDlet getMIDlet() {
         return Emulator.midlet;
     }
     
-    public static void setMIDlet(final MIDlet amiDlet499) {
-        Emulator.midlet = amiDlet499;
+    public static void setMIDlet(final MIDlet midlet) {
+        Emulator.midlet = midlet;
     }
     
     public static Display getCurrentDisplay() {
@@ -317,7 +316,6 @@ public class Emulator
                 else {
                     final StringBuffer sb = new StringBuffer();
                     file = (file2 = new File(sb.append(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3)).append("jad").toString()));
-                   
                 }
                 final File file3 = file2;
                 if (file.exists()) {
@@ -465,20 +463,20 @@ public class Emulator
     }
     
     public static void setupMRUList() {
-        if (Emulator.midletJar == null && Settings.aArray[0].trim().equalsIgnoreCase("")) {
+        if (Emulator.midletJar == null && Settings.recentJars[0].trim().equalsIgnoreCase("")) {
             return;
         }
-        if (Settings.aArray[0].trim().equalsIgnoreCase("")) {
-            Settings.aArray[0] = Emulator.midletJar;
+        if (Settings.recentJars[0].trim().equalsIgnoreCase("")) {
+            Settings.recentJars[0] = Emulator.midletJar;
             return;
         }
         if (Emulator.midletJar != null) {
             for (int i = 4; i > 0; --i) {
-                if (Settings.aArray[i].equalsIgnoreCase(Settings.aArray[0])) {
-                    Settings.aArray[i] = Settings.aArray[1];
-                    Settings.aArray[1] = Settings.aArray[0];
-                    if (!Settings.aArray[0].equalsIgnoreCase(Emulator.midletJar)) {
-                        Settings.aArray[0] = Emulator.midletJar;
+                if (Settings.recentJars[i].equalsIgnoreCase(Settings.recentJars[0])) {
+                    Settings.recentJars[i] = Settings.recentJars[1];
+                    Settings.recentJars[1] = Settings.recentJars[0];
+                    if (!Settings.recentJars[0].equalsIgnoreCase(Emulator.midletJar)) {
+                        Settings.recentJars[0] = Emulator.midletJar;
                     }
                     return;
                 }
@@ -486,27 +484,27 @@ public class Emulator
         }
         int j;
         for (j = 4; j > 0; --j) {
-            if (Settings.aArray[j].equalsIgnoreCase(Settings.aArray[0])) {
-                Settings.aArray[j] = Settings.aArray[1];
-                Settings.aArray[1] = Settings.aArray[0];
+            if (Settings.recentJars[j].equalsIgnoreCase(Settings.recentJars[0])) {
+                Settings.recentJars[j] = Settings.recentJars[1];
+                Settings.recentJars[1] = Settings.recentJars[0];
                 break;
             }
         }
         if (j == 0) {
             for (int k2 = 4; k2 > 0; --k2) {
-                Settings.aArray[k2] = Settings.aArray[k2 - 1];
+                Settings.recentJars[k2] = Settings.recentJars[k2 - 1];
             }
         }
         String[] array;
         int n;
         String midletJar;
         if (Emulator.midletJar == null) {
-            array = Settings.aArray;
+            array = Settings.recentJars;
             n = 0;
             midletJar = "";
         }
         else {
-            array = Settings.aArray;
+            array = Settings.recentJars;
             n = 0;
             midletJar = Emulator.midletJar;
         }
@@ -610,7 +608,6 @@ public class Emulator
         }
         System.setProperty("microedition.sensor.version", "1.0");
         System.setProperty("kemulator.notificationapi.version", "1.0");
-        System.setProperty("kemulator.filemanagerapi.version", "1.0");
         System.setProperty("fileconn.dir.photos", "file:///root/photos/");
         System.setProperty("fileconn.dir.music", "file:///root/music/");
         System.setProperty("fileconn.dir.private", "file://root/private/");
@@ -629,6 +626,7 @@ public class Emulator
         System.setProperty("microedition.amms.version", "1.0");
         System.setProperty("org.pigler.api.version", "1.2-kemulator");
         if(platform.isX64()) System.setProperty("kemulator.x64", "true");
+        System.setProperty("kemulator.rpc.version", "1.0");
 	    try {
 	        Webcam w = Webcam.getDefault();
 	        if(w != null) {
@@ -689,7 +687,7 @@ public class Emulator
         Devices.load(Emulator.deviceFile);
         tryToSetDevice(Emulator.deviceName);
         setupMRUList();
-        loadRichPresence();
+        initRichPresence();
         if (Emulator.midletClassName == null && Emulator.midletJar == null) {
             Emulator.emulatorimpl.getEmulatorScreen().start(false);
             EmulatorImpl.dispose();
@@ -725,8 +723,11 @@ public class Emulator
             jar = jar.substring(jar.lastIndexOf("/") + 1);
         if (jar.indexOf("\\") > -1)
             jar = jar.substring(jar.lastIndexOf("\\") + 1);
-        if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null)
-            Emulator.updatePresence((uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name"), uei ? "UEI" : jar);
+        if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
+            Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+            Emulator.rpcDetails = Settings.uei ? "UEI" : jar;
+            updatePresence();
+        }
         Emulator.emulatorimpl.getEmulatorScreen().setWindowIcon(inputStream);
         setProperties();
         if (Emulator.midletClassName == null) {
@@ -836,7 +837,7 @@ public class Emulator
                 Settings.showLogFrame = true;
             }
             else if (key.equalsIgnoreCase("uei")) {
-                Emulator.uei = true;
+                Settings.uei = true;
             }
             else if(value != null) {
                 if (key.equalsIgnoreCase("jar")) {
@@ -920,7 +921,7 @@ public class Emulator
         cmd.add("-cp");
         cmd.add(System.getProperty("java.class.path"));
         cmd.add("-Xmx1G");
-        if(Emulator.jdwpDebug) {
+        if(Settings.jdwpDebug) {
             cmd.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + Settings.debugPort);
         }
         if("false".equals(System.getProperty("sun.java3d.d3d"))) {
@@ -955,20 +956,6 @@ public class Emulator
         }
     	CustomMethod.close();
         System.exit(0);
-    }
-    
-    private static void method284(final StringBuffer sb, final String s) {
-        final int index;
-        if ((index = sb.indexOf(s)) != -1) {
-            final int n = index + (s.length() + 1);
-            sb.insert(n, "\"");
-            final int index2;
-            if ((index2 = sb.indexOf("-", n)) != -1) {
-                sb.insert(index2 - 1, "\"");
-                return;
-            }
-            sb.append("\"");
-        }
     }
 
     static String getMidletJarUrl(String jadPath) {
