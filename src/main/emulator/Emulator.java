@@ -239,7 +239,12 @@ public class Emulator
             if (s.length() > 100) {
                 s = s.substring(0, 100) + "...";
             }
-            messageBox.setMessage("MIDlet wants to open URL: " + s);
+            if(s.startsWith("vlc:")) {
+                s = s.substring(4);
+                messageBox.setMessage("MIDlet wants to open URL in VLC: " + s);
+            } else {
+                messageBox.setMessage("MIDlet wants to open URL: " + s);
+            }
             messageBox.setText("Security");
             dialogResult = messageBox.open();
         });
