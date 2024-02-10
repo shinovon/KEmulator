@@ -2,6 +2,7 @@ package javax.microedition.midlet;
 
 import emulator.*;
 import emulator.custom.CustomMethod;
+import org.eclipse.swt.internal.C;
 
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
@@ -45,36 +46,45 @@ public abstract class MIDlet
         try {
             System.out.println("platformRequest(" + s + ")");
 
-            if (Settings.networkNotAvailable || !Emulator.requestURLAccess(s)/*JOptionPane.showConfirmDialog(new JPanel(), "MIDlet wants to open URL:\n" + s2, "Security", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION*/) {
+            if (Settings.networkNotAvailable || !Emulator.requestURLAccess(s)) {
                 return false;
             }
-        	//Emulator.checkPermission("midlet.platformrequest");
             if(s.startsWith("file:///root/")) {
             	s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
+            } else if(s.startsWith("file:")) {
+                throw new SecurityException();
             }
-            if(s.startsWith("vlc.exe")) {
+            if(s.startsWith("vlc:")) {
             	if(Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
-                	s = new File(Settings.vlcDir).getCanonicalPath() + "/vlc.exe" + s.substring("vlc.exe".length());
+                    s = s.substring(4);
+                    if(s.startsWith("file:///root/")) {
+                        s = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") + "/file/root/" + s.substring("file:///root/".length())).replace(" ", "%20");
+                    } else if(s.startsWith("file:")) {
+                        throw new SecurityException();
+                    }
+                	s = new File(Settings.vlcDir).getCanonicalPath() + "/vlc \"" + s + "\"";
                     Runtime.getRuntime().exec(s);
-                	return true;
+                	return false;
             	}
-            	s = "C:/PROGRA~1/VideoLAN/VLC/vlc.exe" + s.substring("vlc.exe".length());
-                Runtime.getRuntime().exec(s);
-            	return true;
+                throw new ConnectionNotFoundException("vlc dir not set");
             }
             try {
 	            if(Desktop.getDesktop().isDesktopSupported()) {
 	            	Desktop.getDesktop().browse(new URI(s));
 	            }
             } catch (Exception e) {
-            	System.out.println(e);
+                Emulator.getEmulator().getLogStream().println(e.toString());
+                if(Emulator.isX64()) {
+                    throw new ConnectionNotFoundException("not supported");
+                }
             	Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + s);
             }
             return false;
-        }
-        catch (Exception ex) {
-        	ex.printStackTrace();
-            throw new ConnectionNotFoundException(ex);
+        } catch (ConnectionNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+        	e.printStackTrace();
+            throw new ConnectionNotFoundException(e);
         }
     }
     
