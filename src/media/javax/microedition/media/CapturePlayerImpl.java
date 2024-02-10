@@ -25,6 +25,8 @@ import javax.microedition.media.control.CameraVideoControlImpl;
 
 import com.github.sarxos.webcam.Webcam;
 
+import emulator.Emulator;
+import emulator.Permission;
 import emulator.graphics2D.awt.d;
 
 public class CapturePlayerImpl implements Player {
@@ -313,6 +315,7 @@ public class CapturePlayerImpl implements Player {
 
 	@Override
 	public void start() throws IllegalStateException, MediaException {
+		Permission.checkPermission("camera");
 		webcam.open();
 		started = true;
 	}

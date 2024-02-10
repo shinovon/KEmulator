@@ -31,12 +31,12 @@ public class MessageConnectionImpl implements MessageConnection
     }
     
     public void send(final Message message) throws IOException, InterruptedIOException {
-    	Emulator.checkPermission("messageconnection.send");
+    	Permission.checkPermission("messageconnection.send");
         Emulator.getEmulator().getMessage().send(message, this.aString314);
     }
     
     public Message receive() throws IOException, InterruptedIOException {
-    	Emulator.checkPermission("messageconnection.receive");
+        Permission.checkPermission("messageconnection.receive");
         Message receive = null;
         while (receive == null && !this.aBoolean313) {
             try {

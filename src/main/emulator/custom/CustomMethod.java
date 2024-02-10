@@ -82,7 +82,7 @@ public class CustomMethod
     		b = false;
     		res = DebugUtils.getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
     	} else if(prop.equalsIgnoreCase("com.nokia.mid.imei") || prop.equalsIgnoreCase("com.nokia.imei") || prop.equalsIgnoreCase("device.imei")) {
-    		res = Emulator.askIMEI();
+    		res = Permission.askIMEI();
     	} else if(prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
     		res = "" + Manager.isLibVlcSupported();
     	}

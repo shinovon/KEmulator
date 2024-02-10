@@ -68,14 +68,8 @@ public class Emulator
 	private static long presenceStartTimestamp;
 	private static Thread rpcCallbackThread;
 	public static boolean rpcEnabled;
-	private static Vector allowPerms = new Vector();
-	private static Vector notAllowPerms = new Vector();
 	public static String customUA;
-	private static String imei;
-	public static boolean askPermissions = false;
-	public static boolean askImei = true;
 	private static Thread vlcCheckerThread;
-    private static int dialogResult;
     public static boolean jdwpDebug;
     public static boolean uei;
     private static IEmulatorPlatform platform;
@@ -116,140 +110,6 @@ public class Emulator
 			presence.details = details;
 		rpc.Discord_UpdatePresence(presence);
 	}
-	
-	private static int getAppPermissionLevel(String x) {
-		if(!askPermissions) return 2;
-		x = x.toLowerCase();
-		switch(x) {
-		case "connector.open.http":
-		case "connector.open.https":
-		case "connector.open.file":
-		case "connector.open.socket":
-		case "connector.open.serversocket":
-		case "connector.open.sms":
-			return 5;
-		default:
-			return 4;
-		}
-	}
-
-
-    static InputDialog imeiDialog;
-	public synchronized static String askIMEI() {
-		if(notAllowPerms.contains("imei"))
-			return null;
-		if(!askImei) return "0000000000000000";
-		if(imei != null) return imei;
-        emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
-            imeiDialog = new InputDialog(emulatorimpl.getEmulatorScreen().getShell());
-            imeiDialog.setMessage("Application asks for IMEI");
-            imeiDialog.setInput("0000000000000000");
-            imeiDialog.open();
-        });
-        String s = imeiDialog.getInput();
-        //String s = showInputDialog(parent, "Application asks for IMEI", "0000000000000000", JOptionPane.WARNING_MESSAGE);
-        if(s == null) {
-            notAllowPerms.add("imei");
-        }
-		allowPerms.add("imei");
-		return imei = s;
-	}
-
-    public static boolean showConfirmDialog(String message, String title) {
-        emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
-        MessageBox messageBox = new MessageBox(emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
-        messageBox.setMessage(message);
-        messageBox.setText(title);
-        dialogResult = messageBox.open();
-        });
-        return dialogResult == SWT.YES;
-    }
-    
-	public static void checkPermission(String x) {
-		int p = getAppPermissionLevel(x);
-		//0: always ask
-		//1: ask once if yes, ask next time if no is pressed
-		//2: always allowed
-		//3: never
-		//4: always ask until no is pressed
-		//5: ask once
-		if(p == 0) {
-			// always ask
-			if(!showConfirmDialog(localizePerm(x), ""))
-				throw new SecurityException(x);
-			allowPerms.add(x);
-		} else if(p == 1) {
-			// ask once
-			if(allowPerms.contains(x))
-				return;
-            if(!showConfirmDialog(localizePerm(x), ""))
-				throw new SecurityException(x);
-			allowPerms.add(x);
-		} else if(p == 2) {
-			// allowed
-		} else if(p == 3) {
-			// never
-			throw new SecurityException(x);
-		} else if(p == 4) {
-			// always ask until "no" is pressed
-			if(notAllowPerms.contains(x))
-				return;
-            if(!showConfirmDialog(localizePerm(x), "")) {
-				notAllowPerms.add(x);
-				throw new SecurityException(x);
-			}
-			allowPerms.add(x);
-		} else if(p == 5) {
-			// ask once
-			if(notAllowPerms.contains(x))
-				throw new SecurityException(x);
-			if(allowPerms.contains(x))
-				return;
-            if(!showConfirmDialog(localizePerm(x), "")) {
-				notAllowPerms.add(x);
-				throw new SecurityException(x);
-			}
-			allowPerms.add(x);
-		} else {
-			
-		}
-	}
-    
-    private static String localizePerm(String x) {
-		switch(x) {
-		case "connector.open.http":
-			return "Allow the application to open HTTP connections?";
-		case "connector.open.https":
-			return "Allow the application to open HTTPS connections?";
-		case "connector.open.file":
-			return "Allow the application to access the file system?";
-		case "connector.open.socket":
-			return "Allow the application to open socket connections?";
-		case "connector.open.serversocket":
-			return "Allow the application to open server socket connections?";
-		default:
-			return "Allow the application to use \'" + x + "\'?";
-		}
-	}
-
-    public static boolean requestURLAccess(final String url) {
-        emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
-            MessageBox messageBox = new MessageBox(emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
-            String s = url;
-            if (s.length() > 100) {
-                s = s.substring(0, 100) + "...";
-            }
-            if(s.startsWith("vlc:")) {
-                s = s.substring(4);
-                messageBox.setMessage("MIDlet wants to open URL in VLC: " + s);
-            } else {
-                messageBox.setMessage("MIDlet wants to open URL: " + s);
-            }
-            messageBox.setText("Security");
-            dialogResult = messageBox.open();
-        });
-        return dialogResult == SWT.YES;
-    }
 
 	public Emulator() {
         super();

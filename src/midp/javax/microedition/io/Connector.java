@@ -34,11 +34,11 @@ public class Connector
             return new ResourceConnectionImpl(s);
         }
         if (s.startsWith("file://")) {
-        	Emulator.checkPermission("connector.open.file");
+        	Permission.checkPermission("connector.open.file");
             return new FileConnectionImpl(s);
         }
         if (s.startsWith("sms://")) {
-        	Emulator.checkPermission("connector.open.sms");
+        	Permission.checkPermission("connector.open.sms");
             return new MessageConnectionImpl(s);
         }
         if (s.startsWith("sensor:")) {
@@ -55,19 +55,19 @@ public class Connector
                 throw new IOException("Network not available");
             }
             if (s.startsWith("http://")) {
-            	Emulator.checkPermission("connector.open.http");
+            	Permission.checkPermission("connector.open.http");
                 return new HttpConnectionImpl(s);
             }
             if (s.startsWith("https://")) {
-            	Emulator.checkPermission("connector.open.http");
+            	Permission.checkPermission("connector.open.http");
                 return new HttpConnectionImpl(s);
             }
             if (s.startsWith("socket://:")) {
-            	Emulator.checkPermission("connector.open.serversocket");
+            	Permission.checkPermission("connector.open.serversocket");
                 return new ServerSocketImpl(s);
             }
             if (s.startsWith("socket://")) {
-            	Emulator.checkPermission("connector.open.socket");
+            	Permission.checkPermission("connector.open.socket");
                 return new SocketConnectionImpl(s);
             }
             Connection openPrim = null;

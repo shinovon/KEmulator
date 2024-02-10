@@ -48,7 +48,7 @@ public abstract class MIDlet
             if(url.startsWith("vlc.exe \"")) {
                 url = "vlc:" + url.substring(9, url.length()-1);
             }
-            if (Settings.networkNotAvailable || !Emulator.requestURLAccess(url)) {
+            if (Settings.networkNotAvailable || !Permission.requestURLAccess(url)) {
                 return false;
             }
             if(url.startsWith("file:///root/")) {
