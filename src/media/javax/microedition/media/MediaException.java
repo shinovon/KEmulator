@@ -1,7 +1,5 @@
 package javax.microedition.media;
 
-import javazoom.jl.decoder.JavaLayerException;
-
 public class MediaException extends Exception
 {
     private static final long serialVersionUID = 1L;

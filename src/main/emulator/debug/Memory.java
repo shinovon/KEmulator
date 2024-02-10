@@ -3,7 +3,7 @@ package emulator.debug;
 import emulator.*;
 import javax.microedition.lcdui.*;
 import com.nokia.mid.sound.*;
-import com.samsung.util.*;
+
 import javax.microedition.m3g.*;
 import emulator.graphics2D.*;
 
@@ -14,6 +14,7 @@ import java.lang.reflect.*;
 import emulator.ui.swt.EmulatorScreen;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
+import com.samsung.util.AudioClip;
 
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;

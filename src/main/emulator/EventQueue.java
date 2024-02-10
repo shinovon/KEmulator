@@ -2,7 +2,7 @@ package emulator;
 
 import javax.microedition.lcdui.*;
 
-import net.rim.device.api.system.*;
+import net.rim.device.api.system.Application;
 import emulator.graphics2D.*;
 
 import java.util.Stack;
@@ -10,22 +10,16 @@ import java.util.Vector;
 
 public final class EventQueue implements Runnable {
 	private int[] events;
-	private int readed;
+	private int readIndex;
 	private int ind;
-	private int anInt1222;
+	private int event;
 	private boolean running;
 	private Vector serialEvents = new Vector();
-	private ThreadCallSerially threadCallSerially = new ThreadCallSerially(this);
+	private ThreadCallSerially threadCallSerially = new ThreadCallSerially();
 	private Thread eventThread;
 	private boolean canvasHidden;
 	private boolean repainted;
 	private boolean gameRepainted;
-	private Thread mouseThread;
-	private int dx;
-	private int dy;
-	private boolean changed;
-	protected long last;
-	public static Runnable aRunnable1219;
 	private InputThread input = new InputThread();
 	private RepaintThread repaint = new RepaintThread();
 	private Thread inputThread;
@@ -35,8 +29,8 @@ public final class EventQueue implements Runnable {
 		super();
 		this.events = new int[128];
 		this.ind = 0;
-		this.readed = 0;
-		this.anInt1222 = 0;
+		this.readIndex = 0;
+		this.event = 0;
 		this.canvasHidden = false;
 		this.running = true;
 		this.repainted = true;
@@ -64,24 +58,6 @@ public final class EventQueue implements Runnable {
 	public final void keyRelease(int n) {
 		input.queue(1, n, 0, true);
 		//method717(134217728, n);
-	}
-
-
-	public final void controllerEvent(final int n, final int n2) {
-		final int n3 = n | method718(n2);
-		switch(n) {
-			case 67108864:
-				keyPress(n2);
-				break;
-			case 134217728:
-				keyRelease(n2);
-				break;
-			case 33554432:
-				keyRepeat(n2);
-				break;
-			default:
-				this.queue(n3);
-		}
 	}
 
 	private static int method718(final int n) {
@@ -158,8 +134,8 @@ public final class EventQueue implements Runnable {
 	public synchronized final void mouse(final int n, final int x, final int y) {
 		final int n4 = n | method718(x) | method718(y) << 12;
 		this.queue(n4);
-		//Emulator.getNetMonitor().b(n4);
 	}
+
 	/**
 	 * queue event
 	 */
@@ -213,13 +189,13 @@ public final class EventQueue implements Runnable {
 	}
 
 	private synchronized int nextEvent() {
-		if (this.readed == this.ind) {
+		if (this.readIndex == this.ind) {
 			return 0;
 		}
-		int n = this.events[this.readed];
-		this.events[this.readed++] = 0;
-		if (this.readed >= events.length) {
-			this.readed = 0;
+		int n = this.events[this.readIndex];
+		this.events[this.readIndex++] = 0;
+		if (this.readIndex >= events.length) {
+			this.readIndex = 0;
 		}
 		return n;
 	}
@@ -259,7 +235,7 @@ public final class EventQueue implements Runnable {
 					}
 					continue;
 				}
-				switch (this.anInt1222 = this.nextEvent()) {
+				switch (this.event = this.nextEvent()) {
 				case 1: {
 					if (Emulator.getCanvas() == null
 							|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
@@ -367,23 +343,23 @@ public final class EventQueue implements Runnable {
 				case 0:
 					break;
 				default:
-					if ((this.anInt1222 & Integer.MIN_VALUE) != 0x0) {
+					if ((this.event & Integer.MIN_VALUE) != 0x0) {
 						if (Emulator.getCanvas() == null) {
 							if (Emulator.getScreen() != null)
-								Emulator.getScreen().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
-										.method719(this.anInt1222, this.anInt1222 >> 12, false));
+								Emulator.getScreen().invokeSizeChanged(this.method719(this.event, this.event, false), this
+										.method719(this.event, this.event >> 12, false));
 							break;
 						}
 						if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 							break;
 						}
-						Emulator.getCanvas().invokeSizeChanged(this.method719(this.anInt1222, this.anInt1222, false), this
-								.method719(this.anInt1222, this.anInt1222 >> 12, false));
+						Emulator.getCanvas().invokeSizeChanged(this.method719(this.event, this.event, false), this
+								.method719(this.event, this.event >> 12, false));
 						break;
 					}
 					break;
 				}
-				this.anInt1222 = 0;
+				this.event = 0;
 				Controllers.poll();
 				try {
 					Thread.sleep(1L);
@@ -401,12 +377,12 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void callSerially(Runnable run) {
-		serialEvents.add(EventQueue.aRunnable1219 = run);
+		serialEvents.add(run);
 	//	queue(2);
 	}
 
 	private class RepaintThread implements Runnable {
-		private int[] events;
+		private int[] events = new int[length = 16];
 		private Object readLock = new Object();
 		private int length;
 		private int count;
@@ -414,9 +390,6 @@ public final class EventQueue implements Runnable {
 		private Object sync = new Object();
 		private Stack<int[]> region = new Stack<int[]>();
 
-		private RepaintThread() {
-			events = new int[length = 16];
-		}
 		public synchronized void queue(int i) {
 			if(events[0] == i) return;
 			synchronized(sync) {
@@ -436,9 +409,9 @@ public final class EventQueue implements Runnable {
 			try {
 				while(running) {
 					if(!added)
-					synchronized(readLock) {
-						readLock.wait();
-					}
+						synchronized(readLock) {
+							readLock.wait();
+						}
 					added = false;
 					while(Emulator.getMIDlet() == null || canvasHidden) {
 						Thread.sleep(5);
@@ -593,9 +566,9 @@ public final class EventQueue implements Runnable {
 			while(running) {
 				try {
 					if(!added)
-					synchronized(readLock) {
-						readLock.wait();
-					}
+						synchronized(readLock) {
+							readLock.wait();
+						}
 					added = false;
 					while(Emulator.getMIDlet() == null || canvasHidden) {
 						Thread.sleep(5);
@@ -630,19 +603,17 @@ public final class EventQueue implements Runnable {
 				int n = (int) o[1];
 				switch((int) o[0]) {
 				case 0: {
-					int k = Application.internalKeyPress(n);
-					if(!d.handleSoftKeyAction(k, true)) {
-						if (canv) ((Canvas)d).invokeKeyPressed(k);
-						else ((Screen)d).invokeKeyPressed(k);
-					}
+					Application.internalKeyPress(n);
+					if(d.handleSoftKeyAction(n, true)) return;
+					if (canv) ((Canvas)d).invokeKeyPressed(n);
+					else ((Screen)d).invokeKeyPressed(n);
 					break;
 				}
 				case 1: {
-					int k = Application.internalKeyRelease(n);
-					if(!d.handleSoftKeyAction(k, false)) {
-						if (canv) ((Canvas)d).invokeKeyReleased(k);
-						else ((Screen)d).invokeKeyReleased(k);
-					}
+					Application.internalKeyRelease(n);
+					if(d.handleSoftKeyAction(n, false)) return;
+					if (canv) ((Canvas)d).invokeKeyReleased(n);
+					else ((Screen)d).invokeKeyReleased(n);
 					break;
 				}
 				case 2:
@@ -673,28 +644,16 @@ public final class EventQueue implements Runnable {
 	}
 
 	private final class ThreadCallSerially implements Runnable {
-		private boolean aBoolean1048;
-		private Runnable aRunnable1049;
-
-		private ThreadCallSerially(final EventQueue aj1050) {
-			super();
-		}
-
-		public final void run() {
-			while (running) {
-				if(!serialEvents.isEmpty()) {
-					((Runnable)serialEvents.remove(0)).run();
-				}
-				try {
+		public void run() {
+			try {
+				while (running) {
+					if(!serialEvents.isEmpty()) {
+						((Runnable)serialEvents.remove(0)).run();
+					}
 					Thread.sleep(1L);
-				} catch (Exception ex) {
-					ex.printStackTrace();
 				}
+			} catch (Exception ex) {
 			}
-		}
-
-		ThreadCallSerially(final EventQueue j, final InvokeStartAppRunnable c) {
-			this(j);
 		}
 	}
 }
