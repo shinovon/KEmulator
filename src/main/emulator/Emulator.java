@@ -661,6 +661,7 @@ public class Emulator
         try {
             platform = ((IEmulatorPlatform) Class.forName("emulator.EmulatorPlatform").newInstance());
         } catch (Exception e) {
+            System.out.println("Platform class not found");
             return;
         }
         if (!platform.isX64() && System.getProperty("os.arch").equals("amd64")) {

@@ -1238,7 +1238,7 @@ MouseTrackListener
                     return;
                 }
                 this.pauseState = 1;
-                Emulator.getEventQueue().queue(15);
+                Emulator.getEventQueue().queue(17);
                 this.screenImg.dispose();
                 if (Settings.steps == 0) {
                     this.pauseScreen();

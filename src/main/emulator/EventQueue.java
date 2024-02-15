@@ -316,11 +316,6 @@ public final class EventQueue implements Runnable {
 					if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 						break;
 					}
-					try {
-						Emulator.getMIDlet().invokeStartApp();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
 					Emulator.getCanvas().invokeShowNotify();
 					break;
 				}
@@ -338,6 +333,21 @@ public final class EventQueue implements Runnable {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+					break;
+				}
+				case 17: {
+					if (Emulator.getCanvas() == null) {
+						break;
+					}
+					if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+						break;
+					}
+					try {
+						Emulator.getMIDlet().invokeStartApp();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					Emulator.getCanvas().invokeShowNotify();
 					break;
 				}
 				case 0:
