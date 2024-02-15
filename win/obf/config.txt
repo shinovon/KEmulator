@@ -18,10 +18,10 @@
 -renamesourcefileattribute A
 
 #-dontshrink
-#-dontoptimize
--optimizations !library/*,!class/*,!code/simplification/object
+-dontoptimize
+#-optimizations !library/*,!class/*,!code/simplification/object
 -allowaccessmodification
--optimizationpasses 2
+#-optimizationpasses 2
 
 # APIS
 -keep public class javax.microedition.** { public protected *; }
