@@ -530,7 +530,10 @@ public class Graphics
         }
         if(i2 != xrayImage) {
             this.xrayImage = i2;
-            (this.xrayGraphics = i2.createGraphics()).setAlpha(60);
+            if(i2 != null)
+                (this.xrayGraphics = i2.createGraphics()).setAlpha(60);
+            else
+                xrayGraphics = null;
         }
         setColor(0);
         setFont(Font.getDefaultFont());
