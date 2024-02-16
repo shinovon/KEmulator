@@ -18,9 +18,6 @@ public class Display
     static Displayable current;
     static Hashtable displays;
 	private MIDlet midlet;
-	private long from;
-	protected boolean fadeComplete;
-	private boolean pausd;
     
     public Display() {
         super();
