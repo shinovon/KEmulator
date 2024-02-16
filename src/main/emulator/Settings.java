@@ -71,6 +71,7 @@ public final class Settings
     public static boolean rpc;
 
     public static boolean uei;
+    public static boolean fpsCounter = true;
 
     public Settings() {
         super();

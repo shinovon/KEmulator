@@ -34,6 +34,7 @@ MouseTrackListener
     private static Display display;
     private static int threadCount;
     private long lastPollTime;
+    private MenuItem fpsCounterMenuItem;
 
     public Shell getShell() {
         return shell;
@@ -601,7 +602,7 @@ MouseTrackListener
         var9.append(var8);
         var9.append(this.pauseStateStrings[this.pauseState]);
         var9.append(var8);
-        if(this.pauseState == 1) {
+        if(this.pauseState == 1 && Settings.fpsCounter) {
             var9.append(Profiler.FPS);
             var9.append(" FPS");
             var9.append(var8);
@@ -691,6 +692,8 @@ MouseTrackListener
         this.rotate90MenuItem = new MenuItem(this.menuView, 8);
         this.rotate90MenuItem.setText(emulator.UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees"));
         this.rotate90MenuItem.addSelectionListener(this);
+        
+        
         (this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
         this.forcePaintMenuItem.addSelectionListener((SelectionListener)this);
         setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
@@ -763,6 +766,14 @@ MouseTrackListener
         this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
         this.showTrackInfoMenuItem.addSelectionListener((SelectionListener)this);
         this.showTrackInfoMenuItem.setAccelerator(16777228);
+
+        this.fpsCounterMenuItem = new MenuItem(this.menuTool, 32);
+        this.fpsCounterMenuItem.setText(emulator.UILocale.get("MENU_TOOL_FPS_COUNT", "FPS Counter"));
+        this.fpsCounterMenuItem.addSelectionListener(this);
+        this.fpsCounterMenuItem.setSelection(Settings.fpsCounter);
+
+        new MenuItem(this.menuTool, 2);
+
         this.canvasKeyboardMenuItem = new MenuItem(this.menuTool, 32);
         canvasKeyboardMenuItem.setText(emulator.UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
         canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
@@ -1023,12 +1034,15 @@ MouseTrackListener
                 }
 
                 if(menuItem.equals(networkKillswitchMenuItem)) {
-                    Settings.networkNotAvailable = !Settings.networkNotAvailable;
-                    networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
+                    networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable = !Settings.networkNotAvailable);
+                    return;
+                }
+                if (menuItem.equals(this.fpsCounterMenuItem)) {
+                    this.fpsCounterMenuItem.setSelection(Settings.fpsCounter = !Settings.fpsCounter);
                     return;
                 }
                 if (menuItem.equals(this.showTrackInfoMenuItem)) {
-                    Settings.threadMethodTrack = !Settings.threadMethodTrack;
+                    this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack = !Settings.threadMethodTrack);
                     return;
                 }
                 if (menuItem.equals(this.zoomInMenuItem)) {
@@ -1244,10 +1258,9 @@ MouseTrackListener
                     return;
                 }
 
-                if (menuItem.equals(this.rotate90MenuItem))
-                {
-                  rotate90degrees(false);
-                  return;
+                if (menuItem.equals(this.rotate90MenuItem)) {
+                    rotate90degrees(false);
+                    return;
                 }
                 if (menuItem.equals(this.forcePaintMenuItem)) {
                     if (Settings.g2d == 0) {

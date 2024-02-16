@@ -23,7 +23,7 @@ MENU_MIDLET_RESTART=Перезапуск
 MENU_MIDLET_EXIT=Выход
 
 
-MENU_VIEW_INFO=Инфо
+MENU_VIEW_INFO=Выделение
 MENU_VIEW_XRAY=X-Ray
 MENU_VIEW_TOP=Поверх всех окон
 MENU_VIEW_ROTATE=Повернуть экран
@@ -60,7 +60,8 @@ MENU_TOOL_CAPTURE_CLIP=Скриншот в буфер обмена
 MENU_TOOL_START_RECORD_AVI=Начать запись AVI
 MENU_TOOL_STOP_RECORD_AVI=Остановить запись AVI
 
-MENU_TOOL_SHOW_TRACK_INFO=Отображение трэка
+MENU_TOOL_SHOW_TRACK_INFO=Вкл. отслеживание вызовов
+MENU_TOOL_FPS_COUNT=Счетчик FPS
 
 MENU_TOOL_QWERTY_MODE=Режим QWERTY
 MENU_TOOL_DISABLE_NETWORK_ACCESS=Отключить доступ к сети
