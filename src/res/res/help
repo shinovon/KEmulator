@@ -42,13 +42,16 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.15 [2024.02.10]
+$nnmod v2.15 [2024.02.16]
 Set default fps limit to 60
+Updated localization prompts
 Added UI language property
 Removed "Connect to Network" menu item
-Implemented Canvas.repaint(IIII)
+Implemented Canvas.repaint(IIII) (region repaint)
 Patching midlet's paint() method (Ratatouille freeze fix)
 Added fps counter in status bar
+Fixed startApp calling on Display.setCurrent (v2.14.4 bug)
+Fixed NullPointerException on disabling X-Ray (v2.14.4 bug)
 Fixed restart function
 
 $nnmod v2.14.4 [2024.02.02]
