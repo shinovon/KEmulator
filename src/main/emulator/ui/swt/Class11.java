@@ -2,15 +2,16 @@ package emulator.ui.swt;
 
 import emulator.ui.*;
 import org.eclipse.swt.custom.*;
+
 import java.io.*;
+
 import org.eclipse.swt.layout.*;
 import emulator.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class11 implements ILogStream, ControlListener, DisposeListener
-{
+public final class Class11 implements ILogStream, ControlListener, DisposeListener {
     private Shell aShell568;
     PrintStream aPrintStream569;
     LogStream aClass159_570;
@@ -20,7 +21,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     private StyledText aStyledText574;
     private Shell aShell575;
     private boolean aBoolean576;
-    
+
     public Class11() {
         super();
         this.aShell568 = null;
@@ -33,34 +34,34 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             this.aClass159_570 = new LogStream(this);
             this.aPrintStream569 = new PrintStream(new FileOutputStream(file));
             this.aClass11_571 = this;
+        } catch (Exception ex) {
         }
-        catch (Exception ex) {}
     }
 
-	public void print1(String s) {
+    public void print1(String s) {
         this.aPrintStream569.print(s);
         if (this.aBoolean573) {
             this.method326(s);
         }
-	}
+    }
 
-	public void println1(String s) {
+    public void println1(String s) {
         this.aPrintStream569.println(s);
         if (this.aBoolean573) {
             this.method326(s + "\n");
         }
-	}
-    
+    }
+
     public final void print(final String s) {
         aClass159_570.orig.print(s);
         print1(s);
     }
-    
+
     public final void println(final String s) {
         aClass159_570.orig.println(s);
         println1(s);
     }
-    
+
     public final void println() {
         aClass159_570.orig.println();
         this.aPrintStream569.println();
@@ -68,7 +69,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             this.method326("\n");
         }
     }
-    
+
     public final void stdout(final String s) {
         this.aPrintStream569.println(s);
         this.aClass159_570.method831(s);
@@ -76,16 +77,16 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             this.method326(s + "\n");
         }
     }
-    
+
     public final void printStackTrace(final String s) {
         this.println("==StackTrace==" + s + "==StackTrace==");
     }
-    
+
     private void method326(final String aString572) {
         Class11.aString572 = aString572;
         EmulatorImpl.syncExec(new Textout(this));
     }
-    
+
     private void method332() {
         try {
             final BufferedReader bufferedReader = new BufferedReader(new FileReader(Emulator.getAbsolutePath() + "/log.txt"));
@@ -95,115 +96,112 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             }
             bufferedReader.close();
             this.aStyledText574.setTopIndex(this.aStyledText574.getLineCount());
+        } catch (Exception ex) {
         }
-        catch (Exception ex) {}
     }
-    
+
     public final boolean method327() {
         return this.aBoolean573;
     }
-    
+
     public final Shell method328() {
         return this.aShell568;
     }
-    
+
     public final void method329(final Shell aShell575) {
         this.method334();
         this.method332();
         final Display current = Display.getCurrent();
         this.aShell575 = aShell575;
-        ((Control)this.aShell568).setLocation(aShell575.getLocation().x + aShell575.getSize().x, aShell575.getLocation().y);
-        ((Control)this.aShell568).setSize(aShell575.getSize());
+        ((Control) this.aShell568).setLocation(aShell575.getLocation().x + aShell575.getSize().x, aShell575.getLocation().y);
+        ((Control) this.aShell568).setSize(aShell575.getSize());
         this.aBoolean573 = true;
         this.aBoolean576 = true;
         this.aShell568.open();
-        ((Control)this.aShell568).addControlListener((ControlListener)this);
-        ((Widget)this.aShell568).addDisposeListener((DisposeListener)this);
-        ((Composite)aShell575).setFocus();
-        while (!((Widget)this.aShell568).isDisposed()) {
+        ((Control) this.aShell568).addControlListener((ControlListener) this);
+        ((Widget) this.aShell568).addDisposeListener((DisposeListener) this);
+        ((Composite) aShell575).setFocus();
+        while (!((Widget) this.aShell568).isDisposed()) {
             if (!current.readAndDispatch()) {
                 current.sleep();
             }
         }
         this.aBoolean573 = false;
     }
-    
+
     public final void method330() {
-        if (this.aShell568 != null && !((Widget)this.aShell568).isDisposed()) {
+        if (this.aShell568 != null && !((Widget) this.aShell568).isDisposed()) {
             this.aShell568.dispose();
         }
         this.aBoolean573 = false;
     }
-    
+
     private void method334() {
         final FillLayout layout;
         (layout = new FillLayout()).spacing = 0;
         layout.marginWidth = 1;
         layout.marginHeight = 1;
-        ((Decorations)(this.aShell568 = new Shell())).setText(UILocale.get("LOG_FRAME_TITLE", "Log"));
-        ((Decorations)this.aShell568).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        ((Composite)this.aShell568).setLayout((Layout)layout);
-        ((Control)this.aShell568).setSize(new Point(310, 254));
-        this.aStyledText574 = new StyledText((Composite)this.aShell568, 2816);
+        ((Decorations) (this.aShell568 = new Shell())).setText(UILocale.get("LOG_FRAME_TITLE", "Log"));
+        ((Decorations) this.aShell568).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        ((Composite) this.aShell568).setLayout((Layout) layout);
+        ((Control) this.aShell568).setSize(new Point(310, 254));
+        this.aStyledText574 = new StyledText((Composite) this.aShell568, 2816);
     }
-    
+
     public final boolean method333() {
         return this.aBoolean576;
     }
-    
+
     public final void controlMoved(final ControlEvent controlEvent) {
         Class11 class11;
         boolean aBoolean576;
         if (Math.abs(this.aShell575.getLocation().x + this.aShell575.getSize().x - this.aShell568.getLocation().x) < 10 && Math.abs(this.aShell575.getLocation().y - this.aShell568.getLocation().y) < 20) {
-            ((Control)this.aShell568).setLocation(this.aShell575.getLocation().x + this.aShell575.getSize().x, this.aShell575.getLocation().y);
+            ((Control) this.aShell568).setLocation(this.aShell575.getLocation().x + this.aShell575.getSize().x, this.aShell575.getLocation().y);
             class11 = this;
             aBoolean576 = true;
-        }
-        else {
+        } else {
             class11 = this;
             aBoolean576 = false;
         }
         class11.aBoolean576 = aBoolean576;
     }
-    
+
     public final void controlResized(final ControlEvent controlEvent) {
     }
-    
+
     public final void widgetDisposed(final DisposeEvent disposeEvent) {
         this.method330();
     }
-    
+
     static StyledText method331(final Class11 class11) {
         return class11.aStyledText574;
     }
-    
-    private final class Textout implements Runnable
-    {
+
+    private final class Textout implements Runnable {
         private final Class11 aClass11_1301;
-        
+
         private Textout(final Class11 aClass11_1301) {
             super();
             this.aClass11_1301 = aClass11_1301;
         }
-        
+
         public final void run() {
-            if (((Widget)Class11.method331(this.aClass11_1301)).isDisposed()) {
+            if (((Widget) Class11.method331(this.aClass11_1301)).isDisposed()) {
                 return;
             }
             Class11.method331(this.aClass11_1301).append(Class11.aString572);
             Class11.method331(this.aClass11_1301).setTopIndex(Class11.method331(this.aClass11_1301).getLineCount());
         }
-        
+
         Textout(final Class11 class11, final Class89 object) {
             this(class11);
         }
     }
-    
-    private final class LogStream extends PrintStream
-    {
+
+    private final class LogStream extends PrintStream {
         PrintStream orig;
         private final Class11 aClass11_1402;
-        
+
         LogStream(final Class11 aClass11_1402) {
             super(System.out, true);
             this.aClass11_1402 = aClass11_1402;
@@ -211,32 +209,32 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             System.setOut(this);
             System.setErr(this);
         }
-        
+
         public final void print(final String s) {
             this.aClass11_1402.aClass11_571.print1(">>" + s);
             this.orig.print(s);
         }
-        
+
         public final void println(final String s) {
             this.aClass11_1402.aClass11_571.println1(">>" + s);
             this.orig.println(s);
         }
-        
+
         public final void print(final Object o) {
             this.aClass11_1402.aClass11_571.print1(">>" + o);
             this.orig.print(o);
         }
-        
+
         public final void println(final Object o) {
             this.aClass11_1402.aClass11_571.println1(">>" + o);
             this.orig.println(o);
         }
-        
+
         public final void println() {
             this.aClass11_1402.aClass11_571.println1(">>");
             this.orig.println();
         }
-        
+
         public final void method831(final String s) {
             this.orig.println(s);
         }

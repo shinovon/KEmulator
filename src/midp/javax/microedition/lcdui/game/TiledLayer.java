@@ -2,8 +2,7 @@ package javax.microedition.lcdui.game;
 
 import javax.microedition.lcdui.*;
 
-public class TiledLayer extends Layer
-{
+public class TiledLayer extends Layer {
     private int cellHeight;
     private int cellWidth;
     private int rows;
@@ -15,7 +14,7 @@ public class TiledLayer extends Layer
     int[] anIntArray267;
     private int[] animatedTiles;
     private int anInt274;
-    
+
     public TiledLayer(final int anInt272, final int anInt273, final Image image, final int n, final int n2) {
         super((anInt272 < 1 || n < 1) ? -1 : (anInt272 * n), (anInt273 < 1 || n2 < 1) ? -1 : (anInt273 * n2));
         if (image.getWidth() % n != 0 || image.getHeight() % n2 != 0) {
@@ -26,7 +25,7 @@ public class TiledLayer extends Layer
         this.cells = new int[anInt273][anInt272];
         this.method111(image, image.getWidth() / n * (image.getHeight() / n2) + 1, n, n2, true);
     }
-    
+
     public int createAnimatedTile(final int n) {
         if (n < 0 || n >= this.anInt273) {
             throw new IndexOutOfBoundsException();
@@ -34,8 +33,7 @@ public class TiledLayer extends Layer
         if (this.animatedTiles == null) {
             this.animatedTiles = new int[4];
             this.anInt274 = 1;
-        }
-        else if (this.anInt274 == this.animatedTiles.length) {
+        } else if (this.anInt274 == this.animatedTiles.length) {
             final int[] anIntArray268 = new int[this.animatedTiles.length * 2];
             System.arraycopy(this.animatedTiles, 0, anIntArray268, 0, this.animatedTiles.length);
             this.animatedTiles = anIntArray268;
@@ -44,7 +42,7 @@ public class TiledLayer extends Layer
         ++this.anInt274;
         return -(this.anInt274 - 1);
     }
-    
+
     public void setAnimatedTile(int n, final int n2) {
         if (n2 < 0 || n2 >= this.anInt273) {
             throw new IndexOutOfBoundsException();
@@ -55,7 +53,7 @@ public class TiledLayer extends Layer
         }
         this.animatedTiles[n] = n2;
     }
-    
+
     public int getAnimatedTile(int n) {
         n = -n;
         if (this.animatedTiles == null || n <= 0 || n >= this.anInt274) {
@@ -63,7 +61,7 @@ public class TiledLayer extends Layer
         }
         return this.animatedTiles[n];
     }
-    
+
     public void setCell(final int n, final int n2, final int n3) {
         if (n < 0 || n >= this.columns || n2 < 0 || n2 >= this.rows) {
             throw new IndexOutOfBoundsException();
@@ -72,20 +70,19 @@ public class TiledLayer extends Layer
             if (n3 >= this.anInt273) {
                 throw new IndexOutOfBoundsException();
             }
-        }
-        else if (n3 < 0 && (this.animatedTiles == null || -n3 >= this.anInt274)) {
+        } else if (n3 < 0 && (this.animatedTiles == null || -n3 >= this.anInt274)) {
             throw new IndexOutOfBoundsException();
         }
         this.cells[n2][n] = n3;
     }
-    
+
     public int getCell(final int n, final int n2) {
         if (n < 0 || n >= this.columns || n2 < 0 || n2 >= this.rows) {
             throw new IndexOutOfBoundsException();
         }
         return this.cells[n2][n];
     }
-    
+
     public void fillCells(final int n, final int n2, final int n3, final int n4, final int n5) {
         if (n < 0 || n >= this.columns || n2 < 0 || n2 >= this.rows || n3 < 0 || n + n3 > this.columns || n4 < 0 || n2 + n4 > this.rows) {
             throw new IndexOutOfBoundsException();
@@ -94,8 +91,7 @@ public class TiledLayer extends Layer
             if (n5 >= this.anInt273) {
                 throw new IndexOutOfBoundsException();
             }
-        }
-        else if (n5 < 0 && (this.animatedTiles == null || -n5 >= this.anInt274)) {
+        } else if (n5 < 0 && (this.animatedTiles == null || -n5 >= this.anInt274)) {
             throw new IndexOutOfBoundsException();
         }
         for (int i = n2; i < n2 + n4; ++i) {
@@ -104,23 +100,23 @@ public class TiledLayer extends Layer
             }
         }
     }
-    
+
     public final int getCellWidth() {
         return this.cellWidth;
     }
-    
+
     public final int getCellHeight() {
         return this.cellHeight;
     }
-    
+
     public final int getColumns() {
         return this.columns;
     }
-    
+
     public final int getRows() {
         return this.rows;
     }
-    
+
     public void setStaticTileSet(final Image image, final int n, final int n2) {
         if (n < 1 || n2 < 1 || image.getWidth() % n != 0 || image.getHeight() % n2 != 0) {
             throw new IllegalArgumentException();
@@ -131,13 +127,12 @@ public class TiledLayer extends Layer
         boolean b;
         if ((n3 = image.getWidth() / n * (image.getHeight() / n2)) >= this.anInt273 - 1) {
             b = true;
-        }
-        else {
+        } else {
             b = false;
         }
         method111(image, n3 + 1, n, n2, b);
     }
-    
+
     public final void paint(final Graphics graphics) {
         if (graphics == null) {
             throw new NullPointerException();
@@ -162,7 +157,7 @@ public class TiledLayer extends Layer
             }
         }
     }
-    
+
     private void method111(final Image anImage265, final int anInt273, final int anInt274, final int anInt275, final boolean b) {
         this.cellWidth = anInt274;
         this.cellHeight = anInt275;

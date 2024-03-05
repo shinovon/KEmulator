@@ -1,18 +1,17 @@
 package emulator.graphics3D.egl;
 
-public final class GLConfiguration
-{
+public final class GLConfiguration {
     public static boolean aBoolean1325;
     public static boolean aBoolean1326;
     public static boolean aBoolean1327;
     public static boolean aBoolean1328;
     public static boolean aBoolean1329;
     public static boolean aBoolean1330;
-    
+
     public GLConfiguration() {
         super();
     }
-    
+
     public static int method768(final int n) {
         switch (n) {
             case 2833:
@@ -142,11 +141,11 @@ public final class GLConfiguration
             }
         }
     }
-    
+
     public static int method769() {
         return 1;
     }
-    
+
     public static int method770(final int n) {
         switch (n) {
             case 4613:
@@ -172,7 +171,7 @@ public final class GLConfiguration
             }
         }
     }
-    
+
     public static int method772(final int n) {
         switch (n) {
             case 2899: {
@@ -187,7 +186,7 @@ public final class GLConfiguration
             }
         }
     }
-    
+
     public static int method773(final int n) {
         switch (n) {
             case 4608:
@@ -205,14 +204,14 @@ public final class GLConfiguration
             }
         }
     }
-    
+
     public static int method774(final int n) {
         if (n == 33065) {
             return 3;
         }
         return 1;
     }
-    
+
     public static int method775(final int n) {
         switch (n) {
             case 8704:
@@ -230,11 +229,11 @@ public final class GLConfiguration
             }
         }
     }
-    
+
     public static int method771() {
         return 1;
     }
-    
+
     public static int method776(final int n) {
         switch (n) {
             case 10240:
@@ -252,7 +251,7 @@ public final class GLConfiguration
             }
         }
     }
-    
+
     static {
         GLConfiguration.aBoolean1325 = false;
         GLConfiguration.aBoolean1326 = false;

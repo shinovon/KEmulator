@@ -2,27 +2,26 @@ package emulator.custom.subclass;
 
 import java.util.*;
 
-public class Timer
-{
+public class Timer {
     private TaskQueue queue;
     private TimerThread thread;
-    
+
     public Timer() {
         super();
         this.queue = new TaskQueue();
     }
-    
+
     public void schedule(final SubTimerTask subTimerTask, final long n) {
         if (n < 0L) {
             throw new IllegalArgumentException("Negative delay.");
         }
         this.sched(subTimerTask, System.currentTimeMillis() + n, 0L);
     }
-    
+
     public void schedule(final SubTimerTask subTimerTask, final Date date) {
         this.sched(subTimerTask, date.getTime(), 0L);
     }
-    
+
     public void schedule(final SubTimerTask subTimerTask, final long n, final long n2) {
         if (n < 0L) {
             throw new IllegalArgumentException("Negative delay.");
@@ -32,14 +31,14 @@ public class Timer
         }
         this.sched(subTimerTask, System.currentTimeMillis() + n, -n2);
     }
-    
+
     public void schedule(final SubTimerTask subTimerTask, final Date date, final long n) {
         if (n <= 0L) {
             throw new IllegalArgumentException("Non-positive period.");
         }
         this.sched(subTimerTask, date.getTime(), -n);
     }
-    
+
     public void scheduleAtFixedRate(final SubTimerTask subTimerTask, final long n, final long n2) {
         if (n < 0L) {
             throw new IllegalArgumentException("Negative delay.");
@@ -49,14 +48,14 @@ public class Timer
         }
         this.sched(subTimerTask, System.currentTimeMillis() + n, n2);
     }
-    
+
     public void scheduleAtFixedRate(final SubTimerTask subTimerTask, final Date date, final long n) {
         if (n <= 0L) {
             throw new IllegalArgumentException("Non-positive period.");
         }
         this.sched(subTimerTask, date.getTime(), n);
     }
-    
+
     private void sched(final SubTimerTask subTimerTask, final long nextExecutionTime, final long period) {
         if (nextExecutionTime < 0L) {
             throw new IllegalArgumentException("Illegal execution time.");
@@ -82,7 +81,7 @@ public class Timer
             }
         }
     }
-    
+
     public void cancel() {
         synchronized (this.queue) {
             this.queue.newTasksMayBeScheduled = false;

@@ -3,8 +3,7 @@ package javax.microedition.lcdui;
 import emulator.*;
 import emulator.lcdui.*;
 
-public class TextField extends Item
-{
+public class TextField extends Item {
     public static final int ANY = 0;
     public static final int EMAILADDR = 1;
     public static final int NUMERIC = 2;
@@ -25,22 +24,22 @@ public class TextField extends Item
     private int anInt29;
     private int anInt30;
     protected boolean isTextBox;
-    
+
     public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
         super(s);
         this.string = aString25;
         this.maxSize = anInt349;
         this.constraints = anInt350;
     }
-    
+
     public String getString() {
         return this.string;
     }
-    
+
     public void setString(final String aString25) {
         this.string = aString25;
     }
-    
+
     public int getChars(final char[] array) {
         if (this.string == null) {
             return 0;
@@ -49,74 +48,73 @@ public class TextField extends Item
         System.arraycopy(charArray = this.string.toCharArray(), 0, array, 0, charArray.length);
         return charArray.length;
     }
-    
+
     public void setChars(final char[] array, final int n, final int n2) {
         final char[] array2 = new char[n2];
         System.arraycopy(array, n, array2, 0, n2);
         this.setString(new String(array2));
     }
-    
+
     public void insert(final String s, final int n) {
         final String aString25 = this.string;
         this.setString(aString25.substring(0, n) + s + aString25.substring(n));
     }
-    
+
     public void insert(final char[] array, final int n, final int n2, final int n3) {
         final char[] array2 = new char[n2];
         System.arraycopy(array, n, array2, 0, n2);
         this.insert(new String(array2), n3);
     }
-    
+
     public void delete(final int n, final int n2) {
         final String aString25 = this.string;
         this.setString(aString25.substring(0, n) + aString25.substring(n + n2));
     }
-    
+
     public int getMaxSize() {
         return this.maxSize;
     }
-    
+
     public int setMaxSize(final int anInt349) {
         return this.maxSize = anInt349;
     }
-    
+
     public int size() {
         if (this.string == null) {
             return 0;
         }
         return this.string.length();
     }
-    
+
     public int getCaretPosition() {
         return Emulator.getEmulator().getScreen().getCaret().getCaretPosition();
     }
-    
+
     public void setConstraints(final int anInt28) {
         this.constraints = anInt28;
     }
-    
+
     public int getConstraints() {
         return this.constraints;
     }
-    
+
     public void setInitialInputMode(final String s) {
     }
-    
+
     protected void focus() {
         super.focus();
         Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.anInt29, this.anInt30);
     }
-    
+
     protected void defocus() {
         super.defocus();
         Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
     }
-    
+
     protected void paint(final Graphics graphics) {
         if (!this.isTextBox) {
             super.paint(graphics);
-        }
-        else {
+        } else {
             graphics.setColor(-16777216);
         }
         int n = super.bounds[1];
@@ -147,7 +145,7 @@ public class TextField extends Item
             }
         }
     }
-    
+
     protected void layout() {
         super.layout();
         int n = 4;
@@ -155,8 +153,7 @@ public class TextField extends Item
         if (super.label != null) {
             super.labelArr = c.textArr(super.label, Item.font, n2, n2);
             n = 4 + (Item.font.getHeight() + 4) * super.labelArr.length;
-        }
-        else {
+        } else {
             super.labelArr = null;
         }
         final Font aFont173 = Screen.font;
@@ -165,14 +162,14 @@ public class TextField extends Item
     }
 
     protected int getItemWidth() {
-		return getPreferredWidth();
-	}
+        return getPreferredWidth();
+    }
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return false;
-	}
+    protected boolean allowNextItemPlaceSameRow() {
+        return false;
+    }
 
-	protected boolean isFullWidthItem() {
-		return true;
-	}
+    protected boolean isFullWidthItem() {
+        return true;
+    }
 }

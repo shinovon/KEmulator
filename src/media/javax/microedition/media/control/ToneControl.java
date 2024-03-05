@@ -2,8 +2,7 @@ package javax.microedition.media.control;
 
 import javax.microedition.media.*;
 
-public interface ToneControl extends Control
-{
+public interface ToneControl extends Control {
     public static final byte VERSION = -2;
     public static final byte TEMPO = -3;
     public static final byte RESOLUTION = -4;
@@ -14,6 +13,6 @@ public interface ToneControl extends Control
     public static final byte REPEAT = -9;
     public static final byte C4 = 60;
     public static final byte SILENCE = -1;
-    
+
     void setSequence(final byte[] p0);
 }

@@ -4,14 +4,13 @@ import java.text.*;
 import java.util.*;
 import java.io.*;
 
-public final class KeyRecords
-{
+public final class KeyRecords {
     private String aString1156;
     private PrintStream aPrintStream1157;
     private BufferedReader aBufferedReader1158;
     private long aLong1159;
     private String aString1160;
-    
+
     public KeyRecords() {
         super();
         if (Settings.playingRecordedKeys) {
@@ -21,9 +20,8 @@ public final class KeyRecords
                 Settings.recordedRandomSeed = Long.parseLong(this.aBufferedReader1158.readLine());
                 this.aLong1159 = -1L;
                 return;
-            }
-            catch (Exception ex) {
-                Emulator.getEmulator().getLogStream().println("4 "+ ex.toString());
+            } catch (Exception ex) {
+                Emulator.getEmulator().getLogStream().println("4 " + ex.toString());
                 Settings.playingRecordedKeys = false;
                 return;
             }
@@ -38,20 +36,19 @@ public final class KeyRecords
                 }
                 (this.aPrintStream1157 = new PrintStream(new FileOutputStream(file))).println(Emulator.midletJar);
                 this.aPrintStream1157.println(Settings.recordedRandomSeed);
-            }
-            catch (Exception ex2) {
-                Emulator.getEmulator().getLogStream().println("5 "+ex2.toString());
+            } catch (Exception ex2) {
+                Emulator.getEmulator().getLogStream().println("5 " + ex2.toString());
             }
         }
     }
-    
+
     public final void print(final String s) {
         if (this.aPrintStream1157 == null) {
             return;
         }
         this.aPrintStream1157.println(s);
     }
-    
+
     public final String method698(final long n) {
         if (this.aBufferedReader1158 == null || !Settings.playingRecordedKeys) {
             return null;
@@ -62,8 +59,7 @@ public final class KeyRecords
                 final String line;
                 if ((line = this.aBufferedReader1158.readLine()) == null) {
                     Settings.playingRecordedKeys = false;
-                }
-                else {
+                } else {
                     final String[] split;
                     if ((split = line.split(":")) != null && split.length > 1) {
                         this.aLong1159 = Long.parseLong(split[0]);
@@ -74,16 +70,15 @@ public final class KeyRecords
                         }
                     }
                 }
+            } catch (IOException ex) {
             }
-            catch (IOException ex) {}
-        }
-        else if (n == this.aLong1159) {
+        } else if (n == this.aLong1159) {
             s = this.aString1160;
             this.method699();
         }
         return s;
     }
-    
+
     private void method699() {
         try {
             final String line;
@@ -96,10 +91,10 @@ public final class KeyRecords
                 return;
             }
             Settings.playingRecordedKeys = false;
+        } catch (IOException ex) {
         }
-        catch (IOException ex) {}
     }
-    
+
     private static String method700() {
         final String string = Emulator.getAbsolutePath() + "/records/";
         final File file;
@@ -108,15 +103,14 @@ public final class KeyRecords
         }
         return string;
     }
-    
+
     public static String method701(final String s) {
         if (s == null) {
             return null;
         }
         try {
             return new BufferedReader(new FileReader(s)).readLine();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             return null;
         }
     }

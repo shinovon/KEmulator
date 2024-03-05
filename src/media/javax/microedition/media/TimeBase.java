@@ -1,6 +1,5 @@
 package javax.microedition.media;
 
-public interface TimeBase
-{
+public interface TimeBase {
     long getTime();
 }

@@ -5,15 +5,14 @@ import org.eclipse.swt.events.*;
 import javax.microedition.rms.RecordStore;
 import java.io.*;
 
-final class Class103 extends SelectionAdapter
-{
+final class Class103 extends SelectionAdapter {
     private final Property aClass38_1057;
-    
+
     Class103(final Property aClass38_1057) {
         super();
         this.aClass38_1057 = aClass38_1057;
     }
-    
+
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         // TODO: rms delete
         final String string = Property.method368(this.aClass38_1057) + ".";

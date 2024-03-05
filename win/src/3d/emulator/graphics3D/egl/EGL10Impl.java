@@ -2,21 +2,22 @@ package emulator.graphics3D.egl;
 
 import javax.microedition.khronos.egl.*;
 import javax.microedition.lcdui.*;
+
 import org.lwjgl.opengl.*;
+
 import javax.microedition.m3g.*;
 
 /**
  * EGL10
  */
-public class EGL10Impl implements EGL10
-{
+public class EGL10Impl implements EGL10 {
     static EGL10Impl egl;
     static emulator.graphics3D.lwjgl.Emulator3D ab1332;
-    
+
     public EGL10Impl() {
         super();
     }
-    
+
     public static EGL10Impl getEgl() {
         if (EGL10Impl.egl == null) {
             EGL10Impl.egl = new EGL11Impl();
@@ -24,7 +25,7 @@ public class EGL10Impl implements EGL10
         }
         return EGL10Impl.egl;
     }
-    
+
     public boolean eglChooseConfig(final EGLDisplay eglDisplay, final int[] attrib_list, final EGLConfig[] configs, final int config_size, final int[] num_config) {
         if (eglDisplay == null) {
             throw new IllegalArgumentException("display == null");
@@ -41,11 +42,11 @@ public class EGL10Impl implements EGL10
         num_config[0] = EGLConfigImpl.method780(configs);
         return true;
     }
-    
+
     public boolean eglCopyBuffers(final EGLDisplay eglDisplay, final EGLSurface eglSurface, final Object o) {
         return false;
     }
-    
+
     public EGLContext eglCreateContext(final EGLDisplay eglDisplay, final EGLConfig eglConfig, final EGLContext share_context, final int[] attrib_list) {
         if (eglDisplay == null) {
             throw new IllegalArgumentException("display == null");
@@ -61,7 +62,7 @@ public class EGL10Impl implements EGL10
         }
         return EGLContextImpl.method765(1);
     }
-    
+
     public EGLSurface eglCreatePbufferSurface(final EGLDisplay eglDisplay, final EGLConfig eglConfig, final int[] array) {
         if (eglDisplay == null) {
             throw new IllegalArgumentException("display == null");
@@ -78,8 +79,7 @@ public class EGL10Impl implements EGL10
             for (int i = 0; i < array.length; i += 2) {
                 if (array[i] == 12375) {
                     n = array[i + 1];
-                }
-                else if (array[i] == 12374) {
+                } else if (array[i] == 12374) {
                     n2 = array[i + 1];
                 }
             }
@@ -88,7 +88,7 @@ public class EGL10Impl implements EGL10
         method781.method783(Image.createImage(n, n2).getGraphics());
         return method781;
     }
-    
+
     public EGLSurface eglCreatePixmapSurface(final EGLDisplay eglDisplay, final EGLConfig eglConfig, final Object o, final int[] array) {
         if (eglDisplay == null) {
             throw new IllegalArgumentException("display == null");
@@ -107,10 +107,10 @@ public class EGL10Impl implements EGL10
         }
         final Graphics graphics;
         final EGLSurfaceImpl method781;
-        (method781 = EGLSurfaceImpl.method781(2, (graphics = (Graphics)o).getImage().getWidth(), graphics.getImage().getHeight())).method783(graphics);
+        (method781 = EGLSurfaceImpl.method781(2, (graphics = (Graphics) o).getImage().getWidth(), graphics.getImage().getHeight())).method783(graphics);
         return method781;
     }
-    
+
     public EGLSurface eglCreateWindowSurface(final EGLDisplay eglDisplay, final EGLConfig eglConfig, final Object o, final int[] array) {
         if (eglDisplay == null) {
             throw new IllegalArgumentException("display == null");
@@ -126,22 +126,22 @@ public class EGL10Impl implements EGL10
         }
         final Graphics graphics;
         final EGLSurfaceImpl method781;
-        (method781 = EGLSurfaceImpl.method781(1, (graphics = (Graphics)o).getImage().getWidth(), graphics.getImage().getHeight())).method783(graphics);
+        (method781 = EGLSurfaceImpl.method781(1, (graphics = (Graphics) o).getImage().getWidth(), graphics.getImage().getHeight())).method783(graphics);
         return method781;
     }
-    
+
     public boolean eglDestroyContext(final EGLDisplay eglDisplay, final EGLContext eglContext) {
         return false;
     }
-    
+
     public boolean eglDestroySurface(final EGLDisplay eglDisplay, final EGLSurface eglSurface) {
         return false;
     }
-    
+
     public boolean eglGetConfigAttrib(final EGLDisplay eglDisplay, final EGLConfig eglConfig, final int n, final int[] array) {
         return false;
     }
-    
+
     public boolean eglGetConfigs(final EGLDisplay eglDisplay, final EGLConfig[] array, final int n, final int[] array2) {
         if (eglDisplay == null) {
             throw new IllegalArgumentException("display == null");
@@ -155,7 +155,7 @@ public class EGL10Impl implements EGL10
         array2[0] = EGLConfigImpl.method780(array);
         return true;
     }
-    
+
     public EGLContext eglGetCurrentContext() {
         final EGLContext value;
         if ((value = (EGLContext) GL10Impl.threadToContext.get(Thread.currentThread())) == null) {
@@ -163,21 +163,21 @@ public class EGL10Impl implements EGL10
         }
         return value;
     }
-    
+
     public EGLDisplay eglGetCurrentDisplay() {
         final EGLContextImpl c;
-        if ((c = (EGLContextImpl)this.eglGetCurrentContext()) != EGL10.EGL_NO_CONTEXT) {
+        if ((c = (EGLContextImpl) this.eglGetCurrentContext()) != EGL10.EGL_NO_CONTEXT) {
             return c.getDisplay();
         }
         return EGL10.EGL_NO_DISPLAY;
     }
-    
+
     public EGLSurface eglGetCurrentSurface(final int n) {
         if (n != 12378 && n != 12377) {
             throw new IllegalArgumentException("readdraw not one of EGL.EGL_READ or EGL.EGL_DRAW");
         }
         final EGLContextImpl c;
-        if ((c = (EGLContextImpl)this.eglGetCurrentContext()) == EGL10.EGL_NO_CONTEXT) {
+        if ((c = (EGLContextImpl) this.eglGetCurrentContext()) == EGL10.EGL_NO_CONTEXT) {
             return EGL10.EGL_NO_SURFACE;
         }
         if (n == 12378) {
@@ -185,18 +185,18 @@ public class EGL10Impl implements EGL10
         }
         return c.method762();
     }
-    
+
     public EGLDisplay eglGetDisplay(final Object display) {
         if (display == EGL10.EGL_DEFAULT_DISPLAY) {
             return EGLDisplayImpl.method803(1);
         }
         throw new IllegalArgumentException("display != EGL.EGL_DEFAULT_DISPLAY");
     }
-    
+
     public int eglGetError() {
         return 0;
     }
-    
+
     public boolean eglInitialize(final EGLDisplay display, final int[] maj_min) {
         if (display == null) {
             throw new IllegalArgumentException("display == null");
@@ -212,7 +212,7 @@ public class EGL10Impl implements EGL10
         }
         return true;
     }
-    
+
     public boolean eglMakeCurrent(final EGLDisplay display, final EGLSurface draw, final EGLSurface read, final EGLContext context) {
         if (display == null) {
             throw new IllegalArgumentException("display == null");
@@ -231,7 +231,7 @@ public class EGL10Impl implements EGL10
             final Object value;
             if ((value = GL10Impl.threadToContext.get(currentThread)) != null) {
                 final EGLContextImpl c;
-                if ((c = (EGLContextImpl)value).method764()) {
+                if ((c = (EGLContextImpl) value).method764()) {
                     this.eglDestroyContext(c.getDisplay(), c);
                 }
                 c.setDisplay(null);
@@ -244,12 +244,11 @@ public class EGL10Impl implements EGL10
                 GL10Impl.threadToContext.remove(currentThread);
                 EGL10Impl.ab1332.releaseTarget();
             }
-        }
-        else {
+        } else {
             final EGLContextImpl c2;
-            (c2 = (EGLContextImpl)context).setDisplay((EGLDisplayImpl)display);
-            c2.method763((EGLSurfaceImpl)draw);
-            c2.method767((EGLSurfaceImpl)read);
+            (c2 = (EGLContextImpl) context).setDisplay((EGLDisplayImpl) display);
+            c2.method763((EGLSurfaceImpl) draw);
+            c2.method767((EGLSurfaceImpl) read);
             GL10Impl.contextToThread.put(c2, currentThread);
             GL10Impl.displayThread.put(c2, display);
             GL10Impl.drawSurfaceThread.put(c2, draw);
@@ -260,48 +259,46 @@ public class EGL10Impl implements EGL10
         }
         return true;
     }
-    
+
     public boolean eglQueryContext(final EGLDisplay eglDisplay, final EGLContext eglContext, final int n, final int[] array) {
         return true;
     }
-    
+
     public String eglQueryString(final EGLDisplay eglDisplay, final int n) {
         return null;
     }
-    
+
     public boolean eglQuerySurface(final EGLDisplay eglDisplay, final EGLSurface eglSurface, final int n, final int[] array) {
         return true;
     }
-    
+
     public boolean eglSwapBuffers(final EGLDisplay eglDisplay, final EGLSurface eglSurface) {
         try {
             EGL10Impl.ab1332.method192();
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
     }
-    
+
     public boolean eglTerminate(final EGLDisplay eglDisplay) {
         return true;
     }
-    
+
     public boolean eglWaitGL() {
         try {
             EGL10Impl.ab1332.method192();
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
     }
-    
+
     public boolean eglWaitNative(final int n, final Object o) {
         try {
-            final Graphics graphics = (Graphics)o;
+            final Graphics graphics = (Graphics) o;
             EGL10Impl.ab1332.setViewport(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
             final Background background;
             (background = new Background()).setColor(GL10Impl.anInt1359);
@@ -310,25 +307,22 @@ public class EGL10Impl implements EGL10
             EGL10Impl.ab1332.clearBackgound(background);
             if (GL10Impl.aBoolean1355) {
                 GL11.glEnable(2896);
-            }
-            else {
+            } else {
                 GL11.glDisable(2896);
             }
             if (GL10Impl.aBoolean1358) {
                 GL11.glEnable(2912);
-            }
-            else {
+            } else {
                 GL11.glDisable(2912);
             }
             GL11.glMatrixMode(GL10Impl.anInt1354);
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
     }
-    
+
     static boolean method778(final int[] array) {
         if (array == null) {
             return true;

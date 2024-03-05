@@ -143,13 +143,13 @@ public class Sound {
     }
 
     public byte[] getData() {
-        if(m_player == null) return null;
-        if(data != null) return data.clone();
+        if (m_player == null) return null;
+        if (data != null) return data.clone();
         return m_player.getData();
     }
 
     public String getExportName() {
-        switch(type) {
+        switch (type) {
             case FORMAT_TONE:
                 return "nokiatoneconverted" + hashCode() + ".mid";
             case FORMAT_WAV:

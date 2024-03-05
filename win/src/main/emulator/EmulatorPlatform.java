@@ -15,8 +15,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public String getInfoString(String version) {
-        return "KEmulator nnmod "+version+"\n\n\t" +
-                UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") +  "\n\n" +
+        return "KEmulator nnmod " + version + "\n\n\t" +
+                UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator") + "\n\n" +
                 UILocale.get("ABOUT_INFO_APIS", "Support APIs") + ":\n\n"
                 + "\tMIDP 2.0 (JSR118)\n"
                 + "\tNokiaUI 1.4\n"

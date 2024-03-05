@@ -4,12 +4,11 @@ import java.net.*;
 import java.io.*;
 import javax.microedition.io.*;
 
-public class L2CAPConnectionImpl implements L2CAPConnection
-{
+public class L2CAPConnectionImpl implements L2CAPConnection {
     Socket socket;
     InputStream in;
     OutputStream out;
-    
+
     protected L2CAPConnectionImpl(final Socket aSocket315) throws IOException {
         super();
         this.socket = aSocket315;
@@ -18,31 +17,31 @@ public class L2CAPConnectionImpl implements L2CAPConnection
         aSocket315.setReceiveBufferSize(672);
         aSocket315.setSendBufferSize(672);
     }
-    
+
     public int getTransmitMTU() throws IOException {
         return this.socket.getSendBufferSize();
     }
-    
+
     public int getReceiveMTU() throws IOException {
         return this.socket.getReceiveBufferSize();
     }
-    
+
     public void send(final byte[] array) throws IOException {
         this.out.write(array, 0, Math.min(672, array.length));
     }
-    
+
     public int receive(final byte[] array) throws IOException {
         return this.in.read(array, 0, Math.min(672, array.length));
     }
-    
+
     public boolean ready() throws IOException {
         return this.in.available() > 0;
     }
-    
+
     public void close() throws IOException {
         this.socket.close();
     }
-    
+
     public static Connection open(final String s) throws IOException {
         final int n = s.indexOf("://") + 3;
         final String substring = s.substring(n, s.indexOf(":", n));

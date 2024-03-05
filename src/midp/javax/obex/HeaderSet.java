@@ -2,8 +2,7 @@ package javax.obex;
 
 import java.io.*;
 
-public interface HeaderSet
-{
+public interface HeaderSet {
     public static final int COUNT = 192;
     public static final int NAME = 1;
     public static final int TYPE = 66;
@@ -16,14 +15,14 @@ public interface HeaderSet
     public static final int WHO = 74;
     public static final int OBJECT_CLASS = 79;
     public static final int APPLICATION_PARAMETER = 76;
-    
+
     void setHeader(final int p0, final Object p1);
-    
+
     Object getHeader(final int p0) throws IOException;
-    
+
     int[] getHeaderList() throws IOException;
-    
+
     void createAuthenticationChallenge(final String p0, final boolean p1, final boolean p2);
-    
+
     int getResponseCode() throws IOException;
 }

@@ -2,8 +2,7 @@ package javax.microedition.khronos.opengles;
 
 import java.nio.*;
 
-public interface GL11ExtensionPack extends GL
-{
+public interface GL11ExtensionPack extends GL {
     public static final int GL_MIRRORED_REPEAT = 33648;
     public static final int GL_NORMAL_MAP = 34065;
     public static final int GL_REFLECTION_MAP = 34066;
@@ -90,110 +89,110 @@ public interface GL11ExtensionPack extends GL
     public static final int GL_STENCIL_INDEX8_OES = 36168;
     public static final int GL_STENCIL_INDEX = 6401;
     public static final int GL_DEPTH_COMPONENT = 6402;
-    
+
     void glTexEnvf(final int p0, final int p1, final float p2);
-    
+
     void glTexEnvfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glTexEnvfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glTexEnvx(final int p0, final int p1, final int p2);
-    
+
     void glTexEnvxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glTexEnvxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glTexParameterf(final int p0, final int p1, final float p2);
-    
+
     void glBindTexture(final int p0, final int p1);
-    
+
     void glCompressedTexImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final Buffer p7);
-    
+
     void glCopyTexImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final int p7);
-    
+
     void glEnable(final int p0);
-    
+
     void glGetIntegerv(final int p0, final int[] p1, final int p2);
-    
+
     void glGetIntegerv(final int p0, final IntBuffer p1);
-    
+
     void glTexGeni(final int p0, final int p1, final int p2);
-    
+
     void glTexGenf(final int p0, final int p1, final float p2);
-    
+
     void glTexGenx(final int p0, final int p1, final int p2);
-    
+
     void glTexGenfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glTexGenfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glTexGeniv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glTexGeniv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glTexGenxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glTexGenxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetTexGeniv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetTexGeniv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetTexGenfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glGetTexGenxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetTexGenxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetTexGenfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glBlendEquation(final int p0);
-    
+
     void glBlendFuncSeparate(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glBlendEquationSeparate(final int p0, final int p1);
-    
+
     void glStencilOp(final int p0, final int p1, final int p2);
-    
+
     boolean glIsRenderbufferOES(final int p0);
-    
+
     void glBindRenderbufferOES(final int p0, final int p1);
-    
+
     void glDeleteRenderbuffersOES(final int p0, final int[] p1, final int p2);
-    
+
     void glDeleteRenderbuffersOES(final int p0, final IntBuffer p1);
-    
+
     void glGenRenderbuffersOES(final int p0, final int[] p1, final int p2);
-    
+
     void glGenRenderbuffersOES(final int p0, final IntBuffer p1);
-    
+
     void glRenderbufferStorageOES(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glGetRenderbufferParameterivOES(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetRenderbufferParameterivOES(final int p0, final int p1, final IntBuffer p2);
-    
+
     boolean glIsFramebufferOES(final int p0);
-    
+
     void glBindFramebufferOES(final int p0, final int p1);
-    
+
     void glDeleteFramebuffersOES(final int p0, final int[] p1, final int p2);
-    
+
     void glDeleteFramebuffersOES(final int p0, final IntBuffer p1);
-    
+
     void glGenFramebuffersOES(final int p0, final int[] p1, final int p2);
-    
+
     void glGenFramebuffersOES(final int p0, final IntBuffer p1);
-    
+
     int glCheckFramebufferStatusOES(final int p0);
-    
+
     void glFramebufferTexture2DOES(final int p0, final int p1, final int p2, final int p3, final int p4);
-    
+
     void glFramebufferRenderbufferOES(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glGetFramebufferAttachmentParameterivOES(final int p0, final int p1, final int p2, final int[] p3, final int p4);
-    
+
     void glGetFramebufferAttachmentParameterivOES(final int p0, final int p1, final int p2, final IntBuffer p3);
-    
+
     void glGenerateMipmapOES(final int p0);
 }

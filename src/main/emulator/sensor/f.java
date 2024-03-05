@@ -1,21 +1,21 @@
 package emulator.sensor;
 
 import emulator.*;
+
 import java.net.*;
 import java.io.*;
 
-public final class f
-{
+public final class f {
     protected boolean aBoolean472;
     Socket aSocket473;
     PrintWriter aPrintWriter474;
     BufferedReader aBufferedReader475;
-    
+
     public f() {
         super();
         this.aBoolean472 = false;
     }
-    
+
     public final void method260() {
         if (this.aBoolean472) {
             return;
@@ -31,16 +31,13 @@ public final class f
             this.aSocket473 = new Socket(s, Integer.parseInt(s2));
             this.aPrintWriter474 = new PrintWriter(this.aSocket473.getOutputStream(), true);
             this.aBufferedReader475 = new BufferedReader(new InputStreamReader(this.aSocket473.getInputStream()));
-        }
-        catch (UnknownHostException ex) {
+        } catch (UnknownHostException ex) {
             Emulator.getEmulator().getLogStream().println("Don't know about host: " + s + " : " + s2);
             return;
-        }
-        catch (SocketTimeoutException ex2) {
+        } catch (SocketTimeoutException ex2) {
             Emulator.getEmulator().getLogStream().println("Connection time out: " + s + " : " + s2);
             return;
-        }
-        catch (IOException ex3) {
+        } catch (IOException ex3) {
             Emulator.getEmulator().getLogStream().println("Couldn't get I/O for the connection to: " + s + " : " + s2);
             return;
         }
@@ -48,8 +45,7 @@ public final class f
         String line;
         try {
             line = this.aBufferedReader475.readLine();
-        }
-        catch (IOException ex4) {
+        } catch (IOException ex4) {
             Emulator.getEmulator().getLogStream().println("Couldn't get I/O for the connection to: x.x.x.x.");
             return;
         }
@@ -62,7 +58,7 @@ public final class f
         Emulator.getEmulator().getLogStream().println("Problem connecting: Wrong string sent.");
         this.method263();
     }
-    
+
     public final void method263() {
         if (this.aBoolean472) {
             Emulator.getEmulator().getLogStream().println("Disconnect()");
@@ -70,14 +66,13 @@ public final class f
                 this.aPrintWriter474.close();
                 this.aBufferedReader475.close();
                 this.aSocket473.close();
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 Emulator.getEmulator().getLogStream().println("Couldn't get I/O for the connection to: x.x.x.x.");
             }
             this.aBoolean472 = false;
         }
     }
-    
+
     public final void method261(final String s) {
         if (!this.aBoolean472) {
             return;
@@ -88,12 +83,11 @@ public final class f
             if (this.aBufferedReader475.readLine().compareTo("throw IllegalArgumentException") == 0) {
                 throw new IllegalArgumentException("Sensor '" + s + "' is not supported.");
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             Emulator.getEmulator().getLogStream().println("Couldn't get I/O for the connection to: x.x.x.x.");
         }
     }
-    
+
     public final void method264(final String s) {
         if (!this.aBoolean472) {
             return;
@@ -104,12 +98,11 @@ public final class f
             if (this.aBufferedReader475.readLine().compareTo("throw IllegalArgumentException") == 0) {
                 throw new IllegalArgumentException("Sensor '" + s + "' is not supported.");
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             Emulator.getEmulator().getLogStream().println("Couldn't get I/O for the connection to: x.x.x.x.");
         }
     }
-    
+
     public final void method262(final String s, final float[] array) {
         if (!this.aBoolean472) {
             return;
@@ -133,8 +126,7 @@ public final class f
             for (int i = 0; i < int1; ++i) {
                 array[i] = Float.parseFloat(this.aBufferedReader475.readLine());
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             Emulator.getEmulator().getLogStream().println("Couldn't get I/O for the connection to: x.x.x.x.");
         }
     }

@@ -4,17 +4,17 @@ import javax.microedition.media.Control;
 import javax.microedition.media.Controllable;
 
 public class Spectator implements Controllable {
-	private Controllable specImpl;
+    private Controllable specImpl;
 
-	Spectator(Controllable impl) {
-		this.specImpl = impl;
-	}
+    Spectator(Controllable impl) {
+        this.specImpl = impl;
+    }
 
-	public Control getControl(String controlType) {
-		return this.specImpl.getControl(controlType);
-	}
+    public Control getControl(String controlType) {
+        return this.specImpl.getControl(controlType);
+    }
 
-	public Control[] getControls() {
-		return this.specImpl.getControls();
-	}
+    public Control[] getControls() {
+        return this.specImpl.getControls();
+    }
 }

@@ -2,13 +2,10 @@ package javax.microedition.lcdui;
 
 import java.util.*;
 
-import javax.microedition.media.CapturePlayerImpl;
-
 import emulator.*;
 import emulator.lcdui.*;
 
-public abstract class Screen extends Displayable
-{
+public abstract class Screen extends Displayable {
     static final Font font;
     static final int fontHeight;
     static final int fontHeight4;
@@ -16,11 +13,11 @@ public abstract class Screen extends Displayable
     int anInt182;
     int anInt349;
     private long lastPressTime;
-    
+
     Screen() {
         this("");
     }
-    
+
     Screen(final String s) {
         super();
         super.title = ((s == null) ? "" : s);
@@ -28,7 +25,7 @@ public abstract class Screen extends Displayable
         this.anInt182 = 0;
         this.anInt349 = -1;
     }
-    
+
     public void invokeKeyPressed(final int n) {
         final long currentTimeMillis;
         if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
@@ -39,38 +36,35 @@ public abstract class Screen extends Displayable
             if (n >= 49 && n <= 57) {
                 final int n2;
                 if ((n2 = n - 49 + 1) < super.commands.size()) {
-                    super.cmdListener.commandAction((Command)super.commands.get(n2), this);
+                    super.cmdListener.commandAction((Command) super.commands.get(n2), this);
                     super.aBoolean18 = false;
                 }
-            }
-            else if (n == Keyboard.getArrowKeyFromDevice(1)) {
+            } else if (n == KeyMapping.getArrowKeyFromDevice(1)) {
                 if (super.anInt28 > 0) {
                     --super.anInt28;
                 }
-            }
-            else if (n == Keyboard.getArrowKeyFromDevice(6)) {
+            } else if (n == KeyMapping.getArrowKeyFromDevice(6)) {
                 if (super.anInt28 < super.commands.size() - 2) {
                     ++super.anInt28;
                 }
-            }
-            else {
+            } else {
                 final int n3;
-                if (n == Keyboard.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.commands.size()) {
-                    super.cmdListener.commandAction((Command)super.commands.get(n3), this);
+                if (n == KeyMapping.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.commands.size()) {
+                    super.cmdListener.commandAction((Command) super.commands.get(n3), this);
                     super.aBoolean18 = false;
                 }
             }
             this.refreshSoftMenu();
             return;
         }
-        if (selectedItem != null && selectedItem instanceof CustomItem && ((CustomItem)selectedItem).callTraverse(n)) {
+        if (selectedItem != null && selectedItem instanceof CustomItem && ((CustomItem) selectedItem).callTraverse(n)) {
             return;
         }
-        if (selectedItem != null && n == Keyboard.getArrowKeyFromDevice(8)) {
+        if (selectedItem != null && n == KeyMapping.getArrowKeyFromDevice(8)) {
             selectedItem.itemApplyCommand();
             return;
         }
-        if (n == Keyboard.getArrowKeyFromDevice(1)) {
+        if (n == KeyMapping.getArrowKeyFromDevice(1)) {
             if (this.items.size() > 0) {
                 final int index = this.items.indexOf(selectedItem);
                 if (selectedItem != null) {
@@ -86,13 +80,11 @@ public abstract class Screen extends Displayable
                     screen = this;
                     vector = this.items;
                     n4 = this.items.size() - 1;
-                }
-                else if (index > 0) {
+                } else if (index > 0) {
                     screen = this;
                     vector = this.items;
                     n4 = index - 1;
-                }
-                else {
+                } else {
                     screen = this;
                     vector = this.items;
                     n4 = 0;
@@ -104,8 +96,7 @@ public abstract class Screen extends Displayable
                     this.anInt349 = -1;
                 }
             }
-        }
-        else if (n == Keyboard.getArrowKeyFromDevice(6) && this.items.size() > 0) {
+        } else if (n == KeyMapping.getArrowKeyFromDevice(6) && this.items.size() > 0) {
             final int index2 = this.items.indexOf(selectedItem);
             if (selectedItem != null) {
                 if (!selectedItem.scrollDown()) {
@@ -120,13 +111,11 @@ public abstract class Screen extends Displayable
                 screen2 = this;
                 vector2 = this.items;
                 n5 = 0;
-            }
-            else if (index2 < this.items.size() - 1) {
+            } else if (index2 < this.items.size() - 1) {
                 screen2 = this;
                 vector2 = this.items;
                 n5 = index2 + 1;
-            }
-            else {
+            } else {
                 screen2 = this;
                 vector2 = this.items;
                 n5 = this.items.size() - 1;
@@ -139,10 +128,10 @@ public abstract class Screen extends Displayable
             }
         }
     }
-    
+
     public void invokeKeyReleased(final int n) {
     }
-    
+
     public void invokePointerPressed(final int x, final int y) {
         if (super.aBoolean18) {
             final int n3 = super.w >> 1;
@@ -152,7 +141,7 @@ public abstract class Screen extends Displayable
             final int n6 = n3 - 1;
             final int n7 = super.h - n4 - 1;
             final int[] array;
-            if (BoundsUtils.collides(array = new int[] { n6, n7, n3, n4 }, x, y)) {
+            if (BoundsUtils.collides(array = new int[]{n6, n7, n3, n4}, x, y)) {
                 array[0] = n6;
                 array[1] = n7;
                 array[2] = n3;
@@ -161,7 +150,7 @@ public abstract class Screen extends Displayable
                 int n8;
                 for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
                     if (BoundsUtils.collides(array, x, y)) {
-                        super.cmdListener.commandAction((Command)super.commands.get(i + 1), this);
+                        super.cmdListener.commandAction((Command) super.commands.get(i + 1), this);
                         super.aBoolean18 = false;
                         return;
                     }
@@ -169,7 +158,7 @@ public abstract class Screen extends Displayable
             }
             return;
         }
-        if (selectedItem != null && selectedItem instanceof ChoiceGroup && ((ChoiceGroup)selectedItem).aBoolean542) {
+        if (selectedItem != null && selectedItem instanceof ChoiceGroup && ((ChoiceGroup) selectedItem).aBoolean542) {
             selectedItem.pointerPressed(x, y);
             return;
         }
@@ -186,22 +175,21 @@ public abstract class Screen extends Displayable
                         selectedItem.defocus();
                     }
                     (selectedItem = futureSelect).focus();
-                }
-                else {
+                } else {
                     ++j;
                 }
             }
         }
     }
-    
+
     public void invokePointerReleased(final int n, final int n2) {
     }
-    
+
     public void invokePointerDragged(final int n, final int n2) {
     }
-    
+
     protected abstract void paint(final Graphics p0);
-    
+
     public void invokePaint(final Graphics graphics) {
         Displayable.resetXRayGraphics();
         final int color = graphics.getColor();
@@ -219,7 +207,7 @@ public abstract class Screen extends Displayable
         graphics.setFont(font);
         graphics.setStrokeStyle(strokeStyle);
     }
-    
+
     protected void drawTitleBar(final Graphics graphics) {
         final int n;
         final String value = String.valueOf(n = ((selectedItem != null) ? (this.items.indexOf(selectedItem) + 1) : this.items.size()));
@@ -236,21 +224,21 @@ public abstract class Screen extends Displayable
         graphics.drawString(super.title, n3, 1, 0);
         graphics.drawString(value, n4, 1, 0);
     }
-    
+
     protected void sizeChanged(final int w, final int h) {
-	}
-    
+    }
+
     protected void drawScrollBar(final Graphics graphics) {
         emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (selectedItem != null) ? this.items.indexOf(selectedItem) : -1);
     }
-    
+
     static {
         font = Font.getDefaultFont();
         fontHeight = Screen.font.getHeight();
         fontHeight4 = Screen.fontHeight + 4;
     }
 
-	protected void shown() {
-		
-	}
+    protected void shown() {
+
+    }
 }

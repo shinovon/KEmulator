@@ -3,20 +3,20 @@ package emulator.ui.swt;
 import java.util.*;
 import javax.microedition.lcdui.*;
 
-final class Class15 implements Comparator
-{
+final class Class15 implements Comparator {
     private final MemoryView aClass110_580;
-    
+
     Class15(final MemoryView aClass110_580) {
         super();
         this.aClass110_580 = aClass110_580;
     }
-    
+
     public final int compare(final Object o, final Object o2) {
         int n = 0;
-        final Image image = (Image)o;
-        final Image image2 = (Image)o2;
-        Label_0142: {
+        final Image image = (Image) o;
+        final Image image2 = (Image) o2;
+        Label_0142:
+        {
             int usedCount = 0;
             int usedCount2 = 0;
             switch (MemoryView.method645(this.aClass110_580)) {

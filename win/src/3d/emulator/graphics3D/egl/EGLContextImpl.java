@@ -7,15 +7,14 @@ import javax.microedition.khronos.opengles.*;
 /**
  * EGLContext
  */
-public final class EGLContextImpl extends EGLContext
-{
+public final class EGLContextImpl extends EGLContext {
     private static Hashtable aHashtable1319;
     private GL gl;
     private EGLDisplayImpl display;
     private EGLSurfaceImpl ana1322;
     private EGLSurfaceImpl ana1324;
     private boolean aBoolean1323;
-    
+
     private EGLContextImpl(final int n) {
         super();
         this.gl = null;
@@ -27,35 +26,35 @@ public final class EGLContextImpl extends EGLContext
             EGLContextImpl.aHashtable1319.put(new Integer(n), this);
         }
     }
-    
+
     public final EGLDisplayImpl getDisplay() {
         return this.display;
     }
-    
+
     public final void setDisplay(final EGLDisplayImpl ag1321) {
         this.display = ag1321;
     }
-    
+
     public final EGLSurfaceImpl method762() {
         return this.ana1322;
     }
-    
+
     public final void method763(final EGLSurfaceImpl ana1322) {
         this.ana1322 = ana1322;
     }
-    
+
     public final EGLSurfaceImpl method766() {
         return this.ana1324;
     }
-    
+
     public final void method767(final EGLSurfaceImpl ana1324) {
         this.ana1324 = ana1324;
     }
-    
+
     public final boolean method764() {
         return this.aBoolean1323;
     }
-    
+
     public static EGLContextImpl method765(final int n) {
         synchronized (EGLContextImpl.aHashtable1319) {
             final EGLContextImpl value;
@@ -65,7 +64,7 @@ public final class EGLContextImpl extends EGLContext
             return value;
         }
     }
-    
+
     public final GL getGL() {
         synchronized (this) {
             if (this.gl == null) {
@@ -74,7 +73,7 @@ public final class EGLContextImpl extends EGLContext
             return this.gl;
         }
     }
-    
+
     static {
         EGLContextImpl.aHashtable1319 = new Hashtable();
     }

@@ -47,7 +47,7 @@ public class Composite extends Scrollable {
         if (var2 == 0) {
             return new Control[0];
         } else {
-            while(var2 != 0) {
+            while (var2 != 0) {
                 ++var1;
                 var2 = OS.GetWindow(var2, 2);
             }
@@ -55,7 +55,7 @@ public class Composite extends Scrollable {
             Control[] var3 = new Control[var1];
             int var4 = 0;
 
-            for(var2 = OS.GetWindow(this.handle, 5); var2 != 0; var2 = OS.GetWindow(var2, 2)) {
+            for (var2 = OS.GetWindow(this.handle, 5); var2 != 0; var2 = OS.GetWindow(var2, 2)) {
                 Control var5 = this.display.getControl(var2);
                 if (var5 != null && var5 != this) {
                     var3[var4++] = var5;
@@ -78,7 +78,7 @@ public class Composite extends Scrollable {
         } else {
             int var1 = 0;
 
-            for(int var2 = 0; var2 < this.tabList.length; ++var2) {
+            for (int var2 = 0; var2 < this.tabList.length; ++var2) {
                 if (!this.tabList[var2].isDisposed()) {
                     ++var1;
                 }
@@ -90,7 +90,7 @@ public class Composite extends Scrollable {
                 Control[] var5 = new Control[var1];
                 int var3 = 0;
 
-                for(int var4 = 0; var4 < this.tabList.length; ++var4) {
+                for (int var4 = 0; var4 < this.tabList.length; ++var4) {
                     if (!this.tabList[var4].isDisposed()) {
                         var5[var3++] = this.tabList[var4];
                     }
@@ -102,7 +102,9 @@ public class Composite extends Scrollable {
         }
     }
 
-    /** @deprecated */
+    /**
+     * @deprecated
+     */
     @Deprecated
     public void changed(Control[] var1) {
         this.layout(var1, 4);
@@ -135,7 +137,7 @@ public class Composite extends Scrollable {
         } else {
             Control[] var2 = this.tabList != null ? this._getTabList() : this._getChildren();
 
-            for(int var3 = 0; var3 < var2.length; ++var3) {
+            for (int var3 = 0; var3 < var2.length; ++var3) {
                 Control var4 = var2[var3];
                 Widget[] var5 = var4.computeTabList();
                 if (var5.length != 0) {
@@ -213,7 +215,7 @@ public class Composite extends Scrollable {
             OS.DefWindowProc(this.handle, 11, 1, 0);
         }
 
-        OS.RedrawWindow(this.handle, (RECT)null, 0, 384);
+        OS.RedrawWindow(this.handle, (RECT) null, 0, 384);
         OS.PrintWindow(this.handle, var6, 0);
         if ((var13 & 268435456) == 0) {
             OS.DefWindowProc(this.handle, 11, 0, 0);
@@ -279,7 +281,7 @@ public class Composite extends Scrollable {
             Menu[] var2 = super.findMenus(var1);
             Control[] var3 = this._getChildren();
 
-            for(int var4 = 0; var4 < var3.length; ++var4) {
+            for (int var4 = 0; var4 < var3.length; ++var4) {
                 Control var5 = var3[var4];
                 Menu[] var6 = var5.findMenus(var1);
                 if (var6.length != 0) {
@@ -298,7 +300,7 @@ public class Composite extends Scrollable {
         super.fixChildren(var1, var2, var3, var4, var5);
         Control[] var6 = this._getChildren();
 
-        for(int var7 = 0; var7 < var6.length; ++var7) {
+        for (int var7 = 0; var7 < var6.length; ++var7) {
             var6[var7].fixChildren(var1, var2, var3, var4, var5);
         }
 
@@ -308,7 +310,7 @@ public class Composite extends Scrollable {
         if (this.tabList != null) {
             int var2 = 0;
 
-            for(int var3 = 0; var3 < this.tabList.length; ++var3) {
+            for (int var3 = 0; var3 < this.tabList.length; ++var3) {
                 if (this.tabList[var3] == var1) {
                     ++var2;
                 }
@@ -321,7 +323,7 @@ public class Composite extends Scrollable {
                     var7 = new Control[var4];
                     int var5 = 0;
 
-                    for(int var6 = 0; var6 < this.tabList.length; ++var6) {
+                    for (int var6 = 0; var6 < this.tabList.length; ++var6) {
                         if (this.tabList[var6] != var1) {
                             var7[var5++] = this.tabList[var6];
                         }
@@ -346,7 +348,7 @@ public class Composite extends Scrollable {
     int getChildrenCount() {
         int var1 = 0;
 
-        for(int var2 = OS.GetWindow(this.handle, 5); var2 != 0; var2 = OS.GetWindow(var2, 2)) {
+        for (int var2 = OS.GetWindow(this.handle, 5); var2 != 0; var2 = OS.GetWindow(var2, 2)) {
             ++var1;
         }
 
@@ -366,7 +368,7 @@ public class Composite extends Scrollable {
             Control[] var3 = this._getChildren();
 
             int var4;
-            for(var4 = 0; var4 < var3.length; ++var4) {
+            for (var4 = 0; var4 < var3.length; ++var4) {
                 if (var3[var4].isTabGroup()) {
                     ++var2;
                 }
@@ -375,7 +377,7 @@ public class Composite extends Scrollable {
             var1 = new Control[var2];
             var4 = 0;
 
-            for(int var5 = 0; var5 < var3.length; ++var5) {
+            for (int var5 = 0; var5 < var3.length; ++var5) {
                 if (var3[var5].isTabGroup()) {
                     var1[var4++] = var3[var5];
                 }
@@ -432,7 +434,7 @@ public class Composite extends Scrollable {
         this.checkWidget();
         if (var1 != null) {
             int var3;
-            for(var3 = 0; var3 < var1.length; ++var3) {
+            for (var3 = 0; var3 < var1.length; ++var3) {
                 Control var4 = var1[var3];
                 if (var4 == null) {
                     this.error(5);
@@ -444,7 +446,7 @@ public class Composite extends Scrollable {
 
                 boolean var5 = false;
 
-                for(Composite var6 = var4.parent; var6 != null; var6 = var6.parent) {
+                for (Composite var6 = var4.parent; var6 != null; var6 = var6.parent) {
                     var5 = var6 == this;
                     if (var5) {
                         break;
@@ -460,15 +462,15 @@ public class Composite extends Scrollable {
             Composite[] var9 = new Composite[16];
 
             int var10;
-            for(var10 = 0; var10 < var1.length; ++var10) {
+            for (var10 = 0; var10 < var1.length; ++var10) {
                 Object var11 = var1[var10];
-                Composite var7 = ((Control)var11).parent;
-                ((Control)var11).markLayout(false, false);
+                Composite var7 = ((Control) var11).parent;
+                ((Control) var11).markLayout(false, false);
 
-                while(var11 != this) {
+                while (var11 != this) {
                     if (var7.layout != null) {
                         var7.state |= 32;
-                        if (!var7.layout.flushCache((Control)var11)) {
+                        if (!var7.layout.flushCache((Control) var11)) {
                             var7.state |= 64;
                         }
                     }
@@ -480,7 +482,7 @@ public class Composite extends Scrollable {
                     }
 
                     var11 = var9[var3++] = var7;
-                    var7 = ((Control)var11).parent;
+                    var7 = ((Control) var11).parent;
                 }
             }
 
@@ -489,7 +491,7 @@ public class Composite extends Scrollable {
                 this.display.addLayoutDeferred(this);
             }
 
-            for(var10 = var3 - 1; var10 >= 0; --var10) {
+            for (var10 = var3 - 1; var10 >= 0; --var10) {
                 var9[var10].updateLayout(false);
             }
         } else {
@@ -519,7 +521,7 @@ public class Composite extends Scrollable {
         if (var2) {
             Control[] var3 = this._getChildren();
 
-            for(int var4 = 0; var4 < var3.length; ++var4) {
+            for (int var4 = 0; var4 < var3.length; ++var4) {
                 var3[var4].markLayout(var1, var2);
             }
         }
@@ -532,7 +534,7 @@ public class Composite extends Scrollable {
         int var6 = 0;
         int var7 = 0;
 
-        for(int var8 = 0; var8 < var4.length; ++var8) {
+        for (int var8 = 0; var8 < var4.length; ++var8) {
             Rectangle var9 = DPIUtil.autoScaleUp(var4[var8].getBounds());
             var6 = Math.max(var6, var9.x - var5.x + var9.width);
             var7 = Math.max(var7, var9.y - var5.y + var9.height);
@@ -547,7 +549,7 @@ public class Composite extends Scrollable {
         } else {
             Control[] var1 = this._getChildren();
 
-            for(int var2 = 0; var2 < var1.length; ++var2) {
+            for (int var2 = 0; var2 < var1.length; ++var2) {
                 var1[var2].redrawChildren();
             }
 
@@ -561,7 +563,7 @@ public class Composite extends Scrollable {
             int var1 = this.parent.handle;
 
             int var3;
-            for(int var2 = OS.GetWindow(var1, 5); var2 != 0; var2 = OS.GetWindow(var2, 2)) {
+            for (int var2 = OS.GetWindow(var1, 5); var2 != 0; var2 = OS.GetWindow(var2, 2)) {
                 if (var2 != this.handle) {
                     var3 = OS.GetWindowLong(var1, -20);
                     if ((var3 & 32) != 0) {
@@ -580,7 +582,7 @@ public class Composite extends Scrollable {
     void releaseChildren(boolean var1) {
         Control[] var2 = this._getChildren();
 
-        for(int var3 = 0; var3 < var2.length; ++var3) {
+        for (int var3 = 0; var3 < var2.length; ++var3) {
             Control var4 = var2[var3];
             if (var4 != null && !var4.isDisposed()) {
                 var4.release(false);
@@ -595,7 +597,7 @@ public class Composite extends Scrollable {
         if ((this.state & 2) != 0 && (this.style & 16777216) != 0) {
             int var1 = OS.GetWindow(this.handle, 5);
             if (var1 != 0) {
-                int var2 = OS.GetWindowThreadProcessId(var1, (int[])null);
+                int var2 = OS.GetWindowThreadProcessId(var1, (int[]) null);
                 if (var2 != OS.GetCurrentThreadId()) {
                     OS.ShowWindow(var1, 0);
                     OS.SetParent(var1, 0);
@@ -617,7 +619,7 @@ public class Composite extends Scrollable {
         super.reskinChildren(var1);
         Control[] var2 = this._getChildren();
 
-        for(int var3 = 0; var3 < var2.length; ++var3) {
+        for (int var3 = 0; var3 < var2.length; ++var3) {
             Control var4 = var2[var3];
             if (var4 != null) {
                 var4.reskin(var1);
@@ -634,7 +636,7 @@ public class Composite extends Scrollable {
                 if (!this.resizeChildren(true, var1)) {
                     this.resizeChildren(false, var1);
                 }
-            } while(this.lpwp != null);
+            } while (this.lpwp != null);
 
         }
     }
@@ -651,7 +653,7 @@ public class Composite extends Scrollable {
                 }
             }
 
-            for(int var4 = 0; var4 < var2.length; ++var4) {
+            for (int var4 = 0; var4 < var2.length; ++var4) {
                 WINDOWPOS var5 = var2[var4];
                 if (var5 != null) {
                     if (var1) {
@@ -714,7 +716,7 @@ public class Composite extends Scrollable {
         this.backgroundMode = var1;
         Control[] var2 = this._getChildren();
 
-        for(int var3 = 0; var3 < var2.length; ++var3) {
+        for (int var3 = 0; var3 < var2.length; ++var3) {
             var2[var3].updateBackgroundMode();
         }
 
@@ -752,14 +754,14 @@ public class Composite extends Scrollable {
 
         int var2;
         Control var3;
-        for(var2 = 0; var2 < var1.length; ++var2) {
+        for (var2 = 0; var2 < var1.length; ++var2) {
             var3 = var1[var2];
             if (var3.setRadioFocus(false)) {
                 return true;
             }
         }
 
-        for(var2 = 0; var2 < var1.length; ++var2) {
+        for (var2 = 0; var2 < var1.length; ++var2) {
             var3 = var1[var2];
             if (var3.setFocus()) {
                 return true;
@@ -789,7 +791,7 @@ public class Composite extends Scrollable {
     public void setTabList(Control[] var1) {
         this.checkWidget();
         if (var1 != null) {
-            for(int var2 = 0; var2 < var1.length; ++var2) {
+            for (int var2 = 0; var2 < var1.length; ++var2) {
                 Control var3 = var1[var2];
                 if (var3 == null) {
                     this.error(5);
@@ -847,14 +849,14 @@ public class Composite extends Scrollable {
 
                 int var3;
                 Control var4;
-                for(var3 = 0; var3 < var2.length; ++var3) {
+                for (var3 = 0; var3 < var2.length; ++var3) {
                     var4 = var2[var3];
                     if (var4.isTabItem() && var4.setRadioFocus(true)) {
                         return true;
                     }
                 }
 
-                for(var3 = 0; var3 < var2.length; ++var3) {
+                for (var3 = 0; var3 < var2.length; ++var3) {
                     var4 = var2[var3];
                     if (var4.isTabItem() && !var4.isTabGroup() && var4.setTabItemFocus()) {
                         return true;
@@ -871,7 +873,7 @@ public class Composite extends Scrollable {
         Control[] var2 = this._getChildren();
         int var3 = var2.length;
 
-        while(var3-- > 0) {
+        while (var3-- > 0) {
             if (var2[var3] != null && !var2[var3].isDisposed()) {
                 var2[var3].updateTextDirection(var1);
             }
@@ -883,7 +885,7 @@ public class Composite extends Scrollable {
     String toolTipText(NMTTDISPINFO var1) {
         Shell var2 = this.getShell();
         if ((var1.uFlags & 1) != 0) {
-            var2.setToolTipTitle(var1.hwndFrom, (String)null, 0);
+            var2.setToolTipTitle(var1.hwndFrom, (String) null, 0);
             OS.SendMessage(var1.hwndFrom, 1048, 0, 32767);
             Control var5 = this.display.getControl(var1.idFrom);
             return var5 != null ? var5.toolTipText : null;
@@ -912,7 +914,7 @@ public class Composite extends Scrollable {
             if (var2 != null) {
                 Control[] var3 = this._getChildren();
 
-                for(int var4 = 0; var4 < var3.length; ++var4) {
+                for (int var4 = 0; var4 < var3.length; ++var4) {
                     Control var5 = var3[var4];
                     if (var5.translateMnemonic(var1, var2)) {
                         return true;
@@ -953,7 +955,7 @@ public class Composite extends Scrollable {
         super.updateBackgroundColor();
         Control[] var1 = this._getChildren();
 
-        for(int var2 = 0; var2 < var1.length; ++var2) {
+        for (int var2 = 0; var2 < var1.length; ++var2) {
             if ((var1[var2].state & 1024) != 0) {
                 var1[var2].updateBackgroundColor();
             }
@@ -965,7 +967,7 @@ public class Composite extends Scrollable {
         super.updateBackgroundImage();
         Control[] var1 = this._getChildren();
 
-        for(int var2 = 0; var2 < var1.length; ++var2) {
+        for (int var2 = 0; var2 < var1.length; ++var2) {
             if ((var1[var2].state & 1024) != 0) {
                 var1[var2].updateBackgroundImage();
             }
@@ -977,7 +979,7 @@ public class Composite extends Scrollable {
         super.updateBackgroundMode();
         Control[] var1 = this._getChildren();
 
-        for(int var2 = 0; var2 < var1.length; ++var2) {
+        for (int var2 = 0; var2 < var1.length; ++var2) {
             var1[var2].updateBackgroundMode();
         }
 
@@ -987,7 +989,7 @@ public class Composite extends Scrollable {
         super.updateFont(var1, var2);
         Control[] var3 = this._getChildren();
 
-        for(int var4 = 0; var4 < var3.length; ++var4) {
+        for (int var4 = 0; var4 < var3.length; ++var4) {
             Control var5 = var3[var4];
             if (!var5.isDisposed()) {
                 var5.updateFont(var1, var2);
@@ -1023,7 +1025,7 @@ public class Composite extends Scrollable {
                 this.state &= -129;
                 Control[] var6 = this._getChildren();
 
-                for(int var5 = 0; var5 < var6.length; ++var5) {
+                for (int var5 = 0; var5 < var6.length; ++var5) {
                     var6[var5].updateLayout(var1, var2);
                 }
             }
@@ -1036,7 +1038,7 @@ public class Composite extends Scrollable {
         RECT[] var2 = new RECT[var1.length];
 
         int var3;
-        for(var3 = 0; var3 < var1.length; ++var3) {
+        for (var3 = 0; var3 < var1.length; ++var3) {
             Control var4 = var1[var3];
             RECT var5 = var2[var3] = new RECT();
             var4.forceResize();
@@ -1047,7 +1049,7 @@ public class Composite extends Scrollable {
         var3 = this.style & 100663296;
         super.updateOrientation();
 
-        for(int var8 = 0; var8 < var1.length; ++var8) {
+        for (int var8 = 0; var8 < var1.length; ++var8) {
             Control var9 = var1[var8];
             RECT var6 = var2[var8];
             var9.setOrientation(var3);
@@ -1145,7 +1147,7 @@ public class Composite extends Scrollable {
                 OS.MapWindowPoints(0, this.handle, var6, 1);
                 if (!OS.PtInRect(var5, var6)) {
                     short var7 = 1025;
-                    OS.RedrawWindow(this.handle, (RECT)null, 0, var7);
+                    OS.RedrawWindow(this.handle, (RECT) null, 0, var7);
                 }
             }
 
@@ -1207,7 +1209,7 @@ public class Composite extends Scrollable {
                         var11 = 0;
                         RECT var12 = new RECT();
                         OS.SetRect(var12, var5.left, var5.top, var5.right, var5.bottom);
-                        int var13 = OS.BeginBufferedPaint(var7, var12, var11, (BP_PAINTPARAMS)null, var10);
+                        int var13 = OS.BeginBufferedPaint(var7, var12, var11, (BP_PAINTPARAMS) null, var10);
                         var14 = new GCData();
                         var14.device = this.display;
                         var14.foreground = this.getForegroundPixel();
@@ -1216,7 +1218,7 @@ public class Composite extends Scrollable {
                             var15 = this;
                         }
 
-                        var14.background = ((Control)var15).getBackgroundPixel();
+                        var14.background = ((Control) var15).getBackgroundPixel();
                         var14.font = Font.win32_new(this.display, OS.SendMessage(this.handle, 49, 0, 0));
                         var14.uiState = OS.SendMessage(this.handle, 297, 0, 0);
                         if ((this.style & 262144) == 0) {
@@ -1250,7 +1252,7 @@ public class Composite extends Scrollable {
                         var9 = OS.CreateRectRgn(0, 0, 0, 0);
                         if (OS.GetRandomRgn(var24.handle, var9, 4) == 1) {
                             if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION(4, 10) && (OS.GetLayout(var24.handle) & 1) != 0) {
-                                var25 = OS.GetRegionData(var9, 0, (int[])null);
+                                var25 = OS.GetRegionData(var9, 0, (int[]) null);
                                 int[] var27 = new int[var25 / 4];
                                 OS.GetRegionData(var9, var25, var27);
                                 int var28 = OS.ExtCreateRegion(new float[]{-1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F}, var25, var27);
@@ -1289,8 +1291,8 @@ public class Composite extends Scrollable {
                             OS.SelectClipRgn(var24.handle, var9);
                             OS.OffsetRgn(var9, var5.left, var5.top);
                             OS.SetMetaRgn(var24.handle);
-                            OS.SetWindowOrgEx(var24.handle, var5.left, var5.top, (POINT)null);
-                            OS.SetBrushOrgEx(var24.handle, var5.left, var5.top, (POINT)null);
+                            OS.SetWindowOrgEx(var24.handle, var5.left, var5.top, (POINT) null);
+                            OS.SetBrushOrgEx(var24.handle, var5.left, var5.top, (POINT) null);
                             if ((this.style & 1074003968) == 0) {
                                 var32 = new RECT();
                                 OS.SetRect(var32, var5.left, var5.top, var5.right, var5.bottom);
@@ -1302,12 +1304,12 @@ public class Composite extends Scrollable {
                         var31.gc = var24;
                         var32 = null;
                         if ((this.style & 2097152) != 0 && OS.GetRgnBox(var9, var32 = new RECT()) == 3) {
-                            int var34 = OS.GetRegionData(var9, 0, (int[])null);
+                            int var34 = OS.GetRegionData(var9, 0, (int[]) null);
                             int[] var36 = new int[var34 / 4];
                             OS.GetRegionData(var9, var34, var36);
                             int var18 = var36[2];
 
-                            for(int var19 = 0; var19 < var18; ++var19) {
+                            for (int var19 = 0; var19 < var18; ++var19) {
                                 int var20 = 8 + (var19 << 2);
                                 OS.SetRect(var32, var36[var20], var36[var20 + 1], var36[var20 + 2], var36[var20 + 3]);
                                 if ((this.style & 1610874880) == 0) {
@@ -1396,7 +1398,7 @@ public class Composite extends Scrollable {
                         var7 = this;
                     }
 
-                    var6.background = ((Control)var7).getBackgroundPixel();
+                    var6.background = ((Control) var7).getBackgroundPixel();
                     var6.font = Font.win32_new(this.display, OS.SendMessage(this.handle, 49, 0, 0));
                     var6.uiState = OS.SendMessage(this.handle, 297, 0, 0);
                     GC var8 = GC.win32_new(var1, var6);
@@ -1417,7 +1419,7 @@ public class Composite extends Scrollable {
 
     LRESULT WM_SETFONT(int var1, int var2) {
         if (var2 != 0) {
-            OS.InvalidateRect(this.handle, (RECT)null, true);
+            OS.InvalidateRect(this.handle, (RECT) null, true);
         }
 
         return super.WM_SETFONT(var1, var2);
@@ -1444,7 +1446,7 @@ public class Composite extends Scrollable {
 
         if (OS.IsWindowVisible(this.handle)) {
             if ((this.state & 2) != 0 && (this.style & 1048576) == 0 && this.hooks(9)) {
-                OS.InvalidateRect(this.handle, (RECT)null, true);
+                OS.InvalidateRect(this.handle, (RECT) null, true);
             }
 
             if (OS.COMCTL32_MAJOR >= 6 && OS.IsAppThemed() && this.findThemeControl() != null) {
@@ -1464,7 +1466,7 @@ public class Composite extends Scrollable {
         if (var3 != null) {
             return var3;
         } else {
-            for(int var4 = OS.GetWindow(this.handle, 5); var4 != 0; var4 = OS.GetWindow(var4, 2)) {
+            for (int var4 = OS.GetWindow(this.handle, 5); var4 != 0; var4 = OS.GetWindow(var4, 2)) {
                 OS.SendMessage(var4, 21, 0, 0);
             }
 
@@ -1489,7 +1491,7 @@ public class Composite extends Scrollable {
                         int var7 = this.callWindowProc(this.handle, 274, var1, var2);
                         if (var5 != (this.horizontalBar != null && this.horizontalBar.getVisible()) || var6 != (this.verticalBar != null && this.verticalBar.getVisible())) {
                             short var8 = 1281;
-                            OS.RedrawWindow(this.handle, (RECT)null, 0, var8);
+                            OS.RedrawWindow(this.handle, (RECT) null, 0, var8);
                         }
 
                         if (var7 == 0) {
@@ -1510,7 +1512,7 @@ public class Composite extends Scrollable {
             return var3;
         } else {
             if ((this.state & 2) != 0 && this.hooks(9)) {
-                OS.InvalidateRect(this.handle, (RECT)null, true);
+                OS.InvalidateRect(this.handle, (RECT) null, true);
             }
 
             return var3;
@@ -1540,7 +1542,7 @@ public class Composite extends Scrollable {
                     var10.left = var10.top = 0;
                     int var11 = OS.GetSystemMetrics(45);
                     OS.ExcludeClipRect(var9, var11, var11, var10.right - var11, var10.bottom - var11);
-                    OS.DrawThemeBackground(this.display.hEditTheme(), var9, 1, 1, var10, (RECT)null);
+                    OS.DrawThemeBackground(this.display.hEditTheme(), var9, 1, 1, var10, (RECT) null);
                     OS.ReleaseDC(var1, var9);
                     return new LRESULT(var7);
                 }
@@ -1558,13 +1560,13 @@ public class Composite extends Scrollable {
                     Object var12;
                     if (var1.code == -520) {
                         var12 = new NMTTDISPINFOA();
-                        OS.MoveMemory((NMTTDISPINFOA)var12, var3, NMTTDISPINFOA.sizeof);
+                        OS.MoveMemory((NMTTDISPINFOA) var12, var3, NMTTDISPINFOA.sizeof);
                     } else {
                         var12 = new NMTTDISPINFOW();
-                        OS.MoveMemory((NMTTDISPINFOW)var12, var3, NMTTDISPINFOW.sizeof);
+                        OS.MoveMemory((NMTTDISPINFOW) var12, var3, NMTTDISPINFOW.sizeof);
                     }
 
-                    String var14 = this.toolTipText((NMTTDISPINFO)var12);
+                    String var14 = this.toolTipText((NMTTDISPINFO) var12);
                     if (var14 != null) {
                         Shell var15 = this.getShell();
                         var14 = Display.withCrLf(var14);
@@ -1575,30 +1577,30 @@ public class Composite extends Scrollable {
                         char[] var7 = this.fixMnemonic(var14);
                         Object var8 = null;
                         int var9 = var1.idFrom;
-                        if ((((NMTTDISPINFO)var12).uFlags & 1) != 0) {
+                        if ((((NMTTDISPINFO) var12).uFlags & 1) != 0) {
                             var8 = this.display.getControl(var9);
                         } else if (var1.hwndFrom == var15.toolTipHandle || var1.hwndFrom == var15.balloonTipHandle) {
                             var8 = var15.findToolTip(var1.idFrom);
                         }
 
                         if (var8 != null) {
-                            int var10 = ((Widget)var8).getStyle();
+                            int var10 = ((Widget) var8).getStyle();
                             int var11 = -2080374784;
                             if ((var10 & var11) != 0 && (var10 & var11) != var11) {
-                                ((NMTTDISPINFO)var12).uFlags |= 4;
+                                ((NMTTDISPINFO) var12).uFlags |= 4;
                             } else {
-                                ((NMTTDISPINFO)var12).uFlags &= -5;
+                                ((NMTTDISPINFO) var12).uFlags &= -5;
                             }
                         }
 
                         if (var1.code == -520) {
                             byte[] var16 = new byte[var7.length * 2];
-                            OS.WideCharToMultiByte(this.getCodePage(), 0, var7, var7.length, var16, var16.length, (byte[])null, (boolean[])null);
-                            var15.setToolTipText((NMTTDISPINFO)var12, var16);
-                            OS.MoveMemory(var3, (NMTTDISPINFOA)var12, NMTTDISPINFOA.sizeof);
+                            OS.WideCharToMultiByte(this.getCodePage(), 0, var7, var7.length, var16, var16.length, (byte[]) null, (boolean[]) null);
+                            var15.setToolTipText((NMTTDISPINFO) var12, var16);
+                            OS.MoveMemory(var3, (NMTTDISPINFOA) var12, NMTTDISPINFOA.sizeof);
                         } else {
-                            var15.setToolTipText((NMTTDISPINFO)var12, var7);
-                            OS.MoveMemory(var3, (NMTTDISPINFOW)var12, NMTTDISPINFOW.sizeof);
+                            var15.setToolTipText((NMTTDISPINFO) var12, var7);
+                            OS.MoveMemory(var3, (NMTTDISPINFOW) var12, NMTTDISPINFOW.sizeof);
                         }
 
                         return LRESULT.ZERO;
@@ -1616,7 +1618,7 @@ public class Composite extends Scrollable {
                         }
 
                         var5 = OS.GetWindowLong(var4, -20);
-                    } while((var5 & 8) == 0);
+                    } while ((var5 & 8) == 0);
 
                     if (var4 == 0) {
                         if (this.display.getActiveShell() == null) {

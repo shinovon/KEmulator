@@ -1,8 +1,7 @@
 package emulator.ui;
 
-public interface IPlugin
-{
+public interface IPlugin {
     void open();
-    
+
     void close();
 }

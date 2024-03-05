@@ -3,10 +3,9 @@ package emulator.ui.swt;
 import emulator.*;
 import emulator.debug.*;
 
-final class Class14 implements Runnable
-{
+final class Class14 implements Runnable {
     private final Class5 aClass5_587;
-    
+
     Class14(final Class5 aClass5_579) {
         super();
         this.aClass5_587 = aClass5_579;
@@ -35,32 +34,32 @@ final class Class14 implements Runnable
             }
         }
     }*/
-    
+
     public final void run() {
-    	try {
-	        switch (Class5.method314(this.aClass5_587)) {
-	            case 0: {
-	                for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
-	                    final String s = (String) Emulator.jarClasses.get(i);
-	                    final c c;
-	                    if ((c = new c(s, (Object)(s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null))).method879((String)null)) {
-	                        String s2 = c.toString();
-	                        if (c.method883().getSuperclass() != null) {
-	                            s2 = s2 + "@" + c.method883().getSuperclass().getName();
-	                        }
-	                        Class5.method304(this.aClass5_587).put(s2, c);
-	                    }
-	                }
-	            }
-	            case 1: {
-	                final c c2;
-	                (c2 = new c("emulator.debug.Profiler", (Object)null)).method879((String)null);
-	                Class5.method304(this.aClass5_587).put("SystemProfiler", c2);
-	                break;
-	            }
-	        }
-    	} catch (Error e) {
-    		
-    	}
+        try {
+            switch (Class5.method314(this.aClass5_587)) {
+                case 0: {
+                    for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
+                        final String s = (String) Emulator.jarClasses.get(i);
+                        final c c;
+                        if ((c = new c(s, (Object) (s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null))).method879((String) null)) {
+                            String s2 = c.toString();
+                            if (c.method883().getSuperclass() != null) {
+                                s2 = s2 + "@" + c.method883().getSuperclass().getName();
+                            }
+                            Class5.method304(this.aClass5_587).put(s2, c);
+                        }
+                    }
+                }
+                case 1: {
+                    final c c2;
+                    (c2 = new c("emulator.debug.Profiler", (Object) null)).method879((String) null);
+                    Class5.method304(this.aClass5_587).put("SystemProfiler", c2);
+                    break;
+                }
+            }
+        } catch (Error e) {
+
+        }
     }
 }

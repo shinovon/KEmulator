@@ -2,18 +2,17 @@ package emulator;
 
 import java.util.*;
 
-public final class Settings
-{
-	/*
-	 * awt - 1
-	 * swt - 0
-	 */
+public final class Settings {
+    /*
+     * awt - 1
+     * swt - 0
+     */
     public static int g2d;
     /*
      * 1 - lwj
      * 0 - wgl
      */
-   // public static int g3d;
+    // public static int g3d;
     public static boolean enableVibration;
     public static boolean enableKeyRepeat;
     public static boolean ignoreFullScreen;
@@ -54,15 +53,15 @@ public final class Settings
     public static boolean showInfoFrame;
     public static boolean showMemViewFrame;
     public static boolean aBoolean1274;
-	public static boolean canvasKeyboard;
-	public static boolean awtAntiAliasing;
-	public static boolean fpsMode;
-	public static boolean textAntiAliasing = true;
-	// 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS, 3 - QUANTUM
-	public static int fpsGame;
-	public static boolean playerBufferAll = false;
-	public static String vlcDir = "";
-	public static String locale = "en-US";
+    public static boolean canvasKeyboard;
+    public static boolean awtAntiAliasing;
+    public static boolean fpsMode;
+    public static boolean textAntiAliasing = true;
+    // 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS, 3 - QUANTUM
+    public static int fpsGame;
+    public static boolean playerBufferAll = false;
+    public static String vlcDir = "";
+    public static String locale = "en-US";
     public static boolean jdwpDebug;
     public static int debugPort = 29292;
     public static Map<String, String> controllerBinds = new HashMap<String, String>();
@@ -76,10 +75,10 @@ public final class Settings
     public Settings() {
         super();
     }
-    
+
     static {
         Settings.g2d = 1;
-       // Settings.g3d = 1;
+        // Settings.g3d = 1;
         Settings.canvasScale = 100;
         Settings.frameRate = 60;
         Settings.steps = -1;

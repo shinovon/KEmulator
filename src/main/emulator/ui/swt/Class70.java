@@ -2,15 +2,14 @@ package emulator.ui.swt;
 
 import org.eclipse.swt.events.*;
 
-final class Class70 extends SelectionAdapter
-{
+final class Class70 extends SelectionAdapter {
     private final MemoryView aClass110_853;
-    
+
     Class70(final MemoryView aClass110_853) {
         super();
         this.aClass110_853 = aClass110_853;
     }
-    
+
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         if (MemoryView.method648(this.aClass110_853).getSelection()) {
             final long long1;

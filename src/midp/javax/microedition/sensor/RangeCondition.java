@@ -2,13 +2,12 @@ package javax.microedition.sensor;
 
 import emulator.sensor.*;
 
-public class RangeCondition implements Condition
-{
+public class RangeCondition implements Condition {
     private final double aDouble378;
     private final double aDouble380;
     private final String aString379;
     private final String aString381;
-    
+
     public RangeCondition(final double aDouble378, final String aString379, final double aDouble379, final String aString380) {
         super();
         if (!i.method244(aString379) || !i.method245(aString380)) {
@@ -25,27 +24,27 @@ public class RangeCondition implements Condition
         this.aString379 = aString379;
         this.aString381 = aString380;
     }
-    
+
     public final double getLowerLimit() {
         return this.aDouble378;
     }
-    
+
     public final String getLowerOp() {
         return this.aString379;
     }
-    
+
     public final double getUpperLimit() {
         return this.aDouble380;
     }
-    
+
     public final String getUpperOp() {
         return this.aString381;
     }
-    
+
     public boolean isMet(final double n) {
         return i.method242(this.aString379, this.aDouble378, n) && i.method242(this.aString381, this.aDouble380, n);
     }
-    
+
     public boolean isMet(final Object o) {
         return false;
     }

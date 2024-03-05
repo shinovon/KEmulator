@@ -1,8 +1,10 @@
 package emulator.graphics3D.lwjgl;
 
 import emulator.graphics3D.*;
+
 import java.util.*;
 import javax.microedition.lcdui.*;
+
 import emulator.*;
 import org.lwjgl.*;
 import org.eclipse.swt.graphics.*;
@@ -20,8 +22,7 @@ import java.nio.*;
 import javax.microedition.m3g.*;
 import javax.microedition.m3g.Transform;
 
-public final class Emulator3D implements IGraphics3D
-{
+public final class Emulator3D implements IGraphics3D {
     private static Emulator3D ab383;
     private Object renderTarget;
     private boolean aBoolean382;
@@ -65,14 +66,14 @@ public final class Emulator3D implements IGraphics3D
         Emulator3D.m3gProps.put("numTextureUnits", new Integer(10));
         Emulator3D.m3gProps.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
     }
-    
+
     public static Emulator3D method189() {
         if (Emulator3D.ab383 == null) {
             Emulator3D.ab383 = new Emulator3D();
         }
         return Emulator3D.ab383;
     }
-    
+
     private static PixelFormat method190() {
         if (Emulator3D.aPixelFormat395 == null) {
             int n = 4;
@@ -80,9 +81,8 @@ public final class Emulator3D implements IGraphics3D
             while (true) {
                 try {
                     Emulator3D.aPixelFormat395 = new PixelFormat(screenDepth, 0, 24, 0, n);
-                    new Pbuffer(1, 1, Emulator3D.aPixelFormat395, (RenderTexture)null, (Drawable)null).destroy();
-                }
-                catch (Exception ex) {
+                    new Pbuffer(1, 1, Emulator3D.aPixelFormat395, (RenderTexture) null, (Drawable) null).destroy();
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     if ((n >>= 1) != 0) {
                         continue;
@@ -94,42 +94,39 @@ public final class Emulator3D implements IGraphics3D
         }
         return Emulator3D.aPixelFormat395;
     }
-    
+
     public final void bindTarget(final Object o) {
         int anInt396;
         int anInt397;
         if (o instanceof Graphics) {
             this.renderTarget = o;
-            anInt396 = ((Graphics)this.renderTarget).getImage().getWidth();
-            anInt397 = ((Graphics)this.renderTarget).getImage().getHeight();
-        }
-        else {
+            anInt396 = ((Graphics) this.renderTarget).getImage().getWidth();
+            anInt397 = ((Graphics) this.renderTarget).getImage().getHeight();
+        } else {
             if (!(o instanceof Image2D)) {
                 throw new IllegalArgumentException();
             }
             this.renderTarget = o;
-            anInt396 = ((Image2D)this.renderTarget).getWidth();
-            anInt397 = ((Image2D)this.renderTarget).getHeight();
+            anInt396 = ((Image2D) this.renderTarget).getWidth();
+            anInt397 = ((Image2D) this.renderTarget).getHeight();
         }
         try {
             try {
                 final String string = anInt396 + "x" + anInt397;
-                Emulator3D.aPbuffer390 = (Pbuffer)Emulator3D.aHashtable388.get(string);
+                Emulator3D.aPbuffer390 = (Pbuffer) Emulator3D.aHashtable388.get(string);
                 if (Emulator3D.aPbuffer390 == null) {
-                    Emulator3D.aPbuffer390 = new Pbuffer(anInt396, anInt397, method190(), (RenderTexture)null, (Drawable)null);
+                    Emulator3D.aPbuffer390 = new Pbuffer(anInt396, anInt397, method190(), (RenderTexture) null, (Drawable) null);
                     Emulator3D.aHashtable388.put(string, Emulator3D.aPbuffer390);
                 }
                 Emulator3D.aPbuffer390.makeCurrent();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 this.method191(anInt396, anInt397);
             }
             if (Emulator3D.anInt396 != anInt396 || Emulator3D.anInt399 != anInt397) {
                 if (Settings.g2d == 1) {
                     Emulator3D.aBufferedImage392 = new BufferedImage(anInt396, anInt397, 4);
-                }
-                else {
+                } else {
                     Emulator3D.anImageData393 = new ImageData(anInt396, anInt397, 32, Emulator3D.aPaletteData394);
                 }
                 Emulator3D.aByteBuffer391 = BufferUtils.createByteBuffer(anInt396 * anInt397 * 4);
@@ -139,36 +136,35 @@ public final class Emulator3D implements IGraphics3D
             GL11.glEnable(3089);
             GL11.glEnable(2977);
             GL11.glPixelStorei(3317, 1);
-        }
-        catch (Exception ex2) {
+        } catch (Exception ex2) {
             ex2.printStackTrace();
             this.renderTarget = null;
             throw new IllegalArgumentException();
         }
     }
-    
+
     public final void releaseTarget() {
         GL11.glFinish();
         this.method192();
         this.renderTarget = null;
         if (Emulator3D.aPbuffer390 != null) {
             try {
-				Emulator3D.aPbuffer390.releaseContext();
-			} catch (LWJGLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                Emulator3D.aPbuffer390.releaseContext();
+            } catch (LWJGLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             return;
         }
         this.releaseGl();
     }
-    
+
     private void method191(final int n, final int n2) {
         if (this.image == null || this.image.getBounds().width != n || this.image.getBounds().height != n2) {
             if (this.image != null) {
                 this.image.dispose();
                 this.gc.dispose();
-                if(useWgl()) {
+                if (useWgl()) {
                     WGL_wglDeleteContext(this.context);
                 } else {
                     // TODO
@@ -207,9 +203,8 @@ public final class Emulator3D implements IGraphics3D
             // TODO
         }
         try {
-            GLContext.useContext((Object)this.image);
-        }
-        catch (Exception ex) {
+            GLContext.useContext((Object) this.image);
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw new IllegalArgumentException();
         }
@@ -220,24 +215,24 @@ public final class Emulator3D implements IGraphics3D
     }
 
     private void releaseGl() {
-        if(useWgl()) {
+        if (useWgl()) {
             WGL_wglMakeCurrent(getHandle(gc), -1);
         } else {
             // TODO
         }
         try {
-            GLContext.useContext((Object)null);
+            GLContext.useContext((Object) null);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     public final void method192() {
         if (this.renderTarget == null) {
             return;
         }
         if (this.renderTarget instanceof Image2D) {
-            final Image2D image2D = (Image2D)this.renderTarget;
+            final Image2D image2D = (Image2D) this.renderTarget;
             Emulator3D.aByteBuffer391.rewind();
             GL11.glReadPixels(0, 0, Emulator3D.anInt396, Emulator3D.anInt399, 6408, 5121, Emulator3D.aByteBuffer391);
             final byte[] array = new byte[Emulator3D.anInt396 * Emulator3D.anInt399 * 4];
@@ -260,8 +255,7 @@ public final class Emulator3D implements IGraphics3D
                 n5 = image2D.getWidth();
                 n6 = image2D.getHeight();
                 array2 = array;
-            }
-            else {
+            } else {
                 final byte[] array3 = new byte[image2D.getWidth() * image2D.getHeight() * 3];
                 for (int n7 = array.length - 1, j = array3.length - 1; j >= 0; array3[j--] = array[n7--], array3[j--] = array[n7--], array3[j--] = array[n7--]) {
                     --n7;
@@ -285,14 +279,14 @@ public final class Emulator3D implements IGraphics3D
                 Emulator3D.aByteBuffer391.get(Emulator3D.anImageData393.data, n9, n8);
                 n9 -= n8;
             }
-            final Image image = new Image((Device)null, Emulator3D.anImageData393);
-            ((Graphics2DSWT)((Graphics)this.renderTarget).getImpl()).method299().drawImage(image, 0, 0);
+            final Image image = new Image((Device) null, Emulator3D.anImageData393);
+            ((Graphics2DSWT) ((Graphics) this.renderTarget).getImpl()).method299().drawImage(image, 0, 0);
             image.dispose();
             return;
         }
         Emulator3D.aByteBuffer391.rewind();
         GL11.glReadPixels(0, 0, Emulator3D.anInt396, Emulator3D.anInt399, 6408, 5121, Emulator3D.aByteBuffer391);
-        final int[] data = ((DataBufferInt)Emulator3D.aBufferedImage392.getRaster().getDataBuffer()).getData();
+        final int[] data = ((DataBufferInt) Emulator3D.aBufferedImage392.getRaster().getDataBuffer()).getData();
         final IntBuffer intBuffer = Emulator3D.aByteBuffer391.asIntBuffer();
         final int anInt396 = Emulator3D.anInt396;
         int n10 = data.length - anInt396;
@@ -300,31 +294,30 @@ public final class Emulator3D implements IGraphics3D
             intBuffer.get(data, n10, anInt396);
             n10 -= anInt396;
         }
-        ((emulator.graphics2D.awt.b)((Graphics)this.renderTarget).getImpl()).g().drawImage(Emulator3D.aBufferedImage392, 0, 0, null);
+        ((emulator.graphics2D.awt.b) ((Graphics) this.renderTarget).getImpl()).g().drawImage(Emulator3D.aBufferedImage392, 0, 0, null);
     }
-    
+
     public final void enableDepthBuffer(final boolean aBoolean382) {
         this.aBoolean382 = aBoolean382;
     }
-    
+
     public final boolean isDepthBufferEnabled() {
         return this.aBoolean382;
     }
-    
+
     public final void setHints(final int anInt387) {
         this.anInt387 = anInt387;
         if (this.renderTarget != null) {
             this.method195();
         }
     }
-    
+
     private void method195() {
         if ((this.anInt387 & 0x2) != 0x0) {
             GL11.glEnable(2832);
             GL11.glEnable(2848);
             GL11.glEnable(2881);
-        }
-        else {
+        } else {
             GL11.glDisable(2832);
             GL11.glDisable(2848);
             GL11.glDisable(2881);
@@ -335,38 +328,38 @@ public final class Emulator3D implements IGraphics3D
         }
         GL11.glDisable(3024);
     }
-    
+
     public final int getHints() {
         return this.anInt387;
     }
-    
+
     public final Hashtable getProperties() {
         return Emulator3D.m3gProps;
     }
-    
+
     public final void setDepthRange(final float aFloat386, final float aFloat387) {
         this.aFloat386 = aFloat386;
         this.aFloat398 = aFloat387;
     }
-    
+
     private void method196() {
-        GL11.glDepthRange((double)this.aFloat386, (double)this.aFloat398);
+        GL11.glDepthRange((double) this.aFloat386, (double) this.aFloat398);
     }
-    
+
     public final void setViewport(final int anInt401, final int anInt402, final int anInt403, final int anInt404) {
         this.anInt401 = anInt401;
         this.anInt402 = anInt402;
         this.anInt403 = anInt403;
         this.anInt404 = anInt404;
     }
-    
+
     private void method197() {
         GL11.glViewport(this.anInt401, Emulator3D.anInt399 - this.anInt402 - this.anInt404, this.anInt403, this.anInt404);
         GL11.glScissor(this.anInt401, Emulator3D.anInt399 - this.anInt402 - this.anInt404, this.anInt403, this.anInt404);
     }
-    
+
     public final void clearBackgound(final Object o) {
-        final Background background = (Background)o;
+        final Background background = (Background) o;
         this.method197();
         this.method196();
         GL11.glClearDepth(1.0);
@@ -381,7 +374,7 @@ public final class Emulator3D implements IGraphics3D
         }
         GL11.glClear(0x4000 | (this.aBoolean382 ? 256 : 0));
     }
-    
+
     private void method193(final Background background) {
         if (background != null && background.getImage() != null && background.getCropWidth() > 0 && background.getCropHeight() > 0) {
             GL11.glDisable(2896);
@@ -410,12 +403,12 @@ public final class Emulator3D implements IGraphics3D
                 if ((n12 = n8 % n6) > 0.0f) {
                     n12 -= n6;
                 }
-                n10 = (int)(2.5f + n2 / n6);
+                n10 = (int) (2.5f + n2 / n6);
                 n8 = n12 - n10 / 2 * n6;
             }
             if (background.getImageModeY() == 33) {
                 final float n13 = n9 % n7;
-                n11 = (int)(2.5f + n3 / n7);
+                n11 = (int) (2.5f + n3 / n7);
                 n9 = n13 + n11 / 2 * n7;
             }
             GL11.glPixelStorei(3314, width);
@@ -440,57 +433,57 @@ public final class Emulator3D implements IGraphics3D
             GL11.glPopMatrix();
         }
     }
-    
+
     public final void render(final VertexBuffer vertexBuffer, final IndexBuffer indexBuffer, final Appearance appearance, final Transform transform, final int n) {
     }
-    
+
     public final void render(final Node node, final Transform transform) {
     }
-    
+
     public final void render(final World world) {
     }
-    
+
     public final void v3bind(final Graphics graphics) {
-    	
+
     }
-    
+
     public final void v3flush() {
     }
-    
+
     public final void v3release(final Graphics graphics) {
     }
-    
+
     static {
         Emulator3D.aHashtable388 = new Hashtable();
         aPaletteData394 = new PaletteData(-16777216, 16711680, 65280);
         Emulator3D.m3gProps = new Hashtable();
     }
-    
+
     private static long toLong(Object o) {
-    	if(o instanceof Integer) {
-    		return ((Integer) o).longValue();
-    	}
-    	if(o instanceof Long) {
-    		return ((Long) o).longValue();
-    	}
-    	throw new Error("Not number: " + o.getClass());
-	}
-    
+        if (o instanceof Integer) {
+            return ((Integer) o).longValue();
+        }
+        if (o instanceof Long) {
+            return ((Long) o).longValue();
+        }
+        throw new Error("Not number: " + o.getClass());
+    }
+
     private static long Win32(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
-    	try {
-    		Class<?> os = Class.forName("org.eclipse.swt.internal.win32.OS");
-    		Method m = null;
-    		try {
-    			m = os.getMethod(n, t);
-    			return toLong(m.invoke(null, p));
-    		} catch (Exception e) {
-    			m = os.getMethod(n, t64);
-    			return toLong(m.invoke(null, p64));
-    		}
-    	} catch (Exception e) {
-    		throw new Error(e);
-    	}
-	}
+        try {
+            Class<?> os = Class.forName("org.eclipse.swt.internal.win32.OS");
+            Method m = null;
+            try {
+                m = os.getMethod(n, t);
+                return toLong(m.invoke(null, p));
+            } catch (Exception e) {
+                m = os.getMethod(n, t64);
+                return toLong(m.invoke(null, p64));
+            }
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
 
     private static long GTK(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
         try {
@@ -510,34 +503,34 @@ public final class Emulator3D implements IGraphics3D
 
     private static long GTK_gtk_widget_get_window(long n) {
         return GTK("gtk_widget_get_window",
-                new Class[] { int.class },
-                new Object[] { (int)n },
-                new Class[] { long.class },
-                new Object[] { n } );
+                new Class[]{int.class},
+                new Object[]{(int) n},
+                new Class[]{long.class},
+                new Object[]{n});
     }
 
     private static long GTK_gdk_x11_display_get_xdisplay(long n) {
         return GTK("gdk_x11_display_get_xdisplay",
-                new Class[] { int.class },
-                new Object[] { (int)n },
-                new Class[] { long.class },
-                new Object[] { n } );
+                new Class[]{int.class},
+                new Object[]{(int) n},
+                new Class[]{long.class},
+                new Object[]{n});
     }
 
     private static long GTK_gdk_window_get_display(long n) {
         return GTK("gdk_window_get_display",
-                new Class[] { int.class },
-                new Object[] { (int)n },
-                new Class[] { long.class },
-                new Object[] { n } );
+                new Class[]{int.class},
+                new Object[]{(int) n},
+                new Class[]{long.class},
+                new Object[]{n});
     }
 
     private static long GTK_XDefaultScreen(long n) {
         return GTK("XDefaultScreen",
-                new Class[] { int.class },
-                new Object[] { (int)n },
-                new Class[] { long.class },
-                new Object[] { n } );
+                new Class[]{int.class},
+                new Object[]{(int) n},
+                new Class[]{long.class},
+                new Object[]{n});
     }
 
     private long gdk_x11_display_get_xdisplay(long n) {
@@ -545,88 +538,88 @@ public final class Emulator3D implements IGraphics3D
     }
 
     private static Object WGL(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
-    	try {
-    		Class<?> os = WGL.class;
-    		Method m = null;
-    		try {
-    			m = os.getMethod(n, t);
-    			return m.invoke(null, p);
-    		} catch (Exception e) {
-    			m = os.getMethod(n, t64);
-    			return m.invoke(null, p64);
-    		}
-    	} catch (Exception e) {
-    		throw new Error(e);
-    	}
-	}
-    
+        try {
+            Class<?> os = WGL.class;
+            Method m = null;
+            try {
+                m = os.getMethod(n, t);
+                return m.invoke(null, p);
+            } catch (Exception e) {
+                m = os.getMethod(n, t64);
+                return m.invoke(null, p64);
+            }
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
     private static long Win32_ReleaseDC(long h, long i) {
-    	return Win32("ReleaseDC",
-    			new Class[] { int.class, int.class }, 
-    			new Object[] { (int)h, (int)i }, 
-    			new Class[] { long.class, long.class }, 
-    			new Object[] { h, i } );
+        return Win32("ReleaseDC",
+                new Class[]{int.class, int.class},
+                new Object[]{(int) h, (int) i},
+                new Class[]{long.class, long.class},
+                new Object[]{h, i});
     }
-    
+
     private static long Win32_GetDC(long h) {
-    	return Win32("GetDC",
-    			new Class[] { int.class}, 
-    			new Object[] { (int) h}, 
-    			new Class[] { long.class}, 
-    			new Object[] { h } );
+        return Win32("GetDC",
+                new Class[]{int.class},
+                new Object[]{(int) h},
+                new Class[]{long.class},
+                new Object[]{h});
     }
-    
+
     private static long WGL_wglMakeCurrent(long i, long d) {
-    	return toLong(WGL("wglMakeCurrent",
-    			new Class[] { int.class, int.class }, 
-    			new Object[] { (int)i, (int)d }, 
-    			new Class[] { long.class, long.class }, 
-    			new Object[] { i, d } ));
+        return toLong(WGL("wglMakeCurrent",
+                new Class[]{int.class, int.class},
+                new Object[]{(int) i, (int) d},
+                new Class[]{long.class, long.class},
+                new Object[]{i, d}));
     }
-    
+
     private static long WGL_wglCreateContext(long i) {
-    	return toLong(WGL("wglCreateContext",
-    			new Class[] { int.class }, 
-    			new Object[] { (int)i }, 
-    			new Class[] { long.class }, 
-    			new Object[] { i } ));
+        return toLong(WGL("wglCreateContext",
+                new Class[]{int.class},
+                new Object[]{(int) i},
+                new Class[]{long.class},
+                new Object[]{i}));
     }
-    
+
     private static boolean WGL_SetPixelFormat(long i, long j, PIXELFORMATDESCRIPTOR k) {
-    	return (boolean) WGL("SetPixelFormat",
-    			new Class[] { int.class, int.class, PIXELFORMATDESCRIPTOR.class }, 
-    			new Object[] { (int)i, (int)j, k }, 
-    			new Class[] { long.class, int.class, PIXELFORMATDESCRIPTOR.class }, 
-    			new Object[] { i, (int)j, k } );
+        return (boolean) WGL("SetPixelFormat",
+                new Class[]{int.class, int.class, PIXELFORMATDESCRIPTOR.class},
+                new Object[]{(int) i, (int) j, k},
+                new Class[]{long.class, int.class, PIXELFORMATDESCRIPTOR.class},
+                new Object[]{i, (int) j, k});
     }
-    
+
     private static long WGL_ChoosePixelFormat(long i, PIXELFORMATDESCRIPTOR k) {
-    	return toLong(WGL("ChoosePixelFormat",
-    			new Class[] { int.class, PIXELFORMATDESCRIPTOR.class }, 
-    			new Object[] { (int)i, k }, 
-    			new Class[] { long.class, PIXELFORMATDESCRIPTOR.class }, 
-    			new Object[] { i, k } ));
+        return toLong(WGL("ChoosePixelFormat",
+                new Class[]{int.class, PIXELFORMATDESCRIPTOR.class},
+                new Object[]{(int) i, k},
+                new Class[]{long.class, PIXELFORMATDESCRIPTOR.class},
+                new Object[]{i, k}));
     }
-    
+
     private static long WGL_wglGetCurrentContext() {
-    	return toLong(WGL("wglGetCurrentContext", null, null, null, null));
+        return toLong(WGL("wglGetCurrentContext", null, null, null, null));
     }
-    
+
     private static long WGL_wglDeleteContext(long i) {
-    	return toLong(WGL("wglDeleteContext",
-    			new Class[] { int.class }, 
-    			new Object[] { (int)i }, 
-    			new Class[] { long.class }, 
-    			new Object[] { i } ));
+        return toLong(WGL("wglDeleteContext",
+                new Class[]{int.class},
+                new Object[]{(int) i},
+                new Class[]{long.class},
+                new Object[]{i}));
     }
-    
+
     private static long getHandle(Object c) {
-    	try {
-    		Class<?> cl = c.getClass();
-    		Field f = cl.getField("handle");
-    		return f.getLong(c);
-    	} catch (Exception e) {
-    		throw new Error(e);
-    	}
-	}
+        try {
+            Class<?> cl = c.getClass();
+            Field f = cl.getField("handle");
+            return f.getLong(c);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
 }

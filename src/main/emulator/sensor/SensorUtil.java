@@ -2,41 +2,40 @@ package emulator.sensor;
 
 import javax.microedition.sensor.*;
 
-public final class SensorUtil
-{
+public final class SensorUtil {
     private int position;
     private String aString463;
     private String aString464;
     private String aString465;
     private String aString466;
     private String aString467;
-    
+
     private SensorUtil() {
         super();
     }
-    
+
     public final String method246() {
         return this.aString464;
     }
-    
+
     public final String method252() {
         return this.aString465;
     }
-    
+
     public final String method254() {
         return this.aString466;
     }
-    
+
     public final String method255() {
         return this.aString467;
     }
-    
+
     private static boolean method247(final char c) {
         return Character.isDigit(c) || Character.isLowerCase(c) || Character.isUpperCase(c) || method253(c);
     }
-    
+
     private static boolean method253(final char c) {
-        final char[] array = { '-', '_', '.', '!', '~', '*', '\'', '(', ')' };
+        final char[] array = {'-', '_', '.', '!', '~', '*', '\'', '(', ')'};
         for (int i = 0; i < array.length; ++i) {
             if (c == array[i]) {
                 return true;
@@ -44,7 +43,7 @@ public final class SensorUtil
         }
         return false;
     }
-    
+
     private String method256() throws IllegalArgumentException {
         if (this.position < 0 || this.position > this.aString463.length() - 1) {
             throw new IllegalArgumentException("Wrong position");
@@ -60,7 +59,7 @@ public final class SensorUtil
         }
         return sb.toString();
     }
-    
+
     private String method248(final String[] array) throws IllegalArgumentException {
         final String method256 = this.method256();
         boolean b = false;
@@ -75,7 +74,7 @@ public final class SensorUtil
         }
         return method256;
     }
-    
+
     private void method249(final char c) throws IllegalArgumentException {
         if (this.position < 0 || this.position > this.aString463.length() - 1) {
             throw new IllegalArgumentException("Wrong position");
@@ -84,7 +83,7 @@ public final class SensorUtil
             throw new IllegalArgumentException("Current symbol is not separator url = \"" + this.aString463 + "\" pos = " + this.position);
         }
     }
-    
+
     public static SensorUtil method250(final String aString463) {
         final SensorUtil d;
         (d = new SensorUtil()).aString463 = aString463;
@@ -99,23 +98,21 @@ public final class SensorUtil
         int n3 = 0;
         while (d.position < length) {
             d.method249(';');
-            final String method248 = d.method248(new String[] { "contextType", "model", "location" });
+            final String method248 = d.method248(new String[]{"contextType", "model", "location"});
             d.method249('=');
             if (method248.equals("contextType")) {
                 if (n != 0) {
                     throw new IllegalArgumentException("contextType defined twice");
                 }
                 n = 1;
-                d.aString466 = d.method248(new String[] { "ambient", "device", "user", "vehicle" });
-            }
-            else if (method248.equals("model")) {
+                d.aString466 = d.method248(new String[]{"ambient", "device", "user", "vehicle"});
+            } else if (method248.equals("model")) {
                 if (n2 != 0) {
                     throw new IllegalArgumentException("model defined twice");
                 }
                 n2 = 1;
                 d.aString464 = d.method256();
-            }
-            else {
+            } else {
                 if (!method248.equals("location")) {
                     continue;
                 }
@@ -128,7 +125,7 @@ public final class SensorUtil
         }
         return d;
     }
-    
+
     public static String getUrl(final SensorInfo sensorInfo) {
         final StringBuffer sb;
         (sb = new StringBuffer("sensor:")).append(sensorInfo.getQuantity());
@@ -146,9 +143,9 @@ public final class SensorUtil
         }
         String s = null;
         try {
-            s = (String)sensorInfo.getProperty("location");
+            s = (String) sensorInfo.getProperty("location");
+        } catch (IllegalArgumentException ex) {
         }
-        catch (IllegalArgumentException ex) {}
         if (s != null) {
             sb.append(';');
             sb.append("location");

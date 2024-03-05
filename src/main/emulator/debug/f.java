@@ -1,16 +1,18 @@
 package emulator.debug;
 
 import javax.microedition.lcdui.*;
+
 import emulator.graphics2D.*;
+
 import javax.microedition.m3g.*;
+
 import emulator.*;
 
-public final class f extends Image
-{
+public final class f extends Image {
     public f(final IImage image) {
         super(image);
     }
-    
+
     public static IImage method844(final Image2D image2D) {
         if (image2D.getFormat() != 99 && image2D.getFormat() != 100) {
             return null;
@@ -25,14 +27,13 @@ public final class f extends Image
                 for (int i = length - 1; i >= 0; --i) {
                     data[i] = ((array[i * 4] & 0xFF) << 16) + ((array[i * 4 + 1] & 0xFF) << 8) + (array[i * 4 + 2] & 0xFF) + ((array[i * 4 + 3] & 0xFF) << 24);
                 }
-            }
-            else {
+            } else {
                 for (int j = length - 1; j >= 0; --j) {
                     data[j] = ((array[j * 3] & 0xFF) << 16) + ((array[j * 3 + 1] & 0xFF) << 8) + (array[j * 3 + 2] & 0xFF) - 16777216;
                 }
             }
+        } catch (Exception ex) {
         }
-        catch (Exception ex) {}
         image.setData(data);
         return image;
     }

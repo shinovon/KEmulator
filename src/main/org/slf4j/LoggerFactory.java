@@ -9,47 +9,40 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class LoggerFactory
-{
-  
-  private static Logger logger = new LoggerImpl();
+public final class LoggerFactory {
 
-static void reset()
-  {
-  }
-  
-  private static boolean messageContainsOrgSlf4jImplStaticLoggerBinder(String msg)
-  {
-    if (msg == null) {
-      return false;
+    private static Logger logger = new LoggerImpl();
+
+    static void reset() {
     }
-    if (msg.indexOf("org/slf4j/impl/StaticLoggerBinder") != -1) {
-      return true;
+
+    private static boolean messageContainsOrgSlf4jImplStaticLoggerBinder(String msg) {
+        if (msg == null) {
+            return false;
+        }
+        if (msg.indexOf("org/slf4j/impl/StaticLoggerBinder") != -1) {
+            return true;
+        }
+        if (msg.indexOf("org.slf4j.impl.StaticLoggerBinder") != -1) {
+            return true;
+        }
+        return false;
     }
-    if (msg.indexOf("org.slf4j.impl.StaticLoggerBinder") != -1) {
-      return true;
+
+
+    static void failedBinding(Throwable t) {
     }
-    return false;
-  }
-  
-  
-  static void failedBinding(Throwable t)
-  {
-  }
-  
-  
-  public static Logger getLogger(String name)
-  {
-    return logger;
-  }
-  
-  public static Logger getLogger(Class clazz)
-  {
-    return logger;
-  }
-  
-  public static ILoggerFactory getILoggerFactory()
-  {
-    return null;
-  }
+
+
+    public static Logger getLogger(String name) {
+        return logger;
+    }
+
+    public static Logger getLogger(Class clazz) {
+        return logger;
+    }
+
+    public static ILoggerFactory getILoggerFactory() {
+        return null;
+    }
 }

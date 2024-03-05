@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.custom.*;
+
 import java.text.*;
 
 import emulator.custom.h;
@@ -17,8 +18,7 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class46 implements Runnable, DisposeListener
-{
+public final class Class46 implements Runnable, DisposeListener {
     private Shell aShell784;
     private SashForm aSashForm785;
     private Composite aComposite787;
@@ -36,7 +36,7 @@ public final class Class46 implements Runnable, DisposeListener
     private static NumberFormat aNumberFormat794;
     private int anInt786;
     private ArrayList anArrayList792;
-    
+
     public Class46() {
         super();
         this.aShell784 = null;
@@ -54,7 +54,7 @@ public final class Class46 implements Runnable, DisposeListener
         Class46.aNumberFormat794 = NumberFormat.getInstance();
         this.anArrayList792 = new ArrayList();
     }
-    
+
     private void method448() {
         this.anArrayList792.clear();
         this.anArrayList792.addAll(h.aHashtable1061.values());
@@ -62,7 +62,7 @@ public final class Class46 implements Runnable, DisposeListener
         while (elements.hasMoreElements()) {
             final h.MethodInfo data = elements.nextElement();
             final TableItem tableItem;
-            ((Widget)(tableItem = new TableItem(this.aTable788, 0))).setData((Object)data);
+            ((Widget) (tableItem = new TableItem(this.aTable788, 0))).setData((Object) data);
             tableItem.setText(0, data.aString1172);
             tableItem.setText(1, data.aString1177);
             tableItem.setText(2, data.aString1181);
@@ -76,15 +76,15 @@ public final class Class46 implements Runnable, DisposeListener
         this.run();
         this.method435(0);
     }
-    
+
     private void method435(final int n) {
         this.aTable788.setSortColumn(this.aTable788.getColumn(n));
         this.aTable788.setSortDirection((this.aTable788.getSortDirection() == 128) ? 1024 : 128);
-        Collections.sort((List<Object>)this.anArrayList792, new Class169(this, n));
+        Collections.sort((List<Object>) this.anArrayList792, new Class169(this, n));
         for (int i = this.anArrayList792.size() - 1; i >= 0; --i) {
             final h.MethodInfo data = (MethodInfo) this.anArrayList792.get(i);
             final TableItem item;
-            ((Widget)(item = this.aTable788.getItem(i))).setData((Object)data);
+            ((Widget) (item = this.aTable788.getItem(i))).setData((Object) data);
             item.setText(0, data.aString1172);
             item.setText(1, data.aString1177);
             item.setText(2, data.aString1181);
@@ -97,19 +97,19 @@ public final class Class46 implements Runnable, DisposeListener
             item.setText(8, Class46.aNumberFormat794.format(data.aFloat1180));
         }
     }
-    
+
     public final void run() {
         if (!this.aBoolean793) {
             return;
         }
         try {
             long max = 0L;
-            final Enumeration<h.MethodInfo> elements = (Enumeration<h.MethodInfo>)h.aHashtable1061.elements();
+            final Enumeration<h.MethodInfo> elements = (Enumeration<h.MethodInfo>) h.aHashtable1061.elements();
             while (elements.hasMoreElements()) {
                 max = Math.max(max, elements.nextElement().aLong1179);
             }
             if (max > 0L) {
-                final Enumeration<h.MethodInfo> elements2 = (Enumeration<h.MethodInfo>)h.aHashtable1061.elements();
+                final Enumeration<h.MethodInfo> elements2 = (Enumeration<h.MethodInfo>) h.aHashtable1061.elements();
                 while (elements2.hasMoreElements()) {
                     final h.MethodInfo methodInfo = elements2.nextElement();
                     methodInfo.aFloat1180 = 100.0f * methodInfo.aLong1179 / max;
@@ -123,10 +123,10 @@ public final class Class46 implements Runnable, DisposeListener
                 item.setText(7, Class46.aNumberFormat794.format(methodInfo2.aFloat1175));
                 item.setText(8, Class46.aNumberFormat794.format(methodInfo2.aFloat1180));
             }
+        } catch (Exception ex) {
         }
-        catch (Exception ex) {}
     }
-    
+
     public final void method436() {
         if (h.aHashtable1061 == null) {
             h.aHashtable1061 = new Hashtable();
@@ -134,50 +134,50 @@ public final class Class46 implements Runnable, DisposeListener
         }
         this.method449();
         this.aDisplay791 = Display.getCurrent();
-        ((Control)this.aShell784).setLocation(this.aDisplay791.getClientArea().width - this.aShell784.getSize().x >> 1, this.aDisplay791.getClientArea().height - this.aShell784.getSize().y >> 1);
+        ((Control) this.aShell784).setLocation(this.aDisplay791.getClientArea().width - this.aShell784.getSize().x >> 1, this.aDisplay791.getClientArea().height - this.aShell784.getSize().y >> 1);
         this.aShell784.open();
-        ((Widget)this.aShell784).addDisposeListener((DisposeListener)this);
+        ((Widget) this.aShell784).addDisposeListener((DisposeListener) this);
         this.aBoolean793 = true;
         this.method448();
-        while (!((Widget)this.aShell784).isDisposed()) {
+        while (!((Widget) this.aShell784).isDisposed()) {
             if (!this.aDisplay791.readAndDispatch()) {
                 this.aDisplay791.sleep();
             }
         }
         this.aBoolean793 = false;
     }
-    
+
     public final void method446() {
-        if (this.aShell784 != null && !((Widget)this.aShell784).isDisposed()) {
+        if (this.aShell784 != null && !((Widget) this.aShell784).isDisposed()) {
             this.aShell784.dispose();
         }
         this.aBoolean793 = false;
     }
-    
+
     public final boolean method438() {
         return this.aBoolean793;
     }
-    
+
     private void method449() {
-        ((Decorations)(this.aShell784 = new Shell(1264))).setText(UILocale.get("METHOD_FRAME_TITLE", "Methods"));
-        ((Decorations)this.aShell784).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        ((Control)this.aShell784).setSize(new Point(752, 483));
-        ((Composite)this.aShell784).setLayout((Layout)new GridLayout());
+        ((Decorations) (this.aShell784 = new Shell(1264))).setText(UILocale.get("METHOD_FRAME_TITLE", "Methods"));
+        ((Decorations) this.aShell784).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        ((Control) this.aShell784).setSize(new Point(752, 483));
+        ((Composite) this.aShell784).setLayout((Layout) new GridLayout());
         this.method450();
     }
-    
+
     private void method450() {
         final GridData layoutData;
         (layoutData = new GridData()).horizontalAlignment = 4;
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.grabExcessVerticalSpace = true;
         layoutData.verticalAlignment = 4;
-        (this.aSashForm785 = new SashForm((Composite)this.aShell784, 0)).setOrientation(512);
+        (this.aSashForm785 = new SashForm((Composite) this.aShell784, 0)).setOrientation(512);
         this.method451();
-        ((Control)this.aSashForm785).setLayoutData((Object)layoutData);
+        ((Control) this.aSashForm785).setLayoutData((Object) layoutData);
         this.method452();
     }
-    
+
     private void method451() {
         final GridData layoutData;
         (layoutData = new GridData()).horizontalSpan = 2;
@@ -189,65 +189,65 @@ public final class Class46 implements Runnable, DisposeListener
         (layout = new GridLayout()).numColumns = 2;
         layout.marginHeight = 3;
         layout.marginWidth = 3;
-        (this.aComposite787 = new Composite((Composite)this.aSashForm785, 0)).setLayout((Layout)layout);
+        (this.aComposite787 = new Composite((Composite) this.aSashForm785, 0)).setLayout((Layout) layout);
         (this.aButton783 = new Button(this.aComposite787, 8388608)).setText(UILocale.get("METHOD_FRAME_RESET_CALLS", "Reset Calls"));
-        this.aButton783.addSelectionListener((SelectionListener)new Class170(this));
+        this.aButton783.addSelectionListener((SelectionListener) new Class170(this));
         (this.aButton795 = new Button(this.aComposite787, 8388608)).setText(UILocale.get("METHOD_FRAME_EXPORT_BYTECODE", "Export ByteCode"));
-        this.aButton795.addSelectionListener((SelectionListener)new Class164(this));
-        if(!Settings.enableMethodTrack)
-        	new Label(this.aComposite787, 8388608).setText("To track calls, enable it in System settings");
+        this.aButton795.addSelectionListener((SelectionListener) new Class164(this));
+        if (!Settings.enableMethodTrack)
+            new Label(this.aComposite787, 8388608).setText("To track calls, enable it in System settings");
         (this.aTable788 = new Table(this.aComposite787, 67584)).setHeaderVisible(true);
-        ((Control)this.aTable788).setLayoutData((Object)layoutData);
+        ((Control) this.aTable788).setLayoutData((Object) layoutData);
         this.aTable788.setLinesVisible(true);
-        this.aTable788.addSelectionListener((SelectionListener)new Class165(this));
+        this.aTable788.addSelectionListener((SelectionListener) new Class165(this));
         final TableColumn tableColumn;
         (tableColumn = new TableColumn(this.aTable788, 0)).setWidth(100);
         tableColumn.setText("Class");
-        tableColumn.addSelectionListener((SelectionListener)new Class166(this));
+        tableColumn.addSelectionListener((SelectionListener) new Class166(this));
         final TableColumn tableColumn2;
         (tableColumn2 = new TableColumn(this.aTable788, 0)).setWidth(100);
         tableColumn2.setText("Name");
-        tableColumn2.addSelectionListener((SelectionListener)new Class167(this));
+        tableColumn2.addSelectionListener((SelectionListener) new Class167(this));
         final TableColumn tableColumn3;
         (tableColumn3 = new TableColumn(this.aTable788, 0)).setWidth(200);
         tableColumn3.setText("Description");
-        tableColumn3.addSelectionListener((SelectionListener)new Class160(this));
+        tableColumn3.addSelectionListener((SelectionListener) new Class160(this));
         final TableColumn tableColumn4;
         (tableColumn4 = new TableColumn(this.aTable788, 0)).setWidth(60);
         tableColumn4.setText("Code Size");
-        tableColumn4.addSelectionListener((SelectionListener)new Class99(this));
+        tableColumn4.addSelectionListener((SelectionListener) new Class99(this));
         final TableColumn tableColumn5;
         (tableColumn5 = new TableColumn(this.aTable788, 0)).setWidth(60);
         tableColumn5.setText("References");
-        tableColumn5.addSelectionListener((SelectionListener)new Class95(this));
+        tableColumn5.addSelectionListener((SelectionListener) new Class95(this));
         final TableColumn tableColumn6;
         (tableColumn6 = new TableColumn(this.aTable788, 0)).setWidth(60);
         tableColumn6.setText("Calls");
-        tableColumn6.addSelectionListener((SelectionListener)new Class73(this));
+        tableColumn6.addSelectionListener((SelectionListener) new Class73(this));
         final TableColumn tableColumn7;
         (tableColumn7 = new TableColumn(this.aTable788, 0)).setWidth(60);
         tableColumn7.setText("Total Time(ms)");
-        tableColumn7.addSelectionListener((SelectionListener)new Class72(this));
+        tableColumn7.addSelectionListener((SelectionListener) new Class72(this));
         final TableColumn tableColumn8;
         (tableColumn8 = new TableColumn(this.aTable788, 0)).setWidth(60);
         tableColumn8.setText("Average Time(ms)");
-        tableColumn8.addSelectionListener((SelectionListener)new Class75(this));
+        tableColumn8.addSelectionListener((SelectionListener) new Class75(this));
         final TableColumn tableColumn9;
         (tableColumn9 = new TableColumn(this.aTable788, 0)).setWidth(60);
         tableColumn9.setText("% Time");
-        tableColumn9.addSelectionListener((SelectionListener)new Class74(this));
+        tableColumn9.addSelectionListener((SelectionListener) new Class74(this));
     }
-    
+
     private void method439(final TableItem[] array) {
         if (array == null || array.length < 1) {
             return;
         }
         final h.MethodInfo methodInfo;
-        if ((methodInfo = (h.MethodInfo)((Widget)array[0]).getData()) != null) {
+        if ((methodInfo = (h.MethodInfo) ((Widget) array[0]).getData()) != null) {
             this.aStyledText790.setText(methodInfo.method705(this.aButton797.getSelection(), this.aButton798.getSelection()));
         }
     }
-    
+
     private void method452() {
         final GridData layoutData;
         (layoutData = new GridData()).grabExcessHorizontalSpace = false;
@@ -263,56 +263,56 @@ public final class Class46 implements Runnable, DisposeListener
         (layout = new GridLayout()).numColumns = 4;
         layout.marginHeight = 3;
         layout.marginWidth = 3;
-        (this.aComposite796 = new Composite((Composite)this.aSashForm785, 0)).setLayout((Layout)layout);
+        (this.aComposite796 = new Composite((Composite) this.aSashForm785, 0)).setLayout((Layout) layout);
         (this.aButton797 = new Button(this.aComposite796, 32)).setText("Show Line Numbers");
-        this.aButton797.addSelectionListener((SelectionListener)new Class77(this));
+        this.aButton797.addSelectionListener((SelectionListener) new Class77(this));
         (this.aButton798 = new Button(this.aComposite796, 32)).setText("Show Frames    ");
-        this.aButton798.addSelectionListener((SelectionListener)new Class76(this));
-        ((Control)(this.aText789 = new Text(this.aComposite796, 2048))).setLayoutData((Object)layoutData);
+        this.aButton798.addSelectionListener((SelectionListener) new Class76(this));
+        ((Control) (this.aText789 = new Text(this.aComposite796, 2048))).setLayoutData((Object) layoutData);
         (this.aButton799 = new Button(this.aComposite796, 8388608)).setText(UILocale.get("METHOD_FRAME_SEARCH", "Search"));
-        this.aButton799.addSelectionListener((SelectionListener)new Class79(this));
-        ((Control)this.aButton799).addFocusListener((FocusListener)new Class78(this));
-        ((Control)(this.aStyledText790 = new StyledText(this.aComposite796, 2562))).setLayoutData((Object)layoutData2);
+        this.aButton799.addSelectionListener((SelectionListener) new Class79(this));
+        ((Control) this.aButton799).addFocusListener((FocusListener) new Class78(this));
+        ((Control) (this.aStyledText790 = new StyledText(this.aComposite796, 2562))).setLayoutData((Object) layoutData2);
         this.aStyledText790.setEditable(false);
         this.aStyledText790.setIndent(3);
     }
-    
+
     public final void widgetDisposed(final DisposeEvent disposeEvent) {
         this.method446();
     }
-    
+
     static Table method441(final Class46 class46) {
         return class46.aTable788;
     }
-    
+
     static Shell method442(final Class46 class46) {
         return class46.aShell784;
     }
-    
+
     static void method443(final Class46 class46, final TableItem[] array) {
         class46.method439(array);
     }
-    
+
     static void method444(final Class46 class46, final int n) {
         class46.method435(n);
     }
-    
+
     static Text method434(final Class46 class46) {
         return class46.aText789;
     }
-    
+
     static int method445(final Class46 class46, final int anInt786) {
         return class46.anInt786 = anInt786;
     }
-    
+
     static int method437(final Class46 class46) {
         return class46.anInt786;
     }
-    
+
     static StyledText method440(final Class46 class46) {
         return class46.aStyledText790;
     }
-    
+
     static int method447(final Class46 class46) {
         return class46.anInt786++;
     }

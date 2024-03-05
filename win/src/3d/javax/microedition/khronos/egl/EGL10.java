@@ -2,8 +2,7 @@ package javax.microedition.khronos.egl;
 
 import emulator.graphics3D.egl.*;
 
-public interface EGL10 extends EGL
-{
+public interface EGL10 extends EGL {
     public static final Object EGL_DEFAULT_DISPLAY = new Object();
     public static final EGLContext EGL_NO_CONTEXT = EGLContextImpl.method765(0);
     public static final EGLDisplay EGL_NO_DISPLAY = EGLDisplayImpl.method803(0);
@@ -65,52 +64,52 @@ public interface EGL10 extends EGL
     public static final int EGL_DRAW = 12377;
     public static final int EGL_READ = 12378;
     public static final int EGL_CORE_NATIVE_ENGINE = 12379;
-    
+
     int eglGetError();
-    
+
     EGLDisplay eglGetDisplay(final Object p0);
-    
+
     boolean eglInitialize(final EGLDisplay p0, final int[] p1);
-    
+
     boolean eglTerminate(final EGLDisplay p0);
-    
+
     String eglQueryString(final EGLDisplay p0, final int p1);
-    
+
     boolean eglGetConfigs(final EGLDisplay p0, final EGLConfig[] p1, final int p2, final int[] p3);
-    
+
     boolean eglChooseConfig(final EGLDisplay p0, final int[] p1, final EGLConfig[] p2, final int p3, final int[] p4);
-    
+
     boolean eglGetConfigAttrib(final EGLDisplay p0, final EGLConfig p1, final int p2, final int[] p3);
-    
+
     EGLSurface eglCreateWindowSurface(final EGLDisplay p0, final EGLConfig p1, final Object p2, final int[] p3);
-    
+
     EGLSurface eglCreatePixmapSurface(final EGLDisplay p0, final EGLConfig p1, final Object p2, final int[] p3);
-    
+
     EGLSurface eglCreatePbufferSurface(final EGLDisplay p0, final EGLConfig p1, final int[] p2);
-    
+
     boolean eglDestroySurface(final EGLDisplay p0, final EGLSurface p1);
-    
+
     boolean eglQuerySurface(final EGLDisplay p0, final EGLSurface p1, final int p2, final int[] p3);
-    
+
     EGLContext eglCreateContext(final EGLDisplay p0, final EGLConfig p1, final EGLContext p2, final int[] p3);
-    
+
     boolean eglDestroyContext(final EGLDisplay p0, final EGLContext p1);
-    
+
     boolean eglMakeCurrent(final EGLDisplay p0, final EGLSurface p1, final EGLSurface p2, final EGLContext p3);
-    
+
     EGLContext eglGetCurrentContext();
-    
+
     EGLSurface eglGetCurrentSurface(final int p0);
-    
+
     EGLDisplay eglGetCurrentDisplay();
-    
+
     boolean eglQueryContext(final EGLDisplay p0, final EGLContext p1, final int p2, final int[] p3);
-    
+
     boolean eglWaitGL();
-    
+
     boolean eglWaitNative(final int p0, final Object p1);
-    
+
     boolean eglSwapBuffers(final EGLDisplay p0, final EGLSurface p1);
-    
+
     boolean eglCopyBuffers(final EGLDisplay p0, final EGLSurface p1, final Object p2);
 }

@@ -2,8 +2,7 @@ package javax.bluetooth;
 
 import java.io.*;
 
-public class BluetoothConnectionException extends IOException
-{
+public class BluetoothConnectionException extends IOException {
     private static final long serialVersionUID = 1L;
     int anInt1392;
     public static final int UNKNOWN_PSM = 1;
@@ -12,19 +11,19 @@ public class BluetoothConnectionException extends IOException
     public static final int FAILED_NOINFO = 4;
     public static final int TIMEOUT = 5;
     public static final int UNACCEPTABLE_PARAMS = 6;
-    
+
     public BluetoothConnectionException(final int n) {
         this(n, null);
     }
-    
+
     public BluetoothConnectionException(final int n, final String s) {
         super(method830(n, s));
     }
-    
+
     public int getStatus() {
         return this.anInt1392;
     }
-    
+
     private static final String method830(final int n, final String s) {
         String s2 = null;
         switch (n) {

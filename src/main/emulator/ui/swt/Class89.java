@@ -1,3 +1,4 @@
 package emulator.ui.swt;
 
-final class Class89 {}
+final class Class89 {
+}

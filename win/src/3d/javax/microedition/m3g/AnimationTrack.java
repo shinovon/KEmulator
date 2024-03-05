@@ -1,7 +1,6 @@
 package javax.microedition.m3g;
 
-public class AnimationTrack extends Object3D
-{
+public class AnimationTrack extends Object3D {
     public static final int ALPHA = 256;
     public static final int AMBIENT_COLOR = 257;
     public static final int COLOR = 258;
@@ -23,38 +22,38 @@ public class AnimationTrack extends Object3D
     public static final int SPOT_EXPONENT = 274;
     public static final int TRANSLATION = 275;
     public static final int VISIBILITY = 276;
-    
+
     AnimationTrack(final int n) {
         super(n);
     }
-    
+
     public AnimationTrack(final KeyframeSequence keyframeSequence, final int n) {
         this(create(keyframeSequence, n));
         Engine.addJavaPeer(super.swerveHandle, this);
         super.ii = (getClass() != AnimationTrack.class);
         Engine.addXOT(keyframeSequence);
     }
-    
+
     private static native int create(final KeyframeSequence p0, final int p1);
-    
+
     public AnimationController getController() {
-        return (AnimationController)Engine.instantiateJavaPeer(this.getControllerImpl());
+        return (AnimationController) Engine.instantiateJavaPeer(this.getControllerImpl());
     }
-    
+
     private native int getControllerImpl();
-    
+
     public KeyframeSequence getKeyframeSequence() {
-        return (KeyframeSequence)Engine.instantiateJavaPeer(this.getKeyframeSequenceImpl());
+        return (KeyframeSequence) Engine.instantiateJavaPeer(this.getKeyframeSequenceImpl());
     }
-    
+
     private native int getKeyframeSequenceImpl();
-    
+
     public native int getTargetProperty();
-    
+
     public void setController(final AnimationController controllerImpl) {
         this.setControllerImpl(controllerImpl);
         Engine.addXOT(controllerImpl);
     }
-    
+
     private native void setControllerImpl(final AnimationController p0);
 }

@@ -3,12 +3,11 @@ package emulator.sensor;
 import java.util.*;
 import javax.microedition.sensor.*;
 
-public final class b
-{
+public final class b {
     public b() {
         super();
     }
-    
+
     public static String method222(final k k) {
         final StringBuffer sb;
         (sb = new StringBuffer("channel=")).append(k.getName());
@@ -34,15 +33,14 @@ public final class b
                 sb.append('&');
                 final Condition condition;
                 if ((condition = (Condition) vector.elementAt(l)) instanceof LimitCondition) {
-                    final LimitCondition limitCondition = (LimitCondition)condition;
+                    final LimitCondition limitCondition = (LimitCondition) condition;
                     sb.append("limit=");
                     sb.append(Double.toString(i.method243(limitCondition.getLimit(), scale)));
                     sb.append('&');
                     sb.append("op=");
                     sb.append(limitCondition.getOperator());
-                }
-                else {
-                    final RangeCondition rangeCondition = (RangeCondition)condition;
+                } else {
+                    final RangeCondition rangeCondition = (RangeCondition) condition;
                     sb.append("lowerLimit=");
                     sb.append(Double.toString(i.method243(rangeCondition.getLowerLimit(), scale)));
                     sb.append("&lowerOp=");

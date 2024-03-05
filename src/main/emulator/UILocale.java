@@ -3,14 +3,13 @@ package emulator;
 import java.util.*;
 import java.io.*;
 
-public final class UILocale
-{
+public final class UILocale {
     static PropertyResourceBundle bundle;
-    
+
     public UILocale() {
         super();
     }
-    
+
     public static void initLocale() {
         try {
             final FileInputStream fileInputStream = new FileInputStream(Emulator.getAbsolutePath() + "/lang/" + Settings.uiLanguage + ".txt");
@@ -26,7 +25,7 @@ public final class UILocale
             }
         }
     }
-    
+
     public static String get(final String s, final String s2) {
         if (UILocale.bundle == null)
             return s2;

@@ -2,8 +2,7 @@ package javax.microedition.khronos.opengles;
 
 import java.nio.*;
 
-public interface GL10 extends GL
-{
+public interface GL10 extends GL {
     public static final int GL_DEPTH_BUFFER_BIT = 256;
     public static final int GL_STENCIL_BUFFER_BIT = 1024;
     public static final int GL_COLOR_BUFFER_BIT = 16384;
@@ -239,250 +238,250 @@ public interface GL10 extends GL
     public static final int GL_LIGHT5 = 16389;
     public static final int GL_LIGHT6 = 16390;
     public static final int GL_LIGHT7 = 16391;
-    
+
     void glActiveTexture(final int p0);
-    
+
     void glAlphaFunc(final int p0, final float p1);
-    
+
     void glAlphaFuncx(final int p0, final int p1);
-    
+
     void glBindTexture(final int p0, final int p1);
-    
+
     void glBlendFunc(final int p0, final int p1);
-    
+
     void glClear(final int p0);
-    
+
     void glClearColor(final float p0, final float p1, final float p2, final float p3);
-    
+
     void glClearColorx(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glClearDepthf(final float p0);
-    
+
     void glClearDepthx(final int p0);
-    
+
     void glClearStencil(final int p0);
-    
+
     void glClientActiveTexture(final int p0);
-    
+
     void glColor4f(final float p0, final float p1, final float p2, final float p3);
-    
+
     void glColor4x(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glColorMask(final boolean p0, final boolean p1, final boolean p2, final boolean p3);
-    
+
     void glColorPointer(final int p0, final int p1, final int p2, final Buffer p3);
-    
+
     void glCompressedTexImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final Buffer p7);
-    
+
     void glCompressedTexSubImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final int p7, final Buffer p8);
-    
+
     void glCopyTexImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final int p7);
-    
+
     void glCopyTexSubImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final int p7);
-    
+
     void glCullFace(final int p0);
-    
+
     void glDeleteTextures(final int p0, final int[] p1, final int p2);
-    
+
     void glDeleteTextures(final int p0, final IntBuffer p1);
-    
+
     void glDepthFunc(final int p0);
-    
+
     void glDepthMask(final boolean p0);
-    
+
     void glDepthRangef(final float p0, final float p1);
-    
+
     void glDepthRangex(final int p0, final int p1);
-    
+
     void glDisable(final int p0);
-    
+
     void glDisableClientState(final int p0);
-    
+
     void glDrawArrays(final int p0, final int p1, final int p2);
-    
+
     void glDrawElements(final int p0, final int p1, final int p2, final Buffer p3);
-    
+
     void glEnable(final int p0);
-    
+
     void glEnableClientState(final int p0);
-    
+
     void glFinish();
-    
+
     void glFlush();
-    
+
     void glFogf(final int p0, final float p1);
-    
+
     void glFogfv(final int p0, final float[] p1, final int p2);
-    
+
     void glFogfv(final int p0, final FloatBuffer p1);
-    
+
     void glFogx(final int p0, final int p1);
-    
+
     void glFogxv(final int p0, final int[] p1, final int p2);
-    
+
     void glFogxv(final int p0, final IntBuffer p1);
-    
+
     void glFrontFace(final int p0);
-    
+
     void glFrustumf(final float p0, final float p1, final float p2, final float p3, final float p4, final float p5);
-    
+
     void glFrustumx(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5);
-    
+
     void glGenTextures(final int p0, final int[] p1, final int p2);
-    
+
     void glGenTextures(final int p0, final IntBuffer p1);
-    
+
     int glGetError();
-    
+
     void glGetIntegerv(final int p0, final int[] p1, final int p2);
-    
+
     void glGetIntegerv(final int p0, final IntBuffer p1);
-    
+
     String glGetString(final int p0);
-    
+
     void glHint(final int p0, final int p1);
-    
+
     void glLightModelf(final int p0, final float p1);
-    
+
     void glLightModelfv(final int p0, final float[] p1, final int p2);
-    
+
     void glLightModelfv(final int p0, final FloatBuffer p1);
-    
+
     void glLightModelx(final int p0, final int p1);
-    
+
     void glLightModelxv(final int p0, final int[] p1, final int p2);
-    
+
     void glLightModelxv(final int p0, final IntBuffer p1);
-    
+
     void glLightf(final int p0, final int p1, final float p2);
-    
+
     void glLightfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glLightfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glLightx(final int p0, final int p1, final int p2);
-    
+
     void glLightxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glLightxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glLineWidth(final float p0);
-    
+
     void glLineWidthx(final int p0);
-    
+
     void glLoadIdentity();
-    
+
     void glLoadMatrixf(final float[] p0, final int p1);
-    
+
     void glLoadMatrixf(final FloatBuffer p0);
-    
+
     void glLoadMatrixx(final int[] p0, final int p1);
-    
+
     void glLoadMatrixx(final IntBuffer p0);
-    
+
     void glLogicOp(final int p0);
-    
+
     void glMaterialf(final int p0, final int p1, final float p2);
-    
+
     void glMaterialfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glMaterialfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glMaterialx(final int p0, final int p1, final int p2);
-    
+
     void glMaterialxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glMaterialxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glMatrixMode(final int p0);
-    
+
     void glMultMatrixf(final float[] p0, final int p1);
-    
+
     void glMultMatrixf(final FloatBuffer p0);
-    
+
     void glMultMatrixx(final int[] p0, final int p1);
-    
+
     void glMultMatrixx(final IntBuffer p0);
-    
+
     void glMultiTexCoord4f(final int p0, final float p1, final float p2, final float p3, final float p4);
-    
+
     void glMultiTexCoord4x(final int p0, final int p1, final int p2, final int p3, final int p4);
-    
+
     void glNormal3f(final float p0, final float p1, final float p2);
-    
+
     void glNormal3x(final int p0, final int p1, final int p2);
-    
+
     void glNormalPointer(final int p0, final int p1, final Buffer p2);
-    
+
     void glOrthof(final float p0, final float p1, final float p2, final float p3, final float p4, final float p5);
-    
+
     void glOrthox(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5);
-    
+
     void glPixelStorei(final int p0, final int p1);
-    
+
     void glPointSize(final float p0);
-    
+
     void glPointSizex(final int p0);
-    
+
     void glPolygonOffset(final float p0, final float p1);
-    
+
     void glPolygonOffsetx(final int p0, final int p1);
-    
+
     void glPopMatrix();
-    
+
     void glPushMatrix();
-    
+
     void glReadPixels(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final Buffer p6);
-    
+
     void glRotatef(final float p0, final float p1, final float p2, final float p3);
-    
+
     void glRotatex(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glSampleCoverage(final float p0, final boolean p1);
-    
+
     void glSampleCoveragex(final int p0, final boolean p1);
-    
+
     void glScalef(final float p0, final float p1, final float p2);
-    
+
     void glScalex(final int p0, final int p1, final int p2);
-    
+
     void glScissor(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glShadeModel(final int p0);
-    
+
     void glStencilFunc(final int p0, final int p1, final int p2);
-    
+
     void glStencilMask(final int p0);
-    
+
     void glStencilOp(final int p0, final int p1, final int p2);
-    
+
     void glTexCoordPointer(final int p0, final int p1, final int p2, final Buffer p3);
-    
+
     void glTexEnvf(final int p0, final int p1, final float p2);
-    
+
     void glTexEnvfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glTexEnvfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glTexEnvx(final int p0, final int p1, final int p2);
-    
+
     void glTexEnvxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glTexEnvxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glTexImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final int p7, final Buffer p8);
-    
+
     void glTexParameterf(final int p0, final int p1, final float p2);
-    
+
     void glTexParameterx(final int p0, final int p1, final int p2);
-    
+
     void glTexSubImage2D(final int p0, final int p1, final int p2, final int p3, final int p4, final int p5, final int p6, final int p7, final Buffer p8);
-    
+
     void glTranslatef(final float p0, final float p1, final float p2);
-    
+
     void glTranslatex(final int p0, final int p1, final int p2);
-    
+
     void glVertexPointer(final int p0, final int p1, final int p2, final Buffer p3);
-    
+
     void glViewport(final int p0, final int p1, final int p2, final int p3);
 }

@@ -1,11 +1,11 @@
 package javax.microedition.lcdui;
 
 import emulator.lcdui.*;
+
 /**
  * ChoiceGroupItem
  */
-final class a
-{
+final class a {
     boolean sel;
     boolean aBoolean424;
     String string;
@@ -14,7 +14,7 @@ final class a
     int[] bounds;
     ChoiceGroup choice;
     String[] str;
-    
+
     a(final String aString418, final Image anImage419, final Font aFont420, final ChoiceGroup aChoiceGroup422) {
         super();
         this.string = aString418;
@@ -24,7 +24,7 @@ final class a
         this.bounds = new int[4];
         this.aBoolean424 = true;
     }
-    
+
     protected final void method211(final Graphics graphics, final boolean b) {
 
         graphics.setColor(-16777216);
@@ -32,7 +32,8 @@ final class a
         final boolean b3 = this.choice.aBoolean542 && this.choice.anIntArray179 != null;
         int anInt28 = 0;
         int anInt29 = 0;
-        Label_0103: {
+        Label_0103:
+        {
             if (b2) {
                 if (!b3) {
                     anInt28 = this.choice.bounds[1];
@@ -40,8 +41,7 @@ final class a
                     break Label_0103;
                 }
                 anInt28 = this.choice.anInt28;
-            }
-            else {
+            } else {
                 anInt28 = this.choice.bounds[1];
             }
             anInt29 = this.bounds[1];
@@ -56,13 +56,13 @@ final class a
         }
         final Font font = (this.font != null) ? this.font : Screen.font;
         graphics.setFont(font);
-        if(this.str != null)
-        for (int i = 0; i < this.str.length; ++i) {
-            graphics.drawString(this.str[i], ((i == 0 && this.choice.choiceType != 3 && !b3) ? (n2 + 10) : n2) + 4, n, 0);
-            n += font.getHeight() + 4;
-        }
+        if (this.str != null)
+            for (int i = 0; i < this.str.length; ++i) {
+                graphics.drawString(this.str[i], ((i == 0 && this.choice.choiceType != 3 && !b3) ? (n2 + 10) : n2) + 4, n, 0);
+                n += font.getHeight() + 4;
+            }
     }
-    
+
     protected final void method212() {
         this.bounds[0] = 0;
         this.bounds[1] = 0;
@@ -73,8 +73,8 @@ final class a
         this.str = c.textArr(this.string, font, n, n2);
         this.bounds[3] = (font.getHeight() + 4) * this.str.length;
     }
-    
+
     public String toString() {
-    	return string;
+        return string;
     }
 }

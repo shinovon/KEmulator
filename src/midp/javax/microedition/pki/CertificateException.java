@@ -2,8 +2,7 @@ package javax.microedition.pki;
 
 import java.io.*;
 
-public class CertificateException extends IOException
-{
+public class CertificateException extends IOException {
     private static final long serialVersionUID = 1L;
     private byte aByte1501;
     private Certificate aCertificate1502;
@@ -21,27 +20,27 @@ public class CertificateException extends IOException
     public static final byte ROOT_CA_EXPIRED = 12;
     public static final byte UNSUPPORTED_PUBLIC_KEY_TYPE = 13;
     public static final byte VERIFICATION_FAILED = 14;
-    
+
     public CertificateException(final Certificate aCertificate1502, final byte aByte1501) {
         super(method886(aByte1501));
         this.aCertificate1502 = aCertificate1502;
         this.aByte1501 = aByte1501;
     }
-    
+
     public CertificateException(final String s, final Certificate aCertificate1502, final byte aByte1501) {
         super(s);
         this.aCertificate1502 = aCertificate1502;
         this.aByte1501 = aByte1501;
     }
-    
+
     public Certificate getCertificate() {
         return this.aCertificate1502;
     }
-    
+
     public byte getReason() {
         return this.aByte1501;
     }
-    
+
     static String method886(final int n) {
         switch (n) {
             case 1: {

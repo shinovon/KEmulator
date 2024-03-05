@@ -1,27 +1,25 @@
 package emulator.custom.subclass;
 
-class TimerThread extends Thread
-{
+class TimerThread extends Thread {
     private TaskQueue queue;
     private static final long THREAD_TIMEOUT = 30000L;
-    
+
     TimerThread(final TaskQueue queue) {
         super();
         this.queue = queue;
     }
-    
+
     public void run() {
         try {
             this.mainLoop();
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             synchronized (this.queue) {
                 this.queue.newTasksMayBeScheduled = false;
                 this.queue.clear();
             }
         }
     }
-    
+
     private void mainLoop() {
         while (true) {
             try {
@@ -51,8 +49,7 @@ class TimerThread extends Thread
                                 if (min.period == 0L) {
                                     this.queue.removeMin();
                                     min.state = 2;
-                                }
-                                else {
+                                } else {
                                     this.queue.rescheduleMin((min.period < 0L) ? (currentTimeMillis - min.period) : (nextExecutionTime + min.period));
                                 }
                             }
@@ -64,14 +61,12 @@ class TimerThread extends Thread
                     if (b) {
                         try {
                             min.run();
-                        }
-                        catch (Exception ex) {
+                        } catch (Exception ex) {
                             min.cancel();
                         }
                     }
                 }
-            }
-            catch (InterruptedException ex2) {
+            } catch (InterruptedException ex2) {
                 continue;
             }
         }

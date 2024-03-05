@@ -1,24 +1,25 @@
 package emulator.ui.swt;
 
 import java.util.*;
+
 import emulator.custom.*;
 
-final class Class169 implements Comparator
-{
+final class Class169 implements Comparator {
     private final int anInt1438;
     private final Class46 aClass46_1439;
-    
+
     Class169(final Class46 aClass46_1439, final int anInt1438) {
         super();
         this.aClass46_1439 = aClass46_1439;
         this.anInt1438 = anInt1438;
     }
-    
+
     public final int compare(final Object o, final Object o2) {
         int n = 0;
-        final h.MethodInfo methodInfo = (h.MethodInfo)o;
-        final h.MethodInfo methodInfo2 = (h.MethodInfo)o2;
-        Label_0290: {
+        final h.MethodInfo methodInfo = (h.MethodInfo) o;
+        final h.MethodInfo methodInfo2 = (h.MethodInfo) o2;
+        Label_0290:
+        {
             int n2 = 0;
             switch (this.anInt1438) {
                 case 0: {

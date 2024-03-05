@@ -24,9 +24,9 @@ public class Permission {
     public static boolean askImei = true;
 
     private static int getAppPermissionLevel(String x) {
-        if(!askPermissions) return 2;
+        if (!askPermissions) return 2;
         x = x.toLowerCase();
-        switch(x) {
+        switch (x) {
             case "messageconnection.send":
             case "messageconnection.receive":
             case "connector.open.http":
@@ -43,10 +43,10 @@ public class Permission {
     }
 
     public synchronized static String askIMEI() {
-        if(notAllowPerms.contains("imei"))
+        if (notAllowPerms.contains("imei"))
             return null;
-        if(!askImei) return "0000000000000000";
-        if(imei != null) return imei;
+        if (!askImei) return "0000000000000000";
+        if (imei != null) return imei;
         Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
             imeiDialog = new InputDialog(Emulator.emulatorimpl.getEmulatorScreen().getShell());
             imeiDialog.setMessage("Application asks for IMEI");
@@ -55,7 +55,7 @@ public class Permission {
             imeiDialog.open();
         });
         String s = imeiDialog.getInput();
-        if(s == null) {
+        if (s == null) {
             notAllowPerms.add("imei");
         }
         allowPerms.add("imei");
@@ -80,16 +80,16 @@ public class Permission {
         //3: never
         //4: always ask until no is pressed
         //5: ask once
-        switch(getAppPermissionLevel(x)) {
+        switch (getAppPermissionLevel(x)) {
             case ask_always:
-                if(!showConfirmDialog(localizePerm(x), null))
+                if (!showConfirmDialog(localizePerm(x), null))
                     throw new SecurityException(x);
                 allowPerms.add(x);
                 break;
             case ask_always_until_yes:
-                if(allowPerms.contains(x))
+                if (allowPerms.contains(x))
                     return;
-                if(!showConfirmDialog(localizePerm(x), null))
+                if (!showConfirmDialog(localizePerm(x), null))
                     throw new SecurityException(x);
                 allowPerms.add(x);
             case allowed:
@@ -98,20 +98,20 @@ public class Permission {
             case never:
                 throw new SecurityException(x);
             case ask_always_until_no:
-                if(notAllowPerms.contains(x))
+                if (notAllowPerms.contains(x))
                     return;
-                if(!showConfirmDialog(localizePerm(x), null)) {
+                if (!showConfirmDialog(localizePerm(x), null)) {
                     notAllowPerms.add(x);
                     throw new SecurityException(x);
                 }
                 allowPerms.add(x);
                 break;
             case ask_once:
-                if(notAllowPerms.contains(x))
+                if (notAllowPerms.contains(x))
                     throw new SecurityException(x);
-                if(allowPerms.contains(x))
+                if (allowPerms.contains(x))
                     return;
-                if(!showConfirmDialog(localizePerm(x), null)) {
+                if (!showConfirmDialog(localizePerm(x), null)) {
                     notAllowPerms.add(x);
                     throw new SecurityException(x);
                 }
@@ -121,7 +121,7 @@ public class Permission {
     }
 
     private static String localizePerm(String x) {
-        switch(x) {
+        switch (x) {
             case "connector.open.http":
                 return "Allow the application to open HTTP connections?";
             case "connector.open.file":
@@ -144,7 +144,7 @@ public class Permission {
             if (s.length() > 100) {
                 s = s.substring(0, 100) + "...";
             }
-            if(s.startsWith("vlc:")) {
+            if (s.startsWith("vlc:")) {
                 s = s.substring(4);
                 messageBox.setMessage(UILocale.get("PLATFORMREQUEST_VLC_ALERT", "Application wants to open URL in VLC") +
                         ": " + s);

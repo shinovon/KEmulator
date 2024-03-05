@@ -3,8 +3,7 @@ package emulator.sensor;
 import java.io.*;
 import javax.microedition.sensor.*;
 
-public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDataListener
-{
+public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDataListener {
     private String description;
     private String contextType;
     private String model;
@@ -25,7 +24,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
     private boolean availabilityPushSup;
     private boolean conditionPushSup;
     private boolean aBoolean458;
-    
+
     SensorImpl(final int n, final String aString314, final String aString315, final String aString316, final String aString317, final int anInt448, final int anInt449, final SensorProperties aSensorProperties452, final boolean aBoolean440, final boolean aBoolean441, final k[] akArray453, final a ana449) {
         super();
         this.ana449 = null;
@@ -48,7 +47,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         }
         this.state = 4;
     }
-    
+
     public final ChannelInfo[] getChannelInfos() {
         final ChannelInfo[] array = new ChannelInfo[this.channelInfos.length];
         for (int i = 0; i < array.length; ++i) {
@@ -56,47 +55,47 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         }
         return array;
     }
-    
+
     public final int getConnectionType() {
         return this.connectionType;
     }
-    
+
     public final String getContextType() {
         return this.contextType;
     }
-    
+
     public final String getDescription() {
         return this.description;
     }
-    
+
     public final int getMaxBufferSize() {
         return this.maxBufferSize;
     }
-    
+
     public final String getModel() {
         return this.model;
     }
-    
+
     public final String getQuantity() {
         return this.quantity;
     }
-    
+
     public final String getUrl() {
         return SensorUtil.getUrl(this);
     }
-    
+
     public final boolean isAvailabilityPushSupported() {
         return this.availabilityPushSup;
     }
-    
+
     public final boolean isAvailable() {
         return this.ana449.isAvailable();
     }
-    
+
     public final boolean isConditionPushSupported() {
         return this.conditionPushSup;
     }
-    
+
     public final Object getProperty(final String s) {
         if (s == null) {
             throw new NullPointerException();
@@ -107,20 +106,20 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         }
         return property;
     }
-    
+
     public final String[] getPropertyNames() {
         return this.properties.getPropertyNames();
     }
-    
+
     public final boolean method237(final String s, final String s2) {
         return (s == null || s.equals(this.quantity)) && (s2 == null || s2.equals(this.contextType));
     }
-    
+
     public final boolean method238(final SensorUtil d) {
-        final String s = (String)this.properties.getProperty("location");
+        final String s = (String) this.properties.getProperty("location");
         return this.quantity.equals(d.method252()) && (d.method254() == null || d.method254().equals(this.contextType)) && (d.method255() == null || d.method255().equals(s)) && (d.method246() == null || d.method246().equals(this.model));
     }
-    
+
     public final synchronized void method239() throws IOException {
         this.aBoolean313 = false;
         if (this.state != 4) {
@@ -131,11 +130,11 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         }
         this.state = 1;
     }
-    
+
     public final int getState() {
         return this.state;
     }
-    
+
     public final Channel getChannel(final ChannelInfo channelInfo) {
         if (channelInfo == null) {
             throw new NullPointerException();
@@ -147,7 +146,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         }
         throw new IllegalArgumentException("This channel is not from this sensor");
     }
-    
+
     protected final void method240(final int n, final Object[] array, final int n2) {
         Object[] array2;
         int n3;
@@ -156,22 +155,21 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
             array2 = array;
             n3 = 0;
             n4 = new Double(this.ana449.method223(n));
-        }
-        else {
+        } else {
             if (n2 != 2) {
                 return;
             }
             array2 = array;
             n3 = 0;
-            n4 = new Integer((int)this.ana449.method223(n));
+            n4 = new Integer((int) this.ana449.method223(n));
         }
         array2[n3] = n4;
     }
-    
+
     public final Data[] getData(final int n) throws IOException {
         return this.getData(n, 0L, false, false, false);
     }
-    
+
     public final synchronized Data[] getData(int anInt448, final long n, final boolean b, final boolean b2, final boolean b3) throws IOException {
         if ((anInt448 < 1 && n < 1L) || anInt448 > this.maxBufferSize) {
             throw new IllegalArgumentException("Wrong buffer size or/and period values");
@@ -196,8 +194,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         while (!this.aBoolean458) {
             try {
                 this.wait();
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -206,7 +203,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         }
         return this.alArray450;
     }
-    
+
     public final void channelDataReceived(final int n, final SensorDataImpl l) {
         if (!this.aBoolean313) {
             this.alArray450[n] = l;
@@ -226,7 +223,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
                 if (aDataListener451 != null) {
                     final boolean b = this.anInt460 != 0;
                     ++this.anInt460;
-                    ((DataListener)aDataListener451).dataReceived(this, this.alArray450, b);
+                    ((DataListener) aDataListener451).dataReceived(this, this.alArray450, b);
                     --this.anInt460;
                     synchronized (this) {
                         this.anInt455 = 0;
@@ -235,7 +232,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
             }
         }
     }
-    
+
     public final void channelErrorReceived(final int anInt459, final int anInt460) {
         synchronized (this) {
             if (this.state != 4) {
@@ -246,11 +243,11 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
             }
         }
     }
-    
+
     public final SensorInfo getSensorInfo() {
         return this;
     }
-    
+
     public final void removeDataListener() {
         if (this.state == 4) {
             throw new IllegalStateException("Connection is already closed");
@@ -268,11 +265,11 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
             this.state = 1;
         }
     }
-    
+
     public final void setDataListener(final DataListener dataListener, final int n) {
         this.setDataListener(dataListener, n, 0L, false, false, false);
     }
-    
+
     public final synchronized void setDataListener(final DataListener aDataListener451, int anInt448, final long n, final boolean b, final boolean b2, final boolean b3) {
         if ((anInt448 < 1 && n < 1L) || anInt448 > this.maxBufferSize) {
             throw new IllegalArgumentException("Wrong buffer size or/and period values");
@@ -299,7 +296,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
             this.channelInfos[i].method276(this, anInt448, n, b, b2, b3, true);
         }
     }
-    
+
     public final void close() throws IOException {
         this.aBoolean313 = true;
         this.ana449.method225();
@@ -308,7 +305,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
         }
         this.state = 4;
     }
-    
+
     public final String toString() {
         return super.toString() + "{ quantity=" + this.quantity + " contextType=" + this.contextType + " model=" + this.model + " prop:location=" + this.properties.getProperty("location") + "}";
     }

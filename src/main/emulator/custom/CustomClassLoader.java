@@ -3,14 +3,14 @@ package emulator.custom;
 import emulator.*;
 import org.objectweb.asm.*;
 import org.apache.tools.zip.*;
+
 import java.io.*;
 
-public final class CustomClassLoader extends ClassLoader
-{
+public final class CustomClassLoader extends ClassLoader {
     public CustomClassLoader(final ClassLoader classLoader) {
         super(classLoader);
     }
-    
+
     public final synchronized Class loadClass(final String s, final boolean b) throws ClassNotFoundException {
         final Class<?> loadedClass;
         if ((loadedClass = this.findLoadedClass(s)) != null) {
@@ -19,8 +19,7 @@ public final class CustomClassLoader extends ClassLoader
         if (!Emulator.jarClasses.contains(s)) {
             try {
                 return super.loadClass(s, b);
-            }
-            catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException ex) {
                 final Class method806;
                 if ((method806 = this.method806(s)) == null) {
                     throw ex;
@@ -34,28 +33,27 @@ public final class CustomClassLoader extends ClassLoader
         }
         return class1;
     }
-    
+
     private Class method806(final String s) {
         Class<?> defineClass = null;
         try {
             for (int i = 0; i < Emulator.jarLibrarys.size(); ++i) {
                 final ZipFile zipFile;
                 final ZipEntry entry;
-                if ((entry = (zipFile = new ZipFile((String)Emulator.jarLibrarys.get(i))).getEntry(s.replace('.', '/') + ".class")) != null) {
+                if ((entry = (zipFile = new ZipFile((String) Emulator.jarLibrarys.get(i))).getEntry(s.replace('.', '/') + ".class")) != null) {
                     final ClassReader classReader = new ClassReader(zipFile.getInputStream(entry));
                     final ClassWriter classWriter = new ClassWriter(0);
-                    classReader.accept((ClassVisitor)new ClassAdapter((ClassVisitor)classWriter), 0);
+                    classReader.accept((ClassVisitor) new ClassAdapter((ClassVisitor) classWriter), 0);
                     final byte[] byteArray = classWriter.toByteArray();
                     defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
                 }
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return defineClass;
     }
-    
+
     protected final Class findClass(final String s) throws ClassNotFoundException {
         Class<?> defineClass;
         try {
@@ -66,8 +64,7 @@ public final class CustomClassLoader extends ClassLoader
                     return super.findClass(s);
                 }
                 inputStream = new FileInputStream(fileFromClassPath);
-            }
-            else {
+            } else {
                 final ZipFile zipFile;
                 final ZipEntry entry;
                 if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(s.replace('.', '/') + ".class")) == null) {
@@ -77,17 +74,16 @@ public final class CustomClassLoader extends ClassLoader
             }
             final ClassReader classReader = new ClassReader(inputStream);
             final ClassWriter classWriter = new ClassWriter(0);
-            classReader.accept((ClassVisitor)new CustomClassAdapter((ClassVisitor)classWriter, s), 0);
+            classReader.accept((ClassVisitor) new CustomClassAdapter((ClassVisitor) classWriter, s), 0);
             final byte[] byteArray = classWriter.toByteArray();
             defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
-        }
-        catch (Exception ex2) {
+        } catch (Exception ex2) {
             //ex2.printStackTrace();
             return super.findClass(s);
         }
         return defineClass;
     }
-    
+
     public final InputStream getResourceAsStream(final String s) {
         return super.getResourceAsStream(s);
     }

@@ -1,7 +1,6 @@
 package emulator.debug;
 
-public class Profiler
-{
+public class Profiler {
     public static int FPS;
     public static int drawImageCallCount;
     public static int drawImagePixelCount;
@@ -17,12 +16,12 @@ public class Profiler
     public static int totalImagePixelCount;
     public static int gcCallCount;
     public static int currentTimeMillisCallCount;
-	public static int drawCallCount;
-    
+    public static int drawCallCount;
+
     public Profiler() {
         super();
     }
-    
+
     public static void reset() {
         Profiler.drawImageCallCount = 0;
         Profiler.drawImagePixelCount = 0;

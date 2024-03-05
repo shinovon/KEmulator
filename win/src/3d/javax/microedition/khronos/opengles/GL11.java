@@ -2,8 +2,7 @@ package javax.microedition.khronos.opengles;
 
 import java.nio.*;
 
-public interface GL11 extends GL10
-{
+public interface GL11 extends GL10 {
     public static final int GL_CLIP_PLANE0 = 12288;
     public static final int GL_CLIP_PLANE1 = 12289;
     public static final int GL_CLIP_PLANE2 = 12290;
@@ -126,146 +125,146 @@ public interface GL11 extends GL10
     public static final int GL_POINT_SIZE_ARRAY_STRIDE_OES = 35211;
     public static final int GL_POINT_SIZE_ARRAY_POINTER_OES = 35212;
     public static final int GL_POINT_SIZE_ARRAY_BUFFER_BINDING_OES = 35743;
-    
+
     void glGenBuffers(final int p0, final int[] p1, final int p2);
-    
+
     void glGenBuffers(final int p0, final IntBuffer p1);
-    
+
     void glBindBuffer(final int p0, final int p1);
-    
+
     void glBufferData(final int p0, final int p1, final Buffer p2, final int p3);
-    
+
     void glBufferSubData(final int p0, final int p1, final int p2, final Buffer p3);
-    
+
     void glDeleteBuffers(final int p0, final int[] p1, final int p2);
-    
+
     void glDeleteBuffers(final int p0, final IntBuffer p1);
-    
+
     void glClipPlanef(final int p0, final float[] p1, final int p2);
-    
+
     void glClipPlanef(final int p0, final FloatBuffer p1);
-    
+
     void glClipPlanex(final int p0, final int[] p1, final int p2);
-    
+
     void glClipPlanex(final int p0, final IntBuffer p1);
-    
+
     void glGetFloatv(final int p0, final float[] p1, final int p2);
-    
+
     void glGetFloatv(final int p0, final FloatBuffer p1);
-    
+
     void glGetBooleanv(final int p0, final boolean[] p1, final int p2);
-    
+
     void glGetBooleanv(final int p0, final IntBuffer p1);
-    
+
     void glGetFixedv(final int p0, final int[] p1, final int p2);
-    
+
     void glGetFixedv(final int p0, final IntBuffer p1);
-    
+
     void glGetBufferParameteriv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetBufferParameteriv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetClipPlanef(final int p0, final float[] p1, final int p2);
-    
+
     void glGetClipPlanef(final int p0, final FloatBuffer p1);
-    
+
     void glGetClipPlanex(final int p0, final int[] p1, final int p2);
-    
+
     void glGetClipPlanex(final int p0, final IntBuffer p1);
-    
+
     void glGetLightfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glGetLightfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glGetLightxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetLightxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetMaterialfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glGetMaterialfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glGetMaterialxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetMaterialxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetPointerv(final int p0, final Buffer[] p1);
-    
+
     void glGetTexEnvfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glGetTexEnvfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glGetTexEnviv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetTexEnviv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetTexEnvxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetTexEnvxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetTexParameterfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glGetTexParameterfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glGetTexParameteriv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetTexParameteriv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glGetTexParameterxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glGetTexParameterxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     boolean glIsBuffer(final int p0);
-    
+
     boolean glIsEnabled(final int p0);
-    
+
     boolean glIsTexture(final int p0);
-    
+
     void glPointParameterf(final int p0, final float p1);
-    
+
     void glPointParameterx(final int p0, final int p1);
-    
+
     void glPointParameterfv(final int p0, final float[] p1, final int p2);
-    
+
     void glPointParameterfv(final int p0, final FloatBuffer p1);
-    
+
     void glPointParameterxv(final int p0, final int[] p1, final int p2);
-    
+
     void glPointParameterxv(final int p0, final IntBuffer p1);
-    
+
     void glColor4ub(final byte p0, final byte p1, final byte p2, final byte p3);
-    
+
     void glTexEnvi(final int p0, final int p1, final int p2);
-    
+
     void glTexEnviv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glTexEnviv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glTexParameterfv(final int p0, final int p1, final float[] p2, final int p3);
-    
+
     void glTexParameterfv(final int p0, final int p1, final FloatBuffer p2);
-    
+
     void glTexParameteri(final int p0, final int p1, final int p2);
-    
+
     void glTexParameteriv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glTexParameteriv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glTexParameterxv(final int p0, final int p1, final int[] p2, final int p3);
-    
+
     void glTexParameterxv(final int p0, final int p1, final IntBuffer p2);
-    
+
     void glColorPointer(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glNormalPointer(final int p0, final int p1, final int p2);
-    
+
     void glTexCoordPointer(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glVertexPointer(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glDrawElements(final int p0, final int p1, final int p2, final int p3);
-    
+
     void glPointSizePointerOES(final int p0, final int p1, final Buffer p2);
-    
+
     void glPointSizePointerOES(final int p0, final int p1, final int p2);
 }

@@ -1,28 +1,28 @@
 package emulator;
 
 import org.w3c.dom.*;
+
 import java.util.*;
 
-public final class DevicePlatform
-{
+public final class DevicePlatform {
     String name;
     Properties properties;
     DevicePlatform parent;
-    
+
     public DevicePlatform(final Element element) {
         super();
         this.properties = new Properties();
         this.name = element.getAttribute("name");
         this.parse(element);
     }
-    
+
     private void parse(final Element element) {
         final NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); ++i) {
             final Node item;
             if ((item = childNodes.item(i)).getNodeType() == 1) {
                 final Element element2;
-                if ((element2 = (Element)item).getNodeName().toLowerCase() == "define") {
+                if ((element2 = (Element) item).getNodeName().toLowerCase() == "define") {
                     this.put(element2);
                 }
             }
@@ -42,7 +42,7 @@ public final class DevicePlatform
             e = ane1203;
         }
     }
-    
+
     private void put(final Element element) {
         final String attribute = element.getAttribute("name");
         final String attribute2 = element.getAttribute("value");
@@ -50,17 +50,17 @@ public final class DevicePlatform
             this.properties.put(attribute, attribute2);
         }
     }
-    
+
     public final int getInt(final String s) {
         int int1 = 0;
         try {
             int1 = Integer.parseInt(this.getString(s));
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        catch (Exception ex) {
-            ex.printStackTrace();}
         return int1;
     }
-    
+
     public final String getString(final String s) {
         String s2;
         if ((s2 = (String) this.properties.get(s)) == null) {
@@ -68,14 +68,14 @@ public final class DevicePlatform
         }
         return s2;
     }
-    
+
     public final boolean exists(final String s) {
         if (this.properties.get(s) == null) {
-        	return false;
+            return false;
         }
         return true;
     }
-    
+
     public final boolean hasNokiaUI() {
         return this.getInt("NOKIA_UI") == 1;
     }

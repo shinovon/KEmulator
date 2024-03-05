@@ -17,8 +17,8 @@ import javax.microedition.lcdui.Screen;
 import javax.microedition.lcdui.a;
 
 public class ChoiceGroup
-extends Item
-implements Choice {
+        extends Item
+        implements Choice {
     boolean aBoolean541;
     int choiceType;
     private int fitPolicy;
@@ -27,7 +27,7 @@ implements Choice {
     int anInt28;
     int anInt29;
     Command aCommand540;
-	private int currentSelect;
+    private int currentSelect;
 
     public ChoiceGroup(String label, int choiceType) {
         this(label, choiceType, new String[0], null);
@@ -61,7 +61,7 @@ implements Choice {
             ++j;
         }
         if (this.items.size() > 0) {
-            ((a)this.items.get((int)0)).sel = true;
+            ((a) this.items.get((int) 0)).sel = true;
         }
     }
 
@@ -96,33 +96,33 @@ implements Choice {
         if (n < 0 || n >= this.items.size()) {
             throw new IndexOutOfBoundsException();
         }
-        ((a)this.items.get((int)n)).font = aFont420;
+        ((a) this.items.get((int) n)).font = aFont420;
     }
 
     public Font getFont(int n) {
-        return ((a)this.items.get((int)n)).font;
+        return ((a) this.items.get((int) n)).font;
     }
 
     public Image getImage(int n) {
-        return ((a)this.items.get((int)n)).image;
+        return ((a) this.items.get((int) n)).image;
     }
 
     public String getString(int n) {
-        return ((a)this.items.get((int)n)).string;
+        return ((a) this.items.get((int) n)).string;
     }
 
     public void insert(int n, String s, Image image) {
         if (s == null) {
             throw new NullPointerException();
         }
-        this.items.insertElementAt((Object)new a(s, image, null, this), n);
+        this.items.insertElementAt((Object) new a(s, image, null, this), n);
     }
 
     public void set(int n, String s, Image image) {
         if (s == null) {
             throw new NullPointerException();
         }
-        this.items.set(n, (Object)new a(s, image, null, this));
+        this.items.set(n, (Object) new a(s, image, null, this));
     }
 
     public void setSelectedFlags(boolean[] array) {
@@ -137,21 +137,21 @@ implements Choice {
             int i = 0;
             while (i < this.items.size()) {
                 if (n == 0 && array[i]) {
-                    ((a)this.items.get((int)i)).sel = true;
+                    ((a) this.items.get((int) i)).sel = true;
                     n = 1;
                 } else {
-                    ((a)this.items.get((int)i)).sel = false;
+                    ((a) this.items.get((int) i)).sel = false;
                 }
                 ++i;
             }
             if (n == 0 && this.items.size() > 0) {
-                ((a)this.items.get((int)n)).sel = true;
+                ((a) this.items.get((int) n)).sel = true;
             }
             return;
         }
         int j = 0;
         while (j < this.items.size()) {
-            ((a)this.items.get((int)j)).sel = array[j];
+            ((a) this.items.get((int) j)).sel = array[j];
             ++j;
         }
     }
@@ -166,7 +166,7 @@ implements Choice {
         int n = 0;
         int i = 0;
         while (i < this.items.size()) {
-            array[i] = ((a)this.items.get((int)i)).sel;
+            array[i] = ((a) this.items.get((int) i)).sel;
             if (array[i]) {
                 ++n;
             }
@@ -179,7 +179,7 @@ implements Choice {
         if (this.choiceType != MULTIPLE) {
             int i = 0;
             while (i < this.items.size()) {
-                if (((a)this.items.get((int)i)).sel) {
+                if (((a) this.items.get((int) i)).sel) {
                     return i;
                 }
                 ++i;
@@ -189,7 +189,7 @@ implements Choice {
     }
 
     public boolean isSelected(int n) {
-        return ((a)this.items.get((int)n)).sel;
+        return ((a) this.items.get((int) n)).sel;
     }
 
     public void setSelectedIndex(int n, boolean flag) {
@@ -197,17 +197,17 @@ implements Choice {
             throw new IndexOutOfBoundsException();
         }
         if (this.choiceType != MULTIPLE) {
-        	if(flag) {
-        		currentSelect = n;
-	            int i = 0;
-	            while (i < this.items.size()) {
-	               ((a)this.items.get(i)).sel = i == n;
-	                ++i;
-	            }
-        	}
+            if (flag) {
+                currentSelect = n;
+                int i = 0;
+                while (i < this.items.size()) {
+                    ((a) this.items.get(i)).sel = i == n;
+                    ++i;
+                }
+            }
             return;
         }
-        ((a)this.items.get((int)n)).sel = flag;
+        ((a) this.items.get((int) n)).sel = flag;
     }
 
     public int size() {
@@ -217,22 +217,22 @@ implements Choice {
     protected void itemApplyCommand() {
         super.itemApplyCommand();
         if (this.aBoolean541 && this.aCommand540 != null) {
-        	if(screen.cmdListener != null)
-            this.screen.cmdListener.commandAction(this.aCommand540, (Displayable)this.screen);
+            if (screen.cmdListener != null)
+                this.screen.cmdListener.commandAction(this.aCommand540, (Displayable) this.screen);
         }
         if (this.choiceType == EXCLUSIVE) {
-        	notifyStateChanged();
+            notifyStateChanged();
             this.setSelectedIndex(this.currentPos, true);
             return;
         }
         if (this.choiceType == MULTIPLE) {
-        	notifyStateChanged();
+            notifyStateChanged();
             this.setSelectedIndex(this.currentPos, !this.isSelected(this.currentPos));
             return;
         }
         if (this.choiceType == POPUP) {
             if (this.aBoolean542) {
-            	notifyStateChanged();
+                notifyStateChanged();
                 this.setSelectedIndex(this.currentPos, true);
             }
             this.aBoolean542 = !this.aBoolean542;
@@ -257,12 +257,12 @@ implements Choice {
         }
         if (this.items.size() > 0) {
             switch (this.choiceType) {
-                case EXCLUSIVE: 
-                case MULTIPLE: 
+                case EXCLUSIVE:
+                case MULTIPLE:
                 case IMPLICIT: {
                     int j = 0;
                     while (j < this.items.size()) {
-                        a a2 = (a)this.items.get(j);
+                        a a2 = (a) this.items.get(j);
                         if (a2.aBoolean424) {
                             a2.method211(graphics, this.inFocus && j == this.currentPos);
                         }
@@ -271,12 +271,12 @@ implements Choice {
                 }
                 case POPUP: {
                     if (this.aBoolean542 && this.anIntArray179 != null) {
-                        this.anInt28 = Math.max((int)(this.bounds[1] - this.anInt29 / 2 - 4), (int)0);
-                        a a2 = (a)this.items.get(0);
-                        emulator.lcdui.a.method178((Graphics)graphics, (int)a2.bounds[0], (int)(this.anInt28 - 2), (int)a2.bounds[2], (int)(this.anInt29 + 2));
+                        this.anInt28 = Math.max((int) (this.bounds[1] - this.anInt29 / 2 - 4), (int) 0);
+                        a a2 = (a) this.items.get(0);
+                        emulator.lcdui.a.method178((Graphics) graphics, (int) a2.bounds[0], (int) (this.anInt28 - 2), (int) a2.bounds[2], (int) (this.anInt29 + 2));
                         int k = 0;
                         while (k < this.items.size()) {
-                            a a3 = (a)this.items.get(k);
+                            a a3 = (a) this.items.get(k);
                             if (a3.aBoolean424) {
                                 a3.method211(graphics, k == this.currentPos);
                             }
@@ -284,7 +284,7 @@ implements Choice {
                         }
                         return;
                     }
-                    ((a)this.items.get(this.currentSelect)).method211(graphics, this.inFocus);
+                    ((a) this.items.get(this.currentSelect)).method211(graphics, this.inFocus);
                 }
             }
         }
@@ -295,19 +295,19 @@ implements Choice {
         int n = 0;
         if (this.label != null) {
             int n2 = this.getPreferredWidth() - 8;
-            this.labelArr = c.textArr((String)this.label, (Font)Item.font, (int)n2, (int)n2);
+            this.labelArr = c.textArr((String) this.label, (Font) Item.font, (int) n2, (int) n2);
             n = (Item.font.getHeight() + 4) * this.labelArr.length;
         } else {
             this.labelArr = null;
         }
         switch (this.choiceType) {
-        case EXCLUSIVE: 
-        case MULTIPLE: 
-        case IMPLICIT: {
+            case EXCLUSIVE:
+            case MULTIPLE:
+            case IMPLICIT: {
                 this.anIntArray179 = new int[this.items.size()];
                 int i = 0;
                 while (i < this.items.size()) {
-                    a a2 = (a)this.items.get(i);
+                    a a2 = (a) this.items.get(i);
                     a2.method212();
                     a2.bounds[Y] = n;
                     n += a2.bounds[H];
@@ -320,7 +320,7 @@ implements Choice {
                 break;
             }
             case POPUP: {
-                a a2 = (a)this.items.get(this.getSelectedIndex());
+                a a2 = (a) this.items.get(this.getSelectedIndex());
                 a2.method212();
                 n += a2.bounds[H];
                 if (this.aBoolean542) {
@@ -328,13 +328,13 @@ implements Choice {
                     this.anInt29 = 0;
                     int j = 0;
                     while (j < this.items.size()) {
-                        this.anInt29 += ((a)this.items.get((int)j)).bounds[H];
+                        this.anInt29 += ((a) this.items.get((int) j)).bounds[H];
                         ++j;
                     }
                     int n3 = 0;
                     int k = 0;
                     while (k < this.items.size()) {
-                        a a3 = (a)this.items.get(k);
+                        a a3 = (a) this.items.get(k);
                         a3.method212();
                         a3.bounds[Y] = n3;
                         n3 += a3.bounds[H];
@@ -349,7 +349,7 @@ implements Choice {
                 this.anInt28 = n - a2.bounds[H];
             }
         }
-        this.bounds[H] = Math.min((int)n, (int)this.screen.bounds[H]);
+        this.bounds[H] = Math.min((int) n, (int) this.screen.bounds[H]);
     }
 
     protected boolean scrollUp() {
@@ -377,13 +377,13 @@ implements Choice {
         int[] array = new int[4];
         int i = 0;
         while (i < this.items.size()) {
-            a a2 = (a)this.items.get(i);
-            System.arraycopy((Object)a2.bounds, (int)0, (Object)array, (int)0, (int)4);
+            a a2 = (a) this.items.get(i);
+            System.arraycopy((Object) a2.bounds, (int) 0, (Object) array, (int) 0, (int) 4);
             int[] array2 = array;
             boolean n3 = true;
             int[] arrn = array2;
             arrn[1] = arrn[1] + (this.aBoolean542 ? this.anInt28 : this.bounds[1]);
-            if (a2.aBoolean424 && BoundsUtils.collides((int[])array, (int)x, (int)y)) {
+            if (a2.aBoolean424 && BoundsUtils.collides((int[]) array, (int) x, (int) y)) {
                 this.currentPos = i;
             }
             ++i;
@@ -391,10 +391,10 @@ implements Choice {
     }
 
     protected int getItemWidth() {
-		return -1;
-	}
+        return -1;
+    }
 
-	protected boolean isFullWidthItem() {
-		return true;
-	}
+    protected boolean isFullWidthItem() {
+        return true;
+    }
 }

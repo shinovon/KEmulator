@@ -2,15 +2,14 @@ package emulator.media;
 
 import emulator.*;
 
-public final class b
-{
+public final class b {
     a ana1225;
     int anInt1226;
     byte[] aByteArray1227;
     static int anInt1229;
     static int anInt1230;
     static final int[] anIntArray1228;
-    
+
     public b(final byte[] array) {
         super();
         this.ana1225 = new a();
@@ -18,11 +17,11 @@ public final class b
         System.arraycopy(array, 0, this.aByteArray1227 = new byte[this.anInt1226 + 10], 0, this.anInt1226);
         this.method729(this.aByteArray1227);
     }
-    
+
     public final byte[] method726() {
         return this.ana1225.method730();
     }
-    
+
     private static int method727(final byte[] array, final int n) {
         final int n2 = ((array[b.anInt1229] & 0xFF) << 8) + (array[b.anInt1229 + 1] & 0xFF) >> 16 - (n + b.anInt1230) & (1 << n) - 1;
         b.anInt1230 += n;
@@ -32,11 +31,11 @@ public final class b
         }
         return n2;
     }
-    
+
     private static int method728(final int n) {
         return b.anIntArray1228[n];
     }
-    
+
     private void method729(final byte[] array) {
         b.anInt1229 = 0;
         b.anInt1230 = 0;
@@ -111,8 +110,8 @@ public final class b
         }
         this.ana1225.method738();
     }
-    
+
     static {
-        anIntArray1228 = new int[] { 25, 28, 31, 35, 40, 45, 50, 56, 63, 70, 80, 90, 100, 112, 125, 140, 160, 180, 200, 225, 250, 285, 320, 355, 400, 450, 500, 565, 635, 715, 800, 900 };
+        anIntArray1228 = new int[]{25, 28, 31, 35, 40, 45, 50, 56, 63, 70, 80, 90, 100, 112, 125, 140, 160, 180, 200, 225, 250, 285, 320, 355, 400, 450, 500, 565, 635, 715, 800, 900};
     }
 }

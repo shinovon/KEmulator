@@ -1,195 +1,197 @@
 package emulator.debug;
 
 import emulator.Emulator;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 public final class ClassTypes {
-   static Class strCls;
+    static Class strCls;
 
-   public static String method869(Class var0) {
-      return !var0.isArray()?var0.getName():method870(var0.getName());
-   }
+    public static String method869(Class var0) {
+        return !var0.isArray() ? var0.getName() : method870(var0.getName());
+    }
 
-   public static String method870(String var0) {
-      if(var0 == null) {
-         return var0;
-      } else {
-         int var1;
-         if((var1 = var0.lastIndexOf(91)) == -1) {
+    public static String method870(String var0) {
+        if (var0 == null) {
             return var0;
-         } else {
-            label35: {
-               String var10000;
-               switch((var0 = var0.substring(var1 + 1)).charAt(0)) {
-               case 'B':
-                  var10000 = "byte";
-                  break;
-               case 'C':
-                  var10000 = "char";
-                  break;
-               case 'D':
-                  var10000 = "double";
-                  break;
-               case 'E':
-               case 'G':
-               case 'H':
-               case 'K':
-               case 'M':
-               case 'N':
-               case 'O':
-               case 'P':
-               case 'Q':
-               case 'R':
-               case 'T':
-               case 'U':
-               case 'W':
-               case 'X':
-               case 'Y':
-               default:
-                  break label35;
-               case 'F':
-                  var10000 = "float";
-                  break;
-               case 'I':
-                  var10000 = "int";
-                  break;
-               case 'J':
-                  var10000 = "long";
-                  break;
-               case 'L':
-                  var10000 = var0.substring(1, var0.length() - 1);
-                  break;
-               case 'S':
-                  var10000 = "short";
-                  break;
-               case 'V':
-                  var10000 = "void";
-                  break;
-               case 'Z':
-                  var10000 = "boolean";
-               }
-
-               var0 = var10000;
-            }
-
-            for(int var2 = var1; var2 >= 0; --var2) {
-               var0 = var0 + "[]";
-            }
-
-            return var0;
-         }
-      }
-   }
-
-   public static boolean method871(Class var0) {
-      return var0 == Integer.TYPE?false:(var0 == Boolean.TYPE?false:(var0 == Byte.TYPE?false:(var0 == Short.TYPE?false:(var0 == Long.TYPE?false:(var0 == Float.TYPE?false:(var0 == Double.TYPE?false:(var0 == Character.TYPE?false:(var0 == (strCls != null?strCls:(strCls = cls("java.lang.String")))?false:!var0.isArray()))))))));
-   }
-
-   public static String method872(Object var0, int var1, boolean var2) {
-      Object var3;
-      Class var4;
-      return var0 != null && var0.getClass().isArray()?((var3 = Array.get(var0, var1)) == null?"null":((var4 = var0.getClass().getComponentType()) == Integer.TYPE?(var2?"0x" + Integer.toHexString(Array.getInt(var0, var1)):String.valueOf(Array.getInt(var0, var1))):(var4 == Boolean.TYPE?String.valueOf(Array.getBoolean(var0, var1)):(var4 == Byte.TYPE?(var2?"0x" + Integer.toHexString(Array.getByte(var0, var1)):String.valueOf(Array.getByte(var0, var1))):(var4 == Short.TYPE?(var2?"0x" + Integer.toHexString(Array.getShort(var0, var1)):String.valueOf(Array.getShort(var0, var1))):(var4 == Long.TYPE?(var2?"0x" + Long.toHexString(Array.getLong(var0, var1)):String.valueOf(Array.getLong(var0, var1))):(var4 == Float.TYPE?String.valueOf(Array.getFloat(var0, var1)):(var4 == Double.TYPE?String.valueOf(Array.getDouble(var0, var1)):(var4 == Character.TYPE?String.valueOf(Array.getChar(var0, var1)):(var4 == (strCls != null?strCls:(strCls = cls("java.lang.String")))?String.valueOf(var3):(!var4.isArray()?var3.toString():"[" + Array.getLength(var3) + "]"))))))))))):"null";
-   }
-
-   public static void method873(Object var0, int var1, String var2) {
-      if(var0 != null && var0.getClass().isArray()) {
-         if(Array.get(var0, var1) != null) {
-            int var4;
-            if((var4 = var2.startsWith("0x")?16:10) == 16) {
-               var2 = var2.substring(2);
-            }
-
-            Class var5;
-            if((var5 = var0.getClass().getComponentType()) == Long.TYPE) {
-               Array.setLong(var0, var1, Long.parseLong(var2, var4));
-            } else if(var5 == Integer.TYPE) {
-               Array.setInt(var0, var1, Integer.parseInt(var2, var4));
-            } else if(var5 == Short.TYPE) {
-               Array.setShort(var0, var1, (short)Integer.parseInt(var2, var4));
-            } else if(var5 == Byte.TYPE) {
-               Array.setByte(var0, var1, (byte)Integer.parseInt(var2, var4));
-            } else if(var5 == Boolean.TYPE) {
-               Array.setBoolean(var0, var1, Boolean.valueOf(var2).booleanValue());
-            } else if(var5 == Float.TYPE) {
-               Array.setFloat(var0, var1, Float.parseFloat(var2));
-            } else if(var5 == Double.TYPE) {
-               Array.setDouble(var0, var1, Double.parseDouble(var2));
-            } else if(var5 == Character.TYPE) {
-               Array.setChar(var0, var1, var2.charAt(0));
+        } else {
+            int var1;
+            if ((var1 = var0.lastIndexOf(91)) == -1) {
+                return var0;
             } else {
-               if(var5 == (strCls != null?strCls:(strCls = cls("java.lang.String")))) {
-                  Array.set(var0, var1, var2);
-               }
+                label35:
+                {
+                    String var10000;
+                    switch ((var0 = var0.substring(var1 + 1)).charAt(0)) {
+                        case 'B':
+                            var10000 = "byte";
+                            break;
+                        case 'C':
+                            var10000 = "char";
+                            break;
+                        case 'D':
+                            var10000 = "double";
+                            break;
+                        case 'E':
+                        case 'G':
+                        case 'H':
+                        case 'K':
+                        case 'M':
+                        case 'N':
+                        case 'O':
+                        case 'P':
+                        case 'Q':
+                        case 'R':
+                        case 'T':
+                        case 'U':
+                        case 'W':
+                        case 'X':
+                        case 'Y':
+                        default:
+                            break label35;
+                        case 'F':
+                            var10000 = "float";
+                            break;
+                        case 'I':
+                            var10000 = "int";
+                            break;
+                        case 'J':
+                            var10000 = "long";
+                            break;
+                        case 'L':
+                            var10000 = var0.substring(1, var0.length() - 1);
+                            break;
+                        case 'S':
+                            var10000 = "short";
+                            break;
+                        case 'V':
+                            var10000 = "void";
+                            break;
+                        case 'Z':
+                            var10000 = "boolean";
+                    }
 
+                    var0 = var10000;
+                }
+
+                for (int var2 = var1; var2 >= 0; --var2) {
+                    var0 = var0 + "[]";
+                }
+
+                return var0;
             }
-         }
-      }
-   }
+        }
+    }
 
-   public static String method874(Object var0, Field var1, boolean var2) {
-      try {
-         return var1.get(var0) == null?"null":(var1.getType() == Integer.TYPE?(var2?"0x" + Integer.toHexString(var1.getInt(var0)):String.valueOf(var1.getInt(var0))):(var1.getType() == Boolean.TYPE?String.valueOf(var1.getBoolean(var0)):(var1.getType() == Byte.TYPE?(var2?"0x" + Integer.toHexString(var1.getByte(var0)):String.valueOf(var1.getByte(var0))):(var1.getType() == Short.TYPE?(var2?"0x" + Integer.toHexString(var1.getShort(var0)):String.valueOf(var1.getShort(var0))):(var1.getType() == Long.TYPE?(var2?"0x" + Long.toHexString(var1.getLong(var0)):String.valueOf(var1.getLong(var0))):(var1.getType() == Float.TYPE?String.valueOf(var1.getFloat(var0)):(var1.getType() == Double.TYPE?String.valueOf(var1.getDouble(var0)):(var1.getType() == Character.TYPE?String.valueOf(var1.getChar(var0)):(var1.getType() == (strCls != null?strCls:(strCls = cls("java.lang.String")))?String.valueOf(var1.get(var0)):(!var1.getType().isArray()?var1.get(var0).toString():"[" + Array.getLength(var1.get(var0)) + "]"))))))))));
-      } catch (Exception var3) {
-         return "!!error!!";
-      }
-   }
+    public static boolean method871(Class var0) {
+        return var0 == Integer.TYPE ? false : (var0 == Boolean.TYPE ? false : (var0 == Byte.TYPE ? false : (var0 == Short.TYPE ? false : (var0 == Long.TYPE ? false : (var0 == Float.TYPE ? false : (var0 == Double.TYPE ? false : (var0 == Character.TYPE ? false : (var0 == (strCls != null ? strCls : (strCls = cls("java.lang.String"))) ? false : !var0.isArray()))))))));
+    }
 
-   public static void method875(Object var0, Field var1, String var2) {
-      try {
-         int var3;
-         if((var3 = var2.startsWith("0x")?16:10) == 16) {
-            var2 = var2.substring(2);
-         }
+    public static String method872(Object var0, int var1, boolean var2) {
+        Object var3;
+        Class var4;
+        return var0 != null && var0.getClass().isArray() ? ((var3 = Array.get(var0, var1)) == null ? "null" : ((var4 = var0.getClass().getComponentType()) == Integer.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getInt(var0, var1)) : String.valueOf(Array.getInt(var0, var1))) : (var4 == Boolean.TYPE ? String.valueOf(Array.getBoolean(var0, var1)) : (var4 == Byte.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getByte(var0, var1)) : String.valueOf(Array.getByte(var0, var1))) : (var4 == Short.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getShort(var0, var1)) : String.valueOf(Array.getShort(var0, var1))) : (var4 == Long.TYPE ? (var2 ? "0x" + Long.toHexString(Array.getLong(var0, var1)) : String.valueOf(Array.getLong(var0, var1))) : (var4 == Float.TYPE ? String.valueOf(Array.getFloat(var0, var1)) : (var4 == Double.TYPE ? String.valueOf(Array.getDouble(var0, var1)) : (var4 == Character.TYPE ? String.valueOf(Array.getChar(var0, var1)) : (var4 == (strCls != null ? strCls : (strCls = cls("java.lang.String"))) ? String.valueOf(var3) : (!var4.isArray() ? var3.toString() : "[" + Array.getLength(var3) + "]"))))))))))) : "null";
+    }
 
-         if(var1.getType() == Long.TYPE) {
-            var1.setLong(var0, Long.parseLong(var2, var3));
-         } else if(var1.getType() == Integer.TYPE) {
-            var1.setInt(var0, Integer.parseInt(var2, var3));
-         } else if(var1.getType() == Short.TYPE) {
-            var1.setShort(var0, (short)Integer.parseInt(var2, var3));
-         } else if(var1.getType() == Byte.TYPE) {
-            var1.setByte(var0, (byte)Integer.parseInt(var2, var3));
-         } else if(var1.getType() == Boolean.TYPE) {
-            var1.setBoolean(var0, Boolean.valueOf(var2).booleanValue());
-         } else if(var1.getType() == Float.TYPE) {
-            var1.setFloat(var0, Float.parseFloat(var2));
-         } else if(var1.getType() == Double.TYPE) {
-            var1.setDouble(var0, Double.parseDouble(var2));
-         } else {
-            if(var1.getType() != Character.TYPE) {
-               if(var1.getType() == (strCls != null?strCls:(strCls = cls("java.lang.String")))) {
-                  var1.set(var0, var2);
-               }
+    public static void method873(Object var0, int var1, String var2) {
+        if (var0 != null && var0.getClass().isArray()) {
+            if (Array.get(var0, var1) != null) {
+                int var4;
+                if ((var4 = var2.startsWith("0x") ? 16 : 10) == 16) {
+                    var2 = var2.substring(2);
+                }
 
-               return;
+                Class var5;
+                if ((var5 = var0.getClass().getComponentType()) == Long.TYPE) {
+                    Array.setLong(var0, var1, Long.parseLong(var2, var4));
+                } else if (var5 == Integer.TYPE) {
+                    Array.setInt(var0, var1, Integer.parseInt(var2, var4));
+                } else if (var5 == Short.TYPE) {
+                    Array.setShort(var0, var1, (short) Integer.parseInt(var2, var4));
+                } else if (var5 == Byte.TYPE) {
+                    Array.setByte(var0, var1, (byte) Integer.parseInt(var2, var4));
+                } else if (var5 == Boolean.TYPE) {
+                    Array.setBoolean(var0, var1, Boolean.valueOf(var2).booleanValue());
+                } else if (var5 == Float.TYPE) {
+                    Array.setFloat(var0, var1, Float.parseFloat(var2));
+                } else if (var5 == Double.TYPE) {
+                    Array.setDouble(var0, var1, Double.parseDouble(var2));
+                } else if (var5 == Character.TYPE) {
+                    Array.setChar(var0, var1, var2.charAt(0));
+                } else {
+                    if (var5 == (strCls != null ? strCls : (strCls = cls("java.lang.String")))) {
+                        Array.set(var0, var1, var2);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public static String method874(Object var0, Field var1, boolean var2) {
+        try {
+            return var1.get(var0) == null ? "null" : (var1.getType() == Integer.TYPE ? (var2 ? "0x" + Integer.toHexString(var1.getInt(var0)) : String.valueOf(var1.getInt(var0))) : (var1.getType() == Boolean.TYPE ? String.valueOf(var1.getBoolean(var0)) : (var1.getType() == Byte.TYPE ? (var2 ? "0x" + Integer.toHexString(var1.getByte(var0)) : String.valueOf(var1.getByte(var0))) : (var1.getType() == Short.TYPE ? (var2 ? "0x" + Integer.toHexString(var1.getShort(var0)) : String.valueOf(var1.getShort(var0))) : (var1.getType() == Long.TYPE ? (var2 ? "0x" + Long.toHexString(var1.getLong(var0)) : String.valueOf(var1.getLong(var0))) : (var1.getType() == Float.TYPE ? String.valueOf(var1.getFloat(var0)) : (var1.getType() == Double.TYPE ? String.valueOf(var1.getDouble(var0)) : (var1.getType() == Character.TYPE ? String.valueOf(var1.getChar(var0)) : (var1.getType() == (strCls != null ? strCls : (strCls = cls("java.lang.String"))) ? String.valueOf(var1.get(var0)) : (!var1.getType().isArray() ? var1.get(var0).toString() : "[" + Array.getLength(var1.get(var0)) + "]"))))))))));
+        } catch (Exception var3) {
+            return "!!error!!";
+        }
+    }
+
+    public static void method875(Object var0, Field var1, String var2) {
+        try {
+            int var3;
+            if ((var3 = var2.startsWith("0x") ? 16 : 10) == 16) {
+                var2 = var2.substring(2);
             }
 
-            var1.setChar(var0, var2.charAt(0));
-         }
-      } catch (Exception var4) {
-         Emulator.getEmulator().getLogStream().println(var4.toString());
-      }
+            if (var1.getType() == Long.TYPE) {
+                var1.setLong(var0, Long.parseLong(var2, var3));
+            } else if (var1.getType() == Integer.TYPE) {
+                var1.setInt(var0, Integer.parseInt(var2, var3));
+            } else if (var1.getType() == Short.TYPE) {
+                var1.setShort(var0, (short) Integer.parseInt(var2, var3));
+            } else if (var1.getType() == Byte.TYPE) {
+                var1.setByte(var0, (byte) Integer.parseInt(var2, var3));
+            } else if (var1.getType() == Boolean.TYPE) {
+                var1.setBoolean(var0, Boolean.valueOf(var2).booleanValue());
+            } else if (var1.getType() == Float.TYPE) {
+                var1.setFloat(var0, Float.parseFloat(var2));
+            } else if (var1.getType() == Double.TYPE) {
+                var1.setDouble(var0, Double.parseDouble(var2));
+            } else {
+                if (var1.getType() != Character.TYPE) {
+                    if (var1.getType() == (strCls != null ? strCls : (strCls = cls("java.lang.String")))) {
+                        var1.set(var0, var2);
+                    }
 
-   }
+                    return;
+                }
 
-   public static Object method876(Object var0, Field var1) {
-      try {
-         return var1.get(var0);
-      } catch (Exception var2) {
-         return null;
-      }
-   }
+                var1.setChar(var0, var2.charAt(0));
+            }
+        } catch (Exception var4) {
+            Emulator.getEmulator().getLogStream().println(var4.toString());
+        }
 
-   private static Class cls(String var0) {
-      try {
-         Class var1 = Class.forName(var0);
-         return var1;
-      } catch (ClassNotFoundException var3) {
-         Emulator.AntiCrack(var3);
-         throw new NoClassDefFoundError(var3.getMessage());
-      }
-   }
+    }
+
+    public static Object method876(Object var0, Field var1) {
+        try {
+            return var1.get(var0);
+        } catch (Exception var2) {
+            return null;
+        }
+    }
+
+    private static Class cls(String var0) {
+        try {
+            Class var1 = Class.forName(var0);
+            return var1;
+        } catch (ClassNotFoundException var3) {
+            Emulator.AntiCrack(var3);
+            throw new NoClassDefFoundError(var3.getMessage());
+        }
+    }
 }
 
 

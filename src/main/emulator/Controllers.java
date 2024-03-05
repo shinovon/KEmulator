@@ -2,11 +2,9 @@ package emulator;
 
 import java.util.*;
 
-import emulator.ui.swt.Property;
 import net.java.games.input.*;
 
-public class Controllers
-{
+public class Controllers {
     private static ArrayList controllers = new ArrayList();
     private static int count;
     private static boolean loaded;
@@ -19,7 +17,7 @@ public class Controllers
     public Controllers() {
         super();
     }
-    
+
     private static void init() throws Exception {
         if (Controllers.loaded) {
             return;
@@ -30,12 +28,12 @@ public class Controllers
             for (int i = 0; i < controllers.length; ++i) {
                 Controller controller;
                 if (!(controller = controllers[i]).getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
-                	String s = controller.getName();
-                	if(s.contains("tablet")) continue;
-                	if(s.contains("STAR")) continue;
-                    if(s.contains("Gaming Keyboard")) continue;
-                    if(s.contains("Gaming Mouse")) continue;
-                    if(s.contains("Microphone")) continue;
+                    String s = controller.getName();
+                    if (s.contains("tablet")) continue;
+                    if (s.contains("STAR")) continue;
+                    if (s.contains("Gaming Keyboard")) continue;
+                    if (s.contains("Gaming Mouse")) continue;
+                    if (s.contains("Microphone")) continue;
                     list.add(controller);
                 }
             }
@@ -43,13 +41,12 @@ public class Controllers
                 addController((Controller) list.get(j));
             }
             Controllers.loaded = true;
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             t.printStackTrace();
             throw new Exception("Failed to initialise controllers", t);
         }
     }
-    
+
     private static void addController(Controller controller) {
         Controller[] controllers = controller.getControllers();
         if (controllers.length == 0) {
@@ -62,15 +59,15 @@ public class Controllers
             addController(controllers[i]);
         }
     }
-    
+
     public static int getControllersCount() {
         return Controllers.count;
     }
-    
+
     public static Controller getController(int n) {
         return (Controller) Controllers.controllers.get(n);
     }
-    
+
     private static void initBinds() {
         Controllers.binds = new String[Controllers.count][19];
         for (int i = 0; i < Controllers.count; ++i) {
@@ -94,15 +91,15 @@ public class Controllers
             Controllers.binds[i][16] = "9";
             Controllers.binds[i][17] = "10";
             Controllers.binds[i][18] = "11";
-            if(Settings.controllerBinds.containsKey(name + ".0")) {
-                for(int j = 0; j < 19; j++) {
+            if (Settings.controllerBinds.containsKey(name + ".0")) {
+                for (int j = 0; j < 19; j++) {
                     String s = Settings.controllerBinds.get(name + "." + j);
-                    if(s != null) Controllers.binds[i][j] = s;
+                    if (s != null) Controllers.binds[i][j] = s;
                 }
             }
         }
     }
-    
+
     public static void bind(int controllerId, int n2, String s) {
         Controllers.binds[controllerId][n2] = s;
         try {
@@ -111,7 +108,7 @@ public class Controllers
             e.printStackTrace();
         }
     }
-    
+
     public static String getBind(int controllerId, int n2) {
         String s = Controllers.binds[controllerId][n2];
         if (!s.isEmpty() && !s.equalsIgnoreCase("LEFT") && !s.equalsIgnoreCase("RIGHT") && !s.equalsIgnoreCase("UP") && !s.equalsIgnoreCase("DOWN")) {
@@ -119,29 +116,29 @@ public class Controllers
         }
         return s;
     }
-    
+
     private static int map(int n, String s) {
         int n2;
-        for (n2 = 0; n2 < 19 && !s.equalsIgnoreCase(Controllers.binds[n][n2]); ++n2);
+        for (n2 = 0; n2 < 19 && !s.equalsIgnoreCase(Controllers.binds[n][n2]); ++n2) ;
         if (n2 == 19) {
             return 10000;
         }
-        return method747(Keyboard.deviceKeycodes[n2]);
+        return method747(KeyMapping.deviceKeycodes[n2]);
     }
-    
+
     private static int method747(String s) {
-        return Integer.parseInt(Keyboard.replaceKey(Integer.parseInt(s)));
+        return Integer.parseInt(KeyMapping.replaceKey(Integer.parseInt(s)));
     }
-    
+
     private static boolean method748(String aString1292) {
         Controllers.aString1292 = aString1292;
         return Emulator.getEmulator().getProperty().updateController();
     }
-    
+
     public static String method749() {
         return Controllers.aString1292;
     }
-    
+
     public static void refresh(boolean b) {
         reset();
         if (b) {
@@ -157,7 +154,7 @@ public class Controllers
             }
         }
     }
-    
+
     private static void reset() {
         Controllers.loaded = false;
         Controllers.controllers.clear();
@@ -165,7 +162,7 @@ public class Controllers
         Controllers.dpad = null;
         Controllers.binds = null;
     }
-    
+
     public static void poll() {
         if (!Controllers.loaded) {
             return;
@@ -175,7 +172,7 @@ public class Controllers
         }
         for (int i = 0; i < Controllers.count; ++i) {
             Controller controller = getController(i);
-            if(!controller.poll()) {
+            if (!controller.poll()) {
                 continue;
             }
             Event event = new Event();
@@ -188,7 +185,7 @@ public class Controllers
                     int key = map(i, name);
                     if (key == 10000) return;
                     if (value == 1.0f) {
-                        if(!b) Emulator.getEventQueue().keyPress(key);
+                        if (!b) Emulator.getEventQueue().keyPress(key);
                     } else {
                         Emulator.getEventQueue().keyRelease(key);
                     }
@@ -211,9 +208,9 @@ public class Controllers
             }
         }
     }
-    
+
     private static void filterX(int n, float f) {
-        if(Math.abs(f) <= 0.05f && Math.abs(lastX) <= 0.05f) return;
+        if (Math.abs(f) <= 0.05f && Math.abs(lastX) <= 0.05f) return;
         handleX(n, f);
         lastX = f;
     }
@@ -235,9 +232,9 @@ public class Controllers
             Controllers.dpad[n][1] = false;
         }
     }
-    
+
     private static void filterY(int n, float f) {
-        if(Math.abs(f) <= 0.05f && Math.abs(lastY) <= 0.05f) return;
+        if (Math.abs(f) <= 0.05f && Math.abs(lastY) <= 0.05f) return;
         handleY(n, f);
         lastY = f;
     }
@@ -259,7 +256,7 @@ public class Controllers
             Controllers.dpad[n][3] = false;
         }
     }
-    
+
     private static float povX(float n) {
         if (n == 0.875f || n == 0.125f || n == 1.0f) {
             return -1.0f;
@@ -269,7 +266,7 @@ public class Controllers
         }
         return 0.0f;
     }
-    
+
     private static float povY(float n) {
         if (n == 0.875f || n == 0.625f || n == 0.75f) {
             return 1.0f;

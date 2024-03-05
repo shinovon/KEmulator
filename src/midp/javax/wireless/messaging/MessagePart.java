@@ -2,15 +2,14 @@ package javax.wireless.messaging;
 
 import java.io.*;
 
-public class MessagePart
-{
+public class MessagePart {
     static int anInt158;
     byte[] aByteArray159;
     String aString160;
     String aString161;
     String aString162;
     String aString163;
-    
+
     final void method54(final byte[] array, final int n, final int n2, final String aString163, final String aString164, final String aString165, final String aString166) throws SizeExceededException {
         if (n2 > MessagePart.anInt158) {
             throw new SizeExceededException("InputStream data exceeds " + MessagePart.anInt158 + " byte MessagePart size limit");
@@ -37,17 +36,17 @@ public class MessagePart
         this.aString161 = aString165;
         this.aString162 = aString166;
     }
-    
+
     public MessagePart(final byte[] array, final int n, final int n2, final String s, final String s2, final String s3, final String s4) throws SizeExceededException {
         super();
         this.method54(array, n, n2, s, s2, s3, s4);
     }
-    
+
     public MessagePart(final byte[] array, final String s, final String s2, final String s3, final String s4) throws SizeExceededException {
         super();
         this.method54(array, 0, (array == null) ? 0 : array.length, s, s2, s3, s4);
     }
-    
+
     public MessagePart(final InputStream inputStream, final String s, final String s2, final String s3, final String s4) throws IOException, SizeExceededException {
         super();
         byte[] byteArray = new byte[0];
@@ -62,7 +61,7 @@ public class MessagePart
         }
         this.method54(byteArray, 0, byteArray.length, s, s2, s3, s4);
     }
-    
+
     public byte[] getContent() {
         if (this.aByteArray159 == null) {
             return null;
@@ -71,37 +70,37 @@ public class MessagePart
         System.arraycopy(this.aByteArray159, 0, array, 0, this.aByteArray159.length);
         return array;
     }
-    
+
     public InputStream getContentAsStream() {
         if (this.aByteArray159 == null) {
             return new ByteArrayInputStream(new byte[0]);
         }
         return new ByteArrayInputStream(this.aByteArray159);
     }
-    
+
     public String getContentID() {
         return this.aString160;
     }
-    
+
     public String getContentLocation() {
         return this.aString161;
     }
-    
+
     public String getEncoding() {
         return this.aString162;
     }
-    
+
     public int getLength() {
         if (this.aByteArray159 == null) {
             return 0;
         }
         return this.aByteArray159.length;
     }
-    
+
     public String getMIMEType() {
         return this.aString163;
     }
-    
+
     static void method55(final String s) throws IllegalArgumentException {
         if (s == null) {
             throw new IllegalArgumentException("contentId must be specified");
@@ -113,7 +112,7 @@ public class MessagePart
             throw new IllegalArgumentException("contentId must not contain non-US-ASCII characters");
         }
     }
-    
+
     static void method57(final String s) throws IllegalArgumentException {
         if (s != null) {
             if (method56(s)) {
@@ -124,7 +123,7 @@ public class MessagePart
             }
         }
     }
-    
+
     static boolean method56(final String s) {
         for (int length = s.length(), i = 0; i < length; ++i) {
             final char char1;
@@ -134,7 +133,7 @@ public class MessagePart
         }
         return false;
     }
-    
+
     static {
         MessagePart.anInt158 = 30720;
     }

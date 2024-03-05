@@ -1,28 +1,28 @@
 package com.nokia.mid.ui;
 
 public class SoftNotificationException extends Exception {
-	private int errorCode;
+    private int errorCode;
 
-	protected SoftNotificationException() {
-	}
+    protected SoftNotificationException() {
+    }
 
-	public SoftNotificationException(String info) {
-		super(info);
-	}
+    public SoftNotificationException(String info) {
+        super(info);
+    }
 
-	public SoftNotificationException(String info, int errorCode) {
-		super(info);
-		this.errorCode = errorCode;
-	}
+    public SoftNotificationException(String info, int errorCode) {
+        super(info);
+        this.errorCode = errorCode;
+    }
 
-	public String toString() {
-		if (this.errorCode == 0) {
-			return super.toString();
-		}
-		return super.toString() + " Native error: " + this.errorCode;
-	}
+    public String toString() {
+        if (this.errorCode == 0) {
+            return super.toString();
+        }
+        return super.toString() + " Native error: " + this.errorCode;
+    }
 
-	public int getErrorCode() {
-		return this.errorCode;
-	}
+    public int getErrorCode() {
+        return this.errorCode;
+    }
 }

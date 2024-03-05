@@ -2,14 +2,14 @@ package emulator.ui.swt;
 
 import org.eclipse.swt.events.*;
 import emulator.custom.*;
+
 import java.util.*;
 
-final class Class170 extends SelectionAdapter
-{
+final class Class170 extends SelectionAdapter {
     Class170(final Class46 class46) {
         super();
     }
-    
+
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         final Enumeration<h.MethodInfo> elements = h.aHashtable1061.elements();
         while (elements.hasMoreElements()) {

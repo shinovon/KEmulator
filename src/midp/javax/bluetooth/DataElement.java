@@ -1,7 +1,6 @@
 package javax.bluetooth;
 
-public class DataElement
-{
+public class DataElement {
     public static final int NULL = 0;
     public static final int U_INT_1 = 8;
     public static final int U_INT_2 = 9;
@@ -19,49 +18,49 @@ public class DataElement
     public static final int STRING = 32;
     public static final int DATSEQ = 48;
     public static final int DATALT = 56;
-    
+
     public DataElement(final int n) {
         super();
     }
-    
+
     public DataElement(final boolean b) {
         super();
     }
-    
+
     public DataElement(final int n, final long n2) {
         super();
     }
-    
+
     public DataElement(final int n, final Object o) {
         super();
     }
-    
+
     public void addElement(final DataElement dataElement) {
     }
-    
+
     public void insertElementAt(final DataElement dataElement, final int n) {
     }
-    
+
     public int getSize() {
         return 0;
     }
-    
+
     public boolean removeElement(final DataElement dataElement) {
         return false;
     }
-    
+
     public int getDataType() {
         return 0;
     }
-    
+
     public long getLong() {
         return -1L;
     }
-    
+
     public boolean getBoolean() {
         return false;
     }
-    
+
     public Object getValue() {
         return null;
     }

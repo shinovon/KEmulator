@@ -1,7 +1,6 @@
 package javax.microedition.media;
 
-public interface PlayerListener
-{
+public interface PlayerListener {
     public static final String STARTED = "started";
     public static final String STOPPED = "stopped";
     public static final String STOPPED_AT_TIME = "stoppedAtTime";
@@ -18,6 +17,6 @@ public interface PlayerListener
     public static final String RECORD_ERROR = "recordError";
     public static final String BUFFERING_STARTED = "bufferingStarted";
     public static final String BUFFERING_STOPPED = "bufferingStopped";
-    
+
     void playerUpdate(final Player p0, final String p1, final Object p2);
 }

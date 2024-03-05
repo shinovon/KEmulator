@@ -1,7 +1,6 @@
 package javax.obex;
 
-public class ResponseCodes
-{
+public class ResponseCodes {
     public static final int OBEX_HTTP_OK = 160;
     public static final int OBEX_HTTP_CREATED = 161;
     public static final int OBEX_HTTP_ACCEPTED = 162;
@@ -39,7 +38,7 @@ public class ResponseCodes
     public static final int OBEX_HTTP_VERSION = 213;
     public static final int OBEX_DATABASE_FULL = 224;
     public static final int OBEX_DATABASE_LOCKED = 225;
-    
+
     public ResponseCodes() {
         super();
     }
