@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.UILocale;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -131,7 +132,7 @@ public class InputDialog extends Dialog {
         // Create the cancel button and add a handler
         // so that pressing it will set input to null
         Button cancel = new Button(shell, SWT.PUSH);
-        cancel.setText("Cancel");
+        cancel.setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
         data = new GridData(GridData.FILL_HORIZONTAL);
         cancel.setLayoutData(data);
         cancel.addSelectionListener(new SelectionAdapter() {

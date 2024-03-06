@@ -36,6 +36,7 @@ public final class EmulatorScreen implements
     private static int threadCount;
     private long lastPollTime;
     private MenuItem fpsCounterMenuItem;
+    private MenuItem changeResolutionMenuItem;
 
     public Shell getShell() {
         return shell;
@@ -686,9 +687,11 @@ public final class EmulatorScreen implements
         this.rotate90MenuItem.setText(emulator.UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees") + "\tAlt+Y");
         this.rotate90MenuItem.addSelectionListener(this);
 
-
         (this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
         this.forcePaintMenuItem.addSelectionListener((SelectionListener) this);
+        (this.changeResolutionMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_SCREEN_SIZE", "Change screen size"));
+        this.changeResolutionMenuItem.addSelectionListener((SelectionListener) this);
+
         setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
         new MenuItem(this.menuView, 2);
         (this.aMenuItem956 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
@@ -1245,6 +1248,14 @@ public final class EmulatorScreen implements
                         (Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenCopyAwt);
                     }
                     ((Control) this.canvas).redraw();
+                    return;
+                }
+                if(menuItem.equals(changeResolutionMenuItem)) {
+                    ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
+                    int[] r = d.open();
+                    if(r != null) {
+                        rotate(r[0], r[1]);
+                    }
                     return;
                 }
                 if (menuItem.equals(this.aMenuItem964)) {
