@@ -683,7 +683,7 @@ public final class EmulatorScreen implements
         this.rotateScreenMenuItem.addSelectionListener((SelectionListener) this);
 
         this.rotate90MenuItem = new MenuItem(this.menuView, 8);
-        this.rotate90MenuItem.setText(emulator.UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees"));
+        this.rotate90MenuItem.setText(emulator.UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees") + "\tAlt+Y");
         this.rotate90MenuItem.addSelectionListener(this);
 
 
@@ -858,6 +858,7 @@ public final class EmulatorScreen implements
         this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
         this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
         this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
+        this.rotate90MenuItem.setAccelerator(SWT.ALT | 89);
         this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
         this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
         this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);

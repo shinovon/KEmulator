@@ -1,11 +1,5 @@
 package javax.microedition.location;
 
-import com.nokia.mid.impl.policy.PolicyAccess;
-import com.nokia.mid.s40.location.LocationUtil;
-import com.nokia.mid.s40.location.LocationUtil.LandmarkAccessorIF;
-
-import java.io.IOException;
-
 public class Landmark {
     private String name;
     private QualifiedCoordinates coordinates;
