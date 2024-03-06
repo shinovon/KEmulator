@@ -550,6 +550,7 @@ public final class Property implements IProperty {
             Settings.pollKeyboardOnRepaint = Boolean.valueOf(properties.getProperty("PollKeyboardOnRepaint", "true"));
             Settings.uiLanguage = properties.getProperty("UILanguage", "en");
             Settings.fpsCounter = Boolean.valueOf(properties.getProperty("FPSCounter", "true"));
+            Settings.synchronizeKeyEvents = Boolean.valueOf(properties.getProperty("SynchronizeKeyEvents", "true"));
             fileInputStream.close();
         } catch (Exception ex) {
             if (!(ex instanceof FileNotFoundException)) {
@@ -679,6 +680,7 @@ public final class Property implements IProperty {
             properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
             properties.setProperty("UILanguage", Settings.uiLanguage);
             properties.setProperty("FPSCounter", String.valueOf(Settings.fpsCounter));
+            properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         } catch (Exception ex) {
