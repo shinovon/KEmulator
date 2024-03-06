@@ -29,6 +29,7 @@ MENU_VIEW_TOP=Поверх всех окон
 MENU_VIEW_ROTATE=Повернуть экран
 MENU_VIEW_FORCE_PAINT=Принудительно обновить
 MENU_VIEW_ROTATE_90=Повернуть экран на 90 гр.
+MENU_VIEW_SCREEN_SIZE=Изменить размер экрана
 
 MENU_VIEW_KEYPAD=Окно кейпада
 MENU_VIEW_WATCHES=Классы
@@ -81,6 +82,7 @@ LINK_JAR_FILE=Открыть JAR
 
 DIALOG_OK=OK
 DIALOG_CANCEL=Отмена
+DIALOG_SET=ОК
 
 
 #Info show
@@ -311,4 +313,6 @@ PLATFORMREQUEST_VLC_ALERT=Приложение хочет открыть URL в 
 PERMISSION_CAMERA=Разрешить приложению использовать камеру?
 
 SECURITY_ALERT_TITLE=Безопасность
+
+SCREEN_SIZE_DIALOG_TITLE=Изменение размера экрана
 

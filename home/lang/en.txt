@@ -29,6 +29,7 @@ MENU_VIEW_TOP=Always On Top
 MENU_VIEW_ROTATE=Rotate Screen
 MENU_VIEW_FORCE_PAINT=Force Paint
 MENU_VIEW_ROTATE_90=Rotate 90 Degrees
+MENU_VIEW_SCREEN_SIZE=Change screen size
 
 MENU_VIEW_KEYPAD=Keypad
 MENU_VIEW_WATCHES=Watches
@@ -81,6 +82,7 @@ LINK_JAR_FILE=Specify a jar file
 
 DIALOG_OK=OK
 DIALOG_CANCEL=Cancel
+DIALOG_SET=Set
 
 
 #Info show
@@ -311,4 +313,6 @@ PLATFORMREQUEST_VLC_ALERT=Application wants to open URL in VLC
 PERMISSION_CAMERA=Allow the application to use camera?
 
 SECURITY_ALERT_TITLE=Security
+
+SCREEN_SIZE_DIALOG_TITLE=Set screen size
 
