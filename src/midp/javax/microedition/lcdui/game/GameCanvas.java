@@ -32,22 +32,23 @@ public abstract class GameCanvas extends Canvas {
         graphics.getImpl().drawImage(Emulator.getEmulator().getScreen().getBackBufferImage(), 0, 0);
     }
 
-    public void flushGraphics(final int n, final int n2, final int n3, final int n4) {
-        this.method220();
-    }
-
-    public void flushGraphics() {
-        this.method220();
-    }
-
-    private void method220() {
+    public void flushGraphics(final int x, final int y, final int w, final int h) {
         if (this != Emulator.getCanvas()) return;
         Displayable.checkForSteps();
         Displayable.fpsLimiter();
         if (graphics == null) getGraphics();
         this.paintSoftMenu(graphics);
-        Emulator.getEventQueue().queueGraphicsFlush();
-        Emulator.getEventQueue().waitGameRepaint();
+        Emulator.getEventQueue().gameGraphicsFlush(x, y, w, h);
+        Displayable.resetXRayGraphics();
+    }
+
+    public void flushGraphics() {
+        if (this != Emulator.getCanvas()) return;
+        Displayable.checkForSteps();
+        Displayable.fpsLimiter();
+        if (graphics == null) getGraphics();
+        this.paintSoftMenu(graphics);
+        Emulator.getEventQueue().gameGraphicsFlush();
         Displayable.resetXRayGraphics();
     }
 }

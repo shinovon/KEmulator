@@ -45,13 +45,13 @@ public abstract class Canvas extends Displayable {
         this.paintSoftMenu(graphics);
     }
 
-    public void invokePaint(IImage buffer, IImage xray, int[] region) {
+    public void invokePaint(IImage buffer, IImage xray, int x, int y, int w, int h) {
         if (!Settings.xrayView) xray = null;
         if (graphics == null) {
             graphics = new Graphics(buffer, xray);
         }
         graphics.reset(buffer, xray);
-        graphics.setClip(region[0], region[1], region[2], region[3]);
+        graphics.setClip(x, y, w, h);
         this.paint(graphics);
         this.paintTicker(graphics);
         this.paintSoftMenu(graphics);
@@ -123,10 +123,7 @@ public abstract class Canvas extends Displayable {
     }
 
     public void repaint() {
-        if (this != Emulator.getCurrentDisplay().getCurrent()) {
-            return;
-        }
-        Emulator.getEventQueue().queueRepaint();
+        repaint(0, 0, w, h);
     }
 
     public void repaint(final int x, final int y, final int w, final int h) {
