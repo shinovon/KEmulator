@@ -63,7 +63,8 @@ public class RecordStore {
             if (!file.exists()) {
                 if (aHomeSuite) {
                     // fallback
-                    file = new File(oldPath + "idx");
+                    file = new File(oldPath + ".idx");
+                    logln("Fallback to " + file.getAbsolutePath());
                     if (!file.exists()) throw new RecordStoreNotFoundException(name);
                     convert = true;
                 } else {
