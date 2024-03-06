@@ -42,6 +42,11 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$nnmod v2.15.1 [2024.03.07]
+Hotkey for "Rotate 90 degrees"
+Synchronized event queue
+Added "SynchronizeKeyEvents" property
+
 $nnmod v2.15 [2024.02.16]
 Set default fps limit to 60
 Updated localization prompts
