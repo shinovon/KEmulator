@@ -20,6 +20,8 @@ public final class EventQueue implements Runnable {
     private Thread inputThread;
     private int[] repaintRegion = new int[4];
     private Object lock = new Object();
+    private Object repaintLock = new Object();
+    private boolean repainted;
 
     public EventQueue() {
         super();
@@ -134,6 +136,9 @@ public final class EventQueue implements Runnable {
      * queue event
      */
     public synchronized void queue(final int n) {
+        if(n == 1) {
+            repainted = false;
+        }
         if (n == 15) {
             this.paused = false;
         }
@@ -185,9 +190,15 @@ public final class EventQueue implements Runnable {
     }
 
     public void serviceRepaints() {
-        synchronized(lock) {
-            internalRepaint();
-        }
+        if(Thread.currentThread() == eventThread || repainted) return;
+        try {
+            synchronized (repaintLock) {
+                repaintLock.wait();
+            }
+        } catch (Exception e) {}
+//        synchronized(lock) {
+//            internalRepaint();
+//        }
     }
 
     public final void run() {
@@ -356,36 +367,35 @@ public final class EventQueue implements Runnable {
             System.err.println("Exception in repaint!");
             e.printStackTrace();
         }
+        try {
+            synchronized(repaintLock) {
+                repaintLock.notify();
+            }
+        } catch (Exception e) {}
+        repainted = true;
     }
 
     private void internalGameFlush() {
-        try {
-            if (Emulator.getCanvas() == null
-                    || Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-                return;
-            }
-            final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
-            final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
-            final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
-            (Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
-            Emulator.getEmulator().getScreen().repaint();
-        } catch (Exception e) {
-            System.err.println("Exception in graphicsFlush!");
-            e.printStackTrace();
+        if (Emulator.getCanvas() == null
+                || Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
+            return;
         }
+        final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
+        final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
+        final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
+        (Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+        Emulator.getEmulator().getScreen().repaint();
     }
 
     private class InputThread implements Runnable {
         private Object[] elements;
 
         private Object readLock = new Object();
-        private int length;
         private int count;
         private boolean added;
-        private Object sync = new Object();
 
         private InputThread() {
-            elements = new Object[length = 16];
+            elements = new Object[16];
         }
 
         public void queue(int state, int arg1, int arg2, boolean key) {
@@ -393,13 +403,11 @@ public final class EventQueue implements Runnable {
         }
 
         private void append(Object o) {
-            synchronized (sync) {
-                if (count + 1 >= length) {
-                    // увеличивание массива
+            synchronized (this) {
+                if (count + 1 >= elements.length) {
                     Object[] tmp = elements;
-                    elements = new Object[length += 16];
+                    elements = new Object[tmp.length + 16];
                     System.arraycopy(tmp, 0, elements, 0, count);
-                    //System.out.println("Growed input buffer from " + (count + 1) + " to " + length);
                 }
             }
             elements[count++] = o;
@@ -432,8 +440,8 @@ public final class EventQueue implements Runnable {
                             System.out.println("Exception in Input Thread!");
                             e.printStackTrace();
                         }
-                        synchronized (sync) {
-                            System.arraycopy(elements, 1, elements, 0, length - 1);
+                        synchronized (this) {
+                            System.arraycopy(elements, 1, elements, 0, elements.length - 1);
                             elements[--count] = null;
                         }
                     }
