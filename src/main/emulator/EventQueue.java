@@ -132,9 +132,6 @@ public final class EventQueue implements Runnable {
         this.queue(n4);
     }
 
-    /**
-     * queue event
-     */
     public synchronized void queue(final int n) {
         if(n == 1) {
             repainted = false;
@@ -149,10 +146,7 @@ public final class EventQueue implements Runnable {
     }
 
     public void queueRepaint() {
-        repaintRegion[0] = -1;
-        repaintRegion[1] = -1;
-        repaintRegion[2] = -1;
-        repaintRegion[3] = -1;
+        repaintRegion[0] = repaintRegion[1] = repaintRegion[2] = repaintRegion[3] = -1;
         queue(1);
     }
 

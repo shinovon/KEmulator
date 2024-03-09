@@ -111,7 +111,7 @@ public abstract class Canvas extends Displayable {
         Emulator.getEventQueue().queueRepaint();
     }
 
-    protected abstract void paint(final Graphics p0);
+    protected abstract void paint(final Graphics g);
 
     protected void keyReleased(final int n) {
     }

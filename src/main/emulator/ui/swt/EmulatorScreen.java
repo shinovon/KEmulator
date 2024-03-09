@@ -147,7 +147,6 @@ public final class EmulatorScreen implements
     private boolean fpsWasBottom;
     private boolean fpsWasntVer;
     private MenuItem rotate90MenuItem;
-    private int keysPressed;
     private Vector<Integer> pressedKeys = new Vector<Integer>();
     private int lastDragTime;
     private int lastMouseX;
@@ -336,57 +335,46 @@ public final class EmulatorScreen implements
 
     public synchronized void pollKeyboard(Canvas canvas) {
         if (Settings.canvasKeyboard || !win || canvas == null || canvas.isDisposed()) return;
-        long time = System.currentTimeMillis();
-        if (time - lastPollTime < 10) return;
-        lastPollTime = time;
-        final boolean active = canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
-        if (win32OS == null) {
-            try {
-                win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
-            } catch (Exception e) {
-            }
-            if (win32OS == null)
-                return;
-        }
-        if (win32OSGetKeyState == null) {
-            win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", Integer.TYPE);
-            if (win32OSGetKeyState == null)
-                return;
-        }
-
         long now = System.currentTimeMillis();
-        for (int i = 0; i < keyboardButtonStates.length; i++) {
-            lastKeyboardButtonStates[i] = keyboardButtonStates[i];
-            short keyState;
-            try {
-                keyState = ((Short) win32OSGetKeyState.invoke(null, Integer.valueOf(i))).shortValue();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return;
+        if (now - lastPollTime < 10) return;
+        lastPollTime = now;
+        final boolean active = canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
+        try {
+            if (win32OS == null) {
+                win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
             }
-            //keyboardButtonStates[i] = active ? keyState/*org.eclipse.swt.internal.win32.OS.GetKeyState(i)*/ > 0 : false;
-            boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
-            if (!keyboardButtonStates[i]) {
-                if (pressed) {
-                    keyboardButtonStates[i] = true;
+            if (win32OSGetKeyState == null) {
+                if ((win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", Integer.TYPE)) == null)
+                    return;
+            }
+            for (int i = 0; i < keyboardButtonStates.length; i++) {
+                lastKeyboardButtonStates[i] = keyboardButtonStates[i];
+                short keyState = ((Short) win32OSGetKeyState.invoke(null, Integer.valueOf(i))).shortValue();
+                boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
+                if (!keyboardButtonStates[i]) {
+                    if (pressed) {
+                        keyboardButtonStates[i] = true;
+                        keyboardButtonHoldTimes[i] = 0;
+                        keyboardButtonDownTimes[i] = now;
+                        onKeyDown(i);
+                    }
+                } else if (!pressed) {
+                    keyboardButtonStates[i] = false;
                     keyboardButtonHoldTimes[i] = 0;
-                    keyboardButtonDownTimes[i] = now;
-                    onKeyDown(i);
+                    onKeyUp(i);
                 }
-            } else if (!pressed) {
-                keyboardButtonStates[i] = false;
-                keyboardButtonHoldTimes[i] = 0;
-                onKeyUp(i);
-            }
-            if (lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
-                if (keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
-                    keyboardButtonHoldTimes[i] = now;
-                }
-                if (now - keyboardButtonHoldTimes[i] >= 40) {
-                    keyboardButtonHoldTimes[i] = now;
-                    onKeyHeld(i);
+                if (lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
+                    if (keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
+                        keyboardButtonHoldTimes[i] = now;
+                    }
+                    if (now - keyboardButtonHoldTimes[i] >= 40) {
+                        keyboardButtonHoldTimes[i] = now;
+                        onKeyHeld(i);
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -1560,9 +1548,6 @@ public final class EmulatorScreen implements
 
 
     protected final void handleKeyPress(int n) {
-        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
-            return;
-        }
 		/*
 		if (Settings.fpsMode) {
 			int g = Keyboard.fpsKey(n);
@@ -1571,7 +1556,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 		}*/
-        if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
             return;
         }
         final String r;
@@ -1587,7 +1572,6 @@ public final class EmulatorScreen implements
         synchronized (pressedKeys) {
             if (!pressedKeys.contains(n)) {
                 pressedKeys.add(n);
-                keysPressed++;
             }
         }
         if (Settings.enableKeyCache) {
@@ -1601,9 +1585,7 @@ public final class EmulatorScreen implements
     }
 
     protected final void handleKeyRelease(int n) {
-        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
-            return;
-        }/*
+        /*
         if(Settings.fpsMode) {
         	int g = Keyboard.fpsKey(n);
         	if(g != 0) {
@@ -1611,20 +1593,15 @@ public final class EmulatorScreen implements
         		return;
         	}
         }*/
-        if ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
             return;
         }
         final String r;
         if ((r = KeyMapping.replaceKey(n)) == null) {
             return;
         }
-        Integer in = new Integer(n);
         synchronized (pressedKeys) {
-            if (!pressedKeys.contains(in)) {
-                return;
-            }
-            pressedKeys.remove(in);
-            keysPressed--;
+            pressedKeys.removeElement(n);
         }
 
         if (Settings.enableKeyCache) {
@@ -1708,8 +1685,7 @@ public final class EmulatorScreen implements
     private void onKeyDown(int n) {
         if (Settings.canvasKeyboard) return;
         n = key(n);
-        if (n <= 0) return;
-        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+        if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
         final String r;
@@ -1729,14 +1705,7 @@ public final class EmulatorScreen implements
     private void onKeyHeld(int n) {
         if (Settings.canvasKeyboard) return;
         n = key(n);
-        if (n <= 0) return;
-        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
-            return;
-        }
-        if (!Settings.enableKeyRepeat) {
-            return;
-        }
-        if (Settings.enableKeyCache) {
+        if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys || !Settings.enableKeyRepeat || Settings.enableKeyCache) {
             return;
         }
         String r = KeyMapping.replaceKey(n);
@@ -1749,8 +1718,7 @@ public final class EmulatorScreen implements
     private void onKeyUp(int n) {
         if (Settings.canvasKeyboard) return;
         n = key(n);
-        if (n <= 0) return;
-        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+        if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
         final String r;
