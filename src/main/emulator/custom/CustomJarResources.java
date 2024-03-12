@@ -15,8 +15,8 @@ public final class CustomJarResources {
         try {
             if (Emulator.midletJar != null) {
                 String substring = s;
-                if (s.length() > 0 && s.startsWith("/")) {
-                    substring = s.substring(1);
+                while (substring.length() > 0 && substring.startsWith("/")) {
+                    substring = substring.substring(1);
                 }
                 final ZipFile zipFile;
                 final ZipEntry entry;
