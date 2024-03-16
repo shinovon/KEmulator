@@ -47,8 +47,9 @@ Hotkey for "Rotate 90 degrees"
 Synchronized event queue
 Added "SynchronizeKeyEvents" property
 Added change screen size dialog
-RMS fallback fix
 Fix loading resources with double slash in path
+Fixed listRecordStores always returning empty array (v2.14-v2.15 bug)
+RMS fallback fix
 
 $nnmod v2.15 [2024.02.16]
 Set default fps limit to 60
