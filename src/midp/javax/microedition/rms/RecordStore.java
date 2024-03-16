@@ -260,7 +260,7 @@ public class RecordStore {
             ArrayList<String> tmp = new ArrayList<String>();
             if (list != null) {
                 for (String s : list) {
-                    if (!new File(file.getAbsolutePath() + "/" + s + "/.idx").exists())
+                    if (!new File(file.getAbsolutePath() + "/" + s + "/idx").exists())
                         continue;
                     tmp.add(decodeBase64(s));
                 }
