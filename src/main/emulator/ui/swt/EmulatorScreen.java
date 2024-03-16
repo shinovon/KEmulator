@@ -334,11 +334,11 @@ public final class EmulatorScreen implements
     boolean win = System.getProperty("os.name").startsWith("Win");
 
     public synchronized void pollKeyboard(Canvas canvas) {
-        if (Settings.canvasKeyboard || !win || canvas == null || canvas.isDisposed()) return;
+        if (!win || canvas == null || canvas.isDisposed()) return;
         long now = System.currentTimeMillis();
         if (now - lastPollTime < 10) return;
         lastPollTime = now;
-        final boolean active = canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
+        final boolean active = !Settings.canvasKeyboard && canvas.getDisplay().getActiveShell() == canvas.getShell() && canvas.getShell().isVisible();
         try {
             if (win32OS == null) {
                 win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
