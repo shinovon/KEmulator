@@ -42,11 +42,13 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$nnmod v2.15.1 [2024.03.07]
+$nnmod v2.15.1 [2024.03.12]
 Hotkey for "Rotate 90 degrees"
 Synchronized event queue
 Added "SynchronizeKeyEvents" property
 Added change screen size dialog
+RMS fallback fix
+Fix loading resources with double slash in path
 
 $nnmod v2.15 [2024.02.16]
 Set default fps limit to 60
