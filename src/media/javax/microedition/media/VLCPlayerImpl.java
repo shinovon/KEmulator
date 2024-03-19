@@ -514,7 +514,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
     public long setMediaTime(long p0) throws MediaException {
         mediaPlayer.controls().setTime(p0 / 1000L);
-        return mediaPlayer.status().time();
+        return mediaPlayer.status().time() * 1000L;
     }
 
     public Object getItem() {

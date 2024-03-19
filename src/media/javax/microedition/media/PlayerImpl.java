@@ -423,7 +423,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             return midiPosition;
         }
         if (this.sequence instanceof Player) {
-            return ((Player) this.sequence).getPosition() * 1000;
+            return ((Player) this.sequence).getPosition() * 1000L;
         }
         return -1L;
     }
@@ -447,14 +447,14 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 this.midiSequencer.setMicrosecondPosition(ms);
         } else if (this.sequence instanceof Player) {
             long l = getMediaTime();
-            if (t == 0 && l == t)
+            if (t == 0 && l == 0)
                 return 0;
             if (t < l) {
                 try {
                     Header old = ((Player) sequence).bitstream().header;
                     ((Player) sequence).reset();
                     ((Player) sequence).skip((int) (t / 1000L), old);
-                    ms = ((Player) sequence).getPosition();
+                    ms = ((Player) sequence).getPosition() * 1000L;
                 } catch (JavaLayerException e) {
                     throw new MediaException(e);
                 }
@@ -463,7 +463,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                     Header old = ((Player) sequence).bitstream().header;
                     ((Player) sequence).reset();
                     ((Player) sequence).skip((int) (t / 1000L), old);
-                    ms = ((Player) sequence).getPosition();
+                    ms = ((Player) sequence).getPosition() * 1000L;
                 } catch (JavaLayerException e) {
                     throw new MediaException(e);
                 }
