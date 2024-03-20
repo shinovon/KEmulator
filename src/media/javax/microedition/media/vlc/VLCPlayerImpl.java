@@ -60,7 +60,6 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     public int dataLen;
     private Vector listeners;
     private TimeBase timeBase;
-
     private String url;
     private String mediaUrl;
     private InputStream inputStream;
@@ -89,12 +88,68 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
     private VideoControl videoControl;
     private VolumeControl volumeControl;
-    private FramePositioningControl frameControl;
     private RateControl rateControl;
     private StopTimeControl stopTimeControl;
 
     long stopTime = StopTimeControl.RESET;
     private boolean stoppedAtTime;
+
+    private VLCPlayerImpl() {
+        this.listeners = new Vector();
+        videoControl = new VideoControlImpl(this);
+        volumeControl = new VolumeControlImpl(this);
+        rateControl = new RateControlImpl(this);
+        stopTimeControl = new StopTimeControlImpl(this);
+        controls = new Control[]{videoControl, volumeControl, rateControl, stopTimeControl};
+        this.timeBase = Manager.getSystemTimeBase();
+        PlayerImpl.players.add(this);
+    }
+
+    public VLCPlayerImpl(String url) throws IOException {
+        this();
+        if (url.startsWith("file:///root/")) {
+            url = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
+        }
+        this.url = url;
+        this.mediaUrl = url;
+        this.state = UNREALIZED;
+    }
+
+    public VLCPlayerImpl(InputStream inputStream, String type) throws IOException {
+        this();
+        this.contentType = type;
+        this.inputStream = inputStream;
+        this.state = UNREALIZED;
+    }
+
+    public VLCPlayerImpl(String contentType, DataSource src) throws IOException {
+        this();
+        this.contentType = contentType;
+        this.dataSource = src;
+        this.state = UNREALIZED;
+    }
+
+    public VLCPlayerImpl(String locator, String contentType, DataSource src) throws IOException {
+        this();
+        if (locator.startsWith("file:///root/")) {
+            locator = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
+        }
+        this.url = locator;
+        this.mediaUrl = locator;
+        this.state = UNREALIZED;
+        this.dataSource = src;
+    }
+
+    public VLCPlayerImpl(String url, String contentType) throws IOException {
+        this();
+        if (url.startsWith("file:///root/")) {
+            url = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
+        }
+        this.url = url;
+        this.mediaUrl = url;
+        this.contentType = contentType;
+        this.state = UNREALIZED;
+    }
 
     public static void draw(Graphics g, Object obj) {
         if (inst != null) {
@@ -173,68 +228,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         return null;
     }
 
-    public VLCPlayerImpl(String url) throws IOException {
-        this();
-        if (url.startsWith("file:///root/")) {
-            url = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
-        }
-        this.url = url;
-        this.mediaUrl = url;
-        this.state = UNREALIZED;
-    }
-
-    public VLCPlayerImpl(InputStream inputStream, String type) throws IOException {
-        this();
-        this.contentType = type;
-        this.inputStream = inputStream;
-        this.state = UNREALIZED;
-    }
-
-    private VLCPlayerImpl() throws IOException {
-        PlayerImpl.players.add(this);
-        this.listeners = new Vector();
-//        frameControl = new FramePositioningControlI();
-        videoControl = new VideoControlImpl(this);
-        volumeControl = new VolumeControlImpl(this);
-        rateControl = new RateControlImpl(this);
-        stopTimeControl = new StopTimeControlImpl(this);
-        controls = new Control[]{videoControl, volumeControl};
-        this.timeBase = Manager.getSystemTimeBase();
-    }
-
-    public VLCPlayerImpl(String contentType, DataSource src) throws IOException {
-        this();
-        this.contentType = contentType;
-        this.dataSource = src;
-        this.state = UNREALIZED;
-    }
-
-    public VLCPlayerImpl(String locator, String contentType, DataSource src) throws IOException {
-        this();
-        if (locator.startsWith("file:///root/")) {
-            locator = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
-        }
-        this.url = locator;
-        this.mediaUrl = locator;
-        this.state = UNREALIZED;
-        this.dataSource = src;
-    }
-
-    public VLCPlayerImpl(String url, String contentType) throws IOException {
-        this();
-        if (url.startsWith("file:///root/")) {
-            url = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
-        }
-        this.url = url;
-        this.mediaUrl = url;
-        this.contentType = contentType;
-        this.state = UNREALIZED;
-    }
-
     public Control getControl(String s) {
-        if (s.contains("FramePositioningControl")) {
-            return frameControl;
-        }
         if (s.contains("GUIControl") || s.contains("VideoControl")) {
             return videoControl;
         }
@@ -347,7 +341,6 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
             } catch (Exception e) {
                 throw new MediaException(e);
             }
-            //System.out.println("prepared");
             prepared = true;
         }
         this.state = PREFETCHED;
