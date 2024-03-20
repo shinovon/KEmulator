@@ -29,6 +29,7 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.media.control.FramePositioningControl;
+import javax.microedition.media.control.RateControl;
 import javax.microedition.media.control.VideoControl;
 import javax.microedition.media.control.VolumeControl;
 import javax.microedition.media.protocol.DataSource;
@@ -53,16 +54,15 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters;
 
 public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
+    private static VLCPlayerImpl inst;
+
     private Control[] controls;
     private String contentType;
     private int state;
-    private FramePositioningControl frameControl;
     public int dataLen;
-    private int loopCount;
     private Vector listeners;
     private TimeBase timeBase;
-    private VideoControl videoControl;
-    private VolumeControl volumeControl;
+
     private String url;
     private String mediaUrl;
     private InputStream inputStream;
@@ -86,9 +86,13 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     private int vol = -1;
     private CallbackMedia mediaCallback;
     private File tempFile;
-    private static VLCPlayerImpl inst;
 
     private boolean started;
+
+    private VideoControl videoControl;
+    private VolumeControl volumeControl;
+    private FramePositioningControl frameControl;
+    private RateControl rateControl;
 
     public static void draw(Graphics g, Object obj) {
         if (inst != null) {
@@ -186,11 +190,11 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
     private VLCPlayerImpl() throws IOException {
         PlayerImpl.players.add(this);
-        this.loopCount = 1;
         this.listeners = new Vector();
 //        frameControl = new FramePositioningControlI();
         videoControl = new VideoControlI();
         volumeControl = new VolumeControlI();
+        rateControl = new RateControlI();
         controls = new Control[]{videoControl, volumeControl};
         this.timeBase = Manager.getSystemTimeBase();
     }
@@ -465,14 +469,16 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     }
 
     public long getDuration() {
-        if (mediaPlayer == null) return 0;
-        if (mediaPlayer.status() == null) return 0;
+        if (released || mediaPlayer == null)
+            throw new IllegalStateException();
+        if (mediaPlayer.status() == null) return TIME_UNKNOWN;
         return mediaPlayer.status().length() * 1000L;
     }
 
     public long getMediaTime() {
-        if (mediaPlayer == null) return 0;
-        if (mediaPlayer.status() == null) return 0;
+        if (released || mediaPlayer == null)
+            throw new IllegalStateException();
+        if (mediaPlayer.status() == null) return TIME_UNKNOWN;
         return mediaPlayer.status().time() * 1000L;
     }
 
@@ -494,6 +500,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     }
 
     public Object getItem() {
+        // TODO
         return null;
     }
 
@@ -523,7 +530,6 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     public void setLoopCount(int p0) {
         if (p0 == -1) {
             mediaPlayer.controls().setRepeat(true);
-        } else {
         }
     }
 
@@ -703,6 +709,35 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
             }
             canvas = p1;
             return null;
+        }
+    }
+
+    class RateControlI implements RateControl {
+
+        private static final int MAX_RATE = 200000;
+        private static final int MIN_RATE = 50000;
+
+        public int getMaxRate() {
+            return MAX_RATE;
+        }
+
+        public int getMinRate() {
+            return MIN_RATE;
+        }
+
+        public int getRate() {
+            if (released || mediaPlayer == null)
+                throw new IllegalStateException();
+            return (int) (mediaPlayer.status().rate() * 100000);
+        }
+
+        public int setRate(int millirate) {
+            if (released || mediaPlayer == null)
+                throw new IllegalStateException();
+            if(millirate > MAX_RATE) millirate = MAX_RATE;
+            if(millirate < MIN_RATE) millirate = MIN_RATE;
+            mediaPlayer.controls().setRate(millirate / 100000F);
+            return getRate();
         }
     }
 
