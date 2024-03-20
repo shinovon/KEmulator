@@ -4,10 +4,8 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.custom.*;
 import uk.co.caprica.vlcj.binding.LibC;
-import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
-import uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
 import uk.co.caprica.vlcj.factory.discovery.strategy.BaseNativeDiscoveryStrategy;
 import uk.co.caprica.vlcj.factory.discovery.strategy.LinuxNativeDiscoveryStrategy;
 import uk.co.caprica.vlcj.factory.discovery.strategy.NativeDiscoveryStrategy;
@@ -16,16 +14,15 @@ import uk.co.caprica.vlcj.factory.discovery.strategy.WindowsNativeDiscoveryStrat
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
 import javax.microedition.io.*;
 import javax.microedition.io.file.FileConnectionImpl;
 import javax.microedition.media.protocol.DataSource;
+import javax.microedition.media.vlc.VLCPlayerImpl;
 
 import com.nokia.microedition.media.BufferDataSource;
-import com.sun.jna.Native;
 
 public class Manager {
     public static final String TONE_DEVICE_LOCATOR = "device://tone";

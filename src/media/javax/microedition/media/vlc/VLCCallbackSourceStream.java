@@ -1,4 +1,4 @@
-package javax.microedition.media;
+package javax.microedition.media.vlc;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package javax.microedition.media;
+package javax.microedition.media.vlc;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -28,10 +28,8 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import javax.microedition.media.control.FramePositioningControl;
-import javax.microedition.media.control.RateControl;
-import javax.microedition.media.control.VideoControl;
-import javax.microedition.media.control.VolumeControl;
+import javax.microedition.media.*;
+import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
 
 import emulator.Emulator;
@@ -67,7 +65,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     private String mediaUrl;
     private InputStream inputStream;
     private boolean playing;
-    private Object canvas;
+    Object canvas;
     public boolean isItem;
     public int displayX, displayY;
     public int width, height;
@@ -77,13 +75,13 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     private boolean prepared;
     public int bufferWidth, bufferHeight;
     private MediaPlayerFactory factory;
-    private EmbeddedMediaPlayer mediaPlayer;
+    EmbeddedMediaPlayer mediaPlayer;
     public BufferedImage img;
     public ByteBuffer bb;
-    private boolean released;
+    boolean released;
     private DataSource dataSource;
     private boolean lengthNotified;
-    private int vol = -1;
+    int volume = -1;
     private CallbackMedia mediaCallback;
     private File tempFile;
 
@@ -93,6 +91,10 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     private VolumeControl volumeControl;
     private FramePositioningControl frameControl;
     private RateControl rateControl;
+    private StopTimeControl stopTimeControl;
+
+    long stopTime = StopTimeControl.RESET;
+    private boolean stoppedAtTime;
 
     public static void draw(Graphics g, Object obj) {
         if (inst != null) {
@@ -150,7 +152,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         return new Image(new d(img));
     }
 
-    private static byte[] imgToBytes(BufferedImage img) {
+    static byte[] imgToBytes(BufferedImage img) {
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ImageOutputStream ios = ImageIO.createImageOutputStream(os);
@@ -192,9 +194,10 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         PlayerImpl.players.add(this);
         this.listeners = new Vector();
 //        frameControl = new FramePositioningControlI();
-        videoControl = new VideoControlI();
-        volumeControl = new VolumeControlI();
-        rateControl = new RateControlI();
+        videoControl = new VideoControlImpl(this);
+        volumeControl = new VolumeControlImpl(this);
+        rateControl = new RateControlImpl(this);
+        stopTimeControl = new StopTimeControlImpl(this);
         controls = new Control[]{videoControl, volumeControl};
         this.timeBase = Manager.getSystemTimeBase();
     }
@@ -237,6 +240,12 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         }
         if (s.contains("VolumeControl")) {
             return volumeControl;
+        }
+        if(s.contains("RateControl")) {
+            return rateControl;
+        }
+        if (s.contains("StopTimeControl")) {
+            return stopTimeControl;
         }
         return null;
     }
@@ -439,9 +448,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
             } else {
                 mediaPlayer.controls().play();
             }
-            if (vol == -1) {
-                notifyListeners(PlayerListener.VOLUME_CHANGED, vol = 50);
-                mediaPlayer.audio().setVolume(vol);
+            if (volume == -1) {
+                notifyListeners(PlayerListener.VOLUME_CHANGED, volume = 50);
+                mediaPlayer.audio().setVolume(volume);
             }
             playing = true;
             state = STARTED;
@@ -544,201 +553,6 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
             throw new IllegalStateException();
         }
         return this.timeBase;
-    }
-
-//    class FramePositioningControlI implements FramePositioningControl {
-//
-//        @Override
-//        public long mapFrameToTime(int frameNumber) {
-//            return -1;
-//        }
-//
-//        @Override
-//        public int mapTimeToFrame(long mediaTime) {
-//            return -1;
-//        }
-//
-//        @Override
-//        public int seek(int frameNumber) {
-//            return 0;
-//        }
-//
-//        @Override
-//        public int skip(int framesToSkip) {
-//            return 0;
-//        }
-//
-//    }
-
-    class VolumeControlI implements VolumeControl {
-
-        public int getLevel() {
-            if (released || mediaPlayer == null)
-                throw new IllegalStateException();
-            if (isMuted()) return 0;
-            return vol = mediaPlayer.audio().volume();
-        }
-
-        public boolean isMuted() {
-            if (released || mediaPlayer == null)
-                throw new IllegalStateException();
-            return mediaPlayer.audio().isMute();
-        }
-
-        public int setLevel(int p0) {
-            if (released || mediaPlayer == null)
-                throw new IllegalStateException();
-            if (isMuted()) return 0;
-            mediaPlayer.audio().setVolume(p0);
-            notifyListeners(PlayerListener.VOLUME_CHANGED, mediaPlayer.audio().volume());
-            return vol = mediaPlayer.audio().volume();
-        }
-
-        public void setMute(boolean p0) {
-            if (released || mediaPlayer == null)
-                throw new IllegalStateException();
-            mediaPlayer.audio().setMute(p0);
-        }
-
-    }
-
-    class VideoControlI implements VideoControl {
-
-        @Override
-        public int getDisplayHeight() {
-            return width;
-        }
-
-        @Override
-        public int getDisplayWidth() {
-            return height;
-        }
-
-        @Override
-        public int getDisplayX() {
-            return displayX;
-        }
-
-        @Override
-        public int getDisplayY() {
-            return displayY;
-        }
-
-        @Override
-        public void setDisplayFullScreen(boolean b) {
-            fullscreen = b;
-        }
-
-        @Override
-        public void setDisplayLocation(int x, int y) {
-            displayX = x;
-            displayY = y;
-        }
-
-        @Override
-        public void setDisplaySize(int w, int h) {
-            if(width == w && height == h) return;
-            width = w;
-            height = h;
-            notifyListeners(PlayerListener.SIZE_CHANGED, videoControl);
-        }
-
-        @Override
-        public void setVisible(boolean b) {
-            visible = b;
-        }
-
-        @Override
-        public int getSourceHeight() {
-            if (released || mediaPlayer == null) {
-                throw new IllegalStateException();
-            }
-            try {
-                if (mediaPlayer.video().videoDimension() == null) {
-                    mediaPlayer.media().parsing().parse();
-                    Thread.sleep(100L);
-                }
-                sourceHeight = mediaPlayer.video().videoDimension().height;
-            } catch (Exception e) {}
-            if (sourceHeight == 0)
-                sourceHeight = bufferHeight;
-            return sourceHeight;
-        }
-
-        @Override
-        public int getSourceWidth() {
-            if (released || mediaPlayer == null) {
-                throw new IllegalStateException();
-            }
-            try {
-                if (mediaPlayer.video().videoDimension() == null) {
-                    mediaPlayer.media().parsing().parse();
-                    Thread.sleep(100L);
-                }
-                sourceWidth = mediaPlayer.video().videoDimension().width;
-            } catch (Exception e) {}
-            if (sourceWidth == 0)
-                sourceWidth = bufferWidth;
-            return sourceWidth;
-        }
-
-        @Override
-        public byte[] getSnapshot(String p0) throws MediaException {
-            if (released || mediaPlayer == null)
-                throw new IllegalStateException();
-            if (img != null) {
-                return imgToBytes(img);
-            }
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(mediaPlayer.snapshots().get(), "JPEG", os);
-                byte[] bytes = os.toByteArray();
-                os.close();
-                return bytes;
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new MediaException(e);
-            }
-        }
-
-        @Override
-        public Object initDisplayMode(int p0, Object p1) {
-            if (p0 == 0) {
-                isItem = true;
-                return getItem();
-            }
-            canvas = p1;
-            return null;
-        }
-    }
-
-    class RateControlI implements RateControl {
-
-        private static final int MAX_RATE = 200000;
-        private static final int MIN_RATE = 50000;
-
-        public int getMaxRate() {
-            return MAX_RATE;
-        }
-
-        public int getMinRate() {
-            return MIN_RATE;
-        }
-
-        public int getRate() {
-            if (released || mediaPlayer == null)
-                throw new IllegalStateException();
-            return (int) (mediaPlayer.status().rate() * 100000);
-        }
-
-        public int setRate(int millirate) {
-            if (released || mediaPlayer == null)
-                throw new IllegalStateException();
-            if(millirate > MAX_RATE) millirate = MAX_RATE;
-            if(millirate < MIN_RATE) millirate = MIN_RATE;
-            mediaPlayer.controls().setRate(millirate / 100000F);
-            return getRate();
-        }
     }
 
     private class MyVideoSurface extends CallbackVideoSurface {
@@ -883,6 +697,11 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     @Override
     public void paused(MediaPlayer arg0) {
         this.state = PREFETCHED;
+        if(stoppedAtTime) {
+            notifyListeners(PlayerListener.STOPPED_AT_TIME, getMediaTime());
+            stoppedAtTime = false;
+            return;
+        }
         notifyListeners(PlayerListener.STOPPED, getMediaTime());
     }
 
@@ -907,11 +726,22 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     @Override
     public void stopped(MediaPlayer arg0) {
         this.state = PREFETCHED;
+        if(stoppedAtTime) {
+            notifyListeners(PlayerListener.STOPPED_AT_TIME, getMediaTime());
+            stoppedAtTime = false;
+            return;
+        }
         notifyListeners(PlayerListener.STOPPED, getMediaTime());
     }
 
     @Override
-    public void timeChanged(MediaPlayer arg0, long arg1) {
+    public void timeChanged(MediaPlayer arg0, long time) {
+        if(stopTime != StopTimeControl.RESET && time >= stopTime/1000L && time <= stopTime/1000L + 1000) {
+            stoppedAtTime = true;
+            try {
+                stop();
+            } catch (MediaException e) {}
+        }
     }
 
     @Override

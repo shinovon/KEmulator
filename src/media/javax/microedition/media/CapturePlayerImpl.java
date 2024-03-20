@@ -1,31 +1,24 @@
 package javax.microedition.media;
 
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
 import javax.microedition.amms.control.camera.CameraControl;
 import javax.microedition.amms.control.camera.FlashControl;
 import javax.microedition.amms.control.camera.FocusControl;
-import javax.microedition.amms.control.imageeffect.ImageTransformControl;
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Item;
 import javax.microedition.media.control.VideoControl;
 import javax.microedition.media.control.CameraVideoControlImpl;
+import javax.microedition.media.vlc.VLCPlayerImpl;
 
 import com.github.sarxos.webcam.Webcam;
 
-import emulator.Emulator;
 import emulator.Permission;
 import emulator.graphics2D.awt.d;
 
