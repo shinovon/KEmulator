@@ -44,6 +44,7 @@ log.txt      log file
 $[Changelog]
 $2024.03.20
 Fix Player.setMediaTime returning wrong values
+Implemented RateControl, StopTimeControl in VLCPlayerImpl
 
 $nnmod v2.15.1 [2024.03.16]
 Hotkey for "Rotate 90 degrees"

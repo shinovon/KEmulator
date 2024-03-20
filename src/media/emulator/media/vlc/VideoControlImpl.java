@@ -1,4 +1,4 @@
-package javax.microedition.media.vlc;
+package emulator.media.vlc;
 
 import javax.imageio.ImageIO;
 import javax.microedition.media.MediaException;

@@ -1,4 +1,4 @@
-package javax.microedition.media.vlc;
+package emulator.media.vlc;
 
 import javax.microedition.media.control.StopTimeControl;
 

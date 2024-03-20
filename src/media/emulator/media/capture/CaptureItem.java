@@ -1,8 +1,7 @@
-package javax.microedition.media;
+package emulator.media.capture;
 
 import javax.microedition.lcdui.CustomItem;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Item;
 
 public class CaptureItem extends CustomItem {
 
@@ -31,7 +30,6 @@ public class CaptureItem extends CustomItem {
 
     protected void paint(Graphics g, int p1, int p2) {
         pl.paint(g);
-
     }
 
 }

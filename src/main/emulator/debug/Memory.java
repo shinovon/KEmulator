@@ -21,7 +21,7 @@ import com.samsung.util.AudioClip;
 
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
-import javax.microedition.media.vlc.VLCPlayerImpl;
+import emulator.media.vlc.VLCPlayerImpl;
 
 public final class Memory {
     public Hashtable table;

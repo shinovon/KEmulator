@@ -1,4 +1,4 @@
-package javax.microedition.media.vlc;
+package emulator.media.vlc;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -601,7 +601,10 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         return resize(img, tw, th);
     }
 
-    private static BufferedImage resize(BufferedImage original, int w, int h) {
+    public static BufferedImage resize(BufferedImage original, int w, int h) {
+        if(w == -1) {
+            w = (int) (((double) original.getWidth() / (double) original.getHeight()) * (double) h);
+        }
         try {
             BufferedImage resized = new BufferedImage(w, h, original.getType());
             Graphics2D g = resized.createGraphics();

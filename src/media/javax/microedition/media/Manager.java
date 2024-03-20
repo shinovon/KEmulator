@@ -3,6 +3,7 @@ package javax.microedition.media;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.custom.*;
+import emulator.media.capture.CapturePlayerImpl;
 import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
@@ -20,7 +21,7 @@ import java.util.Vector;
 import javax.microedition.io.*;
 import javax.microedition.io.file.FileConnectionImpl;
 import javax.microedition.media.protocol.DataSource;
-import javax.microedition.media.vlc.VLCPlayerImpl;
+import emulator.media.vlc.VLCPlayerImpl;
 
 import com.nokia.microedition.media.BufferDataSource;
 

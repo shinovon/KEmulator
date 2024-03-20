@@ -2,7 +2,7 @@ package javax.microedition.lcdui;
 
 import java.util.*;
 
-import javax.microedition.media.CapturePlayerImpl;
+import emulator.media.capture.CapturePlayerImpl;
 
 import emulator.*;
 import emulator.debug.*;

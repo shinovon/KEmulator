@@ -1,8 +1,7 @@
-package javax.microedition.media.control;
+package emulator.media.capture;
 
 import javax.microedition.media.MediaException;
-import javax.microedition.media.CapturePlayerImpl;
-import javax.microedition.media.Player;
+import javax.microedition.media.control.VideoControl;
 
 public class CameraVideoControlImpl implements VideoControl {
 

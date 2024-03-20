@@ -1,4 +1,4 @@
-package javax.microedition.media.vlc;
+package emulator.media.vlc;
 
 import javax.microedition.media.PlayerListener;
 import javax.microedition.media.control.VolumeControl;
