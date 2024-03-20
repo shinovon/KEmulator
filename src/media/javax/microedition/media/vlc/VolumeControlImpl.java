@@ -29,8 +29,8 @@ class VolumeControlImpl implements VolumeControl {
             throw new IllegalStateException();
         if (isMuted()) return 0;
         player.mediaPlayer.audio().setVolume(p0);
-        player.notifyListeners(PlayerListener.VOLUME_CHANGED, player.mediaPlayer.audio().volume());
-        return player.volume = player.mediaPlayer.audio().volume();
+        player.notifyListeners(PlayerListener.VOLUME_CHANGED, player.volume = player.mediaPlayer.audio().volume());
+        return player.volume;
     }
 
     public void setMute(boolean p0) {
