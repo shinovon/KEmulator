@@ -231,8 +231,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     private static MidiDevice midiDevice;
-    private static Sequencer midiSequencer;
-    private static PlayerImpl currentMidiPlayer;
+    static Sequencer midiSequencer;
+    public static PlayerImpl currentMidiPlayer;
     private static boolean midiPlaying;
     private long midiPosition;
 
@@ -243,37 +243,34 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         } catch (Exception e) {
             this.sequence = null;
         }
-        try {
-            if (midiDevice == null) {
-                midiDevice = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
-                midiDevice.open();
-            }
-            if (midiSequencer == null) {
-                midiSequencer = MidiSystem.getSequencer();
-                for (Transmitter t : midiSequencer.getTransmitters()) {
-                    t.setReceiver(midiDevice.getReceiver());
-                }
-                midiSequencer.addMetaEventListener(new MetaEventListener() {
-                    @Override
-                    public void meta(MetaMessage meta) {
-                        if (meta.getType() == 47) {
-                            if (currentMidiPlayer != null) {
-                                currentMidiPlayer.midiCompleted = true;
-                            }
-                        }
-                    }
-                });
-                midiSequencer.open();
-            }
-        } catch (Exception ex2) {
-            ex2.printStackTrace();
-            this.sequence = null;
-            throw new IOException(ex2.toString());
-        }
         this.midiControl = new MIDIControlImpl(this);
         this.toneControl = new ToneControlImpl();
         this.volumeControl = new VolumeControlImpl(this);
         this.controls = new Control[]{this.toneControl, this.volumeControl, this.midiControl};
+    }
+
+    static void initMIDIDevice() throws MidiUnavailableException {
+        if (midiDevice == null) {
+            midiDevice = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
+            midiDevice.open();
+        }
+        if (midiSequencer == null) {
+            midiSequencer = MidiSystem.getSequencer();
+            for (Transmitter t : midiSequencer.getTransmitters()) {
+                t.setReceiver(midiDevice.getReceiver());
+            }
+            midiSequencer.addMetaEventListener(new MetaEventListener() {
+                @Override
+                public void meta(MetaMessage meta) {
+                    if (meta.getType() == 47) {
+                        if (currentMidiPlayer != null) {
+                            currentMidiPlayer.midiCompleted = true;
+                        }
+                    }
+                }
+            });
+            midiSequencer.open();
+        }
     }
 
     public void addPlayerListener(final PlayerListener playerListener) throws IllegalStateException {
@@ -453,6 +450,23 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         } else if (this.state != REALIZED) {
             return;
         }
+        if (sequence instanceof Sequence) {
+            try {
+                initMIDIDevice();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MediaException(e);
+            }
+            try {
+                if (this.sequence != null) {
+                    midiSequencer.setSequence((Sequence) this.sequence);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.sequence = null;
+                throw new MediaException(e.toString());
+            }
+        }
         if (this.dataSource != null) {
             try {
                 this.dataSource.connect();
@@ -470,18 +484,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         }
         if (this.state == UNREALIZED) {
             this.state = REALIZED;
-        }
-        if (sequence instanceof Sequence) {
-            try {
-                this.midiSequencer.open();
-                if (this.sequence != null) {
-                    this.midiSequencer.setSequence((Sequence) this.sequence);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                this.sequence = null;
-                throw new MediaException(e.toString());
-            }
         }
         if (dataSource != null) {
             try {
@@ -544,6 +546,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     public void start() throws IllegalStateException, MediaException {
         if (this.state == CLOSED) {
             throw new IllegalStateException();
+        }
+        if(state < PREFETCHED && sequence instanceof Sequence) {
+            prefetch();
         }
         if (this.state != STARTED) {
             if (sequence != null) {
@@ -716,17 +721,46 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         }
     }
 
-    public void setMIDIChannelVolume(final int n, final int n2) {
-        if (sequence == null) return;
-        if (this.sequence instanceof Sequence) {
-            try {
-                Receiver r = midiSequencer.getTransmitters().iterator().next().getReceiver();
-                ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, (int) (n2 * 127.0));
-                r.send(shortMessage, -1L);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+    public static void setMIDIChannelVolume(final int n, final int n2) {
+        try {
+            Receiver r = getMidiReceiver();
+            ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, (int) (n2 * 127.0));
+            r.send(shortMessage, -1L);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+    }
+
+    public static void shortMidiEvent(int type, int data1, int data2) {
+        try {
+            Receiver r = getMidiReceiver();
+            ShortMessage shortMessage = new ShortMessage(type, data1, data2);
+            r.send(shortMessage, -1L);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static int longMidiEvent(byte[] data, int offset, int length) {
+        byte[] b = new byte[length];
+        System.arraycopy(data, offset, b, 0, length);
+        try {
+            Receiver r = getMidiReceiver();
+            MidiMessage msg = new MidiMessage(b) {
+                public Object clone() {
+                    return null;
+                }
+            };
+            r.send(msg, -1L);
+            return length;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
+    private static Receiver getMidiReceiver() {
+        return midiSequencer.getTransmitters().iterator().next().getReceiver();
     }
 
     public TimeBase getTimeBase() {

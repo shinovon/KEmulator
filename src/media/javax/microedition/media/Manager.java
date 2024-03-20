@@ -27,6 +27,7 @@ import com.nokia.microedition.media.BufferDataSource;
 
 public class Manager {
     public static final String TONE_DEVICE_LOCATOR = "device://tone";
+    public static final String MIDI_DEVICE_LOCATOR = "device://midi";
     public static final String CONTENT_TYPE_UNKNOWN = "unknown";
     public static final String CONTENT_TYPE_MIDI = "audio/midi";
     public static final String CONTENT_TYPE_XMIDI = "audio/x-midi";
@@ -74,8 +75,11 @@ public class Manager {
 
     public static Player createPlayer(String s) throws IOException, MediaException {
         log("createPlayer " + s);
-        if (s.startsWith("device://tone")) {
+        if (s.startsWith(TONE_DEVICE_LOCATOR)) {
             return new ToneImpl();
+        }
+        if (s.startsWith(MIDI_DEVICE_LOCATOR)) {
+            return new MIDIImpl();
         }
         if (s.startsWith("capture://image") || s.startsWith("capture://video")) {
             return new CapturePlayerImpl();

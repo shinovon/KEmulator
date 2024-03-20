@@ -3,11 +3,15 @@ package javax.microedition.media.control;
 import javax.microedition.media.*;
 
 public class MIDIControlImpl implements MIDIControl {
-    PlayerImpl aPlayerImpl539;
+    static final int PROGRAM_CHANGE = 0xC0;
+    static final int CONTROL_BANK_CHANGE_MSB = 0x00;
+    static final int CONTROL_BANK_CHANGE_LSB = 0x20;
 
-    public MIDIControlImpl(final Object o) {
+    Player player;
+
+    public MIDIControlImpl(Player o) {
         super();
-        this.aPlayerImpl539 = (PlayerImpl) o;
+        this.player = o;
     }
 
     public boolean isBankQuerySupported() {
@@ -22,11 +26,14 @@ public class MIDIControlImpl implements MIDIControl {
         return -1;
     }
 
-    public void setProgram(final int n, final int n2, final int n3) {
+    public void setProgram(final int channel, final int bank, final int program) {
+        shortMidiEvent(CONTROL_CHANGE | channel, CONTROL_BANK_CHANGE_MSB, bank >> 7);
+        shortMidiEvent(CONTROL_CHANGE | channel, CONTROL_BANK_CHANGE_LSB, bank & 0x7F);
+        shortMidiEvent(PROGRAM_CHANGE | channel, program, 0);
     }
 
     public void setChannelVolume(final int n, final int n2) {
-        this.aPlayerImpl539.setMIDIChannelVolume(n, n2);
+        PlayerImpl.setMIDIChannelVolume(n, n2);
     }
 
     public int[] getBankList(final boolean b) throws MediaException {
@@ -46,9 +53,10 @@ public class MIDIControlImpl implements MIDIControl {
     }
 
     public void shortMidiEvent(final int n, final int n2, final int n3) {
+        PlayerImpl.shortMidiEvent(n, n2, n3);
     }
 
     public int longMidiEvent(final byte[] array, final int n, final int n2) {
-        return -1;
+        return PlayerImpl.longMidiEvent(array, n, n2);
     }
 }
