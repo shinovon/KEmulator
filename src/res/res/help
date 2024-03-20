@@ -42,13 +42,16 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$2024.03.20
+Fix Player.setMediaTime returning wrong values
+
 $nnmod v2.15.1 [2024.03.16]
 Hotkey for "Rotate 90 degrees"
 Synchronized event queue
 Added "SynchronizeKeyEvents" property
 Added change screen size dialog
-Fix loading resources with double slash in path
-Fixed listRecordStores returning empty array (v2.14-v2.15 bug)
+Fix resources loading with double slash in path
+Fix listRecordStores returning empty array (v2.14-v2.15 bug)
 RMS fallback fix
 
 $nnmod v2.15 [2024.02.16]

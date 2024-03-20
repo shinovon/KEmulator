@@ -37,28 +37,27 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     public int dataLen;
     private boolean mp3Complete;
     private DataSource dataSource;
-    private FramePositioningControl frameControl;
     private boolean dataSourceDisconnected;
     private InputStream inputStream;
-    static Class clipCls;
     private static int count;
     private int level = 100;
     private byte[] data;
 
-
-    public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
-        super();
-        this.contentType = contentType;
-        this.dataSource = src;
+    PlayerImpl() {
         players.add(this);
     }
 
+    public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
+        this();
+        this.contentType = contentType;
+        this.dataSource = src;
+    }
+
     public PlayerImpl(final InputStream inputStream, String contentType) throws IOException {
-        super();
+        this();
         if (contentType == null)
             contentType = "";
         a(inputStream, contentType);
-        players.add(this);
     }
 
     private void a(final InputStream inputStream, String contentType) throws IOException {
@@ -87,35 +86,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             }
             this.volumeControl = new VolumeControlImpl(this);
             this.controls = new Control[]{this.volumeControl};
-            frameControl = new FramePositioningControl() {
-
-                public long mapFrameToTime(int p0) {
-                    if (((Player) sequence).framesPerSecond() == 0)
-                        return -1;
-                    return ((int) (((Player) sequence).framesPerSecond() * p0)) * 1000L;
-                }
-
-                public int mapTimeToFrame(long p0) {
-                    if (((Player) sequence).framesPerSecond() == 0)
-                        return -1;
-                    return (int) (((float) p0 / 1000.0F) * ((Player) sequence).framesPerSecond());
-                }
-
-                public int seek(int p0) {
-                    return 0;
-                }
-
-                public int skip(int i) {
-                    if (i < 0) {
-                        return 0;
-                    }
-                    if (i == 0)
-                        return 0;
-                    // TODO
-                    return 0;
-                }
-
-            };
         } else {
             try {
                 this.midi(inputStream);
@@ -132,17 +102,18 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 }
             }
         }
-        this.state = 100;
+        this.state = UNREALIZED;
         this.setLevel(level);
         this.listeners = new Vector();
         this.timeBase = Manager.getSystemTimeBase();
     }
 
     public PlayerImpl(String locator, String contentType, DataSource src) {
-        players.add(this);
+        this();
     }
 
     public PlayerImpl(String src, String contentType) throws IOException {
+        this();
         if (contentType == null)
             contentType = "";
         if (contentType.equals("audio/wav")) {
@@ -151,7 +122,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             this.loopCount = 1;
             this.dataLen = (int) new File(src).length();
             wav(new URL("file:///" + src));
-            this.state = 100;
+            this.state = UNREALIZED;
             this.setLevel(level);
             this.listeners = new Vector();
             this.timeBase = Manager.getSystemTimeBase();
@@ -159,7 +130,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             this.dataLen = (int) new File(src).length();
             a(new FileInputStream(src), contentType);
         }
-        players.add(this);
     }
 
     private void amr(final InputStream inputStream) throws IOException {
@@ -307,7 +277,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public void addPlayerListener(final PlayerListener playerListener) throws IllegalStateException {
-        if (this.state == 0) {
+        if (this.state == CLOSED) {
             throw new IllegalStateException();
         }
         if (playerListener != null) {
@@ -316,7 +286,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public void removePlayerListener(final PlayerListener playerListener) throws IllegalStateException {
-        if (this.state == 0) {
+        if (this.state == CLOSED) {
             throw new IllegalStateException();
         }
         if (playerListener != null) {
@@ -351,16 +321,16 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             dataSourceDisconnected = true;
         }
         this.sequence = null;
-        this.state = 0;
-        this.notifyListeners("closed", null);
+        this.state = CLOSED;
+        this.notifyListeners(PlayerListener.CLOSED, null);
     }
 
     public void deallocate() throws IllegalStateException {
         data = null;
-        if (this.state == 0) {
+        if (this.state == CLOSED) {
             throw new IllegalStateException();
         }
-        if (this.state == 400) {
+        if (this.state == STARTED) {
             try {
                 this.stop();
                 return;
@@ -368,15 +338,13 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 return;
             }
         }
-        int anInt303;
-        if (this.state == 300) {
-            anInt303 = 200;
-        } else if (this.state == 200) {
-            anInt303 = 100;
+        if (this.state == PREFETCHED) {
+            state = REALIZED;
+        } else if (this.state == REALIZED) {
+            state = UNREALIZED;
         } else {
             return;
         }
-        state = anInt303;
         if (dataSource != null && dataSource.getStreams() != null && dataSource.getStreams()[0] != null && !dataSourceDisconnected) {
             if (dataSource.getStreams()[0].getSeekType() == 0) {
                 dataSource.disconnect();
@@ -425,7 +393,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         if (this.sequence instanceof Player) {
             return ((Player) this.sequence).getPosition() * 1000L;
         }
-        return -1L;
+        return TIME_UNKNOWN;
     }
 
     public long setMediaTime(final long t) throws MediaException {
@@ -477,12 +445,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public void prefetch() throws IllegalStateException, MediaException {
-        if (this.state == 0) {
+        if (this.state == CLOSED) {
             throw new IllegalStateException();
         }
-        if (this.state == 100) {
+        if (this.state == UNREALIZED) {
             this.realize();
-        } else if (this.state != 200) {
+        } else if (this.state != REALIZED) {
             return;
         }
         if (this.dataSource != null) {
@@ -493,15 +461,15 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 throw new MediaException(e);
             }
         }
-        this.state = 300;
+        this.state = PREFETCHED;
     }
 
     public void realize() throws IllegalStateException, MediaException {
-        if (this.state == 0) {
+        if (this.state == CLOSED) {
             throw new IllegalStateException();
         }
-        if (this.state == 100) {
-            this.state = 200;
+        if (this.state == UNREALIZED) {
+            this.state = REALIZED;
         }
         if (sequence instanceof Sequence) {
             try {
@@ -557,7 +525,6 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 }
                 this.volumeControl = new VolumeControlImpl(this);
                 this.controls = new Control[]{this.volumeControl};
-                this.state = 100;
                 this.setLevel(level);
                 this.listeners = new Vector();
                 this.timeBase = Manager.getSystemTimeBase();
@@ -575,10 +542,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public void start() throws IllegalStateException, MediaException {
-        if (this.state == 0) {
+        if (this.state == CLOSED) {
             throw new IllegalStateException();
         }
-        if (this.state != 400) {
+        if (this.state != STARTED) {
             if (sequence != null) {
                 if (this.sequence instanceof Sequence && midiPlaying && currentMidiPlayer != this && currentMidiPlayer != null) {
                     try {
@@ -595,17 +562,17 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 (this.playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
             }
             setLevel(level);
-            this.state = 400;
-            this.notifyListeners("started", new Long(0L));
+            this.state = STARTED;
+            this.notifyListeners(PlayerListener.STARTED, new Long(getMediaTime()));
             if (sequence == null) {
-                this.state = 300;
-                this.notifyListeners("stopped", new Long(0L));
+                this.state = PREFETCHED;
+                this.notifyListeners(PlayerListener.STOPPED, new Long(0L));
             }
         }
     }
 
     public void stop() throws IllegalStateException, MediaException {
-        if (this.state == 0) {
+        if (this.state == CLOSED) {
             throw new IllegalStateException();
         }
         if (sequence == null) return;
@@ -614,24 +581,28 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             return;
         }
         if (this.playerThread != null) {
-            final Thread aThread297 = this.playerThread;
+            final Thread t = this.playerThread;
             this.playerThread = null;
-            while (aThread297.isAlive()) ;
+            if(t.isAlive()) {
+                try {
+                    synchronized (t) {
+                        t.wait();
+                    }
+                } catch (Exception e) {
+                }
+            }
         }
     }
 
     public Control getControl(final String s) {
-        if (s.indexOf("VolumeControl") != -1) {
+        if (s.contains("VolumeControl")) {
             return this.volumeControl;
         }
-        if (s.indexOf("ToneControl") != -1) {
+        if (s.contains("ToneControl")) {
             return this.toneControl;
         }
-        if (s.indexOf("MIDIControl") != -1) {
+        if (s.contains("MIDIControl")) {
             return this.midiControl;
-        }
-        if (s.contains("FramePositioningControl") && sequence instanceof Player) {
-            return this.frameControl;
         }
         return null;
     }
@@ -702,8 +673,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             }
         }
         this.playerThread = null;
-        this.state = 300;
-        notifyListeners(this.soundCompleted || this.midiCompleted || this.mp3Complete ? "endOfMedia" : "stopped", getMediaTime());
+        this.state = PREFETCHED;
+        notifyListeners(this.soundCompleted || this.midiCompleted || this.mp3Complete ? PlayerListener.END_OF_MEDIA : PlayerListener.STOPPED, getMediaTime());
     }
 
     public void update(final LineEvent lineEvent) {
@@ -713,7 +684,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public void setLevel(int n) {
-        if (level != n) notifyListeners("volumeChanged", n);
+        if (level != n) notifyListeners(PlayerListener.VOLUME_CHANGED, n);
         level = n;
         if (sequence == null) return;
         final double n2 = n / 100.0;
@@ -759,14 +730,14 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public TimeBase getTimeBase() {
-        if (this.state == 100 || this.state == 0) {
+        if (this.state == UNREALIZED || this.state == CLOSED) {
             throw new IllegalStateException();
         }
         return this.timeBase;
     }
 
     public void setTimeBase(final TimeBase timeBase) throws MediaException {
-        if (this.state == 100 || this.state == 400 || this.state == 0) {
+        if (this.state == UNREALIZED || this.state == STARTED || this.state == CLOSED) {
             throw new IllegalStateException();
         }
         throw new MediaException("TimeBase can't be set on this player.");
