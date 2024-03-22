@@ -12,12 +12,10 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Screen;
 import javax.microedition.media.Manager;
 import javax.microedition.midlet.MIDlet;
-import javax.sound.midi.MidiDevice.Info;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import emulator.media.EmulatorMIDI;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -52,7 +50,6 @@ public class Emulator {
     public static String deviceFile;
     public static String[] commandLineArguments;
     public static emulator.custom.CustomClassLoader customClassLoader;
-    private static Info[] midiDeviceInfo;
     public static String iconPath;
 
     protected static DiscordRPC rpc;
@@ -664,7 +661,7 @@ public class Emulator {
             return;
         }
         platform.loadLibraries();
-        midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
+        EmulatorMIDI.initDevices();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.initLocale();
         Emulator.emulatorimpl = new EmulatorImpl();
@@ -973,15 +970,6 @@ public class Emulator {
                 Manager.checkLibVlcSupport();
             }
         };
-    }
-
-    public static Info getMidiDeviceInfo() throws MidiUnavailableException {
-        for (int i = 0; i < midiDeviceInfo.length; ++i) {
-            if (midiDeviceInfo[i].getName().toLowerCase().contains("virtualmidisynth")) {
-                return midiDeviceInfo[i];
-            }
-        }
-        return MidiSystem.getSynthesizer().getDeviceInfo();
     }
 
     public static String getMidletName() {

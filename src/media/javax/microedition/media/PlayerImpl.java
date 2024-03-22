@@ -2,6 +2,7 @@ package javax.microedition.media;
 
 import emulator.*;
 import emulator.custom.CustomJarResources;
+import emulator.media.EmulatorMIDI;
 
 import java.io.*;
 import java.net.URL;
@@ -20,14 +21,16 @@ import javazoom.jl.player.Player;
 
 public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener {
 
+    private static int count;
+    private static boolean midiPlaying;
+
     public static List<javax.microedition.media.Player> players = new ArrayList<javax.microedition.media.Player>();
     Object sequence;
     Thread playerThread;
-    boolean midiCompleted;
-    boolean soundCompleted;
+    boolean complete;
     private int state;
     private String contentType;
-    private Vector listeners;
+    private Vector<PlayerListener> listeners;
     Control midiControl;
     Control toneControl;
     Control volumeControl;
@@ -35,15 +38,18 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     TimeBase timeBase;
     public int loopCount;
     public int dataLen;
-    private boolean mp3Complete;
     private DataSource dataSource;
     private boolean dataSourceDisconnected;
-    private InputStream inputStream;
-    private static int count;
     private int level = 100;
     private byte[] data;
+    private long midiPosition;
+    private final Object playLock = new Object();
 
     PlayerImpl() {
+        loopCount = 1;
+        state = UNREALIZED;
+        listeners = new Vector<PlayerListener>();
+        timeBase = Manager.getSystemTimeBase();
         players.add(this);
     }
 
@@ -55,80 +61,69 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 
     public PlayerImpl(final InputStream inputStream, String contentType) throws IOException {
         this();
-        if (contentType == null)
-            contentType = "";
-        a(inputStream, contentType);
+        init(inputStream, contentType);
     }
 
-    private void a(final InputStream inputStream, String contentType) throws IOException {
-        contentType = contentType.toLowerCase();
-        this.contentType = contentType;
-        this.loopCount = 1;
-        if (dataLen == 0) this.dataLen = inputStream.available();
-        this.inputStream = inputStream;
+    private void init(final InputStream inputStream, String contentType) throws IOException {
+        if (contentType == null)
+            contentType = "";
+        this.contentType = (contentType = contentType.toLowerCase());
+        if (dataLen == 0) dataLen = inputStream.available();
         if (contentType.equals("audio/amr")) {
-            this.amr(inputStream);
+            amr(inputStream);
         } else if (contentType.equals("audio/x-wav") || contentType.equals("audio/wav")) {
-            this.wav(inputStream);
+            wav(inputStream);
         } else if (contentType.equals("audio/x-midi") || contentType.equals("audio/midi")) {
-            this.midi(inputStream);
+            midi(inputStream);
         } else if (contentType.equals("audio/mpeg")) {
             try {
                 InputStream i = inputStream;
                 if (i instanceof ByteArrayInputStream) {
-                    this.data = CustomJarResources.getBytes(i);
+                    data = CustomJarResources.getBytes(i);
                     i = new ByteArrayInputStream(data);
                 }
-                this.sequence = new Player(i);
+                sequence = new Player(i);
             } catch (JavaLayerException e) {
                 e.printStackTrace();
                 throw new IOException(e);
             }
-            this.volumeControl = new VolumeControlImpl(this);
-            this.controls = new Control[]{this.volumeControl};
+            volumeControl = new VolumeControlImpl(this);
+            controls = new Control[]{volumeControl};
         } else {
             try {
-                this.midi(inputStream);
-            } catch (Exception ex) {
+                midi(inputStream);
+            } catch (Exception e) {
                 try {
-                    this.wav(inputStream);
-                } catch (Exception ex2) {
+                    wav(inputStream);
+                } catch (Exception e2) {
                     try {
-                        this.amr(inputStream);
-                    } catch (Exception ex3) {
+                        amr(inputStream);
+                    } catch (Exception e3) {
                         Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
-                        this.sequence = null;
+                        sequence = null;
                     }
                 }
             }
         }
-        this.state = UNREALIZED;
-        this.setLevel(level);
-        this.listeners = new Vector();
-        this.timeBase = Manager.getSystemTimeBase();
+        setLevel(level);
     }
 
     public PlayerImpl(String locator, String contentType, DataSource src) {
         this();
+        this.contentType = contentType;
+        this.dataSource = src;
     }
 
     public PlayerImpl(String src, String contentType) throws IOException {
         this();
-        if (contentType == null)
-            contentType = "";
-        if (contentType.equals("audio/wav")) {
-            contentType = contentType.toLowerCase();
-            this.contentType = contentType;
-            this.loopCount = 1;
-            this.dataLen = (int) new File(src).length();
+        if ("audio/wav".equals(contentType)) {
+            this.contentType = contentType.toLowerCase();
+            dataLen = (int) new File(src).length();
             wav(new URL("file:///" + src));
-            this.state = UNREALIZED;
-            this.setLevel(level);
-            this.listeners = new Vector();
-            this.timeBase = Manager.getSystemTimeBase();
+            setLevel(level);
         } else {
-            this.dataLen = (int) new File(src).length();
-            a(new FileInputStream(src), contentType);
+            dataLen = (int) new File(src).length();
+            init(new FileInputStream(src), contentType);
         }
     }
 
@@ -141,34 +136,33 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             InputStream i = new ByteArrayInputStream(method476);
             final AudioFormat audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 8000.0f, 16, 1, 2, 8000.0f, false);
             final AudioInputStream audioInputStream = new AudioInputStream(i, audioFormat, -1L);
-            final Clip anObject298;
-            (anObject298 = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioFormat)))
+            final Clip clip;
+            (clip = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioFormat)))
                     .addLineListener(this);
-            anObject298.open(audioInputStream);
-            this.sequence = anObject298;
-        } catch (Exception ex) {
-            this.sequence = null;
-            throw new IOException("AMR realize error!", ex);
+            clip.open(audioInputStream);
+            sequence = clip;
+        } catch (Exception e) {
+            sequence = null;
+            throw new IOException("AMR realize error!", e);
         }
-        this.toneControl = new ToneControlImpl();
-        this.volumeControl = new VolumeControlImpl(this);
-        this.controls = new Control[]{this.toneControl, this.volumeControl};
+        toneControl = new ToneControlImpl();
+        volumeControl = new VolumeControlImpl(this);
+        controls = new Control[]{toneControl, volumeControl};
     }
 
     private void wav(final InputStream inputStream) throws IOException {
         try {
-            this.sequence = AudioSystem.getAudioInputStream(inputStream);
-        } catch (Exception ex) {
-            System.out.println("WAV realize error: " + ex.toString());
-            //ex.printStackTrace();
-            this.sequence = null;
-            //throw new IOException("WAV realize error!", ex);
+            sequence = AudioSystem.getAudioInputStream(inputStream);
+        } catch (Exception e) {
+            System.out.println("WAV realize error: " + e);
+            sequence = null;
+            //throw new IOException("WAV realize error!", e);
             return;
         }
         try {
             AudioInputStream audioInputStream;
             AudioFormat format;
-            if ((format = (audioInputStream = (AudioInputStream) this.sequence).getFormat())
+            if ((format = (audioInputStream = (AudioInputStream) sequence).getFormat())
                     .getEncoding() == AudioFormat.Encoding.ULAW || format.getEncoding() == AudioFormat.Encoding.ALAW) {
                 final AudioFormat audioFormat;
                 audioInputStream = AudioSystem
@@ -178,34 +172,34 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                                 * 2, format.getFrameRate(), true), audioInputStream);
                 format = audioFormat;
             }
-            final Clip anObject298;
-            (anObject298 = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioInputStream
+            final Clip clip;
+            (clip = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioInputStream
                     .getFormat(), (int) audioInputStream.getFrameLength() * format.getFrameSize())))
                     .addLineListener(this);
-            anObject298.open(audioInputStream);
-            this.sequence = anObject298;
-        } catch (Exception ex2) {
-            this.sequence = null;
+            clip.open(audioInputStream);
+            sequence = clip;
+        } catch (Exception e) {
+            sequence = null;
             throw new IOException();
         }
-        this.toneControl = new ToneControlImpl();
-        this.volumeControl = new VolumeControlImpl(this);
-        this.controls = new Control[]{this.toneControl, this.volumeControl};
+        toneControl = new ToneControlImpl();
+        volumeControl = new VolumeControlImpl(this);
+        controls = new Control[]{toneControl, volumeControl};
     }
 
     private void wav(final URL url) throws IOException {
         try {
-            this.sequence = AudioSystem.getAudioInputStream(url);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            this.sequence = null;
-            //throw new IOException("WAV realize error!", ex);
+            sequence = AudioSystem.getAudioInputStream(url);
+        } catch (Exception e) {
+            System.out.println("WAV realize error: " + e);
+            sequence = null;
+            //throw new IOException("WAV realize error!", e);
             return;
         }
         try {
             AudioInputStream audioInputStream;
             AudioFormat format;
-            if ((format = (audioInputStream = (AudioInputStream) this.sequence).getFormat())
+            if ((format = (audioInputStream = (AudioInputStream) sequence).getFormat())
                     .getEncoding() == AudioFormat.Encoding.ULAW || format.getEncoding() == AudioFormat.Encoding.ALAW) {
                 final AudioFormat audioFormat;
                 audioInputStream = AudioSystem
@@ -220,81 +214,51 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                     .getFormat(), (int) audioInputStream.getFrameLength() * format.getFrameSize())))
                     .addLineListener(this);
             anObject298.open(audioInputStream);
-            this.sequence = anObject298;
-        } catch (Exception ex2) {
-            this.sequence = null;
+            sequence = anObject298;
+        } catch (Exception e) {
+            sequence = null;
             throw new IOException();
         }
-        this.toneControl = new ToneControlImpl();
-        this.volumeControl = new VolumeControlImpl(this);
-        this.controls = new Control[]{this.toneControl, this.volumeControl};
+        toneControl = new ToneControlImpl();
+        volumeControl = new VolumeControlImpl(this);
+        controls = new Control[]{toneControl, volumeControl};
     }
-
-    private static MidiDevice midiDevice;
-    static Sequencer midiSequencer;
-    public static PlayerImpl currentMidiPlayer;
-    private static boolean midiPlaying;
-    private long midiPosition;
 
     private void midi(final InputStream inputStream) throws IOException {
         try {
-            this.data = CustomJarResources.getBytes(inputStream);
-            this.sequence = MidiSystem.getSequence(new ByteArrayInputStream(data));
+            data = CustomJarResources.getBytes(inputStream);
+            sequence = MidiSystem.getSequence(new ByteArrayInputStream(data));
         } catch (Exception e) {
-            this.sequence = null;
+            sequence = null;
         }
-        this.midiControl = new MIDIControlImpl(this);
-        this.toneControl = new ToneControlImpl();
-        this.volumeControl = new VolumeControlImpl(this);
-        this.controls = new Control[]{this.toneControl, this.volumeControl, this.midiControl};
-    }
-
-    static void initMIDIDevice() throws MidiUnavailableException {
-        if (midiDevice == null) {
-            midiDevice = MidiSystem.getMidiDevice(Emulator.getMidiDeviceInfo());
-            midiDevice.open();
-        }
-        if (midiSequencer == null) {
-            midiSequencer = MidiSystem.getSequencer();
-            for (Transmitter t : midiSequencer.getTransmitters()) {
-                t.setReceiver(midiDevice.getReceiver());
-            }
-            midiSequencer.addMetaEventListener(new MetaEventListener() {
-                @Override
-                public void meta(MetaMessage meta) {
-                    if (meta.getType() == 47) {
-                        if (currentMidiPlayer != null) {
-                            currentMidiPlayer.midiCompleted = true;
-                        }
-                    }
-                }
-            });
-            midiSequencer.open();
-        }
+        midiControl = new MIDIControlImpl(this);
+        toneControl = new ToneControlImpl();
+        volumeControl = new VolumeControlImpl(this);
+        controls = new Control[]{toneControl, volumeControl, midiControl};
     }
 
     public void addPlayerListener(final PlayerListener playerListener) throws IllegalStateException {
-        if (this.state == CLOSED) {
+        if (state == CLOSED) {
             throw new IllegalStateException();
         }
         if (playerListener != null) {
-            this.listeners.add(playerListener);
+            listeners.add(playerListener);
         }
     }
 
     public void removePlayerListener(final PlayerListener playerListener) throws IllegalStateException {
-        if (this.state == CLOSED) {
+        if (state == CLOSED) {
             throw new IllegalStateException();
         }
         if (playerListener != null) {
-            this.listeners.remove(playerListener);
+            listeners.remove(playerListener);
         }
     }
 
     protected void notifyListeners(final String s, final Object o) {
         if (listeners == null)
             return;
-        final Enumeration<PlayerListener> elements = this.listeners.elements();
+        final Enumeration<PlayerListener> elements = listeners.elements();
         while (elements.hasMoreElements()) {
             elements.nextElement().playerUpdate(this, s.intern(), o);
         }
@@ -302,42 +266,37 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 
     public void close() {
         players.remove(this);
-        if (this.playerThread != null) {
+        if (playerThread != null) {
             try {
-                this.stop();
-            } catch (Exception ex) {
-            }
+                stop();
+            } catch (Exception e) {}
         }
-        if (this.sequence instanceof Sequence) {
-            //this.midiSequencer.close();
-        } else if (this.sequence instanceof Player) {
-            ((Player) this.sequence).close();
+        if (sequence instanceof Player) {
+            ((Player) sequence).close();
         }
         if (dataSource != null && !dataSourceDisconnected) {
             dataSource.disconnect();
             dataSourceDisconnected = true;
         }
-        this.sequence = null;
-        this.state = CLOSED;
-        this.notifyListeners(PlayerListener.CLOSED, null);
+        sequence = null;
+        state = CLOSED;
+        notifyListeners(PlayerListener.CLOSED, null);
     }
 
     public void deallocate() throws IllegalStateException {
         data = null;
-        if (this.state == CLOSED) {
+        if (state == CLOSED) {
             throw new IllegalStateException();
         }
-        if (this.state == STARTED) {
+        if (state == STARTED) {
             try {
-                this.stop();
-                return;
-            } catch (MediaException ex) {
-                return;
-            }
+                stop();
+            } catch (MediaException e) {}
+            return;
         }
-        if (this.state == PREFETCHED) {
+        if (state == PREFETCHED) {
             state = REALIZED;
-        } else if (this.state == REALIZED) {
+        } else if (state == REALIZED) {
             state = UNREALIZED;
         } else {
             return;
@@ -351,44 +310,42 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public String getContentType() {
-        return this.contentType;
+        return contentType;
     }
 
     public long getDuration() {
-        double n = 0.0;
-        double n2;
         if (sequence == null) return 0;
-        if (this.sequence instanceof Sequence) {
-            n2 = ((Sequence) this.sequence).getMicrosecondLength() / 1000000.0;
-        } else if (this.sequence instanceof Clip) {
+        double res;
+        if (sequence instanceof Sequence) {
+            res = ((Sequence) sequence).getMicrosecondLength() / 1000000D;
+        } else if (sequence instanceof Clip) {
             final Clip clip;
-            n2 = (clip = (Clip) this.sequence).getBufferSize()
+            res = (clip = (Clip) sequence).getBufferSize()
                     / (clip.getFormat().getFrameSize() * clip.getFormat().getFrameRate());
-        } else if (this.sequence instanceof Player) {
+        } else if (sequence instanceof Player) {
             try {
-                n2 = ((dataLen * 8) / ((Player) sequence).getBitrate());
+                res = ((double) (dataLen * 8) / ((Player) sequence).getBitrate());
             } catch (ArithmeticException e) {
                 return -1;
             }
         } else {
             return 0;
         }
-        n = n2;
-        return (long) (n * 1000000.0);
+        return (long) (res * 1000000D);
     }
 
     public long getMediaTime() {
         if (sequence == null) return 0;
-        if (this.sequence instanceof Clip) {
-            return ((Clip) this.sequence).getMicrosecondPosition();
+        if (sequence instanceof Clip) {
+            return ((Clip) sequence).getMicrosecondPosition();
         }
-        if (this.sequence instanceof Sequence) {
-            if (currentMidiPlayer == this && midiPlaying)
-                return this.midiSequencer.getMicrosecondPosition();
+        if (sequence instanceof Sequence) {
+            if (EmulatorMIDI.currentPlayer == this && midiPlaying)
+                return EmulatorMIDI.getMicrosecondPosition();
             return midiPosition;
         }
-        if (this.sequence instanceof Player) {
-            return ((Player) this.sequence).getPosition() * 1000L;
+        if (sequence instanceof Player) {
+            return ((Player) sequence).getPosition() * 1000L;
         }
         return TIME_UNKNOWN;
     }
@@ -396,21 +353,21 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     public long setMediaTime(final long t) throws MediaException {
         if (sequence == null) return 0;
         long ms = 0L;
-        if (this.sequence instanceof Clip) {
-            ms = ((Clip) this.sequence).getMicrosecondPosition();
+        if (sequence instanceof Clip) {
+            ms = ((Clip) sequence).getMicrosecondPosition();
             if (t < ms) {
                 ms = t;
             }
-            ((Clip) this.sequence).setMicrosecondPosition(t);
-        } else if (this.sequence instanceof Sequence) {
-            ms = ((Sequence) this.sequence).getMicrosecondLength();
+            ((Clip) sequence).setMicrosecondPosition(t);
+        } else if (sequence instanceof Sequence) {
+            ms = ((Sequence) sequence).getMicrosecondLength();
             if (t < ms) {
                 ms = t;
             }
             midiPosition = ms;
-            if (currentMidiPlayer == this)
-                this.midiSequencer.setMicrosecondPosition(ms);
-        } else if (this.sequence instanceof Player) {
+            if (EmulatorMIDI.currentPlayer == this)
+                EmulatorMIDI.setMicrosecondPosition(ms);
+        } else if (sequence instanceof Player) {
             long l = getMediaTime();
             if (t == 0 && l == 0)
                 return 0;
@@ -438,52 +395,52 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public int getState() {
-        return this.state;
+        return state;
     }
 
     public void prefetch() throws IllegalStateException, MediaException {
-        if (this.state == CLOSED) {
+        if (state == CLOSED) {
             throw new IllegalStateException();
         }
-        if (this.state == UNREALIZED) {
-            this.realize();
-        } else if (this.state != REALIZED) {
+        if (state == UNREALIZED) {
+            realize();
+        } else if (state != REALIZED) {
             return;
         }
         if (sequence instanceof Sequence) {
             try {
-                initMIDIDevice();
+                EmulatorMIDI.initDevice();
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MediaException(e);
             }
             try {
-                if (this.sequence != null) {
-                    midiSequencer.setSequence((Sequence) this.sequence);
+                if (sequence != null) {
+                    EmulatorMIDI.setSequence((Sequence) sequence);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                this.sequence = null;
+                sequence = null;
                 throw new MediaException(e.toString());
             }
         }
-        if (this.dataSource != null) {
+        if (dataSource != null) {
             try {
-                this.dataSource.connect();
+                dataSource.connect();
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new MediaException(e);
             }
         }
-        this.state = PREFETCHED;
+        state = PREFETCHED;
     }
 
     public void realize() throws IllegalStateException, MediaException {
-        if (this.state == CLOSED) {
+        if (state == CLOSED) {
             throw new IllegalStateException();
         }
-        if (this.state == UNREALIZED) {
-            this.state = REALIZED;
+        if (state == UNREALIZED) {
+            state = REALIZED;
         }
         if (dataSource != null) {
             try {
@@ -497,16 +454,16 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             SourceStream stream = dataSource.getStreams()[0];
             String streamContentType = stream.getContentDescriptor().getContentType();
             if (streamContentType != null) {
-                if (streamContentType.equalsIgnoreCase("audio/mpeg") || this.contentType.equalsIgnoreCase("audio/mp3")) {
+                if (streamContentType.equalsIgnoreCase("audio/mpeg") || contentType.equalsIgnoreCase("audio/mp3")) {
                     mp3 = true;
-                    if (this.contentType == null)
-                        this.contentType = "audio/mpeg";
+                    if (contentType == null)
+                        contentType = "audio/mpeg";
                 }
             }
-            if (mp3 || this.contentType.equalsIgnoreCase("audio/mpeg") || this.contentType.equalsIgnoreCase("audio/mp3")) {
+            if (mp3 || contentType.equalsIgnoreCase("audio/mpeg") || contentType.equalsIgnoreCase("audio/mp3")) {
                 dataLen = (int) stream.getContentLength();
                 try {
-                    this.sequence = new Player(new InputStream() {
+                    sequence = new Player(new InputStream() {
 
                         public int read() throws IOException {
                             byte[] b = new byte[1];
@@ -525,11 +482,11 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 } catch (JavaLayerException e) {
                     throw new MediaException(e);
                 }
-                this.volumeControl = new VolumeControlImpl(this);
-                this.controls = new Control[]{this.volumeControl};
-                this.setLevel(level);
-                this.listeners = new Vector();
-                this.timeBase = Manager.getSystemTimeBase();
+                volumeControl = new VolumeControlImpl(this);
+                controls = new Control[]{volumeControl};
+                setLevel(level);
+                listeners = new Vector();
+                timeBase = Manager.getSystemTimeBase();
             } else {
                 throw new MediaException("Unsupported content type: " + contentType);
             }
@@ -544,147 +501,154 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     }
 
     public void start() throws IllegalStateException, MediaException {
-        if (this.state == CLOSED) {
+        if (state == CLOSED) {
             throw new IllegalStateException();
         }
         if(state < PREFETCHED && sequence instanceof Sequence) {
             prefetch();
         }
-        if (this.state != STARTED) {
+        if (state != STARTED) {
             if (sequence != null) {
-                if (this.sequence instanceof Sequence && midiPlaying && currentMidiPlayer != this && currentMidiPlayer != null) {
+                if (sequence instanceof Sequence && midiPlaying && EmulatorMIDI.currentPlayer != this && EmulatorMIDI.currentPlayer != null) {
                     try {
-                        currentMidiPlayer.stop();
+                        EmulatorMIDI.currentPlayer.stop();
                     } catch (Exception e) {
                     }
 //					throw new MediaException("MIDI is currently playing");
                 }
-                if ((this.sequence instanceof Sequence && midiCompleted)
-                        || (this.sequence instanceof Player && mp3Complete)
-                        || (this.sequence instanceof Clip && soundCompleted)) {
+                if (complete) {
                     setMediaTime(0);
                 }
-                (this.playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
+                (playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
             }
             setLevel(level);
-            this.state = STARTED;
-            this.notifyListeners(PlayerListener.STARTED, new Long(getMediaTime()));
-            if (sequence == null) {
-                this.state = PREFETCHED;
-                this.notifyListeners(PlayerListener.STOPPED, new Long(0L));
-            }
+            state = STARTED;
         }
     }
 
     public void stop() throws IllegalStateException, MediaException {
-        if (this.state == CLOSED) {
+        if (state == CLOSED) {
             throw new IllegalStateException();
         }
         if (sequence == null) return;
-        if (this.sequence instanceof Player) {
-            ((Player) this.sequence).stop();
+        if (sequence instanceof Player) {
+            ((Player) sequence).stop();
             return;
         }
-        if (this.playerThread != null) {
-            final Thread t = this.playerThread;
-            this.playerThread = null;
+        synchronized (playLock) {
+            playLock.notify();
+        }
+        if (playerThread != null) {
+            final Thread t = playerThread;
+            playerThread = null;
             if(t.isAlive()) {
                 try {
                     synchronized (t) {
                         t.wait();
                     }
-                } catch (Exception e) {
-                }
+                } catch (Exception e) {}
             }
         }
     }
 
     public Control getControl(final String s) {
         if (s.contains("VolumeControl")) {
-            return this.volumeControl;
+            return volumeControl;
         }
         if (s.contains("ToneControl")) {
-            return this.toneControl;
+            return toneControl;
         }
         if (s.contains("MIDIControl")) {
-            return this.midiControl;
+            return midiControl;
         }
         return null;
     }
 
     public Control[] getControls() {
-        return this.controls;
+        return controls;
     }
 
     public void run() {
-        int loopCount = this.loopCount;
-        while (playerThread != null && loopCount != 0) {
-            boolean b2 = false;
-            mp3Complete = midiCompleted = soundCompleted = false;
-            if (sequence instanceof Sequence && playerThread != null) {
-                try {
-                    midiSequencer.setSequence((Sequence) sequence);
-                    currentMidiPlayer = this;
-                    midiSequencer.setMicrosecondPosition(midiPosition);
-                    midiSequencer.start();
+        try {
+            if (sequence == null) {
+                playerThread = null;
+                state = PREFETCHED;
+                return;
+            }
+            int loopCount = this.loopCount;
+            boolean complete = false;
+            boolean b = true;
+            while (playerThread != null && loopCount != 0) {
+                complete = false;
+                if (sequence instanceof Sequence) {
+                    EmulatorMIDI.start(this, (Sequence) sequence, midiPosition);
+                    EmulatorMIDI.currentPlayer = this;
+                    if (b) {
+                        notifyListeners(PlayerListener.STARTED, midiPosition = EmulatorMIDI.getMicrosecondPosition());
+                        b = false;
+                    }
                     midiPlaying = true;
-                    while (!midiCompleted && playerThread != null) {
-                        try {
-                            Thread.sleep(1);
-                        } catch (Exception e) {
-                            break;
+                    synchronized (playLock) {
+                        playLock.wait();
+                    }
+                    complete = this.complete;
+                    midiPosition = EmulatorMIDI.getMicrosecondPosition();
+                    midiPlaying = false;
+                    EmulatorMIDI.stop();
+                } else if (sequence instanceof Clip) {
+                    Clip clip = (Clip) sequence;
+                    clip.start();
+                    if (b) {
+                        notifyListeners(PlayerListener.STARTED, getMediaTime());
+                        b = false;
+                    }
+                    synchronized (playLock) {
+                        playLock.wait();
+                    }
+                    complete = this.complete;
+                    clip.stop();
+                } else if (sequence instanceof Player) {
+                    if (b) {
+                        notifyListeners(PlayerListener.STARTED, getMediaTime());
+                        b = false;
+                    }
+                    try {
+                        ((Player) sequence).play();
+                    } catch (JavaLayerException e) {
+                        e.printStackTrace();
+                        notifyListeners(PlayerListener.ERROR, e.toString());
+                    }
+                    if (sequence != null && ((Player) sequence).isComplete()) {
+                        complete = true;
+                        if (dataSource != null) {
+                            //dataSource.stop();
+                            dataSource.disconnect();
                         }
                     }
-                    midiPosition = midiSequencer.getMicrosecondPosition();
-                } catch (InvalidMidiDataException e) {
                 }
-                midiPlaying = false;
-                this.midiSequencer.stop();
-            } else if (sequence instanceof Clip && playerThread != null) {
-                Clip clip = (Clip) this.sequence;
-                clip.start();
-                while (!soundCompleted && playerThread != null) {
+                if (!complete) break;
+                if (loopCount != -1) {
+                    if (loopCount <= 0) continue;
+                    --loopCount;
+                }
+                if (loopCount != 0) {
                     try {
-                        Thread.sleep(99);
-                    } catch (Exception exception) {
-                        break;
-                    }
-                }
-                clip.stop();
-            } else if (sequence instanceof Player) {
-                try {
-                    ((Player) sequence).play();
-                } catch (JavaLayerException e) {
-                    e.printStackTrace();
-                }
-                if (sequence != null && ((Player) sequence).isComplete()) {
-                    mp3Complete = true;
-                    if (dataSource != null) {
-                        //dataSource.stop();
-                        dataSource.disconnect();
-                    }
+                        setMediaTime(0);
+                    } catch (MediaException e) {}
                 }
             }
-            if (loopCount != -1) {
-                if (loopCount <= 0) continue;
-                --loopCount;
-            }
-            if (loopCount != 0) {
-                try {
-                    setMediaTime(0L);
-                } catch (MediaException e) {
-                    e.printStackTrace();
-                }
-            }
+            playerThread = null;
+            state = PREFETCHED;
+            notifyListeners(complete ? PlayerListener.END_OF_MEDIA : PlayerListener.STOPPED, getMediaTime());
+        } catch (Exception e) {
+            System.err.println("Exception in player thread!");
+            e.printStackTrace();
         }
-        this.playerThread = null;
-        this.state = PREFETCHED;
-        notifyListeners(this.soundCompleted || this.midiCompleted || this.mp3Complete ? PlayerListener.END_OF_MEDIA : PlayerListener.STOPPED, getMediaTime());
     }
 
     public void update(final LineEvent lineEvent) {
         if (lineEvent.getType() == LineEvent.Type.STOP) {
-            this.soundCompleted = true;
+            notifyCompleted();
         }
     }
 
@@ -693,85 +657,32 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         level = n;
         if (sequence == null) return;
         final double n2 = n / 100.0;
-        if (this.sequence instanceof Clip) {
+        if (sequence instanceof Clip) {
             try {
-                ((FloatControl) ((Clip) this.sequence).getControl(FloatControl.Type.MASTER_GAIN))
+                ((FloatControl) ((Clip) sequence).getControl(FloatControl.Type.MASTER_GAIN))
                         .setValue((float) (Math.log((n2 == 0.0) ? 1.0E-4 : n2) / Math.log(10.0) * 20.0));
             } catch (Exception e) {
             }
             return;
         }
-        if (this.sequence instanceof Sequence) {
-			/*
-			try {
-				Receiver r = sequencer.getTransmitters().iterator().next().getReceiver();
-				final ShortMessage shortMessage = new ShortMessage();
-				for (int i = 0; i < 16; ++i) {
-					shortMessage.setMessage(ShortMessage.CONTROL_CHANGE, i, 7, (int) (n2 * 127.0));
-					r.send(shortMessage, -1L);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			 */
+        if (sequence instanceof Sequence) {
+			// TODO midi volume
             return;
         }
-        if (this.sequence instanceof Player) {
-            ((Player) this.sequence).setLevel(n);
+        if (sequence instanceof Player) {
+            ((Player) sequence).setLevel(n);
         }
-    }
-
-    public static void setMIDIChannelVolume(final int n, final int n2) {
-        try {
-            Receiver r = getMidiReceiver();
-            ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, (int) (n2 * 127.0));
-            r.send(shortMessage, -1L);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static void shortMidiEvent(int type, int data1, int data2) {
-        try {
-            Receiver r = getMidiReceiver();
-            ShortMessage shortMessage = new ShortMessage(type, data1, data2);
-            r.send(shortMessage, -1L);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static int longMidiEvent(byte[] data, int offset, int length) {
-        byte[] b = new byte[length];
-        System.arraycopy(data, offset, b, 0, length);
-        try {
-            Receiver r = getMidiReceiver();
-            MidiMessage msg = new MidiMessage(b) {
-                public Object clone() {
-                    return null;
-                }
-            };
-            r.send(msg, -1L);
-            return length;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return -1;
-    }
-
-    private static Receiver getMidiReceiver() {
-        return midiSequencer.getTransmitters().iterator().next().getReceiver();
     }
 
     public TimeBase getTimeBase() {
-        if (this.state == UNREALIZED || this.state == CLOSED) {
+        if (state == UNREALIZED || state == CLOSED) {
             throw new IllegalStateException();
         }
-        return this.timeBase;
+        return timeBase;
     }
 
     public void setTimeBase(final TimeBase timeBase) throws MediaException {
-        if (this.state == UNREALIZED || this.state == STARTED || this.state == CLOSED) {
+        if (state == UNREALIZED || state == STARTED || state == CLOSED) {
             throw new IllegalStateException();
         }
         throw new MediaException("TimeBase can't be set on this player.");
@@ -810,5 +721,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         }
         if (ext.isEmpty()) return "audio" + hashCode();
         return hashCode() + "." + ext;
+    }
+
+    public void notifyCompleted() {
+        complete = true;
+        synchronized (playLock) {
+            playLock.notify();
+        }
     }
 }

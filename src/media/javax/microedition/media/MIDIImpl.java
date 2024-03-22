@@ -1,5 +1,7 @@
 package javax.microedition.media;
 
+import emulator.media.EmulatorMIDI;
+
 import javax.microedition.media.control.MIDIControlImpl;
 
 public class MIDIImpl implements Player {
@@ -48,7 +50,7 @@ public class MIDIImpl implements Player {
             state = Player.PREFETCHED;
         }
         try {
-            PlayerImpl.initMIDIDevice();
+            EmulatorMIDI.initDevice();
         } catch (Exception e) {
             e.printStackTrace();
             throw new MediaException(e);

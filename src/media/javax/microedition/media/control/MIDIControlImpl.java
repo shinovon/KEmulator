@@ -1,5 +1,7 @@
 package javax.microedition.media.control;
 
+import emulator.media.EmulatorMIDI;
+
 import javax.microedition.media.*;
 
 public class MIDIControlImpl implements MIDIControl {
@@ -33,7 +35,7 @@ public class MIDIControlImpl implements MIDIControl {
     }
 
     public void setChannelVolume(final int n, final int n2) {
-        PlayerImpl.setMIDIChannelVolume(n, n2);
+        EmulatorMIDI.setMIDIChannelVolume(n, n2);
     }
 
     public int[] getBankList(final boolean b) throws MediaException {
@@ -53,10 +55,10 @@ public class MIDIControlImpl implements MIDIControl {
     }
 
     public void shortMidiEvent(final int n, final int n2, final int n3) {
-        PlayerImpl.shortMidiEvent(n, n2, n3);
+        EmulatorMIDI.shortMidiEvent(n, n2, n3);
     }
 
     public int longMidiEvent(final byte[] array, final int n, final int n2) {
-        return PlayerImpl.longMidiEvent(array, n, n2);
+        return EmulatorMIDI.longMidiEvent(array, n, n2);
     }
 }
