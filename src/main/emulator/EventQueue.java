@@ -124,24 +124,23 @@ public final class EventQueue implements Runnable {
 
     public void queue(int n, int x, int y) {
         final int n4 = n | method718(x) | method718(y) << 12;
-        this.queue(n4);
+        queue(n4);
     }
 
     public synchronized final void mouse(final int n, final int x, final int y) {
-        final int n4 = n | method718(x) | method718(y) << 12;
-        this.queue(n4);
+        queue(n | method718(x) | method718(y) << 12);
     }
 
     public synchronized void queue(final int n) {
         if(n == 1) {
             repainted = false;
         }
-        if (n == 15) {
-            this.paused = false;
+        if (n == 15 || n == 17) {
+            paused = false;
         }
-        this.events[this.ind++] = n;
-        if (this.ind >= events.length) {
-            this.ind = 0;
+        events[this.ind++] = n;
+        if (ind >= events.length) {
+            ind = 0;
         }
     }
 

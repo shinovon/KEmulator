@@ -44,7 +44,7 @@ public abstract class MIDlet {
 
     public boolean platformRequest(String url) throws ConnectionNotFoundException {
         try {
-            System.out.println("platformRequest(" + url + ")");
+            Emulator.getEmulator().getLogStream().println("platformRequest " + url);
             if (url.startsWith("vlc.exe \"")) {
                 url = "vlc:" + url.substring(9, url.length() - 1);
             }
