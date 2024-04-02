@@ -41,6 +41,7 @@ public abstract class Canvas extends Displayable {
         }
         graphics.reset(buffer, xray);
         this.paint(graphics);
+        graphics.reset(buffer, xray); // paintTicker fix
         this.paintTicker(graphics);
         this.paintSoftMenu(graphics);
     }
@@ -53,6 +54,7 @@ public abstract class Canvas extends Displayable {
         graphics.reset(buffer, xray);
         graphics.setClip(x, y, w, h);
         this.paint(graphics);
+        graphics.reset(buffer, xray); // paintTicker fix
         this.paintTicker(graphics);
         this.paintSoftMenu(graphics);
     }
@@ -149,14 +151,12 @@ public abstract class Canvas extends Displayable {
     public void setFullScreenMode(final boolean b) {
         if (!Settings.ignoreFullScreen) {
             super.h = Emulator.getEmulator().getScreen().getHeight();
-            /*
-            if (b) {
-                this.setTicker(null);
-                return;
-            }
-            this.setTicker(new Ticker("setFullScreenMode(true) to remove me"));
+//            if (b) {
+//                this.setTicker(null);
+//                return;
+//            }
+//            this.setTicker(new Ticker("setFullScreenMode(true) to remove me"));
             super.h -= Screen.fontHeight4;
-            */
         }
     }
 
