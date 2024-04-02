@@ -50,19 +50,22 @@ public class AudioClip {
         if (b == null) {
             throw new NullPointerException();
         }
+        if(b.length > 4 && b[0] == 77 && b[1] == 77 && b[2] == 77 && b[3] == 68) { // mmf header check
+            type = TYPE_MMF;
+        }
         this.type = type;
-        if (type == 1) {
+        if (type == TYPE_MMF) {
             this.mmfInit = MMFPlayer.a();
             this.data = b;
             this.dataLen = b.length;
-            this.status = 0;
+            this.status = STATUS_STOP;
             return;
         }
         try {
             String ct = "";
-            if (type == 3) {
+            if (type == TYPE_MIDI) {
                 ct = "audio/midi";
-            } else if (type == 2) {
+            } else if (type == TYPE_MP3) {
                 ct = "audio/mpeg";
             }
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
@@ -71,7 +74,7 @@ public class AudioClip {
             bais.close();
         } catch (Exception exception) {
         }
-        this.status = 0;
+        this.status = STATUS_STOP;
     }
 
     public int getStatus() {
@@ -83,10 +86,10 @@ public class AudioClip {
     }
 
     public void pause() {
-        if (this.type == 1) {
+        if (this.type == TYPE_MMF) {
             if (this.mmfInit && MMFPlayer.isPlaying()) {
                 MMFPlayer.pause();
-                this.status = 2;
+                this.status = STATUS_PAUSE;
                 return;
             }
         } else if (this.m_player != null) {
@@ -96,7 +99,7 @@ public class AudioClip {
                 this.m_player.setMediaTime(l);
             } catch (Exception exception) {
             }
-            this.status = 2;
+            this.status = STATUS_PAUSE;
         }
     }
 
@@ -116,7 +119,7 @@ public class AudioClip {
             if (this.mmfInit) {
                 MMFPlayer.initPlayer(this.data);
                 MMFPlayer.play(l, v);
-                this.status = 1;
+                this.status = STATUS_PLAY;
                 return;
             }
         } else if (this.m_player != null) {
@@ -126,15 +129,15 @@ public class AudioClip {
                 this.m_player.start();
             } catch (Exception exception) {
             }
-            this.status = 1;
+            this.status = STATUS_PLAY;
         }
     }
 
     public void resume() {
-        if (this.type == 1) {
+        if (this.type == TYPE_MMF) {
             if (this.mmfInit) {
                 MMFPlayer.resume();
-                this.status = 1;
+                this.status = STATUS_PLAY;
                 return;
             }
         } else if (this.m_player != null) {
@@ -142,15 +145,15 @@ public class AudioClip {
                 this.m_player.start();
             } catch (Exception exception) {
             }
-            this.status = 1;
+            this.status = STATUS_PLAY;
         }
     }
 
     public void stop() {
-        if (this.type == 1) {
+        if (this.type == TYPE_MMF) {
             if (this.mmfInit && MMFPlayer.isPlaying()) {
                 MMFPlayer.stop();
-                this.status = 0;
+                this.status = STATUS_STOP;
                 return;
             }
         } else if (this.m_player != null) {
@@ -158,14 +161,14 @@ public class AudioClip {
                 this.m_player.stop();
             } catch (Exception exception) {
             }
-            this.status = 0;
+            this.status = STATUS_STOP;
         }
     }
 
     class MMAPIListener implements PlayerListener {
         public void playerUpdate(Player p, String s, Object o) {
-            if ("stopped".equals(s)) {
-                AudioClip.this.status = 0;
+            if (STOPPED.equals(s) || END_OF_MEDIA.equals(s)) {
+                AudioClip.this.status = STATUS_STOP;
             }
         }
     }
