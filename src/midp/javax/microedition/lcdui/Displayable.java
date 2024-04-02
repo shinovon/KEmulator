@@ -162,7 +162,7 @@ public class Displayable {
                     this.cmdListener.commandAction(leftSoftCommand, this);
                 }
             }
-            return true;
+            return !Settings.motorolaSoftKeyFix;
         }
         if (KeyMapping.isRightSoft(n)) {
             if (this.commands.size() > 2) {
@@ -190,7 +190,7 @@ public class Displayable {
                     }
                 }
             }
-            return true;
+            return !Settings.motorolaSoftKeyFix;
         }
         return false;
     }

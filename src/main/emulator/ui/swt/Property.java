@@ -185,6 +185,8 @@ public final class Property implements IProperty {
     private Button keymapClearBtn;
     private Composite keyMapControllerComp;
     private Composite keyMapTabComp;
+    private Button softkeyMotFixCheck;
+    private Button synchronizeKeyEventsCheck;
 //    private Button pollOnRepaintBtn;
 
     public Property() {
@@ -551,6 +553,7 @@ public final class Property implements IProperty {
             Settings.uiLanguage = properties.getProperty("UILanguage", "en");
             Settings.fpsCounter = Boolean.valueOf(properties.getProperty("FPSCounter", "true"));
             Settings.synchronizeKeyEvents = Boolean.valueOf(properties.getProperty("SynchronizeKeyEvents", "true"));
+            Settings.motorolaSoftKeyFix = Boolean.valueOf(properties.getProperty("MotorolaSoftKeyFix", "false"));
             fileInputStream.close();
         } catch (Exception ex) {
             if (!(ex instanceof FileNotFoundException)) {
@@ -681,6 +684,7 @@ public final class Property implements IProperty {
             properties.setProperty("UILanguage", Settings.uiLanguage);
             properties.setProperty("FPSCounter", String.valueOf(Settings.fpsCounter));
             properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
+            properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         } catch (Exception ex) {
@@ -751,6 +755,8 @@ public final class Property implements IProperty {
         Settings.enableKeyRepeat = this.aButton728.getSelection();
         Settings.ignoreFullScreen = this.aButton732.getSelection();
         Settings.networkNotAvailable = this.aButton736.getSelection();
+        Settings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
+        Settings.motorolaSoftKeyFix = softkeyMotFixCheck.getSelection();
         Settings.xrayOverlapScreen = this.aButton746.getSelection();
         Settings.xrayShowClipBorder = this.aButton749.getSelection();
         Settings.infoColorHex = this.aButton752.getSelection();
@@ -1551,6 +1557,13 @@ public final class Property implements IProperty {
         (this.aButton736 = new Button((Composite) this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Network not available."));
         ((Control) this.aButton736).setLayoutData((Object) gridData);
         this.aButton736.setSelection(Settings.networkNotAvailable);
+
+        (this.synchronizeKeyEventsCheck = new Button((Composite) this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
+        ((Control) this.synchronizeKeyEventsCheck).setLayoutData((Object) gridData);
+        this.synchronizeKeyEventsCheck.setSelection(Settings.synchronizeKeyEvents);
+        (this.softkeyMotFixCheck = new Button((Composite) this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
+        ((Control) this.softkeyMotFixCheck).setLayoutData((Object) gridData);
+        this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
     }
 
     private void setupMediaComp() {

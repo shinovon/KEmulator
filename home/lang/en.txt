@@ -271,6 +271,8 @@ OPTION_COREAPI_VIBRATION=Enable Vibration APIs.
 OPTION_COREAPI_KEY_REPEAT=Enable Canvas.keyRepeated(int).
 OPTION_COREAPI_FULLSCREEN=Ignore Canvas.setFullScreenMode(boolean).
 OPTION_COREAPI_NO_NETWORK=Network not available.
+OPTION_COREAPI_SYNC_KEYEVENTS=Synchronize key events
+OPTION_COREAPI_SOFTKEY_FIX=Send keyPressed with commandAction
 
 OPTION_RECORDS_RMS_FOLDER=RMS Folder:
 OPTION_RECORDS_RMS_TEXT=All Records in current midlet:
