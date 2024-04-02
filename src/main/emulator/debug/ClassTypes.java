@@ -94,6 +94,19 @@ public final class ClassTypes {
         return var0 != null && var0.getClass().isArray() ? ((var3 = Array.get(var0, var1)) == null ? "null" : ((var4 = var0.getClass().getComponentType()) == Integer.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getInt(var0, var1)) : String.valueOf(Array.getInt(var0, var1))) : (var4 == Boolean.TYPE ? String.valueOf(Array.getBoolean(var0, var1)) : (var4 == Byte.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getByte(var0, var1)) : String.valueOf(Array.getByte(var0, var1))) : (var4 == Short.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getShort(var0, var1)) : String.valueOf(Array.getShort(var0, var1))) : (var4 == Long.TYPE ? (var2 ? "0x" + Long.toHexString(Array.getLong(var0, var1)) : String.valueOf(Array.getLong(var0, var1))) : (var4 == Float.TYPE ? String.valueOf(Array.getFloat(var0, var1)) : (var4 == Double.TYPE ? String.valueOf(Array.getDouble(var0, var1)) : (var4 == Character.TYPE ? String.valueOf(Array.getChar(var0, var1)) : (var4 == (strCls != null ? strCls : (strCls = cls("java.lang.String"))) ? String.valueOf(var3) : (!var4.isArray() ? var3.toString() : "[" + Array.getLength(var3) + "]"))))))))))) : "null";
     }
 
+
+
+    public static String asd(Object var0, int var1, boolean var2) {
+        Object var3;
+        Class var4;
+        return var0 != null && var0.getClass().isArray() ? ((var3 = Array.get(var0, var1)) == null ? "null" : ((var4 = var0.getClass().getComponentType()) == Integer.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getInt(var0, var1)) : String.valueOf(Array.getInt(var0, var1))) : (var4 == Boolean.TYPE ? String.valueOf(Array.getBoolean(var0, var1)) : (var4 == Byte.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getByte(var0, var1)) : String.valueOf(Array.getByte(var0, var1))) : (var4 == Short.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getShort(var0, var1)) : String.valueOf(Array.getShort(var0, var1))) : (var4 == Long.TYPE ? (var2 ? "0x" + Long.toHexString(Array.getLong(var0, var1)) : String.valueOf(Array.getLong(var0, var1))) : (var4 == Float.TYPE ? String.valueOf(Array.getFloat(var0, var1)) : (var4 == Double.TYPE ? String.valueOf(Array.getDouble(var0, var1)) : (var4 == Character.TYPE ? String.valueOf(Array.getChar(var0, var1)) : (var4 == (strCls != null ? strCls : (strCls = cls("java.lang.String"))) ? String.valueOf(var3) :
+                (!var4.isArray() ? var3.toString() :
+                        ClassTypes.method869(var3.getClass()).replaceFirst("\\[\\]", "[" + Array.getLength(var3) + "]")
+
+
+                ))))))))))) : "null";
+    }
+
     public static void method873(Object var0, int var1, String var2) {
         if (var0 != null && var0.getClass().isArray()) {
             if (Array.get(var0, var1) != null) {
@@ -175,7 +188,7 @@ public final class ClassTypes {
 
     }
 
-    public static Object method876(Object var0, Field var1) {
+    public static Object getFieldValue(Object var0, Field var1) {
         try {
             return var1.get(var0);
         } catch (Exception var2) {

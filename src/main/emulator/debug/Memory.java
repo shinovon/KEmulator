@@ -215,7 +215,7 @@ public final class Memory {
                 for (int j = 0; j < method845.length; ++j) {
                     final String name = method845[j].getName();
                     method845[j].setAccessible(true);
-                    final Object method846 = ClassTypes.method876(o, method845[j]);
+                    final Object method846 = ClassTypes.getFieldValue(o, method845[j]);
                     final String string = s + '.' + name;
                     if (!method845[j].getType().isPrimitive() && method846 != null) {
                         this.method847(method846.getClass(), method846, string, false);
@@ -230,7 +230,7 @@ public final class Memory {
                     //if((o instanceof Item || o instanceof Screen) && f[k].getType() == int[].class) continue;
                     if (!Modifier.isFinal(f[k].getModifiers()) || !f[k].getType().isPrimitive()) {
                         f[k].setAccessible(true);
-                        final Object method848 = ClassTypes.method876(o, f[k]);
+                        final Object method848 = ClassTypes.getFieldValue(o, f[k]);
                         final String string2 = s + '.' + name2;
                         if (!f[k].getType().isPrimitive() && method848 != null) {
                             this.method847(method848.getClass(), method848, string2, false);

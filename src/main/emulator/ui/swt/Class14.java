@@ -44,8 +44,8 @@ final class Class14 implements Runnable {
                         final c c;
                         if ((c = new c(s, (Object) (s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null))).method879((String) null)) {
                             String s2 = c.toString();
-                            if (c.method883().getSuperclass() != null) {
-                                s2 = s2 + "@" + c.method883().getSuperclass().getName();
+                            if (c.getCls().getSuperclass() != null) {
+                                s2 = s2 + "@" + c.getCls().getSuperclass().getName();
                             }
                             Class5.method304(this.aClass5_587).put(s2, c);
                         }

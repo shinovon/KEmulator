@@ -1,11 +1,16 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.debug.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 import java.util.List;
 import java.lang.reflect.*;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.events.*;
@@ -22,7 +27,7 @@ public final class Class5 implements Runnable, DisposeListener {
     private Button aButton558;
     private Display aDisplay550;
     private boolean aBoolean560;
-    private Hashtable aHashtable552;
+    private Hashtable table;
     private int anInt553;
     private Tree aTree554;
     private TreeEditor aTreeEditor555;
@@ -33,6 +38,7 @@ public final class Class5 implements Runnable, DisposeListener {
     private boolean aBoolean561;
     boolean aBoolean545;
     boolean aBoolean559;
+    private Button exportBtn;
 
     public Class5(final int anInt553) {
         super();
@@ -46,7 +52,7 @@ public final class Class5 implements Runnable, DisposeListener {
         this.aTreeEditor555 = null;
         this.aDisplay550 = EmulatorImpl.getDisplay();
         this.anInt553 = anInt553;
-        this.aHashtable552 = new Hashtable();
+        this.table = new Hashtable();
         this.aClass5_556 = this;
     }
 
@@ -65,10 +71,10 @@ public final class Class5 implements Runnable, DisposeListener {
         }
         this.aDisplay550 = EmulatorImpl.getDisplay();
         this.anInt553 = 0;
-        this.aHashtable552 = new Hashtable();
+        this.table = new Hashtable();
         final c c;
         (c = new c(o.getClass().getName(), o)).method879(null);
-        this.aHashtable552.put(o.toString(), c);
+        this.table.put(o.toString(), c);
         this.aClass5_556 = this;
     }
 
@@ -79,12 +85,12 @@ public final class Class5 implements Runnable, DisposeListener {
     private void method322() {
         this.aString551 = this.aCombo546.getText();
         final c c;
-        (c = (emulator.debug.c) this.aHashtable552.get(this.aString551)).method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
+        (c = (emulator.debug.c) this.table.get(this.aString551)).method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
         this.aTree554.removeAll();
-        for (int i = 0; i < c.method881().size(); ++i) {
+        for (int i = 0; i < c.getFields().size(); ++i) {
             final Object value;
-            if ((value = c.method881().get(i)) instanceof Field) {
-                final Field field = (Field) c.method881().get(i);
+            if ((value = c.getFields().get(i)) instanceof Field) {
+                final Field field = (Field) c.getFields().get(i);
                 final TreeItem treeItem;
                 (treeItem = new TreeItem(this.aTree554, 0)).setText(0, field.getName());
                 if (this.anInt553 == 0) {
@@ -105,7 +111,7 @@ public final class Class5 implements Runnable, DisposeListener {
     private void method301(final c c, final Field field, final TreeItem treeItem) {
         final String method869 = ClassTypes.method869(field.getType());
         if (field.getType().isArray()) {
-            final Object method870 = ClassTypes.method876(c.method882(), field);
+            final Object method870 = ClassTypes.getFieldValue(c.getInstance(), field);
             method305(method870, method303(method870, method869.substring(0, method869.length() - 2)), treeItem);
         }
     }
@@ -141,9 +147,9 @@ public final class Class5 implements Runnable, DisposeListener {
     }
 
     private void method306(final TreeItem treeItem) {
-        final c c = (emulator.debug.c) this.aHashtable552.get(this.aString551);
+        final c c = (emulator.debug.c) this.table.get(this.aString551);
         if (treeItem.getParentItem() == null) {
-            this.method301(c, (Field) c.method881().get(treeItem.getParent().indexOf(treeItem)), treeItem);
+            this.method301(c, (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), treeItem);
             return;
         }
         TreeItem parentItem = treeItem;
@@ -152,8 +158,8 @@ public final class Class5 implements Runnable, DisposeListener {
             stack.push(parentItem);
             parentItem = parentItem.getParentItem();
         }
-        final Field field = (Field) c.method881().get(parentItem.getParent().indexOf(parentItem));
-        Object o = ClassTypes.method876(c.method882(), field);
+        final Field field = (Field) c.getFields().get(parentItem.getParent().indexOf(parentItem));
+        Object o = ClassTypes.getFieldValue(c.getInstance(), field);
         final String method869 = ClassTypes.method869(field.getType());
         String s = method303(o, method869.substring(0, method869.length() - 2));
         String s2;
@@ -173,12 +179,12 @@ public final class Class5 implements Runnable, DisposeListener {
         if (array == null || array.length == 0) {
             return;
         }
-        final c c = (emulator.debug.c) this.aHashtable552.get(this.aString551);
+        final c c = (emulator.debug.c) this.table.get(this.aString551);
         Object o;
         Class<?> clazz;
         if (array[0].getParentItem() == null) {
-            final Field field = (Field) c.method881().get(array[0].getParent().indexOf(array[0]));
-            o = ClassTypes.method876(c.method882(), field);
+            final Field field = (Field) c.getFields().get(array[0].getParent().indexOf(array[0]));
+            o = ClassTypes.getFieldValue(c.getInstance(), field);
             clazz = field.getType();
         } else {
             TreeItem parentItem = array[0];
@@ -187,7 +193,7 @@ public final class Class5 implements Runnable, DisposeListener {
                 stack.push(parentItem);
                 parentItem = parentItem.getParentItem();
             }
-            clazz = (o = ClassTypes.method876(c.method882(), (Field) c.method881().get(parentItem.getParent().indexOf(parentItem)))).getClass().getComponentType();
+            clazz = (o = ClassTypes.getFieldValue(c.getInstance(), (Field) c.getFields().get(parentItem.getParent().indexOf(parentItem)))).getClass().getComponentType();
             while (!stack.isEmpty()) {
                 final TreeItem treeItem = (TreeItem) stack.pop();
                 final int index = treeItem.getParentItem().indexOf(treeItem);
@@ -215,10 +221,10 @@ public final class Class5 implements Runnable, DisposeListener {
     }
 
     private void method310(final TreeItem treeItem, final String s) {
-        final c c = (emulator.debug.c) this.aHashtable552.get(this.aString551);
+        final c c = (emulator.debug.c) this.table.get(this.aString551);
         this.aBoolean545 = true;
         if (treeItem.getParentItem() == null) {
-            ClassTypes.method875(c.method882(), (Field) c.method881().get(treeItem.getParent().indexOf(treeItem)), s);
+            ClassTypes.method875(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), s);
         } else {
             TreeItem parentItem = treeItem;
             final Stack stack = new Stack<TreeItem>();
@@ -227,7 +233,7 @@ public final class Class5 implements Runnable, DisposeListener {
                 parentItem = parentItem.getParentItem();
             }
             int n = parentItem.getParent().indexOf(parentItem);
-            Object o = ClassTypes.method876(c.method882(), (Field) c.method881().get(n));
+            Object o = ClassTypes.getFieldValue(c.getInstance(), (Field) c.getFields().get(n));
             Object o2 = null;
             Label_0140:
             while (true) {
@@ -317,14 +323,14 @@ public final class Class5 implements Runnable, DisposeListener {
 
     private void method323() {
         final List list;
-        Collections.sort((List<Comparable>) (list = (List) Collections.list(this.aHashtable552.keys())));
+        Collections.sort((List<Comparable>) (list = (List) Collections.list(this.table.keys())));
         final Enumeration enumeration = Collections.enumeration((Collection) list);
         while (enumeration.hasMoreElements()) {
             this.aCombo546.add(enumeration.nextElement().toString());
         }
         Class5 class5;
         String item;
-        if (this.aHashtable552.size() > 0) {
+        if (this.table.size() > 0) {
             class5 = this;
             item = this.aCombo546.getItem(0);
         } else {
@@ -337,20 +343,20 @@ public final class Class5 implements Runnable, DisposeListener {
     }
 
     public final void run() {
-        if (this.aHashtable552.size() == 0 || !this.aBoolean560 || this.aBoolean559 || this.aBoolean561) {
+        if (this.table.size() == 0 || !this.aBoolean560 || this.aBoolean559 || this.aBoolean561) {
             return;
         }
         this.aBoolean559 = true;
-        final c c = (emulator.debug.c) this.aHashtable552.get(this.aString551);
+        final c c = (emulator.debug.c) this.table.get(this.aString551);
         int n = 0;
         try {
-            for (int i = 0; i < c.method881().size(); ++i) {
-                final Field field = (Field) c.method881().get(i);
+            for (int i = 0; i < c.getFields().size(); ++i) {
+                final Field field = (Field) c.getFields().get(i);
                 if (this.aBoolean561) {
                     this.aBoolean559 = false;
                     return;
                 }
-                final String s = (!Modifier.isStatic(field.getModifiers()) && c.method882() == null) ? "" : ClassTypes.method874(c.method882(), field, this.aButton558.getSelection());
+                final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, this.aButton558.getSelection());
                 if (this.aBoolean545) {
                     this.aBoolean559 = false;
                     return;
@@ -361,7 +367,7 @@ public final class Class5 implements Runnable, DisposeListener {
                     this.aBoolean559 = false;
                     return;
                 }
-                this.method318(ClassTypes.method876(c.method882(), field), item);
+                this.method318(ClassTypes.getFieldValue(c.getInstance(), field), item);
             }
         } catch (Exception ex) {
         }
@@ -386,7 +392,7 @@ public final class Class5 implements Runnable, DisposeListener {
     private void method324() {
         final GridData layoutData;
         (layoutData = new GridData()).horizontalAlignment = 4;
-        layoutData.horizontalSpan = 5;
+        layoutData.horizontalSpan = 6;
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.grabExcessVerticalSpace = true;
         layoutData.verticalAlignment = 4;
@@ -395,7 +401,7 @@ public final class Class5 implements Runnable, DisposeListener {
         layoutData2.grabExcessHorizontalSpace = true;
         layoutData2.verticalAlignment = 2;
         final GridLayout layout;
-        (layout = new GridLayout()).numColumns = 5;
+        (layout = new GridLayout()).numColumns = 6;
         ((Decorations) (this.aShell557 = new Shell())).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
         ((Decorations) this.aShell557).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         ((Composite) this.aShell557).setLayout((Layout) layout);
@@ -408,6 +414,83 @@ public final class Class5 implements Runnable, DisposeListener {
         this.aText543.addModifyListener((ModifyListener) new Class141(this));
         (this.aButton558 = new Button((Composite) this.aShell557, 32)).setText("HEX");
         this.aButton558.addSelectionListener((SelectionListener) new Class8(this));
+        if (this.anInt553 == 0) {
+            (this.exportBtn = new Button((Composite) this.aShell557, SWT.PUSH)).setText("Export");
+            this.exportBtn.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent selectionEvent) {
+                    new Thread(() -> {
+                        // XXX
+                        try {
+                            File file = new File(Emulator.getAbsolutePath() + "/classwatcher.txt");
+                            if (!file.exists()) file.createNewFile();
+                            PrintStream ps = new PrintStream(new FileOutputStream(file));
+                            try {
+                                final List list;
+                                Collections.sort((List<Comparable>) (list = (List) Collections.list(table.keys())));
+                                for (Object o : list) {
+                                    ps.println(o);
+                                    final c c = (emulator.debug.c) table.get(o);
+                                    c.method879(null);
+                                    Vector fields = c.getFields();
+                                    for (int i = 0; i < fields.size(); ++i) {
+                                        final Object f = fields.get(i);
+                                        if (f instanceof Field) {
+                                            final Field field = (Field) c.getFields().get(i);
+                                            Class type = field.getType();
+                                            ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.method869(type) + " " + field.getName());
+                                            try {
+                                                Object v = field.get(c.getInstance());
+                                                if (type.isArray()) {
+                                                    int l = Array.getLength(v);
+                                                    ps.println(" = " + ClassTypes.method869(v.getClass()).replaceFirst("\\[\\]", "[" + l + "]"));
+                                                    ps.print(" [");
+                                                    for (int n = 0; n < l; n++) {
+                                                        ps.print(ClassTypes.asd(v, n, false));
+                                                        if (n != l - 1) ps.print(", ");
+                                                    }
+                                                    ps.println("]");
+                                                } else {
+                                                    String s = v.toString();
+                                                    if (v instanceof String) {
+                                                        StringBuilder sb = new StringBuilder();
+                                                        sb.append('"');
+                                                        for (char ch : s.toCharArray()) {
+                                                            if (ch == '\r') {
+                                                                sb.append("\\r");
+                                                                continue;
+                                                            }
+                                                            if (ch == '\n') {
+                                                                sb.append("\\n");
+                                                                continue;
+                                                            }
+                                                            sb.append(ch);
+                                                        }
+                                                        sb.append('"');
+                                                        s = sb.toString();
+                                                    }
+                                                    ps.println(" = " + s);
+                                                }
+                                            } catch (NullPointerException e) {
+                                                ps.println(" = null");
+                                            } catch (Exception e) {
+                                                ps.println();
+                                                ps.println(" " + e);
+                                            }
+                                        } else {
+                                        }
+                                    }
+                                    ps.println();
+                                }
+                            } finally {
+                                ps.close();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                }
+            });
+        }
         (this.aTree554 = new Tree((Composite) this.aShell557, 67584)).setHeaderVisible(true);
         this.aTree554.setLinesVisible(true);
         ((Control) this.aTree554).setLayoutData((Object) layoutData);
@@ -452,7 +535,7 @@ public final class Class5 implements Runnable, DisposeListener {
     }
 
     static Hashtable method304(final Class5 class5) {
-        return class5.aHashtable552;
+        return class5.table;
     }
 
     static void method315(final Class5 class5, final TreeItem treeItem, final String s) {
