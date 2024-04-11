@@ -130,107 +130,47 @@ public class Form extends Screen {
     protected void layout() {
         if (super.anInt182 != -1) {
             int h = Screen.fontHeight4;
-            int x = 0;
-            int lh = Screen.fontHeight4;
-            boolean row = false;
-            int rowHeight = 0;
-            Item prevItem = null;
             for (int i = 0; i < super.items.size(); ++i) {
                 final Item item = ((Item) super.items.get(i));
-                boolean c;
-                Item item2;
                 if (i < super.anInt182) {
-                    item2 = item;
-                    c = false;
+//                    if(item instanceof CustomItem && item.shownOnForm) {
+//                        ((CustomItem) item).hideNotify();
+//                    }
+                    item.shownOnForm = false;
                 } else {
-                	/*
-                	if(row) {
-                        item.bounds[W] = bounds[W] - x - 4;
-                	}*/
                     item.layout();
-            		/*if((item.isLayoutNewLineBefore() || item.isFullWidthItem()) && row) {
-            			h += prevItem.bounds[H];
-            			x = 0;
-            			row = false;
-                        item.bounds[W] = bounds[W];
-            			rowHeight = 0;
-            		}
-            		if(row) {
-            			rowHeight = Math.max(rowHeight, item.bounds[H]);
-            			item.setInRow(true);
-            		}
-            		boolean wrow = row;
-            		row = false;
-            		if(x != 0)
-                    item.bounds[X] = x;*/
                     item.bounds[Y] = h;
-                   /* lh = item.bounds[H];
-                    if(item.allowNextItemPlaceSameRow() && !item.isLayoutNewLineAfter()) {
-                    	x = item.getItemWidth() + 1;
-                    	row = true;
-            			rowHeight = Math.max(rowHeight, item.bounds[H]);
-                    } else {
-                    	row = false;
-                    	x = 0;
-                    }
-                    if(!row) {
-                    	if(wrow) {
-                    		h += rowHeight;
-                    		rowHeight = 0;
-                    	} else*/
                     h += item.bounds[H];
-                    //}
-                    item2 = item;
-                    c = true;
-                    c = BoundsUtils.collides(super.bounds, item.bounds);
+                    item.shownOnForm = BoundsUtils.collides(super.bounds, item.bounds);
+//                    if(!item.shownOnForm && (item.shownOnForm = BoundsUtils.collides(super.bounds, item.bounds)) && item instanceof CustomItem) {
+//                        ((CustomItem) item).showNotify();
+//                    }
                 }
-                /*if(item2 instanceof CustomItem) {
-                    boolean w = item2.shownOnForm;
-	                if(!w && c) {
-	                	((CustomItem) item2).showNotify();
-	                } else if(w && !c) {
-	                	((CustomItem) item2).hideNotify();
-	                }
-                }*/
-                prevItem = item;
-                item2.shownOnForm = c;
             }
             return;
         }
         int n = Screen.fontHeight4 + super.bounds[H];
         for (int j = super.items.size() - 1; j >= 0; --j) {
-            final Item item3 = ((Item) super.items.get(j));
-            Item item4;
+            final Item item = ((Item) super.items.get(j));
             boolean c;
             if (j > super.anInt349) {
-                item4 = item3;
-                c = true;
+                item.shownOnForm = true;
             } else {
-                item3.layout();
-                item3.bounds[Y] = n - item3.bounds[H];
-                n -= item3.bounds[H];
-                item4 = item3;
-                c = BoundsUtils.collides2(super.bounds, item3.bounds);
+                item.layout();
+                item.bounds[Y] = n - item.bounds[H];
+                n -= item.bounds[H];
+                item.shownOnForm = BoundsUtils.collides2(super.bounds, item.bounds);
             }
-            /*if(item4 instanceof CustomItem) {
-                boolean w = item4.shownOnForm;
-                if(!w && c) {
-                	((CustomItem) item4).showNotify();
-                } else if(w && !c) {
-                	((CustomItem) item4).hideNotify();
-                }
-            }*/
-            item4.shownOnForm = c;
         }
         int h = Screen.fontHeight4;
         for (int k = 0; k < super.items.size(); ++k) {
-            final Item item5;
-            if ((item5 = ((Item) super.items.get(k))).shownOnForm) {
-                item5.layout();
-                item5.bounds[Y] = h;
-                h += item5.bounds[H];
-                item5.shownOnForm = BoundsUtils.collides2(super.bounds, item5.bounds);
-                /*if(!item5.shownOnForm && item5 instanceof CustomItem) {
+            final Item item;
+            if ((item = ((Item) super.items.get(k))).shownOnForm) {
+                item.layout();
+                item.bounds[Y] = h;
+                h += item.bounds[H];
+                item.shownOnForm = BoundsUtils.collides2(super.bounds, item.bounds);
+                /*if(!item.shownOnForm && item instanceof CustomItem) {
                 	((CustomItem) item5).hideNotify();
                 }*/
             }

@@ -419,7 +419,6 @@ public final class Class5 implements Runnable, DisposeListener {
             this.exportBtn.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent selectionEvent) {
                     new Thread(() -> {
-                        // XXX
                         try {
                             File file = new File(Emulator.getAbsolutePath() + "/classwatcher.txt");
                             if (!file.exists()) file.createNewFile();
@@ -476,7 +475,6 @@ public final class Class5 implements Runnable, DisposeListener {
                                                 ps.println();
                                                 ps.println(" " + e);
                                             }
-                                        } else {
                                         }
                                     }
                                     ps.println();
