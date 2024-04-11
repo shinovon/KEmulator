@@ -519,21 +519,11 @@ public final class MemoryView implements DisposeListener {
         }
         this.bytecodeSizeLbl.setText(this.bytecodeSize + " bytes");
         this.objectsSizeLbl.setText(this.objectsSize + " bytes");
-        int usedmidp = this.bytecodeSize + this.objectsSize;
-        this.totalmemLbl.setText(usedmidp + " bytes");
+        this.totalmemLbl.setText(this.bytecodeSize + this.objectsSize + " bytes");
         this.aCLabel1140.setText(this.anInt1130 + " bytes");
         long t = Runtime.getRuntime().totalMemory();
         long f = Runtime.getRuntime().freeMemory();
-        int usedmidpk = usedmidp / 1024;
-        long usedem = (t - f) / 1024L;
-        long totalem = t / 1024L;
-        this.jvmmemLabel.setText(usedem + "/" + totalem + " kb");
-
-        //System.out.println("Использовано эмулятором: " + usedem + "K");
-        //System.out.println("Использовано приложением: " + usedmidpk + "K");
-        //System.out.println("Пропорции юзания памяти (эмуль/прога): " + (int) ((((double) usedem / (double) usedmidpk) * 100) * 100D) / 100D + "%");
-        //System.out.println("Пропорции юзания памяти (прога/эмуль): " + (int) ((((double) usedmidpk / (double) usedem) * 100) * 100D) / 100D + "%");
-
+        this.jvmmemLabel.setText(((t - f) / 1024L) + "/" + (t / 1024L) + " kb");
         sort();
     }
 

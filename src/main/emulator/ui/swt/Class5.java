@@ -224,7 +224,7 @@ public final class Class5 implements Runnable, DisposeListener {
         final c c = (emulator.debug.c) this.table.get(this.aString551);
         this.aBoolean545 = true;
         if (treeItem.getParentItem() == null) {
-            ClassTypes.method875(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), s);
+            ClassTypes.setFieldValue(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), s);
         } else {
             TreeItem parentItem = treeItem;
             final Stack stack = new Stack<TreeItem>();

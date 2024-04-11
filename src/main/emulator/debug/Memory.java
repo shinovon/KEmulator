@@ -39,10 +39,6 @@ public final class Memory {
     static Class _F;
     static Class _D;
     static Class _C;
-    static Class lStringCls;
-    static Class InputStreamCls;
-    static Class ImageCls;
-    static Class Image2DCls;
 
     public Memory() {
         super();
@@ -125,10 +121,6 @@ public final class Memory {
         }
     }
 
-    private static Class strC() {
-        return lStringCls != null ? lStringCls : (lStringCls = cls("java.lang.String"));
-    }
-
     private void method847(final Class clazz, final Object o, final String s, boolean vector) {
         String s2 = clazz.getName();
         if (clazz.isArray()) {
@@ -179,9 +171,9 @@ public final class Memory {
             while ((componentType = clazz2.getComponentType()).getComponentType() != null) {
                 clazz2 = componentType;
             }
-            //if (!ClassTypes.method871(componentType) && componentType != strC()) {
-            //    return;
-            //}
+            if (!ClassTypes.method871(componentType) && componentType != String.class) {
+                return;
+            }
             for (int i = 0; i < Array.getLength(o); ++i) {
                 final Object value;
                 if ((value = Array.get(o, i)) != null) {
@@ -223,7 +215,7 @@ public final class Memory {
                 }
                 return;
             }
-            if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || ((Memory.InputStreamCls != null) ? Memory.InputStreamCls : (Memory.InputStreamCls = cls("java.io.InputStream"))).isAssignableFrom(clazz)) {
+            if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || InputStream.class.isAssignableFrom(clazz)) {
                 final Field[] f = fields(clazz);
                 for (int k = 0; k < f.length; ++k) {
                     final String name2 = f[k].getName();
@@ -643,8 +635,7 @@ public final class Memory {
     }
 
     public final int size(Class c, Object o, String s) {
-        int i = size(c, o);
-        return i;
+        return size(c, o);
     }
 
     public final int size(final Class cls, final Object o) {
@@ -664,21 +655,18 @@ public final class Memory {
             }
         }
         if (o != null) {
-            int len;
-            int size2;
             if (cls.isArray()) {
-                len = res;
-                size2 = this.arraySize(cls, o);
+                res += this.arraySize(cls, o);
             } else {
                 res += 12;
-                if (cls == ((Memory.lStringCls != null) ? Memory.lStringCls : (Memory.lStringCls = cls("java.lang.String")))) {
-                    len = res + 2 + ((String) o).length();
+                if (cls == String.class) {
+                    res += 2 + ((String) o).length();
                 } else {
-                    if (cls == ((Memory.ImageCls != null) ? Memory.ImageCls : (Memory.ImageCls = cls("javax.microedition.lcdui.Image")))) {
+                    if (cls == Image.class) {
                         final Image image = (Image) o;
-                        len = res + image.size();
+                        res += image.size();
                     } else {
-                        if (cls != ((Memory.Image2DCls != null) ? Memory.Image2DCls : (Memory.Image2DCls = cls("javax.microedition.m3g.Image2D")))) {
+                        if (cls != Image2D.class) {
                             /*if(!(cls == Vector.class || cls == Hashtable.class 
                             		|| cls == StringItem.class || cls == Command.class 
                             		|| cls == cls("javax.microedition.lcdui.a")
@@ -688,11 +676,10 @@ public final class Memory {
                             return res;
                         }
                         final Image2D image2D = (Image2D) o;
-                        len = res + image2D.size();
+                        res += image2D.size();
                     }
                 }
             }
-            res = len;
         }
         return res;
     }
