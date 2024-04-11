@@ -109,7 +109,7 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public final void disposeSubWindows() {
-        Settings.showLogFrame = this.ilogstream.method327();
+        Settings.showLogFrame = this.ilogstream.isLogOpen();
         Settings.showInfoFrame = this.aClass108_1390.method610();
         this.aClass161_1387.method836();
         this.ilogstream.method330();

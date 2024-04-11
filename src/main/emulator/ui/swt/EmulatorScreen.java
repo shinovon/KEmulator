@@ -1194,7 +1194,7 @@ public final class EmulatorScreen implements
                 return;
             }
             if (menuItem.equals(this.aMenuItem957)) {
-                if (((Class11) Emulator.getEmulator().getLogStream()).method327()) {
+                if (((Class11) Emulator.getEmulator().getLogStream()).isLogOpen()) {
                     ((Class11) Emulator.getEmulator().getLogStream()).method330();
                     return;
                 }
@@ -2073,8 +2073,8 @@ public final class EmulatorScreen implements
 
     public final void controlMoved(final ControlEvent controlEvent) {
         this.getWindowPos();
-        if (((Class11) Emulator.getEmulator().getLogStream()).method327()) {
-            final Shell method328 = ((Class11) Emulator.getEmulator().getLogStream()).method328();
+        if (((Class11) Emulator.getEmulator().getLogStream()).isLogOpen()) {
+            final Shell method328 = ((Class11) Emulator.getEmulator().getLogStream()).getLogShell();
             if (((Class11) Emulator.getEmulator().getLogStream()).method333() && !((Widget) method328).isDisposed()) {
                 ((Control) method328).setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
             }
