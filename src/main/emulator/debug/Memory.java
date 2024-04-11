@@ -1,5 +1,7 @@
 package emulator.debug;
 
+import com.nec.graphics.Sprite;
+import com.sun.prism.Texture;
 import emulator.*;
 
 import javax.microedition.lcdui.*;
@@ -119,6 +121,10 @@ public final class Memory {
             if (clazz != null)
                 a.method847(clazz, o, s, false);
         }
+
+        for (int i = 0; i < m3gObjects.size(); i++) {
+            m3gReadTextures((Node) m3gObjects.elementAt(i));
+        }
     }
 
     private void method847(final Class clazz, final Object o, final String s, boolean vector) {
@@ -156,17 +162,12 @@ public final class Memory {
                     this.players.add(o);
             } else if (o instanceof Node) {
                 this.m3gObjects.add(o);
-            } else {
-
-                if (o instanceof Image2D) {
-                    IImage img = MemoryViewImage.createFromM3GImage((Image2D) o);
-                    if (img != null)
-                        this.images.add(new MemoryViewImage(img));
-                }
-
-                if(o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
-                    this.images.add(Emulator.getPlatform().convertMicro3DTexture(o));
-                }
+            } else if (o instanceof Image2D) {
+                IImage img = MemoryViewImage.createFromM3GImage((Image2D) o);
+                if (img != null)
+                    this.images.add(new MemoryViewImage(img));
+            } else if(o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
+                this.images.add(Emulator.getPlatform().convertMicro3DTexture(o));
             }
         }
         if (o != null && clazz.isArray()) {
@@ -234,6 +235,48 @@ public final class Memory {
                     }
                 }
             }
+        }
+    }
+
+    private void m3gReadTextures(Object3D obj) {
+        if(obj == null) return;
+
+        if (obj instanceof Group) {
+            Group g = (Group) obj;
+
+            for (int i = 0; i < g.getChildCount(); i++) {
+                Node child = g.getChild(i);
+                m3gReadTextures(child);
+            }
+        } else if (obj instanceof Mesh) {
+            Mesh mesh = (Mesh) obj;
+
+            for (int i = 0; i < mesh.getSubmeshCount(); i++) {
+                m3gReadTextures(mesh.getAppearance(i));
+            }
+        } else if (obj instanceof Appearance) {
+            Appearance ap = (Appearance) obj;
+
+            for (int i = 0; ; i++) {
+                try {
+                    m3gReadTextures(ap.getTexture(i));
+                } catch(IndexOutOfBoundsException e) {
+                    break;
+                }
+            }
+        } else if (obj instanceof Sprite3D) {
+            m3gReadTextures(((Sprite3D) obj).getImage());
+        } else if (obj instanceof Texture2D) {
+            m3gReadTextures(((Texture2D) obj).getImage());
+        } else if (obj instanceof Image2D) {
+            Image2D img2d = (Image2D) obj;
+            //use only after all objects are added to instances list!
+            if(this.instances.contains(img2d)) return;
+            this.instances.add(img2d);
+
+            IImage img = MemoryViewImage.createFromM3GImage(img2d);
+            if (img != null)
+                this.images.add(new MemoryViewImage(img));
         }
     }
 
