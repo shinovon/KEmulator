@@ -157,9 +157,11 @@ public final class Memory {
             } else if (o instanceof Node) {
                 this.m3gObjects.add(o);
             } else {
-                IImage img;
-                if (o instanceof Image2D && (img = Texture.convertM3GTexture((Image2D) o)) != null) {
-                    this.images.add(new Texture(img));
+
+                if (o instanceof Image2D) {
+                    IImage img = MemoryViewImage.createFromM3GImage((Image2D) o);
+                    if (img != null)
+                        this.images.add(new MemoryViewImage(img));
                 }
 
                 if(o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {

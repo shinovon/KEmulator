@@ -111,9 +111,9 @@ public class Image2D extends Object3D {
         return Helpers.isOpaque(image);
     }
 
-    native boolean isPalettized();
+    public native boolean isPalettized();
 
-    native void getPalette(final byte[] p0);
+    public native void getPalette(final byte[] p0);
 
     native void setPalette(final byte[] p0);
 
@@ -127,8 +127,7 @@ public class Image2D extends Object3D {
         return (Image2D) Engine.instantiateJavaPeer(this.qonvertATITCImpl(n));
     }
 
-    public int size() {
-        int i = getWidth() * getHeight();
+    public int getBitsPerColor() {
         int m = 1;
         switch (getFormat()) {
             case ALPHA:
@@ -145,6 +144,11 @@ public class Image2D extends Object3D {
                 m = 4;
                 break;
         }
-        return i * m + 4;
+
+        return m;
+    }
+
+    public int size() {
+        return getWidth() * getHeight() * getBitsPerColor() + 4;
     }
 }

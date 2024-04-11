@@ -12,7 +12,7 @@ import java.util.*;
 
 import org.eclipse.swt.graphics.*;
 import emulator.debug.*;
-import emulator.debug.Texture;
+import emulator.debug.MemoryViewImage;
 
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
@@ -633,7 +633,7 @@ public final class MemoryView implements DisposeListener {
                     }
                 } catch (Exception ex2) {
                 }
-                if (image instanceof Texture) {
+                if (image instanceof MemoryViewImage) {
                     gc.setForeground(foreground);
                     gc.drawString("Tex", n2 - 1, n + 1 - gc.getFontMetrics().getHeight(), true);
                 } else {

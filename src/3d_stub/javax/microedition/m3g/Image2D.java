@@ -51,7 +51,16 @@ public class Image2D
         super(paramInt);
     }
 
+    public boolean isPalettized() { return false; }
+
     public void getPixels(byte[] array) {
+    }
+
+    public void getPalette(byte[] array) {
+    }
+
+    public int getBitsPerColor() {
+        return 0;
     }
 
     public int size() {
