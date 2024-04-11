@@ -175,9 +175,9 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private void method536() {
         this.ana898.method846();
         this.aTree896.removeAll();
-        for (int i = 0; i < this.ana898.aVector1467.size(); ++i) {
+        for (int i = 0; i < this.ana898.m3gObjects.size(); ++i) {
             final Node data;
-            final String name = (data = (Node) this.ana898.aVector1467.get(i)).getClass().getName();
+            final String name = (data = (Node) this.ana898.m3gObjects.get(i)).getClass().getName();
             final Widget widget;
             ((TreeItem) (widget = (Widget) new TreeItem(this.aTree896, 0))).setText(name.substring(name.lastIndexOf(".") + 1) + "_" + data.getUserID());
             widget.setData((Object) data);

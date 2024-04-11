@@ -6,13 +6,13 @@ import emulator.*;
 
 import java.lang.reflect.*;
 
-public final class c {
+public final class Instance {
     Vector fields;
     String className;
     Class aClass;
     Object instance;
 
-    public c(final String aString1494, final Object anObject1496) {
+    public Instance(final String aString1494, final Object anObject1496) {
         super();
         this.fields = new Vector();
         this.className = aString1494;

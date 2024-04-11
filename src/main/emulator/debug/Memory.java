@@ -25,11 +25,11 @@ import emulator.media.vlc.VLCPlayerImpl;
 
 public final class Memory {
     public Hashtable table;
-    public Vector aVector1459;
-    public Vector aVector1461;
+    public Vector instances;
+    public Vector images;
     public Vector aVector1463;
     public Vector players;
-    public Vector aVector1467;
+    public Vector m3gObjects;
     private Vector checkClasses;
     static Class _J;
     static Class _I;
@@ -43,11 +43,11 @@ public final class Memory {
     public Memory() {
         super();
         this.table = new Hashtable();
-        this.aVector1459 = new Vector();
-        this.aVector1461 = new Vector();
+        this.instances = new Vector();
+        this.images = new Vector();
         this.aVector1463 = new Vector();
         this.players = new Vector();
-        this.aVector1467 = new Vector();
+        this.m3gObjects = new Vector();
         checkClasses = new Vector();
         checkClasses.add("javax.microedition.lcdui.ImageItem");
         checkClasses.add("javax.microedition.lcdui.CustomItem");
@@ -60,17 +60,17 @@ public final class Memory {
 
     public final void method846() {
         if (Settings.recordReleasedImg) {
-            for (int i = 0; i < this.aVector1461.size(); ++i) {
-                if (!this.aVector1463.contains(this.aVector1461.get(i))) {
-                    this.aVector1463.addElement(this.aVector1461.get(i));
+            for (int i = 0; i < this.images.size(); ++i) {
+                if (!this.aVector1463.contains(this.images.get(i))) {
+                    this.aVector1463.addElement(this.images.get(i));
                 }
             }
         }
         this.table.clear();
-        this.aVector1459.clear();
-        this.aVector1461.clear();
+        this.instances.clear();
+        this.images.clear();
         this.players.clear();
-        this.aVector1467.clear();
+        this.m3gObjects.clear();
         for (Player p : PlayerImpl.players)
             this.players.add(p);
         for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
@@ -138,18 +138,16 @@ public final class Memory {
         }
         if (o != null) {
             try {
-                if (this.aVector1459.contains(o)) {
+                if (this.instances.contains(o)) {
                     return;
                 }
             } catch (Exception e) {
-
             }
-            final ClassInfo classInfo2 = classInfo;
-            ++classInfo2.anInt1485;
+            ++classInfo.instancesCount;
             classInfo.objs.add(new ObjInstance(this, s, o));
-            this.aVector1459.add(o);
+            this.instances.add(o);
             if (o instanceof Image) {
-                this.aVector1461.add(o);
+                this.images.add(o);
                 if (Settings.recordReleasedImg && this.aVector1463.contains(o)) {
                     this.aVector1463.removeElement(o);
                 }
@@ -157,11 +155,11 @@ public final class Memory {
                 if (!PlayerImpl.players.contains(o))
                     this.players.add(o);
             } else if (o instanceof Node) {
-                this.aVector1467.add(o);
+                this.m3gObjects.add(o);
             } else {
                 final IImage method844;
-                if (o instanceof Image2D && (method844 = f.method844((Image2D) o)) != null) {
-                    this.aVector1461.add(new f(method844));
+                if (o instanceof Image2D && (method844 = Texture.convertImage2D((Image2D) o)) != null) {
+                    this.images.add(new Texture(method844));
                 }
             }
         }
@@ -604,7 +602,7 @@ public final class Memory {
 
     public final int method866(final Object o) {
         try {
-            return ((ClassInfo) this.table.get(o)).anInt1485;
+            return ((ClassInfo) this.table.get(o)).instancesCount;
         } catch (NullPointerException e) {
         }
         return 0;
@@ -718,7 +716,7 @@ public final class Memory {
         return n;
     }
 
-    private static Class cls(final String s) {
+    static Class cls(final String s) {
         Class<?> forName;
         try {
             forName = Class.forName(s, false, Emulator.getCustomClassLoader());
@@ -726,10 +724,6 @@ public final class Memory {
             throw new NoClassDefFoundError(ex2.getMessage());
         }
         return forName;
-    }
-
-    static Class method848(final String s) {
-        return cls(s);
     }
 
     private final class ObjInstance {
@@ -747,7 +741,7 @@ public final class Memory {
 
     private final class ClassInfo implements Comparable {
         String s;
-        int anInt1485;
+        int instancesCount;
         int anInt1487;
         Vector objs;
 
@@ -763,11 +757,11 @@ public final class Memory {
             return this.s.compareTo(((ClassInfo) o).s);
         }
 
-        ClassInfo(final Memory a, final String aString1484) {
+        ClassInfo(final Memory m, final String aString1484) {
             super();
             this.objs = new Vector();
-            this.anInt1485 = 0;
-            this.anInt1487 = a.size(a.method848(aString1484), null);
+            this.instancesCount = 0;
+            this.anInt1487 = m.size(cls(aString1484), null);
             this.s = aString1484;
         }
     }

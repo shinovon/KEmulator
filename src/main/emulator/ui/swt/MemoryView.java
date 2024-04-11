@@ -12,7 +12,7 @@ import java.util.*;
 
 import org.eclipse.swt.graphics.*;
 import emulator.debug.*;
-import emulator.debug.f;
+import emulator.debug.Texture;
 
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
@@ -541,15 +541,15 @@ public final class MemoryView implements DisposeListener {
 
     private void method694() {
         synchronized (MemoryView.anObject1086) {
-            final int size = this.memoryMgr.aVector1461.size();
-            final int n = this.memoryMgr.aVector1461.size() + (this.aBoolean1131 ? this.memoryMgr.aVector1463.size() : 0);
+            final int size = this.memoryMgr.images.size();
+            final int n = this.memoryMgr.images.size() + (this.aBoolean1131 ? this.memoryMgr.aVector1463.size() : 0);
             MemoryView.aVector1099.clear();
             MemoryView.anArrayList1090.clear();
             for (int i = 0; i < n; ++i) {
                 Image image;
                 try {
                     if (i < size) {
-                        image = (Image) this.memoryMgr.aVector1461.get(i);
+                        image = (Image) this.memoryMgr.images.get(i);
                     } else {
                         image = (Image) this.memoryMgr.aVector1463.get(i - size);
                     }
@@ -633,7 +633,7 @@ public final class MemoryView implements DisposeListener {
                     }
                 } catch (Exception ex2) {
                 }
-                if (image instanceof f) {
+                if (image instanceof Texture) {
                     gc.setForeground(foreground);
                     gc.drawString("Tex", n2 - 1, n + 1 - gc.getFontMetrics().getHeight(), true);
                 } else {

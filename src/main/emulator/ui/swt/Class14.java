@@ -41,8 +41,8 @@ final class Class14 implements Runnable {
                 case 0: {
                     for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
                         final String s = (String) Emulator.jarClasses.get(i);
-                        final c c;
-                        if ((c = new c(s, (Object) (s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null))).method879((String) null)) {
+                        final Instance c;
+                        if ((c = new Instance(s, (Object) (s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null))).method879((String) null)) {
                             String s2 = c.toString();
                             if (c.getCls().getSuperclass() != null) {
                                 s2 = s2 + "@" + c.getCls().getSuperclass().getName();
@@ -52,8 +52,8 @@ final class Class14 implements Runnable {
                     }
                 }
                 case 1: {
-                    final c c2;
-                    (c2 = new c("emulator.debug.Profiler", (Object) null)).method879((String) null);
+                    final Instance c2;
+                    (c2 = new Instance("emulator.debug.Profiler", (Object) null)).method879((String) null);
                     Class5.method304(this.aClass5_587).put("SystemProfiler", c2);
                     break;
                 }

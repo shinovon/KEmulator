@@ -13,8 +13,8 @@ final class Class123 extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        for (int i = 0; i < MemoryView.method629(this.aClass110_1206).aVector1461.size(); ++i) {
-            ((Image) MemoryView.method629(this.aClass110_1206).aVector1461.get(i)).resetUsedRegion();
+        for (int i = 0; i < MemoryView.method629(this.aClass110_1206).images.size(); ++i) {
+            ((Image) MemoryView.method629(this.aClass110_1206).images.get(i)).resetUsedRegion();
         }
         MemoryView.method647(this.aClass110_1206);
     }

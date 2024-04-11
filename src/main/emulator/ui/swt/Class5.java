@@ -72,8 +72,8 @@ public final class Class5 implements Runnable, DisposeListener {
         this.aDisplay550 = EmulatorImpl.getDisplay();
         this.anInt553 = 0;
         this.table = new Hashtable();
-        final c c;
-        (c = new c(o.getClass().getName(), o)).method879(null);
+        final Instance c;
+        (c = new Instance(o.getClass().getName(), o)).method879(null);
         this.table.put(o.toString(), c);
         this.aClass5_556 = this;
     }
@@ -84,8 +84,8 @@ public final class Class5 implements Runnable, DisposeListener {
 
     private void method322() {
         this.aString551 = this.aCombo546.getText();
-        final c c;
-        (c = (emulator.debug.c) this.table.get(this.aString551)).method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
+        final Instance c;
+        (c = (Instance) this.table.get(this.aString551)).method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
         this.aTree554.removeAll();
         for (int i = 0; i < c.getFields().size(); ++i) {
             final Object value;
@@ -108,7 +108,7 @@ public final class Class5 implements Runnable, DisposeListener {
         }
     }
 
-    private void method301(final c c, final Field field, final TreeItem treeItem) {
+    private void method301(final Instance c, final Field field, final TreeItem treeItem) {
         final String method869 = ClassTypes.method869(field.getType());
         if (field.getType().isArray()) {
             final Object method870 = ClassTypes.getFieldValue(c.getInstance(), field);
@@ -147,7 +147,7 @@ public final class Class5 implements Runnable, DisposeListener {
     }
 
     private void method306(final TreeItem treeItem) {
-        final c c = (emulator.debug.c) this.table.get(this.aString551);
+        final Instance c = (Instance) this.table.get(this.aString551);
         if (treeItem.getParentItem() == null) {
             this.method301(c, (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), treeItem);
             return;
@@ -179,7 +179,7 @@ public final class Class5 implements Runnable, DisposeListener {
         if (array == null || array.length == 0) {
             return;
         }
-        final c c = (emulator.debug.c) this.table.get(this.aString551);
+        final Instance c = (Instance) this.table.get(this.aString551);
         Object o;
         Class<?> clazz;
         if (array[0].getParentItem() == null) {
@@ -221,7 +221,7 @@ public final class Class5 implements Runnable, DisposeListener {
     }
 
     private void method310(final TreeItem treeItem, final String s) {
-        final c c = (emulator.debug.c) this.table.get(this.aString551);
+        final Instance c = (Instance) this.table.get(this.aString551);
         this.aBoolean545 = true;
         if (treeItem.getParentItem() == null) {
             ClassTypes.setFieldValue(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), s);
@@ -347,7 +347,7 @@ public final class Class5 implements Runnable, DisposeListener {
             return;
         }
         this.aBoolean559 = true;
-        final c c = (emulator.debug.c) this.table.get(this.aString551);
+        final Instance c = (Instance) this.table.get(this.aString551);
         int n = 0;
         try {
             for (int i = 0; i < c.getFields().size(); ++i) {
@@ -428,7 +428,7 @@ public final class Class5 implements Runnable, DisposeListener {
                                 Collections.sort((List<Comparable>) (list = (List) Collections.list(table.keys())));
                                 for (Object o : list) {
                                     ps.println(o);
-                                    final c c = (emulator.debug.c) table.get(o);
+                                    final Instance c = (Instance) table.get(o);
                                     c.method879(null);
                                     Vector fields = c.getFields();
                                     for (int i = 0; i < fields.size(); ++i) {
