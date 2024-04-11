@@ -1,6 +1,6 @@
 package emulator;
 
-import emulator.debug.Texture;
+import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
@@ -44,10 +44,10 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return true;
     }
 
-    public Texture convertMicro3DTexture(Object o) {
+    public MemoryViewImage convertMicro3DTexture(Object o) {
         IImage img = ((com.mascotcapsule.micro3d.v3.Texture) o).debugImage;
         if(img == null)
             return null;
-        return new Texture(img);
+        return new MemoryViewImage(img);
     }
 }

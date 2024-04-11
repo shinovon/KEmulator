@@ -1,6 +1,6 @@
 package emulator;
 
-import emulator.debug.Texture;
+import emulator.debug.MemoryViewImage;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -48,7 +48,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return false;
     }
 
-    public Texture convertMicro3DTexture(Object o) {
+    public MemoryViewImage convertMicro3DTexture(Object o) {
         return null;
     }
 
