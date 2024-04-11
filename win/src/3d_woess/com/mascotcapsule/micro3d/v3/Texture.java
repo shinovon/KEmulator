@@ -74,7 +74,7 @@ public class Texture {
             if ((data[pos++] & 0xff) != 'B' || (data[pos++] & 0xff) != 'M') {
                 throw new RuntimeException("Not a BMP!");
             }
-            pos += 10;
+            pos += 8;
 
             int rasterOffset = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
                     | (data[pos++] & 0xff) << 16 | data[pos++] << 24;
