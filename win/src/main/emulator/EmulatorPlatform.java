@@ -1,5 +1,7 @@
 package emulator;
 
+import emulator.debug.Texture;
+
 public class EmulatorPlatform implements IEmulatorPlatform {
 
     public boolean isX64() {
@@ -39,5 +41,9 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public boolean supportsM3G() {
         return true;
+    }
+
+    public Texture convertMicro3DTexture(Object o) {
+        return new Texture(((com.mascotcapsule.micro3d.v3.Texture) o).debugImage);
     }
 }

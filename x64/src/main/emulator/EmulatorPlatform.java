@@ -1,5 +1,7 @@
 package emulator;
 
+import emulator.debug.Texture;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -44,6 +46,10 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public boolean supportsM3G() {
         return false;
+    }
+
+    public Texture convertMicro3DTexture(Object o) {
+        return null;
     }
 
     private static void loadJOGLLibrary() {

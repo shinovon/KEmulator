@@ -161,6 +161,10 @@ public final class Memory {
                 if (o instanceof Image2D && (img = Texture.convertM3GTexture((Image2D) o)) != null) {
                     this.images.add(new Texture(img));
                 }
+
+                if(o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
+                    this.images.add(Emulator.getPlatform().convertMicro3DTexture(o));
+                }
             }
         }
         if (o != null && clazz.isArray()) {
@@ -179,7 +183,7 @@ public final class Memory {
                 }
             }
         } else {
-            if (o != null && o instanceof Vector) {
+            if (o instanceof Vector) {
                 final Enumeration<Object> elements = (Enumeration<Object>) ((Vector) o).elements();
                 while (elements.hasMoreElements()) {
                     final Object nextElement;

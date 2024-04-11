@@ -18,11 +18,15 @@ package com.mascotcapsule.micro3d.v3;
 
 import java.io.IOException;
 
+import emulator.Emulator;
+import emulator.graphics2D.IImage;
 import ru.woesss.micro3d.PlatformHelper;
 
 public class Texture {
     int nPointer;
     boolean isForModel;
+
+    public IImage debugImage;
 
     public Texture(byte[] b, boolean isForModel) {
         if (b == null) {
@@ -32,6 +36,7 @@ public class Texture {
         if (this.nPointer == 0) {
             throw new RuntimeException();
         }
+        loadDebugBitmap(b);
         this.isForModel = isForModel;
     }
 
@@ -47,6 +52,7 @@ public class Texture {
         if (this.nPointer == 0) {
             throw new RuntimeException();
         }
+        loadDebugBitmap(b);
         this.isForModel = isForModel;
     }
 
@@ -60,6 +66,92 @@ public class Texture {
     protected void finalize() throws Throwable {
         dispose();
         super.finalize();
+    }
+
+    private void loadDebugBitmap(byte[] data) {
+        try {
+            int pos = 0;
+            if ((data[pos++] & 0xff) != 'B' || (data[pos++] & 0xff) != 'M') {
+                throw new RuntimeException("Not a BMP!");
+            }
+            pos += 10;
+
+            int rasterOffset = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
+                    | (data[pos++] & 0xff) << 16 | data[pos++] << 24;
+            int dibHeaderSize = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
+                    | (data[pos++] & 0xff) << 16 | data[pos++] << 24;
+
+            int width;
+            int height;
+            boolean reversed;
+            if (dibHeaderSize == 12) {
+                width = data[pos++] & 0xff | (data[pos++] & 0xff) << 8;
+                height = data[pos++] & 0xff | (data[pos++] & 0xff) << 8;
+                pos += 2;
+                int bpp = data[pos++] & 0xff | (data[pos++] & 0xff) << 8;
+                if (bpp != 8) {
+                    throw new RuntimeException("Unsupported BMP format: bpp = " + bpp);
+                }
+                reversed = true;
+            } else if (dibHeaderSize == 40) {
+                width = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
+                        | (data[pos++] & 0xff) << 16 | data[pos++] << 24;
+                int h = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
+                        | (data[pos++] & 0xff) << 16 | data[pos++] << 24;
+                if (h < 0) {
+                    height = -h;
+                    reversed = false;
+                } else {
+                    height = h;
+                    reversed = true;
+                }
+                pos += 2;
+                int bpp = data[pos++] & 0xff | (data[pos++] & 0xff) << 8;
+                if (bpp != 8) {
+                    throw new RuntimeException("Unsupported BMP format: bpp = " + bpp);
+                }
+                int compression = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
+                        | (data[pos++] & 0xff) << 16 | data[pos++] << 24;
+                if (compression != 0) {
+                    throw new RuntimeException("Unsupported BMP format: compression = " + compression);
+                }
+                pos += 20;
+            } else {
+                throw new RuntimeException("Unsupported BMP version = " + dibHeaderSize);
+            }
+
+            int paletteOffset = 14 + dibHeaderSize;
+
+            IImage image = Emulator.getEmulator().newImage(width, height, true);
+            int[] rgb = image.getData();
+            int remainder = width % 4;
+            int stride = remainder == 0 ? width : width + 4 - remainder;
+            int n = 0;
+            if (reversed) {
+                for (int i = height - 1; i >= 0; i--) {
+                    for (int j = rasterOffset + i * stride, s = j + width; j < s; j++) {
+                        byte idx = data[j];
+                        int p = (idx & 0xff) * 4 + paletteOffset;
+                        byte b = data[p++];
+                        byte g = data[p++];
+                        byte r = data[p];
+                        rgb[n++] = ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF) + ((idx == 0 ? 0 : 0xff) << 24);
+                    }
+                }
+            } else {
+                for (int i = 0; i < height; i++) {
+                    for (int j = rasterOffset + i * stride, s = j + width; j < s; j++) {
+                        byte idx = data[j];
+                        int p = (idx & 0xff) * 4 + paletteOffset;
+                        byte b = data[p++];
+                        byte g = data[p++];
+                        byte r = data[p];
+                        rgb[n++] = ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF) + ((idx == 0 ? 0 : 0xff) << 24);
+                    }
+                }
+            }
+            debugImage = image;
+        } catch (Exception ignored) {}
     }
 
     static {
