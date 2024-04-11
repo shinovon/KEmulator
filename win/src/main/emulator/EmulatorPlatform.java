@@ -32,4 +32,12 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public void loadLibraries() {
     }
+
+    public boolean supportsMascotCapsule() {
+        return true;
+    }
+
+    public boolean supportsM3G() {
+        return true;
+    }
 }

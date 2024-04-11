@@ -13,7 +13,7 @@ public final class Texture extends Image {
         super(image);
     }
 
-    public static IImage convertImage2D(final Image2D image2D) {
+    public static IImage convertM3GTexture(final Image2D image2D) {
         if (image2D.getFormat() != 99 || image2D.getFormat() != 100) {
             return null;
         }

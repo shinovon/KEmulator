@@ -1,7 +1,6 @@
 package javax.microedition.io;
 
 import java.net.*;
-import java.util.Arrays;
 
 import emulator.*;
 import java.io.*;
@@ -206,9 +205,9 @@ final class HttpConnectionImpl implements HttpConnection {
 			return;
 		try {
 			if (getRequestProperty("User-Agent") == null) {
-				if (Emulator.customUA != null) {
+				if (Emulator.httpUserAgent != null) {
 					connection.setRequestProperty("User-Agent", 
-							Emulator.customUA);
+							Emulator.httpUserAgent);
 				} else {
 					connection.setRequestProperty("User-Agent", 
 							Emulator.deviceName + " (KEmulator/" + Emulator.version + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");

@@ -38,6 +38,14 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         loadJOGLLibrary();
     }
 
+    public boolean supportsMascotCapsule() {
+        return false;
+    }
+
+    public boolean supportsM3G() {
+        return false;
+    }
+
     private static void loadJOGLLibrary() {
         String osn = System.getProperty("os.name").toLowerCase();
         String osa = System.getProperty("os.arch").toLowerCase();

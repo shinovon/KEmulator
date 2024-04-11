@@ -157,9 +157,9 @@ public final class Memory {
             } else if (o instanceof Node) {
                 this.m3gObjects.add(o);
             } else {
-                final IImage method844;
-                if (o instanceof Image2D && (method844 = Texture.convertImage2D((Image2D) o)) != null) {
-                    this.images.add(new Texture(method844));
+                IImage img;
+                if (o instanceof Image2D && (img = Texture.convertM3GTexture((Image2D) o)) != null) {
+                    this.images.add(new Texture(img));
                 }
             }
         }

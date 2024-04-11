@@ -10,4 +10,8 @@ public interface IEmulatorPlatform {
     public String getInfoString(String version);
 
     public void loadLibraries();
+
+    boolean supportsM3G();
+
+    boolean supportsMascotCapsule();
 }

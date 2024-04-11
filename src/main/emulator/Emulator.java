@@ -61,7 +61,7 @@ public class Emulator {
     public static int rpcPartySize;
     public static int rpcPartyMax;
 
-    public static String customUA;
+    public static String httpUserAgent;
     private static Thread vlcCheckerThread;
     private static IEmulatorPlatform platform;
 
@@ -502,7 +502,8 @@ public class Emulator {
     private static void setProperties() {
         System.setProperty("microedition.configuration", "CLDC-1.1");
         System.setProperty("microedition.profiles", "MIDP-2.0");
-        System.setProperty("microedition.m3g.version", "1.1");
+        if(platform.supportsM3G())
+            System.setProperty("microedition.m3g.version", "1.1");
         System.setProperty("microedition.encoding", Settings.fileEncoding);
         if (System.getProperty("microedition.locale") == null) {
             System.setProperty("microedition.locale", Settings.locale);
@@ -510,73 +511,30 @@ public class Emulator {
         if (System.getProperty("microedition.platform") == null) {
             String plat = Emulator.deviceName;
             DevicePlatform c = Devices.getPlatform(Emulator.deviceName);
-            if (true) {
-                if (c.exists("OVERRIDE_NAME")) {
-                    plat = c.getString("OVERRIDE_NAME");
-                }
-                boolean e = c.exists("MIDP20_CLDC11") || c.exists("MIDP20_CLDC10") || c.exists("MIDP21_CLDC11") || c.exists("MIDP10_CLDC10");
-                if (c.exists("R")) {
-                    plat += "-" + c.getString("R");
-                }
+            if (c.exists("OVERRIDE_NAME")) {
+                plat = c.getString("OVERRIDE_NAME");
+            }
+            if (c.exists("R")) {
+                plat += "-" + c.getString("R");
+            }
 
-                String s2 = plat;
-                if (!c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
-                    plat += "/" + c.getString("PLATFORM_VERSION");
-                }
-                if (e) {
-                    Emulator.customUA = s2 + "/" + c.getString("PLATFORM_VERSION");
-                    if (c.exists("PLATFORM_VERSION2")) {
-                        Emulator.customUA += " (" + c.getString("PLATFORM_VERSION2") + ")";
-                    }
-                    s2 = Emulator.customUA;
-                    if (c.exists("SYMBIANOS_VERSION")) {
-                        Emulator.customUA += " SymbianOS/" + c.getString("SYMBIANOS_VERSION");
-                    }
-                    if (c.exists("S60_VERSION")) {
-                        Emulator.customUA += " Series60/" + c.getString("S60_VERSION");
-                    }
-                }
-                boolean x = c.exists("SW_PLATFORM") || c.exists("SW_PLATFORM_VERSION");
-                if (c.exists("SYMBIANOS_VERSION") && x)
-                    if (c.getString("SYMBIANOS_VERSION").equals("9.3") || c.getString("SYMBIANOS_VERSION").equals("3"))
-                        Emulator.customUA = s2 + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ") UNTRUSTED/1.0";
-                    else if (c.exists("CUSTOM_UA")) {
-                        Emulator.customUA = c.getString("CUSTOM_UA");
-                    } else if (c.exists("MIDP20_CLDC11")) {
-                        Emulator.customUA = Emulator.customUA + " Profile/MIDP-2.0 Configuration/CLDC-1.1";
-                    } else if (c.exists("MIDP20_CLDC10")) {
-                        Emulator.customUA = Emulator.customUA + " Profile/MIDP-2.0 Configuration/CLDC-1.0";
-                    } else if (c.exists("MIDP21_CLDC11")) {
-                        Emulator.customUA = Emulator.customUA + " Profile/MIDP-2.1 Configuration/CLDC-1.1";
-                    } else if (c.exists("MIDP10_CLDC10")) {
-                        Emulator.customUA = Emulator.customUA + " Profile/MIDP-1.0 Configuration/CLDC-1.0";
-                    } else if (c.parent != null && c.parent.name.equalsIgnoreCase("Nokia_SERIES40")) {
-                        Emulator.customUA = Emulator.customUA + " Profile/MIDP-2.0 Configuration/CLDC-1.1";
-                    }
-                if (c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
-                    plat += "/" + c.getString("PLATFORM_VERSION2");
-                }
-                if (x) {
-                    plat += "/";
-                }
-                if (c.exists("SW_PLATFORM")) {
-                    plat += "sw_platform=" + c.getString("SW_PLATFORM");
-                }
-                if (c.exists("SW_PLATFORM_VERSION")) {
-                    plat += ";sw_platform_version=" + c.getString("SW_PLATFORM_VERSION");
-                }
+            Emulator.httpUserAgent = plat + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ")";
+
+            if (!c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
+                plat += "/" + c.getString("PLATFORM_VERSION");
             }
-            String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-            String midletVendor = Emulator.emulatorimpl.getAppProperty("MIDlet-Vendor");
-            if (midlet != null) {
-                if (midlet.equalsIgnoreCase("bounce tales")) {
-                    Settings.fpsGame = 1;
-                } else if (midlet.equalsIgnoreCase("micro counter strike")) {
-                    Settings.fpsGame = 2;
-                } else if (midlet.equalsIgnoreCase("quantum") || (midletVendor != null && midletVendor.toLowerCase().contains("ae-mods"))) {
-                    Settings.fpsGame = 3;
-                }
+            if (c.exists("CUSTOM_UA")) {
+                Emulator.httpUserAgent = c.getString("CUSTOM_UA");
             }
+            if (c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
+                plat += "/" + c.getString("PLATFORM_VERSION2");
+            }
+//                if (c.exists("SW_PLATFORM")) {
+//                    plat += "sw_platform=" + c.getString("SW_PLATFORM");
+//                }
+//                if (c.exists("SW_PLATFORM_VERSION")) {
+//                    plat += ";sw_platform_version=" + c.getString("SW_PLATFORM_VERSION");
+//                }
             System.setProperty("microedition.platform", plat);
         }
         System.setProperty("microedition.media.version", "1.0");
@@ -625,8 +583,22 @@ public class Emulator {
                 Dimension d = w.getViewSize();
                 System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
             }
-        } catch (Throwable e) {
-        }
+        } catch (Throwable e) {}
+
+        try {
+            String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+            String midletVendor = Emulator.emulatorimpl.getAppProperty("MIDlet-Vendor");
+            if (midlet != null) {
+                // TODO this is stupid
+                if (midlet.equalsIgnoreCase("bounce tales")) {
+                    Settings.fpsGame = 1;
+                } else if (midlet.equalsIgnoreCase("micro counter strike")) {
+                    Settings.fpsGame = 2;
+                } else if (midlet.equalsIgnoreCase("quantum") || (midletVendor != null && midletVendor.toLowerCase().contains("ae-mods"))) {
+                    Settings.fpsGame = 3;
+                }
+            }
+        } catch (Exception e) {}
     }
 
     private static String getHWID() {
@@ -983,5 +955,9 @@ public class Emulator {
 
     public static boolean isX64() {
         return platform.isX64();
+    }
+
+    public static IEmulatorPlatform getPlatform() {
+        return platform;
     }
 }
