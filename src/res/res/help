@@ -42,6 +42,19 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$2024.04.11
+Make logs asynchronous
+Fixed arrays in MemoryView
+Fixed M3G textures in MemoryView (contributed by rmn20)
+Added MascotCapsule textures in MemoryView
+
+$2024.04.02
+Fixed suspend/resume
+Fixed ticker rendering on Canvas
+Added option for motorola specific softkeys behaviour
+Canvas.setFullScreenMode() is no longer forced to true
+Added Class Watcher export to txt
+
 $2024.03.20
 Fix Player.setMediaTime returning wrong values
 Implemented RateControl, StopTimeControl in VLCPlayerImpl
