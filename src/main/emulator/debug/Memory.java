@@ -80,30 +80,24 @@ public final class Memory {
             this.players.add(p);
         for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
             final String s = (String) Emulator.jarClasses.get(j);
-            Memory a;
             Class clazz = null;
             Object o;
             if (Emulator.getMIDlet().getClass().getName().equals(s)) {
-                a = this;
                 clazz = cls(s);
                 o = Emulator.getMIDlet();
             } else if (Emulator.getCurrentDisplay() != null && Emulator.getCurrentDisplay().getCurrent() != null && Emulator.getCurrentDisplay().getCurrent().getClass().getName().equals(s)) {
-                a = this;
                 clazz = cls(s);
                 o = Emulator.getCurrentDisplay().getCurrent();
             } else {
-                a = this;
                 try {
                     clazz = cls(s);
                 } catch (Exception e) {
-
                 } catch (Error e) {
-
                 }
                 o = null;
             }
             if (clazz != null)
-                a.method847(clazz, o, s, false);
+                method847(clazz, o, s, false);
         }
         for (int j = 0; j < checkClasses.size(); ++j) {
             Memory a;
