@@ -1,7 +1,5 @@
 package emulator.debug;
 
-import com.nec.graphics.Sprite;
-import com.sun.prism.Texture;
 import emulator.*;
 
 import javax.microedition.lcdui.*;
@@ -41,6 +39,7 @@ public final class Memory {
     static Class _F;
     static Class _D;
     static Class _C;
+    public static final Object debugLock = new Object();
 
     public Memory() {
         super();
@@ -116,8 +115,12 @@ public final class Memory {
                 a.method847(clazz, o, s, false);
         }
 
-        for (int i = 0; i < m3gObjects.size(); i++) {
-            m3gReadTextures((Node) m3gObjects.elementAt(i));
+        if(m3gObjects.size() == 0) return;
+
+        synchronized(debugLock) {
+            for (int i = 0; i < m3gObjects.size(); i++) {
+                m3gReadTextures((Node) m3gObjects.elementAt(i));
+            }
         }
     }
 
@@ -234,7 +237,6 @@ public final class Memory {
 
     private void m3gReadTextures(Object3D obj) {
         if(obj == null) return;
-
         if (obj instanceof Group) {
             Group g = (Group) obj;
 
@@ -252,11 +254,14 @@ public final class Memory {
             Appearance ap = (Appearance) obj;
 
             for (int i = 0; ; i++) {
+                Texture2D tex2d;
                 try {
-                    m3gReadTextures(ap.getTexture(i));
-                } catch(IndexOutOfBoundsException e) {
+                    tex2d = ap.getTexture(i);
+                    if(tex2d == null) break;
+                } catch (IndexOutOfBoundsException e) {
                     break;
                 }
+                m3gReadTextures(tex2d);
             }
         } else if (obj instanceof Sprite3D) {
             m3gReadTextures(((Sprite3D) obj).getImage());
@@ -265,7 +270,7 @@ public final class Memory {
         } else if (obj instanceof Image2D) {
             Image2D img2d = (Image2D) obj;
             //use only after all objects are added to instances list!
-            if(this.instances.contains(img2d)) return;
+            if (this.instances.contains(img2d)) return;
             this.instances.add(img2d);
 
             IImage img = MemoryViewImage.createFromM3GImage(img2d);
@@ -310,9 +315,7 @@ public final class Memory {
                             n += (int) ((ZipEntry) zipFile.getEntry(s.replace('.', '/') + ".class")).getSize();
                         }
                     } catch (Exception e) {
-
                     } catch (Error e) {
-
                     }
                 }
             } else {

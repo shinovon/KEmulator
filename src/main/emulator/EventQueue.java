@@ -2,6 +2,7 @@ package emulator;
 
 import javax.microedition.lcdui.*;
 
+import emulator.debug.Memory;
 import net.rim.device.api.system.Application;
 import emulator.graphics2D.*;
 
@@ -345,10 +346,12 @@ public final class EventQueue implements Runnable {
             final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
             final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
             try {
-                if (repaintRegion[0] == -1) { // full repaint
-                    Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
-                } else {
-                    Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage, repaintRegion[0], repaintRegion[1], repaintRegion[2], repaintRegion[3]);
+                synchronized(Memory.debugLock) {
+                    if (repaintRegion[0] == -1) { // full repaint
+                        Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
+                    } else {
+                        Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage, repaintRegion[0], repaintRegion[1], repaintRegion[2], repaintRegion[3]);
+                    }
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
