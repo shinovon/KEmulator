@@ -203,10 +203,10 @@ public final class EventQueue implements Runnable {
                 }
                 switch (this.event = this.nextEvent()) {
                     case 1: {
-                        Displayable.fpsLimiter();
                         synchronized(lock) {
                             internalRepaint();
                         }
+                        Displayable.fpsLimiter();
                         break;
                     }
                     case 2: { // serial call
