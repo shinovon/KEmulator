@@ -135,7 +135,7 @@ public class Texture {
                         byte b = data[p++];
                         byte g = data[p++];
                         byte r = data[p];
-                        rgb[n++] = ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF) + ((idx == 0 ? 0 : 0xff) << 24);
+                        rgb[n++] = ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF) + (0xff << 24);
                     }
                 }
             } else {
@@ -146,7 +146,7 @@ public class Texture {
                         byte b = data[p++];
                         byte g = data[p++];
                         byte r = data[p];
-                        rgb[n++] = ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF) + ((idx == 0 ? 0 : 0xff) << 24);
+                        rgb[n++] = ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF) + (0xff << 24);
                     }
                 }
             }
