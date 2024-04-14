@@ -303,25 +303,6 @@ public class Displayable {
         graphics.translate(translateX, translateY);
         graphics.setClip(clipX, clipY, clipWidth, clipHeight);
     }
-	/*
-	protected static void fpsLimiter() {
-	    if (k.f == 1 && k.d <= 50) {
-	        final long n = System.currentTimeMillis() - Displayable.aLong23;
-	        final long n2 = 1000 / k.d;
-	        try {
-	            Thread.sleep(n2 - n);
-	        }
-	        catch (Exception ex) {}
-	    }
-	    Displayable.aLong23 = System.currentTimeMillis();
-	    ++Displayable.anInt24;
-	    if (Displayable.aLong23 - Displayable.aLong27 > 2000L) {
-	        Profiler.FPS = (int)((Displayable.anInt24 * 1000 + 500) / (Displayable.aLong23 - Displayable.aLong27));
-	        Displayable.aLong27 = Displayable.aLong23;
-	        Displayable.anInt24 = 0;
-	    }
-	}
-	*/
 
     public static void fpsLimiter() {
         if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
