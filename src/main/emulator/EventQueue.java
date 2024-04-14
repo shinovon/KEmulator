@@ -346,12 +346,10 @@ public final class EventQueue implements Runnable {
             final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
             final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
             try {
-                synchronized(Memory.debugLock) {
-                    if (repaintRegion[0] == -1) { // full repaint
-                        Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
-                    } else {
-                        Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage, repaintRegion[0], repaintRegion[1], repaintRegion[2], repaintRegion[3]);
-                    }
+                if (repaintRegion[0] == -1) { // full repaint
+                    Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
+                } else {
+                    Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage, repaintRegion[0], repaintRegion[1], repaintRegion[2], repaintRegion[3]);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

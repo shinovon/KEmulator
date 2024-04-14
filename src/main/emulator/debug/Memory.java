@@ -105,9 +105,7 @@ public final class Memory {
                 try {
                     clazz = cls(s);
                 } catch (Exception e) {
-
                 } catch (Error e) {
-
                 }
                 o = null;
             }
@@ -118,9 +116,13 @@ public final class Memory {
         if(m3gObjects.size() == 0) return;
 
         synchronized(debugLock) {
+            EmulatorScreen emuScr = ((EmulatorScreen) Emulator.getEmulator().getScreen());
+            boolean scrPaused = emuScr.isFullyPaused();
+            if(!scrPaused) EmulatorScreen.pause();
             for (int i = 0; i < m3gObjects.size(); i++) {
                 m3gReadTextures((Node) m3gObjects.elementAt(i));
             }
+            if(!scrPaused) emuScr.resumeStep();
         }
     }
 
