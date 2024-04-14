@@ -927,17 +927,11 @@ public final class EmulatorScreen implements
         }
     }
 
-    public static boolean isFullyPaused() { return Settings.steps == 0; }
-
-    public static void pause() {
-        Settings.steps = 0;
-    }
-
-    public static void pauseStep() {
+    protected static void pauseStep() {
         Settings.steps = 1;
     }
 
-    public final void resumeStep() {
+    protected final void resumeStep() {
         Settings.steps = -1;
         if (this.screenImg != null && !this.screenImg.isDisposed()) {
             this.screenImg.dispose();

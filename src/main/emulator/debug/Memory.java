@@ -1,5 +1,7 @@
 package emulator.debug;
 
+import com.nec.graphics.Sprite;
+import com.sun.prism.Texture;
 import emulator.*;
 
 import javax.microedition.lcdui.*;
@@ -59,11 +61,6 @@ public final class Memory {
     }
 
     public final void method846() {
-        EmulatorScreen emuScr = ((EmulatorScreen) Emulator.getEmulator().getScreen());
-
-        boolean scrPaused = emuScr.isFullyPaused();
-        if(!scrPaused) EmulatorScreen.pause();
-
         if (Settings.recordReleasedImg) {
             for (int i = 0; i < this.images.size(); ++i) {
                 if (!this.aVector1463.contains(this.images.get(i))) {
@@ -122,8 +119,6 @@ public final class Memory {
         for (int i = 0; i < m3gObjects.size(); i++) {
             m3gReadTextures((Node) m3gObjects.elementAt(i));
         }
-
-        if(!scrPaused) emuScr.resumeStep();
     }
 
     private void method847(final Class clazz, final Object o, final String s, boolean vector) {
@@ -257,16 +252,11 @@ public final class Memory {
             Appearance ap = (Appearance) obj;
 
             for (int i = 0; ; i++) {
-                Texture2D tex2d;
-
                 try {
-                    tex2d = ap.getTexture(i);
-                    if(tex2d == null) break;
-                } catch (IndexOutOfBoundsException e) {
+                    m3gReadTextures(ap.getTexture(i));
+                } catch(IndexOutOfBoundsException e) {
                     break;
                 }
-
-                m3gReadTextures(tex2d);
             }
         } else if (obj instanceof Sprite3D) {
             m3gReadTextures(((Sprite3D) obj).getImage());
@@ -275,7 +265,7 @@ public final class Memory {
         } else if (obj instanceof Image2D) {
             Image2D img2d = (Image2D) obj;
             //use only after all objects are added to instances list!
-            if (this.instances.contains(img2d)) return;
+            if(this.instances.contains(img2d)) return;
             this.instances.add(img2d);
 
             IImage img = MemoryViewImage.createFromM3GImage(img2d);
