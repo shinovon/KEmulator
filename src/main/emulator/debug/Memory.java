@@ -87,8 +87,7 @@ public final class Memory {
             } else {
                 try {
                     clazz = cls(s);
-                } catch (Exception e) {
-                } catch (Error e) {
+                } catch (Throwable e) {
                 }
                 o = null;
             }
@@ -104,8 +103,7 @@ public final class Memory {
                 a = this;
                 try {
                     clazz = cls(s);
-                } catch (Exception e) {
-                } catch (Error e) {
+                } catch (Throwable e) {
                 }
                 o = null;
             }
@@ -115,15 +113,19 @@ public final class Memory {
 
         if(m3gObjects.size() == 0) return;
 
-        synchronized(debugLock) {
-            EmulatorScreen emuScr = ((EmulatorScreen) Emulator.getEmulator().getScreen());
-            boolean scrPaused = emuScr.isFullyPaused();
-            if(!scrPaused) EmulatorScreen.pause();
-            for (int i = 0; i < m3gObjects.size(); i++) {
-                m3gReadTextures((Node) m3gObjects.elementAt(i));
+        try {
+            synchronized (debugLock) {
+                EmulatorScreen emuScr = ((EmulatorScreen) Emulator.getEmulator().getScreen());
+                boolean scrPaused = emuScr.isFullyPaused();
+                if (!scrPaused) EmulatorScreen.pause();
+                Thread.sleep(2);
+                for (int i = 0; i < m3gObjects.size(); i++) {
+                    m3gReadTextures((Node) m3gObjects.elementAt(i));
+                }
+                Thread.sleep(2);
+                if (!scrPaused) emuScr.resumeStep();
             }
-            if(!scrPaused) emuScr.resumeStep();
-        }
+        } catch (Exception e) {}
     }
 
     private void method847(final Class clazz, final Object o, final String s, boolean vector) {
@@ -316,8 +318,7 @@ public final class Memory {
                         if (!cls(s = elements.nextElement()).isInterface()) {
                             n += (int) ((ZipEntry) zipFile.getEntry(s.replace('.', '/') + ".class")).getSize();
                         }
-                    } catch (Exception e) {
-                    } catch (Error e) {
+                    } catch (Throwable e) {
                     }
                 }
             } else {

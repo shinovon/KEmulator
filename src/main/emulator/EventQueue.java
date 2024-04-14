@@ -341,10 +341,10 @@ public final class EventQueue implements Runnable {
                     || Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
                 return;
             }
-            Displayable.checkForSteps();
             if (Settings.xrayView) Displayable.resetXRayGraphics();
             final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
             final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
+            Displayable.checkForSteps();
             try {
                 if (repaintRegion[0] == -1) { // full repaint
                     Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);

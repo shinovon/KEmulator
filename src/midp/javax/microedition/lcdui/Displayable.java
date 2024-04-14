@@ -334,7 +334,7 @@ public class Displayable {
                 final long currentTimeMillis = System.currentTimeMillis();
                 try {
                     while (Settings.steps == 0) {
-                        Thread.sleep(250L);
+                        Thread.sleep(50L);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
