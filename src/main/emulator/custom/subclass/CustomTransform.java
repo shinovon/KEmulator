@@ -8,79 +8,79 @@ import javax.microedition.m3g.VertexArray;
 public class CustomTransform {
     
     public static void set(Transform o, float[] matrix) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.set(matrix);
         }
     }
 
     public static void set(Transform o, Transform transform) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.set(transform);
         }
     }
 
     public static void transform(Transform o, float[] array) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.transform(array);
         }
     }
 
     public static void get(Transform o, float[] paramArrayOfFloat) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.get(paramArrayOfFloat);
         }
     }
 
     public static void setIdentity(Transform o) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.setIdentity();
         }
     }
 
     public static void invert(Transform o) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.invert();
         }
     }
 
     public static void postMultiply(Transform o, Transform paramTransform) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.postMultiply(paramTransform);
         }
     }
 
     public static void postRotate(Transform o, float paramFloat1, float paramFloat2, float paramFloat3, float paramFloat4) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.postRotate(paramFloat1, paramFloat2, paramFloat3, paramFloat4);
         }
     }
 
     public static void postRotateQuat(Transform o, float paramFloat1, float paramFloat2, float paramFloat3, float paramFloat4) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.postRotateQuat(paramFloat1, paramFloat2, paramFloat3, paramFloat4);
         }
     }
 
     public static void postScale(Transform o, float paramFloat1, float paramFloat2, float paramFloat3) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.postScale(paramFloat1, paramFloat2, paramFloat3);
         }
     }
 
     public static void postTranslate(Transform o, float paramFloat1, float paramFloat2, float paramFloat3) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.postTranslate(paramFloat1, paramFloat2, paramFloat3);
         }
     }
 
     public static void transform(Transform o, VertexArray paramVertexArray, float[] paramArrayOfFloat, boolean paramBoolean) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.transform(paramVertexArray, paramArrayOfFloat, paramBoolean);
         }
     }
 
     public static void transpose(Transform o) {
-        synchronized(Memory.debugLock) {
+        synchronized(Memory.m3gLock) {
             o.transpose();
         }
     }

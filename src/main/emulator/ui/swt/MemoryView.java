@@ -250,7 +250,7 @@ public final class MemoryView implements DisposeListener {
         ((Control) this.totalmemLbl).setLayoutData((Object) gridData2);
         (this.aCLabel1082 = new CLabel((Composite) this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_INTERVAL", "Interval(milli sec):"));
         ((Control) this.aCLabel1082).setLayoutData((Object) layoutData3);
-        (this.aText1087 = new Text((Composite) this.aShell1080, 2048)).setText("1000    ");
+        (this.aText1087 = new Text((Composite) this.aShell1080, 2048)).setText("1000");
         ((Control) this.aText1087).setLayoutData((Object) layoutData5);
         (this.aCLabel1114 = new CLabel((Composite) this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_OBJECT_SIZE", "Objects Size:"));
         this.aCLabel1114.setLayoutData(layoutData2);

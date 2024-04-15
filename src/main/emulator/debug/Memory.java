@@ -40,7 +40,9 @@ public final class Memory {
     static Class _F;
     static Class _D;
     static Class _C;
-    public static final Object debugLock = new Object();
+
+    public static final Object m3gLock = new Object();
+    public static boolean debuggingM3G;
 
     public Memory() {
         super();
@@ -77,49 +79,44 @@ public final class Memory {
             this.players.add(p);
         for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
             final String s = (String) Emulator.jarClasses.get(j);
-            Class clazz = null;
+            Class cls = null;
             Object o;
             if (Emulator.getMIDlet().getClass().getName().equals(s)) {
-                clazz = cls(s);
+                cls = cls(s);
                 o = Emulator.getMIDlet();
             } else if (Emulator.getCurrentDisplay() != null && Emulator.getCurrentDisplay().getCurrent() != null && Emulator.getCurrentDisplay().getCurrent().getClass().getName().equals(s)) {
-                clazz = cls(s);
+                cls = cls(s);
                 o = Emulator.getCurrentDisplay().getCurrent();
             } else {
                 try {
-                    clazz = cls(s);
-                } catch (Throwable e) {
-                }
+                    cls = cls(s);
+                } catch (Throwable e) {}
                 o = null;
             }
-            if (clazz != null)
-                method847(clazz, o, s, false);
+            if (cls != null)
+                method847(cls, o, s, false);
         }
         for (int j = 0; j < checkClasses.size(); ++j) {
-            Memory a;
-            Class clazz = null;
-            Object o;
+            Class cls = null;
             final String s = (String) checkClasses.get(j);
-            {
-                a = this;
-                try {
-                    clazz = cls(s);
-                } catch (Throwable e) {
-                }
-                o = null;
-            }
-            if (clazz != null)
-                a.method847(clazz, o, s, false);
+            try {
+                cls = cls(s);
+            } catch (Throwable e) {}
+            if (cls != null)
+                method847(cls, null, s, false);
         }
 
         if(m3gObjects.size() == 0) return;
 
+        debuggingM3G = true;
+        
         try {
-            synchronized (debugLock) {
-                // delays to make sure jsr184client did all the job
+            synchronized (m3gLock) {
+                // delays to make sure jsr184client.dll did all the job
                 Thread.sleep(5);
                 for (int i = 0; i < m3gObjects.size(); i++) {
                     m3gReadTextures((Node) m3gObjects.elementAt(i));
+                    Thread.yield();
                 }
                 Thread.sleep(5);
             }
@@ -237,7 +234,7 @@ public final class Memory {
         }
     }
 
-    private void m3gReadTextures(Object3D obj) {
+    private synchronized void m3gReadTextures(Object3D obj) {
         if(obj == null) return;
         if (obj instanceof Group) {
             Group g = (Group) obj;
@@ -245,12 +242,14 @@ public final class Memory {
             for (int i = 0; i < g.getChildCount(); i++) {
                 Node child = g.getChild(i);
                 m3gReadTextures(child);
+                Thread.yield();
             }
         } else if (obj instanceof Mesh) {
             Mesh mesh = (Mesh) obj;
 
             for (int i = 0; i < mesh.getSubmeshCount(); i++) {
                 m3gReadTextures(mesh.getAppearance(i));
+                Thread.yield();
             }
         } else if (obj instanceof Appearance) {
             Appearance ap = (Appearance) obj;
@@ -264,6 +263,7 @@ public final class Memory {
                     break;
                 }
                 m3gReadTextures(tex2d);
+                Thread.yield();
             }
         } else if (obj instanceof Sprite3D) {
             m3gReadTextures(((Sprite3D) obj).getImage());

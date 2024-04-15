@@ -90,28 +90,30 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                     super.visitMethodInsn(acc, "emulator/custom/subclass/SubTimerTask", name, sign);
                     return;
                 }
-                if (cls.equals("javax/microedition/m3g/Transform")) {
-                    if(!name.equals("finalize") && !name.contains("init>")) {
-                        Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
-                        sign = "(Ljavax/microedition/m3g/Transform;" + sign.substring(1);
-                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransform", name, sign);
-                        return;
+                if(Memory.debuggingM3G) {
+                    if (cls.equals("javax/microedition/m3g/Transform")) {
+                        if (!name.equals("finalize") && !name.contains("init>")) {
+                            Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
+                            sign = "(Ljavax/microedition/m3g/Transform;" + sign.substring(1);
+                            super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransform", name, sign);
+                            return;
+                        }
                     }
-                }
-                if (cls.equals("javax/microedition/m3g/Transformable")) {
-                    if(!name.equals("finalize") && !name.contains("init>")) {
-                        Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
-                        sign = "(Ljavax/microedition/m3g/Transformable;" + sign.substring(1);
-                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransformable", name, sign);
-                        return;
+                    if (cls.equals("javax/microedition/m3g/Transformable")) {
+                        if (!name.equals("finalize") && !name.contains("init>")) {
+                            Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
+                            sign = "(Ljavax/microedition/m3g/Transformable;" + sign.substring(1);
+                            super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransformable", name, sign);
+                            return;
+                        }
                     }
-                }
-                if (cls.equals("javax/microedition/m3g/Graphics3D")) {
-                    if(name.endsWith("Light") || name.endsWith("Camera")) {
-                        Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
-                        sign = "(Ljavax/microedition/m3g/Graphics3D;" + sign.substring(1);
-                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomGraphics3D", name, sign);
-                        return;
+                    if (cls.equals("javax/microedition/m3g/Graphics3D")) {
+                        if (name.endsWith("Light") || name.endsWith("Camera")) {
+                            Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
+                            sign = "(Ljavax/microedition/m3g/Graphics3D;" + sign.substring(1);
+                            super.visitMethodInsn(184, "emulator/custom/subclass/CustomGraphics3D", name, sign);
+                            return;
+                        }
                     }
                 }
                 String s5;

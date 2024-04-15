@@ -1,5 +1,6 @@
 package javax.microedition.m3g;
 
+import emulator.debug.Memory;
 import emulator.i;
 
 import java.util.Hashtable;
@@ -90,7 +91,9 @@ public class Graphics3D {
         this.clipHeight = Helpers.getClipHeight(var1);
         if ((this.clipWidth <= maxViewportWidth) && (this.clipHeight <= maxViewportHeight)) {
             this.boundTarget = var1;
-            Helpers.bindTarget(this, var1, this.clipX, this.clipY, this.clipWidth, this.clipHeight);
+            synchronized (Memory.m3gLock) {
+                Helpers.bindTarget(this, var1, this.clipX, this.clipY, this.clipWidth, this.clipHeight);
+            }
         } else {
             throw new IllegalArgumentException();
         }
@@ -100,7 +103,9 @@ public class Graphics3D {
         if (this.boundTarget != null) {
             this.preload = false;
             if (this.isGraphics) {
-                Helpers.releaseTarget(this, (Graphics) this.boundTarget);
+                synchronized (Memory.m3gLock) {
+                    Helpers.releaseTarget(this, (Graphics) this.boundTarget);
+                }
             } else {
                 setBackBufferImage2D(null);
             }
@@ -154,8 +159,11 @@ public class Graphics3D {
             throw new IllegalStateException();
         }
         this.preload = ((!this.unload) && (!this.overwrite) && (var1 != null) && (!var1.isColorClearEnabled()));
-        clearImpl(var1);
-        this.unload = true;
+
+        synchronized (Memory.m3gLock) {
+            clearImpl(var1);
+            this.unload = true;
+        }
     }
 
     public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4) {
@@ -167,8 +175,10 @@ public class Graphics3D {
             throw new IllegalStateException();
         }
         this.preload = ((!this.unload) && (!this.overwrite));
-        renderPrimitive(var1, var2, var3, var4, var5);
-        this.unload = true;
+        synchronized (Memory.m3gLock) {
+            renderPrimitive(var1, var2, var3, var4, var5);
+            this.unload = true;
+        }
     }
 
     public synchronized void render(Node var1, Transform var2) {
@@ -176,18 +186,22 @@ public class Graphics3D {
             throw new IllegalStateException();
         }
         this.preload = ((!this.unload) && (!this.overwrite));
-        renderNode(var1, var2);
-        this.unload = true;
+        synchronized (Memory.m3gLock) {
+            renderNode(var1, var2);
+            this.unload = true;
+        }
     }
 
     public synchronized void render(World var1) {
         if (this.boundTarget == null) {
             throw new IllegalStateException();
         }
-        Background var2 = var1.getBackground();
-        this.preload = ((!this.unload) && (!this.overwrite) && (var2 != null) && (!var2.isColorClearEnabled()));
-        renderWorld(var1);
-        this.unload = true;
+        synchronized (Memory.m3gLock) {
+            Background var2 = var1.getBackground();
+            this.preload = ((!this.unload) && (!this.overwrite) && (var2 != null) && (!var2.isColorClearEnabled()));
+            renderWorld(var1);
+            this.unload = true;
+        }
     }
 
     public Camera getCamera(Transform var1) {
