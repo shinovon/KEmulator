@@ -11,7 +11,6 @@ import emulator.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
-import org.slf4j.Marker;
 
 public final class Class11 implements ILogStream, ControlListener, DisposeListener, Runnable {
     private Shell logShell;
