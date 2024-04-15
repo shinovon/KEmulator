@@ -106,6 +106,14 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                         return;
                     }
                 }
+                if (cls.equals("javax/microedition/m3g/Graphics3D")) {
+                    if(name.endsWith("Light") || name.endsWith("Camera")) {
+                        Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
+                        sign = "(Ljavax/microedition/m3g/Graphics3D;" + sign.substring(1);
+                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomGraphics3D", name, sign);
+                        return;
+                    }
+                }
                 String s5;
                 String s6;
                 if (sign.contains("java/util/TimerTask")) {
