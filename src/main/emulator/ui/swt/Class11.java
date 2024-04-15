@@ -4,14 +4,16 @@ import emulator.ui.*;
 import org.eclipse.swt.custom.*;
 
 import java.io.*;
+import java.util.Vector;
 
 import org.eclipse.swt.layout.*;
 import emulator.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
+import org.slf4j.Marker;
 
-public final class Class11 implements ILogStream, ControlListener, DisposeListener {
+public final class Class11 implements ILogStream, ControlListener, DisposeListener, Runnable {
     private Shell logShell;
     PrintStream filePrintStream;
     LogStream logStream;
@@ -19,6 +21,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     StyledText styledText;
     Shell parentShell;
     private boolean aBoolean576;
+    private Vector<String> printQueue = new Vector<String>();
 
     public Class11() {
         super();
@@ -33,6 +36,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             this.filePrintStream = new PrintStream(new FileOutputStream(file));
         } catch (Exception ex) {
         }
+        new Thread(this, "KEmulator-Log").start();
     }
 
     // KEmulator api methods
@@ -70,7 +74,10 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     }
 
     private void queuePrint(final String s) {
-        EmulatorImpl.asyncExec(new Textout(this, s));
+        synchronized (printQueue) {
+            printQueue.add(s);
+            printQueue.notify();
+        }
     }
 
 
@@ -155,6 +162,22 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         this.method330();
     }
 
+    public void run() {
+        try {
+            while (true) {
+                if (printQueue.size() > 0) {
+                    EmulatorImpl.asyncExec(new Textout(this, printQueue.remove(0)));
+                } else {
+                    synchronized (printQueue) {
+                        printQueue.wait();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private final class Textout implements Runnable {
         private final Class11 class11;
         private final String s;
@@ -169,7 +192,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             try {
                 class11.filePrintStream.print(s);
             } catch (Exception e) {}
-            if (!class11.logOpen || class11.styledText.isDisposed() ) {
+            if (!class11.logOpen || class11.styledText.isDisposed()) {
                 return;
             }
             class11.styledText.append(s);
