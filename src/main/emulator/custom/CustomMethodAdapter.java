@@ -2,13 +2,12 @@ package emulator.custom;
 
 import org.objectweb.asm.*;
 import emulator.*;
-import emulator.debug.*;
 
 public final class CustomMethodAdapter extends MethodAdapter implements Opcodes {
     private int anInt1185;
-    private String sourceFile;
-    private String aString1187;
-    private String aString1189;
+    private String className;
+    private String methodName;
+    private String methodDesc;
     private String aString1190;
     private int sourceLine;
 
@@ -90,30 +89,28 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                     super.visitMethodInsn(acc, "emulator/custom/subclass/SubTimerTask", name, sign);
                     return;
                 }
-                if(Memory.debuggingM3G) {
-                    if (cls.equals("javax/microedition/m3g/Transform")) {
-                        if (!name.equals("finalize") && !name.contains("init>")) {
-                            Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
-                            sign = "(Ljavax/microedition/m3g/Transform;" + sign.substring(1);
-                            super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransform", name, sign);
-                            return;
-                        }
+                if (cls.equals("javax/microedition/m3g/Transform")) {
+                    if (!name.equals("finalize") && !name.contains("init>")) {
+                        Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign + " in " + className + "." + methodName + methodDesc);
+                        sign = "(Ljavax/microedition/m3g/Transform;" + sign.substring(1);
+                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransform", name, sign);
+                        return;
                     }
-                    if (cls.equals("javax/microedition/m3g/Transformable")) {
-                        if (!name.equals("finalize") && !name.contains("init>")) {
-                            Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
-                            sign = "(Ljavax/microedition/m3g/Transformable;" + sign.substring(1);
-                            super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransformable", name, sign);
-                            return;
-                        }
+                }
+                if (cls.equals("javax/microedition/m3g/Transformable")) {
+                    if (!name.equals("finalize") && !name.contains("init>")) {
+                        Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign + " in " + className + "." + methodName + methodDesc);
+                        sign = "(Ljavax/microedition/m3g/Transformable;" + sign.substring(1);
+                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransformable", name, sign);
+                        return;
                     }
-                    if (cls.equals("javax/microedition/m3g/Graphics3D")) {
-                        if (name.endsWith("Light") || name.endsWith("Camera")) {
-                            Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign);
-                            sign = "(Ljavax/microedition/m3g/Graphics3D;" + sign.substring(1);
-                            super.visitMethodInsn(184, "emulator/custom/subclass/CustomGraphics3D", name, sign);
-                            return;
-                        }
+                }
+                if (cls.equals("javax/microedition/m3g/Graphics3D")) {
+                    if (name.endsWith("Light") || name.endsWith("Camera")) {
+                        Emulator.getEmulator().getLogStream().println("Patched: " + cls + "." + name + sign + " in " + className + "." + methodName + methodDesc);
+                        sign = "(Ljavax/microedition/m3g/Graphics3D;" + sign.substring(1);
+                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomGraphics3D", name, sign);
+                        return;
                     }
                 }
                 String s5;
@@ -158,18 +155,18 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
         super(methodVisitor);
         this.anInt1185 = 0;
         if (Settings.enableNewTrack || Settings.enableMethodTrack) {
-            this.sourceFile = aString1186;
-            this.aString1187 = aString1186 + "." + s;
-            this.aString1189 = aString1187;
+            this.className = aString1186;
+            this.methodName = aString1186 + "." + s;
+            this.methodDesc = aString1187;
             this.aString1190 = "";
             this.sourceLine = 0;
             final int lastIndex;
-            if ((lastIndex = this.sourceFile.lastIndexOf(36)) != -1) {
-                this.sourceFile = this.sourceFile.substring(0, lastIndex);
+            if ((lastIndex = this.className.lastIndexOf(36)) != -1) {
+                this.className = this.className.substring(0, lastIndex);
             }
             final int lastIndex2;
-            if ((lastIndex2 = this.sourceFile.lastIndexOf(46)) != -1) {
-                this.sourceFile = this.sourceFile.substring(lastIndex2 + 1);
+            if ((lastIndex2 = this.className.lastIndexOf(46)) != -1) {
+                this.className = this.className.substring(lastIndex2 + 1);
             }
         }
     }
@@ -183,7 +180,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
 
     private void method708(final String s) {
         try {
-            super.visitLdcInsn((Object) (this.aString1190 = s + "\t at " + this.aString1187 + " (" + this.sourceFile + ".java:" + this.sourceLine + ")\n"));
+            super.visitLdcInsn((Object) (this.aString1190 = s + "\t at " + this.methodName + " (" + this.className + ".java:" + this.sourceLine + ")\n"));
             super.visitMethodInsn(184, "emulator/custom/CustomMethod", "showTrackInfo", "(Ljava/lang/String;)V");
             this.method707(1);
         } catch (Exception ex) {
@@ -292,7 +289,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
     public final void visitCode() {
         if (Settings.enableMethodTrack) {
             this.method707(1);
-            super.visitLdcInsn((Object) (this.aString1187 + this.aString1189));
+            super.visitLdcInsn((Object) (this.methodName + this.methodDesc));
             super.visitMethodInsn(184, "emulator/custom/CustomMethod", "beginMethod", "(Ljava/lang/String;)V");
         }
     }
@@ -308,7 +305,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                 case 177:
                 case 191: {
                     this.method707(1);
-                    super.visitLdcInsn((Object) (this.aString1187 + this.aString1189));
+                    super.visitLdcInsn((Object) (this.methodName + this.methodDesc));
                     super.visitMethodInsn(184, "emulator/custom/CustomMethod", "endMethod", "(Ljava/lang/String;)V");
                     break;
                 }
