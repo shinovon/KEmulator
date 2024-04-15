@@ -83,7 +83,7 @@
 
 -keep,allowshrinking public class org.objectweb.** { *; }
 
--keep,allowshrinking public class org.lwjgl.** { public protected *; }
+-keep class org.lwjgl.** { *; }
 
 #-keep class com.sun.** { *; }
 #-keep class javax.** { *; }
