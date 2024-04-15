@@ -57,10 +57,14 @@ public class Graphics3D {
                 throw new IllegalArgumentException();
             }
             this.isGraphics = false;
-            setBackBufferImage2D((Image2D) var1);
+            synchronized (Memory.m3gLock) {
+                setBackBufferImage2D((Image2D) var1);
+            }
             this.boundTarget = var1;
         }
-        setHints(var2, var3);
+        synchronized (Memory.m3gLock) {
+            setHints(var2, var3);
+        }
     }
 
     public synchronized void bindTarget(Object var1) {
@@ -77,7 +81,9 @@ public class Graphics3D {
             bindTarget((Graphics) var1);
         } else if ((var1 instanceof Image2D)) {
             this.isGraphics = false;
-            setBackBufferImage2D((Image2D) var1);
+            synchronized (Memory.m3gLock) {
+                setBackBufferImage2D((Image2D) var1);
+            }
             this.boundTarget = var1;
         } else {
             throw new IllegalArgumentException();
@@ -102,12 +108,12 @@ public class Graphics3D {
     public synchronized void releaseTarget() {
         if (this.boundTarget != null) {
             this.preload = false;
-            if (this.isGraphics) {
-                synchronized (Memory.m3gLock) {
+            synchronized (Memory.m3gLock) {
+                if (this.isGraphics) {
                     Helpers.releaseTarget(this, (Graphics) this.boundTarget);
+                } else {
+                    setBackBufferImage2D(null);
                 }
-            } else {
-                setBackBufferImage2D(null);
             }
             this.boundTarget = null;
         }
