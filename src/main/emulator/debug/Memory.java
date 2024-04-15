@@ -24,7 +24,6 @@ import javax.microedition.media.control.*;
 import emulator.media.vlc.VLCPlayerImpl;
 
 public final class Memory {
-    public static boolean lockM3GObjects;
 
     public Hashtable table;
     public Vector instances;
@@ -116,20 +115,14 @@ public final class Memory {
         if(m3gObjects.size() == 0) return;
 
         try {
-            Memory.lockM3GObjects = true;
             synchronized (debugLock) {
-                EmulatorScreen emuScr = ((EmulatorScreen) Emulator.getEmulator().getScreen());
-                boolean scrPaused = emuScr.isFullyPaused();
-                if (!scrPaused) EmulatorScreen.pause();
-                Thread.sleep(10);
+                // delays to make sure jsr184client did all the job
+                Thread.sleep(5);
                 for (int i = 0; i < m3gObjects.size(); i++) {
                     m3gReadTextures((Node) m3gObjects.elementAt(i));
                 }
-                Thread.sleep(10);
-                if (!scrPaused) emuScr.resumeStep();
-                debugLock.notifyAll();
+                Thread.sleep(5);
             }
-            Memory.lockM3GObjects = false;
         } catch (Exception e) {}
     }
 
