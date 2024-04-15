@@ -4,7 +4,6 @@ import emulator.ui.*;
 import org.eclipse.swt.custom.*;
 
 import java.io.*;
-import java.util.Vector;
 
 import org.eclipse.swt.layout.*;
 import emulator.*;
@@ -20,7 +19,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     StyledText styledText;
     Shell parentShell;
     private boolean aBoolean576;
-    Vector<String> printQueue = new Vector<String>();
+    StringBuffer printQueue = new StringBuffer();
 
     public Class11() {
         super();
@@ -74,7 +73,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
 
     private void queuePrint(final String s) {
         synchronized (printQueue) {
-            printQueue.add(s);
+            printQueue.append(s);
             printQueue.notify();
         }
     }
@@ -164,7 +163,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     public void run() {
         try {
             while (true) {
-                if (printQueue.size() > 0) {
+                if (printQueue.length() > 0) {
                     EmulatorImpl.syncExec(new Textout(this));
                 } else {
                     synchronized (printQueue) {
@@ -186,11 +185,11 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         }
 
         public final void run() {
-            StringBuffer sb = new StringBuffer();
-            while (printQueue.size() > 0) {
-                sb.append(printQueue.remove(0));
+            String s;
+            synchronized(printQueue) {
+                s = printQueue.toString();
+                printQueue.setLength(0);
             }
-            String s = sb.toString();
             try {
                 class11.filePrintStream.print(s);
             } catch (Exception e) {}
