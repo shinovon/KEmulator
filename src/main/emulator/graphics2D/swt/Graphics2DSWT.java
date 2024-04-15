@@ -24,7 +24,7 @@ public final class Graphics2DSWT implements IGraphics2D
         this.height = image.getImageData().height;
     }
     
-    public final GC method299() {
+    public final GC method138() {
         return this.gc;
     }
     

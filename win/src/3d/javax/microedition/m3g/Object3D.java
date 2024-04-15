@@ -1,123 +1,179 @@
 package javax.microedition.m3g;
 
-import emulator.i;
+import java.util.Vector;
+import javax.microedition.m3g.AnimationTrack;
+import javax.microedition.m3g.Node;
 
-public abstract class Object3D {
-    int swerveHandle;
-    Object uo;
-    boolean ii;
+public abstract class Object3D implements Cloneable {
+   int anInt869 = 0;
+   Object anObject870 = null;
+   Vector aVector871 = new Vector();
+   Vector aVector872 = new Vector();
 
-    Object3D() {
-        this.uo = null;
-        this.ii = false;
-    }
+   public final int animate(int var1) {
+      int var2 = this.animation(var1);
 
-    Object3D(int swerveHandle) {
-        this.uo = null;
-        this.ii = false;
-        this.swerveHandle = swerveHandle;
-    }
+      for(int var3 = 0; var3 < this.aVector872.size(); ++var3) {
+         var2 = Math.min(var2, ((Object3D)this.aVector872.get(var3)).animate(var1));
+      }
 
-    public AnimationTrack getAnimationTrack(int n) {
-        return (AnimationTrack) Engine.instantiateJavaPeer(getAnimationTrackImpl(n));
-    }
+      return var2;
+   }
 
-    public void addAnimationTrack(AnimationTrack animationTrack) {
-        addAnimationTrackImpl(animationTrack);
-        Engine.addXOT(animationTrack);
-    }
+   protected final int animation(int var1) {
+      int var2 = Integer.MAX_VALUE;
+      int var3 = 0;
 
-    public Object3D find(int n) {
-        return (Object3D) Engine.instantiateJavaPeer(findImpl(n));
-    }
+      while(var3 < this.aVector871.size()) {
+         AnimationTrack var4;
+         int var5 = (var4 = (AnimationTrack)this.aVector871.elementAt(var3)).getTargetProperty();
+         float[] var6 = new float[var4.getKeyframeSequence().getComponentCount()];
+         float[] var7 = new float[2];
+         float var8 = 0.0F;
 
-    public int getReferences(Object3D[] array) {
-        int referencesImpl = getReferencesImpl(null);
-        if (array == null) {
-            return referencesImpl;
-        }
-        if (array.length < referencesImpl) {
-            throw new IllegalArgumentException();
-        }
-        int[] array2 = new int[array.length];
-        int referencesImpl2;
-        if ((referencesImpl2 = getReferencesImpl(array2)) > referencesImpl) {
-            referencesImpl2 = referencesImpl;
-        }
-        for (int i = 0; i < referencesImpl2; i++) {
-            array[i] = ((Object3D) Engine.instantiateJavaPeer(array2[i]));
-        }
-        return referencesImpl2;
-    }
+         do {
+            var4.getContribution(var1, var6, var7);
+            var8 += var7[0];
+            var2 = Math.min(var2, (int)var7[1]);
+            ++var3;
+         } while(var3 != this.aVector871.size() && (var4 = (AnimationTrack)this.aVector871.elementAt(var3)).getTargetProperty() == var5);
 
-    public final Object3D duplicate() {
-        Object3D object3D;
-        duplicateHelper(object3D = (Object3D) Engine.instantiateJavaPeer(duplicateImpl()), this);
-        return object3D;
-    }
+         if(var8 > 0.0F) {
+            this.updateProperty(var5, var6);
+         }
+      }
 
-    private static void duplicateHelper(Object3D object3D, Object3D object3D2) {
-        object3D.setUserObject(object3D2.uo);
-        if ((object3D2 instanceof Group)) {
-            Group group = (Group) object3D2;
-            Group group2 = (Group) object3D;
-            int childCount = group.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                try {
-                    duplicateHelper(group2.getChild(i), group.getChild(i));
-                } catch (IndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
-                    return;
-                }
+      return var2;
+   }
+
+   protected void updateProperty(int var1, float[] var2) {
+      throw new Error("Invalid animation target property!");
+   }
+
+   public final Object3D duplicate() {
+      Object3D var1 = this.duplicateObject();
+      if(this instanceof Node) {
+         Node var2;
+         (var2 = (Node)this).updateAlignReferences();
+         var2.clearAlignReferences();
+      }
+
+      return var1;
+   }
+
+   protected Object3D duplicateObject() {
+      Object3D var1 = null;
+
+      try {
+         (var1 = (Object3D)this.clone()).aVector872 = (Vector)this.aVector872.clone();
+         var1.aVector871 = (Vector)this.aVector871.clone();
+      } catch (Exception var2) {
+         ;
+      }
+
+      return var1;
+   }
+
+   public Object3D find(int var1) {
+      if(this.anInt869 == var1) {
+         return this;
+      } else {
+         Object3D var2 = null;
+
+         for(int var3 = 0; var3 < this.aVector872.size() && (var2 = ((Object3D)this.aVector872.get(var3)).find(var1)) == null; ++var3) {
+            ;
+         }
+
+         return var2;
+      }
+   }
+
+   public int getReferences(Object3D[] var1) {
+      if(var1 != null && var1.length < this.getReferences((Object3D[])null)) {
+         throw new IllegalArgumentException();
+      } else {
+         if(var1 != null) {
+            for(int var2 = 0; var2 < this.aVector872.size(); ++var2) {
+               var1[var2] = (Object3D)this.aVector872.get(var2);
             }
-            return;
-        }
-        if ((object3D2 instanceof SkinnedMesh)) {
-            duplicateHelper(((SkinnedMesh) object3D).getSkeleton(), ((SkinnedMesh) object3D2).getSkeleton());
-        }
-    }
+         }
 
-    public Object getUserObject() {
-        return this.uo;
-    }
+         return this.aVector872.size();
+      }
+   }
 
-    public void setUserObject(Object uo) {
-        this.uo = uo;
-        if (this.uo != null) {
-            Engine.addXOT(this);
-        }
-    }
+   public void setUserID(int var1) {
+      this.anInt869 = var1;
+   }
 
-    static {
-        i.a("jsr184client");
-        Engine.cacheFID(Object3D.class, 0);
-    }
+   public int getUserID() {
+      return this.anInt869;
+   }
 
-    protected native void finalize();
+   public void setUserObject(Object var1) {
+      this.anObject870 = var1;
+   }
 
-    public native int getUserID();
+   public Object getUserObject() {
+      return this.anObject870;
+   }
 
-    public native int getAnimationTrackCount();
+   public void addAnimationTrack(AnimationTrack var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(!this.aVector871.contains(var1) && var1.checkCompatible(this)) {
+         int var2 = var1.getKeyframeSequence().getComponentCount();
+         int var3 = var1.getTargetProperty();
 
-    public native void setUserID(int paramInt);
+         for(int var4 = 0; var4 < this.aVector871.size(); ++var4) {
+            AnimationTrack var5;
+            if((var5 = (AnimationTrack)this.aVector871.get(var4)).getTargetProperty() > var3) {
+               this.aVector871.insertElementAt(var1, var4);
+               this.addReference(var1);
+               return;
+            }
 
-    private native int getAnimationTrackImpl(int paramInt);
+            if(var5.getTargetProperty() == var3 && var5.getKeyframeSequence().getComponentCount() != var2) {
+               throw new IllegalArgumentException();
+            }
+         }
 
-    private native void addAnimationTrackImpl(AnimationTrack paramAnimationTrack);
+         this.aVector871.addElement(var1);
+         this.addReference(var1);
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
 
-    public native void removeAnimationTrack(AnimationTrack paramAnimationTrack);
+   public AnimationTrack getAnimationTrack(int var1) {
+      if(var1 >= 0 && var1 < this.aVector871.size()) {
+         return (AnimationTrack)this.aVector871.elementAt(var1);
+      } else {
+         throw new IndexOutOfBoundsException();
+      }
+   }
 
-    public final native int animate(int paramInt);
+   public void removeAnimationTrack(AnimationTrack var1) {
+      if(this.aVector871.contains(var1)) {
+         this.aVector871.remove(var1);
+         this.removeReference(var1);
+      }
 
-    private native int findImpl(int paramInt);
+   }
 
-    private native int getReferencesImpl(int[] paramArrayOfInt);
+   public int getAnimationTrackCount() {
+      return this.aVector871.size();
+   }
 
-    native void removeUserParameters();
+   protected void addReference(Object3D var1) {
+      if(var1 != null) {
+         this.aVector872.add(var1);
+      }
+   }
 
-    native int getUserParameterID(int paramInt);
-
-    native int getUserParameterValue(int paramInt, byte[] paramArrayOfByte);
-
-    private native int duplicateImpl();
+   protected void removeReference(Object3D var1) {
+      if(var1 != null) {
+         this.aVector872.remove(var1);
+      }
+   }
 }

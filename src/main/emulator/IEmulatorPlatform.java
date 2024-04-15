@@ -1,6 +1,7 @@
 package emulator;
 
 import emulator.debug.MemoryViewImage;
+import emulator.graphics3D.IGraphics3D;
 
 public interface IEmulatorPlatform {
     public boolean isX64();
@@ -18,4 +19,6 @@ public interface IEmulatorPlatform {
     boolean supportsMascotCapsule();
 
     MemoryViewImage convertMicro3DTexture(Object o);
+
+    IGraphics3D getGraphics3D();
 }

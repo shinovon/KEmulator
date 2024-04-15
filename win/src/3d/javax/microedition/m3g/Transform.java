@@ -1,68 +1,153 @@
 package javax.microedition.m3g;
 
-import emulator.i;
+import emulator.graphics3D.c;
+import javax.microedition.m3g.VertexArray;
 
 public class Transform {
-    int swerveHandle;
+   private c ac1306;
 
-    Transform(int swerveHandle) {
-        this.swerveHandle = swerveHandle;
-    }
+   public Transform() {
+      this.ac1306 = new c();
+   }
 
-    public Transform() {
-        Engine.addJavaPeer(this.swerveHandle = create(), this);
-    }
+   public Transform(Transform var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else {
+         this.ac1306 = new c();
+         this.ac1306.method434(var1.ac1306);
+      }
+   }
 
-    public Transform(Transform transform) {
-        Engine.addJavaPeer(this.swerveHandle = createCopy(transform), this);
-    }
+   public c getImpl() {
+      return this.ac1306;
+   }
 
-    public void set(float[] matrix) {
-        setMatrix(matrix);
-    }
+   public void setIdentity() {
+      this.ac1306.method432();
+   }
 
-    public void set(Transform transform) {
-        setTransform(transform);
-    }
+   public void set(Transform var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else {
+         this.ac1306.method434(var1.ac1306);
+      }
+   }
 
-    public void transform(float[] array) {
-        transformPoints(array);
-    }
+   public void set(float[] var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1.length < 16) {
+         throw new IllegalArgumentException();
+      } else {
+         this.ac1306.method441(var1);
+      }
+   }
 
-    static {
-        i.a("jsr184client");
-        Engine.cacheFID(Transform.class, 4);
-    }
+   public void get(float[] var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1.length < 16) {
+         throw new IllegalArgumentException();
+      } else {
+         this.ac1306.method433(var1);
+      }
+   }
 
-    protected native void finalize();
+   public void invert() {
+      this.ac1306.method442();
+   }
 
-    private static native int create();
+   public void transpose() {
+      this.ac1306.method447();
+   }
 
-    private static native int createCopy(Transform paramTransform);
+   public void postMultiply(Transform var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else {
+         this.ac1306.method436(var1.ac1306, false);
+      }
+   }
 
-    public native void get(float[] paramArrayOfFloat);
+   public void preMultiply(Transform var1) {
+      this.ac1306.method436(var1.ac1306, true);
+   }
 
-    private native void setMatrix(float[] paramArrayOfFloat);
+   public void postScale(float var1, float var2, float var3) {
+      this.ac1306.method438(var1, var2, var3);
+   }
 
-    private native void setTransform(Transform paramTransform);
+   public void postRotate(float var1, float var2, float var3, float var4) {
+      if(var2 == 0.0F && var3 == 0.0F && var4 == 0.0F && var1 != 0.0F) {
+         throw new IllegalArgumentException();
+      } else {
+         this.ac1306.method437(var1, var2, var3, var4);
+      }
+   }
 
-    public native void setIdentity();
+   public void postRotateQuat(float var1, float var2, float var3, float var4) {
+      if(var3 == 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
+         throw new IllegalArgumentException();
+      } else {
+         this.ac1306.method443(var1, var2, var3, var4);
+      }
+   }
 
-    public native void invert();
+   public void postTranslate(float var1, float var2, float var3) {
+      this.ac1306.method444(var1, var2, var3);
+   }
 
-    public native void postMultiply(Transform paramTransform);
+   public void transform(VertexArray var1, float[] var2, boolean var3) {
+      if(var1 != null && var2 != null) {
+         if(var1.getComponentCount() != 4 && var2.length >= 4 * var1.getVertexCount()) {
+            int var4 = var3?1:0;
+            int var5 = var1.getVertexCount();
+            int var6 = var1.getComponentCount();
+            int var7 = var5 * 4;
+            int var8 = 0;
+            int var9 = 0;
+            if(var1.getComponentType() == 1) {
+               byte[] var10 = new byte[var5 * var6];
+               var1.get(0, var5, var10);
 
-    public native void postRotate(float paramFloat1, float paramFloat2, float paramFloat3, float paramFloat4);
+               while(var8 < var7) {
+                  if(var8 % 4 < var6) {
+                     var2[var8++] = (float)var10[var9++];
+                  } else {
+                     var2[var8++] = (float)var4;
+                  }
+               }
+            } else {
+               short[] var11 = new short[var5 * var6];
+               var1.get(0, var5, var11);
 
-    public native void postRotateQuat(float paramFloat1, float paramFloat2, float paramFloat3, float paramFloat4);
+               while(var8 < var7) {
+                  if(var8 % 4 < var6) {
+                     var2[var8++] = (float)var11[var9++];
+                  } else {
+                     var2[var8++] = (float)var4;
+                  }
+               }
+            }
 
-    public native void postScale(float paramFloat1, float paramFloat2, float paramFloat3);
+            this.ac1306.method446(var2);
+         } else {
+            throw new IllegalArgumentException();
+         }
+      } else {
+         throw new NullPointerException();
+      }
+   }
 
-    public native void postTranslate(float paramFloat1, float paramFloat2, float paramFloat3);
-
-    public native void transform(VertexArray paramVertexArray, float[] paramArrayOfFloat, boolean paramBoolean);
-
-    private native void transformPoints(float[] paramArrayOfFloat);
-
-    public native void transpose();
+   public void transform(float[] var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1.length % 4 != 0) {
+         throw new IllegalArgumentException();
+      } else {
+         this.ac1306.method446(var1);
+      }
+   }
 }

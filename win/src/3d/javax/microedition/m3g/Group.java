@@ -1,47 +1,184 @@
 package javax.microedition.m3g;
 
+import emulator.graphics3D.b;
+import java.util.Vector;
+import javax.microedition.m3g.Camera;
+import javax.microedition.m3g.Node;
+import javax.microedition.m3g.Object3D;
+import javax.microedition.m3g.RayIntersection;
+import javax.microedition.m3g.Transform;
+import javax.microedition.m3g.World;
+
 public class Group extends Node {
-    Group(int n) {
-        super(n);
-    }
+   Vector aVector931 = new Vector();
 
-    public Group() {
-        this(create());
-        Engine.addJavaPeer(this.swerveHandle, this);
-        this.ii = (getClass() != Group.class);
-    }
+   protected Object3D duplicateObject() {
+      Group var1;
+      (var1 = (Group)super.duplicateObject()).aVector931 = (Vector)this.aVector931.clone();
 
-    private static native int create();
+      for(int var2 = var1.getChildCount() - 1; var2 >= 0; --var2) {
+         var1.removeReference(var1.getChild(var2));
+         Node var3;
+         (var3 = (Node)var1.getChild(var2).duplicateObject()).aNode1303 = var1;
+         var1.aVector931.set(var2, var3);
+         var1.addReference(var3);
+      }
 
-    public native int getChildCount();
+      return var1;
+   }
 
-    public Node getChild(int n) {
-        return (Node) Engine.instantiateJavaPeer(getChildImpl(n));
-    }
+   public void addChild(Node var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1 == this) {
+         throw new IllegalArgumentException("child is this Group");
+      } else if(var1 instanceof World) {
+         throw new IllegalArgumentException("child is a World node");
+      } else if(var1.aNode1303 != null && var1.aNode1303 != this) {
+         throw new IllegalArgumentException("child already has a parent other than this Group");
+      } else if(var1.isParentOf(this)) {
+         throw new IllegalArgumentException("child is an ancestor of this Group");
+      } else {
+         if(!this.aVector931.contains(var1)) {
+            this.aVector931.add(var1);
+         }
 
-    private native int getChildImpl(int paramInt);
+         var1.aNode1303 = this;
+         this.addReference(var1);
+      }
+   }
 
-    public void addChild(Node node) {
-        addChildImpl(node);
-        Engine.addXOT(node);
-    }
+   public void removeChild(Node var1) {
+      if(var1 != null) {
+         if(var1.isSkinnedMeshBone()) {
+            throw new IllegalArgumentException();
+         } else {
+            var1.aNode1303 = null;
+            if(this.aVector931.contains(var1)) {
+               this.aVector931.remove(var1);
+               this.removeReference(var1);
+            }
+         }
+      }
+   }
 
-    private native void addChildImpl(Node paramNode);
+   public int getChildCount() {
+      return this.aVector931.size();
+   }
 
-    public native void removeChild(Node paramNode);
+   public Node getChild(int var1) {
+      if(var1 >= 0 && var1 < this.getChildCount()) {
+         return (Node)this.aVector931.get(var1);
+      } else {
+         throw new IndexOutOfBoundsException();
+      }
+   }
 
-    public boolean pick(int n, float n2, float n3, float n4, float n5, float n6, float n7,
-                        RayIntersection rayIntersection) {
-        return pickNode(n, n2, n3, n4, n5, n6, n7, rayIntersection);
-    }
+   protected void alignment(Node var1) {
+      super.alignment(var1);
 
-    private native boolean pickNode(int paramInt, float paramFloat1, float paramFloat2, float paramFloat3,
-                                    float paramFloat4, float paramFloat5, float paramFloat6, RayIntersection paramRayIntersection);
+      for(int var2 = 0; var2 < this.aVector931.size(); ++var2) {
+         ((Node)this.aVector931.get(var2)).alignment(var1);
+      }
 
-    public boolean pick(int n, float n2, float n3, Camera camera, RayIntersection rayIntersection) {
-        return pickCamera(n, n2, n3, camera, rayIntersection);
-    }
+   }
 
-    private native boolean pickCamera(int paramInt, float paramFloat1, float paramFloat2, Camera paramCamera,
-                                      RayIntersection paramRayIntersection);
+   public boolean pick(int var1, float var2, float var3, Camera var4, RayIntersection var5) {
+      if(var4 == null) {
+         throw new NullPointerException();
+      } else if(var4.getRoot() != this.getRoot()) {
+         throw new IllegalStateException();
+      } else {
+         b var7 = new b(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, 1.0F, 1.0F);
+         b var8 = new b(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, -1.0F, 1.0F);
+         Transform var9 = new Transform();
+         var4.getProjection(var9);
+         var9.getImpl().method445();
+         var9.getImpl().method440(var8);
+         var8.method425(1.0F / var8.aFloat614);
+         var9.getImpl().method440(var7);
+         var7.method425(1.0F / var7.aFloat614);
+         float[] var10;
+         (var10 = new float[8])[6] = var8.aFloat612;
+         var10[7] = var7.aFloat612;
+         Transform var11 = new Transform();
+         var4.getTransformTo(this, var11);
+         var11.getImpl().method440(var8);
+         var8.method425(1.0F / var8.aFloat614);
+         var11.getImpl().method440(var7);
+         var7.method425(1.0F / var7.aFloat614);
+         var10[0] = var8.aFloat608;
+         var10[1] = var8.aFloat610;
+         var10[2] = var8.aFloat612;
+         var10[3] = var7.aFloat608;
+         var10[4] = var7.aFloat610;
+         var10[5] = var7.aFloat612;
+         if(var5 == null) {
+            var5 = new RayIntersection();
+         }
+
+         var5.startPick(this, var10, var2, var3, var4);
+         var11.setIdentity();
+         return this.rayIntersect(var1, var10, var5, var11);
+      }
+   }
+
+   public boolean pick(int var1, float var2, float var3, float var4, float var5, float var6, float var7, RayIntersection var8) {
+      if(var5 == 0.0F && var6 == 0.0F && var7 == 0.0F) {
+         throw new IllegalArgumentException();
+      } else {
+         Transform var9 = new Transform();
+         float[] var10;
+         (var10 = new float[6])[0] = var2;
+         var10[1] = var3;
+         var10[2] = var4;
+         var10[3] = var2 + var5;
+         var10[4] = var3 + var6;
+         var10[5] = var4 + var7;
+         if(var8 == null) {
+            var8 = new RayIntersection();
+         }
+
+         var8.startPick(this, var10, 0.0F, 0.0F, (Camera)null);
+         return this.rayIntersect(var1, var10, var8, var9);
+      }
+   }
+
+   protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
+      boolean var5 = false;
+      Transform var6 = new Transform();
+      Transform var7 = new Transform();
+
+      for(int var8 = 0; var8 < this.aVector931.size(); ++var8) {
+         Node var9;
+         if(((var9 = (Node)this.aVector931.get(var8)) instanceof Group || (var9.getScope() & var1) != 0) && var9.isPickable(var3.getRoot())) {
+            var6.set(var4);
+            var9.getCompositeTransform(var7);
+            var6.postMultiply(var7);
+            if(var9.rayIntersect(var1, var2, var3, var6)) {
+               var5 = true;
+            }
+         }
+      }
+
+      return var5;
+   }
+
+   protected void updateAlignReferences() {
+      super.updateAlignReferences();
+
+      for(int var1 = 0; var1 < this.aVector931.size(); ++var1) {
+         ((Node)this.aVector931.get(var1)).updateAlignReferences();
+      }
+
+   }
+
+   protected void clearAlignReferences() {
+      super.clearAlignReferences();
+
+      for(int var1 = 0; var1 < this.aVector931.size(); ++var1) {
+         ((Node)this.aVector931.get(var1)).clearAlignReferences();
+      }
+
+   }
 }

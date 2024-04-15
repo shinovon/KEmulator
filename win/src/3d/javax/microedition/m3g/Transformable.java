@@ -1,36 +1,162 @@
 package javax.microedition.m3g;
 
+import emulator.graphics3D.a;
+import javax.microedition.m3g.Object3D;
+import javax.microedition.m3g.Transform;
+
 public abstract class Transformable extends Object3D {
-    Transformable(final int n) {
-        super(n);
-    }
+   float[] aFloatArray735 = new float[3];
+   float[] aFloatArray866 = new float[3];
+   a ana864 = new a(0.0F, 0.0F, 0.0F, 1.0F);
+   Transform aTransform865 = new Transform();
 
-    Transformable() {
-    }
+   Transformable() {
+      this.aFloatArray735[0] = this.aFloatArray735[1] = this.aFloatArray735[2] = 1.0F;
+   }
 
-    public native void getTranslation(final float[] p0);
+   public void setOrientation(float var1, float var2, float var3, float var4) {
+      if(var1 != 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
+         throw new IllegalArgumentException();
+      } else {
+         this.ana864.method407(var1, var2, var3, var4);
+      }
+   }
 
-    public native void getScale(final float[] p0);
+   public void getOrientation(float[] var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1.length < 4) {
+         throw new IllegalArgumentException();
+      } else {
+         this.ana864.method415(var1);
+      }
+   }
 
-    public native void getOrientation(final float[] p0);
+   public void preRotate(float var1, float var2, float var3, float var4) {
+      if(var1 != 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
+         throw new IllegalArgumentException();
+      } else {
+         a var5;
+         (var5 = new a()).method407(var1, var2, var3, var4);
+         var5.method416(this.ana864);
+         this.ana864.method406(var5);
+      }
+   }
 
-    public native void setTranslation(final float p0, final float p1, final float p2);
+   public void postRotate(float var1, float var2, float var3, float var4) {
+      if(var1 != 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
+         throw new IllegalArgumentException();
+      } else {
+         a var5;
+         (var5 = new a()).method407(var1, var2, var3, var4);
+         this.ana864.method416(var5);
+      }
+   }
 
-    public native void setScale(final float p0, final float p1, final float p2);
+   public void setScale(float var1, float var2, float var3) {
+      this.aFloatArray735[0] = var1;
+      this.aFloatArray735[1] = var2;
+      this.aFloatArray735[2] = var3;
+   }
 
-    public native void setOrientation(final float p0, final float p1, final float p2, final float p3);
+   public void scale(float var1, float var2, float var3) {
+      this.aFloatArray735[0] *= var1;
+      this.aFloatArray735[1] *= var2;
+      this.aFloatArray735[2] *= var3;
+   }
 
-    public native void translate(final float p0, final float p1, final float p2);
+   public void getScale(float[] var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1.length < 3) {
+         throw new IllegalArgumentException();
+      } else {
+         System.arraycopy(this.aFloatArray735, 0, var1, 0, 3);
+      }
+   }
 
-    public native void scale(final float p0, final float p1, final float p2);
+   public void setTranslation(float var1, float var2, float var3) {
+      this.aFloatArray866[0] = var1;
+      this.aFloatArray866[1] = var2;
+      this.aFloatArray866[2] = var3;
+   }
 
-    public native void preRotate(final float p0, final float p1, final float p2, final float p3);
+   public void translate(float var1, float var2, float var3) {
+      this.aFloatArray866[0] += var1;
+      this.aFloatArray866[1] += var2;
+      this.aFloatArray866[2] += var3;
+   }
 
-    public native void postRotate(final float p0, final float p1, final float p2, final float p3);
+   public void getTranslation(float[] var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1.length < 3) {
+         throw new IllegalArgumentException();
+      } else {
+         System.arraycopy(this.aFloatArray866, 0, var1, 0, 3);
+      }
+   }
 
-    public native void getTransform(final Transform p0);
+   public void setTransform(Transform var1) {
+      if(var1 == null) {
+         this.aTransform865.setIdentity();
+      } else {
+         this.aTransform865.set(var1);
+      }
+   }
 
-    public native void getCompositeTransform(final Transform p0);
+   public void getTransform(Transform var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else {
+         var1.set(this.aTransform865);
+      }
+   }
 
-    public native void setTransform(final Transform p0);
+   public void getCompositeTransform(Transform var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else {
+         var1.setIdentity();
+         var1.postTranslate(this.aFloatArray866[0], this.aFloatArray866[1], this.aFloatArray866[2]);
+         var1.postRotateQuat(this.ana864.aFloat603, this.ana864.aFloat604, this.ana864.aFloat605, this.ana864.aFloat606);
+         var1.postScale(this.aFloatArray735[0], this.aFloatArray735[1], this.aFloatArray735[2]);
+         var1.postMultiply(this.aTransform865);
+      }
+   }
+
+   protected void updateProperty(int var1, float[] var2) {
+      switch(var1) {
+      case 268:
+         this.ana864.method405(var2);
+         this.ana864.method404();
+         return;
+      case 270:
+         if(var2.length == 1) {
+            this.aFloatArray735[0] = this.aFloatArray735[1] = this.aFloatArray735[2] = var2[0];
+            return;
+         }
+
+         this.aFloatArray735[0] = var2[0];
+         this.aFloatArray735[1] = var2[1];
+         this.aFloatArray735[2] = var2[2];
+         return;
+      case 275:
+         this.aFloatArray866[0] = var2[0];
+         this.aFloatArray866[1] = var2[1];
+         this.aFloatArray866[2] = var2[2];
+         return;
+      default:
+         super.updateProperty(var1, var2);
+      }
+   }
+
+   protected Object3D duplicateObject() {
+      Transformable var1;
+      (var1 = (Transformable)super.duplicateObject()).ana864 = new a(this.ana864);
+      var1.aTransform865 = new Transform(this.aTransform865);
+      var1.aFloatArray866 = (float[])this.aFloatArray866.clone();
+      var1.aFloatArray735 = (float[])this.aFloatArray735.clone();
+      return var1;
+   }
 }

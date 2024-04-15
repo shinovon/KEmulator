@@ -1,154 +1,272 @@
 package javax.microedition.m3g;
 
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Image;
+import javax.microedition.m3g.Object3D;
 
 public class Image2D extends Object3D {
-    public static final int ALPHA = 96;
-    public static final int LUMINANCE = 97;
-    public static final int LUMINANCE_ALPHA = 98;
-    public static final int RGB = 99;
-    public static final int RGBA = 100;
+   public static final int ALPHA = 96;
+   public static final int LUMINANCE = 97;
+   public static final int LUMINANCE_ALPHA = 98;
+   public static final int RGB = 99;
+   public static final int RGBA = 100;
+   private int anInt37;
+   private int anInt39;
+   private int anInt40;
+   private byte[] aByteArray35;
+   private boolean aBoolean36;
+   private static byte[] aByteArray38;
 
-    Image2D(final int n) {
-        super(n);
-    }
+   public Image2D(int var1, Object var2) {
+      if(var2 == null) {
+         throw new NullPointerException();
+      } else if(!method14(var1)) {
+         throw new IllegalArgumentException();
+      } else if(var2 instanceof Image) {
+         Image var3 = (Image)var2;
+         this.anInt39 = var3.getWidth();
+         this.anInt40 = var3.getHeight();
+         this.aBoolean36 = false;
+         this.anInt37 = var1;
+         this.aByteArray35 = method15(var1, var3.getImpl().getData(), var3.isMutable());
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
 
-    public Image2D(final int n, final int n2, final int n3, final byte[] array) {
-        this(create(n, n2, n3, array));
-        Engine.addJavaPeer(super.swerveHandle, this);
-        this.ii = (getClass() != Image2D.class);
-    }
-
-    private static native int create(final int p0, final int p1, final int p2, final byte[] p3);
-
-    public Image2D(final int n, final int n2, final int n3, final byte[] array, final byte[] array2) {
-        this(createPalettized(n, n2, n3, array, array2));
-        Engine.addJavaPeer(super.swerveHandle, this);
-        this.ii = (getClass() != Image2D.class);
-    }
-
-    private static native int createPalettized(final int p0, final int p1, final int p2, final byte[] p3, final byte[] p4);
-
-    public Image2D(final int n, final int n2, final int n3) {
-        this(createMutable(n, n2, n3));
-        Engine.addJavaPeer(super.swerveHandle, this);
-        this.ii = (getClass() != Image2D.class);
-    }
-
-    private static native int createMutable(final int p0, final int p1, final int p2);
-
-    private static native int createUninitialized(final int p0, final int p1, final int p2, final boolean p3);
-
-    public Image2D(final int n, final Object o) {
-        this(createImage(n, o));
-        Engine.addJavaPeer(super.swerveHandle, this);
-        this.ii = (getClass() != Image2D.class);
-        final Image image = (Image) o;
-        final int width = this.getWidth();
-        final int height = this.getHeight();
-        final boolean opaque = isOpaque(image);
-        if (width <= height) {
-            final int[] array = new int[width];
-            for (int i = 0; i < height; ++i) {
-                getImageRGB(image, array, 0, width, 0, i, width, 1);
-                this.setRGB(array, 0, i, width, 1, opaque);
-            }
-            return;
-        }
-        final int[] array2 = new int[height];
-        for (int j = 0; j < width; ++j) {
-            getImageRGB(image, array2, 0, 1, j, 0, 1, height);
-            this.setRGB(array2, j, 0, 1, height, opaque);
-        }
-    }
-
-    Image2D(final byte[] array, final int n, final int n2) {
-        this(createImageImpl(array, n, n2));
-        Engine.addJavaPeer(super.swerveHandle, this);
-        this.ii = (getClass() != Image2D.class);
-    }
-
-    public native int getFormat();
-
-    public native int getWidth();
-
-    public native int getHeight();
-
-    public native boolean isMutable();
-
-    public native void set(final int p0, final int p1, final int p2, final int p3, final byte[] p4);
-
-    native void unpalettize();
-
-    private native void setRGB(final int[] p0, final int p1, final int p2, final int p3, final int p4, final boolean p5);
-
-    private static int createImage(final int n, final Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        if (!(o instanceof Image)) {
+   public Image2D(int var1, int var2, int var3, byte[] var4) {
+      if(var4 == null) {
+         throw new NullPointerException();
+      } else if(var2 > 0 && var3 > 0 && method14(var1)) {
+         int var5 = var2 * var3 * method13(var1);
+         if(var4.length < var5) {
             throw new IllegalArgumentException();
-        }
-        final Image image = (Image) o;
-        return createUninitialized(n, getImageWidth(image), getImageHeight(image), true);
-    }
+         } else {
+            this.anInt39 = var2;
+            this.anInt40 = var3;
+            this.aBoolean36 = false;
+            this.anInt37 = var1;
+            this.aByteArray35 = new byte[var5];
+            System.arraycopy(var4, 0, this.aByteArray35, 0, var5);
+         }
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
 
-    private static native int createImageImpl(final byte[] p0, final int p1, final int p2);
+   public Image2D(int var1, int var2, int var3, byte[] var4, byte[] var5) {
+      if(var4 != null && var5 != null) {
+         int var6 = var2 * var3;
+         if(var2 > 0 && var3 > 0 && method14(var1) && var4.length >= var6) {
+            int var7 = method13(var1);
+            if(var5.length < 256 * var7 && var5.length % var7 != 0) {
+               throw new IllegalArgumentException();
+            } else {
+               this.anInt39 = var2;
+               this.anInt40 = var3;
+               this.aBoolean36 = false;
+               this.anInt37 = var1;
+               this.aByteArray35 = new byte[var6 * var7];
 
-    private static int getImageWidth(final Image image) {
-        return Helpers.getImageWidth(image);
-    }
+               for(int var8 = 0; var8 < var6; ++var8) {
+                  System.arraycopy(var5, (var4[var8] & 255) * var7, this.aByteArray35, var8 * var7, var7);
+               }
 
-    private static int getImageHeight(final Image image) {
-        return Helpers.getImageHeight(image);
-    }
+            }
+         } else {
+            throw new IllegalArgumentException();
+         }
+      } else {
+         throw new NullPointerException();
+      }
+   }
 
-    static void getImageRGB(final Image image, final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-        Helpers.getImageRGB(image, array, n, n2, n3, n4, n5, n6);
-    }
+   public Image2D(int var1, int var2, int var3) {
+      if(var2 > 0 && var3 > 0 && method14(var1)) {
+         this.anInt39 = var2;
+         this.anInt40 = var3;
+         this.aBoolean36 = true;
+         this.anInt37 = var1;
+         int var4 = var2 * method13(var1);
+         this.aByteArray35 = new byte[var4 * var3];
+         int var5;
+         if(aByteArray38 == null || aByteArray38.length < var4) {
+            aByteArray38 = new byte[var4];
 
-    static boolean isOpaque(final Image image) {
-        return Helpers.isOpaque(image);
-    }
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               aByteArray38[var5] = -1;
+            }
+         }
 
-    public native boolean isPalettized();
+         for(var5 = 0; var5 < var3; ++var5) {
+            System.arraycopy(aByteArray38, 0, this.aByteArray35, var5 * var4, var4);
+         }
 
-    public native void getPalette(final byte[] p0);
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
 
-    native void setPalette(final byte[] p0);
+   public void set(int var1, int var2, int var3, int var4, byte[] var5) {
+      if(var5 == null) {
+         throw new NullPointerException();
+      } else if(this.aBoolean36 && var1 >= 0 && var2 >= 0 && var3 > 0 && var4 > 0 && var1 + var3 <= this.anInt39 && var2 + var4 <= this.anInt40) {
+         int var6 = this.getBpp();
+         if(var5.length < var3 * var4 * var6) {
+            throw new IllegalArgumentException();
+         } else {
+            for(int var7 = 0; var7 < var4; ++var7) {
+               System.arraycopy(var5, var7 * var3 * var6, this.aByteArray35, ((var2 + var7) * this.anInt39 + var1) * var6, var3 * var6);
+            }
 
-    public native void getPixels(final byte[] p0);
+         }
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
 
-    native void setPixels(final byte[] p0);
+   public boolean isMutable() {
+      return this.aBoolean36;
+   }
 
-    private native int qonvertATITCImpl(final int p0);
+   public int getFormat() {
+      return this.anInt37;
+   }
 
-    Image2D qonvertATITC(final int n) {
-        return (Image2D) Engine.instantiateJavaPeer(this.qonvertATITCImpl(n));
-    }
+   public int getWidth() {
+      return this.anInt39;
+   }
 
-    public int getBitsPerColor() {
-        int m = 1;
-        switch (getFormat()) {
-            case ALPHA:
-            case LUMINANCE:
-                m = 1;
-                break;
-            case LUMINANCE_ALPHA:
-                m = 2;
-                break;
-            case RGB:
-                m = 3;
-                break;
-            case RGBA:
-                m = 4;
-                break;
-        }
+   public int getHeight() {
+      return this.anInt40;
+   }
 
-        return m;
-    }
+   public int getBpp() {
+      return method13(this.anInt37);
+   }
 
-    public int size() {
-        return getWidth() * getHeight() * getBitsPerColor() + 4;
-    }
+   private static int method13(int var0) {
+      switch(var0) {
+      case 96:
+      case 97:
+         return 1;
+      case 98:
+         return 2;
+      case 99:
+         return 3;
+      case 100:
+         return 4;
+      default:
+         throw new IllegalArgumentException();
+      }
+   }
+
+   private static boolean method14(int var0) {
+      return var0 >= 96 && var0 <= 100;
+   }
+
+   public final byte[] getImageData() {
+      return this.aByteArray35;
+   }
+
+   private static byte[] method15(int var0, int[] var1, boolean var2) {
+      byte[] var3 = null;
+      int var4 = var1.length;
+      int var5;
+      if(var2) {
+         switch(var0) {
+         case 96:
+         case 97:
+            var3 = new byte[var4];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5] = (byte)(((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
+            }
+
+            return var3;
+         case 98:
+            var3 = new byte[var4 * 2];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5 * 2] = (byte)(((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
+               var3[var5 * 2 + 1] = -1;
+            }
+
+            return var3;
+         case 99:
+            var3 = new byte[var4 * 3];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5 * 3] = (byte)(var1[var5] >> 16 & 255);
+               var3[var5 * 3 + 1] = (byte)(var1[var5] >> 8 & 255);
+               var3[var5 * 3 + 2] = (byte)(var1[var5] & 255);
+            }
+
+            return var3;
+         case 100:
+            var3 = new byte[var4 * 4];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5 * 4] = (byte)(var1[var5] >> 16 & 255);
+               var3[var5 * 4 + 1] = (byte)(var1[var5] >> 8 & 255);
+               var3[var5 * 4 + 2] = (byte)(var1[var5] & 255);
+               var3[var5 * 4 + 3] = -1;
+            }
+         }
+      } else {
+         switch(var0) {
+         case 96:
+            var3 = new byte[var4];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5] = (byte)(var1[var5] >> 24 & 255);
+            }
+
+            return var3;
+         case 97:
+            var3 = new byte[var4];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5] = (byte)(((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
+            }
+
+            return var3;
+         case 98:
+            var3 = new byte[var4 * 2];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5 * 2] = (byte)(((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
+               var3[var5 * 2 + 1] = (byte)(var1[var5] >> 24 & 255);
+            }
+
+            return var3;
+         case 99:
+            var3 = new byte[var4 * 3];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5 * 3] = (byte)(var1[var5] >> 16 & 255);
+               var3[var5 * 3 + 1] = (byte)(var1[var5] >> 8 & 255);
+               var3[var5 * 3 + 2] = (byte)(var1[var5] & 255);
+            }
+
+            return var3;
+         case 100:
+            var3 = new byte[var4 * 4];
+
+            for(var5 = var4 - 1; var5 >= 0; --var5) {
+               var3[var5 * 4] = (byte)(var1[var5] >> 16 & 255);
+               var3[var5 * 4 + 1] = (byte)(var1[var5] >> 8 & 255);
+               var3[var5 * 4 + 2] = (byte)(var1[var5] & 255);
+               var3[var5 * 4 + 3] = (byte)(var1[var5] >> 24 & 255);
+            }
+         }
+      }
+
+      return var3;
+   }
+
+   protected Object3D duplicateObject() {
+      Image2D var1;
+      (var1 = (Image2D)super.duplicateObject()).aByteArray35 = (byte[])this.aByteArray35.clone();
+      return var1;
+   }
 }

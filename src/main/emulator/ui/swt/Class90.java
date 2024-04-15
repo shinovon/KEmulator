@@ -43,7 +43,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private float aFloat920;
     private float aFloat924;
     private float aFloat926;
-    private emulator.graphics3D.a ana892;
+//    private emulator.graphics3D.a ana892;
     private Background aBackground900;
     private Node aNode904;
     private Rectangle aRectangle903;
@@ -86,7 +86,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aMenu918 = null;
         this.aMenu923 = null;
         try {
-            this.ana892 = new emulator.graphics3D.a();
+//            this.ana892 = new emulator.graphics3D.a();
         } catch (Error e) {
         }
         this.aBackground900 = null;
@@ -120,10 +120,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aFloat920 = 0.0f;
         this.aFloat924 = 0.0f;
         this.aFloat926 = 20.0f;
-        this.ana892.method813(-10.0f, 1.0f, 0.0f, 0.0f);
-        this.aTransform902.setIdentity();
-        this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
-        this.aTransform902.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
+//        this.ana892.method813(-10.0f, 1.0f, 0.0f, 0.0f);
+//        this.aTransform902.setIdentity();
+//        this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
+//        this.aTransform902.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
     }
 
 
@@ -193,15 +193,15 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
           this.m3gview.a1();
         }*/
         this.aTransform902.setIdentity();
-        this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
+//        this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
         this.aTransform902.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
         //emulator.graphics3D.view.a.a(this.aCamera901, this.aTransform902);
         //m3gview.a(this.aBackground900);
         if (this.aBoolean914) {
-            new Camera().setPerspective(50.0f, (this.aRectangle903.width >> 1) / (this.aRectangle903.height >> 1), 1.0f, 1000.0f);
-            final Transform transform;
-            (transform = new Transform()).postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
-            transform.postTranslate(0.0f, 0.0f, 6.0f);
+//            new Camera().setPerspective(50.0f, (this.aRectangle903.width >> 1) / (this.aRectangle903.height >> 1), 1.0f, 1000.0f);
+//            final Transform transform;
+//            (transform = new Transform()).postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
+//            transform.postTranslate(0.0f, 0.0f, 6.0f);
         }
     }
 
@@ -353,21 +353,21 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         final emulator.graphics3D.a a = new emulator.graphics3D.a();
         switch (this.anInt893) {
             case 0: {
-                if (Math.abs(n) > Math.abs(n2)) {
-                    a.method813(n / 2.0f, 0.0f, 1.0f, 0.0f);
-                    a.method814(this.ana892);
-                    this.ana892.method811(a);
-                    return;
-                }
-                if (n2 != 0) {
-                    final b method495 = this.method495(this.ana892);
-                    a.method813(-n2 / 2.0f, method495.aFloat1372, method495.aFloat1373, method495.aFloat1374);
-                    a.method814(this.ana892);
-                    if (this.method495(a).method816()) {
-                        this.ana892.method811(a);
-                    }
-                    return;
-                }
+//                if (Math.abs(n) > Math.abs(n2)) {
+//                    a.method813(n / 2.0f, 0.0f, 1.0f, 0.0f);
+//                    a.method814(this.ana892);
+//                    this.ana892.method811(a);
+//                    return;
+//                }
+//                if (n2 != 0) {
+//                    final b method495 = this.method495(this.ana892);
+//                    a.method813(-n2 / 2.0f, method495.aFloat1372, method495.aFloat1373, method495.aFloat1374);
+//                    a.method814(this.ana892);
+//                    if (this.method495(a).method816()) {
+//                        this.ana892.method811(a);
+//                    }
+//                    return;
+//                }
                 break;
             }
             case 1: {
@@ -401,11 +401,11 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private b method495(final emulator.graphics3D.a a) {
         final float[] array = {this.aFloat920, this.aFloat924, this.aFloat926, 1.0f};
         final b b = new b();
-        final Transform transform;
-        (transform = new Transform()).postRotateQuat(a.aFloat1367, a.aFloat1368, a.aFloat1369, a.aFloat1370);
-        transform.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
-        transform.transform(array);
-        b.method815(new b(array), emulator.graphics3D.b.ab1371);
+//        final Transform transform;
+//        (transform = new Transform()).postRotateQuat(a.aFloat1367, a.aFloat1368, a.aFloat1369, a.aFloat1370);
+//        transform.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
+//        transform.transform(array);
+//        b.method815(new b(array), emulator.graphics3D.b.ab1371);
         return b;
     }
 

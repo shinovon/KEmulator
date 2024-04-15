@@ -2,6 +2,7 @@ package emulator;
 
 import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
+import emulator.graphics3D.IGraphics3D;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
 
@@ -49,5 +50,9 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         if(img == null)
             return null;
         return new MemoryViewImage(img);
+    }
+
+    public IGraphics3D getGraphics3D() {
+        return emulator.graphics3D.lwjgl.Emulator3D.method501();
     }
 }

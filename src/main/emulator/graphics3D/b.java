@@ -1,56 +1,100 @@
 package emulator.graphics3D;
 
 public final class b {
-    public static final b ab1371;
-    public float aFloat1372;
-    public float aFloat1373;
-    public float aFloat1374;
-    public float aFloat1375;
+    public static final b ab607 = new b(1.0F, 0.0F, 0.0F, 0.0F);
+    public static final b ab609 = new b(0.0F, 1.0F, 0.0F, 0.0F);
+    public static final b ab611 = new b(0.0F, 0.0F, 1.0F, 0.0F);
+    public static final b ab613 = new b(0.0F, 0.0F, 0.0F, 1.0F);
+    public float aFloat608;
+    public float aFloat610;
+    public float aFloat612;
+    public float aFloat614;
 
     public b() {
-        super();
     }
 
-    public b(final float[] array) {
-        super();
-        this.aFloat1372 = array[0];
-        this.aFloat1373 = array[1];
-        this.aFloat1374 = array[2];
-        this.aFloat1375 = array[3];
+    public b(float var1, float var2, float var3, float var4) {
+        this.aFloat608 = var1;
+        this.aFloat610 = var2;
+        this.aFloat612 = var3;
+        this.aFloat614 = var4;
     }
 
-    public b(final float aFloat1372, final float aFloat1373, final float aFloat1374, final float aFloat1375) {
-        super();
-        this.aFloat1372 = aFloat1372;
-        this.aFloat1373 = aFloat1373;
-        this.aFloat1374 = aFloat1374;
-        this.aFloat1375 = aFloat1375;
+    public b(b var1) {
+        this.aFloat608 = var1.aFloat608;
+        this.aFloat610 = var1.aFloat610;
+        this.aFloat612 = var1.aFloat612;
+        this.aFloat614 = var1.aFloat614;
     }
 
-    public final void method815(final b b, final b b2) {
-        this.aFloat1372 = b.aFloat1373 * b2.aFloat1374 - b.aFloat1374 * b2.aFloat1373;
-        this.aFloat1373 = b.aFloat1374 * b2.aFloat1372 - b.aFloat1372 * b2.aFloat1374;
-        this.aFloat1374 = b.aFloat1372 * b2.aFloat1373 - b.aFloat1373 * b2.aFloat1372;
-        this.aFloat1375 = 0.0f;
+    public final void method422(float var1, float var2, float var3, float var4) {
+        this.aFloat608 = var1;
+        this.aFloat610 = var2;
+        this.aFloat612 = var3;
+        this.aFloat614 = var4;
     }
 
-    public final boolean method816() {
-        final float n;
-        if ((n = this.aFloat1372 * this.aFloat1372 + this.aFloat1373 * this.aFloat1373 + this.aFloat1374 * this.aFloat1374 + this.aFloat1375 * this.aFloat1375) < 1.0E-5f) {
+    public final void method423(b var1) {
+        this.aFloat608 = var1.aFloat608;
+        this.aFloat610 = var1.aFloat610;
+        this.aFloat612 = var1.aFloat612;
+        this.aFloat614 = var1.aFloat614;
+    }
+
+    public final float method424() {
+        return (float)Math.sqrt((double)(this.aFloat608 * this.aFloat608 + this.aFloat610 * this.aFloat610 + this.aFloat612 * this.aFloat612));
+    }
+
+    public final void method425(float var1) {
+        this.aFloat608 *= var1;
+        this.aFloat610 *= var1;
+        this.aFloat612 *= var1;
+        this.aFloat614 *= var1;
+    }
+
+    public final void method429(b var1) {
+        this.aFloat608 += var1.aFloat608;
+        this.aFloat610 += var1.aFloat610;
+        this.aFloat612 += var1.aFloat612;
+        this.aFloat614 += var1.aFloat614;
+    }
+
+    public final void method431(b var1) {
+        this.aFloat608 -= var1.aFloat608;
+        this.aFloat610 -= var1.aFloat610;
+        this.aFloat612 -= var1.aFloat612;
+        this.aFloat614 -= var1.aFloat614;
+    }
+
+    public final void method426(b var1, b var2) {
+        this.aFloat608 = var1.aFloat608 - var2.aFloat608;
+        this.aFloat610 = var1.aFloat610 - var2.aFloat610;
+        this.aFloat612 = var1.aFloat612 - var2.aFloat612;
+        this.aFloat614 = var1.aFloat614 - var2.aFloat614;
+    }
+
+    public final float method427(b var1) {
+        return this.aFloat608 * var1.aFloat608 + this.aFloat610 * var1.aFloat610 + this.aFloat612 * var1.aFloat612 + this.aFloat614 * var1.aFloat614;
+    }
+
+    public final void method430(b var1, b var2) {
+        this.aFloat608 = var1.aFloat610 * var2.aFloat612 - var1.aFloat612 * var2.aFloat610;
+        this.aFloat610 = var1.aFloat612 * var2.aFloat608 - var1.aFloat608 * var2.aFloat612;
+        this.aFloat612 = var1.aFloat608 * var2.aFloat610 - var1.aFloat610 * var2.aFloat608;
+        this.aFloat614 = 0.0F;
+    }
+
+    public final boolean method428() {
+        float var1;
+        if((var1 = this.aFloat608 * this.aFloat608 + this.aFloat610 * this.aFloat610 + this.aFloat612 * this.aFloat612 + this.aFloat614 * this.aFloat614) < 1.0E-5F) {
             return false;
+        } else {
+            float var2 = 1.0F / (float)Math.sqrt((double)var1);
+            this.aFloat608 *= var2;
+            this.aFloat610 *= var2;
+            this.aFloat612 *= var2;
+            this.aFloat614 *= var2;
+            return true;
         }
-        final float n2 = 1.0f / (float) Math.sqrt(n);
-        this.aFloat1372 *= n2;
-        this.aFloat1373 *= n2;
-        this.aFloat1374 *= n2;
-        this.aFloat1375 *= n2;
-        return true;
-    }
-
-    static {
-        new b(1.0f, 0.0f, 0.0f, 0.0f);
-        ab1371 = new b(0.0f, 1.0f, 0.0f, 0.0f);
-        new b(0.0f, 0.0f, 1.0f, 0.0f);
-        new b(0.0f, 0.0f, 0.0f, 1.0f);
     }
 }

@@ -203,7 +203,8 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public final IGraphics3D getGraphics3D() {
-        return null;
+        // TODO
+        return Emulator.getPlatform().getGraphics3D();
     }
 
     public final void syncValues() {

@@ -1,85 +1,98 @@
 package javax.microedition.m3g;
 
+import javax.microedition.m3g.CompositingMode;
+import javax.microedition.m3g.Fog;
+import javax.microedition.m3g.Graphics3D;
+import javax.microedition.m3g.Material;
+import javax.microedition.m3g.Object3D;
+import javax.microedition.m3g.PolygonMode;
+import javax.microedition.m3g.Texture2D;
+
 public class Appearance extends Object3D {
+   private int anInt37 = 0;
+   private PolygonMode aPolygonMode1010 = null;
+   private CompositingMode aCompositingMode1011 = null;
+   private Material aMaterial1012 = null;
+   private Fog aFog1013 = null;
+   private Texture2D[] aTexture2DArray1014;
 
-    Appearance(final int n) {
-        super(n);
-    }
+   public Appearance() {
+      this.aTexture2DArray1014 = new Texture2D[Graphics3D.NumTextureUnits];
+   }
 
-    public Appearance() {
-        this(create());
-        Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (getClass() != Appearance.class);
-    }
+   protected Object3D duplicateObject() {
+      Appearance var1;
+      (var1 = (Appearance)super.duplicateObject()).aTexture2DArray1014 = (Texture2D[])this.aTexture2DArray1014.clone();
+      return var1;
+   }
 
-    private static native int create();
+   public void setLayer(int var1) {
+      if(var1 >= -63 && var1 <= 63) {
+         this.anInt37 = var1;
+      } else {
+         throw new IndexOutOfBoundsException();
+      }
+   }
 
-    public native int getLayer();
+   public int getLayer() {
+      return this.anInt37;
+   }
 
-    public Material getMaterial() {
-        return (Material) Engine.instantiateJavaPeer(this.getMaterialImpl());
-    }
+   public void setFog(Fog var1) {
+      this.removeReference(this.aFog1013);
+      this.aFog1013 = var1;
+      this.addReference(this.aFog1013);
+   }
 
-    private native int getMaterialImpl();
+   public Fog getFog() {
+      return this.aFog1013;
+   }
 
-    public Fog getFog() {
-        return (Fog) Engine.instantiateJavaPeer(this.getFogImpl());
-    }
+   public void setPolygonMode(PolygonMode var1) {
+      this.removeReference(this.aPolygonMode1010);
+      this.aPolygonMode1010 = var1;
+      this.addReference(this.aPolygonMode1010);
+   }
 
-    private native int getFogImpl();
+   public PolygonMode getPolygonMode() {
+      return this.aPolygonMode1010;
+   }
 
-    public CompositingMode getCompositingMode() {
-        return (CompositingMode) Engine.instantiateJavaPeer(this.getCompositingModeImpl());
-    }
+   public void setCompositingMode(CompositingMode var1) {
+      this.removeReference(this.aCompositingMode1011);
+      this.aCompositingMode1011 = var1;
+      this.addReference(this.aCompositingMode1011);
+   }
 
-    private native int getCompositingModeImpl();
+   public CompositingMode getCompositingMode() {
+      return this.aCompositingMode1011;
+   }
 
-    public PolygonMode getPolygonMode() {
-        return (PolygonMode) Engine.instantiateJavaPeer(this.getPolygonModeImpl());
-    }
+   public void setTexture(int var1, Texture2D var2) {
+      if(var1 >= 0 && var1 < Graphics3D.NumTextureUnits) {
+         this.removeReference(this.aTexture2DArray1014[var1]);
+         this.aTexture2DArray1014[var1] = var2;
+         this.addReference(this.aTexture2DArray1014[var1]);
+      } else {
+         throw new IndexOutOfBoundsException();
+      }
+   }
 
-    private native int getPolygonModeImpl();
+   public Texture2D getTexture(int var1) {
+      if(var1 >= 0 && var1 < Graphics3D.NumTextureUnits) {
+         return this.aTexture2DArray1014[var1];
+      } else {
+         throw new IndexOutOfBoundsException();
+      }
+   }
 
-    public native void setLayer(final int p0);
+   public void setMaterial(Material var1) {
+      this.removeReference(this.aMaterial1012);
+      this.aMaterial1012 = var1;
+      this.addReference(this.aMaterial1012);
+   }
 
-    public void setMaterial(final Material materialImpl) {
-        this.setMaterialImpl(materialImpl);
-        Engine.addXOT(materialImpl);
-    }
-
-    private native void setMaterialImpl(final Material p0);
-
-    public void setFog(final Fog fogImpl) {
-        this.setFogImpl(fogImpl);
-        Engine.addXOT(fogImpl);
-    }
-
-    private native void setFogImpl(final Fog p0);
-
-    public void setCompositingMode(final CompositingMode compositingModeImpl) {
-        this.setCompositingModeImpl(compositingModeImpl);
-        Engine.addXOT(compositingModeImpl);
-    }
-
-    private native void setCompositingModeImpl(final CompositingMode p0);
-
-    public void setPolygonMode(final PolygonMode polygonModeImpl) {
-        this.setPolygonModeImpl(polygonModeImpl);
-        Engine.addXOT(polygonModeImpl);
-    }
-
-    private native void setPolygonModeImpl(final PolygonMode p0);
-
-    public Texture2D getTexture(final int n) {
-        return (Texture2D) Engine.instantiateJavaPeer(this.getTextureImpl(n));
-    }
-
-    private native int getTextureImpl(final int p0);
-
-    public void setTexture(final int n, final Texture2D texture2D) {
-        this.setTextureImpl(n, texture2D);
-        Engine.addXOT(texture2D);
-    }
-
-    private native void setTextureImpl(final int p0, final Texture2D p1);
+   public Material getMaterial() {
+      return this.aMaterial1012;
+   }
 }

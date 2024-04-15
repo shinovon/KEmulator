@@ -1,51 +1,88 @@
 package javax.microedition.m3g;
 
+import javax.microedition.m3g.Object3D;
+
 public class CompositingMode extends Object3D {
-    public static final int ALPHA = 64;
-    public static final int ALPHA_ADD = 65;
-    public static final int MODULATE = 66;
-    public static final int MODULATE_X2 = 67;
-    public static final int REPLACE = 68;
+   public static final int ALPHA = 64;
+   public static final int ALPHA_ADD = 65;
+   public static final int MODULATE = 66;
+   public static final int MODULATE_X2 = 67;
+   public static final int REPLACE = 68;
+   private int anInt37 = 68;
+   private float aFloat681 = 0.0F;
+   private float aFloat682 = 0.0F;
+   private float aFloat683 = 0.0F;
+   private boolean aBoolean36 = true;
+   private boolean aBoolean190 = true;
+   private boolean aBoolean684 = true;
+   private boolean aBoolean685 = true;
 
-    CompositingMode(final int n) {
-        super(n);
-    }
+   public void setBlending(int var1) {
+      if(var1 >= 64 && var1 <= 68) {
+         this.anInt37 = var1;
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
 
-    public CompositingMode() {
-        this(create());
-        Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != CompositingMode.class);
-    }
+   public int getBlending() {
+      return this.anInt37;
+   }
 
-    private static native int create();
+   public void setAlphaThreshold(float var1) {
+      if(var1 >= 0.0F && var1 <= 1.0F) {
+         this.aFloat681 = var1;
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
 
-    public native float getAlphaThreshold();
+   public float getAlphaThreshold() {
+      return this.aFloat681;
+   }
 
-    public native int getBlending();
+   public void setAlphaWriteEnable(boolean var1) {
+      this.aBoolean685 = var1;
+   }
 
-    public native boolean isColorWriteEnabled();
+   public boolean isAlphaWriteEnabled() {
+      return this.aBoolean685;
+   }
 
-    public native boolean isAlphaWriteEnabled();
+   public void setColorWriteEnable(boolean var1) {
+      this.aBoolean684 = var1;
+   }
 
-    public native boolean isDepthWriteEnabled();
+   public boolean isColorWriteEnabled() {
+      return this.aBoolean684;
+   }
 
-    public native boolean isDepthTestEnabled();
+   public void setDepthWriteEnable(boolean var1) {
+      this.aBoolean190 = var1;
+   }
 
-    public native float getDepthOffsetFactor();
+   public boolean isDepthWriteEnabled() {
+      return this.aBoolean190;
+   }
 
-    public native float getDepthOffsetUnits();
+   public void setDepthTestEnable(boolean var1) {
+      this.aBoolean36 = var1;
+   }
 
-    public native void setAlphaThreshold(final float p0);
+   public boolean isDepthTestEnabled() {
+      return this.aBoolean36;
+   }
 
-    public native void setBlending(final int p0);
+   public void setDepthOffset(float var1, float var2) {
+      this.aFloat682 = var1;
+      this.aFloat683 = var2;
+   }
 
-    public native void setColorWriteEnable(final boolean p0);
+   public float getDepthOffsetFactor() {
+      return this.aFloat682;
+   }
 
-    public native void setAlphaWriteEnable(final boolean p0);
-
-    public native void setDepthWriteEnable(final boolean p0);
-
-    public native void setDepthTestEnable(final boolean p0);
-
-    public native void setDepthOffset(final float p0, final float p1);
+   public float getDepthOffsetUnits() {
+      return this.aFloat683;
+   }
 }

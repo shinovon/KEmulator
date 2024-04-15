@@ -1,352 +1,251 @@
 package javax.microedition.m3g;
 
-import emulator.debug.Memory;
-import emulator.i;
-
+import emulator.Emulator;
+import emulator.graphics3D.IGraphics3D;
+import emulator.graphics3D.m3g.a;
+import emulator.graphics3D.m3g.f;
 import java.util.Hashtable;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 public class Graphics3D {
-    Object bbPixels = null;
-    private Object boundTarget = null;
-    private boolean isGraphics = true;
-    private boolean preload = false;
-    private boolean unload = false;
-    private boolean overwrite = false;
-    private int clipX = 0;
-    private int clipY = 0;
-    private int clipWidth = 0;
-    private int clipHeight = 0;
-    private int viewportX = 0;
-    private int viewportY = 0;
-    private int viewportWidth = 0;
-    private int viewportHeight = 0;
+   public static final int ANTIALIAS = 2;
+   public static final int DITHER = 4;
+   public static final int OVERWRITE = 16;
+   public static final int TRUE_COLOR = 8;
+   private static Object anObject876 = null;
+   private static IGraphics3D anIGraphics3D877;
+   private static Graphics3D aGraphics3D878 = new Graphics3D();
+   public static final int MaxViewportWidth = ((Integer)getProperties().get("maxViewportWidth")).intValue();
+   public static final int MaxViewportHeight = ((Integer)getProperties().get("maxViewportHeight")).intValue();
+   public static final int NumTextureUnits = ((Integer)getProperties().get("numTextureUnits")).intValue();
+   public static final int MaxTextureDimension = ((Integer)getProperties().get("maxTextureDimension")).intValue();
+   public static final int MaxSpriteCropDimension = ((Integer)getProperties().get("maxSpriteCropDimension")).intValue();
+   private int anInt879;
+   private int anInt881;
+   private int anInt883;
+   private int anInt884;
+   private float aFloat880;
+   private float aFloat882;
 
-    Graphics3D(int var1) {
-        this.swerveHandle = var1;
-    }
+   private Graphics3D() {
+      anIGraphics3D877 = Emulator.getEmulator().getGraphics3D();
+      this.aFloat880 = 0.0F;
+      this.aFloat882 = 1.0F;
+   }
 
-    public static final Graphics3D getInstance() {
-        if (instance == null) {
-            instance = (Graphics3D) Engine.instantiateJavaPeer(createImpl());
-        }
-        return instance;
-    }
+   public static final Graphics3D getInstance() {
+      return aGraphics3D878;
+   }
 
-    public Object getTarget() {
-        return this.boundTarget;
-    }
+   public static final IGraphics3D getImpl() {
+      return anIGraphics3D877;
+   }
 
-    public synchronized void bindTarget(Object var1, boolean var2, int var3) {
-        if (this.boundTarget != null) {
-            throw new IllegalStateException();
-        }
-        if (var1 == null) {
-            throw new NullPointerException();
-        }
-        if ((var3 & 0xFFFFFFE1) != 0) {
-            throw new IllegalArgumentException();
-        }
-        if ((var1 instanceof Graphics)) {
-            this.isGraphics = true;
-            this.overwrite = ((var3 & 0x10) != 0);
-            this.unload = false;
-            bindTarget((Graphics) var1);
-        } else {
-            if (!(var1 instanceof Image2D)) {
-                throw new IllegalArgumentException();
+   public static final Hashtable getProperties() {
+      return anIGraphics3D877.getProperties();
+   }
+
+   public void bindTarget(Object var1) {
+      this.bindTarget(var1, true, 0);
+   }
+
+   public void bindTarget(Object var1, boolean var2, int var3) {
+      anIGraphics3D877.enableDepthBuffer(var2);
+      if(anObject876 != null) {
+         throw new IllegalStateException();
+      } else if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var3 != 0 && (var3 & 30) == 0) {
+         throw new IllegalArgumentException();
+      } else {
+         Background var4 = new Background();
+         int var6;
+         int var7;
+         if(var1 instanceof Graphics) {
+            Graphics var5;
+            var6 = (var5 = (Graphics)var1).getImage().getWidth();
+            var7 = var5.getImage().getHeight();
+            if(var6 > MaxViewportWidth || var7 > MaxViewportHeight) {
+               throw new IllegalArgumentException();
             }
-            this.isGraphics = false;
-            synchronized (Memory.m3gLock) {
-                setBackBufferImage2D((Image2D) var1);
+
+            anObject876 = var1;
+            anIGraphics3D877.bindTarget(var5);
+            this.setViewport(var5.getClipX(), var5.getClipY(), var5.getClipWidth(), var5.getClipHeight());
+            Image2D var8 = new Image2D(99, new Image(var5.getImage()));
+            var4.setImage(var8);
+            var4.setCrop(this.anInt879, this.anInt881, this.anInt883, this.anInt884);
+         } else {
+            if(!(var1 instanceof Image2D)) {
+               throw new IllegalArgumentException();
             }
-            this.boundTarget = var1;
-        }
-        synchronized (Memory.m3gLock) {
-            setHints(var2, var3);
-        }
-    }
 
-    public synchronized void bindTarget(Object var1) {
-        if (this.boundTarget != null) {
-            throw new IllegalStateException();
-        }
-        if (var1 == null) {
-            throw new NullPointerException();
-        }
-        if ((var1 instanceof Graphics)) {
-            this.isGraphics = true;
-            this.overwrite = false;
-            this.unload = false;
-            bindTarget((Graphics) var1);
-        } else if ((var1 instanceof Image2D)) {
-            this.isGraphics = false;
-            synchronized (Memory.m3gLock) {
-                setBackBufferImage2D((Image2D) var1);
+            Image2D var9;
+            var6 = (var9 = (Image2D)var1).getWidth();
+            var7 = var9.getHeight();
+            if(var9.getWidth() > MaxViewportWidth || var9.getHeight() > MaxViewportHeight) {
+               throw new IllegalArgumentException();
             }
-            this.boundTarget = var1;
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
 
-    private void bindTarget(Graphics var1) {
-        this.clipX = (Helpers.getTranslateX(var1) + Helpers.getClipX(var1));
-        this.clipY = (Helpers.getTranslateY(var1) + Helpers.getClipY(var1));
-        this.clipWidth = Helpers.getClipWidth(var1);
-        this.clipHeight = Helpers.getClipHeight(var1);
-        if ((this.clipWidth <= maxViewportWidth) && (this.clipHeight <= maxViewportHeight)) {
-            this.boundTarget = var1;
-            synchronized (Memory.m3gLock) {
-                Helpers.bindTarget(this, var1, this.clipX, this.clipY, this.clipWidth, this.clipHeight);
+            int var10 = var9.getFormat();
+            if(!var9.isMutable() || var10 != 99 && var10 != 100) {
+               throw new IllegalArgumentException();
             }
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
 
-    public synchronized void releaseTarget() {
-        if (this.boundTarget != null) {
-            this.preload = false;
-            synchronized (Memory.m3gLock) {
-                if (this.isGraphics) {
-                    Helpers.releaseTarget(this, (Graphics) this.boundTarget);
-                } else {
-                    setBackBufferImage2D(null);
-                }
-            }
-            this.boundTarget = null;
-        }
-    }
+            anObject876 = var1;
+            anIGraphics3D877.bindTarget(var9);
+            this.setViewport(0, 0, var6, var7);
+            var4.setImage(var9);
+            var4.setCrop(this.anInt879, this.anInt881, this.anInt883, this.anInt884);
+         }
 
-    public synchronized void setViewport(int var1, int var2, int var3, int var4) {
-        if ((var3 > 0) && (var3 <= maxViewportWidth) && (var4 > 0) && (var4 <= maxViewportHeight)) {
-            this.viewportX = var1;
-            this.viewportY = var2;
-            this.viewportWidth = var3;
-            this.viewportHeight = var4;
-            if (this.boundTarget != null) {
-                if ((this.boundTarget instanceof Graphics)) {
-                    Graphics var5 = (Graphics) this.boundTarget;
-                    var1 += Helpers.getTranslateX(var5);
-                    var2 += Helpers.getTranslateY(var5);
-                    this.preload = ((!this.unload)
-                            && ((!this.overwrite) || (var1 > this.clipX) || (var1 + var3 < this.clipX + this.clipWidth)
-                            || (var2 > this.clipY) || (var2 + var4 < this.clipY + this.clipHeight)));
-                    setViewportImpl(var1, var2, var3, var4);
-                    this.unload = ((this.unload) || (this.preload));
-                    return;
-                }
-                setViewportImpl(var1, var2, var3, var4);
-            }
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
+         if(anObject876 != null) {
+            anIGraphics3D877.setHints(var3);
+            this.setDepthRange(this.aFloat880, this.aFloat882);
+            this.clear(var4);
+         }
 
-    public int getViewportX() {
-        return this.viewportX;
-    }
+      }
+   }
 
-    public int getViewportY() {
-        return this.viewportY;
-    }
+   public void releaseTarget() {
+      if(anObject876 != null) {
+         anIGraphics3D877.releaseTarget();
+         anObject876 = null;
+      }
 
-    public int getViewportWidth() {
-        return this.viewportWidth;
-    }
+   }
 
-    public int getViewportHeight() {
-        return this.viewportHeight;
-    }
+   public Object getTarget() {
+      return anObject876;
+   }
 
-    public synchronized void clear(Background var1) {
-        if (this.boundTarget == null) {
+   public int getHints() {
+      return anIGraphics3D877.getHints();
+   }
+
+   public boolean isDepthBufferEnabled() {
+      return anIGraphics3D877.isDepthBufferEnabled();
+   }
+
+   public void setViewport(int var1, int var2, int var3, int var4) {
+      if(var3 > 0 && var4 > 0 && var3 <= MaxViewportWidth && var4 <= MaxViewportHeight) {
+         this.anInt879 = var1;
+         this.anInt881 = var2;
+         this.anInt883 = var3;
+         this.anInt884 = var4;
+         anIGraphics3D877.setViewport(var1, var2, var3, var4);
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
+
+   public int getViewportX() {
+      return this.anInt879;
+   }
+
+   public int getViewportY() {
+      return this.anInt881;
+   }
+
+   public int getViewportWidth() {
+      return this.anInt883;
+   }
+
+   public int getViewportHeight() {
+      return this.anInt884;
+   }
+
+   public void setDepthRange(float var1, float var2) {
+      if(var1 >= 0.0F && var1 <= 1.0F && var2 >= 0.0F && var2 <= 1.0F) {
+         this.aFloat880 = var1;
+         this.aFloat882 = var2;
+         anIGraphics3D877.setDepthRange(var1, var2);
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
+
+   public float getDepthRangeNear() {
+      return this.aFloat880;
+   }
+
+   public float getDepthRangeFar() {
+      return this.aFloat882;
+   }
+
+   public void clear(Background var1) {
+      if(anObject876 == null) {
+         throw new IllegalStateException();
+      } else {
+         anIGraphics3D877.clearBackgound(var1);
+      }
+   }
+
+   public void render(World var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(anObject876 != null && var1.getActiveCamera() != null && var1.getActiveCamera().isDescendantOf(var1)) {
+         anIGraphics3D877.render(var1);
+      } else {
+         throw new IllegalStateException();
+      }
+   }
+
+   public void render(Node var1, Transform var2) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(!(var1 instanceof Sprite3D) && !(var1 instanceof Mesh) && !(var1 instanceof Group)) {
+         throw new IllegalArgumentException();
+      } else if(anObject876 != null && f.aCamera1137 != null) {
+         anIGraphics3D877.render(var1, var2);
+      } else {
+         throw new IllegalStateException();
+      }
+   }
+
+   public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5) {
+      if(var1 != null && var2 != null && var3 != null) {
+         if(anObject876 != null && f.aCamera1137 != null) {
+            anIGraphics3D877.render(var1, var2, var3, var4, var5);
+         } else {
             throw new IllegalStateException();
-        }
-        this.preload = ((!this.unload) && (!this.overwrite) && (var1 != null) && (!var1.isColorClearEnabled()));
+         }
+      } else {
+         throw new NullPointerException();
+      }
+   }
 
-        synchronized (Memory.m3gLock) {
-            clearImpl(var1);
-            this.unload = true;
-        }
-    }
+   public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4) {
+      this.render(var1, var2, var3, var4, -1);
+   }
 
-    public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4) {
-        render(var1, var2, var3, var4, -1);
-    }
+   public void setCamera(Camera var1, Transform var2) {
+      f.method785(var1, var2);
+   }
 
-    public synchronized void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5) {
-        if (this.boundTarget == null) {
-            throw new IllegalStateException();
-        }
-        this.preload = ((!this.unload) && (!this.overwrite));
-        synchronized (Memory.m3gLock) {
-            renderPrimitive(var1, var2, var3, var4, var5);
-            this.unload = true;
-        }
-    }
+   public Camera getCamera(Transform var1) {
+      return f.method786(var1);
+   }
 
-    public synchronized void render(Node var1, Transform var2) {
-        if (this.boundTarget == null) {
-            throw new IllegalStateException();
-        }
-        this.preload = ((!this.unload) && (!this.overwrite));
-        synchronized (Memory.m3gLock) {
-            renderNode(var1, var2);
-            this.unload = true;
-        }
-    }
+   public int addLight(Light var1, Transform var2) {
+      return a.method800(var1, var2);
+   }
 
-    public synchronized void render(World var1) {
-        if (this.boundTarget == null) {
-            throw new IllegalStateException();
-        }
-        synchronized (Memory.m3gLock) {
-            Background var2 = var1.getBackground();
-            this.preload = ((!this.unload) && (!this.overwrite) && (var2 != null) && (!var2.isColorClearEnabled()));
-            renderWorld(var1);
-            this.unload = true;
-        }
-    }
+   public void setLight(int var1, Light var2, Transform var3) {
+      a.method801(var1, var2, var3);
+   }
 
-    public Camera getCamera(Transform var1) {
-        return (Camera) Engine.instantiateJavaPeer(getCameraImpl(var1));
-    }
+   public void resetLights() {
+      a.method802();
+   }
 
-    public void setCamera(Camera var1, Transform var2) {
-        setCameraImpl(var1, var2);
-        Engine.addXOT(var1);
-    }
+   public int getLightCount() {
+      return a.method803();
+   }
 
-    public void setLight(int var1, Light var2, Transform var3) {
-        setLightImpl(var1, var2, var3);
-        Engine.addXOT(var2);
-    }
-
-    public Light getLight(int var1, Transform var2) {
-        return (Light) Engine.instantiateJavaPeer(getLightImpl(var1, var2));
-    }
-
-    public int addLight(Light var1, Transform var2) {
-        int var3 = addLightImpl(var1, var2);
-        Engine.addXOT(var1);
-        return var3;
-    }
-
-    public static final synchronized Hashtable getProperties() {
-        Hashtable var0;
-        (var0 = new Hashtable()).put(new String("supportAntialiasing"), new Boolean(getCapability(0) == 1));
-        var0.put(new String("supportTrueColor"), new Boolean(getCapability(1) == 1));
-        var0.put(new String("supportDithering"), new Boolean(getCapability(2) == 1));
-        var0.put(new String("supportMipmapping"), new Boolean(getCapability(3) == 1));
-        var0.put(new String("supportPerspectiveCorrection"), new Boolean(getCapability(4) == 1));
-        var0.put(new String("supportLocalCameraLighting"), new Boolean(getCapability(5) == 1));
-        var0.put(new String("maxLights"), new Integer(getCapability(6)));
-        var0.put(new String("maxViewportDimension"), new Integer(getCapability(7)));
-        var0.put(new String("maxTextureDimension"), new Integer(getCapability(8)));
-        var0.put(new String("maxSpriteCropDimension"), new Integer(getCapability(9)));
-        var0.put(new String("numTextureUnits"), new Integer(getCapability(10)));
-        var0.put(new String("maxTransformsPerVertex"), new Integer(getCapability(11)));
-        var0.put(new String("maxViewportWidth"), new Integer(maxViewportWidth));
-        var0.put(new String("maxViewportHeight"), new Integer(maxViewportHeight));
-        var0.put(new String("C3A458D3-2015-41f5-8338-66A2D3014335"), Engine.getVersionMajor() + "."
-                + Engine.getVersionMinor() + "." + Engine.getRevisionMajor() + "." + Engine.getRevisionMinor() + ":"
-                + Engine.getBranchNumber());
-        try {
-            var0.put(new String("com.superscape.m3gx.DebugUtils"), Class.forName("javax.microedition.m3g.DebugUtils")
-                    .newInstance());
-        } catch (Exception localException) {
-        }
-        try {
-            var0.put(new String("com.superscape.m3gx.Image2DUtils"), Class
-                    .forName("javax.microedition.m3g.Image2DUtils").newInstance());
-        } catch (Exception localException1) {
-        }
-        try {
-            var0.put(new String("com.superscape.m3gx.SerializeOut"), Class
-                    .forName("javax.microedition.m3g.SerializeOut").newInstance());
-        } catch (Exception localException2) {
-        }
-        return var0;
-    }
-
-    static {
-        i.a("jsr184client");
-        Engine.cacheFID(Graphics3D.class, 1);
-    }
-
-    private static Graphics3D instance = null;
-    private static int maxViewportWidth = getCapability(12);
-    private static int maxViewportHeight = getCapability(13);
-    int swerveHandle;
-    public static final int ANTIALIAS = 2;
-    public static final int DITHER = 4;
-    public static final int TRUE_COLOR = 8;
-    public static final int OVERWRITE = 16;
-    static final int SUPPORTANTIALIASING = 0;
-    static final int SUPPORTTRUECOLOR = 1;
-    static final int SUPPORTDITHERING = 2;
-    static final int SUPPORTMIPMAP = 3;
-    static final int SUPPORTPERSPECTIVECORRECTION = 4;
-    static final int SUPPORTLOCALCAMERALIGHTING = 5;
-    static final int MAXLIGHTS = 6;
-    static final int MAXVIEWPORTDIMENSION = 7;
-    static final int MAXTEXTUREDIMENSION = 8;
-    static final int MAXSPRITECROPDIMENSION = 9;
-    static final int NUMTEXTUREUNITS = 10;
-    static final int MAXTRANSFORMSPERVERTEX = 11;
-    static final int MAXVIEWPORTWIDTH = 12;
-    static final int MAXVIEWPORTHEIGHT = 13;
-    static final int SUPPORTROTATE90 = 14;
-    static final int SUPPORTROTATE180 = 15;
-    static final int SUPPORTROTATE270 = 16;
-
-    protected native void finalize();
-
-    Graphics3D() {
-    }
-
-    public native float getDepthRangeNear();
-
-    public native float getDepthRangeFar();
-
-    public native boolean isDepthBufferEnabled();
-
-    public native int getHints();
-
-    public native int getLightCount();
-
-    private static native int createImpl();
-
-    private native void setBackBufferImage2D(Image2D paramImage2D);
-
-    private native void setHints(boolean paramBoolean, int paramInt);
-
-    private native void setViewportImpl(int paramInt1, int paramInt2, int paramInt3, int paramInt4);
-
-    public native void setDepthRange(float paramFloat1, float paramFloat2);
-
-    private native void clearImpl(Background paramBackground);
-
-    private native void renderPrimitive(VertexBuffer paramVertexBuffer, IndexBuffer paramIndexBuffer,
-                                        Appearance paramAppearance, Transform paramTransform, int paramInt);
-
-    private native void renderNode(Node paramNode, Transform paramTransform);
-
-    private native void renderWorld(World paramWorld);
-
-    private native int getCameraImpl(Transform paramTransform);
-
-    private native void setCameraImpl(Camera paramCamera, Transform paramTransform);
-
-    private native void setLightImpl(int paramInt, Light paramLight, Transform paramTransform);
-
-    private native int getLightImpl(int paramInt, Transform paramTransform);
-
-    private native int addLightImpl(Light paramLight, Transform paramTransform);
-
-    public native void resetLights();
-
-    private static native int getCapability(int paramInt);
+   public Light getLight(int var1, Transform var2) {
+      return a.method804(var1, var2);
+   }
 }

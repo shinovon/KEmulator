@@ -1,35 +1,76 @@
 package javax.microedition.m3g;
 
+import javax.microedition.m3g.Object3D;
+
 public class AnimationController extends Object3D {
-    AnimationController(int n) {
-        super(n);
-    }
+   private int anInt37 = 0;
+   private int anInt39 = 0;
+   private int anInt40 = 0;
+   private float aFloat681 = 0.0F;
+   private float aFloat682 = 1.0F;
+   private float aFloat683 = 1.0F;
 
-    public AnimationController() {
-        this(create());
-        Engine.addJavaPeer(this.swerveHandle, this);
-        this.ii = (getClass() != AnimationController.class);
-    }
+   public void setActiveInterval(int var1, int var2) {
+      if(var1 > var2) {
+         throw new IllegalArgumentException();
+      } else {
+         this.anInt37 = var1;
+         this.anInt39 = var2;
+      }
+   }
 
-    private static native int create();
+   public int getActiveIntervalStart() {
+      return this.anInt37;
+   }
 
-    public native float getWeight();
+   public int getActiveIntervalEnd() {
+      return this.anInt39;
+   }
 
-    public native int getActiveIntervalStart();
+   public void setSpeed(float var1, int var2) {
+      this.aFloat681 = this.getPosition(var2);
+      this.anInt40 = var2;
+      this.aFloat683 = var1;
+   }
 
-    public native int getActiveIntervalEnd();
+   public float getSpeed() {
+      return this.aFloat683;
+   }
 
-    public native float getSpeed();
+   public void setPosition(float var1, int var2) {
+      this.aFloat681 = var1;
+      this.anInt40 = var2;
+   }
 
-    public native int getRefWorldTime();
+   public float getPosition(int var1) {
+      return this.aFloat681 + this.aFloat683 * (float)(var1 - this.anInt40);
+   }
 
-    public native void setWeight(float paramFloat);
+   public int getRefWorldTime() {
+      return this.anInt40;
+   }
 
-    public native void setActiveInterval(int paramInt1, int paramInt2);
+   public void setWeight(float var1) {
+      if(var1 < 0.0F) {
+         throw new IllegalArgumentException();
+      } else {
+         this.aFloat682 = var1;
+      }
+   }
 
-    public native float getPosition(int paramInt);
+   public float getWeight() {
+      return this.aFloat682;
+   }
 
-    public native void setPosition(float paramFloat, int paramInt);
+   protected boolean isActive(int var1) {
+      return this.anInt37 == this.anInt39?true:var1 >= this.anInt37 && var1 < this.anInt39;
+   }
 
-    public native void setSpeed(float paramFloat, int paramInt);
+   protected int timeToActivation(int var1) {
+      return var1 < this.anInt37?this.anInt37 - var1:(var1 >= this.anInt39?Integer.MAX_VALUE:0);
+   }
+
+   protected int timeToDeactivation(int var1) {
+      return var1 < this.anInt39?this.anInt39 - var1:Integer.MAX_VALUE;
+   }
 }

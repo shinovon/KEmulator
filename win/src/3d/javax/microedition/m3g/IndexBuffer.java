@@ -1,19 +1,24 @@
 package javax.microedition.m3g;
 
+import javax.microedition.m3g.Object3D;
+
 public abstract class IndexBuffer extends Object3D {
-    IndexBuffer(final int n) {
-        super(n);
-    }
+   int[] anIntArray145;
 
-    IndexBuffer() {
-        super();
-    }
+   public int getIndexCount() {
+      return this.anIntArray145 != null?this.anIntArray145.length:0;
+   }
 
-    public abstract int getIndexCount();
+   public void getIndices(int[] var1) {
+      if(var1 == null) {
+         throw new NullPointerException();
+      } else if(var1.length < this.getIndexCount()) {
+         throw new IllegalArgumentException();
+      } else {
+         if(this.anIntArray145 != null) {
+            System.arraycopy(this.anIntArray145, 0, var1, 0, this.anIntArray145.length);
+         }
 
-    native int getIndexCountImpl();
-
-    public abstract void getIndices(final int[] p0);
-
-    native void getIndicesImpl(final int[] p0);
+      }
+   }
 }

@@ -42,7 +42,7 @@ public class CustomMethod {
         } else if (prop.equalsIgnoreCase("console.encoding")) {
             res = System.getProperty("file.encoding");
         } else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
-            res = Settings.networkNotAvailable ? null : "available";
+            res = Settings.networkNotAvailable ? "unavailable" : "available";
         } else if (prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {
             res = "50";
         } else if (prop.startsWith("com.nokia.memoryram")) {

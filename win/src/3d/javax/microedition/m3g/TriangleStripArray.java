@@ -1,32 +1,125 @@
 package javax.microedition.m3g;
 
+import javax.microedition.m3g.IndexBuffer;
+import javax.microedition.m3g.Object3D;
+
 public class TriangleStripArray extends IndexBuffer {
+   private int[] anIntArray1009;
 
-    TriangleStripArray(final int n) {
-        super(n);
-    }
+   protected Object3D duplicateObject() {
+      TriangleStripArray var1;
+      (var1 = (TriangleStripArray)super.duplicateObject()).anIntArray145 = (int[])super.anIntArray145.clone();
+      var1.anIntArray1009 = (int[])this.anIntArray1009.clone();
+      return var1;
+   }
 
-    public TriangleStripArray(final int n, final int[] array) {
-        this(createImplicit(n, array));
-        Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != TriangleStripArray.class);
-    }
+   public int getStripCount() {
+      return this.anIntArray1009.length;
+   }
 
-    private static native int createImplicit(final int p0, final int[] p1);
+   public int[] getIndexStrip(int var1) {
+      if(var1 >= 0 && var1 < this.anIntArray1009.length) {
+         int var2 = 0;
 
-    public TriangleStripArray(final int[] array, final int[] array2) {
-        this(createExplicit(array, array2));
-        Engine.addJavaPeer(super.swerveHandle, this);
-        super.ii = (this.getClass() != TriangleStripArray.class);
-    }
+         for(int var3 = 0; var3 < var1; ++var3) {
+            var2 += this.anIntArray1009[var3];
+         }
 
-    private static native int createExplicit(final int[] p0, final int[] p1);
+         int[] var4 = new int[this.anIntArray1009[var1]];
+         if(this.anIntArray1009 != null) {
+            System.arraycopy(super.anIntArray145, var2, var4, 0, this.anIntArray1009[var1]);
+         }
 
-    public int getIndexCount() {
-        return this.getIndexCountImpl();
-    }
+         return var4;
+      } else {
+         return null;
+      }
+   }
 
-    public void getIndices(final int[] array) {
-        this.getIndicesImpl(array);
-    }
+   protected boolean getIndices(int var1, int[] var2) {
+      int var3 = 0;
+
+      for(int var4 = 0; var4 < this.anIntArray1009.length; ++var4) {
+         if(var1 < this.anIntArray1009[var4] - 2) {
+            var2[0] = super.anIntArray145[var3 + var1 + 0];
+            var2[1] = super.anIntArray145[var3 + var1 + 1];
+            var2[2] = super.anIntArray145[var3 + var1 + 2];
+            var2[3] = var1 & 1;
+            return true;
+         }
+
+         var1 -= this.anIntArray1009[var4] - 2;
+         var3 += this.anIntArray1009[var4];
+      }
+
+      return false;
+   }
+
+   public TriangleStripArray(int var1, int[] var2) {
+      if(var2 == null) {
+         throw new NullPointerException();
+      } else if(var2.length == 0) {
+         throw new IllegalArgumentException();
+      } else {
+         int var3 = 0;
+
+         int var4;
+         for(var4 = var2.length - 1; var4 >= 0; --var4) {
+            if(var2[var4] < 3) {
+               throw new IllegalArgumentException();
+            }
+
+            var3 += var2[var4];
+         }
+
+         if(var1 + var3 > '\uffff') {
+            throw new IllegalArgumentException();
+         } else {
+            super.anIntArray145 = new int[var3];
+
+            for(var4 = 0; var4 < var3; ++var4) {
+               super.anIntArray145[var4] = var1 + var4;
+            }
+
+            this.anIntArray1009 = new int[var2.length];
+            System.arraycopy(var2, 0, this.anIntArray1009, 0, var2.length);
+         }
+      }
+   }
+
+   public TriangleStripArray(int[] var1, int[] var2) {
+      if(var1 != null && var2 != null) {
+         if(var2.length != 0 && var1.length >= 3) {
+            int var3 = 0;
+
+            int var4;
+            for(var4 = var2.length - 1; var4 >= 0; --var4) {
+               if(var2[var4] < 3 || var2[var4] > '\uffff') {
+                  throw new IllegalArgumentException();
+               }
+
+               var3 += var2[var4];
+            }
+
+            if(var1.length < var3) {
+               throw new IllegalArgumentException();
+            } else {
+               for(var4 = var3 - 1; var4 >= 0; --var4) {
+                  if(var1[var4] < 0 || var1[var4] > '\uffff') {
+                     throw new IllegalArgumentException();
+                  }
+               }
+
+               super.anIntArray145 = new int[var3];
+               System.arraycopy(var1, 0, super.anIntArray145, 0, var3);
+               this.anIntArray1009 = new int[var2.length];
+               System.arraycopy(var2, 0, this.anIntArray1009, 0, var2.length);
+            }
+         } else {
+            throw new IllegalArgumentException();
+         }
+      } else {
+         throw new NullPointerException();
+      }
+   }
 }
