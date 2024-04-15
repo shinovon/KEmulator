@@ -20,7 +20,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     StyledText styledText;
     Shell parentShell;
     private boolean aBoolean576;
-    private Vector<String> printQueue = new Vector<String>();
+    Vector<String> printQueue = new Vector<String>();
 
     public Class11() {
         super();
@@ -165,7 +165,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         try {
             while (true) {
                 if (printQueue.size() > 0) {
-                    EmulatorImpl.asyncExec(new Textout(this, printQueue.remove(0)));
+                    EmulatorImpl.syncExec(new Textout(this));
                 } else {
                     synchronized (printQueue) {
                         printQueue.wait();
@@ -179,15 +179,18 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
 
     private final class Textout implements Runnable {
         private final Class11 class11;
-        private final String s;
 
-        private Textout(final Class11 c11, String s) {
+        private Textout(final Class11 c11) {
             super();
             this.class11 = c11;
-            this.s = s;
         }
 
         public final void run() {
+            StringBuffer sb = new StringBuffer();
+            while (printQueue.size() > 0) {
+                sb.append(printQueue.remove(0));
+            }
+            String s = sb.toString();
             try {
                 class11.filePrintStream.print(s);
             } catch (Exception e) {}

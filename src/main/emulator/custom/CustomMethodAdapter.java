@@ -154,10 +154,11 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
     public CustomMethodAdapter(final MethodVisitor methodVisitor, final String aString1186, final String s, final String aString1187) {
         super(methodVisitor);
         this.anInt1185 = 0;
+        this.className = aString1186;
+        this.methodName = s;
+        this.methodDesc = aString1187;
         if (Settings.enableNewTrack || Settings.enableMethodTrack) {
-            this.className = aString1186;
             this.methodName = aString1186 + "." + s;
-            this.methodDesc = aString1187;
             this.aString1190 = "";
             this.sourceLine = 0;
             final int lastIndex;
