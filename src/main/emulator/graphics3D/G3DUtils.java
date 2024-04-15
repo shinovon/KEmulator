@@ -2,8 +2,79 @@ package emulator.graphics3D;
 
 import emulator.graphics3D.b;
 
+import java.util.Arrays;
+
 public class G3DUtils {
+    private static final float FLOAT_EPSILON = 1e-6f;
+    
     public static native boolean intelSSE_Invert4x4(float[] var0, float var1);
+    public static boolean Invert4x4(float[] var0, float var1) {
+        try {
+            return intelSSE_Invert4x4(var0, var1);
+        } catch (Error e) {
+            // TODO
+            mert4x4(var0, var1);
+            return true;
+        }
+    }
+
+    static void mert4x4(float m[], float epsilon) {
+        // Adapted from The Mesa 3-D graphics library. 
+        // Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
+        // Published under the MIT license (see the header of this file)
+        float m0 = m[0];
+        float m1 = m[1];
+        float m2 = m[2];
+        float m3 = m[3];
+        float m4 = m[4];
+        float m5 = m[5];
+        float m6 = m[6];
+        float m7 = m[7];
+        float m8 = m[8];
+        float m9 = m[9];
+        float mA = m[10];
+        float mB = m[11];
+        float mC = m[12];
+        float mD = m[13];
+        float mE = m[14];
+        float mF = m[15];
+
+        m[0] = m5 * mA * mF - m5 * mB * mE - m9 * m6 * mF + m9 * m7 * mE + mD * m6 * mB - mD * m7 * mA;
+        m[4] = -m4 * mA * mF + m4 * mB * mE + m8 * m6 * mF - m8 * m7 * mE - mC * m6 * mB + mC * m7 * mA;
+        m[8] = m4 * m9 * mF - m4 * mB * mD - m8 * m5 * mF + m8 * m7 * mD + mC * m5 * mB - mC * m7 * m9;
+        m[12] = -m4 * m9 * mE + m4 * mA * mD + m8 * m5 * mE - m8 * m6 * mD - mC * m5 * mA + mC * m6 * m9;
+        m[1] = -m1 * mA * mF + m1 * mB * mE + m9 * m2 * mF - m9 * m3 * mE - mD * m2 * mB + mD * m3 * mA;
+        m[5] = m0 * mA * mF - m0 * mB * mE - m8 * m2 * mF + m8 * m3 * mE + mC * m2 * mB - mC * m3 * mA;
+        m[9] = -m0 * m9 * mF + m0 * mB * mD + m8 * m1 * mF - m8 * m3 * mD - mC * m1 * mB + mC * m3 * m9;
+        m[13] = m0 * m9 * mE - m0 * mA * mD - m8 * m1 * mE + m8 * m2 * mD + mC * m1 * mA - mC * m2 * m9;
+        m[2] = m1 * m6 * mF - m1 * m7 * mE - m5 * m2 * mF + m5 * m3 * mE + mD * m2 * m7 - mD * m3 * m6;
+        m[6] = -m0 * m6 * mF + m0 * m7 * mE + m4 * m2 * mF - m4 * m3 * mE - mC * m2 * m7 + mC * m3 * m6;
+        m[10] = m0 * m5 * mF - m0 * m7 * mD - m4 * m1 * mF + m4 * m3 * mD + mC * m1 * m7 - mC * m3 * m5;
+        m[14] = -m0 * m5 * mE + m0 * m6 * mD + m4 * m1 * mE - m4 * m2 * mD - mC * m1 * m6 + mC * m2 * m5;
+        m[3] = -m1 * m6 * mB + m1 * m7 * mA + m5 * m2 * mB - m5 * m3 * mA - m9 * m2 * m7 + m9 * m3 * m6;
+        m[7] = m0 * m6 * mB - m0 * m7 * mA - m4 * m2 * mB + m4 * m3 * mA + m8 * m2 * m7 - m8 * m3 * m6;
+        m[11] = -m0 * m5 * mB + m0 * m7 * m9 + m4 * m1 * mB - m4 * m3 * m9 - m8 * m1 * m7 + m8 * m3 * m5;
+        m[15] = m0 * m5 * mA - m0 * m6 * m9 - m4 * m1 * mA + m4 * m2 * m9 + m8 * m1 * m6 - m8 * m2 * m5;
+        // (Ain't that pretty?)
+
+        float det = m0 * m[0] + m1 * m[4] + m2 * m[8] + m3 * m[12];
+        if (Math.abs(det) <= epsilon) {
+            setIdentity4x4(m);
+            return;
+        }
+        float mDet = 1.0f / det;
+        for (int i = 0; i < 16; i++) {
+            m[i] *= mDet;
+        }
+    }
+
+    static void setIdentity4x4(float m[]) {
+        Arrays.fill(m, 0.0f);
+        m[0] = 1.0f;
+        m[5] = 1.0f;
+        m[10] = 1.0f;
+        m[15] = 1.0f;
+    }
 
     public static float method601(int var0, int var1) {
         return (float)(var0 >> var1 & 255) / 255.0F;

@@ -1,6 +1,5 @@
 package emulator.graphics3D.m3g;
 
-import emulator.graphics3D.m3g.b;
 import java.io.IOException;
 import java.io.InputStream;
 

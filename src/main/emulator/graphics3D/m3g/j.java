@@ -2,10 +2,7 @@ package emulator.graphics3D.m3g;
 
 import emulator.Emulator;
 import emulator.custom.CustomJarResources;
-import emulator.custom.h;
-import emulator.graphics3D.m3g.b;
-import emulator.graphics3D.m3g.g;
-import emulator.graphics3D.m3g.i;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

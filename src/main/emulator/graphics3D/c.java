@@ -30,13 +30,13 @@ public final class c {
   }
 
   public final void method442() {
-    if(!G3DUtils.intelSSE_Invert4x4(this.aFloatArray615, 1.0E-10F)) {
+    if(!G3DUtils.Invert4x4(this.aFloatArray615, 1.0E-10F)) {
       throw new ArithmeticException();
     }
   }
 
   public final void method445() {
-    G3DUtils.intelSSE_Invert4x4(this.aFloatArray615, 0.0F);
+    G3DUtils.Invert4x4(this.aFloatArray615, 0.0F);
   }
 
   public final void method447() {

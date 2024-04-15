@@ -1,7 +1,7 @@
 package emulator.graphics3D.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import emulator.graphics3D.m3g.h;
+
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.microedition.m3g.Graphics3D;

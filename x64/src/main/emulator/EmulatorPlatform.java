@@ -46,7 +46,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public boolean supportsM3G() {
-        return false;
+        return true;
     }
 
     public MemoryViewImage convertMicro3DTexture(Object o) {
@@ -54,7 +54,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public IGraphics3D getGraphics3D() {
-        return null;
+        return emulator.graphics3D.lwjgl.Emulator3D.method501();
     }
 
     private static void loadJOGLLibrary() {

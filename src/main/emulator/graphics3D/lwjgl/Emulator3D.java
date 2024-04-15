@@ -14,8 +14,8 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
-import org.eclipse.swt.internal.opengl.win32.WGL;
+//import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
+//import org.eclipse.swt.internal.opengl.win32.WGL;
 import emulator.graphics3D.m3g.e;
 import emulator.graphics3D.m3g.f;
 
@@ -129,7 +129,7 @@ public final class Emulator3D implements IGraphics3D {
 
                 aPbuffer747.makeCurrent();
             } catch (Exception var5) {
-                this.method499(var2, var3);
+//                this.method499(var2, var3);
             }
 
             if (anInt761 != var2 || anInt764 != var3) {
@@ -172,56 +172,56 @@ public final class Emulator3D implements IGraphics3D {
         return aPbuffer747 == null;
     }
 
-    private void method499(int var1, int var2) {
-        if (this.anImage757 == null || this.anImage757.getBounds().width != var1 || this.anImage757.getBounds().height != var2) {
-            if (this.anImage757 != null) {
-                this.anImage757.dispose();
-                this.aGC749.dispose();
-                WGL.wglDeleteContext(this.anInt765);
-            }
-
-            ImageData var3 = new ImageData(var1, var2, 32, aPaletteData758);
-            this.anImage757 = new Image((Device) null, var3);
-            this.aGC749 = new GC(this.anImage757);
-            PIXELFORMATDESCRIPTOR var4;
-            (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
-            var4.nVersion = 1;
-            var4.dwFlags = 57;
-            var4.iPixelType = 0;
-            var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
-            var4.iLayerType = 0;
-            int var5;
-            if ((var5 = WGL.ChoosePixelFormat(this.aGC749.handle, var4)) == 0 || !WGL.SetPixelFormat(this.aGC749.handle, var5, var4)) {
-                this.aGC749.dispose();
-                this.anImage757.dispose();
-                throw new IllegalArgumentException();
-            }
-
-            this.anInt765 = WGL.wglCreateContext(this.aGC749.handle);
-            if (this.anInt765 == 0) {
-                this.aGC749.dispose();
-                this.anImage757.dispose();
-                throw new IllegalArgumentException();
-            }
-        }
-
-        if (WGL.wglGetCurrentContext() != this.anImage757.handle) {
-            while (WGL.wglGetCurrentContext() > 0) {
-                ;
-            }
-
-            WGL.wglMakeCurrent(this.aGC749.handle, this.anInt765);
-
-            try {
-                GLContext.useContext(this.anImage757);
-            } catch (Exception var6) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
+//    private void method499(int var1, int var2) {
+//        if (this.anImage757 == null || this.anImage757.getBounds().width != var1 || this.anImage757.getBounds().height != var2) {
+//            if (this.anImage757 != null) {
+//                this.anImage757.dispose();
+//                this.aGC749.dispose();
+//                WGL.wglDeleteContext(this.anInt765);
+//            }
+//
+//            ImageData var3 = new ImageData(var1, var2, 32, aPaletteData758);
+//            this.anImage757 = new Image((Device) null, var3);
+//            this.aGC749 = new GC(this.anImage757);
+//            PIXELFORMATDESCRIPTOR var4;
+//            (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
+//            var4.nVersion = 1;
+//            var4.dwFlags = 57;
+//            var4.iPixelType = 0;
+//            var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
+//            var4.iLayerType = 0;
+//            int var5;
+//            if ((var5 = WGL.ChoosePixelFormat(this.aGC749.handle, var4)) == 0 || !WGL.SetPixelFormat(this.aGC749.handle, var5, var4)) {
+//                this.aGC749.dispose();
+//                this.anImage757.dispose();
+//                throw new IllegalArgumentException();
+//            }
+//
+//            this.anInt765 = WGL.wglCreateContext(this.aGC749.handle);
+//            if (this.anInt765 == 0) {
+//                this.aGC749.dispose();
+//                this.anImage757.dispose();
+//                throw new IllegalArgumentException();
+//            }
+//        }
+//
+//        if (WGL.wglGetCurrentContext() != this.anImage757.handle) {
+//            while (WGL.wglGetCurrentContext() > 0) {
+//                ;
+//            }
+//
+//            WGL.wglMakeCurrent(this.aGC749.handle, this.anInt765);
+//
+//            try {
+//                GLContext.useContext(this.anImage757);
+//            } catch (Exception var6) {
+//                throw new IllegalArgumentException();
+//            }
+//        }
+//    }
 
     private void method514() {
-        WGL.wglMakeCurrent(this.aGC749.handle, -1);
+//        WGL.wglMakeCurrent(this.aGC749.handle, -1);
 
         try {
             GLContext.useContext((Object) null);

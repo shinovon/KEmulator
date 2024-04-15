@@ -269,4 +269,9 @@ public class Image2D extends Object3D {
       (var1 = (Image2D)super.duplicateObject()).aByteArray35 = (byte[])this.aByteArray35.clone();
       return var1;
    }
+
+    public int size() {
+      // TODO
+       return aByteArray35.length;
+    }
 }
