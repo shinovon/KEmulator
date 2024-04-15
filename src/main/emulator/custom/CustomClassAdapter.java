@@ -10,15 +10,14 @@ public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
         {
             String s4;
             String s5;
-            if (desc.indexOf("java/util/TimerTask") != -1) {
+            if (desc.contains("java/util/TimerTask")) {
                 s4 = "java/util/TimerTask";
                 s5 = "emulator/custom/subclass/SubTimerTask";
-            } else {
-                if (desc.indexOf("java/util/Timer") == -1) {
-                    break Label_0037;
-                }
+            } else if (desc.contains("java/util/Timer")) {
                 s4 = "java/util/Timer";
                 s5 = "emulator/custom/subclass/Timer";
+            } else {
+                break Label_0037;
             }
             desc = desc.replaceAll(s4, s5);
         }

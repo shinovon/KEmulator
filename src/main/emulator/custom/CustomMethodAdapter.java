@@ -91,26 +91,25 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                     return;
                 }
                 if (cls.equals("javax/microedition/m3g/Transform")) {
-                    super.visitMethodInsn(acc, "emulator/custom/subclass/M3GDebug", "waitDebug", "()V");
-                    super.visitMethodInsn(acc, cls, name, sign);
-                    return;
+                    if(!name.equals("finalize") && !name.contains("init>")) {
+                        System.out.println("patched " + acc + " " + cls + " " + name + " " + sign);
+                        sign = "(Ljavax/microedition/m3g/Transform;" + sign.substring(1);
+                        super.visitMethodInsn(184, "emulator/custom/subclass/CustomTransform", name, sign);
+                        return;
+                    }
                 }
-                String s4;
                 String s5;
                 String s6;
-                if (sign.indexOf("java/util/TimerTask") != -1) {
-                    s4 = sign;
+                if (sign.contains("java/util/TimerTask")) {
                     s5 = "java/util/TimerTask";
                     s6 = "emulator/custom/subclass/SubTimerTask";
-                } else {
-                    if (sign.indexOf("java/util/Timer") == -1) {
-                        break Label_0576;
-                    }
-                    s4 = sign;
+                } else if (sign.contains("java/util/Timer")) {
                     s5 = "java/util/Timer";
                     s6 = "emulator/custom/subclass/Timer";
+                } else {
+                    break Label_0576;
                 }
-                sign = s4.replaceAll(s5, s6);
+                sign = sign.replaceAll(s5, s6);
             }
         }
         super.visitMethodInsn(acc, cls, name, sign);
