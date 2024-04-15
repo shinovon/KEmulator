@@ -90,6 +90,11 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                     super.visitMethodInsn(acc, "emulator/custom/subclass/SubTimerTask", name, sign);
                     return;
                 }
+                if (cls.equals("javax/microedition/m3g/Transform")) {
+                    super.visitMethodInsn(acc, "emulator/custom/subclass/M3GDebug", "waitDebug", "()V");
+                    super.visitMethodInsn(acc, cls, name, sign);
+                    return;
+                }
                 String s4;
                 String s5;
                 String s6;

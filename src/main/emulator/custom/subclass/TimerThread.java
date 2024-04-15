@@ -62,9 +62,7 @@ class TimerThread extends Thread {
                     }
                     if (b) {
                         try {
-                            synchronized (Memory.debugLock) { // NFS HotPursuit fix
-                                min.run();
-                            }
+                            min.run();
                         } catch (Exception ex) {
                             min.cancel();
                         }
