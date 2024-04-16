@@ -4,6 +4,8 @@ import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
 
+import java.lang.reflect.Field;
+
 public class EmulatorPlatform implements IEmulatorPlatform {
 
     public boolean isX64() {
@@ -35,6 +37,24 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public void loadLibraries() {
+        loadM3G();
+    }
+
+    private static void loadM3G() {
+        boolean m3gLoaded = false;
+        try {
+            Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
+            Field f = null;
+            try {
+                f = cls.getField("_STUB");
+                m3gLoaded = !f.getBoolean(null);
+            } catch (Throwable ignored) {
+                m3gLoaded = true;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        System.out.println("m3g loaded: " + m3gLoaded);
     }
 
     public boolean supportsMascotCapsule() {

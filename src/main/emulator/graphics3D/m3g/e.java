@@ -1,6 +1,8 @@
 package emulator.graphics3D.m3g;
 
 import emulator.graphics3D.G3DUtils;
+import emulator.graphics3D.TransformImpl;
+import emulator.graphics3D.lwjgl.Emulator3D;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -74,7 +76,7 @@ public final class e {
         this.aVertexArrayArray1125 = new VertexArray[var3];
         float[] var4 = new float[var3];
         var1.getWeights(var4);
-        float var5 = var1.m_baseWeight;
+        float var5 = var1.getBaseWeight();
         int var6;
         int var7;
         if (this.aVertexArray1126 != null) {
@@ -224,7 +226,7 @@ public final class e {
             this.aVertexArray1133 = null;
         }
 
-        this.aVertexArrayArray1131 = new VertexArray[Graphics3D.NumTextureUnits];
+        this.aVertexArrayArray1131 = new VertexArray[Emulator3D.NumTextureUnits];
 
         for (int var2 = 0; var2 < this.aVertexArrayArray1131.length; ++var2) {
             if (var1.getTexCoords(var2, (float[]) null) != null) {
@@ -272,7 +274,7 @@ public final class e {
         } else {
             VertexArray var4 = var2.getNormals();
             int var5 = var2.getVertexCount();
-            Vector var6 = var1.m_transforms;
+            Vector var6 = var1.getTransforms();
 
             for (int var7 = 0; var7 < var6.size(); ++var7) {
                 h var8;
@@ -291,7 +293,7 @@ public final class e {
                     var8.aTransform1099.postMultiply(var8.aTransform1096);
                     if (var4 != null) {
                         var8.aTransform1101.set(var8.aTransform1099);
-                        var8.aTransform1101.getImpl().method445();
+                        ((TransformImpl) var8.aTransform1101.getImpl()).method445();
                         var8.aTransform1101.transpose();
                     }
 

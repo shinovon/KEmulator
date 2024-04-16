@@ -15,6 +15,7 @@ import javax.microedition.midlet.MIDlet;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -959,5 +960,9 @@ public class Emulator {
 
     public static IEmulatorPlatform getPlatform() {
         return platform;
+    }
+
+    public static IGraphics3D getGraphics3D() {
+        return platform.getGraphics3D();
     }
 }

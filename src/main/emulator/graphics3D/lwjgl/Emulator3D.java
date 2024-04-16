@@ -52,6 +52,13 @@ public final class Emulator3D implements IGraphics3D {
     private int viewportWidth;
     private int viewportHeight;
 
+
+    public static final int MaxViewportWidth = 2048;
+    public static final int MaxViewportHeight = 2048;
+    public static final int NumTextureUnits = 10;
+    public static final int MaxTextureDimension = 1024;
+    public static final int MaxSpriteCropDimension = 1024;
+
     private Emulator3D() {
         instance = this;
         properties.put("supportAntialiasing", Boolean.TRUE);
@@ -61,13 +68,13 @@ public final class Emulator3D implements IGraphics3D {
         properties.put("supportPerspectiveCorrection", Boolean.TRUE);
         properties.put("supportLocalCameraLighting", Boolean.TRUE);
         properties.put("maxLights", new Integer(8));
-        properties.put("maxViewportWidth", new Integer(2048));
-        properties.put("maxViewportHeight", new Integer(2048));
+        properties.put("maxViewportWidth", new Integer(MaxViewportWidth));
+        properties.put("maxViewportHeight", new Integer(MaxViewportHeight));
         properties.put("maxViewportDimension", new Integer(2048));
-        properties.put("maxTextureDimension", new Integer(1024));
-        properties.put("maxSpriteCropDimension", new Integer(1024));
+        properties.put("maxTextureDimension", new Integer(MaxTextureDimension));
+        properties.put("maxSpriteCropDimension", new Integer(MaxSpriteCropDimension));
         properties.put("maxTransformsPerVertex", new Integer(1000));
-        properties.put("numTextureUnits", new Integer(10));
+        properties.put("numTextureUnits", new Integer(NumTextureUnits));
         properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
     }
 
@@ -447,11 +454,11 @@ public final class Emulator3D implements IGraphics3D {
             f.aCamera1137.getProjection(var0);
             var0.transpose();
             GL11.glMatrixMode(5889);
-            GL11.glLoadMatrix(Buffers.method527(var0.getImpl().matrix));
+            GL11.glLoadMatrix(Buffers.method527(((TransformImpl) var0.getImpl()).matrix));
             var0.set(f.aTransform1138);
             var0.transpose();
             GL11.glMatrixMode(5888);
-            GL11.glLoadMatrix(Buffers.method527(var0.getImpl().matrix));
+            GL11.glLoadMatrix(Buffers.method527(((TransformImpl) var0.getImpl()).matrix));
         }
     }
 
@@ -481,7 +488,7 @@ public final class Emulator3D implements IGraphics3D {
                 var3.transpose();
                 GL11.glPushMatrix();
                 GL11.glMatrixMode(5888);
-                GL11.glMultMatrix(Buffers.method527(var3.getImpl().matrix));
+                GL11.glMultMatrix(Buffers.method527(((TransformImpl) var3.getImpl()).matrix));
                 float[] var9;
                 (var9 = new float[4])[3] = 1.0F;
                 GL11.glLight(16384 + var6, 4608, Buffers.method527(var9));
@@ -577,7 +584,7 @@ public final class Emulator3D implements IGraphics3D {
                 Transform var7;
                 (var7 = new Transform()).set(var4);
                 var7.transpose();
-                GL11.glMultMatrix(Buffers.method527(var7.getImpl().matrix));
+                GL11.glMultMatrix(Buffers.method527(((TransformImpl) var7.getImpl()).matrix));
             }
 
             this.method511(var3, var6, false);
@@ -791,9 +798,9 @@ public final class Emulator3D implements IGraphics3D {
         int var9;
         int[] var22;
         if (var3 != null && !Settings.xrayView) {
-            var9 = Graphics3D.NumTextureUnits;
+            var9 = NumTextureUnits;
             IntBuffer var10;
-            GL11.glGenTextures(var10 = BufferUtils.createIntBuffer(Graphics3D.NumTextureUnits));
+            GL11.glGenTextures(var10 = BufferUtils.createIntBuffer(NumTextureUnits));
 
             int var11;
             for (var11 = 0; var11 < var9; ++var11) {
@@ -943,7 +950,7 @@ public final class Emulator3D implements IGraphics3D {
                     var12.getCompositeTransform(var31);
                     var31.transpose();
                     GL11.glMatrixMode(5890);
-                    GL11.glLoadMatrix(Buffers.method527(var31.getImpl().matrix));
+                    GL11.glLoadMatrix(Buffers.method527(((TransformImpl) var31.getImpl()).matrix));
                     GL11.glTranslatef(var26[1], var26[2], var26[3]);
                     GL11.glScalef(var26[0], var26[0], var26[0]);
                 }
@@ -1017,9 +1024,10 @@ public final class Emulator3D implements IGraphics3D {
         emulator.graphics3D.b var5 = new emulator.graphics3D.b(0.0F, 1.0F, 0.0F, 1.0F);
         Transform var6;
         (var6 = new Transform(f.aTransform1138)).postMultiply(var2);
-        var6.getImpl().method440(var3);
-        var6.getImpl().method440(var4);
-        var6.getImpl().method440(var5);
+        TransformImpl impl = (TransformImpl) var6.getImpl();
+        impl.method440(var3);
+        impl.method440(var4);
+        impl.method440(var5);
         emulator.graphics3D.b var7 = new emulator.graphics3D.b(var3);
         var3.method425(1.0F / var3.aFloat614);
         var4.method425(1.0F / var4.aFloat614);
@@ -1032,9 +1040,10 @@ public final class Emulator3D implements IGraphics3D {
         var9.method429(var7);
         Transform var10 = new Transform();
         f.aCamera1137.getProjection(var10);
-        var10.getImpl().method440(var7);
-        var10.getImpl().method440(var8);
-        var10.getImpl().method440(var9);
+        impl = (TransformImpl) var10.getImpl();
+        impl.method440(var7);
+        impl.method440(var8);
+        impl.method440(var9);
         if (var7.aFloat614 > 0.0F && -var7.aFloat614 < var7.aFloat612 && var7.aFloat612 <= var7.aFloat614) {
             var7.method425(1.0F / var7.aFloat614);
             var8.method425(1.0F / var8.aFloat614);
@@ -1132,9 +1141,9 @@ public final class Emulator3D implements IGraphics3D {
                     var6.transpose();
                     GL11.glViewport(var23, targetHeight - var24 - var26, var25, var26);
                     GL11.glMatrixMode(5889);
-                    GL11.glLoadMatrix(Buffers.method527(var10.getImpl().matrix));
+                    GL11.glLoadMatrix(Buffers.method527(((TransformImpl) var10.getImpl()).matrix));
                     GL11.glMatrixMode(5888);
-                    GL11.glLoadMatrix(Buffers.method527(var6.getImpl().matrix));
+                    GL11.glLoadMatrix(Buffers.method527(((TransformImpl) var6.getImpl()).matrix));
                     GL11.glDisable(2896);
                     var27 = Buffers.method520(var1.getImage().getImageData());
                     GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);

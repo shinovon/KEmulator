@@ -4,6 +4,7 @@ import emulator.debug.MemoryViewImage;
 import emulator.graphics3D.IGraphics3D;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -38,7 +39,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     public void loadLibraries() {
         System.setProperty("jna.nosys", "true");
         loadSWTLibrary();
-        loadJOGLLibrary();
+        loadM3G();
     }
 
     public boolean supportsMascotCapsule() {
@@ -57,27 +58,21 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
-    private static void loadJOGLLibrary() {
-        String osn = System.getProperty("os.name").toLowerCase();
-        String osa = System.getProperty("os.arch").toLowerCase();
-        String os =
-                osn.contains("win") ? "windows" :
-                        osn.contains("mac") ? "macosx" :
-                                osn.contains("linux") || osn.contains("nix") ? "linux" :
-                                        null;
-        if(os == null) {
-            return;
+    private static void loadM3G() {
+        boolean m3gLoaded = false;
+        try {
+            Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
+            Field f = null;
+            try {
+                f = cls.getField("_STUB");
+                m3gLoaded = !f.getBoolean(null);
+            } catch (Throwable ignored) {
+                m3gLoaded = true;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-        if(!osa.contains("amd64") && !osa.contains("86") && !osa.contains("armv6")) {
-            return;
-        }
-        String arch = osn.contains("macosx") ? "universal" : osa.contains("amd64") ? "amd64" : osa.contains("86") ? "i586" : osa;
-        String suffix = "-natives-" + os + "-" + arch + ".jar";
-
-        addToClassPath("gluegen-rt.jar");
-        addToClassPath("gluegen-rt" + suffix);
-        addToClassPath("jogl-all.jar");
-        addToClassPath("jogl-all" + suffix);
+        System.out.println("m3g loaded: " + m3gLoaded);
     }
 
     private static void loadSWTLibrary() {
