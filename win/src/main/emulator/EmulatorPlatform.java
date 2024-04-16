@@ -3,7 +3,6 @@ package emulator;
 import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
-import emulator.graphics3D.lwjgl.Emulator3D;
 
 import java.io.File;
 import java.lang.reflect.Field;

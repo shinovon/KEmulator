@@ -11,7 +11,6 @@ public class G3DUtils {
         try {
             return intelSSE_Invert4x4(var0, var1);
         } catch (Error e) {
-            // TODO
             mert4x4(var0, var1);
             return true;
         }

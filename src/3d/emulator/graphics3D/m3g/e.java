@@ -6,7 +6,6 @@ import emulator.graphics3D.lwjgl.Emulator3D;
 
 import java.util.Hashtable;
 import java.util.Vector;
-import javax.microedition.m3g.Graphics3D;
 import javax.microedition.m3g.Mesh;
 import javax.microedition.m3g.MorphingMesh;
 import javax.microedition.m3g.SkinnedMesh;
