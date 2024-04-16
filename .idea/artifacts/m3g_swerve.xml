@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="m3g_swerve">
-    <output-path>$PROJECT_DIR$/m3g</output-path>
-    <root id="archive" name="m3g_lwjgl.jar">
+    <output-path>$PROJECT_DIR$/home</output-path>
+    <root id="archive" name="m3g_swerve.jar">
       <element id="module-output" name="m3g_swerve" />
     </root>
   </artifact>

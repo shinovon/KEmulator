@@ -52,6 +52,7 @@ public final class EmulatorScreen implements
     private Menu menuTool;
     private Menu menuView;
     private Menu menu2dEngine;
+    private Menu menu3dEngine;
     private Menu aMenu1018;
     private Menu menuInterpolation;
     public static int locX;
@@ -78,6 +79,10 @@ public final class EmulatorScreen implements
     private String aString989;
     MenuItem awt2dMenuItem;
     MenuItem swt2dMenuItem;
+
+    MenuItem swerve3dMenuItem;
+    MenuItem lwj3dMenuItem;
+
     MenuItem loadJarMenuItem;
     MenuItem loadAutoPlayMenuItem;
     MenuItem openJadMenuItem;
@@ -826,6 +831,18 @@ public final class EmulatorScreen implements
         this.swt2dMenuItem.setSelection(Settings.g2d == 0);
         this.swt2dMenuItem.addSelectionListener((SelectionListener) this);
         menuItem7.setMenu(this.menu2dEngine);
+
+        final MenuItem engine3dGroup;
+        (engine3dGroup = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.get("MENU_MIDLET_3DENGINE", "3D Graphics Engine"));
+        engine3dGroup.setMenu(this.menu3dEngine = new Menu((Decorations)this.shell, 4194308));
+        (this.lwj3dMenuItem = new MenuItem(this.menu3dEngine, 16)).setText("LWJGL");
+        this.lwj3dMenuItem.setSelection(Settings.g3d == 1);
+        this.lwj3dMenuItem.addSelectionListener((SelectionListener)this);
+        (this.swerve3dMenuItem = new MenuItem(this.menu3dEngine, 16)).setText("Swerve");
+        this.swerve3dMenuItem.setSelection(Settings.g3d == 0);
+        this.swerve3dMenuItem.addSelectionListener((SelectionListener)this);
+        engine3dGroup.setMenu(this.menu3dEngine);
+
         new MenuItem(this.menuMidlet, 2);
         (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_SUSPEND", "Suspend") + "\tCtrl+S");
         this.suspendMenuItem.addSelectionListener((SelectionListener) this);
@@ -1167,15 +1184,15 @@ public final class EmulatorScreen implements
                 this.awt2dMenuItem.setSelection(false);
                 this.swt2dMenuItem.setSelection(true);
             }
-        } else /*if (parent.equals(this.menu3dEngine)) {
-            if (menuItem.equals(this.swt3dMenuItem)) {
+        } else if (parent.equals(this.menu3dEngine)) {
+            if (menuItem.equals(this.swerve3dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g3d != 0) {
                     Emulator.loadGame(null, Settings.g2d, 0, false);
                     return;
                 }
                 Settings.g3d = 0;
                 this.lwj3dMenuItem.setSelection(false);
-                this.swt3dMenuItem.setSelection(true);
+                this.swerve3dMenuItem.setSelection(true);
             }
             else if (menuItem.equals(this.lwj3dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g3d != 1) {
@@ -1183,11 +1200,11 @@ public final class EmulatorScreen implements
                     return;
                 }
                 Settings.g3d = 1;
-                this.swt3dMenuItem.setSelection(false);
+                this.swerve3dMenuItem.setSelection(false);
                 this.lwj3dMenuItem.setSelection(true);
             }
         }
-        else */if (parent.equals(this.menuView)) {
+        else if (parent.equals(this.menuView)) {
             if (menuItem.equals(this.aMenuItem949)) {
                 new Class54().method454(this.shell);
                 return;

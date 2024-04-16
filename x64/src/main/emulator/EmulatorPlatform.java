@@ -38,8 +38,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public void loadLibraries() {
         System.setProperty("jna.nosys", "true");
+        System.setProperty("org.lwjgl.librarypath", Emulator.getAbsolutePath());
         loadSWTLibrary();
-        loadM3G();
     }
 
     public boolean supportsMascotCapsule() {
@@ -58,7 +58,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
-    private void loadM3G() {
+    public void loadM3G() {
         if(!supportsM3G()) return;
         boolean m3gLoaded = false;
         try {
@@ -71,7 +71,6 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 m3gLoaded = true;
             }
         } catch (Throwable e) {
-            e.printStackTrace();
         }
         System.out.println("m3g loaded: " + m3gLoaded);
         if(!m3gLoaded) {

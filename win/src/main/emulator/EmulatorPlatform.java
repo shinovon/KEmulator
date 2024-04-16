@@ -3,6 +3,7 @@ package emulator;
 import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
+import emulator.graphics3D.lwjgl.Emulator3D;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -41,7 +42,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public void loadLibraries() {
-        loadM3G();
+        System.setProperty("org.lwjgl.librarypath", Emulator.getAbsolutePath());
     }
 
     public boolean supportsMascotCapsule() {
@@ -63,7 +64,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
-    private void loadM3G() {
+    public void loadM3G() {
         if(!supportsM3G()) return;
         boolean m3gLoaded = false;
         try {
@@ -72,17 +73,20 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             try {
                 f = cls.getField("_STUB");
                 m3gLoaded = !f.getBoolean(null);
+                if(!m3gLoaded) {
+                    System.out.println("m3g stub!!");
+                }
             } catch (Throwable ignored) {
                 m3gLoaded = true;
             }
         } catch (Throwable e) {
-            e.printStackTrace();
         }
-        System.out.println("m3g loaded: " + m3gLoaded);
         if(!m3gLoaded) {
             // TODO setting
-            boolean swerve = false;
-            addToClassPath(swerve ? "m3g_swerve.jar" : "m3g_lwjgl.jar");
+            String s = Settings.g3d == 0 ? "m3g_swerve.jar" : "m3g_lwjgl.jar";
+            addToClassPath(s);
+        } else {
+            System.out.println("m3g preloaded");
         }
     }
 

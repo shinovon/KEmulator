@@ -42,6 +42,9 @@ public final class EmulatorImpl implements IEmulator {
         this.aClass161_1387 = new Class161();
         this.aClass5_1377 = new Class5(0);
         this.aClass5_1391 = new Class5(1);
+    }
+
+    public void init() {
         this.aClass110_1382 = new MemoryView();
         this.aClass46_1381 = new Class46();
         this.aClass90_1384 = new Class90();

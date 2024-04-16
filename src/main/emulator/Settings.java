@@ -8,11 +8,6 @@ public final class Settings {
      * swt - 0
      */
     public static int g2d;
-    /*
-     * 1 - lwj
-     * 0 - wgl
-     */
-    // public static int g3d;
     public static boolean enableVibration;
     public static boolean enableKeyRepeat;
     public static boolean ignoreFullScreen;
@@ -68,11 +63,11 @@ public final class Settings {
     public static boolean pollKeyboardOnRepaint = true;
     public static String uiLanguage = "en";
     public static boolean rpc;
-
     public static boolean uei;
     public static boolean fpsCounter = true;
     public static boolean synchronizeKeyEvents = true;
     public static boolean motorolaSoftKeyFix = true;
+    public static int g3d; // 0 - swerve, 1 - lwjgl
 
     public Settings() {
         super();
@@ -80,7 +75,7 @@ public final class Settings {
 
     static {
         Settings.g2d = 1;
-        // Settings.g3d = 1;
+        Settings.g3d = 1;
         Settings.canvasScale = 100;
         Settings.frameRate = 60;
         Settings.steps = -1;

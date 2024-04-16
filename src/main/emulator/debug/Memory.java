@@ -109,7 +109,14 @@ public final class Memory {
         if(m3gObjects.size() == 0) return;
 
         debuggingM3G = true;
-        
+
+        if(Settings.g3d == 1) {
+            // lwjgl engine
+            for (int i = 0; i < m3gObjects.size(); i++) {
+                m3gReadTextures((Node) m3gObjects.elementAt(i));
+            }
+            return;
+        }
         try {
             synchronized (m3gLock) {
                 // delays to make sure jsr184client.dll did all the job

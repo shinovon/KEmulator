@@ -472,7 +472,8 @@ public final class Property implements IProperty {
             this.down = properties.getProperty("KEY_DOWN", "-2");
             this.left = properties.getProperty("KEY_LEFT", "-3");
             this.right = properties.getProperty("KEY_RIGHT", "-4");
-            // Settings.g3d = (properties.getProperty("3D_Graphics_Enginge", "LWJ").equalsIgnoreCase("WGL") ? 0 : 1);
+            Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ")
+                    .equalsIgnoreCase("LWJ") ? 1 : 0);
             Settings.g2d = (properties.getProperty("2D_Graphics_Enginge", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
             Settings.alwaysOnTop = Boolean.valueOf(properties.getProperty("AlwaysOnTop", "false"));
             Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(100)));
@@ -619,7 +620,7 @@ public final class Property implements IProperty {
             properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
             properties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
             properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
-            //  sortProperties.setProperty("3D_Graphics_Enginge", (Settings.g3d == 0) ? "WGL" : "LWJ");
+            properties.setProperty("3D_Graphics_Engine", (Settings.g3d == 0) ? "SWERVE" : "LWJ");
             properties.setProperty("MAP_KEY_NUM_0", KeyMapping.get(0));
             properties.setProperty("MAP_KEY_NUM_1", KeyMapping.get(1));
             properties.setProperty("MAP_KEY_NUM_2", KeyMapping.get(2));

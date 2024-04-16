@@ -628,8 +628,9 @@ public class Emulator {
             System.out.println("Platform class not found");
             return;
         }
-        if (!platform.isX64() && System.getProperty("os.arch").equals("amd64")) {
-            JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
+        String arch = System.getProperty("os.arch");
+        if (!platform.isX64() && !arch.equals("x86")) {
+            JOptionPane.showMessageDialog(new JPanel(), "Can't run this version KEmulator nnmod at this architecture (" + arch + "). Try x64 version instead.");
             System.exit(0);
             return;
         }
@@ -638,14 +639,16 @@ public class Emulator {
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.initLocale();
         Emulator.emulatorimpl = new EmulatorImpl();
+        parseLaunchArgs(commandLineArguments);
+        platform.loadM3G();
+        // костыль, чтобы грузить классы которым нужен м3г только после его линковки
+        Emulator.emulatorimpl.init();
         try {
             i.a("emulator");
-        } catch (Error e) {
-        }
+        } catch (Error e) {}
         vlcCheckerThread.start();
         Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
-        parseLaunchArgs(commandLineArguments);
         Devices.load(Emulator.deviceFile);
         tryToSetDevice(Emulator.deviceName);
         setupMRUList();
@@ -794,6 +797,12 @@ public class Emulator {
             } else if (key.equals("swt")) {
                 Settings.g2d = 0;
                 Emulator.commandLineArguments[i] = "";
+            } else if (key.equals("lwj")) {
+                Settings.g3d = 1;
+                Emulator.commandLineArguments[i] = "";
+            } else if (key.equals("swerve")) {
+                Settings.g3d = 0;
+                Emulator.commandLineArguments[i] = "";
             } else if (key.equalsIgnoreCase("log")) {
                 Settings.showLogFrame = true;
             } else if (key.equalsIgnoreCase("uei")) {
@@ -860,7 +869,7 @@ public class Emulator {
         return s;
     }
 
-    public static void loadGame(final String s, final int n, final int n2, final boolean b) {
+    public static void loadGame(final String s, final int engine2d, final int engine3d, final boolean b) {
         ArrayList<String> cmd = new ArrayList<String>();
         getEmulator().getLogStream().println("loadGame: " + s);
         String javahome = System.getProperty("java.home");
@@ -893,8 +902,8 @@ public class Emulator {
             cmd.add("-rec");
             cmd.add(Settings.recordedKeysFile);
         }
-        cmd.add(n == 0 ? "-swt" : "-awt");
-        cmd.add(n2 == 0 ? "-wgl" : "-lwj");
+        cmd.add(engine2d == 0 ? "-swt" : "-awt");
+        cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {

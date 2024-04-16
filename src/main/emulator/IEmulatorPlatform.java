@@ -14,6 +14,8 @@ public interface IEmulatorPlatform {
 
     public void loadLibraries();
 
+    public void loadM3G();
+
     boolean supportsM3G();
 
     boolean supportsMascotCapsule();
