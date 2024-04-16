@@ -67,7 +67,7 @@ public final class Emulator3D implements IGraphics3D {
         Emulator3D.m3gProps.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
     }
 
-    public static Emulator3D method189() {
+    public static Emulator3D getInstance() {
         if (Emulator3D.ab383 == null) {
             Emulator3D.ab383 = new Emulator3D();
         }

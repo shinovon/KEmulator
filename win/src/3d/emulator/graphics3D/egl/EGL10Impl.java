@@ -21,7 +21,7 @@ public class EGL10Impl implements EGL10 {
     public static EGL10Impl getEgl() {
         if (EGL10Impl.egl == null) {
             EGL10Impl.egl = new EGL11Impl();
-            EGL10Impl.ab1332 = emulator.graphics3D.lwjgl.Emulator3D.method189();
+            EGL10Impl.ab1332 = emulator.graphics3D.lwjgl.Emulator3D.getInstance();
         }
         return EGL10Impl.egl;
     }
