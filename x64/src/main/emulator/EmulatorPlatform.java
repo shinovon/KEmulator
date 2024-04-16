@@ -58,7 +58,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
-    private static void loadM3G() {
+    private void loadM3G() {
+        if(!supportsM3G()) return;
         boolean m3gLoaded = false;
         try {
             Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
@@ -73,6 +74,10 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             e.printStackTrace();
         }
         System.out.println("m3g loaded: " + m3gLoaded);
+        if(!m3gLoaded) {
+            // TODO
+            addToClassPath("m3g_lwjgl.jar");
+        }
     }
 
     private static void loadSWTLibrary() {
@@ -99,7 +104,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             URLClassLoader classLoader = (URLClassLoader) Emulator.class.getClassLoader();
             Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             addUrlMethod.setAccessible(true);
-            File f = new File("./"+s);
+            File f = new File(Emulator.getAbsolutePath() + "/" + s);
             URL swtFileUrl = f.toURL();
             addUrlMethod.invoke(classLoader, swtFileUrl);
         }

@@ -4,7 +4,11 @@ import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
 
@@ -40,23 +44,6 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         loadM3G();
     }
 
-    private static void loadM3G() {
-        boolean m3gLoaded = false;
-        try {
-            Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
-            Field f = null;
-            try {
-                f = cls.getField("_STUB");
-                m3gLoaded = !f.getBoolean(null);
-            } catch (Throwable ignored) {
-                m3gLoaded = true;
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        System.out.println("m3g loaded: " + m3gLoaded);
-    }
-
     public boolean supportsMascotCapsule() {
         return true;
     }
@@ -74,5 +61,42 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public IGraphics3D getGraphics3D() {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
+    }
+
+    private void loadM3G() {
+        if(!supportsM3G()) return;
+        boolean m3gLoaded = false;
+        try {
+            Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
+            Field f = null;
+            try {
+                f = cls.getField("_STUB");
+                m3gLoaded = !f.getBoolean(null);
+            } catch (Throwable ignored) {
+                m3gLoaded = true;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        System.out.println("m3g loaded: " + m3gLoaded);
+        if(!m3gLoaded) {
+            // TODO setting
+            boolean swerve = false;
+            addToClassPath(swerve ? "m3g_swerve.jar" : "m3g_lwjgl.jar");
+        }
+    }
+
+    private static void addToClassPath(String s) {
+        try {
+            URLClassLoader classLoader = (URLClassLoader) Emulator.class.getClassLoader();
+            Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            addUrlMethod.setAccessible(true);
+            File f = new File(Emulator.getAbsolutePath() + "/" + s);
+            URL swtFileUrl = f.toURL();
+            addUrlMethod.invoke(classLoader, swtFileUrl);
+        }
+        catch(Exception e) {
+            throw new RuntimeException(s, e);
+        }
     }
 }
