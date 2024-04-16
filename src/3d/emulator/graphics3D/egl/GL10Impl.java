@@ -645,6 +645,7 @@ public class GL10Impl implements GL10, GL10Ext {
         }
         if (n == 5122) {
             // TODO short buffers
+            System.err.println("short buffers not supported!!!!");
             //GL11.glNormalPointer(n2, (ShortBuffer)buffer);
             return;
         }

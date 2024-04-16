@@ -754,7 +754,7 @@ public final class Emulator3D implements IGraphics3D {
             } else {
                 // TODO short buffers
                 System.err.println("short buffers not supported!!!!1");
-                throw new RuntimeException();
+//                throw new RuntimeException();
 //                var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
 //                var5.get(0, var5.getVertexCount(), var24);
 //                GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, true, 0, a.method523(var24, var4, var5.getVertexCount()));
@@ -770,7 +770,7 @@ public final class Emulator3D implements IGraphics3D {
             } else {
                 // TODO short buffers
                 System.err.println("short buffers not supported!!!!");
-                throw new RuntimeException();
+//                throw new RuntimeException();
 //                var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
 //                var5.get(0, var5.getVertexCount(), var24);
 //                GL11.glNormalPointer(0, a.method521(var24));
