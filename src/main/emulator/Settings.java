@@ -66,7 +66,7 @@ public final class Settings {
     public static boolean uei;
     public static boolean fpsCounter = true;
     public static boolean synchronizeKeyEvents = true;
-    public static boolean motorolaSoftKeyFix = true;
+    public static boolean motorolaSoftKeyFix = false;
     public static int g3d; // 0 - swerve, 1 - lwjgl
 
     public Settings() {
