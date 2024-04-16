@@ -79,12 +79,9 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             } catch (Throwable ignored) {
                 m3gLoaded = true;
             }
-        } catch (Throwable e) {
-        }
+        } catch (Throwable e) {}
         if(!m3gLoaded) {
-            // TODO setting
-            String s = Settings.g3d == 0 ? "m3g_swerve.jar" : "m3g_lwjgl.jar";
-            addToClassPath(s);
+            addToClassPath(Settings.g3d == 0 ? "m3g_swerve.jar" : "m3g_lwjgl.jar");
         } else {
             System.out.println("m3g preloaded");
         }

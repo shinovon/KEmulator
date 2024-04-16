@@ -32,7 +32,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 + "\tNokiaUI 1.4\n"
                 + "\tSprint 1.0\n"
                 + "\tWMA 1.0 (JSR120)\n"
-                + "\t(no 3d support)"
+                + "\tM3G 1.1 (JSR184)\n"
+                + "\tOpenGL ES (JSR239)"
                 ;
     }
 

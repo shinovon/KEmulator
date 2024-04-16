@@ -14,12 +14,10 @@
 -dontnote
 -dontwarn
 -defaultpackage 'kemnn'
--renamesourcefileattribute A
 
 #-dontshrink
 -dontoptimize
 #-optimizations !library/*,!class/*,!code/simplification/object
--allowaccessmodification
 #-optimizationpasses 2
 
 # APIS
@@ -28,8 +26,6 @@
 -keep class com.mascotcapsule.micro3d.v3 { public protected *; }
 
 -keep public class com.nokia.mid.** { public protected *; }
--keep public class com.nokia.mj.** { public protected *; }
--keep public class com.nokia.microedition.** { public protected *; }
 
 -keep public class com.samsung.util.* { public protected *; }
 
@@ -88,10 +84,7 @@
 
 -keep,allowshrinking public class org.objectweb.** { *; }
 
--keep,allowshrinking public class org.lwjgl.** { public protected *; }
-
-#-keep class com.sun.** { *; }
-#-keep class javax.** { *; }
+-keep class org.lwjgl.** { *; }
 
 # EMULATOR CLASSES
 -keep class emulator.Emulator { public static *; }

@@ -3,10 +3,9 @@
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
 -libraryjars '..\..\natives\swt-win32-x86.jar'
+-libraryjars '..\..\home\m3g_stub.jar'
 
 -target 1.8
-#-dontshrink
--dontoptimize
 -printmapping '.\mapping.txt'
 -overloadaggressively
 #-keeppackagenames **
@@ -15,7 +14,11 @@
 -dontnote
 -dontwarn
 -defaultpackage 'kemnn'
--renamesourcefileattribute A
+
+#-dontshrink
+-dontoptimize
+#-optimizations !library/*,!class/*,!code/simplification/object
+#-optimizationpasses 2
 
 # APIS
 -keep public class javax.microedition.** { public protected *; }
@@ -23,8 +26,6 @@
 -keep class com.mascotcapsule.micro3d.v3 { public protected *; }
 
 -keep public class com.nokia.mid.** { public protected *; }
--keep public class com.nokia.mj.** { public protected *; }
--keep public class com.nokia.microedition.** { public protected *; }
 
 -keep public class com.samsung.util.* { public protected *; }
 
@@ -85,25 +86,31 @@
 
 -keep class org.lwjgl.** { *; }
 
-#-keep class com.sun.** { *; }
-#-keep class javax.** { *; }
--keep public class com.jogamp.** { *; }
--keep public class gluegen.** { *; }
-
 # EMULATOR CLASSES
+-keep class emulator.Emulator { public static *; }
+
+# 2D
 -keep public class emulator.graphics2D.awt.* { public protected *; }
-
--keep class emulator.custom.subclass.* { *; }
-
--keep class emulator.custom.CustomMethod { public *; }
-
--keep class emulator.debug.Profiler { *; }
+-keep class emulator.graphics2D.IImage { *; }
 
 -keep class javazoom.jl.player.JavaSoundAudioDevice
 
+# Debug & custom
+-keep class emulator.debug.Memory { public static *; }
+-keep class emulator.debug.Profiler { *; }
+-keep class emulator.custom.subclass.* { *; }
+-keep class emulator.custom.CustomMethod { public *; }
+-keep class emulator.custom.CustomJarResources { public protected *; }
+
 -keep class emulator.i { *; }
 
--keep class emulator.Emulator { public static *; }
+# Interfaces
+-keep class emulator.ui.* { *; }
+
+# 3D
+-keep class emulator.graphics3D.** { public protected *; }
+-keep class emulator.graphics3D.IGraphics3D { *; }
+
 
 # Keep - Applications. Keep all application classes, along with their 'main' methods.
 -keepclasseswithmembers public class * {
