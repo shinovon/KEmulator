@@ -2,12 +2,6 @@ package javax.microedition.m3g;
 
 import emulator.graphics3D.b;
 import java.util.Vector;
-import javax.microedition.m3g.Camera;
-import javax.microedition.m3g.Node;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.RayIntersection;
-import javax.microedition.m3g.Transform;
-import javax.microedition.m3g.World;
 
 public class Group extends Node {
    Vector aVector931 = new Vector();
@@ -19,7 +13,7 @@ public class Group extends Node {
       for(int var2 = var1.getChildCount() - 1; var2 >= 0; --var2) {
          var1.removeReference(var1.getChild(var2));
          Node var3;
-         (var3 = (Node)var1.getChild(var2).duplicateObject()).aNode1303 = var1;
+         (var3 = (Node)var1.getChild(var2).duplicateObject()).parent = var1;
          var1.aVector931.set(var2, var3);
          var1.addReference(var3);
       }
@@ -34,7 +28,7 @@ public class Group extends Node {
          throw new IllegalArgumentException("child is this Group");
       } else if(var1 instanceof World) {
          throw new IllegalArgumentException("child is a World node");
-      } else if(var1.aNode1303 != null && var1.aNode1303 != this) {
+      } else if(var1.parent != null && var1.parent != this) {
          throw new IllegalArgumentException("child already has a parent other than this Group");
       } else if(var1.isParentOf(this)) {
          throw new IllegalArgumentException("child is an ancestor of this Group");
@@ -43,7 +37,7 @@ public class Group extends Node {
             this.aVector931.add(var1);
          }
 
-         var1.aNode1303 = this;
+         var1.parent = this;
          this.addReference(var1);
       }
    }
@@ -53,7 +47,7 @@ public class Group extends Node {
          if(var1.isSkinnedMeshBone()) {
             throw new IllegalArgumentException();
          } else {
-            var1.aNode1303 = null;
+            var1.parent = null;
             if(this.aVector931.contains(var1)) {
                this.aVector931.remove(var1);
                this.removeReference(var1);

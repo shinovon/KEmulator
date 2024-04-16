@@ -2,17 +2,14 @@ package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.b;
-import javax.microedition.m3g.Graphics3D;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.VertexArray;
 
 public class VertexBuffer extends Object3D {
-   private int anInt37 = -1;
-   private int anInt39 = 0;
+   private int defaultColor = -1;
+   private int vertexCount = 0;
    private int anInt40 = 0;
-   private VertexArray aVertexArray733 = null;
-   private VertexArray aVertexArray736 = null;
-   private VertexArray aVertexArray737 = null;
+   private VertexArray positions = null;
+   private VertexArray normals = null;
+   private VertexArray colors = null;
    private VertexArray[] aVertexArrayArray734;
    private float[] aFloatArray735;
    private float[][] aFloatArrayArray144;
@@ -38,7 +35,7 @@ public class VertexBuffer extends Object3D {
    }
 
    public int getVertexCount() {
-      return this.anInt39;
+      return this.vertexCount;
    }
 
    public void setPositions(VertexArray var1, float var2, float[] var3) {
@@ -46,17 +43,17 @@ public class VertexBuffer extends Object3D {
          throw new IllegalArgumentException();
       } else if(var1 != null && var3 != null && var3.length < 3) {
          throw new IllegalArgumentException();
-      } else if(var1 != null && this.anInt39 != 0 && var1.getVertexCount() != this.anInt39) {
+      } else if(var1 != null && this.vertexCount != 0 && var1.getVertexCount() != this.vertexCount) {
          throw new IllegalArgumentException();
       } else {
-         this.removeReference(this.aVertexArray733);
+         this.removeReference(this.positions);
          if(var1 != null) {
-            if(this.aVertexArray733 == null) {
+            if(this.positions == null) {
                ++this.anInt40;
             }
 
-            this.anInt39 = var1.getVertexCount();
-            this.aVertexArray733 = var1;
+            this.vertexCount = var1.getVertexCount();
+            this.positions = var1;
             this.aFloatArray735[0] = var2;
             if(var3 != null) {
                System.arraycopy(var3, 0, this.aFloatArray735, 1, 3);
@@ -65,20 +62,20 @@ public class VertexBuffer extends Object3D {
                this.aFloatArray735[2] = 0.0F;
                this.aFloatArray735[3] = 0.0F;
             }
-         } else if(this.aVertexArray733 != null) {
-            this.aVertexArray733 = null;
+         } else if(this.positions != null) {
+            this.positions = null;
             --this.anInt40;
-            this.anInt39 = this.anInt40 > 0?this.anInt39:0;
+            this.vertexCount = this.anInt40 > 0?this.vertexCount :0;
          }
 
-         this.addReference(this.aVertexArray733);
+         this.addReference(this.positions);
       }
    }
 
    public void setTexCoords(int var1, VertexArray var2, float var3, float[] var4) {
       if(var2 != null && var2.getComponentCount() != 2 && var2.getComponentCount() != 3) {
          throw new IllegalArgumentException();
-      } else if(var2 != null && this.anInt39 != 0 && var2.getVertexCount() != this.anInt39) {
+      } else if(var2 != null && this.vertexCount != 0 && var2.getVertexCount() != this.vertexCount) {
          throw new IllegalArgumentException();
       } else if(var2 != null && var4 != null && var4.length < var2.getComponentCount()) {
          throw new IllegalArgumentException();
@@ -89,7 +86,7 @@ public class VertexBuffer extends Object3D {
                ++this.anInt40;
             }
 
-            this.anInt39 = var2.getVertexCount();
+            this.vertexCount = var2.getVertexCount();
             this.aVertexArrayArray734[var1] = var2;
             this.aFloatArrayArray144[var1][0] = var3;
             this.aFloatArrayArray144[var1][1] = 0.0F;
@@ -101,7 +98,7 @@ public class VertexBuffer extends Object3D {
          } else if(this.aVertexArrayArray734[var1] != null) {
             this.aVertexArrayArray734[var1] = null;
             --this.anInt40;
-            this.anInt39 = this.anInt40 > 0?this.anInt39:0;
+            this.vertexCount = this.anInt40 > 0?this.vertexCount :0;
          }
 
          this.addReference(this.aVertexArrayArray734[var1]);
@@ -113,24 +110,24 @@ public class VertexBuffer extends Object3D {
    public void setNormals(VertexArray var1) {
       if(var1 != null && var1.getComponentCount() != 3) {
          throw new IllegalArgumentException();
-      } else if(var1 != null && this.anInt39 != 0 && var1.getVertexCount() != this.anInt39) {
+      } else if(var1 != null && this.vertexCount != 0 && var1.getVertexCount() != this.vertexCount) {
          throw new IllegalArgumentException();
       } else {
-         this.removeReference(this.aVertexArray736);
+         this.removeReference(this.normals);
          if(var1 != null) {
-            if(this.aVertexArray736 == null) {
+            if(this.normals == null) {
                ++this.anInt40;
             }
 
-            this.anInt39 = var1.getVertexCount();
-            this.aVertexArray736 = var1;
-         } else if(this.aVertexArray736 != null) {
-            this.aVertexArray736 = null;
+            this.vertexCount = var1.getVertexCount();
+            this.normals = var1;
+         } else if(this.normals != null) {
+            this.normals = null;
             --this.anInt40;
-            this.anInt39 = this.anInt40 > 0?this.anInt39:0;
+            this.vertexCount = this.anInt40 > 0?this.vertexCount :0;
          }
 
-         this.addReference(this.aVertexArray736);
+         this.addReference(this.normals);
       }
    }
 
@@ -139,24 +136,24 @@ public class VertexBuffer extends Object3D {
          throw new IllegalArgumentException();
       } else if(var1 != null && var1.getComponentCount() != 3 && var1.getComponentCount() != 4) {
          throw new IllegalArgumentException();
-      } else if(var1 != null && this.anInt39 != 0 && var1.getVertexCount() != this.anInt39) {
+      } else if(var1 != null && this.vertexCount != 0 && var1.getVertexCount() != this.vertexCount) {
          throw new IllegalArgumentException();
       } else {
-         this.removeReference(this.aVertexArray737);
+         this.removeReference(this.colors);
          if(var1 != null) {
-            if(this.aVertexArray737 == null) {
+            if(this.colors == null) {
                ++this.anInt40;
             }
 
-            this.anInt39 = var1.getVertexCount();
-            this.aVertexArray737 = var1;
-         } else if(this.aVertexArray737 != null) {
-            this.aVertexArray737 = null;
+            this.vertexCount = var1.getVertexCount();
+            this.colors = var1;
+         } else if(this.colors != null) {
+            this.colors = null;
             --this.anInt40;
-            this.anInt39 = this.anInt40 > 0?this.anInt39:0;
+            this.vertexCount = this.anInt40 > 0?this.vertexCount :0;
          }
 
-         this.addReference(this.aVertexArray737);
+         this.addReference(this.colors);
       }
    }
 
@@ -164,11 +161,11 @@ public class VertexBuffer extends Object3D {
       if(var1 != null && var1.length < 4) {
          throw new IllegalArgumentException();
       } else {
-         if(this.aVertexArray733 != null && var1 != null) {
+         if(this.positions != null && var1 != null) {
             System.arraycopy(this.aFloatArray735, 0, var1, 0, 4);
          }
 
-         return this.aVertexArray733;
+         return this.positions;
       }
    }
 
@@ -189,30 +186,30 @@ public class VertexBuffer extends Object3D {
    }
 
    public VertexArray getNormals() {
-      return this.aVertexArray736;
+      return this.normals;
    }
 
    public VertexArray getColors() {
-      return this.aVertexArray737;
+      return this.colors;
    }
 
    public void setDefaultColor(int var1) {
-      this.anInt37 = var1;
+      this.defaultColor = var1;
    }
 
    public int getDefaultColor() {
-      return this.anInt37;
+      return this.defaultColor;
    }
 
    protected void updateProperty(int var1, float[] var2) {
       switch(var1) {
       case 256:
-         this.anInt37 &= 16777215;
-         this.anInt37 |= G3DUtils.method603(var2) & -16777216;
+         this.defaultColor &= 16777215;
+         this.defaultColor |= G3DUtils.getIntColor(var2) & -16777216;
          return;
       case 258:
-         this.anInt37 &= -16777216;
-         this.anInt37 |= G3DUtils.method603(var2) & 16777215;
+         this.defaultColor &= -16777216;
+         this.defaultColor |= G3DUtils.getIntColor(var2) & 16777215;
          return;
       default:
          super.updateProperty(var1, var2);
@@ -220,23 +217,23 @@ public class VertexBuffer extends Object3D {
    }
 
    protected boolean getNormalVertex(int var1, b var2) {
-      if(this.aVertexArray736 == null) {
+      if(this.normals == null) {
          return false;
       } else {
          b var10000;
          float var10001;
          float var10002;
          short var10003;
-         if(this.aVertexArray736.getComponentType() == 1) {
+         if(this.normals.getComponentType() == 1) {
             byte[] var3 = new byte[3];
-            this.aVertexArray736.get(var1, 1, var3);
+            this.normals.get(var1, 1, var3);
             var10000 = var2;
             var10001 = (float)var3[0];
             var10002 = (float)var3[1];
             var10003 = var3[2];
          } else {
             short[] var4 = new short[3];
-            this.aVertexArray736.get(var1, 1, var4);
+            this.normals.get(var1, 1, var4);
             var10000 = var2;
             var10001 = (float)var4[0];
             var10002 = (float)var4[1];
@@ -254,13 +251,13 @@ public class VertexBuffer extends Object3D {
       short var10000;
       float var5;
       float var6;
-      if(this.aVertexArray733.getComponentType() == 1) {
-         this.aVertexArray733.get(var1, 1, var3);
+      if(this.positions.getComponentType() == 1) {
+         this.positions.get(var1, 1, var3);
          var5 = (float)var3[0];
          var6 = (float)var3[1];
          var10000 = var3[2];
       } else {
-         this.aVertexArray733.get(var1, 1, var4);
+         this.positions.get(var1, 1, var4);
          var5 = (float)var4[0];
          var6 = (float)var4[1];
          var10000 = var4[2];

@@ -1,37 +1,36 @@
 package javax.microedition.m3g;
 
-import emulator.graphics3D.c;
-import javax.microedition.m3g.VertexArray;
+import emulator.graphics3D.TransformImpl;
 
 public class Transform {
-   private c ac1306;
+   private TransformImpl impl;
 
    public Transform() {
-      this.ac1306 = new c();
+      this.impl = new TransformImpl();
    }
 
    public Transform(Transform var1) {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.ac1306 = new c();
-         this.ac1306.method434(var1.ac1306);
+         this.impl = new TransformImpl();
+         this.impl.copy(var1.impl);
       }
    }
 
-   public c getImpl() {
-      return this.ac1306;
+   public TransformImpl getImpl() {
+      return this.impl;
    }
 
    public void setIdentity() {
-      this.ac1306.method432();
+      this.impl.reset();
    }
 
    public void set(Transform var1) {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.ac1306.method434(var1.ac1306);
+         this.impl.copy(var1.impl);
       }
    }
 
@@ -41,7 +40,7 @@ public class Transform {
       } else if(var1.length < 16) {
          throw new IllegalArgumentException();
       } else {
-         this.ac1306.method441(var1);
+         this.impl.set(var1);
       }
    }
 
@@ -51,39 +50,39 @@ public class Transform {
       } else if(var1.length < 16) {
          throw new IllegalArgumentException();
       } else {
-         this.ac1306.method433(var1);
+         this.impl.get(var1);
       }
    }
 
    public void invert() {
-      this.ac1306.method442();
+      this.impl.method442();
    }
 
    public void transpose() {
-      this.ac1306.method447();
+      this.impl.method447();
    }
 
    public void postMultiply(Transform var1) {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.ac1306.method436(var1.ac1306, false);
+         this.impl.method436(var1.impl, false);
       }
    }
 
    public void preMultiply(Transform var1) {
-      this.ac1306.method436(var1.ac1306, true);
+      this.impl.method436(var1.impl, true);
    }
 
    public void postScale(float var1, float var2, float var3) {
-      this.ac1306.method438(var1, var2, var3);
+      this.impl.method438(var1, var2, var3);
    }
 
    public void postRotate(float var1, float var2, float var3, float var4) {
       if(var2 == 0.0F && var3 == 0.0F && var4 == 0.0F && var1 != 0.0F) {
          throw new IllegalArgumentException();
       } else {
-         this.ac1306.method437(var1, var2, var3, var4);
+         this.impl.method437(var1, var2, var3, var4);
       }
    }
 
@@ -91,12 +90,12 @@ public class Transform {
       if(var3 == 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
          throw new IllegalArgumentException();
       } else {
-         this.ac1306.method443(var1, var2, var3, var4);
+         this.impl.method443(var1, var2, var3, var4);
       }
    }
 
    public void postTranslate(float var1, float var2, float var3) {
-      this.ac1306.method444(var1, var2, var3);
+      this.impl.method444(var1, var2, var3);
    }
 
    public void transform(VertexArray var1, float[] var2, boolean var3) {
@@ -132,7 +131,7 @@ public class Transform {
                }
             }
 
-            this.ac1306.method446(var2);
+            this.impl.method446(var2);
          } else {
             throw new IllegalArgumentException();
          }
@@ -147,7 +146,7 @@ public class Transform {
       } else if(var1.length % 4 != 0) {
          throw new IllegalArgumentException();
       } else {
-         this.ac1306.method446(var1);
+         this.impl.method446(var1);
       }
    }
 }

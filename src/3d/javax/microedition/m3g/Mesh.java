@@ -2,20 +2,11 @@ package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.b;
-import javax.microedition.m3g.Appearance;
-import javax.microedition.m3g.Graphics3D;
-import javax.microedition.m3g.IndexBuffer;
-import javax.microedition.m3g.Node;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.RayIntersection;
-import javax.microedition.m3g.Transform;
-import javax.microedition.m3g.TriangleStripArray;
-import javax.microedition.m3g.VertexBuffer;
 
 public class Mesh extends Node {
    protected VertexBuffer m_vertices;
    private IndexBuffer[] anIndexBufferArray888;
-   private Appearance[] anAppearanceArray889;
+   private Appearance[] appearances;
 
    public Mesh(VertexBuffer var1, IndexBuffer var2, Appearance var3) {
       if(var1 != null && var2 != null) {
@@ -24,10 +15,10 @@ public class Mesh extends Node {
          this.anIndexBufferArray888[0] = var2;
          this.addReference(this.m_vertices);
          this.addReference(this.anIndexBufferArray888[0]);
-         this.anAppearanceArray889 = new Appearance[1];
+         this.appearances = new Appearance[1];
          if(var3 != null) {
-            this.anAppearanceArray889[0] = var3;
-            this.addReference(this.anAppearanceArray889[0]);
+            this.appearances[0] = var3;
+            this.addReference(this.appearances[0]);
          }
 
       } else {
@@ -41,7 +32,7 @@ public class Mesh extends Node {
             this.m_vertices = var1;
             this.addReference(this.m_vertices);
             this.anIndexBufferArray888 = new IndexBuffer[var2.length];
-            this.anAppearanceArray889 = new Appearance[var2.length];
+            this.appearances = new Appearance[var2.length];
 
             for(int var4 = var2.length - 1; var4 >= 0; --var4) {
                if(var2[var4] == null) {
@@ -51,8 +42,8 @@ public class Mesh extends Node {
                this.anIndexBufferArray888[var4] = var2[var4];
                this.addReference(this.anIndexBufferArray888[var4]);
                if(var3 != null) {
-                  this.anAppearanceArray889[var4] = var3[var4];
-                  this.addReference(this.anAppearanceArray889[var4]);
+                  this.appearances[var4] = var3[var4];
+                  this.addReference(this.appearances[var4]);
                }
             }
 
@@ -67,15 +58,15 @@ public class Mesh extends Node {
    protected Object3D duplicateObject() {
       Mesh var1;
       (var1 = (Mesh)super.duplicateObject()).anIndexBufferArray888 = (IndexBuffer[])this.anIndexBufferArray888.clone();
-      var1.anAppearanceArray889 = (Appearance[])this.anAppearanceArray889.clone();
+      var1.appearances = (Appearance[])this.appearances.clone();
       return var1;
    }
 
    public void setAppearance(int var1, Appearance var2) {
       if(var1 >= 0 && var1 < this.anIndexBufferArray888.length) {
-         this.removeReference(this.anAppearanceArray889[var1]);
-         this.anAppearanceArray889[var1] = var2;
-         this.addReference(this.anAppearanceArray889[var1]);
+         this.removeReference(this.appearances[var1]);
+         this.appearances[var1] = var2;
+         this.addReference(this.appearances[var1]);
       } else {
          throw new IndexOutOfBoundsException();
       }
@@ -83,7 +74,7 @@ public class Mesh extends Node {
 
    public Appearance getAppearance(int var1) {
       if(var1 >= 0 && var1 < this.anIndexBufferArray888.length) {
-         return this.anAppearanceArray889[var1];
+         return this.appearances[var1];
       } else {
          throw new IndexOutOfBoundsException();
       }
@@ -110,7 +101,7 @@ public class Mesh extends Node {
    }
 
    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4, VertexBuffer var5) {
-      if(var5 != null && this.anAppearanceArray889 != null && this.anIndexBufferArray888 != null) {
+      if(var5 != null && this.appearances != null && this.anIndexBufferArray888 != null) {
          if(var5.getPositions((float[])null) == null) {
             throw new IllegalStateException("No vertex positions");
          } else {
@@ -137,13 +128,13 @@ public class Mesh extends Node {
             float[] var19 = null;
 
             for(int var20 = 0; var20 < this.anIndexBufferArray888.length; ++var20) {
-               if(this.anAppearanceArray889[var20] != null && this.anIndexBufferArray888[var20] != null) {
+               if(this.appearances[var20] != null && this.anIndexBufferArray888[var20] != null) {
                   int var21;
-                  if(this.anAppearanceArray889[var20].getPolygonMode() != null) {
+                  if(this.appearances[var20].getPolygonMode() != null) {
                      label120: {
-                        var21 = this.anAppearanceArray889[var20].getPolygonMode().getWinding() != 168?1:0;
+                        var21 = this.appearances[var20].getPolygonMode().getWinding() != 168?1:0;
                         int var10000;
-                        switch(this.anAppearanceArray889[var20].getPolygonMode().getCulling()) {
+                        switch(this.appearances[var20].getPolygonMode().getCulling()) {
                         case 161:
                            var10000 = var21 ^ 1;
                            break;
@@ -195,8 +186,8 @@ public class Mesh extends Node {
                               var13.aFloat610 = var10.aFloat610 * (1.0F - (var14.aFloat610 + var14.aFloat612)) + var11.aFloat610 * var14.aFloat610 + var12.aFloat610 * var14.aFloat612;
                               var13.aFloat612 = 0.0F;
                               var13.aFloat614 = 1.0F;
-                              if(this.anAppearanceArray889[var20] != null && this.anAppearanceArray889[var20].getTexture(var25) != null) {
-                                 this.anAppearanceArray889[var20].getTexture(var25).getCompositeTransform(var15);
+                              if(this.appearances[var20] != null && this.appearances[var20].getTexture(var25) != null) {
+                                 this.appearances[var20].getTexture(var25).getCompositeTransform(var15);
                                  var15.getImpl().method440(var13);
                                  var13.method425(1.0F / var13.aFloat614);
                               }

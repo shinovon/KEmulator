@@ -3,16 +3,6 @@ package javax.microedition.m3g;
 import emulator.graphics3D.m3g.e;
 import emulator.graphics3D.m3g.h;
 import java.util.Vector;
-import javax.microedition.m3g.Appearance;
-import javax.microedition.m3g.Group;
-import javax.microedition.m3g.IndexBuffer;
-import javax.microedition.m3g.Mesh;
-import javax.microedition.m3g.Node;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.RayIntersection;
-import javax.microedition.m3g.Transform;
-import javax.microedition.m3g.VertexBuffer;
-import javax.microedition.m3g.World;
 
 public class SkinnedMesh extends Mesh {
    Group aGroup1203;
@@ -24,7 +14,7 @@ public class SkinnedMesh extends Mesh {
          throw new NullPointerException();
       } else if(!(var4 instanceof World) && var4.getParent() == null) {
          this.aGroup1203 = var4;
-         this.aGroup1203.aNode1303 = this;
+         this.aGroup1203.parent = this;
          this.addReference(this.aGroup1203);
          this.m_transforms = new Vector();
       } else {
@@ -36,7 +26,7 @@ public class SkinnedMesh extends Mesh {
       super(var1, var2, var3);
       if(!(var4 instanceof World) && var4.getParent() == null) {
          this.aGroup1203 = var4;
-         this.aGroup1203.aNode1303 = this;
+         this.aGroup1203.parent = this;
          this.addReference(this.aGroup1203);
          this.m_transforms = new Vector();
       } else {
@@ -52,7 +42,7 @@ public class SkinnedMesh extends Mesh {
       SkinnedMesh var1;
       Group var2 = (Group)(var1 = (SkinnedMesh)super.duplicateObject()).getSkeleton().duplicateObject();
       var1.removeReference(var1.aGroup1203);
-      var2.aNode1303 = var1;
+      var2.parent = var1;
       var1.aGroup1203 = var2;
       var1.addReference(var2);
       var1.m_transforms = (Vector)this.m_transforms.clone();
@@ -156,8 +146,8 @@ public class SkinnedMesh extends Mesh {
    }
 
    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
-      e.method777().method779(this);
-      e.method777().method778();
-      return super.rayIntersect(var1, var2, var3, var4, e.method777().aVertexBuffer1124);
+      e.getInstance().method779(this);
+      e.getInstance().method778();
+      return super.rayIntersect(var1, var2, var3, var4, e.getInstance().aVertexBuffer1124);
    }
 }

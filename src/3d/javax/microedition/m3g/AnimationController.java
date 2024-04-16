@@ -1,76 +1,74 @@
 package javax.microedition.m3g;
 
-import javax.microedition.m3g.Object3D;
-
 public class AnimationController extends Object3D {
-   private int anInt37 = 0;
-   private int anInt39 = 0;
-   private int anInt40 = 0;
+   private int activeIntervalStart = 0;
+   private int activeIntervalEnd = 0;
+   private int refWorldTime = 0;
    private float aFloat681 = 0.0F;
-   private float aFloat682 = 1.0F;
-   private float aFloat683 = 1.0F;
+   private float weight = 1.0F;
+   private float speed = 1.0F;
 
    public void setActiveInterval(int var1, int var2) {
       if(var1 > var2) {
          throw new IllegalArgumentException();
       } else {
-         this.anInt37 = var1;
-         this.anInt39 = var2;
+         this.activeIntervalStart = var1;
+         this.activeIntervalEnd = var2;
       }
    }
 
    public int getActiveIntervalStart() {
-      return this.anInt37;
+      return this.activeIntervalStart;
    }
 
    public int getActiveIntervalEnd() {
-      return this.anInt39;
+      return this.activeIntervalEnd;
    }
 
    public void setSpeed(float var1, int var2) {
       this.aFloat681 = this.getPosition(var2);
-      this.anInt40 = var2;
-      this.aFloat683 = var1;
+      this.refWorldTime = var2;
+      this.speed = var1;
    }
 
    public float getSpeed() {
-      return this.aFloat683;
+      return this.speed;
    }
 
    public void setPosition(float var1, int var2) {
       this.aFloat681 = var1;
-      this.anInt40 = var2;
+      this.refWorldTime = var2;
    }
 
    public float getPosition(int var1) {
-      return this.aFloat681 + this.aFloat683 * (float)(var1 - this.anInt40);
+      return this.aFloat681 + this.speed * (float)(var1 - this.refWorldTime);
    }
 
    public int getRefWorldTime() {
-      return this.anInt40;
+      return this.refWorldTime;
    }
 
    public void setWeight(float var1) {
       if(var1 < 0.0F) {
          throw new IllegalArgumentException();
       } else {
-         this.aFloat682 = var1;
+         this.weight = var1;
       }
    }
 
    public float getWeight() {
-      return this.aFloat682;
+      return this.weight;
    }
 
    protected boolean isActive(int var1) {
-      return this.anInt37 == this.anInt39?true:var1 >= this.anInt37 && var1 < this.anInt39;
+      return this.activeIntervalStart == this.activeIntervalEnd ?true:var1 >= this.activeIntervalStart && var1 < this.activeIntervalEnd;
    }
 
    protected int timeToActivation(int var1) {
-      return var1 < this.anInt37?this.anInt37 - var1:(var1 >= this.anInt39?Integer.MAX_VALUE:0);
+      return var1 < this.activeIntervalStart ?this.activeIntervalStart - var1:(var1 >= this.activeIntervalEnd ?Integer.MAX_VALUE:0);
    }
 
    protected int timeToDeactivation(int var1) {
-      return var1 < this.anInt39?this.anInt39 - var1:Integer.MAX_VALUE;
+      return var1 < this.activeIntervalEnd ?this.activeIntervalEnd - var1:Integer.MAX_VALUE;
    }
 }

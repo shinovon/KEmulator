@@ -1,22 +1,18 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import javax.microedition.m3g.Node;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.RayIntersection;
-import javax.microedition.m3g.Transform;
 
 public class Camera extends Node {
    public static final int GENERIC = 48;
    public static final int PARALLEL = 49;
    public static final int PERSPECTIVE = 50;
-   private int anInt37 = 48;
-   private Transform aTransform917 = new Transform();
+   private int projection = 48;
+   private Transform generic = new Transform();
    private float[] aFloatArray918 = new float[4];
 
    protected Object3D duplicateObject() {
       Camera var1;
-      (var1 = (Camera)super.duplicateObject()).aTransform917 = new Transform(this.aTransform917);
+      (var1 = (Camera)super.duplicateObject()).generic = new Transform(this.generic);
       var1.aFloatArray918 = (float[])this.aFloatArray918.clone();
       return var1;
    }
@@ -34,7 +30,7 @@ public class Camera extends Node {
          this.aFloatArray918[1] = var2;
          this.aFloatArray918[2] = var3;
          this.aFloatArray918[3] = var4;
-         this.anInt37 = 49;
+         this.projection = 49;
       } else {
          throw new IllegalArgumentException();
       }
@@ -46,7 +42,7 @@ public class Camera extends Node {
          this.aFloatArray918[1] = var2;
          this.aFloatArray918[2] = var3;
          this.aFloatArray918[3] = var4;
-         this.anInt37 = 50;
+         this.projection = 50;
       } else {
          throw new IllegalArgumentException();
       }
@@ -56,7 +52,7 @@ public class Camera extends Node {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.aTransform917.set(var1);
+         this.generic.set(var1);
       }
    }
 
@@ -66,7 +62,7 @@ public class Camera extends Node {
          float var3;
          float var4;
          float[] var5;
-         if(this.anInt37 == 49) {
+         if(this.projection == 49) {
             var2 = this.aFloatArray918[0];
             var3 = this.aFloatArray918[1] * var2;
             if((var4 = this.aFloatArray918[3] - this.aFloatArray918[2]) == 0.0F) {
@@ -79,7 +75,7 @@ public class Camera extends Node {
             var5[11] = -(this.aFloatArray918[2] + this.aFloatArray918[3]) / var4;
             var5[15] = 1.0F;
             var1.set(var5);
-         } else if(this.anInt37 == 50) {
+         } else if(this.projection == 50) {
             var2 = (float)Math.tan(Math.toRadians((double)(this.aFloatArray918[0] / 2.0F)));
             var3 = this.aFloatArray918[1] * var2;
             if((var4 = this.aFloatArray918[3] - this.aFloatArray918[2]) == 0.0F) {
@@ -93,40 +89,40 @@ public class Camera extends Node {
             var5[14] = -1.0F;
             var1.set(var5);
          } else {
-            var1.set(this.aTransform917);
+            var1.set(this.generic);
          }
       }
 
-      return this.anInt37;
+      return this.projection;
    }
 
    public int getProjection(float[] var1) {
       if(var1 != null && var1.length < 4) {
          throw new IllegalArgumentException();
       } else {
-         if(var1 != null && this.anInt37 != 48) {
+         if(var1 != null && this.projection != 48) {
             System.arraycopy(this.aFloatArray918, 0, var1, 0, 4);
          }
 
-         return this.anInt37;
+         return this.projection;
       }
    }
 
    protected void updateProperty(int var1, float[] var2) {
-      if(this.anInt37 != 48) {
+      if(this.projection != 48) {
          switch(var1) {
          case 263:
-            this.aFloatArray918[3] = this.anInt37 != 50?var2[0]:G3DUtils.method604(var2[0]);
+            this.aFloatArray918[3] = this.projection != 50?var2[0]:G3DUtils.method604(var2[0]);
             return;
          case 264:
-            this.aFloatArray918[0] = this.anInt37 != 50?G3DUtils.method604(var2[0]):G3DUtils.method605(var2[0], 0.0F, 180.0F);
+            this.aFloatArray918[0] = this.projection != 50?G3DUtils.method604(var2[0]):G3DUtils.method605(var2[0], 0.0F, 180.0F);
             return;
          case 265:
          case 266:
          default:
             break;
          case 267:
-            this.aFloatArray918[2] = this.anInt37 != 50?var2[0]:G3DUtils.method604(var2[0]);
+            this.aFloatArray918[2] = this.projection != 50?var2[0]:G3DUtils.method604(var2[0]);
             return;
          }
       }

@@ -1,7 +1,6 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import javax.microedition.m3g.Object3D;
 
 public class Fog extends Object3D {
    public static final int EXPONENTIAL = 80;
@@ -60,7 +59,7 @@ public class Fog extends Object3D {
    protected void updateProperty(int var1, float[] var2) {
       switch(var1) {
       case 258:
-         this.anInt39 = G3DUtils.method603(var2);
+         this.anInt39 = G3DUtils.getIntColor(var2);
          return;
       case 259:
       case 261:

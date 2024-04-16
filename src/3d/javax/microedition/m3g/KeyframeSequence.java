@@ -1,7 +1,6 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.a;
-import javax.microedition.m3g.Object3D;
 
 public class KeyframeSequence extends Object3D {
    public static final int CONSTANT = 192;
@@ -11,15 +10,15 @@ public class KeyframeSequence extends Object3D {
    public static final int SPLINE = 178;
    public static final int SQUAD = 179;
    public static final int STEP = 180;
-   private int anInt37;
-   private int anInt39;
-   private int anInt40;
+   private int keyframeCount;
+   private int componentCount;
+   private int interpolationType;
    private float[][] aFloatArrayArray144;
-   private int[] anIntArray145;
-   private int anInt150;
-   private int anInt151;
-   private int anInt152;
-   private int anInt153;
+   private int[] keyframes;
+   private int validRangeFirst;
+   private int validRangeLast;
+   private int duration;
+   private int repeatMode;
    private boolean aBoolean36;
    private float[][] aFloatArrayArray147;
    private float[][] aFloatArrayArray149;
@@ -28,23 +27,23 @@ public class KeyframeSequence extends Object3D {
 
    protected Object3D duplicateObject() {
       KeyframeSequence var1;
-      (var1 = (KeyframeSequence)super.duplicateObject()).anIntArray145 = (int[])this.anIntArray145.clone();
-      var1.aFloatArrayArray144 = new float[this.anInt37][this.anInt39];
+      (var1 = (KeyframeSequence)super.duplicateObject()).keyframes = (int[])this.keyframes.clone();
+      var1.aFloatArrayArray144 = new float[this.keyframeCount][this.componentCount];
       int var2;
-      if(this.anInt40 == 179) {
+      if(this.interpolationType == 179) {
          for(var2 = 0; var2 < this.anaArray146.length; ++var2) {
             var1.anaArray146[var2] = new a(this.anaArray146[var2]);
             var1.anaArray148[var2] = new a(this.anaArray148[var2]);
          }
 
-         for(var2 = 0; var2 < this.anInt37; ++var2) {
+         for(var2 = 0; var2 < this.keyframeCount; ++var2) {
             var1.aFloatArrayArray144[var2] = (float[])this.aFloatArrayArray144[var2].clone();
          }
-      } else if(this.anInt40 == 178) {
-         var1.aFloatArrayArray147 = new float[this.anInt37][this.anInt39];
-         var1.aFloatArrayArray149 = new float[this.anInt37][this.anInt39];
+      } else if(this.interpolationType == 178) {
+         var1.aFloatArrayArray147 = new float[this.keyframeCount][this.componentCount];
+         var1.aFloatArrayArray149 = new float[this.keyframeCount][this.componentCount];
 
-         for(var2 = 0; var2 < this.anInt37; ++var2) {
+         for(var2 = 0; var2 < this.keyframeCount; ++var2) {
             var1.aFloatArrayArray147[var2] = (float[])this.aFloatArrayArray147[var2].clone();
             var1.aFloatArrayArray149[var2] = (float[])this.aFloatArrayArray149[var2].clone();
             var1.aFloatArrayArray144[var2] = (float[])this.aFloatArrayArray144[var2].clone();
@@ -59,21 +58,21 @@ public class KeyframeSequence extends Object3D {
          if((var3 == 177 || var3 == 179) && var2 != 4) {
             throw new IllegalArgumentException();
          } else {
-            this.anInt37 = var1;
-            this.anInt39 = var2;
-            this.anInt40 = var3;
+            this.keyframeCount = var1;
+            this.componentCount = var2;
+            this.interpolationType = var3;
             this.aFloatArrayArray144 = new float[var1][var2];
-            this.anIntArray145 = new int[var1];
-            this.anInt153 = 192;
-            this.anInt150 = 0;
-            this.anInt151 = this.anInt37 - 1;
-            this.anInt152 = 0;
+            this.keyframes = new int[var1];
+            this.repeatMode = 192;
+            this.validRangeFirst = 0;
+            this.validRangeLast = this.keyframeCount - 1;
+            this.duration = 0;
             this.aBoolean36 = false;
-            if(this.anInt40 == 178) {
+            if(this.interpolationType == 178) {
                this.aFloatArrayArray147 = new float[var1][var2];
                this.aFloatArrayArray149 = new float[var1][var2];
             } else {
-               if(this.anInt40 == 179) {
+               if(this.interpolationType == 179) {
                   this.anaArray146 = new a[var1];
                   this.anaArray148 = new a[var1];
 
@@ -95,25 +94,25 @@ public class KeyframeSequence extends Object3D {
    }
 
    public int getComponentCount() {
-      return this.anInt39;
+      return this.componentCount;
    }
 
    public int getKeyframeCount() {
-      return this.anInt37;
+      return this.keyframeCount;
    }
 
    public int getInterpolationType() {
-      return this.anInt40;
+      return this.interpolationType;
    }
 
    public void setKeyframe(int var1, int var2, float[] var3) {
       if(var3 == null) {
          throw new NullPointerException();
-      } else if(var1 >= 0 && var1 < this.anInt37) {
-         if(var2 >= 0 && var3.length >= this.anInt39) {
-            this.anIntArray145[var1] = var2;
+      } else if(var1 >= 0 && var1 < this.keyframeCount) {
+         if(var2 >= 0 && var3.length >= this.componentCount) {
+            this.keyframes[var1] = var2;
             float[] var4 = this.aFloatArrayArray144[var1];
-            if(this.anInt40 != 177 && this.anInt40 != 179) {
+            if(this.interpolationType != 177 && this.interpolationType != 179) {
                System.arraycopy(var3, 0, var4, 0, var4.length);
             } else {
                a var5;
@@ -134,15 +133,15 @@ public class KeyframeSequence extends Object3D {
    }
 
    public int getKeyframe(int var1, float[] var2) {
-      if(var1 >= 0 && var1 < this.anInt37) {
-         if(var2 != null && var2.length < this.anInt39) {
+      if(var1 >= 0 && var1 < this.keyframeCount) {
+         if(var2 != null && var2.length < this.componentCount) {
             throw new IllegalArgumentException();
          } else {
             if(var2 != null) {
-               System.arraycopy(this.aFloatArrayArray144[var1], 0, var2, 0, this.anInt39);
+               System.arraycopy(this.aFloatArrayArray144[var1], 0, var2, 0, this.componentCount);
             }
 
-            return this.anIntArray145[var1];
+            return this.keyframes[var1];
          }
       } else {
          throw new IndexOutOfBoundsException();
@@ -150,9 +149,9 @@ public class KeyframeSequence extends Object3D {
    }
 
    public void setValidRange(int var1, int var2) {
-      if(var1 >= 0 && var1 < this.anInt37 && var2 >= 0 && var2 < this.anInt37) {
-         this.anInt150 = var1;
-         this.anInt151 = var2;
+      if(var1 >= 0 && var1 < this.keyframeCount && var2 >= 0 && var2 < this.keyframeCount) {
+         this.validRangeFirst = var1;
+         this.validRangeLast = var2;
          this.aBoolean36 = false;
       } else {
          throw new IndexOutOfBoundsException();
@@ -160,26 +159,26 @@ public class KeyframeSequence extends Object3D {
    }
 
    public int getValidRangeFirst() {
-      return this.anInt150;
+      return this.validRangeFirst;
    }
 
    public int getValidRangeLast() {
-      return this.anInt151;
+      return this.validRangeLast;
    }
 
    public void setDuration(int var1) {
-      this.anInt152 = var1;
+      this.duration = var1;
    }
 
    public int getDuration() {
-      return this.anInt152;
+      return this.duration;
    }
 
    public void setRepeatMode(int var1) {
       if(var1 != 192 && var1 != 193) {
          throw new IllegalArgumentException();
       } else {
-         this.anInt153 = var1;
+         this.repeatMode = var1;
          if(this.aBoolean36) {
             this.method122();
          }
@@ -188,7 +187,7 @@ public class KeyframeSequence extends Object3D {
    }
 
    public int getRepeatMode() {
-      return this.anInt153;
+      return this.repeatMode;
    }
 
    protected int getSampleFrame(float var1, float[] var2) {
@@ -197,36 +196,36 @@ public class KeyframeSequence extends Object3D {
       }
 
       float var4;
-      if(this.anInt153 == 193) {
-         if((var1 = var1 < 0.0F?var1 % (float)this.anInt152 + (float)this.anInt152:var1 % (float)this.anInt152) < (float)this.anIntArray145[this.anInt150]) {
-            var1 += (float)this.anInt152;
+      if(this.repeatMode == 193) {
+         if((var1 = var1 < 0.0F?var1 % (float)this.duration + (float)this.duration :var1 % (float)this.duration) < (float)this.keyframes[this.validRangeFirst]) {
+            var1 += (float)this.duration;
          }
       } else {
          float[] var6;
-         if(var1 < (float)this.anIntArray145[this.anInt150]) {
-            System.arraycopy(var6 = this.aFloatArrayArray144[this.anInt150], 0, var2, 0, var6.length);
-            if((var4 = (float)this.anIntArray145[this.anInt150] - var1) <= 2.14748365E9F) {
+         if(var1 < (float)this.keyframes[this.validRangeFirst]) {
+            System.arraycopy(var6 = this.aFloatArrayArray144[this.validRangeFirst], 0, var2, 0, var6.length);
+            if((var4 = (float)this.keyframes[this.validRangeFirst] - var1) <= 2.14748365E9F) {
                return (int)var4;
             }
 
             return Integer.MAX_VALUE;
          }
 
-         if(var1 >= (float)this.anIntArray145[this.anInt151]) {
-            System.arraycopy(var6 = this.aFloatArrayArray144[this.anInt151], 0, var2, 0, var6.length);
+         if(var1 >= (float)this.keyframes[this.validRangeLast]) {
+            System.arraycopy(var6 = this.aFloatArrayArray144[this.validRangeLast], 0, var2, 0, var6.length);
             return Integer.MAX_VALUE;
          }
       }
 
-      int var10000 = this.anInt150;
+      int var10000 = this.validRangeFirst;
 
       while(true) {
          int var3 = var10000;
-         if(var10000 == this.anInt151 || (float)this.anIntArray145[this.method13(var3)] > var1) {
-            if(var1 - (float)this.anIntArray145[var3] >= 1.0E-5F && this.anInt40 != 180) {
-               var4 = (var1 - (float)this.anIntArray145[var3]) / (float)this.method120(var3);
+         if(var10000 == this.validRangeLast || (float)this.keyframes[this.method13(var3)] > var1) {
+            if(var1 - (float)this.keyframes[var3] >= 1.0E-5F && this.interpolationType != 180) {
+               var4 = (var1 - (float)this.keyframes[var3]) / (float)this.method120(var3);
                int var5 = this.method13(var3);
-               switch(this.anInt40) {
+               switch(this.interpolationType) {
                case 176:
                   this.method111(var2, var4, var3, var5);
                   break;
@@ -245,8 +244,8 @@ public class KeyframeSequence extends Object3D {
 
                return 1;
             } else {
-               System.arraycopy(this.aFloatArrayArray144[var3], 0, var2, 0, this.anInt39);
-               return this.anInt40 != 180?1:(int)((float)this.method120(var3) - (var1 - (float)this.anIntArray145[var3]));
+               System.arraycopy(this.aFloatArrayArray144[var3], 0, var2, 0, this.componentCount);
+               return this.interpolationType != 180?1:(int)((float)this.method120(var3) - (var1 - (float)this.keyframes[var3]));
             }
          }
 
@@ -255,21 +254,21 @@ public class KeyframeSequence extends Object3D {
    }
 
    private void method110() {
-      if(this.anInt152 <= 0) {
+      if(this.duration <= 0) {
          throw new IllegalStateException();
       } else {
-         int var10000 = this.anInt150;
+         int var10000 = this.validRangeFirst;
 
          while(true) {
             int var1 = var10000;
-            if(var10000 == this.anInt151) {
+            if(var10000 == this.validRangeLast) {
                this.aBoolean36 = true;
                this.method122();
                return;
             }
 
-            int var2 = var1 >= this.anIntArray145.length - 1?0:var1 + 1;
-            if(this.anIntArray145[var2] < this.anIntArray145[var1] || this.anIntArray145[var2] > this.anInt152) {
+            int var2 = var1 >= this.keyframes.length - 1?0:var1 + 1;
+            if(this.keyframes[var2] < this.keyframes[var1] || this.keyframes[var2] > this.duration) {
                throw new IllegalStateException();
             }
 
@@ -301,7 +300,7 @@ public class KeyframeSequence extends Object3D {
    }
 
    private final void method115() {
-      int var1 = this.anInt150;
+      int var1 = this.validRangeFirst;
 
       do {
          float[] var2 = this.aFloatArrayArray144[this.method117(var1)];
@@ -309,11 +308,11 @@ public class KeyframeSequence extends Object3D {
          float var4 = this.method113(var1);
          float var5 = this.method116(var1);
 
-         for(int var6 = 0; var6 < this.anInt39; ++var6) {
+         for(int var6 = 0; var6 < this.componentCount; ++var6) {
             this.aFloatArrayArray147[var1][var6] = 0.5F * (var3[var6] - var2[var6]) * var4;
             this.aFloatArrayArray149[var1][var6] = 0.5F * (var3[var6] - var2[var6]) * var5;
          }
-      } while((var1 = this.method13(var1)) != this.anInt150);
+      } while((var1 = this.method13(var1)) != this.validRangeFirst);
 
    }
 
@@ -355,7 +354,7 @@ public class KeyframeSequence extends Object3D {
       a var5 = new a();
       a var6 = new a();
       a var7 = new a();
-      int var8 = this.anInt150;
+      int var8 = this.validRangeFirst;
 
       do {
          var3.method405(this.aFloatArrayArray144[this.method117(var8)]);
@@ -382,7 +381,7 @@ public class KeyframeSequence extends Object3D {
          var6.method419(var6);
          this.anaArray148[var8].method406(var1);
          this.anaArray148[var8].method416(var6);
-      } while((var8 = this.method13(var8)) != this.anInt150);
+      } while((var8 = this.method13(var8)) != this.validRangeFirst);
 
    }
 
@@ -393,7 +392,7 @@ public class KeyframeSequence extends Object3D {
    }
 
    private float method113(int var1) {
-      if(this.anInt153 != 192 || var1 != this.anInt150 && var1 != this.anInt151) {
+      if(this.repeatMode != 192 || var1 != this.validRangeFirst && var1 != this.validRangeLast) {
          int var2 = this.method117(var1);
          return 2.0F * (float)this.method120(var2) / (float)(this.method120(var1) + this.method120(var2));
       } else {
@@ -402,7 +401,7 @@ public class KeyframeSequence extends Object3D {
    }
 
    private float method116(int var1) {
-      if(this.anInt153 != 192 || var1 != this.anInt150 && var1 != this.anInt151) {
+      if(this.repeatMode != 192 || var1 != this.validRangeFirst && var1 != this.validRangeLast) {
          int var2 = this.method117(var1);
          return 2.0F * (float)this.method120(var1) / (float)(this.method120(var2) + this.method120(var1));
       } else {
@@ -413,10 +412,10 @@ public class KeyframeSequence extends Object3D {
    private void method122() {
       if(!this.aBoolean36) {
          throw new Error();
-      } else if(this.anInt40 == 178) {
+      } else if(this.interpolationType == 178) {
          this.method115();
       } else {
-         if(this.anInt40 == 179) {
+         if(this.interpolationType == 179) {
             this.method119();
          }
 
@@ -424,14 +423,14 @@ public class KeyframeSequence extends Object3D {
    }
 
    private int method13(int var1) {
-      return var1 == this.anInt151?this.anInt150:(var1 == this.anIntArray145.length - 1?0:var1 + 1);
+      return var1 == this.validRangeLast ?this.validRangeFirst :(var1 == this.keyframes.length - 1?0:var1 + 1);
    }
 
    private int method117(int var1) {
-      return var1 == this.anInt150?this.anInt151:(var1 == 0?this.anIntArray145.length - 1:var1 - 1);
+      return var1 == this.validRangeFirst ?this.validRangeLast :(var1 == 0?this.keyframes.length - 1:var1 - 1);
    }
 
    private int method120(int var1) {
-      return var1 == this.anInt151?this.anInt152 - this.anIntArray145[this.anInt151] + this.anIntArray145[this.anInt150]:this.anIntArray145[this.method13(var1)] - this.anIntArray145[var1];
+      return var1 == this.validRangeLast ?this.duration - this.keyframes[this.validRangeLast] + this.keyframes[this.validRangeFirst]:this.keyframes[this.method13(var1)] - this.keyframes[var1];
    }
 }

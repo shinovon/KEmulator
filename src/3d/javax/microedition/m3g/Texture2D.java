@@ -1,9 +1,6 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import javax.microedition.m3g.Graphics3D;
-import javax.microedition.m3g.Image2D;
-import javax.microedition.m3g.Transformable;
 
 public class Texture2D extends Transformable {
    public static final int FILTER_BASE_LEVEL = 208;
@@ -16,22 +13,22 @@ public class Texture2D extends Transformable {
    public static final int FUNC_REPLACE = 228;
    public static final int WRAP_CLAMP = 240;
    public static final int WRAP_REPEAT = 241;
-   private Image2D anImage2D157;
-   private int anInt37;
-   private int anInt39;
-   private int anInt40;
-   private int anInt150;
-   private int anInt151;
-   private int anInt152;
+   private Image2D image;
+   private int wrappingS;
+   private int wrappingT;
+   private int levelFilter;
+   private int imageFilter;
+   private int blending;
+   private int blendColor;
 
    public Texture2D(Image2D var1) {
       this.setImage(var1);
-      this.anInt37 = 241;
-      this.anInt39 = 241;
-      this.anInt40 = 208;
-      this.anInt150 = 210;
-      this.anInt151 = 227;
-      this.anInt152 = 0;
+      this.wrappingS = 241;
+      this.wrappingT = 241;
+      this.levelFilter = 208;
+      this.imageFilter = 210;
+      this.blending = 227;
+      this.blendColor = 0;
    }
 
    private static boolean method14(int var0) {
@@ -46,9 +43,9 @@ public class Texture2D extends Transformable {
          int var3 = var1.getHeight();
          if(method14(var2) && method14(var3)) {
             if(var2 <= Graphics3D.MaxTextureDimension && var3 <= Graphics3D.MaxTextureDimension) {
-               this.removeReference(this.anImage2D157);
-               this.anImage2D157 = var1;
-               this.addReference(this.anImage2D157);
+               this.removeReference(this.image);
+               this.image = var1;
+               this.addReference(this.image);
             } else {
                throw new IllegalArgumentException("the width or height of image exceeds the MaxTextureDimension :" + Graphics3D.MaxTextureDimension);
             }
@@ -59,7 +56,7 @@ public class Texture2D extends Transformable {
    }
 
    public Image2D getImage() {
-      return this.anImage2D157;
+      return this.image;
    }
 
    public void setFiltering(int var1, int var2) {
@@ -68,17 +65,17 @@ public class Texture2D extends Transformable {
       } else if(var2 != 209 && var2 != 210) {
          throw new IllegalArgumentException();
       } else {
-         this.anInt40 = var1;
-         this.anInt150 = var2;
+         this.levelFilter = var1;
+         this.imageFilter = var2;
       }
    }
 
    public int getLevelFilter() {
-      return this.anInt40;
+      return this.levelFilter;
    }
 
    public int getImageFilter() {
-      return this.anInt150;
+      return this.imageFilter;
    }
 
    public void setWrapping(int var1, int var2) {
@@ -87,43 +84,43 @@ public class Texture2D extends Transformable {
       } else if(var2 != 240 && var2 != 241) {
          throw new IllegalArgumentException();
       } else {
-         this.anInt37 = var1;
-         this.anInt39 = var2;
+         this.wrappingS = var1;
+         this.wrappingT = var2;
       }
    }
 
    public int getWrappingS() {
-      return this.anInt37;
+      return this.wrappingS;
    }
 
    public int getWrappingT() {
-      return this.anInt39;
+      return this.wrappingT;
    }
 
    public void setBlending(int var1) {
       if(var1 >= 224 && var1 <= 228) {
-         this.anInt151 = var1;
+         this.blending = var1;
       } else {
          throw new IllegalArgumentException();
       }
    }
 
    public int getBlending() {
-      return this.anInt151;
+      return this.blending;
    }
 
    public void setBlendColor(int var1) {
-      this.anInt152 = var1;
+      this.blendColor = var1;
    }
 
    public int getBlendColor() {
-      return this.anInt152;
+      return this.blendColor;
    }
 
    protected void updateProperty(int var1, float[] var2) {
       switch(var1) {
       case 258:
-         this.anInt152 = G3DUtils.method603(var2);
+         this.blendColor = G3DUtils.getIntColor(var2);
          return;
       default:
          super.updateProperty(var1, var2);

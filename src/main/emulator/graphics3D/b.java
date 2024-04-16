@@ -42,7 +42,7 @@ public final class b {
     }
 
     public final float method424() {
-        return (float)Math.sqrt((double)(this.aFloat608 * this.aFloat608 + this.aFloat610 * this.aFloat610 + this.aFloat612 * this.aFloat612));
+        return (float) Math.sqrt((double) (this.aFloat608 * this.aFloat608 + this.aFloat610 * this.aFloat610 + this.aFloat612 * this.aFloat612));
     }
 
     public final void method425(float var1) {
@@ -86,10 +86,10 @@ public final class b {
 
     public final boolean method428() {
         float var1;
-        if((var1 = this.aFloat608 * this.aFloat608 + this.aFloat610 * this.aFloat610 + this.aFloat612 * this.aFloat612 + this.aFloat614 * this.aFloat614) < 1.0E-5F) {
+        if ((var1 = this.aFloat608 * this.aFloat608 + this.aFloat610 * this.aFloat610 + this.aFloat612 * this.aFloat612 + this.aFloat614 * this.aFloat614) < 1.0E-5F) {
             return false;
         } else {
-            float var2 = 1.0F / (float)Math.sqrt((double)var1);
+            float var2 = 1.0F / (float) Math.sqrt((double) var1);
             this.aFloat608 *= var2;
             this.aFloat610 *= var2;
             this.aFloat612 *= var2;

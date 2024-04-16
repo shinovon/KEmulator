@@ -1,20 +1,5 @@
 package javax.microedition.m3g;
 
-import javax.microedition.m3g.AnimationController;
-import javax.microedition.m3g.Background;
-import javax.microedition.m3g.Camera;
-import javax.microedition.m3g.Fog;
-import javax.microedition.m3g.KeyframeSequence;
-import javax.microedition.m3g.Light;
-import javax.microedition.m3g.Material;
-import javax.microedition.m3g.MorphingMesh;
-import javax.microedition.m3g.Node;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.Sprite3D;
-import javax.microedition.m3g.Texture2D;
-import javax.microedition.m3g.Transformable;
-import javax.microedition.m3g.VertexBuffer;
-
 public class AnimationTrack extends Object3D {
    public static final int ALPHA = 256;
    public static final int AMBIENT_COLOR = 257;
@@ -37,9 +22,9 @@ public class AnimationTrack extends Object3D {
    public static final int SPOT_EXPONENT = 274;
    public static final int TRANSLATION = 275;
    public static final int VISIBILITY = 276;
-   private KeyframeSequence aKeyframeSequence901;
-   private AnimationController anAnimationController902;
-   private int anInt37;
+   private KeyframeSequence keyframeSequence;
+   private AnimationController controller;
+   private int target;
 
    public AnimationTrack(KeyframeSequence var1, int var2) {
       if(var1 == null) {
@@ -49,92 +34,60 @@ public class AnimationTrack extends Object3D {
       } else if(!method595(var2, var1.getComponentCount())) {
          throw new IllegalArgumentException();
       } else {
-         this.aKeyframeSequence901 = var1;
-         this.anInt37 = var2;
-         this.anAnimationController902 = null;
-         this.addReference(this.aKeyframeSequence901);
+         this.keyframeSequence = var1;
+         this.target = var2;
+         this.controller = null;
+         this.addReference(this.keyframeSequence);
       }
    }
 
-   protected boolean checkCompatible(Object3D var1) {
-      boolean var2;
-      boolean var3;
-      label89: {
-         var2 = false;
-         Object3D var10000;
-         switch(this.anInt37) {
-         case 256:
-            var2 = var1 instanceof Node || var1 instanceof Background || var1 instanceof Material || var1 instanceof VertexBuffer;
-            return var2;
-         case 257:
-            var3 = var1 instanceof Material;
-            break label89;
-         case 258:
-            var2 = var1 instanceof Light || var1 instanceof Background || var1 instanceof Fog || var1 instanceof Texture2D || var1 instanceof VertexBuffer;
-            return var2;
-         case 259:
-            var2 = var1 instanceof Sprite3D || var1 instanceof Background;
-            return var2;
-         case 260:
-            var3 = var1 instanceof Fog;
-            break label89;
-         case 261:
-            var3 = var1 instanceof Material;
-            break label89;
-         case 262:
-            var3 = var1 instanceof Material;
-            break label89;
-         case 263:
-            var2 = var1 instanceof Camera || var1 instanceof Fog;
-            return var2;
-         case 264:
-            var3 = var1 instanceof Camera;
-            break label89;
-         case 265:
-            var3 = var1 instanceof Light;
-            break label89;
-         case 266:
-            var3 = var1 instanceof MorphingMesh;
-            break label89;
-         case 267:
-            var2 = var1 instanceof Camera || var1 instanceof Fog;
-            return var2;
-         case 268:
-            var3 = var1 instanceof Transformable;
-            break label89;
-         case 269:
-            var10000 = var1;
-            break;
-         case 270:
-            var3 = var1 instanceof Transformable;
-            break label89;
-         case 271:
-            var3 = var1 instanceof Material;
-            break label89;
-         case 272:
-            var3 = var1 instanceof Material;
-            break label89;
-         case 273:
-            var3 = var1 instanceof Light;
-            break label89;
-         case 274:
-            var3 = var1 instanceof Light;
-            break label89;
-         case 275:
-            var3 = var1 instanceof Transformable;
-            break label89;
-         case 276:
-            var10000 = var1;
-            break;
-         default:
-            return var2;
-         }
-
-         var3 = var10000 instanceof Node;
+   protected boolean checkCompatible(Object3D o) {
+      switch(this.target) {
+      case 256:
+         return o instanceof Node || o instanceof Background || o instanceof Material || o instanceof VertexBuffer;
+      case 257:
+         return o instanceof Material;
+      case 258:
+         return o instanceof Light || o instanceof Background || o instanceof Fog || o instanceof Texture2D || o instanceof VertexBuffer;
+      case 259:
+         return o instanceof Sprite3D || o instanceof Background;
+      case 260:
+         return o instanceof Fog;
+      case 261:
+         return o instanceof Material;
+      case 262:
+         return o instanceof Material;
+      case 263:
+         return o instanceof Camera || o instanceof Fog;
+      case 264:
+         return o instanceof Camera;
+      case 265:
+         return o instanceof Light;
+      case 266:
+         return o instanceof MorphingMesh;
+      case 267:
+         return o instanceof Camera || o instanceof Fog;
+      case 268:
+         return o instanceof Transformable;
+      case 269:
+         return o instanceof Node;
+      case 270:
+         return o instanceof Transformable;
+      case 271:
+         return o instanceof Material;
+      case 272:
+         return o instanceof Material;
+      case 273:
+         return o instanceof Light;
+      case 274:
+         return o instanceof Light;
+      case 275:
+         return o instanceof Transformable;
+      case 276:
+         return o instanceof Node;
+      default:
+         return false;
       }
-
-      var2 = var3;
-      return var2;
    }
 
    private static boolean method595(int var0, int var1) {
@@ -217,30 +170,30 @@ public class AnimationTrack extends Object3D {
    }
 
    public void setController(AnimationController var1) {
-      this.removeReference(this.anAnimationController902);
-      this.anAnimationController902 = var1;
-      this.addReference(this.anAnimationController902);
+      this.removeReference(this.controller);
+      this.controller = var1;
+      this.addReference(this.controller);
    }
 
    public AnimationController getController() {
-      return this.anAnimationController902;
+      return this.controller;
    }
 
    public KeyframeSequence getKeyframeSequence() {
-      return this.aKeyframeSequence901;
+      return this.keyframeSequence;
    }
 
    public int getTargetProperty() {
-      return this.anInt37;
+      return this.target;
    }
 
    protected void getContribution(int var1, float[] var2, float[] var3) {
-      if(this.anAnimationController902 != null && this.anAnimationController902.isActive(var1)) {
-         float[] var4 = new float[this.aKeyframeSequence901.getComponentCount()];
-         float var5 = this.anAnimationController902.getPosition(var1);
-         int var6 = this.aKeyframeSequence901.getSampleFrame(var5, var4);
-         var3[1] = (float)Math.min(var6, this.anAnimationController902.timeToDeactivation(var1));
-         float var7 = this.anAnimationController902.getWeight();
+      if(this.controller != null && this.controller.isActive(var1)) {
+         float[] var4 = new float[this.keyframeSequence.getComponentCount()];
+         float var5 = this.controller.getPosition(var1);
+         int var6 = this.keyframeSequence.getSampleFrame(var5, var4);
+         var3[1] = (float)Math.min(var6, this.controller.timeToDeactivation(var1));
+         float var7 = this.controller.getWeight();
 
          for(int var8 = 0; var8 < var4.length; ++var8) {
             var2[var8] += var4[var8] * var7;
@@ -249,7 +202,7 @@ public class AnimationTrack extends Object3D {
          var3[0] = var7;
       } else {
          var3[0] = 0.0F;
-         var3[1] = (float)Math.max(1, this.anAnimationController902 == null?Integer.MAX_VALUE:this.anAnimationController902.timeToActivation(var1));
+         var3[1] = (float)Math.max(1, this.controller == null?Integer.MAX_VALUE:this.controller.timeToActivation(var1));
       }
    }
 }

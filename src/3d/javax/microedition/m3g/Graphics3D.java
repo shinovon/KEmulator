@@ -13,25 +13,25 @@ public class Graphics3D {
    public static final int DITHER = 4;
    public static final int OVERWRITE = 16;
    public static final int TRUE_COLOR = 8;
-   private static Object anObject876 = null;
-   private static IGraphics3D anIGraphics3D877;
+   private static Object target = null;
+   private static IGraphics3D impl;
    private static Graphics3D aGraphics3D878 = new Graphics3D();
    public static final int MaxViewportWidth = ((Integer)getProperties().get("maxViewportWidth")).intValue();
    public static final int MaxViewportHeight = ((Integer)getProperties().get("maxViewportHeight")).intValue();
    public static final int NumTextureUnits = ((Integer)getProperties().get("numTextureUnits")).intValue();
    public static final int MaxTextureDimension = ((Integer)getProperties().get("maxTextureDimension")).intValue();
    public static final int MaxSpriteCropDimension = ((Integer)getProperties().get("maxSpriteCropDimension")).intValue();
-   private int anInt879;
-   private int anInt881;
-   private int anInt883;
-   private int anInt884;
-   private float aFloat880;
-   private float aFloat882;
+   private int viewportX;
+   private int viewportY;
+   private int viewportWidth;
+   private int viewportHeight;
+   private float depthRangeNear;
+   private float depthRangeFar;
 
    private Graphics3D() {
-      anIGraphics3D877 = Emulator.getEmulator().getGraphics3D();
-      this.aFloat880 = 0.0F;
-      this.aFloat882 = 1.0F;
+      impl = Emulator.getEmulator().getGraphics3D();
+      this.depthRangeNear = 0.0F;
+      this.depthRangeFar = 1.0F;
    }
 
    public static final Graphics3D getInstance() {
@@ -39,11 +39,11 @@ public class Graphics3D {
    }
 
    public static final IGraphics3D getImpl() {
-      return anIGraphics3D877;
+      return impl;
    }
 
    public static final Hashtable getProperties() {
-      return anIGraphics3D877.getProperties();
+      return impl.getProperties();
    }
 
    public void bindTarget(Object var1) {
@@ -51,8 +51,8 @@ public class Graphics3D {
    }
 
    public void bindTarget(Object var1, boolean var2, int var3) {
-      anIGraphics3D877.enableDepthBuffer(var2);
-      if(anObject876 != null) {
+      impl.enableDepthBuffer(var2);
+      if(target != null) {
          throw new IllegalStateException();
       } else if(var1 == null) {
          throw new NullPointerException();
@@ -70,12 +70,12 @@ public class Graphics3D {
                throw new IllegalArgumentException();
             }
 
-            anObject876 = var1;
-            anIGraphics3D877.bindTarget(var5);
+            target = var1;
+            impl.bindTarget(var5);
             this.setViewport(var5.getClipX(), var5.getClipY(), var5.getClipWidth(), var5.getClipHeight());
             Image2D var8 = new Image2D(99, new Image(var5.getImage()));
             var4.setImage(var8);
-            var4.setCrop(this.anInt879, this.anInt881, this.anInt883, this.anInt884);
+            var4.setCrop(this.viewportX, this.viewportY, this.viewportWidth, this.viewportHeight);
          } else {
             if(!(var1 instanceof Image2D)) {
                throw new IllegalArgumentException();
@@ -93,16 +93,16 @@ public class Graphics3D {
                throw new IllegalArgumentException();
             }
 
-            anObject876 = var1;
-            anIGraphics3D877.bindTarget(var9);
+            target = var1;
+            impl.bindTarget(var9);
             this.setViewport(0, 0, var6, var7);
             var4.setImage(var9);
-            var4.setCrop(this.anInt879, this.anInt881, this.anInt883, this.anInt884);
+            var4.setCrop(this.viewportX, this.viewportY, this.viewportWidth, this.viewportHeight);
          }
 
-         if(anObject876 != null) {
-            anIGraphics3D877.setHints(var3);
-            this.setDepthRange(this.aFloat880, this.aFloat882);
+         if(target != null) {
+            impl.setHints(var3);
+            this.setDepthRange(this.depthRangeNear, this.depthRangeFar);
             this.clear(var4);
          }
 
@@ -110,84 +110,84 @@ public class Graphics3D {
    }
 
    public void releaseTarget() {
-      if(anObject876 != null) {
-         anIGraphics3D877.releaseTarget();
-         anObject876 = null;
+      if(target != null) {
+         impl.releaseTarget();
+         target = null;
       }
 
    }
 
    public Object getTarget() {
-      return anObject876;
+      return target;
    }
 
    public int getHints() {
-      return anIGraphics3D877.getHints();
+      return impl.getHints();
    }
 
    public boolean isDepthBufferEnabled() {
-      return anIGraphics3D877.isDepthBufferEnabled();
+      return impl.isDepthBufferEnabled();
    }
 
    public void setViewport(int var1, int var2, int var3, int var4) {
       if(var3 > 0 && var4 > 0 && var3 <= MaxViewportWidth && var4 <= MaxViewportHeight) {
-         this.anInt879 = var1;
-         this.anInt881 = var2;
-         this.anInt883 = var3;
-         this.anInt884 = var4;
-         anIGraphics3D877.setViewport(var1, var2, var3, var4);
+         this.viewportX = var1;
+         this.viewportY = var2;
+         this.viewportWidth = var3;
+         this.viewportHeight = var4;
+         impl.setViewport(var1, var2, var3, var4);
       } else {
          throw new IllegalArgumentException();
       }
    }
 
    public int getViewportX() {
-      return this.anInt879;
+      return this.viewportX;
    }
 
    public int getViewportY() {
-      return this.anInt881;
+      return this.viewportY;
    }
 
    public int getViewportWidth() {
-      return this.anInt883;
+      return this.viewportWidth;
    }
 
    public int getViewportHeight() {
-      return this.anInt884;
+      return this.viewportHeight;
    }
 
    public void setDepthRange(float var1, float var2) {
       if(var1 >= 0.0F && var1 <= 1.0F && var2 >= 0.0F && var2 <= 1.0F) {
-         this.aFloat880 = var1;
-         this.aFloat882 = var2;
-         anIGraphics3D877.setDepthRange(var1, var2);
+         this.depthRangeNear = var1;
+         this.depthRangeFar = var2;
+         impl.setDepthRange(var1, var2);
       } else {
          throw new IllegalArgumentException();
       }
    }
 
    public float getDepthRangeNear() {
-      return this.aFloat880;
+      return this.depthRangeNear;
    }
 
    public float getDepthRangeFar() {
-      return this.aFloat882;
+      return this.depthRangeFar;
    }
 
    public void clear(Background var1) {
-      if(anObject876 == null) {
+      if(target == null) {
          throw new IllegalStateException();
       } else {
-         anIGraphics3D877.clearBackgound(var1);
+         impl.clearBackgound(var1);
       }
    }
 
    public void render(World var1) {
       if(var1 == null) {
          throw new NullPointerException();
-      } else if(anObject876 != null && var1.getActiveCamera() != null && var1.getActiveCamera().isDescendantOf(var1)) {
-         anIGraphics3D877.render(var1);
+      } else if(target != null && var1.getActiveCamera() != null && var1.getActiveCamera().isDescendantOf(var1)) {
+         impl.render(var1);
       } else {
          throw new IllegalStateException();
       }
@@ -198,8 +198,8 @@ public class Graphics3D {
          throw new NullPointerException();
       } else if(!(var1 instanceof Sprite3D) && !(var1 instanceof Mesh) && !(var1 instanceof Group)) {
          throw new IllegalArgumentException();
-      } else if(anObject876 != null && f.aCamera1137 != null) {
-         anIGraphics3D877.render(var1, var2);
+      } else if(target != null && f.aCamera1137 != null) {
+         impl.render(var1, var2);
       } else {
          throw new IllegalStateException();
       }
@@ -207,8 +207,8 @@ public class Graphics3D {
 
    public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5) {
       if(var1 != null && var2 != null && var3 != null) {
-         if(anObject876 != null && f.aCamera1137 != null) {
-            anIGraphics3D877.render(var1, var2, var3, var4, var5);
+         if(target != null && f.aCamera1137 != null) {
+            impl.render(var1, var2, var3, var4, var5);
          } else {
             throw new IllegalStateException();
          }

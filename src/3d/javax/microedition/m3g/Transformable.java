@@ -1,14 +1,12 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.a;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.Transform;
 
 public abstract class Transformable extends Object3D {
    float[] aFloatArray735 = new float[3];
-   float[] aFloatArray866 = new float[3];
+   float[] translation = new float[3];
    a ana864 = new a(0.0F, 0.0F, 0.0F, 1.0F);
-   Transform aTransform865 = new Transform();
+   Transform transform = new Transform();
 
    Transformable() {
       this.aFloatArray735[0] = this.aFloatArray735[1] = this.aFloatArray735[2] = 1.0F;
@@ -76,15 +74,15 @@ public abstract class Transformable extends Object3D {
    }
 
    public void setTranslation(float var1, float var2, float var3) {
-      this.aFloatArray866[0] = var1;
-      this.aFloatArray866[1] = var2;
-      this.aFloatArray866[2] = var3;
+      this.translation[0] = var1;
+      this.translation[1] = var2;
+      this.translation[2] = var3;
    }
 
    public void translate(float var1, float var2, float var3) {
-      this.aFloatArray866[0] += var1;
-      this.aFloatArray866[1] += var2;
-      this.aFloatArray866[2] += var3;
+      this.translation[0] += var1;
+      this.translation[1] += var2;
+      this.translation[2] += var3;
    }
 
    public void getTranslation(float[] var1) {
@@ -93,15 +91,15 @@ public abstract class Transformable extends Object3D {
       } else if(var1.length < 3) {
          throw new IllegalArgumentException();
       } else {
-         System.arraycopy(this.aFloatArray866, 0, var1, 0, 3);
+         System.arraycopy(this.translation, 0, var1, 0, 3);
       }
    }
 
    public void setTransform(Transform var1) {
       if(var1 == null) {
-         this.aTransform865.setIdentity();
+         this.transform.setIdentity();
       } else {
-         this.aTransform865.set(var1);
+         this.transform.set(var1);
       }
    }
 
@@ -109,7 +107,7 @@ public abstract class Transformable extends Object3D {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         var1.set(this.aTransform865);
+         var1.set(this.transform);
       }
    }
 
@@ -118,10 +116,10 @@ public abstract class Transformable extends Object3D {
          throw new NullPointerException();
       } else {
          var1.setIdentity();
-         var1.postTranslate(this.aFloatArray866[0], this.aFloatArray866[1], this.aFloatArray866[2]);
+         var1.postTranslate(this.translation[0], this.translation[1], this.translation[2]);
          var1.postRotateQuat(this.ana864.aFloat603, this.ana864.aFloat604, this.ana864.aFloat605, this.ana864.aFloat606);
          var1.postScale(this.aFloatArray735[0], this.aFloatArray735[1], this.aFloatArray735[2]);
-         var1.postMultiply(this.aTransform865);
+         var1.postMultiply(this.transform);
       }
    }
 
@@ -142,9 +140,9 @@ public abstract class Transformable extends Object3D {
          this.aFloatArray735[2] = var2[2];
          return;
       case 275:
-         this.aFloatArray866[0] = var2[0];
-         this.aFloatArray866[1] = var2[1];
-         this.aFloatArray866[2] = var2[2];
+         this.translation[0] = var2[0];
+         this.translation[1] = var2[1];
+         this.translation[2] = var2[2];
          return;
       default:
          super.updateProperty(var1, var2);
@@ -154,8 +152,8 @@ public abstract class Transformable extends Object3D {
    protected Object3D duplicateObject() {
       Transformable var1;
       (var1 = (Transformable)super.duplicateObject()).ana864 = new a(this.ana864);
-      var1.aTransform865 = new Transform(this.aTransform865);
-      var1.aFloatArray866 = (float[])this.aFloatArray866.clone();
+      var1.transform = new Transform(this.transform);
+      var1.translation = (float[])this.translation.clone();
       var1.aFloatArray735 = (float[])this.aFloatArray735.clone();
       return var1;
    }

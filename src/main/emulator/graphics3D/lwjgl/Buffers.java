@@ -6,7 +6,7 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import org.lwjgl.BufferUtils;
 
-public final class a {
+public final class Buffers {
     private static ByteBuffer aByteBuffer770;
     private static ByteBuffer aByteBuffer774;
     private static ShortBuffer aShortBuffer771;

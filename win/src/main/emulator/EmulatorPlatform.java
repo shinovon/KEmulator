@@ -53,6 +53,6 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public IGraphics3D getGraphics3D() {
-        return emulator.graphics3D.lwjgl.Emulator3D.method501();
+        return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 }

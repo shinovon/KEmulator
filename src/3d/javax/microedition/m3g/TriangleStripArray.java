@@ -1,14 +1,11 @@
 package javax.microedition.m3g;
 
-import javax.microedition.m3g.IndexBuffer;
-import javax.microedition.m3g.Object3D;
-
 public class TriangleStripArray extends IndexBuffer {
    private int[] anIntArray1009;
 
    protected Object3D duplicateObject() {
       TriangleStripArray var1;
-      (var1 = (TriangleStripArray)super.duplicateObject()).anIntArray145 = (int[])super.anIntArray145.clone();
+      (var1 = (TriangleStripArray)super.duplicateObject()).indices = (int[])super.indices.clone();
       var1.anIntArray1009 = (int[])this.anIntArray1009.clone();
       return var1;
    }
@@ -27,7 +24,7 @@ public class TriangleStripArray extends IndexBuffer {
 
          int[] var4 = new int[this.anIntArray1009[var1]];
          if(this.anIntArray1009 != null) {
-            System.arraycopy(super.anIntArray145, var2, var4, 0, this.anIntArray1009[var1]);
+            System.arraycopy(super.indices, var2, var4, 0, this.anIntArray1009[var1]);
          }
 
          return var4;
@@ -41,9 +38,9 @@ public class TriangleStripArray extends IndexBuffer {
 
       for(int var4 = 0; var4 < this.anIntArray1009.length; ++var4) {
          if(var1 < this.anIntArray1009[var4] - 2) {
-            var2[0] = super.anIntArray145[var3 + var1 + 0];
-            var2[1] = super.anIntArray145[var3 + var1 + 1];
-            var2[2] = super.anIntArray145[var3 + var1 + 2];
+            var2[0] = super.indices[var3 + var1 + 0];
+            var2[1] = super.indices[var3 + var1 + 1];
+            var2[2] = super.indices[var3 + var1 + 2];
             var2[3] = var1 & 1;
             return true;
          }
@@ -75,10 +72,10 @@ public class TriangleStripArray extends IndexBuffer {
          if(var1 + var3 > '\uffff') {
             throw new IllegalArgumentException();
          } else {
-            super.anIntArray145 = new int[var3];
+            super.indices = new int[var3];
 
             for(var4 = 0; var4 < var3; ++var4) {
-               super.anIntArray145[var4] = var1 + var4;
+               super.indices[var4] = var1 + var4;
             }
 
             this.anIntArray1009 = new int[var2.length];
@@ -110,8 +107,8 @@ public class TriangleStripArray extends IndexBuffer {
                   }
                }
 
-               super.anIntArray145 = new int[var3];
-               System.arraycopy(var1, 0, super.anIntArray145, 0, var3);
+               super.indices = new int[var3];
+               System.arraycopy(var1, 0, super.indices, 0, var3);
                this.anIntArray1009 = new int[var2.length];
                System.arraycopy(var2, 0, this.anIntArray1009, 0, var2.length);
             }

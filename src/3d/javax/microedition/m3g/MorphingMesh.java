@@ -1,17 +1,10 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.m3g.e;
-import javax.microedition.m3g.Appearance;
-import javax.microedition.m3g.IndexBuffer;
-import javax.microedition.m3g.Mesh;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.RayIntersection;
-import javax.microedition.m3g.Transform;
-import javax.microedition.m3g.VertexBuffer;
 
 public class MorphingMesh extends Mesh {
    private VertexBuffer[] aVertexBufferArray937;
-   private float[] aFloatArray918;
+   private float[] weights;
    public float m_baseWeight;
 
    public MorphingMesh(VertexBuffer var1, VertexBuffer[] var2, IndexBuffer var3, Appearance var4) {
@@ -34,7 +27,7 @@ public class MorphingMesh extends Mesh {
             this.addReference(this.aVertexBufferArray937[var5]);
          }
 
-         this.aFloatArray918 = new float[this.aVertexBufferArray937.length];
+         this.weights = new float[this.aVertexBufferArray937.length];
          this.m_baseWeight = 1.0F;
       }
    }
@@ -56,13 +49,13 @@ public class MorphingMesh extends Mesh {
          this.addReference(this.aVertexBufferArray937[var5]);
       }
 
-      this.aFloatArray918 = new float[this.aVertexBufferArray937.length];
+      this.weights = new float[this.aVertexBufferArray937.length];
       this.m_baseWeight = 1.0F;
    }
 
    protected Object3D duplicateObject() {
       MorphingMesh var1;
-      (var1 = (MorphingMesh)super.duplicateObject()).aFloatArray918 = (float[])this.aFloatArray918.clone();
+      (var1 = (MorphingMesh)super.duplicateObject()).weights = (float[])this.weights.clone();
       var1.aVertexBufferArray937 = (VertexBuffer[])this.aVertexBufferArray937.clone();
       return var1;
    }
@@ -82,13 +75,13 @@ public class MorphingMesh extends Mesh {
    public void setWeights(float[] var1) {
       if(var1 == null) {
          throw new NullPointerException();
-      } else if(var1.length < this.aFloatArray918.length) {
+      } else if(var1.length < this.weights.length) {
          throw new IllegalArgumentException();
       } else {
          this.m_baseWeight = 1.0F;
 
-         for(int var2 = 0; var2 < this.aFloatArray918.length; ++var2) {
-            this.aFloatArray918[var2] = var1[var2];
+         for(int var2 = 0; var2 < this.weights.length; ++var2) {
+            this.weights[var2] = var1[var2];
             this.m_baseWeight -= var1[var2];
          }
 
@@ -98,10 +91,10 @@ public class MorphingMesh extends Mesh {
    public void getWeights(float[] var1) {
       if(var1 == null) {
          throw new NullPointerException();
-      } else if(var1.length < this.aFloatArray918.length) {
+      } else if(var1.length < this.weights.length) {
          throw new IllegalArgumentException();
       } else {
-         System.arraycopy(this.aFloatArray918, 0, var1, 0, this.aFloatArray918.length);
+         System.arraycopy(this.weights, 0, var1, 0, this.weights.length);
       }
    }
 
@@ -110,12 +103,12 @@ public class MorphingMesh extends Mesh {
       case 266:
          this.m_baseWeight = 1.0F;
 
-         for(int var3 = 0; var3 < this.aFloatArray918.length; ++var3) {
+         for(int var3 = 0; var3 < this.weights.length; ++var3) {
             if(var3 < var2.length) {
-               this.aFloatArray918[var3] = var2[var3];
+               this.weights[var3] = var2[var3];
                this.m_baseWeight -= var2[var3];
             } else {
-               this.aFloatArray918[var3] = 0.0F;
+               this.weights[var3] = 0.0F;
             }
          }
 
@@ -126,8 +119,8 @@ public class MorphingMesh extends Mesh {
    }
 
    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
-      e.method777().method779(this);
-      e.method777().method778();
-      return super.rayIntersect(var1, var2, var3, var4, e.method777().aVertexBuffer1124);
+      e.getInstance().method779(this);
+      e.getInstance().method778();
+      return super.rayIntersect(var1, var2, var3, var4, e.getInstance().aVertexBuffer1124);
    }
 }

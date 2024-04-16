@@ -3,11 +3,6 @@ package javax.microedition.m3g;
 import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.a;
 import emulator.graphics3D.b;
-import javax.microedition.m3g.Object3D;
-import javax.microedition.m3g.RayIntersection;
-import javax.microedition.m3g.SkinnedMesh;
-import javax.microedition.m3g.Transform;
-import javax.microedition.m3g.Transformable;
 
 public abstract class Node extends Transformable {
    public static final int NONE = 144;
@@ -15,62 +10,62 @@ public abstract class Node extends Transformable {
    public static final int X_AXIS = 146;
    public static final int Y_AXIS = 147;
    public static final int Z_AXIS = 148;
-   Node aNode1303 = null;
-   private boolean aBoolean36 = true;
-   private boolean aBoolean190 = true;
-   private float aFloat681 = 1.0F;
-   private int anInt37 = -1;
+   Node parent = null;
+   private boolean renderingEnable = true;
+   private boolean pickingEnable = true;
+   private float alphaFactor = 1.0F;
+   private int scope = -1;
    private int anInt39;
    private int anInt40;
    private Node aNode1304;
    private Node aNode1305;
-   private boolean aBoolean684;
+   private boolean boneFlag;
    protected Node m_duplicatedNode;
 
    Node() {
       this.anInt39 = this.anInt40 = 144;
       this.aNode1304 = this.aNode1305 = null;
-      this.aBoolean684 = false;
+      this.boneFlag = false;
    }
 
    public void setRenderingEnable(boolean var1) {
-      this.aBoolean36 = var1;
+      this.renderingEnable = var1;
    }
 
    public void setPickingEnable(boolean var1) {
-      this.aBoolean190 = var1;
+      this.pickingEnable = var1;
    }
 
    public void setScope(int var1) {
-      this.anInt37 = var1;
+      this.scope = var1;
    }
 
    public void setAlphaFactor(float var1) {
       if(var1 >= 0.0F && var1 <= 1.0F) {
-         this.aFloat681 = var1;
+         this.alphaFactor = var1;
       } else {
          throw new IllegalArgumentException();
       }
    }
 
    public boolean isRenderingEnabled() {
-      return this.aBoolean36;
+      return this.renderingEnable;
    }
 
    public boolean isPickingEnabled() {
-      return this.aBoolean190;
+      return this.pickingEnable;
    }
 
    public int getScope() {
-      return this.anInt37;
+      return this.scope;
    }
 
    public float getAlphaFactor() {
-      return this.aFloat681;
+      return this.alphaFactor;
    }
 
    public Node getParent() {
-      return this.aNode1303;
+      return this.parent;
    }
 
    public boolean getTransformTo(Node var1, Transform var2) {
@@ -86,7 +81,7 @@ public abstract class Node extends Transformable {
             int var8 = var1.getDepth();
 
             int var9;
-            for(var9 = this.getDepth(); var9 > var8; var6 = var6.aNode1303) {
+            for(var9 = this.getDepth(); var9 > var8; var6 = var6.parent) {
                var6.getCompositeTransform(var5);
                var4.preMultiply(var5);
                --var9;
@@ -96,16 +91,16 @@ public abstract class Node extends Transformable {
                var7.getCompositeTransform(var5);
                var3.preMultiply(var5);
                --var8;
-               var7 = var7.aNode1303;
+               var7 = var7.parent;
             }
 
             while(var6 != var7) {
                var6.getCompositeTransform(var5);
                var4.preMultiply(var5);
-               var6 = var6.aNode1303;
+               var6 = var6.parent;
                var7.getCompositeTransform(var5);
                var3.preMultiply(var5);
-               var7 = var7.aNode1303;
+               var7 = var7.parent;
             }
 
             var3.getImpl().method445();
@@ -122,8 +117,8 @@ public abstract class Node extends Transformable {
       Node var1 = this;
 
       int var2;
-      for(var2 = 0; var1.aNode1303 != null; ++var2) {
-         var1 = var1.aNode1303;
+      for(var2 = 0; var1.parent != null; ++var2) {
+         var1 = var1.parent;
       }
 
       return var2;
@@ -147,7 +142,7 @@ public abstract class Node extends Transformable {
    }
 
    protected boolean isDescendantOf(Node var1) {
-      Node var10000 = this.aNode1303;
+      Node var10000 = this.parent;
 
       while(true) {
          Node var2 = var10000;
@@ -197,7 +192,7 @@ public abstract class Node extends Transformable {
                throw new IllegalStateException();
             }
 
-            (this.aNode1305 == null?var1:this.aNode1305).getTransformTo(this.aNode1303, var7);
+            (this.aNode1305 == null?var1:this.aNode1305).getTransformTo(this.parent, var7);
             var8.postTranslate(-var11[0], -var11[1], -var11[2]);
             var7.preMultiply(var8);
             method904(this.anInt40, var7, var2, var3, var4, var5, var9);
@@ -210,7 +205,7 @@ public abstract class Node extends Transformable {
                throw new IllegalStateException();
             }
 
-            (this.aNode1304 == null?var1:this.aNode1304).getTransformTo(this.aNode1303, var7);
+            (this.aNode1304 == null?var1:this.aNode1304).getTransformTo(this.parent, var7);
             var8.postTranslate(-var11[0], -var11[1], -var11[2]);
             var7.preMultiply(var8);
             if(this.anInt40 != 144) {
@@ -282,24 +277,24 @@ public abstract class Node extends Transformable {
       }
    }
 
-   public Node getAlignmentReference(int var1) {
-      if(var1 != 148 && var1 != 147) {
+   public Node getAlignmentReference(int axis) {
+      if(axis != 148 && axis != 147) {
          throw new IllegalArgumentException("axis != Z_AXIS && axis != Y_AXIS");
       } else {
-         return var1 == 148?this.aNode1305:this.aNode1304;
+         return axis == 148?this.aNode1305:this.aNode1304;
       }
    }
 
    protected void updateProperty(int var1, float[] var2) {
       switch(var1) {
       case 256:
-         this.aFloat681 = G3DUtils.method605(var2[0], 0.0F, 1.0F);
+         this.alphaFactor = G3DUtils.method605(var2[0], 0.0F, 1.0F);
          return;
       case 269:
-         this.aBoolean190 = var2[0] >= 0.5F;
+         this.pickingEnable = var2[0] >= 0.5F;
          return;
       case 276:
-         this.aBoolean36 = var2[0] >= 0.5F;
+         this.renderingEnable = var2[0] >= 0.5F;
          return;
       default:
          super.updateProperty(var1, var2);
@@ -311,11 +306,11 @@ public abstract class Node extends Transformable {
 
       while(true) {
          Node var1 = var10000;
-         if(var10000.aNode1303 == null) {
+         if(var10000.parent == null) {
             return var1;
          }
 
-         var10000 = var1.aNode1303;
+         var10000 = var1.parent;
       }
    }
 
@@ -328,7 +323,7 @@ public abstract class Node extends Transformable {
             break;
          }
 
-         if(!var2.aBoolean190) {
+         if(!var2.pickingEnable) {
             return false;
          }
 
@@ -336,7 +331,7 @@ public abstract class Node extends Transformable {
             break;
          }
 
-         var10000 = var2.aNode1303;
+         var10000 = var2.parent;
       }
 
       return true;
@@ -345,7 +340,7 @@ public abstract class Node extends Transformable {
    protected abstract boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4);
 
    protected void enableBoneFlag() {
-      this.aBoolean684 = true;
+      this.boneFlag = true;
    }
 
    protected void setSkinnedMeshBone() {
@@ -363,7 +358,7 @@ public abstract class Node extends Transformable {
    }
 
    protected boolean isSkinnedMeshBone() {
-      return this.aBoolean684;
+      return this.boneFlag;
    }
 
    protected void updateAlignReferences() {
@@ -390,7 +385,7 @@ public abstract class Node extends Transformable {
 
    protected Object3D duplicateObject() {
       Node var1;
-      (var1 = (Node)super.duplicateObject()).aNode1303 = null;
+      (var1 = (Node)super.duplicateObject()).parent = null;
       this.m_duplicatedNode = var1;
       return var1;
    }
