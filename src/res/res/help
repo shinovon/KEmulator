@@ -43,8 +43,6 @@ log.txt      log file
 ==================
 $[Changelog]
 $nnmod v2.15.2 [2024.04.16]
-Make logs asynchronous
-Fixed arrays in MemoryView
 Improved M3G textures debugging in MemoryView (contributed by rmn20)
 Added MascotCapsule textures in MemoryView
 Fixed suspend/resume
@@ -57,6 +55,7 @@ Implemented RateControl, StopTimeControl in VLCPlayerImpl
 Fixed log frame lag
 Synchronized M3G objects
 Fixed FPS limit in M3G games
+Fixed arrays in MemoryView
 
 $nnmod v2.15.1 [2024.03.16]
 Hotkey for "Rotate 90 degrees"
