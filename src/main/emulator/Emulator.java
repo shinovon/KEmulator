@@ -32,7 +32,7 @@ import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator {
-    public static final String version = "2.15.2";
+    public static final String version = "m3g2";
     public static final int numericVersion = 15;
 
     static EmulatorImpl emulatorimpl;

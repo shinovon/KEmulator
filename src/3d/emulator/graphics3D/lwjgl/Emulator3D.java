@@ -3,7 +3,6 @@ package emulator.graphics3D.lwjgl;
 import emulator.graphics3D.*;
 
 import java.util.*;
-import javax.microedition.lcdui.*;
 
 import emulator.*;
 import org.lwjgl.*;
@@ -19,11 +18,11 @@ import org.eclipse.swt.internal.opengl.win32.WGL;
 import emulator.graphics3D.m3g.e;
 import emulator.graphics3D.m3g.f;
 
-
 import emulator.graphics2D.swt.Graphics2DSWT;
 
 import java.awt.image.*;
 import java.nio.*;
+import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
 
 public final class Emulator3D implements IGraphics3D {
@@ -322,7 +321,7 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void setHintsInternal() {
-        if ((this.hints & 2) != 0) {
+        if ((this.hints & Graphics3D.ANTIALIAS) != 0) {
             GL11.glEnable(2832);
             GL11.glEnable(2848);
             GL11.glEnable(2881);
@@ -448,10 +447,10 @@ public final class Emulator3D implements IGraphics3D {
 
     }
 
-    private static void method518() {
-        if (f.aCamera1137 != null) {
+    private static void camera() {
+        if (f.camera != null) {
             Transform var0 = new Transform();
-            f.aCamera1137.getProjection(var0);
+            f.camera.getProjection(var0);
             var0.transpose();
             GL11.glMatrixMode(5889);
             GL11.glLoadMatrix(Buffers.method527(((TransformImpl) var0.getImpl()).matrix));
@@ -462,7 +461,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static void method505(Vector var0, Vector var1, int var2) {
+    private static void lights(Vector var0, Vector var1, int var2) {
         Transform var3 = new Transform();
         int var4 = var0.size();
         int var5 = ((Integer) properties.get("maxLights")).intValue();
@@ -575,11 +574,11 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void renderInternal(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5, float var6) {
-        if ((f.aCamera1137.getScope() & var5) != 0) {
+        if ((f.camera.getScope() & var5) != 0) {
             this.viewport();
             this.depth();
-            method518();
-            method505(emulator.graphics3D.m3g.a.aVector1150, emulator.graphics3D.m3g.a.aVector1152, var5);
+            camera();
+            lights(emulator.graphics3D.m3g.a.aVector1150, emulator.graphics3D.m3g.a.aVector1152, var5);
             if (var4 != null) {
                 Transform var7;
                 (var7 = new Transform()).set(var4);
@@ -587,25 +586,25 @@ public final class Emulator3D implements IGraphics3D {
                 GL11.glMultMatrix(Buffers.method527(((TransformImpl) var7.getImpl()).matrix));
             }
 
-            this.method511(var3, var6, false);
-            this.method507(var1, var2, var3, var6);
+            this.appearance(var3, var6, false);
+            this.draw(var1, var2, var3, var6);
         }
     }
 
-    private void method511(Appearance var1, float var2, boolean var3) {
+    private void appearance(Appearance var1, float var2, boolean var3) {
         if (!var3) {
-            method513(var1.getPolygonMode());
+            polygonMode(var1.getPolygonMode());
         }
 
-        this.method510(var1.getCompositingMode());
+        this.compositingMode(var1.getCompositingMode());
         if (!var3) {
-            method512(var1.getMaterial(), var2);
+            material(var1.getMaterial(), var2);
         }
 
-        method506(var1.getFog());
+        fog(var1.getFog());
     }
 
-    private static void method513(PolygonMode var0) {
+    private static void polygonMode(PolygonMode var0) {
         if (var0 == null) {
             var0 = new PolygonMode();
         }
@@ -626,7 +625,7 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glHint(3152, var0.isPerspectiveCorrectionEnabled() ? 4354 : 4353);
     }
 
-    private void method510(CompositingMode var1) {
+    private void compositingMode(CompositingMode var1) {
         if (var1 == null) {
             var1 = new CompositingMode();
         }
@@ -691,7 +690,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static void method512(Material var0, float var1) {
+    private static void material(Material var0, float var1) {
         short var10000;
         if (var0 != null) {
             GL11.glEnable(2896);
@@ -721,7 +720,7 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glDisable(var10000);
     }
 
-    private static void method506(Fog var0) {
+    private static void fog(Fog var0) {
         if (var0 != null && !Settings.xrayView) {
             GL11.glEnable(2912);
             GL11.glFogi(2917, var0.getMode() == 81 ? 9729 : 2048);
@@ -737,7 +736,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private void method507(VertexBuffer var1, IndexBuffer var2, Appearance var3, float var4) {
+    private void draw(VertexBuffer var1, IndexBuffer var2, Appearance var3, float var4) {
         VertexArray var5;
         byte[] var23;
         short[] var24;
@@ -989,7 +988,7 @@ public final class Emulator3D implements IGraphics3D {
         Transform var2 = new Transform();
         this.clearBackgound(var1.getBackground());
         var1.getActiveCamera().getTransformTo(var1, var2);
-        f.method785(var1.getActiveCamera(), var2);
+        f.setCamera(var1.getActiveCamera(), var2);
         emulator.graphics3D.m3g.a.method798(var1);
         emulator.graphics3D.m3g.d.method788().method795(var1, (Transform) null);
         this.method519();
@@ -1041,7 +1040,7 @@ public final class Emulator3D implements IGraphics3D {
         var8.method429(var7);
         var9.method429(var7);
         Transform var10 = new Transform();
-        f.aCamera1137.getProjection(var10);
+        f.camera.getProjection(var10);
         impl = (TransformImpl) var10.getImpl();
         impl.method440(var7);
         impl.method440(var8);
@@ -1179,7 +1178,7 @@ public final class Emulator3D implements IGraphics3D {
                     var28 = var29;
                 }
 
-                this.method511(var1.getAppearance(), 1.0F, true);
+                this.appearance(var1.getAppearance(), 1.0F, true);
                 GL11.glDrawPixels(var21[2], var21[3], var28, 5121, var27);
                 GL11.glPixelStorei(3314, 0);
                 GL11.glPixelStorei(3315, 0);

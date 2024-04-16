@@ -194,7 +194,7 @@ public class Graphics3D {
          throw new NullPointerException();
       } else if(!(var1 instanceof Sprite3D) && !(var1 instanceof Mesh) && !(var1 instanceof Group)) {
          throw new IllegalArgumentException();
-      } else if(target != null && f.aCamera1137 != null) {
+      } else if(target != null && f.camera != null) {
          impl.render(var1, var2);
       } else {
          throw new IllegalStateException();
@@ -203,7 +203,7 @@ public class Graphics3D {
 
    public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5) {
       if(var1 != null && var2 != null && var3 != null) {
-         if(target != null && f.aCamera1137 != null) {
+         if(target != null && f.camera != null) {
             impl.render(var1, var2, var3, var4, var5);
          } else {
             throw new IllegalStateException();
@@ -218,11 +218,11 @@ public class Graphics3D {
    }
 
    public void setCamera(Camera var1, Transform var2) {
-      f.method785(var1, var2);
+      f.setCamera(var1, var2);
    }
 
    public Camera getCamera(Transform var1) {
-      return f.method786(var1);
+      return f.getCamera(var1);
    }
 
    public int addLight(Light var1, Transform var2) {
