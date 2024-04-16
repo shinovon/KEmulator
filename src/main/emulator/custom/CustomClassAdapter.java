@@ -28,6 +28,12 @@ public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
                 Emulator.getEmulator().getLogStream().println("Patched paint method: " + className);
             }
         }
+        if ("playerUpdate".equals(name) && "(Ljavax/microedition/media/Player;Ljava/lang/String;Ljava/lang/Object;)V".equals(desc)) {
+            if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
+                acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
+                Emulator.getEmulator().getLogStream().println("Patched playerUpdate method: " + className);
+            }
+        }
         final MethodVisitor visitMethod;
         if ((visitMethod = super.visitMethod(acc, name, desc, sign, array)) != null) {
             return (MethodVisitor) new CustomMethodAdapter(visitMethod, this.className, name, desc);
