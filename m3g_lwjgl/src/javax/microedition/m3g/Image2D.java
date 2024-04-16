@@ -109,7 +109,7 @@ public class Image2D extends Object3D {
       if(var5 == null) {
          throw new NullPointerException();
       } else if(this.aBoolean36 && var1 >= 0 && var2 >= 0 && var3 > 0 && var4 > 0 && var1 + var3 <= this.width && var2 + var4 <= this.height) {
-         int var6 = this.getBpp();
+         int var6 = this.getBitsPerColor();
          if(var5.length < var3 * var4 * var6) {
             throw new IllegalArgumentException();
          } else {
@@ -139,7 +139,7 @@ public class Image2D extends Object3D {
       return this.height;
    }
 
-   public int getBpp() {
+   public int getBitsPerColor() {
       return bytesPerPixel(this.type);
    }
 
@@ -271,6 +271,18 @@ public class Image2D extends Object3D {
 
     public int size() {
       // TODO
-       return imageData.length;
+      return imageData.length;
     }
+
+   public void getPixels(byte[] dist) {
+      byte[] b = getImageData();
+      System.arraycopy(b, 0, dist, 0, b.length);
+   }
+
+   public boolean isPalettized() {
+      return false;
+   }
+
+   public void getPalette(byte[] array) {
+   }
 }
