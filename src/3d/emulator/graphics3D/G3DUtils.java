@@ -3,7 +3,6 @@ package emulator.graphics3D;
 import java.util.Arrays;
 
 public class G3DUtils {
-    private static final float FLOAT_EPSILON = 1e-6f;
 
     public static native boolean intelSSE_Invert4x4(float[] var0, float var1);
 
