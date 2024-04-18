@@ -56,6 +56,7 @@ public final class Emulator3D implements IGraphics3D {
     public static final int NumTextureUnits = 10;
     public static final int MaxTextureDimension = 1024;
     public static final int MaxSpriteCropDimension = 1024;
+    public static final int MaxLights = 8;
 
     private Emulator3D() {
         instance = this;
@@ -65,7 +66,7 @@ public final class Emulator3D implements IGraphics3D {
         properties.put("supportMipmapping", Boolean.TRUE);
         properties.put("supportPerspectiveCorrection", Boolean.TRUE);
         properties.put("supportLocalCameraLighting", Boolean.TRUE);
-        properties.put("maxLights", new Integer(8));
+        properties.put("maxLights", new Integer(MaxLights));
         properties.put("maxViewportWidth", new Integer(MaxViewportWidth));
         properties.put("maxViewportHeight", new Integer(MaxViewportHeight));
         properties.put("maxViewportDimension", new Integer(2048));
@@ -134,6 +135,7 @@ public final class Emulator3D implements IGraphics3D {
 
                 pbufferContext.makeCurrent();
             } catch (Exception var5) {
+                var5.printStackTrace();
 //                this.method499(var2, var3);
             }
 
@@ -143,7 +145,6 @@ public final class Emulator3D implements IGraphics3D {
                 } else {
                     swtBufferImage = new ImageData(w, h, 32, swtPalleteData);
                 }
-
                 buffer = BufferUtils.createByteBuffer(w * h * 4);
                 targetWidth = w;
                 targetHeight = h;
@@ -153,19 +154,19 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnable(2977);
             GL11.glPixelStorei(3317, 1);
         } catch (Exception var6) {
+            var6.printStackTrace();
             this.target = null;
             throw new IllegalArgumentException();
         }
     }
 
     public final void releaseTarget() {
-//        System.out.println("releaseTarget");
         GL11.glFinish();
         this.method503();
         this.target = null;
         if (pbufferContext != null) {
             try {
-                pbufferContext.releaseContext(); // XXX renamed from release()
+                pbufferContext.releaseContext();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -463,7 +464,7 @@ public final class Emulator3D implements IGraphics3D {
     private static void renderLights(Vector var0, Vector var1, int var2) {
         Transform var3 = new Transform();
         int var4 = var0.size();
-        int var5 = ((Integer) properties.get("maxLights")).intValue();
+        int var5 = MaxLights;
         if (var4 > var5) {
             var4 = var5;
         }
@@ -742,16 +743,14 @@ public final class Emulator3D implements IGraphics3D {
         if ((var5 = var1.getColors()) == null) {
             int var6;
             GL11.glColor4ub((byte) ((var6 = var1.getDefaultColor()) >> 16 & 255), (byte) (var6 >> 8 & 255), (byte) (var6 & 255), (byte) ((int) ((float) (var6 >> 24 & 255) * var4)));
-            GL11.glDisableClientState('\u8076');
+            GL11.glDisableClientState(32886);
         } else {
-            GL11.glEnableClientState('\u8076');
+            GL11.glEnableClientState(32886);
             if (var5.getComponentType() == 1) {
-                var23 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var23);
+                var23 = var5.getByteValues();
                 GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, 5121, 0, LWJGLUtility.getByteBuffer(var23, var4, var5.getVertexCount()));
             } else {
-                var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var24);
+                var24 = var5.getShortValues();
                 GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, 5121, 0, LWJGLUtility.getByteBuffer(var24, var4, var5.getVertexCount()));
             }
         }
@@ -759,13 +758,9 @@ public final class Emulator3D implements IGraphics3D {
         if ((var5 = var1.getNormals()) != null && var3.getMaterial() != null) {
             GL11.glEnableClientState(32885);
             if (var5.getComponentType() == 1) {
-                var23 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var23);
-                GL11.glNormalPointer(0, LWJGLUtility.getByteBuffer(var23));
+                GL11.glNormalPointer(0, LWJGLUtility.getByteBuffer(var5.getByteValues()));
             } else {
-                var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var24);
-                GL11.glNormalPointer(0, LWJGLUtility.getIntBuffer(var24));
+                GL11.glNormalPointer(0, LWJGLUtility.getIntBuffer(var5.getShortValues()));
             }
         } else {
             GL11.glDisableClientState(32885);
@@ -775,12 +770,10 @@ public final class Emulator3D implements IGraphics3D {
         var5 = var1.getPositions(var26);
         GL11.glEnableClientState(32884);
         if (var5.getComponentType() == 1) {
-            byte[] var7 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-            var5.get(0, var5.getVertexCount(), var7);
+            byte[] var7 = var5.getByteValues();
             GL11.glVertexPointer(var5.getComponentCount(), 0, LWJGLUtility.getIntBuffer(var7));
         } else {
-            short[] var25 = new short[var5.getComponentCount() * var5.getVertexCount()];
-            var5.get(0, var5.getVertexCount(), var25);
+            short[] var25 = var5.getShortValues();
             GL11.glVertexPointer(var5.getComponentCount(), 0, LWJGLUtility.getShortBuffer(var25));
         }
 
@@ -912,24 +905,14 @@ public final class Emulator3D implements IGraphics3D {
                     GL11.glTexParameteri(3553, 10241, var20);
                     GL11.glTexParameteri(3553, 10240, var19);
                     GL11.glEnableClientState('\u8078');
-                    byte var28;
                     FloatBuffer var29;
-                    int var32;
                     if (var5.getComponentType() == 1) {
-                        byte[] var21 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-                        var5.get(0, var5.getVertexCount(), var21);
-                        var32 = var5.getComponentCount();
-                        var28 = 0;
-                        var29 = LWJGLUtility.getFloatBuffer(var21);
+                        var29 = LWJGLUtility.getFloatBuffer(var5.getByteValues());
                     } else {
-                        short[] var30 = new short[var5.getComponentCount() * var5.getVertexCount()];
-                        var5.get(0, var5.getVertexCount(), var30);
-                        var32 = var5.getComponentCount();
-                        var28 = 0;
-                        var29 = LWJGLUtility.getFloatBuffer(var30);
+                        var29 = LWJGLUtility.getFloatBuffer(var5.getShortValues());
                     }
 
-                    GL11.glTexCoordPointer(var32, var28, var29);
+                    GL11.glTexCoordPointer(var5.getComponentCount(), 0, var29);
                     Transform var31 = new Transform();
                     var12.getCompositeTransform(var31);
                     var31.transpose();
