@@ -321,20 +321,20 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void setHintsInternal() {
-        if ((this.hints & Graphics3D.ANTIALIAS) != 0) {
-            GL11.glEnable(2832);
-            GL11.glEnable(2848);
-            GL11.glEnable(2881);
+        if ((hints & Graphics3D.ANTIALIAS) != 0) {
+            GL11.glEnable(GL11.GL_POINT_SMOOTH);
+            GL11.glEnable(GL11.GL_LINE_SMOOTH);
+            GL11.glEnable(GL11.GL_POLYGON_SMOOTH);
         } else {
-            GL11.glDisable(2832);
-            GL11.glDisable(2848);
-            GL11.glDisable(2881);
+            GL11.glDisable(GL11.GL_POINT_SMOOTH);
+            GL11.glDisable(GL11.GL_LINE_SMOOTH);
+            GL11.glDisable(GL11.GL_POLYGON_SMOOTH);
         }
 
-        if ((this.hints & 4) != 0) {
-            GL11.glEnable(3024);
+        if ((hints & Graphics3D.DITHER) != 0) {
+            GL11.glEnable(GL11.GL_DITHER);
         } else {
-            GL11.glDisable(3024);
+            GL11.glDisable(GL11.GL_DITHER);
         }
     }
 
