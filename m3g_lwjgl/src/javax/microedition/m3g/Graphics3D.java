@@ -57,7 +57,7 @@ public class Graphics3D {
          throw new IllegalArgumentException();
       }
 
-      boolean overwrite = false;//(hints & OVERWRITE) != 0;
+      boolean overwrite = (hints & OVERWRITE) != 0;
 
       Background bck = new Background();
       bck.setColorClearEnable(!overwrite);
