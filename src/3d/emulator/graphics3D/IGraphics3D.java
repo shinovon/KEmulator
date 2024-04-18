@@ -30,10 +30,4 @@ public interface IGraphics3D {
     void render(final Node p0, final Transform p1);
 
     void render(final World p0);
-
-    void v3bind(final Graphics p0);
-
-    void v3release(final Graphics p0);
-
-    void v3flush();
 }

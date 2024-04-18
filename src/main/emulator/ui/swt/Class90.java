@@ -350,7 +350,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     private void method492(final int n, final int n2) {
-        final emulator.graphics3D.a a = new emulator.graphics3D.a();
+        final Quaternion a = new Quaternion();
         switch (this.anInt893) {
             case 0: {
 //                if (Math.abs(n) > Math.abs(n2)) {
@@ -398,9 +398,9 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
     }
 
-    private b method495(final emulator.graphics3D.a a) {
+    private Vector4f method495(final Quaternion a) {
         final float[] array = {this.aFloat920, this.aFloat924, this.aFloat926, 1.0f};
-        final b b = new b();
+        final Vector4f b = new Vector4f();
 //        final Transform transform;
 //        (transform = new Transform()).postRotateQuat(a.aFloat1367, a.aFloat1368, a.aFloat1369, a.aFloat1370);
 //        transform.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);

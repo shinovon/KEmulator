@@ -34,7 +34,7 @@ public class AudioClip {
     }
 
     public AudioClip(int type, String s) throws IOException {
-        InputStream is = CustomJarResources.getResourceStream(s);
+        InputStream is = CustomJarResources.getResourceAsStream(s);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] b = new byte[512];
         while (is.available() > 0) {

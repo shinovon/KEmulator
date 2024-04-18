@@ -3,7 +3,7 @@ package emulator.graphics3D.m3g;
 import java.io.IOException;
 import java.io.InputStream;
 
-public final class i extends InputStream {
+public final class PeekInputStream extends InputStream {
     private int[] anIntArray1076;
     private InputStream anInputStream1077;
     private int anInt1078;
@@ -32,7 +32,7 @@ public final class i extends InputStream {
         this.anInputStream1077.close();
     }
 
-    public final void method695() throws IOException {
+    public final void rewind() throws IOException {
         if (this.anInt1079 > this.anInt1078) {
             throw new IOException("Peek buffer overrun.");
         } else {
@@ -40,7 +40,7 @@ public final class i extends InputStream {
         }
     }
 
-    public i(InputStream var1, int var2) {
+    public PeekInputStream(InputStream var1, int var2) {
         this.anInputStream1077 = var1;
         this.anIntArray1076 = new int[var2];
     }

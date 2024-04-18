@@ -134,7 +134,7 @@ public class VertexArray extends Object3D {
             }
 
             var6 += (float)var2.byteValues[var5] * var4;
-            this.byteValues[var5] = (byte)G3DUtils.method607(var6);
+            this.byteValues[var5] = (byte)G3DUtils.round(var6);
          }
       } else {
          for(var5 = 0; var5 < this.shortValues.length; ++var5) {
@@ -145,7 +145,7 @@ public class VertexArray extends Object3D {
             }
 
             var6 += (float)var2.shortValues[var5] * var4;
-            this.shortValues[var5] = (short)G3DUtils.method607(var6);
+            this.shortValues[var5] = (short)G3DUtils.round(var6);
          }
       }
 
@@ -168,7 +168,7 @@ public class VertexArray extends Object3D {
             }
 
             var6 += (float)(var2.byteValues[var5] & 255) * var4;
-            this.byteValues[var5] = (byte)G3DUtils.method606((int)(var6 + 0.5F), 0, 255);
+            this.byteValues[var5] = (byte)G3DUtils.limit((int)(var6 + 0.5F), 0, 255);
          }
       }
 

@@ -94,7 +94,7 @@ public class Material extends Object3D {
          this.emissiveColor = G3DUtils.getIntColor(var2);
          return;
       case 271:
-         this.shininess = G3DUtils.method605(var2[0], 0.0F, 128.0F);
+         this.shininess = G3DUtils.limit(var2[0], 0.0F, 128.0F);
          return;
       case 272:
          this.specularColor = G3DUtils.getIntColor(var2);

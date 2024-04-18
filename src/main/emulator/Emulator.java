@@ -670,14 +670,14 @@ public class Emulator {
         final String appProperty;
         if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
             iconPath = appProperty;
-            inputStream = emulator.custom.CustomJarResources.getResourceStream(appProperty);
+            inputStream = emulator.custom.CustomJarResources.getResourceAsStream(appProperty);
         } else {
             final String appProperty2;
             if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
                 try {
                     String s = appProperty2.split(",")[1].trim();
                     iconPath = s;
-                    inputStream = emulator.custom.CustomJarResources.getResourceStream(s);
+                    inputStream = emulator.custom.CustomJarResources.getResourceAsStream(s);
                 } catch (Exception ex3) {
                     ex3.printStackTrace();
                 }

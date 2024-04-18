@@ -124,11 +124,11 @@ public class Background extends Object3D {
          this.color = this.color & -16777216 | G3DUtils.getIntColor(var2) & 16777215;
          return;
       case 259:
-         this.cropX = G3DUtils.method607(var2[0]);
-         this.cropY = G3DUtils.method607(var2[1]);
+         this.cropX = G3DUtils.round(var2[0]);
+         this.cropY = G3DUtils.round(var2[1]);
          if(var2.length > 2) {
-            this.cropWidth = Math.max(G3DUtils.method607(var2[2]), 0);
-            this.cropHeight = Math.max(G3DUtils.method607(var2[3]), 0);
+            this.cropWidth = Math.max(G3DUtils.round(var2[2]), 0);
+            this.cropHeight = Math.max(G3DUtils.round(var2[3]), 0);
             return;
          }
       }

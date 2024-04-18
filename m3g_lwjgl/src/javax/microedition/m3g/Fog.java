@@ -71,7 +71,7 @@ public class Fog extends Object3D {
          super.updateProperty(var1, var2);
          return;
       case 260:
-         this.aFloat681 = G3DUtils.method604(var2[0]);
+         this.aFloat681 = G3DUtils.limitPositive(var2[0]);
          return;
       case 263:
          this.aFloat683 = var2[0];

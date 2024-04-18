@@ -107,7 +107,7 @@ public class Manager {
                 return new VLCPlayerImpl(s, contentType);
             }
             // jar resources
-            return new VLCPlayerImpl(CustomJarResources.getResourceStream(s), contentType);
+            return new VLCPlayerImpl(CustomJarResources.getResourceAsStream(s), contentType);
         } else if (contentType != null && contentType.startsWith("audio/")) {
             if (s.startsWith("rtsp://") || s.startsWith("rtp://") || isAudioContentTypeRequiresLibVlc(contentType)) {
                 requireLibVlc();
@@ -123,7 +123,7 @@ public class Manager {
             if (s.indexOf(58) != -1) {
                 return createPlayer(((InputConnection) Connector.open(s)).openInputStream(), contentType);
             }
-            return createPlayer(CustomJarResources.getResourceStream(s), contentType);
+            return createPlayer(CustomJarResources.getResourceAsStream(s), contentType);
         }
         throw new MediaException("Unknown content type");
     }
@@ -148,7 +148,7 @@ public class Manager {
                         return createPlayer(((InputConnection) Connector.open(locator)).openInputStream(), contentType);
                     }
                     // jar resources
-                    return createPlayer(CustomJarResources.getResourceStream(locator), contentType);
+                    return createPlayer(CustomJarResources.getResourceAsStream(locator), contentType);
                 } else {
                     // streaming datasource
                     player = new PlayerImpl(contentType, src);

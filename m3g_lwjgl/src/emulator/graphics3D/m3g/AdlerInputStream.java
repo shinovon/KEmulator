@@ -3,7 +3,7 @@ package emulator.graphics3D.m3g;
 import java.io.IOException;
 import java.io.InputStream;
 
-public final class g extends M3GFilterStream {
+public final class AdlerInputStream extends CountedInputStream {
     private int anInt1093 = 1;
     private int anInt1094 = 0;
 
@@ -19,11 +19,11 @@ public final class g extends M3GFilterStream {
         return var1;
     }
 
-    public final long method757() {
+    public final long getChecksum() {
         return ((long) this.anInt1094 << 16) + (long) this.anInt1093;
     }
 
-    public g(InputStream var1) {
+    public AdlerInputStream(InputStream var1) {
         super(var1);
     }
 }

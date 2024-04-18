@@ -8,53 +8,53 @@ import javax.microedition.m3g.SkinnedMesh;
 import javax.microedition.m3g.Sprite3D;
 import javax.microedition.m3g.Transform;
 
-public final class d {
-    private static d ad1145;
-    private static d ad1148;
+public final class RenderPipe {
+    private static RenderPipe inst;
+    private static RenderPipe viewInst;
     private Node aNode1146;
     private Vector aVector1147 = new Vector();
 
-    public static d method788() {
-        if (ad1145 == null) {
-            ad1145 = new d();
+    public static RenderPipe getInstance() {
+        if (inst == null) {
+            inst = new RenderPipe();
         }
 
-        return ad1145;
+        return inst;
     }
 
-    public static d method796() {
-        if (ad1148 == null) {
-            ad1148 = new d();
+    public static RenderPipe getViewInstance() {
+        if (viewInst == null) {
+            viewInst = new RenderPipe();
         }
 
-        return ad1148;
+        return viewInst;
     }
 
-    private void method789(c var1) {
+    private void method789(RenderObject var1) {
         Object var2 = null;
 
         int var3;
-        for (var3 = 0; var3 < this.aVector1147.size() && ((c) this.aVector1147.get(var3)).anInt1144 <= var1.anInt1144; ++var3) {
+        for (var3 = 0; var3 < this.aVector1147.size() && ((RenderObject) this.aVector1147.get(var3)).m_sortKey <= var1.m_sortKey; ++var3) {
             ;
         }
 
         this.aVector1147.insertElementAt(var1, var3);
     }
 
-    public final int method790() {
+    public final int getSize() {
         return this.aVector1147.size();
     }
 
-    public final void method791() {
+    public final void clear() {
         this.aVector1147.clear();
         this.aNode1146 = null;
     }
 
-    public final c method792(int var1) {
-        return (c) this.aVector1147.get(var1);
+    public final RenderObject getRenderObj(int var1) {
+        return (RenderObject) this.aVector1147.get(var1);
     }
 
-    public final boolean method793(Node var1) {
+    public final boolean isVisible(Node var1) {
         Node var10000 = var1;
 
         while (true) {
@@ -77,7 +77,7 @@ public final class d {
         return true;
     }
 
-    public final float method794(Node var1) {
+    public final float getEffectiveAlphaFactor(Node var1) {
         float var2 = var1.getAlphaFactor();
         Node var10000 = var1;
 
@@ -92,13 +92,13 @@ public final class d {
         }
     }
 
-    public final void method795(Node var1, Transform var2) {
+    public final void pushRenderNode(Node var1, Transform var2) {
         this.aNode1146 = var1;
         this.method797(var1, var2);
     }
 
     private void method797(Node var1, Transform var2) {
-        if (this.method793(var1)) {
+        if (this.isVisible(var1)) {
             if (var2 == null) {
                 var2 = new Transform();
             }
@@ -106,7 +106,7 @@ public final class d {
             if (var1 instanceof Sprite3D) {
                 Sprite3D var9;
                 if ((var9 = (Sprite3D) var1).getAppearance() != null && var9.getCropWidth() != 0 && var9.getCropHeight() != 0) {
-                    this.method789(new c(var1, var2, 0, this));
+                    this.method789(new RenderObject(var1, var2, 0, this));
                 }
             } else {
                 if (var1 instanceof Mesh) {
@@ -114,7 +114,7 @@ public final class d {
 
                     for (int var4 = 0; var4 < var3; ++var4) {
                         if (((Mesh) var1).getAppearance(var4) != null) {
-                            this.method789(new c(var1, var2, var4, this));
+                            this.method789(new RenderObject(var1, var2, var4, this));
                         }
                     }
 

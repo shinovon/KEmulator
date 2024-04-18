@@ -103,10 +103,10 @@ public class Light extends Node {
          this.intensity = var2[0];
          return;
       case 273:
-         this.spotAngle = G3DUtils.method605(var2[0], 0.0F, 90.0F);
+         this.spotAngle = G3DUtils.limit(var2[0], 0.0F, 90.0F);
          return;
       case 274:
-         this.spotExponent = G3DUtils.method605(var2[0], 0.0F, 128.0F);
+         this.spotExponent = G3DUtils.limit(var2[0], 0.0F, 128.0F);
          return;
       default:
          super.updateProperty(var1, var2);

@@ -1,7 +1,7 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import emulator.graphics3D.b;
+import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
 public class VertexBuffer extends Object3D {
@@ -217,11 +217,11 @@ public class VertexBuffer extends Object3D {
       }
    }
 
-   protected boolean getNormalVertex(int var1, b var2) {
+   protected boolean getNormalVertex(int var1, Vector4f var2) {
       if(this.normals == null) {
          return false;
       } else {
-         b var10000;
+         Vector4f var10000;
          float var10001;
          float var10002;
          short var10003;
@@ -241,12 +241,12 @@ public class VertexBuffer extends Object3D {
             var10003 = var4[2];
          }
 
-         var10000.method422(var10001, var10002, (float)var10003, 1.0F);
+         var10000.set(var10001, var10002, (float)var10003, 1.0F);
          return true;
       }
    }
 
-   protected void getVertex(int var1, b var2) {
+   protected void getVertex(int var1, Vector4f var2) {
       byte[] var3 = new byte[3];
       short[] var4 = new short[3];
       short var10000;
@@ -271,10 +271,10 @@ public class VertexBuffer extends Object3D {
       var5 += this.aFloatArray735[1];
       var6 += this.aFloatArray735[2];
       var7 += this.aFloatArray735[3];
-      var2.method422(var5, var6, var7, 1.0F);
+      var2.set(var5, var6, var7, 1.0F);
    }
 
-   protected boolean getTexVertex(int var1, int var2, b var3) {
+   protected boolean getTexVertex(int var1, int var2, Vector4f var3) {
       if(this.aVertexArrayArray734[var2] == null) {
          return false;
       } else {
@@ -301,7 +301,7 @@ public class VertexBuffer extends Object3D {
          var7 += this.aFloatArrayArray144[var2][1];
          var8 += this.aFloatArrayArray144[var2][2];
          var9 += this.aFloatArrayArray144[var2][3];
-         var3.method422(var7, var8, var9, 1.0F);
+         var3.set(var7, var8, var9, 1.0F);
          return true;
       }
    }

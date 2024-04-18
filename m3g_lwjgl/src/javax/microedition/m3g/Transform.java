@@ -1,24 +1,24 @@
 package javax.microedition.m3g;
 
-import emulator.graphics3D.TransformImpl;
+import emulator.graphics3D.Transform3D;
 
 public class Transform {
-   private TransformImpl impl;
+   private Transform3D impl;
 
    public Transform() {
-      this.impl = new TransformImpl();
+      this.impl = new Transform3D();
    }
 
    public Transform(Transform var1) {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.impl = new TransformImpl();
-         this.impl.copy(var1.impl);
+         this.impl = new Transform3D();
+         this.impl.set(var1.impl);
       }
    }
 
-   TransformImpl getImpl_() {
+   Transform3D getImpl_() {
       return this.impl;
    }
 
@@ -27,14 +27,14 @@ public class Transform {
    }
 
    public void setIdentity() {
-      this.impl.reset();
+      this.impl.setIdentity();
    }
 
    public void set(Transform var1) {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.impl.copy(var1.impl);
+         this.impl.set(var1.impl);
       }
    }
 
@@ -59,34 +59,34 @@ public class Transform {
    }
 
    public void invert() {
-      this.impl.method442();
+      this.impl.invert();
    }
 
    public void transpose() {
-      this.impl.method447();
+      this.impl.transpose();
    }
 
    public void postMultiply(Transform var1) {
       if(var1 == null) {
          throw new NullPointerException();
       } else {
-         this.impl.method436(var1.impl, false);
+         this.impl.postMultiply(var1.impl, false);
       }
    }
 
    public void preMultiply(Transform var1) {
-      this.impl.method436(var1.impl, true);
+      this.impl.postMultiply(var1.impl, true);
    }
 
    public void postScale(float var1, float var2, float var3) {
-      this.impl.method438(var1, var2, var3);
+      this.impl.postScale(var1, var2, var3);
    }
 
    public void postRotate(float var1, float var2, float var3, float var4) {
       if(var2 == 0.0F && var3 == 0.0F && var4 == 0.0F && var1 != 0.0F) {
          throw new IllegalArgumentException();
       } else {
-         this.impl.method437(var1, var2, var3, var4);
+         this.impl.postRotate(var1, var2, var3, var4);
       }
    }
 
@@ -94,12 +94,12 @@ public class Transform {
       if(var3 == 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
          throw new IllegalArgumentException();
       } else {
-         this.impl.method443(var1, var2, var3, var4);
+         this.impl.postRotateQuat(var1, var2, var3, var4);
       }
    }
 
    public void postTranslate(float var1, float var2, float var3) {
-      this.impl.method444(var1, var2, var3);
+      this.impl.postTranslate(var1, var2, var3);
    }
 
    public void transform(VertexArray var1, float[] var2, boolean var3) {
@@ -135,7 +135,7 @@ public class Transform {
                }
             }
 
-            this.impl.method446(var2);
+            this.impl.transform(var2);
          } else {
             throw new IllegalArgumentException();
          }
@@ -150,7 +150,7 @@ public class Transform {
       } else if(var1.length % 4 != 0) {
          throw new IllegalArgumentException();
       } else {
-         this.impl.method446(var1);
+         this.impl.transform(var1);
       }
    }
 }

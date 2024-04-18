@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.graphics3D.b;
+import emulator.graphics3D.Vector4f;
 import java.util.Vector;
 
 public class Group extends Node {
@@ -83,30 +83,30 @@ public class Group extends Node {
       } else if(var4.getRoot() != this.getRoot()) {
          throw new IllegalStateException();
       } else {
-         b var7 = new b(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, 1.0F, 1.0F);
-         b var8 = new b(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, -1.0F, 1.0F);
+         Vector4f var7 = new Vector4f(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, 1.0F, 1.0F);
+         Vector4f var8 = new Vector4f(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, -1.0F, 1.0F);
          Transform var9 = new Transform();
          var4.getProjection(var9);
          var9.getImpl_().method445();
-         var9.getImpl_().method440(var8);
-         var8.method425(1.0F / var8.aFloat614);
-         var9.getImpl_().method440(var7);
-         var7.method425(1.0F / var7.aFloat614);
+         var9.getImpl_().transform(var8);
+         var8.mul(1.0F / var8.w);
+         var9.getImpl_().transform(var7);
+         var7.mul(1.0F / var7.w);
          float[] var10;
-         (var10 = new float[8])[6] = var8.aFloat612;
-         var10[7] = var7.aFloat612;
+         (var10 = new float[8])[6] = var8.z;
+         var10[7] = var7.z;
          Transform var11 = new Transform();
          var4.getTransformTo(this, var11);
-         var11.getImpl_().method440(var8);
-         var8.method425(1.0F / var8.aFloat614);
-         var11.getImpl_().method440(var7);
-         var7.method425(1.0F / var7.aFloat614);
-         var10[0] = var8.aFloat608;
-         var10[1] = var8.aFloat610;
-         var10[2] = var8.aFloat612;
-         var10[3] = var7.aFloat608;
-         var10[4] = var7.aFloat610;
-         var10[5] = var7.aFloat612;
+         var11.getImpl_().transform(var8);
+         var8.mul(1.0F / var8.w);
+         var11.getImpl_().transform(var7);
+         var7.mul(1.0F / var7.w);
+         var10[0] = var8.x;
+         var10[1] = var8.y;
+         var10[2] = var8.z;
+         var10[3] = var7.x;
+         var10[4] = var7.y;
+         var10[5] = var7.z;
          if(var5 == null) {
             var5 = new RayIntersection();
          }

@@ -1,7 +1,7 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import emulator.graphics3D.b;
+import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
 public class Mesh extends Node {
@@ -107,21 +107,21 @@ public class Mesh extends Node {
             throw new IllegalStateException("No vertex positions");
          } else {
             boolean var6 = false;
-            b var7 = new b(var2[0], var2[1], var2[2], 1.0F);
-            b var8 = new b(var2[3], var2[4], var2[5], 1.0F);
+            Vector4f var7 = new Vector4f(var2[0], var2[1], var2[2], 1.0F);
+            Vector4f var8 = new Vector4f(var2[3], var2[4], var2[5], 1.0F);
             Transform var9;
             (var9 = new Transform()).set(var4);
             var9.getImpl_().method445();
-            var9.getImpl_().method440(var7);
-            var9.getImpl_().method440(var8);
-            var7.method425(1.0F / var7.aFloat614);
-            var8.method425(1.0F / var8.aFloat614);
-            var8.method431(var7);
-            b var10 = new b();
-            b var11 = new b();
-            b var12 = new b();
-            b var13 = new b();
-            b var14 = new b();
+            var9.getImpl_().transform(var7);
+            var9.getImpl_().transform(var8);
+            var7.mul(1.0F / var7.w);
+            var8.mul(1.0F / var8.w);
+            var8.sub(var7);
+            Vector4f var10 = new Vector4f();
+            Vector4f var11 = new Vector4f();
+            Vector4f var12 = new Vector4f();
+            Vector4f var13 = new Vector4f();
+            Vector4f var14 = new Vector4f();
             Transform var15 = new Transform();
             int[] var16 = new int[4];
             float[] var17 = new float[Emulator3D.NumTextureUnits];
@@ -167,13 +167,13 @@ public class Mesh extends Node {
                      var5.getVertex(var16[0], var10);
                      var5.getVertex(var16[1], var11);
                      var5.getVertex(var16[2], var12);
-                     if(G3DUtils.method609(var7, var8, var10, var11, var12, var14, var16[3] ^ var21) && var3.testDistance(var14.aFloat608)) {
+                     if(G3DUtils.intersectTriangle(var7, var8, var10, var11, var12, var14, var16[3] ^ var21) && var3.testDistance(var14.x)) {
                         if(var5.getNormalVertex(var16[0], var10)) {
                            var5.getNormalVertex(var16[1], var11);
                            var5.getNormalVertex(var16[2], var12);
-                           (var19 = new float[3])[0] = var10.aFloat608 * (1.0F - (var14.aFloat610 + var14.aFloat612)) + var11.aFloat608 * var14.aFloat610 + var12.aFloat608 * var14.aFloat612;
-                           var19[1] = var10.aFloat610 * (1.0F - (var14.aFloat610 + var14.aFloat612)) + var11.aFloat610 * var14.aFloat610 + var12.aFloat610 * var14.aFloat612;
-                           var19[2] = var10.aFloat612 * (1.0F - (var14.aFloat610 + var14.aFloat612)) + var11.aFloat612 * var14.aFloat610 + var12.aFloat612 * var14.aFloat612;
+                           (var19 = new float[3])[0] = var10.x * (1.0F - (var14.y + var14.z)) + var11.x * var14.y + var12.x * var14.z;
+                           var19[1] = var10.y * (1.0F - (var14.y + var14.z)) + var11.y * var14.y + var12.y * var14.z;
+                           var19[2] = var10.z * (1.0F - (var14.y + var14.z)) + var11.z * var14.y + var12.z * var14.z;
                         }
 
                         for(int var25 = 0; var25 < var17.length; ++var25) {
@@ -183,20 +183,20 @@ public class Mesh extends Node {
                            if(var5.getTexVertex(var16[0], var25, var10)) {
                               var5.getTexVertex(var16[1], var25, var11);
                               var5.getTexVertex(var16[2], var25, var12);
-                              var13.aFloat608 = var10.aFloat608 * (1.0F - (var14.aFloat610 + var14.aFloat612)) + var11.aFloat608 * var14.aFloat610 + var12.aFloat608 * var14.aFloat612;
-                              var13.aFloat610 = var10.aFloat610 * (1.0F - (var14.aFloat610 + var14.aFloat612)) + var11.aFloat610 * var14.aFloat610 + var12.aFloat610 * var14.aFloat612;
-                              var13.aFloat612 = 0.0F;
-                              var13.aFloat614 = 1.0F;
+                              var13.x = var10.x * (1.0F - (var14.y + var14.z)) + var11.x * var14.y + var12.x * var14.z;
+                              var13.y = var10.y * (1.0F - (var14.y + var14.z)) + var11.y * var14.y + var12.y * var14.z;
+                              var13.z = 0.0F;
+                              var13.w = 1.0F;
                               if(this.appearances[var20] != null && this.appearances[var20].getTexture(var25) != null) {
                                  this.appearances[var20].getTexture(var25).getCompositeTransform(var15);
-                                 var15.getImpl_().method440(var13);
-                                 var13.method425(1.0F / var13.aFloat614);
+                                 var15.getImpl_().transform(var13);
+                                 var13.mul(1.0F / var13.w);
                               }
 
-                              var18[var25] = var13.aFloat608;
+                              var18[var25] = var13.x;
                               var26 = var17;
                               var10001 = var25;
-                              var10002 = var13.aFloat610;
+                              var10002 = var13.y;
                            } else {
                               var18[var25] = 0.0F;
                               var26 = var17;
@@ -207,7 +207,7 @@ public class Mesh extends Node {
                            var26[var10001] = var10002;
                         }
 
-                        if(var3.endPick(var14.aFloat608, var18, var17, var20, this, var14.aFloat608, var19)) {
+                        if(var3.endPick(var14.x, var18, var17, var20, this, var14.x, var19)) {
                            var6 = true;
                         }
                      }

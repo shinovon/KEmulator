@@ -3,7 +3,6 @@ package javax.microedition.lcdui;
 import emulator.graphics2D.*;
 import emulator.debug.*;
 import emulator.*;
-import emulator.custom.*;
 
 import java.io.*;
 
@@ -155,7 +154,7 @@ public class Image {
             if (!string.startsWith("/")) {
                 string = "/" + string;
             }
-            return createImage(emulator.custom.CustomJarResources.getResourceStream(string));
+            return createImage(emulator.custom.CustomJarResources.getResourceAsStream(string));
         } catch (Exception ex) {
             //ex.printStackTrace();
             throw new IOException(string);
@@ -170,6 +169,29 @@ public class Image {
 
     public void getRGB(final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
         emulator.graphics2D.b.method165(this.imageImpl, array, n, n2, n3, n4, n5, n6);
+    }
+
+    public static Image createImage(InputStream var0, int var1) throws IOException {
+        ByteArrayOutputStream var2 = new ByteArrayOutputStream();
+        byte[] var3 = new byte[512];
+        if (var1 == 8) {
+            var2.write(137);
+            var2.write(80);
+            var2.write(78);
+            var2.write(71);
+            var2.write(13);
+            var2.write(10);
+            var2.write(26);
+            var2.write(10);
+        }
+
+        while(var0.available() > 0) {
+            int var4 = var0.read(var3);
+            var2.write(var3, 0, var4);
+        }
+
+        byte[] b = var2.toByteArray();
+        return createImage(b, 0, b.length);
     }
 
     void dispose() {

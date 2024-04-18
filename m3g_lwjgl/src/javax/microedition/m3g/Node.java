@@ -1,8 +1,8 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import emulator.graphics3D.a;
-import emulator.graphics3D.b;
+import emulator.graphics3D.Quaternion;
+import emulator.graphics3D.Vector4f;
 
 public abstract class Node extends Transformable {
    public static final int NONE = 144;
@@ -173,18 +173,18 @@ public abstract class Node extends Transformable {
          var10001 = var1;
       }
 
-      var10000.computeAlignment(var10001, (b)null, (b)null, (b)null, (b)null);
+      var10000.computeAlignment(var10001, (Vector4f)null, (Vector4f)null, (Vector4f)null, (Vector4f)null);
    }
 
-   protected void computeAlignment(Node var1, b var2, b var3, b var4, b var5) {
+   protected void computeAlignment(Node var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5) {
       Node var6 = this.getRoot();
       if(this.aNode1305 != null && (this.aNode1305.isDescendantOf(this) || this.aNode1305.getRoot() != var6)) {
          throw new IllegalStateException();
       } else if(this.aNode1304 == null || !this.aNode1304.isDescendantOf(this) && this.aNode1304.getRoot() == var6) {
          Transform var7 = new Transform();
          Transform var8 = new Transform();
-         b var9 = new b();
-         a var10 = new a(0.0F, 0.0F, 0.0F, 1.0F);
+         Vector4f var9 = new Vector4f();
+         Quaternion var10 = new Quaternion(0.0F, 0.0F, 0.0F, 1.0F);
          float[] var11 = new float[3];
          this.getTranslation(var11);
          if(this.anInt40 != 144) {
@@ -196,8 +196,8 @@ public abstract class Node extends Transformable {
             var8.postTranslate(-var11[0], -var11[1], -var11[2]);
             var7.preMultiply(var8);
             method904(this.anInt40, var7, var2, var3, var4, var5, var9);
-            var9.aFloat614 = 0.0F;
-            var10.method413(b.ab611, var9, (b)null);
+            var9.w = 0.0F;
+            var10.setRotation(Vector4f.Z_AXIS, var9, (Vector4f)null);
          }
 
          if(this.anInt39 != 144) {
@@ -210,23 +210,23 @@ public abstract class Node extends Transformable {
             var7.preMultiply(var8);
             if(this.anInt40 != 144) {
                var8.setIdentity();
-               var8.postRotateQuat(var10.aFloat603, var10.aFloat604, var10.aFloat605, -var10.aFloat606);
+               var8.postRotateQuat(var10.x, var10.y, var10.z, -var10.w);
                var7.preMultiply(var8);
             }
 
             method904(this.anInt39, var7, var2, var3, var4, var5, var9);
-            var9.aFloat614 = 0.0F;
+            var9.w = 0.0F;
             if(this.anInt40 != 144) {
-               a var13;
-               (var13 = new a()).method413(b.ab609, var9, b.ab611);
-               var10.method416(var13);
+               Quaternion var13;
+               (var13 = new Quaternion()).setRotation(Vector4f.Y_AXIS, var9, Vector4f.Z_AXIS);
+               var10.mul(var13);
             } else {
-               var10.method413(b.ab609, var9, (b)null);
+               var10.setRotation(Vector4f.Y_AXIS, var9, (Vector4f)null);
             }
          }
 
          if(this.anInt40 != 144 || this.anInt39 != 144) {
-            super.ana864.method406(var10);
+            super.ana864.set(var10);
          }
 
       } else {
@@ -234,22 +234,22 @@ public abstract class Node extends Transformable {
       }
    }
 
-   private static void method904(int var0, Transform var1, b var2, b var3, b var4, b var5, b var6) {
+   private static void method904(int var0, Transform var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5, Vector4f var6) {
       switch(var0) {
       case 145:
-         var6.method423(var2 == null?b.ab613:var2);
+         var6.set(var2 == null? Vector4f.ORIGIN :var2);
          break;
       case 146:
-         var6.method423(var3 == null?b.ab607:var3);
+         var6.set(var3 == null? Vector4f.X_AXIS :var3);
          break;
       case 147:
-         var6.method423(var4 == null?b.ab609:var4);
+         var6.set(var4 == null? Vector4f.Y_AXIS :var4);
          break;
       case 148:
-         var6.method423(var5 == null?b.ab611:var5);
+         var6.set(var5 == null? Vector4f.Z_AXIS :var5);
       }
 
-      var1.getImpl_().method440(var6);
+      var1.getImpl_().transform(var6);
    }
 
    public void setAlignment(Node var1, int var2, Node var3, int var4) {
@@ -288,7 +288,7 @@ public abstract class Node extends Transformable {
    protected void updateProperty(int var1, float[] var2) {
       switch(var1) {
       case 256:
-         this.alphaFactor = G3DUtils.method605(var2[0], 0.0F, 1.0F);
+         this.alphaFactor = G3DUtils.limit(var2[0], 0.0F, 1.0F);
          return;
       case 269:
          this.pickingEnable = var2[0] >= 0.5F;

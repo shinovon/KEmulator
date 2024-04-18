@@ -3,8 +3,8 @@ package javax.microedition.m3g;
 import emulator.Emulator;
 import emulator.graphics3D.IGraphics3D;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.m3g.a;
-import emulator.graphics3D.m3g.f;
+import emulator.graphics3D.m3g.LightsCache;
+import emulator.graphics3D.m3g.CameraCache;
 import java.util.Hashtable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
@@ -194,7 +194,7 @@ public class Graphics3D {
          throw new NullPointerException();
       } else if(!(var1 instanceof Sprite3D) && !(var1 instanceof Mesh) && !(var1 instanceof Group)) {
          throw new IllegalArgumentException();
-      } else if(target != null && f.camera != null) {
+      } else if(target != null && CameraCache.camera != null) {
          impl.render(var1, var2);
       } else {
          throw new IllegalStateException();
@@ -203,7 +203,7 @@ public class Graphics3D {
 
    public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5) {
       if(var1 != null && var2 != null && var3 != null) {
-         if(target != null && f.camera != null) {
+         if(target != null && CameraCache.camera != null) {
             impl.render(var1, var2, var3, var4, var5);
          } else {
             throw new IllegalStateException();
@@ -218,30 +218,30 @@ public class Graphics3D {
    }
 
    public void setCamera(Camera var1, Transform var2) {
-      f.setCamera(var1, var2);
+      CameraCache.setCamera(var1, var2);
    }
 
    public Camera getCamera(Transform var1) {
-      return f.getCamera(var1);
+      return CameraCache.getCamera(var1);
    }
 
    public int addLight(Light var1, Transform var2) {
-      return a.method800(var1, var2);
+      return LightsCache.addLight(var1, var2);
    }
 
    public void setLight(int var1, Light var2, Transform var3) {
-      a.method801(var1, var2, var3);
+      LightsCache.setLight(var1, var2, var3);
    }
 
    public void resetLights() {
-      a.method802();
+      LightsCache.resetLights();
    }
 
    public int getLightCount() {
-      return a.method803();
+      return LightsCache.getLightCount();
    }
 
    public Light getLight(int var1, Transform var2) {
-      return a.method804(var1, var2);
+      return LightsCache.getLight(var1, var2);
    }
 }

@@ -1,7 +1,7 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.G3DUtils;
-import emulator.graphics3D.b;
+import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
 public class Sprite3D extends Node {
@@ -80,11 +80,11 @@ public class Sprite3D extends Node {
    protected void updateProperty(int var1, float[] var2) {
       switch(var1) {
       case 259:
-         this.cropX = G3DUtils.method607(var2[0]);
-         this.cropY = G3DUtils.method607(var2[1]);
+         this.cropX = G3DUtils.round(var2[0]);
+         this.cropY = G3DUtils.round(var2[1]);
          if(var2.length > 2) {
-            this.cropWidth = G3DUtils.method606(G3DUtils.method607(var2[2]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
-            this.cropHeight = G3DUtils.method606(G3DUtils.method607(var2[3]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
+            this.cropWidth = G3DUtils.limit(G3DUtils.round(var2[2]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
+            this.cropHeight = G3DUtils.limit(G3DUtils.round(var2[3]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
             return;
          }
          break;
@@ -104,53 +104,53 @@ public class Sprite3D extends Node {
             var6[2] = Math.abs(var6[2]);
             var6[3] = Math.abs(var6[3]);
             int[] var9 = new int[4];
-            if(!G3DUtils.method608(var6[0], var6[1], var6[2], var6[3], 0, 0, this.image.getWidth(), this.image.getHeight(), var9)) {
+            if(!G3DUtils.intersectRectangle(var6[0], var6[1], var6[2], var6[3], 0, 0, this.image.getWidth(), this.image.getHeight(), var9)) {
                return false;
             } else {
-               b var10 = new b(0.0F, 0.0F, 0.0F, 1.0F);
-               b var11 = new b(0.5F, 0.0F, 0.0F, 1.0F);
-               b var12 = new b(0.0F, 0.5F, 0.0F, 1.0F);
+               Vector4f var10 = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
+               Vector4f var11 = new Vector4f(0.5F, 0.0F, 0.0F, 1.0F);
+               Vector4f var12 = new Vector4f(0.0F, 0.5F, 0.0F, 1.0F);
                Transform var13 = new Transform();
                this.getTransformTo(var5, var13);
-               var13.getImpl_().method440(var10);
-               var13.getImpl_().method440(var11);
-               var13.getImpl_().method440(var12);
-               b var14 = new b(var10);
-               var10.method425(1.0F / var10.aFloat614);
-               var11.method425(1.0F / var11.aFloat614);
-               var12.method425(1.0F / var12.aFloat614);
-               float var15 = (var10.aFloat612 - var2[6]) / (var2[7] - var2[6]);
-               var11.method431(var10);
-               var12.method431(var10);
-               b var16 = new b(var11.method424(), 0.0F, 0.0F, 0.0F);
-               b var17 = new b(0.0F, var12.method424(), 0.0F, 0.0F);
-               var16.method429(var14);
-               var17.method429(var14);
+               var13.getImpl_().transform(var10);
+               var13.getImpl_().transform(var11);
+               var13.getImpl_().transform(var12);
+               Vector4f var14 = new Vector4f(var10);
+               var10.mul(1.0F / var10.w);
+               var11.mul(1.0F / var11.w);
+               var12.mul(1.0F / var12.w);
+               float var15 = (var10.z - var2[6]) / (var2[7] - var2[6]);
+               var11.sub(var10);
+               var12.sub(var10);
+               Vector4f var16 = new Vector4f(var11.length(), 0.0F, 0.0F, 0.0F);
+               Vector4f var17 = new Vector4f(0.0F, var12.length(), 0.0F, 0.0F);
+               var16.add(var14);
+               var17.add(var14);
                var5.getProjection(var13);
-               var13.getImpl_().method440(var14);
-               var13.getImpl_().method440(var16);
-               var13.getImpl_().method440(var17);
-               if(var14.aFloat614 > 0.0F && -var14.aFloat614 < var14.aFloat612 && var14.aFloat612 <= var14.aFloat614) {
-                  var14.method425(1.0F / var14.aFloat614);
-                  var16.method425(1.0F / var16.aFloat614);
-                  var17.method425(1.0F / var17.aFloat614);
-                  var16.method431(var14);
-                  var17.method431(var14);
-                  var16.aFloat608 = var16.method424() / (float)var6[2];
-                  var17.aFloat610 = var17.method424() / (float)var6[3];
-                  var14.aFloat608 -= (float)(2 * var6[0] + var6[2] - 2 * var9[0] - var9[2]) * var16.aFloat608;
-                  var14.aFloat610 += (float)(2 * var6[1] + var6[3] - 2 * var9[1] - var9[3]) * var17.aFloat610;
-                  var16.aFloat608 *= (float)var9[2];
-                  var17.aFloat610 *= (float)var9[3];
+               var13.getImpl_().transform(var14);
+               var13.getImpl_().transform(var16);
+               var13.getImpl_().transform(var17);
+               if(var14.w > 0.0F && -var14.w < var14.z && var14.z <= var14.w) {
+                  var14.mul(1.0F / var14.w);
+                  var16.mul(1.0F / var16.w);
+                  var17.mul(1.0F / var17.w);
+                  var16.sub(var14);
+                  var17.sub(var14);
+                  var16.x = var16.length() / (float)var6[2];
+                  var17.y = var17.length() / (float)var6[3];
+                  var14.x -= (float)(2 * var6[0] + var6[2] - 2 * var9[0] - var9[2]) * var16.x;
+                  var14.y += (float)(2 * var6[1] + var6[3] - 2 * var9[1] - var9[3]) * var17.y;
+                  var16.x *= (float)var9[2];
+                  var17.y *= (float)var9[3];
                   float[] var18 = new float[12];
                   int[] var19 = new int[8];
-                  var18[0] = var14.aFloat608 - var16.aFloat608;
-                  var18[1] = var14.aFloat610 + var17.aFloat610;
-                  var18[2] = var14.aFloat612;
+                  var18[0] = var14.x - var16.x;
+                  var18[1] = var14.y + var17.y;
+                  var18[2] = var14.z;
                   var18[3] = var18[0];
-                  var18[4] = var14.aFloat610 - var17.aFloat610;
+                  var18[4] = var14.y - var17.y;
                   var18[5] = var18[2];
-                  var18[6] = var14.aFloat608 + var16.aFloat608;
+                  var18[6] = var14.x + var16.x;
                   var18[7] = var18[1];
                   var18[8] = var18[2];
                   var18[9] = var18[6];
@@ -228,10 +228,10 @@ public class Sprite3D extends Node {
                      }
 
                      var29[var10001] = var30;
-                     int var24 = G3DUtils.method606(G3DUtils.method607(var22[0]), 0, this.image.getWidth() - 1);
-                     int var25 = G3DUtils.method606(G3DUtils.method607(var23[0]), 0, this.image.getWidth() - 1);
-                     var22[0] = G3DUtils.method605(var22[0], 0.0F, (float)this.image.getWidth());
-                     var23[0] = G3DUtils.method605(var23[0], 0.0F, (float)this.image.getHeight());
+                     int var24 = G3DUtils.limit(G3DUtils.round(var22[0]), 0, this.image.getWidth() - 1);
+                     int var25 = G3DUtils.limit(G3DUtils.round(var23[0]), 0, this.image.getWidth() - 1);
+                     var22[0] = G3DUtils.limit(var22[0], 0.0F, (float)this.image.getWidth());
+                     var23[0] = G3DUtils.limit(var23[0], 0.0F, (float)this.image.getHeight());
                      int var26 = 0;
                      byte var27 = -1;
                      if(this.appearance.getCompositingMode() != null) {

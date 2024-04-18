@@ -123,14 +123,14 @@ public final class EmulatorScreen implements
     MenuItem aMenuItem964;
     MenuItem networkKillswitchMenuItem;
     private static AVIWriter aviWriter;
-    private static int anInt1012;
+    private static int captureFileCounter;
     private static String aString993;
     private int pauseState;
     private final String[] pauseStateStrings;
     private boolean infosEnabled;
     private String aString1008;
     private CaretImpl caret;
-    private int anInt1020;
+    private int interpolation;
     private boolean[] keysState;
     private int mouseXPress;
     private int mouseXRelease;
@@ -975,11 +975,11 @@ public final class EmulatorScreen implements
                         file.mkdir();
                     }
                     if (Settings.g2d == 0) {
-                        this.screenCopySwt.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
+                        this.screenCopySwt.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.captureFileCounter + ".png");
                     } else if (Settings.g2d == 1) {
-                        this.screenCopyAwt.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".png");
+                        this.screenCopyAwt.saveToFile(string + EmulatorScreen.aString993 + EmulatorScreen.captureFileCounter + ".png");
                     }
-                    ++EmulatorScreen.anInt1012;
+                    ++EmulatorScreen.captureFileCounter;
                 }
             } else if (menuItem.equals(this.captureToClipboardMenuItem)) {
                 if (this.pauseState != 0) {
@@ -1003,7 +1003,7 @@ public final class EmulatorScreen implements
                     ((Dialog) (fileDialog = new FileDialog(this.shell, 8192))).setText(emulator.UILocale.get("SAVE_TO_FILE", "Save to file"));
                     fileDialog.setFilterPath(string2);
                     fileDialog.setFilterExtensions(new String[]{"*.avi", "*.*"});
-                    fileDialog.setFileName(EmulatorScreen.aString993 + EmulatorScreen.anInt1012 + ".avi");
+                    fileDialog.setFileName(EmulatorScreen.aString993 + EmulatorScreen.captureFileCounter + ".avi");
                     final String open;
                     if ((open = fileDialog.open()) != null) {
                         EmulatorScreen.aviWriter = new AVIWriter();
@@ -1011,7 +1011,7 @@ public final class EmulatorScreen implements
                             EmulatorScreen.aviWriter.method842();
                             EmulatorScreen.aviWriter = null;
                         }
-                        ++EmulatorScreen.anInt1012;
+                        ++EmulatorScreen.captureFileCounter;
                         this.updatePauseState();
                     }
                     this.resumeStep();
@@ -1432,7 +1432,7 @@ public final class EmulatorScreen implements
 
     public final void paintControl(final PaintEvent paintEvent) {
         final GC gc;
-        (gc = paintEvent.gc).setInterpolation(this.anInt1020);
+        (gc = paintEvent.gc).setInterpolation(this.interpolation);
         gc.setTransform(this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform);
         try {
             if (this.screenImg == null || this.screenImg.isDisposed()) {
@@ -2194,7 +2194,7 @@ public final class EmulatorScreen implements
     }
 
     static int method562(final EmulatorScreen class93, final int anInt1020) {
-        return class93.anInt1020 = anInt1020;
+        return class93.interpolation = anInt1020;
     }
 
     static long method559(final EmulatorScreen class93, final long aLong1017) {
@@ -2214,7 +2214,7 @@ public final class EmulatorScreen implements
     }
 
     static {
-        EmulatorScreen.anInt1012 = 1;
+        EmulatorScreen.captureFileCounter = 1;
         EmulatorScreen.aString993 = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss", Locale.ENGLISH).format(Calendar.getInstance().getTime()) + "_";
     }
 

@@ -56,7 +56,7 @@ public final class M3GLoader {
     private boolean aBoolean1085;
     private boolean aBoolean1090;
 
-    public static Object3D[] loadObject3D(String var0) throws IOException {
+    public static Object3D[] load(String var0) throws IOException {
         if (var0 == null) {
             throw new NullPointerException();
         } else {
@@ -72,7 +72,7 @@ public final class M3GLoader {
         }
     }
 
-    public static Object3D[] loadObject3D(byte[] var0, int var1) throws IOException {
+    public static Object3D[] load(byte[] var0, int var1) throws IOException {
         if (var0 == null) {
             throw new NullPointerException();
         } else {
@@ -104,9 +104,9 @@ public final class M3GLoader {
         } else {
             this.aString1083 = var1;
             this.aVector1091.addElement(var1);
-            i var2;
-            int var3 = method756(var2 = new i(this.method752(var1), 12));
-            var2.method695();
+            PeekInputStream var2;
+            int var3 = method756(var2 = new PeekInputStream(this.method752(var1), 12));
+            var2.rewind();
             Object3D[] var4 = this.method696(var2, var3);
             this.aVector1091.removeElement(var1);
             return var4;
@@ -150,9 +150,9 @@ public final class M3GLoader {
         if (this.anInt1084 > 1 && this.aBoolean1090 && !this.aBoolean1085) {
             throw new IOException("No external sections (" + this.aString1083 + ").");
         } else {
-            g var2;
+            AdlerInputStream var2;
             int var3;
-            if ((var3 = method705(var2 = new g(var1))) == -1) {
+            if ((var3 = method705(var2 = new AdlerInputStream(var1))) == -1) {
                 return false;
             } else if (this.anInt1084 == 0 && var3 != 0) {
                 throw new IOException("Compressed header (" + this.aString1083 + ").");
@@ -176,20 +176,20 @@ public final class M3GLoader {
                     var2.read(var10);
                     byte[] var11 = new byte[(int) var7];
                     method721(var10, var11);
-                    var9 = new M3GFilterStream(new ByteArrayInputStream(var11));
+                    var9 = new CountedInputStream(new ByteArrayInputStream(var11));
                 }
 
-                ((M3GFilterStream) var9).resetPos();
+                ((CountedInputStream) var9).resetCounter();
 
-                while ((long) ((M3GFilterStream) var9).getPos() < var7) {
-                    this.method722(this.method719((M3GFilterStream) var9));
+                while ((long) ((CountedInputStream) var9).getCounter() < var7) {
+                    this.method722(this.method719((CountedInputStream) var9));
                 }
 
-                if ((long) ((M3GFilterStream) var9).getPos() != var7) {
+                if ((long) ((CountedInputStream) var9).getCounter() != var7) {
                     Emulator.getEmulator().getLogStream().println("M3GLoader: Section length mismatch!!!");
                     return false;
                 } else {
-                    long var12 = var2.method757();
+                    long var12 = var2.getChecksum();
                     long var14 = method702(var2);
                     if (var12 != var14) {
                         throw new IOException("Checksum is wrong (" + this.aString1083 + ").");
@@ -201,10 +201,10 @@ public final class M3GLoader {
         }
     }
 
-    private Object3D method719(M3GFilterStream var1) throws IOException {
+    private Object3D method719(CountedInputStream var1) throws IOException {
         int var2 = method705(var1);
         long var3 = method702(var1);
-        long var5 = (long) var1.getPos() + var3;
+        long var5 = (long) var1.getCounter() + var3;
         Object var7 = null;
         switch (var2) {
             case 0:
@@ -297,7 +297,7 @@ public final class M3GLoader {
                 throw new IOException("Unrecognized object type " + var2 + " (" + this.aString1083 + ").");
         }
 
-        if (var5 != (long) var1.getPos()) {
+        if (var5 != (long) var1.getCounter()) {
             throw new IOException("Object length mismatch (" + this.aString1083 + ").");
         } else {
             this.method749((Object3D) var7);
@@ -454,7 +454,7 @@ public final class M3GLoader {
         AnimationController var4 = (AnimationController) this.method728(var1);
         int var5 = (int) method702(var1);
         AnimationTrack var6 = new AnimationTrack(var3, var5);
-        method704(var2, var6);
+        copyObject3D(var2, var6);
         var6.setController(var4);
         return var6;
     }
@@ -569,7 +569,7 @@ public final class M3GLoader {
         }
 
         var7 = var10000;
-        method704(var2, var7);
+        copyObject3D(var2, var7);
         return var7;
     }
 
@@ -585,7 +585,7 @@ public final class M3GLoader {
         int var9 = (int) method702(var1);
         int var10 = (int) method702(var1);
         KeyframeSequence var11 = new KeyframeSequence(var10, var9, var3);
-        method704(var2, var11);
+        copyObject3D(var2, var11);
         var11.setRepeatMode(var4);
         var11.setDuration(var6);
         var11.setValidRange(var7, var8);
@@ -678,7 +678,7 @@ public final class M3GLoader {
         }
 
         Mesh var8 = new Mesh(var3, var5, var6);
-        method735(var2, var8);
+        copyNode(var2, var8);
         return var8;
     }
 
@@ -703,7 +703,7 @@ public final class M3GLoader {
         }
 
         MorphingMesh var10 = new MorphingMesh(var2.getVertexBuffer(), var4, var7, var8);
-        method725(var2, var10);
+        copyMesh(var2, var10);
         var10.setWeights(var5);
         return var10;
     }
@@ -733,7 +733,7 @@ public final class M3GLoader {
         }
 
         SkinnedMesh var13 = new SkinnedMesh(var2.getVertexBuffer(), var5, var6, var3);
-        method725(var2, var13);
+        copyMesh(var2, var13);
         int var8 = (int) method702(var1);
 
         while (var8-- > 0) {
@@ -754,7 +754,7 @@ public final class M3GLoader {
         Appearance var4 = (Appearance) this.method728(var1);
         boolean var5 = method750(var1);
         Sprite3D var6 = new Sprite3D(var5, var3, var4);
-        method735(var2, var6);
+        copyNode(var2, var6);
         var6.setCrop(method753(var1), method753(var1), method753(var1), method753(var1));
         return var6;
     }
@@ -763,7 +763,7 @@ public final class M3GLoader {
         Group var2 = new Group();
         this.method737(var2, var1);
         Texture2D var3 = new Texture2D((Image2D) this.method728(var1));
-        method724(var2, var3);
+        copyTransformable(var2, var3);
         var3.setBlendColor(method755(var1));
         var3.setBlending(method705(var1));
         var3.setWrapping(method705(var1), method705(var1));
@@ -841,7 +841,7 @@ public final class M3GLoader {
 
         TriangleStripArray var8 = null;
         var8 = var3 != 0 && var3 != 1 && var3 != 2 ? new TriangleStripArray(var5, var9) : new TriangleStripArray(var4, var9);
-        method704(var2, var8);
+        copyObject3D(var2, var8);
         return var8;
     }
 
@@ -901,7 +901,7 @@ public final class M3GLoader {
                 }
             }
 
-            method704(var2, var7);
+            copyObject3D(var2, var7);
             return var7;
         }
     }
@@ -1120,30 +1120,30 @@ public final class M3GLoader {
         if (var1.indexOf(58) != -1) {
             return method709(var1);
         } else if (var1.charAt(0) == 47) {
-            return CustomJarResources.getResourceStream(var1);
+            return CustomJarResources.getResourceAsStream(var1);
         } else if (this.aString1089 == null) {
             throw new IOException("Relative URI.");
         } else {
             String var2;
-            return (var2 = this.aString1089.substring(0, this.aString1089.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? CustomJarResources.getResourceStream(var2) : method709(var2);
+            return (var2 = this.aString1089.substring(0, this.aString1089.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? CustomJarResources.getResourceAsStream(var2) : method709(var2);
         }
     }
 
-    private static void method704(Object3D var0, Object3D var1) {
+    private static void copyObject3D(Object3D var0, Object3D var1) {
         var1.setUserObject(var0.getUserObject());
         var1.setUserID(var0.getUserID());
     }
 
-    private static void method735(Node var0, Node var1) {
-        method724(var0, var1);
+    private static void copyNode(Node var0, Node var1) {
+        copyTransformable(var0, var1);
         var1.setAlphaFactor(var0.getAlphaFactor());
         var1.setScope(var0.getScope());
         var1.setPickingEnable(var0.isPickingEnabled());
         var1.setRenderingEnable(var0.isRenderingEnabled());
     }
 
-    private static void method724(Transformable var0, Transformable var1) {
-        method704(var0, var1);
+    private static void copyTransformable(Transformable var0, Transformable var1) {
+        copyObject3D(var0, var1);
         float[] var2 = new float[4];
         Transform var3 = new Transform();
         var0.getTranslation(var2);
@@ -1156,8 +1156,8 @@ public final class M3GLoader {
         var1.setTransform(var3);
     }
 
-    private static void method725(Mesh var0, Mesh var1) {
-        method735(var0, var1);
+    private static void copyMesh(Mesh var0, Mesh var1) {
+        copyNode(var0, var1);
     }
 
     private static void method721(byte[] var0, byte[] var1) {

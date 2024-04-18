@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.graphics3D.m3g.e;
+import emulator.graphics3D.m3g.MeshMorph;
 
 public class MorphingMesh extends Mesh {
    private VertexBuffer[] aVertexBufferArray937;
@@ -119,9 +119,9 @@ public class MorphingMesh extends Mesh {
    }
 
    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
-      e.getInstance().method779(this);
-      e.getInstance().method778();
-      return super.rayIntersect(var1, var2, var3, var4, e.getInstance().aVertexBuffer1124);
+      MeshMorph.getInstance().getMorphedVertexBuffer(this);
+      MeshMorph.getInstance().clearCache();
+      return super.rayIntersect(var1, var2, var3, var4, MeshMorph.getInstance().morphed);
    }
 
    public float getBaseWeight() {

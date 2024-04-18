@@ -13,7 +13,7 @@ class Helpers {
     static InputStream openInputStream(final String s) throws IOException {
         try {
             if (s.charAt(0) == '/') {
-                return CustomJarResources.getResourceStream(s);
+                return CustomJarResources.getResourceAsStream(s);
             }
             final InputConnection inputConnection;
             final String headerField;

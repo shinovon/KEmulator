@@ -1,7 +1,7 @@
 package javax.microedition.m3g;
 
-import emulator.graphics3D.m3g.e;
-import emulator.graphics3D.m3g.h;
+import emulator.graphics3D.m3g.MeshMorph;
+import emulator.graphics3D.m3g.WeightedTransform;
 import java.util.Vector;
 
 public class SkinnedMesh extends Mesh {
@@ -57,7 +57,7 @@ public class SkinnedMesh extends Mesh {
       } else if(var2 > 0 && var4 > 0) {
          if(var3 >= 0 && var3 + var4 <= '\uffff') {
             int var5;
-            for(var5 = 0; var5 < this.m_transforms.size() && var3 > ((h)this.m_transforms.elementAt(var5)).anInt1098; ++var5) {
+            for(var5 = 0; var5 < this.m_transforms.size() && var3 > ((WeightedTransform)this.m_transforms.elementAt(var5)).m_firstVertex; ++var5) {
                ;
             }
 
@@ -65,7 +65,7 @@ public class SkinnedMesh extends Mesh {
             if(!this.getTransformTo(var1, var6)) {
                throw new ArithmeticException();
             } else {
-               h var7 = new h(var1, var6, var2, var3, var3 + var4 - 1);
+               WeightedTransform var7 = new WeightedTransform(var1, var6, var2, var3, var3 + var4 - 1);
                this.m_transforms.insertElementAt(var7, var5);
                var1.setSkinnedMeshBone();
             }
@@ -82,11 +82,11 @@ public class SkinnedMesh extends Mesh {
          if(var1 != this.aGroup1203 && !var1.isDescendantOf(this.aGroup1203)) {
             throw new IllegalArgumentException();
          } else {
-            h var3 = null;
+            WeightedTransform var3 = null;
 
             for(int var4 = 0; var4 < this.m_transforms.size(); ++var4) {
-               if((var3 = (h)this.m_transforms.elementAt(var4)).aNode1095 == var1) {
-                  var2.set(var3.aTransform1096);
+               if((var3 = (WeightedTransform)this.m_transforms.elementAt(var4)).m_bone == var1) {
+                  var2.set(var3.m_toBoneTransform);
                   return;
                }
             }
@@ -106,15 +106,15 @@ public class SkinnedMesh extends Mesh {
          int var4 = 0;
          int var5;
          float[] var6 = new float[var5 = super.m_vertices.getVertexCount()];
-         h var7 = null;
+         WeightedTransform var7 = null;
 
          int var8;
          for(var8 = 0; var8 < this.m_transforms.size(); ++var8) {
-            if((var7 = (h)this.m_transforms.elementAt(var8)).aNode1095 == var1 && var7.anInt1098 < var5) {
-               int var9 = Math.min(var5, var7.anInt1100 + 1);
+            if((var7 = (WeightedTransform)this.m_transforms.elementAt(var8)).m_bone == var1 && var7.m_firstVertex < var5) {
+               int var9 = Math.min(var5, var7.m_lastVertex + 1);
 
-               for(int var10 = var7.anInt1098; var10 < var9; ++var10) {
-                  var6[var10] += (float)var7.anInt1097;
+               for(int var10 = var7.m_firstVertex; var10 < var9; ++var10) {
+                  var6[var10] += (float)var7.m_weight;
                }
             }
          }
@@ -146,9 +146,9 @@ public class SkinnedMesh extends Mesh {
    }
 
    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
-      e.getInstance().method779(this);
-      e.getInstance().method778();
-      return super.rayIntersect(var1, var2, var3, var4, e.getInstance().aVertexBuffer1124);
+      MeshMorph.getInstance().getMorphedVertexBuffer(this);
+      MeshMorph.getInstance().clearCache();
+      return super.rayIntersect(var1, var2, var3, var4, MeshMorph.getInstance().morphed);
    }
 
    public Vector getTransforms() {

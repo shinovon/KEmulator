@@ -3,21 +3,21 @@ package emulator.graphics3D.m3g;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class M3GFilterStream extends InputStream {
+public class CountedInputStream extends InputStream {
     private InputStream in;
-    private int pos;
+    private int counter;
 
     public int read() throws IOException {
-        ++this.pos;
+        ++this.counter;
         return this.in.read();
     }
 
-    public final void resetPos() {
-        this.pos = 0;
+    public final void resetCounter() {
+        this.counter = 0;
     }
 
-    public final int getPos() {
-        return this.pos;
+    public final int getCounter() {
+        return this.counter;
     }
 
     public int available() throws IOException {
@@ -28,8 +28,8 @@ public class M3GFilterStream extends InputStream {
         this.in.close();
     }
 
-    public M3GFilterStream(InputStream var1) {
+    public CountedInputStream(InputStream var1) {
         this.in = var1;
-        this.resetPos();
+        this.resetCounter();
     }
 }
