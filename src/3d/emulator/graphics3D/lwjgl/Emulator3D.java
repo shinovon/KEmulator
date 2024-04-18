@@ -428,7 +428,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glDepthFunc(519);
             GL11.glDepthMask(false);
             GL11.glPixelZoom(var7, -var8);
-            ByteBuffer var15 = LWJGLUtility.getByteBuffer1(var1.getImage().getImageData());
+            ByteBuffer var15 = LWJGLUtility.getByteBuffer(var1.getImage().getImageData());
 
             for (int var16 = 0; var16 < var14; ++var16) {
                 for (int var17 = 0; var17 < var13; ++var17) {
@@ -748,44 +748,40 @@ public final class Emulator3D implements IGraphics3D {
             if (var5.getComponentType() == 1) {
                 var23 = new byte[var5.getComponentCount() * var5.getVertexCount()];
                 var5.get(0, var5.getVertexCount(), var23);
-                GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, true, 0, LWJGLUtility.getByteBuffer(var23, var4, var5.getVertexCount()));
+                GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, 5121, 0, LWJGLUtility.getByteBuffer(var23, var4, var5.getVertexCount()));
             } else {
-                // TODO short buffers
                 var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
                 var5.get(0, var5.getVertexCount(), var24);
-                GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, 5121, 0, LWJGLUtility.getByteBuffer(var24));
-//                GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, true, 0, a.method523(var24, var4, var5.getVertexCount()));
+                GL11.glColorPointer(var4 == 1.0F ? var5.getComponentCount() : 4, 5121, 0, LWJGLUtility.getByteBuffer(var24, var4, var5.getVertexCount()));
             }
         }
 
         if ((var5 = var1.getNormals()) != null && var3.getMaterial() != null) {
-            GL11.glEnableClientState('\u8075');
+            GL11.glEnableClientState(32885);
             if (var5.getComponentType() == 1) {
                 var23 = new byte[var5.getComponentCount() * var5.getVertexCount()];
                 var5.get(0, var5.getVertexCount(), var23);
-                GL11.glNormalPointer(0, LWJGLUtility.getByteBuffer1(var23));
+                GL11.glNormalPointer(0, LWJGLUtility.getByteBuffer(var23));
             } else {
-                // TODO short buffers
                 var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
                 var5.get(0, var5.getVertexCount(), var24);
-                GL11.glNormalPointer(5120, 0, LWJGLUtility.getByteBuffer(var24));
-//                GL11.glNormalPointer(0, a.method521(var24));
+                GL11.glNormalPointer(0, LWJGLUtility.getIntBuffer(var24));
             }
         } else {
-            GL11.glDisableClientState('\u8075');
+            GL11.glDisableClientState(32885);
         }
 
         float[] var26 = new float[4];
         var5 = var1.getPositions(var26);
-        GL11.glEnableClientState('\u8074');
+        GL11.glEnableClientState(32884);
         if (var5.getComponentType() == 1) {
             byte[] var7 = new byte[var5.getComponentCount() * var5.getVertexCount()];
             var5.get(0, var5.getVertexCount(), var7);
-            GL11.glVertexPointer(var5.getComponentCount(), 0, LWJGLUtility.getIntBuffer2(var7));
+            GL11.glVertexPointer(var5.getComponentCount(), 0, LWJGLUtility.getIntBuffer(var7));
         } else {
             short[] var25 = new short[var5.getComponentCount() * var5.getVertexCount()];
             var5.get(0, var5.getVertexCount(), var25);
-            GL11.glVertexPointer(var5.getComponentCount(), 0, LWJGLUtility.getShortBuffer2(var25));
+            GL11.glVertexPointer(var5.getComponentCount(), 0, LWJGLUtility.getShortBuffer(var25));
         }
 
         GL11.glMatrixMode(5888);
@@ -851,43 +847,33 @@ public final class Emulator3D implements IGraphics3D {
                         GL11.glTexEnvi(var10000, var10001, var10002);
                     }
 
-                    Image2D var15;
-                    short var16;
-                    label135:
-                    {
-                        float[] var14;
-                        G3DUtils.fillFloatColor(var14 = new float[4], var12.getBlendColor());
-                        var14[3] = 1.0F;
-                        GL11.glTexEnv(8960, 8705, LWJGLUtility.getFloatBuffer(var14));
-                        var15 = var12.getImage();
-                        var16 = 6407;
-                        switch (var15.getFormat()) {
-                            case 96:
-                                var10000 = 6406;
-                                break;
-                            case 97:
-                                var10000 = 6409;
-                                break;
-                            case 98:
-                                var10000 = 6410;
-                                break;
-                            case 99:
-                                var10000 = 6407;
-                                break;
-                            case 100:
-                                var10000 = 6408;
-                                break;
-                            default:
-                                break label135;
-                        }
-
-                        var16 = var10000;
+                    float[] var14;
+                    G3DUtils.fillFloatColor(var14 = new float[4], var12.getBlendColor());
+                    var14[3] = 1.0F;
+                    GL11.glTexEnv(8960, 8705, LWJGLUtility.getFloatBuffer(var14));
+                    Image2D var15 = var12.getImage();
+                    short var16 = 6407;
+                    switch (var15.getFormat()) {
+                        case 96:
+                            var16 = 6406;
+                            break;
+                        case 97:
+                            var16 = 6409;
+                            break;
+                        case 98:
+                            var16 = 6410;
+                            break;
+                        case 99:
+                            var16 = 6407;
+                            break;
+                        case 100:
+                            var16 = 6408;
                     }
 
                     short var19;
                     label128:
                     {
-                        GL11.glTexImage2D(3553, 0, var16, var15.getWidth(), var15.getHeight(), 0, var16, 5121, LWJGLUtility.getByteBuffer2(var15.getImageData()));
+                        GL11.glTexImage2D(3553, 0, var16, var15.getWidth(), var15.getHeight(), 0, var16, 5121, LWJGLUtility.getByteBuffer(var15.getImageData()));
                         GL11.glTexParameterf(3553, 10242, var12.getWrappingS() == 240 ? 33071.0F : 10497.0F);
                         GL11.glTexParameterf(3553, 10243, var12.getWrappingT() == 240 ? 33071.0F : 10497.0F);
                         int var17 = var12.getLevelFilter();
@@ -927,20 +913,20 @@ public final class Emulator3D implements IGraphics3D {
                     GL11.glTexParameteri(3553, 10240, var19);
                     GL11.glEnableClientState('\u8078');
                     byte var28;
-                    IntBuffer var29;
+                    FloatBuffer var29;
                     int var32;
                     if (var5.getComponentType() == 1) {
                         byte[] var21 = new byte[var5.getComponentCount() * var5.getVertexCount()];
                         var5.get(0, var5.getVertexCount(), var21);
                         var32 = var5.getComponentCount();
                         var28 = 0;
-                        var29 = LWJGLUtility.getIntBuffer(var21);
+                        var29 = LWJGLUtility.getFloatBuffer(var21);
                     } else {
                         short[] var30 = new short[var5.getComponentCount() * var5.getVertexCount()];
                         var5.get(0, var5.getVertexCount(), var30);
                         var32 = var5.getComponentCount();
                         var28 = 0;
-                        var29 = LWJGLUtility.getIntBuffer(var30);
+                        var29 = LWJGLUtility.getFloatBuffer(var30);
                     }
 
                     GL11.glTexCoordPointer(var32, var28, var29);
@@ -1143,7 +1129,7 @@ public final class Emulator3D implements IGraphics3D {
                     GL11.glMatrixMode(5888);
                     GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
                     GL11.glDisable(2896);
-                    var27 = LWJGLUtility.getByteBuffer1(var1.getImage().getImageData());
+                    var27 = LWJGLUtility.getByteBuffer(var1.getImage().getImageData());
                     GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
                     GL11.glPixelStorei(3314, var1.getImage().getWidth());
                     GL11.glPixelStorei(3315, var21[1]);
