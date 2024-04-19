@@ -157,7 +157,6 @@ public final class ImageSWT implements IImage
             this.imgdata = this.img.getImageData();
         }
         this.imgdata.getPixels(0, 0, this.len, this.rgb, 0);
-        boolean b = Arrays.toString(new Exception().getStackTrace()).contains("getRGB");
         if (this.imgdata.alphaData != null) {
             for (int i = this.len - 1; i >= 0; --i) {
                 final RGB rgb = this.imgdata.palette.getRGB(this.rgb[i]);
