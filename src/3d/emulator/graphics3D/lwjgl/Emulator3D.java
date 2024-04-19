@@ -136,8 +136,8 @@ public final class Emulator3D implements IGraphics3D {
                 }
 
                 pbufferContext.makeCurrent();
-            } catch (Exception var5) {
-                var5.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
 //                this.method499(var2, var3);
             }
 
@@ -165,9 +165,9 @@ public final class Emulator3D implements IGraphics3D {
     public final void releaseTarget() {
         GL11.glFinish();
         this.method503();
-        while(texturesToRelease.size() > 0) {
-            releaseTexture((Image2D) texturesToRelease.remove(0));
-        }
+//        while(texturesToRelease.size() > 0) {
+//            releaseTexture((Image2D) texturesToRelease.remove(0));
+//        }
         this.target = null;
         if (pbufferContext != null) {
             try {
@@ -806,9 +806,10 @@ public final class Emulator3D implements IGraphics3D {
 
                     int id = image2D.getId();
                     if(id == 0) {
-//                        texturesToRelease.add(image2D);
                         image2D.setId(id = GL11.glGenTextures());
                         image2D.setLoaded(false);
+                        if(!texturesToRelease.contains(image2D))
+                            texturesToRelease.add(image2D);
                     }
                     short var10000;
                     label141:
