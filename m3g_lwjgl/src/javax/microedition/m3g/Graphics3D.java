@@ -17,7 +17,7 @@ public class Graphics3D {
     public static final int TRUE_COLOR = 8;
     private static Object target = null;
     private static IGraphics3D impl;
-    private static Graphics3D aGraphics3D878 = new Graphics3D();
+    private static Graphics3D inst = new Graphics3D();
     private int viewportX;
     private int viewportY;
     private int viewportWidth;
@@ -32,7 +32,7 @@ public class Graphics3D {
     }
 
     public static final Graphics3D getInstance() {
-        return aGraphics3D878;
+        return inst;
     }
 
     public static final IGraphics3D getImpl() {

@@ -7,6 +7,7 @@ import javax.microedition.media.Manager;
 import emulator.debug.*;
 import emulator.*;
 import emulator.custom.h.MethodInfo;
+import emulator.graphics3D.lwjgl.Emulator3D;
 
 import java.io.*;
 
@@ -161,13 +162,17 @@ public class CustomMethod {
     }
 
     public static void close() {
-        if (trackWriter != null)
+        try {
+            Emulator3D.getInstance().finalize();
+        } catch (Throwable ignored) {}
+        if (trackWriter != null) {
             try {
                 trackWriter.close();
                 trackWriter = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
     }
 
     private static String getStackTrace(Throwable t) {

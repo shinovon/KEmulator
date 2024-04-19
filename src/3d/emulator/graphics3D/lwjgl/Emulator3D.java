@@ -51,7 +51,7 @@ public final class Emulator3D implements IGraphics3D {
     private int viewportY;
     private int viewportWidth;
     private int viewportHeight;
-
+    private static Vector texturesToRelease = new Vector();
 
     public static final int MaxViewportWidth = 2048;
     public static final int MaxViewportHeight = 2048;
@@ -174,6 +174,10 @@ public final class Emulator3D implements IGraphics3D {
             }
         } else {
             this.releaseContext();
+        }
+
+        while(texturesToRelease.size() > 0) {
+            releaseTexture((Image2D) texturesToRelease.remove(0));
         }
     }
 
@@ -786,94 +790,90 @@ public final class Emulator3D implements IGraphics3D {
         int stripCount = (triangleStripArray = (TriangleStripArray) indexBuffer).getStripCount();
         int i;
         int[] var22;
-        // TODO don't load textures every frame
         if (appearance != null && !Settings.xrayView) {
             int j;
             i = NumTextureUnits;
-            IntBuffer texturesBuffer = BufferUtils.createIntBuffer(i);
-            GL11.glGenTextures(texturesBuffer);
 
             for (j = 0; j < i; ++j) {
                 Texture2D texture2D = appearance.getTexture(j);
                 var26[3] = 0.0F;
                 texCoords = vertexBuffer.getTexCoords(j, var26);
                 if (texture2D != null && texCoords != null) {
+                    Image2D image2D = texture2D.getImage();
                     if (useGL13()) {
                         GL13.glActiveTexture('\u84c0' + j);
                         GL13.glClientActiveTexture('\u84c0' + j);
                     }
 
+                    int id = image2D.getId();
+                    if(id == 0) {
+                        image2D.setId(id = GL11.glGenTextures());
+                        image2D.setLoaded(false);
+                    }
                     short var10000;
                     label141:
                     {
                         GL11.glEnable(GL_TEXTURE_2D);
-                        GL11.glBindTexture(GL_TEXTURE_2D, texturesBuffer.get(j));
-                        short var10001;
+                        GL11.glBindTexture(GL_TEXTURE_2D, id);
                         short var10002;
                         switch (texture2D.getBlending()) {
                             case 224:
-                                var10000 = 8960;
-                                var10001 = 8704;
                                 var10002 = 260;
                                 break;
                             case 225:
-                                var10000 = 8960;
-                                var10001 = 8704;
                                 var10002 = 3042;
                                 break;
                             case 226:
-                                var10000 = 8960;
-                                var10001 = 8704;
                                 var10002 = 8449;
                                 break;
                             case 227:
-                                var10000 = 8960;
-                                var10001 = 8704;
                                 var10002 = 8448;
                                 break;
                             case 228:
-                                var10000 = 8960;
-                                var10001 = 8704;
                                 var10002 = 7681;
                                 break;
                             default:
                                 break label141;
                         }
-
-                        GL11.glTexEnvi(var10000, var10001, var10002);
+                        GL11.glTexEnvi(89600, 8704, var10002);
                     }
 
                     float[] var14;
                     G3DUtils.fillFloatColor(var14 = new float[4], texture2D.getBlendColor());
                     var14[3] = 1.0F;
                     GL11.glTexEnv(8960, 8705, LWJGLUtility.getFloatBuffer(var14));
-                    Image2D var15 = texture2D.getImage();
-                    short var16 = GL_RGB;
-                    switch (var15.getFormat()) {
-                        case 96:
-                            var16 = GL_ALPHA;
-                            break;
-                        case 97:
-                            var16 = GL_LUMINANCE;
-                            break;
-                        case 98:
-                            var16 = GL_LUMINANCE_ALPHA;
-                            break;
-                        case 99:
-                            var16 = GL_RGB;
-                            break;
-                        case 100:
-                            var16 = GL_RGBA;
+
+                    if(!image2D.isLoaded()) {
+                        image2D.setLoaded(true);
+                        System.out.println("loaded texture: " + image2D + " " + id);
+                        short var16 = GL_RGB;
+                        switch (image2D.getFormat()) {
+                            case 96:
+                                var16 = GL_ALPHA;
+                                break;
+                            case 97:
+                                var16 = GL_LUMINANCE;
+                                break;
+                            case 98:
+                                var16 = GL_LUMINANCE_ALPHA;
+                                break;
+                            case 99:
+                                var16 = GL_RGB;
+                                break;
+                            case 100:
+                                var16 = GL_RGBA;
+                        }
+                        GL11.glTexImage2D(GL_TEXTURE_2D, 0, var16, image2D.getWidth(), image2D.getHeight(), 0, var16, 5121, LWJGLUtility.getByteBuffer(image2D.getImageData()));
                     }
 
+                    GL11.glTexParameterf(GL_TEXTURE_2D, 10242, texture2D.getWrappingS() == 240 ? 33071.0F : 10497.0F);
+                    GL11.glTexParameterf(GL_TEXTURE_2D, 10243, texture2D.getWrappingT() == 240 ? 33071.0F : 10497.0F);
+
+                    int var17 = texture2D.getLevelFilter();
+                    int var18 = texture2D.getImageFilter();
                     short var19;
                     label128:
                     {
-                        GL11.glTexImage2D(GL_TEXTURE_2D, 0, var16, var15.getWidth(), var15.getHeight(), 0, var16, 5121, LWJGLUtility.getByteBuffer(var15.getImageData()));
-                        GL11.glTexParameterf(GL_TEXTURE_2D, 10242, texture2D.getWrappingS() == 240 ? 33071.0F : 10497.0F);
-                        GL11.glTexParameterf(GL_TEXTURE_2D, 10243, texture2D.getWrappingT() == 240 ? 33071.0F : 10497.0F);
-                        int var17 = texture2D.getLevelFilter();
-                        int var18 = texture2D.getImageFilter();
                         if (var17 == 208) {
                             if (var18 == 210) {
                                 var19 = 9728;
@@ -903,7 +903,6 @@ public final class Emulator3D implements IGraphics3D {
                         var19 = var10000;
                         var10000 = 9729;
                     }
-
                     short var20 = var10000;
                     GL11.glTexParameteri(GL_TEXTURE_2D, 10241, var20);
                     GL11.glTexParameteri(GL_TEXTURE_2D, 10240, var19);
@@ -932,18 +931,23 @@ public final class Emulator3D implements IGraphics3D {
             }
 
             for (j = 0; j < i; ++j) {
-                if (GL11.glIsTexture(texturesBuffer.get(j))) {
-                    if (useGL13()) {
-                        GL13.glActiveTexture('\u84c0' + j);
-                        GL13.glClientActiveTexture('\u84c0' + j);
+                // TODO
+                try {
+                    Texture2D tex = appearance.getTexture(j);
+                    if (tex != null && tex.getImage().getId() != 0) {
+//                if (GL11.glIsTexture(texturesBuffer.get(j))) {
+                        if (useGL13()) {
+                            GL13.glActiveTexture('\u84c0' + j);
+                            GL13.glClientActiveTexture('\u84c0' + j);
+                        }
+                        GL11.glBindTexture(GL_TEXTURE_2D, 0);
+//                    GL11.glDisableClientState('\u8078');
+//                    GL11.glDisable(GL_TEXTURE_2D);
                     }
-
-                    GL11.glDisableClientState('\u8078');
-                    GL11.glDisable(GL_TEXTURE_2D);
-                }
+                } catch (IndexOutOfBoundsException e) {}
             }
 
-            GL11.glDeleteTextures(texturesBuffer);
+//            GL11.glDeleteTextures(texturesBuffer);
         } else {
             for (i = 0; i < stripCount; ++i) {
                 var22 = triangleStripArray.getIndexStrip(i);
@@ -1163,5 +1167,30 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public final void v3flush() {
+    }
+
+    public void finalizeTexture(Image2D image2D) {
+        // TODO
+        texturesToRelease.add(image2D);
+    }
+
+    public void invalidateTexture(Image2D image2D) {
+        System.out.println("invalidateTexture: " + image2D);
+        image2D.setLoaded(false);
+    }
+
+    public void finalize() {
+        System.out.println("Emulator3D finalize");
+        while(texturesToRelease.size() > 0) {
+            releaseTexture((Image2D) texturesToRelease.remove(0));
+        }
+    }
+
+    private void releaseTexture(Image2D image2D) {
+        int id = image2D.getId();
+        System.out.println("releaseTexture: " + image2D + " " + id);
+        if(id == 0) return;
+        GL11.glDeleteTextures(id);
+        image2D.setId(0);
     }
 }

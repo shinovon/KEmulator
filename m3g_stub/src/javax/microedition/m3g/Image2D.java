@@ -70,4 +70,18 @@ public class Image2D
     public byte[] getImageData() {
         return null;
     }
+
+    public boolean isLoaded() {
+        return false;
+    }
+
+    public void setLoaded(boolean b) {
+    }
+
+    public void setId(int id) {
+    }
+
+    public int getId() {
+        return 0;
+    }
 }

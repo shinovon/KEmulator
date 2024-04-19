@@ -1,5 +1,7 @@
 package javax.microedition.m3g;
 
+import emulator.graphics3D.lwjgl.Emulator3D;
+
 import javax.microedition.lcdui.Image;
 
 public class Image2D extends Object3D {
@@ -12,8 +14,10 @@ public class Image2D extends Object3D {
     private int width;
     private int height;
     private byte[] imageData;
-    private boolean aBoolean36;
+    private boolean mutable;
     private static byte[] aByteArray38;
+    public boolean loaded;
+    private int id;
 
     public Image2D(int var1, Object var2) {
         if (var2 == null) {
@@ -24,7 +28,7 @@ public class Image2D extends Object3D {
             Image var3 = (Image) var2;
             this.width = var3.getWidth();
             this.height = var3.getHeight();
-            this.aBoolean36 = false;
+            this.mutable = false;
             this.type = var1;
             this.imageData = method15(var1, var3.getImpl().getData(), var3.isMutable());
         } else {
@@ -42,7 +46,7 @@ public class Image2D extends Object3D {
             } else {
                 this.width = var2;
                 this.height = var3;
-                this.aBoolean36 = false;
+                this.mutable = false;
                 this.type = var1;
                 this.imageData = new byte[var5];
                 System.arraycopy(var4, 0, this.imageData, 0, var5);
@@ -62,7 +66,7 @@ public class Image2D extends Object3D {
                 } else {
                     this.width = var2;
                     this.height = var3;
-                    this.aBoolean36 = false;
+                    this.mutable = false;
                     this.type = var1;
                     this.imageData = new byte[var6 * var7];
 
@@ -83,7 +87,7 @@ public class Image2D extends Object3D {
         if (var2 > 0 && var3 > 0 && checkType(var1)) {
             this.width = var2;
             this.height = var3;
-            this.aBoolean36 = true;
+            this.mutable = true;
             this.type = var1;
             int var4 = var2 * bytesPerPixel(var1);
             this.imageData = new byte[var4 * var3];
@@ -108,7 +112,7 @@ public class Image2D extends Object3D {
     public void set(int var1, int var2, int var3, int var4, byte[] var5) {
         if (var5 == null) {
             throw new NullPointerException();
-        } else if (this.aBoolean36 && var1 >= 0 && var2 >= 0 && var3 > 0 && var4 > 0 && var1 + var3 <= this.width && var2 + var4 <= this.height) {
+        } else if (this.mutable && var1 >= 0 && var2 >= 0 && var3 > 0 && var4 > 0 && var1 + var3 <= this.width && var2 + var4 <= this.height) {
             int var6 = this.getBitsPerColor();
             if (var5.length < var3 * var4 * var6) {
                 throw new IllegalArgumentException();
@@ -116,7 +120,7 @@ public class Image2D extends Object3D {
                 for (int var7 = 0; var7 < var4; ++var7) {
                     System.arraycopy(var5, var7 * var3 * var6, this.imageData, ((var2 + var7) * this.width + var1) * var6, var3 * var6);
                 }
-
+                ((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);
             }
         } else {
             throw new IllegalArgumentException();
@@ -124,7 +128,7 @@ public class Image2D extends Object3D {
     }
 
     public boolean isMutable() {
-        return this.aBoolean36;
+        return this.mutable;
     }
 
     public int getFormat() {
@@ -267,6 +271,28 @@ public class Image2D extends Object3D {
         Image2D var1;
         (var1 = (Image2D) super.duplicateObject()).imageData = (byte[]) this.imageData.clone();
         return var1;
+    }
+
+    public void finalize() {
+        // check if was binded
+        if(id == 0) return;
+        ((Emulator3D) Graphics3D.getImpl()).finalizeTexture(this);
+    }
+
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public void setLoaded(boolean b) {
+        loaded = b;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int size() {
