@@ -59,6 +59,7 @@ public final class Emulator3D implements IGraphics3D {
     public static final int MaxTextureDimension = 1024;
     public static final int MaxSpriteCropDimension = 1024;
     public static final int MaxLights = 8;
+    private boolean exiting;
 
     private Emulator3D() {
         instance = this;
@@ -110,6 +111,9 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public final void bindTarget(Object var1) {
+        if(exiting) {
+            throw new IllegalStateException("exiting");
+        }
         int w;
         int h;
         if (var1 instanceof Graphics) {
@@ -165,9 +169,11 @@ public final class Emulator3D implements IGraphics3D {
     public final void releaseTarget() {
         GL11.glFinish();
         this.method503();
-//        while(texturesToRelease.size() > 0) {
-//            releaseTexture((Image2D) texturesToRelease.remove(0));
-//        }
+        if(exiting) {
+            while (texturesToRelease.size() > 0) {
+                releaseTexture((Image2D) texturesToRelease.remove(0));
+            }
+        }
         this.target = null;
         if (pbufferContext != null) {
             try {
@@ -933,22 +939,27 @@ public final class Emulator3D implements IGraphics3D {
 
             for (j = 0; j < i; ++j) {
                 Texture2D tex = appearance.getTexture(j);
-                if (tex != null && tex.getImage().getId() != 0) {
+                Image2D image2D;
+                if (tex != null && ((image2D = tex.getImage()).getId()) != 0) {
                     if (useGL13()) {
                         GL13.glActiveTexture('\u84c0' + j);
                         GL13.glClientActiveTexture('\u84c0' + j);
                     }
                     GL11.glBindTexture(GL_TEXTURE_2D, 0);
+                    if(exiting) {
+                        releaseTexture(image2D);
+                    }
                 }
             }
-
-//            GL11.glDeleteTextures(texturesBuffer);
         } else {
             for (i = 0; i < stripCount; ++i) {
                 var22 = triangleStripArray.getIndexStrip(i);
                 GL11.glDrawElements(5, LWJGLUtility.getIntBuffer(var22));
             }
 
+        }
+        if(exiting) {
+            releaseTarget();
         }
     }
 
@@ -1175,15 +1186,24 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public void finalize() {
-        while(texturesToRelease.size() > 0) {
-            releaseTexture((Image2D) texturesToRelease.remove(0));
-        }
+        // TODO
+        if(pbufferContext == null || exiting) return;
+        exiting = true;
+        try {
+            // try to make context current
+            pbufferContext.makeCurrent();
+
+            while (texturesToRelease.size() > 0) {
+                releaseTexture((Image2D) texturesToRelease.remove(0));
+            }
+            pbufferContext.destroy();
+        } catch (Exception ignored) {}
     }
 
     private void releaseTexture(Image2D image2D) {
         int id = image2D.getId();
-        System.out.println("releaseTexture: " + image2D + " " + id);
         if(id == 0) return;
+        System.out.println("releaseTexture: " + image2D + " " + id);
         GL11.glDeleteTextures(id);
         image2D.setId(0);
     }
