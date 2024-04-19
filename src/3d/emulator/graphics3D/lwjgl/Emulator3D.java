@@ -165,6 +165,9 @@ public final class Emulator3D implements IGraphics3D {
     public final void releaseTarget() {
         GL11.glFinish();
         this.method503();
+        while(texturesToRelease.size() > 0) {
+            releaseTexture((Image2D) texturesToRelease.remove(0));
+        }
         this.target = null;
         if (pbufferContext != null) {
             try {
@@ -174,10 +177,6 @@ public final class Emulator3D implements IGraphics3D {
             }
         } else {
             this.releaseContext();
-        }
-
-        while(texturesToRelease.size() > 0) {
-            releaseTexture((Image2D) texturesToRelease.remove(0));
         }
     }
 
@@ -807,6 +806,7 @@ public final class Emulator3D implements IGraphics3D {
 
                     int id = image2D.getId();
                     if(id == 0) {
+//                        texturesToRelease.add(image2D);
                         image2D.setId(id = GL11.glGenTextures());
                         image2D.setLoaded(false);
                     }
@@ -931,20 +931,14 @@ public final class Emulator3D implements IGraphics3D {
             }
 
             for (j = 0; j < i; ++j) {
-                // TODO
-                try {
-                    Texture2D tex = appearance.getTexture(j);
-                    if (tex != null && tex.getImage().getId() != 0) {
-//                if (GL11.glIsTexture(texturesBuffer.get(j))) {
-                        if (useGL13()) {
-                            GL13.glActiveTexture('\u84c0' + j);
-                            GL13.glClientActiveTexture('\u84c0' + j);
-                        }
-                        GL11.glBindTexture(GL_TEXTURE_2D, 0);
-//                    GL11.glDisableClientState('\u8078');
-//                    GL11.glDisable(GL_TEXTURE_2D);
+                Texture2D tex = appearance.getTexture(j);
+                if (tex != null && tex.getImage().getId() != 0) {
+                    if (useGL13()) {
+                        GL13.glActiveTexture('\u84c0' + j);
+                        GL13.glClientActiveTexture('\u84c0' + j);
                     }
-                } catch (IndexOutOfBoundsException e) {}
+                    GL11.glBindTexture(GL_TEXTURE_2D, 0);
+                }
             }
 
 //            GL11.glDeleteTextures(texturesBuffer);
@@ -1180,7 +1174,6 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public void finalize() {
-        System.out.println("Emulator3D finalize");
         while(texturesToRelease.size() > 0) {
             releaseTexture((Image2D) texturesToRelease.remove(0));
         }
