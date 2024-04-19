@@ -25,6 +25,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 public final class Emulator3D implements IGraphics3D {
 
@@ -336,10 +337,14 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnable(GL_POINT_SMOOTH);
             GL11.glEnable(GL_LINE_SMOOTH);
             GL11.glEnable(GL_POLYGON_SMOOTH);
+//            if(useGL13())
+            GL11.glEnable(GL_MULTISAMPLE);
         } else {
             GL11.glDisable(GL_POINT_SMOOTH);
             GL11.glDisable(GL_LINE_SMOOTH);
             GL11.glDisable(GL_POLYGON_SMOOTH);
+//            if(useGL13())
+            GL11.glDisable(GL_MULTISAMPLE);
         }
 
         if ((hints & Graphics3D.DITHER) != 0) {
