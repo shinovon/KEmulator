@@ -1422,10 +1422,10 @@ public final class EmulatorScreen implements
                 integerScalingMenuItem.setEnabled(true);
             } else if(menuItem == keepAspectRatioMenuItem) {
                 Settings.keepAspectRatio = keepAspectRatioMenuItem.getSelection();
-                Settings.integerResize = false;
+                integerScalingMenuItem.setSelection(Settings.integerResize = false);
             } else if(menuItem == integerScalingMenuItem) {
                 Settings.integerResize = integerScalingMenuItem.getSelection();
-                Settings.keepAspectRatio = false;
+                keepAspectRatioMenuItem.setSelection(Settings.keepAspectRatio = false);
             }
             resized();
         }
