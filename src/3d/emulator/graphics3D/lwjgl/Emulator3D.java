@@ -451,7 +451,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glDepthFunc(519);
             GL11.glDepthMask(false);
             GL11.glPixelZoom(var7, -var8);
-            ByteBuffer var15 = LWJGLUtility.getByteBuffer(var1.getImage().getImageData());
+            ByteBuffer var15 = LWJGLUtility.getByteBuffer1(var1.getImage().getImageData());
 
             for (int var16 = 0; var16 < var14; ++var16) {
                 for (int var17 = 0; var17 < var13; ++var17) {
@@ -752,9 +752,9 @@ public final class Emulator3D implements IGraphics3D {
         if ((texCoords = vertexBuffer.getNormals()) != null && appearance.getMaterial() != null) {
             GL11.glEnableClientState(32885);
             if (texCoords.getComponentType() == 1) {
-                GL11.glNormalPointer(0, LWJGLUtility.getByteBuffer(texCoords.getByteValues()));
+                GL11.glNormalPointer(0, LWJGLUtility.getByteBuffer1(texCoords.getByteValues()));
             } else {
-                GL11.glNormalPointer(0, LWJGLUtility.getIntBuffer(texCoords.getShortValues()));
+                GL11.glNormalPointer(5120, 0, LWJGLUtility.getByteBuffer(texCoords.getShortValues()));
             }
         } else {
             GL11.glDisableClientState(32885);
@@ -765,10 +765,10 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glEnableClientState(32884);
         if (texCoords.getComponentType() == 1) {
             byte[] var7 = texCoords.getByteValues();
-            GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getIntBuffer(var7));
+            GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getIntBuffer2(var7));
         } else {
             short[] var25 = texCoords.getShortValues();
-            GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getShortBuffer(var25));
+            GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getShortBuffer2(var25));
         }
 
         GL11.glMatrixMode(5888);
@@ -825,7 +825,7 @@ public final class Emulator3D implements IGraphics3D {
                             default:
                                 break label141;
                         }
-                        GL11.glTexEnvi(89600, 8704, var10002);
+                        GL11.glTexEnvi(8960, 8704, var10002);
                     }
 
                     float[] var14;
@@ -853,7 +853,7 @@ public final class Emulator3D implements IGraphics3D {
                             case 100:
                                 var16 = GL_RGBA;
                         }
-                        GL11.glTexImage2D(GL_TEXTURE_2D, 0, var16, image2D.getWidth(), image2D.getHeight(), 0, var16, 5121, LWJGLUtility.getByteBuffer(image2D.getImageData()));
+                        GL11.glTexImage2D(GL_TEXTURE_2D, 0, var16, image2D.getWidth(), image2D.getHeight(), 0, var16, 5121, LWJGLUtility.getByteBuffer2(image2D.getImageData()));
                     }
 
                     GL11.glTexParameterf(GL_TEXTURE_2D, 10242, texture2D.getWrappingS() == 240 ? 33071.0F : 10497.0F);
@@ -897,11 +897,11 @@ public final class Emulator3D implements IGraphics3D {
                     GL11.glTexParameteri(GL_TEXTURE_2D, 10241, var20);
                     GL11.glTexParameteri(GL_TEXTURE_2D, 10240, var19);
                     GL11.glEnableClientState('\u8078');
-                    FloatBuffer var29;
+                    IntBuffer var29;
                     if (texCoords.getComponentType() == 1) {
-                        var29 = LWJGLUtility.getFloatBuffer(texCoords.getByteValues());
+                        var29 = LWJGLUtility.getIntBuffer(texCoords.getByteValues());
                     } else {
-                        var29 = LWJGLUtility.getFloatBuffer(texCoords.getShortValues());
+                        var29 = LWJGLUtility.getIntBuffer(texCoords.getShortValues());
                     }
 
                     GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, var29);
@@ -1105,7 +1105,7 @@ public final class Emulator3D implements IGraphics3D {
                     GL11.glMatrixMode(5888);
                     GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
                     GL11.glDisable(2896);
-                    var27 = LWJGLUtility.getByteBuffer(var1.getImage().getImageData());
+                    var27 = LWJGLUtility.getByteBuffer1(var1.getImage().getImageData());
                     GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
                     GL11.glPixelStorei(3314, var1.getImage().getWidth());
                     GL11.glPixelStorei(3315, var21[1]);
