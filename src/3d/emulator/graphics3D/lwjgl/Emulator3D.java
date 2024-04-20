@@ -378,14 +378,14 @@ public final class Emulator3D implements IGraphics3D {
         this.viewportHeight = var4;
     }
 
-    private void viewport() {
+    private void setupViewport() {
         GL11.glViewport(this.viewportX, targetHeight - this.viewportY - this.viewportHeight, this.viewportWidth, this.viewportHeight);
         GL11.glScissor(this.viewportX, targetHeight - this.viewportY - this.viewportHeight, this.viewportWidth, this.viewportHeight);
     }
 
     public final void clearBackgound(Object var1) {
         Background var2 = (Background) var1;
-        this.viewport();
+        this.setupViewport();
         this.depth();
         GL11.glClearDepth(1.0D);
         GL11.glDepthMask(true);
@@ -572,7 +572,7 @@ public final class Emulator3D implements IGraphics3D {
 
     private void renderVertex(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5, float var6) {
         if ((CameraCache.camera.getScope() & var5) != 0) {
-            this.viewport();
+            this.setupViewport();
             this.depth();
             setupCamera();
             setupLights(LightsCache.m_lights, LightsCache.m_lightsTransform, var5);
