@@ -830,7 +830,6 @@ public final class Emulator3D implements IGraphics3D {
 
                     if(!image2D.isLoaded()) {
                         image2D.setLoaded(true);
-                        System.out.println("loaded texture: " + id);
                         short var16 = GL_RGB;
                         switch (image2D.getFormat()) {
                             case Image2D.ALPHA:
@@ -935,6 +934,11 @@ public final class Emulator3D implements IGraphics3D {
                 var22 = triangleStripArray.getIndexStrip(i);
                 GL11.glDrawElements(5, LWJGLUtility.getElementsBuffer(var22));
             }
+        }
+
+        int err = GL11.glGetError();
+        if (err != GL11.GL_NO_ERROR) {
+            Emulator.getEmulator().getLogStream().println("GL Error: " + err + " " + Util.translateGLErrorString(err));
         }
         if(exiting) {
             releaseTarget();
@@ -1179,7 +1183,6 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public void invalidateTexture(Image2D image2D) {
-        System.out.println("invalidateTexture: " + image2D);
         image2D.setLoaded(false);
     }
 
