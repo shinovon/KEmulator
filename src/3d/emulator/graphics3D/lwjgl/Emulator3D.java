@@ -733,19 +733,15 @@ public final class Emulator3D implements IGraphics3D {
     private void draw(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Appearance appearance, float alphaFactor) {
         VertexArray texCoords;
         byte[] var23;
-        short[] var24;
         if ((texCoords = vertexBuffer.getColors()) == null) {
-            int var6;
-            GL11.glColor4ub((byte) ((var6 = vertexBuffer.getDefaultColor()) >> 16 & 255), (byte) (var6 >> 8 & 255), (byte) (var6 & 255), (byte) ((int) ((float) (var6 >> 24 & 255) * alphaFactor)));
+            int var6 = vertexBuffer.getDefaultColor();
+            GL11.glColor4ub((byte) (var6 >> 16 & 255), (byte) (var6 >> 8 & 255), (byte) (var6 & 255), (byte) ((int) ((float) (var6 >> 24 & 255) * alphaFactor)));
             GL11.glDisableClientState(GL_COLOR_ARRAY);
         } else {
             GL11.glEnableClientState(GL_COLOR_ARRAY);
             if (texCoords.getComponentType() == 1) {
                 var23 = texCoords.getByteValues();
                 GL11.glColorPointer(alphaFactor == 1.0F ? texCoords.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(var23, alphaFactor, texCoords.getVertexCount()));
-            } else {
-                var24 = texCoords.getShortValues();
-                GL11.glColorPointer(alphaFactor == 1.0F ? texCoords.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(var24, alphaFactor, texCoords.getVertexCount()));
             }
         }
 
@@ -939,7 +935,6 @@ public final class Emulator3D implements IGraphics3D {
                 var22 = triangleStripArray.getIndexStrip(i);
                 GL11.glDrawElements(5, LWJGLUtility.getElementsBuffer(var22));
             }
-
         }
         if(exiting) {
             releaseTarget();

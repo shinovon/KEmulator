@@ -115,42 +115,6 @@ public final class LWJGLUtility {
         return colorBuffer;
     }
 
-    public static ByteBuffer getColorBuffer(short[] var0, float var1, int var2) {
-        int var3 = var1 == 1.0F ? var0.length : 4 * var2;
-        if (colorBuffer == null || colorBuffer.capacity() < var3) {
-            colorBuffer = BufferUtils.createByteBuffer(var3);
-        }
-
-        colorBuffer.position(colorBuffer.capacity() - var0.length);
-        int var4;
-        if (var1 == 1.0F) {
-            for(var4 = 0; var4 < var0.length; ++var4) {
-                colorBuffer.put((byte)((var0[var4] & '\uffff') / 257));
-            }
-        } else if (var0.length == var3) {
-            var4 = 0;
-
-            while(var4 < var3) {
-                colorBuffer.put((byte)((var0[var4++] & '\uffff') / 257));
-                colorBuffer.put((byte)((var0[var4++] & '\uffff') / 257));
-                colorBuffer.put((byte)((var0[var4++] & '\uffff') / 257));
-                colorBuffer.put((byte)((int)((float)((byte)((var0[var4++] & '\uffff') / 257) & 255) * var1 + 0.5F)));
-            }
-        } else {
-            byte var5 = 0;
-
-            while(var5 < var0.length) {
-                colorBuffer.put((byte)((var0[var5] & '\uffff') / 257));
-                colorBuffer.put((byte)((var0[var5] & '\uffff') / 257));
-                colorBuffer.put((byte)((var0[var5] & '\uffff') / 257));
-                colorBuffer.put((byte)((int)(255.0F * var1 + 0.5F)));
-            }
-        }
-
-        colorBuffer.position(colorBuffer.capacity() - var0.length);
-        return colorBuffer;
-    }
-
     public static IntBuffer getElementsBuffer(int[] var0) {
         if(elementsBuffer == null || elementsBuffer.capacity() < var0.length) {
             elementsBuffer = BufferUtils.createIntBuffer(var0.length);
