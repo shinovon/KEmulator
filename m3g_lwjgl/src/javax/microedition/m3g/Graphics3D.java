@@ -58,7 +58,7 @@ public class Graphics3D {
             throw new IllegalArgumentException();
         }
 
-        boolean overwrite = (hints & OVERWRITE) != 0;
+        boolean overwrite = false;//Inquisitors Torments fix //(hints & OVERWRITE) != 0;
 
         Background bck = new Background();
         bck.setColorClearEnable(!overwrite);
