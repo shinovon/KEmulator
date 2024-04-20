@@ -164,7 +164,7 @@ public class CustomMethod {
 
     public static void close() {
         try {
-            Emulator3D.getInstance().finalize();
+            Emulator3D.getInstance().releaseGLTextures();
         } catch (Throwable ignored) {}
         if (trackWriter != null) {
             try {

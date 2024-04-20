@@ -52,7 +52,9 @@ public final class Emulator3D implements IGraphics3D {
     private int viewportY;
     private int viewportWidth;
     private int viewportHeight;
-    private static Vector texturesToRelease = new Vector();
+
+    private static Vector<Integer> usedGLTextures = new Vector<>();
+    private static Vector<Integer> unusedGLTextures = new Vector<>();
 
     public static final int MaxViewportWidth = 2048;
     public static final int MaxViewportHeight = 2048;
@@ -170,11 +172,15 @@ public final class Emulator3D implements IGraphics3D {
     public final void releaseTarget() {
         GL11.glFinish();
         this.method503();
+
+        while (!unusedGLTextures.isEmpty())
+            releaseTexture(unusedGLTextures.get(0));
+
         if(exiting) {
-            while (texturesToRelease.size() > 0) {
-                releaseTexture((Image2D) texturesToRelease.remove(0));
-            }
+            while (!usedGLTextures.isEmpty())
+                releaseTexture(usedGLTextures.get(0));
         }
+
         this.target = null;
         if (pbufferContext != null) {
             try {
@@ -788,11 +794,11 @@ public final class Emulator3D implements IGraphics3D {
                     }
 
                     int id = image2D.getId();
-                    if(id == 0) {
+                    if (id == 0) {
                         image2D.setId(id = GL11.glGenTextures());
                         image2D.setLoaded(false);
-                        if(!texturesToRelease.contains(image2D))
-                            texturesToRelease.add(image2D);
+                        if (!usedGLTextures.contains(id))
+                            usedGLTextures.add(id);
                     }
                     short var10000;
                     label141:
@@ -923,9 +929,6 @@ public final class Emulator3D implements IGraphics3D {
                         GL13.glClientActiveTexture('\u84c0' + j);
                     }
                     GL11.glBindTexture(GL_TEXTURE_2D, 0);
-                    if(exiting) {
-                        releaseTexture(image2D);
-                    }
                 }
             }
         } else {
@@ -1153,16 +1156,16 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public void finalizeTexture(Image2D image2D) {
-        // TODO
-        texturesToRelease.add(image2D);
+        if (usedGLTextures.contains(image2D.getId()))
+            usedGLTextures.removeElement(image2D.getId());
+
+        if (!unusedGLTextures.contains(image2D.getId()))
+            unusedGLTextures.add(image2D.getId());
+
+        image2D.setId(0);
     }
 
-    public void invalidateTexture(Image2D image2D) {
-        System.out.println("invalidateTexture: " + image2D);
-        image2D.setLoaded(false);
-    }
-
-    public void finalize() {
+    public void releaseGLTextures() {
         // TODO
         if(pbufferContext == null || exiting) return;
         exiting = true;
@@ -1170,18 +1173,22 @@ public final class Emulator3D implements IGraphics3D {
             // try to make context current
             pbufferContext.makeCurrent();
 
-            while (texturesToRelease.size() > 0) {
-                releaseTexture((Image2D) texturesToRelease.remove(0));
-            }
+            while (!usedGLTextures.isEmpty()) releaseTexture(usedGLTextures.get(0));
+            while (!unusedGLTextures.isEmpty()) releaseTexture(unusedGLTextures.get(0));
+
             pbufferContext.destroy();
         } catch (Exception ignored) {}
     }
 
-    private void releaseTexture(Image2D image2D) {
-        int id = image2D.getId();
-        if(id == 0) return;
-        System.out.println("releaseTexture: " + image2D + " " + id);
+    public void invalidateTexture(Image2D image2D) {
+        System.out.println("invalidateTexture: " + image2D);
+        image2D.setLoaded(false);
+    }
+
+    private void releaseTexture(int id) {
+        System.out.println("releaseTexture: " + id);
         GL11.glDeleteTextures(id);
-        image2D.setId(0);
+        usedGLTextures.removeElement(id);
+        unusedGLTextures.removeElement(id);
     }
 }
