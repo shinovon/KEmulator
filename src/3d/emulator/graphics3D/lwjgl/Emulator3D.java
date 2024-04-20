@@ -598,7 +598,7 @@ public final class Emulator3D implements IGraphics3D {
             material(var1.getMaterial(), var2);
         }
 
-        fog(var1.getFog());
+        setupFog(var1.getFog());
     }
 
     private static void polygonMode(PolygonMode var0) {
@@ -717,19 +717,21 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glDisable(var10000);
     }
 
-    private static void fog(Fog var0) {
-        if (var0 != null && !Settings.xrayView) {
-            GL11.glEnable(2912);
-            GL11.glFogi(2917, var0.getMode() == 81 ? 9729 : 2048);
-            float[] var1;
-            G3DUtils.fillFloatColor(var1 = new float[4], var0.getColor());
-            var1[3] = 1.0F;
-            GL11.glFog(2918, LWJGLUtility.getFloatBuffer(var1));
-            GL11.glFogf(2915, var0.getNearDistance());
-            GL11.glFogf(2916, var0.getFarDistance());
-            GL11.glFogf(2914, var0.getDensity());
+    private static void setupFog(Fog fog) {
+        if (fog != null && !Settings.xrayView) {
+            GL11.glEnable(GL_FOG);
+            GL11.glFogi(GL_FOG_MODE, fog.getMode() == Fog.LINEAR ? GL_LINEAR : GL_EXP);
+
+            float[] fogColor = new float[4];
+            G3DUtils.fillFloatColor(fogColor, fog.getColor());
+            fogColor[3] = 1.0F;
+            GL11.glFog(GL_FOG_COLOR, LWJGLUtility.getFloatBuffer(fogColor));
+
+            GL11.glFogf(GL_FOG_START, fog.getNearDistance());
+            GL11.glFogf(GL_FOG_END, fog.getFarDistance());
+            GL11.glFogf(GL_FOG_DENSITY, fog.getDensity());
         } else {
-            GL11.glDisable(2912);
+            GL11.glDisable(GL_FOG);
         }
     }
 
