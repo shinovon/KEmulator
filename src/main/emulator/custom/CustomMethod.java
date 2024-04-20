@@ -30,7 +30,8 @@ public class CustomMethod {
     }
 
     public static void yield() throws InterruptedException {
-        Thread.sleep(1L);
+//        Thread.sleep(1L);
+        Thread.yield();
     }
 
     public static String getProperty(final String prop) {
