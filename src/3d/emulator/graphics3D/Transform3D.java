@@ -26,14 +26,15 @@ public final class Transform3D {
     }
 
     public final void invert() {
-        if (!G3DUtils.Invert4x4(this.m_matrix, 1.0E-10F)) {
+//        if (!G3DUtils.Invert4x4(this.m_matrix, 1.0E-10F)) {
+        if (!G3DUtils.Invert4x4(this.m_matrix)) {
             throw new ArithmeticException();
         }
     }
 
-    public final void method445() {
-        G3DUtils.Invert4x4(this.m_matrix, 0.0F);
-    }
+//    public final void method445() {
+//        G3DUtils.Invert4x4(this.m_matrix, 0.0F);
+//    }
 
     public final void transpose() {
         this.method435(1, 4);

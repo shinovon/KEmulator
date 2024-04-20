@@ -111,7 +111,8 @@ public class Mesh extends Node {
                 Vector4f var8 = new Vector4f(var2[3], var2[4], var2[5], 1.0F);
                 Transform var9;
                 (var9 = new Transform()).set(var4);
-                var9.getImpl_().method445();
+//                var9.getImpl_().method445();
+                var9.getImpl_().invert();
                 var9.getImpl_().transform(var7);
                 var9.getImpl_().transform(var8);
                 var7.mul(1.0F / var7.w);

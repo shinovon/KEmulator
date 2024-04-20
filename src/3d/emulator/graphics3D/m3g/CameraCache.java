@@ -14,7 +14,8 @@ public final class CameraCache {
         if (var1 != null) {
             a.set(var1);
             m_model2camTransform.set(var1);
-            ((Transform3D) m_model2camTransform.getImpl()).method445();
+            ((Transform3D) m_model2camTransform.getImpl()).invert();
+//            ((Transform3D) m_model2camTransform.getImpl()).method445();
         } else {
             a.setIdentity();
             m_model2camTransform.setIdentity();

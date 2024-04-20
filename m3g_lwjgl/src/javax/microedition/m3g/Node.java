@@ -103,7 +103,8 @@ public abstract class Node extends Transformable {
                     var7 = var7.parent;
                 }
 
-                var3.getImpl_().method445();
+//                var3.getImpl_().method445();
+                var3.getImpl_().invert();
                 var3.postMultiply(var4);
                 var2.set(var3);
                 return true;

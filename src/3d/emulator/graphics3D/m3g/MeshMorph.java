@@ -301,7 +301,8 @@ public final class MeshMorph {
                     var8.m_positionTransform.postMultiply(var8.m_toBoneTransform);
                     if (var4 != null) {
                         var8.m_normalTransform.set(var8.m_positionTransform);
-                        ((Transform3D) var8.m_normalTransform.getImpl()).method445();
+//                        ((Transform3D) var8.m_normalTransform.getImpl()).method445();
+                        ((Transform3D) var8.m_normalTransform.getImpl()).invert();
                         var8.m_normalTransform.transpose();
                     }
 

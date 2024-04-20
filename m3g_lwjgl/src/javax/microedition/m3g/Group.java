@@ -88,7 +88,8 @@ public class Group extends Node {
             Vector4f var8 = new Vector4f(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, -1.0F, 1.0F);
             Transform var9 = new Transform();
             var4.getProjection(var9);
-            var9.getImpl_().method445();
+//            var9.getImpl_().method445();
+            var9.getImpl_().invert();
             var9.getImpl_().transform(var8);
             var8.mul(1.0F / var8.w);
             var9.getImpl_().transform(var7);

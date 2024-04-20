@@ -469,7 +469,8 @@ public final class b {
     public static void method371(Camera var0, Transform var1) {
         if (var1 != null) {
             aTransform589.set(var1);
-            ((Transform3D) aTransform589.getImpl()).method445();
+//            ((Transform3D) aTransform589.getImpl()).method445();
+            ((Transform3D) aTransform589.getImpl()).invert();
         } else {
             aTransform589.setIdentity();
         }
