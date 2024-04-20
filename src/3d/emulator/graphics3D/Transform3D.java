@@ -37,18 +37,18 @@ public final class Transform3D {
 //    }
 
     public final void transpose() {
-        this.method435(1, 4);
-        this.method435(2, 8);
-        this.method435(3, 12);
-        this.method435(7, 13);
-        this.method435(11, 14);
-        this.method435(6, 9);
+        this.swapAt(1, 4);
+        this.swapAt(2, 8);
+        this.swapAt(3, 12);
+        this.swapAt(7, 13);
+        this.swapAt(11, 14);
+        this.swapAt(6, 9);
     }
 
-    private void method435(int var1, int var2) {
-        float var3 = this.m_matrix[var1];
-        this.m_matrix[var1] = this.m_matrix[var2];
-        this.m_matrix[var2] = var3;
+    private void swapAt(int a, int b) {
+        float tmp = this.m_matrix[a];
+        this.m_matrix[a] = this.m_matrix[b];
+        this.m_matrix[b] = tmp;
     }
 
     public final void postMultiply(Transform3D var1, boolean var2) {
