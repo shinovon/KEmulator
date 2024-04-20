@@ -53,6 +53,7 @@ public class Camera extends Node {
             throw new NullPointerException();
         } else {
             this.generic.set(var1);
+            this.projection = 48;
         }
     }
 
