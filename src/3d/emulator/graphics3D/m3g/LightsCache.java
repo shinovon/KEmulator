@@ -14,48 +14,48 @@ public final class LightsCache {
     public static Vector m_lights = new Vector();
     public static Vector m_lightsTransform = new Vector();
 
-    public static void getLightsInWorld(World var0) {
+    public static void addLightsFromWorld(World world) {
         resetLights();
-        method799(var0, var0);
+        addLightsFromGroup(world, world);
     }
 
-    private static void method799(World var0, Group var1) {
-        Transform var2 = new Transform();
+    private static void addLightsFromGroup(World world, Group group) {
+        Transform tmpMat = new Transform();
 
-        for (int var3 = 0; var3 < var1.getChildCount(); ++var3) {
-            Node var4;
-            if ((var4 = var1.getChild(var3)) instanceof Light && var4.getTransformTo(var0, var2)) {
-                m_lights.add(var4);
-                m_lightsTransform.add(new Transform(var2));
-            } else if (var4 instanceof Group) {
-                method799(var0, (Group) var4);
+        for (int i = 0; i < group.getChildCount(); ++i) {
+            Node child = group.getChild(i);
+
+            if (child instanceof Light && child.getTransformTo(world, tmpMat)) {
+                m_lights.add(child);
+                m_lightsTransform.add(new Transform(tmpMat));
+            } else if (child instanceof Group) {
+                addLightsFromGroup(world, (Group) child);
             }
         }
-
     }
 
-    public static int addLight(Light var0, Transform var1) {
-        if (var0 == null) {
+    public static int addLight(Light light, Transform transform) {
+        if (light == null) {
             throw new NullPointerException();
         } else {
-            m_lights.add(var0);
-            if (var1 == null) {
+            m_lights.add(light);
+            if (transform == null) {
                 m_lightsTransform.add(new Transform());
             } else {
-                m_lightsTransform.add(new Transform(var1));
+                m_lightsTransform.add(new Transform(transform));
             }
 
             return m_lights.size();
         }
     }
 
-    public static void setLight(int var0, Light var1, Transform var2) {
-        if (var0 >= 0 && var0 < getLightCount()) {
-            m_lights.set(var0, var1);
-            if (var2 == null) {
-                m_lightsTransform.set(var0, new Transform());
+    public static void setLight(int index, Light light, Transform transform) {
+        if (index >= 0 && index < getLightCount()) {
+            m_lights.set(index, light);
+            if (transform == null) {
+                m_lightsTransform.set(index, new Transform());
             } else {
-                m_lightsTransform.set(var0, new Transform(var2));
+                m_lightsTransform.set(index, new Transform(transform));
             }
         } else {
             throw new IndexOutOfBoundsException();
@@ -71,17 +71,17 @@ public final class LightsCache {
         return m_lights.size();
     }
 
-    public static Light getLight(int var0, Transform var1) {
-        if (var0 >= 0 && var0 < getLightCount()) {
-            if (var1 != null) {
-                if (m_lightsTransform.get(var0) == null) {
-                    var1.setIdentity();
+    public static Light getLight(int index, Transform transform) {
+        if (index >= 0 && index < getLightCount()) {
+            if (transform != null) {
+                if (m_lightsTransform.get(index) == null) {
+                    transform.setIdentity();
                 } else {
-                    var1.set((Transform) m_lightsTransform.get(var0));
+                    transform.set((Transform) m_lightsTransform.get(index));
                 }
             }
 
-            return (Light) m_lights.get(var0);
+            return (Light) m_lights.get(index);
         } else {
             throw new IndexOutOfBoundsException();
         }

@@ -483,7 +483,7 @@ public final class Emulator3D implements IGraphics3D {
         int lightsCount = Math.min(lights.size(), MaxLights);
 
         for (int i = 0; i < MaxLights; ++i) {
-                GL11.glDisable(GL_LIGHT0 + i);
+            GL11.glDisable(GL_LIGHT0 + i);
         }
 
         //ARBColorBufferFloat.glClampColorARB(ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
@@ -524,8 +524,6 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glLightf(lightId, GL_SPOT_CUTOFF, 180.0F);
             GL11.glLightf(lightId, GL_SPOT_EXPONENT, 0.0F);
 
-            //if(light.getMode() != Light.OMNI) continue;
-
             float[] tmpLightPos;
             if (light.getMode() == Light.DIRECTIONAL) {
                 tmpLightPos = LightsCache.POSITIVE_Z_AXIS; //light direction!
@@ -534,7 +532,6 @@ public final class Emulator3D implements IGraphics3D {
             }
 
             GL11.glLight(lightId, GL_POSITION, LWJGLUtility.getFloatBuffer(tmpLightPos));
-            GL11.glLight(lightId, GL_SPOT_DIRECTION, LWJGLUtility.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
 
             G3DUtils.fillFloatColor(lightColor, light.getColor());
             float lightIntensity = light.getIntensity();
@@ -553,6 +550,7 @@ public final class Emulator3D implements IGraphics3D {
             }
 
             if(lightMode == Light.SPOT) {
+                GL11.glLight(lightId, GL_SPOT_DIRECTION, LWJGLUtility.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
                 GL11.glLightf(lightId, GL_SPOT_CUTOFF, light.getSpotAngle());
                 GL11.glLightf(lightId, GL_SPOT_EXPONENT, light.getSpotExponent());
             }
@@ -956,7 +954,7 @@ public final class Emulator3D implements IGraphics3D {
         this.clearBackgound(var1.getBackground());
         var1.getActiveCamera().getTransformTo(var1, var2);
         CameraCache.setCamera(var1.getActiveCamera(), var2);
-        LightsCache.getLightsInWorld(var1);
+        LightsCache.addLightsFromWorld(var1);
         RenderPipe.getInstance().pushRenderNode(var1, (Transform) null);
         this.method519();
     }
