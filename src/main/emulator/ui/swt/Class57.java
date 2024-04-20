@@ -13,7 +13,7 @@ final class Class57 extends ControlAdapter {
 
     public final void controlResized(final ControlEvent controlEvent) {
         if (((Control) Class90.method499(this.aClass90_823)).getVisible()) {
-            //Class90.method511(this.aClass90_823);
+            Class90.method511(this.aClass90_823);
         }
     }
 }

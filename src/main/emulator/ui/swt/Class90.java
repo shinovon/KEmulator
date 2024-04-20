@@ -412,7 +412,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
                 }
                 if (n2 != 0) {
                     final Vector4f method495 = this.method495(this.ana892);
-                    a.setAngleAxis(-n2 / 2.0f, method495.x, method495.y, method495.w);
+                    a.setAngleAxis(-n2 / 2.0f, method495.x, method495.y, method495.z);
                     a.mul(this.ana892);
                     if (this.method495(a).normalize()) {
                         this.ana892.set(a);
