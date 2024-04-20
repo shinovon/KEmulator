@@ -2276,6 +2276,7 @@ public final class EmulatorScreen implements
                     int origHeight = getHeight();
                     float f = Math.min((float) size.width / (float) origWidth, (float) size.height / (float) origHeight);
                     f = (int) (f - (f % 1));
+                    if(f < 1) f = 1;
                     this.zoom = f;
                     zoomedWidth = (int) ((float) origWidth * this.zoom);
                     zoomedHeight = (int) ((float) origHeight * this.zoom);
