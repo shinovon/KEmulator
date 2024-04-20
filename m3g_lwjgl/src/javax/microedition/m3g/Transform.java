@@ -91,7 +91,7 @@ public class Transform {
     }
 
     public void postRotateQuat(float var1, float var2, float var3, float var4) {
-        if (var3 == 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
+        if (var1 == 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
             throw new IllegalArgumentException();
         } else {
             this.impl.postRotateQuat(var1, var2, var3, var4);
