@@ -19,7 +19,7 @@ final class Class59 implements Listener {
                 } else if (Class90.method517(this.aClass90_825) >= 180.0f && Class90.method500(this.aClass90_825) == 0) {
                     Class90.method544(this.aClass90_825, event.count);
                 }
-                Class90.method511(this.aClass90_825);
+                Class90.method252(this.aClass90_825);
                 break;
             }
         }

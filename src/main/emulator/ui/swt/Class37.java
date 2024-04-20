@@ -24,7 +24,7 @@ final class Class37 extends SelectionAdapter {
             } else {
                 Class90.method518(this.aClass90_625, class30.aFloat603);
             }
-            Class90.method511(this.aClass90_625);
+            Class90.method252(this.aClass90_625);
         }
     }
 }

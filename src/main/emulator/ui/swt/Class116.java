@@ -27,6 +27,6 @@ final class Class116 extends SelectionAdapter {
             Class90.method506(this.aClass90_1167, class30.aFloat606);
             Class90.method513(this.aClass90_1167, class30.aFloat608);
         }
-        Class90.method511(this.aClass90_1167);
+        Class90.method252(this.aClass90_1167);
     }
 }

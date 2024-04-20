@@ -133,10 +133,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
             if (this.aFloat915 >= 180.0f) {
                 this.aFloat915 = 179.99f;
             }
-            this.aCamera901.setPerspective(this.aFloat915, clientArea.width / clientArea.height, this.aFloat906, this.aFloat911);
+            this.aCamera901.setPerspective(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
             return;
         }
-        this.aCamera901.setParallel(this.aFloat915, clientArea.width / clientArea.height, this.aFloat906, this.aFloat911);
+        this.aCamera901.setParallel(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
     }
 
     public final void method226() {
@@ -246,7 +246,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
         if (this.aBoolean381) {
             Camera localCamera = new Camera();
-            localCamera.setPerspective(50.0f, (this.aRectangle903.width >> 1) / (this.aRectangle903.height >> 1), 1.0f, 1000.0f);
+            localCamera.setPerspective(50.0f, (float)(this.aRectangle903.width >> 1) / (float)(this.aRectangle903.height >> 1), 1.0f, 1000.0f);
             final Transform transform;
             (transform = new Transform()).postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
             transform.postTranslate(0.0f, 0.0f, 6.0f);
@@ -405,14 +405,14 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         switch (this.anInt893) {
             case 0: {
                 if (Math.abs(n) > Math.abs(n2)) {
-                    a.setAngleAxis(n / 2.0f, 0.0f, 1.0f, 0.0f);
+                    a.setAngleAxis((float) n / 2.0f, 0.0f, 1.0f, 0.0f);
                     a.mul(this.ana892);
                     this.ana892.set(a);
                     return;
                 }
                 if (n2 != 0) {
                     final Vector4f method495 = this.method495(this.ana892);
-                    a.setAngleAxis(-n2 / 2.0f, method495.x, method495.y, method495.z);
+                    a.setAngleAxis(-((float)n2) / 2.0f, method495.x, method495.y, method495.z);
                     a.mul(this.ana892);
                     if (this.method495(a).normalize()) {
                         this.ana892.set(a);
@@ -422,18 +422,18 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
                 break;
             }
             case 1: {
-                this.aFloat920 += n / 10.0f;
-                this.aFloat924 -= n2 / 10.0f;
+                this.aFloat920 += (float)n / 10.0f;
+                this.aFloat924 -= (float)n2 / 10.0f;
             }
             case 2: {
                 if (this.anInt910 == 0) {
-                    this.aFloat926 -= n / 10.0f;
+                    this.aFloat926 -= (float)n / 10.0f;
                     return;
                 }
                 break;
             }
             case 3: {
-                this.aFloat915 -= n / 10.0f;
+                this.aFloat915 -= (float)n / 10.0f;
                 Label_0263:
                 {
                     if (this.aFloat915 > 0.0f) {
@@ -502,6 +502,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
 
     static void method511(final Class90 class90) {
         class90.method276();
+    }
+
+    static void method252(Class90 paramClass57) {
+        paramClass57.method531();
     }
 
     static Shell method499(final Class90 class90) {

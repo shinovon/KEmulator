@@ -13,6 +13,6 @@ final class Class118 extends SelectionAdapter {
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         Class90.method510(this.aClass90_1184, 1);
         Class90.method505(this.aClass90_1184).setEnabled(false);
-        Class90.method511(this.aClass90_1184);
+        Class90.method252(this.aClass90_1184);
     }
 }
