@@ -737,9 +737,9 @@ public final class Emulator3D implements IGraphics3D {
         if ((texCoords = vertexBuffer.getColors()) == null) {
             int var6;
             GL11.glColor4ub((byte) ((var6 = vertexBuffer.getDefaultColor()) >> 16 & 255), (byte) (var6 >> 8 & 255), (byte) (var6 & 255), (byte) ((int) ((float) (var6 >> 24 & 255) * alphaFactor)));
-            GL11.glDisableClientState(32886);
+            GL11.glDisableClientState(GL_COLOR_ARRAY);
         } else {
-            GL11.glEnableClientState(32886);
+            GL11.glEnableClientState(GL_COLOR_ARRAY);
             if (texCoords.getComponentType() == 1) {
                 var23 = texCoords.getByteValues();
                 GL11.glColorPointer(alphaFactor == 1.0F ? texCoords.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(var23, alphaFactor, texCoords.getVertexCount()));
@@ -750,19 +750,19 @@ public final class Emulator3D implements IGraphics3D {
         }
 
         if ((texCoords = vertexBuffer.getNormals()) != null && appearance.getMaterial() != null) {
-            GL11.glEnableClientState(32885);
+            GL11.glEnableClientState(GL_NORMAL_ARRAY);
             if (texCoords.getComponentType() == 1) {
                 GL11.glNormalPointer(0, LWJGLUtility.getNormalBuffer(texCoords.getByteValues()));
             } else {
                 GL11.glNormalPointer(5120, 0, LWJGLUtility.getNormalBuffer(texCoords.getShortValues()));
             }
         } else {
-            GL11.glDisableClientState(32885);
+            GL11.glDisableClientState(GL_NORMAL_ARRAY);
         }
 
         float[] var26 = new float[4];
         texCoords = vertexBuffer.getPositions(var26);
-        GL11.glEnableClientState(32884);
+        GL11.glEnableClientState(GL_VERTEX_ARRAY);
         if (texCoords.getComponentType() == 1) {
             byte[] var7 = texCoords.getByteValues();
             GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(var7));
@@ -771,7 +771,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(var25));
         }
 
-        GL11.glMatrixMode(5888);
+        GL11.glMatrixMode(GL_MODELVIEW);
         GL11.glTranslatef(var26[1], var26[2], var26[3]);
         GL11.glScalef(var26[0], var26[0], var26[0]);
         TriangleStripArray triangleStripArray;
@@ -789,8 +789,8 @@ public final class Emulator3D implements IGraphics3D {
                 if (texture2D != null && texCoords != null) {
                     Image2D image2D = texture2D.getImage();
                     if (useGL13()) {
-                        GL13.glActiveTexture('\u84c0' + j);
-                        GL13.glClientActiveTexture('\u84c0' + j);
+                        GL13.glActiveTexture(GL13.GL_TEXTURE0 + j);
+                        GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + j);
                     }
 
                     int id = image2D.getId();
@@ -800,67 +800,67 @@ public final class Emulator3D implements IGraphics3D {
                         if (!usedGLTextures.contains(id))
                             usedGLTextures.add(id);
                     }
-                    short var10000;
+                    GL11.glEnable(GL_TEXTURE_2D);
+                    GL11.glBindTexture(GL_TEXTURE_2D, id);
                     label141:
                     {
-                        GL11.glEnable(GL_TEXTURE_2D);
-                        GL11.glBindTexture(GL_TEXTURE_2D, id);
-                        short var10002;
+                        int blendMode;
                         switch (texture2D.getBlending()) {
-                            case 224:
-                                var10002 = 260;
+                            case Texture2D.FUNC_ADD:
+                                blendMode = GL_ADD;
                                 break;
-                            case 225:
-                                var10002 = 3042;
+                            case Texture2D.FUNC_BLEND:
+                                blendMode = GL_BLEND;
                                 break;
-                            case 226:
-                                var10002 = 8449;
+                            case Texture2D.FUNC_DECAL:
+                                blendMode = GL_DECAL;
                                 break;
-                            case 227:
-                                var10002 = 8448;
+                            case Texture2D.FUNC_MODULATE:
+                                blendMode = GL_MODULATE;
                                 break;
-                            case 228:
-                                var10002 = 7681;
+                            case Texture2D.FUNC_REPLACE:
+                                blendMode = GL_REPLACE;
                                 break;
                             default:
                                 break label141;
                         }
-                        GL11.glTexEnvi(8960, 8704, var10002);
+                        GL11.glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blendMode);
                     }
 
                     float[] var14;
                     G3DUtils.fillFloatColor(var14 = new float[4], texture2D.getBlendColor());
                     var14[3] = 1.0F;
-                    GL11.glTexEnv(8960, 8705, LWJGLUtility.getFloatBuffer(var14));
+                    GL11.glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, LWJGLUtility.getFloatBuffer(var14));
 
                     if(!image2D.isLoaded()) {
                         image2D.setLoaded(true);
-                        System.out.println("loaded texture: " + image2D + " " + id);
+                        System.out.println("loaded texture: " + id);
                         short var16 = GL_RGB;
                         switch (image2D.getFormat()) {
-                            case 96:
+                            case Image2D.ALPHA:
                                 var16 = GL_ALPHA;
                                 break;
-                            case 97:
+                            case Image2D.LUMINANCE:
                                 var16 = GL_LUMINANCE;
                                 break;
-                            case 98:
+                            case Image2D.LUMINANCE_ALPHA:
                                 var16 = GL_LUMINANCE_ALPHA;
                                 break;
-                            case 99:
+                            case Image2D.RGB:
                                 var16 = GL_RGB;
                                 break;
-                            case 100:
+                            case Image2D.RGBA:
                                 var16 = GL_RGBA;
                         }
                         GL11.glTexImage2D(GL_TEXTURE_2D, 0, var16, image2D.getWidth(), image2D.getHeight(), 0, var16, 5121, LWJGLUtility.getImageBuffer(image2D.getImageData()));
                     }
 
-                    GL11.glTexParameterf(GL_TEXTURE_2D, 10242, texture2D.getWrappingS() == 240 ? 33071.0F : 10497.0F);
-                    GL11.glTexParameterf(GL_TEXTURE_2D, 10243, texture2D.getWrappingT() == 240 ? 33071.0F : 10497.0F);
+                    GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture2D.getWrappingS() == 240 ? 33071.0F : 10497.0F);
+                    GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture2D.getWrappingT() == 240 ? 33071.0F : 10497.0F);
 
                     int var17 = texture2D.getLevelFilter();
                     int var18 = texture2D.getImageFilter();
+                    short var10000;
                     short var19;
                     label128:
                     {
@@ -894,9 +894,9 @@ public final class Emulator3D implements IGraphics3D {
                         var10000 = 9729;
                     }
                     short var20 = var10000;
-                    GL11.glTexParameteri(GL_TEXTURE_2D, 10241, var20);
-                    GL11.glTexParameteri(GL_TEXTURE_2D, 10240, var19);
-                    GL11.glEnableClientState('\u8078');
+                    GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, var20);
+                    GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, var19);
+                    GL11.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
                     IntBuffer var29;
                     if (texCoords.getComponentType() == 1) {
                         var29 = LWJGLUtility.getTexCoordsBuffer(texCoords.getByteValues(), j);
@@ -925,8 +925,8 @@ public final class Emulator3D implements IGraphics3D {
                 Image2D image2D;
                 if (tex != null && ((image2D = tex.getImage()).getId()) != 0) {
                     if (useGL13()) {
-                        GL13.glActiveTexture('\u84c0' + j);
-                        GL13.glClientActiveTexture('\u84c0' + j);
+                        GL13.glActiveTexture(GL13.GL_TEXTURE0 + j);
+                        GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + j);
                     }
                     GL11.glBindTexture(GL_TEXTURE_2D, 0);
                 }
