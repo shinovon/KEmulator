@@ -1,5 +1,7 @@
 package emulator.ui.swt;
 
+import emulator.UILocale;
+import emulator.graphics3D.view.b;
 import org.eclipse.swt.custom.*;
 
 import javax.microedition.m3g.*;
@@ -24,17 +26,18 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private Tree aTree896;
     private Canvas aCanvas897;
     private Memory ana898;
-    //  private emulator.graphics3D.view.a m3gview;
+    private emulator.graphics3D.view.b ab369;
     private Camera aCamera901;
-    private Transform aTransform902;
+    private Transform aTransform372;
     private Menu aMenu908;
     private Menu aMenu913;
     private Menu aMenu918;
     private Menu aMenu923;
     private boolean aBoolean905;
     private boolean aBoolean909;
-    private boolean aBoolean914;
-    private boolean aBoolean919;
+    private boolean aBoolean381;
+    private boolean aBoolean386;
+    private int anInt362 = 0;
     private int anInt893;
     private int anInt910;
     private float aFloat906;
@@ -43,9 +46,9 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private float aFloat920;
     private float aFloat924;
     private float aFloat926;
-//    private emulator.graphics3D.a ana892;
+    private Quaternion ana892;
     private Background aBackground900;
-    private Node aNode904;
+    private Node aNode361;
     private Rectangle aRectangle903;
     private MenuItem aMenuItem894;
     private MenuItem aMenuItem912;
@@ -76,33 +79,24 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aComposite907 = null;
         this.aTree896 = null;
         this.aCanvas897 = null;
-        try {
-            this.aCamera901 = new Camera();
-            this.aTransform902 = new Transform();
-        } catch (Error e) {
-        }
+        this.aCamera901 = new Camera();
+        this.aTransform372 = new Transform();
         this.aMenu908 = null;
         this.aMenu913 = null;
         this.aMenu918 = null;
         this.aMenu923 = null;
-        try {
-//            this.ana892 = new emulator.graphics3D.a();
-        } catch (Error e) {
-        }
+        this.ana892 = new Quaternion();
         this.aBackground900 = null;
-        this.aNode904 = null;
+        this.aNode361 = null;
         this.ana898 = new Memory();
-	    /*try {
-        this.m3gview = emulator.graphics3D.view.a.acreate();
-        } catch (Error e) {
-        }*/
+        this.ab369 = emulator.graphics3D.view.b.method362();
     }
 
     private void method516() {
-        this.aBoolean914 = true;
-        this.aBoolean919 = true;
-        this.aMenuItem894.setSelection(this.aBoolean914);
-        this.aMenuItem912.setSelection(this.aBoolean919);
+        this.aBoolean381 = true;
+        this.aBoolean386 = true;
+        this.aMenuItem894.setSelection(this.aBoolean381);
+        this.aMenuItem912.setSelection(this.aBoolean386);
         this.aMenuItem936.setSelection(true);
         this.aMenuItem938.setEnabled(false);
         this.anInt893 = 0;
@@ -120,10 +114,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aFloat920 = 0.0f;
         this.aFloat924 = 0.0f;
         this.aFloat926 = 20.0f;
-//        this.ana892.method813(-10.0f, 1.0f, 0.0f, 0.0f);
-//        this.aTransform902.setIdentity();
-//        this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
-//        this.aTransform902.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
+        this.ana892.setAngleAxis(-10.0f, 1.0f, 0.0f, 0.0f);
+        this.aTransform372.setIdentity();
+        this.aTransform372.postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
+        this.aTransform372.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
     }
 
 
@@ -145,8 +139,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aCamera901.setParallel(this.aFloat915, clientArea.width / clientArea.height, this.aFloat906, this.aFloat911);
     }
 
-    public final void method493() {
-        // this.method543();
+    public final void method226() {
+        this.method543();
         final Display current = Display.getCurrent();
         ((Control) this.aShell889).setLocation(current.getClientArea().width - this.aShell889.getSize().x >> 1, current.getClientArea().height - this.aShell889.getSize().y >> 1);
         this.aShell889.open();
@@ -187,104 +181,161 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
     }
 
-    private void method540() {
+    private void method276()
+    {
+        label32: {
+            this.aBackground900 = null;
+            this.aNode361 = null;
+            Class90 var10000;
+            Node var10001;
+            if(this.aTree896.getSelectionCount() > 0) {
+                this.aNode361 = (Node)this.aTree896.getSelection()[0].getData();
+                if(this.aNode361 instanceof Sprite3D || this.aNode361 instanceof Mesh || this.aNode361 instanceof Group) {
+                    break label32;
+                }
 
-      /*  if (!emulator.graphics3D.view.a.abool()) {
-          this.m3gview.a1();
-        }*/
-        this.aTransform902.setIdentity();
-//        this.aTransform902.postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
-        this.aTransform902.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
-        //emulator.graphics3D.view.a.a(this.aCamera901, this.aTransform902);
-        //m3gview.a(this.aBackground900);
-        if (this.aBoolean914) {
-//            new Camera().setPerspective(50.0f, (this.aRectangle903.width >> 1) / (this.aRectangle903.height >> 1), 1.0f, 1000.0f);
-//            final Transform transform;
-//            (transform = new Transform()).postRotateQuat(this.ana892.aFloat1367, this.ana892.aFloat1368, this.ana892.aFloat1369, this.ana892.aFloat1370);
-//            transform.postTranslate(0.0f, 0.0f, 6.0f);
+                var10000 = this;
+                var10001 = null;
+            } else {
+                if(this.ana898.m3gObjects.size() <= 0) {
+                    break label32;
+                }
+
+                var10000 = this;
+                var10001 = (Node)this.ana898.m3gObjects.get(0);
+            }
+
+            var10000.aNode361 = var10001;
         }
+
+        if(this.aNode361 != null) {
+            if(this.aNode361 instanceof World) {
+                World var1 = (World)this.aNode361;
+                this.aBackground900 = var1.getBackground();
+                if(this.anInt362 == 0) {
+                    this.ab369.method374(var1);
+                }
+            } else {
+                Light var2;
+                (var2 = new Light()).setMode(128);
+                b.method388();
+                b.method381(var2, (Transform)null);
+            }
+        }
+        this.aRectangle903 = this.aCanvas897.getClientArea();
     }
 
-    /*
+    private void method540() {
+        if (!emulator.graphics3D.view.b.method384()) {
+            this.ab369.method380();
+        }
+        this.aTransform372.setIdentity();
+        this.aTransform372.postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
+        this.aTransform372.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
+        emulator.graphics3D.view.b.method371(this.aCamera901, this.aTransform372);
+        ab369.method367(this.aBackground900);
+        if (this.aBoolean386) {
+            this.ab369.method372(1.0F);
+        }
+        if (this.aNode361 != null) {
+            try {
+                this.ab369.method368(this.aNode361, null);
+            } catch (Exception localException) {
+                localException.printStackTrace();
+            }
+        }
+        if (this.aBoolean381) {
+            Camera localCamera = new Camera();
+            localCamera.setPerspective(50.0f, (this.aRectangle903.width >> 1) / (this.aRectangle903.height >> 1), 1.0f, 1000.0f);
+            final Transform transform;
+            (transform = new Transform()).postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
+            transform.postTranslate(0.0f, 0.0f, 6.0f);
+            emulator.graphics3D.view.b.method371(localCamera, transform);
+            this.ab369.method389();
+            this.ab369.method364(this.aRectangle903.width, this.aRectangle903.height);
+        }
+        emulator.graphics3D.view.b.method386();
+    }
+
     private void method543() {
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 1;
         layout.marginHeight = 2;
         layout.marginWidth = 2;
-        ((Decorations)(this.aShell889 = new Shell())).setText(UILocale.uiText("M3G_VIEW_TITLE", "M3G View"));
-        ((Decorations)this.aShell889).setImage(new Image((Device)Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        ((Decorations) (this.aShell889 = new Shell())).setText(UILocale.get("M3G_VIEW_TITLE", "M3G View"));
+        ((Decorations) this.aShell889).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         this.method545();
-        ((Composite)this.aShell889).setLayout((Layout)layout);
-        ((Control)this.aShell889).setSize(new Point(600, 400));
-        this.aMenu895 = new Menu((Decorations)this.aShell889, 2);
+        ((Composite) this.aShell889).setLayout((Layout) layout);
+        ((Control) this.aShell889).setSize(new Point(600, 400));
+        this.aMenu895 = new Menu((Decorations) this.aShell889, 2);
         final MenuItem menuItem = new MenuItem(this.aMenu895, 64);
         final MenuItem menuItem2;
-        (menuItem2 = new MenuItem(this.aMenu895, 64)).setText(UILocale.uiText("M3G_VIEW_CAMERA", "Camera"));
+        (menuItem2 = new MenuItem(this.aMenu895, 64)).setText(UILocale.get("M3G_VIEW_CAMERA", "Camera"));
         final MenuItem menuItem3;
-        (menuItem3 = new MenuItem(this.aMenu895, 64)).setText(UILocale.uiText("M3G_VIEW_LIGHT", "Light"));
+        (menuItem3 = new MenuItem(this.aMenu895, 64)).setText(UILocale.get("M3G_VIEW_LIGHT", "Light"));
         this.aMenu918 = new Menu(menuItem3);
-        (this.aMenuItem936 = new MenuItem(this.aMenu918, 16)).setText(UILocale.uiText("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
-        this.aMenuItem936.addSelectionListener((SelectionListener)new Class122(this));
-        (this.aMenuItem937 = new MenuItem(this.aMenu918, 16)).setText(UILocale.uiText("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
-        this.aMenuItem937.addSelectionListener((SelectionListener)new Class94(this));
+        (this.aMenuItem936 = new MenuItem(this.aMenu918, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
+        this.aMenuItem936.addSelectionListener((SelectionListener) new Class122(this));
+        (this.aMenuItem937 = new MenuItem(this.aMenu918, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
+        this.aMenuItem937.addSelectionListener((SelectionListener) new Class94(this));
         new MenuItem(this.aMenu918, 2);
-        (this.aMenuItem938 = new MenuItem(this.aMenu918, 8)).setText(UILocale.uiText("M3G_VIEW_LIGHT_SETTING", "Light Setting"));
+        (this.aMenuItem938 = new MenuItem(this.aMenu918, 8)).setText(UILocale.get("M3G_VIEW_LIGHT_SETTING", "Light Setting"));
         menuItem3.setMenu(this.aMenu918);
         this.aMenu913 = new Menu(menuItem2);
-        (this.aMenuItem925 = new MenuItem(this.aMenu913, 16)).setText(UILocale.uiText("M3G_VIEW_CAMERA_ORBIT", "Orbit") + "\t(1)");
+        (this.aMenuItem925 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ORBIT", "Orbit") + "\t(1)");
         this.aMenuItem925.setAccelerator(49);
-        this.aMenuItem925.addSelectionListener((SelectionListener)new Class98(this));
-        (this.aMenuItem927 = new MenuItem(this.aMenu913, 16)).setText(UILocale.uiText("M3G_VIEW_CAMERA_PAN", "Pan") + "\t(2)");
+        this.aMenuItem925.addSelectionListener((SelectionListener) new Class98(this));
+        (this.aMenuItem927 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PAN", "Pan") + "\t(2)");
         this.aMenuItem927.setAccelerator(50);
-        this.aMenuItem927.addSelectionListener((SelectionListener)new Class102(this));
-        (this.aMenuItem928 = new MenuItem(this.aMenu913, 16)).setText(UILocale.uiText("M3G_VIEW_CAMERA_DOLLY", "Dolly") + "\t(3)");
+        this.aMenuItem927.addSelectionListener((SelectionListener) new Class102(this));
+        (this.aMenuItem928 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_DOLLY", "Dolly") + "\t(3)");
         this.aMenuItem928.setAccelerator(51);
-        this.aMenuItem928.addSelectionListener((SelectionListener)new Class106(this));
-        (this.aMenuItem929 = new MenuItem(this.aMenu913, 16)).setText(UILocale.uiText("M3G_VIEW_CAMERA_ZOOM", "Zoom") + "\t(4)");
+        this.aMenuItem928.addSelectionListener((SelectionListener) new Class106(this));
+        (this.aMenuItem929 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ZOOM", "Zoom") + "\t(4)");
         this.aMenuItem929.setAccelerator(52);
-        this.aMenuItem929.addSelectionListener((SelectionListener)new Class114(this));
+        this.aMenuItem929.addSelectionListener((SelectionListener) new Class114(this));
         new MenuItem(this.aMenu913, 2);
         final MenuItem menuItem4;
-        (menuItem4 = new MenuItem(this.aMenu913, 64)).setText(UILocale.uiText("M3G_VIEW_CAMERA_PROJECTION", "Projection Mode"));
+        (menuItem4 = new MenuItem(this.aMenu913, 64)).setText(UILocale.get("M3G_VIEW_CAMERA_PROJECTION", "Projection Mode"));
         this.aMenu923 = new Menu(menuItem4);
-        (this.aMenuItem930 = new MenuItem(this.aMenu923, 16)).setText(UILocale.uiText("M3G_VIEW_CAMERA_PERSPECTIVE", "Perspective Projection"));
-        this.aMenuItem930.addSelectionListener((SelectionListener)new Class112(this));
-        (this.aMenuItem931 = new MenuItem(this.aMenu923, 16)).setText(UILocale.uiText("M3G_VIEW_CAMERA_PARALLEL", "Parallel Projection"));
-        this.aMenuItem931.addSelectionListener((SelectionListener)new Class118(this));
+        (this.aMenuItem930 = new MenuItem(this.aMenu923, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PERSPECTIVE", "Perspective Projection"));
+        this.aMenuItem930.addSelectionListener((SelectionListener) new Class112(this));
+        (this.aMenuItem931 = new MenuItem(this.aMenu923, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PARALLEL", "Parallel Projection"));
+        this.aMenuItem931.addSelectionListener((SelectionListener) new Class118(this));
         menuItem4.setMenu(this.aMenu923);
         new MenuItem(this.aMenu913, 2);
-        (this.aMenuItem932 = new MenuItem(this.aMenu913, 8)).setText(UILocale.uiText("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
+        (this.aMenuItem932 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
         this.aMenuItem932.setAccelerator(67);
-        this.aMenuItem932.addSelectionListener((SelectionListener)new Class116(this));
-        (this.aMenuItem933 = new MenuItem(this.aMenu913, 8)).setText(UILocale.uiText("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View") + "\tF");
+        this.aMenuItem932.addSelectionListener((SelectionListener) new Class116(this));
+        (this.aMenuItem933 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View") + "\tF");
         this.aMenuItem933.setAccelerator(70);
-        this.aMenuItem933.addSelectionListener((SelectionListener)new Class37(this));
-        (this.aMenuItem934 = new MenuItem(this.aMenu913, 8)).setText(UILocale.uiText("M3G_VIEW_CAMEAR_POSITION", "Camera Position") + "\tP");
+        this.aMenuItem933.addSelectionListener((SelectionListener) new Class37(this));
+        (this.aMenuItem934 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position") + "\tP");
         this.aMenuItem934.setAccelerator(80);
-        this.aMenuItem934.addSelectionListener((SelectionListener)new Class143(this));
+        this.aMenuItem934.addSelectionListener((SelectionListener) new Class143(this));
         new MenuItem(this.aMenu913, 2);
-        (this.aMenuItem935 = new MenuItem(this.aMenu913, 8)).setText(UILocale.uiText("M3G_VIEW_CAMEAR_RESET", "Reset Camera") + "\tR");
+        (this.aMenuItem935 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_RESET", "Reset Camera") + "\tR");
         this.aMenuItem935.setAccelerator(82);
-        this.aMenuItem935.addSelectionListener((SelectionListener)new Class126(this));
+        this.aMenuItem935.addSelectionListener((SelectionListener) new Class126(this));
         menuItem2.setMenu(this.aMenu913);
         this.aMenu908 = new Menu(menuItem);
-        (this.aMenuItem894 = new MenuItem(this.aMenu908, 32)).setText(UILocale.uiText("M3G_VIEW_DISPLAY_COORDINATE", "Coordinate Axis"));
-        this.aMenuItem894.addSelectionListener((SelectionListener)new Class61(this));
-        (this.aMenuItem912 = new MenuItem(this.aMenu908, 32)).setText(UILocale.uiText("M3G_VIEW_DISPLAY_SHOW_GRID", "Show Grid"));
-        this.aMenuItem912.addSelectionListener((SelectionListener)new Class60(this));
-        (this.aMenuItem916 = new MenuItem(this.aMenu908, 32)).setText(UILocale.uiText("M3G_VIEW_DISPLAY_SHOW_XRAY", "Show Xray") + "\tX");
+        (this.aMenuItem894 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_COORDINATE", "Coordinate Axis"));
+        this.aMenuItem894.addSelectionListener((SelectionListener) new Class61(this));
+        (this.aMenuItem912 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_GRID", "Show Grid"));
+        this.aMenuItem912.addSelectionListener((SelectionListener) new Class60(this));
+        (this.aMenuItem916 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_XRAY", "Show Xray") + "\tX");
         this.aMenuItem916.setAccelerator(88);
-        this.aMenuItem916.addSelectionListener((SelectionListener)new Class63(this));
+        this.aMenuItem916.addSelectionListener((SelectionListener) new Class63(this));
         new MenuItem(this.aMenu908, 2);
-        (this.aMenuItem921 = new MenuItem(this.aMenu908, 8)).setText(UILocale.uiText("M3G_VIEW_DISPLAY_UPDATE_WORLD", "Update World") + "\tF5");
+        (this.aMenuItem921 = new MenuItem(this.aMenu908, 8)).setText(UILocale.get("M3G_VIEW_DISPLAY_UPDATE_WORLD", "Update World") + "\tF5");
         this.aMenuItem921.setAccelerator(16777230);
-        this.aMenuItem921.addSelectionListener((SelectionListener)new Class62(this));
+        this.aMenuItem921.addSelectionListener((SelectionListener) new Class62(this));
         menuItem.setMenu(this.aMenu908);
-        menuItem.setText(UILocale.uiText("M3G_VIEW_DISPLAY", "Display"));
-        ((Decorations)this.aShell889).setMenuBar(this.aMenu895);
-        this.aShell889.addShellListener((ShellListener)new Class49(this));
+        menuItem.setText(UILocale.get("M3G_VIEW_DISPLAY", "Display"));
+        ((Decorations) this.aShell889).setMenuBar(this.aMenu895);
+        this.aShell889.addShellListener((ShellListener) new Class49(this));
     }
-    */
+
     private void method545() {
         final GridData layoutData;
         (layoutData = new GridData()).horizontalAlignment = 4;
@@ -353,21 +404,21 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         final Quaternion a = new Quaternion();
         switch (this.anInt893) {
             case 0: {
-//                if (Math.abs(n) > Math.abs(n2)) {
-//                    a.method813(n / 2.0f, 0.0f, 1.0f, 0.0f);
-//                    a.method814(this.ana892);
-//                    this.ana892.method811(a);
-//                    return;
-//                }
-//                if (n2 != 0) {
-//                    final b method495 = this.method495(this.ana892);
-//                    a.method813(-n2 / 2.0f, method495.aFloat1372, method495.aFloat1373, method495.aFloat1374);
-//                    a.method814(this.ana892);
-//                    if (this.method495(a).method816()) {
-//                        this.ana892.method811(a);
-//                    }
-//                    return;
-//                }
+                if (Math.abs(n) > Math.abs(n2)) {
+                    a.setAngleAxis(n / 2.0f, 0.0f, 1.0f, 0.0f);
+                    a.mul(this.ana892);
+                    this.ana892.set(a);
+                    return;
+                }
+                if (n2 != 0) {
+                    final Vector4f method495 = this.method495(this.ana892);
+                    a.setAngleAxis(-n2 / 2.0f, method495.x, method495.y, method495.w);
+                    a.mul(this.ana892);
+                    if (this.method495(a).normalize()) {
+                        this.ana892.set(a);
+                    }
+                    return;
+                }
                 break;
             }
             case 1: {
@@ -398,14 +449,14 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
     }
 
-    private Vector4f method495(final Quaternion a) {
-        final float[] array = {this.aFloat920, this.aFloat924, this.aFloat926, 1.0f};
+    private Vector4f method495(final Quaternion q) {
+        final Vector4f a = new Vector4f(this.aFloat920, this.aFloat924, this.aFloat926, 1.0f);
         final Vector4f b = new Vector4f();
-//        final Transform transform;
-//        (transform = new Transform()).postRotateQuat(a.aFloat1367, a.aFloat1368, a.aFloat1369, a.aFloat1370);
-//        transform.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
-//        transform.transform(array);
-//        b.method815(new b(array), emulator.graphics3D.b.ab1371);
+        final Transform transform;
+        (transform = new Transform()).postRotateQuat(q.x, q.y, q.z, q.w);
+        transform.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
+        ((Transform3D) transform.getImpl()).transform(a);
+        b.cross(a, Vector4f.Y_AXIS);
         return b;
     }
 
@@ -413,28 +464,28 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.method507();
     }
 
-    static Canvas method496(final Class90 class90) {
+    static Canvas method231(final Class90 class90) {
         return class90.aCanvas897;
     }
 
-    static boolean method497(final Class90 class90, final boolean aBoolean905) {
+    static boolean method236(final Class90 class90, final boolean aBoolean909) {
+        return class90.aBoolean909 = aBoolean909;
+    }
+
+    static boolean method243(final Class90 class90, final boolean aBoolean905) {
         return class90.aBoolean905 = aBoolean905;
     }
 
-    static boolean method498(final Class90 class90) {
+    static boolean method232(final Class90 class90) {
         return class90.aBoolean905;
     }
 
-    static boolean method508(final Class90 class90) {
+    static boolean method242(final Class90 class90) {
         return class90.aBoolean909;
     }
 
-    static void method502(final Class90 class90) {
+    static void method244(final Class90 class90) {
         class90.method540();
-    }
-
-    static boolean method509(final Class90 class90, final boolean aBoolean909) {
-        return class90.aBoolean909 = aBoolean909;
     }
 
     static int method504(final Class90 class90, final int anInt893) {
@@ -450,7 +501,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     static void method511(final Class90 class90) {
-        class90.method531();
+        class90.method276();
     }
 
     static Shell method499(final Class90 class90) {
@@ -514,7 +565,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     static boolean method520(final Class90 class90, final boolean aBoolean914) {
-        return class90.aBoolean914 = aBoolean914;
+        return class90.aBoolean381 = aBoolean914;
     }
 
     static MenuItem method514(final Class90 class90) {
@@ -522,7 +573,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     static boolean method527(final Class90 class90, final boolean aBoolean919) {
-        return class90.aBoolean919 = aBoolean919;
+        return class90.aBoolean386 = aBoolean919;
     }
 
     static MenuItem method521(final Class90 class90) {
@@ -590,18 +641,18 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
 
         public final void run() {
-            // Class90.method497(this.aClass90_1207, emulator.graphics3D.view.a.abool());
-            Class90.method497(this.aClass90_1207, false);
-            while (Class90.method496(this.aClass90_1207) != null) {
-                if (((Widget) Class90.method496(this.aClass90_1207)).isDisposed()) {
+            Class90.method243(this.aClass90_1207, aClass90_1207.ab369.method379(aClass90_1207.aCanvas897));
+            while (Class90.method231(this.aClass90_1207) != null) {
+                if (((Widget) Class90.method231(this.aClass90_1207)).isDisposed()) {
                     return;
                 }
-                if (Class90.method498(this.aClass90_1207) && Class90.method508(this.aClass90_1207)) {
+                if (Class90.method232(this.aClass90_1207) && Class90.method242(this.aClass90_1207)) {
                     try {
-                        Class90.method502(this.aClass90_1207);
+                        Class90.method244(this.aClass90_1207);
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
-                    Class90.method509(this.aClass90_1207, false);
+                    Class90.method236(this.aClass90_1207, false);
                 }
                 try {
                     Thread.sleep(10L);
@@ -624,8 +675,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
 
         public final void run() {
-            while (Class90.method496(this.aClass90_830) != null) {
-                if (((Widget) Class90.method496(this.aClass90_830)).isDisposed()) {
+            while (Class90.method231(this.aClass90_830) != null) {
+                if (((Widget) Class90.method231(this.aClass90_830)).isDisposed()) {
                     return;
                 }
                 EmulatorImpl.syncExec(new Class10(this));

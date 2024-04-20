@@ -14,6 +14,7 @@ import javax.microedition.m3g.VertexBuffer;
 
 public final class MeshMorph {
     private static MeshMorph inst;
+    private static MeshMorph viewInst;
     private Hashtable cacheTable = new Hashtable();
     private Hashtable aHashtable1129 = new Hashtable();
     public VertexBuffer morphed;
@@ -34,6 +35,14 @@ public final class MeshMorph {
         }
 
         return inst;
+    }
+
+    public static MeshMorph getViewInstance() {
+        if (viewInst == null) {
+            viewInst = new MeshMorph();
+        }
+
+        return viewInst;
     }
 
     public final void clearCache() {

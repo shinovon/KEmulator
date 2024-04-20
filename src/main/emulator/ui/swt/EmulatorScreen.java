@@ -43,6 +43,7 @@ public final class EmulatorScreen implements
     private MenuItem fillScreenMenuItem;
     private MenuItem keepAspectRatioMenuItem;
     private MenuItem integerScalingMenuItem;
+    private MenuItem aMenuItem962;
 
     public Shell getShell() {
         return shell;
@@ -726,6 +727,8 @@ public final class EmulatorScreen implements
         (this.aMenuItem960 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_METHODS", "Methods"));
         this.aMenuItem960.addSelectionListener((SelectionListener) this);
         (this.aMenuItem961 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
+        (this.aMenuItem962 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
+        this.aMenuItem962.addSelectionListener((SelectionListener)this);
         this.aMenuItem961.addSelectionListener((SelectionListener) this);
         (this.aMenuItem963 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_SMS", "SMS Console"));
         this.aMenuItem963.addSelectionListener((SelectionListener) this);
@@ -1362,14 +1365,14 @@ public final class EmulatorScreen implements
                         return;
                     }
                     ((Class83) Emulator.getEmulator().getMessage()).method481(this.shell);
-                } else/* if (menuItem.equals(this.aMenuItem962)) {
+                } else if (menuItem.equals(this.aMenuItem962)) {
                     if (((EmulatorImpl)Emulator.getEmulator()).method827().method494()) {
                         ((EmulatorImpl)Emulator.getEmulator()).method827().method507();
                         return;
                     }
-                    ((EmulatorImpl)Emulator.getEmulator()).method827().method493();
+                    ((EmulatorImpl)Emulator.getEmulator()).method827().method226();
                 }
-                else*/ {
+                else {
                     if (menuItem.equals(this.xrayViewMenuItem)) {
                         Settings.xrayView = this.xrayViewMenuItem.getSelection();
                         return;

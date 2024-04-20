@@ -13,7 +13,7 @@ final class Class58 implements Listener {
     public final void handleEvent(final Event event) {
         switch (event.type) {
             case 12: {
-                Class90.method497(this.aClass90_824, false);
+                Class90.method243(this.aClass90_824, false);
                 break;
             }
         }

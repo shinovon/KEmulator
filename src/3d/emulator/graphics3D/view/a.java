@@ -1,227 +1,169 @@
 package emulator.graphics3D.view;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
-import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
-import org.eclipse.swt.internal.opengl.win32.WGL;
-import org.eclipse.swt.internal.win32.OS;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Control;
-
-import emulator.Emulator;
-
-import javax.microedition.m3g.Camera;
-import javax.microedition.m3g.Transform;
+import org.lwjgl.BufferUtils;
 
 public final class a {
-    static a a;
-    private static long handle;
-    private static long d;
-    private static PIXELFORMATDESCRIPTOR pixelFormat;
-    private static Camera camera;
-    private static Transform trans = new Transform();
+    private static ByteBuffer aByteBuffer596;
+    private static ByteBuffer aByteBuffer599;
+    private static IntBuffer anIntBuffer597;
+    private static IntBuffer anIntBuffer600;
+    private static FloatBuffer aFloatBuffer598;
+    private static FloatBuffer aFloatBuffer601;
 
-    private a() {
-        super();
-        a = this;
-    }
-
-    public static a acreate() {
-        if (a == null) {
-            a = new a();
+    public static ByteBuffer method394(byte[] paramArrayOfByte) {
+        if ((aByteBuffer596 == null) || (aByteBuffer596.capacity() < paramArrayOfByte.length)) {
+            aByteBuffer596 = BufferUtils.createByteBuffer(paramArrayOfByte.length);
         }
-        return a;
+        aByteBuffer596.position(aByteBuffer596.capacity() - paramArrayOfByte.length);
+        aByteBuffer596.put(paramArrayOfByte);
+        aByteBuffer596.position(aByteBuffer596.capacity() - paramArrayOfByte.length);
+        return aByteBuffer596;
     }
 
-    public static boolean abool() {
-        boolean bool = false;
-        long i = OS_GetDC(handle);
-        bool = WGL_wglGetCurrentContext() == i;
-        OS_ReleaseDC(handle, i);
-        return bool;
-    }
-
-
-    private static PIXELFORMATDESCRIPTOR a() {
-        if (pixelFormat == null) {
-            pixelFormat = new PIXELFORMATDESCRIPTOR();
-            pixelFormat.nSize = 40;
-            pixelFormat.nVersion = 1;
-            pixelFormat.dwFlags = 37;
-            pixelFormat.iPixelType = 0;
-            pixelFormat.cColorBits = ((byte) Emulator.getEmulator().getScreenDepth());
-            pixelFormat.iLayerType = 0;
-            pixelFormat.cDepthBits = 24;
+    public static ByteBuffer method395(short[] paramArrayOfShort) {
+        if ((aByteBuffer596 == null) || (aByteBuffer596.capacity() < paramArrayOfShort.length)) {
+            aByteBuffer596 = BufferUtils.createByteBuffer(paramArrayOfShort.length);
         }
-        return pixelFormat;
-    }
-
-    public final boolean a(Canvas paramCanvas) {
-        /*
-      handle = getHandle(paramCanvas);
-      long i;
-      long j;
-      if (((j = WGL_ChoosePixelFormat(i = OS_GetDC(handle), a())) == 0) || (!WGL_SetPixelFormat(i, j, pixelFormat)))
-      {
-        OS_ReleaseDC(handle, i);
-        Emulator.getEmulator().getLogStream().println("SetPixelFormat() error!!");
-        return false;
-      }
-      d = WGL_wglCreateContext(i);
-      if (d == 0)
-      {
-        OS_ReleaseDC(handle, i);
-        Emulator.getEmulator().getLogStream().println("wglCreateContext() error!!");
-        return false;
-      }
-      OS_ReleaseDC(handle, i);
-      a();
-      try
-      {
-        GLContext.useContext(paramCanvas);
-      }
-      catch (Exception localException)
-      {
-        Emulator.getEmulator().getLogStream().println("useContext() error!!");
-        return false;
-      }
-      GL11.glEnable(3089);
-      GL11.glEnable(2977);
-      GL11.glPixelStorei(3317, 1);
-      GL11.glEnable(2832);
-      GL11.glEnable(2848);
-      GL11.glEnable(2881);
-      GL11.glEnable(3024);
-      return true;
-
-         */
-        return false;
-    }
-
-    private static long getHandle(Control c) {
-        try {
-            Class<?> cl = c.getClass();
-            Field f = cl.getField("handle");
-            return f.getLong(c);
-        } catch (Exception e) {
-            throw new Error(e);
+        aByteBuffer596.position(aByteBuffer596.capacity() - paramArrayOfShort.length);
+        for (int i = 0; i < paramArrayOfShort.length; i++) {
+            aByteBuffer596.put((byte) (paramArrayOfShort[i] / 257));
         }
+        aByteBuffer596.position(aByteBuffer596.capacity() - paramArrayOfShort.length);
+        return aByteBuffer596;
     }
 
-    private static long OS(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
-        try {
-            Class<?> os = OS.class;
-            Method m = null;
-            try {
-                m = os.getMethod(n, t);
-                return toLong(m.invoke(null, p));
-            } catch (Exception e) {
-                m = os.getMethod(n, t64);
-                return toLong(m.invoke(null, p64));
-            }
-        } catch (Exception e) {
-            throw new Error(e);
+    public static ByteBuffer method396(byte[] paramArrayOfByte, float paramFloat, int paramInt) {
+        int i = paramFloat == 1.0F ? paramArrayOfByte.length : 4 * paramInt;
+        if ((aByteBuffer599 == null) || (aByteBuffer599.capacity() < i)) {
+            aByteBuffer599 = BufferUtils.createByteBuffer(i);
         }
-    }
-
-    private static long toLong(Object o) {
-        if (o instanceof Integer) {
-            return ((Integer) o).longValue();
-        }
-        if (o instanceof Long) {
-            return ((Long) o).longValue();
-        }
-        throw new Error("Not number: " + o.getClass());
-    }
-
-    private static Object WGL(String n, Class[] t, Object[] p, Class[] t64, Object[] p64) {
-        try {
-            Class<?> os = WGL.class;
-            Method m = null;
-            try {
-                m = os.getMethod(n, t);
-                return m.invoke(null, p);
-            } catch (Exception e) {
-                m = os.getMethod(n, t64);
-                return m.invoke(null, p64);
-            }
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-    }
-
-    private static long OS_ReleaseDC(long h, long i) {
-        return OS("ReleaseDC",
-                new Class[]{int.class, int.class},
-                new Object[]{(int) h, (int) i},
-                new Class[]{long.class, long.class},
-                new Object[]{h, i});
-    }
-
-    private static long OS_GetDC(long h) {
-        return OS("GetDC",
-                new Class[]{int.class},
-                new Object[]{(int) h},
-                new Class[]{long.class},
-                new Object[]{h});
-    }
-
-    private static long WGL_wglMakeCurrent(long i, long d) {
-        return toLong(WGL("wglMakeCurrent",
-                new Class[]{int.class, int.class},
-                new Object[]{(int) i, (int) d},
-                new Class[]{long.class, long.class},
-                new Object[]{i, d}));
-    }
-
-    private static long WGL_wglCreateContext(long i) {
-        return toLong(WGL("wglCreateContext",
-                new Class[]{int.class},
-                new Object[]{(int) i},
-                new Class[]{long.class},
-                new Object[]{i}));
-    }
-
-    private static boolean WGL_SetPixelFormat(long i, long j, PIXELFORMATDESCRIPTOR k) {
-        return (boolean) WGL("SetPixelFormat",
-                new Class[]{int.class, int.class, PIXELFORMATDESCRIPTOR.class},
-                new Object[]{(int) i, (int) j, k},
-                new Class[]{long.class, int.class, PIXELFORMATDESCRIPTOR.class},
-                new Object[]{i, (int) j, k});
-    }
-
-    private static long WGL_ChoosePixelFormat(long i, PIXELFORMATDESCRIPTOR k) {
-        return toLong(WGL("ChoosePixelFormat",
-                new Class[]{int.class, PIXELFORMATDESCRIPTOR.class},
-                new Object[]{(int) i, k},
-                new Class[]{long.class, PIXELFORMATDESCRIPTOR.class},
-                new Object[]{i, k}));
-    }
-
-    private static long WGL_wglGetCurrentContext() {
-        return toLong(WGL("wglGetCurrentContext", null, null, null, null));
-    }
-
-    public void a1() {
-
-        if (abool()) {
-            return;
-        }
-        long i;
-        WGL_wglMakeCurrent(i = OS_GetDC(handle), d);
-        OS_ReleaseDC(handle, i);
-
-    }
-
-
-    public static void a(Camera paramCamera, Transform paramTransform) {
-        if (paramTransform != null) {
-            trans.set(paramTransform);
-            //jdField_a_of_type_JavaxMicroeditionM3gTransform.c.c();
+        aByteBuffer599.position(aByteBuffer599.capacity() - i);
+        if (paramFloat == 1.0F) {
+            aByteBuffer599.put(paramArrayOfByte);
         } else {
-            trans.setIdentity();
+            if (paramArrayOfByte.length == i) {
+                int j = 0;
+                while (j < i) {
+                    aByteBuffer599.put(paramArrayOfByte[(j++)]);
+                    aByteBuffer599.put(paramArrayOfByte[(j++)]);
+                    aByteBuffer599.put(paramArrayOfByte[(j++)]);
+                    aByteBuffer599.put((byte) (int) ((paramArrayOfByte[(j++)] & 0xFF) * paramFloat + 0.5F));
+                }
+            }
+            int j = 0;
+            while (j < paramArrayOfByte.length) {
+                aByteBuffer599.put(paramArrayOfByte[(j++)]);
+                aByteBuffer599.put(paramArrayOfByte[(j++)]);
+                aByteBuffer599.put(paramArrayOfByte[(j++)]);
+                aByteBuffer599.put((byte) (int) (255.0F * paramFloat + 0.5F));
+            }
         }
-        camera = paramCamera;
+        aByteBuffer599.position(aByteBuffer599.capacity() - i);
+        return aByteBuffer599;
+    }
+
+    public static ByteBuffer method397(short[] paramArrayOfShort, float paramFloat, int paramInt) {
+        int i = paramFloat == 1.0F ? paramArrayOfShort.length : 4 * paramInt;
+        if ((aByteBuffer599 == null) || (aByteBuffer599.capacity() < i)) {
+            aByteBuffer599 = BufferUtils.createByteBuffer(i);
+        }
+        aByteBuffer599.position(aByteBuffer599.capacity() - i);
+        int j;
+        if (paramFloat == 1.0F) {
+            for (j = 0; j < paramArrayOfShort.length; j++) {
+                aByteBuffer596.put((byte) ((paramArrayOfShort[j] & 0xFFFF) / 257));
+            }
+        }
+        if (paramArrayOfShort.length == i) {
+            j = 0;
+            while (j < i) {
+                aByteBuffer599.put((byte) ((paramArrayOfShort[(j++)] & 0xFFFF) / 257));
+                aByteBuffer599.put((byte) ((paramArrayOfShort[(j++)] & 0xFFFF) / 257));
+                aByteBuffer599.put((byte) ((paramArrayOfShort[(j++)] & 0xFFFF) / 257));
+                aByteBuffer599.put((byte) (int) (((byte) ((paramArrayOfShort[(j++)] & 0xFFFF) / 257) & 0xFF) * paramFloat + 0.5F));
+            }
+        }
+        j = 0;
+        while (0 < paramArrayOfShort.length) {
+            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
+            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
+            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
+            aByteBuffer599.put((byte) (int) (255.0F * paramFloat + 0.5F));
+        }
+        aByteBuffer599.position(aByteBuffer599.capacity() - i);
+        return aByteBuffer599;
+    }
+
+    public static IntBuffer method398(int[] paramArrayOfInt) {
+        if ((anIntBuffer597 == null) || (anIntBuffer597.capacity() < paramArrayOfInt.length)) {
+            anIntBuffer597 = BufferUtils.createIntBuffer(paramArrayOfInt.length);
+        }
+        anIntBuffer597.position(anIntBuffer597.capacity() - paramArrayOfInt.length);
+        anIntBuffer597.put(paramArrayOfInt);
+        anIntBuffer597.position(anIntBuffer597.capacity() - paramArrayOfInt.length);
+        return anIntBuffer597;
+    }
+
+    public static IntBuffer method399(short[] paramArrayOfShort) {
+        if ((anIntBuffer600 == null) || (anIntBuffer600.capacity() < paramArrayOfShort.length)) {
+            anIntBuffer600 = BufferUtils.createIntBuffer(paramArrayOfShort.length);
+        }
+        anIntBuffer600.position(anIntBuffer600.capacity() - paramArrayOfShort.length);
+        for (int i = 0; i < paramArrayOfShort.length; i++) {
+            anIntBuffer600.put(paramArrayOfShort[i]);
+        }
+        anIntBuffer600.position(anIntBuffer600.capacity() - paramArrayOfShort.length);
+        return anIntBuffer600;
+    }
+
+    public static IntBuffer method400(byte[] paramArrayOfByte) {
+        if ((anIntBuffer600 == null) || (anIntBuffer600.capacity() < paramArrayOfByte.length)) {
+            anIntBuffer600 = BufferUtils.createIntBuffer(paramArrayOfByte.length);
+        }
+        anIntBuffer600.position(anIntBuffer600.capacity() - paramArrayOfByte.length);
+        for (int i = 0; i < paramArrayOfByte.length; i++) {
+            anIntBuffer600.put(paramArrayOfByte[i]);
+        }
+        anIntBuffer600.position(anIntBuffer600.capacity() - paramArrayOfByte.length);
+        return anIntBuffer600;
+    }
+
+    public static FloatBuffer method401(float[] paramArrayOfFloat) {
+        if ((aFloatBuffer598 == null) || (aFloatBuffer598.capacity() < paramArrayOfFloat.length)) {
+            aFloatBuffer598 = BufferUtils.createFloatBuffer(paramArrayOfFloat.length);
+        }
+        aFloatBuffer598.position(aFloatBuffer598.capacity() - paramArrayOfFloat.length);
+        aFloatBuffer598.put(paramArrayOfFloat);
+        aFloatBuffer598.position(aFloatBuffer598.capacity() - paramArrayOfFloat.length);
+        return aFloatBuffer598;
+    }
+
+    public static FloatBuffer method402(short[] paramArrayOfShort) {
+        if ((aFloatBuffer601 == null) || (aFloatBuffer601.capacity() < paramArrayOfShort.length)) {
+            aFloatBuffer601 = BufferUtils.createFloatBuffer(paramArrayOfShort.length);
+        }
+        aFloatBuffer601.position(aFloatBuffer601.capacity() - paramArrayOfShort.length);
+        for (int i = 0; i < paramArrayOfShort.length; i++) {
+            aFloatBuffer601.put(paramArrayOfShort[i]);
+        }
+        aFloatBuffer601.position(aFloatBuffer601.capacity() - paramArrayOfShort.length);
+        return aFloatBuffer601;
+    }
+
+    public static FloatBuffer method403(byte[] paramArrayOfByte) {
+        if ((aFloatBuffer601 == null) || (aFloatBuffer601.capacity() < paramArrayOfByte.length)) {
+            aFloatBuffer601 = BufferUtils.createFloatBuffer(paramArrayOfByte.length);
+        }
+        aFloatBuffer601.position(aFloatBuffer601.capacity() - paramArrayOfByte.length);
+        for (int i = 0; i < paramArrayOfByte.length; i++) {
+            aFloatBuffer601.put(paramArrayOfByte[i]);
+        }
+        aFloatBuffer601.position(aFloatBuffer601.capacity() - paramArrayOfByte.length);
+        return aFloatBuffer601;
     }
 }

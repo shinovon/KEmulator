@@ -11,8 +11,8 @@ final class Refresher implements Runnable {
     }
 
     public final void run() {
-        while (Class90.method496(this.aClass90_830) != null) {
-            if (((Widget) Class90.method496(this.aClass90_830)).isDisposed()) {
+        while (Class90.method231(this.aClass90_830) != null) {
+            if (((Widget) Class90.method231(this.aClass90_830)).isDisposed()) {
                 return;
             }
             EmulatorImpl.syncExec(new Class10(this));
