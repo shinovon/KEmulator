@@ -2286,8 +2286,11 @@ public final class EmulatorScreen implements
                     updateStatus();
                 }
             }
-            canvas.redraw();
+        } else {
+            zoomedWidth = (int) (getWidth() * zoom);
+            zoomedHeight = (int) (getHeight() * zoom);
         }
+        canvas.redraw();
     }
 
     public final void startVibra(final long aLong1013) {
