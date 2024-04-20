@@ -741,7 +741,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnableClientState(GL_COLOR_ARRAY);
             if (colors.getComponentType() == 1) {
                 byte[] colorsBArr = colors.getByteValues();
-                GL11.glColorPointer(alphaFactor == 1.0F ? tcolors.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(colorsBArr, alphaFactor, texCoords.getVertexCount()));
+                GL11.glColorPointer(alphaFactor == 1.0F ? colors.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount()));
             }
         }
 
