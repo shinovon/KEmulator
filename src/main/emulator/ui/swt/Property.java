@@ -555,6 +555,12 @@ public final class Property implements IProperty {
             Settings.fpsCounter = Boolean.valueOf(properties.getProperty("FPSCounter", "true"));
             Settings.synchronizeKeyEvents = Boolean.valueOf(properties.getProperty("SynchronizeKeyEvents", "true"));
             Settings.motorolaSoftKeyFix = Boolean.valueOf(properties.getProperty("MotorolaSoftKeyFix", "false"));
+            Settings.resizeMode = Integer.valueOf(properties.getProperty("ResizeMode", "2"));
+            Settings.keepAspectRatio = Boolean.valueOf(properties.getProperty("KeepAspectRatio", "true"));
+            Settings.integerResize = Boolean.valueOf(properties.getProperty("IntegerResize", "false"));
+            EmulatorScreen.sizeW = Integer.valueOf(properties.getProperty("SizeW", "-1"));
+            EmulatorScreen.sizeH = Integer.valueOf(properties.getProperty("SizeH", "-1"));
+            EmulatorScreen.maximized = Boolean.valueOf(properties.getProperty("Maximized", "false"));
             fileInputStream.close();
         } catch (Exception ex) {
             if (!(ex instanceof FileNotFoundException)) {
@@ -686,6 +692,12 @@ public final class Property implements IProperty {
             properties.setProperty("FPSCounter", String.valueOf(Settings.fpsCounter));
             properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
             properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
+            properties.setProperty("ResizeMode", String.valueOf(Settings.resizeMode));
+            properties.setProperty("KeepAspectRatio", String.valueOf(Settings.keepAspectRatio));
+            properties.setProperty("IntegerResize", String.valueOf(Settings.integerResize));
+            properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
+            properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
+            properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         } catch (Exception ex) {

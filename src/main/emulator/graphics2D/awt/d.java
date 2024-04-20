@@ -49,6 +49,12 @@ public final class d implements IImage
         gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
         image.dispose();
     }
+
+    public final void method13(final GC gc, final int x, final int y) {
+        final Image image = new Image((Device)null, emulator.graphics2D.c.method168(this.img));
+        gc.drawImage(image, x, y);
+        image.dispose();
+    }
     
     public final IGraphics2D createGraphics() {
         return this.ab6 = new b(this.img);

@@ -68,6 +68,9 @@ public final class Settings {
     public static boolean synchronizeKeyEvents = true;
     public static boolean motorolaSoftKeyFix = false;
     public static int g3d; // 0 - swerve, 1 - lwjgl
+    public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill
+    public static boolean keepAspectRatio = true;
+    public static boolean integerResize = false;
 
     public Settings() {
         super();

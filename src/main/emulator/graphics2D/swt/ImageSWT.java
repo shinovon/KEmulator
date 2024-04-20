@@ -143,6 +143,15 @@ public final class ImageSWT implements IImage
         gc.drawImage(this.img = new Image((Device)null, this.imgdata), n, n2, n3, n4, n5, n6, n7, n8);
         this.img.dispose();
     }
+
+    public final void method13(final GC gc, final int x, final int y) {
+        if (this.mutable) {
+            gc.drawImage(this.img, x, y);
+            return;
+        }
+        gc.drawImage(this.img = new Image((Device)null, this.imgdata), x, y);
+        this.img.dispose();
+    }
     
     public final int getWidth() {
         return this.imgdata.width;
