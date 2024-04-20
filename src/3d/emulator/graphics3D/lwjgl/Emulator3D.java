@@ -852,6 +852,9 @@ public final class Emulator3D implements IGraphics3D {
                             case Image2D.RGBA:
                                 var16 = GL_RGBA;
                         }
+						
+						GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
+						
                         GL11.glTexImage2D(GL_TEXTURE_2D, 0, var16, image2D.getWidth(), image2D.getHeight(), 0, var16, 5121, LWJGLUtility.getImageBuffer(image2D.getImageData()));
                     }
 
