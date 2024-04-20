@@ -487,17 +487,16 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private static void setupLights(Vector lights, Vector lightMats, int scope) {
-        int lightsCount = Math.min(lights.size(), MaxLights);
-
         for (int i = 0; i < MaxLights; ++i) {
             GL11.glDisable(GL_LIGHT0 + i);
         }
 
         //ARBColorBufferFloat.glClampColorARB(ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
 
+        int usedLights = 0;
         Transform tmpMat = new Transform();
 
-        for (int i = 0; i < lightsCount; ++i) {
+        for (int i = 0; i < lights.size() && usedLights < MaxLights; ++i) {
             Light light = (Light) lights.get(i);
 
             if (light == null || (light.getScope() & scope) == 0 || !RenderPipe.getInstance().isVisible(light)) {
@@ -517,7 +516,9 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glMatrixMode(GL_MODELVIEW);
             GL11.glMultMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
-            int lightId = GL_LIGHT0 + i;
+            int lightId = GL_LIGHT0 + usedLights;
+            usedLights++;
+
             float[] lightColor = new float[] {0, 0, 0, 1}; //rgba
 
             //Set default light preferences?
