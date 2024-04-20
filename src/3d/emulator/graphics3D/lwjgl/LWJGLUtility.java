@@ -126,7 +126,7 @@ public final class LWJGLUtility {
         return elementsBuffer;
     }
 
-    public static IntBuffer getTexCoordsBuffer(short[] var0, int idx) {
+    public static IntBuffer getTexCoordBuffer(short[] var0, int idx) {
         if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
             texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
         }
@@ -144,7 +144,7 @@ public final class LWJGLUtility {
         return buf;
     }
 
-    public static IntBuffer getTexCoordsBuffer(byte[] var0, int idx) {
+    public static IntBuffer getTexCoordBuffer(byte[] var0, int idx) {
         if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
             texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
         }

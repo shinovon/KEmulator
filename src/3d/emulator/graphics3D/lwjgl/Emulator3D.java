@@ -25,6 +25,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 public final class Emulator3D implements IGraphics3D {
@@ -731,208 +732,206 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void draw(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Appearance appearance, float alphaFactor) {
-        VertexArray texCoords;
-        byte[] var23;
-        if ((texCoords = vertexBuffer.getColors()) == null) {
-            int var6 = vertexBuffer.getDefaultColor();
-            GL11.glColor4ub((byte) (var6 >> 16 & 255), (byte) (var6 >> 8 & 255), (byte) (var6 & 255), (byte) ((int) ((float) (var6 >> 24 & 255) * alphaFactor)));
+        VertexArray colors = vertexBuffer.getColors();
+        if (colors == null) {
+            int col = vertexBuffer.getDefaultColor();
+            GL11.glColor4ub((byte) (col >> 16 & 255), (byte) (col >> 8 & 255), (byte) (col & 255), (byte) ((int) ((float) (col >> 24 & 255) * alphaFactor)));
             GL11.glDisableClientState(GL_COLOR_ARRAY);
         } else {
             GL11.glEnableClientState(GL_COLOR_ARRAY);
-            if (texCoords.getComponentType() == 1) {
-                var23 = texCoords.getByteValues();
-                GL11.glColorPointer(alphaFactor == 1.0F ? texCoords.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(var23, alphaFactor, texCoords.getVertexCount()));
+            if (colors.getComponentType() == 1) {
+                byte[] colorsBArr = colors.getByteValues();
+                GL11.glColorPointer(alphaFactor == 1.0F ? tcolors.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(colorsBArr, alphaFactor, texCoords.getVertexCount()));
             }
         }
 
-        if ((texCoords = vertexBuffer.getNormals()) != null && appearance.getMaterial() != null) {
+        VertexArray normals = vertexBuffer.getNormals();
+        if (normals != null && appearance.getMaterial() != null) {
             GL11.glEnableClientState(GL_NORMAL_ARRAY);
-            if (texCoords.getComponentType() == 1) {
-                GL11.glNormalPointer(0, LWJGLUtility.getNormalBuffer(texCoords.getByteValues()));
+            if (normals.getComponentType() == 1) {
+                GL11.glNormalPointer(0, LWJGLUtility.getNormalBuffer(normals.getByteValues()));
             } else {
-                GL11.glNormalPointer(5120, 0, LWJGLUtility.getNormalBuffer(texCoords.getShortValues()));
+                GL11.glNormalPointer(5120, 0, LWJGLUtility.getNormalBuffer(normals.getShortValues()));
             }
         } else {
             GL11.glDisableClientState(GL_NORMAL_ARRAY);
         }
 
-        float[] var26 = new float[4];
-        texCoords = vertexBuffer.getPositions(var26);
+        float[] scaleBias = new float[4];
+        VertexArray positions = vertexBuffer.getPositions(scaleBias);
         GL11.glEnableClientState(GL_VERTEX_ARRAY);
-        if (texCoords.getComponentType() == 1) {
-            byte[] var7 = texCoords.getByteValues();
-            GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(var7));
+        if (positions.getComponentType() == 1) {
+            byte[] posesBArr = positions.getByteValues();
+            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesBArr));
         } else {
-            short[] var25 = texCoords.getShortValues();
-            GL11.glVertexPointer(texCoords.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(var25));
+            short[] posesSArr = positions.getShortValues();
+            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesSArr));
         }
 
         GL11.glMatrixMode(GL_MODELVIEW);
-        GL11.glTranslatef(var26[1], var26[2], var26[3]);
-        GL11.glScalef(var26[0], var26[0], var26[0]);
+        GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
+        GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
+
         TriangleStripArray triangleStripArray;
         int stripCount = (triangleStripArray = (TriangleStripArray) indexBuffer).getStripCount();
-        int i;
-        int[] var22;
+
         if (appearance != null && !Settings.xrayView) {
-            int j;
-            i = NumTextureUnits;
 
-            for (j = 0; j < i; ++j) {
-                Texture2D texture2D = appearance.getTexture(j);
-                var26[3] = 0.0F;
-                texCoords = vertexBuffer.getTexCoords(j, var26);
-                if (texture2D != null && texCoords != null) {
-                    Image2D image2D = texture2D.getImage();
-                    if (useGL13()) {
-                        GL13.glActiveTexture(GL13.GL_TEXTURE0 + j);
-                        GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + j);
-                    }
+            for (int i = 0; i < NumTextureUnits; ++i) {
+                Texture2D texture2D = appearance.getTexture(i);
+                scaleBias[3] = 0.0F;
+                VertexArray texCoords = vertexBuffer.getTexCoords(i, scaleBias);
 
-                    int id = image2D.getId();
-                    if (id == 0) {
-                        image2D.setId(id = GL11.glGenTextures());
-                        image2D.setLoaded(false);
-                        if (!usedGLTextures.contains(id))
-                            usedGLTextures.add(id);
-                    }
-                    GL11.glEnable(GL_TEXTURE_2D);
-                    GL11.glBindTexture(GL_TEXTURE_2D, id);
-                    label141:
-                    {
-                        int blendMode;
-                        switch (texture2D.getBlending()) {
-                            case Texture2D.FUNC_ADD:
-                                blendMode = GL_ADD;
-                                break;
-                            case Texture2D.FUNC_BLEND:
-                                blendMode = GL_BLEND;
-                                break;
-                            case Texture2D.FUNC_DECAL:
-                                blendMode = GL_DECAL;
-                                break;
-                            case Texture2D.FUNC_MODULATE:
-                                blendMode = GL_MODULATE;
-                                break;
-                            case Texture2D.FUNC_REPLACE:
-                                blendMode = GL_REPLACE;
-                                break;
-                            default:
-                                break label141;
-                        }
-                        GL11.glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blendMode);
-                    }
+                if (texture2D == null || texCoords == null) continue;
 
-                    float[] var14;
-                    G3DUtils.fillFloatColor(var14 = new float[4], texture2D.getBlendColor());
-                    var14[3] = 1.0F;
-                    GL11.glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, LWJGLUtility.getFloatBuffer(var14));
+                Image2D image2D = texture2D.getImage();
 
-                    if(!image2D.isLoaded()) {
-                        image2D.setLoaded(true);
-                        short var16 = GL_RGB;
-                        switch (image2D.getFormat()) {
-                            case Image2D.ALPHA:
-                                var16 = GL_ALPHA;
-                                break;
-                            case Image2D.LUMINANCE:
-                                var16 = GL_LUMINANCE;
-                                break;
-                            case Image2D.LUMINANCE_ALPHA:
-                                var16 = GL_LUMINANCE_ALPHA;
-                                break;
-                            case Image2D.RGB:
-                                var16 = GL_RGB;
-                                break;
-                            case Image2D.RGBA:
-                                var16 = GL_RGBA;
-                        }
-						
-						GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
-						
-                        GL11.glTexImage2D(GL_TEXTURE_2D, 0, var16, image2D.getWidth(), image2D.getHeight(), 0, var16, 5121, LWJGLUtility.getImageBuffer(image2D.getImageData()));
-                    }
-
-                    GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture2D.getWrappingS() == 240 ? 33071.0F : 10497.0F);
-                    GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture2D.getWrappingT() == 240 ? 33071.0F : 10497.0F);
-
-                    int var17 = texture2D.getLevelFilter();
-                    int var18 = texture2D.getImageFilter();
-                    short var10000;
-                    short var19;
-                    label128:
-                    {
-                        if (var17 == 208) {
-                            if (var18 == 210) {
-                                var19 = 9728;
-                                var10000 = 9728;
-                                break label128;
-                            }
-
-                            var10000 = 9729;
-                        } else if (var17 == 209) {
-                            if (var18 == 210) {
-                                var19 = 9985;
-                                var10000 = 9728;
-                                break label128;
-                            }
-
-                            var10000 = 9987;
-                        } else {
-                            if (var18 == 210) {
-                                var19 = 9984;
-                                var10000 = 9728;
-                                break label128;
-                            }
-
-                            var10000 = 9986;
-                        }
-
-                        var19 = var10000;
-                        var10000 = 9729;
-                    }
-                    short var20 = var10000;
-                    GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, var20);
-                    GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, var19);
-                    GL11.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                    IntBuffer var29;
-                    if (texCoords.getComponentType() == 1) {
-                        var29 = LWJGLUtility.getTexCoordsBuffer(texCoords.getByteValues(), j);
-                    } else {
-                        var29 = LWJGLUtility.getTexCoordsBuffer(texCoords.getShortValues(), j);
-                    }
-
-                    GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, var29);
-                    Transform var31 = new Transform();
-                    texture2D.getCompositeTransform(var31);
-                    var31.transpose();
-                    GL11.glMatrixMode(5890);
-                    GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) var31.getImpl()).m_matrix));
-                    GL11.glTranslatef(var26[1], var26[2], var26[3]);
-                    GL11.glScalef(var26[0], var26[0], var26[0]);
+                if (useGL13()) {
+                    GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
+                    GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
                 }
+
+                int id = image2D.getId();
+                if (id == 0) {
+                    id = GL11.glGenTextures();
+                    image2D.setId(id);
+                    image2D.setLoaded(false);
+                    if (!usedGLTextures.contains(id))
+                        usedGLTextures.add(id);
+                }
+
+                GL11.glEnable(GL_TEXTURE_2D);
+                GL11.glBindTexture(GL_TEXTURE_2D, id);
+
+                int blendMode = 0;
+                switch (texture2D.getBlending()) {
+                    case Texture2D.FUNC_ADD:
+                        blendMode = GL_ADD;
+                        break;
+                    case Texture2D.FUNC_BLEND:
+                        blendMode = GL_BLEND;
+                        break;
+                    case Texture2D.FUNC_DECAL:
+                        blendMode = GL_DECAL;
+                        break;
+                    case Texture2D.FUNC_MODULATE:
+                        blendMode = GL_MODULATE;
+                        break;
+                    case Texture2D.FUNC_REPLACE:
+                        blendMode = GL_REPLACE;
+                        break;
+                    default:
+                        break;
+                }
+
+                GL11.glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blendMode);
+
+                float[] blendColor = new float[4];
+                G3DUtils.fillFloatColor(blendColor, texture2D.getBlendColor());
+                blendColor[3] = 1.0F;
+                GL11.glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, LWJGLUtility.getFloatBuffer(blendColor));
+
+                if(!image2D.isLoaded()) {
+                    image2D.setLoaded(true);
+                    System.out.println("loaded texture: " + image2D + " " + id);
+
+                    short texFormat = GL_RGB;
+                    switch (image2D.getFormat()) {
+                        case Image2D.ALPHA:
+                            texFormat = GL_ALPHA;
+                            break;
+                        case Image2D.LUMINANCE:
+                            texFormat = GL_LUMINANCE;
+                            break;
+                        case Image2D.LUMINANCE_ALPHA:
+                            texFormat = GL_LUMINANCE_ALPHA;
+                            break;
+                        case Image2D.RGB:
+                            texFormat = GL_RGB;
+                            break;
+                        case Image2D.RGBA:
+                            texFormat = GL_RGBA;
+                    }
+
+                    GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
+
+                    GL11.glTexImage2D(GL_TEXTURE_2D, 0,
+                            texFormat, image2D.getWidth(), image2D.getHeight(), 0,
+                            texFormat, GL_UNSIGNED_BYTE,
+                            LWJGLUtility.getImageBuffer(image2D.getImageData())
+                    );
+                }
+
+                GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                        texture2D.getWrappingS() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+                );
+                GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                        texture2D.getWrappingT() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+                );
+
+                int levelFilter = texture2D.getLevelFilter();
+                int imageFilter = texture2D.getImageFilter();
+                int magFilter = 0, minFilter = 0;
+
+                if (imageFilter == Texture2D.FILTER_NEAREST) {
+                    minFilter = magFilter = GL_NEAREST;
+
+                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                } else if (imageFilter == Texture2D.FILTER_LINEAR) {
+                    minFilter = magFilter = GL_LINEAR;
+
+                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                }
+
+                GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+                GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+                GL11.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+                IntBuffer texCoordBuffer;
+                if (texCoords.getComponentType() == 1) {
+                    texCoordBuffer = LWJGLUtility.getTexCoordBuffer(texCoords.getByteValues(), i);
+                } else {
+                    texCoordBuffer = LWJGLUtility.getTexCoordBuffer(texCoords.getShortValues(), i);
+                }
+                GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, texCoordBuffer);
+
+
+                Transform tmpMat = new Transform();
+                texture2D.getCompositeTransform(tmpMat);
+                tmpMat.transpose();
+
+                GL11.glMatrixMode(GL_TEXTURE);
+                GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+                GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
+                GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
             }
 
-            for (j = 0; j < stripCount; ++j) {
-                var22 = triangleStripArray.getIndexStrip(j);
-                GL11.glDrawElements(5, LWJGLUtility.getElementsBuffer(var22));
+            for (int i = 0; i < stripCount; ++i) {
+                int[] indexStrip = triangleStripArray.getIndexStrip(i);
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, LWJGLUtility.getElementsBuffer(indexStrip));
             }
 
-            for (j = 0; j < i; ++j) {
-                Texture2D tex = appearance.getTexture(j);
-                Image2D image2D;
-                if (tex != null && ((image2D = tex.getImage()).getId()) != 0) {
+            for (int i = 0; i < NumTextureUnits; ++i) {
+                Texture2D tex = appearance.getTexture(i);
+                if(tex == null) continue;
+
+                Image2D image2D = tex.getImage();
+
+                if (image2D.getId() != 0) {
                     if (useGL13()) {
-                        GL13.glActiveTexture(GL13.GL_TEXTURE0 + j);
-                        GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + j);
+                        GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
+                        GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
                     }
                     GL11.glBindTexture(GL_TEXTURE_2D, 0);
                 }
             }
         } else {
-            for (i = 0; i < stripCount; ++i) {
-                var22 = triangleStripArray.getIndexStrip(i);
-                GL11.glDrawElements(5, LWJGLUtility.getElementsBuffer(var22));
+            //xray
+            for (int i = 0; i < stripCount; ++i) {
+                int[] indexStrip = triangleStripArray.getIndexStrip(i);
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, LWJGLUtility.getElementsBuffer(indexStrip));
             }
         }
 
