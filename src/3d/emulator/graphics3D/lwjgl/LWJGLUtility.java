@@ -10,7 +10,7 @@ public final class LWJGLUtility {
     private static ByteBuffer imageBuffer;
     private static IntBuffer vertexByteBuffer;
     private static ShortBuffer vertexShortBuffer;
-    private static IntBuffer texCoordsByteBuffer, texCoordsShortBuffer;
+    private static IntBuffer[] texCoordsBuffer = new IntBuffer[Emulator3D.NumTextureUnits];
     private static IntBuffer elementsBuffer;
     private static FloatBuffer floatBuffer;
 
@@ -162,38 +162,40 @@ public final class LWJGLUtility {
         return elementsBuffer;
     }
 
-    public static IntBuffer getTexCoordsBuffer(short[] var0) {
-        if(texCoordsShortBuffer == null || texCoordsShortBuffer.capacity() < var0.length) {
-            texCoordsShortBuffer = BufferUtils.createIntBuffer(var0.length);
+    public static IntBuffer getTexCoordsBuffer(short[] var0, int idx) {
+        if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
+            texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
         }
+        IntBuffer buf = texCoordsBuffer[idx];
 
-        texCoordsShortBuffer.position(texCoordsShortBuffer.capacity() - var0.length);
+        buf.position(buf.capacity() - var0.length);
         int var1 = 0;
         int var2 = var0.length;
 
         while(var1 < var2) {
-            texCoordsShortBuffer.put(var0[var1++]);
+            buf.put(var0[var1++]);
         }
 
-        texCoordsShortBuffer.position(texCoordsShortBuffer.capacity() - var0.length);
-        return texCoordsShortBuffer;
+        buf.position(buf.capacity() - var0.length);
+        return buf;
     }
 
-    public static IntBuffer getTexCoordsBuffer(byte[] var0) {
-        if(texCoordsByteBuffer == null || texCoordsByteBuffer.capacity() < var0.length) {
-            texCoordsByteBuffer = BufferUtils.createIntBuffer(var0.length);
+    public static IntBuffer getTexCoordsBuffer(byte[] var0, int idx) {
+        if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
+            texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
         }
+        IntBuffer buf = texCoordsBuffer[idx];
 
-        texCoordsByteBuffer.position(texCoordsByteBuffer.capacity() - var0.length);
+        buf.position(buf.capacity() - var0.length);
         int var1 = 0;
         int var2 = var0.length;
 
         while(var1 < var2) {
-            texCoordsByteBuffer.put(var0[var1++]);
+            buf.put(var0[var1++]);
         }
 
-        texCoordsByteBuffer.position(texCoordsByteBuffer.capacity() - var0.length);
-        return texCoordsByteBuffer;
+        buf.position(buf.capacity() - var0.length);
+        return buf;
     }
 
     public static FloatBuffer getFloatBuffer(float[] var0) {

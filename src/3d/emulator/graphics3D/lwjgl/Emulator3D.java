@@ -899,9 +899,9 @@ public final class Emulator3D implements IGraphics3D {
                     GL11.glEnableClientState('\u8078');
                     IntBuffer var29;
                     if (texCoords.getComponentType() == 1) {
-                        var29 = LWJGLUtility.getTexCoordsBuffer(texCoords.getByteValues());
+                        var29 = LWJGLUtility.getTexCoordsBuffer(texCoords.getByteValues(), j);
                     } else {
-                        var29 = LWJGLUtility.getTexCoordsBuffer(texCoords.getShortValues());
+                        var29 = LWJGLUtility.getTexCoordsBuffer(texCoords.getShortValues(), j);
                     }
 
                     GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, var29);
