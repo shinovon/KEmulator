@@ -583,138 +583,127 @@ public final class Emulator3D implements IGraphics3D {
                 GL11.glMultMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) var7.getImpl()).m_matrix));
             }
 
-            this.appearance(var3, var6, false);
+            this.setupAppearance(var3, var6, false);
             this.draw(var1, var2, var3, var6);
         }
     }
 
-    private void appearance(Appearance var1, float var2, boolean var3) {
-        if (!var3) {
-            polygonMode(var1.getPolygonMode());
+    private void setupAppearance(Appearance ap, float var2, boolean spriteMode) {
+        if (!spriteMode) {
+            setupPolygonMode(ap.getPolygonMode());
         }
 
-        this.compositingMode(var1.getCompositingMode());
-        if (!var3) {
-            material(var1.getMaterial(), var2);
+        setupCompositingMode(ap.getCompositingMode());
+        if (!spriteMode) {
+            setupMaterial(ap.getMaterial(), var2);
         }
 
-        setupFog(var1.getFog());
+        setupFog(ap.getFog());
     }
 
-    private static void polygonMode(PolygonMode var0) {
-        if (var0 == null) {
-            var0 = new PolygonMode();
+    private static void setupPolygonMode(PolygonMode pm) {
+        if (pm == null) {
+            pm = new PolygonMode();
         }
 
-        GL11.glPolygonMode(1032, Settings.xrayView ? 6913 : 6914);
-        int var1;
-        if ((var1 = var0.getCulling()) == 162) {
-            GL11.glDisable(2884);
+        GL11.glPolygonMode(GL_FRONT_AND_BACK, Settings.xrayView ? GL_LINE : GL_FILL);
+
+        int var1 = pm.getCulling();
+        if (var1 == PolygonMode.CULL_NONE) {
+            GL11.glDisable(GL_CULL_FACE);
         } else {
-            GL11.glEnable(2884);
-            GL11.glCullFace(var1 == 161 ? 1028 : 1029);
+            GL11.glEnable(GL_CULL_FACE);
+            GL11.glCullFace(var1 == PolygonMode.CULL_FRONT ? GL_FRONT : GL_BACK);
         }
 
-        GL11.glShadeModel(var0.getShading() == 164 ? 7424 : 7425);
-        GL11.glFrontFace(var0.getWinding() == 169 ? 2304 : 2305);
-        GL11.glLightModelf(2898, var0.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
-        GL11.glLightModelf(2897, var0.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
-        GL11.glHint(3152, var0.isPerspectiveCorrectionEnabled() ? 4354 : 4353);
+        GL11.glShadeModel(pm.getShading() == PolygonMode.SHADE_FLAT ? GL_FLAT : GL_SMOOTH);
+        GL11.glFrontFace(pm.getWinding() == PolygonMode.WINDING_CW ? GL_CW : GL_CCW);
+        GL11.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, pm.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
+        GL11.glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, pm.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
+        GL11.glHint(GL_PERSPECTIVE_CORRECTION_HINT, pm.isPerspectiveCorrectionEnabled() ? GL_NICEST : GL_FASTEST);
     }
 
-    private void compositingMode(CompositingMode var1) {
-        if (var1 == null) {
-            var1 = new CompositingMode();
+    private void setupCompositingMode(CompositingMode cm) {
+        if (cm == null) {
+            cm = new CompositingMode();
         }
 
-        if (this.depthBufferEnabled) {
-            GL11.glEnable(2929);
+        if (depthBufferEnabled) {
+            GL11.glEnable(GL_DEPTH_TEST);
         } else {
-            GL11.glDisable(2929);
+            GL11.glDisable(GL_DEPTH_TEST);
         }
 
-        GL11.glDepthMask(var1.isDepthWriteEnabled());
-        GL11.glDepthFunc(var1.isDepthTestEnabled() ? 515 : 519);
-        GL11.glColorMask(var1.isColorWriteEnabled(), var1.isColorWriteEnabled(), var1.isColorWriteEnabled(), var1.isAlphaWriteEnabled());
-        GL11.glAlphaFunc(518, var1.getAlphaThreshold());
-        if (var1.getAlphaThreshold() == 0.0F) {
-            GL11.glDisable(3008);
+        GL11.glDepthMask(cm.isDepthWriteEnabled());
+        GL11.glDepthFunc(cm.isDepthTestEnabled() ? GL_LEQUAL : GL_ALWAYS);
+        GL11.glColorMask(cm.isColorWriteEnabled(), cm.isColorWriteEnabled(), cm.isColorWriteEnabled(), cm.isAlphaWriteEnabled());
+
+        GL11.glAlphaFunc(GL_GEQUAL, cm.getAlphaThreshold());
+        if (cm.getAlphaThreshold() == 0.0F) {
+            GL11.glDisable(GL_ALPHA_TEST);
         } else {
-            GL11.glEnable(3008);
+            GL11.glEnable(GL_ALPHA_TEST);
         }
 
-        label51:
-        {
-            short var10000;
-            short var10001;
-            label50:
-            {
-                GL11.glEnable(3042);
-                switch (var1.getBlending()) {
-                    case 64:
-                        var10000 = 770;
-                        var10001 = 771;
-                        break label50;
-                    case 65:
-                        var10000 = 770;
-                        var10001 = 1;
-                        break label50;
-                    case 66:
-                        var10000 = 774;
-                        break;
-                    case 67:
-                        var10000 = 774;
-                        var10001 = 768;
-                        break label50;
-                    case 68:
-                        var10000 = 1;
-                        break;
-                    default:
-                        break label51;
-                }
+        GL11.glEnable(GL_BLEND);
 
-                var10001 = 0;
+        switch (cm.getBlending()) {
+            case CompositingMode.ALPHA:
+                GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                break;
+            case CompositingMode.ALPHA_ADD:
+                GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+                break;
+            case CompositingMode.MODULATE:
+                GL11.glBlendFunc(GL_DST_COLOR, GL_ZERO);
+                break;
+            case CompositingMode.MODULATE_X2:
+                GL11.glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+                break;
+            case CompositingMode.REPLACE:
+                GL11.glBlendFunc(GL_ONE, GL_ZERO);
+                break;
+            default:
+                break;
+        }
+
+        GL11.glPolygonOffset(cm.getDepthOffsetFactor(), cm.getDepthOffsetUnits());
+        if (cm.getDepthOffsetFactor() == 0.0F && cm.getDepthOffsetUnits() == 0.0F) {
+            GL11.glDisable(Settings.xrayView ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
+        } else {
+            GL11.glEnable(Settings.xrayView ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
+        }
+    }
+
+    private static void setupMaterial(Material mat, float var1) {
+        if (mat != null) {
+            GL11.glEnable(GL_LIGHTING);
+            float[] tmpCol = new float[4];
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.AMBIENT));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_AMBIENT, LWJGLUtility.getFloatBuffer(tmpCol));
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.DIFFUSE));
+            tmpCol[3] *= var1;
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, LWJGLUtility.getFloatBuffer(tmpCol));
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.EMISSIVE));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_EMISSION, LWJGLUtility.getFloatBuffer(tmpCol));
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.SPECULAR));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, LWJGLUtility.getFloatBuffer(tmpCol));
+
+            GL11.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat.getShininess());
+
+            if (mat.isVertexColorTrackingEnabled()) {
+                GL11.glEnable(GL_COLOR_MATERIAL);
+                GL11.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+            } else {
+                GL11.glDisable(GL_COLOR_MATERIAL);
             }
-
-            GL11.glBlendFunc(var10000, var10001);
-        }
-
-        GL11.glPolygonOffset(var1.getDepthOffsetFactor(), var1.getDepthOffsetUnits());
-        if (var1.getDepthOffsetFactor() == 0.0F && var1.getDepthOffsetUnits() == 0.0F) {
-            GL11.glDisable(Settings.xrayView ? 10754 : '\u8037');
         } else {
-            GL11.glEnable(Settings.xrayView ? 10754 : '\u8037');
+            GL11.glDisable(GL_LIGHTING);
         }
-    }
-
-    private static void material(Material var0, float var1) {
-        short var10000;
-        if (var0 != null) {
-            GL11.glEnable(2896);
-            float[] var2;
-            G3DUtils.fillFloatColor(var2 = new float[4], var0.getColor(1024));
-            GL11.glMaterial(1032, 4608, LWJGLUtility.getFloatBuffer(var2));
-            G3DUtils.fillFloatColor(var2, var0.getColor(2048));
-            var2[3] *= var1;
-            GL11.glMaterial(1032, 4609, LWJGLUtility.getFloatBuffer(var2));
-            G3DUtils.fillFloatColor(var2, var0.getColor(4096));
-            GL11.glMaterial(1032, 5632, LWJGLUtility.getFloatBuffer(var2));
-            G3DUtils.fillFloatColor(var2, var0.getColor(8192));
-            GL11.glMaterial(1032, 4610, LWJGLUtility.getFloatBuffer(var2));
-            float var3 = var0.getShininess();
-            GL11.glMaterialf(1032, 5633, var3);
-            if (var0.isVertexColorTrackingEnabled()) {
-                GL11.glEnable(2903);
-                GL11.glColorMaterial(1032, 5634);
-                return;
-            }
-
-            var10000 = 2903;
-        } else {
-            var10000 = 2896;
-        }
-
-        GL11.glDisable(var10000);
     }
 
     private static void setupFog(Fog fog) {
@@ -1145,7 +1134,7 @@ public final class Emulator3D implements IGraphics3D {
                     var28 = var29;
                 }
 
-                this.appearance(var1.getAppearance(), 1.0F, true);
+                this.setupAppearance(var1.getAppearance(), 1.0F, true);
                 GL11.glDrawPixels(var21[2], var21[3], var28, 5121, var27);
                 GL11.glPixelStorei(3314, 0);
                 GL11.glPixelStorei(3315, 0);
