@@ -467,7 +467,7 @@ public final class EmulatorScreen implements
 
 
     private void zoom(float var1) {
-        // ASD
+        if(Settings.resizeMode == 3 && !Settings.integerResize) return;
         this.zoom = var1;
         this.zoomedWidth = (int) ((float) this.getWidth() * this.zoom);
         this.zoomedHeight = (int) ((float) this.getHeight() * this.zoom);
@@ -480,10 +480,12 @@ public final class EmulatorScreen implements
 
 
     private void d() {
-        int i1 = this.shell.getSize().x - this.canvas.getSize().x;
-        int i2 = this.shell.getSize().y - this.canvas.getSize().y;
-        this.canvas.setSize((int) (this.jdField_d_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2, (int) ((float) this.jdField_e_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2);
-        this.shell.setSize(this.canvas.getSize().x + i1, this.canvas.getSize().y + i2);
+        if(!shell.getMaximized() && Settings.resizeMode != 0) {
+            int i1 = this.shell.getSize().x - this.canvas.getSize().x;
+            int i2 = this.shell.getSize().y - this.canvas.getSize().y;
+            this.canvas.setSize((int) (this.jdField_d_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2, (int) ((float) this.jdField_e_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2);
+            this.shell.setSize(this.canvas.getSize().x + i1, this.canvas.getSize().y + i2);
+        }
         this.canvas.redraw();
     }
 
@@ -2194,6 +2196,9 @@ public final class EmulatorScreen implements
 
     public final void startVibra(final long aLong1013) {
         if (!Settings.enableVibration) {
+            return;
+        }
+        if(shell.getMaximized()) {
             return;
         }
         this.vibra = aLong1013;
