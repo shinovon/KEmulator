@@ -749,6 +749,7 @@ public final class Emulator3D implements IGraphics3D {
         VertexArray normals = vertexBuffer.getNormals();
         if (normals != null && appearance.getMaterial() != null) {
             GL11.glEnableClientState(GL_NORMAL_ARRAY);
+            glEnable(GL_NORMALIZE);
             if (normals.getComponentType() == 1) {
                 GL11.glNormalPointer(0, LWJGLUtility.getNormalBuffer(normals.getByteValues()));
             } else {
