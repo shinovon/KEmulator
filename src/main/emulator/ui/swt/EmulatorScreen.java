@@ -365,8 +365,7 @@ public final class EmulatorScreen implements
         long now = System.currentTimeMillis();
         if (now - lastPollTime < 10) return;
         lastPollTime = now;
-        final boolean active = !Settings.canvasKeyboard &&
-                canvas.getDisplay().getActiveShell() == shell &&
+        final boolean active = canvas.getDisplay().getActiveShell() == shell &&
                 shell.isVisible() &&
                 canvas.isFocusControl();
         try {
@@ -386,7 +385,7 @@ public final class EmulatorScreen implements
                         keyboardButtonStates[i] = true;
                         keyboardButtonHoldTimes[i] = 0;
                         keyboardButtonDownTimes[i] = now;
-                        onKeyDown(i);
+//                        onKeyDown(i);
                     }
                 } else if (!pressed) {
                     keyboardButtonStates[i] = false;
@@ -399,7 +398,7 @@ public final class EmulatorScreen implements
                     }
                     if (now - keyboardButtonHoldTimes[i] >= 40) {
                         keyboardButtonHoldTimes[i] = now;
-                        onKeyHeld(i);
+//                        onKeyHeld(i);
                     }
                 }
             }
@@ -1436,11 +1435,10 @@ public final class EmulatorScreen implements
     }
 
     private static void setWindowOnTop(final long handle, final boolean b) {
-        // XXX: SWT VERSION
+        // TODO
         try {
             OS.SetWindowPos((int) handle, b ? -1 : -2, 0, 0, 0, 0, 19);
         } catch (Throwable e) {
-
         }
     }
 
@@ -1691,9 +1689,6 @@ public final class EmulatorScreen implements
             return;
         }
         this.caret.keyPressed(keyEvent);
-        if (!Settings.canvasKeyboard && win) {
-            return;
-        }
         int n = keyEvent.keyCode & 0xFEFFFFFF;
         if (keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
             n = keyEvent.character;
@@ -1712,14 +1707,6 @@ public final class EmulatorScreen implements
 
 
     protected final void handleKeyPress(int n) {
-		/*
-		if (Settings.fpsMode) {
-			int g = Keyboard.fpsKey(n);
-			if (g != 0) {
-				mp(n);
-				return;
-			}
-		}*/
         if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
             return;
         }
@@ -1727,9 +1714,10 @@ public final class EmulatorScreen implements
         if ((r = KeyMapping.replaceKey(n)) == null) {
             return;
         }
+        n = Integer.parseInt(r);
         if (pressedKeys.contains(n)) {
             if (Settings.enableKeyRepeat) {
-                Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
+                Emulator.getEventQueue().keyRepeat(n);
             }
             return;
         }
@@ -1745,18 +1733,10 @@ public final class EmulatorScreen implements
         if (Settings.recordKeys && !Settings.playingRecordedKeys) {
             Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
         }
-        Emulator.getEventQueue().keyPress(Integer.parseInt(r));
+        Emulator.getEventQueue().keyPress(n);
     }
 
     protected final void handleKeyRelease(int n) {
-        /*
-        if(Settings.fpsMode) {
-        	int g = Keyboard.fpsKey(n);
-        	if(g != 0) {
-        		mr(n);
-        		return;
-        	}
-        }*/
         if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
             return;
         }
@@ -1764,7 +1744,11 @@ public final class EmulatorScreen implements
         if ((r = KeyMapping.replaceKey(n)) == null) {
             return;
         }
+        n = Integer.parseInt(r);
         synchronized (pressedKeys) {
+            if(win && !pressedKeys.contains(n)) {
+                return;
+            }
             pressedKeys.removeElement(n);
         }
 
@@ -1775,12 +1759,36 @@ public final class EmulatorScreen implements
         if (Settings.recordKeys && !Settings.playingRecordedKeys) {
             Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
         }
+        Emulator.getEventQueue().keyRelease(n);
+    }
+
+    private void onKeyUp(int n) {
+        n = key(n);
+        if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys) {
+            return;
+        }
+        final String r;
+        if ((r = KeyMapping.replaceKey(n)) == null) {
+            return;
+        }
+        n = Integer.parseInt(r);
+        synchronized (pressedKeys) {
+            if(!pressedKeys.contains(n)) {
+                return;
+            }
+            pressedKeys.removeElement(n);
+        }
+        if (Settings.enableKeyCache) {
+            KeyMapping.keyCacheStack.push('1' + r);
+            return;
+        }
+        if (Settings.recordKeys && !Settings.playingRecordedKeys) {
+            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
+        }
         Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
     }
 
-
     private int key(int n) {
-        //XXX
         if (n <= 7) return -1;
         if (n >= 14 && n <= 31) return -1;
         if (n >= 91 && n <= 95) return -1;
@@ -1844,59 +1852,6 @@ public final class EmulatorScreen implements
                     break;
             }
         return n;
-    }
-
-    private void onKeyDown(int n) {
-        if (Settings.canvasKeyboard) return;
-        n = key(n);
-        if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys) {
-            return;
-        }
-        final String r;
-        if ((r = KeyMapping.replaceKey(n)) == null) {
-            return;
-        }
-        if (Settings.enableKeyCache) {
-            KeyMapping.keyCacheStack.push('0' + r);
-            return;
-        }
-        if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
-        }
-        Emulator.getEventQueue().keyPress(Integer.parseInt(r));
-    }
-
-    private void onKeyHeld(int n) {
-        if (Settings.canvasKeyboard) return;
-        n = key(n);
-        if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys || !Settings.enableKeyRepeat || Settings.enableKeyCache) {
-            return;
-        }
-        String r = KeyMapping.replaceKey(n);
-        if (r == null) {
-            return;
-        }
-        Emulator.getEventQueue().keyRepeat(Integer.parseInt(r));
-    }
-
-    private void onKeyUp(int n) {
-        if (Settings.canvasKeyboard) return;
-        n = key(n);
-        if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys) {
-            return;
-        }
-        final String r;
-        if ((r = KeyMapping.replaceKey(n)) == null) {
-            return;
-        }
-        if (Settings.enableKeyCache) {
-            KeyMapping.keyCacheStack.push('1' + r);
-            return;
-        }
-        if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-            Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
-        }
-        Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
     }
 
     public final void mouseDoubleClick(final MouseEvent mouseEvent) {
