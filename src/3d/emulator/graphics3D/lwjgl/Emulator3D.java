@@ -376,7 +376,7 @@ public final class Emulator3D implements IGraphics3D {
         this.depthRangeFar = var2;
     }
 
-    private void depth() {
+    private void setupDepth() {
         GL11.glDepthRange((double) this.depthRangeNear, (double) this.depthRangeFar);
     }
 
@@ -395,7 +395,7 @@ public final class Emulator3D implements IGraphics3D {
     public final void clearBackgound(Object var1) {
         Background var2 = (Background) var1;
         this.setupViewport();
-        this.depth();
+        this.setupDepth();
         GL11.glClearDepth(1.0D);
         GL11.glDepthMask(true);
         GL11.glColorMask(true, true, true, true);
@@ -576,36 +576,37 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    public final void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5) {
-        this.renderVertex(var1, var2, var3, var4, var5, 1.0F);
+    public final void render(VertexBuffer vb, IndexBuffer ib, Appearance ap, Transform trans, int scope) {
+        this.renderVertex(vb, ib, ap, trans, scope, 1.0F);
     }
 
-    private void renderVertex(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5, float var6) {
-        if ((CameraCache.camera.getScope() & var5) != 0) {
-            this.setupViewport();
-            this.depth();
+    private void renderVertex(VertexBuffer vb, IndexBuffer ib, Appearance ap, Transform trans, int scope, float alphaFactor) {
+        if ((CameraCache.camera.getScope() & scope) != 0) {
+            setupViewport();
+            setupDepth();
             setupCamera();
-            setupLights(LightsCache.m_lights, LightsCache.m_lightsTransform, var5);
-            if (var4 != null) {
-                Transform var7;
-                (var7 = new Transform()).set(var4);
-                var7.transpose();
-                GL11.glMultMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) var7.getImpl()).m_matrix));
+            setupLights(LightsCache.m_lights, LightsCache.m_lightsTransform, scope);
+
+            if (trans != null) {
+                Transform tmpMat = new Transform();
+                tmpMat.set(trans);
+                tmpMat.transpose();
+                GL11.glMultMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
             }
 
-            this.setupAppearance(var3, var6, false);
-            this.draw(var1, var2, var3, var6);
+            setupAppearance(ap, false);
+            draw(vb, ib, ap, alphaFactor);
         }
     }
 
-    private void setupAppearance(Appearance ap, float var2, boolean spriteMode) {
+    private void setupAppearance(Appearance ap, boolean spriteMode) {
         if (!spriteMode) {
             setupPolygonMode(ap.getPolygonMode());
         }
 
         setupCompositingMode(ap.getCompositingMode());
         if (!spriteMode) {
-            setupMaterial(ap.getMaterial(), var2);
+            setupMaterial(ap.getMaterial());
         }
 
         setupFog(ap.getFog());
@@ -655,7 +656,11 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnable(GL_ALPHA_TEST);
         }
 
-        GL11.glEnable(GL_BLEND);
+        if (cm.getBlending() == CompositingMode.REPLACE) {
+            GL11.glDisable(GL_BLEND);
+        } else {
+            GL11.glEnable(GL_BLEND);
+        }
 
         switch (cm.getBlending()) {
             case CompositingMode.ALPHA:
@@ -685,7 +690,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static void setupMaterial(Material mat, float var1) {
+    private static void setupMaterial(Material mat) {
         if (mat != null) {
             GL11.glEnable(GL_LIGHTING);
             float[] tmpCol = new float[4];
@@ -694,7 +699,6 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glMaterial(GL_FRONT_AND_BACK, GL_AMBIENT, LWJGLUtility.getFloatBuffer(tmpCol));
 
             G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.DIFFUSE));
-            tmpCol[3] *= var1;
             GL11.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, LWJGLUtility.getFloatBuffer(tmpCol));
 
             G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.EMISSIVE));
@@ -975,7 +979,7 @@ public final class Emulator3D implements IGraphics3D {
                     this.renderVertex(var6, var4, var5, var2.m_transform, var3.getScope(), var2.m_alphaFactor);
                 }
             } else {
-                this.method509((Sprite3D) var2.m_node, var2.m_transform);
+                this.method509((Sprite3D) var2.m_node, var2.m_transform, var2.m_alphaFactor);
             }
         }
 
@@ -983,7 +987,7 @@ public final class Emulator3D implements IGraphics3D {
         MeshMorph.getInstance().clearCache();
     }
 
-    private void method509(Sprite3D var1, Transform var2) {
+    private void method509(Sprite3D var1, Transform var2, float alphaFactor) {
         Vector4f var3 = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
         Vector4f var4 = new Vector4f(1.0F, 0.0F, 0.0F, 1.0F);
         Vector4f var5 = new Vector4f(0.0F, 1.0F, 0.0F, 1.0F);
@@ -1142,7 +1146,10 @@ public final class Emulator3D implements IGraphics3D {
                     var28 = var29;
                 }
 
-                this.setupAppearance(var1.getAppearance(), 1.0F, true);
+                this.setupAppearance(var1.getAppearance(), true);
+                GL11.glColor4ub((byte) 255, (byte) 255, (byte) 255, (byte) (255 * alphaFactor));
+                GL11.glDisableClientState(GL_COLOR_ARRAY);
+
                 GL11.glDrawPixels(var21[2], var21[3], var28, 5121, var27);
                 GL11.glPixelStorei(3314, 0);
                 GL11.glPixelStorei(3315, 0);
