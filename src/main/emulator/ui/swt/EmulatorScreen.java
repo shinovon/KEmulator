@@ -490,13 +490,13 @@ public final class EmulatorScreen implements
 
     private void zoomIn() {
         if (zoom < 5f) {
-            zoom(Math.max(5f, zoom + (Settings.integerResize ? 1f : .5f)));
+            zoom(Math.min(5f, zoom + (Settings.integerResize ? 1f : .5f)));
         }
     }
 
     private void zoomOut() {
         if (zoom > 1f) {
-            zoom(Math.min(1f, zoom - (Settings.integerResize ? 1f : .5f)));
+            zoom(Math.max(1f, zoom - (Settings.integerResize ? 1f : .5f)));
         }
     }
 
