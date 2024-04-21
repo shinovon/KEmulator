@@ -155,7 +155,6 @@ public final class EmulatorScreen implements
     private int lastMouseMoveX;
     private boolean fpsWasRight;
     private boolean fpsWasLeft;
-    private boolean ignoreNextFps;
     private boolean fpsWasntHor;
     private boolean mset;
     private boolean fpsWasUp;
@@ -163,10 +162,6 @@ public final class EmulatorScreen implements
     private boolean fpsWasntVer;
     private MenuItem rotate90MenuItem;
     private Vector<Integer> pressedKeys = new Vector<Integer>();
-    private int lastDragTime;
-    private int lastMouseX;
-    private int lastMouseY;
-    private boolean shifted;
     static Font f;
 
     public EmulatorScreen(final int n, final int n2) {
@@ -494,14 +489,14 @@ public final class EmulatorScreen implements
 
 
     private void zoomIn() {
-        if (this.zoom < 5.0) {
-            this.zoom(this.zoom + 0.5f);
+        if (zoom < 5f) {
+            zoom(Math.max(5f, zoom + (Settings.integerResize ? 1f : .5f)));
         }
     }
 
     private void zoomOut() {
-        if (this.zoom > 1.0f) {
-            this.zoom(this.zoom - 0.5f);
+        if (zoom > 1f) {
+            zoom(Math.min(1f, zoom - (Settings.integerResize ? 1f : .5f)));
         }
     }
 
@@ -961,73 +956,27 @@ public final class EmulatorScreen implements
 
     protected void toggleMenuAccelerators(final boolean b) {
         if (b) {
-
             this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
             this.startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
-            /*
-            this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
-            this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
-            this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
-            this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
-            this.forecPaintMenuItem.setAccelerator(SWT.CONTROL | 70);
-            this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
-            this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
-            this.startpauseTickMenuItem.setAccelerator(SWT.CONTROL | 75);
-            this.resetTickMenuItem.setAccelerator(SWT.CONTROL | 76);
-            this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
-            this.startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
-            this.stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
-            this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
-            this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
-            this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
-            this.pausestepMenuItem.setAccelerator(SWT.CONTROL | 84);
-            this.playResumeMenuItem.setAccelerator(SWT.CONTROL | 82);
-            */
         } else {
             this.captureToFileMenuItem.setAccelerator(0);
             this.startRecordAviMenuItem.setAccelerator(0);
-            /*
-            this.infosMenuItem.setAccelerator(0);
-            this.xrayViewMenuItem.setAccelerator(0);
-            this.alwaysOnTopMenuItem.setAccelerator(0);
-            this.rotateScreenMenuItem.setAccelerator(0);
-            this.forecPaintMenuItem.setAccelerator(0);
-            this.speedUpMenuItem.setAccelerator(0);
-            this.slowDownMenuItem.setAccelerator(0);
-            this.startpauseTickMenuItem.setAccelerator(0);
-            this.resetTickMenuItem.setAccelerator(0);
-            this.captureToFileMenuItem.setAccelerator(0);
-            this.startRecordAviMenuItem.setAccelerator(0);
-            this.stopRecordAviMenuItem.setAccelerator(0);
-            this.suspendMenuItem.setAccelerator(0);
-            this.resumeMenuItem.setAccelerator(0);
-            this.openJadMenuItem.setAccelerator(0);
-            this.pausestepMenuItem.setAccelerator(0);
-            this.playResumeMenuItem.setAccelerator(0);
-            */
         }
     }
 
 
-    protected void setFpsMode(boolean b) {
+    void setFpsMode(boolean b) {
         if (b) {
             Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2);
             display.setCursorLocation(pt);
-            //TODO
-        } else {
-
         }
-    }
-
-    public static boolean isFullyPaused() {
-        return Settings.steps == 0;
     }
 
     public static void pause() {
         Settings.steps = 0;
     }
 
-    protected static void pauseStep() {
+    static void pauseStep() {
         Settings.steps = 1;
     }
 
@@ -1918,8 +1867,6 @@ public final class EmulatorScreen implements
             this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
             final int x = (int) (zoom[0] / this.zoom);
             final int y = (int) (zoom[1] / this.zoom);
-            lastMouseX = x;
-            lastMouseY = y;
             Emulator.getEventQueue().mouseDown(x, y);
             if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getScreen()) {
                 this.caret.mouseDown(x, y);
@@ -1969,8 +1916,6 @@ public final class EmulatorScreen implements
             this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
             final int x = (int) (zoom[0] / this.zoom);
             final int y = (int) (zoom[1] / this.zoom);
-            lastMouseX = x;
-            lastMouseY = y;
             Emulator.getEventQueue().mouseUp(x, y);
         }
     }
@@ -2153,7 +2098,6 @@ public final class EmulatorScreen implements
                 if (dy != 0) fpsWasntVer = false;
             }
             lastMouseMoveX = dx;
-            //if(canvas.getSize().x / 2 != mouseEvent.x) ignoreNextFps = true;
             return;
         } else if (mset) {
             Cursor cursor = new Cursor(display, SWT.CURSOR_ARROW);
@@ -2167,13 +2111,6 @@ public final class EmulatorScreen implements
             this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
             int x = (int) (zoom[0] / this.zoom);
             int y = (int) (zoom[1] / this.zoom);
-            // Drag filter
-            //if(mouseEvent.time - lastDragTime < 5 && Math.abs(x-lastMouseX) < 4 && Math.abs(y-lastMouseY) < 4) {
-            //	return;
-            //}
-            lastMouseX = x;
-            lastMouseY = y;
-            lastDragTime = mouseEvent.time;
             Emulator.getEventQueue().mouseDrag(x, y);
         }
     }
