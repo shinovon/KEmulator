@@ -1,11 +1,13 @@
 package emulator.graphics3D.lwjgl;
 
 import java.nio.*;
+import java.util.Arrays;
 
 import org.lwjgl.BufferUtils;
 
 public final class LWJGLUtility {
-    private static ByteBuffer normalByteBuffer, normalShortBuffer;
+    private static ByteBuffer normalByteBuffer;
+    private static ShortBuffer normalShortBuffer;
     private static ByteBuffer colorBuffer;
     private static ByteBuffer imageBuffer;
     private static IntBuffer vertexByteBuffer;
@@ -25,15 +27,16 @@ public final class LWJGLUtility {
         return normalByteBuffer;
     }
 
-    public static ByteBuffer getNormalBuffer(short[] var0) {
+    public static ShortBuffer getNormalBuffer(short[] var0) {
         if (normalShortBuffer == null || normalShortBuffer.capacity() < var0.length) {
-            normalShortBuffer = BufferUtils.createByteBuffer(var0.length);
+            normalShortBuffer = BufferUtils.createShortBuffer(var0.length);
         }
 
         normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);
 
         for(int var1 = 0; var1 < var0.length; ++var1) {
-            normalShortBuffer.put((byte)(var0[var1] / 257));
+
+            normalShortBuffer.put(var0[var1]);
         }
 
         normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);

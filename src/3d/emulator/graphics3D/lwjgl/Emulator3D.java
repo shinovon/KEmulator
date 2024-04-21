@@ -752,7 +752,7 @@ public final class Emulator3D implements IGraphics3D {
             if (normals.getComponentType() == 1) {
                 GL11.glNormalPointer(0, LWJGLUtility.getNormalBuffer(normals.getByteValues()));
             } else {
-                GL11.glNormalPointer(5120, 0, LWJGLUtility.getNormalBuffer(normals.getShortValues()));
+                GLExtensions.glNormalPointer(0, LWJGLUtility.getNormalBuffer(normals.getShortValues()));
             }
         } else {
             GL11.glDisableClientState(GL_NORMAL_ARRAY);
