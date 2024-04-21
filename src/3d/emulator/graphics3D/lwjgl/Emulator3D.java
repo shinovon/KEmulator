@@ -146,7 +146,13 @@ public final class Emulator3D implements IGraphics3D {
                 pbufferContext.makeCurrent();
             } catch (Exception e) {
                 e.printStackTrace();
-//                this.method499(var2, var3);
+                try {
+                    this.method499(w, h);
+                } catch (Throwable e2) {
+                    e2.printStackTrace();
+                    this.target = null;
+                    return;
+                }
             }
 
             if (targetWidth != w || targetHeight != h) {
@@ -199,64 +205,60 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void method499(int var1, int var2) {
-        try {
-            Class.forName("org.eclipse.swt.internal.opengl.win32.WGL");
-            if (this.swtImage == null || this.swtImage.getBounds().width != var1 || this.swtImage.getBounds().height != var2) {
-                if (this.swtImage != null) {
-                    this.swtImage.dispose();
-                    this.swtGC.dispose();
-                    WGL.wglDeleteContext(this.wglContextHandle);
-                }
-
-                ImageData var3 = new ImageData(var1, var2, 32, swtPalleteData);
-                this.swtImage = new Image((Device) null, var3);
-                this.swtGC = new GC(this.swtImage);
-                PIXELFORMATDESCRIPTOR var4;
-                (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
-                var4.nVersion = 1;
-                var4.dwFlags = 57;
-                var4.iPixelType = 0;
-                var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
-                var4.iLayerType = 0;
-                int var5;
-                if ((var5 = WGL.ChoosePixelFormat(this.swtGC.handle, var4)) == 0 || !WGL.SetPixelFormat(this.swtGC.handle, var5, var4)) {
-                    this.swtGC.dispose();
-                    this.swtImage.dispose();
-                    throw new IllegalArgumentException();
-                }
-
-                this.wglContextHandle = WGL.wglCreateContext(this.swtGC.handle);
-                if (this.wglContextHandle == 0) {
-                    this.swtGC.dispose();
-                    this.swtImage.dispose();
-                    throw new IllegalArgumentException();
-                }
+        if (this.swtImage == null || this.swtImage.getBounds().width != var1 || this.swtImage.getBounds().height != var2) {
+            if (this.swtImage != null) {
+                this.swtImage.dispose();
+                this.swtGC.dispose();
+                WGL.wglDeleteContext(this.wglContextHandle);
             }
 
-            if (WGL.wglGetCurrentContext() != this.swtImage.handle) {
-                while (WGL.wglGetCurrentContext() > 0) {
-                    ;
-                }
-
-                WGL.wglMakeCurrent(this.swtGC.handle, this.wglContextHandle);
-
-                try {
-                    GLContext.useContext(this.swtImage);
-                } catch (Exception var6) {
-                    throw new IllegalArgumentException();
-                }
+            ImageData var3 = new ImageData(var1, var2, 32, swtPalleteData);
+            this.swtImage = new Image((Device) null, var3);
+            this.swtGC = new GC(this.swtImage);
+            PIXELFORMATDESCRIPTOR var4;
+            (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
+            var4.nVersion = 1;
+            var4.dwFlags = 57;
+            var4.iPixelType = 0;
+            var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
+            var4.iLayerType = 0;
+            int var5;
+            if ((var5 = WGL.ChoosePixelFormat(this.swtGC.handle, var4)) == 0 || !WGL.SetPixelFormat(this.swtGC.handle, var5, var4)) {
+                this.swtGC.dispose();
+                this.swtImage.dispose();
+                throw new IllegalArgumentException();
             }
-        } catch (ClassNotFoundException e) {
+
+            this.wglContextHandle = WGL.wglCreateContext(this.swtGC.handle);
+            if (this.wglContextHandle == 0) {
+                this.swtGC.dispose();
+                this.swtImage.dispose();
+                throw new IllegalArgumentException();
+            }
+        }
+
+        if (WGL.wglGetCurrentContext() != this.swtImage.handle) {
+            while (WGL.wglGetCurrentContext() > 0) {
+                ;
+            }
+
+            WGL.wglMakeCurrent(this.swtGC.handle, this.wglContextHandle);
+
+            try {
+                GLContext.useContext(this.swtImage);
+            } catch (Exception var6) {
+                throw new IllegalArgumentException();
+            }
         }
     }
 
     private void releaseContext() {
-//        WGL.wglMakeCurrent(this.swtGC.handle, -1);
+        try {
+            WGL.wglMakeCurrent(this.swtGC.handle, -1);
+        } catch (Throwable ignored) {}
         try {
             GLContext.useContext((Object) null);
-        } catch (Exception e) {
-            ;
-        }
+        } catch (Exception ignored) {}
     }
 
     public final void method503() {
