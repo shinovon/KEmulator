@@ -282,6 +282,7 @@ public final class EmulatorScreen implements
                     try {
                         if (b) {
                             pollKeyboard(canvas);
+                            Controllers.poll();
                             return;
                         }
                         b = true;
@@ -1635,7 +1636,10 @@ public final class EmulatorScreen implements
         if (this.pauseState != 1) {
             return;
         }
-        if (Settings.pollKeyboardOnRepaint) pollKeyboard(canvas);
+        if (Settings.pollKeyboardOnRepaint) {
+            pollKeyboard(canvas);
+            Controllers.poll();
+        }
         if (Settings.g2d == 0) {
             this.screenImageSwt.cloneImage(this.screenCopySwt);
         } else if (Settings.g2d == 1) {

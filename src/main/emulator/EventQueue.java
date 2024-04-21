@@ -314,7 +314,6 @@ public final class EventQueue implements Runnable {
                         break;
                 }
                 this.event = 0;
-                Controllers.poll();
                 try {
                     Thread.sleep(1L);
                 } catch (Exception ex4) {

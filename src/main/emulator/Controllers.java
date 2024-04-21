@@ -176,7 +176,7 @@ public class Controllers {
                 continue;
             }
             Event event = new Event();
-            if (controller.getEventQueue().getNextEvent(event)) {
+            while (controller.getEventQueue().getNextEvent(event)) {
                 Component.Identifier identifier = event.getComponent().getIdentifier();
                 String name = identifier.getName();
                 float value = event.getValue();
