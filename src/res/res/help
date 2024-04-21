@@ -42,6 +42,13 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$nnmod v2.xx [2024.xx.xx]
+M3G LWJGL engine
+Added M3GView from 0.9.8
+Free window resize & more scaling options
+Improved controller support
+Rewrote keyboard input handling
+
 $nnmod v2.15.2 [2024.04.16]
 Improved M3G textures debugging in MemoryView (contributed by rmn20)
 Added MascotCapsule textures in MemoryView
