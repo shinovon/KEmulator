@@ -5,303 +5,310 @@ import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
 public class VertexBuffer extends Object3D {
-    private int defaultColor = -1;
+
     private int vertexCount = 0;
-    private int anInt40 = 0;
     private VertexArray positions = null;
     private VertexArray normals = null;
+    private VertexArray[] uvms;
     private VertexArray colors = null;
-    private VertexArray[] aVertexArrayArray734;
-    private float[] aFloatArray735;
-    private float[][] aFloatArrayArray144;
+
+    private int defaultColor = -1;
+
+    private float[] posScaleBias;
+    private float[][] uvScaleBias;
+
+    private int arraysCount = 0;
 
     public VertexBuffer() {
-        this.aVertexArrayArray734 = new VertexArray[Emulator3D.NumTextureUnits];
-        this.aFloatArray735 = new float[4];
-        this.aFloatArray735[0] = 1.0F;
-        this.aFloatArrayArray144 = new float[Emulator3D.NumTextureUnits][4];
+        this.uvms = new VertexArray[Emulator3D.NumTextureUnits];
+        this.posScaleBias = new float[] {1, 0, 0, 0};
+        this.uvScaleBias = new float[Emulator3D.NumTextureUnits][4];
     }
 
     protected Object3D duplicateObject() {
-        VertexBuffer var1;
-        (var1 = (VertexBuffer) super.duplicateObject()).aVertexArrayArray734 = (VertexArray[]) this.aVertexArrayArray734.clone();
-        var1.aFloatArray735 = (float[]) this.aFloatArray735.clone();
-        var1.aFloatArrayArray144 = new float[Emulator3D.NumTextureUnits][4];
+        VertexBuffer clone = (VertexBuffer) super.duplicateObject();
+        clone.uvms = (VertexArray[]) uvms.clone();
+        clone.posScaleBias = (float[]) posScaleBias.clone();
+        clone.uvScaleBias = new float[Emulator3D.NumTextureUnits][4];
 
-        for (int var2 = 0; var2 < Emulator3D.NumTextureUnits; ++var2) {
-            var1.aFloatArrayArray144[var2] = (float[]) this.aFloatArrayArray144[var2].clone();
+        for (int i = 0; i < Emulator3D.NumTextureUnits; ++i) {
+            clone.uvScaleBias[i] = (float[]) uvScaleBias[i].clone();
         }
 
-        return var1;
+        return clone;
     }
 
     public int getVertexCount() {
-        return this.vertexCount;
+        return vertexCount;
     }
 
-    public void setPositions(VertexArray var1, float var2, float[] var3) {
-        if (var1 != null && var1.getComponentCount() != 3) {
+    public void setPositions(VertexArray newPoses, float scale, float[] bias) {
+        if (newPoses != null && newPoses.getComponentCount() != 3) {
             throw new IllegalArgumentException();
-        } else if (var1 != null && var3 != null && var3.length < 3) {
+        } else if (newPoses != null && bias != null && bias.length < 3) {
             throw new IllegalArgumentException();
-        } else if (var1 != null && this.vertexCount != 0 && var1.getVertexCount() != this.vertexCount) {
+        } else if (newPoses != null && vertexCount != 0 && newPoses.getVertexCount() != vertexCount) {
             throw new IllegalArgumentException();
         } else {
-            this.removeReference(this.positions);
-            if (var1 != null) {
-                if (this.positions == null) {
-                    ++this.anInt40;
-                }
+            removeReference(positions);
 
-                this.vertexCount = var1.getVertexCount();
-                this.positions = var1;
-                this.aFloatArray735[0] = var2;
-                if (var3 != null) {
-                    System.arraycopy(var3, 0, this.aFloatArray735, 1, 3);
+            if (newPoses != null) {
+                if (positions == null) arraysCount++;
+
+                vertexCount = newPoses.getVertexCount();
+                positions = newPoses;
+
+                posScaleBias[0] = scale;
+                if (bias != null) {
+                    System.arraycopy(bias, 0, posScaleBias, 1, 3);
                 } else {
-                    this.aFloatArray735[1] = 0.0F;
-                    this.aFloatArray735[2] = 0.0F;
-                    this.aFloatArray735[3] = 0.0F;
+                    posScaleBias[1] = 0.0F;
+                    posScaleBias[2] = 0.0F;
+                    posScaleBias[3] = 0.0F;
                 }
-            } else if (this.positions != null) {
-                this.positions = null;
-                --this.anInt40;
-                this.vertexCount = this.anInt40 > 0 ? this.vertexCount : 0;
+            } else if (positions != null) {
+                positions = null;
+                arraysCount--;
+                vertexCount = arraysCount > 0 ? vertexCount : 0;
             }
 
-            this.addReference(this.positions);
+            addReference(positions);
         }
     }
 
-    public void setTexCoords(int var1, VertexArray var2, float var3, float[] var4) {
-        if (var2 != null && var2.getComponentCount() != 2 && var2.getComponentCount() != 3) {
+    public void setTexCoords(int index, VertexArray newUvm, float scale, float[] bias) {
+        if (newUvm != null && newUvm.getComponentCount() != 2 && newUvm.getComponentCount() != 3) {
             throw new IllegalArgumentException();
-        } else if (var2 != null && this.vertexCount != 0 && var2.getVertexCount() != this.vertexCount) {
+        } else if (newUvm != null && vertexCount != 0 && newUvm.getVertexCount() != vertexCount) {
             throw new IllegalArgumentException();
-        } else if (var2 != null && var4 != null && var4.length < var2.getComponentCount()) {
+        } else if (newUvm != null && bias != null && bias.length < newUvm.getComponentCount()) {
             throw new IllegalArgumentException();
-        } else if (var1 >= 0 && var1 < Emulator3D.NumTextureUnits) {
-            this.removeReference(this.aVertexArrayArray734[var1]);
-            if (var2 != null) {
-                if (this.aVertexArrayArray734[var1] == null) {
-                    ++this.anInt40;
-                }
+        } else if (index >= 0 && index < Emulator3D.NumTextureUnits) {
+            removeReference(uvms[index]);
 
-                this.vertexCount = var2.getVertexCount();
-                this.aVertexArrayArray734[var1] = var2;
-                this.aFloatArrayArray144[var1][0] = var3;
-                this.aFloatArrayArray144[var1][1] = 0.0F;
-                this.aFloatArrayArray144[var1][2] = 0.0F;
-                this.aFloatArrayArray144[var1][3] = 0.0F;
-                if (var4 != null) {
-                    System.arraycopy(var4, 0, this.aFloatArrayArray144[var1], 1, var2.getComponentCount());
+            if (newUvm != null) {
+                if (uvms[index] == null) arraysCount++;
+
+                vertexCount = newUvm.getVertexCount();
+                uvms[index] = newUvm;
+
+                uvScaleBias[index][0] = scale;
+                uvScaleBias[index][1] = 0.0F;
+                uvScaleBias[index][2] = 0.0F;
+                uvScaleBias[index][3] = 0.0F;
+                if (bias != null) {
+                    System.arraycopy(bias, 0, uvScaleBias[index], 1, newUvm.getComponentCount());
                 }
-            } else if (this.aVertexArrayArray734[var1] != null) {
-                this.aVertexArrayArray734[var1] = null;
-                --this.anInt40;
-                this.vertexCount = this.anInt40 > 0 ? this.vertexCount : 0;
+            } else if (uvms[index] != null) {
+                uvms[index] = null;
+                arraysCount--;
+                vertexCount = arraysCount > 0 ? vertexCount : 0;
             }
 
-            this.addReference(this.aVertexArrayArray734[var1]);
+            addReference(uvms[index]);
         } else {
             throw new IndexOutOfBoundsException();
         }
     }
 
-    public void setNormals(VertexArray var1) {
-        if (var1 != null && var1.getComponentCount() != 3) {
+    public void setNormals(VertexArray newNorms) {
+        if (newNorms != null && newNorms.getComponentCount() != 3) {
             throw new IllegalArgumentException();
-        } else if (var1 != null && this.vertexCount != 0 && var1.getVertexCount() != this.vertexCount) {
+        } else if (newNorms != null && vertexCount != 0 && newNorms.getVertexCount() != vertexCount) {
             throw new IllegalArgumentException();
         } else {
-            this.removeReference(this.normals);
-            if (var1 != null) {
-                if (this.normals == null) {
-                    ++this.anInt40;
-                }
+            removeReference(normals);
 
-                this.vertexCount = var1.getVertexCount();
-                this.normals = var1;
-            } else if (this.normals != null) {
-                this.normals = null;
-                --this.anInt40;
-                this.vertexCount = this.anInt40 > 0 ? this.vertexCount : 0;
+            if (newNorms != null) {
+                if (normals == null) arraysCount++;
+
+                vertexCount = newNorms.getVertexCount();
+                normals = newNorms;
+            } else if (normals != null) {
+                normals = null;
+                arraysCount--;
+                vertexCount = arraysCount > 0 ? vertexCount : 0;
             }
 
-            this.addReference(this.normals);
+            addReference(normals);
         }
     }
 
-    public void setColors(VertexArray var1) {
-        if (var1 != null && var1.getComponentType() != 1) {
+    public void setColors(VertexArray newCols) {
+        if (newCols != null && newCols.getComponentType() != 1) {
             throw new IllegalArgumentException();
-        } else if (var1 != null && var1.getComponentCount() != 3 && var1.getComponentCount() != 4) {
+        } else if (newCols != null && newCols.getComponentCount() != 3 && newCols.getComponentCount() != 4) {
             throw new IllegalArgumentException();
-        } else if (var1 != null && this.vertexCount != 0 && var1.getVertexCount() != this.vertexCount) {
+        } else if (newCols != null && vertexCount != 0 && newCols.getVertexCount() != vertexCount) {
             throw new IllegalArgumentException();
         } else {
-            this.removeReference(this.colors);
-            if (var1 != null) {
-                if (this.colors == null) {
-                    ++this.anInt40;
-                }
+            removeReference(colors);
 
-                this.vertexCount = var1.getVertexCount();
-                this.colors = var1;
-            } else if (this.colors != null) {
-                this.colors = null;
-                --this.anInt40;
-                this.vertexCount = this.anInt40 > 0 ? this.vertexCount : 0;
+            if (newCols != null) {
+                if (colors == null) arraysCount++;
+
+                vertexCount = newCols.getVertexCount();
+                colors = newCols;
+            } else if (colors != null) {
+                colors = null;
+                arraysCount--;
+                vertexCount = arraysCount > 0 ? vertexCount : 0;
             }
 
-            this.addReference(this.colors);
+            addReference(colors);
         }
     }
 
-    public VertexArray getPositions(float[] var1) {
-        if (var1 != null && var1.length < 4) {
+    public VertexArray getPositions(float[] scaleBias) {
+        if (scaleBias != null && scaleBias.length < 4) {
             throw new IllegalArgumentException();
         } else {
-            if (this.positions != null && var1 != null) {
-                System.arraycopy(this.aFloatArray735, 0, var1, 0, 4);
+            if (positions != null && scaleBias != null) {
+                System.arraycopy(posScaleBias, 0, scaleBias, 0, 4);
             }
 
-            return this.positions;
+            return positions;
         }
     }
 
-    public VertexArray getTexCoords(int var1, float[] var2) {
-        if (var1 >= 0 && var1 < Emulator3D.NumTextureUnits) {
-            if (this.aVertexArrayArray734[var1] != null && var2 != null) {
-                if (var2.length < this.aVertexArrayArray734[var1].getComponentCount() + 1) {
+    public VertexArray getTexCoords(int index, float[] scaleBias) {
+        if (index >= 0 && index < Emulator3D.NumTextureUnits) {
+
+            if (uvms[index] != null && scaleBias != null) {
+                if (scaleBias.length < uvms[index].getComponentCount() + 1) {
                     throw new IllegalArgumentException();
                 }
 
-                System.arraycopy(this.aFloatArrayArray144[var1], 0, var2, 0, this.aVertexArrayArray734[var1].getComponentCount() + 1);
+                System.arraycopy(uvScaleBias[index], 0, scaleBias, 0, uvms[index].getComponentCount() + 1);
             }
 
-            return this.aVertexArrayArray734[var1];
+            return uvms[index];
         } else {
             throw new IndexOutOfBoundsException();
         }
     }
 
     public VertexArray getNormals() {
-        return this.normals;
+        return normals;
     }
 
     public VertexArray getColors() {
-        return this.colors;
+        return colors;
     }
 
-    public void setDefaultColor(int var1) {
-        this.defaultColor = var1;
+    public void setDefaultColor(int col) {
+        defaultColor = col;
     }
 
     public int getDefaultColor() {
-        return this.defaultColor;
+        return defaultColor;
     }
 
-    protected void updateProperty(int var1, float[] var2) {
-        switch (var1) {
-            case 256:
-                this.defaultColor &= 16777215;
-                this.defaultColor |= G3DUtils.getIntColor(var2) & -16777216;
+    protected void updateProperty(int property, float[] value) {
+        switch (property) {
+            case AnimationTrack.ALPHA:
+                defaultColor &= 0xffffff;
+                defaultColor |= G3DUtils.getIntColor(value) & 0xff000000;
                 return;
-            case 258:
-                this.defaultColor &= -16777216;
-                this.defaultColor |= G3DUtils.getIntColor(var2) & 16777215;
+            case AnimationTrack.COLOR:
+                defaultColor &= 0xff000000;
+                defaultColor |= G3DUtils.getIntColor(value) & 0xffffff;
                 return;
             default:
-                super.updateProperty(var1, var2);
+                super.updateProperty(property, value);
         }
     }
 
-    protected boolean getNormalVertex(int var1, Vector4f var2) {
-        if (this.normals == null) {
+    protected boolean getNormalVertex(int vertexIndex, Vector4f vec) {
+        if (normals == null) {
             return false;
         } else {
-            Vector4f var10000;
-            float var10001;
-            float var10002;
-            short var10003;
-            if (this.normals.getComponentType() == 1) {
-                byte[] var3 = new byte[3];
-                this.normals.get(var1, 1, var3);
-                var10000 = var2;
-                var10001 = (float) var3[0];
-                var10002 = (float) var3[1];
-                var10003 = var3[2];
+            float nx, ny, nz;
+
+            if (normals.getComponentType() == 1) {
+                byte[] tmpVec = new byte[3];
+                normals.get(vertexIndex, 1, tmpVec);
+
+                nx = tmpVec[0];
+                ny = tmpVec[1];
+                nz = tmpVec[2];
             } else {
-                short[] var4 = new short[3];
-                this.normals.get(var1, 1, var4);
-                var10000 = var2;
-                var10001 = (float) var4[0];
-                var10002 = (float) var4[1];
-                var10003 = var4[2];
+                short[] tmpVec = new short[3];
+                normals.get(vertexIndex, 1, tmpVec);
+
+                nx = tmpVec[0];
+                ny = tmpVec[1];
+                nz = tmpVec[2];
             }
 
-            var10000.set(var10001, var10002, (float) var10003, 1.0F);
+            vec.set(nx, ny, nz, 1.0F);
             return true;
         }
     }
 
-    protected void getVertex(int var1, Vector4f var2) {
-        byte[] var3 = new byte[3];
-        short[] var4 = new short[3];
-        short var10000;
-        float var5;
-        float var6;
+    protected void getVertex(int vertexIndex, Vector4f vec) {
+        float x, y, z;
+
         if (this.positions.getComponentType() == 1) {
-            this.positions.get(var1, 1, var3);
-            var5 = (float) var3[0];
-            var6 = (float) var3[1];
-            var10000 = var3[2];
+            byte[] tmpVec = new byte[3];
+            positions.get(vertexIndex, 1, tmpVec);
+
+            x = tmpVec[0];
+            y = tmpVec[1];
+            z = tmpVec[2];
         } else {
-            this.positions.get(var1, 1, var4);
-            var5 = (float) var4[0];
-            var6 = (float) var4[1];
-            var10000 = var4[2];
+            short[] tmpVec = new short[3];
+            positions.get(vertexIndex, 1, tmpVec);
+
+            x = tmpVec[0];
+            y = tmpVec[1];
+            z = tmpVec[2];
         }
 
-        float var7 = (float) var10000;
-        var5 *= this.aFloatArray735[0];
-        var6 *= this.aFloatArray735[0];
-        var7 *= this.aFloatArray735[0];
-        var5 += this.aFloatArray735[1];
-        var6 += this.aFloatArray735[2];
-        var7 += this.aFloatArray735[3];
-        var2.set(var5, var6, var7, 1.0F);
+        x *= posScaleBias[0];
+        y *= posScaleBias[0];
+        z *= posScaleBias[0];
+
+        x += posScaleBias[1];
+        y += posScaleBias[2];
+        z += posScaleBias[3];
+
+        vec.set(x, y, z, 1.0F);
     }
 
-    protected boolean getTexVertex(int var1, int var2, Vector4f var3) {
-        if (this.aVertexArrayArray734[var2] == null) {
+    protected boolean getTexVertex(int vertexIndex, int texSlot, Vector4f vec) {
+        if (uvms[texSlot] == null) {
             return false;
         } else {
-            int var4;
-            byte[] var5 = new byte[var4 = this.aVertexArrayArray734[var2].getComponentCount()];
-            short[] var6 = new short[var4];
-            float var7;
-            float var8;
-            float var9;
-            if (this.aVertexArrayArray734[var2].getComponentType() == 1) {
-                this.aVertexArrayArray734[var2].get(var1, 1, var5);
-                var7 = (float) var5[0];
-                var8 = (float) var5[1];
-                var9 = var4 == 3 ? (float) var5[2] : 0.0F;
+            float x, y ,z;
+
+            int componentCount = this.uvms[texSlot].getComponentCount();
+
+            if (uvms[texSlot].getComponentType() == 1) {
+                byte[] tmpVec = new byte[componentCount];
+                uvms[texSlot].get(vertexIndex, 1, tmpVec);
+
+                x = tmpVec[0];
+                y = tmpVec[1];
+                z = componentCount == 3 ? (float) tmpVec[2] : 0.0F;
             } else {
-                this.aVertexArrayArray734[var2].get(var1, 1, var6);
-                var7 = (float) var6[0];
-                var8 = (float) var6[1];
-                var9 = var4 == 3 ? (float) var6[2] : 0.0F;
+                short[] tmpVec = new short[componentCount];
+                uvms[texSlot].get(vertexIndex, 1, tmpVec);
+
+                x = tmpVec[0];
+                y = tmpVec[1];
+                z = componentCount == 3 ? (float) tmpVec[2] : 0.0F;
             }
 
-            var7 *= this.aFloatArrayArray144[var2][0];
-            var8 *= this.aFloatArrayArray144[var2][0];
-            var7 += this.aFloatArrayArray144[var2][1];
-            var8 += this.aFloatArrayArray144[var2][2];
-            var9 += this.aFloatArrayArray144[var2][3];
-            var3.set(var7, var8, var9, 1.0F);
+            x *= uvScaleBias[texSlot][0];
+            y *= uvScaleBias[texSlot][0];
+            z *= uvScaleBias[texSlot][0];
+
+            x += uvScaleBias[texSlot][1];
+            y += uvScaleBias[texSlot][2];
+            z += uvScaleBias[texSlot][3];
+
+            vec.set(x, y, z, 1.0F);
             return true;
         }
     }
