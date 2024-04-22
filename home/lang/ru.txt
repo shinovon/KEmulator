@@ -12,6 +12,7 @@ MENU_MIDLET_LOAD_JAR=Открыть jar...
 MENU_MIDLET_LOAD_AUTO_PLAY=Открыть запись
 MENU_MIDLET_RECENTLY=Последние файлы
 MENU_MIDLET_2DENGINE=Движок 2D
+MENU_MIDLET_3DENGINE=Движок 3D
 
 MENU_MIDLET_JAD=Открыть JAD в блокноте
 MENU_MIDLET_SUSPEND=Приостановить
@@ -36,6 +37,7 @@ MENU_VIEW_WATCHES=Классы
 MENU_VIEW_PROFILER=Профайлер
 MENU_VIEW_METHODS=Методы
 MENU_VIEW_MEMORY=Просмотр памяти
+MENU_VIEW_M3GVIEW=Просмотр M3G
 MENU_VIEW_SMS=SMS консоль
 MENU_VIEW_SENSOR=Симулятор акселерометра
 MENU_VIEW_LOG=Логи
@@ -49,6 +51,13 @@ MENU_TOOL_INTERPOSE=Интерполяция
 MENU_TOOL_INTER_NEAREST=NearestNeighbor
 MENU_TOOL_INTER_HIGH=HighQuality
 MENU_TOOL_INTER_LOW=LowQuality
+
+MENU_TOOL_RESIZE_MODE=Режим отображения
+MENU_TOOL_RESIZE_MODE_CENTER=По центру
+MENU_TOOL_RESIZE_MODE_SYNC=Синхронизировать размер
+MENU_TOOL_RESIZE_MODE_FILL=Заполнить свободное место
+MENU_TOOL_RESIZE_KEEP_PROPORTIONS=Сохранять пропорции
+MENU_TOOL_RESIZE_INTEGER=Целочисленный масштаб
 
 MENU_TOOL_SPEEDUP=Ускорить
 MENU_TOOL_SPEEDDOWN=Замедлить
@@ -273,6 +282,7 @@ OPTION_COREAPI_FULLSCREEN=Игнорировать Canvas.setFullScreenMode().
 OPTION_COREAPI_NO_NETWORK=Отключить доступ к сети
 OPTION_COREAPI_SYNC_KEYEVENTS=Синхронизировать события клавиш
 OPTION_COREAPI_SOFTKEY_FIX=Отправлять keyPressed вместе с commandAction
+OPTION_COREAPI_IGNORE_M3G_OVERWRITE=Игнорировать M3G флаг перезаписи
 
 OPTION_RECORDS_RMS_FOLDER=Папка RMS:
 OPTION_RECORDS_RMS_TEXT=Записи текущего мидлета:

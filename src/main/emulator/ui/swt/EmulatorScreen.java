@@ -177,7 +177,7 @@ public final class EmulatorScreen implements
         this.menuView = null;
         this.menu2dEngine = null;
         this.aMenu1018 = null;
-        this.pauseStateStrings = new String[]{emulator.UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), emulator.UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), emulator.UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
+        this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
         EmulatorScreen.display = EmulatorImpl.getDisplay();
         this.initShell();
         this.initScreenBuffer(n, n2);
@@ -216,7 +216,7 @@ public final class EmulatorScreen implements
     public final void showMessage(final String message) {
         setWindowOnTop(getHandle(shell), true);
         final MessageBox messageBox;
-        ((Dialog) (messageBox = new MessageBox(this.shell))).setText(emulator.UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
+        ((Dialog) (messageBox = new MessageBox(this.shell))).setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
         messageBox.setMessage(message);
         messageBox.open();
     }
@@ -246,7 +246,7 @@ public final class EmulatorScreen implements
             this.zoom(Settings.canvasScale / 100.0f);
         } catch (Exception ex) {
             ex.printStackTrace();
-            this.showMessage(emulator.UILocale.get("LOAD_GDIPLUS_ERROR", "Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path."));
+            this.showMessage(UILocale.get("LOAD_GDIPLUS_ERROR", "Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path."));
             System.exit(1);
             return;
         }
@@ -687,102 +687,102 @@ public final class EmulatorScreen implements
     private void method586() {
         this.aMenu971 = new Menu((Decorations) this.shell, 2);
         final MenuItem menuItemMidlet;
-        (menuItemMidlet = new MenuItem(this.aMenu971, 64)).setText(emulator.UILocale.get("MENU_MIDLET", "Midlet"));
+        (menuItemMidlet = new MenuItem(this.aMenu971, 64)).setText(UILocale.get("MENU_MIDLET", "Midlet"));
         final MenuItem menuItemTool;
-        (menuItemTool = new MenuItem(this.aMenu971, 64)).setText(emulator.UILocale.get("MENU_TOOL", "Tool"));
+        (menuItemTool = new MenuItem(this.aMenu971, 64)).setText(UILocale.get("MENU_TOOL", "Tool"));
         final MenuItem menuItemView;
-        (menuItemView = new MenuItem(this.aMenu971, 64)).setText(emulator.UILocale.get("MENU_VIEW", "View"));
+        (menuItemView = new MenuItem(this.aMenu971, 64)).setText(UILocale.get("MENU_VIEW", "View"));
         this.menuView = new Menu(menuItemView);
-        (this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
+        (this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
         this.infosMenuItem.addSelectionListener((SelectionListener) this);
-        (this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tCtrl+X");
+        (this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tCtrl+X");
         this.xrayViewMenuItem.addSelectionListener((SelectionListener) this);
-        (this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(emulator.UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
+        (this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
         this.alwaysOnTopMenuItem.addSelectionListener((SelectionListener) this);
         this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
-        (this.rotateScreenMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_ROTATE", "Rotate Screen") + "\tCtrl+Y");
+        (this.rotateScreenMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_ROTATE", "Rotate Screen") + "\tCtrl+Y");
         this.rotateScreenMenuItem.addSelectionListener((SelectionListener) this);
 
 
         this.rotate90MenuItem = new MenuItem(this.menuView, 8);
-        this.rotate90MenuItem.setText(emulator.UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees") + "\tAlt+Y");
+        this.rotate90MenuItem.setText(UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees") + "\tAlt+Y");
         this.rotate90MenuItem.addSelectionListener(this);
 
-        (this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
+        (this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
         this.forcePaintMenuItem.addSelectionListener((SelectionListener) this);
-        (this.changeResolutionMenuItem = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_SCREEN_SIZE", "Change screen size"));
+        (this.changeResolutionMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SCREEN_SIZE", "Change screen size"));
         this.changeResolutionMenuItem.addSelectionListener((SelectionListener) this);
 
         setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
         new MenuItem(this.menuView, 2);
-        (this.aMenuItem956 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
+        (this.aMenuItem956 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
         this.aMenuItem956.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem958 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_WATCHES", "Watches"));
+        (this.aMenuItem958 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_WATCHES", "Watches"));
         this.aMenuItem958.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem959 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_PROFILER", "Profiler"));
+        (this.aMenuItem959 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_PROFILER", "Profiler"));
         this.aMenuItem959.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem960 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_METHODS", "Methods"));
+        (this.aMenuItem960 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_METHODS", "Methods"));
         this.aMenuItem960.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem961 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
-        (this.aMenuItem962 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
+        (this.aMenuItem961 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
+        (this.aMenuItem962 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
         this.aMenuItem962.addSelectionListener((SelectionListener)this);
         this.aMenuItem961.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem963 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_SMS", "SMS Console"));
+        (this.aMenuItem963 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SMS", "SMS Console"));
         this.aMenuItem963.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem964 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
+        (this.aMenuItem964 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
         this.aMenuItem964.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem957 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_LOG", "Log"));
+        (this.aMenuItem957 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
         this.aMenuItem957.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuView, 2);
-        (this.aMenuItem950 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
+        (this.aMenuItem950 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
         this.aMenuItem950.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem949 = new MenuItem(this.menuView, 8)).setText(emulator.UILocale.get("MENU_VIEW_HELP", "About"));
+        (this.aMenuItem949 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
         this.aMenuItem949.addSelectionListener((SelectionListener) this);
 
         menuItemView.setMenu(this.menuView);
         this.menuTool = new Menu(menuItemTool);
-        (this.zoomInMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_ZOOMIN", "Zoom In") + "\tPad+");
+        (this.zoomInMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMIN", "Zoom In") + "\tPad+");
         this.zoomInMenuItem.addSelectionListener((SelectionListener) this);
-        (this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tPad-");
+        (this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tPad-");
         this.zoomOutMenuItem.addSelectionListener((SelectionListener) this);
 
         final MenuItem interpolationMenuItem;
-        (interpolationMenuItem = new MenuItem(this.menuTool, 64)).setText(emulator.UILocale.get("MENU_TOOL_INTERPOSE", "Interpolation"));
+        (interpolationMenuItem = new MenuItem(this.menuTool, 64)).setText(UILocale.get("MENU_TOOL_INTERPOSE", "Interpolation"));
         this.menuInterpolation = new Menu((Decorations) this.shell, 4194308);
-        (this.interposeNearestMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(emulator.UILocale.get("MENU_TOOL_INTER_NEAREST", "NearestNeighbor"));
+        (this.interposeNearestMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(UILocale.get("MENU_TOOL_INTER_NEAREST", "NearestNeighbor"));
         this.interposeNearestMenuItem.setSelection(true);
         this.interposeNearestMenuItem.addSelectionListener((SelectionListener) new Class52(this));
-        (this.interposeLowMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(emulator.UILocale.get("MENU_TOOL_INTER_LOW", "LowQuality"));
+        (this.interposeLowMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(UILocale.get("MENU_TOOL_INTER_LOW", "LowQuality"));
         this.interposeLowMenuItem.addSelectionListener((SelectionListener) new Class55(this));
-        (this.interposeHightMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(emulator.UILocale.get("MENU_TOOL_INTER_HIGH", "HighQuality"));
+        (this.interposeHightMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(UILocale.get("MENU_TOOL_INTER_HIGH", "HighQuality"));
         this.interposeHightMenuItem.addSelectionListener((SelectionListener) new Class42(this));
         interpolationMenuItem.setMenu(this.menuInterpolation);
 
         MenuItem resizeMenuItem = new MenuItem(menuTool, 64);
-        resizeMenuItem.setText("Display mode");
+        resizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE", "Display mode"));
         menuResize = new Menu(this.shell, 4194308);
 
         centerOnScreenMenuItem = new MenuItem(menuResize, 16);
-        centerOnScreenMenuItem.setText("Center on screen");
+        centerOnScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_CENTER", "Center on screen"));
         centerOnScreenMenuItem.addSelectionListener(this);
 
         syncSizeMenuItem = new MenuItem(menuResize, 16);
-        syncSizeMenuItem.setText("Sync canvas size to screen size");
+        syncSizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_SYNC", "Sync canvas size to screen size"));
         syncSizeMenuItem.addSelectionListener(this);
 
         fillScreenMenuItem = new MenuItem(menuResize, 16);
-        fillScreenMenuItem.setText("Fill available space");
+        fillScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL", "Fill available space"));
         fillScreenMenuItem.addSelectionListener(this);
 
         new MenuItem(this.menuResize, 2);
 
         keepAspectRatioMenuItem = new MenuItem(menuResize, 32);
-        keepAspectRatioMenuItem.setText("Keep aspect ratio");
+        keepAspectRatioMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_KEEP_PROPORTIONS", "Keep aspect ratio"));
         keepAspectRatioMenuItem.addSelectionListener(this);
         keepAspectRatioMenuItem.setSelection(Settings.keepAspectRatio);
 
         integerScalingMenuItem = new MenuItem(menuResize, 32);
-        integerScalingMenuItem.setText("Integer scaling");
+        integerScalingMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_INTEGER", "Integer scaling"));
         integerScalingMenuItem.addSelectionListener(this);
         integerScalingMenuItem.setSelection(Settings.integerResize);
 
@@ -798,45 +798,45 @@ public final class EmulatorScreen implements
 
 
         new MenuItem(this.menuTool, 2);
-        (this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPEEDUP", "Speed Up") + "\tAlt+>");
+        (this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDUP", "Speed Up") + "\tAlt+>");
         this.speedUpMenuItem.addSelectionListener((SelectionListener) this);
-        (this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_SPEEDDOWN", "Slow Down") + "\tAlt+<");
+        (this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDDOWN", "Slow Down") + "\tAlt+<");
         this.slowDownMenuItem.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuTool, 2);
-        (this.recordKeysMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.get("MENU_TOOL_RECORD_KEY", "Record Keys"));
+        (this.recordKeysMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_RECORD_KEY", "Record Keys"));
         this.recordKeysMenuItem.addSelectionListener((SelectionListener) this);
         this.recordKeysMenuItem.setSelection(Settings.recordKeys);
         this.recordKeysMenuItem.setEnabled(!Settings.playingRecordedKeys);
-        (this.enableAutoplayMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.get("MENU_TOOL_AUTO_PLAY", "Enable Autoplay"));
+        (this.enableAutoplayMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_AUTO_PLAY", "Enable Autoplay"));
         this.enableAutoplayMenuItem.addSelectionListener((SelectionListener) this);
         this.enableAutoplayMenuItem.setSelection(Settings.playingRecordedKeys);
         this.enableAutoplayMenuItem.setEnabled(Settings.playingRecordedKeys);
         new MenuItem(this.menuTool, 2);
-        (this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tCtrl+C");
+        (this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tCtrl+C");
         this.captureToFileMenuItem.addSelectionListener((SelectionListener) this);
-        (this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+C");
+        (this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+C");
         this.captureToClipboardMenuItem.setAccelerator(65603);
         this.captureToClipboardMenuItem.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuTool, 2);
-        (this.startRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_START_RECORD_AVI", "Start Record AVI") + "\tCtrl+V");
+        (this.startRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_START_RECORD_AVI", "Start Record AVI") + "\tCtrl+V");
         this.startRecordAviMenuItem.addSelectionListener((SelectionListener) this);
-        (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(emulator.UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
+        (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
         this.stopRecordAviMenuItem.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuTool, 2);
-        (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(emulator.UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
+        (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
         this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
         this.showTrackInfoMenuItem.addSelectionListener((SelectionListener) this);
         this.showTrackInfoMenuItem.setAccelerator(16777228);
 
         this.fpsCounterMenuItem = new MenuItem(this.menuTool, 32);
-        this.fpsCounterMenuItem.setText(emulator.UILocale.get("MENU_TOOL_FPS_COUNT", "FPS Counter"));
+        this.fpsCounterMenuItem.setText(UILocale.get("MENU_TOOL_FPS_COUNT", "FPS Counter"));
         this.fpsCounterMenuItem.addSelectionListener(this);
         this.fpsCounterMenuItem.setSelection(Settings.fpsCounter);
 
         new MenuItem(this.menuTool, 2);
 
         this.canvasKeyboardMenuItem = new MenuItem(this.menuTool, 32);
-        canvasKeyboardMenuItem.setText(emulator.UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
+        canvasKeyboardMenuItem.setText(UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
         canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
         canvasKeyboardMenuItem.addSelectionListener((SelectionListener) this);
         this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
@@ -846,16 +846,16 @@ public final class EmulatorScreen implements
         fpsModeMenuItem.setAccelerator(SWT.ALT + 'F');
         menuItemTool.setMenu(this.menuTool);
         this.networkKillswitchMenuItem = new MenuItem(this.menuTool, 32);
-        networkKillswitchMenuItem.setText(emulator.UILocale.get("MENU_TOOL_DISABLE_NETWORK_ACCESS", "Disable network access"));
+        networkKillswitchMenuItem.setText(UILocale.get("MENU_TOOL_DISABLE_NETWORK_ACCESS", "Disable network access"));
         networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
         networkKillswitchMenuItem.addSelectionListener((SelectionListener) this);
         this.menuMidlet = new Menu(menuItemMidlet);
-        (this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar..."));
+        (this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar..."));
         this.loadJarMenuItem.addSelectionListener((SelectionListener) this);
-        (this.loadAutoPlayMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_LOAD_AUTO_PLAY", "Load auto-play record"));
+        (this.loadAutoPlayMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_LOAD_AUTO_PLAY", "Load auto-play record"));
         this.loadAutoPlayMenuItem.addSelectionListener((SelectionListener) this);
         final MenuItem menuItem5;
-        (menuItem5 = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.get("MENU_MIDLET_RECENTLY", "Recent jarfiles"));
+        (menuItem5 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_RECENTLY", "Recent jarfiles"));
         this.aMenu1018 = new Menu((Decorations) this.shell, 4194308);
         for (int n = 1; n < 5 && !Settings.recentJars[n].equals(""); ++n) {
             final String s;
@@ -890,11 +890,11 @@ public final class EmulatorScreen implements
         }
         menuItem5.setMenu(this.aMenu1018);
         new MenuItem(this.menuMidlet, 2);
-        (this.openJadMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_JAD", "Open JAD with Notepad") + "\tCtrl+D");
+        (this.openJadMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_JAD", "Open JAD with Notepad") + "\tCtrl+D");
         this.openJadMenuItem.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuMidlet, 2);
         final MenuItem menuItem7;
-        (menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.get("MENU_MIDLET_2DENGINE", "2D Graphics Engine"));
+        (menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_2DENGINE", "2D Graphics Engine"));
         this.menu2dEngine = new Menu((Decorations) this.shell, 4194308);
         (this.awt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("AWT-Graphics");
         this.awt2dMenuItem.setSelection(Settings.g2d == 1);
@@ -905,7 +905,7 @@ public final class EmulatorScreen implements
         menuItem7.setMenu(this.menu2dEngine);
 
         final MenuItem engine3dGroup;
-        (engine3dGroup = new MenuItem(this.menuMidlet, 64)).setText(emulator.UILocale.get("MENU_MIDLET_3DENGINE", "3D Graphics Engine"));
+        (engine3dGroup = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_3DENGINE", "3D Graphics Engine"));
         engine3dGroup.setMenu(this.menu3dEngine = new Menu((Decorations)this.shell, 4194308));
         (this.lwj3dMenuItem = new MenuItem(this.menu3dEngine, 16)).setText("LWJGL");
         this.lwj3dMenuItem.setSelection(Settings.g3d == 1);
@@ -916,20 +916,20 @@ public final class EmulatorScreen implements
         engine3dGroup.setMenu(this.menu3dEngine);
 
         new MenuItem(this.menuMidlet, 2);
-        (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_SUSPEND", "Suspend") + "\tCtrl+S");
+        (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_SUSPEND", "Suspend") + "\tCtrl+S");
         this.suspendMenuItem.addSelectionListener((SelectionListener) this);
-        (this.resumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_RESUME", "Resume") + "\tCtrl+E");
+        (this.resumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_RESUME", "Resume") + "\tCtrl+E");
         this.resumeMenuItem.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuMidlet, 2);
-        (this.pausestepMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_PAUSE_STEP", "Pause/Step") + "\tCtrl+T");
+        (this.pausestepMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_PAUSE_STEP", "Pause/Step") + "\tCtrl+T");
         this.pausestepMenuItem.addSelectionListener((SelectionListener) this);
-        (this.playResumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_PLAY_RESUME", "Play/Resume") + "\tCtrl+R");
+        (this.playResumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_PLAY_RESUME", "Play/Resume") + "\tCtrl+R");
         this.playResumeMenuItem.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuMidlet, 2);
-        (this.restartMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_RESTART", "Restart") + "\tAlt+R");
+        (this.restartMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_RESTART", "Restart") + "\tAlt+R");
         this.restartMenuItem.setAccelerator(65618);
         this.restartMenuItem.addSelectionListener((SelectionListener) this);
-        (this.exitMenuItem = new MenuItem(this.menuMidlet, 8)).setText(emulator.UILocale.get("MENU_MIDLET_EXIT", "Exit") + "\tESC");
+        (this.exitMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_EXIT", "Exit") + "\tESC");
         this.exitMenuItem.setAccelerator(27);
         this.exitMenuItem.addSelectionListener((SelectionListener) this);
         menuItemMidlet.setMenu(this.menuMidlet);
@@ -1026,7 +1026,7 @@ public final class EmulatorScreen implements
                         file2.mkdir();
                     }
                     final FileDialog fileDialog;
-                    ((Dialog) (fileDialog = new FileDialog(this.shell, 8192))).setText(emulator.UILocale.get("SAVE_TO_FILE", "Save to file"));
+                    ((Dialog) (fileDialog = new FileDialog(this.shell, 8192))).setText(UILocale.get("SAVE_TO_FILE", "Save to file"));
                     fileDialog.setFilterPath(string2);
                     fileDialog.setFilterExtensions(new String[]{"*.avi", "*.*"});
                     fileDialog.setFileName(EmulatorScreen.aString993 + EmulatorScreen.captureFileCounter + ".avi");
@@ -1124,7 +1124,7 @@ public final class EmulatorScreen implements
             } else if (menuItem.equals(this.loadJarMenuItem) /*|| (equals = menuItem.equals(this.loadWithConsoleMenuItem))*/) {
                 pauseStep();
                 final FileDialog fileDialog2;
-                ((Dialog) (fileDialog2 = new FileDialog(this.shell, 4096))).setText(emulator.UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
+                ((Dialog) (fileDialog2 = new FileDialog(this.shell, 4096))).setText(UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
                 fileDialog2.setFilterExtensions(new String[]{"*.jar;*.jad", "*.*"});
                 final String open2;
                 if ((open2 = fileDialog2.open()) != null) {
@@ -1135,7 +1135,7 @@ public final class EmulatorScreen implements
             } else if (menuItem.equals(this.loadAutoPlayMenuItem)) {
                 pauseStep();
                 final FileDialog fileDialog3;
-                ((Dialog) (fileDialog3 = new FileDialog(this.shell, 4096))).setText(emulator.UILocale.get("OPEN_REC_FILE", "Open a record file"));
+                ((Dialog) (fileDialog3 = new FileDialog(this.shell, 4096))).setText(UILocale.get("OPEN_REC_FILE", "Open a record file"));
                 fileDialog3.setFilterPath(Emulator.getAbsolutePath());
                 fileDialog3.setFilterExtensions(new String[]{"*.rec", "*.*"});
                 Label_1321:
@@ -1145,7 +1145,7 @@ public final class EmulatorScreen implements
                         Emulator.getRobot();
                         String s;
                         if ((s = KeyRecords.method701(open3)) == null || !new File(s).exists()) {
-                            ((Dialog) fileDialog3).setText(emulator.UILocale.get("LINK_JAR_FILE", "Specify a jar file"));
+                            ((Dialog) fileDialog3).setText(UILocale.get("LINK_JAR_FILE", "Specify a jar file"));
                             fileDialog3.setFileName("");
                             fileDialog3.setFilterExtensions(new String[]{"*.jar", "*.*"});
                             if ((s = fileDialog3.open()) == null) {
@@ -1428,7 +1428,7 @@ public final class EmulatorScreen implements
         final int n5 = (rgb = this.getScreenImg().getRGB(n3, n4)) >> 16 & 0xFF;
         final int n6 = rgb >> 8 & 0xFF;
         final int n7 = rgb & 0xFF;
-        this.aString1008 = emulator.UILocale.get("INFO_FRAME_POS", "Pos") + "(" + n3 + "," + n4 + ")\n" + emulator.UILocale.get("INFO_FRAME_COLOR", "Color") + "(";
+        this.aString1008 = UILocale.get("INFO_FRAME_POS", "Pos") + "(" + n3 + "," + n4 + ")\n" + UILocale.get("INFO_FRAME_COLOR", "Color") + "(";
         EmulatorScreen class93;
         StringBuffer sb2;
         if (Settings.infoColorHex) {
@@ -1447,7 +1447,7 @@ public final class EmulatorScreen implements
         arrayOfFloat[3] = mouseYRelease;
         this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
         this.aString1008 = this.aString1008 + ")\n" +
-                emulator.UILocale.get("INFO_FRAME_RECT", "R")
+                UILocale.get("INFO_FRAME_RECT", "R")
 
                 + "(" + (int) (arrayOfFloat[0] / zoom) + "," +
                 (int) (arrayOfFloat[1] / zoom) + "," + (int) ((arrayOfFloat[2] - arrayOfFloat[0]) / zoom) +
