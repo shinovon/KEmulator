@@ -94,7 +94,7 @@ public final class Emulator3D implements IGraphics3D {
         return instance;
     }
 
-    private static PixelFormat method500() {
+    private static PixelFormat pixelFormat() {
         if (pixelFormat == null) {
             int var0 = 4;
             int var1 = Emulator.getEmulator().getScreenDepth();
@@ -116,22 +116,22 @@ public final class Emulator3D implements IGraphics3D {
         return pixelFormat;
     }
 
-    public final void bindTarget(Object var1) {
+    public final void bindTarget(Object target) {
         if(exiting) {
             throw new IllegalStateException("exiting");
         }
         int w;
         int h;
-        if (var1 instanceof Graphics) {
-            this.target = var1;
+        if (target instanceof Graphics) {
+            this.target = target;
             w = ((Graphics) this.target).getImage().getWidth();
             h = ((Graphics) this.target).getImage().getHeight();
         } else {
-            if (!(var1 instanceof Image2D)) {
+            if (!(target instanceof Image2D)) {
                 throw new IllegalArgumentException();
             }
 
-            this.target = var1;
+            this.target = target;
             w = ((Image2D) this.target).getWidth();
             h = ((Image2D) this.target).getHeight();
         }
@@ -139,15 +139,13 @@ public final class Emulator3D implements IGraphics3D {
         try {
             try {
                 String s = w + "x" + h;
-//                pbufferContext = (Pbuffer) contexts.get(var4);
                 if(contextRes != null && !contextRes.equals(s)) {
                     releaseTextures();
                     exiting = false;
                     pbufferContext = null;
                 }
                 if (pbufferContext == null) {
-                    pbufferContext = new Pbuffer(w, h, method500(), (RenderTexture) null, (Drawable) null);
-//                    contexts.put(var4, pbufferContext);
+                    pbufferContext = new Pbuffer(w, h, pixelFormat(), (RenderTexture) null, (Drawable) null);
                     contextRes = s;
                 }
 

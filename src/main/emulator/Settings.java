@@ -71,6 +71,7 @@ public final class Settings {
     public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill
     public static boolean keepAspectRatio = true;
     public static boolean integerResize = false;
+    public static boolean ignoreM3GOverwrite;
 
     public Settings() {
         super();

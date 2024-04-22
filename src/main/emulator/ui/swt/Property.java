@@ -187,6 +187,7 @@ public final class Property implements IProperty {
     private Composite keyMapTabComp;
     private Button softkeyMotFixCheck;
     private Button synchronizeKeyEventsCheck;
+    private Button ignoreM3GOverwriteCheck;
 //    private Button pollOnRepaintBtn;
 
     public Property() {
@@ -561,6 +562,7 @@ public final class Property implements IProperty {
             EmulatorScreen.sizeW = Integer.valueOf(properties.getProperty("SizeW", "-1"));
             EmulatorScreen.sizeH = Integer.valueOf(properties.getProperty("SizeH", "-1"));
             EmulatorScreen.maximized = Boolean.valueOf(properties.getProperty("Maximized", "false"));
+            Settings.ignoreM3GOverwrite = Boolean.valueOf(properties.getProperty("IgnoreM3GOverwrite", "false"));
             fileInputStream.close();
         } catch (Exception ex) {
             if (!(ex instanceof FileNotFoundException)) {
@@ -698,6 +700,7 @@ public final class Property implements IProperty {
             properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
             properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
             properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
+            properties.setProperty("IgnoreM3GOverwrite", String.valueOf(Settings.ignoreM3GOverwrite));
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         } catch (Exception ex) {
@@ -789,6 +792,7 @@ public final class Property implements IProperty {
 //        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
         Settings.vlcDir = vlcDirText.getText().trim();
         Settings.locale = localeText.getText().trim();
+        Settings.ignoreM3GOverwrite = ignoreM3GOverwriteCheck.getSelection();
         this.updateProxy();
     }
 
@@ -1574,9 +1578,14 @@ public final class Property implements IProperty {
         (this.synchronizeKeyEventsCheck = new Button((Composite) this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
         ((Control) this.synchronizeKeyEventsCheck).setLayoutData((Object) gridData);
         this.synchronizeKeyEventsCheck.setSelection(Settings.synchronizeKeyEvents);
+
         (this.softkeyMotFixCheck = new Button((Composite) this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
         ((Control) this.softkeyMotFixCheck).setLayoutData((Object) gridData);
         this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
+
+        (this.ignoreM3GOverwriteCheck = new Button((Composite) this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_IGNORE_M3G_OVERWRITE", "Ignore M3G overwrite hint"));
+        ((Control) this.ignoreM3GOverwriteCheck).setLayoutData((Object) gridData);
+        this.ignoreM3GOverwriteCheck.setSelection(Settings.ignoreM3GOverwrite);
     }
 
     private void setupMediaComp() {

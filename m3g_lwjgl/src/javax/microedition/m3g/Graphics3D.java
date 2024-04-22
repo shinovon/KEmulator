@@ -1,6 +1,7 @@
 package javax.microedition.m3g;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.graphics3D.IGraphics3D;
 import emulator.graphics3D.lwjgl.Emulator3D;
 import emulator.graphics3D.m3g.LightsCache;
@@ -58,7 +59,7 @@ public class Graphics3D {
             throw new IllegalArgumentException();
         }
 
-        boolean overwrite = false;//Inquisitors Torments fix //(hints & OVERWRITE) != 0;
+        boolean overwrite = !Settings.ignoreM3GOverwrite && (hints & OVERWRITE) != 0;
 
         Background bck = new Background();
         bck.setColorClearEnable(!overwrite);
