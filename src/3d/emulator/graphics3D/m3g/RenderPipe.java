@@ -138,7 +138,6 @@ public final class RenderPipe {
     }
 
     private void insertNodeInList(RenderObject ro) {
-
         int index;
 
         for (index = 0; index < roList.size(); index++) {

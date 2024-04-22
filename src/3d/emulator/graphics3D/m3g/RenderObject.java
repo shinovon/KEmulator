@@ -26,10 +26,10 @@ public final class RenderObject {
     }
 
     private int getSortKey(Appearance ap) {
-        int sortKey = ap.getLayer();
+        int sortKey = ap.getLayer() * 2;
 
         if (ap.getCompositingMode() != null && ap.getCompositingMode().getBlending() != CompositingMode.REPLACE) {
-            sortKey += 127;
+            sortKey++;
         }
 
         return sortKey;
