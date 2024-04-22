@@ -162,7 +162,7 @@ public final class EmulatorScreen implements
     private int screenY;
     private int screenWidth;
     private int screenHeight;
-    private boolean pointerWasPressed;
+    private boolean pointerState;
 
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -1882,10 +1882,10 @@ public final class EmulatorScreen implements
                 return;
             }
             int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
-            if(i[0] < 0 || i[1] < 0 || i[0] > getWidth() || i[1] > getHeight()) {
+            if(i[0] < 0 || i[1] < 0 || i[0] >= getWidth() || i[1] >= getHeight()) {
                 return;
             }
-            pointerWasPressed = true;
+            pointerState = true;
             Emulator.getEventQueue().mouseDown(i[0], i[1]);
             if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getScreen()) {
                 this.caret.mouseDown(i[0], i[1]);
@@ -1929,7 +1929,8 @@ public final class EmulatorScreen implements
                     mr(KeyMapping.getArrowKeyFromDevice(8));
                 return;
             }
-            if(!pointerWasPressed) return;
+            if(!pointerState) return;
+            pointerState = false;
             int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
             Emulator.getEventQueue().mouseUp(i[0], i[1]);
         }
@@ -2077,9 +2078,9 @@ public final class EmulatorScreen implements
             this.canvas.getShell().setCursor(cursor);
             mset = false;
         }
-        if ((mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
+        if (pointerState && (mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
             int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
-            if(i[0] < 0 || i[1] < 0 || i[0] > getWidth() || i[1] > getHeight()) {
+            if(i[0] < 0 || i[1] < 0 || i[0] >= getWidth() || i[1] >= getHeight()) {
                 return;
             }
             Emulator.getEventQueue().mouseDrag(i[0], i[1]);
