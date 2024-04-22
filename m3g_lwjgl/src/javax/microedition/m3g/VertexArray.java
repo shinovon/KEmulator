@@ -169,6 +169,5 @@ public class VertexArray extends Object3D {
                 this.byteValues[i] = (byte) G3DUtils.limit(G3DUtils.round(val), 0, 255);
             }
         }
-
     }
 }
