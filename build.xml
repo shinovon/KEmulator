@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="KEmulator" default="asd" basedir=".">
+    <available file=".git" type="dir" property="git.present"/>
+
+    <target name="asd" if="git.present">
+        <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+            <arg value="describe"/>
+            <arg value="--tags"/>
+            <arg value="--always"/>
+            <arg value="HEAD"/>
+        </exec>
+        <condition property="repository.version" value="${git.revision}" else="unknown">
+            <and>
+                <isset property="git.revision"/>
+                <length string="${git.revision}" trim="yes" length="0" when="greater"/>
+            </and>
+        </condition>
+        <manifest file="./src/res/META-INF/version.mf">
+            <attribute name="Git-Revision" value="${git.revision}"/>
+        </manifest>
+    </target>
+</project>

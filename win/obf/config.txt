@@ -1,4 +1,4 @@
--injars '.\..\KEmulator.jar'
+-injars '.\..\..\home\KEmulator.jar'
 -outjars '.\KEmulator.jar'
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'

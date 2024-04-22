@@ -1,6 +1,12 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="KEmulator_win">
-    <output-path>$PROJECT_DIR$/win</output-path>
+    <output-path>$PROJECT_DIR$/home</output-path>
+    <properties id="ant-preprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/build.xml</file>
+        <target>asd</target>
+      </options>
+    </properties>
     <root id="archive" name="KEmulator.jar">
       <element id="module-output" name="KEmulator_win" />
       <element id="module-output" name="KEmulator_base" />

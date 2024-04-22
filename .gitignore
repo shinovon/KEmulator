@@ -48,3 +48,5 @@ plugins
 config_fast.txt
 home/classwatcher.txt
 m3g_*.jar
+home/KEmulator_x64.jar
+src/res/META-INF/version.mf

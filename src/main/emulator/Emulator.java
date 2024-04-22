@@ -6,6 +6,7 @@ import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Display;
@@ -32,7 +33,8 @@ import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator {
-    public static final String version = "m3g2";
+    public static boolean debugBuild = true;
+    public static String version = "m3g2";
     public static final int numericVersion = 15;
 
     static EmulatorImpl emulatorimpl;
@@ -259,7 +261,7 @@ public class Emulator {
     }
 
     public static String getInfoString() {
-        return platform.getInfoString("v" + version);
+        return platform.getInfoString((version.startsWith("2.") ? "v" : "") + version);
     }
 
     public static String getAboutString() {
@@ -627,6 +629,23 @@ public class Emulator {
         } catch (Exception e) {
             System.out.println("Platform class not found");
             return;
+        }
+        try {
+            if(debugBuild) {
+                Manifest versionManifest = new Manifest(Emulator.class.getResourceAsStream("/META-INF/version.mf"));
+                final Attributes mainAttributes = versionManifest.getMainAttributes();
+                for (Map.Entry entry : mainAttributes.entrySet()) {
+                    if(entry.getKey().toString().equals("Git-Revision")) {
+                        String s = entry.getValue().toString();
+                        if(s.length() > 0)
+                            version = version + " " + s;
+                        System.out.println(version);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         String arch = System.getProperty("os.arch");
         if (!platform.isX64() && !arch.equals("x86")) {
