@@ -6,18 +6,20 @@ public class VertexArray extends Object3D {
     private int componentType;
     private int vertexCount;
     private int componentCount;
+
     private byte[] byteValues;
     private short[] shortValues;
 
-    public VertexArray(int var1, int var2, int var3) {
-        if ((var1 >= 1 || var1 <= '\uffff') && (var2 >= 2 || var2 <= 4) && (var3 >= 1 || var3 <= 2)) {
-            this.vertexCount = var1;
-            this.componentCount = var2;
-            this.componentType = var3;
-            if (this.componentType == 1) {
-                this.byteValues = new byte[var1 * var2];
+    public VertexArray(int numVertices, int numComponents, int componentSize) {
+        if ((numVertices >= 1 && numVertices <= 65535) && (numComponents >= 2 || numComponents <= 4) && (componentSize >= 1 || componentSize <= 2)) {
+            vertexCount = numVertices;
+            componentCount = numComponents;
+            componentType = componentSize;
+
+            if (componentType == 1) {
+                byteValues = new byte[numVertices * numComponents];
             } else {
-                this.shortValues = new short[var1 * var2];
+                shortValues = new short[numVertices * numComponents];
             }
         } else {
             throw new IllegalArgumentException();
@@ -25,150 +27,146 @@ public class VertexArray extends Object3D {
     }
 
     protected Object3D duplicateObject() {
-        VertexArray var1 = (VertexArray) super.duplicateObject();
-        if (this.componentType == 1) {
-            var1.byteValues = (byte[]) this.byteValues.clone();
+        VertexArray clone = (VertexArray) super.duplicateObject();
+
+        if (componentType == 1) {
+            clone.byteValues = (byte[]) byteValues.clone();
         } else {
-            var1.shortValues = (short[]) this.shortValues.clone();
+            clone.shortValues = (short[]) shortValues.clone();
         }
 
-        return var1;
+        return clone;
     }
 
-    public void set(int var1, int var2, short[] var3) {
-        if (var3 == null) {
+    public void set(int firstVertex, int numVertices, short[] values) {
+        if (values == null) {
             throw new NullPointerException();
-        } else if (this.componentType == 2 && var2 >= 0 && var3.length >= var2 * this.componentCount) {
-            if (var1 >= 0 && var1 + var2 <= this.vertexCount) {
-                System.arraycopy(var3, 0, this.shortValues, var1 * this.componentCount, var2 * this.componentCount);
-            } else {
-                throw new IndexOutOfBoundsException();
-            }
-        } else {
+        } else if (componentType != 2) {
+            throw new IllegalStateException();
+        } else if (numVertices < 0 || values.length < numVertices * componentCount) {
             throw new IllegalArgumentException();
+        } else if (firstVertex < 0 || firstVertex + numVertices > vertexCount) {
+            throw new IndexOutOfBoundsException();
         }
+
+        System.arraycopy(values, 0, shortValues, firstVertex * componentCount, numVertices * componentCount);
     }
 
-    public void set(int var1, int var2, byte[] var3) {
-        if (var3 == null) {
+    public void set(int firstVertex, int numVertices, byte[] values) {
+        if (values == null) {
             throw new NullPointerException();
-        } else if (this.componentType == 1 && var2 >= 0 && var3.length >= var2 * this.componentCount) {
-            if (var1 >= 0 && var1 + var2 <= this.vertexCount) {
-                System.arraycopy(var3, 0, this.byteValues, var1 * this.componentCount, var2 * this.componentCount);
-            } else {
-                throw new IndexOutOfBoundsException();
-            }
-        } else {
+        } else if (componentType != 1) {
+            throw new IllegalStateException();
+        } else if (numVertices < 0 || values.length < numVertices * componentCount) {
             throw new IllegalArgumentException();
+        } else if (firstVertex < 0 || firstVertex + numVertices > vertexCount) {
+            throw new IndexOutOfBoundsException();
         }
+
+        System.arraycopy(values, 0, byteValues, firstVertex * componentCount, numVertices * componentCount);
     }
 
     public int getVertexCount() {
-        return this.vertexCount;
+        return vertexCount;
     }
 
     public int getComponentCount() {
-        return this.componentCount;
+        return componentCount;
     }
 
     public int getComponentType() {
-        return this.componentType;
+        return componentType;
     }
 
-    public void get(int var1, int var2, short[] var3) {
-        if (var3 == null) {
+    public void get(int firstVertex, int numVertices, short[] values) {
+        if (values == null) {
             throw new NullPointerException();
-        } else if (this.componentType == 2 && var2 >= 0 && var3.length >= var2 * this.componentCount) {
-            if (var1 >= 0 && var1 + var2 <= this.vertexCount) {
-                System.arraycopy(this.shortValues, var1 * this.componentCount, var3, 0, var2 * this.componentCount);
-            } else {
-                throw new IndexOutOfBoundsException();
-            }
-        } else {
+        } else if (componentType != 2) {
+            throw new IllegalStateException();
+        } else if (numVertices < 0 || values.length < numVertices * componentCount) {
             throw new IllegalArgumentException();
+        } else if (firstVertex < 0 || firstVertex + numVertices > vertexCount) {
+            throw new IndexOutOfBoundsException();
         }
+
+        System.arraycopy(shortValues, firstVertex * componentCount, values, 0, numVertices * componentCount);
     }
 
-    public void get(int var1, int var2, byte[] var3) {
-        if (var3 == null) {
+    public void get(int firstVertex, int numVertices, byte[] values) {
+        if (values == null) {
             throw new NullPointerException();
-        } else if (this.componentType == 1 && var2 >= 0 && var3.length >= var2 * this.componentCount) {
-            if (var1 >= 0 && var1 + var2 <= this.vertexCount) {
-                System.arraycopy(this.byteValues, var1 * this.componentCount, var3, 0, var2 * this.componentCount);
-            } else {
-                throw new IndexOutOfBoundsException();
-            }
-        } else {
+        } else if (componentType != 1) {
+            throw new IllegalStateException();
+        } else if (numVertices < 0 || values.length < numVertices * componentCount) {
             throw new IllegalArgumentException();
+        } else if (firstVertex < 0 || firstVertex + numVertices > vertexCount) {
+            throw new IndexOutOfBoundsException();
         }
+
+        System.arraycopy(byteValues, firstVertex * componentCount, values, 0, numVertices * componentCount);
     }
 
     public byte[] getByteValues() {
-        return this.byteValues;
+        return byteValues;
     }
 
     public short[] getShortValues() {
-        return this.shortValues;
+        return shortValues;
     }
 
-    private boolean equals_(VertexArray var1) {
-        return var1 != null && this.componentType == var1.componentType && this.componentCount == var1.componentCount && this.vertexCount == var1.vertexCount;
+    private boolean equals_(VertexArray va) {
+        return va != null && componentType == va.componentType && componentCount == va.componentCount && vertexCount == va.vertexCount;
     }
 
-    public void morph(VertexArray[] var1, VertexArray var2, float[] var3, float var4) {
-        int var5;
-        for (var5 = 0; var5 < var1.length; ++var5) {
-            if (!this.equals_(var1[var5])) {
+    public void morph(VertexArray[] targets, VertexArray base, float[] weights, float baseWeight) {
+        for (int i = 0; i < targets.length; i++) {
+            if (!equals_(targets[i])) {
                 throw new IllegalStateException();
             }
         }
 
-        float var6;
-        int var7;
         if (this.componentType == 1) {
-            for (var5 = 0; var5 < this.byteValues.length; ++var5) {
-                var6 = 0.0F;
+            for (int i = 0; i < byteValues.length; i++) {
+                float val = 0;
 
-                for (var7 = 0; var7 < var1.length; ++var7) {
-                    var6 += (float) var1[var7].byteValues[var5] * var3[var7];
+                for (int t = 0; t < targets.length; t++) {
+                    val += targets[t].byteValues[i] * weights[t];
                 }
 
-                var6 += (float) var2.byteValues[var5] * var4;
-                this.byteValues[var5] = (byte) G3DUtils.round(var6);
+                val += base.byteValues[i] * baseWeight;
+                byteValues[i] = (byte) G3DUtils.round(val);
             }
         } else {
-            for (var5 = 0; var5 < this.shortValues.length; ++var5) {
-                var6 = 0.0F;
+            for (int i = 0; i < shortValues.length; i++) {
+                float val = 0;
 
-                for (var7 = 0; var7 < var1.length; ++var7) {
-                    var6 += (float) var1[var7].shortValues[var5] * var3[var7];
+                for (int t = 0; t < targets.length; t++) {
+                    val += targets[t].shortValues[i] * weights[t];
                 }
 
-                var6 += (float) var2.shortValues[var5] * var4;
-                this.shortValues[var5] = (short) G3DUtils.round(var6);
+                val += base.shortValues[i] * baseWeight;
+                shortValues[i] = (short) G3DUtils.round(val);
             }
         }
-
     }
 
-    public void morphColors(VertexArray[] var1, VertexArray var2, float[] var3, float var4) {
-        int var5;
-        for (var5 = 0; var5 < var1.length; ++var5) {
-            if (!this.equals_(var1[var5])) {
+    public void morphColors(VertexArray[] targets, VertexArray base, float[] weights, float baseWeight) {
+        for (int i = 0; i < targets.length; i++) {
+            if (!equals_(targets[i])) {
                 throw new IllegalStateException();
             }
         }
 
-        if (this.componentType == 1) {
-            for (var5 = 0; var5 < this.byteValues.length; ++var5) {
-                float var6 = 0.0F;
+        if (componentType == 1) {
+            for (int i = 0; i < byteValues.length; i++) {
+                float val = 0;
 
-                for (int var7 = 0; var7 < var1.length; ++var7) {
-                    var6 += (float) ((short) var1[var7].byteValues[var5] & 255) * var3[var7];
+                for (int t = 0; t < targets.length; t++) {
+                    val += (targets[t].byteValues[i] & 255) * weights[t];
                 }
 
-                var6 += (float) (var2.byteValues[var5] & 255) * var4;
-                this.byteValues[var5] = (byte) G3DUtils.limit((int) (var6 + 0.5F), 0, 255);
+                val += (base.byteValues[i] & 255) * baseWeight;
+                this.byteValues[i] = (byte) G3DUtils.limit(G3DUtils.round(val), 0, 255);
             }
         }
 
