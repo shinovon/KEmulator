@@ -16,20 +16,20 @@ public class Graphics3D {
     public static final int DITHER = 4;
     public static final int OVERWRITE = 16;
     public static final int TRUE_COLOR = 8;
+
     private static Object target = null;
     private static IGraphics3D impl;
     private static Graphics3D inst = new Graphics3D();
-    private int viewportX;
-    private int viewportY;
-    private int viewportWidth;
-    private int viewportHeight;
-    private float depthRangeNear;
-    private float depthRangeFar;
+
+    private int viewportX, viewportY;
+    private int viewportWidth, viewportHeight;
+
+    private float depthRangeNear, depthRangeFar;
 
     private Graphics3D() {
         impl = Emulator.getGraphics3D();
-        this.depthRangeNear = 0.0F;
-        this.depthRangeFar = 1.0F;
+        depthRangeNear = 0.0F;
+        depthRangeFar = 1.0F;
     }
 
     public static final Graphics3D getInstance() {
@@ -44,8 +44,8 @@ public class Graphics3D {
         return impl.getProperties();
     }
 
-    public void bindTarget(Object var1) {
-        this.bindTarget(var1, true, 0);
+    public void bindTarget(Object target) {
+        this.bindTarget(target, true, 0);
     }
 
     public void bindTarget(Object target, boolean depthBuffer, int hints) {
@@ -136,13 +136,13 @@ public class Graphics3D {
         return impl.isDepthBufferEnabled();
     }
 
-    public void setViewport(int var1, int var2, int var3, int var4) {
-        if (var3 > 0 && var4 > 0 && var3 <= Emulator3D.MaxViewportWidth && var4 <= Emulator3D.MaxViewportHeight) {
-            this.viewportX = var1;
-            this.viewportY = var2;
-            this.viewportWidth = var3;
-            this.viewportHeight = var4;
-            impl.setViewport(var1, var2, var3, var4);
+    public void setViewport(int x, int y, int width, int height) {
+        if (width > 0 && height > 0 && width <= Emulator3D.MaxViewportWidth && height <= Emulator3D.MaxViewportHeight) {
+            viewportX = x;
+            viewportY = y;
+            viewportWidth = width;
+            viewportHeight = height;
+            impl.setViewport(x, y, width, height);
         } else {
             throw new IllegalArgumentException();
         }
@@ -164,58 +164,58 @@ public class Graphics3D {
         return this.viewportHeight;
     }
 
-    public void setDepthRange(float var1, float var2) {
-        if (var1 >= 0.0F && var1 <= 1.0F && var2 >= 0.0F && var2 <= 1.0F) {
-            this.depthRangeNear = var1;
-            this.depthRangeFar = var2;
-            impl.setDepthRange(var1, var2);
+    public void setDepthRange(float near, float far) {
+        if (near >= 0.0F && near <= 1.0F && far >= 0.0F && far <= 1.0F) {
+            depthRangeNear = near;
+            depthRangeFar = far;
+            impl.setDepthRange(near, far);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
     public float getDepthRangeNear() {
-        return this.depthRangeNear;
+        return depthRangeNear;
     }
 
     public float getDepthRangeFar() {
-        return this.depthRangeFar;
+        return depthRangeFar;
     }
 
-    public void clear(Background var1) {
+    public void clear(Background background) {
         if (target == null) {
             throw new IllegalStateException();
         } else {
-            impl.clearBackgound(var1);
+            impl.clearBackgound(background);
         }
     }
 
-    public void render(World var1) {
-        if (var1 == null) {
+    public void render(World world) {
+        if (world == null) {
             throw new NullPointerException();
-        } else if (target != null && var1.getActiveCamera() != null && var1.getActiveCamera().isDescendantOf(var1)) {
-            impl.render(var1);
+        } else if (target != null && world.getActiveCamera() != null && world.getActiveCamera().isDescendantOf(world)) {
+            impl.render(world);
         } else {
             throw new IllegalStateException();
         }
     }
 
-    public void render(Node var1, Transform var2) {
-        if (var1 == null) {
+    public void render(Node node, Transform transform) {
+        if (node == null) {
             throw new NullPointerException();
-        } else if (!(var1 instanceof Sprite3D) && !(var1 instanceof Mesh) && !(var1 instanceof Group)) {
+        } else if (!(node instanceof Sprite3D) && !(node instanceof Mesh) && !(node instanceof Group)) {
             throw new IllegalArgumentException();
         } else if (target != null && CameraCache.camera != null) {
-            impl.render(var1, var2);
+            impl.render(node, transform);
         } else {
             throw new IllegalStateException();
         }
     }
 
-    public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5) {
-        if (var1 != null && var2 != null && var3 != null) {
+    public void render(VertexBuffer vertices, IndexBuffer triangles, Appearance appearance, Transform transform, int scope) {
+        if (vertices != null && triangles != null && appearance != null) {
             if (target != null && CameraCache.camera != null) {
-                impl.render(var1, var2, var3, var4, var5);
+                impl.render(vertices, triangles, appearance, transform, scope);
             } else {
                 throw new IllegalStateException();
             }
@@ -224,24 +224,24 @@ public class Graphics3D {
         }
     }
 
-    public void render(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4) {
-        this.render(var1, var2, var3, var4, -1);
+    public void render(VertexBuffer vertices, IndexBuffer triangles, Appearance appearance, Transform transform) {
+        this.render(vertices, triangles, appearance, transform, -1);
     }
 
-    public void setCamera(Camera var1, Transform var2) {
-        CameraCache.setCamera(var1, var2);
+    public void setCamera(Camera camera, Transform transform) {
+        CameraCache.setCamera(camera, transform);
     }
 
-    public Camera getCamera(Transform var1) {
-        return CameraCache.getCamera(var1);
+    public Camera getCamera(Transform transform) {
+        return CameraCache.getCamera(transform);
     }
 
-    public int addLight(Light var1, Transform var2) {
-        return LightsCache.addLight(var1, var2);
+    public int addLight(Light light, Transform transform) {
+        return LightsCache.addLight(light, transform);
     }
 
-    public void setLight(int var1, Light var2, Transform var3) {
-        LightsCache.setLight(var1, var2, var3);
+    public void setLight(int index, Light light, Transform transform) {
+        LightsCache.setLight(index, light, transform);
     }
 
     public void resetLights() {
@@ -252,7 +252,7 @@ public class Graphics3D {
         return LightsCache.getLightCount();
     }
 
-    public Light getLight(int var1, Transform var2) {
-        return LightsCache.getLight(var1, var2);
+    public Light getLight(int index, Transform transform) {
+        return LightsCache.getLight(index, transform);
     }
 }
