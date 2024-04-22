@@ -447,7 +447,6 @@ public final class EmulatorScreen implements
         this.zoomedHeight = (int) ((float) this.getHeight() * this.zoom);
         rotate90degrees(true);
         Settings.canvasScale = (int) (this.zoom * 100.0F);
-        this.caret.setWindowZoom(this.zoom);
         this.canvas.redraw();
         this.updateStatus();
     }
@@ -1807,7 +1806,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    private int[] transformPointer(int x, int y)  {
+    int[] transformPointer(int x, int y)  {
         int w, h;
         if(rotation % 2 == 1) {
             w = getHeight();
@@ -2175,6 +2174,9 @@ public final class EmulatorScreen implements
     private void resized() {
         if(getScreenImg() == null) return;
         Rectangle size = canvas.getClientArea();
+        int origWidth = getWidth();
+        int origHeight = getHeight();
+
         if (this.paintTransform == null) {
             this.paintTransform = new Transform(null);
         }
@@ -2195,7 +2197,7 @@ public final class EmulatorScreen implements
                 this.paintTransform.translate(0.0F, size.height);
                 this.paintTransform.rotate(270.0F);
         }
-        this.caret.a(this.paintTransform, this.rotation);
+        caret.a(this.paintTransform, this.rotation);
         if(Settings.resizeMode > 0) {
             synchronized (this) {
                 if (Settings.resizeMode == 1) {
@@ -2208,8 +2210,6 @@ public final class EmulatorScreen implements
                         Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
                     }
                 } else if(Settings.integerResize) {
-                    int origWidth = getWidth();
-                    int origHeight = getHeight();
                     float f = Math.min((float) size.width / (float) origWidth, (float) size.height / (float) origHeight);
                     f = (int) (f - (f % 1));
                     if(f < 1) f = 1;
@@ -2229,6 +2229,7 @@ public final class EmulatorScreen implements
             zoomedHeight = (int) (getHeight() * zoom);
         }
         canvas.redraw();
+        caret.setWindowZoom((float) screenHeight / (float) origHeight);
     }
 
     public final void startVibra(final long aLong1013) {

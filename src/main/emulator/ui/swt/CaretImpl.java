@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.ui.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Canvas;
@@ -45,13 +46,8 @@ public final class CaretImpl implements ICaret {
     public final void setCaretLocation(final int x, final int y) {
         this.caretLocX = x;
         this.caretLocY = y;
-        float[] arrayOfFloat;
-        (arrayOfFloat = new float[2])[0] = x;
-        arrayOfFloat[1] = y;
-        this.transform.transform(arrayOfFloat);
-
-        swtCaret.setLocation((int) (arrayOfFloat[0] * this.zoom), (int) (arrayOfFloat[1] * this.zoom));
-        //this.swtCaret.setLocation((int)(x * this.zoom), (int)(y * this.zoom));
+        int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformPointer(x, y);
+        swtCaret.setLocation(i[0], i[1]);
     }
 
     public final void setWindowZoom(final float aFloat840) {
