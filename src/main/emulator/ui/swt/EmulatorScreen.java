@@ -416,9 +416,6 @@ public final class EmulatorScreen implements
     }
 
     private void rotate90degrees(boolean update) {
-        if (this.paintTransform == null) {
-            this.paintTransform = new Transform(null);
-        }
         if (!update) {
             this.rotation += 1;
             this.rotation %= 4;
@@ -439,11 +436,7 @@ public final class EmulatorScreen implements
                 this.rotatedHeight = w;
                 break;
         }
-        if (!update) {
-            resized();
-            canvas.redraw();
-        }
-        this.caret.a(this.paintTransform, this.rotation);
+        resized();
     }
 
 
@@ -1498,22 +1491,6 @@ public final class EmulatorScreen implements
                 gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
                 gc.fillRectangle(0, 0, size.width, size.height);
             }
-            this.paintTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
-            switch (this.rotation) {
-                case 0:
-                    break;
-                case 1:
-                    this.paintTransform.translate(size.width, 0.0F);
-                    this.paintTransform.rotate(90.0F);
-                    break;
-                case 2:
-                    this.paintTransform.translate(size.width, size.height);
-                    this.paintTransform.rotate(180.0F);
-                    break;
-                case 3:
-                    this.paintTransform.translate(0.0F, size.height);
-                    this.paintTransform.rotate(270.0F);
-            }
             gc.setTransform(this.paintTransform);
             if (this.screenImg == null || this.screenImg.isDisposed()) {
                 if (this.pauseState == 0) {
@@ -2102,6 +2079,9 @@ public final class EmulatorScreen implements
         }
         if ((mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
             int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
+            if(i[0] < 0 || i[1] < 0 || i[0] > getWidth() || i[1] > getHeight()) {
+                return;
+            }
             Emulator.getEventQueue().mouseDrag(i[0], i[1]);
         }
     }
@@ -2193,9 +2173,30 @@ public final class EmulatorScreen implements
 
     private void resized() {
         if(getScreenImg() == null) return;
+        Rectangle size = canvas.getClientArea();
+        if (this.paintTransform == null) {
+            this.paintTransform = new Transform(null);
+        }
+
+        this.paintTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
+        switch (this.rotation) {
+            case 0:
+                break;
+            case 1:
+                this.paintTransform.translate(size.width, 0.0F);
+                this.paintTransform.rotate(90.0F);
+                break;
+            case 2:
+                this.paintTransform.translate(size.width, size.height);
+                this.paintTransform.rotate(180.0F);
+                break;
+            case 3:
+                this.paintTransform.translate(0.0F, size.height);
+                this.paintTransform.rotate(270.0F);
+        }
+        this.caret.a(this.paintTransform, this.rotation);
         if(Settings.resizeMode > 0) {
             synchronized (this) {
-                Rectangle size = canvas.getClientArea();
                 if (Settings.resizeMode == 1) {
                     zoomedWidth = rotation % 2 == 1 ? size.height : size.width;
                     zoomedHeight = rotation % 2 == 1 ? size.width : size.height;
