@@ -977,16 +977,16 @@ public final class Emulator3D implements IGraphics3D {
     private void method519() {
         for (int var1 = 0; var1 < RenderPipe.getInstance().getSize(); ++var1) {
             RenderObject var2;
-            if ((var2 = RenderPipe.getInstance().getRenderObj(var1)).m_node instanceof Mesh) {
+            if ((var2 = RenderPipe.getInstance().getRenderObj(var1)).node instanceof Mesh) {
                 Mesh var3;
-                IndexBuffer var4 = (var3 = (Mesh) var2.m_node).getIndexBuffer(var2.m_index);
-                Appearance var5 = var3.getAppearance(var2.m_index);
+                IndexBuffer var4 = (var3 = (Mesh) var2.node).getIndexBuffer(var2.submeshIndex);
+                Appearance var5 = var3.getAppearance(var2.submeshIndex);
                 if (var4 != null && var5 != null) {
                     VertexBuffer var6 = MeshMorph.getInstance().getMorphedVertexBuffer(var3);
-                    this.renderVertex(var6, var4, var5, var2.m_transform, var3.getScope(), var2.m_alphaFactor);
+                    this.renderVertex(var6, var4, var5, var2.trans, var3.getScope(), var2.alphaFactor);
                 }
             } else {
-                this.method509((Sprite3D) var2.m_node, var2.m_transform, var2.m_alphaFactor);
+                this.method509((Sprite3D) var2.node, var2.trans, var2.alphaFactor);
             }
         }
 

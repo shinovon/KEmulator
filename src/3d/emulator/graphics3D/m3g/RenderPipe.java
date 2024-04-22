@@ -11,8 +11,9 @@ import javax.microedition.m3g.Transform;
 public final class RenderPipe {
     private static RenderPipe inst;
     private static RenderPipe viewInst;
-    private Node aNode1146;
-    private Vector aVector1147 = new Vector();
+
+    private Node parentNode;
+    private Vector roList = new Vector();
 
     public static RenderPipe getInstance() {
         if (inst == null) {
@@ -30,117 +31,121 @@ public final class RenderPipe {
         return viewInst;
     }
 
-    private void method789(RenderObject var1) {
-        Object var2 = null;
-
-        int var3;
-        for (var3 = 0; var3 < this.aVector1147.size() && ((RenderObject) this.aVector1147.get(var3)).m_sortKey <= var1.m_sortKey; ++var3) {
-            ;
-        }
-
-        this.aVector1147.insertElementAt(var1, var3);
-    }
-
     public final int getSize() {
-        return this.aVector1147.size();
+        return roList.size();
     }
 
     public final void clear() {
-        this.aVector1147.clear();
-        this.aNode1146 = null;
+        roList.clear();
+        parentNode = null;
     }
 
-    public final RenderObject getRenderObj(int var1) {
-        return (RenderObject) this.aVector1147.get(var1);
+    public final RenderObject getRenderObj(int index) {
+        return (RenderObject) roList.get(index);
     }
 
-    public final boolean isVisible(Node var1) {
-        Node var10000 = var1;
+    public final boolean isVisible(Node node) {
+        Node tmpNode = node;
 
         while (true) {
-            Node var2 = var10000;
-            if (var10000 == null) {
-                break;
-            }
+            if (tmpNode == null) break;
 
-            if (!var2.isRenderingEnabled()) {
+            if (!tmpNode.isRenderingEnabled()) {
                 return false;
             }
 
-            if (this.aNode1146 == null || var2 == this.aNode1146) {
+            if (parentNode == null || tmpNode == parentNode) {
                 break;
             }
 
-            var10000 = var2.getParent();
+            tmpNode = tmpNode.getParent();
         }
 
         return true;
     }
 
-    public final float getEffectiveAlphaFactor(Node var1) {
-        float var2 = var1.getAlphaFactor();
-        Node var10000 = var1;
+    public final float getEffectiveAlphaFactor(Node node) {
+        float alphaFactor = 1;
+        Node tmpNode = node;
 
         while (true) {
-            Node var3 = var10000;
-            if (var10000.getParent() == null || var1 == this.aNode1146) {
-                return var2;
+            alphaFactor *= tmpNode.getAlphaFactor();
+
+            if (tmpNode.getParent() == null || node == parentNode) {
+                return alphaFactor;
             }
 
-            var2 *= var3.getAlphaFactor();
-            var10000 = var3.getParent();
+            tmpNode = tmpNode.getParent();
         }
     }
 
-    public final void pushRenderNode(Node var1, Transform var2) {
-        this.aNode1146 = var1;
-        this.method797(var1, var2);
+    public final void pushRenderNode(Node node, Transform trans) {
+        this.parentNode = node;
+        this.pushRenderNodeImpl(node, trans);
     }
 
-    private void method797(Node var1, Transform var2) {
-        if (this.isVisible(var1)) {
-            if (var2 == null) {
-                var2 = new Transform();
+    private void pushRenderNodeImpl(Node node, Transform trans) {
+        if (isVisible(node)) {
+            if (trans == null) {
+                trans = new Transform();
             }
 
-            if (var1 instanceof Sprite3D) {
-                Sprite3D var9;
-                if ((var9 = (Sprite3D) var1).getAppearance() != null && var9.getCropWidth() != 0 && var9.getCropHeight() != 0) {
-                    this.method789(new RenderObject(var1, var2, 0, this));
+            if (node instanceof Sprite3D) {
+                Sprite3D spr = (Sprite3D) node;
+
+                if (spr.getAppearance() != null && spr.getCropWidth() != 0 && spr.getCropHeight() != 0) {
+                    insertNodeInList(new RenderObject(node, trans, 0, this));
                 }
             } else {
-                if (var1 instanceof Mesh) {
-                    int var3 = ((Mesh) var1).getSubmeshCount();
+                if (node instanceof Mesh) {
+                    int submeshes = ((Mesh) node).getSubmeshCount();
 
-                    for (int var4 = 0; var4 < var3; ++var4) {
-                        if (((Mesh) var1).getAppearance(var4) != null) {
-                            this.method789(new RenderObject(var1, var2, var4, this));
+                    for (int i = 0; i < submeshes; ++i) {
+                        if (((Mesh) node).getAppearance(i) != null) {
+                            insertNodeInList(new RenderObject(node, trans, i, this));
                         }
                     }
 
-                    if (var1 instanceof SkinnedMesh) {
-                        Group var10 = ((SkinnedMesh) var1).getSkeleton();
-                        Transform var5 = new Transform();
-                        Transform var6 = new Transform(var2);
-                        var10.getCompositeTransform(var5);
-                        var6.postMultiply(var5);
-                        this.method797(((SkinnedMesh) var1).getSkeleton(), var6);
-                        return;
-                    }
-                } else if (var1 instanceof Group) {
-                    Transform var8 = new Transform();
-                    Transform var11 = new Transform(var2);
-                    Group var12 = (Group) var1;
+                    if (node instanceof SkinnedMesh) {
+                        Group skeleton = ((SkinnedMesh) node).getSkeleton();
 
-                    for (int var7 = 0; var7 < var12.getChildCount(); ++var7) {
-                        Node var13;
-                        (var13 = var12.getChild(var7)).getCompositeTransform(var8);
-                        var8.preMultiply(var11);
-                        this.method797(var13, var8);
+                        Transform skeletonMat = new Transform();
+                        skeleton.getCompositeTransform(skeletonMat);
+
+                        Transform tmpMat = new Transform(trans);
+                        tmpMat.postMultiply(skeletonMat);
+
+                        pushRenderNodeImpl(skeleton, tmpMat);
+                    }
+                } else if (node instanceof Group) {
+                    Group group = (Group) node;
+
+                    Transform childTrans = new Transform();
+                    Transform groupTrans = new Transform(trans);
+
+                    for (int i = 0; i < group.getChildCount(); ++i) {
+                        Node child = group.getChild(i);
+
+                        child.getCompositeTransform(childTrans);
+                        childTrans.preMultiply(groupTrans);
+
+                        pushRenderNodeImpl(child, childTrans);
                     }
                 }
 
             }
         }
+    }
+
+    private void insertNodeInList(RenderObject ro) {
+
+        int index;
+
+        for (index = 0; index < roList.size(); index++) {
+            RenderObject ro2 = (RenderObject) roList.get(index);
+            if(ro2.sortKey >= ro.sortKey) break;
+        }
+
+        roList.insertElementAt(ro, index);
     }
 }

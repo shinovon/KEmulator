@@ -9,7 +9,6 @@ import emulator.graphics3D.m3g.LightsCache;
 import emulator.graphics3D.m3g.RenderObject;
 import emulator.graphics3D.m3g.RenderPipe;
 import emulator.graphics3D.m3g.MeshMorph;
-import emulator.graphics3D.view.a;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -20,7 +19,6 @@ import javax.microedition.m3g.Background;
 import javax.microedition.m3g.Camera;
 import javax.microedition.m3g.CompositingMode;
 import javax.microedition.m3g.Fog;
-import javax.microedition.m3g.Graphics3D;
 import javax.microedition.m3g.Group;
 import javax.microedition.m3g.Image2D;
 import javax.microedition.m3g.IndexBuffer;
@@ -180,16 +178,16 @@ public final class b {
     private void method392() {
         for (int var1 = 0; var1 < RenderPipe.getViewInstance().getSize(); ++var1) {
             RenderObject var2;
-            if ((var2 = RenderPipe.getViewInstance().getRenderObj(var1)).m_node instanceof Mesh) {
+            if ((var2 = RenderPipe.getViewInstance().getRenderObj(var1)).node instanceof Mesh) {
                 Mesh var3;
-                IndexBuffer var4 = (var3 = (Mesh) var2.m_node).getIndexBuffer(var2.m_index);
-                Appearance var5 = var3.getAppearance(var2.m_index);
+                IndexBuffer var4 = (var3 = (Mesh) var2.node).getIndexBuffer(var2.submeshIndex);
+                Appearance var5 = var3.getAppearance(var2.submeshIndex);
                 if (var4 != null && var5 != null) {
                     VertexBuffer var6 = MeshMorph.getViewInstance().getMorphedVertexBuffer(var3);
-                    this.method373(var6, var4, var5, var2.m_transform, var3.getScope(), var2.m_alphaFactor);
+                    this.method373(var6, var4, var5, var2.trans, var3.getScope(), var2.alphaFactor);
                 }
             } else {
-                this.method375((Sprite3D) var2.m_node, var2.m_transform);
+                this.method375((Sprite3D) var2.node, var2.trans);
             }
         }
 
