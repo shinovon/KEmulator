@@ -289,6 +289,7 @@ public class Image2D extends Object3D {
 
     public void setId(int id) {
         this.id = id;
+        loaded = false;
     }
 
     public int getId() {

@@ -34,7 +34,7 @@ public final class Emulator3D implements IGraphics3D {
     private Object target;
     private boolean depthBufferEnabled;
     private int hints;
-    private static Hashtable contexts = new Hashtable();
+//    private static Hashtable contexts = new Hashtable();
     private static int targetWidth;
     private static int targetHeight;
     private static Pbuffer pbufferContext;
@@ -64,6 +64,8 @@ public final class Emulator3D implements IGraphics3D {
     public static final int MaxSpriteCropDimension = 1024;
     public static final int MaxLights = 8;
     private boolean exiting;
+    private String contextRes;
+    private Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
 
     private Emulator3D() {
         instance = this;
@@ -136,11 +138,17 @@ public final class Emulator3D implements IGraphics3D {
 
         try {
             try {
-                String var4 = w + "x" + h;
-                pbufferContext = (Pbuffer) contexts.get(var4);
+                String s = w + "x" + h;
+//                pbufferContext = (Pbuffer) contexts.get(var4);
+                if(contextRes != null && !contextRes.equals(s)) {
+                    releaseTextures();
+                    exiting = false;
+                    pbufferContext = null;
+                }
                 if (pbufferContext == null) {
                     pbufferContext = new Pbuffer(w, h, method500(), (RenderTexture) null, (Drawable) null);
-                    contexts.put(var4, pbufferContext);
+//                    contexts.put(var4, pbufferContext);
+                    contextRes = s;
                 }
 
                 pbufferContext.makeCurrent();
@@ -806,6 +814,7 @@ public final class Emulator3D implements IGraphics3D {
                     image2D.setLoaded(false);
                     if (!usedGLTextures.contains(id))
                         usedGLTextures.add(id);
+                    texturesTable.put(id, image2D);
                 }
 
                 GL11.glEnable(GL_TEXTURE_2D);
@@ -841,7 +850,7 @@ public final class Emulator3D implements IGraphics3D {
 
                 if(!image2D.isLoaded()) {
                     image2D.setLoaded(true);
-                    System.out.println("loaded texture: " + image2D + " " + id);
+                    System.out.println("loaded texture: " + id);
 
                     short texFormat = GL_RGB;
                     switch (image2D.getFormat()) {
@@ -1177,7 +1186,7 @@ public final class Emulator3D implements IGraphics3D {
         image2D.setId(0);
     }
 
-    public void releaseGLTextures() {
+    public void releaseTextures() {
         // TODO
         if(pbufferContext == null || exiting) return;
         exiting = true;
@@ -1201,5 +1210,11 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glDeleteTextures(id);
         usedGLTextures.removeElement(id);
         unusedGLTextures.removeElement(id);
+        if(texturesTable.containsKey(id)) {
+            Image2D img = texturesTable.get(id);
+            if(img != null)
+                img.setId(0);
+        }
+        texturesTable.remove(id);
     }
 }
