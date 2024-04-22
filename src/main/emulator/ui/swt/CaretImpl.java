@@ -19,7 +19,7 @@ public final class CaretImpl implements ICaret {
     private int caretLocY;
     private int caretX;
     private int caretY;
-    private Transform jdField_a_of_type_OrgEclipseSwtGraphicsTransform;
+    private Transform transform;
     private int e;
     private TextField lcduiTextField;
     private int caretPosition;
@@ -38,7 +38,7 @@ public final class CaretImpl implements ICaret {
     }
 
     public final void a(Transform paramTransform, int paramInt) {
-        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform = paramTransform;
+        this.transform = paramTransform;
         this.e = paramInt;
     }
 
@@ -48,7 +48,7 @@ public final class CaretImpl implements ICaret {
         float[] arrayOfFloat;
         (arrayOfFloat = new float[2])[0] = x;
         arrayOfFloat[1] = y;
-        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
+        this.transform.transform(arrayOfFloat);
 
         swtCaret.setLocation((int) (arrayOfFloat[0] * this.zoom), (int) (arrayOfFloat[1] * this.zoom));
         //this.swtCaret.setLocation((int)(x * this.zoom), (int)(y * this.zoom));

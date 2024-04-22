@@ -45,10 +45,6 @@ public final class EmulatorScreen implements
     private MenuItem integerScalingMenuItem;
     private MenuItem aMenuItem962;
 
-    public Shell getShell() {
-        return shell;
-    }
-
     private Shell shell;
     private Canvas canvas;
     private CLabel aCLabel970;
@@ -67,11 +63,10 @@ public final class EmulatorScreen implements
     public static int sizeW;
     public static int sizeH;
     public static boolean maximized;
-    private Transform jdField_a_of_type_OrgEclipseSwtGraphicsTransform;
-    private Transform jdField_b_of_type_OrgEclipseSwtGraphicsTransform;
-    private int jdField_c_of_type_Int;
-    private int jdField_d_of_type_Int;
-    private int jdField_e_of_type_Int;
+    private Transform paintTransform;
+    private int rotation;
+    private int rotatedWidth;
+    private int rotatedHeight;
     private float zoom;
     private int zoomedWidth;
     private int zoomedHeight;
@@ -163,6 +158,11 @@ public final class EmulatorScreen implements
     private MenuItem rotate90MenuItem;
     private Vector<Integer> pressedKeys = new Vector<Integer>();
     static Font f;
+    private int screenX;
+    private int screenY;
+    private int screenWidth;
+    private int screenHeight;
+    private boolean pointerWasPressed;
 
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -182,6 +182,10 @@ public final class EmulatorScreen implements
         this.initShell();
         this.initScreenBuffer(n, n2);
         this.updatePauseState();
+    }
+
+    public Shell getShell() {
+        return shell;
     }
 
     private void initScreenBuffer(final int n, final int n2) {
@@ -411,58 +415,35 @@ public final class EmulatorScreen implements
         }
     }
 
-    private void rotate90degrees(boolean paramBoolean) {
-        if (this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform == null) {
-            this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform = new Transform(null);
+    private void rotate90degrees(boolean update) {
+        if (this.paintTransform == null) {
+            this.paintTransform = new Transform(null);
         }
-        if (this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform == null) {
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform = new Transform(null);
+        if (!update) {
+            this.rotation += 1;
+            this.rotation %= 4;
         }
-        if (!paramBoolean) {
-            this.jdField_c_of_type_Int += 1;
-            this.jdField_c_of_type_Int %= 4;
-        }
-        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
-        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
-        int i1 = getWidth();
-        int i2 = getHeight();
-        switch (this.jdField_c_of_type_Int) {
+        int w = getWidth();
+        int h = getHeight();
+        float zoomX = (float) screenWidth / (float) w;
+        float zoomY = (float) screenHeight / (float) h;
+        switch (this.rotation) {
             case 0:
-                this.jdField_d_of_type_Int = i1;
-                this.jdField_e_of_type_Int = i2;
+            case 2:
+                this.rotatedWidth = w;
+                this.rotatedHeight = h;
                 break;
             case 1:
-                this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.translate(i2 * zoom, 0.0F);
-                this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.rotate(90.0F);
-                this.jdField_d_of_type_Int = i2;
-                this.jdField_e_of_type_Int = i1;
-                this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.translate(i2 * zoom, 0.0F);
-                this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.rotate(90.0F);
-                break;
-            case 2:
-                this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.translate(i1 * zoom, i2 * zoom);
-                this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.rotate(180.0F);
-                this.jdField_d_of_type_Int = i1;
-                this.jdField_e_of_type_Int = i2;
-                this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.translate(i1 * zoom, i2 * zoom);
-                this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.rotate(180.0F);
-                break;
             case 3:
-                this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.translate(0.0F, i1 * zoom);
-                this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.rotate(270.0F);
-                this.jdField_d_of_type_Int = i2;
-                this.jdField_e_of_type_Int = i1;
-                this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.translate(0.0F, i1 * zoom);
-                this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.rotate(270.0F);
+                this.rotatedWidth = h;
+                this.rotatedHeight = w;
+                break;
         }
-        try {
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.invert();
-        } catch (Exception localException) {
+        if (!update) {
+            resized();
+            canvas.redraw();
         }
-        this.caret.a(this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform, this.jdField_c_of_type_Int);
-        if (!paramBoolean) {
-            d();
-        }
+        this.caret.a(this.paintTransform, this.rotation);
     }
 
 
@@ -474,20 +455,19 @@ public final class EmulatorScreen implements
         rotate90degrees(true);
         Settings.canvasScale = (int) (this.zoom * 100.0F);
         this.caret.setWindowZoom(this.zoom);
-        this.d();
+        this.canvas.redraw();
         this.updateStatus();
     }
 
-
-    private void d() {
-        if(!shell.getMaximized() && Settings.resizeMode != 0) {
-            int i1 = this.shell.getSize().x - this.canvas.getSize().x;
-            int i2 = this.shell.getSize().y - this.canvas.getSize().y;
-            this.canvas.setSize((int) (this.jdField_d_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2, (int) ((float) this.jdField_e_of_type_Int * this.zoom) + this.canvas.getBorderWidth() * 2);
-            this.shell.setSize(this.canvas.getSize().x + i1, this.canvas.getSize().y + i2);
-        }
-        this.canvas.redraw();
-    }
+//    private void d() {
+//        if(!shell.getMaximized() && Settings.resizeMode != 0) {
+//            int i1 = this.shell.getSize().x - this.canvas.getSize().x;
+//            int i2 = this.shell.getSize().y - this.canvas.getSize().y;
+//            this.canvas.setSize((int) (this.rotatedWidth * this.zoom) + this.canvas.getBorderWidth() * 2, (int) ((float) this.rotatedHeight * this.zoom) + this.canvas.getBorderWidth() * 2);
+//            this.shell.setSize(this.canvas.getSize().x + i1, this.canvas.getSize().y + i2);
+//        }
+//        this.canvas.redraw();
+//    }
 
 
     private void zoomIn() {
@@ -1294,6 +1274,7 @@ public final class EmulatorScreen implements
                     int[] r = d.open();
                     if(r != null) {
                         rotate(r[0], r[1]);
+                        resized();
                     }
                     return;
                 }
@@ -1415,12 +1396,9 @@ public final class EmulatorScreen implements
     }
 
     private void updateInfos(final int n, final int n2) {
-        float[] arrayOfFloat;
-        (arrayOfFloat = new float[4])[0] = n;
-        arrayOfFloat[1] = n2;
-        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
-        final int n3 = (int) (arrayOfFloat[0] / this.zoom);
-        final int n4 = (int) (arrayOfFloat[1] / this.zoom);
+        int[] i = transformPointer(n, n2);
+        final int n3 = i[0];
+        final int n4 = i[1];
         if (n3 < 0 || n4 < 0 || n3 > this.getWidth() - 1 || n4 > this.getHeight() - 1) {
             return;
         }
@@ -1441,17 +1419,14 @@ public final class EmulatorScreen implements
             sb2 = sb3.append(this.aString1008).append("0x").append(Integer.toHexString(rgb).toUpperCase());
         }
         class93.aString1008 = sb2.toString();
-        arrayOfFloat[0] = mouseXPress;
-        arrayOfFloat[1] = mouseYPress;
-        arrayOfFloat[2] = mouseXRelease;
-        arrayOfFloat[3] = mouseYRelease;
-        this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
+        i = transformPointer(mouseXPress, mouseYPress);
+        int[] i2 = transformPointer(mouseXRelease, mouseYRelease);
         this.aString1008 = this.aString1008 + ")\n" +
                 UILocale.get("INFO_FRAME_RECT", "R")
 
-                + "(" + (int) (arrayOfFloat[0] / zoom) + "," +
-                (int) (arrayOfFloat[1] / zoom) + "," + (int) ((arrayOfFloat[2] - arrayOfFloat[0]) / zoom) +
-                "," + (int) ((arrayOfFloat[3] - arrayOfFloat[1]) / zoom) + ")";
+                + "(" + (i[0]) + "," +
+                (i[1]) + "," + (i2[0] - i[0]) +
+                "," + (i2[1] - i[1]) + ")";
         /*
         "(" + (int)(this.mouseXPress / this.zoom) + "," + 
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
@@ -1486,57 +1461,90 @@ public final class EmulatorScreen implements
     public final void paintControl(final PaintEvent paintEvent) {
         final GC gc;
         (gc = paintEvent.gc).setInterpolation(this.interpolation);
-        gc.setTransform(this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform);
         Rectangle size = canvas.getClientArea();
+
         int origWidth = getWidth();
         int origHeight = getHeight();
-        int canvasWidth = size.width;
-        int canvasHeight = size.height;
-        int scaleWidth = zoomedWidth;
-        int scaleHeight = zoomedHeight;
-        int x = 0;
-        int y = 0;
-        if(Settings.keepAspectRatio &&
-                ((float) origWidth / (float) origHeight) != ((float) scaleWidth / (float) scaleHeight)) {
-            scaleWidth = (int) ((float) scaleHeight * ((float) origWidth / (float) origHeight));
-            if(scaleWidth > canvasWidth) {
-                scaleWidth = canvasWidth;
-                scaleHeight = (int) ((float) scaleWidth * ((float) origHeight / (float) origWidth));
+        int canvasWidth;
+        int canvasHeight;
+        int scaledWidth;
+        int scaledHeight;
+
+        if(rotation % 2 == 1) {
+            canvasWidth = size.height;
+            canvasHeight = size.width;
+            scaledWidth = zoomedHeight;
+            scaledHeight = zoomedWidth;
+        } else {
+            canvasWidth = size.width;
+            canvasHeight = size.height;
+            scaledWidth = zoomedWidth;
+            scaledHeight = zoomedHeight;
+        }
+
+        final float ratio = ((float) origWidth / (float) origHeight);
+        if(Settings.keepAspectRatio && ratio != ((float) scaledWidth / (float) scaledHeight)) {
+            scaledWidth = (int) ((float) scaledHeight * ratio);
+            if(scaledWidth > canvasWidth) {
+                scaledWidth = canvasWidth;
+                scaledHeight = (int) ((float) scaledWidth * ((float) origHeight / (float) origWidth));
             }
         }
-        x = (canvasWidth - scaleWidth) / 2;
-        y = (canvasHeight - scaleHeight) / 2;
+
+        int x = (canvasWidth - scaledWidth) / 2;
+        int y = (canvasHeight - scaledHeight) / 2;
         try {
-            if(x > 0 || y > 0 || scaleWidth != origWidth) {
+            if(x > 0 || y > 0 || scaledWidth != origWidth) {
                 gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
-                gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
+                gc.fillRectangle(0, 0, size.width, size.height);
             }
+            this.paintTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
+            switch (this.rotation) {
+                case 0:
+                    break;
+                case 1:
+                    this.paintTransform.translate(size.width, 0.0F);
+                    this.paintTransform.rotate(90.0F);
+                    break;
+                case 2:
+                    this.paintTransform.translate(size.width, size.height);
+                    this.paintTransform.rotate(180.0F);
+                    break;
+                case 3:
+                    this.paintTransform.translate(0.0F, size.height);
+                    this.paintTransform.rotate(270.0F);
+            }
+            gc.setTransform(this.paintTransform);
             if (this.screenImg == null || this.screenImg.isDisposed()) {
                 if (this.pauseState == 0) {
                     gc.setBackground(EmulatorScreen.display.getSystemColor(22));
-                    gc.fillRectangle(0, 0, this.zoomedWidth, this.zoomedHeight);
+                    gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
                     gc.setForeground(EmulatorScreen.display.getSystemColor(21));
                     gc.setFont(f);
-                    gc.drawText(Emulator.getInfoString(), this.zoomedWidth >> 3, this.zoomedHeight >> 3, true);
+                    gc.drawText(Emulator.getInfoString(), canvasWidth >> 3, canvasHeight >> 3, true);
                 }
                 else if (Settings.g2d == 0) {
-                    if(x == 0 && origWidth == scaleWidth && origHeight == scaleHeight) {
+                    if(x == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
                         this.screenCopySwt.method13(gc, 0, 0);
                     } else {
-                        this.screenCopySwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaleWidth, scaleHeight);
+                        this.screenCopySwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
                     }
                 } else if (Settings.g2d == 1) {
-                    if(x == 0 && origWidth == scaleWidth && origHeight == scaleHeight) {
+                    if(x == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
                         this.screenCopyAwt.method13(gc, 0, 0);
                     } else {
-                        this.screenCopyAwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaleWidth, scaleHeight);
+                        this.screenCopyAwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
                     }
                 }
             } else {
-                gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, 0, 0, scaleWidth, scaleHeight);
+                gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, 0, 0, scaledWidth, scaledHeight);
             }
         } catch (Exception ex) {
         }
+        screenX = x;
+        screenY = y;
+        screenWidth = scaledWidth;
+        screenHeight = scaledHeight;
         gc.setAdvanced(false);
         this.method565(gc);
     }
@@ -1822,6 +1830,40 @@ public final class EmulatorScreen implements
         }
     }
 
+    private int[] transformPointer(int x, int y)  {
+        int w, h;
+        if(rotation % 2 == 1) {
+            w = getHeight();
+            h = getWidth();
+            x = (int) ((x - screenY) / ((float)screenHeight / w));
+            y = (int) ((y - screenX) / ((float)screenWidth / h));
+        } else {
+            w = getWidth();
+            h = getHeight();
+            x = (int) ((x - screenX) / ((float)screenWidth / w));
+            y = (int) ((y - screenY) / ((float)screenHeight / h));
+        }
+        int tmp;
+        switch (this.rotation) {
+            case 0:
+                break;
+            case 1:
+                tmp = x;
+                x = y;
+                y = w-tmp;
+                break;
+            case 2:
+                x = w-x;
+                y = h-y;
+                break;
+            case 3:
+                tmp = x;
+                x = h-y;
+                y = tmp;
+        }
+        return new int[] {x, y};
+    }
+
     public final void mouseDown(final MouseEvent mouseEvent) {
         if (this.infosEnabled && !this.mouseDownInfos) {
             this.mouseXPress = mouseEvent.x;
@@ -1862,16 +1904,14 @@ public final class EmulatorScreen implements
                     mp(KeyMapping.getArrowKeyFromDevice(8));
                 return;
             }
-
-            float[] zoom;
-            (zoom = new float[2])[0] = mouseEvent.x;
-            zoom[1] = mouseEvent.y;
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
-            final int x = (int) (zoom[0] / this.zoom);
-            final int y = (int) (zoom[1] / this.zoom);
-            Emulator.getEventQueue().mouseDown(x, y);
+            int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
+            if(i[0] < 0 || i[1] < 0 || i[0] > getWidth() || i[1] > getHeight()) {
+                return;
+            }
+            pointerWasPressed = true;
+            Emulator.getEventQueue().mouseDown(i[0], i[1]);
             if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getScreen()) {
-                this.caret.mouseDown(x, y);
+                this.caret.mouseDown(i[0], i[1]);
             }
         }
     }
@@ -1912,56 +1952,10 @@ public final class EmulatorScreen implements
                     mr(KeyMapping.getArrowKeyFromDevice(8));
                 return;
             }
-            float[] zoom;
-            (zoom = new float[2])[0] = mouseEvent.x;
-            zoom[1] = mouseEvent.y;
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
-            final int x = (int) (zoom[0] / this.zoom);
-            final int y = (int) (zoom[1] / this.zoom);
-            Emulator.getEventQueue().mouseUp(x, y);
+            if(!pointerWasPressed) return;
+            int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
+            Emulator.getEventQueue().mouseUp(i[0], i[1]);
         }
-    }
-
-    private void mp(int i) {
-        if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-            Emulator.getCanvas().invokeKeyPressed(i);
-        } else {
-            Emulator.getScreen().invokeKeyPressed(i);
-        }
-    }
-
-    private void mr(int i) {
-        if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-            Emulator.getCanvas().invokeKeyReleased(i);
-        } else {
-            Emulator.getScreen().invokeKeyReleased(i);
-        }
-    }
-
-    private void mrp(int i) {
-        if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-            Emulator.getCanvas().invokeKeyRepeated(i);
-        } else {
-        }
-    }
-
-
-    @Override
-    public void mouseEnter(MouseEvent arg0) {
-
-    }
-
-    @Override
-    public void mouseExit(MouseEvent e) {
-        if (Settings.fpsMode) {
-            Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
-            display.setCursorLocation(pt);
-        }
-    }
-
-    @Override
-    public void mouseHover(MouseEvent arg0) {
-
     }
 
     public final void mouseMove(final MouseEvent mouseEvent) {
@@ -1972,7 +1966,7 @@ public final class EmulatorScreen implements
                 ((Control) this.canvas).redraw();
             }
             this.updateInfos(mouseEvent.x, mouseEvent.y);
-            //return;
+//            return;
         }
         if (this.pauseState == 0) {
             return;
@@ -2107,14 +2101,51 @@ public final class EmulatorScreen implements
             mset = false;
         }
         if ((mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
-            float[] zoom;
-            (zoom = new float[2])[0] = mouseEvent.x;
-            zoom[1] = mouseEvent.y;
-            this.jdField_b_of_type_OrgEclipseSwtGraphicsTransform.transform(zoom);
-            int x = (int) (zoom[0] / this.zoom);
-            int y = (int) (zoom[1] / this.zoom);
-            Emulator.getEventQueue().mouseDrag(x, y);
+            int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
+            Emulator.getEventQueue().mouseDrag(i[0], i[1]);
         }
+    }
+
+    private void mp(int i) {
+        if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+            Emulator.getCanvas().invokeKeyPressed(i);
+        } else {
+            Emulator.getScreen().invokeKeyPressed(i);
+        }
+    }
+
+    private void mr(int i) {
+        if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+            Emulator.getCanvas().invokeKeyReleased(i);
+        } else {
+            Emulator.getScreen().invokeKeyReleased(i);
+        }
+    }
+
+    private void mrp(int i) {
+        if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+            Emulator.getCanvas().invokeKeyRepeated(i);
+        } else {
+        }
+    }
+
+
+    @Override
+    public void mouseEnter(MouseEvent arg0) {
+
+    }
+
+    @Override
+    public void mouseExit(MouseEvent e) {
+        if (Settings.fpsMode) {
+            Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
+            display.setCursorLocation(pt);
+        }
+    }
+
+    @Override
+    public void mouseHover(MouseEvent arg0) {
+
     }
 
     public final void widgetDisposed(final DisposeEvent disposeEvent) {
@@ -2165,26 +2196,30 @@ public final class EmulatorScreen implements
         if(Settings.resizeMode > 0) {
             synchronized (this) {
                 Rectangle size = canvas.getClientArea();
-                zoomedWidth = size.width;
-                zoomedHeight = size.height;
                 if (Settings.resizeMode == 1) {
-                    int w = (int) ((float) size.width / zoom);
-                    int h = (int) ((float) size.height / zoom);
-                    initScreenBuffer(w, h);
-                    Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
+                    zoomedWidth = rotation % 2 == 1 ? size.height : size.width;
+                    zoomedHeight = rotation % 2 == 1 ? size.width : size.height;
+                    int w = (int) ((float) zoomedWidth / zoom);
+                    int h = (int) ((float) zoomedHeight / zoom);
+                    if(getWidth() != w || getHeight() != h) {
+                        initScreenBuffer(w, h);
+                        Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
+                    }
                 } else if(Settings.integerResize) {
                     int origWidth = getWidth();
                     int origHeight = getHeight();
                     float f = Math.min((float) size.width / (float) origWidth, (float) size.height / (float) origHeight);
                     f = (int) (f - (f % 1));
                     if(f < 1) f = 1;
-                    this.zoom = f;
-                    zoomedWidth = (int) ((float) origWidth * this.zoom);
-                    zoomedHeight = (int) ((float) origHeight * this.zoom);
+                    zoomedWidth = (int) ((float) origWidth * f);
+                    zoomedHeight = (int) ((float) origHeight * f);
                     rotate90degrees(true);
-                    Settings.canvasScale = (int) (zoom * 100.0F);
-                    caret.setWindowZoom(zoom);
+                    Settings.canvasScale = (int) (f * 100.0F);
+                    caret.setWindowZoom(this.zoom = f);
                     updateStatus();
+                } else {
+                    zoomedWidth = size.width;
+                    zoomedHeight = size.height;
                 }
             }
         } else {
