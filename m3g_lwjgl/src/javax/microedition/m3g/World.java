@@ -1,37 +1,37 @@
 package javax.microedition.m3g;
 
 public class World extends Group {
-    private Background background = null;
-    private Camera activeCamera = null;
+    private Background activeBg = null;
+    private Camera activeCam = null;
 
-    public void setBackground(Background var1) {
-        this.removeReference(this.background);
-        this.background = var1;
-        this.addReference(this.background);
+    public void setBackground(Background bg) {
+        removeReference(activeBg);
+        activeBg = bg;
+        addReference(activeBg);
     }
 
     public Background getBackground() {
-        return this.background;
+        return activeBg;
     }
 
-    public void setActiveCamera(Camera var1) {
-        if (var1 == null) {
+    public void setActiveCamera(Camera cam) {
+        if (cam == null) {
             throw new NullPointerException();
         } else {
-            this.removeReference(this.activeCamera);
-            this.activeCamera = var1;
-            this.addReference(this.activeCamera);
+            removeReference(activeCam);
+            activeCam = cam;
+            addReference(activeCam);
         }
     }
 
     public Camera getActiveCamera() {
-        return this.activeCamera;
+        return activeCam;
     }
 
     protected void updateAlignReferences() {
         super.updateAlignReferences();
-        if (this.activeCamera != null && this.activeCamera.m_duplicatedNode != null && this.activeCamera.m_duplicatedNode.isDescendantOf(super.m_duplicatedNode)) {
-            ((World) super.m_duplicatedNode).activeCamera = (Camera) this.activeCamera.m_duplicatedNode;
+        if (activeCam != null && activeCam.m_duplicatedNode != null && activeCam.m_duplicatedNode.isDescendantOf(super.m_duplicatedNode)) {
+            ((World) super.m_duplicatedNode).activeCam = (Camera) activeCam.m_duplicatedNode;
         }
 
     }
