@@ -292,7 +292,7 @@ public final class EmulatorScreen implements
                             Thread.sleep(20);
                         }
                     } catch (Exception e) {
-                        System.out.println("Exception in keyboard poll thread");
+                        System.err.println("Exception in keyboard poll thread");
                         e.printStackTrace();
                     }
                 }
@@ -444,25 +444,20 @@ public final class EmulatorScreen implements
     private void zoom(float var1) {
         this.zoom = var1;
         rotate90degrees(true);
-        resized();
         Settings.canvasScale = (int) (this.zoom * 100.0F);
+        Point size = canvas.getSize();
+        if(!shell.getMaximized() && Settings.resizeMode == 0) {
+            int i1 = this.shell.getSize().x - size.x;
+            int i2 = this.shell.getSize().y - size.y;
+            int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
+            int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+            this.canvas.setSize(w, h);
+            size = canvas.getSize();
+            this.shell.setSize(size.x + i1, size.y + i2);
+        }
         this.canvas.redraw();
         this.updateStatus();
     }
-
-//    private void d() {
-//        Point size = canvas.getSize();
-//        if(!shell.getMaximized() && Settings.resizeMode != 0) {
-//            int i1 = this.shell.getSize().x - size.x;
-//            int i2 = this.shell.getSize().y - size.y;
-//            int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
-//            int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
-//            this.canvas.setSize(w, h);
-//            size = canvas.getSize();
-//            this.shell.setSize(size.x + i1, size.y + i2);
-//        }
-//        this.canvas.redraw();
-//    }
 
 
     private void zoomIn() {
@@ -1357,6 +1352,8 @@ public final class EmulatorScreen implements
                     initScreenBuffer(startWidth, startHeight);
                     Emulator.getEventQueue().queue(Integer.MIN_VALUE, startWidth, startHeight);
                 }
+                zoomedWidth = startWidth;
+                zoomedHeight = startHeight;
                 rotate90degrees(true);
                 Point size = canvas.getSize();
                 int i1 = this.shell.getSize().x - size.x;
@@ -1530,7 +1527,7 @@ public final class EmulatorScreen implements
         int y = (canvasHeight - scaledHeight) / 2;
         try {
             // Fill background
-            if(x > 0 || y > 0 || scaledWidth != origWidth) {
+            if(x > 0 || y > 0 || scaledWidth != origWidth || scaledHeight != origHeight) {
                 gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
                 gc.fillRectangle(0, 0, size.width, size.height);
             }
