@@ -241,7 +241,7 @@ public final class Memory {
         }
     }
 
-    private synchronized void m3gReadTextures(Object3D obj) {
+    private synchronized void m3gReadTextures(Object obj) {
         if(obj == null) return;
         if (obj instanceof Group) {
             Group g = (Group) obj;

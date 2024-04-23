@@ -1295,11 +1295,13 @@ public final class EmulatorScreen implements
                     }
                     ((Class83) Emulator.getEmulator().getMessage()).method481(this.shell);
                 } else if (menuItem.equals(this.aMenuItem962)) {
-                    if (((EmulatorImpl)Emulator.getEmulator()).method827().method494()) {
-                        ((EmulatorImpl)Emulator.getEmulator()).method827().method507();
-                        return;
-                    }
-                    ((EmulatorImpl)Emulator.getEmulator()).method827().method226();
+                    try {
+                        if (((EmulatorImpl) Emulator.getEmulator()).getM3GView().method494()) {
+                            ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method507();
+                            return;
+                        }
+                        ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method226();
+                    } catch (Throwable ignored) {}
                 }
                 else {
                     if (menuItem.equals(this.xrayViewMenuItem)) {

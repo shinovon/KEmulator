@@ -79,15 +79,15 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aComposite907 = null;
         this.aTree896 = null;
         this.aCanvas897 = null;
-        this.aCamera901 = new Camera();
-        this.aTransform372 = new Transform();
         this.aMenu908 = null;
         this.aMenu913 = null;
         this.aMenu918 = null;
         this.aMenu923 = null;
-        this.ana892 = new Quaternion();
         this.aBackground900 = null;
         this.aNode361 = null;
+        this.aCamera901 = new Camera();
+        this.aTransform372 = new Transform();
+        this.ana892 = new Quaternion();
         this.ana898 = new Memory();
         this.ab369 = emulator.graphics3D.view.b.method362();
     }
