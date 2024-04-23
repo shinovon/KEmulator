@@ -697,6 +697,7 @@ public final class EmulatorScreen implements
         this.aMenuItem960.addSelectionListener((SelectionListener) this);
         (this.aMenuItem961 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
         (this.aMenuItem962 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
+        aMenuItem962.setEnabled(Settings.g3d == 1 && win);
         this.aMenuItem962.addSelectionListener((SelectionListener)this);
         this.aMenuItem961.addSelectionListener((SelectionListener) this);
         (this.aMenuItem963 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SMS", "SMS Console"));
