@@ -34,15 +34,9 @@ public final class EmulatorScreen implements
         MouseTrackListener {
     private static Display display;
     private static int threadCount;
+    private final int startWidth;
+    private final int startHeight;
     private long lastPollTime;
-    private MenuItem fpsCounterMenuItem;
-    private MenuItem changeResolutionMenuItem;
-    private Menu menuResize;
-    private MenuItem centerOnScreenMenuItem;
-    private MenuItem syncSizeMenuItem;
-    private MenuItem fillScreenMenuItem;
-    private MenuItem integerScalingMenuItem;
-    private MenuItem aMenuItem962;
 
     private Shell shell;
     private Canvas canvas;
@@ -110,22 +104,33 @@ public final class EmulatorScreen implements
     MenuItem startRecordAviMenuItem;
     MenuItem stopRecordAviMenuItem;
     MenuItem showTrackInfoMenuItem;
-    MenuItem aMenuItem949;
-    MenuItem aMenuItem950;
+    MenuItem helpMenuItem;
+    MenuItem optionsMenuItem;
     MenuItem xrayViewMenuItem;
     MenuItem infosMenuItem;
     MenuItem alwaysOnTopMenuItem;
     MenuItem rotateScreenMenuItem;
     MenuItem forcePaintMenuItem;
-    MenuItem aMenuItem956;
-    MenuItem aMenuItem957;
-    MenuItem aMenuItem958;
-    MenuItem aMenuItem959;
-    MenuItem aMenuItem960;
-    MenuItem aMenuItem961;
-    MenuItem aMenuItem963;
-    MenuItem aMenuItem964;
+    MenuItem keypadMenuItem;
+    MenuItem logMenuItem;
+    MenuItem watchesMenuItem;
+    MenuItem profilerMenuItem;
+    MenuItem methodsMenuItem;
+    MenuItem memoryViewMenuItem;
+    MenuItem smsConsoleMenuItem;
+    MenuItem sensorMenuItem;
     MenuItem networkKillswitchMenuItem;
+    private MenuItem canvasKeyboardMenuItem;
+    private MenuItem fpsModeMenuItem;
+    private MenuItem fpsCounterMenuItem;
+    private MenuItem changeResMenuItem;
+    private Menu menuResize;
+    private MenuItem centerOnScreenMenuItem;
+    private MenuItem syncSizeMenuItem;
+    private MenuItem fillScreenMenuItem;
+    private MenuItem integerScalingMenuItem;
+    private MenuItem m3gViewMenuItem;
+    private MenuItem resetSizeMenuItem;
     private static AVIWriter aviWriter;
     private static int captureFileCounter;
     private static String aString993;
@@ -144,8 +149,6 @@ public final class EmulatorScreen implements
     private Vibrate vibraThread;
     private long vibra;
     private long vibraStart;
-    private MenuItem canvasKeyboardMenuItem;
-    private MenuItem fpsModeMenuItem;
     private int lastMouseMoveX;
     private boolean fpsWasRight;
     private boolean fpsWasLeft;
@@ -179,7 +182,7 @@ public final class EmulatorScreen implements
         this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
         EmulatorScreen.display = EmulatorImpl.getDisplay();
         this.initShell();
-        this.initScreenBuffer(n, n2);
+        this.initScreenBuffer(startWidth = n, startHeight = n2);
         this.updatePauseState();
     }
 
@@ -435,13 +438,13 @@ public final class EmulatorScreen implements
                 this.rotatedHeight = w;
                 break;
         }
-        resized();
     }
 
 
     private void zoom(float var1) {
         this.zoom = var1;
         rotate90degrees(true);
+        resized();
         Settings.canvasScale = (int) (this.zoom * 100.0F);
         this.canvas.redraw();
         this.updateStatus();
@@ -682,35 +685,33 @@ public final class EmulatorScreen implements
 
         (this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
         this.forcePaintMenuItem.addSelectionListener((SelectionListener) this);
-        (this.changeResolutionMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SCREEN_SIZE", "Change screen size"));
-        this.changeResolutionMenuItem.addSelectionListener((SelectionListener) this);
 
         setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
         new MenuItem(this.menuView, 2);
-        (this.aMenuItem956 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
-        this.aMenuItem956.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem958 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_WATCHES", "Watches"));
-        this.aMenuItem958.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem959 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_PROFILER", "Profiler"));
-        this.aMenuItem959.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem960 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_METHODS", "Methods"));
-        this.aMenuItem960.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem961 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
-        (this.aMenuItem962 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
-        aMenuItem962.setEnabled(Settings.g3d == 1 && win);
-        this.aMenuItem962.addSelectionListener((SelectionListener)this);
-        this.aMenuItem961.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem963 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SMS", "SMS Console"));
-        this.aMenuItem963.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem964 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
-        this.aMenuItem964.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem957 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
-        this.aMenuItem957.addSelectionListener((SelectionListener) this);
+        (this.keypadMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
+        this.keypadMenuItem.addSelectionListener((SelectionListener) this);
+        (this.watchesMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_WATCHES", "Watches"));
+        this.watchesMenuItem.addSelectionListener((SelectionListener) this);
+        (this.profilerMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_PROFILER", "Profiler"));
+        this.profilerMenuItem.addSelectionListener((SelectionListener) this);
+        (this.methodsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_METHODS", "Methods"));
+        this.methodsMenuItem.addSelectionListener((SelectionListener) this);
+        (this.memoryViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
+        (this.m3gViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
+        m3gViewMenuItem.setEnabled(Settings.g3d == 1 && win);
+        this.m3gViewMenuItem.addSelectionListener((SelectionListener)this);
+        this.memoryViewMenuItem.addSelectionListener((SelectionListener) this);
+        (this.smsConsoleMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SMS", "SMS Console"));
+        this.smsConsoleMenuItem.addSelectionListener((SelectionListener) this);
+        (this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
+        this.sensorMenuItem.addSelectionListener((SelectionListener) this);
+        (this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
+        this.logMenuItem.addSelectionListener((SelectionListener) this);
         new MenuItem(this.menuView, 2);
-        (this.aMenuItem950 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
-        this.aMenuItem950.addSelectionListener((SelectionListener) this);
-        (this.aMenuItem949 = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
-        this.aMenuItem949.addSelectionListener((SelectionListener) this);
+        (this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
+        this.optionsMenuItem.addSelectionListener((SelectionListener) this);
+        (this.helpMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
+        this.helpMenuItem.addSelectionListener((SelectionListener) this);
 
         menuItemView.setMenu(this.menuView);
         this.menuTool = new Menu(menuItemTool);
@@ -729,29 +730,40 @@ public final class EmulatorScreen implements
         this.interposeLowMenuItem.addSelectionListener((SelectionListener) new Class55(this));
         (this.interposeHightMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(UILocale.get("MENU_TOOL_INTER_HIGH", "HighQuality"));
         this.interposeHightMenuItem.addSelectionListener((SelectionListener) new Class42(this));
-        interpolationMenuItem.setMenu(this.menuInterpolation);
+        interpolationMenuItem.setMenu(menuInterpolation);
 
         MenuItem resizeMenuItem = new MenuItem(menuTool, 64);
         resizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE", "Display mode"));
-        menuResize = new Menu(this.shell, 4194308);
+        menuResize = new Menu(shell, 4194308);
 
-        centerOnScreenMenuItem = new MenuItem(menuResize, 16);
-        centerOnScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_CENTER", "Center on screen"));
+        centerOnScreenMenuItem = new MenuItem(menuResize, SWT.RADIO);
+        centerOnScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_CENTER", "Center screen"));
         centerOnScreenMenuItem.addSelectionListener(this);
 
-        fillScreenMenuItem = new MenuItem(menuResize, 16);
-        fillScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL", "Fit screen"));
+        fillScreenMenuItem = new MenuItem(menuResize, SWT.RADIO);
+        fillScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL", "Fit window"));
         fillScreenMenuItem.addSelectionListener(this);
 
-        integerScalingMenuItem = new MenuItem(menuResize, 16);
-        integerScalingMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL_INT", "Fit screen (Integer scaling)"));
+        integerScalingMenuItem = new MenuItem(menuResize, SWT.RADIO);
+        integerScalingMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL_INT", "Fit window (Integer scaling)"));
         integerScalingMenuItem.addSelectionListener(this);
 
-        syncSizeMenuItem = new MenuItem(menuResize, 16);
-        syncSizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_SYNC", "Sync canvas size to screen size"));
+        syncSizeMenuItem = new MenuItem(menuResize, SWT.RADIO);
+        syncSizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_SYNC", "Sync screen size"));
         syncSizeMenuItem.addSelectionListener(this);
 
-        resizeMenuItem.setMenu(this.menuResize);
+        new MenuItem(menuResize, 2);
+
+
+        changeResMenuItem = new MenuItem(menuResize, 8);
+        changeResMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_SET", "Change screen size"));
+        changeResMenuItem.addSelectionListener(this);
+
+        resetSizeMenuItem = new MenuItem(menuResize, SWT.PUSH);
+        resetSizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_RESET", "Reset window size"));
+        resetSizeMenuItem.addSelectionListener(this);
+
+        resizeMenuItem.setMenu(menuResize);
 
         if(Settings.resizeMode == 1) {
             syncSizeMenuItem.setSelection(true);
@@ -764,7 +776,7 @@ public final class EmulatorScreen implements
         }
 
 
-        new MenuItem(this.menuTool, 2);
+        new MenuItem(menuTool, 2);
         (this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDUP", "Speed Up") + "\tAlt+>");
         this.speedUpMenuItem.addSelectionListener((SelectionListener) this);
         (this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDDOWN", "Slow Down") + "\tAlt+<");
@@ -1198,11 +1210,11 @@ public final class EmulatorScreen implements
             }
         }
         else if (parent.equals(this.menuView)) {
-            if (menuItem.equals(this.aMenuItem949)) {
+            if (menuItem.equals(this.helpMenuItem)) {
                 new Class54().method454(this.shell);
                 return;
             }
-            if (menuItem.equals(this.aMenuItem950)) {
+            if (menuItem.equals(this.optionsMenuItem)) {
                 ((Property) Emulator.getEmulator().getProperty()).method354(this.shell);
                 return;
             }
@@ -1211,13 +1223,13 @@ public final class EmulatorScreen implements
                 setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
                 return;
             }
-            if (menuItem.equals(this.aMenuItem957)) {
+            if (menuItem.equals(this.logMenuItem)) {
                 if (((Class11) Emulator.getEmulator().getLogStream()).isLogOpen()) {
                     ((Class11) Emulator.getEmulator().getLogStream()).method330();
                     return;
                 }
                 ((Class11) Emulator.getEmulator().getLogStream()).method329(this.shell);
-            } else if (menuItem.equals(this.aMenuItem956)) {
+            } else if (menuItem.equals(this.keypadMenuItem)) {
                 if (((EmulatorImpl) Emulator.getEmulator()).method826().method834()) {
                     ((EmulatorImpl) Emulator.getEmulator()).method826().method836();
                     return;
@@ -1241,6 +1253,7 @@ public final class EmulatorScreen implements
 
                 if (menuItem.equals(this.rotate90MenuItem)) {
                     rotate90degrees(false);
+                    resized();
                     return;
                 }
                 if (menuItem.equals(this.forcePaintMenuItem)) {
@@ -1256,27 +1269,7 @@ public final class EmulatorScreen implements
                     ((Control) this.canvas).redraw();
                     return;
                 }
-                if(menuItem.equals(changeResolutionMenuItem)) {
-                    ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
-                    int[] r = d.open();
-                    if(r != null) {
-                        rotate(r[0], r[1]);
-                        if(Settings.resizeMode == 1) {
-                            Point size = canvas.getSize();
-                            int i1 = this.shell.getSize().x - size.x;
-                            int i2 = this.shell.getSize().y - size.y;
-                            int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
-                            int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
-                            this.canvas.setSize(w, h);
-                            size = canvas.getSize();
-                            this.shell.setSize(size.x + i1, size.y + i2);
-                        } else {
-                            resized();
-                        }
-                    }
-                    return;
-                }
-                if (menuItem.equals(this.aMenuItem964)) {
+                if (menuItem.equals(this.sensorMenuItem)) {
                     final File file3;
                     if ((file3 = new File(Emulator.getAbsolutePath() + "/sensorsimulator.jar")).exists()) {
                         try {
@@ -1289,13 +1282,13 @@ public final class EmulatorScreen implements
                     }
                     return;
                 }
-                if (menuItem.equals(this.aMenuItem963)) {
+                if (menuItem.equals(this.smsConsoleMenuItem)) {
                     if (((Class83) Emulator.getEmulator().getMessage()).method479()) {
                         ((Class83) Emulator.getEmulator().getMessage()).method482();
                         return;
                     }
                     ((Class83) Emulator.getEmulator().getMessage()).method481(this.shell);
-                } else if (menuItem.equals(this.aMenuItem962)) {
+                } else if (menuItem.equals(this.m3gViewMenuItem)) {
                     try {
                         if (((EmulatorImpl) Emulator.getEmulator()).getM3GView().method494()) {
                             ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method507();
@@ -1309,25 +1302,25 @@ public final class EmulatorScreen implements
                         Settings.xrayView = this.xrayViewMenuItem.getSelection();
                         return;
                     }
-                    if (menuItem.equals(this.aMenuItem958)) {
+                    if (menuItem.equals(this.watchesMenuItem)) {
                         if (((EmulatorImpl) Emulator.getEmulator()).method822().method313()) {
                             ((EmulatorImpl) Emulator.getEmulator()).method822().method321();
                             return;
                         }
                         ((EmulatorImpl) Emulator.getEmulator()).method822().method311(this.shell);
-                    } else if (menuItem.equals(this.aMenuItem959)) {
+                    } else if (menuItem.equals(this.profilerMenuItem)) {
                         if (((EmulatorImpl) Emulator.getEmulator()).method829().method313()) {
                             ((EmulatorImpl) Emulator.getEmulator()).method829().method321();
                             return;
                         }
                         ((EmulatorImpl) Emulator.getEmulator()).method829().method311(this.shell);
-                    } else if (menuItem.equals(this.aMenuItem960)) {
+                    } else if (menuItem.equals(this.methodsMenuItem)) {
                         if (((EmulatorImpl) Emulator.getEmulator()).method824().method438()) {
                             ((EmulatorImpl) Emulator.getEmulator()).method824().method446();
                             return;
                         }
                         ((EmulatorImpl) Emulator.getEmulator()).method824().method436();
-                    } else if (menuItem.equals(this.aMenuItem961)) {
+                    } else if (menuItem.equals(this.memoryViewMenuItem)) {
                         if (((EmulatorImpl) Emulator.getEmulator()).method823().method622()) {
                             ((EmulatorImpl) Emulator.getEmulator()).method823().method656();
                             return;
@@ -1357,6 +1350,41 @@ public final class EmulatorScreen implements
                 centerOnScreenMenuItem.setSelection(false);
                 syncSizeMenuItem.setSelection(false);
                 fillScreenMenuItem.setSelection(false);
+            } else if(menuItem == resetSizeMenuItem) {
+                if(getWidth() != startWidth || getHeight() != startHeight) {
+                    initScreenBuffer(startWidth, startHeight);
+                    Emulator.getEventQueue().queue(Integer.MIN_VALUE, startWidth, startHeight);
+                }
+                rotate90degrees(true);
+                Point size = canvas.getSize();
+                int i1 = this.shell.getSize().x - size.x;
+                int i2 = this.shell.getSize().y - size.y;
+                int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
+                int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+                this.canvas.setSize(w, h);
+                size = canvas.getSize();
+                this.shell.setSize(size.x + i1, size.y + i2);
+                return;
+            } else if(menuItem == changeResMenuItem) {
+                ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
+                int[] r = d.open();
+                if(r != null) {
+                    rotate(r[0], r[1]);
+                    if(Settings.resizeMode == 1) {
+                        rotate90degrees(true);
+                        Point size = canvas.getSize();
+                        int i1 = this.shell.getSize().x - size.x;
+                        int i2 = this.shell.getSize().y - size.y;
+                        int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
+                        int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+                        this.canvas.setSize(w, h);
+                        size = canvas.getSize();
+                        this.shell.setSize(size.x + i1, size.y + i2);
+                    } else {
+                        resized();
+                    }
+                }
+                return;
             }
             resized();
         }
@@ -1379,10 +1407,11 @@ public final class EmulatorScreen implements
         this.pausestepMenuItem.setEnabled(this.pauseState != 0);
         this.playResumeMenuItem.setEnabled(Settings.steps >= 0 && this.pauseState != 0);
         this.openJadMenuItem.setEnabled(this.pauseState != 0);
-        this.aMenuItem958.setEnabled(this.pauseState != 0);
-        this.aMenuItem959.setEnabled(this.pauseState != 0);
-        this.aMenuItem961.setEnabled(this.pauseState != 0);
-        this.aMenuItem960.setEnabled(this.pauseState != 0);
+        this.watchesMenuItem.setEnabled(this.pauseState != 0);
+        this.profilerMenuItem.setEnabled(this.pauseState != 0);
+        this.memoryViewMenuItem.setEnabled(this.pauseState != 0);
+        this.methodsMenuItem.setEnabled(this.pauseState != 0);
+        m3gViewMenuItem.setEnabled(m3gViewMenuItem.getEnabled() && pauseState != 0);
         this.startRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter == null);
         this.stopRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter != null);
         this.updateStatus();
@@ -2416,7 +2445,7 @@ public final class EmulatorScreen implements
             switch (this.anInt1058) {
                 case 0: {
                     if (Settings.showMemViewFrame) {
-                        this.aClass93_1059.aMenuItem961.setSelection(true);
+                        this.aClass93_1059.memoryViewMenuItem.setSelection(true);
                         ((EmulatorImpl) Emulator.getEmulator()).method823().method621();
                         return;
                     }
@@ -2424,7 +2453,7 @@ public final class EmulatorScreen implements
                 }
                 case 1: {
                     if (Settings.showLogFrame) {
-                        this.aClass93_1059.aMenuItem957.setSelection(true);
+                        this.aClass93_1059.logMenuItem.setSelection(true);
                         ((Class11) Emulator.getEmulator().getLogStream()).method329(EmulatorScreen.method561(this.aClass93_1059));
                         return;
                     }

@@ -155,23 +155,25 @@ public final class Memory {
             ++classInfo.instancesCount;
             classInfo.objs.add(new ObjInstance(this, s, o));
             this.instances.add(o);
-            if (o instanceof Image) {
-                this.images.add(o);
-                if (Settings.recordReleasedImg && this.aVector1463.contains(o)) {
-                    this.aVector1463.removeElement(o);
+            try {
+                if (o instanceof Image) {
+                    this.images.add(o);
+                    if (Settings.recordReleasedImg && this.aVector1463.contains(o)) {
+                        this.aVector1463.removeElement(o);
+                    }
+                } else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
+                    if (!PlayerImpl.players.contains(o))
+                        this.players.add(o);
+                } else if (o instanceof Node) {
+                    this.m3gObjects.add(o);
+                } else if (o instanceof Image2D) {
+                    IImage img = MemoryViewImage.createFromM3GImage((Image2D) o);
+                    if (img != null)
+                        this.images.add(new MemoryViewImage(img));
+                } else if (o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
+                    this.images.add(Emulator.getPlatform().convertMicro3DTexture(o));
                 }
-            } else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
-                if (!PlayerImpl.players.contains(o))
-                    this.players.add(o);
-            } else if (o instanceof Node) {
-                this.m3gObjects.add(o);
-            } else if (o instanceof Image2D) {
-                IImage img = MemoryViewImage.createFromM3GImage((Image2D) o);
-                if (img != null)
-                    this.images.add(new MemoryViewImage(img));
-            } else if(o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
-                this.images.add(Emulator.getPlatform().convertMicro3DTexture(o));
-            }
+            } catch (NoClassDefFoundError ignored) {}
         }
         if (o != null && clazz.isArray()) {
             Class clazz2 = clazz;
@@ -210,19 +212,21 @@ public final class Memory {
                 }
                 return;
             }
-            if (o instanceof Object3D) {
-                final Field[] method845 = fields(clazz);
-                for (int j = 0; j < method845.length; ++j) {
-                    final String name = method845[j].getName();
-                    method845[j].setAccessible(true);
-                    final Object method846 = ClassTypes.getFieldValue(o, method845[j]);
-                    final String string = s + '.' + name;
-                    if (!method845[j].getType().isPrimitive() && method846 != null) {
-                        this.method847(method846.getClass(), method846, string, false);
+            try {
+                if (o instanceof Object3D) {
+                    final Field[] method845 = fields(clazz);
+                    for (int j = 0; j < method845.length; ++j) {
+                        final String name = method845[j].getName();
+                        method845[j].setAccessible(true);
+                        final Object method846 = ClassTypes.getFieldValue(o, method845[j]);
+                        final String string = s + '.' + name;
+                        if (!method845[j].getType().isPrimitive() && method846 != null) {
+                            this.method847(method846.getClass(), method846, string, false);
+                        }
                     }
+                    return;
                 }
-                return;
-            }
+            } catch (NoClassDefFoundError ignored) {}
             if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || InputStream.class.isAssignableFrom(clazz)) {
                 final Field[] f = fields(clazz);
                 for (int k = 0; k < f.length; ++k) {
@@ -718,17 +722,19 @@ public final class Memory {
                         final Image image = (Image) o;
                         res += image.size();
                     } else {
-                        if (cls != Image2D.class) {
-                            /*if(!(cls == Vector.class || cls == Hashtable.class 
-                            		|| cls == StringItem.class || cls == Command.class 
-                            		|| cls == cls("javax.microedition.lcdui.a")
-                            		))
-                            	return res + o.toString().length();
-                            else */
-                            return res;
-                        }
-                        final Image2D image2D = (Image2D) o;
-                        res += image2D.size();
+                        try {
+                            if (cls == Image2D.class) {
+                                final Image2D image2D = (Image2D) o;
+                                res += image2D.size();
+                            }
+                        } catch (NoClassDefFoundError ignored) {}
+                        /*if(!(cls == Vector.class || cls == Hashtable.class
+                                || cls == StringItem.class || cls == Command.class
+                                || cls == cls("javax.microedition.lcdui.a")
+                                ))
+                            return res + o.toString().length();
+                        else */
+                        return res;
                     }
                 }
             }

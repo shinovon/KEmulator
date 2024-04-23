@@ -30,7 +30,6 @@ MENU_VIEW_TOP=Поверх всех окон
 MENU_VIEW_ROTATE=Повернуть экран
 MENU_VIEW_FORCE_PAINT=Принудительно обновить
 MENU_VIEW_ROTATE_90=Повернуть экран на 90 гр.
-MENU_VIEW_SCREEN_SIZE=Изменить размер экрана
 
 MENU_VIEW_KEYPAD=Окно кейпада
 MENU_VIEW_WATCHES=Классы
@@ -52,12 +51,14 @@ MENU_TOOL_INTER_NEAREST=NearestNeighbor
 MENU_TOOL_INTER_HIGH=HighQuality
 MENU_TOOL_INTER_LOW=LowQuality
 
-MENU_TOOL_RESIZE_MODE=Режим отображения
-MENU_TOOL_RESIZE_MODE_CENTER=По центру
+MENU_TOOL_RESIZE_MODE=Отображение
+MENU_TOOL_RESIZE_MODE_CENTER=Без адаптации к окну
 MENU_TOOL_RESIZE_MODE_SYNC=Синхронизировать размер
 MENU_TOOL_RESIZE_MODE_FILL=Заполнить свободное место
 MENU_TOOL_RESIZE_MODE_FILL_INT=Заполнить (Целочисленный масштаб)
 MENU_TOOL_RESIZE_KEEP_PROPORTIONS=Сохранять пропорции
+MENU_TOOL_RESIZE_RESET=Сбросить размер окна
+MENU_TOOL_RESIZE_SET=Изменить размер экрана
 
 MENU_TOOL_SPEEDUP=Ускорить
 MENU_TOOL_SPEEDDOWN=Замедлить

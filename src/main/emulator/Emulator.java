@@ -659,10 +659,6 @@ public class Emulator {
         Emulator.emulatorimpl = new EmulatorImpl();
         parseLaunchArgs(commandLineArguments);
         platform.loadM3G();
-        // костыль, чтобы грузить классы которым нужен м3г только после его линковки
-        Emulator.emulatorimpl.init();
-        // спарсить арги еще раз чтобы сохранить настройки
-        parseLaunchArgs(commandLineArguments);
         try {
             i.a("emulator");
         } catch (Error e) {}

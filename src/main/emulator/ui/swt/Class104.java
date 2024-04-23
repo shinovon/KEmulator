@@ -19,7 +19,7 @@ final class WindowOpen implements Runnable {
         switch (this.anInt1058) {
             case 0: {
                 if (Settings.showMemViewFrame) {
-                    this.aClass93_1059.aMenuItem961.setSelection(true);
+                    this.aClass93_1059.memoryViewMenuItem.setSelection(true);
                     ((EmulatorImpl) Emulator.getEmulator()).method823().method621();
                     return;
                 }
@@ -27,7 +27,7 @@ final class WindowOpen implements Runnable {
             }
             case 1: {
                 if (Settings.showLogFrame) {
-                    this.aClass93_1059.aMenuItem957.setSelection(true);
+                    this.aClass93_1059.logMenuItem.setSelection(true);
                     ((Class11) Emulator.getEmulator().getLogStream()).method329(EmulatorScreen.method561(this.aClass93_1059));
                     return;
                 }
