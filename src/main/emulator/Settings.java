@@ -72,6 +72,7 @@ public final class Settings {
     public static boolean keepAspectRatio = true;
     public static boolean integerResize = false;
     public static boolean ignoreM3GOverwrite;
+    public static boolean patchSynchronizedPaint = true;
 
     public Settings() {
         super();

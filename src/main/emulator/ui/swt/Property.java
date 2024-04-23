@@ -563,6 +563,7 @@ public final class Property implements IProperty {
             EmulatorScreen.sizeH = Integer.valueOf(properties.getProperty("SizeH", "-1"));
             EmulatorScreen.maximized = Boolean.valueOf(properties.getProperty("Maximized", "false"));
             Settings.ignoreM3GOverwrite = Boolean.valueOf(properties.getProperty("IgnoreM3GOverwrite", "false"));
+            Settings.patchSynchronizedPaint = Boolean.valueOf(properties.getProperty("PatchSynchronizedPaint", "true"));
             fileInputStream.close();
         } catch (Exception ex) {
             if (!(ex instanceof FileNotFoundException)) {
@@ -701,6 +702,7 @@ public final class Property implements IProperty {
             properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
             properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
             properties.setProperty("IgnoreM3GOverwrite", String.valueOf(Settings.ignoreM3GOverwrite));
+            properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         } catch (Exception ex) {
