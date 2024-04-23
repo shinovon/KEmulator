@@ -639,7 +639,6 @@ public class Emulator {
                         String s = entry.getValue().toString();
                         if(s.length() > 0)
                             version = version + " " + s;
-                        System.out.println(version);
                         break;
                     }
                 }

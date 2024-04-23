@@ -56,8 +56,8 @@ MENU_TOOL_RESIZE_MODE=Режим отображения
 MENU_TOOL_RESIZE_MODE_CENTER=По центру
 MENU_TOOL_RESIZE_MODE_SYNC=Синхронизировать размер
 MENU_TOOL_RESIZE_MODE_FILL=Заполнить свободное место
+MENU_TOOL_RESIZE_MODE_FILL_INT=Заполнить (Целочисленный масштаб)
 MENU_TOOL_RESIZE_KEEP_PROPORTIONS=Сохранять пропорции
-MENU_TOOL_RESIZE_INTEGER=Целочисленный масштаб
 
 MENU_TOOL_SPEEDUP=Ускорить
 MENU_TOOL_SPEEDDOWN=Замедлить

@@ -41,7 +41,6 @@ public final class EmulatorScreen implements
     private MenuItem centerOnScreenMenuItem;
     private MenuItem syncSizeMenuItem;
     private MenuItem fillScreenMenuItem;
-    private MenuItem keepAspectRatioMenuItem;
     private MenuItem integerScalingMenuItem;
     private MenuItem aMenuItem962;
 
@@ -441,10 +440,7 @@ public final class EmulatorScreen implements
 
 
     private void zoom(float var1) {
-        if(Settings.resizeMode == 3 && !Settings.integerResize) return;
         this.zoom = var1;
-        this.zoomedWidth = (int) ((float) this.getWidth() * this.zoom);
-        this.zoomedHeight = (int) ((float) this.getHeight() * this.zoom);
         rotate90degrees(true);
         Settings.canvasScale = (int) (this.zoom * 100.0F);
         this.canvas.redraw();
@@ -452,11 +448,15 @@ public final class EmulatorScreen implements
     }
 
 //    private void d() {
+//        Point size = canvas.getSize();
 //        if(!shell.getMaximized() && Settings.resizeMode != 0) {
-//            int i1 = this.shell.getSize().x - this.canvas.getSize().x;
-//            int i2 = this.shell.getSize().y - this.canvas.getSize().y;
-//            this.canvas.setSize((int) (this.rotatedWidth * this.zoom) + this.canvas.getBorderWidth() * 2, (int) ((float) this.rotatedHeight * this.zoom) + this.canvas.getBorderWidth() * 2);
-//            this.shell.setSize(this.canvas.getSize().x + i1, this.canvas.getSize().y + i2);
+//            int i1 = this.shell.getSize().x - size.x;
+//            int i2 = this.shell.getSize().y - size.y;
+//            int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
+//            int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+//            this.canvas.setSize(w, h);
+//            size = canvas.getSize();
+//            this.shell.setSize(size.x + i1, size.y + i2);
 //        }
 //        this.canvas.redraw();
 //    }
@@ -464,13 +464,13 @@ public final class EmulatorScreen implements
 
     private void zoomIn() {
         if (zoom < 5f) {
-            zoom(Math.min(5f, zoom + (Settings.integerResize ? 1f : .5f)));
+            zoom(Math.min(5f, zoom + .5f));
         }
     }
 
     private void zoomOut() {
         if (zoom > 1f) {
-            zoom(Math.max(1f, zoom - (Settings.integerResize ? 1f : .5f)));
+            zoom(Math.max(1f, zoom - .5f));
         }
     }
 
@@ -738,25 +738,17 @@ public final class EmulatorScreen implements
         centerOnScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_CENTER", "Center on screen"));
         centerOnScreenMenuItem.addSelectionListener(this);
 
+        fillScreenMenuItem = new MenuItem(menuResize, 16);
+        fillScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL", "Fit screen"));
+        fillScreenMenuItem.addSelectionListener(this);
+
+        integerScalingMenuItem = new MenuItem(menuResize, 16);
+        integerScalingMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL_INT", "Fit screen (Integer scaling)"));
+        integerScalingMenuItem.addSelectionListener(this);
+
         syncSizeMenuItem = new MenuItem(menuResize, 16);
         syncSizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_SYNC", "Sync canvas size to screen size"));
         syncSizeMenuItem.addSelectionListener(this);
-
-        fillScreenMenuItem = new MenuItem(menuResize, 16);
-        fillScreenMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_MODE_FILL", "Fill available space"));
-        fillScreenMenuItem.addSelectionListener(this);
-
-        new MenuItem(this.menuResize, 2);
-
-        keepAspectRatioMenuItem = new MenuItem(menuResize, 32);
-        keepAspectRatioMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_KEEP_PROPORTIONS", "Keep aspect ratio"));
-        keepAspectRatioMenuItem.addSelectionListener(this);
-        keepAspectRatioMenuItem.setSelection(Settings.keepAspectRatio);
-
-        integerScalingMenuItem = new MenuItem(menuResize, 32);
-        integerScalingMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_INTEGER", "Integer scaling"));
-        integerScalingMenuItem.addSelectionListener(this);
-        integerScalingMenuItem.setSelection(Settings.integerResize);
 
         resizeMenuItem.setMenu(this.menuResize);
 
@@ -764,6 +756,8 @@ public final class EmulatorScreen implements
             syncSizeMenuItem.setSelection(true);
         } else if(Settings.resizeMode == 2) {
             fillScreenMenuItem.setSelection(true);
+        } else if(Settings.resizeMode == 3) {
+            integerScalingMenuItem.setSelection(true);
         } else {
             centerOnScreenMenuItem.setSelection(true);
         }
@@ -1266,7 +1260,18 @@ public final class EmulatorScreen implements
                     int[] r = d.open();
                     if(r != null) {
                         rotate(r[0], r[1]);
-                        resized();
+                        if(Settings.resizeMode == 1) {
+                            Point size = canvas.getSize();
+                            int i1 = this.shell.getSize().x - size.x;
+                            int i2 = this.shell.getSize().y - size.y;
+                            int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
+                            int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+                            this.canvas.setSize(w, h);
+                            size = canvas.getSize();
+                            this.shell.setSize(size.x + i1, size.y + i2);
+                        } else {
+                            resized();
+                        }
                     }
                     return;
                 }
@@ -1333,26 +1338,22 @@ public final class EmulatorScreen implements
                 Settings.resizeMode = 0;
                 fillScreenMenuItem.setSelection(false);
                 syncSizeMenuItem.setSelection(false);
-                keepAspectRatioMenuItem.setEnabled(false);
-                integerScalingMenuItem.setEnabled(false);
+                integerScalingMenuItem.setSelection(false);
             } else if(menuItem == syncSizeMenuItem) {
                 Settings.resizeMode = 1;
                 centerOnScreenMenuItem.setSelection(false);
                 fillScreenMenuItem.setSelection(false);
-                keepAspectRatioMenuItem.setEnabled(false);
-                integerScalingMenuItem.setEnabled(false);
+                integerScalingMenuItem.setSelection(false);
             } else if(menuItem == fillScreenMenuItem) {
                 Settings.resizeMode = 2;
                 centerOnScreenMenuItem.setSelection(false);
                 syncSizeMenuItem.setSelection(false);
-                keepAspectRatioMenuItem.setEnabled(true);
-                integerScalingMenuItem.setEnabled(true);
-            } else if(menuItem == keepAspectRatioMenuItem) {
-                Settings.keepAspectRatio = keepAspectRatioMenuItem.getSelection();
-                integerScalingMenuItem.setSelection(Settings.integerResize = false);
+                integerScalingMenuItem.setSelection(false);
             } else if(menuItem == integerScalingMenuItem) {
-                Settings.integerResize = integerScalingMenuItem.getSelection();
-                keepAspectRatioMenuItem.setSelection(Settings.keepAspectRatio = false);
+                Settings.resizeMode = 3;
+                centerOnScreenMenuItem.setSelection(false);
+                syncSizeMenuItem.setSelection(false);
+                fillScreenMenuItem.setSelection(false);
             }
             resized();
         }
@@ -1463,6 +1464,7 @@ public final class EmulatorScreen implements
         int scaledHeight;
 
         if(rotation % 2 == 1) {
+            // swap width & height if rotated by 90 or 270 degrees
             canvasWidth = size.height;
             canvasHeight = size.width;
             scaledWidth = zoomedHeight;
@@ -1474,6 +1476,7 @@ public final class EmulatorScreen implements
             scaledHeight = zoomedHeight;
         }
 
+        // Keep proportions
         final float ratio = ((float) origWidth / (float) origHeight);
         if(Settings.keepAspectRatio && ratio != ((float) scaledWidth / (float) scaledHeight)) {
             scaledWidth = (int) ((float) scaledHeight * ratio);
@@ -1483,16 +1486,26 @@ public final class EmulatorScreen implements
             }
         }
 
+        // Old zoom
+        if(Settings.resizeMode != 1 && zoom != 1f) {
+            scaledWidth *= zoom;
+            scaledHeight *= zoom;
+        }
+
         int x = (canvasWidth - scaledWidth) / 2;
         int y = (canvasHeight - scaledHeight) / 2;
         try {
+            // Fill background
             if(x > 0 || y > 0 || scaledWidth != origWidth) {
                 gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
                 gc.fillRectangle(0, 0, size.width, size.height);
             }
+            // Apply transform
             gc.setTransform(this.paintTransform);
+            // Draw canvas buffer
             if (this.screenImg == null || this.screenImg.isDisposed()) {
                 if (this.pauseState == 0) {
+                    // Game not running, show info label
                     gc.setBackground(EmulatorScreen.display.getSystemColor(22));
                     gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
                     gc.setForeground(EmulatorScreen.display.getSystemColor(21));
@@ -1513,10 +1526,10 @@ public final class EmulatorScreen implements
                     }
                 }
             } else {
+                // Hold image (paused)
                 gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, 0, 0, scaledWidth, scaledHeight);
             }
-        } catch (Exception ex) {
-        }
+        } catch (Exception ex) {}
         screenX = x;
         screenY = y;
         screenWidth = scaledWidth;
@@ -1807,6 +1820,7 @@ public final class EmulatorScreen implements
     }
 
     int[] transformPointer(int x, int y)  {
+        // Map coordinates on window to canvas
         int w, h;
         if(rotation % 2 == 1) {
             w = getHeight();
@@ -1848,10 +1862,7 @@ public final class EmulatorScreen implements
             this.mouseYRelease = mouseEvent.y;
             this.mouseDownInfos = true;
         }
-        if (this.pauseState == 0) {
-            return;
-        }
-        if (Settings.playingRecordedKeys) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
         if (Emulator.getCurrentDisplay().getCurrent() != null) {
@@ -1894,11 +1905,7 @@ public final class EmulatorScreen implements
 
     public final void mouseUp(final MouseEvent mouseEvent) {
         this.mouseDownInfos = false;
-        if (this.pauseState == 0) {
-            return;
-        }
-
-        if (Settings.playingRecordedKeys) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
         if (Emulator.getCurrentDisplay().getCurrent() != null) {
@@ -1945,7 +1952,7 @@ public final class EmulatorScreen implements
             this.updateInfos(mouseEvent.x, mouseEvent.y);
 //            return;
         }
-        if (this.pauseState == 0) {
+        if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }
         final int xoff = 1;
@@ -2201,6 +2208,7 @@ public final class EmulatorScreen implements
         if(Settings.resizeMode > 0) {
             synchronized (this) {
                 if (Settings.resizeMode == 1) {
+                    // Sync canvas size
                     zoomedWidth = rotation % 2 == 1 ? size.height : size.width;
                     zoomedHeight = rotation % 2 == 1 ? size.width : size.height;
                     int w = (int) ((float) zoomedWidth / zoom);
@@ -2209,24 +2217,23 @@ public final class EmulatorScreen implements
                         initScreenBuffer(w, h);
                         Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
                     }
-                } else if(Settings.integerResize) {
+                } else if (Settings.resizeMode == 3) {
+                    // Integer scaling
                     float f = Math.min((float) size.width / (float) origWidth, (float) size.height / (float) origHeight);
                     f = (int) (f - (f % 1));
                     if(f < 1) f = 1;
                     zoomedWidth = (int) ((float) origWidth * f);
                     zoomedHeight = (int) ((float) origHeight * f);
-                    rotate90degrees(true);
-                    Settings.canvasScale = (int) (f * 100.0F);
-                    caret.setWindowZoom(this.zoom = f);
-                    updateStatus();
                 } else {
+                    // Fit
                     zoomedWidth = size.width;
                     zoomedHeight = size.height;
                 }
             }
         } else {
-            zoomedWidth = (int) (getWidth() * zoom);
-            zoomedHeight = (int) (getHeight() * zoom);
+            // No scaling / center
+            zoomedWidth = getWidth();
+            zoomedHeight = getHeight();
         }
         canvas.redraw();
         caret.setWindowZoom((float) screenHeight / (float) origHeight);
@@ -2440,30 +2447,8 @@ public final class EmulatorScreen implements
         int k = 0;
         if (arg0.count < 0) {
             k = Integer.parseInt(KeyMapping.replaceKey(2));
-    		/*
-    		Event e = new Event();
-    		e.widget = this.canvas;
-    		KeyEvent ke = new KeyEvent(e);
-    		ke.keyCode = 16777218;
-    		ke.character = '\0';
-    		ke.doit = true;
-    		ke.stateMask = 0;
-    		this.keyPressed(ke);
-    		this.keyReleased(ke);
-    		*/
         } else if (arg0.count > 0) {
             k = Integer.parseInt(KeyMapping.replaceKey(1));
-    		/*
-    		Event e = new Event();
-    		e.widget = this.canvas;
-    		KeyEvent ke = new KeyEvent(e);
-    		ke.keyCode = 16777217;
-    		ke.character = '\0';
-    		ke.doit = true;
-    		ke.stateMask = 0;
-    		this.keyPressed(ke);
-    		this.keyReleased(ke);
-    		*/
         }
         if (k != 0) {
             mp(k);
