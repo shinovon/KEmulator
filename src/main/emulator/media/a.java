@@ -171,7 +171,8 @@ public final class a {
         this.method731(255, 1);
         this.method731(81, 1);
         this.method731(3, 1);
-        final int n = 60000000 / this.anInt1280;
+        // tempo
+        final int n = this.anInt1280 == 0 ? 60000000 / 250 : 60000000 / this.anInt1280;
         this.method731(n >> 16, 1);
         this.method731(n >> 8 & 0xFF, 1);
         this.method731(n & 0xFF, 1);
