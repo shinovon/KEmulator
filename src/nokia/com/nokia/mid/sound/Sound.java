@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.microedition.media.PlayerListener;
+import javax.microedition.media.control.MIDIControl;
 import javax.microedition.media.control.VolumeControlImpl;
 
 public class Sound {
@@ -115,6 +116,9 @@ public class Sound {
     public void resume() {
         try {
             this.m_player.start();
+            if(type == FORMAT_TONE) {
+                ((MIDIControl) m_player.getControl("MIDIControl")).setChannelVolume(0, 64);
+            }
         } catch (Exception localException) {
         }
         this.state = 0;

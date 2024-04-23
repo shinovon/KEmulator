@@ -72,7 +72,7 @@ public class EmulatorMIDI {
     public static void setMIDIChannelVolume(final int n, final int n2) {
         try {
             Receiver r = getMidiReceiver();
-            ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, (int) (n2 * 127.0));
+            ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, n2);
             r.send(shortMessage, -1L);
         } catch (Exception ex) {
             ex.printStackTrace();
