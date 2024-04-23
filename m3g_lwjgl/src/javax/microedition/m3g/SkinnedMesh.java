@@ -50,25 +50,25 @@ public class SkinnedMesh extends Mesh {
         return var1;
     }
 
-    public void addTransform(Node var1, int var2, int var3, int var4) {
-        if (var1 == null) {
+    public void addTransform(Node bone, int weight, int firstVertex, int numVertices) {
+        if (bone == null) {
             throw new NullPointerException();
-        } else if (var1 != this.aGroup1203 && !var1.isDescendantOf(this.aGroup1203)) {
+        } else if (bone != this.aGroup1203 && !bone.isDescendantOf(this.aGroup1203)) {
             throw new IllegalArgumentException();
-        } else if (var2 > 0 && var4 > 0) {
-            if (var3 >= 0 && var3 + var4 <= '\uffff') {
+        } else if (weight > 0 && numVertices > 0) {
+            if (firstVertex >= 0 && firstVertex + numVertices <= '\uffff') {
                 int var5;
-                for (var5 = 0; var5 < this.m_transforms.size() && var3 > ((WeightedTransform) this.m_transforms.elementAt(var5)).m_firstVertex; ++var5) {
+                for (var5 = 0; var5 < this.m_transforms.size() && firstVertex > ((WeightedTransform) this.m_transforms.elementAt(var5)).firstVertex; ++var5) {
                     ;
                 }
 
                 Transform var6 = new Transform();
-                if (!this.getTransformTo(var1, var6)) {
+                if (!this.getTransformTo(bone, var6)) {
                     throw new ArithmeticException();
                 } else {
-                    WeightedTransform var7 = new WeightedTransform(var1, var6, var2, var3, var3 + var4 - 1);
+                    WeightedTransform var7 = new WeightedTransform(bone, var6, weight, firstVertex, firstVertex + numVertices - 1);
                     this.m_transforms.insertElementAt(var7, var5);
-                    var1.setSkinnedMeshBone();
+                    bone.setSkinnedMeshBone();
                 }
             } else {
                 throw new IndexOutOfBoundsException();
@@ -86,8 +86,8 @@ public class SkinnedMesh extends Mesh {
                 WeightedTransform var3 = null;
 
                 for (int var4 = 0; var4 < this.m_transforms.size(); ++var4) {
-                    if ((var3 = (WeightedTransform) this.m_transforms.elementAt(var4)).m_bone == var1) {
-                        var2.set(var3.m_toBoneTransform);
+                    if ((var3 = (WeightedTransform) this.m_transforms.elementAt(var4)).bone == var1) {
+                        var2.set(var3.toBoneTrans);
                         return;
                     }
                 }
@@ -111,11 +111,11 @@ public class SkinnedMesh extends Mesh {
 
             int var8;
             for (var8 = 0; var8 < this.m_transforms.size(); ++var8) {
-                if ((var7 = (WeightedTransform) this.m_transforms.elementAt(var8)).m_bone == var1 && var7.m_firstVertex < var5) {
-                    int var9 = Math.min(var5, var7.m_lastVertex + 1);
+                if ((var7 = (WeightedTransform) this.m_transforms.elementAt(var8)).bone == var1 && var7.firstVertex < var5) {
+                    int var9 = Math.min(var5, var7.lastVertex + 1);
 
-                    for (int var10 = var7.m_firstVertex; var10 < var9; ++var10) {
-                        var6[var10] += (float) var7.m_weight;
+                    for (int var10 = var7.firstVertex; var10 < var9; ++var10) {
+                        var6[var10] += (float) var7.weight;
                     }
                 }
             }

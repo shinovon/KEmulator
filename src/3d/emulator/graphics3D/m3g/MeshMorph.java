@@ -16,18 +16,19 @@ public final class MeshMorph {
     private static MeshMorph inst;
     private static MeshMorph viewInst;
     private Hashtable cacheTable = new Hashtable();
-    private Hashtable aHashtable1129 = new Hashtable();
+    private Hashtable processedWeightNodes = new Hashtable();
     public VertexBuffer morphed;
     private VertexArray[] tmpMorphTargets;
     private VertexArray positions;
     private VertexArray normals;
     private VertexArray colors;
     private VertexArray[] uvms;
-    private float[] tmpPositions;
-    private float[] tmpBias = new float[4];
+
+    private float[] tmpPositions, tmpNormals;
+
+    private float[] tmp = new float[4];
     private float[] tmpScaleBias = new float[4];
-    private float[] maxPos = new float[3];
-    private float[] minPos = new float[3];
+    private float[] maxPos = new float[3], minPos = new float[3];
 
     public static MeshMorph getInstance() {
         if (inst == null) {
@@ -211,11 +212,11 @@ public final class MeshMorph {
         if (vb.getPositions((float[]) null) != null) {
             positions = (VertexArray) vb.getPositions(tmpScaleBias).duplicate();
 
-            tmpBias[0] = tmpScaleBias[1];
-            tmpBias[1] = tmpScaleBias[2];
-            tmpBias[2] = tmpScaleBias[3];
+            tmp[0] = tmpScaleBias[1];
+            tmp[1] = tmpScaleBias[2];
+            tmp[2] = tmpScaleBias[3];
 
-            morphed.setPositions(positions, tmpScaleBias[0], tmpBias);
+            morphed.setPositions(positions, tmpScaleBias[0], tmp);
         } else {
             positions = null;
         }
@@ -240,11 +241,11 @@ public final class MeshMorph {
             if (vb.getTexCoords(i, (float[]) null) != null) {
                 uvms[i] = (VertexArray) vb.getTexCoords(i, tmpScaleBias).duplicate();
 
-                tmpBias[0] = tmpScaleBias[1];
-                tmpBias[1] = tmpScaleBias[2];
-                tmpBias[2] = tmpScaleBias[3];
+                tmp[0] = tmpScaleBias[1];
+                tmp[1] = tmpScaleBias[2];
+                tmp[2] = tmpScaleBias[3];
 
-                morphed.setTexCoords(i, uvms[i], tmpScaleBias[0], tmpBias);
+                morphed.setTexCoords(i, uvms[i], tmpScaleBias[0], tmp);
             } else {
                 uvms[i] = null;
             }
@@ -271,6 +272,9 @@ public final class MeshMorph {
             }
 
             morphed.setNormals(normals);
+            if (tmpNormals == null || tmpNormals.length < vertexCount * 3) {
+                tmpNormals = new float[vertexCount * 3];
+            }
         }
 
     }
@@ -282,234 +286,166 @@ public final class MeshMorph {
         VertexArray meshPoses = meshVB.getPositions(tmpScaleBias);
         if (meshPoses == null) {
             throw new IllegalStateException();
-        } else {
-            VertexArray var4 = meshVB.getNormals();
-            int vertexCount = meshVB.getVertexCount();
-            Vector var6 = mesh.getTransforms();
-
-            for (int var7 = 0; var7 < var6.size(); ++var7) {
-                WeightedTransform var8;
-                if ((var8 = (WeightedTransform) var6.elementAt(var7)).m_firstVertex < 0 || var8.m_lastVertex >= vertexCount) {
-                    throw new IllegalStateException();
-                }
-
-                WeightedTransform var9;
-                if ((var9 = (WeightedTransform) this.aHashtable1129.get(var8.m_bone)) != null) {
-                    var8.m_positionTransform.set(var9.m_positionTransform);
-                    if (var4 != null) {
-                        var8.m_normalTransform.set(var9.m_normalTransform);
-                    }
-                } else {
-                    var8.m_bone.getTransformTo(mesh, var8.m_positionTransform);
-                    var8.m_positionTransform.postMultiply(var8.m_toBoneTransform);
-                    if (var4 != null) {
-                        var8.m_normalTransform.set(var8.m_positionTransform);
-//                        ((Transform3D) var8.m_normalTransform.getImpl()).method445();
-                        ((Transform3D) var8.m_normalTransform.getImpl()).invert();
-                        var8.m_normalTransform.transpose();
-                    }
-
-                    this.aHashtable1129.put(var8.m_bone, var8);
-                }
-            }
-
-            this.aHashtable1129.clear();
-            short[] var23 = meshPoses.getShortValues();
-            byte[] var24 = meshPoses.getByteValues();
-            short[] positionsVals = this.positions.getShortValues();
-            short[] var10 = var4 == null ? null : var4.getShortValues();
-            byte[] var11 = var4 == null ? null : var4.getByteValues();
-            short[] var12 = var4 == null ? null : this.normals.getShortValues();
-            int var13 = 0;
-            int var14 = 0;
-            int var15 = -1;
-            float maxAxisSize = 0.0F;
-
-            this.maxPos[0] = this.maxPos[1] = this.maxPos[2] = -Float.MAX_VALUE;
-            this.minPos[0] = this.minPos[1] = this.minPos[2] = Float.MAX_VALUE;
-
-            int var17;
-            int var26;
-            for (var17 = 0; var17 < vertexCount; ++var17) {
-                WeightedTransform var18;
-                while (var6.size() > var15 + 1 && (var18 = (WeightedTransform) var6.elementAt(var15 + 1)).m_firstVertex <= var17) {
-                    var13 += var18.m_weight;
-                    ++var14;
-                    ++var15;
-                }
-
-                var26 = 0;
-                float[] var10000;
-                int var10001;
-                short var10002;
-                int var19;
-                int var10003;
-                float[] var29;
-                if (var14 <= 0) {
-                    for (var19 = 0; var19 < 3; ++var19) {
-                        if (meshPoses.getComponentType() == 2) {
-                            var10000 = this.tmpPositions;
-                            var10001 = var17 * 3 + var19;
-                            var10002 = var23[var17 * 3 + var19];
-                        } else {
-                            var10000 = this.tmpPositions;
-                            var10001 = var17 * 3 + var19;
-                            var10002 = (short) (var24[var17 * 3 + var19] * 257);
-                        }
-
-                        var10000[var10001] = (float) var10002;
-                        this.tmpPositions[var17 * 3 + var19] = this.tmpPositions[var17 * 3 + var19] * this.tmpScaleBias[0] + this.tmpScaleBias[var19 + 1];
-                        var10000 = this.maxPos;
-                        if (this.maxPos[var19] <= this.tmpPositions[var17 * 3 + var19]) {
-                            var29 = this.tmpPositions;
-                            var10003 = var17 * 3 + var19;
-                        } else {
-                            var29 = this.maxPos;
-                            var10003 = var19;
-                        }
-
-                        var10000[var19] = var29[var10003];
-                        var10000 = this.minPos;
-                        if (this.minPos[var19] >= this.tmpPositions[var17 * 3 + var19]) {
-                            var29 = this.tmpPositions;
-                            var10003 = var17 * 3 + var19;
-                        } else {
-                            var29 = this.minPos;
-                            var10003 = var19;
-                        }
-
-                        var10000[var19] = var29[var10003];
-                        if (var12 != null) {
-                            short[] var30;
-                            if (var4.getComponentType() == 2) {
-                                var30 = var12;
-                                var10001 = var17 * 3 + var19;
-                                var10002 = var10[var17 * 3 + var19];
-                            } else {
-                                var30 = var12;
-                                var10001 = var17 * 3 + var19;
-                                var10002 = (short) (var11[var17 * 3 + var19] * 257);
-                            }
-
-                            var30[var10001] = var10002;
-                        }
-                    }
-                } else {
-                    this.tmpPositions[var17 * 3] = this.tmpPositions[var17 * 3 + 1] = this.tmpPositions[var17 * 3 + 2] = 0.0F;
-                    if (var12 != null) {
-                        var12[var17 * 3] = var12[var17 * 3 + 1] = var12[var17 * 3 + 2] = 0;
-                    }
-
-                    if (var13 != 0 && this.tmpScaleBias[0] != 0.0F) {
-                        for (var19 = 0; var19 <= var15; ++var19) {
-                            WeightedTransform var20;
-                            if ((var20 = (WeightedTransform) var6.elementAt(var19)).m_lastVertex >= var17) {
-                                if (var20.m_lastVertex == var17) {
-                                    --var14;
-                                    var26 += var20.m_weight;
-                                }
-
-                                float var21 = (float) var20.m_weight / (float) var13;
-
-                                int var22;
-                                for (var22 = 0; var22 < 3; ++var22) {
-                                    if (meshPoses.getComponentType() == 2) {
-                                        var10000 = this.tmpBias;
-                                        var10001 = var22;
-                                        var10002 = var23[var17 * 3 + var22];
-                                    } else {
-                                        var10000 = this.tmpBias;
-                                        var10001 = var22;
-                                        var10002 = var24[var17 * 3 + var22];
-                                    }
-
-                                    var10000[var10001] = (float) var10002;
-                                }
-
-                                this.tmpBias[0] = var21 * (this.tmpBias[0] * this.tmpScaleBias[0] + this.tmpScaleBias[1]);
-                                this.tmpBias[1] = var21 * (this.tmpBias[1] * this.tmpScaleBias[0] + this.tmpScaleBias[2]);
-                                this.tmpBias[2] = var21 * (this.tmpBias[2] * this.tmpScaleBias[0] + this.tmpScaleBias[3]);
-                                this.tmpBias[3] = var21;
-                                var20.m_positionTransform.transform(this.tmpBias);
-                                this.tmpPositions[var17 * 3] += this.tmpBias[0];
-                                this.tmpPositions[var17 * 3 + 1] += this.tmpBias[1];
-                                this.tmpPositions[var17 * 3 + 2] += this.tmpBias[2];
-
-                                for (var22 = 0; var22 < 3; ++var22) {
-                                    var10000 = this.maxPos;
-                                    if (this.maxPos[var22] <= this.tmpPositions[var17 * 3 + var22]) {
-                                        var29 = this.tmpPositions;
-                                        var10003 = var17 * 3 + var22;
-                                    } else {
-                                        var29 = this.maxPos;
-                                        var10003 = var22;
-                                    }
-
-                                    var10000[var22] = var29[var10003];
-                                    var10000 = this.minPos;
-                                    if (this.minPos[var22] >= this.tmpPositions[var17 * 3 + var22]) {
-                                        var29 = this.tmpPositions;
-                                        var10003 = var17 * 3 + var22;
-                                    } else {
-                                        var29 = this.minPos;
-                                        var10003 = var22;
-                                    }
-
-                                    var10000[var22] = var29[var10003];
-                                }
-
-                                if (var12 != null) {
-                                    for (var22 = 0; var22 < 3; ++var22) {
-                                        float var31;
-                                        float var32;
-                                        if (var4.getComponentType() == 2) {
-                                            var10000 = this.tmpBias;
-                                            var10001 = var22;
-                                            var31 = (float) var10[var17 * 3 + var22] + 0.5F;
-                                            var32 = 32767.5F;
-                                        } else {
-                                            var10000 = this.tmpBias;
-                                            var10001 = var22;
-                                            var31 = (float) var11[var17 * 3 + var22] + 0.5F;
-                                            var32 = 127.5F;
-                                        }
-
-                                        var10000[var10001] = var31 / var32;
-                                    }
-
-                                    this.tmpBias[0] *= var21;
-                                    this.tmpBias[1] *= var21;
-                                    this.tmpBias[2] *= var21;
-                                    this.tmpBias[3] = 0.0F;
-                                    var20.m_normalTransform.transform(this.tmpBias);
-                                    var12[var17 * 3] += (short) G3DUtils.round(this.tmpBias[0] * 32767.5F - 0.5F);
-                                    var12[var17 * 3 + 1] += (short) G3DUtils.round(this.tmpBias[1] * 32767.5F - 0.5F);
-                                    var12[var17 * 3 + 2] += (short) G3DUtils.round(this.tmpBias[2] * 32767.5F - 0.5F);
-                                }
-                            }
-                        }
-
-                        var13 -= var26;
-                    }
-                }
-            }
-
-            for (int axis = 0; axis < 3; ++axis) {
-                tmpBias[axis] = (minPos[axis] + maxPos[axis]) / 2;
-
-                float tmpScale = (maxPos[axis] - minPos[axis]) / 2;
-                if(maxAxisSize < tmpScale) maxAxisSize = tmpScale;
-            }
-
-            float scale = maxAxisSize != 0.0F ? maxAxisSize / 32767.0F : 1.0F;
-
-            for (int i = 0; i < vertexCount; i++) {
-                positionsVals[i * 3 + 0] = (short) G3DUtils.round((tmpPositions[i * 3 + 0] - tmpBias[0]) / scale);
-                positionsVals[i * 3 + 1] = (short) G3DUtils.round((tmpPositions[i * 3 + 1] - tmpBias[1]) / scale);
-                positionsVals[i * 3 + 2] = (short) G3DUtils.round((tmpPositions[i * 3 + 2] - tmpBias[2]) / scale);
-            }
-
-            morphed.setPositions(positions, scale, tmpBias);
         }
+
+        VertexArray meshNorms = meshVB.getNormals();
+        int vertexCount = meshVB.getVertexCount();
+        Vector weights = mesh.getTransforms();
+
+        for (int i = 0; i < weights.size(); i++) {
+            WeightedTransform weight = (WeightedTransform) weights.elementAt(i);
+
+            if (weight.firstVertex < 0 || weight.lastVertex >= vertexCount) {
+                throw new IllegalStateException();
+            }
+
+            WeightedTransform hashWeight = (WeightedTransform) processedWeightNodes.get(weight.bone);
+            if (hashWeight != null) {
+                weight.posTrans.set(hashWeight.posTrans);
+                if (meshNorms != null) {
+                    weight.normTrans.set(hashWeight.normTrans);
+                }
+            } else {
+                weight.bone.getTransformTo(mesh, weight.posTrans);
+                weight.posTrans.postMultiply(weight.toBoneTrans);
+
+                if (meshNorms != null) {
+                    weight.normTrans.set(weight.posTrans);
+                    ((Transform3D) weight.normTrans.getImpl()).invert();
+                    weight.normTrans.transpose();
+                }
+
+                processedWeightNodes.put(weight.bone, weight);
+            }
+        }
+
+        processedWeightNodes.clear();
+
+        short[] shortPoses = meshPoses.getShortValues();
+        byte[] bytePoses = meshPoses.getByteValues();
+
+        short[] shortNorms = meshNorms == null ? null : meshNorms.getShortValues();
+        byte[] byteNorms = meshNorms == null ? null : meshNorms.getByteValues();
+        short[] normsOut = meshNorms == null ? null : normals.getShortValues();
+
+        maxPos[0] = maxPos[1] = maxPos[2] = -Float.MAX_VALUE;
+        minPos[0] = minPos[1] = minPos[2] = Float.MAX_VALUE;
+
+        for (int i = 0; i < vertexCount; i++) {
+            tmpPositions[i * 3] = tmpPositions[i * 3 + 1] = tmpPositions[i * 3 + 2] = 0;
+            if (meshNorms != null) {
+                tmpNormals[i * 3] = tmpNormals[i * 3 + 1] = tmpNormals[i * 3 + 2] = 0;
+            }
+
+            float weightSumm = 0;
+
+            //weights are sorted by firstVertex id
+            for (int t = 0; t < weights.size(); t++) {
+                WeightedTransform weight = (WeightedTransform) weights.elementAt(t);
+
+                if (weight.firstVertex > i) break; //weights are ordered by firstVertex index
+                if (i > weight.lastVertex) continue;
+
+                int boneWeight = weight.weight;
+                weightSumm += boneWeight;
+
+                for (int axis = 0; axis < 3; axis++) {
+                    if (meshPoses.getComponentType() == 2) {
+                        tmp[axis] = shortPoses[i * 3 + axis];
+                    } else {
+                        tmp[axis] = bytePoses[i * 3 + axis];
+                    }
+                }
+
+                tmp[0] = tmp[0] * tmpScaleBias[0] + tmpScaleBias[1];
+                tmp[1] = tmp[1] * tmpScaleBias[0] + tmpScaleBias[2];
+                tmp[2] = tmp[2] * tmpScaleBias[0] + tmpScaleBias[3];
+                tmp[3] = 1;
+
+                weight.posTrans.transform(tmp);
+
+                tmpPositions[i * 3 + 0] += tmp[0] * boneWeight;
+                tmpPositions[i * 3 + 1] += tmp[1] * boneWeight;
+                tmpPositions[i * 3 + 2] += tmp[2] * boneWeight;
+
+                if (meshNorms != null) {
+                    for (int axis = 0; axis < 3; ++axis) {
+                        if (meshNorms.getComponentType() == 2) {
+                            tmp[axis] = (shortNorms[i * 3 + axis] + 32768) / 65535f - 0.5f;
+                        } else {
+                            tmp[axis] = (byteNorms[i * 3 + axis] + 128) / 255f - 0.5f;
+                        }
+                    }
+
+                    tmp[3] = 0;
+
+                    weight.normTrans.transform(this.tmp);
+
+                    tmpNormals[i * 3 + 0] += tmp[0] * boneWeight;
+                    tmpNormals[i * 3 + 1] += tmp[1] * boneWeight;
+                    tmpNormals[i * 3 + 2] += tmp[2] * boneWeight;
+                }
+            }
+
+            for (int axis = 0; axis < 3; axis++) {
+                float posVal;
+
+                if (weightSumm != 0) {
+                    posVal = tmpPositions[i * 3 + axis];
+                    posVal /= weightSumm;
+                } else {
+                    if (meshPoses.getComponentType() == 2) {
+                        posVal = shortPoses[i * 3 + axis];
+                    } else {
+                        posVal = bytePoses[i * 3 + axis];
+                    }
+
+                    posVal = posVal * tmpScaleBias[0] + tmpScaleBias[axis + 1];
+                }
+
+                tmpPositions[i * 3 + axis] = posVal;
+
+                if (posVal > maxPos[axis]) maxPos[axis] = posVal;
+                if (posVal < minPos[axis]) minPos[axis] = posVal;
+
+                if (meshNorms != null) {
+                    float normVal;
+
+                    if (weightSumm != 0) {
+                        normVal = tmpNormals[i * 3 + axis] / weightSumm;
+                    } else {
+                        if (meshNorms.getComponentType() == 2) {
+                            normVal = (shortNorms[i * 3 + axis] + 32768) / 65535f - 0.5f;
+                        } else {
+                            normVal = (byteNorms[i * 3 + axis] + 128) / 255f - 0.5f;
+                        }
+                    }
+
+                    normsOut[i * 3 + axis] = (short) G3DUtils.round((normVal + 0.5f) * 65535 - 32768);
+                }
+            }
+        }
+
+        float maxAxisSize = 0.0F;
+
+        for (int axis = 0; axis < 3; ++axis) {
+            tmp[axis] = (minPos[axis] + maxPos[axis]) / 2;
+
+            float tmpScale = (maxPos[axis] - minPos[axis]) / 2;
+            if(maxAxisSize < tmpScale) maxAxisSize = tmpScale;
+        }
+
+        float scale = maxAxisSize != 0.0F ? maxAxisSize / 32767.0F : 1.0F;
+
+        short[] posesOut = positions.getShortValues();
+
+        for (int i = 0; i < vertexCount; i++) {
+            posesOut[i * 3 + 0] = (short) G3DUtils.round((tmpPositions[i * 3 + 0] - tmp[0]) / scale);
+            posesOut[i * 3 + 1] = (short) G3DUtils.round((tmpPositions[i * 3 + 1] - tmp[1]) / scale);
+            posesOut[i * 3 + 2] = (short) G3DUtils.round((tmpPositions[i * 3 + 2] - tmp[2]) / scale);
+        }
+
+        morphed.setPositions(positions, scale, tmp);
+        if (meshNorms != null) morphed.setNormals(normals);
     }
 }

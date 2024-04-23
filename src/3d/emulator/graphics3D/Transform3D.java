@@ -32,10 +32,6 @@ public final class Transform3D {
         }
     }
 
-//    public final void method445() {
-//        G3DUtils.Invert4x4(this.m_matrix, 0.0F);
-//    }
-
     public final void transpose() {
         this.swapAt(1, 4);
         this.swapAt(2, 8);
