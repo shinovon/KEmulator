@@ -715,9 +715,9 @@ public final class EmulatorScreen implements
 
         menuItemView.setMenu(this.menuView);
         this.menuTool = new Menu(menuItemTool);
-        (this.zoomInMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMIN", "Zoom In") + "\tPad+");
+        (this.zoomInMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMIN", "Zoom In") + "\tCtrl+Pad+");
         this.zoomInMenuItem.addSelectionListener((SelectionListener) this);
-        (this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tPad-");
+        (this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tCtrl+Pad-");
         this.zoomOutMenuItem.addSelectionListener((SelectionListener) this);
 
         final MenuItem interpolationMenuItem;
@@ -1662,11 +1662,11 @@ public final class EmulatorScreen implements
     }
 
     public final void keyPressed(final KeyEvent keyEvent) {
-        if (keyEvent.keyCode == 16777261) {
+        if (keyEvent.keyCode == 16777261 && (keyEvent.stateMask & SWT.CONTROL) != 0) {
             this.zoomOut();
             return;
         }
-        if (keyEvent.keyCode == 16777259) {
+        if (keyEvent.keyCode == 16777259 && (keyEvent.stateMask & SWT.CONTROL) != 0) {
             this.zoomIn();
             return;
         }
