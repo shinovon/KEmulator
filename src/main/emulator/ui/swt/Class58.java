@@ -15,7 +15,7 @@ final class Class58 implements Listener {
         switch (event.type) {
             case 12: {
                 Class90.method243(this.aClass90_824, false);
-                b.method387();
+                b.releaseContext();
                 break;
             }
         }

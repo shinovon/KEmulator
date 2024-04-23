@@ -15,6 +15,8 @@ import org.eclipse.swt.layout.*;
 import emulator.graphics3D.*;
 
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.opengl.GLCanvas;
+import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.*;
 
 public final class Class90 implements MouseMoveListener, DisposeListener {
@@ -24,7 +26,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private Menu aMenu895;
     private Composite aComposite907;
     private Tree aTree896;
-    private Canvas aCanvas897;
+    private GLCanvas canvas;
     private Memory ana898;
     private emulator.graphics3D.view.b ab369;
     private Camera aCamera901;
@@ -78,7 +80,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aMenu895 = null;
         this.aComposite907 = null;
         this.aTree896 = null;
-        this.aCanvas897 = null;
+        this.canvas = null;
         this.aMenu908 = null;
         this.aMenu913 = null;
         this.aMenu918 = null;
@@ -123,7 +125,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
 
     private void method531() {
         final Rectangle clientArea;
-        if ((clientArea = ((Scrollable) this.aCanvas897).getClientArea()).width == 0 || clientArea.height == 0) {
+        if ((clientArea = ((Scrollable) this.canvas).getClientArea()).width == 0 || clientArea.height == 0) {
             return;
         }
         if (this.anInt910 == 0) {
@@ -222,12 +224,12 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
                 b.method381(var2, (Transform)null);
             }
         }
-        this.aRectangle903 = this.aCanvas897.getClientArea();
+        this.aRectangle903 = this.canvas.getClientArea();
     }
 
     private void method540() {
-        if (!emulator.graphics3D.view.b.method384()) {
-            this.ab369.method380();
+        if (!ab369.isCurrent()) {
+            this.ab369.setCurrent();
         }
         this.aTransform372.setIdentity();
         this.aTransform372.postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
@@ -254,7 +256,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
             this.ab369.method389();
             this.ab369.method364(this.aRectangle903.width, this.aRectangle903.height);
         }
-        emulator.graphics3D.view.b.method386();
+        ab369.swapBuffers();
     }
 
     private void method543() {
@@ -381,12 +383,15 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.grabExcessVerticalSpace = true;
         layoutData.verticalAlignment = 4;
-        ((Control) (this.aCanvas897 = new Canvas(this.aComposite907, 264192))).setLayoutData((Object) layoutData);
-        ((Control) this.aCanvas897).addMouseMoveListener((MouseMoveListener) this);
-        ((Control) this.aCanvas897).addMouseListener((MouseListener) new Class56(this));
-        ((Control) this.aCanvas897).addControlListener((ControlListener) new Class57(this));
-        ((Widget) this.aCanvas897).addListener(12, (Listener) new Class58(this));
-        ((Widget) this.aCanvas897).addListener(37, (Listener) new Class59(this));
+        GLData gld = new GLData();
+        gld.depthSize = 24;
+        gld.doubleBuffer = true;
+        ((Control) (this.canvas = new GLCanvas(this.aComposite907, 264192, gld))).setLayoutData((Object) layoutData);
+        ((Control) this.canvas).addMouseMoveListener((MouseMoveListener) this);
+        ((Control) this.canvas).addMouseListener((MouseListener) new Class56(this));
+        ((Control) this.canvas).addControlListener((ControlListener) new Class57(this));
+        ((Widget) this.canvas).addListener(12, (Listener) new Class58(this));
+        ((Widget) this.canvas).addListener(37, (Listener) new Class59(this));
     }
 
     public final void mouseMove(final MouseEvent mouseEvent) {
@@ -465,7 +470,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     static Canvas method231(final Class90 class90) {
-        return class90.aCanvas897;
+        return class90.canvas;
     }
 
     static boolean method236(final Class90 class90, final boolean aBoolean909) {
@@ -645,7 +650,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
 
         public final void run() {
-            Class90.method243(this.aClass90_1207, aClass90_1207.ab369.method379(aClass90_1207.aCanvas897));
+            Class90.method243(this.aClass90_1207, aClass90_1207.ab369.useContext(aClass90_1207.canvas));
             while (Class90.method231(this.aClass90_1207) != null) {
                 if (((Widget) Class90.method231(this.aClass90_1207)).isDisposed()) {
                     return;

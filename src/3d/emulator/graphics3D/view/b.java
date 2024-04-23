@@ -35,10 +35,10 @@ import javax.microedition.m3g.VertexArray;
 import javax.microedition.m3g.VertexBuffer;
 import javax.microedition.m3g.World;
 
+import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
-import org.eclipse.swt.internal.opengl.win32.WGL;
-import org.eclipse.swt.internal.win32.OS;
-import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.opengl.GLCanvas;
+import org.eclipse.swt.widgets.Event;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -58,6 +58,7 @@ public final class b {
     private static Transform aTransform589 = new Transform();
     private static Vector aVector590 = new Vector();
     private static Vector aVector593 = new Vector();
+    private static GLCanvas glCanvas;
 
     private b() {
         ab583 = this;
@@ -394,74 +395,81 @@ public final class b {
         return aPIXELFORMATDESCRIPTOR587;
     }
 
-    public final boolean method379(Canvas var1) {
-        anInt594 = var1.handle;
-        int var2;
-        int var3;
-        if ((var3 = WGL.ChoosePixelFormat(var2 = OS.GetDC(anInt594), method378())) != 0 && WGL.SetPixelFormat(var2, var3, aPIXELFORMATDESCRIPTOR587)) {
-            anInt595 = WGL.wglCreateContext(var2);
-            if (anInt595 == 0) {
-                OS.ReleaseDC(anInt594, var2);
-                Emulator.getEmulator().getLogStream().println("wglCreateContext() error!!");
-                return false;
-            } else {
-                OS.ReleaseDC(anInt594, var2);
-                this.method380();
+    public final boolean useContext(GLCanvas canvas) {
+        glCanvas = canvas;
+//        anInt594 = canvas.handle;
+//        int var2;
+//        int var3;
+//        if ((var3 = WGL.ChoosePixelFormat(var2 = OS.GetDC(anInt594), method378())) != 0 && WGL.SetPixelFormat(var2, var3, aPIXELFORMATDESCRIPTOR587)) {
+//            anInt595 = WGL.wglCreateContext(var2);
+//            if (anInt595 == 0) {
+//                OS.ReleaseDC(anInt594, var2);
+//                Emulator.getEmulator().getLogStream().println("wglCreateContext() error!!");
+//                return false;
+//            } else {
+//                OS.ReleaseDC(anInt594, var2);
+        setCurrent();
 
-                try {
-                    GLContext.useContext(var1);
-                } catch (Exception var4) {
-                    var4.printStackTrace();
-                    Emulator.getEmulator().getLogStream().println("useContext() error!!");
-                    return false;
-                }
-
-                GL11.glEnable(3089);
-                GL11.glEnable(2977);
-                GL11.glPixelStorei(3317, 1);
-                GL11.glEnable(2832);
-                GL11.glEnable(2848);
-                GL11.glEnable(2881);
-                GL11.glEnable(3024);
-                return true;
-            }
-        } else {
-            OS.ReleaseDC(anInt594, var2);
-            Emulator.getEmulator().getLogStream().println("SetPixelFormat() error!!");
+        try {
+            GLContext.useContext(canvas);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Emulator.getEmulator().getLogStream().println("useContext() error!!");
             return false;
         }
+
+        GL11.glEnable(3089);
+        GL11.glEnable(2977);
+        GL11.glPixelStorei(3317, 1);
+        GL11.glEnable(2832);
+        GL11.glEnable(2848);
+        GL11.glEnable(2881);
+        GL11.glEnable(3024);
+        return true;
+//            }
+//        } else {
+//            OS.ReleaseDC(anInt594, var2);
+//            Emulator.getEmulator().getLogStream().println("SetPixelFormat() error!!");
+//            return false;
+//        }
     }
 
-    public final void method380() {
-        if (!method384()) {
-            int var1;
-            WGL.wglMakeCurrent(var1 = OS.GetDC(anInt594), anInt595);
-            OS.ReleaseDC(anInt594, var1);
+    public final void setCurrent() {
+//        if (!method384()) {
+//            int var1;
+//            WGL.wglMakeCurrent(var1 = OS.GetDC(anInt594), anInt595);
+//            OS.ReleaseDC(anInt594, var1);
+//        }
+        if(!glCanvas.isCurrent()) {
+            glCanvas.setCurrent();
         }
     }
 
-    public static boolean method384() {
-        boolean var0 = false;
-        int var1 = OS.GetDC(anInt594);
-        var0 = WGL.wglGetCurrentContext() == var1;
-        OS.ReleaseDC(anInt594, var1);
-        return var0;
+    public static boolean isCurrent() {
+        return glCanvas.isCurrent();
+//        boolean var0 = false;
+//        int var1 = OS.GetDC(anInt594);
+//        var0 = WGL.wglGetCurrentContext() == var1;
+//        OS.ReleaseDC(anInt594, var1);
+//        return var0;
     }
 
-    public static void method386() {
-        int var0;
-        WGL.SwapBuffers(var0 = OS.GetDC(anInt594));
-        OS.ReleaseDC(anInt594, var0);
+    public static void swapBuffers() {
+        glCanvas.swapBuffers();
+//        int var0;
+//        WGL.SwapBuffers(var0 = OS.GetDC(anInt594));
+//        OS.ReleaseDC(anInt594, var0);
     }
 
-    public static void method387() {
+    public static void releaseContext() {
         try {
             GLContext.useContext((Object) null);
         } catch (Exception var0) {
             ;
         }
-
-        WGL.wglDeleteContext(anInt595);
+//        if(glCanvas != null)
+//            glCanvas.notifyListeners(12, new Event());
+//        WGL.wglDeleteContext(anInt595);
     }
 
     public static void method371(Camera var0, Transform var1) {

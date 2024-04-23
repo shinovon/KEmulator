@@ -698,7 +698,7 @@ public final class EmulatorScreen implements
         this.methodsMenuItem.addSelectionListener((SelectionListener) this);
         (this.memoryViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
         (this.m3gViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
-        m3gViewMenuItem.setEnabled(Settings.g3d == 1 && win);
+        m3gViewMenuItem.setEnabled(Settings.g3d == 1);
         this.m3gViewMenuItem.addSelectionListener((SelectionListener)this);
         this.memoryViewMenuItem.addSelectionListener((SelectionListener) this);
         (this.smsConsoleMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SMS", "SMS Console"));
@@ -1288,14 +1288,16 @@ public final class EmulatorScreen implements
                         return;
                     }
                     ((Class83) Emulator.getEmulator().getMessage()).method481(this.shell);
-                } else if (menuItem.equals(this.m3gViewMenuItem)) {
+                } else if (menuItem == m3gViewMenuItem) {
                     try {
                         if (((EmulatorImpl) Emulator.getEmulator()).getM3GView().method494()) {
                             ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method507();
                             return;
                         }
                         ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method226();
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
                 }
                 else {
                     if (menuItem.equals(this.xrayViewMenuItem)) {
@@ -1411,7 +1413,7 @@ public final class EmulatorScreen implements
         this.profilerMenuItem.setEnabled(this.pauseState != 0);
         this.memoryViewMenuItem.setEnabled(this.pauseState != 0);
         this.methodsMenuItem.setEnabled(this.pauseState != 0);
-        m3gViewMenuItem.setEnabled(m3gViewMenuItem.getEnabled() && pauseState != 0);
+        m3gViewMenuItem.setEnabled(Settings.g3d == 1 && pauseState != 0);
         this.startRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter == null);
         this.stopRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter != null);
         this.updateStatus();
