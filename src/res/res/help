@@ -48,6 +48,7 @@ Added M3GView from 0.9.8
 Free window resize & more scaling options
 Improved controller support
 Rewrote keyboard input handling
+Fixed nokia sound tones
 
 $nnmod v2.15.2 [2024.04.16]
 Improved M3G textures debugging in MemoryView (contributed by rmn20)
@@ -846,4 +847,4 @@ $[Bug Report]
 telegram @nnmidletschat / @shinovon
 
 $Special thanks to:
-Афабыч, TwoSpacesSG, sym_ansel
+Афабыч, TwoSpacesSG, sym_ansel, rmn20
