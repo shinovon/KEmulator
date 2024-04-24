@@ -44,9 +44,6 @@ public final class EmulatorImpl implements IEmulator {
         this.aClass5_1391 = new Class5(1);
         this.aClass110_1382 = new MemoryView();
         this.aClass46_1381 = new Class46();
-        try {
-            this.aClass90_1384 = new Class90();
-        } catch (Error ignored) {}
     }
 
     public static void dispose() {
@@ -107,6 +104,9 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public final Class90 getM3GView() {
+        if(aClass90_1384 == null) {
+            this.aClass90_1384 = new Class90();
+        }
         return this.aClass90_1384;
     }
 
