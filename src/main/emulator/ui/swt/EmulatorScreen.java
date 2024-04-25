@@ -2274,7 +2274,7 @@ public final class EmulatorScreen implements
         if (!Settings.enableVibration) {
             return;
         }
-        if(shell.getMaximized()) {
+        if(maximized) {
             return;
         }
         this.vibra = aLong1013;
