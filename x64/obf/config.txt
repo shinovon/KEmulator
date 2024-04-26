@@ -61,6 +61,10 @@
 
 -keep public class org.pigler.** { public protected *; }
 
+-keep public class com.mexa.** { public protected *; }
+-keep public class com.j_phone.** { public protected *; }
+-keep public class com.jblend.** { public protected *; }
+
 # LIBRARIES
 -keep public class club.minnced.discord.rpc.** { public protected *; }
 
