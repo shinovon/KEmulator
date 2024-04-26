@@ -441,20 +441,34 @@ public final class EmulatorScreen implements
     }
 
 
-    private void zoom(float var1) {
-        this.zoom = var1;
+    private void zoom(float zoom) {
+        if (Settings.resizeMode == 3) {
+            zoom = (int) zoom;
+        }
+        this.zoom = zoom;
         rotate90degrees(true);
-        Settings.canvasScale = (int) (this.zoom * 100.0F);
+        Settings.canvasScale = (int) (zoom * 100.0F);
         Point size = canvas.getSize();
-        if(!shell.getMaximized() && Settings.resizeMode == 0) {
+        if (!shell.getMaximized()) {
             int i1 = this.shell.getSize().x - size.x;
             int i2 = this.shell.getSize().y - size.y;
-            int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
-            int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+            int bw = getWidth();
+            int bh = getHeight();
+            int w;
+            int h;
+            if (screenWidth != 0 && screenHeight != 0 &&
+                    (Settings.resizeMode == 2 || Settings.resizeMode == 3)) {
+                w = (int) (bw * zoom) + canvas.getBorderWidth() * 2 + screenX * 2;
+                h = (int) (bh * zoom) + canvas.getBorderWidth() * 2 + screenY * 2;
+            } else {
+                w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
+                h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+            }
             this.canvas.setSize(w, h);
             size = canvas.getSize();
             this.shell.setSize(size.x + i1, size.y + i2);
         }
+        resized();
         this.canvas.redraw();
         this.updateStatus();
     }
@@ -462,13 +476,13 @@ public final class EmulatorScreen implements
 
     private void zoomIn() {
         if (zoom < 5f) {
-            zoom(Math.min(5f, zoom + .5f));
+            zoom(Math.min(5f, zoom + (Settings.resizeMode == 3 ? 1 : .5f)));
         }
     }
 
     private void zoomOut() {
         if (zoom > 1f) {
-            zoom(Math.max(1f, zoom - .5f));
+            zoom(Math.max(1f, zoom - (Settings.resizeMode == 3 ? 1 : .5f)));
         }
     }
 
@@ -1517,14 +1531,17 @@ public final class EmulatorScreen implements
             }
         }
 
-        // Old zoom
-        if(Settings.resizeMode != 1 && zoom != 1f) {
+        if(Settings.resizeMode != 0) {
+            zoom = (float) scaledWidth / (float) origWidth;
+            Settings.canvasScale = (int) (zoom * 100F);
+        } else if(zoom != 1f) {
             scaledWidth *= zoom;
             scaledHeight *= zoom;
         }
 
         int x = (canvasWidth - scaledWidth) / 2;
         int y = (canvasHeight - scaledHeight) / 2;
+
         try {
             // Fill background
             if(x > 0 || y > 0 || scaledWidth != origWidth || scaledHeight != origHeight) {
@@ -1544,13 +1561,13 @@ public final class EmulatorScreen implements
                     gc.drawText(Emulator.getInfoString(), canvasWidth >> 3, canvasHeight >> 3, true);
                 }
                 else if (Settings.g2d == 0) {
-                    if(x == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
+                    if(x == 0 && y == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
                         this.screenCopySwt.method13(gc, 0, 0);
                     } else {
                         this.screenCopySwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
                     }
                 } else if (Settings.g2d == 1) {
-                    if(x == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
+                    if(x == 0 && y == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
                         this.screenCopyAwt.method13(gc, 0, 0);
                     } else {
                         this.screenCopyAwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
