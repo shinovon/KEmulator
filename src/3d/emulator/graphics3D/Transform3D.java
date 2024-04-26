@@ -119,23 +119,22 @@ public final class Transform3D {
         this.m_matrix[15] += this.m_matrix[12] * var1 + this.m_matrix[13] * var2 + this.m_matrix[14] * var3;
     }
 
-    private void method439(float[] var1, int var2) {
-        int var3 = 0;
+    private void vecTransform(float[] vec, int i) {
+        float x = this.m_matrix[0] * vec[i + 0] + this.m_matrix[1] * vec[i + 1] + this.m_matrix[2] * vec[i + 2] + this.m_matrix[3] * vec[i + 3];
+        float y = this.m_matrix[4] * vec[i + 0] + this.m_matrix[5] * vec[i + 1] + this.m_matrix[6] * vec[i + 2] + this.m_matrix[7] * vec[i + 3];
+        float z = this.m_matrix[8] * vec[i + 0] + this.m_matrix[9] * vec[i + 1] + this.m_matrix[10] * vec[i + 2] + this.m_matrix[11] * vec[i + 3];
+        float w = this.m_matrix[12] * vec[i + 0] + this.m_matrix[13] * vec[i + 1] + this.m_matrix[14] * vec[i + 2] + this.m_matrix[15] * vec[i + 3];
 
-        for (int var4 = 0; var4 < 4; ++var4) {
-            float var5 = (var5 = 0.0F + this.m_matrix[var3 + 0] * var1[var2 + 0]) + this.m_matrix[var3 + 1] * var1[var2 + 1] + this.m_matrix[var3 + 2] * var1[var2 + 2] + this.m_matrix[var3 + 3] * var1[var2 + 3];
-            this.aFloatArray617[var4] = var5;
-            var3 += 4;
-        }
-
-        System.arraycopy(this.aFloatArray617, 0, var1, var2, 4);
+        vec[i + 0] = x;
+        vec[i + 1] = y;
+        vec[i + 2] = z;
+        vec[i + 3] = w;
     }
 
     public final void transform(float[] var1) {
-        for (int var2 = 0; var2 + 4 <= var1.length; var2 += 4) {
-            this.method439(var1, var2);
+        for (int i = 0; i < var1.length; i += 4) {
+            this.vecTransform(var1, i);
         }
-
     }
 
     public final void transform(Vector4f var1) {
