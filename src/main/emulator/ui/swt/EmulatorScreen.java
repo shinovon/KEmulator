@@ -1368,15 +1368,18 @@ public final class EmulatorScreen implements
                 }
                 zoomedWidth = startWidth;
                 zoomedHeight = startHeight;
+                rotation = 0;
                 rotate90degrees(true);
                 Point size = canvas.getSize();
-                int i1 = this.shell.getSize().x - size.x;
-                int i2 = this.shell.getSize().y - size.y;
-                int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
-                int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
-                this.canvas.setSize(w, h);
+                int i1 = shell.getSize().x - size.x;
+                int i2 = shell.getSize().y - size.y;
+                int w = startWidth + canvas.getBorderWidth() * 2;
+                int h = startHeight + canvas.getBorderWidth() * 2;
+                zoom = 1;
+                Settings.canvasScale = 100;
+                canvas.setSize(w, h);
                 size = canvas.getSize();
-                this.shell.setSize(size.x + i1, size.y + i2);
+                shell.setSize(size.x + i1, size.y + i2);
                 return;
             } else if(menuItem == changeResMenuItem) {
                 ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
