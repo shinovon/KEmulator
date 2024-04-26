@@ -84,7 +84,7 @@ public abstract class Node extends Transformable {
             Node rootThis = this, rootTarget = target;
             int depthThis = getDepth(), depthTarget = target.getDepth();
 
-            while (rootThis != rootTarget) {
+            while (depthThis > depthTarget) {
                 rootThis.getCompositeTransform(tmpTrans);
                 transThis.preMultiply(tmpTrans);
                 depthThis--;
@@ -118,9 +118,10 @@ public abstract class Node extends Transformable {
     protected int getDepth() {
         Node node = this;
 
-        int depth;
-        for (depth = 0; node.parent != null; depth++) {
+        int depth = 0;
+        while (node.parent != null) {
             node = node.parent;
+            depth++;
         }
 
         return depth;
