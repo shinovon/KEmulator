@@ -73,57 +73,57 @@ public abstract class Node extends Transformable {
             throw new NullPointerException();
         }
 
-        Transform var3 = new Transform();
-        Transform var4 = new Transform();
-        Transform var5 = new Transform();
-        Node var6 = this;
-        Node var7 = target;
+        Transform tmpTrans = new Transform();
+        Transform transThis = new Transform();
+        Transform transTarget = new Transform();
 
         if (getRoot() != target.getRoot()) {
             return false;
         } else {
-            int var8 = target.getDepth();
 
-            int var9;
-            for (var9 = this.getDepth(); var9 > var8; var6 = var6.parent) {
-                var6.getCompositeTransform(var5);
-                var4.preMultiply(var5);
-                --var9;
+            Node rootThis = this, rootTarget = target;
+            int depthThis = getDepth(), depthTarget = target.getDepth();
+
+            while (rootThis != rootTarget) {
+                rootThis.getCompositeTransform(tmpTrans);
+                transThis.preMultiply(tmpTrans);
+                depthThis--;
+                rootThis = rootThis.parent;
             }
 
-            while (var8 > var9) {
-                var7.getCompositeTransform(var5);
-                var3.preMultiply(var5);
-                --var8;
-                var7 = var7.parent;
+            while (depthTarget > depthThis) {
+                rootTarget.getCompositeTransform(tmpTrans);
+                transTarget.preMultiply(tmpTrans);
+                depthTarget--;
+                rootTarget = rootTarget.parent;
             }
 
-            while (var6 != var7) {
-                var6.getCompositeTransform(var5);
-                var4.preMultiply(var5);
-                var6 = var6.parent;
-                var7.getCompositeTransform(var5);
-                var3.preMultiply(var5);
-                var7 = var7.parent;
+            while (rootThis != rootTarget) {
+                rootThis.getCompositeTransform(tmpTrans);
+                transThis.preMultiply(tmpTrans);
+                rootThis = rootThis.parent;
+                rootTarget.getCompositeTransform(tmpTrans);
+                transTarget.preMultiply(tmpTrans);
+                rootTarget = rootTarget.parent;
             }
 
 //                var3.getImpl_().method445();
-            var3.getImpl_().invert();
-            var3.postMultiply(var4);
-            transform.set(var3);
+            transTarget.getImpl_().invert();
+            transTarget.postMultiply(transThis);
+            transform.set(transTarget);
             return true;
         }
     }
 
     protected int getDepth() {
-        Node var1 = this;
+        Node node = this;
 
-        int var2;
-        for (var2 = 0; var1.parent != null; ++var2) {
-            var1 = var1.parent;
+        int depth;
+        for (depth = 0; node.parent != null; depth++) {
+            node = node.parent;
         }
 
-        return var2;
+        return depth;
     }
 
     protected boolean isParentOf(Node var1) {
@@ -304,15 +304,13 @@ public abstract class Node extends Transformable {
     }
 
     protected Node getRoot() {
-        Node var10000 = this;
+        Node node = this;
 
         while (true) {
-            Node var1 = var10000;
-            if (var10000.parent == null) {
-                return var1;
+            if (node.parent == null) {
+                return node;
             }
-
-            var10000 = var1.parent;
+            node = node.parent;
         }
     }
 

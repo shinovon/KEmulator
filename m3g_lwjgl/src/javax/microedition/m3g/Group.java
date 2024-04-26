@@ -36,10 +36,10 @@ public class Group extends Node {
         } else {
             if (!this.aVector931.contains(var1)) {
                 this.aVector931.add(var1);
+                var1.parent = this;
+                this.addReference(var1);
             }
 
-            var1.parent = this;
-            this.addReference(var1);
         }
     }
 
