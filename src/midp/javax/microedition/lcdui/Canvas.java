@@ -28,6 +28,7 @@ public abstract class Canvas extends Displayable {
     public static final int KEY_POUND = 35;
     protected int m_keyStates;
     private Graphics graphics;
+    private int vKeyStates;
 
     protected Canvas() {
         super();
@@ -60,7 +61,14 @@ public abstract class Canvas extends Displayable {
     }
 
     public void invokeKeyReleased(final int n) {
-        this.m_keyStates &= ~(1 << this.getGameAction(n));
+        int i = 1 << this.getGameAction(n);
+        if((m_keyStates & i) != 0)
+            m_keyStates &= ~i;
+
+        i = getKeyBit(n);
+        if((vKeyStates & i) != 0)
+            vKeyStates &= ~i;
+
         this.keyReleased(n);
     }
 
@@ -91,6 +99,7 @@ public abstract class Canvas extends Displayable {
             return;
         }
         this.m_keyStates |= 1 << this.getGameAction(n);
+        this.vKeyStates |= getKeyBit(n);
         this.keyPressed(n);
     }
 
@@ -406,5 +415,59 @@ public abstract class Canvas extends Displayable {
 
     public boolean isDoubleBuffered() {
         return true;
+    }
+
+    // Copyright Yury Kharchenko
+    private int getKeyBit(int vKey) {
+        switch(getGameAction(vKey)) {
+            case UP:
+                return 1 << 12; // 12 Up
+            case LEFT:
+                return 1 << 13; // 13 Left
+            case RIGHT:
+                return 1 << 14; // 14 Right
+            case DOWN:
+                return 1 << 15; // 15 Down
+            case FIRE:
+                return 1 << 16; // 16 Select
+            case GAME_C:
+                return 1 << 19; // 19 Softkey 3
+        }
+        switch (vKey) {
+            case KEY_NUM0:
+                return 1; //  0 0
+            case KEY_NUM1:
+                return 1 <<  1; //  1 1
+            case KEY_NUM2:
+                return 1 <<  2; //  2 2
+            case KEY_NUM3:
+                return 1 <<  3; //  3 3
+            case KEY_NUM4:
+                return 1 <<  4; //  4 4
+            case KEY_NUM5:
+                return 1 <<  5; //  5 5
+            case KEY_NUM6:
+                return 1 <<  6; //  6 6
+            case KEY_NUM7:
+                return 1 <<  7; //  7 7
+            case KEY_NUM8:
+                return 1 <<  8; //  8 8
+            case KEY_NUM9:
+                return 1 <<  9; //  9 9
+            case KEY_STAR:
+                return 1 << 10; // 10 *
+            case KEY_POUND:
+                return 1 << 11; // 11 #
+            default:
+                if(KeyMapping.isLeftSoft(vKey))
+                    return 1 << 17; // 17 Softkey 1
+                if(KeyMapping.isRightSoft(vKey))
+                    return 1 << 18; // 18 Softkey 2
+                return 0;
+        }
+    }
+
+    public int getKeyStatesVodafone() {
+        return vKeyStates;
     }
 }
