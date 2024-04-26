@@ -39,7 +39,11 @@ public class EGL10Impl implements EGL10 {
         if (num_config != null && num_config.length < 1) {
             throw new IllegalArgumentException("num_config != null && num_config.length < 1");
         }
-        num_config[0] = EGLConfigImpl.method780(configs);
+        if(configs != null) {
+            configs[0] = EGLConfigImpl.method779(1);
+        }
+        if(num_config != null)
+            num_config[0] = EGLConfigImpl.method780(configs);
         return true;
     }
 

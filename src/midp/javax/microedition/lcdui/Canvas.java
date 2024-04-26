@@ -80,17 +80,17 @@ public abstract class Canvas extends Displayable {
                     super.cmdListener.commandAction((Command) super.commands.get(n2), this);
                     super.aBoolean18 = false;
                 }
-            } else if (n == KeyMapping.getArrowKeyFromDevice(1)) {
+            } else if (n == KeyMapping.getArrowKeyFromDevice(UP)) {
                 if (super.anInt28 > 0) {
                     --super.anInt28;
                 }
-            } else if (n == KeyMapping.getArrowKeyFromDevice(6)) {
+            } else if (n == KeyMapping.getArrowKeyFromDevice(DOWN)) {
                 if (super.anInt28 < super.commands.size() - 2) {
                     ++super.anInt28;
                 }
             } else {
                 final int n3;
-                if (n == KeyMapping.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.commands.size()) {
+                if (n == KeyMapping.getArrowKeyFromDevice(FIRE) && (n3 = super.anInt28 + 1) < super.commands.size()) {
                     super.cmdListener.commandAction((Command) super.commands.get(n3), this);
                     super.aBoolean18 = false;
                 }
@@ -239,23 +239,23 @@ public abstract class Canvas extends Displayable {
                 break;
             }
             default: {
-                if (n == KeyMapping.getArrowKeyFromDevice(1) || n == 50) {
+                if (n == KeyMapping.getArrowKeyFromDevice(UP) || n == 50) {
                     n3 = 1;
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(6) || n == 56) {
+                if (n == KeyMapping.getArrowKeyFromDevice(DOWN) || n == 56) {
                     n3 = 6;
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(2) || n == 52) {
+                if (n == KeyMapping.getArrowKeyFromDevice(LEFT) || n == 52) {
                     n3 = 2;
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(5) || n == 54) {
+                if (n == KeyMapping.getArrowKeyFromDevice(RIGHT) || n == 54) {
                     n3 = 5;
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(8) || n == 53) {
+                if (n == KeyMapping.getArrowKeyFromDevice(FIRE) || n == 53) {
                     n3 = 8;
                     break;
                 }
@@ -267,51 +267,48 @@ public abstract class Canvas extends Displayable {
     }
 
     public int getKeyCode(final int n) {
-        int n2 = 0;
-        int n3 = 0;
+        int r = 0;
         switch (n) {
             case 1: {
-                n3 = KeyMapping.getArrowKeyFromDevice(1);
+                r = KeyMapping.getArrowKeyFromDevice(UP);
                 break;
             }
             case 6: {
-                n3 = KeyMapping.getArrowKeyFromDevice(6);
+                r = KeyMapping.getArrowKeyFromDevice(DOWN);
                 break;
             }
             case 2: {
-                n3 = KeyMapping.getArrowKeyFromDevice(2);
+                r = KeyMapping.getArrowKeyFromDevice(LEFT);
                 break;
             }
             case 5: {
-                n3 = KeyMapping.getArrowKeyFromDevice(5);
+                r = KeyMapping.getArrowKeyFromDevice(RIGHT);
                 break;
             }
             case 8: {
-                n3 = KeyMapping.getArrowKeyFromDevice(8);
+                r = KeyMapping.getArrowKeyFromDevice(FIRE);
                 break;
             }
             case 9: {
-                n3 = 49;
+                r = KEY_NUM1;
                 break;
             }
             case 10: {
-                n3 = 51;
+                r = KEY_NUM3;
                 break;
             }
             case 11: {
-                n3 = 55;
+                r = KEY_NUM7;
                 break;
             }
             case 12: {
-                n3 = 57;
+                r = KEY_NUM9;
                 break;
             }
-            default: {
-                return n2;
-            }
+            default:
+                break;
         }
-        n2 = n3;
-        return n2;
+        return r;
     }
 
     public String getKeyName(final int n) {
@@ -321,81 +318,79 @@ public abstract class Canvas extends Displayable {
             return "" + (char) n;
         }
         String s = "";
-        String s2 = null;
         switch (n) {
-            case 48: {
-                s2 = "0";
+            case KEY_NUM0: {
+                s = "0";
                 break;
             }
-            case 49: {
-                s2 = "1";
+            case KEY_NUM1: {
+                s = "1";
                 break;
             }
-            case 50: {
-                s2 = "2";
+            case KEY_NUM2: {
+                s = "2";
                 break;
             }
-            case 51: {
-                s2 = "3";
+            case KEY_NUM3: {
+                s = "3";
                 break;
             }
-            case 52: {
-                s2 = "4";
+            case KEY_NUM4: {
+                s = "4";
                 break;
             }
-            case 53: {
-                s2 = "5";
+            case KEY_NUM5: {
+                s = "5";
                 break;
             }
-            case 54: {
-                s2 = "6";
+            case KEY_NUM6: {
+                s = "6";
                 break;
             }
-            case 55: {
-                s2 = "7";
+            case KEY_NUM7: {
+                s = "7";
                 break;
             }
-            case 56: {
-                s2 = "8";
+            case KEY_NUM8: {
+                s = "8";
                 break;
             }
-            case 57: {
-                s2 = "9";
+            case KEY_NUM9: {
+                s = "9";
                 break;
             }
-            case 42: {
-                s2 = "*";
+            case KEY_STAR: {
+                s = "*";
                 break;
             }
-            case 35: {
-                s2 = "#";
+            case KEY_POUND: {
+                s = "#";
                 break;
             }
             default: {
-                if (n == KeyMapping.getArrowKeyFromDevice(1)) {
-                    s2 = "Up";
+                if (n == KeyMapping.getArrowKeyFromDevice(UP)) {
+                    s = "Up";
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(6)) {
-                    s2 = "Down";
+                if (n == KeyMapping.getArrowKeyFromDevice(DOWN)) {
+                    s = "Down";
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(2)) {
-                    s2 = "Left";
+                if (n == KeyMapping.getArrowKeyFromDevice(LEFT)) {
+                    s = "Left";
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(5)) {
-                    s2 = "Right";
+                if (n == KeyMapping.getArrowKeyFromDevice(RIGHT)) {
+                    s = "Right";
                     break;
                 }
-                if (n == KeyMapping.getArrowKeyFromDevice(8)) {
-                    s2 = "Select";
+                if (n == KeyMapping.getArrowKeyFromDevice(FIRE)) {
+                    s = "Select";
                     break;
                 }
                 return s;
             }
         }
-        s = s2;
         return s;
     }
 
@@ -470,4 +465,32 @@ public abstract class Canvas extends Displayable {
     public int getKeyStatesVodafone() {
         return vKeyStates;
     }
+
+    // TODO mascot capsule stub
+//    public void drawCommandList(Texture[] textures, int x, int y, FigureLayout layout, Effect3D effect, int[] commandlist) {
+//        com.jblend.graphics.j3d.RenderProxy.drawCommandList(this, textures, x, y, layout, effect, commandlist);
+//    }
+//
+//    public void drawCommandList(Texture texture, int x, int y, FigureLayout layout, Effect3D effect, int[] commandlist) {
+//        com.jblend.graphics.j3d.RenderProxy.drawCommandList(this, texture, x, y, layout, effect, commandlist);
+//    }
+//
+//    public void drawFigure(com.jblend.graphics.j3d.Figure figure,
+//                           int x, int y,
+//                           com.jblend.graphics.j3d.FigureLayout layout,
+//                           com.jblend.graphics.j3d.Effect3D effect) {
+//        com.jblend.graphics.j3d.RenderProxy.drawFigure(this, figure, x, y, layout, effect);
+//    }
+//
+//    public void flush() {
+//        com.jblend.graphics.j3d.RenderProxy.flush(this);
+//    }
+//
+//    public void renderFigure(Figure figure, int x, int y, FigureLayout layout, Effect3D effect) {
+//        com.jblend.graphics.j3d.RenderProxy.renderFigure(this, figure, x, y, layout, effect);
+//    }
+//
+//    public void renderPrimitives(Texture texture, int x, int y, FigureLayout layout, Effect3D effect, int command, int numPrimitives, int[] vertexCoords, int[] normals, int[] textureCoords, int[] colors) {
+//        com.jblend.graphics.j3d.RenderProxy.renderPrimitives(this, texture, x, y, layout, effect, command, numPrimitives, vertexCoords, normals, textureCoords, colors);
+//    }
 }

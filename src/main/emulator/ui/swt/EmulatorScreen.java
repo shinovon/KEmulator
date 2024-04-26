@@ -1844,7 +1844,7 @@ public final class EmulatorScreen implements
             return;
         }
         try {
-            Emulator.getScreen().invokeKeyPressed(KeyMapping.getArrowKeyFromDevice(8));
+            Emulator.getScreen().invokeKeyPressed(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1919,7 +1919,7 @@ public final class EmulatorScreen implements
                 if (Settings.fpsGame == 2)
                     handleKeyPress(13);
                 else
-                    mp(KeyMapping.getArrowKeyFromDevice(8));
+                    mp(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
                 return;
             }
             int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
@@ -1963,7 +1963,7 @@ public final class EmulatorScreen implements
                 if (Settings.fpsGame == 2)
                     handleKeyRelease(13);
                 else
-                    mr(KeyMapping.getArrowKeyFromDevice(8));
+                    mr(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
                 return;
             }
             if(!pointerState) return;

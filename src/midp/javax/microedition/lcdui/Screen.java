@@ -39,17 +39,17 @@ public abstract class Screen extends Displayable {
                     super.cmdListener.commandAction((Command) super.commands.get(n2), this);
                     super.aBoolean18 = false;
                 }
-            } else if (n == KeyMapping.getArrowKeyFromDevice(1)) {
+            } else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
                 if (super.anInt28 > 0) {
                     --super.anInt28;
                 }
-            } else if (n == KeyMapping.getArrowKeyFromDevice(6)) {
+            } else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
                 if (super.anInt28 < super.commands.size() - 2) {
                     ++super.anInt28;
                 }
             } else {
                 final int n3;
-                if (n == KeyMapping.getArrowKeyFromDevice(8) && (n3 = super.anInt28 + 1) < super.commands.size()) {
+                if (n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE) && (n3 = super.anInt28 + 1) < super.commands.size()) {
                     super.cmdListener.commandAction((Command) super.commands.get(n3), this);
                     super.aBoolean18 = false;
                 }
@@ -60,7 +60,7 @@ public abstract class Screen extends Displayable {
         if (selectedItem != null && selectedItem instanceof CustomItem && ((CustomItem) selectedItem).callTraverse(n)) {
             return;
         }
-        if (selectedItem != null && n == KeyMapping.getArrowKeyFromDevice(8)) {
+        if (selectedItem != null && n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)) {
             selectedItem.itemApplyCommand();
             return;
         }
@@ -96,7 +96,7 @@ public abstract class Screen extends Displayable {
                     this.anInt349 = -1;
                 }
             }
-        } else if (n == KeyMapping.getArrowKeyFromDevice(6) && this.items.size() > 0) {
+        } else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN) && this.items.size() > 0) {
             final int index2 = this.items.indexOf(selectedItem);
             if (selectedItem != null) {
                 if (!selectedItem.scrollDown()) {

@@ -243,7 +243,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
             try {
                 this.ab369.method368(this.aNode361, null);
             } catch (Exception localException) {
-                localException.printStackTrace();
+//                localException.printStackTrace();
             }
         }
         if (this.aBoolean381) {

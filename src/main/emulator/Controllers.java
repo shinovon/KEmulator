@@ -4,12 +4,14 @@ import java.util.*;
 
 import net.java.games.input.*;
 
+import javax.microedition.lcdui.Canvas;
+
 public class Controllers {
     private static ArrayList controllers = new ArrayList();
     private static int count;
     private static boolean loaded;
     private static String[][] binds;
-    private static boolean[][] dpad;
+    private static boolean[][] arrowKeysState;
     private static String aString1292;
     private static float lastX;
     private static float lastY;
@@ -145,7 +147,7 @@ public class Controllers {
             try {
                 init();
                 if (Controllers.count > 0) {
-                    Controllers.dpad = new boolean[Controllers.count][8];
+                    Controllers.arrowKeysState = new boolean[Controllers.count][8];
                     initBinds();
                 }
             } catch (Exception ex) {
@@ -159,7 +161,7 @@ public class Controllers {
         Controllers.loaded = false;
         Controllers.controllers.clear();
         Controllers.count = 0;
-        Controllers.dpad = null;
+        Controllers.arrowKeysState = null;
         Controllers.binds = null;
     }
 
@@ -233,41 +235,41 @@ public class Controllers {
         if(pov) {
             if (f < -0.7f) {
                 if (method748("LEFT")) return;
-                if (Controllers.dpad[n][0])
+                if (Controllers.arrowKeysState[n][0])
                     return;
                 Emulator.getEventQueue().keyPress(map(n, "LEFT"));
-                Controllers.dpad[n][0] = true;
+                Controllers.arrowKeysState[n][0] = true;
             } else if (f > 0.7f) {
                 if (method748("RIGHT")) return;
-                if (Controllers.dpad[n][1])
+                if (Controllers.arrowKeysState[n][1])
                     return;
                 Emulator.getEventQueue().keyPress(map(n, "RIGHT"));
-                Controllers.dpad[n][1] = true;
-            } else if (Controllers.dpad[n][0]) {
+                Controllers.arrowKeysState[n][1] = true;
+            } else if (Controllers.arrowKeysState[n][0]) {
                 Emulator.getEventQueue().keyRelease(map(n, "LEFT"));
-                Controllers.dpad[n][0] = false;
-            } else if (Controllers.dpad[n][1]) {
+                Controllers.arrowKeysState[n][0] = false;
+            } else if (Controllers.arrowKeysState[n][1]) {
                 Emulator.getEventQueue().keyRelease(map(n, "RIGHT"));
-                Controllers.dpad[n][1] = false;
+                Controllers.arrowKeysState[n][1] = false;
             }
             return;
         }
         if (f < -0.7f) {
-            if (Controllers.dpad[n][4])
+            if (Controllers.arrowKeysState[n][4])
                 return;
-            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(2));
-            Controllers.dpad[n][4] = true;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT));
+            Controllers.arrowKeysState[n][4] = true;
         } else if (f > 0.7f) {
-            if (Controllers.dpad[n][5])
+            if (Controllers.arrowKeysState[n][5])
                 return;
-            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(5));
-            Controllers.dpad[n][5] = true;
-        } else if (Controllers.dpad[n][4]) {
-            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(2));
-            Controllers.dpad[n][4] = false;
-        } else if (Controllers.dpad[n][5]) {
-            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(5));
-            Controllers.dpad[n][5] = false;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT));
+            Controllers.arrowKeysState[n][5] = true;
+        } else if (Controllers.arrowKeysState[n][4]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT));
+            Controllers.arrowKeysState[n][4] = false;
+        } else if (Controllers.arrowKeysState[n][5]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT));
+            Controllers.arrowKeysState[n][5] = false;
         }
     }
 
@@ -275,43 +277,43 @@ public class Controllers {
         if(pov) {
             if (f < -0.7f) {
                 if (method748("UP")) return;
-                if (Controllers.dpad[n][2])
+                if (Controllers.arrowKeysState[n][2])
                     return;
                 Emulator.getEventQueue().keyPress(map(n, "UP"));
-                Controllers.dpad[n][2] = true;
+                Controllers.arrowKeysState[n][2] = true;
             } else if (f > 0.7f) {
                 if (method748("DOWN")) return;
-                if (Controllers.dpad[n][3])
+                if (Controllers.arrowKeysState[n][3])
                     return;
                 Emulator.getEventQueue().keyPress(map(n, "DOWN"));
-                Controllers.dpad[n][3] = true;
-            } else if (Controllers.dpad[n][2]) {
+                Controllers.arrowKeysState[n][3] = true;
+            } else if (Controllers.arrowKeysState[n][2]) {
                 Emulator.getEventQueue().keyRelease(map(n, "UP"));
-                Controllers.dpad[n][2] = false;
-            } else if (Controllers.dpad[n][3]) {
+                Controllers.arrowKeysState[n][2] = false;
+            } else if (Controllers.arrowKeysState[n][3]) {
                 Emulator.getEventQueue().keyRelease(map(n, "DOWN"));
-                Controllers.dpad[n][3] = false;
+                Controllers.arrowKeysState[n][3] = false;
             }
             return;
         }
         if (f < -0.7f) {
             if (method748("UP")) return;
-            if (Controllers.dpad[n][6])
+            if (Controllers.arrowKeysState[n][6])
                 return;
-            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(1));
-            Controllers.dpad[n][6] = true;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.UP));
+            Controllers.arrowKeysState[n][6] = true;
         } else if (f > 0.7f) {
             if (method748("DOWN")) return;
-            if (Controllers.dpad[n][7])
+            if (Controllers.arrowKeysState[n][7])
                 return;
-            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(6));
-            Controllers.dpad[n][7] = true;
-        } else if (Controllers.dpad[n][6]) {
-            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(1));
-            Controllers.dpad[n][6] = false;
-        } else if (Controllers.dpad[n][7]) {
-            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(6));
-            Controllers.dpad[n][7] = false;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN));
+            Controllers.arrowKeysState[n][7] = true;
+        } else if (Controllers.arrowKeysState[n][6]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.UP));
+            Controllers.arrowKeysState[n][6] = false;
+        } else if (Controllers.arrowKeysState[n][7]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN));
+            Controllers.arrowKeysState[n][7] = false;
         }
     }
 
