@@ -648,7 +648,7 @@ public class Emulator {
         }
         String arch = System.getProperty("os.arch");
         if (!platform.isX64() && !arch.equals("x86")) {
-            JOptionPane.showMessageDialog(new JPanel(), "Can't run this version KEmulator nnmod at this architecture (" + arch + "). Try x64 version instead.");
+            JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod at this architecture (" + arch + "). Try x64 version instead.");
             System.exit(0);
             return;
         }

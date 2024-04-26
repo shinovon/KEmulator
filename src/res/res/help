@@ -49,6 +49,7 @@ Free window resize & more scaling options
 Improved controller support
 Rewrote keyboard input handling
 Fixed nokia sound tones
+Added SoftBank implementation from JL-Mod by woesss
 
 $nnmod v2.15.2 [2024.04.16]
 Improved M3G textures debugging in MemoryView (contributed by rmn20)
