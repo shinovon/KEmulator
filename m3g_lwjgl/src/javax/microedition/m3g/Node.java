@@ -15,16 +15,16 @@ public abstract class Node extends Transformable {
     private boolean pickingEnable = true;
     private float alphaFactor = 1.0F;
     private int scope = -1;
-    private int anInt39;
-    private int anInt40;
-    private Node aNode1304;
-    private Node aNode1305;
+    private int yTarget;
+    private int zTarget;
+    private Node yRef;
+    private Node zRef;
     private boolean boneFlag;
     protected Node m_duplicatedNode;
 
     Node() {
-        this.anInt39 = this.anInt40 = 144;
-        this.aNode1304 = this.aNode1305 = null;
+        this.yTarget = this.zTarget = 144;
+        this.yRef = this.zRef = null;
         this.boneFlag = false;
     }
 
@@ -68,49 +68,50 @@ public abstract class Node extends Transformable {
         return this.parent;
     }
 
-    public boolean getTransformTo(Node var1, Transform var2) {
-        if (var1 != null && var2 != null) {
-            Transform var3 = new Transform();
-            Transform var4 = new Transform();
-            Transform var5 = new Transform();
-            Node var6 = this;
-            Node var7 = var1;
-            if (this.getRoot() != var1.getRoot()) {
-                return false;
-            } else {
-                int var8 = var1.getDepth();
+    public boolean getTransformTo(Node target, Transform transform) {
+        if (target == null || transform == null) {
+            throw new NullPointerException();
+        }
 
-                int var9;
-                for (var9 = this.getDepth(); var9 > var8; var6 = var6.parent) {
-                    var6.getCompositeTransform(var5);
-                    var4.preMultiply(var5);
-                    --var9;
-                }
+        Transform var3 = new Transform();
+        Transform var4 = new Transform();
+        Transform var5 = new Transform();
+        Node var6 = this;
+        Node var7 = target;
 
-                while (var8 > var9) {
-                    var7.getCompositeTransform(var5);
-                    var3.preMultiply(var5);
-                    --var8;
-                    var7 = var7.parent;
-                }
+        if (getRoot() != target.getRoot()) {
+            return false;
+        } else {
+            int var8 = target.getDepth();
 
-                while (var6 != var7) {
-                    var6.getCompositeTransform(var5);
-                    var4.preMultiply(var5);
-                    var6 = var6.parent;
-                    var7.getCompositeTransform(var5);
-                    var3.preMultiply(var5);
-                    var7 = var7.parent;
-                }
+            int var9;
+            for (var9 = this.getDepth(); var9 > var8; var6 = var6.parent) {
+                var6.getCompositeTransform(var5);
+                var4.preMultiply(var5);
+                --var9;
+            }
+
+            while (var8 > var9) {
+                var7.getCompositeTransform(var5);
+                var3.preMultiply(var5);
+                --var8;
+                var7 = var7.parent;
+            }
+
+            while (var6 != var7) {
+                var6.getCompositeTransform(var5);
+                var4.preMultiply(var5);
+                var6 = var6.parent;
+                var7.getCompositeTransform(var5);
+                var3.preMultiply(var5);
+                var7 = var7.parent;
+            }
 
 //                var3.getImpl_().method445();
-                var3.getImpl_().invert();
-                var3.postMultiply(var4);
-                var2.set(var3);
-                return true;
-            }
-        } else {
-            throw new NullPointerException();
+            var3.getImpl_().invert();
+            var3.postMultiply(var4);
+            transform.set(var3);
+            return true;
         }
     }
 
@@ -179,45 +180,45 @@ public abstract class Node extends Transformable {
 
     protected void computeAlignment(Node var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5) {
         Node var6 = this.getRoot();
-        if (this.aNode1305 != null && (this.aNode1305.isDescendantOf(this) || this.aNode1305.getRoot() != var6)) {
+        if (this.zRef != null && (this.zRef.isDescendantOf(this) || this.zRef.getRoot() != var6)) {
             throw new IllegalStateException();
-        } else if (this.aNode1304 == null || !this.aNode1304.isDescendantOf(this) && this.aNode1304.getRoot() == var6) {
+        } else if (this.yRef == null || !this.yRef.isDescendantOf(this) && this.yRef.getRoot() == var6) {
             Transform var7 = new Transform();
             Transform var8 = new Transform();
             Vector4f var9 = new Vector4f();
             Quaternion var10 = new Quaternion(0.0F, 0.0F, 0.0F, 1.0F);
             float[] var11 = new float[3];
             this.getTranslation(var11);
-            if (this.anInt40 != 144) {
-                if (this.aNode1305 == null && var1 == this) {
+            if (this.zTarget != 144) {
+                if (this.zRef == null && var1 == this) {
                     throw new IllegalStateException();
                 }
 
-                (this.aNode1305 == null ? var1 : this.aNode1305).getTransformTo(this.parent, var7);
+                (this.zRef == null ? var1 : this.zRef).getTransformTo(this.parent, var7);
                 var8.postTranslate(-var11[0], -var11[1], -var11[2]);
                 var7.preMultiply(var8);
-                method904(this.anInt40, var7, var2, var3, var4, var5, var9);
+                method904(this.zTarget, var7, var2, var3, var4, var5, var9);
                 var9.w = 0.0F;
                 var10.setRotation(Vector4f.Z_AXIS, var9, (Vector4f) null);
             }
 
-            if (this.anInt39 != 144) {
-                if (this.aNode1304 == null && var1 == this) {
+            if (this.yTarget != 144) {
+                if (this.yRef == null && var1 == this) {
                     throw new IllegalStateException();
                 }
 
-                (this.aNode1304 == null ? var1 : this.aNode1304).getTransformTo(this.parent, var7);
+                (this.yRef == null ? var1 : this.yRef).getTransformTo(this.parent, var7);
                 var8.postTranslate(-var11[0], -var11[1], -var11[2]);
                 var7.preMultiply(var8);
-                if (this.anInt40 != 144) {
+                if (this.zTarget != 144) {
                     var8.setIdentity();
                     var8.postRotateQuat(var10.x, var10.y, var10.z, -var10.w);
                     var7.preMultiply(var8);
                 }
 
-                method904(this.anInt39, var7, var2, var3, var4, var5, var9);
+                method904(this.yTarget, var7, var2, var3, var4, var5, var9);
                 var9.w = 0.0F;
-                if (this.anInt40 != 144) {
+                if (this.zTarget != 144) {
                     Quaternion var13;
                     (var13 = new Quaternion()).setRotation(Vector4f.Y_AXIS, var9, Vector4f.Z_AXIS);
                     var10.mul(var13);
@@ -226,7 +227,7 @@ public abstract class Node extends Transformable {
                 }
             }
 
-            if (this.anInt40 != 144 || this.anInt39 != 144) {
+            if (this.zTarget != 144 || this.yTarget != 144) {
                 super.ana864.set(var10);
             }
 
@@ -253,28 +254,28 @@ public abstract class Node extends Transformable {
         var1.getImpl_().transform(var6);
     }
 
-    public void setAlignment(Node var1, int var2, Node var3, int var4) {
-        if (var2 >= 144 && var2 <= 148 && var4 >= 144 && var4 <= 148) {
-            if (var1 == var3 && var2 == var4 && var4 != 144) {
-                throw new IllegalArgumentException("(zRef == yRef) &&  (zTarget == yTarget != NONE)");
-            } else if (var1 != this && var3 != this) {
-                this.anInt40 = var2;
-                this.anInt39 = var4;
-                this.aNode1305 = var1;
-                this.aNode1304 = var3;
-            } else {
-                throw new IllegalArgumentException("zRef or yRef is this Node");
-            }
-        } else {
+    public void setAlignment(Node zRef, int zTarget, Node yRef, int yTarget) {
+        if (zTarget < NONE || zTarget > Z_AXIS || yTarget < NONE || yTarget > Z_AXIS) {
             throw new IllegalArgumentException("yTarget or zTarget is not one of the symbolic constants");
         }
+
+        if (zRef == yRef && zTarget == yTarget && yTarget != NONE) {
+            throw new IllegalArgumentException("(zRef == yRef) &&  (zTarget == yTarget != NONE)");
+        } else if (zRef == this || yRef == this) {
+            throw new IllegalArgumentException("zRef or yRef is this Node");
+        }
+
+        this.zTarget = zTarget;
+        this.yTarget = yTarget;
+        this.zRef = zRef;
+        this.yRef = yRef;
     }
 
     public int getAlignmentTarget(int var1) {
         if (var1 != 148 && var1 != 147) {
             throw new IllegalArgumentException("axis != Z_AXIS && axis != Y_AXIS");
         } else {
-            return var1 == 148 ? this.anInt40 : this.anInt39;
+            return var1 == 148 ? this.zTarget : this.yTarget;
         }
     }
 
@@ -282,7 +283,7 @@ public abstract class Node extends Transformable {
         if (axis != 148 && axis != 147) {
             throw new IllegalArgumentException("axis != Z_AXIS && axis != Y_AXIS");
         } else {
-            return axis == 148 ? this.aNode1305 : this.aNode1304;
+            return axis == 148 ? this.zRef : this.yRef;
         }
     }
 
@@ -364,17 +365,17 @@ public abstract class Node extends Transformable {
 
     protected void updateAlignReferences() {
         Node var1;
-        if (this.anInt40 != 144) {
-            var1 = this.aNode1305.m_duplicatedNode;
-            if (this.aNode1305 != null && var1 != null && var1.isDescendantOf(this.m_duplicatedNode.getRoot())) {
-                this.m_duplicatedNode.aNode1305 = var1;
+        if (this.zTarget != 144) {
+            var1 = this.zRef.m_duplicatedNode;
+            if (this.zRef != null && var1 != null && var1.isDescendantOf(this.m_duplicatedNode.getRoot())) {
+                this.m_duplicatedNode.zRef = var1;
             }
         }
 
-        if (this.anInt39 != 144) {
-            var1 = this.aNode1304.m_duplicatedNode;
-            if (this.aNode1304 != null && var1 != null && var1.isDescendantOf(this.m_duplicatedNode.getRoot())) {
-                this.m_duplicatedNode.aNode1304 = var1;
+        if (this.yTarget != 144) {
+            var1 = this.yRef.m_duplicatedNode;
+            if (this.yRef != null && var1 != null && var1.isDescendantOf(this.m_duplicatedNode.getRoot())) {
+                this.m_duplicatedNode.yRef = var1;
             }
         }
 
