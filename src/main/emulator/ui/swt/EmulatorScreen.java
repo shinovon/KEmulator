@@ -900,6 +900,7 @@ public final class EmulatorScreen implements
         this.lwj3dMenuItem.addSelectionListener((SelectionListener)this);
         (this.swerve3dMenuItem = new MenuItem(this.menu3dEngine, 16)).setText("Swerve");
         this.swerve3dMenuItem.setSelection(Settings.g3d == 0);
+        swerve3dMenuItem.setEnabled(!Emulator.isX64());
         this.swerve3dMenuItem.addSelectionListener((SelectionListener)this);
         engine3dGroup.setMenu(this.menu3dEngine);
 
