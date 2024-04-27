@@ -6,6 +6,7 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
+import emulator.graphics3D.lwjgl.LWJGLUtility;
 import emulator.graphics3D.m3g.*;
 
 import java.nio.ByteBuffer;
@@ -37,10 +38,7 @@ import org.eclipse.swt.internal.opengl.win32.WGL;
 import org.eclipse.swt.internal.win32.OS;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.GLExtensions;
+import org.lwjgl.opengl.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -93,7 +91,7 @@ public final class b {
         GL11.glDepthRange((double) this.aFloat586, (double) this.aFloat592);
     }
 
-    public final void method367(Background var1) {
+    public final void clearBackground(Background var1) {
         this.setupViewport();
         this.setupDepth();
         GL11.glClearDepth(1.0D);
@@ -458,9 +456,8 @@ public final class b {
 
     public static boolean isCurrent() {
         if(useSoftwareWgl) {
-            boolean var0 = false;
             int var1 = OS.GetDC(anInt594);
-            var0 = WGL.wglGetCurrentContext() == var1;
+            boolean var0 = WGL.wglGetCurrentContext() == var1;
             OS.ReleaseDC(anInt594, var1);
             return var0;
         }
@@ -868,25 +865,25 @@ public final class b {
 
             for (int i = 0; i < stripCount; ++i) {
                 var22 = triangleStripArray.getIndexStrip(i);
-                GL11.glDrawElements(5, a.getElementsBuffer(var22));
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, a.getElementsBuffer(var22));
             }
 
             for (int i = 0; i < var9; ++i) {
                 if (GL11.glIsTexture(var10.get(i))) {
-                    GL13.glActiveTexture('\u84c0' + i);
-                    GL13.glClientActiveTexture('\u84c0' + i);
-                    GL11.glDisableClientState('\u8078');
-                    GL11.glDisable(3553);
+                    GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
+                    GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
+                    GL11.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+                    GL11.glDisable(GL_TEXTURE_2D);
                 }
             }
 
             GL11.glDeleteTextures(var10);
         } else {
-            for (var9 = 0; var9 < stripCount; ++var9) {
-                var22 = triangleStripArray.getIndexStrip(var9);
-                GL11.glDrawElements(5, a.getElementsBuffer(var22));
+            //xray
+            for (int i = 0; i < stripCount; ++i) {
+                int[] indexStrip = triangleStripArray.getIndexStrip(i);
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, LWJGLUtility.getElementsBuffer(indexStrip));
             }
-
         }
     }
 

@@ -240,7 +240,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         this.cameraTransform.postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
 
         emulator.graphics3D.view.b.setCamera(this.camera, this.cameraTransform);
-        m3gview.method367(this.aBackground900);
+        m3gview.clearBackground(this.aBackground900);
         if (this.aBoolean386) {
             this.m3gview.method372(1.0F);
         }
