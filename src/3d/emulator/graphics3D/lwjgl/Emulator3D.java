@@ -9,7 +9,6 @@ import emulator.graphics3D.m3g.*;
 import org.lwjgl.*;
 import org.eclipse.swt.graphics.Image;
 import org.lwjgl.opengl.*;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -171,9 +170,9 @@ public final class Emulator3D implements IGraphics3D {
                 targetHeight = h;
             }
 
-            GL11.glEnable(3089);
-            GL11.glEnable(2977);
-            GL11.glPixelStorei(3317, 1);
+            GL11.glEnable(GL_SCISSOR_TEST);
+            GL11.glEnable(GL_NORMALIZE);
+            GL11.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         } catch (Exception var6) {
             var6.printStackTrace();
             this.target = null;
@@ -349,14 +348,14 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnable(GL_POINT_SMOOTH);
             GL11.glEnable(GL_LINE_SMOOTH);
             GL11.glEnable(GL_POLYGON_SMOOTH);
-//            if(useGL13())
-            GL11.glEnable(GL_MULTISAMPLE);
+            if(useGL13())
+                GL11.glEnable(GL_MULTISAMPLE);
         } else {
             GL11.glDisable(GL_POINT_SMOOTH);
             GL11.glDisable(GL_LINE_SMOOTH);
             GL11.glDisable(GL_POLYGON_SMOOTH);
-//            if(useGL13())
-            GL11.glDisable(GL_MULTISAMPLE);
+            if(useGL13())
+                GL11.glDisable(GL_MULTISAMPLE);
         }
 
         if ((hints & Graphics3D.DITHER) != 0) {
@@ -982,7 +981,7 @@ public final class Emulator3D implements IGraphics3D {
                     this.renderVertex(var6, var4, var5, var2.trans, var3.getScope(), var2.alphaFactor);
                 }
             } else {
-                this.method509((Sprite3D) var2.node, var2.trans, var2.alphaFactor);
+                this.renderSprite((Sprite3D) var2.node, var2.trans, var2.alphaFactor);
             }
         }
 
@@ -990,7 +989,7 @@ public final class Emulator3D implements IGraphics3D {
         MeshMorph.getInstance().clearCache();
     }
 
-    private void method509(Sprite3D var1, Transform var2, float alphaFactor) {
+    private void renderSprite(Sprite3D var1, Transform var2, float alphaFactor) {
         Vector4f var3 = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
         Vector4f var4 = new Vector4f(1.0F, 0.0F, 0.0F, 1.0F);
         Vector4f var5 = new Vector4f(0.0F, 1.0F, 0.0F, 1.0F);

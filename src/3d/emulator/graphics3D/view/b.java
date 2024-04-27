@@ -1,14 +1,12 @@
 package emulator.graphics3D.view;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.m3g.LightsCache;
-import emulator.graphics3D.m3g.RenderObject;
-import emulator.graphics3D.m3g.RenderPipe;
-import emulator.graphics3D.m3g.MeshMorph;
+import emulator.graphics3D.m3g.*;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -35,6 +33,8 @@ import javax.microedition.m3g.VertexBuffer;
 import javax.microedition.m3g.World;
 
 import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
+import org.eclipse.swt.internal.opengl.win32.WGL;
+import org.eclipse.swt.internal.win32.OS;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -43,13 +43,13 @@ import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.GLExtensions;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 
 public final class b {
-    private static b ab583;
+    private static final boolean useSoftwareWgl = false;
+    private static b instance;
     private boolean xray;
-    private int anInt585;
-    private int anInt591;
+    private int viewportWidth;
+    private int viewportHeight;
     private float aFloat586;
     private float aFloat592;
     private static int anInt594;
@@ -57,45 +57,45 @@ public final class b {
     private static PIXELFORMATDESCRIPTOR aPIXELFORMATDESCRIPTOR587;
     private static Camera camera;
     private static Transform cameraTransform = new Transform();
-    private static Vector aVector590 = new Vector();
-    private static Vector aVector593 = new Vector();
+    private static Vector lights = new Vector();
+    private static Vector lightsTransforms = new Vector();
     private static GLCanvas glCanvas;
 
     private b() {
-        ab583 = this;
+        instance = this;
         this.aFloat586 = 0.0F;
         this.aFloat592 = 1.0F;
     }
 
-    public static b method362() {
-        if (ab583 == null) {
-            ab583 = new b();
+    public static b getViewInstance() {
+        if (instance == null) {
+            instance = new b();
         }
 
-        return ab583;
+        return instance;
     }
 
     public final void setXray(boolean var1) {
         this.xray = var1;
     }
 
-    public final void method364(int var1, int var2) {
-        this.anInt585 = var1;
-        this.anInt591 = var2;
+    public final void setViewport(int var1, int var2) {
+        this.viewportWidth = var1;
+        this.viewportHeight = var2;
     }
 
-    private void method390() {
-        GL11.glViewport(0, 0, this.anInt585, this.anInt591);
-        GL11.glScissor(0, 0, this.anInt585, this.anInt591);
+    private void setupViewport() {
+        GL11.glViewport(0, 0, this.viewportWidth, this.viewportHeight);
+        GL11.glScissor(0, 0, this.viewportWidth, this.viewportHeight);
     }
 
-    private void method391() {
+    private void setupDepth() {
         GL11.glDepthRange((double) this.aFloat586, (double) this.aFloat592);
     }
 
     public final void method367(Background var1) {
-        this.method390();
-        this.method391();
+        this.setupViewport();
+        this.setupDepth();
         GL11.glClearDepth(1.0D);
         GL11.glDepthMask(true);
         GL11.glColorMask(true, true, true, true);
@@ -119,8 +119,8 @@ public final class b {
             GL11.glLoadIdentity();
             GL11.glMatrixMode(5888);
             GL11.glLoadIdentity();
-            float var5 = (float) this.anInt585;
-            float var6 = (float) this.anInt591;
+            float var5 = (float) this.viewportWidth;
+            float var6 = (float) this.viewportHeight;
             float var7 = var5 / (float) var1.getCropWidth();
             float var8 = var6 / (float) var1.getCropHeight();
             float var9 = var7 * (float) var3;
@@ -185,10 +185,10 @@ public final class b {
                 Appearance var5 = var3.getAppearance(var2.submeshIndex);
                 if (var4 != null && var5 != null) {
                     VertexBuffer var6 = MeshMorph.getViewInstance().getMorphedVertexBuffer(var3);
-                    this.method373(var6, var4, var5, var2.trans, var3.getScope(), var2.alphaFactor);
+                    this.renderVertex(var6, var4, var5, var2.trans, var3.getScope(), var2.alphaFactor);
                 }
             } else {
-                this.method375((Sprite3D) var2.node, var2.trans);
+                this.renderSprite((Sprite3D) var2.node, var2.trans, var2.alphaFactor);
             }
         }
 
@@ -196,12 +196,12 @@ public final class b {
         MeshMorph.getViewInstance().clearCache();
     }
 
-    private void method373(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5, float var6) {
-        if ((camera.getScope() & var5) != 0) {
-            this.method390();
-            this.method391();
+    private void renderVertex(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int scope, float alphaFactor) {
+        if ((camera.getScope() & scope) != 0) {
+            this.setupViewport();
+            this.setupDepth();
             setupCamera();
-            method370(aVector590, aVector593, var5);
+            setupLights(lights, lightsTransforms, scope);
             if (var4 != null) {
                 Transform var7;
                 (var7 = new Transform()).set(var4);
@@ -209,18 +209,18 @@ public final class b {
                 GL11.glMultMatrix(a.method401(((Transform3D) var7.getImpl()).m_matrix));
             }
 
-            this.method383(var3, var6, false);
-            this.draw(var1, var2, var3, var6);
+            this.setupAppearance(var3, false);
+            this.draw(var1, var2, var3, alphaFactor);
         }
     }
 
-    private void method375(Sprite3D var1, Transform var2) {
+    private void renderSprite(Sprite3D var1, Transform var2, float alphaFactor) {
         Vector4f var3 = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
         Vector4f var4 = new Vector4f(1.0F, 0.0F, 0.0F, 1.0F);
         Vector4f var5 = new Vector4f(0.0F, 1.0F, 0.0F, 1.0F);
         Transform var6;
         (var6 = new Transform(cameraTransform)).postMultiply(var2);
-        Transform3D impl = ((Transform3D) var6.getImpl());
+        Transform3D impl = (Transform3D) var6.getImpl();
         impl.transform(var3);
         impl.transform(var4);
         impl.transform(var5);
@@ -270,8 +270,8 @@ public final class b {
                 var19 = (float) var12[2];
                 var20 = (float) var12[3];
             } else {
-                var15 = var8.length() * (float) this.anInt585 * 0.5F;
-                var16 = var9.length() * (float) this.anInt591 * 0.5F;
+                var15 = var8.length() * (float) this.viewportWidth * 0.5F;
+                var16 = var9.length() * (float) this.viewportHeight * 0.5F;
                 var19 = var15;
                 var20 = var16;
                 var17 = -var15 / 2.0F;
@@ -326,22 +326,22 @@ public final class b {
                 label84:
                 {
                     Transform var22;
-                    (var22 = new Transform()).postScale((float) this.anInt585 / ((float) this.anInt585 + var19), (float) this.anInt591 / ((float) this.anInt591 + var20), 1.0F);
+                    (var22 = new Transform()).postScale((float) this.viewportWidth / ((float) this.viewportWidth + var19), (float) this.viewportHeight / ((float) this.viewportHeight + var20), 1.0F);
                     var22.postMultiply(var10);
                     var10.set(var22);
-                    int var23 = (int) (0.0F - var19 / 2.0F);
-                    int var24 = (int) (0.0F - var20 / 2.0F);
-                    int var25 = (int) ((float) this.anInt585 + var19);
-                    int var26 = (int) ((float) this.anInt591 + var20);
+                    int var23 = (int) (0F - var19 / 2.0F);
+                    int var24 = (int) (0F - var20 / 2.0F);
+                    int var25 = (int) ((float) this.viewportWidth + var19);
+                    int var26 = (int) ((float) this.viewportHeight + var20);
                     var10.transpose();
                     var6.transpose();
-                    GL11.glViewport(var23, -var24, var25, var26);
+                    GL11.glViewport(var23, viewportHeight - var24 - var26, var25, var26);
                     GL11.glMatrixMode(5889);
-                    GL11.glLoadMatrix(a.method401(((Transform3D) var10.getImpl()).m_matrix));
+                    GL11.glLoadMatrix(a.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
                     GL11.glMatrixMode(5888);
-                    GL11.glLoadMatrix(a.method401(((Transform3D) var6.getImpl()).m_matrix));
+                    GL11.glLoadMatrix(a.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
                     GL11.glDisable(2896);
-                    var27 = a.method394(var1.getImage().getImageData());
+                    var27 = a.getImageBuffer(var1.getImage().getImageData());
                     GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
                     GL11.glPixelStorei(3314, var1.getImage().getWidth());
                     GL11.glPixelStorei(3315, var21[1]);
@@ -373,7 +373,10 @@ public final class b {
                     var28 = var29;
                 }
 
-                this.method383(var1.getAppearance(), 1.0F, true);
+                this.setupAppearance(var1.getAppearance(), true);
+                GL11.glColor4ub((byte) 255, (byte) 255, (byte) 255, (byte) (255 * alphaFactor));
+                GL11.glDisableClientState(GL_COLOR_ARRAY);
+
                 GL11.glDrawPixels(var21[2], var21[3], var28, 5121, var27);
                 GL11.glPixelStorei(3314, 0);
                 GL11.glPixelStorei(3315, 0);
@@ -399,17 +402,25 @@ public final class b {
 
     public final boolean useContext(GLCanvas canvas) {
         glCanvas = canvas;
-//        anInt594 = canvas.handle;
-//        int var2;
-//        int var3;
-//        if ((var3 = WGL.ChoosePixelFormat(var2 = OS.GetDC(anInt594), method378())) != 0 && WGL.SetPixelFormat(var2, var3, aPIXELFORMATDESCRIPTOR587)) {
-//            anInt595 = WGL.wglCreateContext(var2);
-//            if (anInt595 == 0) {
-//                OS.ReleaseDC(anInt594, var2);
-//                Emulator.getEmulator().getLogStream().println("wglCreateContext() error!!");
-//                return false;
-//            } else {
-//                OS.ReleaseDC(anInt594, var2);
+        if(useSoftwareWgl) {
+            anInt594 = canvas.handle;
+            int var2;
+            int var3;
+            if ((var3 = WGL.ChoosePixelFormat(var2 = OS.GetDC(anInt594), method378())) != 0 && WGL.SetPixelFormat(var2, var3, aPIXELFORMATDESCRIPTOR587)) {
+                anInt595 = WGL.wglCreateContext(var2);
+                if (anInt595 == 0) {
+                    OS.ReleaseDC(anInt594, var2);
+                    Emulator.getEmulator().getLogStream().println("wglCreateContext() error!!");
+                    return false;
+                } else {
+                    OS.ReleaseDC(anInt594, var2);
+                }
+            } else {
+                OS.ReleaseDC(anInt594, var2);
+                Emulator.getEmulator().getLogStream().println("SetPixelFormat() error!!");
+                return false;
+            }
+        }
         setCurrent();
 
         try {
@@ -420,47 +431,50 @@ public final class b {
             return false;
         }
 
-        GL11.glEnable(3089);
-        GL11.glEnable(2977);
-        GL11.glPixelStorei(3317, 1);
-        GL11.glEnable(2832);
-        GL11.glEnable(2848);
-        GL11.glEnable(2881);
-        GL11.glEnable(3024);
+        GL11.glEnable(GL_SCISSOR_TEST);
+        GL11.glEnable(GL_NORMALIZE);
+        GL11.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        GL11.glEnable(GL_POINT_SMOOTH);
+        GL11.glEnable(GL_LINE_SMOOTH);
+        GL11.glEnable(GL_POLYGON_SMOOTH);
+        GL11.glEnable(GL_DITHER);
+
         return true;
-//            }
-//        } else {
-//            OS.ReleaseDC(anInt594, var2);
-//            Emulator.getEmulator().getLogStream().println("SetPixelFormat() error!!");
-//            return false;
-//        }
     }
 
     public final void setCurrent() {
-//        if (!method384()) {
-//            int var1;
-//            WGL.wglMakeCurrent(var1 = OS.GetDC(anInt594), anInt595);
-//            OS.ReleaseDC(anInt594, var1);
-//        }
+        if(useSoftwareWgl) {
+            if (!isCurrent()) {
+                int var1;
+                WGL.wglMakeCurrent(var1 = OS.GetDC(anInt594), anInt595);
+                OS.ReleaseDC(anInt594, var1);
+            }
+            return;
+        }
         if(!glCanvas.isCurrent()) {
             glCanvas.setCurrent();
         }
     }
 
     public static boolean isCurrent() {
+        if(useSoftwareWgl) {
+            boolean var0 = false;
+            int var1 = OS.GetDC(anInt594);
+            var0 = WGL.wglGetCurrentContext() == var1;
+            OS.ReleaseDC(anInt594, var1);
+            return var0;
+        }
         return glCanvas.isCurrent();
-//        boolean var0 = false;
-//        int var1 = OS.GetDC(anInt594);
-//        var0 = WGL.wglGetCurrentContext() == var1;
-//        OS.ReleaseDC(anInt594, var1);
-//        return var0;
     }
 
     public static void swapBuffers() {
+        if(useSoftwareWgl) {
+            int var0;
+            WGL.SwapBuffers(var0 = OS.GetDC(anInt594));
+            OS.ReleaseDC(anInt594, var0);
+            return;
+        }
         glCanvas.swapBuffers();
-//        int var0;
-//        WGL.SwapBuffers(var0 = OS.GetDC(anInt594));
-//        OS.ReleaseDC(anInt594, var0);
     }
 
     public static void releaseContext() {
@@ -469,7 +483,9 @@ public final class b {
         } catch (Exception ignored) {}
 //        if(glCanvas != null)
 //            glCanvas.notifyListeners(12, new Event());
-//        WGL.wglDeleteContext(anInt595);
+        if(useSoftwareWgl) {
+            WGL.wglDeleteContext(anInt595);
+        }
     }
 
     public static void setCamera(Camera var0, Transform var1) {
@@ -488,20 +504,20 @@ public final class b {
         if (var0 == null) {
             throw new NullPointerException();
         } else {
-            aVector590.add(var0);
+            lights.add(var0);
             if (var1 == null) {
-                aVector593.add(new Transform());
+                lightsTransforms.add(new Transform());
             } else {
-                aVector593.add(new Transform(var1));
+                lightsTransforms.add(new Transform(var1));
             }
 
-            return aVector590.size();
+            return lights.size();
         }
     }
 
     public static void method388() {
-        aVector590.clear();
-        aVector593.clear();
+        lights.clear();
+        lightsTransforms.clear();
     }
 
     public final void method374(World var1) {
@@ -515,8 +531,8 @@ public final class b {
         for (int var4 = 0; var4 < var2.getChildCount(); ++var4) {
             Node var5;
             if ((var5 = var2.getChild(var4)) instanceof Light && var5.getTransformTo(var1, var3)) {
-                aVector590.add(var5);
-                aVector593.add(new Transform(var3));
+                lights.add(var5);
+                lightsTransforms.add(new Transform(var3));
             } else if (var5 instanceof Group) {
                 this.method365(var1, (Group) var5);
             }
@@ -524,132 +540,121 @@ public final class b {
 
     }
 
-    private void method383(Appearance var1, float var2, boolean var3) {
+    private void setupAppearance(Appearance var1, boolean var3) {
         if (!var3) {
-            this.method366(var1.getPolygonMode());
+            this.setupPolygonMode(var1.getPolygonMode());
         }
 
-        this.method369(var1.getCompositingMode());
+        this.setupCompositingMode(var1.getCompositingMode());
         if (!var3) {
-            method376(var1.getMaterial(), var2);
+            setupMaterial(var1.getMaterial());
         }
 
         this.setupFog(var1.getFog());
     }
 
-    private void method366(PolygonMode var1) {
-        if (var1 == null) {
-            var1 = new PolygonMode();
+    private void setupPolygonMode(PolygonMode pm) {
+        if (pm == null) {
+            pm = new PolygonMode();
         }
 
-        GL11.glPolygonMode(1032, this.xray ? 6913 : 6914);
-        int var2;
-        if ((var2 = var1.getCulling()) == 162) {
-            GL11.glDisable(2884);
+        GL11.glPolygonMode(GL_FRONT_AND_BACK, Settings.xrayView ? GL_LINE : GL_FILL);
+
+        int var1 = pm.getCulling();
+        if (var1 == PolygonMode.CULL_NONE) {
+            GL11.glDisable(GL_CULL_FACE);
         } else {
-            GL11.glEnable(2884);
-            GL11.glCullFace(var2 == 161 ? 1028 : 1029);
+            GL11.glEnable(GL_CULL_FACE);
+            GL11.glCullFace(var1 == PolygonMode.CULL_FRONT ? GL_FRONT : GL_BACK);
         }
 
-        GL11.glShadeModel(var1.getShading() == 164 ? 7424 : 7425);
-        GL11.glFrontFace(var1.getWinding() == 169 ? 2304 : 2305);
-        GL11.glLightModelf(2898, var1.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
-        GL11.glLightModelf(2897, var1.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
-        GL11.glHint(3152, var1.isPerspectiveCorrectionEnabled() ? 4354 : 4353);
+        GL11.glShadeModel(pm.getShading() == PolygonMode.SHADE_FLAT ? GL_FLAT : GL_SMOOTH);
+        GL11.glFrontFace(pm.getWinding() == PolygonMode.WINDING_CW ? GL_CW : GL_CCW);
+        GL11.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, pm.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
+        GL11.glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, pm.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
+        GL11.glHint(GL_PERSPECTIVE_CORRECTION_HINT, pm.isPerspectiveCorrectionEnabled() ? GL_NICEST : GL_FASTEST);
     }
 
-    private void method369(CompositingMode var1) {
-        if (var1 == null) {
-            var1 = new CompositingMode();
+    private void setupCompositingMode(CompositingMode cm) {
+        if (cm == null) {
+            cm = new CompositingMode();
         }
 
-        GL11.glEnable(2929);
-        GL11.glDepthMask(var1.isDepthWriteEnabled());
-        GL11.glDepthFunc(var1.isDepthTestEnabled() ? 515 : 519);
-        GL11.glColorMask(var1.isColorWriteEnabled(), var1.isColorWriteEnabled(), var1.isColorWriteEnabled(), var1.isAlphaWriteEnabled());
-        GL11.glAlphaFunc(518, var1.getAlphaThreshold());
-        if (var1.getAlphaThreshold() == 0.0F) {
-            GL11.glDisable(3008);
+        GL11.glEnable(GL_DEPTH_TEST);
+
+        GL11.glDepthMask(cm.isDepthWriteEnabled());
+        GL11.glDepthFunc(cm.isDepthTestEnabled() ? GL_LEQUAL : GL_ALWAYS);
+        GL11.glColorMask(cm.isColorWriteEnabled(), cm.isColorWriteEnabled(), cm.isColorWriteEnabled(), cm.isAlphaWriteEnabled());
+
+        GL11.glAlphaFunc(GL_GEQUAL, cm.getAlphaThreshold());
+        if (cm.getAlphaThreshold() == 0.0F) {
+            GL11.glDisable(GL_ALPHA_TEST);
         } else {
-            GL11.glEnable(3008);
+            GL11.glEnable(GL_ALPHA_TEST);
         }
 
-        if (var1.getBlending() == 68) {
-            GL11.glDisable(3042);
+        if (cm.getBlending() == CompositingMode.REPLACE) {
+            GL11.glDisable(GL_BLEND);
         } else {
-            label48:
-            {
-                short var10000;
-                short var10001;
-                label47:
-                {
-                    GL11.glEnable(3042);
-                    switch (var1.getBlending()) {
-                        case 64:
-                            var10000 = 770;
-                            var10001 = 771;
-                            break label47;
-                        case 65:
-                            var10000 = 770;
-                            var10001 = 1;
-                            break label47;
-                        case 66:
-                            var10000 = 774;
-                            break;
-                        case 67:
-                            var10000 = 774;
-                            var10001 = 768;
-                            break label47;
-                        case 68:
-                            var10000 = 1;
-                            break;
-                        default:
-                            break label48;
-                    }
-
-                    var10001 = 0;
-                }
-
-                GL11.glBlendFunc(var10000, var10001);
-            }
+            GL11.glEnable(GL_BLEND);
         }
 
-        GL11.glPolygonOffset(var1.getDepthOffsetFactor(), var1.getDepthOffsetUnits());
-        if (var1.getDepthOffsetFactor() == 0.0F && var1.getDepthOffsetUnits() == 0.0F) {
-            GL11.glDisable(this.xray ? 10754 : '\u8037');
+        switch (cm.getBlending()) {
+            case CompositingMode.ALPHA:
+                GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                break;
+            case CompositingMode.ALPHA_ADD:
+                GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+                break;
+            case CompositingMode.MODULATE:
+                GL11.glBlendFunc(GL_DST_COLOR, GL_ZERO);
+                break;
+            case CompositingMode.MODULATE_X2:
+                GL11.glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+                break;
+            case CompositingMode.REPLACE:
+                GL11.glBlendFunc(GL_ONE, GL_ZERO);
+                break;
+            default:
+                break;
+        }
+
+        GL11.glPolygonOffset(cm.getDepthOffsetFactor(), cm.getDepthOffsetUnits());
+        if (cm.getDepthOffsetFactor() == 0.0F && cm.getDepthOffsetUnits() == 0.0F) {
+            GL11.glDisable(Settings.xrayView ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
         } else {
-            GL11.glEnable(this.xray ? 10754 : '\u8037');
+            GL11.glEnable(Settings.xrayView ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
         }
     }
 
-    private static void method376(Material var0, float var1) {
-        short var10000;
-        if (var0 != null) {
-            GL11.glEnable(2896);
-            float[] var2;
-            G3DUtils.fillFloatColor(var2 = new float[4], var0.getColor(1024));
-            GL11.glMaterial(1032, 4608, a.method401(var2));
-            G3DUtils.fillFloatColor(var2, var0.getColor(2048));
-            var2[3] *= var1;
-            GL11.glMaterial(1032, 4609, a.method401(var2));
-            G3DUtils.fillFloatColor(var2, var0.getColor(4096));
-            GL11.glMaterial(1032, 5632, a.method401(var2));
-            G3DUtils.fillFloatColor(var2, var0.getColor(8192));
-            GL11.glMaterial(1032, 4610, a.method401(var2));
-            float var3 = var0.getShininess();
-            GL11.glMaterialf(1032, 5633, var3);
-            if (var0.isVertexColorTrackingEnabled()) {
-                GL11.glEnable(2903);
-                GL11.glColorMaterial(1032, 5634);
-                return;
+    private static void setupMaterial(Material mat) {
+        if (mat != null) {
+            GL11.glEnable(GL_LIGHTING);
+            float[] tmpCol = new float[4];
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.AMBIENT));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_AMBIENT, a.getFloatBuffer(tmpCol));
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.DIFFUSE));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, a.getFloatBuffer(tmpCol));
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.EMISSIVE));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_EMISSION, a.getFloatBuffer(tmpCol));
+
+            G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.SPECULAR));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, a.getFloatBuffer(tmpCol));
+
+            GL11.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat.getShininess());
+
+            if (mat.isVertexColorTrackingEnabled()) {
+                GL11.glEnable(GL_COLOR_MATERIAL);
+                GL11.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+            } else {
+                GL11.glDisable(GL_COLOR_MATERIAL);
             }
-
-            var10000 = 2903;
         } else {
-            var10000 = 2896;
+            GL11.glDisable(GL_LIGHTING);
         }
-
-        GL11.glDisable(var10000);
     }
 
     private void setupFog(Fog var1) {
@@ -669,7 +674,6 @@ public final class b {
     }
 
     private void draw(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Appearance appearance, float alphaFactor) {
-
         VertexArray colors = vertexBuffer.getColors();
         if (colors == null) {
             int col = vertexBuffer.getDefaultColor();
@@ -864,7 +868,7 @@ public final class b {
 
             for (int i = 0; i < stripCount; ++i) {
                 var22 = triangleStripArray.getIndexStrip(i);
-                GL11.glDrawElements(5, a.method398(var22));
+                GL11.glDrawElements(5, a.getElementsBuffer(var22));
             }
 
             for (int i = 0; i < var9; ++i) {
@@ -880,7 +884,7 @@ public final class b {
         } else {
             for (var9 = 0; var9 < stripCount; ++var9) {
                 var22 = triangleStripArray.getIndexStrip(var9);
-                GL11.glDrawElements(5, a.method398(var22));
+                GL11.glDrawElements(5, a.getElementsBuffer(var22));
             }
 
         }
@@ -901,7 +905,7 @@ public final class b {
         }
     }
 
-    private static void method370(Vector var0, Vector var1, int var2) {
+    private static void setupLights(Vector var0, Vector var1, int var2) {
         Transform var3 = new Transform();
         int var4;
         if ((var4 = var0.size()) > 8) {
@@ -1009,8 +1013,8 @@ public final class b {
     }
 
     public final void method372(float var1) {
-        this.method390();
-        this.method391();
+        this.setupViewport();
+        this.setupDepth();
         setupCamera();
         GL11.glPolygonMode(1032, 6914);
         GL11.glDisable(2884);
@@ -1062,9 +1066,9 @@ public final class b {
         }
     }
 
-    public final void method389() {
-        this.method390();
-        this.method391();
+    public final void drawAxis() {
+        this.setupViewport();
+        this.setupDepth();
         setupCamera();
         GL11.glPolygonMode(1032, 6914);
         GL11.glDisable(2884);
