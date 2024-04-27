@@ -16,7 +16,6 @@ public final class MeshMorph {
     private static MeshMorph inst;
     private static MeshMorph viewInst;
     private Hashtable cacheTable = new Hashtable();
-    private Hashtable processedWeightNodes = new Hashtable();
     public VertexBuffer morphed;
     private VertexArray[] tmpMorphTargets;
     private VertexArray positions;
@@ -290,36 +289,23 @@ public final class MeshMorph {
 
         VertexArray meshNorms = meshVB.getNormals();
         int vertexCount = meshVB.getVertexCount();
-        Vector weights = mesh.getTransforms();
+        Vector boneTransList = mesh.getTransforms();
 
-        for (int i = 0; i < weights.size(); i++) {
-            WeightedTransform weight = (WeightedTransform) weights.elementAt(i);
+        for (int i = 0; i < boneTransList.size(); i++) {
+            BoneTransform weight = (BoneTransform) boneTransList.elementAt(i);
 
-            if (weight.firstVertex < 0 || weight.lastVertex >= vertexCount) {
-                throw new IllegalStateException();
-            }
+            weight.bone.getTransformTo(mesh, weight.posTrans);
+            weight.posTrans.postMultiply(weight.toBoneTrans);
 
-            WeightedTransform hashWeight = (WeightedTransform) processedWeightNodes.get(weight.bone);
-            if (hashWeight != null) {
-                weight.posTrans.set(hashWeight.posTrans);
-                if (meshNorms != null) {
-                    weight.normTrans.set(hashWeight.normTrans);
-                }
-            } else {
-                weight.bone.getTransformTo(mesh, weight.posTrans);
-                weight.posTrans.postMultiply(weight.toBoneTrans);
-
-                if (meshNorms != null) {
-                    weight.normTrans.set(weight.posTrans);
-                    ((Transform3D) weight.normTrans.getImpl()).invert();
-                    weight.normTrans.transpose();
-                }
-
-                processedWeightNodes.put(weight.bone, weight);
+            if (meshNorms != null) {
+                weight.normTrans.set(weight.posTrans);
+                ((Transform3D) weight.normTrans.getImpl()).invert();
+                weight.normTrans.transpose();
             }
         }
 
-        processedWeightNodes.clear();
+        BoneTransform[] vtxBones = (BoneTransform[]) mesh.getVerticesBones();
+        int[] vtxWeights = mesh.getVerticesWeights();
 
         short[] shortPoses = meshPoses.getShortValues();
         byte[] bytePoses = meshPoses.getByteValues();
@@ -339,14 +325,12 @@ public final class MeshMorph {
 
             float weightSumm = 0;
 
-            //weights are sorted by firstVertex id
-            for (int t = 0; t < weights.size(); t++) {
-                WeightedTransform weight = (WeightedTransform) weights.elementAt(t);
+            for (int slot = 0; slot < Emulator3D.MaxTransformsPerVertex; slot++) {
+                BoneTransform boneTrans = vtxBones[i * Emulator3D.MaxTransformsPerVertex + slot];
 
-                if (weight.firstVertex > i) break; //weights are ordered by firstVertex index
-                if (i > weight.lastVertex) continue;
+                if (boneTrans == null) break; //no more active bone slots
 
-                int boneWeight = weight.weight;
+                int boneWeight = vtxWeights[i * Emulator3D.MaxTransformsPerVertex + slot];
                 weightSumm += boneWeight;
 
                 for (int axis = 0; axis < 3; axis++) {
@@ -362,7 +346,7 @@ public final class MeshMorph {
                 tmp[2] = tmp[2] * tmpScaleBias[0] + tmpScaleBias[3];
                 tmp[3] = 1;
 
-                weight.posTrans.transform(tmp);
+                boneTrans.posTrans.transform(tmp);
 
                 tmpPositions[i * 3 + 0] += tmp[0] * boneWeight;
                 tmpPositions[i * 3 + 1] += tmp[1] * boneWeight;
@@ -379,7 +363,7 @@ public final class MeshMorph {
 
                     tmp[3] = 0;
 
-                    weight.normTrans.transform(this.tmp);
+                    boneTrans.normTrans.transform(this.tmp);
 
                     tmpNormals[i * 3 + 0] += tmp[0] * boneWeight;
                     tmpNormals[i * 3 + 1] += tmp[1] * boneWeight;

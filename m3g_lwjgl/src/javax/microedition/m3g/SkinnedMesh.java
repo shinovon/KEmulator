@@ -1,23 +1,31 @@
 package javax.microedition.m3g;
 
+import emulator.graphics3D.lwjgl.Emulator3D;
 import emulator.graphics3D.m3g.MeshMorph;
-import emulator.graphics3D.m3g.WeightedTransform;
+import emulator.graphics3D.m3g.BoneTransform;
 
+import java.util.Hashtable;
 import java.util.Vector;
 
 public class SkinnedMesh extends Mesh {
-    Group aGroup1203;
-    public Vector m_transforms;
+    Group skeleton;
+
+    public Vector<BoneTransform> m_transforms;
+    public BoneTransform[] vtxBones;
+    public int[] vtxWeights;
 
     public SkinnedMesh(VertexBuffer var1, IndexBuffer var2, Appearance var3, Group var4) {
         super(var1, var2, var3);
         if (var4 == null) {
             throw new NullPointerException();
         } else if (!(var4 instanceof World) && var4.getParent() == null) {
-            this.aGroup1203 = var4;
-            this.aGroup1203.parent = this;
-            this.addReference(this.aGroup1203);
+            this.skeleton = var4;
+            this.skeleton.parent = this;
+            this.addReference(this.skeleton);
             this.m_transforms = new Vector();
+
+            vtxBones = new BoneTransform[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
+            vtxWeights = new int[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
         } else {
             throw new IllegalArgumentException();
         }
@@ -26,25 +34,28 @@ public class SkinnedMesh extends Mesh {
     public SkinnedMesh(VertexBuffer var1, IndexBuffer[] var2, Appearance[] var3, Group var4) {
         super(var1, var2, var3);
         if (!(var4 instanceof World) && var4.getParent() == null) {
-            this.aGroup1203 = var4;
-            this.aGroup1203.parent = this;
-            this.addReference(this.aGroup1203);
+            this.skeleton = var4;
+            this.skeleton.parent = this;
+            this.addReference(this.skeleton);
             this.m_transforms = new Vector();
+
+            vtxBones = new BoneTransform[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
+            vtxWeights = new int[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
         } else {
             throw new IllegalArgumentException();
         }
     }
 
     public Group getSkeleton() {
-        return this.aGroup1203;
+        return this.skeleton;
     }
 
     protected Object3D duplicateObject() {
         SkinnedMesh var1;
         Group var2 = (Group) (var1 = (SkinnedMesh) super.duplicateObject()).getSkeleton().duplicateObject();
-        var1.removeReference(var1.aGroup1203);
+        var1.removeReference(var1.skeleton);
         var2.parent = var1;
-        var1.aGroup1203 = var2;
+        var1.skeleton = var2;
         var1.addReference(var2);
         var1.m_transforms = (Vector) this.m_transforms.clone();
         return var1;
@@ -53,95 +64,69 @@ public class SkinnedMesh extends Mesh {
     public void addTransform(Node bone, int weight, int firstVertex, int numVertices) {
         if (bone == null) {
             throw new NullPointerException();
-        } else if (bone != this.aGroup1203 && !bone.isDescendantOf(this.aGroup1203)) {
+        } else if (bone != skeleton && !bone.isDescendantOf(skeleton)) {
             throw new IllegalArgumentException();
         } else if (weight > 0 && numVertices > 0) {
-            if (firstVertex >= 0 && firstVertex + numVertices <= '\uffff') {
-                int var5;
-                for (var5 = 0; var5 < this.m_transforms.size() && firstVertex > ((WeightedTransform) this.m_transforms.elementAt(var5)).firstVertex; ++var5) {
-                    ;
-                }
-
-                Transform var6 = new Transform();
-                if (!this.getTransformTo(bone, var6)) {
-                    throw new ArithmeticException();
-                } else {
-                    WeightedTransform var7 = new WeightedTransform(bone, var6, weight, firstVertex, firstVertex + numVertices - 1);
-                    this.m_transforms.insertElementAt(var7, var5);
-                    bone.setSkinnedMeshBone();
-                }
-            } else {
+            if (firstVertex < 0 && firstVertex + numVertices > 65535) {
                 throw new IndexOutOfBoundsException();
             }
+
+            BoneTransform boneTrans = null;
+
+            for (int i = 0; i < m_transforms.size(); i++) {
+                BoneTransform tmpBoneTrans = m_transforms.elementAt(i);
+
+                if (tmpBoneTrans.bone == bone) {
+                    boneTrans = tmpBoneTrans;
+                    break;
+                }
+            }
+
+            if (boneTrans == null) {
+                Transform toBoneTrans = new Transform();
+                if (!getTransformTo(bone, toBoneTrans)) {
+                    throw new ArithmeticException();
+                }
+
+                boneTrans = new BoneTransform(bone, toBoneTrans);
+                m_transforms.add(boneTrans);
+            }
+
+            for (int i = firstVertex; i < firstVertex + numVertices; i++) {
+                //find bone slot with minimal weight
+                int minWeight = Integer.MAX_VALUE;
+                int selSlot = -1;
+
+                for (int slot = 0; slot < Emulator3D.MaxTransformsPerVertex; slot++) {
+                    int slotWeight = vtxWeights[i * Emulator3D.MaxTransformsPerVertex + slot];
+
+                    if (slotWeight < minWeight) {
+                        minWeight = slotWeight;
+                        selSlot = slot;
+
+                        if (slotWeight == 0) break;
+                    }
+                }
+
+                //selected slot weight should be less than current bone weight
+                if (minWeight > weight) selSlot = -1;
+
+                if (selSlot != -1) {
+                    vtxBones[i * Emulator3D.MaxTransformsPerVertex + selSlot] = boneTrans;
+                    vtxWeights[i * Emulator3D.MaxTransformsPerVertex + selSlot] = weight;
+                }
+            }
+
+            bone.setSkinnedMeshBone();
         } else {
             throw new IllegalArgumentException();
-        }
-    }
-
-    public void getBoneTransform(Node var1, Transform var2) {
-        if (var1 != null && var2 != null) {
-            if (var1 != this.aGroup1203 && !var1.isDescendantOf(this.aGroup1203)) {
-                throw new IllegalArgumentException();
-            } else {
-                WeightedTransform var3 = null;
-
-                for (int var4 = 0; var4 < this.m_transforms.size(); ++var4) {
-                    if ((var3 = (WeightedTransform) this.m_transforms.elementAt(var4)).bone == var1) {
-                        var2.set(var3.toBoneTrans);
-                        return;
-                    }
-                }
-
-            }
-        } else {
-            throw new NullPointerException();
-        }
-    }
-
-    public int getBoneVertices(Node var1, int[] var2, float[] var3) {
-        if (var1 == null) {
-            throw new NullPointerException();
-        } else if (var1 != this.aGroup1203 && !var1.isDescendantOf(this.aGroup1203)) {
-            throw new IllegalArgumentException();
-        } else {
-            int var4 = 0;
-            int var5;
-            float[] var6 = new float[var5 = super.m_vertices.getVertexCount()];
-            WeightedTransform var7 = null;
-
-            int var8;
-            for (var8 = 0; var8 < this.m_transforms.size(); ++var8) {
-                if ((var7 = (WeightedTransform) this.m_transforms.elementAt(var8)).bone == var1 && var7.firstVertex < var5) {
-                    int var9 = Math.min(var5, var7.lastVertex + 1);
-
-                    for (int var10 = var7.firstVertex; var10 < var9; ++var10) {
-                        var6[var10] += (float) var7.weight;
-                    }
-                }
-            }
-
-            for (var8 = 0; var8 < var5; ++var8) {
-                if (var6[var8] > 0.0F) {
-                    if (var2 != null) {
-                        var2[var4] = var8;
-                    }
-
-                    if (var3 != null) {
-                        var3[var4] = var6[var8];
-                    }
-
-                    ++var4;
-                }
-            }
-
-            return var4;
         }
     }
 
     protected void alignment(Node var1) {
         super.alignment(var1);
-        if (this.aGroup1203 != null) {
-            this.aGroup1203.alignment(var1);
+        if (this.skeleton != null) {
+            this.skeleton.alignment(var1);
         }
 
     }
@@ -154,5 +139,13 @@ public class SkinnedMesh extends Mesh {
 
     public Vector getTransforms() {
         return m_transforms;
+    }
+
+    public Object[] getVerticesBones() {
+        return vtxBones;
+    }
+
+    public int[] getVerticesWeights() {
+        return vtxWeights;
     }
 }

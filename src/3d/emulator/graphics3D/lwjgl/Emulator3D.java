@@ -61,6 +61,7 @@ public final class Emulator3D implements IGraphics3D {
     public static final int MaxTextureDimension = 1024;
     public static final int MaxSpriteCropDimension = 1024;
     public static final int MaxLights = 8;
+    public static final int MaxTransformsPerVertex = 4;
     private boolean exiting;
     private String contextRes;
     private Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
@@ -79,7 +80,7 @@ public final class Emulator3D implements IGraphics3D {
         properties.put("maxViewportDimension", new Integer(2048));
         properties.put("maxTextureDimension", new Integer(MaxTextureDimension));
         properties.put("maxSpriteCropDimension", new Integer(MaxSpriteCropDimension));
-        properties.put("maxTransformsPerVertex", new Integer(1000));
+        properties.put("maxTransformsPerVertex", new Integer(MaxTransformsPerVertex));
         properties.put("numTextureUnits", new Integer(NumTextureUnits));
         properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
     }

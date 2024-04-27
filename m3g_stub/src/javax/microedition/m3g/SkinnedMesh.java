@@ -1,5 +1,6 @@
 package javax.microedition.m3g;
 
+import java.util.Hashtable;
 import java.util.Vector;
 
 public class SkinnedMesh
@@ -19,13 +20,6 @@ public class SkinnedMesh
         return null;
     }
 
-    public void getBoneTransform(Node paramNode, Transform paramTransform) {
-    }
-
-    public int getBoneVertices(Node paramNode, int[] paramArrayOfInt, float[] paramArrayOfFloat) {
-        return 1;
-    }
-
     SkinnedMesh(int paramInt) {
         super(paramInt);
     }
@@ -33,4 +27,8 @@ public class SkinnedMesh
     public Vector getTransforms() {
         return null;
     }
+
+    public Object[] getVerticesBones() { return null; }
+
+    public int[] getVerticesWeights() { return null; }
 }
