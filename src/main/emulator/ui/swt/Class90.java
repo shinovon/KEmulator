@@ -20,7 +20,7 @@ import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.*;
 
-public final class Class90 implements MouseMoveListener, DisposeListener, KeyListener {
+public final class Class90 implements MouseMoveListener, DisposeListener, KeyListener, MouseWheelListener {
     private Shell aShell889;
     private SashForm aSashForm890;
     private Composite aComposite891;
@@ -401,7 +401,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         canvas.addKeyListener(this);
         this.canvas.addControlListener(new Class57(this));
         this.canvas.addListener(12, new Class58(this));
-        this.canvas.addListener(37, new Class59(this));
+        canvas.addMouseWheelListener(this);
     }
 
     public final void mouseMove(final MouseEvent mouseEvent) {
@@ -719,6 +719,20 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
 
     static float method544(final Class90 class90, final float n) {
         return class90.zoom -= n;
+    }
+
+    public void mouseScrolled(MouseEvent mouseEvent) {
+        if(mouseEvent.count == 0) return;
+        moveSpeed *= Math.pow(1.1, mouseEvent.count > 0 ? 1 : -1);
+        moveSpeed = Math.max(1F, Math.min(100F, moveSpeed)); // limit
+        // there was zoom change
+//                Class90.method542(this.aClass90_825, event.count);
+//                if (Class90.method517(this.aClass90_825) <= 0.0f) {
+//                    Class90.method544(this.aClass90_825, event.count);
+//                } else if (Class90.method517(this.aClass90_825) >= 180.0f && Class90.method500(this.aClass90_825) == 0) {
+//                    Class90.method544(this.aClass90_825, event.count);
+//                }
+//                Class90.method252(this.aClass90_825);
     }
 
     private final class Flusher implements Runnable {
