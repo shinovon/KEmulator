@@ -45,7 +45,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private int anInt910;
     private float aFloat906;
     private float aFloat911;
-    private float aFloat915;
+    private float zoom;
     private float cameraX;
     private float cameraY;
     private float cameraZ;
@@ -74,6 +74,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private int anInt922;
     private float rotationX;
     private float rotationY;
+    protected float moveSpeed = 5F;
 
     public Class90() {
         super();
@@ -114,7 +115,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private void method524() {
         this.aFloat906 = 1.0f;
         this.aFloat911 = 100000.0f;
-        this.aFloat915 = 50.0f;
+        this.zoom = 50.0f;
         this.method531();
         this.cameraX = 0.0f;
         this.cameraY = 0.0f;
@@ -132,16 +133,16 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
             return;
         }
         if (this.anInt910 == 0) {
-            if (this.aFloat915 < 0.0f) {
-                this.aFloat915 = 0.0f;
+            if (this.zoom < 0.0f) {
+                this.zoom = 0.0f;
             }
-            if (this.aFloat915 >= 180.0f) {
-                this.aFloat915 = 179.99f;
+            if (this.zoom >= 180.0f) {
+                this.zoom = 179.99f;
             }
-            this.camera.setPerspective(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
+            this.camera.setPerspective(this.zoom, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
             return;
         }
-        this.camera.setParallel(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
+        this.camera.setParallel(this.zoom, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
     }
 
     public final void method226() {
@@ -433,8 +434,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
                     x = -1;
                     break;
             }
-            rotationX += x * 5f;
-            rotationY += y * 5f;
+            rotationX += x * 5F;
+            rotationY += y * 5F;
 
             quaternion.setAngleAxis(0, 0, 0, 0);
             Quaternion var5 = new Quaternion();
@@ -465,8 +466,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
             default:
                 break;
         }
-        forward *= 20f;
-        strafe *= 20f;
+        forward *= moveSpeed;
+        strafe *= moveSpeed;
         Transform t = new Transform();
         float[] m = new float[16];
         t.postTranslate(cameraX, cameraY, cameraZ);
@@ -487,48 +488,45 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
 
     }
 
-    private void method492(final int n, final int n2) {
+    private void method492(final int x, final int y) {
         final Quaternion a = new Quaternion();
         switch (this.anInt893) {
             case 0: {
-                if (Math.abs(n) > Math.abs(n2)) {
-                    a.setAngleAxis((float) n / 2.0f, 0.0f, 1.0f, 0.0f);
-                    a.mul(this.quaternion);
-                    this.quaternion.set(a);
-                    return;
-                }
-                if (n2 != 0) {
-                    final Vector4f method495 = this.method495(this.quaternion);
-                    a.setAngleAxis(-((float)n2) / 2.0f, method495.x, method495.y, method495.z);
-                    a.mul(this.quaternion);
-                    if (this.method495(a).normalize()) {
-                        this.quaternion.set(a);
-                    }
-                    return;
-                }
+                rotationX += x / 2F;
+                rotationY += y / 2F;
+
+                quaternion.setAngleAxis(0, 0, 0, 0);
+                Quaternion var5 = new Quaternion();
+                var5.setAngleAxis(rotationX, 0, 1, 0);
+                var5.mul(quaternion);
+                quaternion.set(var5);
+
+                var5 = new Quaternion();
+                var5.setAngleAxis(rotationY, 1, 0, 0);
+                quaternion.mul(var5);
                 break;
             }
             case 1: {
-                this.cameraX += (float)n / 10.0f;
-                this.cameraY -= (float)n2 / 10.0f;
+                this.cameraX += (float)x / 10.0f;
+                this.cameraY -= (float)y / 10.0f;
             }
             case 2: {
                 if (this.anInt910 == 0) {
-                    this.cameraZ -= (float)n / 10.0f;
+                    this.cameraZ -= (float)x / 10.0f;
                     return;
                 }
                 break;
             }
             case 3: {
-                this.aFloat915 -= (float)n / 10.0f;
+                this.zoom -= (float)x / 10.0f;
                 Label_0263:
                 {
-                    if (this.aFloat915 > 0.0f) {
-                        if (this.aFloat915 < 180.0f || this.anInt910 != 0) {
+                    if (this.zoom > 0.0f) {
+                        if (this.zoom < 180.0f || this.anInt910 != 0) {
                             break Label_0263;
                         }
                     }
-                    this.aFloat915 += n / 10.0f;
+                    this.zoom += x / 10.0f;
                 }
                 this.method531();
                 break;
@@ -620,11 +618,11 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     }
 
     static float method517(final Class90 class90) {
-        return class90.aFloat915;
+        return class90.zoom;
     }
 
     static float method518(final Class90 class90, final float aFloat915) {
-        return class90.aFloat915 = aFloat915;
+        return class90.zoom = aFloat915;
     }
 
     static float method525(final Class90 class90) {
@@ -716,11 +714,11 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     }
 
     static float method542(final Class90 class90, final float n) {
-        return class90.aFloat915 += n;
+        return class90.zoom += n;
     }
 
     static float method544(final Class90 class90, final float n) {
-        return class90.aFloat915 -= n;
+        return class90.zoom -= n;
     }
 
     private final class Flusher implements Runnable {
