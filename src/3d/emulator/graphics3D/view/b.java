@@ -5,14 +5,12 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.lwjgl.LWJGLUtility;
 import emulator.graphics3D.m3g.LightsCache;
 import emulator.graphics3D.m3g.RenderObject;
 import emulator.graphics3D.m3g.RenderPipe;
 import emulator.graphics3D.m3g.MeshMorph;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Vector;
 import javax.microedition.m3g.Appearance;
@@ -49,7 +47,7 @@ import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 
 public final class b {
     private static b ab583;
-    private boolean aBoolean584;
+    private boolean xray;
     private int anInt585;
     private int anInt591;
     private float aFloat586;
@@ -77,8 +75,8 @@ public final class b {
         return ab583;
     }
 
-    public final void method363(boolean var1) {
-        this.aBoolean584 = var1;
+    public final void setXray(boolean var1) {
+        this.xray = var1;
     }
 
     public final void method364(int var1, int var2) {
@@ -101,10 +99,10 @@ public final class b {
         GL11.glClearDepth(1.0D);
         GL11.glDepthMask(true);
         GL11.glColorMask(true, true, true, true);
-        int var10000 = var1 != null && !this.aBoolean584 ? var1.getColor() : 0;
+        int var10000 = var1 != null && !this.xray ? var1.getColor() : 0;
         GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var10000, 8), G3DUtils.getFloatColor(var10000, 0), G3DUtils.getFloatColor(var10000, 24));
         GL11.glClear(16640);
-        if (var1 != null && !this.aBoolean584) {
+        if (var1 != null && !this.xray) {
             this.method385(var1);
         }
 
@@ -542,7 +540,7 @@ public final class b {
             var1 = new PolygonMode();
         }
 
-        GL11.glPolygonMode(1032, this.aBoolean584 ? 6913 : 6914);
+        GL11.glPolygonMode(1032, this.xray ? 6913 : 6914);
         int var2;
         if ((var2 = var1.getCulling()) == 162) {
             GL11.glDisable(2884);
@@ -616,9 +614,9 @@ public final class b {
 
         GL11.glPolygonOffset(var1.getDepthOffsetFactor(), var1.getDepthOffsetUnits());
         if (var1.getDepthOffsetFactor() == 0.0F && var1.getDepthOffsetUnits() == 0.0F) {
-            GL11.glDisable(this.aBoolean584 ? 10754 : '\u8037');
+            GL11.glDisable(this.xray ? 10754 : '\u8037');
         } else {
-            GL11.glEnable(this.aBoolean584 ? 10754 : '\u8037');
+            GL11.glEnable(this.xray ? 10754 : '\u8037');
         }
     }
 
@@ -653,7 +651,7 @@ public final class b {
     }
 
     private void setupFog(Fog var1) {
-        if (var1 != null && !this.aBoolean584) {
+        if (var1 != null && !this.xray) {
             GL11.glEnable(2912);
             GL11.glFogi(2917, var1.getMode() == 81 ? 9729 : 2048);
             float[] var2;
@@ -669,10 +667,7 @@ public final class b {
     }
 
     private void draw(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Appearance appearance, float alphaFactor) {
-        VertexArray texCoords;
-        int var10000;
-        byte[] var23;
-        short[] var24;
+
         VertexArray colors = vertexBuffer.getColors();
         if (colors == null) {
             int col = vertexBuffer.getDefaultColor();
@@ -704,10 +699,10 @@ public final class b {
         GL11.glEnableClientState(GL_VERTEX_ARRAY);
         if (positions.getComponentType() == 1) {
             byte[] posesBArr = positions.getByteValues();
-            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesBArr));
+            GL11.glVertexPointer(positions.getComponentCount(), 0, a.getVertexBuffer(posesBArr));
         } else {
             short[] posesSArr = positions.getShortValues();
-            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesSArr));
+            GL11.glVertexPointer(positions.getComponentCount(), 0, a.getVertexBuffer(posesSArr));
         }
 
         GL11.glMatrixMode(GL_MODELVIEW);
@@ -719,7 +714,7 @@ public final class b {
 
         int var9;
         int[] var22;
-        if (appearance != null && !this.aBoolean584) {
+        if (appearance != null && !this.xray) {
             var9 = Emulator3D.NumTextureUnits;
             IntBuffer var10;
             GL11.glGenTextures(var10 = BufferUtils.createIntBuffer(Emulator3D.NumTextureUnits));
@@ -727,7 +722,7 @@ public final class b {
             for (int i = 0; i < var9; ++i) {
                 Texture2D var12 = appearance.getTexture(i);
                 scaleBias[3] = 0.0F;
-                texCoords = vertexBuffer.getTexCoords(i, scaleBias);
+                VertexArray texCoords = vertexBuffer.getTexCoords(i, scaleBias);
                 if (var12 != null && texCoords != null) {
                     short var29;
                     label135:

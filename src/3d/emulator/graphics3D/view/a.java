@@ -15,9 +15,11 @@ public final class a {
     private static IntBuffer anIntBuffer600;
     private static FloatBuffer aFloatBuffer598;
     private static FloatBuffer aFloatBuffer601;
-
     private static ByteBuffer normalByteBuffer;
     private static ShortBuffer normalShortBuffer;
+
+    private static IntBuffer vertexByteBuffer;
+    private static ShortBuffer vertexShortBuffer;
     private static ByteBuffer colorBuffer;
     private static final IntBuffer[] texCoordsBuffer = new IntBuffer[Emulator3D.NumTextureUnits];
 
@@ -197,6 +199,34 @@ public final class a {
 
         normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);
         return normalShortBuffer;
+    }
+
+    public static IntBuffer getVertexBuffer(byte[] var0) {
+        if(vertexByteBuffer == null || vertexByteBuffer.capacity() < var0.length) {
+            vertexByteBuffer = BufferUtils.createIntBuffer(var0.length);
+        }
+
+        vertexByteBuffer.position(vertexByteBuffer.capacity() - var0.length);
+        int var1 = 0;
+        int var2 = var0.length;
+
+        while(var1 < var2) {
+            vertexByteBuffer.put(var0[var1++]);
+        }
+
+        vertexByteBuffer.position(vertexByteBuffer.capacity() - var0.length);
+        return vertexByteBuffer;
+    }
+
+    public static ShortBuffer getVertexBuffer(short[] var0) {
+        if(vertexShortBuffer == null || vertexShortBuffer.capacity() < var0.length) {
+            vertexShortBuffer = BufferUtils.createShortBuffer(var0.length);
+        }
+
+        vertexShortBuffer.position(vertexShortBuffer.capacity() - var0.length);
+        vertexShortBuffer.put(var0);
+        vertexShortBuffer.position(vertexShortBuffer.capacity() - var0.length);
+        return vertexShortBuffer;
     }
 
     public static ByteBuffer getColorBuffer(byte[] var0, float var1, int var2) {

@@ -11,6 +11,6 @@ final class Class63 extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        Class90.method528(this.aClass90_829).getSelection();
+        aClass90_829.setXray(Class90.method528(this.aClass90_829).getSelection());
     }
 }

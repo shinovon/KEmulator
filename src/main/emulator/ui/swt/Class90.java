@@ -28,7 +28,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private Tree aTree896;
     private GLCanvas canvas;
     private Memory ana898;
-    private emulator.graphics3D.view.b ab369;
+    private emulator.graphics3D.view.b m3gview;
     private Camera aCamera901;
     private Transform aTransform372;
     private Menu aMenu908;
@@ -91,7 +91,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aTransform372 = new Transform();
         this.ana892 = new Quaternion();
         this.ana898 = new Memory();
-        this.ab369 = emulator.graphics3D.view.b.method362();
+        this.m3gview = emulator.graphics3D.view.b.method362();
     }
 
     private void method516() {
@@ -215,7 +215,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
                 World var1 = (World)this.aNode361;
                 this.aBackground900 = var1.getBackground();
                 if(this.anInt362 == 0) {
-                    this.ab369.method374(var1);
+                    this.m3gview.method374(var1);
                 }
             } else {
                 Light var2;
@@ -228,20 +228,20 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     private void method540() {
-        if (!ab369.isCurrent()) {
-            this.ab369.setCurrent();
+        if (!m3gview.isCurrent()) {
+            this.m3gview.setCurrent();
         }
         this.aTransform372.setIdentity();
         this.aTransform372.postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
         this.aTransform372.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
         emulator.graphics3D.view.b.method371(this.aCamera901, this.aTransform372);
-        ab369.method367(this.aBackground900);
+        m3gview.method367(this.aBackground900);
         if (this.aBoolean386) {
-            this.ab369.method372(1.0F);
+            this.m3gview.method372(1.0F);
         }
         if (this.aNode361 != null) {
             try {
-                this.ab369.method368(this.aNode361, null);
+                this.m3gview.method368(this.aNode361, null);
             } catch (Exception localException) {
 //                localException.printStackTrace();
             }
@@ -253,10 +253,14 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
             (transform = new Transform()).postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
             transform.postTranslate(0.0f, 0.0f, 6.0f);
             emulator.graphics3D.view.b.method371(localCamera, transform);
-            this.ab369.method389();
-            this.ab369.method364(this.aRectangle903.width, this.aRectangle903.height);
+            this.m3gview.method389();
+            this.m3gview.method364(this.aRectangle903.width, this.aRectangle903.height);
         }
-        ab369.swapBuffers();
+        b.swapBuffers();
+    }
+
+    public void setXray(boolean b) {
+        this.m3gview.setXray(b);
     }
 
     private void method543() {
@@ -650,7 +654,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
 
         public final void run() {
-            Class90.method243(this.aClass90_1207, aClass90_1207.ab369.useContext(aClass90_1207.canvas));
+            Class90.method243(this.aClass90_1207, aClass90_1207.m3gview.useContext(aClass90_1207.canvas));
             while (Class90.method231(this.aClass90_1207) != null) {
                 if (Class90.method231(this.aClass90_1207).isDisposed()) {
                     return;
