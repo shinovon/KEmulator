@@ -723,8 +723,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
 
     public void mouseScrolled(MouseEvent mouseEvent) {
         if(mouseEvent.count == 0) return;
-        moveSpeed *= Math.pow(1.1, mouseEvent.count > 0 ? 1 : -1);
-        moveSpeed = Math.max(1F, Math.min(100F, moveSpeed)); // limit
+        moveSpeed *= Math.pow(1.1F, mouseEvent.count > 0 ? 1 : -1);
+        moveSpeed = Math.max(0.01F, Math.min(1000F, moveSpeed)); // limit
         // there was zoom change
 //                Class90.method542(this.aClass90_825, event.count);
 //                if (Class90.method517(this.aClass90_825) <= 0.0f) {
