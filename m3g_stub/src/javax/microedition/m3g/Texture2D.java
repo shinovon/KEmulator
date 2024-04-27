@@ -21,8 +21,7 @@ public class Texture2D
     }
 
     public Image2D getImage() {
-        Image2D localImage2D = null;
-        return localImage2D;
+        return null;
     }
 
     public void setFiltering(int paramInt1, int paramInt2) {
@@ -32,39 +31,33 @@ public class Texture2D
     }
 
     public int getWrappingS() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getWrappingT() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setBlending(int paramInt) {
     }
 
     public int getBlending() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setBlendColor(int paramInt) {
     }
 
     public int getBlendColor() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getImageFilter() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getLevelFilter() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Texture2D(int paramInt) {

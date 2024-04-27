@@ -1,7 +1,5 @@
 package emulator.graphics3D;
 
-import java.util.Arrays;
-
 public class G3DUtils {
 
 //    public static native boolean intelSSE_Invert4x4(float[] var0, float var1);

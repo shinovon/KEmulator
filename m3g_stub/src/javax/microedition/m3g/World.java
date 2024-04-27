@@ -10,16 +10,14 @@ public class World
     }
 
     public Background getBackground() {
-        Background localBackground = null;
-        return localBackground;
+        return null;
     }
 
     public void setActiveCamera(Camera paramCamera) {
     }
 
     public Camera getActiveCamera() {
-        Camera localCamera = null;
-        return localCamera;
+        return null;
     }
 
     World(int paramInt) {

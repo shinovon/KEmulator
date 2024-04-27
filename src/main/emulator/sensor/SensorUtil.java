@@ -144,7 +144,7 @@ public final class SensorUtil {
         String s = null;
         try {
             s = (String) sensorInfo.getProperty("location");
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ignored) {
         }
         if (s != null) {
             sb.append(';');

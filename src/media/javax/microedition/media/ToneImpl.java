@@ -80,10 +80,10 @@ public class ToneImpl implements Player {
     }
 
     public Control getControl(final String s) {
-        if (s == "VolumeControl") {
+        if (s.equals("VolumeControl")) {
             return this.volumeControl;
         }
-        if (s == "ToneControl") {
+        if (s.equals("ToneControl")) {
             return this.toneControl;
         }
         return null;

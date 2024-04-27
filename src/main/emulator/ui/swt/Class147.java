@@ -11,8 +11,8 @@ final class SortProperties extends Properties {
 
     public final Enumeration keys() {
         final List list;
-        Collections.sort((List<Comparable>) (list = (List) Collections.list((Enumeration) super.keys())));
-        return Collections.enumeration((Collection) list);
+        Collections.sort((List<Comparable>) (list = Collections.list(super.keys())));
+        return Collections.enumeration(list);
     }
 
     SortProperties(final Property class38, final Class117 class39) {

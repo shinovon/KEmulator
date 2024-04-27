@@ -73,7 +73,7 @@ public class Player {
             anInt915 = n != -1 ? n + 1 : -1;
             aPlayer907.setLoopCount(anInt915);
             Class55 class55 = new Class55(aPlayerListener911);
-            Class55.method366((Class55) class55, (javax.microedition.media.Player) aPlayer907);
+            Class55.method366(class55, aPlayer907);
             anInt912 = clip.priority;
             aClip909 = clip;
             anInt905 = 1;
@@ -85,7 +85,7 @@ public class Player {
             if (aPlayerListener911 != null) {
                 aPlayerListener911.playerUpdate(2, anObject906);
             }
-            System.out.println(new StringBuffer().append("Player.play() clip encountered a MediaException: ").append(mediaException.getMessage()).toString());
+            System.out.println("Player.play() clip encountered a MediaException: " + mediaException.getMessage());
             mediaException.printStackTrace();
             anInt905 = 0;
             anObject906 = null;
@@ -146,14 +146,14 @@ public class Player {
                 aPlayer916.close();
                 aPlayer916 = null;
             }
-            aPlayer916 = Manager.createPlayer((String) "device://tone");
+            aPlayer916 = Manager.createPlayer("device://tone");
             aPlayer916.realize();
             aToneControl908 = (ToneControl) aPlayer916.getControl("ToneControl");
             anInt917 = n != -1 ? n + 1 : -1;
             aPlayer916.setLoopCount(anInt917);
             aToneControl908.setSequence(dualTone.aByteArray513);
             Class55 class55 = new Class55(aPlayerListener911);
-            Class55.method366((Class55) class55, (javax.microedition.media.Player) aPlayer916);
+            Class55.method366(class55, aPlayer916);
             anInt912 = dualTone.anInt514;
             anObject906 = dualTone;
             aDualTone910 = dualTone;
@@ -165,10 +165,9 @@ public class Player {
                 aPlayerListener911.playerUpdate(2, anObject906);
             }
             mediaException.printStackTrace();
-            System.out.println(new StringBuffer().append("Player.play(DualTone) encountered an exception: ").append(mediaException.getMessage()).toString());
+            System.out.println("Player.play(DualTone) encountered an exception: " + mediaException.getMessage());
             return;
         } catch (Exception exception) {
-            Exception exception2 = exception;
             exception.printStackTrace();
             return;
         }
@@ -201,7 +200,7 @@ public class Player {
             anInt918 = n != -1 ? n + 1 : -1;
             aPlayer913.setLoopCount(anInt918);
             Class55 class55 = new Class55(aPlayerListener911);
-            Class55.method366((Class55) class55, (javax.microedition.media.Player) aPlayer913);
+            Class55.method366(class55, aPlayer913);
             aClip914 = clip;
             if (anInt905 != 1 && anInt905 != 6) {
                 anObject906 = aClip914;
@@ -213,7 +212,7 @@ public class Player {
                 aPlayerListener911.playerUpdate(2, anObject906);
             }
             mediaException.printStackTrace();
-            System.out.println(new StringBuffer().append("playBackground() encountered a MediaException: ").append(mediaException.getMessage()).toString());
+            System.out.println("playBackground() encountered a MediaException: " + mediaException.getMessage());
             anInt905 = 0;
             anObject906 = null;
             aClip914 = null;
@@ -222,7 +221,7 @@ public class Player {
             if (aPlayerListener911 != null) {
                 aPlayerListener911.playerUpdate(2, anObject906);
             }
-            System.out.println(new StringBuffer().append("playBackground() encountered an IOException: ").append(exception.getMessage()).toString());
+            System.out.println("playBackground() encountered an IOException: " + exception.getMessage());
             anInt905 = 0;
             anObject906 = null;
             aClip914 = null;
@@ -250,7 +249,7 @@ public class Player {
                 }
                 return;
             } catch (MediaException mediaException) {
-                System.out.println(new StringBuffer().append("Player.pause encountered an exception: ").append(mediaException.getMessage()).toString());
+                System.out.println("Player.pause encountered an exception: " + mediaException.getMessage());
                 mediaException.printStackTrace();
                 anInt905 = 0;
                 anObject906 = null;

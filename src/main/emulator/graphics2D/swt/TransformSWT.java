@@ -4,8 +4,6 @@ import emulator.graphics2D.ITransform;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Transform;
 
-import java.awt.geom.AffineTransform;
-
 public final class TransformSWT implements ITransform {
     float[] a;
 

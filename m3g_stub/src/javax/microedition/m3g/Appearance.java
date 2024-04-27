@@ -10,48 +10,42 @@ public class Appearance
     }
 
     public CompositingMode getCompositingMode() {
-        CompositingMode localCompositingMode = null;
-        return localCompositingMode;
+        return null;
     }
 
     public void setFog(Fog paramFog) {
     }
 
     public Fog getFog() {
-        Fog localFog = null;
-        return localFog;
+        return null;
     }
 
     public void setPolygonMode(PolygonMode paramPolygonMode) {
     }
 
     public PolygonMode getPolygonMode() {
-        PolygonMode localPolygonMode = null;
-        return localPolygonMode;
+        return null;
     }
 
     public void setLayer(int paramInt) {
     }
 
     public int getLayer() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setMaterial(Material paramMaterial) {
     }
 
     public Material getMaterial() {
-        Material localMaterial = null;
-        return localMaterial;
+        return null;
     }
 
     public void setTexture(int paramInt, Texture2D paramTexture2D) {
     }
 
     public Texture2D getTexture(int paramInt) {
-        Texture2D localTexture2D = null;
-        return localTexture2D;
+        return null;
     }
 
     Appearance(int paramInt) {

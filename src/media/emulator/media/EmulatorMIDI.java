@@ -17,9 +17,9 @@ public class EmulatorMIDI {
     }
 
     static MidiDevice.Info getMidiDeviceInfo() throws MidiUnavailableException {
-        for (int i = 0; i < midiDeviceInfo.length; ++i) {
-            if (midiDeviceInfo[i].getName().toLowerCase().contains("virtualmidisynth")) {
-                return midiDeviceInfo[i];
+        for (MidiDevice.Info info : midiDeviceInfo) {
+            if (info.getName().toLowerCase().contains("virtualmidisynth")) {
+                return info;
             }
         }
         return MidiSystem.getSynthesizer().getDeviceInfo();
@@ -35,12 +35,9 @@ public class EmulatorMIDI {
             for (Transmitter t : midiSequencer.getTransmitters()) {
                 t.setReceiver(midiDevice.getReceiver());
             }
-            midiSequencer.addMetaEventListener(new MetaEventListener() {
-                @Override
-                public void meta(MetaMessage meta) {
-                    if (meta.getType() == 0x2F && currentPlayer instanceof PlayerImpl) {
-                        ((PlayerImpl) currentPlayer).notifyCompleted();
-                    }
+            midiSequencer.addMetaEventListener(meta -> {
+                if (meta.getType() == 0x2F && currentPlayer instanceof PlayerImpl) {
+                    ((PlayerImpl) currentPlayer).notifyCompleted();
                 }
             });
             midiSequencer.open();

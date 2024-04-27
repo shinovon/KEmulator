@@ -15,58 +15,50 @@ public class Light
     }
 
     public float getIntensity() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setColor(int paramInt) {
     }
 
     public int getColor() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setMode(int paramInt) {
     }
 
     public int getMode() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setSpotAngle(float paramFloat) {
     }
 
     public float getSpotAngle() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setSpotExponent(float paramFloat) {
     }
 
     public float getSpotExponent() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setAttenuation(float paramFloat1, float paramFloat2, float paramFloat3) {
     }
 
     public float getConstantAttenuation() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getLinearAttenuation() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getQuadraticAttenuation() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     Light(int paramInt) {

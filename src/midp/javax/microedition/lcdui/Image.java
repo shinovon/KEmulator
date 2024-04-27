@@ -125,7 +125,7 @@ public class Image {
                 g.getImpl().setAlpha(255);
                 g.setColor(0);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return image;
     }

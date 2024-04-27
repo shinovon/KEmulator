@@ -16,61 +16,53 @@ public class CompositingMode
     }
 
     public int getBlending() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setAlphaThreshold(float paramFloat) {
     }
 
     public float getAlphaThreshold() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setAlphaWriteEnable(boolean paramBoolean) {
     }
 
     public boolean isAlphaWriteEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setColorWriteEnable(boolean paramBoolean) {
     }
 
     public boolean isColorWriteEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setDepthWriteEnable(boolean paramBoolean) {
     }
 
     public boolean isDepthWriteEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setDepthTestEnable(boolean paramBoolean) {
     }
 
     public boolean isDepthTestEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setDepthOffset(float paramFloat1, float paramFloat2) {
     }
 
     public float getDepthOffsetFactor() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getDepthOffsetUnits() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     CompositingMode(int paramInt) {

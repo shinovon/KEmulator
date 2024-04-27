@@ -10,42 +10,36 @@ public class AnimationController
     }
 
     public int getActiveIntervalStart() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getActiveIntervalEnd() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setSpeed(float paramFloat, int paramInt) {
     }
 
     public float getSpeed() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setPosition(float paramFloat, int paramInt) {
     }
 
     public float getPosition(int paramInt) {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setWeight(float paramFloat) {
     }
 
     public float getWeight() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public int getRefWorldTime() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     AnimationController(int paramInt) {

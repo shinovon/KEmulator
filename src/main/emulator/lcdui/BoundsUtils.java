@@ -11,13 +11,10 @@ public final class BoundsUtils {
     }
 
     public static boolean collides(int[] arr, int x, int y) {
-        if (arr[X] <= x &&
+        return arr[X] <= x &&
                 arr[X] + arr[W] >= x &&
                 arr[Y] <= y &&
-                arr[Y] + arr[H] >= y) {
-            return true;
-        }
-        return false;
+                arr[Y] + arr[H] >= y;
     }
 
     public static boolean collides(int[] a, int[] b) {
@@ -25,12 +22,9 @@ public final class BoundsUtils {
     }
 
     public static boolean collides2(int[] a, int[] b) {
-        if (collides(a, b[X], b[Y])
+        return collides(a, b[X], b[Y])
                 && collides(a, b[X] + b[W], b[Y])
                 && collides(a, b[X], b[Y] + b[H])
-                && collides(a, b[X] + b[W], b[Y] + b[H])) {
-            return true;
-        }
-        return false;
+                && collides(a, b[X] + b[W], b[Y] + b[H]);
     }
 }

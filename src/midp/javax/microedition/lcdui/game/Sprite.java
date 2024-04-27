@@ -152,9 +152,7 @@ public class Sprite extends Layer {
             this.aBoolean407 = false;
             this.frameSequence = new int[this.rawFrameCount];
 
-            for (var2 = 0; var2 < this.rawFrameCount; this.frameSequence[var2] = var2++) {
-                ;
-            }
+            for (var2 = 0; var2 < this.rawFrameCount; this.frameSequence[var2] = var2++);
 
         } else if (var1.length < 1) {
             throw new IllegalArgumentException();

@@ -11,13 +11,11 @@ public class MorphingMesh
     }
 
     public VertexBuffer getMorphTarget(int paramInt) {
-        VertexBuffer localVertexBuffer = null;
-        return localVertexBuffer;
+        return null;
     }
 
     public int getMorphTargetCount() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setWeights(float[] paramArrayOfFloat) {

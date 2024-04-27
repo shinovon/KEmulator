@@ -4,7 +4,6 @@ import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
 import emulator.graphics2D.*;
 import java.io.*;
-import java.util.Arrays;
 import javax.imageio.*;
 
 /*
@@ -36,7 +35,7 @@ public final class ImageSWT implements IImage
             final RGB rgb = this.imgdata.palette.colors[this.imgdata.transparentPixel];
             for (int i = this.imgdata.palette.colors.length - 1; i >= 0; --i) {
                 if (i != this.imgdata.transparentPixel) {
-                    if (rgb.equals((Object)this.imgdata.palette.colors[i])) {
+                    if (rgb.equals(this.imgdata.palette.colors[i])) {
                         RGB rgb2;
                         int red;
                         if (this.imgdata.palette.colors[i].red == 255) {
@@ -51,15 +50,15 @@ public final class ImageSWT implements IImage
                 }
             }
         }
-        this.img = new Image((Device)null, this.imgdata);
+        this.img = new Image(null, this.imgdata);
         mutable = true;
     }
     
     public ImageSWT(final int n, final int n2, final boolean transparent, final int n3) {
-    	this.img = new Image((Device)null, n, n2);
+    	this.img = new Image(null, n, n2);
     	if(!transparent) {
             GC gc = new GC(this.img);
-            Color background = new Color((Device)null, n3 >> 16 & 255, n3 >> 8 & 255, n3 & 255);
+            Color background = new Color(null, n3 >> 16 & 255, n3 >> 8 & 255, n3 & 255);
             gc.setBackground(background);
             gc.fillRectangle(0, 0, n, n2);
             gc.dispose();
@@ -79,20 +78,18 @@ public final class ImageSWT implements IImage
     }
     
     public final void finalize() {
-        EmulatorImpl.asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    if (img != null && !img.isDisposed()) {
-                        img.dispose();
-                    }
-                    if (graphics != null) {
-                        graphics.finalize();
-                        graphics = null;
-                    }
-                } catch (Exception e) {
+        EmulatorImpl.asyncExec(() -> {
+            try {
+                if (img != null && !img.isDisposed()) {
+                    img.dispose();
                 }
-                mutable = false;
+                if (graphics != null) {
+                    graphics.finalize();
+                    graphics = null;
+                }
+            } catch (Exception ignored) {
             }
+            mutable = false;
         });
     }
     
@@ -106,9 +103,9 @@ public final class ImageSWT implements IImage
             }
         }
         else {
-            this.img = new Image((Device)null, this.imgdata.width, this.imgdata.height);
-            final GC gc = new GC((Drawable)this.img);
-            final Image image = new Image((Device)null, this.imgdata);
+            this.img = new Image(null, this.imgdata.width, this.imgdata.height);
+            final GC gc = new GC(this.img);
+            final Image image = new Image(null, this.imgdata);
             gc.drawImage(image, 0, 0);
             gc.dispose();
             image.dispose();
@@ -131,7 +128,7 @@ public final class ImageSWT implements IImage
             gc.drawImage(this.img, n, n2);
             return;
         }
-        gc.drawImage(this.img = new Image((Device)null, this.imgdata), n, n2);
+        gc.drawImage(this.img = new Image(null, this.imgdata), n, n2);
         this.img.dispose();
     }
     
@@ -140,7 +137,7 @@ public final class ImageSWT implements IImage
             gc.drawImage(this.img, n, n2, n3, n4, n5, n6, n7, n8);
             return;
         }
-        gc.drawImage(this.img = new Image((Device)null, this.imgdata), n, n2, n3, n4, n5, n6, n7, n8);
+        gc.drawImage(this.img = new Image(null, this.imgdata), n, n2, n3, n4, n5, n6, n7, n8);
         this.img.dispose();
     }
 
@@ -149,7 +146,7 @@ public final class ImageSWT implements IImage
             gc.drawImage(this.img, x, y);
             return;
         }
-        gc.drawImage(this.img = new Image((Device)null, this.imgdata), x, y);
+        gc.drawImage(this.img = new Image(null, this.imgdata), x, y);
         this.img.dispose();
     }
     
@@ -321,7 +318,7 @@ public final class ImageSWT implements IImage
     }
     
     public final void cloneImage(final IImage image) {
-        ((ImageSWT)image).setData(this.getData());
+        image.setData(this.getData());
     }
     
     static {

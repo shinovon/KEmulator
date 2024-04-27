@@ -19,8 +19,8 @@ public class AMRDecoder {
             i.a("amrdecoder");
             AMRDecoder.aBoolean444 = true;
             return AMRDecoder.aBoolean444;
-        } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
-        } catch (Exception ex) {
+        } catch (UnsatisfiedLinkError ignored) {
+        } catch (Exception ignored) {
         }
         AMRDecoder.aBoolean444 = false;
         return AMRDecoder.aBoolean444;

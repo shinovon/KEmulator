@@ -215,7 +215,7 @@ public final class KeyMapping {
         }
 
         if (Settings.canvasKeyboard && (n >= '0' && n <= '9')) {
-            return "" + n;
+            return String.valueOf(n);
         }
         final Object value;
         if ((value = KeyMapping.deviceKeyToStr.get(String.valueOf(n))) != null) {
@@ -223,7 +223,7 @@ public final class KeyMapping {
         }
         if (Settings.fpsMode) {
             int g = fpsKey(n);
-            if (g != 0) return "" + g;
+            if (g != 0) return String.valueOf(g);
         }
         final String method594;
         if ((method594 = keyToString(String.valueOf(n))) == null) {
@@ -233,7 +233,7 @@ public final class KeyMapping {
         if ((value2 = KeyMapping.aHashtable1067.get(method594)) == null) {
             if (Settings.canvasKeyboard) {
                 if ((n >= 32 && n <= 126) || n == 8) {
-                    return "" + n;
+                    return String.valueOf(n);
                 }
             }
             return null;

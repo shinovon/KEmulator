@@ -125,7 +125,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
 
     private void method531() {
         final Rectangle clientArea;
-        if ((clientArea = ((Scrollable) this.canvas).getClientArea()).width == 0 || clientArea.height == 0) {
+        if ((clientArea = this.canvas.getClientArea()).width == 0 || clientArea.height == 0) {
             return;
         }
         if (this.anInt910 == 0) {
@@ -144,14 +144,14 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     public final void method226() {
         this.method543();
         final Display current = Display.getCurrent();
-        ((Control) this.aShell889).setLocation(current.getClientArea().width - this.aShell889.getSize().x >> 1, current.getClientArea().height - this.aShell889.getSize().y >> 1);
+        this.aShell889.setLocation(current.getClientArea().width - this.aShell889.getSize().x >> 1, current.getClientArea().height - this.aShell889.getSize().y >> 1);
         this.aShell889.open();
-        ((Widget) this.aShell889).addDisposeListener((DisposeListener) this);
+        this.aShell889.addDisposeListener(this);
         this.method516();
         this.method536();
         new Thread(new Refresher(this)).start();
         new Thread(new Flusher(this)).start();
-        while (!((Widget) this.aShell889).isDisposed()) {
+        while (!this.aShell889.isDisposed()) {
             if (!current.readAndDispatch()) {
                 current.sleep();
             }
@@ -159,13 +159,13 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     public final void method507() {
-        if (this.aShell889 != null && !((Widget) this.aShell889).isDisposed()) {
+        if (this.aShell889 != null && !this.aShell889.isDisposed()) {
             this.aShell889.dispose();
         }
     }
 
     public final boolean method494() {
-        return this.aShell889 != null && !((Widget) this.aShell889).isDisposed();
+        return this.aShell889 != null && !this.aShell889.isDisposed();
     }
 
     private void method536() {
@@ -175,8 +175,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
             final Node data;
             final String name = (data = (Node) this.ana898.m3gObjects.get(i)).getClass().getName();
             final Widget widget;
-            ((TreeItem) (widget = (Widget) new TreeItem(this.aTree896, 0))).setText(name.substring(name.lastIndexOf(".") + 1) + "_" + data.getUserID());
-            widget.setData((Object) data);
+            ((TreeItem) (widget = new TreeItem(this.aTree896, 0))).setText(name.substring(name.lastIndexOf(".") + 1) + "_" + data.getUserID());
+            widget.setData(data);
             if (data instanceof Group) {
                 new TreeItem((TreeItem) widget, 0);
             }
@@ -221,7 +221,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
                 Light var2;
                 (var2 = new Light()).setMode(128);
                 b.method388();
-                b.method381(var2, (Transform)null);
+                b.method381(var2, null);
             }
         }
         this.aRectangle903 = this.canvas.getClientArea();
@@ -264,12 +264,12 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         (layout = new GridLayout()).numColumns = 1;
         layout.marginHeight = 2;
         layout.marginWidth = 2;
-        ((Decorations) (this.aShell889 = new Shell())).setText(UILocale.get("M3G_VIEW_TITLE", "M3G View"));
-        ((Decorations) this.aShell889).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        (this.aShell889 = new Shell()).setText(UILocale.get("M3G_VIEW_TITLE", "M3G View"));
+        this.aShell889.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
         this.method545();
-        ((Composite) this.aShell889).setLayout((Layout) layout);
-        ((Control) this.aShell889).setSize(new Point(600, 400));
-        this.aMenu895 = new Menu((Decorations) this.aShell889, 2);
+        this.aShell889.setLayout(layout);
+        this.aShell889.setSize(new Point(600, 400));
+        this.aMenu895 = new Menu(this.aShell889, 2);
         final MenuItem menuItem = new MenuItem(this.aMenu895, 64);
         final MenuItem menuItem2;
         (menuItem2 = new MenuItem(this.aMenu895, 64)).setText(UILocale.get("M3G_VIEW_CAMERA", "Camera"));
@@ -277,65 +277,65 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         (menuItem3 = new MenuItem(this.aMenu895, 64)).setText(UILocale.get("M3G_VIEW_LIGHT", "Light"));
         this.aMenu918 = new Menu(menuItem3);
         (this.aMenuItem936 = new MenuItem(this.aMenu918, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
-        this.aMenuItem936.addSelectionListener((SelectionListener) new Class122(this));
+        this.aMenuItem936.addSelectionListener(new Class122(this));
         (this.aMenuItem937 = new MenuItem(this.aMenu918, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
-        this.aMenuItem937.addSelectionListener((SelectionListener) new Class94(this));
+        this.aMenuItem937.addSelectionListener(new Class94(this));
         new MenuItem(this.aMenu918, 2);
         (this.aMenuItem938 = new MenuItem(this.aMenu918, 8)).setText(UILocale.get("M3G_VIEW_LIGHT_SETTING", "Light Setting"));
         menuItem3.setMenu(this.aMenu918);
         this.aMenu913 = new Menu(menuItem2);
         (this.aMenuItem925 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ORBIT", "Orbit") + "\t(1)");
         this.aMenuItem925.setAccelerator(49);
-        this.aMenuItem925.addSelectionListener((SelectionListener) new Class98(this));
+        this.aMenuItem925.addSelectionListener(new Class98(this));
         (this.aMenuItem927 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PAN", "Pan") + "\t(2)");
         this.aMenuItem927.setAccelerator(50);
-        this.aMenuItem927.addSelectionListener((SelectionListener) new Class102(this));
+        this.aMenuItem927.addSelectionListener(new Class102(this));
         (this.aMenuItem928 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_DOLLY", "Dolly") + "\t(3)");
         this.aMenuItem928.setAccelerator(51);
-        this.aMenuItem928.addSelectionListener((SelectionListener) new Class106(this));
+        this.aMenuItem928.addSelectionListener(new Class106(this));
         (this.aMenuItem929 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ZOOM", "Zoom") + "\t(4)");
         this.aMenuItem929.setAccelerator(52);
-        this.aMenuItem929.addSelectionListener((SelectionListener) new Class114(this));
+        this.aMenuItem929.addSelectionListener(new Class114(this));
         new MenuItem(this.aMenu913, 2);
         final MenuItem menuItem4;
         (menuItem4 = new MenuItem(this.aMenu913, 64)).setText(UILocale.get("M3G_VIEW_CAMERA_PROJECTION", "Projection Mode"));
         this.aMenu923 = new Menu(menuItem4);
         (this.aMenuItem930 = new MenuItem(this.aMenu923, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PERSPECTIVE", "Perspective Projection"));
-        this.aMenuItem930.addSelectionListener((SelectionListener) new Class112(this));
+        this.aMenuItem930.addSelectionListener(new Class112(this));
         (this.aMenuItem931 = new MenuItem(this.aMenu923, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PARALLEL", "Parallel Projection"));
-        this.aMenuItem931.addSelectionListener((SelectionListener) new Class118(this));
+        this.aMenuItem931.addSelectionListener(new Class118(this));
         menuItem4.setMenu(this.aMenu923);
         new MenuItem(this.aMenu913, 2);
         (this.aMenuItem932 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
         this.aMenuItem932.setAccelerator(67);
-        this.aMenuItem932.addSelectionListener((SelectionListener) new Class116(this));
+        this.aMenuItem932.addSelectionListener(new Class116(this));
         (this.aMenuItem933 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View") + "\tF");
         this.aMenuItem933.setAccelerator(70);
-        this.aMenuItem933.addSelectionListener((SelectionListener) new Class37(this));
+        this.aMenuItem933.addSelectionListener(new Class37(this));
         (this.aMenuItem934 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position") + "\tP");
         this.aMenuItem934.setAccelerator(80);
-        this.aMenuItem934.addSelectionListener((SelectionListener) new Class143(this));
+        this.aMenuItem934.addSelectionListener(new Class143(this));
         new MenuItem(this.aMenu913, 2);
         (this.aMenuItem935 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_RESET", "Reset Camera") + "\tR");
         this.aMenuItem935.setAccelerator(82);
-        this.aMenuItem935.addSelectionListener((SelectionListener) new Class126(this));
+        this.aMenuItem935.addSelectionListener(new Class126(this));
         menuItem2.setMenu(this.aMenu913);
         this.aMenu908 = new Menu(menuItem);
         (this.aMenuItem894 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_COORDINATE", "Coordinate Axis"));
-        this.aMenuItem894.addSelectionListener((SelectionListener) new Class61(this));
+        this.aMenuItem894.addSelectionListener(new Class61(this));
         (this.aMenuItem912 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_GRID", "Show Grid"));
-        this.aMenuItem912.addSelectionListener((SelectionListener) new Class60(this));
+        this.aMenuItem912.addSelectionListener(new Class60(this));
         (this.aMenuItem916 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_XRAY", "Show Xray") + "\tX");
         this.aMenuItem916.setAccelerator(88);
-        this.aMenuItem916.addSelectionListener((SelectionListener) new Class63(this));
+        this.aMenuItem916.addSelectionListener(new Class63(this));
         new MenuItem(this.aMenu908, 2);
         (this.aMenuItem921 = new MenuItem(this.aMenu908, 8)).setText(UILocale.get("M3G_VIEW_DISPLAY_UPDATE_WORLD", "Update World") + "\tF5");
         this.aMenuItem921.setAccelerator(16777230);
-        this.aMenuItem921.addSelectionListener((SelectionListener) new Class62(this));
+        this.aMenuItem921.addSelectionListener(new Class62(this));
         menuItem.setMenu(this.aMenu908);
         menuItem.setText(UILocale.get("M3G_VIEW_DISPLAY", "Display"));
-        ((Decorations) this.aShell889).setMenuBar(this.aMenu895);
-        this.aShell889.addShellListener((ShellListener) new Class49(this));
+        this.aShell889.setMenuBar(this.aMenu895);
+        this.aShell889.addShellListener(new Class49(this));
     }
 
     private void method545() {
@@ -344,7 +344,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         layoutData.grabExcessVerticalSpace = true;
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = 4;
-        ((Control) (this.aSashForm890 = new SashForm((Composite) this.aShell889, 0))).setLayoutData((Object) layoutData);
+        (this.aSashForm890 = new SashForm(this.aShell889, 0)).setLayoutData(layoutData);
         this.method546();
         this.method547();
         this.aSashForm890.setWeights(new int[]{3, 7});
@@ -360,21 +360,21 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.grabExcessVerticalSpace = true;
         layoutData.verticalAlignment = 4;
-        (this.aComposite891 = new Composite((Composite) this.aSashForm890, 0)).setLayout((Layout) layout);
+        (this.aComposite891 = new Composite(this.aSashForm890, 0)).setLayout(layout);
         (this.aTree896 = new Tree(this.aComposite891, 2048)).setHeaderVisible(false);
-        ((Control) this.aTree896).setLayoutData((Object) layoutData);
+        this.aTree896.setLayoutData(layoutData);
         this.aTree896.setLinesVisible(false);
-        ((Widget) this.aTree896).addListener(17, (Listener) new Class48(this));
-        ((Control) this.aTree896).addMouseListener((MouseListener) new Class51(this));
+        this.aTree896.addListener(17, new Class48(this));
+        this.aTree896.addMouseListener(new Class51(this));
     }
 
     private void method547() {
         final GridLayout layout;
         (layout = new GridLayout()).marginWidth = 0;
         layout.marginHeight = 0;
-        this.aComposite907 = new Composite((Composite) this.aSashForm890, 0);
+        this.aComposite907 = new Composite(this.aSashForm890, 0);
         this.method548();
-        this.aComposite907.setLayout((Layout) layout);
+        this.aComposite907.setLayout(layout);
     }
 
     private void method548() {
@@ -386,12 +386,12 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         GLData gld = new GLData();
         gld.depthSize = 24;
         gld.doubleBuffer = true;
-        ((Control) (this.canvas = new GLCanvas(this.aComposite907, 264192, gld))).setLayoutData((Object) layoutData);
-        ((Control) this.canvas).addMouseMoveListener((MouseMoveListener) this);
-        ((Control) this.canvas).addMouseListener((MouseListener) new Class56(this));
-        ((Control) this.canvas).addControlListener((ControlListener) new Class57(this));
-        ((Widget) this.canvas).addListener(12, (Listener) new Class58(this));
-        ((Widget) this.canvas).addListener(37, (Listener) new Class59(this));
+        (this.canvas = new GLCanvas(this.aComposite907, 264192, gld)).setLayoutData(layoutData);
+        this.canvas.addMouseMoveListener(this);
+        this.canvas.addMouseListener(new Class56(this));
+        this.canvas.addControlListener(new Class57(this));
+        this.canvas.addListener(12, new Class58(this));
+        this.canvas.addListener(37, new Class59(this));
     }
 
     public final void mouseMove(final MouseEvent mouseEvent) {
@@ -652,7 +652,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         public final void run() {
             Class90.method243(this.aClass90_1207, aClass90_1207.ab369.useContext(aClass90_1207.canvas));
             while (Class90.method231(this.aClass90_1207) != null) {
-                if (((Widget) Class90.method231(this.aClass90_1207)).isDisposed()) {
+                if (Class90.method231(this.aClass90_1207).isDisposed()) {
                     return;
                 }
                 if (Class90.method232(this.aClass90_1207) && Class90.method242(this.aClass90_1207)) {
@@ -665,8 +665,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
                 }
                 try {
                     Thread.sleep(10L);
-                } catch (Exception ex2) {
-                }
+                } catch (Exception ignored) {}
             }
         }
 
@@ -685,14 +684,13 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
 
         public final void run() {
             while (Class90.method231(this.aClass90_830) != null) {
-                if (((Widget) Class90.method231(this.aClass90_830)).isDisposed()) {
+                if (Class90.method231(this.aClass90_830).isDisposed()) {
                     return;
                 }
                 EmulatorImpl.syncExec(new Class10(this));
                 try {
                     Thread.sleep(10L);
-                } catch (Exception ex) {
-                }
+                } catch (Exception ignored) {}
             }
         }
 

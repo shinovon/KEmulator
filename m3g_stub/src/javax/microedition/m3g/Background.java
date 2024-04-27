@@ -13,29 +13,25 @@ public class Background
     }
 
     public int getColor() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setImage(Image2D paramImage2D) {
     }
 
     public Image2D getImage() {
-        Image2D localImage2D = null;
-        return localImage2D;
+        return null;
     }
 
     public void setImageMode(int paramInt1, int paramInt2) {
     }
 
     public int getImageModeX() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getImageModeY() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setColorClearEnable(boolean paramBoolean) {
@@ -45,36 +41,30 @@ public class Background
     }
 
     public boolean isColorClearEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public boolean isDepthClearEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setCrop(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
     }
 
     public int getCropX() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getCropY() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getCropWidth() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getCropHeight() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Background(int paramInt) {

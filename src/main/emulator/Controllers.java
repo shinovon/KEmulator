@@ -27,9 +27,8 @@ public class Controllers {
         try {
             Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
             ArrayList list = new ArrayList<Controller>();
-            for (int i = 0; i < controllers.length; ++i) {
-                Controller controller;
-                if (!(controller = controllers[i]).getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
+            for (Controller controller: controllers) {
+                if (!controller.getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
                     String s = controller.getName();
                     if (s.contains("tablet")) continue;
                     if (s.contains("STAR")) continue;
@@ -57,8 +56,8 @@ public class Controllers {
             ++Controllers.count;
             return;
         }
-        for (int i = 0; i < controllers.length; ++i) {
-            addController(controllers[i]);
+        for (Controller value: controllers) {
+            addController(value);
         }
     }
 

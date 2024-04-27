@@ -1,7 +1,5 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.widgets.*;
-
 final class ShellPosition implements Runnable {
     int anInt1478;
     int anInt1481;
@@ -22,6 +20,6 @@ final class ShellPosition implements Runnable {
             this.anInt1481 = EmulatorScreen.method561(this.aClass93_1480).getLocation().y;
             return;
         }
-        ((Control) EmulatorScreen.method561(this.aClass93_1480)).setLocation(this.anInt1478, this.anInt1481);
+        EmulatorScreen.method561(this.aClass93_1480).setLocation(this.anInt1478, this.anInt1481);
     }
 }

@@ -7,8 +7,7 @@ public class VertexBuffer
     }
 
     public int getVertexCount() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setPositions(VertexArray paramVertexArray, float paramFloat, float[] paramArrayOfFloat) {
@@ -24,31 +23,26 @@ public class VertexBuffer
     }
 
     public VertexArray getPositions(float[] paramArrayOfFloat) {
-        VertexArray localVertexArray = null;
-        return localVertexArray;
+        return null;
     }
 
     public VertexArray getTexCoords(int paramInt, float[] paramArrayOfFloat) {
-        VertexArray localVertexArray = null;
-        return localVertexArray;
+        return null;
     }
 
     public VertexArray getNormals() {
-        VertexArray localVertexArray = null;
-        return localVertexArray;
+        return null;
     }
 
     public VertexArray getColors() {
-        VertexArray localVertexArray = null;
-        return localVertexArray;
+        return null;
     }
 
     public void setDefaultColor(int paramInt) {
     }
 
     public int getDefaultColor() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     VertexBuffer(int paramInt) {

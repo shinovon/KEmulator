@@ -15,24 +15,21 @@ public class Material
     }
 
     public int getColor(int paramInt) {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setShininess(float paramFloat) {
     }
 
     public float getShininess() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setVertexColorTrackingEnable(boolean paramBoolean) {
     }
 
     public boolean isVertexColorTrackingEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     Material(int paramInt) {

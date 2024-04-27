@@ -28,23 +28,19 @@ public class Image2D
     }
 
     public boolean isMutable() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public int getFormat() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getWidth() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getHeight() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Image2D(int paramInt) {

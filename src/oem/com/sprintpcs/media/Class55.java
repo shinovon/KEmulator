@@ -6,7 +6,7 @@ final class Class55
         implements javax.microedition.media.PlayerListener {
     private void method365(javax.microedition.media.Player player) {
         try {
-            player.addPlayerListener((javax.microedition.media.PlayerListener) this);
+            player.addPlayerListener(this);
             return;
         } catch (Exception exception) {
             System.out.println("Exception in addPlayerListener");
@@ -29,7 +29,7 @@ final class Class55
                             System.out.println("ERROR: currentPlayed is null!");
                         }
                         if (string != "started") break block32;
-                        long l = Long.parseLong((String) object.toString());
+                        long l = Long.parseLong(object.toString());
                         if (l > 0L) {
                             if (Player.method314() != null) {
                                 Player.method314().playerUpdate(6, Player.method313());
@@ -78,13 +78,13 @@ final class Class55
                     Player.aPlayer907.close();
                     Player.aPlayer907 = null;
                     Player.aClip909 = null;
-                    Player.method316((Object) null);
-                    Player.method317((int) 0);
-                    Player.method320((int) 0);
+                    Player.method316(null);
+                    Player.method317(0);
+                    Player.method320(0);
                     if (Player.aPlayer913 == null) break;
-                    Player.method320((int) 0);
-                    Player.method317((int) 4);
-                    Player.method316((Object) Player.aClip914);
+                    Player.method320(0);
+                    Player.method317(4);
+                    Player.method316(Player.aClip914);
                     try {
                         Player.aPlayer913.start();
                         return;
@@ -102,13 +102,13 @@ final class Class55
                         Player.aPlayer916.close();
                         Player.aPlayer916 = null;
                         Player.aDualTone910 = null;
-                        Player.method316((Object) null);
-                        Player.method317((int) 0);
-                        Player.method320((int) 0);
+                        Player.method316(null);
+                        Player.method317(0);
+                        Player.method320(0);
                         if (Player.aPlayer913 != null) {
-                            Player.method320((int) 0);
-                            Player.method317((int) 4);
-                            Player.method316((Object) Player.aClip914);
+                            Player.method320(0);
+                            Player.method317(4);
+                            Player.method316(Player.aClip914);
                             Player.aPlayer913.start();
                             return;
                         }
@@ -116,7 +116,7 @@ final class Class55
                     } catch (MediaException mediaException) {
                         if (Player.method314() != null) {
                             Player.method314().playerUpdate(2, Player.method313());
-                            System.out.println(new StringBuffer().append("play background clip encountered a MediaException: ").append(mediaException.getMessage()).toString());
+                            System.out.println("play background clip encountered a MediaException: " + mediaException.getMessage());
                         }
                         exception = mediaException;
                     } catch (Exception exception2) {
@@ -130,7 +130,7 @@ final class Class55
     }
 
     Class55(PlayerListener playerListener) {
-        Player.method318((PlayerListener) playerListener);
+        Player.method318(playerListener);
     }
 
     static void method366(Class55 class55, javax.microedition.media.Player player) {

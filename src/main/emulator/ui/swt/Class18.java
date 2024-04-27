@@ -18,6 +18,6 @@ final class Class18 extends FocusAdapter {
     public final void focusLost(final FocusEvent focusEvent) {
         this.aTreeItem583.setText(1, this.aText584.getText());
         Class5.method315(this.aClass5_585, this.aTreeItem583, this.aText584.getText());
-        ((Widget) this.aText584).dispose();
+        this.aText584.dispose();
     }
 }

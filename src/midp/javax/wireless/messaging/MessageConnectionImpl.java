@@ -21,10 +21,10 @@ public class MessageConnectionImpl implements MessageConnection {
     }
 
     public Message newMessage(final String s, final String s2) {
-        if (s == "text") {
+        if (s.equals("text")) {
             return new TextMessageImpl(s2, null);
         }
-        if (s == "binary") {
+        if (s.equals("binary")) {
             return new BinaryMessageImpl(s2, null);
         }
         return null;
@@ -42,8 +42,7 @@ public class MessageConnectionImpl implements MessageConnection {
             try {
                 receive = Emulator.getEmulator().getMessage().receive(this.aString314);
                 Thread.sleep(1L);
-            } catch (InterruptedException ex) {
-            }
+            } catch (InterruptedException ignored) {}
         }
         if (receive != null) {
             this.aMessageListener1365.notifyIncomingMessage(this);

@@ -1,8 +1,6 @@
 package com.samsung.util;
 
 import emulator.Emulator;
-import emulator.ui.IEmulator;
-import emulator.ui.IScreen;
 
 public class Vibration {
     public static boolean isSupported() {

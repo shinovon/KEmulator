@@ -78,7 +78,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             } catch (Throwable ignored) {
                 m3gLoaded = true;
             }
-        } catch (Throwable e) {}
+        } catch (Throwable ignored) {}
         if(!m3gLoaded) {
             addToClassPath(Settings.g3d == 0 ? "m3g_swerve.jar" : "m3g_lwjgl.jar");
         } else {

@@ -21,7 +21,7 @@ final class Class103 extends SelectionAdapter {
             if (Property.method367(this.aClass38_1057).getItem(i).getChecked()) {
                 try {
                     RecordStore.deleteRecordStore(Property.method367(this.aClass38_1057).getItem(i).getText().trim());
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
             }

@@ -32,18 +32,15 @@ public class AnimationTrack
     }
 
     public AnimationController getController() {
-        AnimationController localAnimationController = null;
-        return localAnimationController;
+        return null;
     }
 
     public KeyframeSequence getKeyframeSequence() {
-        KeyframeSequence localKeyframeSequence = null;
-        return localKeyframeSequence;
+        return null;
     }
 
     public int getTargetProperty() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     AnimationTrack(int paramInt) {

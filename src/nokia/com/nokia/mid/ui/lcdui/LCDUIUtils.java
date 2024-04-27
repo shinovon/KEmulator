@@ -34,7 +34,7 @@ public final class LCDUIUtils {
 
     public static void setCurrent(Display paramDisplay, Alert paramAlert, Displayable paramDisplayable,
                                   String paramString) {
-        if ((paramDisplay == null) || (paramString == null) || (paramDisplay == null) || (paramString == null)) {
+        if ((paramDisplay == null) || (paramAlert == null) || (paramDisplayable == null) || (paramString == null)) {
             throw new NullPointerException();
         }
         paramDisplay.setCurrent(paramAlert, paramDisplayable);

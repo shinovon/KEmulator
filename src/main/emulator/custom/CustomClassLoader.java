@@ -43,7 +43,7 @@ public final class CustomClassLoader extends ClassLoader {
                 if ((entry = (zipFile = new ZipFile((String) Emulator.jarLibrarys.get(i))).getEntry(s.replace('.', '/') + ".class")) != null) {
                     final ClassReader classReader = new ClassReader(zipFile.getInputStream(entry));
                     final ClassWriter classWriter = new ClassWriter(0);
-                    classReader.accept((ClassVisitor) new ClassAdapter((ClassVisitor) classWriter), 0);
+                    classReader.accept(new ClassAdapter(classWriter), 0);
                     final byte[] byteArray = classWriter.toByteArray();
                     defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
                 }
@@ -74,7 +74,7 @@ public final class CustomClassLoader extends ClassLoader {
             }
             final ClassReader classReader = new ClassReader(inputStream);
             final ClassWriter classWriter = new ClassWriter(0);
-            classReader.accept((ClassVisitor) new CustomClassAdapter((ClassVisitor) classWriter, s), 0);
+            classReader.accept(new CustomClassAdapter(classWriter, s), 0);
             final byte[] byteArray = classWriter.toByteArray();
             defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
         } catch (Exception ex2) {

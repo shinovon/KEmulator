@@ -20,7 +20,7 @@ public final class d implements IImage
     
     public d(final byte[] array) {
         super();
-        this.img = emulator.graphics2D.c.method171(new ImageData((InputStream)new ByteArrayInputStream(array)));
+        this.img = emulator.graphics2D.c.method171(new ImageData(new ByteArrayInputStream(array)));
     }
     
     public d(final BufferedImage bi) {
@@ -45,13 +45,13 @@ public final class d implements IImage
     }
     
     public final void method13(final GC gc, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-        final Image image = new Image((Device)null, emulator.graphics2D.c.method168(this.img));
+        final Image image = new Image(null, emulator.graphics2D.c.method168(this.img));
         gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
         image.dispose();
     }
 
     public final void method13(final GC gc, final int x, final int y) {
-        final Image image = new Image((Device)null, emulator.graphics2D.c.method168(this.img));
+        final Image image = new Image(null, emulator.graphics2D.c.method168(this.img));
         gc.drawImage(image, x, y);
         image.dispose();
     }

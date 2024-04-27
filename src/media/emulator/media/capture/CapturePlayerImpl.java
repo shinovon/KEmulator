@@ -205,7 +205,7 @@ public class CapturePlayerImpl implements Player {
                     }
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             BufferedImage img = webcam.getImage();
@@ -237,7 +237,7 @@ public class CapturePlayerImpl implements Player {
         if (visible && started) {
             try {
                 g.drawImage(new Image(new d(VLCPlayerImpl.resize(webcam.getImage(),-1, scaleh))), locx, locy, 0);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }

@@ -19,7 +19,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     StyledText styledText;
     Shell parentShell;
     private boolean aBoolean576;
-    StringBuffer printQueue = new StringBuffer();
+    final StringBuffer printQueue = new StringBuffer();
 
     public Class11() {
         super();
@@ -32,7 +32,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             }
             this.logStream = new LogStream(this);
             this.filePrintStream = new PrintStream(new FileOutputStream(file));
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         new Thread(this, "KEmulator-Log").start();
     }
@@ -88,7 +88,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             }
             bufferedReader.close();
             this.styledText.setTopIndex(this.styledText.getLineCount());
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -105,15 +105,15 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         this.method332();
         final Display current = Display.getCurrent();
         this.parentShell = aShell575;
-        ((Control) this.logShell).setLocation(aShell575.getLocation().x + aShell575.getSize().x, aShell575.getLocation().y);
-        ((Control) this.logShell).setSize(aShell575.getSize());
+        this.logShell.setLocation(aShell575.getLocation().x + aShell575.getSize().x, aShell575.getLocation().y);
+        this.logShell.setSize(aShell575.getSize());
         this.logOpen = true;
         this.aBoolean576 = true;
         this.logShell.open();
-        ((Control) this.logShell).addControlListener((ControlListener) this);
-        ((Widget) this.logShell).addDisposeListener((DisposeListener) this);
-        ((Composite) aShell575).setFocus();
-        while (!((Widget) this.logShell).isDisposed()) {
+        this.logShell.addControlListener(this);
+        this.logShell.addDisposeListener(this);
+        aShell575.setFocus();
+        while (!this.logShell.isDisposed()) {
             if (!current.readAndDispatch()) {
                 current.sleep();
             }
@@ -122,7 +122,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
     }
 
     public final void method330() {
-        if (this.logShell != null && !((Widget) this.logShell).isDisposed()) {
+        if (this.logShell != null && !this.logShell.isDisposed()) {
             this.logShell.dispose();
         }
         this.logOpen = false;
@@ -133,11 +133,11 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         (layout = new FillLayout()).spacing = 0;
         layout.marginWidth = 1;
         layout.marginHeight = 1;
-        ((Decorations) (this.logShell = new Shell())).setText(UILocale.get("LOG_FRAME_TITLE", "Log"));
-        ((Decorations) this.logShell).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        ((Composite) this.logShell).setLayout((Layout) layout);
-        ((Control) this.logShell).setSize(new Point(310, 254));
-        this.styledText = new StyledText((Composite) this.logShell, 2816);
+        (this.logShell = new Shell()).setText(UILocale.get("LOG_FRAME_TITLE", "Log"));
+        this.logShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        this.logShell.setLayout(layout);
+        this.logShell.setSize(new Point(310, 254));
+        this.styledText = new StyledText(this.logShell, 2816);
     }
 
     public final boolean method333() {
@@ -146,7 +146,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
 
     public final void controlMoved(final ControlEvent controlEvent) {
         if (Math.abs(this.parentShell.getLocation().x + this.parentShell.getSize().x - this.logShell.getLocation().x) < 10 && Math.abs(this.parentShell.getLocation().y - this.logShell.getLocation().y) < 20) {
-            ((Control) this.logShell).setLocation(this.parentShell.getLocation().x + this.parentShell.getSize().x, this.parentShell.getLocation().y);
+            this.logShell.setLocation(this.parentShell.getLocation().x + this.parentShell.getSize().x, this.parentShell.getLocation().y);
             aBoolean576 = true;
         } else {
             aBoolean576 = false;
@@ -192,7 +192,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
             }
             try {
                 class11.filePrintStream.print(s);
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
             if (!class11.logOpen || class11.styledText.isDisposed()) {
                 return;
             }

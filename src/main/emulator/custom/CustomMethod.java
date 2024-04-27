@@ -112,7 +112,7 @@ public class CustomMethod {
             final Integer value;
             n = (((value = (Integer) CustomMethod.aHashtable14.get(currentThread)) == null) ? 0 : value);
         }
-        CustomMethod.aHashtable14.put(currentThread, new Integer(n + 1));
+        CustomMethod.aHashtable14.put(currentThread, n + 1);
         CustomMethod.aThread15 = currentThread;
         return n;
     }
@@ -121,7 +121,7 @@ public class CustomMethod {
         final Thread currentThread = Thread.currentThread();
         final Object value;
         if ((value = CustomMethod.aHashtable14.get(currentThread)) != null) {
-            CustomMethod.aHashtable14.put(currentThread, new Integer(Math.max((int) value - 1, 0)));
+            CustomMethod.aHashtable14.put(currentThread, Math.max((int) value - 1, 0));
         }
     }
 
@@ -133,8 +133,7 @@ public class CustomMethod {
         final h.MethodInfo methodInfo;
         if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
             final int method16 = method16();
-            final h.MethodInfo methodInfo2 = methodInfo;
-            ++methodInfo2.anInt1182;
+            ++methodInfo.anInt1182;
             trackStr = "";
             for (int i = 0; i < method16; ++i) {
                 trackStr += ("  ");
@@ -149,9 +148,8 @@ public class CustomMethod {
         final h.MethodInfo methodInfo;
         if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
             if (methodInfo.anInt1182 > 0) {
-                final h.MethodInfo methodInfo2 = methodInfo;
-                methodInfo2.aLong1179 += System.currentTimeMillis() - methodInfo.aLong1174;
-                methodInfo.aFloat1175 = methodInfo.aLong1179 / methodInfo.anInt1182;
+                methodInfo.aLong1179 += System.currentTimeMillis() - methodInfo.aLong1174;
+                methodInfo.aFloat1175 = (float) methodInfo.aLong1179 / methodInfo.anInt1182;
             }
             method17();
         }

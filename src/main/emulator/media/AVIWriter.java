@@ -12,7 +12,7 @@ public class AVIWriter {
             return this.startAVI(s, n, n2, n3);
         } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
             Emulator.getEmulator().getLogStream().println("+++ emulator.dll not loaded +++");
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -22,7 +22,7 @@ public class AVIWriter {
             this.finishAVI();
         } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
             Emulator.getEmulator().getLogStream().println("+++ emulator.dll not loaded +++");
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         return true;
     }
@@ -32,7 +32,7 @@ public class AVIWriter {
             this.addFrameAVI(array);
         } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
             Emulator.getEmulator().getLogStream().println("+++ emulator.dll not loaded +++");
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 

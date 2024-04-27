@@ -2,7 +2,6 @@ package emulator.ui.swt;
 
 import emulator.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.widgets.*;
 
 final class WindowOpen implements Runnable {
     int anInt1058;
@@ -36,7 +35,7 @@ final class WindowOpen implements Runnable {
             case 2: {
                 if (Settings.showInfoFrame) {
                     this.aClass93_1059.infosMenuItem.setSelection(true);
-                    ((Control) EmulatorScreen.method558(this.aClass93_1059)).setCursor(new Cursor((Device) EmulatorScreen.method564(), 2));
+                    EmulatorScreen.method558(this.aClass93_1059).setCursor(new Cursor(EmulatorScreen.method564(), 2));
                     ((EmulatorImpl) Emulator.getEmulator()).method825().method607(EmulatorScreen.method561(this.aClass93_1059));
                     break;
                 }

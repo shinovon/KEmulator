@@ -18,32 +18,28 @@ public class PolygonMode
     }
 
     public int getCulling() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setWinding(int paramInt) {
     }
 
     public int getWinding() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setShading(int paramInt) {
     }
 
     public int getShading() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setTwoSidedLightingEnable(boolean paramBoolean) {
     }
 
     public boolean isTwoSidedLightingEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setLocalCameraLightingEnable(boolean paramBoolean) {
@@ -53,13 +49,11 @@ public class PolygonMode
     }
 
     public boolean isLocalCameraLightingEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public boolean isPerspectiveCorrectionEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     PolygonMode(int paramInt) {

@@ -119,8 +119,8 @@ public class VertexArray extends Object3D {
     }
 
     public void morph(VertexArray[] targets, VertexArray base, float[] weights, float baseWeight) {
-        for (int i = 0; i < targets.length; i++) {
-            if (!equals_(targets[i])) {
+        for (VertexArray target : targets) {
+            if (!equals_(target)) {
                 throw new IllegalStateException();
             }
         }
@@ -151,8 +151,8 @@ public class VertexArray extends Object3D {
     }
 
     public void morphColors(VertexArray[] targets, VertexArray base, float[] weights, float baseWeight) {
-        for (int i = 0; i < targets.length; i++) {
-            if (!equals_(targets[i])) {
+        for (VertexArray target : targets) {
+            if (!equals_(target)) {
                 throw new IllegalStateException();
             }
         }

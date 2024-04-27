@@ -1,7 +1,6 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
 
 final class Class19 extends SelectionAdapter {
     private final MemoryView aClass110_586;
@@ -14,7 +13,7 @@ final class Class19 extends SelectionAdapter {
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         if (MemoryView.method639(this.aClass110_586)) {
             MemoryView.method683(this.aClass110_586, MemoryView.method670(this.aClass110_586).getSelectionIndex());
-            ((Control) MemoryView.method642(this.aClass110_586)).redraw();
+            MemoryView.method642(this.aClass110_586).redraw();
         }
     }
 }

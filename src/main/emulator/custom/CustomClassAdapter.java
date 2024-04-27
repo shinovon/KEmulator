@@ -37,7 +37,7 @@ public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
         }
         final MethodVisitor visitMethod;
         if ((visitMethod = super.visitMethod(acc, name, desc, sign, array)) != null) {
-            return (MethodVisitor) new CustomMethodAdapter(visitMethod, this.className, name, desc);
+            return new CustomMethodAdapter(visitMethod, this.className, name, desc);
         }
         return null;
     }

@@ -2,7 +2,6 @@ package emulator.graphics3D;
 
 import java.util.*;
 import javax.microedition.m3g.*;
-import javax.microedition.lcdui.*;
 
 public interface IGraphics3D {
     void setHints(final int p0);

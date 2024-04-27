@@ -20,8 +20,6 @@ public final class CaretImpl implements ICaret {
     private int caretLocY;
     private int caretX;
     private int caretY;
-    private Transform transform;
-    private int e;
     private TextField lcduiTextField;
     private int caretPosition;
     private int caretCol;
@@ -39,8 +37,6 @@ public final class CaretImpl implements ICaret {
     }
 
     public final void a(Transform paramTransform, int paramInt) {
-        this.transform = paramTransform;
-        this.e = paramInt;
     }
 
     public final void setCaretLocation(final int x, final int y) {
@@ -218,7 +214,7 @@ public final class CaretImpl implements ICaret {
                                 var6.substring(this.caretCol, var7);
                             }
 
-                            var3 = var3.substring(0, this.caretPosition - 1) + var3.substring(this.caretPosition, var3.length());
+                            var3 = var3.substring(0, this.caretPosition - 1) + var3.substring(this.caretPosition);
                         }
                     case '\t':
                     case '\n':
@@ -242,13 +238,13 @@ public final class CaretImpl implements ICaret {
                                 var6.substring(this.caretCol, var7);
                             }
 
-                            var3 = var3.substring(0, this.caretPosition) + var3.substring(this.caretPosition + 1, var3.length());
+                            var3 = var3.substring(0, this.caretPosition) + var3.substring(this.caretPosition + 1);
                         }
                         break;
                     default:
                         if (var1.character >= 32 && var3.length() < this.lcduiTextField.getMaxSize()) {
                             try {
-                                var3 = var3.substring(0, this.caretPosition) + var1.character + var3.substring(this.caretPosition, var3.length());
+                                var3 = var3.substring(0, this.caretPosition) + var1.character + var3.substring(this.caretPosition);
                                 if (var1.character != 32 || var3.charAt(this.caretPosition + 1) == 32) {
                                     if (this.caretCol == var7 && this.caretRow < var4.length - 1) {
                                         ++this.caretRow;
@@ -267,9 +263,7 @@ public final class CaretImpl implements ICaret {
                                         ++this.caretRow;
                                     }
                                 }
-                            } catch (Exception var12) {
-                                ;
-                            }
+                            } catch (Exception ignored) {}
                         }
                 }
 

@@ -2,7 +2,6 @@ package emulator;
 
 import javax.microedition.lcdui.*;
 
-import emulator.debug.Memory;
 import net.rim.device.api.system.Application;
 import emulator.graphics2D.*;
 
@@ -20,8 +19,8 @@ public final class EventQueue implements Runnable {
     private InputThread input = new InputThread();
     private Thread inputThread;
     private int[] repaintRegion = new int[4];
-    private Object lock = new Object();
-    private Object repaintLock = new Object();
+    private final Object lock = new Object();
+    private final Object repaintLock = new Object();
     private boolean repainted;
 
     public EventQueue() {
@@ -85,7 +84,7 @@ public final class EventQueue implements Runnable {
                 return;
             }
             Emulator.getScreen().invokePointerPressed(x, y);
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         //input.queue(0, x, y, false);
         //mouse(268435456, x, y);
@@ -101,7 +100,7 @@ public final class EventQueue implements Runnable {
                 return;
             }
             Emulator.getScreen().invokePointerReleased(x, y);
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         //input.queue(1, x, y, false);
         //mouse(536870912, x, y);
@@ -117,7 +116,7 @@ public final class EventQueue implements Runnable {
                 return;
             }
             Emulator.getScreen().invokePointerDragged(x, y);
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         //input.queue(2, x, y, false);
         //mouse(1073741824, x, y);
@@ -189,7 +188,7 @@ public final class EventQueue implements Runnable {
             synchronized (repaintLock) {
                 repaintLock.wait();
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
 //        synchronized(lock) {
 //            internalRepaint();
 //        }
@@ -233,7 +232,7 @@ public final class EventQueue implements Runnable {
                         Emulator.getEmulator().getScreen().repaint();
                         try {
                             Thread.sleep(100L);
-                        } catch (Exception ex2) {
+                        } catch (Exception ignored) {
                         }
                         this.queue(4);
                         break;
@@ -316,7 +315,7 @@ public final class EventQueue implements Runnable {
                 this.event = 0;
                 try {
                     Thread.sleep(1L);
-                } catch (Exception ex4) {
+                } catch (Exception ignored) {
                 }
             } catch (Throwable e) {
                 System.err.println("Exception in Event Thread!");
@@ -364,7 +363,7 @@ public final class EventQueue implements Runnable {
             synchronized(repaintLock) {
                 repaintLock.notify();
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
         repainted = true;
     }
 
@@ -452,8 +451,8 @@ public final class EventQueue implements Runnable {
             boolean canv = d instanceof Canvas;
             if (o[3] > 0) {
                 // keyboard
-                int n = (int) o[1];
-                switch ((int) o[0]) {
+                int n = o[1];
+                switch (o[0]) {
                     case 0: {
                         Application.internalKeyPress(n);
                         if (d.handleSoftKeyAction(n, true)) return;
@@ -475,9 +474,9 @@ public final class EventQueue implements Runnable {
                 }
             } else {
                 // mouse
-                int x = (int) o[1];
-                int y = (int) o[2];
-                switch ((int) o[0]) {
+                int x = o[1];
+                int y = o[2];
+                switch (o[0]) {
                     case 0:
                         if (canv) ((Canvas) d).invokePointerPressed(x, y);
                         else ((Screen) d).invokePointerPressed(x, y);

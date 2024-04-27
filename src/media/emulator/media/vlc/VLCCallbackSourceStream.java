@@ -1,13 +1,11 @@
 package emulator.media.vlc;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.microedition.media.protocol.DataSource;
 import javax.microedition.media.protocol.SourceStream;
 
 import uk.co.caprica.vlcj.media.callback.DefaultCallbackMedia;
-import uk.co.caprica.vlcj.media.callback.nonseekable.NonSeekableInputStreamMedia;
 
 public class VLCCallbackSourceStream extends DefaultCallbackMedia {
 

@@ -1,10 +1,8 @@
 package emulator.graphics2D;
 
-import java.util.*;
 import org.eclipse.swt.graphics.*;
 import java.awt.image.*;
 import java.awt.*;
-import java.awt.datatransfer.*;
 
 public final class c
 {

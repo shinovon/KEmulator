@@ -16,16 +16,14 @@ public class SkinnedMesh
     }
 
     public Group getSkeleton() {
-        Group localGroup = null;
-        return localGroup;
+        return null;
     }
 
     public void getBoneTransform(Node paramNode, Transform paramTransform) {
     }
 
     public int getBoneVertices(Node paramNode, int[] paramArrayOfInt, float[] paramArrayOfFloat) {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     SkinnedMesh(int paramInt) {

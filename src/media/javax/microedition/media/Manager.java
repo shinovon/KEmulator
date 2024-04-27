@@ -316,7 +316,7 @@ public class Manager {
         if (locator.startsWith("http://") || locator.startsWith("https://")) {
             try {
                 c = getContentTypeHttp(locator);
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
             if (c == null || c.equals("text/plain")) c = getContentTypeFromURL(locator);
         } else {
@@ -356,8 +356,7 @@ public class Manager {
         Vector<String> vlc = new Vector<String>();
         vlc.add("rtsp");
         vlc.add("rtp");
-        Vector<String> fullList = new Vector<String>();
-        fullList.addAll(kem);
+        Vector<String> fullList = new Vector<String>(kem);
         if (isLibVlcSupported()) {
             fullList.addAll(vlc);
         }
@@ -366,7 +365,7 @@ public class Manager {
 
     public static String getContentTypeFromURL(String url) throws IOException {
         // remove query
-        if (url.indexOf("?") != -1) {
+        if (url.contains("?")) {
             url = url.substring(0, url.indexOf("?"));
         }
         if (url.endsWith(".amr")) {

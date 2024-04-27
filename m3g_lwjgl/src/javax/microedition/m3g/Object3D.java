@@ -11,8 +11,8 @@ public abstract class Object3D implements Cloneable {
     public final int animate(int var1) {
         int var2 = this.animation(var1);
 
-        for (int var3 = 0; var3 < this.references.size(); ++var3) {
-            var2 = Math.min(var2, ((Object3D) this.references.get(var3)).animate(var1));
+        for (Object reference : this.references) {
+            var2 = Math.min(var2, ((Object3D) reference).animate(var1));
         }
 
         return var2;
@@ -65,9 +65,7 @@ public abstract class Object3D implements Cloneable {
         try {
             (var1 = (Object3D) this.clone()).references = (Vector) this.references.clone();
             var1.animationTracks = (Vector) this.animationTracks.clone();
-        } catch (Exception var2) {
-            ;
-        }
+        } catch (Exception ignored) {}
 
         return var1;
     }

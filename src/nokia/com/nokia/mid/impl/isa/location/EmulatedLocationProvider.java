@@ -59,20 +59,19 @@ public class EmulatedLocationProvider extends LocationProvider {
         } else {
             timeout = newtime;
         }
-        try {
-            locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(1.0D, 1.0D, 3.0F, 10.0F, 20.0F)));
+        
+        locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(1.0D, 1.0D, 3.0F, 10.0F, 20.0F)));
 
-            locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(1.0D, 1.0D, 3.0F, 10.0F, 20.0F)));
+        locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(1.0D, 1.0D, 3.0F, 10.0F, 20.0F)));
 
-            locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(2.0D, 2.0D, 3.0F, 10.0F, 20.0F)));
+        locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(2.0D, 2.0D, 3.0F, 10.0F, 20.0F)));
 
-            locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(3.0D, 4.0D, 3.0F, 10.0F, 20.0F)));
+        locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(3.0D, 4.0D, 3.0F, 10.0F, 20.0F)));
 
-            locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(4.0D, 5.0D, 2.0F, 10.0F, 20.0F)));
+        locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(4.0D, 5.0D, 2.0F, 10.0F, 20.0F)));
 
-            locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(5.0D, 6.0D, 2.0F, 10.0F, 20.0F)));
-        } finally {
-        }
+        locations.addElement(new EmulatedLocationImpl(new QualifiedCoordinates(5.0D, 6.0D, 2.0F, 10.0F, 20.0F)));
+
         return (Location) locations.elementAt(currentLocation++ % (locations.size() - 1));
     }
 
@@ -89,9 +88,9 @@ public class EmulatedLocationProvider extends LocationProvider {
             throw ie;
         } catch (SecurityException se) {
             throw se;
-        } catch (IllegalMonitorStateException ie) {
-        } catch (NullPointerException ne) {
-        } catch (Exception ne) {
+        } catch (IllegalMonitorStateException ignored) {
+        } catch (NullPointerException ignored) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -132,7 +131,7 @@ public class EmulatedLocationProvider extends LocationProvider {
                     line = readLine(in);
                 }
             }
-        } catch (IOException localIOException1) {
+        } catch (IOException ignored) {
         } finally {
             try {
                 if (in != null) {
@@ -141,7 +140,7 @@ public class EmulatedLocationProvider extends LocationProvider {
                 if (filecon != null) {
                     filecon.close();
                 }
-            } catch (IOException localIOException3) {
+            } catch (IOException ignored) {
             }
         }
         return counter != 0;
@@ -238,25 +237,25 @@ public class EmulatedLocationProvider extends LocationProvider {
                         synchronized (this.listener) {
                             this.listener.wait(this.interval * 1000);
                         }
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignored) {
                     }
                     try {
                         this.listener.locationUpdated(this.provider, EmulatedLocationProvider.this
                                 .getLocation(this.timeout));
-                    } catch (LocationException e) {
-                    } catch (InterruptedException e) {
-                    } catch (IllegalArgumentException ie) {
+                    } catch (LocationException ignored) {
+                    } catch (InterruptedException ignored) {
+                    } catch (IllegalArgumentException ignored) {
                     }
                 }
-            } catch (NullPointerException ne) {
+            } catch (NullPointerException ignored) {
             }
         }
 
         public void abort() {
             try {
                 this.abort = true;
-            } catch (IllegalMonitorStateException ie) {
-            } catch (Exception e) {
+            } catch (IllegalMonitorStateException ignored) {
+            } catch (Exception ignored) {
             }
         }
     }

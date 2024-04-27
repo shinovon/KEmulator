@@ -15,7 +15,6 @@ import java.util.*;
 import java.lang.reflect.*;
 
 import emulator.ui.swt.EmulatorScreen;
-import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import com.samsung.util.AudioClip;
 
@@ -75,8 +74,7 @@ public final class Memory {
         this.images.clear();
         this.players.clear();
         this.m3gObjects.clear();
-        for (Player p : PlayerImpl.players)
-            this.players.add(p);
+        this.players.addAll(PlayerImpl.players);
         for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
             final String s = (String) Emulator.jarClasses.get(j);
             Class cls = null;
@@ -90,7 +88,7 @@ public final class Memory {
             } else {
                 try {
                     cls = cls(s);
-                } catch (Throwable e) {}
+                } catch (Throwable ignored) {}
                 o = null;
             }
             if (cls != null)
@@ -101,7 +99,7 @@ public final class Memory {
             final String s = (String) checkClasses.get(j);
             try {
                 cls = cls(s);
-            } catch (Throwable e) {}
+            } catch (Throwable ignored) {}
             if (cls != null)
                 method847(cls, null, s, false);
         }
@@ -113,7 +111,7 @@ public final class Memory {
         if(Settings.g3d == 1) {
             // lwjgl engine
             for (int i = 0; i < m3gObjects.size(); i++) {
-                m3gReadTextures((Node) m3gObjects.elementAt(i));
+                m3gReadTextures(m3gObjects.elementAt(i));
             }
             return;
         }
@@ -122,12 +120,12 @@ public final class Memory {
                 // delays to make sure jsr184client.dll did all the job
                 Thread.sleep(5);
                 for (int i = 0; i < m3gObjects.size(); i++) {
-                    m3gReadTextures((Node) m3gObjects.elementAt(i));
+                    m3gReadTextures(m3gObjects.elementAt(i));
                     Thread.yield();
                 }
                 Thread.sleep(5);
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     private void method847(final Class clazz, final Object o, final String s, boolean vector) {
@@ -150,7 +148,7 @@ public final class Memory {
                 if (this.instances.contains(o)) {
                     return;
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             ++classInfo.instancesCount;
             classInfo.objs.add(new ObjInstance(this, s, o));
@@ -311,7 +309,7 @@ public final class Memory {
             for (int i = 0; i < declaredFields.length; ++i) {
                 vector.add(declaredFields[i]);
             }
-        } catch (Error error) {
+        } catch (Error ignored) {
         }
     }
 
@@ -325,9 +323,9 @@ public final class Memory {
                     final String s;
                     try {
                         if (!cls(s = elements.nextElement()).isInterface()) {
-                            n += (int) ((ZipEntry) zipFile.getEntry(s.replace('.', '/') + ".class")).getSize();
+                            n += (int) zipFile.getEntry(s.replace('.', '/') + ".class").getSize();
                         }
-                    } catch (Throwable e) {
+                    } catch (Throwable ignored) {
                     }
                 }
             } else {
@@ -339,7 +337,7 @@ public final class Memory {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         return n;
     }
@@ -507,7 +505,7 @@ public final class Memory {
                 }
                 ((VolumeControlImpl) ((PlayerImpl) o).getControl("VolumeControl")).setLevel(n);
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -546,7 +544,7 @@ public final class Memory {
                         break;
                     }
                 }
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
             return;
         }
@@ -645,7 +643,7 @@ public final class Memory {
                     }
                 }
             }
-        } catch (Exception ex2) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -661,7 +659,7 @@ public final class Memory {
     public final int method866(final Object o) {
         try {
             return ((ClassInfo) this.table.get(o)).instancesCount;
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
         }
         return 0;
     }
@@ -669,7 +667,7 @@ public final class Memory {
     public final int method867(final Object o) {
         try {
             return ((ClassInfo) this.table.get(o)).size();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
         }
         return 0;
     }

@@ -10,7 +10,6 @@ import emulator.graphics2D.*;
 import emulator.graphics2D.swt.FontSWT;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.graphics3D.*;
-import org.eclipse.swt.graphics.*;
 
 public final class EmulatorImpl implements IEmulator {
     private static Display display;
@@ -34,7 +33,7 @@ public final class EmulatorImpl implements IEmulator {
         super();
         EmulatorImpl.display = new Display();
         this.aVector1379 = new Vector();
-        this.screenDepth = ((Device) EmulatorImpl.display).getDepth();
+        this.screenDepth = EmulatorImpl.display.getDepth();
         this.iproperty = new Property();
         this.ilogstream = new Class11();
         this.aClass83_1389 = new Class83();
@@ -47,8 +46,8 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public static void dispose() {
-        if (!((Device) EmulatorImpl.display).isDisposed()) {
-            ((Device) EmulatorImpl.display).dispose();
+        if (!EmulatorImpl.display.isDisposed()) {
+            EmulatorImpl.display.dispose();
         }
     }
 
@@ -57,13 +56,13 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public static void syncExec(final Runnable runnable) {
-        if (!((Device) EmulatorImpl.display).isDisposed()) {
+        if (!EmulatorImpl.display.isDisposed()) {
             EmulatorImpl.display.syncExec(runnable);
         }
     }
 
     public static void asyncExec(final Runnable runnable) {
-        if (!((Device) EmulatorImpl.display).isDisposed()) {
+        if (!EmulatorImpl.display.isDisposed()) {
             EmulatorImpl.display.asyncExec(runnable);
         }
     }
@@ -127,8 +126,8 @@ public final class EmulatorImpl implements IEmulator {
         while (Class5.aVector548.size() > 0) {
             ((Class5) Class5.aVector548.get(0)).method321();
         }
-        for (int i = 0; i < this.aVector1379.size(); ++i) {
-            ((IPlugin) this.aVector1379.get(i)).close();
+        for (Object o : this.aVector1379) {
+            ((IPlugin) o).close();
         }
     }
 
@@ -191,7 +190,7 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public final IImage newImage(int n, int n2, boolean b, int n3) {
-        return (IImage) (Settings.g2d == 0 ? new ImageSWT(n, n2, b, n3) : (Settings.g2d == 1 ? new emulator.graphics2D.awt.d(n, n2, b, n3) : null));
+        return Settings.g2d == 0 ? new ImageSWT(n, n2, b, n3) : (Settings.g2d == 1 ? new emulator.graphics2D.awt.d(n, n2, b, n3) : null);
     }
 
 

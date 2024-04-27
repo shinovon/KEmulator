@@ -20,13 +20,11 @@ public class Camera
     }
 
     public int getProjection(Transform paramTransform) {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getProjection(float[] paramArrayOfFloat) {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Camera(int paramInt) {

@@ -4,7 +4,7 @@ public final class c extends a implements Runnable {
     private f af468;
     private Thread aThread469;
     private boolean aBoolean470;
-    float[] aFloatArray471;
+    final float[] aFloatArray471;
 
     public c(final int n) {
         super(n, 0, 0);
@@ -54,8 +54,7 @@ public final class c extends a implements Runnable {
                 synchronized (this.aFloatArray471) {
                     this.method257(this.aFloatArray471);
                 }
-            } catch (InterruptedException ex) {
-            }
+            } catch (InterruptedException ignored) {}
         } while (!this.aBoolean470);
     }
 

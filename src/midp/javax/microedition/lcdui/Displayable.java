@@ -311,9 +311,7 @@ public class Displayable {
             if (var2 - var0 > 0) {
                 try {
                     Thread.sleep(var2 - var0);
-                } catch (Exception var4) {
-                    ;
-                }
+                } catch (Exception ignored) {}
             }
         }
 
@@ -336,9 +334,7 @@ public class Displayable {
                     while (Settings.steps == 0) {
                         Thread.sleep(50L);
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                } catch (Exception ignored) {}
                 Settings.aLong1235 += System.currentTimeMillis() - currentTimeMillis;
             }
             --Settings.steps;

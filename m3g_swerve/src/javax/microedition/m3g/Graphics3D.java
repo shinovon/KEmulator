@@ -236,37 +236,37 @@ public class Graphics3D {
 
     public static final synchronized Hashtable getProperties() {
         Hashtable var0;
-        (var0 = new Hashtable()).put(new String("supportAntialiasing"), new Boolean(getCapability(0) == 1));
-        var0.put(new String("supportTrueColor"), new Boolean(getCapability(1) == 1));
-        var0.put(new String("supportDithering"), new Boolean(getCapability(2) == 1));
-        var0.put(new String("supportMipmapping"), new Boolean(getCapability(3) == 1));
-        var0.put(new String("supportPerspectiveCorrection"), new Boolean(getCapability(4) == 1));
-        var0.put(new String("supportLocalCameraLighting"), new Boolean(getCapability(5) == 1));
-        var0.put(new String("maxLights"), new Integer(getCapability(6)));
-        var0.put(new String("maxViewportDimension"), new Integer(getCapability(7)));
-        var0.put(new String("maxTextureDimension"), new Integer(getCapability(8)));
-        var0.put(new String("maxSpriteCropDimension"), new Integer(getCapability(9)));
-        var0.put(new String("numTextureUnits"), new Integer(getCapability(10)));
-        var0.put(new String("maxTransformsPerVertex"), new Integer(getCapability(11)));
-        var0.put(new String("maxViewportWidth"), new Integer(maxViewportWidth));
-        var0.put(new String("maxViewportHeight"), new Integer(maxViewportHeight));
-        var0.put(new String("C3A458D3-2015-41f5-8338-66A2D3014335"), Engine.getVersionMajor() + "."
+        (var0 = new Hashtable()).put("supportAntialiasing", new Boolean(getCapability(0) == 1));
+        var0.put("supportTrueColor", new Boolean(getCapability(1) == 1));
+        var0.put("supportDithering", new Boolean(getCapability(2) == 1));
+        var0.put("supportMipmapping", new Boolean(getCapability(3) == 1));
+        var0.put("supportPerspectiveCorrection", new Boolean(getCapability(4) == 1));
+        var0.put("supportLocalCameraLighting", new Boolean(getCapability(5) == 1));
+        var0.put("maxLights", new Integer(getCapability(6)));
+        var0.put("maxViewportDimension", new Integer(getCapability(7)));
+        var0.put("maxTextureDimension", new Integer(getCapability(8)));
+        var0.put("maxSpriteCropDimension", new Integer(getCapability(9)));
+        var0.put("numTextureUnits", new Integer(getCapability(10)));
+        var0.put("maxTransformsPerVertex", new Integer(getCapability(11)));
+        var0.put("maxViewportWidth", new Integer(maxViewportWidth));
+        var0.put("maxViewportHeight", new Integer(maxViewportHeight));
+        var0.put("C3A458D3-2015-41f5-8338-66A2D3014335", Engine.getVersionMajor() + "."
                 + Engine.getVersionMinor() + "." + Engine.getRevisionMajor() + "." + Engine.getRevisionMinor() + ":"
                 + Engine.getBranchNumber());
         try {
-            var0.put(new String("com.superscape.m3gx.DebugUtils"), Class.forName("javax.microedition.m3g.DebugUtils")
+            var0.put("com.superscape.m3gx.DebugUtils", Class.forName("javax.microedition.m3g.DebugUtils")
                     .newInstance());
-        } catch (Exception localException) {
+        } catch (Exception ignored) {
         }
         try {
-            var0.put(new String("com.superscape.m3gx.Image2DUtils"), Class
+            var0.put("com.superscape.m3gx.Image2DUtils", Class
                     .forName("javax.microedition.m3g.Image2DUtils").newInstance());
-        } catch (Exception localException1) {
+        } catch (Exception ignored) {
         }
         try {
-            var0.put(new String("com.superscape.m3gx.SerializeOut"), Class
+            var0.put("com.superscape.m3gx.SerializeOut", Class
                     .forName("javax.microedition.m3g.SerializeOut").newInstance());
-        } catch (Exception localException2) {
+        } catch (Exception ignored) {
         }
         return var0;
     }

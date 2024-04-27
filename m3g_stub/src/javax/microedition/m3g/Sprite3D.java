@@ -7,47 +7,40 @@ public class Sprite3D
     }
 
     public boolean isScaled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setAppearance(Appearance paramAppearance) {
     }
 
     public Appearance getAppearance() {
-        Appearance localAppearance = null;
-        return localAppearance;
+        return null;
     }
 
     public void setImage(Image2D paramImage2D) {
     }
 
     public Image2D getImage() {
-        Image2D localImage2D = null;
-        return localImage2D;
+        return null;
     }
 
     public void setCrop(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
     }
 
     public int getCropX() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getCropY() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getCropWidth() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getCropHeight() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Sprite3D(int paramInt) {

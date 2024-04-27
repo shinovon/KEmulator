@@ -4,7 +4,6 @@ import emulator.Emulator;
 import emulator.media.b;
 
 import java.io.ByteArrayInputStream;
-import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.microedition.media.PlayerListener;
 import javax.microedition.media.control.MIDIControl;
@@ -23,12 +22,10 @@ public class Sound {
     private int type;
     public int dataLen;
 
-    private PlayerListener playerListener = new PlayerListener() {
-        public void playerUpdate(Player p0, String p1, Object p2) {
-            if (Sound.this.soundListener == null) return;
-            if ("endOfMedia".equals(p1)) {
-                Sound.this.soundListener.soundStateChanged(Sound.this, 1);
-            }
+    private PlayerListener playerListener = (p0, p1, p2) -> {
+        if (Sound.this.soundListener == null) return;
+        if ("endOfMedia".equals(p1)) {
+            Sound.this.soundListener.soundStateChanged(Sound.this, 1);
         }
     };
     private byte[] data;
@@ -85,7 +82,7 @@ public class Sound {
             this.m_player = new PlayerImpl(localByteArrayInputStream, type == FORMAT_WAV ? "audio/wav" : null);
             this.m_player.addPlayerListener(playerListener);
             localByteArrayInputStream.close();
-        } catch (Exception localException) {
+        } catch (Exception ignored) {
         }
         this.state = 3;
     }
@@ -119,7 +116,7 @@ public class Sound {
             if(type == FORMAT_TONE) {
                 ((MIDIControl) m_player.getControl("MIDIControl")).setChannelVolume(0, 64);
             }
-        } catch (Exception localException) {
+        } catch (Exception ignored) {
         }
         this.state = 0;
         if (this.soundListener != null) {
@@ -138,7 +135,7 @@ public class Sound {
     public void stop() {
         try {
             this.m_player.stop();
-        } catch (Exception localException) {
+        } catch (Exception ignored) {
         }
         this.state = 1;
         if (this.soundListener != null) {

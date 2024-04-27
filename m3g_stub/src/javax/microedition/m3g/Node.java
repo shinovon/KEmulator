@@ -9,13 +9,11 @@ public abstract class Node
     public static final int Z_AXIS = 148;
 
     public Node getParent() {
-        Node localNode = null;
-        return localNode;
+        return null;
     }
 
     public boolean getTransformTo(Node paramNode, Transform paramTransform) {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setAlignment(Node paramNode1, int paramInt1, Node paramNode2, int paramInt2) {
@@ -25,45 +23,39 @@ public abstract class Node
     }
 
     public float getAlphaFactor() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setRenderingEnable(boolean paramBoolean) {
     }
 
     public boolean isRenderingEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setPickingEnable(boolean paramBoolean) {
     }
 
     public boolean isPickingEnabled() {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public void setScope(int paramInt) {
     }
 
     public int getScope() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public final void align(Node paramNode) {
     }
 
     public Node getAlignmentReference(int paramInt) {
-        Node localNode = null;
-        return localNode;
+        return null;
     }
 
     public int getAlignmentTarget(int paramInt) {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Node(int paramInt) {

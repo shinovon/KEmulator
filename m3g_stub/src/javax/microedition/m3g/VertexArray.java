@@ -19,18 +19,15 @@ public class VertexArray
     }
 
     public int getComponentCount() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getComponentType() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public int getVertexCount() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     VertexArray(int paramInt) {

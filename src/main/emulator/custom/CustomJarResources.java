@@ -24,7 +24,7 @@ public final class CustomJarResources {
                     Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (null)");
                     throw new IOException();
                 }
-                final byte[] array = new byte[(int) ((java.util.zip.ZipEntry) entry).getSize()];
+                final byte[] array = new byte[(int) entry.getSize()];
                 Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + array.length + ")");
                 new DataInputStream(zipFile.getInputStream(entry)).readFully(array);
                 return new ByteArrayInputStream(array);

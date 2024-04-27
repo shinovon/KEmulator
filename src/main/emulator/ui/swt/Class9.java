@@ -1,8 +1,5 @@
 package emulator.ui.swt;
 
-import java.io.*;
-import java.nio.charset.*;
-import java.util.regex.*;
 import java.util.*;
 
 final class Class9 implements Comparator {

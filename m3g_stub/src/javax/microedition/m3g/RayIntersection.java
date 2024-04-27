@@ -2,43 +2,35 @@ package javax.microedition.m3g;
 
 public class RayIntersection {
     public Node getIntersected() {
-        Node localNode = null;
-        return localNode;
+        return null;
     }
 
     public float getDistance() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public int getSubmeshIndex() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public float getTextureS(int paramInt) {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getTextureT(int paramInt) {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getNormalX() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getNormalY() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getNormalZ() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void getRay(float[] paramArrayOfFloat) {

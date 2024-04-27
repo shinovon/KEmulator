@@ -13,23 +13,19 @@ public class Group
     }
 
     public int getChildCount() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public Node getChild(int paramInt) {
-        Node localNode = null;
-        return localNode;
+        return null;
     }
 
     public boolean pick(int paramInt, float paramFloat1, float paramFloat2, float paramFloat3, float paramFloat4, float paramFloat5, float paramFloat6, RayIntersection paramRayIntersection) {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     public boolean pick(int paramInt, float paramFloat1, float paramFloat2, Camera paramCamera, RayIntersection paramRayIntersection) {
-        boolean bool = true;
-        return bool;
+        return true;
     }
 
     Group(int paramInt) {

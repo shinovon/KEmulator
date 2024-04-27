@@ -1,7 +1,6 @@
 package emulator.graphics3D.lwjgl;
 
 import java.nio.*;
-import java.util.Arrays;
 
 import org.lwjgl.BufferUtils;
 
@@ -34,9 +33,8 @@ public final class LWJGLUtility {
 
         normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);
 
-        for(int var1 = 0; var1 < var0.length; ++var1) {
-
-            normalShortBuffer.put(var0[var1]);
+        for (short i : var0) {
+            normalShortBuffer.put(i);
         }
 
         normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);

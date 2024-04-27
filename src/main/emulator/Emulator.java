@@ -312,11 +312,11 @@ public class Emulator {
                     file = (file2 = new File(Emulator.jadPath));
                 } else {
                     final StringBuffer sb = new StringBuffer();
-                    file = (file2 = new File(sb.append(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3)).append("jad").toString()));
+                    file = (file2 = new File(sb.append(Emulator.midletJar, 0, Emulator.midletJar.length() - 3).append("jad").toString()));
                 }
                 final File file3 = file2;
                 if (file.exists()) {
-                    ((Properties) (props = new Properties())).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
+                    (props = new Properties()).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
                     final Enumeration<Object> keys = props.keys();
                     while (keys.hasMoreElements()) {
                         final String s = (String) keys.nextElement();
@@ -339,12 +339,12 @@ public class Emulator {
                         final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
                         props = new Properties();
                         for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
-                            props.put(entry.getKey().toString(), (String) entry.getValue());
+                            props.put(entry.getKey().toString(), entry.getValue());
                         }
                     } catch (Exception ex2) {
                         final InputStream inputStream;
                         (inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
-                        ((Properties) (props = new Properties())).load(new InputStreamReader(inputStream, "UTF-8"));
+                        (props = new Properties()).load(new InputStreamReader(inputStream, "UTF-8"));
                         inputStream.close();
                         final Enumeration<Object> keys2 = props.keys();
                         while (keys2.hasMoreElements()) {
@@ -353,7 +353,7 @@ public class Emulator {
                         }
                     }
                 }
-                Emulator.emulatorimpl.midletProps = (Properties) props;
+                Emulator.emulatorimpl.midletProps = props;
                 if (props.containsKey("MIDlet-2") && props.containsKey("MIDlet-1")) {
                     // find all midlets and show choice window
                     Vector<String> midletKeys = new Vector<String>();
@@ -367,7 +367,7 @@ public class Emulator {
                                 String v = props.getProperty(s);
                                 v = v.substring(0, v.indexOf(","));
                                 midletKeys.add(n + " (" + v + ")");
-                            } catch (Exception e) {
+                            } catch (Exception ignored) {
                             }
                         }
                     }
@@ -586,7 +586,7 @@ public class Emulator {
                 Dimension d = w.getViewSize();
                 System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
             }
-        } catch (Throwable e) {}
+        } catch (Throwable ignored) {}
 
         try {
             String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
@@ -601,7 +601,7 @@ public class Emulator {
                     Settings.fpsGame = 3;
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     private static String getHWID() {
@@ -610,7 +610,7 @@ public class Emulator {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(s.getBytes());
             StringBuffer sb = new StringBuffer();
-            byte b[] = md.digest();
+            byte[] b = md.digest();
             for (byte aByteData : b) {
                 String hex = Integer.toHexString(0xff & aByteData);
                 if (hex.length() == 1) sb.append('0');
@@ -661,7 +661,7 @@ public class Emulator {
         platform.loadM3G();
         try {
             i.a("emulator");
-        } catch (Error e) {}
+        } catch (Error ignored) {}
         vlcCheckerThread.start();
         Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
@@ -700,9 +700,9 @@ public class Emulator {
             }
         }
         String jar = midletJar;
-        if (jar.indexOf("/") > -1)
+        if (jar.contains("/"))
             jar = jar.substring(jar.lastIndexOf("/") + 1);
-        if (jar.indexOf("\\") > -1)
+        if (jar.contains("\\"))
             jar = jar.substring(jar.lastIndexOf("\\") + 1);
         if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
             Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
@@ -719,7 +719,7 @@ public class Emulator {
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
         Class<?> forName;
         try {
-            forName = Class.forName(Emulator.midletClassName, true, (ClassLoader) Emulator.customClassLoader);
+            forName = Class.forName(Emulator.midletClassName, true, Emulator.customClassLoader);
         } catch (Exception ex) {
             ex.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
@@ -923,7 +923,7 @@ public class Emulator {
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {
-            new ProcessBuilder(new String[0]).directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
+            new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -940,7 +940,7 @@ public class Emulator {
                 String absolutePath = file.getAbsolutePath().replace('\\', '/');
                 return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + properties.getProperty("MIDlet-Jar-URL");
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return null;
     }
@@ -963,11 +963,7 @@ public class Emulator {
         Emulator.jarClasses = new Vector();
         Emulator.deviceName = "SonyEricssonK800";
         Emulator.deviceFile = "/res/plat";
-        vlcCheckerThread = new Thread() {
-            public void run() {
-                Manager.checkLibVlcSupport();
-            }
-        };
+        vlcCheckerThread = new Thread(() -> Manager.checkLibVlcSupport());
     }
 
     public static String getMidletName() {

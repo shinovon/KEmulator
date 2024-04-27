@@ -11,8 +11,7 @@ public class TriangleStripArray
     }
 
     public int getIndexCount() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void getIndices(int[] paramArrayOfInt) {

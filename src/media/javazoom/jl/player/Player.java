@@ -396,12 +396,11 @@ public class Player
 		while (offset-- > 0 && ret) {
 			ret = skipFrame();
 			try {
-				double i = (double)initial;
+				double i = initial;
 				double d = (i-offset)/i;
 				int l = (int)(d*skip);
 				//if(listener != null && offset % 2 == 1) listener.positionChanged(l);
-			} catch (ArithmeticException e) {
-			}
+			} catch (ArithmeticException ignored) {}
 		}
 		return ret;
 	}

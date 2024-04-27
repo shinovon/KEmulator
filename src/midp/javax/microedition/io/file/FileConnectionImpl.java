@@ -52,7 +52,7 @@ public class FileConnectionImpl implements FileConnection
     
     private static String method216(final String s, final String s2) {
         String replaceFirst = s;
-        if (s.indexOf(s2 + ":") != -1) {
+        if (s.contains(s2 + ":")) {
             final File file;
             if (!(file = new File(Emulator.getAbsolutePath() + "/file/" + s2 + "/")).exists() || file.isFile()) {
                 file.mkdirs();

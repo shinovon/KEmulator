@@ -315,7 +315,7 @@ public abstract class Canvas extends Displayable {
         if (n == 8) return "Backspace";
         if (n == 32) return "Space";
         if (n >= 32 && n <= 126) {
-            return "" + (char) n;
+            return String.valueOf((char) n);
         }
         String s = "";
         switch (n) {
@@ -395,13 +395,11 @@ public abstract class Canvas extends Displayable {
     }
 
     public boolean hasPointerEvents() {
-        if (h < 320) return false;
-        return true;
+        return h >= 320;
     }
 
     public boolean hasPointerMotionEvents() {
-        if (h < 320) return false;
-        return true;
+        return h >= 320;
     }
 
     public boolean hasRepeatEvents() {

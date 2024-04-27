@@ -135,7 +135,7 @@ public class Group extends Node {
                 var8 = new RayIntersection();
             }
 
-            var8.startPick(this, var10, 0.0F, 0.0F, (Camera) null);
+            var8.startPick(this, var10, 0.0F, 0.0F, null);
             return this.rayIntersect(var1, var10, var8, var9);
         }
     }

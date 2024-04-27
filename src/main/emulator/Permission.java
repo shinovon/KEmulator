@@ -133,7 +133,7 @@ public class Permission {
             case "camera":
                 return UILocale.get("PERMISSION_CAMERA", "Allow the application to use camera?");
             default:
-                return "Allow the application to use \'" + x + "\'?";
+                return "Allow the application to use '" + x + "'?";
         }
     }
 

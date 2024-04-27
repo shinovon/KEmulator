@@ -13,37 +13,32 @@ public class Fog
     }
 
     public int getMode() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     public void setLinear(float paramFloat1, float paramFloat2) {
     }
 
     public float getNearDistance() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public float getFarDistance() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setDensity(float paramFloat) {
     }
 
     public float getDensity() {
-        float f = 1.0F;
-        return f;
+        return 1.0F;
     }
 
     public void setColor(int paramInt) {
     }
 
     public int getColor() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Fog(int paramInt) {

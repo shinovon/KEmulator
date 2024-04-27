@@ -13,7 +13,7 @@ final class Class34 extends SelectionAdapter {
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         try {
             MemoryView.method641(this.aClass110_619, MemoryView.method664(this.aClass110_619).getSelection());
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 }

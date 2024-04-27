@@ -70,7 +70,7 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
                 if (!(message instanceof BinaryMessage)) {
                     break Label_0106;
                 }
-                sb = new StringBuffer().append("Message From ").append(((BinaryMessage) message).getAddress());
+                sb = new StringBuffer().append("Message From ").append(message.getAddress());
                 payloadText = "\n [Binary data]";
             }
             Class83.aString871 = sb.append(payloadText).toString();
@@ -91,14 +91,14 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
         this.method487();
         final Display current = Display.getCurrent();
         this.aShell879 = aShell879;
-        ((Control) this.aShell868).setLocation(aShell879.getLocation().x - aShell879.getSize().x, aShell879.getLocation().y);
-        ((Control) this.aShell868).setSize(aShell879.getSize());
+        this.aShell868.setLocation(aShell879.getLocation().x - aShell879.getSize().x, aShell879.getLocation().y);
+        this.aShell868.setSize(aShell879.getSize());
         this.aBoolean875 = true;
         this.aBoolean881 = true;
         this.aShell868.open();
-        ((Control) this.aShell868).addControlListener((ControlListener) this);
-        ((Widget) this.aShell868).addDisposeListener((DisposeListener) this);
-        while (!((Widget) this.aShell868).isDisposed()) {
+        this.aShell868.addControlListener(this);
+        this.aShell868.addDisposeListener(this);
+        while (!this.aShell868.isDisposed()) {
             if (!current.readAndDispatch()) {
                 current.sleep();
             }
@@ -107,17 +107,17 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
     }
 
     public final void method482() {
-        if (this.aShell868 != null && !((Widget) this.aShell868).isDisposed()) {
+        if (this.aShell868 != null && !this.aShell868.isDisposed()) {
             this.aShell868.dispose();
         }
         this.aBoolean875 = false;
     }
 
     private void method487() {
-        ((Decorations) (this.aShell868 = new Shell())).setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
-        ((Decorations) this.aShell868).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        ((Composite) this.aShell868).setLayout((Layout) new GridLayout());
-        ((Control) this.aShell868).setSize(new Point(100, 200));
+        (this.aShell868 = new Shell()).setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
+        this.aShell868.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        this.aShell868.setLayout(new GridLayout());
+        this.aShell868.setSize(new Point(100, 200));
         this.method490();
         this.method491();
     }
@@ -142,16 +142,16 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
         layoutData2.horizontalSpan = 2;
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 2;
-        ((Composite) (this.aGroup872 = new Group((Composite) this.aShell868, 0))).setLayout((Layout) layout);
+        (this.aGroup872 = new Group(this.aShell868, 0)).setLayout(layout);
         this.aGroup872.setText(UILocale.get("SMS_CONSOLE_SEND_TO", "Send to midlet"));
-        ((Control) this.aGroup872).setLayoutData((Object) layoutData);
-        ((Control) (this.aStyledText874 = new StyledText((Composite) this.aGroup872, 2624))).setLayoutData((Object) layoutData2);
-        (this.aButton878 = new Button((Composite) this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_CLEAR", "Clear"));
-        ((Control) this.aButton878).setLayoutData((Object) gridData);
-        this.aButton878.addSelectionListener((SelectionListener) new Class84(this));
-        (this.aButton880 = new Button((Composite) this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_SEND", "Send"));
-        ((Control) this.aButton880).setLayoutData((Object) gridData);
-        this.aButton880.addSelectionListener((SelectionListener) new Class87(this));
+        this.aGroup872.setLayoutData(layoutData);
+        (this.aStyledText874 = new StyledText(this.aGroup872, 2624)).setLayoutData(layoutData2);
+        (this.aButton878 = new Button(this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_CLEAR", "Clear"));
+        this.aButton878.setLayoutData(gridData);
+        this.aButton878.addSelectionListener(new Class84(this));
+        (this.aButton880 = new Button(this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_SEND", "Send"));
+        this.aButton880.setLayoutData(gridData);
+        this.aButton880.addSelectionListener(new Class87(this));
     }
 
     private void method491() {
@@ -160,13 +160,13 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
         gridData.grabExcessHorizontalSpace = true;
         gridData.grabExcessVerticalSpace = true;
         gridData.verticalAlignment = 4;
-        ((Composite) (this.aGroup876 = new Group((Composite) this.aShell868, 0))).setLayout((Layout) new GridLayout());
+        (this.aGroup876 = new Group(this.aShell868, 0)).setLayout(new GridLayout());
         this.aGroup876.setText(UILocale.get("SMS_CONSOLE_RECEIVE", "Receive from midlet"));
-        ((Control) this.aGroup876).setLayoutData((Object) gridData);
-        (this.aButton873 = new Button((Composite) this.aGroup876, 32)).setText(UILocale.get("SMS_CONSOLE_BLOCK", "Block the received message"));
+        this.aGroup876.setLayoutData(gridData);
+        (this.aButton873 = new Button(this.aGroup876, 32)).setText(UILocale.get("SMS_CONSOLE_BLOCK", "Block the received message"));
         this.aButton873.setSelection(this.aBoolean869);
-        this.aButton873.addSelectionListener((SelectionListener) new Class86(this));
-        ((Control) (this.aStyledText877 = new StyledText((Composite) this.aGroup876, 2624))).setLayoutData((Object) gridData);
+        this.aButton873.addSelectionListener(new Class86(this));
+        (this.aStyledText877 = new StyledText(this.aGroup876, 2624)).setLayoutData(gridData);
     }
 
     public final boolean method488() {
@@ -177,7 +177,7 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
         Class83 class83;
         boolean aBoolean881;
         if (Math.abs(this.aShell879.getLocation().x - this.aShell868.getSize().x - this.aShell868.getLocation().x) < 10 && Math.abs(this.aShell879.getLocation().y - this.aShell868.getLocation().y) < 20) {
-            ((Control) this.aShell868).setLocation(this.aShell879.getLocation().x - this.aShell868.getSize().x, this.aShell879.getLocation().y);
+            this.aShell868.setLocation(this.aShell879.getLocation().x - this.aShell868.getSize().x, this.aShell879.getLocation().y);
             class83 = this;
             aBoolean881 = true;
         } else {
@@ -223,7 +223,7 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
         }
 
         public final void run() {
-            if (Class83.method483(this.aClass83_867) == null || ((Widget) Class83.method483(this.aClass83_867)).isDisposed()) {
+            if (Class83.method483(this.aClass83_867) == null || Class83.method483(this.aClass83_867).isDisposed()) {
                 return;
             }
             Class83.method483(this.aClass83_867).append(Class83.aString871);

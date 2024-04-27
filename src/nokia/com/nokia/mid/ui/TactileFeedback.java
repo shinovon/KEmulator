@@ -34,10 +34,7 @@ public class TactileFeedback {
     }
 
     private boolean isValidControlType(Object obj) {
-        if ((!(obj instanceof Canvas)) && (!(obj instanceof CustomItem)) && (!(obj instanceof Control))) {
-            return false;
-        }
-        return true;
+        return (obj instanceof Canvas) || (obj instanceof CustomItem) || (obj instanceof Control);
     }
 
     private int getControlHandle(Object uiObject) {

@@ -14,23 +14,19 @@ public class Mesh
     }
 
     public Appearance getAppearance(int paramInt) {
-        Appearance localAppearance = null;
-        return localAppearance;
+        return null;
     }
 
     public IndexBuffer getIndexBuffer(int paramInt) {
-        IndexBuffer localIndexBuffer = null;
-        return localIndexBuffer;
+        return null;
     }
 
     public VertexBuffer getVertexBuffer() {
-        VertexBuffer localVertexBuffer = null;
-        return localVertexBuffer;
+        return null;
     }
 
     public int getSubmeshCount() {
-        int i = 1;
-        return i;
+        return 1;
     }
 
     Mesh(int paramInt) {

@@ -1,7 +1,5 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.widgets.*;
-
 final class Refresher implements Runnable {
     private final Class90 aClass90_830;
 
@@ -12,14 +10,13 @@ final class Refresher implements Runnable {
 
     public final void run() {
         while (Class90.method231(this.aClass90_830) != null) {
-            if (((Widget) Class90.method231(this.aClass90_830)).isDisposed()) {
+            if (Class90.method231(this.aClass90_830).isDisposed()) {
                 return;
             }
             EmulatorImpl.syncExec(new Class10(this));
             try {
                 Thread.sleep(10L);
-            } catch (Exception ex) {
-            }
+            } catch (Exception ignored) {}
         }
     }
 

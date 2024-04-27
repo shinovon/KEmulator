@@ -17,8 +17,8 @@ public class MMFPlayer {
             i.a("mmfplayer");
             initMMFLibrary(Emulator.getAbsolutePath() + "/ma3smwemu.dll");
             return MMFPlayer.initialized = true;
-        } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
-        } catch (Exception ex) {
+        } catch (UnsatisfiedLinkError ignored) {
+        } catch (Exception ignored) {
         }
         return MMFPlayer.initialized = false;
     }

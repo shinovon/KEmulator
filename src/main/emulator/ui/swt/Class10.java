@@ -26,18 +26,16 @@ final class Class10 implements Runnable {
                     return;
                 }
             } else {
-                final Rectangle clientArea = ((Scrollable)Class90.method231(Class90.Refresher.method464(this.a))).getClientArea();
+                final Rectangle clientArea = Class90.method231(Class90.Refresher.method464(this.a)).getClientArea();
                 final GC gc;
-                (gc = new GC((Drawable)Class90.method231(Class90.Refresher.method464(this.a)))).setBackground(Display.getCurrent().getSystemColor(2));
+                (gc = new GC(Class90.method231(Class90.Refresher.method464(this.a)))).setBackground(Display.getCurrent().getSystemColor(2));
                 gc.fillRectangle(clientArea);
                 gc.setForeground(Display.getCurrent().getSystemColor(3));
                 gc.drawString("M3GView init .....", clientArea.width >> 2, clientArea.height >> 2, true);
                 gc.dispose();
             }
 
-        } catch (Exception var3) {
-            ;
-        }
+        } catch (Exception ignored) {}
 
     }
 }

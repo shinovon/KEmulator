@@ -1,6 +1,5 @@
 package javax.microedition.lcdui;
 
-import emulator.graphics2D.IFont;
 import emulator.lcdui.*;
 
 public class StringItem extends Item {

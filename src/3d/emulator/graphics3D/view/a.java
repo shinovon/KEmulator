@@ -1,6 +1,5 @@
 package emulator.graphics3D.view;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

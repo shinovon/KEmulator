@@ -100,77 +100,77 @@ public final class Class161 implements ControlListener, DisposeListener {
         layout.marginHeight = 15;
         layout.horizontalSpacing = 5;
         layout.marginWidth = 5;
-        ((Decorations) (this.aShell1404 = new Shell(224))).setText(UILocale.get("KEYPAD_FRAME_TITLE", "Keypad"));
-        ((Decorations) this.aShell1404).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        ((Composite) this.aShell1404).setLayout((Layout) layout);
-        ((Control) this.aShell1404).setSize(new Point(259, 280));
-        (this.aButton1405 = new Button((Composite) this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_LSK", "Left Soft Key"));
-        ((Control) this.aButton1405).addMouseListener((MouseListener) new Class155(this));
-        ((Control) (this.aButton1428 = new Button((Composite) this.aShell1404, 8388608))).setEnabled(false);
-        ((Control) this.aButton1428).setVisible(false);
-        (this.aButton1407 = new Button((Composite) this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_RSK", "Right Soft Key"));
-        ((Control) this.aButton1407).setLayoutData((Object) layoutData6);
-        ((Control) this.aButton1407).addMouseListener((MouseListener) new Class154(this));
-        ((Control) (this.aButton1429 = new Button((Composite) this.aShell1404, 8388608))).setEnabled(false);
-        ((Control) this.aButton1429).setVisible(false);
-        (this.aButton1410 = new Button((Composite) this.aShell1404, 8388612)).setText("Up");
-        ((Control) this.aButton1410).setLayoutData((Object) layoutData5);
-        ((Control) this.aButton1410).addMouseListener((MouseListener) new Class153(this));
-        ((Control) (this.aButton1430 = new Button((Composite) this.aShell1404, 8388608))).setEnabled(false);
-        ((Control) this.aButton1430).setVisible(false);
-        (this.aButton1411 = new Button((Composite) this.method833(), 8404996)).setText("Left");
-        ((Control) this.aButton1411).setLayoutData((Object) layoutData3);
-        ((Control) this.aButton1411).addMouseListener((MouseListener) new Class152(this));
-        (this.aButton1409 = new Button((Composite) this.aShell1404, 8388608)).setText("Pad");
-        ((Control) this.aButton1409).setLayoutData((Object) layoutData4);
+        (this.aShell1404 = new Shell(224)).setText(UILocale.get("KEYPAD_FRAME_TITLE", "Keypad"));
+        this.aShell1404.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        this.aShell1404.setLayout(layout);
+        this.aShell1404.setSize(new Point(259, 280));
+        (this.aButton1405 = new Button(this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_LSK", "Left Soft Key"));
+        this.aButton1405.addMouseListener(new Class155(this));
+        (this.aButton1428 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+        this.aButton1428.setVisible(false);
+        (this.aButton1407 = new Button(this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_RSK", "Right Soft Key"));
+        this.aButton1407.setLayoutData(layoutData6);
+        this.aButton1407.addMouseListener(new Class154(this));
+        (this.aButton1429 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+        this.aButton1429.setVisible(false);
+        (this.aButton1410 = new Button(this.aShell1404, 8388612)).setText("Up");
+        this.aButton1410.setLayoutData(layoutData5);
+        this.aButton1410.addMouseListener(new Class153(this));
+        (this.aButton1430 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+        this.aButton1430.setVisible(false);
+        (this.aButton1411 = new Button(this.method833(), 8404996)).setText("Left");
+        this.aButton1411.setLayoutData(layoutData3);
+        this.aButton1411.addMouseListener(new Class152(this));
+        (this.aButton1409 = new Button(this.aShell1404, 8388608)).setText("Pad");
+        this.aButton1409.setLayoutData(layoutData4);
         ((Control) this.aButton1409).setFocus();
-        ((Control) this.aButton1409).addMouseListener((MouseListener) new Class151(this));
-        (this.aButton1412 = new Button((Composite) this.method833(), 8519684)).setText("Right");
-        ((Control) this.aButton1412).setLayoutData((Object) layoutData2);
-        ((Control) this.aButton1412).addMouseListener((MouseListener) new Class150(this));
-        ((Control) (this.aButton1427 = new Button((Composite) this.aShell1404, 8388608))).setEnabled(false);
-        ((Control) this.aButton1427).setVisible(false);
-        (this.aButton1413 = new Button((Composite) this.method833(), 8389636)).setText("Down");
-        ((Control) this.aButton1413).setLayoutData((Object) layoutData);
-        ((Control) this.aButton1413).addMouseListener((MouseListener) new Class149(this));
-        ((Control) (this.aButton1426 = new Button((Composite) this.aShell1404, 8388608))).setEnabled(false);
-        ((Control) this.aButton1426).setVisible(false);
-        (this.aButton1414 = new Button((Composite) this.aShell1404, 8388608)).setText("1");
-        ((Control) this.aButton1414).setLayoutData((Object) gridData);
-        ((Control) this.aButton1414).addMouseListener((MouseListener) new Class148(this));
-        (this.aButton1415 = new Button((Composite) this.aShell1404, 8388608)).setText("2 abc");
-        ((Control) this.aButton1415).setLayoutData((Object) gridData);
-        ((Control) this.aButton1415).addMouseListener((MouseListener) new Class145(this));
-        (this.aButton1416 = new Button((Composite) this.aShell1404, 8388608)).setText("3 def");
-        ((Control) this.aButton1416).setLayoutData((Object) gridData);
-        ((Control) this.aButton1416).addMouseListener((MouseListener) new Class100(this));
-        (this.aButton1417 = new Button((Composite) this.aShell1404, 8388608)).setText("4 ghi");
-        ((Control) this.aButton1417).setLayoutData((Object) gridData);
-        ((Control) this.aButton1417).addMouseListener((MouseListener) new Class96(this));
-        (this.aButton1418 = new Button((Composite) this.aShell1404, 8388608)).setText("5 jkl");
-        ((Control) this.aButton1418).setLayoutData((Object) gridData);
-        ((Control) this.aButton1418).addMouseListener((MouseListener) new Class92(this));
-        (this.aButton1419 = new Button((Composite) this.aShell1404, 8388608)).setText("6 mno");
-        ((Control) this.aButton1419).setLayoutData((Object) gridData);
-        ((Control) this.aButton1419).addMouseListener((MouseListener) new Class120(this));
-        (this.aButton1420 = new Button((Composite) this.aShell1404, 8388608)).setText("7 pqrs");
-        ((Control) this.aButton1420).setLayoutData((Object) gridData);
-        ((Control) this.aButton1420).addMouseListener((MouseListener) new Class134(this));
-        (this.aButton1421 = new Button((Composite) this.aShell1404, 8388608)).setText("8 tuv");
-        ((Control) this.aButton1421).setLayoutData((Object) gridData);
-        ((Control) this.aButton1421).addMouseListener((MouseListener) new Class132(this));
-        (this.aButton1422 = new Button((Composite) this.aShell1404, 8388608)).setText("9 wxyz");
-        ((Control) this.aButton1422).setLayoutData((Object) gridData);
-        ((Control) this.aButton1422).addMouseListener((MouseListener) new Class138(this));
-        (this.aButton1423 = new Button((Composite) this.aShell1404, 8388608)).setText("* .");
-        ((Control) this.aButton1423).setLayoutData((Object) gridData);
-        ((Control) this.aButton1423).addMouseListener((MouseListener) new Class136(this));
-        (this.aButton1424 = new Button((Composite) this.aShell1404, 8388608)).setText("0");
-        ((Control) this.aButton1424).setLayoutData((Object) gridData);
-        ((Control) this.aButton1424).addMouseListener((MouseListener) new Class130(this));
-        (this.aButton1425 = new Button((Composite) this.aShell1404, 8388608)).setText("# -+");
-        ((Control) this.aButton1425).setLayoutData((Object) gridData);
-        ((Control) this.aButton1425).addMouseListener((MouseListener) new Class128(this));
+        this.aButton1409.addMouseListener(new Class151(this));
+        (this.aButton1412 = new Button(this.method833(), 8519684)).setText("Right");
+        this.aButton1412.setLayoutData(layoutData2);
+        this.aButton1412.addMouseListener(new Class150(this));
+        (this.aButton1427 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+        this.aButton1427.setVisible(false);
+        (this.aButton1413 = new Button(this.method833(), 8389636)).setText("Down");
+        this.aButton1413.setLayoutData(layoutData);
+        this.aButton1413.addMouseListener(new Class149(this));
+        (this.aButton1426 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+        this.aButton1426.setVisible(false);
+        (this.aButton1414 = new Button(this.aShell1404, 8388608)).setText("1");
+        this.aButton1414.setLayoutData(gridData);
+        this.aButton1414.addMouseListener(new Class148(this));
+        (this.aButton1415 = new Button(this.aShell1404, 8388608)).setText("2 abc");
+        this.aButton1415.setLayoutData(gridData);
+        this.aButton1415.addMouseListener(new Class145(this));
+        (this.aButton1416 = new Button(this.aShell1404, 8388608)).setText("3 def");
+        this.aButton1416.setLayoutData(gridData);
+        this.aButton1416.addMouseListener(new Class100(this));
+        (this.aButton1417 = new Button(this.aShell1404, 8388608)).setText("4 ghi");
+        this.aButton1417.setLayoutData(gridData);
+        this.aButton1417.addMouseListener(new Class96(this));
+        (this.aButton1418 = new Button(this.aShell1404, 8388608)).setText("5 jkl");
+        this.aButton1418.setLayoutData(gridData);
+        this.aButton1418.addMouseListener(new Class92(this));
+        (this.aButton1419 = new Button(this.aShell1404, 8388608)).setText("6 mno");
+        this.aButton1419.setLayoutData(gridData);
+        this.aButton1419.addMouseListener(new Class120(this));
+        (this.aButton1420 = new Button(this.aShell1404, 8388608)).setText("7 pqrs");
+        this.aButton1420.setLayoutData(gridData);
+        this.aButton1420.addMouseListener(new Class134(this));
+        (this.aButton1421 = new Button(this.aShell1404, 8388608)).setText("8 tuv");
+        this.aButton1421.setLayoutData(gridData);
+        this.aButton1421.addMouseListener(new Class132(this));
+        (this.aButton1422 = new Button(this.aShell1404, 8388608)).setText("9 wxyz");
+        this.aButton1422.setLayoutData(gridData);
+        this.aButton1422.addMouseListener(new Class138(this));
+        (this.aButton1423 = new Button(this.aShell1404, 8388608)).setText("* .");
+        this.aButton1423.setLayoutData(gridData);
+        this.aButton1423.addMouseListener(new Class136(this));
+        (this.aButton1424 = new Button(this.aShell1404, 8388608)).setText("0");
+        this.aButton1424.setLayoutData(gridData);
+        this.aButton1424.addMouseListener(new Class130(this));
+        (this.aButton1425 = new Button(this.aShell1404, 8388608)).setText("# -+");
+        this.aButton1425.setLayoutData(gridData);
+        this.aButton1425.addMouseListener(new Class128(this));
     }
 
     private static void method832(final int n) {
@@ -191,15 +191,15 @@ public final class Class161 implements ControlListener, DisposeListener {
 
     public final void method835(final Shell aShell1408) {
         this.method838();
-        ((Control) this.aShell1404).pack();
+        this.aShell1404.pack();
         final Display current = Display.getCurrent();
         this.aShell1408 = aShell1408;
-        ((Control) this.aShell1404).setLocation(aShell1408.getLocation().x + aShell1408.getSize().x, aShell1408.getLocation().y);
+        this.aShell1404.setLocation(aShell1408.getLocation().x + aShell1408.getSize().x, aShell1408.getLocation().y);
         this.aBoolean1406 = true;
         this.aShell1404.open();
-        ((Control) this.aShell1404).addControlListener((ControlListener) this);
-        ((Widget) this.aShell1404).addDisposeListener((DisposeListener) this);
-        while (!((Widget) this.aShell1404).isDisposed()) {
+        this.aShell1404.addControlListener(this);
+        this.aShell1404.addDisposeListener(this);
+        while (!this.aShell1404.isDisposed()) {
             if (!current.readAndDispatch()) {
                 current.sleep();
             }
@@ -208,7 +208,7 @@ public final class Class161 implements ControlListener, DisposeListener {
     }
 
     public final void method836() {
-        if (this.aShell1404 != null && !((Widget) this.aShell1404).isDisposed()) {
+        if (this.aShell1404 != null && !this.aShell1404.isDisposed()) {
             this.aShell1404.dispose();
         }
         this.aBoolean1406 = false;
@@ -216,7 +216,7 @@ public final class Class161 implements ControlListener, DisposeListener {
 
     public final void controlMoved(final ControlEvent controlEvent) {
         if (Math.abs(this.aShell1408.getLocation().x + this.aShell1408.getSize().x - this.aShell1404.getLocation().x) < 10 && Math.abs(this.aShell1408.getLocation().y - this.aShell1404.getLocation().y) < 20) {
-            ((Control) this.aShell1404).setLocation(this.aShell1408.getLocation().x + this.aShell1408.getSize().x, this.aShell1408.getLocation().y);
+            this.aShell1404.setLocation(this.aShell1408.getLocation().x + this.aShell1408.getSize().x, this.aShell1408.getLocation().y);
         }
     }
 

@@ -38,7 +38,6 @@ public final class Class5 implements Runnable, DisposeListener {
     private boolean aBoolean561;
     boolean aBoolean545;
     boolean aBoolean559;
-    private Button exportBtn;
 
     public Class5(final int anInt553) {
         super();
@@ -124,7 +123,7 @@ public final class Class5 implements Runnable, DisposeListener {
                 if (Array.getLength(o) > 0 && (index = (string = Array.get(o, 0).toString()).indexOf(64)) != -1) {
                     method870 = ClassTypes.method870(string.substring(0, index));
                 }
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
         return method870;
@@ -212,11 +211,11 @@ public final class Class5 implements Runnable, DisposeListener {
         }
         final TreeItem treeItem = array[0];
         final Control control;
-        ((Text) (control = (Control) new Text((Composite) this.aTree554, 0))).setText(treeItem.getText(1));
+        ((Text) (control = new Text(this.aTree554, 0))).setText(treeItem.getText(1));
         ((Text) control).selectAll();
         control.setFocus();
-        control.addFocusListener((FocusListener) new Class18(this, treeItem, (Text) control));
-        control.addKeyListener((KeyListener) new Class20(this, treeItem, (Text) control));
+        control.addFocusListener(new Class18(this, treeItem, (Text) control));
+        control.addKeyListener(new Class20(this, treeItem, (Text) control));
         this.aTreeEditor555.setEditor(control, treeItem, 1);
     }
 
@@ -265,7 +264,7 @@ public final class Class5 implements Runnable, DisposeListener {
         {
             switch (this.anInt553) {
                 case 0: {
-                    ((Decorations) this.aShell557).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
+                    this.aShell557.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
                     if (aShell544 != null) {
                         break;
                     }
@@ -275,14 +274,14 @@ public final class Class5 implements Runnable, DisposeListener {
                     break Label_0172;
                 }
                 case 1: {
-                    ((Decorations) this.aShell557).setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
+                    this.aShell557.setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
                     break;
                 }
                 default: {
                     break Label_0172;
                 }
             }
-            ((Control) this.aShell557).setSize(aShell544.getSize());
+            this.aShell557.setSize(aShell544.getSize());
             shell = this.aShell557;
             n = aShell544.getLocation().x - this.aShell557.getSize().x;
             y = aShell544.getLocation().y;
@@ -290,15 +289,15 @@ public final class Class5 implements Runnable, DisposeListener {
         if (anInt553 == 1) {
             profiler = this;
         }
-        ((Control) shell).setLocation(n, y);
+        shell.setLocation(n, y);
         this.aShell544 = aShell544;
         this.aShell557.open();
-        ((Widget) this.aShell557).addDisposeListener((DisposeListener) this);
+        this.aShell557.addDisposeListener(this);
         this.aBoolean561 = false;
         this.aBoolean560 = true;
         EmulatorImpl.asyncExec(this.aClass5_556);
         if (anInt553 != 1) Class5.aVector548.addElement(this);
-        while (!((Widget) this.aShell557).isDisposed()) {
+        while (!this.aShell557.isDisposed()) {
             if (!this.aDisplay550.readAndDispatch()) {
                 this.aDisplay550.sleep();
             }
@@ -311,7 +310,7 @@ public final class Class5 implements Runnable, DisposeListener {
     public final void method321() {
         this.aBoolean561 = true;
         Class5.aVector548.removeElement(this);
-        if (this.aShell557 != null && !((Widget) this.aShell557).isDisposed()) {
+        if (this.aShell557 != null && !this.aShell557.isDisposed()) {
             this.aShell557.dispose();
         }
         this.aBoolean560 = false;
@@ -323,8 +322,8 @@ public final class Class5 implements Runnable, DisposeListener {
 
     private void method323() {
         final List list;
-        Collections.sort((List<Comparable>) (list = (List) Collections.list(this.table.keys())));
-        final Enumeration enumeration = Collections.enumeration((Collection) list);
+        Collections.sort((List<Comparable>) (list = Collections.list(this.table.keys())));
+        final Enumeration enumeration = Collections.enumeration(list);
         while (enumeration.hasMoreElements()) {
             this.aCombo546.add(enumeration.nextElement().toString());
         }
@@ -369,7 +368,7 @@ public final class Class5 implements Runnable, DisposeListener {
                 }
                 this.method318(ClassTypes.getFieldValue(c.getInstance(), field), item);
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         this.aBoolean559 = false;
     }
@@ -402,21 +401,22 @@ public final class Class5 implements Runnable, DisposeListener {
         layoutData2.verticalAlignment = 2;
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 6;
-        ((Decorations) (this.aShell557 = new Shell())).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
-        ((Decorations) this.aShell557).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        ((Composite) this.aShell557).setLayout((Layout) layout);
-        (this.aCLabel547 = new CLabel((Composite) this.aShell557, 0)).setText("Classes:");
+        (this.aShell557 = new Shell()).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
+        this.aShell557.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        this.aShell557.setLayout(layout);
+        (this.aCLabel547 = new CLabel(this.aShell557, 0)).setText("Classes:");
         this.method325();
-        ((Control) this.aShell557).setSize(new Point(351, 286));
-        (this.aButton549 = new Button((Composite) this.aShell557, 32)).setText("Filter:");
-        this.aButton549.addSelectionListener((SelectionListener) new Class139(this));
-        ((Control) (this.aText543 = new Text((Composite) this.aShell557, 2048))).setLayoutData((Object) layoutData2);
-        this.aText543.addModifyListener((ModifyListener) new Class141(this));
-        (this.aButton558 = new Button((Composite) this.aShell557, 32)).setText("HEX");
-        this.aButton558.addSelectionListener((SelectionListener) new Class8(this));
+        this.aShell557.setSize(new Point(351, 286));
+        (this.aButton549 = new Button(this.aShell557, 32)).setText("Filter:");
+        this.aButton549.addSelectionListener(new Class139(this));
+        (this.aText543 = new Text(this.aShell557, 2048)).setLayoutData(layoutData2);
+        this.aText543.addModifyListener(new Class141(this));
+        (this.aButton558 = new Button(this.aShell557, 32)).setText("HEX");
+        this.aButton558.addSelectionListener(new Class8(this));
         if (this.anInt553 == 0) {
-            (this.exportBtn = new Button((Composite) this.aShell557, SWT.PUSH)).setText("Export");
-            this.exportBtn.addSelectionListener(new SelectionAdapter() {
+            Button exportBtn;
+            (exportBtn = new Button(this.aShell557, SWT.PUSH)).setText("Export");
+            exportBtn.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent selectionEvent) {
                     new Thread(() -> {
                         try {
@@ -425,7 +425,7 @@ public final class Class5 implements Runnable, DisposeListener {
                             PrintStream ps = new PrintStream(new FileOutputStream(file));
                             try {
                                 final List list;
-                                Collections.sort((List<Comparable>) (list = (List) Collections.list(table.keys())));
+                                Collections.sort((List<Comparable>) (list = Collections.list(table.keys())));
                                 for (Object o : list) {
                                     ps.println(o);
                                     final Instance c = (Instance) table.get(o);
@@ -489,12 +489,12 @@ public final class Class5 implements Runnable, DisposeListener {
                 }
             });
         }
-        (this.aTree554 = new Tree((Composite) this.aShell557, 67584)).setHeaderVisible(true);
+        (this.aTree554 = new Tree(this.aShell557, 67584)).setHeaderVisible(true);
         this.aTree554.setLinesVisible(true);
-        ((Control) this.aTree554).setLayoutData((Object) layoutData);
-        ((Control) this.aTree554).setToolTipText("Right click to open a Object Watcher");
-        this.aTree554.addTreeListener((TreeListener) new Class6(this));
-        ((Control) this.aTree554).addMouseListener((MouseListener) new Class12(this));
+        this.aTree554.setLayoutData(layoutData);
+        this.aTree554.setToolTipText("Right click to open a Object Watcher");
+        this.aTree554.addTreeListener(new Class6(this));
+        this.aTree554.addMouseListener(new Class12(this));
         final TreeColumn treeColumn;
         (treeColumn = new TreeColumn(this.aTree554, 16384)).setWidth(150);
         treeColumn.setText("Variable");
@@ -504,8 +504,8 @@ public final class Class5 implements Runnable, DisposeListener {
         treeColumn2.setText("Value");
         treeColumn2.setMoveable(true);
         this.aTreeEditor555 = new TreeEditor(this.aTree554);
-        ((ControlEditor) this.aTreeEditor555).horizontalAlignment = 16384;
-        ((ControlEditor) this.aTreeEditor555).grabHorizontal = true;
+        this.aTreeEditor555.horizontalAlignment = 16384;
+        this.aTreeEditor555.grabHorizontal = true;
         if (this.anInt553 == 0) {
             final TreeColumn treeColumn3;
             (treeColumn3 = new TreeColumn(this.aTree554, 16384)).setWidth(150);
@@ -519,9 +519,9 @@ public final class Class5 implements Runnable, DisposeListener {
         (layoutData = new GridData()).horizontalAlignment = 4;
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = 2;
-        ((Control) (this.aCombo546 = new Combo((Composite) this.aShell557, 8))).setLayoutData((Object) layoutData);
+        (this.aCombo546 = new Combo(this.aShell557, 8)).setLayoutData(layoutData);
         aCombo546.setVisibleItemCount(8);
-        this.aCombo546.addModifyListener((ModifyListener) new Class16(this));
+        this.aCombo546.addModifyListener(new Class16(this));
     }
 
     public final void widgetDisposed(final DisposeEvent disposeEvent) {

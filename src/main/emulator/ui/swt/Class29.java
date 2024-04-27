@@ -2,7 +2,6 @@ package emulator.ui.swt;
 
 import emulator.*;
 import org.eclipse.swt.dnd.*;
-import org.eclipse.swt.events.*;
 
 final class Class29 extends DropTargetAdapter {
     Class29(final EmulatorScreen class93) {
@@ -21,7 +20,7 @@ final class Class29 extends DropTargetAdapter {
 
     public final void drop(final DropTargetEvent dropTargetEvent) {
         final String[] array;
-        if (((ByteArrayTransfer) FileTransfer.getInstance()).isSupportedType(dropTargetEvent.currentDataType) && (array = (String[]) ((TypedEvent) dropTargetEvent).data).length > 0 && (array[0].toLowerCase().endsWith(".jar") || array[0].toLowerCase().endsWith(".jad"))) {
+        if (FileTransfer.getInstance().isSupportedType(dropTargetEvent.currentDataType) && (array = (String[]) dropTargetEvent.data).length > 0 && (array[0].toLowerCase().endsWith(".jar") || array[0].toLowerCase().endsWith(".jad"))) {
             Emulator.loadGame(array[0], Settings.g2d, 1, false);
         }
     }

@@ -35,10 +35,8 @@ import javax.microedition.m3g.VertexArray;
 import javax.microedition.m3g.VertexBuffer;
 import javax.microedition.m3g.World;
 
-import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
 import org.eclipse.swt.opengl.GLCanvas;
-import org.eclipse.swt.widgets.Event;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -99,8 +97,7 @@ public final class b {
         GL11.glDepthMask(true);
         GL11.glColorMask(true, true, true, true);
         int var10000 = var1 != null && !this.aBoolean584 ? var1.getColor() : 0;
-        int var2 = var10000;
-        GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var2, 8), G3DUtils.getFloatColor(var2, 0), G3DUtils.getFloatColor(var2, 24));
+        GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var10000, 8), G3DUtils.getFloatColor(var10000, 0), G3DUtils.getFloatColor(var10000, 24));
         GL11.glClear(16640);
         if (var1 != null && !this.aBoolean584) {
             this.method385(var1);
@@ -464,9 +461,7 @@ public final class b {
     public static void releaseContext() {
         try {
             GLContext.useContext((Object) null);
-        } catch (Exception var0) {
-            ;
-        }
+        } catch (Exception ignored) {}
 //        if(glCanvas != null)
 //            glCanvas.notifyListeners(12, new Event());
 //        WGL.wglDeleteContext(anInt595);

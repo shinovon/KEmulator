@@ -70,7 +70,7 @@ public class PiglerAPI {
             try {
                 SoftNotificationImpl.trayIcon.setImage(((d) icon.getImpl()).getBufferedImage());
                 SoftNotificationImpl.trayIcon.setImageAutoSize(true);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
     }
 
@@ -119,17 +119,15 @@ public class PiglerAPI {
         tapped = true;
         if(launch)
             try {
-                EmulatorImpl.asyncExec(new Runnable() {
-                    public void run() {
-                        try {
-                            Shell shell = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell();
-                            shell.setMinimized(false);
-                            shell.setActive();
-                        } catch (Exception e) {
-                        }
+                EmulatorImpl.asyncExec(() -> {
+                    try {
+                        Shell shell = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell();
+                        shell.setMinimized(false);
+                        shell.setActive();
+                    } catch (Exception ignored) {
                     }
                 });
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
         if(!created) return;
         created = false;
         if(listener != null)

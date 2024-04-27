@@ -14,7 +14,7 @@ final class Class13 extends MouseAdapter {
         if (mouseEvent.button == 3) {
             try {
                 MemoryView.method658(this.aClass110_578, MemoryView.method670(this.aClass110_578).getSelection());
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
     }

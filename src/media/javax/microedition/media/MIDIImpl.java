@@ -86,7 +86,7 @@ public class MIDIImpl implements Player {
     }
 
     public Control getControl(final String s) {
-        if (s == "MIDIControl") {
+        if (s.equals("MIDIControl")) {
             return this.midiControl;
         }
         return null;

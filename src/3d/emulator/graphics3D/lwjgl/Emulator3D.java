@@ -9,7 +9,6 @@ import emulator.graphics3D.m3g.*;
 import org.lwjgl.*;
 import org.eclipse.swt.graphics.Image;
 import org.lwjgl.opengl.*;
-import org.lwjgl.opengl.Drawable;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.ImageData;
@@ -102,7 +101,7 @@ public final class Emulator3D implements IGraphics3D {
             while (true) {
                 try {
                     pixelFormat = new PixelFormat(var1, 0, 24, 0, var0);
-                    (new Pbuffer(1, 1, pixelFormat, (RenderTexture) null, (Drawable) null)).destroy();
+                    (new Pbuffer(1, 1, pixelFormat, null, null)).destroy();
                     break;
                 } catch (Exception var3) {
                     if ((var0 >>= 1) == 0) {
@@ -145,7 +144,7 @@ public final class Emulator3D implements IGraphics3D {
                     pbufferContext = null;
                 }
                 if (pbufferContext == null) {
-                    pbufferContext = new Pbuffer(w, h, pixelFormat(), (RenderTexture) null, (Drawable) null);
+                    pbufferContext = new Pbuffer(w, h, pixelFormat(), null, null);
                     contextRes = s;
                 }
 
@@ -219,7 +218,7 @@ public final class Emulator3D implements IGraphics3D {
             }
 
             ImageData var3 = new ImageData(var1, var2, 32, swtPalleteData);
-            this.swtImage = new Image((Device) null, var3);
+            this.swtImage = new Image(null, var3);
             this.swtGC = new GC(this.swtImage);
             PIXELFORMATDESCRIPTOR var4;
             (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
@@ -244,9 +243,7 @@ public final class Emulator3D implements IGraphics3D {
         }
 
         if (WGL.wglGetCurrentContext() != this.swtImage.handle) {
-            while (WGL.wglGetCurrentContext() > 0) {
-                ;
-            }
+            while (WGL.wglGetCurrentContext() > 0);
 
             WGL.wglMakeCurrent(this.swtGC.handle, this.wglContextHandle);
 
@@ -263,7 +260,7 @@ public final class Emulator3D implements IGraphics3D {
             WGL.wglMakeCurrent(this.swtGC.handle, -1);
         } catch (Throwable ignored) {}
         try {
-            GLContext.useContext((Object) null);
+            GLContext.useContext(null);
         } catch (Exception ignored) {}
     }
 
@@ -310,7 +307,7 @@ public final class Emulator3D implements IGraphics3D {
                     var10 -= var8;
                 }
 
-                Image var12 = new Image((Device) null, swtBufferImage);
+                Image var12 = new Image(null, swtBufferImage);
                 ((Graphics2DSWT) ((Graphics) this.target).getImpl()).method138().drawImage(var12, 0, 0);
                 var12.dispose();
             } else {
@@ -326,7 +323,7 @@ public final class Emulator3D implements IGraphics3D {
                     var4 -= var3;
                 }
 
-                ((emulator.graphics2D.awt.b) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, 0, 0, (ImageObserver) null);
+                ((emulator.graphics2D.awt.b) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, 0, 0, null);
             }
         }
     }
@@ -406,8 +403,7 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glDepthMask(true);
         GL11.glColorMask(true, true, true, true);
         int var10000 = var2 != null && !Settings.xrayView ? var2.getColor() : 0;
-        int var3 = var10000;
-        GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var3, 8), G3DUtils.getFloatColor(var3, 0), G3DUtils.getFloatColor(var3, 24));
+        GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var10000, 8), G3DUtils.getFloatColor(var10000, 0), G3DUtils.getFloatColor(var10000, 24));
         if (var2 != null && !Settings.xrayView) {
             GL11.glClear((var2.isColorClearEnabled() ? 16384 : 0) | (this.depthBufferEnabled && var2.isDepthClearEnabled() ? 256 : 0));
             this.method504(var2);
@@ -965,7 +961,7 @@ public final class Emulator3D implements IGraphics3D {
         var1.getActiveCamera().getTransformTo(var1, var2);
         CameraCache.setCamera(var1.getActiveCamera(), var2);
         LightsCache.addLightsFromWorld(var1);
-        RenderPipe.getInstance().pushRenderNode(var1, (Transform) null);
+        RenderPipe.getInstance().pushRenderNode(var1, null);
         this.method519();
     }
 

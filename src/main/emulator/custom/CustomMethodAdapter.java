@@ -41,12 +41,12 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                 if (name.equals("<init>")) {
                     if (sign.equals("()V")) {
                         this.method707(2);
-                        super.visitLdcInsn((Object) new Long(Settings.recordedRandomSeed));
+                        super.visitLdcInsn(new Long(Settings.recordedRandomSeed));
                         super.visitMethodInsn(acc, cls, name, "(J)V");
                         return;
                     }
                     super.visitInsn(88);
-                    super.visitLdcInsn((Object) new Long(Settings.recordedRandomSeed));
+                    super.visitLdcInsn(new Long(Settings.recordedRandomSeed));
                     super.visitMethodInsn(acc, cls, name, sign);
                     return;
                 }
@@ -63,13 +63,13 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
             } else if (cls.equals("java/lang/String")) {
                 if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
                     this.method707(1);
-                    super.visitLdcInsn((Object) Settings.fileEncoding);
+                    super.visitLdcInsn(Settings.fileEncoding);
                     super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
                     return;
                 }
                 if (name.equals("getBytes") && sign.startsWith("()")) {
                     this.method707(1);
-                    super.visitLdcInsn((Object) Settings.fileEncoding);
+                    super.visitLdcInsn(Settings.fileEncoding);
                     super.visitMethodInsn(acc, cls, name, "(Ljava/lang/String;)[B");
                     return;
                 }
@@ -79,7 +79,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                 }
             } else {
                 if (cls.equals("java/util/Timer")) {
-                    if (sign.indexOf("java/util/TimerTask") != -1) {
+                    if (sign.contains("java/util/TimerTask")) {
                         sign = sign.replaceAll("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
                     }
                     super.visitMethodInsn(acc, "emulator/custom/subclass/Timer", name, sign);
@@ -183,7 +183,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
 
     private void method708(final String s) {
         try {
-            super.visitLdcInsn((Object) (this.aString1190 = s + "\t at " + this.methodName + " (" + this.className + ".java:" + this.sourceLine + ")\n"));
+            super.visitLdcInsn((this.aString1190 = s + "\t at " + this.methodName + " (" + this.className + ".java:" + this.sourceLine + ")\n"));
             super.visitMethodInsn(184, "emulator/custom/CustomMethod", "showTrackInfo", "(Ljava/lang/String;)V");
             this.method707(1);
         } catch (Exception ex) {
@@ -292,7 +292,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
     public final void visitCode() {
         if (Settings.enableMethodTrack) {
             this.method707(1);
-            super.visitLdcInsn((Object) (this.methodName + this.methodDesc));
+            super.visitLdcInsn((this.methodName + this.methodDesc));
             super.visitMethodInsn(184, "emulator/custom/CustomMethod", "beginMethod", "(Ljava/lang/String;)V");
         }
     }
@@ -308,7 +308,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
                 case 177:
                 case 191: {
                     this.method707(1);
-                    super.visitLdcInsn((Object) (this.methodName + this.methodDesc));
+                    super.visitLdcInsn((this.methodName + this.methodDesc));
                     super.visitMethodInsn(184, "emulator/custom/CustomMethod", "endMethod", "(Ljava/lang/String;)V");
                     break;
                 }
