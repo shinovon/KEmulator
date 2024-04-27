@@ -2,6 +2,7 @@ package emulator.ui.swt;
 
 import emulator.UILocale;
 import emulator.graphics3D.view.b;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
 
 import javax.microedition.m3g.*;
@@ -19,7 +20,7 @@ import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.*;
 
-public final class Class90 implements MouseMoveListener, DisposeListener {
+public final class Class90 implements MouseMoveListener, DisposeListener, KeyListener {
     private Shell aShell889;
     private SashForm aSashForm890;
     private Composite aComposite891;
@@ -29,15 +30,15 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private GLCanvas canvas;
     private Memory ana898;
     private emulator.graphics3D.view.b m3gview;
-    private Camera aCamera901;
-    private Transform aTransform372;
+    private Camera camera;
+    private Transform cameraTransform;
     private Menu aMenu908;
     private Menu aMenu913;
     private Menu aMenu918;
     private Menu aMenu923;
     private boolean aBoolean905;
     private boolean aBoolean909;
-    private boolean aBoolean381;
+    private boolean coordinateAxis;
     private boolean aBoolean386;
     private int anInt362 = 0;
     private int anInt893;
@@ -45,10 +46,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private float aFloat906;
     private float aFloat911;
     private float aFloat915;
-    private float aFloat920;
-    private float aFloat924;
-    private float aFloat926;
-    private Quaternion ana892;
+    private float cameraX;
+    private float cameraY;
+    private float cameraZ;
+    private Quaternion quaternion;
     private Background aBackground900;
     private Node aNode361;
     private Rectangle aRectangle903;
@@ -71,6 +72,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     private MenuItem aMenuItem938;
     private int anInt917;
     private int anInt922;
+    private float rotationX;
+    private float rotationY;
 
     public Class90() {
         super();
@@ -87,17 +90,17 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aMenu923 = null;
         this.aBackground900 = null;
         this.aNode361 = null;
-        this.aCamera901 = new Camera();
-        this.aTransform372 = new Transform();
-        this.ana892 = new Quaternion();
+        this.camera = new Camera();
+        this.cameraTransform = new Transform();
+        this.quaternion = new Quaternion();
         this.ana898 = new Memory();
         this.m3gview = emulator.graphics3D.view.b.method362();
     }
 
     private void method516() {
-        this.aBoolean381 = true;
+        this.coordinateAxis = true;
         this.aBoolean386 = true;
-        this.aMenuItem894.setSelection(this.aBoolean381);
+        this.aMenuItem894.setSelection(this.coordinateAxis);
         this.aMenuItem912.setSelection(this.aBoolean386);
         this.aMenuItem936.setSelection(true);
         this.aMenuItem938.setEnabled(false);
@@ -113,13 +116,13 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         this.aFloat911 = 100000.0f;
         this.aFloat915 = 50.0f;
         this.method531();
-        this.aFloat920 = 0.0f;
-        this.aFloat924 = 0.0f;
-        this.aFloat926 = 20.0f;
-        this.ana892.setAngleAxis(-10.0f, 1.0f, 0.0f, 0.0f);
-        this.aTransform372.setIdentity();
-        this.aTransform372.postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
-        this.aTransform372.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
+        this.cameraX = 0.0f;
+        this.cameraY = 0.0f;
+        this.cameraZ = 20.0f;
+        this.quaternion.setAngleAxis(-10.0f, 1.0f, 0.0f, 0.0f);
+        this.cameraTransform.setIdentity();
+        this.cameraTransform.postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
+        this.cameraTransform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
     }
 
 
@@ -135,10 +138,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
             if (this.aFloat915 >= 180.0f) {
                 this.aFloat915 = 179.99f;
             }
-            this.aCamera901.setPerspective(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
+            this.camera.setPerspective(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
             return;
         }
-        this.aCamera901.setParallel(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
+        this.camera.setParallel(this.aFloat915, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
     }
 
     public final void method226() {
@@ -231,10 +234,11 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         if (!m3gview.isCurrent()) {
             this.m3gview.setCurrent();
         }
-        this.aTransform372.setIdentity();
-        this.aTransform372.postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
-        this.aTransform372.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
-        emulator.graphics3D.view.b.method371(this.aCamera901, this.aTransform372);
+        this.cameraTransform.setIdentity();
+        this.cameraTransform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
+        this.cameraTransform.postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
+
+        emulator.graphics3D.view.b.setCamera(this.camera, this.cameraTransform);
         m3gview.method367(this.aBackground900);
         if (this.aBoolean386) {
             this.m3gview.method372(1.0F);
@@ -246,16 +250,16 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
 //                localException.printStackTrace();
             }
         }
-        if (this.aBoolean381) {
+        if (this.coordinateAxis) {
             Camera localCamera = new Camera();
             localCamera.setPerspective(50.0f, (float)(this.aRectangle903.width >> 1) / (float)(this.aRectangle903.height >> 1), 1.0f, 1000.0f);
             final Transform transform;
-            (transform = new Transform()).postRotateQuat(this.ana892.x, this.ana892.y, this.ana892.z, this.ana892.w);
+            (transform = new Transform()).postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
             transform.postTranslate(0.0f, 0.0f, 6.0f);
-            emulator.graphics3D.view.b.method371(localCamera, transform);
+            emulator.graphics3D.view.b.setCamera(localCamera, transform);
             this.m3gview.method389();
-            this.m3gview.method364(this.aRectangle903.width, this.aRectangle903.height);
         }
+        this.m3gview.method364(this.aRectangle903.width, this.aRectangle903.height);
         b.swapBuffers();
     }
 
@@ -393,6 +397,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         (this.canvas = new GLCanvas(this.aComposite907, 264192, gld)).setLayoutData(layoutData);
         this.canvas.addMouseMoveListener(this);
         this.canvas.addMouseListener(new Class56(this));
+        canvas.addKeyListener(this);
         this.canvas.addControlListener(new Class57(this));
         this.canvas.addListener(12, new Class58(this));
         this.canvas.addListener(37, new Class59(this));
@@ -409,34 +414,107 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
         }
     }
 
+    public void keyPressed(KeyEvent keyEvent) {
+        int key = keyEvent.keyCode;
+        if(keyEvent.keyCode >= SWT.ARROW_UP) {
+            float x = 0;
+            float y = 0;
+            switch (key) {
+                case SWT.ARROW_UP:
+                    y = 1;
+                    break;
+                case SWT.ARROW_DOWN:
+                    y = -1;
+                    break;
+                case SWT.ARROW_LEFT:
+                    x = 1;
+                    break;
+                case SWT.ARROW_RIGHT:
+                    x = -1;
+                    break;
+            }
+            rotationX += x * 5f;
+            rotationY += y * 5f;
+
+            quaternion.setAngleAxis(0, 0, 0, 0);
+            Quaternion var5 = new Quaternion();
+            var5.setAngleAxis(rotationX, 0, 1, 0);
+            var5.mul(quaternion);
+            quaternion.set(var5);
+
+            var5 = new Quaternion();
+            var5.setAngleAxis(rotationY, 1, 0, 0);
+            quaternion.mul(var5);
+            return;
+        }
+        float forward = 0f;
+        float strafe = 0f;
+        switch (key) {
+            case 'w':
+                forward = 1;
+                break;
+            case 'a':
+                strafe = 1;
+                break;
+            case 's':
+                forward = -1;
+                break;
+            case 'd':
+                strafe = -1;
+                break;
+            default:
+                break;
+        }
+        forward *= 20f;
+        strafe *= 20f;
+        Transform t = new Transform();
+        float[] m = new float[16];
+        t.postTranslate(cameraX, cameraY, cameraZ);
+        t.postRotateQuat(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+        t.get(m);
+        if (forward != 0) {
+            cameraX += -m[2] * forward;
+            cameraY += -m[6] * forward;
+            cameraZ += -m[10] * forward;
+        } else {
+            cameraX += m[0] * strafe;
+            cameraY += m[4] * strafe;
+            cameraZ += m[8] * strafe;
+        }
+    }
+
+    public void keyReleased(KeyEvent keyEvent) {
+
+    }
+
     private void method492(final int n, final int n2) {
         final Quaternion a = new Quaternion();
         switch (this.anInt893) {
             case 0: {
                 if (Math.abs(n) > Math.abs(n2)) {
                     a.setAngleAxis((float) n / 2.0f, 0.0f, 1.0f, 0.0f);
-                    a.mul(this.ana892);
-                    this.ana892.set(a);
+                    a.mul(this.quaternion);
+                    this.quaternion.set(a);
                     return;
                 }
                 if (n2 != 0) {
-                    final Vector4f method495 = this.method495(this.ana892);
+                    final Vector4f method495 = this.method495(this.quaternion);
                     a.setAngleAxis(-((float)n2) / 2.0f, method495.x, method495.y, method495.z);
-                    a.mul(this.ana892);
+                    a.mul(this.quaternion);
                     if (this.method495(a).normalize()) {
-                        this.ana892.set(a);
+                        this.quaternion.set(a);
                     }
                     return;
                 }
                 break;
             }
             case 1: {
-                this.aFloat920 += (float)n / 10.0f;
-                this.aFloat924 -= (float)n2 / 10.0f;
+                this.cameraX += (float)n / 10.0f;
+                this.cameraY -= (float)n2 / 10.0f;
             }
             case 2: {
                 if (this.anInt910 == 0) {
-                    this.aFloat926 -= (float)n / 10.0f;
+                    this.cameraZ -= (float)n / 10.0f;
                     return;
                 }
                 break;
@@ -459,11 +537,11 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     private Vector4f method495(final Quaternion q) {
-        final Vector4f a = new Vector4f(this.aFloat920, this.aFloat924, this.aFloat926, 1.0f);
+        final Vector4f a = new Vector4f(this.cameraX, this.cameraY, this.cameraZ, 1.0f);
         final Vector4f b = new Vector4f();
         final Transform transform;
         (transform = new Transform()).postRotateQuat(q.x, q.y, q.z, q.w);
-        transform.postTranslate(this.aFloat920, this.aFloat924, this.aFloat926);
+        transform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
         ((Transform3D) transform.getImpl()).transform(a);
         b.cross(a, Vector4f.Y_AXIS);
         return b;
@@ -550,27 +628,27 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     static float method525(final Class90 class90) {
-        return class90.aFloat920;
+        return class90.cameraX;
     }
 
     static float method532(final Class90 class90) {
-        return class90.aFloat924;
+        return class90.cameraY;
     }
 
     static float method537(final Class90 class90) {
-        return class90.aFloat926;
+        return class90.cameraZ;
     }
 
     static float method526(final Class90 class90, final float aFloat920) {
-        return class90.aFloat920 = aFloat920;
+        return class90.cameraX = aFloat920;
     }
 
     static float method533(final Class90 class90, final float aFloat924) {
-        return class90.aFloat924 = aFloat924;
+        return class90.cameraY = aFloat924;
     }
 
     static float method538(final Class90 class90, final float aFloat926) {
-        return class90.aFloat926 = aFloat926;
+        return class90.cameraZ = aFloat926;
     }
 
     static void method519(final Class90 class90) {
@@ -578,7 +656,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener {
     }
 
     static boolean method520(final Class90 class90, final boolean aBoolean914) {
-        return class90.aBoolean381 = aBoolean914;
+        return class90.coordinateAxis = aBoolean914;
     }
 
     static MenuItem method514(final Class90 class90) {

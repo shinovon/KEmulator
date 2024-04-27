@@ -55,8 +55,8 @@ public final class b {
     private static int anInt594;
     private static int anInt595;
     private static PIXELFORMATDESCRIPTOR aPIXELFORMATDESCRIPTOR587;
-    private static Camera aCamera588;
-    private static Transform aTransform589 = new Transform();
+    private static Camera camera;
+    private static Transform cameraTransform = new Transform();
     private static Vector aVector590 = new Vector();
     private static Vector aVector593 = new Vector();
     private static GLCanvas glCanvas;
@@ -197,10 +197,10 @@ public final class b {
     }
 
     private void method373(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int var5, float var6) {
-        if ((aCamera588.getScope() & var5) != 0) {
+        if ((camera.getScope() & var5) != 0) {
             this.method390();
             this.method391();
-            method393();
+            setupCamera();
             method370(aVector590, aVector593, var5);
             if (var4 != null) {
                 Transform var7;
@@ -219,10 +219,11 @@ public final class b {
         Vector4f var4 = new Vector4f(1.0F, 0.0F, 0.0F, 1.0F);
         Vector4f var5 = new Vector4f(0.0F, 1.0F, 0.0F, 1.0F);
         Transform var6;
-        (var6 = new Transform(aTransform589)).postMultiply(var2);
-        ((Transform3D) var6.getImpl()).transform(var3);
-        ((Transform3D) var6.getImpl()).transform(var4);
-        ((Transform3D) var6.getImpl()).transform(var5);
+        (var6 = new Transform(cameraTransform)).postMultiply(var2);
+        Transform3D impl = ((Transform3D) var6.getImpl());
+        impl.transform(var3);
+        impl.transform(var4);
+        impl.transform(var5);
         Vector4f var7 = new Vector4f(var3);
         var3.mul(1.0F / var3.w);
         var4.mul(1.0F / var4.w);
@@ -234,10 +235,11 @@ public final class b {
         var8.add(var7);
         var9.add(var7);
         Transform var10 = new Transform();
-        aCamera588.getProjection(var10);
-        ((Transform3D) var10.getImpl()).transform(var7);
-        ((Transform3D) var10.getImpl()).transform(var8);
-        ((Transform3D) var10.getImpl()).transform(var9);
+        camera.getProjection(var10);
+        impl = (Transform3D) var10.getImpl();
+        impl.transform(var7);
+        impl.transform(var8);
+        impl.transform(var9);
         if (var7.w > 0.0F && -var7.w < var7.z && var7.z <= var7.w) {
             var7.mul(1.0F / var7.w);
             var8.mul(1.0F / var8.w);
@@ -470,16 +472,16 @@ public final class b {
 //        WGL.wglDeleteContext(anInt595);
     }
 
-    public static void method371(Camera var0, Transform var1) {
+    public static void setCamera(Camera var0, Transform var1) {
         if (var1 != null) {
-            aTransform589.set(var1);
+            cameraTransform.set(var1);
 //            ((Transform3D) aTransform589.getImpl()).method445();
-            ((Transform3D) aTransform589.getImpl()).invert();
+            ((Transform3D) cameraTransform.getImpl()).invert();
         } else {
-            aTransform589.setIdentity();
+            cameraTransform.setIdentity();
         }
 
-        aCamera588 = var0;
+        camera = var0;
     }
 
     public static int method381(Light var0, Transform var1) {
@@ -884,14 +886,15 @@ public final class b {
         }
     }
 
-    private static void method393() {
-        if (aCamera588 != null) {
+    private static void setupCamera() {
+        if (camera != null) {
             Transform var0 = new Transform();
-            aCamera588.getProjection(var0);
+            camera.getProjection(var0);
             var0.transpose();
             GL11.glMatrixMode(5889);
             GL11.glLoadMatrix(a.method401(((Transform3D) var0.getImpl()).m_matrix));
-            var0.set(aTransform589);
+
+            var0.set(cameraTransform);
             var0.transpose();
             GL11.glMatrixMode(5888);
             GL11.glLoadMatrix(a.method401(((Transform3D) var0.getImpl()).m_matrix));
@@ -1008,7 +1011,7 @@ public final class b {
     public final void method372(float var1) {
         this.method390();
         this.method391();
-        method393();
+        setupCamera();
         GL11.glPolygonMode(1032, 6914);
         GL11.glDisable(2884);
         GL11.glShadeModel(7425);
@@ -1062,7 +1065,7 @@ public final class b {
     public final void method389() {
         this.method390();
         this.method391();
-        method393();
+        setupCamera();
         GL11.glPolygonMode(1032, 6914);
         GL11.glDisable(2884);
         GL11.glShadeModel(7425);
