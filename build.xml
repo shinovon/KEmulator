@@ -15,6 +15,9 @@
                 <length string="${git.revision}" trim="yes" length="0" when="greater"/>
             </and>
         </condition>
+        <manifest file="./home/version.mf">
+            <attribute name="Git-Revision" value="${git.revision}"/>
+        </manifest>
         <manifest file="./src/res/META-INF/version.mf">
             <attribute name="Git-Revision" value="${git.revision}"/>
         </manifest>
