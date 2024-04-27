@@ -53,35 +53,32 @@ public class KeyframeSequence extends Object3D {
         return var1;
     }
 
-    public KeyframeSequence(int var1, int var2, int var3) {
-        if (var1 >= 1 && var2 >= 1 && method14(var3)) {
-            if ((var3 == 177 || var3 == 179) && var2 != 4) {
+    public KeyframeSequence(int numKeyframes, int numComponents, int interpolation) {
+        if (numKeyframes >= 1 && numComponents >= 1 && method14(interpolation)) {
+            if ((interpolation == SLERP || interpolation == SQUAD) && numComponents != 4) {
                 throw new IllegalArgumentException();
             } else {
-                this.keyframeCount = var1;
-                this.componentCount = var2;
-                this.interpolationType = var3;
-                this.aFloatArrayArray144 = new float[var1][var2];
-                this.keyframes = new int[var1];
-                this.repeatMode = 192;
+                this.keyframeCount = numKeyframes;
+                this.componentCount = numComponents;
+                this.interpolationType = interpolation;
+                this.aFloatArrayArray144 = new float[numKeyframes][numComponents];
+                this.keyframes = new int[numKeyframes];
+                this.repeatMode = CONSTANT;
                 this.validRangeFirst = 0;
                 this.validRangeLast = this.keyframeCount - 1;
                 this.duration = 0;
                 this.aBoolean36 = false;
-                if (this.interpolationType == 178) {
-                    this.aFloatArrayArray147 = new float[var1][var2];
-                    this.aFloatArrayArray149 = new float[var1][var2];
-                } else {
-                    if (this.interpolationType == 179) {
-                        this.anaArray146 = new Quaternion[var1];
-                        this.anaArray148 = new Quaternion[var1];
+                if (this.interpolationType == SPLINE) {
+                    this.aFloatArrayArray147 = new float[numKeyframes][numComponents];
+                    this.aFloatArrayArray149 = new float[numKeyframes][numComponents];
+                } else if (this.interpolationType == SQUAD) {
+                    this.anaArray146 = new Quaternion[numKeyframes];
+                    this.anaArray148 = new Quaternion[numKeyframes];
 
-                        for (int var4 = 0; var4 < var1; ++var4) {
-                            this.anaArray146[var4] = new Quaternion();
-                            this.anaArray148[var4] = new Quaternion();
-                        }
+                    for (int var4 = 0; var4 < numKeyframes; ++var4) {
+                        this.anaArray146[var4] = new Quaternion();
+                        this.anaArray148[var4] = new Quaternion();
                     }
-
                 }
             }
         } else {
@@ -90,7 +87,7 @@ public class KeyframeSequence extends Object3D {
     }
 
     private static boolean method14(int var0) {
-        return var0 >= 176 && var0 <= 180;
+        return var0 >= LINEAR && var0 <= STEP;
     }
 
     public int getComponentCount() {
@@ -196,7 +193,7 @@ public class KeyframeSequence extends Object3D {
         }
 
         float var4;
-        if (this.repeatMode == 193) {
+        if (this.repeatMode == LOOP) {
             if ((var1 = var1 < 0.0F ? var1 % (float) this.duration + (float) this.duration : var1 % (float) this.duration) < (float) this.keyframes[this.validRangeFirst]) {
                 var1 += (float) this.duration;
             }
@@ -222,21 +219,21 @@ public class KeyframeSequence extends Object3D {
         while (true) {
             int var3 = var10000;
             if (var10000 == this.validRangeLast || (float) this.keyframes[this.method13(var3)] > var1) {
-                if (var1 - (float) this.keyframes[var3] >= 1.0E-5F && this.interpolationType != 180) {
+                if (var1 - (float) this.keyframes[var3] >= 1.0E-5F && this.interpolationType != STEP) {
                     var4 = (var1 - (float) this.keyframes[var3]) / (float) this.method120(var3);
                     int var5 = this.method13(var3);
                     switch (this.interpolationType) {
-                        case 176:
-                            this.method111(var2, var4, var3, var5);
+                        case LINEAR:
+                            this.linearInterp(var2, var4, var3, var5);
                             break;
-                        case 177:
-                            this.method118(var2, var4, var3, var5);
+                        case SLERP:
+                            this.slerpInterp(var2, var4, var3, var5);
                             break;
-                        case 178:
-                            this.method114(var2, var4, var3, var5);
+                        case SPLINE:
+                            this.splineInterp(var2, var4, var3, var5);
                             break;
-                        case 179:
-                            this.method121(var2, var4, var3, var5);
+                        case SQUAD:
+                            this.squadInterp(var2, var4, var3, var5);
                             break;
                         default:
                             throw new Error("Invalid type for interpolation!");
@@ -245,7 +242,7 @@ public class KeyframeSequence extends Object3D {
                     return 1;
                 } else {
                     System.arraycopy(this.aFloatArrayArray144[var3], 0, var2, 0, this.componentCount);
-                    return this.interpolationType != 180 ? 1 : (int) ((float) this.method120(var3) - (var1 - (float) this.keyframes[var3]));
+                    return this.interpolationType != STEP ? 1 : (int) ((float) this.method120(var3) - (var1 - (float) this.keyframes[var3]));
                 }
             }
 
@@ -277,26 +274,31 @@ public class KeyframeSequence extends Object3D {
         }
     }
 
-    private final void method111(float[] var1, float var2, int var3, int var4) {
-        float[] var5 = this.aFloatArrayArray144[var3];
-        float[] var6 = this.aFloatArrayArray144[var4];
+    private final void linearInterp(float[] out, float weight, int var3, int var4) {
+        float[] frameA = this.aFloatArrayArray144[var3];
+        float[] frameB = this.aFloatArrayArray144[var4];
 
-        for (int var7 = 0; var7 < var1.length; ++var7) {
-            var1[var7] = var5[var7] + var2 * (var6[var7] - var5[var7]);
+        for (int i = 0; i < out.length; ++i) {
+            out[i] = frameA[i] + weight * (frameB[i] - frameA[i]);
         }
 
     }
 
-    private final void method114(float[] var1, float var2, int var3, int var4) {
-        float[] var5 = this.aFloatArrayArray144[var3];
-        float[] var6 = this.aFloatArrayArray144[var4];
+    private final void splineInterp(float[] out, float weight, int var3, int var4) {
+        float[] frameA = this.aFloatArrayArray144[var3];
+        float[] frameB = this.aFloatArrayArray144[var4];
 
-        for (int var7 = 0; var7 < var1.length; ++var7) {
-            float var8 = this.aFloatArrayArray149[var3][var7];
-            float var9 = this.aFloatArrayArray147[var4][var7];
-            var1[var7] = method112(var2, var5[var7], var6[var7], var8, var9);
+        for (int i = 0; i < out.length; ++i) {
+            float a = this.aFloatArrayArray149[var3][i];
+            float b = this.aFloatArrayArray147[var4][i];
+            out[i] = spline(weight, frameA[i], frameB[i], a, b);
         }
+    }
 
+    private static float spline(float weight, float a, float b, float var3, float var4) {
+        float weight2 = weight * weight;
+        float weight3 = weight2 * weight;
+        return (2.0F * weight3 - 3.0F * weight2 + 1.0F) * a + (-2.0F * weight3 + 3.0F * weight2) * b + (weight3 - 2.0F * weight2 + weight) * var3 + (weight3 - weight2) * var4;
     }
 
     private final void method115() {
@@ -316,7 +318,7 @@ public class KeyframeSequence extends Object3D {
 
     }
 
-    private final void method118(float[] var1, float var2, int var3, int var4) {
+    private final void slerpInterp(float[] var1, float var2, int var3, int var4) {
         if (var1.length != 4) {
             throw new Error("Invalid keyframe type");
         } else {
@@ -331,7 +333,7 @@ public class KeyframeSequence extends Object3D {
         }
     }
 
-    private final void method121(float[] var1, float var2, int var3, int var4) {
+    private final void squadInterp(float[] var1, float var2, int var3, int var4) {
         if (var1.length != 4) {
             throw new Error("Invalid keyframe type");
         } else {
@@ -383,12 +385,6 @@ public class KeyframeSequence extends Object3D {
             this.anaArray148[var8].mul(var6);
         } while ((var8 = this.method13(var8)) != this.validRangeFirst);
 
-    }
-
-    private static float method112(float var0, float var1, float var2, float var3, float var4) {
-        float var5;
-        float var6 = (var5 = var0 * var0) * var0;
-        return (2.0F * var6 - 3.0F * var5 + 1.0F) * var1 + (-2.0F * var6 + 3.0F * var5) * var2 + (var6 - 2.0F * var5 + var0) * var3 + (var6 - var5) * var4;
     }
 
     private float method113(int var1) {
