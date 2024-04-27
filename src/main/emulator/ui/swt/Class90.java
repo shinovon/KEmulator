@@ -455,13 +455,13 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
                 forward = 1;
                 break;
             case 'a':
-                strafe = 1;
+                strafe = -1;
                 break;
             case 's':
                 forward = -1;
                 break;
             case 'd':
-                strafe = -1;
+                strafe = 1;
                 break;
             default:
                 break;
