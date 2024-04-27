@@ -782,8 +782,8 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
         GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 
-        TriangleStripArray triangleStripArray;
-        int stripCount = (triangleStripArray = (TriangleStripArray) indexBuffer).getStripCount();
+        TriangleStripArray triangleStripArray = (TriangleStripArray) indexBuffer;
+        int stripCount = triangleStripArray.getStripCount();
 
         if (appearance != null && !Settings.xrayView) {
 

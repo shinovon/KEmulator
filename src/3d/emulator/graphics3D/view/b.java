@@ -5,6 +5,7 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
+import emulator.graphics3D.lwjgl.LWJGLUtility;
 import emulator.graphics3D.m3g.LightsCache;
 import emulator.graphics3D.m3g.RenderObject;
 import emulator.graphics3D.m3g.RenderPipe;
@@ -41,6 +42,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.GLExtensions;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 
 public final class b {
     private static b ab583;
@@ -207,7 +212,7 @@ public final class b {
             }
 
             this.method383(var3, var6, false);
-            this.method382(var1, var2, var3, var6);
+            this.draw(var1, var2, var3, var6);
         }
     }
 
@@ -529,7 +534,7 @@ public final class b {
             method376(var1.getMaterial(), var2);
         }
 
-        this.method377(var1.getFog());
+        this.setupFog(var1.getFog());
     }
 
     private void method366(PolygonMode var1) {
@@ -647,7 +652,7 @@ public final class b {
         GL11.glDisable(var10000);
     }
 
-    private void method377(Fog var1) {
+    private void setupFog(Fog var1) {
         if (var1 != null && !this.aBoolean584) {
             GL11.glEnable(2912);
             GL11.glFogi(2917, var1.getMode() == 81 ? 9729 : 2048);
@@ -663,99 +668,74 @@ public final class b {
         }
     }
 
-    private void method382(VertexBuffer var1, IndexBuffer var2, Appearance var3, float var4) {
-        VertexArray var5;
+    private void draw(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Appearance appearance, float alphaFactor) {
+        VertexArray texCoords;
         int var10000;
         byte[] var23;
         short[] var24;
-        if ((var5 = var1.getColors()) == null) {
-            int var6;
-            GL11.glColor4ub((byte) ((var6 = var1.getDefaultColor()) >> 16 & 255), (byte) (var6 >> 8 & 255), (byte) (var6 & 255), (byte) ((int) ((float) (var6 >> 24 & 255) * var4)));
-            GL11.glDisableClientState('\u8076');
+        VertexArray colors = vertexBuffer.getColors();
+        if (colors == null) {
+            int col = vertexBuffer.getDefaultColor();
+            GL11.glColor4ub((byte) (col >> 16 & 255), (byte) (col >> 8 & 255), (byte) (col & 255), (byte) ((int) ((float) (col >> 24 & 255) * alphaFactor)));
+            GL11.glDisableClientState(GL_COLOR_ARRAY);
         } else {
-            GL11.glEnableClientState('\u8076');
-            boolean var10001;
-            byte var10002;
-            ByteBuffer var10003;
-            if (var5.getComponentType() == 1) {
-                var23 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var23);
-                var10000 = var4 == 1.0F ? var5.getComponentCount() : 4;
-                var10001 = true;
-                var10002 = 0;
-                var10003 = a.method396(var23, var4, var5.getVertexCount());
-            } else {
-                var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var24);
-                var10000 = var4 == 1.0F ? var5.getComponentCount() : 4;
-                var10001 = true;
-                var10002 = 0;
-                var10003 = a.method397(var24, var4, var5.getVertexCount());
+            GL11.glEnableClientState(GL_COLOR_ARRAY);
+            if (colors.getComponentType() == 1) {
+                byte[] colorsBArr = colors.getByteValues();
+                GL11.glColorPointer(alphaFactor == 1.0F ? colors.getComponentCount() : 4, 5121, 0, a.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount()));
             }
-
-            GL11.glColorPointer(var10000, var10001, var10002, var10003);
         }
 
-        if ((var5 = var1.getNormals()) != null && var3.getMaterial() != null) {
-            GL11.glEnableClientState('\u8075');
-            if (var5.getComponentType() == 1) {
-                var23 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var23);
-                GL11.glNormalPointer(0, a.method394(var23));
+        VertexArray normals = vertexBuffer.getNormals();
+        if (normals != null && appearance.getMaterial() != null) {
+            GL11.glEnableClientState(GL_NORMAL_ARRAY);
+            glEnable(GL_NORMALIZE);
+            if (normals.getComponentType() == 1) {
+                GL11.glNormalPointer(0, a.getNormalBuffer(normals.getByteValues()));
             } else {
-                var24 = new short[var5.getComponentCount() * var5.getVertexCount()];
-                var5.get(0, var5.getVertexCount(), var24);
-                GL11.glNormalPointer(0, a.method395(var24));
+                GLExtensions.glNormalPointer(0, a.getNormalBuffer(normals.getShortValues()));
             }
         } else {
-            GL11.glDisableClientState('\u8075');
+            GL11.glDisableClientState(GL_NORMAL_ARRAY);
         }
 
-        float[] var26 = new float[4];
-        var5 = var1.getPositions(var26);
-        GL11.glEnableClientState('\u8074');
-        byte var28;
-        IntBuffer var30;
-        if (var5.getComponentType() == 1) {
-            byte[] var7 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-            var5.get(0, var5.getVertexCount(), var7);
-            var10000 = var5.getComponentCount();
-            var28 = 0;
-            var30 = a.method400(var7);
+        float[] scaleBias = new float[4];
+        VertexArray positions = vertexBuffer.getPositions(scaleBias);
+        GL11.glEnableClientState(GL_VERTEX_ARRAY);
+        if (positions.getComponentType() == 1) {
+            byte[] posesBArr = positions.getByteValues();
+            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesBArr));
         } else {
-            short[] var25 = new short[var5.getComponentCount() * var5.getVertexCount()];
-            var5.get(0, var5.getVertexCount(), var25);
-            var10000 = var5.getComponentCount();
-            var28 = 0;
-            var30 = a.method399(var25);
+            short[] posesSArr = positions.getShortValues();
+            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesSArr));
         }
 
-        GL11.glVertexPointer(var10000, var28, var30);
-        GL11.glMatrixMode(5888);
-        GL11.glTranslatef(var26[1], var26[2], var26[3]);
-        GL11.glScalef(var26[0], var26[0], var26[0]);
-        TriangleStripArray var27;
-        int var8 = (var27 = (TriangleStripArray) var2).getStripCount();
+        GL11.glMatrixMode(GL_MODELVIEW);
+        GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
+        GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
+
+        TriangleStripArray triangleStripArray = (TriangleStripArray) indexBuffer;
+        int stripCount = triangleStripArray.getStripCount();
+
         int var9;
         int[] var22;
-        if (var3 != null && !this.aBoolean584) {
+        if (appearance != null && !this.aBoolean584) {
             var9 = Emulator3D.NumTextureUnits;
             IntBuffer var10;
             GL11.glGenTextures(var10 = BufferUtils.createIntBuffer(Emulator3D.NumTextureUnits));
 
-            int var11;
-            for (var11 = 0; var11 < var9; ++var11) {
-                Texture2D var12 = var3.getTexture(var11);
-                var26[3] = 0.0F;
-                var5 = var1.getTexCoords(var11, var26);
-                if (var12 != null && var5 != null) {
+            for (int i = 0; i < var9; ++i) {
+                Texture2D var12 = appearance.getTexture(i);
+                scaleBias[3] = 0.0F;
+                texCoords = vertexBuffer.getTexCoords(i, scaleBias);
+                if (var12 != null && texCoords != null) {
                     short var29;
                     label135:
                     {
-                        GL13.glActiveTexture('\u84c0' + var11);
-                        GL13.glClientActiveTexture('\u84c0' + var11);
+                        GL13.glActiveTexture('\u84c0' + i);
+                        GL13.glClientActiveTexture('\u84c0' + i);
                         GL11.glEnable(3553);
-                        GL11.glBindTexture(3553, var10.get(var11));
+                        GL11.glBindTexture(3553, var10.get(i));
                         short var31;
                         short var32;
                         switch (var12.getBlending()) {
@@ -866,41 +846,34 @@ public final class b {
                     GL11.glTexParameteri(3553, 10241, var20);
                     GL11.glTexParameteri(3553, 10240, var19);
                     GL11.glEnableClientState('\u8078');
-                    FloatBuffer var35;
-                    if (var5.getComponentType() == 1) {
-                        byte[] var21 = new byte[var5.getComponentCount() * var5.getVertexCount()];
-                        var5.get(0, var5.getVertexCount(), var21);
-                        var10000 = var5.getComponentCount();
-                        var28 = 0;
-                        var35 = a.method403(var21);
-                    } else {
-                        short[] var33 = new short[var5.getComponentCount() * var5.getVertexCount()];
-                        var5.get(0, var5.getVertexCount(), var33);
-                        var10000 = var5.getComponentCount();
-                        var28 = 0;
-                        var35 = a.method402(var33);
-                    }
 
-                    GL11.glTexCoordPointer(var10000, var28, var35);
+                    IntBuffer texCoordBuffer;
+                    if (texCoords.getComponentType() == 1) {
+                        texCoordBuffer = a.getTexCoordBuffer(texCoords.getByteValues(), i);
+                    } else {
+                        texCoordBuffer = a.getTexCoordBuffer(texCoords.getShortValues(), i);
+                    }
+                    GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, texCoordBuffer);
+
                     Transform var34 = new Transform();
                     var12.getCompositeTransform(var34);
                     var34.transpose();
                     GL11.glMatrixMode(5890);
                     GL11.glLoadMatrix(a.method401(((Transform3D) var34.getImpl()).m_matrix));
-                    GL11.glTranslatef(var26[1], var26[2], var26[3]);
-                    GL11.glScalef(var26[0], var26[0], var26[0]);
+                    GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
+                    GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
                 }
             }
 
-            for (var11 = 0; var11 < var8; ++var11) {
-                var22 = var27.getIndexStrip(var11);
+            for (int i = 0; i < stripCount; ++i) {
+                var22 = triangleStripArray.getIndexStrip(i);
                 GL11.glDrawElements(5, a.method398(var22));
             }
 
-            for (var11 = 0; var11 < var9; ++var11) {
-                if (GL11.glIsTexture(var10.get(var11))) {
-                    GL13.glActiveTexture('\u84c0' + var11);
-                    GL13.glClientActiveTexture('\u84c0' + var11);
+            for (int i = 0; i < var9; ++i) {
+                if (GL11.glIsTexture(var10.get(i))) {
+                    GL13.glActiveTexture('\u84c0' + i);
+                    GL13.glClientActiveTexture('\u84c0' + i);
                     GL11.glDisableClientState('\u8078');
                     GL11.glDisable(3553);
                 }
@@ -908,8 +881,8 @@ public final class b {
 
             GL11.glDeleteTextures(var10);
         } else {
-            for (var9 = 0; var9 < var8; ++var9) {
-                var22 = var27.getIndexStrip(var9);
+            for (var9 = 0; var9 < stripCount; ++var9) {
+                var22 = triangleStripArray.getIndexStrip(var9);
                 GL11.glDrawElements(5, a.method398(var22));
             }
 

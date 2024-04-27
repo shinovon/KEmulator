@@ -3,7 +3,9 @@ package emulator.graphics3D.view;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
+import emulator.graphics3D.lwjgl.Emulator3D;
 import org.lwjgl.BufferUtils;
 
 public final class a {
@@ -13,6 +15,11 @@ public final class a {
     private static IntBuffer anIntBuffer600;
     private static FloatBuffer aFloatBuffer598;
     private static FloatBuffer aFloatBuffer601;
+
+    private static ByteBuffer normalByteBuffer;
+    private static ShortBuffer normalShortBuffer;
+    private static ByteBuffer colorBuffer;
+    private static final IntBuffer[] texCoordsBuffer = new IntBuffer[Emulator3D.NumTextureUnits];
 
     public static ByteBuffer method394(byte[] paramArrayOfByte) {
         if ((aByteBuffer596 == null) || (aByteBuffer596.capacity() < paramArrayOfByte.length)) {
@@ -87,13 +94,13 @@ public final class a {
                 aByteBuffer599.put((byte) (int) (((byte) ((paramArrayOfShort[(j++)] & 0xFFFF) / 257) & 0xFF) * paramFloat + 0.5F));
             }
         }
-        j = 0;
-        while (0 < paramArrayOfShort.length) {
-            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
-            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
-            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
-            aByteBuffer599.put((byte) (int) (255.0F * paramFloat + 0.5F));
-        }
+//        j = 0;
+//        while (0 < paramArrayOfShort.length) {
+//            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
+//            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
+//            aByteBuffer599.put((byte) ((paramArrayOfShort[0] & 0xFFFF) / 257));
+//            aByteBuffer599.put((byte) (int) (255.0F * paramFloat + 0.5F));
+//        }
         aByteBuffer599.position(aByteBuffer599.capacity() - i);
         return aByteBuffer599;
     }
@@ -164,5 +171,103 @@ public final class a {
         }
         aFloatBuffer601.position(aFloatBuffer601.capacity() - paramArrayOfByte.length);
         return aFloatBuffer601;
+    }
+
+    public static ByteBuffer getNormalBuffer(byte[] var0) {
+        if(normalByteBuffer == null || normalByteBuffer.capacity() < var0.length) {
+            normalByteBuffer = BufferUtils.createByteBuffer(var0.length);
+        }
+
+        normalByteBuffer.position(normalByteBuffer.capacity() - var0.length);
+        normalByteBuffer.put(var0);
+        normalByteBuffer.position(normalByteBuffer.capacity() - var0.length);
+        return normalByteBuffer;
+    }
+
+    public static ShortBuffer getNormalBuffer(short[] var0) {
+        if (normalShortBuffer == null || normalShortBuffer.capacity() < var0.length) {
+            normalShortBuffer = BufferUtils.createShortBuffer(var0.length);
+        }
+
+        normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);
+
+        for (short i : var0) {
+            normalShortBuffer.put(i);
+        }
+
+        normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);
+        return normalShortBuffer;
+    }
+
+    public static ByteBuffer getColorBuffer(byte[] var0, float var1, int var2) {
+        int var3 = var1 == 1.0F?var0.length:4 * var2;
+        if(colorBuffer == null || colorBuffer.capacity() < var3) {
+            colorBuffer = BufferUtils.createByteBuffer(var3);
+        }
+
+        colorBuffer.position(colorBuffer.capacity() - var3);
+        if(var1 == 1.0F) {
+            colorBuffer.put(var0);
+        } else {
+            int var4;
+            if(var0.length == var3) {
+                var4 = 0;
+
+                while(var4 < var3) {
+                    colorBuffer.put(var0[var4++]);
+                    colorBuffer.put(var0[var4++]);
+                    colorBuffer.put(var0[var4++]);
+                    colorBuffer.put((byte)((int)((float)(var0[var4++] & 255) * var1 + 0.5F)));
+                }
+            } else {
+                var4 = 0;
+
+                while(var4 < var0.length) {
+                    colorBuffer.put(var0[var4++]);
+                    colorBuffer.put(var0[var4++]);
+                    colorBuffer.put(var0[var4++]);
+                    colorBuffer.put((byte)((int)(255.0F * var1 + 0.5F)));
+                }
+            }
+        }
+
+        colorBuffer.position(colorBuffer.capacity() - var3);
+        return colorBuffer;
+    }
+
+    public static IntBuffer getTexCoordBuffer(short[] var0, int idx) {
+        if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
+            texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
+        }
+        IntBuffer buf = texCoordsBuffer[idx];
+
+        buf.position(buf.capacity() - var0.length);
+        int var1 = 0;
+        int var2 = var0.length;
+
+        while(var1 < var2) {
+            buf.put(var0[var1++]);
+        }
+
+        buf.position(buf.capacity() - var0.length);
+        return buf;
+    }
+
+    public static IntBuffer getTexCoordBuffer(byte[] var0, int idx) {
+        if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
+            texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
+        }
+        IntBuffer buf = texCoordsBuffer[idx];
+
+        buf.position(buf.capacity() - var0.length);
+        int var1 = 0;
+        int var2 = var0.length;
+
+        while(var1 < var2) {
+            buf.put(var0[var1++]);
+        }
+
+        buf.position(buf.capacity() - var0.length);
+        return buf;
     }
 }

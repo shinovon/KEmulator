@@ -11,7 +11,7 @@ public final class LWJGLUtility {
     private static ByteBuffer imageBuffer;
     private static IntBuffer vertexByteBuffer;
     private static ShortBuffer vertexShortBuffer;
-    private static IntBuffer[] texCoordsBuffer = new IntBuffer[Emulator3D.NumTextureUnits];
+    private static final IntBuffer[] texCoordsBuffer = new IntBuffer[Emulator3D.NumTextureUnits];
     private static IntBuffer elementsBuffer;
     private static FloatBuffer floatBuffer;
 
