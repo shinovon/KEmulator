@@ -41,6 +41,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 public final class b {
     private static final boolean useSoftwareWgl = false;
@@ -101,9 +102,11 @@ public final class b {
         GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var10000, 8), G3DUtils.getFloatColor(var10000, 0), G3DUtils.getFloatColor(var10000, 24));
         GL11.glClear(16640);
         if (var1 != null && !this.xray) {
+            GL11.glClear(var1.isColorClearEnabled() ? 16384 : 0);
             this.method385(var1);
+        } else {
+            GL11.glClear(GL_COLOR_BUFFER_BIT);
         }
-
     }
 
     private void method385(Background var1) {
@@ -719,148 +722,115 @@ public final class b {
         int[] var22;
         if (appearance != null && !this.xray) {
             var9 = Emulator3D.NumTextureUnits;
-            IntBuffer var10;
-            GL11.glGenTextures(var10 = BufferUtils.createIntBuffer(Emulator3D.NumTextureUnits));
+            IntBuffer var10 = BufferUtils.createIntBuffer(Emulator3D.NumTextureUnits);
+            GL11.glGenTextures(var10);
 
             for (int i = 0; i < var9; ++i) {
-                Texture2D var12 = appearance.getTexture(i);
-                scaleBias[3] = 0.0F;
+                Texture2D texture2D = appearance.getTexture(i);
                 VertexArray texCoords = vertexBuffer.getTexCoords(i, scaleBias);
-                if (var12 != null && texCoords != null) {
-                    short var29;
-                    label135:
-                    {
-                        GL13.glActiveTexture('\u84c0' + i);
-                        GL13.glClientActiveTexture('\u84c0' + i);
-                        GL11.glEnable(3553);
-                        GL11.glBindTexture(3553, var10.get(i));
-                        short var31;
-                        short var32;
-                        switch (var12.getBlending()) {
-                            case 224:
-                                var29 = 8960;
-                                var31 = 8704;
-                                var32 = 260;
-                                break;
-                            case 225:
-                                var29 = 8960;
-                                var31 = 8704;
-                                var32 = 3042;
-                                break;
-                            case 226:
-                                var29 = 8960;
-                                var31 = 8704;
-                                var32 = 8449;
-                                break;
-                            case 227:
-                                var29 = 8960;
-                                var31 = 8704;
-                                var32 = 8448;
-                                break;
-                            case 228:
-                                var29 = 8960;
-                                var31 = 8704;
-                                var32 = 7681;
-                                break;
-                            default:
-                                break label135;
-                        }
 
-                        GL11.glTexEnvi(var29, var31, var32);
-                    }
+                if (texture2D == null || texCoords == null) continue;
 
-                    Image2D var15;
-                    short var16;
-                    label129:
-                    {
-                        float[] var14;
-                        G3DUtils.fillFloatColor(var14 = new float[4], var12.getBlendColor());
-                        var14[3] = 1.0F;
-                        GL11.glTexEnv(8960, 8705, a.method401(var14));
-                        var15 = var12.getImage();
-                        var16 = 6407;
-                        switch (var15.getFormat()) {
-                            case 96:
-                                var29 = 6406;
-                                break;
-                            case 97:
-                                var29 = 6409;
-                                break;
-                            case 98:
-                                var29 = 6410;
-                                break;
-                            case 99:
-                                var29 = 6407;
-                                break;
-                            case 100:
-                                var29 = 6408;
-                                break;
-                            default:
-                                break label129;
-                        }
+                Image2D image2D = texture2D.getImage();
+                scaleBias[3] = 0.0F;
+                GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
+                GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
 
-                        var16 = var29;
-                    }
+                GL11.glEnable(GL_TEXTURE_2D);
+                GL11.glBindTexture(GL_TEXTURE_2D, var10.get(i));
 
-                    short var19;
-                    label122:
-                    {
-                        GL11.glTexImage2D(3553, 0, var16, var15.getWidth(), var15.getHeight(), 0, var16, 5121, a.method394(var15.getImageData()));
-                        GL11.glTexParameterf(3553, 10242, var12.getWrappingS() == 240 ? 33071.0F : 10497.0F);
-                        GL11.glTexParameterf(3553, 10243, var12.getWrappingT() == 240 ? 33071.0F : 10497.0F);
-                        int var17 = var12.getLevelFilter();
-                        int var18 = var12.getImageFilter();
-                        if (var17 == 208) {
-                            if (var18 == 210) {
-                                var19 = 9728;
-                                var29 = 9728;
-                                break label122;
-                            }
-
-                            var29 = 9729;
-                        } else if (var17 == 209) {
-                            if (var18 == 210) {
-                                var19 = 9985;
-                                var29 = 9728;
-                                break label122;
-                            }
-
-                            var29 = 9987;
-                        } else {
-                            if (var18 == 210) {
-                                var19 = 9984;
-                                var29 = 9728;
-                                break label122;
-                            }
-
-                            var29 = 9986;
-                        }
-
-                        var19 = var29;
-                        var29 = 9729;
-                    }
-
-                    short var20 = var29;
-                    GL11.glTexParameteri(3553, 10241, var20);
-                    GL11.glTexParameteri(3553, 10240, var19);
-                    GL11.glEnableClientState('\u8078');
-
-                    IntBuffer texCoordBuffer;
-                    if (texCoords.getComponentType() == 1) {
-                        texCoordBuffer = a.getTexCoordBuffer(texCoords.getByteValues(), i);
-                    } else {
-                        texCoordBuffer = a.getTexCoordBuffer(texCoords.getShortValues(), i);
-                    }
-                    GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, texCoordBuffer);
-
-                    Transform var34 = new Transform();
-                    var12.getCompositeTransform(var34);
-                    var34.transpose();
-                    GL11.glMatrixMode(5890);
-                    GL11.glLoadMatrix(a.method401(((Transform3D) var34.getImpl()).m_matrix));
-                    GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
-                    GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
+                int blendMode = 0;
+                switch (texture2D.getBlending()) {
+                    case Texture2D.FUNC_ADD:
+                        blendMode = GL_ADD;
+                        break;
+                    case Texture2D.FUNC_BLEND:
+                        blendMode = GL_BLEND;
+                        break;
+                    case Texture2D.FUNC_DECAL:
+                        blendMode = GL_DECAL;
+                        break;
+                    case Texture2D.FUNC_MODULATE:
+                        blendMode = GL_MODULATE;
+                        break;
+                    case Texture2D.FUNC_REPLACE:
+                        blendMode = GL_REPLACE;
+                        break;
+                    default:
+                        break;
                 }
+
+                GL11.glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blendMode);
+
+                short texFormat = GL_RGB;
+                switch (image2D.getFormat()) {
+                    case Image2D.ALPHA:
+                        texFormat = GL_ALPHA;
+                        break;
+                    case Image2D.LUMINANCE:
+                        texFormat = GL_LUMINANCE;
+                        break;
+                    case Image2D.LUMINANCE_ALPHA:
+                        texFormat = GL_LUMINANCE_ALPHA;
+                        break;
+                    case Image2D.RGB:
+                        texFormat = GL_RGB;
+                        break;
+                    case Image2D.RGBA:
+                        texFormat = GL_RGBA;
+                }
+
+//                GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
+
+                GL11.glTexImage2D(GL_TEXTURE_2D, 0,
+                        texFormat, image2D.getWidth(), image2D.getHeight(), 0,
+                        texFormat, GL_UNSIGNED_BYTE,
+                        a.getImageBuffer(image2D.getImageData())
+                );
+
+                GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                        texture2D.getWrappingS() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+                );
+                GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                        texture2D.getWrappingT() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+                );
+
+                int levelFilter = texture2D.getLevelFilter();
+                int imageFilter = texture2D.getImageFilter();
+                int magFilter = 0, minFilter = 0;
+
+                if (imageFilter == Texture2D.FILTER_NEAREST) {
+                    minFilter = magFilter = GL_NEAREST;
+
+                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                } else if (imageFilter == Texture2D.FILTER_LINEAR) {
+                    minFilter = magFilter = GL_LINEAR;
+
+                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                }
+
+                GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+                GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+                GL11.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+                IntBuffer texCoordBuffer;
+                if (texCoords.getComponentType() == 1) {
+                    texCoordBuffer = a.getTexCoordBuffer(texCoords.getByteValues(), i);
+                } else {
+                    texCoordBuffer = a.getTexCoordBuffer(texCoords.getShortValues(), i);
+                }
+                GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, texCoordBuffer);
+
+                Transform tmpMat = new Transform();
+                texture2D.getCompositeTransform(tmpMat);
+                tmpMat.transpose();
+
+                GL11.glMatrixMode(GL_TEXTURE);
+                GL11.glLoadMatrix(a.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+                GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
+                GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
             }
 
             for (int i = 0; i < stripCount; ++i) {
