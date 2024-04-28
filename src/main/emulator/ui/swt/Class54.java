@@ -100,7 +100,7 @@ public final class Class54 implements MouseListener, MouseMoveListener {
         this.aLink820.setLayoutData(gridData2);
         //   ((Control)this.aLink820).setEnabled(false);
         this.aLink820.addSelectionListener(new Class157(this));
-        (this.aLink807 = new Link(this.aShell806, 0)).setText("Mod by shinovon\n3D engine contributions by rmn20\nSoftBank MEXA, MascotCapsule impl by: woesss\n" + emulator.UILocale.get("ABOUT_AUTHOR", "Author") + ": <a>Wu.Liang</a>  (c) 2006,2008");
+        (this.aLink807 = new Link(this.aShell806, 0)).setText("Mod by shinovon\n3D engine contributions by rmn20\nSoftBank MEXA, MascotCapsule impl by woesss\n" + emulator.UILocale.get("ABOUT_AUTHOR", "Author") + ": <a>Wu.Liang</a>  (c) 2006,2008");
         this.aLink807.setLayoutData(layoutData);
         this.aLink807.addSelectionListener(new Class156(this));
         (this.aStyledText808 = new StyledText(this.aShell806, 2562)).setLayoutData(layoutData4);

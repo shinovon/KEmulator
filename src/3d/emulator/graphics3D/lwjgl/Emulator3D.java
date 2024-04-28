@@ -21,6 +21,7 @@ import java.awt.image.*;
 import java.nio.*;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
+import javax.xml.soap.Text;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
@@ -65,6 +66,7 @@ public final class Emulator3D implements IGraphics3D {
     private boolean exiting;
     private String contextRes;
     private Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
+    private boolean printed;
 
     private Emulator3D() {
         instance = this;
@@ -150,7 +152,7 @@ public final class Emulator3D implements IGraphics3D {
 
                 pbufferContext.makeCurrent();
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 try {
                     this.method499(w, h);
                 } catch (Throwable e2) {
@@ -159,6 +161,7 @@ public final class Emulator3D implements IGraphics3D {
                     return;
                 }
             }
+            printGLInfo();
 
             if (targetWidth != w || targetHeight != h) {
                 if (Settings.g2d == 1) {
@@ -205,8 +208,8 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static boolean useGL13() {
-        return pbufferContext != null;
+    private static boolean useGL11() {
+        return pbufferContext == null;
     }
 
     private void method499(int var1, int var2) {
@@ -240,6 +243,7 @@ public final class Emulator3D implements IGraphics3D {
                 this.swtImage.dispose();
                 throw new IllegalArgumentException();
             }
+            System.out.println("WGL context initialized");
         }
 
         if (WGL.wglGetCurrentContext() != this.swtImage.handle) {
@@ -253,6 +257,14 @@ public final class Emulator3D implements IGraphics3D {
                 throw new IllegalArgumentException();
             }
         }
+    }
+
+    private void printGLInfo() {
+        if(printed) return;
+        printed = true;
+        System.out.println("GL_VENDOR: " + GL11.glGetString(GL_VENDOR));
+        System.out.println("GL_RENDERER: " + GL11.glGetString(GL_RENDERER));
+        System.out.println("GL_VERSION: " + GL11.glGetString(GL_VERSION));
     }
 
     private void releaseContext() {
@@ -349,13 +361,13 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnable(GL_POINT_SMOOTH);
             GL11.glEnable(GL_LINE_SMOOTH);
             GL11.glEnable(GL_POLYGON_SMOOTH);
-            if(useGL13())
+            if(!useGL11())
                 GL11.glEnable(GL_MULTISAMPLE);
         } else {
             GL11.glDisable(GL_POINT_SMOOTH);
             GL11.glDisable(GL_LINE_SMOOTH);
             GL11.glDisable(GL_POLYGON_SMOOTH);
-            if(useGL13())
+            if(!useGL11())
                 GL11.glDisable(GL_MULTISAMPLE);
         }
 
@@ -796,7 +808,7 @@ public final class Emulator3D implements IGraphics3D {
 
                 Image2D image2D = texture2D.getImage();
 
-                if (useGL13()) {
+                if (!useGL11()) {
                     GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
                     GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
                 }
@@ -864,7 +876,8 @@ public final class Emulator3D implements IGraphics3D {
                             texFormat = GL_RGBA;
                     }
 
-                    GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
+                    if(!useGL11())
+                        GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
 
                     GL11.glTexImage2D(GL_TEXTURE_2D, 0,
                             texFormat, image2D.getWidth(), image2D.getHeight(), 0,
@@ -874,13 +887,13 @@ public final class Emulator3D implements IGraphics3D {
                 }
 
                 GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                        texture2D.getWrappingS() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+                        texture2D.getWrappingS() == Texture2D.WRAP_CLAMP && !useGL11() ? GL_CLAMP_TO_EDGE : GL_REPEAT
                 );
                 GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                        texture2D.getWrappingT() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+                        texture2D.getWrappingT() == Texture2D.WRAP_CLAMP && !useGL11() ? GL_CLAMP_TO_EDGE : GL_REPEAT
                 );
 
-                int levelFilter = texture2D.getLevelFilter();
+                int levelFilter = useGL11() ? Texture2D.FILTER_BASE_LEVEL : texture2D.getLevelFilter();
                 int imageFilter = texture2D.getImageFilter();
                 int magFilter = 0, minFilter = 0;
 
@@ -931,7 +944,7 @@ public final class Emulator3D implements IGraphics3D {
                 Image2D image2D = tex.getImage();
 
                 if (image2D.getId() != 0) {
-                    if (useGL13()) {
+                    if (!useGL11()) {
                         GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
                         GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
                     }
