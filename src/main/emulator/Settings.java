@@ -71,8 +71,24 @@ public final class Settings {
     public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill
     public static boolean keepAspectRatio = true;
     public static boolean integerResize = false;
-    public static boolean ignoreM3GOverwrite;
     public static boolean patchSynchronizedPaint = true;
+
+    //m3g
+    public static boolean m3gIgnoreOverwrite;
+    public static boolean m3gForcePerspectiveCorrection;
+    public static boolean m3gDisableLightClamp;
+
+    public static final int APP_CONTROLLED = 0;
+
+    public static final int AA_OFF = 1, AA_ON = 2;
+    public static int m3gAA;
+
+    public static final int TEX_FILTER_NEAREST = 1, TEX_FILTER_LINEAR = 2;
+    public static int m3gTexFilter;
+
+    public static final int MIP_OFF = 1, MIP_LINEAR = 2, MIP_TRILINEAR = 3,
+            MIP_ANISO_2 = 4, MIP_ANISO_4 = 5, MIP_ANISO_8 = 6, MIP_ANISO_16 = 7;
+    public static int m3gMipmapping;
 
     public Settings() {
         super();

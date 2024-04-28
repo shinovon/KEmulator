@@ -59,7 +59,7 @@ public class Graphics3D {
             throw new IllegalArgumentException();
         }
 
-        boolean overwrite = !Settings.ignoreM3GOverwrite && (hints & OVERWRITE) != 0;
+        boolean overwrite = !Settings.m3gIgnoreOverwrite && (hints & OVERWRITE) != 0;
 
         Background bck = new Background();
         bck.setColorClearEnable(!overwrite);

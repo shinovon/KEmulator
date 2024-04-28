@@ -22,6 +22,7 @@ import java.nio.*;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
 
+import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
@@ -356,7 +357,12 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void setHintsInternal() {
-        if ((hints & Graphics3D.ANTIALIAS) != 0) {
+        boolean aa = (hints & Graphics3D.ANTIALIAS) != 0;
+
+        if (Settings.m3gAA == Settings.AA_OFF) aa = false;
+        else if (Settings.m3gAA == Settings.AA_ON) aa = true;
+
+        if (aa) {
             GL11.glEnable(GL_POINT_SMOOTH);
             GL11.glEnable(GL_LINE_SMOOTH);
             GL11.glEnable(GL_POLYGON_SMOOTH);
@@ -506,7 +512,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glDisable(GL_LIGHT0 + i);
         }
 
-        //ARBColorBufferFloat.glClampColorARB(ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
+        ARBColorBufferFloat.glClampColorARB(ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB, Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE);
 
         int usedLights = 0;
         Transform tmpMat = new Transform();
@@ -644,7 +650,11 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glFrontFace(pm.getWinding() == PolygonMode.WINDING_CW ? GL_CW : GL_CCW);
         GL11.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, pm.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
         GL11.glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, pm.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
-        GL11.glHint(GL_PERSPECTIVE_CORRECTION_HINT, pm.isPerspectiveCorrectionEnabled() ? GL_NICEST : GL_FASTEST);
+
+        boolean persCorrect = pm.isPerspectiveCorrectionEnabled();
+        if (Settings.m3gForcePerspectiveCorrection) persCorrect = true;
+
+        GL11.glHint(GL_PERSPECTIVE_CORRECTION_HINT, persCorrect ? GL_NICEST : GL_FASTEST);
     }
 
     private void setupCompositingMode(CompositingMode cm) {
@@ -892,8 +902,26 @@ public final class Emulator3D implements IGraphics3D {
                         texture2D.getWrappingT() == Texture2D.WRAP_CLAMP && !useGL11() ? GL_CLAMP_TO_EDGE : GL_REPEAT
                 );
 
-                int levelFilter = useGL11() ? Texture2D.FILTER_BASE_LEVEL : texture2D.getLevelFilter();
+                int levelFilter = texture2D.getLevelFilter();
                 int imageFilter = texture2D.getImageFilter();
+
+                if (useGL11() || Settings.m3gMipmapping == Settings.MIP_OFF) {
+                    levelFilter = Texture2D.FILTER_BASE_LEVEL;
+                } else if (Settings.m3gMipmapping == Settings.MIP_LINEAR) {
+                    levelFilter = Texture2D.FILTER_NEAREST;
+                } else if (Settings.m3gMipmapping == Settings.MIP_TRILINEAR) {
+                    levelFilter = Texture2D.FILTER_LINEAR;
+                } else if (Settings.m3gMipmapping >= Settings.MIP_ANISO_2) {
+                    levelFilter = Texture2D.FILTER_LINEAR;
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2 << (Settings.m3gMipmapping - Settings.MIP_ANISO_2));
+                }
+
+                if (Settings.m3gTexFilter == Settings.TEX_FILTER_NEAREST) {
+                    imageFilter = Texture2D.FILTER_NEAREST;
+                } else if (Settings.m3gTexFilter == Settings.TEX_FILTER_LINEAR) {
+                    imageFilter = Texture2D.FILTER_LINEAR;
+                }
+
                 int magFilter = 0, minFilter = 0;
 
                 if (imageFilter == Texture2D.FILTER_NEAREST) {

@@ -187,7 +187,14 @@ public final class Property implements IProperty {
     private Composite keyMapTabComp;
     private Button softkeyMotFixCheck;
     private Button synchronizeKeyEventsCheck;
-    private Button ignoreM3GOverwriteCheck;
+
+    private Composite m3gComp;
+    private Button m3gIgnoreOverwriteCheck;
+    private Button m3gForcePersCorrect;
+    private Button m3gDisableLightClamp;
+    private Combo m3gAACombo;
+    private Combo m3gTexFilterCombo;
+    private Combo m3gMipmapCombo;
 //    private Button pollOnRepaintBtn;
 
     public Property() {
@@ -562,8 +569,16 @@ public final class Property implements IProperty {
             EmulatorScreen.sizeW = Integer.valueOf(properties.getProperty("SizeW", "-1"));
             EmulatorScreen.sizeH = Integer.valueOf(properties.getProperty("SizeH", "-1"));
             EmulatorScreen.maximized = Boolean.valueOf(properties.getProperty("Maximized", "false"));
-            Settings.ignoreM3GOverwrite = Boolean.valueOf(properties.getProperty("IgnoreM3GOverwrite", "false"));
             Settings.patchSynchronizedPaint = Boolean.valueOf(properties.getProperty("PatchSynchronizedPaint", "true"));
+
+            Settings.m3gIgnoreOverwrite = Boolean.valueOf(properties.getProperty("M3GIgnoreOverwrite", "false"));
+            Settings.m3gForcePerspectiveCorrection = Boolean.valueOf(properties.getProperty("M3GForcePerspectiveCorrection", "false"));
+            Settings.m3gDisableLightClamp = Boolean.valueOf(properties.getProperty("M3GDisableLightClamp", "false"));
+
+            Settings.m3gAA = Integer.valueOf(properties.getProperty("M3GAA", "0"));
+            Settings.m3gTexFilter = Integer.valueOf(properties.getProperty("M3GTexFilter", "0"));
+            Settings.m3gMipmapping = Integer.valueOf(properties.getProperty("M3GMipmapping", "0"));
+
             fileInputStream.close();
         } catch (Exception ex) {
             if (!(ex instanceof FileNotFoundException)) {
@@ -701,8 +716,16 @@ public final class Property implements IProperty {
             properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
             properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
             properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
-            properties.setProperty("IgnoreM3GOverwrite", String.valueOf(Settings.ignoreM3GOverwrite));
             properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
+
+            properties.setProperty("M3GIgnoreOverwrite", String.valueOf(Settings.m3gIgnoreOverwrite));
+            properties.setProperty("M3GForcePerspectiveCorrection", String.valueOf(Settings.m3gForcePerspectiveCorrection));
+            properties.setProperty("M3GDisableLightClamp", String.valueOf(Settings.m3gDisableLightClamp));
+
+            properties.setProperty("M3GAA", String.valueOf(Settings.m3gAA));
+            properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
+            properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
+
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
         } catch (Exception ignored) {
@@ -794,7 +817,15 @@ public final class Property implements IProperty {
 //        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
         Settings.vlcDir = vlcDirText.getText().trim();
         Settings.locale = localeText.getText().trim();
-        Settings.ignoreM3GOverwrite = ignoreM3GOverwriteCheck.getSelection();
+
+        Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
+        Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
+        Settings.m3gDisableLightClamp = m3gDisableLightClamp.getSelection();
+
+        Settings.m3gAA = m3gAACombo.getSelectionIndex();
+        Settings.m3gTexFilter = m3gTexFilterCombo.getSelectionIndex();
+        Settings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
+
         this.updateProxy();
     }
 
@@ -1025,8 +1056,9 @@ public final class Property implements IProperty {
         this.setupRecordsComp();
         this.setupNetworkComp();
         this.setupMediaComp();
+        this.setupM3GComp();
         final CTabItem deviceTab;
-        (deviceTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_CUSTOM", "Custom"));
+        (deviceTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_CUSTOM", "General"));
         deviceTab.setControl(this.customComp);
         final CTabItem keymapTab;
         (keymapTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
@@ -1049,6 +1081,9 @@ public final class Property implements IProperty {
         final CTabItem mediaTab;
         (mediaTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
         mediaTab.setControl(this.mediaComp);
+        final CTabItem m3gTab;
+        (m3gTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_M3G", "M3G"));
+        m3gTab.setControl(this.m3gComp);
     }
 
     private void setupCustomComp() {
@@ -1580,10 +1615,6 @@ public final class Property implements IProperty {
         (this.softkeyMotFixCheck = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
         this.softkeyMotFixCheck.setLayoutData(gridData);
         this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
-
-        (this.ignoreM3GOverwriteCheck = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_IGNORE_M3G_OVERWRITE", "Ignore M3G overwrite hint"));
-        this.ignoreM3GOverwriteCheck.setLayoutData(gridData);
-        this.ignoreM3GOverwriteCheck.setSelection(Settings.ignoreM3GOverwrite);
     }
 
     private void setupMediaComp() {
@@ -1609,6 +1640,101 @@ public final class Property implements IProperty {
         vlcDirText.setEnabled(true);
         vlcDirText.setLayoutData(fillHor);
         vlcDirText.setText(Settings.vlcDir);
+    }
+
+    private void setupM3GComp() {
+        this.m3gComp = new Composite(this.tabFolder, 0);
+        m3gComp.setLayout(new GridLayout());
+        this.initM3GComp();
+    }
+
+    private void initM3GComp() {
+        final GridLayout layout = new GridLayout();
+        layout.numColumns = 2;
+        layout.marginWidth = 5;
+        /*m3gComp.setLayout(layout);*/
+
+        final GridData groupData = new GridData();
+        groupData.horizontalAlignment = 4;
+        groupData.grabExcessHorizontalSpace = true;
+        groupData.grabExcessVerticalSpace = true;
+        groupData.verticalAlignment = 1;
+
+        Group lwjglGroup = new Group(m3gComp, 0);
+        lwjglGroup.setText(UILocale.get("OPTION_M3G_LWJGL_SETTINGS", "LWJGL Settings"));
+        lwjglGroup.setLayout(layout);
+        lwjglGroup.setLayoutData(groupData);
+
+        final GridData labelGridData = new GridData();
+        labelGridData.horizontalAlignment = SWT.FILL;
+        labelGridData.grabExcessHorizontalSpace = true;
+        labelGridData.horizontalSpan = 2;
+
+        m3gIgnoreOverwriteCheck = new Button(lwjglGroup, SWT.CHECK);
+        m3gIgnoreOverwriteCheck.setText(UILocale.get("OPTION_M3G_IGNORE_OVERWRITE", "Ignore M3G overwrite hint"));
+        m3gIgnoreOverwriteCheck.setLayoutData(labelGridData);
+        m3gIgnoreOverwriteCheck.setSelection(Settings.m3gIgnoreOverwrite);
+
+        m3gForcePersCorrect = new Button(lwjglGroup, SWT.CHECK);
+        m3gForcePersCorrect.setText(UILocale.get("OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION", "Force perspective correction"));
+        m3gForcePersCorrect.setLayoutData(labelGridData);
+        m3gForcePersCorrect.setSelection(Settings.m3gForcePerspectiveCorrection);
+
+        m3gDisableLightClamp = new Button(lwjglGroup, SWT.CHECK);
+        m3gDisableLightClamp.setText(UILocale.get("OPTION_M3G_DISABLE_LIGHT_CLAMPING", "Disable light clamping"));
+        m3gDisableLightClamp.setLayoutData(labelGridData);
+        m3gDisableLightClamp.setSelection(Settings.m3gDisableLightClamp);
+
+        final GridData dataFillLabel = new GridData();
+        dataFillLabel.horizontalAlignment = SWT.FILL;
+
+        final GridData dataFillLabel2 = new GridData();
+        dataFillLabel2.horizontalAlignment = SWT.FILL;
+
+        final GridData dataFillLabel3 = new GridData();
+        dataFillLabel3.horizontalAlignment = SWT.FILL;
+
+        final GridData listGridData = new GridData();
+        listGridData.horizontalAlignment = SWT.FILL;
+        listGridData.grabExcessHorizontalSpace = true;
+
+        CLabel tmpLabel = new CLabel(lwjglGroup, 0);
+        tmpLabel.setText(UILocale.get("OPTION_M3G_AA", "Anti-aliasing:"));
+        tmpLabel.setLayoutData(dataFillLabel);
+
+        m3gAACombo = new Combo(lwjglGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+        m3gAACombo.setLayoutData(listGridData);
+        m3gAACombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
+        m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_OFF", "Force off"));
+        m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_ON", "Force on"));
+        m3gAACombo.setText(m3gAACombo.getItem(Settings.m3gAA));
+
+        tmpLabel = new CLabel(lwjglGroup, 0);
+        tmpLabel.setText(UILocale.get("OPTION_M3G_TEXTURE_FILTER", "Texture filter:"));
+        tmpLabel.setLayoutData(dataFillLabel2);
+
+        m3gTexFilterCombo = new Combo(lwjglGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+        m3gTexFilterCombo.setLayoutData(listGridData);
+        m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
+        m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_NEAREST", "Force nearest"));
+        m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_LINEAR", "Force linear"));
+        m3gTexFilterCombo.setText(m3gTexFilterCombo.getItem(Settings.m3gTexFilter));
+
+        tmpLabel = new CLabel(lwjglGroup, 0);
+        tmpLabel.setText(UILocale.get("OPTION_M3G_MIPMAPPING", "Mipmapping:"));
+        tmpLabel.setLayoutData(dataFillLabel3);
+
+        m3gMipmapCombo = new Combo(lwjglGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+        m3gMipmapCombo.setLayoutData(listGridData);
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_OFF", "Force off"));
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_BILINEAR", "Force bilinear"));
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_TRILINEAR", "Force trilinear"));
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_2X", "Force anisotropic 2x"));
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_4X", "Force anisotropic 4x"));
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_8X", "Force anisotropic 8x"));
+        m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_16X", "Force anisotropic 16x"));
+        m3gMipmapCombo.setText(m3gMipmapCombo.getItem(Settings.m3gMipmapping));
     }
 
     private void initSystemComp() {

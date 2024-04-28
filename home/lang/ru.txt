@@ -217,6 +217,7 @@ OPTION_TAB_COREAPI=CoreAPI
 OPTION_TAB_RECORDS=Сохранения
 OPTION_TAB_NETWORK=Сеть
 OPTION_TAB_MEDIA=Медиа
+OPTION_TAB_M3G=M3G
 
 OPTION_CUSTOM_DEVICE=Пресет устройства:
 OPTION_CUSTOM_ENCODING=Кодировка MIDP:
@@ -283,7 +284,6 @@ OPTION_COREAPI_FULLSCREEN=Игнорировать Canvas.setFullScreenMode().
 OPTION_COREAPI_NO_NETWORK=Отключить доступ к сети
 OPTION_COREAPI_SYNC_KEYEVENTS=Синхронизировать события клавиш
 OPTION_COREAPI_SOFTKEY_FIX=Отправлять keyPressed вместе с commandAction
-OPTION_COREAPI_IGNORE_M3G_OVERWRITE=Игнорировать M3G флаг перезаписи
 
 OPTION_RECORDS_RMS_FOLDER=Папка RMS:
 OPTION_RECORDS_RMS_TEXT=Записи текущего мидлета:
@@ -307,6 +307,28 @@ OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
 
 OPTION_MEDIA_VLC_DIR=Путь к VLC
 
+
+OPTION_M3G_LWJGL_SETTINGS=Настройки LWJGL
+OPTION_M3G_IGNORE_OVERWRITE=Игнорировать флаг OVERWRITE
+OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Принудительно использовать перспективную коррекцию
+OPTION_M3G_DISABLE_LIGHT_CLAMPING=Отключить ограничение яркости света
+
+OPTION_M3G_AA=Сглаживание:
+OPTION_M3G_APP_CONTROLLED=Использовать параметры приложения
+OPTION_M3G_FORCE_OFF=Принудительно выкл.
+OPTION_M3G_FORCE_ON=Принудительно вкл.
+
+OPTION_M3G_TEXTURE_FILTER=Фильтрация текстур:
+OPTION_M3G_FORCE_NEAREST=Принудительный фильтр ближайшего соседа
+OPTION_M3G_FORCE_LINEAR=Принудительный линейный фильтр
+
+OPTION_M3G_MIPMAPPING=Мипмаппинг:
+OPTION_M3G_FORCE_BILINEAR=Принудительная билинейная фильтрация
+OPTION_M3G_FORCE_TRILINEAR=Принудительная трилинейная фильтрация
+OPTION_M3G_FORCE_ANISO_2X=Принудительная анизотропная фильтрация 2x
+OPTION_M3G_FORCE_ANISO_4X=Принудительная анизотропная фильтрация 4x
+OPTION_M3G_FORCE_ANISO_8X=Принудительная анизотропная фильтрация 8x
+OPTION_M3G_FORCE_ANISO_16X=Принудительная анизотропная фильтрация 16x
 
 #Message
 
