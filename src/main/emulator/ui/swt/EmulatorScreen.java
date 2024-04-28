@@ -1100,7 +1100,7 @@ public final class EmulatorScreen implements
                 return;
             }
             if (menuItem.equals(this.restartMenuItem)) {
-                Emulator.loadGame(null, Settings.g2d, 1, false);
+                Emulator.loadGame(null, Settings.g2d, Settings.g3d, false);
             } else if (menuItem.equals(this.loadJarMenuItem) /*|| (equals = menuItem.equals(this.loadWithConsoleMenuItem))*/) {
                 pauseStep();
                 final FileDialog fileDialog2;
@@ -1109,7 +1109,7 @@ public final class EmulatorScreen implements
                 final String open2;
                 if ((open2 = fileDialog2.open()) != null) {
                     Settings.recordedKeysFile = null;
-                    Emulator.loadGame(open2, Settings.g2d, 1, equals);
+                    Emulator.loadGame(open2, Settings.g2d, Settings.g3d, equals);
                 }
                 this.resumeStep();
             } else if (menuItem.equals(this.loadAutoPlayMenuItem)) {
@@ -1133,7 +1133,7 @@ public final class EmulatorScreen implements
                             }
                         }
                         Settings.recordedKeysFile = open3;
-                        Emulator.loadGame(s, Settings.g2d, 1, false);
+                        Emulator.loadGame(s, Settings.g2d, Settings.g3d, false);
                     }
                 }
                 this.resumeStep();
@@ -1175,7 +1175,7 @@ public final class EmulatorScreen implements
         } else if (parent.equals(this.menu2dEngine)) {
             if (menuItem.equals(this.awt2dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g2d != 1) {
-                    Emulator.loadGame(null, 1, 1, false);
+                    Emulator.loadGame(null, 1, Settings.g3d, false);
                     return;
                 }
                 Settings.g2d = 1;
@@ -1183,7 +1183,7 @@ public final class EmulatorScreen implements
                 this.awt2dMenuItem.setSelection(true);
             } else if (menuItem.equals(this.swt2dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g2d != 0) {
-                    Emulator.loadGame(null, 0, 1, false);
+                    Emulator.loadGame(null, 0, Settings.g3d, false);
                     return;
                 }
                 Settings.g2d = 0;
