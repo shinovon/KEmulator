@@ -22,187 +22,162 @@ public class AnimationTrack extends Object3D {
     public static final int SPOT_EXPONENT = 274;
     public static final int TRANSLATION = 275;
     public static final int VISIBILITY = 276;
+
     private KeyframeSequence keyframeSequence;
     private AnimationController controller;
-    private int target;
+    private int targetProperty;
 
-    public AnimationTrack(KeyframeSequence var1, int var2) {
-        if (var1 == null) {
+    public AnimationTrack(KeyframeSequence sequence, int property) {
+        if (sequence == null) {
             throw new NullPointerException();
-        } else if (!method14(var2)) {
+        } else if (!isValidPropertyId(property)) {
             throw new IllegalArgumentException();
-        } else if (!method595(var2, var1.getComponentCount())) {
+        } else if (!isValidComponentCount(property, sequence.getComponentCount())) {
             throw new IllegalArgumentException();
-        } else {
-            this.keyframeSequence = var1;
-            this.target = var2;
-            this.controller = null;
-            this.addReference(this.keyframeSequence);
         }
+
+        keyframeSequence = sequence;
+        targetProperty = property;
+        controller = null;
+        addReference(keyframeSequence);
     }
 
     protected boolean checkCompatible(Object3D o) {
-        switch (this.target) {
-            case 256:
+        switch (this.targetProperty) {
+            case ALPHA:
                 return o instanceof Node || o instanceof Background || o instanceof Material || o instanceof VertexBuffer;
-            case 257:
+            case AMBIENT_COLOR:
                 return o instanceof Material;
-            case 258:
+            case COLOR:
                 return o instanceof Light || o instanceof Background || o instanceof Fog || o instanceof Texture2D || o instanceof VertexBuffer;
-            case 259:
+            case CROP:
                 return o instanceof Sprite3D || o instanceof Background;
-            case 260:
+            case DENSITY:
                 return o instanceof Fog;
-            case 261:
+            case DIFFUSE_COLOR:
                 return o instanceof Material;
-            case 262:
+            case EMISSIVE_COLOR:
                 return o instanceof Material;
-            case 263:
+            case FAR_DISTANCE:
                 return o instanceof Camera || o instanceof Fog;
-            case 264:
+            case FIELD_OF_VIEW:
                 return o instanceof Camera;
-            case 265:
+            case INTENSITY:
                 return o instanceof Light;
-            case 266:
+            case MORPH_WEIGHTS:
                 return o instanceof MorphingMesh;
-            case 267:
+            case NEAR_DISTANCE:
                 return o instanceof Camera || o instanceof Fog;
-            case 268:
+            case ORIENTATION:
                 return o instanceof Transformable;
-            case 269:
+            case PICKABILITY:
                 return o instanceof Node;
-            case 270:
+            case SCALE:
                 return o instanceof Transformable;
-            case 271:
+            case SHININESS:
                 return o instanceof Material;
-            case 272:
+            case SPECULAR_COLOR:
                 return o instanceof Material;
-            case 273:
+            case SPOT_ANGLE:
                 return o instanceof Light;
-            case 274:
+            case SPOT_EXPONENT:
                 return o instanceof Light;
-            case 275:
+            case TRANSLATION:
                 return o instanceof Transformable;
-            case 276:
+            case VISIBILITY:
                 return o instanceof Node;
             default:
                 return false;
         }
     }
 
-    private static boolean method595(int var0, int var1) {
-        boolean var2 = false;
-        boolean var10000;
-        switch (var0) {
-            case 256:
-                var2 = var1 == 1;
-                return var2;
-            case 257:
-                var2 = var1 == 3;
-                return var2;
-            case 258:
-                var2 = var1 == 3;
-                return var2;
-            case 259:
-                var2 = var1 == 2 || var1 == 4;
-                return var2;
-            case 260:
-                var2 = var1 == 1;
-                return var2;
-            case 261:
-                var2 = var1 == 3;
-                return var2;
-            case 262:
-                var2 = var1 == 3;
-                return var2;
-            case 263:
-                var2 = var1 == 1;
-                return var2;
-            case 264:
-                var2 = var1 == 1;
-                return var2;
-            case 265:
-                var2 = var1 == 1;
-                return var2;
-            case 266:
-                var10000 = true;
-                break;
-            case 267:
-                var2 = var1 == 1;
-                return var2;
-            case 268:
-                var2 = var1 == 4;
-                return var2;
-            case 269:
-                var2 = var1 == 1;
-                return var2;
-            case 270:
-                var2 = var1 == 1 || var1 == 3;
-                return var2;
-            case 271:
-                var2 = var1 == 1;
-                return var2;
-            case 272:
-                var2 = var1 == 3;
-                return var2;
-            case 273:
-                var2 = var1 == 1;
-                return var2;
-            case 274:
-                var2 = var1 == 1;
-                return var2;
-            case 275:
-                var2 = var1 == 3;
-                return var2;
-            case 276:
-                var10000 = var1 == 1;
-                break;
-            default:
-                return var2;
+    private static boolean isValidPropertyId(int property) {
+        return property >= ALPHA && property <= VISIBILITY;
+    }
+
+    private static boolean isValidComponentCount(int property, int componentCount) {
+        switch (property) {
+            case ALPHA:
+                return componentCount == 1;
+            case AMBIENT_COLOR:
+                return componentCount == 3;
+            case COLOR:
+                return componentCount == 3;
+            case CROP:
+                return componentCount == 2 || componentCount == 4;
+            case DENSITY:
+                return componentCount == 1;
+            case DIFFUSE_COLOR:
+                return componentCount == 3;
+            case EMISSIVE_COLOR:
+                return componentCount == 3;
+            case FAR_DISTANCE:
+                return componentCount == 1;
+            case FIELD_OF_VIEW:
+                return componentCount == 1;
+            case INTENSITY:
+                return componentCount == 1;
+            case MORPH_WEIGHTS:
+                return true;
+            case NEAR_DISTANCE:
+                return componentCount == 1;
+            case ORIENTATION:
+                return componentCount == 4;
+            case PICKABILITY:
+                return componentCount == 1;
+            case SCALE:
+                return componentCount == 1 || componentCount == 3;
+            case SHININESS:
+                return componentCount == 1;
+            case SPECULAR_COLOR:
+                return componentCount == 3;
+            case SPOT_ANGLE:
+                return componentCount == 1;
+            case SPOT_EXPONENT:
+                return componentCount == 1;
+            case TRANSLATION:
+                return componentCount == 3;
+            case VISIBILITY:
+                return componentCount == 1;
         }
 
-        var2 = var10000;
-        return var2;
+        return false;
     }
 
-    private static boolean method14(int var0) {
-        return var0 >= 256 && var0 <= 276;
-    }
-
-    public void setController(AnimationController var1) {
-        this.removeReference(this.controller);
-        this.controller = var1;
-        this.addReference(this.controller);
+    public void setController(AnimationController controller) {
+        removeReference(this.controller);
+        this.controller = controller;
+        addReference(controller);
     }
 
     public AnimationController getController() {
-        return this.controller;
+        return controller;
     }
 
     public KeyframeSequence getKeyframeSequence() {
-        return this.keyframeSequence;
+        return keyframeSequence;
     }
 
     public int getTargetProperty() {
-        return this.target;
+        return targetProperty;
     }
 
-    protected void getContribution(int var1, float[] var2, float[] var3) {
-        if (this.controller != null && this.controller.isActive(var1)) {
-            float[] var4 = new float[this.keyframeSequence.getComponentCount()];
-            float var5 = this.controller.getPosition(var1);
-            int var6 = this.keyframeSequence.getSampleFrame(var5, var4);
-            var3[1] = (float) Math.min(var6, this.controller.timeToDeactivation(var1));
-            float var7 = this.controller.getWeight();
+    protected void getContribution(int worldTime, float[] contribution, float[] weightTime) {
+        if (controller != null && controller.isActive(worldTime)) {
+            float[] components = new float[keyframeSequence.getComponentCount()];
+            float keyframePos = controller.getPosition(worldTime);
+            int timeToKeyframeEnd = keyframeSequence.getSampleFrame(keyframePos, components);
+            float weight = controller.getWeight();
 
-            for (int var8 = 0; var8 < var4.length; ++var8) {
-                var2[var8] += var4[var8] * var7;
+            for (int i = 0; i < components.length; ++i) {
+                contribution[i] += components[i] * weight;
             }
 
-            var3[0] = var7;
+            weightTime[0] = weight;
+            weightTime[1] = (float) Math.min(timeToKeyframeEnd, controller.timeToDeactivation(worldTime));
         } else {
-            var3[0] = 0.0F;
-            var3[1] = (float) Math.max(1, this.controller == null ? Integer.MAX_VALUE : this.controller.timeToActivation(var1));
+            weightTime[0] = 0.0F;
+            weightTime[1] = (float) Math.max(1, controller == null ? Integer.MAX_VALUE : controller.timeToActivation(worldTime));
         }
     }
 }

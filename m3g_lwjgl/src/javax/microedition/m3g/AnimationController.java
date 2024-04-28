@@ -19,15 +19,15 @@ public class AnimationController extends Object3D {
     }
 
     public int getActiveIntervalStart() {
-        return this.activeIntervalStart;
+        return activeIntervalStart;
     }
 
     public int getActiveIntervalEnd() {
-        return this.activeIntervalEnd;
+        return activeIntervalEnd;
     }
 
     public void setSpeed(float speed, int worldTime) {
-        refSequenceTime = this.getPosition(worldTime);
+        refSequenceTime = getPosition(worldTime);
         refWorldTime = worldTime;
         this.speed = speed;
     }

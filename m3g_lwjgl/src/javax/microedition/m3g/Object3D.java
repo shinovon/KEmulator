@@ -8,17 +8,17 @@ public abstract class Object3D implements Cloneable {
     Vector animationTracks = new Vector();
     Vector references = new Vector();
 
-    public final int animate(int var1) {
-        int var2 = this.animation(var1);
+    public final int animate(int time) {
+        int var2 = this.animation(time);
 
         for (Object reference : this.references) {
-            var2 = Math.min(var2, ((Object3D) reference).animate(var1));
+            var2 = Math.min(var2, ((Object3D) reference).animate(time));
         }
 
         return var2;
     }
 
-    protected final int animation(int var1) {
+    protected final int animation(int time) {
         int var2 = Integer.MAX_VALUE;
         int var3 = 0;
 
@@ -30,7 +30,7 @@ public abstract class Object3D implements Cloneable {
             float var8 = 0.0F;
 
             do {
-                var4.getContribution(var1, var6, var7);
+                var4.getContribution(time, var6, var7);
                 var8 += var7[0];
                 var2 = Math.min(var2, (int) var7[1]);
                 ++var3;
