@@ -512,7 +512,12 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glDisable(GL_LIGHT0 + i);
         }
 
-        ARBColorBufferFloat.glClampColorARB(ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB, Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE);
+        if (!useGL11()) {
+            ARBColorBufferFloat.glClampColorARB(
+                    ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
+                    Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE
+            );
+        }
 
         int usedLights = 0;
         Transform tmpMat = new Transform();
