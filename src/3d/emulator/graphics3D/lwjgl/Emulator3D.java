@@ -890,7 +890,7 @@ public final class Emulator3D implements IGraphics3D {
                             texFormat = GL_RGBA;
                     }
 
-                    if(!useGL11())
+                    if (!useGL11())
                         GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
 
                     GL11.glTexImage2D(GL_TEXTURE_2D, 0,
