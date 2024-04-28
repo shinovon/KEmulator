@@ -36,7 +36,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 + "\tSensor (JSR256)\n"
                 + "\tM3G 1.1 (JSR184)\n"
                 + "\tOpenGL ES (JSR239)\n"
-                + "\tMascot Capsule"
+                + "\tMascot Capsule V3\n"
+                + "\tSoftBank MEXA"
                 ;
     }
 

@@ -33,7 +33,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 + "\tSprint 1.0\n"
                 + "\tWMA 1.0 (JSR120)\n"
                 + "\tM3G 1.1 (JSR184)\n"
-                + "\tOpenGL ES (JSR239)"
+                + "\tOpenGL ES (JSR239)\n"
+                + "\tSoftBank MEXA"
                 ;
     }
 
