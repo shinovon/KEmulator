@@ -265,7 +265,7 @@ public class Emulator {
     }
 
     public static String getAboutString() {
-        return "KEmulator nnmod " + version + "\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+        return "KEmulator nnmod\n" + version + "\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     }
 
     public static void getLibraries() {
