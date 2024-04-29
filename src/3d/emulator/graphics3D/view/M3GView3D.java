@@ -40,6 +40,7 @@ import org.eclipse.swt.opengl.GLCanvas;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 
+import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
@@ -731,14 +732,11 @@ public final class M3GView3D {
         TriangleStripArray triangleStripArray = (TriangleStripArray) indexBuffer;
         int stripCount = triangleStripArray.getStripCount();
 
-        int var9;
-        int[] var22;
         if (appearance != null && !this.xray) {
-            var9 = Emulator3D.NumTextureUnits;
             IntBuffer var10 = BufferUtils.createIntBuffer(Emulator3D.NumTextureUnits);
             GL11.glGenTextures(var10);
 
-            for (int i = 0; i < var9; ++i) {
+            for (int i = 0; i < Emulator3D.NumTextureUnits; ++i) {
                 Texture2D texture2D = appearance.getTexture(i);
                 VertexArray texCoords = vertexBuffer.getTexCoords(i, scaleBias);
 
@@ -793,7 +791,8 @@ public final class M3GView3D {
                         texFormat = GL_RGBA;
                 }
 
-//                GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
+                /*if (!useGL11())
+                    GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);*/
 
                 GL11.glTexImage2D(GL_TEXTURE_2D, 0,
                         texFormat, image2D.getWidth(), image2D.getHeight(), 0,
@@ -808,50 +807,41 @@ public final class M3GView3D {
                         texture2D.getWrappingT() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
                 );
 
-                {
-                    int levelFilter = texture2D.getLevelFilter();
-                    int imageFilter = texture2D.getImageFilter();
-                    int magFilter = 0, minFilter = 0;
-
-                    if (imageFilter == Texture2D.FILTER_NEAREST) {
-                        minFilter = magFilter = GL_NEAREST;
-
-                        if (levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_NEAREST_MIPMAP_NEAREST;
-                        else if (levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_NEAREST_MIPMAP_LINEAR;
-                    } else if (imageFilter == Texture2D.FILTER_LINEAR) {
-                        minFilter = magFilter = GL_LINEAR;
-
-                        if (levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_LINEAR_MIPMAP_NEAREST;
-                        else if (levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_LINEAR_MIPMAP_LINEAR;
-                    }
-                }
-
                 int levelFilter = texture2D.getLevelFilter();
                 int imageFilter = texture2D.getImageFilter();
 
-                int minFilter = GL_LINEAR;
-                int magFilter;
+                if (useGL11() || Settings.m3gMipmapping == Settings.MIP_OFF || true) {
+                    levelFilter = Texture2D.FILTER_BASE_LEVEL;
+                    if (!useGL11()) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
+                } else if (Settings.m3gMipmapping == Settings.MIP_LINEAR) {
+                    levelFilter = Texture2D.FILTER_NEAREST;
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
+                } else if (Settings.m3gMipmapping == Settings.MIP_TRILINEAR) {
+                    levelFilter = Texture2D.FILTER_LINEAR;
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
+                } else if (Settings.m3gMipmapping >= Settings.MIP_ANISO_2) {
+                    levelFilter = Texture2D.FILTER_LINEAR;
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2 << (Settings.m3gMipmapping - Settings.MIP_ANISO_2));
+                }
 
-                if (levelFilter == Texture2D.FILTER_BASE_LEVEL) {
-                    if (imageFilter == Texture2D.FILTER_NEAREST) {
-                        minFilter = magFilter = GL_NEAREST;
-                    } else {
-                        minFilter = magFilter = GL_LINEAR;
-                    }
-                } else if (levelFilter == Texture2D.FILTER_LINEAR) {
-                    if (imageFilter == Texture2D.FILTER_NEAREST) {
-                        magFilter = GL_LINEAR_MIPMAP_NEAREST;
-                        minFilter = GL_NEAREST;
-                    } else {
-                        magFilter = GL_LINEAR_MIPMAP_LINEAR;
-                    }
-                } else /*if (levelFilter == Texture2D.FILTER_NEAREST)*/ {
-                    if (imageFilter == Texture2D.FILTER_NEAREST) {
-                        magFilter = GL_NEAREST_MIPMAP_NEAREST;
-                        minFilter = GL_NEAREST;
-                    } else {
-                        magFilter = GL_NEAREST_MIPMAP_LINEAR;
-                    }
+                if (Settings.m3gTexFilter == Settings.TEX_FILTER_NEAREST) {
+                    imageFilter = Texture2D.FILTER_NEAREST;
+                } else if (Settings.m3gTexFilter == Settings.TEX_FILTER_LINEAR) {
+                    imageFilter = Texture2D.FILTER_LINEAR;
+                }
+
+                int magFilter = 0, minFilter = 0;
+
+                if (imageFilter == Texture2D.FILTER_NEAREST) {
+                    minFilter = magFilter = GL_NEAREST;
+
+                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                } else if (imageFilter == Texture2D.FILTER_LINEAR) {
+                    minFilter = magFilter = GL_LINEAR;
+
+                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_LINEAR_MIPMAP_LINEAR;
                 }
 
                 GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
@@ -877,11 +867,11 @@ public final class M3GView3D {
             }
 
             for (int i = 0; i < stripCount; ++i) {
-                var22 = triangleStripArray.getIndexStrip(i);
-                GL11.glDrawElements(GL_TRIANGLE_STRIP, a.getElementsBuffer(var22));
+                int[] indexStrip = triangleStripArray.getIndexStrip(i);
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, a.getElementsBuffer(indexStrip));
             }
 
-            for (int i = 0; i < var9; ++i) {
+            for (int i = 0; i < Emulator3D.NumTextureUnits; ++i) {
                 if (GL11.glIsTexture(var10.get(i))) {
                     GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
                     GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
@@ -901,7 +891,7 @@ public final class M3GView3D {
     }
 
     private static boolean useGL11() {
-        return false;
+        return useSoftwareWgl;
     }
 
     //CameraCache.camera -> camera
