@@ -370,7 +370,7 @@ public final class EmulatorScreen implements
                 win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
             }
             if (win32OSGetKeyState == null) {
-                if ((win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", Integer.TYPE)) == null)
+                if ((win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", int.class)) == null)
                     return;
             }
             for (int i = 0; i < keyboardButtonStates.length; i++) {
@@ -489,9 +489,9 @@ public final class EmulatorScreen implements
         this.screenImg = new Image(null, this.getWidth(), this.getHeight());
         final GC gc = new GC(this.screenImg);
         if (Settings.g2d == 0) {
-            this.screenImageSwt.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.getWidth(), this.getHeight());
+            this.screenImageSwt.copyToScreen(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.getWidth(), this.getHeight());
         } else if (Settings.g2d == 1) {
-            this.screenImageAwt.method13(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.getWidth(), this.getHeight());
+            this.screenImageAwt.copyToScreen(gc, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.getWidth(), this.getHeight());
         }
         if (this.pauseState == 2) {
             gc.setAlpha(100);
@@ -1554,23 +1554,17 @@ public final class EmulatorScreen implements
                     gc.setForeground(EmulatorScreen.display.getSystemColor(21));
                     gc.setFont(f);
                     gc.drawText(Emulator.getInfoString(), canvasWidth >> 3, canvasHeight >> 3, true);
-                }
-                else if (Settings.g2d == 0) {
+                } else {
+                    IImage buf = Settings.g2d == 1 ? screenCopyAwt : screenCopySwt;
                     if(x == 0 && y == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
-                        this.screenCopySwt.method13(gc, 0, 0);
+                        buf.copyToScreen(gc);
                     } else {
-                        this.screenCopySwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
-                    }
-                } else if (Settings.g2d == 1) {
-                    if(x == 0 && y == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
-                        this.screenCopyAwt.method13(gc, 0, 0);
-                    } else {
-                        this.screenCopyAwt.method13(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
+                        buf.copyToScreen(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
                     }
                 }
             } else {
                 // Hold image (paused)
-                gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, 0, 0, scaledWidth, scaledHeight);
+                gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
             }
         } catch (Exception ignored) {}
         screenX = x;

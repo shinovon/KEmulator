@@ -639,14 +639,14 @@ public final class MemoryView implements DisposeListener {
                 }
                 try {
                     if (Settings.g2d == 1) {
-                        ((emulator.graphics2D.awt.d) image.getImpl()).method13(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+                        ((emulator.graphics2D.awt.d) image.getImpl()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
                         if (this.aBoolean1135) {
-                            ((emulator.graphics2D.awt.d) image.getUsedRegion()).method13(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+                            ((emulator.graphics2D.awt.d) image.getUsedRegion()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
                         }
                     } else if (Settings.g2d == 0) {
-                        ((emulator.graphics2D.swt.ImageSWT) image.getImpl()).method13(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+                        ((emulator.graphics2D.swt.ImageSWT) image.getImpl()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
                         if (this.aBoolean1135) {
-                            ((emulator.graphics2D.swt.ImageSWT) image.getUsedRegion()).method13(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+                            ((emulator.graphics2D.swt.ImageSWT) image.getUsedRegion()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
                         }
                     }
                 } catch (Exception ignored) {

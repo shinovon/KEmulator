@@ -132,7 +132,7 @@ public final class ImageSWT implements IImage
         this.img.dispose();
     }
     
-    public final void method13(final GC gc, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
+    public final void copyToScreen(final GC gc, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
         if (this.mutable) {
             gc.drawImage(this.img, n, n2, n3, n4, n5, n6, n7, n8);
             return;
@@ -141,12 +141,12 @@ public final class ImageSWT implements IImage
         this.img.dispose();
     }
 
-    public final void method13(final GC gc, final int x, final int y) {
+    public final void copyToScreen(final GC gc) {
         if (this.mutable) {
-            gc.drawImage(this.img, x, y);
+            gc.drawImage(this.img, 0, 0);
             return;
         }
-        gc.drawImage(this.img = new Image(null, this.imgdata), x, y);
+        gc.drawImage(this.img = new Image(null, this.imgdata), 0, 0);
         this.img.dispose();
     }
     
@@ -304,7 +304,7 @@ public final class ImageSWT implements IImage
             }
         }
         try {
-            ImageIO.write(emulator.graphics2D.c.method167(this.imgdata), "png", new File(s));
+            ImageIO.write(emulator.graphics2D.c.toAwtForCapture(this.imgdata), "png", new File(s));
         }
         catch (Exception ex2) {
             ex2.printStackTrace();}
@@ -314,7 +314,7 @@ public final class ImageSWT implements IImage
         if (this.mutable) {
             this.imgdata = this.img.getImageData();
         }
-        emulator.graphics2D.c.method169(emulator.graphics2D.c.method167(this.imgdata));
+        emulator.graphics2D.c.setClipboard(emulator.graphics2D.c.toAwtForCapture(this.imgdata));
     }
     
     public final void cloneImage(final IImage image) {

@@ -12,7 +12,7 @@ public final class c
         super();
     }
     
-    public static BufferedImage method167(final ImageData imageData) {
+    public static BufferedImage toAwtForCapture(final ImageData imageData) {
         final PaletteData palette;
         if ((palette = imageData.palette).isDirect) {
             final DirectColorModel directColorModel = new DirectColorModel(imageData.depth, palette.redMask, palette.greenMask, palette.blueMask);
@@ -53,7 +53,7 @@ public final class c
         return bufferedImage2;
     }
     
-    private static ImageData method170(final BufferedImage bufferedImage) {
+    private static ImageData _awtToSwt(final BufferedImage bufferedImage) {
         if (bufferedImage.getColorModel() instanceof DirectColorModel) {
             final DirectColorModel directColorModel = (DirectColorModel)bufferedImage.getColorModel();
             final PaletteData paletteData = new PaletteData(directColorModel.getRedMask(), directColorModel.getGreenMask(), directColorModel.getBlueMask());
@@ -99,7 +99,7 @@ public final class c
         return null;
     }
     
-    public static BufferedImage method171(final ImageData imageData) {
+    public static BufferedImage toAwt(final ImageData imageData) {
         final BufferedImage bufferedImage;
         int[] data = ((DataBufferInt)(bufferedImage = new BufferedImage(imageData.width, imageData.height, 2)).getRaster().getDataBuffer()).getData();
         final int n = imageData.width * imageData.height;
@@ -148,9 +148,9 @@ public final class c
         return bufferedImage;
     }
     
-    public static ImageData method168(final BufferedImage bufferedImage) {
+    public static ImageData toSwt(final BufferedImage bufferedImage) {
         if (bufferedImage.getType() != 1) {
-            return method170(bufferedImage);
+            return _awtToSwt(bufferedImage);
         }
         final ImageData imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, c.aPaletteData354);
         final int[] data = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
@@ -164,7 +164,7 @@ public final class c
         return imageData;
     }
     
-    public static void method169(final BufferedImage bufferedImage) {
+    public static void setClipboard(final BufferedImage bufferedImage) {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new a(bufferedImage), null);
     }
     

@@ -16,11 +16,11 @@ import java.awt.image.*;
 public final class d implements IImage
 {
     private BufferedImage img;
-    private b ab6;
+    private b graphics;
     
     public d(final byte[] array) {
         super();
-        this.img = emulator.graphics2D.c.method171(new ImageData(new ByteArrayInputStream(array)));
+        this.img = emulator.graphics2D.c.toAwt(new ImageData(new ByteArrayInputStream(array)));
     }
     
     public d(final BufferedImage bi) {
@@ -40,28 +40,24 @@ public final class d implements IImage
         return this.img;
     }
     
-    public final void method12(final GC gc, final int n, final int n2) {
-        this.method13(gc, 0, 0, this.getWidth(), this.getHeight(), n, n2, this.getWidth(), this.getHeight());
-    }
-    
-    public final void method13(final GC gc, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-        final Image image = new Image(null, emulator.graphics2D.c.method168(this.img));
+    public final void copyToScreen(final GC gc, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
+        final Image image = new Image(null, emulator.graphics2D.c.toSwt(this.img));
         gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
         image.dispose();
     }
 
-    public final void method13(final GC gc, final int x, final int y) {
-        final Image image = new Image(null, emulator.graphics2D.c.method168(this.img));
-        gc.drawImage(image, x, y);
+    public final void copyToScreen(final GC gc) {
+        final Image image = new Image(null, emulator.graphics2D.c.toSwt(this.img));
+        gc.drawImage(image, 0, 0);
         image.dispose();
     }
     
     public final IGraphics2D createGraphics() {
-        return this.ab6 = new b(this.img);
+        return this.graphics = new b(this.img);
     }
     
     public final IGraphics2D getGraphics() {
-        return this.ab6;
+        return this.graphics;
     }
     
     public final int getWidth() {
@@ -84,18 +80,24 @@ public final class d implements IImage
 	        }
 	        return data;
     	} catch (ClassCastException e) {
-    		//e.printStackTrace();
-    		
+    		e.printStackTrace();
             final byte[] data = ((DataBufferByte)this.img.getRaster().getDataBuffer()).getData();
             final int[] intdata = new int[data.length];
             for(int i = 0; i < data.length; i++) {
-            	intdata[i] = data[i];
+                intdata[i] = ((data[i++] & 0xFF) << 24) +
+                        ((data[i++] & 0xFF) << 16) +
+                        ((data[i++] & 0xFF) << 8) +
+                        (data[i++] & 0xFF);
+//            	intdata[i] = data[i];
             }
             return intdata;
     	}
     }
     
     public final void setData(final int[] array) {
+        final int[] data = ((DataBufferInt)this.img.getRaster().getDataBuffer()).getData();
+        if(array.length != data.length) return;
+        System.arraycopy(array, 0, data, 0, array.length);
     }
     
     public final void setAlpha(final int n, final int n2, final int n3, final int n4, final int n5) {
@@ -128,7 +130,7 @@ public final class d implements IImage
     }
     
     public final void copyToClipBoard() {
-        emulator.graphics2D.c.method169(this.img);
+        emulator.graphics2D.c.setClipboard(this.img);
     }
     
     public final void cloneImage(final IImage image) {
