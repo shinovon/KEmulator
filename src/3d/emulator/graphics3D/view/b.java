@@ -6,7 +6,6 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.lwjgl.LWJGLUtility;
 import emulator.graphics3D.m3g.*;
 
 import java.nio.ByteBuffer;
@@ -558,7 +557,7 @@ public final class b {
             pm = new PolygonMode();
         }
 
-        GL11.glPolygonMode(GL_FRONT_AND_BACK, Settings.xrayView ? GL_LINE : GL_FILL);
+        GL11.glPolygonMode(GL_FRONT_AND_BACK, xray ? GL_LINE : GL_FILL);
 
         int var1 = pm.getCulling();
         if (var1 == PolygonMode.CULL_NONE) {
@@ -621,9 +620,9 @@ public final class b {
 
         GL11.glPolygonOffset(cm.getDepthOffsetFactor(), cm.getDepthOffsetUnits());
         if (cm.getDepthOffsetFactor() == 0.0F && cm.getDepthOffsetUnits() == 0.0F) {
-            GL11.glDisable(Settings.xrayView ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
+            GL11.glDisable(xray ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
         } else {
-            GL11.glEnable(Settings.xrayView ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
+            GL11.glEnable(xray ? GL_POLYGON_OFFSET_LINE : GL_POLYGON_OFFSET_FILL);
         }
     }
 
@@ -882,7 +881,7 @@ public final class b {
             //xray
             for (int i = 0; i < stripCount; ++i) {
                 int[] indexStrip = triangleStripArray.getIndexStrip(i);
-                GL11.glDrawElements(GL_TRIANGLE_STRIP, LWJGLUtility.getElementsBuffer(indexStrip));
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, a.getElementsBuffer(indexStrip));
             }
         }
     }
