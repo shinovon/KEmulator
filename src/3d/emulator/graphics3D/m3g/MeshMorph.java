@@ -290,7 +290,9 @@ public final class MeshMorph {
         for (int i = 0; i < boneTransList.size(); i++) {
             BoneTransform weight = (BoneTransform) boneTransList.elementAt(i);
 
-            weight.bone.getTransformTo(mesh, weight.posTrans);
+            if(!weight.bone.getTransformTo(mesh, weight.posTrans)) {
+                throw new IllegalStateException();
+            }
             weight.posTrans.postMultiply(weight.toBoneTrans);
 
             if (meshNorms != null) {
