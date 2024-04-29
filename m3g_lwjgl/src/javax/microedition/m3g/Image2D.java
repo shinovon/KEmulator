@@ -326,5 +326,6 @@ public class Image2D extends Object3D {
             var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
             var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
         }
+        ((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);
     }
 }
