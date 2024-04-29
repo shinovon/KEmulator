@@ -260,6 +260,11 @@ public final class Memory {
                 m3gReadTextures(mesh.getAppearance(i));
                 Thread.yield();
             }
+
+            if (obj instanceof SkinnedMesh) {
+                m3gReadTextures(((SkinnedMesh) mesh).getSkeleton());
+                Thread.yield();
+            }
         } else if (obj instanceof Appearance) {
             Appearance ap = (Appearance) obj;
 
