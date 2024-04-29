@@ -27,6 +27,13 @@ public final class Vector4f {
         this.w = var1.w;
     }
 
+    public Vector4f(float[] f) {
+        this.x = f[0];
+        this.y = f[1];
+        this.z = f[2];
+        this.w = f[3];
+    }
+
     public final void set(float var1, float var2, float var3, float var4) {
         this.x = var1;
         this.y = var2;
@@ -96,5 +103,30 @@ public final class Vector4f {
             this.w *= var2;
             return true;
         }
+    }
+
+    public static void mul(float[] a, float b) {
+        a[0] *= b;
+        a[1] *= b;
+        a[2] *= b;
+        a[3] *= b;
+    }
+
+    public static void sub(float[] a, float[] b) {
+        a[0] -= b[0];
+        a[1] -= b[1];
+        a[2] -= b[2];
+        a[3] -= b[3];
+    }
+
+    public static void add(float[] a, float[] b) {
+        a[0] += b[0];
+        a[1] += b[1];
+        a[2] += b[2];
+        a[3] += b[3];
+    }
+
+    public static float length(float[] a) {
+        return (float) Math.sqrt((double) (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]));
     }
 }

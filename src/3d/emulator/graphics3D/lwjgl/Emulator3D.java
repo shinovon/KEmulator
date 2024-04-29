@@ -1039,37 +1039,37 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void renderSprite(Sprite3D var1, Transform var2, float alphaFactor) {
-        Vector4f var3 = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
-        Vector4f var4 = new Vector4f(1.0F, 0.0F, 0.0F, 1.0F);
-        Vector4f var5 = new Vector4f(0.0F, 1.0F, 0.0F, 1.0F);
+        float[] var3 = new float[] {0.0F, 0.0F, 0.0F, 1.0F};
+        float[] var4 = new float[] {1.0F, 0.0F, 0.0F, 1.0F};
+        float[] var5 = new float[] {0.0F, 1.0F, 0.0F, 1.0F};
         Transform var6;
         (var6 = new Transform(CameraCache.m_model2camTransform)).postMultiply(var2);
         Transform3D impl = (Transform3D) var6.getImpl();
         impl.transform(var3);
         impl.transform(var4);
         impl.transform(var5);
-        Vector4f var7 = new Vector4f(var3);
-        var3.mul(1.0F / var3.w);
-        var4.mul(1.0F / var4.w);
-        var5.mul(1.0F / var5.w);
-        var4.sub(var3);
-        var5.sub(var3);
-        Vector4f var8 = new Vector4f(var4.length(), 0.0F, 0.0F, 0.0F);
-        Vector4f var9 = new Vector4f(0.0F, var5.length(), 0.0F, 0.0F);
-        var8.add(var7);
-        var9.add(var7);
+        float[] var7 = new float[] {var3[0], var3[1], var3[2], var3[3]};
+        Vector4f.mul(var3, 1.0F / var3[3]);
+        Vector4f.mul(var4, 1.0F / var4[3]);
+        Vector4f.mul(var5, 1.0F / var5[3]);
+        Vector4f.sub(var4, var3);
+        Vector4f.sub(var5, var3);
+        float[] var8 = new float[] {Vector4f.length(var4), 0.0F, 0.0F, 0.0F};
+        float[] var9 = new float[] {0.0F, Vector4f.length(var5), 0.0F, 0.0F};
+        Vector4f.add(var8, var7);
+        Vector4f.add(var9, var7);
         Transform var10 = new Transform();
         CameraCache.camera.getProjection(var10);
         impl = (Transform3D) var10.getImpl();
         impl.transform(var7);
         impl.transform(var8);
         impl.transform(var9);
-        if (var7.w > 0.0F && -var7.w < var7.z && var7.z <= var7.w) {
-            var7.mul(1.0F / var7.w);
-            var8.mul(1.0F / var8.w);
-            var9.mul(1.0F / var9.w);
-            var8.sub(var7);
-            var9.sub(var7);
+        if (var7[3] > 0.0F && -var7[3] < var7[2] && var7[2] <= var7[3]) {
+            Vector4f.mul(var7, 1.0F / var7[3]);
+            Vector4f.mul(var8, 1.0F / var8[3]);
+            Vector4f.mul(var9, 1.0F / var9[3]);
+            Vector4f.sub(var8, var7);
+            Vector4f.sub(var9, var7);
             boolean var11 = var1.isScaled();
             int[] var12;
             boolean var13 = (var12 = new int[]{var1.getCropX(), var1.getCropY(), var1.getCropWidth(), var1.getCropHeight()})[2] < 0;
@@ -1094,8 +1094,8 @@ public final class Emulator3D implements IGraphics3D {
                 var19 = (float) var12[2];
                 var20 = (float) var12[3];
             } else {
-                var15 = var8.length() * (float) this.viewportWidth * 0.5F;
-                var16 = var9.length() * (float) this.viewportHeight * 0.5F;
+                var15 = Vector4f.length(var8) * (float) this.viewportWidth * 0.5F;
+                var16 = Vector4f.length(var9) * (float) this.viewportHeight * 0.5F;
                 var19 = var15;
                 var20 = var16;
                 var17 = -var15 / 2.0F;
