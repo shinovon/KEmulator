@@ -912,10 +912,13 @@ public final class Emulator3D implements IGraphics3D {
 
                 if (useGL11() || Settings.m3gMipmapping == Settings.MIP_OFF) {
                     levelFilter = Texture2D.FILTER_BASE_LEVEL;
+                    if (!useGL11()) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
                 } else if (Settings.m3gMipmapping == Settings.MIP_LINEAR) {
                     levelFilter = Texture2D.FILTER_NEAREST;
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
                 } else if (Settings.m3gMipmapping == Settings.MIP_TRILINEAR) {
                     levelFilter = Texture2D.FILTER_LINEAR;
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
                 } else if (Settings.m3gMipmapping >= Settings.MIP_ANISO_2) {
                     levelFilter = Texture2D.FILTER_LINEAR;
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2 << (Settings.m3gMipmapping - Settings.MIP_ANISO_2));
