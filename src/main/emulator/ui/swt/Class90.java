@@ -237,17 +237,25 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         // TODO frametime
         float forward = moveForward * moveSpeed;
         float strafe = moveStrafe * moveSpeed;
+
+        if (forward != 0 && strafe != 0) {
+            forward /= Math.sqrt(2);
+            strafe /= Math.sqrt(2);
+        }
+
         if(forward != 0 || strafe != 0) {
             Transform t = new Transform();
             float[] m = new float[16];
             t.postTranslate(cameraX, cameraY, cameraZ);
             t.postRotateQuat(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
             t.get(m);
+
             if (forward != 0) {
                 cameraX += -m[2] * forward;
                 cameraY += -m[6] * forward;
                 cameraZ += -m[10] * forward;
-            } else {
+            }
+            if (strafe != 0) {
                 cameraX += m[0] * strafe;
                 cameraY += m[4] * strafe;
                 cameraZ += m[8] * strafe;
