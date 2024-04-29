@@ -795,20 +795,50 @@ public final class b {
                         texture2D.getWrappingT() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
                 );
 
+                {
+                    int levelFilter = texture2D.getLevelFilter();
+                    int imageFilter = texture2D.getImageFilter();
+                    int magFilter = 0, minFilter = 0;
+
+                    if (imageFilter == Texture2D.FILTER_NEAREST) {
+                        minFilter = magFilter = GL_NEAREST;
+
+                        if (levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                        else if (levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                    } else if (imageFilter == Texture2D.FILTER_LINEAR) {
+                        minFilter = magFilter = GL_LINEAR;
+
+                        if (levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                        else if (levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                    }
+                }
+
                 int levelFilter = texture2D.getLevelFilter();
                 int imageFilter = texture2D.getImageFilter();
-                int magFilter = 0, minFilter = 0;
 
-                if (imageFilter == Texture2D.FILTER_NEAREST) {
-                    minFilter = magFilter = GL_NEAREST;
+                int minFilter = GL_LINEAR;
+                int magFilter;
 
-                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_NEAREST_MIPMAP_NEAREST;
-                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_NEAREST_MIPMAP_LINEAR;
-                } else if (imageFilter == Texture2D.FILTER_LINEAR) {
-                    minFilter = magFilter = GL_LINEAR;
-
-                    if(levelFilter == Texture2D.FILTER_NEAREST) minFilter = GL_LINEAR_MIPMAP_NEAREST;
-                    else if(levelFilter == Texture2D.FILTER_LINEAR) minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                if (levelFilter == Texture2D.FILTER_BASE_LEVEL) {
+                    if (imageFilter == Texture2D.FILTER_NEAREST) {
+                        minFilter = magFilter = GL_NEAREST;
+                    } else {
+                        minFilter = magFilter = GL_LINEAR;
+                    }
+                } else if (levelFilter == Texture2D.FILTER_LINEAR) {
+                    if (imageFilter == Texture2D.FILTER_NEAREST) {
+                        magFilter = GL_LINEAR_MIPMAP_NEAREST;
+                        minFilter = GL_NEAREST;
+                    } else {
+                        magFilter = GL_LINEAR_MIPMAP_LINEAR;
+                    }
+                } else /*if (levelFilter == Texture2D.FILTER_NEAREST)*/ {
+                    if (imageFilter == Texture2D.FILTER_NEAREST) {
+                        magFilter = GL_NEAREST_MIPMAP_NEAREST;
+                        minFilter = GL_NEAREST;
+                    } else {
+                        magFilter = GL_NEAREST_MIPMAP_LINEAR;
+                    }
                 }
 
                 GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);

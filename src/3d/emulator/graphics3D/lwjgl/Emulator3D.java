@@ -932,6 +932,7 @@ public final class Emulator3D implements IGraphics3D {
 
                 int magFilter = 0, minFilter = 0;
 
+                // TODO FILTER_BASE_LEVEL
                 if (imageFilter == Texture2D.FILTER_NEAREST) {
                     minFilter = magFilter = GL_NEAREST;
 
