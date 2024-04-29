@@ -1,7 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.UILocale;
-import emulator.graphics3D.view.b;
+import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
 
@@ -29,7 +29,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private Tree aTree896;
     GLCanvas canvas;
     private Memory ana898;
-    private emulator.graphics3D.view.b m3gview;
+    private M3GView3D m3gview;
     private Camera camera;
     private Transform cameraTransform;
     private Menu aMenu908;
@@ -97,7 +97,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         this.cameraTransform = new Transform();
         this.quaternion = new Quaternion();
         this.ana898 = new Memory();
-        this.m3gview = emulator.graphics3D.view.b.getViewInstance();
+        this.m3gview = M3GView3D.getViewInstance();
     }
 
     private void method516() {
@@ -226,8 +226,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
             } else {
                 Light var2;
                 (var2 = new Light()).setMode(128);
-                b.method388();
-                b.method381(var2, null);
+                M3GView3D.method388();
+                M3GView3D.method381(var2, null);
             }
         }
         this.aRectangle903 = this.canvas.getClientArea();
@@ -271,7 +271,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         this.cameraTransform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
         this.cameraTransform.postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
 
-        emulator.graphics3D.view.b.setCamera(this.camera, this.cameraTransform);
+        M3GView3D.setCamera(this.camera, this.cameraTransform);
         m3gview.clearBackground(this.aBackground900);
         if (this.aBoolean386) {
             this.m3gview.method372(1.0F);
@@ -289,11 +289,11 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
             final Transform transform;
             (transform = new Transform()).postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
             transform.postTranslate(0.0f, 0.0f, 6.0f);
-            emulator.graphics3D.view.b.setCamera(localCamera, transform);
+            M3GView3D.setCamera(localCamera, transform);
             this.m3gview.drawAxis();
         }
         this.m3gview.setViewport(this.aRectangle903.width, this.aRectangle903.height);
-        b.swapBuffers();
+        M3GView3D.swapBuffers();
     }
 
     public void setXray(boolean b) {

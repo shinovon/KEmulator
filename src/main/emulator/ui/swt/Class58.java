@@ -1,6 +1,6 @@
 package emulator.ui.swt;
 
-import emulator.graphics3D.view.b;
+import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.widgets.*;
 
 final class Class58 implements Listener {
@@ -15,7 +15,7 @@ final class Class58 implements Listener {
         switch (event.type) {
             case 12: {
                 Class90.method243(this.aClass90_824, false);
-                b.releaseContext();
+                M3GView3D.releaseContext();
                 break;
             }
         }

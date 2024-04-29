@@ -6,6 +6,7 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
+import emulator.graphics3D.lwjgl.LWJGLUtility;
 import emulator.graphics3D.m3g.*;
 
 import java.nio.ByteBuffer;
@@ -41,15 +42,16 @@ import org.lwjgl.opengl.*;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
-public final class b {
+public final class M3GView3D {
     private static final boolean useSoftwareWgl = false;
-    private static b instance;
+    private static M3GView3D instance;
     private boolean xray;
     private int viewportWidth;
     private int viewportHeight;
-    private float aFloat586;
-    private float aFloat592;
+    private float depthRangeNear;
+    private float depthRangeFar;
     private static int anInt594;
     private static int anInt595;
     private static PIXELFORMATDESCRIPTOR aPIXELFORMATDESCRIPTOR587;
@@ -59,15 +61,15 @@ public final class b {
     private static Vector lightsTransforms = new Vector();
     private static GLCanvas glCanvas;
 
-    private b() {
+    private M3GView3D() {
         instance = this;
-        this.aFloat586 = 0.0F;
-        this.aFloat592 = 1.0F;
+        this.depthRangeNear = 0.0F;
+        this.depthRangeFar = 1.0F;
     }
 
-    public static b getViewInstance() {
+    public static M3GView3D getViewInstance() {
         if (instance == null) {
-            instance = new b();
+            instance = new M3GView3D();
         }
 
         return instance;
@@ -88,7 +90,7 @@ public final class b {
     }
 
     private void setupDepth() {
-        GL11.glDepthRange((double) this.aFloat586, (double) this.aFloat592);
+        GL11.glDepthRange((double) this.depthRangeNear, (double) this.depthRangeFar);
     }
 
     public final void clearBackground(Background var1) {
@@ -434,9 +436,9 @@ public final class b {
         GL11.glEnable(GL_SCISSOR_TEST);
         GL11.glEnable(GL_NORMALIZE);
         GL11.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        GL11.glEnable(GL_POINT_SMOOTH);
-        GL11.glEnable(GL_LINE_SMOOTH);
-        GL11.glEnable(GL_POLYGON_SMOOTH);
+        GL11.glDisable(GL_POINT_SMOOTH);
+        GL11.glDisable(GL_LINE_SMOOTH);
+        GL11.glDisable(GL_POLYGON_SMOOTH);
         GL11.glEnable(GL_DITHER);
 
         return true;
@@ -552,6 +554,7 @@ public final class b {
         this.setupFog(var1.getFog());
     }
 
+    //Settings.xrayView -> xray
     private void setupPolygonMode(PolygonMode pm) {
         if (pm == null) {
             pm = new PolygonMode();
@@ -571,9 +574,15 @@ public final class b {
         GL11.glFrontFace(pm.getWinding() == PolygonMode.WINDING_CW ? GL_CW : GL_CCW);
         GL11.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, pm.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
         GL11.glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, pm.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
-        GL11.glHint(GL_PERSPECTIVE_CORRECTION_HINT, pm.isPerspectiveCorrectionEnabled() ? GL_NICEST : GL_FASTEST);
+
+        boolean persCorrect = pm.isPerspectiveCorrectionEnabled();
+        if (Settings.m3gForcePerspectiveCorrection) persCorrect = true;
+
+        GL11.glHint(GL_PERSPECTIVE_CORRECTION_HINT, persCorrect ? GL_NICEST : GL_FASTEST);
     }
 
+    //Settings.xrayView -> xray
+    //depthBufferEnabled = true
     private void setupCompositingMode(CompositingMode cm) {
         if (cm == null) {
             cm = new CompositingMode();
@@ -626,6 +635,7 @@ public final class b {
         }
     }
 
+    //LWJGLUtility.getFloatBuffer -> a.getFloatBuffer
     private static void setupMaterial(Material mat) {
         if (mat != null) {
             GL11.glEnable(GL_LIGHTING);
@@ -656,19 +666,23 @@ public final class b {
         }
     }
 
-    private void setupFog(Fog var1) {
-        if (var1 != null && !this.xray) {
-            GL11.glEnable(2912);
-            GL11.glFogi(2917, var1.getMode() == 81 ? 9729 : 2048);
-            float[] var2;
-            G3DUtils.fillFloatColor(var2 = new float[4], var1.getColor());
-            var2[3] = 1.0F;
-            GL11.glFog(2918, a.method401(var2));
-            GL11.glFogf(2915, var1.getNearDistance());
-            GL11.glFogf(2916, var1.getFarDistance());
-            GL11.glFogf(2914, var1.getDensity());
+    //Settings.xrayView -> xray
+    //LWJGLUtility.getFloatBuffer -> a.method401
+    private void setupFog(Fog fog) {
+        if (fog != null && !xray) {
+            GL11.glEnable(GL_FOG);
+            GL11.glFogi(GL_FOG_MODE, fog.getMode() == Fog.LINEAR ? GL_LINEAR : GL_EXP);
+
+            float[] fogColor = new float[4];
+            G3DUtils.fillFloatColor(fogColor, fog.getColor());
+            fogColor[3] = 1.0F;
+            GL11.glFog(GL_FOG_COLOR, a.method401(fogColor));
+
+            GL11.glFogf(GL_FOG_START, fog.getNearDistance());
+            GL11.glFogf(GL_FOG_END, fog.getFarDistance());
+            GL11.glFogf(GL_FOG_DENSITY, fog.getDensity());
         } else {
-            GL11.glDisable(2912);
+            GL11.glDisable(GL_FOG);
         }
     }
 
@@ -886,126 +900,120 @@ public final class b {
         }
     }
 
+    private static boolean useGL11() {
+        return false;
+    }
+
+    //CameraCache.camera -> camera
+    //LWJGLUtility.getFloatBuffer -> a.method401
     private static void setupCamera() {
         if (camera != null) {
-            Transform var0 = new Transform();
-            camera.getProjection(var0);
-            var0.transpose();
-            GL11.glMatrixMode(5889);
-            GL11.glLoadMatrix(a.method401(((Transform3D) var0.getImpl()).m_matrix));
+            Transform tmpMat = new Transform();
 
-            var0.set(cameraTransform);
-            var0.transpose();
-            GL11.glMatrixMode(5888);
-            GL11.glLoadMatrix(a.method401(((Transform3D) var0.getImpl()).m_matrix));
+            camera.getProjection(tmpMat);
+            tmpMat.transpose();
+            GL11.glMatrixMode(GL_PROJECTION);
+            GL11.glLoadMatrix(a.method401(((Transform3D) tmpMat.getImpl()).m_matrix));
+
+            tmpMat.set(cameraTransform);
+            tmpMat.transpose();
+            GL11.glMatrixMode(GL_MODELVIEW);
+            GL11.glLoadMatrix(a.method401(((Transform3D) tmpMat.getImpl()).m_matrix));
         }
     }
 
-    private static void setupLights(Vector var0, Vector var1, int var2) {
-        Transform var3 = new Transform();
-        int var4;
-        if ((var4 = var0.size()) > 8) {
-            var4 = 8;
+    //LWJGLUtility.getFloatBuffer -> a.method401
+    private static void setupLights(Vector lights, Vector lightMats, int scope) {
+        for (int i = 0; i < Emulator3D.MaxLights; ++i) {
+            GL11.glDisable(GL_LIGHT0 + i);
         }
 
-        int var5;
-        for (var5 = 0; var5 < 8; ++var5) {
-            GL11.glDisable(16384 + var5);
+        if (!useGL11()) {
+            ARBColorBufferFloat.glClampColorARB(
+                    ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
+                    Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE
+            );
         }
 
-        for (var5 = 0; var5 < var4; ++var5) {
-            Light var6;
-            if (((var6 = (Light) var0.get(var5)).getScope() & var2) != 0 && RenderPipe.getInstance().isVisible(var6)) {
-                Transform var7;
-                if ((var7 = (Transform) var1.get(var5)) != null) {
-                    var3.set(var7);
-                } else {
-                    var3.setIdentity();
-                }
+        int usedLights = 0;
+        Transform tmpMat = new Transform();
 
-                var3.transpose();
-                GL11.glPushMatrix();
-                GL11.glMatrixMode(5888);
-                GL11.glMultMatrix(a.method401(((Transform3D) var3.getImpl()).m_matrix));
-                float[] var8;
-                (var8 = new float[4])[3] = 1.0F;
-                GL11.glLight(16384 + var5, 4608, a.method401(var8));
-                GL11.glLight(16384 + var5, 4609, a.method401(var8));
-                GL11.glLight(16384 + var5, 4610, a.method401(var8));
-                GL11.glLightf(16384 + var5, 4615, 1.0F);
-                GL11.glLightf(16384 + var5, 4616, 0.0F);
-                GL11.glLightf(16384 + var5, 4617, 0.0F);
-                GL11.glLightf(16384 + var5, 4614, 180.0F);
-                GL11.glLightf(16384 + var5, 4613, 0.0F);
-                int var10000;
-                short var10001;
-                float[] var10002;
-                if (var6.getMode() != 129) {
-                    var10000 = 16384 + var5;
-                    var10001 = 4611;
-                    var10002 = LightsCache.LOCAL_ORIGIN;
-                } else {
-                    var10000 = 16384 + var5;
-                    var10001 = 4611;
-                    var10002 = LightsCache.POSITIVE_Z_AXIS;
-                }
+        for (int i = 0; i < lights.size() && usedLights < Emulator3D.MaxLights; ++i) {
+            Light light = (Light) lights.get(i);
 
-                label45:
-                {
-                    GL11.glLight(var10000, var10001, a.method401(var10002));
-                    GL11.glLight(16384 + var5, 4612, a.method401(LightsCache.NEGATIVE_Z_AXIS));
-                    float var9 = var6.getIntensity();
-                    G3DUtils.fillFloatColor(var8, var6.getColor());
-                    var8[3] = 1.0F;
-                    var8[0] *= var9;
-                    var8[1] *= var9;
-                    var8[2] *= var9;
-                    float var10 = var6.getConstantAttenuation();
-                    float var11 = var6.getLinearAttenuation();
-                    float var12 = var6.getQuadraticAttenuation();
-                    float var15;
-                    switch (var6.getMode()) {
-                        case 128:
-                            GL11.glLight(16384 + var5, 4608, a.method401(var8));
-                            break label45;
-                        case 129:
-                            GL11.glLight(16384 + var5, 4609, a.method401(var8));
-                            GL11.glLight(16384 + var5, 4610, a.method401(var8));
-                            break label45;
-                        case 130:
-                            GL11.glLight(16384 + var5, 4609, a.method401(var8));
-                            GL11.glLight(16384 + var5, 4610, a.method401(var8));
-                            GL11.glLightf(16384 + var5, 4615, var10);
-                            GL11.glLightf(16384 + var5, 4616, var11);
-                            var10000 = 16384 + var5;
-                            var10001 = 4617;
-                            var15 = var12;
-                            break;
-                        case 131:
-                            GL11.glLight(16384 + var5, 4609, a.method401(var8));
-                            GL11.glLight(16384 + var5, 4610, a.method401(var8));
-                            GL11.glLightf(16384 + var5, 4615, var10);
-                            GL11.glLightf(16384 + var5, 4616, var11);
-                            GL11.glLightf(16384 + var5, 4617, var12);
-                            float var13 = var6.getSpotAngle();
-                            float var14 = var6.getSpotExponent();
-                            GL11.glLightf(16384 + var5, 4614, var13);
-                            var10000 = 16384 + var5;
-                            var10001 = 4613;
-                            var15 = var14;
-                            break;
-                        default:
-                            break label45;
-                    }
-
-                    GL11.glLightf(var10000, var10001, var15);
-                }
-
-                GL11.glEnable(16384 + var5);
-                GL11.glPopMatrix();
+            if (light == null || (light.getScope() & scope) == 0 || !RenderPipe.getInstance().isVisible(light)) {
+                continue;
             }
-        }
 
+            Transform lightMat = (Transform) lightMats.get(i);
+
+            if (lightMat != null) {
+                tmpMat.set(lightMat);
+            } else {
+                tmpMat.setIdentity();
+            }
+            tmpMat.transpose();
+
+            GL11.glPushMatrix();
+            GL11.glMatrixMode(GL_MODELVIEW);
+            GL11.glMultMatrix(a.method401(((Transform3D) tmpMat.getImpl()).m_matrix));
+
+            int lightId = GL_LIGHT0 + usedLights;
+            usedLights++;
+
+            float[] lightColor = new float[] {0, 0, 0, 1}; //rgba
+
+            //Set default light preferences?
+            GL11.glLight(lightId, GL_AMBIENT, a.method401(lightColor));
+            GL11.glLight(lightId, GL_DIFFUSE, a.method401(lightColor));
+            GL11.glLight(lightId, GL_SPECULAR, a.method401(lightColor));
+
+            GL11.glLightf(lightId, GL_CONSTANT_ATTENUATION, 1.0F);
+            GL11.glLightf(lightId, GL_LINEAR_ATTENUATION, 0.0F);
+            GL11.glLightf(lightId, GL_QUADRATIC_ATTENUATION, 0.0F);
+            GL11.glLightf(lightId, GL_SPOT_CUTOFF, 180.0F);
+            GL11.glLightf(lightId, GL_SPOT_EXPONENT, 0.0F);
+
+            float[] tmpLightPos;
+            if (light.getMode() == Light.DIRECTIONAL) {
+                tmpLightPos = LightsCache.POSITIVE_Z_AXIS; //light direction!
+            } else {
+                tmpLightPos = LightsCache.LOCAL_ORIGIN;
+            }
+
+            GL11.glLight(lightId, GL_POSITION, a.method401(tmpLightPos));
+
+            G3DUtils.fillFloatColor(lightColor, light.getColor());
+            float lightIntensity = light.getIntensity();
+            lightColor[0] *= lightIntensity;
+            lightColor[1] *= lightIntensity;
+            lightColor[2] *= lightIntensity;
+            lightColor[3] = 1.0F;
+
+            int lightMode = light.getMode();
+
+            if(lightMode == Light.AMBIENT) {
+                GL11.glLight(lightId, GL_AMBIENT, a.method401(lightColor));
+            } else {
+                GL11.glLight(lightId, GL_DIFFUSE, a.method401(lightColor));
+                GL11.glLight(lightId, GL_SPECULAR, a.method401(lightColor));
+            }
+
+            if(lightMode == Light.SPOT) {
+                GL11.glLight(lightId, GL_SPOT_DIRECTION, a.method401(LightsCache.NEGATIVE_Z_AXIS));
+                GL11.glLightf(lightId, GL_SPOT_CUTOFF, light.getSpotAngle());
+                GL11.glLightf(lightId, GL_SPOT_EXPONENT, light.getSpotExponent());
+            }
+
+            if(lightMode == Light.SPOT || lightMode == Light.OMNI) {
+                GL11.glLightf(lightId, GL_CONSTANT_ATTENUATION, light.getConstantAttenuation());
+                GL11.glLightf(lightId, GL_LINEAR_ATTENUATION, light.getLinearAttenuation());
+                GL11.glLightf(lightId, GL_QUADRATIC_ATTENUATION, light.getQuadraticAttenuation());
+            }
+
+            GL11.glEnable(lightId);
+            GL11.glPopMatrix();
+        }
     }
 
     public final void method372(float var1) {
