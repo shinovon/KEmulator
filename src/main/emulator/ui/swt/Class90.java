@@ -73,8 +73,9 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private int anInt917;
     private int anInt922;
     private float rotationX, rotationY;
-    protected float moveSpeed = 1F;
-    private int moveForward, moveStrafe;
+    protected float moveSpeed = 5F;
+    private boolean moveForward, moveBackward, moveRight, moveLeft;
+    private boolean shift, control;
     private int rotateX, rotateY;
     private long lastUpdate = 1;
 
@@ -236,8 +237,13 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private void update() {
         float deltaTime = (float) ((System.nanoTime() - lastUpdate) / 10000000000.0);
         lastUpdate = System.nanoTime();
-        float forward = moveForward * moveSpeed * deltaTime;
-        float strafe = moveStrafe * moveSpeed * deltaTime;
+
+        float tmpSpeed = moveSpeed;
+        if (shift) tmpSpeed *= 2;
+        if (control) tmpSpeed *= 0.25f;
+
+        float forward = ((moveForward?1:0) - (moveBackward?1:0)) * tmpSpeed * deltaTime;
+        float strafe = ((moveRight?1:0) - (moveLeft?1:0)) * tmpSpeed * deltaTime;
 
         if (forward != 0 && strafe != 0) {
             forward /= Math.sqrt(2);
@@ -483,16 +489,22 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         }
         switch (key) {
             case 'w':
-                moveForward = 1;
+                moveForward = true;
                 break;
             case 'a':
-                moveStrafe = -1;
+                moveLeft = true;
                 break;
             case 's':
-                moveForward = -1;
+                moveBackward = true;
                 break;
             case 'd':
-                moveStrafe = 1;
+                moveRight = true;
+                break;
+            case SWT.SHIFT:
+                shift = true;
+                break;
+            case SWT.CONTROL:
+                control = true;
                 break;
             default:
                 break;
@@ -514,12 +526,22 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
                 rotateX = 0;
                 break;
             case 'w':
-            case 's':
-                moveForward = 0;
+                moveForward = false;
                 break;
             case 'a':
+                moveLeft = false;
+                break;
+            case 's':
+                moveBackward = false;
+                break;
             case 'd':
-                moveStrafe = 0;
+                moveRight = false;
+                break;
+            case SWT.SHIFT:
+                shift = false;
+                break;
+            case SWT.CONTROL:
+                control = false;
                 break;
             default:
                 break;
@@ -749,7 +771,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
 
     public void mouseScrolled(MouseEvent mouseEvent) {
         if(mouseEvent.count == 0) return;
-        moveSpeed *= Math.pow(1.1F, mouseEvent.count > 0 ? 1 : -1);
+        moveSpeed *= Math.pow(1.15F, mouseEvent.count > 0 ? 1 : -1);
         moveSpeed = Math.max(0.01F, Math.min(1000F, moveSpeed)); // limit
         // there was zoom change
 //                Class90.method542(this.aClass90_825, event.count);
