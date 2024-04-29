@@ -56,6 +56,6 @@ final class Class56 extends MouseAdapter {
                 Class90.method535(this.aClass90_822, mouseEvent.y);
             }
         }
-        Class90.method231(this.aClass90_822).forceFocus();
+        aClass90_822.canvas.forceFocus();
     }
 }

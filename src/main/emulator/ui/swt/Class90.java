@@ -38,7 +38,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private Menu aMenu918;
     private Menu aMenu923;
     private boolean aBoolean905;
-    private boolean aBoolean909;
+    boolean aBoolean909;
     private boolean coordinateAxis;
     private boolean aBoolean386;
     private int anInt362 = 0;
@@ -578,14 +578,6 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         this.method507();
     }
 
-    static Canvas method231(final Class90 class90) {
-        return class90.canvas;
-    }
-
-    static boolean method236(final Class90 class90, final boolean aBoolean909) {
-        return class90.aBoolean909 = aBoolean909;
-    }
-
     static boolean method243(final Class90 class90, final boolean aBoolean905) {
         return class90.aBoolean905 = aBoolean905;
     }
@@ -596,10 +588,6 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
 
     static boolean method242(final Class90 class90) {
         return class90.aBoolean909;
-    }
-
-    static void method244(final Class90 class90) {
-        class90.update();
     }
 
     static int method504(final Class90 class90, final int anInt893) {
@@ -774,17 +762,17 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
 
         public final void run() {
             Class90.method243(this.aClass90_1207, aClass90_1207.m3gview.useContext(aClass90_1207.canvas));
-            while (Class90.method231(this.aClass90_1207) != null) {
-                if (Class90.method231(this.aClass90_1207).isDisposed()) {
+            while (aClass90_1207.canvas != null) {
+                if (aClass90_1207.canvas.isDisposed()) {
                     return;
                 }
                 if (Class90.method232(this.aClass90_1207) && Class90.method242(this.aClass90_1207)) {
                     try {
-                        Class90.method244(this.aClass90_1207);
+                        aClass90_1207.update();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-                    Class90.method236(this.aClass90_1207, false);
+                    this.aClass90_1207.aBoolean909 = false;
                 }
                 try {
                     Thread.sleep(10L);
@@ -806,8 +794,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         }
 
         public final void run() {
-            while (Class90.method231(this.aClass90_830) != null) {
-                if (Class90.method231(this.aClass90_830).isDisposed()) {
+            while (aClass90_830.canvas != null) {
+                if (aClass90_830.canvas.isDisposed()) {
                     return;
                 }
                 EmulatorImpl.syncExec(new Class10(this));
