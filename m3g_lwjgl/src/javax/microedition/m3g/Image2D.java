@@ -110,7 +110,7 @@ public class Image2D extends Object3D {
         }
     }
 
-    public void setRGB(int var1, int var2, int var3, int var4, byte[] var5) {
+    public void set(int var1, int var2, int var3, int var4, byte[] var5) {
         if (var5 == null) {
             throw new NullPointerException();
         } else if (this.mutable && var1 >= 0 && var2 >= 0 && var3 > 0 && var4 > 0 && var1 + var3 <= this.width && var2 + var4 <= this.height) {
