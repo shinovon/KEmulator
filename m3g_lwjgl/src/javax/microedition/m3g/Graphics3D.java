@@ -80,7 +80,7 @@ public class Graphics3D {
             setViewport(g.getClipX(), g.getClipY(), g.getClipWidth(), g.getClipHeight());
 
             if (!overwrite) {
-                if(tempBgImage == null)
+                if(tempBgImage == null || tempBgImage.getWidth() != targetW || tempBgImage.getHeight() != targetH)
                     tempBgImage = new Image2D(Image2D.RGB, new Image(g.getImage()));
                 tempBgImage.setRGB(g.getImage());
                 bck.setImage(tempBgImage);
