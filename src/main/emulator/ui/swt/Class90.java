@@ -74,9 +74,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private int anInt917;
     private int anInt922;
     private float rotationX, rotationY;
-    protected float moveSpeed = 5F;
+    protected float moveSpeed = 1F;
     private int moveForward, moveStrafe;
     private int rotateX, rotateY;
+    private float deltaTime = 1;
 
     public Class90() {
         super();
@@ -234,9 +235,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     }
 
     private void update() {
-        // TODO frametime
-        float forward = moveForward * moveSpeed;
-        float strafe = moveStrafe * moveSpeed;
+        float forward = moveForward * moveSpeed * deltaTime;
+        float strafe = moveStrafe * moveSpeed * deltaTime;
 
         if (forward != 0 && strafe != 0) {
             forward /= Math.sqrt(2);
@@ -771,6 +771,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         public final void run() {
             Class90.method243(this.aClass90_1207, aClass90_1207.m3gview.useContext(aClass90_1207.canvas));
             while (aClass90_1207.canvas != null) {
+                long startTime = System.nanoTime();
                 if (aClass90_1207.canvas.isDisposed()) {
                     return;
                 }
@@ -785,6 +786,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
                 try {
                     Thread.sleep(10L);
                 } catch (Exception ignored) {}
+                deltaTime = (float) ((System.nanoTime() - startTime) * 60.0 / 1000000000.0);
             }
         }
 
