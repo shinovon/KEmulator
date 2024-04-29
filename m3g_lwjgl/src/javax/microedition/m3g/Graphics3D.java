@@ -25,6 +25,7 @@ public class Graphics3D {
     private int viewportWidth, viewportHeight;
 
     private float depthRangeNear, depthRangeFar;
+    private Image2D tempBgImage;
 
     private Graphics3D() {
         impl = Emulator.getGraphics3D();
@@ -79,8 +80,10 @@ public class Graphics3D {
             setViewport(g.getClipX(), g.getClipY(), g.getClipWidth(), g.getClipHeight());
 
             if (!overwrite) {
-                Image2D bckImage = new Image2D(Image2D.RGB, new Image(g.getImage()));
-                bck.setImage(bckImage);
+                if(tempBgImage == null)
+                    tempBgImage = new Image2D(Image2D.RGB, new Image(g.getImage()));
+                tempBgImage.setRGB(g.getImage());
+                bck.setImage(tempBgImage);
                 bck.setCrop(this.viewportX, this.viewportY, this.viewportWidth, this.viewportHeight);
             }
         } else if (target instanceof Image2D) {

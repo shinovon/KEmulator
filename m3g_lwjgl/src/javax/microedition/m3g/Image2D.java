@@ -1,5 +1,6 @@
 package javax.microedition.m3g;
 
+import emulator.graphics2D.IImage;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
 import javax.microedition.lcdui.Image;
@@ -30,7 +31,7 @@ public class Image2D extends Object3D {
             this.height = var3.getHeight();
             this.mutable = false;
             this.type = var1;
-            this.imageData = method15(var1, var3.getImpl().getData(), var3.isMutable());
+            this.imageData = convert(var1, var3.getImpl().getData(), var3.isMutable());
         } else {
             throw new IllegalArgumentException();
         }
@@ -109,7 +110,7 @@ public class Image2D extends Object3D {
         }
     }
 
-    public void set(int var1, int var2, int var3, int var4, byte[] var5) {
+    public void setRGB(int var1, int var2, int var3, int var4, byte[] var5) {
         if (var5 == null) {
             throw new NullPointerException();
         } else if (this.mutable && var1 >= 0 && var2 >= 0 && var3 > 0 && var4 > 0 && var1 + var3 <= this.width && var2 + var4 <= this.height) {
@@ -171,18 +172,18 @@ public class Image2D extends Object3D {
         return this.imageData;
     }
 
-    private static byte[] method15(int var0, int[] var1, boolean var2) {
+    private static byte[] convert(int type, int[] data, boolean mutable) {
         byte[] var3 = null;
-        int var4 = var1.length;
+        int var4 = data.length;
         int var5;
-        if (var2) {
-            switch (var0) {
+        if (mutable) {
+            switch (type) {
                 case 96:
                 case 97:
                     var3 = new byte[var4];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5] = (byte) (((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
+                        var3[var5] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
                     }
 
                     return var3;
@@ -190,7 +191,7 @@ public class Image2D extends Object3D {
                     var3 = new byte[var4 * 2];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5 * 2] = (byte) (((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
+                        var3[var5 * 2] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
                         var3[var5 * 2 + 1] = -1;
                     }
 
@@ -199,9 +200,9 @@ public class Image2D extends Object3D {
                     var3 = new byte[var4 * 3];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5 * 3] = (byte) (var1[var5] >> 16 & 255);
-                        var3[var5 * 3 + 1] = (byte) (var1[var5] >> 8 & 255);
-                        var3[var5 * 3 + 2] = (byte) (var1[var5] & 255);
+                        var3[var5 * 3] = (byte) (data[var5] >> 16 & 255);
+                        var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
+                        var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
                     }
 
                     return var3;
@@ -209,19 +210,19 @@ public class Image2D extends Object3D {
                     var3 = new byte[var4 * 4];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5 * 4] = (byte) (var1[var5] >> 16 & 255);
-                        var3[var5 * 4 + 1] = (byte) (var1[var5] >> 8 & 255);
-                        var3[var5 * 4 + 2] = (byte) (var1[var5] & 255);
+                        var3[var5 * 4] = (byte) (data[var5] >> 16 & 255);
+                        var3[var5 * 4 + 1] = (byte) (data[var5] >> 8 & 255);
+                        var3[var5 * 4 + 2] = (byte) (data[var5] & 255);
                         var3[var5 * 4 + 3] = -1;
                     }
             }
         } else {
-            switch (var0) {
+            switch (type) {
                 case 96:
                     var3 = new byte[var4];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5] = (byte) (var1[var5] >> 24 & 255);
+                        var3[var5] = (byte) (data[var5] >> 24 & 255);
                     }
 
                     return var3;
@@ -229,7 +230,7 @@ public class Image2D extends Object3D {
                     var3 = new byte[var4];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5] = (byte) (((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
+                        var3[var5] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
                     }
 
                     return var3;
@@ -237,8 +238,8 @@ public class Image2D extends Object3D {
                     var3 = new byte[var4 * 2];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5 * 2] = (byte) (((var1[var5] >> 16 & 255) + (var1[var5] >> 8 & 255) + (var1[var5] & 255)) / 3 & 255);
-                        var3[var5 * 2 + 1] = (byte) (var1[var5] >> 24 & 255);
+                        var3[var5 * 2] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
+                        var3[var5 * 2 + 1] = (byte) (data[var5] >> 24 & 255);
                     }
 
                     return var3;
@@ -246,9 +247,9 @@ public class Image2D extends Object3D {
                     var3 = new byte[var4 * 3];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5 * 3] = (byte) (var1[var5] >> 16 & 255);
-                        var3[var5 * 3 + 1] = (byte) (var1[var5] >> 8 & 255);
-                        var3[var5 * 3 + 2] = (byte) (var1[var5] & 255);
+                        var3[var5 * 3] = (byte) (data[var5] >> 16 & 255);
+                        var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
+                        var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
                     }
 
                     return var3;
@@ -256,10 +257,10 @@ public class Image2D extends Object3D {
                     var3 = new byte[var4 * 4];
 
                     for (var5 = var4 - 1; var5 >= 0; --var5) {
-                        var3[var5 * 4] = (byte) (var1[var5] >> 16 & 255);
-                        var3[var5 * 4 + 1] = (byte) (var1[var5] >> 8 & 255);
-                        var3[var5 * 4 + 2] = (byte) (var1[var5] & 255);
-                        var3[var5 * 4 + 3] = (byte) (var1[var5] >> 24 & 255);
+                        var3[var5 * 4] = (byte) (data[var5] >> 16 & 255);
+                        var3[var5 * 4 + 1] = (byte) (data[var5] >> 8 & 255);
+                        var3[var5 * 4 + 2] = (byte) (data[var5] & 255);
+                        var3[var5 * 4 + 3] = (byte) (data[var5] >> 24 & 255);
                     }
             }
         }
@@ -311,5 +312,19 @@ public class Image2D extends Object3D {
     }
 
     public void getPalette(byte[] array) {
+    }
+
+    void setRGB(IImage image) {
+        int[] data = image.getData();
+        int var4 = data.length;
+        if(imageData == null || imageData.length != var4 * 3)
+            imageData = new byte[var4 * 3];
+        byte[] var3 = imageData;
+
+        for (int var5 = var4 - 1; var5 >= 0; --var5) {
+            var3[var5 * 3] = (byte) (data[var5] >> 16 & 255);
+            var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
+            var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
+        }
     }
 }

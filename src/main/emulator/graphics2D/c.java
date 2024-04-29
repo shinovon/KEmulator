@@ -6,8 +6,11 @@ import java.awt.*;
 
 public final class c
 {
-    private static final PaletteData aPaletteData354;
-    
+    private static final PaletteData palleteData;
+    private static int[] buffer;
+    private static BufferedImage lastImg;
+    private static ImageData imageData;
+
     public c() {
         super();
     }
@@ -152,16 +155,21 @@ public final class c
         if (bufferedImage.getType() != 1) {
             return _awtToSwt(bufferedImage);
         }
-        final ImageData imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, c.aPaletteData354);
-        final int[] data = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
-        int n = imageData.data.length - 1;
-        for (int i = data.length - 1; i >= 0; --i) {
-            imageData.data[n--] = (byte)(data[i] >> 24 & 0xFF);
-            imageData.data[n--] = (byte)(data[i] >> 16 & 0xFF);
-            imageData.data[n--] = (byte)(data[i] >> 8 & 0xFF);
-            imageData.data[n--] = (byte)(data[i] & 0xFF);
+        if(buffer == null || bufferedImage != lastImg) {
+            imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, c.palleteData);
+            buffer = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
+            lastImg = bufferedImage;
         }
-        return imageData;
+        ImageData data = c.imageData;
+        int[] buf = c.buffer;
+        int n = data.data.length - 1;
+        for (int i = buf.length - 1; i >= 0; --i) {
+            data.data[n--] = (byte)(buf[i] >> 24 & 0xFF);
+            data.data[n--] = (byte)(buf[i] >> 16 & 0xFF);
+            data.data[n--] = (byte)(buf[i] >> 8 & 0xFF);
+            data.data[n--] = (byte)(buf[i] & 0xFF);
+        }
+        return data;
     }
     
     public static void setClipboard(final BufferedImage bufferedImage) {
@@ -169,6 +177,6 @@ public final class c
     }
     
     static {
-        aPaletteData354 = new PaletteData(65280, 16711680, -16777216);
+        palleteData = new PaletteData(65280, 16711680, -16777216);
     }
 }

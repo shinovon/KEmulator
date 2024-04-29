@@ -17,7 +17,8 @@ public final class d implements IImage
 {
     private BufferedImage img;
     private b graphics;
-    
+    private int[] data;
+
     public d(final byte[] array) {
         super();
         this.img = emulator.graphics2D.c.toAwt(new ImageData(new ByteArrayInputStream(array)));
@@ -70,12 +71,10 @@ public final class d implements IImage
     
     public final int[] getData() {
     	try {
-	        final int[] data = ((DataBufferInt)this.img.getRaster().getDataBuffer()).getData();
+	        final int[] data = getInternalData();
 	        if (!this.img.getColorModel().hasAlpha()) {
 	            for (int i = data.length - 1; i >= 0; --i) {
-	                final int[] array = data;
-	                final int n = i;
-	                array[n] |= 0xFF000000;
+	                data[i] |= 0xFF000000;
 	            }
 	        }
 	        return data;
@@ -95,7 +94,7 @@ public final class d implements IImage
     }
     
     public final void setData(final int[] array) {
-        final int[] data = ((DataBufferInt)this.img.getRaster().getDataBuffer()).getData();
+        final int[] data = getInternalData();
         if(array.length != data.length) return;
         System.arraycopy(array, 0, data, 0, array.length);
     }
@@ -107,7 +106,7 @@ public final class d implements IImage
             graphics.fillRect(n, n2, n3, n4);
             return;
         }
-        final int[] data = ((DataBufferInt)this.img.getRaster().getDataBuffer()).getData();
+        final int[] data = this.data != null ? this.data : ((DataBufferInt)this.img.getRaster().getDataBuffer()).getData();
         final int[] array = new int[n3];
         for (int i = 0; i < n3; ++i) {
             array[i] = n5 << 24;
@@ -124,9 +123,9 @@ public final class d implements IImage
     public final void saveToFile(final String s) {
         try {
             ImageIO.write(this.img, "png", new File(s));
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        catch (Exception ex) {
-            ex.printStackTrace();}
     }
     
     public final void copyToClipBoard() {
@@ -134,15 +133,20 @@ public final class d implements IImage
     }
     
     public final void cloneImage(final IImage image) {
-        final int[] data = ((DataBufferInt)this.img.getRaster().getDataBuffer()).getData();
-        System.arraycopy(data, 0, ((DataBufferInt)((d)image).getBufferedImage().getRaster().getDataBuffer()).getData(), 0, data.length);
+        System.arraycopy(getInternalData(), 0, ((d)image).getInternalData(), 0, data.length);
     }
 
-	public int size() {
-		return img.getData().getDataBuffer().getSize();
+    private int[] getInternalData() {
+        if(data == null) {
+            data = ((DataBufferInt) this.img.getRaster().getDataBuffer()).getData();
+        }
+        return data;
+    }
+
+    public int size() {
+		return getInternalData().length;
 	}
 
-	@Override
 	public Object getNative() {
 		return getBufferedImage();
 	}
