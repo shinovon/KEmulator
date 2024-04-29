@@ -10,40 +10,42 @@ import java.util.Vector;
 public class SkinnedMesh extends Mesh {
     Group skeleton;
 
-    public Vector<BoneTransform> m_transforms;
-    public BoneTransform[] vtxBones;
+    public Vector<BoneTransform> boneTransList;
+    public int[] vtxBones; //0 - no bone, 1+ - bone from list
     public int[] vtxWeights;
 
-    public SkinnedMesh(VertexBuffer var1, IndexBuffer var2, Appearance var3, Group var4) {
-        super(var1, var2, var3);
-        if (var4 == null) {
+    public SkinnedMesh(VertexBuffer vertices, IndexBuffer submesh, Appearance appearance, Group skeleton) {
+        super(vertices, submesh, appearance);
+        if (skeleton == null) {
             throw new NullPointerException();
-        } else if (!(var4 instanceof World) && var4.getParent() == null) {
-            this.skeleton = var4;
-            this.skeleton.parent = this;
-            this.addReference(this.skeleton);
-            this.m_transforms = new Vector();
-
-            vtxBones = new BoneTransform[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
-            vtxWeights = new int[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
-        } else {
+        } else if (skeleton instanceof World || skeleton.getParent() != null) {
             throw new IllegalArgumentException();
         }
+
+        this.skeleton = skeleton;
+        this.skeleton.parent = this;
+        this.addReference(this.skeleton);
+        this.boneTransList = new Vector();
+
+        vtxBones = new int[vertices.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
+        vtxWeights = new int[vertices.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
     }
 
-    public SkinnedMesh(VertexBuffer var1, IndexBuffer[] var2, Appearance[] var3, Group var4) {
-        super(var1, var2, var3);
-        if (!(var4 instanceof World) && var4.getParent() == null) {
-            this.skeleton = var4;
-            this.skeleton.parent = this;
-            this.addReference(this.skeleton);
-            this.m_transforms = new Vector();
-
-            vtxBones = new BoneTransform[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
-            vtxWeights = new int[var1.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
-        } else {
+    public SkinnedMesh(VertexBuffer vertices, IndexBuffer[] submeshes, Appearance[] appearances, Group skeleton) {
+        super(vertices, submeshes, appearances);
+        if (skeleton == null) {
+            throw new NullPointerException();
+        } else if (skeleton instanceof World || skeleton.getParent() != null) {
             throw new IllegalArgumentException();
         }
+
+        this.skeleton = skeleton;
+        this.skeleton.parent = this;
+        this.addReference(this.skeleton);
+        this.boneTransList = new Vector();
+
+        vtxBones = new int[vertices.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
+        vtxWeights = new int[vertices.getVertexCount() * Emulator3D.MaxTransformsPerVertex];
     }
 
     public Group getSkeleton() {
@@ -51,14 +53,51 @@ public class SkinnedMesh extends Mesh {
     }
 
     protected Object3D duplicateObject() {
-        SkinnedMesh var1;
-        Group var2 = (Group) (var1 = (SkinnedMesh) super.duplicateObject()).getSkeleton().duplicateObject();
-        var1.removeReference(var1.skeleton);
-        var2.parent = var1;
-        var1.skeleton = var2;
-        var1.addReference(var2);
-        var1.m_transforms = (Vector) this.m_transforms.clone();
-        return var1;
+        SkinnedMesh clone = (SkinnedMesh) super.duplicateObject();
+
+        Group newSkeleton = (Group) clone.getSkeleton().duplicateObject();
+        clone.removeReference(clone.skeleton);
+        clone.addReference(newSkeleton);
+        clone.skeleton = newSkeleton;
+        newSkeleton.parent = clone;
+
+        Hashtable<Node, Node> oldToNewBone = new Hashtable<>();
+        getOldToNewBonesMapping(oldToNewBone, skeleton, newSkeleton);
+
+        clone.boneTransList = new Vector();
+
+        for (int i = 0; i < boneTransList.size(); i++) {
+            BoneTransform oldBoneTrans = boneTransList.elementAt(i);
+            BoneTransform newBoneTrans = new BoneTransform(oldToNewBone.get(oldBoneTrans.bone), oldBoneTrans.toBoneTrans);
+
+            clone.boneTransList.add(newBoneTrans);
+        }
+
+        clone.vtxBones = vtxBones.clone();
+        clone.vtxWeights = vtxWeights.clone();
+
+        return clone;
+    }
+
+    private void getOldToNewBonesMapping(Hashtable map, Node oldNode, Node newNode) {
+        map.put(oldNode, newNode);
+
+        if (oldNode instanceof Group) {
+            Group oldGroup = (Group) oldNode;
+            Group newGroup = (Group) newNode;
+
+            for (int i = 0; i < oldGroup.getChildCount(); i++) {
+                Node oldChild = oldGroup.getChild(i);
+                Node newChild = newGroup.getChild(i);
+
+                getOldToNewBonesMapping(map, oldChild, newChild);
+            }
+        } else if (oldNode instanceof SkinnedMesh) {
+            Group oldSkeleton = ((SkinnedMesh) oldNode).getSkeleton();
+            Group newSkeleton = ((SkinnedMesh) newNode).getSkeleton();
+
+            getOldToNewBonesMapping(map, oldSkeleton, newSkeleton);
+        }
     }
 
     public void addTransform(Node bone, int weight, int firstVertex, int numVertices) {
@@ -72,12 +111,14 @@ public class SkinnedMesh extends Mesh {
             }
 
             BoneTransform boneTrans = null;
+            int boneTransId = -1;
 
-            for (int i = 0; i < m_transforms.size(); i++) {
-                BoneTransform tmpBoneTrans = m_transforms.elementAt(i);
+            for (int i = 0; i < boneTransList.size(); i++) {
+                BoneTransform tmpBoneTrans = boneTransList.elementAt(i);
 
                 if (tmpBoneTrans.bone == bone) {
                     boneTrans = tmpBoneTrans;
+                    boneTransId = i;
                     break;
                 }
             }
@@ -89,7 +130,8 @@ public class SkinnedMesh extends Mesh {
                 }
 
                 boneTrans = new BoneTransform(bone, toBoneTrans);
-                m_transforms.add(boneTrans);
+                boneTransList.add(boneTrans);
+                boneTransId = boneTransList.size() - 1;
             }
 
             for (int i = firstVertex; i < firstVertex + numVertices; i++) {
@@ -112,7 +154,7 @@ public class SkinnedMesh extends Mesh {
                 if (minWeight > weight) selSlot = -1;
 
                 if (selSlot != -1) {
-                    vtxBones[i * Emulator3D.MaxTransformsPerVertex + selSlot] = boneTrans;
+                    vtxBones[i * Emulator3D.MaxTransformsPerVertex + selSlot] = boneTransId + 1;
                     vtxWeights[i * Emulator3D.MaxTransformsPerVertex + selSlot] = weight;
                 }
             }
@@ -138,10 +180,10 @@ public class SkinnedMesh extends Mesh {
     }
 
     public Vector getTransforms() {
-        return m_transforms;
+        return boneTransList;
     }
 
-    public Object[] getVerticesBones() {
+    public int[] getVerticesBones() {
         return vtxBones;
     }
 

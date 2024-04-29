@@ -5,21 +5,24 @@ import emulator.graphics3D.Vector4f;
 import java.util.Vector;
 
 public class Group extends Node {
-    Vector aVector931 = new Vector();
+    Vector children = new Vector();
 
     protected Object3D duplicateObject() {
-        Group var1;
-        (var1 = (Group) super.duplicateObject()).aVector931 = (Vector) this.aVector931.clone();
+        Group clone = (Group) super.duplicateObject();
+        clone.children = (Vector) children.clone();
 
-        for (int var2 = var1.getChildCount() - 1; var2 >= 0; --var2) {
-            var1.removeReference(var1.getChild(var2));
-            Node var3;
-            (var3 = (Node) var1.getChild(var2).duplicateObject()).parent = var1;
-            var1.aVector931.set(var2, var3);
-            var1.addReference(var3);
+        for (int i = clone.getChildCount() - 1; i >= 0; --i) {
+            Node oldChild = clone.getChild(i);
+            Node newChild = (Node) clone.getChild(i).duplicateObject();
+
+            clone.removeReference(oldChild);
+            clone.addReference(newChild);
+
+            newChild.parent = clone;
+            clone.children.set(i, newChild);
         }
 
-        return var1;
+        return clone;
     }
 
     public void addChild(Node var1) {
@@ -34,8 +37,8 @@ public class Group extends Node {
         } else if (var1.isParentOf(this)) {
             throw new IllegalArgumentException("child is an ancestor of this Group");
         } else {
-            if (!this.aVector931.contains(var1)) {
-                this.aVector931.add(var1);
+            if (!this.children.contains(var1)) {
+                this.children.add(var1);
                 var1.parent = this;
                 this.addReference(var1);
             }
@@ -48,9 +51,9 @@ public class Group extends Node {
             if (var1.isSkinnedMeshBone()) {
                 throw new IllegalArgumentException();
             } else {
-                var1.parent = null;
-                if (this.aVector931.contains(var1)) {
-                    this.aVector931.remove(var1);
+                if (this.children.contains(var1)) {
+                    this.children.remove(var1);
+                    var1.parent = null;
                     this.removeReference(var1);
                 }
             }
@@ -58,12 +61,12 @@ public class Group extends Node {
     }
 
     public int getChildCount() {
-        return this.aVector931.size();
+        return this.children.size();
     }
 
     public Node getChild(int var1) {
         if (var1 >= 0 && var1 < this.getChildCount()) {
-            return (Node) this.aVector931.get(var1);
+            return (Node) this.children.get(var1);
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -72,8 +75,8 @@ public class Group extends Node {
     protected void alignment(Node var1) {
         super.alignment(var1);
 
-        for (int var2 = 0; var2 < this.aVector931.size(); ++var2) {
-            ((Node) this.aVector931.get(var2)).alignment(var1);
+        for (int var2 = 0; var2 < this.children.size(); ++var2) {
+            ((Node) this.children.get(var2)).alignment(var1);
         }
 
     }
@@ -145,9 +148,9 @@ public class Group extends Node {
         Transform var6 = new Transform();
         Transform var7 = new Transform();
 
-        for (int var8 = 0; var8 < this.aVector931.size(); ++var8) {
+        for (int var8 = 0; var8 < this.children.size(); ++var8) {
             Node var9;
-            if (((var9 = (Node) this.aVector931.get(var8)) instanceof Group || (var9.getScope() & var1) != 0) && var9.isPickable(var3.getRoot())) {
+            if (((var9 = (Node) this.children.get(var8)) instanceof Group || (var9.getScope() & var1) != 0) && var9.isPickable(var3.getRoot())) {
                 var6.set(var4);
                 var9.getCompositeTransform(var7);
                 var6.postMultiply(var7);
@@ -163,8 +166,8 @@ public class Group extends Node {
     protected void updateAlignReferences() {
         super.updateAlignReferences();
 
-        for (int var1 = 0; var1 < this.aVector931.size(); ++var1) {
-            ((Node) this.aVector931.get(var1)).updateAlignReferences();
+        for (int var1 = 0; var1 < this.children.size(); ++var1) {
+            ((Node) this.children.get(var1)).updateAlignReferences();
         }
 
     }
@@ -172,8 +175,8 @@ public class Group extends Node {
     protected void clearAlignReferences() {
         super.clearAlignReferences();
 
-        for (int var1 = 0; var1 < this.aVector931.size(); ++var1) {
-            ((Node) this.aVector931.get(var1)).clearAlignReferences();
+        for (int var1 = 0; var1 < this.children.size(); ++var1) {
+            ((Node) this.children.get(var1)).clearAlignReferences();
         }
 
     }

@@ -6,11 +6,7 @@ import emulator.graphics3D.lwjgl.Emulator3D;
 
 import java.util.Hashtable;
 import java.util.Vector;
-import javax.microedition.m3g.Mesh;
-import javax.microedition.m3g.MorphingMesh;
-import javax.microedition.m3g.SkinnedMesh;
-import javax.microedition.m3g.VertexArray;
-import javax.microedition.m3g.VertexBuffer;
+import javax.microedition.m3g.*;
 
 public final class MeshMorph {
     private static MeshMorph inst;
@@ -304,7 +300,7 @@ public final class MeshMorph {
             }
         }
 
-        BoneTransform[] vtxBones = (BoneTransform[]) mesh.getVerticesBones();
+        int[] vtxBones = mesh.getVerticesBones();
         int[] vtxWeights = mesh.getVerticesWeights();
 
         short[] shortPoses = meshPoses.getShortValues();
@@ -326,9 +322,11 @@ public final class MeshMorph {
             float weightSumm = 0;
 
             for (int slot = 0; slot < Emulator3D.MaxTransformsPerVertex; slot++) {
-                BoneTransform boneTrans = vtxBones[i * Emulator3D.MaxTransformsPerVertex + slot];
+                int boneTransId = vtxBones[i * Emulator3D.MaxTransformsPerVertex + slot];
 
-                if (boneTrans == null) break; //no more active bone slots
+                if (boneTransId == 0) break; //no more active bone slots
+
+                BoneTransform boneTrans = (BoneTransform) boneTransList.elementAt(boneTransId - 1);
 
                 int boneWeight = vtxWeights[i * Emulator3D.MaxTransformsPerVertex + slot];
                 weightSumm += boneWeight;

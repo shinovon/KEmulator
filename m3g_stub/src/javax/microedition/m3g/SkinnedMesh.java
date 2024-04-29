@@ -28,7 +28,7 @@ public class SkinnedMesh
         return null;
     }
 
-    public Object[] getVerticesBones() { return null; }
+    public int[] getVerticesBones() { return null; }
 
     public int[] getVerticesWeights() { return null; }
 }
