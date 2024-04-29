@@ -360,20 +360,21 @@ public final class EmulatorScreen implements
     public synchronized void pollKeyboard(Canvas canvas) {
         if (!win || canvas == null || canvas.isDisposed()) return;
         long now = System.currentTimeMillis();
-        if (now - lastPollTime < 10) return;
-        lastPollTime = now;
         Shell shell = canvas.getShell();
+        if(shell == this.shell) {
+            if (now - lastPollTime < 10) return;
+            lastPollTime = now;
+        }
         final boolean active = canvas.getDisplay().getActiveShell() == shell &&
                 shell.isVisible() &&
                 canvas.isFocusControl();
+        if(!active) return;
         try {
-            if (win32OS == null) {
+            if (win32OS == null)
                 win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
-            }
-            if (win32OSGetKeyState == null) {
-                if ((win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", int.class)) == null)
+            if (win32OSGetKeyState == null &&
+                (win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", int.class)) == null)
                     return;
-            }
             for (int i = 0; i < keyboardButtonStates.length; i++) {
                 lastKeyboardButtonStates[i] = keyboardButtonStates[i];
                 short keyState = (short) win32OSGetKeyState.invoke(null, i);
@@ -1752,6 +1753,7 @@ public final class EmulatorScreen implements
         n = key(n);
         if(!screen) {
             ((EmulatorImpl) Emulator.getEmulator()).getM3GView().keyReleased(n);
+            return;
         }
         if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
