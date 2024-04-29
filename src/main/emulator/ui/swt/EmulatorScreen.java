@@ -362,6 +362,7 @@ public final class EmulatorScreen implements
         long now = System.currentTimeMillis();
         if (now - lastPollTime < 10) return;
         lastPollTime = now;
+        Shell shell = canvas.getShell();
         final boolean active = canvas.getDisplay().getActiveShell() == shell &&
                 shell.isVisible() &&
                 canvas.isFocusControl();
@@ -387,7 +388,7 @@ public final class EmulatorScreen implements
                 } else if (!pressed) {
                     keyboardButtonStates[i] = false;
                     keyboardButtonHoldTimes[i] = 0;
-                    onKeyUp(i);
+                    onKeyUp(i, shell == this.shell);
                 }
                 if (lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
                     if (keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
@@ -1747,8 +1748,11 @@ public final class EmulatorScreen implements
         Emulator.getEventQueue().keyRelease(n);
     }
 
-    private void onKeyUp(int n) {
+    private void onKeyUp(int n, boolean screen) {
         n = key(n);
+        if(!screen) {
+            ((EmulatorImpl) Emulator.getEmulator()).getM3GView().keyReleased(n);
+        }
         if (n <= 0 || this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
         }

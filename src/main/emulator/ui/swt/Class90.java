@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.UILocale;
 import emulator.graphics3D.view.b;
 import org.eclipse.swt.SWT;
@@ -27,7 +28,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private Menu aMenu895;
     private Composite aComposite907;
     private Tree aTree896;
-    private GLCanvas canvas;
+    GLCanvas canvas;
     private Memory ana898;
     private emulator.graphics3D.view.b m3gview;
     private Camera camera;
@@ -72,9 +73,10 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private MenuItem aMenuItem938;
     private int anInt917;
     private int anInt922;
-    private float rotationX;
-    private float rotationY;
+    private float rotationX, rotationY;
     protected float moveSpeed = 5F;
+    private int moveForward, moveStrafe;
+    private int rotateX, rotateY;
 
     public Class90() {
         super();
@@ -231,7 +233,28 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         this.aRectangle903 = this.canvas.getClientArea();
     }
 
-    private void method540() {
+    private void update() {
+        // TODO frametime
+        float forward = moveForward * moveSpeed;
+        float strafe = moveStrafe * moveSpeed;
+        if(forward != 0 || strafe != 0) {
+            Transform t = new Transform();
+            float[] m = new float[16];
+            t.postTranslate(cameraX, cameraY, cameraZ);
+            t.postRotateQuat(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+            t.get(m);
+            if (forward != 0) {
+                cameraX += -m[2] * forward;
+                cameraY += -m[6] * forward;
+                cameraZ += -m[10] * forward;
+            } else {
+                cameraX += m[0] * strafe;
+                cameraY += m[4] * strafe;
+                cameraZ += m[8] * strafe;
+            }
+        }
+        // TODO camera rotation
+
         if (!m3gview.isCurrent()) {
             this.m3gview.setCurrent();
         }
@@ -434,6 +457,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
                     x = -1;
                     break;
             }
+
             rotationX += x * 5F;
             rotationY += y * 5F;
 
@@ -448,44 +472,49 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
             quaternion.mul(var5);
             return;
         }
-        float forward = 0f;
-        float strafe = 0f;
         switch (key) {
             case 'w':
-                forward = 1;
+                moveForward = 1;
                 break;
             case 'a':
-                strafe = -1;
+                moveStrafe = -1;
                 break;
             case 's':
-                forward = -1;
+                moveForward = -1;
                 break;
             case 'd':
-                strafe = 1;
+                moveStrafe = 1;
                 break;
             default:
                 break;
         }
-        forward *= moveSpeed;
-        strafe *= moveSpeed;
-        Transform t = new Transform();
-        float[] m = new float[16];
-        t.postTranslate(cameraX, cameraY, cameraZ);
-        t.postRotateQuat(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-        t.get(m);
-        if (forward != 0) {
-            cameraX += -m[2] * forward;
-            cameraY += -m[6] * forward;
-            cameraZ += -m[10] * forward;
-        } else {
-            cameraX += m[0] * strafe;
-            cameraY += m[4] * strafe;
-            cameraZ += m[8] * strafe;
-        }
     }
 
     public void keyReleased(KeyEvent keyEvent) {
+        keyReleased(keyEvent.keyCode);
+    }
 
+    public void keyReleased(int key) {
+        switch (key) {
+            case SWT.ARROW_UP:
+            case SWT.ARROW_DOWN:
+                rotateY = 0;
+                break;
+            case SWT.ARROW_LEFT:
+            case SWT.ARROW_RIGHT:
+                rotateX = 0;
+                break;
+            case 'w':
+            case 's':
+                moveForward = 0;
+                break;
+            case 'a':
+            case 'd':
+                moveStrafe = 0;
+                break;
+            default:
+                break;
+        }
     }
 
     private void method492(final int x, final int y) {
@@ -570,7 +599,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     }
 
     static void method244(final Class90 class90) {
-        class90.method540();
+        class90.update();
     }
 
     static int method504(final Class90 class90, final int anInt893) {
@@ -769,7 +798,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     }
 
     final static class Refresher implements Runnable {
-        private final Class90 aClass90_830;
+        final Class90 aClass90_830;
 
         private Refresher(final Class90 aClass90_830) {
             super();
@@ -790,10 +819,6 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
 
         Refresher(final Class90 class90, final Class122 class91) {
             this(class90);
-        }
-
-        public static Class90 method464(final Refresher refresher) {
-            return refresher.aClass90_830;
         }
     }
 }

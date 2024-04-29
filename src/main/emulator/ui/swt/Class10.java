@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 
@@ -17,18 +18,20 @@ final class Class10 implements Runnable {
     }
 
     public final void run() {
-
         try {
-            if (Class90.method232(Class90.Refresher.method464(this.a))) {
-                if (!Class90.method242(Class90.Refresher.method464(this.a))) {
-                    Class90.method511(Class90.Refresher.method464(this.a));
-                    Class90.method236(Class90.Refresher.method464(this.a), true);
+            if(a.aClass90_830.canvas != null) {
+                ((EmulatorScreen) Emulator.getEmulator().getScreen()).pollKeyboard(a.aClass90_830.canvas);
+            }
+            if (Class90.method232(a.aClass90_830)) {
+                if (!Class90.method242(a.aClass90_830)) {
+                    Class90.method511(a.aClass90_830);
+                    Class90.method236(a.aClass90_830, true);
                     return;
                 }
             } else {
-                final Rectangle clientArea = Class90.method231(Class90.Refresher.method464(this.a)).getClientArea();
+                final Rectangle clientArea = Class90.method231(a.aClass90_830).getClientArea();
                 final GC gc;
-                (gc = new GC(Class90.method231(Class90.Refresher.method464(this.a)))).setBackground(Display.getCurrent().getSystemColor(2));
+                (gc = new GC(Class90.method231(a.aClass90_830))).setBackground(Display.getCurrent().getSystemColor(2));
                 gc.fillRectangle(clientArea);
                 gc.setForeground(Display.getCurrent().getSystemColor(3));
                 gc.drawString("M3GView init .....", clientArea.width >> 2, clientArea.height >> 2, true);
