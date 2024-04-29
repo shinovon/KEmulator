@@ -118,13 +118,13 @@ public class Texture2D extends Transformable {
         return this.blendColor;
     }
 
-    protected void updateProperty(int var1, float[] var2) {
-        switch (var1) {
+    protected void updateProperty(int property, float[] values) {
+        switch (property) {
             case 258:
-                this.blendColor = G3DUtils.getIntColor(var2);
+                this.blendColor = G3DUtils.getIntColor(values);
                 return;
             default:
-                super.updateProperty(var1, var2);
+                super.updateProperty(property, values);
         }
     }
 }

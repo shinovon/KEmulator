@@ -98,15 +98,15 @@ public class MorphingMesh extends Mesh {
         }
     }
 
-    protected void updateProperty(int var1, float[] var2) {
-        switch (var1) {
+    protected void updateProperty(int property, float[] values) {
+        switch (property) {
             case 266:
                 this.m_baseWeight = 1.0F;
 
                 for (int var3 = 0; var3 < this.weights.length; ++var3) {
-                    if (var3 < var2.length) {
-                        this.weights[var3] = var2[var3];
-                        this.m_baseWeight -= var2[var3];
+                    if (var3 < values.length) {
+                        this.weights[var3] = values[var3];
+                        this.m_baseWeight -= values[var3];
                     } else {
                         this.weights[var3] = 0.0F;
                     }
@@ -114,7 +114,7 @@ public class MorphingMesh extends Mesh {
 
                 return;
             default:
-                super.updateProperty(var1, var2);
+                super.updateProperty(property, values);
         }
     }
 

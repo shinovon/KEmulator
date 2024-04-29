@@ -109,26 +109,26 @@ public class Camera extends Node {
         }
     }
 
-    protected void updateProperty(int var1, float[] var2) {
+    protected void updateProperty(int property, float[] values) {
         if (this.projection != 48) {
-            switch (var1) {
+            switch (property) {
                 case 263:
-                    this.aFloatArray918[3] = this.projection != 50 ? var2[0] : G3DUtils.limitPositive(var2[0]);
+                    this.aFloatArray918[3] = this.projection != 50 ? values[0] : G3DUtils.limitPositive(values[0]);
                     return;
                 case 264:
-                    this.aFloatArray918[0] = this.projection != 50 ? G3DUtils.limitPositive(var2[0]) : G3DUtils.limit(var2[0], 0.0F, 180.0F);
+                    this.aFloatArray918[0] = this.projection != 50 ? G3DUtils.limitPositive(values[0]) : G3DUtils.limit(values[0], 0.0F, 180.0F);
                     return;
                 case 265:
                 case 266:
                 default:
                     break;
                 case 267:
-                    this.aFloatArray918[2] = this.projection != 50 ? var2[0] : G3DUtils.limitPositive(var2[0]);
+                    this.aFloatArray918[2] = this.projection != 50 ? values[0] : G3DUtils.limitPositive(values[0]);
                     return;
             }
         }
 
-        super.updateProperty(var1, var2);
+        super.updateProperty(property, values);
     }
 
     protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {

@@ -229,7 +229,7 @@ public abstract class Node extends Transformable {
             }
 
             if (this.zTarget != 144 || this.yTarget != 144) {
-                super.ana864.set(var10);
+                super.rotation.set(var10);
             }
 
         } else {
@@ -288,19 +288,19 @@ public abstract class Node extends Transformable {
         }
     }
 
-    protected void updateProperty(int var1, float[] var2) {
-        switch (var1) {
+    protected void updateProperty(int property, float[] values) {
+        switch (property) {
             case 256:
-                this.alphaFactor = G3DUtils.limit(var2[0], 0.0F, 1.0F);
+                this.alphaFactor = G3DUtils.limit(values[0], 0.0F, 1.0F);
                 return;
             case 269:
-                this.pickingEnable = var2[0] >= 0.5F;
+                this.pickingEnable = values[0] >= 0.5F;
                 return;
             case 276:
-                this.renderingEnable = var2[0] >= 0.5F;
+                this.renderingEnable = values[0] >= 0.5F;
                 return;
             default:
-                super.updateProperty(var1, var2);
+                super.updateProperty(property, values);
         }
     }
 

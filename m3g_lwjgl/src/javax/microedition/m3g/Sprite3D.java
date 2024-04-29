@@ -77,19 +77,19 @@ public class Sprite3D extends Node {
         return this.cropHeight;
     }
 
-    protected void updateProperty(int var1, float[] var2) {
-        switch (var1) {
+    protected void updateProperty(int property, float[] values) {
+        switch (property) {
             case 259:
-                this.cropX = G3DUtils.round(var2[0]);
-                this.cropY = G3DUtils.round(var2[1]);
-                if (var2.length > 2) {
-                    this.cropWidth = G3DUtils.limit(G3DUtils.round(var2[2]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
-                    this.cropHeight = G3DUtils.limit(G3DUtils.round(var2[3]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
+                this.cropX = G3DUtils.round(values[0]);
+                this.cropY = G3DUtils.round(values[1]);
+                if (values.length > 2) {
+                    this.cropWidth = G3DUtils.limit(G3DUtils.round(values[2]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
+                    this.cropHeight = G3DUtils.limit(G3DUtils.round(values[3]), -Emulator3D.MaxSpriteCropDimension, Emulator3D.MaxSpriteCropDimension);
                     return;
                 }
                 break;
             default:
-                super.updateProperty(var1, var2);
+                super.updateProperty(property, values);
         }
 
     }
