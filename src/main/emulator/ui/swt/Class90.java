@@ -1,6 +1,5 @@
 package emulator.ui.swt;
 
-import emulator.Emulator;
 import emulator.UILocale;
 import emulator.graphics3D.view.b;
 import org.eclipse.swt.SWT;
@@ -77,7 +76,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     protected float moveSpeed = 1F;
     private int moveForward, moveStrafe;
     private int rotateX, rotateY;
-    private float deltaTime = 1;
+    private long lastUpdate = 1;
 
     public Class90() {
         super();
@@ -235,6 +234,8 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     }
 
     private void update() {
+        float deltaTime = (float) ((System.nanoTime() - lastUpdate) / 10000000000.0);
+        lastUpdate = System.nanoTime();
         float forward = moveForward * moveSpeed * deltaTime;
         float strafe = moveStrafe * moveSpeed * deltaTime;
 
@@ -771,7 +772,6 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         public final void run() {
             Class90.method243(this.aClass90_1207, aClass90_1207.m3gview.useContext(aClass90_1207.canvas));
             while (aClass90_1207.canvas != null) {
-                long startTime = System.nanoTime();
                 if (aClass90_1207.canvas.isDisposed()) {
                     return;
                 }
@@ -786,7 +786,6 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
                 try {
                     Thread.sleep(10L);
                 } catch (Exception ignored) {}
-                deltaTime = (float) ((System.nanoTime() - startTime) * 60.0 / 1000000000.0);
             }
         }
 
