@@ -239,7 +239,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     private void update() {
-        float deltaTime = (float) ((System.nanoTime() - lastUpdate) / 10000000.0);
+        float deltaTime = (float) ((System.nanoTime() - lastUpdate) * 60.0 / 10000000000.0);
         lastUpdate = System.nanoTime();
 
         float tmpSpeed = moveSpeed;
