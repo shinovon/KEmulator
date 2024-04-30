@@ -3,10 +3,10 @@ package emulator.ui.swt;
 import org.eclipse.swt.events.*;
 import emulator.*;
 
-final class Class37 extends SelectionAdapter {
+final class M3GViewCameraFOVListener extends SelectionAdapter {
     private final M3GViewUI aClass90_625;
 
-    Class37(final M3GViewUI aClass90_625) {
+    M3GViewCameraFOVListener(final M3GViewUI aClass90_625) {
         super();
         this.aClass90_625 = aClass90_625;
     }

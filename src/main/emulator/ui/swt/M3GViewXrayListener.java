@@ -2,10 +2,10 @@ package emulator.ui.swt;
 
 import org.eclipse.swt.events.*;
 
-final class Class63 extends SelectionAdapter {
+final class M3GViewXrayListener extends SelectionAdapter {
     private final M3GViewUI aClass90_829;
 
-    Class63(final M3GViewUI aClass90_829) {
+    M3GViewXrayListener(final M3GViewUI aClass90_829) {
         super();
         this.aClass90_829 = aClass90_829;
     }

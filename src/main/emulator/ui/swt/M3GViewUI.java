@@ -328,65 +328,65 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         (menuItem3 = new MenuItem(this.aMenu895, 64)).setText(UILocale.get("M3G_VIEW_LIGHT", "Light"));
         this.aMenu918 = new Menu(menuItem3);
         (this.aMenuItem936 = new MenuItem(this.aMenu918, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
-        this.aMenuItem936.addSelectionListener(new Class122(this));
+        this.aMenuItem936.addSelectionListener(new M3GViewLightSceneListener(this));
         (this.aMenuItem937 = new MenuItem(this.aMenu918, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
-        this.aMenuItem937.addSelectionListener(new Class94(this));
+        this.aMenuItem937.addSelectionListener(new M3GViewLightViewListener(this));
         new MenuItem(this.aMenu918, 2);
         (this.aMenuItem938 = new MenuItem(this.aMenu918, 8)).setText(UILocale.get("M3G_VIEW_LIGHT_SETTING", "Light Setting"));
         menuItem3.setMenu(this.aMenu918);
         this.aMenu913 = new Menu(menuItem2);
         (this.aMenuItem925 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ORBIT", "Orbit") + "\t(1)");
         this.aMenuItem925.setAccelerator(49);
-        this.aMenuItem925.addSelectionListener(new Class98(this));
+        this.aMenuItem925.addSelectionListener(new M3GViewCameraOrbitListener(this));
         (this.aMenuItem927 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PAN", "Pan") + "\t(2)");
         this.aMenuItem927.setAccelerator(50);
-        this.aMenuItem927.addSelectionListener(new Class102(this));
+        this.aMenuItem927.addSelectionListener(new M3GViewCameraPanListener(this));
         (this.aMenuItem928 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_DOLLY", "Dolly") + "\t(3)");
         this.aMenuItem928.setAccelerator(51);
-        this.aMenuItem928.addSelectionListener(new Class106(this));
+        this.aMenuItem928.addSelectionListener(new M3GViewCameraDollyListener(this));
         (this.aMenuItem929 = new MenuItem(this.aMenu913, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ZOOM", "Zoom") + "\t(4)");
         this.aMenuItem929.setAccelerator(52);
-        this.aMenuItem929.addSelectionListener(new Class114(this));
+        this.aMenuItem929.addSelectionListener(new M3GViewCameraZoomListener(this));
         new MenuItem(this.aMenu913, 2);
         final MenuItem menuItem4;
         (menuItem4 = new MenuItem(this.aMenu913, 64)).setText(UILocale.get("M3G_VIEW_CAMERA_PROJECTION", "Projection Mode"));
         this.aMenu923 = new Menu(menuItem4);
         (this.aMenuItem930 = new MenuItem(this.aMenu923, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PERSPECTIVE", "Perspective Projection"));
-        this.aMenuItem930.addSelectionListener(new Class112(this));
+        this.aMenuItem930.addSelectionListener(new M3GViewCameraPerspectiveListener(this));
         (this.aMenuItem931 = new MenuItem(this.aMenu923, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PARALLEL", "Parallel Projection"));
-        this.aMenuItem931.addSelectionListener(new Class118(this));
+        this.aMenuItem931.addSelectionListener(new M3GViewCameraParallelListener(this));
         menuItem4.setMenu(this.aMenu923);
         new MenuItem(this.aMenu913, 2);
         (this.aMenuItem932 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
         this.aMenuItem932.setAccelerator(67);
-        this.aMenuItem932.addSelectionListener(new Class116(this));
+        this.aMenuItem932.addSelectionListener(new M3GViewCameraClipPlanesListener(this));
         (this.aMenuItem933 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View") + "\tF");
         this.aMenuItem933.setAccelerator(70);
-        this.aMenuItem933.addSelectionListener(new Class37(this));
+        this.aMenuItem933.addSelectionListener(new M3GViewCameraFOVListener(this));
         (this.aMenuItem934 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position") + "\tP");
         this.aMenuItem934.setAccelerator(80);
-        this.aMenuItem934.addSelectionListener(new Class143(this));
+        this.aMenuItem934.addSelectionListener(new M3GViewCameraPosListener(this));
         new MenuItem(this.aMenu913, 2);
         (this.aMenuItem935 = new MenuItem(this.aMenu913, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_RESET", "Reset Camera") + "\tR");
         this.aMenuItem935.setAccelerator(82);
-        this.aMenuItem935.addSelectionListener(new Class126(this));
+        this.aMenuItem935.addSelectionListener(new M3GViewCameraResetListener(this));
         menuItem2.setMenu(this.aMenu913);
         this.aMenu908 = new Menu(menuItem);
         (this.aMenuItem894 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_COORDINATE", "Coordinate Axis"));
-        this.aMenuItem894.addSelectionListener(new Class61(this));
+        this.aMenuItem894.addSelectionListener(new M3GViewDisplayAxisListener(this));
         (this.aMenuItem912 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_GRID", "Show Grid"));
-        this.aMenuItem912.addSelectionListener(new Class60(this));
+        this.aMenuItem912.addSelectionListener(new M3GViewDisplayGridListener(this));
         (this.aMenuItem916 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_XRAY", "Show Xray") + "\tX");
         this.aMenuItem916.setAccelerator(88);
-        this.aMenuItem916.addSelectionListener(new Class63(this));
+        this.aMenuItem916.addSelectionListener(new M3GViewXrayListener(this));
         new MenuItem(this.aMenu908, 2);
         (this.aMenuItem921 = new MenuItem(this.aMenu908, 8)).setText(UILocale.get("M3G_VIEW_DISPLAY_UPDATE_WORLD", "Update World") + "\tF5");
         this.aMenuItem921.setAccelerator(16777230);
-        this.aMenuItem921.addSelectionListener(new Class62(this));
+        this.aMenuItem921.addSelectionListener(new M3GViewUpdateWorldListener(this));
         menuItem.setMenu(this.aMenu908);
         menuItem.setText(UILocale.get("M3G_VIEW_DISPLAY", "Display"));
         this.aShell889.setMenuBar(this.aMenu895);
-        this.aShell889.addShellListener(new Class49(this));
+        this.aShell889.addShellListener(new M3GViewCloseListener(this));
     }
 
     private void method545() {
@@ -415,8 +415,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         (this.aTree896 = new Tree(this.aComposite891, 2048)).setHeaderVisible(false);
         this.aTree896.setLayoutData(layoutData);
         this.aTree896.setLinesVisible(false);
-        this.aTree896.addListener(17, new M3GViewGroupClick(this));
-        this.aTree896.addMouseListener(new Class51(this));
+        this.aTree896.addListener(17, new M3GViewGroupClickListener(this));
+        this.aTree896.addMouseListener(new M3GViewNodeRightClickListener(this));
     }
 
     private void method547() {
@@ -815,7 +815,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
             }
         }
 
-        Flusher(final M3GViewUI class90, final Class122 class91) {
+        Flusher(final M3GViewUI class90, final M3GViewLightSceneListener class91) {
             this(class90);
         }
     }
@@ -840,7 +840,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
             }
         }
 
-        Refresher(final M3GViewUI class90, final Class122 class91) {
+        Refresher(final M3GViewUI class90, final M3GViewLightSceneListener class91) {
             this(class90);
         }
     }

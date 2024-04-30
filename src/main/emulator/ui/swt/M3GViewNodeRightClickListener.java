@@ -4,10 +4,10 @@ import org.eclipse.swt.events.*;
 
 import javax.microedition.m3g.*;
 
-final class Class51 extends MouseAdapter {
+final class M3GViewNodeRightClickListener extends MouseAdapter {
     private final M3GViewUI aClass90_802;
 
-    Class51(final M3GViewUI aClass90_802) {
+    M3GViewNodeRightClickListener(final M3GViewUI aClass90_802) {
         super();
         this.aClass90_802 = aClass90_802;
     }

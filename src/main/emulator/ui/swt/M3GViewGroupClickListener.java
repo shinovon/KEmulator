@@ -6,8 +6,8 @@ import org.eclipse.swt.widgets.*;
 import javax.microedition.m3g.Node;
 import javax.microedition.m3g.Group;
 
-final class M3GViewGroupClick implements Listener {
-    M3GViewGroupClick(final M3GViewUI m3gViewUI) {
+final class M3GViewGroupClickListener implements Listener {
+    M3GViewGroupClickListener(final M3GViewUI m3gViewUI) {
         super();
     }
 
