@@ -20,7 +20,7 @@ import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.*;
 
-public final class Class90 implements MouseMoveListener, DisposeListener, KeyListener, MouseWheelListener {
+public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyListener, MouseWheelListener {
     private Shell aShell889;
     private SashForm aSashForm890;
     private Composite aComposite891;
@@ -79,7 +79,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     private int rotateX, rotateY;
     private long lastUpdate = 1;
 
-    public Class90() {
+    public M3GViewUI() {
         super();
         this.aShell889 = null;
         this.aSashForm890 = null;
@@ -196,7 +196,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         label32: {
             this.aBackground900 = null;
             this.aNode361 = null;
-            Class90 var10000;
+            M3GViewUI var10000;
             Node var10001;
             if(this.aTree896.getSelectionCount() > 0) {
                 this.aNode361 = (Node)this.aTree896.getSelection()[0].getData();
@@ -610,163 +610,163 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         this.method507();
     }
 
-    static boolean method243(final Class90 class90, final boolean aBoolean905) {
+    static boolean method243(final M3GViewUI class90, final boolean aBoolean905) {
         return class90.aBoolean905 = aBoolean905;
     }
 
-    static boolean method232(final Class90 class90) {
+    static boolean method232(final M3GViewUI class90) {
         return class90.aBoolean905;
     }
 
-    static boolean method242(final Class90 class90) {
+    static boolean method242(final M3GViewUI class90) {
         return class90.aBoolean909;
     }
 
-    static int method504(final Class90 class90, final int anInt893) {
+    static int method504(final M3GViewUI class90, final int anInt893) {
         return class90.anInt893 = anInt893;
     }
 
-    static int method510(final Class90 class90, final int anInt910) {
+    static int method510(final M3GViewUI class90, final int anInt910) {
         return class90.anInt910 = anInt910;
     }
 
-    static MenuItem method505(final Class90 class90) {
+    static MenuItem method505(final M3GViewUI class90) {
         return class90.aMenuItem928;
     }
 
-    static void method511(final Class90 class90) {
+    static void method511(final M3GViewUI class90) {
         class90.method276();
     }
 
-    static void method252(Class90 paramClass57) {
+    static void method252(M3GViewUI paramClass57) {
         paramClass57.method531();
     }
 
-    static Shell method499(final Class90 class90) {
+    static Shell method499(final M3GViewUI class90) {
         return class90.aShell889;
     }
 
-    static float method503(final Class90 class90) {
+    static float method503(final M3GViewUI class90) {
         return class90.aFloat906;
     }
 
-    static float method512(final Class90 class90) {
+    static float method512(final M3GViewUI class90) {
         return class90.aFloat911;
     }
 
-    static int method500(final Class90 class90) {
+    static int method500(final M3GViewUI class90) {
         return class90.anInt910;
     }
 
-    static float method506(final Class90 class90, final float aFloat906) {
+    static float method506(final M3GViewUI class90, final float aFloat906) {
         return class90.aFloat906 = aFloat906;
     }
 
-    static float method513(final Class90 class90, final float aFloat911) {
+    static float method513(final M3GViewUI class90, final float aFloat911) {
         return class90.aFloat911 = aFloat911;
     }
 
-    static float method517(final Class90 class90) {
+    static float method517(final M3GViewUI class90) {
         return class90.zoom;
     }
 
-    static float method518(final Class90 class90, final float aFloat915) {
+    static float method518(final M3GViewUI class90, final float aFloat915) {
         return class90.zoom = aFloat915;
     }
 
-    static float method525(final Class90 class90) {
+    static float method525(final M3GViewUI class90) {
         return class90.cameraX;
     }
 
-    static float method532(final Class90 class90) {
+    static float method532(final M3GViewUI class90) {
         return class90.cameraY;
     }
 
-    static float method537(final Class90 class90) {
+    static float method537(final M3GViewUI class90) {
         return class90.cameraZ;
     }
 
-    static float method526(final Class90 class90, final float aFloat920) {
+    static float method526(final M3GViewUI class90, final float aFloat920) {
         return class90.cameraX = aFloat920;
     }
 
-    static float method533(final Class90 class90, final float aFloat924) {
+    static float method533(final M3GViewUI class90, final float aFloat924) {
         return class90.cameraY = aFloat924;
     }
 
-    static float method538(final Class90 class90, final float aFloat926) {
+    static float method538(final M3GViewUI class90, final float aFloat926) {
         return class90.cameraZ = aFloat926;
     }
 
-    static void method519(final Class90 class90) {
+    static void method519(final M3GViewUI class90) {
         class90.method524();
     }
 
-    static boolean method520(final Class90 class90, final boolean aBoolean914) {
+    static boolean method520(final M3GViewUI class90, final boolean aBoolean914) {
         return class90.coordinateAxis = aBoolean914;
     }
 
-    static MenuItem method514(final Class90 class90) {
+    static MenuItem method514(final M3GViewUI class90) {
         return class90.aMenuItem894;
     }
 
-    static boolean method527(final Class90 class90, final boolean aBoolean919) {
+    static boolean method527(final M3GViewUI class90, final boolean aBoolean919) {
         return class90.aBoolean386 = aBoolean919;
     }
 
-    static MenuItem method521(final Class90 class90) {
+    static MenuItem method521(final M3GViewUI class90) {
         return class90.aMenuItem912;
     }
 
-    static MenuItem method528(final Class90 class90) {
+    static MenuItem method528(final M3GViewUI class90) {
         return class90.aMenuItem916;
     }
 
-    static void method529(final Class90 class90) {
+    static void method529(final M3GViewUI class90) {
         class90.method536();
     }
 
-    static Tree method501(final Class90 class90) {
+    static Tree method501(final M3GViewUI class90) {
         return class90.aTree896;
     }
 
-    static int method515(final Class90 class90) {
+    static int method515(final M3GViewUI class90) {
         return class90.anInt893++;
     }
 
-    static int method522(final Class90 class90, final int n) {
+    static int method522(final M3GViewUI class90, final int n) {
         return class90.anInt893 %= n;
     }
 
-    static int method523(final Class90 class90) {
+    static int method523(final M3GViewUI class90) {
         return class90.anInt893;
     }
 
-    static MenuItem method534(final Class90 class90) {
+    static MenuItem method534(final M3GViewUI class90) {
         return class90.aMenuItem929;
     }
 
-    static MenuItem method539(final Class90 class90) {
+    static MenuItem method539(final M3GViewUI class90) {
         return class90.aMenuItem925;
     }
 
-    static MenuItem method541(final Class90 class90) {
+    static MenuItem method541(final M3GViewUI class90) {
         return class90.aMenuItem927;
     }
 
-    static int method530(final Class90 class90, final int anInt917) {
+    static int method530(final M3GViewUI class90, final int anInt917) {
         return class90.anInt917 = anInt917;
     }
 
-    static int method535(final Class90 class90, final int anInt922) {
+    static int method535(final M3GViewUI class90, final int anInt922) {
         return class90.anInt922 = anInt922;
     }
 
-    static float method542(final Class90 class90, final float n) {
+    static float method542(final M3GViewUI class90, final float n) {
         return class90.zoom += n;
     }
 
-    static float method544(final Class90 class90, final float n) {
+    static float method544(final M3GViewUI class90, final float n) {
         return class90.zoom -= n;
     }
 
@@ -785,20 +785,20 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
     }
 
     private final class Flusher implements Runnable {
-        private final Class90 aClass90_1207;
+        private final M3GViewUI aClass90_1207;
 
-        private Flusher(final Class90 aClass90_1207) {
+        private Flusher(final M3GViewUI aClass90_1207) {
             super();
             this.aClass90_1207 = aClass90_1207;
         }
 
         public final void run() {
-            Class90.method243(this.aClass90_1207, aClass90_1207.m3gview.useContext(aClass90_1207.canvas));
+            M3GViewUI.method243(this.aClass90_1207, aClass90_1207.m3gview.useContext(aClass90_1207.canvas));
             while (aClass90_1207.canvas != null) {
                 if (aClass90_1207.canvas.isDisposed()) {
                     return;
                 }
-                if (Class90.method232(this.aClass90_1207) && Class90.method242(this.aClass90_1207)) {
+                if (M3GViewUI.method232(this.aClass90_1207) && M3GViewUI.method242(this.aClass90_1207)) {
                     try {
                         aClass90_1207.update();
                     } catch (Exception ex) {
@@ -812,15 +812,15 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
             }
         }
 
-        Flusher(final Class90 class90, final Class122 class91) {
+        Flusher(final M3GViewUI class90, final Class122 class91) {
             this(class90);
         }
     }
 
     final static class Refresher implements Runnable {
-        final Class90 aClass90_830;
+        final M3GViewUI aClass90_830;
 
-        private Refresher(final Class90 aClass90_830) {
+        private Refresher(final M3GViewUI aClass90_830) {
             super();
             this.aClass90_830 = aClass90_830;
         }
@@ -837,7 +837,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
             }
         }
 
-        Refresher(final Class90 class90, final Class122 class91) {
+        Refresher(final M3GViewUI class90, final Class122 class91) {
             this(class90);
         }
     }

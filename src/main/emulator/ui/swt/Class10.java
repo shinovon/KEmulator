@@ -5,9 +5,9 @@ import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 
 final class Class10 implements Runnable {
-    private final Class90.Refresher a;
+    private final M3GViewUI.Refresher a;
 
-    Class10(final Class90.Refresher aClass64_567) {
+    Class10(final M3GViewUI.Refresher aClass64_567) {
         super();
         this.a = aClass64_567;
     }
@@ -17,9 +17,9 @@ final class Class10 implements Runnable {
             if(a.aClass90_830.canvas != null) {
                 ((EmulatorScreen) Emulator.getEmulator().getScreen()).pollKeyboard(a.aClass90_830.canvas);
             }
-            if (Class90.method232(a.aClass90_830)) {
-                if (!Class90.method242(a.aClass90_830)) {
-                    Class90.method511(a.aClass90_830);
+            if (M3GViewUI.method232(a.aClass90_830)) {
+                if (!M3GViewUI.method242(a.aClass90_830)) {
+                    M3GViewUI.method511(a.aClass90_830);
                     a.aClass90_830.aBoolean909 = true;
                     return;
                 }

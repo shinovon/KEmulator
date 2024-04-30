@@ -4,9 +4,9 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
 final class Class56 extends MouseAdapter {
-    private final Class90 aClass90_822;
+    private final M3GViewUI aClass90_822;
 
-    Class56(final Class90 aClass90_822) {
+    Class56(final M3GViewUI aClass90_822) {
         super();
         this.aClass90_822 = aClass90_822;
     }
@@ -15,45 +15,45 @@ final class Class56 extends MouseAdapter {
         Label_0205:
         {
             if (mouseEvent.button == 3) {
-                Class90.method515(this.aClass90_822);
-                Class90.method522(this.aClass90_822, 4);
+                M3GViewUI.method515(this.aClass90_822);
+                M3GViewUI.method522(this.aClass90_822, 4);
                 MenuItem menuItem = null;
                 Label_0166:
                 {
-                    switch (Class90.method523(this.aClass90_822)) {
+                    switch (M3GViewUI.method523(this.aClass90_822)) {
                         case 0: {
-                            Class90.method534(this.aClass90_822).setSelection(false);
-                            menuItem = Class90.method539(this.aClass90_822);
+                            M3GViewUI.method534(this.aClass90_822).setSelection(false);
+                            menuItem = M3GViewUI.method539(this.aClass90_822);
                             break Label_0166;
                         }
                         case 1: {
-                            Class90.method539(this.aClass90_822).setSelection(false);
-                            menuItem = Class90.method541(this.aClass90_822);
+                            M3GViewUI.method539(this.aClass90_822).setSelection(false);
+                            menuItem = M3GViewUI.method541(this.aClass90_822);
                             break Label_0166;
                         }
                         case 2: {
-                            Class90.method541(this.aClass90_822).setSelection(false);
-                            if (Class90.method500(this.aClass90_822) == 0) {
-                                menuItem = Class90.method505(this.aClass90_822);
+                            M3GViewUI.method541(this.aClass90_822).setSelection(false);
+                            if (M3GViewUI.method500(this.aClass90_822) == 0) {
+                                menuItem = M3GViewUI.method505(this.aClass90_822);
                                 break Label_0166;
                             }
-                            Class90.method515(this.aClass90_822);
+                            M3GViewUI.method515(this.aClass90_822);
                             break;
                         }
                         case 3: {
-                            Class90.method505(this.aClass90_822).setSelection(false);
+                            M3GViewUI.method505(this.aClass90_822).setSelection(false);
                             break;
                         }
                         default: {
                             break Label_0205;
                         }
                     }
-                    menuItem = Class90.method534(this.aClass90_822);
+                    menuItem = M3GViewUI.method534(this.aClass90_822);
                 }
                 menuItem.setSelection(true);
             } else if (mouseEvent.button == 1) {
-                Class90.method530(this.aClass90_822, mouseEvent.x);
-                Class90.method535(this.aClass90_822, mouseEvent.y);
+                M3GViewUI.method530(this.aClass90_822, mouseEvent.x);
+                M3GViewUI.method535(this.aClass90_822, mouseEvent.y);
             }
         }
         aClass90_822.canvas.forceFocus();

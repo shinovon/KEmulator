@@ -24,7 +24,7 @@ public final class EmulatorImpl implements IEmulator {
     private Class11 ilogstream;
     private Class161 aClass161_1387;
     private Class108 aClass108_1390;
-    private Class90 aClass90_1384;
+    private M3GViewUI aClass90_1384;
     private Class83 aClass83_1389;
     public Properties midletProps;
     private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
@@ -102,9 +102,9 @@ public final class EmulatorImpl implements IEmulator {
         return this.aClass161_1387;
     }
 
-    public final Class90 getM3GView() {
+    public final M3GViewUI getM3GView() {
         if(aClass90_1384 == null) {
-            this.aClass90_1384 = new Class90();
+            this.aClass90_1384 = new M3GViewUI();
         }
         return this.aClass90_1384;
     }

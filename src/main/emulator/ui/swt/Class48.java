@@ -6,7 +6,7 @@ import javax.microedition.m3g.Node;
 import javax.microedition.m3g.Group;
 
 final class Class48 implements Listener {
-    Class48(final Class90 class90) {
+    Class48(final M3GViewUI class90) {
         super();
     }
 
