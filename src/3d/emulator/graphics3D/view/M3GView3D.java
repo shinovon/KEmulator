@@ -6,7 +6,6 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.lwjgl.LWJGLUtility;
 import emulator.graphics3D.m3g.*;
 
 import java.nio.ByteBuffer;
@@ -43,7 +42,6 @@ import org.lwjgl.opengl.*;
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 public final class M3GView3D {
     private static final boolean useSoftwareWgl = false;
@@ -1006,7 +1004,7 @@ public final class M3GView3D {
         }
     }
 
-    public final void method372(float var1) {
+    public final void drawGrid(float var1) {
         this.setupViewport();
         this.setupDepth();
         setupCamera();

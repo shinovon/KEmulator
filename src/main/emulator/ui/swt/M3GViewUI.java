@@ -39,7 +39,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private boolean aBoolean905;
     boolean aBoolean909;
     private boolean coordinateAxis;
-    private boolean aBoolean386;
+    private boolean showGrid;
     private int anInt362 = 0;
     private int anInt893;
     private int anInt910;
@@ -73,7 +73,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private int anInt917;
     private int anInt922;
     private float rotationX, rotationY;
-    protected float moveSpeed = 5F;
+    protected float moveSpeed = 1F;
     private boolean moveForward, moveBackward, moveRight, moveLeft;
     private boolean shift, control;
     private int rotateX, rotateY;
@@ -102,10 +102,10 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     private void method516() {
-        this.coordinateAxis = true;
-        this.aBoolean386 = true;
+        this.coordinateAxis = false;
+        this.showGrid = false;
         this.aMenuItem894.setSelection(this.coordinateAxis);
-        this.aMenuItem912.setSelection(this.aBoolean386);
+        this.aMenuItem912.setSelection(this.showGrid);
         this.aMenuItem936.setSelection(true);
         this.aMenuItem938.setEnabled(false);
         this.anInt893 = 0;
@@ -236,7 +236,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     private void update() {
-        float deltaTime = (float) ((System.nanoTime() - lastUpdate) / 10000000000.0);
+        float deltaTime = (float) ((System.nanoTime() - lastUpdate) / 10000000.0);
         lastUpdate = System.nanoTime();
 
         float tmpSpeed = moveSpeed;
@@ -280,8 +280,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
         M3GView3D.setCamera(this.camera, this.cameraTransform);
         m3gview.clearBackground(this.aBackground900);
-        if (this.aBoolean386) {
-            this.m3gview.method372(1.0F);
+        if (this.showGrid) {
+            this.m3gview.drawGrid(1.0F);
         }
         if (this.aNode361 != null) {
             try {
@@ -711,7 +711,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static boolean method527(final M3GViewUI class90, final boolean aBoolean919) {
-        return class90.aBoolean386 = aBoolean919;
+        return class90.showGrid = aBoolean919;
     }
 
     static MenuItem method521(final M3GViewUI class90) {
