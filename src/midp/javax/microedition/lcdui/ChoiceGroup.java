@@ -3,17 +3,14 @@ package javax.microedition.lcdui;
 import emulator.lcdui.BoundsUtils;
 import emulator.lcdui.c;
 
-import java.util.Arrays;
 import java.util.Vector;
 import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.Screen;
 import javax.microedition.lcdui.a;
 
 public class ChoiceGroup
@@ -61,7 +58,7 @@ public class ChoiceGroup
             ++j;
         }
         if (this.items.size() > 0) {
-            ((a) this.items.get((int) 0)).sel = true;
+            ((a) this.items.get(0)).sel = true;
         }
     }
 
@@ -96,33 +93,33 @@ public class ChoiceGroup
         if (n < 0 || n >= this.items.size()) {
             throw new IndexOutOfBoundsException();
         }
-        ((a) this.items.get((int) n)).font = aFont420;
+        ((a) this.items.get(n)).font = aFont420;
     }
 
     public Font getFont(int n) {
-        return ((a) this.items.get((int) n)).font;
+        return ((a) this.items.get(n)).font;
     }
 
     public Image getImage(int n) {
-        return ((a) this.items.get((int) n)).image;
+        return ((a) this.items.get(n)).image;
     }
 
     public String getString(int n) {
-        return ((a) this.items.get((int) n)).string;
+        return ((a) this.items.get(n)).string;
     }
 
     public void insert(int n, String s, Image image) {
         if (s == null) {
             throw new NullPointerException();
         }
-        this.items.insertElementAt((Object) new a(s, image, null, this), n);
+        this.items.insertElementAt(new a(s, image, null, this), n);
     }
 
     public void set(int n, String s, Image image) {
         if (s == null) {
             throw new NullPointerException();
         }
-        this.items.set(n, (Object) new a(s, image, null, this));
+        this.items.set(n, new a(s, image, null, this));
     }
 
     public void setSelectedFlags(boolean[] array) {
@@ -137,21 +134,21 @@ public class ChoiceGroup
             int i = 0;
             while (i < this.items.size()) {
                 if (n == 0 && array[i]) {
-                    ((a) this.items.get((int) i)).sel = true;
+                    ((a) this.items.get(i)).sel = true;
                     n = 1;
                 } else {
-                    ((a) this.items.get((int) i)).sel = false;
+                    ((a) this.items.get(i)).sel = false;
                 }
                 ++i;
             }
             if (n == 0 && this.items.size() > 0) {
-                ((a) this.items.get((int) n)).sel = true;
+                ((a) this.items.get(n)).sel = true;
             }
             return;
         }
         int j = 0;
         while (j < this.items.size()) {
-            ((a) this.items.get((int) j)).sel = array[j];
+            ((a) this.items.get(j)).sel = array[j];
             ++j;
         }
     }
@@ -166,7 +163,7 @@ public class ChoiceGroup
         int n = 0;
         int i = 0;
         while (i < this.items.size()) {
-            array[i] = ((a) this.items.get((int) i)).sel;
+            array[i] = ((a) this.items.get(i)).sel;
             if (array[i]) {
                 ++n;
             }
@@ -179,7 +176,7 @@ public class ChoiceGroup
         if (this.choiceType != MULTIPLE) {
             int i = 0;
             while (i < this.items.size()) {
-                if (((a) this.items.get((int) i)).sel) {
+                if (((a) this.items.get(i)).sel) {
                     return i;
                 }
                 ++i;
@@ -189,7 +186,7 @@ public class ChoiceGroup
     }
 
     public boolean isSelected(int n) {
-        return ((a) this.items.get((int) n)).sel;
+        return ((a) this.items.get(n)).sel;
     }
 
     public void setSelectedIndex(int n, boolean flag) {
@@ -207,7 +204,7 @@ public class ChoiceGroup
             }
             return;
         }
-        ((a) this.items.get((int) n)).sel = flag;
+        ((a) this.items.get(n)).sel = flag;
     }
 
     public int size() {
@@ -218,7 +215,7 @@ public class ChoiceGroup
         super.itemApplyCommand();
         if (this.aBoolean541 && this.aCommand540 != null) {
             if (screen.cmdListener != null)
-                this.screen.cmdListener.commandAction(this.aCommand540, (Displayable) this.screen);
+                this.screen.cmdListener.commandAction(this.aCommand540, this.screen);
         }
         if (this.choiceType == EXCLUSIVE) {
             notifyStateChanged();
@@ -271,9 +268,9 @@ public class ChoiceGroup
                 }
                 case POPUP: {
                     if (this.aBoolean542 && this.anIntArray179 != null) {
-                        this.anInt28 = Math.max((int) (this.bounds[1] - this.anInt29 / 2 - 4), (int) 0);
+                        this.anInt28 = Math.max(this.bounds[1] - this.anInt29 / 2 - 4, 0);
                         a a2 = (a) this.items.get(0);
-                        emulator.lcdui.a.method178((Graphics) graphics, (int) a2.bounds[0], (int) (this.anInt28 - 2), (int) a2.bounds[2], (int) (this.anInt29 + 2));
+                        emulator.lcdui.a.method178(graphics, a2.bounds[0], this.anInt28 - 2, a2.bounds[2], this.anInt29 + 2);
                         int k = 0;
                         while (k < this.items.size()) {
                             a a3 = (a) this.items.get(k);
@@ -295,7 +292,7 @@ public class ChoiceGroup
         int n = 0;
         if (this.label != null) {
             int n2 = this.getPreferredWidth() - 8;
-            this.labelArr = c.textArr((String) this.label, (Font) Item.font, (int) n2, (int) n2);
+            this.labelArr = c.textArr(this.label, Item.font, n2, n2);
             n = (Item.font.getHeight() + 4) * this.labelArr.length;
         } else {
             this.labelArr = null;
@@ -328,7 +325,7 @@ public class ChoiceGroup
                     this.anInt29 = 0;
                     int j = 0;
                     while (j < this.items.size()) {
-                        this.anInt29 += ((a) this.items.get((int) j)).bounds[H];
+                        this.anInt29 += ((a) this.items.get(j)).bounds[H];
                         ++j;
                     }
                     int n3 = 0;
@@ -349,7 +346,7 @@ public class ChoiceGroup
                 this.anInt28 = n - a2.bounds[H];
             }
         }
-        this.bounds[H] = Math.min((int) n, (int) this.screen.bounds[H]);
+        this.bounds[H] = Math.min(n, this.screen.bounds[H]);
     }
 
     protected boolean scrollUp() {
@@ -378,12 +375,10 @@ public class ChoiceGroup
         int i = 0;
         while (i < this.items.size()) {
             a a2 = (a) this.items.get(i);
-            System.arraycopy((Object) a2.bounds, (int) 0, (Object) array, (int) 0, (int) 4);
-            int[] array2 = array;
+            System.arraycopy(a2.bounds, 0, array, 0, 4);
             boolean n3 = true;
-            int[] arrn = array2;
-            arrn[1] = arrn[1] + (this.aBoolean542 ? this.anInt28 : this.bounds[1]);
-            if (a2.aBoolean424 && BoundsUtils.collides((int[]) array, (int) x, (int) y)) {
+            array[1] = array[1] + (this.aBoolean542 ? this.anInt28 : this.bounds[1]);
+            if (a2.aBoolean424 && BoundsUtils.collides(array, x, y)) {
                 this.currentPos = i;
             }
             ++i;

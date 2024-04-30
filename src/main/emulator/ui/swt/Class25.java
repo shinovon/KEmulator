@@ -12,7 +12,7 @@ final class Class25 extends MouseAdapter {
     }
 
     public final void mouseDown(final MouseEvent mouseEvent) {
-        ((Control) MemoryView.method642(this.aClass110_594)).forceFocus();
+        MemoryView.method642(this.aClass110_594).forceFocus();
         if (mouseEvent.button == 3) {
             Canvas canvas;
             Menu menu;
@@ -23,7 +23,7 @@ final class Class25 extends MouseAdapter {
                 canvas = MemoryView.method642(this.aClass110_594);
                 menu = MemoryView.method663(this.aClass110_594);
             }
-            ((Control) canvas).setMenu(menu);
+            canvas.setMenu(menu);
         }
     }
 }

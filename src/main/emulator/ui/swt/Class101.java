@@ -16,7 +16,7 @@ final class Class101 extends SelectionAdapter {
         Emulator.getEmulator().getScreen();
         EmulatorScreen.pauseStep();
         final DirectoryDialog directoryDialog;
-        ((Dialog) (directoryDialog = new DirectoryDialog(Property.method364(this.aClass38_1055)))).setText(UILocale.get("OPTION_RECORDS_OPEN_DIRECTORY", "Select a directory for rms"));
+        (directoryDialog = new DirectoryDialog(Property.method364(this.aClass38_1055))).setText(UILocale.get("OPTION_RECORDS_OPEN_DIRECTORY", "Select a directory for rms"));
         directoryDialog.setMessage(UILocale.get("OPTION_RECORDS_CHOOSE_DIR", "Choose a directory"));
         directoryDialog.setFilterPath(System.getProperty("user.dir"));
         final String open;

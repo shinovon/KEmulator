@@ -12,6 +12,7 @@ MENU_MIDLET_LOAD_JAR=Load jar...
 MENU_MIDLET_LOAD_AUTO_PLAY=Load auto-play record
 MENU_MIDLET_RECENTLY=Recent jarfiles
 MENU_MIDLET_2DENGINE=2D Graphics Engine
+MENU_MIDLET_3DENGINE=3D Graphics Engine
 
 MENU_MIDLET_JAD=Open JAD with Notepad
 MENU_MIDLET_SUSPEND=Suspend
@@ -29,13 +30,13 @@ MENU_VIEW_TOP=Always On Top
 MENU_VIEW_ROTATE=Rotate Screen
 MENU_VIEW_FORCE_PAINT=Force Paint
 MENU_VIEW_ROTATE_90=Rotate 90 Degrees
-MENU_VIEW_SCREEN_SIZE=Change screen size
 
 MENU_VIEW_KEYPAD=Keypad
 MENU_VIEW_WATCHES=Watches
 MENU_VIEW_PROFILER=Profiler
 MENU_VIEW_METHODS=Methods
 MENU_VIEW_MEMORY=Memory View
+MENU_VIEW_M3GVIEW=M3G View
 MENU_VIEW_SMS=SMS Console
 MENU_VIEW_SENSOR=Sensor Simulator
 MENU_VIEW_LOG=Log
@@ -49,6 +50,15 @@ MENU_TOOL_INTERPOSE=Interpolation
 MENU_TOOL_INTER_NEAREST=NearestNeighbor
 MENU_TOOL_INTER_HIGH=HighQuality
 MENU_TOOL_INTER_LOW=LowQuality
+
+MENU_TOOL_RESIZE_MODE=Display
+MENU_TOOL_RESIZE_MODE_CENTER=No adaptive scaling
+MENU_TOOL_RESIZE_MODE_SYNC=Sync with window size
+MENU_TOOL_RESIZE_MODE_FILL=Fit window
+MENU_TOOL_RESIZE_MODE_FILL_INT=Fit window (Integer scaling)
+MENU_TOOL_RESIZE_KEEP_PROPORTIONS=Keep aspect ratio
+MENU_TOOL_RESIZE_RESET=Reset window size
+MENU_TOOL_RESIZE_SET=Set screen size
 
 MENU_TOOL_SPEEDUP=Speed Up
 MENU_TOOL_SPEEDDOWN=Slow Down
@@ -96,7 +106,7 @@ INFO_FRAME_RECT=R
 
 ABOUT_FRAME_TITLE=About & Help
 ABOUT_INFO_EMULATOR=Mobile Game Emulator
-ABOUT_INFO_APIS=Support APIs
+ABOUT_INFO_APIS=Supported APIs
 
 ABOUT_AUTHOR=Author
 ABOUT_CHACK_NEW_VER=Check new version
@@ -199,7 +209,7 @@ WATCHES_FRAME_PROFILER=Profiler Monitor
 
 OPTION_FRAME_TITLE=Options & Properties
 
-OPTION_TAB_CUSTOM=Custom
+OPTION_TAB_CUSTOM=General
 OPTION_TAB_KEYMAP=KeyMap
 OPTION_TAB_SYSFONT=SysFont
 OPTION_TAB_SYSTEM=System
@@ -207,6 +217,7 @@ OPTION_TAB_COREAPI=CoreAPI
 OPTION_TAB_RECORDS=Records
 OPTION_TAB_NETWORK=Network
 OPTION_TAB_MEDIA=Media
+OPTION_TAB_M3G=M3G
 
 OPTION_CUSTOM_DEVICE=Device Select:
 OPTION_CUSTOM_ENCODING=Default Encoding:
@@ -255,22 +266,22 @@ OPTION_FONT_SMALL_SIZE=Small Size:
 OPTION_FONT_TEST_TEXT=Test Text:
 OPTION_FONT_TEST_TEXT_TXT=This is an Example.
 
-OPTION_SYSTEM_ASSOCIATE=Associate with *.jar files.
-OPTION_SYSTEM_SHORTCUT=Add shortcut to right-click menu.
-OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images.
-OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region.
-OPTION_SYSTEM_INFO_COLOR=Info View: Show color in (R,G,B).
-OPTION_SYSTEM_RELEASED_IMG=Memory View: Record released images.
-OPTION_SYSTEM_AUTOGEN_JAD=Auto Generate Jad file with \"KEmu-Platform\".
-OPTION_SYSTEM_TRACK_NEW=Track \"new/new[]...\" operations.
-OPTION_SYSTEM_TRACK_METHOD=Track method calls.
+OPTION_SYSTEM_ASSOCIATE=Associate with *.jar files
+OPTION_SYSTEM_SHORTCUT=Add shortcut to right-click menu
+OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images
+OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region
+OPTION_SYSTEM_INFO_COLOR=Info View: Show color in (R,G,B)
+OPTION_SYSTEM_RELEASED_IMG=Memory View: Record released images
+OPTION_SYSTEM_AUTOGEN_JAD=Auto Generate Jad file with \"KEmu-Platform\"
+OPTION_SYSTEM_TRACK_NEW=Track \"new/new[]...\" operations
+OPTION_SYSTEM_TRACK_METHOD=Track method calls
 OPTION_SYSTEM_DISCORD_RICHPRESENCE=Discord Rich Presence
 OPTION_SYSTEM_AWT_ANTIALIASING=AWT Smooth drawing
 
-OPTION_COREAPI_VIBRATION=Enable Vibration APIs.
-OPTION_COREAPI_KEY_REPEAT=Enable Canvas.keyRepeated(int).
-OPTION_COREAPI_FULLSCREEN=Ignore Canvas.setFullScreenMode(boolean).
-OPTION_COREAPI_NO_NETWORK=Network not available.
+OPTION_COREAPI_VIBRATION=Enable Vibration APIs
+OPTION_COREAPI_KEY_REPEAT=Enable Canvas.keyRepeated(int)
+OPTION_COREAPI_FULLSCREEN=Ignore Canvas.setFullScreenMode(boolean)
+OPTION_COREAPI_NO_NETWORK=Restrict network connections
 OPTION_COREAPI_SYNC_KEYEVENTS=Synchronize key events
 OPTION_COREAPI_SOFTKEY_FIX=Send keyPressed with commandAction
 
@@ -294,8 +305,29 @@ OPTION_NETWORK_PROXY_TEST=Proxy Test
 OPTION_NETWORK_PROXY_EMPTY=Empty proxy host!
 OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
 
-OPTION_MEDIA_VLC_DIR=VLC Path
+OPTION_MEDIA_VLC_DIR=VLC Path        
 
+OPTION_M3G_LWJGL_SETTINGS=LWJGL Settings
+OPTION_M3G_IGNORE_OVERWRITE=Ignore OVERWRITE hint
+OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Force perspective correction
+OPTION_M3G_DISABLE_LIGHT_CLAMPING=Disable light clamping
+
+OPTION_M3G_AA=Anti-aliasing:
+OPTION_M3G_APP_CONTROLLED=Application-controlled
+OPTION_M3G_FORCE_OFF=Force off
+OPTION_M3G_FORCE_ON=Force on
+
+OPTION_M3G_TEXTURE_FILTER=Texture filter:
+OPTION_M3G_FORCE_NEAREST=Force nearest
+OPTION_M3G_FORCE_LINEAR=Force linear
+
+OPTION_M3G_MIPMAPPING=Mipmapping:
+OPTION_M3G_FORCE_BILINEAR=Force bilinear
+OPTION_M3G_FORCE_TRILINEAR=Force trilinear
+OPTION_M3G_FORCE_ANISO_2X=Force anisotropic 2x
+OPTION_M3G_FORCE_ANISO_4X=Force anisotropic 4x
+OPTION_M3G_FORCE_ANISO_8X=Force anisotropic 8x
+OPTION_M3G_FORCE_ANISO_16X=Force anisotropic 16x
 
 #Message
 

@@ -15,12 +15,12 @@ public final class FontSWT implements IFont
     
     public FontSWT(final String s, final int size, final int n2, boolean height) {
         super();
-        this.font = new Font((Device)null, s, size, n2);
+        this.font = new Font(null, s, size, n2);
         metrics();
         if(height && getHeight() != size) {
             float f = ((float)charWidth('W') / (float)getHeight()) * (float)size;
             font.dispose();
-            this.font = new Font((Device)null, s, (int)f, n2);
+            this.font = new Font(null, s, (int)f, n2);
             metrics();
         }
     }
@@ -28,24 +28,22 @@ public final class FontSWT implements IFont
     private void metrics() {
         if(gc != null && !gc.isDisposed())
             gc.dispose();
-        (this.gc = new GC((Drawable)new Image((Device)null, 1, 1))).setFont(this.font);
+        (this.gc = new GC(new Image(null, 1, 1))).setFont(this.font);
 
 
     }
 
 
     public final void finalize() {
-        EmulatorImpl.asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    if (font != null && !font.isDisposed()) {
-                        font.dispose();
-                    }
-                    if (gc != null && !gc.isDisposed()) {
-                        gc.dispose();
-                    }
-                } catch (Exception e) {
+        EmulatorImpl.asyncExec(() -> {
+            try {
+                if (font != null && !font.isDisposed()) {
+                    font.dispose();
                 }
+                if (gc != null && !gc.isDisposed()) {
+                    gc.dispose();
+                }
+            } catch (Exception ignored) {
             }
         });
     }

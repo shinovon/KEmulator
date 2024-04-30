@@ -107,7 +107,7 @@ public class Manager {
                 return new VLCPlayerImpl(s, contentType);
             }
             // jar resources
-            return new VLCPlayerImpl(CustomJarResources.getResourceStream(s), contentType);
+            return new VLCPlayerImpl(CustomJarResources.getResourceAsStream(s), contentType);
         } else if (contentType != null && contentType.startsWith("audio/")) {
             if (s.startsWith("rtsp://") || s.startsWith("rtp://") || isAudioContentTypeRequiresLibVlc(contentType)) {
                 requireLibVlc();
@@ -123,7 +123,7 @@ public class Manager {
             if (s.indexOf(58) != -1) {
                 return createPlayer(((InputConnection) Connector.open(s)).openInputStream(), contentType);
             }
-            return createPlayer(CustomJarResources.getResourceStream(s), contentType);
+            return createPlayer(CustomJarResources.getResourceAsStream(s), contentType);
         }
         throw new MediaException("Unknown content type");
     }
@@ -148,7 +148,7 @@ public class Manager {
                         return createPlayer(((InputConnection) Connector.open(locator)).openInputStream(), contentType);
                     }
                     // jar resources
-                    return createPlayer(CustomJarResources.getResourceStream(locator), contentType);
+                    return createPlayer(CustomJarResources.getResourceAsStream(locator), contentType);
                 } else {
                     // streaming datasource
                     player = new PlayerImpl(contentType, src);
@@ -316,7 +316,7 @@ public class Manager {
         if (locator.startsWith("http://") || locator.startsWith("https://")) {
             try {
                 c = getContentTypeHttp(locator);
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
             if (c == null || c.equals("text/plain")) c = getContentTypeFromURL(locator);
         } else {
@@ -356,8 +356,7 @@ public class Manager {
         Vector<String> vlc = new Vector<String>();
         vlc.add("rtsp");
         vlc.add("rtp");
-        Vector<String> fullList = new Vector<String>();
-        fullList.addAll(kem);
+        Vector<String> fullList = new Vector<String>(kem);
         if (isLibVlcSupported()) {
             fullList.addAll(vlc);
         }
@@ -366,7 +365,7 @@ public class Manager {
 
     public static String getContentTypeFromURL(String url) throws IOException {
         // remove query
-        if (url.indexOf("?") != -1) {
+        if (url.contains("?")) {
             url = url.substring(0, url.indexOf("?"));
         }
         if (url.endsWith(".amr")) {

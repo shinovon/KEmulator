@@ -13,7 +13,7 @@ public class List extends Screen implements Choice {
         if (n != 2 && n != 1 && n != 3) {
             throw new IllegalArgumentException();
         } else {
-            choiceGroup = new ChoiceGroup((String) null, n, array, array2, true);
+            choiceGroup = new ChoiceGroup(null, n, array, array2, true);
             super.items.add(choiceGroup);
             choiceGroup.screen = this;
             choiceGroup.aBoolean541 = true;

@@ -7,6 +7,7 @@ import javax.microedition.media.Manager;
 import emulator.debug.*;
 import emulator.*;
 import emulator.custom.h.MethodInfo;
+import emulator.graphics3D.lwjgl.Emulator3D;
 
 import java.io.*;
 
@@ -29,7 +30,8 @@ public class CustomMethod {
     }
 
     public static void yield() throws InterruptedException {
-        Thread.sleep(1L);
+//        Thread.sleep(1L);
+        Thread.yield();
     }
 
     public static String getProperty(final String prop) {
@@ -42,7 +44,7 @@ public class CustomMethod {
         } else if (prop.equalsIgnoreCase("console.encoding")) {
             res = System.getProperty("file.encoding");
         } else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
-            res = Settings.networkNotAvailable ? null : "available";
+            res = Settings.networkNotAvailable ? "unavailable" : "available";
         } else if (prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {
             res = "50";
         } else if (prop.startsWith("com.nokia.memoryram")) {
@@ -110,7 +112,7 @@ public class CustomMethod {
             final Integer value;
             n = (((value = (Integer) CustomMethod.aHashtable14.get(currentThread)) == null) ? 0 : value);
         }
-        CustomMethod.aHashtable14.put(currentThread, new Integer(n + 1));
+        CustomMethod.aHashtable14.put(currentThread, n + 1);
         CustomMethod.aThread15 = currentThread;
         return n;
     }
@@ -119,7 +121,7 @@ public class CustomMethod {
         final Thread currentThread = Thread.currentThread();
         final Object value;
         if ((value = CustomMethod.aHashtable14.get(currentThread)) != null) {
-            CustomMethod.aHashtable14.put(currentThread, new Integer(Math.max((int) value - 1, 0)));
+            CustomMethod.aHashtable14.put(currentThread, Math.max((int) value - 1, 0));
         }
     }
 
@@ -131,8 +133,7 @@ public class CustomMethod {
         final h.MethodInfo methodInfo;
         if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
             final int method16 = method16();
-            final h.MethodInfo methodInfo2 = methodInfo;
-            ++methodInfo2.anInt1182;
+            ++methodInfo.anInt1182;
             trackStr = "";
             for (int i = 0; i < method16; ++i) {
                 trackStr += ("  ");
@@ -147,9 +148,8 @@ public class CustomMethod {
         final h.MethodInfo methodInfo;
         if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
             if (methodInfo.anInt1182 > 0) {
-                final h.MethodInfo methodInfo2 = methodInfo;
-                methodInfo2.aLong1179 += System.currentTimeMillis() - methodInfo.aLong1174;
-                methodInfo.aFloat1175 = methodInfo.aLong1179 / methodInfo.anInt1182;
+                methodInfo.aLong1179 += System.currentTimeMillis() - methodInfo.aLong1174;
+                methodInfo.aFloat1175 = (float) methodInfo.aLong1179 / methodInfo.anInt1182;
             }
             method17();
         }
@@ -161,13 +161,17 @@ public class CustomMethod {
     }
 
     public static void close() {
-        if (trackWriter != null)
+        try {
+            Emulator3D.getInstance().releaseTextures();
+        } catch (Throwable ignored) {}
+        if (trackWriter != null) {
             try {
                 trackWriter.close();
                 trackWriter = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
     }
 
     private static String getStackTrace(Throwable t) {

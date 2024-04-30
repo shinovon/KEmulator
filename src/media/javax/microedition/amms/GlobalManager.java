@@ -37,7 +37,7 @@ public class GlobalManager {
             s = s.substring("javax.microedition.amms.control.audioeffect".length() + 1);
             pkgName = "javax.microedition.amms.control.audioeffect";
         }
-        if (s.indexOf("CommitControl") != -1) {
+        if (s.contains("CommitControl")) {
             return new CommitControl() {
 
                 @Override
@@ -72,7 +72,7 @@ public class GlobalManager {
 
             @Override
             public Control getControl(String s) {
-                if (s.indexOf("LocationControl") != -1) {
+                if (s.contains("LocationControl")) {
                     return new LocationControl() {
 
                         @Override
@@ -95,7 +95,7 @@ public class GlobalManager {
 
                     };
                 }
-                if (s.indexOf("OrientationControl") != -1) {
+                if (s.contains("OrientationControl")) {
                     return new OrientationControl() {
 
                         @Override
@@ -119,7 +119,7 @@ public class GlobalManager {
 
                     };
                 }
-                if (s.indexOf("DopplerControl") != -1) {
+                if (s.contains("DopplerControl")) {
                     return new DopplerControl() {
 
                         @Override

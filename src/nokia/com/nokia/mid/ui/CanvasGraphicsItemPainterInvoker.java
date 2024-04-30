@@ -1,10 +1,8 @@
 package com.nokia.mid.ui;
 
 public abstract class CanvasGraphicsItemPainterInvoker {
-    private static CanvasGraphicsItemPainterInvoker sInvoker;
 
     public static void setInvoker(CanvasGraphicsItemPainterInvoker invoker) {
-        sInvoker = invoker;
     }
 
     protected static CanvasGraphicsItemPainter createCanvasGraphicsItemPainter(CanvasGraphicsItem aItem,

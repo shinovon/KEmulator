@@ -16,30 +16,28 @@ public final class Graphics2DSWT implements IGraphics2D
         super();
         this.gc = new GC(image);
         gc.setAntialias(SWT.OFF);
-        final Transform transform = new Transform((Device)null);
+        final Transform transform = new Transform(null);
         this.gc.getTransform(transform);
         transform.dispose();
-        this.color = new Color((Device)null, 0, 0, 0);
+        this.color = new Color(null, 0, 0, 0);
         this.width = image.getImageData().width;
         this.height = image.getImageData().height;
     }
     
-    public final GC method299() {
+    public final GC method138() {
         return this.gc;
     }
     
     public final void finalize() {
-        EmulatorImpl.asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    if (!gc.isDisposed()) {
-                        gc.dispose();
-                    }
-                    if (!color.isDisposed()) {
-                        color.dispose();
-                    }
-                } catch (Exception e) {
+        EmulatorImpl.asyncExec(() -> {
+            try {
+                if (!gc.isDisposed()) {
+                    gc.dispose();
                 }
+                if (!color.isDisposed()) {
+                    color.dispose();
+                }
+            } catch (Exception ignored) {
             }
         });
     }
@@ -111,7 +109,7 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void drawImage(final IImage image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-        ((ImageSWT)image).method13(this.gc, n, n2, n3, n4, n5, n6, n7, n8);
+        ((ImageSWT)image).copyToScreen(this.gc, n, n2, n3, n4, n5, n6, n7, n8);
     }
     
     public final void setClip(final int n, final int n2, final int n3, final int n4) {
@@ -124,7 +122,7 @@ public final class Graphics2DSWT implements IGraphics2D
         final int n3 = n >> 8 & 0xFF;
         final int n4 = n & 0xFF;
         this.color.dispose();
-        this.color = new Color((Device)null, n2, n3, n4);
+        this.color = new Color(null, n2, n3, n4);
         gc.setAlpha(b ? a : a > 0 ? a : 255);
         gc.setBackground(this.color);
         gc.setForeground(this.color);
@@ -132,7 +130,7 @@ public final class Graphics2DSWT implements IGraphics2D
     
     public final void setColor(final int n, final int n2, final int n3) {
         this.color.dispose();
-        this.color = new Color((Device)null, n, n2, n3);
+        this.color = new Color(null, n, n2, n3);
         gc.setBackground(this.color);
         gc.setForeground(this.color);
     }
@@ -235,7 +233,7 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final ITransform getTransform() {
-        final Transform transform = new Transform((Device)null);
+        final Transform transform = new Transform(null);
         this.gc.getTransform(transform);
         final TransformSWT b = new TransformSWT(transform);
         transform.dispose();
@@ -249,7 +247,7 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void transform(final ITransform transform) {
-        final Transform transform2 = new Transform((Device)null);
+        final Transform transform2 = new Transform(null);
         this.gc.getTransform(transform2);
         final TransformSWT b = new TransformSWT(transform2);
         transform2.dispose();
@@ -260,7 +258,7 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void translate(final int n, final int n2) {
-        final Transform transform = new Transform((Device)null);
+        final Transform transform = new Transform(null);
         this.gc.getTransform(transform);
         transform.translate((float)n, (float)n2);
         this.gc.setTransform(transform);

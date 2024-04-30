@@ -32,16 +32,34 @@ KEmulator.jar    main jar
 KEmulator.exe    win32 launcher
 *.dll            win32 dlls
 
-\libs        auto-load libs
-\records     key records
-\capture     image & avi captures
-\rms         record store
-\file        file system
+libs/        auto-load libs
+records/     key records
+capture/     image & avi captures
+rms/         record store
+file/        file system
+uei/         SDK integration
 property.txt properties of KEmulator
 log.txt      log file
 
 ==================
 $[Changelog]
+$[2024.04.29]
+M3G LWJGL: added settings, fixed SkinnedMesh rendering
+M3GView: new controls
+Fixed 3D engine choice saving
+Localization fixes
+Better Windows XP support
+Memory leaks fixes
+
+$m3g demo [2024.04.26]
+M3G LWJGL engine (WIP)
+Added M3GView from 0.9.8
+Free window resize & more scaling options
+Improved controller support, right stick support
+Rewrote keyboard input handling
+Fixed nokia sound tones
+Added SoftBank implementation from JL-Mod by woesss
+
 $nnmod v2.15.2 [2024.04.16]
 Improved M3G textures debugging in MemoryView (contributed by rmn20)
 Added MascotCapsule textures in MemoryView
@@ -839,4 +857,6 @@ $[Bug Report]
 telegram @nnmidletschat / @shinovon
 
 $Special thanks to:
-Афабыч, TwoSpacesSG, sym_ansel
+Афабыч, TwoSpacesSG, sym_ansel, rmn20
+
+292 labs

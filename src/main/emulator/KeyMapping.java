@@ -1,5 +1,6 @@
 package emulator;
 
+import javax.microedition.lcdui.Canvas;
 import java.util.*;
 
 /*
@@ -58,23 +59,23 @@ public final class KeyMapping {
         int n2 = 0;
         switch (n) {
             case 1: {
-                n2 = ((Devices.getPropertyInt("KEY_UP") != 0) ? Devices.getPropertyInt("KEY_UP") : 1);
+                n2 = ((Devices.getPropertyInt("KEY_UP") != 0) ? Devices.getPropertyInt("KEY_UP") : Canvas.UP);
                 break;
             }
             case 6: {
-                n2 = ((Devices.getPropertyInt("KEY_DOWN") != 0) ? Devices.getPropertyInt("KEY_DOWN") : 6);
+                n2 = ((Devices.getPropertyInt("KEY_DOWN") != 0) ? Devices.getPropertyInt("KEY_DOWN") : Canvas.DOWN);
                 break;
             }
             case 2: {
-                n2 = ((Devices.getPropertyInt("KEY_LEFT") != 0) ? Devices.getPropertyInt("KEY_LEFT") : 2);
+                n2 = ((Devices.getPropertyInt("KEY_LEFT") != 0) ? Devices.getPropertyInt("KEY_LEFT") : Canvas.LEFT);
                 break;
             }
             case 5: {
-                n2 = ((Devices.getPropertyInt("KEY_RIGHT") != 0) ? Devices.getPropertyInt("KEY_RIGHT") : 5);
+                n2 = ((Devices.getPropertyInt("KEY_RIGHT") != 0) ? Devices.getPropertyInt("KEY_RIGHT") : Canvas.RIGHT);
                 break;
             }
             case 8: {
-                n2 = ((Devices.getPropertyInt("KEY_FIRE") != 0) ? Devices.getPropertyInt("KEY_FIRE") : 8);
+                n2 = ((Devices.getPropertyInt("KEY_FIRE") != 0) ? Devices.getPropertyInt("KEY_FIRE") : Canvas.FIRE);
                 break;
             }
         }
@@ -82,11 +83,11 @@ public final class KeyMapping {
     }
 
     private static void method602() {
-        final int mid = getArrowKeyFromDevice(8);
-        final int up = getArrowKeyFromDevice(1);
-        final int left = getArrowKeyFromDevice(2);
-        final int down = getArrowKeyFromDevice(6);
-        final int right = getArrowKeyFromDevice(5);
+        final int mid = getArrowKeyFromDevice(Canvas.FIRE);
+        final int up = getArrowKeyFromDevice(Canvas.UP);
+        final int left = getArrowKeyFromDevice(Canvas.LEFT);
+        final int down = getArrowKeyFromDevice(Canvas.DOWN);
+        final int right = getArrowKeyFromDevice(Canvas.RIGHT);
         final int s1 = (Devices.getPropertyInt("KEY_S1") != 0) ? Devices.getPropertyInt("KEY_S1") : 21;
         final int s2 = (Devices.getPropertyInt("KEY_S2") != 0) ? Devices.getPropertyInt("KEY_S2") : 22;
         KeyMapping.strToPCKey.clear();
@@ -166,9 +167,9 @@ public final class KeyMapping {
     public static int fpsKey(int n) {
         if (Settings.fpsGame == 2) {
             //up
-            if (n == 'w') return getArrowKeyFromDevice(1);
+            if (n == 'w') return getArrowKeyFromDevice(Canvas.UP);
             //down
-            if (n == 's') return getArrowKeyFromDevice(6);
+            if (n == 's') return getArrowKeyFromDevice(Canvas.DOWN);
 
             //num1
             if (n == 'a') return 49;
@@ -186,9 +187,9 @@ public final class KeyMapping {
             if (n == 'z') return 35;
         } else if (Settings.fpsGame == 3) {
             //up
-            if (n == 'w') return getArrowKeyFromDevice(1);
+            if (n == 'w') return getArrowKeyFromDevice(Canvas.UP);
             //down
-            if (n == 's') return getArrowKeyFromDevice(6);
+            if (n == 's') return getArrowKeyFromDevice(Canvas.DOWN);
 
             //num1
             //if(n == 'a') return 49;
@@ -214,7 +215,7 @@ public final class KeyMapping {
         }
 
         if (Settings.canvasKeyboard && (n >= '0' && n <= '9')) {
-            return "" + n;
+            return String.valueOf(n);
         }
         final Object value;
         if ((value = KeyMapping.deviceKeyToStr.get(String.valueOf(n))) != null) {
@@ -222,7 +223,7 @@ public final class KeyMapping {
         }
         if (Settings.fpsMode) {
             int g = fpsKey(n);
-            if (g != 0) return "" + g;
+            if (g != 0) return String.valueOf(g);
         }
         final String method594;
         if ((method594 = keyToString(String.valueOf(n))) == null) {
@@ -232,7 +233,7 @@ public final class KeyMapping {
         if ((value2 = KeyMapping.aHashtable1067.get(method594)) == null) {
             if (Settings.canvasKeyboard) {
                 if ((n >= 32 && n <= 126) || n == 8) {
-                    return "" + n;
+                    return String.valueOf(n);
                 }
             }
             return null;

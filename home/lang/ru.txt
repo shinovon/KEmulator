@@ -12,6 +12,7 @@ MENU_MIDLET_LOAD_JAR=Открыть jar...
 MENU_MIDLET_LOAD_AUTO_PLAY=Открыть запись
 MENU_MIDLET_RECENTLY=Последние файлы
 MENU_MIDLET_2DENGINE=Движок 2D
+MENU_MIDLET_3DENGINE=Движок 3D
 
 MENU_MIDLET_JAD=Открыть JAD в блокноте
 MENU_MIDLET_SUSPEND=Приостановить
@@ -29,13 +30,13 @@ MENU_VIEW_TOP=Поверх всех окон
 MENU_VIEW_ROTATE=Повернуть экран
 MENU_VIEW_FORCE_PAINT=Принудительно обновить
 MENU_VIEW_ROTATE_90=Повернуть экран на 90 гр.
-MENU_VIEW_SCREEN_SIZE=Изменить размер экрана
 
 MENU_VIEW_KEYPAD=Окно кейпада
 MENU_VIEW_WATCHES=Классы
 MENU_VIEW_PROFILER=Профайлер
 MENU_VIEW_METHODS=Методы
 MENU_VIEW_MEMORY=Просмотр памяти
+MENU_VIEW_M3GVIEW=Просмотр M3G
 MENU_VIEW_SMS=SMS консоль
 MENU_VIEW_SENSOR=Симулятор акселерометра
 MENU_VIEW_LOG=Логи
@@ -49,6 +50,15 @@ MENU_TOOL_INTERPOSE=Интерполяция
 MENU_TOOL_INTER_NEAREST=NearestNeighbor
 MENU_TOOL_INTER_HIGH=HighQuality
 MENU_TOOL_INTER_LOW=LowQuality
+
+MENU_TOOL_RESIZE_MODE=Отображение
+MENU_TOOL_RESIZE_MODE_CENTER=Без адаптации к окну
+MENU_TOOL_RESIZE_MODE_SYNC=Синхронизировать размер
+MENU_TOOL_RESIZE_MODE_FILL=Заполнить свободное место
+MENU_TOOL_RESIZE_MODE_FILL_INT=Заполнить (Целочисленный масштаб)
+MENU_TOOL_RESIZE_KEEP_PROPORTIONS=Сохранять пропорции
+MENU_TOOL_RESIZE_RESET=Сбросить размер окна
+MENU_TOOL_RESIZE_SET=Изменить размер экрана
 
 MENU_TOOL_SPEEDUP=Ускорить
 MENU_TOOL_SPEEDDOWN=Замедлить
@@ -207,6 +217,7 @@ OPTION_TAB_COREAPI=CoreAPI
 OPTION_TAB_RECORDS=Сохранения
 OPTION_TAB_NETWORK=Сеть
 OPTION_TAB_MEDIA=Медиа
+OPTION_TAB_M3G=M3G
 
 OPTION_CUSTOM_DEVICE=Пресет устройства:
 OPTION_CUSTOM_ENCODING=Кодировка MIDP:
@@ -296,6 +307,28 @@ OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
 
 OPTION_MEDIA_VLC_DIR=Путь к VLC
 
+
+OPTION_M3G_LWJGL_SETTINGS=Настройки LWJGL
+OPTION_M3G_IGNORE_OVERWRITE=Игнорировать флаг OVERWRITE
+OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Принудительно использовать перспективную коррекцию
+OPTION_M3G_DISABLE_LIGHT_CLAMPING=Отключить ограничение яркости света
+
+OPTION_M3G_AA=Сглаживание:
+OPTION_M3G_APP_CONTROLLED=Использовать параметры приложения
+OPTION_M3G_FORCE_OFF=Принудительно выкл.
+OPTION_M3G_FORCE_ON=Принудительно вкл.
+
+OPTION_M3G_TEXTURE_FILTER=Фильтрация текстур:
+OPTION_M3G_FORCE_NEAREST=Принудительный фильтр ближайшего соседа
+OPTION_M3G_FORCE_LINEAR=Принудительный линейный фильтр
+
+OPTION_M3G_MIPMAPPING=Мипмаппинг:
+OPTION_M3G_FORCE_BILINEAR=Принудительная билинейная фильтрация
+OPTION_M3G_FORCE_TRILINEAR=Принудительная трилинейная фильтрация
+OPTION_M3G_FORCE_ANISO_2X=Принудительная анизотропная фильтрация 2x
+OPTION_M3G_FORCE_ANISO_4X=Принудительная анизотропная фильтрация 4x
+OPTION_M3G_FORCE_ANISO_8X=Принудительная анизотропная фильтрация 8x
+OPTION_M3G_FORCE_ANISO_16X=Принудительная анизотропная фильтрация 16x
 
 #Message
 

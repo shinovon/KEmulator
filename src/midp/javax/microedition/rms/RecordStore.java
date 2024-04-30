@@ -1,13 +1,9 @@
 package javax.microedition.rms;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 import emulator.*;
 import emulator.ui.IEmulator;
-import emulator.ui.IProperty;
 import emulator.ui.swt.EmulatorImpl;
 
 import java.io.*;
@@ -40,7 +36,7 @@ public class RecordStore {
                 homeRootPath = getRootPath(null, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name"));
                 logln("midlet rms path: " + homeRootPath);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -89,7 +85,7 @@ public class RecordStore {
                     authmode = dataInputStream.readInt();
                     writable = dataInputStream.readBoolean();
                 }
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
             dataInputStream.close();
             if (!homeSuite && authmode == AUTHMODE_PRIVATE) {
@@ -239,9 +235,8 @@ public class RecordStore {
             throw new RecordStoreNotFoundException(name);
         }
         try {
-            File[] files = file.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                files[i].delete();
+            for (File value : file.listFiles()) {
+                value.delete();
             }
             file.delete();
         } catch (Exception e) {

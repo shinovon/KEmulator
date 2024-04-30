@@ -1,7 +1,6 @@
 package javax.microedition.io;
 
 import java.io.*;
-import emulator.custom.*;
 
 final class ResourceConnectionImpl implements InputConnection
 {
@@ -17,7 +16,7 @@ final class ResourceConnectionImpl implements InputConnection
     }
     
     public final InputStream openInputStream() throws IOException {
-        return emulator.custom.CustomJarResources.getResourceStream(this.aString314);
+        return emulator.custom.CustomJarResources.getResourceAsStream(this.aString314);
     }
     
     public final void close() {

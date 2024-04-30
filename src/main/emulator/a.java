@@ -25,9 +25,7 @@ final class a implements Runnable {
             }
             try {
                 Thread.sleep(1L);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ignored) {}
         }
     }
 

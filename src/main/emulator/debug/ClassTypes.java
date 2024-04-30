@@ -66,9 +66,11 @@ public final class ClassTypes {
                     s = "boolean";
             }
 
+            StringBuilder sBuilder = new StringBuilder(s);
             for (int var2 = var1; var2 >= 0; --var2) {
-                s = s + "[]";
+                sBuilder.append("[]");
             }
+            s = sBuilder.toString();
 
         }
         return s;

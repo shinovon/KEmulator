@@ -445,7 +445,7 @@ public class DualTone {
             player = Player.aPlayer916;
         }
         if (player != null && player instanceof PlayerImpl) {
-            n = ((PlayerImpl) player).getState();
+            n = player.getState();
         }
         return n;
     }

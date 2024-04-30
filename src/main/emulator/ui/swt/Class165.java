@@ -13,7 +13,7 @@ final class Class165 extends SelectionAdapter {
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         try {
             Class46.method443(this.aClass46_1433, Class46.method441(this.aClass46_1433).getSelection());
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 }

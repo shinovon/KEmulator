@@ -17,9 +17,9 @@ public class EmulatorMIDI {
     }
 
     static MidiDevice.Info getMidiDeviceInfo() throws MidiUnavailableException {
-        for (int i = 0; i < midiDeviceInfo.length; ++i) {
-            if (midiDeviceInfo[i].getName().toLowerCase().contains("virtualmidisynth")) {
-                return midiDeviceInfo[i];
+        for (MidiDevice.Info info : midiDeviceInfo) {
+            if (info.getName().toLowerCase().contains("virtualmidisynth")) {
+                return info;
             }
         }
         return MidiSystem.getSynthesizer().getDeviceInfo();
@@ -35,12 +35,9 @@ public class EmulatorMIDI {
             for (Transmitter t : midiSequencer.getTransmitters()) {
                 t.setReceiver(midiDevice.getReceiver());
             }
-            midiSequencer.addMetaEventListener(new MetaEventListener() {
-                @Override
-                public void meta(MetaMessage meta) {
-                    if (meta.getType() == 0x2F && currentPlayer instanceof PlayerImpl) {
-                        ((PlayerImpl) currentPlayer).notifyCompleted();
-                    }
+            midiSequencer.addMetaEventListener(meta -> {
+                if (meta.getType() == 0x2F && currentPlayer instanceof PlayerImpl) {
+                    ((PlayerImpl) currentPlayer).notifyCompleted();
                 }
             });
             midiSequencer.open();
@@ -72,7 +69,7 @@ public class EmulatorMIDI {
     public static void setMIDIChannelVolume(final int n, final int n2) {
         try {
             Receiver r = getMidiReceiver();
-            ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, (int) (n2 * 127.0));
+            ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, n2);
             r.send(shortMessage, -1L);
         } catch (Exception ex) {
             ex.printStackTrace();

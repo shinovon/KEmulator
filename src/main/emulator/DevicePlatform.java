@@ -22,7 +22,7 @@ public final class DevicePlatform {
             final Node item;
             if ((item = childNodes.item(i)).getNodeType() == 1) {
                 final Element element2;
-                if ((element2 = (Element) item).getNodeName().toLowerCase() == "define") {
+                if ((element2 = (Element) item).getNodeName().equalsIgnoreCase("define")) {
                     this.put(element2);
                 }
             }
@@ -70,10 +70,7 @@ public final class DevicePlatform {
     }
 
     public final boolean exists(final String s) {
-        if (this.properties.get(s) == null) {
-            return false;
-        }
-        return true;
+        return this.properties.get(s) != null;
     }
 
     public final boolean hasNokiaUI() {

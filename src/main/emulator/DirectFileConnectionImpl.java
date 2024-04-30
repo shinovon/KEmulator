@@ -12,7 +12,6 @@ import java.util.Enumeration;
 
 import javax.microedition.io.file.ConnectionClosedException;
 import javax.microedition.io.file.FileConnection;
-import javax.microedition.io.file.FileConnectionImpl;
 
 public class DirectFileConnectionImpl implements FileConnection {
 

@@ -70,7 +70,7 @@ public final class KeyRecords {
                         }
                     }
                 }
-            } catch (IOException ex) {
+            } catch (IOException ignored) {
             }
         } else if (n == this.aLong1159) {
             s = this.aString1160;
@@ -91,7 +91,7 @@ public final class KeyRecords {
                 return;
             }
             Settings.playingRecordedKeys = false;
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
         }
     }
 

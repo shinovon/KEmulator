@@ -63,8 +63,8 @@ public class ImageItem extends Item {
         int y = super.bounds[Y] + 2;
         if (super.labelArr != null && super.labelArr.length > 0) {
             graphics.setFont(Item.font);
-            for (int i = 0; i < super.labelArr.length; ++i) {
-                graphics.drawString(super.labelArr[i], super.bounds[X] + 4, y + 2, 0);
+            for (String s : super.labelArr) {
+                graphics.drawString(s, super.bounds[X] + 4, y + 2, 0);
                 y += Item.font.getHeight() + 4;
             }
         }

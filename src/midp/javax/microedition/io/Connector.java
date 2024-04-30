@@ -3,9 +3,7 @@ package javax.microedition.io;
 import javax.microedition.io.file.*;
 import javax.wireless.messaging.*;
 import emulator.sensor.*;
-import emulator.sensor.SensorImpl;
 import emulator.*;
-import emulator.Settings;
 
 import com.sun.cdc.io.*;
 import javax.microedition.sensor.*;

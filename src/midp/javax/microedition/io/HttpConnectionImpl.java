@@ -23,7 +23,7 @@ final class HttpConnectionImpl implements HttpConnection {
 				Emulator.getEmulator().getLogStream().println("update Connect to: " + s2);
 				(this.connection = (HttpURLConnection) new URL(s2).openConnection()).setDoInput(true);
 				this.connection.setDoOutput(true);
-			} catch (IOException ex) {
+			} catch (IOException ignored) {
 			}
 		}
 	}

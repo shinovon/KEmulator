@@ -176,7 +176,7 @@ public class RecordEnumerationImpl implements RecordEnumeration, RecordListener 
                     iCurrentPos += 1;
                 }
             }
-        } catch (RecordStoreException e) {
+        } catch (RecordStoreException ignored) {
         }
     }
 
@@ -215,15 +215,12 @@ public class RecordEnumerationImpl implements RecordEnumeration, RecordListener 
                 }
             }
             iRecordIDs = vectorToIntArray(filtered);
-        } catch (RecordStoreException noe) {
+        } catch (RecordStoreException ignored) {
         }
     }
 
     private boolean filterMatches(byte[] aRecord) {
-        if ((iRecordFilter == null) || (iRecordFilter.matches(aRecord))) {
-            return true;
-        }
-        return false;
+        return (iRecordFilter == null) || (iRecordFilter.matches(aRecord));
     }
 
     private int[] vectorToIntArray(Vector aVector) {
@@ -238,7 +235,7 @@ public class RecordEnumerationImpl implements RecordEnumeration, RecordListener 
     private void doSort() {
         try {
             quickSort(iRecordIDs, 0, iRecordIDs.length - 1);
-        } catch (RecordStoreException e) {
+        } catch (RecordStoreException ignored) {
         }
     }
 

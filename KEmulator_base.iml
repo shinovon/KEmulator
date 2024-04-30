@@ -8,13 +8,15 @@
       <sourceFolder url="file://$MODULE_DIR$/src/midp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/nnapi" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/nokia" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/3d_stub" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/res" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/oem" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/3d" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="libraries" level="project" />
     <orderEntry type="library" exported="" name="swt" level="project" />
+    <orderEntry type="library" name="lwjgl" level="project" />
+    <orderEntry type="module" module-name="m3g_stub" />
   </component>
 </module>

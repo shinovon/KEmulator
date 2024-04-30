@@ -12,15 +12,15 @@ public class Form extends Screen {
     public Form(final String s, final Item[] array) {
         super(s);
         if (array != null) {
-            for (int i = 0; i < array.length; ++i) {
-                if (array[i] == null) {
+            for (Item item : array) {
+                if (item == null) {
                     throw new NullPointerException();
                 }
-                if (array[i].screen != null) {
+                if (item.screen != null) {
                     throw new IllegalStateException();
                 }
-                super.items.add(array[i]);
-                array[i].screen = this;
+                super.items.add(item);
+                item.screen = this;
             }
         }
     }
@@ -71,8 +71,8 @@ public class Form extends Screen {
     }
 
     public void deleteAll() {
-        for (int i = 0; i < super.items.size(); ++i) {
-            ((Item) super.items.get(i)).screen = null;
+        for (Object item : super.items) {
+            ((Item) item).screen = null;
         }
         super.items.removeAllElements();
     }
@@ -117,8 +117,8 @@ public class Form extends Screen {
 
     protected void paint(final Graphics g) {
         this.layout();
-        for (int i = 0; i < super.items.size(); ++i) {
-            final Item item = ((Item) super.items.get(i));
+        for (Object o : super.items) {
+            final Item item = ((Item) o);
             if (item.shownOnForm) {
                 item.paint(g);
             } else {
@@ -163,9 +163,9 @@ public class Form extends Screen {
             }
         }
         int h = Screen.fontHeight4;
-        for (int k = 0; k < super.items.size(); ++k) {
+        for (Object o : super.items) {
             final Item item;
-            if ((item = ((Item) super.items.get(k))).shownOnForm) {
+            if ((item = ((Item) o)).shownOnForm) {
                 item.layout();
                 item.bounds[Y] = h;
                 h += item.bounds[H];

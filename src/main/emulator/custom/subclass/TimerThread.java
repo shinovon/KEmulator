@@ -1,7 +1,5 @@
 package emulator.custom.subclass;
 
-import emulator.debug.Memory;
-
 class TimerThread extends Thread {
     private TaskQueue queue;
     private static final long THREAD_TIMEOUT = 30000L;

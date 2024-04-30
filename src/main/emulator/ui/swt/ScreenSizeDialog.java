@@ -18,10 +18,12 @@ public class ScreenSizeDialog extends Dialog {
     }
 
     public int[] open() {
-        Shell shell = new Shell(getParent(), getStyle());
+        Shell parentShell = getParent();
+        Shell shell = new Shell(parentShell, getStyle());
         shell.setText(emulator.UILocale.get("SCREEN_SIZE_DIALOG_TITLE", "Set screen size"));
         createContents(shell);
         shell.pack();
+        shell.setLocation(parentShell.getLocation().x + (parentShell.getSize().x - shell.getSize().x >> 1), parentShell.getLocation().y + (parentShell.getSize().y - shell.getSize().y >> 1));
         shell.open();
         Display display = getParent().getDisplay();
         while (!shell.isDisposed()) {

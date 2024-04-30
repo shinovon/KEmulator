@@ -50,9 +50,9 @@ public final class Instance {
             if (clazz.getSuperclass() != null) {
                 this.method880(clazz.getSuperclass(), s);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
-        } catch (Error error) {
+        } catch (Error ignored) {
         }
     }
 
@@ -75,7 +75,7 @@ public final class Instance {
     private static boolean method884(String lowerCase, final String s) {
         lowerCase = lowerCase.toLowerCase();
         final String lowerCase2;
-        return (lowerCase2 = s.toLowerCase()).length() > 0 && lowerCase.indexOf(lowerCase2) >= 0;
+        return (lowerCase2 = s.toLowerCase()).length() > 0 && lowerCase.contains(lowerCase2);
     }
 
     private static Class getCls(final String s) {
@@ -83,9 +83,8 @@ public final class Instance {
         try {
             forName = Class.forName(s, false, Emulator.getCustomClassLoader());
         } catch (ClassNotFoundException ex2) {
-            final ClassNotFoundException ex = ex2;
             Emulator.AntiCrack(ex2);
-            throw new NoClassDefFoundError(ex.getMessage());
+            throw new NoClassDefFoundError(ex2.getMessage());
         }
         return forName;
     }

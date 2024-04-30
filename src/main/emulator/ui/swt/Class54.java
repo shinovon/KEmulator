@@ -84,39 +84,39 @@ public final class Class54 implements MouseListener, MouseMoveListener {
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 2;
         layout.horizontalSpacing = 0;
-        ((Decorations) (this.aShell806 = new Shell(shell, 67680))).setText(emulator.UILocale.get("ABOUT_FRAME_TITLE", "About & Help"));
-        ((Decorations) this.aShell806).setImage(new Image((Device) Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        ((Composite) this.aShell806).setLayout((Layout) layout);
-        ((Control) this.aShell806).setSize(new Point(360, 400));
-        ((Control) (this.aCLabel805 = new CLabel((Composite) this.aShell806, 0))).setLayoutData((Object) layoutData5);
+        (this.aShell806 = new Shell(shell, 67680)).setText(emulator.UILocale.get("ABOUT_FRAME_TITLE", "About & Help"));
+        this.aShell806.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        this.aShell806.setLayout(layout);
+        this.aShell806.setSize(new Point(360, 400));
+        (this.aCLabel805 = new CLabel(this.aShell806, 0)).setLayoutData(layoutData5);
         aCLabel805.setFont(EmulatorScreen.f);
         this.aCLabel805.setText(Emulator.getAboutString());
         this.method463();
-        (this.aLink816 = new Link((Composite) this.aShell806, 0)).setText("<a>" + "nnmod web page" + "</a>");
-        ((Control) this.aLink816).setLayoutData((Object) gridData2);
+        (this.aLink816 = new Link(this.aShell806, 0)).setText("<a>" + "nnmod web page" + "</a>");
+        this.aLink816.setLayoutData(gridData2);
         //((Control)this.aLink816).setEnabled(false);
-        this.aLink816.addSelectionListener((SelectionListener) new Class158(this));
-        (this.aLink820 = new Link((Composite) this.aShell806, 0)).setText("<a>" + "News && chat (en/ru)" + "</a>");
-        ((Control) this.aLink820).setLayoutData((Object) gridData2);
+        this.aLink816.addSelectionListener(new Class158(this));
+        (this.aLink820 = new Link(this.aShell806, 0)).setText("<a>" + "Chat, news (en)" + "</a>");
+        this.aLink820.setLayoutData(gridData2);
         //   ((Control)this.aLink820).setEnabled(false);
-        this.aLink820.addSelectionListener((SelectionListener) new Class157(this));
-        (this.aLink807 = new Link((Composite) this.aShell806, 0)).setText("Mod by shinovon\n" + emulator.UILocale.get("ABOUT_AUTHOR", "Author") + ": <a>Wu.Liang</a>  (c) 2006,2008");
-        ((Control) this.aLink807).setLayoutData((Object) layoutData);
-        this.aLink807.addSelectionListener((SelectionListener) new Class156(this));
-        ((Control) (this.aStyledText808 = new StyledText((Composite) this.aShell806, 2562))).setLayoutData((Object) layoutData4);
-        ((Composite) this.aStyledText808).setFocus();
+        this.aLink820.addSelectionListener(new Class157(this));
+        (this.aLink807 = new Link(this.aShell806, 0)).setText("Mod by shinovon\n3D engine contributions by rmn20\nSoftBank MEXA, MascotCapsule impl by woesss\n" + emulator.UILocale.get("ABOUT_AUTHOR", "Author") + ": <a>Wu.Liang</a>  (c) 2006,2008");
+        this.aLink807.setLayoutData(layoutData);
+        this.aLink807.addSelectionListener(new Class156(this));
+        (this.aStyledText808 = new StyledText(this.aShell806, 2562)).setLayoutData(layoutData4);
+        this.aStyledText808.setFocus();
         this.aStyledText808.setEditable(false);
         this.aStyledText808.setIndent(5);
         aStyledText808.setFont(EmulatorScreen.f);
-        (this.aButton819 = new Button((Composite) this.aShell806, 8388608)).setText(emulator.UILocale.get("ABOUT_ONLINE_MANUAL", "Online Manual"));
-        ((Control) this.aButton819).setLayoutData((Object) layoutData2);
-        ((Control) this.aButton819).setEnabled(false);
-        this.aButton819.addSelectionListener((SelectionListener) new Class162(this));
-        (this.aButton809 = new Button((Composite) this.aShell806, 8388616)).setText(emulator.UILocale.get("DIALOG_OK", "OK"));
-        ((Control) this.aButton809).setLayoutData((Object) layoutData3);
+        (this.aButton819 = new Button(this.aShell806, 8388608)).setText(emulator.UILocale.get("ABOUT_ONLINE_MANUAL", "Online Manual"));
+        this.aButton819.setLayoutData(layoutData2);
+        this.aButton819.setEnabled(false);
+        this.aButton819.addSelectionListener(new Class162(this));
+        (this.aButton809 = new Button(this.aShell806, 8388616)).setText(emulator.UILocale.get("DIALOG_OK", "OK"));
+        this.aButton809.setLayoutData(layoutData3);
         layoutData3.heightHint = 20;
         layoutData3.widthHint = 70;
-        this.aButton809.addSelectionListener((SelectionListener) new Class163(this));
+        this.aButton809.addSelectionListener(new Class163(this));
         this.method453();
     }
 
@@ -128,22 +128,22 @@ public final class Class54 implements MouseListener, MouseMoveListener {
                 final int charCount = this.aStyledText808.getCharCount();
                 if (line.startsWith("$")) {
                     this.aStyledText808.append(line.substring(1) + "\n");
-                    this.aStyledText808.setStyleRange(new StyleRange(charCount, line.length(), Display.getCurrent().getSystemColor(9), (Color) null));
+                    this.aStyledText808.setStyleRange(new StyleRange(charCount, line.length(), Display.getCurrent().getSystemColor(9), null));
                 } else {
                     this.aStyledText808.append(line + "\n");
                 }
             }
             bufferedReader.close();
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 
     public final void method454(final Shell shell) {
         this.method462(shell);
-        final Display display = ((Widget) shell).getDisplay();
-        ((Control) this.aShell806).setLocation(shell.getLocation().x + (shell.getSize().x - this.aShell806.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aShell806.getSize().y >> 1));
+        final Display display = shell.getDisplay();
+        this.aShell806.setLocation(shell.getLocation().x + (shell.getSize().x - this.aShell806.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aShell806.getSize().y >> 1));
         this.aShell806.open();
-        while (!((Widget) this.aShell806).isDisposed()) {
+        while (!this.aShell806.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
             }
@@ -156,10 +156,10 @@ public final class Class54 implements MouseListener, MouseMoveListener {
         layoutData.verticalAlignment = 4;
         layoutData.heightHint = 146;
         layoutData.widthHint = 156;
-        ((Control) (this.aCanvas810 = new Canvas((Composite) this.aShell806, 537133056))).setLayoutData((Object) layoutData);
-        ((Control) this.aCanvas810).addMouseListener((MouseListener) this);
-        ((Control) this.aCanvas810).addMouseMoveListener((MouseMoveListener) this);
-        this.aGC814 = new GC((Drawable) this.aCanvas810);
+        (this.aCanvas810 = new Canvas(this.aShell806, 537133056)).setLayoutData(layoutData);
+        this.aCanvas810.addMouseListener(this);
+        this.aCanvas810.addMouseMoveListener(this);
+        this.aGC814 = new GC(this.aCanvas810);
         this.method455("".getClass().getResourceAsStream("/res/sign"));
     }
 
@@ -238,12 +238,10 @@ public final class Class54 implements MouseListener, MouseMoveListener {
     }
 
     public void finalize() {
-        EmulatorImpl.asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    if (!aGC814.isDisposed()) aGC814.dispose();
-                } catch (Exception e) {
-                }
+        EmulatorImpl.asyncExec(() -> {
+            try {
+                if (!aGC814.isDisposed()) aGC814.dispose();
+            } catch (Exception ignored) {
             }
         });
     }

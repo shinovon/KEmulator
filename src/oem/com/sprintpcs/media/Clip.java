@@ -104,7 +104,7 @@ public class Clip {
         }
 
         if (var2 != null && var2 instanceof PlayerImpl) {
-            var1 = var1 + ((PlayerImpl) var2).getState();
+            var1 = var1 + var2.getState();
         }
 
         return var1;

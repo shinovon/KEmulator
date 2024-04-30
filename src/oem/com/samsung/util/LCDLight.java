@@ -1,9 +1,5 @@
 package com.samsung.util;
 
-import com.nokia.mid.ui.DeviceControl;
-
-import emulator.Emulator;
-
 public class LCDLight {
     public static boolean isSupported() {
         return false;

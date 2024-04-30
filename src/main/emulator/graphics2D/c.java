@@ -1,20 +1,21 @@
 package emulator.graphics2D;
 
-import java.util.*;
 import org.eclipse.swt.graphics.*;
 import java.awt.image.*;
 import java.awt.*;
-import java.awt.datatransfer.*;
 
 public final class c
 {
-    private static final PaletteData aPaletteData354;
-    
+    private static final PaletteData palleteData;
+    private static int[] buffer;
+    private static BufferedImage lastImg;
+    private static ImageData imageData;
+
     public c() {
         super();
     }
     
-    public static BufferedImage method167(final ImageData imageData) {
+    public static BufferedImage toAwtForCapture(final ImageData imageData) {
         final PaletteData palette;
         if ((palette = imageData.palette).isDirect) {
             final DirectColorModel directColorModel = new DirectColorModel(imageData.depth, palette.redMask, palette.greenMask, palette.blueMask);
@@ -55,7 +56,7 @@ public final class c
         return bufferedImage2;
     }
     
-    private static ImageData method170(final BufferedImage bufferedImage) {
+    private static ImageData _awtToSwt(final BufferedImage bufferedImage) {
         if (bufferedImage.getColorModel() instanceof DirectColorModel) {
             final DirectColorModel directColorModel = (DirectColorModel)bufferedImage.getColorModel();
             final PaletteData paletteData = new PaletteData(directColorModel.getRedMask(), directColorModel.getGreenMask(), directColorModel.getBlueMask());
@@ -101,7 +102,7 @@ public final class c
         return null;
     }
     
-    public static BufferedImage method171(final ImageData imageData) {
+    public static BufferedImage toAwt(final ImageData imageData) {
         final BufferedImage bufferedImage;
         int[] data = ((DataBufferInt)(bufferedImage = new BufferedImage(imageData.width, imageData.height, 2)).getRaster().getDataBuffer()).getData();
         final int n = imageData.width * imageData.height;
@@ -150,27 +151,32 @@ public final class c
         return bufferedImage;
     }
     
-    public static ImageData method168(final BufferedImage bufferedImage) {
+    public static ImageData toSwt(final BufferedImage bufferedImage) {
         if (bufferedImage.getType() != 1) {
-            return method170(bufferedImage);
+            return _awtToSwt(bufferedImage);
         }
-        final ImageData imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, c.aPaletteData354);
-        final int[] data = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
-        int n = imageData.data.length - 1;
-        for (int i = data.length - 1; i >= 0; --i) {
-            imageData.data[n--] = (byte)(data[i] >> 24 & 0xFF);
-            imageData.data[n--] = (byte)(data[i] >> 16 & 0xFF);
-            imageData.data[n--] = (byte)(data[i] >> 8 & 0xFF);
-            imageData.data[n--] = (byte)(data[i] & 0xFF);
+        if(buffer == null || bufferedImage != lastImg) {
+            imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, c.palleteData);
+            buffer = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
+            lastImg = bufferedImage;
         }
-        return imageData;
+        ImageData data = c.imageData;
+        int[] buf = c.buffer;
+        int n = data.data.length - 1;
+        for (int i = buf.length - 1; i >= 0; --i) {
+            data.data[n--] = (byte)(buf[i] >> 24 & 0xFF);
+            data.data[n--] = (byte)(buf[i] >> 16 & 0xFF);
+            data.data[n--] = (byte)(buf[i] >> 8 & 0xFF);
+            data.data[n--] = (byte)(buf[i] & 0xFF);
+        }
+        return data;
     }
     
-    public static void method169(final BufferedImage bufferedImage) {
+    public static void setClipboard(final BufferedImage bufferedImage) {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new a(bufferedImage), null);
     }
     
     static {
-        aPaletteData354 = new PaletteData(65280, 16711680, -16777216);
+        palleteData = new PaletteData(65280, 16711680, -16777216);
     }
 }

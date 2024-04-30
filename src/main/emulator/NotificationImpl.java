@@ -26,7 +26,7 @@ public class NotificationImpl implements AbstractNotification {
             tray = SystemTray.getSystemTray();
             Image image;
             if (imgpath != null) {
-                image = ImageIO.read(emulator.custom.CustomJarResources.getResourceStream(imgpath));
+                image = ImageIO.read(emulator.custom.CustomJarResources.getResourceAsStream(imgpath));
             } else {
                 image = ImageIO.read(getClass().getResourceAsStream("/res/icon"));
             }

@@ -67,7 +67,7 @@ public class InputStreamSourceStream implements SourceStream {
     }
 
     public Control getControl(String aControlType) {
-        if ((aControlType == "SeekControl") && (getSeekType() == 1)) {
+        if ((aControlType.equals("SeekControl")) && (getSeekType() == 1)) {
             return this.iSeekControl;
         }
         return null;

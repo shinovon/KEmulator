@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="m3g_stub">
+    <output-path>$PROJECT_DIR$/home</output-path>
+    <root id="archive" name="m3g_stub.jar">
+      <element id="module-output" name="m3g_stub" />
+    </root>
+  </artifact>
+</component>

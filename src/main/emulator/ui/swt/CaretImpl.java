@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.ui.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Canvas;
@@ -19,8 +20,6 @@ public final class CaretImpl implements ICaret {
     private int caretLocY;
     private int caretX;
     private int caretY;
-    private Transform jdField_a_of_type_OrgEclipseSwtGraphicsTransform;
-    private int e;
     private TextField lcduiTextField;
     private int caretPosition;
     private int caretCol;
@@ -38,20 +37,13 @@ public final class CaretImpl implements ICaret {
     }
 
     public final void a(Transform paramTransform, int paramInt) {
-        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform = paramTransform;
-        this.e = paramInt;
     }
 
     public final void setCaretLocation(final int x, final int y) {
         this.caretLocX = x;
         this.caretLocY = y;
-        float[] arrayOfFloat;
-        (arrayOfFloat = new float[2])[0] = x;
-        arrayOfFloat[1] = y;
-        this.jdField_a_of_type_OrgEclipseSwtGraphicsTransform.transform(arrayOfFloat);
-
-        swtCaret.setLocation((int) (arrayOfFloat[0] * this.zoom), (int) (arrayOfFloat[1] * this.zoom));
-        //this.swtCaret.setLocation((int)(x * this.zoom), (int)(y * this.zoom));
+        int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformPointer(x, y);
+        swtCaret.setLocation(i[0], i[1]);
     }
 
     public final void setWindowZoom(final float aFloat840) {
@@ -222,7 +214,7 @@ public final class CaretImpl implements ICaret {
                                 var6.substring(this.caretCol, var7);
                             }
 
-                            var3 = var3.substring(0, this.caretPosition - 1) + var3.substring(this.caretPosition, var3.length());
+                            var3 = var3.substring(0, this.caretPosition - 1) + var3.substring(this.caretPosition);
                         }
                     case '\t':
                     case '\n':
@@ -246,13 +238,13 @@ public final class CaretImpl implements ICaret {
                                 var6.substring(this.caretCol, var7);
                             }
 
-                            var3 = var3.substring(0, this.caretPosition) + var3.substring(this.caretPosition + 1, var3.length());
+                            var3 = var3.substring(0, this.caretPosition) + var3.substring(this.caretPosition + 1);
                         }
                         break;
                     default:
                         if (var1.character >= 32 && var3.length() < this.lcduiTextField.getMaxSize()) {
                             try {
-                                var3 = var3.substring(0, this.caretPosition) + var1.character + var3.substring(this.caretPosition, var3.length());
+                                var3 = var3.substring(0, this.caretPosition) + var1.character + var3.substring(this.caretPosition);
                                 if (var1.character != 32 || var3.charAt(this.caretPosition + 1) == 32) {
                                     if (this.caretCol == var7 && this.caretRow < var4.length - 1) {
                                         ++this.caretRow;
@@ -271,9 +263,7 @@ public final class CaretImpl implements ICaret {
                                         ++this.caretRow;
                                     }
                                 }
-                            } catch (Exception var12) {
-                                ;
-                            }
+                            } catch (Exception ignored) {}
                         }
                 }
 

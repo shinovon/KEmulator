@@ -1,6 +1,7 @@
 package emulator.custom;
 
 import emulator.Emulator;
+import emulator.Settings;
 import org.objectweb.asm.*;
 
 public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
@@ -22,7 +23,7 @@ public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
             }
             desc = desc.replaceAll(s4, s5);
         }
-        if ("paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc)) {
+        if ("paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc) && Settings.patchSynchronizedPaint) {
             if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
                 acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
                 Emulator.getEmulator().getLogStream().println("Patched paint method: " + className);
@@ -36,7 +37,7 @@ public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
         }
         final MethodVisitor visitMethod;
         if ((visitMethod = super.visitMethod(acc, name, desc, sign, array)) != null) {
-            return (MethodVisitor) new CustomMethodAdapter(visitMethod, this.className, name, desc);
+            return new CustomMethodAdapter(visitMethod, this.className, name, desc);
         }
         return null;
     }

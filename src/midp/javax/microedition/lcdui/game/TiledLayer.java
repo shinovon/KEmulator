@@ -124,12 +124,7 @@ public class TiledLayer extends Layer {
         this._setWidth(this.columns * n);
         this._setHeight(this.rows * n2);
         final int n3;
-        boolean b;
-        if ((n3 = image.getWidth() / n * (image.getHeight() / n2)) >= this.anInt273 - 1) {
-            b = true;
-        } else {
-            b = false;
-        }
+        boolean b = (n3 = image.getWidth() / n * (image.getHeight() / n2)) >= this.anInt273 - 1;
         method111(image, n3 + 1, n, n2, b);
     }
 

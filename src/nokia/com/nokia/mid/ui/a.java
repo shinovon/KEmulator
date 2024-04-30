@@ -6,8 +6,6 @@ import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.ITransform;
 import emulator.graphics2D.b;
-import emulator.ui.IEmulator;
-import emulator.ui.ILogStream;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;

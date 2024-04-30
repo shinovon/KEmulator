@@ -10,7 +10,6 @@ import emulator.graphics2D.*;
 import emulator.graphics2D.swt.FontSWT;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.graphics3D.*;
-import org.eclipse.swt.graphics.*;
 
 public final class EmulatorImpl implements IEmulator {
     private static Display display;
@@ -25,7 +24,7 @@ public final class EmulatorImpl implements IEmulator {
     private Class11 ilogstream;
     private Class161 aClass161_1387;
     private Class108 aClass108_1390;
-    private Class90 aClass90_1384;
+    private M3GViewUI aClass90_1384;
     private Class83 aClass83_1389;
     public Properties midletProps;
     private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
@@ -34,7 +33,7 @@ public final class EmulatorImpl implements IEmulator {
         super();
         EmulatorImpl.display = new Display();
         this.aVector1379 = new Vector();
-        this.screenDepth = ((Device) EmulatorImpl.display).getDepth();
+        this.screenDepth = EmulatorImpl.display.getDepth();
         this.iproperty = new Property();
         this.ilogstream = new Class11();
         this.aClass83_1389 = new Class83();
@@ -44,12 +43,11 @@ public final class EmulatorImpl implements IEmulator {
         this.aClass5_1391 = new Class5(1);
         this.aClass110_1382 = new MemoryView();
         this.aClass46_1381 = new Class46();
-        this.aClass90_1384 = new Class90();
     }
 
     public static void dispose() {
-        if (!((Device) EmulatorImpl.display).isDisposed()) {
-            ((Device) EmulatorImpl.display).dispose();
+        if (!EmulatorImpl.display.isDisposed()) {
+            EmulatorImpl.display.dispose();
         }
     }
 
@@ -58,13 +56,13 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public static void syncExec(final Runnable runnable) {
-        if (!((Device) EmulatorImpl.display).isDisposed()) {
+        if (!EmulatorImpl.display.isDisposed()) {
             EmulatorImpl.display.syncExec(runnable);
         }
     }
 
     public static void asyncExec(final Runnable runnable) {
-        if (!((Device) EmulatorImpl.display).isDisposed()) {
+        if (!EmulatorImpl.display.isDisposed()) {
             EmulatorImpl.display.asyncExec(runnable);
         }
     }
@@ -104,7 +102,10 @@ public final class EmulatorImpl implements IEmulator {
         return this.aClass161_1387;
     }
 
-    public final Class90 method827() {
+    public final M3GViewUI getM3GView() {
+        if(aClass90_1384 == null) {
+            this.aClass90_1384 = new M3GViewUI();
+        }
         return this.aClass90_1384;
     }
 
@@ -120,12 +121,13 @@ public final class EmulatorImpl implements IEmulator {
         this.aClass110_1382.method656();
         this.aClass5_1377.method321();
         this.aClass5_1391.method321();
-        this.aClass90_1384.method507();
+        if(aClass90_1384 != null)
+            this.aClass90_1384.method507();
         while (Class5.aVector548.size() > 0) {
             ((Class5) Class5.aVector548.get(0)).method321();
         }
-        for (int i = 0; i < this.aVector1379.size(); ++i) {
-            ((IPlugin) this.aVector1379.get(i)).close();
+        for (Object o : this.aVector1379) {
+            ((IPlugin) o).close();
         }
     }
 
@@ -188,7 +190,7 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public final IImage newImage(int n, int n2, boolean b, int n3) {
-        return (IImage) (Settings.g2d == 0 ? new ImageSWT(n, n2, b, n3) : (Settings.g2d == 1 ? new emulator.graphics2D.awt.d(n, n2, b, n3) : null));
+        return Settings.g2d == 0 ? new ImageSWT(n, n2, b, n3) : (Settings.g2d == 1 ? new emulator.graphics2D.awt.d(n, n2, b, n3) : null);
     }
 
 
@@ -203,7 +205,8 @@ public final class EmulatorImpl implements IEmulator {
     }
 
     public final IGraphics3D getGraphics3D() {
-        return null;
+        // TODO
+        return Emulator.getPlatform().getGraphics3D();
     }
 
     public final void syncValues() {

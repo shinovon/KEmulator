@@ -8,11 +8,6 @@ public final class Settings {
      * swt - 0
      */
     public static int g2d;
-    /*
-     * 1 - lwj
-     * 0 - wgl
-     */
-    // public static int g3d;
     public static boolean enableVibration;
     public static boolean enableKeyRepeat;
     public static boolean ignoreFullScreen;
@@ -68,11 +63,32 @@ public final class Settings {
     public static boolean pollKeyboardOnRepaint = true;
     public static String uiLanguage = "en";
     public static boolean rpc;
-
     public static boolean uei;
     public static boolean fpsCounter = true;
     public static boolean synchronizeKeyEvents = true;
     public static boolean motorolaSoftKeyFix = false;
+    public static int g3d; // 0 - swerve, 1 - lwjgl
+    public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill
+    public static boolean keepAspectRatio = true;
+    public static boolean integerResize = false;
+    public static boolean patchSynchronizedPaint = true;
+
+    //m3g
+    public static boolean m3gIgnoreOverwrite;
+    public static boolean m3gForcePerspectiveCorrection;
+    public static boolean m3gDisableLightClamp;
+
+    public static final int APP_CONTROLLED = 0;
+
+    public static final int AA_OFF = 1, AA_ON = 2;
+    public static int m3gAA;
+
+    public static final int TEX_FILTER_NEAREST = 1, TEX_FILTER_LINEAR = 2;
+    public static int m3gTexFilter;
+
+    public static final int MIP_OFF = 1, MIP_LINEAR = 2, MIP_TRILINEAR = 3,
+            MIP_ANISO_2 = 4, MIP_ANISO_4 = 5, MIP_ANISO_8 = 6, MIP_ANISO_16 = 7;
+    public static int m3gMipmapping;
 
     public Settings() {
         super();
@@ -80,7 +96,7 @@ public final class Settings {
 
     static {
         Settings.g2d = 1;
-        // Settings.g3d = 1;
+        Settings.g3d = 1;
         Settings.canvasScale = 100;
         Settings.frameRate = 60;
         Settings.steps = -1;

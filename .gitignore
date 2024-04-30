@@ -47,3 +47,6 @@ plugins
 .idea/uiDesigner.xml
 config_fast.txt
 home/classwatcher.txt
+m3g_*.jar
+KEmulator_x64.jar
+version.mf

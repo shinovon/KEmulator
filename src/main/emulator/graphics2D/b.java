@@ -42,9 +42,8 @@ public final class b
             System.arraycopy(array, n, data, n5, n3);
             if (!b) {
                 for (int j = 0; j < n3; ++j) {
-                    final int[] array2 = data;
                     final int n6 = n5 + j;
-                    array2[n6] |= 0xFF000000;
+                    data[n6] |= 0xFF000000;
                 }
             }
             n5 += image.getWidth();
@@ -74,9 +73,8 @@ public final class b
             System.arraycopy(array, n, data, n5, n3);
             if (!b) {
                 for (int j = 0; j < n3; ++j) {
-                    final int[] array3 = data;
                     final int n6 = n5 + j;
-                    array3[n6] |= 0xFF000000;
+                    data[n6] |= 0xFF000000;
                 }
             }
             n5 += emulator.graphics2D.b.anIImage351.getWidth();

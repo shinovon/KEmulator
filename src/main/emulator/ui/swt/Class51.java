@@ -4,12 +4,10 @@ import org.eclipse.swt.events.*;
 
 import javax.microedition.m3g.*;
 
-import org.eclipse.swt.widgets.*;
-
 final class Class51 extends MouseAdapter {
-    private final Class90 aClass90_802;
+    private final M3GViewUI aClass90_802;
 
-    Class51(final Class90 aClass90_802) {
+    Class51(final M3GViewUI aClass90_802) {
         super();
         this.aClass90_802 = aClass90_802;
     }
@@ -18,10 +16,10 @@ final class Class51 extends MouseAdapter {
         if (mouseEvent.button == 3) {
             try {
                 final Node node;
-                if (Class90.method501(this.aClass90_802).getSelection() != null && (node = (Node) ((Widget) Class90.method501(this.aClass90_802).getSelection()[0]).getData()) != null) {
-                    new Class5(node).method311(Class90.method499(aClass90_802));
+                if (M3GViewUI.method501(this.aClass90_802).getSelection() != null && (node = (Node) M3GViewUI.method501(this.aClass90_802).getSelection()[0].getData()) != null) {
+                    new Class5(node).method311(M3GViewUI.method499(aClass90_802));
                 }
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
     }

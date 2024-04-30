@@ -131,9 +131,8 @@ public final class a {
             final int n11 = i * i;
             for (int j = n7; j < n8; ++j) {
                 if (j * j + n11 < n6) {
-                    final int[] array2 = array;
                     final int n12 = this.anInt316 * (i + n2) + (j + n);
-                    array2[n12] += n4;
+                    array[n12] += n4;
                 }
             }
         }

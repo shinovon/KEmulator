@@ -6,6 +6,7 @@ import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Display;
@@ -15,6 +16,7 @@ import javax.microedition.midlet.MIDlet;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -31,7 +33,8 @@ import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator {
-    public static final String version = "2.15.2";
+    public static boolean debugBuild = true;
+    public static String version = "m3g2";
     public static final int numericVersion = 15;
 
     static EmulatorImpl emulatorimpl;
@@ -258,11 +261,11 @@ public class Emulator {
     }
 
     public static String getInfoString() {
-        return platform.getInfoString("v" + version);
+        return platform.getInfoString((version.startsWith("2.") ? "v" : "") + version);
     }
 
     public static String getAboutString() {
-        return "KEmulator nnmod " + version + "\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+        return "KEmulator nnmod\n" + version + "\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
     }
 
     public static void getLibraries() {
@@ -309,11 +312,11 @@ public class Emulator {
                     file = (file2 = new File(Emulator.jadPath));
                 } else {
                     final StringBuffer sb = new StringBuffer();
-                    file = (file2 = new File(sb.append(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3)).append("jad").toString()));
+                    file = (file2 = new File(sb.append(Emulator.midletJar, 0, Emulator.midletJar.length() - 3).append("jad").toString()));
                 }
                 final File file3 = file2;
                 if (file.exists()) {
-                    ((Properties) (props = new Properties())).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
+                    (props = new Properties()).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
                     final Enumeration<Object> keys = props.keys();
                     while (keys.hasMoreElements()) {
                         final String s = (String) keys.nextElement();
@@ -336,12 +339,12 @@ public class Emulator {
                         final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
                         props = new Properties();
                         for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
-                            props.put(entry.getKey().toString(), (String) entry.getValue());
+                            props.put(entry.getKey().toString(), entry.getValue());
                         }
                     } catch (Exception ex2) {
                         final InputStream inputStream;
                         (inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
-                        ((Properties) (props = new Properties())).load(new InputStreamReader(inputStream, "UTF-8"));
+                        (props = new Properties()).load(new InputStreamReader(inputStream, "UTF-8"));
                         inputStream.close();
                         final Enumeration<Object> keys2 = props.keys();
                         while (keys2.hasMoreElements()) {
@@ -350,7 +353,7 @@ public class Emulator {
                         }
                     }
                 }
-                Emulator.emulatorimpl.midletProps = (Properties) props;
+                Emulator.emulatorimpl.midletProps = props;
                 if (props.containsKey("MIDlet-2") && props.containsKey("MIDlet-1")) {
                     // find all midlets and show choice window
                     Vector<String> midletKeys = new Vector<String>();
@@ -364,7 +367,7 @@ public class Emulator {
                                 String v = props.getProperty(s);
                                 v = v.substring(0, v.indexOf(","));
                                 midletKeys.add(n + " (" + v + ")");
-                            } catch (Exception e) {
+                            } catch (Exception ignored) {
                             }
                         }
                     }
@@ -583,7 +586,7 @@ public class Emulator {
                 Dimension d = w.getViewSize();
                 System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
             }
-        } catch (Throwable e) {}
+        } catch (Throwable ignored) {}
 
         try {
             String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
@@ -598,7 +601,7 @@ public class Emulator {
                     Settings.fpsGame = 3;
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     private static String getHWID() {
@@ -607,7 +610,7 @@ public class Emulator {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(s.getBytes());
             StringBuffer sb = new StringBuffer();
-            byte b[] = md.digest();
+            byte[] b = md.digest();
             for (byte aByteData : b) {
                 String hex = Integer.toHexString(0xff & aByteData);
                 if (hex.length() == 1) sb.append('0');
@@ -627,8 +630,25 @@ public class Emulator {
             System.out.println("Platform class not found");
             return;
         }
-        if (!platform.isX64() && System.getProperty("os.arch").equals("amd64")) {
-            JOptionPane.showMessageDialog(new JPanel(), "Cannot run KEmulator nnmod with 64 bit java. Try kemulator nnx64 instead.");
+        try {
+            if(debugBuild) {
+                Manifest versionManifest = new Manifest(Emulator.class.getResourceAsStream("/META-INF/version.mf"));
+                final Attributes mainAttributes = versionManifest.getMainAttributes();
+                for (Map.Entry entry : mainAttributes.entrySet()) {
+                    if(entry.getKey().toString().equals("Git-Revision")) {
+                        String s = entry.getValue().toString();
+                        if(s.length() > 0)
+                            version = version + " " + s;
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String arch = System.getProperty("os.arch");
+        if (!platform.isX64() && !arch.equals("x86")) {
+            JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod at this architecture (" + arch + "). Try x64 version instead.");
             System.exit(0);
             return;
         }
@@ -637,14 +657,14 @@ public class Emulator {
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.initLocale();
         Emulator.emulatorimpl = new EmulatorImpl();
+        parseLaunchArgs(commandLineArguments);
+        platform.loadM3G();
         try {
             i.a("emulator");
-        } catch (Error e) {
-        }
+        } catch (Error ignored) {}
         vlcCheckerThread.start();
         Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
-        parseLaunchArgs(commandLineArguments);
         Devices.load(Emulator.deviceFile);
         tryToSetDevice(Emulator.deviceName);
         setupMRUList();
@@ -666,23 +686,23 @@ public class Emulator {
         final String appProperty;
         if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
             iconPath = appProperty;
-            inputStream = emulator.custom.CustomJarResources.getResourceStream(appProperty);
+            inputStream = emulator.custom.CustomJarResources.getResourceAsStream(appProperty);
         } else {
             final String appProperty2;
             if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
                 try {
                     String s = appProperty2.split(",")[1].trim();
                     iconPath = s;
-                    inputStream = emulator.custom.CustomJarResources.getResourceStream(s);
+                    inputStream = emulator.custom.CustomJarResources.getResourceAsStream(s);
                 } catch (Exception ex3) {
                     ex3.printStackTrace();
                 }
             }
         }
         String jar = midletJar;
-        if (jar.indexOf("/") > -1)
+        if (jar.contains("/"))
             jar = jar.substring(jar.lastIndexOf("/") + 1);
-        if (jar.indexOf("\\") > -1)
+        if (jar.contains("\\"))
             jar = jar.substring(jar.lastIndexOf("\\") + 1);
         if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
             Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
@@ -699,7 +719,7 @@ public class Emulator {
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
         Class<?> forName;
         try {
-            forName = Class.forName(Emulator.midletClassName, true, (ClassLoader) Emulator.customClassLoader);
+            forName = Class.forName(Emulator.midletClassName, true, Emulator.customClassLoader);
         } catch (Exception ex) {
             ex.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
@@ -793,6 +813,12 @@ public class Emulator {
             } else if (key.equals("swt")) {
                 Settings.g2d = 0;
                 Emulator.commandLineArguments[i] = "";
+            } else if (key.equals("lwj")) {
+                Settings.g3d = 1;
+                Emulator.commandLineArguments[i] = "";
+            } else if (key.equals("swerve")) {
+                Settings.g3d = 0;
+                Emulator.commandLineArguments[i] = "";
             } else if (key.equalsIgnoreCase("log")) {
                 Settings.showLogFrame = true;
             } else if (key.equalsIgnoreCase("uei")) {
@@ -859,7 +885,7 @@ public class Emulator {
         return s;
     }
 
-    public static void loadGame(final String s, final int n, final int n2, final boolean b) {
+    public static void loadGame(final String s, final int engine2d, final int engine3d, final boolean b) {
         ArrayList<String> cmd = new ArrayList<String>();
         getEmulator().getLogStream().println("loadGame: " + s);
         String javahome = System.getProperty("java.home");
@@ -892,12 +918,12 @@ public class Emulator {
             cmd.add("-rec");
             cmd.add(Settings.recordedKeysFile);
         }
-        cmd.add(n == 0 ? "-swt" : "-awt");
-        cmd.add(n2 == 0 ? "-wgl" : "-lwj");
+        cmd.add(engine2d == 0 ? "-swt" : "-awt");
+        cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {
-            new ProcessBuilder(new String[0]).directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
+            new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -914,7 +940,7 @@ public class Emulator {
                 String absolutePath = file.getAbsolutePath().replace('\\', '/');
                 return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + properties.getProperty("MIDlet-Jar-URL");
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return null;
     }
@@ -937,11 +963,7 @@ public class Emulator {
         Emulator.jarClasses = new Vector();
         Emulator.deviceName = "SonyEricssonK800";
         Emulator.deviceFile = "/res/plat";
-        vlcCheckerThread = new Thread() {
-            public void run() {
-                Manager.checkLibVlcSupport();
-            }
-        };
+        vlcCheckerThread = new Thread(() -> Manager.checkLibVlcSupport());
     }
 
     public static String getMidletName() {
@@ -959,5 +981,9 @@ public class Emulator {
 
     public static IEmulatorPlatform getPlatform() {
         return platform;
+    }
+
+    public static IGraphics3D getGraphics3D() {
+        return platform.getGraphics3D();
     }
 }

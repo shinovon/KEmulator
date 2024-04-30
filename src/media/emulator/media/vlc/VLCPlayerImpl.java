@@ -379,7 +379,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         if (playing) {
             try {
                 this.stop();
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
         try {
@@ -736,7 +736,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
             stoppedAtTime = true;
             try {
                 stop();
-            } catch (MediaException e) {}
+            } catch (MediaException ignored) {}
         }
     }
 

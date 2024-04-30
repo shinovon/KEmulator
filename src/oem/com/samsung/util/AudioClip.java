@@ -34,7 +34,7 @@ public class AudioClip {
     }
 
     public AudioClip(int type, String s) throws IOException {
-        InputStream is = CustomJarResources.getResourceStream(s);
+        InputStream is = CustomJarResources.getResourceAsStream(s);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] b = new byte[512];
         while (is.available() > 0) {
@@ -72,7 +72,7 @@ public class AudioClip {
             this.m_player = new PlayerImpl(bais, ct);
             this.m_player.addPlayerListener(new MMAPIListener());
             bais.close();
-        } catch (Exception exception) {
+        } catch (Exception ignored) {
         }
         this.status = STATUS_STOP;
     }
@@ -97,7 +97,7 @@ public class AudioClip {
                 long l = this.m_player.getMediaTime();
                 this.m_player.stop();
                 this.m_player.setMediaTime(l);
-            } catch (Exception exception) {
+            } catch (Exception ignored) {
             }
             this.status = STATUS_PAUSE;
         }
@@ -127,7 +127,7 @@ public class AudioClip {
             this.m_player.setLevel(v * 20);
             try {
                 this.m_player.start();
-            } catch (Exception exception) {
+            } catch (Exception ignored) {
             }
             this.status = STATUS_PLAY;
         }
@@ -143,7 +143,7 @@ public class AudioClip {
         } else if (this.m_player != null) {
             try {
                 this.m_player.start();
-            } catch (Exception exception) {
+            } catch (Exception ignored) {
             }
             this.status = STATUS_PLAY;
         }
@@ -159,7 +159,7 @@ public class AudioClip {
         } else if (this.m_player != null) {
             try {
                 this.m_player.stop();
-            } catch (Exception exception) {
+            } catch (Exception ignored) {
             }
             this.status = STATUS_STOP;
         }

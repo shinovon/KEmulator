@@ -69,41 +69,49 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             contentType = "";
         this.contentType = (contentType = contentType.toLowerCase());
         if (dataLen == 0) dataLen = inputStream.available();
-        if (contentType.equals("audio/amr")) {
-            amr(inputStream);
-        } else if (contentType.equals("audio/x-wav") || contentType.equals("audio/wav")) {
-            wav(inputStream);
-        } else if (contentType.equals("audio/x-midi") || contentType.equals("audio/midi")) {
-            midi(inputStream);
-        } else if (contentType.equals("audio/mpeg")) {
-            try {
-                InputStream i = inputStream;
-                if (i instanceof ByteArrayInputStream) {
-                    data = CustomJarResources.getBytes(i);
-                    i = new ByteArrayInputStream(data);
-                }
-                sequence = new Player(i);
-            } catch (JavaLayerException e) {
-                e.printStackTrace();
-                throw new IOException(e);
-            }
-            volumeControl = new VolumeControlImpl(this);
-            controls = new Control[]{volumeControl};
-        } else {
-            try {
+        switch (contentType) {
+            case "audio/amr":
+                amr(inputStream);
+                break;
+            case "audio/x-wav":
+            case "audio/wav":
+                wav(inputStream);
+                break;
+            case "audio/x-midi":
+            case "audio/midi":
                 midi(inputStream);
-            } catch (Exception e) {
+                break;
+            case "audio/mpeg":
                 try {
-                    wav(inputStream);
-                } catch (Exception e2) {
+                    InputStream i = inputStream;
+                    if (i instanceof ByteArrayInputStream) {
+                        data = CustomJarResources.getBytes(i);
+                        i = new ByteArrayInputStream(data);
+                    }
+                    sequence = new Player(i);
+                } catch (JavaLayerException e) {
+                    e.printStackTrace();
+                    throw new IOException(e);
+                }
+                volumeControl = new VolumeControlImpl(this);
+                controls = new Control[]{volumeControl};
+                break;
+            default:
+                try {
+                    midi(inputStream);
+                } catch (Exception e) {
                     try {
-                        amr(inputStream);
-                    } catch (Exception e3) {
-                        Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
-                        sequence = null;
+                        wav(inputStream);
+                    } catch (Exception e2) {
+                        try {
+                            amr(inputStream);
+                        } catch (Exception e3) {
+                            Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
+                            sequence = null;
+                        }
                     }
                 }
-            }
+                break;
         }
         setLevel(level);
     }
@@ -269,7 +277,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         if (playerThread != null) {
             try {
                 stop();
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
         }
         if (sequence instanceof Player) {
             ((Player) sequence).close();
@@ -291,7 +299,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         if (state == STARTED) {
             try {
                 stop();
-            } catch (MediaException e) {}
+            } catch (MediaException ignored) {}
             return;
         }
         if (state == PREFETCHED) {
@@ -512,7 +520,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 if (sequence instanceof Sequence && midiPlaying && EmulatorMIDI.currentPlayer != this && EmulatorMIDI.currentPlayer != null) {
                     try {
                         EmulatorMIDI.currentPlayer.stop();
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
 //					throw new MediaException("MIDI is currently playing");
                 }
@@ -546,7 +554,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                     synchronized (t) {
                         t.wait();
                     }
-                } catch (Exception e) {}
+                } catch (Exception ignored) {}
             }
         }
     }
@@ -634,7 +642,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 if (loopCount != 0) {
                     try {
                         setMediaTime(0);
-                    } catch (MediaException e) {}
+                    } catch (MediaException ignored) {}
                 }
             }
             playerThread = null;
@@ -661,7 +669,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             try {
                 ((FloatControl) ((Clip) sequence).getControl(FloatControl.Type.MASTER_GAIN))
                         .setValue((float) (Math.log((n2 == 0.0) ? 1.0E-4 : n2) / Math.log(10.0) * 20.0));
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             return;
         }

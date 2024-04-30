@@ -11,7 +11,7 @@ public final class CustomJarResources {
         super();
     }
 
-    public static InputStream getResourceStream(final String s) {
+    public static InputStream getResourceAsStream(final String s) {
         try {
             if (Emulator.midletJar != null) {
                 String substring = s;
@@ -24,7 +24,7 @@ public final class CustomJarResources {
                     Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (null)");
                     throw new IOException();
                 }
-                final byte[] array = new byte[(int) ((java.util.zip.ZipEntry) entry).getSize()];
+                final byte[] array = new byte[(int) entry.getSize()];
                 Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + array.length + ")");
                 new DataInputStream(zipFile.getInputStream(entry)).readFully(array);
                 return new ByteArrayInputStream(array);
@@ -56,17 +56,17 @@ public final class CustomJarResources {
             final String name;
             final int lastIndex;
             if ((lastIndex = (name = ((Class) o).getName()).lastIndexOf(46)) < 0) {
-                return getResourceStream(substring);
+                return getResourceAsStream(substring);
             }
             s = "/" + name.substring(0, lastIndex + 1).replace('.', '/') + substring;
         }
         substring = s;
-        return getResourceStream(substring);
+        return getResourceAsStream(substring);
     }
 
     public static byte[] getBytes(final String s) throws IOException {
         final InputStream inputStream;
-        return getBytes(inputStream = ((s.indexOf(58) != -1) ? ((InputConnection) Connector.open(s, Connector.READ)).openInputStream() : getResourceStream(s)));
+        return getBytes(inputStream = ((s.indexOf(58) != -1) ? ((InputConnection) Connector.open(s, Connector.READ)).openInputStream() : getResourceAsStream(s)));
     }
 
     public static byte[] getBytes(final InputStream inputStream) throws IOException {
@@ -106,6 +106,6 @@ public final class CustomJarResources {
     }
 
     public static InputStream a(String paramString) {
-        return getResourceStream(paramString);
+        return getResourceAsStream(paramString);
     }
 }

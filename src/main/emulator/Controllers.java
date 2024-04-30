@@ -4,12 +4,14 @@ import java.util.*;
 
 import net.java.games.input.*;
 
+import javax.microedition.lcdui.Canvas;
+
 public class Controllers {
     private static ArrayList controllers = new ArrayList();
     private static int count;
     private static boolean loaded;
     private static String[][] binds;
-    private static boolean[][] dpad;
+    private static boolean[][] arrowKeysState;
     private static String aString1292;
     private static float lastX;
     private static float lastY;
@@ -25,9 +27,8 @@ public class Controllers {
         try {
             Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
             ArrayList list = new ArrayList<Controller>();
-            for (int i = 0; i < controllers.length; ++i) {
-                Controller controller;
-                if (!(controller = controllers[i]).getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
+            for (Controller controller: controllers) {
+                if (!controller.getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
                     String s = controller.getName();
                     if (s.contains("tablet")) continue;
                     if (s.contains("STAR")) continue;
@@ -55,8 +56,8 @@ public class Controllers {
             ++Controllers.count;
             return;
         }
-        for (int i = 0; i < controllers.length; ++i) {
-            addController(controllers[i]);
+        for (Controller value: controllers) {
+            addController(value);
         }
     }
 
@@ -145,7 +146,7 @@ public class Controllers {
             try {
                 init();
                 if (Controllers.count > 0) {
-                    Controllers.dpad = new boolean[Controllers.count][4];
+                    Controllers.arrowKeysState = new boolean[Controllers.count][8];
                     initBinds();
                 }
             } catch (Exception ex) {
@@ -159,7 +160,7 @@ public class Controllers {
         Controllers.loaded = false;
         Controllers.controllers.clear();
         Controllers.count = 0;
-        Controllers.dpad = null;
+        Controllers.arrowKeysState = null;
         Controllers.binds = null;
     }
 
@@ -176,7 +177,7 @@ public class Controllers {
                 continue;
             }
             Event event = new Event();
-            if (controller.getEventQueue().getNextEvent(event)) {
+            while (controller.getEventQueue().getNextEvent(event)) {
                 Component.Identifier identifier = event.getComponent().getIdentifier();
                 String name = identifier.getName();
                 float value = event.getValue();
@@ -190,18 +191,26 @@ public class Controllers {
                         Emulator.getEventQueue().keyRelease(key);
                     }
                 } else if (identifier.equals(Component.Identifier.Axis.POV)) {
-                    handleX(i, povX(value));
-                    handleY(i, povY(value));
+                    handleX(i, povX(value), true);
+                    handleY(i, povY(value), true);
                 } else {
                     if (Math.abs(value) < 0.05f) {
                         value = 0.0f;
                     }
-                    if (name.equalsIgnoreCase("x")) {
-                        filterX(i, value);
+                    if (name.equalsIgnoreCase("x") ) {
+                        filterX(i, value, true);
                         continue;
                     }
                     if (name.equalsIgnoreCase("y")) {
-                        filterY(i, value);
+                        filterY(i, value, true);
+                        continue;
+                    }
+                    if (name.equalsIgnoreCase("z")) {
+                        filterX(i, value, false);
+                        continue;
+                    }
+                    if (name.equalsIgnoreCase("rz")) {
+                        filterY(i, value, false);
                         continue;
                     }
                 }
@@ -209,51 +218,101 @@ public class Controllers {
         }
     }
 
-    private static void filterX(int n, float f) {
+    private static void filterX(int n, float f, boolean pov) {
         if (Math.abs(f) <= 0.05f && Math.abs(lastX) <= 0.05f) return;
-        handleX(n, f);
+        handleX(n, f, pov);
         lastX = f;
     }
 
-    private static void handleX(int n, float f) {
-        if (f == -1.0f) {
-            if (method748("LEFT")) return;
-            Emulator.getEventQueue().keyPress(map(n, "LEFT"));
-            Controllers.dpad[n][0] = true;
-        } else if (f == 1.0f) {
-            if (method748("RIGHT")) return;
-            Emulator.getEventQueue().keyPress(map(n, "RIGHT"));
-            Controllers.dpad[n][1] = true;
-        } else if (Controllers.dpad[n][0]) {
-            Emulator.getEventQueue().keyRelease(map(n, "LEFT"));
-            Controllers.dpad[n][0] = false;
-        } else if (Controllers.dpad[n][1]) {
-            Emulator.getEventQueue().keyRelease(map(n, "RIGHT"));
-            Controllers.dpad[n][1] = false;
-        }
-    }
-
-    private static void filterY(int n, float f) {
+    private static void filterY(int n, float f, boolean pov) {
         if (Math.abs(f) <= 0.05f && Math.abs(lastY) <= 0.05f) return;
-        handleY(n, f);
+        handleY(n, f, pov);
         lastY = f;
     }
 
-    private static void handleY(int n, float f) {
-        if (f == -1.0f) {
+    private static void handleX(int n, float f, boolean pov) {
+        if(pov) {
+            if (f < -0.7f) {
+                if (method748("LEFT")) return;
+                if (Controllers.arrowKeysState[n][0])
+                    return;
+                Emulator.getEventQueue().keyPress(map(n, "LEFT"));
+                Controllers.arrowKeysState[n][0] = true;
+            } else if (f > 0.7f) {
+                if (method748("RIGHT")) return;
+                if (Controllers.arrowKeysState[n][1])
+                    return;
+                Emulator.getEventQueue().keyPress(map(n, "RIGHT"));
+                Controllers.arrowKeysState[n][1] = true;
+            } else if (Controllers.arrowKeysState[n][0]) {
+                Emulator.getEventQueue().keyRelease(map(n, "LEFT"));
+                Controllers.arrowKeysState[n][0] = false;
+            } else if (Controllers.arrowKeysState[n][1]) {
+                Emulator.getEventQueue().keyRelease(map(n, "RIGHT"));
+                Controllers.arrowKeysState[n][1] = false;
+            }
+            return;
+        }
+        if (f < -0.7f) {
+            if (Controllers.arrowKeysState[n][4])
+                return;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT));
+            Controllers.arrowKeysState[n][4] = true;
+        } else if (f > 0.7f) {
+            if (Controllers.arrowKeysState[n][5])
+                return;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT));
+            Controllers.arrowKeysState[n][5] = true;
+        } else if (Controllers.arrowKeysState[n][4]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT));
+            Controllers.arrowKeysState[n][4] = false;
+        } else if (Controllers.arrowKeysState[n][5]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT));
+            Controllers.arrowKeysState[n][5] = false;
+        }
+    }
+
+    private static void handleY(int n, float f, boolean pov) {
+        if(pov) {
+            if (f < -0.7f) {
+                if (method748("UP")) return;
+                if (Controllers.arrowKeysState[n][2])
+                    return;
+                Emulator.getEventQueue().keyPress(map(n, "UP"));
+                Controllers.arrowKeysState[n][2] = true;
+            } else if (f > 0.7f) {
+                if (method748("DOWN")) return;
+                if (Controllers.arrowKeysState[n][3])
+                    return;
+                Emulator.getEventQueue().keyPress(map(n, "DOWN"));
+                Controllers.arrowKeysState[n][3] = true;
+            } else if (Controllers.arrowKeysState[n][2]) {
+                Emulator.getEventQueue().keyRelease(map(n, "UP"));
+                Controllers.arrowKeysState[n][2] = false;
+            } else if (Controllers.arrowKeysState[n][3]) {
+                Emulator.getEventQueue().keyRelease(map(n, "DOWN"));
+                Controllers.arrowKeysState[n][3] = false;
+            }
+            return;
+        }
+        if (f < -0.7f) {
             if (method748("UP")) return;
-            Emulator.getEventQueue().keyPress(map(n, "UP"));
-            Controllers.dpad[n][2] = true;
-        } else if (f == 1.0f) {
+            if (Controllers.arrowKeysState[n][6])
+                return;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.UP));
+            Controllers.arrowKeysState[n][6] = true;
+        } else if (f > 0.7f) {
             if (method748("DOWN")) return;
-            Emulator.getEventQueue().keyPress(map(n, "DOWN"));
-            Controllers.dpad[n][3] = true;
-        } else if (Controllers.dpad[n][2]) {
-            Emulator.getEventQueue().keyRelease(map(n, "UP"));
-            Controllers.dpad[n][2] = false;
-        } else if (Controllers.dpad[n][3]) {
-            Emulator.getEventQueue().keyRelease(map(n, "DOWN"));
-            Controllers.dpad[n][3] = false;
+            if (Controllers.arrowKeysState[n][7])
+                return;
+            Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN));
+            Controllers.arrowKeysState[n][7] = true;
+        } else if (Controllers.arrowKeysState[n][6]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.UP));
+            Controllers.arrowKeysState[n][6] = false;
+        } else if (Controllers.arrowKeysState[n][7]) {
+            Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN));
+            Controllers.arrowKeysState[n][7] = false;
         }
     }
 

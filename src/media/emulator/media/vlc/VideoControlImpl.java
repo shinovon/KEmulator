@@ -61,7 +61,7 @@ class VideoControlImpl implements VideoControl {
                 Thread.sleep(100L);
             }
             player.sourceHeight = player.mediaPlayer.video().videoDimension().height;
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
         if (player.sourceHeight == 0)
             player.sourceHeight = player.bufferHeight;
         return player.sourceHeight;
@@ -77,7 +77,7 @@ class VideoControlImpl implements VideoControl {
                 Thread.sleep(100L);
             }
             player.sourceWidth = player.mediaPlayer.video().videoDimension().width;
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
         if (player.sourceWidth == 0)
             player.sourceWidth = player.bufferWidth;
         return player.sourceWidth;

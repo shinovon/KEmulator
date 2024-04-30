@@ -31,7 +31,7 @@ public final class c {
                 list.add(new String(arr, i, arr.length - i));
             }
 
-            return (String[]) ((String[]) list.toArray(new String[list.size()]));
+            return (String[]) list.toArray(new String[list.size()]);
         }
     }
 
@@ -66,7 +66,7 @@ public final class c {
                     }
                 }
 
-                return (String[]) ((String[]) list.toArray(new String[list.size()]));
+                return (String[]) list.toArray(new String[list.size()]);
             }
         } else {
             return new String[]{s};
@@ -107,7 +107,7 @@ public final class c {
                     }
                 }
 
-                return (String[]) ((String[]) list.toArray(new String[list.size()]));
+                return (String[]) list.toArray(new String[list.size()]);
             }
         } else {
             return new String[]{s};

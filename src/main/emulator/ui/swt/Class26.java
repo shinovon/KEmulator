@@ -1,7 +1,6 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
 
 final class Class26 implements PaintListener {
     private final MemoryView aClass110_595;
@@ -12,9 +11,9 @@ final class Class26 implements PaintListener {
     }
 
     public final void paintControl(final PaintEvent paintEvent) {
-        MemoryView.method669(this.aClass110_595, ((Control) MemoryView.method642(this.aClass110_595)).getSize().x);
-        MemoryView.method675(this.aClass110_595, ((Control) MemoryView.method642(this.aClass110_595)).getSize().y);
-        MemoryView.method680(this.aClass110_595, ((Scrollable) MemoryView.method642(this.aClass110_595)).getVerticalBar().getSelection());
+        MemoryView.method669(this.aClass110_595, MemoryView.method642(this.aClass110_595).getSize().x);
+        MemoryView.method675(this.aClass110_595, MemoryView.method642(this.aClass110_595).getSize().y);
+        MemoryView.method680(this.aClass110_595, MemoryView.method642(this.aClass110_595).getVerticalBar().getSelection());
         MemoryView.method650(this.aClass110_595, paintEvent.gc);
     }
 }

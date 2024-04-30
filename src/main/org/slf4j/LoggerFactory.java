@@ -1,14 +1,5 @@
 package org.slf4j;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 public final class LoggerFactory {
 
     private static Logger logger = new LoggerImpl();
@@ -20,10 +11,10 @@ public final class LoggerFactory {
         if (msg == null) {
             return false;
         }
-        if (msg.indexOf("org/slf4j/impl/StaticLoggerBinder") != -1) {
+        if (msg.contains("org/slf4j/impl/StaticLoggerBinder")) {
             return true;
         }
-        if (msg.indexOf("org.slf4j.impl.StaticLoggerBinder") != -1) {
+        if (msg.contains("org.slf4j.impl.StaticLoggerBinder")) {
             return true;
         }
         return false;

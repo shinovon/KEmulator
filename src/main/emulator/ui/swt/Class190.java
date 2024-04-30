@@ -3,7 +3,6 @@ package emulator.ui.swt;
 import org.eclipse.swt.events.*;
 import emulator.*;
 import emulator.graphics2D.swt.*;
-import emulator.graphics2D.swt.ImageSWT;
 
 final class Class190 implements PaintListener {
     private final Property aClass38_1483;
@@ -22,7 +21,7 @@ final class Class190 implements PaintListener {
             return;
         }
         if (Settings.g2d == 1) {
-            ((emulator.graphics2D.awt.d) Property.method356(this.aClass38_1483)).method12(paintEvent.gc, 0, 0);
+            ((emulator.graphics2D.awt.d) Property.method356(this.aClass38_1483)).copyToScreen(paintEvent.gc);
         }
     }
 }

@@ -1,9 +1,7 @@
 package com.nokia.mid.payment;
 
 import java.io.InputStream;
-import java.util.Properties;
 
-import emulator.Emulator;
 import emulator.custom.CustomJarResources;
 
 public final class IAPClientPaymentManager {
@@ -83,7 +81,7 @@ public final class IAPClientPaymentManager {
     public InputStream getDRMResourceAsStream(String s) {
         System.out.println("getDRMResourceAsStream " + s);
         Thread.dumpStack();
-        InputStream localInputStream = CustomJarResources.getResourceStream(s);
+        InputStream localInputStream = CustomJarResources.getResourceAsStream(s);
         return localInputStream;
     }
 }

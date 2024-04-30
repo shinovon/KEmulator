@@ -26,9 +26,8 @@ public final class h {
                 final ClassNode classNode = new ClassNode();
                 classReader.accept((ClassVisitor) classNode, 0);
                 method592.close();
-                final Iterator iterator = classNode.methods.iterator();
-                while (iterator.hasNext()) {
-                    final MethodInfo methodInfo = new MethodInfo(classNode, (MethodNode) iterator.next());
+                for (Object o : classNode.methods) {
+                    final MethodInfo methodInfo = new MethodInfo(classNode, (MethodNode) o);
                     h.aHashtable1061.put(methodInfo.method704(), methodInfo);
                 }
             }
@@ -135,12 +134,12 @@ public final class h {
 
         private static String method703(final MethodNode methodNode) {
             final Method method = new Method(methodNode.name, methodNode.desc);
-            String s = method.getReturnType().getClassName() + " " + methodNode.name + "(";
+            StringBuilder s = new StringBuilder(method.getReturnType().getClassName() + " " + methodNode.name + "(");
             final Type[] argumentTypes = method.getArgumentTypes();
             for (int i = 0; i < argumentTypes.length; ++i) {
-                s = s + argumentTypes[i].getClassName() + ((i >= argumentTypes.length - 1) ? "" : ", ");
+                s.append(argumentTypes[i].getClassName()).append((i >= argumentTypes.length - 1) ? "" : ", ");
             }
-            return s + ")";
+            return s.append(")").toString();
         }
 
         public final String method704() {
@@ -152,12 +151,12 @@ public final class h {
         }
 
         public final String method705(final boolean b, final boolean b2) {
-            String s = "" + "\nname      : " + this.methodNode.name + "\nsignature : " + this.methodNode.signature + "\naccess    : " + getAccess(this.methodNode.access) + "\ndesc      : " + this.methodNode.desc + "\nmaxStack  : " + this.methodNode.maxStack + "\nmaxLocals : " + this.methodNode.maxLocals + "\n";
+            String s = "\nname      : " + this.methodNode.name + "\nsignature : " + this.methodNode.signature + "\naccess    : " + getAccess(this.methodNode.access) + "\ndesc      : " + this.methodNode.desc + "\nmaxStack  : " + this.methodNode.maxStack + "\nmaxLocals : " + this.methodNode.maxLocals + "\n";
             if (this.methodNode.exceptions != null && this.methodNode.exceptions.size() > 0) {
-                String s2 = s + "\nExceptions: " + this.methodNode.exceptions.size();
+                StringBuilder s2 = new StringBuilder(s + "\nExceptions: " + this.methodNode.exceptions.size());
                 final Iterator<Object> iterator = this.methodNode.exceptions.iterator();
                 while (iterator.hasNext()) {
-                    s2 = s2 + "\n\t" + iterator.next();
+                    s2.append("\n\t").append(iterator.next());
                 }
                 s = s2 + "\n";
             }

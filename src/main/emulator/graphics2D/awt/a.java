@@ -4,7 +4,6 @@ import emulator.graphics2D.*;
 import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.awt.image.*;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

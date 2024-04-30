@@ -2,7 +2,6 @@ package emulator.ui.swt;
 
 import org.eclipse.swt.layout.*;
 import emulator.*;
-import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
 public final class Class30 extends Dialog {
@@ -45,12 +44,12 @@ public final class Class30 extends Dialog {
 
     public final void method340() {
         final Shell shell;
-        ((Decorations) (shell = new Shell(this.getParent(), this.getStyle()))).setText(this.getText());
+        (shell = new Shell(this.getParent(), this.getStyle())).setText(this.getText());
         this.method341(shell);
-        ((Control) shell).setLocation(this.getParent().getBounds().x + (this.getParent().getBounds().width - shell.getSize().x) / 2, this.getParent().getBounds().y + (this.getParent().getBounds().height - shell.getSize().y) / 2);
+        shell.setLocation(this.getParent().getBounds().x + (this.getParent().getBounds().width - shell.getSize().x) / 2, this.getParent().getBounds().y + (this.getParent().getBounds().height - shell.getSize().y) / 2);
         shell.open();
-        final Display display = ((Widget) this.getParent()).getDisplay();
-        while (!((Widget) shell).isDisposed()) {
+        final Display display = this.getParent().getDisplay();
+        while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
             }
@@ -58,70 +57,70 @@ public final class Class30 extends Dialog {
     }
 
     private void method341(final Shell shell) {
-        ((Composite) shell).setLayout((Layout) new GridLayout(2, true));
+        shell.setLayout(new GridLayout(2, true));
         final GridData layoutData = new GridData(768);
         Text text;
         float n;
         if (this.anInt604 == 0) {
             final Group group;
-            (group = new Group((Composite) shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_FOVY", "Fovy"));
+            (group = new Group(shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_FOVY", "Fovy"));
             layoutData.horizontalSpan = 2;
-            ((Control) group).setLayoutData((Object) layoutData);
-            ((Composite) group).setLayout((Layout) new GridLayout(1, true));
-            ((Control) (this.aText605 = new Text((Composite) group, 133120))).setLayoutData((Object) new GridData(768));
+            group.setLayoutData(layoutData);
+            group.setLayout(new GridLayout(1, true));
+            (this.aText605 = new Text(group, 133120)).setLayoutData(new GridData(768));
             text = this.aText605;
             n = this.aFloat603;
         } else if (this.anInt604 == 1) {
             final Group group2;
-            (group2 = new Group((Composite) shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_NEAR", "Near"));
-            ((Control) group2).setLayoutData((Object) layoutData);
-            ((Composite) group2).setLayout((Layout) new GridLayout(1, true));
-            ((Control) (this.aText607 = new Text((Composite) group2, 133120))).setLayoutData((Object) layoutData);
+            (group2 = new Group(shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_NEAR", "Near"));
+            group2.setLayoutData(layoutData);
+            group2.setLayout(new GridLayout(1, true));
+            (this.aText607 = new Text(group2, 133120)).setLayoutData(layoutData);
             this.aText607.setText(String.valueOf(this.aFloat606));
             final Group group3;
-            (group3 = new Group((Composite) shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_FAR", "Far"));
-            ((Control) group3).setLayoutData((Object) layoutData);
-            ((Composite) group3).setLayout((Layout) new GridLayout(1, true));
-            ((Control) (this.aText609 = new Text((Composite) group3, 133120))).setLayoutData((Object) layoutData);
+            (group3 = new Group(shell, 0)).setText(UILocale.get("M3G_VIEW_DIALOG_FAR", "Far"));
+            group3.setLayoutData(layoutData);
+            group3.setLayout(new GridLayout(1, true));
+            (this.aText609 = new Text(group3, 133120)).setLayoutData(layoutData);
             text = this.aText609;
             n = this.aFloat608;
         } else {
             final Group group4;
-            (group4 = new Group((Composite) shell, 0)).setText("X");
-            ((Control) group4).setLayoutData((Object) layoutData);
-            ((Composite) group4).setLayout((Layout) new GridLayout(1, true));
-            ((Control) (this.aText611 = new Text((Composite) group4, 133120))).setLayoutData((Object) layoutData);
+            (group4 = new Group(shell, 0)).setText("X");
+            group4.setLayoutData(layoutData);
+            group4.setLayout(new GridLayout(1, true));
+            (this.aText611 = new Text(group4, 133120)).setLayoutData(layoutData);
             this.aText611.setText(String.valueOf(this.aFloat610));
             final Group group5;
-            (group5 = new Group((Composite) shell, 0)).setText("Y");
-            ((Control) group5).setLayoutData((Object) layoutData);
-            ((Composite) group5).setLayout((Layout) new GridLayout(1, true));
-            ((Control) (this.aText613 = new Text((Composite) group5, 133120))).setLayoutData((Object) layoutData);
+            (group5 = new Group(shell, 0)).setText("Y");
+            group5.setLayoutData(layoutData);
+            group5.setLayout(new GridLayout(1, true));
+            (this.aText613 = new Text(group5, 133120)).setLayoutData(layoutData);
             this.aText613.setText(String.valueOf(this.aFloat612));
             final Group group6;
-            (group6 = new Group((Composite) shell, 0)).setText("Z");
+            (group6 = new Group(shell, 0)).setText("Z");
             final GridData layoutData2;
             (layoutData2 = new GridData(768)).horizontalSpan = 2;
-            ((Control) group6).setLayoutData((Object) layoutData2);
-            ((Composite) group6).setLayout((Layout) new GridLayout(1, true));
-            ((Control) (this.aText615 = new Text((Composite) group6, 133120))).setLayoutData((Object) new GridData(768));
+            group6.setLayoutData(layoutData2);
+            group6.setLayout(new GridLayout(1, true));
+            (this.aText615 = new Text(group6, 133120)).setLayoutData(new GridData(768));
             text = this.aText615;
             n = this.aFloat614;
         }
         text.setText(String.valueOf(n));
         final Button button;
-        (button = new Button((Composite) shell, 8388616)).setText(UILocale.get("DIALOG_OK", "OK"));
+        (button = new Button(shell, 8388616)).setText(UILocale.get("DIALOG_OK", "OK"));
         final GridData layoutData3;
         (layoutData3 = new GridData(768)).widthHint = 80;
-        ((Control) button).setLayoutData((Object) layoutData3);
-        button.addSelectionListener((SelectionListener) new Class80(this, shell));
+        button.setLayoutData(layoutData3);
+        button.addSelectionListener(new Class80(this, shell));
         final Button button2;
-        (button2 = new Button((Composite) shell, 8388616)).setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
+        (button2 = new Button(shell, 8388616)).setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
         final GridData layoutData4;
         (layoutData4 = new GridData(768)).widthHint = 80;
-        ((Control) button2).setLayoutData((Object) layoutData4);
-        button2.addSelectionListener((SelectionListener) new Class81(this, shell));
-        ((Control) shell).pack();
+        button2.setLayoutData(layoutData4);
+        button2.addSelectionListener(new Class81(this, shell));
+        shell.pack();
     }
 
     static int method342(final Class30 class30) {

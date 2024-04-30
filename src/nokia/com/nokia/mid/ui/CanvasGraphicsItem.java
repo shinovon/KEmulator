@@ -1,7 +1,6 @@
 package com.nokia.mid.ui;
 
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.CustomItem;
 import javax.microedition.lcdui.Graphics;
 
 public abstract class CanvasGraphicsItem extends CanvasItem {
@@ -56,8 +55,7 @@ public abstract class CanvasGraphicsItem extends CanvasItem {
     }
 
     public int getZPosition() {
-        int positionZ = -1;
-        return positionZ;
+        return -1;
     }
 
     CanvasGraphicsItem() {

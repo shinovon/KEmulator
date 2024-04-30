@@ -2,16 +2,12 @@ package javax.microedition.midlet;
 
 import emulator.*;
 import emulator.custom.CustomMethod;
-import org.eclipse.swt.internal.C;
 
 import java.awt.Desktop;
-import java.awt.Desktop.Action;
 import java.io.File;
 import java.net.URI;
 
 import javax.microedition.io.*;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 public abstract class MIDlet {
     private boolean destroyed;

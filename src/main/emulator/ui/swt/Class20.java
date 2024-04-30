@@ -22,7 +22,7 @@ final class Class20 extends KeyAdapter {
                 Class5.method315(this.aClass5_589, this.aTreeItem587, this.aText588.getText());
             }
             case 27: {
-                ((Widget) this.aText588).dispose();
+                this.aText588.dispose();
                 break;
             }
         }
