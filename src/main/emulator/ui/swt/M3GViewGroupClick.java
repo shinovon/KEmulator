@@ -7,7 +7,7 @@ import javax.microedition.m3g.Node;
 import javax.microedition.m3g.Group;
 
 final class M3GViewGroupClick implements Listener {
-    M3GViewGroupClick(final M3GViewUI class90) {
+    M3GViewGroupClick(final M3GViewUI m3gViewUI) {
         super();
     }
 
@@ -19,6 +19,7 @@ final class M3GViewGroupClick implements Listener {
         if (items[0].getData() != null) return;
 
         items[0].dispose();
+        
         if (groupWidget.getData() instanceof Group) {
             final Group group = (Group) groupWidget.getData();
 
