@@ -12,8 +12,6 @@ import org.lwjgl.opengl.*;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
-import org.eclipse.swt.internal.opengl.win32.WGL;
 
 import emulator.graphics2D.swt.Graphics2DSWT;
 
@@ -40,7 +38,7 @@ public final class Emulator3D implements IGraphics3D {
     private static ByteBuffer buffer;
     private static BufferedImage awtBufferImage;
     private static ImageData swtBufferImage;
-    private static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
+    public static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
     private static Hashtable properties = new Hashtable();
     private static PixelFormat pixelFormat;
     private int wglContextHandle;
@@ -95,19 +93,19 @@ public final class Emulator3D implements IGraphics3D {
         return instance;
     }
 
-    private static PixelFormat pixelFormat() {
+    public static PixelFormat pixelFormat() {
         if (pixelFormat == null) {
-            int var0 = 4;
-            int var1 = Emulator.getEmulator().getScreenDepth();
+            int samples = 4;
+            int bpp = Emulator.getEmulator().getScreenDepth();
 
             while (true) {
                 try {
-                    pixelFormat = new PixelFormat(var1, 0, 24, 0, var0);
+                    pixelFormat = new PixelFormat(bpp, 0, 24, 0, samples);
                     (new Pbuffer(1, 1, pixelFormat, null, null)).destroy();
                     break;
                 } catch (Exception var3) {
-                    if ((var0 >>= 1) == 0) {
-                        pixelFormat = new PixelFormat(var1, 0, 24, 0, 0);
+                    if ((samples >>= 1) == 0) {
+                        pixelFormat = new PixelFormat(bpp, 0, 24, 0, 0);
                         break;
                     }
                 }
@@ -152,7 +150,7 @@ public final class Emulator3D implements IGraphics3D {
 
                 pbufferContext.makeCurrent();
             } catch (Exception e) {
-//                e.printStackTrace();
+                if (Emulator.isX64()) throw e;
                 try {
                     this.method499(w, h);
                 } catch (Throwable e2) {
@@ -177,8 +175,8 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnable(GL_SCISSOR_TEST);
             GL11.glEnable(GL_NORMALIZE);
             GL11.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        } catch (Exception var6) {
-            var6.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             this.target = null;
             throw new IllegalArgumentException();
         }
@@ -217,27 +215,13 @@ public final class Emulator3D implements IGraphics3D {
             if (this.swtImage != null) {
                 this.swtImage.dispose();
                 this.swtGC.dispose();
-                WGL.wglDeleteContext(this.wglContextHandle);
+                Emulator.getPlatform().deleteGLContext(wglContextHandle);
             }
 
             ImageData var3 = new ImageData(var1, var2, 32, swtPalleteData);
             this.swtImage = new Image(null, var3);
             this.swtGC = new GC(this.swtImage);
-            PIXELFORMATDESCRIPTOR var4;
-            (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
-            var4.nVersion = 1;
-            var4.dwFlags = 57;
-            var4.iPixelType = 0;
-            var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
-            var4.iLayerType = 0;
-            int var5;
-            if ((var5 = WGL.ChoosePixelFormat(this.swtGC.handle, var4)) == 0 || !WGL.SetPixelFormat(this.swtGC.handle, var5, var4)) {
-                this.swtGC.dispose();
-                this.swtImage.dispose();
-                throw new IllegalArgumentException();
-            }
-
-            this.wglContextHandle = WGL.wglCreateContext(this.swtGC.handle);
+            this.wglContextHandle = Emulator.getPlatform().createGLContext(swtGC.handle);
             if (this.wglContextHandle == 0) {
                 this.swtGC.dispose();
                 this.swtImage.dispose();
@@ -246,10 +230,8 @@ public final class Emulator3D implements IGraphics3D {
             System.out.println("WGL context initialized");
         }
 
-        if (WGL.wglGetCurrentContext() != this.swtImage.handle) {
-            while (WGL.wglGetCurrentContext() > 0);
-
-            WGL.wglMakeCurrent(this.swtGC.handle, this.wglContextHandle);
+        if (!Emulator.getPlatform().isGLContextCurrent(swtImage.handle)) {
+            Emulator.getPlatform().setGLContextCurrent(this.swtGC.handle, this.wglContextHandle);
 
             try {
                 GLContext.useContext(this.swtImage);
@@ -269,7 +251,7 @@ public final class Emulator3D implements IGraphics3D {
 
     private void releaseContext() {
         try {
-            WGL.wglMakeCurrent(this.swtGC.handle, -1);
+            Emulator.getPlatform().releaseGLContext(this.swtGC.handle);
         } catch (Throwable ignored) {}
         try {
             GLContext.useContext(null);

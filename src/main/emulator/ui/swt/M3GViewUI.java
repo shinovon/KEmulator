@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.UILocale;
 import emulator.graphics3D.m3g.RenderPipe;
 import emulator.graphics3D.view.M3GView3D;
@@ -20,6 +21,8 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.*;
+import org.lwjgl.opengl.Pbuffer;
+import org.lwjgl.opengl.PixelFormat;
 
 public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyListener, MouseWheelListener {
     private Shell aShell889;
@@ -28,7 +31,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private Menu aMenu895;
     private Composite aComposite907;
     private Tree aTree896;
-    GLCanvas canvas;
+    Canvas canvas;
     private Memory ana898;
     private M3GView3D m3gview;
     private Camera camera;
@@ -279,30 +282,34 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         }
         // TODO camera rotation
 
-        if (!M3GView3D.isCurrent()) {
-            this.m3gview.setCurrent();
-        }
-        this.cameraTransform.setIdentity();
-        this.cameraTransform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
-        this.cameraTransform.postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
-
-        M3GView3D.setCamera(this.camera, this.cameraTransform);
-        m3gview.clearBackground(this.aBackground900);
-        if (this.showGrid) {
-            this.m3gview.drawGrid(1.0F);
-        }
-        if (this.aNode361 != null) {
-            try {
-                this.m3gview.method368(this.aNode361, null);
-            } catch (Exception localException) {
-//                localException.printStackTrace();
+        try {
+            if (!this.m3gview.isCurrent()) {
+                this.m3gview.setCurrent(this.aRectangle903.width, this.aRectangle903.height);
             }
+            this.cameraTransform.setIdentity();
+            this.cameraTransform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
+            this.cameraTransform.postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
+
+            M3GView3D.setCamera(this.camera, this.cameraTransform);
+            m3gview.clearBackground(this.aBackground900);
+            if (this.showGrid) {
+                this.m3gview.drawGrid(1.0F);
+            }
+            if (this.aNode361 != null) {
+                try {
+                    this.m3gview.method368(this.aNode361, null);
+                } catch (Exception localException) {
+                    //                localException.printStackTrace();
+                }
+            }
+            if (this.showAxis) {
+                this.m3gview.drawAxis();
+            }
+            this.m3gview.setViewport(this.aRectangle903.width, this.aRectangle903.height);
+            m3gview.swapBuffers();
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-        if (this.showAxis) {
-            this.m3gview.drawAxis();
-        }
-        this.m3gview.setViewport(this.aRectangle903.width, this.aRectangle903.height);
-        M3GView3D.swapBuffers();
     }
 
     public void setXray(boolean b) {
@@ -445,9 +452,30 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         layoutData.grabExcessVerticalSpace = true;
         layoutData.verticalAlignment = 4;
         GLData gld = new GLData();
-        gld.depthSize = 24;
+        gld.depthSize = Emulator.getEmulator().getScreenDepth();
         gld.doubleBuffer = true;
-        (this.canvas = new GLCanvas(this.aComposite907, 264192, gld)).setLayoutData(layoutData);
+
+        try {
+            int samples = 4;
+            while (true) {
+                try {
+                    gld.samples = samples;
+                    canvas = new GLCanvas(this.aComposite907, 264192, gld);
+                    break;
+                } catch (Exception e) {
+                    if ((samples >>= 1) == 0) {
+                        gld.samples = samples;
+                        canvas = new GLCanvas(this.aComposite907, 264192, gld);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            canvas = new Canvas(this.aComposite907, 264192);
+        }
+
+        canvas.setLayoutData(layoutData);
         this.canvas.addMouseMoveListener(this);
         this.canvas.addMouseListener(new Class56(this));
         canvas.addKeyListener(this);

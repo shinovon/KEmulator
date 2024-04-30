@@ -123,7 +123,7 @@ public final class ImageSWT implements IImage
         return this.graphics;
     }
     
-    public final void method12(final GC gc, final int n, final int n2) {
+    public final void method12(GC gc, final int n, final int n2) {
         if (this.mutable) {
             gc.drawImage(this.img, n, n2);
             return;
@@ -132,7 +132,8 @@ public final class ImageSWT implements IImage
         this.img.dispose();
     }
     
-    public final void copyToScreen(final GC gc, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
+    public final void copyToScreen(Object g, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
+        GC gc = (GC) g;
         if (this.mutable) {
             gc.drawImage(this.img, n, n2, n3, n4, n5, n6, n7, n8);
             return;
@@ -141,7 +142,8 @@ public final class ImageSWT implements IImage
         this.img.dispose();
     }
 
-    public final void copyToScreen(final GC gc) {
+    public final void copyToScreen(Object g) {
+        GC gc = (GC) g;
         if (this.mutable) {
             gc.drawImage(this.img, 0, 0);
             return;

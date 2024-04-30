@@ -60,6 +60,25 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
+    public int createGLContext(int gcHandle) {
+        return 0;
+    }
+
+    public boolean isGLContextCurrent(int imgHandle) {
+        return false;
+    }
+
+    public void setGLContextCurrent(int gcHandle, int contextHandle) {
+
+    }
+
+    public void releaseGLContext(int gcHandle) {
+
+    }
+
+    public void deleteGLContext(int contextHandle) {
+    }
+
     public void loadM3G() {
         if(!supportsM3G()) return;
         boolean m3gLoaded = false;

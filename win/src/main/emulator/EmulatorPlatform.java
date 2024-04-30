@@ -3,6 +3,8 @@ package emulator;
 import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
+import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
+import org.eclipse.swt.internal.opengl.win32.WGL;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -55,7 +57,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public MemoryViewImage convertMicro3DTexture(Object o) {
         IImage img = ((com.mascotcapsule.micro3d.v3.Texture) o).debugImage;
-        if(img == null)
+        if (img == null)
             return null;
         return new MemoryViewImage(img);
     }
@@ -64,8 +66,41 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
+    public int createGLContext(int gcHandle) {
+        PIXELFORMATDESCRIPTOR var4;
+        (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
+        var4.nVersion = 1;
+        var4.dwFlags = 57;
+        var4.iPixelType = 0;
+        var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
+        var4.iLayerType = 0;
+        int var5;
+        if ((var5 = WGL.ChoosePixelFormat(gcHandle, var4)) == 0 || !WGL.SetPixelFormat(gcHandle, var5, var4)) {
+            return 0;
+        }
+
+        return WGL.wglCreateContext(gcHandle);
+    }
+
+    public boolean isGLContextCurrent(int imgHandle) {
+        return WGL.wglGetCurrentContext() == imgHandle;
+    }
+
+    public void setGLContextCurrent(int gcHandle, int contextHandle) {
+        while (WGL.wglGetCurrentContext() > 0);
+        WGL.wglMakeCurrent(gcHandle, contextHandle);
+    }
+
+    public void releaseGLContext(int gcHandle) {
+        WGL.wglMakeCurrent(gcHandle, -1);
+    }
+
+    public void deleteGLContext(int contextHandle) {
+        WGL.wglDeleteContext(contextHandle);
+    }
+
     public void loadM3G() {
-        if(!supportsM3G()) return;
+        if (!supportsM3G()) return;
         boolean m3gLoaded = false;
         try {
             Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
@@ -73,14 +108,14 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             try {
                 f = cls.getField("_STUB");
                 m3gLoaded = !f.getBoolean(null);
-                if(!m3gLoaded) {
+                if (!m3gLoaded) {
                     System.out.println("m3g stub!!");
                 }
             } catch (Throwable ignored) {
                 m3gLoaded = true;
             }
         } catch (Throwable ignored) {}
-        if(!m3gLoaded) {
+        if (!m3gLoaded) {
             addToClassPath(Settings.g3d == 0 ? "m3g_swerve.jar" : "m3g_lwjgl.jar");
         } else {
             System.out.println("m3g preloaded");

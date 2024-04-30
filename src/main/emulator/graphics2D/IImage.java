@@ -1,7 +1,5 @@
 package emulator.graphics2D;
 
-import org.eclipse.swt.graphics.GC;
-
 public interface IImage
 {
     IGraphics2D createGraphics();
@@ -30,7 +28,7 @@ public interface IImage
 
 	Object getNative();
 
-    void copyToScreen(GC gc);
+    void copyToScreen(Object gc);
 
-    void copyToScreen(GC gc, int srcX, int srcY, int srcWidth, int srcHeight, int dstX, int dstY, int dstWidth, int dstHeight);
+    void copyToScreen(Object gc, int srcX, int srcY, int srcWidth, int srcHeight, int dstX, int dstY, int dstWidth, int dstHeight);
 }
