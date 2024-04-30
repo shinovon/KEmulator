@@ -45,7 +45,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private int anInt910;
     private float aFloat906;
     private float aFloat911;
-    private float zoom;
+    private float fov;
     private float cameraX;
     private float cameraY;
     private float cameraZ;
@@ -118,7 +118,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private void method524() {
         this.aFloat906 = 1.0f;
         this.aFloat911 = 100000.0f;
-        this.zoom = 50.0f;
+        this.fov = 70.0f;
         this.method531();
         this.cameraX = 0.0f;
         this.cameraY = 0.0f;
@@ -136,16 +136,16 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
             return;
         }
         if (this.anInt910 == 0) {
-            if (this.zoom < 0.0f) {
-                this.zoom = 0.0f;
+            if (this.fov < 0.0f) {
+                this.fov = 0.0f;
             }
-            if (this.zoom >= 180.0f) {
-                this.zoom = 179.99f;
+            if (this.fov >= 180.0f) {
+                this.fov = 179.99f;
             }
-            this.camera.setPerspective(this.zoom, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
+            this.camera.setPerspective(this.fov, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
             return;
         }
-        this.camera.setParallel(this.zoom, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
+        this.camera.setParallel(this.fov, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
     }
 
     public final void method226() {
@@ -579,15 +579,15 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
                 break;
             }
             case 3: {
-                this.zoom -= (float)x / 10.0f;
+                this.fov -= (float)x / 10.0f;
                 Label_0263:
                 {
-                    if (this.zoom > 0.0f) {
-                        if (this.zoom < 180.0f || this.anInt910 != 0) {
+                    if (this.fov > 0.0f) {
+                        if (this.fov < 180.0f || this.anInt910 != 0) {
                             break Label_0263;
                         }
                     }
-                    this.zoom += x / 10.0f;
+                    this.fov += x / 10.0f;
                 }
                 this.method531();
                 break;
@@ -667,11 +667,11 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static float method517(final M3GViewUI class90) {
-        return class90.zoom;
+        return class90.fov;
     }
 
     static float method518(final M3GViewUI class90, final float aFloat915) {
-        return class90.zoom = aFloat915;
+        return class90.fov = aFloat915;
     }
 
     static float method525(final M3GViewUI class90) {
@@ -763,11 +763,11 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static float method542(final M3GViewUI class90, final float n) {
-        return class90.zoom += n;
+        return class90.fov += n;
     }
 
     static float method544(final M3GViewUI class90, final float n) {
-        return class90.zoom -= n;
+        return class90.fov -= n;
     }
 
     public void mouseScrolled(MouseEvent mouseEvent) {
