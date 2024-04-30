@@ -299,12 +299,6 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
             }
         }
         if (this.showAxis) {
-            Camera localCamera = new Camera();
-            localCamera.setPerspective(50.0f, (float)(this.aRectangle903.width >> 1) / (float)(this.aRectangle903.height >> 1), 1.0f, 1000.0f);
-            final Transform transform;
-            (transform = new Transform()).postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
-            transform.postTranslate(0.0f, 0.0f, 6.0f);
-            M3GView3D.setCamera(localCamera, transform);
             this.m3gview.drawAxis();
         }
         this.m3gview.setViewport(this.aRectangle903.width, this.aRectangle903.height);
