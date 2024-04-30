@@ -181,8 +181,9 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         for (int i = 0; i < this.ana898.m3gObjects.size(); ++i) {
             final Node data;
             final String name = (data = (Node) this.ana898.m3gObjects.get(i)).getClass().getName();
-            final Widget widget;
-            ((TreeItem) (widget = new TreeItem(this.aTree896, 0))).setText(name.substring(name.lastIndexOf(".") + 1) + "_" + data.getUserID());
+            final TreeItem widget = new TreeItem(this.aTree896, 0);
+            widget.setText(name.substring(name.lastIndexOf(".") + 1) + "_" + data.getUserID());
+            if(!data.isRenderingEnabled()) widget.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
             widget.setData(data);
             if (data instanceof Group) {
                 new TreeItem((TreeItem) widget, 0);
