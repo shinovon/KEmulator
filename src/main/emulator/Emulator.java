@@ -900,13 +900,12 @@ public class Emulator {
                     s = "~/local/share/KEmulator";
                 } else {
                     s = System.getenv("APPDATA");
-                    if (s == null) {
+                    if (s == null)
                         break installed;
-                    }
                     s += "\\KEmulator";
                 }
                 File f = new File(s);
-                if (f.exists() || f.mkdir())
+                if ((f.exists() && f.isDirectory()) || f.mkdir())
                     return s;
             }
         }
@@ -920,10 +919,11 @@ public class Emulator {
         cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
         cmd.add("-cp");
         cmd.add(System.getProperty("java.class.path"));
-        cmd.add("-Xmx1G");
+        cmd.add("-Xmx512M"); // FIXME
         if (Settings.jdwpDebug) {
             cmd.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + Settings.debugPort);
         }
+        cmd.add("-Djava.library.path=" + getAbsolutePath());
         if ("false".equals(System.getProperty("sun.java3d.d3d"))) {
             cmd.add("-Dsun.java3d.d3d=false");
         }
