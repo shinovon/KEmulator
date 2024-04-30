@@ -11,6 +11,6 @@ final class M3GViewDisplayAxisListener extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        M3GViewUI.method520(this.aClass90_827, M3GViewUI.method514(this.aClass90_827).getSelection());
+        M3GViewUI.setAxisVisible(this.aClass90_827, M3GViewUI.getAxisItem(this.aClass90_827).getSelection());
     }
 }

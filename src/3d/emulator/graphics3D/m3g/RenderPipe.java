@@ -14,6 +14,7 @@ public final class RenderPipe {
 
     private Node parentNode;
     private Vector roList = new Vector();
+    private boolean renderInvisibleNodes;
 
     public static RenderPipe getInstance() {
         if (inst == null) {
@@ -50,7 +51,7 @@ public final class RenderPipe {
         while (true) {
             if (tmpNode == null) break;
 
-            if (!tmpNode.isRenderingEnabled()) {
+            if (!tmpNode.isRenderingEnabled() && !renderInvisibleNodes) {
                 return false;
             }
 
@@ -146,5 +147,13 @@ public final class RenderPipe {
         }
 
         roList.insertElementAt(ro, index);
+    }
+
+    public void setRenderInvisibleNodes(boolean render) {
+        renderInvisibleNodes = render;
+    }
+
+    public boolean isRenderInvisibleNodes() {
+        return renderInvisibleNodes;
     }
 }

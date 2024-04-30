@@ -11,6 +11,6 @@ final class M3GViewXrayListener extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        aClass90_829.setXray(M3GViewUI.method528(this.aClass90_829).getSelection());
+        aClass90_829.setXray(M3GViewUI.getXrayItem(this.aClass90_829).getSelection());
     }
 }

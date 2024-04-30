@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.UILocale;
+import emulator.graphics3D.m3g.RenderPipe;
 import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
@@ -38,8 +39,6 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private Menu aMenu923;
     private boolean aBoolean905;
     boolean aBoolean909;
-    private boolean coordinateAxis;
-    private boolean showGrid;
     private int anInt362 = 0;
     private int anInt893;
     private int anInt910;
@@ -53,9 +52,6 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private Background aBackground900;
     private Node aNode361;
     private Rectangle aRectangle903;
-    private MenuItem aMenuItem894;
-    private MenuItem aMenuItem912;
-    private MenuItem aMenuItem916;
     private MenuItem aMenuItem921;
     private MenuItem aMenuItem925;
     private MenuItem aMenuItem927;
@@ -78,6 +74,14 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private boolean shift, control;
     private int rotateX, rotateY;
     private long lastUpdate = 1;
+
+    private MenuItem renderInvisibleItem;
+
+    private MenuItem axisItem;
+    private static boolean showAxis;
+    private MenuItem gridItem;
+    private static boolean showGrid;
+    private MenuItem xrayItem;
 
     public M3GViewUI() {
         super();
@@ -102,10 +106,11 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     private void method516() {
-        this.coordinateAxis = false;
+        this.showAxis = false;
         this.showGrid = false;
-        this.aMenuItem894.setSelection(this.coordinateAxis);
-        this.aMenuItem912.setSelection(this.showGrid);
+        this.axisItem.setSelection(this.showAxis);
+        this.gridItem.setSelection(this.showGrid);
+        this.renderInvisibleItem.setSelection(RenderPipe.getViewInstance().isRenderInvisibleNodes());
         this.aMenuItem936.setSelection(true);
         this.aMenuItem938.setEnabled(false);
         this.anInt893 = 0;
@@ -293,7 +298,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 //                localException.printStackTrace();
             }
         }
-        if (this.coordinateAxis) {
+        if (this.showAxis) {
             Camera localCamera = new Camera();
             localCamera.setPerspective(50.0f, (float)(this.aRectangle903.width >> 1) / (float)(this.aRectangle903.height >> 1), 1.0f, 1000.0f);
             final Transform transform;
@@ -310,6 +315,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         this.m3gview.setXray(b);
     }
 
+    //TODO: Use anonymous classes
     private void method543() {
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 1;
@@ -372,13 +378,23 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         this.aMenuItem935.addSelectionListener(new M3GViewCameraResetListener(this));
         menuItem2.setMenu(this.aMenu913);
         this.aMenu908 = new Menu(menuItem);
-        (this.aMenuItem894 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_COORDINATE", "Coordinate Axis"));
-        this.aMenuItem894.addSelectionListener(new M3GViewDisplayAxisListener(this));
-        (this.aMenuItem912 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_GRID", "Show Grid"));
-        this.aMenuItem912.addSelectionListener(new M3GViewDisplayGridListener(this));
-        (this.aMenuItem916 = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_XRAY", "Show Xray") + "\tX");
-        this.aMenuItem916.setAccelerator(88);
-        this.aMenuItem916.addSelectionListener(new M3GViewXrayListener(this));
+        (this.axisItem = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_COORDINATE", "Coordinate Axis"));
+        this.axisItem.addSelectionListener(new M3GViewDisplayAxisListener(this));
+        (this.gridItem = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_GRID", "Show Grid"));
+        this.gridItem.addSelectionListener(new M3GViewDisplayGridListener(this));
+        (this.xrayItem = new MenuItem(this.aMenu908, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_XRAY", "Show Xray") + "\tX");
+        this.xrayItem.setAccelerator(88);
+        this.xrayItem.addSelectionListener(new M3GViewXrayListener(this));
+
+        renderInvisibleItem = new MenuItem(this.aMenu908, 32);
+        renderInvisibleItem.setText(UILocale.get("M3G_VIEW_DISPLAY_RENDER_INVISIBLE", "Render invisible nodes") + "\tV");
+        renderInvisibleItem.setAccelerator('V');
+        renderInvisibleItem.addSelectionListener(new SelectionAdapter() {
+            public final void widgetSelected(final SelectionEvent selectionEvent) {
+                RenderPipe.getViewInstance().setRenderInvisibleNodes(((MenuItem) selectionEvent.widget).getSelection());
+            }
+        });
+
         new MenuItem(this.aMenu908, 2);
         (this.aMenuItem921 = new MenuItem(this.aMenu908, 8)).setText(UILocale.get("M3G_VIEW_DISPLAY_UPDATE_WORLD", "Update World") + "\tF5");
         this.aMenuItem921.setAccelerator(16777230);
@@ -705,24 +721,24 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         class90.method524();
     }
 
-    static boolean method520(final M3GViewUI class90, final boolean aBoolean914) {
-        return class90.coordinateAxis = aBoolean914;
+    static boolean setAxisVisible(final M3GViewUI class90, final boolean aBoolean914) {
+        return class90.showAxis = aBoolean914;
     }
 
-    static MenuItem method514(final M3GViewUI class90) {
-        return class90.aMenuItem894;
+    static MenuItem getAxisItem(final M3GViewUI class90) {
+        return class90.axisItem;
     }
 
-    static boolean method527(final M3GViewUI class90, final boolean aBoolean919) {
+    static boolean setGridVisible(final M3GViewUI class90, final boolean aBoolean919) {
         return class90.showGrid = aBoolean919;
     }
 
-    static MenuItem method521(final M3GViewUI class90) {
-        return class90.aMenuItem912;
+    static MenuItem getGridItem(final M3GViewUI class90) {
+        return class90.gridItem;
     }
 
-    static MenuItem method528(final M3GViewUI class90) {
-        return class90.aMenuItem916;
+    static MenuItem getXrayItem(final M3GViewUI class90) {
+        return class90.xrayItem;
     }
 
     static void method529(final M3GViewUI class90) {

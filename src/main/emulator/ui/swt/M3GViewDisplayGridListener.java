@@ -11,6 +11,6 @@ final class M3GViewDisplayGridListener extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        M3GViewUI.method527(this.aClass90_826, M3GViewUI.method521(this.aClass90_826).getSelection());
+        M3GViewUI.setGridVisible(this.aClass90_826, M3GViewUI.getGridItem(this.aClass90_826).getSelection());
     }
 }
