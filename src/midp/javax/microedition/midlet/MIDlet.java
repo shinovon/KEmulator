@@ -48,7 +48,7 @@ public abstract class MIDlet {
                 return false;
             }
             if (url.startsWith("file:///root/")) {
-                url = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") +
+                url = "file:///" + (Emulator.getUserPath().replace("\\", "/") +
                         "/file/" + url.substring(8)).replace(" ", "%20");
             }
             if (url.startsWith("vlc:")) {
@@ -57,7 +57,7 @@ public abstract class MIDlet {
                     throw new ConnectionNotFoundException("Invalid URL");
                 }
                 if (url.startsWith("file:///root/")) {
-                    url = "file:///" + (Emulator.getAbsolutePath().replace("\\", "/") +
+                    url = "file:///" + (Emulator.getUserPath().replace("\\", "/") +
                             "/file" + url.substring(13)).replace(" ", "%20");
                 }
                 if (Settings.vlcDir != null && Settings.vlcDir.length() > 2) {

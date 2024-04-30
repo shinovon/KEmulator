@@ -27,7 +27,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
         this.styledText = null;
         try {
             final File file;
-            if (!(file = new File(Emulator.getAbsolutePath() + "/log.txt")).exists()) {
+            if (!(file = new File(Emulator.getUserPath() + "/log.txt")).exists()) {
                 file.createNewFile();
             }
             this.logStream = new LogStream(this);
@@ -81,7 +81,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
 
     private void method332() {
         try {
-            final BufferedReader bufferedReader = new BufferedReader(new FileReader(Emulator.getAbsolutePath() + "/log.txt"));
+            final BufferedReader bufferedReader = new BufferedReader(new FileReader(Emulator.getUserPath() + "/log.txt"));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 this.styledText.append(line + "\n");

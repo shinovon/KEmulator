@@ -191,7 +191,7 @@ public class CustomMethod {
     static {
         CustomMethod.aHashtable14 = new Hashtable();
         try {
-            fw = new FileWriter(Emulator.getAbsolutePath() + "/track.txt", false);
+            fw = new FileWriter(Emulator.getUserPath() + "/track.txt", false);
             trackWriter = new BufferedWriter(fw);
         } catch (IOException e) {
             e.printStackTrace();

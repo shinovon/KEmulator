@@ -28,13 +28,13 @@ public class FileConnectionImpl implements FileConnection
         url = method216(url = method216(url = method216(url = (url = url.replaceFirst("localhost", "")).substring("file://".length()), "c"), "d"), "e");
         if(url.startsWith("/"))
         	url = url.substring(1);
-        this.systemPath = Emulator.getAbsolutePath() + "/file/" + url;
+        this.systemPath = Emulator.getUserPath() + "/file/" + url;
         //method134(this.aString439 = Emulator.getAbsolutePath() + "/file/" + aString314);
         this.file = new File(this.systemPath);
     }
     
     private static void method134(final String s) {
-        final int length = (Emulator.getAbsolutePath() + "/file/").length();
+        final int length = (Emulator.getUserPath() + "/file/").length();
         String s2 = s;
         String s3 = "/";
         int n = length;
@@ -54,7 +54,7 @@ public class FileConnectionImpl implements FileConnection
         String replaceFirst = s;
         if (s.contains(s2 + ":")) {
             final File file;
-            if (!(file = new File(Emulator.getAbsolutePath() + "/file/" + s2 + "/")).exists() || file.isFile()) {
+            if (!(file = new File(Emulator.getUserPath() + "/file/" + s2 + "/")).exists() || file.isFile()) {
                 file.mkdirs();
             }
             replaceFirst = s.replaceFirst(s2 + ":", s2);
@@ -335,7 +335,7 @@ public class FileConnectionImpl implements FileConnection
     }
     
     static {
-        FileConnectionImpl.aString441 = Emulator.getAbsolutePath() + "/file/" + "root/";
+        FileConnectionImpl.aString441 = Emulator.getUserPath() + "/file/" + "root/";
     }
 
 	public String getRealPath() {

@@ -399,13 +399,13 @@ public final class Property implements IProperty {
             StringBuffer sb;
             String substring;
             if ((s = this.rmsFolder).startsWith(".")) {
-                sb = new StringBuffer().append(Emulator.getAbsolutePath());
+                sb = new StringBuffer().append(Emulator.getUserPath());
                 substring = s.substring(1);
             } else {
                 if (!s.startsWith("/") && !s.startsWith("\\")) {
                     break Label_0077;
                 }
-                sb = new StringBuffer().append(Emulator.getAbsolutePath());
+                sb = new StringBuffer().append(Emulator.getUserPath());
                 substring = s;
             }
             s = sb.append(substring).toString();
@@ -457,10 +457,10 @@ public final class Property implements IProperty {
 
     public final void loadProperties() {
         try {
-            if (!new File(Emulator.getAbsolutePath() + "/property.txt").exists()) {
+            if (!new File(Emulator.getUserPath() + "/property.txt").exists()) {
                 throw new FileNotFoundException();
             }
-            final FileInputStream fileInputStream = new FileInputStream(Emulator.getAbsolutePath() + "/property.txt");
+            final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + "/property.txt");
             final Properties properties;
             (properties = new Properties()).load(fileInputStream);
             final String property = properties.getProperty("Device", "SonyEricssonK800");
@@ -623,7 +623,7 @@ public final class Property implements IProperty {
 
     public final void saveProperties() {
         try {
-            final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getAbsolutePath() + "/property.txt");
+            final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getUserPath() + "/property.txt");
             final SortProperties properties;
             (properties = new SortProperties(this)).setProperty("Device", this.device);
             properties.setProperty("DefaultFont", this.defaultFont);
@@ -2007,13 +2007,13 @@ public final class Property implements IProperty {
             StringBuffer sb;
             String substring;
             if ((s = this.aText662.getText().trim()).startsWith(".")) {
-                sb = new StringBuffer().append(Emulator.getAbsolutePath());
+                sb = new StringBuffer().append(Emulator.getUserPath());
                 substring = s.substring(1);
             } else {
                 if (!s.startsWith("/") && !s.startsWith("\\")) {
                     break Label_0083;
                 }
-                sb = new StringBuffer().append(Emulator.getAbsolutePath());
+                sb = new StringBuffer().append(Emulator.getUserPath());
                 substring = s;
             }
             s = sb.append(substring).toString();

@@ -420,7 +420,7 @@ public final class Class5 implements Runnable, DisposeListener {
                 public void widgetSelected(SelectionEvent selectionEvent) {
                     new Thread(() -> {
                         try {
-                            File file = new File(Emulator.getAbsolutePath() + "/classwatcher.txt");
+                            File file = new File(Emulator.getUserPath() + "/classwatcher.txt");
                             if (!file.exists()) file.createNewFile();
                             PrintStream ps = new PrintStream(new FileOutputStream(file));
                             try {

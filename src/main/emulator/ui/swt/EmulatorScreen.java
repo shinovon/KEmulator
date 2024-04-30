@@ -274,7 +274,7 @@ public final class EmulatorScreen implements
         this.shell.open();
         this.shell.addDisposeListener(this);
         this.shell.addControlListener(this);
-        if (win) {
+        if (Emulator.win) {
             new Thread("KEmulator keyboard poll thread") {
                 boolean b;
 
@@ -355,10 +355,9 @@ public final class EmulatorScreen implements
     protected static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
     private static Class win32OS;
     private static Method win32OSGetKeyState;
-    boolean win = System.getProperty("os.name").startsWith("Win");
 
     public synchronized void pollKeyboard(Canvas canvas) {
-        if (!win || canvas == null || canvas.isDisposed()) return;
+        if (!Emulator.win || canvas == null || canvas.isDisposed()) return;
         long now = System.currentTimeMillis();
         Shell shell = canvas.getShell();
         if (shell == this.shell) {
@@ -982,7 +981,7 @@ public final class EmulatorScreen implements
         if ((parent = (menuItem = (MenuItem) selectionEvent.widget).getParent()).equals(this.menuTool)) {
             if (menuItem.equals(this.captureToFileMenuItem)) {
                 if (this.pauseState != 0) {
-                    final String string = Emulator.getAbsolutePath() + "/capture/";
+                    final String string = Emulator.getUserPath() + "/capture/";
                     final File file;
                     if (!(file = new File(string)).exists() || !file.isDirectory()) {
                         file.mkdir();
@@ -1007,7 +1006,7 @@ public final class EmulatorScreen implements
             } else {
                 if (menuItem.equals(this.startRecordAviMenuItem)) {
                     pauseStep();
-                    final String string2 = Emulator.getAbsolutePath() + "/capture/";
+                    final String string2 = Emulator.getUserPath() + "/capture/";
                     final File file2;
                     if (!(file2 = new File(string2)).exists() || !file2.isDirectory()) {
                         file2.mkdir();
@@ -1123,7 +1122,7 @@ public final class EmulatorScreen implements
                 pauseStep();
                 final FileDialog fileDialog3;
                 (fileDialog3 = new FileDialog(this.shell, 4096)).setText(UILocale.get("OPEN_REC_FILE", "Open a record file"));
-                fileDialog3.setFilterPath(Emulator.getAbsolutePath());
+                fileDialog3.setFilterPath(Emulator.getUserPath());
                 fileDialog3.setFilterExtensions(new String[]{"*.rec", "*.*"});
                 Label_1321:
                 {
@@ -1690,7 +1689,7 @@ public final class EmulatorScreen implements
     }
 
     public final void keyReleased(final KeyEvent keyEvent) {
-        if (!Settings.canvasKeyboard && win) {
+        if (!Settings.canvasKeyboard && Emulator.win) {
             return;
         }
         int n = keyEvent.keyCode & 0xFEFFFFFF;
@@ -1740,7 +1739,7 @@ public final class EmulatorScreen implements
         }
         n = Integer.parseInt(r);
         synchronized (pressedKeys) {
-            if (win && !pressedKeys.contains(n)) {
+            if (Emulator.win && !pressedKeys.contains(n)) {
                 return;
             }
             pressedKeys.removeElement(n);

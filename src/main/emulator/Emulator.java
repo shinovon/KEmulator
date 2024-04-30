@@ -67,6 +67,11 @@ public class Emulator {
     public static String httpUserAgent;
     private static Thread vlcCheckerThread;
     private static IEmulatorPlatform platform;
+    public static boolean installed;
+
+    public static final String os = System.getProperty("os.name").toLowerCase();
+    public static final boolean win = os.startsWith("win");
+    public static final boolean linux = os.contains("linux") || os.contains("nix");
 
     private static void initRichPresence() {
         if (!Settings.rpc)
@@ -821,6 +826,8 @@ public class Emulator {
                 Emulator.commandLineArguments[i] = "";
             } else if (key.equalsIgnoreCase("log")) {
                 Settings.showLogFrame = true;
+            } else if (key.equalsIgnoreCase("installed")) {
+                installed = true;
             } else if (key.equalsIgnoreCase("uei")) {
                 Settings.uei = true;
             } else if (value != null) {
@@ -837,9 +844,8 @@ public class Emulator {
                 } else if (key.equalsIgnoreCase("jad")) {
                     Emulator.jadPath = value;
                 } else if (key.equalsIgnoreCase("rec")) {
-                    File localFile;
                     Settings.recordedKeysFile = value;
-                    Settings.playingRecordedKeys = (localFile = new File(value)).exists();
+                    Settings.playingRecordedKeys = new File(value).exists();
                 } else if (key.equalsIgnoreCase("device")) {
                     Emulator.deviceName = value;
                 } else if (key.equalsIgnoreCase("devicefile")) {
@@ -885,11 +891,32 @@ public class Emulator {
         return s;
     }
 
+    public static String getUserPath() {
+        installed:
+        {
+            if (installed) {
+                String s;
+                if (linux) {
+                    s = "~/local/share/KEmulator";
+                } else {
+                    s = System.getenv("APPDATA");
+                    if (s == null) {
+                        break installed;
+                    }
+                    s += "\\KEmulator";
+                }
+                File f = new File(s);
+                if (f.exists() || f.mkdir())
+                    return s;
+            }
+        }
+        return getAbsolutePath();
+    }
+
     public static void loadGame(final String s, final int engine2d, final int engine3d, final boolean b) {
         ArrayList<String> cmd = new ArrayList<String>();
         getEmulator().getLogStream().println("loadGame: " + s);
         String javahome = System.getProperty("java.home");
-        boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");
         cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
         cmd.add("-cp");
         cmd.add(System.getProperty("java.class.path"));
@@ -920,6 +947,7 @@ public class Emulator {
         }
         cmd.add(engine2d == 0 ? "-swt" : "-awt");
         cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
+        if(installed) cmd.add("-installed");
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {

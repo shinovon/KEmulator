@@ -653,7 +653,7 @@ public final class Memory {
     }
 
     public static void exportAudio(byte[] b, String name) throws IOException {
-        File f = new File(Emulator.getAbsolutePath() + "/" + name);
+        File f = new File(Emulator.getUserPath() + "/" + name);
         if (f.exists()) return;
         f.createNewFile();
         DataOutputStream o = new DataOutputStream(new FileOutputStream(f));

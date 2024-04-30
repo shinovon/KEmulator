@@ -108,7 +108,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     public VLCPlayerImpl(String url) throws IOException {
         this();
         if (url.startsWith("file:///root/")) {
-            url = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
+            url = "file:///" + (Emulator.getUserPath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
         }
         this.url = url;
         this.mediaUrl = url;
@@ -132,7 +132,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     public VLCPlayerImpl(String locator, String contentType, DataSource src) throws IOException {
         this();
         if (locator.startsWith("file:///root/")) {
-            locator = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
+            locator = "file:///" + (Emulator.getUserPath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
         }
         this.url = locator;
         this.mediaUrl = locator;
@@ -143,7 +143,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     public VLCPlayerImpl(String url, String contentType) throws IOException {
         this();
         if (url.startsWith("file:///root/")) {
-            url = "file:///" + (Emulator.getAbsolutePath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
+            url = "file:///" + (Emulator.getUserPath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
         }
         this.url = url;
         this.mediaUrl = url;

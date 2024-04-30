@@ -43,6 +43,11 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$[2024.04.30]
+M3G LWJGL: fixed Sprite3D alpha
+M3GView: even better controls, added fallback to pbuffer, show hidden nodes as red
+Updated lwjgl library to 2.9.4
+
 $[2024.04.29]
 M3G LWJGL: added settings, fixed SkinnedMesh rendering
 M3GView: new controls

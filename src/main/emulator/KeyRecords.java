@@ -96,7 +96,7 @@ public final class KeyRecords {
     }
 
     private static String method700() {
-        final String string = Emulator.getAbsolutePath() + "/records/";
+        final String string = Emulator.getUserPath() + "/records/";
         final File file;
         if (!(file = new File(string)).exists() || !file.isDirectory()) {
             file.mkdir();
