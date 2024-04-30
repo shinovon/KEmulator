@@ -433,6 +433,8 @@ public final class Emulator3D implements IGraphics3D {
         if (var1 != null && var1.getImage() != null && var1.getCropWidth() > 0 && var1.getCropHeight() > 0) {
             GL11.glDisable(2896);
             GL11.glDisable(2912);
+            GL11.glDisable(GL_ALPHA_TEST);
+            GL11.glDisable(GL_BLEND);
             int var2 = var1.getImage().getFormat() == 99 ? GL_RGB : GL_RGBA;
             int var3 = var1.getImage().getWidth();
             int var4 = var1.getImage().getHeight();
