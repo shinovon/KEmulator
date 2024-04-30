@@ -19,7 +19,7 @@ final class M3GViewGroupClick implements Listener {
         if (items[0].getData() != null) return;
 
         items[0].dispose();
-        
+
         if (groupWidget.getData() instanceof Group) {
             final Group group = (Group) groupWidget.getData();
 
