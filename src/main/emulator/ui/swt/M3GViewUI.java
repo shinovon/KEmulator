@@ -155,7 +155,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         this.aShell889.open();
         this.aShell889.addDisposeListener(this);
         this.method516();
-        this.method536();
+        this.addM3GObjects();
         new Thread(new Refresher(this)).start();
         new Thread(new Flusher(this)).start();
         while (!this.aShell889.isDisposed()) {
@@ -175,17 +175,20 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         return this.aShell889 != null && !this.aShell889.isDisposed();
     }
 
-    private void method536() {
+    private void addM3GObjects() {
         this.ana898.method846();
         this.aTree896.removeAll();
+
         for (int i = 0; i < this.ana898.m3gObjects.size(); ++i) {
-            final Node data;
-            final String name = (data = (Node) this.ana898.m3gObjects.get(i)).getClass().getName();
+            final Node node = (Node) this.ana898.m3gObjects.get(i);
+            final String name = node.getClass().getName();
             final TreeItem widget = new TreeItem(this.aTree896, 0);
-            widget.setText(name.substring(name.lastIndexOf(".") + 1) + "_" + data.getUserID());
-            if(!data.isRenderingEnabled()) widget.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-            widget.setData(data);
-            if (data instanceof Group) {
+
+            widget.setText(name.substring(name.lastIndexOf(".") + 1) + "_" + node.getUserID());
+            if(!node.isRenderingEnabled()) widget.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+            widget.setData(node);
+            if (node instanceof Group) {
                 new TreeItem((TreeItem) widget, 0);
             }
         }
@@ -412,7 +415,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         (this.aTree896 = new Tree(this.aComposite891, 2048)).setHeaderVisible(false);
         this.aTree896.setLayoutData(layoutData);
         this.aTree896.setLinesVisible(false);
-        this.aTree896.addListener(17, new Class48(this));
+        this.aTree896.addListener(17, new M3GViewGroupClick(this));
         this.aTree896.addMouseListener(new Class51(this));
     }
 
@@ -723,7 +726,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static void method529(final M3GViewUI class90) {
-        class90.method536();
+        class90.addM3GObjects();
     }
 
     static Tree method501(final M3GViewUI class90) {
