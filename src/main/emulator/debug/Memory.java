@@ -104,11 +104,11 @@ public final class Memory {
                 method847(cls, null, s, false);
         }
 
-        if(m3gObjects.size() == 0) return;
+        if (m3gObjects.size() == 0) return;
 
         debuggingM3G = true;
 
-        if(Settings.g3d == 1) {
+        if (Settings.g3d == 1) {
             // lwjgl engine
             for (int i = 0; i < m3gObjects.size(); i++) {
                 m3gReadTextures(m3gObjects.elementAt(i));
@@ -229,7 +229,7 @@ public final class Memory {
                 final Field[] f = fields(clazz);
                 for (int k = 0; k < f.length; ++k) {
                     final String name2 = f[k].getName();
-                    //if((o instanceof Item || o instanceof Screen) && f[k].getType() == int[].class) continue;
+                    //if ((o instanceof Item || o instanceof Screen) && f[k].getType() == int[].class) continue;
                     if (!Modifier.isFinal(f[k].getModifiers()) || !f[k].getType().isPrimitive()) {
                         f[k].setAccessible(true);
                         final Object method848 = ClassTypes.getFieldValue(o, f[k]);
@@ -244,7 +244,7 @@ public final class Memory {
     }
 
     private synchronized void m3gReadTextures(Object obj) {
-        if(obj == null) return;
+        if (obj == null) return;
         if (obj instanceof Group) {
             Group g = (Group) obj;
 
@@ -272,7 +272,7 @@ public final class Memory {
                 Texture2D tex2d;
                 try {
                     tex2d = ap.getTexture(i);
-                    if(tex2d == null) break;
+                    if (tex2d == null) break;
                 } catch (IndexOutOfBoundsException e) {
                     break;
                 }
@@ -731,7 +731,7 @@ public final class Memory {
                                 res += image2D.size();
                             }
                         } catch (NoClassDefFoundError ignored) {}
-                        /*if(!(cls == Vector.class || cls == Hashtable.class
+                        /*if (!(cls == Vector.class || cls == Hashtable.class
                                 || cls == StringItem.class || cls == Command.class
                                 || cls == cls("javax.microedition.lcdui.a")
                                 ))

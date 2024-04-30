@@ -132,7 +132,7 @@ public final class EventQueue implements Runnable {
     }
 
     public synchronized void queue(final int n) {
-        if(n == 1) {
+        if (n == 1) {
             repainted = false;
         }
         if (n == 15 || n == 17) {
@@ -183,7 +183,7 @@ public final class EventQueue implements Runnable {
     }
 
     public void serviceRepaints() {
-        if(Thread.currentThread() == eventThread || repainted) return;
+        if (Thread.currentThread() == eventThread || repainted) return;
         try {
             synchronized (repaintLock) {
                 repaintLock.wait();
@@ -423,7 +423,7 @@ public final class EventQueue implements Runnable {
                     while (count > 0) {
                         try {
                             int[] o = (int[]) elements[0];
-                            if(Settings.synchronizeKeyEvents) {
+                            if (Settings.synchronizeKeyEvents) {
                                 synchronized (lock) {
                                     processAction(o);
                                 }

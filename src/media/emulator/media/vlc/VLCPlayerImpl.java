@@ -235,7 +235,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         if (s.contains("VolumeControl")) {
             return volumeControl;
         }
-        if(s.contains("RateControl")) {
+        if (s.contains("RateControl")) {
             return rateControl;
         }
         if (s.contains("StopTimeControl")) {
@@ -460,7 +460,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         }
         if (playing) {
             mediaPlayer.controls().pause();
-            if(state == STARTED)
+            if (state == STARTED)
                 state = PREFETCHED;
             playing = false;
         }
@@ -512,7 +512,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
             started = true;
         }
         if ("stopped".equals(s) || "endOfMedia".equals(s)) {
-            if(state == STARTED) {
+            if (state == STARTED) {
                 state = PREFETCHED;
             }
             started = false;
@@ -602,7 +602,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     }
 
     public static BufferedImage resize(BufferedImage original, int w, int h) {
-        if(w == -1) {
+        if (w == -1) {
             w = (int) (((double) original.getWidth() / (double) original.getHeight()) * (double) h);
         }
         try {
@@ -693,7 +693,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     @Override
     public void paused(MediaPlayer arg0) {
         this.state = PREFETCHED;
-        if(stoppedAtTime) {
+        if (stoppedAtTime) {
             notifyListeners(PlayerListener.STOPPED_AT_TIME, getMediaTime());
             stoppedAtTime = false;
             return;
@@ -722,7 +722,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
     @Override
     public void stopped(MediaPlayer arg0) {
         this.state = PREFETCHED;
-        if(stoppedAtTime) {
+        if (stoppedAtTime) {
             notifyListeners(PlayerListener.STOPPED_AT_TIME, getMediaTime());
             stoppedAtTime = false;
             return;
@@ -732,7 +732,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
     @Override
     public void timeChanged(MediaPlayer arg0, long time) {
-        if(stopTime != StopTimeControl.RESET && time >= stopTime/1000L && time <= stopTime/1000L + 1000) {
+        if (stopTime != StopTimeControl.RESET && time >= stopTime/1000L && time <= stopTime/1000L + 1000) {
             stoppedAtTime = true;
             try {
                 stop();
@@ -751,7 +751,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
         int h = sourceHeight;
         sourceHeight = mediaPlayer.video().videoDimension().height;
         sourceWidth = mediaPlayer.video().videoDimension().width;
-        if(w != sourceWidth || h != sourceHeight)
+        if (w != sourceWidth || h != sourceHeight)
             notifyListeners(PlayerListener.SIZE_CHANGED, videoControl);
     }
 

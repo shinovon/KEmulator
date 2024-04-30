@@ -85,7 +85,7 @@ public class CapturePlayerImpl implements Player {
     }
 
     public void close() {
-        if(state == CLOSED) return;
+        if (state == CLOSED) return;
         state = CLOSED;
         started = false;
         webcam.close();
@@ -113,12 +113,12 @@ public class CapturePlayerImpl implements Player {
     }
 
     public void prefetch() throws IllegalStateException, MediaException {
-        if(state == CLOSED) throw new IllegalStateException();
+        if (state == CLOSED) throw new IllegalStateException();
         state = PREFETCHED;
     }
 
     public void realize() throws IllegalStateException, MediaException {
-        if(state == CLOSED) throw new IllegalStateException();
+        if (state == CLOSED) throw new IllegalStateException();
         state = REALIZED;
         inst = this;
     }
@@ -134,8 +134,8 @@ public class CapturePlayerImpl implements Player {
     }
 
     public void start() throws IllegalStateException, MediaException {
-        if(state == CLOSED) throw new IllegalStateException();
-        if(inst != this) {
+        if (state == CLOSED) throw new IllegalStateException();
+        if (inst != this) {
             realize();
         }
         Permission.checkPermission("camera");
@@ -145,7 +145,7 @@ public class CapturePlayerImpl implements Player {
     }
 
     public void stop() throws IllegalStateException, MediaException {
-        if(state == CLOSED) throw new IllegalStateException();
+        if (state == CLOSED) throw new IllegalStateException();
         started = false;
         state = PREFETCHED;
     }
@@ -172,7 +172,7 @@ public class CapturePlayerImpl implements Player {
     }
 
     public Object initDisplayMode(int p0, Object p1) {
-        if(state == CLOSED) throw new IllegalStateException();
+        if (state == CLOSED) throw new IllegalStateException();
         if (p0 == 0) {
             isItem = true;
             return getItem();
@@ -195,11 +195,11 @@ public class CapturePlayerImpl implements Player {
             if (p0 != null) {
                 String[] ar = p0.split("&");
                 for(String s: ar) {
-                    if(s.startsWith("width=")) {
+                    if (s.startsWith("width=")) {
                         w = Integer.parseInt(s.replace("width=", ""));
                         continue;
                     }
-                    if(s.startsWith("height=")) {
+                    if (s.startsWith("height=")) {
                         h = Integer.parseInt(s.replace("height=", ""));
                         continue;
                     }
@@ -209,7 +209,7 @@ public class CapturePlayerImpl implements Player {
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             BufferedImage img = webcam.getImage();
-            if(w > 0 && h > 0) {
+            if (w > 0 && h > 0) {
                 img = VLCPlayerImpl.resize(img, w, h);
             }
             ImageIO.write(img, "JPEG", os);

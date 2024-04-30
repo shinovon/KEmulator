@@ -95,24 +95,24 @@ public final class TransformSWT implements ITransform {
         }
         final TransformSWT a = new TransformSWT(transform);
         transform.dispose();
-        return (ITransform)a;
+        return a;
     }
 
     private static int a(int var0, int var1, int var2, int var3) {
-        if(var2 <= 3) {
-            if((var3 & 1) != 0) {
+        if (var2 <= 3) {
+            if ((var3 & 1) != 0) {
                 return -(var0 >> 1);
             }
 
-            if((var3 & 8) != 0) {
+            if ((var3 & 8) != 0) {
                 return -var0;
             }
         } else {
-            if((var3 & 1) != 0) {
+            if ((var3 & 1) != 0) {
                 return -(var1 >> 1);
             }
 
-            if((var3 & 8) != 0) {
+            if ((var3 & 8) != 0) {
                 return -var1;
             }
         }
@@ -121,20 +121,20 @@ public final class TransformSWT implements ITransform {
     }
 
     private static int b(int var0, int var1, int var2, int var3) {
-        if(var2 <= 3) {
-            if((var3 & 2) != 0) {
+        if (var2 <= 3) {
+            if ((var3 & 2) != 0) {
                 return -(var1 >> 1);
             }
 
-            if((var3 & 32) != 0) {
+            if ((var3 & 32) != 0) {
                 return -var1;
             }
         } else {
-            if((var3 & 2) != 0) {
+            if ((var3 & 2) != 0) {
                 return -(var0 >> 1);
             }
 
-            if((var3 & 32) != 0) {
+            if ((var3 & 32) != 0) {
                 return -var0;
             }
         }

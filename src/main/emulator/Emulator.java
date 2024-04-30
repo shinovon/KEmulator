@@ -505,7 +505,7 @@ public class Emulator {
     private static void setProperties() {
         System.setProperty("microedition.configuration", "CLDC-1.1");
         System.setProperty("microedition.profiles", "MIDP-2.0");
-        if(platform.supportsM3G())
+        if (platform.supportsM3G())
             System.setProperty("microedition.m3g.version", "1.1");
         System.setProperty("microedition.encoding", Settings.fileEncoding);
         if (System.getProperty("microedition.locale") == null) {
@@ -631,13 +631,13 @@ public class Emulator {
             return;
         }
         try {
-            if(debugBuild) {
+            if (debugBuild) {
                 Manifest versionManifest = new Manifest(Emulator.class.getResourceAsStream("/META-INF/version.mf"));
                 final Attributes mainAttributes = versionManifest.getMainAttributes();
                 for (Map.Entry entry : mainAttributes.entrySet()) {
-                    if(entry.getKey().toString().equals("Git-Revision")) {
+                    if (entry.getKey().toString().equals("Git-Revision")) {
                         String s = entry.getValue().toString();
-                        if(s.length() > 0)
+                        if (s.length() > 0)
                             version = version + " " + s;
                         break;
                     }
