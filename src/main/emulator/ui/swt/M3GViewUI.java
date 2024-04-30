@@ -243,8 +243,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         lastUpdate = System.nanoTime();
 
         float tmpSpeed = moveSpeed;
-        if (shift) tmpSpeed *= 2;
-        if (control) tmpSpeed *= 0.25f;
+        if (shift) tmpSpeed *= 5;
+        if (control) tmpSpeed /= 5;
 
         float forward = ((moveForward?1:0) - (moveBackward?1:0)) * tmpSpeed * deltaTime;
         float strafe = ((moveRight?1:0) - (moveLeft?1:0)) * tmpSpeed * deltaTime;
