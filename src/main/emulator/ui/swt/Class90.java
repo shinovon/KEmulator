@@ -270,7 +270,7 @@ public final class Class90 implements MouseMoveListener, DisposeListener, KeyLis
         }
         // TODO camera rotation
 
-        if (!m3gview.isCurrent()) {
+        if (!M3GView3D.isCurrent()) {
             this.m3gview.setCurrent();
         }
         this.cameraTransform.setIdentity();

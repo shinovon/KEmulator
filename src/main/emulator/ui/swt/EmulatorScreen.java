@@ -473,8 +473,8 @@ public final class EmulatorScreen implements
 
 
     private void zoomIn() {
-        if (zoom < 5f) {
-            zoom(Math.min(5f, zoom + (Settings.resizeMode == 3 ? 1 : .5f)));
+        if (zoom < 10f) {
+            zoom(Math.min(10f, zoom + (Settings.resizeMode == 3 ? 1 : .5f)));
         }
     }
 
