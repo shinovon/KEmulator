@@ -800,15 +800,17 @@ public final class EmulatorScreen implements
         this.captureToClipboardMenuItem.setAccelerator(65603);
         this.captureToClipboardMenuItem.addSelectionListener(this);
         new MenuItem(this.menuTool, 2);
-        (this.startRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_START_RECORD_AVI", "Start Record AVI") + "\tCtrl+V");
-        this.startRecordAviMenuItem.addSelectionListener(this);
-        (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
-        this.stopRecordAviMenuItem.addSelectionListener(this);
-        new MenuItem(this.menuTool, 2);
-        (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
-        this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
-        this.showTrackInfoMenuItem.addSelectionListener(this);
-        this.showTrackInfoMenuItem.setAccelerator(16777228);
+        if(!Emulator.isX64()) {
+            (this.startRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_START_RECORD_AVI", "Start Record AVI") + "\tCtrl+V");
+            this.startRecordAviMenuItem.addSelectionListener(this);
+            (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
+            this.stopRecordAviMenuItem.addSelectionListener(this);
+            new MenuItem(this.menuTool, 2);
+            (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
+            this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
+            this.showTrackInfoMenuItem.addSelectionListener(this);
+            this.showTrackInfoMenuItem.setAccelerator(16777228);
+        }
 
         this.fpsCounterMenuItem = new MenuItem(this.menuTool, 32);
         this.fpsCounterMenuItem.setText(UILocale.get("MENU_TOOL_FPS_COUNT", "FPS Counter"));
@@ -924,7 +926,8 @@ public final class EmulatorScreen implements
         this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
         this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
         this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
-        this.stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
+        if(stopRecordAviMenuItem != null)
+            stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
         this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
         this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
         this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
@@ -941,10 +944,12 @@ public final class EmulatorScreen implements
     protected void toggleMenuAccelerators(final boolean b) {
         if (b) {
             this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
-            this.startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
+            if(startRecordAviMenuItem != null)
+                    startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
         } else {
             this.captureToFileMenuItem.setAccelerator(0);
-            this.startRecordAviMenuItem.setAccelerator(0);
+            if(startRecordAviMenuItem != null)
+                startRecordAviMenuItem.setAccelerator(0);
         }
     }
 
@@ -1422,8 +1427,10 @@ public final class EmulatorScreen implements
         this.memoryViewMenuItem.setEnabled(this.pauseState != 0);
         this.methodsMenuItem.setEnabled(this.pauseState != 0);
         m3gViewMenuItem.setEnabled(Settings.g3d == 1 && pauseState != 0);
-        this.startRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter == null);
-        this.stopRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter != null);
+        if(startRecordAviMenuItem != null)
+            startRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter == null);
+        if(stopRecordAviMenuItem != null)
+            stopRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter != null);
         this.updateStatus();
     }
 
