@@ -563,12 +563,15 @@ public final class Property implements IProperty {
             Settings.fpsCounter = Boolean.valueOf(properties.getProperty("FPSCounter", "true"));
             Settings.synchronizeKeyEvents = Boolean.valueOf(properties.getProperty("SynchronizeKeyEvents", "true"));
             Settings.motorolaSoftKeyFix = Boolean.valueOf(properties.getProperty("MotorolaSoftKeyFix", "false"));
+
             Settings.resizeMode = Integer.valueOf(properties.getProperty("ResizeMode", "2"));
             Settings.keepAspectRatio = Boolean.valueOf(properties.getProperty("KeepAspectRatio", "true"));
             Settings.integerResize = Boolean.valueOf(properties.getProperty("IntegerResize", "false"));
+
             EmulatorScreen.sizeW = Integer.valueOf(properties.getProperty("SizeW", "-1"));
             EmulatorScreen.sizeH = Integer.valueOf(properties.getProperty("SizeH", "-1"));
             EmulatorScreen.maximized = Boolean.valueOf(properties.getProperty("Maximized", "false"));
+
             Settings.patchSynchronizedPaint = Boolean.valueOf(properties.getProperty("PatchSynchronizedPaint", "true"));
 
             Settings.m3gIgnoreOverwrite = Boolean.valueOf(properties.getProperty("M3GIgnoreOverwrite", "false"));
@@ -578,6 +581,8 @@ public final class Property implements IProperty {
             Settings.m3gAA = Integer.valueOf(properties.getProperty("M3GAA", "0"));
             Settings.m3gTexFilter = Integer.valueOf(properties.getProperty("M3GTexFilter", "0"));
             Settings.m3gMipmapping = Integer.valueOf(properties.getProperty("M3GMipmapping", "0"));
+
+            Settings.writeKemCfg = Boolean.valueOf(properties.getProperty("WriteKemulatorCfg", "true"));
 
             fileInputStream.close();
         } catch (Exception ex) {
@@ -725,6 +730,8 @@ public final class Property implements IProperty {
             properties.setProperty("M3GAA", String.valueOf(Settings.m3gAA));
             properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
             properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
+
+            properties.setProperty("WriteKemulatorCfg",  String.valueOf(Settings.writeKemCfg));
 
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();

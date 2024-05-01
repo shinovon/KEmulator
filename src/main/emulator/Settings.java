@@ -3,11 +3,7 @@ package emulator;
 import java.util.*;
 
 public final class Settings {
-    /*
-     * awt - 1
-     * swt - 0
-     */
-    public static int g2d;
+    public static int g2d = 1; // swt - 0, awt - 1
     public static boolean enableVibration;
     public static boolean enableKeyRepeat;
     public static boolean ignoreFullScreen;
@@ -15,25 +11,24 @@ public final class Settings {
     public static boolean enableKeyCache;
     public static boolean associateWithJar;
     public static boolean rightClickMenu;
-    public static int canvasScale;
-    public static int frameRate;
-    public static int steps;
+    public static int canvasScale = 100;
+    public static int frameRate = 60;
+    public static int steps = -1;
     public static long aLong1235;
     public static String fileEncoding;
-    public static String[] recentJars;
+    public static String[] recentJars = new String[5];
     public static boolean infoColorHex;
     public static boolean recordReleasedImg;
     public static boolean xrayView;
     public static boolean xrayOverlapScreen;
     public static boolean xrayShowClipBorder;
-    public static int speedModifier;
+    public static int speedModifier = 1;
     public static boolean autoGenJad;
     public static boolean enableMethodTrack;
     public static boolean enableNewTrack;
     public static boolean threadMethodTrack;
-    private static final Random rng;
-    public static final long rngSeed;
-    public static long recordedRandomSeed;
+    public static final long rngSeed = new Random().nextLong();
+    public static long recordedRandomSeed = rngSeed;
     public static boolean playingRecordedKeys;
     public static boolean recordKeys;
     public static String recordedKeysFile;
@@ -47,12 +42,12 @@ public final class Settings {
     public static boolean showLogFrame;
     public static boolean showInfoFrame;
     public static boolean showMemViewFrame;
-    public static boolean aBoolean1274;
+    public static boolean aBoolean1274 = false;
     public static boolean canvasKeyboard;
     public static boolean awtAntiAliasing;
     public static boolean fpsMode;
     public static boolean textAntiAliasing = true;
-    // 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS, 3 - QUANTUM
+    // 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS, 3 - QUANTUM FIXME
     public static int fpsGame;
     public static boolean playerBufferAll = false;
     public static String vlcDir = "";
@@ -67,7 +62,7 @@ public final class Settings {
     public static boolean fpsCounter = true;
     public static boolean synchronizeKeyEvents = true;
     public static boolean motorolaSoftKeyFix = false;
-    public static int g3d; // 0 - swerve, 1 - lwjgl
+    public static int g3d = 1; // 0 - swerve, 1 - lwjgl
     public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill
     public static boolean keepAspectRatio = true;
     public static boolean integerResize = false;
@@ -90,21 +85,5 @@ public final class Settings {
             MIP_ANISO_2 = 4, MIP_ANISO_4 = 5, MIP_ANISO_8 = 6, MIP_ANISO_16 = 7;
     public static int m3gMipmapping;
 
-    public Settings() {
-        super();
-    }
-
-    static {
-        Settings.g2d = 1;
-        Settings.g3d = 1;
-        Settings.canvasScale = 100;
-        Settings.frameRate = 60;
-        Settings.steps = -1;
-        Settings.recentJars = new String[5];
-        Settings.speedModifier = 1;
-        rng = new Random();
-        rngSeed = Settings.rng.nextLong();
-        Settings.recordedRandomSeed = Settings.rngSeed;
-        Settings.aBoolean1274 = false;
-    }
+    public static boolean writeKemCfg = true;
 }

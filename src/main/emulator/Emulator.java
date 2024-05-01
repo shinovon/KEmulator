@@ -208,6 +208,9 @@ public class Emulator {
         if (Emulator.midletJar == null) {
             return;
         }
+        if(!Settings.writeKemCfg) {
+            return;
+        }
         try {
             String s = Emulator.midletJar;
             final int lastIndex = s.lastIndexOf(Emulator.midletJar.lastIndexOf("\\") != -1 ? "\\" : "/");
@@ -914,19 +917,24 @@ public class Emulator {
 
     public static void loadGame(final String s, final int engine2d, final int engine3d, final boolean b) {
         ArrayList<String> cmd = new ArrayList<String>();
-        getEmulator().getLogStream().println("loadGame: " + s);
+        getEmulator().getLogStream().println(s == null ? "Restarting" : ("loadGame: " + s));
         String javahome = System.getProperty("java.home");
         cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
         cmd.add("-cp");
         cmd.add(System.getProperty("java.class.path"));
         cmd.add("-Xmx512M"); // FIXME
+
+        // start with debug server
         if (Settings.jdwpDebug) {
             cmd.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + Settings.debugPort);
         }
+
+        // linux fixes
         cmd.add("-Djava.library.path=" + getAbsolutePath());
         if ("false".equals(System.getProperty("sun.java3d.d3d"))) {
             cmd.add("-Dsun.java3d.d3d=false");
         }
+
         cmd.add("emulator.Emulator");
         if (s == null) {
             for (int i = 0; i < Emulator.commandLineArguments.length; ++i) {
@@ -945,9 +953,12 @@ public class Emulator {
             cmd.add("-rec");
             cmd.add(Settings.recordedKeysFile);
         }
+
         cmd.add(engine2d == 0 ? "-swt" : "-awt");
         cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
+
         if(installed) cmd.add("-installed");
+
         getEmulator().disposeSubWindows();
         notifyDestroyed();
         try {
