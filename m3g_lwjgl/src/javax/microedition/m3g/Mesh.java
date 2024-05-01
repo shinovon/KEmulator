@@ -120,26 +120,26 @@ public class Mesh extends Node {
                 var7.mul(1.0F / var7.w);
                 var8.mul(1.0F / var8.w);
                 var8.sub(var7);
-                Vector4f var10 = new Vector4f();
-                Vector4f var11 = new Vector4f();
-                Vector4f var12 = new Vector4f();
+                Vector4f vtxA = new Vector4f();
+                Vector4f vtxB = new Vector4f();
+                Vector4f vtxC = new Vector4f();
                 Vector4f var13 = new Vector4f();
                 Vector4f var14 = new Vector4f();
                 Transform var15 = new Transform();
-                int[] var16 = new int[4];
-                float[] var17 = new float[Emulator3D.NumTextureUnits];
-                float[] var18 = new float[Emulator3D.NumTextureUnits];
-                float[] var19 = null;
+                int[] triIndices = new int[4];
+                float[] texS = new float[Emulator3D.NumTextureUnits];
+                float[] texT = new float[Emulator3D.NumTextureUnits];
+                float[] normal = null;
 
-                for (int var20 = 0; var20 < this.submeshes.length; ++var20) {
-                    if (this.appearances[var20] != null && this.submeshes[var20] != null) {
+                for (int submesh = 0; submesh < this.submeshes.length; ++submesh) {
+                    if (this.appearances[submesh] != null && this.submeshes[submesh] != null) {
                         int var21;
-                        if (this.appearances[var20].getPolygonMode() != null) {
+                        if (this.appearances[submesh].getPolygonMode() != null) {
                             label120:
                             {
-                                var21 = this.appearances[var20].getPolygonMode().getWinding() != 168 ? 1 : 0;
+                                var21 = this.appearances[submesh].getPolygonMode().getWinding() != 168 ? 1 : 0;
                                 int var10000;
-                                switch (this.appearances[var20].getPolygonMode().getCulling()) {
+                                switch (this.appearances[submesh].getPolygonMode().getCulling()) {
                                     case 161:
                                         var10000 = var21 ^ 1;
                                         break;
@@ -156,54 +156,59 @@ public class Mesh extends Node {
                             var21 = 0;
                         }
 
-                        TriangleStripArray var22 = (TriangleStripArray) this.submeshes[var20];
+                        TriangleStripArray tsa = (TriangleStripArray) this.submeshes[submesh];
 
-                        for (int var23 = 0; var22.getIndices(var23, var16); ++var23) {
-                            int var24 = vb.getVertexCount();
-                            if (var16[0] >= var24 || var16[1] >= var24 || var16[2] >= var24) {
-                                throw new IllegalStateException("Index overflow: (" + var16[0] + ", " + var16[1] + ", " + var16[2] + ") >=" + var24);
+                        for (int i = 0; tsa.getIndices(i, triIndices); i++) {
+                            int vtxCount = vb.getVertexCount();
+
+                            if (triIndices[0] >= vtxCount || triIndices[1] >= vtxCount || triIndices[2] >= vtxCount) {
+                                throw new IllegalStateException("Index overflow: (" + triIndices[0] + ", " + triIndices[1] + ", " + triIndices[2] + ") >=" + vtxCount);
                             }
 
-                            if (var16[0] < 0 || var16[1] < 0 || var16[2] < 0) {
+                            if (triIndices[0] < 0 || triIndices[1] < 0 || triIndices[2] < 0) {
                                 throw new IllegalStateException("Index underflow");
                             }
 
-                            vb.getVertex(var16[0], var10);
-                            vb.getVertex(var16[1], var11);
-                            vb.getVertex(var16[2], var12);
-                            if (G3DUtils.intersectTriangle(var7, var8, var10, var11, var12, var14, var16[3] ^ var21) && ri.testDistance(var14.x)) {
-                                if (vb.getNormalVertex(var16[0], var10)) {
-                                    vb.getNormalVertex(var16[1], var11);
-                                    vb.getNormalVertex(var16[2], var12);
-                                    (var19 = new float[3])[0] = var10.x * (1.0F - (var14.y + var14.z)) + var11.x * var14.y + var12.x * var14.z;
-                                    var19[1] = var10.y * (1.0F - (var14.y + var14.z)) + var11.y * var14.y + var12.y * var14.z;
-                                    var19[2] = var10.z * (1.0F - (var14.y + var14.z)) + var11.z * var14.y + var12.z * var14.z;
+                            vb.getVertex(triIndices[0], vtxA);
+                            vb.getVertex(triIndices[1], vtxB);
+                            vb.getVertex(triIndices[2], vtxC);
+
+                            if (G3DUtils.intersectTriangle(var7, var8, vtxA, vtxB, vtxC, var14, triIndices[3] ^ var21) && ri.testDistance(var14.x)) {
+                                if (vb.getNormalVertex(triIndices[0], vtxA)) {
+                                    vb.getNormalVertex(triIndices[1], vtxB);
+                                    vb.getNormalVertex(triIndices[2], vtxC);
+
+                                    normal = new float[3];
+
+                                    normal[0] = vtxA.x * (1.0F - (var14.y + var14.z)) + vtxB.x * var14.y + vtxC.x * var14.z;
+                                    normal[1] = vtxA.y * (1.0F - (var14.y + var14.z)) + vtxB.y * var14.y + vtxC.y * var14.z;
+                                    normal[2] = vtxA.z * (1.0F - (var14.y + var14.z)) + vtxB.z * var14.y + vtxC.z * var14.z;
                                 }
 
-                                for (int var25 = 0; var25 < var17.length; ++var25) {
+                                for (int var25 = 0; var25 < texS.length; ++var25) {
                                     int var10001;
                                     float var10002;
                                     float[] var26;
-                                    if (vb.getTexVertex(var16[0], var25, var10)) {
-                                        vb.getTexVertex(var16[1], var25, var11);
-                                        vb.getTexVertex(var16[2], var25, var12);
-                                        var13.x = var10.x * (1.0F - (var14.y + var14.z)) + var11.x * var14.y + var12.x * var14.z;
-                                        var13.y = var10.y * (1.0F - (var14.y + var14.z)) + var11.y * var14.y + var12.y * var14.z;
+                                    if (vb.getTexVertex(triIndices[0], var25, vtxA)) {
+                                        vb.getTexVertex(triIndices[1], var25, vtxB);
+                                        vb.getTexVertex(triIndices[2], var25, vtxC);
+                                        var13.x = vtxA.x * (1.0F - (var14.y + var14.z)) + vtxB.x * var14.y + vtxC.x * var14.z;
+                                        var13.y = vtxA.y * (1.0F - (var14.y + var14.z)) + vtxB.y * var14.y + vtxC.y * var14.z;
                                         var13.z = 0.0F;
                                         var13.w = 1.0F;
-                                        if (this.appearances[var20] != null && this.appearances[var20].getTexture(var25) != null) {
-                                            this.appearances[var20].getTexture(var25).getCompositeTransform(var15);
+                                        if (this.appearances[submesh] != null && this.appearances[submesh].getTexture(var25) != null) {
+                                            this.appearances[submesh].getTexture(var25).getCompositeTransform(var15);
                                             var15.getImpl_().transform(var13);
                                             var13.mul(1.0F / var13.w);
                                         }
 
-                                        var18[var25] = var13.x;
-                                        var26 = var17;
+                                        texT[var25] = var13.x;
+                                        var26 = texS;
                                         var10001 = var25;
                                         var10002 = var13.y;
                                     } else {
-                                        var18[var25] = 0.0F;
-                                        var26 = var17;
+                                        texT[var25] = 0.0F;
+                                        var26 = texS;
                                         var10001 = var25;
                                         var10002 = 0.0F;
                                     }
@@ -211,7 +216,7 @@ public class Mesh extends Node {
                                     var26[var10001] = var10002;
                                 }
 
-                                if (ri.endPick(var14.x, var18, var17, var20, this, var19)) {
+                                if (ri.endPick(var14.x, texT, texS, submesh, this, normal)) {
                                     var6 = true;
                                 }
                             }
