@@ -9,10 +9,8 @@ import java.util.Vector;
 
 public final class EventQueue implements Runnable {
     private int[] events;
-    private int readIndex;
-    private int ind;
-    private int event;
-    private boolean running;
+    private int count;
+    boolean running;
     private Vector serialEvents = new Vector();
     private Thread eventThread;
     private boolean paused;
@@ -25,14 +23,11 @@ public final class EventQueue implements Runnable {
 
     public EventQueue() {
         super();
-        this.events = new int[128];
-        this.ind = 0;
-        this.readIndex = 0;
-        this.event = 0;
+        events = new int[128];
         this.paused = false;
         this.running = true;
-        this.eventThread = new Thread(this, "KEmulator-EventQueue");
-        this.eventThread.start();
+        eventThread = new Thread(this, "KEmulator-EventQueue");
+        eventThread.start();
         (this.inputThread = new Thread(input, "KEmulator-InputQueue")).setPriority(3);
         this.inputThread.start();
     }
@@ -133,14 +128,28 @@ public final class EventQueue implements Runnable {
 
     public synchronized void queue(final int n) {
         if (n == 1) {
+            if(events[0] == 1 && !repainted)
+                return;
             repainted = false;
         }
         if (n == 15 || n == 17) {
             paused = false;
         }
-        events[this.ind++] = n;
-        if (ind >= events.length) {
-            ind = 0;
+        synchronized (this) {
+            events[count++] = n;
+            if (count >= events.length) {
+                System.arraycopy(events, 0, events = new int[events.length * 2], 0, count);
+            }
+        }
+    }
+
+    private synchronized int nextEvent() {
+        if(count == 0) return 0;
+        synchronized (this) {
+            int n = events[0];
+            System.arraycopy(events, 1, events, 0, events.length - 1);
+            count--;
+            return n;
         }
     }
 
@@ -170,18 +179,6 @@ public final class EventQueue implements Runnable {
         }
     }
 
-    private synchronized int nextEvent() {
-        if (this.readIndex == this.ind) {
-            return 0;
-        }
-        int n = this.events[this.readIndex];
-        this.events[this.readIndex++] = 0;
-        if (this.readIndex >= events.length) {
-            this.readIndex = 0;
-        }
-        return n;
-    }
-
     public void serviceRepaints() {
         if (Thread.currentThread() == eventThread) {
             synchronized(lock) {
@@ -199,13 +196,14 @@ public final class EventQueue implements Runnable {
     }
 
     public final void run() {
+        int event;
         while (this.running) {
             try {
-                if (Emulator.getMIDlet() == null || this.paused) {
+                if (Emulator.getMIDlet() == null || paused) {
                     Thread.sleep(5);
                     continue;
                 }
-                switch (this.event = this.nextEvent()) {
+                switch (event = this.nextEvent()) {
                     case 1: {
                         synchronized(lock) {
                             internalRepaint();
@@ -214,8 +212,8 @@ public final class EventQueue implements Runnable {
                         break;
                     }
                     case 2: { // serial call
-                        synchronized(lock) {
-                            if (!serialEvents.isEmpty()) {
+                        if (!serialEvents.isEmpty()) {
+                            synchronized(lock) {
                                 ((Runnable) serialEvents.remove(0)).run();
                             }
                         }
@@ -300,27 +298,30 @@ public final class EventQueue implements Runnable {
                     case 0:
                         break;
                     default:
-                        if ((this.event & Integer.MIN_VALUE) != 0x0) {
+                        if ((event & Integer.MIN_VALUE) != 0x0) {
                             if (Emulator.getCanvas() == null) {
                                 if (Emulator.getScreen() != null)
-                                    Emulator.getScreen().invokeSizeChanged(this.method719(this.event, this.event, false), this
-                                            .method719(this.event, this.event >> 12, false));
+                                    Emulator.getScreen().invokeSizeChanged(this.method719(event, event, false), this
+                                            .method719(event, event >> 12, false));
                                 break;
                             }
                             if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
                                 break;
                             }
-                            Emulator.getCanvas().invokeSizeChanged(this.method719(this.event, this.event, false), this
-                                    .method719(this.event, this.event >> 12, false));
+                            Emulator.getCanvas().invokeSizeChanged(this.method719(event, event, false), this
+                                    .method719(event, event >> 12, false));
                             break;
                         }
                         break;
                 }
-                this.event = 0;
-                try {
-                    Thread.sleep(1L);
-                } catch (Exception ignored) {
+                if (!serialEvents.isEmpty()) {
+                    synchronized(lock) {
+                        ((Runnable) serialEvents.remove(0)).run();
+                    }
+                } else if(event == 0) {
+                    Thread.sleep(1);
                 }
+                event = 0;
             } catch (Throwable e) {
                 System.err.println("Exception in Event Thread!");
                 e.printStackTrace();
@@ -328,13 +329,9 @@ public final class EventQueue implements Runnable {
         }
     }
 
-    static boolean method723(final EventQueue j) {
-        return j.running;
-    }
-
     public void callSerially(Runnable run) {
         serialEvents.add(run);
-        queue(2);
+//        queue(2);
     }
 
     private void internalRepaint() {
@@ -385,8 +382,7 @@ public final class EventQueue implements Runnable {
 
     private class InputThread implements Runnable {
         private Object[] elements;
-
-        private Object readLock = new Object();
+        private final Object readLock = new Object();
         private int count;
         private boolean added;
 
@@ -401,9 +397,7 @@ public final class EventQueue implements Runnable {
         private void append(Object o) {
             synchronized (this) {
                 if (count + 1 >= elements.length) {
-                    Object[] tmp = elements;
-                    elements = new Object[tmp.length + 16];
-                    System.arraycopy(tmp, 0, elements, 0, count);
+                    System.arraycopy(elements, 0, elements = new Object[elements.length * 2], 0, count);
                 }
             }
             elements[count++] = o;

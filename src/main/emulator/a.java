@@ -18,7 +18,7 @@ final class a implements Runnable {
     }
 
     public final void run() {
-        while (EventQueue.method723(this.aj1050)) {
+        while (this.aj1050.running) {
             if (this.aBoolean1048) {
                 this.aBoolean1048 = false;
                 this.aRunnable1049.run();
