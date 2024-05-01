@@ -25,142 +25,138 @@ public class Group extends Node {
         return clone;
     }
 
-    public void addChild(Node var1) {
-        if (var1 == null) {
+    public void addChild(Node child) {
+        if (child == null) {
             throw new NullPointerException();
-        } else if (var1 == this) {
+        } else if (child == this) {
             throw new IllegalArgumentException("child is this Group");
-        } else if (var1 instanceof World) {
+        } else if (child instanceof World) {
             throw new IllegalArgumentException("child is a World node");
-        } else if (var1.parent != null && var1.parent != this) {
+        } else if (child.parent != null && child.parent != this) {
             throw new IllegalArgumentException("child already has a parent other than this Group");
-        } else if (var1.isParentOf(this)) {
+        } else if (child.isParentOf(this)) {
             throw new IllegalArgumentException("child is an ancestor of this Group");
-        } else {
-            if (!this.children.contains(var1)) {
-                this.children.add(var1);
-                var1.parent = this;
-                this.addReference(var1);
-            }
+        }
 
+        if (!children.contains(child)) {
+            children.add(child);
+            child.parent = this;
+            addReference(child);
         }
     }
 
-    public void removeChild(Node var1) {
-        if (var1 != null) {
-            if (var1.isSkinnedMeshBone()) {
+    public void removeChild(Node child) {
+        if (child != null) {
+            if (child.isSkinnedMeshBone()) {
                 throw new IllegalArgumentException();
-            } else {
-                if (this.children.contains(var1)) {
-                    this.children.remove(var1);
-                    var1.parent = null;
-                    this.removeReference(var1);
-                }
+            }
+
+            if (children.contains(child)) {
+                children.remove(child);
+                child.parent = null;
+                removeReference(child);
             }
         }
     }
 
     public int getChildCount() {
-        return this.children.size();
+        return children.size();
     }
 
-    public Node getChild(int var1) {
-        if (var1 >= 0 && var1 < this.getChildCount()) {
-            return (Node) this.children.get(var1);
-        } else {
+    public Node getChild(int index) {
+        if (index < 0 || index >= getChildCount()) {
             throw new IndexOutOfBoundsException();
         }
+
+        return (Node) children.get(index);
     }
 
-    protected void alignment(Node var1) {
-        super.alignment(var1);
+    protected void alignment(Node reference) {
+        super.alignment(reference);
 
-        for (int var2 = 0; var2 < this.children.size(); ++var2) {
-            ((Node) this.children.get(var2)).alignment(var1);
+        for (int i = 0; i < children.size(); ++i) {
+            ((Node) children.get(i)).alignment(reference);
         }
-
     }
 
-    public boolean pick(int var1, float var2, float var3, Camera var4, RayIntersection var5) {
-        if (var4 == null) {
+    public boolean pick(int scope, float x, float y, Camera camera, RayIntersection ri) {
+        if (camera == null) {
             throw new NullPointerException();
-        } else if (var4.getRoot() != this.getRoot()) {
+        } else if (camera.getRoot() != getRoot()) {
             throw new IllegalStateException();
-        } else {
-            Vector4f var7 = new Vector4f(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, 1.0F, 1.0F);
-            Vector4f var8 = new Vector4f(2.0F * var2 - 1.0F, 1.0F - 2.0F * var3, -1.0F, 1.0F);
-            Transform var9 = new Transform();
-            var4.getProjection(var9);
-//            var9.getImpl_().method445();
-            var9.getImpl_().invert();
-            var9.getImpl_().transform(var8);
-            var8.mul(1.0F / var8.w);
-            var9.getImpl_().transform(var7);
-            var7.mul(1.0F / var7.w);
-            float[] var10;
-            (var10 = new float[8])[6] = var8.z;
-            var10[7] = var7.z;
-            Transform var11 = new Transform();
-            var4.getTransformTo(this, var11);
-            var11.getImpl_().transform(var8);
-            var8.mul(1.0F / var8.w);
-            var11.getImpl_().transform(var7);
-            var7.mul(1.0F / var7.w);
-            var10[0] = var8.x;
-            var10[1] = var8.y;
-            var10[2] = var8.z;
-            var10[3] = var7.x;
-            var10[4] = var7.y;
-            var10[5] = var7.z;
-            if (var5 == null) {
-                var5 = new RayIntersection();
-            }
-
-            var5.startPick(this, var10, var2, var3, var4);
-            var11.setIdentity();
-            return this.rayIntersect(var1, var10, var5, var11);
         }
+
+        Vector4f rayStart = new Vector4f(2 * x - 1, 1 - 2 * y, -1, 1);
+        Vector4f rayEnd = new Vector4f(2 * x - 1, 1 - 2 * y, 1, 1);
+
+        Transform invProj = new Transform();
+        camera.getProjection(invProj);
+        invProj.getImpl_().invert();
+
+        invProj.getImpl_().transform(rayStart);
+        invProj.getImpl_().transform(rayEnd);
+        rayStart.mul(1 / rayStart.w);
+        rayEnd.mul(1 / rayEnd.w);
+
+        float[] ray = new float[8];
+        ray[6] = rayStart.z;
+        ray[7] = rayEnd.z;
+
+        Transform camToGroup = new Transform();
+        camera.getTransformTo(this, camToGroup);
+        camToGroup.getImpl_().transform(rayStart);
+        camToGroup.getImpl_().transform(rayEnd);
+        rayStart.mul(1 / rayStart.w);
+        rayEnd.mul(1 / rayEnd.w);
+
+        ray[0] = rayStart.x;
+        ray[1] = rayStart.y;
+        ray[2] = rayStart.z;
+        ray[3] = rayEnd.x;
+        ray[4] = rayEnd.y;
+        ray[5] = rayEnd.z;
+
+        if (ri == null) ri = new RayIntersection();
+
+        ri.startPick(this, ray, x, y, camera);
+        return rayIntersect(scope, ray, ri, camToGroup);
     }
 
-    public boolean pick(int var1, float var2, float var3, float var4, float var5, float var6, float var7, RayIntersection var8) {
-        if (var5 == 0.0F && var6 == 0.0F && var7 == 0.0F) {
+    public boolean pick(int scope, float ox, float oy, float oz, float dx, float dy, float dz, RayIntersection ri) {
+        if (dx == 0.0F && dy == 0.0F && dz == 0.0F) {
             throw new IllegalArgumentException();
-        } else {
-            Transform var9 = new Transform();
-            float[] var10;
-            (var10 = new float[6])[0] = var2;
-            var10[1] = var3;
-            var10[2] = var4;
-            var10[3] = var2 + var5;
-            var10[4] = var3 + var6;
-            var10[5] = var4 + var7;
-            if (var8 == null) {
-                var8 = new RayIntersection();
-            }
-
-            var8.startPick(this, var10, 0.0F, 0.0F, null);
-            return this.rayIntersect(var1, var10, var8, var9);
         }
+
+        float[] ray = new float[] {ox, oy, oz, ox + dx, oy + dy, oz + dz};
+
+        Transform transform = new Transform();
+
+        if (ri == null) ri = new RayIntersection();
+
+        ri.startPick(this, ray, 0.0F, 0.0F, null);
+        return rayIntersect(scope, ray, ri, transform);
     }
 
-    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
-        boolean var5 = false;
-        Transform var6 = new Transform();
-        Transform var7 = new Transform();
+    protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
+        boolean hit = false;
+        Transform childTransform = new Transform();
+        Transform tmpTrans = new Transform();
 
-        for (int var8 = 0; var8 < this.children.size(); ++var8) {
-            Node var9;
-            if (((var9 = (Node) this.children.get(var8)) instanceof Group || (var9.getScope() & var1) != 0) && var9.isPickable(var3.getRoot())) {
-                var6.set(var4);
-                var9.getCompositeTransform(var7);
-                var6.postMultiply(var7);
-                if (var9.rayIntersect(var1, var2, var3, var6)) {
-                    var5 = true;
+        for (int i = 0; i < children.size(); ++i) {
+            Node child = (Node) children.get(i);
+
+            if ((child.getScope() & scope) != 0 && child.isPickingEnabled()) {
+                childTransform.set(transform);
+                child.getCompositeTransform(tmpTrans);
+                childTransform.postMultiply(tmpTrans);
+
+                if (child.rayIntersect(scope, ray, ri, childTransform)) {
+                    hit = true;
                 }
             }
         }
 
-        return var5;
+        return hit;
     }
 
     protected void updateAlignReferences() {

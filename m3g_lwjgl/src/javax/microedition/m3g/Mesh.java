@@ -5,112 +5,112 @@ import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
 public class Mesh extends Node {
-    protected VertexBuffer m_vertices;
-    private IndexBuffer[] anIndexBufferArray888;
+    protected VertexBuffer vertices;
+    private IndexBuffer[] submeshes;
     private Appearance[] appearances;
 
-    public Mesh(VertexBuffer var1, IndexBuffer var2, Appearance var3) {
-        if (var1 != null && var2 != null) {
-            this.m_vertices = var1;
-            this.anIndexBufferArray888 = new IndexBuffer[1];
-            this.anIndexBufferArray888[0] = var2;
-            this.addReference(this.m_vertices);
-            this.addReference(this.anIndexBufferArray888[0]);
-            this.appearances = new Appearance[1];
-            if (var3 != null) {
-                this.appearances[0] = var3;
-                this.addReference(this.appearances[0]);
-            }
-
-        } else {
+    public Mesh(VertexBuffer vertices, IndexBuffer submesh, Appearance appearance) {
+        if (vertices == null || submesh == null) {
             throw new NullPointerException();
         }
+
+        this.vertices = vertices;
+        this.submeshes = new IndexBuffer[1];
+        this.submeshes[0] = submesh;
+        this.appearances = new Appearance[1];
+        if (appearance != null) {
+            this.appearances[0] = appearance;
+            addReference(this.appearances[0]);
+        }
+
+        addReference(this.vertices);
+        addReference(this.submeshes[0]);
     }
 
-    public Mesh(VertexBuffer var1, IndexBuffer[] var2, Appearance[] var3) {
-        if (var1 != null && var2 != null) {
-            if (var2.length != 0 && (var3 == null || var3.length >= var2.length)) {
-                this.m_vertices = var1;
-                this.addReference(this.m_vertices);
-                this.anIndexBufferArray888 = new IndexBuffer[var2.length];
-                this.appearances = new Appearance[var2.length];
-
-                for (int var4 = var2.length - 1; var4 >= 0; --var4) {
-                    if (var2[var4] == null) {
-                        throw new NullPointerException();
-                    }
-
-                    this.anIndexBufferArray888[var4] = var2[var4];
-                    this.addReference(this.anIndexBufferArray888[var4]);
-                    if (var3 != null) {
-                        this.appearances[var4] = var3[var4];
-                        this.addReference(this.appearances[var4]);
-                    }
-                }
-
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else {
+    public Mesh(VertexBuffer vertices, IndexBuffer[] submeshes, Appearance[] appearances) {
+        if (vertices == null || submeshes == null) {
             throw new NullPointerException();
+        } else if (submeshes.length == 0 || (appearances != null && appearances.length < submeshes.length)) {
+            throw new IllegalArgumentException();
         }
+
+        this.vertices = vertices;
+        this.submeshes = new IndexBuffer[submeshes.length];
+        this.appearances = new Appearance[submeshes.length];
+
+        for (int i = 0; i < submeshes.length; i++) {
+            if (submeshes[i] == null) {
+                throw new NullPointerException();
+            }
+
+            this.submeshes[i] = submeshes[i];
+            addReference(this.submeshes[i]);
+
+            if (appearances != null) {
+                this.appearances[i] = appearances[i];
+                addReference(this.appearances[i]);
+            }
+        }
+
+        addReference(this.vertices);
     }
 
     protected Object3D duplicateObject() {
-        Mesh var1;
-        (var1 = (Mesh) super.duplicateObject()).anIndexBufferArray888 = (IndexBuffer[]) this.anIndexBufferArray888.clone();
-        var1.appearances = (Appearance[]) this.appearances.clone();
-        return var1;
+        Mesh clone = (Mesh) super.duplicateObject();
+        clone.submeshes = (IndexBuffer[]) submeshes.clone();
+        clone.appearances = (Appearance[]) appearances.clone();
+
+        return clone;
     }
 
-    public void setAppearance(int var1, Appearance var2) {
-        if (var1 >= 0 && var1 < this.anIndexBufferArray888.length) {
-            this.removeReference(this.appearances[var1]);
-            this.appearances[var1] = var2;
-            this.addReference(this.appearances[var1]);
-        } else {
+    public void setAppearance(int index, Appearance ap) {
+        if (index < 0 || index >= submeshes.length) {
             throw new IndexOutOfBoundsException();
         }
+        
+        removeReference(appearances[index]);
+        appearances[index] = ap;
+        addReference(appearances[index]);
     }
 
-    public Appearance getAppearance(int var1) {
-        if (var1 >= 0 && var1 < this.anIndexBufferArray888.length) {
-            return this.appearances[var1];
-        } else {
+    public Appearance getAppearance(int index) {
+        if (index < 0 || index >= submeshes.length) {
             throw new IndexOutOfBoundsException();
         }
+        
+        return appearances[index];
     }
 
-    public IndexBuffer getIndexBuffer(int var1) {
-        if (var1 >= 0 && var1 < this.anIndexBufferArray888.length) {
-            return this.anIndexBufferArray888[var1];
-        } else {
+    public IndexBuffer getIndexBuffer(int index) {
+        if (index < 0 || index >= submeshes.length) {
             throw new IndexOutOfBoundsException();
         }
+
+        return submeshes[index];
     }
 
     public VertexBuffer getVertexBuffer() {
-        return this.m_vertices;
+        return vertices;
     }
 
     public int getSubmeshCount() {
-        return this.anIndexBufferArray888.length;
+        return submeshes.length;
     }
 
-    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
-        return this.rayIntersect(var1, var2, var3, var4, this.m_vertices);
+    protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
+        return this.rayIntersect(scope, ray, ri, transform, this.vertices);
     }
 
-    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4, VertexBuffer var5) {
-        if (var5 != null && this.appearances != null && this.anIndexBufferArray888 != null) {
-            if (var5.getPositions((float[]) null) == null) {
+    protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform, VertexBuffer vb) {
+        if (vb != null && this.appearances != null && this.submeshes != null) {
+            if (vb.getPositions((float[]) null) == null) {
                 throw new IllegalStateException("No vertex positions");
             } else {
                 boolean var6 = false;
-                Vector4f var7 = new Vector4f(var2[0], var2[1], var2[2], 1.0F);
-                Vector4f var8 = new Vector4f(var2[3], var2[4], var2[5], 1.0F);
+                Vector4f var7 = new Vector4f(ray[0], ray[1], ray[2], 1.0F);
+                Vector4f var8 = new Vector4f(ray[3], ray[4], ray[5], 1.0F);
                 Transform var9;
-                (var9 = new Transform()).set(var4);
+                (var9 = new Transform()).set(transform);
 //                var9.getImpl_().method445();
                 var9.getImpl_().invert();
                 var9.getImpl_().transform(var7);
@@ -129,8 +129,8 @@ public class Mesh extends Node {
                 float[] var18 = new float[Emulator3D.NumTextureUnits];
                 float[] var19 = null;
 
-                for (int var20 = 0; var20 < this.anIndexBufferArray888.length; ++var20) {
-                    if (this.appearances[var20] != null && this.anIndexBufferArray888[var20] != null) {
+                for (int var20 = 0; var20 < this.submeshes.length; ++var20) {
+                    if (this.appearances[var20] != null && this.submeshes[var20] != null) {
                         int var21;
                         if (this.appearances[var20].getPolygonMode() != null) {
                             label120:
@@ -154,10 +154,10 @@ public class Mesh extends Node {
                             var21 = 0;
                         }
 
-                        TriangleStripArray var22 = (TriangleStripArray) this.anIndexBufferArray888[var20];
+                        TriangleStripArray var22 = (TriangleStripArray) this.submeshes[var20];
 
                         for (int var23 = 0; var22.getIndices(var23, var16); ++var23) {
-                            int var24 = var5.getVertexCount();
+                            int var24 = vb.getVertexCount();
                             if (var16[0] >= var24 || var16[1] >= var24 || var16[2] >= var24) {
                                 throw new IllegalStateException("Index overflow: (" + var16[0] + ", " + var16[1] + ", " + var16[2] + ") >=" + var24);
                             }
@@ -166,13 +166,13 @@ public class Mesh extends Node {
                                 throw new IllegalStateException("Index underflow");
                             }
 
-                            var5.getVertex(var16[0], var10);
-                            var5.getVertex(var16[1], var11);
-                            var5.getVertex(var16[2], var12);
-                            if (G3DUtils.intersectTriangle(var7, var8, var10, var11, var12, var14, var16[3] ^ var21) && var3.testDistance(var14.x)) {
-                                if (var5.getNormalVertex(var16[0], var10)) {
-                                    var5.getNormalVertex(var16[1], var11);
-                                    var5.getNormalVertex(var16[2], var12);
+                            vb.getVertex(var16[0], var10);
+                            vb.getVertex(var16[1], var11);
+                            vb.getVertex(var16[2], var12);
+                            if (G3DUtils.intersectTriangle(var7, var8, var10, var11, var12, var14, var16[3] ^ var21) && ri.testDistance(var14.x)) {
+                                if (vb.getNormalVertex(var16[0], var10)) {
+                                    vb.getNormalVertex(var16[1], var11);
+                                    vb.getNormalVertex(var16[2], var12);
                                     (var19 = new float[3])[0] = var10.x * (1.0F - (var14.y + var14.z)) + var11.x * var14.y + var12.x * var14.z;
                                     var19[1] = var10.y * (1.0F - (var14.y + var14.z)) + var11.y * var14.y + var12.y * var14.z;
                                     var19[2] = var10.z * (1.0F - (var14.y + var14.z)) + var11.z * var14.y + var12.z * var14.z;
@@ -182,9 +182,9 @@ public class Mesh extends Node {
                                     int var10001;
                                     float var10002;
                                     float[] var26;
-                                    if (var5.getTexVertex(var16[0], var25, var10)) {
-                                        var5.getTexVertex(var16[1], var25, var11);
-                                        var5.getTexVertex(var16[2], var25, var12);
+                                    if (vb.getTexVertex(var16[0], var25, var10)) {
+                                        vb.getTexVertex(var16[1], var25, var11);
+                                        vb.getTexVertex(var16[2], var25, var12);
                                         var13.x = var10.x * (1.0F - (var14.y + var14.z)) + var11.x * var14.y + var12.x * var14.z;
                                         var13.y = var10.y * (1.0F - (var14.y + var14.z)) + var11.y * var14.y + var12.y * var14.z;
                                         var13.z = 0.0F;
@@ -209,7 +209,7 @@ public class Mesh extends Node {
                                     var26[var10001] = var10002;
                                 }
 
-                                if (var3.endPick(var14.x, var18, var17, var20, this, var14.x, var19)) {
+                                if (ri.endPick(var14.x, var18, var17, var20, this, var14.x, var19)) {
                                     var6 = true;
                                 }
                             }

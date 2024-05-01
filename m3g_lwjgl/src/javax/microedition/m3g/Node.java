@@ -161,22 +161,16 @@ public abstract class Node extends Transformable {
         }
     }
 
-    public final void align(Node var1) {
-        this.alignment(var1);
+    public final void align(Node reference) {
+        alignment(reference);
     }
 
-    protected void alignment(Node var1) {
-        Node var10000;
-        Node var10001;
-        if (var1 == null) {
-            var10000 = this;
-            var10001 = this;
-        } else {
-            var10000 = this;
-            var10001 = var1;
+    protected void alignment(Node reference) {
+        if (reference == null) {
+            reference = this;
         }
 
-        var10000.computeAlignment(var10001, (Vector4f) null, (Vector4f) null, (Vector4f) null, (Vector4f) null);
+        computeAlignment(reference, (Vector4f) null, (Vector4f) null, (Vector4f) null, (Vector4f) null);
     }
 
     protected void computeAlignment(Node var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5) {
@@ -315,7 +309,7 @@ public abstract class Node extends Transformable {
         }
     }
 
-    protected boolean isPickable(Node var1) {
+    /*protected boolean isPickable(Node var1) {
         Node var10000 = this;
 
         while (true) {
@@ -336,7 +330,7 @@ public abstract class Node extends Transformable {
         }
 
         return true;
-    }
+    }*/
 
     protected abstract boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4);
 

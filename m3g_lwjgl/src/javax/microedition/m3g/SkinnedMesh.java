@@ -165,18 +165,18 @@ public class SkinnedMesh extends Mesh {
         }
     }
 
-    protected void alignment(Node var1) {
-        super.alignment(var1);
+    protected void alignment(Node reference) {
+        super.alignment(reference);
         if (this.skeleton != null) {
-            this.skeleton.alignment(var1);
+            this.skeleton.alignment(reference);
         }
 
     }
 
-    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
+    protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
         MeshMorph.getInstance().getMorphedVertexBuffer(this);
         MeshMorph.getInstance().clearCache();
-        return super.rayIntersect(var1, var2, var3, var4, MeshMorph.getInstance().morphed);
+        return super.rayIntersect(scope, ray, ri, transform, MeshMorph.getInstance().morphed);
     }
 
     public Vector getTransforms() {

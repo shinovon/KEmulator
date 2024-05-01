@@ -94,10 +94,10 @@ public class Sprite3D extends Node {
 
     }
 
-    protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
+    protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
         if (this.appearance != null && this.image != null && this.scaled && this.cropWidth != 0 && this.cropHeight != 0) {
             Camera var5;
-            if ((var5 = var3.getCamera()) != null && this.image != null) {
+            if ((var5 = ri.getCamera()) != null && this.image != null) {
                 int[] var6;
                 boolean var7 = (var6 = new int[]{this.cropX, this.cropY, this.cropWidth, this.cropHeight})[2] < 0;
                 boolean var8 = var6[3] < 0;
@@ -119,7 +119,7 @@ public class Sprite3D extends Node {
                     var10.mul(1.0F / var10.w);
                     var11.mul(1.0F / var11.w);
                     var12.mul(1.0F / var12.w);
-                    float var15 = (var10.z - var2[6]) / (var2[7] - var2[6]);
+                    float var15 = (var10.z - ray[6]) / (ray[7] - ray[6]);
                     var11.sub(var10);
                     var12.sub(var10);
                     Vector4f var16 = new Vector4f(var11.length(), 0.0F, 0.0F, 0.0F);
@@ -193,10 +193,10 @@ public class Sprite3D extends Node {
                         }
 
                         var10000[var10001] = var10002;
-                        float var20 = 2.0F * var3.getPickX() - 1.0F;
-                        float var21 = 1.0F - 2.0F * var3.getPickY();
+                        float var20 = 2.0F * ri.getPickX() - 1.0F;
+                        float var21 = 1.0F - 2.0F * ri.getPickY();
                         if (var20 >= var18[0] && var20 <= var18[6] && var21 <= var18[1] && var21 >= var18[4]) {
-                            if (!var3.testDistance(var15)) {
+                            if (!ri.testDistance(var15)) {
                                 return false;
                             }
 
@@ -271,7 +271,7 @@ public class Sprite3D extends Node {
                             var22[0] /= (float) this.image.getWidth();
                             var23[0] /= (float) this.image.getHeight();
                             if ((var27 & 255) >= var26) {
-                                return var3.endPick(var15, var22, var23, 0, this, var15, (float[]) null);
+                                return ri.endPick(var15, var22, var23, 0, this, var15, (float[]) null);
                             }
                         }
 
