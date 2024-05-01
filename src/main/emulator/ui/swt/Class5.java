@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.custom.*;
 
 public final class Class5 implements Runnable, DisposeListener {
-    private Shell aShell544;
-    private Shell aShell557;
+    private Shell parentShell;
+    private Shell shell;
     private Combo aCombo546;
     private Text aText543;
     private CLabel aCLabel547;
@@ -41,7 +41,7 @@ public final class Class5 implements Runnable, DisposeListener {
 
     public Class5(final int anInt553) {
         super();
-        this.aShell557 = null;
+        this.shell = null;
         this.aCombo546 = null;
         this.aText543 = null;
         this.aCLabel547 = null;
@@ -57,7 +57,7 @@ public final class Class5 implements Runnable, DisposeListener {
 
     public Class5(final Object o) {
         super();
-        this.aShell557 = null;
+        this.shell = null;
         this.aCombo546 = null;
         this.aText543 = null;
         this.aCLabel547 = null;
@@ -201,7 +201,7 @@ public final class Class5 implements Runnable, DisposeListener {
             }
         }
         if (o != null && ClassTypes.method871(clazz)) {
-            new Class5(o).method311(this.aShell544);
+            new Class5(o).method311(this.parentShell);
         }
     }
 
@@ -254,50 +254,45 @@ public final class Class5 implements Runnable, DisposeListener {
         this.aBoolean545 = false;
     }
 
-    public final void method311(final Shell aShell544) {
+    public final void method311(final Shell parent) {
         this.method324();
         this.method323();
-        Shell shell = null;
-        int n = 0;
-        int y = 0;
-        Label_0172:
-        {
-            switch (this.anInt553) {
-                case 0: {
-                    this.aShell557.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
-                    if (aShell544 != null) {
-                        break;
-                    }
-                    shell = this.aShell557;
-                    n = this.aDisplay550.getClientArea().width - this.aShell557.getSize().x >> 1;
-                    y = this.aDisplay550.getClientArea().height - this.aShell557.getSize().y >> 1;
-                    break Label_0172;
-                }
-                case 1: {
-                    this.aShell557.setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
+        int x, y;
+        switch (this.anInt553) {
+            case 0: {
+                this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
+                if (parent != null) {
+                    x = parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x) / 2;
+                    y = parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y) / 2;
+                    shell.setLocation(x, y);
                     break;
                 }
-                default: {
-                    break Label_0172;
-                }
+                x = this.aDisplay550.getClientArea().width - this.shell.getSize().x >> 1;
+                y = this.aDisplay550.getClientArea().height - this.shell.getSize().y >> 1;
+                shell.setLocation(x, y);
+                break;
             }
-            this.aShell557.setSize(aShell544.getSize());
-            shell = this.aShell557;
-            n = aShell544.getLocation().x - this.aShell557.getSize().x;
-            y = aShell544.getLocation().y;
+            case 1: {
+                this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
+
+                this.shell.setSize(parent.getSize());
+                x = parent.getLocation().x - this.shell.getSize().x;
+                y = parent.getLocation().y;
+                shell.setLocation(x, y);
+                break;
+            }
         }
         if (anInt553 == 1) {
             profiler = this;
         }
-        shell.setLocation(n, y);
-        this.aShell544 = aShell544;
-        this.aShell557.open();
-        this.aShell557.addDisposeListener(this);
+        this.parentShell = parent;
+        this.shell.open();
+        this.shell.addDisposeListener(this);
         this.aBoolean561 = false;
         this.aBoolean560 = true;
         EmulatorImpl.asyncExec(this.aClass5_556);
         if (anInt553 != 1) Class5.aVector548.addElement(this);
-        while (!this.aShell557.isDisposed()) {
+        while (!this.shell.isDisposed()) {
             if (!this.aDisplay550.readAndDispatch()) {
                 this.aDisplay550.sleep();
             }
@@ -310,8 +305,8 @@ public final class Class5 implements Runnable, DisposeListener {
     public final void method321() {
         this.aBoolean561 = true;
         Class5.aVector548.removeElement(this);
-        if (this.aShell557 != null && !this.aShell557.isDisposed()) {
-            this.aShell557.dispose();
+        if (this.shell != null && !this.shell.isDisposed()) {
+            this.shell.dispose();
         }
         this.aBoolean560 = false;
     }
@@ -401,21 +396,21 @@ public final class Class5 implements Runnable, DisposeListener {
         layoutData2.verticalAlignment = 2;
         final GridLayout layout;
         (layout = new GridLayout()).numColumns = 6;
-        (this.aShell557 = new Shell()).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
-        this.aShell557.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-        this.aShell557.setLayout(layout);
-        (this.aCLabel547 = new CLabel(this.aShell557, 0)).setText("Classes:");
+        (this.shell = new Shell()).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
+        this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+        this.shell.setLayout(layout);
+        (this.aCLabel547 = new CLabel(this.shell, 0)).setText("Classes:");
         this.method325();
-        this.aShell557.setSize(new Point(351, 286));
-        (this.aButton549 = new Button(this.aShell557, 32)).setText("Filter:");
+        this.shell.setSize(new Point(351, 286));
+        (this.aButton549 = new Button(this.shell, 32)).setText("Filter:");
         this.aButton549.addSelectionListener(new Class139(this));
-        (this.aText543 = new Text(this.aShell557, 2048)).setLayoutData(layoutData2);
+        (this.aText543 = new Text(this.shell, 2048)).setLayoutData(layoutData2);
         this.aText543.addModifyListener(new Class141(this));
-        (this.aButton558 = new Button(this.aShell557, 32)).setText("HEX");
+        (this.aButton558 = new Button(this.shell, 32)).setText("HEX");
         this.aButton558.addSelectionListener(new Class8(this));
         if (this.anInt553 == 0) {
             Button exportBtn;
-            (exportBtn = new Button(this.aShell557, SWT.PUSH)).setText("Export");
+            (exportBtn = new Button(this.shell, SWT.PUSH)).setText("Export");
             exportBtn.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent selectionEvent) {
                     new Thread(() -> {
@@ -489,7 +484,7 @@ public final class Class5 implements Runnable, DisposeListener {
                 }
             });
         }
-        (this.aTree554 = new Tree(this.aShell557, 67584)).setHeaderVisible(true);
+        (this.aTree554 = new Tree(this.shell, 67584)).setHeaderVisible(true);
         this.aTree554.setLinesVisible(true);
         this.aTree554.setLayoutData(layoutData);
         this.aTree554.setToolTipText("Right click to open a Object Watcher");
@@ -519,7 +514,7 @@ public final class Class5 implements Runnable, DisposeListener {
         (layoutData = new GridData()).horizontalAlignment = 4;
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = 2;
-        (this.aCombo546 = new Combo(this.aShell557, 8)).setLayoutData(layoutData);
+        (this.aCombo546 = new Combo(this.shell, 8)).setLayoutData(layoutData);
         aCombo546.setVisibleItemCount(8);
         this.aCombo546.addModifyListener(new Class16(this));
     }
