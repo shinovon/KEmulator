@@ -582,7 +582,7 @@ public final class Property implements IProperty {
             Settings.m3gTexFilter = Integer.valueOf(properties.getProperty("M3GTexFilter", "0"));
             Settings.m3gMipmapping = Integer.valueOf(properties.getProperty("M3GMipmapping", "0"));
 
-            Settings.writeKemCfg = Boolean.valueOf(properties.getProperty("WriteKemulatorCfg", "true"));
+            Settings.writeKemCfg = Boolean.valueOf(properties.getProperty("WriteKemulatorCfg", "false"));
 
             fileInputStream.close();
         } catch (Exception ex) {

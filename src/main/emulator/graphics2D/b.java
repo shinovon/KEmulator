@@ -25,17 +25,15 @@ public final class b
     public static void method162(final IImage image, final int[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
         int[] data = null;
         Label_0042: {
-            int[] data2;
             if (Settings.g2d == 0) {
-                data2 = new int[image.getWidth() * image.getHeight()];
+                data = new int[image.getWidth() * image.getHeight()];
             }
             else {
                 if (Settings.g2d != 1) {
                     break Label_0042;
                 }
-                data2 = image.getData();
+                data = image.getData();
             }
-            data = data2;
         }
         int n5 = 0;
         for (int i = 0; i < n4; ++i) {

@@ -170,7 +170,7 @@ public class Emulator {
             method280();
             return;
         }
-        method286();
+        saveTargetDevice();
     }
 
     private static void method280() {
@@ -204,34 +204,49 @@ public class Emulator {
         return Emulator.emulatorimpl.midletProps;
     }
 
-    private static void method286() {
+    private static void saveTargetDevice() {
         if (Emulator.midletJar == null) {
             return;
         }
-        if(!Settings.writeKemCfg) {
+        if(Settings.writeKemCfg) {
+            String propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + "/kemulator.cfg";
+            try {
+                String key = new File(Emulator.midletJar).getName();
+                key = key.substring(0, key.lastIndexOf("."));
+                final Properties properties = new Properties();
+                if (new File(propsPath).exists()) {
+                    try (FileInputStream in = new FileInputStream(propsPath)) {
+                        properties.load(in);
+                    }
+                }
+                properties.setProperty(key, Emulator.deviceName);
+                try (FileOutputStream out = new FileOutputStream(propsPath)) {
+                    properties.store(out, "KEmulator platforms");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return;
         }
+        final String propsPath = getUserPath() + "/midlets.txt";
         try {
-            String s = Emulator.midletJar;
-            final int lastIndex = s.lastIndexOf(Emulator.midletJar.lastIndexOf("\\") != -1 ? "\\" : "/");
-            final String string = Emulator.midletJar.substring(0, lastIndex) + "/kemulator.cfg";
-            final String substring = Emulator.midletJar.substring(lastIndex + 1, Emulator.midletJar.lastIndexOf("."));
+            String key = new File(Emulator.midletJar).getCanonicalPath();
             final Properties properties = new Properties();
-            if (new File(string).exists()) {
-                final FileInputStream fileInputStream = new FileInputStream(string);
-                properties.load(fileInputStream);
-                fileInputStream.close();
+            if (new File(propsPath).exists()) {
+                try (FileInputStream in = new FileInputStream(propsPath)) {
+                    properties.load(in);
+                }
             }
-            properties.setProperty(substring, Emulator.deviceName);
-            final FileOutputStream fileOutputStream = new FileOutputStream(string);
-            properties.store(fileOutputStream, "KEmulator platforms");
-            fileOutputStream.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            properties.setProperty(key, Emulator.deviceName);
+            try (FileOutputStream out = new FileOutputStream(propsPath)) {
+                properties.store(out, "KEmulator platforms");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private static void method287() {
+    private static void loadTargetDevice() {
         final String property;
         if ((property = Emulator.emulatorimpl.midletProps.getProperty("KEmu-Platform")) != null) {
             tryToSetDevice(property);
@@ -240,22 +255,41 @@ public class Emulator {
         if (Emulator.midletJar == null) {
             return;
         }
-        String parent = new File(Emulator.midletJar).getParentFile().getAbsolutePath();
-        final String string = parent + "/kemulator.cfg";
-        String name = new File(Emulator.midletJar).getName();
-        final String substring = name.substring(0, name.lastIndexOf("."));
-        if (new File(string).exists()) {
+        String propsPath = getUserPath() + "/midlets.txt";
+        if(new File(propsPath).exists()) {
             try {
-                final FileInputStream fileInputStream = new FileInputStream(string);
-                final Properties properties;
-                (properties = new Properties()).load(fileInputStream);
-                fileInputStream.close();
-                final String property2;
-                if ((property2 = properties.getProperty(substring, null)) != null) {
-                    tryToSetDevice(property2);
+                String key = new File(Emulator.midletJar).getCanonicalPath();
+                final Properties p = new Properties();
+                try (FileInputStream in = new FileInputStream(propsPath)) {
+                    p.load(in);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                final String device = p.getProperty(key, null);
+                if (device != null) {
+                    tryToSetDevice(device);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + "/kemulator.cfg";
+
+        String key = new File(Emulator.midletJar).getName();
+        key = key.substring(0, key.lastIndexOf("."));
+
+        if (new File(propsPath).exists()) {
+            try {
+                final Properties p = new Properties();
+                try (FileInputStream in = new FileInputStream(propsPath)) {
+                    p.load(in);
+                }
+                final String device = p.getProperty(key, null);
+                if (device != null) {
+                    tryToSetDevice(device);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -430,7 +464,7 @@ public class Emulator {
             }
             return false;
         }
-        method287();
+        loadTargetDevice();
         return true;
     }
 
