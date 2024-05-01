@@ -183,15 +183,19 @@ public final class EventQueue implements Runnable {
     }
 
     public void serviceRepaints() {
-        if (Thread.currentThread() == eventThread || repainted) return;
+        if (Thread.currentThread() == eventThread) {
+            synchronized(lock) {
+                internalRepaint();
+            }
+            Displayable.fpsLimiter();
+            return;
+        }
+        if(repainted) return;
         try {
             synchronized (repaintLock) {
                 repaintLock.wait();
             }
         } catch (Exception ignored) {}
-//        synchronized(lock) {
-//            internalRepaint();
-//        }
     }
 
     public final void run() {
