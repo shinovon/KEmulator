@@ -484,7 +484,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glMatrixMode(GL_PROJECTION);
             GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
-            tmpMat.set(CameraCache.m_model2camTransform);
+            tmpMat.set(CameraCache.invCam);
             tmpMat.transpose();
             GL11.glMatrixMode(GL_MODELVIEW);
             GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
@@ -1027,7 +1027,7 @@ public final class Emulator3D implements IGraphics3D {
         float[] var4 = new float[] {1.0F, 0.0F, 0.0F, 1.0F};
         float[] var5 = new float[] {0.0F, 1.0F, 0.0F, 1.0F};
         Transform var6;
-        (var6 = new Transform(CameraCache.m_model2camTransform)).postMultiply(var2);
+        (var6 = new Transform(CameraCache.invCam)).postMultiply(var2);
         Transform3D impl = (Transform3D) var6.getImpl();
         impl.transform(var3);
         impl.transform(var4);

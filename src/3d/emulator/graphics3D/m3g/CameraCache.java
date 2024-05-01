@@ -7,26 +7,26 @@ import javax.microedition.m3g.Transform;
 
 public final class CameraCache {
     public static Camera camera;
-    public static Transform m_model2camTransform = new Transform();
-    private static Transform a = new Transform();
 
-    public static void setCamera(Camera var0, Transform var1) {
-        if (var1 != null) {
-            a.set(var1);
-            m_model2camTransform.set(var1);
-            ((Transform3D) m_model2camTransform.getImpl()).invert();
-//            ((Transform3D) m_model2camTransform.getImpl()).method445();
+    private static Transform camTrans = new Transform();
+    public static Transform invCam = new Transform();
+
+    public static void setCamera(Camera cam, Transform transform) {
+        if (transform != null) {
+            camTrans.set(transform);
+            invCam.set(transform);
+            ((Transform3D) invCam.getImpl()).invert();
         } else {
-            a.setIdentity();
-            m_model2camTransform.setIdentity();
+            camTrans.setIdentity();
+            invCam.setIdentity();
         }
 
-        camera = var0;
+        camera = cam;
     }
 
-    public static Camera getCamera(Transform var0) {
-        if (var0 != null) {
-            var0.set(a);
+    public static Camera getCamera(Transform transform) {
+        if (transform != null) {
+            transform.set(camTrans);
         }
 
         return camera;
