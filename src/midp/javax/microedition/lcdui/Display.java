@@ -17,6 +17,7 @@ public class Display {
     public static final int COLOR_HIGHLIGHTED_BORDER = 5;
     static Displayable current;
     static Hashtable displays;
+    private static Display staticDisplay;
     private MIDlet midlet;
 
     public Display() {
@@ -71,6 +72,12 @@ public class Display {
     }
 
     public static Display getDisplay(final MIDlet midlet) {
+        if(staticDisplay != null) {
+            return staticDisplay;
+        }
+        if(midlet == null) {
+            return staticDisplay = new Display();
+        }
         if (Display.displays.get(midlet) == null) {
             Display.displays.put(midlet, new Display(midlet));
         }

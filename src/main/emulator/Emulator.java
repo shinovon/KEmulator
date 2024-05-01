@@ -35,7 +35,7 @@ import emulator.ui.swt.EmulatorImpl;
 public class Emulator {
     public static boolean debugBuild = true;
     public static String version = "m3g2";
-    public static final int numericVersion = 15;
+    public static final int numericVersion = 16;
 
     static EmulatorImpl emulatorimpl;
     private static MIDlet midlet;
@@ -65,7 +65,7 @@ public class Emulator {
     public static int rpcPartyMax;
 
     public static String httpUserAgent;
-    private static Thread vlcCheckerThread;
+    private final static Thread vlcCheckerThread;
     private static IEmulatorPlatform platform;
     public static boolean installed;
 
@@ -679,8 +679,7 @@ public class Emulator {
                 for (Map.Entry entry : mainAttributes.entrySet()) {
                     if (entry.getKey().toString().equals("Git-Revision")) {
                         String s = entry.getValue().toString();
-                        if (s.length() > 0)
-                            version = version + " " + s;
+                        if (s.length() > 0) version = s;
                         break;
                     }
                 }
@@ -763,13 +762,8 @@ public class Emulator {
         Class<?> forName;
         try {
             forName = Class.forName(Emulator.midletClassName, true, Emulator.customClassLoader);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             ex.printStackTrace();
-            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
-            System.exit(1);
-            return;
-        } catch (Error error) {
-            error.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
