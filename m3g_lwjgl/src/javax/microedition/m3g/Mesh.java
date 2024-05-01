@@ -102,6 +102,8 @@ public class Mesh extends Node {
     }
 
     protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform, VertexBuffer vb) {
+        if ((scope & getScope()) == 0) return false;
+
         if (vb != null && this.appearances != null && this.submeshes != null) {
             if (vb.getPositions((float[]) null) == null) {
                 throw new IllegalStateException("No vertex positions");
@@ -209,7 +211,7 @@ public class Mesh extends Node {
                                     var26[var10001] = var10002;
                                 }
 
-                                if (ri.endPick(var14.x, var18, var17, var20, this, var14.x, var19)) {
+                                if (ri.endPick(var14.x, var18, var17, var20, this, var19)) {
                                     var6 = true;
                                 }
                             }

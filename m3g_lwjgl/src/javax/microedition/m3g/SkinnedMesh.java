@@ -167,16 +167,14 @@ public class SkinnedMesh extends Mesh {
 
     protected void alignment(Node reference) {
         super.alignment(reference);
-        if (this.skeleton != null) {
-            this.skeleton.alignment(reference);
-        }
-
+        skeleton.alignment(reference);
     }
 
     protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
         MeshMorph.getInstance().getMorphedVertexBuffer(this);
         MeshMorph.getInstance().clearCache();
-        return super.rayIntersect(scope, ray, ri, transform, MeshMorph.getInstance().morphed);
+        return super.rayIntersect(scope, ray, ri, transform, MeshMorph.getInstance().morphed) ||
+                skeleton.rayIntersect(scope, ray, ri, transform);
     }
 
     public Vector getTransforms() {

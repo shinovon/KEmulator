@@ -95,6 +95,8 @@ public class Sprite3D extends Node {
     }
 
     protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
+        if ((scope & getScope()) == 0) return false;
+
         if (this.appearance != null && this.image != null && this.scaled && this.cropWidth != 0 && this.cropHeight != 0) {
             Camera var5;
             if ((var5 = ri.getCamera()) != null && this.image != null) {
@@ -271,7 +273,7 @@ public class Sprite3D extends Node {
                             var22[0] /= (float) this.image.getWidth();
                             var23[0] /= (float) this.image.getHeight();
                             if ((var27 & 255) >= var26) {
-                                return ri.endPick(var15, var22, var23, 0, this, var15, (float[]) null);
+                                return ri.endPick(var15, var22, var23, 0, this, new float[] {0, 0, 1});
                             }
                         }
 

@@ -86,6 +86,8 @@ public class Group extends Node {
             throw new IllegalStateException();
         }
 
+        if (!isPickingEnabled()) return false;
+
         Vector4f rayStart = new Vector4f(2 * x - 1, 1 - 2 * y, -1, 1);
         Vector4f rayEnd = new Vector4f(2 * x - 1, 1 - 2 * y, 1, 1);
 
@@ -118,14 +120,17 @@ public class Group extends Node {
 
         if (ri == null) ri = new RayIntersection();
 
-        ri.startPick(this, ray, x, y, camera);
+        ri.startPick(ray, x, y, camera);
+        camToGroup.setIdentity();
         return rayIntersect(scope, ray, ri, camToGroup);
     }
 
     public boolean pick(int scope, float ox, float oy, float oz, float dx, float dy, float dz, RayIntersection ri) {
-        if (dx == 0.0F && dy == 0.0F && dz == 0.0F) {
+        if (dx == 0 && dy == 0 && dz == 0) {
             throw new IllegalArgumentException();
         }
+
+        if (!isPickingEnabled()) return false;
 
         float[] ray = new float[] {ox, oy, oz, ox + dx, oy + dy, oz + dz};
 
@@ -133,7 +138,7 @@ public class Group extends Node {
 
         if (ri == null) ri = new RayIntersection();
 
-        ri.startPick(this, ray, 0.0F, 0.0F, null);
+        ri.startPick(ray, 0, 0, null);
         return rayIntersect(scope, ray, ri, transform);
     }
 
@@ -145,7 +150,7 @@ public class Group extends Node {
         for (int i = 0; i < children.size(); ++i) {
             Node child = (Node) children.get(i);
 
-            if ((child.getScope() & scope) != 0 && child.isPickingEnabled()) {
+            if (child.isPickingEnabled()) {
                 childTransform.set(transform);
                 child.getCompositeTransform(tmpTrans);
                 childTransform.postMultiply(tmpTrans);
