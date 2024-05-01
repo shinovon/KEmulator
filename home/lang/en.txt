@@ -337,7 +337,7 @@ LOAD_CLASSES_ERROR=Get Classes Failed!! Plz check the input jar or classpath.
 LOAD_MIDLET_ERROR=Can not find MIDlet class. Plz check jad or use -midlet param.
 FAIL_LAUNCH_MIDLET=Fail to launch the MIDlet class:
 
-LOAD_ZIP_ERROR=Input file isn't ZIP archive.
+LOAD_ZIP_ERROR=Input file is not JAR or ZIP archive.
 
 LOAD_GDIPLUS_ERROR=Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path.
 

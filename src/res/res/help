@@ -43,6 +43,10 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$[2024.05.01]
+Replace kemulator.cfg with midlets.txt
+Fix serviceRepaints inside of callSerially
+
 $[2024.04.30]
 M3G LWJGL: fixed Sprite3D alpha
 M3GView: even better controls, added fallback to pbuffer, show hidden nodes as red

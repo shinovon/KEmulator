@@ -460,7 +460,7 @@ public class Emulator {
         } catch (Exception ex) {
             ex.printStackTrace();
             if (ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
-                Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file isn't ZIP archive."));
+                Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file is not JAR or ZIP archive."));
             }
             return false;
         }
@@ -690,7 +690,7 @@ public class Emulator {
         }
         String arch = System.getProperty("os.arch");
         if (!platform.isX64() && !arch.equals("x86")) {
-            JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod at this architecture (" + arch + "). Try x64 version instead.");
+            JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try x64 version instead.");
             System.exit(0);
             return;
         }
@@ -698,6 +698,7 @@ public class Emulator {
         EmulatorMIDI.initDevices();
         Emulator.commandLineArguments = commandLineArguments;
         UILocale.initLocale();
+        parseLaunchArgs(commandLineArguments); //
         Emulator.emulatorimpl = new EmulatorImpl();
         parseLaunchArgs(commandLineArguments);
         platform.loadM3G();
@@ -851,16 +852,12 @@ public class Emulator {
             }
             if (key.equals("awt")) {
                 Settings.g2d = 1;
-                Emulator.commandLineArguments[i] = "";
             } else if (key.equals("swt")) {
                 Settings.g2d = 0;
-                Emulator.commandLineArguments[i] = "";
             } else if (key.equals("lwj")) {
                 Settings.g3d = 1;
-                Emulator.commandLineArguments[i] = "";
             } else if (key.equals("swerve")) {
                 Settings.g3d = 0;
-                Emulator.commandLineArguments[i] = "";
             } else if (key.equalsIgnoreCase("log")) {
                 Settings.showLogFrame = true;
             } else if (key.equalsIgnoreCase("installed")) {
