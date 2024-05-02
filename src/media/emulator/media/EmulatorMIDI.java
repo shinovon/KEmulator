@@ -44,11 +44,13 @@ public class EmulatorMIDI {
         }
     }
 
-    public static void setSequence(Sequence sequence) throws InvalidMidiDataException {
+    public static void setSequence(Sequence sequence) throws InvalidMidiDataException, MidiUnavailableException {
+        initDevice();
         midiSequencer.setSequence(sequence);
     }
 
-    public static void start(PlayerImpl player, Sequence sequence, long position) throws InvalidMidiDataException {
+    public static void start(PlayerImpl player, Sequence sequence, long position) throws InvalidMidiDataException, MidiUnavailableException {
+        initDevice();
         midiSequencer.setSequence(sequence);
         midiSequencer.setMicrosecondPosition(position);
         midiSequencer.start();
@@ -56,6 +58,10 @@ public class EmulatorMIDI {
 
     public static void stop() {
         midiSequencer.stop();
+        midiSequencer.close();
+        midiDevice.close();
+        midiSequencer = null;
+        midiDevice = null;
     }
 
     public static void setMicrosecondPosition(long ms) {
