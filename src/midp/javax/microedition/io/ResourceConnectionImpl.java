@@ -4,11 +4,15 @@ import java.io.*;
 
 final class ResourceConnectionImpl implements InputConnection
 {
-    String aString314;
+    String url;
     
     ResourceConnectionImpl(final String s) {
         super();
-        this.aString314 = s.substring("resource://".length());
+        if(s.startsWith("resource://")) {
+            this.url = s.substring("resource://".length());
+        }  else {
+            this.url = s.substring("resource:".length());
+        }
     }
     
     public final DataInputStream openDataInputStream() throws IOException {
@@ -16,7 +20,7 @@ final class ResourceConnectionImpl implements InputConnection
     }
     
     public final InputStream openInputStream() throws IOException {
-        return emulator.custom.CustomJarResources.getResourceAsStream(this.aString314);
+        return emulator.custom.CustomJarResources.getResourceAsStream(this.url);
     }
     
     public final void close() {

@@ -28,7 +28,7 @@ public class Connector
     }
     
     public static Connection open(final String s, final int n, final boolean b) throws IOException {
-        if (s.startsWith("resource://")) {
+        if (s.startsWith("resource:")) {
             return new ResourceConnectionImpl(s);
         }
         if (s.startsWith("file://")) {
