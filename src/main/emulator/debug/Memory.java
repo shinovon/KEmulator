@@ -46,7 +46,20 @@ public final class Memory {
     public Memory() {
         super();
         this.table = new Hashtable();
-        this.instances = new Vector();
+        this.instances = new Vector() {
+            public synchronized int indexOf(Object o, int index) {
+                if (o == null) {
+                    for (int i = index ; i < elementCount ; i++)
+                        if (elementData[i]==null)
+                            return i;
+                } else {
+                    for (int i = index ; i < elementCount ; i++)
+                        if (o == elementData[i])
+                            return i;
+                }
+                return -1;
+            }
+        };
         this.images = new Vector();
         this.aVector1463 = new Vector();
         this.players = new Vector();
