@@ -70,11 +70,13 @@ public class EmulatorMIDI {
         }
     }
 
-    public static void setMicrosecondPosition(long ms) {
+    public static void setMicrosecondPosition(long ms) throws MidiUnavailableException {
+        initDevice();
         midiSequencer.setMicrosecondPosition(ms);
     }
 
-    public static long getMicrosecondPosition() {
+    public static long getMicrosecondPosition() throws MidiUnavailableException {
+        initDevice();
         return midiSequencer.getMicrosecondPosition();
     }
 

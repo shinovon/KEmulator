@@ -348,8 +348,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             return ((Clip) sequence).getMicrosecondPosition();
         }
         if (sequence instanceof Sequence) {
-            if (EmulatorMIDI.currentPlayer == this && midiPlaying)
-                return EmulatorMIDI.getMicrosecondPosition();
+            try {
+                if (EmulatorMIDI.currentPlayer == this && midiPlaying)
+                    return EmulatorMIDI.getMicrosecondPosition();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return midiPosition;
         }
         if (sequence instanceof Player) {
@@ -373,8 +377,12 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 ms = t;
             }
             midiPosition = ms;
-            if (EmulatorMIDI.currentPlayer == this)
-                EmulatorMIDI.setMicrosecondPosition(ms);
+            try {
+                if (EmulatorMIDI.currentPlayer == this)
+                    EmulatorMIDI.setMicrosecondPosition(ms);
+            } catch (Exception e) {
+                throw new MediaException(e);
+            }
         } else if (sequence instanceof Player) {
             long l = getMediaTime();
             if (t == 0 && l == 0)
