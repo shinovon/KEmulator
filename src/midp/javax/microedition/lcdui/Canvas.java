@@ -115,10 +115,10 @@ public abstract class Canvas extends Displayable {
         this.showNotify();
     }
 
-    public void invokeSizeChanged(final int n, final int n2) {
+    public void invokeSizeChanged(final int w, final int h) {
         super.w = Emulator.getEmulator().getScreen().getWidth();
         super.h = Emulator.getEmulator().getScreen().getHeight();
-        this.sizeChanged(n, n2);
+        this.sizeChanged(w, h);
         Emulator.getEventQueue().queueRepaint();
     }
 

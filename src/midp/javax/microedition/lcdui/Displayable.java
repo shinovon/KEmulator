@@ -62,11 +62,11 @@ public class Displayable {
         }
     }
 
-    protected void setItemCommands(final Item anItem20) {
-        this.selectedItem = anItem20;
-        if (anItem20.itemCommands.size() > 0) {
-            for (int i = 0; i < anItem20.itemCommands.size(); ++i) {
-                this.addCommand((Command) anItem20.itemCommands.get(i));
+    protected void setItemCommands(final Item item) {
+        this.selectedItem = item;
+        if (item.itemCommands.size() > 0) {
+            for (int i = 0; i < item.itemCommands.size(); ++i) {
+                this.addCommand((Command) item.itemCommands.get(i));
             }
         }
     }
@@ -196,21 +196,21 @@ public class Displayable {
         return false;
     }
 
-    public void setCommandListener(final CommandListener aCommandListener19) {
-        this.cmdListener = aCommandListener19;
+    public void setCommandListener(final CommandListener listener) {
+        this.cmdListener = listener;
     }
 
-    public void setTitle(final String aString25) {
-        this.title = aString25;
+    public void setTitle(final String title) {
+        this.title = title;
     }
 
     protected void sizeChanged(final int n, final int n2) {
     }
 
-    public void invokeSizeChanged(final int n, final int n2) {
-        w = Emulator.getEmulator().getScreen().getWidth();
-        h = Emulator.getEmulator().getScreen().getHeight();
-        this.sizeChanged(n, n2);
+    public void invokeSizeChanged(final int w, final int h) {
+        this.w = Emulator.getEmulator().getScreen().getWidth();
+        this.h = Emulator.getEmulator().getScreen().getHeight();
+        this.sizeChanged(w, h);
         Emulator.getEventQueue().queueRepaint();
     }
 
@@ -218,20 +218,9 @@ public class Displayable {
         return this.ticker;
     }
 
-    public void setTicker(final Ticker aTicker22) {
-        this.ticker = aTicker22;
-        final int[] anIntArray21 = this.bounds;
-        final int n = H;
-        int n2;
-        int anInt181;
-        if (this.ticker == null) {
-            n2 = this.h;
-            anInt181 = Screen.fontHeight4;
-        } else {
-            n2 = this.h;
-            anInt181 = Screen.fontHeight4 * 2;
-        }
-        anIntArray21[n] = n2 - anInt181;
+    public void setTicker(final Ticker ticker) {
+        this.ticker = ticker;
+        bounds[H] = h - (this.ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
         this.tickerX = this.w;
     }
 

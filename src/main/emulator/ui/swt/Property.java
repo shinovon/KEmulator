@@ -196,6 +196,7 @@ public final class Property implements IProperty {
     private Combo m3gTexFilterCombo;
     private Combo m3gMipmapCombo;
     private Button vmsCheck;
+    private Button reopenMidiCheck;
 //    private Button pollOnRepaintBtn;
 
     public Property() {
@@ -606,8 +607,9 @@ public final class Property implements IProperty {
             Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 
             // media
-            Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
             Settings.vlcDir = properties.getProperty("VlcDir", "");
+            Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
+            Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "true"));
 
             // jvm
             Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -783,8 +785,9 @@ public final class Property implements IProperty {
             properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
 
             // media
-            properties.setProperty("MIDISearchVMS", String.valueOf(Settings.searchVms));
             properties.setProperty("VlcDir", Settings.vlcDir);
+            properties.setProperty("MIDISearchVMS", String.valueOf(Settings.searchVms));
+            properties.setProperty("MIDIReopenDevice", String.valueOf(Settings.reopenMidiDevice));
 
             // jvm
             properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
@@ -890,6 +893,7 @@ public final class Property implements IProperty {
         Settings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
 
         Settings.searchVms = vmsCheck.getSelection();
+        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 
         this.updateProxy();
     }
@@ -1713,6 +1717,11 @@ public final class Property implements IProperty {
         vlcDirText.setEnabled(true);
         vlcDirText.setLayoutData(fillHor2);
         vlcDirText.setText(Settings.vlcDir);
+        
+        reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
+        reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));
+        reopenMidiCheck.setLayoutData(fillHor);
+        reopenMidiCheck.setSelection(Settings.reopenMidiDevice);
     }
 
     private void setupM3GComp() {
