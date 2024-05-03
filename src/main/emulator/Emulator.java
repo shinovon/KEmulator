@@ -759,26 +759,20 @@ public class Emulator {
             return;
         }
         getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
-        Class<?> forName;
+        Class<?> midletClass;
         try {
-            forName = Class.forName(Emulator.midletClassName, true, Emulator.customClassLoader);
-        } catch (Throwable ex) {
-            ex.printStackTrace();
+            midletClass = Class.forName(Emulator.midletClassName, true, Emulator.customClassLoader);
+        } catch (Throwable e) {
+            e.printStackTrace();
             Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);
             return;
         }
         Emulator.eventQueue = new EventQueue();
         try {
-            forName.newInstance();
-        } catch (Exception ex2) {
-            ex2.printStackTrace();
-            Emulator.eventQueue.stop();
-            Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
-            System.exit(1);
-            return;
-        } catch (Error error2) {
-            error2.printStackTrace();
+            midletClass.newInstance();
+        } catch (Throwable e) {
+            e.printStackTrace();
             Emulator.eventQueue.stop();
             Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
             System.exit(1);

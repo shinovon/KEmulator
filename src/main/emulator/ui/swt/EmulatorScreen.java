@@ -421,8 +421,6 @@ public final class EmulatorScreen implements
         }
         int w = getWidth();
         int h = getHeight();
-        float zoomX = (float) screenWidth / (float) w;
-        float zoomY = (float) screenHeight / (float) h;
         switch (this.rotation) {
             case 0:
             case 2:
@@ -1118,6 +1116,7 @@ public final class EmulatorScreen implements
                     Emulator.loadGame(open2, Settings.g2d, Settings.g3d, equals);
                 }
                 this.resumeStep();
+                this.updatePauseState();
                 return;
             }
             if (menuItem.equals(this.loadAutoPlayMenuItem)) {
@@ -1145,6 +1144,7 @@ public final class EmulatorScreen implements
                     }
                 }
                 this.resumeStep();
+                this.updatePauseState();
                 return;
             } if (menuItem.equals(this.suspendMenuItem)) {
                 if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
@@ -1154,6 +1154,7 @@ public final class EmulatorScreen implements
                 Emulator.getEventQueue().queue(16);
                 this.pauseScreen();
                 this.canvas.redraw();
+                this.updatePauseState();
                 return;
             }
             if (menuItem.equals(this.resumeMenuItem)) {
@@ -1169,14 +1170,17 @@ public final class EmulatorScreen implements
                 } else {
                     Emulator.getCanvas().repaint();
                 }
+                this.updatePauseState();
                 return;
             }
             if (menuItem.equals(this.pausestepMenuItem)) {
                 pauseStep();
+                this.updatePauseState();
                 return;
             }
             if (menuItem.equals(this.playResumeMenuItem)) {
                 this.resumeStep();
+                this.updatePauseState();
                 return;
             }
             if (menuItem.equals(this.openJadMenuItem)) {
@@ -1187,9 +1191,9 @@ public final class EmulatorScreen implements
                     }
                 } catch (Exception ignored) {
                 }
+                this.updatePauseState();
+                return;
             }
-            this.updatePauseState();
-            return;
         }
         if (parent.equals(this.menu2dEngine)) {
             if (menuItem.equals(this.awt2dMenuItem)) {
@@ -1444,6 +1448,7 @@ public final class EmulatorScreen implements
     }
 
     private void updatePauseState() {
+        System.out.println("updatePauseState");
         this.suspendMenuItem.setEnabled(this.pauseState == 1);
         this.resumeMenuItem.setEnabled(this.pauseState == 2);
         this.restartMenuItem.setEnabled(this.pauseState != 0);
