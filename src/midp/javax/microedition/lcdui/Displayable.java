@@ -27,6 +27,7 @@ public class Displayable {
     private static long lastFrameTime;
     private static long lastFpsUpdateTime;
     private static int framesCount;
+    protected boolean nonFullScreen;
 
     public Displayable() {
         super();
@@ -235,10 +236,9 @@ public class Displayable {
     }
 
     protected void paintTicker(final Graphics graphics) {
-        if (this.ticker == null) {
-            return;
-        }
+        if(!nonFullScreen) return;
         a.method181(graphics, 0, Screen.fontHeight4 + this.bounds[H] - 1, this.w, Screen.fontHeight4);
+        if (ticker == null) return;
         graphics.setFont(Screen.font);
         graphics.drawString(this.ticker.getString(), this.tickerX, Screen.fontHeight4 + this.bounds[H] - 1 + 2, 0);
         this.tickerX -= 5;

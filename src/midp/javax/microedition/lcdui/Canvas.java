@@ -161,10 +161,12 @@ public abstract class Canvas extends Displayable {
         if (!Settings.ignoreFullScreen) {
             super.h = Emulator.getEmulator().getScreen().getHeight();
             if (b) {
+                nonFullScreen = false;
 //                this.setTicker(null);
                 return;
             }
 //            this.setTicker(new Ticker("setFullScreenMode(true) to remove me"));
+            nonFullScreen = true;
             super.h -= Screen.fontHeight4;
         }
     }
