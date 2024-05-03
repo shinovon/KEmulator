@@ -8,9 +8,9 @@ import java.util.*;
 import emulator.*;
 import emulator.graphics3D.m3g.*;
 import org.lwjgl.*;
-import org.eclipse.swt.graphics.Image;
 import org.lwjgl.opengl.*;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 
@@ -20,7 +20,7 @@ import java.awt.image.*;
 import java.nio.*;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
-import javax.swing.*;
+import javax.swing.JFrame;
 
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
@@ -158,7 +158,9 @@ public final class Emulator3D implements IGraphics3D {
             } else {
                 try {
                     if (contextRes != null && !contextRes.equals(s)) {
+                        pbufferContext.makeCurrent();
                         releaseTextures();
+                        pbufferContext.destroy();
                         pbufferContext = null;
                     }
                     if (pbufferContext == null) {
