@@ -4,6 +4,7 @@ import emulator.Emulator;
 import emulator.media.b;
 
 import java.io.ByteArrayInputStream;
+import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.microedition.media.PlayerListener;
 import javax.microedition.media.control.MIDIControl;
@@ -22,10 +23,12 @@ public class Sound {
     private int type;
     public int dataLen;
 
-    private PlayerListener playerListener = (p0, p1, p2) -> {
-        if (Sound.this.soundListener == null) return;
-        if ("endOfMedia".equals(p1)) {
-            Sound.this.soundListener.soundStateChanged(Sound.this, 1);
+    private final PlayerListener playerListener = new PlayerListener() {
+        public void playerUpdate(Player p0, String p1, Object p2) {
+            if (Sound.this.soundListener == null) return;
+            if ("endOfMedia".equals(p1)) {
+                Sound.this.soundListener.soundStateChanged(Sound.this, 1);
+            }
         }
     };
     private byte[] data;
