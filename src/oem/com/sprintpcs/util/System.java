@@ -6,6 +6,9 @@ import emulator.Emulator;
 public class System {
 
     public static String getSystemState(String s) {
+//        if("sprint.device.formfactor".equals(s)) {
+//            return "OPEN";
+//        }
         return "";
     }
 
@@ -15,5 +18,8 @@ public class System {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void addSystemListener(SystemEventListener listener) {
     }
 }
