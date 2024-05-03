@@ -236,9 +236,14 @@ public class Displayable {
     }
 
     protected void paintTicker(final Graphics graphics) {
-        if(!nonFullScreen) return;
+        if (ticker == null) {
+            if(nonFullScreen) {
+                graphics.setColor(-1);
+                graphics.fillRect(0, this.bounds[H], w, Screen.fontHeight4);
+            }
+            return;
+        }
         a.method181(graphics, 0, Screen.fontHeight4 + this.bounds[H] - 1, this.w, Screen.fontHeight4);
-        if (ticker == null) return;
         graphics.setFont(Screen.font);
         graphics.drawString(this.ticker.getString(), this.tickerX, Screen.fontHeight4 + this.bounds[H] - 1 + 2, 0);
         this.tickerX -= 5;
