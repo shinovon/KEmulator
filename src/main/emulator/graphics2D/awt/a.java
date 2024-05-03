@@ -13,14 +13,11 @@ import java.util.Map;
 public final class a implements IFont
 {
     private Font font;
-    //private Font emoji;
     private FontMetrics metrics;
-	//private FontMetrics emojimetrics;
 	private static Font nokiaFont;
     
     public a(final String s, final int size, final int style, boolean height) {
         super();
-        Map<TextAttribute, Object> attributes = new HashMap<>();
         if(s.equals("Nokia")) {
         	if(nokiaFont == null) {
         		try {
@@ -33,14 +30,12 @@ public final class a implements IFont
         } else {
         	this.font = new Font(s, style, size);
         }
-        //this.emoji = new Font("Segoe UI Emoji", style, size);
         metrics();
         if(height && metrics.getHeight() != size) {
         	float f = ((float)metrics.charWidth('W') / (float)metrics.getHeight()) * (float)size;
         	font = font.deriveFont(f);
         	metrics();
         }
-        //this.emojimetrics = new BufferedImage(1, 1, 1).getGraphics().getFontMetrics(this.emoji);
     }
     
     private void metrics() {
@@ -48,14 +43,8 @@ public final class a implements IFont
     }
     
     public final int stringWidth(final String s) {
-		/*if(b.isEmojiString(s)) { 
-			return emojimetrics.stringWidth(s);
-		}*/
         return this.metrics.stringWidth(s);
     }
-   /* public final int emojistringWidth(final String s) {
-		return emojimetrics.stringWidth(s);
-    }*/
     
     public final Font getAWTFont() {
         return this.font;
@@ -72,8 +61,4 @@ public final class a implements IFont
     public final int getAscent() {
         return this.metrics.getAscent();
     }
-
-	/*public Font getEmojiFont() {
-		return emoji;
-	}*/
 }

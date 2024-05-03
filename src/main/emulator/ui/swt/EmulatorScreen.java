@@ -707,8 +707,17 @@ public final class EmulatorScreen implements
         this.smsConsoleMenuItem.addSelectionListener(this);
         (this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
         this.sensorMenuItem.addSelectionListener(this);
+
         (this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
         this.logMenuItem.addSelectionListener(this);
+
+        new MenuItem(this.menuView, 2);
+
+        this.fpsCounterMenuItem = new MenuItem(this.menuView, 32);
+        this.fpsCounterMenuItem.setText(UILocale.get("MENU_TOOL_FPS_COUNT", "FPS Counter"));
+        this.fpsCounterMenuItem.addSelectionListener(this);
+        this.fpsCounterMenuItem.setSelection(Settings.fpsCounter);
+
         new MenuItem(this.menuView, 2);
         (this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
         this.optionsMenuItem.addSelectionListener(this);
@@ -804,19 +813,12 @@ public final class EmulatorScreen implements
             this.startRecordAviMenuItem.addSelectionListener(this);
             (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
             this.stopRecordAviMenuItem.addSelectionListener(this);
-            new MenuItem(this.menuTool, 2);
-            (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
-            this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
-            this.showTrackInfoMenuItem.addSelectionListener(this);
-            this.showTrackInfoMenuItem.setAccelerator(16777228);
         }
-
-        this.fpsCounterMenuItem = new MenuItem(this.menuTool, 32);
-        this.fpsCounterMenuItem.setText(UILocale.get("MENU_TOOL_FPS_COUNT", "FPS Counter"));
-        this.fpsCounterMenuItem.addSelectionListener(this);
-        this.fpsCounterMenuItem.setSelection(Settings.fpsCounter);
-
         new MenuItem(this.menuTool, 2);
+        (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
+        this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
+        this.showTrackInfoMenuItem.addSelectionListener(this);
+        this.showTrackInfoMenuItem.setAccelerator(16777228);
 
         this.canvasKeyboardMenuItem = new MenuItem(this.menuTool, 32);
         canvasKeyboardMenuItem.setText(UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
@@ -1053,10 +1055,6 @@ public final class EmulatorScreen implements
                     networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable = !Settings.networkNotAvailable);
                     return;
                 }
-                if (menuItem.equals(this.fpsCounterMenuItem)) {
-                    this.fpsCounterMenuItem.setSelection(Settings.fpsCounter = !Settings.fpsCounter);
-                    return;
-                }
                 if (menuItem.equals(this.showTrackInfoMenuItem)) {
                     this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack = !Settings.threadMethodTrack);
                     return;
@@ -1107,7 +1105,9 @@ public final class EmulatorScreen implements
             }
             if (menuItem.equals(this.restartMenuItem)) {
                 Emulator.loadGame(null, Settings.g2d, Settings.g3d, false);
-            } else if (menuItem.equals(this.loadJarMenuItem) /*|| (equals = menuItem.equals(this.loadWithConsoleMenuItem))*/) {
+                return;
+            }
+            if (menuItem.equals(this.loadJarMenuItem) /*|| (equals = menuItem.equals(this.loadWithConsoleMenuItem))*/) {
                 pauseStep();
                 final FileDialog fileDialog2;
                 (fileDialog2 = new FileDialog(this.shell, 4096)).setText(UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
@@ -1118,7 +1118,9 @@ public final class EmulatorScreen implements
                     Emulator.loadGame(open2, Settings.g2d, Settings.g3d, equals);
                 }
                 this.resumeStep();
-            } else if (menuItem.equals(this.loadAutoPlayMenuItem)) {
+                return;
+            }
+            if (menuItem.equals(this.loadAutoPlayMenuItem)) {
                 pauseStep();
                 final FileDialog fileDialog3;
                 (fileDialog3 = new FileDialog(this.shell, 4096)).setText(UILocale.get("OPEN_REC_FILE", "Open a record file"));
@@ -1143,7 +1145,8 @@ public final class EmulatorScreen implements
                     }
                 }
                 this.resumeStep();
-            } else if (menuItem.equals(this.suspendMenuItem)) {
+                return;
+            } if (menuItem.equals(this.suspendMenuItem)) {
                 if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
                     return;
                 }
@@ -1151,7 +1154,9 @@ public final class EmulatorScreen implements
                 Emulator.getEventQueue().queue(16);
                 this.pauseScreen();
                 this.canvas.redraw();
-            } else if (menuItem.equals(this.resumeMenuItem)) {
+                return;
+            }
+            if (menuItem.equals(this.resumeMenuItem)) {
                 if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
                     return;
                 }
@@ -1164,11 +1169,17 @@ public final class EmulatorScreen implements
                 } else {
                     Emulator.getCanvas().repaint();
                 }
-            } else if (menuItem.equals(this.pausestepMenuItem)) {
+                return;
+            }
+            if (menuItem.equals(this.pausestepMenuItem)) {
                 pauseStep();
-            } else if (menuItem.equals(this.playResumeMenuItem)) {
+                return;
+            }
+            if (menuItem.equals(this.playResumeMenuItem)) {
                 this.resumeStep();
-            } else if (menuItem.equals(this.openJadMenuItem)) {
+                return;
+            }
+            if (menuItem.equals(this.openJadMenuItem)) {
                 try {
                     final String jadPath;
                     if ((jadPath = Emulator.getJadPath()) != null) {
@@ -1178,7 +1189,9 @@ public final class EmulatorScreen implements
                 }
             }
             this.updatePauseState();
-        } else if (parent.equals(this.menu2dEngine)) {
+            return;
+        }
+        if (parent.equals(this.menu2dEngine)) {
             if (menuItem.equals(this.awt2dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g2d != 1) {
                     Emulator.loadGame(null, 1, Settings.g3d, false);
@@ -1196,7 +1209,9 @@ public final class EmulatorScreen implements
                 this.awt2dMenuItem.setSelection(false);
                 this.swt2dMenuItem.setSelection(true);
             }
-        } else if (parent.equals(this.menu3dEngine)) {
+            return;
+        }
+        if (parent.equals(this.menu3dEngine)) {
             if (menuItem.equals(this.swerve3dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g3d != 0) {
                     Emulator.loadGame(null, Settings.g2d, 0, false);
@@ -1205,8 +1220,7 @@ public final class EmulatorScreen implements
                 Settings.g3d = 0;
                 this.lwj3dMenuItem.setSelection(false);
                 this.swerve3dMenuItem.setSelection(true);
-            }
-            else if (menuItem.equals(this.lwj3dMenuItem)) {
+            } else if (menuItem.equals(this.lwj3dMenuItem)) {
                 if (this.pauseState != 0 && Settings.g3d != 1) {
                     Emulator.loadGame(null, Settings.g2d, 1, false);
                     return;
@@ -1215,8 +1229,9 @@ public final class EmulatorScreen implements
                 this.swerve3dMenuItem.setSelection(false);
                 this.lwj3dMenuItem.setSelection(true);
             }
+            return;
         }
-        else if (parent.equals(this.menuView)) {
+        if (parent.equals(this.menuView)) {
             if (menuItem.equals(this.helpMenuItem)) {
                 new Class54().method454(this.shell);
                 return;
@@ -1230,19 +1245,27 @@ public final class EmulatorScreen implements
                 setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
                 return;
             }
+            if (menuItem.equals(this.fpsCounterMenuItem)) {
+                this.fpsCounterMenuItem.setSelection(Settings.fpsCounter = !Settings.fpsCounter);
+                return;
+            }
             if (menuItem.equals(this.logMenuItem)) {
                 if (((Class11) Emulator.getEmulator().getLogStream()).isLogOpen()) {
                     ((Class11) Emulator.getEmulator().getLogStream()).method330();
                     return;
                 }
                 ((Class11) Emulator.getEmulator().getLogStream()).method329(this.shell);
-            } else if (menuItem.equals(this.keypadMenuItem)) {
+                return;
+            }
+            if (menuItem.equals(this.keypadMenuItem)) {
                 if (((EmulatorImpl) Emulator.getEmulator()).method826().method834()) {
                     ((EmulatorImpl) Emulator.getEmulator()).method826().method836();
                     return;
                 }
                 ((EmulatorImpl) Emulator.getEmulator()).method826().method835(this.shell);
-            } else if (menuItem.equals(this.infosMenuItem)) {
+                return;
+            }
+            if (menuItem.equals(this.infosMenuItem)) {
                 this.infosEnabled = this.infosMenuItem.getSelection();
                 if (this.infosEnabled) {
                     this.canvas.setCursor(new Cursor(EmulatorScreen.display, 2));
@@ -1252,91 +1275,99 @@ public final class EmulatorScreen implements
                 this.canvas.setCursor(new Cursor(EmulatorScreen.display, 0));
                 this.canvas.redraw();
                 ((EmulatorImpl) Emulator.getEmulator()).method825().method608();
-            } else {
-                if (menuItem.equals(this.rotateScreenMenuItem)) {
-                    this.rotate(this.getHeight(), this.getWidth());
-                    return;
-                }
+                return;
+            }
+            if (menuItem.equals(this.rotateScreenMenuItem)) {
+                this.rotate(this.getHeight(), this.getWidth());
+                return;
+            }
 
-                if (menuItem.equals(this.rotate90MenuItem)) {
-                    rotate90degrees(false);
-                    resized();
-                    return;
-                }
-                if (menuItem.equals(this.forcePaintMenuItem)) {
-                    if (Settings.g2d == 0) {
-                        if (Settings.xrayView) {
-                            this.xrayScreenImageSwt.cloneImage(this.screenCopySwt);
-                        } else {
-                            this.backBufferImageSwt.cloneImage(this.screenCopySwt);
-                        }
-                    } else if (Settings.g2d == 1) {
-                        (Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenCopyAwt);
+            if (menuItem.equals(this.rotate90MenuItem)) {
+                rotate90degrees(false);
+                resized();
+                return;
+            }
+            if (menuItem.equals(this.forcePaintMenuItem)) {
+                if (Settings.g2d == 0) {
+                    if (Settings.xrayView) {
+                        this.xrayScreenImageSwt.cloneImage(this.screenCopySwt);
+                    } else {
+                        this.backBufferImageSwt.cloneImage(this.screenCopySwt);
                     }
-                    this.canvas.redraw();
-                    return;
+                } else if (Settings.g2d == 1) {
+                    (Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenCopyAwt);
                 }
-                if (menuItem.equals(this.sensorMenuItem)) {
-                    final File file3;
-                    if ((file3 = new File(Emulator.getAbsolutePath() + "/sensorsimulator.jar")).exists()) {
-                        try {
-                            final String[] array;
-                            (array = new String[2])[0] = "cmd.exe";
-                            array[1] = "/c \" java -jar " + file3.getAbsolutePath() + " \"";
-                            Runtime.getRuntime().exec(array);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                    return;
-                }
-                if (menuItem.equals(this.smsConsoleMenuItem)) {
-                    if (((Class83) Emulator.getEmulator().getMessage()).method479()) {
-                        ((Class83) Emulator.getEmulator().getMessage()).method482();
-                        return;
-                    }
-                    ((Class83) Emulator.getEmulator().getMessage()).method481(this.shell);
-                } else if (menuItem == m3gViewMenuItem) {
+                this.canvas.redraw();
+                return;
+            }
+            if (menuItem.equals(this.sensorMenuItem)) {
+                final File file3;
+                if ((file3 = new File(Emulator.getAbsolutePath() + "/sensorsimulator.jar")).exists()) {
                     try {
-                        if (((EmulatorImpl) Emulator.getEmulator()).getM3GView().method494()) {
-                            ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method507();
-                            return;
-                        }
-                        ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method226();
-                    } catch (Throwable e) {
-                        e.printStackTrace();
+                        final String[] array;
+                        (array = new String[2])[0] = "cmd.exe";
+                        array[1] = "/c \" java -jar " + file3.getAbsolutePath() + " \"";
+                        Runtime.getRuntime().exec(array);
+                    } catch (Exception ignored) {
                     }
                 }
-                else {
-                    if (menuItem.equals(this.xrayViewMenuItem)) {
-                        Settings.xrayView = this.xrayViewMenuItem.getSelection();
+                return;
+            }
+            if (menuItem.equals(this.smsConsoleMenuItem)) {
+                if (((Class83) Emulator.getEmulator().getMessage()).method479()) {
+                    ((Class83) Emulator.getEmulator().getMessage()).method482();
+                    return;
+                }
+                ((Class83) Emulator.getEmulator().getMessage()).method481(this.shell);
+                return;
+            }
+            if (menuItem == m3gViewMenuItem) {
+                try {
+                    if (((EmulatorImpl) Emulator.getEmulator()).getM3GView().method494()) {
+                        ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method507();
                         return;
                     }
-                    if (menuItem.equals(this.watchesMenuItem)) {
-                        if (((EmulatorImpl) Emulator.getEmulator()).method822().method313()) {
-                            ((EmulatorImpl) Emulator.getEmulator()).method822().method321();
-                            return;
-                        }
-                        ((EmulatorImpl) Emulator.getEmulator()).method822().method311(this.shell);
-                    } else if (menuItem.equals(this.profilerMenuItem)) {
-                        if (((EmulatorImpl) Emulator.getEmulator()).method829().method313()) {
-                            ((EmulatorImpl) Emulator.getEmulator()).method829().method321();
-                            return;
-                        }
-                        ((EmulatorImpl) Emulator.getEmulator()).method829().method311(this.shell);
-                    } else if (menuItem.equals(this.methodsMenuItem)) {
-                        if (((EmulatorImpl) Emulator.getEmulator()).method824().method438()) {
-                            ((EmulatorImpl) Emulator.getEmulator()).method824().method446();
-                            return;
-                        }
-                        ((EmulatorImpl) Emulator.getEmulator()).method824().method436();
-                    } else if (menuItem.equals(this.memoryViewMenuItem)) {
-                        if (((EmulatorImpl) Emulator.getEmulator()).method823().method622()) {
-                            ((EmulatorImpl) Emulator.getEmulator()).method823().method656();
-                            return;
-                        }
-                        ((EmulatorImpl) Emulator.getEmulator()).method823().method621();
-                    }
+                    ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method226();
+                } catch (Throwable e) {
+                    e.printStackTrace();
                 }
+                return;
+            }
+            if (menuItem.equals(this.xrayViewMenuItem)) {
+                Settings.xrayView = this.xrayViewMenuItem.getSelection();
+                return;
+            }
+            if (menuItem.equals(this.watchesMenuItem)) {
+                if (((EmulatorImpl) Emulator.getEmulator()).method822().method313()) {
+                    ((EmulatorImpl) Emulator.getEmulator()).method822().method321();
+                    return;
+                }
+                ((EmulatorImpl) Emulator.getEmulator()).method822().method311(this.shell);
+                return;
+            }
+            if (menuItem.equals(this.profilerMenuItem)) {
+                if (((EmulatorImpl) Emulator.getEmulator()).method829().method313()) {
+                    ((EmulatorImpl) Emulator.getEmulator()).method829().method321();
+                    return;
+                }
+                ((EmulatorImpl) Emulator.getEmulator()).method829().method311(this.shell);
+                return;
+            }
+            if (menuItem.equals(this.methodsMenuItem)) {
+                if (((EmulatorImpl) Emulator.getEmulator()).method824().method438()) {
+                    ((EmulatorImpl) Emulator.getEmulator()).method824().method446();
+                    return;
+                }
+                ((EmulatorImpl) Emulator.getEmulator()).method824().method436();
+                return;
+            }
+            if (menuItem.equals(this.memoryViewMenuItem)) {
+                if (((EmulatorImpl) Emulator.getEmulator()).method823().method622()) {
+                    ((EmulatorImpl) Emulator.getEmulator()).method823().method656();
+                    return;
+                }
+                ((EmulatorImpl) Emulator.getEmulator()).method823().method621();
+                return;
             }
         } else if (parent == menuResize) {
             if (menuItem == centerOnScreenMenuItem) {

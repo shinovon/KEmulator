@@ -105,7 +105,7 @@ public final class Property implements IProperty {
     private Button aButton719;
     private Composite systemComp;
     private Composite coreApiComp;
-    private Group aGroup678;
+    private Group coreApiGroup;
     private Group sysChecksGroup;
     private Button aButton724;
     private Button aButton728;
@@ -143,7 +143,7 @@ public final class Property implements IProperty {
     private String left;
     private String right;
     private int fontSmallSize;
-    private int fontMediumSIze;
+    private int fontMediumSize;
     private int fontLargeSize;
     private CLabel aCLabel646;
     private Combo controllerCombo;
@@ -195,6 +195,7 @@ public final class Property implements IProperty {
     private Combo m3gAACombo;
     private Combo m3gTexFilterCombo;
     private Combo m3gMipmapCombo;
+    private Button vmsCheck;
 //    private Button pollOnRepaintBtn;
 
     public Property() {
@@ -279,7 +280,7 @@ public final class Property implements IProperty {
         this.aButton719 = null;
         this.systemComp = null;
         this.coreApiComp = null;
-        this.aGroup678 = null;
+        this.coreApiGroup = null;
         this.sysChecksGroup = null;
         this.aButton724 = null;
         this.aButton728 = null;
@@ -365,7 +366,7 @@ public final class Property implements IProperty {
     }
 
     public final int getFontMediumSize() {
-        return this.fontMediumSIze;
+        return this.fontMediumSize;
     }
 
     public final int getFontLargeSize() {
@@ -381,7 +382,7 @@ public final class Property implements IProperty {
     }
 
     public final void getFontMediumSize(final int anInt681) {
-        this.fontMediumSIze = anInt681;
+        this.fontMediumSize = anInt681;
     }
 
     public final void getFontLargeSize(final int anInt687) {
@@ -461,15 +462,15 @@ public final class Property implements IProperty {
                 throw new FileNotFoundException();
             }
             final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + "/property.txt");
-            final Properties properties;
-            (properties = new Properties()).load(fileInputStream);
+            final Properties properties = new Properties();
+            properties.load(fileInputStream);
             final String property = properties.getProperty("Device", "SonyEricssonK800");
             this.device = property;
             Emulator.deviceName = property;
             this.defaultFont = properties.getProperty("DefaultFont", "Tahoma");
             this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
             this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
-            this.fontMediumSIze = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
+            this.fontMediumSize = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
             this.fontLargeSize = Integer.parseInt(properties.getProperty("FontLargeSize", String.valueOf(16)));
             this.screenWidth = properties.getProperty("SCREEN_WIDTH", "240");
             this.screenHeight = properties.getProperty("SCREEN_HEIGHT", "320");
@@ -483,12 +484,10 @@ public final class Property implements IProperty {
             Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ")
                     .equalsIgnoreCase("LWJ") ? 1 : 0);
             Settings.g2d = (properties.getProperty("2D_Graphics_Enginge", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
-            Settings.alwaysOnTop = Boolean.valueOf(properties.getProperty("AlwaysOnTop", "false"));
-            Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(100)));
-            if (Settings.canvasScale < 100 || Settings.canvasScale % 50 != 0) {
-                Settings.canvasScale = 100;
-            }
+
             Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
+
+            // keyboard mappings
             KeyMapping.mapDeviceKey(0, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_0")));
             KeyMapping.mapDeviceKey(1, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_1")));
             KeyMapping.mapDeviceKey(2, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_2")));
@@ -508,29 +507,53 @@ public final class Property implements IProperty {
             KeyMapping.mapDeviceKey(16, KeyMapping.method601(properties.getProperty("MAP_KEY_MIDDLE")));
             KeyMapping.mapDeviceKey(17, KeyMapping.method601(properties.getProperty("MAP_KEY_LSOFT")));
             KeyMapping.mapDeviceKey(18, KeyMapping.method601(properties.getProperty("MAP_KEY_RSOFT")));
-            Settings.enableKeyCache = Boolean.valueOf(properties.getProperty("EnableKeyCache", "false"));
-            Settings.enableVibration = Boolean.valueOf(properties.getProperty("EnableVibration", "false"));
-            Settings.enableKeyRepeat = Boolean.valueOf(properties.getProperty("EnableKeyRepeat", "false"));
-            Settings.ignoreFullScreen = Boolean.valueOf(properties.getProperty("IgnoreFullScreenMode", "false"));
-            Settings.networkNotAvailable = Boolean.valueOf(properties.getProperty("NetworkNotAvailable", "false"));
-            Settings.associateWithJar = Boolean.valueOf(properties.getProperty("AssociateWithJar", "false"));
-            Settings.rightClickMenu = Boolean.valueOf(properties.getProperty("RightClickMenu", "false"));
-            Settings.xrayOverlapScreen = Boolean.valueOf(properties.getProperty("XRayOverLapScreen", "false"));
-            Settings.xrayShowClipBorder = Boolean.valueOf(properties.getProperty("XRayShowClipBorder", "false"));
-            Settings.infoColorHex = Boolean.valueOf(properties.getProperty("InfoColorHex", "false"));
-            Settings.recordReleasedImg = Boolean.valueOf(properties.getProperty("RecordReleasedImg", "false"));
-            Settings.autoGenJad = Boolean.valueOf(properties.getProperty("AutoGenJad", "false"));
-            Settings.enableNewTrack = Boolean.valueOf(properties.getProperty("EnableNewTrack", "false"));
-            Settings.enableMethodTrack = Boolean.valueOf(properties.getProperty("EnableMethodTrack", "false"));
-            //Emulator.inactivityTimer = Integer.valueOf(properties.getProperty("InactivityTimer", "0"));
-            Settings.threadMethodTrack = Boolean.valueOf(properties.getProperty("ShowMethodTrack", "false"));
-            EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", "-1"));
-            EmulatorScreen.locY = Integer.parseInt(properties.getProperty("LocationY", "-1"));
+            Settings.enableKeyCache = Boolean.parseBoolean(properties.getProperty("EnableKeyCache", "false"));
+            Settings.canvasKeyboard = Boolean.parseBoolean(properties.getProperty("CanvasKeyboardMode", "true"));
+            Settings.recordKeys = Boolean.parseBoolean(properties.getProperty("RecordKeys", "false"));
+
+            // controller mappings
+            for (Object k : properties.keySet()) {
+                if (((String) k).startsWith("ControllerMap.")) {
+                    Settings.controllerBinds.put(((String) k).substring("ControllerMap.".length()), properties.getProperty((String) k));
+                }
+            }
+
+            // api
+            Settings.enableVibration = Boolean.parseBoolean(properties.getProperty("EnableVibration", "false"));
+            Settings.enableKeyRepeat = Boolean.parseBoolean(properties.getProperty("EnableKeyRepeat", "false"));
+            Settings.ignoreFullScreen = Boolean.parseBoolean(properties.getProperty("IgnoreFullScreenMode", "false"));
+            Settings.networkNotAvailable = Boolean.parseBoolean(properties.getProperty("NetworkNotAvailable", "false"));
+
+            // platform
+            Settings.synchronizeKeyEvents = Boolean.parseBoolean(properties.getProperty("SynchronizeKeyEvents", "true"));
+            Settings.motorolaSoftKeyFix = Boolean.parseBoolean(properties.getProperty("MotorolaSoftKeyFix", "false"));
+            Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
+            Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
+
             Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
-            Settings.recordKeys = Boolean.valueOf(properties.getProperty("RecordKeys", "false"));
+            Settings.locale = properties.getProperty("MIDPLocale", "en-US");
+
+            // emulator
+            Settings.associateWithJar = Boolean.parseBoolean(properties.getProperty("AssociateWithJar", "false"));
+            Settings.rightClickMenu = Boolean.parseBoolean(properties.getProperty("RightClickMenu", "false"));
+            Settings.xrayOverlapScreen = Boolean.parseBoolean(properties.getProperty("XRayOverLapScreen", "false"));
+            Settings.xrayShowClipBorder = Boolean.parseBoolean(properties.getProperty("XRayShowClipBorder", "false"));
+            Settings.infoColorHex = Boolean.parseBoolean(properties.getProperty("InfoColorHex", "false"));
+            Settings.recordReleasedImg = Boolean.parseBoolean(properties.getProperty("RecordReleasedImg", "false"));
+            Settings.autoGenJad = Boolean.parseBoolean(properties.getProperty("AutoGenJad", "false"));
+            Settings.enableNewTrack = Boolean.parseBoolean(properties.getProperty("EnableNewTrack", "false"));
+            Settings.enableMethodTrack = Boolean.parseBoolean(properties.getProperty("EnableMethodTrack", "false"));
+            Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
+
+            Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "true"));
+            Settings.uiLanguage = properties.getProperty("UILanguage", "en");
+            Settings.writeKemCfg = Boolean.parseBoolean(properties.getProperty("WriteKemulatorCfg", "false"));
+
             for (int i = 0; i < 5; ++i) {
                 Settings.recentJars[i] = properties.getProperty("MRUList" + i, "");
             }
+
+            // proxy
             Settings.proxyType = Integer.parseInt(properties.getProperty("ProxyType", "0"));
             if (Settings.proxyType < 0 || Settings.proxyType > 2) {
                 Settings.proxyType = 0;
@@ -540,49 +563,54 @@ public final class Property implements IProperty {
             Settings.proxyUser = properties.getProperty("ProxyUsername", "");
             Settings.proxyPass = properties.getProperty("ProxyPassword", "");
             Settings.proxyDomain = properties.getProperty("ProxyDomain", "");
-            Settings.showLogFrame = Boolean.valueOf(properties.getProperty("ShowLogFrame", "false"));
-            Settings.showInfoFrame = Boolean.valueOf(properties.getProperty("ShowInfoFrame", "false"));
-            Settings.showMemViewFrame = Boolean.valueOf(properties.getProperty("ShowMemViewFrame", "false"));
-            Settings.rpc = Boolean.valueOf(properties.getProperty("DiscordRichPresence", "true"));
-            Settings.awtAntiAliasing = Boolean.valueOf(properties.getProperty("AWTAntiAliasing", "false"));
-            Settings.canvasKeyboard = Boolean.valueOf(properties.getProperty("CanvasKeyboardMode", "true"));
+
+            // view
+            Settings.showLogFrame = Boolean.parseBoolean(properties.getProperty("ShowLogFrame", "false"));
+            Settings.showInfoFrame = Boolean.parseBoolean(properties.getProperty("ShowInfoFrame", "false"));
+            Settings.showMemViewFrame = Boolean.parseBoolean(properties.getProperty("ShowMemViewFrame", "false"));
+            Settings.fpsCounter = Boolean.parseBoolean(properties.getProperty("FPSCounter", "true"));
+
+            Settings.awtAntiAliasing = Boolean.parseBoolean(properties.getProperty("AWTAntiAliasing", "false"));
+            Settings.textAntiAliasing = Boolean.parseBoolean(properties.getProperty("TextAntiAliasing", "true"));
+
             if (Emulator.getEmulator() != null && Emulator.getEmulator().getScreen() != null) {
                 ((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(!Settings.canvasKeyboard);
                 ((EmulatorScreen) Emulator.getEmulator().getScreen()).setFpsMode(Settings.fpsMode);
             }
-            Settings.vlcDir = properties.getProperty("VlcDir", "");
-            Settings.locale = properties.getProperty("MIDPLocale", "en-US");
-            Settings.textAntiAliasing = Boolean.valueOf(properties.getProperty("TextAntiAliasing", "true"));
-            for (Object k : properties.keySet()) {
-                if (((String) k).startsWith("ControllerMap.")) {
-                    Settings.controllerBinds.put(((String) k).substring("ControllerMap.".length()), properties.getProperty((String) k));
-                }
+
+            // display
+            Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(100)));
+            if (Settings.canvasScale < 100 || Settings.canvasScale % 50 != 0) {
+                Settings.canvasScale = 100;
             }
-            Settings.pollKeyboardOnRepaint = Boolean.valueOf(properties.getProperty("PollKeyboardOnRepaint", "true"));
-            Settings.uiLanguage = properties.getProperty("UILanguage", "en");
-            Settings.fpsCounter = Boolean.valueOf(properties.getProperty("FPSCounter", "true"));
-            Settings.synchronizeKeyEvents = Boolean.valueOf(properties.getProperty("SynchronizeKeyEvents", "true"));
-            Settings.motorolaSoftKeyFix = Boolean.valueOf(properties.getProperty("MotorolaSoftKeyFix", "false"));
+            Settings.resizeMode = Integer.parseInt(properties.getProperty("ResizeMode", "2"));
+            Settings.keepAspectRatio = Boolean.parseBoolean(properties.getProperty("KeepAspectRatio", "true"));
+            Settings.integerResize = Boolean.parseBoolean(properties.getProperty("IntegerResize", "false"));
 
-            Settings.resizeMode = Integer.valueOf(properties.getProperty("ResizeMode", "2"));
-            Settings.keepAspectRatio = Boolean.valueOf(properties.getProperty("KeepAspectRatio", "true"));
-            Settings.integerResize = Boolean.valueOf(properties.getProperty("IntegerResize", "false"));
+            // window
+            EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", "-1"));
+            EmulatorScreen.locY = Integer.parseInt(properties.getProperty("LocationY", "-1"));
+            EmulatorScreen.sizeW = Integer.parseInt(properties.getProperty("SizeW", "-1"));
+            EmulatorScreen.sizeH = Integer.parseInt(properties.getProperty("SizeH", "-1"));
+            EmulatorScreen.maximized = Boolean.parseBoolean(properties.getProperty("Maximized", "false"));
 
-            EmulatorScreen.sizeW = Integer.valueOf(properties.getProperty("SizeW", "-1"));
-            EmulatorScreen.sizeH = Integer.valueOf(properties.getProperty("SizeH", "-1"));
-            EmulatorScreen.maximized = Boolean.valueOf(properties.getProperty("Maximized", "false"));
+            Settings.alwaysOnTop = Boolean.parseBoolean(properties.getProperty("AlwaysOnTop", "false"));
 
-            Settings.patchSynchronizedPaint = Boolean.valueOf(properties.getProperty("PatchSynchronizedPaint", "true"));
+            // m3g
+            Settings.m3gIgnoreOverwrite = Boolean.parseBoolean(properties.getProperty("M3GIgnoreOverwrite", "false"));
+            Settings.m3gForcePerspectiveCorrection = Boolean.parseBoolean(properties.getProperty("M3GForcePerspectiveCorrection", "false"));
+            Settings.m3gDisableLightClamp = Boolean.parseBoolean(properties.getProperty("M3GDisableLightClamp", "false"));
 
-            Settings.m3gIgnoreOverwrite = Boolean.valueOf(properties.getProperty("M3GIgnoreOverwrite", "false"));
-            Settings.m3gForcePerspectiveCorrection = Boolean.valueOf(properties.getProperty("M3GForcePerspectiveCorrection", "false"));
-            Settings.m3gDisableLightClamp = Boolean.valueOf(properties.getProperty("M3GDisableLightClamp", "false"));
+            Settings.m3gAA = Integer.parseInt(properties.getProperty("M3GAA", "0"));
+            Settings.m3gTexFilter = Integer.parseInt(properties.getProperty("M3GTexFilter", "0"));
+            Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 
-            Settings.m3gAA = Integer.valueOf(properties.getProperty("M3GAA", "0"));
-            Settings.m3gTexFilter = Integer.valueOf(properties.getProperty("M3GTexFilter", "0"));
-            Settings.m3gMipmapping = Integer.valueOf(properties.getProperty("M3GMipmapping", "0"));
+            // media
+            Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
+            Settings.vlcDir = properties.getProperty("VlcDir", "");
 
-            Settings.writeKemCfg = Boolean.valueOf(properties.getProperty("WriteKemulatorCfg", "false"));
+            // jvm
+            Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
 
             fileInputStream.close();
         } catch (Exception ex) {
@@ -609,7 +637,7 @@ public final class Property implements IProperty {
             Settings.enableNewTrack = false;
             Settings.enableMethodTrack = false;
             this.fontSmallSize = 12;
-            this.fontMediumSIze = 14;
+            this.fontMediumSize = 14;
             this.fontLargeSize = 16;
             for (int j = 0; j < 5; ++j) {
                 Settings.recentJars[j] = "";
@@ -634,7 +662,7 @@ public final class Property implements IProperty {
             properties.setProperty("DefaultFont", this.defaultFont);
             properties.setProperty("RMSFolder", this.rmsFolder);
             properties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
-            properties.setProperty("FontMediumSize", String.valueOf(this.fontMediumSIze));
+            properties.setProperty("FontMediumSize", String.valueOf(this.fontMediumSize));
             properties.setProperty("FontLargeSize", String.valueOf(this.fontLargeSize));
             properties.setProperty("SCREEN_WIDTH", this.screenWidth);
             properties.setProperty("SCREEN_HEIGHT", this.screenHeight);
@@ -646,10 +674,10 @@ public final class Property implements IProperty {
             properties.setProperty("KEY_LEFT", this.left);
             properties.setProperty("KEY_RIGHT", this.right);
             properties.setProperty("2D_Graphics_Enginge", (Settings.g2d == 0) ? "SWT" : "AWT");
-            properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
-            properties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
-            properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
             properties.setProperty("3D_Graphics_Engine", (Settings.g3d == 0) ? "SWERVE" : "LWJ");
+            properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
+
+            // keyboard mappings
             properties.setProperty("MAP_KEY_NUM_0", KeyMapping.get(0));
             properties.setProperty("MAP_KEY_NUM_1", KeyMapping.get(1));
             properties.setProperty("MAP_KEY_NUM_2", KeyMapping.get(2));
@@ -670,11 +698,30 @@ public final class Property implements IProperty {
             properties.setProperty("MAP_KEY_LSOFT", KeyMapping.get(17));
             properties.setProperty("MAP_KEY_RSOFT", KeyMapping.get(18));
             properties.setProperty("EnableKeyCache", String.valueOf(Settings.enableKeyCache));
+            properties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
+            properties.setProperty("RecordKeys", String.valueOf(Settings.recordKeys));
+
+            // controller mappings
+            for (Map.Entry<String, String> e : Settings.controllerBinds.entrySet()) {
+                properties.setProperty("ControllerMap." + e.getKey(), e.getValue());
+            }
+
+            // api
             properties.setProperty("EnableVibration", String.valueOf(Settings.enableVibration));
-            //sortProperties.setProperty("InactivityTimer", String.valueOf(Emulator.inactivityTimer));
             properties.setProperty("EnableKeyRepeat", String.valueOf(Settings.enableKeyRepeat));
             properties.setProperty("IgnoreFullScreenMode", String.valueOf(Settings.ignoreFullScreen));
             properties.setProperty("NetworkNotAvailable", String.valueOf(Settings.networkNotAvailable));
+
+            // platform
+            properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
+            properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
+            properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
+            properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
+
+            properties.setProperty("FileEncoding", Settings.fileEncoding);
+            properties.setProperty("MIDPLocale", Settings.locale);
+
+            // emulator
             properties.setProperty("AssociateWithJar", String.valueOf(Settings.associateWithJar));
             properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
             properties.setProperty("XRayOverLapScreen", String.valueOf(Settings.xrayOverlapScreen));
@@ -685,44 +732,48 @@ public final class Property implements IProperty {
             properties.setProperty("EnableNewTrack", String.valueOf(Settings.enableNewTrack));
             properties.setProperty("EnableMethodTrack", String.valueOf(Settings.enableMethodTrack));
             properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
-            properties.setProperty("LocationX", String.valueOf(EmulatorScreen.locX));
-            properties.setProperty("LocationY", String.valueOf(EmulatorScreen.locY));
-            properties.setProperty("FileEncoding", Settings.fileEncoding);
-            properties.setProperty("RecordKeys", String.valueOf(Settings.recordKeys));
+
+            properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
+            properties.setProperty("UILanguage", Settings.uiLanguage);
+            properties.setProperty("WriteKemulatorCfg", String.valueOf(Settings.writeKemCfg));
+
             for (int i = 0; i < 5; ++i) {
                 properties.setProperty("MRUList" + i, Settings.recentJars[i]);
             }
+
+            // proxy
             properties.setProperty("ProxyType", String.valueOf(Settings.proxyType));
             properties.setProperty("ProxyHost", Settings.proxyHost);
             properties.setProperty("ProxyPort", Settings.proxyPort);
             properties.setProperty("ProxyUsername", Settings.proxyUser);
             properties.setProperty("ProxyPassword", Settings.proxyPass);
             properties.setProperty("ProxyDomain", Settings.proxyDomain);
+
+            // view
             properties.setProperty("ShowLogFrame", String.valueOf(Settings.showLogFrame));
             properties.setProperty("ShowInfoFrame", String.valueOf(Settings.showInfoFrame));
             properties.setProperty("ShowMemViewFrame", String.valueOf(Settings.showMemViewFrame));
-            properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
-            properties.setProperty("AWTAntiAliasing", String.valueOf(Settings.awtAntiAliasing));
-            properties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
-            properties.setProperty("VlcDir", Settings.vlcDir);
-            properties.setProperty("MIDPLocale", Settings.locale);
-            properties.setProperty("TextAntiAliasing", String.valueOf(Settings.textAntiAliasing));
-            for (Map.Entry<String, String> e : Settings.controllerBinds.entrySet()) {
-                properties.setProperty("ControllerMap." + e.getKey(), e.getValue());
-            }
-            properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
-            properties.setProperty("UILanguage", Settings.uiLanguage);
             properties.setProperty("FPSCounter", String.valueOf(Settings.fpsCounter));
-            properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
-            properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
+
+            properties.setProperty("AWTAntiAliasing", String.valueOf(Settings.awtAntiAliasing));
+            properties.setProperty("TextAntiAliasing", String.valueOf(Settings.textAntiAliasing));
+
+            // display
+            properties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
             properties.setProperty("ResizeMode", String.valueOf(Settings.resizeMode));
             properties.setProperty("KeepAspectRatio", String.valueOf(Settings.keepAspectRatio));
             properties.setProperty("IntegerResize", String.valueOf(Settings.integerResize));
+
+            // window
+            properties.setProperty("LocationX", String.valueOf(EmulatorScreen.locX));
+            properties.setProperty("LocationY", String.valueOf(EmulatorScreen.locY));
             properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
             properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
             properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
-            properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
 
+            properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
+
+            // m3g
             properties.setProperty("M3GIgnoreOverwrite", String.valueOf(Settings.m3gIgnoreOverwrite));
             properties.setProperty("M3GForcePerspectiveCorrection", String.valueOf(Settings.m3gForcePerspectiveCorrection));
             properties.setProperty("M3GDisableLightClamp", String.valueOf(Settings.m3gDisableLightClamp));
@@ -731,7 +782,12 @@ public final class Property implements IProperty {
             properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
             properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
 
-            properties.setProperty("WriteKemulatorCfg",  String.valueOf(Settings.writeKemCfg));
+            // media
+            properties.setProperty("MIDISearchVMS", String.valueOf(Settings.searchVms));
+            properties.setProperty("VlcDir", Settings.vlcDir);
+
+            // jvm
+            properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
 
             properties.store(fileOutputStream, "KEmulator properties");
             fileOutputStream.close();
@@ -748,7 +804,7 @@ public final class Property implements IProperty {
         this.rmsFolder = this.aText662.getText().trim();
         Settings.fileEncoding = this.aCombo675.getText().trim();
         this.fontSmallSize = this.aSpinner690.getSelection();
-        this.fontMediumSIze = this.aSpinner679.getSelection();
+        this.fontMediumSize = this.aSpinner679.getSelection();
         this.fontLargeSize = this.aSpinner670.getSelection();
         this.screenWidth = this.aText672.getText().trim();
         this.screenHeight = this.aText684.getText().trim();
@@ -832,6 +888,8 @@ public final class Property implements IProperty {
         Settings.m3gAA = m3gAACombo.getSelectionIndex();
         Settings.m3gTexFilter = m3gTexFilterCombo.getSelectionIndex();
         Settings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
+
+        Settings.searchVms = vmsCheck.getSelection();
 
         this.updateProxy();
     }
@@ -1587,10 +1645,7 @@ public final class Property implements IProperty {
 
     private void setupCoreApiComp() {
         (this.coreApiComp = new Composite(this.tabFolder, 0)).setLayout(new GridLayout());
-        this.method412();
-    }
 
-    private void method412() {
         final GridData gridData;
         (gridData = new GridData()).grabExcessHorizontalSpace = true;
         gridData.verticalAlignment = 2;
@@ -1600,52 +1655,63 @@ public final class Property implements IProperty {
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.grabExcessVerticalSpace = true;
         layoutData.verticalAlignment = 4;
-        (this.aGroup678 = new Group(this.coreApiComp, 0)).setLayout(new GridLayout());
-        this.aGroup678.setLayoutData(layoutData);
-        (this.aButton724 = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
+        (this.coreApiGroup = new Group(this.coreApiComp, 0)).setLayout(new GridLayout());
+        this.coreApiGroup.setLayoutData(layoutData);
+        (this.aButton724 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
         this.aButton724.setLayoutData(gridData);
         this.aButton724.setSelection(Settings.enableVibration);
-        (this.aButton728 = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_KEY_REPEAT", "Enable Canvas.keyRepeated(int)."));
+        (this.aButton728 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_KEY_REPEAT", "Enable Canvas.keyRepeated(int)."));
         this.aButton728.setLayoutData(gridData);
         this.aButton728.setSelection(Settings.enableKeyRepeat);
-        (this.aButton732 = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
+        (this.aButton732 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
         this.aButton732.setLayoutData(gridData);
         this.aButton732.setSelection(Settings.ignoreFullScreen);
-        (this.aButton736 = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Network not available."));
+        (this.aButton736 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Network not available."));
         this.aButton736.setLayoutData(gridData);
         this.aButton736.setSelection(Settings.networkNotAvailable);
 
-        (this.synchronizeKeyEventsCheck = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
+        (this.synchronizeKeyEventsCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
         this.synchronizeKeyEventsCheck.setLayoutData(gridData);
         this.synchronizeKeyEventsCheck.setSelection(Settings.synchronizeKeyEvents);
 
-        (this.softkeyMotFixCheck = new Button(this.aGroup678, 32)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
+        (this.softkeyMotFixCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
         this.softkeyMotFixCheck.setLayoutData(gridData);
         this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
     }
 
     private void setupMediaComp() {
         (this.mediaComp = new Composite(this.tabFolder, 0)).setLayout(new GridLayout());
-        this.initMediaComp();
-    }
 
-    private void initMediaComp() {
         final GridData fill = new GridData();
         fill.horizontalAlignment = 4;
         fill.grabExcessHorizontalSpace = true;
         fill.grabExcessVerticalSpace = true;
         fill.verticalAlignment = 4;
+
         final GridData fillHor = new GridData();
         fillHor.horizontalAlignment = GridData.FILL;
         fillHor.grabExcessHorizontalSpace = true;
+
+        final GridData fillHor2 = new GridData();
+        fillHor2.horizontalAlignment = GridData.FILL;
+        fillHor2.grabExcessHorizontalSpace = true;
+
         mediaGroup = new Group(this.mediaComp, 0);
+        mediaGroup.setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
         mediaGroup.setLayout(new GridLayout());
         mediaGroup.setLayoutData(fill);
-        new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") + (System.getProperty("os.arch").equals("amd64") ? " (64-bit only)" : " (32-bit only)") + ":");
+
+        vmsCheck = new Button(mediaGroup, SWT.CHECK);
+        vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMidiSynth as MIDI device"));
+        vmsCheck.setLayoutData(fillHor);
+        vmsCheck.setSelection(Settings.searchVms);
+
+        new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") +
+                (System.getProperty("os.arch").equals("amd64") ? " (64-bit only)" : " (32-bit only)") + ":");
         vlcDirText = new Text(mediaGroup, SWT.DEFAULT);
         vlcDirText.setEditable(true);
         vlcDirText.setEnabled(true);
-        vlcDirText.setLayoutData(fillHor);
+        vlcDirText.setLayoutData(fillHor2);
         vlcDirText.setText(Settings.vlcDir);
     }
 
@@ -1809,7 +1875,7 @@ public final class Property implements IProperty {
         this.method420();
         (this.aCLabel642 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
         (this.aSpinner679 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
-        this.aSpinner679.setSelection(this.fontMediumSIze);
+        this.aSpinner679.setSelection(this.fontMediumSize);
         this.aSpinner679.addModifyListener(new Class187(this));
         this.method422();
         (this.aCLabel644 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));

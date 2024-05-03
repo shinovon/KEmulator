@@ -306,7 +306,7 @@ OPTION_NETWORK_PROXY_EMPTY=Пустой хост!
 OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
 
 OPTION_MEDIA_VLC_DIR=Путь к VLC
-
+OPTION_MEDIA_VMS=Использовать VirtualMIDISynth как MIDI устройство
 
 OPTION_M3G_LWJGL_SETTINGS=Настройки LWJGL
 OPTION_M3G_IGNORE_OVERWRITE=Игнорировать флаг OVERWRITE

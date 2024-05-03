@@ -1,5 +1,7 @@
 package emulator.media;
 
+import emulator.Settings;
+
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.sound.midi.*;
@@ -17,9 +19,11 @@ public class EmulatorMIDI {
     }
 
     static MidiDevice.Info getMidiDeviceInfo() throws MidiUnavailableException {
-        for (MidiDevice.Info info : midiDeviceInfo) {
-            if (info.getName().toLowerCase().contains("virtualmidisynth")) {
-                return info;
+        if(Settings.searchVms) {
+            for (MidiDevice.Info info : midiDeviceInfo) {
+                if (info.getName().toLowerCase().contains("virtualmidisynth")) {
+                    return info;
+                }
             }
         }
         return MidiSystem.getSynthesizer().getDeviceInfo();
@@ -58,10 +62,12 @@ public class EmulatorMIDI {
 
     public static void stop() {
         midiSequencer.stop();
-        midiSequencer.close();
-        midiDevice.close();
-        midiSequencer = null;
-        midiDevice = null;
+        if(Settings.reopenMidiDevice) {
+            midiSequencer.close();
+            midiDevice.close();
+            midiSequencer = null;
+            midiDevice = null;
+        }
     }
 
     public static void setMicrosecondPosition(long ms) {

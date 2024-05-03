@@ -947,7 +947,7 @@ public class Emulator {
         cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
         cmd.add("-cp");
         cmd.add(System.getProperty("java.class.path"));
-        cmd.add("-Xmx512M"); // FIXME
+        cmd.add("-Xmx" + Settings.xmx + "M"); // FIXME
 
         // start with debug server
         if (Settings.jdwpDebug) {
@@ -962,8 +962,11 @@ public class Emulator {
 
         cmd.add("emulator.Emulator");
         if (s == null) {
-            for (int i = 0; i < Emulator.commandLineArguments.length; ++i) {
-                cmd.add(Emulator.commandLineArguments[i]);
+            for (String a: Emulator.commandLineArguments) {
+                if(a.equals("-swt") || a.equals("-awt")
+                        || a.equals("-swerve") || a.equals("-lwj"))
+                    continue;
+                cmd.add(a);
             }
         } else if (s.endsWith(".jad")) {
             cmd.add("-jad");
