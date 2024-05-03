@@ -43,16 +43,22 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$[2024.05.01]
-Replace kemulator.cfg with midlets.txt
-Fix serviceRepaints inside of callSerially
+$v2.16 [2024.05.03]
+Fix MIDI players switching
+Fix resource: protocol handling
+Stub com.sprintpcs.util.System
 
-$[2024.04.30]
+$v2.16 [2024.05.01]
+Replace kemulator.cfg with midlets.txt (can be disabled with WriteKemulatorCfg)
+Fix serviceRepaints inside of callSerially
+Added -installed argument that moves user files to AppData
+
+$v2.16 [2024.04.30]
 M3G LWJGL: fixed Sprite3D alpha
 M3GView: even better controls, added fallback to pbuffer, show hidden nodes as red
 Updated lwjgl library to 2.9.4
 
-$[2024.04.29]
+$v2.16 [2024.04.29]
 M3G LWJGL: added settings, fixed SkinnedMesh rendering
 M3GView: new controls
 Fixed 3D engine choice saving
