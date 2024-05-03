@@ -209,10 +209,13 @@ public abstract class Screen extends Displayable {
     }
 
     protected void drawTitleBar(final Graphics graphics) {
+        String title = super.title;
+        if(title == null)
+            title = "";
         final int n;
         final String value = String.valueOf(n = ((selectedItem != null) ? (this.items.indexOf(selectedItem) + 1) : this.items.size()));
         final int n2 = (Screen.fontHeight4 >> 1) - 1;
-        final int stringWidth = Screen.font.stringWidth(super.title);
+        final int stringWidth = Screen.font.stringWidth(title);
         final int stringWidth2 = Screen.font.stringWidth(value);
         final int n3 = (super.w - stringWidth >> 1) + 2;
         final int n4 = super.w - stringWidth2 - 2;
@@ -221,7 +224,7 @@ public abstract class Screen extends Displayable {
         graphics.fillRect(n3 + stringWidth + 2, n2, n4 - n3 - stringWidth - 4, 2);
         graphics.setColor(-16777216);
         graphics.setFont(Screen.font);
-        graphics.drawString(super.title, n3, 1, 0);
+        graphics.drawString(title, n3, 1, 0);
         graphics.drawString(value, n4, 1, 0);
     }
 
