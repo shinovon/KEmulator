@@ -30,6 +30,7 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 public final class Emulator3D implements IGraphics3D {
 
     private static Emulator3D instance;
+    private LWJGLUtility memoryBuffers;
     private Object target;
     private boolean depthBufferEnabled;
     private int hints;
@@ -90,6 +91,8 @@ public final class Emulator3D implements IGraphics3D {
         properties.put("maxTransformsPerVertex", new Integer(MaxTransformsPerVertex));
         properties.put("numTextureUnits", new Integer(NumTextureUnits));
         properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
+
+        memoryBuffers = new LWJGLUtility();
     }
 
     public static Emulator3D getInstance() {
@@ -494,7 +497,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glDepthFunc(519);
             GL11.glDepthMask(false);
             GL11.glPixelZoom(var7, -var8);
-            ByteBuffer var15 = LWJGLUtility.getImageBuffer(var1.getImage().getImageData());
+            ByteBuffer var15 = memoryBuffers.getImageBuffer(var1.getImage().getImageData());
 
             for (int var16 = 0; var16 < var14; ++var16) {
                 for (int var17 = 0; var17 < var13; ++var17) {
@@ -512,19 +515,19 @@ public final class Emulator3D implements IGraphics3D {
 
     }
 
-    private static void setupCamera() {
+    private void setupCamera() {
         if (CameraCache.camera != null) {
             Transform tmpMat = new Transform();
 
             CameraCache.camera.getProjection(tmpMat);
             tmpMat.transpose();
             GL11.glMatrixMode(GL_PROJECTION);
-            GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+            GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
             tmpMat.set(CameraCache.invCam);
             tmpMat.transpose();
             GL11.glMatrixMode(GL_MODELVIEW);
-            GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+            GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
         }
     }
 
@@ -561,7 +564,7 @@ public final class Emulator3D implements IGraphics3D {
 
             GL11.glPushMatrix();
             GL11.glMatrixMode(GL_MODELVIEW);
-            GL11.glMultMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+            GL11.glMultMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
             int lightId = GL_LIGHT0 + usedLights;
             usedLights++;
@@ -569,9 +572,9 @@ public final class Emulator3D implements IGraphics3D {
             float[] lightColor = new float[] {0, 0, 0, 1}; //rgba
 
             //Set default light preferences?
-            GL11.glLight(lightId, GL_AMBIENT, LWJGLUtility.getFloatBuffer(lightColor));
-            GL11.glLight(lightId, GL_DIFFUSE, LWJGLUtility.getFloatBuffer(lightColor));
-            GL11.glLight(lightId, GL_SPECULAR, LWJGLUtility.getFloatBuffer(lightColor));
+            GL11.glLight(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
+            GL11.glLight(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
+            GL11.glLight(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
 
             GL11.glLightf(lightId, GL_CONSTANT_ATTENUATION, 1.0F);
             GL11.glLightf(lightId, GL_LINEAR_ATTENUATION, 0.0F);
@@ -586,7 +589,7 @@ public final class Emulator3D implements IGraphics3D {
                 tmpLightPos = LightsCache.LOCAL_ORIGIN;
             }
 
-            GL11.glLight(lightId, GL_POSITION, LWJGLUtility.getFloatBuffer(tmpLightPos));
+            GL11.glLight(lightId, GL_POSITION, memoryBuffers.getFloatBuffer(tmpLightPos));
 
             G3DUtils.fillFloatColor(lightColor, light.getColor());
             float lightIntensity = light.getIntensity();
@@ -598,14 +601,14 @@ public final class Emulator3D implements IGraphics3D {
             int lightMode = light.getMode();
 
             if(lightMode == Light.AMBIENT) {
-                GL11.glLight(lightId, GL_AMBIENT, LWJGLUtility.getFloatBuffer(lightColor));
+                GL11.glLight(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
             } else {
-                GL11.glLight(lightId, GL_DIFFUSE, LWJGLUtility.getFloatBuffer(lightColor));
-                GL11.glLight(lightId, GL_SPECULAR, LWJGLUtility.getFloatBuffer(lightColor));
+                GL11.glLight(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
+                GL11.glLight(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
             }
 
             if(lightMode == Light.SPOT) {
-                GL11.glLight(lightId, GL_SPOT_DIRECTION, LWJGLUtility.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
+                GL11.glLight(lightId, GL_SPOT_DIRECTION, memoryBuffers.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
                 GL11.glLightf(lightId, GL_SPOT_CUTOFF, light.getSpotAngle());
                 GL11.glLightf(lightId, GL_SPOT_EXPONENT, light.getSpotExponent());
             }
@@ -636,7 +639,7 @@ public final class Emulator3D implements IGraphics3D {
                 Transform tmpMat = new Transform();
                 tmpMat.set(trans);
                 tmpMat.transpose();
-                GL11.glMultMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+                GL11.glMultMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
             }
 
             setupAppearance(ap, false);
@@ -739,22 +742,22 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static void setupMaterial(Material mat) {
+    private void setupMaterial(Material mat) {
         if (mat != null) {
             GL11.glEnable(GL_LIGHTING);
             float[] tmpCol = new float[4];
 
             G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.AMBIENT));
-            GL11.glMaterial(GL_FRONT_AND_BACK, GL_AMBIENT, LWJGLUtility.getFloatBuffer(tmpCol));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_AMBIENT, memoryBuffers.getFloatBuffer(tmpCol));
 
             G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.DIFFUSE));
-            GL11.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, LWJGLUtility.getFloatBuffer(tmpCol));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, memoryBuffers.getFloatBuffer(tmpCol));
 
             G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.EMISSIVE));
-            GL11.glMaterial(GL_FRONT_AND_BACK, GL_EMISSION, LWJGLUtility.getFloatBuffer(tmpCol));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_EMISSION, memoryBuffers.getFloatBuffer(tmpCol));
 
             G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.SPECULAR));
-            GL11.glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, LWJGLUtility.getFloatBuffer(tmpCol));
+            GL11.glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, memoryBuffers.getFloatBuffer(tmpCol));
 
             GL11.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat.getShininess());
 
@@ -769,7 +772,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static void setupFog(Fog fog) {
+    private void setupFog(Fog fog) {
         if (fog != null && !Settings.xrayView) {
             GL11.glEnable(GL_FOG);
             GL11.glFogi(GL_FOG_MODE, fog.getMode() == Fog.LINEAR ? GL_LINEAR : GL_EXP);
@@ -777,7 +780,7 @@ public final class Emulator3D implements IGraphics3D {
             float[] fogColor = new float[4];
             G3DUtils.fillFloatColor(fogColor, fog.getColor());
             fogColor[3] = 1.0F;
-            GL11.glFog(GL_FOG_COLOR, LWJGLUtility.getFloatBuffer(fogColor));
+            GL11.glFog(GL_FOG_COLOR, memoryBuffers.getFloatBuffer(fogColor));
 
             GL11.glFogf(GL_FOG_START, fog.getNearDistance());
             GL11.glFogf(GL_FOG_END, fog.getFarDistance());
@@ -797,7 +800,7 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnableClientState(GL_COLOR_ARRAY);
             if (colors.getComponentType() == 1) {
                 byte[] colorsBArr = colors.getByteValues();
-                GL11.glColorPointer(alphaFactor == 1.0F ? colors.getComponentCount() : 4, 5121, 0, LWJGLUtility.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount()));
+                GL11.glColorPointer(alphaFactor == 1.0F ? colors.getComponentCount() : 4, 5121, 0, memoryBuffers.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount()));
             }
         }
 
@@ -806,9 +809,9 @@ public final class Emulator3D implements IGraphics3D {
             GL11.glEnableClientState(GL_NORMAL_ARRAY);
             glEnable(GL_NORMALIZE);
             if (normals.getComponentType() == 1) {
-                GL11.glNormalPointer(0, LWJGLUtility.getNormalBuffer(normals.getByteValues()));
+                GL11.glNormalPointer(0, memoryBuffers.getNormalBuffer(normals.getByteValues()));
             } else {
-                GLExtensions.glNormalPointer(0, LWJGLUtility.getNormalBuffer(normals.getShortValues()));
+                GLExtensions.glNormalPointer(0, memoryBuffers.getNormalBuffer(normals.getShortValues()));
             }
         } else {
             GL11.glDisableClientState(GL_NORMAL_ARRAY);
@@ -819,10 +822,10 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glEnableClientState(GL_VERTEX_ARRAY);
         if (positions.getComponentType() == 1) {
             byte[] posesBArr = positions.getByteValues();
-            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesBArr));
+            GL11.glVertexPointer(positions.getComponentCount(), 0, memoryBuffers.getVertexBuffer(posesBArr));
         } else {
             short[] posesSArr = positions.getShortValues();
-            GL11.glVertexPointer(positions.getComponentCount(), 0, LWJGLUtility.getVertexBuffer(posesSArr));
+            GL11.glVertexPointer(positions.getComponentCount(), 0, memoryBuffers.getVertexBuffer(posesSArr));
         }
 
         GL11.glMatrixMode(GL_MODELVIEW);
@@ -887,7 +890,7 @@ public final class Emulator3D implements IGraphics3D {
                 float[] blendColor = new float[4];
                 G3DUtils.fillFloatColor(blendColor, texture2D.getBlendColor());
                 blendColor[3] = 1.0F;
-                GL11.glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, LWJGLUtility.getFloatBuffer(blendColor));
+                GL11.glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, memoryBuffers.getFloatBuffer(blendColor));
 
                 if(!image2D.isLoaded()) {
                     image2D.setLoaded(true);
@@ -917,7 +920,7 @@ public final class Emulator3D implements IGraphics3D {
                     GL11.glTexImage2D(GL_TEXTURE_2D, 0,
                             texFormat, image2D.getWidth(), image2D.getHeight(), 0,
                             texFormat, GL_UNSIGNED_BYTE,
-                            LWJGLUtility.getImageBuffer(image2D.getImageData())
+                            memoryBuffers.getImageBuffer(image2D.getImageData())
                     );
                 }
 
@@ -971,9 +974,9 @@ public final class Emulator3D implements IGraphics3D {
 
                 ShortBuffer texCoordBuffer;
                 if (texCoords.getComponentType() == 1) {
-                    texCoordBuffer = LWJGLUtility.getTexCoordBuffer(texCoords.getByteValues(), i);
+                    texCoordBuffer = memoryBuffers.getTexCoordBuffer(texCoords.getByteValues(), i);
                 } else {
-                    texCoordBuffer = LWJGLUtility.getTexCoordBuffer(texCoords.getShortValues(), i);
+                    texCoordBuffer = memoryBuffers.getTexCoordBuffer(texCoords.getShortValues(), i);
                 }
                 GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, texCoordBuffer);
 
@@ -983,14 +986,14 @@ public final class Emulator3D implements IGraphics3D {
                 tmpMat.transpose();
 
                 GL11.glMatrixMode(GL_TEXTURE);
-                GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+                GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
                 GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
                 GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
             }
 
             for (int i = 0; i < stripCount; ++i) {
                 int[] indexStrip = triangleStripArray.getIndexStrip(i);
-                GL11.glDrawElements(GL_TRIANGLE_STRIP, LWJGLUtility.getElementsBuffer(indexStrip));
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
             }
 
             for (int i = 0; i < NumTextureUnits; ++i) {
@@ -1011,7 +1014,7 @@ public final class Emulator3D implements IGraphics3D {
             //xray
             for (int i = 0; i < stripCount; ++i) {
                 int[] indexStrip = triangleStripArray.getIndexStrip(i);
-                GL11.glDrawElements(GL_TRIANGLE_STRIP, LWJGLUtility.getElementsBuffer(indexStrip));
+                GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
             }
         }
 
@@ -1182,11 +1185,11 @@ public final class Emulator3D implements IGraphics3D {
                     var6.transpose();
                     GL11.glViewport(var23, targetHeight - var24 - var26, var25, var26);
                     GL11.glMatrixMode(5889);
-                    GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
+                    GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
                     GL11.glMatrixMode(5888);
-                    GL11.glLoadMatrix(LWJGLUtility.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
+                    GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
                     GL11.glDisable(2896);
-                    var27 = LWJGLUtility.getImageBuffer(var1.getImage().getImageData());
+                    var27 = memoryBuffers.getImageBuffer(var1.getImage().getImageData());
                     GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
                     GL11.glPixelStorei(3314, var1.getImage().getWidth());
                     GL11.glPixelStorei(3315, var21[1]);
