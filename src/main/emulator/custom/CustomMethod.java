@@ -162,7 +162,7 @@ public class CustomMethod {
 
     public static void close() {
         try {
-            Emulator3D.getInstance().releaseTextures();
+            Emulator3D.exit();
         } catch (Throwable ignored) {}
         if (trackWriter != null) {
             try {

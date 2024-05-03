@@ -2,6 +2,7 @@ package emulator.graphics3D.lwjgl;
 
 import emulator.graphics3D.*;
 
+import java.awt.*;
 import java.util.*;
 
 import emulator.*;
@@ -19,6 +20,7 @@ import java.awt.image.*;
 import java.nio.*;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
+import javax.swing.*;
 
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
@@ -65,6 +67,11 @@ public final class Emulator3D implements IGraphics3D {
     private String contextRes;
     private Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
     private boolean printed;
+    private boolean useDisplay;
+    private boolean useWgl;
+
+    private JFrame tmpFrame;
+    private Canvas tmpCanvas;
 
     private Emulator3D() {
         instance = this;
@@ -115,7 +122,7 @@ public final class Emulator3D implements IGraphics3D {
         return pixelFormat;
     }
 
-    public final void bindTarget(Object target) {
+    public synchronized final void bindTarget(Object target) {
         if(exiting) {
             throw new IllegalStateException("exiting");
         }
@@ -136,27 +143,49 @@ public final class Emulator3D implements IGraphics3D {
         }
 
         try {
-            try {
-                String s = w + "x" + h;
+            String s = w + "x" + h;
+            if(useDisplay) {
                 if(contextRes != null && !contextRes.equals(s)) {
-                    releaseTextures();
-                    exiting = false;
-                    pbufferContext = null;
+                    tmpCanvas.setBounds(0, 0, w, h);
                 }
-                if (pbufferContext == null) {
-                    pbufferContext = new Pbuffer(w, h, pixelFormat(), null, null);
-                    contextRes = s;
-                }
-
-                pbufferContext.makeCurrent();
-            } catch (Exception e) {
-                if (Emulator.isX64()) throw e;
+                contextRes = s;
+                Display.makeCurrent();
+            } else if(useWgl) {
+                bindWgl(w, h);
+            } else {
                 try {
-                    this.method499(w, h);
-                } catch (Throwable e2) {
-                    e2.printStackTrace();
-                    this.target = null;
-                    return;
+                    if (contextRes != null && !contextRes.equals(s)) {
+                        releaseTextures();
+                        pbufferContext = null;
+                    }
+                    if (pbufferContext == null) {
+                        pbufferContext = new Pbuffer(w, h, pixelFormat(), null);
+                        contextRes = s;
+                    }
+
+                    pbufferContext.makeCurrent();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    try {
+                        // мега костыль
+                        System.out.println("using lwjgl display");
+                        tmpFrame = new JFrame();
+                        tmpCanvas = new Canvas();
+                        tmpCanvas.setBounds(0, 0, w, h);
+                        tmpFrame.add(tmpCanvas);
+                        tmpFrame.pack();
+                        tmpFrame.setVisible(true);
+
+                        Display.setParent(tmpCanvas);
+                        tmpFrame.setVisible(false);
+                        Display.create(pixelFormat());
+
+                        useDisplay = true;
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                        if (Emulator.isX64()) throw e2;
+                        bindWgl(w, h);
+                    }
                 }
             }
             printGLInfo();
@@ -182,7 +211,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    public final void releaseTarget() {
+    public synchronized void releaseTarget() {
         GL11.glFinish();
         this.method503();
 
@@ -192,6 +221,7 @@ public final class Emulator3D implements IGraphics3D {
         if(exiting) {
             while (!usedGLTextures.isEmpty())
                 releaseTexture(usedGLTextures.get(0));
+            return;
         }
 
         this.target = null;
@@ -206,11 +236,11 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static boolean useGL11() {
-        return pbufferContext == null;
+    private boolean useGL11() {
+        return useWgl;
     }
 
-    private void method499(int var1, int var2) {
+    private void bindWgl(int var1, int var2) {
         if (this.swtImage == null || this.swtImage.getBounds().width != var1 || this.swtImage.getBounds().height != var2) {
             if (this.swtImage != null) {
                 this.swtImage.dispose();
@@ -239,6 +269,7 @@ public final class Emulator3D implements IGraphics3D {
                 throw new IllegalArgumentException();
             }
         }
+        useWgl = true;
     }
 
     private void printGLInfo() {
@@ -253,6 +284,12 @@ public final class Emulator3D implements IGraphics3D {
         try {
             Emulator.getPlatform().releaseGLContext(this.swtGC.handle);
         } catch (Throwable ignored) {}
+        if(useDisplay) {
+            try {
+                Display.releaseContext();
+            } catch (Exception ignored) {}
+            return;
+        }
         try {
             GLContext.useContext(null);
         } catch (Exception ignored) {}
@@ -491,7 +528,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private static void setupLights(Vector lights, Vector lightMats, int scope) {
+    private void setupLights(Vector lights, Vector lightMats, int scope) {
         for (int i = 0; i < MaxLights; ++i) {
             GL11.glDisable(GL_LIGHT0 + i);
         }
@@ -987,7 +1024,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    public final void render(World var1) {
+    public synchronized void render(World var1) {
         Transform var2 = new Transform();
         this.clearBackgound(var1.getBackground());
         var1.getActiveCamera().getTransformTo(var1, var2);
@@ -997,7 +1034,7 @@ public final class Emulator3D implements IGraphics3D {
         this.method519();
     }
 
-    public final void render(Node var1, Transform var2) {
+    public synchronized void render(Node var1, Transform var2) {
         RenderPipe.getInstance().pushRenderNode(var1, var2);
         this.method519();
     }
@@ -1212,19 +1249,34 @@ public final class Emulator3D implements IGraphics3D {
         image2D.setId(0);
     }
 
-    public void releaseTextures() {
-        // TODO
-        if(pbufferContext == null || exiting) return;
-        exiting = true;
-        try {
-            // try to make context current
-            pbufferContext.makeCurrent();
+    public synchronized void releaseTextures() {
+        while (!usedGLTextures.isEmpty()) releaseTexture(usedGLTextures.get(0));
+        while (!unusedGLTextures.isEmpty()) releaseTexture(unusedGLTextures.get(0));
+    }
 
-            while (!usedGLTextures.isEmpty()) releaseTexture(usedGLTextures.get(0));
-            while (!unusedGLTextures.isEmpty()) releaseTexture(unusedGLTextures.get(0));
-
-            pbufferContext.destroy();
-        } catch (Exception ignored) {}
+    public static void exit() {
+        if(instance == null)
+            return;
+        Emulator3D inst = instance;
+        if ((inst.useDisplay && pbufferContext == null) || inst.exiting) return;
+        inst.exiting = true;
+        synchronized (inst) {
+            if (inst.useDisplay) {
+                try {
+                    Display.makeCurrent();
+                    inst.releaseTextures();
+                    Display.destroy();
+                } catch (Exception ignored) {}
+                return;
+            }
+            try {
+                // try to make context current
+                pbufferContext.makeCurrent();
+                inst.releaseTextures();
+                pbufferContext.destroy();
+                pbufferContext = null;
+            } catch (Exception ignored) {}
+        }
     }
 
     public void invalidateTexture(Image2D image2D) {
