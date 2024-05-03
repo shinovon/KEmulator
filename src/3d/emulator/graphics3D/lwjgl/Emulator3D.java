@@ -932,7 +932,7 @@ public final class Emulator3D implements IGraphics3D {
                 GL11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
                 GL11.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-                IntBuffer texCoordBuffer;
+                ShortBuffer texCoordBuffer;
                 if (texCoords.getComponentType() == 1) {
                     texCoordBuffer = LWJGLUtility.getTexCoordBuffer(texCoords.getByteValues(), i);
                 } else {

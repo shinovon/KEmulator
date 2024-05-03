@@ -8,16 +8,41 @@ public final class LWJGLUtility {
     private static ByteBuffer normalByteBuffer;
     private static ShortBuffer normalShortBuffer;
     private static ByteBuffer colorBuffer;
-    private static ByteBuffer imageBuffer;
-    private static IntBuffer vertexByteBuffer;
     private static ShortBuffer vertexShortBuffer;
-    private static final IntBuffer[] texCoordsBuffer = new IntBuffer[Emulator3D.NumTextureUnits];
+    private static ShortBuffer[] texCoordsBuffer = new ShortBuffer[Emulator3D.NumTextureUnits];
     private static IntBuffer elementsBuffer;
+
+    private static ByteBuffer imageBuffer;
     private static FloatBuffer floatBuffer;
+
+    static {
+        final int initVerticesCount = 1024 * 4;
+
+        normalByteBuffer = BufferUtils.createByteBuffer(initVerticesCount * 3);
+        normalShortBuffer = BufferUtils.createShortBuffer(initVerticesCount * 3);
+
+        colorBuffer = BufferUtils.createByteBuffer(initVerticesCount * 4);
+
+        vertexShortBuffer = BufferUtils.createShortBuffer(initVerticesCount * 3);
+
+        for (int slot = 0; slot < Emulator3D.NumTextureUnits; slot++) {
+            texCoordsBuffer[slot] = BufferUtils.createShortBuffer(initVerticesCount * 2);
+        }
+
+        final int initPolyCount = 1024;
+
+        elementsBuffer = BufferUtils.createIntBuffer(initPolyCount * 3);
+
+        final int initTextureSize = 512;
+
+        imageBuffer = BufferUtils.createByteBuffer(initTextureSize * initTextureSize * 4);
+
+        floatBuffer = BufferUtils.createFloatBuffer(16); //should be enough for matrices and stuff
+    }
 
     public static ByteBuffer getNormalBuffer(byte[] var0) {
         if(normalByteBuffer == null || normalByteBuffer.capacity() < var0.length) {
-            normalByteBuffer = BufferUtils.createByteBuffer(var0.length);
+            normalByteBuffer = BufferUtils.createByteBuffer(var0.length * 4 / 3);
         }
 
         normalByteBuffer.position(normalByteBuffer.capacity() - var0.length);
@@ -28,7 +53,7 @@ public final class LWJGLUtility {
 
     public static ShortBuffer getNormalBuffer(short[] var0) {
         if (normalShortBuffer == null || normalShortBuffer.capacity() < var0.length) {
-            normalShortBuffer = BufferUtils.createShortBuffer(var0.length);
+            normalShortBuffer = BufferUtils.createShortBuffer(var0.length * 4 / 3);
         }
 
         normalShortBuffer.position(normalShortBuffer.capacity() - var0.length);
@@ -43,7 +68,7 @@ public final class LWJGLUtility {
 
     public static ByteBuffer getImageBuffer(byte[] var0) {
         if(imageBuffer == null || imageBuffer.capacity() < var0.length) {
-            imageBuffer = BufferUtils.createByteBuffer(var0.length);
+            imageBuffer = BufferUtils.createByteBuffer(var0.length * 4 / 3);
         }
 
         imageBuffer.position(imageBuffer.capacity() - var0.length);
@@ -52,26 +77,26 @@ public final class LWJGLUtility {
         return imageBuffer;
     }
 
-    public static IntBuffer getVertexBuffer(byte[] var0) {
-        if(vertexByteBuffer == null || vertexByteBuffer.capacity() < var0.length) {
-            vertexByteBuffer = BufferUtils.createIntBuffer(var0.length);
+    public static ShortBuffer getVertexBuffer(byte[] var0) {
+        if(vertexShortBuffer == null || vertexShortBuffer.capacity() < var0.length) {
+            vertexShortBuffer = BufferUtils.createShortBuffer(var0.length * 4 / 3);
         }
 
-        vertexByteBuffer.position(vertexByteBuffer.capacity() - var0.length);
+        vertexShortBuffer.position(vertexShortBuffer.capacity() - var0.length);
         int var1 = 0;
         int var2 = var0.length;
 
         while(var1 < var2) {
-            vertexByteBuffer.put(var0[var1++]);
+            vertexShortBuffer.put(var0[var1++]);
         }
 
-        vertexByteBuffer.position(vertexByteBuffer.capacity() - var0.length);
-        return vertexByteBuffer;
+        vertexShortBuffer.position(vertexShortBuffer.capacity() - var0.length);
+        return vertexShortBuffer;
     }
 
     public static ShortBuffer getVertexBuffer(short[] var0) {
         if(vertexShortBuffer == null || vertexShortBuffer.capacity() < var0.length) {
-            vertexShortBuffer = BufferUtils.createShortBuffer(var0.length);
+            vertexShortBuffer = BufferUtils.createShortBuffer(var0.length * 4 / 3);
         }
 
         vertexShortBuffer.position(vertexShortBuffer.capacity() - var0.length);
@@ -83,7 +108,7 @@ public final class LWJGLUtility {
     public static ByteBuffer getColorBuffer(byte[] var0, float var1, int var2) {
         int var3 = var1 == 1.0F?var0.length:4 * var2;
         if(colorBuffer == null || colorBuffer.capacity() < var3) {
-            colorBuffer = BufferUtils.createByteBuffer(var3);
+            colorBuffer = BufferUtils.createByteBuffer(var3 * 4 / 3);
         }
 
         colorBuffer.position(colorBuffer.capacity() - var3);
@@ -118,7 +143,7 @@ public final class LWJGLUtility {
 
     public static IntBuffer getElementsBuffer(int[] var0) {
         if(elementsBuffer == null || elementsBuffer.capacity() < var0.length) {
-            elementsBuffer = BufferUtils.createIntBuffer(var0.length);
+            elementsBuffer = BufferUtils.createIntBuffer(var0.length * 4 / 3);
         }
 
         elementsBuffer.position(elementsBuffer.capacity() - var0.length);
@@ -127,11 +152,11 @@ public final class LWJGLUtility {
         return elementsBuffer;
     }
 
-    public static IntBuffer getTexCoordBuffer(short[] var0, int idx) {
+    public static ShortBuffer getTexCoordBuffer(short[] var0, int idx) {
         if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
-            texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
+            texCoordsBuffer[idx] = BufferUtils.createShortBuffer(var0.length * 4 / 3);
         }
-        IntBuffer buf = texCoordsBuffer[idx];
+        ShortBuffer buf = texCoordsBuffer[idx];
 
         buf.position(buf.capacity() - var0.length);
         int var1 = 0;
@@ -145,11 +170,11 @@ public final class LWJGLUtility {
         return buf;
     }
 
-    public static IntBuffer getTexCoordBuffer(byte[] var0, int idx) {
+    public static ShortBuffer getTexCoordBuffer(byte[] var0, int idx) {
         if(texCoordsBuffer[idx] == null || texCoordsBuffer[idx].capacity() < var0.length) {
-            texCoordsBuffer[idx] = BufferUtils.createIntBuffer(var0.length);
+            texCoordsBuffer[idx] = BufferUtils.createShortBuffer(var0.length * 4 / 3);
         }
-        IntBuffer buf = texCoordsBuffer[idx];
+        ShortBuffer buf = texCoordsBuffer[idx];
 
         buf.position(buf.capacity() - var0.length);
         int var1 = 0;
@@ -165,7 +190,7 @@ public final class LWJGLUtility {
 
     public static FloatBuffer getFloatBuffer(float[] var0) {
         if(floatBuffer == null || floatBuffer.capacity() < var0.length) {
-            floatBuffer = BufferUtils.createFloatBuffer(var0.length);
+            floatBuffer = BufferUtils.createFloatBuffer(var0.length * 4 / 3);
         }
 
         floatBuffer.position(floatBuffer.capacity() - var0.length);
