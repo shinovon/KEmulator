@@ -62,7 +62,10 @@ public class EmulatorMIDI {
 
     public static void stop() {
         midiSequencer.stop();
-        if(Settings.reopenMidiDevice) {
+    }
+
+    public static void close() {
+        if(Settings.reopenMidiDevice && midiSequencer != null) {
             midiSequencer.close();
             midiDevice.close();
             midiSequencer = null;

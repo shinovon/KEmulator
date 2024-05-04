@@ -282,6 +282,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         if (sequence instanceof Player) {
             ((Player) sequence).close();
         }
+        if(sequence instanceof Sequence) {
+            EmulatorMIDI.close();
+        }
         if (dataSource != null && !dataSourceDisconnected) {
             dataSource.disconnect();
             dataSourceDisconnected = true;
@@ -520,17 +523,20 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         if (state == CLOSED) {
             throw new IllegalStateException();
         }
-        if(state < PREFETCHED && sequence instanceof Sequence) {
+        boolean midi = sequence instanceof Sequence;
+        if(state < PREFETCHED && midi) {
             prefetch();
         }
         if (state != STARTED) {
             if (sequence != null) {
-                if (sequence instanceof Sequence && midiPlaying && EmulatorMIDI.currentPlayer != this && EmulatorMIDI.currentPlayer != null) {
-                    try {
-                        EmulatorMIDI.currentPlayer.stop();
-                    } catch (Exception ignored) {
+                if (midi && EmulatorMIDI.currentPlayer != null) {
+                    if(midiPlaying && EmulatorMIDI.currentPlayer != this) {
+                        try {
+                            EmulatorMIDI.currentPlayer.stop();
+                        } catch (Exception ignored) {}
+//                        throw new MediaException("MIDI is currently playing");
                     }
-//					throw new MediaException("MIDI is currently playing");
+                    EmulatorMIDI.close();
                 }
                 if (complete) {
                     setMediaTime(0);
