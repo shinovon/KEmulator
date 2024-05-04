@@ -1448,7 +1448,6 @@ public final class EmulatorScreen implements
     }
 
     private void updatePauseState() {
-        System.out.println("updatePauseState");
         this.suspendMenuItem.setEnabled(this.pauseState == 1);
         this.resumeMenuItem.setEnabled(this.pauseState == 2);
         this.restartMenuItem.setEnabled(this.pauseState != 0);

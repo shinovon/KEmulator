@@ -91,4 +91,5 @@ public final class Settings {
     public static boolean searchVms;
 
     public static int xmx = 512;
+    public static boolean asmSkipDebug;
 }

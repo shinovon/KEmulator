@@ -24,7 +24,7 @@ public final class h {
                 final InputStream method592 = method592((String) Emulator.jarClasses.get(i));
                 final ClassReader classReader = new ClassReader(method592);
                 final ClassNode classNode = new ClassNode();
-                classReader.accept((ClassVisitor) classNode, 0);
+                classReader.accept((ClassVisitor) classNode, Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
                 method592.close();
                 for (Object o : classNode.methods) {
                     final MethodInfo methodInfo = new MethodInfo(classNode, (MethodNode) o);
@@ -33,7 +33,7 @@ public final class h {
             }
             for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
                 final InputStream method593 = method592((String) Emulator.jarClasses.get(j));
-                new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), 0);
+                new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
                 method593.close();
             }
         } catch (Exception ex2) {
@@ -60,11 +60,11 @@ public final class h {
         }
     }
 
-    static final class TraceClassAdapter extends ClassAdapter implements Opcodes {
+    static final class TraceClassAdapter extends ClassVisitor implements Opcodes {
         private String aString1366;
 
         public TraceClassAdapter(final ClassVisitor classVisitor) {
-            super(classVisitor);
+            super(Opcodes.ASM4, classVisitor);
         }
 
         public final void visit(final int n, final int n2, final String aString1366, final String s, final String s2, final String[] array) {
@@ -126,7 +126,7 @@ public final class h {
             this.classNode = aClassNode1169;
             this.methodNode = aMethodNode1170;
             this.aString1181 = method703(this.methodNode);
-            this.anInt1173 = this.methodNode.codeLength;
+            this.anInt1173 = this.methodNode.instructions.size();
             this.refCount = 0;
             this.aString1172 = this.classNode.name.replace('/', '.');
             this.aString1177 = this.methodNode.name;
@@ -154,7 +154,7 @@ public final class h {
             String s = "\nname      : " + this.methodNode.name + "\nsignature : " + this.methodNode.signature + "\naccess    : " + getAccess(this.methodNode.access) + "\ndesc      : " + this.methodNode.desc + "\nmaxStack  : " + this.methodNode.maxStack + "\nmaxLocals : " + this.methodNode.maxLocals + "\n";
             if (this.methodNode.exceptions != null && this.methodNode.exceptions.size() > 0) {
                 StringBuilder s2 = new StringBuilder(s + "\nExceptions: " + this.methodNode.exceptions.size());
-                final Iterator<Object> iterator = this.methodNode.exceptions.iterator();
+                final Iterator iterator = this.methodNode.exceptions.iterator();
                 while (iterator.hasNext()) {
                     s2.append("\n\t").append(iterator.next());
                 }

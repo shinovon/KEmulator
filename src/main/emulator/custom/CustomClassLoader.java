@@ -21,7 +21,7 @@ public final class CustomClassLoader extends ClassLoader {
                 return super.loadClass(s, b);
             } catch (ClassNotFoundException ex) {
                 final Class method806;
-                if ((method806 = this.method806(s)) == null) {
+                if ((method806 = this.loadLibraryClass(s)) == null) {
                     throw ex;
                 }
                 return method806;
@@ -34,7 +34,7 @@ public final class CustomClassLoader extends ClassLoader {
         return class1;
     }
 
-    private Class method806(final String s) {
+    private Class loadLibraryClass(final String s) {
         Class<?> defineClass = null;
         try {
             for (int i = 0; i < Emulator.jarLibrarys.size(); ++i) {
@@ -43,7 +43,7 @@ public final class CustomClassLoader extends ClassLoader {
                 if ((entry = (zipFile = new ZipFile((String) Emulator.jarLibrarys.get(i))).getEntry(s.replace('.', '/') + ".class")) != null) {
                     final ClassReader classReader = new ClassReader(zipFile.getInputStream(entry));
                     final ClassWriter classWriter = new ClassWriter(0);
-                    classReader.accept(new ClassAdapter(classWriter), 0);
+                    classReader.accept(new ClassVisitor(Opcodes.ASM4, classWriter) {}, Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
                     final byte[] byteArray = classWriter.toByteArray();
                     defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
                 }
@@ -57,31 +57,50 @@ public final class CustomClassLoader extends ClassLoader {
     protected final Class findClass(final String s) throws ClassNotFoundException {
         Class<?> defineClass;
         try {
-            InputStream inputStream;
-            if (Emulator.midletJar == null) {
-                final File fileFromClassPath;
-                if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
-                    return super.findClass(s);
-                }
-                inputStream = new FileInputStream(fileFromClassPath);
-            } else {
-                final ZipFile zipFile;
-                final ZipEntry entry;
-                if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(s.replace('.', '/') + ".class")) == null) {
-                    return super.findClass(s);
-                }
-                inputStream = zipFile.getInputStream(entry);
+            byte[] bytes;
+            try {
+                bytes = load(s);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                if(Settings.asmSkipDebug) throw e;
+                System.out.println("skipping debug");
+                Settings.asmSkipDebug = true;
+                bytes = load(s);
             }
-            final ClassReader classReader = new ClassReader(inputStream);
-            final ClassWriter classWriter = new ClassWriter(0);
-            classReader.accept(new CustomClassAdapter(classWriter, s), 0);
-            final byte[] byteArray = classWriter.toByteArray();
-            defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
-        } catch (Exception ex2) {
-            //ex2.printStackTrace();
+            defineClass = this.defineClass(s, bytes, 0, bytes.length);
+        } catch (ClassNotFoundException e) {
+            return super.findClass(s);
+        } catch (Exception e) {
+            e.printStackTrace();
             return super.findClass(s);
         }
         return defineClass;
+    }
+
+    private byte[] load(String s) throws Exception {
+        InputStream inputStream;
+        if (Emulator.midletJar == null) {
+            final File fileFromClassPath;
+            if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
+                throw new ClassNotFoundException();
+            }
+            inputStream = new FileInputStream(fileFromClassPath);
+        } else {
+            final ZipFile zipFile;
+            final ZipEntry entry;
+            if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(s.replace('.', '/') + ".class")) == null) {
+                throw new ClassNotFoundException();
+            }
+            inputStream = zipFile.getInputStream(entry);
+        }
+
+        final ClassReader classReader = new ClassReader(inputStream);
+        final ClassWriter classWriter = new ClassWriter(0);
+        try {
+            classReader.accept(new CustomClassAdapter(classWriter, s), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+        } finally {
+            inputStream.close();
+        }
+        return classWriter.toByteArray();
     }
 
     public final InputStream getResourceAsStream(final String s) {

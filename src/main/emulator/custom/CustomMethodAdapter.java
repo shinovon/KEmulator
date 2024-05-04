@@ -3,7 +3,7 @@ package emulator.custom;
 import org.objectweb.asm.*;
 import emulator.*;
 
-public final class CustomMethodAdapter extends MethodAdapter implements Opcodes {
+public final class CustomMethodAdapter extends MethodVisitor implements Opcodes {
     private int anInt1185;
     private String className;
     private String methodName;
@@ -154,7 +154,7 @@ public final class CustomMethodAdapter extends MethodAdapter implements Opcodes 
     }
 
     public CustomMethodAdapter(final MethodVisitor methodVisitor, final String aString1186, final String s, final String aString1187) {
-        super(methodVisitor);
+        super(Opcodes.ASM4, methodVisitor);
         this.anInt1185 = 0;
         this.className = aString1186;
         this.methodName = s;

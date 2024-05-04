@@ -23,8 +23,7 @@ final class HttpConnectionImpl implements HttpConnection {
 				Emulator.getEmulator().getLogStream().println("update Connect to: " + s2);
 				(this.connection = (HttpURLConnection) new URL(s2).openConnection()).setDoInput(true);
 				this.connection.setDoOutput(true);
-			} catch (IOException ignored) {
-			}
+			} catch (IOException ignored) {}
 		}
 	}
 
@@ -84,28 +83,21 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final void setRequestProperty(final String s, final String s2) throws IOException {
-		//System.out.println("setRequestProperty " + s +": " + s2);
 		if (s.equalsIgnoreCase("User-Agent")) {
-			setua(s2);
+			if(s2 != null && s2.length() > 0) {
+				String x = null;
+				DevicePlatform c = Devices.getPlatform(Emulator.deviceName);
+				if(c.exists("SW_PLATFORM") || c.exists("SW_PLATFORM_VERSION"))  {
+					x = "UNTRUSTED/1.0";
+				}
+				connection.setRequestProperty("User-Agent", s2 + (x == null ? "" : (" " + x)));
+			}
 			return;
 		}
 		if (s.equalsIgnoreCase("X-Online-Host")) {
-			this.method134(s2);
-			//this.connection.setRequestProperty("Host", s2);
-			//return;
+			method134(s2);
 		}
-		this.connection.setRequestProperty(s, s2);
-	}
-
-	private void setua(String s2) {
-		if(s2 != null && s2.length() > 0) {
-			String x = null;
-        	DevicePlatform c = Devices.getPlatform(Emulator.deviceName);
-        	if(c.exists("SW_PLATFORM") || c.exists("SW_PLATFORM_VERSION"))  {
-        		x = "UNTRUSTED/1.0";
-        	}
-    		this.connection.setRequestProperty("User-Agent", s2 + (x == null ? "" : (" " + x)));
-		}
+		connection.setRequestProperty(s, s2);
 	}
 
 	public final int getResponseCode() throws IOException {
@@ -206,10 +198,10 @@ final class HttpConnectionImpl implements HttpConnection {
 		try {
 			if (getRequestProperty("User-Agent") == null) {
 				if (Emulator.httpUserAgent != null) {
-					connection.setRequestProperty("User-Agent", 
+					connection.setRequestProperty("User-Agent",
 							Emulator.httpUserAgent);
 				} else {
-					connection.setRequestProperty("User-Agent", 
+					connection.setRequestProperty("User-Agent",
 							Emulator.deviceName + " (KEmulator/" + Emulator.version + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
 				}
 			}
@@ -224,7 +216,6 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
-		//System.out.println(Arrays.toString(connection.getRequestProperties().entrySet().toArray()));
 		setUserAgent();
 		if (this.closed) {
 			throw new IOException();

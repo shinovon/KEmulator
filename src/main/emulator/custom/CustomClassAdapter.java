@@ -4,7 +4,7 @@ import emulator.Emulator;
 import emulator.Settings;
 import org.objectweb.asm.*;
 
-public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
+public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
     private String className;
 
     public final MethodVisitor visitMethod(int acc, final String name, String desc, final String sign, final String[] array) {
@@ -43,7 +43,7 @@ public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
     }
 
     public CustomClassAdapter(final ClassVisitor classVisitor, final String aString1165) {
-        super(classVisitor);
+        super(Opcodes.ASM4, classVisitor);
         this.className = aString1165;
     }
 
@@ -65,6 +65,8 @@ public final class CustomClassAdapter extends ClassAdapter implements Opcodes {
             s4 = "Lemulator/custom/subclass/SubTimerTask;";
         } else {
             if (!s2.equals("Ljava/util/Timer;")) {
+//                if(className.equals("AppTHQwale"))
+//                    System.out.println(s + " " + s2 + " " + s3 + " " + o);
                 return super.visitField(n, s, s2, s3, o);
             }
             s4 = "Lemulator/custom/subclass/Timer;";
