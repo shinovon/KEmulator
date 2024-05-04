@@ -58,7 +58,12 @@ public class CustomMethod {
         } else if (prop.equalsIgnoreCase("kemulator.threadtrace")) {
             b = false;
             res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
-        } else if (prop.equalsIgnoreCase("com.nokia.mid.imei") || prop.equalsIgnoreCase("com.nokia.imei") || prop.equalsIgnoreCase("device.imei")) {
+        } else if (prop.equalsIgnoreCase("com.nokia.mid.imei") ||
+                prop.equalsIgnoreCase("com.nokia.imei") ||
+                prop.equalsIgnoreCase("device.imei") ||
+                prop.equalsIgnoreCase("phone.imei") ||
+                prop.equalsIgnoreCase("com.sonyericsson.imei") ||
+                prop.equalsIgnoreCase("com.samsung.imei")) {
             res = Permission.askIMEI();
         } else if (prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
             res = String.valueOf(Manager.isLibVlcSupported());
