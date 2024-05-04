@@ -609,7 +609,7 @@ public final class Property implements IProperty {
             // media
             Settings.vlcDir = properties.getProperty("VlcDir", "");
             Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
-            Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "true"));
+            Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "false"));
 
             // jvm
             Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -1705,11 +1705,6 @@ public final class Property implements IProperty {
         mediaGroup.setLayout(new GridLayout());
         mediaGroup.setLayoutData(fill);
 
-        vmsCheck = new Button(mediaGroup, SWT.CHECK);
-        vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMidiSynth as MIDI device"));
-        vmsCheck.setLayoutData(fillHor);
-        vmsCheck.setSelection(Settings.searchVms);
-
         new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") +
                 (System.getProperty("os.arch").equals("amd64") ? " (64-bit only)" : " (32-bit only)") + ":");
         vlcDirText = new Text(mediaGroup, SWT.DEFAULT);
@@ -1717,7 +1712,12 @@ public final class Property implements IProperty {
         vlcDirText.setEnabled(true);
         vlcDirText.setLayoutData(fillHor2);
         vlcDirText.setText(Settings.vlcDir);
-        
+
+        vmsCheck = new Button(mediaGroup, SWT.CHECK);
+        vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMidiSynth as MIDI device"));
+        vmsCheck.setLayoutData(fillHor);
+        vmsCheck.setSelection(Settings.searchVms);
+
         reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
         reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));
         reopenMidiCheck.setLayoutData(fillHor);

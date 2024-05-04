@@ -87,7 +87,7 @@ public final class Settings {
 
     public static boolean writeKemCfg = false;
 
-    public static boolean reopenMidiDevice = true;
+    public static boolean reopenMidiDevice = false;
     public static boolean searchVms;
 
     public static int xmx = 512;
