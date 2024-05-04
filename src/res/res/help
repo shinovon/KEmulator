@@ -43,10 +43,20 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.16 [2024.05.04]
+M3G LWJGL: allocate buffers beforehand
+Fix for Mesa 3D on Linux
+Fix lcdui ticker
+Stub com.immersion.VibeTonz
+Updated asm to 5.2 (vServ loading fix)
+
 $v2.16 [2024.05.03]
 Fix MIDI players switching
 Fix resource: protocol handling
 Stub com.sprintpcs.util.System
+
+$v2.16 [2024.05.02]
+M3G LWJGL: raytrace fix
 
 $v2.16 [2024.05.01]
 Replace kemulator.cfg with midlets.txt (can be disabled with WriteKemulatorCfg)

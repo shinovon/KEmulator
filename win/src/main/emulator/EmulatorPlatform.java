@@ -108,17 +108,15 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             try {
                 f = cls.getField("_STUB");
                 m3gLoaded = !f.getBoolean(null);
-                if (!m3gLoaded) {
-                    System.out.println("m3g stub!!");
-                }
+//                if (!m3gLoaded) {
+//                    System.out.println("m3g stub!!");
+//                }
             } catch (Throwable ignored) {
                 m3gLoaded = true;
             }
         } catch (Throwable ignored) {}
         if (!m3gLoaded) {
             addToClassPath(Settings.g3d == 0 ? "m3g_swerve.jar" : "m3g_lwjgl.jar");
-        } else {
-            System.out.println("m3g preloaded");
         }
     }
 

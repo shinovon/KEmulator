@@ -93,7 +93,6 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             }
         } catch (Throwable ignored) {
         }
-        System.out.println("m3g loaded: " + m3gLoaded);
         if(!m3gLoaded) {
             // TODO
             addToClassPath("m3g_lwjgl.jar");
