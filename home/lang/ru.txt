@@ -1,6 +1,6 @@
 #KEmulator nnmod localization file
 #Russian
-#by shinovon / nnproject MIDlets
+#by shinovon
 
 #Main Frame
 
@@ -284,6 +284,7 @@ OPTION_COREAPI_FULLSCREEN=Игнорировать Canvas.setFullScreenMode().
 OPTION_COREAPI_NO_NETWORK=Отключить доступ к сети
 OPTION_COREAPI_SYNC_KEYEVENTS=Синхронизировать события клавиш
 OPTION_COREAPI_SOFTKEY_FIX=Отправлять keyPressed вместе с commandAction
+OPTION_COREAPI_IGNORE_REGION_REPAINT=Всегда перерисовывать экран полностью
 
 OPTION_RECORDS_RMS_FOLDER=Папка RMS:
 OPTION_RECORDS_RMS_TEXT=Записи текущего мидлета:
@@ -307,6 +308,7 @@ OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
 
 OPTION_MEDIA_VLC_DIR=Путь к VLC
 OPTION_MEDIA_VMS=Использовать VirtualMIDISynth как MIDI устройство
+OPTION_MEDIA_GLOBAL_MIDI=Проигрывание только одного MIDI за раз (меньше лагов)
 OPTION_MEDIA_REOPEN_MIDI=Каждый раз переоткрывать MIDI устройство
 
 OPTION_M3G_LWJGL_SETTINGS=Настройки LWJGL

@@ -284,6 +284,7 @@ OPTION_COREAPI_FULLSCREEN=Ignore Canvas.setFullScreenMode(boolean)
 OPTION_COREAPI_NO_NETWORK=Restrict network connections
 OPTION_COREAPI_SYNC_KEYEVENTS=Synchronize key events
 OPTION_COREAPI_SOFTKEY_FIX=Send keyPressed with commandAction
+OPTION_COREAPI_IGNORE_REGION_REPAINT=Always repaint screen fully
 
 OPTION_RECORDS_RMS_FOLDER=RMS Folder:
 OPTION_RECORDS_RMS_TEXT=All Records in current midlet:
@@ -307,6 +308,7 @@ OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
 
 OPTION_MEDIA_VLC_DIR=VLC Path
 OPTION_MEDIA_VMS=Search for VirtualMIDISynth as MIDI device
+OPTION_MEDIA_GLOBAL_MIDI=Allow only one MIDI playback at time (reduces lag)
 OPTION_MEDIA_REOPEN_MIDI=Reopen MIDI device every time
 
 OPTION_M3G_LWJGL_SETTINGS=LWJGL Settings

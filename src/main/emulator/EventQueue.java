@@ -159,10 +159,14 @@ public final class EventQueue implements Runnable {
     }
 
     public void queueRepaint(int x, int y, int w, int h) {
-        repaintRegion[0] = x;
-        repaintRegion[1] = y;
-        repaintRegion[2] = w;
-        repaintRegion[3] = h;
+        if(Settings.ignoreRegionRepaint) {
+            repaintRegion[0] = repaintRegion[1] = repaintRegion[2] = repaintRegion[3] = -1;
+        } else {
+            repaintRegion[0] = x;
+            repaintRegion[1] = y;
+            repaintRegion[2] = w;
+            repaintRegion[3] = h;
+        }
         queue(1);
     }
 

@@ -93,4 +93,5 @@ public final class Settings {
     public static int xmx = 512;
     public static boolean asmSkipDebug;
     public static boolean oneMidiAtTime;
+    public static boolean ignoreRegionRepaint;
 }

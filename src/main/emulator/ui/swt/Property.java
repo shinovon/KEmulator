@@ -196,7 +196,9 @@ public final class Property implements IProperty {
     private Combo m3gTexFilterCombo;
     private Combo m3gMipmapCombo;
     private Button vmsCheck;
-    private Button reopenMidiCheck;
+//    private Button reopenMidiCheck;
+    private Button globalMidiCheck;
+    private Button ignoreRegionRepaintCheck;
 //    private Button pollOnRepaintBtn;
 
     public Property() {
@@ -534,6 +536,7 @@ public final class Property implements IProperty {
             Settings.motorolaSoftKeyFix = Boolean.parseBoolean(properties.getProperty("MotorolaSoftKeyFix", "false"));
             Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
             Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
+            Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
 
             Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
             Settings.locale = properties.getProperty("MIDPLocale", "en-US");
@@ -614,6 +617,7 @@ public final class Property implements IProperty {
             Settings.vlcDir = properties.getProperty("VlcDir", "");
             Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
             Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "false"));
+            Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
 
             // jvm
             Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -723,6 +727,7 @@ public final class Property implements IProperty {
             properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
             properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
             properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
+            properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
 
             properties.setProperty("FileEncoding", Settings.fileEncoding);
             properties.setProperty("MIDPLocale", Settings.locale);
@@ -792,6 +797,7 @@ public final class Property implements IProperty {
             properties.setProperty("VlcDir", Settings.vlcDir);
             properties.setProperty("MIDISearchVMS", String.valueOf(Settings.searchVms));
             properties.setProperty("MIDIReopenDevice", String.valueOf(Settings.reopenMidiDevice));
+            properties.setProperty("MIDIGlobalSequencer", String.valueOf(Settings.oneMidiAtTime));
 
             // jvm
             properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
@@ -897,7 +903,9 @@ public final class Property implements IProperty {
         Settings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
 
         Settings.searchVms = vmsCheck.getSelection();
-        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
+//        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
+        Settings.oneMidiAtTime = globalMidiCheck.getSelection();
+        Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
 
         this.updateProxy();
     }
@@ -1685,6 +1693,11 @@ public final class Property implements IProperty {
         (this.softkeyMotFixCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
         this.softkeyMotFixCheck.setLayoutData(gridData);
         this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
+
+        ignoreRegionRepaintCheck = new Button(coreApiGroup, SWT.CHECK);
+        ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
+        ignoreRegionRepaintCheck.setLayoutData(gridData);
+        ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
     }
 
     private void setupMediaComp() {
@@ -1718,14 +1731,19 @@ public final class Property implements IProperty {
         vlcDirText.setText(Settings.vlcDir);
 
         vmsCheck = new Button(mediaGroup, SWT.CHECK);
-        vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMidiSynth as MIDI device"));
+        vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMIDISynth as MIDI device"));
         vmsCheck.setLayoutData(fillHor);
         vmsCheck.setSelection(Settings.searchVms);
 
-        reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
-        reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));
-        reopenMidiCheck.setLayoutData(fillHor);
-        reopenMidiCheck.setSelection(Settings.reopenMidiDevice);
+        globalMidiCheck = new Button(mediaGroup, SWT.CHECK);
+        globalMidiCheck.setText(UILocale.get("OPTION_MEDIA_GLOBAL_MIDI", "Allow only one MIDI playback at time (reduces lag)"));
+        globalMidiCheck.setLayoutData(fillHor);
+        globalMidiCheck.setSelection(Settings.oneMidiAtTime);
+
+//        reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
+//        reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));
+//        reopenMidiCheck.setLayoutData(fillHor);
+//        reopenMidiCheck.setSelection(Settings.reopenMidiDevice);
     }
 
     private void setupM3GComp() {
