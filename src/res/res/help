@@ -43,6 +43,9 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.16 [2024.05.05]
+Updated swt
+
 $v2.16 [2024.05.04]
 M3G LWJGL: allocate buffers beforehand
 Fix for Mesa 3D on Linux
@@ -867,7 +870,7 @@ v0.1.0 [2006.06.15]
 
 ==================
 $[Libs]
-swt-4.5.2
+swt-4.20 / 4.5.2 (32-bit)
 asm-5.2
 lwjgl-2.9.4
 java-discord-rpc-2.0.1

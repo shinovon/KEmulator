@@ -26,20 +26,12 @@ public class Permission {
     private static int getAppPermissionLevel(String x) {
         if (!askPermissions) return 2;
         x = x.toLowerCase();
-        switch (x) {
-            case "messageconnection.send":
-            case "messageconnection.receive":
-            case "connector.open.http":
-            case "connector.open.file":
-            case "connector.open.socket":
-            case "connector.open.serversocket":
-            case "connector.open.sms":
-                return allowed; // return 5;
-            case "camera":
-                return ask_always_until_no;
-            default:
-                return ask_always_until_yes;
+        if (x.equals("messageconnection.send") || x.equals("messageconnection.receive") || x.equals("connector.open.http") || x.equals("connector.open.file") || x.equals("connector.open.socket") || x.equals("connector.open.serversocket") || x.equals("connector.open.sms")) {
+            return allowed; // return 5;
+        } else if (x.equals("camera")) {
+            return ask_always_until_no;
         }
+        return ask_always_until_yes;
     }
 
     public synchronized static String askIMEI() {
@@ -47,12 +39,14 @@ public class Permission {
             return null;
         if (!askImei) return "0000000000000000";
         if (imei != null) return imei;
-        Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
-            imeiDialog = new InputDialog(Emulator.emulatorimpl.getEmulatorScreen().getShell());
-            imeiDialog.setMessage("Application asks for IMEI");
-            imeiDialog.setInput("0000000000000000");
-            imeiDialog.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
-            imeiDialog.open();
+        Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(new Runnable() {
+            public void run() {
+                imeiDialog = new InputDialog(Emulator.emulatorimpl.getEmulatorScreen().getShell());
+                imeiDialog.setMessage("Application asks for IMEI");
+                imeiDialog.setInput("0000000000000000");
+                imeiDialog.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
+                imeiDialog.open();
+            }
         });
         String s = imeiDialog.getInput();
         if (s == null) {
@@ -62,13 +56,15 @@ public class Permission {
         return imei = s;
     }
 
-    public static boolean showConfirmDialog(String message, String title) {
+    public static boolean showConfirmDialog(final String message, final String title) {
 
-        Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
-            MessageBox messageBox = new MessageBox(Emulator.emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
-            messageBox.setMessage(message);
-            messageBox.setText(title == null ? UILocale.get("SECURITY_ALERT_TITLE", "Security") : title);
-            dialogResult = messageBox.open();
+        Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(new Runnable() {
+            public void run() {
+                MessageBox messageBox = new MessageBox(Emulator.emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
+                messageBox.setMessage(message);
+                messageBox.setText(title == null ? UILocale.get("SECURITY_ALERT_TITLE", "Security") : title);
+                dialogResult = messageBox.open();
+            }
         });
         return dialogResult == SWT.YES;
     }
@@ -121,39 +117,39 @@ public class Permission {
     }
 
     private static String localizePerm(String x) {
-        switch (x) {
-            case "connector.open.http":
-                return "Allow the application to open HTTP connections?";
-            case "connector.open.file":
-                return "Allow the application to access the file system?";
-            case "connector.open.socket":
-                return "Allow the application to open socket connections?";
-            case "connector.open.serversocket":
-                return "Allow the application to open server socket connections?";
-            case "camera":
-                return UILocale.get("PERMISSION_CAMERA", "Allow the application to use camera?");
-            default:
-                return "Allow the application to use '" + x + "'?";
+        if (x.equals("connector.open.http")) {
+            return "Allow the application to open HTTP connections?";
+        } else if (x.equals("connector.open.file")) {
+            return "Allow the application to access the file system?";
+        } else if (x.equals("connector.open.socket")) {
+            return "Allow the application to open socket connections?";
+        } else if (x.equals("connector.open.serversocket")) {
+            return "Allow the application to open server socket connections?";
+        } else if (x.equals("camera")) {
+            return UILocale.get("PERMISSION_CAMERA", "Allow the application to use camera?");
         }
+        return "Allow the application to use '" + x + "'?";
     }
 
     public static boolean requestURLAccess(final String url) {
-        Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(() -> {
-            MessageBox messageBox = new MessageBox(Emulator.emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
-            String s = url;
-            if (s.length() > 100) {
-                s = s.substring(0, 100) + "...";
+        Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(new Runnable() {
+            public void run() {
+                MessageBox messageBox = new MessageBox(Emulator.emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
+                String s = url;
+                if (s.length() > 100) {
+                    s = s.substring(0, 100) + "...";
+                }
+                if (s.startsWith("vlc:")) {
+                    s = s.substring(4);
+                    messageBox.setMessage(UILocale.get("PLATFORMREQUEST_VLC_ALERT", "Application wants to open URL in VLC") +
+                            ": " + s);
+                } else {
+                    messageBox.setMessage(UILocale.get("PLATFORMREQUEST_ALERT", "Application wants to open URL") +
+                            ": " + s);
+                }
+                messageBox.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
+                dialogResult = messageBox.open();
             }
-            if (s.startsWith("vlc:")) {
-                s = s.substring(4);
-                messageBox.setMessage(UILocale.get("PLATFORMREQUEST_VLC_ALERT", "Application wants to open URL in VLC") +
-                        ": " + s);
-            } else {
-                messageBox.setMessage(UILocale.get("PLATFORMREQUEST_ALERT", "Application wants to open URL") +
-                        ": " + s);
-            }
-            messageBox.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
-            dialogResult = messageBox.open();
         });
         return dialogResult == SWT.YES;
     }

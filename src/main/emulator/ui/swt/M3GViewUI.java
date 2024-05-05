@@ -451,11 +451,11 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.grabExcessVerticalSpace = true;
         layoutData.verticalAlignment = 4;
-        GLData gld = new GLData();
-        gld.depthSize = Emulator.getEmulator().getScreenDepth();
-        gld.doubleBuffer = true;
-
         try {
+            GLData gld = new GLData();
+            gld.depthSize = Emulator.getEmulator().getScreenDepth();
+            gld.doubleBuffer = true;
+
             int samples = 4;
             while (true) {
                 try {
@@ -472,6 +472,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
             }
         } catch (Exception e) {
             e.printStackTrace();
+            if(canvas != null) canvas.dispose();
             canvas = new Canvas(this.aComposite907, 264192);
         }
 

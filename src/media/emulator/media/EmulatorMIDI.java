@@ -36,12 +36,11 @@ public class EmulatorMIDI {
         }
         if (midiSequencer == null) {
             midiSequencer = MidiSystem.getSequencer();
-            for (Transmitter t : midiSequencer.getTransmitters()) {
-                t.setReceiver(midiDevice.getReceiver());
-            }
-            midiSequencer.addMetaEventListener(meta -> {
-                if (meta.getType() == 0x2F && currentPlayer instanceof PlayerImpl) {
-                    ((PlayerImpl) currentPlayer).notifyCompleted();
+            midiSequencer.addMetaEventListener(new MetaEventListener() {
+                public void meta(MetaMessage meta) {
+                    if (meta.getType() == 0x2F && currentPlayer instanceof PlayerImpl) {
+                        ((PlayerImpl) currentPlayer).notifyCompleted();
+                    }
                 }
             });
             midiSequencer.open();

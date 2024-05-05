@@ -41,20 +41,26 @@ public class ScreenSizeDialog extends Dialog {
         data.horizontalSpan = 2;
 
         final Text width = new Text(shell, SWT.BORDER);
-        width.addListener(SWT.KeyDown, event ->
+        width.addListener(SWT.KeyDown, new Listener() {
+            public void handleEvent(Event event) {
                 event.doit = event.keyCode == SWT.BS || event.keyCode == SWT.DEL ||
                         event.keyCode == SWT.ARROW_LEFT || event.keyCode == SWT.ARROW_RIGHT ||
-                        Character.isDigit(event.character));
+                        Character.isDigit(event.character);
+            }
+        });
         width.setText(String.valueOf(result[0]));
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 2;
         width.setLayoutData(data);
 
         final Text height = new Text(shell, SWT.BORDER);
-        height.addListener(SWT.KeyDown, event ->
+        height.addListener(SWT.KeyDown, new Listener() {
+            public void handleEvent(Event event) {
                 event.doit = event.keyCode == SWT.BS || event.keyCode == SWT.DEL ||
                         event.keyCode == SWT.ARROW_LEFT || event.keyCode == SWT.ARROW_RIGHT ||
-                        Character.isDigit(event.character));
+                        Character.isDigit(event.character);
+            }
+        });
         height.setText(String.valueOf(result[1]));
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 2;

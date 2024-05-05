@@ -412,8 +412,8 @@ public final class Property implements IProperty {
             }
             s = sb.append(substring).toString();
         }
-        final File file;
-        if (!(file = new File(s)).exists() || !file.isDirectory()) {
+        final File file = new File(s);
+        if (!file.exists() || !file.isDirectory()) {
             file.mkdirs();
         }
         /*
@@ -423,11 +423,15 @@ public final class Property implements IProperty {
             file2.mkdirs();
         }
         */
-        return s.replace('\\', '/') + "/";
+        try {
+            return file.getCanonicalPath() + File.separator;
+        } catch (IOException e) {
+            return s + File.separator;
+        }
     }
 
     public String getOldRmsPath() {
-        return getRmsFolderPath() + method355() + "/";
+        return getRmsFolderPath() + method355() + File.separator;
     }
 
     public final void setCustomProperties() {
@@ -978,7 +982,7 @@ public final class Property implements IProperty {
         layoutData.verticalAlignment = 2;
         (this.aCombo675 = new Combo(this.customComp, 8)).setLayoutData(layoutData);
         final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
-        final ArrayList<Comparable> list = new ArrayList<>(availableCharsets.keySet());
+        final ArrayList<Comparable> list = new ArrayList(availableCharsets.keySet());
         Collections.sort(list);
         String s = (String) list.get(0);
         for (int i = 0; i < list.size(); ++i) {

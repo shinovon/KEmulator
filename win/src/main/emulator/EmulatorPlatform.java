@@ -4,7 +4,6 @@ import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
 import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
-import org.eclipse.swt.internal.opengl.win32.WGL;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -13,6 +12,28 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
+
+    private static Class wglClass;
+    private static Class pixelFormatDescriptorClass;
+    private static Method ChoosePixelFormat;
+    private static Method SetPixelFormat;
+    private static Method wglCreateContext;
+    private static Method wglDeleteContext;
+    private static Method wglMakeCurrent;
+    private static Method wglGetCurrentContext;
+
+    static {
+        try {
+            wglClass = Class.forName("org.eclipse.swt.internal.opengl.win32.WGL");
+            pixelFormatDescriptorClass = Class.forName("org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR");
+            ChoosePixelFormat = ReflectUtil.getMethod(wglClass, "ChoosePixelFormat", int.class, pixelFormatDescriptorClass);
+            SetPixelFormat = ReflectUtil.getMethod(wglClass, "SetPixelFormat", int.class, int.class, pixelFormatDescriptorClass);
+            wglCreateContext = ReflectUtil.getMethod(wglClass, "wglCreateContext", int.class);
+            wglMakeCurrent = ReflectUtil.getMethod(wglClass, "wglMakeCurrent", int.class, int.class);
+            wglDeleteContext = ReflectUtil.getMethod(wglClass, "wglDeleteContext", int.class);
+            wglGetCurrentContext = ReflectUtil.getMethod(wglClass, "wglGetCurrentContext");
+        } catch (Exception ignored) {}
+    }
 
     public boolean isX64() {
         return false;
@@ -66,37 +87,46 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
-    public int createGLContext(int gcHandle) {
-        PIXELFORMATDESCRIPTOR var4;
-        (var4 = new PIXELFORMATDESCRIPTOR()).nSize = 40;
+    public long createGLContext(long gcHandle) throws Exception {
+        int handle = (int) gcHandle;
+        PIXELFORMATDESCRIPTOR var4 = new PIXELFORMATDESCRIPTOR();
+        var4.nSize = 40;
         var4.nVersion = 1;
         var4.dwFlags = 57;
         var4.iPixelType = 0;
         var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
         var4.iLayerType = 0;
-        int var5;
-        if ((var5 = WGL.ChoosePixelFormat(gcHandle, var4)) == 0 || !WGL.SetPixelFormat(gcHandle, var5, var4)) {
+        int var5 = (Integer) ChoosePixelFormat.invoke(null, handle, var4);
+        if (var5 == 0) {
             return 0;
         }
 
-        return WGL.wglCreateContext(gcHandle);
+        if(!((Boolean) SetPixelFormat.invoke(null, handle, var5, var4))) {
+            return 0;
+        }
+
+        return (Integer) wglCreateContext.invoke(null, handle);
     }
 
-    public boolean isGLContextCurrent(int imgHandle) {
-        return WGL.wglGetCurrentContext() == imgHandle;
+    public boolean isGLContextCurrent(long imgHandle) throws Exception {
+        return (Integer) wglGetCurrentContext.invoke(null) == imgHandle;
     }
 
-    public void setGLContextCurrent(int gcHandle, int contextHandle) {
-        while (WGL.wglGetCurrentContext() > 0);
-        WGL.wglMakeCurrent(gcHandle, contextHandle);
+    public void setGLContextCurrent(long gcHandle, long contextHandle) throws Exception {
+        while ((Integer) wglGetCurrentContext.invoke(null) > 0);
+        try {
+            wglMakeCurrent.invoke(null, gcHandle, contextHandle);
+        } catch (IllegalArgumentException e) {
+            wglMakeCurrent.invoke(null, (int) gcHandle, (int) contextHandle);
+        }
     }
 
-    public void releaseGLContext(int gcHandle) {
-        WGL.wglMakeCurrent(gcHandle, -1);
+    public void releaseGLContext(long gcHandle) throws Exception {
+        wglMakeCurrent.invoke(null, (int) gcHandle, -1);
     }
 
-    public void deleteGLContext(int contextHandle) {
-        WGL.wglDeleteContext(contextHandle);
+    public void deleteGLContext(long contextHandle) throws Exception {
+        wglDeleteContext.invoke(null, (int) contextHandle);
     }
 
     public void loadM3G() {

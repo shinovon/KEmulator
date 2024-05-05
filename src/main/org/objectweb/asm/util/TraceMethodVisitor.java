@@ -342,7 +342,7 @@ public class TraceMethodVisitor extends TraceAbstractVisitor {
                 TraceMethodVisitor traceMethodVisitor2 = null;
                 int n3 = 0;
                 String s2 = null;
-                switch ((int) array[i]) {
+                switch ((Integer) array[i]) {
                     case 0: {
                         traceMethodVisitor2 = this;
                         n3 = 1;

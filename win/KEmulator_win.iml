@@ -6,7 +6,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/3d" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/3d_woess" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/swtpatch" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

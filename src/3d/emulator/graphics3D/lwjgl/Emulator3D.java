@@ -44,7 +44,7 @@ public final class Emulator3D implements IGraphics3D {
     public static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
     private static Hashtable properties = new Hashtable();
     private static PixelFormat pixelFormat;
-    private int wglContextHandle;
+    private long wglContextHandle;
     private Image swtImage;
     private GC swtGC;
     private float depthRangeNear;
@@ -54,8 +54,8 @@ public final class Emulator3D implements IGraphics3D {
     private int viewportWidth;
     private int viewportHeight;
 
-    private static Vector<Integer> usedGLTextures = new Vector<>();
-    private static Vector<Integer> unusedGLTextures = new Vector<>();
+    private static Vector<Integer> usedGLTextures = new Vector();
+    private static Vector<Integer> unusedGLTextures = new Vector();
 
     public static final int MaxViewportWidth = 2048;
     public static final int MaxViewportHeight = 2048;
@@ -245,7 +245,7 @@ public final class Emulator3D implements IGraphics3D {
         return useWgl;
     }
 
-    private void bindWgl(int var1, int var2) {
+    private void bindWgl(int var1, int var2) throws Exception {
         if (this.swtImage == null || this.swtImage.getBounds().width != var1 || this.swtImage.getBounds().height != var2) {
             if (this.swtImage != null) {
                 this.swtImage.dispose();

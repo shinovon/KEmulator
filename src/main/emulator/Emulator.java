@@ -55,7 +55,7 @@ public class Emulator {
     public static emulator.custom.CustomClassLoader customClassLoader;
     public static String iconPath;
 
-    protected static DiscordRPC rpc;
+    protected static Object rpc;
     private static Thread rpcCallbackThread;
     public static long rpcStartTimestamp;
     public static long rpcEndTimestamp;
@@ -76,10 +76,11 @@ public class Emulator {
     private static void initRichPresence() {
         if (!Settings.rpc)
             return;
-        rpc = DiscordRPC.INSTANCE;
+        final DiscordRPC rpc = (DiscordRPC) (Emulator.rpc = DiscordRPC.INSTANCE);
         DiscordEventHandlers handlers = new DiscordEventHandlers();
-        handlers.ready = (user) -> {
-        };
+//        handlers.ready = new DiscordEventHandlers.OnReady() {
+//            public void accept(DiscordUser user) {}
+//        };
         rpc.Discord_Initialize("823522436444192818", handlers, true, "");
         DiscordRichPresence presence = new DiscordRichPresence();
         presence.startTimestamp = rpcStartTimestamp = System.currentTimeMillis() / 1000;
@@ -101,6 +102,7 @@ public class Emulator {
     }
 
     public static void updatePresence() {
+        DiscordRPC rpc = (DiscordRPC) Emulator.rpc;
         if (rpc == null)
             return;
         DiscordRichPresence presence = new DiscordRichPresence();
@@ -215,13 +217,19 @@ public class Emulator {
                 key = key.substring(0, key.lastIndexOf("."));
                 final Properties properties = new Properties();
                 if (new File(propsPath).exists()) {
-                    try (FileInputStream in = new FileInputStream(propsPath)) {
+                    FileInputStream in = new FileInputStream(propsPath);
+                    try {
                         properties.load(in);
+                    } finally {
+                        in.close();
                     }
                 }
                 properties.setProperty(key, Emulator.deviceName);
-                try (FileOutputStream out = new FileOutputStream(propsPath)) {
+                FileOutputStream out = new FileOutputStream(propsPath);
+                try {
                     properties.store(out, "KEmulator platforms");
+                } finally {
+                    out.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -233,13 +241,19 @@ public class Emulator {
             String key = new File(Emulator.midletJar).getCanonicalPath();
             final Properties properties = new Properties();
             if (new File(propsPath).exists()) {
-                try (FileInputStream in = new FileInputStream(propsPath)) {
+                FileInputStream in = new FileInputStream(propsPath);
+                try {
                     properties.load(in);
+                } finally {
+                    in.close();
                 }
             }
             properties.setProperty(key, Emulator.deviceName);
-            try (FileOutputStream out = new FileOutputStream(propsPath)) {
+            FileOutputStream out = new FileOutputStream(propsPath);
+            try {
                 properties.store(out, "KEmulator platforms");
+            } finally {
+                out.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -260,8 +274,11 @@ public class Emulator {
             try {
                 String key = new File(Emulator.midletJar).getCanonicalPath();
                 final Properties p = new Properties();
-                try (FileInputStream in = new FileInputStream(propsPath)) {
+                FileInputStream in = new FileInputStream(propsPath);
+                try {
                     p.load(in);
+                } finally {
+                    in.close();
                 }
                 final String device = p.getProperty(key, null);
                 if (device != null) {
@@ -281,8 +298,11 @@ public class Emulator {
         if (new File(propsPath).exists()) {
             try {
                 final Properties p = new Properties();
-                try (FileInputStream in = new FileInputStream(propsPath)) {
+                FileInputStream in = new FileInputStream(propsPath);
+                try {
                     p.load(in);
+                } finally {
+                    in.close();
                 }
                 final String device = p.getProperty(key, null);
                 if (device != null) {
@@ -908,8 +928,13 @@ public class Emulator {
         if (new File(s + "/KEmulator.jar").exists() || new File(s + "/emulator.dll").exists()) {
             return s;
         }
-        s = getAbsoluteFile().replace('\\', '/');
-        s = s.substring(0, s.lastIndexOf('/')).replace('/', '\\');
+        s = getAbsoluteFile();
+        File file = new File(s).getParentFile();
+        try {
+            s = file.getCanonicalPath() + File.separator;
+        } catch (IOException e) {
+            s = file.getAbsolutePath() + File.separator;
+        }
         return s;
     }
 

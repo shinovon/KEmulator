@@ -116,7 +116,7 @@ public abstract class MIDlet {
         } catch (Throwable ex) {
             System.out.println("startApp exception!");
             ex.printStackTrace();
-            throw ex;
+            throw new RuntimeException(ex);
         }
     }
 

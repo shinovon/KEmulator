@@ -126,7 +126,7 @@ public class CustomMethod {
         final Thread currentThread = Thread.currentThread();
         final Object value;
         if ((value = CustomMethod.aHashtable14.get(currentThread)) != null) {
-            CustomMethod.aHashtable14.put(currentThread, Math.max((int) value - 1, 0));
+            CustomMethod.aHashtable14.put(currentThread, Math.max((Integer) value - 1, 0));
         }
     }
 

@@ -88,7 +88,7 @@ final class Class55
                     try {
                         Player.aPlayer913.start();
                         return;
-                    } catch (IllegalStateException | MediaException mediaException) {
+                    } catch (Exception mediaException) {
                         mediaException.printStackTrace();
                         return;
                     }

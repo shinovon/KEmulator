@@ -24,9 +24,9 @@ public interface IEmulatorPlatform {
 
     IGraphics3D getGraphics3D();
 
-    int createGLContext(int gcHandle);
-    boolean isGLContextCurrent(int imgHandle);
-    void setGLContextCurrent(int gcHandle, int contextHandle);
-    void releaseGLContext(int gcHandle);
-    void deleteGLContext(int contextHandle);
+    long createGLContext(long gcHandle) throws Exception;
+    boolean isGLContextCurrent(long imgHandle) throws Exception;
+    void setGLContextCurrent(long gcHandle, long contextHandle) throws Exception;
+    void releaseGLContext(long gcHandle) throws Exception;
+    void deleteGLContext(long contextHandle) throws Exception;
 }

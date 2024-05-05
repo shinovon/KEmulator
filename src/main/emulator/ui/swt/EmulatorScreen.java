@@ -314,39 +314,6 @@ public final class EmulatorScreen implements
         this.pauseState = 0;
     }
 
-    public static final Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
-        for (Method method : clazz.getDeclaredMethods()) {
-            Class<?>[] checkParamTypes = method.getParameterTypes();
-            if (method.getName().equals(name) && checkParamTypes.length == parameterTypes.length) {
-                boolean matches = true;
-                for (int i = 0; i < parameterTypes.length; i++) {
-                    Class<?> paramType = parameterTypes[i];
-                    Class<?> checkParamType = checkParamTypes[i];
-
-                    if (!equals(paramType, checkParamType)) {
-                        matches = false;
-                        break;
-                    }
-                }
-                if (!matches) {
-                    continue;
-                }
-                return method;
-            }
-        }
-        return null;
-    }
-
-    public static final boolean equals(Class<?> class1, Class<?> class2) {
-        if (class1 == null) {
-            return class2 == null;
-        }
-        if (class2 == null) {
-            return false;
-        }
-        return class1.isAssignableFrom(class2) && class2.isAssignableFrom(class1);
-    }
-
     // KEYBOARD
 
     protected static volatile boolean[] lastKeyboardButtonStates = new boolean[256];
@@ -372,11 +339,11 @@ public final class EmulatorScreen implements
             if (win32OS == null)
                 win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
             if (win32OSGetKeyState == null &&
-                (win32OSGetKeyState = getMethod(win32OS, "GetAsyncKeyState", int.class)) == null)
+                (win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class)) == null)
                     return;
             for (int i = 0; i < keyboardButtonStates.length; i++) {
                 lastKeyboardButtonStates[i] = keyboardButtonStates[i];
-                short keyState = (short) win32OSGetKeyState.invoke(null, i);
+                short keyState = (Short) win32OSGetKeyState.invoke(null, i);
                 boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
                 if (!keyboardButtonStates[i]) {
                     if (pressed) {

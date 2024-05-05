@@ -61,7 +61,7 @@ public class SkinnedMesh extends Mesh {
         clone.skeleton = newSkeleton;
         newSkeleton.parent = clone;
 
-        Hashtable<Node, Node> oldToNewBone = new Hashtable<>();
+        Hashtable<Node, Node> oldToNewBone = new Hashtable();
         getOldToNewBonesMapping(oldToNewBone, skeleton, newSkeleton);
 
         clone.boneTransList = new Vector();

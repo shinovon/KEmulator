@@ -48,7 +48,7 @@ public final class SensorDataImpl implements Data {
             for (int i = 0; i < this.anInt486; ++i) {
                 final Object o;
                 if ((o = this.anObjectArray484[i]) instanceof Double) {
-                    array[i] = (double) o;
+                    array[i] = (Double) o;
                 } else {
                     array[i] = 0.0;
                     if (this.aBoolean487 && this.aBooleanArray482[i]) {
@@ -70,7 +70,7 @@ public final class SensorDataImpl implements Data {
             for (int i = 0; i < this.anInt486; ++i) {
                 final Object o;
                 if ((o = this.anObjectArray484[i]) instanceof Integer) {
-                    array[i] = (int) o;
+                    array[i] = (Integer) o;
                 } else {
                     array[i] = 0;
                     if (this.aBoolean487 && this.aBooleanArray482[i]) {
