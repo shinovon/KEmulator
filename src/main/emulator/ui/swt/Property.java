@@ -663,8 +663,8 @@ public final class Property implements IProperty {
     public final void saveProperties() {
         try {
             final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getUserPath() + "/property.txt");
-            final SortProperties properties;
-            (properties = new SortProperties(this)).setProperty("Device", this.device);
+            final Properties properties = new Properties();
+            properties.setProperty("Device", this.device);
             properties.setProperty("DefaultFont", this.defaultFont);
             properties.setProperty("RMSFolder", this.rmsFolder);
             properties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
