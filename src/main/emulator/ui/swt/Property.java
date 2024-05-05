@@ -490,7 +490,7 @@ public final class Property implements IProperty {
             this.right = properties.getProperty("KEY_RIGHT", "-4");
             Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ")
                     .equalsIgnoreCase("LWJ") ? 1 : 0);
-            Settings.g2d = (properties.getProperty("2D_Graphics_Enginge", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
+            Settings.g2d = (properties.getProperty("2D_Graphics_Engine", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
 
             Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
 
@@ -684,7 +684,7 @@ public final class Property implements IProperty {
             properties.setProperty("KEY_DOWN", this.down);
             properties.setProperty("KEY_LEFT", this.left);
             properties.setProperty("KEY_RIGHT", this.right);
-            properties.setProperty("2D_Graphics_Enginge", (Settings.g2d == 0) ? "SWT" : "AWT");
+            properties.setProperty("2D_Graphics_Engine", (Settings.g2d == 0) ? "SWT" : "AWT");
             properties.setProperty("3D_Graphics_Engine", (Settings.g3d == 0) ? "SWERVE" : "LWJ");
             properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
 
