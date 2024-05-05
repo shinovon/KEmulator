@@ -111,11 +111,16 @@ public final class Emulator3D implements IGraphics3D {
             while (true) {
                 try {
                     pixelFormat = new PixelFormat(bpp, 0, 24, 0, samples);
-                    (new Pbuffer(1, 1, pixelFormat, null, null)).destroy();
+                    new Pbuffer(1, 1, pixelFormat, null, null).destroy();
                     break;
-                } catch (Exception var3) {
+                } catch (Exception e) {
                     if ((samples >>= 1) == 0) {
-                        pixelFormat = new PixelFormat(bpp, 0, 24, 0, 0);
+                        try {
+                            pixelFormat = new PixelFormat(bpp, 0, 24, 0, 0);
+                            new Pbuffer(1, 1, pixelFormat, null, null).destroy();
+                        } catch (Exception e2) {
+                            pixelFormat = new PixelFormat();
+                        }
                         break;
                     }
                 }
