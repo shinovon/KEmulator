@@ -667,7 +667,8 @@ public final class Property implements IProperty {
     public final void saveProperties() {
         try {
             final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getUserPath() + "/property.txt");
-            final Properties properties = new Properties();
+            final Properties properties = new SortProperties();
+
             properties.setProperty("Device", this.device);
             properties.setProperty("DefaultFont", this.defaultFont);
             properties.setProperty("RMSFolder", this.rmsFolder);
@@ -2504,18 +2505,10 @@ public final class Property implements IProperty {
     private final class SortProperties extends Properties {
         private static final long serialVersionUID = 1L;
 
-        private SortProperties(final Property class38) {
-            super();
-        }
-
         public final Enumeration keys() {
             final List list;
             Collections.sort((List<Comparable>) (list = Collections.list(super.keys())));
             return Collections.enumeration(list);
-        }
-
-        SortProperties(final Property class38, final Class117 class39) {
-            this(class38);
         }
     }
 }
