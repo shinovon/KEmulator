@@ -68,9 +68,6 @@ MENU_TOOL_AUTO_PLAY=Прогр. записи
 MENU_TOOL_CAPTURE_FILE=Скриншот в файл
 MENU_TOOL_CAPTURE_CLIP=Скриншот в буфер обмена
 
-MENU_TOOL_START_RECORD_AVI=Начать запись AVI
-MENU_TOOL_STOP_RECORD_AVI=Остановить запись AVI
-
 MENU_TOOL_SHOW_TRACK_INFO=Вкл. отслеживание вызовов
 MENU_TOOL_FPS_COUNT=Счетчик FPS
 
@@ -266,8 +263,6 @@ OPTION_FONT_SMALL_SIZE=Мелкий:
 OPTION_FONT_TEST_TEXT=Пример:
 OPTION_FONT_TEST_TEXT_TXT=This is an Example.
 
-OPTION_SYSTEM_ASSOCIATE=Ассоциировать с *.jar файлами.
-OPTION_SYSTEM_SHORTCUT=Добавить ярлык в контекстное меню.
 OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images.
 OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region.
 OPTION_SYSTEM_INFO_COLOR=Info View: Показывать цвет в формате (R,G,B).

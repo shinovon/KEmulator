@@ -68,9 +68,6 @@ MENU_TOOL_AUTO_PLAY=Enable Autoplay
 MENU_TOOL_CAPTURE_FILE=Capture to File
 MENU_TOOL_CAPTURE_CLIP=Capture to ClipBoard
 
-MENU_TOOL_START_RECORD_AVI=Start Record AVI
-MENU_TOOL_STOP_RECORD_AVI=Stop Record AVI
-
 MENU_TOOL_SHOW_TRACK_INFO=Show Track Info
 MENU_TOOL_FPS_COUNT=FPS Counter
 
@@ -266,8 +263,6 @@ OPTION_FONT_SMALL_SIZE=Small Size:
 OPTION_FONT_TEST_TEXT=Test Text:
 OPTION_FONT_TEST_TEXT_TXT=This is an Example.
 
-OPTION_SYSTEM_ASSOCIATE=Associate with *.jar files
-OPTION_SYSTEM_SHORTCUT=Add shortcut to right-click menu
 OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images
 OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region
 OPTION_SYSTEM_INFO_COLOR=Info View: Show color in (R,G,B)

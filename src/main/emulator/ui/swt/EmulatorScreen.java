@@ -101,8 +101,6 @@ public final class EmulatorScreen implements
     MenuItem enableAutoplayMenuItem;
     MenuItem captureToFileMenuItem;
     MenuItem captureToClipboardMenuItem;
-    MenuItem startRecordAviMenuItem;
-    MenuItem stopRecordAviMenuItem;
     MenuItem showTrackInfoMenuItem;
     MenuItem helpMenuItem;
     MenuItem optionsMenuItem;
@@ -131,7 +129,6 @@ public final class EmulatorScreen implements
     private MenuItem integerScalingMenuItem;
     private MenuItem m3gViewMenuItem;
     private MenuItem resetSizeMenuItem;
-    private static AVIWriter aviWriter;
     private static int captureFileCounter;
     private static String aString993;
     private int pauseState;
@@ -773,13 +770,6 @@ public final class EmulatorScreen implements
         this.captureToClipboardMenuItem.setAccelerator(65603);
         this.captureToClipboardMenuItem.addSelectionListener(this);
         new MenuItem(this.menuTool, 2);
-        if(!Emulator.isX64()) {
-            (this.startRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_START_RECORD_AVI", "Start Record AVI") + "\tCtrl+V");
-            this.startRecordAviMenuItem.addSelectionListener(this);
-            (this.stopRecordAviMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_STOP_RECORD_AVI", "Stop Record AVI") + "\tCtrl+B");
-            this.stopRecordAviMenuItem.addSelectionListener(this);
-        }
-        new MenuItem(this.menuTool, 2);
         (this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
         this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
         this.showTrackInfoMenuItem.addSelectionListener(this);
@@ -892,8 +882,6 @@ public final class EmulatorScreen implements
         this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
         this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
         this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
-        if(stopRecordAviMenuItem != null)
-            stopRecordAviMenuItem.setAccelerator(SWT.CONTROL | 66);
         this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
         this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
         this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
@@ -907,16 +895,8 @@ public final class EmulatorScreen implements
     }
 
 
-    protected void toggleMenuAccelerators(final boolean b) {
-        if (b) {
-            this.captureToFileMenuItem.setAccelerator(SWT.CONTROL | 67);
-            if(startRecordAviMenuItem != null)
-                    startRecordAviMenuItem.setAccelerator(SWT.CONTROL | 86);
-        } else {
-            this.captureToFileMenuItem.setAccelerator(0);
-            if(startRecordAviMenuItem != null)
-                startRecordAviMenuItem.setAccelerator(0);
-        }
+    void toggleMenuAccelerators(final boolean b) {
+        this.captureToFileMenuItem.setAccelerator(b ? SWT.CONTROL | 67 : 0);
     }
 
 
@@ -971,39 +951,6 @@ public final class EmulatorScreen implements
                     }
                 }
             } else {
-                if (menuItem.equals(this.startRecordAviMenuItem)) {
-                    pauseStep();
-                    final String string2 = Emulator.getUserPath() + "/capture/";
-                    final File file2;
-                    if (!(file2 = new File(string2)).exists() || !file2.isDirectory()) {
-                        file2.mkdir();
-                    }
-                    final FileDialog fileDialog;
-                    (fileDialog = new FileDialog(this.shell, 8192)).setText(UILocale.get("SAVE_TO_FILE", "Save to file"));
-                    fileDialog.setFilterPath(string2);
-                    fileDialog.setFilterExtensions(new String[]{"*.avi", "*.*"});
-                    fileDialog.setFileName(EmulatorScreen.aString993 + EmulatorScreen.captureFileCounter + ".avi");
-                    final String open;
-                    if ((open = fileDialog.open()) != null) {
-                        EmulatorScreen.aviWriter = new AVIWriter();
-                        if (!EmulatorScreen.aviWriter.method841(open, Profiler.FPS, this.getWidth(), this.getHeight())) {
-                            EmulatorScreen.aviWriter.method842();
-                            EmulatorScreen.aviWriter = null;
-                        }
-                        ++EmulatorScreen.captureFileCounter;
-                        this.updatePauseState();
-                    }
-                    this.resumeStep();
-                    return;
-                }
-                if (menuItem.equals(this.stopRecordAviMenuItem)) {
-                    if (EmulatorScreen.aviWriter != null) {
-                        EmulatorScreen.aviWriter.method842();
-                        EmulatorScreen.aviWriter = null;
-                    }
-                    this.updatePauseState();
-                    return;
-                }
                 if (menuItem.equals(canvasKeyboardMenuItem)) {
                     Settings.canvasKeyboard = canvasKeyboardMenuItem.getSelection();
                     toggleMenuAccelerators(!Settings.canvasKeyboard);
@@ -1428,10 +1375,6 @@ public final class EmulatorScreen implements
         this.memoryViewMenuItem.setEnabled(this.pauseState != 0);
         this.methodsMenuItem.setEnabled(this.pauseState != 0);
         m3gViewMenuItem.setEnabled(Settings.g3d == 1 && pauseState != 0);
-        if(startRecordAviMenuItem != null)
-            startRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter == null);
-        if(stopRecordAviMenuItem != null)
-            stopRecordAviMenuItem.setEnabled(this.pauseState != 0 && EmulatorScreen.aviWriter != null);
         this.updateStatus();
     }
 
@@ -1637,9 +1580,6 @@ public final class EmulatorScreen implements
             this.screenImageSwt.cloneImage(this.screenCopySwt);
         } else if (Settings.g2d == 1) {
             this.screenImageAwt.cloneImage(this.screenCopyAwt);
-        }
-        if (EmulatorScreen.aviWriter != null) {
-            EmulatorScreen.aviWriter.method843(this.screenCopyAwt.getData());
         }
         this.canvas.redraw();
         this.updateStatus();
@@ -2186,10 +2126,6 @@ public final class EmulatorScreen implements
     }
 
     public final void widgetDisposed(final DisposeEvent disposeEvent) {
-        if (EmulatorScreen.aviWriter != null) {
-            EmulatorScreen.aviWriter.method842();
-            EmulatorScreen.aviWriter = null;
-        }
         Emulator.getEmulator().disposeSubWindows();
         Emulator.notifyDestroyed();
         if (this.pauseState != 0) {

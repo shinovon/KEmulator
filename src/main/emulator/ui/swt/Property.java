@@ -111,8 +111,6 @@ public final class Property implements IProperty {
     private Button aButton728;
     private Button aButton732;
     private Button aButton736;
-    private Button aButton740;
-    private Button aButton743;
     private Button aButton746;
     private Button aButton749;
     private Button aButton752;
@@ -289,8 +287,6 @@ public final class Property implements IProperty {
         this.aButton728 = null;
         this.aButton732 = null;
         this.aButton736 = null;
-        this.aButton740 = null;
-        this.aButton743 = null;
         this.aButton746 = null;
         this.aButton749 = null;
         this.aButton752 = null;
@@ -542,7 +538,6 @@ public final class Property implements IProperty {
             Settings.locale = properties.getProperty("MIDPLocale", "en-US");
 
             // emulator
-            Settings.associateWithJar = Boolean.parseBoolean(properties.getProperty("AssociateWithJar", "false"));
             Settings.rightClickMenu = Boolean.parseBoolean(properties.getProperty("RightClickMenu", "false"));
             Settings.xrayOverlapScreen = Boolean.parseBoolean(properties.getProperty("XRayOverLapScreen", "false"));
             Settings.xrayShowClipBorder = Boolean.parseBoolean(properties.getProperty("XRayShowClipBorder", "false"));
@@ -734,7 +729,6 @@ public final class Property implements IProperty {
             properties.setProperty("MIDPLocale", Settings.locale);
 
             // emulator
-            properties.setProperty("AssociateWithJar", String.valueOf(Settings.associateWithJar));
             properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
             properties.setProperty("XRayOverLapScreen", String.valueOf(Settings.xrayOverlapScreen));
             properties.setProperty("XRayShowClipBorder", String.valueOf(Settings.xrayShowClipBorder));
@@ -864,12 +858,6 @@ public final class Property implements IProperty {
         if (Settings.enableVibration != this.aButton724.getSelection() && !(Settings.enableVibration = this.aButton724.getSelection())) {
             Emulator.getEmulator().getScreen().stopVibra();
         }
-        if (Settings.associateWithJar != this.aButton740.getSelection()) {
-            associateJar(Settings.associateWithJar = this.aButton740.getSelection());
-        }
-        if (Settings.rightClickMenu != this.aButton743.getSelection()) {
-            regRightMenu(Settings.rightClickMenu = this.aButton743.getSelection());
-        }
         Settings.enableKeyRepeat = this.aButton728.getSelection();
         Settings.ignoreFullScreen = this.aButton732.getSelection();
         Settings.networkNotAvailable = this.aButton736.getSelection();
@@ -909,35 +897,6 @@ public final class Property implements IProperty {
         Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
 
         this.updateProxy();
-    }
-
-    private static void regRightMenu(final boolean b) {
-        try {
-            if (!b) {
-                Emulator.unregRightMenu();
-                return;
-            }
-            final String absoluteFile = Emulator.getAbsoluteFile();
-            Emulator.regRightMenu("\"" + (absoluteFile.substring(0, absoluteFile.length() - 3) + "exe").replace('/', '\\') + "\" \"%1\"");
-        } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
-            Emulator.getEmulator().getLogStream().println("+++ emulator.dll not loaded +++");
-        } catch (Exception ignored) {
-        }
-    }
-
-    private static void associateJar(final boolean b) {
-        try {
-            if (!b) {
-                Emulator.unregAssociateJar("KEmulator");
-                return;
-            }
-            final String absoluteFile = Emulator.getAbsoluteFile();
-            final String replace = (absoluteFile.substring(0, absoluteFile.length() - 3) + "exe").replace('/', '\\');
-            Emulator.regAssociateJar("KEmulator", replace + ",0", "\"" + replace + "\" \"%1\"");
-        } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
-            Emulator.getEmulator().getLogStream().println("+++ emulator.dll not loaded +++");
-        } catch (Exception ignored) {
-        }
     }
 
     private void method372(final Shell shell) {
@@ -1850,10 +1809,6 @@ public final class Property implements IProperty {
         layoutData.verticalAlignment = 4;
         (this.sysChecksGroup = new Group(this.systemComp, 0)).setLayout(new GridLayout());
         this.sysChecksGroup.setLayoutData(layoutData);
-        (this.aButton740 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_ASSOCIATE", "Associate with *.jar files."));
-        this.aButton740.setSelection(Settings.associateWithJar);
-        (this.aButton743 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_SHORTCUT", "Add shortcut to right-click menu."));
-        this.aButton743.setSelection(Settings.rightClickMenu);
         (this.aButton746 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_XRAY_BG", "X-Ray View: OverLap images."));
         this.aButton746.setSelection(Settings.xrayOverlapScreen);
         (this.aButton749 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_XRAY_CLIP", "X-Ray View: Show image clipping region."));

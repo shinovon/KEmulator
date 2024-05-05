@@ -721,9 +721,6 @@ public class Emulator {
         Emulator.emulatorimpl = new EmulatorImpl();
         parseLaunchArgs(commandLineArguments);
         platform.loadM3G();
-        try {
-            i.a("emulator");
-        } catch (Error ignored) {}
         vlcCheckerThread.start();
         Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running...");
@@ -910,7 +907,7 @@ public class Emulator {
 
     public static String getAbsoluteFile() {
         String s = System.getProperty("user.dir");
-        if (new File(s + "/KEmulator.jar").exists() || new File(s + "/emulator.dll").exists()) {
+        if (new File(s + "/KEmulator.jar").exists() || new File(s + "/sensorsimulator.jar").exists()) {
             return s + "/KEmulator.jar";
         }
         s = new Emulator().getClass().getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
@@ -925,7 +922,7 @@ public class Emulator {
 
     public static String getAbsolutePath() {
         String s = System.getProperty("user.dir");
-        if (new File(s + "/KEmulator.jar").exists() || new File(s + "/emulator.dll").exists()) {
+        if (new File(s + "/KEmulator.jar").exists() || new File(s + "/sensorsimulator.jar").exists()) {
             return s;
         }
         s = getAbsoluteFile();

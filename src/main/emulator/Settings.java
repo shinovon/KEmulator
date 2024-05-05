@@ -9,7 +9,6 @@ public final class Settings {
     public static boolean ignoreFullScreen;
     public static boolean alwaysOnTop;
     public static boolean enableKeyCache;
-    public static boolean associateWithJar;
     public static boolean rightClickMenu;
     public static int canvasScale = 100;
     public static int frameRate = 60;
