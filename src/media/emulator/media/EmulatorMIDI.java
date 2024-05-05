@@ -123,4 +123,10 @@ public class EmulatorMIDI {
     private static Receiver getMidiReceiver() {
         return midiSequencer.getTransmitters().iterator().next().getReceiver();
     }
+
+    public static void setupSequencer(Sequencer sequencer) throws MidiUnavailableException {
+        for (Transmitter t : sequencer.getTransmitters()) {
+            t.setReceiver(midiDevice.getReceiver());
+        }
+    }
 }

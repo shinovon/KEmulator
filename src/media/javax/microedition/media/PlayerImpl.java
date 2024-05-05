@@ -19,7 +19,7 @@ import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
-public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener {
+public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener, MetaEventListener {
 
     private static int count;
     private static boolean midiPlaying;
@@ -44,6 +44,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
     private byte[] data;
     private long midiPosition;
     private final Object playLock = new Object();
+    private Sequencer midiSequencer;
 
     PlayerImpl() {
         loopCount = 1;
@@ -69,49 +70,41 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             contentType = "";
         this.contentType = (contentType = contentType.toLowerCase());
         if (dataLen == 0) dataLen = inputStream.available();
-        switch (contentType) {
-            case "audio/amr":
-                amr(inputStream);
-                break;
-            case "audio/x-wav":
-            case "audio/wav":
-                wav(inputStream);
-                break;
-            case "audio/x-midi":
-            case "audio/midi":
+        if (contentType.equals("audio/amr")) {
+            amr(inputStream);
+        } else if (contentType.equals("audio/x-wav") || contentType.equals("audio/wav")) {
+            wav(inputStream);
+        } else if (contentType.equals("audio/x-midi") || contentType.equals("audio/midi")) {
+            midi(inputStream);
+        } else if (contentType.equals("audio/mpeg")) {
+            try {
+                InputStream i = inputStream;
+                if (i instanceof ByteArrayInputStream) {
+                    data = CustomJarResources.getBytes(i);
+                    i = new ByteArrayInputStream(data);
+                }
+                sequence = new Player(i);
+            } catch (JavaLayerException e) {
+                e.printStackTrace();
+                throw new IOException(e);
+            }
+            volumeControl = new VolumeControlImpl(this);
+            controls = new Control[]{volumeControl};
+        } else {
+            try {
                 midi(inputStream);
-                break;
-            case "audio/mpeg":
+            } catch (Exception e) {
                 try {
-                    InputStream i = inputStream;
-                    if (i instanceof ByteArrayInputStream) {
-                        data = CustomJarResources.getBytes(i);
-                        i = new ByteArrayInputStream(data);
-                    }
-                    sequence = new Player(i);
-                } catch (JavaLayerException e) {
-                    e.printStackTrace();
-                    throw new IOException(e);
-                }
-                volumeControl = new VolumeControlImpl(this);
-                controls = new Control[]{volumeControl};
-                break;
-            default:
-                try {
-                    midi(inputStream);
-                } catch (Exception e) {
+                    wav(inputStream);
+                } catch (Exception e2) {
                     try {
-                        wav(inputStream);
-                    } catch (Exception e2) {
-                        try {
-                            amr(inputStream);
-                        } catch (Exception e3) {
-                            Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
-                            sequence = null;
-                        }
+                        amr(inputStream);
+                    } catch (Exception e3) {
+                        Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
+                        sequence = null;
                     }
                 }
-                break;
+            }
         }
         setLevel(level);
     }
@@ -282,8 +275,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         if (sequence instanceof Player) {
             ((Player) sequence).close();
         }
-        if(sequence instanceof Sequence) {
-            EmulatorMIDI.close();
+        if(sequence instanceof Sequence && midiSequencer != null) {
+            midiSequencer.close();
+            midiSequencer = null;
+//            EmulatorMIDI.close();
         }
         if (dataSource != null && !dataSourceDisconnected) {
             dataSource.disconnect();
@@ -352,8 +347,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         }
         if (sequence instanceof Sequence) {
             try {
-                if (EmulatorMIDI.currentPlayer == this && midiPlaying)
-                    return EmulatorMIDI.getMicrosecondPosition();
+                if(midiSequencer != null)
+                    midiSequencer.getMicrosecondPosition();
+//                if (EmulatorMIDI.currentPlayer == this && midiPlaying)
+//                    return EmulatorMIDI.getMicrosecondPosition();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -381,8 +378,10 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             }
             midiPosition = ms;
             try {
-                if (EmulatorMIDI.currentPlayer == this)
-                    EmulatorMIDI.setMicrosecondPosition(ms);
+                if(midiSequencer != null)
+                    midiSequencer.setMicrosecondPosition(ms);
+//                if (EmulatorMIDI.currentPlayer == this)
+//                    EmulatorMIDI.setMicrosecondPosition(ms);
             } catch (Exception e) {
                 throw new MediaException(e);
             }
@@ -435,12 +434,17 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             }
             try {
                 if (sequence != null) {
-                    EmulatorMIDI.setSequence((Sequence) sequence);
+                    if (Settings.oneMidiAtTime) {
+                        EmulatorMIDI.setSequence((Sequence) sequence);
+                    } else {
+                        initMidiSequencer();
+                        midiSequencer.setSequence((Sequence) sequence);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 sequence = null;
-                throw new MediaException(e.toString());
+                throw new MediaException(e);
             }
         }
         if (dataSource != null) {
@@ -470,7 +474,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             }
             boolean mp3 = false;
 
-            SourceStream stream = dataSource.getStreams()[0];
+            final SourceStream stream = dataSource.getStreams()[0];
             String streamContentType = stream.getContentDescriptor().getContentType();
             if (streamContentType != null) {
                 if (streamContentType.equalsIgnoreCase("audio/mpeg") || contentType.equalsIgnoreCase("audio/mp3")) {
@@ -529,7 +533,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         }
         if (state != STARTED) {
             if (sequence != null) {
-                if (midi && EmulatorMIDI.currentPlayer != null) {
+                if (midi && Settings.oneMidiAtTime && EmulatorMIDI.currentPlayer != null) {
                     if(midiPlaying && EmulatorMIDI.currentPlayer != this) {
                         try {
                             EmulatorMIDI.currentPlayer.stop();
@@ -597,16 +601,24 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 state = PREFETCHED;
                 return;
             }
+            boolean globalMidi = Settings.oneMidiAtTime;
             int loopCount = this.loopCount;
             boolean complete = false;
             boolean b = true;
             while (playerThread != null && loopCount != 0) {
                 complete = false;
                 if (sequence instanceof Sequence) {
-                    EmulatorMIDI.start(this, (Sequence) sequence, midiPosition);
-                    EmulatorMIDI.currentPlayer = this;
+                    initMidiSequencer();
+                    if (globalMidi) {
+                        EmulatorMIDI.start(this, (Sequence) sequence, midiPosition);
+                        EmulatorMIDI.currentPlayer = this;
+                    } else {
+                        midiSequencer.setSequence((Sequence) sequence);
+                        midiSequencer.setMicrosecondPosition(midiPosition);
+                        midiSequencer.start();
+                    }
                     if (b) {
-                        notifyListeners(PlayerListener.STARTED, midiPosition = EmulatorMIDI.getMicrosecondPosition());
+                        notifyListeners(PlayerListener.STARTED, midiPosition = midiSequencer.getMicrosecondPosition());
                         b = false;
                     }
                     midiPlaying = true;
@@ -614,9 +626,13 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                         playLock.wait();
                     }
                     complete = this.complete;
-                    midiPosition = EmulatorMIDI.getMicrosecondPosition();
+                    midiPosition = midiSequencer.getMicrosecondPosition();
                     midiPlaying = false;
-                    EmulatorMIDI.stop();
+                    if (globalMidi) {
+                        EmulatorMIDI.stop();
+                    } else {
+                        midiSequencer.stop();
+                    }
                 } else if (sequence instanceof Clip) {
                     Clip clip = (Clip) sequence;
                     clip.start();
@@ -724,21 +740,17 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         } else if (sequence instanceof Player) {
             ext = "mp3";
         } else if (contentType != null) {
-            switch (contentType.toLowerCase()) {
-                case "audio/wav":
-                case "audio/wave":
-                case "audio/x-wav":
-                    ext = "wav";
-                    break;
-                case "audio/x-mid":
-                case "audio/mid":
-                case "audio/midi":
-                    ext = "mid";
-                    break;
-                case "audio/mpeg":
-                case "audio/mp3":
-                    ext = "mp3";
-                    break;
+            if (contentType.equalsIgnoreCase("audio/wav") ||
+                    contentType.equalsIgnoreCase("audio/wave") ||
+                    contentType.equalsIgnoreCase("audio/x-wav")) {
+                ext = "wav";
+            } else if (contentType.equalsIgnoreCase("audio/x-mid") ||
+                    contentType.equalsIgnoreCase("audio/mid") ||
+                    contentType.equalsIgnoreCase("audio/midi")) {
+                ext = "mid";
+            } else if (contentType.equalsIgnoreCase("audio/mpeg") ||
+                    contentType.equalsIgnoreCase("audio/mp3")) {
+                ext = "mp3";
             }
         }
         if (ext.isEmpty()) return "audio" + hashCode();
@@ -749,6 +761,20 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
         complete = true;
         synchronized (playLock) {
             playLock.notify();
+        }
+    }
+
+    private void initMidiSequencer() throws MidiUnavailableException {
+        if(midiSequencer != null) return;
+        midiSequencer = MidiSystem.getSequencer();
+        EmulatorMIDI.setupSequencer(midiSequencer);
+        midiSequencer.addMetaEventListener(this);
+        midiSequencer.open();
+    }
+
+    public void meta(MetaMessage meta) {
+        if (meta.getType() == 0x2F) {
+            notifyCompleted();
         }
     }
 }
