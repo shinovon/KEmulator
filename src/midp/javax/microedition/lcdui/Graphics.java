@@ -12,7 +12,7 @@ import com.jblend.graphics.j3d.FigureLayout;
 import com.jblend.graphics.j3d.Texture;
 
 
-public class Graphics {
+public class Graphics implements com.jblend.graphics.j3d.Graphics3D {
     IGraphics2D impl;
     IImage image;
     IImage copyimage;
