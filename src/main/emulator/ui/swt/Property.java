@@ -533,6 +533,7 @@ public final class Property implements IProperty {
             Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
             Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
             Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
+            Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
 
             Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
             Settings.locale = properties.getProperty("MIDPLocale", "en-US");
@@ -724,6 +725,7 @@ public final class Property implements IProperty {
             properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
             properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
             properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
+            properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
 
             properties.setProperty("FileEncoding", Settings.fileEncoding);
             properties.setProperty("MIDPLocale", Settings.locale);
