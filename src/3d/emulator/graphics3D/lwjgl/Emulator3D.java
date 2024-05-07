@@ -369,18 +369,19 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    public final void enableDepthBuffer(boolean var1) {
-        this.depthBufferEnabled = var1;
+    public final void enableDepthBuffer(boolean enabled) {
+        depthBufferEnabled = enabled;
     }
 
     public final boolean isDepthBufferEnabled() {
-        return this.depthBufferEnabled;
+        return depthBufferEnabled;
     }
 
-    public final void setHints(int var1) {
-        this.hints = var1;
-        if (this.target != null) {
-            this.setHintsInternal();
+    public final void setHints(int hints) {
+        this.hints = hints;
+
+        if (target != null) {
+            setHintsInternal();
         }
 
     }
@@ -413,113 +414,136 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public final int getHints() {
-        return this.hints;
+        return hints;
     }
 
     public final Hashtable getProperties() {
         return properties;
     }
 
-    public final void setDepthRange(float var1, float var2) {
-        this.depthRangeNear = var1;
-        this.depthRangeFar = var2;
+    public final void setDepthRange(float near, float far) {
+        depthRangeNear = near;
+        depthRangeFar = far;
     }
 
     private void setupDepth() {
-        GL11.glDepthRange((double) this.depthRangeNear, (double) this.depthRangeFar);
+        GL11.glDepthRange(depthRangeNear, depthRangeFar);
     }
 
-    public final void setViewport(int var1, int var2, int var3, int var4) {
-        this.viewportX = var1;
-        this.viewportY = var2;
-        this.viewportWidth = var3;
-        this.viewportHeight = var4;
+    public final void setViewport(int x, int y, int w, int h) {
+        viewportX = x;
+        viewportY = y;
+        viewportWidth = w;
+        viewportHeight = h;
     }
 
     private void setupViewport() {
-        GL11.glViewport(this.viewportX, targetHeight - this.viewportY - this.viewportHeight, this.viewportWidth, this.viewportHeight);
-        GL11.glScissor(this.viewportX, targetHeight - this.viewportY - this.viewportHeight, this.viewportWidth, this.viewportHeight);
+        GL11.glViewport(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
+        GL11.glScissor(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
     }
 
-    public final void clearBackgound(Object var1) {
-        Background var2 = (Background) var1;
-        this.setupViewport();
-        this.setupDepth();
-        GL11.glClearDepth(1.0D);
+    public final void clearBackgound(Object bgObj) {
+        Background bg = (Background) bgObj;
+
+        setupViewport();
+        setupDepth();
+
+        GL11.glClearDepth(1);
         GL11.glDepthMask(true);
         GL11.glColorMask(true, true, true, true);
-        int var10000 = var2 != null && !Settings.xrayView ? var2.getColor() : 0;
-        GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var10000, 8), G3DUtils.getFloatColor(var10000, 0), G3DUtils.getFloatColor(var10000, 24));
-        if (var2 != null && !Settings.xrayView) {
-            GL11.glClear((var2.isColorClearEnabled() ? 16384 : 0) | (this.depthBufferEnabled && var2.isDepthClearEnabled() ? 256 : 0));
-            this.method504(var2);
+
+        int bgColor = bg != null && !Settings.xrayView ? bg.getColor() : 0;
+        GL11.glClearColor(
+                G3DUtils.getFloatColor(bgColor, 16),
+                G3DUtils.getFloatColor(bgColor, 8),
+                G3DUtils.getFloatColor(bgColor, 0),
+                G3DUtils.getFloatColor(bgColor, 24)
+        );
+
+        if (bg != null && !Settings.xrayView) {
+            int colorClear = bg.isColorClearEnabled() ? GL_COLOR_BUFFER_BIT : 0;
+            int depthClear = depthBufferEnabled && bg.isDepthClearEnabled() ? GL_DEPTH_BUFFER_BIT : 0;
+            GL11.glClear(colorClear | depthClear);
+
+            drawBackgroundImage(bg);
         } else {
-            GL11.glClear(GL_COLOR_BUFFER_BIT | (this.depthBufferEnabled ? 256 : 0));
+            GL11.glClear(GL_COLOR_BUFFER_BIT | (depthBufferEnabled ? GL_DEPTH_BUFFER_BIT : 0));
         }
     }
 
-    private void method504(Background var1) {
-        if (var1 != null && var1.getImage() != null && var1.getCropWidth() > 0 && var1.getCropHeight() > 0) {
-            GL11.glDisable(2896);
-            GL11.glDisable(2912);
-            GL11.glDisable(GL_ALPHA_TEST);
-            GL11.glDisable(GL_BLEND);
-            int var2 = var1.getImage().getFormat() == 99 ? GL_RGB : GL_RGBA;
-            int var3 = var1.getImage().getWidth();
-            int var4 = var1.getImage().getHeight();
-            GL11.glMatrixMode(5889);
-            GL11.glPushMatrix();
-            GL11.glLoadIdentity();
-            GL11.glMatrixMode(5888);
-            GL11.glPushMatrix();
-            GL11.glLoadIdentity();
-            float var5 = (float) this.viewportWidth;
-            float var6 = (float) this.viewportHeight;
-            float var7 = var5 / (float) var1.getCropWidth();
-            float var8 = var6 / (float) var1.getCropHeight();
-            float var9 = var7 * (float) var3;
-            float var10 = var8 * (float) var4;
-            float var11 = -var5 * (float) var1.getCropX() / (float) var1.getCropWidth() - var5 / 2.0F;
-            float var12 = var6 * (float) var1.getCropY() / (float) var1.getCropHeight() + var6 / 2.0F;
-            int var13 = 1;
-            int var14 = 1;
-            if (var1.getImageModeX() == 33) {
-                if ((var11 %= var9) > 0.0F) {
-                    var11 -= var9;
-                }
+    private void drawBackgroundImage(Background bg) {
+        if (bg == null || bg.getImage() == null || bg.getCropWidth() <= 0 || bg.getCropHeight() <= 0) return;
 
-                var13 = (int) (2.5F + var5 / var9);
-                var11 -= (float) (var13 / 2) * var9;
+        GL11.glDisable(GL_LIGHTING);
+        GL11.glDisable(GL_FOG);
+        GL11.glDisable(GL_ALPHA_TEST);
+        GL11.glDisable(GL_BLEND);
+
+        GL11.glDepthFunc(GL_ALWAYS);
+        GL11.glDepthMask(false);
+
+        GL11.glMatrixMode(GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+
+        GL11.glMatrixMode(GL_MODELVIEW);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+
+        int imgGlFormat = bg.getImage().getFormat() == Image2D.RGB ? GL_RGB : GL_RGBA;
+        int imgW = bg.getImage().getWidth();
+        int imgH = bg.getImage().getHeight();
+
+        float viewportW = viewportWidth;
+        float viewportH = viewportHeight;
+
+        float imgScaleX = viewportW / bg.getCropWidth();
+        float imgScaleY = viewportH / bg.getCropHeight();
+
+        //TODO: understand what's going on here
+        float drawX = -viewportW * bg.getCropX() / bg.getCropWidth() - viewportW / 2;
+        float drawY = viewportH * bg.getCropY() / bg.getCropHeight() + viewportH / 2;
+
+        float offsetX = imgScaleX * imgW;
+        float offsetY = imgScaleY * imgH;
+
+        int repeatsX = 1;
+        if (bg.getImageModeX() == Background.REPEAT) {
+            if ((drawX %= offsetX) > 0) {
+                drawX -= offsetX;
             }
 
-            if (var1.getImageModeY() == 33) {
-                var12 %= var10;
-                var14 = (int) (2.5F + var6 / var10);
-                var12 += (float) (var14 / 2) * var10;
-            }
-
-            GL11.glPixelStorei(3314, var3);
-            GL11.glPixelStorei(3315, 0);
-            GL11.glPixelStorei(3316, 0);
-            GL11.glDepthFunc(519);
-            GL11.glDepthMask(false);
-            GL11.glPixelZoom(var7, -var8);
-            ByteBuffer var15 = memoryBuffers.getImageBuffer(var1.getImage().getImageData());
-
-            for (int var16 = 0; var16 < var14; ++var16) {
-                for (int var17 = 0; var17 < var13; ++var17) {
-                    GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
-                    GL11.glBitmap(0, 0, 0.0F, 0.0F, var11 + (float) var17 * var9, var12 - (float) var16 * var10, var15);
-                    GL11.glDrawPixels(var3, var4, var2, 5121, var15);
-                }
-            }
-
-            GL11.glPixelStorei(3314, 0);
-            GL11.glPopMatrix();
-            GL11.glMatrixMode(5889);
-            GL11.glPopMatrix();
+            repeatsX = (int) (2.5f + viewportW / offsetX);
+            drawX -= repeatsX / 2f * offsetX;
         }
 
+        int repeatsY = 1;
+        if (bg.getImageModeY() == Background.REPEAT) {
+            drawY %= offsetY;
+            repeatsY = (int) (2.5f + viewportH / offsetY);
+            drawY += repeatsY / 2f * offsetY;
+        }
+
+        GL11.glPixelStorei(GL_UNPACK_ROW_LENGTH, imgW);
+        GL11.glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+        GL11.glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+
+        GL11.glPixelZoom(imgScaleX, -imgScaleY);
+        ByteBuffer imgBuffer = memoryBuffers.getImageBuffer(bg.getImage().getImageData());
+
+        for (int y = 0; y < repeatsY; y++) {
+            for (int x = 0; x < repeatsX; x++) {
+                GL11.glRasterPos4f(0, 0, 0, 1);
+                GL11.glBitmap(0, 0, 0, 0, drawX + x * offsetX, drawY - y * offsetY, imgBuffer);
+                GL11.glDrawPixels(imgW, imgH, imgGlFormat, GL_UNSIGNED_BYTE, imgBuffer);
+            }
+        }
+
+        GL11.glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL_PROJECTION);
+        GL11.glPopMatrix();
     }
 
     private void setupCamera() {
@@ -632,7 +656,7 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     public final void render(VertexBuffer vb, IndexBuffer ib, Appearance ap, Transform trans, int scope) {
-        this.renderVertex(vb, ib, ap, trans, scope, 1.0F);
+        renderVertex(vb, ib, ap, trans, scope, 1.0F);
     }
 
     private void renderVertex(VertexBuffer vb, IndexBuffer ib, Appearance ap, Transform trans, int scope, float alphaFactor) {
@@ -797,22 +821,27 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private void draw(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Appearance appearance, float alphaFactor) {
-        VertexArray colors = vertexBuffer.getColors();
+    private void draw(VertexBuffer vb, IndexBuffer indices, Appearance ap, float alphaFactor) {
+        VertexArray colors = vb.getColors();
         if (colors == null) {
-            int col = vertexBuffer.getDefaultColor();
-            GL11.glColor4ub((byte) (col >> 16 & 255), (byte) (col >> 8 & 255), (byte) (col & 255), (byte) ((int) ((float) (col >> 24 & 255) * alphaFactor)));
+            int col = vb.getDefaultColor();
+            GL11.glColor4ub((byte) (col >> 16 & 255), (byte) (col >> 8 & 255), (byte) (col & 255), (byte) ((col >> 24 & 255) * alphaFactor));
             GL11.glDisableClientState(GL_COLOR_ARRAY);
         } else {
             GL11.glEnableClientState(GL_COLOR_ARRAY);
             if (colors.getComponentType() == 1) {
                 byte[] colorsBArr = colors.getByteValues();
-                GL11.glColorPointer(alphaFactor == 1.0F ? colors.getComponentCount() : 4, 5121, 0, memoryBuffers.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount()));
+                GL11.glColorPointer(
+                        alphaFactor == 1.0F ? colors.getComponentCount() : 4,
+                        GL_UNSIGNED_BYTE,
+                        0,
+                        memoryBuffers.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount())
+                );
             }
         }
 
-        VertexArray normals = vertexBuffer.getNormals();
-        if (normals != null && appearance.getMaterial() != null) {
+        VertexArray normals = vb.getNormals();
+        if (normals != null && ap.getMaterial() != null) {
             GL11.glEnableClientState(GL_NORMAL_ARRAY);
             glEnable(GL_NORMALIZE);
             if (normals.getComponentType() == 1) {
@@ -825,7 +854,7 @@ public final class Emulator3D implements IGraphics3D {
         }
 
         float[] scaleBias = new float[4];
-        VertexArray positions = vertexBuffer.getPositions(scaleBias);
+        VertexArray positions = vb.getPositions(scaleBias);
         GL11.glEnableClientState(GL_VERTEX_ARRAY);
         if (positions.getComponentType() == 1) {
             byte[] posesBArr = positions.getByteValues();
@@ -839,15 +868,15 @@ public final class Emulator3D implements IGraphics3D {
         GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
         GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 
-        TriangleStripArray triangleStripArray = (TriangleStripArray) indexBuffer;
+        TriangleStripArray triangleStripArray = (TriangleStripArray) indices;
         int stripCount = triangleStripArray.getStripCount();
 
-        if (appearance != null && !Settings.xrayView) {
+        if (ap != null && !Settings.xrayView) {
 
             for (int i = 0; i < NumTextureUnits; ++i) {
-                Texture2D texture2D = appearance.getTexture(i);
+                Texture2D texture2D = ap.getTexture(i);
                 scaleBias[3] = 0.0F;
-                VertexArray texCoords = vertexBuffer.getTexCoords(i, scaleBias);
+                VertexArray texCoords = vb.getTexCoords(i, scaleBias);
 
                 if (texture2D == null || texCoords == null) continue;
 
@@ -1004,7 +1033,7 @@ public final class Emulator3D implements IGraphics3D {
             }
 
             for (int i = 0; i < NumTextureUnits; ++i) {
-                Texture2D tex = appearance.getTexture(i);
+                Texture2D tex = ap.getTexture(i);
                 if(tex == null) continue;
 
                 Image2D image2D = tex.getImage();
@@ -1034,34 +1063,38 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    public synchronized void render(World var1) {
-        Transform var2 = new Transform();
-        this.clearBackgound(var1.getBackground());
-        var1.getActiveCamera().getTransformTo(var1, var2);
-        CameraCache.setCamera(var1.getActiveCamera(), var2);
-        LightsCache.addLightsFromWorld(var1);
-        RenderPipe.getInstance().pushRenderNode(var1, null);
-        this.method519();
+    public synchronized void render(World world) {
+        Transform camTrans = new Transform();
+        world.getActiveCamera().getTransformTo(world, camTrans);
+        CameraCache.setCamera(world.getActiveCamera(), camTrans);
+
+        clearBackgound(world.getBackground());
+        LightsCache.addLightsFromWorld(world);
+        RenderPipe.getInstance().pushRenderNode(world, null);
+
+        renderPushedNodes();
     }
 
-    public synchronized void render(Node var1, Transform var2) {
-        RenderPipe.getInstance().pushRenderNode(var1, var2);
-        this.method519();
+    public synchronized void render(Node node, Transform transform) {
+        RenderPipe.getInstance().pushRenderNode(node, transform);
+        renderPushedNodes();
     }
 
-    private void method519() {
-        for (int var1 = 0; var1 < RenderPipe.getInstance().getSize(); ++var1) {
-            RenderObject var2;
-            if ((var2 = RenderPipe.getInstance().getRenderObj(var1)).node instanceof Mesh) {
-                Mesh var3;
-                IndexBuffer var4 = (var3 = (Mesh) var2.node).getIndexBuffer(var2.submeshIndex);
-                Appearance var5 = var3.getAppearance(var2.submeshIndex);
-                if (var4 != null && var5 != null) {
-                    VertexBuffer var6 = MeshMorph.getInstance().getMorphedVertexBuffer(var3);
-                    this.renderVertex(var6, var4, var5, var2.trans, var3.getScope(), var2.alphaFactor);
+    private void renderPushedNodes() {
+        for (int i = 0; i < RenderPipe.getInstance().getSize(); i++) {
+            RenderObject ro = RenderPipe.getInstance().getRenderObj(i);
+
+            if (ro.node instanceof Mesh) {
+                Mesh mesh = (Mesh) ro.node;
+                IndexBuffer indices = mesh.getIndexBuffer(ro.submeshIndex);
+                Appearance ap = mesh.getAppearance(ro.submeshIndex);
+
+                if (indices != null && ap != null) {
+                    VertexBuffer vb = MeshMorph.getInstance().getMorphedVertexBuffer(mesh);
+                    renderVertex(vb, indices, ap, ro.trans, mesh.getScope(), ro.alphaFactor);
                 }
             } else {
-                this.renderSprite((Sprite3D) var2.node, var2.trans, var2.alphaFactor);
+                renderSprite((Sprite3D) ro.node, ro.trans, ro.alphaFactor);
             }
         }
 
