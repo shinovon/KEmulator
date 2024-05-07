@@ -353,7 +353,7 @@ public final class EventQueue implements Runnable {
                         time = System.currentTimeMillis();
                     } else if(time != -1 && (System.currentTimeMillis() - time) > 10000) {
                         time = -1;
-                        Emulator.getEmulator().getLogStream().println("Event thread remained idle for last 10 seconds! Is app alive?");
+                        Emulator.getEmulator().getLogStream().println("Event thread remained idle for last 10 seconds!");
                     }
                     Thread.sleep(1);
                 } else {
