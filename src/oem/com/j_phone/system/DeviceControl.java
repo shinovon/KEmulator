@@ -64,11 +64,9 @@ public class DeviceControl {
         if (device != 3) {
             return 0;
         }
-        // TODO
         try {
             return Emulator.getCanvas().getKeyStatesVodafone();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
         return 0;
     }
 

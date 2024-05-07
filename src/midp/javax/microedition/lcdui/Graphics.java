@@ -12,7 +12,8 @@ import com.jblend.graphics.j3d.FigureLayout;
 import com.jblend.graphics.j3d.Texture;
 
 
-public class Graphics implements com.jblend.graphics.j3d.Graphics3D {
+public class Graphics implements com.vodafone.v10.graphics.j3d.Graphics3D,
+        com.jblend.graphics.j3d.Graphics3D {
     IGraphics2D impl;
     IImage image;
     IImage copyimage;
@@ -551,6 +552,13 @@ public class Graphics implements com.jblend.graphics.j3d.Graphics3D {
         impl.reset();
         if (xrayGraphics != null)
             xrayGraphics.reset();
+    }
+
+    public synchronized void drawFigure(com.vodafone.v10.graphics.j3d.Figure figure,
+                                         int x, int y,
+                                         com.vodafone.v10.graphics.j3d.FigureLayout layout,
+                                         com.vodafone.v10.graphics.j3d.Effect3D effect) {
+        com.vodafone.v10.graphics.j3d.RenderProxy.drawFigure(this, figure, x, y, layout, effect);
     }
 
     public void drawCommandList(Texture[] textures, int x, int y, FigureLayout layout, Effect3D effect, int[] commandlist) {

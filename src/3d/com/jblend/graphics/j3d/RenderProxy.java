@@ -94,7 +94,7 @@ public class RenderProxy {
 		render.renderPrimitives(getMascotTexture(texture), x, y, getMascotLayout(layout), getMascotEffect(effect), command, numPrimitives, vertexCoords, normals, textureCoords, colors);
 	}
 
-	private static com.mascotcapsule.micro3d.v3.Graphics3D getRender(Graphics g) {
+	public static com.mascotcapsule.micro3d.v3.Graphics3D getRender(Graphics g) {
 		com.mascotcapsule.micro3d.v3.Graphics3D render = renders.get(g);
 		if (render == null) {
 			render = new com.mascotcapsule.micro3d.v3.Graphics3D();
