@@ -465,32 +465,4 @@ public abstract class Canvas extends Displayable {
     public int getKeyStatesVodafone() {
         return vKeyStates;
     }
-
-    // TODO mascot capsule stub
-//    public void drawCommandList(Texture[] textures, int x, int y, FigureLayout layout, Effect3D effect, int[] commandlist) {
-//        com.jblend.graphics.j3d.RenderProxy.drawCommandList(this, textures, x, y, layout, effect, commandlist);
-//    }
-//
-//    public void drawCommandList(Texture texture, int x, int y, FigureLayout layout, Effect3D effect, int[] commandlist) {
-//        com.jblend.graphics.j3d.RenderProxy.drawCommandList(this, texture, x, y, layout, effect, commandlist);
-//    }
-//
-//    public void drawFigure(com.jblend.graphics.j3d.Figure figure,
-//                           int x, int y,
-//                           com.jblend.graphics.j3d.FigureLayout layout,
-//                           com.jblend.graphics.j3d.Effect3D effect) {
-//        com.jblend.graphics.j3d.RenderProxy.drawFigure(this, figure, x, y, layout, effect);
-//    }
-//
-//    public void flush() {
-//        com.jblend.graphics.j3d.RenderProxy.flush(this);
-//    }
-//
-//    public void renderFigure(Figure figure, int x, int y, FigureLayout layout, Effect3D effect) {
-//        com.jblend.graphics.j3d.RenderProxy.renderFigure(this, figure, x, y, layout, effect);
-//    }
-//
-//    public void renderPrimitives(Texture texture, int x, int y, FigureLayout layout, Effect3D effect, int command, int numPrimitives, int[] vertexCoords, int[] normals, int[] textureCoords, int[] colors) {
-//        com.jblend.graphics.j3d.RenderProxy.renderPrimitives(this, texture, x, y, layout, effect, command, numPrimitives, vertexCoords, normals, textureCoords, colors);
-//    }
 }

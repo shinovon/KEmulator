@@ -52,6 +52,7 @@ public class Vector3D {
     }
 
     public final int innerProduct(Vector3D paramVector3D) {
+        return 0;
     }
 
     public final void outerProduct(Vector3D paramVector3D) {

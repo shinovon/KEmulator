@@ -29,6 +29,7 @@ public class Figure {
     }
 
     public final int getNumTextures() {
+        return 0;
     }
 
     public final void selectTexture(int paramInt) {
