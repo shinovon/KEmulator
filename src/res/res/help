@@ -44,7 +44,7 @@ log.txt      log file
 ==================
 $[Changelog]
 $v2.16 [2024.05.06]
-Remove emulator.dll and its functions
+Removed emulator.dll
 
 $v2.16 [2024.05.05]
 Updated swt

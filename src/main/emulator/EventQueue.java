@@ -11,12 +11,12 @@ public final class EventQueue implements Runnable {
     private int[] events;
     private int count;
     boolean running;
-    private Vector serialEvents = new Vector();
-    private Thread eventThread;
+    private final Vector serialEvents = new Vector();
+    private final Thread eventThread;
     private boolean paused;
-    private InputThread input = new InputThread();
-    private Thread inputThread;
-    private int[] repaintRegion = new int[4];
+    private final InputThread input = new InputThread();
+    private final Thread inputThread;
+    private final int[] repaintRegion = new int[4];
     private final Object lock = new Object();
     private final Object repaintLock = new Object();
     private boolean repainted;
@@ -299,10 +299,12 @@ public final class EventQueue implements Runnable {
                         }
                         Emulator.getCanvas().invokeHideNotify();
                         this.paused = true;
-                        try {
-                            Emulator.getMIDlet().invokePauseApp();
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if(Settings.startAppOnResume) {
+                            try {
+                                Emulator.getMIDlet().invokePauseApp();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                         break;
                     }
@@ -313,10 +315,12 @@ public final class EventQueue implements Runnable {
                         if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
                             break;
                         }
-                        try {
-                            Emulator.getMIDlet().invokeStartApp();
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if(Settings.startAppOnResume) {
+                            try {
+                                Emulator.getMIDlet().invokeStartApp();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                         Emulator.getCanvas().invokeShowNotify();
                         break;
