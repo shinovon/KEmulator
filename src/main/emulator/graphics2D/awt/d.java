@@ -118,8 +118,12 @@ public final class d implements IImage
         }
     }
     
-    public final int getRGB(final int n, final int n2) {
-        return this.img.getRGB(n, n2);
+    public final int getRGB(int x, int y) {
+        return this.img.getRGB(x, y);
+    }
+
+    public void setRGB(int x, int y, int color) {
+        img.setRGB(x, y, color | 0xFF000000);
     }
     
     public final void saveToFile(final String s) {

@@ -3,7 +3,10 @@ package com.siemens.mp.ui;
 import java.io.IOException;
 import javax.microedition.lcdui.Graphics;
 
-public class Image {
+public class Image extends com.siemens.mp.misc.NativeMem {
+
+    public Image() {
+    }
     public Image(byte[] imageData) {
         System.out.println("public Image(byte[] imageData)");
     }
@@ -56,7 +59,6 @@ public class Image {
 
     public static javax.microedition.lcdui.Image createImageWithoutScaling(String name)
             throws IOException {
-        System.out.println("public static javax.microedition.lcdui.Image createImageWithoutScaling(String name)");
         return javax.microedition.lcdui.Image.createImage(name);
     }
 
@@ -119,4 +121,8 @@ public class Image {
         }
         return p | a;
     }
+
+    public static void mirrorImageVertically(javax.microedition.lcdui.Image image) {}
+
+    protected static void setNativeImage(javax.microedition.lcdui.Image img, Image simg) {}
 }
