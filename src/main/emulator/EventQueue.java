@@ -184,7 +184,8 @@ public final class EventQueue implements Runnable {
     }
 
     public void serviceRepaints() {
-        if (Thread.currentThread() == eventThread) {
+        Thread t = Thread.currentThread();
+        if (t == eventThread || t == inputThread) {
             synchronized(lock) {
                 internalRepaint();
             }
