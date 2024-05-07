@@ -20,46 +20,65 @@ public final class EventQueue implements Runnable {
     private final Object lock = new Object();
     private final Object repaintLock = new Object();
     private boolean repainted;
+    private boolean alive;
 
     public EventQueue() {
-        super();
         events = new int[128];
-        this.paused = false;
-        this.running = true;
+        paused = false;
+        running = true;
         eventThread = new Thread(this, "KEmulator-EventQueue");
         eventThread.start();
-        (this.inputThread = new Thread(input, "KEmulator-InputQueue")).setPriority(3);
-        this.inputThread.start();
+        inputThread = new Thread(input, "KEmulator-InputQueue");
+        inputThread.setPriority(3);
+        inputThread.start();
+        Thread crashThread = new Thread() {
+            public void run() {
+                long time = System.currentTimeMillis();
+                try {
+                    while (running) {
+                        if(alive || paused || Settings.steps >= 0) {
+                            time = System.currentTimeMillis();
+                            alive = false;
+                        } else if((System.currentTimeMillis() - time) > 5000) {
+                            time = System.currentTimeMillis();
+                            Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
+                        }
+                        sleep(100);
+                    }
+                } catch (InterruptedException ignored) {}
+            }
+        };
+        crashThread.start();
     }
 
-    public final void stop() {
-        this.running = false;
+    public void stop() {
+        running = false;
     }
 
-    public final void keyRepeat(int n) {
+    public void keyRepeat(int n) {
         input.queue(2, n, 0, true);
         //method717(33554432, n);
     }
 
-    public final void keyPress(int n) {
+    public void keyPress(int n) {
         input.queue(0, n, 0, true);
         //method717(67108864, n);
     }
 
-    public final void keyRelease(int n) {
+    public void keyRelease(int n) {
         input.queue(1, n, 0, true);
         //method717(134217728, n);
     }
 
-    private static int method718(final int n) {
+    private static int method718(int n) {
         if (n < 0) {
             return (-n & 0xFFF) | 0x8000;
         }
         return n & 0xFFF;
     }
 
-    private int method719(int i, final int n, final boolean b) {
-        final int n2 = n & 0xFFF;
+    private int method719(int i, int n, boolean b) {
+        int n2 = n & 0xFFF;
         if (!b) {
             return n2;
         }
@@ -69,7 +88,7 @@ public final class EventQueue implements Runnable {
         return n2;
     }
 
-    public final void mouseDown(final int x, final int y) {
+    public void mouseDown(int x, int y) {
         try {
             if (Emulator.getCurrentDisplay().getCurrent() == null) {
                 return;
@@ -85,7 +104,7 @@ public final class EventQueue implements Runnable {
         //mouse(268435456, x, y);
     }
 
-    public final void mouseUp(final int x, final int y) {
+    public void mouseUp(int x, int y) {
         try {
             if (Emulator.getCurrentDisplay().getCurrent() == null) {
                 return;
@@ -101,7 +120,7 @@ public final class EventQueue implements Runnable {
         //mouse(536870912, x, y);
     }
 
-    public final void mouseDrag(final int x, final int y) {
+    public void mouseDrag(int x, int y) {
         try {
             if (Emulator.getCurrentDisplay().getCurrent() == null) {
                 return;
@@ -118,15 +137,15 @@ public final class EventQueue implements Runnable {
     }
 
     public void queue(int n, int x, int y) {
-        final int n4 = n | method718(x) | method718(y) << 12;
+        int n4 = n | method718(x) | method718(y) << 12;
         queue(n4);
     }
 
-    public synchronized final void mouse(final int n, final int x, final int y) {
+    public synchronized void mouse(int n, int x, int y) {
         queue(n | method718(x) | method718(y) << 12);
     }
 
-    public synchronized void queue(final int n) {
+    public synchronized void queue(int n) {
         if (n == 1) {
             if(events[0] == 1 && !repainted)
                 return;
@@ -200,15 +219,17 @@ public final class EventQueue implements Runnable {
         } catch (Exception ignored) {}
     }
 
-    public final void run() {
+    public void run() {
+        long time = 0;
         int event;
-        while (this.running) {
+        while (running) {
+            alive = true;
             try {
                 if (Emulator.getMIDlet() == null || paused) {
                     Thread.sleep(5);
                     continue;
                 }
-                switch (event = this.nextEvent()) {
+                switch (event = nextEvent()) {
                     case 1: {
                         synchronized(lock) {
                             internalRepaint();
@@ -324,9 +345,16 @@ public final class EventQueue implements Runnable {
                         ((Runnable) serialEvents.remove(0)).run();
                     }
                 } else if(event == 0) {
+                    if (time == 0) {
+                        time = System.currentTimeMillis();
+                    } else if(time != -1 && (System.currentTimeMillis() - time) > 10000) {
+                        time = -1;
+                        Emulator.getEmulator().getLogStream().println("Event thread remained idle for last 10 seconds! Is app alive?");
+                    }
                     Thread.sleep(1);
+                } else {
+                    time = 0;
                 }
-                event = 0;
             } catch (Throwable e) {
                 System.err.println("Exception in Event Thread!");
                 e.printStackTrace();

@@ -167,6 +167,7 @@ public class CustomMethod {
 
     public static void close() {
         try {
+            Emulator.getEventQueue().stop();
             Emulator3D.exit();
         } catch (Throwable ignored) {}
         if (trackWriter != null) {
