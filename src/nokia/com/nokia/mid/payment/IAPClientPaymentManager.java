@@ -21,67 +21,40 @@ public final class IAPClientPaymentManager {
     public static final int RESTORE = 102;
     public static final int FAIL = 103;
     public static final int NORMAL = 104;
-    private static IAPClientPaymentListener listener;
+    private static IAPClientPaymentManager inst = new IAPClientPaymentManager();
 
     public static IAPClientPaymentManager getIAPClientPaymentManager() throws IAPClientPaymentException {
-        System.out.println("getIAPClientPaymentManager");
-        Thread.dumpStack();
-        IAPClientPaymentManager localIAPClientPaymentManager = new IAPClientPaymentManager();
-        return localIAPClientPaymentManager;
+        return inst;
     }
 
     public static void setIAPClientPaymentListener(IAPClientPaymentListener listener) {
-        System.out.println("setIAPClientPaymentListener " + listener);
-        Thread.dumpStack();
     }
 
     public int getProductData(String paramString) {
-        System.out.println("getProductData1");
-        Thread.dumpStack();
-        int i = 1;
-        return i;
+        return FAIL;
     }
 
     public int getProductData(String[] paramArrayOfString) {
-        System.out.println("getProductData2");
-        Thread.dumpStack();
-        int i = 1;
-        return i;
+        return FAIL;
     }
 
     public int purchaseProduct(String paramString, int paramInt) {
-        System.out.println("purchaseProduct");
-        Thread.dumpStack();
-        int i = 1;
-        return i;
+        return FAIL;
     }
 
     public int restoreProduct(String paramString, int paramInt) {
-        System.out.println("restoreProduct");
-        Thread.dumpStack();
-        listener.restorationCompleted(1, "1212");
-        int i = 1;
-        return i;
+        return FAIL;
     }
 
     public int getRestorableProducts(int paramInt) {
-        System.out.println("getRestorableProducts");
-        Thread.dumpStack();
-        int i = 1;
-        return i;
+        return FAIL;
     }
 
     public int getUserAndDeviceId(int paramInt) {
-        System.out.println("getUserAndDeviceId");
-        Thread.dumpStack();
-        int i = 1;
-        return i;
+        return FAIL;
     }
 
     public InputStream getDRMResourceAsStream(String s) {
-        System.out.println("getDRMResourceAsStream " + s);
-        Thread.dumpStack();
-        InputStream localInputStream = CustomJarResources.getResourceAsStream(s);
-        return localInputStream;
+        return null;
     }
 }

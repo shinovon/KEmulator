@@ -23,7 +23,7 @@ public class DrmResourceInputStream extends InputStream {
     }
 
     public boolean markSupported() {
-        return true;
+        return false;
     }
 
     public synchronized void reset() throws IOException {

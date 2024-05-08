@@ -38,6 +38,6 @@ public class IAPClientProductData {
     }
 
     public int getDrmProtection() {
-        return 1;
+        return 0;
     }
 }

@@ -2,32 +2,26 @@ package com.nokia.mid.payment;
 
 public class IAPClientUserAndDeviceData {
     public String getAccount() {
-        String str = null;
-        return str;
+        return "dummy_account";
     }
 
     public String getImei() {
-        String str = null;
-        return str;
+        return "dummy_imei";
     }
 
     public String getImsi() {
-        String str = null;
-        return str;
+        return "dummy_imsi";
     }
 
     public String getCountry() {
-        String str = null;
-        return str;
+        return "dummy_country";
     }
 
     public String getLanguage() {
-        String str = null;
-        return str;
+        return "dummy_language";
     }
 
     public String getDeviceModel() {
-        String str = null;
-        return str;
+        return "dummy_device_model";
     }
 }
