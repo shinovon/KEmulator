@@ -19,7 +19,7 @@ public final class TransformSWT implements ITransform {
         var1.getElements(this.a);
     }
 
-    public final Transform method298() {
+    public final Transform create() {
         return new Transform((Device)null, this.a);
     }
 
@@ -32,7 +32,7 @@ public final class TransformSWT implements ITransform {
 
     public final void transform(ITransform t) {
         Transform t1 = new Transform(null, this.a);
-        Transform t2 = ((TransformSWT)t).method298();
+        Transform t2 = ((TransformSWT)t).create();
         t1.multiply(t2);
         t1.getElements(this.a);
         t1.dispose();

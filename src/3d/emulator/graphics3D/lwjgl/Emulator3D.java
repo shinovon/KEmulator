@@ -349,7 +349,7 @@ public final class Emulator3D implements IGraphics3D {
                 }
 
                 Image var12 = new Image(null, swtBufferImage);
-                ((Graphics2DSWT) ((Graphics) this.target).getImpl()).method138().drawImage(var12, 0, 0);
+                ((Graphics2DSWT) ((Graphics) this.target).getImpl()).gc().drawImage(var12, 0, 0);
                 var12.dispose();
             } else {
                 buffer.rewind();

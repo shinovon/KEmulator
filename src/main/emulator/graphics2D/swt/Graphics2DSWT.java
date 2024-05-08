@@ -24,7 +24,7 @@ public final class Graphics2DSWT implements IGraphics2D
         this.height = image.getImageData().height;
     }
     
-    public final GC method138() {
+    public final GC gc() {
         return this.gc;
     }
     
@@ -241,9 +241,9 @@ public final class Graphics2DSWT implements IGraphics2D
     }
     
     public final void setTransform(final ITransform transform) {
-        final Transform method298 = ((TransformSWT)transform).method298();
-        this.gc.setTransform(method298);
-        method298.dispose();
+        final Transform t = ((TransformSWT)transform).create();
+        this.gc.setTransform(t);
+        t.dispose();
     }
     
     public final void transform(final ITransform transform) {
@@ -252,9 +252,9 @@ public final class Graphics2DSWT implements IGraphics2D
         final TransformSWT b = new TransformSWT(transform2);
         transform2.dispose();
         b.transform(transform);
-        final Transform method298 = b.method298();
-        this.gc.setTransform(method298);
-        method298.dispose();
+        final Transform t = b.create();
+        this.gc.setTransform(t);
+        t.dispose();
     }
     
     public final void translate(final int n, final int n2) {

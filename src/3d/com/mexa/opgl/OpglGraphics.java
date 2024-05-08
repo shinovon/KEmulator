@@ -514,7 +514,7 @@ public class OpglGraphics {
 				var10 -= var8;
 			}
 			Image var12 = new Image((Device) null, swtImageBuffer);
-			((Graphics2DSWT) graphics.getImpl()).method138().drawImage(var12, 0, 0);
+			((Graphics2DSWT) graphics.getImpl()).gc().drawImage(var12, 0, 0);
 			var12.dispose();
 		} else {
 			int[] var1 = ((DataBufferInt) awtImageBuffer.getRaster().getDataBuffer()).getData();
