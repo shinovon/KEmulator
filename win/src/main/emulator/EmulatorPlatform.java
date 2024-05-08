@@ -21,17 +21,25 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     private static Method wglDeleteContext;
     private static Method wglMakeCurrent;
     private static Method wglGetCurrentContext;
+    private static Class osClass;
+    private static Method getDC;
+    private static Method releaseDC;
+    private static Method SwapBuffers;
 
     static {
         try {
             wglClass = Class.forName("org.eclipse.swt.internal.opengl.win32.WGL");
             pixelFormatDescriptorClass = Class.forName("org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR");
+            osClass = Class.forName("org.eclipse.swt.internal.win32.OS");
             ChoosePixelFormat = ReflectUtil.getMethod(wglClass, "ChoosePixelFormat", int.class, pixelFormatDescriptorClass);
             SetPixelFormat = ReflectUtil.getMethod(wglClass, "SetPixelFormat", int.class, int.class, pixelFormatDescriptorClass);
             wglCreateContext = ReflectUtil.getMethod(wglClass, "wglCreateContext", int.class);
             wglMakeCurrent = ReflectUtil.getMethod(wglClass, "wglMakeCurrent", int.class, int.class);
             wglDeleteContext = ReflectUtil.getMethod(wglClass, "wglDeleteContext", int.class);
+            SwapBuffers = ReflectUtil.getMethod(wglClass, "wglSwapBuffers", int.class);
             wglGetCurrentContext = ReflectUtil.getMethod(wglClass, "wglGetCurrentContext");
+            getDC = ReflectUtil.getMethod(osClass, "getDC", int.class);
+            releaseDC = ReflectUtil.getMethod(osClass, "releaseDC", int.class, int.class);
         } catch (Exception ignored) {}
     }
 
@@ -87,12 +95,12 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
     }
 
-    public long createGLContext(long gcHandle) throws Exception {
+    public long createGLContext(long gcHandle, boolean b) throws Exception {
         int handle = (int) gcHandle;
         PIXELFORMATDESCRIPTOR var4 = new PIXELFORMATDESCRIPTOR();
         var4.nSize = 40;
         var4.nVersion = 1;
-        var4.dwFlags = 57;
+        var4.dwFlags = 37 + (b ? 20 : 0);
         var4.iPixelType = 0;
         var4.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
         var4.iLayerType = 0;
@@ -114,11 +122,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public void setGLContextCurrent(long gcHandle, long contextHandle) throws Exception {
         while ((Integer) wglGetCurrentContext.invoke(null) > 0);
-        try {
-            wglMakeCurrent.invoke(null, gcHandle, contextHandle);
-        } catch (IllegalArgumentException e) {
-            wglMakeCurrent.invoke(null, (int) gcHandle, (int) contextHandle);
-        }
+        wglMakeCurrent.invoke(null, (int) gcHandle, (int) contextHandle);
     }
 
     public void releaseGLContext(long gcHandle) throws Exception {
@@ -127,6 +131,18 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     public void deleteGLContext(long contextHandle) throws Exception {
         wglDeleteContext.invoke(null, (int) contextHandle);
+    }
+
+    public long getDC(long handle) throws Exception {
+        return (int) getDC.invoke(null, (int) handle);
+    }
+
+    public void releaseDC(long handle, long dc) throws Exception {
+        releaseDC.invoke(null, (int) handle, (int) dc);
+    }
+
+    public void swapBuffers(long dc) throws Exception {
+        SwapBuffers.invoke(null, (int)dc);
     }
 
     public void loadM3G() {

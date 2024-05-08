@@ -122,7 +122,7 @@ public final class EmulatorImpl implements IEmulator {
         this.aClass5_1377.method321();
         this.aClass5_1391.method321();
         if(aClass90_1384 != null)
-            this.aClass90_1384.method507();
+            this.aClass90_1384.close();
         while (Class5.aVector548.size() > 0) {
             ((Class5) Class5.aVector548.get(0)).method321();
         }

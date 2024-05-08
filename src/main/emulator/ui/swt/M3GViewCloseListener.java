@@ -12,6 +12,6 @@ final class M3GViewCloseListener extends ShellAdapter {
 
     public final void shellClosed(final ShellEvent shellEvent) {
         shellEvent.doit = false;
-        this.aClass90_800.method507();
+        this.aClass90_800.close();
     }
 }

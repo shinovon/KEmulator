@@ -1,6 +1,8 @@
 package emulator.graphics3D.view;
 
 import emulator.Emulator;
+import emulator.IEmulatorPlatform;
+import emulator.ReflectUtil;
 import emulator.Settings;
 import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
@@ -40,9 +42,6 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-//import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
-//import org.eclipse.swt.internal.opengl.win32.WGL;
-import org.eclipse.swt.internal.win32.OS;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.widgets.Canvas;
 import org.lwjgl.BufferUtils;
@@ -54,7 +53,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 public final class M3GView3D implements PaintListener, Runnable {
-//    private static final boolean useSoftwareWgl = false;
     private static M3GView3D instance;
     private LWJGLUtility memoryBuffers;
     private boolean xray;
@@ -62,9 +60,8 @@ public final class M3GView3D implements PaintListener, Runnable {
     private int viewportHeight;
     private float depthRangeNear;
     private float depthRangeFar;
-    private static int anInt594;
-    private static int anInt595;
-//    private static PIXELFORMATDESCRIPTOR aPIXELFORMATDESCRIPTOR587;
+    private static long canvasHandle;
+    private static long wglHandle;
     private static Camera camera;
     private static Transform cameraTransform = new Transform();
     private static Vector lights = new Vector();
@@ -73,7 +70,8 @@ public final class M3GView3D implements PaintListener, Runnable {
     private static Pbuffer pbufferContext;
     private static ByteBuffer buffer;
     private static ImageData bufferImage;
-    private boolean usePbuffer;
+    private static boolean usePbuffer;
+    private static boolean useWgl;
 
     private M3GView3D() {
         instance = this;
@@ -402,53 +400,38 @@ public final class M3GView3D implements PaintListener, Runnable {
         }
     }
 
-//    private static PIXELFORMATDESCRIPTOR method378() {
-//        if (aPIXELFORMATDESCRIPTOR587 == null) {
-//            aPIXELFORMATDESCRIPTOR587 = new PIXELFORMATDESCRIPTOR();
-//            aPIXELFORMATDESCRIPTOR587.nSize = 40;
-//            aPIXELFORMATDESCRIPTOR587.nVersion = 1;
-//            aPIXELFORMATDESCRIPTOR587.dwFlags = 37;
-//            aPIXELFORMATDESCRIPTOR587.iPixelType = 0;
-//            aPIXELFORMATDESCRIPTOR587.cColorBits = (byte) Emulator.getEmulator().getScreenDepth();
-//            aPIXELFORMATDESCRIPTOR587.iLayerType = 0;
-//            aPIXELFORMATDESCRIPTOR587.cDepthBits = 24;
-//        }
-//
-//        return aPIXELFORMATDESCRIPTOR587;
-//    }
-
     public final boolean useContext(Canvas canvas) {
         M3GView3D.canvas = canvas;
         usePbuffer = !(canvas instanceof GLCanvas);
 
         if(!usePbuffer) {
-//            if(useSoftwareWgl) {
-//                anInt594 = canvas.handle;
-//                int var2;
-//                int var3;
-//                if ((var3 = WGL.ChoosePixelFormat(var2 = OS.GetDC(anInt594), method378())) != 0 && WGL.SetPixelFormat(var2, var3, aPIXELFORMATDESCRIPTOR587)) {
-//                    anInt595 = WGL.wglCreateContext(var2);
-//                    if (anInt595 == 0) {
-//                        OS.ReleaseDC(anInt594, var2);
-//                        Emulator.getEmulator().getLogStream().println("wglCreateContext() error!!");
-//                        return false;
-//                    } else {
-//                        OS.ReleaseDC(anInt594, var2);
-//                    }
-//                } else {
-//                    OS.ReleaseDC(anInt594, var2);
-//                    Emulator.getEmulator().getLogStream().println("SetPixelFormat() error!!");
-//                    return false;
-//                }
-//            }
+            if(useWgl) {
+                try {
+                    IEmulatorPlatform pl = Emulator.getPlatform();
+                    canvasHandle = ReflectUtil.getHandle(canvas);
+                    long dc = pl.getDC(canvasHandle);
+                    wglHandle = pl.createGLContext(dc, false);
+                    pl.releaseDC(canvasHandle, dc);
+                } catch (Exception ignored) {}
+                if(wglHandle == 0) { // check if wgl failed
+                    usePbuffer = true;
+                    EmulatorImpl.syncExec(this);
+                    return true;
+                }
+            }
             setCurrent();
             try {
                 GLContext.useContext(canvas);
             } catch (Exception e) {
                 e.printStackTrace();
                 Emulator.getEmulator().getLogStream().println("useContext() error!!");
-                usePbuffer = true;
-                return true;
+                try {
+                    GLContext.useContext(null);
+                } catch (Exception ignored) {}
+//                usePbuffer = true;
+//                EmulatorImpl.syncExec(this);
+//                return true;
+                return false;
             }
 
             hints();
@@ -472,14 +455,15 @@ public final class M3GView3D implements PaintListener, Runnable {
     }
 
     public final void setCurrent() {
-//        if(useSoftwareWgl) {
-//            if (!isCurrent()) {
-//                int var1;
-//                WGL.wglMakeCurrent(var1 = OS.GetDC(anInt594), anInt595);
-//                OS.ReleaseDC(anInt594, var1);
-//            }
-//            return;
-//        }
+        if(useWgl) {
+            try {
+                if (!isCurrent()) {
+                    IEmulatorPlatform pl = Emulator.getPlatform();
+                    pl.setGLContextCurrent(pl.getDC(canvasHandle), wglHandle);
+                }
+            } catch (Exception ignored) {}
+            return;
+        }
         if(!((GLCanvas) canvas).isCurrent()) {
             ((GLCanvas) canvas).setCurrent();
         }
@@ -519,12 +503,17 @@ public final class M3GView3D implements PaintListener, Runnable {
     }
 
     public boolean isCurrent() {
-//        if(useSoftwareWgl) {
-//            int var1 = OS.GetDC(anInt594);
-//            boolean var0 = WGL.wglGetCurrentContext() == var1;
-//            OS.ReleaseDC(anInt594, var1);
-//            return var0;
-//        }
+        if(useWgl) {
+            try {
+                IEmulatorPlatform pl = Emulator.getPlatform();
+                long dc = pl.getDC(canvasHandle);
+                boolean ret = pl.isGLContextCurrent(dc);
+                pl.releaseDC(canvasHandle, dc);
+                return ret;
+            } catch (Exception e) {
+                return false;
+            }
+        }
         if(usePbuffer) {
             return false;
         }
@@ -532,12 +521,15 @@ public final class M3GView3D implements PaintListener, Runnable {
     }
 
     public void swapBuffers() {
-//        if(useSoftwareWgl) {
-//            int var0;
-//            WGL.SwapBuffers(var0 = OS.GetDC(anInt594));
-//            OS.ReleaseDC(anInt594, var0);
-//            return;
-//        }
+        if(useWgl) {
+            try {
+                IEmulatorPlatform pl = Emulator.getPlatform();
+                long dc = pl.getDC(canvasHandle);
+                pl.swapBuffers(dc);
+                pl.releaseDC(canvasHandle, dc);
+            } catch (Exception ignored) {}
+            return;
+        }
         if(usePbuffer) {
             buffer.rewind();
             GL11.glReadPixels(0, 0, viewportWidth, viewportHeight, 6408, 5121, buffer);
@@ -565,11 +557,13 @@ public final class M3GView3D implements PaintListener, Runnable {
 
     public static void releaseContext() {
         try {
-            GLContext.useContext((Object) null);
+            GLContext.useContext(null);
         } catch (Exception ignored) {}
-//        if(useSoftwareWgl) {
-//            WGL.wglDeleteContext(anInt595);
-//        }
+        if(useWgl) {
+            try {
+                Emulator.getPlatform().deleteGLContext(wglHandle);
+            } catch (Exception ignored) {}
+        }
     }
 
     public static void setCamera(Camera var0, Transform var1) {

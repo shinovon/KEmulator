@@ -1,5 +1,6 @@
 package emulator;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class ReflectUtil {
@@ -35,5 +36,15 @@ public class ReflectUtil {
             return false;
         }
         return class1.isAssignableFrom(class2) && class2.isAssignableFrom(class1);
+    }
+
+    public static long getHandle(Object c) {
+        try {
+            Class<?> cl = c.getClass();
+            Field f = cl.getField("handle");
+            return f.getLong(c);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
     }
 }

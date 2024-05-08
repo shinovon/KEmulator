@@ -2,7 +2,6 @@ package emulator.ui.swt;
 
 import org.eclipse.swt.custom.*;
 import emulator.graphics2D.swt.ImageSWT;
-import emulator.media.*;
 import emulator.graphics2D.*;
 import emulator.debug.*;
 import emulator.*;
@@ -1242,7 +1241,7 @@ public final class EmulatorScreen implements
             if (menuItem == m3gViewMenuItem) {
                 try {
                     if (((EmulatorImpl) Emulator.getEmulator()).getM3GView().method494()) {
-                        ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method507();
+                        ((EmulatorImpl) Emulator.getEmulator()).getM3GView().close();
                         return;
                     }
                     ((EmulatorImpl) Emulator.getEmulator()).getM3GView().method226();
@@ -1543,7 +1542,7 @@ public final class EmulatorScreen implements
 
     private static void OS_SetROP2(GC gc, int j) {
         try {
-            long i = getHandle(gc);
+            long i = ReflectUtil.getHandle(gc);
             Class<?> os = OS.class;
             Method m = null;
             try {
@@ -1553,16 +1552,6 @@ public final class EmulatorScreen implements
                 m = os.getMethod("SetROP2", long.class, int.class);
                 m.invoke(null, i, j);
             }
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-    }
-
-    private static long getHandle(GC c) {
-        try {
-            Class<?> cl = c.getClass();
-            Field f = cl.getField("handle");
-            return f.getLong(c);
         } catch (Exception e) {
             throw new Error(e);
         }

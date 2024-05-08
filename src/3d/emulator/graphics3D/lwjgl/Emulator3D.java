@@ -261,7 +261,7 @@ public final class Emulator3D implements IGraphics3D {
             ImageData var3 = new ImageData(var1, var2, 32, swtPalleteData);
             this.swtImage = new Image(null, var3);
             this.swtGC = new GC(this.swtImage);
-            this.wglContextHandle = Emulator.getPlatform().createGLContext(swtGC.handle);
+            this.wglContextHandle = Emulator.getPlatform().createGLContext(swtGC.handle, false);
             if (this.wglContextHandle == 0) {
                 this.swtGC.dispose();
                 this.swtImage.dispose();
