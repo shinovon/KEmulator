@@ -17,14 +17,13 @@ import javax.sound.midi.*;
 
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.Player;
 
-public class PlayerImpl implements javax.microedition.media.Player, Runnable, LineListener, MetaEventListener {
+public class PlayerImpl implements Player, Runnable, LineListener, MetaEventListener {
 
     private static int count;
     private static boolean midiPlaying;
 
-    public static List<javax.microedition.media.Player> players = new ArrayList<javax.microedition.media.Player>();
+    public static Set<Player> players = Collections.newSetFromMap(new WeakHashMap());
     Object sequence;
     Thread playerThread;
     boolean complete;
@@ -83,7 +82,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                     data = CustomJarResources.getBytes(i);
                     i = new ByteArrayInputStream(data);
                 }
-                sequence = new Player(i);
+                sequence = new javazoom.jl.player.Player(i);
             } catch (JavaLayerException e) {
                 e.printStackTrace();
                 throw new IOException(e);
@@ -272,8 +271,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                 stop();
             } catch (Exception ignored) {}
         }
-        if (sequence instanceof Player) {
-            ((Player) sequence).close();
+        if (sequence instanceof javazoom.jl.player.Player) {
+            ((javazoom.jl.player.Player) sequence).close();
         }
         if(sequence instanceof Sequence && midiSequencer != null) {
             midiSequencer.close();
@@ -328,9 +327,9 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             final Clip clip;
             res = (clip = (Clip) sequence).getBufferSize()
                     / (clip.getFormat().getFrameSize() * clip.getFormat().getFrameRate());
-        } else if (sequence instanceof Player) {
+        } else if (sequence instanceof javazoom.jl.player.Player) {
             try {
-                res = ((double) (dataLen * 8) / ((Player) sequence).getBitrate());
+                res = ((double) (dataLen * 8) / ((javazoom.jl.player.Player) sequence).getBitrate());
             } catch (ArithmeticException e) {
                 return -1;
             }
@@ -356,8 +355,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             }
             return midiPosition;
         }
-        if (sequence instanceof Player) {
-            return ((Player) sequence).getPosition() * 1000L;
+        if (sequence instanceof javazoom.jl.player.Player) {
+            return ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
         }
         return TIME_UNKNOWN;
     }
@@ -385,25 +384,25 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             } catch (Exception e) {
                 throw new MediaException(e);
             }
-        } else if (sequence instanceof Player) {
+        } else if (sequence instanceof javazoom.jl.player.Player) {
             long l = getMediaTime();
             if (t == 0 && l == 0)
                 return 0;
             if (t < l) {
                 try {
-                    Header old = ((Player) sequence).bitstream().header;
-                    ((Player) sequence).reset();
-                    ((Player) sequence).skip((int) (t / 1000L), old);
-                    ms = ((Player) sequence).getPosition() * 1000L;
+                    Header old = ((javazoom.jl.player.Player) sequence).bitstream().header;
+                    ((javazoom.jl.player.Player) sequence).reset();
+                    ((javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
+                    ms = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
                 } catch (JavaLayerException e) {
                     throw new MediaException(e);
                 }
             } else {
                 try {
-                    Header old = ((Player) sequence).bitstream().header;
-                    ((Player) sequence).reset();
-                    ((Player) sequence).skip((int) (t / 1000L), old);
-                    ms = ((Player) sequence).getPosition() * 1000L;
+                    Header old = ((javazoom.jl.player.Player) sequence).bitstream().header;
+                    ((javazoom.jl.player.Player) sequence).reset();
+                    ((javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
+                    ms = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
                 } catch (JavaLayerException e) {
                     throw new MediaException(e);
                 }
@@ -486,7 +485,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             if (mp3 || contentType.equalsIgnoreCase("audio/mpeg") || contentType.equalsIgnoreCase("audio/mp3")) {
                 dataLen = (int) stream.getContentLength();
                 try {
-                    sequence = new Player(new InputStream() {
+                    sequence = new javazoom.jl.player.Player(new InputStream() {
 
                         public int read() throws IOException {
                             byte[] b = new byte[1];
@@ -557,8 +556,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             throw new IllegalStateException();
         }
         if (sequence == null) return;
-        if (sequence instanceof Player) {
-            ((Player) sequence).stop();
+        if (sequence instanceof javazoom.jl.player.Player) {
+            ((javazoom.jl.player.Player) sequence).stop();
             return;
         }
         synchronized (playLock) {
@@ -645,18 +644,18 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
                     }
                     complete = this.complete;
                     clip.stop();
-                } else if (sequence instanceof Player) {
+                } else if (sequence instanceof javazoom.jl.player.Player) {
                     if (b) {
                         notifyListeners(PlayerListener.STARTED, getMediaTime());
                         b = false;
                     }
                     try {
-                        ((Player) sequence).play();
+                        ((javazoom.jl.player.Player) sequence).play();
                     } catch (JavaLayerException e) {
                         e.printStackTrace();
                         notifyListeners(PlayerListener.ERROR, e.toString());
                     }
-                    if (sequence != null && ((Player) sequence).isComplete()) {
+                    if (sequence != null && ((javazoom.jl.player.Player) sequence).isComplete()) {
                         complete = true;
                         if (dataSource != null) {
                             //dataSource.stop();
@@ -707,8 +706,8 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
 			// TODO midi volume
             return;
         }
-        if (sequence instanceof Player) {
-            ((Player) sequence).setLevel(n);
+        if (sequence instanceof javazoom.jl.player.Player) {
+            ((javazoom.jl.player.Player) sequence).setLevel(n);
         }
     }
 
@@ -737,7 +736,7 @@ public class PlayerImpl implements javax.microedition.media.Player, Runnable, Li
             ext = "mid";
         } else if (sequence instanceof Clip) {
             ext = "amr";
-        } else if (sequence instanceof Player) {
+        } else if (sequence instanceof javazoom.jl.player.Player) {
             ext = "mp3";
         } else if (contentType != null) {
             if (contentType.equalsIgnoreCase("audio/wav") ||

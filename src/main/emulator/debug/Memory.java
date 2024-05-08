@@ -87,7 +87,9 @@ public final class Memory {
         this.images.clear();
         this.players.clear();
         this.m3gObjects.clear();
-        this.players.addAll(PlayerImpl.players);
+        try {
+            this.players.addAll(PlayerImpl.players);
+        } catch (Exception ignored) {}
         for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
             final String s = (String) Emulator.jarClasses.get(j);
             Class cls = null;
