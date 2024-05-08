@@ -1,5 +1,6 @@
 package emulator.graphics3D.m3g;
 
+import java.util.Comparator;
 import java.util.Vector;
 import javax.microedition.m3g.Group;
 import javax.microedition.m3g.Mesh;
@@ -10,7 +11,7 @@ import javax.microedition.m3g.Transform;
 
 public final class RenderPipe {
     private Node parentNode;
-    private Vector roList = new Vector();
+    private Vector<RenderObject> roList = new Vector();
     private boolean renderInvisibleNodes;
 
     public RenderPipe() {}
@@ -78,7 +79,7 @@ public final class RenderPipe {
                 Sprite3D spr = (Sprite3D) node;
 
                 if (spr.getAppearance() != null && spr.getCropWidth() != 0 && spr.getCropHeight() != 0) {
-                    insertNodeInList(new RenderObject(node, trans, 0, this));
+                    roList.add(new RenderObject(node, trans, 0, this));
                 }
             } else {
                 if (node instanceof Mesh) {
@@ -86,7 +87,7 @@ public final class RenderPipe {
 
                     for (int i = 0; i < submeshes; ++i) {
                         if (((Mesh) node).getAppearance(i) != null) {
-                            insertNodeInList(new RenderObject(node, trans, i, this));
+                            roList.add(new RenderObject(node, trans, i, this));
                         }
                     }
 
@@ -121,15 +122,8 @@ public final class RenderPipe {
         }
     }
 
-    private void insertNodeInList(RenderObject ro) {
-        int index;
-
-        for (index = 0; index < roList.size(); index++) {
-            RenderObject ro2 = (RenderObject) roList.get(index);
-            if(ro2.sortKey >= ro.sortKey) break;
-        }
-
-        roList.insertElementAt(ro, index);
+    public void sortNodes() {
+        roList.sort(Comparator.comparingInt((RenderObject renderObject) -> renderObject.sortKey));
     }
 
     public void setRenderInvisibleNodes(boolean render) {

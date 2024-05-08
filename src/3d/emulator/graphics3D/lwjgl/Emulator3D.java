@@ -1083,6 +1083,8 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void renderPushedNodes() {
+        renderPipe.sortNodes();
+
         for (int i = 0; i < renderPipe.getSize(); i++) {
             RenderObject ro = renderPipe.getRenderObj(i);
 

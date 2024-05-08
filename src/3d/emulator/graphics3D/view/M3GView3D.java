@@ -197,23 +197,27 @@ public final class M3GView3D implements PaintListener, Runnable {
             throw new IllegalArgumentException();
         } else {
             renderPipe.pushRenderNode(var1, var2 == null ? new Transform() : var2);
-            this.method392();
+            this.renderPushedNodes();
         }
     }
 
-    private void method392() {
-        for (int var1 = 0; var1 < renderPipe.getSize(); ++var1) {
-            RenderObject var2;
-            if ((var2 = renderPipe.getRenderObj(var1)).node instanceof Mesh) {
-                Mesh var3;
-                IndexBuffer var4 = (var3 = (Mesh) var2.node).getIndexBuffer(var2.submeshIndex);
-                Appearance var5 = var3.getAppearance(var2.submeshIndex);
-                if (var4 != null && var5 != null) {
-                    VertexBuffer var6 = MeshMorph.getViewInstance().getMorphedVertexBuffer(var3);
-                    this.renderVertex(var6, var4, var5, var2.trans, var3.getScope(), var2.alphaFactor);
+    private void renderPushedNodes() {
+        renderPipe.sortNodes();
+
+        for (int i = 0; i < renderPipe.getSize(); i++) {
+            RenderObject ro = renderPipe.getRenderObj(i);
+
+            if (ro.node instanceof Mesh) {
+                Mesh mesh = (Mesh) ro.node;
+                IndexBuffer indices = mesh.getIndexBuffer(ro.submeshIndex);
+                Appearance ap = mesh.getAppearance(ro.submeshIndex);
+
+                if (indices != null && ap != null) {
+                    VertexBuffer vb = MeshMorph.getViewInstance().getMorphedVertexBuffer(mesh);
+                    renderVertex(vb, indices, ap, ro.trans, mesh.getScope(), ro.alphaFactor);
                 }
             } else {
-                this.renderSprite((Sprite3D) var2.node, var2.trans, var2.alphaFactor);
+                renderSprite((Sprite3D) ro.node, ro.trans, ro.alphaFactor);
             }
         }
 
