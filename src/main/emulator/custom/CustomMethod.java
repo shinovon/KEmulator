@@ -69,6 +69,10 @@ public class CustomMethod {
             res = String.valueOf(Manager.isLibVlcSupported());
         } else if (prop.equalsIgnoreCase("com.nokia.pointer.number")) {
             b = false;
+        } else if (prop.equalsIgnoreCase("microedition.locale")) {
+            res = Settings.locale;
+        } else if (prop.equalsIgnoreCase("microedition.encoding")) {
+            res = Settings.fileEncoding;
         }
         if (b)
             Emulator.getEmulator().getLogStream().println("System.getProperty#" + prop + "=" + res);
