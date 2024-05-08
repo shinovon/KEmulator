@@ -223,7 +223,7 @@ public final class Emulator3D implements IGraphics3D {
 
     public synchronized void releaseTarget() {
         GL11.glFinish();
-        this.method503();
+        this.swapBuffers();
 
         while (!unusedGLTextures.isEmpty())
             releaseTexture(unusedGLTextures.get(0));
@@ -305,7 +305,7 @@ public final class Emulator3D implements IGraphics3D {
         } catch (Exception ignored) {}
     }
 
-    public final void method503() {
+    public final void swapBuffers() {
         if (this.target != null) {
             int var3;
             int var4;
@@ -339,7 +339,7 @@ public final class Emulator3D implements IGraphics3D {
                 }
             } else if (Settings.g2d == 0) {
                 buffer.rewind();
-                GL11.glReadPixels(0, 0, targetWidth, targetHeight, 6408, 5121, buffer);
+                GL11.glReadPixels(0, 0, targetWidth, targetHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
                 int var8 = swtBufferImage.width << 2;
                 int var10 = swtBufferImage.data.length - var8;
 
@@ -353,7 +353,7 @@ public final class Emulator3D implements IGraphics3D {
                 var12.dispose();
             } else {
                 buffer.rewind();
-                GL11.glReadPixels(0, 0, targetWidth, targetHeight, 6408, 5121, buffer);
+                GL11.glReadPixels(0, 0, targetWidth, targetHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
                 int[] var1 = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
                 IntBuffer var2 = buffer.asIntBuffer();
                 var3 = targetWidth;

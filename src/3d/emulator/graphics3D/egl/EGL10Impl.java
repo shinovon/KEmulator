@@ -278,7 +278,7 @@ public class EGL10Impl implements EGL10 {
 
     public boolean eglSwapBuffers(final EGLDisplay eglDisplay, final EGLSurface eglSurface) {
         try {
-            EGL10Impl.ab1332.method503();
+            EGL10Impl.ab1332.swapBuffers();
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -292,7 +292,7 @@ public class EGL10Impl implements EGL10 {
 
     public boolean eglWaitGL() {
         try {
-            EGL10Impl.ab1332.method503();
+            EGL10Impl.ab1332.swapBuffers();
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
