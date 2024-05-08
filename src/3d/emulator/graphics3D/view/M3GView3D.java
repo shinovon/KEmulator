@@ -55,6 +55,7 @@ import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 public final class M3GView3D implements PaintListener, Runnable {
     private static M3GView3D instance;
     private LWJGLUtility memoryBuffers;
+    private RenderPipe renderPipe;
     private boolean xray;
     private int viewportWidth;
     private int viewportHeight;
@@ -78,6 +79,7 @@ public final class M3GView3D implements PaintListener, Runnable {
         this.depthRangeNear = 0.0F;
         this.depthRangeFar = 1.0F;
         memoryBuffers = new LWJGLUtility();
+        renderPipe = new RenderPipe();
     }
 
     public static M3GView3D getViewInstance() {
@@ -186,15 +188,15 @@ public final class M3GView3D implements PaintListener, Runnable {
         } else if (!(var1 instanceof Sprite3D) && !(var1 instanceof Mesh) && !(var1 instanceof Group)) {
             throw new IllegalArgumentException();
         } else {
-            RenderPipe.getViewInstance().pushRenderNode(var1, var2 == null ? new Transform() : var2);
+            renderPipe.pushRenderNode(var1, var2 == null ? new Transform() : var2);
             this.method392();
         }
     }
 
     private void method392() {
-        for (int var1 = 0; var1 < RenderPipe.getViewInstance().getSize(); ++var1) {
+        for (int var1 = 0; var1 < renderPipe.getSize(); ++var1) {
             RenderObject var2;
-            if ((var2 = RenderPipe.getViewInstance().getRenderObj(var1)).node instanceof Mesh) {
+            if ((var2 = renderPipe.getRenderObj(var1)).node instanceof Mesh) {
                 Mesh var3;
                 IndexBuffer var4 = (var3 = (Mesh) var2.node).getIndexBuffer(var2.submeshIndex);
                 Appearance var5 = var3.getAppearance(var2.submeshIndex);
@@ -207,7 +209,7 @@ public final class M3GView3D implements PaintListener, Runnable {
             }
         }
 
-        RenderPipe.getViewInstance().clear();
+        renderPipe.clear();
         MeshMorph.getViewInstance().clearCache();
     }
 

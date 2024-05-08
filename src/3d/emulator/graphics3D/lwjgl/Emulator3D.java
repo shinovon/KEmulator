@@ -31,6 +31,7 @@ public final class Emulator3D implements IGraphics3D {
 
     private static Emulator3D instance;
     private LWJGLUtility memoryBuffers;
+    private RenderPipe renderPipe;
     private Object target;
     private boolean depthBufferEnabled;
     private int hints;
@@ -93,6 +94,7 @@ public final class Emulator3D implements IGraphics3D {
         properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
 
         memoryBuffers = new LWJGLUtility();
+        renderPipe = new RenderPipe();
     }
 
     public static Emulator3D getInstance() {
@@ -580,7 +582,7 @@ public final class Emulator3D implements IGraphics3D {
         for (int i = 0; i < lights.size() && usedLights < MaxLights; ++i) {
             Light light = (Light) lights.get(i);
 
-            if (light == null || (light.getScope() & scope) == 0 || !RenderPipe.getInstance().isVisible(light)) {
+            if (light == null || (light.getScope() & scope) == 0 || !renderPipe.isVisible(light)) {
                 continue;
             }
 
@@ -1070,19 +1072,19 @@ public final class Emulator3D implements IGraphics3D {
 
         clearBackgound(world.getBackground());
         LightsCache.addLightsFromWorld(world);
-        RenderPipe.getInstance().pushRenderNode(world, null);
+        renderPipe.pushRenderNode(world, null);
 
         renderPushedNodes();
     }
 
     public synchronized void render(Node node, Transform transform) {
-        RenderPipe.getInstance().pushRenderNode(node, transform);
+        renderPipe.pushRenderNode(node, transform);
         renderPushedNodes();
     }
 
     private void renderPushedNodes() {
-        for (int i = 0; i < RenderPipe.getInstance().getSize(); i++) {
-            RenderObject ro = RenderPipe.getInstance().getRenderObj(i);
+        for (int i = 0; i < renderPipe.getSize(); i++) {
+            RenderObject ro = renderPipe.getRenderObj(i);
 
             if (ro.node instanceof Mesh) {
                 Mesh mesh = (Mesh) ro.node;
@@ -1098,7 +1100,7 @@ public final class Emulator3D implements IGraphics3D {
             }
         }
 
-        RenderPipe.getInstance().clear();
+        renderPipe.clear();
         MeshMorph.getInstance().clearCache();
     }
 

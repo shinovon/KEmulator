@@ -9,28 +9,11 @@ import javax.microedition.m3g.Sprite3D;
 import javax.microedition.m3g.Transform;
 
 public final class RenderPipe {
-    private static RenderPipe inst;
-    private static RenderPipe viewInst;
-
     private Node parentNode;
     private Vector roList = new Vector();
     private boolean renderInvisibleNodes;
 
-    public static RenderPipe getInstance() {
-        if (inst == null) {
-            inst = new RenderPipe();
-        }
-
-        return inst;
-    }
-
-    public static RenderPipe getViewInstance() {
-        if (viewInst == null) {
-            viewInst = new RenderPipe();
-        }
-
-        return viewInst;
-    }
+    public RenderPipe() {}
 
     public final int getSize() {
         return roList.size();
