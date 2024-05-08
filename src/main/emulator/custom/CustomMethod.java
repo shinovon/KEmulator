@@ -67,6 +67,8 @@ public class CustomMethod {
             res = Permission.askIMEI();
         } else if (prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
             res = String.valueOf(Manager.isLibVlcSupported());
+        } else if (prop.equalsIgnoreCase("com.nokia.pointer.number")) {
+            b = false;
         }
         if (b)
             Emulator.getEmulator().getLogStream().println("System.getProperty#" + prop + "=" + res);
