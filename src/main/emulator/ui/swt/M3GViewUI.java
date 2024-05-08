@@ -111,7 +111,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         this.showGrid = false;
         this.axisItem.setSelection(this.showAxis);
         this.gridItem.setSelection(this.showGrid);
-        this.renderInvisibleItem.setSelection(RenderPipe.getViewInstance().isRenderInvisibleNodes());
+        this.renderInvisibleItem.setSelection(m3gview.isRenderInvisibleNodes());
         this.aMenuItem936.setSelection(true);
         this.aMenuItem938.setEnabled(false);
         this.anInt893 = 0;
@@ -394,7 +394,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         renderInvisibleItem.setAccelerator('V');
         renderInvisibleItem.addSelectionListener(new SelectionAdapter() {
             public final void widgetSelected(final SelectionEvent selectionEvent) {
-                RenderPipe.getViewInstance().setRenderInvisibleNodes(((MenuItem) selectionEvent.widget).getSelection());
+                m3gview.setRenderInvisibleNodes(((MenuItem) selectionEvent.widget).getSelection());
             }
         });
 

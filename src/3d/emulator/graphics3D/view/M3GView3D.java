@@ -90,6 +90,14 @@ public final class M3GView3D implements PaintListener, Runnable {
         return instance;
     }
 
+    public boolean isRenderInvisibleNodes() {
+        return renderPipe.isRenderInvisibleNodes();
+    }
+
+    public void setRenderInvisibleNodes(boolean render) {
+        renderPipe.setRenderInvisibleNodes(render);
+    }
+
     public final void setXray(boolean var1) {
         this.xray = var1;
     }
@@ -1013,7 +1021,7 @@ public final class M3GView3D implements PaintListener, Runnable {
         for (int i = 0; i < lights.size() && usedLights < Emulator3D.MaxLights; ++i) {
             Light light = (Light) lights.get(i);
 
-            if (light == null || (light.getScope() & scope) == 0 || !RenderPipe.getInstance().isVisible(light)) {
+            if (light == null || (light.getScope() & scope) == 0 || !renderPipe.isVisible(light)) {
                 continue;
             }
 
