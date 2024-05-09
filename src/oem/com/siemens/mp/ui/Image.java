@@ -99,14 +99,10 @@ public class Image extends com.siemens.mp.misc.NativeMem {
     }
 
     private static boolean isBitSet(byte b, int pos) {
-        boolean retval = false;
-
-        retval = (b & (byte) (1 << pos)) != 0;
-
-        return retval;
+        return (b & (byte) (1 << pos)) != 0;
     }
 
-    private static int doAlpha(byte[] pix, byte[] alpha, int pos, int shift) {
+    public static int doAlpha(byte[] pix, byte[] alpha, int pos, int shift) {
         int p;
         if (isBitSet(pix[pos], shift)) {
             p = 0;

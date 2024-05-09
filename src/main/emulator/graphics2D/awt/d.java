@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.io.*;
 import javax.imageio.*;
 import java.awt.image.*;
+import java.util.Arrays;
 
 /**
  * ImageAWT
@@ -31,7 +32,7 @@ public final class d implements IImage
     
     public d(final int n, final int n2, final boolean b, final int n3) {
         super();
-        this.img = new BufferedImage(n, n2, b ? 2 : 1);
+        this.img = new BufferedImage(n, n2, b ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
         final Graphics2D graphics;
         (graphics = this.img.createGraphics()).setColor(new Color(n3, b));
         graphics.fillRect(0, 0, n, n2);
@@ -46,6 +47,14 @@ public final class d implements IImage
         final Image image = new Image(null, emulator.graphics2D.c.toSwt(this.img));
         gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
         image.dispose();
+    }
+
+    public boolean isTransparent() {
+        return img.getType() == BufferedImage.TYPE_INT_ARGB;
+    }
+
+    public void fill(int color) {
+        Arrays.fill(getInternalData(), color);
     }
 
     public final void copyToScreen(Object g) {

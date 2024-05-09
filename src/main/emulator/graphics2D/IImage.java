@@ -33,4 +33,8 @@ public interface IImage
     void copyToScreen(Object gc);
 
     void copyToScreen(Object gc, int srcX, int srcY, int srcWidth, int srcHeight, int dstX, int dstY, int dstWidth, int dstHeight);
+
+    boolean isTransparent();
+
+    void fill(int color);
 }

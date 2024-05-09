@@ -142,6 +142,14 @@ public final class ImageSWT implements IImage
         this.img.dispose();
     }
 
+    public boolean isTransparent() {
+        return transparent;
+    }
+
+    public void fill(int color) {
+        // TODO
+    }
+
     public final void copyToScreen(Object g) {
         GC gc = (GC) g;
         if (this.mutable) {

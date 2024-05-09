@@ -53,14 +53,10 @@ public abstract class SpriteCanvas extends Canvas {
 	}
 
 	public void drawFrameBuffer(int tx, int ty) {
-		Displayable.checkForSteps();
-		Displayable.fpsLimiter();
 		if(bufferGraphics == null)
 			bufferGraphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
 		bufferGraphics.drawImage(spriteImage, tx, ty, 0);
 		Emulator.getEventQueue().gameGraphicsFlush();
-		Displayable.resetXRayGraphics();
-		super.paintSoftMenu(bufferGraphics);
 
 		graphics.setColor(0);
 		graphics.fillRect(0, 0, getWidth(), getHeight());
