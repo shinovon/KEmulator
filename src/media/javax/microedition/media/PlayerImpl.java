@@ -274,10 +274,13 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
         if (sequence instanceof javazoom.jl.player.Player) {
             ((javazoom.jl.player.Player) sequence).close();
         }
-        if(sequence instanceof Sequence && midiSequencer != null) {
-            midiSequencer.close();
-            midiSequencer = null;
-//            EmulatorMIDI.close();
+        if(sequence instanceof Sequence) {
+            if(midiSequencer != null) {
+                midiSequencer.close();
+                midiSequencer = null;
+            } else if(Settings.oneMidiAtTime) {
+                EmulatorMIDI.close();
+            }
         }
         if (dataSource != null && !dataSourceDisconnected) {
             dataSource.disconnect();
@@ -348,8 +351,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
             try {
                 if(midiSequencer != null)
                     midiSequencer.getMicrosecondPosition();
-//                if (EmulatorMIDI.currentPlayer == this && midiPlaying)
-//                    return EmulatorMIDI.getMicrosecondPosition();
+                else if (Settings.oneMidiAtTime && EmulatorMIDI.currentPlayer == this && midiPlaying)
+                    return EmulatorMIDI.getMicrosecondPosition();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -379,8 +382,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
             try {
                 if(midiSequencer != null)
                     midiSequencer.setMicrosecondPosition(ms);
-//                if (EmulatorMIDI.currentPlayer == this)
-//                    EmulatorMIDI.setMicrosecondPosition(ms);
+                else if (Settings.oneMidiAtTime && EmulatorMIDI.currentPlayer == this)
+                    EmulatorMIDI.setMicrosecondPosition(ms);
             } catch (Exception e) {
                 throw new MediaException(e);
             }
@@ -625,11 +628,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
                         playLock.wait();
                     }
                     complete = this.complete;
-                    midiPosition = midiSequencer.getMicrosecondPosition();
                     midiPlaying = false;
                     if (globalMidi) {
+                        midiPosition = EmulatorMIDI.getMicrosecondPosition();
                         EmulatorMIDI.stop();
                     } else {
+                        midiPosition = midiSequencer.getMicrosecondPosition();
                         midiSequencer.stop();
                     }
                 } else if (sequence instanceof Clip) {
