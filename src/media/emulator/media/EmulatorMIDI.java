@@ -43,6 +43,11 @@ public class EmulatorMIDI {
                     }
                 }
             });
+            if(Settings.searchVms) {
+                for (Transmitter t : midiSequencer.getTransmitters()) {
+                    t.setReceiver(midiDevice.getReceiver());
+                }
+            }
             midiSequencer.open();
         }
     }
@@ -120,11 +125,14 @@ public class EmulatorMIDI {
         return -1;
     }
 
-    private static Receiver getMidiReceiver() {
+    private static Receiver getMidiReceiver() throws MidiUnavailableException {
+        EmulatorMIDI.initDevice();
         return midiSequencer.getTransmitters().iterator().next().getReceiver();
     }
 
     public static void setupSequencer(Sequencer sequencer) throws MidiUnavailableException {
+        if(!Settings.searchVms) return;
+        EmulatorMIDI.initDevice();
         for (Transmitter t : sequencer.getTransmitters()) {
             t.setReceiver(midiDevice.getReceiver());
         }

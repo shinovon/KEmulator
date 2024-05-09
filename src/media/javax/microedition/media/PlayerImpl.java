@@ -278,7 +278,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
             if(midiSequencer != null) {
                 midiSequencer.close();
                 midiSequencer = null;
-            } else if(Settings.oneMidiAtTime) {
+            }
+            if(Settings.oneMidiAtTime) {
                 EmulatorMIDI.close();
             }
         }
@@ -535,14 +536,20 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
         }
         if (state != STARTED) {
             if (sequence != null) {
-                if (midi && Settings.oneMidiAtTime && EmulatorMIDI.currentPlayer != null) {
-                    if(midiPlaying && EmulatorMIDI.currentPlayer != this) {
-                        try {
-                            EmulatorMIDI.currentPlayer.stop();
-                        } catch (Exception ignored) {}
+                if (midi) {
+                    if(Settings.oneMidiAtTime && EmulatorMIDI.currentPlayer != null) {
+                        if (midiPlaying && EmulatorMIDI.currentPlayer != this) {
+                            try {
+                                EmulatorMIDI.currentPlayer.stop();
+                            } catch (Exception ignored) {}
 //                        throw new MediaException("MIDI is currently playing");
+                        }
+                        EmulatorMIDI.close();
                     }
-                    EmulatorMIDI.close();
+                    if(midiSequencer != null) {
+                        midiSequencer.close();
+                        midiSequencer = null;
+                    }
                 }
                 if (complete) {
                     setMediaTime(0);
@@ -610,17 +617,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
             while (playerThread != null && loopCount != 0) {
                 complete = false;
                 if (sequence instanceof Sequence) {
-                    initMidiSequencer();
                     if (globalMidi) {
                         EmulatorMIDI.start(this, (Sequence) sequence, midiPosition);
                         EmulatorMIDI.currentPlayer = this;
                     } else {
+                        initMidiSequencer();
                         midiSequencer.setSequence((Sequence) sequence);
                         midiSequencer.setMicrosecondPosition(midiPosition);
                         midiSequencer.start();
                     }
                     if (b) {
-                        notifyListeners(PlayerListener.STARTED, midiPosition = midiSequencer.getMicrosecondPosition());
+                        notifyListeners(PlayerListener.STARTED, midiPosition = globalMidi ? EmulatorMIDI.getMicrosecondPosition() : midiSequencer.getMicrosecondPosition());
                         b = false;
                     }
                     midiPlaying = true;
