@@ -300,7 +300,7 @@ public final class ImageSWT implements IImage
     }
 
     public void setRGB(int x, int y, int color) {
-        // TODO
+        imgdata.setPixel(x, y, color);
     }
     
     private int method300(int x, int y, ImageData imgdata) {
