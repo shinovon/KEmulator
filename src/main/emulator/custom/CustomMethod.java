@@ -63,7 +63,8 @@ public class CustomMethod {
                 prop.equalsIgnoreCase("device.imei") ||
                 prop.equalsIgnoreCase("phone.imei") ||
                 prop.equalsIgnoreCase("com.sonyericsson.imei") ||
-                prop.equalsIgnoreCase("com.samsung.imei")) {
+                prop.equalsIgnoreCase("com.samsung.imei") ||
+                prop.equalsIgnoreCase("com.siemens.IMEI")) {
             res = Permission.askIMEI();
         } else if (prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
             res = String.valueOf(Manager.isLibVlcSupported());
