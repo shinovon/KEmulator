@@ -1604,11 +1604,11 @@ public final class EmulatorScreen implements
     }
 
     public final void keyPressed(final KeyEvent keyEvent) {
-        if (keyEvent.keyCode == 16777261 && (keyEvent.stateMask & SWT.CONTROL) != 0) {
+        if (keyEvent.keyCode == 16777261/*&& (keyEvent.stateMask & SWT.CONTROL) != 0*/) {
             this.zoomOut();
             return;
         }
-        if (keyEvent.keyCode == 16777259 && (keyEvent.stateMask & SWT.CONTROL) != 0) {
+        if (keyEvent.keyCode == 16777259/*&& (keyEvent.stateMask & SWT.CONTROL) != 0*/) {
             this.zoomIn();
             return;
         }

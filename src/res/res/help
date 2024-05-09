@@ -43,6 +43,17 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.16 [2024.05.09]
+Implemented siemens game api
+
+$v2.16 [2024.05.07]
+Stub JSR 211 Content Handler
+Stub Nokia InApp
+
+$v2.16 [2024.05.07]
+Implemented siemens file api
+Implemented vodafone api
+
 $v2.16 [2024.05.06]
 Removed emulator.dll
 
