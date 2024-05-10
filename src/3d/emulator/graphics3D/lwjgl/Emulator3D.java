@@ -1305,7 +1305,7 @@ public final class Emulator3D implements IGraphics3D {
         if(instance == null)
             return;
         Emulator3D inst = instance;
-        if ((inst.useDisplay && pbufferContext == null) || inst.exiting) return;
+        if ((!inst.useDisplay && pbufferContext == null) || inst.exiting) return;
         inst.exiting = true;
         synchronized (inst) {
             if (inst.useDisplay) {
