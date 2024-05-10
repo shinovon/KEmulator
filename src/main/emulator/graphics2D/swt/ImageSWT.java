@@ -334,7 +334,12 @@ public final class ImageSWT implements IImage
     public final void cloneImage(final IImage image) {
         image.setData(this.getData());
     }
-    
+
+    public void cloneImage(IImage image, int x, int y, int w, int h) {
+        // TODO
+        image.setData(this.getData());
+    }
+
     static {
         aPaletteData537 = new PaletteData(65280, 16711680, -16777216);
     }

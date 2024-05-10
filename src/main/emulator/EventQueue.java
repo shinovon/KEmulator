@@ -2,6 +2,7 @@ package emulator;
 
 import javax.microedition.lcdui.*;
 
+import emulator.ui.IScreen;
 import net.rim.device.api.system.Application;
 import emulator.graphics2D.*;
 
@@ -191,20 +192,30 @@ public final class EventQueue implements Runnable {
 
     public void gameGraphicsFlush() {
         synchronized(lock) {
-            internalGameFlush();
+            IScreen scr = Emulator.getEmulator().getScreen();
+            final IImage screenImage = scr.getScreenImg();
+            final IImage backBufferImage2 = scr.getBackBufferImage();
+            final IImage xRayScreenImage2 = scr.getXRayScreenImage();
+            (Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+            scr.repaint();
         }
     }
 
     public void gameGraphicsFlush(int x, int y, int w, int h) {
-        // TODO
         synchronized(lock) {
-            internalGameFlush();
+            IScreen scr = Emulator.getEmulator().getScreen();
+            final IImage screenImage = scr.getScreenImg();
+            final IImage backBufferImage2 = scr.getBackBufferImage();
+            final IImage xRayScreenImage2 = scr.getXRayScreenImage();
+            (Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage, x, y, w, h);
+            scr.repaint();
         }
     }
 
     public void serviceRepaints() {
         Thread t = Thread.currentThread();
         if (t == eventThread || t == inputThread) {
+            Displayable.checkForSteps();
             synchronized(lock) {
                 internalRepaint();
             }
@@ -246,18 +257,17 @@ public final class EventQueue implements Runnable {
                         break;
                     }
                     case 4: {
-                        if (Emulator.getScreen() == null) {
+                        if (Emulator.getScreen() == null ||
+                                Emulator.getCurrentDisplay().getCurrent() != Emulator.getScreen()) {
                             break;
                         }
-                        if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getScreen()) {
-                            break;
-                        }
-                        final IImage backBufferImage3 = Emulator.getEmulator().getScreen().getBackBufferImage();
-                        final IImage xRayScreenImage3 = Emulator.getEmulator().getScreen().getXRayScreenImage();
+                        IScreen scr = Emulator.getEmulator().getScreen();
+                        final IImage backBufferImage3 = scr.getBackBufferImage();
+                        final IImage xRayScreenImage3 = scr.getXRayScreenImage();
                         Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
                         (Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
-                                .cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
-                        Emulator.getEmulator().getScreen().repaint();
+                                .cloneImage(scr.getScreenImg());
+                        scr.repaint();
                         try {
                             Thread.sleep(100L);
                         } catch (Exception ignored) {
@@ -378,8 +388,9 @@ public final class EventQueue implements Runnable {
                 return;
             }
             if (Settings.xrayView) Displayable.resetXRayGraphics();
-            final IImage backBufferImage = Emulator.getEmulator().getScreen().getBackBufferImage();
-            final IImage xRayScreenImage = Emulator.getEmulator().getScreen().getXRayScreenImage();
+            IScreen scr = Emulator.getEmulator().getScreen();
+            final IImage backBufferImage = scr.getBackBufferImage();
+            final IImage xRayScreenImage = scr.getXRayScreenImage();
             Displayable.checkForSteps();
             try {
                 if (repaintRegion[0] == -1) { // full repaint
@@ -391,8 +402,8 @@ public final class EventQueue implements Runnable {
                 ex.printStackTrace();
             }
             (Settings.xrayView ? xRayScreenImage : backBufferImage)
-                    .cloneImage(Emulator.getEmulator().getScreen().getScreenImg());
-            Emulator.getEmulator().getScreen().repaint();
+                    .cloneImage(scr.getScreenImg());
+            scr.repaint();
         } catch (Exception e) {
             System.err.println("Exception in repaint!");
             e.printStackTrace();
@@ -403,18 +414,6 @@ public final class EventQueue implements Runnable {
                 repaintLock.notifyAll();
             }
         } catch (Exception ignored) {}
-    }
-
-    private void internalGameFlush() {
-        if (Emulator.getCanvas() == null
-                || Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-            return;
-        }
-        final IImage screenImage = Emulator.getEmulator().getScreen().getScreenImg();
-        final IImage backBufferImage2 = Emulator.getEmulator().getScreen().getBackBufferImage();
-        final IImage xRayScreenImage2 = Emulator.getEmulator().getScreen().getXRayScreenImage();
-        (Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
-        Emulator.getEmulator().getScreen().repaint();
     }
 
     private class InputThread implements Runnable {
