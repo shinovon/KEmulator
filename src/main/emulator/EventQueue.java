@@ -397,12 +397,12 @@ public final class EventQueue implements Runnable {
             System.err.println("Exception in repaint!");
             e.printStackTrace();
         }
+        repainted = true;
         try {
             synchronized(repaintLock) {
-                repaintLock.notify();
+                repaintLock.notifyAll();
             }
         } catch (Exception ignored) {}
-        repainted = true;
     }
 
     private void internalGameFlush() {
