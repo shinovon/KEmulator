@@ -638,6 +638,8 @@ public class Emulator {
         System.setProperty("org.pigler.api.version", "1.2-kemulator");
         if (platform.isX64()) System.setProperty("kemulator.x64", "true");
         System.setProperty("kemulator.rpc.version", "1.0");
+
+        if(!platform.isX64())
         try {
             Webcam w = Webcam.getDefault();
             if (w != null) {
