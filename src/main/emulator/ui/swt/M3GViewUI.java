@@ -2,7 +2,6 @@ package emulator.ui.swt;
 
 import emulator.Emulator;
 import emulator.UILocale;
-import emulator.graphics3D.m3g.RenderPipe;
 import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
@@ -42,9 +41,9 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     boolean aBoolean909;
     private int anInt362 = 0;
     private int anInt893;
-    private int anInt910;
-    private float aFloat906;
-    private float aFloat911;
+    private int parallelProjEnabled;
+    private float nearPlane;
+    private float farPlane;
     private float fov;
     private float cameraX;
     private float cameraY;
@@ -115,17 +114,17 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         this.aMenuItem936.setSelection(true);
         this.aMenuItem938.setEnabled(false);
         this.anInt893 = 0;
-        this.anInt910 = 0;
+        this.parallelProjEnabled = 0;
         this.aMenuItem925.setSelection(true);
         this.aMenuItem930.setSelection(true);
         this.method524();
     }
 
     private void method524() {
-        this.aFloat906 = 1.0f;
-        this.aFloat911 = 100000.0f;
+        this.nearPlane = 1.0f;
+        this.farPlane = 100000.0f;
         this.fov = 70.0f;
-        this.method531();
+        this.setupCamera();
         this.cameraX = 0.0f;
         this.cameraY = 0.0f;
         this.cameraZ = 20.0f;
@@ -136,22 +135,18 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
 
-    private void method531() {
-        final Rectangle clientArea;
-        if ((clientArea = this.canvas.getClientArea()).width == 0 || clientArea.height == 0) {
-            return;
+    private void setupCamera() {
+        final Rectangle renderArea = canvas.getClientArea();
+        if (renderArea.width == 0 || renderArea.height == 0) return;
+
+        if (parallelProjEnabled == 0) {
+            if (fov < 0.0f) fov = 0.0f;
+            if (fov >= 180.0f) fov = 179.99f;
+            
+            camera.setPerspective(fov, (float) renderArea.width / renderArea.height, nearPlane, farPlane);
+        } else {
+            camera.setParallel(fov, (float) renderArea.width / renderArea.height, nearPlane, farPlane);
         }
-        if (this.anInt910 == 0) {
-            if (this.fov < 0.0f) {
-                this.fov = 0.0f;
-            }
-            if (this.fov >= 180.0f) {
-                this.fov = 179.99f;
-            }
-            this.camera.setPerspective(this.fov, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
-            return;
-        }
-        this.camera.setParallel(this.fov, (float) clientArea.width / (float) clientArea.height, this.aFloat906, this.aFloat911);
     }
 
     public final void method226() {
@@ -616,7 +611,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
                 this.cameraY -= (float)y / 10.0f;
             }
             case 2: {
-                if (this.anInt910 == 0) {
+                if (this.parallelProjEnabled == 0) {
                     this.cameraZ -= (float)x / 10.0f;
                     return;
                 }
@@ -627,13 +622,13 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
                 Label_0263:
                 {
                     if (this.fov > 0.0f) {
-                        if (this.fov < 180.0f || this.anInt910 != 0) {
+                        if (this.fov < 180.0f || this.parallelProjEnabled != 0) {
                             break Label_0263;
                         }
                     }
                     this.fov += x / 10.0f;
                 }
-                this.method531();
+                this.setupCamera();
                 break;
             }
         }
@@ -671,7 +666,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static int method510(final M3GViewUI class90, final int anInt910) {
-        return class90.anInt910 = anInt910;
+        return class90.parallelProjEnabled = anInt910;
     }
 
     static MenuItem method505(final M3GViewUI class90) {
@@ -683,7 +678,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static void method252(M3GViewUI paramClass57) {
-        paramClass57.method531();
+        paramClass57.setupCamera();
     }
 
     static Shell method499(final M3GViewUI class90) {
@@ -691,23 +686,23 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static float method503(final M3GViewUI class90) {
-        return class90.aFloat906;
+        return class90.nearPlane;
     }
 
     static float method512(final M3GViewUI class90) {
-        return class90.aFloat911;
+        return class90.farPlane;
     }
 
     static int method500(final M3GViewUI class90) {
-        return class90.anInt910;
+        return class90.parallelProjEnabled;
     }
 
     static float method506(final M3GViewUI class90, final float aFloat906) {
-        return class90.aFloat906 = aFloat906;
+        return class90.nearPlane = aFloat906;
     }
 
     static float method513(final M3GViewUI class90, final float aFloat911) {
-        return class90.aFloat911 = aFloat911;
+        return class90.farPlane = aFloat911;
     }
 
     static float method517(final M3GViewUI class90) {
