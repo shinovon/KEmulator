@@ -17,52 +17,63 @@
 package com.jblend.media.smaf.phrase;
 
 abstract class PhraseTrackBase {
-	public static final int NO_DATA = 1;
-	public static final int READY = 2;
-	public static final int PLAYING = 3;
-	public static final int PAUSED = 5;
-	public static final int DEFAULT_VOLUME = 100;
-	public static final int DEFAULT_PANPOT = 64;
+    public static final int NO_DATA = 1;
+    public static final int READY = 2;
+    public static final int PLAYING = 3;
+    public static final int PAUSED = 5;
+    public static final int DEFAULT_VOLUME = 100;
+    public static final int DEFAULT_PANPOT = 64;
 
-	PhraseTrackBase(int id) {}
+    PhraseTrackBase(int id) {
+    }
 
-	public void removePhrase() {}
+    public void removePhrase() {
+    }
 
-	public void play() {}
+    public void play() {
+    }
 
-	public void play(int loop) {}
+    public void play(int loop) {
+    }
 
-	public void stop() {}
+    public void stop() {
+    }
 
-	public void pause() {}
+    public void pause() {
+    }
 
-	public void resume() {}
+    public void resume() {
+    }
 
-	public int getState() {
-		return PLAYING;
-	}
+    public int getState() {
+        return PLAYING;
+    }
 
-	public void setVolume(int value) {}
+    public void setVolume(int value) {
+    }
 
-	public int getVolume() {
-		return 0;
-	}
+    public int getVolume() {
+        return 0;
+    }
 
-	public void setPanpot(int value) {}
+    public void setPanpot(int value) {
+    }
 
-	public int getPanpot() {
-		return 0;
-	}
+    public int getPanpot() {
+        return 0;
+    }
 
-	public void mute(boolean mute) {}
+    public void mute(boolean mute) {
+    }
 
-	public boolean isMute() {
-		return true;
-	}
+    public boolean isMute() {
+        return true;
+    }
 
-	public int getID() {
-		return 0;
-	}
+    public int getID() {
+        return 0;
+    }
 
-	public void setEventListener(PhraseTrackListener l) {}
+    public void setEventListener(PhraseTrackListener l) {
+    }
 }

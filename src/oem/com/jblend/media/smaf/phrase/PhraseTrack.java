@@ -17,21 +17,24 @@
 package com.jblend.media.smaf.phrase;
 
 public class PhraseTrack extends PhraseTrackBase {
-	PhraseTrack(int id) {
-		super(id);
-	}
+    PhraseTrack(int id) {
+        super(id);
+    }
 
-	public void setPhrase(Phrase p) {}
+    public void setPhrase(Phrase p) {
+    }
 
-	public Phrase getPhrase() {
-		return null;
-	}
+    public Phrase getPhrase() {
+        return null;
+    }
 
-	public void removePhrase() {}
+    public void removePhrase() {
+    }
 
-	public void setSubjectTo(PhraseTrack master) {}
+    public void setSubjectTo(PhraseTrack master) {
+    }
 
-	public PhraseTrack getSyncMaster() {
-		return null;
-	}
+    public PhraseTrack getSyncMaster() {
+        return null;
+    }
 }
