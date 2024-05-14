@@ -801,11 +801,11 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         return class90.anInt922 = anInt922;
     }
 
-    static float method542(final M3GViewUI class90, final float n) {
+    static float fovAdd(final M3GViewUI class90, final float n) {
         return class90.fov += n;
     }
 
-    static float method544(final M3GViewUI class90, final float n) {
+    static float fovSubtract(final M3GViewUI class90, final float n) {
         return class90.fov -= n;
     }
 
