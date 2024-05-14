@@ -978,6 +978,11 @@ public class Emulator {
             cmd.add("-Dsun.java3d.d3d=false");
         }
 
+        // mac cocoa fix
+        if (os.startsWith("darwin")) {
+            cmd.add("-XstartOnFirstThread");
+        }
+
         cmd.add("emulator.Emulator");
         if (s == null) {
             for (String a: Emulator.commandLineArguments) {

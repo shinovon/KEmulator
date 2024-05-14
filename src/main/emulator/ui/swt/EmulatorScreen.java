@@ -648,8 +648,9 @@ public final class EmulatorScreen implements
 
         (this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
         this.forcePaintMenuItem.addSelectionListener(this);
-
-        setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+        try {
+            setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+        } catch (Throwable ignored) {}
         new MenuItem(this.menuView, 2);
         (this.keypadMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
         this.keypadMenuItem.addSelectionListener(this);
