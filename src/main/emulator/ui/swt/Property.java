@@ -197,6 +197,7 @@ public final class Property implements IProperty {
 //    private Button reopenMidiCheck;
     private Button globalMidiCheck;
     private Button ignoreRegionRepaintCheck;
+    private Button fpsCounterCheck;
 //    private Button pollOnRepaintBtn;
 
     public Property() {
@@ -897,6 +898,8 @@ public final class Property implements IProperty {
 //        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
         Settings.oneMidiAtTime = globalMidiCheck.getSelection();
         Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
+
+        Settings.fpsCounter = fpsCounterCheck.getSelection();
 
         this.updateProxy();
     }
@@ -1685,7 +1688,7 @@ public final class Property implements IProperty {
         mediaGroup.setLayoutData(fill);
 
         new Label(this.mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") +
-                (System.getProperty("os.arch").equals("amd64") ? " (64-bit only)" : " (32-bit only)") + ":");
+                (System.getProperty("os.arch").contains("64") ? " (64-bit only)" : " (32-bit only)") + ":");
         vlcDirText = new Text(mediaGroup, SWT.DEFAULT);
         vlcDirText.setEditable(true);
         vlcDirText.setEnabled(true);
@@ -1835,6 +1838,9 @@ public final class Property implements IProperty {
         this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
 //        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
 //        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
+        fpsCounterCheck = new Button(sysChecksGroup, SWT.CHECK);
+        fpsCounterCheck.setText(UILocale.get("OPTION_SYSTEM_FPS_COUNT", "FPS Counter"));
+        fpsCounterCheck.setSelection(Settings.fpsCounter);
     }
 
     private void setupSysFontComp() {

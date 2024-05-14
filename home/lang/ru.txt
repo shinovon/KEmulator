@@ -69,7 +69,6 @@ MENU_TOOL_CAPTURE_FILE=Скриншот в файл
 MENU_TOOL_CAPTURE_CLIP=Скриншот в буфер обмена
 
 MENU_TOOL_SHOW_TRACK_INFO=Вкл. отслеживание вызовов
-MENU_TOOL_FPS_COUNT=Счетчик FPS
 
 MENU_TOOL_QWERTY_MODE=Режим QWERTY
 MENU_TOOL_DISABLE_NETWORK_ACCESS=Отключить доступ к сети
@@ -272,6 +271,7 @@ OPTION_SYSTEM_TRACK_NEW=Отслеживать операции \"new/new[]...\"
 OPTION_SYSTEM_TRACK_METHOD=Отслеживать вызовы методов
 OPTION_SYSTEM_DISCORD_RICHPRESENCE=Discord Rich Presence
 OPTION_SYSTEM_AWT_ANTIALIASING=Сглаживание AWT
+OPTION_SYSTEM_FPS_COUNT=Счетчик FPS
 
 OPTION_COREAPI_VIBRATION=Включить вибрацию
 OPTION_COREAPI_KEY_REPEAT=Включить Canvas.keyRepeated().

@@ -119,7 +119,6 @@ public final class EmulatorScreen implements
     MenuItem networkKillswitchMenuItem;
     private MenuItem canvasKeyboardMenuItem;
     private MenuItem fpsModeMenuItem;
-    private MenuItem fpsCounterMenuItem;
     private MenuItem changeResMenuItem;
     private Menu menuResize;
     private MenuItem centerOnScreenMenuItem;
@@ -674,13 +673,6 @@ public final class EmulatorScreen implements
         this.logMenuItem.addSelectionListener(this);
 
         new MenuItem(this.menuView, 2);
-
-        this.fpsCounterMenuItem = new MenuItem(this.menuView, 32);
-        this.fpsCounterMenuItem.setText(UILocale.get("MENU_TOOL_FPS_COUNT", "FPS Counter"));
-        this.fpsCounterMenuItem.addSelectionListener(this);
-        this.fpsCounterMenuItem.setSelection(Settings.fpsCounter);
-
-        new MenuItem(this.menuView, 2);
         (this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
         this.optionsMenuItem.addSelectionListener(this);
         (this.helpMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
@@ -1161,10 +1153,6 @@ public final class EmulatorScreen implements
             if (menuItem.equals(this.alwaysOnTopMenuItem)) {
                 Settings.alwaysOnTop = this.alwaysOnTopMenuItem.getSelection();
                 setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
-                return;
-            }
-            if (menuItem.equals(this.fpsCounterMenuItem)) {
-                this.fpsCounterMenuItem.setSelection(Settings.fpsCounter = !Settings.fpsCounter);
                 return;
             }
             if (menuItem.equals(this.logMenuItem)) {
