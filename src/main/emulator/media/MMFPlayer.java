@@ -13,13 +13,14 @@ public class MMFPlayer {
         if (MMFPlayer.initialized) {
             return true;
         }
+        if(Emulator.isX64()) {
+            return false;
+        }
         try {
             i.a("mmfplayer");
             initMMFLibrary(Emulator.getAbsolutePath() + "/ma3smwemu.dll");
             return MMFPlayer.initialized = true;
-        } catch (UnsatisfiedLinkError ignored) {
-        } catch (Exception ignored) {
-        }
+        } catch (Throwable ignored) {}
         return MMFPlayer.initialized = false;
     }
 

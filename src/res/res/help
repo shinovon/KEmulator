@@ -43,6 +43,13 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.16 [2024.05.14]
+Java 9+ support
+Fix for Mac OS
+
+$v2.16 [2024.05.10]
+GameCanvas partial flushScreen() support
+
 $v2.16 [2024.05.09]
 Implemented siemens game api
 
