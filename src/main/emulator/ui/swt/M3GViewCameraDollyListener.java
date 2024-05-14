@@ -11,6 +11,6 @@ final class M3GViewCameraDollyListener extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        M3GViewUI.method504(this.aClass90_1060, 2);
+        M3GViewUI.setCameraMode(this.aClass90_1060, 2);
     }
 }

@@ -11,6 +11,6 @@ final class M3GViewCameraZoomListener extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        M3GViewUI.method504(this.aClass90_1164, 3);
+        M3GViewUI.setCameraMode(this.aClass90_1164, 3);
     }
 }

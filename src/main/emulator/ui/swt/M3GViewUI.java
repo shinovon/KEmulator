@@ -40,7 +40,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private boolean aBoolean905;
     boolean aBoolean909;
     private int anInt362 = 0;
-    private int anInt893;
+    private int cameraMode;
     private int parallelProjEnabled;
     private float nearPlane;
     private float farPlane;
@@ -53,19 +53,19 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     private Node aNode361;
     private Rectangle aRectangle903;
     private MenuItem aMenuItem921;
-    private MenuItem aMenuItem925;
+    private MenuItem orbitCameraItem;
     private MenuItem aMenuItem927;
     private MenuItem aMenuItem928;
     private MenuItem aMenuItem929;
-    private MenuItem aMenuItem930;
+    private MenuItem persModeItem;
     private MenuItem aMenuItem931;
     private MenuItem aMenuItem932;
     private MenuItem aMenuItem933;
     private MenuItem aMenuItem934;
     private MenuItem aMenuItem935;
-    private MenuItem aMenuItem936;
-    private MenuItem aMenuItem937;
-    private MenuItem aMenuItem938;
+    private MenuItem sceneLightItem;
+    private MenuItem viewLightItem;
+    private MenuItem lightSettingsItem;
     private int anInt917;
     private int anInt922;
     private float rotationX, rotationY;
@@ -105,19 +105,23 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         this.m3gview = M3GView3D.getViewInstance();
     }
 
-    private void method516() {
-        this.showAxis = false;
-        this.showGrid = false;
-        this.axisItem.setSelection(this.showAxis);
-        this.gridItem.setSelection(this.showGrid);
-        this.renderInvisibleItem.setSelection(m3gview.isRenderInvisibleNodes());
-        this.aMenuItem936.setSelection(true);
-        this.aMenuItem938.setEnabled(false);
-        this.anInt893 = 0;
-        this.parallelProjEnabled = 0;
-        this.aMenuItem925.setSelection(true);
-        this.aMenuItem930.setSelection(true);
-        this.method524();
+    private void setDefaultPreferences() {
+        showAxis = false;
+        axisItem.setSelection(showAxis);
+        showGrid = false;
+        gridItem.setSelection(showGrid);
+
+        renderInvisibleItem.setSelection(m3gview.isRenderInvisibleNodes());
+        sceneLightItem.setSelection(true);
+        //lightSettingsItem.setEnabled(false);
+
+        cameraMode = 0;
+        //orbitCameraItem.setSelection(true);
+
+        parallelProjEnabled = 0;
+        //persModeItem.setSelection(true);
+
+        method524();
     }
 
     private void method524() {
@@ -155,7 +159,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         this.shell.setLocation(current.getClientArea().width - this.shell.getSize().x >> 1, current.getClientArea().height - this.shell.getSize().y >> 1);
         this.shell.open();
         this.shell.addDisposeListener(this);
-        this.method516();
+        this.setDefaultPreferences();
         this.addM3GObjects();
         new Thread(new Refresher(this)).start();
         new Thread(new Flusher(this)).start();
@@ -331,17 +335,18 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         final MenuItem menuItem3;
         (menuItem3 = new MenuItem(this.menu, 64)).setText(UILocale.get("M3G_VIEW_LIGHT", "Light"));
         this.lightMenu = new Menu(menuItem3);
-        (this.aMenuItem936 = new MenuItem(this.lightMenu, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
-        this.aMenuItem936.addSelectionListener(new M3GViewLightSceneListener(this));
-        (this.aMenuItem937 = new MenuItem(this.lightMenu, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
-        this.aMenuItem937.addSelectionListener(new M3GViewLightViewListener(this));
-        new MenuItem(this.lightMenu, 2);
-        (this.aMenuItem938 = new MenuItem(this.lightMenu, 8)).setText(UILocale.get("M3G_VIEW_LIGHT_SETTING", "Light Setting"));
+        (this.sceneLightItem = new MenuItem(this.lightMenu, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
+        this.sceneLightItem.addSelectionListener(new M3GViewLightSceneListener(this));
+        (this.viewLightItem = new MenuItem(this.lightMenu, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
+        this.viewLightItem.addSelectionListener(new M3GViewLightViewListener(this));
+        /*new MenuItem(this.lightMenu, 2);
+        (this.lightSettingsItem = new MenuItem(this.lightMenu, 8)).setText(UILocale.get("M3G_VIEW_LIGHT_SETTING", "Light Setting"));*/
         menuItem3.setMenu(this.lightMenu);
         this.cameraMenu = new Menu(menuItem2);
-        (this.aMenuItem925 = new MenuItem(this.cameraMenu, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ORBIT", "Orbit") + "\t(1)");
-        this.aMenuItem925.setAccelerator(49);
-        this.aMenuItem925.addSelectionListener(new M3GViewCameraOrbitListener(this));
+
+        /*(this.orbitCameraItem = new MenuItem(this.cameraMenu, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ORBIT", "Orbit") + "\t(1)");
+        this.orbitCameraItem.setAccelerator(49);
+        this.orbitCameraItem.addSelectionListener(new M3GViewCameraOrbitListener(this));
         (this.aMenuItem927 = new MenuItem(this.cameraMenu, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PAN", "Pan") + "\t(2)");
         this.aMenuItem927.setAccelerator(50);
         this.aMenuItem927.addSelectionListener(new M3GViewCameraPanListener(this));
@@ -351,16 +356,19 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         (this.aMenuItem929 = new MenuItem(this.cameraMenu, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_ZOOM", "Zoom") + "\t(4)");
         this.aMenuItem929.setAccelerator(52);
         this.aMenuItem929.addSelectionListener(new M3GViewCameraZoomListener(this));
+
         new MenuItem(this.cameraMenu, 2);
         final MenuItem menuItem4;
         (menuItem4 = new MenuItem(this.cameraMenu, 64)).setText(UILocale.get("M3G_VIEW_CAMERA_PROJECTION", "Projection Mode"));
         this.projectionMenu = new Menu(menuItem4);
-        (this.aMenuItem930 = new MenuItem(this.projectionMenu, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PERSPECTIVE", "Perspective Projection"));
-        this.aMenuItem930.addSelectionListener(new M3GViewCameraPerspectiveListener(this));
+        (this.persModeItem = new MenuItem(this.projectionMenu, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PERSPECTIVE", "Perspective Projection"));
+        this.persModeItem.addSelectionListener(new M3GViewCameraPerspectiveListener(this));
         (this.aMenuItem931 = new MenuItem(this.projectionMenu, 16)).setText(UILocale.get("M3G_VIEW_CAMERA_PARALLEL", "Parallel Projection"));
         this.aMenuItem931.addSelectionListener(new M3GViewCameraParallelListener(this));
         menuItem4.setMenu(this.projectionMenu);
-        new MenuItem(this.cameraMenu, 2);
+
+        new MenuItem(this.cameraMenu, 2);*/
+
         (this.aMenuItem932 = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
         this.aMenuItem932.setAccelerator(67);
         this.aMenuItem932.addSelectionListener(new M3GViewCameraClipPlanesListener(this));
@@ -590,7 +598,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
     private void method492(final int x, final int y) {
         final Quaternion a = new Quaternion();
-        switch (this.anInt893) {
+        switch (this.cameraMode) {
             case 0: {
                 rotationX += x / 2F;
                 rotationY += y / 2F;
@@ -661,8 +669,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         return class90.aBoolean909;
     }
 
-    static int method504(final M3GViewUI class90, final int anInt893) {
-        return class90.anInt893 = anInt893;
+    static int setCameraMode(final M3GViewUI m3gViewUi, final int mode) {
+        return m3gViewUi.cameraMode = mode;
     }
 
     static int method510(final M3GViewUI class90, final int anInt910) {
@@ -769,16 +777,12 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
         return class90.aTree896;
     }
 
-    static int method515(final M3GViewUI class90) {
-        return class90.anInt893++;
+    static void nextCameraMode(final M3GViewUI m3gViewUi) {
+        m3gViewUi.cameraMode = (m3gViewUi.cameraMode + 1) % 4;
     }
 
-    static int method522(final M3GViewUI class90, final int n) {
-        return class90.anInt893 %= n;
-    }
-
-    static int method523(final M3GViewUI class90) {
-        return class90.anInt893;
+    static int getCameraMode(final M3GViewUI m3gViewUi) {
+        return m3gViewUi.cameraMode;
     }
 
     static MenuItem method534(final M3GViewUI class90) {
@@ -786,7 +790,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
     }
 
     static MenuItem method539(final M3GViewUI class90) {
-        return class90.aMenuItem925;
+        return class90.orbitCameraItem;
     }
 
     static MenuItem method541(final M3GViewUI class90) {

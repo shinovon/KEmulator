@@ -11,6 +11,6 @@ final class M3GViewCameraPanListener extends SelectionAdapter {
     }
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
-        M3GViewUI.method504(this.aClass90_1056, 1);
+        M3GViewUI.setCameraMode(this.aClass90_1056, 1);
     }
 }

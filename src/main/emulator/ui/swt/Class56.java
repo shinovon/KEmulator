@@ -15,12 +15,11 @@ final class Class56 extends MouseAdapter {
         Label_0205:
         {
             if (mouseEvent.button == 3) {
-                M3GViewUI.method515(this.aClass90_822);
-                M3GViewUI.method522(this.aClass90_822, 4);
+                /*M3GViewUI.nextCameraMode(this.aClass90_822);
                 MenuItem menuItem = null;
                 Label_0166:
                 {
-                    switch (M3GViewUI.method523(this.aClass90_822)) {
+                    switch (M3GViewUI.getCameraMode(this.aClass90_822)) {
                         case 0: {
                             M3GViewUI.method534(this.aClass90_822).setSelection(false);
                             menuItem = M3GViewUI.method539(this.aClass90_822);
@@ -37,7 +36,7 @@ final class Class56 extends MouseAdapter {
                                 menuItem = M3GViewUI.method505(this.aClass90_822);
                                 break Label_0166;
                             }
-                            M3GViewUI.method515(this.aClass90_822);
+                            M3GViewUI.nextCameraMode(this.aClass90_822);
                             break;
                         }
                         case 3: {
@@ -50,7 +49,7 @@ final class Class56 extends MouseAdapter {
                     }
                     menuItem = M3GViewUI.method534(this.aClass90_822);
                 }
-                menuItem.setSelection(true);
+                menuItem.setSelection(true);*/
             } else if (mouseEvent.button == 1) {
                 M3GViewUI.method530(this.aClass90_822, mouseEvent.x);
                 M3GViewUI.method535(this.aClass90_822, mouseEvent.y);
