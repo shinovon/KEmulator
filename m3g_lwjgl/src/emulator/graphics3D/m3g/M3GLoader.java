@@ -1166,8 +1166,7 @@ public final class M3GLoader {
             (var2 = new Inflater(false)).setInput(var0);
             var2.inflate(var1);
             var2.end();
-        } catch (Exception var3) {
-            Emulator.AntiCrack(var3);
+        } catch (Exception e) {
             Emulator.getEmulator().getLogStream().println("m3g upzip error");
         }
     }

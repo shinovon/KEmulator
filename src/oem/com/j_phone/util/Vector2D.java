@@ -45,14 +45,22 @@ public class Vector2D {
         this.y = FixedPoint.fromDouble(y);
     }
 
-    public static FixedPoint innerProduct(Vector2D paramVector2D1, Vector2D paramVector2D2) {
+    public static FixedPoint innerProduct(Vector2D v1, Vector2D v2) {
         // TODO
-        return null;
+        double x1 = FixedPoint.toDouble(v1.x);
+        double y1 = FixedPoint.toDouble(v1.y);
+        double x2 = FixedPoint.toDouble(v2.x);
+        double y2 = FixedPoint.toDouble(v2.y);
+        return new FixedPoint(FixedPoint.fromDouble(x1 * x2 + y1 * y2));
     }
 
-    public static FixedPoint outerProduct(Vector2D paramVector2D1, Vector2D paramVector2D2) {
+    public static FixedPoint outerProduct(Vector2D v1, Vector2D v2) {
         // TODO
-        return null;
+        double x1 = FixedPoint.toDouble(v1.x);
+        double y1 = FixedPoint.toDouble(v1.y);
+        double x2 = FixedPoint.toDouble(v2.x);
+        double y2 = FixedPoint.toDouble(v2.y);
+        return new FixedPoint();
     }
 
     public void setValue(int x, int y) {

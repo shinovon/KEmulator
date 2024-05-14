@@ -82,9 +82,8 @@ public final class Instance {
         Class<?> forName;
         try {
             forName = Class.forName(s, false, Emulator.getCustomClassLoader());
-        } catch (ClassNotFoundException ex2) {
-            Emulator.AntiCrack(ex2);
-            throw new NoClassDefFoundError(ex2.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new NoClassDefFoundError(e.getMessage());
         }
         return forName;
     }

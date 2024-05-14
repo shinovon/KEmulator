@@ -186,9 +186,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
             super.visitLdcInsn((this.aString1190 = s + "\t at " + this.methodName + " (" + this.className + ".java:" + this.sourceLine + ")\n"));
             super.visitMethodInsn(184, "emulator/custom/CustomMethod", "showTrackInfo", "(Ljava/lang/String;)V");
             this.method707(1);
-        } catch (Exception ex) {
-            Emulator.AntiCrack(ex);
-        }
+        } catch (Exception ignored) {}
     }
 
     public final void visitMultiANewArrayInsn(final String s, final int n) {

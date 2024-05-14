@@ -36,10 +36,8 @@ public final class h {
                 new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
                 method593.close();
             }
-        } catch (Exception ex2) {
-            final Exception ex = ex2;
-            Emulator.AntiCrack(ex2);
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

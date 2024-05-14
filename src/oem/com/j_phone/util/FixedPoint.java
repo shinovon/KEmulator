@@ -1,4 +1,5 @@
 package com.j_phone.util;
+
 public class FixedPoint {
     private static final int PI = fromDouble((double) Math.PI);
     private static final int MAX = (32767 << 16) | 0xFFFF;

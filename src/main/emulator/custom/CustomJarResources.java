@@ -8,7 +8,6 @@ import java.io.*;
 
 public final class CustomJarResources {
     public CustomJarResources() {
-        super();
     }
 
     public static InputStream getResourceAsStream(final String s) {
@@ -40,12 +39,11 @@ public final class CustomJarResources {
                 return new ByteArrayInputStream(array2);
             }
         } catch (Exception ex) {
-            Emulator.AntiCrack(ex);
             return Emulator.class.getResourceAsStream(s);
         }
     }
 
-    public static InputStream method808(final Object o, String substring) {
+    public static InputStream getResourceAsStream(final Object o, String substring) {
         String s;
         if (substring.length() > 0 && substring.charAt(0) == '/') {
             s = substring.substring(1);
@@ -65,28 +63,30 @@ public final class CustomJarResources {
     }
 
     public static byte[] getBytes(final String s) throws IOException {
-        final InputStream inputStream;
-        return getBytes(inputStream = ((s.indexOf(58) != -1) ? ((InputConnection) Connector.open(s, Connector.READ)).openInputStream() : getResourceAsStream(s)));
+        return getBytes(((s.indexOf(58) != -1) ? ((InputConnection) Connector.open(s, Connector.READ)).openInputStream() : getResourceAsStream(s)));
     }
 
     public static byte[] getBytes(final InputStream inputStream) throws IOException {
         if (inputStream == null) {
             return null;
         }
-        int available;
-        if ((available = inputStream.available()) <= 0) {
-            available = 128;
+        try {
+            int available;
+            if ((available = inputStream.available()) <= 0) {
+                available = 128;
+            }
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(available);
+            final byte[] array = new byte[available];
+            int read;
+            while ((read = inputStream.read(array)) > 0) {
+                byteArrayOutputStream.write(array, 0, read);
+            }
+            final byte[] byteArray = byteArrayOutputStream.toByteArray();
+            byteArrayOutputStream.close();
+            return byteArray;
+        } finally {
+            inputStream.close();
         }
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(available);
-        final byte[] array = new byte[available];
-        int read;
-        while ((read = inputStream.read(array)) > 0) {
-            byteArrayOutputStream.write(array, 0, read);
-        }
-        final byte[] byteArray = byteArrayOutputStream.toByteArray();
-        byteArrayOutputStream.close();
-        inputStream.close();
-        return byteArray;
     }
 
     public static void write(final InputStream i, OutputStream o) throws IOException {
@@ -103,9 +103,5 @@ public final class CustomJarResources {
             o.write(buf, 0, read);
         }
         i.close();
-    }
-
-    public static InputStream a(String paramString) {
-        return getResourceAsStream(paramString);
     }
 }

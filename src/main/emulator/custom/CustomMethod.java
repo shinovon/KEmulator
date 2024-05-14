@@ -97,7 +97,7 @@ public class CustomMethod {
     }
 
     public static InputStream getResourceAsStream(final Object o, final String s) {
-        return CustomJarResources.method808(o, s);
+        return CustomJarResources.getResourceAsStream(o, s);
     }
 
     public static void showTrackInfo(final String s) {
