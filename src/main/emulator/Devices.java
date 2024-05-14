@@ -23,7 +23,7 @@ public final class Devices {
             final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             InputStream resourceAsStream;
             try {
-                resourceAsStream = "".getClass().getResourceAsStream(s);
+                resourceAsStream = Emulator.class.getResourceAsStream(s);
             } catch (Exception ex) {
                 resourceAsStream = new FileInputStream(s);
             }
@@ -43,6 +43,7 @@ public final class Devices {
             }
             Collections.sort((List<Comparable>) Devices.anArrayList1075);
         } catch (Exception ex2) {
+            ex2.printStackTrace();
             Emulator.getEmulator().getLogStream().println("Failed to load XML file.");
         }
     }

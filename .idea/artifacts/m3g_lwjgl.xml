@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/home</output-path>
     <root id="archive" name="m3g_lwjgl.jar">
       <element id="module-output" name="m3g_lwjgl" />
+      <element id="file-copy" path="$PROJECT_DIR$/home/version.mf" output-file-name="META-INF/version.mf" />
     </root>
   </artifact>
 </component>

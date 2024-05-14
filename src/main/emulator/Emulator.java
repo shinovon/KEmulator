@@ -2,6 +2,7 @@ package emulator;
 
 import java.awt.Dimension;
 import java.io.*;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
@@ -715,6 +716,7 @@ public class Emulator {
             System.exit(0);
             return;
         }
+        getLibraryClassLoader();
         platform.loadLibraries();
         EmulatorMIDI.initDevices();
         Emulator.commandLineArguments = commandLineArguments;
@@ -1075,5 +1077,24 @@ public class Emulator {
 
     public static IGraphics3D getGraphics3D() {
         return platform.getGraphics3D();
+    }
+
+    public static boolean isJava9() {
+        try {
+            return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 9;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    public static ClassLoader getLibraryClassLoader() {
+        try {
+            if (isJava9()) {
+                ClassLoader cl = new Java9ClassLoader(new URL[0], Emulator.class.getClassLoader());
+                Thread.currentThread().setContextClassLoader(cl);
+                return cl;
+            }
+        } catch (Throwable ignored) {}
+        return Emulator.class.getClassLoader();
     }
 }

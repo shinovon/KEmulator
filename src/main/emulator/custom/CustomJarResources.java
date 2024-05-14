@@ -41,7 +41,7 @@ public final class CustomJarResources {
             }
         } catch (Exception ex) {
             Emulator.AntiCrack(ex);
-            return "".getClass().getResourceAsStream(s);
+            return Emulator.class.getResourceAsStream(s);
         }
     }
 

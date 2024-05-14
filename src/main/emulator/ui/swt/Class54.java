@@ -160,7 +160,7 @@ public final class Class54 implements MouseListener, MouseMoveListener {
         this.aCanvas810.addMouseListener(this);
         this.aCanvas810.addMouseMoveListener(this);
         this.aGC814 = new GC(this.aCanvas810);
-        this.method455("".getClass().getResourceAsStream("/res/sign"));
+        this.method455(Emulator.class.getResourceAsStream("/res/sign"));
     }
 
     private void method455(final InputStream inputStream) {

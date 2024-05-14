@@ -40,7 +40,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
             wglGetCurrentContext = ReflectUtil.getMethod(wglClass, "wglGetCurrentContext");
             getDC = ReflectUtil.getMethod(osClass, "getDC", int.class);
             releaseDC = ReflectUtil.getMethod(osClass, "releaseDC", int.class, int.class);
-        } catch (Exception ignored) {}
+        } catch (Throwable ignored) {}
     }
 
     public boolean isX64() {
@@ -168,14 +168,18 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     private static void addToClassPath(String s) {
         try {
-            URLClassLoader classLoader = (URLClassLoader) Emulator.class.getClassLoader();
-            Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            addUrlMethod.setAccessible(true);
             File f = new File(Emulator.getAbsolutePath() + "/" + s);
-            URL swtFileUrl = f.toURL();
-            addUrlMethod.invoke(classLoader, swtFileUrl);
-        }
-        catch(Exception e) {
+            URL url = f.toURL();
+
+            URLClassLoader classLoader = (URLClassLoader) Emulator.getLibraryClassLoader();
+            if (Emulator.isJava9()) {
+                ((Java9ClassLoader) classLoader).addURL(url);
+            } else {
+                Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+                addUrlMethod.setAccessible(true);
+                addUrlMethod.invoke(classLoader, url);
+            }
+        } catch(Exception e) {
             throw new RuntimeException(s, e);
         }
     }
