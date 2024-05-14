@@ -634,9 +634,11 @@ public final class EmulatorScreen implements
         this.infosMenuItem.addSelectionListener(this);
         (this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tCtrl+X");
         this.xrayViewMenuItem.addSelectionListener(this);
-        (this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
-        this.alwaysOnTopMenuItem.addSelectionListener(this);
-        this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
+        if (!Emulator.isX64()) {
+            (this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
+            this.alwaysOnTopMenuItem.addSelectionListener(this);
+            this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
+        }
         (this.rotateScreenMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_ROTATE", "Rotate Screen") + "\tCtrl+Y");
         this.rotateScreenMenuItem.addSelectionListener(this);
 
@@ -917,8 +919,8 @@ public final class EmulatorScreen implements
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         final MenuItem menuItem;
         final Menu parent;
-        if ((parent = (menuItem = (MenuItem) selectionEvent.widget).getParent()).equals(this.menuTool)) {
-            if (menuItem.equals(this.captureToFileMenuItem)) {
+        if ((parent = (menuItem = (MenuItem) selectionEvent.widget).getParent()) == this.menuTool) {
+            if (menuItem == this.captureToFileMenuItem) {
                 if (this.pauseState != 0) {
                     final String string = Emulator.getUserPath() + "/capture/";
                     final File file;
@@ -932,7 +934,7 @@ public final class EmulatorScreen implements
                     }
                     ++EmulatorScreen.captureFileCounter;
                 }
-            } else if (menuItem.equals(this.captureToClipboardMenuItem)) {
+            } else if (menuItem == this.captureToClipboardMenuItem) {
                 if (this.pauseState != 0) {
                     if (Settings.g2d == 0) {
                         this.screenCopySwt.copyToClipBoard();
@@ -943,35 +945,35 @@ public final class EmulatorScreen implements
                     }
                 }
             } else {
-                if (menuItem.equals(canvasKeyboardMenuItem)) {
+                if (menuItem == canvasKeyboardMenuItem) {
                     Settings.canvasKeyboard = canvasKeyboardMenuItem.getSelection();
                     toggleMenuAccelerators(!Settings.canvasKeyboard);
                     return;
                 }
 
-                if (menuItem.equals(fpsModeMenuItem)) {
+                if (menuItem == fpsModeMenuItem) {
                     Settings.fpsMode = fpsModeMenuItem.getSelection();
                     setFpsMode(true);
                     return;
                 }
 
-                if (menuItem.equals(networkKillswitchMenuItem)) {
+                if (menuItem == networkKillswitchMenuItem) {
                     networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable = !Settings.networkNotAvailable);
                     return;
                 }
-                if (menuItem.equals(this.showTrackInfoMenuItem)) {
+                if (menuItem == this.showTrackInfoMenuItem) {
                     this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack = !Settings.threadMethodTrack);
                     return;
                 }
-                if (menuItem.equals(this.zoomInMenuItem)) {
+                if (menuItem == this.zoomInMenuItem) {
                     this.zoomIn();
                     return;
                 }
-                if (menuItem.equals(this.zoomOutMenuItem)) {
+                if (menuItem == this.zoomOutMenuItem) {
                     this.zoomOut();
                     return;
                 }
-                if (menuItem.equals(this.speedUpMenuItem)) {
+                if (menuItem == this.speedUpMenuItem) {
                     if (Settings.speedModifier == -1) {
                         Settings.speedModifier = 1;
                         this.updateStatus();
@@ -981,7 +983,7 @@ public final class EmulatorScreen implements
                         ++Settings.speedModifier;
                         this.updateStatus();
                     }
-                } else if (menuItem.equals(this.slowDownMenuItem)) {
+                } else if (menuItem == this.slowDownMenuItem) {
                     if (Settings.speedModifier == 1) {
                         Settings.speedModifier = -1;
                         this.updateStatus();
@@ -992,26 +994,26 @@ public final class EmulatorScreen implements
                         this.updateStatus();
                     }
                 } else {
-                    if (menuItem.equals(this.recordKeysMenuItem)) {
+                    if (menuItem == this.recordKeysMenuItem) {
                         Settings.recordKeys = !Settings.recordKeys;
                         return;
                     }
-                    if (menuItem.equals(this.enableAutoplayMenuItem)) {
+                    if (menuItem == this.enableAutoplayMenuItem) {
                         Settings.playingRecordedKeys = !Settings.playingRecordedKeys;
                     }
                 }
             }
-        } else if (parent.equals(this.menuMidlet)) {
+        } else if (parent == this.menuMidlet) {
             boolean equals = false;
-            if (menuItem.equals(this.exitMenuItem)) {
+            if (menuItem == this.exitMenuItem) {
                 this.shell.dispose();
                 return;
             }
-            if (menuItem.equals(this.restartMenuItem)) {
+            if (menuItem == this.restartMenuItem) {
                 Emulator.loadGame(null, Settings.g2d, Settings.g3d, false);
                 return;
             }
-            if (menuItem.equals(this.loadJarMenuItem) /*|| (equals = menuItem.equals(this.loadWithConsoleMenuItem))*/) {
+            if (menuItem == this.loadJarMenuItem) {
                 pauseStep();
                 final FileDialog fileDialog2;
                 (fileDialog2 = new FileDialog(this.shell, 4096)).setText(UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
@@ -1025,7 +1027,7 @@ public final class EmulatorScreen implements
                 this.updatePauseState();
                 return;
             }
-            if (menuItem.equals(this.loadAutoPlayMenuItem)) {
+            if (menuItem == this.loadAutoPlayMenuItem) {
                 pauseStep();
                 final FileDialog fileDialog3;
                 (fileDialog3 = new FileDialog(this.shell, 4096)).setText(UILocale.get("OPEN_REC_FILE", "Open a record file"));
@@ -1052,7 +1054,7 @@ public final class EmulatorScreen implements
                 this.resumeStep();
                 this.updatePauseState();
                 return;
-            } if (menuItem.equals(this.suspendMenuItem)) {
+            } if (menuItem == this.suspendMenuItem) {
                 if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
                     return;
                 }
@@ -1063,7 +1065,7 @@ public final class EmulatorScreen implements
                 this.updatePauseState();
                 return;
             }
-            if (menuItem.equals(this.resumeMenuItem)) {
+            if (menuItem == this.resumeMenuItem) {
                 if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
                     return;
                 }
@@ -1079,17 +1081,17 @@ public final class EmulatorScreen implements
                 this.updatePauseState();
                 return;
             }
-            if (menuItem.equals(this.pausestepMenuItem)) {
+            if (menuItem == this.pausestepMenuItem) {
                 pauseStep();
                 this.updatePauseState();
                 return;
             }
-            if (menuItem.equals(this.playResumeMenuItem)) {
+            if (menuItem == this.playResumeMenuItem) {
                 this.resumeStep();
                 this.updatePauseState();
                 return;
             }
-            if (menuItem.equals(this.openJadMenuItem)) {
+            if (menuItem == this.openJadMenuItem) {
                 try {
                     final String jadPath;
                     if ((jadPath = Emulator.getJadPath()) != null) {
@@ -1101,8 +1103,8 @@ public final class EmulatorScreen implements
                 return;
             }
         }
-        if (parent.equals(this.menu2dEngine)) {
-            if (menuItem.equals(this.awt2dMenuItem)) {
+        if (parent == this.menu2dEngine) {
+            if (menuItem == this.awt2dMenuItem) {
                 if (this.pauseState != 0 && Settings.g2d != 1) {
                     Emulator.loadGame(null, 1, Settings.g3d, false);
                     return;
@@ -1110,7 +1112,7 @@ public final class EmulatorScreen implements
                 Settings.g2d = 1;
                 this.swt2dMenuItem.setSelection(false);
                 this.awt2dMenuItem.setSelection(true);
-            } else if (menuItem.equals(this.swt2dMenuItem)) {
+            } else if (menuItem == this.swt2dMenuItem) {
                 if (this.pauseState != 0 && Settings.g2d != 0) {
                     Emulator.loadGame(null, 0, Settings.g3d, false);
                     return;
@@ -1121,8 +1123,8 @@ public final class EmulatorScreen implements
             }
             return;
         }
-        if (parent.equals(this.menu3dEngine)) {
-            if (menuItem.equals(this.swerve3dMenuItem)) {
+        if (parent == this.menu3dEngine) {
+            if (menuItem == this.swerve3dMenuItem) {
                 if (this.pauseState != 0 && Settings.g3d != 0) {
                     Emulator.loadGame(null, Settings.g2d, 0, false);
                     return;
@@ -1130,7 +1132,7 @@ public final class EmulatorScreen implements
                 Settings.g3d = 0;
                 this.lwj3dMenuItem.setSelection(false);
                 this.swerve3dMenuItem.setSelection(true);
-            } else if (menuItem.equals(this.lwj3dMenuItem)) {
+            } else if (menuItem == this.lwj3dMenuItem) {
                 if (this.pauseState != 0 && Settings.g3d != 1) {
                     Emulator.loadGame(null, Settings.g2d, 1, false);
                     return;
@@ -1141,21 +1143,21 @@ public final class EmulatorScreen implements
             }
             return;
         }
-        if (parent.equals(this.menuView)) {
-            if (menuItem.equals(this.helpMenuItem)) {
+        if (parent == this.menuView) {
+            if (menuItem == this.helpMenuItem) {
                 new Class54().method454(this.shell);
                 return;
             }
-            if (menuItem.equals(this.optionsMenuItem)) {
+            if (menuItem == this.optionsMenuItem) {
                 ((Property) Emulator.getEmulator().getProperty()).method354(this.shell);
                 return;
             }
-            if (menuItem.equals(this.alwaysOnTopMenuItem)) {
+            if (menuItem == this.alwaysOnTopMenuItem) {
                 Settings.alwaysOnTop = this.alwaysOnTopMenuItem.getSelection();
                 setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
                 return;
             }
-            if (menuItem.equals(this.logMenuItem)) {
+            if (menuItem == this.logMenuItem) {
                 if (((Class11) Emulator.getEmulator().getLogStream()).isLogOpen()) {
                     ((Class11) Emulator.getEmulator().getLogStream()).method330();
                     return;
@@ -1163,7 +1165,7 @@ public final class EmulatorScreen implements
                 ((Class11) Emulator.getEmulator().getLogStream()).method329(this.shell);
                 return;
             }
-            if (menuItem.equals(this.keypadMenuItem)) {
+            if (menuItem == this.keypadMenuItem) {
                 if (((EmulatorImpl) Emulator.getEmulator()).method826().method834()) {
                     ((EmulatorImpl) Emulator.getEmulator()).method826().method836();
                     return;
@@ -1171,7 +1173,7 @@ public final class EmulatorScreen implements
                 ((EmulatorImpl) Emulator.getEmulator()).method826().method835(this.shell);
                 return;
             }
-            if (menuItem.equals(this.infosMenuItem)) {
+            if (menuItem == this.infosMenuItem) {
                 this.infosEnabled = this.infosMenuItem.getSelection();
                 if (this.infosEnabled) {
                     this.canvas.setCursor(new Cursor(EmulatorScreen.display, 2));
@@ -1183,17 +1185,17 @@ public final class EmulatorScreen implements
                 ((EmulatorImpl) Emulator.getEmulator()).method825().method608();
                 return;
             }
-            if (menuItem.equals(this.rotateScreenMenuItem)) {
+            if (menuItem == this.rotateScreenMenuItem) {
                 this.rotate(this.getHeight(), this.getWidth());
                 return;
             }
 
-            if (menuItem.equals(this.rotate90MenuItem)) {
+            if (menuItem == this.rotate90MenuItem) {
                 rotate90degrees(false);
                 resized();
                 return;
             }
-            if (menuItem.equals(this.forcePaintMenuItem)) {
+            if (menuItem == this.forcePaintMenuItem) {
                 if (Settings.g2d == 0) {
                     if (Settings.xrayView) {
                         this.xrayScreenImageSwt.cloneImage(this.screenCopySwt);
@@ -1206,7 +1208,7 @@ public final class EmulatorScreen implements
                 this.canvas.redraw();
                 return;
             }
-            if (menuItem.equals(this.sensorMenuItem)) {
+            if (menuItem == this.sensorMenuItem) {
                 final File file3;
                 if ((file3 = new File(Emulator.getAbsolutePath() + "/sensorsimulator.jar")).exists()) {
                     try {
@@ -1219,7 +1221,7 @@ public final class EmulatorScreen implements
                 }
                 return;
             }
-            if (menuItem.equals(this.smsConsoleMenuItem)) {
+            if (menuItem == this.smsConsoleMenuItem) {
                 if (((Class83) Emulator.getEmulator().getMessage()).method479()) {
                     ((Class83) Emulator.getEmulator().getMessage()).method482();
                     return;
@@ -1239,11 +1241,11 @@ public final class EmulatorScreen implements
                 }
                 return;
             }
-            if (menuItem.equals(this.xrayViewMenuItem)) {
+            if (menuItem == this.xrayViewMenuItem) {
                 Settings.xrayView = this.xrayViewMenuItem.getSelection();
                 return;
             }
-            if (menuItem.equals(this.watchesMenuItem)) {
+            if (menuItem == this.watchesMenuItem) {
                 if (((EmulatorImpl) Emulator.getEmulator()).method822().method313()) {
                     ((EmulatorImpl) Emulator.getEmulator()).method822().method321();
                     return;
@@ -1251,7 +1253,7 @@ public final class EmulatorScreen implements
                 ((EmulatorImpl) Emulator.getEmulator()).method822().method311(this.shell);
                 return;
             }
-            if (menuItem.equals(this.profilerMenuItem)) {
+            if (menuItem == this.profilerMenuItem) {
                 if (((EmulatorImpl) Emulator.getEmulator()).method829().method313()) {
                     ((EmulatorImpl) Emulator.getEmulator()).method829().method321();
                     return;
@@ -1259,7 +1261,7 @@ public final class EmulatorScreen implements
                 ((EmulatorImpl) Emulator.getEmulator()).method829().method311(this.shell);
                 return;
             }
-            if (menuItem.equals(this.methodsMenuItem)) {
+            if (menuItem == this.methodsMenuItem) {
                 if (((EmulatorImpl) Emulator.getEmulator()).method824().method438()) {
                     ((EmulatorImpl) Emulator.getEmulator()).method824().method446();
                     return;
@@ -1267,7 +1269,7 @@ public final class EmulatorScreen implements
                 ((EmulatorImpl) Emulator.getEmulator()).method824().method436();
                 return;
             }
-            if (menuItem.equals(this.memoryViewMenuItem)) {
+            if (menuItem == this.memoryViewMenuItem) {
                 if (((EmulatorImpl) Emulator.getEmulator()).method823().method622()) {
                     ((EmulatorImpl) Emulator.getEmulator()).method823().method656();
                     return;
