@@ -180,7 +180,6 @@ public final class Emulator3D implements IGraphics3D {
                     e.printStackTrace();
                     try {
                         // мега костыль
-                        System.out.println("using lwjgl display");
                         tmpFrame = new JFrame();
                         tmpCanvas = new Canvas();
                         tmpCanvas.setBounds(0, 0, w, h);
@@ -269,7 +268,6 @@ public final class Emulator3D implements IGraphics3D {
                 this.swtImage.dispose();
                 throw new IllegalArgumentException();
             }
-            System.out.println("WGL context initialized");
         }
 
         if (!Emulator.getPlatform().isGLContextCurrent(swtImage.handle)) {
@@ -287,9 +285,6 @@ public final class Emulator3D implements IGraphics3D {
     private void printGLInfo() {
         if(printed) return;
         printed = true;
-        System.out.println("GL_VENDOR: " + GL11.glGetString(GL_VENDOR));
-        System.out.println("GL_RENDERER: " + GL11.glGetString(GL_RENDERER));
-        System.out.println("GL_VERSION: " + GL11.glGetString(GL_VERSION));
     }
 
     private void releaseContext() {
@@ -932,7 +927,6 @@ public final class Emulator3D implements IGraphics3D {
 
                 if(!image2D.isLoaded()) {
                     image2D.setLoaded(true);
-                    System.out.println("loaded texture: " + id);
 
                     short texFormat = GL_RGB;
                     switch (image2D.getFormat()) {
@@ -1331,7 +1325,6 @@ public final class Emulator3D implements IGraphics3D {
     }
 
     private void releaseTexture(int id) {
-        System.out.println("releaseTexture: " + id);
         GL11.glDeleteTextures(id);
         usedGLTextures.removeElement(id);
         unusedGLTextures.removeElement(id);

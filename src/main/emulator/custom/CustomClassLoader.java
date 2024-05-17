@@ -62,7 +62,6 @@ public final class CustomClassLoader extends ClassLoader {
                 bytes = load(s);
             } catch (ArrayIndexOutOfBoundsException e) {
                 if(Settings.asmSkipDebug) throw e;
-                System.out.println("skipping debug");
                 Settings.asmSkipDebug = true;
                 bytes = load(s);
             }
