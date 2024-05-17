@@ -156,13 +156,6 @@ public class Player
 				
 			}
 		}
-	    AudioDevice anAudioDevice1341;
-	    if ((!ret) && ((anAudioDevice1341 = this.audio) != null))
-	    {
-	      audio.flush();
-	      reset();
-	    }
-		/*
 		if (!ret)
 		{
 			// last frame, ensure all data flushed to the audio device. 
@@ -173,11 +166,10 @@ public class Player
 				synchronized (this)
 				{
 					complete = (!closed);
-					close();
+					reset();
 				}				
 			}
 		}
-		*/
 		return ret;
 	}
 
