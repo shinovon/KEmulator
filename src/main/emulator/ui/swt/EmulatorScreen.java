@@ -1443,24 +1443,24 @@ public final class EmulatorScreen implements
         int origHeight = getHeight();
         int canvasWidth;
         int canvasHeight;
-        int scaledWidth;
-        int scaledHeight;
+        int scaledWidth = zoomedWidth;
+        int scaledHeight = zoomedHeight;
 
         if (rotation % 2 == 1) {
             // swap width & height if rotated by 90 or 270 degrees
             canvasWidth = size.height;
             canvasHeight = size.width;
-            scaledWidth = zoomedHeight;
-            scaledHeight = zoomedWidth;
+            if (Settings.resizeMode != 3) {
+                scaledWidth = zoomedHeight;
+                scaledHeight =  zoomedWidth;
+            }
         } else {
             canvasWidth = size.width;
             canvasHeight = size.height;
-            scaledWidth = zoomedWidth;
-            scaledHeight = zoomedHeight;
         }
 
         // Keep proportions
-        final float ratio = ((float) origWidth / (float) origHeight);
+        final float ratio = (float) origWidth / (float) origHeight;
         if (Settings.keepAspectRatio && ratio != ((float) scaledWidth / (float) scaledHeight)) {
             scaledWidth = (int) ((float) scaledHeight * ratio);
             if (scaledWidth > canvasWidth) {
@@ -1470,7 +1470,7 @@ public final class EmulatorScreen implements
         }
 
         if (Settings.resizeMode != 0) {
-            zoom = (float) scaledWidth / (float) origWidth;
+            zoom = ((float) scaledWidth / (float) origWidth);
             Settings.canvasScale = (int) (zoom * 100F);
         } else if (zoom != 1f) {
             scaledWidth *= zoom;
@@ -2185,7 +2185,7 @@ public final class EmulatorScreen implements
                     }
                 } else if (Settings.resizeMode == 3) {
                     // Integer scaling
-                    float f = Math.min((float) size.width / (float) origWidth, (float) size.height / (float) origHeight);
+                    float f = Math.min((float) (rotation % 2 == 1 ? size.height : size.width) / (float) origWidth, (float) (rotation % 2 == 1 ? size.width : size.height) / (float) origHeight);
                     f = (int) (f - (f % 1));
                     if (f < 1) f = 1;
                     zoomedWidth = (int) ((float) origWidth * f);
