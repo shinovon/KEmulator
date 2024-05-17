@@ -159,6 +159,7 @@ public final class EmulatorScreen implements
     private int screenWidth;
     private int screenHeight;
     private boolean pointerState;
+    private boolean win;
 
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -269,7 +270,8 @@ public final class EmulatorScreen implements
         this.shell.open();
         this.shell.addDisposeListener(this);
         this.shell.addControlListener(this);
-        if (Emulator.win) {
+        win = Emulator.win;
+        if (win) {
             new Thread("KEmulator keyboard poll thread") {
                 boolean b;
 
@@ -319,7 +321,7 @@ public final class EmulatorScreen implements
     private static Method win32OSGetKeyState;
 
     public synchronized void pollKeyboard(Canvas canvas) {
-        if (!Emulator.win || canvas == null || canvas.isDisposed()) return;
+        if (!win || canvas == null || canvas.isDisposed()) return;
         long now = System.currentTimeMillis();
         Shell shell = canvas.getShell();
         if (shell == this.shell) {
@@ -334,8 +336,11 @@ public final class EmulatorScreen implements
             if (win32OS == null)
                 win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
             if (win32OSGetKeyState == null &&
-                (win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class)) == null)
-                    return;
+                (win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class)) == null) {
+                // TODO jna
+                win = false;
+                return;
+            }
             for (int i = 0; i < keyboardButtonStates.length; i++) {
                 lastKeyboardButtonStates[i] = keyboardButtonStates[i];
                 short keyState = (Short) win32OSGetKeyState.invoke(null, i);
@@ -1612,7 +1617,7 @@ public final class EmulatorScreen implements
     }
 
     public final void keyReleased(final KeyEvent keyEvent) {
-        if (!Settings.canvasKeyboard && Emulator.win) {
+        if (!Settings.canvasKeyboard && win) {
             return;
         }
         int n = keyEvent.keyCode & 0xFEFFFFFF;
@@ -1662,7 +1667,7 @@ public final class EmulatorScreen implements
         }
         n = Integer.parseInt(r);
         synchronized (pressedKeys) {
-            if (Emulator.win && !pressedKeys.contains(n)) {
+            if (win && !pressedKeys.contains(n)) {
                 return;
             }
             pressedKeys.removeElement(n);
