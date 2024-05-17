@@ -870,7 +870,8 @@ public final class EmulatorScreen implements
 
         this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
         this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
-        this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
+        if(alwaysOnTopMenuItem != null)
+            this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
         this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
         this.rotate90MenuItem.setAccelerator(SWT.ALT | 89);
         this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
