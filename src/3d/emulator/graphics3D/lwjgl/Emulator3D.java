@@ -68,7 +68,6 @@ public final class Emulator3D implements IGraphics3D {
     private boolean exiting;
     private String contextRes;
     private Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
-    private boolean printed;
     private boolean useDisplay;
     private boolean useWgl;
 
@@ -199,7 +198,6 @@ public final class Emulator3D implements IGraphics3D {
                     }
                 }
             }
-            printGLInfo();
 
             if (targetWidth != w || targetHeight != h) {
                 if (Settings.g2d == 1) {
@@ -280,11 +278,6 @@ public final class Emulator3D implements IGraphics3D {
             }
         }
         useWgl = true;
-    }
-
-    private void printGLInfo() {
-        if(printed) return;
-        printed = true;
     }
 
     private void releaseContext() {
