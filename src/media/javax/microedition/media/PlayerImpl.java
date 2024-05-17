@@ -661,12 +661,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
                         b = false;
                     }
                     try {
-                        ((javazoom.jl.player.Player) sequence).play();
+                        complete = ((javazoom.jl.player.Player) sequence).play(Integer.MAX_VALUE);
                     } catch (JavaLayerException e) {
                         e.printStackTrace();
                         notifyListeners(PlayerListener.ERROR, e.toString());
                     }
-                    if (sequence != null && ((javazoom.jl.player.Player) sequence).isComplete()) {
+                    if (complete || (sequence != null && ((javazoom.jl.player.Player) sequence).isComplete())) {
                         complete = true;
                         if (dataSource != null) {
                             //dataSource.stop();
