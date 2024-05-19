@@ -40,6 +40,8 @@ public class RecordStore {
         }
     }
 
+    private int openCount = 1;
+
     RecordStore(String aName, String aRootPath, boolean aHomeSuite, boolean existing) throws RecordStoreException, RecordStoreNotFoundException, RecordStoreFullException {
         records = new Vector();
         recordListeners = new Vector(3);
@@ -186,6 +188,7 @@ public class RecordStore {
         String rootPath = homeRootPath + encodeBase64(name) + "/";
         RecordStore rs = findRecordStore(rootPath);
         if (rs != null) {
+            rs.openCount++;
             rs.setMode(authmode, writable);
             return rs;
         }
@@ -212,7 +215,10 @@ public class RecordStore {
         logln("openRecordStore " + name + " " + vendorName + " " + suiteName);
         String rootPath = getRootPath(name, vendorName, suiteName) + encodeBase64(name) + "/";
         RecordStore rs = findRecordStore(rootPath);
-        if (rs != null) return rs;
+        if (rs != null) {
+            rs.openCount++;
+            return rs;
+        }
         File file = new File(rootPath);
         if (!file.exists() || !file.isDirectory() || !new File(rootPath + "idx").exists()) {
             throw new RecordStoreNotFoundException(name);
@@ -226,7 +232,7 @@ public class RecordStore {
         logln("deleteRecordStore " + name);
         String rootPath = homeRootPath + encodeBase64(name) + "/";
         if (findRecordStore(rootPath) != null) {
-            logln("open");
+            logln("tried to delete active store");
             throw new RecordStoreException("Cannot delete currently opened record store: " + name);
         }
         File file = new File(rootPath);
@@ -411,12 +417,14 @@ public class RecordStore {
     public void closeRecordStore() throws RecordStoreNotOpenException, RecordStoreException {
         if (closed) throw new RecordStoreNotOpenException();
         logln("closeRecordStore " + name + (!homeSuite ? " (guest)" : ""));
-        closed = true;
-        openRecordStores.removeElement(this);
-        if (!recordListeners.isEmpty()) {
-            recordListeners.removeAllElements();
+        if(--openCount < 1) {
+            closed = true;
+            openRecordStores.removeElement(this);
+            if (!recordListeners.isEmpty()) {
+                recordListeners.removeAllElements();
+            }
+            if (homeSuite || writable) writeIndex();
         }
-        if (homeSuite || writable) writeIndex();
     }
 
     private void modify() {
