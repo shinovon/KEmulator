@@ -2185,7 +2185,7 @@ public final class EmulatorScreen implements
                     zoomedHeight = rotation % 2 == 1 ? size.width : size.height;
                     int w = (int) ((float) zoomedWidth / zoom);
                     int h = (int) ((float) zoomedHeight / zoom);
-                    if (getWidth() != w || getHeight() != h) {
+                    if (pauseState != 0 && (getWidth() != w || getHeight() != h)) {
                         initScreenBuffer(w, h);
                         Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
                     }
