@@ -868,8 +868,8 @@ public final class EmulatorScreen implements
         (this.restartMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_RESTART", "Restart") + "\tAlt+R");
         this.restartMenuItem.setAccelerator(65618);
         this.restartMenuItem.addSelectionListener(this);
-        (this.exitMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_EXIT", "Exit") + "\tCtrl+ESC");
-        this.exitMenuItem.setAccelerator(SWT.CONTROL | 27);
+        (this.exitMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_EXIT", "Exit")/* + "\tESC"*/);
+        //this.exitMenuItem.setAccelerator(SWT.CONTROL | 27);
         this.exitMenuItem.addSelectionListener(this);
         menuItemMidlet.setMenu(this.menuMidlet);
 
