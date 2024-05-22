@@ -967,7 +967,7 @@ public class Emulator {
         cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
         cmd.add("-cp");
         cmd.add(System.getProperty("java.class.path"));
-        cmd.add("-Xmx" + Settings.xmx + "M"); // FIXME
+        cmd.add("-Xmx" + Settings.xmx + "M");
 
         // start with debug server
         if (Settings.jdwpDebug) {
@@ -984,6 +984,8 @@ public class Emulator {
         if (os.startsWith("darwin")) {
             cmd.add("-XstartOnFirstThread");
         }
+
+        cmd.add("-javaagent:" + getAbsoluteFile());
 
         cmd.add("emulator.Emulator");
         if (s == null) {

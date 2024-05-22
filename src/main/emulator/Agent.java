@@ -10,7 +10,11 @@ import java.util.jar.JarFile;
 public class Agent {
     private static Instrumentation inst;
 
-    public static void agentmain(final String a, final Instrumentation inst) {
+    public static void premain(String a, Instrumentation inst) {
+        Agent.inst = inst;
+    }
+
+    public static void agentmain(String a, Instrumentation inst) {
         Agent.inst = inst;
     }
 
