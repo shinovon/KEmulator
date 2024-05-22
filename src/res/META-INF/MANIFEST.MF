@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: emulator.Emulator
+Launcher-Agent-Class: emulator.Agent
 

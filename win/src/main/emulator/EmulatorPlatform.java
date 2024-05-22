@@ -168,18 +168,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     private static void addToClassPath(String s) {
         try {
-            File f = new File(Emulator.getAbsolutePath() + "/" + s);
-            URL url = f.toURL();
-
-            URLClassLoader classLoader = (URLClassLoader) Emulator.getLibraryClassLoader();
-            if (Emulator.isJava9()) {
-                ((Java9ClassLoader) classLoader).addURL(url);
-            } else {
-                Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-                addUrlMethod.setAccessible(true);
-                addUrlMethod.invoke(classLoader, url);
-            }
-        } catch(Exception e) {
+            Agent.addClassPath(new File(Emulator.getAbsolutePath() + "/" + s));
+        } catch (Exception e) {
             throw new RuntimeException(s, e);
         }
     }

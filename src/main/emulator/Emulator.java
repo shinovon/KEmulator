@@ -716,7 +716,6 @@ public class Emulator {
             System.exit(0);
             return;
         }
-        getLibraryClassLoader();
         platform.loadLibraries();
         EmulatorMIDI.initDevices();
         Emulator.commandLineArguments = commandLineArguments;
@@ -1085,16 +1084,5 @@ public class Emulator {
         } catch (Throwable e) {
             return false;
         }
-    }
-
-    public static ClassLoader getLibraryClassLoader() {
-        try {
-            if (isJava9()) {
-                ClassLoader cl = new Java9ClassLoader(new URL[0], Emulator.class.getClassLoader());
-                Thread.currentThread().setContextClassLoader(cl);
-                return cl;
-            }
-        } catch (Throwable ignored) {}
-        return Emulator.class.getClassLoader();
     }
 }
