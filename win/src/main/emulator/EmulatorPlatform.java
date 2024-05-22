@@ -63,6 +63,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 + "\tNokiaUI 1.4\n"
                 + "\tSamsung 1.0\n"
                 + "\tSprint 1.0\n"
+                + "\tSiemens API\n"
                 + "\tWMA 1.0 (JSR120)\n"
                 + "\tSensor (JSR256)\n"
                 + "\tM3G 1.1 (JSR184)\n"

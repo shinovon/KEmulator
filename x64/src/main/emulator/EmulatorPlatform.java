@@ -71,6 +71,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 + "\tMIDP 2.0 (JSR118)\n"
                 + "\tNokiaUI 1.4\n"
                 + "\tSprint 1.0\n"
+                + "\tSiemens API\n"
                 + "\tWMA 1.0 (JSR120)\n"
                 + "\tM3G 1.1 (JSR184)\n"
                 + "\tOpenGL ES (JSR239)\n"
