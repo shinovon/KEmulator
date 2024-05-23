@@ -31,7 +31,7 @@ import javax.microedition.lcdui.Image;
 public final class TextureImpl {
 	static int sLastId;
 
-	final TextureData image;
+	public final TextureData image;
 	private final boolean isMutable;
 
 	int mTexId = -1;
@@ -126,11 +126,11 @@ public final class TextureImpl {
 		return mTexId;
 	}
 
-	int getWidth() {
+	public int getWidth() {
 		return image.width;
 	}
 
-	int getHeight() {
+	public int getHeight() {
 		return image.height;
 	}
 

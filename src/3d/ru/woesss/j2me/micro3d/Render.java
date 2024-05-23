@@ -26,9 +26,10 @@ import static org.lwjgl.opengl.GL20.*;
 import com.mascotcapsule.micro3d.v3.Graphics3D;
 
 import java.awt.Rectangle;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.ImageObserver;
+import java.nio.*;
 import java.util.LinkedList;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -36,9 +37,16 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
+import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.lcdui.Graphics;
 
+import emulator.Settings;
 import emulator.graphics2D.IImage;
+import emulator.graphics2D.swt.Graphics2DSWT;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.Util;
 import ru.woesss.j2me.micro3d.RenderNode.FigureNode;
@@ -78,6 +86,12 @@ public class Render {
 	private int clearColor;
 	private TextureImpl targetTexture;
 	private ByteBuffer imageBuffer;
+
+	private ByteBuffer pixelBuffer;
+
+	private static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
+	private static BufferedImage awtImageBuffer;
+	private static ImageData swtImageBuffer;
 
 	/**
 	 * Utility method for debugging OpenGL calls.
@@ -139,7 +153,13 @@ public class Render {
 			init();
 		}
 		EGL10 egl = (EGL10) EGLContext.getEGL();
-		if (env.width != width || env.height != height) {
+		if (env.width != width || env.height != height || eglWindowSurface == null) {
+			if (Settings.g2d == 0) {
+				swtImageBuffer = new ImageData(width, height, 32, swtPalleteData);
+			} else {
+				awtImageBuffer = new BufferedImage(width, height, 4);
+			}
+			pixelBuffer = java.nio.ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
 
 			if (eglWindowSurface != null) {
 				releaseEglContext();
@@ -588,7 +608,34 @@ public class Render {
 			}
 			glFinish();
 			Rectangle clip = this.gClip;
-			Utils.glReadPixels(clip.x, clip.y, clip.width, clip.height, targetGraphics);
+//			Utils.glReadPixels(clip.x, clip.y, clip.width, clip.height, targetGraphics);
+			glFinish();
+			glReadPixels(clip.x, clip.y, clip.width, clip.height, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, (ByteBuffer) pixelBuffer.rewind());
+
+			if (Settings.g2d == 0) {
+				int var8 = swtImageBuffer.width << 2;
+				int var10 = swtImageBuffer.data.length - var8;
+
+				for (int var3 = swtImageBuffer.height; var3 > 0; --var3) {
+					pixelBuffer.get(swtImageBuffer.data, var10, var8);
+					var10 -= var8;
+				}
+				Image var12 = new Image((Device) null, swtImageBuffer);
+				((Graphics2DSWT) targetGraphics.getImpl()).gc().drawImage(var12, 0, 0);
+				var12.dispose();
+			} else {
+				int[] var1 = ((DataBufferInt) awtImageBuffer.getRaster().getDataBuffer()).getData();
+				IntBuffer var2 = pixelBuffer.asIntBuffer();
+				int var3 = clip.width;
+				int var4 = var1.length - var3;
+
+				for (int var5 = clip.height; var5 > 0; --var5) {
+					var2.get(var1, var4, var3);
+					var4 -= var3;
+				}
+
+				((emulator.graphics2D.awt.b) targetGraphics.getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
+			}
 			targetGraphics = null;
 		}
 		releaseEglContext();

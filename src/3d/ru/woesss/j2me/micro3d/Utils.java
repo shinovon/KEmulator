@@ -19,6 +19,7 @@ package ru.woesss.j2me.micro3d;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -312,7 +313,7 @@ public class Utils {
 			} else {
 				swtBufferImage = new ImageData(width, height, 32, swtPalleteData);
 			}
-			buffer = BufferUtils.createByteBuffer(width * height * 4);
+			buffer = BufferUtils.createByteBuffer(width * height * 4).order(ByteOrder.nativeOrder());
 			targetWidth = width;
 			targetHeight = height;
 		}

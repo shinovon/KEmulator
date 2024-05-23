@@ -4,12 +4,15 @@ import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
 import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
+import ru.woesss.j2me.micro3d.TextureImpl;
 
+import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.IntBuffer;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
 
@@ -86,12 +89,20 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public MemoryViewImage convertMicro3DTexture(Object o) {
-        // TODO
-//        IImage img = ((com.mascotcapsule.micro3d.v3.Texture) o).debugImage;
-//        if (img == null)
-//            return null;
-//        return new MemoryViewImage(img);
-        return null;
+        TextureImpl impl = ((com.mascotcapsule.micro3d.v3.Texture) o).impl;
+        if(impl == null)
+            return null;
+        IntBuffer ib = impl.image.getRaster().asIntBuffer();
+        int w = impl.getWidth(), h = impl.getHeight();
+        IImage img = Emulator.getEmulator().newImage(w, h, true);
+        int[] data = img.getData();
+        int i = data.length - w;
+
+        for (int j = h; j > 0; --j) {
+            ib.get(data, i, w);
+            i -= w;
+        }
+        return new MemoryViewImage(img);
     }
 
     public IGraphics3D getGraphics3D() {

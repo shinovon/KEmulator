@@ -18,7 +18,7 @@ package ru.woesss.j2me.micro3d;
 
 import java.nio.ByteBuffer;
 
-class TextureData {
+public class TextureData {
 	private final ByteBuffer raster;
 	final int width;
 	final int height;
@@ -29,7 +29,7 @@ class TextureData {
 		this.height = height;
 	}
 
-	ByteBuffer getRaster() {
+	public ByteBuffer getRaster() {
 		raster.rewind();
 		return raster;
 	}
