@@ -180,7 +180,13 @@ public class Render {
 			glClearColor(0, 0, 0, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
-		egl.eglMakeCurrent(eglDisplay, eglWindowSurface, eglWindowSurface, eglContext);
+		try {
+			bindEglContext();
+		} catch (RuntimeException e) {
+			targetGraphics = null;
+			throw e;
+		}
+//		egl.eglMakeCurrent(eglDisplay, eglWindowSurface, eglWindowSurface, eglContext);
 		Rectangle clip = this.clip;
 		clip.setBounds(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
 		int l = clip.x;
@@ -196,7 +202,7 @@ public class Render {
 		}
 		glClear(GL_DEPTH_BUFFER_BIT);
 		backCopied = false;
-		egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+//		egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 	}
 
 	public synchronized void bind(TextureImpl tex) {
@@ -208,6 +214,12 @@ public class Render {
 		}
 		EGL10 egl = (EGL10) EGLContext.getEGL();
 		if (env.width != width || env.height != height) {
+			if (Settings.g2d == 0) {
+				swtImageBuffer = new ImageData(width, height, 32, swtPalleteData);
+			} else {
+				awtImageBuffer = new BufferedImage(width, height, 4);
+			}
+			pixelBuffer = java.nio.ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
 
 			if (eglWindowSurface != null) {
 				releaseEglContext();
@@ -219,14 +231,16 @@ public class Render {
 					EGL10.EGL_HEIGHT, height,
 					EGL10.EGL_NONE};
 			eglWindowSurface = egl.eglCreatePbufferSurface(eglDisplay, eglConfig, surface_attribs);
-			egl.eglMakeCurrent(eglDisplay, eglWindowSurface, eglWindowSurface, eglContext);
+			bindEglContext();
 
 			glViewport(0, 0, width, height);
 			Program.create();
 			env.width = width;
 			env.height = height;
+		} else {
+			bindEglContext();
 		}
-		egl.eglMakeCurrent(eglDisplay, eglWindowSurface, eglWindowSurface, eglContext);
+//		egl.eglMakeCurrent(eglDisplay, eglWindowSurface, eglWindowSurface, eglContext);
 		Rectangle clip = this.clip;
 		clip.setBounds(0, 0, width, height);
 		int l = clip.x;
@@ -247,7 +261,7 @@ public class Render {
 				1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		backCopied = false;
-		egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+//		egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 
 	}
 
@@ -597,7 +611,7 @@ public class Render {
 
 	public synchronized void release() {
 		stack.clear();
-		bindEglContext();
+		//bindEglContext();
 		if (targetTexture != null) {
 			glFinish();
 			glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
@@ -606,7 +620,6 @@ public class Render {
 			if (postCopy2D) {
 				copy2d(false);
 			}
-			glFinish();
 			Rectangle clip = this.gClip;
 //			Utils.glReadPixels(clip.x, clip.y, clip.width, clip.height, targetGraphics);
 			glFinish();
@@ -645,7 +658,7 @@ public class Render {
 		if (stack.isEmpty()) {
 			return;
 		}
-		bindEglContext();
+		//bindEglContext();
 		try {
 			if (!backCopied && preCopy2D) {
 				copy2d(true);
@@ -665,7 +678,7 @@ public class Render {
 			glFlush();
 		} finally {
 			stack.clear();
-			releaseEglContext();
+			//releaseEglContext();
 		}
 	}
 
@@ -861,7 +874,7 @@ public class Render {
 	}
 
 	private void updateClip() {
-		bindEglContext();
+		//bindEglContext();
 		Rectangle clip = this.clip;
 		int l = clip.x;
 		int t = clip.y;
@@ -873,7 +886,7 @@ public class Render {
 			glEnable(GL_SCISSOR_TEST);
 			glScissor(l, t, w, h);
 		}
-		releaseEglContext();
+		//releaseEglContext();
 	}
 
 	public synchronized void postFigure(FigureImpl figure) {
@@ -1180,7 +1193,7 @@ public class Render {
 	}
 
 	public synchronized void drawFigure(FigureImpl figure) {
-		bindEglContext();
+		//bindEglContext();
 		if (!backCopied && preCopy2D) {
 			copy2d(true);
 		}
@@ -1227,7 +1240,7 @@ public class Render {
 			glDepthMask(true);
 			glClear(GL_DEPTH_BUFFER_BIT);
 		} finally {
-			releaseEglContext();
+			//releaseEglContext();
 		}
 	}
 
@@ -1527,7 +1540,7 @@ public class Render {
 		if (stack.isEmpty()) {
 			return;
 		}
-		bindEglContext();
+		//bindEglContext();
 		try {
 			copy2d(true);
 			flushStep = 1;
@@ -1551,7 +1564,7 @@ public class Render {
 			}
 		} finally {
 			stack.clear();
-			releaseEglContext();
+			//releaseEglContext();
 		}
 	}
 

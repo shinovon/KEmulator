@@ -213,15 +213,15 @@ public class Utils {
 		boneMatrices.rewind();
 
 		dstVertices.rewind();
-		for (int i = 0; i < dstVert.length; i++) {
-			dstVertices.put(dstVert[i]);
+		for (float f : dstVert) {
+			dstVertices.put(f);
 		}
 		dstVertices.rewind();
 
 		if (dstNormals != null) {
 			dstNormals.rewind();
-			for (int i = 0; i < dstNorm.length; i++) {
-				dstVertices.put(dstNorm[i]);
+			for (float f : dstNorm) {
+				dstNormals.put(f);
 			}
 			dstNormals.rewind();
 		}
@@ -349,8 +349,5 @@ public class Utils {
 
 			((emulator.graphics2D.awt.b) target.getImpl()).g().drawImage(awtBufferImage, x, y, null);
 		}
-	}
-
-	static {
 	}
 }
