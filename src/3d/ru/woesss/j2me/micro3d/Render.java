@@ -350,6 +350,9 @@ public class Render {
 //			canvas.clipRect(gClip);
 //			canvas.drawColor(0, PorterDuff.Mode.SRC);
 //			targetImage.setHasAlpha(false);
+
+			targetGraphics.setColor(0);
+			targetGraphics.fillRect(gClip.x, gClip.y, gClip.width, gClip.height);
 		}
 		backCopied = true;
 	}
@@ -611,7 +614,7 @@ public class Render {
 
 	public synchronized void release() {
 		stack.clear();
-		//bindEglContext();
+		bindEglContext();
 		if (targetTexture != null) {
 			glFinish();
 			glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
@@ -620,45 +623,19 @@ public class Render {
 			if (postCopy2D) {
 				copy2d(false);
 			}
-			Rectangle clip = this.gClip;
-//			Utils.glReadPixels(clip.x, clip.y, clip.width, clip.height, targetGraphics);
 			glFinish();
-			glReadPixels(clip.x, clip.y, clip.width, clip.height, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, (ByteBuffer) pixelBuffer.rewind());
-
-			if (Settings.g2d == 0) {
-				int var8 = swtImageBuffer.width << 2;
-				int var10 = swtImageBuffer.data.length - var8;
-
-				for (int var3 = swtImageBuffer.height; var3 > 0; --var3) {
-					pixelBuffer.get(swtImageBuffer.data, var10, var8);
-					var10 -= var8;
-				}
-				Image var12 = new Image((Device) null, swtImageBuffer);
-				((Graphics2DSWT) targetGraphics.getImpl()).gc().drawImage(var12, 0, 0);
-				var12.dispose();
-			} else {
-				int[] var1 = ((DataBufferInt) awtImageBuffer.getRaster().getDataBuffer()).getData();
-				IntBuffer var2 = pixelBuffer.asIntBuffer();
-				int var3 = clip.width;
-				int var4 = var1.length - var3;
-
-				for (int var5 = clip.height; var5 > 0; --var5) {
-					var2.get(var1, var4, var3);
-					var4 -= var3;
-				}
-
-				((emulator.graphics2D.awt.b) targetGraphics.getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
-			}
+//			Utils.glReadPixels(clip.x, clip.y, clip.width, clip.height, targetGraphics);
+			readPixels();
 			targetGraphics = null;
 		}
-		releaseEglContext();
+		((EGL10) EGLContext.getEGL()).eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 	}
 
 	public synchronized void flush() {
 		if (stack.isEmpty()) {
 			return;
 		}
-		//bindEglContext();
+		bindEglContext();
 		try {
 			if (!backCopied && preCopy2D) {
 				copy2d(true);
@@ -678,7 +655,7 @@ public class Render {
 			glFlush();
 		} finally {
 			stack.clear();
-			//releaseEglContext();
+			releaseEglContext();
 		}
 	}
 
@@ -874,7 +851,7 @@ public class Render {
 	}
 
 	private void updateClip() {
-		//bindEglContext();
+		bindEglContext();
 		Rectangle clip = this.clip;
 		int l = clip.x;
 		int t = clip.y;
@@ -886,7 +863,7 @@ public class Render {
 			glEnable(GL_SCISSOR_TEST);
 			glScissor(l, t, w, h);
 		}
-		//releaseEglContext();
+		releaseEglContext();
 	}
 
 	public synchronized void postFigure(FigureImpl figure) {
@@ -1193,7 +1170,7 @@ public class Render {
 	}
 
 	public synchronized void drawFigure(FigureImpl figure) {
-		//bindEglContext();
+		bindEglContext();
 		if (!backCopied && preCopy2D) {
 			copy2d(true);
 		}
@@ -1240,7 +1217,7 @@ public class Render {
 			glDepthMask(true);
 			glClear(GL_DEPTH_BUFFER_BIT);
 		} finally {
-			//releaseEglContext();
+			releaseEglContext();
 		}
 	}
 
@@ -1249,6 +1226,7 @@ public class Render {
 	}
 
 	private void releaseEglContext() {
+		readPixels();
 		((EGL10) EGLContext.getEGL()).eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 	}
 
@@ -1540,7 +1518,7 @@ public class Render {
 		if (stack.isEmpty()) {
 			return;
 		}
-		//bindEglContext();
+		bindEglContext();
 		try {
 			copy2d(true);
 			flushStep = 1;
@@ -1559,12 +1537,40 @@ public class Render {
 			if (targetTexture != null) {
 				glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
 			} else if (targetGraphics != null) {
-				Rectangle clip = this.gClip;
-				Utils.glReadPixels(clip.x, clip.y, clip.width, clip.height, targetGraphics);
+				readPixels();
 			}
 		} finally {
 			stack.clear();
-			//releaseEglContext();
+			releaseEglContext();
+		}
+	}
+
+	private void readPixels() {
+		Rectangle clip = this.clip;
+		glReadPixels(clip.x, clip.y, clip.width, clip.height, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) pixelBuffer.rewind());
+		if (Settings.g2d == 0) {
+			int var8 = swtImageBuffer.width << 2;
+			int var10 = swtImageBuffer.data.length - var8;
+
+			for (int var3 = swtImageBuffer.height; var3 > 0; --var3) {
+				pixelBuffer.get(swtImageBuffer.data, var10, var8);
+				var10 -= var8;
+			}
+			Image var12 = new Image((Device) null, swtImageBuffer);
+			((Graphics2DSWT) targetGraphics.getImpl()).gc().drawImage(var12, clip.x, clip.y);
+			var12.dispose();
+		} else {
+			int[] var1 = ((DataBufferInt) awtImageBuffer.getRaster().getDataBuffer()).getData();
+			IntBuffer var2 = pixelBuffer.asIntBuffer();
+			int var3 = clip.width;
+			int var4 = var1.length - var3;
+
+			for (int var5 = clip.height; var5 > 0; --var5) {
+				var2.get(var1, var4, var3);
+				var4 -= var3;
+			}
+
+			((emulator.graphics2D.awt.b) targetGraphics.getImpl()).g().drawImage(awtImageBuffer, clip.x, clip.y, null);
 		}
 	}
 
