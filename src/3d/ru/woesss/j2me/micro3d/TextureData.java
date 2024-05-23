@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Yury Kharchenko
+ * Copyright 2022 Yury Kharchenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.mascotcapsule.micro3d.v3;
+package ru.woesss.j2me.micro3d;
 
-import ru.woesss.j2me.micro3d.MathUtil;
+import java.nio.ByteBuffer;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-public class Util3D {
+class TextureData {
+	private final ByteBuffer raster;
+	final int width;
+	final int height;
 
-    public static int sqrt(int p) {
-        return MathUtil.uSqrt(p);
-    }
+	TextureData(int width, int height) {
+		this.raster = BufferUtils.createByteBuffer(width * height * 4);
+		this.width = width;
+		this.height = height;
+	}
 
-    public static int sin(int p) {
-        return MathUtil.iSin(p);
-    }
-
-    public static int cos(int p) {
-        return MathUtil.iCos(p);
-    }
+	ByteBuffer getRaster() {
+		raster.rewind();
+		return raster;
+	}
 }

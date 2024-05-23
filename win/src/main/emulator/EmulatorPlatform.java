@@ -86,10 +86,12 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public MemoryViewImage convertMicro3DTexture(Object o) {
-        IImage img = ((com.mascotcapsule.micro3d.v3.Texture) o).debugImage;
-        if (img == null)
-            return null;
-        return new MemoryViewImage(img);
+        // TODO
+//        IImage img = ((com.mascotcapsule.micro3d.v3.Texture) o).debugImage;
+//        if (img == null)
+//            return null;
+//        return new MemoryViewImage(img);
+        return null;
     }
 
     public IGraphics3D getGraphics3D() {
