@@ -41,6 +41,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 wglDeleteContext = ReflectUtil.getMethod(wglClass, "wglDeleteContext", long.class);
                 getDC = ReflectUtil.getMethod(osClass, "getDC", long.class);
                 releaseDC = ReflectUtil.getMethod(osClass, "releaseDC", long.class, long.class);
+                SwapBuffers = ReflectUtil.getMethod(wglClass, "wglSwapBuffers", long.class);
             } else {
                 ChoosePixelFormat = ReflectUtil.getMethod(wglClass, "ChoosePixelFormat", int.class, pixelFormatDescriptorClass);
                 SetPixelFormat = ReflectUtil.getMethod(wglClass, "SetPixelFormat", int.class, int.class, pixelFormatDescriptorClass);
@@ -49,6 +50,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 wglDeleteContext = ReflectUtil.getMethod(wglClass, "wglDeleteContext", int.class);
                 getDC = ReflectUtil.getMethod(osClass, "getDC", int.class);
                 releaseDC = ReflectUtil.getMethod(osClass, "releaseDC", int.class, int.class);
+                SwapBuffers = ReflectUtil.getMethod(wglClass, "wglSwapBuffers", int.class);
             }
             wglGetCurrentContext = ReflectUtil.getMethod(wglClass, "wglGetCurrentContext");
         } catch (Throwable ignored) {}
