@@ -1,4 +1,3 @@
-precision mediump float;
 uniform sampler2D uTextureUnit;
 uniform sampler2D uSphereUnit;
 uniform vec2 uSphereSize;

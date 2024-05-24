@@ -1,4 +1,3 @@
-precision mediump float;
 uniform sampler2D uTextureUnit;
 uniform bool uIsTransparency;
 varying vec2 vTexture;
