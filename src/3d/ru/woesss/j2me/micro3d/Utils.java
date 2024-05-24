@@ -27,13 +27,6 @@ import org.eclipse.swt.graphics.PaletteData;
 public class Utils {
 	static final String TAG = "micro3d";
 
-	private static ByteBuffer buffer;
-	private static BufferedImage awtBufferImage;
-	private static ImageData swtBufferImage;
-	public static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
-	private static int targetWidth;
-	private static int targetHeight;
-
 	static void getSpriteVertex(float[] vertex, float angle, float halfW, float halfH) {
 		angle *= MathUtil.TO_RADIANS;
 		float sin = (float) Math.sin(angle);
@@ -286,18 +279,6 @@ public class Utils {
 			dst[idx*3] = x * m00 + y * m01 + z * m02;
 			dst[idx*3 + 1] = x * m10 + y * m11 + z * m12;
 			dst[idx*3 + 2] = x * m20 + y * m21 + z * m22;
-		}
-
-		Transform3D toTransform3D() {
-			Transform3D t = new Transform3D();
-			t.set(new float[] {
-					m00, m01, m02, m03,
-					m10, m11, m12, m13,
-					m20, m21, m22, m23,
-					0f, 0f, 0f, 1f
-			});
-
-			return t;
 		}
 	}
 
