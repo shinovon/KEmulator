@@ -33,6 +33,9 @@ public class Image {
     }
 
     protected IImage getXRayBuffer() {
+        if (this.xrayBuffer == null && Settings.xrayView) {
+            this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
+        }
         return this.xrayBuffer;
     }
 
@@ -53,7 +56,7 @@ public class Image {
         if (!this.mutable && !Devices.curPlatform.hasNokiaUI()) {
             throw new IllegalStateException("the image is immutable.");
         }
-        if (this.xrayBuffer == null) {
+        if (this.xrayBuffer == null && Settings.xrayView) {
             this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
         }
 
@@ -104,29 +107,17 @@ public class Image {
         if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
         final Image image;
         (image = new Image(Emulator.getEmulator().newImage(n, n2, false))).mutable = true;
-        image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
+        if(Settings.xrayView)
+            image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
         return image;
     }
 
     public static Image createImage(final int n, final int n2, int color) {
         if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
         final Image image;
-        (image = new Image(Emulator.getEmulator().newImage(n, n2, true))).mutable = true;
-        image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
-        // мега костыль
-        try {
-            Graphics g = image.getGraphics();
-            if (g != null) {
-                int alpha = color >> 24 & 0xFF;
-                color |= 0xFF000000;
-                g.setColor(color);
-                g.getImpl().setAlpha(alpha);
-                g.fillRect(0, 0, n, n2);
-                g.getImpl().setAlpha(255);
-                g.setColor(0);
-            }
-        } catch (Exception ignored) {
-        }
+        (image = new Image(Emulator.getEmulator().newImage(n, n2, true, color))).mutable = true;
+        if(Settings.xrayView)
+            image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true, color);
         return image;
     }
 
@@ -140,7 +131,8 @@ public class Image {
         final int n7 = b ? n4 : n3;
         final Image image2;
         (image2 = new Image(Emulator.getEmulator().newImage(n6, n7, true, 0))).mutable = true;
-        image2.xrayBuffer = Emulator.getEmulator().newImage(n6, n7, true, 0);
+        if(Settings.xrayView)
+            image2.xrayBuffer = Emulator.getEmulator().newImage(n6, n7, true, 0);
         image2.getGraphics().drawRegion(image, n, n2, n3, n4, n5, 0, 0, 20);
         image2.mutable = false;
         return image2;
