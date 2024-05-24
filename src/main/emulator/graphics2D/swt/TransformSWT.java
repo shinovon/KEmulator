@@ -4,6 +4,8 @@ import emulator.graphics2D.ITransform;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Transform;
 
+import java.awt.geom.AffineTransform;
+
 public final class TransformSWT implements ITransform {
     float[] a;
 
@@ -17,6 +19,14 @@ public final class TransformSWT implements ITransform {
     public TransformSWT(Transform var1) {
         this.a = new float[6];
         var1.getElements(this.a);
+    }
+
+    // covert from awt
+    public TransformSWT(AffineTransform var1) {
+        this.a = new float[6];
+        double[] tmp = new double[6];
+        var1.getMatrix(tmp);
+        for(int i = 0; i < 6; i++) a[i] = (float) tmp[i];
     }
 
     public final Transform create() {

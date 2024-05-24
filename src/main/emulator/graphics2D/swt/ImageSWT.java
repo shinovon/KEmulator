@@ -302,6 +302,10 @@ public final class ImageSWT implements IImage
     public void setRGB(int x, int y, int color) {
         imgdata.setPixel(x, y, color);
     }
+
+    public void setRGB(int x, int y, int w, int h, int[] data, int off, int scan) {
+        // TODO
+    }
     
     private int method300(int x, int y, ImageData imgdata) {
         final RGB rgb = imgdata.palette.getRGB(imgdata.getPixel(x, y));

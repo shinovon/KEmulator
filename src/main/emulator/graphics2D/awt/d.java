@@ -136,6 +136,10 @@ public final class d implements IImage
     public void setRGB(int x, int y, int color) {
         img.setRGB(x, y, color | 0xFF000000);
     }
+
+    public void setRGB(int x, int y, int w, int h, int[] data, int off, int scan) {
+        img.setRGB(x, y, w, h, data, off, scan);
+    }
     
     public final void saveToFile(final String s) {
         try {

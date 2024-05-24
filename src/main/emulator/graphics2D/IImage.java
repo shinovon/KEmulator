@@ -17,6 +17,8 @@ public interface IImage
     int getRGB(final int x, final int y);
 
     void setRGB(int x, int y, int color);
+
+    void setRGB(int x, int y, int w, int h, int[] data, int off, int scan);
     
     void setAlpha(final int p0, final int p1, final int p2, final int p3, final int p4);
     
