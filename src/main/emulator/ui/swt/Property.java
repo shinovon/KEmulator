@@ -194,7 +194,7 @@ public final class Property implements IProperty {
     private Combo m3gTexFilterCombo;
     private Combo m3gMipmapCombo;
     private Button vmsCheck;
-//    private Button reopenMidiCheck;
+    //    private Button reopenMidiCheck;
     private Button globalMidiCheck;
     private Button ignoreRegionRepaintCheck;
     private Button fpsCounterCheck;
@@ -202,141 +202,12 @@ public final class Property implements IProperty {
 
     public Property() {
         super();
-        this.setsShell = null;
-        this.aCombo657 = null;
-        this.aCLabel658 = null;
-        this.aCLabel673 = null;
-        this.aCombo675 = null;
-        this.aCLabel683 = null;
-        this.aGroup660 = null;
-        this.aText662 = null;
-        this.aButton666 = null;
-        this.aCLabel694 = null;
-        this.aText672 = null;
-        this.aCLabel701 = null;
-        this.aText684 = null;
-        this.aCLabel707 = null;
-        this.aText695 = null;
-        this.aCLabel712 = null;
-        this.aText702 = null;
-        this.aCLabel717 = null;
-        this.aText708 = null;
-        this.aCLabel722 = null;
-        this.aText713 = null;
-        this.aCLabel726 = null;
-        this.aText718 = null;
-        this.aCLabel730 = null;
-        this.aText723 = null;
-        this.aCLabel734 = null;
-        this.aText727 = null;
-        this.aComposite667 = null;
-        this.aButton676 = null;
-        this.aButton685 = null;
-        this.aScale669 = null;
-        this.aCLabel738 = null;
-        this.tabFolder = null;
-        this.customComp = null;
-        this.keyMapBindsComp = null;
-        this.aCLabel741 = null;
-        this.aText731 = null;
-        this.aCLabel744 = null;
-        this.aText735 = null;
-        this.aCLabel747 = null;
-        this.aText739 = null;
-        this.aCLabel750 = null;
-        this.aText742 = null;
-        this.aCLabel753 = null;
-        this.aText745 = null;
-        this.aCLabel756 = null;
-        this.aText748 = null;
-        this.aCLabel759 = null;
-        this.aText751 = null;
-        this.aCLabel762 = null;
-        this.aText754 = null;
-        this.aCLabel765 = null;
-        this.aText757 = null;
-        this.aCLabel767 = null;
-        this.aText760 = null;
-        this.aCLabel769 = null;
-        this.aText763 = null;
-        this.aCLabel771 = null;
-        this.aText766 = null;
-        this.aCLabel773 = null;
-        this.aText768 = null;
-        this.aCLabel626 = null;
-        this.aText770 = null;
-        this.aCLabel628 = null;
-        this.aText772 = null;
-        this.aCLabel630 = null;
-        this.aText774 = null;
-        this.aCLabel632 = null;
-        this.aText627 = null;
-        this.aCLabel634 = null;
-        this.aText629 = null;
-        this.aCLabel636 = null;
-        this.aText631 = null;
-        this.aButton696 = null;
-        this.aButton703 = null;
-        this.aButton709 = null;
-        this.aButton714 = null;
-        this.aButton719 = null;
-        this.systemComp = null;
-        this.coreApiComp = null;
-        this.coreApiGroup = null;
-        this.sysChecksGroup = null;
-        this.aButton724 = null;
-        this.aButton728 = null;
-        this.aButton732 = null;
-        this.aButton736 = null;
-        this.aButton746 = null;
-        this.aButton749 = null;
-        this.aButton752 = null;
-        this.sysFontComp = null;
-        this.aCLabel638 = null;
-        this.aCombo689 = null;
-        this.aCLabel640 = null;
-        this.aSpinner670 = null;
-        this.aCanvas663 = null;
-        this.aCLabel642 = null;
-        this.aSpinner679 = null;
-        this.aCanvas680 = null;
-        this.aCLabel644 = null;
-        this.aSpinner690 = null;
-        this.aCanvas691 = null;
-        this.aCLabel645 = null;
-        this.aText633 = null;
-        this.aCLabel646 = null;
-        this.controllerCombo = null;
-        this.keymapRefreshBtn = null;
-        this.recordsComp = null;
-        this.aTable665 = null;
-        this.aCLabel647 = null;
-        this.aButton758 = null;
-        this.aButton761 = null;
-        this.networkComp = null;
-        this.aGroup700 = null;
-        this.aCLabel648 = null;
-        this.proxyTypeCombo = null;
-        this.aCLabel649 = null;
-        this.aText635 = null;
-        this.aCLabel650 = null;
-        this.aCLabel651 = null;
-        this.aText637 = null;
-        this.aCLabel652 = null;
-        this.aText639 = null;
-        this.aCLabel653 = null;
-        this.aText641 = null;
-        this.aCLabel654 = null;
-        this.aText643 = null;
-        this.aButton764 = null;
-        rpcBtn = null;
-        antiAliasBtn = null;
         this.loadProperties();
         this.updateProxy();
         UILocale.initLocale();
     }
 
-    public final void method354(final Shell shell) {
+    public void method354(final Shell shell) {
         Property.aDisplay656 = shell.getDisplay();
         this.method372(shell);
         this.setsShell.pack();
@@ -353,39 +224,39 @@ public final class Property implements IProperty {
         this.anIImage693 = null;
     }
 
-    public final void resetDeviceName() {
+    public void resetDeviceName() {
         this.device = Emulator.deviceName;
     }
 
-    public final String getDefaultFontName() {
+    public String getDefaultFontName() {
         return this.defaultFont;
     }
 
-    public final int getFontSmallSize() {
+    public int getFontSmallSize() {
         return this.fontSmallSize;
     }
 
-    public final int getFontMediumSize() {
+    public int getFontMediumSize() {
         return this.fontMediumSize;
     }
 
-    public final int getFontLargeSize() {
+    public int getFontLargeSize() {
         return this.fontLargeSize;
     }
 
-    public final void setDefaultFontName(final String aString682) {
+    public void setDefaultFontName(final String aString682) {
         this.defaultFont = aString682;
     }
 
-    public final void setFontSmallSize(final int anInt664) {
+    public void setFontSmallSize(final int anInt664) {
         this.fontSmallSize = anInt664;
     }
 
-    public final void getFontMediumSize(final int anInt681) {
+    public void getFontMediumSize(final int anInt681) {
         this.fontMediumSize = anInt681;
     }
 
-    public final void getFontLargeSize(final int anInt687) {
+    public void getFontLargeSize(final int anInt687) {
         this.fontLargeSize = anInt687;
     }
 
@@ -433,7 +304,7 @@ public final class Property implements IProperty {
         return getRmsFolderPath() + method355() + File.separator;
     }
 
-    public final void setCustomProperties() {
+    public void setCustomProperties() {
         if (this.device.equalsIgnoreCase(Emulator.deviceName)) {
             Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
             Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
@@ -448,7 +319,7 @@ public final class Property implements IProperty {
         }
     }
 
-    public final void updateCustomProperties() {
+    public void updateCustomProperties() {
         this.screenWidth = Devices.getProperty("SCREEN_WIDTH");
         this.screenHeight = Devices.getProperty("SCREEN_HEIGHT");
         this.lsoft = Devices.getProperty("KEY_S1");
@@ -460,7 +331,7 @@ public final class Property implements IProperty {
         this.right = Devices.getProperty("KEY_RIGHT");
     }
 
-    public final void loadProperties() {
+    public void loadProperties() {
         try {
             if (!new File(Emulator.getUserPath() + "/property.txt").exists()) {
                 throw new FileNotFoundException();
@@ -661,7 +532,7 @@ public final class Property implements IProperty {
         }
     }
 
-    public final void saveProperties() {
+    public void saveProperties() {
         try {
             final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getUserPath() + "/property.txt");
             final Properties properties = new SortProperties();
@@ -1612,7 +1483,7 @@ public final class Property implements IProperty {
         text.setText(method744);
     }
 
-    public final boolean updateController() {
+    public boolean updateController() {
         if (this.controllerCombo == null || this.controllerCombo.isDisposed()) {
             return false;
         }
@@ -2452,8 +2323,8 @@ public final class Property implements IProperty {
     }
 
     private final class MyAuthenticator extends Authenticator {
-        private String aString780;
-        private String aString781;
+        private final String aString780;
+        private final String aString781;
 
         MyAuthenticator(final Property class38, final String aString780, final String aString781) {
             super();
@@ -2461,7 +2332,7 @@ public final class Property implements IProperty {
             this.aString781 = aString781;
         }
 
-        public final PasswordAuthentication getPasswordAuthentication() {
+        public PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(this.aString780, this.aString781.toCharArray());
         }
     }
@@ -2469,7 +2340,7 @@ public final class Property implements IProperty {
     private final class SortProperties extends Properties {
         private static final long serialVersionUID = 1L;
 
-        public final Enumeration keys() {
+        public Enumeration keys() {
             final List list;
             Collections.sort((List<Comparable>) (list = Collections.list(super.keys())));
             return Collections.enumeration(list);

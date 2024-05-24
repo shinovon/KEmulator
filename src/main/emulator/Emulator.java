@@ -3,6 +3,7 @@ package emulator;
 import java.awt.Dimension;
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -211,7 +212,7 @@ public class Emulator {
             return;
         }
         if(Settings.writeKemCfg) {
-            String propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + "/kemulator.cfg";
+            String propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + File.separatorChar + "kemulator.cfg";
             try {
                 String key = new File(Emulator.midletJar).getName();
                 key = key.substring(0, key.lastIndexOf("."));
@@ -236,7 +237,7 @@ public class Emulator {
             }
             return;
         }
-        final String propsPath = getUserPath() + "/midlets.txt";
+        final String propsPath = getUserPath() + File.separatorChar + "midlets.txt";
         try {
             String key = new File(Emulator.midletJar).getCanonicalPath();
             final Properties properties = new Properties();
@@ -269,7 +270,7 @@ public class Emulator {
         if (Emulator.midletJar == null) {
             return;
         }
-        String propsPath = getUserPath() + "/midlets.txt";
+        String propsPath = getUserPath() + File.separatorChar + "midlets.txt";
         if(new File(propsPath).exists()) {
             try {
                 String key = new File(Emulator.midletJar).getCanonicalPath();
@@ -290,7 +291,7 @@ public class Emulator {
             return;
         }
 
-        propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + "/kemulator.cfg";
+        propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + File.separatorChar + "kemulator.cfg";
 
         String key = new File(Emulator.midletJar).getName();
         key = key.substring(0, key.lastIndexOf("."));
@@ -332,7 +333,7 @@ public class Emulator {
 
     public static void getLibraries() {
         final File file;
-        if ((file = new File(getAbsolutePath() + "/libs")).exists() && file.isDirectory()) {
+        if ((file = new File(getAbsolutePath() + File.separatorChar + "libs")).exists() && file.isDirectory()) {
             final File[] listFiles = file.listFiles();
             for (int i = 0; i < listFiles.length; ++i) {
                 final String absolutePath;
@@ -509,7 +510,7 @@ public class Emulator {
         final String[] split = Emulator.classPath.split(";");
         for (int i = 0; i < split.length; ++i) {
             final File file;
-            if ((file = new File(split[i] + "/" + s)).exists()) {
+            if ((file = new File(split[i] + File.separatorChar + s)).exists()) {
                 return file;
             }
         }
@@ -763,14 +764,9 @@ public class Emulator {
                 }
             }
         }
-        String jar = midletJar;
-        if (jar.contains("/"))
-            jar = jar.substring(jar.lastIndexOf("/") + 1);
-        if (jar.contains("\\"))
-            jar = jar.substring(jar.lastIndexOf("\\") + 1);
         if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
             Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-            Emulator.rpcDetails = Settings.uei ? "UEI" : jar;
+            Emulator.rpcDetails = Settings.uei ? "UEI" : new File(midletJar).getName();
             updatePresence();
         }
         Emulator.emulatorimpl.getEmulatorScreen().setWindowIcon(inputStream);
@@ -916,8 +912,8 @@ public class Emulator {
 
     public static String getAbsoluteFile() {
         String s = System.getProperty("user.dir");
-        if (new File(s + "/KEmulator.jar").exists() || new File(s + "/sensorsimulator.jar").exists()) {
-            return s + "/KEmulator.jar";
+        if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+            return s + File.separatorChar + "KEmulator.jar";
         }
         s = new Emulator().getClass().getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
         if (s.endsWith("bin/"))
@@ -931,15 +927,14 @@ public class Emulator {
 
     public static String getAbsolutePath() {
         String s = System.getProperty("user.dir");
-        if (new File(s + "/KEmulator.jar").exists() || new File(s + "/sensorsimulator.jar").exists()) {
+        if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
             return s;
         }
-        s = getAbsoluteFile();
-        File file = new File(s).getParentFile();
+        File file = new File(getAbsoluteFile()).getParentFile();
         try {
-            s = file.getCanonicalPath() + File.separator;
+            s = file.getCanonicalPath();
         } catch (IOException e) {
-            s = file.getAbsolutePath() + File.separator;
+            s = file.getAbsolutePath();
         }
         return s;
     }
@@ -1040,17 +1035,14 @@ public class Emulator {
             File file = new File(jadPath);
             if (file.exists()) {
                 Properties properties = new Properties();
-                properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-                String absolutePath = file.getAbsolutePath().replace('\\', '/');
-                return absolutePath.substring(0, absolutePath.lastIndexOf('/')) + "/" + properties.getProperty("MIDlet-Jar-URL");
+                properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+                return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
         return null;
     }
 
     public static void AntiCrack(final Exception ex) {
-        ex.toString();
     }
 
     public static native void regAssociateJar(final String p0, final String p1, final String p2);

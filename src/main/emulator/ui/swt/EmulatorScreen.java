@@ -165,18 +165,6 @@ public final class EmulatorScreen implements
     private Menu menuM3DEngine;
 
     public EmulatorScreen(final int n, final int n2) {
-        super();
-        this.shell = null;
-        this.canvas = null;
-        this.aCLabel970 = null;
-        this.aCLabel984 = null;
-        this.statusLabel = null;
-        this.aMenu971 = null;
-        this.menuMidlet = null;
-        this.menuTool = null;
-        this.menuView = null;
-        this.menu2dEngine = null;
-        this.aMenu1018 = null;
         this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
         EmulatorScreen.display = EmulatorImpl.getDisplay();
         this.initShell();
@@ -207,7 +195,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void setWindowIcon(final InputStream inputStream) {
+    public void setWindowIcon(final InputStream inputStream) {
         if (inputStream == null) {
             return;
         }
@@ -216,7 +204,7 @@ public final class EmulatorScreen implements
         } catch (Exception ignored) {}
     }
 
-    public final void showMessage(final String message) {
+    public void showMessage(final String message) {
         try {
             setWindowOnTop(getHandle(shell), true);
         } catch (Throwable ignored) {}
@@ -246,7 +234,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void start(final boolean midletLoaded) {
+    public void start(final boolean midletLoaded) {
         try {
             this.zoom(Settings.canvasScale / 100.0f);
         } catch (Exception ex) {
@@ -317,10 +305,10 @@ public final class EmulatorScreen implements
 
     // KEYBOARD
 
-    protected static volatile boolean[] lastKeyboardButtonStates = new boolean[256];
-    protected static volatile boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
-    protected static volatile long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];
-    protected static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
+    private static volatile boolean[] lastKeyboardButtonStates = new boolean[256];
+    private static volatile boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
+    private static volatile long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];
+    private static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
     private static Class win32OS;
     private static Method win32OSGetKeyState;
 
@@ -471,7 +459,7 @@ public final class EmulatorScreen implements
         gc.dispose();
     }
 
-    public final IImage getScreenImg() {
+    public IImage getScreenImg() {
         synchronized(this) {
             if (Settings.g2d == 0) {
                 return this.screenImageSwt;
@@ -483,7 +471,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final IImage getBackBufferImage() {
+    public IImage getBackBufferImage() {
         synchronized(this) {
             if (Settings.g2d == 0) {
                 return this.backBufferImageSwt;
@@ -495,7 +483,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final IImage getXRayScreenImage() {
+    public IImage getXRayScreenImage() {
         synchronized(this) {
             if (Settings.g2d == 0) {
                 return this.xrayScreenImageSwt;
@@ -507,7 +495,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void repaint() {
+    public void repaint() {
         if (Emulator.getCurrentDisplay().getCurrent() == null || this.pauseState == 0) {
             return;
         }
@@ -540,20 +528,20 @@ public final class EmulatorScreen implements
         EmulatorImpl.asyncExec(this);
     }
 
-    public final int getWidth() {
+    public int getWidth() {
         return this.getScreenImg().getWidth();
     }
 
-    public final int getHeight() {
+    public int getHeight() {
         return this.getScreenImg().getHeight();
     }
 
-    public final void setCommandLeft(final String aString983) {
+    public void setCommandLeft(final String aString983) {
         this.aString983 = aString983;
         EmulatorImpl.syncExec(new Class41(this));
     }
 
-    public final void setCommandRight(final String aString989) {
+    public void setCommandRight(final String aString989) {
         this.aString989 = aString989;
         EmulatorImpl.syncExec(new Class40(this));
     }
@@ -800,32 +788,10 @@ public final class EmulatorScreen implements
         (menuItem5 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_RECENTLY", "Recent jarfiles"));
         this.aMenu1018 = new Menu(this.shell, 4194308);
         for (int n = 1; n < 5 && !Settings.recentJars[n].equals(""); ++n) {
-            final String s;
-            String s2;
-            String s3;
-            int n2;
-            if ((s = Settings.recentJars[n]).lastIndexOf(92) > 0) {
-                s2 = s;
-                s3 = s;
-                n2 = 92;
-            } else {
-                s2 = s;
-                s3 = s;
-                n2 = 47;
-            }
-            final String trim = s2.substring(s3.lastIndexOf(n2) + 1).trim();
-            StringBuffer sb;
-            String s4;
-            if (s.length() > 10) {
-                sb = new StringBuffer().append("[").append(s, 0, 10);
-                s4 = "...]";
-            } else {
-                sb = new StringBuffer().append("[").append(s);
-                s4 = "]";
-            }
-            final String string = sb.append(s4).toString();
-            final MenuItem menuItem6;
-            (menuItem6 = new MenuItem(this.aMenu1018, 8)).setText("&" + n + " " + trim + " " + string);
+            final String s = Settings.recentJars[n];
+            final String f = s.substring(s.lastIndexOf(s.lastIndexOf(92) > 0 ? 92 : 47) + 1).trim();
+            final MenuItem menuItem6 = new MenuItem(this.aMenu1018, 8);
+            menuItem6.setText("&" + n + " " + f + " " + (s.length() > 10 ? ('[' + s.substring(0, 10) + "...]") : ('[' + s + ']')));
             menuItem6.setAccelerator(SWT.MOD1 + 49 + n - 1);
             menuItem6.addSelectionListener(new Class45(this, n));
         }
@@ -935,14 +901,14 @@ public final class EmulatorScreen implements
         Settings.steps = 1;
     }
 
-    public final void resumeStep() {
+    public void resumeStep() {
         Settings.steps = -1;
         if (this.screenImg != null && !this.screenImg.isDisposed()) {
             this.screenImg.dispose();
         }
     }
 
-    public final void widgetSelected(final SelectionEvent selectionEvent) {
+    public void widgetSelected(final SelectionEvent selectionEvent) {
         final MenuItem menuItem;
         final Menu parent;
         if ((parent = (menuItem = (MenuItem) selectionEvent.widget).getParent()) == this.menuTool) {
@@ -1330,7 +1296,6 @@ public final class EmulatorScreen implements
                     return;
                 }
                 ((EmulatorImpl) Emulator.getEmulator()).method823().method621();
-                return;
             }
         } else if (parent == menuResize) {
             if (menuItem == centerOnScreenMenuItem) {
@@ -1422,7 +1387,7 @@ public final class EmulatorScreen implements
         this.updateStatus();
     }
 
-    public final void widgetDefaultSelected(final SelectionEvent selectionEvent) {
+    public void widgetDefaultSelected(final SelectionEvent selectionEvent) {
     }
 
     private void updateInfos(final int n, final int n2) {
@@ -1488,7 +1453,7 @@ public final class EmulatorScreen implements
         shell.layout();
     }
 
-    public final void paintControl(final PaintEvent paintEvent) {
+    public void paintControl(final PaintEvent paintEvent) {
         final GC gc;
         (gc = paintEvent.gc).setInterpolation(this.interpolation);
         Rectangle size = canvas.getClientArea();
@@ -1600,7 +1565,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void run() {
+    public void run() {
         if (this.pauseState != 1) {
             return;
         }
@@ -1646,7 +1611,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void keyPressed(final KeyEvent keyEvent) {
+    public void keyPressed(final KeyEvent keyEvent) {
         if (keyEvent.keyCode == 16777261/*&& (keyEvent.stateMask & SWT.CONTROL) != 0*/) {
             this.zoomOut();
             return;
@@ -1662,7 +1627,7 @@ public final class EmulatorScreen implements
         handleKeyPress(n);
     }
 
-    public final void keyReleased(final KeyEvent keyEvent) {
+    public void keyReleased(final KeyEvent keyEvent) {
         if (!Settings.canvasKeyboard && win) {
             return;
         }
@@ -1673,7 +1638,7 @@ public final class EmulatorScreen implements
     }
 
 
-    protected final void handleKeyPress(int n) {
+    void handleKeyPress(int n) {
         if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
             return;
         }
@@ -1703,7 +1668,7 @@ public final class EmulatorScreen implements
         Emulator.getEventQueue().keyPress(n);
     }
 
-    protected final void handleKeyRelease(int n) {
+    void handleKeyRelease(int n) {
         if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
             return;
         }
@@ -1825,7 +1790,7 @@ public final class EmulatorScreen implements
         return n;
     }
 
-    public final void mouseDoubleClick(final MouseEvent mouseEvent) {
+    public void mouseDoubleClick(final MouseEvent mouseEvent) {
         if (Settings.playingRecordedKeys) {
             return;
         }
@@ -1877,7 +1842,7 @@ public final class EmulatorScreen implements
         return new int[] {x, y};
     }
 
-    public final void mouseDown(final MouseEvent mouseEvent) {
+    public void mouseDown(final MouseEvent mouseEvent) {
         if (this.infosEnabled && !this.mouseDownInfos) {
             this.mouseXPress = mouseEvent.x;
             this.mouseYPress = mouseEvent.y;
@@ -1926,7 +1891,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void mouseUp(final MouseEvent mouseEvent) {
+    public void mouseUp(final MouseEvent mouseEvent) {
         this.mouseDownInfos = false;
         if (this.pauseState == 0 || Settings.playingRecordedKeys) {
             return;
@@ -1965,7 +1930,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void mouseMove(final MouseEvent mouseEvent) {
+    public void mouseMove(final MouseEvent mouseEvent) {
         if (this.infosEnabled) {
             if (this.mouseDownInfos) {
                 this.mouseXRelease = mouseEvent.x;
@@ -1985,7 +1950,7 @@ public final class EmulatorScreen implements
             if (!mset) {
                 Color white = display.getSystemColor(SWT.COLOR_WHITE);
                 Color black = display.getSystemColor(SWT.COLOR_BLACK);
-                PaletteData palette = new PaletteData(new RGB[]{white.getRGB(), black.getRGB()});
+                PaletteData palette = new PaletteData(white.getRGB(), black.getRGB());
                 ImageData sourceData = new ImageData(16, 16, 1, palette);
                 sourceData.transparentPixel = 0;
                 Cursor cursor = new Cursor(display, sourceData, 0, 0);
@@ -2157,7 +2122,7 @@ public final class EmulatorScreen implements
 
     }
 
-    public final void widgetDisposed(final DisposeEvent disposeEvent) {
+    public void widgetDisposed(final DisposeEvent disposeEvent) {
         Emulator.getEmulator().disposeSubWindows();
         Emulator.notifyDestroyed();
         if (this.pauseState != 0) {
@@ -2165,7 +2130,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void controlMoved(final ControlEvent controlEvent) {
+    public void controlMoved(final ControlEvent controlEvent) {
         if (controlEvent.widget != shell)
             return;
         this.getWindowPos();
@@ -2191,7 +2156,7 @@ public final class EmulatorScreen implements
         }
     }
 
-    public final void controlResized(final ControlEvent controlEvent) {
+    public void controlResized(final ControlEvent controlEvent) {
         this.controlMoved(controlEvent);
         resized();
     }
@@ -2257,7 +2222,7 @@ public final class EmulatorScreen implements
         caret.setWindowZoom((float) screenHeight / (float) origHeight);
     }
 
-    public final void startVibra(final long aLong1013) {
+    public void startVibra(final long aLong1013) {
         if (!Settings.enableVibration) {
             return;
         }
@@ -2277,7 +2242,7 @@ public final class EmulatorScreen implements
         this.vibraStart = System.currentTimeMillis();
     }
 
-    public final void stopVibra() {
+    public void stopVibra() {
         if (this.vibraThread != null) {
             this.vibraThread.aBoolean1194 = true;
         }
@@ -2285,11 +2250,11 @@ public final class EmulatorScreen implements
 
     private void method589() {
         final DropTarget dropTarget;
-        (dropTarget = new DropTarget(this.canvas, 19)).setTransfer(new Transfer[]{FileTransfer.getInstance()});
+        (dropTarget = new DropTarget(this.canvas, 19)).setTransfer(FileTransfer.getInstance());
         dropTarget.addDropListener(new Class29(this));
     }
 
-    public final ICaret getCaret() {
+    public ICaret getCaret() {
         return this.caret;
     }
 
@@ -2368,7 +2333,7 @@ public final class EmulatorScreen implements
             this.aBoolean1479 = aBoolean1479;
         }
 
-        public final void run() {
+        public void run() {
             if (this.aBoolean1479) {
                 this.anInt1478 = EmulatorScreen.method561(this.aClass93_1480).getLocation().x;
                 this.anInt1481 = EmulatorScreen.method561(this.aClass93_1480).getLocation().y;
@@ -2393,7 +2358,7 @@ public final class EmulatorScreen implements
             this.aRandom1195 = new Random();
         }
 
-        public final void run() {
+        public void run() {
             this.anInt1193 = 10;
             final ShellPosition shellPosition = this.aClass93_1196.new ShellPosition(aClass93_1196, 0, 0, true);
             while (System.currentTimeMillis() - EmulatorScreen.method567(this.aClass93_1196) < EmulatorScreen.method575(this.aClass93_1196) && !this.aBoolean1194) {
@@ -2426,7 +2391,7 @@ public final class EmulatorScreen implements
             this.anInt1058 = anInt1058;
         }
 
-        public final void run() {
+        public void run() {
             switch (this.anInt1058) {
                 case 0: {
                     if (Settings.showMemViewFrame) {

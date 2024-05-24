@@ -289,7 +289,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
     private static void addToClassPath(String s) {
         try {
-            Agent.addClassPath(new File(Emulator.getAbsolutePath() + "/" + s));
+            Agent.addClassPath(new File(Emulator.getAbsolutePath() + File.separatorChar + s));
         } catch (Exception e) {
             throw new RuntimeException(s, e);
         }
