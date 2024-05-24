@@ -17,7 +17,7 @@
     <orderEntry type="library" exported="" name="libraries" level="project" />
     <orderEntry type="library" exported="" name="swt" level="project" />
     <orderEntry type="library" name="lwjgl" level="project" />
+    <orderEntry type="module" module-name="micro3d_stub" />
     <orderEntry type="module" module-name="m3g_stub" />
-    <orderEntry type="module" module-name="mascot_stub" />
   </component>
 </module>

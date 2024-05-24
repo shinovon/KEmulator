@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="micro3d_dll">
+    <output-path>$PROJECT_DIR$/home</output-path>
+    <root id="archive" name="micro3d_dll.jar">
+      <element id="module-output" name="micro3d_dll" />
+    </root>
+  </artifact>
+</component>

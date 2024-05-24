@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="mascot_win">
-    <output-path>$PROJECT_DIR$/home</output-path>
-    <root id="archive" name="mascot_dll.jar">
-      <element id="module-output" name="mascot_win" />
-    </root>
-  </artifact>
-</component>

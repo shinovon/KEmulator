@@ -6,12 +6,8 @@ import emulator.graphics3D.IGraphics3D;
 import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
 import ru.woesss.j2me.micro3d.TextureImpl;
 
-import java.awt.image.DataBufferInt;
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.IntBuffer;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
@@ -91,7 +87,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     public MemoryViewImage convertMicro3DTexture(Object o) {
         Class cls = o.getClass();
         try {
-            if(Settings.mascotEngine == 1) {
+            if(Settings.micro3d == 1) {
                 TextureImpl impl = (TextureImpl) cls.getField("impl").get(o);
                 if (impl == null)
                     return null;
@@ -203,7 +199,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 }
             } catch (Throwable ignored) {}
             if (!mascotLoaded) {
-                addToClassPath(Settings.mascotEngine == 0 ? "mascot_dll.jar" : "mascot_gl.jar");
+                addToClassPath(Settings.micro3d == 0 ? "micro3d_dll.jar" : "micro3d_gl.jar");
             }
         }
     }

@@ -48,6 +48,7 @@ plugins
 config_fast.txt
 home/classwatcher.txt
 m3g_*.jar
+micro3d_*.jar
 KEmulator_x64.jar
 version.mf
 home/midlets.txt

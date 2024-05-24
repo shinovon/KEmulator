@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="mascot_stub">
-    <output-path>$PROJECT_DIR$/home</output-path>
-    <root id="archive" name="mascot_stub.jar">
-      <element id="module-output" name="mascot_stub" />
-    </root>
-  </artifact>
-</component>

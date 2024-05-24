@@ -11,7 +11,7 @@
       <element id="module-output" name="KEmulator_x64" />
       <element id="module-output" name="KEmulator_base" />
       <element id="module-output" name="m3g_lwjgl" />
-      <element id="module-output" name="mascot_gl" />
+      <element id="module-output" name="micro3d_gl" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl_util.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/vlcj-4.7.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/bridj-0.7.0.jar" path-in-jar="/" />

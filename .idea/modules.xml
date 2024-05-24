@@ -8,9 +8,9 @@
       <module fileurl="file://$PROJECT_DIR$/m3g_lwjgl/m3g_lwjgl.iml" filepath="$PROJECT_DIR$/m3g_lwjgl/m3g_lwjgl.iml" />
       <module fileurl="file://$PROJECT_DIR$/m3g_stub/m3g_stub.iml" filepath="$PROJECT_DIR$/m3g_stub/m3g_stub.iml" />
       <module fileurl="file://$PROJECT_DIR$/m3g_swerve/m3g_swerve.iml" filepath="$PROJECT_DIR$/m3g_swerve/m3g_swerve.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mascot_gl/mascot_gl.iml" filepath="$PROJECT_DIR$/mascot_gl/mascot_gl.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mascot_stub/mascot_stub.iml" filepath="$PROJECT_DIR$/mascot_stub/mascot_stub.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mascot_win/mascot_win.iml" filepath="$PROJECT_DIR$/mascot_win/mascot_win.iml" />
+      <module fileurl="file://$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" filepath="$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" />
+      <module fileurl="file://$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" filepath="$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/micro3d_stub/micro3d_stub.iml" filepath="$PROJECT_DIR$/micro3d_stub/micro3d_stub.iml" />
     </modules>
   </component>
 </project>

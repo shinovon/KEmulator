@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.charset.StandardCharsets;
 
 abstract class Program {
 	static Tex tex;
@@ -67,8 +68,8 @@ abstract class Program {
 	}
 
 	private int createProgram(String vertexShader, String fragmentShader) throws IOException {
-		String vertexShaderCode = new String(CustomJarResources.getBytes(this.getClass().getResourceAsStream(vertexShader)), "UTF-8");
-		String fragmentShaderCode = new String(CustomJarResources.getBytes(this.getClass().getResourceAsStream(fragmentShader)), "UTF-8");
+		String vertexShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(vertexShader)), StandardCharsets.UTF_8);
+		String fragmentShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(fragmentShader)), StandardCharsets.UTF_8);
 
 		int vertexId = loadShader(GL_VERTEX_SHADER, vertexShaderCode);
 		int fragmentId = loadShader(GL_FRAGMENT_SHADER, fragmentShaderCode);

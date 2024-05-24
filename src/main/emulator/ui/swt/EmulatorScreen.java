@@ -47,7 +47,7 @@ public final class EmulatorScreen implements
     private Menu menuTool;
     private Menu menuView;
     private Menu menu2dEngine;
-    private Menu menu3dEngine;
+    private Menu menuM3GEngine;
     private Menu aMenu1018;
     private Menu menuInterpolation;
     public static int locX;
@@ -160,6 +160,9 @@ public final class EmulatorScreen implements
     private int screenHeight;
     private boolean pointerState;
     private boolean win;
+    private MenuItem glM3DMenuItem;
+    private MenuItem softM3DMenuItem;
+    private Menu menuM3DEngine;
 
     public EmulatorScreen(final int n, final int n2) {
         super();
@@ -832,7 +835,7 @@ public final class EmulatorScreen implements
         this.openJadMenuItem.addSelectionListener(this);
         new MenuItem(this.menuMidlet, 2);
         final MenuItem menuItem7;
-        (menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_2DENGINE", "2D Graphics Engine"));
+        (menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_2D_ENGINE", "2D Engine"));
         this.menu2dEngine = new Menu(this.shell, 4194308);
         (this.awt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("AWT-Graphics");
         this.awt2dMenuItem.setSelection(Settings.g2d == 1);
@@ -842,17 +845,34 @@ public final class EmulatorScreen implements
         this.swt2dMenuItem.addSelectionListener(this);
         menuItem7.setMenu(this.menu2dEngine);
 
-        final MenuItem engine3dGroup;
-        (engine3dGroup = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_3DENGINE", "3D Graphics Engine"));
-        engine3dGroup.setMenu(this.menu3dEngine = new Menu(this.shell, 4194308));
-        (this.lwj3dMenuItem = new MenuItem(this.menu3dEngine, 16)).setText("LWJGL");
-        this.lwj3dMenuItem.setSelection(Settings.g3d == 1);
-        this.lwj3dMenuItem.addSelectionListener(this);
-        (this.swerve3dMenuItem = new MenuItem(this.menu3dEngine, 16)).setText("Swerve");
-        this.swerve3dMenuItem.setSelection(Settings.g3d == 0);
+        final MenuItem engineM3GGroup;
+        (engineM3GGroup = new MenuItem(menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_M3G_ENGINE", "M3G Engine"));
+        engineM3GGroup.setMenu(menuM3GEngine = new Menu(this.shell, 4194308));
+
+        lwj3dMenuItem = new MenuItem(menuM3GEngine, SWT.RADIO);
+        lwj3dMenuItem.setText("LWJGL");
+        lwj3dMenuItem.setSelection(Settings.g3d == 1);
+        lwj3dMenuItem.addSelectionListener(this);
+        swerve3dMenuItem = new MenuItem(menuM3GEngine, SWT.RADIO);
+        swerve3dMenuItem.setText("Swerve");
+        swerve3dMenuItem.setSelection(Settings.g3d == 0);
         swerve3dMenuItem.setEnabled(!Emulator.isX64());
-        this.swerve3dMenuItem.addSelectionListener(this);
-        engine3dGroup.setMenu(this.menu3dEngine);
+        swerve3dMenuItem.addSelectionListener(this);
+
+        final MenuItem engineM3DGroup;
+        (engineM3DGroup = new MenuItem(menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_M3D_ENGINE", "MascotCapsule Engine"));
+        engineM3DGroup.setMenu(menuM3DEngine = new Menu(this.shell, 4194308));
+
+        glM3DMenuItem = new MenuItem(menuM3DEngine, SWT.RADIO);
+        glM3DMenuItem.setText("LWJGL");
+        glM3DMenuItem.setSelection(Settings.micro3d == 1);
+        glM3DMenuItem.addSelectionListener(this);
+        softM3DMenuItem = new MenuItem(this.menuM3DEngine, SWT.RADIO);
+        softM3DMenuItem.setText("Software");
+        softM3DMenuItem.setSelection(Settings.micro3d == 0);
+        softM3DMenuItem.setEnabled(!Emulator.isX64());
+        softM3DMenuItem.addSelectionListener(this);
+
 
         new MenuItem(this.menuMidlet, 2);
         (this.suspendMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_SUSPEND", "Suspend") + "\tCtrl+S");
@@ -1016,7 +1036,7 @@ public final class EmulatorScreen implements
                 return;
             }
             if (menuItem == this.restartMenuItem) {
-                Emulator.loadGame(null, Settings.g2d, Settings.g3d, false);
+                Emulator.loadGame(null, false);
                 return;
             }
             if (menuItem == this.loadJarMenuItem) {
@@ -1027,7 +1047,7 @@ public final class EmulatorScreen implements
                 final String open2;
                 if ((open2 = fileDialog2.open()) != null) {
                     Settings.recordedKeysFile = null;
-                    Emulator.loadGame(open2, Settings.g2d, Settings.g3d, equals);
+                    Emulator.loadGame(open2, equals);
                 }
                 this.resumeStep();
                 this.updatePauseState();
@@ -1054,7 +1074,7 @@ public final class EmulatorScreen implements
                             }
                         }
                         Settings.recordedKeysFile = open3;
-                        Emulator.loadGame(s, Settings.g2d, Settings.g3d, false);
+                        Emulator.loadGame(s, false);
                     }
                 }
                 this.resumeStep();
@@ -1112,7 +1132,7 @@ public final class EmulatorScreen implements
         if (parent == this.menu2dEngine) {
             if (menuItem == this.awt2dMenuItem) {
                 if (this.pauseState != 0 && Settings.g2d != 1) {
-                    Emulator.loadGame(null, 1, Settings.g3d, false);
+                    Emulator.loadGame(null, 1, Settings.g3d, Settings.micro3d, false);
                     return;
                 }
                 Settings.g2d = 1;
@@ -1120,7 +1140,7 @@ public final class EmulatorScreen implements
                 this.awt2dMenuItem.setSelection(true);
             } else if (menuItem == this.swt2dMenuItem) {
                 if (this.pauseState != 0 && Settings.g2d != 0) {
-                    Emulator.loadGame(null, 0, Settings.g3d, false);
+                    Emulator.loadGame(null, 0, Settings.g3d, Settings.micro3d, false);
                     return;
                 }
                 Settings.g2d = 0;
@@ -1129,10 +1149,10 @@ public final class EmulatorScreen implements
             }
             return;
         }
-        if (parent == this.menu3dEngine) {
+        if (parent == this.menuM3GEngine) {
             if (menuItem == this.swerve3dMenuItem) {
                 if (this.pauseState != 0 && Settings.g3d != 0) {
-                    Emulator.loadGame(null, Settings.g2d, 0, false);
+                    Emulator.loadGame(null, Settings.g2d, 0, Settings.micro3d, false);
                     return;
                 }
                 Settings.g3d = 0;
@@ -1140,12 +1160,32 @@ public final class EmulatorScreen implements
                 this.swerve3dMenuItem.setSelection(true);
             } else if (menuItem == this.lwj3dMenuItem) {
                 if (this.pauseState != 0 && Settings.g3d != 1) {
-                    Emulator.loadGame(null, Settings.g2d, 1, false);
+                    Emulator.loadGame(null, Settings.g2d, 1, Settings.micro3d, false);
                     return;
                 }
                 Settings.g3d = 1;
                 this.swerve3dMenuItem.setSelection(false);
                 this.lwj3dMenuItem.setSelection(true);
+            }
+            return;
+        }
+        if (parent == menuM3DEngine) {
+            if (menuItem == softM3DMenuItem) {
+                if (pauseState != 0 && Settings.micro3d != 0) {
+                    Emulator.loadGame(null, Settings.g2d, Settings.g3d, 0, false);
+                    return;
+                }
+                Settings.micro3d = 0;
+                glM3DMenuItem.setSelection(false);
+                softM3DMenuItem.setSelection(true);
+            } else if (menuItem == glM3DMenuItem) {
+                if (pauseState != 0 && Settings.micro3d != 1) {
+                    Emulator.loadGame(null, Settings.g2d, Settings.g3d, 1, false);
+                    return;
+                }
+                Settings.micro3d = 1;
+                softM3DMenuItem.setSelection(false);
+                glM3DMenuItem.setSelection(true);
             }
             return;
         }

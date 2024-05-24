@@ -255,15 +255,12 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 Class cls = Class.forName("com.mascotcapsule.micro3d.v3.Graphics3D");
                 try {
                     mascotLoaded = !cls.getField("_STUB").getBoolean(null);
-//                if (!m3gLoaded) {
-//                    System.out.println("m3g stub!!");
-//                }
                 } catch (Throwable e) {
                     mascotLoaded = true;
                 }
             } catch (Throwable ignored) {}
             if (!mascotLoaded) {
-                addToClassPath("mascot_gl.jar");
+                addToClassPath("micro3d_gl.jar");
             }
         }
     }

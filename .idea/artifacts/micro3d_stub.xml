@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="micro3d_stub">
+    <output-path>$PROJECT_DIR$/home</output-path>
+    <root id="archive" name="micro3d_stub.jar">
+      <element id="module-output" name="micro3d_stub" />
+    </root>
+  </artifact>
+</component>
