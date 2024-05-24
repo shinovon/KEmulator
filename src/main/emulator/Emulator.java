@@ -723,6 +723,8 @@ public class Emulator {
         parseLaunchArgs(commandLineArguments); //
         Emulator.emulatorimpl = new EmulatorImpl();
         parseLaunchArgs(commandLineArguments);
+        // Force m3g engine to LWJGL in x64 build
+        if(platform.isX64()) Settings.g3d = 1;
         platform.loadM3G();
         vlcCheckerThread.start();
         Controllers.refresh(true);

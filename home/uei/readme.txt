@@ -14,6 +14,6 @@ libraries not supported by kemulator:
 jsr 75 pim
 jsr 226 (svg)
 jsr 234 (amms)
-siemens io
 nokia ui 1.6 (partially)
+jsr 211 chapi
 filemanagerapi.jar

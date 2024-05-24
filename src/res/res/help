@@ -906,6 +906,30 @@ v0.1.3 [2006.06.20]
 v0.1.0 [2006.06.15]
 
 ==================
+$[Supported APIs]
+MIDP 2.0 (JSR118)
+NokiaUI 1.4 (except TextEditor)
+Samsung 1.0 (win32 only)
+Sprint 1.0
+Siemens API
+WMA 1.0 (JSR120)
+Sensor (JSR256)
+M3G 1.1 (JSR184)
+OpenGL ES (JSR239)
+Mascot Capsule V3 (win32 only)
+SoftBank MEXA
+Nokia M3D(O)
+Vodafone API
+PantechAudio (win32 only)
+
+$[Stub APIs]
+JSR 211 ContentHandler
+Nokia InApp
+Immersion VibeTonz
+com.nec
+com.motorola
+
+==================
 $[Libs]
 swt-4.20 / 4.7 (32-bit)
 asm-5.2
