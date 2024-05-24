@@ -17,24 +17,12 @@
 package ru.woesss.j2me.micro3d;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
-import emulator.Settings;
-import emulator.graphics2D.swt.Graphics2DSWT;
-import org.eclipse.swt.graphics.Image;
+import emulator.graphics3D.Transform3D;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-
-import javax.microedition.lcdui.Graphics;
-
-import static org.lwjgl.opengl.GL11.GL_RGBA;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 
 public class Utils {
 	static final String TAG = "micro3d";
@@ -172,7 +160,7 @@ public class Utils {
 				mtx.m23 = actionMatrices[i*12 + 11];
 			}
 		}
-		int actionsIdx = 0, dstVertIdx = 0, srcVertIdx = 0, dstNormIdx = 0, srcNormIdx = 0;
+		int k = 0;
 
 		Matrix[] tmp = new Matrix[bonesLen];
 		for (int i = 0; i < bonesLen; i++) tmp[i] = new Matrix();
@@ -187,15 +175,16 @@ public class Utils {
 				matrix.multiply(tmp[parent], bone.matrix);
 			}
 			if (i < actionsLen) {
-				matrix.multiply(actions[actionsIdx++]);
+				matrix.multiply(actions[i]);
 			}
 			int boneLen = bone.length;
 			for (int j = 0; j < boneLen; j++) {
-				matrix.transformPoint(dstVert, dstVertIdx++, srcVert, srcVertIdx++);
+				matrix.transformPoint(dstVert, srcVert, k);
 
 				if (srcNormals != null) {
-					matrix.transformVector(dstNorm, dstNormIdx++, srcNorm, srcNormIdx++);
+					matrix.transformVector(dstNorm, srcNorm, k);
 				}
+				++k;
 			}
 		}
 
@@ -229,17 +218,17 @@ public class Utils {
 
 	// structs
 	static class Matrix {
-		float m00;
+		float m00 = 1f;
 		float m01;
 		float m02;
 		float m03;
 		float m10;
-		float m11;
+		float m11 = 1f;
 		float m12;
 		float m13;
 		float m20;
 		float m21;
-		float m22;
+		float m22 = 1f;
 		float m23;
 
 		void multiply(Matrix lm, Matrix rm) {
@@ -283,20 +272,32 @@ public class Utils {
 			multiply(this, rm);
 		}
 
-		void transformPoint(float[] dst, int dstidx, float[] src, int srcidx) {
-			transformVector(dst, dstidx, src, srcidx);
-			dst[dstidx*3] += m03;
-			dst[dstidx*3 + 1] += m13;
-			dst[dstidx*3 + 2] += m23;
+		void transformPoint(float[] dst, float[] src, int idx) {
+			transformVector(dst, src, idx);
+			dst[idx*3] += m03;
+			dst[idx*3 + 1] += m13;
+			dst[idx*3 + 2] += m23;
 		}
 
-		void transformVector(float[] dst, int dstidx, float[] src, int srcidx) {
-			float x = src[srcidx*3];
-			float y = src[srcidx*3 + 1];
-			float z = src[srcidx*3 + 2];
-			dst[dstidx*3] = x * m00 + y * m01 + z * m02;
-			dst[dstidx*3 + 1] = x * m10 + y * m11 + z * m12;
-			dst[dstidx*3 + 2] = x * m20 + y * m21 + z * m22;
+		void transformVector(float[] dst, float[] src, int idx) {
+			float x = src[idx*3];
+			float y = src[idx*3 + 1];
+			float z = src[idx*3 + 2];
+			dst[idx*3] = x * m00 + y * m01 + z * m02;
+			dst[idx*3 + 1] = x * m10 + y * m11 + z * m12;
+			dst[idx*3 + 2] = x * m20 + y * m21 + z * m22;
+		}
+
+		Transform3D toTransform3D() {
+			Transform3D t = new Transform3D();
+			t.set(new float[] {
+					m00, m01, m02, m03,
+					m10, m11, m12, m13,
+					m20, m21, m22, m23,
+					0f, 0f, 0f, 1f
+			});
+
+			return t;
 		}
 	}
 
@@ -304,50 +305,5 @@ public class Utils {
 		int length;
 		int parent;
 		Matrix matrix;
-	}
-
-	static void glReadPixels(int x, int y, int width, int height, Graphics target) {
-		if (targetWidth != width || targetHeight != height) {
-			if (Settings.g2d == 1) {
-				awtBufferImage = new BufferedImage(width, height, 4);
-			} else {
-				swtBufferImage = new ImageData(width, height, 32, swtPalleteData);
-			}
-			buffer = BufferUtils.createByteBuffer(width * height * 4).order(ByteOrder.nativeOrder());
-			targetWidth = width;
-			targetHeight = height;
-		}
-		int var3;
-		int var4;
-		int var5;
-		if (Settings.g2d == 0) {
-			buffer.rewind();
-			GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-			int var8 = swtBufferImage.width << 2;
-			int var10 = swtBufferImage.data.length - var8;
-
-			for (var3 = swtBufferImage.height; var3 > 0; --var3) {
-				buffer.get(swtBufferImage.data, var10, var8);
-				var10 -= var8;
-			}
-
-			Image var12 = new Image(null, swtBufferImage);
-			((Graphics2DSWT) target.getImpl()).gc().drawImage(var12, x, y);
-			var12.dispose();
-		} else {
-			buffer.rewind();
-			GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-			int[] var1 = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
-			IntBuffer var2 = buffer.asIntBuffer();
-			var3 = width;
-			var4 = var1.length - var3;
-
-			for (var5 = height; var5 > 0; --var5) {
-				var2.get(var1, var4, var3);
-				var4 -= var3;
-			}
-
-			((emulator.graphics2D.awt.b) target.getImpl()).g().drawImage(awtBufferImage, x, y, null);
-		}
 	}
 }
