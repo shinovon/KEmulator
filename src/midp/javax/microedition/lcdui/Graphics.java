@@ -341,7 +341,7 @@ public class Graphics implements com.vodafone.v10.graphics.j3d.Graphics3D,
         if (Settings.xrayOverlapScreen) {
             this.xrayGraphics.drawImage(image.getImpl(), n, n2, n5, n6, n3, n4, n5, n6);
         }
-        if (image.isMutable()) {
+        if (image.isMutable() && image.getXRayBuffer() != null) {
             this.xrayGraphics.drawImage(image.getXRayBuffer(), n3, n4);
         }
         this.xrayFillRect(n3, n4, n5, n6, 16777215);

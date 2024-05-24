@@ -231,7 +231,7 @@ public final class EventQueue implements Runnable {
     }
 
     public void run() {
-        long time = 0;
+        //long time = 0;
         int event;
         while (running) {
             alive = true;
@@ -358,7 +358,7 @@ public final class EventQueue implements Runnable {
                     synchronized(lock) {
                         ((Runnable) serialEvents.remove(0)).run();
                     }
-                } else if(event == 0) {
+                }/*else if(event == 0) {
                     if (time == 0) {
                         time = System.currentTimeMillis();
                     } else if(time != -1 && (System.currentTimeMillis() - time) > 10000) {
@@ -368,7 +368,7 @@ public final class EventQueue implements Runnable {
                     Thread.sleep(1);
                 } else {
                     time = 0;
-                }
+                }*/
             } catch (Throwable e) {
                 System.err.println("Exception in Event Thread!");
                 e.printStackTrace();
