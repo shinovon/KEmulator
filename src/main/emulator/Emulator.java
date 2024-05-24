@@ -2,7 +2,6 @@ package emulator;
 
 import java.awt.Dimension;
 import java.io.*;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
@@ -725,7 +724,7 @@ public class Emulator {
         parseLaunchArgs(commandLineArguments);
         // Force m3g engine to LWJGL in x64 build
         if(platform.isX64()) Settings.g3d = 1;
-        platform.loadM3G();
+        platform.load3D();
         vlcCheckerThread.start();
         Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on " +
