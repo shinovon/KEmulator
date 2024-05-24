@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 Yury Kharchenko
+ * Copyright 2020-2024 Yury Kharchenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,9 @@
 
 package ru.woesss.j2me.micro3d;
 
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-
-import emulator.graphics3D.Transform3D;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
+import java.nio.IntBuffer;
 
 public class Utils {
 	static final String TAG = "micro3d";
@@ -82,209 +78,111 @@ public class Utils {
 
 	static void fillBuffer(FloatBuffer buffer, FloatBuffer vertices, int[] indices) {
 		buffer.rewind();
+		float[] arr = new float[3];
 		for (int index : indices) {
-			buffer.put(vertices.get(index * 3));
-			buffer.put(vertices.get(index * 3 + 1));
-			buffer.put(vertices.get(index * 3 + 2));
+			vertices.position(index * 3);
+			vertices.get(arr);
+			buffer.put(arr);
 		}
-		buffer.rewind();
 	}
 
 	static void transform(FloatBuffer srcVertices, FloatBuffer dstVertices,
-								 FloatBuffer srcNormals, FloatBuffer dstNormals,
-								 ByteBuffer boneMatrices, float[] actionMatrices) {
-		float[] srcVert = new float[srcVertices.capacity()];
-		float[] dstVert = new float[dstVertices.capacity()];
-
-		for (int i = 0; i < srcVert.length; i++) srcVert[i] = srcVertices.get(i);
-
-		float[] srcNorm = null;
-		float[] dstNorm = null;
+						  FloatBuffer srcNormals, FloatBuffer dstNormals,
+						  ByteBuffer bonesBuf, float[] actionMatrices) {
+		srcVertices.rewind();
+		dstVertices.rewind();
 		if (srcNormals != null) {
-			srcNorm = new float[srcNormals.capacity()];
-			dstNorm = new float[dstNormals.capacity()];
-
-			for (int i = 0; i < srcNorm.length; i++) srcNorm[i] = srcNormals.get(i);
+			srcNormals.rewind();
+			dstNormals.rewind();
 		}
-
-		int bonesLen = boneMatrices.capacity() / (14 * 4);
-		Bone[] bones = new Bone[bonesLen];
-
-		boneMatrices.rewind();
-
-		// read bones
-		for (int i = 0; i < bonesLen; i++) {
-			Bone bone = bones[i] = new Bone();
-			bone.length = boneMatrices.getInt((i*14) * 4);
-			bone.parent = boneMatrices.getInt((i*14 + 1) * 4);
-			Matrix mtx = bone.matrix = new Matrix();
-			mtx.m00 = boneMatrices.getFloat((i*14 + 2) * 4);
-			mtx.m01 = boneMatrices.getFloat((i*14 + 3) * 4);
-			mtx.m02 = boneMatrices.getFloat((i*14 + 4) * 4);
-			mtx.m03 = boneMatrices.getFloat((i*14 + 5) * 4);
-			mtx.m10 = boneMatrices.getFloat((i*14 + 6) * 4);
-			mtx.m11 = boneMatrices.getFloat((i*14 + 7) * 4);
-			mtx.m12 = boneMatrices.getFloat((i*14 + 8) * 4);
-			mtx.m13 = boneMatrices.getFloat((i*14 + 9) * 4);
-			mtx.m20 = boneMatrices.getFloat((i*14 + 10) * 4);
-			mtx.m21 = boneMatrices.getFloat((i*14 + 11) * 4);
-			mtx.m22 = boneMatrices.getFloat((i*14 + 12) * 4);
-			mtx.m23 = boneMatrices.getFloat((i*14 + 13) * 4);
-		}
-
+		int bonesLen = bonesBuf.capacity() / ((12 + 2) * 4);
 		int actionsLen = 0;
-		Matrix[] actions = null;
 		if (actionMatrices != null) {
 			actionsLen = actionMatrices.length / 12;
-			actions = new Matrix[actionsLen];
-			for (int i = 0; i < actionsLen; i++) {
-				Matrix mtx = actions[i] = new Matrix();
-				mtx.m00 = actionMatrices[i*12];
-				mtx.m01 = actionMatrices[i*12 + 1];
-				mtx.m02 = actionMatrices[i*12 + 2];
-				mtx.m03 = actionMatrices[i*12 + 3];
-				mtx.m10 = actionMatrices[i*12 + 4];
-				mtx.m11 = actionMatrices[i*12 + 5];
-				mtx.m12 = actionMatrices[i*12 + 6];
-				mtx.m13 = actionMatrices[i*12 + 7];
-				mtx.m20 = actionMatrices[i*12 + 8];
-				mtx.m21 = actionMatrices[i*12 + 9];
-				mtx.m22 = actionMatrices[i*12 + 10];
-				mtx.m23 = actionMatrices[i*12 + 11];
-			}
 		}
-		int k = 0;
-
-		Matrix[] tmp = new Matrix[bonesLen];
-		for (int i = 0; i < bonesLen; i++) tmp[i] = new Matrix();
-
-		for (int i = 0; i < bonesLen; i++) {
-			Bone bone = bones[i];
-			int parent = bone.parent;
-			Matrix matrix = tmp[i];
+		IntBuffer bones = bonesBuf.asIntBuffer();
+		FloatBuffer boneMatrix = bonesBuf.asFloatBuffer();
+		float[] boneMatrixTmp = new float[bonesLen * 12];
+		float[] tmp = new float[12];
+		for (int i = 0; i < bonesLen; ++i) {
+			bones.position(i * 14);
+			int boneLen = bones.get();
+			int parent = bones.get();
+			boneMatrix.position(i * 14 + 2);
 			if (parent == -1) {
-				matrix = bone.matrix;
+				boneMatrix.get(boneMatrixTmp, i * 12, 12);
 			} else {
-				matrix.multiply(tmp[parent], bone.matrix);
+				boneMatrix.get(tmp);
+				multiplyMM(boneMatrixTmp, i * 12, boneMatrixTmp, parent * 12, tmp, 0);
 			}
 			if (i < actionsLen) {
-				matrix.multiply(actions[i]);
+				multiplyMM(boneMatrixTmp, i * 12, boneMatrixTmp, i * 12, actionMatrices, i * 12);
 			}
-			int boneLen = bone.length;
-			for (int j = 0; j < boneLen; j++) {
-				matrix.transformPoint(dstVert, srcVert, k);
+			for (int j = 0; j < boneLen; ++j) {
+				multiplyMV(dstVertices, srcVertices, boneMatrixTmp, i * 12);
 
 				if (srcNormals != null) {
-					matrix.transformVector(dstNorm, srcNorm, k);
+					multiplyMN(dstNormals, srcNormals, boneMatrixTmp, i * 12);
 				}
-				++k;
 			}
-		}
-
-		// write buffers
-		boneMatrices.rewind();
-		for (int i = 0; i < bonesLen; i++) {
-			Bone bone = bones[i];
-			boneMatrices.putInt(bone.length).putInt(bone.parent);
-
-			Matrix mtx = bone.matrix;
-			boneMatrices.putFloat(mtx.m00).putFloat(mtx.m01).putFloat(mtx.m02).putFloat(mtx.m03)
-					.putFloat(mtx.m10).putFloat(mtx.m11).putFloat(mtx.m12).putFloat(mtx.m13)
-					.putFloat(mtx.m20).putFloat(mtx.m21).putFloat(mtx.m22).putFloat(mtx.m23);
-		}
-		boneMatrices.rewind();
-
-		dstVertices.rewind();
-		for (float f : dstVert) {
-			dstVertices.put(f);
-		}
-		dstVertices.rewind();
-
-		if (dstNormals != null) {
-			dstNormals.rewind();
-			for (float f : dstNorm) {
-				dstNormals.put(f);
-			}
-			dstNormals.rewind();
 		}
 	}
 
-	// structs
-	static class Matrix {
-		float m00 = 1f;
-		float m01;
-		float m02;
-		float m03;
-		float m10;
-		float m11 = 1f;
-		float m12;
-		float m13;
-		float m20;
-		float m21;
-		float m22 = 1f;
-		float m23;
+	private static void multiplyMM(float[] resM, int resOff, float[] lm, int lOff, float[] rm, int rOff) {
+		float l00 = lm[lOff     ];
+		float l01 = lm[lOff +  1];
+		float l02 = lm[lOff +  2];
+		float l03 = lm[lOff +  3];
+		float l04 = lm[lOff +  4];
+		float l05 = lm[lOff +  5];
+		float l06 = lm[lOff +  6];
+		float l07 = lm[lOff +  7];
+		float l08 = lm[lOff +  8];
+		float l09 = lm[lOff +  9];
+		float l10 = lm[lOff + 10];
+		float l11 = lm[lOff + 11];
+		float r00 = rm[rOff     ];
+		float r01 = rm[rOff +  1];
+		float r02 = rm[rOff +  2];
+		float r03 = rm[rOff +  3];
+		float r04 = rm[rOff +  4];
+		float r05 = rm[rOff +  5];
+		float r06 = rm[rOff +  6];
+		float r07 = rm[rOff +  7];
+		float r08 = rm[rOff +  8];
+		float r09 = rm[rOff +  9];
+		float r10 = rm[rOff + 10];
+		float r11 = rm[rOff + 11];
 
-		void multiply(Matrix lm, Matrix rm) {
-			float l00 = lm.m00;
-			float l01 = lm.m01;
-			float l02 = lm.m02;
-			float l10 = lm.m10;
-			float l11 = lm.m11;
-			float l12 = lm.m12;
-			float l20 = lm.m20;
-			float l21 = lm.m21;
-			float l22 = lm.m22;
-			float r00 = rm.m00;
-			float r01 = rm.m01;
-			float r02 = rm.m02;
-			float r03 = rm.m03;
-			float r10 = rm.m10;
-			float r11 = rm.m11;
-			float r12 = rm.m12;
-			float r13 = rm.m13;
-			float r20 = rm.m20;
-			float r21 = rm.m21;
-			float r22 = rm.m22;
-			float r23 = rm.m23;
-
-			m00 = l00 * r00 + l01 * r10 + l02 * r20;
-			m01 = l00 * r01 + l01 * r11 + l02 * r21;
-			m02 = l00 * r02 + l01 * r12 + l02 * r22;
-			m03 = l00 * r03 + l01 * r13 + l02 * r23 + lm.m03;
-			m10 = l10 * r00 + l11 * r10 + l12 * r20;
-			m11 = l10 * r01 + l11 * r11 + l12 * r21;
-			m12 = l10 * r02 + l11 * r12 + l12 * r22;
-			m13 = l10 * r03 + l11 * r13 + l12 * r23 + lm.m13;
-			m20 = l20 * r00 + l21 * r10 + l22 * r20;
-			m21 = l20 * r01 + l21 * r11 + l22 * r21;
-			m22 = l20 * r02 + l21 * r12 + l22 * r22;
-			m23 = l20 * r03 + l21 * r13 + l22 * r23 + lm.m23;
-		}
-
-		void multiply(Matrix rm) {
-			multiply(this, rm);
-		}
-
-		void transformPoint(float[] dst, float[] src, int idx) {
-			transformVector(dst, src, idx);
-			dst[idx*3] += m03;
-			dst[idx*3 + 1] += m13;
-			dst[idx*3 + 2] += m23;
-		}
-
-		void transformVector(float[] dst, float[] src, int idx) {
-			float x = src[idx*3];
-			float y = src[idx*3 + 1];
-			float z = src[idx*3 + 2];
-			dst[idx*3] = x * m00 + y * m01 + z * m02;
-			dst[idx*3 + 1] = x * m10 + y * m11 + z * m12;
-			dst[idx*3 + 2] = x * m20 + y * m21 + z * m22;
-		}
+		resM[resOff     ] = l00 * r00 + l01 * r04 + l02 * r08;
+		resM[resOff +  1] = l00 * r01 + l01 * r05 + l02 * r09;
+		resM[resOff +  2] = l00 * r02 + l01 * r06 + l02 * r10;
+		resM[resOff +  3] = l00 * r03 + l01 * r07 + l02 * r11 + l03;
+		resM[resOff +  4] = l04 * r00 + l05 * r04 + l06 * r08;
+		resM[resOff +  5] = l04 * r01 + l05 * r05 + l06 * r09;
+		resM[resOff +  6] = l04 * r02 + l05 * r06 + l06 * r10;
+		resM[resOff +  7] = l04 * r03 + l05 * r07 + l06 * r11 + l07;
+		resM[resOff +  8] = l08 * r00 + l09 * r04 + l10 * r08;
+		resM[resOff +  9] = l08 * r01 + l09 * r05 + l10 * r09;
+		resM[resOff + 10] = l08 * r02 + l09 * r06 + l10 * r10;
+		resM[resOff + 11] = l08 * r03 + l09 * r07 + l10 * r11 + l11;
 	}
 
-	static class Bone {
-		int length;
-		int parent;
-		Matrix matrix;
+	private static void multiplyMV(FloatBuffer dst, FloatBuffer src, float[] m, int mOffset) {
+		float x = src.get();
+		float y = src.get();
+		float z = src.get();
+		dst.put(x * m[mOffset    ] + y * m[mOffset + 1] + z * m[mOffset +  2] + m[mOffset +  3]);
+		dst.put(x * m[mOffset + 4] + y * m[mOffset + 5] + z * m[mOffset +  6] + m[mOffset +  7]);
+		dst.put(x * m[mOffset + 8] + y * m[mOffset + 9] + z * m[mOffset + 10] + m[mOffset + 11]);
+	}
+
+	private static void multiplyMN(FloatBuffer dst, FloatBuffer src, float[] m, int mOffset) {
+		float x = src.get();
+		float y = src.get();
+		float z = src.get();
+		dst.put(x * m[mOffset    ] + y * m[mOffset + 1] + z * m[mOffset +  2]);
+		dst.put(x * m[mOffset + 4] + y * m[mOffset + 5] + z * m[mOffset +  6]);
+		dst.put(x * m[mOffset + 8] + y * m[mOffset + 9] + z * m[mOffset + 10]);
 	}
 }
