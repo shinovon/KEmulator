@@ -46,7 +46,8 @@ $[Changelog]
 $ [2024.05.24]
 Fixed PlayerImpl.stop() race condition
 Implemented com.pantech.titan.PantechAudio
-
+Fixed alpha in nokiaui DirectUtils.createImage(III)
+Added Nokia M3D(O) implementation from FreeJ2ME
 
 $v2.16_2 [2024.05.23]
 Java 9+ support fix
