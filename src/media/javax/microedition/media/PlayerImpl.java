@@ -44,6 +44,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
     private long midiPosition;
     private final Object playLock = new Object();
     private Sequencer midiSequencer;
+    private boolean stopped;
 
     PlayerImpl() {
         loopCount = 1;
@@ -570,8 +571,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
             ((javazoom.jl.player.Player) sequence).stop();
             return;
         }
+        stopped = true;
         synchronized (playLock) {
-            playLock.notify();
+            playLock.notifyAll();
         }
         if (playerThread != null) {
             final Thread t = playerThread;
@@ -631,9 +633,11 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
                         b = false;
                     }
                     midiPlaying = true;
-                    synchronized (playLock) {
-                        playLock.wait();
-                    }
+                    if (!stopped)
+                        synchronized (playLock) {
+                            playLock.wait();
+                        }
+                    stopped = false;
                     complete = this.complete;
                     midiPlaying = false;
                     if (globalMidi) {
@@ -770,7 +774,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
     public void notifyCompleted() {
         complete = true;
         synchronized (playLock) {
-            playLock.notify();
+            playLock.notifyAll();
         }
     }
 

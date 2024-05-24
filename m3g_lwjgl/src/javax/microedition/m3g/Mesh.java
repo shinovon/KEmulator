@@ -113,7 +113,6 @@ public class Mesh extends Node {
                 Vector4f var8 = new Vector4f(ray[3], ray[4], ray[5], 1.0F);
                 Transform var9;
                 (var9 = new Transform()).set(transform);
-//                var9.getImpl_().method445();
                 var9.getImpl_().invert();
                 var9.getImpl_().transform(var7);
                 var9.getImpl_().transform(var8);

@@ -192,7 +192,7 @@ public abstract class Node extends Transformable {
                 (this.zRef == null ? var1 : this.zRef).getTransformTo(this.parent, var7);
                 var8.postTranslate(-var11[0], -var11[1], -var11[2]);
                 var7.preMultiply(var8);
-                method904(this.zTarget, var7, var2, var3, var4, var5, var9);
+                transformTarget(this.zTarget, var7, var2, var3, var4, var5, var9);
                 var9.w = 0.0F;
                 var10.setRotation(Vector4f.Z_AXIS, var9, (Vector4f) null);
             }
@@ -211,7 +211,7 @@ public abstract class Node extends Transformable {
                     var7.preMultiply(var8);
                 }
 
-                method904(this.yTarget, var7, var2, var3, var4, var5, var9);
+                transformTarget(this.yTarget, var7, var2, var3, var4, var5, var9);
                 var9.w = 0.0F;
                 if (this.zTarget != 144) {
                     Quaternion var13;
@@ -231,7 +231,7 @@ public abstract class Node extends Transformable {
         }
     }
 
-    private static void method904(int var0, Transform var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5, Vector4f var6) {
+    private static void transformTarget(int var0, Transform var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5, Vector4f var6) {
         switch (var0) {
             case 145:
                 var6.set(var2 == null ? Vector4f.ORIGIN : var2);

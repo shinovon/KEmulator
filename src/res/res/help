@@ -43,6 +43,18 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$ [2024.05.24]
+Fixed PlayerImpl.stop() race condition
+Implemented com.pantech.titan.PantechAudio
+
+
+$v2.16_2 [2024.05.23]
+Java 9+ support fix
+
+$v2.16_1 [2024.05.22]
+Fix RecordStore multiple opens
+Fixed crash with sync resize
+
 $v2.16 [2024.05.17]
 Fix mp3 endOfMedia event
 
