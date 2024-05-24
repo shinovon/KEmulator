@@ -111,22 +111,8 @@ public class Image {
     public static Image createImage(final int n, final int n2, int color) {
         if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
         final Image image;
-        (image = new Image(Emulator.getEmulator().newImage(n, n2, true))).mutable = true;
-        image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
-        // мега костыль
-        try {
-            Graphics g = image.getGraphics();
-            if (g != null) {
-                int alpha = color >> 24 & 0xFF;
-                color |= 0xFF000000;
-                g.setColor(color);
-                g.getImpl().setAlpha(alpha);
-                g.fillRect(0, 0, n, n2);
-                g.getImpl().setAlpha(255);
-                g.setColor(0);
-            }
-        } catch (Exception ignored) {
-        }
+        (image = new Image(Emulator.getEmulator().newImage(n, n2, true, color))).mutable = true;
+        image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true, color);
         return image;
     }
 
