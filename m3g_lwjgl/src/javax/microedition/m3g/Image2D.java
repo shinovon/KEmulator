@@ -16,7 +16,7 @@ public class Image2D extends Object3D {
     private int height;
     private byte[] imageData;
     private boolean mutable;
-    private static byte[] aByteArray38;
+    private static byte[] tmp;
     public boolean loaded;
     private int id;
 
@@ -93,16 +93,16 @@ public class Image2D extends Object3D {
             int var4 = var2 * bytesPerPixel(var1);
             this.imageData = new byte[var4 * var3];
             int var5;
-            if (aByteArray38 == null || aByteArray38.length < var4) {
-                aByteArray38 = new byte[var4];
+            if (tmp == null || tmp.length < var4) {
+                tmp = new byte[var4];
 
                 for (var5 = var4 - 1; var5 >= 0; --var5) {
-                    aByteArray38[var5] = -1;
+                    tmp[var5] = -1;
                 }
             }
 
             for (var5 = 0; var5 < var3; ++var5) {
-                System.arraycopy(aByteArray38, 0, this.imageData, var5 * var4, var4);
+                System.arraycopy(tmp, 0, this.imageData, var5 * var4, var4);
             }
 
         } else {

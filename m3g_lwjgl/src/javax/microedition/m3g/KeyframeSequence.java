@@ -19,11 +19,11 @@ public class KeyframeSequence extends Object3D {
     private int validRangeLast;
     private int duration;
     private int repeatMode;
-    private boolean aBoolean36;
-    private float[][] aFloatArrayArray147;
-    private float[][] aFloatArrayArray149;
-    private Quaternion[] anaArray146;
-    private Quaternion[] anaArray148;
+    private boolean dirty;
+    private float[][] inTangent;
+    private float[][] outTangent;
+    private Quaternion[] a;
+    private Quaternion[] b;
 
     protected Object3D duplicateObject() {
         KeyframeSequence var1;
@@ -31,21 +31,21 @@ public class KeyframeSequence extends Object3D {
         var1.aFloatArrayArray144 = new float[this.keyframeCount][this.componentCount];
         int var2;
         if (this.interpolationType == 179) {
-            for (var2 = 0; var2 < this.anaArray146.length; ++var2) {
-                var1.anaArray146[var2] = new Quaternion(this.anaArray146[var2]);
-                var1.anaArray148[var2] = new Quaternion(this.anaArray148[var2]);
+            for (var2 = 0; var2 < this.a.length; ++var2) {
+                var1.a[var2] = new Quaternion(this.a[var2]);
+                var1.b[var2] = new Quaternion(this.b[var2]);
             }
 
             for (var2 = 0; var2 < this.keyframeCount; ++var2) {
                 var1.aFloatArrayArray144[var2] = (float[]) this.aFloatArrayArray144[var2].clone();
             }
         } else if (this.interpolationType == 178) {
-            var1.aFloatArrayArray147 = new float[this.keyframeCount][this.componentCount];
-            var1.aFloatArrayArray149 = new float[this.keyframeCount][this.componentCount];
+            var1.inTangent = new float[this.keyframeCount][this.componentCount];
+            var1.outTangent = new float[this.keyframeCount][this.componentCount];
 
             for (var2 = 0; var2 < this.keyframeCount; ++var2) {
-                var1.aFloatArrayArray147[var2] = (float[]) this.aFloatArrayArray147[var2].clone();
-                var1.aFloatArrayArray149[var2] = (float[]) this.aFloatArrayArray149[var2].clone();
+                var1.inTangent[var2] = (float[]) this.inTangent[var2].clone();
+                var1.outTangent[var2] = (float[]) this.outTangent[var2].clone();
                 var1.aFloatArrayArray144[var2] = (float[]) this.aFloatArrayArray144[var2].clone();
             }
         }
@@ -54,7 +54,7 @@ public class KeyframeSequence extends Object3D {
     }
 
     public KeyframeSequence(int numKeyframes, int numComponents, int interpolation) {
-        if (numKeyframes >= 1 && numComponents >= 1 && method14(interpolation)) {
+        if (numKeyframes >= 1 && numComponents >= 1 && checkInterpolation(interpolation)) {
             if ((interpolation == SLERP || interpolation == SQUAD) && numComponents != 4) {
                 throw new IllegalArgumentException();
             } else {
@@ -67,17 +67,17 @@ public class KeyframeSequence extends Object3D {
                 this.validRangeFirst = 0;
                 this.validRangeLast = this.keyframeCount - 1;
                 this.duration = 0;
-                this.aBoolean36 = false;
+                this.dirty = false;
                 if (this.interpolationType == SPLINE) {
-                    this.aFloatArrayArray147 = new float[numKeyframes][numComponents];
-                    this.aFloatArrayArray149 = new float[numKeyframes][numComponents];
+                    this.inTangent = new float[numKeyframes][numComponents];
+                    this.outTangent = new float[numKeyframes][numComponents];
                 } else if (this.interpolationType == SQUAD) {
-                    this.anaArray146 = new Quaternion[numKeyframes];
-                    this.anaArray148 = new Quaternion[numKeyframes];
+                    this.a = new Quaternion[numKeyframes];
+                    this.b = new Quaternion[numKeyframes];
 
                     for (int var4 = 0; var4 < numKeyframes; ++var4) {
-                        this.anaArray146[var4] = new Quaternion();
-                        this.anaArray148[var4] = new Quaternion();
+                        this.a[var4] = new Quaternion();
+                        this.b[var4] = new Quaternion();
                     }
                 }
             }
@@ -86,7 +86,7 @@ public class KeyframeSequence extends Object3D {
         }
     }
 
-    private static boolean method14(int var0) {
+    private static boolean checkInterpolation(int var0) {
         return var0 >= LINEAR && var0 <= STEP;
     }
 
@@ -120,7 +120,7 @@ public class KeyframeSequence extends Object3D {
                     var4[3] = var5.w;
                 }
 
-                this.aBoolean36 = false;
+                this.dirty = false;
             } else {
                 throw new IllegalArgumentException();
             }
@@ -149,7 +149,7 @@ public class KeyframeSequence extends Object3D {
         if (var1 >= 0 && var1 < this.keyframeCount && var2 >= 0 && var2 < this.keyframeCount) {
             this.validRangeFirst = var1;
             this.validRangeLast = var2;
-            this.aBoolean36 = false;
+            this.dirty = false;
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -176,8 +176,8 @@ public class KeyframeSequence extends Object3D {
             throw new IllegalArgumentException();
         } else {
             this.repeatMode = var1;
-            if (this.aBoolean36) {
-                this.method122();
+            if (this.dirty) {
+                this.updateTangents();
             }
 
         }
@@ -188,8 +188,8 @@ public class KeyframeSequence extends Object3D {
     }
 
     protected int getSampleFrame(float var1, float[] var2) {
-        if (!this.aBoolean36) {
-            this.method110();
+        if (!this.dirty) {
+            this.validate();
         }
 
         float var4;
@@ -218,10 +218,10 @@ public class KeyframeSequence extends Object3D {
 
         while (true) {
             int var3 = var10000;
-            if (var10000 == this.validRangeLast || (float) this.keyframes[this.method13(var3)] > var1) {
+            if (var10000 == this.validRangeLast || (float) this.keyframes[this.keyframeAfter(var3)] > var1) {
                 if (var1 - (float) this.keyframes[var3] >= 1.0E-5F && this.interpolationType != STEP) {
-                    var4 = (var1 - (float) this.keyframes[var3]) / (float) this.method120(var3);
-                    int var5 = this.method13(var3);
+                    var4 = (var1 - (float) this.keyframes[var3]) / (float) this.timeDelta(var3);
+                    int var5 = this.keyframeAfter(var3);
                     switch (this.interpolationType) {
                         case LINEAR:
                             this.linearInterp(var2, var4, var3, var5);
@@ -242,15 +242,15 @@ public class KeyframeSequence extends Object3D {
                     return 1;
                 } else {
                     System.arraycopy(this.aFloatArrayArray144[var3], 0, var2, 0, this.componentCount);
-                    return this.interpolationType != STEP ? 1 : (int) ((float) this.method120(var3) - (var1 - (float) this.keyframes[var3]));
+                    return this.interpolationType != STEP ? 1 : (int) ((float) this.timeDelta(var3) - (var1 - (float) this.keyframes[var3]));
                 }
             }
 
-            var10000 = this.method13(var3);
+            var10000 = this.keyframeAfter(var3);
         }
     }
 
-    private void method110() {
+    private void validate() {
         if (this.duration <= 0) {
             throw new IllegalStateException();
         } else {
@@ -259,8 +259,8 @@ public class KeyframeSequence extends Object3D {
             while (true) {
                 int var1 = var10000;
                 if (var10000 == this.validRangeLast) {
-                    this.aBoolean36 = true;
-                    this.method122();
+                    this.dirty = true;
+                    this.updateTangents();
                     return;
                 }
 
@@ -289,8 +289,8 @@ public class KeyframeSequence extends Object3D {
         float[] frameB = this.aFloatArrayArray144[var4];
 
         for (int i = 0; i < out.length; ++i) {
-            float a = this.aFloatArrayArray149[var3][i];
-            float b = this.aFloatArrayArray147[var4][i];
+            float a = this.outTangent[var3][i];
+            float b = this.inTangent[var4][i];
             out[i] = spline(weight, frameA[i], frameB[i], a, b);
         }
     }
@@ -301,20 +301,20 @@ public class KeyframeSequence extends Object3D {
         return (2.0F * weight3 - 3.0F * weight2 + 1.0F) * a + (-2.0F * weight3 + 3.0F * weight2) * b + (weight3 - 2.0F * weight2 + weight) * var3 + (weight3 - weight2) * var4;
     }
 
-    private final void method115() {
+    private final void precalculateTangents() {
         int var1 = this.validRangeFirst;
 
         do {
-            float[] var2 = this.aFloatArrayArray144[this.method117(var1)];
-            float[] var3 = this.aFloatArrayArray144[this.method13(var1)];
-            float var4 = this.method113(var1);
-            float var5 = this.method116(var1);
+            float[] var2 = this.aFloatArrayArray144[this.keyframeBefore(var1)];
+            float[] var3 = this.aFloatArrayArray144[this.keyframeAfter(var1)];
+            float var4 = this.incomingTangentScale(var1);
+            float var5 = this.outgoingTangentScale(var1);
 
             for (int var6 = 0; var6 < this.componentCount; ++var6) {
-                this.aFloatArrayArray147[var1][var6] = 0.5F * (var3[var6] - var2[var6]) * var4;
-                this.aFloatArrayArray149[var1][var6] = 0.5F * (var3[var6] - var2[var6]) * var5;
+                this.inTangent[var1][var6] = 0.5F * (var3[var6] - var2[var6]) * var4;
+                this.outTangent[var1][var6] = 0.5F * (var3[var6] - var2[var6]) * var5;
             }
-        } while ((var1 = this.method13(var1)) != this.validRangeFirst);
+        } while ((var1 = this.keyframeAfter(var1)) != this.validRangeFirst);
 
     }
 
@@ -340,7 +340,7 @@ public class KeyframeSequence extends Object3D {
             Quaternion var5 = new Quaternion(this.aFloatArrayArray144[var3]);
             Quaternion var6 = new Quaternion(this.aFloatArrayArray144[var4]);
             Quaternion var7;
-            (var7 = new Quaternion()).squad(var2, var5, this.anaArray146[var3], this.anaArray148[var4], var6);
+            (var7 = new Quaternion()).squad(var2, var5, this.a[var3], this.b[var4], var6);
             var1[0] = var7.x;
             var1[1] = var7.y;
             var1[2] = var7.z;
@@ -348,7 +348,7 @@ public class KeyframeSequence extends Object3D {
         }
     }
 
-    private final void method119() {
+    private final void precalculateAB() {
         Quaternion var1 = new Quaternion();
         Quaternion var2 = new Quaternion();
         Quaternion var3 = new Quaternion();
@@ -359,74 +359,74 @@ public class KeyframeSequence extends Object3D {
         int var8 = this.validRangeFirst;
 
         do {
-            var3.set(this.aFloatArrayArray144[this.method117(var8)]);
+            var3.set(this.aFloatArrayArray144[this.keyframeBefore(var8)]);
             var1.set(this.aFloatArrayArray144[var8]);
-            var2.set(this.aFloatArrayArray144[this.method13(var8)]);
-            var4.set(this.aFloatArrayArray144[this.method13(this.method13(var8))]);
+            var2.set(this.aFloatArrayArray144[this.keyframeAfter(var8)]);
+            var4.set(this.aFloatArrayArray144[this.keyframeAfter(this.keyframeAfter(var8))]);
             var7.logDiff(var1, var2);
             var6.logDiff(var3, var1);
             var7.add(var6);
             var7.mul(0.5F);
             var5.set(var7);
-            var5.mul(this.method116(var8));
+            var5.mul(this.outgoingTangentScale(var8));
             var6.logDiff(var1, var2);
             var5.sub(var6);
             var5.mul(0.5F);
             var6.exp(var5);
-            this.anaArray146[var8].set(var1);
-            this.anaArray146[var8].mul(var6);
+            this.a[var8].set(var1);
+            this.a[var8].mul(var6);
             var5.set(var7);
-            var5.mul(this.method113(var8));
+            var5.mul(this.incomingTangentScale(var8));
             var6.logDiff(var3, var1);
             var6.sub(var5);
             var6.mul(0.5F);
             var6.exp(var6);
-            this.anaArray148[var8].set(var1);
-            this.anaArray148[var8].mul(var6);
-        } while ((var8 = this.method13(var8)) != this.validRangeFirst);
+            this.b[var8].set(var1);
+            this.b[var8].mul(var6);
+        } while ((var8 = this.keyframeAfter(var8)) != this.validRangeFirst);
 
     }
 
-    private float method113(int var1) {
+    private float incomingTangentScale(int var1) {
         if (this.repeatMode != 192 || var1 != this.validRangeFirst && var1 != this.validRangeLast) {
-            int var2 = this.method117(var1);
-            return 2.0F * (float) this.method120(var2) / (float) (this.method120(var1) + this.method120(var2));
+            int var2 = this.keyframeBefore(var1);
+            return 2.0F * (float) this.timeDelta(var2) / (float) (this.timeDelta(var1) + this.timeDelta(var2));
         } else {
             return 0.0F;
         }
     }
 
-    private float method116(int var1) {
+    private float outgoingTangentScale(int var1) {
         if (this.repeatMode != 192 || var1 != this.validRangeFirst && var1 != this.validRangeLast) {
-            int var2 = this.method117(var1);
-            return 2.0F * (float) this.method120(var1) / (float) (this.method120(var2) + this.method120(var1));
+            int var2 = this.keyframeBefore(var1);
+            return 2.0F * (float) this.timeDelta(var1) / (float) (this.timeDelta(var2) + this.timeDelta(var1));
         } else {
             return 0.0F;
         }
     }
 
-    private void method122() {
-        if (!this.aBoolean36) {
+    private void updateTangents() {
+        if (!this.dirty) {
             throw new Error();
         } else if (this.interpolationType == 178) {
-            this.method115();
+            this.precalculateTangents();
         } else {
             if (this.interpolationType == 179) {
-                this.method119();
+                this.precalculateAB();
             }
 
         }
     }
 
-    private int method13(int var1) {
+    private int keyframeAfter(int var1) {
         return var1 == this.validRangeLast ? this.validRangeFirst : (var1 == this.keyframes.length - 1 ? 0 : var1 + 1);
     }
 
-    private int method117(int var1) {
+    private int keyframeBefore(int var1) {
         return var1 == this.validRangeFirst ? this.validRangeLast : (var1 == 0 ? this.keyframes.length - 1 : var1 - 1);
     }
 
-    private int method120(int var1) {
-        return var1 == this.validRangeLast ? this.duration - this.keyframes[this.validRangeLast] + this.keyframes[this.validRangeFirst] : this.keyframes[this.method13(var1)] - this.keyframes[var1];
+    private int timeDelta(int var1) {
+        return var1 == this.validRangeLast ? this.duration - this.keyframes[this.validRangeLast] + this.keyframes[this.validRangeFirst] : this.keyframes[this.keyframeAfter(var1)] - this.keyframes[var1];
     }
 }
