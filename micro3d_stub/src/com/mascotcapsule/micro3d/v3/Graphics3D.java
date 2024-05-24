@@ -3,6 +3,8 @@ package com.mascotcapsule.micro3d.v3;
 import javax.microedition.lcdui.Graphics;
 
 public class Graphics3D {
+    public static boolean _STUB = true;
+
     public static final int COMMAND_LIST_VERSION_1_0 = -33554431;
     public static final int COMMAND_END = Integer.MIN_VALUE;
     public static final int COMMAND_NOP = -2130706432;

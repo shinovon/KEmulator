@@ -14,7 +14,7 @@ public interface IEmulatorPlatform {
 
     public void loadLibraries();
 
-    public void loadM3G();
+    public void load3D();
 
     boolean supportsM3G();
 

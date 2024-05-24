@@ -2,7 +2,6 @@ package emulator;
 
 import java.awt.Dimension;
 import java.io.*;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
@@ -724,8 +723,8 @@ public class Emulator {
         Emulator.emulatorimpl = new EmulatorImpl();
         parseLaunchArgs(commandLineArguments);
         // Force m3g engine to LWJGL in x64 build
-        if(platform.isX64()) Settings.g3d = 1;
-        platform.loadM3G();
+        if(platform.isX64()) Settings.micro3d = Settings.g3d = 1;
+        platform.load3D();
         vlcCheckerThread.start();
         Controllers.refresh(true);
         Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on " +
@@ -869,6 +868,10 @@ public class Emulator {
                 Settings.g3d = 1;
             } else if (key.equals("swerve")) {
                 Settings.g3d = 0;
+            } else if (key.equals("mascotgl")) {
+                Settings.micro3d = 1;
+            } else if (key.equals("mascotdll")) {
+                Settings.micro3d = 0;
             } else if (key.equalsIgnoreCase("log")) {
                 Settings.showLogFrame = true;
             } else if (key.equalsIgnoreCase("installed")) {
@@ -962,7 +965,11 @@ public class Emulator {
         return getAbsolutePath();
     }
 
-    public static void loadGame(final String s, final int engine2d, final int engine3d, final boolean b) {
+    public static void loadGame(String s, boolean b) {
+        loadGame(s, Settings.g2d, Settings.g3d, Settings.micro3d, b);
+    }
+
+    public static void loadGame(final String s, final int engine2d, final int engine3d, int mascotEngine, final boolean b) {
         ArrayList<String> cmd = new ArrayList<String>();
         getEmulator().getLogStream().println(s == null ? "Restarting" : ("loadGame: " + s));
         String javahome = System.getProperty("java.home");
@@ -1013,6 +1020,7 @@ public class Emulator {
 
         cmd.add(engine2d == 0 ? "-swt" : "-awt");
         cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
+        cmd.add(mascotEngine == 0 ? "-mascotdll" : "-mascotgl");
 
         if(installed) cmd.add("-installed");
 

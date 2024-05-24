@@ -1,13 +1,16 @@
 package emulator;
 
 import emulator.debug.MemoryViewImage;
+import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
+import ru.woesss.j2me.micro3d.TextureImpl;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.IntBuffer;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
 
@@ -86,7 +89,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public boolean supportsMascotCapsule() {
-        return false;
+        return true;
     }
 
     public boolean supportsM3G() {
@@ -94,6 +97,23 @@ public class EmulatorPlatform implements IEmulatorPlatform {
     }
 
     public MemoryViewImage convertMicro3DTexture(Object o) {
+        try {
+            Class cls = o.getClass();
+            TextureImpl impl = (TextureImpl) cls.getField("impl").get(o);
+            if (impl == null)
+                return null;
+            IntBuffer ib = impl.image.getRaster().asIntBuffer();
+            int w = impl.getWidth(), h = impl.getHeight();
+            IImage img = Emulator.getEmulator().newImage(w, h, true);
+            int[] data = img.getData();
+            int i = data.length - w;
+
+            for (int j = h; j > 0; --j) {
+                ib.get(data, i, w);
+                i -= w;
+            }
+            return new MemoryViewImage(img);
+        } catch (Exception ignored) {}
         return null;
     }
 
@@ -210,23 +230,38 @@ public class EmulatorPlatform implements IEmulatorPlatform {
         }
     }
 
-    public void loadM3G() {
-        if(!supportsM3G()) return;
-        boolean m3gLoaded = false;
-        try {
-            Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
-            Field f = null;
+    public void load3D() {
+        if(supportsM3G()) {
+            // load m3g
+            boolean m3gLoaded = false;
             try {
-                f = cls.getField("_STUB");
-                m3gLoaded = !f.getBoolean(null);
-            } catch (Throwable ignored) {
-                m3gLoaded = true;
+                Class cls = Class.forName("javax.microedition.m3g.Graphics3D");
+                try {
+                    m3gLoaded = !cls.getField("_STUB").getBoolean(null);
+                } catch (Throwable e) {
+                    m3gLoaded = true;
+                }
+            } catch (Throwable ignored) {}
+            if(!m3gLoaded) {
+                // TODO
+                addToClassPath("m3g_lwjgl.jar");
             }
-        } catch (Throwable ignored) {
         }
-        if(!m3gLoaded) {
-            // TODO
-            addToClassPath("m3g_lwjgl.jar");
+
+        // load mascot
+        if(supportsMascotCapsule()) {
+            boolean mascotLoaded = false;
+            try {
+                Class cls = Class.forName("com.mascotcapsule.micro3d.v3.Graphics3D");
+                try {
+                    mascotLoaded = !cls.getField("_STUB").getBoolean(null);
+                } catch (Throwable e) {
+                    mascotLoaded = true;
+                }
+            } catch (Throwable ignored) {}
+            if (!mascotLoaded) {
+                addToClassPath("micro3d_gl.jar");
+            }
         }
     }
 

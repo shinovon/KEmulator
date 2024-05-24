@@ -3,7 +3,6 @@ package emulator.graphics3D;
 public final class Transform3D {
     public float[] m_matrix = new float[16];
     private static final float[] defaultMatrix = new float[]{1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F};
-    private float[] aFloatArray617 = new float[4];
 
     public Transform3D() {
         this.setIdentity();

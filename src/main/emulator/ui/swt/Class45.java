@@ -13,6 +13,6 @@ final class Class45 extends SelectionAdapter {
 
     public final void widgetSelected(final SelectionEvent selectionEvent) {
         Settings.recordedKeysFile = null;
-        Emulator.loadGame(Settings.recentJars[this.anInt782], Settings.g2d, 1, false);
+        Emulator.loadGame(Settings.recentJars[this.anInt782], false);
     }
 }
