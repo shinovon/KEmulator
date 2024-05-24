@@ -45,6 +45,8 @@ log.txt      log file
 $[Changelog]
 $ [2024.05.24]
 Fixed PlayerImpl.stop() race condition
+Implemented com.pantech.titan.PantechAudio
+
 
 $v2.16_2 [2024.05.23]
 Java 9+ support fix
