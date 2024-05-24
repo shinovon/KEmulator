@@ -3,7 +3,8 @@
 
 -libraryjars 'G:\Progs\KEmulator103mod\jre\lib\rt.jar'
 -libraryjars '..\..\natives\swt-win32-x86.jar'
--libraryjars '..\..\home\m3g_stub.jar'
+#-libraryjars '..\..\home\m3g_stub.jar'
+#-libraryjars '..\..\home\micro3d_stub.jar'
 
 -target 1.8
 -printmapping '.\mapping.txt'
