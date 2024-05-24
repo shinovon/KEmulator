@@ -487,7 +487,7 @@ public final class Property implements IProperty {
             this.right = properties.getProperty("KEY_RIGHT", "-4");
             Settings.g2d = (properties.getProperty("2D_Graphics_Engine", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
             Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("LWJ") ? 1 : 0);
-            Settings.micro3d = (properties.getProperty("Micro3D_Engine", "GL").equalsIgnoreCase("GL") ? 1 : 0);
+            Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("GL") ? 1 : 0);
 
             Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
 
