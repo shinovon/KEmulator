@@ -213,12 +213,13 @@ public final class EmulatorScreen implements
         }
         try {
             this.shell.setImage(new Image(null, inputStream));
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public final void showMessage(final String message) {
-        setWindowOnTop(getHandle(shell), true);
+        try {
+            setWindowOnTop(getHandle(shell), true);
+        } catch (Throwable ignored) {}
         final MessageBox messageBox;
         (messageBox = new MessageBox(this.shell)).setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
         messageBox.setMessage(message);
@@ -613,8 +614,7 @@ public final class EmulatorScreen implements
                 f = new Font(shell.getDisplay(), fd);
             }
             shell.setFont(f);
-        } catch (Error ignored) {
-        }
+        } catch (Error ignored) {}
         this.method588();
         (this.aCLabel970 = new CLabel(this.shell, 0)).setText("\t");
         this.aCLabel970.setLayoutData(layoutData3);
@@ -1123,8 +1123,7 @@ public final class EmulatorScreen implements
                     if ((jadPath = Emulator.getJadPath()) != null) {
                         Runtime.getRuntime().exec("notepad.exe " + jadPath);
                     }
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
                 this.updatePauseState();
                 return;
             }
@@ -1200,7 +1199,9 @@ public final class EmulatorScreen implements
             }
             if (menuItem == this.alwaysOnTopMenuItem) {
                 Settings.alwaysOnTop = this.alwaysOnTopMenuItem.getSelection();
-                setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+                try {
+                    setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+                } catch (Throwable ignored) {}
                 return;
             }
             if (menuItem == this.logMenuItem) {
@@ -1255,15 +1256,23 @@ public final class EmulatorScreen implements
                 return;
             }
             if (menuItem == this.sensorMenuItem) {
-                final File file3;
-                if ((file3 = new File(Emulator.getAbsolutePath() + "/sensorsimulator.jar")).exists()) {
+                final File f;
+                if ((f = new File(Emulator.getAbsolutePath() + "/sensorsimulator.jar")).exists()) {
                     try {
-                        final String[] array;
-                        (array = new String[2])[0] = "cmd.exe";
-                        array[1] = "/c \" java -jar " + file3.getAbsolutePath() + " \"";
-                        Runtime.getRuntime().exec(array);
-                    } catch (Exception ignored) {
-                    }
+                        if (Emulator.isX64()) {
+                            String javahome = System.getProperty("java.home");
+                            Runtime.getRuntime().exec(new String[] {
+                                    javahome == null || javahome.length() < 1 ? "java" : (javahome + "/bin/java"),
+                                    "-jar",
+                                    f.getAbsolutePath()
+                            });
+                        } else {
+                            final String[] array;
+                            (array = new String[2])[0] = "cmd.exe";
+                            array[1] = "/c \" java -jar " + f.getAbsolutePath() + " \"";
+                            Runtime.getRuntime().exec(array);
+                        }
+                    } catch (Exception ignored) {}
                 }
                 return;
             }
@@ -1393,8 +1402,7 @@ public final class EmulatorScreen implements
         // TODO
         try {
             OS.SetWindowPos((int) handle, b ? -1 : -2, 0, 0, 0, 0, 19);
-        } catch (Throwable ignored) {
-        }
+        } catch (Throwable ignored) {}
     }
 
     private void updatePauseState() {
@@ -1571,9 +1579,7 @@ public final class EmulatorScreen implements
                 gc.setForeground(EmulatorScreen.display.getSystemColor(1));
                 gc.drawRectangle(this.mouseXPress, this.mouseYPress, this.mouseXRelease - this.mouseXPress, this.mouseYRelease - this.mouseYPress);
                 OS_SetROP2(gc, 13);
-            } catch (Throwable ignored) {
-
-            }
+            } catch (Throwable ignored) {}
         }
     }
 
