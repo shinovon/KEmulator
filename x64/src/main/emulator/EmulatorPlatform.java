@@ -78,6 +78,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
                 + "\tWMA 1.0 (JSR120)\n"
                 + "\tM3G 1.1 (JSR184)\n"
                 + "\tOpenGL ES (JSR239)\n"
+                + "\tMascotCapsule v3\n"
                 + "\tSoftBank MEXA"
                 ;
     }
