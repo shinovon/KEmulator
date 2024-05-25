@@ -71,7 +71,9 @@ abstract class Program {
 		String vertexShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(vertexShader)), StandardCharsets.UTF_8);
 		String fragmentShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(fragmentShader)), StandardCharsets.UTF_8);
 
+		System.out.println("loadShader " + vertexShader);
 		int vertexId = loadShader(GL_VERTEX_SHADER, vertexShaderCode);
+		System.out.println("loadShader " + fragmentShader);
 		int fragmentId = loadShader(GL_FRAGMENT_SHADER, fragmentShaderCode);
 
 		int program = glCreateProgram();             // create empty OpenGL Program
