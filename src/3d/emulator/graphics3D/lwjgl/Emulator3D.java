@@ -68,8 +68,8 @@ public final class Emulator3D implements IGraphics3D {
     private boolean exiting;
     private String contextRes;
     private Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
-    private boolean useDisplay;
-    private boolean useWgl;
+    private static boolean useDisplay;
+    private static boolean useWgl;
 
     private JFrame tmpFrame;
     private Canvas tmpCanvas;
@@ -245,7 +245,7 @@ public final class Emulator3D implements IGraphics3D {
         }
     }
 
-    private boolean useGL11() {
+    public static boolean useGL11() {
         return useWgl;
     }
 

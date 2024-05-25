@@ -41,6 +41,7 @@ import javax.microedition.lcdui.Graphics;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.swt.Graphics2DSWT;
+import emulator.graphics3D.lwjgl.Emulator3D;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -195,6 +196,26 @@ public class Render {
 			glScissor(l, t, w, h);
 		}
 		glClear(GL_DEPTH_BUFFER_BIT);
+
+		boolean aa = false;
+
+		if (Settings.m3gAA == Settings.AA_OFF) aa = false;
+		else if (Settings.m3gAA == Settings.AA_ON) aa = true;
+
+		if (aa) {
+			GL11.glEnable(GL_POINT_SMOOTH);
+			GL11.glEnable(GL_LINE_SMOOTH);
+			GL11.glEnable(GL_POLYGON_SMOOTH);
+			if(!Emulator3D.useGL11())
+				GL11.glEnable(GL_MULTISAMPLE);
+		} else {
+			GL11.glDisable(GL_POINT_SMOOTH);
+			GL11.glDisable(GL_LINE_SMOOTH);
+			GL11.glDisable(GL_POLYGON_SMOOTH);
+			if(!Emulator3D.useGL11())
+				GL11.glDisable(GL_MULTISAMPLE);
+		}
+
 		backCopied = false;
 		egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 	}
