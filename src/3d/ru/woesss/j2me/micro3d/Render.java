@@ -197,10 +197,7 @@ public class Render {
 		}
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		boolean aa = false;
-
-		if (Settings.m3gAA == Settings.AA_OFF) aa = false;
-		else if (Settings.m3gAA == Settings.AA_ON) aa = true;
+		boolean aa = Settings.m3gAA == Settings.AA_ON;
 
 		if (aa) {
 			GL11.glEnable(GL_POINT_SMOOTH);
