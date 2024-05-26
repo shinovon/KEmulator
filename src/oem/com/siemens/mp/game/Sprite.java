@@ -65,7 +65,7 @@ public class Sprite extends GraphicObject {
 //			g.drawImage(pixels, 0, 0, 0);
 //			g.setColor(0);
 //		} else {
-			sprite = pixels;
+		sprite = pixels;
 //		}
 		frameHeight = height / numFrames;
 		frameBounds = new Rectangle(0, 0, width, frameHeight);

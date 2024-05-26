@@ -20,13 +20,13 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface MailListener {
-    int SKYMAIL = 1;
-    int RELAY = 2;
-    int GREETING = 3;
-    int LONGMAIL = 4;
-    int WEB = 5;
-    int CBS_DEFINE = 6;
-    int CBS_PL = 7;
+	int SKYMAIL = 1;
+	int RELAY = 2;
+	int GREETING = 3;
+	int LONGMAIL = 4;
+	int WEB = 5;
+	int CBS_DEFINE = 6;
+	int CBS_PL = 7;
 
-    void received(String a, String b, int c);
+	void received(String a, String b, int c);
 }

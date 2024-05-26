@@ -20,7 +20,7 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface BodyOpenListener {
-    void bodyOpened();
+	void bodyOpened();
 
-    void bodyClosed();
+	void bodyClosed();
 }

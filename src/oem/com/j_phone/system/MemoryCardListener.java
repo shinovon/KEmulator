@@ -20,7 +20,7 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface MemoryCardListener {
-    void memoryCardInserted();
+	void memoryCardInserted();
 
-    void memoryCardRemoved();
+	void memoryCardRemoved();
 }

@@ -5,8 +5,8 @@ package ru.nnproject.kemulator.notificationapi;
  */
 public class NotificationException extends Exception {
 
-    public NotificationException(String string) {
-        super(string);
-    }
+	public NotificationException(String string) {
+		super(string);
+	}
 
 }

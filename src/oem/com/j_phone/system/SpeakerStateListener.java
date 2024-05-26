@@ -20,7 +20,7 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface SpeakerStateListener {
-    void speakerInternal();
+	void speakerInternal();
 
-    void speakerExternal();
+	void speakerExternal();
 }

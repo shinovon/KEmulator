@@ -19,17 +19,17 @@ package com.jblend.media.smaf.phrase;
 import java.io.IOException;
 
 abstract class PhraseBase {
-    public PhraseBase(byte[] data) {
-    }
+	public PhraseBase(byte[] data) {
+	}
 
-    public PhraseBase(String url) throws IOException {
-    }
+	public PhraseBase(String url) throws IOException {
+	}
 
-    public int getSize() {
-        return 0;
-    }
+	public int getSize() {
+		return 0;
+	}
 
-    public int getUseTracks() {
-        return 0;
-    }
+	public int getUseTracks() {
+		return 0;
+	}
 }

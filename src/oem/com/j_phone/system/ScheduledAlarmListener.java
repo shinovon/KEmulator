@@ -17,5 +17,5 @@
 package com.j_phone.system;
 
 public interface ScheduledAlarmListener {
-    void notice(String a);
+	void notice(String a);
 }

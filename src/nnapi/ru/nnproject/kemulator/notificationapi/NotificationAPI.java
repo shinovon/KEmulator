@@ -9,16 +9,16 @@ import emulator.NotificationImpl;
  */
 public class NotificationAPI {
 
-    public final static int INFO = 0;
-    public final static int WARNING = 1;
-    public final static int ERROR = 2;
-    public final static int NONE = 3;
+	public final static int INFO = 0;
+	public final static int WARNING = 1;
+	public final static int ERROR = 2;
+	public final static int NONE = 3;
 
-    public static AbstractNotification getInstance(String name) {
-        return new NotificationImpl(name);
-    }
+	public static AbstractNotification getInstance(String name) {
+		return new NotificationImpl(name);
+	}
 
-    public static boolean isSupported() {
-        return SystemTray.isSupported();
-    }
+	public static boolean isSupported() {
+		return SystemTray.isSupported();
+	}
 }

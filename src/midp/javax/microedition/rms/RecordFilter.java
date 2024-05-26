@@ -1,5 +1,5 @@
 package javax.microedition.rms;
 
 public interface RecordFilter {
-    boolean matches(final byte[] p0);
+	boolean matches(final byte[] p0);
 }

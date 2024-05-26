@@ -1,5 +1,5 @@
 package javax.wireless.messaging;
 
 public interface MessageListener {
-    void notifyIncomingMessage(final MessageConnection p0);
+	void notifyIncomingMessage(final MessageConnection p0);
 }

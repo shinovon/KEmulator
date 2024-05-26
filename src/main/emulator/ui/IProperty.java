@@ -1,35 +1,35 @@
 package emulator.ui;
 
 public interface IProperty {
-    String getRmsFolderPath();
+	String getRmsFolderPath();
 
-    String getDefaultFontName();
+	String getDefaultFontName();
 
-    int getFontSmallSize();
+	int getFontSmallSize();
 
-    int getFontMediumSize();
+	int getFontMediumSize();
 
-    int getFontLargeSize();
+	int getFontLargeSize();
 
-    void setDefaultFontName(final String p0);
+	void setDefaultFontName(final String p0);
 
-    void setFontSmallSize(final int p0);
+	void setFontSmallSize(final int p0);
 
-    void getFontMediumSize(final int p0);
+	void getFontMediumSize(final int p0);
 
-    void getFontLargeSize(final int p0);
+	void getFontLargeSize(final int p0);
 
-    void resetDeviceName();
+	void resetDeviceName();
 
-    void setCustomProperties();
+	void setCustomProperties();
 
-    void updateCustomProperties();
+	void updateCustomProperties();
 
-    void saveProperties();
+	void saveProperties();
 
-    void loadProperties();
+	void loadProperties();
 
-    boolean updateController();
+	boolean updateController();
 
-    String getOldRmsPath();
+	String getOldRmsPath();
 }

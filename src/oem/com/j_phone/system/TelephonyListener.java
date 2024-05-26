@@ -20,7 +20,7 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface TelephonyListener {
-    void ring(String a, String b);
+	void ring(String a, String b);
 
-    void ignored();
+	void ignored();
 }

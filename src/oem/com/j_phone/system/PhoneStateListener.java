@@ -20,10 +20,10 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface PhoneStateListener {
-    int UPDATE_RECEIVE_MAILBOX = 1;
-    int UPDATE_SEND_MAILBOX = 2;
-    int UPDATE_ADDRESSBOOK = 4;
-    int UPDATE_FILE = 8;
+	int UPDATE_RECEIVE_MAILBOX = 1;
+	int UPDATE_SEND_MAILBOX = 2;
+	int UPDATE_ADDRESSBOOK = 4;
+	int UPDATE_FILE = 8;
 
-    void phoneStateUpdated(int a);
+	void phoneStateUpdated(int a);
 }

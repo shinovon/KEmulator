@@ -17,5 +17,5 @@
 package com.jblend.media.smaf.phrase;
 
 public interface PhraseTrackListener {
-    void eventOccurred(int event);
+	void eventOccurred(int event);
 }

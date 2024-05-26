@@ -17,17 +17,17 @@
 package com.jblend.media.smaf.phrase;
 
 public class AudioPhraseTrack extends PhraseTrackBase {
-    private AudioPhrase phrase;
+	private AudioPhrase phrase;
 
-    AudioPhraseTrack(int id) {
-        super(id);
-    }
+	AudioPhraseTrack(int id) {
+		super(id);
+	}
 
-    public void setPhrase(AudioPhrase p) {
-        phrase = p;
-    }
+	public void setPhrase(AudioPhrase p) {
+		phrase = p;
+	}
 
-    public AudioPhrase getPhrase() {
-        return phrase;
-    }
+	public AudioPhrase getPhrase() {
+		return phrase;
+	}
 }

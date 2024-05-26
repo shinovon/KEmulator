@@ -4,8 +4,8 @@ import javax.microedition.location.LocationException;
 import javax.microedition.location.LocationProvider;
 
 public final class LocationUtil {
-    public static LocationProvider getLocationProvider(int[] paramArrayOfInt, String paramString)
-            throws SecurityException, LocationException {
-        return null;
-    }
+	public static LocationProvider getLocationProvider(int[] paramArrayOfInt, String paramString)
+			throws SecurityException, LocationException {
+		return null;
+	}
 }

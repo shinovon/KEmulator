@@ -3,13 +3,13 @@ package javax.bluetooth;
 import java.io.*;
 
 public class ServiceRegistrationException extends IOException {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public ServiceRegistrationException() {
-        super();
-    }
+	public ServiceRegistrationException() {
+		super();
+	}
 
-    public ServiceRegistrationException(final String s) {
-        super(s);
-    }
+	public ServiceRegistrationException(final String s) {
+		super(s);
+	}
 }

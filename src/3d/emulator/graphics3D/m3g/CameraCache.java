@@ -6,35 +6,35 @@ import javax.microedition.m3g.Camera;
 import javax.microedition.m3g.Transform;
 
 public final class CameraCache {
-    public static Camera camera;
+	public static Camera camera;
 
-    private static Transform camTrans = new Transform();
-    public static Transform invCam = new Transform();
+	private static Transform camTrans = new Transform();
+	public static Transform invCam = new Transform();
 
     /*private static final float[][] frustum = new float[6][16];
     private static final float[] invCamf = new float[16], proj = new float[16], clip = new float[16];*/
 
-    public static void setCamera(Camera cam, Transform transform) {
-        if (transform != null) {
-            camTrans.set(transform);
-            invCam.set(transform);
-            ((Transform3D) invCam.getImpl()).invert();
-        } else {
-            camTrans.setIdentity();
-            invCam.setIdentity();
-        }
+	public static void setCamera(Camera cam, Transform transform) {
+		if (transform != null) {
+			camTrans.set(transform);
+			invCam.set(transform);
+			((Transform3D) invCam.getImpl()).invert();
+		} else {
+			camTrans.setIdentity();
+			invCam.setIdentity();
+		}
 
-        camera = cam;
-        //setFrustum();
-    }
+		camera = cam;
+		//setFrustum();
+	}
 
-    public static Camera getCamera(Transform transform) {
-        if (transform != null) {
-            transform.set(camTrans);
-        }
+	public static Camera getCamera(Transform transform) {
+		if (transform != null) {
+			transform.set(camTrans);
+		}
 
-        return camera;
-    }
+		return camera;
+	}
 
     /*private static void setFrustum() {
         camTrans.get(invCamf);

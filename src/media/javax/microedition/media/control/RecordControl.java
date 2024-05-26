@@ -4,19 +4,19 @@ import javax.microedition.media.*;
 import java.io.*;
 
 public interface RecordControl extends Control {
-    void commit();
+	void commit();
 
-    String getContentType();
+	String getContentType();
 
-    void reset();
+	void reset();
 
-    void setRecordLocation(final String p0);
+	void setRecordLocation(final String p0);
 
-    int setRecordSizeLimit(final int p0);
+	int setRecordSizeLimit(final int p0);
 
-    void setRecordStream(final OutputStream p0);
+	void setRecordStream(final OutputStream p0);
 
-    void startRecord();
+	void startRecord();
 
-    void stopRecord();
+	void stopRecord();
 }

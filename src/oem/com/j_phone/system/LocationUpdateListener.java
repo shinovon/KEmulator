@@ -20,8 +20,8 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface LocationUpdateListener {
-    int UPDATE_SUCCEEDED = 0;
-    int UPDATE_FAILED = -1;
+	int UPDATE_SUCCEEDED = 0;
+	int UPDATE_FAILED = -1;
 
-    void locationUpdated(int a);
+	void locationUpdated(int a);
 }

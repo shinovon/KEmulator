@@ -19,11 +19,11 @@ package com.jblend.media.smaf.phrase;
 import java.io.IOException;
 
 public class Phrase extends PhraseBase {
-    public Phrase(byte[] data) {
-        super(data);
-    }
+	public Phrase(byte[] data) {
+		super(data);
+	}
 
-    public Phrase(String url) throws IOException {
-        super(url);
-    }
+	public Phrase(String url) throws IOException {
+		super(url);
+	}
 }

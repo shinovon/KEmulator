@@ -3,11 +3,11 @@ package javax.microedition.media.control;
 import javax.microedition.media.*;
 
 public interface RateControl extends Control {
-    int getMaxRate();
+	int getMaxRate();
 
-    int getMinRate();
+	int getMinRate();
 
-    int getRate();
+	int getRate();
 
-    int setRate(final int p0);
+	int setRate(final int p0);
 }

@@ -17,54 +17,54 @@
 package com.jblend.media.smaf.phrase;
 
 public class PhrasePlayer {
-    private static final PhrasePlayer phrasePlayer = new PhrasePlayer();
+	private static final PhrasePlayer phrasePlayer = new PhrasePlayer();
 
-    protected int trackCount;
-    protected int audioTrackCount;
+	protected int trackCount;
+	protected int audioTrackCount;
 
-    public static PhrasePlayer getPlayer() {
-        return phrasePlayer;
-    }
+	public static PhrasePlayer getPlayer() {
+		return phrasePlayer;
+	}
 
-    public void disposePlayer() {
-    }
+	public void disposePlayer() {
+	}
 
-    public PhraseTrack getTrack() {
-        return new PhraseTrack(trackCount++);
-    }
+	public PhraseTrack getTrack() {
+		return new PhraseTrack(trackCount++);
+	}
 
-    public AudioPhraseTrack getAudioTrack() {
-        return new AudioPhraseTrack(audioTrackCount++);
-    }
+	public AudioPhraseTrack getAudioTrack() {
+		return new AudioPhraseTrack(audioTrackCount++);
+	}
 
-    public int getTrackCount() {
-        return 16;
-    }
+	public int getTrackCount() {
+		return 16;
+	}
 
-    public int getAudioTrackCount() {
-        return 16;
-    }
+	public int getAudioTrackCount() {
+		return 16;
+	}
 
-    public PhraseTrack getTrack(int track) {
-        return null;
-    }
+	public PhraseTrack getTrack(int track) {
+		return null;
+	}
 
-    public AudioPhraseTrack getAudioTrack(int track) {
-        return null;
-    }
+	public AudioPhraseTrack getAudioTrack(int track) {
+		return null;
+	}
 
-    public void disposeTrack(PhraseTrack t) {
-    }
+	public void disposeTrack(PhraseTrack t) {
+	}
 
-    public void disposeAudioTrack(AudioPhraseTrack t) {
-    }
+	public void disposeAudioTrack(AudioPhraseTrack t) {
+	}
 
-    public void kill() {
-    }
+	public void kill() {
+	}
 
-    public void pause() {
-    }
+	public void pause() {
+	}
 
-    public void resume() {
-    }
+	public void resume() {
+	}
 }

@@ -1,17 +1,17 @@
 package javax.microedition.sensor;
 
 public interface Channel {
-    void addCondition(final ConditionListener p0, final Condition p1);
+	void addCondition(final ConditionListener p0, final Condition p1);
 
-    ChannelInfo getChannelInfo();
+	ChannelInfo getChannelInfo();
 
-    Condition[] getConditions(final ConditionListener p0);
+	Condition[] getConditions(final ConditionListener p0);
 
-    String getChannelUrl();
+	String getChannelUrl();
 
-    void removeAllConditions();
+	void removeAllConditions();
 
-    void removeCondition(final ConditionListener p0, final Condition p1);
+	void removeCondition(final ConditionListener p0, final Condition p1);
 
-    void removeConditionListener(final ConditionListener p0);
+	void removeConditionListener(final ConditionListener p0);
 }

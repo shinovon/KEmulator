@@ -20,5 +20,5 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface StyleChangedListener {
-    void styleChanged(int a);
+	void styleChanged(int a);
 }

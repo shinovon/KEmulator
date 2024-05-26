@@ -4,10 +4,10 @@ import javax.microedition.lcdui.Font;
 
 public abstract class FreeSizeFontInvoker {
 
-    public static void setInvoker(FreeSizeFontInvoker invoker) {
-    }
+	public static void setInvoker(FreeSizeFontInvoker invoker) {
+	}
 
-    public static Font getFont(int aFace, int aStyle, int aHeight) {
-        return Font.getFont(aFace, 0, 0).deriveFont(aStyle, aHeight);
-    }
+	public static Font getFont(int aFace, int aStyle, int aHeight) {
+		return Font.getFont(aFace, 0, 0).deriveFont(aStyle, aHeight);
+	}
 }

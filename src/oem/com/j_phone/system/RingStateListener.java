@@ -20,7 +20,7 @@ package com.j_phone.system;
  * @noinspection unused
  */
 public interface RingStateListener {
-    void ringStarted();
+	void ringStarted();
 
-    void ringStopped();
+	void ringStopped();
 }
