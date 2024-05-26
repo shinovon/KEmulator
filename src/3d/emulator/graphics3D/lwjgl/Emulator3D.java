@@ -30,12 +30,11 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 public final class Emulator3D implements IGraphics3D {
 
     private static Emulator3D instance;
-    private LWJGLUtility memoryBuffers;
-    private RenderPipe renderPipe;
+    private final LWJGLUtility memoryBuffers;
+    private final RenderPipe renderPipe;
     private Object target;
     private boolean depthBufferEnabled;
     private int hints;
-//    private static Hashtable contexts = new Hashtable();
     private static int targetWidth;
     private static int targetHeight;
     private static Pbuffer pbufferContext;
@@ -43,7 +42,7 @@ public final class Emulator3D implements IGraphics3D {
     private static BufferedImage awtBufferImage;
     private static ImageData swtBufferImage;
     public static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
-    private static Hashtable properties = new Hashtable();
+    private static final Hashtable properties = new Hashtable();
     private static PixelFormat pixelFormat;
     private long wglContextHandle;
     private Image swtImage;
@@ -55,8 +54,8 @@ public final class Emulator3D implements IGraphics3D {
     private int viewportWidth;
     private int viewportHeight;
 
-    private static Vector<Integer> usedGLTextures = new Vector();
-    private static Vector<Integer> unusedGLTextures = new Vector();
+    private static final Vector<Integer> usedGLTextures = new Vector();
+    private static final Vector<Integer> unusedGLTextures = new Vector();
 
     public static final int MaxViewportWidth = 2048;
     public static final int MaxViewportHeight = 2048;
@@ -67,11 +66,10 @@ public final class Emulator3D implements IGraphics3D {
     public static final int MaxTransformsPerVertex = 4;
     private boolean exiting;
     private String contextRes;
-    private Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
+    private final Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
     private static boolean useDisplay;
     private static boolean useWgl;
 
-    private JFrame tmpFrame;
     private Canvas tmpCanvas;
 
     private Emulator3D() {
@@ -137,6 +135,7 @@ public final class Emulator3D implements IGraphics3D {
         }
         int w;
         int h;
+
         if (target instanceof Graphics) {
             this.target = target;
             w = ((Graphics) this.target).getImage().getWidth();
@@ -179,7 +178,7 @@ public final class Emulator3D implements IGraphics3D {
                     e.printStackTrace();
                     try {
                         // мега костыль
-                        tmpFrame = new JFrame();
+                        JFrame tmpFrame = new JFrame();
                         tmpCanvas = new Canvas();
                         tmpCanvas.setBounds(0, 0, w, h);
                         tmpFrame.add(tmpCanvas);
@@ -294,48 +293,49 @@ public final class Emulator3D implements IGraphics3D {
             GLContext.useContext(null);
         } catch (Exception ignored) {}
     }
+    
+    public void swapBuffers() {
+        swapBuffers(false, 0, 0, targetWidth, targetHeight);
+    }
 
-    public final void swapBuffers() {
+    public final void swapBuffers(boolean flip, int x, int y, int width, int height) {
         if (this.target != null) {
-            int var3;
-            int var4;
-            int var5;
             if (this.target instanceof Image2D) {
                 Image2D var9 = (Image2D) this.target;
                 buffer.rewind();
-                GL11.glReadPixels(0, 0, targetWidth, targetHeight, 6408, 5121, buffer);
-                byte[] var11 = new byte[targetWidth * targetHeight * 4];
-                var3 = targetWidth << 2;
-                var4 = var11.length - var3;
+                GL11.glReadPixels(x, y, width, height, 6408, 5121, buffer);
+                byte[] var11 = new byte[width * height * 4];
+                int w = width << 2;
+                int off = var11.length - w;
 
-                for (var5 = targetHeight; var5 > 0; --var5) {
-                    buffer.get(var11, var4, var3);
-                    var4 -= var3;
+                for (int i = height; i > 0; --i) {
+                    buffer.get(var11, off, w);
+                    off -= w;
                 }
 
                 if (var9.getFormat() == 100) {
-                    var9.set(0, 0, var9.getWidth(), var9.getHeight(), var11);
+                    var9.set(x, y, var9.getWidth(), var9.getHeight(), var11);
                 } else {
-                    byte[] var13 = new byte[var9.getWidth() * var9.getHeight() * 3];
+                    byte[] data = new byte[var9.getWidth() * var9.getHeight() * 3];
                     int var6 = var11.length - 1;
 
-                    for (int var7 = var13.length - 1; var7 >= 0; var13[var7--] = var11[var6--]) {
+                    for (int var7 = data.length - 1; var7 >= 0; data[var7--] = var11[var6--]) {
                         --var6;
-                        var13[var7--] = var11[var6--];
-                        var13[var7--] = var11[var6--];
+                        data[var7--] = var11[var6--];
+                        data[var7--] = var11[var6--];
                     }
 
-                    var9.set(0, 0, var9.getWidth(), var9.getHeight(), var13);
+                    var9.set(x, y, var9.getWidth(), var9.getHeight(), data);
                 }
             } else if (Settings.g2d == 0) {
                 buffer.rewind();
-                GL11.glReadPixels(0, 0, targetWidth, targetHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-                int var8 = swtBufferImage.width << 2;
-                int var10 = swtBufferImage.data.length - var8;
+                GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+                int w = swtBufferImage.width << 2;
+                int off = swtBufferImage.data.length - w;
 
-                for (var3 = swtBufferImage.height; var3 > 0; --var3) {
-                    buffer.get(swtBufferImage.data, var10, var8);
-                    var10 -= var8;
+                for (int i = swtBufferImage.height; i > 0; --i) {
+                    buffer.get(swtBufferImage.data, off, w);
+                    off -= w;
                 }
 
                 Image var12 = new Image(null, swtBufferImage);
@@ -343,18 +343,26 @@ public final class Emulator3D implements IGraphics3D {
                 var12.dispose();
             } else {
                 buffer.rewind();
-                GL11.glReadPixels(0, 0, targetWidth, targetHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-                int[] var1 = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
-                IntBuffer var2 = buffer.asIntBuffer();
-                var3 = targetWidth;
-                var4 = var1.length - var3;
+                GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+                int[] data = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
+                IntBuffer ib = buffer.asIntBuffer();
+                int off;
 
-                for (var5 = targetHeight; var5 > 0; --var5) {
-                    var2.get(var1, var4, var3);
-                    var4 -= var3;
+                if (flip) {
+                    off = 0;
+                    for (int i = height; i > 0; --i) {
+                        ib.get(data, off, width);
+                        off += width;
+                    }
+                } else {
+                    off = data.length - width;
+                    for (int i = height; i > 0; --i) {
+                        ib.get(data, off, width);
+                        off -= width;
+                    }
                 }
 
-                ((emulator.graphics2D.awt.b) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, 0, 0, null);
+                ((emulator.graphics2D.awt.b) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, x, y, null);
             }
         }
     }
@@ -1292,10 +1300,10 @@ public final class Emulator3D implements IGraphics3D {
         if(instance == null)
             return;
         Emulator3D inst = instance;
-        if ((!inst.useDisplay && pbufferContext == null) || inst.exiting) return;
+        if ((!useDisplay && pbufferContext == null) || inst.exiting) return;
         inst.exiting = true;
         synchronized (inst) {
-            if (inst.useDisplay) {
+            if (useDisplay) {
                 try {
                     Display.makeCurrent();
                     inst.releaseTextures();
