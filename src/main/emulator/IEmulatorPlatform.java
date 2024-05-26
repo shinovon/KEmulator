@@ -4,17 +4,17 @@ import emulator.debug.MemoryViewImage;
 import emulator.graphics3D.IGraphics3D;
 
 public interface IEmulatorPlatform {
-    public boolean isX64();
+    boolean isX64();
 
     String getName();
 
     String getTitleName();
 
-    public String getInfoString(String version);
+    String getInfoString(String version);
 
-    public void loadLibraries();
+    void loadLibraries();
 
-    public void load3D();
+    void load3D();
 
     boolean supportsM3G();
 
