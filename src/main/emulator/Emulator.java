@@ -915,7 +915,7 @@ public class Emulator {
 		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
 			return s + File.separatorChar + "KEmulator.jar";
 		}
-		s = new Emulator().getClass().getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
+		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
 		if (s.endsWith("bin/"))
 			s = s.substring(0, s.length() - 4);
 		try {
@@ -1044,14 +1044,6 @@ public class Emulator {
 
 	public static void AntiCrack(final Exception ex) {
 	}
-
-	public static native void regAssociateJar(final String p0, final String p1, final String p2);
-
-	public static native void unregAssociateJar(final String p0);
-
-	public static native void regRightMenu(final String p0);
-
-	public static native void unregRightMenu();
 
 	static {
 		Emulator.customClassLoader = new CustomClassLoader(ClassLoader.getSystemClassLoader());

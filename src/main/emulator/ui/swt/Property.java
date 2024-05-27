@@ -400,7 +400,7 @@ public final class Property implements IProperty {
 			Settings.networkNotAvailable = Boolean.parseBoolean(properties.getProperty("NetworkNotAvailable", "false"));
 
 			// platform
-			Settings.synchronizeKeyEvents = Boolean.parseBoolean(properties.getProperty("SynchronizeKeyEvents", "true"));
+			Settings.synchronizeKeyEvents = Boolean.parseBoolean(properties.getProperty("SynchronizeKeyEvents", "false"));
 			Settings.motorolaSoftKeyFix = Boolean.parseBoolean(properties.getProperty("MotorolaSoftKeyFix", "false"));
 			Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
 			Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
