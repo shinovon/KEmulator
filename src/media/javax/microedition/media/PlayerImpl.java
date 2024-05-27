@@ -352,9 +352,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence instanceof Sequence) {
 			try {
 				if (midiSequencer != null)
-					midiSequencer.getMicrosecondPosition();
+					midiPosition = midiSequencer.getMicrosecondPosition();
 				else if (Settings.oneMidiAtTime && EmulatorMIDI.currentPlayer == this && midiPlaying)
-					return EmulatorMIDI.getMicrosecondPosition();
+					midiPosition = EmulatorMIDI.getMicrosecondPosition();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
