@@ -43,11 +43,14 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$ [2024.05.24]
-Fixed PlayerImpl.stop() race condition
+$v2.16.1 [2024.05.27]
+Midi player fixes
 Implemented com.pantech.titan.PantechAudio
 Fixed alpha in nokiaui DirectUtils.createImage(III)
 Added Nokia M3D(O) implementation from FreeJ2ME
+Added MascotCapsule GL implementation from JL-Mod (WIP)
+Fix sensorsimulator in x64 build
+Set synchronize key events to off by default
 
 $v2.16_2 [2024.05.23]
 Java 9+ support fix
