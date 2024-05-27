@@ -49,8 +49,8 @@ Implemented com.pantech.titan.PantechAudio
 Fixed alpha in nokiaui DirectUtils.createImage(III)
 Added Nokia M3D(O) implementation from FreeJ2ME
 Added MascotCapsule GL implementation from JL-Mod (WIP)
-Fix sensorsimulator in x64 build
-Set synchronize key events to off by default
+Fix sensor simulator in x64 build
+Set synchronize key events disabled by default
 
 $v2.16_2 [2024.05.23]
 Java 9+ support fix
@@ -60,64 +60,38 @@ Fix RecordStore multiple opens
 Fixed crash with sync resize
 
 $v2.16 [2024.05.17]
-Fix mp3 endOfMedia event
-
-$v2.16 [2024.05.14]
-Java 9+ support
-Fix for Mac OS
-
-$v2.16 [2024.05.10]
-GameCanvas partial flushScreen() support
-
-$v2.16 [2024.05.09]
-Implemented siemens game api
-
-$v2.16 [2024.05.07]
-Stub JSR 211 Content Handler
-Stub Nokia InApp
-
-$v2.16 [2024.05.07]
-Implemented siemens file api
-Implemented vodafone api
-
-$v2.16 [2024.05.06]
-Removed emulator.dll
-
-$v2.16 [2024.05.05]
-Updated swt
-
-$v2.16 [2024.05.04]
-M3G LWJGL: allocate buffers beforehand
-Fix for Mesa 3D on Linux
-Fix lcdui ticker
-Stub com.immersion.VibeTonz
-Updated asm to 5.2 (vServ loading fix)
-
-$v2.16 [2024.05.03]
-Fix MIDI players switching
-Fix resource: protocol handling
-Stub com.sprintpcs.util.System
-
-$v2.16 [2024.05.02]
-M3G LWJGL: raytrace fix
-
-$v2.16 [2024.05.01]
-Replace kemulator.cfg with midlets.txt (can be disabled with WriteKemulatorCfg)
-Fix serviceRepaints inside of callSerially
-Added -installed argument that moves user files to AppData
-
-$v2.16 [2024.04.30]
-M3G LWJGL: fixed Sprite3D alpha
-M3GView: even better controls, added fallback to pbuffer, show hidden nodes as red
-Updated lwjgl library to 2.9.4
-
-$v2.16 [2024.04.29]
-M3G LWJGL: added settings, fixed SkinnedMesh rendering
-M3GView: new controls
-Fixed 3D engine choice saving
-Localization fixes
-Better Windows XP support
-Memory leaks fixes
+05.17 Fix mp3 endOfMedia event
+05.14 Java 9+ support
+      Fix for Mac OS
+05.10 GameCanvas partial flushScreen() support
+05.09 Implemented siemens game api
+05.08 Stub JSR 211 Content Handler
+      Stub Nokia InApp
+05.07 Implemented siemens file api
+      Implemented vodafone api
+05.06 Removed emulator.dll
+05.05 Updated swt
+05.04 M3G LWJGL: allocate buffers beforehand
+      Fix for Mesa 3D on Linux
+      Fix lcdui ticker
+      Stub com.immersion.VibeTonz
+      Updated asm to 5.2 (vServ loading fix)
+05.03 Fix MIDI players switching
+      Fix resource: protocol handling
+      Stub com.sprintpcs.util.System
+05.02 M3G LWJGL: raytrace fix
+05.01 Replace kemulator.cfg with midlets.txt (can be disabled with WriteKemulatorCfg)
+      Fix serviceRepaints inside of callSerially
+      Added -installed argument that moves user files to AppData
+04.30 M3G LWJGL: fixed Sprite3D alpha
+      M3GView: even better controls, added fallback to pbuffer, show hidden nodes as red
+      Updated lwjgl library to 2.9.4
+04.29 M3G LWJGL: added settings, fixed SkinnedMesh rendering
+      M3GView: new controls
+      Fixed 3D engine choice saving
+      Localization fixes
+      Better Windows XP support
+      Memory leaks fixes
 
 $m3g demo [2024.04.26]
 M3G LWJGL engine (WIP)
@@ -378,7 +352,7 @@ $mod nnproject v8 [2021.04.02]
 Fixed broken callSerially
 
 $mod nnproject v8 [2021.03.22]
-Added discrod rich presence
+Added discord rich presence
 
 $mod nnproject v7 [2021.01.31]
 Changed Class Watcher Combo Box size

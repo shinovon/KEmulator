@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class EmulatorExe {
 
-	public static final String version = "1.5";
+	public static final String version = "1.6";
 	public static final boolean WINE = false;
 	public static final boolean NNX64 = false;
 
@@ -86,6 +86,7 @@ public class EmulatorExe {
 			return;
 		}
 		ArrayList<String> cmd = new ArrayList<String>();
+		String os = System.getProperty("os.name").toLowerCase();
 		java: {
 			try {
 				File file = new File("../jre/bin/java.exe");
@@ -96,7 +97,7 @@ public class EmulatorExe {
 			} catch (IOException e) {
 			}
 			String javahome = System.getProperty("java.home");
-			boolean win = System.getProperty("os.name").toLowerCase().startsWith("win");
+			boolean win = os.startsWith("win");
 			cmd.add(javahome == null || javahome.isEmpty() ? "java" : (javahome + "/bin/java" + (win ? ".exe" : "")));
 		}
 
@@ -137,6 +138,12 @@ public class EmulatorExe {
 		if("false".equals(System.getProperty("sun.java3d.d3d"))) {
 			cmd.add("-Dsun.java3d.d3d=false");
 		}
+
+		if (os.startsWith("darwin")) {
+			cmd.add("-XstartOnFirstThread");
+		}
+
+		cmd.add("-javaagent:" + path + "/KEmulator.jar");
 
 		// main class
 		cmd.add("emulator.Emulator");
