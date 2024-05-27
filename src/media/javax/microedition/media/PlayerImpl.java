@@ -554,7 +554,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				}
 				if (complete) {
 					setMediaTime(0);
+					complete = false;
 				}
+				stopped = false;
 				(playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
 			}
 			setLevel(level);
@@ -619,14 +621,16 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			while (playerThread != null && loopCount != 0) {
 				complete = false;
 				if (sequence instanceof Sequence) {
+					Sequencer sequencer = null;
 					if (globalMidi) {
 						EmulatorMIDI.start(this, (Sequence) sequence, midiPosition);
 						EmulatorMIDI.currentPlayer = this;
 					} else {
 						initMidiSequencer();
-						midiSequencer.setSequence((Sequence) sequence);
-						midiSequencer.setMicrosecondPosition(midiPosition);
-						midiSequencer.start();
+						sequencer = midiSequencer;
+						sequencer.setSequence((Sequence) sequence);
+						sequencer.setMicrosecondPosition(midiPosition);
+						sequencer.start();
 					}
 					if (b) {
 						notifyListeners(PlayerListener.STARTED, midiPosition = globalMidi ? EmulatorMIDI.getMicrosecondPosition() : midiSequencer.getMicrosecondPosition());
@@ -644,8 +648,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						midiPosition = EmulatorMIDI.getMicrosecondPosition();
 						EmulatorMIDI.stop();
 					} else {
-						midiPosition = midiSequencer.getMicrosecondPosition();
-						midiSequencer.stop();
+						midiPosition = sequencer.getMicrosecondPosition();
+						sequencer.stop();
 					}
 				} else if (sequence instanceof Clip) {
 					Clip clip = (Clip) sequence;
