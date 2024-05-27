@@ -95,6 +95,7 @@ public class Render {
 
 	private void init() {
 		emulator3d = Emulator3D.getInstance();
+		emulator3d.setFlipImage(true);
 	}
 
 	public synchronized void bind(Graphics graphics) {

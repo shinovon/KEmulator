@@ -71,6 +71,7 @@ public final class Emulator3D implements IGraphics3D {
 	private static boolean useWgl;
 
 	private Canvas tmpCanvas;
+	private boolean flipImage;
 
 	private Emulator3D() {
 		instance = this;
@@ -295,7 +296,7 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public void swapBuffers() {
-		swapBuffers(false, 0, 0, targetWidth, targetHeight);
+		swapBuffers(flipImage, 0, 0, targetWidth, targetHeight);
 	}
 
 	public final void swapBuffers(boolean flip, int x, int y, int width, int height) {
@@ -1335,5 +1336,9 @@ public final class Emulator3D implements IGraphics3D {
 				img.setId(0);
 		}
 		texturesTable.remove(id);
+	}
+
+	public void setFlipImage(boolean b) {
+		flipImage = b;
 	}
 }
