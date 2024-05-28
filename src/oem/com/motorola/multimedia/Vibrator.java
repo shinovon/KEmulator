@@ -1,5 +1,7 @@
 package com.motorola.multimedia;
 
+import emulator.Emulator;
+
 import java.util.TimerTask;
 
 public class Vibrator
@@ -17,6 +19,8 @@ public class Vibrator
 	}
 
 	public static void vibrateFor(int timeInMs) {
+		if (timeInMs > MAX_VIBRATE_TIME) timeInMs = MAX_VIBRATE_TIME;
+		Emulator.getEmulator().getScreen().startVibra(timeInMs);
 	}
 
 	public static void vibratePeriodically(int timeInMs) {
@@ -26,9 +30,11 @@ public class Vibrator
 	}
 
 	public static void vibratorOff() {
+		Emulator.getEmulator().getScreen().startVibra(0);
 	}
 
 	public static void vibratorOn() {
+		Emulator.getEmulator().getScreen().startVibra(3000);
 	}
 
 	public static void setVibrateTone(int tone) {

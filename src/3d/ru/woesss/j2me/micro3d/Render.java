@@ -533,7 +533,6 @@ public class Render {
 
 	public synchronized void release() {
 		stack.clear();
-//		bindEglContext();
 		if (targetTexture != null) {
 			glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
 			targetTexture = null;
@@ -541,7 +540,6 @@ public class Render {
 			if (postCopy2D) {
 				copy2d(false);
 			}
-//			Utils.glReadPixels(clip.x, clip.y, clip.width, clip.height, targetGraphics);
 			swapBuffers();
 			targetGraphics = null;
 		}
@@ -767,7 +765,6 @@ public class Render {
 	}
 
 	private void updateClip() {
-//		bindEglContext();
 		Rectangle clip = this.clip;
 		int l = clip.x;
 		int t = clip.y;
@@ -780,7 +777,6 @@ public class Render {
 			glScissor(l, t, w, h);
 		}
 		swapBuffers();
-//		releaseEglContext();
 	}
 
 	public synchronized void postFigure(FigureImpl figure) {
