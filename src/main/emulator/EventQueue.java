@@ -215,11 +215,10 @@ public final class EventQueue implements Runnable {
 	public void serviceRepaints() {
 		Thread t = Thread.currentThread();
 		if (t == eventThread || t == inputThread) {
-			Displayable.checkForSteps(lock);
 			synchronized (lock) {
+				Displayable.checkForSteps(lock);
 				internalRepaint();
 			}
-			Displayable.fpsLimiter(lock);
 			return;
 		}
 		if (repainted) return;
@@ -245,7 +244,7 @@ public final class EventQueue implements Runnable {
 						synchronized (lock) {
 							internalRepaint();
 						}
-						Displayable.fpsLimiter(null);
+						Displayable.fpsLimiter();
 						break;
 					}
 					case 2: { // serial call

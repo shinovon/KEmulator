@@ -298,17 +298,13 @@ public class Displayable {
 		graphics.setClip(clipX, clipY, clipWidth, clipHeight);
 	}
 
-	public static void fpsLimiter(Object lock) {
+	public static void fpsLimiter() {
 		if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
 			long var0 = System.currentTimeMillis() - lastFrameTime;
 			long var2 = (long) (1000 / Settings.frameRate);
 			if (var2 - var0 > 0) {
 				try {
-					if (lock == null)
-						Thread.sleep(var2 - var0);
-					else synchronized (lock) {
-						lock.wait(var2 - var0);
-					}
+					Thread.sleep(var2 - var0);
 				} catch (Exception ignored) {}
 			}
 		}
