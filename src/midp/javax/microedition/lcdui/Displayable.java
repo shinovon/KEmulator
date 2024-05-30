@@ -298,13 +298,17 @@ public class Displayable {
 		graphics.setClip(clipX, clipY, clipWidth, clipHeight);
 	}
 
-	public static void fpsLimiter() {
+	public static void fpsLimiter(Object lock) {
 		if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
 			long var0 = System.currentTimeMillis() - lastFrameTime;
 			long var2 = (long) (1000 / Settings.frameRate);
 			if (var2 - var0 > 0) {
 				try {
-					Thread.sleep(var2 - var0);
+					if (lock == null)
+						Thread.sleep(var2 - var0);
+					else synchronized (lock) {
+						lock.wait(var2 - var0);
+					}
 				} catch (Exception ignored) {}
 			}
 		}
@@ -313,20 +317,22 @@ public class Displayable {
 		++framesCount;
 		long l = lastFrameTime - lastFpsUpdateTime;
 		if (l > 2000L) {
-			Profiler.FPS = (int) ((long) (framesCount * 1000 + 500) / l);
+			Profiler.FPS = (int) ((framesCount * 1000L + 500) / l);
 			lastFpsUpdateTime = lastFrameTime;
 			framesCount = 0;
 		}
-
 	}
 
-	public static void checkForSteps() {
+	public static void checkForSteps(Object lock) {
 		if (Settings.steps >= 0) {
 			if (Settings.steps == 0) {
 				final long currentTimeMillis = System.currentTimeMillis();
 				try {
 					while (Settings.steps == 0) {
-						Thread.sleep(50L);
+						if (lock == null) Thread.sleep(50);
+						else synchronized (lock) {
+							lock.wait(50L);
+						}
 					}
 				} catch (Exception ignored) {}
 				Settings.aLong1235 += System.currentTimeMillis() - currentTimeMillis;

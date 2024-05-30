@@ -215,11 +215,11 @@ public final class EventQueue implements Runnable {
 	public void serviceRepaints() {
 		Thread t = Thread.currentThread();
 		if (t == eventThread || t == inputThread) {
-			Displayable.checkForSteps();
+			Displayable.checkForSteps(lock);
 			synchronized (lock) {
 				internalRepaint();
 			}
-			Displayable.fpsLimiter();
+			Displayable.fpsLimiter(lock);
 			return;
 		}
 		if (repainted) return;
@@ -245,7 +245,7 @@ public final class EventQueue implements Runnable {
 						synchronized (lock) {
 							internalRepaint();
 						}
-						Displayable.fpsLimiter();
+						Displayable.fpsLimiter(null);
 						break;
 					}
 					case 2: { // serial call
@@ -391,7 +391,7 @@ public final class EventQueue implements Runnable {
 			IScreen scr = Emulator.getEmulator().getScreen();
 			final IImage backBufferImage = scr.getBackBufferImage();
 			final IImage xRayScreenImage = scr.getXRayScreenImage();
-			Displayable.checkForSteps();
+			Displayable.checkForSteps(lock);
 			try {
 				if (repaintRegion[0] == -1) { // full repaint
 					Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
