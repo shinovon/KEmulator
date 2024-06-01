@@ -5,7 +5,7 @@ import com.nokia.mid.ui.SoftNotificationImpl;
 import javax.microedition.lcdui.Image;
 
 import emulator.Emulator;
-import emulator.graphics2D.awt.d;
+import emulator.graphics2D.awt.ImageAWT;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.widgets.Shell;
@@ -68,7 +68,7 @@ public class PiglerAPI {
     public void updateNotification(int uid, Image icon) throws Exception {
         if(icon != null)
             try {
-                SoftNotificationImpl.trayIcon.setImage(((d) icon.getImpl()).getBufferedImage());
+                SoftNotificationImpl.trayIcon.setImage(((ImageAWT) icon.getImpl()).getBufferedImage());
                 SoftNotificationImpl.trayIcon.setImageAutoSize(true);
             } catch (Exception ignored) {
             }

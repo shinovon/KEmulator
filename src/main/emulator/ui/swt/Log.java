@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class11 implements ILogStream, ControlListener, DisposeListener, Runnable {
+public final class Log implements ILogStream, ControlListener, DisposeListener, Runnable {
 	private Shell logShell;
 	PrintStream filePrintStream;
 	LogStream logStream;
@@ -21,7 +21,7 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
 	private boolean aBoolean576;
 	final StringBuffer printQueue = new StringBuffer();
 
-	public Class11() {
+	public Log() {
 		super();
 		this.logShell = null;
 		this.styledText = null;
@@ -177,9 +177,9 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
 	}
 
 	private final class Textout implements Runnable {
-		private final Class11 class11;
+		private final Log class11;
 
-		private Textout(final Class11 c11) {
+		private Textout(final Log c11) {
 			super();
 			this.class11 = c11;
 		}
@@ -203,9 +203,9 @@ public final class Class11 implements ILogStream, ControlListener, DisposeListen
 
 	private final class LogStream extends PrintStream {
 		PrintStream orig;
-		private final Class11 class11;
+		private final Log class11;
 
-		LogStream(final Class11 aClass11_1402) {
+		LogStream(final Log aClass11_1402) {
 			super(System.out, true);
 			this.class11 = aClass11_1402;
 			this.orig = System.out;

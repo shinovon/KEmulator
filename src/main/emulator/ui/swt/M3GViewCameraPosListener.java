@@ -12,8 +12,8 @@ final class M3GViewCameraPosListener extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		final Class30 class30;
-		(class30 = new Class30(M3GViewUI.method499(this.aClass90_1302), 2)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position"));
+		final M3GViewCameraSetDialog class30;
+		(class30 = new M3GViewCameraSetDialog(M3GViewUI.method499(this.aClass90_1302), 2)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position"));
 		class30.method339(M3GViewUI.method525(this.aClass90_1302), M3GViewUI.method532(this.aClass90_1302), M3GViewUI.method537(this.aClass90_1302));
 		class30.method340();
 		M3GViewUI.method526(this.aClass90_1302, class30.aFloat610);

@@ -1,5 +1,6 @@
 package emulator.graphics3D.lwjgl;
 
+import emulator.graphics2D.awt.Graphics2DAWT;
 import emulator.graphics3D.*;
 
 import java.awt.*;
@@ -363,7 +364,7 @@ public final class Emulator3D implements IGraphics3D {
 					}
 				}
 
-				((emulator.graphics2D.awt.b) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, x, y, null);
+				((Graphics2DAWT) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, x, y, null);
 			}
 		}
 	}

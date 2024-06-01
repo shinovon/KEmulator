@@ -6,7 +6,7 @@ import emulator.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class161 implements ControlListener, DisposeListener {
+public final class KeyPad implements ControlListener, DisposeListener {
 	private Shell aShell1404;
 	private Button aButton1405;
 	private Button aButton1407;
@@ -35,7 +35,7 @@ public final class Class161 implements ControlListener, DisposeListener {
 	private boolean aBoolean1406;
 	private Shell aShell1408;
 
-	public Class161() {
+	public KeyPad() {
 		super();
 		this.aShell1404 = null;
 		this.aButton1405 = null;
@@ -227,11 +227,11 @@ public final class Class161 implements ControlListener, DisposeListener {
 		this.method836();
 	}
 
-	static void method837(final Class161 class161, final int n) {
+	static void method837(final KeyPad class161, final int n) {
 		method839(n);
 	}
 
-	static void method840(final Class161 class161, final int n) {
+	static void method840(final KeyPad class161, final int n) {
 		method832(n);
 	}
 }

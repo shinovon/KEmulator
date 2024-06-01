@@ -1,5 +1,7 @@
 package emulator.ui.swt;
 
+import emulator.graphics2D.awt.FontAWT;
+import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.widgets.*;
 
 import java.util.*;
@@ -15,17 +17,17 @@ public final class EmulatorImpl implements IEmulator {
 	private static Display display;
 	private Vector aVector1379;
 	private int screenDepth;
-	private Class46 aClass46_1381;
+	private Methods aClass46_1381;
 	private MemoryView aClass110_1382;
-	private Class5 aClass5_1377;
-	private Class5 aClass5_1391;
+	private Watcher aClass5_1377;
+	private Watcher aClass5_1391;
 	private Property iproperty;
 	private EmulatorScreen iscreen;
-	private Class11 ilogstream;
-	private Class161 aClass161_1387;
-	private Class108 aClass108_1390;
+	private Log ilogstream;
+	private KeyPad aClass161_1387;
+	private InfosBox aClass108_1390;
 	private M3GViewUI aClass90_1384;
-	private Class83 aClass83_1389;
+	private MessageConsole aClass83_1389;
 	public Properties midletProps;
 	private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
 
@@ -35,14 +37,14 @@ public final class EmulatorImpl implements IEmulator {
 		this.aVector1379 = new Vector();
 		this.screenDepth = EmulatorImpl.display.getDepth();
 		this.iproperty = new Property();
-		this.ilogstream = new Class11();
-		this.aClass83_1389 = new Class83();
-		this.aClass108_1390 = new Class108();
-		this.aClass161_1387 = new Class161();
-		this.aClass5_1377 = new Class5(0);
-		this.aClass5_1391 = new Class5(1);
+		this.ilogstream = new Log();
+		this.aClass83_1389 = new MessageConsole();
+		this.aClass108_1390 = new InfosBox();
+		this.aClass161_1387 = new KeyPad();
+		this.aClass5_1377 = new Watcher(0);
+		this.aClass5_1391 = new Watcher(1);
 		this.aClass110_1382 = new MemoryView();
-		this.aClass46_1381 = new Class46();
+		this.aClass46_1381 = new Methods();
 	}
 
 	public static void dispose() {
@@ -78,11 +80,11 @@ public final class EmulatorImpl implements IEmulator {
 		return this.iscreen;
 	}
 
-	public final Class5 method822() {
+	public final Watcher method822() {
 		return this.aClass5_1377;
 	}
 
-	public final Class5 method829() {
+	public final Watcher method829() {
 		return this.aClass5_1391;
 	}
 
@@ -90,15 +92,15 @@ public final class EmulatorImpl implements IEmulator {
 		return this.aClass110_1382;
 	}
 
-	public final Class46 method824() {
+	public final Methods method824() {
 		return this.aClass46_1381;
 	}
 
-	public final Class108 method825() {
+	public final InfosBox method825() {
 		return this.aClass108_1390;
 	}
 
-	public final Class161 method826() {
+	public final KeyPad method826() {
 		return this.aClass161_1387;
 	}
 
@@ -123,8 +125,8 @@ public final class EmulatorImpl implements IEmulator {
 		this.aClass5_1391.method321();
 		if (aClass90_1384 != null)
 			this.aClass90_1384.close();
-		while (Class5.aVector548.size() > 0) {
-			((Class5) Class5.aVector548.get(0)).method321();
+		while (Watcher.aVector548.size() > 0) {
+			((Watcher) Watcher.aVector548.get(0)).method321();
 		}
 		for (Object o : this.aVector1379) {
 			((IPlugin) o).close();
@@ -160,7 +162,7 @@ public final class EmulatorImpl implements IEmulator {
 			return f;
 		}
 		if (Settings.g2d == 1) {
-			return new emulator.graphics2D.awt.a(this.iproperty.getDefaultFontName(), size, style, false);
+			return new FontAWT(this.iproperty.getDefaultFontName(), size, style, false);
 		}
 		return null;
 	}
@@ -174,7 +176,7 @@ public final class EmulatorImpl implements IEmulator {
 			return f;
 		}
 		if (Settings.g2d == 1) {
-			return new emulator.graphics2D.awt.a(this.iproperty.getDefaultFontName(), height, style, true);
+			return new FontAWT(this.iproperty.getDefaultFontName(), height, style, true);
 		}
 		return null;
 	}
@@ -184,13 +186,13 @@ public final class EmulatorImpl implements IEmulator {
 			return new ImageSWT(n, n2, transparent, -1);
 		}
 		if (Settings.g2d == 1) {
-			return new emulator.graphics2D.awt.d(n, n2, transparent, -1);
+			return new ImageAWT(n, n2, transparent, -1);
 		}
 		return null;
 	}
 
 	public final IImage newImage(int n, int n2, boolean b, int n3) {
-		return Settings.g2d == 0 ? new ImageSWT(n, n2, b, n3) : (Settings.g2d == 1 ? new emulator.graphics2D.awt.d(n, n2, b, n3) : null);
+		return Settings.g2d == 0 ? new ImageSWT(n, n2, b, n3) : (Settings.g2d == 1 ? new ImageAWT(n, n2, b, n3) : null);
 	}
 
 
@@ -199,7 +201,7 @@ public final class EmulatorImpl implements IEmulator {
 			return new ImageSWT(array);
 		}
 		if (Settings.g2d == 1) {
-			return new emulator.graphics2D.awt.d(array);
+			return new ImageAWT(array);
 		}
 		return null;
 	}
@@ -210,11 +212,11 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 	public final void syncValues() {
-		if (Class5.profiler != null) {
-			syncExec(Class5.profiler);
+		if (Watcher.profiler != null) {
+			syncExec(Watcher.profiler);
 		}
-		for (int i = 0; i < Class5.aVector548.size(); ++i) {
-			asyncExec((Runnable) Class5.aVector548.get(i));
+		for (int i = 0; i < Watcher.aVector548.size(); ++i) {
+			asyncExec((Runnable) Watcher.aVector548.get(i));
 		}
 		if (this.aClass46_1381.method438()) {
 			asyncExec(this.aClass46_1381);

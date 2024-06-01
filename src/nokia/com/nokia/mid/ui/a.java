@@ -6,6 +6,7 @@ import emulator.debug.Profiler;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.ITransform;
+import emulator.graphics2D.awt.TransformAWT;
 import emulator.graphics2D.b;
 import emulator.graphics2D.swt.TransformSWT;
 
@@ -270,7 +271,7 @@ final class a
 		if (Settings.g2d == 0) {
 			gc.getImpl().setTransform(new TransformSWT(af));
 		} else {
-			gc.getImpl().setTransform(new emulator.graphics2D.awt.c(af));
+			gc.getImpl().setTransform(new TransformAWT(af));
 		}
 		gc.drawImage(image, 0, 0, 0);
 		return transimage;

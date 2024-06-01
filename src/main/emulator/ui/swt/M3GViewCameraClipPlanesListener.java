@@ -12,8 +12,8 @@ final class M3GViewCameraClipPlanesListener extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		final Class30 class30;
-		(class30 = new Class30(M3GViewUI.method499(this.aClass90_1167), 1)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes"));
+		final M3GViewCameraSetDialog class30;
+		(class30 = new M3GViewCameraSetDialog(M3GViewUI.method499(this.aClass90_1167), 1)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes"));
 		class30.method338(M3GViewUI.method503(this.aClass90_1167), M3GViewUI.method512(this.aClass90_1167));
 		class30.method340();
 		if (M3GViewUI.method500(this.aClass90_1167) == 0) {

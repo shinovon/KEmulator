@@ -316,7 +316,7 @@ public class Emulator {
 	}
 
 	public static String getTitleVersionString() {
-		return platform.getTitleName() + " " + version;
+		return platform.getTitleName() + " " + version + (Settings.uei ? " (UEI)" : "");
 	}
 
 	public static String getCmdVersionString() {

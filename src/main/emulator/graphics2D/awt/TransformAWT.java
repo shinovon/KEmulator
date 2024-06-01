@@ -4,18 +4,15 @@ import emulator.graphics2D.*;
 
 import java.awt.geom.*;
 
-/**
- * TransformAWT
- */
-public final class c implements ITransform {
+public final class TransformAWT implements ITransform {
 	private AffineTransform transform;
 
-	public c() {
+	public TransformAWT() {
 		super();
 		this.transform = new AffineTransform();
 	}
 
-	public c(final AffineTransform anAffineTransform4) {
+	public TransformAWT(final AffineTransform anAffineTransform4) {
 		super();
 		this.transform = anAffineTransform4;
 	}
@@ -25,7 +22,7 @@ public final class c implements ITransform {
 	}
 
 	public final void transform(final ITransform transform) {
-		this.transform.concatenate(((c) transform).method8());
+		this.transform.concatenate(((TransformAWT) transform).method8());
 	}
 
 	public final void transform(final float[] array, final int n, final float[] array2, final int n2, final int n3) {
@@ -51,7 +48,7 @@ public final class c implements ITransform {
 				if (var3 == 5) {
 					var7.translate((double) var2, 0.0D);
 					var7.rotate(1.5707963267948966D);
-					return new c(var7);
+					return new TransformAWT(var7);
 				}
 
 				if (var3 == 7) {
@@ -63,7 +60,7 @@ public final class c implements ITransform {
 					if (var3 == 3) {
 						var7.translate((double) var1, (double) var2);
 						var7.rotate(3.141592653589793D);
-						return new c(var7);
+						return new TransformAWT(var7);
 					}
 
 					if (var3 == 2) {
@@ -72,7 +69,7 @@ public final class c implements ITransform {
 						var10002 = 1.0D;
 					} else {
 						if (var3 != 1) {
-							return new c(var7);
+							return new TransformAWT(var7);
 						}
 
 						var7.translate(0.0D, (double) var2);
@@ -85,7 +82,7 @@ public final class c implements ITransform {
 			var7.scale(var10001, var10002);
 		}
 
-		return new c(var7);
+		return new TransformAWT(var7);
 	}
 
 	private static int a(int var0, int var1, int var2, int var3) {

@@ -6,7 +6,7 @@ import emulator.custom.*;
 import java.util.*;
 
 final class Class170 extends SelectionAdapter {
-	Class170(final Class46 class46) {
+	Class170(final Methods class46) {
 		super();
 	}
 

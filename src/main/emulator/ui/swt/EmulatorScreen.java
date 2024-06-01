@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.custom.*;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.graphics2D.*;
@@ -67,10 +68,10 @@ public final class EmulatorScreen implements
 	private ImageSWT screenImageSwt;
 	private ImageSWT backBufferImageSwt;
 	private ImageSWT xrayScreenImageSwt;
-	private emulator.graphics2D.awt.d screenCopyAwt;
-	private emulator.graphics2D.awt.d screenImageAwt;
-	private emulator.graphics2D.awt.d backBufferImageAwt;
-	private emulator.graphics2D.awt.d xrayScreenImageAwt;
+	private ImageAWT screenCopyAwt;
+	private ImageAWT screenImageAwt;
+	private ImageAWT backBufferImageAwt;
+	private ImageAWT xrayScreenImageAwt;
 	private static long aLong982;
 	private String aString983;
 	private String aString989;
@@ -187,10 +188,10 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (Settings.g2d == 1) {
-				this.screenCopyAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
-				this.screenImageAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
-				this.backBufferImageAwt = new emulator.graphics2D.awt.d(n, n2, false, bgcolor);
-				this.xrayScreenImageAwt = new emulator.graphics2D.awt.d(n, n2, true, -16777216);
+				this.screenCopyAwt = new ImageAWT(n, n2, false, bgcolor);
+				this.screenImageAwt = new ImageAWT(n, n2, false, bgcolor);
+				this.backBufferImageAwt = new ImageAWT(n, n2, false, bgcolor);
+				this.xrayScreenImageAwt = new ImageAWT(n, n2, true, -16777216);
 			}
 		}
 	}
@@ -1156,7 +1157,7 @@ public final class EmulatorScreen implements
 		}
 		if (parent == this.menuView) {
 			if (menuItem == this.helpMenuItem) {
-				new Class54().method454(this.shell);
+				new About().method454(this.shell);
 				return;
 			}
 			if (menuItem == this.optionsMenuItem) {
@@ -1171,11 +1172,11 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.logMenuItem) {
-				if (((Class11) Emulator.getEmulator().getLogStream()).isLogOpen()) {
-					((Class11) Emulator.getEmulator().getLogStream()).method330();
+				if (((Log) Emulator.getEmulator().getLogStream()).isLogOpen()) {
+					((Log) Emulator.getEmulator().getLogStream()).method330();
 					return;
 				}
-				((Class11) Emulator.getEmulator().getLogStream()).method329(this.shell);
+				((Log) Emulator.getEmulator().getLogStream()).method329(this.shell);
 				return;
 			}
 			if (menuItem == this.keypadMenuItem) {
@@ -1243,11 +1244,11 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.smsConsoleMenuItem) {
-				if (((Class83) Emulator.getEmulator().getMessage()).method479()) {
-					((Class83) Emulator.getEmulator().getMessage()).method482();
+				if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
+					((MessageConsole) Emulator.getEmulator().getMessage()).method482();
 					return;
 				}
-				((Class83) Emulator.getEmulator().getMessage()).method481(this.shell);
+				((MessageConsole) Emulator.getEmulator().getMessage()).method481(this.shell);
 				return;
 			}
 			if (menuItem == m3gViewMenuItem) {
@@ -2134,15 +2135,15 @@ public final class EmulatorScreen implements
 		if (controlEvent.widget != shell)
 			return;
 		this.getWindowPos();
-		if (((Class11) Emulator.getEmulator().getLogStream()).isLogOpen()) {
-			final Shell method328 = ((Class11) Emulator.getEmulator().getLogStream()).getLogShell();
-			if (((Class11) Emulator.getEmulator().getLogStream()).method333() && !method328.isDisposed()) {
+		if (((Log) Emulator.getEmulator().getLogStream()).isLogOpen()) {
+			final Shell method328 = ((Log) Emulator.getEmulator().getLogStream()).getLogShell();
+			if (((Log) Emulator.getEmulator().getLogStream()).method333() && !method328.isDisposed()) {
 				method328.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 			}
 		}
-		if (((Class83) Emulator.getEmulator().getMessage()).method479()) {
-			final Shell method329 = ((Class83) Emulator.getEmulator().getMessage()).method480();
-			if (((Class83) Emulator.getEmulator().getMessage()).method488() && !method329.isDisposed()) {
+		if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
+			final Shell method329 = ((MessageConsole) Emulator.getEmulator().getMessage()).method480();
+			if (((MessageConsole) Emulator.getEmulator().getMessage()).method488() && !method329.isDisposed()) {
 				method329.setLocation(this.shell.getLocation().x - method329.getSize().x, this.shell.getLocation().y);
 			}
 		}
@@ -2404,7 +2405,7 @@ public final class EmulatorScreen implements
 				case 1: {
 					if (Settings.showLogFrame) {
 						this.aClass93_1059.logMenuItem.setSelection(true);
-						((Class11) Emulator.getEmulator().getLogStream()).method329(EmulatorScreen.method561(this.aClass93_1059));
+						((Log) Emulator.getEmulator().getLogStream()).method329(EmulatorScreen.method561(this.aClass93_1059));
 						return;
 					}
 					break;

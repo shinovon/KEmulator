@@ -10,9 +10,9 @@ import java.util.*;
 import org.eclipse.swt.widgets.*;
 
 final class Class164 extends SelectionAdapter {
-	private final Class46 aClass46_1432;
+	private final Methods aClass46_1432;
 
-	Class164(final Class46 aClass46_1432) {
+	Class164(final Methods aClass46_1432) {
 		super();
 		this.aClass46_1432 = aClass46_1432;
 	}
@@ -21,7 +21,7 @@ final class Class164 extends SelectionAdapter {
 		Emulator.getEmulator().getScreen();
 		EmulatorScreen.pauseStep();
 		final FileDialog fileDialog;
-		(fileDialog = new FileDialog(Class46.method442(this.aClass46_1432), 8192)).setText(UILocale.get("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
+		(fileDialog = new FileDialog(Methods.method442(this.aClass46_1432), 8192)).setText(UILocale.get("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
 		fileDialog.setFileName("bytecode.txt");
 		final String open;
 		if ((open = fileDialog.open()) != null) {

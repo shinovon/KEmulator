@@ -4,7 +4,7 @@ import org.eclipse.swt.layout.*;
 import emulator.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class30 extends Dialog {
+public final class M3GViewCameraSetDialog extends Dialog {
 	float aFloat603;
 	float aFloat606;
 	float aFloat608;
@@ -19,7 +19,7 @@ public final class Class30 extends Dialog {
 	private Text aText613;
 	private Text aText615;
 
-	public Class30(final Shell shell, final int anInt604) {
+	public M3GViewCameraSetDialog(final Shell shell, final int anInt604) {
 		super(shell, 67680);
 		this.anInt604 = anInt604;
 		this.aFloat606 = 1.0f;
@@ -123,31 +123,31 @@ public final class Class30 extends Dialog {
 		shell.pack();
 	}
 
-	static int method342(final Class30 class30) {
+	static int method342(final M3GViewCameraSetDialog class30) {
 		return class30.anInt604;
 	}
 
-	static Text method343(final Class30 class30) {
+	static Text method343(final M3GViewCameraSetDialog class30) {
 		return class30.aText605;
 	}
 
-	static Text method344(final Class30 class30) {
+	static Text method344(final M3GViewCameraSetDialog class30) {
 		return class30.aText607;
 	}
 
-	static Text method345(final Class30 class30) {
+	static Text method345(final M3GViewCameraSetDialog class30) {
 		return class30.aText609;
 	}
 
-	static Text method346(final Class30 class30) {
+	static Text method346(final M3GViewCameraSetDialog class30) {
 		return class30.aText611;
 	}
 
-	static Text method347(final Class30 class30) {
+	static Text method347(final M3GViewCameraSetDialog class30) {
 		return class30.aText613;
 	}
 
-	static Text method348(final Class30 class30) {
+	static Text method348(final M3GViewCameraSetDialog class30) {
 		return class30.aText615;
 	}
 }

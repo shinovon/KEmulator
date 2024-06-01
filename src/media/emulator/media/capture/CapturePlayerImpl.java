@@ -19,7 +19,7 @@ import emulator.media.vlc.VLCPlayerImpl;
 import com.github.sarxos.webcam.Webcam;
 
 import emulator.Permission;
-import emulator.graphics2D.awt.d;
+import emulator.graphics2D.awt.ImageAWT;
 
 public class CapturePlayerImpl implements Player {
 
@@ -236,7 +236,7 @@ public class CapturePlayerImpl implements Player {
 	public void paint(Graphics g) {
 		if (visible && started) {
 			try {
-				g.drawImage(new Image(new d(VLCPlayerImpl.resize(webcam.getImage(), -1, scaleh))), locx, locy, 0);
+				g.drawImage(new Image(new ImageAWT(VLCPlayerImpl.resize(webcam.getImage(), -1, scaleh))), locx, locy, 0);
 			} catch (Exception ignored) {
 			}
 		}

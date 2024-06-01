@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
 
@@ -639,9 +640,9 @@ public final class MemoryView implements DisposeListener {
 				}
 				try {
 					if (Settings.g2d == 1) {
-						((emulator.graphics2D.awt.d) image.getImpl()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+						((ImageAWT) image.getImpl()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
 						if (this.aBoolean1135) {
-							((emulator.graphics2D.awt.d) image.getUsedRegion()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+							((ImageAWT) image.getUsedRegion()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
 						}
 					} else if (Settings.g2d == 0) {
 						((emulator.graphics2D.swt.ImageSWT) image.getImpl()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
@@ -793,7 +794,7 @@ public final class MemoryView implements DisposeListener {
 		}
 		final Object value;
 		if ((value = this.classRefsVector.get(this.classTable.getSelectionIndex())) != null && emulator.debug.ClassTypes.method871(value.getClass())) {
-			new Class5(value).method311(this.aShell1080);
+			new Watcher(value).method311(this.aShell1080);
 		}
 	}
 

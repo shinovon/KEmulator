@@ -3,20 +3,17 @@ package emulator.graphics2D.awt;
 import emulator.graphics2D.*;
 
 import java.awt.*;
-import java.awt.font.TextAttribute;
 import java.awt.image.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * FontAWT
  */
-public final class a implements IFont {
+public final class FontAWT implements IFont {
 	private Font font;
 	private FontMetrics metrics;
 	private static Font nokiaFont;
 
-	public a(final String s, final int size, final int style, boolean height) {
+	public FontAWT(final String s, final int size, final int style, boolean height) {
 		super();
 		if (s.equals("Nokia")) {
 			if (nokiaFont == null) {

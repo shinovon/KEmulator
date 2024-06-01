@@ -34,7 +34,7 @@ import javax.microedition.media.protocol.DataSource;
 
 import emulator.Emulator;
 import emulator.custom.CustomJarResources;
-import emulator.graphics2D.awt.d;
+import emulator.graphics2D.awt.ImageAWT;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.media.MediaRef;
 import uk.co.caprica.vlcj.media.TrackType;
@@ -204,7 +204,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	private static Image awtImgToLcdui(BufferedImage img) {
-		return new Image(new d(img));
+		return new Image(new ImageAWT(img));
 	}
 
 	static byte[] imgToBytes(BufferedImage img) {

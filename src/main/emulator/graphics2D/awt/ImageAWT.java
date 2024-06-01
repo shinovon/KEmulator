@@ -12,26 +12,23 @@ import javax.imageio.*;
 import java.awt.image.*;
 import java.util.Arrays;
 
-/**
- * ImageAWT
- */
-public final class d implements IImage {
+public final class ImageAWT implements IImage {
 	private BufferedImage img;
-	private b graphics;
+	private Graphics2DAWT graphics;
 	private Graphics2D g2d;
 	private int[] data;
 
-	public d(final byte[] array) {
+	public ImageAWT(final byte[] array) {
 		super();
 		img = emulator.graphics2D.c.toAwt(new ImageData(new ByteArrayInputStream(array)));
 	}
 
-	public d(final BufferedImage bi) {
+	public ImageAWT(final BufferedImage bi) {
 		super();
 		img = bi;
 	}
 
-	public d(final int n, final int n2, final boolean b, final int n3) {
+	public ImageAWT(final int n, final int n2, final boolean b, final int n3) {
 		super();
 		img = new BufferedImage(n, n2, b ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
 		final Graphics2D g = g2d = img.createGraphics();
@@ -66,7 +63,7 @@ public final class d implements IImage {
 	}
 
 	public final IGraphics2D createGraphics() {
-		return this.graphics = new b(img);
+		return this.graphics = new Graphics2DAWT(img);
 	}
 
 	public final IGraphics2D getGraphics() {
@@ -154,16 +151,16 @@ public final class d implements IImage {
 	}
 
 	public final void cloneImage(final IImage image) {
-		System.arraycopy(getInternalData(), 0, ((d) image).getInternalData(), 0, data.length);
+		System.arraycopy(getInternalData(), 0, ((ImageAWT) image).getInternalData(), 0, data.length);
 	}
 
 	public void cloneImage(IImage image, int x, int y, int w, int h) {
-		Graphics2D g = ((d) image).g2d;
+		Graphics2D g = ((ImageAWT) image).g2d;
 		if (g == null) {
-			if (((d) image).graphics != null) {
-				g = ((d) image).graphics.g;
+			if (((ImageAWT) image).graphics != null) {
+				g = ((ImageAWT) image).graphics.g;
 			} else {
-				g = ((d) image).g2d = img.createGraphics();
+				g = ((ImageAWT) image).g2d = img.createGraphics();
 			}
 		}
 		g.drawImage(img, x, y, w, h, null);

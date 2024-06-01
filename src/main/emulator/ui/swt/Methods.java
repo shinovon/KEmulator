@@ -17,7 +17,7 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class46 implements Runnable, DisposeListener {
+public final class Methods implements Runnable, DisposeListener {
 	private Shell aShell784;
 	private SashForm aSashForm785;
 	private Composite aComposite787;
@@ -36,7 +36,7 @@ public final class Class46 implements Runnable, DisposeListener {
 	private int anInt786;
 	private ArrayList anArrayList792;
 
-	public Class46() {
+	public Methods() {
 		super();
 		this.aShell784 = null;
 		this.aSashForm785 = null;
@@ -50,7 +50,7 @@ public final class Class46 implements Runnable, DisposeListener {
 		this.aText789 = null;
 		this.aButton799 = null;
 		this.aStyledText790 = null;
-		Class46.aNumberFormat794 = NumberFormat.getInstance();
+		Methods.aNumberFormat794 = NumberFormat.getInstance();
 		this.anArrayList792 = new ArrayList();
 	}
 
@@ -68,9 +68,9 @@ public final class Class46 implements Runnable, DisposeListener {
 			tableItem.setText(3, String.valueOf(data.anInt1173));
 			tableItem.setText(4, String.valueOf(data.refCount));
 			tableItem.setText(5, String.valueOf(data.anInt1182));
-			tableItem.setText(6, Class46.aNumberFormat794.format(data.aLong1179));
-			tableItem.setText(7, Class46.aNumberFormat794.format(data.aFloat1175));
-			tableItem.setText(8, Class46.aNumberFormat794.format(data.aFloat1180));
+			tableItem.setText(6, Methods.aNumberFormat794.format(data.aLong1179));
+			tableItem.setText(7, Methods.aNumberFormat794.format(data.aFloat1175));
+			tableItem.setText(8, Methods.aNumberFormat794.format(data.aFloat1180));
 		}
 		this.run();
 		this.method435(0);
@@ -91,9 +91,9 @@ public final class Class46 implements Runnable, DisposeListener {
 			item.setText(4, String.valueOf(data.refCount));
 			item.setText(5, String.valueOf(data.anInt1182));
 			item.setText(5, String.valueOf(data.anInt1182));
-			item.setText(6, Class46.aNumberFormat794.format(data.aLong1179));
-			item.setText(7, Class46.aNumberFormat794.format(data.aFloat1175));
-			item.setText(8, Class46.aNumberFormat794.format(data.aFloat1180));
+			item.setText(6, Methods.aNumberFormat794.format(data.aLong1179));
+			item.setText(7, Methods.aNumberFormat794.format(data.aFloat1175));
+			item.setText(8, Methods.aNumberFormat794.format(data.aFloat1180));
 		}
 	}
 
@@ -118,9 +118,9 @@ public final class Class46 implements Runnable, DisposeListener {
 				final h.MethodInfo methodInfo2 = (MethodInfo) this.anArrayList792.get(i);
 				final TableItem item;
 				(item = this.aTable788.getItem(i)).setText(5, String.valueOf(methodInfo2.anInt1182));
-				item.setText(6, Class46.aNumberFormat794.format(methodInfo2.aLong1179));
-				item.setText(7, Class46.aNumberFormat794.format(methodInfo2.aFloat1175));
-				item.setText(8, Class46.aNumberFormat794.format(methodInfo2.aFloat1180));
+				item.setText(6, Methods.aNumberFormat794.format(methodInfo2.aLong1179));
+				item.setText(7, Methods.aNumberFormat794.format(methodInfo2.aFloat1175));
+				item.setText(8, Methods.aNumberFormat794.format(methodInfo2.aFloat1180));
 			}
 		} catch (Exception ignored) {
 		}
@@ -280,39 +280,39 @@ public final class Class46 implements Runnable, DisposeListener {
 		this.method446();
 	}
 
-	static Table method441(final Class46 class46) {
+	static Table method441(final Methods class46) {
 		return class46.aTable788;
 	}
 
-	static Shell method442(final Class46 class46) {
+	static Shell method442(final Methods class46) {
 		return class46.aShell784;
 	}
 
-	static void method443(final Class46 class46, final TableItem[] array) {
+	static void method443(final Methods class46, final TableItem[] array) {
 		class46.method439(array);
 	}
 
-	static void method444(final Class46 class46, final int n) {
+	static void method444(final Methods class46, final int n) {
 		class46.method435(n);
 	}
 
-	static Text method434(final Class46 class46) {
+	static Text method434(final Methods class46) {
 		return class46.aText789;
 	}
 
-	static int method445(final Class46 class46, final int anInt786) {
+	static int method445(final Methods class46, final int anInt786) {
 		return class46.anInt786 = anInt786;
 	}
 
-	static int method437(final Class46 class46) {
+	static int method437(final Methods class46) {
 		return class46.anInt786;
 	}
 
-	static StyledText method440(final Class46 class46) {
+	static StyledText method440(final Methods class46) {
 		return class46.aStyledText790;
 	}
 
-	static int method447(final Class46 class46) {
+	static int method447(final Methods class46) {
 		return class46.anInt786++;
 	}
 }

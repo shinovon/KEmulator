@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.events.*;
 import emulator.*;
 import emulator.graphics2D.swt.*;
@@ -21,7 +22,7 @@ final class Class190 implements PaintListener {
 			return;
 		}
 		if (Settings.g2d == 1) {
-			((emulator.graphics2D.awt.d) Property.method356(this.aClass38_1483)).copyToScreen(paintEvent.gc);
+			((ImageAWT) Property.method356(this.aClass38_1483)).copyToScreen(paintEvent.gc);
 		}
 	}
 }

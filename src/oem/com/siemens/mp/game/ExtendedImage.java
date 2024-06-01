@@ -25,6 +25,7 @@
 package com.siemens.mp.game;
 
 import emulator.Emulator;
+import emulator.graphics2D.awt.ImageAWT;
 
 import javax.microedition.lcdui.*;
 
@@ -148,6 +149,6 @@ public class ExtendedImage extends com.siemens.mp.misc.NativeMem {
 				}
 			}
 		}
-		((emulator.graphics2D.awt.d) image.getImpl()).getBufferedImage().setRGB(x, y, width, height, colors, 0, width);
+		((ImageAWT) image.getImpl()).getBufferedImage().setRGB(x, y, width, height, colors, 0, width);
 	}
 }

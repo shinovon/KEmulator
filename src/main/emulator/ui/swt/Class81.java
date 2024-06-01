@@ -6,7 +6,7 @@ import org.eclipse.swt.events.*;
 final class Class81 extends SelectionAdapter {
 	private final Shell aShell866;
 
-	Class81(final Class30 class30, final Shell aShell866) {
+	Class81(final M3GViewCameraSetDialog class30, final Shell aShell866) {
 		super();
 		this.aShell866 = aShell866;
 	}

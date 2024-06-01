@@ -3,7 +3,7 @@ package emulator.ui.swt;
 import org.eclipse.swt.events.*;
 
 final class Class162 extends SelectionAdapter {
-	Class162(final Class54 class54) {
+	Class162(final About class54) {
 		super();
 	}
 

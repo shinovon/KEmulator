@@ -7,17 +7,14 @@ import java.awt.*;
 import emulator.Settings;
 import emulator.graphics2D.*;
 
-/**
- * Graphics2DAWT
- */
-public final class b implements IGraphics2D {
+public final class Graphics2DAWT implements IGraphics2D {
 	Graphics2D g;
 	int width;
 	int height;
 	private int strokeStyle;
-	private a font;
+	private FontAWT font;
 
-	public b(final BufferedImage bufferedImage) {
+	public Graphics2DAWT(final BufferedImage bufferedImage) {
 		super();
 		(g = bufferedImage.createGraphics()).setColor(new Color(0, 0, 0));
 		this.width = bufferedImage.getWidth();
@@ -101,11 +98,11 @@ public final class b implements IGraphics2D {
 	}
 
 	public final void drawImage(final IImage image, final int n, final int n2) {
-		g.drawImage(((d) image).getBufferedImage(), n, n2, null);
+		g.drawImage(((ImageAWT) image).getBufferedImage(), n, n2, null);
 	}
 
 	public final void drawImage(final IImage image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-		g.drawImage(((d) image).getBufferedImage(), n5, n6, n5 + n7, n6 + n8, n, n2, n + n3, n2 + n4, null);
+		g.drawImage(((ImageAWT) image).getBufferedImage(), n5, n6, n5 + n7, n6 + n8, n, n2, n + n3, n2 + n4, null);
 	}
 
 	public final void setClip(final int n, final int n2, final int n3, final int n4) {
@@ -121,8 +118,8 @@ public final class b implements IGraphics2D {
 	}
 
 	public final void setFont(final IFont font) {
-		this.font = (a) font;
-		g.setFont(((a) font).getAWTFont());
+		this.font = (FontAWT) font;
+		g.setFont(((FontAWT) font).getAWTFont());
 	}
 
 	public final void setStrokeStyle(final int anInt12) {
@@ -199,15 +196,15 @@ public final class b implements IGraphics2D {
 	}
 
 	public final ITransform getTransform() {
-		return new c(g.getTransform());
+		return new TransformAWT(g.getTransform());
 	}
 
 	public final void setTransform(final ITransform transform) {
-		g.setTransform(((c) transform).method8());
+		g.setTransform(((TransformAWT) transform).method8());
 	}
 
 	public final void transform(final ITransform transform) {
-		g.transform(((c) transform).method8());
+		g.transform(((TransformAWT) transform).method8());
 	}
 
 	public final void translate(final int x, final int y) {

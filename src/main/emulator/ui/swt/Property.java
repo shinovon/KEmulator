@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.graphics2D.awt.FontAWT;
 import emulator.ui.*;
 import org.eclipse.swt.layout.*;
 
@@ -1832,7 +1833,7 @@ public final class Property implements IProperty {
 					if (Settings.g2d != 1) {
 						break Label_0080;
 					}
-					font2 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0, false);
+					font2 = new FontAWT(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0, false);
 				}
 				font = font2;
 			}
@@ -1855,7 +1856,7 @@ public final class Property implements IProperty {
 					if (Settings.g2d != 1) {
 						break Label_0242;
 					}
-					font3 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0, false);
+					font3 = new FontAWT(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0, false);
 				}
 				font = font3;
 			}
@@ -1878,7 +1879,7 @@ public final class Property implements IProperty {
 					if (Settings.g2d != 1) {
 						break Label_0404;
 					}
-					font4 = new emulator.graphics2D.awt.a(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0, false);
+					font4 = new FontAWT(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0, false);
 				}
 				font = font4;
 			}

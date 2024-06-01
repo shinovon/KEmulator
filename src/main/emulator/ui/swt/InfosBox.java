@@ -5,13 +5,13 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class108 {
+public final class InfosBox {
 	private Shell aShell1069;
 	private Display aDisplay1070;
 	private CLabel aCLabel1071;
 	private boolean aBoolean1072;
 
-	public Class108() {
+	public InfosBox() {
 		super();
 		this.aShell1069 = null;
 		this.aCLabel1071 = null;

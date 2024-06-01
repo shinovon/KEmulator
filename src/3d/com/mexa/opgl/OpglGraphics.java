@@ -18,6 +18,7 @@ package com.mexa.opgl;
 
 import emulator.Settings;
 import emulator.graphics2D.IImage;
+import emulator.graphics2D.awt.Graphics2DAWT;
 import emulator.graphics2D.swt.Graphics2DSWT;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
@@ -527,7 +528,7 @@ public class OpglGraphics {
 				var4 -= var3;
 			}
 
-			((emulator.graphics2D.awt.b) graphics.getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
+			((Graphics2DAWT) graphics.getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
 		}
 //		imageBuffer.copyPixelsFromBuffer(pixelBuffer.rewind());
 //		graphics.getCanvas().drawBitmap(imageBuffer, matrix, null);

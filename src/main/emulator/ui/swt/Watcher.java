@@ -17,7 +17,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.custom.*;
 
-public final class Class5 implements Runnable, DisposeListener {
+public final class Watcher implements Runnable, DisposeListener {
 	private Shell parentShell;
 	private Shell shell;
 	private Combo aCombo546;
@@ -31,15 +31,15 @@ public final class Class5 implements Runnable, DisposeListener {
 	private int anInt553;
 	private Tree aTree554;
 	private TreeEditor aTreeEditor555;
-	private Class5 aClass5_556;
+	private Watcher aClass5_556;
 	private String aString551;
 	public static Vector aVector548;
-	public static Class5 profiler;
+	public static Watcher profiler;
 	private boolean aBoolean561;
 	boolean aBoolean545;
 	boolean aBoolean559;
 
-	public Class5(final int anInt553) {
+	public Watcher(final int anInt553) {
 		super();
 		this.shell = null;
 		this.aCombo546 = null;
@@ -55,7 +55,7 @@ public final class Class5 implements Runnable, DisposeListener {
 		this.aClass5_556 = this;
 	}
 
-	public Class5(final Object o) {
+	public Watcher(final Object o) {
 		super();
 		this.shell = null;
 		this.aCombo546 = null;
@@ -201,7 +201,7 @@ public final class Class5 implements Runnable, DisposeListener {
 			}
 		}
 		if (o != null && ClassTypes.method871(clazz)) {
-			new Class5(o).method311(this.parentShell);
+			new Watcher(o).method311(this.parentShell);
 		}
 	}
 
@@ -291,7 +291,7 @@ public final class Class5 implements Runnable, DisposeListener {
 		this.aBoolean561 = false;
 		this.aBoolean560 = true;
 		EmulatorImpl.asyncExec(this.aClass5_556);
-		if (anInt553 != 1) Class5.aVector548.addElement(this);
+		if (anInt553 != 1) Watcher.aVector548.addElement(this);
 		while (!this.shell.isDisposed()) {
 			if (!this.aDisplay550.readAndDispatch()) {
 				this.aDisplay550.sleep();
@@ -304,7 +304,7 @@ public final class Class5 implements Runnable, DisposeListener {
 
 	public final void method321() {
 		this.aBoolean561 = true;
-		Class5.aVector548.removeElement(this);
+		Watcher.aVector548.removeElement(this);
 		if (this.shell != null && !this.shell.isDisposed()) {
 			this.shell.dispose();
 		}
@@ -322,7 +322,7 @@ public final class Class5 implements Runnable, DisposeListener {
 		while (enumeration.hasMoreElements()) {
 			this.aCombo546.add(enumeration.nextElement().toString());
 		}
-		Class5 class5;
+		Watcher class5;
 		String item;
 		if (this.table.size() > 0) {
 			class5 = this;
@@ -523,43 +523,43 @@ public final class Class5 implements Runnable, DisposeListener {
 		this.method321();
 	}
 
-	static int method314(final Class5 class5) {
+	static int method314(final Watcher class5) {
 		return class5.anInt553;
 	}
 
-	static Hashtable method304(final Class5 class5) {
+	static Hashtable method304(final Watcher class5) {
 		return class5.table;
 	}
 
-	static void method315(final Class5 class5, final TreeItem treeItem, final String s) {
+	static void method315(final Watcher class5, final TreeItem treeItem, final String s) {
 		class5.method310(treeItem, s);
 	}
 
-	static void method317(final Class5 class5) {
+	static void method317(final Watcher class5) {
 		class5.method322();
 	}
 
-	static Class5 method308(final Class5 class5) {
+	static Watcher method308(final Watcher class5) {
 		return class5.aClass5_556;
 	}
 
-	static Button method312(final Class5 class5) {
+	static Button method312(final Watcher class5) {
 		return class5.aButton549;
 	}
 
-	static void method316(final Class5 class5, final TreeItem treeItem) {
+	static void method316(final Watcher class5, final TreeItem treeItem) {
 		class5.method306(treeItem);
 	}
 
-	static Tree method309(final Class5 class5) {
+	static Tree method309(final Watcher class5) {
 		return class5.aTree554;
 	}
 
-	static void method319(final Class5 class5, final TreeItem[] array) {
+	static void method319(final Watcher class5, final TreeItem[] array) {
 		class5.method320(array);
 	}
 
 	static {
-		Class5.aVector548 = new Vector();
+		Watcher.aVector548 = new Vector();
 	}
 }

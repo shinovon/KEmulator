@@ -4,7 +4,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.program.*;
 
 final class Class156 extends SelectionAdapter {
-	Class156(final Class54 class54) {
+	Class156(final About class54) {
 		super();
 	}
 

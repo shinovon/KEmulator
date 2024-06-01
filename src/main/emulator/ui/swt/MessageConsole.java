@@ -15,7 +15,7 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class83 implements IMessage, ControlListener, DisposeListener {
+public final class MessageConsole implements IMessage, ControlListener, DisposeListener {
 	private Shell aShell868;
 	private boolean aBoolean869;
 	private Vector aVector870;
@@ -31,7 +31,7 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
 	private Shell aShell879;
 	private boolean aBoolean881;
 
-	public Class83() {
+	public MessageConsole() {
 		super();
 		this.aShell868 = null;
 		this.aGroup872 = null;
@@ -73,9 +73,9 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
 				sb = new StringBuffer().append("Message From ").append(message.getAddress());
 				payloadText = "\n [Binary data]";
 			}
-			Class83.aString871 = sb.append(payloadText).toString();
+			MessageConsole.aString871 = sb.append(payloadText).toString();
 		}
-		Emulator.getEmulator().getLogStream().println(Class83.aString871);
+		Emulator.getEmulator().getLogStream().println(MessageConsole.aString871);
 		EmulatorImpl.syncExec(new Textout(this));
 	}
 
@@ -174,7 +174,7 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
 	}
 
 	public final void controlMoved(final ControlEvent controlEvent) {
-		Class83 class83;
+		MessageConsole class83;
 		boolean aBoolean881;
 		if (Math.abs(this.aShell879.getLocation().x - this.aShell868.getSize().x - this.aShell868.getLocation().x) < 10 && Math.abs(this.aShell879.getLocation().y - this.aShell868.getLocation().y) < 20) {
 			this.aShell868.setLocation(this.aShell879.getLocation().x - this.aShell868.getSize().x, this.aShell879.getLocation().y);
@@ -194,43 +194,43 @@ public final class Class83 implements IMessage, ControlListener, DisposeListener
 		this.method482();
 	}
 
-	static StyledText method483(final Class83 class83) {
+	static StyledText method483(final MessageConsole class83) {
 		return class83.aStyledText877;
 	}
 
-	static StyledText method489(final Class83 class83) {
+	static StyledText method489(final MessageConsole class83) {
 		return class83.aStyledText874;
 	}
 
-	static Vector method484(final Class83 class83) {
+	static Vector method484(final MessageConsole class83) {
 		return class83.aVector870;
 	}
 
-	static boolean method485(final Class83 class83, final boolean aBoolean869) {
+	static boolean method485(final MessageConsole class83, final boolean aBoolean869) {
 		return class83.aBoolean869 = aBoolean869;
 	}
 
-	static Button method486(final Class83 class83) {
+	static Button method486(final MessageConsole class83) {
 		return class83.aButton873;
 	}
 
 	private final class Textout implements Runnable {
-		private final Class83 aClass83_867;
+		private final MessageConsole aClass83_867;
 
-		private Textout(final Class83 aClass83_867) {
+		private Textout(final MessageConsole aClass83_867) {
 			super();
 			this.aClass83_867 = aClass83_867;
 		}
 
 		public final void run() {
-			if (Class83.method483(this.aClass83_867) == null || Class83.method483(this.aClass83_867).isDisposed()) {
+			if (MessageConsole.method483(this.aClass83_867) == null || MessageConsole.method483(this.aClass83_867).isDisposed()) {
 				return;
 			}
-			Class83.method483(this.aClass83_867).append(Class83.aString871);
-			Class83.method483(this.aClass83_867).setTopIndex(Class83.method483(this.aClass83_867).getLineCount());
+			MessageConsole.method483(this.aClass83_867).append(MessageConsole.aString871);
+			MessageConsole.method483(this.aClass83_867).setTopIndex(MessageConsole.method483(this.aClass83_867).getLineCount());
 		}
 
-		Textout(final Class83 class83, final Class84 class84) {
+		Textout(final MessageConsole class83, final Class84 class84) {
 			this(class83);
 		}
 	}

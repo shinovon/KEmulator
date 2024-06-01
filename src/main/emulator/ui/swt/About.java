@@ -14,7 +14,7 @@ import java.util.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
-public final class Class54 implements MouseListener, MouseMoveListener {
+public final class About implements MouseListener, MouseMoveListener {
 	private Shell aShell806;
 	private CLabel aCLabel805;
 	private Link aLink807;
@@ -32,7 +32,7 @@ public final class Class54 implements MouseListener, MouseMoveListener {
 	int[] anIntArray818;
 	private Button aButton819;
 
-	public Class54() {
+	public About() {
 		super();
 		this.aShell806 = null;
 		this.aCLabel805 = null;
@@ -191,48 +191,48 @@ public final class Class54 implements MouseListener, MouseMoveListener {
 		this.ana811.method137(mouseEvent.x, mouseEvent.y, 5, 50, this.ana811.anInt324);
 	}
 
-	static Shell method456(final Class54 class54) {
+	static Shell method456(final About class54) {
 		return class54.aShell806;
 	}
 
-	static a method457(final Class54 class54) {
+	static a method457(final About class54) {
 		return class54.ana811;
 	}
 
-	static Canvas method458(final Class54 class54) {
+	static Canvas method458(final About class54) {
 		return class54.aCanvas810;
 	}
 
-	static Timer method459(final Class54 class54) {
+	static Timer method459(final About class54) {
 		return class54.aTimer813;
 	}
 
-	static a method460(final Class54 class54, final a ana811) {
+	static a method460(final About class54, final a ana811) {
 		return class54.ana811 = ana811;
 	}
 
-	static ImageSWT method461(final Class54 class54) {
+	static ImageSWT method461(final About class54) {
 		return class54.ad817;
 	}
 
 	final static class WaterTask extends TimerTask {
-		private final Class54 aClass54_775;
+		private final About aClass54_775;
 
-		private WaterTask(final Class54 aClass54_775) {
+		private WaterTask(final About aClass54_775) {
 			super();
 			this.aClass54_775 = aClass54_775;
 		}
 
 		public final void run() {
-			Class54.method457(this.aClass54_775).method136(this.aClass54_775.anIntArray815, this.aClass54_775.anIntArray818);
+			About.method457(this.aClass54_775).method136(this.aClass54_775.anIntArray815, this.aClass54_775.anIntArray818);
 			EmulatorImpl.syncExec(new Water(this, aClass54_775.ana811));
 		}
 
-		WaterTask(final Class54 class54, final Class158 class55) {
+		WaterTask(final About class54, final Class158 class55) {
 			this(class54);
 		}
 
-		static Class54 method433(final WaterTask waterTask) {
+		static About method433(final WaterTask waterTask) {
 			return waterTask.aClass54_775;
 		}
 	}

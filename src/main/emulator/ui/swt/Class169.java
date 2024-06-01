@@ -6,9 +6,9 @@ import emulator.custom.*;
 
 final class Class169 implements Comparator {
 	private final int anInt1438;
-	private final Class46 aClass46_1439;
+	private final Methods aClass46_1439;
 
-	Class169(final Class46 aClass46_1439, final int anInt1438) {
+	Class169(final Methods aClass46_1439, final int anInt1438) {
 		super();
 		this.aClass46_1439 = aClass46_1439;
 		this.anInt1438 = anInt1438;
@@ -61,7 +61,7 @@ final class Class169 implements Comparator {
 			}
 			n = n2;
 		}
-		if (Class46.method441(this.aClass46_1439).getSortDirection() == 128) {
+		if (Methods.method441(this.aClass46_1439).getSortDirection() == 128) {
 			return n;
 		}
 		return -n;
