@@ -43,6 +43,11 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.16.2 [2024.xx.xx]
+Fixed camera capture
+Tried to fix input lag with key events sync on
+Added some more nokia device presets
+
 $v2.16.1 [2024.05.27]
 Midi player fixes
 Implemented com.pantech.titan.PantechAudio
