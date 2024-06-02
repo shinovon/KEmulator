@@ -182,6 +182,28 @@
 		<define name="SCREEN_WIDTH" 	value="240"/>
 		<define name="SCREEN_HEIGHT" 	value="320"/>
 	</device>
+
+    <device name="NokiaN80" parent="Nokia_SERIES60">
+        <define name="SCREEN_WIDTH" value="352"/>
+        <define name="SCREEN_HEIGHT" value="416"/>
+        <define name="MIDP_VERSION" value="20"/>
+        <define name="NOKIA_UI" value="1"/>
+        <define name="KEY_S1" value="-6"/>
+        <define name="KEY_S2" value="-7"/>
+        <define name="KEY_FIRE" value="-5"/>
+        <define name="KEY_UP" value="-1"/>
+        <define name="KEY_DOWN" value="-2"/>
+        <define name="KEY_LEFT" value="-3"/>
+        <define name="KEY_RIGHT" value="-4"/>
+        <define name="S60_VERSION" value="3.0"/>
+        <define name="MIDP20_CLDC11" value="1"/>
+    </device>
+
+    <device name="NokiaE6" parent="NokiaBelleRefresh">
+        <define name="R" value="00"/>
+        <define name="SCREEN_WIDTH" 	value="640"/>
+        <define name="SCREEN_HEIGHT" 	value="480"/>
+    </device>
 	
 	<device name="Nokia7650" parent="Nokia_SERIES60">
 		<define name="PLATFORM_VERSION" 	value="1.0"/>
@@ -1351,23 +1373,6 @@
     <device name="320x480" parent="Nokia">
         <define name="SCREEN_WIDTH"     value="320"/>
         <define name="SCREEN_HEIGHT"    value="480"/>
-    </device>
-
-    <device name="NokiaN80" parent="Nokia_SERIES60">
-        <define name="R" value="1"/>
-        <define name="SCREEN_WIDTH" value="352"/>
-        <define name="SCREEN_HEIGHT" value="416"/>
-        <define name="MIDP_VERSION" value="20"/>
-        <define name="NOKIA_UI" value="1"/>
-        <define name="KEY_S1" value="-6"/>
-        <define name="KEY_S2" value="-7"/>
-        <define name="KEY_FIRE" value="-5"/>
-        <define name="KEY_UP" value="-1"/>
-        <define name="KEY_DOWN" value="-2"/>
-        <define name="KEY_LEFT" value="-3"/>
-        <define name="KEY_RIGHT" value="-4"/>
-        <define name="S60_VERSION" value="3.0"/>
-        <define name="MIDP20_CLDC11" value="1"/>
     </device>
 
 </devices>
