@@ -62,7 +62,7 @@ public class ChoiceGroup
 		}
 	}
 
-	public int append(String s, Image image) {
+	public synchronized int append(String s, Image image) {
 		if (s == null) {
 			throw new NullPointerException();
 		}
@@ -70,14 +70,14 @@ public class ChoiceGroup
 		return this.items.size() - 1;
 	}
 
-	public void delete(int n) {
+	public synchronized void delete(int n) {
 		if (n < 0 || n >= this.items.size()) {
 			throw new IndexOutOfBoundsException();
 		}
 		this.items.remove(n);
 	}
 
-	public void deleteAll() {
+	public synchronized void deleteAll() {
 		this.items.removeAllElements();
 	}
 
@@ -108,21 +108,21 @@ public class ChoiceGroup
 		return ((a) this.items.get(n)).string;
 	}
 
-	public void insert(int n, String s, Image image) {
+	public synchronized void insert(int n, String s, Image image) {
 		if (s == null) {
 			throw new NullPointerException();
 		}
 		this.items.insertElementAt(new a(s, image, null, this), n);
 	}
 
-	public void set(int n, String s, Image image) {
+	public synchronized void set(int n, String s, Image image) {
 		if (s == null) {
 			throw new NullPointerException();
 		}
 		this.items.set(n, new a(s, image, null, this));
 	}
 
-	public void setSelectedFlags(boolean[] array) {
+	public synchronized void setSelectedFlags(boolean[] array) {
 		if (array == null) {
 			throw new NullPointerException();
 		}
@@ -189,7 +189,7 @@ public class ChoiceGroup
 		return ((a) this.items.get(n)).sel;
 	}
 
-	public void setSelectedIndex(int n, boolean flag) {
+	public synchronized void setSelectedIndex(int n, boolean flag) {
 		if (n < 0 || n >= this.items.size()) {
 			throw new IndexOutOfBoundsException();
 		}
@@ -281,13 +281,15 @@ public class ChoiceGroup
 						}
 						return;
 					}
-					((a) this.items.get(this.currentSelect)).method211(graphics, this.inFocus);
+					try {
+						((a) this.items.get(this.currentSelect)).method211(graphics, this.inFocus);
+					} catch (Exception ignored) {}
 				}
 			}
 		}
 	}
 
-	protected void layout() {
+	protected synchronized void layout() {
 		super.layout();
 		int n = 0;
 		if (this.label != null) {
