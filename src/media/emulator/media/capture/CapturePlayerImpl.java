@@ -43,7 +43,7 @@ public class CapturePlayerImpl implements Player {
 
 	private boolean isItem;
 
-	private Item item;
+	private CaptureItem item;
 
 	private FocusControl focusControl;
 
@@ -166,6 +166,10 @@ public class CapturePlayerImpl implements Player {
 	public void setDisplaySize(int p0, int p1) {
 		scalew = p0;
 		scaleh = p1;
+		if(item != null) {
+			item.w = p0;
+			item.h = p1;
+		}
 	}
 
 	public void setDisplayLocation(int p0, int p1) {

@@ -6,10 +6,13 @@ import javax.microedition.lcdui.Graphics;
 public class CaptureItem extends CustomItem {
 
 	private CapturePlayerImpl pl;
+	int w, h;
 
 	CaptureItem(CapturePlayerImpl pl) {
 		super("Capture");
 		this.pl = pl;
+		w = pl.getSourceWidth();
+		h = pl.getSourceHeight();
 	}
 
 	protected int getMinContentWidth() {
@@ -21,11 +24,11 @@ public class CaptureItem extends CustomItem {
 	}
 
 	protected int getPrefContentWidth(int p0) {
-		return pl.getSourceWidth();
+		return w;
 	}
 
 	protected int getPrefContentHeight(int p0) {
-		return pl.getSourceHeight();
+		return h;
 	}
 
 	protected void paint(Graphics g, int w, int h) {
