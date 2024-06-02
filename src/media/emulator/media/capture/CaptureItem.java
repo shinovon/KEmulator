@@ -28,8 +28,8 @@ public class CaptureItem extends CustomItem {
 		return pl.getSourceHeight();
 	}
 
-	protected void paint(Graphics g, int p1, int p2) {
-		pl.paint(g);
+	protected void paint(Graphics g, int w, int h) {
+		pl.paint(g, w, h);
 	}
 
 }

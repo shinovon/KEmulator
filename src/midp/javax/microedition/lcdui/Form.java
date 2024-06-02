@@ -26,29 +26,35 @@ public class Form extends Screen {
 	}
 
 	public int append(final Item item) {
-		if (item == null) {
-			throw new NullPointerException();
+		synchronized(items) {
+			if (item == null) {
+				throw new NullPointerException();
+			}
+			if (item.screen != null) {
+				throw new IllegalStateException();
+			}
+			super.items.add(item);
+			item.screen = this;
+			return super.items.size() - 1;
 		}
-		if (item.screen != null) {
-			throw new IllegalStateException();
-		}
-		super.items.add(item);
-		item.screen = this;
-		return super.items.size() - 1;
 	}
 
 	public int append(final String s) {
-		final StringItem stringItem = new StringItem(null, s);
-		super.items.add(stringItem);
-		stringItem.screen = this;
-		return super.items.size() - 1;
+		synchronized(items) {
+			final StringItem stringItem = new StringItem(null, s);
+			super.items.add(stringItem);
+			stringItem.screen = this;
+			return super.items.size() - 1;
+		}
 	}
 
 	public int append(final Image image) {
-		final ImageItem imageItem = new ImageItem(null, image, 0, null);
-		super.items.add(imageItem);
-		imageItem.screen = this;
-		return super.items.size() - 1;
+		synchronized(items) {
+			final ImageItem imageItem = new ImageItem(null, image, 0, null);
+			super.items.add(imageItem);
+			imageItem.screen = this;
+			return super.items.size() - 1;
+		}
 	}
 
 	public void insert(final int n, final Item item) {
@@ -58,23 +64,29 @@ public class Form extends Screen {
 		if (item.screen != null) {
 			throw new IllegalStateException();
 		}
-		super.items.insertElementAt(item, n);
-		item.screen = this;
+		synchronized(items) {
+			super.items.insertElementAt(item, n);
+			item.screen = this;
+		}
 	}
 
 	public void delete(final int n) {
 		if (n < 0 || n >= super.items.size()) {
 			throw new IndexOutOfBoundsException();
 		}
-		((Item) super.items.get(n)).screen = null;
-		super.items.remove(n);
+		synchronized(items) {
+			((Item) super.items.get(n)).screen = null;
+			super.items.remove(n);
+		}
 	}
 
 	public void deleteAll() {
-		for (Object item : super.items) {
-			((Item) item).screen = null;
+		synchronized(items) {
+			for (Object item : super.items) {
+				((Item) item).screen = null;
+			}
+			super.items.removeAllElements();
 		}
-		super.items.removeAllElements();
 	}
 
 	public void set(final int n, final Item item) {
@@ -87,9 +99,11 @@ public class Form extends Screen {
 		if (item.screen != null) {
 			throw new IllegalStateException();
 		}
-		((Item) super.items.get(n)).screen = null;
-		super.items.set(n, item);
-		item.screen = this;
+		synchronized(items) {
+			((Item) super.items.get(n)).screen = null;
+			super.items.set(n, item);
+			item.screen = this;
+		}
 	}
 
 	public Item get(final int n) {
@@ -116,13 +130,15 @@ public class Form extends Screen {
 	}
 
 	protected void paint(final Graphics g) {
-		this.layout();
-		for (Object o : super.items) {
-			final Item item = ((Item) o);
-			if (item.shownOnForm) {
-				item.paint(g);
-			} else {
-				item.updateHidden();
+		synchronized(items) {
+			this.layout();
+			for (Object o : super.items) {
+				final Item item = ((Item) o);
+				if (item.shownOnForm) {
+					item.paint(g);
+				} else {
+					item.updateHidden();
+				}
 			}
 		}
 	}

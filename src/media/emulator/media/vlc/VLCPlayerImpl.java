@@ -606,7 +606,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			w = (int) (((double) original.getWidth() / (double) original.getHeight()) * (double) h);
 		}
 		try {
-			BufferedImage resized = new BufferedImage(w, h, original.getType());
+			BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g = resized.createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 					RenderingHints.VALUE_INTERPOLATION_BICUBIC);

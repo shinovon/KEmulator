@@ -14,6 +14,7 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.media.*;
 import javax.microedition.media.control.VideoControl;
 
+import emulator.Emulator;
 import emulator.media.vlc.VLCPlayerImpl;
 
 import com.github.sarxos.webcam.Webcam;
@@ -59,6 +60,7 @@ public class CapturePlayerImpl implements Player {
 		focusControl = new FocusControlImpl();
 		flashControl = new FlashControlImpl();
 		cameraControl = new CameraControlImpl();
+		scaleh = Math.max(webcam.getViewSize().height, Emulator.getEmulator().getScreen().getHeight());
 	}
 
 	public Control getControl(String s) {
@@ -188,7 +190,7 @@ public class CapturePlayerImpl implements Player {
 	}
 
 	public byte[] getSnapshot(String p0) throws MediaException {
-		if (!visible) throw new MediaException("Not visible");
+		if (!started) throw new MediaException("Not visible");
 		int w = 0;
 		int h = 0;
 		try {
@@ -237,14 +239,21 @@ public class CapturePlayerImpl implements Player {
 		if (visible && started) {
 			try {
 				g.drawImage(new Image(new ImageAWT(VLCPlayerImpl.resize(webcam.getImage(), -1, scaleh))), locx, locy, 0);
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
+		}
+	}
+
+	public void paint(Graphics g, int w, int h) {
+		if (started) {
+			try {
+				g.drawImage(new Image(new ImageAWT(VLCPlayerImpl.resize(webcam.getImage(), -1, h))), 0, 0, 0);
+			} catch (Exception ignored) {}
 		}
 	}
 
 	public static void draw(Graphics g, Object obj) {
 		if (inst != null) {
-			if (inst.canvas == null || obj == inst.canvas) {
+			if ((inst.canvas == null || obj == inst.canvas) && !inst.isItem) {
 				inst.paint(g);
 			}
 		} else {
