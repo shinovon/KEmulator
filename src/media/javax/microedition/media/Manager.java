@@ -82,7 +82,7 @@ public class Manager {
 		if (s.startsWith(MIDI_DEVICE_LOCATOR)) {
 			return new MIDIImpl();
 		}
-		if (s.startsWith("capture://image") || s.startsWith("capture://video")) {
+		if (s.startsWith("capture://image") || s.startsWith("capture://video") || s.startsWith("capture://devcam0")) {
 			return new CapturePlayerImpl();
 		}
 		String contentType = null;
