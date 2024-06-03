@@ -18,8 +18,7 @@
         <manifest file="./home/version.mf">
             <attribute name="Git-Revision" value="${git.revision}"/>
         </manifest>
-        <manifest file="./src/res/META-INF/version.mf">
-            <attribute name="Git-Revision" value="${git.revision}"/>
-        </manifest>
+        <copy file="./home/version.mf" tofile="./src/res/META-INF/version.mf" overwrite="true" force="true" quiet="true"/>
+        <copy file="./home/version.mf" tofile="./bin/production/KEmulator_base/META-INF/version.mf" overwrite="true" force="true" quiet="true"/>
     </target>
 </project>
