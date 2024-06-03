@@ -22,7 +22,7 @@ public class BackLight {
 	}
 
 	public static int numColors() {
-		return 0;
+		return 1;
 	}
 
 	public static void off() {
