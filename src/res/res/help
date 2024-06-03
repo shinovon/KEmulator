@@ -47,6 +47,11 @@ $v2.16.2 [2024.xx.xx]
 Fixed camera capture
 Tried to fix input lag with key events sync on
 Added some more nokia device presets
+Fix Graphics.drawString (v2.16.1 bug)
+Synchronized ChoiceGroup
+Implement LG Media API
+Reworked "sync key events" setting
+Fix Vodafone API SpriteCanvas rendering
 
 $v2.16.1 [2024.05.27]
 Midi player fixes
