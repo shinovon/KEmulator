@@ -17,6 +17,8 @@
 package com.vodafone.v10.graphics.sprite;
 
 import emulator.Emulator;
+import emulator.graphics2D.IImage;
+import emulator.ui.IScreen;
 
 import java.util.ArrayList;
 
@@ -34,6 +36,8 @@ public abstract class SpriteCanvas extends Canvas {
 	private int[] pixels;
 	private Graphics bufferGraphics;
 
+	public boolean _skipCopy;
+
 	public SpriteCanvas(int numPalettes, int numPatterns) {
 		super();
 		this.palette = new int[numPalettes];
@@ -47,19 +51,33 @@ public abstract class SpriteCanvas extends Canvas {
 	}
 
 	public void disposeFrameBuffer() {
+		spriteImage = null;
+		graphics = null;
 	}
 
 	public void copyArea(int sx, int sy, int fw, int fh, int tx, int ty) {
+		Emulator.getEmulator().getScreen().getBackBufferImage().copyImage(graphics.getImpl(), sx, sy, fw, fh, tx, ty);
+	}
+
+	public void copyFullScreen(int tx, int ty) {
+		copyArea(0, 0, getWidth(), getHeight(), tx, ty);
 	}
 
 	public void drawFrameBuffer(int tx, int ty) {
+		IScreen screen = Emulator.getEmulator().getScreen();
+		IImage screenImage = screen.getScreenImg();
+		IImage backBufferImage = screen.getBackBufferImage();
+
+		backBufferImage.cloneImage(screenImage);
+
 		if (bufferGraphics == null)
-			bufferGraphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
+			bufferGraphics = new Graphics(screenImage, null);
 		bufferGraphics.drawImage(spriteImage, tx, ty, 0);
-		Emulator.getEventQueue().gameGraphicsFlush();
+
+		_skipCopy = true;
 
 		graphics.setColor(0);
-		graphics.fillRect(0, 0, getWidth(), getHeight());
+		graphics.fillRect(0, 0, spriteImage.getWidth(), spriteImage.getHeight());
 	}
 
 	public void setPalette(int index, int palette) {
@@ -84,18 +102,21 @@ public abstract class SpriteCanvas extends Canvas {
 	}
 
 	public void drawSpriteChar(short command, short x, short y) {
-		CharacterCommand characterCommand = commands.get(command);
-		for (int i = 0; i < 64; i++) {
-			int colorId = patternData[characterCommand.patternNo * 64 + i];
-			pixels[i] = palette[colorId];
+		CharacterCommand c = commands.get(command);
+		for (int x1 = 0; x1 < 8; x1++) {
+			for (int y1 = 0; y1 < 8; y1++) {
+				int i = (c.isUpsideDown ? 7 - y1 : y1) * 8 + (c.isRightsideLeft ? 7 - x1 : x1);
+				int colorId = patternData[c.patternNo * 64 + i];
+				pixels[y1 * 8 + x1] = c.transparent && colorId == 0 ? 0 : palette[colorId];
+			}
 		}
 		graphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
 	}
 
 	private static class CharacterCommand {
-		int offset;
+		int offset; // TODO
 		boolean transparent;
-		int rotation;
+		int rotation; // TODO
 		boolean isUpsideDown;
 		boolean isRightsideLeft;
 		int patternNo;

@@ -166,6 +166,10 @@ public final class ImageAWT implements IImage {
 		g.drawImage(img, x, y, w, h, null);
 	}
 
+	public void copyImage(IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty) {
+		((Graphics2DAWT)g).g().drawImage(img, tx, ty, tx + w, ty + h, sx, sy, sx + w, sy + h, null);
+	}
+
 	private int[] getInternalData() {
 		if (data == null) {
 			data = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();

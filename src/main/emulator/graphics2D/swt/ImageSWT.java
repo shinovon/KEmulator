@@ -334,6 +334,10 @@ public final class ImageSWT implements IImage {
 		image.setData(this.getData());
 	}
 
+	public void copyImage(IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty) {
+		// TODO
+	}
+
 	static {
 		aPaletteData537 = new PaletteData(65280, 16711680, -16777216);
 	}

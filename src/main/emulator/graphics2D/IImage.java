@@ -29,6 +29,8 @@ public interface IImage {
 
 	void cloneImage(final IImage img, int x, int y, int w, int h);
 
+	void copyImage(final IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty);
+
 	int size();
 
 	Object getNative();

@@ -2,6 +2,7 @@ package emulator;
 
 import javax.microedition.lcdui.*;
 
+import com.vodafone.v10.graphics.sprite.SpriteCanvas;
 import emulator.ui.IScreen;
 import net.rim.device.api.system.Application;
 import emulator.graphics2D.*;
@@ -413,7 +414,8 @@ public final class EventQueue implements Runnable {
 
 	private void internalRepaint() {
 		try {
-			if (Emulator.getCanvas() == null
+			Canvas canvas = Emulator.getCanvas();
+			if (canvas == null
 					|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 				return;
 			}
@@ -424,15 +426,19 @@ public final class EventQueue implements Runnable {
 			Displayable.checkForSteps(lock);
 			try {
 				if (repaintRegion[0] == -1) { // full repaint
-					Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage);
+					canvas.invokePaint(backBufferImage, xRayScreenImage);
 				} else {
-					Emulator.getCanvas().invokePaint(backBufferImage, xRayScreenImage, repaintRegion[0], repaintRegion[1], repaintRegion[2], repaintRegion[3]);
+					canvas.invokePaint(backBufferImage, xRayScreenImage, repaintRegion[0], repaintRegion[1], repaintRegion[2], repaintRegion[3]);
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			(Settings.xrayView ? xRayScreenImage : backBufferImage)
-					.cloneImage(scr.getScreenImg());
+			if (canvas instanceof SpriteCanvas && ((SpriteCanvas) canvas)._skipCopy) {
+				((SpriteCanvas) canvas)._skipCopy = false;
+			} else {
+				(Settings.xrayView ? xRayScreenImage : backBufferImage)
+						.cloneImage(scr.getScreenImg());
+			}
 			scr.repaint();
 		} catch (Exception e) {
 			System.err.println("Exception in repaint!");
