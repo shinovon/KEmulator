@@ -34,6 +34,11 @@ public class CustomMethod {
 		Thread.yield();
 	}
 
+	public static void sleep(long t) throws InterruptedException {
+		Thread.sleep(t);
+	}
+
+
 	public static String getProperty(final String prop) {
 		String res = System.getProperty(prop);
 		boolean b = true;
