@@ -7,6 +7,12 @@
         <target>asd</target>
       </options>
     </properties>
+    <properties id="ant-postprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/build.xml</file>
+        <target>asd</target>
+      </options>
+    </properties>
     <root id="root" />
   </artifact>
 </component>
