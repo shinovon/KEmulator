@@ -48,10 +48,10 @@ Fixed camera capture
 Tried to fix input lag with key events sync on
 Added some more nokia device presets
 Fix Graphics.drawString (v2.16.1 bug)
-Synchronized ChoiceGroup
-Implement LG Media API
+Synchronized lcdui.ChoiceGroup
+Implemented LG Media API
 Reworked "sync key events" setting
-Fix Vodafone API SpriteCanvas rendering
+Fixed Vodafone API SpriteCanvas rendering
 
 $v2.16.1 [2024.05.27]
 Midi player fixes

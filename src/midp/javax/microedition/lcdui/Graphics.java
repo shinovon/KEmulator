@@ -12,7 +12,9 @@ import com.jblend.graphics.j3d.FigureLayout;
 import com.jblend.graphics.j3d.Texture;
 
 
-public class Graphics implements com.vodafone.v10.graphics.j3d.Graphics3D,
+public class Graphics
+		implements com.vodafone.v10.graphics.j3d.Graphics3D,
+		com.motorola.graphics.j3d.Graphics3D,
 		com.jblend.graphics.j3d.Graphics3D {
 	IGraphics2D impl;
 	IImage image;
@@ -559,6 +561,13 @@ public class Graphics implements com.vodafone.v10.graphics.j3d.Graphics3D,
 										com.vodafone.v10.graphics.j3d.FigureLayout layout,
 										com.vodafone.v10.graphics.j3d.Effect3D effect) {
 		com.vodafone.v10.graphics.j3d.RenderProxy.drawFigure(this, figure, x, y, layout, effect);
+	}
+
+	public synchronized void drawFigure(com.motorola.graphics.j3d.Figure figure,
+										int x, int y,
+										com.motorola.graphics.j3d.FigureLayout layout,
+										com.motorola.graphics.j3d.Effect3D effect) {
+		com.motorola.graphics.j3d.RenderProxy.drawFigure(this, figure, x, y, layout, effect);
 	}
 
 	public void drawCommandList(Texture[] textures, int x, int y, FigureLayout layout, Effect3D effect, int[] commandlist) {

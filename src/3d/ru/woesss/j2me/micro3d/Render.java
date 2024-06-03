@@ -30,6 +30,7 @@ import java.nio.*;
 import java.util.LinkedList;
 
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 import emulator.Settings;
 import emulator.graphics2D.IImage;
@@ -155,47 +156,46 @@ public class Render {
 		backCopied = false;
 	}
 
-//	public synchronized void bind(TextureImpl tex) {
-//		targetTexture = tex;
-//		int width = tex.getWidth();
-//		int height = tex.getHeight();
-//		if (emulator3d == null) {
-//			init();
-//		}
-//		if (env.width != width || env.height != height) {
-//			if (wasBinded) emulator3d.releaseTarget();
-//			emulator3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
-//
-//			glViewport(0, 0, width, height);
-//			Program.create();
-//			env.width = width;
-//			env.height = height;
-//		} else {
-//			emulator3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
-//			glViewport(0, 0, width, height);
-//		}
-//		Rectangle clip = this.clip;
-//		clip.setBounds(0, 0, width, height);
-//		int l = clip.x;
-//		int t = clip.y;
-//		int w = clip.width;
-//		int h = clip.height;
-//		gClip.setBounds(l, t, w, h);
-//		if (l == 0 && t == 0 && w == env.width && h == env.height) {
-//			glDisable(GL_SCISSOR_TEST);
-//		} else {
-//			glEnable(GL_SCISSOR_TEST);
-//			glScissor(l, t, w, h);
-//		}
-//		glClearColor(
-//				((clearColor >> 16) & 0xff) / 255.0f,
-//				((clearColor >> 8) & 0xff) / 255.0f,
-//				(clearColor & 0xff) / 255.0f,
-//				1.0f);
-//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//		backCopied = false;
-//		swapBuffers();
-//	}
+	public synchronized void bind(TextureImpl tex) {
+		targetTexture = tex;
+		int width = tex.getWidth();
+		int height = tex.getHeight();
+		if (emulator3d == null) {
+			init();
+		}
+		if (env.width != width || env.height != height) {
+			if (wasBinded) emulator3d.releaseTarget();
+			emulator3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
+
+			glViewport(0, 0, width, height);
+			Program.create();
+			env.width = width;
+			env.height = height;
+		} else {
+			emulator3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
+			glViewport(0, 0, width, height);
+		}
+		Rectangle clip = this.clip;
+		clip.setBounds(0, 0, width, height);
+		int l = clip.x;
+		int t = clip.y;
+		int w = clip.width;
+		int h = clip.height;
+		gClip.setBounds(l, t, w, h);
+		if (l == 0 && t == 0 && w == env.width && h == env.height) {
+			glDisable(GL_SCISSOR_TEST);
+		} else {
+			glEnable(GL_SCISSOR_TEST);
+			glScissor(l, t, w, h);
+		}
+		glClearColor(
+				((clearColor >> 16) & 0xff) / 255.0f,
+				((clearColor >> 8) & 0xff) / 255.0f,
+				(clearColor & 0xff) / 255.0f,
+				1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		backCopied = false;
+	}
 
 	private static void applyBlending(int blendMode) {
 		switch (blendMode) {
@@ -1417,34 +1417,34 @@ public class Render {
 		clearColor = color;
 	}
 
-//	public synchronized void flushToBuffer() {
-//		if (stack.isEmpty()) {
-//			return;
-//		}
-//		try {
-//			copy2d(true);
-//			flushStep = 1;
-//			for (RenderNode r : stack) {
-//				r.render(this);
-//			}
-//			flushStep = 2;
-//			for (RenderNode r : stack) {
-//				r.render(this);
-//				r.recycle();
-//			}
-//			glDisable(GL_BLEND);
-//			glDepthMask(true);
-//			glClear(GL_DEPTH_BUFFER_BIT);
-//			glFlush();
-//			if (targetTexture != null) {
-//				glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
-//			} else if (targetGraphics != null) {
-//				swapBuffers();
-//			}
-//		} finally {
-//			stack.clear();
-//		}
-//	}
+	public synchronized void flushToBuffer() {
+		if (stack.isEmpty()) {
+			return;
+		}
+		try {
+			copy2d(true);
+			flushStep = 1;
+			for (RenderNode r : stack) {
+				r.render(this);
+			}
+			flushStep = 2;
+			for (RenderNode r : stack) {
+				r.render(this);
+				r.recycle();
+			}
+			glDisable(GL_BLEND);
+			glDepthMask(true);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glFlush();
+			if (targetTexture != null) {
+				glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
+			} else if (targetGraphics != null) {
+				swapBuffers();
+			}
+		} finally {
+			stack.clear();
+		}
+	}
 
 	private void swapBuffers() {
 		if (targetGraphics == null) return;
