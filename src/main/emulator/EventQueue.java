@@ -6,7 +6,6 @@ import emulator.ui.IScreen;
 import net.rim.device.api.system.Application;
 import emulator.graphics2D.*;
 
-import java.util.Arrays;
 import java.util.Vector;
 
 public final class EventQueue implements Runnable {
@@ -178,7 +177,6 @@ public final class EventQueue implements Runnable {
 		synchronized (this) {
 			events[count++] = n;
 			if (count >= events.length) {
-				System.out.println("grow " + events.length * 2);
 				System.arraycopy(events, 0, events = new int[events.length * 2], 0, count);
 			}
 		}
@@ -357,7 +355,6 @@ public final class EventQueue implements Runnable {
 							System.arraycopy(inputs, 1, inputs, 0, inputs.length - 1);
 							inputsCount--;
 						}
-						System.out.println(Arrays.toString(e));
 						if (e != null) {
 							synchronized (lock) {
 								processInputEvent(e);
