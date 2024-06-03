@@ -57,11 +57,11 @@ public class Display {
 					((Canvas) d).setFullScreenMode(true);
 				}
 				Emulator.setCanvas((Canvas) d);
-				Emulator.getEventQueue().queue(15);
+				Emulator.getEventQueue().queue(EventQueue.EVENT_SHOW);
 				Emulator.getEventQueue().queueRepaint();
 			} else if (d instanceof Screen) {
 				Emulator.setScreen((Screen) d);
-				Emulator.getEventQueue().queue(4);
+				Emulator.getEventQueue().queue(EventQueue.EVENT_SCREEN);
 				((Screen) d).shown();
 				if (d instanceof TextBox) {
 					((TextBox) d).focusCaret();
@@ -149,7 +149,7 @@ public class Display {
 		Display.current = alert;
 		alert.lastDisplayed = ret;
 		Emulator.setScreen(alert);
-		Emulator.getEventQueue().queue(4);
+		Emulator.getEventQueue().queue(EventQueue.EVENT_SCREEN);
 		alert.updateCommands();
 	}
 

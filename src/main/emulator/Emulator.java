@@ -798,7 +798,7 @@ public class Emulator {
 		}
 		Emulator.emulatorimpl.method822().method302();
 		Emulator.emulatorimpl.method829().method302();
-		Emulator.eventQueue.queue(10);
+		Emulator.eventQueue.queue(EventQueue.EVENT_START);
 		Emulator.emulatorimpl.getEmulatorScreen().start(true);
 		EmulatorImpl.dispose();
 		System.exit(0);

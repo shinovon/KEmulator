@@ -199,6 +199,7 @@ public final class Property implements IProperty {
 	private Button globalMidiCheck;
 	private Button ignoreRegionRepaintCheck;
 	private Button fpsCounterCheck;
+	private Button serialCallsCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -407,6 +408,7 @@ public final class Property implements IProperty {
 			Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
 			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
+			Settings.processSerialCallsOutOfQueue = Boolean.parseBoolean(properties.getProperty("ProcessSerialCallsOutOfQueue", "false"));
 
 			Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
 			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
@@ -600,6 +602,7 @@ public final class Property implements IProperty {
 			properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
 			properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
+			properties.setProperty("ProcessSerialCallsOutOfQueue", String.valueOf(Settings.processSerialCallsOutOfQueue));
 
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
@@ -771,6 +774,7 @@ public final class Property implements IProperty {
 //        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 		Settings.oneMidiAtTime = globalMidiCheck.getSelection();
 		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
+		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 
@@ -1536,6 +1540,11 @@ public final class Property implements IProperty {
 		ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
 		ignoreRegionRepaintCheck.setLayoutData(gridData);
 		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
+
+		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
+		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
+		serialCallsCheck.setLayoutData(gridData);
+		serialCallsCheck.setSelection(Settings.processSerialCallsOutOfQueue);
 	}
 
 	private void setupMediaComp() {

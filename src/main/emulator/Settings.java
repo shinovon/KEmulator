@@ -95,4 +95,5 @@ public final class Settings {
 	public static boolean ignoreRegionRepaint;
 	public static boolean startAppOnResume = true;
 	public static int micro3d = 1; // 0 - dll, 1 - gl
+	public static boolean processSerialCallsOutOfQueue;
 }

@@ -1052,7 +1052,7 @@ public final class EmulatorScreen implements
 					return;
 				}
 				this.pauseState = 2;
-				Emulator.getEventQueue().queue(16);
+				Emulator.getEventQueue().queue(EventQueue.EVENT_PAUSE);
 				this.pauseScreen();
 				this.canvas.redraw();
 				this.updatePauseState();
@@ -1063,7 +1063,7 @@ public final class EmulatorScreen implements
 					return;
 				}
 				this.pauseState = 1;
-				Emulator.getEventQueue().queue(17);
+				Emulator.getEventQueue().queue(EventQueue.EVENT_RESUME);
 				this.screenImg.dispose();
 				if (Settings.steps == 0) {
 					this.pauseScreen();
@@ -2127,7 +2127,7 @@ public final class EmulatorScreen implements
 		Emulator.getEmulator().disposeSubWindows();
 		Emulator.notifyDestroyed();
 		if (this.pauseState != 0) {
-			Emulator.getEventQueue().queue(11);
+			Emulator.getEventQueue().queue(EventQueue.EVENT_EXIT);
 		}
 	}
 
