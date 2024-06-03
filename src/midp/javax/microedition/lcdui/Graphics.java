@@ -45,8 +45,8 @@ public class Graphics implements com.vodafone.v10.graphics.j3d.Graphics3D,
 		if (i2 != null) {
 			this.xrayImage = i2;
 			(this.xrayGraphics = i2.createGraphics()).setAlpha(60);
-			this.setFont(Font.getDefaultFont());
 		}
+		this.setFont(Font.getDefaultFont());
 	}
 
 	public Graphics(final IImage anIImage517) {
