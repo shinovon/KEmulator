@@ -1,69 +1,78 @@
-/*
- * Copyright 2020 Nikita Shakarun
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.j_phone.amuse;
 
-package com.vodafone.v10.graphics.sprite;
-
+import com.jblend.ui.SequenceInterface;
 import emulator.Emulator;
 import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
 
-import java.util.ArrayList;
-
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+import java.util.ArrayList;
 
-public abstract class SpriteCanvas extends Canvas {
-	private static ArrayList<CharacterCommand> commands = new ArrayList<>();
+public abstract class ACanvas
+		extends Canvas
+		implements SequenceInterface {
+	private static ArrayList<ACanvas.CharacterCommand> commands = new ArrayList<>();
 	private Image spriteImage;
 	private Graphics graphics;
 	private int[] palette;
 	private byte[] patternData;
 	private int[] pixels;
+
 	private Graphics bufferGraphics;
+	private Graphics screenGraphics;
 
 	public boolean _skipCopy;
 
-	public SpriteCanvas(int numPalettes, int numPatterns) {
+	public ACanvas(int numPalettes, int numPatterns, int fw, int fh) {
 		super();
 		this.palette = new int[numPalettes];
 		this.patternData = new byte[numPatterns * 64];
 		this.pixels = new int[64];
-	}
-
-	public void createFrameBuffer(int fw, int fh) {
 		spriteImage = Image.createImage(fw, fh, -1);
 		graphics = spriteImage.getGraphics();
 	}
 
-	public void disposeFrameBuffer() {
-		spriteImage = null;
-		graphics = null;
+	public static int getVirtualWidth() {
+		return Emulator.getEmulator().getScreen().getWidth();
+	}
+
+	public static int getVirtualHeight() {
+		return Emulator.getEmulator().getScreen().getHeight();
+	}
+
+	public void setPalette(int index, int palette) {
+		this.palette[index] = palette | 0xFF000000;
+	}
+
+	public void setPattern(int index, byte[] data) {
+		System.arraycopy(data, 0, patternData, index * 64, data.length);
+	}
+
+	public void drawBackground(short command, short x, short y) {
+		ACanvas.CharacterCommand c = commands.get(command);
+		for (int x1 = 0; x1 < 8; x1++) {
+			for (int y1 = 0; y1 < 8; y1++) {
+				int i = (c.isUpsideDown ? 7 - y1 : y1) * 8 + (c.isRightsideLeft ? 7 - x1 : x1);
+				int colorId = patternData[c.patternNo * 64 + i];
+				pixels[y1 * 8 + x1] = palette[colorId];
+			}
+		}
+		if (screenGraphics == null)
+			screenGraphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), null);
+		screenGraphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
 	}
 
 	public void copyArea(int sx, int sy, int fw, int fh, int tx, int ty) {
 		Emulator.getEmulator().getScreen().getBackBufferImage().copyImage(graphics.getImpl(), sx, sy, fw, fh, tx, ty);
 	}
 
-	public void copyFullScreen(int tx, int ty) {
-		copyArea(0, 0, getWidth(), getHeight(), tx, ty);
+	public void scroll(int dx, int dy) {
+		// TODO
 	}
 
-	public void drawFrameBuffer(int tx, int ty) {
+	public void flush(int tx, int ty) {
 		IScreen screen = Emulator.getEmulator().getScreen();
 		IImage screenImage = screen.getScreenImg();
 
@@ -79,17 +88,9 @@ public abstract class SpriteCanvas extends Canvas {
 		graphics.fillRect(0, 0, spriteImage.getWidth(), spriteImage.getHeight());
 	}
 
-	public void setPalette(int index, int palette) {
-		this.palette[index] = palette | 0xFF000000;
-	}
-
-	public void setPattern(int index, byte[] data) {
-		System.arraycopy(data, 0, patternData, index * 64, data.length);
-	}
-
 	public static short createCharacterCommand(int offset, boolean transparent, int rotation,
 											   boolean isUpsideDown, boolean isRightsideLeft, int patternNo) {
-		CharacterCommand command = new CharacterCommand();
+		ACanvas.CharacterCommand command = new ACanvas.CharacterCommand();
 		command.offset = offset;
 		command.transparent = transparent;
 		command.rotation = rotation;
@@ -101,7 +102,7 @@ public abstract class SpriteCanvas extends Canvas {
 	}
 
 	public void drawSpriteChar(short command, short x, short y) {
-		CharacterCommand c = commands.get(command);
+		ACanvas.CharacterCommand c = commands.get(command);
 		for (int x1 = 0; x1 < 8; x1++) {
 			for (int y1 = 0; y1 < 8; y1++) {
 				int i = (c.isUpsideDown ? 7 - y1 : y1) * 8 + (c.isRightsideLeft ? 7 - x1 : x1);
@@ -120,4 +121,8 @@ public abstract class SpriteCanvas extends Canvas {
 		boolean isRightsideLeft;
 		int patternNo;
 	}
+
+	public final void sequenceStart() {}
+
+	public final void sequenceStop() {}
 }

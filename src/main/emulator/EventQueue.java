@@ -2,6 +2,7 @@ package emulator;
 
 import javax.microedition.lcdui.*;
 
+import com.j_phone.amuse.ACanvas;
 import com.vodafone.v10.graphics.sprite.SpriteCanvas;
 import emulator.ui.IScreen;
 import net.rim.device.api.system.Application;
@@ -435,6 +436,8 @@ public final class EventQueue implements Runnable {
 			}
 			if (canvas instanceof SpriteCanvas && ((SpriteCanvas) canvas)._skipCopy) {
 				((SpriteCanvas) canvas)._skipCopy = false;
+			} else if (canvas instanceof ACanvas && ((ACanvas) canvas)._skipCopy) {
+				((ACanvas) canvas)._skipCopy = false;
 			} else {
 				(Settings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
