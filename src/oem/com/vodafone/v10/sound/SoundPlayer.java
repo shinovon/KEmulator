@@ -32,4 +32,33 @@ public class SoundPlayer {
 		}
 		throw new IllegalStateException("no more tracks available!");
 	}
+
+	public SoundTrack getTrack(int i) {
+		if (tracks[i] == null) {
+			tracks[i] = new SoundTrack(i);
+		}
+		return tracks[i];
+	}
+
+	public int getTrackCount() {
+		int n = 0;
+		for (int i = 0; i < 16; i++) {
+			if (tracks[i] != null) {
+				n++;
+			}
+		}
+		return n;
+	}
+
+	public void kill() {
+		for (int i = 0; i < 16; i++) {
+			if (tracks[i] != null) {
+				tracks[i].stop();
+			}
+		}
+	}
+
+	public void disposePlayer() {
+
+	}
 }

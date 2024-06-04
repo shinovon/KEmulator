@@ -22,6 +22,7 @@ import java.io.IOException;
 import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
+import javax.microedition.media.PlayerImpl;
 
 public class Sound {
 	private Player player;
@@ -42,7 +43,32 @@ public class Sound {
 		}
 	}
 
+	public Sound(String name) throws IOException {
+		try {
+			player = Manager.createPlayer(name);
+		} catch (MediaException e) {
+			throw new RuntimeException(e);
+		}
+		try {
+			player.realize();
+		} catch (MediaException e) {
+			e.printStackTrace();
+		}
+	}
+
 	Player getPlayer() {
 		return player;
+	}
+
+	public int getSize() {
+		try {
+			return ((PlayerImpl) player).dataLen;
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	public int getUseTracks() {
+		return 0;
 	}
 }
