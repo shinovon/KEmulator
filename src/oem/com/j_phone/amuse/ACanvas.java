@@ -61,7 +61,7 @@ public abstract class ACanvas
 		}
 		if (screenGraphics == null)
 			screenGraphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), null);
-		screenGraphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
+		screenGraphics.drawRGB(pixels, 0, 8, x * 8, y * 8, 8, 8, true);
 	}
 
 	public void copyArea(int sx, int sy, int fw, int fh, int tx, int ty) {
