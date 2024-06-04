@@ -79,6 +79,8 @@ public class CustomMethod {
 			res = Settings.locale;
 		} else if (prop.equalsIgnoreCase("microedition.encoding")) {
 			res = Settings.fileEncoding;
+		} else if (prop.equalsIgnoreCase("Platform")) {
+			res = "";
 		}
 		if (b)
 			Emulator.getEmulator().getLogStream().println("System.getProperty#" + prop + "=" + res);

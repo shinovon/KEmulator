@@ -18,6 +18,12 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			} else if (desc.contains("java/util/Timer")) {
 				s4 = "java/util/Timer";
 				s5 = "emulator/custom/subclass/Timer";
+			} else if (desc.contains("com/gcjsp/v10/")) {
+				s4 = "com/gcjsp/v10/";
+				s5 = "com/vodafone/v10/";
+			} else if (desc.contains("tw/com/fareastone/v10/")) {
+				s4 = "tw/com/fareastone/v10/";
+				s5 = "com/vodafone/v10/";
 			} else {
 				break Label_0037;
 			}
@@ -56,22 +62,27 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			super.visit(n, n2, s, s2, "emulator/custom/subclass/Timer", array);
 			return;
 		}
+		if (s3.startsWith("com/gcjsp/v10/")) {
+			super.visit(n, n2, s, s2, s3.replace("com/gcjsp/v10/", "com/vodafone/v10/"), array);
+			return;
+		}
+		if (s3.startsWith("tw/com/fareastone/v10/")) {
+			super.visit(n, n2, s, s2, s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"), array);
+			return;
+		}
 		super.visit(n, n2, s, s2, s3, array);
 	}
 
 	public final FieldVisitor visitField(final int n, final String s, String s2, final String s3, final Object o) {
-		String s4;
 		if (s2.equals("Ljava/util/TimerTask;")) {
-			s4 = "Lemulator/custom/subclass/SubTimerTask;";
-		} else {
-			if (!s2.equals("Ljava/util/Timer;")) {
-//                if(className.equals("AppTHQwale"))
-//                    System.out.println(s + " " + s2 + " " + s3 + " " + o);
-				return super.visitField(n, s, s2, s3, o);
-			}
-			s4 = "Lemulator/custom/subclass/Timer;";
+			s2 = "Lemulator/custom/subclass/SubTimerTask;";
+		} else if (s2.equals("Ljava/util/Timer;")) {
+			s2 = "Lemulator/custom/subclass/Timer;";
+		} else if (s2.contains("com/gcjsp/v10/")) {
+			s2 = s2.replace("com/gcjsp/v10/", "com/vodafone/v10/");
+		} else if (s2.contains("tw/com/fareastone/v10/")) {
+			s2 = s2.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
 		}
-		s2 = s4;
 		return super.visitField(n, s, s2, s3, o);
 	}
 }

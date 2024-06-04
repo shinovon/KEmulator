@@ -15,6 +15,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 		this.anInt1185 = Math.max(this.anInt1185, n);
 	}
 
+
 	public final void visitMethodInsn(final int acc, final String cls, final String name, String sign) {
 		Label_0576:
 		{
@@ -93,6 +94,14 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(acc, "emulator/custom/subclass/SubTimerTask", name, sign);
 					return;
 				}
+				if (cls.startsWith("com/gcjsp/v10/") || sign.contains("com/gcjsp/v10/")) {
+					super.visitMethodInsn(acc, cls.replace("com/gcjsp/v10/", "com/vodafone/v10/"), name, sign.replace("com/gcjsp/v10/", "com/vodafone/v10/"));
+					return;
+				}
+				if (cls.startsWith("tw/com/fareastone/v10/") || sign.contains("tw/com/fareastone/v10/")) {
+					super.visitMethodInsn(acc, cls.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"), name, sign.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"));
+					return;
+				}
 				if (Settings.g3d == 0) {
 					if (cls.equals("javax/microedition/m3g/Transform")) {
 						if (!name.equals("finalize") && !name.contains("init>")) {
@@ -127,6 +136,12 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				} else if (sign.contains("java/util/Timer")) {
 					s5 = "java/util/Timer";
 					s6 = "emulator/custom/subclass/Timer";
+				} else if (sign.contains("com/gcjsp/v10/")) {
+					s5 = "com/gcjsp/v10/";
+					s6 = "com/vodafone/v10/";
+				} else if (sign.contains("tw/com/fareastone/v10/")) {
+					s5 = "tw/com/fareastone/v10/";
+					s6 = "com/vodafone/v10/";
 				} else {
 					break Label_0576;
 				}
@@ -137,18 +152,14 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitFieldInsn(final int n, final String s, final String s2, String s3) {
-		Label_0029:
-		{
-			String s4;
-			if (s3.equals("Ljava/util/TimerTask;")) {
-				s4 = "Lemulator/custom/subclass/SubTimerTask;";
-			} else {
-				if (!s3.equals("Ljava/util/Timer;")) {
-					break Label_0029;
-				}
-				s4 = "Lemulator/custom/subclass/Timer;";
-			}
-			s3 = s4;
+		if (s3.equals("Ljava/util/TimerTask;")) {
+			s3 = "Lemulator/custom/subclass/SubTimerTask;";
+		} else if (s3.equals("Ljava/util/Timer;")) {
+			s3 = "Lemulator/custom/subclass/Timer;";
+		} else if (s3.contains("com/gcjsp/v10/")) {
+			s3 = s3.replace("com/gcjsp/v10/", "com/vodafone/v10/");
+		} else if (s2.contains("tw/com/fareastone/v10/")) {
+			s3 = s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
 		}
 		super.visitFieldInsn(n, s, s2, s3);
 	}
@@ -229,6 +240,14 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 		}
 		if (s.equals("java/util/Timer")) {
 			super.visitTypeInsn(n, "emulator/custom/subclass/Timer");
+			return;
+		}
+		if (s.startsWith("com/gcjsp/v10/")) {
+			super.visitTypeInsn(n, s.replace("com/gcjsp/v10/", "com/vodafone/v10/"));
+			return;
+		}
+		if (s.startsWith("tw/com/fareastone/v10/")) {
+			super.visitTypeInsn(n, s.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"));
 			return;
 		}
 		super.visitTypeInsn(n, s);
