@@ -16,6 +16,7 @@
 
 package com.vodafone.v10.graphics.sprite;
 
+import com.j_phone.amuse.ACanvas;
 import emulator.Emulator;
 import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
@@ -34,7 +35,9 @@ public abstract class SpriteCanvas extends Canvas {
 	private int[] palette;
 	private byte[] patternData;
 	private int[] pixels;
+
 	private Graphics bufferGraphics;
+	private Graphics screenGraphics;
 
 	public boolean _skipCopy;
 
@@ -110,6 +113,20 @@ public abstract class SpriteCanvas extends Canvas {
 			}
 		}
 		graphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
+	}
+
+	public void drawBackground(short command, short x, short y) {
+		CharacterCommand c = commands.get(command);
+		for (int x1 = 0; x1 < 8; x1++) {
+			for (int y1 = 0; y1 < 8; y1++) {
+				int i = (c.isUpsideDown ? 7 - y1 : y1) * 8 + (c.isRightsideLeft ? 7 - x1 : x1);
+				int colorId = patternData[c.patternNo * 64 + i];
+				pixels[y1 * 8 + x1] = palette[colorId];
+			}
+		}
+		if (screenGraphics == null)
+			screenGraphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), null);
+		screenGraphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
 	}
 
 	public static int getVirtualWidth() {
