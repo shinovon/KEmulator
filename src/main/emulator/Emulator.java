@@ -985,7 +985,7 @@ public class Emulator {
 		}
 
 		// mac cocoa fix
-		if (os.startsWith("darwin")) {
+		if (os.startsWith("darwin") || os.startsWith("mac os")) {
 			cmd.add("-XstartOnFirstThread");
 		}
 
