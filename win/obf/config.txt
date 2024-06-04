@@ -65,10 +65,10 @@
 -keep public class com.mexa.** { public protected *; }
 -keep public class com.j_phone.** { public protected *; }
 -keep public class com.jblend.** { public protected *; }
-
 -keep public class com.vodafone.** { public protected *; }
-
 -keep public class com.immersion.** { public protected *; }
+-keep public class com.mot.** { public protected *; }
+-keep public class mmpp.** { public protected *; }
 
 # LIBRARIES
 -keep public class club.minnced.discord.rpc.** { public protected *; }
