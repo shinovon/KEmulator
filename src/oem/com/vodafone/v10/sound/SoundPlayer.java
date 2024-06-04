@@ -26,7 +26,7 @@ public class SoundPlayer {
 	public SoundTrack getTrack() {
 		for (int i = 0; i < 16; i++) {
 			if (tracks[i] == null) {
-				tracks[i] = new SoundTrack();
+				tracks[i] = new SoundTrack(i);
 				return tracks[i];
 			}
 		}

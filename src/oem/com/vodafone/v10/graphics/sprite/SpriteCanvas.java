@@ -112,6 +112,14 @@ public abstract class SpriteCanvas extends Canvas {
 		graphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
 	}
 
+	public static int getVirtualWidth() {
+		return Emulator.getEmulator().getScreen().getWidth();
+	}
+
+	public static int getVirtualHeight() {
+		return Emulator.getEmulator().getScreen().getHeight();
+	}
+
 	private static class CharacterCommand {
 		int offset; // TODO
 		boolean transparent;

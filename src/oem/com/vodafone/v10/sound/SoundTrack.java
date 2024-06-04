@@ -25,12 +25,21 @@ public class SoundTrack {
 	public static final int PLAYING = 2;
 	public static final int READY = 1;
 	private static final int MAX_VOLUME = 127;
+	private int id;
 	private Sound snd;
 	private Player player;
 	private int state;
 	private int loopCount;
 	private int volume = MAX_VOLUME;
 	private SoundTrackListener listener;
+	private SoundTrack syncMaster;
+	
+	public SoundTrack() {
+	}
+
+	SoundTrack(int id) {
+		this.id = id;
+	}
 
 	public Sound getSound() {
 		return snd;
@@ -64,6 +73,10 @@ public class SoundTrack {
 		}
 	}
 
+	public void play() {
+
+	}
+
 	public void play(int loop) {
 		try {
 			if (state != PLAYING) {
@@ -92,5 +105,33 @@ public class SoundTrack {
 		if (listener != null) {
 			listener.eventOccurred(event);
 		}
+	}
+
+	public SoundTrack getSyncMaster() {
+		return syncMaster;
+	}
+
+	public void setSubjectTo(SoundTrack master) {
+		syncMaster = master;
+	}
+
+	public void setPanpot(int value) {
+
+	}
+
+	public int getVolume() {
+		return volume;
+	}
+
+	public int getPanpot() {
+		return 64;
+	}
+
+	public int getID() {
+		return id;
+	}
+
+	public void resume() {
+		play(1);
 	}
 }
