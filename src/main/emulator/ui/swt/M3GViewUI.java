@@ -29,7 +29,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	private Composite aComposite907;
 	private Tree aTree896;
 	Canvas canvas;
-	private Memory ana898;
+	private Memory memory;
 	private M3GView3D m3gview;
 	private Camera camera;
 	private Transform cameraTransform;
@@ -101,7 +101,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		this.camera = new Camera();
 		this.cameraTransform = new Transform();
 		this.quaternion = new Quaternion();
-		this.ana898 = new Memory();
+		this.memory = new Memory();
 		this.m3gview = M3GView3D.getViewInstance();
 	}
 
@@ -185,11 +185,11 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	}
 
 	private void addM3GObjects() {
-		this.ana898.method846();
+		this.memory.method846();
 		this.aTree896.removeAll();
 
-		for (int i = 0; i < this.ana898.m3gObjects.size(); ++i) {
-			final Node node = (Node) this.ana898.m3gObjects.get(i);
+		for (int i = 0; i < this.memory.m3gObjects.size(); ++i) {
+			final Node node = (Node) this.memory.m3gObjects.get(i);
 			final String name = node.getClass().getName();
 			final TreeItem widget = new TreeItem(this.aTree896, 0);
 
@@ -219,12 +219,12 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				var10000 = this;
 				var10001 = null;
 			} else {
-				if (this.ana898.m3gObjects.size() <= 0) {
+				if (this.memory.m3gObjects.size() <= 0) {
 					break label32;
 				}
 
 				var10000 = this;
-				var10001 = (Node) this.ana898.m3gObjects.get(0);
+				var10001 = (Node) this.memory.m3gObjects.get(0);
 			}
 
 			var10000.aNode361 = var10001;
@@ -284,8 +284,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		// TODO camera rotation
 
 		try {
-			if (!this.m3gview.isCurrent()) {
-				this.m3gview.setCurrent(this.aRectangle903.width, this.aRectangle903.height);
+			if (!m3gview.isCurrent()) {
+				m3gview.setCurrent(this.aRectangle903.width, this.aRectangle903.height);
 			}
 			this.cameraTransform.setIdentity();
 			this.cameraTransform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
@@ -293,20 +293,20 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
 			M3GView3D.setCamera(this.camera, this.cameraTransform);
 			m3gview.clearBackground(this.aBackground900);
-			if (this.showGrid) {
-				this.m3gview.drawGrid(1.0F);
+			if (showGrid) {
+				m3gview.drawGrid(1.0F);
 			}
 			if (this.aNode361 != null) {
 				try {
-					this.m3gview.method368(this.aNode361, null);
+					m3gview.method368(this.aNode361, null);
 				} catch (Exception localException) {
 					//                localException.printStackTrace();
 				}
 			}
-			if (this.showAxis) {
-				this.m3gview.drawAxis();
+			if (showAxis) {
+				m3gview.drawAxis();
 			}
-			this.m3gview.setViewport(this.aRectangle903.width, this.aRectangle903.height);
+			m3gview.setViewport(this.aRectangle903.width, this.aRectangle903.height);
 			m3gview.swapBuffers();
 		} catch (Throwable e) {
 			e.printStackTrace();
