@@ -43,15 +43,17 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.16.2 [2024.xx.xx]
-Fixed camera capture
-Tried to fix input lag with key events sync on
+$v2.16.2 [2024.06.05]
+Reworked "sync key events" setting
 Added some more nokia device presets
-Fix Graphics.drawString (v2.16.1 bug)
+Fixed camera capture
+Fix NPE in Graphics.drawString (v2.16.1 bug)
 Synchronized lcdui.ChoiceGroup
 Implemented LG Media API
-Reworked "sync key events" setting
+Implemented Motorola 3D API
 Fixed Vodafone API SpriteCanvas rendering
+Fixed restart in Mac OS 11
+MascotCapsule GL engine fixes
 
 $v2.16.1 [2024.05.27]
 Midi player fixes
