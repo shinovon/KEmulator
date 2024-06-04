@@ -126,7 +126,7 @@ public abstract class SpriteCanvas extends Canvas {
 		}
 		if (screenGraphics == null)
 			screenGraphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), null);
-		screenGraphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
+		screenGraphics.drawRGB(pixels, 0, 8, x * 8, y * 8, 8, 8, true);
 	}
 
 	public static int getVirtualWidth() {
