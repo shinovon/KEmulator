@@ -67,6 +67,7 @@
 -keep public class com.jblend.** { public protected *; }
 -keep public class com.vodafone.** { public protected *; }
 -keep public class com.immersion.** { public protected *; }
+-keep public class com.pantech.** { public protected *; 
 -keep public class com.mot.** { public protected *; }
 -keep public class mmpp.** { public protected *; }
 
