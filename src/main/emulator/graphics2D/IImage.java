@@ -42,4 +42,6 @@ public interface IImage {
 	boolean isTransparent();
 
 	void fill(int color);
+
+	void getRGB(int[] data, int off, int scan, int x, int y, int w, int h);
 }

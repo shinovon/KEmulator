@@ -138,6 +138,10 @@ public final class ImageAWT implements IImage {
 		img.setRGB(x, y, w, h, data, off, scan);
 	}
 
+	public final void getRGB(int[] data, int off, int scan, int x, int y, int w, int h) {
+		img.getRGB(x, y, w, h, data, off, scan);
+	}
+
 	public final void saveToFile(final String s) {
 		try {
 			ImageIO.write(img, "png", new File(s));

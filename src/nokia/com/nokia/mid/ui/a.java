@@ -163,16 +163,59 @@ final class a
 		return 4444;
 	}
 
-	public final void getPixels(int[] paramArrayOfInt, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7) {
-		b.method165(this.gc.getImage(), paramArrayOfInt, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
+	public final void getPixels(int[] pixels, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7) {
+		b.method165(this.gc.getImage(), pixels, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
 	}
 
-	public final void getPixels(short[] paramArrayOfShort, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7) {
-		b.method166(this.gc.getImage(), paramArrayOfShort, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
+	public final void getPixels(short[] pixels, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7) {
+		b.method166(this.gc.getImage(), pixels, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
 	}
 
-	public final void getPixels(byte[] paramArrayOfByte1, byte[] paramArrayOfByte2, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7) {
-		Emulator.getEmulator().getLogStream().println("***com.nokia.mid.ui.getPixels(byte[]) not implemented yet");
+	public final void getPixels(byte[] pixels, byte[] transparencyMask, int offset, int scanLength, int x, int y, int width, int height, int format) {
+		if (pixels == null) {
+			throw new NullPointerException();
+		}
+		if (x < 0 || y < 0 || width < 0 || height < 0) {
+			throw new IllegalArgumentException();
+		}
+		if (width == 0 || height == 0) return;
+		switch (format) {
+			case TYPE_BYTE_1_GRAY:
+				final int dataLen = height * scanLength - (scanLength - width);
+				int minBytesLen = (dataLen + 7) / 8;
+				if (minBytesLen > pixels.length - offset)
+					throw new ArrayIndexOutOfBoundsException();
+				if (transparencyMask != null && minBytesLen > transparencyMask.length - offset)
+					throw new IllegalArgumentException();
+				int[] colors = new int[width * height];
+				gc.getImage().getRGB(colors, 0, width, x, y, width, height);
+				for (int i = offset, k = 0, w = 0, d = 0; d < dataLen; i++) {
+					for (int j = 7; j >= 0 && d < dataLen; j--, w++, d++) {
+						if (w == scanLength) w = 0;
+						if (w >= width) {
+							continue;
+						}
+						int color = colors[k++];
+						int alpha = color >>> 31;
+						int gray = (((color & 0x80) >> 7) + ((color & 0x8000) >> 15) + ((color & 0x800000) >> 23)) >> 1;
+						if (gray == 0 && alpha == 1) pixels[i] |= 1 << j;
+						else pixels[i] &= ~(1 << j);
+						if (transparencyMask != null) {
+							if (alpha == 1) transparencyMask[i] |= 1 << j;
+							else transparencyMask[i] &= ~(1 << j);
+						}
+					}
+				}
+				break;
+			case TYPE_BYTE_1_GRAY_VERTICAL:
+			case TYPE_BYTE_2_GRAY:
+			case TYPE_BYTE_4_GRAY:
+			case TYPE_BYTE_8_GRAY:
+			case TYPE_BYTE_332_RGB:
+				System.err.println("getPixels(byte[] pixels, byte[] transparencyMask, int offset, int scanLength, int x, int y, int width, int height, int format)");
+			default:
+				throw new IllegalArgumentException();
+		}
 	}
 
 	public final void setARGBColor(int paramInt) {
