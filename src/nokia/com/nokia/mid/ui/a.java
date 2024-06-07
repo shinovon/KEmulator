@@ -20,7 +20,6 @@ final class a
 	Graphics gc;
 	IGraphics2D impl;
 	static final int[][] jdField_a_of_type_Array2dOfInt = {{0, 24756}, {16384, 8372}, {8192, 16564}, {180, 24576}, {16474, 8462}, {270, 24666}, {90, 24846}, {8282, 16654}};
-	private Image tmpImage;
 	private int[] tempPixels;
 
 	public a(Graphics paramGraphics) {
@@ -110,10 +109,8 @@ final class a
 				throw new IllegalArgumentException("Illegal format: " + format);
 		}
 
-		if(tmpImage == null || tmpImage.getWidth() < width || tmpImage.getHeight() < height)
-			tmpImage = Image.createImage(width, height, 0);
-		tmpImage.getImpl().setRGB(0, 0, width, height, tempPixels, 0, scanlen);
-		gc.drawRegion(tmpImage, 0, 0, width, height, transform, x, y, 0);
+		Image image = Image.createRGBImage(tempPixels, width, height, true);
+		gc.drawRegion(image, 0, 0, width, height, transform, x, y, 0);
 	}
 
 	public final void drawPixels(int[] paramArrayOfInt, boolean paramBoolean, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7, int paramInt8) {
