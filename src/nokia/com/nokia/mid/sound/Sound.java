@@ -2,12 +2,16 @@ package com.nokia.mid.sound;
 
 import emulator.Emulator;
 import emulator.media.b;
+import emulator.media.tone.MidiToneConstants;
+import emulator.media.tone.ToneManager;
 
 import java.io.ByteArrayInputStream;
+import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.microedition.media.PlayerListener;
 import javax.microedition.media.control.MIDIControl;
+import javax.microedition.media.control.VolumeControl;
 import javax.microedition.media.control.VolumeControlImpl;
 
 public class Sound {
@@ -16,12 +20,23 @@ public class Sound {
 	public static final int SOUND_UNINITIALIZED = 3;
 	public static final int FORMAT_TONE = 1;
 	public static final int FORMAT_WAV = 5;
-	public PlayerImpl m_player;
+	public Player m_player;
 	private Sound inst;
 	private SoundListener soundListener;
 	private int state;
 	private int type;
 	public int dataLen;
+
+	private static final short[] FREQ_TABLE = {
+			0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 26, 27, 29,
+			30, 32, 34, 36, 38, 41, 43, 45, 48, 51, 54, 57, 60, 64, 68, 72, 76, 81, 85, 90, 96,
+			101, 107, 114, 120, 128, 135, 143, 152, 161, 170, 180, 191, 202, 214, 227, 240, 255,
+			270, 286, 303, 321, 340, 360, 381, 404, 428, 453, 480, 509, 539, 571, 605, 641, 679,
+			719, 762, 807, 855, 906, 960, 1017, 1078, 1142, 1210, 1282, 1358, 1438, 1524, 1614,
+			1710, 1812, 1920, 2034, 2155, 2283, 2419, 2563, 2715, 2876, 3047, 3228, 3420, 3624,
+			3839, 4067, 4309, 4565, 4837, 5125, 5429, 5752, 6094, 6456, 6840, 7247, 7678, 8134,
+			8618, 9130, 9673, 10249, 10858, 11504, 12188, 12912
+	};
 
 	private final PlayerListener playerListener = new PlayerListener() {
 		public void playerUpdate(Player p0, String p1, Object p2) {
@@ -32,6 +47,7 @@ public class Sound {
 		}
 	};
 	private byte[] data;
+	private int gain = 255;
 
 	public Sound(byte[] paramArrayOfByte, int paramInt) {
 		this.type = paramInt;
@@ -67,8 +83,7 @@ public class Sound {
 	}
 
 	public static int[] getSupportedFormats() {
-		int[] arrayOfInt;
-		return arrayOfInt = new int[]{1, 5};
+		return new int[]{1, 5};
 	}
 
 	public void init(byte[] paramArrayOfByte, int paramInt) {
@@ -90,8 +105,29 @@ public class Sound {
 		this.state = 3;
 	}
 
-	public void init(int paramInt, long paramLong) {
-		Emulator.getEmulator().getLogStream().println("** com.nokia.mid.sound.init(int freq, long duration) not implemented yet **");
+	public void init(int freq, long duration) {
+		System.out.println("init " + freq + " " + duration );
+		if (duration <= 0) {
+			throw new IllegalArgumentException("duration = " + duration);
+		}
+		if (freq < 0 || freq > FREQ_TABLE[FREQ_TABLE.length - 1]) {
+			throw new IllegalArgumentException("freq = " + freq);
+		}
+
+		try {
+			if (m_player != null) {
+				m_player.close();
+			}
+			int note = convertFreqToNote(freq);
+			m_player = ToneManager.createPlayer(note, (int) duration, MidiToneConstants.TONE_MAX_VOLUME);
+			if (m_player instanceof VolumeControl) {
+				((VolumeControl)m_player).setLevel(gain * 100 / 255);
+			}
+			state = SOUND_STOPPED;
+		} catch (MediaException e) {
+			e.printStackTrace();
+			state = SOUND_UNINITIALIZED;
+		}
 	}
 
 	public void play(int paramInt) {
@@ -128,7 +164,8 @@ public class Sound {
 	}
 
 	public void setGain(int paramInt) {
-		this.m_player.setLevel(paramInt);
+		gain = paramInt;
+		((VolumeControl)m_player).setLevel(gain * 100 / 255);
 	}
 
 	public void setSoundListener(SoundListener paramSoundListener) {
@@ -147,9 +184,9 @@ public class Sound {
 	}
 
 	public byte[] getData() {
-		if (m_player == null) return null;
+		if (m_player == null || !(m_player instanceof PlayerImpl)) return null;
 		if (data != null) return data.clone();
-		return m_player.getData();
+		return ((PlayerImpl) m_player).getData();
 	}
 
 	public String getExportName() {
@@ -159,6 +196,32 @@ public class Sound {
 			case FORMAT_WAV:
 				return "nokiaaudio" + hashCode() + ".wav";
 		}
-		return "nokiaaudio" + m_player.getExportName();
+		if(!(m_player instanceof PlayerImpl)) return "unknown";
+		return "nokiaaudio" + ((PlayerImpl) m_player).getExportName();
+	}
+
+
+
+	public static int convertFreqToNote(int freq) {
+		int low = 0;
+		int high = FREQ_TABLE.length - 1;
+
+		while (low <= high) {
+			int mid = (low + high) >>> 1;
+			int midVal = FREQ_TABLE[mid];
+
+			if (midVal < freq) {
+				low = mid + 1;
+			} else if (midVal > freq) {
+				high = mid - 1;
+			} else {
+				return mid;
+			}
+		}
+		if ((freq - FREQ_TABLE[low - 1]) < (FREQ_TABLE[low] - freq)) {
+			return low - 1;
+		} else {
+			return low;
+		}
 	}
 }

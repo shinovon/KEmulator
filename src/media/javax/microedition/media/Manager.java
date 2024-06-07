@@ -4,6 +4,8 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.custom.*;
 import emulator.media.capture.CapturePlayerImpl;
+import emulator.media.tone.MIDITonePlayer;
+import emulator.media.tone.ToneManager;
 import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
@@ -77,7 +79,7 @@ public class Manager {
 	public static Player createPlayer(String s) throws IOException, MediaException {
 		log("createPlayer " + s);
 		if (s.startsWith(TONE_DEVICE_LOCATOR)) {
-			return new ToneImpl();
+			return new MIDITonePlayer();
 		}
 		if (s.startsWith(MIDI_DEVICE_LOCATOR)) {
 			return new MIDIImpl();
@@ -522,7 +524,8 @@ public class Manager {
 		return;
 	}
 
-	public static void playTone(final int n, final int n2, final int n3) throws MediaException {
+	public synchronized static void playTone(int note, int duration, int volume) throws MediaException {
+		ToneManager.play(note, duration, volume);
 	}
 
 	public static TimeBase getSystemTimeBase() {

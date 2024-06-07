@@ -15,6 +15,7 @@ import java.util.*;
 import javax.sound.sampled.*;
 import javax.sound.midi.*;
 
+import emulator.media.tone.ToneControlImpl;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
 
@@ -46,7 +47,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private Sequencer midiSequencer;
 	private boolean stopped;
 
-	PlayerImpl() {
+	public PlayerImpl() {
 		loopCount = 1;
 		state = UNREALIZED;
 		listeners = new Vector<PlayerListener>();
@@ -236,6 +237,11 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		toneControl = new ToneControlImpl();
 		volumeControl = new VolumeControlImpl(this);
 		controls = new Control[]{toneControl, volumeControl, midiControl};
+	}
+
+
+	public void setMIDISequence(InputStream in) throws IOException {
+		midi(in);
 	}
 
 	public void addPlayerListener(final PlayerListener playerListener) throws IllegalStateException {

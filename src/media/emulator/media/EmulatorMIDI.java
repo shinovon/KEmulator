@@ -30,6 +30,10 @@ public class EmulatorMIDI {
 	}
 
 	public static void initDevice() throws MidiUnavailableException {
+		initDevice(false);
+	}
+
+	public static void initDevice(boolean noVms) throws MidiUnavailableException {
 		if (midiDevice == null) {
 			midiDevice = MidiSystem.getMidiDevice(getMidiDeviceInfo());
 			midiDevice.open();
@@ -43,7 +47,7 @@ public class EmulatorMIDI {
 					}
 				}
 			});
-			if (Settings.searchVms) {
+			if (Settings.searchVms && !noVms) {
 				for (Transmitter t : midiSequencer.getTransmitters()) {
 					t.setReceiver(midiDevice.getReceiver());
 				}
@@ -59,6 +63,13 @@ public class EmulatorMIDI {
 
 	public static void start(PlayerImpl player, Sequence sequence, long position) throws InvalidMidiDataException, MidiUnavailableException {
 		initDevice();
+		midiSequencer.setSequence(sequence);
+		midiSequencer.setMicrosecondPosition(position);
+		midiSequencer.start();
+	}
+
+	public static void startTone(Sequence sequence, long position) throws InvalidMidiDataException, MidiUnavailableException {
+		initDevice(true);
 		midiSequencer.setSequence(sequence);
 		midiSequencer.setMicrosecondPosition(position);
 		midiSequencer.start();

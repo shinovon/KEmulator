@@ -2364,6 +2364,7 @@ public final class EmulatorScreen implements
 			final ShellPosition shellPosition = this.aClass93_1196.new ShellPosition(aClass93_1196, 0, 0, true);
 			while (System.currentTimeMillis() - EmulatorScreen.method567(this.aClass93_1196) < EmulatorScreen.method575(this.aClass93_1196) && !this.aBoolean1194) {
 				if (EmulatorScreen.method566(this.aClass93_1196) != 2) {
+					if(EmulatorScreen.this.shell.isDisposed()) return;
 					EmulatorImpl.syncExec(shellPosition);
 					this.anInt1197 = shellPosition.anInt1478;
 					this.anInt1198 = shellPosition.anInt1481;

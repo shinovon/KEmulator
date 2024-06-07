@@ -438,8 +438,8 @@ public final class Memory {
 	}
 
 	public static int loopCount(final Object o) {
-		if (o instanceof Sound) {
-			return ((Sound) o).m_player.loopCount;
+		if (o instanceof Sound && ((Sound) o).m_player instanceof PlayerImpl) {
+			return ((PlayerImpl) ((Sound) o).m_player).loopCount;
 		}
 		if (o instanceof AudioClip) {
 			return ((AudioClip) o).loopCount;
