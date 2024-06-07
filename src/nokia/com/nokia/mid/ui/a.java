@@ -20,6 +20,8 @@ final class a
 	Graphics gc;
 	IGraphics2D impl;
 	static final int[][] jdField_a_of_type_Array2dOfInt = {{0, 24756}, {16384, 8372}, {8192, 16564}, {180, 24576}, {16474, 8462}, {270, 24666}, {90, 24846}, {8282, 16654}};
+	private Image tmpImage;
+	private int[] tempPixels;
 
 	public a(Graphics paramGraphics) {
 		this.gc = paramGraphics;
@@ -58,53 +60,60 @@ final class a
 		Profiler.nokiaDrawPixelPixelCount += paramInt5 * paramInt6;
 	}
 
-	public void drawPixels(byte[] pixels, byte[] transparencyMask, int offset, int scanlength, int x, int y, int width, int height, int manipulation, int format) {
-		// From FreeJ2ME
-		int[] Type1 = {0xFFFFFFFF, 0xFF000000, 0x00FFFFFF, 0x00000000};
-		int c = 0;
-		int[] data;
-		Image temp;
+	public void drawPixels(byte[] pix, byte[] alpha, int off, int scanlen, int x, int y, int width, int height, int manipulation, int format) {
+		if (pix == null) {
+			throw new NullPointerException();
+		}
+		if (width < 0 || height < 0) {
+			throw new IllegalArgumentException();
+		}
+		if (width == 0 || height == 0) {
+			return;
+		}
+
+		int transform = getTransformation(manipulation);
+		if(tempPixels == null || tempPixels.length < width * height)
+			tempPixels = new int[height * width];
+
 		switch (format) {
-			case -1: // TYPE_BYTE_1_GRAY_VERTICAL // used by Monkiki's Castles
-				data = new int[width * height];
-				int ods = offset / scanlength;
-				int oms = offset % scanlength;
-				int b = ods % 8; //Bit offset in a byte
+			case TYPE_BYTE_1_GRAY: {
+				int b = 7 - off % 8;
+				for (int yj = 0; yj < height; yj++) {
+					int line = off + yj * scanlen;
+					int ypos = yj * width;
+					for (int xj = 0; xj < width; xj++) {
+						tempPixels[ypos + xj] = doAlpha(pix, alpha, (line + xj) / 8, b);
+						b--;
+						if (b < 0) b = 7;
+					}
+					b = b - (scanlen - width) % 8;
+					if (b < 0) b = 8 + b;
+				}
+				break;
+			}
+			case TYPE_BYTE_1_GRAY_VERTICAL: {
+				int ods = off / scanlen;
+				int oms = off % scanlen;
+				int b = ods % 8;
 				for (int yj = 0; yj < height; yj++) {
 					int ypos = yj * width;
-					int tmp = (ods + yj) / 8 * scanlength + oms;
+					int tmp = (ods + yj) / 8 * scanlen + oms;
 					for (int xj = 0; xj < width; xj++) {
-						c = ((pixels[tmp + xj] >> b) & 1);
-						if (transparencyMask != null) {c |= (((transparencyMask[tmp + xj] >> b) & 1) ^ 1) << 1;}
-						data[(yj * width) + xj] = Type1[c];
+						tempPixels[ypos + xj] = doAlpha(pix, alpha, tmp + xj, b);
 					}
 					b++;
 					if (b > 7) b = 0;
 				}
-
-				temp = Image.createImage(width, height, 0);
-				temp.getImpl().setRGB(0, 0, width, height, data, 0, width);
-				gc.drawImage(manipulateImage(temp, manipulation), x, y, 0);
 				break;
-
-			case 1: // TYPE_BYTE_1_GRAY // used by Monkiki's Castles
-				data = new int[pixels.length * 8];
-
-				for (int i = (offset / 8); i < pixels.length; i++) {
-					for (int j = 7; j >= 0; j--) {
-						c = ((pixels[i] >> j) & 1);
-						if (transparencyMask != null) {c |= (((transparencyMask[i] >> j) & 1) ^ 1) << 1;}
-						data[(i * 8) + (7 - j)] = Type1[c];
-					}
-				}
-				temp = Image.createImage(width, height, 0);
-				temp.getImpl().setRGB(0, 0, width, height, data, 0, scanlength);
-				gc.drawImage(manipulateImage(temp, manipulation), x, y, 0);
-				break;
-
+			}
 			default:
-				System.out.println("drawPixels A : Format " + format + " Not Implemented");
+				throw new IllegalArgumentException("Illegal format: " + format);
 		}
+
+		if(tmpImage == null || tmpImage.getWidth() < width || tmpImage.getHeight() < height)
+			tmpImage = Image.createImage(width, height, 0);
+		tmpImage.getImpl().setRGB(0, 0, width, height, tempPixels, 0, scanlen);
+		gc.drawRegion(tmpImage, 0, 0, width, height, transform, x, y, 0);
 	}
 
 	public final void drawPixels(int[] paramArrayOfInt, boolean paramBoolean, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7, int paramInt8) {
@@ -187,15 +196,16 @@ final class a
 					throw new ArrayIndexOutOfBoundsException();
 				if (transparencyMask != null && minBytesLen > transparencyMask.length - offset)
 					throw new IllegalArgumentException();
-				int[] colors = new int[width * height];
-				gc.getImage().getRGB(colors, 0, width, x, y, width, height);
+				if(tempPixels == null || tempPixels.length < width * height)
+					tempPixels = new int[width * height];
+				gc.getImage().getRGB(tempPixels, 0, width, x, y, width, height);
 				for (int i = offset, k = 0, w = 0, d = 0; d < dataLen; i++) {
 					for (int j = 7; j >= 0 && d < dataLen; j--, w++, d++) {
 						if (w == scanLength) w = 0;
 						if (w >= width) {
 							continue;
 						}
-						int color = colors[k++];
+						int color = tempPixels[k++];
 						int alpha = color >>> 31;
 						int gray = (((color & 0x80) >> 7) + ((color & 0x8000) >> 15) + ((color & 0x800000) >> 23)) >> 1;
 						if (gray == 0 && alpha == 1) pixels[i] |= 1 << j;
@@ -318,5 +328,103 @@ final class a
 		}
 		gc.drawImage(image, 0, 0, 0);
 		return transimage;
+	}
+
+	private static int getTransformation(int manipulation) {
+		// manipulations are C-CW and sprite rotations are CW
+		int ret = -1;
+		int rotation = manipulation & 0x0FFF;
+		if ((manipulation & FLIP_HORIZONTAL) != 0) {
+			if ((manipulation & FLIP_VERTICAL) != 0) {
+				// horiz and vertical flipping
+				switch (rotation) {
+					case 0:
+						ret = Sprite.TRANS_ROT180;
+						break;
+					case ROTATE_90:
+						ret = Sprite.TRANS_ROT90;
+						break;
+					case ROTATE_180:
+						ret = Sprite.TRANS_NONE;
+						break;
+					case ROTATE_270:
+						ret = Sprite.TRANS_ROT270;
+						break;
+					default:
+				}
+			} else {
+				// horizontal flipping
+				switch (rotation) {
+					case 0:
+						ret = Sprite.TRANS_MIRROR;
+						break;
+					case ROTATE_90:
+						ret = Sprite.TRANS_MIRROR_ROT90;
+						break;
+					case ROTATE_180:
+						ret = Sprite.TRANS_MIRROR_ROT180;
+						break;
+					case ROTATE_270:
+						ret = Sprite.TRANS_MIRROR_ROT270;
+						break;
+					default:
+				}
+			}
+		} else {
+			if ((manipulation & FLIP_VERTICAL) != 0) {
+				// vertical flipping
+				switch (rotation) {
+					case 0:
+						ret = Sprite.TRANS_MIRROR_ROT180;
+						break;
+					case ROTATE_90:
+						ret = Sprite.TRANS_MIRROR_ROT270;
+						break;
+					case ROTATE_180:
+						ret = Sprite.TRANS_MIRROR;
+						break;
+					case ROTATE_270:
+						ret = Sprite.TRANS_MIRROR_ROT90;
+						break;
+					default:
+				}
+			} else {
+				// no flipping
+				switch (rotation) {
+					case 0:
+						ret = Sprite.TRANS_NONE;
+						break;
+					case ROTATE_90:
+						ret = Sprite.TRANS_ROT270;
+						break;
+					case ROTATE_180:
+						ret = Sprite.TRANS_ROT180;
+						break;
+					case ROTATE_270:
+						ret = Sprite.TRANS_ROT90;
+						break;
+					default:
+				}
+			}
+		}
+		return ret;
+	}
+
+	private static int doAlpha(byte[] pix, byte[] alpha, int pos, int shift) {
+		int p;
+		int a;
+		if (isBitSet(pix[pos], shift))
+			p = 0;
+		else
+			p = 0x00FFFFFF;
+		if (alpha == null || isBitSet(alpha[pos], shift))
+			a = 0xFF000000;
+		else
+			a = 0;
+		return p | a;
+	}
+
+	private static boolean isBitSet(byte b, int pos) {
+		return ((b & (byte) (1 << pos)) != 0);
 	}
 }

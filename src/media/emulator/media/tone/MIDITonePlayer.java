@@ -28,7 +28,7 @@ import javax.microedition.media.control.VolumeControlImpl;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 
-public class MIDITonePlayer implements Player, ToneControl
+public class MIDITonePlayer implements Player, ToneControl, Runnable
 {
 	Control toneControl;
 	Control volumeControl;
@@ -39,6 +39,7 @@ public class MIDITonePlayer implements Player, ToneControl
 	private long duration;
 
 	private Sequence sequence;
+	private static int count;
 
 
 	public MIDITonePlayer()
@@ -75,7 +76,6 @@ public class MIDITonePlayer implements Player, ToneControl
 
     // ToneControl
 	public void setSequence(byte[] sequence) {
-
         try {
 			ToneSequence tone = new ToneSequence(sequence);
 			tone.process();
@@ -155,13 +155,7 @@ public class MIDITonePlayer implements Player, ToneControl
 	public void start() throws IllegalStateException, MediaException {
 		if (state == Player.CLOSED || sequence == null) throw new IllegalStateException();
 		state = Player.STARTED;
-
-		try {
-			EmulatorMIDI.startTone(sequence, 0);
-		} catch (Exception e) {
-			throw new MediaException(e);
-
-		}
+		new Thread(this, "TonePlayer-" + (++count)).start();
 	}
 
 	public void stop() throws IllegalStateException, MediaException {
@@ -191,5 +185,13 @@ public class MIDITonePlayer implements Player, ToneControl
 	}
 
 	public void setTimeBase(final TimeBase timeBase) throws MediaException {
+	}
+
+	public void run() {
+		try {
+			EmulatorMIDI.startTone(sequence, 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

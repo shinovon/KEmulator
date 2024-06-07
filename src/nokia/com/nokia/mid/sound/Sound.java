@@ -2,6 +2,7 @@ package com.nokia.mid.sound;
 
 import emulator.Emulator;
 import emulator.media.b;
+import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.MidiToneConstants;
 import emulator.media.tone.ToneManager;
 
@@ -91,17 +92,20 @@ public class Sound {
 			throw new NullPointerException();
 		}
 		if (paramInt == 1) {
-			paramArrayOfByte = new b(paramArrayOfByte).method726();
+			// TODO fix memory leaks
+//			paramArrayOfByte = new b(paramArrayOfByte).method726();
+			m_player = new MIDITonePlayer();
+			this.state = 3;
+			return;
 		} else {
 			data = paramArrayOfByte;
 		}
 		try {
 			ByteArrayInputStream localByteArrayInputStream = new ByteArrayInputStream(paramArrayOfByte);
-			this.m_player = new PlayerImpl(localByteArrayInputStream, type == FORMAT_WAV ? "audio/wav" : null);
-			this.m_player.addPlayerListener(playerListener);
+			m_player = new PlayerImpl(localByteArrayInputStream, type == FORMAT_WAV ? "audio/wav" : null);
+			m_player.addPlayerListener(playerListener);
 			localByteArrayInputStream.close();
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		this.state = 3;
 	}
 
@@ -200,7 +204,14 @@ public class Sound {
 		return "nokiaaudio" + ((PlayerImpl) m_player).getExportName();
 	}
 
-
+	protected void dispose() {
+		try {
+			if (m_player != null) {
+				m_player.deallocate();
+				m_player.close();
+			}
+		} catch (Exception ignored) {}
+	}
 
 	public static int convertFreqToNote(int freq) {
 		int low = 0;

@@ -52,7 +52,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		state = UNREALIZED;
 		listeners = new Vector<PlayerListener>();
 		timeBase = Manager.getSystemTimeBase();
-		players.add(this);
+//		players.add(this);
 	}
 
 	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
@@ -228,7 +228,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
-			data = CustomJarResources.getBytes(inputStream);
+			byte[] data = CustomJarResources.getBytes(inputStream);
 			sequence = MidiSystem.getSequence(new ByteArrayInputStream(data));
 		} catch (Exception e) {
 			sequence = null;
@@ -300,6 +300,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	}
 
 	public void deallocate() throws IllegalStateException {
+		players.remove(this);
 		data = null;
 		if (state == CLOSED) {
 			throw new IllegalStateException();
@@ -620,6 +621,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				state = PREFETCHED;
 				return;
 			}
+			players.add(this);
 			boolean globalMidi = Settings.oneMidiAtTime;
 			int loopCount = this.loopCount;
 			boolean complete = false;
@@ -706,6 +708,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			System.err.println("Exception in player thread!");
 			e.printStackTrace();
 		}
+		players.remove(this);
 	}
 
 	public void update(final LineEvent lineEvent) {
