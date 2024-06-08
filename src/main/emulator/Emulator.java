@@ -36,6 +36,7 @@ import emulator.ui.swt.EmulatorImpl;
 public class Emulator {
 	public static boolean debugBuild = true;
 	public static String version = "2.16.2";
+	public static String revision = "";
 	public static final int numericVersion = 17;
 
 	static EmulatorImpl emulatorimpl;
@@ -696,20 +697,18 @@ public class Emulator {
 			return;
 		}
 		try {
-			if (debugBuild) {
-				Manifest versionManifest = new Manifest(Emulator.class.getResourceAsStream("/META-INF/version.mf"));
-				final Attributes mainAttributes = versionManifest.getMainAttributes();
-				for (Map.Entry entry : mainAttributes.entrySet()) {
-					if (entry.getKey().toString().equals("Git-Revision")) {
-						String s = entry.getValue().toString();
-						if (s.length() > 0) version = s;
-						break;
-					}
+			Manifest versionManifest = new Manifest(Emulator.class.getResourceAsStream("/META-INF/version.mf"));
+			final Attributes mainAttributes = versionManifest.getMainAttributes();
+			for (Map.Entry entry : mainAttributes.entrySet()) {
+				if (entry.getKey().toString().equals("Git-Revision")) {
+					String s = entry.getValue().toString();
+					if (s.length() == 0) break;
+					if (debugBuild) version = s;
+					revision = s;
+					break;
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception ignored) {}
 		String arch = System.getProperty("os.arch");
 		if (!platform.isX64() && !arch.equals("x86")) {
 			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try x64 version instead.");
