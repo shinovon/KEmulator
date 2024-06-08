@@ -2,6 +2,7 @@ package emulator.ui.swt;
 
 import emulator.Emulator;
 import emulator.UILocale;
+import emulator.graphics3D.lwjgl.Emulator3D;
 import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
@@ -457,6 +458,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.verticalAlignment = 4;
 		try {
+			if (!Emulator.os.startsWith("windows") && Emulator3D.isPbufferSupported()) throw new Exception();
+
 			GLData gld = new GLData();
 			gld.depthSize = Emulator.getEmulator().getScreenDepth();
 			gld.doubleBuffer = true;

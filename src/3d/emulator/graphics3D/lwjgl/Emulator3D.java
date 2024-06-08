@@ -134,6 +134,10 @@ public final class Emulator3D implements IGraphics3D {
 		return pixelFormat;
 	}
 
+	public static boolean isPbufferSupported() {
+		return !useDisplay && !useWgl;
+	}
+
 	public synchronized final void bindTarget(Object target) {
 		if (exiting) {
 			throw new IllegalStateException("exiting");
@@ -159,14 +163,14 @@ public final class Emulator3D implements IGraphics3D {
 
 		try {
 			String s = w + "x" + h;
-			if (useDisplay) {
+			if (useWgl) {
+				bindWgl(w, h);
+			} else if (useDisplay) {
 				if (contextRes != null && !contextRes.equals(s)) {
 					tmpCanvas.setBounds(0, 0, w, h);
 				}
 				contextRes = s;
 				Display.makeCurrent();
-			} else if (useWgl) {
-				bindWgl(w, h);
 			} else {
 				try {
 					if (contextRes != null && !contextRes.equals(s)) {
