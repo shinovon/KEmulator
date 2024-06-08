@@ -110,6 +110,7 @@
 # Debug & custom
 -keep class emulator.debug.Memory { public static *; }
 -keep class emulator.debug.Profiler { *; }
+-keep class emulator.debug.Profiler3D { *; }
 -keep class emulator.custom.subclass.* { *; }
 -keep class emulator.custom.CustomMethod { public *; }
 -keep class emulator.custom.CustomJarResources { public protected *; }
