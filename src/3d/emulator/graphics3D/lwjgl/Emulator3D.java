@@ -140,6 +140,10 @@ public final class Emulator3D implements IGraphics3D {
 
 	public synchronized final void bindTarget(Object target) {
 		if (exiting) {
+			// Infinite lock instead just throwing an exception
+			try {
+				wait();
+			} catch (InterruptedException ignored) {}
 			throw new IllegalStateException("exiting");
 		}
 		Profiler3D.bindTargetCallCount++;
