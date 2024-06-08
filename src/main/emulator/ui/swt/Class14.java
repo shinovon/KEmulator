@@ -33,7 +33,6 @@ final class Class14 implements Runnable {
 					Watcher.staticGetTable(this.aClass5_587).put("SystemProfiler", c2);
 
 					final Instance c3 = new Instance("emulator.debug.Profiler3D", null);
-					c3.method879(null);
 					Watcher.staticGetTable(this.aClass5_587).put("Profiler3D", c3);
 					break;
 				}

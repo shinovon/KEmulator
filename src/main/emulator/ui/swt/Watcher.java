@@ -335,16 +335,11 @@ public final class Watcher implements Runnable, DisposeListener {
 		while (enumeration.hasMoreElements()) {
 			this.aCombo546.add(enumeration.nextElement().toString());
 		}
-		Watcher class5;
-		String item;
 		if (this.table.size() > 0) {
-			class5 = this;
-			item = this.aCombo546.getItem(0);
+			aString551 = type == 0 ? aCombo546.getItem(0) : "SystemProfiler";
 		} else {
-			class5 = this;
-			item = "";
+			aString551 = "";
 		}
-		class5.aString551 = item;
 		this.aCombo546.setText(this.aString551);
 		this.method322();
 	}
