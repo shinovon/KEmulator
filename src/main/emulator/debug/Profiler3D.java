@@ -34,7 +34,33 @@ public class Profiler3D {
 	public static int MC3D_copy2dCount;
 
 	public static void reset() {
+		M3G_clearCallCount = 0;
+		M3G_renderWorldCallCount = 0;
+		M3G_renderNodeCallCount = 0;
+		M3G_renderVertexCallCount = 0;
 
+		bindTargetCallCount = 0;
+		releaseTargetCallCount = 0;
+
+		LWJGL_buffersSwapCount = 0;
+		LWJGL_drawCallCount = 0;
+
+		MC3D_renderFigureCallCount = 0;
+		MC3D_renderModelCallCount = 0;
+		MC3D_renderMeshCallCount = 0;
+		MC3D_renderPrimitiveCallCount = 0;
+		MC3D_renderCommandListCallCount = 0;
+
+		MC3D_postFigureCallCount = 0;
+		MC3D_postPrimitivesCallCount = 0;
+		MC3D_drawFigureCallCount = 0;
+
+		MC3D_bindGraphicsCallCount = 0;
+		MC3D_bindTextureCallCount = 0;
+		MC3D_flushCallCount = 0;
+		MC3D_releaseCallCount = 0;
+
+		MC3D_copy2dCount = 0;
 	}
 
 }

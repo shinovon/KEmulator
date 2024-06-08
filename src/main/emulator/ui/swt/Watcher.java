@@ -28,7 +28,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	private Display aDisplay550;
 	private boolean aBoolean560;
 	private Hashtable table;
-	private int anInt553;
+	private int type;
 	private Tree aTree554;
 	private TreeEditor aTreeEditor555;
 	private Watcher aClass5_556;
@@ -38,6 +38,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	private boolean aBoolean561;
 	boolean aBoolean545;
 	boolean aBoolean559;
+	public static Watcher profiler3D;
 
 	public Watcher(final int anInt553) {
 		super();
@@ -50,7 +51,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.aTree554 = null;
 		this.aTreeEditor555 = null;
 		this.aDisplay550 = EmulatorImpl.getDisplay();
-		this.anInt553 = anInt553;
+		this.type = anInt553;
 		this.table = new Hashtable();
 		this.aClass5_556 = this;
 	}
@@ -69,7 +70,7 @@ public final class Watcher implements Runnable, DisposeListener {
 			return;
 		}
 		this.aDisplay550 = EmulatorImpl.getDisplay();
-		this.anInt553 = 0;
+		this.type = 0;
 		this.table = new Hashtable();
 		final Instance c;
 		(c = new Instance(o.getClass().getName(), o)).method879(null);
@@ -77,14 +78,15 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.aClass5_556 = this;
 	}
 
-	public final void method302() {
+	public final void fill() {
 		new Thread(new Class14(this)).start();
 	}
 
 	private void method322() {
 		this.aString551 = this.aCombo546.getText();
 		final Instance c;
-		(c = (Instance) this.table.get(this.aString551)).method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
+		(c = (Instance) this.table.get(this.aString551))
+				.method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
 		this.aTree554.removeAll();
 		for (int i = 0; i < c.getFields().size(); ++i) {
 			final Object value;
@@ -92,7 +94,7 @@ public final class Watcher implements Runnable, DisposeListener {
 				final Field field = (Field) c.getFields().get(i);
 				final TreeItem treeItem;
 				(treeItem = new TreeItem(this.aTree554, 0)).setText(0, field.getName());
-				if (this.anInt553 == 0) {
+				if (this.type == 0) {
 					this.aTree554.getItem(i).setText(2, ClassTypes.method869(field.getType()));
 					if (field.getType().isArray()) {
 						new TreeItem(treeItem, 0).setText(0, "");
@@ -100,7 +102,7 @@ public final class Watcher implements Runnable, DisposeListener {
 				}
 			} else {
 				new TreeItem(this.aTree554, 0).setText(0, value.getClass().getName());
-				if (this.anInt553 == 0) {
+				if (this.type == 0) {
 					this.aTree554.getItem(i).setText(2, value.getClass().getName());
 				}
 			}
@@ -258,7 +260,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.method324();
 		this.method323();
 		int x, y;
-		switch (this.anInt553) {
+		switch (this.type) {
 			case 0: {
 				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
 				if (parent != null) {
@@ -274,16 +276,30 @@ public final class Watcher implements Runnable, DisposeListener {
 			}
 			case 1: {
 				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
+				if(!parent.getMaximized()) {
+					this.shell.setSize(parent.getSize());
+					x = parent.getLocation().x - this.shell.getSize().x;
+					y = parent.getLocation().y;
+					shell.setLocation(x, y);
+				}
+				break;
+			}
+			case 2: {
+				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER_3D", "3D Profiler Monitor"));
 
-				this.shell.setSize(parent.getSize());
-				x = parent.getLocation().x - this.shell.getSize().x;
-				y = parent.getLocation().y;
-				shell.setLocation(x, y);
+				if(!parent.getMaximized()) {
+					this.shell.setSize(parent.getSize());
+					x = parent.getLocation().x - this.shell.getSize().x;
+					y = parent.getLocation().y;
+					shell.setLocation(x, y);
+				}
 				break;
 			}
 		}
-		if (anInt553 == 1) {
+		if (type == 1) {
 			profiler = this;
+		} else if (type == 2) {
+			profiler3D = this;
 		}
 		this.parentShell = parent;
 		this.shell.open();
@@ -291,7 +307,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.aBoolean561 = false;
 		this.aBoolean560 = true;
 		EmulatorImpl.asyncExec(this.aClass5_556);
-		if (anInt553 != 1) Watcher.aVector548.addElement(this);
+		if (type == 0) Watcher.aVector548.addElement(this);
 		while (!this.shell.isDisposed()) {
 			if (!this.aDisplay550.readAndDispatch()) {
 				this.aDisplay550.sleep();
@@ -302,7 +318,7 @@ public final class Watcher implements Runnable, DisposeListener {
 
 	}
 
-	public final void method321() {
+	public final void dispose() {
 		this.aBoolean561 = true;
 		Watcher.aVector548.removeElement(this);
 		if (this.shell != null && !this.shell.isDisposed()) {
@@ -408,7 +424,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.aText543.addModifyListener(new Class141(this));
 		(this.aButton558 = new Button(this.shell, 32)).setText("HEX");
 		this.aButton558.addSelectionListener(new Class8(this));
-		if (this.anInt553 == 0) {
+		if (this.type == 0) {
 			Button exportBtn;
 			(exportBtn = new Button(this.shell, SWT.PUSH)).setText("Export");
 			exportBtn.addSelectionListener(new SelectionAdapter() {
@@ -501,7 +517,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.aTreeEditor555 = new TreeEditor(this.aTree554);
 		this.aTreeEditor555.horizontalAlignment = 16384;
 		this.aTreeEditor555.grabHorizontal = true;
-		if (this.anInt553 == 0) {
+		if (this.type == 0) {
 			final TreeColumn treeColumn3;
 			(treeColumn3 = new TreeColumn(this.aTree554, 16384)).setWidth(150);
 			treeColumn3.setText("Type");
@@ -520,11 +536,11 @@ public final class Watcher implements Runnable, DisposeListener {
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
-		this.method321();
+		this.dispose();
 	}
 
-	static int method314(final Watcher class5) {
-		return class5.anInt553;
+	static int staticGetType(final Watcher class5) {
+		return class5.type;
 	}
 
 	static Hashtable method304(final Watcher class5) {

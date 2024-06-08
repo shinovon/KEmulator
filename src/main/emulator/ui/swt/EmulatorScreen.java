@@ -164,6 +164,7 @@ public final class EmulatorScreen implements
 	private MenuItem glM3DMenuItem;
 	private MenuItem softM3DMenuItem;
 	private Menu menuM3DEngine;
+	private MenuItem profiler3DMenuItem;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -656,6 +657,9 @@ public final class EmulatorScreen implements
 		this.watchesMenuItem.addSelectionListener(this);
 		(this.profilerMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_PROFILER", "Profiler"));
 		this.profilerMenuItem.addSelectionListener(this);
+		profiler3DMenuItem = new MenuItem(this.menuView, 8);
+		profiler3DMenuItem.setText(UILocale.get("MENU_VIEW_PROFILER_3D", "3D Profiler"));
+		profiler3DMenuItem.addSelectionListener(this);
 		(this.methodsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_METHODS", "Methods"));
 		this.methodsMenuItem.addSelectionListener(this);
 		(this.memoryViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
@@ -1268,19 +1272,27 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.watchesMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).method822().method313()) {
-					((EmulatorImpl) Emulator.getEmulator()).method822().method321();
+				if (((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().method313()) {
+					((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().dispose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).method822().method311(this.shell);
+				((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().method311(this.shell);
 				return;
 			}
 			if (menuItem == this.profilerMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).method829().method313()) {
-					((EmulatorImpl) Emulator.getEmulator()).method829().method321();
+				if (((EmulatorImpl) Emulator.getEmulator()).getProfiler().method313()) {
+					((EmulatorImpl) Emulator.getEmulator()).getProfiler().dispose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).method829().method311(this.shell);
+				((EmulatorImpl) Emulator.getEmulator()).getProfiler().method311(this.shell);
+				return;
+			}
+			if (menuItem == this.profiler3DMenuItem) {
+				if (((EmulatorImpl) Emulator.getEmulator()).getProfiler3D().method313()) {
+					((EmulatorImpl) Emulator.getEmulator()).getProfiler3D().dispose();
+					return;
+				}
+				((EmulatorImpl) Emulator.getEmulator()).getProfiler3D().method311(this.shell);
 				return;
 			}
 			if (menuItem == this.methodsMenuItem) {
@@ -1584,6 +1596,7 @@ public final class EmulatorScreen implements
 		++EmulatorScreen.aLong982;
 		Emulator.getEmulator().syncValues();
 		Profiler.reset();
+		Profiler3D.reset();
 	}
 
 	private static void method578(final int n) {

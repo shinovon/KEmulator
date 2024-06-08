@@ -13,7 +13,7 @@ final class Class14 implements Runnable {
 
 	public final void run() {
 		try {
-			switch (Watcher.method314(this.aClass5_587)) {
+			switch (Watcher.staticGetType(this.aClass5_587)) {
 				case 0: {
 					for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
 						final String s = (String) Emulator.jarClasses.get(i);
@@ -28,9 +28,15 @@ final class Class14 implements Runnable {
 					}
 				}
 				case 1: {
-					final Instance c2;
-					(c2 = new Instance("emulator.debug.Profiler", null)).method879(null);
+					final Instance c2 = new Instance("emulator.debug.Profiler", null);
+					c2.method879(null);
 					Watcher.method304(this.aClass5_587).put("SystemProfiler", c2);
+					break;
+				}
+				case 2: {
+					final Instance c2 = new Instance("emulator.debug.Profiler3D", null);
+					c2.method879(null);
+					Watcher.method304(this.aClass5_587).put("3DProfiler", c2);
 					break;
 				}
 			}

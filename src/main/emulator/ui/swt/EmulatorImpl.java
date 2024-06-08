@@ -19,8 +19,9 @@ public final class EmulatorImpl implements IEmulator {
 	private int screenDepth;
 	private Methods aClass46_1381;
 	private MemoryView aClass110_1382;
-	private Watcher aClass5_1377;
-	private Watcher aClass5_1391;
+	private Watcher classWatcher;
+	private Watcher profiler;
+	private final Watcher profiler3D;
 	private Property iproperty;
 	private EmulatorScreen iscreen;
 	private Log ilogstream;
@@ -41,8 +42,9 @@ public final class EmulatorImpl implements IEmulator {
 		this.aClass83_1389 = new MessageConsole();
 		this.aClass108_1390 = new InfosBox();
 		this.aClass161_1387 = new KeyPad();
-		this.aClass5_1377 = new Watcher(0);
-		this.aClass5_1391 = new Watcher(1);
+		this.classWatcher = new Watcher(0);
+		this.profiler = new Watcher(1);
+		this.profiler3D = new Watcher(2);
 		this.aClass110_1382 = new MemoryView();
 		this.aClass46_1381 = new Methods();
 	}
@@ -80,12 +82,16 @@ public final class EmulatorImpl implements IEmulator {
 		return this.iscreen;
 	}
 
-	public final Watcher method822() {
-		return this.aClass5_1377;
+	public final Watcher getClassWatcher() {
+		return this.classWatcher;
 	}
 
-	public final Watcher method829() {
-		return this.aClass5_1391;
+	public final Watcher getProfiler() {
+		return this.profiler;
+	}
+
+	public final Watcher getProfiler3D() {
+		return this.profiler3D;
 	}
 
 	public final MemoryView method823() {
@@ -121,12 +127,13 @@ public final class EmulatorImpl implements IEmulator {
 		Settings.showMemViewFrame = this.aClass110_1382.method622();
 		this.aClass46_1381.method446();
 		this.aClass110_1382.method656();
-		this.aClass5_1377.method321();
-		this.aClass5_1391.method321();
+		this.classWatcher.dispose();
+		this.profiler.dispose();
+		this.profiler3D.dispose();
 		if (aClass90_1384 != null)
 			this.aClass90_1384.close();
 		while (Watcher.aVector548.size() > 0) {
-			((Watcher) Watcher.aVector548.get(0)).method321();
+			((Watcher) Watcher.aVector548.get(0)).dispose();
 		}
 		for (Object o : this.aVector1379) {
 			((IPlugin) o).close();
@@ -214,6 +221,9 @@ public final class EmulatorImpl implements IEmulator {
 	public final void syncValues() {
 		if (Watcher.profiler != null) {
 			syncExec(Watcher.profiler);
+		}
+		if (Watcher.profiler3D != null) {
+			syncExec(Watcher.profiler3D);
 		}
 		for (int i = 0; i < Watcher.aVector548.size(); ++i) {
 			asyncExec((Runnable) Watcher.aVector548.get(i));
