@@ -1047,7 +1047,8 @@ public final class EmulatorScreen implements
 				this.resumeStep();
 				this.updatePauseState();
 				return;
-			} if (menuItem == this.suspendMenuItem) {
+			}
+			if (menuItem == this.suspendMenuItem) {
 				if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 					return;
 				}

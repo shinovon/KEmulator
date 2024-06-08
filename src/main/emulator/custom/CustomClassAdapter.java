@@ -4,10 +4,17 @@ import emulator.Emulator;
 import emulator.Settings;
 import org.objectweb.asm.*;
 
-public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
-	private String className;
+import java.util.HashSet;
+import java.util.Set;
 
-	public final MethodVisitor visitMethod(int acc, final String name, String desc, final String sign, final String[] array) {
+public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
+	static boolean hasRenamedMethods;
+	static Set<String> renamedClasses = new HashSet<>();
+
+	private String className;
+	private String parentClassName;
+
+	public final MethodVisitor visitMethod(int acc, String name, String desc, final String sign, final String[] array) {
 		Label_0037:
 		{
 			String s4;
@@ -41,6 +48,12 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 				Emulator.getEmulator().getLogStream().println("Patched playerUpdate method: " + className);
 			}
 		}
+		if("()V".equals(desc) && "java/lang/Thread".equals(parentClassName) &&
+				("stop".equals(name) || "resume".equals(name) || "suspend".equals(name))) {
+			hasRenamedMethods = true;
+			renamedClasses.add(className.replace('.', '/'));
+			name = name + "_";
+		}
 		final MethodVisitor visitMethod;
 		if ((visitMethod = super.visitMethod(acc, name, desc, sign, array)) != null) {
 			return new CustomMethodAdapter(visitMethod, this.className, name, desc);
@@ -54,6 +67,7 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 	}
 
 	public final void visit(final int n, final int n2, final String s, final String s2, final String s3, final String[] array) {
+		parentClassName = s3;
 		if (s3.equals("java/util/TimerTask")) {
 			super.visit(n, n2, s, s2, "emulator/custom/subclass/SubTimerTask", array);
 			return;

@@ -16,7 +16,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 
-	public final void visitMethodInsn(final int acc, final String cls, final String name, String sign) {
+	public final void visitMethodInsn(final int acc, final String cls, String name, String sign) {
 		Label_0576:
 		{
 			if (cls.equals("java/lang/System")) {
@@ -147,6 +147,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				}
 				sign = sign.replaceAll(s5, s6);
 			}
+		}
+		if (CustomClassAdapter.hasRenamedMethods && CustomClassAdapter.renamedClasses.contains(cls) && "()V".equals(sign) &&
+				(name.equals("stop") || name.equals("resume") || name.equals("suspend"))) {
+			name = name + "_";
 		}
 		super.visitMethodInsn(acc, cls, name, sign);
 	}
