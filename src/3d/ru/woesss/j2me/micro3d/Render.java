@@ -64,8 +64,8 @@ public class Render {
 	private boolean backCopied;
 	private final LinkedList<RenderNode> stack = new LinkedList<>();
 	private int flushStep;
-	private final boolean postCopy2D = !Boolean.getBoolean("micro3d.v3.render.no-mix2D3D");
-	private final boolean preCopy2D = !Boolean.getBoolean("micro3d.v3.render.background.ignore");
+	private final boolean postCopy2D = !Settings.mascotNo2DMixing;
+	private final boolean preCopy2D = !Settings.mascotIgnoreBackground;
 	private IntBuffer bufHandles;
 	private int clearColor;
 	private TextureImpl targetTexture;
@@ -229,7 +229,7 @@ public class Render {
 			glGenTextures(/*1, */bgTextureId);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, bgTextureId.get(0));
-			boolean filter = Boolean.getBoolean("micro3d.v3.background.filter");
+			boolean filter = Settings.mascotBackgroundFilter;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

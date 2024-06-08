@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
 
+import emulator.Settings;
 import emulator.custom.CustomJarResources;
 
 import java.io.IOException;
@@ -151,7 +152,7 @@ public final class TextureImpl {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, mTexId);
 
-		boolean filter = Boolean.getBoolean("micro3d.v3.texture.filter");
+		boolean filter = Settings.mascotTextureFilter;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

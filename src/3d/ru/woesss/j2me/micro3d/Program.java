@@ -22,6 +22,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.ARBES2Compatibility.*;
 
 import com.mascotcapsule.micro3d.v3.Graphics3D;
+import emulator.Settings;
 import emulator.custom.CustomJarResources;
 
 import java.io.IOException;
@@ -274,7 +275,7 @@ abstract class Program {
 
 		@Override
 		protected int loadShader(int type, String shaderCode) {
-			if (Boolean.getBoolean("micro3d.v3.texture.filter")) {
+			if (Settings.mascotTextureFilter) {
 				shaderCode = "#define FILTER\n" + shaderCode;
 			}
 			return super.loadShader(type, shaderCode);
@@ -365,7 +366,7 @@ abstract class Program {
 
 		@Override
 		protected int loadShader(int type, String shaderCode) {
-			if (Boolean.getBoolean("micro3d.v3.texture.filter")) {
+			if (Settings.mascotTextureFilter) {
 				shaderCode = "#define FILTER\n" + shaderCode;
 			}
 			return super.loadShader(type, shaderCode);

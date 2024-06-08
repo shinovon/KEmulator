@@ -96,4 +96,10 @@ public final class Settings {
 	public static boolean startAppOnResume = true;
 	public static int micro3d = 1; // 0 - dll, 1 - gl
 	public static boolean processSerialCallsOutOfQueue;
+
+	// mascot TODO: ui
+	public static boolean mascotNo2DMixing;
+	public static boolean mascotIgnoreBackground;
+	public static boolean mascotTextureFilter;
+	public static boolean mascotBackgroundFilter;
 }
