@@ -1651,7 +1651,11 @@ public final class EmulatorScreen implements
 		n = Integer.parseInt(r);
 		if (pressedKeys.contains(n)) {
 			if (Settings.enableKeyRepeat) {
-				Emulator.getEventQueue().keyRepeat(n);
+				if (Settings.keyPressOnRepeat) {
+					Emulator.getEventQueue().keyPress(n);
+				} else {
+					Emulator.getEventQueue().keyRepeat(n);
+				}
 			}
 			return;
 		}

@@ -104,4 +104,6 @@ public final class Settings {
 	public static boolean mascotIgnoreBackground;
 	public static boolean mascotTextureFilter;
 	public static boolean mascotBackgroundFilter;
+
+	public static boolean keyPressOnRepeat;
 }

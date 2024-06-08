@@ -200,6 +200,7 @@ public final class Property implements IProperty {
 	private Button ignoreRegionRepaintCheck;
 	private Button fpsCounterCheck;
 	private Button serialCallsCheck;
+	private Button keyPressOnRepeatCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -409,6 +410,7 @@ public final class Property implements IProperty {
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
 			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
 			Settings.processSerialCallsOutOfQueue = Boolean.parseBoolean(properties.getProperty("ProcessSerialCallsOutOfQueue", "false"));
+			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
 
 			Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
 			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
@@ -603,6 +605,7 @@ public final class Property implements IProperty {
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
 			properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
 			properties.setProperty("ProcessSerialCallsOutOfQueue", String.valueOf(Settings.processSerialCallsOutOfQueue));
+			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
 
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
@@ -777,6 +780,7 @@ public final class Property implements IProperty {
 		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
+		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
 
 		this.updateProxy();
 	}
@@ -1545,6 +1549,11 @@ public final class Property implements IProperty {
 		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
 		serialCallsCheck.setLayoutData(gridData);
 		serialCallsCheck.setSelection(Settings.processSerialCallsOutOfQueue);
+
+		keyPressOnRepeatCheck = new Button(coreApiGroup, SWT.CHECK);
+		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
+		keyPressOnRepeatCheck.setLayoutData(gridData);
+		keyPressOnRepeatCheck.setSelection(Settings.processSerialCallsOutOfQueue);
 	}
 
 	private void setupMediaComp() {
