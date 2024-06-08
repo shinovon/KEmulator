@@ -1,5 +1,6 @@
 package emulator.graphics3D.lwjgl;
 
+import emulator.debug.Profiler3D;
 import emulator.graphics2D.awt.Graphics2DAWT;
 import emulator.graphics3D.*;
 
@@ -135,6 +136,8 @@ public final class Emulator3D implements IGraphics3D {
 		if (exiting) {
 			throw new IllegalStateException("exiting");
 		}
+		Profiler3D.bindTargetCallCount++;
+
 		int w;
 		int h;
 
@@ -222,8 +225,10 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public synchronized void releaseTarget() {
+		Profiler3D.releaseTargetCallCount++;
+
 		GL11.glFinish();
-		this.swapBuffers();
+		swapBuffers();
 
 		while (!unusedGLTextures.isEmpty())
 			releaseTexture(unusedGLTextures.get(0));
@@ -301,6 +306,8 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public final void swapBuffers(boolean flip, int x, int y, int width, int height) {
+		Profiler3D.LWJGL_buffersSwapCount++;
+
 		if (this.target != null) {
 			if (this.target instanceof Image2D) {
 				Image2D var9 = (Image2D) this.target;
@@ -822,6 +829,8 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	private void draw(VertexBuffer vb, IndexBuffer indices, Appearance ap, float alphaFactor) {
+		Profiler3D.LWJGL_drawCallCount++;
+
 		VertexArray colors = vb.getColors();
 		if (colors == null) {
 			int col = vb.getDefaultColor();

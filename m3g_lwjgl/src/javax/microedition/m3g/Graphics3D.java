@@ -2,6 +2,7 @@ package javax.microedition.m3g;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.debug.Profiler3D;
 import emulator.graphics3D.IGraphics3D;
 import emulator.graphics3D.lwjgl.Emulator3D;
 import emulator.graphics3D.m3g.LightsCache;
@@ -194,6 +195,8 @@ public class Graphics3D {
 	}
 
 	public void render(World world) {
+		Profiler3D.M3G_renderWorldCallCount++;
+
 		if (world == null) {
 			throw new NullPointerException();
 		} else if (target != null && world.getActiveCamera() != null && world.getActiveCamera().isDescendantOf(world)) {
@@ -204,6 +207,8 @@ public class Graphics3D {
 	}
 
 	public void render(Node node, Transform transform) {
+		Profiler3D.M3G_renderNodeCallCount++;
+
 		if (node == null) {
 			throw new NullPointerException();
 		} else if (!(node instanceof Sprite3D) && !(node instanceof Mesh) && !(node instanceof Group)) {
@@ -216,6 +221,8 @@ public class Graphics3D {
 	}
 
 	public void render(VertexBuffer vertices, IndexBuffer triangles, Appearance appearance, Transform transform, int scope) {
+		Profiler3D.M3G_renderVertexCallCount++;
+
 		if (vertices != null && triangles != null && appearance != null) {
 			if (target != null && CameraCache.camera != null) {
 				impl.render(vertices, triangles, appearance, transform, scope);

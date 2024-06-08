@@ -33,6 +33,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import emulator.Settings;
+import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.lwjgl.Emulator3D;
 import org.lwjgl.opengl.GL11;
@@ -100,6 +101,8 @@ public class Render {
 	}
 
 	public synchronized void bind(Graphics graphics) {
+		Profiler3D.MC3D_bindGraphicsCallCount++;
+
 		this.targetGraphics = graphics;
 		IImage bitmap = graphics.getImage();
 		int width = bitmap.getWidth();
@@ -157,6 +160,8 @@ public class Render {
 	}
 
 	public synchronized void bind(TextureImpl tex) {
+		Profiler3D.MC3D_bindTextureCallCount++;
+
 		targetTexture = tex;
 		int width = tex.getWidth();
 		int height = tex.getHeight();
@@ -224,6 +229,8 @@ public class Render {
 		if (targetTexture != null) {// render to texture
 			return;
 		}
+		Profiler3D.MC3D_copy2dCount++;
+
 		if (!glIsTexture(bgTextureId.get(0))) {
 			bgTextureId.rewind();
 			glGenTextures(/*1, */bgTextureId);
@@ -341,6 +348,8 @@ public class Render {
 					  int toonThreshold,
 					  int toonHigh,
 					  int toonLow) {
+		Profiler3D.MC3D_renderFigureCallCount++;
+
 		boolean isTransparency = (attrs & Graphics3D.ENV_ATTR_SEMI_TRANSPARENT) != 0;
 		if (!isTransparency && flushStep == 2) {
 			return;
@@ -444,6 +453,8 @@ public class Render {
 
 	private void renderModel(TextureImpl[] textures, Model model, boolean enableBlending) {
 		if (textures == null || textures.length == 0) return;
+		Profiler3D.MC3D_renderModelCallCount++;
+
 		Program.Tex program = Program.tex;
 		int[][][] meshes = model.subMeshesLengthsT;
 		int length = meshes.length;
@@ -494,6 +505,8 @@ public class Render {
 	}
 
 	private void renderModel(Model model, boolean enableBlending) {
+		Profiler3D.MC3D_renderModelCallCount++;
+
 		int[][] meshes = model.subMeshesLengthsC;
 		int length = meshes.length;
 		int pos = 0;
@@ -532,6 +545,8 @@ public class Render {
 	}
 
 	public synchronized void release() {
+		Profiler3D.MC3D_releaseCallCount++;
+
 		stack.clear();
 		if (targetTexture != null) {
 			glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
@@ -547,6 +562,8 @@ public class Render {
 	}
 
 	public synchronized void flush() {
+		Profiler3D.MC3D_flushCallCount++;
+
 		if (stack.isEmpty()) {
 			return;
 		}
@@ -659,6 +676,8 @@ public class Render {
 	}
 
 	public void drawCommandList(int[] cmds) {
+		Profiler3D.MC3D_renderCommandListCallCount++;
+
 		if (Graphics3D.COMMAND_LIST_VERSION_1_0 != cmds[0]) {
 			throw new IllegalArgumentException("Unsupported command list version: " + cmds[0]);
 		}
@@ -780,6 +799,8 @@ public class Render {
 	}
 
 	public synchronized void postFigure(FigureImpl figure) {
+		Profiler3D.MC3D_postFigureCallCount++;
+
 		FigureNode rn;
 		if (figure.stack.empty()) {
 			rn = new FigureNode(this, figure);
@@ -795,6 +816,8 @@ public class Render {
 											int[] normals, int no,
 											int[] textureCoords, int to,
 											int[] colors, int co) {
+		Profiler3D.MC3D_postPrimitivesCallCount++;
+
 		if (command < 0) {
 			throw new IllegalArgumentException();
 		}
@@ -1083,6 +1106,8 @@ public class Render {
 	}
 
 	public synchronized void drawFigure(FigureImpl figure) {
+		Profiler3D.MC3D_drawFigureCallCount++;
+
 		if (!backCopied && preCopy2D) {
 			copy2d(true);
 		}
@@ -1418,6 +1443,8 @@ public class Render {
 	}
 
 	public synchronized void flushToBuffer() {
+		Profiler3D.MC3D_flushCallCount++;
+
 		if (stack.isEmpty()) {
 			return;
 		}
