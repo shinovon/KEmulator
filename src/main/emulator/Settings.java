@@ -97,6 +97,8 @@ public final class Settings {
 	public static int micro3d = 1; // 0 - dll, 1 - gl
 	public static boolean processSerialCallsOutOfQueue;
 
+	public static boolean enableOTT;
+
 	// mascot TODO: ui
 	public static boolean mascotNo2DMixing;
 	public static boolean mascotIgnoreBackground;

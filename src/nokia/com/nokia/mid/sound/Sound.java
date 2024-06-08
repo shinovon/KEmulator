@@ -1,6 +1,7 @@
 package com.nokia.mid.sound;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.media.b;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.MidiToneConstants;
@@ -51,17 +52,17 @@ public class Sound {
 	private int gain = 255;
 
 	public Sound(byte[] paramArrayOfByte, int paramInt) {
-		this.type = paramInt;
+		type = paramInt;
 		this.dataLen = paramArrayOfByte.length;
 		this.inst = this;
 		init(paramArrayOfByte, paramInt);
 	}
 
 	public String getType() {
-		if (this.type == 1) {
+		if (type == 1) {
 			return "FORMAT_TONE";
 		}
-		if (this.type == 5) {
+		if (type == 5) {
 			return "FORMAT_WAV";
 		}
 		return null;
@@ -80,7 +81,7 @@ public class Sound {
 	}
 
 	public int getState() {
-		return this.state;
+		return state;
 	}
 
 	public static int[] getSupportedFormats() {
@@ -93,10 +94,13 @@ public class Sound {
 		}
 		if (paramInt == 1) {
 			// TODO fix memory leaks
-//			paramArrayOfByte = new b(paramArrayOfByte).method726();
-			m_player = new MIDITonePlayer();
-			this.state = 3;
-			return;
+			if (Settings.enableOTT) {
+				paramArrayOfByte = new b(paramArrayOfByte).method726();
+			} else {
+				m_player = new MIDITonePlayer();
+				state = 3;
+				return;
+			}
 		} else {
 			data = paramArrayOfByte;
 		}
@@ -106,7 +110,7 @@ public class Sound {
 			m_player.addPlayerListener(playerListener);
 			localByteArrayInputStream.close();
 		} catch (Exception ignored) {}
-		this.state = 3;
+		state = 3;
 	}
 
 	public void init(int freq, long duration) {
@@ -141,12 +145,12 @@ public class Sound {
 
 	public void release() {
 		data = null;
-		if (this.state == 0) {
+		if (state == 0) {
 			stop();
 		}
-		if (this.state != 3) {
+		if (state != 3) {
 			if (m_player != null) this.m_player.deallocate();
-			this.state = 3;
+			state = 3;
 			if (this.soundListener != null) {
 				this.soundListener.soundStateChanged(this, 3);
 			}
@@ -161,7 +165,7 @@ public class Sound {
 			}
 		} catch (Exception ignored) {
 		}
-		this.state = 0;
+		state = 0;
 		if (this.soundListener != null) {
 			this.soundListener.soundStateChanged(this, 0);
 		}
@@ -181,7 +185,7 @@ public class Sound {
 			this.m_player.stop();
 		} catch (Exception ignored) {
 		}
-		this.state = 1;
+		state = 1;
 		if (this.soundListener != null) {
 			this.soundListener.soundStateChanged(this, 1);
 		}
