@@ -61,8 +61,9 @@ public final class Emulator3D implements IGraphics3D {
 
 	public static final int MaxViewportWidth = 2048;
 	public static final int MaxViewportHeight = 2048;
+	public static final int MaxViewportDimension = 2048;
 	public static final int NumTextureUnits = 10;
-	public static final int MaxTextureDimension = 1024;
+	public static final int MaxTextureDimension = 2048;
 	public static final int MaxSpriteCropDimension = 1024;
 	public static final int MaxLights = 8;
 	public static final int MaxTransformsPerVertex = 4;
@@ -86,7 +87,7 @@ public final class Emulator3D implements IGraphics3D {
 		properties.put("maxLights", new Integer(MaxLights));
 		properties.put("maxViewportWidth", new Integer(MaxViewportWidth));
 		properties.put("maxViewportHeight", new Integer(MaxViewportHeight));
-		properties.put("maxViewportDimension", new Integer(2048));
+		properties.put("maxViewportDimension", new Integer(Math.min(MaxViewportDimension, MaxViewportHeight)));
 		properties.put("maxTextureDimension", new Integer(MaxTextureDimension));
 		properties.put("maxSpriteCropDimension", new Integer(MaxSpriteCropDimension));
 		properties.put("maxTransformsPerVertex", new Integer(MaxTransformsPerVertex));
@@ -940,6 +941,8 @@ public final class Emulator3D implements IGraphics3D {
 				if (!image2D.isLoaded()) {
 					image2D.setLoaded(true);
 
+					Profiler3D.LWJGL_glTexImage2DCount++;
+
 					short texFormat = GL_RGB;
 					switch (image2D.getFormat()) {
 						case Image2D.ALPHA:
@@ -1113,6 +1116,8 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	private void renderSprite(Sprite3D var1, Transform var2, float alphaFactor) {
+		Profiler3D.LWJGL_renderSpriteCount++;
+
 		float[] var3 = new float[]{0.0F, 0.0F, 0.0F, 1.0F};
 		float[] var4 = new float[]{1.0F, 0.0F, 0.0F, 1.0F};
 		float[] var5 = new float[]{0.0F, 1.0F, 0.0F, 1.0F};

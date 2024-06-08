@@ -14,6 +14,8 @@ public class Profiler3D {
 
 	public static int LWJGL_buffersSwapCount;
 	public static int LWJGL_drawCallCount;
+	public static int LWJGL_renderSpriteCount;
+	public static int LWJGL_glTexImage2DCount;
 
 	// mascot (woesss)
 	public static int MC3D_renderFigureCallCount;
@@ -44,6 +46,8 @@ public class Profiler3D {
 
 		LWJGL_buffersSwapCount = 0;
 		LWJGL_drawCallCount = 0;
+		LWJGL_renderSpriteCount = 0;
+		LWJGL_glTexImage2DCount = 0;
 
 		MC3D_renderFigureCallCount = 0;
 		MC3D_renderModelCallCount = 0;
