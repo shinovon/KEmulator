@@ -411,6 +411,7 @@ public final class Property implements IProperty {
 			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
 			Settings.processSerialCallsOutOfQueue = Boolean.parseBoolean(properties.getProperty("ProcessSerialCallsOutOfQueue", "false"));
 			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
+			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaint", "true"));
 
 			Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
 			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
@@ -606,6 +607,7 @@ public final class Property implements IProperty {
 			properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
 			properties.setProperty("ProcessSerialCallsOutOfQueue", String.valueOf(Settings.processSerialCallsOutOfQueue));
 			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
+			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
 
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);

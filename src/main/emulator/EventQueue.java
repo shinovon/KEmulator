@@ -242,7 +242,7 @@ public final class EventQueue implements Runnable {
 			if ("invokePaint".equals(st[i].getMethodName())) return;
 		}
 
-		if (t == eventThread || t == inputThread) {
+		if (t == eventThread || t == inputThread || Settings.forcePaintOnServiceRepaints) {
 			synchronized (lock) {
 				internalRepaint();
 			}
@@ -454,12 +454,12 @@ public final class EventQueue implements Runnable {
 			System.err.println("Exception in repaint!");
 			e.printStackTrace();
 		}
-		repainted = true;
 		try {
 			synchronized (repaintLock) {
 				repaintLock.notifyAll();
 			}
 		} catch (Exception ignored) {}
+		repainted = true;
 	}
 
 	void processInputEvent(int[] o) {

@@ -106,4 +106,5 @@ public final class Settings {
 	public static boolean mascotBackgroundFilter;
 
 	public static boolean keyPressOnRepeat;
+	public static boolean forcePaintOnServiceRepaints = true;
 }

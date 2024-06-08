@@ -167,7 +167,7 @@ public class RecordStore {
 
 	public int getSizeAvailable() throws RecordStoreNotOpenException {
 		try {
-			return (int) new File(rootPath).getUsableSpace();
+			return Math.max(32000000, (int) new File(rootPath).getUsableSpace());
 		} catch (Exception e) {
 			return 32000000;
 		}
