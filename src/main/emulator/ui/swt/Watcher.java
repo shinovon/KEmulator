@@ -27,7 +27,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	private Button aButton558;
 	private Display aDisplay550;
 	private boolean aBoolean560;
-	private Hashtable table;
+	private Map table;
 	private int type;
 	private Tree aTree554;
 	private TreeEditor aTreeEditor555;
@@ -38,7 +38,6 @@ public final class Watcher implements Runnable, DisposeListener {
 	private boolean aBoolean561;
 	boolean aBoolean545;
 	boolean aBoolean559;
-	public static Watcher profiler3D;
 
 	public Watcher(final int anInt553) {
 		super();
@@ -52,7 +51,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.aTreeEditor555 = null;
 		this.aDisplay550 = EmulatorImpl.getDisplay();
 		this.type = anInt553;
-		this.table = new Hashtable();
+		this.table = new LinkedHashMap();
 		this.aClass5_556 = this;
 	}
 
@@ -298,8 +297,6 @@ public final class Watcher implements Runnable, DisposeListener {
 		}
 		if (type == 1) {
 			profiler = this;
-		} else if (type == 2) {
-			profiler3D = this;
 		}
 		this.parentShell = parent;
 		this.shell.open();
@@ -332,8 +329,8 @@ public final class Watcher implements Runnable, DisposeListener {
 	}
 
 	private void method323() {
-		final List list;
-		Collections.sort((List<Comparable>) (list = Collections.list(this.table.keys())));
+		final List list = Arrays.asList(table.keySet().toArray());
+		Collections.sort((List<Comparable>) list);
 		final Enumeration enumeration = Collections.enumeration(list);
 		while (enumeration.hasMoreElements()) {
 			this.aCombo546.add(enumeration.nextElement().toString());
@@ -435,8 +432,8 @@ public final class Watcher implements Runnable, DisposeListener {
 							if (!file.exists()) file.createNewFile();
 							PrintStream ps = new PrintStream(new FileOutputStream(file));
 							try {
-								final List list;
-								Collections.sort((List<Comparable>) (list = Collections.list(table.keys())));
+								final List list = Arrays.asList(table.keySet().toArray());
+								Collections.sort((List<Comparable>) list);
 								for (Object o : list) {
 									ps.println(o);
 									final Instance c = (Instance) table.get(o);
@@ -543,7 +540,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		return class5.type;
 	}
 
-	static Hashtable method304(final Watcher class5) {
+	static Map staticGetTable(final Watcher class5) {
 		return class5.table;
 	}
 

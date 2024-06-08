@@ -23,20 +23,18 @@ final class Class14 implements Runnable {
 							if (c.getCls().getSuperclass() != null) {
 								s2 = s2 + "@" + c.getCls().getSuperclass().getName();
 							}
-							Watcher.method304(this.aClass5_587).put(s2, c);
+							Watcher.staticGetTable(this.aClass5_587).put(s2, c);
 						}
 					}
 				}
 				case 1: {
 					final Instance c2 = new Instance("emulator.debug.Profiler", null);
 					c2.method879(null);
-					Watcher.method304(this.aClass5_587).put("SystemProfiler", c2);
-					break;
-				}
-				case 2: {
-					final Instance c2 = new Instance("emulator.debug.Profiler3D", null);
-					c2.method879(null);
-					Watcher.method304(this.aClass5_587).put("3DProfiler", c2);
+					Watcher.staticGetTable(this.aClass5_587).put("SystemProfiler", c2);
+
+					final Instance c3 = new Instance("emulator.debug.Profiler3D", null);
+					c3.method879(null);
+					Watcher.staticGetTable(this.aClass5_587).put("Profiler3D", c3);
 					break;
 				}
 			}

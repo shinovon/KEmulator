@@ -21,7 +21,6 @@ public final class EmulatorImpl implements IEmulator {
 	private MemoryView aClass110_1382;
 	private Watcher classWatcher;
 	private Watcher profiler;
-	private final Watcher profiler3D;
 	private Property iproperty;
 	private EmulatorScreen iscreen;
 	private Log ilogstream;
@@ -44,7 +43,6 @@ public final class EmulatorImpl implements IEmulator {
 		this.aClass161_1387 = new KeyPad();
 		this.classWatcher = new Watcher(0);
 		this.profiler = new Watcher(1);
-		this.profiler3D = new Watcher(2);
 		this.aClass110_1382 = new MemoryView();
 		this.aClass46_1381 = new Methods();
 	}
@@ -90,10 +88,6 @@ public final class EmulatorImpl implements IEmulator {
 		return this.profiler;
 	}
 
-	public final Watcher getProfiler3D() {
-		return this.profiler3D;
-	}
-
 	public final MemoryView method823() {
 		return this.aClass110_1382;
 	}
@@ -129,7 +123,6 @@ public final class EmulatorImpl implements IEmulator {
 		this.aClass110_1382.method656();
 		this.classWatcher.dispose();
 		this.profiler.dispose();
-		this.profiler3D.dispose();
 		if (aClass90_1384 != null)
 			this.aClass90_1384.close();
 		while (Watcher.aVector548.size() > 0) {
@@ -221,9 +214,6 @@ public final class EmulatorImpl implements IEmulator {
 	public final void syncValues() {
 		if (Watcher.profiler != null) {
 			syncExec(Watcher.profiler);
-		}
-		if (Watcher.profiler3D != null) {
-			syncExec(Watcher.profiler3D);
 		}
 		for (int i = 0; i < Watcher.aVector548.size(); ++i) {
 			asyncExec((Runnable) Watcher.aVector548.get(i));
