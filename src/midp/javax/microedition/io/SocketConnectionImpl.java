@@ -10,7 +10,7 @@ final class SocketConnectionImpl implements SocketConnection
 	
 	public SocketConnectionImpl(final String s) throws IOException {
 		super();
-		Emulator.getEmulator().getLogStream().println("SocketConnection: " + s);
+		Emulator.getEmulator().getLogStream().println("Socket opened: " + s);
 		final int n = s.indexOf("://") + 3;
 		final int n2 = s.lastIndexOf(":") + 1;
 		final String substring = s.substring(n, n2 - 1);

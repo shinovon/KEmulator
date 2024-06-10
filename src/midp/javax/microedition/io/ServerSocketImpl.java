@@ -1,5 +1,7 @@
 package javax.microedition.io;
 
+import emulator.Emulator;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -8,6 +10,7 @@ class ServerSocketImpl implements ServerSocketConnection {
 	private ServerSocket socket;
 
 	public ServerSocketImpl(String s) throws NumberFormatException, IOException {
+		Emulator.getEmulator().getLogStream().println("Socket server opened: " + s);
 		socket = new ServerSocket(Integer.parseInt(s.replace("socket://:", "")));
 	}
 

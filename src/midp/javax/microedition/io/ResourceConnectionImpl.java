@@ -1,12 +1,14 @@
 package javax.microedition.io;
 
+import emulator.Emulator;
+
 import java.io.*;
 
 final class ResourceConnectionImpl implements InputConnection {
 	String url;
 
 	ResourceConnectionImpl(final String s) {
-		super();
+		Emulator.getEmulator().getLogStream().println("Resource opened: " + s);
 		if (s.startsWith("resource://")) {
 			this.url = s.substring("resource://".length());
 		} else {
