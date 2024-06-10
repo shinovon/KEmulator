@@ -25,7 +25,7 @@ public class FileConnectionImpl implements FileConnection {
 		if (!(file = new File(FileConnectionImpl.aString441)).exists() || file.isFile()) {
 			file.mkdirs();
 		}
-		url = method216(url = method216(url = method216(url = (url = url.replaceFirst("localhost", "")).substring("file://".length()), "c"), "d"), "e");
+		url = method216(method216(method216(url.replaceFirst("localhost", "").substring("file://".length()), "c"), "d"), "e");
 		if (url.startsWith("/"))
 			url = url.substring(1);
 		this.systemPath = Emulator.getUserPath() + "/file/" + url;

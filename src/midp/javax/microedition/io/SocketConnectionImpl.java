@@ -13,11 +13,7 @@ final class SocketConnectionImpl implements SocketConnection
 		Emulator.getEmulator().getLogStream().println("Socket opened: " + s);
 		final int n = s.indexOf("://") + 3;
 		final int n2 = s.lastIndexOf(":") + 1;
-		final String substring = s.substring(n, n2 - 1);
-		final int int1 = Integer.parseInt(s.substring(n2));
-		Emulator.getEmulator().getLogStream().println("host:" + substring);
-		Emulator.getEmulator().getLogStream().println("port:" + int1);
-		socket = new Socket(substring, int1);
+		socket = new Socket(s.substring(n, n2 - 1), Integer.parseInt(s.substring(n2)));
 	}
 	
 	public final String getAddress() throws IOException {
