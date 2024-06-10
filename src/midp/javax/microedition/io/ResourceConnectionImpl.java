@@ -19,7 +19,7 @@ final class ResourceConnectionImpl implements InputConnection {
 	}
 
 	public final InputStream openInputStream() throws IOException {
-		return emulator.custom.CustomJarResources.getResourceAsStream(this.url);
+		return "!blank".equals(url) ? new ByteArrayInputStream(new byte[0]) : emulator.custom.CustomJarResources.getResourceAsStream(url);
 	}
 
 	public final void close() {

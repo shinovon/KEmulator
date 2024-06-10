@@ -54,11 +54,11 @@ public class Connector {
 			}
 			if (s.startsWith("http://")) {
 				Permission.checkPermission("connector.open.http");
-				return new HttpConnectionImpl(s);
+				return checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
 			}
 			if (s.startsWith("https://")) {
 				Permission.checkPermission("connector.open.http");
-				return new HttpConnectionImpl(s);
+				return checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
 			}
 			if (s.startsWith("socket://:")) {
 				Permission.checkPermission("connector.open.serversocket");
@@ -80,6 +80,10 @@ public class Connector {
 			}
 			return openPrim;
 		}
+	}
+
+	private static boolean checkVserv(String s) {
+		return s.startsWith("http://a.vserv.mobi/") || (s.contains("vserv.mobi/") && s.contains("/adapi"));
 	}
 
 	public static DataInputStream openDataInputStream(final String s) throws IOException {
