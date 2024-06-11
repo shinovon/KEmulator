@@ -2241,17 +2241,18 @@ public final class EmulatorScreen implements
 			this.stopVibra();
 			return;
 		}
+		this.vibraStart = System.currentTimeMillis();
 		if (this.vibraThread == null) {
 			this.vibraThread = new Vibrate(this);
 			new Thread(this.vibraThread, "KEmulator vibrate-" + (++threadCount)).start();
 			return;
 		}
-		this.vibraStart = System.currentTimeMillis();
+		this.vibraThread.stop = false;
 	}
 
 	public void stopVibra() {
 		if (this.vibraThread != null) {
-			this.vibraThread.aBoolean1194 = true;
+			this.vibraThread.stop = true;
 		}
 	}
 
@@ -2309,18 +2310,6 @@ public final class EmulatorScreen implements
 		return class93.vibraStart = aLong1017;
 	}
 
-	static long method567(final EmulatorScreen class93) {
-		return class93.vibraStart;
-	}
-
-	static long method575(final EmulatorScreen class93) {
-		return class93.vibra;
-	}
-
-	static Vibrate method555(final EmulatorScreen class93, final Vibrate aClass119_976) {
-		return class93.vibraThread = aClass119_976;
-	}
-
 	static {
 		EmulatorScreen.captureFileCounter = 1;
 		EmulatorScreen.aString993 = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss", Locale.ENGLISH).format(Calendar.getInstance().getTime()) + "_";
@@ -2352,7 +2341,7 @@ public final class EmulatorScreen implements
 
 	private final class Vibrate implements Runnable {
 		int anInt1193;
-		boolean aBoolean1194;
+		boolean stop;
 		Random aRandom1195;
 		int anInt1197;
 		int anInt1198;
@@ -2361,30 +2350,37 @@ public final class EmulatorScreen implements
 		Vibrate(final EmulatorScreen aClass93_1196) {
 			super();
 			EmulatorScreen.method559(this.aClass93_1196 = aClass93_1196, System.currentTimeMillis());
-			this.aBoolean1194 = false;
+			this.stop = false;
 			this.aRandom1195 = new Random();
 		}
 
 		public void run() {
-			this.anInt1193 = 10;
-			final ShellPosition shellPosition = this.aClass93_1196.new ShellPosition(aClass93_1196, 0, 0, true);
-			while (System.currentTimeMillis() - EmulatorScreen.method567(this.aClass93_1196) < EmulatorScreen.method575(this.aClass93_1196) && !this.aBoolean1194) {
-				if (EmulatorScreen.method566(this.aClass93_1196) != 2) {
-					if(EmulatorScreen.this.shell.isDisposed()) return;
-					EmulatorImpl.syncExec(shellPosition);
-					this.anInt1197 = shellPosition.anInt1478;
-					this.anInt1198 = shellPosition.anInt1481;
-					if (this.anInt1193++ > 10) {
-						EmulatorImpl.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197 + this.aRandom1195.nextInt() % 5, this.anInt1198 + this.aRandom1195.nextInt() % 5, false));
-						this.anInt1193 = 0;
+			try {
+				while (!shell.isDisposed()) {
+					if (stop) {
+						Thread.sleep(5);
+						continue;
 					}
-					EmulatorImpl.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197, this.anInt1198, false));
+					this.anInt1193 = 10;
+					final ShellPosition shellPosition = this.aClass93_1196.new ShellPosition(aClass93_1196, 0, 0, true);
+					while (System.currentTimeMillis() - this.aClass93_1196.vibraStart < this.aClass93_1196.vibra && !this.stop) {
+						if (EmulatorScreen.method566(this.aClass93_1196) != 2) {
+							if (EmulatorScreen.this.shell.isDisposed()) return;
+							EmulatorImpl.syncExec(shellPosition);
+							this.anInt1197 = shellPosition.anInt1478;
+							this.anInt1198 = shellPosition.anInt1481;
+							if (this.anInt1193++ > 10) {
+								EmulatorImpl.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197 + this.aRandom1195.nextInt() % 5, this.anInt1198 + this.aRandom1195.nextInt() % 5, false));
+								this.anInt1193 = 0;
+							}
+							EmulatorImpl.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197, this.anInt1198, false));
+						}
+						Thread.sleep(1L);
+					}
+					stop = true;
 				}
-				try {
-					Thread.sleep(1L);
-				} catch (InterruptedException ignored) {}
-			}
-			EmulatorScreen.method555(this.aClass93_1196, null);
+			} catch (InterruptedException ignored) {}
+			this.aClass93_1196.vibraThread = null;
 		}
 	}
 
