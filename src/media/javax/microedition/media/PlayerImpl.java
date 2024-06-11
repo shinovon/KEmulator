@@ -280,8 +280,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 		if (sequence instanceof javazoom.jl.player.Player) {
 			((javazoom.jl.player.Player) sequence).close();
-		}
-		if (sequence instanceof Sequence) {
+		} else if (sequence instanceof Sequence) {
 			if (midiSequencer != null) {
 				midiSequencer.close();
 				midiSequencer = null;
@@ -289,6 +288,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			if (Settings.oneMidiAtTime) {
 				EmulatorMIDI.close();
 			}
+		} else if (sequence instanceof Clip) {
+			try {
+				((Clip) sequence).close();
+			} catch (Exception ignored) {}
 		}
 		if (dataSource != null && !dataSourceDisconnected) {
 			dataSource.disconnect();
@@ -310,6 +313,11 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				stop();
 			} catch (MediaException ignored) {}
 			return;
+		}
+		if (sequence instanceof Clip) {
+			try {
+				((Clip) sequence).close();
+			} catch (Exception ignored) {}
 		}
 		if (state == PREFETCHED) {
 			state = REALIZED;
