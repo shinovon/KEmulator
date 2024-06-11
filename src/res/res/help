@@ -43,6 +43,12 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.x [2024.06.xx]
+nokiaui fixes
+3D profiler
+Implement nokia.Sound(freq, duration)
+vServ connection wrapper
+
 $v2.16.2 [2024.06.05]
 Reworked "sync key events" setting
 Added some more nokia device presets
