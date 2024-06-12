@@ -111,7 +111,7 @@ public final class Property implements IProperty {
 	private Button aButton724;
 	private Button aButton728;
 	private Button aButton732;
-	private Button aButton736;
+	private Button noNetworkBtn;
 	private Button aButton746;
 	private Button aButton749;
 	private Button aButton752;
@@ -157,7 +157,7 @@ public final class Property implements IProperty {
 	private Button aButton758;
 	private Button aButton761;
 	private Composite networkComp;
-	private Group aGroup700;
+	private Group networkGroup;
 	private CLabel aCLabel648;
 	private Combo proxyTypeCombo;
 	private CLabel aCLabel649;
@@ -744,7 +744,7 @@ public final class Property implements IProperty {
 		}
 		Settings.enableKeyRepeat = this.aButton728.getSelection();
 		Settings.ignoreFullScreen = this.aButton732.getSelection();
-		Settings.networkNotAvailable = this.aButton736.getSelection();
+		Settings.networkNotAvailable = this.noNetworkBtn.getSelection();
 		Settings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
 		Settings.motorolaSoftKeyFix = softkeyMotFixCheck.getSelection();
 		Settings.xrayOverlapScreen = this.aButton746.getSelection();
@@ -993,7 +993,7 @@ public final class Property implements IProperty {
 		(keymapTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
 		keymapTab.setControl(this.keyMapTabComp);
 		final CTabItem sysFontTab;
-		(sysFontTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSFONT", "SysFont"));
+		(sysFontTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_FONT", "Font"));
 		sysFontTab.setControl(this.sysFontComp);
 		final CTabItem systemTab;
 		(systemTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM", "System"));
@@ -1530,9 +1530,6 @@ public final class Property implements IProperty {
 		(this.aButton732 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
 		this.aButton732.setLayoutData(gridData);
 		this.aButton732.setSelection(Settings.ignoreFullScreen);
-		(this.aButton736 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Network not available."));
-		this.aButton736.setLayoutData(gridData);
-		this.aButton736.setSelection(Settings.networkNotAvailable);
 
 		(this.synchronizeKeyEventsCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
 		this.synchronizeKeyEventsCheck.setLayoutData(gridData);
@@ -2026,10 +2023,10 @@ public final class Property implements IProperty {
 
 	private void setupNetworkComp() {
 		(this.networkComp = new Composite(this.tabFolder, 0)).setLayout(new GridLayout());
-		this.method432();
+		this.setupNetworkTabContent();
 	}
 
-	private void method432() {
+	private void setupNetworkTabContent() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 2;
 		layoutData.verticalAlignment = 2;
@@ -2068,44 +2065,48 @@ public final class Property implements IProperty {
 		layoutData8.grabExcessHorizontalSpace = true;
 		layoutData8.grabExcessVerticalSpace = true;
 		layoutData8.verticalAlignment = 1;
-		(this.aGroup700 = new Group(this.networkComp, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY", "Proxy"));
-		this.aGroup700.setLayout(layout);
-		this.aGroup700.setLayoutData(layoutData8);
-		(this.aCLabel648 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY_TYPE", "ProxyType:"));
-		this.method350();
-		(this.aCLabel651 = new CLabel(this.aGroup700, 0)).setText("");
-		(this.aCLabel649 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_HOST", "Host:"));
+		(this.networkGroup = new Group(this.networkComp, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY", "Proxy"));
+		this.networkGroup.setLayout(layout);
+		this.networkGroup.setLayoutData(layoutData8);
+		(this.aCLabel648 = new CLabel(this.networkGroup, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY_TYPE", "ProxyType:"));
+		this.setupProxyCombo();
+		(this.aCLabel651 = new CLabel(this.networkGroup, 0)).setText("");
+		(this.aCLabel649 = new CLabel(this.networkGroup, 0)).setText(UILocale.get("OPTION_NETWORK_HOST", "Host:"));
 		this.aCLabel649.setLayoutData(layoutData6);
-		(this.aText635 = new Text(this.aGroup700, 2048)).setLayoutData(layoutData7);
+		(this.aText635 = new Text(this.networkGroup, 2048)).setLayoutData(layoutData7);
 		this.aText635.setText(Settings.proxyHost);
-		(this.aCLabel650 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_PORT", "Port:"));
-		(this.aText637 = new Text(this.aGroup700, 2048)).setText(Settings.proxyPort);
+		(this.aCLabel650 = new CLabel(this.networkGroup, 0)).setText(UILocale.get("OPTION_NETWORK_PORT", "Port:"));
+		(this.aText637 = new Text(this.networkGroup, 2048)).setText(Settings.proxyPort);
 		this.aText637.setLayoutData(gridData);
-		(this.aCLabel652 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_USERNAME", "Username:"));
+		(this.aCLabel652 = new CLabel(this.networkGroup, 0)).setText(UILocale.get("OPTION_NETWORK_USERNAME", "Username:"));
 		this.aCLabel652.setLayoutData(layoutData5);
-		(this.aText639 = new Text(this.aGroup700, 2048)).setLayoutData(layoutData4);
+		(this.aText639 = new Text(this.networkGroup, 2048)).setLayoutData(layoutData4);
 		this.aText639.setText(Settings.proxyUser);
-		(this.aCLabel653 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_PASSWORD", "Password:"));
-		(this.aText641 = new Text(this.aGroup700, 4196352)).setText(Settings.proxyPass);
+		(this.aCLabel653 = new CLabel(this.networkGroup, 0)).setText(UILocale.get("OPTION_NETWORK_PASSWORD", "Password:"));
+		(this.aText641 = new Text(this.networkGroup, 4196352)).setText(Settings.proxyPass);
 		this.aText641.setLayoutData(gridData);
-		(this.aCLabel654 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_DOMAIN", "Domain:"));
+		(this.aCLabel654 = new CLabel(this.networkGroup, 0)).setText(UILocale.get("OPTION_NETWORK_DOMAIN", "Domain:"));
 		this.aCLabel654.setLayoutData(layoutData3);
-		(this.aText643 = new Text(this.aGroup700, 2048)).setLayoutData(layoutData2);
+		(this.aText643 = new Text(this.networkGroup, 2048)).setLayoutData(layoutData2);
 		this.aText643.setText(Settings.proxyDomain);
-		(this.aButton764 = new Button(this.aGroup700, 8388608)).setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
+		(this.aButton764 = new Button(this.networkGroup, 8388608)).setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
 		this.aButton764.setLayoutData(layoutData);
 		this.aButton764.addSelectionListener(new Class97(this));
 		this.proxyTypeCombo.addModifyListener(new Class65(this));
 		this.proxyTypeCombo.select(Settings.proxyType);
+		
+		(this.noNetworkBtn = new Button(this.networkGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Restrict network connections"));
+		this.noNetworkBtn.setLayoutData(gridData);
+		this.noNetworkBtn.setSelection(Settings.networkNotAvailable);
 	}
 
-	private void method350() {
+	private void setupProxyCombo() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.horizontalSpan = 2;
 		layoutData.verticalAlignment = 2;
-		(this.proxyTypeCombo = new Combo(this.aGroup700, 8)).setLayoutData(layoutData);
+		(this.proxyTypeCombo = new Combo(this.networkGroup, 8)).setLayoutData(layoutData);
 		this.proxyTypeCombo.add("None Proxy");
 		this.proxyTypeCombo.add("HTTP Proxy");
 		this.proxyTypeCombo.add("Socks5 Proxy");
