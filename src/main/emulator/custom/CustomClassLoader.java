@@ -17,6 +17,9 @@ public final class CustomClassLoader extends ClassLoader {
 			return loadedClass;
 		}
 		if (!Emulator.jarClasses.contains(s)) {
+			if (checkIsProtected(s)) {
+				throw new ClassNotFoundException("Protected API: " + s);
+			}
 			try {
 				return super.loadClass(s, b);
 			} catch (ClassNotFoundException ex) {
@@ -100,6 +103,16 @@ public final class CustomClassLoader extends ClassLoader {
 			inputStream.close();
 		}
 		return classWriter.toByteArray();
+	}
+
+	private boolean checkIsProtected(String s) {
+		if (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty())
+			return false;
+		int idx = 0;
+		while ((idx = s.indexOf('.', idx)) != -1) {
+			if (Settings.protectedPackages.contains(s.substring(0, idx))) return true;
+		}
+		return false;
 	}
 
 	public final InputStream getResourceAsStream(final String s) {

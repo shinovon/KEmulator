@@ -107,4 +107,5 @@ public final class Settings {
 
 	public static boolean keyPressOnRepeat;
 	public static boolean forcePaintOnServiceRepaints = true;
+	public static List<String> protectedPackages = new ArrayList<String>();
 }
