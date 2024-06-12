@@ -201,6 +201,7 @@ public final class Property implements IProperty {
 	private Button fpsCounterCheck;
 	private Button serialCallsCheck;
 	private Button keyPressOnRepeatCheck;
+	private Button antiAliasTextBtn;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -762,7 +763,8 @@ public final class Property implements IProperty {
 		Settings.proxyDomain = this.aText643.getText().trim();
 		//Emulator.inactivityTimer = this.inactiveTimerSpinner.getSelection();
 		Settings.rpc = this.rpcBtn.getSelection();
-		Settings.awtAntiAliasing = this.antiAliasBtn.getSelection();
+		Settings.awtAntiAliasing = antiAliasBtn.getSelection();
+		Settings.textAntiAliasing = antiAliasTextBtn.getSelection();
 //        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
 		Settings.locale = localeText.getText().trim();
@@ -1726,6 +1728,9 @@ public final class Property implements IProperty {
 		this.rpcBtn.setSelection(Settings.rpc);
 		(this.antiAliasBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
+
+		(this.antiAliasTextBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_TEXT_ANTIALIASING", "Text Antialiasing"));
+		this.antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
 //        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
 //        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
 		fpsCounterCheck = new Button(sysChecksGroup, SWT.CHECK);
