@@ -87,6 +87,7 @@ public final class Property implements IProperty {
 			{"Socket Server", "connector.open.serversocket", "allowed"},
 			{"Camera", "media.camera", "ask_always_until_no"},
 			{"Location", "location", "allowed"},
+			{"Open browser", "platformrequest", "ask_always_until_no"},
 	};
 
 	public static final String[][] PERMISSIONS_VALUES = {
@@ -294,6 +295,7 @@ public final class Property implements IProperty {
 	private Button mascotTextureFilterCheck;
 	private Button mascotBackgroundFilterCheck;
 	private Button securityCheck;
+	private Composite securityContent;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -308,6 +310,8 @@ public final class Property implements IProperty {
 		this.method372(shell);
 		this.setsShell.pack();
 		this.setsShell.setSize(480, this.setsShell.getSize().y);
+		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
+		securityComp.setExpandVertical(true);
 		this.setsShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.setsShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.setsShell.getSize().y >> 1));
 		this.setsShell.open();
 		while (!this.setsShell.isDisposed()) {
@@ -1985,13 +1989,13 @@ public final class Property implements IProperty {
 	private void setupSecurityComp() {
 		securityComp = new ScrolledComposite(tabFolder, SWT.V_SCROLL);
 
-		Composite content = new Composite(securityComp, SWT.NONE);
+		securityContent = new Composite(securityComp, SWT.NONE);
 
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		layout.marginWidth = 5;
 
-		content.setLayout(new GridLayout());
+		securityContent.setLayout(new GridLayout());
 
 		final GridData labelGridData = new GridData();
 		labelGridData.horizontalAlignment = SWT.FILL;
@@ -2008,12 +2012,12 @@ public final class Property implements IProperty {
 		groupData.grabExcessVerticalSpace = true;
 		groupData.verticalAlignment = 1;
 
-		securityCheck = new Button(content, SWT.CHECK);
+		securityCheck = new Button(securityContent, SWT.CHECK);
 		securityCheck.setText(UILocale.get("OPTION_SECURITY_ENABLE", "Enable security"));
 		securityCheck.setLayoutData(labelGridData);
 		securityCheck.setSelection(Settings.mascotNo2DMixing);
 
-		Group permGroup = new Group(content, SWT.NONE);
+		Group permGroup = new Group(securityContent, SWT.NONE);
 		permGroup.setText(UILocale.get("OPTION_SECURITY_PERMISSIONS", "Permissions"));
 		permGroup.setLayout(layout);
 		permGroup.setLayoutData(groupData);
@@ -2039,8 +2043,7 @@ public final class Property implements IProperty {
 			combo.setLayoutData(comboData);
 		}
 
-		securityComp.setContent(content);
-		securityComp.setExpandVertical(true);
+		securityComp.setContent(securityContent);
 		securityComp.setExpandHorizontal(true);
 	}
 
@@ -2075,8 +2078,8 @@ public final class Property implements IProperty {
 		(this.antiAliasBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
 
-		(this.antiAliasTextBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_TEXT_ANTIALIASING", "Text Antialiasing"));
-		this.antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
+		(antiAliasTextBtn = new Button(sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_TEXT_ANTIALIASING", "Text Antialiasing"));
+		antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
 //        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
 //        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
 		fpsCounterCheck = new Button(sysChecksGroup, SWT.CHECK);

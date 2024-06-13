@@ -38,7 +38,8 @@ public class Permission {
 				x.equals("connector.open.sms") ||
 				x.equals("location")) {
 			return allowed; // return 5;
-		} else if (x.equals("media.camera")) {
+		} else if (x.equals("media.camera") ||
+				x.equals("platformrequest")) {
 			return ask_always_until_no;
 		}
 		return ask_always_until_yes;
@@ -142,6 +143,12 @@ public class Permission {
 	}
 
 	public static boolean requestURLAccess(final String url) {
+		switch (getAppPermissionLevel("platformrequest")) {
+			case never:
+				return false;
+			case allowed:
+				return true;
+		}
 		Emulator.emulatorimpl.getEmulatorScreen().getShell().getDisplay().syncExec(new Runnable() {
 			public void run() {
 				MessageBox messageBox = new MessageBox(Emulator.emulatorimpl.getEmulatorScreen().getShell(), SWT.YES | SWT.NO);
