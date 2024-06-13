@@ -75,7 +75,25 @@ public final class Property implements IProperty {
 			{"Pigler Notifications", "org.pigler"},
 			{"KEmulator Notifications (Deprecated)", "ru.nnproject.kemulator.notificationapi"},
 			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
-			{"KEmulator", "kemulator"}, // эксклюзивные пропы по типу kemulator.version
+			{"KEmulator", "kemulator"}, // проприетарные пропы по типу kemulator.version
+	};
+
+	public static final String[][] PERMISSIONS = {
+			{"Send SMS", "messageconnection.send", "allowed"},
+			{"Receive SMS", "messageconnection.receive", "allowed"},
+			{"File System Access", "connector.open.file", "allowed"},
+			{"HTTP Connection", "connector.open.http", "allowed"},
+			{"Socket Connection", "connector.open.socket", "allowed"},
+			{"Socket Server", "connector.open.serversocket", "allowed"},
+			{"Camera", "media.camera", "ask_always_until_no"},
+			{"Location", "location", "allowed"},
+	};
+
+	public static final String[][] PERMISSIONS_VALUES = {
+			{"Allowed", "allowed"},
+			{"Ask once", "ask_once"},
+			{"Ask every time", "ask_always_until_no"},
+			{"Never", "never"},
 	};
 
 	private static Display aDisplay656;

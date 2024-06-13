@@ -24,11 +24,21 @@ public class Permission {
 	public static boolean askImei = true;
 
 	private static int getAppPermissionLevel(String x) {
-		if (!askPermissions) return 2;
+		if (!Settings.enableSecurity) return 2;
 		x = x.toLowerCase();
-		if (x.equals("messageconnection.send") || x.equals("messageconnection.receive") || x.equals("connector.open.http") || x.equals("connector.open.file") || x.equals("connector.open.socket") || x.equals("connector.open.serversocket") || x.equals("connector.open.sms")) {
+		// TODO
+
+		// default
+		if (x.equals("messageconnection.send") ||
+				x.equals("messageconnection.receive") ||
+				x.equals("connector.open.http") ||
+				x.equals("connector.open.file") ||
+				x.equals("connector.open.socket") ||
+				x.equals("connector.open.serversocket") ||
+				x.equals("connector.open.sms") ||
+				x.equals("location")) {
 			return allowed; // return 5;
-		} else if (x.equals("camera")) {
+		} else if (x.equals("media.camera")) {
 			return ask_always_until_no;
 		}
 		return ask_always_until_yes;
@@ -125,7 +135,7 @@ public class Permission {
 			return "Allow the application to open socket connections?";
 		} else if (x.equals("connector.open.serversocket")) {
 			return "Allow the application to open server socket connections?";
-		} else if (x.equals("camera")) {
+		} else if (x.equals("media.camera")) {
 			return UILocale.get("PERMISSION_CAMERA", "Allow the application to use camera?");
 		}
 		return "Allow the application to use '" + x + "'?";

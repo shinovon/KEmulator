@@ -140,7 +140,7 @@ public class CapturePlayerImpl implements Player {
 		if (inst != this) {
 			realize();
 		}
-		Permission.checkPermission("camera");
+		Permission.checkPermission("media.camera");
 		webcam.open();
 		started = true;
 		state = STARTED;
