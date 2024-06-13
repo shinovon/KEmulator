@@ -234,7 +234,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite recordsComp;
 	private Table aTable665;
 	private CLabel aCLabel647;
-	private Button aButton758;
+	private Button clearRecordsBtn;
 	private Button aButton761;
 	private Composite networkComp;
 	private Group networkProxyGroup;
@@ -296,6 +296,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button mascotBackgroundFilterCheck;
 	private Button securityCheck;
 	private Composite securityContent;
+	private Tree rmsTree;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -2312,19 +2313,127 @@ public final class Property implements IProperty, SelectionListener {
 		this.aText662.setLayoutData(layoutData4);
 		this.aText662.setText(this.rmsFolder);
 		(this.aButton666 = new Button(this.recordsComp, 8388616)).setText("...");
-		(this.aCLabel647 = new CLabel(this.recordsComp, 0)).setText(UILocale.get("OPTION_RECORDS_RMS_TEXT", "All Records in current midlet:"));
-		this.aCLabel647.setLayoutData(layoutData2);
-		(this.aTable665 = new Table(this.recordsComp, 2080)).setHeaderVisible(false);
-		this.aTable665.setLayoutData(layoutData3);
-		this.aTable665.setLinesVisible(true);
-		(this.aButton761 = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_SELECT_ALL", "Select All"));
-		this.aButton761.addSelectionListener(new Class194(this));
-		(this.aButton758 = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
-		this.aButton758.setLayoutData(layoutData);
-		this.aButton758.addSelectionListener(new Class103(this));
-		new TableColumn(this.aTable665, 0).setWidth(200);
-		this.method428();
 		this.aButton666.addSelectionListener(new Class101(this));
+
+		if (Emulator.midletClassName != null) {
+			(this.aCLabel647 = new CLabel(this.recordsComp, 0)).setText(UILocale.get("OPTION_RECORDS_RMS_TEXT", "All Records in current midlet:"));
+			this.aCLabel647.setLayoutData(layoutData2);
+			(this.aTable665 = new Table(this.recordsComp, 2080)).setHeaderVisible(false);
+			this.aTable665.setLayoutData(layoutData3);
+			this.aTable665.setLinesVisible(true);
+			(this.aButton761 = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_SELECT_ALL", "Select All"));
+			this.aButton761.addSelectionListener(new Class194(this));
+			(this.clearRecordsBtn = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
+			this.clearRecordsBtn.setLayoutData(layoutData);
+			this.clearRecordsBtn.addSelectionListener(new Class103(this));
+			new TableColumn(this.aTable665, 0).setWidth(200);
+			this.method428();
+		} else {
+			rmsTree = new Tree(recordsComp, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+			rmsTree.setLayoutData(layoutData3);
+			String rootPath = getRmsFolderPath();
+			File rootDir = new File(rootPath);
+			rmsTree.addTreeListener(new TreeListener() {
+				public void treeCollapsed(TreeEvent treeEvent) {
+				}
+
+				public void treeExpanded(TreeEvent e) {
+					try {
+						TreeItem root = (TreeItem) e.item;
+						TreeItem[] items = root.getItems();
+						for (TreeItem item: items) {
+							if (item.getData() != null) return;
+							item.dispose();
+						}
+						String d = (String) root.getData();
+						if (d.startsWith("r")) {
+							return;
+						}
+						d = d.substring(1);
+						String[] list = new File(rootPath + d).list();
+						if (list != null) {
+							for (String s : list) {
+								String l = decodeBase64(s);
+								if (l == null) continue;
+								TreeItem t = new TreeItem(root, SWT.NONE);
+								t.setData("r" + d + "/" + s);
+								t.setChecked(root.getChecked());
+								t.setText(l);
+							}
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			});
+
+//			rmsTree.addSelectionListener(new SelectionListener() {
+//				public void widgetSelected(SelectionEvent e) {
+//					String s;
+//					if (e.item == null || (s = (String) e.item.getData()) == null || s.startsWith("r"))
+//						return;
+//					TreeItem[] items = ((TreeItem) e.item).getItems();
+//					if (items == null)
+//						return;
+//					for (TreeItem item: items) {
+//						item.setChecked(((TreeItem) e.item).getChecked());
+//					}
+//				}
+//
+//				public void widgetDefaultSelected(SelectionEvent selectionEvent) {
+//				}
+//			});
+
+			String[] list = rootDir.list();
+			if (list != null) {
+				for (String s : list) {
+					String l = decodeBase64(s);
+					if (l == null) continue;
+					TreeItem t = new TreeItem(rmsTree, SWT.NONE);
+					t.setData("m" + s);
+					t.setText(l);
+
+					new TreeItem(t, SWT.NONE);
+				}
+			}
+
+
+			(this.clearRecordsBtn = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
+			this.clearRecordsBtn.setLayoutData(layoutData);
+			clearRecordsBtn.addSelectionListener(new SelectionListener() {
+				public void widgetSelected(SelectionEvent selectionEvent) {
+					TreeItem[] items = rmsTree.getSelection();
+					if (items == null)
+						return;
+
+					for (TreeItem item: items) {
+						String d = (String) item.getData();
+						if (d == null || d.startsWith("m")) continue;
+						item.dispose();
+						try {
+							File file = new File(rootPath + d.substring(1));
+							for (File value : file.listFiles()) {
+								value.delete();
+							}
+							file.delete();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+				public void widgetDefaultSelected(SelectionEvent selectionEvent) {
+				}
+			});
+		}
+	}
+
+	private String decodeBase64(String name) {
+		try {
+			return new String(Base64.getDecoder().decode(name.replace('-', '/').getBytes("UTF-8")), "UTF-8");
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	private String method374() {
