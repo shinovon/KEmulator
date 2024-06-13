@@ -259,6 +259,8 @@ public final class Property implements IProperty {
 	private Table disableApiTable;
 	private Composite propsComp;
 	private Text propsText;
+	private Button mediaDumpCheck;
+	private Button ottCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -567,6 +569,8 @@ public final class Property implements IProperty {
 			Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
 			Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "false"));
 			Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
+			Settings.enableMediaDump = Boolean.parseBoolean(properties.getProperty("EnableMediaDump", "false"));
+			Settings.enableOTT = Boolean.parseBoolean(properties.getProperty("EnableOTT", "false"));
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -772,6 +776,8 @@ public final class Property implements IProperty {
 			properties.setProperty("MIDISearchVMS", String.valueOf(Settings.searchVms));
 			properties.setProperty("MIDIReopenDevice", String.valueOf(Settings.reopenMidiDevice));
 			properties.setProperty("MIDIGlobalSequencer", String.valueOf(Settings.oneMidiAtTime));
+			properties.setProperty("EnableMediaDump", String.valueOf(Settings.enableMediaDump));
+			properties.setProperty("EnableOTT", String.valueOf(Settings.enableOTT));
 
 			// jvm
 			properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
@@ -894,6 +900,9 @@ public final class Property implements IProperty {
 				Settings.systemProperties.put(k, v);
 			}
 		}
+
+		Settings.enableMediaDump = mediaDumpCheck.getSelection();
+		Settings.enableOTT = ottCheck.getSelection();
 
 		this.updateProxy();
 	}
@@ -1763,6 +1772,16 @@ public final class Property implements IProperty {
 		globalMidiCheck.setText(UILocale.get("OPTION_MEDIA_GLOBAL_MIDI", "Allow only one MIDI playback at time (reduces lag)"));
 		globalMidiCheck.setLayoutData(fillHor);
 		globalMidiCheck.setSelection(Settings.oneMidiAtTime);
+
+		mediaDumpCheck = new Button(mediaGroup, SWT.CHECK);
+		mediaDumpCheck.setText(UILocale.get("OPTION_MEDIA_DUMP", "Enable media exporting (higher memory usage)"));
+		mediaDumpCheck.setLayoutData(fillHor);
+		mediaDumpCheck.setSelection(Settings.enableMediaDump);
+
+		ottCheck = new Button(mediaGroup, SWT.CHECK);
+		ottCheck.setText(UILocale.get("OPTION_MEDIA_OTT", "OTT playback (unstable)"));
+		ottCheck.setLayoutData(fillHor);
+		ottCheck.setSelection(Settings.enableOTT);
 
 //        reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
 //        reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));

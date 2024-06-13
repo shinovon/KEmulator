@@ -101,9 +101,8 @@ public class Sound {
 				state = 3;
 				return;
 			}
-		} else {
-			data = paramArrayOfByte;
 		}
+		if (Settings.enableMediaDump) data = paramArrayOfByte;
 		try {
 			ByteArrayInputStream localByteArrayInputStream = new ByteArrayInputStream(paramArrayOfByte);
 			m_player = new PlayerImpl(localByteArrayInputStream, type == FORMAT_WAV ? "audio/wav" : null);

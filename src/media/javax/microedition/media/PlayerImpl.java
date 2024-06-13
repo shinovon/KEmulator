@@ -52,7 +52,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		state = UNREALIZED;
 		listeners = new Vector<PlayerListener>();
 		timeBase = Manager.getSystemTimeBase();
-//		players.add(this);
+		if (Settings.enableMediaDump) players.add(this);
 	}
 
 	public PlayerImpl(String contentType, DataSource src) throws IOException, MediaException {
@@ -80,7 +80,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		} else if (contentType.equals("audio/mpeg")) {
 			try {
 				InputStream i = inputStream;
-				if (i instanceof ByteArrayInputStream) {
+				if (i instanceof ByteArrayInputStream && Settings.enableMediaDump) {
 					data = CustomJarResources.getBytes(i);
 					i = new ByteArrayInputStream(data);
 				}
@@ -131,11 +131,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 
 	private void amr(final InputStream inputStream) throws IOException {
 		try {
-			final byte[] method476;
-			if ((data = method476 = emulator.media.amr.a.method476(CustomJarResources.getBytes(inputStream))) == null) {
+			final byte[] b;
+			if ((b = emulator.media.amr.a.method476(CustomJarResources.getBytes(inputStream))) == null) {
 				throw new MediaException("Cannot parse AMR data");
 			}
-			InputStream i = new ByteArrayInputStream(method476);
+			if (Settings.enableMediaDump) data = b;
+			InputStream i = new ByteArrayInputStream(b);
 			final AudioFormat audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 8000.0f, 16, 1, 2, 8000.0f, false);
 			final AudioInputStream audioInputStream = new AudioInputStream(i, audioFormat, -1L);
 			final Clip clip;
@@ -229,6 +230,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
 			byte[] data = CustomJarResources.getBytes(inputStream);
+			if (Settings.enableMediaDump) this.data = data;
 			sequence = MidiSystem.getSequence(new ByteArrayInputStream(data));
 		} catch (Exception e) {
 			sequence = null;
@@ -716,7 +718,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			System.err.println("Exception in player thread!");
 			e.printStackTrace();
 		}
-		players.remove(this);
+		if (!Settings.enableMediaDump) players.remove(this);
 	}
 
 	public void update(final LineEvent lineEvent) {
@@ -770,15 +772,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		String ext = "";
 		if (sequence instanceof Sequence) {
 			ext = "mid";
-		} else if (sequence instanceof Clip) {
-			ext = "amr";
-		} else if (sequence instanceof javazoom.jl.player.Player) {
+		} else /*if (sequence instanceof Clip) {
+			ext = "wav";
+		} else */if (sequence instanceof javazoom.jl.player.Player) {
 			ext = "mp3";
 		} else if (contentType != null) {
 			if (contentType.equalsIgnoreCase("audio/wav") ||
 					contentType.equalsIgnoreCase("audio/wave") ||
 					contentType.equalsIgnoreCase("audio/x-wav")) {
 				ext = "wav";
+			} else if (contentType.equalsIgnoreCase("audio/amr")) {
+				ext = "amr";
 			} else if (contentType.equalsIgnoreCase("audio/x-mid") ||
 					contentType.equalsIgnoreCase("audio/mid") ||
 					contentType.equalsIgnoreCase("audio/midi")) {

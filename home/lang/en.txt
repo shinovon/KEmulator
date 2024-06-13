@@ -309,6 +309,8 @@ OPTION_MEDIA_VLC_DIR=VLC Path
 OPTION_MEDIA_VMS=Search for VirtualMIDISynth as MIDI device
 OPTION_MEDIA_GLOBAL_MIDI=Allow only one MIDI playback at time (reduces lag)
 OPTION_MEDIA_REOPEN_MIDI=Reopen MIDI device every time
+OPTION_MEDIA_DUMP=Enable media exporting (higher memory usage)
+OPTION_MEDIA_OTT=OTT playback (unstable)
 
 OPTION_M3G_LWJGL_SETTINGS=LWJGL Settings
 OPTION_M3G_IGNORE_OVERWRITE=Ignore OVERWRITE hint
