@@ -833,12 +833,12 @@ public final class Property implements IProperty {
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
-		} catch (Exception ignored) {
-			ignored.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	private void method358() {
+	private void apply() {
 		final String trim = this.aCombo657.getText().trim();
 		this.device = trim;
 		Emulator.deviceName = trim;
@@ -952,6 +952,7 @@ public final class Property implements IProperty {
 
 		Settings.enableMediaDump = mediaDumpCheck.getSelection();
 		Settings.enableOTT = ottCheck.getSelection();
+		Settings.enableSecurity = securityCheck.getSelection();
 
 		this.updateProxy();
 	}
@@ -2015,7 +2016,7 @@ public final class Property implements IProperty {
 		securityCheck = new Button(securityContent, SWT.CHECK);
 		securityCheck.setText(UILocale.get("OPTION_SECURITY_ENABLE", "Enable security"));
 		securityCheck.setLayoutData(labelGridData);
-		securityCheck.setSelection(Settings.mascotNo2DMixing);
+		securityCheck.setSelection(Settings.enableSecurity);
 
 		Group permGroup = new Group(securityContent, SWT.NONE);
 		permGroup.setText(UILocale.get("OPTION_SECURITY_PERMISSIONS", "Permissions"));
@@ -2519,7 +2520,7 @@ public final class Property implements IProperty {
 	}
 
 	static void method375(final Property class38) {
-		class38.method358();
+		class38.apply();
 	}
 
 	static Shell method364(final Property class38) {
