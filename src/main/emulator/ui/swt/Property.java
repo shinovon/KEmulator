@@ -90,10 +90,18 @@ public final class Property implements IProperty {
 	};
 
 	public static final String[][] PERMISSIONS_VALUES = {
-			{"Allowed", "allowed"},
-			{"Ask once", "ask_once"},
-			{"Ask every time", "ask_always_until_no"},
-			{"Never", "never"},
+			{
+				"Allowed",
+				"Ask once",
+				"Ask every time",
+				"Never",
+			},
+			{
+				"allowed",
+				"ask_once",
+				"ask_always_until_no",
+				"never"
+			}
 	};
 
 	private static Display aDisplay656;
@@ -279,12 +287,13 @@ public final class Property implements IProperty {
 	private Text propsText;
 	private Button mediaDumpCheck;
 	private Button ottCheck;
-	private Composite securityComp;
+	private ScrolledComposite securityComp;
 	private Button mascotNo2DMixingCheck;
 	private Composite mascotComp;
 	private Button mascotIgnoreBgCheck;
 	private Button mascotTextureFilterCheck;
 	private Button mascotBackgroundFilterCheck;
+	private Button securityCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -1974,9 +1983,65 @@ public final class Property implements IProperty {
 	}
 	
 	private void setupSecurityComp() {
-		securityComp = new Composite(this.tabFolder, 0);
-		securityComp.setLayout(new GridLayout());
-		// TODO
+		securityComp = new ScrolledComposite(tabFolder, SWT.V_SCROLL);
+
+		Composite content = new Composite(securityComp, SWT.NONE);
+
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.marginWidth = 5;
+
+		content.setLayout(new GridLayout());
+
+		final GridData labelGridData = new GridData();
+		labelGridData.horizontalAlignment = SWT.FILL;
+		labelGridData.grabExcessHorizontalSpace = true;
+		labelGridData.horizontalSpan = 2;
+
+		final GridData comboData = new GridData();
+		comboData.horizontalAlignment = SWT.FILL;
+		comboData.grabExcessHorizontalSpace = true;
+
+		final GridData groupData = new GridData();
+		groupData.horizontalAlignment = 4;
+		groupData.grabExcessHorizontalSpace = true;
+		groupData.grabExcessVerticalSpace = true;
+		groupData.verticalAlignment = 1;
+
+		securityCheck = new Button(content, SWT.CHECK);
+		securityCheck.setText(UILocale.get("OPTION_SECURITY_ENABLE", "Enable security"));
+		securityCheck.setLayoutData(labelGridData);
+		securityCheck.setSelection(Settings.mascotNo2DMixing);
+
+		Group permGroup = new Group(content, SWT.NONE);
+		permGroup.setText(UILocale.get("OPTION_SECURITY_PERMISSIONS", "Permissions"));
+		permGroup.setLayout(layout);
+		permGroup.setLayoutData(groupData);
+
+
+		for (String[] s: PERMISSIONS) {
+			final GridData data = new GridData();
+			data.horizontalAlignment = SWT.FILL;
+
+			CLabel label = new CLabel(permGroup, 0);
+			label.setText(s[0]);
+			label.setLayoutData(data);
+
+			// TODO
+			Combo combo = new Combo(permGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+			combo.setItems(PERMISSIONS_VALUES[0]);
+			for (int i = 0; i < PERMISSIONS_VALUES[1].length; i++) {
+				if (PERMISSIONS_VALUES[1][i].equals(s[2])) {
+					combo.setText(PERMISSIONS_VALUES[0][i]);
+					break;
+				}
+			}
+			combo.setLayoutData(comboData);
+		}
+
+		securityComp.setContent(content);
+		securityComp.setExpandVertical(true);
+		securityComp.setExpandHorizontal(true);
 	}
 
 	private void initSystemComp() {

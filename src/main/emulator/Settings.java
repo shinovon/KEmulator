@@ -99,7 +99,7 @@ public final class Settings {
 
 	public static boolean enableOTT;
 
-	// mascot TODO: ui
+	// mascot
 	public static boolean mascotNo2DMixing;
 	public static boolean mascotIgnoreBackground;
 	public static boolean mascotTextureFilter;
@@ -113,5 +113,5 @@ public final class Settings {
 	public static Set<String> protectedPackages = new HashSet<String>();
 	public static Map<String, String> systemProperties = new HashMap<>();
 
-	public static boolean enableSecurity;
+	public static boolean enableSecurity = true;
 }
