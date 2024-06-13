@@ -463,7 +463,18 @@ public final class Property implements IProperty {
 				Settings.protectedPackages.addAll(Arrays.asList(protectedPackages));
 			}
 
-			Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
+			String[] sysProps = properties.getProperty("SystemProperties", "").split("\n");
+			Settings.systemProperties.clear();
+            for (String s : sysProps) {
+                if ((s = s.trim()).isEmpty()) continue;
+                int i = s.indexOf(':');
+                if (i == -1) continue;
+                String k = s.substring(0, i).trim();
+                String v = s.substring(i + 1).trim();
+                Settings.systemProperties.put(k, v);
+            }
+
+            Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
 			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
 
 			// emulator
@@ -659,14 +670,19 @@ public final class Property implements IProperty {
 			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
 			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
 
-			StringBuilder protectedPackages = new StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			for (String s: Settings.protectedPackages) {
-				protectedPackages.append(s).append(';');
+				builder.append(s).append(';');
 			}
+			builder.setLength(builder.length() - 1);
+			properties.setProperty("ProtectedPackages", builder.toString());
 
-			protectedPackages.setLength(protectedPackages.length() - 1);
-
-			properties.setProperty("ProtectedPackages", protectedPackages.toString());
+			builder.setLength(0);
+			for (String k: Settings.systemProperties.keySet()) {
+				builder.append(k).append(':').append(Settings.systemProperties.get(k)).append('\n');
+			}
+			builder.setLength(builder.length() - 1);
+			properties.setProperty("SystemProperties", builder.toString());
 
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
