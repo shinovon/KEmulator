@@ -2093,9 +2093,6 @@ public final class Property implements IProperty, SelectionListener {
 		this.rpcBtn.setSelection(Settings.rpc);
 		(this.antiAliasBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
-
-		(antiAliasTextBtn = new Button(sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_TEXT_ANTIALIASING", "Text Antialiasing"));
-		antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
 //        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
 //        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
 		fpsCounterCheck = new Button(sysChecksGroup, SWT.CHECK);
@@ -2142,6 +2139,13 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText633 = new Text(this.sysFontComp, 2048)).setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
 		this.aText633.setLayoutData(layoutData);
 		this.aText633.addModifyListener(new Class192(this));
+
+
+		final GridData layoutData4;
+		(layoutData4 = new GridData()).horizontalSpan = 3;
+		(antiAliasTextBtn = new Button(sysFontComp, 32)).setText(UILocale.get("OPTION_SYSTEM_TEXT_ANTIALIASING", "Text Antialiasing"));
+		antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
+		antiAliasTextBtn.setLayoutData(layoutData4);
 	}
 
 	private void method418() {
@@ -2293,7 +2297,7 @@ public final class Property implements IProperty, SelectionListener {
 		(layoutData3 = new GridData()).horizontalSpan = 3;
 		layoutData3.verticalAlignment = 4;
 		layoutData3.grabExcessHorizontalSpace = true;
-		layoutData3.grabExcessVerticalSpace = false;
+		layoutData3.grabExcessVerticalSpace = true;
 		layoutData3.heightHint = 160;
 		layoutData3.horizontalAlignment = 4;
 		final GridData layoutData4;
@@ -2332,7 +2336,6 @@ public final class Property implements IProperty, SelectionListener {
 			rmsTree = new Tree(recordsComp, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 			rmsTree.setLayoutData(layoutData3);
 			String rootPath = getRmsFolderPath();
-			File rootDir = new File(rootPath);
 			rmsTree.addTreeListener(new TreeListener() {
 				public void treeCollapsed(TreeEvent treeEvent) {
 				}
@@ -2346,7 +2349,7 @@ public final class Property implements IProperty, SelectionListener {
 							item.dispose();
 						}
 						String d = (String) root.getData();
-						if (d.startsWith("r")) {
+						if (d == null || d.startsWith("r")) {
 							return;
 						}
 						d = d.substring(1);
@@ -2367,24 +2370,7 @@ public final class Property implements IProperty, SelectionListener {
 				}
 			});
 
-//			rmsTree.addSelectionListener(new SelectionListener() {
-//				public void widgetSelected(SelectionEvent e) {
-//					String s;
-//					if (e.item == null || (s = (String) e.item.getData()) == null || s.startsWith("r"))
-//						return;
-//					TreeItem[] items = ((TreeItem) e.item).getItems();
-//					if (items == null)
-//						return;
-//					for (TreeItem item: items) {
-//						item.setChecked(((TreeItem) e.item).getChecked());
-//					}
-//				}
-//
-//				public void widgetDefaultSelected(SelectionEvent selectionEvent) {
-//				}
-//			});
-
-			String[] list = rootDir.list();
+			String[] list = new File(rootPath).list();
 			if (list != null) {
 				for (String s : list) {
 					String l = decodeBase64(s);
@@ -2541,7 +2527,7 @@ public final class Property implements IProperty, SelectionListener {
 		final GridData layoutData8;
 		(layoutData8 = new GridData()).horizontalAlignment = 4;
 		layoutData8.grabExcessHorizontalSpace = true;
-		layoutData8.grabExcessVerticalSpace = true;
+//		layoutData8.grabExcessVerticalSpace = true;
 		layoutData8.verticalAlignment = 1;
 		(this.networkProxyGroup = new Group(this.networkComp, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY", "Proxy"));
 		this.networkProxyGroup.setLayout(layout);
@@ -2572,9 +2558,14 @@ public final class Property implements IProperty, SelectionListener {
 		this.aButton764.addSelectionListener(new Class97(this));
 		this.proxyTypeCombo.addModifyListener(new Class65(this));
 		this.proxyTypeCombo.select(Settings.proxyType);
+
+		final GridData gridData2;
+		(gridData2 = new GridData()).horizontalAlignment = 4;
+		gridData2.grabExcessHorizontalSpace = true;
+		gridData2.verticalAlignment = GridData.BEGINNING;
 		
 		(this.noNetworkBtn = new Button(this.networkComp, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Restrict network connections"));
-		this.noNetworkBtn.setLayoutData(gridData);
+		this.noNetworkBtn.setLayoutData(gridData2);
 		this.noNetworkBtn.setSelection(Settings.networkNotAvailable);
 	}
 
