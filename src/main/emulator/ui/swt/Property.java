@@ -27,7 +27,7 @@ import javax.microedition.rms.RecordStore;
 public final class Property implements IProperty {
 
 	// список выключаемых апи
-	public static final String[][] APIS_LIST = {
+	public static final String[][] API_LIST = {
 			// стандартные
 			{"FileConnection (JSR 75)", "javax.microedition.io.file"},
 			{"PIM (JSR 75) (Stub)", "javax.microedition.pim"},
@@ -39,7 +39,7 @@ public final class Property implements IProperty {
 			{"M3G (JSR 184)", "javax.microedition.m3g"},
 			{"ContentHandler (JSR 211) (Stub)", "javax.microedition.content"},
 			{"Advanced Media (JSR 234)", "javax.microedition.amms"},
-			{"OpenGL (JSR 239)", "javax.microedition.khronos"},
+			{"OpenGL ES (JSR 239)", "javax.microedition.khronos"},
 			{"Sensor (JSR 256)", "javax.microedition.sensor"},
 			{"GameCanvas (MIDP 2.0)", "javax.microedition.lcdui.game"},
 
@@ -50,7 +50,7 @@ public final class Property implements IProperty {
 			{"Sprint", "com.sprintpcs"},
 			{"Motorola", "com.motorola"},
 			{"Vodafone", "com.vodafone"},
-			{"LG", "com.mmpp"},
+			{"LG", "mmpp"},
 
 			// nokia по отдельности
 			{"Nokia UI", "com.nokia.mid.ui"},
@@ -69,13 +69,13 @@ public final class Property implements IProperty {
 			// экзотические
 			{"Immersion VibeTonz", "com.immersion"},
 			{"PantechAudio", "com.pantech"},
-			{"RIM", "com.rim"},
+			{"RIM", "net.rim"},
 
 			// nnapi
 			{"Pigler Notifications", "org.pigler"},
 			{"KEmulator Notifications (Deprecated)", "ru.nnproject.kemulator.notificationapi"},
 			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
-
+			{"KEmulator", "kemulator"}, // эксклюзивные пропы по типу kemulator.version
 	};
 
 	private static Display aDisplay656;
@@ -685,17 +685,21 @@ public final class Property implements IProperty {
 			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
 
 			StringBuilder builder = new StringBuilder();
-			for (String s: Settings.protectedPackages) {
-				builder.append(s).append(';');
+			if (!Settings.protectedPackages.isEmpty()) {
+				for (String s: Settings.protectedPackages) {
+					builder.append(s).append(';');
+				}
+				builder.setLength(builder.length() - 1);
 			}
-			builder.setLength(builder.length() - 1);
 			properties.setProperty("ProtectedPackages", builder.toString());
 
 			builder.setLength(0);
-			for (String k: Settings.systemProperties.keySet()) {
-				builder.append(k).append(':').append(Settings.systemProperties.get(k)).append('\n');
+			if (!Settings.systemProperties.isEmpty()) {
+				for (String k : Settings.systemProperties.keySet()) {
+					builder.append(k).append(':').append(Settings.systemProperties.get(k)).append('\n');
+				}
+				builder.setLength(builder.length() - 1);
 			}
-			builder.setLength(builder.length() - 1);
 			properties.setProperty("SystemProperties", builder.toString());
 
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
@@ -775,6 +779,7 @@ public final class Property implements IProperty {
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
 		} catch (Exception ignored) {
+			ignored.printStackTrace();
 		}
 	}
 
@@ -1681,7 +1686,7 @@ public final class Property implements IProperty {
 
 		disableApiTable = new Table(disableApiComp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
 		disableApiTable.setLayoutData(d);
-		for (String[] a: APIS_LIST) {
+		for (String[] a: API_LIST) {
 			TableItem i = new TableItem(disableApiTable, SWT.NONE);
 			i.setText(0, a[0]);
 			i.setChecked(Settings.protectedPackages.contains(a[1]));
@@ -1691,9 +1696,9 @@ public final class Property implements IProperty {
 				TableItem item = (TableItem) event.item;
 				int idx = disableApiTable.indexOf(item);
 				if (item.getChecked()) {
-					Settings.protectedPackages.add(APIS_LIST[idx][1]);
+					Settings.protectedPackages.add(API_LIST[idx][1]);
 				} else {
-					Settings.protectedPackages.remove(APIS_LIST[idx][1]);
+					Settings.protectedPackages.remove(API_LIST[idx][1]);
 				}
 			}
 		});
