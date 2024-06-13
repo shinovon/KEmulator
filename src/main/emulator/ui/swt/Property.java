@@ -244,6 +244,8 @@ public final class Property implements IProperty {
 	private Button antiAliasTextBtn;
 	private Composite disableApiComp;
 	private Table disableApiTable;
+	private Composite propsComp;
+	private Text propsText;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -842,6 +844,20 @@ public final class Property implements IProperty {
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
 
+		String sysProps = propsText.getText();
+		Settings.systemProperties.clear();
+		if (!sysProps.isEmpty()) {
+			String[] a = sysProps.split("\n");
+			for (String s: a) {
+				if ((s = s.trim()).isEmpty()) continue;
+				int i = s.indexOf(':');
+				if (i == -1) continue;
+				String k = s.substring(0, i).trim();
+				String v = s.substring(i + 1).trim();
+				Settings.systemProperties.put(k, v);
+			}
+		}
+
 		this.updateProxy();
 	}
 
@@ -1040,6 +1056,7 @@ public final class Property implements IProperty {
 		this.setupSystemComp();
 		this.setupCoreApiComp();
 		setupDisableApiComp();
+		setupPropsComp();
 		this.setupSysFontComp();
 		this.setupRecordsComp();
 		this.setupNetworkComp();
@@ -1063,6 +1080,9 @@ public final class Property implements IProperty {
 		final CTabItem disableApiTab;
 		(disableApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_DISABLE_API", "Disable APIs"));
 		disableApiTab.setControl(this.disableApiComp);
+		final CTabItem propsTab;
+		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
+		propsTab.setControl(this.propsComp);
 		final CTabItem rmsTab;
 		(rmsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_RECORDS", "Records"));
 		rmsTab.setControl(this.recordsComp);
@@ -1646,6 +1666,26 @@ public final class Property implements IProperty {
 				}
 			}
 		});
+	}
+
+	private void setupPropsComp() {
+		(propsComp = new Composite(tabFolder, 0)).setLayout(new GridLayout());
+
+		GridData d = new GridData();
+		d.horizontalAlignment = 4;
+		d.grabExcessHorizontalSpace = true;
+		d.grabExcessVerticalSpace = true;
+		d.verticalAlignment = 4;
+
+		propsText = new Text(propsComp, SWT.MULTI | SWT.BORDER);
+		propsText.setLayoutData(d);
+		propsText.setToolTipText("foo.bar: Example");
+
+		StringBuilder s = new StringBuilder();
+		for (String k: Settings.systemProperties.keySet()) {
+			s.append(k).append(": ").append(Settings.systemProperties.get(k)).append('\n');
+		}
+		propsText.setText(s.toString());
 	}
 
 	private void setupMediaComp() {
