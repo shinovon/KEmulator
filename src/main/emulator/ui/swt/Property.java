@@ -25,6 +25,40 @@ import org.eclipse.swt.widgets.*;
 import javax.microedition.rms.RecordStore;
 
 public final class Property implements IProperty {
+
+	public static final String[][] APIS_LIST = { // TODO
+
+			{"FileConnection (JSR 75)", "javax.microedition.io.file"},
+			{"Messaging (JSR 120)", "javax.wireless.messaging"},
+			{"Location (JSR 179)", "javax.microedition.location"},
+			{"M3G (JSR 184)", "javax.microedition.m3g"},
+			{"Advanced Media (JSR 234)", "javax.microedition.amms"},
+			{"OpenGL (JSR 239)", "javax.microedition.khronos"},
+			{"Sensor (JSR 256)", "javax.microedition.sensor"},
+
+			{"Nokia", "com.nokia.mid"},
+			{"Siemens", "com.siemens"},
+			{"Samsung", "com.samsung"},
+			{"Sprint", "com.sprintpcs"},
+			{"Motorola", "com.motorola"},
+			{"Vodafone", "com.vodafone"},
+			{"LG", "com.mmpp"},
+
+			{"MascotCapsule", "com.mascotcapsule"},
+
+			{"MEXA OpenGL", "com.mexa"},
+			{"com.j_phone", "com.j_phone"},
+			{"com.jblend", "com.jblend"},
+
+			{"Immersion VibeTonz", "com.immersion"},
+			{"PantechAudio", "com.pantech"},
+
+			{"Pigler Notifications", "org.pigler"},
+			{"KEmulator Notifications", "ru.nnproject.kemulator.notificationapi"},
+			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
+
+	};
+
 	private static Display aDisplay656;
 	private Shell setsShell;
 	private Combo aCombo657;
