@@ -1126,9 +1126,6 @@ public final class Property implements IProperty {
 		final CTabItem disableApiTab;
 		(disableApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_DISABLE_API", "Disable APIs"));
 		disableApiTab.setControl(this.disableApiComp);
-		final CTabItem propsTab;
-		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
-		propsTab.setControl(this.propsComp);
 		final CTabItem rmsTab;
 		(rmsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_RECORDS", "Records"));
 		rmsTab.setControl(this.recordsComp);
@@ -1141,6 +1138,9 @@ public final class Property implements IProperty {
 		final CTabItem m3gTab;
 		(m3gTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_M3G", "M3G"));
 		m3gTab.setControl(this.m3gComp);
+		final CTabItem propsTab;
+		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
+		propsTab.setControl(this.propsComp);
 	}
 
 	private void setupCustomComp() {
