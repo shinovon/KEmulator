@@ -32,15 +32,15 @@ public class Connector {
 		if (s.startsWith("resource:")) {
 			return new ResourceConnectionImpl(s);
 		}
-		if (s.startsWith("file://")) {
+		if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
 			Permission.checkPermission("connector.open.file");
 			return new FileConnectionImpl(s);
 		}
-		if (s.startsWith("sms://")) {
+		if (s.startsWith("sms://") && !Settings.protectedPackages.contains("javax.wireless.messaging")) {
 			Permission.checkPermission("connector.open.sms");
 			return new MessageConnectionImpl(s);
 		}
-		if (s.startsWith("sensor:")) {
+		if (s.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
 			final SensorInfo[] sensors;
 			if ((sensors = SensorManager.findSensors(s)).length > 0) {
 				((SensorImpl) sensors[0]).method239();
@@ -49,7 +49,7 @@ public class Connector {
 			return null;
 		} else {
 			if (Settings.networkNotAvailable) {
-				System.out.println("MIDlet tried to open: " + s);
+				Emulator.getEmulator().getLogStream().println("MIDlet tried to open: " + s);
 				throw new IOException("Network not available");
 			}
 			if (s.startsWith("http://")) {
@@ -69,14 +69,16 @@ public class Connector {
 				return new SocketConnectionImpl(s);
 			}
 			Connection openPrim = null;
-			String protocol = s;
+			String protocol = "";
 			if (s.indexOf(':') != -1) {
-				protocol = s.substring(s.indexOf(':'));
+				protocol = s.substring(0, s.indexOf(':'));
+			} else {
+				throw new ConnectionNotFoundException("unknown protocol: " + s);
 			}
 			try {
-				openPrim = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + s.substring(0, s.indexOf(58)) + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(58) + 1), n, b);
+				openPrim = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + protocol + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(':') + 1), n, b);
 			} catch (Exception ex) {
-				throw new IOException("unknown protocol: " + protocol);
+				throw new ConnectionNotFoundException("unknown protocol: " + s);
 			}
 			return openPrim;
 		}
