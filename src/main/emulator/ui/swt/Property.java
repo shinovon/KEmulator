@@ -46,6 +46,12 @@ public final class Property implements IProperty {
 
 			{"MascotCapsule", "com.mascotcapsule"},
 
+			{"Nokia UI", "com.nokia.mid.ui"},
+			{"Nokia Sound", "com.nokia.mid.sound"},
+			{"Nokia M3D(O)", "com.nokia.mid.m3d"},
+			{"Nokia Location", "com.nokia.mid.location"},
+			{"Nokia InApp", "com.nokia.mid.payment"},
+
 			{"MEXA OpenGL", "com.mexa"},
 			{"com.j_phone", "com.j_phone"},
 			{"com.jblend", "com.jblend"},
