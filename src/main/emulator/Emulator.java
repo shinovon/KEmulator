@@ -35,9 +35,9 @@ import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator {
 	public static boolean debugBuild = true;
-	public static String version = "2.16.2";
+	public static String version = "2.16.3";
 	public static String revision = "";
-	public static final int numericVersion = 17;
+	public static final int numericVersion = 18;
 
 	static EmulatorImpl emulatorimpl;
 	private static MIDlet midlet;

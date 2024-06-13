@@ -54,7 +54,7 @@ public class CustomMethod {
 			} else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
 				res = Settings.networkNotAvailable ? "unavailable" : "available";
 			} else if (prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {
-				res = "50";
+				res = "80";
 			} else if (prop.startsWith("com.nokia.memoryram")) {
 				b = false;
 				Runtime r = Runtime.getRuntime();
@@ -115,6 +115,8 @@ public class CustomMethod {
 				} else if (prop.startsWith("kemulator.notificationapi") && Settings.protectedPackages.contains("ru.nnproject.kemulator.notificationapi")) {
 					res = null;
 				} else if (prop.startsWith("kemulator") && Settings.protectedPackages.contains("kemulator")) {
+					res = null;
+				} else if (Settings.protectedPackages.contains(prop)) {
 					res = null;
 				}
 			}

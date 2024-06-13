@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.17 [2024.06.xx]
+$v2.16.3 [2024.06.xx]
 nokiaui DirectGraphics fixes
 3D profiler
 Implement nokia.Sound(freq, duration)
