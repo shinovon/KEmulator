@@ -83,7 +83,7 @@ public class Connector {
 	}
 
 	private static boolean checkVserv(String s) {
-		return s.startsWith("http://a.vserv.mobi/") || (s.contains("vserv.mobi/") && s.contains("/adapi"));
+		return Settings.bypassVserv && (s.startsWith("http://a.vserv.mobi/") || (s.contains("vserv.mobi/") && s.contains("/adapi")));
 	}
 
 	public static DataInputStream openDataInputStream(final String s) throws IOException {

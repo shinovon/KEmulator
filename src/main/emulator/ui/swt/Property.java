@@ -500,6 +500,8 @@ public final class Property implements IProperty {
 			Settings.enableMethodTrack = Boolean.parseBoolean(properties.getProperty("EnableMethodTrack", "false"));
 			Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
 
+			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
+
 			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "true"));
 			Settings.uiLanguage = properties.getProperty("UILanguage", "en");
 			Settings.writeKemCfg = Boolean.parseBoolean(properties.getProperty("WriteKemulatorCfg", "false"));
@@ -709,6 +711,8 @@ public final class Property implements IProperty {
 			properties.setProperty("EnableNewTrack", String.valueOf(Settings.enableNewTrack));
 			properties.setProperty("EnableMethodTrack", String.valueOf(Settings.enableMethodTrack));
 			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
+
+			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 
 			properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
 			properties.setProperty("UILanguage", Settings.uiLanguage);
