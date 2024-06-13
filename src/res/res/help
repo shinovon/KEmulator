@@ -43,11 +43,19 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.x [2024.06.xx]
-nokiaui fixes
+$v2.17 [2024.06.xx]
+nokiaui DirectGraphics fixes
 3D profiler
 Implement nokia.Sound(freq, duration)
 vServ connection wrapper
+Records tree for all midlets
+Security settings
+APIs disabling
+Custom system properties
+MascotCapsule settings
+Fix lcdui Form flicker
+Player leaks fix
+Added media settings: enable audio export, enable ott
 
 $v2.16.2 [2024.06.05]
 Reworked "sync key events" setting
