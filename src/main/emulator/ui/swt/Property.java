@@ -27,15 +27,21 @@ import javax.microedition.rms.RecordStore;
 public final class Property implements IProperty {
 
 	public static final String[][] APIS_LIST = { // TODO
-
+			// стандартные
 			{"FileConnection (JSR 75)", "javax.microedition.io.file"},
+			{"PIM (JSR 75) (Stub)", "javax.microedition.pim"},
+			{"Bluetooth (JSR 82) (Stub)", "javax.bluetooth"},
 			{"Messaging (JSR 120)", "javax.wireless.messaging"},
+			{"Crypto (JSR 177 SATSA)", "javax.crypto"}, // встроено в jre
 			{"Location (JSR 179)", "javax.microedition.location"},
 			{"M3G (JSR 184)", "javax.microedition.m3g"},
+			{"ContentHandler (JSR 211) (Stub)", "javax.microedition.content"},
 			{"Advanced Media (JSR 234)", "javax.microedition.amms"},
 			{"OpenGL (JSR 239)", "javax.microedition.khronos"},
 			{"Sensor (JSR 256)", "javax.microedition.sensor"},
+			{"GameCanvas (MIDP 2.0)", "javax.microedition.lcdui.game"},
 
+			// вендоры
 			{"Nokia", "com.nokia.mid"},
 			{"Siemens", "com.siemens"},
 			{"Samsung", "com.samsung"},
@@ -44,21 +50,26 @@ public final class Property implements IProperty {
 			{"Vodafone", "com.vodafone"},
 			{"LG", "com.mmpp"},
 
-			{"MascotCapsule", "com.mascotcapsule"},
-
+			// nokia по отдельности
 			{"Nokia UI", "com.nokia.mid.ui"},
 			{"Nokia Sound", "com.nokia.mid.sound"},
 			{"Nokia M3D(O)", "com.nokia.mid.m3d"},
 			{"Nokia Location", "com.nokia.mid.location"},
 			{"Nokia InApp", "com.nokia.mid.payment"},
 
+			{"MascotCapsule", "com.mascotcapsule"},
+
+			// японские
 			{"MEXA OpenGL", "com.mexa"},
 			{"com.j_phone", "com.j_phone"},
 			{"com.jblend", "com.jblend"},
 
+			// экзотические
 			{"Immersion VibeTonz", "com.immersion"},
 			{"PantechAudio", "com.pantech"},
+			{"RIM", "com.rim"},
 
+			// nnapi
 			{"Pigler Notifications", "org.pigler"},
 			{"KEmulator Notifications (Deprecated)", "ru.nnproject.kemulator.notificationapi"},
 			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
@@ -464,7 +475,6 @@ public final class Property implements IProperty {
 			}
 
 			String[] sysProps = properties.getProperty("SystemProperties", "").split("\n");
-			Settings.systemProperties.clear();
             for (String s : sysProps) {
                 if ((s = s.trim()).isEmpty()) continue;
                 int i = s.indexOf(':');
@@ -1674,7 +1684,6 @@ public final class Property implements IProperty {
 			public void handleEvent (Event event) {
 				TableItem item = (TableItem) event.item;
 				int idx = disableApiTable.indexOf(item);
-				System.out.println(item);
 				if (item.getChecked()) {
 					Settings.protectedPackages.add(APIS_LIST[idx][1]);
 				} else {

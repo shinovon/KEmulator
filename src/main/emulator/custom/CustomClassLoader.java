@@ -17,7 +17,7 @@ public final class CustomClassLoader extends ClassLoader {
 			return loadedClass;
 		}
 		if (!Emulator.jarClasses.contains(s)) {
-			if (checkIsProtected(s)) {
+			if (checkIsProtected(s)) { // TODO проверять источник вызова, начинает сыпаться MemoryView
 				Emulator.getEmulator().getLogStream().println("Protected class: " + s);
 				throw new ClassNotFoundException("Protected class: " + s);
 			}
