@@ -191,7 +191,7 @@ SMS_CONSOLE_BLOCK=Заблокировать полученное
 
 METHOD_FRAME_TITLE=Методы
 
-METHOD_FRAME_RESET_CALLS=Сбросить вызову
+METHOD_FRAME_RESET_CALLS=Сбросить вызовы
 METHOD_FRAME_EXPORT_BYTECODE=Экспорт байткода
 METHOD_FRAME_SAVE_BYTECODE=Сохранить байткод всех методов:
 METHOD_FRAME_SEARCH=Поиск

@@ -44,45 +44,77 @@ public class CustomMethod {
 		boolean b = true;
 		if (Settings.systemProperties != null && Settings.systemProperties.containsKey(prop)) {
 			res = Settings.systemProperties.get(prop);
-		} else if (prop.equalsIgnoreCase("fileconn.dir.private")) {
-			res = "file://root/private_" + Emulator.midletClassName.replace("\\", "_").replace("/", "_").replace(".", "_") + "/";
-		} else if (prop.equalsIgnoreCase("user.name")) {
-			res = "KEmulator";
-		} else if (prop.equalsIgnoreCase("console.encoding")) {
-			res = System.getProperty("file.encoding");
-		} else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
-			res = Settings.networkNotAvailable ? "unavailable" : "available";
-		} else if (prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {
-			res = "50";
-		} else if (prop.startsWith("com.nokia.memoryram")) {
-			b = false;
-			Runtime r = Runtime.getRuntime();
-			if (prop.equals("com.nokia.memoryramfree")) {
-				res = String.valueOf(r.freeMemory() + r.maxMemory() - r.totalMemory());
-			} else if (prop.equals("com.nokia.memoryramtotal")) {
-				res = String.valueOf(r.maxMemory());
+		} else {
+			if (prop.equalsIgnoreCase("fileconn.dir.private")) {
+				res = "file://root/private_" + Emulator.midletClassName.replace("\\", "_").replace("/", "_").replace(".", "_") + "/";
+			} else if (prop.equalsIgnoreCase("user.name")) {
+				res = "KEmulator";
+			} else if (prop.equalsIgnoreCase("console.encoding")) {
+				res = System.getProperty("file.encoding");
+			} else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
+				res = Settings.networkNotAvailable ? "unavailable" : "available";
+			} else if (prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {
+				res = "50";
+			} else if (prop.startsWith("com.nokia.memoryram")) {
+				b = false;
+				Runtime r = Runtime.getRuntime();
+				if (prop.equals("com.nokia.memoryramfree")) {
+					res = String.valueOf(r.freeMemory() + r.maxMemory() - r.totalMemory());
+				} else if (prop.equals("com.nokia.memoryramtotal")) {
+					res = String.valueOf(r.maxMemory());
+				}
+			} else if (prop.equalsIgnoreCase("kemulator.threadtrace")) {
+				b = false;
+				res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
+			} else if (prop.equalsIgnoreCase("com.nokia.mid.imei") ||
+					prop.equalsIgnoreCase("com.nokia.imei") ||
+					prop.equalsIgnoreCase("device.imei") ||
+					prop.equalsIgnoreCase("phone.imei") ||
+					prop.equalsIgnoreCase("com.sonyericsson.imei") ||
+					prop.equalsIgnoreCase("com.samsung.imei") ||
+					prop.equalsIgnoreCase("com.siemens.IMEI")) {
+				res = Permission.askIMEI();
+			} else if (prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
+				res = String.valueOf(Manager.isLibVlcSupported());
+			} else if (prop.equalsIgnoreCase("com.nokia.pointer.number")) {
+				b = false;
+			} else if (prop.equalsIgnoreCase("microedition.locale")) {
+				res = Settings.locale;
+			} else if (prop.equalsIgnoreCase("microedition.encoding")) {
+				res = Settings.fileEncoding;
+			} else if (prop.equalsIgnoreCase("Platform")) {
+				res = "";
 			}
-		} else if (prop.equalsIgnoreCase("kemulator.threadtrace")) {
-			b = false;
-			res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
-		} else if (prop.equalsIgnoreCase("com.nokia.mid.imei") ||
-				prop.equalsIgnoreCase("com.nokia.imei") ||
-				prop.equalsIgnoreCase("device.imei") ||
-				prop.equalsIgnoreCase("phone.imei") ||
-				prop.equalsIgnoreCase("com.sonyericsson.imei") ||
-				prop.equalsIgnoreCase("com.samsung.imei") ||
-				prop.equalsIgnoreCase("com.siemens.IMEI")) {
-			res = Permission.askIMEI();
-		} else if (prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
-			res = String.valueOf(Manager.isLibVlcSupported());
-		} else if (prop.equalsIgnoreCase("com.nokia.pointer.number")) {
-			b = false;
-		} else if (prop.equalsIgnoreCase("microedition.locale")) {
-			res = Settings.locale;
-		} else if (prop.equalsIgnoreCase("microedition.encoding")) {
-			res = Settings.fileEncoding;
-		} else if (prop.equalsIgnoreCase("Platform")) {
-			res = "";
+			// Hide properties of disabled APIs
+			if (prop.startsWith("com.nokia") && Settings.protectedPackages.contains("com.nokia.mid")) {
+				res = null;
+			} else if (prop.startsWith("com.nokia.mid.ui") && Settings.protectedPackages.contains("com.nokia.mid.ui")) {
+				res = null;
+			} else if(prop.startsWith("wireless.messaging") && Settings.protectedPackages.contains("javax.wireless.messaging")) {
+				res = null;
+			} else if(prop.startsWith("microedition.m3g") && Settings.protectedPackages.contains("javax.microedition.m3g")) {
+				res = null;
+			} else if(prop.startsWith("microedition.sensor") && Settings.protectedPackages.contains("javax.microedition.sensor")) {
+				res = null;
+			} else if(prop.startsWith("microedition.amms") && Settings.protectedPackages.contains("javax.microedition.amms")) {
+				res = null;
+			} else if(prop.startsWith("microedition.media") && Settings.protectedPackages.contains("javax.microedition.media")) {
+				res = null;
+			} else if(prop.startsWith("microedition.pim") && Settings.protectedPackages.contains("javax.microedition.pim")) {
+				res = null;
+			} else if(prop.startsWith("bluetooth") && Settings.protectedPackages.contains("javax.microedition.bluetooth")) {
+				res = null;
+			} else if((prop.startsWith("fileconn") || prop.startsWith("microdition.io.file")) && Settings.protectedPackages.contains("javax.microedition.io.file")) {
+				res = null;
+			} else if(prop.startsWith("org.pigler") && Settings.protectedPackages.contains("org.pigler")) {
+				res = null;
+			} else if(prop.startsWith("kemulator.rpc") && Settings.protectedPackages.contains("ru.nnproject.kemulator.rpc")) {
+				res = null;
+			} else if(prop.startsWith("kemulator.notificationapi") && Settings.protectedPackages.contains("ru.nnproject.kemulator.notificationapi")) {
+				res = null;
+			} else if(prop.startsWith("kemulator") && Settings.protectedPackages.contains("kemulator")) {
+				res = null;
+			}
 		}
 		if (b)
 			Emulator.getEmulator().getLogStream().println("System.getProperty#" + prop + "=" + res);

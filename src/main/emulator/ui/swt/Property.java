@@ -26,12 +26,14 @@ import javax.microedition.rms.RecordStore;
 
 public final class Property implements IProperty {
 
-	public static final String[][] APIS_LIST = { // TODO
+	// список выключаемых апи
+	public static final String[][] APIS_LIST = {
 			// стандартные
 			{"FileConnection (JSR 75)", "javax.microedition.io.file"},
 			{"PIM (JSR 75) (Stub)", "javax.microedition.pim"},
 			{"Bluetooth (JSR 82) (Stub)", "javax.bluetooth"},
 			{"Messaging (JSR 120)", "javax.wireless.messaging"},
+			{"Media (JSR 135)", "javax.microedition.media"},
 			{"Crypto (JSR 177 SATSA)", "javax.crypto"}, // встроено в jre
 			{"Location (JSR 179)", "javax.microedition.location"},
 			{"M3G (JSR 184)", "javax.microedition.m3g"},
@@ -43,8 +45,8 @@ public final class Property implements IProperty {
 
 			// вендоры
 			{"Nokia", "com.nokia.mid"},
-			{"Siemens", "com.siemens"},
 			{"Samsung", "com.samsung"},
+			{"Siemens", "com.siemens"},
 			{"Sprint", "com.sprintpcs"},
 			{"Motorola", "com.motorola"},
 			{"Vodafone", "com.vodafone"},
