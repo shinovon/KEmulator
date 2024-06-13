@@ -110,8 +110,8 @@ public final class Settings {
 	public static boolean bypassVserv = true;
 	public static boolean enableMediaDump;
 
-	public static Set<String> protectedPackages = new HashSet<String>();
-	public static Map<String, String> systemProperties = new HashMap<>();
+	public static final Set<String> protectedPackages = new HashSet<String>();
+	public static final Map<String, String> systemProperties = new HashMap<>();
 
 	public static boolean enableSecurity = true;
 }

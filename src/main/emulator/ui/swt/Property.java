@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.*;
 
 import javax.microedition.rms.RecordStore;
 
-public final class Property implements IProperty {
+public final class Property implements IProperty, SelectionListener {
 
 	// список выключаемых апи
 	public static final String[][] API_LIST = {
@@ -79,15 +79,15 @@ public final class Property implements IProperty {
 	};
 
 	public static final String[][] PERMISSIONS = {
-			{"Send SMS", "messageconnection.send", "allowed"},
-			{"Receive SMS", "messageconnection.receive", "allowed"},
-			{"File System Access", "connector.open.file", "allowed"},
-			{"HTTP Connection", "connector.open.http", "allowed"},
-			{"Socket Connection", "connector.open.socket", "allowed"},
-			{"Socket Server", "connector.open.serversocket", "allowed"},
-			{"Camera", "media.camera", "ask_always_until_no"},
-			{"Location", "location", "allowed"},
-			{"Open browser", "platformrequest", "ask_always_until_no"},
+			{"Send SMS", "messageconnection.send"},
+			{"Receive SMS", "messageconnection.receive"},
+			{"File System Access", "connector.open.file"},
+			{"HTTP Connection", "connector.open.http"},
+			{"Socket Connection", "connector.open.socket"},
+			{"Socket Server", "connector.open.serversocket"},
+			{"Camera", "media.camera"},
+			{"Location", "location"},
+			{"Open browser", "platformrequest"},
 	};
 
 	public static final String[][] PERMISSIONS_VALUES = {
@@ -490,6 +490,9 @@ public final class Property implements IProperty {
 			for (Object k : properties.keySet()) {
 				if (((String) k).startsWith("ControllerMap.")) {
 					Settings.controllerBinds.put(((String) k).substring("ControllerMap.".length()), properties.getProperty((String) k));
+					// permissions
+				} else if (((String) k).startsWith("Security.")) {
+					Permission.permissions.put(((String) k).substring("Security.".length()), Permission.fromString(properties.getProperty((String) k)));
 				}
 			}
 
@@ -617,6 +620,9 @@ public final class Property implements IProperty {
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
+
+			// security
+			Settings.enableSecurity = Boolean.parseBoolean(properties.getProperty("SecurityEnabled", "true"));
 
 			fileInputStream.close();
 		} catch (Exception ex) {
@@ -830,6 +836,12 @@ public final class Property implements IProperty {
 
 			// jvm
 			properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
+
+			// security
+			properties.setProperty("SecurityEnabled", String.valueOf(Settings.enableSecurity));
+			for (String k: Permission.permissions.keySet()) {
+				properties.setProperty("Security." + k, Permission.getPermissionLevelString(k));
+			}
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
@@ -1193,12 +1205,12 @@ public final class Property implements IProperty {
 		final CTabItem mascotTab;
 		(mascotTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_MASCOT", "MascotCapsule"));
 		mascotTab.setControl(this.mascotComp);
-		final CTabItem propsTab;
-		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
-		propsTab.setControl(this.propsComp);
 		final CTabItem securityTab;
 		(securityTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SECURITY", "Security"));
 		securityTab.setControl(this.securityComp);
+		final CTabItem propsTab;
+		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
+		propsTab.setControl(this.propsComp);
 	}
 
 	private void setupCustomComp() {
@@ -2032,11 +2044,13 @@ public final class Property implements IProperty {
 			label.setText(s[0]);
 			label.setLayoutData(data);
 
-			// TODO
 			Combo combo = new Combo(permGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+			combo.addSelectionListener(this);
+			combo.setData(s[1]);
 			combo.setItems(PERMISSIONS_VALUES[0]);
+			String p = Permission.getPermissionLevelString(s[1]);
 			for (int i = 0; i < PERMISSIONS_VALUES[1].length; i++) {
-				if (PERMISSIONS_VALUES[1][i].equals(s[2])) {
+				if (PERMISSIONS_VALUES[1][i].equals(p)) {
 					combo.setText(PERMISSIONS_VALUES[0][i]);
 					break;
 				}
@@ -2697,6 +2711,17 @@ public final class Property implements IProperty {
 
 	static {
 		Property.aStringArray661 = new String[19];
+	}
+
+	public void widgetSelected(SelectionEvent e) {
+		if (e.widget instanceof Combo) {
+			// permission combo
+			Permission.permissions.put((String) e.widget.getData(), Permission.fromString(PERMISSIONS_VALUES[1][((Combo) e.widget).getSelectionIndex()]));
+		}
+	}
+
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);
 	}
 
 	private final class MyAuthenticator extends Authenticator {

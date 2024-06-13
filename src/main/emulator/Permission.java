@@ -4,6 +4,8 @@ import emulator.ui.swt.InputDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 public class Permission {
@@ -17,32 +19,69 @@ public class Permission {
 
 	static InputDialog imeiDialog;
 	private static int dialogResult;
-	private static Vector allowPerms = new Vector();
-	private static Vector notAllowPerms = new Vector();
+	private static final Vector<String> allowPerms = new Vector();
+	private static final Vector<String> notAllowPerms = new Vector();
+	public static final Map<String, Integer> permissions = new HashMap<>();
 	private static String imei;
 	public static boolean askPermissions = true;
 	public static boolean askImei = true;
 
-	private static int getAppPermissionLevel(String x) {
+	public static int getPermissionLevel(String s) {
 		if (!Settings.enableSecurity) return 2;
-		x = x.toLowerCase();
-		// TODO
-
+		s = s.toLowerCase();
+		if (permissions.containsKey(s))
+			return permissions.get(s);
 		// default
-		if (x.equals("messageconnection.send") ||
-				x.equals("messageconnection.receive") ||
-				x.equals("connector.open.http") ||
-				x.equals("connector.open.file") ||
-				x.equals("connector.open.socket") ||
-				x.equals("connector.open.serversocket") ||
-				x.equals("connector.open.sms") ||
-				x.equals("location")) {
-			return allowed; // return 5;
-		} else if (x.equals("media.camera") ||
-				x.equals("platformrequest")) {
+		if (s.equals("messageconnection.send") ||
+				s.equals("messageconnection.receive") ||
+				s.equals("connector.open.http") ||
+				s.equals("connector.open.file") ||
+				s.equals("connector.open.socket") ||
+				s.equals("connector.open.serversocket") ||
+				s.equals("connector.open.sms") ||
+				s.equals("location")) {
+			return allowed;
+		} else if (s.equals("media.camera") ||
+				s.equals("platformrequest")) {
 			return ask_always_until_no;
 		}
 		return ask_always_until_yes;
+	}
+
+	public static String getPermissionLevelString(String s) {
+		switch (getPermissionLevel(s)) {
+			case ask_always:
+				return "ask_always";
+			case ask_always_until_yes:
+				return "ask_always_until_yes";
+			case allowed:
+				return "allowed";
+			case never:
+				return "never";
+			case ask_always_until_no:
+				return "ask_always_until_no";
+			case ask_once:
+				return "ask_once";
+			default:
+				return "unknown";
+		}
+	}
+
+	public static int fromString(String s) {
+		if ("ask_always".equals(s)) {
+			return ask_always;
+		} else if ("ask_always_until_yes".equals(s)) {
+			return ask_always_until_yes;
+		} else if ("allowed".equals(s)) {
+			return allowed;
+		} else if ("never".equals(s)) {
+			return never;
+		} else if ("ask_always_until_no".equals(s)) {
+			return ask_always_until_no;
+		} else if ("ask_once".equals(s)) {
+			return ask_once;
+		}
+		return ask_always_until_no;
 	}
 
 	public synchronized static String askIMEI() {
@@ -87,7 +126,7 @@ public class Permission {
 		//3: never
 		//4: always ask until no is pressed
 		//5: ask once
-		switch (getAppPermissionLevel(x)) {
+		switch (getPermissionLevel(x)) {
 			case ask_always:
 				if (!showConfirmDialog(localizePerm(x), null))
 					throw new SecurityException(x);
@@ -143,7 +182,7 @@ public class Permission {
 	}
 
 	public static boolean requestURLAccess(final String url) {
-		switch (getAppPermissionLevel("platformrequest")) {
+		switch (getPermissionLevel("platformrequest")) {
 			case never:
 				return false;
 			case allowed:
