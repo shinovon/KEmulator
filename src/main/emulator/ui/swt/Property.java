@@ -24,7 +24,87 @@ import org.eclipse.swt.widgets.*;
 
 import javax.microedition.rms.RecordStore;
 
-public final class Property implements IProperty {
+public final class Property implements IProperty, SelectionListener {
+
+	// список выключаемых апи
+	public static final String[][] API_LIST = {
+			// стандартные
+			{"FileConnection (JSR 75)", "javax.microedition.io.file"},
+			{"PIM (JSR 75) (Stub)", "javax.microedition.pim"},
+			{"Bluetooth (JSR 82) (Stub)", "javax.bluetooth"},
+			{"Messaging (JSR 120)", "javax.wireless.messaging"},
+			{"Media (JSR 135)", "javax.microedition.media"},
+			{"Crypto (JSR 177 SATSA)", "javax.crypto"}, // встроено в jre
+			{"Location (JSR 179)", "javax.microedition.location"},
+			{"M3G (JSR 184)", "javax.microedition.m3g"},
+			{"ContentHandler (JSR 211) (Stub)", "javax.microedition.content"},
+			{"Advanced Media (JSR 234)", "javax.microedition.amms"},
+			{"OpenGL ES (JSR 239)", "javax.microedition.khronos"},
+			{"Sensor (JSR 256)", "javax.microedition.sensor"},
+			{"GameCanvas (MIDP 2.0)", "javax.microedition.lcdui.game"},
+
+			// вендоры
+			{"Nokia", "com.nokia.mid"},
+			{"Samsung", "com.samsung"},
+			{"Siemens", "com.siemens"},
+			{"Sprint", "com.sprintpcs"},
+			{"Motorola", "com.motorola"},
+			{"Vodafone", "com.vodafone"},
+			{"LG", "mmpp"},
+
+			// nokia по отдельности
+			{"Nokia UI", "com.nokia.mid.ui"},
+			{"Nokia Sound", "com.nokia.mid.sound"},
+			{"Nokia M3D(O)", "com.nokia.mid.m3d"},
+			{"Nokia Location", "com.nokia.mid.location"},
+			{"Nokia InApp", "com.nokia.mid.payment"},
+
+			{"MascotCapsule", "com.mascotcapsule"},
+
+			// японские
+			{"MEXA OpenGL", "com.mexa"},
+			{"com.j_phone", "com.j_phone"},
+			{"com.jblend", "com.jblend"},
+
+			// экзотические
+			{"Immersion VibeTonz", "com.immersion"},
+			{"PantechAudio", "com.pantech"},
+			{"RIM", "net.rim"},
+
+			// nnapi
+			{"Pigler Notifications", "org.pigler"},
+			{"KEmulator Notifications (Deprecated)", "ru.nnproject.kemulator.notificationapi"},
+			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
+			{"KEmulator", "kemulator"}, // проприетарные пропы по типу kemulator.version
+	};
+
+	public static final String[][] PERMISSIONS = {
+			{"Send SMS", "messageconnection.send"},
+			{"Receive SMS", "messageconnection.receive"},
+			{"File System Access", "connector.open.file"},
+			{"HTTP Connection", "connector.open.http"},
+			{"Socket Connection", "connector.open.socket"},
+			{"Socket Server", "connector.open.serversocket"},
+			{"Camera", "media.camera"},
+			{"Location", "location"},
+			{"Open browser", "platformrequest"},
+	};
+
+	public static final String[][] PERMISSIONS_VALUES = {
+			{
+				"Allowed",
+				"Ask once",
+				"Ask every time",
+				"Never",
+			},
+			{
+				"allowed",
+				"ask_once",
+				"ask_always_until_no",
+				"never"
+			}
+	};
+
 	private static Display aDisplay656;
 	private Shell setsShell;
 	private Combo aCombo657;
@@ -111,7 +191,7 @@ public final class Property implements IProperty {
 	private Button aButton724;
 	private Button aButton728;
 	private Button aButton732;
-	private Button aButton736;
+	private Button noNetworkBtn;
 	private Button aButton746;
 	private Button aButton749;
 	private Button aButton752;
@@ -154,10 +234,10 @@ public final class Property implements IProperty {
 	private Composite recordsComp;
 	private Table aTable665;
 	private CLabel aCLabel647;
-	private Button aButton758;
+	private Button clearRecordsBtn;
 	private Button aButton761;
 	private Composite networkComp;
-	private Group aGroup700;
+	private Group networkProxyGroup;
 	private CLabel aCLabel648;
 	private Combo proxyTypeCombo;
 	private CLabel aCLabel649;
@@ -201,6 +281,22 @@ public final class Property implements IProperty {
 	private Button fpsCounterCheck;
 	private Button serialCallsCheck;
 	private Button keyPressOnRepeatCheck;
+	private Button antiAliasTextBtn;
+	private Composite disableApiComp;
+	private Table disableApiTable;
+	private Composite propsComp;
+	private Text propsText;
+	private Button mediaDumpCheck;
+	private Button ottCheck;
+	private ScrolledComposite securityComp;
+	private Button mascotNo2DMixingCheck;
+	private Composite mascotComp;
+	private Button mascotIgnoreBgCheck;
+	private Button mascotTextureFilterCheck;
+	private Button mascotBackgroundFilterCheck;
+	private Button securityCheck;
+	private Composite securityContent;
+	private Tree rmsTree;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -215,6 +311,8 @@ public final class Property implements IProperty {
 		this.method372(shell);
 		this.setsShell.pack();
 		this.setsShell.setSize(480, this.setsShell.getSize().y);
+		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
+		securityComp.setExpandVertical(true);
 		this.setsShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.setsShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.setsShell.getSize().y >> 1));
 		this.setsShell.open();
 		while (!this.setsShell.isDisposed()) {
@@ -393,6 +491,9 @@ public final class Property implements IProperty {
 			for (Object k : properties.keySet()) {
 				if (((String) k).startsWith("ControllerMap.")) {
 					Settings.controllerBinds.put(((String) k).substring("ControllerMap.".length()), properties.getProperty((String) k));
+					// permissions
+				} else if (((String) k).startsWith("Security.")) {
+					Permission.permissions.put(((String) k).substring("Security.".length()), Permission.fromString(properties.getProperty((String) k)));
 				}
 			}
 
@@ -413,7 +514,22 @@ public final class Property implements IProperty {
 			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
 			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaint", "true"));
 
-			Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
+			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
+			if (protectedPackages.length > 0) {
+				Settings.protectedPackages.addAll(Arrays.asList(protectedPackages));
+			}
+
+			String[] sysProps = properties.getProperty("SystemProperties", "").split("\n");
+            for (String s : sysProps) {
+                if ((s = s.trim()).isEmpty()) continue;
+                int i = s.indexOf(':');
+                if (i == -1) continue;
+                String k = s.substring(0, i).trim();
+                String v = s.substring(i + 1).trim();
+                Settings.systemProperties.put(k, v);
+            }
+
+            Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
 			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
 
 			// emulator
@@ -426,6 +542,8 @@ public final class Property implements IProperty {
 			Settings.enableNewTrack = Boolean.parseBoolean(properties.getProperty("EnableNewTrack", "false"));
 			Settings.enableMethodTrack = Boolean.parseBoolean(properties.getProperty("EnableMethodTrack", "false"));
 			Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
+
+			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 
 			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "true"));
 			Settings.uiLanguage = properties.getProperty("UILanguage", "en");
@@ -487,14 +605,25 @@ public final class Property implements IProperty {
 			Settings.m3gTexFilter = Integer.parseInt(properties.getProperty("M3GTexFilter", "0"));
 			Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 
+			// mascot`
+			Settings.mascotNo2DMixing = Boolean.parseBoolean(properties.getProperty("MascotNo2DMixing", "false"));
+			Settings.mascotIgnoreBackground = Boolean.parseBoolean(properties.getProperty("MascotIgnoreBackground", "false"));
+			Settings.mascotTextureFilter = Boolean.parseBoolean(properties.getProperty("MascotTextureFilter", "false"));
+			Settings.mascotBackgroundFilter = Boolean.parseBoolean(properties.getProperty("MascotBackgroundFilter", "false"));
+
 			// media
 			Settings.vlcDir = properties.getProperty("VlcDir", "");
 			Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
 			Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "false"));
 			Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
+			Settings.enableMediaDump = Boolean.parseBoolean(properties.getProperty("EnableMediaDump", "false"));
+			Settings.enableOTT = Boolean.parseBoolean(properties.getProperty("EnableOTT", "false"));
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
+
+			// security
+			Settings.enableSecurity = Boolean.parseBoolean(properties.getProperty("SecurityEnabled", "true"));
 
 			fileInputStream.close();
 		} catch (Exception ex) {
@@ -609,6 +738,24 @@ public final class Property implements IProperty {
 			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
 			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
 
+			StringBuilder builder = new StringBuilder();
+			if (!Settings.protectedPackages.isEmpty()) {
+				for (String s: Settings.protectedPackages) {
+					builder.append(s).append(';');
+				}
+				builder.setLength(builder.length() - 1);
+			}
+			properties.setProperty("ProtectedPackages", builder.toString());
+
+			builder.setLength(0);
+			if (!Settings.systemProperties.isEmpty()) {
+				for (String k : Settings.systemProperties.keySet()) {
+					builder.append(k).append(':').append(Settings.systemProperties.get(k)).append('\n');
+				}
+				builder.setLength(builder.length() - 1);
+			}
+			properties.setProperty("SystemProperties", builder.toString());
+
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
 
@@ -622,6 +769,8 @@ public final class Property implements IProperty {
 			properties.setProperty("EnableNewTrack", String.valueOf(Settings.enableNewTrack));
 			properties.setProperty("EnableMethodTrack", String.valueOf(Settings.enableMethodTrack));
 			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
+
+			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 
 			properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
 			properties.setProperty("UILanguage", Settings.uiLanguage);
@@ -672,22 +821,37 @@ public final class Property implements IProperty {
 			properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
 			properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
 
+			// mascot
+			properties.setProperty("MascotNo2DMixing", String.valueOf(Settings.mascotNo2DMixing));
+			properties.setProperty("MascotIgnoreBackground", String.valueOf(Settings.mascotIgnoreBackground));
+			properties.setProperty("MascotTextureFilter", String.valueOf(Settings.mascotTextureFilter));
+			properties.setProperty("MascotBackgroundFilter", String.valueOf(Settings.mascotBackgroundFilter));
+
 			// media
 			properties.setProperty("VlcDir", Settings.vlcDir);
 			properties.setProperty("MIDISearchVMS", String.valueOf(Settings.searchVms));
 			properties.setProperty("MIDIReopenDevice", String.valueOf(Settings.reopenMidiDevice));
 			properties.setProperty("MIDIGlobalSequencer", String.valueOf(Settings.oneMidiAtTime));
+			properties.setProperty("EnableMediaDump", String.valueOf(Settings.enableMediaDump));
+			properties.setProperty("EnableOTT", String.valueOf(Settings.enableOTT));
 
 			// jvm
 			properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
 
+			// security
+			properties.setProperty("SecurityEnabled", String.valueOf(Settings.enableSecurity));
+			for (String k: Permission.permissions.keySet()) {
+				properties.setProperty("Security." + k, Permission.getPermissionLevelString(k));
+			}
+
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	private void method358() {
+	private void apply() {
 		final String trim = this.aCombo657.getText().trim();
 		this.device = trim;
 		Emulator.deviceName = trim;
@@ -744,7 +908,7 @@ public final class Property implements IProperty {
 		}
 		Settings.enableKeyRepeat = this.aButton728.getSelection();
 		Settings.ignoreFullScreen = this.aButton732.getSelection();
-		Settings.networkNotAvailable = this.aButton736.getSelection();
+		Settings.networkNotAvailable = this.noNetworkBtn.getSelection();
 		Settings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
 		Settings.motorolaSoftKeyFix = softkeyMotFixCheck.getSelection();
 		Settings.xrayOverlapScreen = this.aButton746.getSelection();
@@ -762,7 +926,8 @@ public final class Property implements IProperty {
 		Settings.proxyDomain = this.aText643.getText().trim();
 		//Emulator.inactivityTimer = this.inactiveTimerSpinner.getSelection();
 		Settings.rpc = this.rpcBtn.getSelection();
-		Settings.awtAntiAliasing = this.antiAliasBtn.getSelection();
+		Settings.awtAntiAliasing = antiAliasBtn.getSelection();
+		Settings.textAntiAliasing = antiAliasTextBtn.getSelection();
 //        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
 		Settings.locale = localeText.getText().trim();
@@ -783,6 +948,24 @@ public final class Property implements IProperty {
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
+
+		String sysProps = propsText.getText();
+		Settings.systemProperties.clear();
+		if (!sysProps.isEmpty()) {
+			String[] a = sysProps.split("\n");
+			for (String s: a) {
+				if ((s = s.trim()).isEmpty()) continue;
+				int i = s.indexOf(':');
+				if (i == -1) continue;
+				String k = s.substring(0, i).trim();
+				String v = s.substring(i + 1).trim();
+				Settings.systemProperties.put(k, v);
+			}
+		}
+
+		Settings.enableMediaDump = mediaDumpCheck.getSelection();
+		Settings.enableOTT = ottCheck.getSelection();
+		Settings.enableSecurity = securityCheck.getSelection();
 
 		this.updateProxy();
 	}
@@ -981,11 +1164,15 @@ public final class Property implements IProperty {
 		this.setupKeyMapComp();
 		this.setupSystemComp();
 		this.setupCoreApiComp();
+		setupDisableApiComp();
+		setupPropsComp();
 		this.setupSysFontComp();
 		this.setupRecordsComp();
 		this.setupNetworkComp();
 		this.setupMediaComp();
 		this.setupM3GComp();
+		setupMascotComp();
+		setupSecurityComp();
 		final CTabItem deviceTab;
 		(deviceTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_CUSTOM", "General"));
 		deviceTab.setControl(this.customComp);
@@ -993,7 +1180,7 @@ public final class Property implements IProperty {
 		(keymapTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
 		keymapTab.setControl(this.keyMapTabComp);
 		final CTabItem sysFontTab;
-		(sysFontTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSFONT", "SysFont"));
+		(sysFontTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_FONT", "Font"));
 		sysFontTab.setControl(this.sysFontComp);
 		final CTabItem systemTab;
 		(systemTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM", "System"));
@@ -1001,6 +1188,9 @@ public final class Property implements IProperty {
 		final CTabItem coreApiTab;
 		(coreApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_COREAPI", "CoreAPI"));
 		coreApiTab.setControl(this.coreApiComp);
+		final CTabItem disableApiTab;
+		(disableApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_DISABLE_API", "Disable APIs"));
+		disableApiTab.setControl(this.disableApiComp);
 		final CTabItem rmsTab;
 		(rmsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_RECORDS", "Records"));
 		rmsTab.setControl(this.recordsComp);
@@ -1013,6 +1203,15 @@ public final class Property implements IProperty {
 		final CTabItem m3gTab;
 		(m3gTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_M3G", "M3G"));
 		m3gTab.setControl(this.m3gComp);
+		final CTabItem mascotTab;
+		(mascotTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_MASCOT", "MascotCapsule"));
+		mascotTab.setControl(this.mascotComp);
+		final CTabItem securityTab;
+		(securityTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SECURITY", "Security"));
+		securityTab.setControl(this.securityComp);
+		final CTabItem propsTab;
+		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
+		propsTab.setControl(this.propsComp);
 	}
 
 	private void setupCustomComp() {
@@ -1530,9 +1729,6 @@ public final class Property implements IProperty {
 		(this.aButton732 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
 		this.aButton732.setLayoutData(gridData);
 		this.aButton732.setSelection(Settings.ignoreFullScreen);
-		(this.aButton736 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Network not available."));
-		this.aButton736.setLayoutData(gridData);
-		this.aButton736.setSelection(Settings.networkNotAvailable);
 
 		(this.synchronizeKeyEventsCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
 		this.synchronizeKeyEventsCheck.setLayoutData(gridData);
@@ -1556,6 +1752,56 @@ public final class Property implements IProperty {
 		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
 		keyPressOnRepeatCheck.setLayoutData(gridData);
 		keyPressOnRepeatCheck.setSelection(Settings.processSerialCallsOutOfQueue);
+	}
+
+	private void setupDisableApiComp() {
+		(disableApiComp = new Composite(tabFolder, 0)).setLayout(new GridLayout());
+
+		GridData d = new GridData();
+		d.horizontalAlignment = 4;
+		d.grabExcessHorizontalSpace = true;
+		d.grabExcessVerticalSpace = true;
+		d.verticalAlignment = 4;
+		d.heightHint = 240;
+
+		disableApiTable = new Table(disableApiComp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
+		disableApiTable.setLayoutData(d);
+		for (String[] a: API_LIST) {
+			TableItem i = new TableItem(disableApiTable, SWT.NONE);
+			i.setText(0, a[0]);
+			i.setChecked(Settings.protectedPackages.contains(a[1]));
+		}
+		disableApiTable.addListener (SWT.Selection, new Listener () {
+			public void handleEvent (Event event) {
+				TableItem item = (TableItem) event.item;
+				int idx = disableApiTable.indexOf(item);
+				if (item.getChecked()) {
+					Settings.protectedPackages.add(API_LIST[idx][1]);
+				} else {
+					Settings.protectedPackages.remove(API_LIST[idx][1]);
+				}
+			}
+		});
+	}
+
+	private void setupPropsComp() {
+		(propsComp = new Composite(tabFolder, 0)).setLayout(new GridLayout());
+
+		GridData d = new GridData();
+		d.horizontalAlignment = 4;
+		d.grabExcessHorizontalSpace = true;
+		d.grabExcessVerticalSpace = true;
+		d.verticalAlignment = 4;
+
+		propsText = new Text(propsComp, SWT.MULTI | SWT.BORDER);
+		propsText.setLayoutData(d);
+		propsText.setToolTipText("foo.bar: Example");
+
+		StringBuilder s = new StringBuilder();
+		for (String k: Settings.systemProperties.keySet()) {
+			s.append(k).append(": ").append(Settings.systemProperties.get(k)).append('\n');
+		}
+		propsText.setText(s.toString());
 	}
 
 	private void setupMediaComp() {
@@ -1597,6 +1843,16 @@ public final class Property implements IProperty {
 		globalMidiCheck.setText(UILocale.get("OPTION_MEDIA_GLOBAL_MIDI", "Allow only one MIDI playback at time (reduces lag)"));
 		globalMidiCheck.setLayoutData(fillHor);
 		globalMidiCheck.setSelection(Settings.oneMidiAtTime);
+
+		mediaDumpCheck = new Button(mediaGroup, SWT.CHECK);
+		mediaDumpCheck.setText(UILocale.get("OPTION_MEDIA_DUMP", "Enable media exporting (higher memory usage)"));
+		mediaDumpCheck.setLayoutData(fillHor);
+		mediaDumpCheck.setSelection(Settings.enableMediaDump);
+
+		ottCheck = new Button(mediaGroup, SWT.CHECK);
+		ottCheck.setText(UILocale.get("OPTION_MEDIA_OTT", "OTT playback (unstable)"));
+		ottCheck.setLayoutData(fillHor);
+		ottCheck.setSelection(Settings.enableOTT);
 
 //        reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
 //        reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));
@@ -1699,6 +1955,114 @@ public final class Property implements IProperty {
 		m3gMipmapCombo.setText(m3gMipmapCombo.getItem(Settings.m3gMipmapping));
 	}
 
+	private void setupMascotComp() {
+		mascotComp = new Composite(this.tabFolder, 0);
+		mascotComp.setLayout(new GridLayout());
+
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.marginWidth = 5;
+
+		final GridData groupData = new GridData();
+		groupData.horizontalAlignment = 4;
+		groupData.grabExcessHorizontalSpace = true;
+		groupData.grabExcessVerticalSpace = true;
+		groupData.verticalAlignment = 1;
+
+		Group lwjglGroup = new Group(mascotComp, 0);
+		lwjglGroup.setText(UILocale.get("OPTION_M3G_LWJGL_SETTINGS", "LWJGL Settings"));
+		lwjglGroup.setLayout(layout);
+		lwjglGroup.setLayoutData(groupData);
+
+		final GridData labelGridData = new GridData();
+		labelGridData.horizontalAlignment = SWT.FILL;
+		labelGridData.grabExcessHorizontalSpace = true;
+		labelGridData.horizontalSpan = 2;
+
+		mascotNo2DMixingCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotNo2DMixingCheck.setText(UILocale.get("OPTION_MASCOT_NO_2D_MIXING", "No 2D mixing"));
+		mascotNo2DMixingCheck.setLayoutData(labelGridData);
+		mascotNo2DMixingCheck.setSelection(Settings.mascotNo2DMixing);
+		
+		mascotIgnoreBgCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotIgnoreBgCheck.setText(UILocale.get("OPTION_MASCOT_IGNORE_BACKGROUND", "Ignore background"));
+		mascotIgnoreBgCheck.setLayoutData(labelGridData);
+		mascotIgnoreBgCheck.setSelection(Settings.mascotIgnoreBackground);
+
+		mascotTextureFilterCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotTextureFilterCheck.setText(UILocale.get("OPTION_MASCOT_TEXTURE_FILTER", "Texture filter"));
+		mascotTextureFilterCheck.setLayoutData(labelGridData);
+		mascotTextureFilterCheck.setSelection(Settings.mascotTextureFilter);
+
+		mascotBackgroundFilterCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotBackgroundFilterCheck.setText(UILocale.get("OPTION_MASCOT_BACKGROUND_FILTER", "Background filter"));
+		mascotBackgroundFilterCheck.setLayoutData(labelGridData);
+		mascotBackgroundFilterCheck.setSelection(Settings.mascotBackgroundFilter);
+	}
+	
+	private void setupSecurityComp() {
+		securityComp = new ScrolledComposite(tabFolder, SWT.V_SCROLL);
+
+		securityContent = new Composite(securityComp, SWT.NONE);
+
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.marginWidth = 5;
+
+		securityContent.setLayout(new GridLayout());
+
+		final GridData labelGridData = new GridData();
+		labelGridData.horizontalAlignment = SWT.FILL;
+		labelGridData.grabExcessHorizontalSpace = true;
+		labelGridData.horizontalSpan = 2;
+
+		final GridData comboData = new GridData();
+		comboData.horizontalAlignment = SWT.FILL;
+		comboData.grabExcessHorizontalSpace = true;
+
+		final GridData groupData = new GridData();
+		groupData.horizontalAlignment = 4;
+		groupData.grabExcessHorizontalSpace = true;
+		groupData.grabExcessVerticalSpace = true;
+		groupData.verticalAlignment = 1;
+
+		securityCheck = new Button(securityContent, SWT.CHECK);
+		securityCheck.setText(UILocale.get("OPTION_SECURITY_ENABLE", "Enable security"));
+		securityCheck.setLayoutData(labelGridData);
+		securityCheck.setSelection(Settings.enableSecurity);
+
+		Group permGroup = new Group(securityContent, SWT.NONE);
+		permGroup.setText(UILocale.get("OPTION_SECURITY_PERMISSIONS", "Permissions"));
+		permGroup.setLayout(layout);
+		permGroup.setLayoutData(groupData);
+
+
+		for (String[] s: PERMISSIONS) {
+			final GridData data = new GridData();
+			data.horizontalAlignment = SWT.FILL;
+
+			CLabel label = new CLabel(permGroup, 0);
+			label.setText(s[0]);
+			label.setLayoutData(data);
+
+			Combo combo = new Combo(permGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+			combo.addSelectionListener(this);
+			combo.setData(s[1]);
+			combo.setItems(PERMISSIONS_VALUES[0]);
+			String p = Permission.getPermissionLevelString(s[1]);
+			for (int i = 0; i < PERMISSIONS_VALUES[1].length; i++) {
+				if (PERMISSIONS_VALUES[1][i].equals(p)) {
+					combo.setText(PERMISSIONS_VALUES[0][i]);
+					break;
+				}
+			}
+			combo.setLayoutData(comboData);
+		}
+
+		securityComp.setContent(securityContent);
+		securityComp.setExpandHorizontal(true);
+	}
+
 	private void initSystemComp() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
@@ -1729,6 +2093,9 @@ public final class Property implements IProperty {
 		this.rpcBtn.setSelection(Settings.rpc);
 		(this.antiAliasBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
+
+		(antiAliasTextBtn = new Button(sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_TEXT_ANTIALIASING", "Text Antialiasing"));
+		antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
 //        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
 //        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
 		fpsCounterCheck = new Button(sysChecksGroup, SWT.CHECK);
@@ -1946,19 +2313,127 @@ public final class Property implements IProperty {
 		this.aText662.setLayoutData(layoutData4);
 		this.aText662.setText(this.rmsFolder);
 		(this.aButton666 = new Button(this.recordsComp, 8388616)).setText("...");
-		(this.aCLabel647 = new CLabel(this.recordsComp, 0)).setText(UILocale.get("OPTION_RECORDS_RMS_TEXT", "All Records in current midlet:"));
-		this.aCLabel647.setLayoutData(layoutData2);
-		(this.aTable665 = new Table(this.recordsComp, 2080)).setHeaderVisible(false);
-		this.aTable665.setLayoutData(layoutData3);
-		this.aTable665.setLinesVisible(true);
-		(this.aButton761 = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_SELECT_ALL", "Select All"));
-		this.aButton761.addSelectionListener(new Class194(this));
-		(this.aButton758 = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
-		this.aButton758.setLayoutData(layoutData);
-		this.aButton758.addSelectionListener(new Class103(this));
-		new TableColumn(this.aTable665, 0).setWidth(200);
-		this.method428();
 		this.aButton666.addSelectionListener(new Class101(this));
+
+		if (Emulator.midletClassName != null) {
+			(this.aCLabel647 = new CLabel(this.recordsComp, 0)).setText(UILocale.get("OPTION_RECORDS_RMS_TEXT", "All Records in current midlet:"));
+			this.aCLabel647.setLayoutData(layoutData2);
+			(this.aTable665 = new Table(this.recordsComp, 2080)).setHeaderVisible(false);
+			this.aTable665.setLayoutData(layoutData3);
+			this.aTable665.setLinesVisible(true);
+			(this.aButton761 = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_SELECT_ALL", "Select All"));
+			this.aButton761.addSelectionListener(new Class194(this));
+			(this.clearRecordsBtn = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
+			this.clearRecordsBtn.setLayoutData(layoutData);
+			this.clearRecordsBtn.addSelectionListener(new Class103(this));
+			new TableColumn(this.aTable665, 0).setWidth(200);
+			this.method428();
+		} else {
+			rmsTree = new Tree(recordsComp, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+			rmsTree.setLayoutData(layoutData3);
+			String rootPath = getRmsFolderPath();
+			File rootDir = new File(rootPath);
+			rmsTree.addTreeListener(new TreeListener() {
+				public void treeCollapsed(TreeEvent treeEvent) {
+				}
+
+				public void treeExpanded(TreeEvent e) {
+					try {
+						TreeItem root = (TreeItem) e.item;
+						TreeItem[] items = root.getItems();
+						for (TreeItem item: items) {
+							if (item.getData() != null) return;
+							item.dispose();
+						}
+						String d = (String) root.getData();
+						if (d.startsWith("r")) {
+							return;
+						}
+						d = d.substring(1);
+						String[] list = new File(rootPath + d).list();
+						if (list != null) {
+							for (String s : list) {
+								String l = decodeBase64(s);
+								if (l == null) continue;
+								TreeItem t = new TreeItem(root, SWT.NONE);
+								t.setData("r" + d + "/" + s);
+								t.setChecked(root.getChecked());
+								t.setText(l);
+							}
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			});
+
+//			rmsTree.addSelectionListener(new SelectionListener() {
+//				public void widgetSelected(SelectionEvent e) {
+//					String s;
+//					if (e.item == null || (s = (String) e.item.getData()) == null || s.startsWith("r"))
+//						return;
+//					TreeItem[] items = ((TreeItem) e.item).getItems();
+//					if (items == null)
+//						return;
+//					for (TreeItem item: items) {
+//						item.setChecked(((TreeItem) e.item).getChecked());
+//					}
+//				}
+//
+//				public void widgetDefaultSelected(SelectionEvent selectionEvent) {
+//				}
+//			});
+
+			String[] list = rootDir.list();
+			if (list != null) {
+				for (String s : list) {
+					String l = decodeBase64(s);
+					if (l == null) continue;
+					TreeItem t = new TreeItem(rmsTree, SWT.NONE);
+					t.setData("m" + s);
+					t.setText(l);
+
+					new TreeItem(t, SWT.NONE);
+				}
+			}
+
+
+			(this.clearRecordsBtn = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
+			this.clearRecordsBtn.setLayoutData(layoutData);
+			clearRecordsBtn.addSelectionListener(new SelectionListener() {
+				public void widgetSelected(SelectionEvent selectionEvent) {
+					TreeItem[] items = rmsTree.getSelection();
+					if (items == null)
+						return;
+
+					for (TreeItem item: items) {
+						String d = (String) item.getData();
+						if (d == null || d.startsWith("m")) continue;
+						item.dispose();
+						try {
+							File file = new File(rootPath + d.substring(1));
+							for (File value : file.listFiles()) {
+								value.delete();
+							}
+							file.delete();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+				public void widgetDefaultSelected(SelectionEvent selectionEvent) {
+				}
+			});
+		}
+	}
+
+	private String decodeBase64(String name) {
+		try {
+			return new String(Base64.getDecoder().decode(name.replace('-', '/').getBytes("UTF-8")), "UTF-8");
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	private String method374() {
@@ -2026,10 +2501,10 @@ public final class Property implements IProperty {
 
 	private void setupNetworkComp() {
 		(this.networkComp = new Composite(this.tabFolder, 0)).setLayout(new GridLayout());
-		this.method432();
+		this.setupNetworkTabContent();
 	}
 
-	private void method432() {
+	private void setupNetworkTabContent() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 2;
 		layoutData.verticalAlignment = 2;
@@ -2068,44 +2543,48 @@ public final class Property implements IProperty {
 		layoutData8.grabExcessHorizontalSpace = true;
 		layoutData8.grabExcessVerticalSpace = true;
 		layoutData8.verticalAlignment = 1;
-		(this.aGroup700 = new Group(this.networkComp, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY", "Proxy"));
-		this.aGroup700.setLayout(layout);
-		this.aGroup700.setLayoutData(layoutData8);
-		(this.aCLabel648 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY_TYPE", "ProxyType:"));
-		this.method350();
-		(this.aCLabel651 = new CLabel(this.aGroup700, 0)).setText("");
-		(this.aCLabel649 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_HOST", "Host:"));
+		(this.networkProxyGroup = new Group(this.networkComp, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY", "Proxy"));
+		this.networkProxyGroup.setLayout(layout);
+		this.networkProxyGroup.setLayoutData(layoutData8);
+		(this.aCLabel648 = new CLabel(this.networkProxyGroup, 0)).setText(UILocale.get("OPTION_NETWORK_PROXY_TYPE", "ProxyType:"));
+		this.setupProxyCombo();
+		(this.aCLabel651 = new CLabel(this.networkProxyGroup, 0)).setText("");
+		(this.aCLabel649 = new CLabel(this.networkProxyGroup, 0)).setText(UILocale.get("OPTION_NETWORK_HOST", "Host:"));
 		this.aCLabel649.setLayoutData(layoutData6);
-		(this.aText635 = new Text(this.aGroup700, 2048)).setLayoutData(layoutData7);
+		(this.aText635 = new Text(this.networkProxyGroup, 2048)).setLayoutData(layoutData7);
 		this.aText635.setText(Settings.proxyHost);
-		(this.aCLabel650 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_PORT", "Port:"));
-		(this.aText637 = new Text(this.aGroup700, 2048)).setText(Settings.proxyPort);
+		(this.aCLabel650 = new CLabel(this.networkProxyGroup, 0)).setText(UILocale.get("OPTION_NETWORK_PORT", "Port:"));
+		(this.aText637 = new Text(this.networkProxyGroup, 2048)).setText(Settings.proxyPort);
 		this.aText637.setLayoutData(gridData);
-		(this.aCLabel652 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_USERNAME", "Username:"));
+		(this.aCLabel652 = new CLabel(this.networkProxyGroup, 0)).setText(UILocale.get("OPTION_NETWORK_USERNAME", "Username:"));
 		this.aCLabel652.setLayoutData(layoutData5);
-		(this.aText639 = new Text(this.aGroup700, 2048)).setLayoutData(layoutData4);
+		(this.aText639 = new Text(this.networkProxyGroup, 2048)).setLayoutData(layoutData4);
 		this.aText639.setText(Settings.proxyUser);
-		(this.aCLabel653 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_PASSWORD", "Password:"));
-		(this.aText641 = new Text(this.aGroup700, 4196352)).setText(Settings.proxyPass);
+		(this.aCLabel653 = new CLabel(this.networkProxyGroup, 0)).setText(UILocale.get("OPTION_NETWORK_PASSWORD", "Password:"));
+		(this.aText641 = new Text(this.networkProxyGroup, 4196352)).setText(Settings.proxyPass);
 		this.aText641.setLayoutData(gridData);
-		(this.aCLabel654 = new CLabel(this.aGroup700, 0)).setText(UILocale.get("OPTION_NETWORK_DOMAIN", "Domain:"));
+		(this.aCLabel654 = new CLabel(this.networkProxyGroup, 0)).setText(UILocale.get("OPTION_NETWORK_DOMAIN", "Domain:"));
 		this.aCLabel654.setLayoutData(layoutData3);
-		(this.aText643 = new Text(this.aGroup700, 2048)).setLayoutData(layoutData2);
+		(this.aText643 = new Text(this.networkProxyGroup, 2048)).setLayoutData(layoutData2);
 		this.aText643.setText(Settings.proxyDomain);
-		(this.aButton764 = new Button(this.aGroup700, 8388608)).setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
+		(this.aButton764 = new Button(this.networkProxyGroup, 8388608)).setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
 		this.aButton764.setLayoutData(layoutData);
 		this.aButton764.addSelectionListener(new Class97(this));
 		this.proxyTypeCombo.addModifyListener(new Class65(this));
 		this.proxyTypeCombo.select(Settings.proxyType);
+		
+		(this.noNetworkBtn = new Button(this.networkComp, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_NO_NETWORK", "Restrict network connections"));
+		this.noNetworkBtn.setLayoutData(gridData);
+		this.noNetworkBtn.setSelection(Settings.networkNotAvailable);
 	}
 
-	private void method350() {
+	private void setupProxyCombo() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.horizontalSpan = 2;
 		layoutData.verticalAlignment = 2;
-		(this.proxyTypeCombo = new Combo(this.aGroup700, 8)).setLayoutData(layoutData);
+		(this.proxyTypeCombo = new Combo(this.networkProxyGroup, 8)).setLayoutData(layoutData);
 		this.proxyTypeCombo.add("None Proxy");
 		this.proxyTypeCombo.add("HTTP Proxy");
 		this.proxyTypeCombo.add("Socks5 Proxy");
@@ -2164,7 +2643,7 @@ public final class Property implements IProperty {
 	}
 
 	static void method375(final Property class38) {
-		class38.method358();
+		class38.apply();
 	}
 
 	static Shell method364(final Property class38) {
@@ -2341,6 +2820,17 @@ public final class Property implements IProperty {
 
 	static {
 		Property.aStringArray661 = new String[19];
+	}
+
+	public void widgetSelected(SelectionEvent e) {
+		if (e.widget instanceof Combo) {
+			// permission combo
+			Permission.permissions.put((String) e.widget.getData(), Permission.fromString(PERMISSIONS_VALUES[1][((Combo) e.widget).getSelectionIndex()]));
+		}
+	}
+
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);
 	}
 
 	private final class MyAuthenticator extends Authenticator {

@@ -191,9 +191,9 @@ SMS_CONSOLE_BLOCK=Заблокировать полученное
 
 METHOD_FRAME_TITLE=Методы
 
-METHOD_FRAME_RESET_CALLS=Reset Calls
-METHOD_FRAME_EXPORT_BYTECODE=Export ByteCode
-METHOD_FRAME_SAVE_BYTECODE=Save all the methods bytecode:
+METHOD_FRAME_RESET_CALLS=Сбросить вызовы
+METHOD_FRAME_EXPORT_BYTECODE=Экспорт байткода
+METHOD_FRAME_SAVE_BYTECODE=Сохранить байткод всех методов:
 METHOD_FRAME_SEARCH=Поиск
 
 #Waches Frame
@@ -207,21 +207,25 @@ WATCHES_FRAME_PROFILER=Профайлер
 OPTION_FRAME_TITLE=Опции
 
 OPTION_TAB_CUSTOM=Общее
-OPTION_TAB_KEYMAP=Клавиши
-OPTION_TAB_SYSFONT=Шрифт
+OPTION_TAB_KEYMAP=Управление
+OPTION_TAB_FONT=Шрифт
 OPTION_TAB_SYSTEM=System
 OPTION_TAB_COREAPI=CoreAPI
+OPTION_TAB_DISABLE_API=Выкл. API
 OPTION_TAB_RECORDS=Сохранения
 OPTION_TAB_NETWORK=Сеть
 OPTION_TAB_MEDIA=Медиа
 OPTION_TAB_M3G=M3G
+OPTION_TAB_MASCOT=MascotCapsule
+OPTION_TAB_SECURITY=Разрешения
+OPTION_TAB_SYSTEM_PROPERTIES=Properties
 
 OPTION_CUSTOM_DEVICE=Пресет устройства:
 OPTION_CUSTOM_ENCODING=Кодировка MIDP:
 OPTION_CUSTOM_LOCALE=Локаль MIDP:
 OPTION_CUSTOM_MAX_FPS=Лимит FPS:
 
-OPTION_CUSTOM_PROPERTIES=Настройки канваса
+OPTION_CUSTOM_PROPERTIES=Настройки экрана
 OPTION_CUSTOM_SCREEN_WIDTH=Ширина:
 OPTION_CUSTOM_SCREEN_HEIGHT=Высота:
 OPTION_CUSTOM_KEY_LSK=ЛСК:
@@ -272,6 +276,7 @@ OPTION_SYSTEM_TRACK_NEW=Отслеживать операции \"new/new[]...\"
 OPTION_SYSTEM_TRACK_METHOD=Отслеживать вызовы методов
 OPTION_SYSTEM_DISCORD_RICHPRESENCE=Discord Rich Presence
 OPTION_SYSTEM_AWT_ANTIALIASING=Сглаживание AWT
+OPTION_SYSTEM_TEXT_ANTIALIASING=Сглаживание текста
 OPTION_SYSTEM_FPS_COUNT=Счетчик FPS
 
 OPTION_COREAPI_VIBRATION=Включить вибрацию
@@ -306,6 +311,8 @@ OPTION_MEDIA_VLC_DIR=Путь к VLC
 OPTION_MEDIA_VMS=Использовать VirtualMIDISynth как MIDI устройство
 OPTION_MEDIA_GLOBAL_MIDI=Проигрывание только одного MIDI за раз (меньше лагов)
 OPTION_MEDIA_REOPEN_MIDI=Каждый раз переоткрывать MIDI устройство
+OPTION_MEDIA_DUMP=Включить экспорт медиа (больше исп. памяти)
+OPTION_MEDIA_OTT=Проигрывать OTT (не стабильно)
 
 OPTION_M3G_LWJGL_SETTINGS=Настройки LWJGL
 OPTION_M3G_IGNORE_OVERWRITE=Игнорировать флаг OVERWRITE
@@ -328,6 +335,14 @@ OPTION_M3G_FORCE_ANISO_2X=Принудительная анизотропная 
 OPTION_M3G_FORCE_ANISO_4X=Принудительная анизотропная фильтрация 4x
 OPTION_M3G_FORCE_ANISO_8X=Принудительная анизотропная фильтрация 8x
 OPTION_M3G_FORCE_ANISO_16X=Принудительная анизотропная фильтрация 16x
+
+OPTION_MASCOT_NO_2D_MIXING=No 2D mixing
+OPTION_MASCOT_IGNORE_BACKGROUND=Ignore background
+OPTION_MASCOT_TEXTURE_FILTER=Texture filter
+OPTION_MASCOT_BACKGROUND_FILTER=Background filter
+
+OPTION_SECURITY_ENABLE=Включить защиту
+OPTION_SECURITY_PERMISSIONS=Разрешения
 
 #Message
 

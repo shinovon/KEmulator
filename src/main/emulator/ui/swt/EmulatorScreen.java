@@ -1030,7 +1030,6 @@ public final class EmulatorScreen implements
 				{
 					final String open3;
 					if ((open3 = fileDialog3.open()) != null) {
-						Emulator.getRobot();
 						String s;
 						if ((s = KeyRecords.method701(open3)) == null || !new File(s).exists()) {
 							fileDialog3.setText(UILocale.get("LINK_JAR_FILE", "Specify a jar file"));
@@ -2106,17 +2105,12 @@ public final class EmulatorScreen implements
 	private void mrp(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
 			Emulator.getCanvas().invokeKeyRepeated(i);
-		} else {
 		}
 	}
 
 
-	@Override
-	public void mouseEnter(MouseEvent arg0) {
+	public void mouseEnter(MouseEvent arg0) {}
 
-	}
-
-	@Override
 	public void mouseExit(MouseEvent e) {
 		if (Settings.fpsMode) {
 			Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
@@ -2124,7 +2118,6 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	@Override
 	public void mouseHover(MouseEvent arg0) {
 
 	}
