@@ -280,6 +280,11 @@ public final class Property implements IProperty {
 	private Button mediaDumpCheck;
 	private Button ottCheck;
 	private Composite securityComp;
+	private Button mascotNo2DMixingCheck;
+	private Composite mascotComp;
+	private Button mascotIgnoreBgCheck;
+	private Button mascotTextureFilterCheck;
+	private Button mascotBackgroundFilterCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -583,6 +588,12 @@ public final class Property implements IProperty {
 			Settings.m3gTexFilter = Integer.parseInt(properties.getProperty("M3GTexFilter", "0"));
 			Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 
+			// mascot`
+			Settings.mascotNo2DMixing = Boolean.parseBoolean(properties.getProperty("MascotNo2DMixing", "false"));
+			Settings.mascotIgnoreBackground = Boolean.parseBoolean(properties.getProperty("MascotIgnoreBackground", "false"));
+			Settings.mascotTextureFilter = Boolean.parseBoolean(properties.getProperty("MascotTextureFilter", "false"));
+			Settings.mascotBackgroundFilter = Boolean.parseBoolean(properties.getProperty("MascotBackgroundFilter", "false"));
+
 			// media
 			Settings.vlcDir = properties.getProperty("VlcDir", "");
 			Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
@@ -789,6 +800,12 @@ public final class Property implements IProperty {
 			properties.setProperty("M3GAA", String.valueOf(Settings.m3gAA));
 			properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
 			properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
+
+			// mascot
+			properties.setProperty("MascotNo2DMixing", String.valueOf(Settings.mascotNo2DMixing));
+			properties.setProperty("MascotIgnoreBackground", String.valueOf(Settings.mascotIgnoreBackground));
+			properties.setProperty("MascotTextureFilter", String.valueOf(Settings.mascotTextureFilter));
+			properties.setProperty("MascotBackgroundFilter", String.valueOf(Settings.mascotBackgroundFilter));
 
 			// media
 			properties.setProperty("VlcDir", Settings.vlcDir);
@@ -1127,6 +1144,7 @@ public final class Property implements IProperty {
 		this.setupNetworkComp();
 		this.setupMediaComp();
 		this.setupM3GComp();
+		setupMascotComp();
 		setupSecurityComp();
 		final CTabItem deviceTab;
 		(deviceTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_CUSTOM", "General"));
@@ -1158,6 +1176,9 @@ public final class Property implements IProperty {
 		final CTabItem m3gTab;
 		(m3gTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_M3G", "M3G"));
 		m3gTab.setControl(this.m3gComp);
+		final CTabItem mascotTab;
+		(mascotTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_MASCOT", "MascotCapsule"));
+		mascotTab.setControl(this.mascotComp);
 		final CTabItem propsTab;
 		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
 		propsTab.setControl(this.propsComp);
@@ -1905,6 +1926,51 @@ public final class Property implements IProperty {
 		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_8X", "Force anisotropic 8x"));
 		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_16X", "Force anisotropic 16x"));
 		m3gMipmapCombo.setText(m3gMipmapCombo.getItem(Settings.m3gMipmapping));
+	}
+
+	private void setupMascotComp() {
+		mascotComp = new Composite(this.tabFolder, 0);
+		mascotComp.setLayout(new GridLayout());
+
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.marginWidth = 5;
+
+		final GridData groupData = new GridData();
+		groupData.horizontalAlignment = 4;
+		groupData.grabExcessHorizontalSpace = true;
+		groupData.grabExcessVerticalSpace = true;
+		groupData.verticalAlignment = 1;
+
+		Group lwjglGroup = new Group(mascotComp, 0);
+		lwjglGroup.setText(UILocale.get("OPTION_M3G_LWJGL_SETTINGS", "LWJGL Settings"));
+		lwjglGroup.setLayout(layout);
+		lwjglGroup.setLayoutData(groupData);
+
+		final GridData labelGridData = new GridData();
+		labelGridData.horizontalAlignment = SWT.FILL;
+		labelGridData.grabExcessHorizontalSpace = true;
+		labelGridData.horizontalSpan = 2;
+
+		mascotNo2DMixingCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotNo2DMixingCheck.setText(UILocale.get("OPTION_MASCOT_NO_2D_MIXING", "No 2D mixing"));
+		mascotNo2DMixingCheck.setLayoutData(labelGridData);
+		mascotNo2DMixingCheck.setSelection(Settings.mascotNo2DMixing);
+		
+		mascotIgnoreBgCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotIgnoreBgCheck.setText(UILocale.get("OPTION_MASCOT_IGNORE_BACKGROUND", "Ignore background"));
+		mascotIgnoreBgCheck.setLayoutData(labelGridData);
+		mascotIgnoreBgCheck.setSelection(Settings.mascotIgnoreBackground);
+
+		mascotTextureFilterCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotTextureFilterCheck.setText(UILocale.get("OPTION_MASCOT_TEXTURE_FILTER", "Texture filter"));
+		mascotTextureFilterCheck.setLayoutData(labelGridData);
+		mascotTextureFilterCheck.setSelection(Settings.mascotTextureFilter);
+
+		mascotBackgroundFilterCheck = new Button(lwjglGroup, SWT.CHECK);
+		mascotBackgroundFilterCheck.setText(UILocale.get("OPTION_MASCOT_BACKGROUND_FILTER", "Background filter"));
+		mascotBackgroundFilterCheck.setLayoutData(labelGridData);
+		mascotBackgroundFilterCheck.setSelection(Settings.mascotBackgroundFilter);
 	}
 	
 	private void setupSecurityComp() {
