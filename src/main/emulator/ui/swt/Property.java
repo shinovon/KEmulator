@@ -261,6 +261,7 @@ public final class Property implements IProperty {
 	private Text propsText;
 	private Button mediaDumpCheck;
 	private Button ottCheck;
+	private Composite securityComp;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -1108,6 +1109,7 @@ public final class Property implements IProperty {
 		this.setupNetworkComp();
 		this.setupMediaComp();
 		this.setupM3GComp();
+		setupSecurityComp();
 		final CTabItem deviceTab;
 		(deviceTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_CUSTOM", "General"));
 		deviceTab.setControl(this.customComp);
@@ -1141,6 +1143,9 @@ public final class Property implements IProperty {
 		final CTabItem propsTab;
 		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
 		propsTab.setControl(this.propsComp);
+		final CTabItem securityTab;
+		(securityTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SECURITY", "Security"));
+		securityTab.setControl(this.securityComp);
 	}
 
 	private void setupCustomComp() {
@@ -1882,6 +1887,12 @@ public final class Property implements IProperty {
 		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_8X", "Force anisotropic 8x"));
 		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_16X", "Force anisotropic 16x"));
 		m3gMipmapCombo.setText(m3gMipmapCombo.getItem(Settings.m3gMipmapping));
+	}
+	
+	private void setupSecurityComp() {
+		securityComp = new Composite(this.tabFolder, 0);
+		securityComp.setLayout(new GridLayout());
+		// TODO
 	}
 
 	private void initSystemComp() {
