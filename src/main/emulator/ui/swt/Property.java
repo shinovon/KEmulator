@@ -60,7 +60,7 @@ public final class Property implements IProperty {
 			{"PantechAudio", "com.pantech"},
 
 			{"Pigler Notifications", "org.pigler"},
-			{"KEmulator Notifications", "ru.nnproject.kemulator.notificationapi"},
+			{"KEmulator Notifications (Deprecated)", "ru.nnproject.kemulator.notificationapi"},
 			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
 
 	};
@@ -242,6 +242,8 @@ public final class Property implements IProperty {
 	private Button serialCallsCheck;
 	private Button keyPressOnRepeatCheck;
 	private Button antiAliasTextBtn;
+	private Composite disableApiComp;
+	private Table disableApiTable;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -1037,6 +1039,7 @@ public final class Property implements IProperty {
 		this.setupKeyMapComp();
 		this.setupSystemComp();
 		this.setupCoreApiComp();
+		setupDisableApiComp();
 		this.setupSysFontComp();
 		this.setupRecordsComp();
 		this.setupNetworkComp();
@@ -1057,6 +1060,9 @@ public final class Property implements IProperty {
 		final CTabItem coreApiTab;
 		(coreApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_COREAPI", "CoreAPI"));
 		coreApiTab.setControl(this.coreApiComp);
+		final CTabItem disableApiTab;
+		(disableApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_DISABLE_API", "Disable APIs"));
+		disableApiTab.setControl(this.disableApiComp);
 		final CTabItem rmsTab;
 		(rmsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_RECORDS", "Records"));
 		rmsTab.setControl(this.recordsComp);
@@ -1609,6 +1615,37 @@ public final class Property implements IProperty {
 		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
 		keyPressOnRepeatCheck.setLayoutData(gridData);
 		keyPressOnRepeatCheck.setSelection(Settings.processSerialCallsOutOfQueue);
+	}
+
+	private void setupDisableApiComp() {
+		(disableApiComp = new Composite(tabFolder, 0)).setLayout(new GridLayout());
+
+		GridData d = new GridData();
+		d.horizontalAlignment = 4;
+		d.grabExcessHorizontalSpace = true;
+		d.grabExcessVerticalSpace = true;
+		d.verticalAlignment = 4;
+		d.heightHint = 240;
+
+		disableApiTable = new Table(disableApiComp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
+		disableApiTable.setLayoutData(d);
+		for (String[] a: APIS_LIST) {
+			TableItem i = new TableItem(disableApiTable, SWT.NONE);
+			i.setText(0, a[0]);
+			i.setChecked(Settings.protectedPackages.contains(a[1]));
+		}
+		disableApiTable.addListener (SWT.Selection, new Listener () {
+			public void handleEvent (Event event) {
+				TableItem item = (TableItem) event.item;
+				int idx = disableApiTable.indexOf(item);
+				System.out.println(item);
+				if (item.getChecked()) {
+					Settings.protectedPackages.add(APIS_LIST[idx][1]);
+				} else {
+					Settings.protectedPackages.remove(APIS_LIST[idx][1]);
+				}
+			}
+		});
 	}
 
 	private void setupMediaComp() {
