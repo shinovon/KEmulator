@@ -42,7 +42,9 @@ public class CustomMethod {
 	public static String getProperty(final String prop) {
 		String res = System.getProperty(prop);
 		boolean b = true;
-		if (prop.equalsIgnoreCase("fileconn.dir.private")) {
+		if (Settings.systemProperties != null && Settings.systemProperties.containsKey(prop)) {
+			res = Settings.systemProperties.get(prop);
+		} else if (prop.equalsIgnoreCase("fileconn.dir.private")) {
 			res = "file://root/private_" + Emulator.midletClassName.replace("\\", "_").replace("/", "_").replace(".", "_") + "/";
 		} else if (prop.equalsIgnoreCase("user.name")) {
 			res = "KEmulator";
