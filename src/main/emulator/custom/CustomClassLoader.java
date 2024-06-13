@@ -12,15 +12,16 @@ public final class CustomClassLoader extends ClassLoader {
 	}
 
 	public final synchronized Class loadClass(final String s, final boolean b) throws ClassNotFoundException {
+		boolean midlet = Emulator.jarClasses.contains(s);
+		if (!midlet && checkIsProtected(s)) {
+			Emulator.getEmulator().getLogStream().println("Protected class: " + s);
+			throw new ClassNotFoundException("Protected class: " + s);
+		}
 		final Class<?> loadedClass;
 		if ((loadedClass = this.findLoadedClass(s)) != null) {
 			return loadedClass;
 		}
-		if (!Emulator.jarClasses.contains(s)) {
-			if (checkIsProtected(s)) { // TODO проверять источник вызова, начинает сыпаться MemoryView
-				Emulator.getEmulator().getLogStream().println("Protected class: " + s);
-				throw new ClassNotFoundException("Protected class: " + s);
-			}
+		if (!midlet) {
 			try {
 				return super.loadClass(s, b);
 			} catch (ClassNotFoundException ex) {
@@ -109,6 +110,12 @@ public final class CustomClassLoader extends ClassLoader {
 	private boolean checkIsProtected(String s) {
 		if (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty())
 			return false;
+
+		StackTraceElement[] st = Thread.currentThread().getStackTrace();
+		if ((st.length > 4 && !Emulator.jarClasses.contains(st[4].getClassName()))) {
+			return false;
+		}
+
 		if (Settings.protectedPackages.contains(s))
 			return true;
 		int idx = -1;
