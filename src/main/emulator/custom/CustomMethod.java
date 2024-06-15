@@ -88,35 +88,17 @@ public class CustomMethod {
 			}
 			// Hide properties of disabled APIs
 			if(!Settings.protectedPackages.isEmpty()) {
-				if (prop.startsWith("com.nokia") && Settings.protectedPackages.contains("com.nokia.mid")) {
+				if (CustomClassLoader.isProtected(prop, false) || CustomClassLoader.isProtected("javax." + prop, false)) {
 					res = null;
-				} else if (prop.startsWith("com.nokia.mid.ui") && Settings.protectedPackages.contains("com.nokia.mid.ui")) {
-					res = null;
-				} else if (prop.startsWith("wireless.messaging") && Settings.protectedPackages.contains("javax.wireless.messaging")) {
-					res = null;
-				} else if (prop.startsWith("microedition.m3g") && Settings.protectedPackages.contains("javax.microedition.m3g")) {
-					res = null;
-				} else if (prop.startsWith("microedition.sensor") && Settings.protectedPackages.contains("javax.microedition.sensor")) {
-					res = null;
-				} else if (prop.startsWith("microedition.amms") && Settings.protectedPackages.contains("javax.microedition.amms")) {
-					res = null;
-				} else if (prop.startsWith("microedition.media") && Settings.protectedPackages.contains("javax.microedition.media")) {
-					res = null;
-				} else if (prop.startsWith("microedition.pim") && Settings.protectedPackages.contains("javax.microedition.pim")) {
+				} else if (prop.startsWith("com.nokia") && Settings.protectedPackages.contains("com.nokia.mid")) {
 					res = null;
 				} else if (prop.startsWith("bluetooth") && Settings.protectedPackages.contains("javax.microedition.bluetooth")) {
 					res = null;
-				} else if ((prop.startsWith("fileconn") || prop.startsWith("microdition.io.file")) && Settings.protectedPackages.contains("javax.microedition.io.file")) {
-					res = null;
-				} else if (prop.startsWith("org.pigler") && Settings.protectedPackages.contains("org.pigler")) {
+				} else if (prop.startsWith("fileconn") && Settings.protectedPackages.contains("javax.microedition.io.file")) {
 					res = null;
 				} else if (prop.startsWith("kemulator.rpc") && Settings.protectedPackages.contains("ru.nnproject.kemulator.rpc")) {
 					res = null;
 				} else if (prop.startsWith("kemulator.notificationapi") && Settings.protectedPackages.contains("ru.nnproject.kemulator.notificationapi")) {
-					res = null;
-				} else if (prop.startsWith("kemulator") && Settings.protectedPackages.contains("kemulator")) {
-					res = null;
-				} else if (Settings.protectedPackages.contains(prop)) {
 					res = null;
 				}
 			}

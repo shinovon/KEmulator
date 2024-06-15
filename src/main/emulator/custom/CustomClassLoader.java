@@ -13,7 +13,7 @@ public final class CustomClassLoader extends ClassLoader {
 
 	public final synchronized Class loadClass(final String s, final boolean b) throws ClassNotFoundException {
 		boolean midlet = Emulator.jarClasses.contains(s);
-		if (!midlet && checkIsProtected(s)) {
+		if (!midlet && isProtected(s, true)) {
 			Emulator.getEmulator().getLogStream().println("Protected class: " + s);
 			throw new ClassNotFoundException("Protected class: " + s);
 		}
@@ -107,13 +107,15 @@ public final class CustomClassLoader extends ClassLoader {
 		return classWriter.toByteArray();
 	}
 
-	private boolean checkIsProtected(String s) {
+	public static boolean isProtected(String s, boolean stack) {
 		if (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty())
 			return false;
 
-		StackTraceElement[] st = Thread.currentThread().getStackTrace();
-		if ((st.length > 4 && !Emulator.jarClasses.contains(st[4].getClassName()))) {
-			return false;
+		if (stack) {
+			StackTraceElement[] st = Thread.currentThread().getStackTrace();
+			if ((st.length > 4 && !Emulator.jarClasses.contains(st[4].getClassName()))) {
+				return false;
+			}
 		}
 
 		if (Settings.protectedPackages.contains(s))
