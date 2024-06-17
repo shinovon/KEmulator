@@ -799,7 +799,9 @@ public class Emulator {
 		Emulator.emulatorimpl.getProfiler().fill();
 		Emulator.eventQueue.queue(EventQueue.EVENT_START);
 		Emulator.emulatorimpl.getEmulatorScreen().start(true);
-		EmulatorImpl.dispose();
+		try {
+			EmulatorImpl.dispose();
+		} catch (Exception ignored) {}
 		System.exit(0);
 	}
 
