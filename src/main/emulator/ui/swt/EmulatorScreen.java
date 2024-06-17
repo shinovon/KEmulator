@@ -253,7 +253,7 @@ public final class EmulatorScreen implements
 			EmulatorScreen.locY = EmulatorScreen.display.getClientArea().height - this.shell.getSize().y >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
-		if (sizeW > 10 && sizeH > 10)
+		if (sizeW > 10 && sizeH > 10 && Settings.resizeMode != 0)
 			shell.setSize(sizeW, sizeH);
 		if (maximized)
 			shell.setMaximized(true);
