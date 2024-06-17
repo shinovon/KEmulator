@@ -24,4 +24,6 @@ public interface IScreen {
 	void stopVibra();
 
 	ICaret getCaret();
+
+	void setSize(int w, int h);
 }

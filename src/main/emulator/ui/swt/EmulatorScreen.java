@@ -537,6 +537,14 @@ public final class EmulatorScreen implements
 		return this.getScreenImg().getHeight();
 	}
 
+	public void setSize(int w, int h) {
+		if (getWidth() != w || getHeight() != h) {
+			initScreenBuffer(w, h);
+			Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
+			resized();
+		}
+	}
+
 	public void setCommandLeft(final String aString983) {
 		this.aString983 = aString983;
 		EmulatorImpl.syncExec(new Class41(this));

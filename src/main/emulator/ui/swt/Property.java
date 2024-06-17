@@ -116,9 +116,9 @@ public final class Property implements IProperty, SelectionListener {
 	private Text aText662;
 	private Button aButton666;
 	private CLabel aCLabel694;
-	private Text aText672;
+	private Text screenWidthText;
 	private CLabel aCLabel701;
-	private Text aText684;
+	private Text screenHeightText;
 	private CLabel aCLabel707;
 	private Text aText695;
 	private CLabel aCLabel712;
@@ -313,6 +313,13 @@ public final class Property implements IProperty, SelectionListener {
 		this.setsShell.setSize(480, this.setsShell.getSize().y);
 		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
 		securityComp.setExpandVertical(true);
+
+		try {
+			IScreen scr = Emulator.getEmulator().getScreen();
+			screenWidthText.setText("" + scr.getWidth());
+			screenHeightText.setText("" + scr.getHeight());
+		} catch (Exception ignored) {}
+
 		this.setsShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.setsShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.setsShell.getSize().y >> 1));
 		this.setsShell.open();
 		while (!this.setsShell.isDisposed()) {
@@ -862,8 +869,8 @@ public final class Property implements IProperty, SelectionListener {
 		this.fontSmallSize = this.aSpinner690.getSelection();
 		this.fontMediumSize = this.aSpinner679.getSelection();
 		this.fontLargeSize = this.aSpinner670.getSelection();
-		this.screenWidth = this.aText672.getText().trim();
-		this.screenHeight = this.aText684.getText().trim();
+		this.screenWidth = this.screenWidthText.getText().trim();
+		this.screenHeight = this.screenHeightText.getText().trim();
 		this.lsoft = this.aText695.getText().trim();
 		this.rsoft = this.aText702.getText().trim();
 		this.fire = this.aText708.getText().trim();
@@ -966,6 +973,10 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.enableMediaDump = mediaDumpCheck.getSelection();
 		Settings.enableOTT = ottCheck.getSelection();
 		Settings.enableSecurity = securityCheck.getSelection();
+
+		try {
+			Emulator.getEmulator().getScreen().setSize(Integer.parseInt(screenWidthText.getText()), Integer.parseInt(screenHeightText.getText()));
+		} catch (Exception ignored) {}
 
 		this.updateProxy();
 	}
@@ -1095,10 +1106,10 @@ public final class Property implements IProperty, SelectionListener {
 		this.aGroup660.setLayoutData(layoutData12);
 		(this.aCLabel694 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_SCREEN_WIDTH", "Screen Width:"));
 		this.aCLabel694.setLayoutData(layoutData9);
-		(this.aText672 = new Text(this.aGroup660, 2048)).setLayoutData(layoutData11);
+		(this.screenWidthText = new Text(this.aGroup660, 2048)).setLayoutData(layoutData11);
 		(this.aCLabel701 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_SCREEN_HEIGHT", "Screen Height:"));
 		this.aCLabel701.setLayoutData(layoutData8);
-		(this.aText684 = new Text(this.aGroup660, 2048)).setLayoutData(layoutData10);
+		(this.screenHeightText = new Text(this.aGroup660, 2048)).setLayoutData(layoutData10);
 		(this.aCLabel707 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_LSK", "Left Soft Key:"));
 		(this.aText695 = new Text(this.aGroup660, 2048)).setLayoutData(layoutData7);
 		(this.aCLabel712 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_RSK", "Right Soft Key:"));
@@ -1119,8 +1130,8 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void method387() {
-		this.aText672.setText(this.screenWidth);
-		this.aText684.setText(this.screenHeight);
+		this.screenWidthText.setText(this.screenWidth);
+		this.screenHeightText.setText(this.screenHeight);
 		this.aText695.setText(this.lsoft);
 		this.aText702.setText(this.rsoft);
 		this.aText708.setText(this.fire);

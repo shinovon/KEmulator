@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 
 import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
+import emulator.ui.IScreen;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -250,7 +251,22 @@ public class Emulator {
 					in.close();
 				}
 			}
-			properties.setProperty(key, Emulator.deviceName);
+			IScreen scr = Emulator.getEmulator().getScreen();
+			StringBuilder s = new StringBuilder("!");
+
+			s.append(Emulator.deviceName).append(';')
+					.append("SCREEN_WIDTH:").append(scr.getWidth()).append(';')
+					.append("SCREEN_HEIGHT:").append(scr.getHeight()).append(';')
+					.append("KEY_S1:").append(Devices.getProperty("KEY_S1")).append(';')
+					.append("KEY_S2:").append(Devices.getProperty("KEY_S2")).append(';')
+					.append("KEY_FIRE:").append(Devices.getProperty("KEY_FIRE")).append(';')
+					.append("KEY_UP:").append(Devices.getProperty("KEY_UP")).append(';')
+					.append("KEY_DOWN:").append(Devices.getProperty("KEY_DOWN")).append(';')
+					.append("KEY_LEFT:").append(Devices.getProperty("KEY_LEFT")).append(';')
+					.append("KEY_RIGHT:").append(Devices.getProperty("KEY_RIGHT"))
+			;
+
+			properties.setProperty(key, s.toString());
 			FileOutputStream out = new FileOutputStream(propsPath);
 			try {
 				properties.store(out, "KEmulator platforms");
@@ -805,12 +821,35 @@ public class Emulator {
 		System.exit(0);
 	}
 
-	private static void tryToSetDevice(final String deviceName) {
+	private static void tryToSetDevice(String deviceName) {
+		String[][] c = null;
+		if (deviceName.startsWith("!")) {
+			deviceName = deviceName.substring(1);
+			String[] a = deviceName.split(";");
+			c = new String[a.length][2];
+			int idx = 0;
+			for (String s: a) {
+				int i = s.indexOf(':');
+				if (i == -1) {
+					deviceName = s;
+					continue;
+				}
+				c[idx][0] = s.substring(0, i);
+				c[idx++][1] = s.substring(i + 1);
+			}
+		}
 		Emulator.deviceName = deviceName;
 		if (!Devices.setPlatform(Emulator.deviceName)) {
 			Devices.setPlatform(Emulator.deviceName = "SonyEricssonK800");
 		}
 		Emulator.emulatorimpl.getProperty().setCustomProperties();
+		if (c != null) {
+			for (String[] p: c) {
+				if (p == null || p[0] == null) continue;
+				Devices.setProperty(p[0], p[1]);
+			}
+		}
+		Devices.writeProperties();
 		Emulator.emulatorimpl.getProperty().updateCustomProperties();
 		Emulator.emulatorimpl.getProperty().resetDeviceName();
 		KeyMapping.init();
