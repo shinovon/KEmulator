@@ -314,11 +314,11 @@ public final class Property implements IProperty, SelectionListener {
 		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
 		securityComp.setExpandVertical(true);
 
-		try {
-			IScreen scr = Emulator.getEmulator().getScreen();
-			screenWidthText.setText("" + scr.getWidth());
-			screenHeightText.setText("" + scr.getHeight());
-		} catch (Exception ignored) {}
+//		try {
+//			IScreen scr = Emulator.getEmulator().getScreen();
+//			screenWidthText.setText("" + scr.getWidth());
+//			screenHeightText.setText("" + scr.getHeight());
+//		} catch (Exception ignored) {}
 
 		this.setsShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.setsShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.setsShell.getSize().y >> 1));
 		this.setsShell.open();
@@ -897,6 +897,8 @@ public final class Property implements IProperty, SelectionListener {
 		KeyMapping.mapDeviceKey(8, KeyMapping.method601(Property.aStringArray661[8]));
 		KeyMapping.mapDeviceKey(9, KeyMapping.method601(Property.aStringArray661[9]));
 		KeyMapping.mapDeviceKey(0, KeyMapping.method601(Property.aStringArray661[0]));
+		Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
+		Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
 		Devices.setProperty("KEY_S1", this.lsoft);
 		Devices.setProperty("KEY_S2", this.rsoft);
 		Devices.setProperty("KEY_FIRE", this.fire);
@@ -974,9 +976,9 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.enableOTT = ottCheck.getSelection();
 		Settings.enableSecurity = securityCheck.getSelection();
 
-		try {
-			Emulator.getEmulator().getScreen().setSize(Integer.parseInt(screenWidthText.getText()), Integer.parseInt(screenHeightText.getText()));
-		} catch (Exception ignored) {}
+//		try {
+//			Emulator.getEmulator().getScreen().setSize(Integer.parseInt(screenWidthText.getText()), Integer.parseInt(screenHeightText.getText()));
+//		} catch (Exception ignored) {}
 
 		this.updateProxy();
 	}

@@ -255,8 +255,8 @@ public class Emulator {
 			StringBuilder s = new StringBuilder("!");
 
 			s.append(Emulator.deviceName).append(';')
-					.append("SCREEN_WIDTH:").append(scr.getWidth()).append(';')
-					.append("SCREEN_HEIGHT:").append(scr.getHeight()).append(';')
+					.append("SCREEN_WIDTH:").append(Devices.getProperty("SCREEN_WIDTH")).append(';')
+					.append("SCREEN_HEIGHT:").append(Devices.getProperty("SCREEN_HEIGHT")).append(';')
 					.append("KEY_S1:").append(Devices.getProperty("KEY_S1")).append(';')
 					.append("KEY_S2:").append(Devices.getProperty("KEY_S2")).append(';')
 					.append("KEY_FIRE:").append(Devices.getProperty("KEY_FIRE")).append(';')
