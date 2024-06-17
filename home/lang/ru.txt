@@ -312,7 +312,7 @@ OPTION_MEDIA_VMS=Использовать VirtualMIDISynth как MIDI устр�
 OPTION_MEDIA_GLOBAL_MIDI=Проигрывание только одного MIDI за раз (меньше лагов)
 OPTION_MEDIA_REOPEN_MIDI=Каждый раз переоткрывать MIDI устройство
 OPTION_MEDIA_DUMP=Включить экспорт медиа (больше исп. памяти)
-OPTION_MEDIA_OTT=Проигрывать OTT (не стабильно)
+OPTION_MEDIA_OTT=Проигрывать Nokia Tone (не стабильно)
 
 OPTION_M3G_LWJGL_SETTINGS=Настройки LWJGL
 OPTION_M3G_IGNORE_OVERWRITE=Игнорировать флаг OVERWRITE

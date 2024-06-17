@@ -1751,7 +1751,7 @@ public final class Property implements IProperty, SelectionListener {
 		keyPressOnRepeatCheck = new Button(coreApiGroup, SWT.CHECK);
 		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
 		keyPressOnRepeatCheck.setLayoutData(gridData);
-		keyPressOnRepeatCheck.setSelection(Settings.processSerialCallsOutOfQueue);
+		keyPressOnRepeatCheck.setSelection(Settings.keyPressOnRepeat);
 	}
 
 	private void setupDisableApiComp() {
@@ -1850,7 +1850,7 @@ public final class Property implements IProperty, SelectionListener {
 		mediaDumpCheck.setSelection(Settings.enableMediaDump);
 
 		ottCheck = new Button(mediaGroup, SWT.CHECK);
-		ottCheck.setText(UILocale.get("OPTION_MEDIA_OTT", "OTT playback (unstable)"));
+		ottCheck.setText(UILocale.get("OPTION_MEDIA_OTT", "Nokia Tone playback (unstable)"));
 		ottCheck.setLayoutData(fillHor);
 		ottCheck.setSelection(Settings.enableOTT);
 
