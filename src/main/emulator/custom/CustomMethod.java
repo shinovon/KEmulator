@@ -63,7 +63,7 @@ public class CustomMethod {
 				} else if (prop.equals("com.nokia.memoryramtotal")) {
 					res = String.valueOf(r.maxMemory());
 				}
-			} else if (prop.equalsIgnoreCase("kemulator.threadtrace")) {
+			} else if (prop.equals("kemulator.threadtrace")) {
 				b = false;
 				res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
 			} else if (((prop.equalsIgnoreCase("com.nokia.mid.imei") || prop.equalsIgnoreCase("com.nokia.imei"))
@@ -75,16 +75,18 @@ public class CustomMethod {
 					(prop.equalsIgnoreCase("com.siemens.IMEI") && !Settings.protectedPackages.contains("com.siemens"))
 			) {
 				res = Permission.askIMEI();
-			} else if (prop.equalsIgnoreCase("kemulator.libvlc.supported")) {
+			} else if (prop.equals("kemulator.libvlc.supported")) {
 				res = String.valueOf(Manager.isLibVlcSupported());
-			} else if (prop.equalsIgnoreCase("com.nokia.pointer.number")) {
+			} else if (prop.equals("com.nokia.pointer.number")) {
 				b = false;
-			} else if (prop.equalsIgnoreCase("microedition.locale")) {
+			} else if (prop.equals("microedition.locale")) {
 				res = Settings.locale;
-			} else if (prop.equalsIgnoreCase("microedition.encoding")) {
+			} else if (prop.equals("microedition.encoding")) {
 				res = Settings.fileEncoding;
-			} else if (prop.equalsIgnoreCase("Platform")) {
+			} else if (prop.equals("Platform")) {
 				res = "";
+			} else if(prop.equals("fileconn.dir.roots.names")) {
+				res = "Root";
 			}
 			// Hide properties of disabled APIs
 			if(!Settings.protectedPackages.isEmpty()) {
