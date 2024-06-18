@@ -54,6 +54,10 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			renamedClasses.add(className.replace('.', '/'));
 			name = name + "_";
 		}
+		if (Settings.bypassVserv && "()V".equals(desc) && "startRealApp".equals(name) && acc == Opcodes.ACC_PRIVATE) {
+			Emulator.getEmulator().getLogStream().println("Patched ALW1: " + className);
+			acc = Opcodes.ACC_PUBLIC;
+		}
 		final MethodVisitor visitMethod;
 		if ((visitMethod = super.visitMethod(acc, name, desc, sign, array)) != null) {
 			return new CustomMethodAdapter(visitMethod, this.className, name, desc);

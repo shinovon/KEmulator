@@ -5,6 +5,7 @@ import emulator.custom.CustomMethod;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URI;
 
 import javax.microedition.io.*;
@@ -117,6 +118,19 @@ public abstract class MIDlet {
 			System.out.println("startApp exception!");
 			ex.printStackTrace();
 			throw new RuntimeException(ex);
+		}
+		if (Settings.bypassVserv) {
+			try {
+				Class cls = getClass();
+				if (cls.getName().endsWith("ALW1")) {
+					Emulator.getEmulator().getLogStream().println("Trying to bypass ALW1");
+					Method m = cls.getMethod("startRealApp");
+					m.setAccessible(true);
+					m.invoke(this);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
