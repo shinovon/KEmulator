@@ -114,7 +114,9 @@ public final class CustomClassLoader extends ClassLoader {
 		if (stack) {
 			StackTraceElement[] st = Thread.currentThread().getStackTrace();
 			if ((st.length > 4 && !Emulator.jarClasses.contains(st[4].getClassName()))) {
-				return false;
+				if (!st[4].getMethodName().equals("forName0") ||
+						(st.length > 6 && !Emulator.jarClasses.contains(st[6].getClassName())))
+					return false;
 			}
 		}
 

@@ -519,7 +519,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
 			Settings.processSerialCallsOutOfQueue = Boolean.parseBoolean(properties.getProperty("ProcessSerialCallsOutOfQueue", "false"));
 			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
-			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaint", "true"));
+			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaints", "true"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {

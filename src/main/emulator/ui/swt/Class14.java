@@ -17,13 +17,17 @@ final class Class14 implements Runnable {
 				case 0: {
 					for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
 						final String s = (String) Emulator.jarClasses.get(i);
-						final Instance c;
-						if ((c = new Instance(s, s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null)).method879(null)) {
-							String s2 = c.toString();
-							if (c.getCls().getSuperclass() != null) {
-								s2 = s2 + "@" + c.getCls().getSuperclass().getName();
+						try {
+							final Instance c;
+							if ((c = new Instance(s, s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null)).method879(null)) {
+								String s2 = c.toString();
+								if (c.getCls().getSuperclass() != null) {
+									s2 = s2 + "@" + c.getCls().getSuperclass().getName();
+								}
+								Watcher.staticGetTable(this.aClass5_587).put(s2, c);
 							}
-							Watcher.staticGetTable(this.aClass5_587).put(s2, c);
+						} catch (Throwable e) {
+							e.printStackTrace();
 						}
 					}
 				}
