@@ -3,7 +3,7 @@ package javax.microedition.io.file;
 import java.util.*;
 
 public class FileSystemRegistry {
-	static Vector aVector1364;
+	static Vector aVector1364 = new Vector();
 
 	public FileSystemRegistry() {
 		super();
