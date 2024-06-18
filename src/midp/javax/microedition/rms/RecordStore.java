@@ -166,11 +166,14 @@ public class RecordStore {
 	}
 
 	public int getSizeAvailable() throws RecordStoreNotOpenException {
+		int r;
 		try {
-			return Math.max(32000000, (int) new File(rootPath).getUsableSpace());
+			r = (int) Math.min(32000000L, new File(rootPath).getUsableSpace());
 		} catch (Exception e) {
-			return 32000000;
+			r = 32000000;
 		}
+		logln("getSizeAvailable: " + r);
+		return r;
 	}
 
 	public RecordEnumeration enumerateRecords(RecordFilter recordFilter, RecordComparator recordComparator, boolean keepUpdated) {
@@ -340,7 +343,9 @@ public class RecordStore {
 
 	public int getNumRecords() throws RecordStoreNotOpenException {
 		if (closed) throw new RecordStoreNotOpenException();
-		return records.size();
+		int r = records.size();
+		logln("getNumRecords: " + r);
+		return r;
 	}
 
 	private boolean recordIdExists(int recordId) {
@@ -388,10 +393,10 @@ public class RecordStore {
 			addRecord(data, offset, length);
 			return;
 		}
+		logln("setRecord " + name + " " + recordId + (!homeSuite ? " (guest)" : ""));
 		if (!recordIdExists(recordId)) {
 			throw new InvalidRecordIDException("recordId=" + recordId);
 		}
-		logln("setRecord " + name + " " + recordId + (!homeSuite ? " (guest)" : ""));
 		synchronized (sync) {
 			modify();
 			try {
