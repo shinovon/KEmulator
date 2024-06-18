@@ -91,22 +91,24 @@ public class Player
 	 */
 	public Player(InputStream stream) throws JavaLayerException
 	{
-		vol = 100;
-	    this.lastPosition = 0;
-	    try
-	    {
-	      this.aByteArray1339 = new byte[stream.available()];
-	      new DataInputStream(stream).readFully(this.aByteArray1339);
-	    }
-	    catch (Exception localException) {
-	    	localException.printStackTrace();
-	    }
-	    reset();
-		//this(stream, null);	
+//		vol = 100;
+//	    this.lastPosition = 0;
+//	    try
+//	    {
+//	      this.aByteArray1339 = new byte[stream.available()];
+//	      new DataInputStream(stream).readFully(this.aByteArray1339);
+//	    }
+//	    catch (Exception localException) {
+//	    	localException.printStackTrace();
+//	    }
+//	    reset();
+		this(stream, null);
 	}
 	
 	public Player(InputStream stream, AudioDevice device) throws JavaLayerException
 	{
+		vol = 100;
+	    this.lastPosition = 0;
 		bitstream = new Bitstream(stream);		
 		decoder = new Decoder();
 		if (device!=null)
