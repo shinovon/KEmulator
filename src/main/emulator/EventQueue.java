@@ -234,6 +234,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void serviceRepaints() {
+		if (Settings.ignoreServiceRepaints) return;
 		Thread t = Thread.currentThread();
 
 		// Sonic 2 Dash StackOverflowError fix

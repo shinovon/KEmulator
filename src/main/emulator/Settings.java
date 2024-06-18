@@ -114,4 +114,5 @@ public final class Settings {
 	public static final Map<String, String> systemProperties = new HashMap<>();
 
 	public static boolean enableSecurity = true;
+	public static boolean ignoreServiceRepaints;
 }

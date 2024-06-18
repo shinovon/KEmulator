@@ -520,6 +520,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.processSerialCallsOutOfQueue = Boolean.parseBoolean(properties.getProperty("ProcessSerialCallsOutOfQueue", "false"));
 			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
 			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaints", "true"));
+			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -744,6 +745,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ProcessSerialCallsOutOfQueue", String.valueOf(Settings.processSerialCallsOutOfQueue));
 			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
 			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
+			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
