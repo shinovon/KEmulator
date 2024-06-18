@@ -32,6 +32,9 @@ public class Connector {
 		if (s.startsWith("resource:")) {
 			return new ResourceConnectionImpl(s);
 		}
+		if(s.startsWith("vserv:")) {
+			return new VServConnectionWrapper(s);
+		}
 		if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
 			Permission.checkPermission("connector.open.file");
 			return new FileConnectionImpl(s);

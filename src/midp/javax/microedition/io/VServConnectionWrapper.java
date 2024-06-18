@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 final class VServConnectionWrapper implements HttpConnection {
 	private String url;
+	private ByteArrayOutputStream output;
+	private boolean userAgentSet;
 
 	public VServConnectionWrapper(String url) {
 		this.url = url;
@@ -42,7 +44,7 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final String getRequestMethod() {
-		return "";
+		return "GET";
 	}
 
 	public final void setRequestMethod(final String requestMethod) throws IOException {
@@ -53,10 +55,16 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final void setRequestProperty(final String s, final String s2) throws IOException {
+		if ("user-agent".equalsIgnoreCase(s)) {
+			userAgentSet = true;
+		}
 	}
 
 	public final int getResponseCode() throws IOException {
-		return 200;
+//		if (output != null) {
+//			System.out.println("output: " + new String(output.toByteArray(), "UTF-8"));
+//		}
+		return url.startsWith("vserv:") ? 200 : 302;
 	}
 
 	public final String getResponseMessage() throws IOException {
@@ -76,6 +84,9 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final String getHeaderField(final String s) throws IOException {
+		if ("location".equalsIgnoreCase(s) && !userAgentSet) {
+			return "vserv:";
+		}
 		return "";
 	}
 
@@ -123,6 +134,6 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
-		return new ByteArrayOutputStream();
+		return output = new ByteArrayOutputStream();
 	}
 }
