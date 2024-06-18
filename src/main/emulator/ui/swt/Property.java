@@ -48,6 +48,7 @@ public final class Property implements IProperty, SelectionListener {
 			{"Samsung", "com.samsung"},
 			{"Siemens", "com.siemens"},
 			{"Sprint", "com.sprintpcs"},
+			{"Sony Ericsson", "com.sonyericsson"},
 			{"Motorola", "com.motorola"},
 			{"Vodafone", "com.vodafone"},
 			{"LG", "mmpp"},
