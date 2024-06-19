@@ -162,8 +162,7 @@ public class Sound {
 			if (type == FORMAT_TONE) {
 				((MIDIControl) m_player.getControl("MIDIControl")).setChannelVolume(0, 64);
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		state = 0;
 		if (this.soundListener != null) {
 			this.soundListener.soundStateChanged(this, 0);
@@ -172,7 +171,7 @@ public class Sound {
 
 	public void setGain(int paramInt) {
 		gain = paramInt;
-		((VolumeControl)m_player).setLevel(gain * 100 / 255);
+		((VolumeControl) m_player.getControl("VolumeControl")).setLevel(gain * 100 / 255);
 	}
 
 	public void setSoundListener(SoundListener paramSoundListener) {
