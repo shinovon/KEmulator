@@ -106,7 +106,7 @@ public final class Settings {
 	public static boolean mascotBackgroundFilter;
 
 	public static boolean keyPressOnRepeat;
-	public static boolean forcePaintOnServiceRepaints = true;
+	public static boolean forcePaintOnServiceRepaints = false;
 	public static boolean bypassVserv = true;
 	public static boolean enableMediaDump;
 
