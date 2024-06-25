@@ -36,6 +36,7 @@ public final class EventQueue implements Runnable {
 	private boolean alive;
 	private int[][] inputs;
 	private int inputsCount;
+	private boolean screen;
 
 	public EventQueue() {
 		events = new int[128];
@@ -173,6 +174,12 @@ public final class EventQueue implements Runnable {
 				return;
 			repainted = false;
 		}
+		if (n == EVENT_SCREEN) {
+			if (screen) {
+				return;
+			}
+			screen = true;
+		}
 		if (n == EVENT_SHOW || n == EVENT_RESUME) {
 			paused = false;
 		}
@@ -281,6 +288,7 @@ public final class EventQueue implements Runnable {
 					case EVENT_SCREEN: {
 						if (Emulator.getScreen() == null ||
 								Emulator.getCurrentDisplay().getCurrent() != Emulator.getScreen()) {
+							screen = false;
 							break;
 						}
 						IScreen scr = Emulator.getEmulator().getScreen();
@@ -292,8 +300,8 @@ public final class EventQueue implements Runnable {
 						scr.repaint();
 						try {
 							Thread.sleep(100L);
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
+						screen = false;
 						this.queue(EVENT_SCREEN);
 						break;
 					}
