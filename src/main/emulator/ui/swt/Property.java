@@ -59,6 +59,7 @@ public final class Property implements IProperty, SelectionListener {
 			{"Nokia M3D(O)", "com.nokia.mid.m3d"},
 			{"Nokia Location", "com.nokia.mid.location"},
 			{"Nokia InApp", "com.nokia.mid.payment"},
+			{"Nokia IAPInfo (Stub)", "com.nokia.mid.iapinfo"},
 
 			{"MascotCapsule", "com.mascotcapsule"},
 

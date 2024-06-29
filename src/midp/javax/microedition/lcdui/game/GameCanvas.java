@@ -50,4 +50,11 @@ public abstract class GameCanvas extends Canvas {
 		Emulator.getEventQueue().gameGraphicsFlush();
 		Displayable.resetXRayGraphics();
 	}
+
+	public void invokeSizeChanged(int w, int h) {
+		if (graphics != null) {
+			graphics.reset(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
+		}
+		super.invokeSizeChanged(w, h);
+	}
 }
