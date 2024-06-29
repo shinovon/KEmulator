@@ -291,9 +291,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				EmulatorMIDI.close();
 			}
 		} else if (sequence instanceof Clip) {
-			try {
-				((Clip) sequence).close();
-			} catch (Exception ignored) {}
+//			try {
+//				((Clip) sequence).close();
+//			} catch (Exception ignored) {}
 		}
 		if (dataSource != null && !dataSourceDisconnected) {
 			dataSource.disconnect();

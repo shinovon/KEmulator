@@ -45,7 +45,6 @@ public abstract class GameCanvas extends Canvas {
 		if (this != Emulator.getCurrentDisplay().getCurrent()) return;
 		Displayable.checkForSteps(null);
 		Displayable.fpsLimiter();
-		if (graphics == null) getGraphics();
 		paintSoftMenu(graphics == null ? getGraphics() : graphics);
 		Emulator.getEventQueue().gameGraphicsFlush();
 		Displayable.resetXRayGraphics();
