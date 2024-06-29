@@ -111,7 +111,9 @@ public class Render {
 			init();
 		}
 		if (env.width != width || env.height != height) {
-			if (wasBinded) emulator3d.releaseTarget();
+			try {
+				if (wasBinded) emulator3d.releaseTarget();
+			} catch (Exception ignored) {}
 			emulator3d.bindTarget(graphics);
 			wasBinded = true;
 
@@ -146,13 +148,13 @@ public class Render {
 			GL11.glEnable(GL_POINT_SMOOTH);
 			GL11.glEnable(GL_LINE_SMOOTH);
 			GL11.glEnable(GL_POLYGON_SMOOTH);
-			if(!Emulator3D.useGL11())
+			if (!Emulator3D.useGL11())
 				GL11.glEnable(GL_MULTISAMPLE);
 		} else {
 			GL11.glDisable(GL_POINT_SMOOTH);
 			GL11.glDisable(GL_LINE_SMOOTH);
 			GL11.glDisable(GL_POLYGON_SMOOTH);
-			if(!Emulator3D.useGL11())
+			if (!Emulator3D.useGL11())
 				GL11.glDisable(GL_MULTISAMPLE);
 		}
 
