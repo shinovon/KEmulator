@@ -32,7 +32,7 @@ public final class KeyMapping {
 		if ((int1 = Integer.parseInt(s)) < 32 || int1 > 122) {
 			return s2;
 		}
-		return new String(new char[]{(char) int1}).toUpperCase();
+		return String.valueOf((char) int1).toUpperCase();
 	}
 
 	public static String method601(final String s) {
@@ -46,7 +46,7 @@ public final class KeyMapping {
 				break;
 			}
 		}
-		if (value == "80") {
+		if ("80".equals(value)) {
 			value = "13";
 		}
 		if (value == null && s.length() == 1) {
@@ -143,12 +143,14 @@ public final class KeyMapping {
 
 	public static boolean isLeftSoft(final int n) {
 		if (KeyMapping.deviceKeycodes[17].isEmpty()) return false;
-		return Integer.parseInt(replaceKey(Integer.parseInt(KeyMapping.deviceKeycodes[17]))) == n;
+		String s = replaceKey(Integer.parseInt(KeyMapping.deviceKeycodes[17]));
+		return s != null && Integer.parseInt(s) == n;
 	}
 
 	public static boolean isRightSoft(final int n) {
 		if (KeyMapping.deviceKeycodes[18].isEmpty()) return false;
-		return Integer.parseInt(replaceKey(Integer.parseInt(KeyMapping.deviceKeycodes[18]))) == n;
+		String s = replaceKey(Integer.parseInt(KeyMapping.deviceKeycodes[18]));
+		return s != null && Integer.parseInt(s) == n;
 	}
 
 	public static int soft1() {
@@ -246,10 +248,10 @@ public final class KeyMapping {
 			return;
 		}
 		final String[] split = s.split(";");
-		for (int i = 0; i < split.length; ++i) {
-			final String[] split2 = split[i].split("=");
-			KeyMapping.aHashtable1067.put(split2[0], split2[1]);
-		}
+        for (String string : split) {
+            final String[] split2 = string.split("=");
+            KeyMapping.aHashtable1067.put(split2[0], split2[1]);
+        }
 	}
 
 	static {

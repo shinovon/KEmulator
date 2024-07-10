@@ -54,11 +54,11 @@ public class Graphics3D {
 		impl.enableDepthBuffer(depthBuffer);
 
 		if (Graphics3D.target != null) {
-			throw new IllegalStateException();
+			throw new IllegalStateException("Target already bound");
 		} else if (target == null) {
-			throw new NullPointerException();
+			throw new NullPointerException("target");
 		} else if (hints != 0 && (hints & (ANTIALIAS | DITHER | OVERWRITE | TRUE_COLOR)) == 0) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("hints");
 		}
 
 		boolean overwrite = !Settings.m3gIgnoreOverwrite && (hints & OVERWRITE) != 0;
@@ -110,7 +110,7 @@ public class Graphics3D {
 				bck.setCrop(viewportX, viewportY, viewportWidth, viewportHeight);
 			}
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Unsupported target type");
 		}
 
 		if (Graphics3D.target != null) {

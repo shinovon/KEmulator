@@ -73,18 +73,21 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void keyPress(int n) {
+		if (n == 10000) return;
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {0, n, 0, 1});
 		} else input.queue(0, n, 0, true);
 	}
 
 	public void keyRelease(int n) {
+		if (n == 10000) return;
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {1, n, 0, 1});
 		} else input.queue(1, n, 0, true);
 	}
 
 	public void keyRepeat(int n) {
+		if (n == 10000) return;
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {2, n, 0, 1});
 		} else input.queue(2, n, 0, true);

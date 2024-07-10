@@ -7,7 +7,7 @@ import net.java.games.input.*;
 import javax.microedition.lcdui.Canvas;
 
 public class Controllers {
-	private static ArrayList controllers = new ArrayList();
+	private static final ArrayList controllers = new ArrayList();
 	private static int count;
 	private static boolean loaded;
 	private static String[][] binds;
@@ -119,8 +119,9 @@ public class Controllers {
 	}
 
 	private static int map(int n, String s) {
-		int n2;
-		for (n2 = 0; n2 < 19 && !s.equalsIgnoreCase(Controllers.binds[n][n2]); ++n2) ;
+		int n2 = 0;
+		while (n2 < 19 && !s.equalsIgnoreCase(Controllers.binds[n][n2]))
+			++n2;
 		if (n2 == 19) {
 			return 10000;
 		}
@@ -128,7 +129,8 @@ public class Controllers {
 	}
 
 	private static int method747(String s) {
-		return Integer.parseInt(KeyMapping.replaceKey(Integer.parseInt(s)));
+		if ((s = KeyMapping.replaceKey(Integer.parseInt(s))) == null) return 10000;
+		return Integer.parseInt(s);
 	}
 
 	private static boolean method748(String aString1292) {
@@ -165,10 +167,7 @@ public class Controllers {
 	}
 
 	public static void poll() {
-		if (!Controllers.loaded) {
-			return;
-		}
-		if (Controllers.count == 0) {
+		if (!Controllers.loaded || Controllers.count == 0) {
 			return;
 		}
 		for (int i = 0; i < Controllers.count; ++i) {
