@@ -299,6 +299,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button securityCheck;
 	private Composite securityContent;
 	private Tree rmsTree;
+	private Button forceServicePaintCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -961,6 +962,7 @@ public final class Property implements IProperty, SelectionListener {
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
+		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
 
 		String sysProps = propsText.getText();
 		Settings.systemProperties.clear();
@@ -1740,25 +1742,34 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aButton724 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
 		this.aButton724.setLayoutData(gridData);
 		this.aButton724.setSelection(Settings.enableVibration);
+		// автор подсказок - twospaces TODO: localize
+		aButton724.setToolTipText("Shakes the window during vibration");
+
 		(this.aButton728 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_KEY_REPEAT", "Enable Canvas.keyRepeated(int)."));
 		this.aButton728.setLayoutData(gridData);
 		this.aButton728.setSelection(Settings.enableKeyRepeat);
+		aButton728.setToolTipText("Enables key repeats");
+
 		(this.aButton732 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
 		this.aButton732.setLayoutData(gridData);
 		this.aButton732.setSelection(Settings.ignoreFullScreen);
+		aButton732.setToolTipText("Forces full screen mode");
 
 		(this.synchronizeKeyEventsCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
 		this.synchronizeKeyEventsCheck.setLayoutData(gridData);
 		this.synchronizeKeyEventsCheck.setSelection(Settings.synchronizeKeyEvents);
+		synchronizeKeyEventsCheck.setToolTipText("Compatibility option");
 
 		(this.softkeyMotFixCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
 		this.softkeyMotFixCheck.setLayoutData(gridData);
 		this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
+		softkeyMotFixCheck.setToolTipText("Compatibility tweak for certain Motorola Triplets games");
 
 		ignoreRegionRepaintCheck = new Button(coreApiGroup, SWT.CHECK);
 		ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
 		ignoreRegionRepaintCheck.setLayoutData(gridData);
 		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
+		ignoreRegionRepaintCheck.setToolTipText("Compatibility tweak for Opera Mini (breaks Fantasy Zone: Part 1)");
 
 		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
 		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
@@ -1769,6 +1780,13 @@ public final class Property implements IProperty, SelectionListener {
 		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
 		keyPressOnRepeatCheck.setLayoutData(gridData);
 		keyPressOnRepeatCheck.setSelection(Settings.keyPressOnRepeat);
+		keyPressOnRepeatCheck.setToolTipText("Compatibility tweak for The Elder Scrolls: Oblivion");
+
+		forceServicePaintCheck = new Button(coreApiGroup, SWT.CHECK);
+		forceServicePaintCheck.setText(UILocale.get("OPTION_COREAPI_FORCE_SERVICE_REPAINTS", "Force paint on serviceRepaints()"));
+		forceServicePaintCheck.setLayoutData(gridData);
+		forceServicePaintCheck.setSelection(Settings.forcePaintOnServiceRepaints);
+		forceServicePaintCheck.setToolTipText("Compatibility tweak for games by SEGA China (breaks other games)");
 	}
 
 	private void setupDisableApiComp() {
