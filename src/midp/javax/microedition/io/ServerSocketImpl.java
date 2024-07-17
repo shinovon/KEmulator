@@ -21,7 +21,7 @@ class ServerSocketImpl implements ServerSocketConnection {
 
 	@Override
 	public StreamConnection acceptAndOpen() throws IOException {
-		return new StreamConnectionImpl(socket.accept());
+		return new SocketConnectionImpl(socket.accept());
 	}
 
 	@Override

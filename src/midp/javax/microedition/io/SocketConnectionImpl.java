@@ -15,6 +15,10 @@ final class SocketConnectionImpl implements SocketConnection
 		final int n2 = s.lastIndexOf(":") + 1;
 		socket = new Socket(s.substring(n, n2 - 1), Integer.parseInt(s.substring(n2)));
 	}
+
+	public SocketConnectionImpl(Socket socket) throws IOException {
+		this.socket = socket;
+	}
 	
 	public final String getAddress() throws IOException {
 		return socket.getInetAddress().getHostAddress();
