@@ -22,6 +22,7 @@ public final class SecondaryWindow {
         awtCanvas.addMouseListener(awtCanvas);
         awtCanvas.addComponentListener(awtCanvas);
         awtCanvas.addMouseMotionListener(awtCanvas);
+        awtCanvas.setDoubleBuffered(true);
         frame.add(awtCanvas);
         frame.setBounds(100, 100, w, h);
     }
@@ -73,9 +74,9 @@ public final class SecondaryWindow {
         }
     }
 
-    private class CanvasImpl extends java.awt.Canvas implements KeyListener, MouseListener, MouseMotionListener, ComponentListener {
+    private class CanvasImpl extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ComponentListener {
 
-        public void paint(java.awt.Graphics g) {
+        public void paintComponent(java.awt.Graphics g) {
             if (screenBuffer == null ||
                     screenBuffer.getWidth() != getWidth() ||
                     screenBuffer.getHeight() != getHeight())
