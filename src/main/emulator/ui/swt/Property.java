@@ -77,6 +77,7 @@ public final class Property implements IProperty, SelectionListener {
 			{"Pigler Notifications", "org.pigler"},
 			{"KEmulator Notifications (Deprecated)", "ru.nnproject.kemulator.notificationapi"},
 			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
+			{"KEmulator Window API", "ru.nnproject.kemulator.windowapi"},
 			{"KEmulator", "kemulator"}, // проприетарные пропы по типу kemulator.version
 	};
 

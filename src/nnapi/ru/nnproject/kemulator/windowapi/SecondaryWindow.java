@@ -11,23 +11,23 @@ import java.awt.image.BufferedImage;
 public final class SecondaryWindow {
 
     JFrame frame;
-    CanvasImpl awtCanvas;
+    CanvasImpl canvas;
     Canvas listener;
     private ImageAWT screenBuffer;
 
     private SecondaryWindow(String title, int w, int h) {
         frame = new JFrame();
         frame.setTitle(title);
-        awtCanvas = new CanvasImpl();
-        awtCanvas.addKeyListener(awtCanvas);
-        awtCanvas.addMouseListener(awtCanvas);
-        awtCanvas.addComponentListener(awtCanvas);
-        awtCanvas.addMouseMotionListener(awtCanvas);
-        awtCanvas.setDoubleBuffered(true);
-        frame.add(awtCanvas);
-        frame.addWindowListener(awtCanvas);
+        canvas = new CanvasImpl();
+        canvas.addKeyListener(canvas);
+        canvas.addMouseListener(canvas);
+        canvas.addComponentListener(canvas);
+        canvas.addMouseMotionListener(canvas);
+        canvas.setDoubleBuffered(true);
+        frame.add(canvas);
+        frame.addWindowListener(canvas);
         frame.setBounds(100, 100, w, h);
-        awtCanvas.setPreferredSize(new Dimension(w, h));
+        canvas.setPreferredSize(new Dimension(w, h));
         frame.pack();
     }
 
@@ -37,11 +37,11 @@ public final class SecondaryWindow {
     }
 
     public int getWidth() {
-        return awtCanvas.getWidth();
+        return canvas.getWidth();
     }
 
     public int getHeight() {
-        return awtCanvas.getHeight();
+        return canvas.getHeight();
     }
 
     public void setBounds(int x, int y, int w, int h) {
@@ -49,7 +49,7 @@ public final class SecondaryWindow {
     }
 
     public void setSize(int w, int h) {
-        awtCanvas.setPreferredSize(new Dimension(w, h));
+        canvas.setPreferredSize(new Dimension(w, h));
         frame.pack();
     }
 
@@ -75,7 +75,7 @@ public final class SecondaryWindow {
     }
 
     public void repaint() {
-        awtCanvas.repaint();
+        canvas.repaint();
     }
 
     // paint(graphics), key events, pointer events, sizeChanged
@@ -83,7 +83,7 @@ public final class SecondaryWindow {
         this.listener = c;
         if (c != null) {
             c.setFullScreenMode(true);
-            awtCanvas.repaint();
+            canvas.repaint();
         }
     }
 
