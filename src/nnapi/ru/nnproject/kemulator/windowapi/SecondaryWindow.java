@@ -24,6 +24,7 @@ public final class SecondaryWindow {
         awtCanvas.addMouseMotionListener(awtCanvas);
         awtCanvas.setDoubleBuffered(true);
         frame.add(awtCanvas);
+        frame.addWindowListener(awtCanvas);
         frame.setBounds(100, 100, w, h);
     }
 
@@ -74,7 +75,7 @@ public final class SecondaryWindow {
         }
     }
 
-    private class CanvasImpl extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ComponentListener {
+    private class CanvasImpl extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ComponentListener, WindowListener {
 
         public void paintComponent(java.awt.Graphics g) {
             if (screenBuffer == null ||
@@ -123,11 +124,9 @@ public final class SecondaryWindow {
         }
 
         public void componentShown(ComponentEvent e) {
-            if (listener != null) listener.invokeShowNotify();
         }
 
         public void componentHidden(ComponentEvent e) {
-            if (listener != null) listener.invokeHideNotify();
         }
 
         public void mouseDragged(MouseEvent e) {
@@ -136,6 +135,33 @@ public final class SecondaryWindow {
 
         public void mouseMoved(MouseEvent e) {
             if (listener != null) listener.invokePointerDragged(e.getX(), e.getY());
+        }
+
+        public void windowOpened(WindowEvent e) {
+            if (listener != null) listener.invokeShowNotify();
+        }
+
+        public void windowClosing(WindowEvent e) {
+            if (listener != null) listener.invokeHideNotify();
+        }
+
+        public void windowClosed(WindowEvent e) {
+        }
+
+        public void windowIconified(WindowEvent e) {
+
+        }
+
+        public void windowDeiconified(WindowEvent e) {
+
+        }
+
+        public void windowActivated(WindowEvent e) {
+
+        }
+
+        public void windowDeactivated(WindowEvent e) {
+
         }
     }
 
