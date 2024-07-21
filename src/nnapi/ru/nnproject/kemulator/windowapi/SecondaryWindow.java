@@ -4,6 +4,7 @@ import emulator.graphics2D.awt.ImageAWT;
 
 import javax.microedition.lcdui.Canvas;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
@@ -26,6 +27,8 @@ public final class SecondaryWindow {
         frame.add(awtCanvas);
         frame.addWindowListener(awtCanvas);
         frame.setBounds(100, 100, w, h);
+        awtCanvas.setPreferredSize(new Dimension(w, h));
+        frame.pack();
     }
 
     // hidden, resizable by default
@@ -43,6 +46,15 @@ public final class SecondaryWindow {
 
     public void setBounds(int x, int y, int w, int h) {
         frame.setBounds(x, y, w, h);
+    }
+
+    public void setSize(int w, int h) {
+        awtCanvas.setPreferredSize(new Dimension(w, h));
+        frame.pack();
+    }
+
+    public void setLocation(int x, int y) {
+        frame.setLocation(x, y);
     }
 
     public void setResizable(boolean b) {
