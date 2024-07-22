@@ -37,6 +37,7 @@ public final class EventQueue implements Runnable {
 	private int[][] inputs;
 	private int inputsCount;
 	private boolean screen;
+	private long lastRepaint;
 
 	public EventQueue() {
 		events = new int[128];
@@ -254,6 +255,8 @@ public final class EventQueue implements Runnable {
 		}
 
 		if (t == eventThread || t == inputThread || Settings.forcePaintOnServiceRepaints) {
+			// harry potter deathly hallows fix
+			if (System.currentTimeMillis() - lastRepaint < 3) return;
 			synchronized (lock) {
 				internalRepaint();
 			}
@@ -471,6 +474,7 @@ public final class EventQueue implements Runnable {
 				repaintLock.notifyAll();
 			}
 		} catch (Exception ignored) {}
+		lastRepaint = System.currentTimeMillis();
 		repainted = true;
 	}
 
