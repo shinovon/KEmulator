@@ -5,6 +5,11 @@ import net.rim.device.api.ui.UiApplication;
 public class Application {
 	private static Application instance = null;
 	private KeyListener keyListener = null;
+	private boolean keyUpEvents = true;
+	private TrackwheelListener trackwheelListener;
+	private SystemListener systemListener;
+	private GlobalEventListener globalEventListener;
+	private HolsterListener holsterListener;
 
 	public static Application getApplication() {
 		if (instance == null) {
@@ -22,6 +27,26 @@ public class Application {
 
 	public void addKeyListener(KeyListener paramKeyListener) {
 		this.keyListener = paramKeyListener;
+	}
+
+	public void enableKeyUpEvents(boolean b) {
+		this.keyUpEvents = b;
+	}
+
+	public void addTrackwheelListener(TrackwheelListener l) {
+		this.trackwheelListener = l;
+	}
+
+	public void addSystemListener(SystemListener l) {
+		this.systemListener = l;
+	}
+
+	public void addGlobalEventListener(GlobalEventListener l) {
+		this.globalEventListener = l;
+	}
+
+	public void addHolsterListener(HolsterListener l) {
+		this.holsterListener = l;
 	}
 
 	public static int internalKeyPress(int paramInt) {
@@ -61,9 +86,13 @@ public class Application {
 	}
 
 	public static int internalKeyRelease(int paramInt) {
-		if ((instance != null) && (instance.keyListener != null)) {
+		if (instance != null && instance.keyUpEvents && instance.keyListener != null) {
 			instance.keyListener.keyUp(paramInt, 0);
 		}
 		return paramInt;
+	}
+
+	public boolean isForeground() {
+		return true;
 	}
 }

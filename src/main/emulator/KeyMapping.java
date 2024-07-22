@@ -14,10 +14,6 @@ public final class KeyMapping {
 	public static Stack keyCacheStack;
 	public static String[] deviceKeycodes;
 
-	public KeyMapping() {
-		super();
-	}
-
 	public static String get(final int n) {
 		return keyToString(KeyMapping.deviceKeycodes[n]);
 	}
