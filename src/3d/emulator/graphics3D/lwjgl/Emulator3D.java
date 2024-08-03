@@ -297,7 +297,7 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	private void releaseContext() {
-		try {
+		if (swtGC != null) try {
 			Emulator.getPlatform().releaseGLContext(this.swtGC.handle);
 		} catch (Throwable ignored) {}
 		if (useDisplay) {
@@ -1047,9 +1047,9 @@ public final class Emulator3D implements IGraphics3D {
 				GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
 				GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 			}
-
 			for (int i = 0; i < stripCount; ++i) {
 				int[] indexStrip = triangleStripArray.getIndexStrip(i);
+				Profiler3D.LWJGL_trianglesCount += indexStrip.length - 2;
 				GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
 			}
 
@@ -1075,12 +1075,13 @@ public final class Emulator3D implements IGraphics3D {
 			}
 		}
 
-		int err = GL11.glGetError();
-		if (err != GL11.GL_NO_ERROR) {
-			Emulator.getEmulator().getLogStream().println("GL Error: " + err + " " + Util.translateGLErrorString(err));
-		}
+//		int err = GL11.glGetError();
+//		if (err != GL11.GL_NO_ERROR) {
+//			Emulator.getEmulator().getLogStream().println("GL Error: " + err + " " + Util.translateGLErrorString(err));
+//		}
 		if (exiting) {
-			releaseTarget();
+			releaseContext();
+			throw new IllegalStateException("exiting");
 		}
 	}
 
@@ -1333,7 +1334,8 @@ public final class Emulator3D implements IGraphics3D {
 				try {
 					Display.makeCurrent();
 					inst.releaseTextures();
-					Display.destroy();
+					Display.releaseContext();
+//					Display.destroy();
 				} catch (Exception ignored) {}
 				return;
 			}
