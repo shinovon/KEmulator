@@ -817,6 +817,7 @@ public final class Emulator3D implements IGraphics3D {
 			}
 		} else {
 			GL11.glDisable(GL_LIGHTING);
+			GL11.glDisable(GL_COLOR_MATERIAL);
 		}
 	}
 
@@ -862,7 +863,7 @@ public final class Emulator3D implements IGraphics3D {
 		VertexArray normals = vb.getNormals();
 		if (normals != null && ap.getMaterial() != null) {
 			GL11.glEnableClientState(GL_NORMAL_ARRAY);
-			glEnable(GL_NORMALIZE);
+//			glEnable(GL_NORMALIZE);
 			if (normals.getComponentType() == 1) {
 				GL11.glNormalPointer(0, memoryBuffers.getNormalBuffer(normals.getByteValues()));
 			} else {
