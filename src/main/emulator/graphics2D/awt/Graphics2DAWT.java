@@ -44,7 +44,7 @@ public final class Graphics2DAWT implements IGraphics2D {
 	}
 
 	public final void drawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		g.drawArc(n, n2, n3 + 1, n4 + 1, n5, n6);
+		g.drawArc(n, n2, n3, n4, n5, n6);
 	}
 
 	public final void drawLine(final int n, final int n2, final int n3, final int n4) {
