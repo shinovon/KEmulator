@@ -115,4 +115,5 @@ public final class Settings {
 
 	public static boolean enableSecurity = true;
 	public static boolean ignoreServiceRepaints;
+	public static boolean dontRepaintOnSetCurrent;
 }
