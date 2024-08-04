@@ -21,8 +21,8 @@ public class Image2D extends Object3D {
 	private static byte[] tmp;
 	public boolean loaded;
 	private int id;
-	private ByteBuffer buffer;
-	private int size;
+//	private ByteBuffer buffer;
+//	private int size;
 
 	public Image2D(int var1, Object var2) {
 		if (var2 == null) {
@@ -36,7 +36,7 @@ public class Image2D extends Object3D {
 			this.mutable = false;
 			this.type = var1;
 			this.imageData = convert(var1, var3.getImpl().getData(), var3.isMutable());
-			allocateBuffer(imageData.length);
+//			allocateBuffer(imageData.length);
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -56,7 +56,7 @@ public class Image2D extends Object3D {
 				this.type = var1;
 				this.imageData = new byte[var5];
 				System.arraycopy(var4, 0, this.imageData, 0, var5);
-				allocateBuffer(var5);
+//				allocateBuffer(var5);
 			}
 		} else {
 			throw new IllegalArgumentException();
@@ -80,8 +80,7 @@ public class Image2D extends Object3D {
 					for (int var8 = 0; var8 < var6; ++var8) {
 						System.arraycopy(var5, (var4[var8] & 255) * var7, this.imageData, var8 * var7, var7);
 					}
-					allocateBuffer(imageData.length);
-
+//					allocateBuffer(imageData.length);
 				}
 			} else {
 				throw new IllegalArgumentException();
@@ -111,7 +110,7 @@ public class Image2D extends Object3D {
 			for (var5 = 0; var5 < var3; ++var5) {
 				System.arraycopy(tmp, 0, this.imageData, var5 * var4, var4);
 			}
-			allocateBuffer(imageData.length);
+//			allocateBuffer(imageData.length);
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -176,11 +175,11 @@ public class Image2D extends Object3D {
 	}
 
 	public final byte[] getImageData() {
-		if (buffer != null) {
-			buffer.position(buffer.capacity() - size);
-			byte[] t = new byte[size];
-			buffer.get(t);
-		}
+//		if (buffer != null) {
+//			buffer.position(buffer.capacity() - size);
+//			byte[] t = new byte[size];
+//			buffer.get(t);
+//		}
 		return this.imageData;
 	}
 
@@ -281,11 +280,10 @@ public class Image2D extends Object3D {
 	}
 
 	protected Object3D duplicateObject() {
-		System.out.println("duplicate!!!");
 		Image2D var1 = (Image2D) super.duplicateObject();
-//		var1.imageData = (byte[]) this.imageData.clone();
-		var1.imageData = getImageData();
-		var1.allocateBuffer(size);
+		var1.imageData = (byte[]) this.imageData.clone();
+//		var1.imageData = getImageData();
+//		var1.allocateBuffer(size);
 		return var1;
 	}
 
@@ -314,7 +312,7 @@ public class Image2D extends Object3D {
 
 	public int size() {
 		// TODO
-		if (buffer != null) return buffer.capacity();
+//		if (buffer != null) return buffer.capacity();
 		return imageData.length;
 	}
 
@@ -333,16 +331,16 @@ public class Image2D extends Object3D {
 	void setRGB(IImage image) {
 		int[] data = image.getData();
 		int l = data.length;
-		if (buffer != null) {
-			buffer.position(buffer.capacity() - (l * 3));
-			for (int var5 = l - 1; var5 >= 0; --var5) {
-				buffer.put((byte) (data[var5] >> 16 & 255));
-				buffer.put((byte) (data[var5] >> 8 & 255));
-				buffer.put((byte) (data[var5] & 255));
-			}
-			((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);
-			return;
-		}
+//		if (buffer != null) {
+//			buffer.position(buffer.capacity() - (l * 3));
+//			for (int var5 = l - 1; var5 >= 0; --var5) {
+//				buffer.put((byte) (data[var5] >> 16 & 255));
+//				buffer.put((byte) (data[var5] >> 8 & 255));
+//				buffer.put((byte) (data[var5] & 255));
+//			}
+//			((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);
+//			return;
+//		}
 		if (imageData == null || imageData.length != l * 3)
 			imageData = new byte[l * 3];
 		byte[] var3 = imageData;
@@ -352,25 +350,25 @@ public class Image2D extends Object3D {
 			var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
 			var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
 		}
-		allocateBuffer(imageData.length);
+//		allocateBuffer(imageData.length);
 		((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);
 	}
 
-	public ByteBuffer getBuffer() {
-		buffer.position(buffer.capacity() - size);
-		return buffer;
-	}
-
-	private void allocateBuffer(int size) {
-		if (buffer == null || buffer.capacity() < size) {
-			buffer = ByteBuffer.allocateDirect((size * 4 / 3) << 2)
-					.order(ByteOrder.nativeOrder());
-		}
-		buffer.position(buffer.capacity() - size);
-		this.size = size;
-		if (imageData != null) {
-			buffer.put(imageData);
-			imageData = null;
-		}
-	}
+//	public ByteBuffer getBuffer() {
+//		buffer.position(buffer.capacity() - size);
+//		return buffer;
+//	}
+//
+//	private void allocateBuffer(int size) {
+//		if (buffer == null || buffer.capacity() < size) {
+//			buffer = ByteBuffer.allocateDirect((size * 4 / 3) << 2)
+//					.order(ByteOrder.nativeOrder());
+//		}
+//		buffer.position(buffer.capacity() - size);
+//		this.size = size;
+//		if (imageData != null) {
+//			buffer.put(imageData);
+//			imageData = null;
+//		}
+//	}
 }

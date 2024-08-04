@@ -546,8 +546,8 @@ public final class Emulator3D implements IGraphics3D {
 		GL11.glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 
 		GL11.glPixelZoom(imgScaleX, -imgScaleY);
-//		ByteBuffer imgBuffer = memoryBuffers.getImageBuffer(bg.getImage().getImageData());
-		ByteBuffer imgBuffer = bg.getImage().getBuffer();
+		ByteBuffer imgBuffer = memoryBuffers.getImageBuffer(bg.getImage().getImageData());
+//		ByteBuffer imgBuffer = bg.getImage().getBuffer();
 
 		for (int y = 0; y < repeatsY; y++) {
 			for (int x = 0; x < repeatsX; x++) {
@@ -978,8 +978,8 @@ public final class Emulator3D implements IGraphics3D {
 					GL11.glTexImage2D(GL_TEXTURE_2D, 0,
 							texFormat, image2D.getWidth(), image2D.getHeight(), 0,
 							texFormat, GL_UNSIGNED_BYTE,
-//							memoryBuffers.getImageBuffer(image2D.getImageData())
-							image2D.getBuffer()
+							memoryBuffers.getImageBuffer(image2D.getImageData())
+//							image2D.getBuffer()
 					);
 				}
 
@@ -1122,7 +1122,7 @@ public final class Emulator3D implements IGraphics3D {
 		MeshMorph.getInstance().clearCache();
 	}
 
-	private void renderSprite(Sprite3D var1, Transform var2, float alphaFactor) {
+	private void renderSprite(Sprite3D sprite, Transform var2, float alphaFactor) {
 		Profiler3D.LWJGL_renderSpriteCount++;
 
 		float[] var3 = new float[]{0.0F, 0.0F, 0.0F, 1.0F};
@@ -1156,9 +1156,9 @@ public final class Emulator3D implements IGraphics3D {
 			Vector4f.mul(var9, 1.0F / var9[3]);
 			Vector4f.sub(var8, var7);
 			Vector4f.sub(var9, var7);
-			boolean var11 = var1.isScaled();
+			boolean var11 = sprite.isScaled();
 			int[] var12;
-			boolean var13 = (var12 = new int[]{var1.getCropX(), var1.getCropY(), var1.getCropWidth(), var1.getCropHeight()})[2] < 0;
+			boolean var13 = (var12 = new int[]{sprite.getCropX(), sprite.getCropY(), sprite.getCropWidth(), sprite.getCropHeight()})[2] < 0;
 			boolean var14 = var12[3] < 0;
 			var12[2] = Math.abs(var12[2]);
 			var12[3] = Math.abs(var12[3]);
@@ -1199,7 +1199,7 @@ public final class Emulator3D implements IGraphics3D {
 			}
 
 			int[] var21 = new int[4];
-			if (G3DUtils.intersectRectangle(var12[0], var12[1], var12[2], var12[3], 0, 0, var1.getImage().getWidth(), var1.getImage().getHeight(), var21)) {
+			if (G3DUtils.intersectRectangle(var12[0], var12[1], var12[2], var12[3], 0, 0, sprite.getImage().getWidth(), sprite.getImage().getHeight(), var21)) {
 				float var10000;
 				label96:
 				{
@@ -1251,16 +1251,17 @@ public final class Emulator3D implements IGraphics3D {
 					GL11.glMatrixMode(5888);
 					GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
 					GL11.glDisable(2896);
-					var27 = var1.getImage().getBuffer();
+//					var27 = sprite.getImage().getBuffer();
+					var27 = memoryBuffers.getImageBuffer(sprite.getImage().getImageData());
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
-					GL11.glPixelStorei(3314, var1.getImage().getWidth());
+					GL11.glPixelStorei(3314, sprite.getImage().getWidth());
 					GL11.glPixelStorei(3315, var21[1]);
 					GL11.glPixelStorei(3316, var21[0]);
 					GL11.glBitmap(0, 0, 0.0F, 0.0F, var17, var18, var27);
 					GL11.glPixelZoom(var15, -var16);
 					var28 = 6407;
 					short var29;
-					switch (var1.getImage().getFormat()) {
+					switch (sprite.getImage().getFormat()) {
 						case 96:
 							var29 = 6406;
 							break;
@@ -1283,7 +1284,7 @@ public final class Emulator3D implements IGraphics3D {
 					var28 = var29;
 				}
 
-				this.setupAppearance(var1.getAppearance(), true);
+				this.setupAppearance(sprite.getAppearance(), true);
 				GL11.glColor4ub((byte) 255, (byte) 255, (byte) 255, (byte) (255 * alphaFactor));
 				GL11.glDisableClientState(GL_COLOR_ARRAY);
 
