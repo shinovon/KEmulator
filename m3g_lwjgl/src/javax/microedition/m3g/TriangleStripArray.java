@@ -5,7 +5,7 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 public class TriangleStripArray extends IndexBuffer {
-	private int[] indexStrip;
+	private int[] stripLengths;
 	private IntBuffer buffer;
 
 	public TriangleStripArray(int firstIndex, int[] stripLengths) {
@@ -33,10 +33,9 @@ public class TriangleStripArray extends IndexBuffer {
 			for (int i = 0; i < sumStripLengths; ++i) {
 				super.indices[i] = firstIndex + i;
 			}
-
-			indexStrip = new int[stripLengths.length];
-			System.arraycopy(stripLengths, 0, indexStrip, 0, stripLengths.length);
-			allocateBuffer(indices.length).put(indices);
+			this.stripLengths = new int[stripLengths.length];
+			System.arraycopy(stripLengths, 0, this.stripLengths, 0, stripLengths.length);
+			copyToNative();
 		}
 	}
 
@@ -69,34 +68,34 @@ public class TriangleStripArray extends IndexBuffer {
 
 		super.indices = new int[sumStripLengths];
 		System.arraycopy(indices, 0, super.indices, 0, sumStripLengths);
-		indexStrip = new int[stripLengths.length];
-		System.arraycopy(stripLengths, 0, indexStrip, 0, stripLengths.length);
-		allocateBuffer(indices.length).put(indices);
+		this.stripLengths = new int[stripLengths.length];
+		System.arraycopy(stripLengths, 0, this.stripLengths, 0, stripLengths.length);
+		copyToNative();
 	}
 
 	protected Object3D duplicateObject() {
 		TriangleStripArray clone = (TriangleStripArray) super.duplicateObject();
 		clone.indices = (int[]) super.indices.clone();
-		clone.indexStrip = (int[]) indexStrip.clone();
+		clone.stripLengths = (int[]) stripLengths.clone();
 
 		return clone;
 	}
 
 	public int getStripCount() {
-		return indexStrip.length;
+		return stripLengths.length;
 	}
 
 	public int[] getIndexStrip(int index) {
-		if (index >= 0 && index < indexStrip.length) {
+		if (index >= 0 && index < stripLengths.length) {
 			int sumStripLengths = 0;
 
 			for (int i = 0; i < index; ++i) {
-				sumStripLengths += indexStrip[i];
+				sumStripLengths += stripLengths[i];
 			}
 
-			int[] resIndexStrip = new int[indexStrip[index]];
-			if (this.indexStrip != null) {
-				System.arraycopy(super.indices, sumStripLengths, resIndexStrip, 0, indexStrip[index]);
+			int[] resIndexStrip = new int[stripLengths[index]];
+			if (this.stripLengths != null) {
+				System.arraycopy(super.indices, sumStripLengths, resIndexStrip, 0, stripLengths[index]);
 			}
 
 			return resIndexStrip;
@@ -105,27 +104,16 @@ public class TriangleStripArray extends IndexBuffer {
 		}
 	}
 
-	public IntBuffer getBuffer(int index) {
-		if (index >= 0 && index < indexStrip.length) {
-			int sumStripLengths = 0;
-
-			for (int i = 0; i < index; ++i) {
-				sumStripLengths += indexStrip[i];
-			}
-
-			buffer.position(sumStripLengths);
-			buffer.limit(sumStripLengths + indexStrip[index]);
-			return buffer;
-		} else {
-			return null;
-		}
+	public IntBuffer getBuffer() {
+		buffer.position(0);
+		return buffer;
 	}
 
 	protected boolean getIndices(int index, int[] indices) {
 		int index2 = 0;
 
-		for (int i = 0; i < indexStrip.length; ++i) {
-			if (index < indexStrip[i] - 2) {
+		for (int i = 0; i < stripLengths.length; ++i) {
+			if (index < stripLengths[i] - 2) {
 				indices[0] = super.indices[index2 + index + 0];
 				indices[1] = super.indices[index2 + index + 1];
 				indices[2] = super.indices[index2 + index + 2];
@@ -134,21 +122,53 @@ public class TriangleStripArray extends IndexBuffer {
 				return true;
 			}
 
-			index -= indexStrip[i] - 2;
-			index2 += indexStrip[i];
+			index -= stripLengths[i] - 2;
+			index2 += stripLengths[i];
 		}
 
 		return false;
 	}
 
+	private void copyToNative() {
+		int joinedIndexCount = 0;
+
+		int stripCount = stripLengths.length;
+		int strip;
+		for (strip = 0; strip < stripCount; ++strip) {
+			if (strip != 0) {
+				joinedIndexCount += ((joinedIndexCount & 1) != 0) ? 3 : 2;
+			}
+
+			joinedIndexCount += stripLengths[strip];
+		}
+		allocateBuffer(joinedIndexCount);
+		int src = 0;
+		for (strip = 0; strip < stripCount; ++strip) {
+
+			if (strip != 0) {
+				buffer.put(indices[src - 1]);
+				buffer.put(indices[src]);
+				if ((stripLengths[strip - 1] & 1) != 0) {
+					buffer.put(src);
+				}
+			}
+			for (int i = 0; i < stripLengths[strip]; ++i) {
+				buffer.put(indices[src++]);
+			}
+		}
+		if (buffer.remaining() > 0) {
+			throw new IllegalArgumentException("a " + buffer.remaining());
+		}
+	}
+
 	private IntBuffer allocateBuffer(int size) {
-		buffer = ByteBuffer.allocateDirect((size * 4 / 3) << 2)
+		buffer = ByteBuffer.allocateDirect(size << 2)
 				.order(ByteOrder.nativeOrder()).asIntBuffer();
 		buffer.position(0);
 		return buffer;
 	}
 
 	public int profilerCount() {
-		return indices.length - indexStrip.length * 2;
+		return indices.length - stripLengths.length * 2;
 	}
 }

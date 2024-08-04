@@ -1050,9 +1050,7 @@ public final class Emulator3D implements IGraphics3D {
 				GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 			}
 			Profiler3D.LWJGL_trianglesCount += triangleStripArray.profilerCount();
-			for (int i = 0; i < stripCount; ++i) {
-				GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer(i));
-			}
+			GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer());
 
 			for (int i = 0; i < NumTextureUnits; ++i) {
 				Texture2D tex = ap.getTexture(i);
@@ -1070,9 +1068,7 @@ public final class Emulator3D implements IGraphics3D {
 			}
 		} else {
 			//xray
-			for (int i = 0; i < stripCount; ++i) {
-				GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer(i));
-			}
+			GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer());
 		}
 
 //		int err = GL11.glGetError();

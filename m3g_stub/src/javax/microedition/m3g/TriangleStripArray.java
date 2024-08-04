@@ -31,7 +31,7 @@ public class TriangleStripArray
         return null;
     }
 
-    public IntBuffer getBuffer(int i) {
+    public IntBuffer getBuffer() {
         return null;
     }
 
