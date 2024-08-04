@@ -147,4 +147,8 @@ public class TriangleStripArray extends IndexBuffer {
 		buffer.position(0);
 		return buffer;
 	}
+
+	public int profilerCount() {
+		return indices.length - indexStrip.length * 2;
+	}
 }

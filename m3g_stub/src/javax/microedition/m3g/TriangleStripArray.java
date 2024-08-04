@@ -34,4 +34,8 @@ public class TriangleStripArray
     public IntBuffer getBuffer(int i) {
         return null;
     }
+
+    public int profilerCount() {
+        return 0;
+    }
 }

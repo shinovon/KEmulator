@@ -1049,10 +1049,8 @@ public final class Emulator3D implements IGraphics3D {
 				GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
 				GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 			}
+			Profiler3D.LWJGL_trianglesCount += triangleStripArray.profilerCount();
 			for (int i = 0; i < stripCount; ++i) {
-//				int[] indexStrip = triangleStripArray.getIndexStrip(i);
-//				Profiler3D.LWJGL_trianglesCount += indexStrip.length - 2;
-//				GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
 				GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer(i));
 			}
 
@@ -1073,8 +1071,7 @@ public final class Emulator3D implements IGraphics3D {
 		} else {
 			//xray
 			for (int i = 0; i < stripCount; ++i) {
-				int[] indexStrip = triangleStripArray.getIndexStrip(i);
-				GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
+				GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer(i));
 			}
 		}
 
