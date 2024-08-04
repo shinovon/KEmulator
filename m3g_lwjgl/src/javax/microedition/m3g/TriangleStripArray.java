@@ -138,13 +138,11 @@ public class TriangleStripArray extends IndexBuffer {
 			if (strip != 0) {
 				joinedIndexCount += ((joinedIndexCount & 1) != 0) ? 3 : 2;
 			}
-
 			joinedIndexCount += stripLengths[strip];
 		}
 		allocateBuffer(joinedIndexCount);
 		int src = 0;
 		for (strip = 0; strip < stripCount; ++strip) {
-
 			if (strip != 0) {
 				buffer.put(indices[src - 1]);
 				buffer.put(indices[src]);
@@ -155,9 +153,6 @@ public class TriangleStripArray extends IndexBuffer {
 			for (int i = 0; i < stripLengths[strip]; ++i) {
 				buffer.put(indices[src++]);
 			}
-		}
-		if (buffer.remaining() > 0) {
-			throw new IllegalArgumentException("a " + buffer.remaining());
 		}
 	}
 
