@@ -37,6 +37,7 @@ public final class EventQueue implements Runnable {
 	private int[][] inputs;
 	private int inputsCount;
 	private boolean screen;
+	private final Object eventLock = new Object();
 
 	public EventQueue() {
 		events = new int[128];
@@ -191,6 +192,9 @@ public final class EventQueue implements Runnable {
 			if (count >= events.length) {
 				System.arraycopy(events, 0, events = new int[events.length * 2], 0, count);
 			}
+		}
+		synchronized (eventLock) {
+			eventLock.notify();
 		}
 	}
 
@@ -384,6 +388,9 @@ public final class EventQueue implements Runnable {
 						break;
 					}
 					case 0:
+						synchronized (eventLock) {
+							eventLock.wait(1000);
+						}
 						break;
 					default:
 						if ((event & Integer.MIN_VALUE) != 0x0) {
