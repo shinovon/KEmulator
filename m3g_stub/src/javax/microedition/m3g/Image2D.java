@@ -1,5 +1,7 @@
 package javax.microedition.m3g;
 
+import java.nio.ByteBuffer;
+
 public class Image2D
         extends Object3D {
     public static final int ALPHA = 96;
@@ -64,6 +66,10 @@ public class Image2D
     }
 
     public byte[] getImageData() {
+        return null;
+    }
+
+    public ByteBuffer getBuffer() {
         return null;
     }
 

@@ -242,13 +242,11 @@ public class Sprite3D extends Node {
 
 							label71:
 							{
-								byte[] var28 = this.image.getImageData();
-								byte[] var31;
+								byte[] var31 = this.image.getImageData();
 								int var32;
 								byte var33;
 								switch (this.image.getFormat()) {
 									case 96:
-										var31 = var28;
 										var32 = var25 * this.image.getWidth() * 1 + var24 * 1;
 										var33 = 0;
 										break;
@@ -257,12 +255,10 @@ public class Sprite3D extends Node {
 									default:
 										break label71;
 									case 98:
-										var31 = var28;
 										var32 = var25 * this.image.getWidth() * 2 + var24 * 2;
 										var33 = 1;
 										break;
 									case 100:
-										var31 = var28;
 										var32 = var25 * this.image.getWidth() * 4 + var24 * 4;
 										var33 = 3;
 								}

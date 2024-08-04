@@ -546,7 +546,8 @@ public final class Emulator3D implements IGraphics3D {
 		GL11.glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 
 		GL11.glPixelZoom(imgScaleX, -imgScaleY);
-		ByteBuffer imgBuffer = memoryBuffers.getImageBuffer(bg.getImage().getImageData());
+//		ByteBuffer imgBuffer = memoryBuffers.getImageBuffer(bg.getImage().getImageData());
+		ByteBuffer imgBuffer = bg.getImage().getBuffer();
 
 		for (int y = 0; y < repeatsY; y++) {
 			for (int x = 0; x < repeatsX; x++) {
@@ -977,7 +978,8 @@ public final class Emulator3D implements IGraphics3D {
 					GL11.glTexImage2D(GL_TEXTURE_2D, 0,
 							texFormat, image2D.getWidth(), image2D.getHeight(), 0,
 							texFormat, GL_UNSIGNED_BYTE,
-							memoryBuffers.getImageBuffer(image2D.getImageData())
+//							memoryBuffers.getImageBuffer(image2D.getImageData())
+							image2D.getBuffer()
 					);
 				}
 
@@ -1256,7 +1258,7 @@ public final class Emulator3D implements IGraphics3D {
 					GL11.glMatrixMode(5888);
 					GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
 					GL11.glDisable(2896);
-					var27 = memoryBuffers.getImageBuffer(var1.getImage().getImageData());
+					var27 = var1.getImage().getBuffer();
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
 					GL11.glPixelStorei(3314, var1.getImage().getWidth());
 					GL11.glPixelStorei(3315, var21[1]);
