@@ -43,19 +43,30 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.16.3 [2024.06.xx]
-nokiaui DirectGraphics fixes
-3D profiler
-Implement nokia.Sound(freq, duration)
-vServ connection wrapper
-Records tree for all midlets
+$v2.17 [2024.08.xx]
+ALW1, vServ bypass mode
+Global RMS records tree
 Security settings
-APIs disabling
-Custom system properties
-MascotCapsule settings
-Fix lcdui Form flicker
-Player leaks fix
-Added media settings: enable audio export, enable ott
+APIs disabling options
+3D profiler
+Custom system properties (like J2ME loader)
+MascotCapsule settings tab
+M3G optimizations
+Improve BlackBerry API support
+Implement nokia.Sound(freq, duration)
+Added more API compatibility settings
+Audio export, ott tones options are now disabled by default
+Nokia DirectGraphics fixes
+Fix Form flickering
+GameCanvas buffer fixes
+Fix server socket connection
+Fix compatibility with older OpenGL
+Fix RecordStore.getSizeAvailable return value
+Fix FileSystemListener
+Fix mp3 player streaming
+Player leaks fixes
+Controller input fixes
+Fixed built-in nokia font
 
 $v2.16.2 [2024.06.05]
 Reworked "sync key events" setting
