@@ -147,7 +147,7 @@ public class TriangleStripArray extends IndexBuffer {
 				buffer.put(indices[src - 1]);
 				buffer.put(indices[src]);
 				if ((stripLengths[strip - 1] & 1) != 0) {
-					buffer.put(src);
+					buffer.put(indices[src]);
 				}
 			}
 			for (int i = 0; i < stripLengths[strip]; ++i) {
