@@ -585,7 +585,7 @@ public final class Emulator3D implements IGraphics3D {
 			GL11.glDisable(GL_LIGHT0 + i);
 		}
 
-		if (!useGL11()) {
+		if (!useGL11() && GLContext.getCapabilities().GL_ARB_color_buffer_float) {
 			ARBColorBufferFloat.glClampColorARB(
 					ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
 					Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE
@@ -972,7 +972,7 @@ public final class Emulator3D implements IGraphics3D {
 							texFormat = GL_RGBA;
 					}
 
-					if (!useGL11())
+					if (!useGL11() && GLContext.getCapabilities().OpenGL14)
 						GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
 
 					GL11.glTexImage2D(GL_TEXTURE_2D, 0,
