@@ -28,6 +28,8 @@ public class Displayable {
 	private static long lastFpsUpdateTime;
 	private static int framesCount;
 	protected boolean nonFullScreen;
+	private static final Object frameLock = new Object();
+	private static final long MILLI_TO_NANO = 1000000L;
 
 	public Displayable() {
 		super();
@@ -300,20 +302,22 @@ public class Displayable {
 
 	public static void fpsLimiter() {
 		if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
-			long var0 = System.currentTimeMillis() - lastFrameTime;
-			long var2 = (long) (1000 / Settings.frameRate);
-			if (var2 - var0 > 0) {
+			long elapsed = System.nanoTime() - lastFrameTime;
+			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
+
+			long delta = var2 - elapsed;
+			if (delta > 0) {
 				try {
-					Thread.sleep(var2 - var0);
+					Thread.sleep(delta / MILLI_TO_NANO/*, (int) (delta % MILLI_TO_NANO)*/);
 				} catch (Exception ignored) {}
 			}
 		}
+		lastFrameTime = System.nanoTime();
 
-		lastFrameTime = System.currentTimeMillis();
 		++framesCount;
 		long l = lastFrameTime - lastFpsUpdateTime;
-		if (l > 2000L) {
-			Profiler.FPS = (int) ((framesCount * 1000L + 500) / l);
+		if (l >= 2000L * MILLI_TO_NANO) {
+			Profiler.FPS = (int) (((framesCount * 1000L + 500) * MILLI_TO_NANO) / l);
 			lastFpsUpdateTime = lastFrameTime;
 			framesCount = 0;
 		}
@@ -342,7 +346,7 @@ public class Displayable {
 	}
 
 	static {
-		Displayable.lastFrameTime = System.currentTimeMillis();
+		Displayable.lastFrameTime = System.nanoTime();
 		Displayable.lastFpsUpdateTime = Displayable.lastFrameTime;
 		Displayable.framesCount = 0;
 	}
