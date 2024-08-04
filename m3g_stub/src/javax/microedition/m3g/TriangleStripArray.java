@@ -1,5 +1,7 @@
 package javax.microedition.m3g;
 
+import java.nio.IntBuffer;
+
 public class TriangleStripArray
         extends IndexBuffer {
     public TriangleStripArray(int paramInt, int[] paramArrayOfInt) {
@@ -26,6 +28,10 @@ public class TriangleStripArray
     }
 
     public int[] getIndexStrip(int var11) {
+        return null;
+    }
+
+    public IntBuffer getBuffer(int i) {
         return null;
     }
 }

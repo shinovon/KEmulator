@@ -1048,9 +1048,10 @@ public final class Emulator3D implements IGraphics3D {
 				GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 			}
 			for (int i = 0; i < stripCount; ++i) {
-				int[] indexStrip = triangleStripArray.getIndexStrip(i);
-				Profiler3D.LWJGL_trianglesCount += indexStrip.length - 2;
-				GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
+//				int[] indexStrip = triangleStripArray.getIndexStrip(i);
+//				Profiler3D.LWJGL_trianglesCount += indexStrip.length - 2;
+//				GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
+				GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer(i));
 			}
 
 			for (int i = 0; i < NumTextureUnits; ++i) {

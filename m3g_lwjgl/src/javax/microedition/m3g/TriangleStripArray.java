@@ -1,7 +1,12 @@
 package javax.microedition.m3g;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+
 public class TriangleStripArray extends IndexBuffer {
 	private int[] indexStrip;
+	private IntBuffer buffer;
 
 	public TriangleStripArray(int firstIndex, int[] stripLengths) {
 		if (stripLengths == null) {
@@ -31,6 +36,7 @@ public class TriangleStripArray extends IndexBuffer {
 
 			indexStrip = new int[stripLengths.length];
 			System.arraycopy(stripLengths, 0, indexStrip, 0, stripLengths.length);
+			allocateBuffer(indices.length).put(indices);
 		}
 	}
 
@@ -65,6 +71,7 @@ public class TriangleStripArray extends IndexBuffer {
 		System.arraycopy(indices, 0, super.indices, 0, sumStripLengths);
 		indexStrip = new int[stripLengths.length];
 		System.arraycopy(stripLengths, 0, indexStrip, 0, stripLengths.length);
+		allocateBuffer(indices.length).put(indices);
 	}
 
 	protected Object3D duplicateObject() {
@@ -98,6 +105,22 @@ public class TriangleStripArray extends IndexBuffer {
 		}
 	}
 
+	public IntBuffer getBuffer(int index) {
+		if (index >= 0 && index < indexStrip.length) {
+			int sumStripLengths = 0;
+
+			for (int i = 0; i < index; ++i) {
+				sumStripLengths += indexStrip[i];
+			}
+
+			buffer.position(sumStripLengths);
+			buffer.limit(sumStripLengths + indexStrip[index]);
+			return buffer;
+		} else {
+			return null;
+		}
+	}
+
 	protected boolean getIndices(int index, int[] indices) {
 		int index2 = 0;
 
@@ -116,5 +139,12 @@ public class TriangleStripArray extends IndexBuffer {
 		}
 
 		return false;
+	}
+
+	private IntBuffer allocateBuffer(int size) {
+		buffer = ByteBuffer.allocateDirect((size * 4 / 3) << 2)
+				.order(ByteOrder.nativeOrder()).asIntBuffer();
+		buffer.position(0);
+		return buffer;
 	}
 }
