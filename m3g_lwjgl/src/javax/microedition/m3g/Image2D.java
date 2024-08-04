@@ -334,7 +334,7 @@ public class Image2D extends Object3D {
 		int[] data = image.getData();
 		int l = data.length;
 		if (buffer != null) {
-			buffer.position(buffer.capacity() - l);
+			buffer.position(buffer.capacity() - (l * 3));
 			for (int var5 = l - 1; var5 >= 0; --var5) {
 				buffer.put((byte) (data[var5] >> 16 & 255));
 				buffer.put((byte) (data[var5] >> 8 & 255));
