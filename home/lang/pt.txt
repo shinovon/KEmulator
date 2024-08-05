@@ -1,6 +1,6 @@
 #KEmulator nnmod localization file
 #Brazilian Portuguese
-#by shinovon
+#by lucmsilva651
 
 #Main Frame
 
