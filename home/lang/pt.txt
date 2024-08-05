@@ -1,0 +1,365 @@
+#KEmulator nnmod localization file
+#Brazilian Portuguese
+#by shinovon
+
+#Main Frame
+
+MENU_MIDLET=Midlet
+MENU_TOOL=Ferramentas
+MENU_VIEW=Visualizar
+
+MENU_MIDLET_LOAD_JAR=Carregar JAR...
+MENU_MIDLET_LOAD_AUTO_PLAY=Carregar gravação de auto-play
+MENU_MIDLET_RECENTLY=Arquivos JAR recentes
+MENU_MIDLET_2D_ENGINE=Engine 2D
+MENU_MIDLET_M3G_ENGINE=Engine M3G
+MENU_MIDLET_M3D_ENGINE=Engine MascotCapsule
+
+MENU_MIDLET_JAD=Abrir JAD com o Bloco de Notas
+MENU_MIDLET_SUSPEND=Suspender
+MENU_MIDLET_RESUME=Resumir
+MENU_MIDLET_PAUSE_STEP=Pausar/Step
+MENU_MIDLET_PLAY_RESUME=Reproduzir/Resumir
+
+MENU_MIDLET_RESTART=Reiniciar
+MENU_MIDLET_EXIT=Sair
+
+
+MENU_VIEW_INFO=Informações
+MENU_VIEW_XRAY=Visão Raio-X
+MENU_VIEW_TOP=Sempre No Topo
+MENU_VIEW_ROTATE=Rotacionar Tela
+MENU_VIEW_FORCE_PAINT=Forçar Pintura
+MENU_VIEW_ROTATE_90=Rotacionar 90 Graus
+
+MENU_VIEW_KEYPAD=Teclado
+MENU_VIEW_WATCHES=Classes
+MENU_VIEW_PROFILER=Analisador
+MENU_VIEW_METHODS=Métodos
+MENU_VIEW_MEMORY=Visualização de Memória
+MENU_VIEW_M3GVIEW=Visão M3G
+MENU_VIEW_SMS=Console SMS
+MENU_VIEW_SENSOR=Simulador de Sensor
+MENU_VIEW_LOG=Log
+
+MENU_VIEW_OPTIONS=Opções...
+MENU_VIEW_HELP=Sobre
+
+MENU_TOOL_ZOOMIN=Aumentar Zoom
+MENU_TOOL_ZOOMOUT=Diminuir Zoom
+MENU_TOOL_INTERPOSE=Interpolação
+MENU_TOOL_INTER_NEAREST=Mais Próximo
+MENU_TOOL_INTER_HIGH=Alta Qualidade
+MENU_TOOL_INTER_LOW=Baixa Qualidade
+
+MENU_TOOL_RESIZE_MODE=Exibição
+MENU_TOOL_RESIZE_MODE_CENTER=Sem escalonamento adaptativo
+MENU_TOOL_RESIZE_MODE_SYNC=Sincronizar com o tamanho da janela
+MENU_TOOL_RESIZE_MODE_FILL=Ajustar à janela
+MENU_TOOL_RESIZE_MODE_FILL_INT=Ajustar à janela (Escalonamento Inteiro)
+MENU_TOOL_RESIZE_KEEP_PROPORTIONS=Manter proporção
+MENU_TOOL_RESIZE_RESET=Redefinir tamanho da janela
+MENU_TOOL_RESIZE_SET=Definir tamanho da tela
+
+MENU_TOOL_SPEEDUP=Aumentar Velocidade
+MENU_TOOL_SPEEDDOWN=Diminuir Velocidade
+
+MENU_TOOL_RECORD_KEY=Gravar Teclas
+MENU_TOOL_AUTO_PLAY=Habilitar Reprodução Automática
+MENU_TOOL_CAPTURE_FILE=Capturar para Arquivo
+MENU_TOOL_CAPTURE_CLIP=Capturar para Área de Transferência
+
+MENU_TOOL_SHOW_TRACK_INFO=Mostrar Informações da Faixa
+
+MENU_TOOL_QWERTY_MODE=Modo QWERTY
+MENU_TOOL_DISABLE_NETWORK_ACCESS=Desabilitar acesso à rede
+
+#Command bar
+
+MAIN_INFO_BAR_UNLOADED=DESCARREGADO
+MAIN_INFO_BAR_RUNNING=EXECUTANDO
+MAIN_INFO_BAR_PAUSED=PAUSADO
+
+#Dialog
+
+SAVE_TO_FILE=Salvar em arquivo
+OPEN_JAR_FILE=Abrir um arquivo JAR
+OPEN_REC_FILE=Abrir um arquivo de registro
+LINK_JAR_FILE=Especificar um arquivo JAR
+
+DIALOG_OK=OK
+DIALOG_CANCEL=Cancelar
+DIALOG_SET=Definir
+
+
+#Info show
+
+INFO_FRAME_POS=Posição
+INFO_FRAME_COLOR=Cor
+INFO_FRAME_RECT=R
+
+#About Frame
+
+ABOUT_FRAME_TITLE=Sobre & Ajuda
+ABOUT_INFO_EMULATOR=Emulador de Jogos Móveis
+ABOUT_INFO_APIS=APIs Suportadas
+
+ABOUT_AUTHOR=Autor
+ABOUT_CHACK_NEW_VER=Verificar nova versão
+ABOUT_ONLINE_MANUAL=Manual Online
+
+
+#Keypad
+
+KEYPAD_FRAME_TITLE=Teclado
+KEYPAD_FRAME_LSK=Tecla Soft Esquerda
+KEYPAD_FRAME_RSK=Tecla Soft Direita
+
+
+#Log Frame
+
+LOG_FRAME_TITLE=Registro
+
+
+#MemoryView
+
+MEMORY_VIEW_TITLE=Visualização de Memória
+MEMORY_VIEW_UPDATE=Atualizar
+MEMORY_VIEW_AUTO_UPDATE=Atualização Automática
+MEMORY_VIEW_BYTECODE_SIZE=Tamanho do ByteCode:
+MEMORY_VIEW_TOTALMEM_SIZE=Memória Total Usada:
+MEMORY_VIEW_OBJECT_SIZE=Tamanho dos Objetos:
+MEMORY_VIEW_MAX_OBJECT_SIZE=Tamanho Máximo dos Objetos:
+MEMORY_VIEW_INTERVAL=Intervalo (milissegundos):
+
+MEMORY_VIEW_IMAGES=Imagens
+MEMORY_VIEW_SOUNDS=Som
+
+MEMORY_VIEW_ZOOM=Zoom:
+MEMORY_VIEW_SORT=Ordenar:
+MEMORY_VIEW_SIZE=Tamanho:
+MEMORY_VIEW_ASCEND=Crescente
+MEMORY_VIEW_IMAGES_DRAWN=Imagens Desenhadas
+MEMORY_VIEW_UNUSED_REGION=Escurecer Regiões Não Usadas
+MEMORY_VIEW_RESET_IMAGE=Redefinir Uso de Imagens
+MEMORY_VIEW_IMAGE_NEVER_DRAW=Imagens Nunca Desenhadas
+MEMORY_VIEW_RELEASED_IMAGES=Imagens Liberadas
+MEMORY_VIEW_CLEAR_RELEASED_IMAGES=Limpar Imagens Liberadas
+
+MEMORY_VIEW_SORT_REFERENCE=Referência
+MEMORY_VIEW_SORT_SIZE=Tamanho
+MEMORY_VIEW_SORT_DRAW_COUNT=Contagem de Desenhos
+
+MEMORY_VIEW_SAVE_AS=Salvar Como...
+MEMORY_VIEW_SAVE_TO_FILE=Salvar em arquivo
+MEMORY_VIEW_SAVE_ALL=Salvar Todas as Imagens...
+MEMORY_VIEW_SAVE_ALL_IMAGES=Salvar todas as imagens
+MEMORY_VIEW_CHOOSE_DIRECTORY=Escolher um diretório
+
+MEMORY_VIEW_SOUND_START=Iniciar
+MEMORY_VIEW_SOUND_PAUSE=Pausar
+MEMORY_VIEW_SOUND_STOP=Parar
+MEMORY_VIEW_SOUND_VOLUME=Volume:
+MEMORY_VIEW_SOUND_PROGRESS=Progresso:
+MEMORY_VIEW_SOUND_EXPORT=Exportar
+
+MEMORY_VIEW_INSTANCE=Instância
+MEMORY_VIEW_CONTENT_TYPE=Tipo de Conteúdo
+MEMORY_VIEW_STATE=Estado
+MEMORY_VIEW_LOOP_COUNT=Contagem de Loop
+MEMORY_VIEW_DATA_SIZE=Tamanho dos Dados
+
+MEMORY_VIEW_CLASS=Classe
+MEMORY_VIEW_INSTANCES=Instâncias
+MEMORY_VIEW_TOTAL_HEAP_SIZE=Tamanho Total do Heap
+MEMORY_VIEW_REFERENCE=Referência
+
+
+#SMS Console
+
+SMS_CONSOLE_TITLE=Console de SMS
+
+SMS_CONSOLE_SEND_TO=Enviar para midlet
+SMS_CONSOLE_CLEAR=Limpar
+SMS_CONSOLE_SEND=Enviar
+SMS_CONSOLE_RECEIVE=Receber de midlet
+SMS_CONSOLE_BLOCK=Bloquear a mensagem recebida
+
+
+#Methods Frame
+
+METHOD_FRAME_TITLE=Métodos
+
+METHOD_FRAME_RESET_CALLS=Redefinir Chamadas
+METHOD_FRAME_EXPORT_BYTECODE=Exportar ByteCode
+METHOD_FRAME_SAVE_BYTECODE=Salvar todo o bytecode dos métodos:
+METHOD_FRAME_SEARCH=Pesquisar
+
+#Waches Frame
+
+WATCHES_FRAME_TITLE=Observador de Classe
+WATCHES_FRAME_PROFILER=Monitor de Profiler
+
+
+#Option Frame
+
+OPTION_FRAME_TITLE=Opções & Propriedades
+
+OPTION_TAB_CUSTOM=Geral
+OPTION_TAB_KEYMAP=Mapeamento de Teclas
+OPTION_TAB_FONT=Fonte
+OPTION_TAB_SYSTEM=Sistema
+OPTION_TAB_COREAPI=CoreAPI
+OPTION_TAB_DISABLE_API=Desabilitar APIs
+OPTION_TAB_RECORDS=Registros
+OPTION_TAB_NETWORK=Rede
+OPTION_TAB_MEDIA=Mídia
+OPTION_TAB_M3G=M3G
+OPTION_TAB_MASCOT=MascotCapsule
+OPTION_TAB_SECURITY=Segurança
+OPTION_TAB_SYSTEM_PROPERTIES=Propriedades
+
+OPTION_CUSTOM_DEVICE=Selecionar Dispositivo:
+OPTION_CUSTOM_ENCODING=Codificação Padrão:
+OPTION_CUSTOM_MAX_FPS=FPS Máximo:
+
+OPTION_CUSTOM_PROPERTIES=Propriedades Personalizadas
+OPTION_CUSTOM_SCREEN_WIDTH=Largura da Tela:
+OPTION_CUSTOM_SCREEN_HEIGHT=Altura da Tela:
+OPTION_CUSTOM_KEY_LSK=Tecla Soft Esquerda:
+OPTION_CUSTOM_KEY_RSK=Tecla Soft Direita:
+OPTION_CUSTOM_KEY_MIDDLE=Fogo/Meio:
+OPTION_CUSTOM_KEY_UP=Para Cima:
+OPTION_CUSTOM_KEY_DOWN=Para Baixo:
+OPTION_CUSTOM_KEY_LEFT=Esquerda:
+OPTION_CUSTOM_KEY_RIGHT=Direita:
+OPTION_CUSTOM_LOCALE=Localidade MIDP:
+
+OPTION_KEYMAP_CONTROLLER=Controlador:
+OPTION_KEYMAP_REFRESH=Atualizar
+OPTION_KEYMAP_KEY_CACHE=Habilitar Cache de Teclas
+OPTION_KEYMAP_LSK=Tecla Soft Esquerda:
+OPTION_KEYMAP_RSK=Tecla Soft Direita:
+OPTION_KEYMAP_NUM_1=Num_1:
+OPTION_KEYMAP_NUM_2=Num_2:
+OPTION_KEYMAP_NUM_3=Num_3:
+OPTION_KEYMAP_NUM_4=Num_4:
+OPTION_KEYMAP_NUM_5=Num_5:
+OPTION_KEYMAP_NUM_6=Num_6:
+OPTION_KEYMAP_NUM_7=Num_7:
+OPTION_KEYMAP_NUM_8=Num_8:
+OPTION_KEYMAP_NUM_9=Num_9:
+OPTION_KEYMAP_NUM_0=Num_0:
+OPTION_KEYMAP_KEY_*=Tecla *:
+OPTION_KEYMAP_KEY_#=Tecla #:
+OPTION_KEYMAP_PAD_LEFT=Pad_Esquerda:
+OPTION_KEYMAP_PAD_RIGHT=Pad_Direita:
+OPTION_KEYMAP_PAD_UP=Pad_Cima:
+OPTION_KEYMAP_PAD_DOWN=Pad_Baixo:
+OPTION_KEYMAP_PAD_MIDDLE=Pad_Meio:
+OPTION_KEYMAP_CLEAR=Limpar
+
+OPTION_FONT_DEFAULT_FONT=Fonte Padrão:
+OPTION_FONT_LARGE_SIZE=Tamanho Grande:
+OPTION_FONT_MIDDLE_SIZE=Tamanho Médio:
+OPTION_FONT_SMALL_SIZE=Tamanho Pequeno:
+OPTION_FONT_TEST_TEXT=Texto de Teste:
+OPTION_FONT_TEST_TEXT_TXT=Este é um Exemplo.
+
+OPTION_SYSTEM_XRAY_BG=Visão de Raios-X: Sobrepor imagens
+OPTION_SYSTEM_XRAY_CLIP=Visão de Raios-X: Mostrar região de recorte de imagem
+OPTION_SYSTEM_INFO_COLOR=Visualização de Informações: Mostrar cor em (R,G,B)
+OPTION_SYSTEM_RELEASED_IMG=Visualização de Memória: Registrar imagens liberadas
+OPTION_SYSTEM_AUTOGEN_JAD=Gerar automaticamente arquivo Jad com "KEmu-Platform"
+OPTION_SYSTEM_TRACK_NEW=Rastrear operações "new/new[]..."
+OPTION_SYSTEM_TRACK_METHOD=Rastrear chamadas de métodos
+OPTION_SYSTEM_DISCORD_RICHPRESENCE=Presença Rica no Discord
+OPTION_SYSTEM_AWT_ANTIALIASING=Suavização AWT
+OPTION_SYSTEM_TEXT_ANTIALIASING=Suavização de Texto
+OPTION_SYSTEM_FPS_COUNT=Contador de FPS
+
+OPTION_COREAPI_VIBRATION=Habilitar APIs de Vibração
+OPTION_COREAPI_KEY_REPEAT=Habilitar Canvas.keyRepeated(int)
+OPTION_COREAPI_FULLSCREEN=Ignorar Canvas.setFullScreenMode(boolean)
+OPTION_COREAPI_NO_NETWORK=Restringir conexões de rede
+OPTION_COREAPI_SYNC_KEYEVENTS=Sincronizar eventos de tecla
+OPTION_COREAPI_SOFTKEY_FIX=Enviar keyPressed com commandAction
+OPTION_COREAPI_IGNORE_REGION_REPAINT=Sempre repintar a tela totalmente
+
+OPTION_RECORDS_RMS_FOLDER=Pasta RMS:
+OPTION_RECORDS_RMS_TEXT=Todos os Registros no midlet atual:
+OPTION_RECORDS_SELECT_ALL=Selecionar Todos
+OPTION_RECORDS_CLEAR_RECORD=Limpar Registros Selecionados
+OPTION_RECORDS_OPEN_DIRECTORY=Selecionar um diretório para rms
+OPTION_RECORDS_CHOOSE_DIR=Escolher um diretório
+
+OPTION_NETWORK_PROXY=Proxy
+OPTION_NETWORK_PROXY_TYPE=Tipo de Proxy:
+OPTION_NETWORK_HOST=Host:
+OPTION_NETWORK_PORT=Porta:
+OPTION_NETWORK_USERNAME=Nome de Usuário:
+OPTION_NETWORK_PASSWORD=Senha:
+OPTION_NETWORK_DOMAIN=Domínio:
+OPTION_NETWORK_CONNECT=Conectar
+
+OPTION_NETWORK_PROXY_TEST=Teste de Proxy
+OPTION_NETWORK_PROXY_EMPTY=Host de proxy vazio!
+OPTION_NETWORK_PROXY_UNIMP=Teste de proxy não totalmente implementado!
+
+OPTION_MEDIA_VLC_DIR=Diretório do VLC
+OPTION_MEDIA_VMS=Procurar VirtualMIDISynth como dispositivo MIDI
+OPTION_MEDIA_GLOBAL_MIDI=Permitir apenas uma reprodução MIDI por vez (reduz o atraso)
+OPTION_MEDIA_REOPEN_MIDI=Reabrir dispositivo MIDI a cada vez
+OPTION_MEDIA_DUMP=Habilitar exportação de mídia (uso mais alto de memória)
+OPTION_MEDIA_OTT=Reprodução de Tom Nokia (instável)
+
+OPTION_M3G_LWJGL_SETTINGS=Configurações LWJGL
+OPTION_M3G_IGNORE_OVERWRITE=Ignorar sugestão OVERWRITE
+OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Forçar correção de perspectiva
+OPTION_M3G_DISABLE_LIGHT_CLAMPING=Desativar limitação de luz
+
+OPTION_M3G_AA=Anti-aliasing:
+OPTION_M3G_APP_CONTROLLED=Controlado pelo aplicativo
+OPTION_M3G_FORCE_OFF=Forçar desligado
+OPTION_M3G_FORCE_ON=Forçar ligado
+
+OPTION_M3G_TEXTURE_FILTER=Filtro de Textura:
+OPTION_M3G_FORCE_NEAREST=Forçar o mais próximo
+OPTION_M3G_FORCE_LINEAR=Forçar linear
+
+OPTION_M3G_MIPMAPPING=Mipmapping:
+OPTION_M3G_FORCE_BILINEAR=Forçar bilinear
+OPTION_M3G_FORCE_TRILINEAR=Forçar trilinear
+OPTION_M3G_FORCE_ANISO_2X=Forçar anisotrópico 2x
+OPTION_M3G_FORCE_ANISO_4X=Forçar anisotrópico 4x
+OPTION_M3G_FORCE_ANISO_8X=Forçar anisotrópico 8x
+OPTION_M3G_FORCE_ANISO_16X=Forçar anisotrópico 16x
+
+OPTION_MASCOT_NO_2D_MIXING=Sem mistura 2D
+OPTION_MASCOT_IGNORE_BACKGROUND=Ignorar fundo
+OPTION_MASCOT_TEXTURE_FILTER=Filtro de Textura
+OPTION_MASCOT_BACKGROUND_FILTER=Filtro de Fundo
+
+OPTION_SECURITY_ENABLE=Habilitar segurança
+OPTION_SECURITY_PERMISSIONS=Permissões
+
+#Message
+
+MESSAGE_BOX_TITLE=Alerta do KEmulator
+
+LOAD_CLASSES_ERROR=Falha ao obter classes!! Verifique o arquivo JAR ou o classpath.
+LOAD_MIDLET_ERROR=Não é possível encontrar a classe MIDlet. Verifique o JAD ou use o parâmetro -midlet.
+FAIL_LAUNCH_MIDLET=Falha ao iniciar a classe MIDlet:
+
+LOAD_ZIP_ERROR=Arquivo de entrada não é um JAR ou arquivo ZIP.
+
+LOAD_GDIPLUS_ERROR=Não é possível carregar "gdiplus.dll"!!! Baixe e copie para o caminho %system32%.
+
+PLATFORMREQUEST_ALERT=O aplicativo deseja abrir uma URL
+PLATFORMREQUEST_VLC_ALERT=O aplicativo deseja abrir uma URL no VLC
+
+PERMISSION_CAMERA=Permitir que o aplicativo use a câmera?
+
+SECURITY_ALERT_TITLE=Segurança
+
+SCREEN_SIZE_DIALOG_TITLE=Definir tamanho da tela
