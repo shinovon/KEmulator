@@ -1068,7 +1068,11 @@ public final class Emulator3D implements IGraphics3D {
 			}
 		} else {
 			//xray
-			GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer());
+//			GL11.glDrawElements(GL_TRIANGLE_STRIP, triangleStripArray.getBuffer());
+			int l = triangleStripArray.getStripCount();
+			for (int i = 0; i < l; ++i) {
+				GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(triangleStripArray.getIndexStrip(i)));
+			}
 		}
 
 //		int err = GL11.glGetError();
