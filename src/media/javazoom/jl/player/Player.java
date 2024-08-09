@@ -176,26 +176,26 @@ public class Player
 	}
 
 	public void reset() {
-		positionOffset = 0;
-		try {
-			if (this.bitstream != null) {
-				this.bitstream.close();
-				this.bitstream = null;
-			}
-			this.bitstream = new Bitstream(new ByteArrayInputStream(this.aByteArray1339));
-			decoder = new Decoder();
-			if (audio != null) {
-				audio.close();
-				audio = null;
-			}
-			FactoryRegistry r = FactoryRegistry.systemRegistry();
-			audio = r.createAudioDevice();
-			audio.open(decoder);
-			this.closed = false;
-			paused = false;
-		} catch (Exception localException) {
-			localException.printStackTrace();
-		}
+//		positionOffset = 0;
+//		try {
+//			if (this.bitstream != null) {
+//				this.bitstream.close();
+//				this.bitstream = null;
+//			}
+//			this.bitstream = new Bitstream(new ByteArrayInputStream(this.aByteArray1339));
+//			decoder = new Decoder();
+//			if (audio != null) {
+//				audio.close();
+//				audio = null;
+//			}
+//			FactoryRegistry r = FactoryRegistry.systemRegistry();
+//			audio = r.createAudioDevice();
+//			audio.open(decoder);
+//			this.closed = false;
+//			paused = false;
+//		} catch (Exception localException) {
+//			localException.printStackTrace();
+//		}
 
 	}
 

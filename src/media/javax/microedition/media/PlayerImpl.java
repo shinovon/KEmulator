@@ -408,6 +408,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 		} else if (sequence instanceof javazoom.jl.player.Player) {
 			long l = getMediaTime();
+			if (true) return l; // TODO
 			if (t == 0 && l == 0)
 				return 0;
 			if (t < l) {
