@@ -77,7 +77,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			wav(inputStream);
 		} else if (contentType.equals("audio/x-midi") || contentType.equals("audio/midi")) {
 			midi(inputStream);
-		} else if (contentType.equals("audio/mpeg")) {
+		} else if (contentType.equals("audio/mpeg") || contentType.equals("audio/mp3")) {
 			try {
 				InputStream i = inputStream;
 				if (i instanceof ByteArrayInputStream && Settings.enableMediaDump) {
