@@ -84,7 +84,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					data = CustomJarResources.getBytes(i);
 					i = new ByteArrayInputStream(data);
 				}
-				sequence = new javazoom.jl.player.Player(i);
+				sequence = new javazoom.jl.player.Player(i, false);
 			} catch (JavaLayerException e) {
 				e.printStackTrace();
 				throw new IOException(e);
@@ -408,24 +408,28 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 		} else if (sequence instanceof javazoom.jl.player.Player) {
 			long l = getMediaTime();
-			if (true) return l; // TODO
-			if (t == 0 && l == 0)
+//			if (true) return l; // TODO
+			if (t == 0 && l == 0 || !((javazoom.jl.player.Player) sequence).isBuffered)
 				return 0;
 			if (t < l) {
 				try {
+					stop();
 					Header old = ((javazoom.jl.player.Player) sequence).bitstream().header;
 					((javazoom.jl.player.Player) sequence).reset();
 					((javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
 					ms = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
+					start();
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
 				}
 			} else {
 				try {
+					stop();
 					Header old = ((javazoom.jl.player.Player) sequence).bitstream().header;
 					((javazoom.jl.player.Player) sequence).reset();
 					((javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
 					ms = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
+					start();
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
 				}
@@ -523,7 +527,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 							return stream.read(b, i, j);
 						}
 
-					});
+					}, false);
+				} catch (IOException e) {
+					throw new MediaException(e);
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
 				}
