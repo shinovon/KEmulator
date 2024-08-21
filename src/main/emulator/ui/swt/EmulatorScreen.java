@@ -164,6 +164,7 @@ public final class EmulatorScreen implements
 	private MenuItem glM3DMenuItem;
 	private MenuItem softM3DMenuItem;
 	private Menu menuM3DEngine;
+	private boolean wasResized;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -1544,6 +1545,10 @@ public final class EmulatorScreen implements
 		screenHeight = scaledHeight;
 		gc.setAdvanced(false);
 		this.method565(gc);
+		if (wasResized) {
+			caret.setWindowZoom((float) screenHeight / (float) origHeight);
+			wasResized = false;
+		}
 	}
 
 	private void method565(final GC gc) {
@@ -1834,6 +1839,41 @@ public final class EmulatorScreen implements
 			h = getHeight();
 			x = (int) ((x - screenX) / ((float) screenWidth / w));
 			y = (int) ((y - screenY) / ((float) screenHeight / h));
+		}
+		int tmp;
+		switch (this.rotation) {
+			case 0:
+				break;
+			case 1:
+				tmp = x;
+				x = y;
+				y = w - tmp;
+				break;
+			case 2:
+				x = w - x;
+				y = h - y;
+				break;
+			case 3:
+				tmp = x;
+				x = h - y;
+				y = tmp;
+		}
+		return new int[]{x, y};
+	}
+
+	int[] transformCaret(int x, int y) {
+		// Map coordinates on window to canvas
+		int w, h;
+		if (rotation % 2 == 1) {
+			w = getHeight();
+			h = getWidth();
+			x = (int) (x / ((float) w / screenWidth)) + screenX;
+			y = (int) (y / ((float) h / screenHeight)) + screenY;
+		} else {
+			w = getWidth();
+			h = getHeight();
+			x = (int) (x / ((float) w / screenWidth)) + screenX;
+			y = (int) (y / ((float) h / screenHeight)) + screenY;
 		}
 		int tmp;
 		switch (this.rotation) {
@@ -2171,6 +2211,7 @@ public final class EmulatorScreen implements
 
 	private void resized() {
 		if (getScreenImg() == null) return;
+		wasResized = true;
 		Rectangle size = canvas.getClientArea();
 		int origWidth = getWidth();
 		int origHeight = getHeight();
@@ -2227,7 +2268,6 @@ public final class EmulatorScreen implements
 			zoomedHeight = getHeight();
 		}
 		canvas.redraw();
-		caret.setWindowZoom((float) screenHeight / (float) origHeight);
 	}
 
 	public void startVibra(final long aLong1013) {

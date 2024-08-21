@@ -42,14 +42,14 @@ public final class CaretImpl implements ICaret {
 	public final void setCaretLocation(final int x, final int y) {
 		this.caretLocX = x;
 		this.caretLocY = y;
-		int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformPointer(x, y);
+		int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaret(x, y);
 		swtCaret.setLocation(i[0], i[1]);
 	}
 
 	public final void setWindowZoom(final float aFloat840) {
 		this.zoom = aFloat840;
 		if (this.swtCaret.isVisible()) {
-			this.swtCaret.setSize((int) aFloat840, (int) (CaretImpl.font.getBaselinePosition() * aFloat840));
+			this.swtCaret.setSize(Math.min(1, (int) aFloat840), (int) (CaretImpl.font.getBaselinePosition() * aFloat840));
 			this.setCaretLocation(this.caretLocX, this.caretLocY);
 		}
 	}
