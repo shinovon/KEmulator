@@ -265,6 +265,16 @@ public final class Property implements IProperty, SelectionListener {
 	private CLabel labelLocale;
 	private Text localeText;
 	private Button keymapClearBtn;
+
+	/**
+	 * language label
+	 */
+	private CLabel labelLanguage;
+	/**
+	 * language Combo
+	 */
+	private Combo languageCombo;
+
 	private Composite keyMapControllerComp;
 	private Composite keyMapTabComp;
 	private Button softkeyMotFixCheck;
@@ -774,6 +784,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
 
+			properties.setProperty("UILanguage", Settings.uiLanguage);
+
 			// emulator
 			properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
 			properties.setProperty("XRayOverLapScreen", String.valueOf(Settings.xrayOverlapScreen));
@@ -949,6 +961,11 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.vlcDir = vlcDirText.getText().trim();
 		Settings.locale = localeText.getText().trim();
 
+		//set UILanguage
+		Settings.uiLanguage = languageCombo.getText().trim();
+		UILocale.initLocale();
+		Emulator.getEmulator().updateLanguage();
+
 		Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
 		Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
 		Settings.m3gDisableLightClamp = m3gDisableLightClamp.getSelection();
@@ -1033,6 +1050,37 @@ public final class Property implements IProperty, SelectionListener {
 			}
 		}
 		this.aCombo657.addModifyListener(new Class117(this));
+	}
+
+	/**
+	 * gen LanguageList
+	 */
+	private void genLanguageList() {
+
+		final GridData layoutData;
+		(layoutData = new GridData()).horizontalAlignment = 4;
+		layoutData.horizontalSpan = 2;
+		layoutData.grabExcessHorizontalSpace = true;
+		layoutData.verticalAlignment = 2;
+
+		this.languageCombo = new Combo(this.customComp, 12);
+		this.languageCombo.setLayoutData(layoutData);
+		languageCombo.setFont(f);
+		File folder = new File(Emulator.getAbsolutePath() + "/lang/");
+		if (folder.exists() && folder.isDirectory()) {
+			File[] files = folder.listFiles();
+			if (files != null) {
+				for (File file : files) {
+					if (file.isFile() && file.getName().endsWith(".txt")) {
+						String fileNameWithoutExtension = file.getName().substring(0, file.getName().length() - 4);
+						this.languageCombo.add(fileNameWithoutExtension);
+					}
+				}
+			}
+		} else {
+			// lang not found
+		}
+		languageCombo.setText(Settings.uiLanguage);
 	}
 
 	private void method379() {
@@ -1268,6 +1316,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.method379();
 		(this.labelLocale = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_LOCALE", "MIDP Locale:"));
 		this.labelLocale.setLayoutData(layoutData5);
+
 		final GridData layoutData333;
 		(layoutData333 = new GridData()).horizontalAlignment = 4;
 		layoutData333.horizontalSpan = 2;
@@ -1276,6 +1325,20 @@ public final class Property implements IProperty, SelectionListener {
 		localeText = new Text(this.customComp, 2048);
 		localeText.setLayoutData(layoutData333);
 		localeText.setText(Settings.locale);
+
+		//language setting
+
+		final GridData layoutDataLanguage;
+		(layoutDataLanguage = new GridData()).horizontalAlignment = 4;
+		layoutDataLanguage.verticalAlignment = 2;
+
+		(this.labelLanguage = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_LANGUAGE", "Language:"));
+		this.labelLanguage.setLayoutData(layoutDataLanguage);
+
+		this.genLanguageList();
+
+		//end
+
 		this.method384();
 		(this.aCLabel738 = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
 		this.aCLabel738.setLayoutData(layoutData);

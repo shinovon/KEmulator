@@ -131,7 +131,7 @@ public final class EmulatorScreen implements
 	private static int captureFileCounter;
 	private static String aString993;
 	private int pauseState;
-	private final String[] pauseStateStrings;
+	private String[] pauseStateStrings;
 	private boolean infosEnabled;
 	private String aString1008;
 	private CaretImpl caret;
@@ -1433,7 +1433,7 @@ public final class EmulatorScreen implements
 				(i[1]) + "," + (i2[0] - i[0]) +
 				"," + (i2[1] - i[1]) + ")";
         /*
-        "(" + (int)(this.mouseXPress / this.zoom) + "," + 
+        "(" + (int)(this.mouseXPress / this.zoom) + "," +
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
         "," + (int)((this.mouseYRelease - this.mouseYPress) / this.zoom) + ")";
         */
@@ -2354,6 +2354,17 @@ public final class EmulatorScreen implements
 	static {
 		EmulatorScreen.captureFileCounter = 1;
 		EmulatorScreen.aString993 = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss", Locale.ENGLISH).format(Calendar.getInstance().getTime()) + "_";
+	}
+
+
+	/**
+	 * updateLanguage
+	 */
+	public void updateLanguage() {
+		method586();
+		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
+		updateStatus();
+		this.canvas.redraw();
 	}
 
 	final class ShellPosition implements Runnable {

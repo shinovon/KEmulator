@@ -51,6 +51,8 @@ public final class Settings {
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
 	public static String locale = "en-US";
+
+
 	public static boolean jdwpDebug;
 	public static int debugPort = 29292;
 	public static Map<String, String> controllerBinds = new HashMap<String, String>();
