@@ -84,8 +84,11 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final String getHeaderField(final String s) throws IOException {
-		if ("location".equalsIgnoreCase(s) && !userAgentSet) {
+		if ("location".equalsIgnoreCase(s)) {
 			return "vserv:";
+		}
+		if ("X-VSERV-CONTEXT".equals(s)) {
+			return "asd";
 		}
 		return "";
 	}
@@ -99,11 +102,11 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final String getHeaderField(final int n) throws IOException {
-		return "";
+		throw new IOException();
 	}
 
 	public final String getHeaderFieldKey(final int n) throws IOException {
-		return "";
+		throw new IOException();
 	}
 
 	public final void close() throws IOException {
