@@ -3,6 +3,8 @@ package emulator.ui;
 import emulator.graphics2D.*;
 import emulator.graphics3D.*;
 
+import java.io.IOException;
+
 public interface IEmulator {
 	IMessage getMessage();
 
@@ -26,7 +28,7 @@ public interface IEmulator {
 
 	IImage newImage(final int p0, final int p1, final boolean p2, final int p3);
 
-	IImage newImage(final byte[] p0);
+	IImage newImage(final byte[] p0) throws IOException;
 
 	IGraphics3D getGraphics3D();
 

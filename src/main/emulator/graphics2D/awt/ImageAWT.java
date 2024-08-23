@@ -1,5 +1,6 @@
 package emulator.graphics2D.awt;
 
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.graphics.Image;
 
@@ -18,9 +19,17 @@ public final class ImageAWT implements IImage {
 	private Graphics2D g2d;
 	private int[] data;
 
-	public ImageAWT(final byte[] array) {
+	public ImageAWT(final byte[] array) throws IOException {
 		super();
-		img = emulator.graphics2D.c.toAwt(new ImageData(new ByteArrayInputStream(array)));
+		try {
+			img = emulator.graphics2D.c.toAwt(new ImageData(new ByteArrayInputStream(array)));
+		} catch (SWTException e) {
+			if ("Invalid image".equals(e.getMessage())) {
+				img = ImageIO.read(new ByteArrayInputStream(array));
+			} else {
+				throw e;
+			}
+		}
 	}
 
 	public ImageAWT(final BufferedImage bi) {

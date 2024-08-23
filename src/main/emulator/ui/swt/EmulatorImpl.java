@@ -4,6 +4,7 @@ import emulator.graphics2D.awt.FontAWT;
 import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.widgets.*;
 
+import java.io.IOException;
 import java.util.*;
 
 import emulator.*;
@@ -196,7 +197,7 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 
-	public final IImage newImage(final byte[] array) {
+	public final IImage newImage(final byte[] array) throws IOException {
 		if (Settings.g2d == 0) {
 			return new ImageSWT(array);
 		}
