@@ -261,6 +261,7 @@ public final class EventQueue implements Runnable {
 			synchronized (lock) {
 				internalRepaint();
 			}
+			Displayable.fpsLimiter();
 			return;
 		}
 		if (repainted) return;
