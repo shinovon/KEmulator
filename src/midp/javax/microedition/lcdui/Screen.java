@@ -229,6 +229,9 @@ public abstract class Screen extends Displayable {
 	}
 
 	protected void sizeChanged(final int w, final int h) {
+		this.w = w;
+		this.h = h;
+		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
 	}
 
 	protected void drawScrollBar(final Graphics graphics) {

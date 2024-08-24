@@ -194,6 +194,8 @@ public class Form extends Screen {
 	}
 
 	protected void sizeChanged(final int w, final int h) {
+		this.w = w;
+		this.h = h;
 		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
 		layout();
 	}

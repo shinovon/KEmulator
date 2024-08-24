@@ -232,12 +232,11 @@ public class Player
 	}
 
 	public int getBitrate() {
-		if(bitrate == 0)
+		if(bitrate == 0) {
 			try {
-				bitstream.header.bitrate();
-			} catch (Exception e) {
-
-			}
+				bitrate = bitstream.header.bitrate();
+			} catch (Exception ignored) {}
+		}
 		return bitrate;
 	}
 
@@ -256,7 +255,7 @@ public class Player
 			try {
 				this.bitstream.close();
 				this.data = null;
-			} catch (BitstreamException localb) {}
+			} catch (BitstreamException ignored) {}
 		}
 	    /*
 		AudioDevice out = audio;
@@ -388,7 +387,7 @@ public class Player
 		float o = 1;
 		switch(h.frequency()) {
 		case 44100:
-			o = 38f + 1 / 3;
+			o = 38f + 1 / 3f;
 			break;
 		case 32000:
 			o = 27.6f;

@@ -303,8 +303,10 @@ public final class EventQueue implements Runnable {
 						final IImage backBufferImage3 = scr.getBackBufferImage();
 						final IImage xRayScreenImage3 = scr.getXRayScreenImage();
 						Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
-						(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
-								.cloneImage(scr.getScreenImg());
+						try {
+							(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
+									.cloneImage(scr.getScreenImg());
+						} catch (Exception ignored) {}
 						scr.repaint();
 						try {
 							Thread.sleep(100L);
