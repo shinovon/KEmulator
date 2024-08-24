@@ -306,10 +306,12 @@ public final class EventQueue implements Runnable {
 						try {
 							(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
 									.cloneImage(scr.getScreenImg());
-						} catch (Exception ignored) {}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						scr.repaint();
 						try {
-							Thread.sleep(100L);
+							Thread.sleep(500L);
 						} catch (Exception ignored) {}
 						screen = false;
 						this.queue(EVENT_SCREEN);

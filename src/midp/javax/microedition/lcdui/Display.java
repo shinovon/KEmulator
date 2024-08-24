@@ -64,9 +64,9 @@ public class Display {
 				Emulator.setScreen((Screen) d);
 				Emulator.getEventQueue().queue(EventQueue.EVENT_SCREEN);
 				((Screen) d).shown();
-				if (d instanceof TextBox) {
-					((TextBox) d).focusCaret();
-				}
+//				if (d instanceof TextBox) {
+//					((TextBox) d).focusCaret();
+//				}
 			}
 			d.updateCommands();
 		}

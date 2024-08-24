@@ -23,7 +23,12 @@ public class Image {
 		++Profiler.totalImageInstances;
 	}
 
-	public void finalize() {
+    static org.eclipse.swt.graphics.Image getSWTImage(Image img) {
+		// TODO
+		return null;
+    }
+
+    public void finalize() {
 		Profiler.totalImagePixelCount -= this.getWidth() * this.getHeight();
 		--Profiler.totalImageInstances;
 	}

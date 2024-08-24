@@ -1,117 +1,477 @@
 package javax.microedition.lcdui;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+
 public class List extends Screen implements Choice {
 	public static final Command SELECT_COMMAND = new Command("Select", 1, 0);
-	private ChoiceGroup choiceGroup;
+	private int type;
+	private Table swtTable;
+	private ChoiceImpl choiceImpl;
+	private Command selectCommand;
+
+	private SwtTableSelectionListener swtTableListener =
+			new SwtTableSelectionListener();
 
 	public List(String s, int n) {
-		this(s, n, new String[0], new Image[0]);
+		this(s, n, new String[0], null);
 	}
 
-	public List(String s, int n, String[] array, Image[] array2) {
-		super(s);
-		if (n != 2 && n != 1 && n != 3) {
+	public List(String title, int type, String[] text, Image[] img) {
+		super(title);
+		if (type != 2 && type != 1 && type != 3) {
 			throw new IllegalArgumentException();
-		} else {
-			choiceGroup = new ChoiceGroup(null, n, array, array2, true);
-			super.items.add(choiceGroup);
-			choiceGroup.screen = this;
-			choiceGroup.aBoolean541 = true;
-			choiceGroup.shownOnForm = true;
-			choiceGroup.focus();
-			choiceGroup.aCommand540 = SELECT_COMMAND;
-			super.addCommand(SELECT_COMMAND);
+		}
+		this.type = type;
+		constructSwt();
+		switch(type)
+		{
+			case Choice.IMPLICIT:
+			case Choice.EXCLUSIVE:
+				choiceImpl = new ChoiceImpl(false);
+				break;
+			case Choice.MULTIPLE:
+				choiceImpl = new ChoiceImpl(true);
+				break;
+		}
+		choiceImpl.check(text, img);
+		for(int i = 0; i < text.length; i++)
+		{
+			append(text[i], img != null
+					? img[i] : null);
 		}
 	}
 
-	public void setSelectCommand(Command aCommand540) {
-		if (choiceGroup.choiceType == 3) {
-			super.removeCommand(choiceGroup.aCommand540);
-			super.addCommand(choiceGroup.aCommand540 = aCommand540);
+
+
+	protected Composite constructSwtContent(int style) {
+		Composite c = super.constructSwtContent(style);
+		swtTable = new Table(c, getStyle(type));
+		return c;
+	}
+
+	public void setSelectCommand(Command cmd) {
+		if (type == Choice.IMPLICIT) {
+			if(cmd == null)
+			{
+				if(selectCommand != null)
+				{
+					super.removeCommand(selectCommand);
+				}
+			}
+			else if(cmd != SELECT_COMMAND)
+			{
+				addCommand(cmd);
+			}
+			selectCommand = cmd;
 		}
 	}
 
-	public int append(String s, Image image) {
-		return choiceGroup.append(s, image);
+	public void removeCommand(Command cmd)
+	{
+		if(cmd == selectCommand)
+		{
+			selectCommand = null;
+		}
+		super.removeCommand(cmd);
 	}
 
-	public void delete(int n) {
-		choiceGroup.delete(n);
+	/**
+	 * Append item with specified text and image.
+	 *
+	 * @param text the text
+	 * @param img the image
+	 * @return index of added item
+	 */
+	public int append(String text, Image img)
+	{
+		final int index = choiceImpl.append(text, img);
+		syncExec(new Runnable()
+		{
+			public void run()
+			{
+				swtInsertItem(index);
+				swtUpdateSelection();
+			}
+		});
+		return index;
 	}
 
-	public void deleteAll() {
-		choiceGroup.deleteAll();
+	/**
+	 * Insert item with specified text and image.
+	 *
+	 * @param position the item index
+	 * @param text the text
+	 * @param img the image
+	 */
+	public void insert(int position, String text, Image img)
+	{
+		choiceImpl.insert(position, text, img);
+		final int index = position; // index of added element
+		syncExec(new Runnable()
+		{
+			public void run()
+			{
+				swtInsertItem(index);
+				swtUpdateSelection();
+			}
+		});
 	}
 
-	public int getFitPolicy() {
-		return choiceGroup.getFitPolicy();
+	/**
+	 * Set item with specified text and image.
+	 *
+	 * @param position the item index
+	 * @param text the text
+	 * @param img the image
+	 */
+	public void set(int position, String text, Image img)
+	{
+		choiceImpl.set(position, text, img);
+		final int index = position; // index of changed element
+		syncExec(new Runnable()
+		{
+			public void run()
+			{
+				swtSetItem(index);
+				swtUpdateSelection();
+			}
+		});
 	}
 
-	public Font getFont(int n) {
-		return choiceGroup.getFont(n);
+	/**
+	 * Remove item with at specified position.
+	 *
+	 * @param position the item index
+	 */
+	public void delete(int position)
+	{
+		if (position < 0 || ( position >= size()))
+		{
+			throw new IndexOutOfBoundsException();
+		}
+		final int index = position; // index of changed element
+		syncExec(new Runnable()
+		{
+			public void run()
+			{
+				swtDeleteItem(index);
+				swtUpdateSelection();
+			}
+		});
 	}
 
-	public Image getImage(int n) {
-		return choiceGroup.getImage(n);
+	/**
+	 * Remove all items.
+	 */
+	public void deleteAll()
+	{
+		if(type != Choice.IMPLICIT)
+		{
+			choiceImpl.deleteAll();
+		}
+		syncExec(new Runnable()
+		{
+			public void run()
+			{
+				swtDeleteAllItems();
+			}
+		});
 	}
 
-	public int getSelectedFlags(boolean[] array) {
-		return choiceGroup.getSelectedFlags(array);
+	/**
+	 * Get the fit policy of this list.
+	 *
+	 * @return the lists fir policy
+	 */
+	public int getFitPolicy()
+	{
+		return choiceImpl.getFitPolicy();
 	}
 
-	public int getSelectedIndex() {
-		return choiceGroup.getSelectedIndex();
+	/**
+	 * Get the font used in a list item.
+	 *
+	 * @param position the index of the item
+	 * @return the items font
+	 */
+	public Font getFont(int position)
+	{
+		return choiceImpl.getFont(position);
 	}
 
-	public String getString(int n) {
-		return choiceGroup.getString(n);
+	/**
+	 * Get the image part of a list item.
+	 *
+	 * @param position the index of the item
+	 * @return the items image part
+	 */
+	public Image getImage(int position)
+	{
+		return choiceImpl.getImage(position);
 	}
 
-	public void insert(int n, String s, Image image) {
-		choiceGroup.insert(n, s, image);
+	/**
+	 * Get the string part of a list item.
+	 *
+	 * @param position the index of the item
+	 * @return the items string part
+	 */
+	public String getString(int position)
+	{
+		return choiceImpl.getString(position);
 	}
 
-	public boolean isSelected(int n) {
-		return choiceGroup.isSelected(n);
+	/**
+	 * Get selected flags.
+	 *
+	 * @param selectedArray an array with selected items
+	 * @return selected flags
+	 */
+	public int getSelectedFlags(boolean[] selectedArray)
+	{
+		return choiceImpl.getSelectedFlags(selectedArray);
 	}
 
-	public void set(int n, String s, Image image) {
-		choiceGroup.set(n, s, image);
+	/**
+	 * Returns the selected index.
+	 *
+	 * @return the selected index
+	 */
+	public int getSelectedIndex()
+	{
+		return choiceImpl.getSelectedIndex();
 	}
 
-	public void setFitPolicy(int fitPolicy) {
-		choiceGroup.setFitPolicy(fitPolicy);
+	/**
+	 * Returns if the specified element is selected.
+	 *
+	 * @param position specified element index
+	 * @return true if its selected, false otherwise
+	 */
+	public boolean isSelected(int position)
+	{
+		return choiceImpl.isSelected(position);
+	}
+
+	public void setFitPolicy(int newFitPolicy)
+	{
+		choiceImpl.setFitPolicy(newFitPolicy);
+//		syncExec(new Runnable()
+//		{
+//			public void run()
+//			{
+//				swtTable.setWordWrap(choiceImpl.getFitPolicy()
+//						== Choice.TEXT_WRAP_ON);
+//			}
+//		});
 	}
 
 	public void setFont(int n, Font font) {
-		choiceGroup.setFont(n, font);
 	}
 
-	public void setSelectedFlags(boolean[] selectedFlags) {
-		choiceGroup.setSelectedFlags(selectedFlags);
+	/**
+	 * Set selected flags.
+	 *
+	 * @param selectedArray an array with selected items
+	 */
+	public void setSelectedFlags(boolean[] selectedArray)
+	{
+		choiceImpl.setSelectedFlags(selectedArray);
+		updateSelection();
 	}
 
-	public void setSelectedIndex(int n, boolean b) {
-		choiceGroup.setSelectedIndex(n, b);
+	/**
+	 * Set selected index.
+	 *
+	 * @param position the index of the item
+	 * @param select selected or not
+	 */
+	public void setSelectedIndex(int position, boolean select)
+	{
+		choiceImpl.setSelected(position, select);
+		updateSelection();
 	}
 
-	public int size() {
-		return choiceGroup.size();
+	/**
+	 * Returns the size of the list.
+	 *
+	 * @return the lists size
+	 */
+	public int size()
+	{
+		return choiceImpl.size();
 	}
 
-	@Override
 	protected void drawScrollBar(final Graphics graphics) {
-		emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, choiceGroup.size(), (choiceGroup.getSelectedIndex() != 0) ? choiceGroup.getSelectedIndex() : -1);
 	}
 
 	protected void paint(Graphics graphics) {
-		this.layout();
-		choiceGroup.paint(graphics);
 	}
 
 	protected void layout() {
-		choiceGroup.layout();
-		choiceGroup.bounds[Y] = Screen.fontHeight4;
-		choiceGroup.bounds[H] = bounds[H];
+	}
+
+	private int getStyle(int listType)
+	{
+		int tableStyle = SWT.NONE;
+		switch(listType)
+		{
+			case Choice.IMPLICIT:
+				tableStyle |= SWT.SINGLE;
+				break;
+			case Choice.EXCLUSIVE:
+				tableStyle |= SWT.SINGLE | SWT.RADIO;
+				break;
+			case Choice.MULTIPLE:
+				tableStyle |= SWT.MULTI | SWT.CHECK;
+				break;
+			default:
+				break;
+		}
+		return tableStyle;
+	}
+
+	private void updateSelection()
+	{
+		syncExec(new Runnable()
+		{
+			public void run()
+			{
+				swtUpdateSelection();
+			}
+		});
+	}
+	/**
+	 * Update eSWT Table selection.
+	 */
+	private void swtUpdateSelection()
+	{
+		if(type == IMPLICIT || type == EXCLUSIVE)
+		{
+			int sel = choiceImpl.getSelectedIndex();
+			if((sel == 0) || (swtTable.getSelectionIndex() != sel))
+			{
+				swtTable.setSelection(sel);
+			}
+		}
+		else
+		{
+			int size = choiceImpl.size();
+			for(int i = 0; i < size; i++)
+			{
+				if(choiceImpl.isSelected(i))
+				{
+					swtTable.select(i);
+				}
+				else
+				{
+					swtTable.deselect(i);
+				}
+			}
+		}
+	}
+
+	private void swtInsertItem(int index)
+	{
+		TableItem item = new TableItem(swtTable, SWT.NONE, index);
+		Image img = choiceImpl.getImage(index);
+		item.setImage(0, Image.getSWTImage(img));
+		item.setText(0, choiceImpl.getString(index));
+	}
+
+	private void swtSetItem(int index)
+	{
+		TableItem item = swtTable.getItem(index);
+		Image img = choiceImpl.getImage(index);
+		item.setImage(0, Image.getSWTImage(img));
+		item.setText(0, choiceImpl.getString(index));
+	}
+
+	private void swtDeleteItem(int index)
+	{
+		swtTable.getItem(index).dispose();
+		choiceImpl.delete(index);
+	}
+
+	private void swtSetItemFont(int index)
+	{
+		org.eclipse.swt.graphics.Font font = Font.getSWTFont(choiceImpl
+				.getFont(index));
+		swtTable.getItem(index).setFont(0, font);
+	}
+
+	private void swtDeleteAllItems()
+	{
+		for(int i = swtTable.getItemCount() - 1; i >= 0; i--)
+		{
+			if(type == Choice.IMPLICIT)
+			{
+				choiceImpl.delete(i);
+			}
+			swtTable.getItem(i).dispose();
+		}
+	}
+
+	class SwtTableSelectionListener implements SelectionListener
+	{
+
+		private void update(SelectionEvent se)
+		{
+			if(se.widget != null && se.item != null)
+			{
+				int index = ((Table) se.widget).indexOf((TableItem) se.item);
+				if(index >= 0)
+				{
+					choiceImpl.setSelected(index, !isSelected(index));
+				}
+			}
+		}
+
+		public void widgetDefaultSelected(SelectionEvent se)
+		{
+			if(type == Choice.IMPLICIT)
+			{
+				if(size() > 0)
+				{
+					callCommandAction(selectCommand);
+				}
+			}
+		}
+
+		public void widgetSelected(SelectionEvent se)
+		{
+			if(type == Choice.IMPLICIT || type == Choice.EXCLUSIVE)
+			{
+				update(se);
+			}
+			else if(type == Choice.MULTIPLE)
+			{
+				if(se.detail == SWT.CHECK)
+				{
+					update(se);
+				}
+			}
+		}
+
+	}
+
+	public void swtShown() {
+		super.swtShown();
+		swtTable.addSelectionListener(swtTableListener);
+	}
+
+	public void swtHidden() {
+		super.swtHidden();
+		swtTable.removeSelectionListener(swtTableListener);
+	}
+
+	public void swtResized(int w, int h) {
+		super.swtResized(w, h);
+		swtTable.setBounds(swtContent.getClientArea());
 	}
 }

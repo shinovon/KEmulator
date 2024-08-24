@@ -51,6 +51,11 @@ public class Font {
 		this.font = Emulator.getEmulator().newFont(n2, anInt1316);
 	}
 
+	static org.eclipse.swt.graphics.Font getSWTFont(Font font) {
+		// TODO
+		return null;
+	}
+
 	public Font deriveFont(int size) {
 		int anInt1316;
 		if (((anInt1316 = this.style) & 0x4) != 0x0) {

@@ -7,6 +7,11 @@ import emulator.media.capture.CapturePlayerImpl;
 import emulator.*;
 import emulator.debug.*;
 import emulator.lcdui.a;
+import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.EmulatorScreen;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
 
 public class Displayable {
 	public static final int X = 0;
@@ -31,6 +36,10 @@ public class Displayable {
 	private static final Object frameLock = new Object();
 	private static final long MILLI_TO_NANO = 1000000L;
 
+	protected Composite swtContent;
+	private Rectangle swtContentArea;
+	private boolean swtInitialized;
+
 	public Displayable() {
 		super();
 		this.selectedItem = null;
@@ -42,10 +51,16 @@ public class Displayable {
 	}
 
 	public int getWidth() {
+		if (swtContentArea != null) {
+			return swtContentArea.width;
+		}
 		return this.w;
 	}
 
 	public int getHeight() {
+		if (swtContentArea != null) {
+			return swtContentArea.height;
+		}
 		return this.h;
 	}
 
@@ -198,6 +213,13 @@ public class Displayable {
 		return false;
 	}
 
+	public void callCommandAction(Command command) {
+		if (cmdListener != null && command != null) {
+			// TODO queue
+			cmdListener.commandAction(command, this);
+		}
+	}
+
 	public void setCommandListener(final CommandListener listener) {
 		this.cmdListener = listener;
 	}
@@ -212,6 +234,13 @@ public class Displayable {
 	public void invokeSizeChanged(final int w, final int h) {
 		this.w = Emulator.getEmulator().getScreen().getWidth();
 		this.h = Emulator.getEmulator().getScreen().getHeight();
+		if (swtContent != null) {
+			syncExec(new Runnable() {
+				public void run() {
+					swtUpdateSizes();
+				}
+			});
+		}
 		this.sizeChanged(w, h);
 		Emulator.getEventQueue().queueRepaint();
 	}
@@ -345,9 +374,80 @@ public class Displayable {
 		Graphics.resetXRayCache();
 	}
 
+
+	void constructSwt() {
+		syncExec(new Runnable() {
+			public void run() {
+				swtContent = constructSwtContent(SWT.NONE);
+				swtContentArea = layoutSwtContent();
+			}
+		});
+	}
+
+	protected Composite constructSwtContent(int style) {
+		return new Composite(getSwtParent(), SWT.NONE);
+	}
+
+	protected Rectangle layoutSwtContent() {
+		Rectangle area = getSwtParent().getClientArea();
+		swtContent.setBounds(0, 0, area.width, area.height);
+		return swtContent.getClientArea();
+	}
+
+	public Composite getSwtContent() {
+		return swtContent;
+	}
+
+	protected void finalize() throws Throwable {
+		syncExec(new Runnable() {
+			public void run() {
+				if (!swtContent.isDisposed()) {
+					swtContent.dispose();
+				}
+			}
+		});
+		super.finalize();
+	}
+
+	static Composite getSwtParent() {
+		return ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+	}
+
+	static void syncExec(Runnable r) {
+		EmulatorImpl.syncExec(r);
+	}
+
+	protected void shown() {
+	}
+
 	static {
 		Displayable.lastFrameTime = System.nanoTime();
 		Displayable.lastFpsUpdateTime = Displayable.lastFrameTime;
 		Displayable.framesCount = 0;
+	}
+
+	public void swtHidden() {
+	}
+
+	public void swtShown() {
+		if (swtContent != null && !swtContent.isDisposed()) {
+			swtUpdateSizes();
+		}
+	}
+
+	void swtUpdateSizes() {
+		Rectangle newArea = layoutSwtContent();
+		if(swtContentArea == null || !swtInitialized
+				|| newArea.width != swtContentArea.width
+				|| newArea.height != swtContentArea.height)
+		{
+			swtInitialized = true;
+			swtContentArea = newArea;
+			swtResized(newArea.width, newArea.height);
+		}
+	}
+
+	public void swtResized(int w, int h) {
+
 	}
 }

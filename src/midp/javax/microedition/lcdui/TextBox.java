@@ -1,24 +1,19 @@
 package javax.microedition.lcdui;
 
 import emulator.*;
+import org.eclipse.swt.widgets.Text;
 
 public class TextBox extends Screen {
-	private TextField textField;
+//	private TextField textField;
+
+	Text swtText;
 
 	public TextBox(final String s, final String s2, final int n, final int n2) {
 		super(s);
-		this.textField = new TextField(null, s2, n, n2);
-		super.items.add(this.textField);
-		this.textField.screen = this;
-		this.textField.isTextBox = true;
-		this.textField.shownOnForm = true;
-		this.textField.inFocus = true;
-		this.textField.screen.setItemCommands(this.textField);
+		constructSwt();
 	}
 
 	protected void focusCaret() {
-		this.textField.screen.setItemCommands(this.textField);
-		Emulator.getEmulator().getScreen().getCaret().focusItem(this.textField, super.bounds[X] + 4, Screen.fontHeight4 + 4);
 	}
 
 	public String getString() {
@@ -70,11 +65,11 @@ public class TextBox extends Screen {
 	}
 
 	public int getConstraints() {
-		return this.textField.getConstraints();
+//		return this.textField.getConstraints();
 	}
 
 	public void setInitialInputMode(final String initialInputMode) {
-		this.textField.setInitialInputMode(initialInputMode);
+//		this.textField.setInitialInputMode(initialInputMode);
 	}
 
 	public void setTitle(final String title) {
@@ -86,17 +81,12 @@ public class TextBox extends Screen {
 	}
 
 	protected void paint(final Graphics graphics) {
-		this.layout();
-		this.textField.paint(graphics);
 	}
 
 	protected void layout() {
-		this.textField.layout();
-		this.textField.bounds[Y] = Screen.fontHeight4;
 	}
 
 	protected void defocus() {
-		this.textField.defocus();
 	}
 
 }
