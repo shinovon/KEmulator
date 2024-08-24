@@ -10,6 +10,7 @@ import emulator.lcdui.a;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
@@ -415,6 +416,19 @@ public class Displayable {
 
 	static void syncExec(Runnable r) {
 		EmulatorImpl.syncExec(r);
+	}
+
+	static void safeSyncExec(Runnable r) {
+		try {
+			EmulatorImpl.syncExec(r);
+		} catch (SWTException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			} else {
+				throw new RuntimeException(cause);
+			}
+		}
 	}
 
 	protected void shown() {
