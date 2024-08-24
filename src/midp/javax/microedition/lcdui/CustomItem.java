@@ -2,6 +2,7 @@ package javax.microedition.lcdui;
 
 import emulator.*;
 import emulator.lcdui.*;
+import org.eclipse.swt.graphics.Point;
 
 public abstract class CustomItem extends Item {
 	protected static final int TRAVERSE_HORIZONTAL = 1;
@@ -16,6 +17,14 @@ public abstract class CustomItem extends Item {
 	private Image img;
 	private Graphics g;
 	int[] anIntArray429;
+
+	/**
+	 * If CustomItem is changed, reasons for Re-layouting.
+	 */
+	static final int UPDATE_REASON_REPAINT = UPDATE_ITEM_MAX << 1;
+
+	private int contentWidth;
+	private int contentHeight;
 
 	protected CustomItem(final String s) {
 		super(s);
@@ -178,5 +187,71 @@ public abstract class CustomItem extends Item {
 		if (screen == null) return false;
 		if (this.anIntArray429 == null) return false;
 		return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
+	}
+
+	/*
+	 * Note that if you call this and getContentHeight() from a non-UI thread
+	 * then it must be made sure size doesn't change between the calls.
+	 */
+	int getContentWidth()
+	{
+		return contentWidth;
+	}
+
+	/*
+	 * Note that if you call this and getContentHeight() from a non-UI thread
+	 * then it must be made sure size doesn't change between the calls.
+	 */
+	int getContentHeight()
+	{
+		return contentHeight;
+	}
+
+	boolean isFocusable()
+	{
+		return true;
+	}
+
+	/**
+	 * Calculates minimum size of this item.
+	 *
+	 * @return Minimum size.
+	 */
+	Point calculateMinimumSize()
+	{
+		return CustomItemLayouter.calculateMinimumBounds(this);
+	}
+
+	/**
+	 * Calculates preferred size of this item.
+	 *
+	 * @return Preferred size.
+	 */
+	Point calculatePreferredSize()
+	{
+		return CustomItemLayouter.calculatePreferredBounds(this);
+	}
+
+	/**
+	 * Set the size of the content area.
+	 *
+	 * @param newWidth
+	 * @param newHeight
+	 */
+	void internalHandleSizeChanged(int newWidth, int newHeight)
+	{
+		if(contentWidth != newWidth || contentHeight != newHeight)
+		{
+			synchronized(this)
+			{
+				contentWidth = newWidth;
+				contentHeight = newHeight;
+			}
+//			EventDispatcher eventDispatcher = EventDispatcher.instance();
+//			LCDUIEvent event = eventDispatcher.newEvent(LCDUIEvent.CUSTOMITEM_SIZECHANGED, layouter.formLayouter.getForm());
+//			event.item = this;
+//			eventDispatcher.postEvent(event);
+//			repaint();
+		}
 	}
 }

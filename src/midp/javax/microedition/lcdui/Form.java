@@ -1,27 +1,103 @@
 package javax.microedition.lcdui;
 
 import emulator.lcdui.*;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Table;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Vector;
 
 public class Form extends Screen {
+	private FormLayouter formLayouter;
 	ItemStateListener itemStateListener;
+	private ScrolledComposite formComposite;
+	private FormScrollBarListener fsbl = new FormScrollBarListener();
+
+	private Timer layoutTimer = new Timer();
+
+	private int startIndex;
+
+	private FormTimerTask formTimerTask;
 
 	public Form(final String s) {
-		this(s, null);
+		super(s);
+
+		constructSwt();
+		formLayouter = new FormLayouter(this);
 	}
 
-	public Form(final String s, final Item[] array) {
-		super(s);
-		if (array != null) {
-			for (Item item : array) {
-				if (item == null) {
-					throw new NullPointerException();
-				}
-				if (item.screen != null) {
-					throw new IllegalStateException();
-				}
-				super.items.add(item);
-				item.screen = this;
+	public Form(String title, Item[] formItems)
+	{
+		this(title);
+		if(formItems != null)
+		{
+			for(int i = 0; i < formItems.length; i++)
+			{
+				this.append(formItems[i]);
 			}
+		}
+	}
+
+	protected Composite constructSwtContent(int style) {
+		Composite comp = super.constructSwtContent(SWT.VERTICAL);
+		ScrollBar vBar = comp.getVerticalBar();
+		if(vBar != null)
+		{
+			vBar.setVisible(true);
+			vBar.setEnabled(true);
+		}
+		formComposite = new ScrolledComposite(comp, SWT.NONE);
+		return comp;
+	}
+
+	/* (non-Javadoc)
+	 * @see Displayable#eswtHandleShowCurrentEvent()
+	 */
+	public void swtShown()
+	{
+		super.swtShown();
+		ScrollBar vBar = getContentComp().getVerticalBar();
+		if(vBar != null)
+		{
+			vBar.addSelectionListener(fsbl);
+		}
+		formLayouter.handleShowCurrentEvent();
+	}
+
+	/* (non-Javadoc)
+	 * @see Displayable#eswtHandleHideCurrentEvent()
+	 */
+
+	public void swtHidden() {
+		super.swtHidden();
+
+		ScrollBar vBar = getContentComp().getVerticalBar();
+		if(vBar != null)
+		{
+			vBar.removeSelectionListener(fsbl);
+		}
+		formLayouter.handleHideCurrentEvent();
+	}
+
+	/* (non-Javadoc)
+	 * @see Displayable#eswtHandleResizeEvent(int, int)
+	 */
+	public void swtResized(int width, int height)
+	{
+		super.swtResized(width, height);
+		if(formComposite != null)
+		{
+			formComposite.setRedraw(false);
+			formComposite.setOrigin(0, 0, true);
+			formComposite.setSize(width, height);
+			formComposite.setRedraw(true);
+			formLayouter.handleResizeEvent(width, height);
+			resetLayoutTimer(0);
 		}
 	}
 
@@ -130,67 +206,9 @@ public class Form extends Screen {
 	}
 
 	protected void paint(final Graphics g) {
-		synchronized(items) {
-			this.layout();
-			for (Object o : super.items) {
-				final Item item = ((Item) o);
-				if (item.shownOnForm) {
-					item.paint(g);
-				} else {
-					item.updateHidden();
-				}
-			}
-		}
 	}
 
 	protected void layout() {
-		if (super.anInt182 != -1) {
-			int h = Screen.fontHeight4;
-			for (int i = 0; i < super.items.size(); ++i) {
-				final Item item = ((Item) super.items.get(i));
-				if (i < super.anInt182) {
-//                    if(item instanceof CustomItem && item.shownOnForm) {
-//                        ((CustomItem) item).hideNotify();
-//                    }
-					item.shownOnForm = false;
-				} else {
-					item.layout();
-					item.bounds[Y] = h;
-					h += item.bounds[H];
-					item.shownOnForm = BoundsUtils.collides(super.bounds, item.bounds);
-//                    if(!item.shownOnForm && (item.shownOnForm = BoundsUtils.collides(super.bounds, item.bounds)) && item instanceof CustomItem) {
-//                        ((CustomItem) item).showNotify();
-//                    }
-				}
-			}
-			return;
-		}
-		int n = Screen.fontHeight4 + super.bounds[H];
-		for (int j = super.items.size() - 1; j >= 0; --j) {
-			final Item item = ((Item) super.items.get(j));
-			boolean c;
-			if (j > super.anInt349) {
-				item.shownOnForm = true;
-			} else {
-				item.layout();
-				item.bounds[Y] = n - item.bounds[H];
-				n -= item.bounds[H];
-				item.shownOnForm = BoundsUtils.collides2(super.bounds, item.bounds);
-			}
-		}
-		int h = Screen.fontHeight4;
-		for (Object o : super.items) {
-			final Item item;
-			if ((item = ((Item) o)).shownOnForm) {
-				item.layout();
-				item.bounds[Y] = h;
-				h += item.bounds[H];
-				item.shownOnForm = BoundsUtils.collides2(super.bounds, item.bounds);
-                /*if(!item.shownOnForm && item instanceof CustomItem) {
-                	((CustomItem) item5).hideNotify();
-                }*/
-			}
-		}
 	}
 
 	protected void sizeChanged(final int w, final int h) {
@@ -198,5 +216,122 @@ public class Form extends Screen {
 		this.h = h;
 		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
 		layout();
+	}
+
+	public Vector getItems() {
+		return items;
+	}
+
+	public ScrolledComposite getFormComposite() {
+		return formComposite;
+	}
+
+	/**
+	 * Returns form Form Layouter.
+	 * @return Reference to layout policy.
+	 *
+	 */
+	FormLayouter getFormLayouter()
+	{
+		return formLayouter;
+	}
+	
+
+	/**
+	 * Update item state in form.
+	 *
+	 * @param item
+	 * @param updateReason
+	 * @param param additional parameter
+	 */
+	void updateItemState(Item item, int updateReason, Object param)
+	{
+		if(item != null && item.getParent() == this)
+		{
+			if(layoutTimer != null)
+			{
+				formLayouter.updateItemState(item, updateReason, param);
+			}
+
+			if((updateReason & Item.UPDATE_SIZE_CHANGED) != 0)
+			{
+				synchronized(formLayouter)
+				{
+					resetLayoutTimer(items.indexOf(item));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Reset timer for do layout with a given start index.
+	 */
+	private void resetLayoutTimer(int newStartIndex)
+	{
+		if(layoutTimer != null)
+		{
+			if(formTimerTask != null)
+			{
+				formTimerTask.cancel();
+				formTimerTask = null;
+			}
+			// schedule new timer
+			startIndex = Math.max(0, Math.min(newStartIndex, startIndex));
+			// formLayouter.layoutForm(startIndex);
+			formTimerTask = new FormTimerTask(startIndex);
+			layoutTimer.schedule(formTimerTask, Config.FORM_LAYOUT_TIMER_DELAY);
+		}
+	}
+
+	/**
+	 * Cancel Layout Timer.
+	 */
+	private void cancelLayoutTimer()
+	{
+		if(layoutTimer != null)
+		{
+			if(formTimerTask != null)
+			{
+				formTimerTask.cancel();
+				formTimerTask = null;
+			}
+			layoutTimer.cancel();
+			layoutTimer = null;
+		}
+	}
+
+	/**
+	 * Form Timer task. Triggers the formComposite to Layout.
+	 */
+	class FormTimerTask extends TimerTask
+	{
+
+		private int index;
+
+		FormTimerTask(int newIndex)
+		{
+			index = newIndex;
+		}
+
+		public void run()
+		{
+			Logger.method(Form.this, "layout");
+			formLayouter.layoutForm(index);
+			startIndex = items.size();
+		}
+
+	}
+	class FormScrollBarListener implements SelectionListener
+	{
+
+		public void widgetDefaultSelected(SelectionEvent se)
+		{
+		}
+
+		public void widgetSelected(SelectionEvent se)
+		{
+			ScrollBar sb = (ScrollBar) se.widget;
+			formLayouter.updateScrolling(sb.getSelection(), false);
+		}
 	}
 }

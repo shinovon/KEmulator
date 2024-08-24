@@ -528,6 +528,19 @@ public class Displayable {
 
 	}
 
+	public boolean getLeftRightLanguage() {
+		return true;
+	}
+
+	public boolean swtIsShown() {
+		return isShown();
+	}
+
+	Composite getContentComp()
+	{
+		return swtContent;
+	}
+
 	class SwtMenuSelectionListener implements SelectionListener {
 
 		public void widgetSelected(SelectionEvent e) {

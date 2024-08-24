@@ -27,6 +27,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void invokeKeyPressed(final int n) {
+		if (swtContent != null) return;
 		final long currentTimeMillis;
 		if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
 			return;
@@ -133,6 +134,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void invokePointerPressed(final int x, final int y) {
+		if (swtContent != null) return;
 		if (super.menuShown) {
 			final int n3 = super.w >> 1;
 			final int anInt181 = Screen.fontHeight4;
@@ -158,10 +160,10 @@ public abstract class Screen extends Displayable {
 			}
 			return;
 		}
-		if (selectedItem != null && selectedItem instanceof ChoiceGroup && ((ChoiceGroup) selectedItem).aBoolean542) {
-			selectedItem.pointerPressed(x, y);
-			return;
-		}
+//		if (selectedItem != null && selectedItem instanceof ChoiceGroup && ((ChoiceGroup) selectedItem).aBoolean542) {
+//			selectedItem.pointerPressed(x, y);
+//			return;
+//		}
 		if (this.items.size() > 0) {
 			int j = 0;
 			while (j < this.items.size()) {
@@ -191,6 +193,7 @@ public abstract class Screen extends Displayable {
 	protected abstract void paint(final Graphics p0);
 
 	public void invokePaint(final Graphics graphics) {
+		if (swtContent != null) return;
 		Displayable.resetXRayGraphics();
 		final int color = graphics.getColor();
 		final int strokeStyle = graphics.getStrokeStyle();
@@ -209,6 +212,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	protected void drawTitleBar(final Graphics graphics) {
+		if (swtContent != null) return;
 		String title = super.title;
 		if (title == null)
 			title = "";

@@ -1,7 +1,6 @@
 package javax.microedition.lcdui;
 
-import emulator.*;
-import emulator.lcdui.*;
+import org.eclipse.swt.graphics.Point;
 
 public class TextField extends Item {
 	public static final int ANY = 0;
@@ -17,6 +16,24 @@ public class TextField extends Item {
 	public static final int INITIAL_CAPS_WORD = 1048576;
 	public static final int INITIAL_CAPS_SENTENCE = 2097152;
 	public static final int CONSTRAINT_MASK = 65535;
+
+	/**
+	 * If TextField is changed, reasons for Re-layouting.
+	 */
+	static final int UPDATE_REASON_DELETE = UPDATE_ITEM_MAX << 1;
+	static final int UPDATE_REASON_INSERT = UPDATE_ITEM_MAX << 2;
+	static final int UPDATE_CHARS = UPDATE_ITEM_MAX << 3;
+	static final int UPDATE_CONSTRAINTS = UPDATE_ITEM_MAX << 4;
+	static final int UPDATE_INITIALINPUTMODE = UPDATE_ITEM_MAX << 5;
+	static final int UPDATE_MAXSIZE = UPDATE_ITEM_MAX << 6;
+	static final int UPDATE_STRING = UPDATE_ITEM_MAX << 7;
+
+
+	private TextWrapper textWrapper;
+
+	private int linesCount = 1;
+	private int maxVisibleLines = 1;
+
 	private String string;
 	private int maxSize;
 	private int constraints;
@@ -25,151 +42,334 @@ public class TextField extends Item {
 	private int anInt30;
 	protected boolean isTextBox;
 
-	public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
-		super(s);
-		this.string = aString25;
-		this.maxSize = anInt349;
-		this.constraints = anInt350;
+	/**
+	 * Creates new TextField item.
+	 *
+	 * @param header label of the TextField.
+	 * @param txt initial text.
+	 * @param maxSize maximum number of characters allowed.
+	 * @param constraints TextField constraints.
+	 */
+	public TextField(String header, String txt, int maxSize, int constraints)
+	{
+		super(header);
+		textWrapper = new TextWrapper(txt, maxSize, constraints);
 	}
 
-	public String getString() {
-		return this.string;
+	/**
+	 * Get current caret's position.
+	 *
+	 * @return index in TextField where caret is.
+	 */
+	public int getCaretPosition()
+	{
+		return textWrapper.getCaretPosition();
 	}
 
-	public void setString(final String aString25) {
-		this.string = aString25;
+	/**
+	 * Get content of TextField.
+	 *
+	 * @return String which represents content of TextField;
+	 */
+	public String getString()
+	{
+		return textWrapper.getContent();
 	}
 
-	public int getChars(final char[] array) {
-		if (this.string == null) {
-			return 0;
+	/**
+	 * Set text into TextField, replacing previous content.
+	 *
+	 * @param newTxt text to set.
+	 */
+	public void setString(String newTxt)
+	{
+		textWrapper.setContent(newTxt);
+		linesCount = 0;
+		updateParent(UPDATE_STRING);
+	}
+
+	/**
+	 * Copy content of TextField into array charaData.
+	 *
+	 * @param charData array where to copy.
+	 * @return number of copied characters.
+	 */
+	public int getChars(char[] charData)
+	{
+		if(charData == null)
+		{
+			throw new NullPointerException();
 		}
-		final char[] charArray;
-		System.arraycopy(charArray = this.string.toCharArray(), 0, array, 0, charArray.length);
-		return charArray.length;
-	}
-
-	public void setChars(final char[] array, final int n, final int n2) {
-		final char[] array2 = new char[n2];
-		System.arraycopy(array, n, array2, 0, n2);
-		this.setString(new String(array2));
-	}
-
-	public void insert(final String s, final int n) {
-		final String aString25 = this.string;
-		this.setString(aString25.substring(0, n) + s + aString25.substring(n));
-	}
-
-	public void insert(final char[] array, final int n, final int n2, final int n3) {
-		final char[] array2 = new char[n2];
-		System.arraycopy(array, n, array2, 0, n2);
-		this.insert(new String(array2), n3);
-	}
-
-	public void delete(final int n, final int n2) {
-		final String aString25 = this.string;
-		this.setString(aString25.substring(0, n) + aString25.substring(n + n2));
-	}
-
-	public int getMaxSize() {
-		return this.maxSize;
-	}
-
-	public int setMaxSize(final int anInt349) {
-		return this.maxSize = anInt349;
-	}
-
-	public int size() {
-		if (this.string == null) {
-			return 0;
+		if(charData.length < getString().length())
+		{
+			throw new ArrayIndexOutOfBoundsException();
 		}
-		return this.string.length();
+		String content = textWrapper.getContent();
+		content.getChars(0, content.length(), charData, 0);
+		return content.length();
 	}
 
-	public int getCaretPosition() {
-		return Emulator.getEmulator().getScreen().getCaret().getCaretPosition();
-	}
-
-	public void setConstraints(final int anInt28) {
-		this.constraints = anInt28;
-	}
-
-	public int getConstraints() {
-		return this.constraints;
-	}
-
-	public void setInitialInputMode(final String s) {
-	}
-
-	protected void focus() {
-		super.focus();
-		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.anInt29, this.anInt30);
-	}
-
-	protected void defocus() {
-		super.defocus();
-		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
-	}
-
-	protected void paint(final Graphics graphics) {
-		if (!this.isTextBox) {
-			super.paint(graphics);
-		} else {
-			graphics.setColor(-16777216);
-		}
-		int n = super.bounds[1];
-		int n2 = super.bounds[1];
-		if (super.labelArr != null && super.labelArr.length > 0) {
-			graphics.setFont(Item.font);
-			for (int i = 0; i < super.labelArr.length; ++i) {
-				graphics.drawString(super.labelArr[i], super.bounds[0] + 4, n + 2, 0);
-				n += Item.font.getHeight() + 4;
+	/**
+	 * Set content of charData into TextField.
+	 *
+	 * @param charData array of chars to set.
+	 * @param offset index in charData to start copy from.
+	 * @param length number of character to copy into TextField.
+	 */
+	public void setChars(char[] charData, int offset, int length)
+	{
+		String extractedString = null;
+		if(charData != null)
+		{
+			try
+			{
+				extractedString = new String(charData, offset, length);
 			}
-			n2 = n - 2;
-		}
-		final int n3 = super.bounds[3] - n + super.bounds[1] - 2;
-		if (super.inFocus) {
-			graphics.setColor(-8355712);
-		}
-		graphics.drawRect(2, n2, super.bounds[2] - 4, n3);
-		graphics.setFont(Screen.font);
-		if (super.inFocus) {
-			graphics.setColor(8617456);
-		}
-		this.anInt29 = super.bounds[0] + 4;
-		this.anInt30 = n + 4;
-		for (int j = 0; j < this.textArr.length; ++j) {
-			graphics.drawString(this.textArr[j], super.bounds[0] + 4, n + 2, 0);
-			if ((n += Screen.font.getHeight() + 4) > super.screen.bounds[3]) {
-				return;
+			catch(IndexOutOfBoundsException e)
+			{
+				throw new ArrayIndexOutOfBoundsException();
 			}
 		}
+		textWrapper.setContent(extractedString);
+		linesCount = 0;
+		updateParent(UPDATE_CHARS);
 	}
 
-	protected void layout() {
-		super.layout();
-		int n = 4;
-		final int n2 = this.getPreferredWidth() - 8;
-		if (super.label != null) {
-			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
-			n = 4 + (Item.font.getHeight() + 4) * super.labelArr.length;
-		} else {
-			super.labelArr = null;
+	/**
+	 * Insert text into content of TextField.
+	 *
+	 * @param newTxt string to insert.
+	 * @param position where to insert.
+	 */
+	public void insert(String newTxt, int position)
+	{
+		textWrapper.insert(newTxt, position);
+		linesCount = 0;
+		updateParent(UPDATE_REASON_INSERT);
+	}
+
+	/**
+	 * Insert into TextField subset of characters from char[] array.
+	 *
+	 * @param charData array of characters where to copy from.
+	 * @param offset start index in charData[].
+	 * @param length number of characters to copy.
+	 * @param position index in TextField where to insert to.
+	 */
+	public void insert(char[] charData, int offset, int length, int position)
+	{
+		if(charData == null)
+		{
+			throw new NullPointerException();
 		}
-		final Font aFont173 = Screen.font;
-		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, n2, n2);
-		super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, super.screen.bounds[3]);
+		String extractedString = null;
+		try
+		{
+			extractedString = new String(charData, offset, length);
+		}
+		catch(IndexOutOfBoundsException e)
+		{
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		textWrapper.insert(extractedString, position);
+		linesCount = 0;
+		updateParent(UPDATE_REASON_INSERT);
 	}
 
-	protected int getItemWidth() {
-		return getPreferredWidth();
+	/**
+	 * Delete subset of characters from TextField.
+	 *
+	 * @param offset start index where to start deletion.
+	 * @param length number of characters to delete.
+	 */
+	public void delete(int offset, int length)
+	{
+		textWrapper.delete(offset, length);
+		linesCount = 0;
+		updateParent(UPDATE_REASON_DELETE);
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
+	/**
+	 * Get number of characters allowed for input.
+	 *
+	 * @return number of characters which TextField can contain.
+	 */
+	public int getMaxSize()
+	{
+		return textWrapper.getMaxSize();
+	}
+
+	/**
+	 * Set the maximum size of TextField.
+	 *
+	 * @param newMaxSize size to set.
+	 * @return max size that was set, depending on implementation may be smaller
+	 *         then requested.
+	 */
+	public int setMaxSize(int newMaxSize)
+	{
+		textWrapper.setMaxSize(newMaxSize);
+		linesCount = 0;
+		updateParent(UPDATE_MAXSIZE);
+		return textWrapper.getMaxSize();
+	}
+
+	/**
+	 * Get number of characters stored in TextField.
+	 *
+	 * @return current content length.
+	 */
+	public int size()
+	{
+		return textWrapper.getSize();
+	}
+
+	/**
+	 * Set constraints for TextField.
+	 *
+	 * @param newConstraints constraints to set.
+	 */
+	public void setConstraints(int newConstraints)
+	{
+		textWrapper.setConstraints(newConstraints);
+		updateParent(UPDATE_CONSTRAINTS);
+		if(!textWrapper.isValidText(getString() , textWrapper.getTypeConstraint(newConstraints)))
+			setString("");
+		updateParent(UPDATE_STRING | UPDATE_SIZE_CHANGED);
+	}
+
+	/**
+	 * Get current constraints active in TextField.
+	 *
+	 * @return current constraints.
+	 */
+	public int getConstraints()
+	{
+		return textWrapper.getConstraints();
+	}
+
+	/**
+	 * Set initial input mode for TextField.
+	 *
+	 * @param inputMode input mode to set.
+	 */
+	public void setInitialInputMode(String inputMode)
+	{
+		textWrapper.setInputMode(inputMode);
+		updateParent(UPDATE_INITIALINPUTMODE);
+	}
+
+	/**
+	 * Get Initial input mode.
+	 *
+	 * @return inputMode currently set for TextField.
+	 */
+	String getInitialInputMode()
+	{
+		return textWrapper.getInputMode();
+	}
+
+	/**
+	 * Calculates minimum size of this item.
+	 *
+	 * @return Minimum size.
+	 */
+	Point calculateMinimumSize()
+	{
+		return TextFieldLayouter.calculateMinimumBounds(this);
+	}
+
+	/**
+	 * Calculates preferred size of this item.
+	 *
+	 * @return Preferred size.
+	 */
+	Point calculatePreferredSize()
+	{
+		return TextFieldLayouter.calculatePreferredBounds(this);
+	}
+
+	/**
+	 * Return layout with optional custom flags.
+	 *
+	 * @return layout directive
+	 */
+	int internalGetLayout()
+	{
+		return super.internalGetLayout(); // | Item.LAYOUT_NEWLINE_BEFORE;
+	}
+
+	/**
+	 * @see javax.microedition.lcdui.Item#isFocusable()
+	 */
+	boolean isFocusable()
+	{
+		return true;
+	}
+
+	/**
+	 * Update caret position.
+	 *
+	 * @param newPosition new caret position.
+	 */
+	void internalSetCaretPosition(int newPosition)
+	{
+		textWrapper.setCaretposition(newPosition);
+	}
+
+	/**
+	 * Set String when user interacts with TextField.
+	 *
+	 * @param newText new text.
+	 * @return true if this resulted in a change
+	 */
+	boolean internalSetString(String newText)
+	{
+		if(!textWrapper.getContent().equals(newText))
+		{
+			textWrapper.setContent(newText);
+			return true;
+		}
 		return false;
 	}
 
-	protected boolean isFullWidthItem() {
-		return true;
+	/**
+	 * Set number of lines for the TextField.
+	 *
+	 * @param newLinesCount new number lines.
+	 */
+	void internalSetLinesCount(int newLinesCount)
+	{
+		linesCount = newLinesCount;
+	}
+
+	/**
+	 * Get number of lines currently in TextField;
+	 *
+	 * @return lines count.
+	 */
+	int internalGetLinesCount()
+	{
+		return linesCount;
+	}
+
+	/**
+	 * Set number of maximum visible lines.
+	 *
+	 * @param newMax maximum visible lines allowed for TextField.
+	 */
+	void internalSetMaxVisibleLines(int newMax)
+	{
+		maxVisibleLines = newMax;
+	}
+
+	/**
+	 * Get number maximum visible lines allowed for TextField.
+	 *
+	 * @return number of maximum visible lines to display on the Form.
+	 */
+	int internalGetMaxVisibleLines()
+	{
+		return maxVisibleLines;
 	}
 }

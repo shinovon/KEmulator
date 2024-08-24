@@ -2,6 +2,9 @@ package javax.microedition.lcdui;
 
 import emulator.graphics2D.*;
 import emulator.*;
+import emulator.graphics2D.awt.FontAWT;
+import emulator.graphics2D.swt.FontSWT;
+import emulator.ui.swt.EmulatorImpl;
 
 public class Font {
 	IFont font;
@@ -53,7 +56,11 @@ public class Font {
 
 	static org.eclipse.swt.graphics.Font getSWTFont(Font font) {
 		// TODO
-		return null;
+		if (Settings.g2d == 0) {
+			return ((FontSWT) font.font).method297();
+		}
+		java.awt.Font awt = ((FontAWT) font.font).getAWTFont();
+		return new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(), awt.getFontName(), awt.getSize(), 0);
 	}
 
 	public Font deriveFont(int size) {

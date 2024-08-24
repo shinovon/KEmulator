@@ -1,17 +1,44 @@
 package javax.microedition.lcdui;
 
+import org.eclipse.swt.graphics.Point;
+
 public class Spacer extends Item {
-	private int anInt349;
-	private int anInt28;
+	/**
+	 * If Spacer is changed, reasons for Re-layouting.
+	 */
+	static final int UPDATE_MINIMUMSIZE = UPDATE_ITEM_MAX << 1;
+
+	private int minimumWidth;
+	private int minimumHeight;
 
 	public Spacer(final int n, final int n2) {
 		super(null);
 		this.setMinimumSize(n, n2);
 	}
 
-	public void setMinimumSize(final int anInt349, final int anInt350) {
-		this.anInt349 = anInt349;
-		this.anInt28 = anInt350;
+	public void setMinimumSize(int minW, int minH) {
+		if(minW < 0 || minH < 0)
+		{
+			throw new IllegalArgumentException();
+		}
+		else
+		{
+			int updateReason = Item.UPDATE_NONE;
+			if(minW != getMinimumWidth())
+			{
+				minimumWidth = minW;
+				updateReason |= UPDATE_MINIMUMSIZE | UPDATE_SIZE_CHANGED;
+			}
+			if(minH != getMinimumHeight())
+			{
+				minimumHeight = minH;
+				updateReason |= UPDATE_MINIMUMSIZE | UPDATE_SIZE_CHANGED;
+			}
+			if(updateReason != Item.UPDATE_NONE)
+			{
+				updateParent(updateReason);
+			}
+		}
 	}
 
 	public void addCommand(final Command command) {
@@ -23,7 +50,7 @@ public class Spacer extends Item {
 	}
 
 	public void setLabel(final String s) {
-		throw new IllegalStateException();
+		if (s != null) throw new IllegalStateException();
 	}
 
 	protected void paint(final Graphics graphics) {
@@ -31,12 +58,25 @@ public class Spacer extends Item {
 	}
 
 	protected void layout() {
-		super.layout();
-		super.bounds[2] = Math.min(this.anInt349 + 4, super.screen.bounds[2]);
-		super.bounds[3] = Math.min(this.anInt28 + 4, super.screen.bounds[3]);
 	}
 
-	public int getItemWidth() {
-		return getMinimumWidth();
+	/**
+	 * Calculates minimum size of this item.
+	 *
+	 * @return Minimum size.
+	 */
+	Point calculateMinimumSize()
+	{
+		return new Point(minimumWidth, minimumHeight);
+	}
+
+	/**
+	 * Calculates preferred size of this item.
+	 *
+	 * @return Preferred size.
+	 */
+	Point calculatePreferredSize()
+	{
+		return new Point(minimumWidth, minimumHeight);
 	}
 }
