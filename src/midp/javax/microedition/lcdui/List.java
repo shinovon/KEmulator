@@ -12,7 +12,7 @@ public class List extends Screen implements Choice {
 	private int type;
 	private Table swtTable;
 	private ChoiceImpl choiceImpl;
-	private Command selectCommand;
+	private Command selectCommand = List.SELECT_COMMAND;
 
 	private SwtTableSelectionListener swtTableListener =
 			new SwtTableSelectionListener();

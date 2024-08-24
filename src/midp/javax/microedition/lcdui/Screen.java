@@ -32,12 +32,12 @@ public abstract class Screen extends Displayable {
 			return;
 		}
 		this.lastPressTime = currentTimeMillis;
-		if (super.aBoolean18) {
+		if (super.menuShown) {
 			if (n >= 49 && n <= 57) {
 				final int n2;
 				if ((n2 = n - 49 + 1) < super.commands.size()) {
 					super.cmdListener.commandAction((Command) super.commands.get(n2), this);
-					super.aBoolean18 = false;
+					super.menuShown = false;
 				}
 			} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
 				if (super.anInt28 > 0) {
@@ -51,7 +51,7 @@ public abstract class Screen extends Displayable {
 				final int n3;
 				if (n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE) && (n3 = super.anInt28 + 1) < super.commands.size()) {
 					super.cmdListener.commandAction((Command) super.commands.get(n3), this);
-					super.aBoolean18 = false;
+					super.menuShown = false;
 				}
 			}
 			this.refreshSoftMenu();
@@ -133,7 +133,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void invokePointerPressed(final int x, final int y) {
-		if (super.aBoolean18) {
+		if (super.menuShown) {
 			final int n3 = super.w >> 1;
 			final int anInt181 = Screen.fontHeight4;
 			final int n5;
@@ -151,7 +151,7 @@ public abstract class Screen extends Displayable {
 				for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
 					if (BoundsUtils.collides(array, x, y)) {
 						super.cmdListener.commandAction((Command) super.commands.get(i + 1), this);
-						super.aBoolean18 = false;
+						super.menuShown = false;
 						return;
 					}
 				}

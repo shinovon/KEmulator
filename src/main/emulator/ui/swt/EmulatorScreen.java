@@ -183,21 +183,23 @@ public final class EmulatorScreen implements
 		return shell;
 	}
 
-	private void initScreenBuffer(final int n, final int n2) {
+	private void initScreenBuffer(int w, int h) {
 		synchronized (this) {
+			if (w < 1) w = 1;
+			if (h < 1) h = 1;
 			final int bgcolor = 0xffffff; // 9934483
 			if (Settings.g2d == 0) {
-				this.screenCopySwt = new ImageSWT(n, n2, false, bgcolor);
-				this.screenImageSwt = new ImageSWT(n, n2, false, bgcolor);
-				this.backBufferImageSwt = new ImageSWT(n, n2, false, bgcolor);
-				this.xrayScreenImageSwt = new ImageSWT(n, n2, true, bgcolor);
+				this.screenCopySwt = new ImageSWT(w, h, false, bgcolor);
+				this.screenImageSwt = new ImageSWT(w, h, false, bgcolor);
+				this.backBufferImageSwt = new ImageSWT(w, h, false, bgcolor);
+				this.xrayScreenImageSwt = new ImageSWT(w, h, true, bgcolor);
 				return;
 			}
 			if (Settings.g2d == 1) {
-				this.screenCopyAwt = new ImageAWT(n, n2, false, bgcolor);
-				this.screenImageAwt = new ImageAWT(n, n2, false, bgcolor);
-				this.backBufferImageAwt = new ImageAWT(n, n2, false, bgcolor);
-				this.xrayScreenImageAwt = new ImageAWT(n, n2, true, -16777216);
+				this.screenCopyAwt = new ImageAWT(w, h, false, bgcolor);
+				this.screenImageAwt = new ImageAWT(w, h, false, bgcolor);
+				this.backBufferImageAwt = new ImageAWT(w, h, false, bgcolor);
+				this.xrayScreenImageAwt = new ImageAWT(w, h, true, -16777216);
 			}
 		}
 	}
@@ -2404,6 +2406,10 @@ public final class EmulatorScreen implements
 
 	public Composite getCanvas() {
 		return canvas;
+	}
+
+	public Point getMenuLocation() {
+		return canvas.toDisplay(canvas.getSize());
 	}
 
 	final class ShellPosition implements Runnable {
