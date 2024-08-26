@@ -133,7 +133,7 @@ public final class EmulatorScreen implements
 	private static int captureFileCounter;
 	private static String aString993;
 	private int pauseState;
-	private final String[] pauseStateStrings;
+	private String[] pauseStateStrings;
 	private boolean infosEnabled;
 	private String aString1008;
 	private CaretImpl caret;
@@ -2412,6 +2412,16 @@ public final class EmulatorScreen implements
 
 	public Point getMenuLocation() {
 		return canvas.toDisplay(canvas.getSize());
+	}
+
+	/**
+	 * updateLanguage
+	 */
+	public void updateLanguage() {
+		method586();
+		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
+		updateStatus();
+		this.canvas.redraw();
 	}
 
 	final class ShellPosition implements Runnable {

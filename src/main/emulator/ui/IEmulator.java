@@ -35,4 +35,7 @@ public interface IEmulator {
 	void syncValues();
 
 	String getAppProperty(final String p0);
+
+    void updateLanguage();
+
 }

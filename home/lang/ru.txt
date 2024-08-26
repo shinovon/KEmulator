@@ -267,6 +267,7 @@ OPTION_FONT_SMALL_SIZE=Мелкий:
 OPTION_FONT_TEST_TEXT=Пример:
 OPTION_FONT_TEST_TEXT_TXT=This is an Example.
 
+OPTION_SYSTEM_UI_LANGUAGE=Язык интерфейса:
 OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images.
 OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region.
 OPTION_SYSTEM_INFO_COLOR=Info View: Показывать цвет в формате (R,G,B).
