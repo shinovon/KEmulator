@@ -311,6 +311,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite securityContent;
 	private Tree rmsTree;
 	private Button forceServicePaintCheck;
+	private Composite langComposite;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -1052,19 +1053,36 @@ public final class Property implements IProperty, SelectionListener {
 		this.aCombo657.addModifyListener(new Class117(this));
 	}
 
-	/**
-	 * gen LanguageList
-	 */
 	private void genLanguageList() {
+		//language setting
+		final GridData compLayoutData = new GridData();
+		compLayoutData.horizontalAlignment = GridData.FILL;
+		compLayoutData.verticalAlignment = GridData.FILL;
+		compLayoutData.grabExcessHorizontalSpace = true;
 
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 2;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
+		final GridLayout langLayout = new GridLayout();
+		langLayout.numColumns = 2;
+		langLayout.marginWidth = 0;
+		langLayout.marginHeight = 0;
 
-		this.languageCombo = new Combo(this.customComp, 12);
-		this.languageCombo.setLayoutData(layoutData);
+		langComposite = new Composite(sysChecksGroup, SWT.NONE);
+		langComposite.setLayout(langLayout);
+		langComposite.setLayoutData(compLayoutData);
+
+		final GridData labelLayoutData = new GridData();
+		labelLayoutData.horizontalAlignment = GridData.FILL;
+		labelLayoutData.verticalAlignment = GridData.CENTER;
+
+		labelLanguage = new CLabel(langComposite, SWT.NONE);
+		labelLanguage.setText(UILocale.get("OPTION_SYSTEM_UI_LANGUAGE", "UI Language:"));
+		labelLanguage.setLayoutData(labelLayoutData);
+
+		final GridData comboLayoutData = new GridData();
+		comboLayoutData.horizontalAlignment = GridData.FILL;
+		comboLayoutData.grabExcessHorizontalSpace = true;
+
+		languageCombo = new Combo(langComposite, 12);
+		languageCombo.setLayoutData(comboLayoutData);
 		languageCombo.setFont(f);
 		File folder = new File(Emulator.getAbsolutePath() + "/lang/");
 		if (folder.exists() && folder.isDirectory()) {
@@ -1073,12 +1091,10 @@ public final class Property implements IProperty, SelectionListener {
 				for (File file : files) {
 					if (file.isFile() && file.getName().endsWith(".txt")) {
 						String fileNameWithoutExtension = file.getName().substring(0, file.getName().length() - 4);
-						this.languageCombo.add(fileNameWithoutExtension);
+						languageCombo.add(fileNameWithoutExtension);
 					}
 				}
 			}
-		} else {
-			// lang not found
 		}
 		languageCombo.setText(Settings.uiLanguage);
 	}
@@ -1325,19 +1341,6 @@ public final class Property implements IProperty, SelectionListener {
 		localeText = new Text(this.customComp, 2048);
 		localeText.setLayoutData(layoutData333);
 		localeText.setText(Settings.locale);
-
-		//language setting
-
-		final GridData layoutDataLanguage;
-		(layoutDataLanguage = new GridData()).horizontalAlignment = 4;
-		layoutDataLanguage.verticalAlignment = 2;
-
-		(this.labelLanguage = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_LANGUAGE", "Language:"));
-		this.labelLanguage.setLayoutData(layoutDataLanguage);
-
-		this.genLanguageList();
-
-		//end
 
 		this.method384();
 		(this.aCLabel738 = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
@@ -2165,6 +2168,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void initSystemComp() {
+
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
@@ -2172,6 +2176,7 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.verticalAlignment = 4;
 		(this.sysChecksGroup = new Group(this.systemComp, 0)).setLayout(new GridLayout());
 		this.sysChecksGroup.setLayoutData(layoutData);
+		genLanguageList();
 		(this.aButton746 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_XRAY_BG", "X-Ray View: OverLap images."));
 		this.aButton746.setSelection(Settings.xrayOverlapScreen);
 		(this.aButton749 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_XRAY_CLIP", "X-Ray View: Show image clipping region."));
