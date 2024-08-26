@@ -5,6 +5,7 @@
     <content url="file://$MODULE_DIR$/res">
       <sourceFolder url="file://$MODULE_DIR$/res" isTestSource="false" />
     </content>
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
