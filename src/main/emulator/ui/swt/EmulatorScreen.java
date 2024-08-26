@@ -170,6 +170,7 @@ public final class EmulatorScreen implements
 	private StackLayout stackLayout;
 	private Composite swtContent;
 	private Displayable lastDisplayable;
+	private boolean painted;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -419,13 +420,15 @@ public final class EmulatorScreen implements
 			int bh = getHeight();
 			int w;
 			int h;
+			int sx = Math.max(0, screenX);
+			int sy = Math.max(0, screenY);
 			if (screenWidth != 0 && screenHeight != 0 &&
 					(Settings.resizeMode == 2 || Settings.resizeMode == 3)) {
-				w = (int) (bw * zoom) + canvas.getBorderWidth() * 2 + screenX * 2;
-				h = (int) (bh * zoom) + canvas.getBorderWidth() * 2 + screenY * 2;
+				w = (int) (bw * zoom) + canvas.getBorderWidth() * 2 + sx * 2;
+				h = (int) (bh * zoom) + canvas.getBorderWidth() * 2 + sy * 2;
 			} else {
-				w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2 + screenX * 2;
-				h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2 + screenY * 2;
+				w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2 + sx * 2;
+				h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2 + sy * 2;
 			}
 			this.canvas.setSize(w, h);
 			size = canvas.getSize();
@@ -1489,7 +1492,7 @@ public final class EmulatorScreen implements
 			// swap width & height if rotated by 90 or 270 degrees
 			canvasWidth = size.height;
 			canvasHeight = size.width;
-			if (Settings.resizeMode == 2) {
+			if (Settings.resizeMode != 3 && (Settings.resizeMode == 2 || !painted)) {
 				scaledWidth = zoomedHeight;
 				scaledHeight = zoomedWidth;
 			}
@@ -1497,6 +1500,7 @@ public final class EmulatorScreen implements
 			canvasWidth = size.width;
 			canvasHeight = size.height;
 		}
+		painted = true;
 
 		// Keep proportions
 		final float ratio = (float) origWidth / (float) origHeight;
@@ -1509,11 +1513,7 @@ public final class EmulatorScreen implements
 		}
 
 		if (Settings.resizeMode != 0) {
-			if (Settings.resizeMode != 1) {
-				zoom = ((float) scaledWidth / (float) origWidth);
-			} else {
-				zoom = ((float) scaledWidth / (float) origWidth);
-			}
+			zoom = ((float) scaledWidth / (float) origWidth);
 			Settings.canvasScale = (int) (zoom * 100F);
 		} else if (zoom != 1f) {
 			scaledWidth *= zoom;
