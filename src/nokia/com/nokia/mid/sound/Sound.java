@@ -181,11 +181,12 @@ public class Sound {
 	public void stop() {
 		try {
 			this.m_player.stop();
-		} catch (Exception ignored) {
-		}
-		state = 1;
-		if (this.soundListener != null) {
-			this.soundListener.soundStateChanged(this, 1);
+		} catch (Exception ignored) {}
+		if (state != 1) {
+			state = 1;
+			if (this.soundListener != null) {
+				this.soundListener.soundStateChanged(this, 1);
+			}
 		}
 	}
 
