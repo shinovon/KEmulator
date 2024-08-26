@@ -424,8 +424,8 @@ public final class EmulatorScreen implements
 				w = (int) (bw * zoom) + canvas.getBorderWidth() * 2 + screenX * 2;
 				h = (int) (bh * zoom) + canvas.getBorderWidth() * 2 + screenY * 2;
 			} else {
-				w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
-				h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
+				w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2 + screenX * 2;
+				h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2 + screenY * 2;
 			}
 			this.canvas.setSize(w, h);
 			size = canvas.getSize();
@@ -1223,6 +1223,7 @@ public final class EmulatorScreen implements
 			if (menuItem == this.rotate90MenuItem) {
 				rotate90degrees(false);
 				resized();
+				if (Settings.resizeMode == 0) zoom(zoom);
 				return;
 			}
 			if (menuItem == this.forcePaintMenuItem) {
@@ -1488,7 +1489,7 @@ public final class EmulatorScreen implements
 			// swap width & height if rotated by 90 or 270 degrees
 			canvasWidth = size.height;
 			canvasHeight = size.width;
-			if (Settings.resizeMode != 3) {
+			if (Settings.resizeMode == 2) {
 				scaledWidth = zoomedHeight;
 				scaledHeight = zoomedWidth;
 			}
@@ -1508,7 +1509,11 @@ public final class EmulatorScreen implements
 		}
 
 		if (Settings.resizeMode != 0) {
-			zoom = ((float) scaledWidth / (float) origWidth);
+			if (Settings.resizeMode != 1) {
+				zoom = ((float) scaledWidth / (float) origWidth);
+			} else {
+				zoom = ((float) scaledWidth / (float) origWidth);
+			}
 			Settings.canvasScale = (int) (zoom * 100F);
 		} else if (zoom != 1f) {
 			scaledWidth *= zoom;
