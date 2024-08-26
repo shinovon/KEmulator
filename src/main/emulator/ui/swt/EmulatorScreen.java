@@ -27,6 +27,8 @@ import org.eclipse.swt.widgets.*;
 
 import org.eclipse.swt.events.*;
 
+import javax.microedition.lcdui.Displayable;
+
 public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,
 		ControlListener, KeyListener, MouseListener,
@@ -165,6 +167,9 @@ public final class EmulatorScreen implements
 	private MenuItem softM3DMenuItem;
 	private Menu menuM3DEngine;
 	private boolean wasResized;
+	private StackLayout stackLayout;
+	private Composite swtContent;
+	private Displayable lastDisplayable;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -178,21 +183,23 @@ public final class EmulatorScreen implements
 		return shell;
 	}
 
-	private void initScreenBuffer(final int n, final int n2) {
+	private void initScreenBuffer(int w, int h) {
 		synchronized (this) {
+			if (w < 1) w = 1;
+			if (h < 1) h = 1;
 			final int bgcolor = 0xffffff; // 9934483
 			if (Settings.g2d == 0) {
-				this.screenCopySwt = new ImageSWT(n, n2, false, bgcolor);
-				this.screenImageSwt = new ImageSWT(n, n2, false, bgcolor);
-				this.backBufferImageSwt = new ImageSWT(n, n2, false, bgcolor);
-				this.xrayScreenImageSwt = new ImageSWT(n, n2, true, bgcolor);
+				this.screenCopySwt = new ImageSWT(w, h, false, bgcolor);
+				this.screenImageSwt = new ImageSWT(w, h, false, bgcolor);
+				this.backBufferImageSwt = new ImageSWT(w, h, false, bgcolor);
+				this.xrayScreenImageSwt = new ImageSWT(w, h, true, bgcolor);
 				return;
 			}
 			if (Settings.g2d == 1) {
-				this.screenCopyAwt = new ImageAWT(n, n2, false, bgcolor);
-				this.screenImageAwt = new ImageAWT(n, n2, false, bgcolor);
-				this.backBufferImageAwt = new ImageAWT(n, n2, false, bgcolor);
-				this.xrayScreenImageAwt = new ImageAWT(n, n2, true, -16777216);
+				this.screenCopyAwt = new ImageAWT(w, h, false, bgcolor);
+				this.screenImageAwt = new ImageAWT(w, h, false, bgcolor);
+				this.backBufferImageAwt = new ImageAWT(w, h, false, bgcolor);
+				this.xrayScreenImageAwt = new ImageAWT(w, h, true, -16777216);
 			}
 		}
 	}
@@ -1433,7 +1440,7 @@ public final class EmulatorScreen implements
 				(i[1]) + "," + (i2[0] - i[0]) +
 				"," + (i2[1] - i[1]) + ")";
         /*
-        "(" + (int)(this.mouseXPress / this.zoom) + "," + 
+        "(" + (int)(this.mouseXPress / this.zoom) + "," +
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
         "," + (int)((this.mouseYRelease - this.mouseYPress) / this.zoom) + ")";
         */
@@ -1457,6 +1464,8 @@ public final class EmulatorScreen implements
 		this.canvas.addControlListener(this);
 		this.canvas.addPaintListener(this);
 		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
+		stackLayout = new StackLayout();
+		canvas.setLayout(stackLayout);
 		this.keysState = new boolean[256];
 		this.method589();
 		this.caret = new CaretImpl(this.canvas);
@@ -1509,36 +1518,38 @@ public final class EmulatorScreen implements
 		int x = (canvasWidth - scaledWidth) / 2;
 		int y = (canvasHeight - scaledHeight) / 2;
 
-		try {
-			// Fill background
-			if (x > 0 || y > 0 || scaledWidth != origWidth || scaledHeight != origHeight) {
-				gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
-				gc.fillRectangle(0, 0, size.width, size.height);
-			}
-			// Apply transform
-			gc.setTransform(this.paintTransform);
-			// Draw canvas buffer
-			if (this.screenImg == null || this.screenImg.isDisposed()) {
-				if (this.pauseState == 0) {
-					// Game not running, show info label
-					gc.setBackground(EmulatorScreen.display.getSystemColor(22));
-					gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
-					gc.setForeground(EmulatorScreen.display.getSystemColor(21));
-					gc.setFont(f);
-					gc.drawText(Emulator.getInfoString(), canvasWidth >> 3, canvasHeight >> 3, true);
-				} else {
-					IImage buf = Settings.g2d == 1 ? screenCopyAwt : screenCopySwt;
-					if (x == 0 && y == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
-						buf.copyToScreen(gc);
-					} else {
-						buf.copyToScreen(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
-					}
+		if (swtContent == null) {
+			try {
+				// Fill background
+				if (x > 0 || y > 0 || scaledWidth != origWidth || scaledHeight != origHeight) {
+					gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
+					gc.fillRectangle(0, 0, size.width, size.height);
 				}
-			} else {
-				// Hold image (paused)
-				gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
-			}
-		} catch (Exception ignored) {}
+				// Apply transform
+				gc.setTransform(this.paintTransform);
+				// Draw canvas buffer
+				if (this.screenImg == null || this.screenImg.isDisposed()) {
+					if (this.pauseState == 0) {
+						// Game not running, show info label
+						gc.setBackground(EmulatorScreen.display.getSystemColor(22));
+						gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
+						gc.setForeground(EmulatorScreen.display.getSystemColor(21));
+						gc.setFont(f);
+						gc.drawText(Emulator.getInfoString(), canvasWidth >> 3, canvasHeight >> 3, true);
+					} else {
+						IImage buf = Settings.g2d == 1 ? screenCopyAwt : screenCopySwt;
+						if (x == 0 && y == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
+							buf.copyToScreen(gc);
+						} else {
+							buf.copyToScreen(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
+						}
+					}
+				} else {
+					// Hold image (paused)
+					gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
+				}
+			} catch (Exception ignored) {}
+		}
 		screenX = x;
 		screenY = y;
 		screenWidth = scaledWidth;
@@ -1587,10 +1598,14 @@ public final class EmulatorScreen implements
 			pollKeyboard(canvas);
 			Controllers.poll();
 		}
-		if (Settings.g2d == 0) {
-			this.screenImageSwt.cloneImage(this.screenCopySwt);
-		} else if (Settings.g2d == 1) {
-			this.screenImageAwt.cloneImage(this.screenCopyAwt);
+		if (swtContent == null) {
+			if (Settings.g2d == 0) {
+				this.screenImageSwt.cloneImage(this.screenCopySwt);
+			} else if (Settings.g2d == 1) {
+				this.screenImageAwt.cloneImage(this.screenCopyAwt);
+			}
+		} else {
+			swtContent.redraw();
 		}
 		this.canvas.redraw();
 		this.updateStatus();
@@ -1598,6 +1613,39 @@ public final class EmulatorScreen implements
 		Emulator.getEmulator().syncValues();
 		Profiler.reset();
 		Profiler3D.reset();
+	}
+
+
+	public void setCurrent(final javax.microedition.lcdui.Displayable d) {
+		// TODO
+		display.syncExec(new Runnable() {
+			public void run() {
+				if (lastDisplayable != null) {
+					lastDisplayable.swtHidden();
+					lastDisplayable = null;
+				}
+				if (d == null) {
+
+					return;
+				}
+				lastDisplayable = d;
+				System.out.println("setCurrent " + d);
+				if (d instanceof javax.microedition.lcdui.Canvas) {
+					stackLayout.topControl = null;
+					swtContent = null;
+				} else {
+					Composite c = d.getSwtContent();
+					System.out.println("swtContent: " + c);
+					stackLayout.topControl = c;
+					swtContent = c;
+					if (c != null) {
+						c.layout();
+					}
+				}
+				canvas.layout();
+				lastDisplayable.swtShown();
+			}
+		});
 	}
 
 	private static void method578(final int n) {
@@ -2354,6 +2402,14 @@ public final class EmulatorScreen implements
 	static {
 		EmulatorScreen.captureFileCounter = 1;
 		EmulatorScreen.aString993 = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss", Locale.ENGLISH).format(Calendar.getInstance().getTime()) + "_";
+	}
+
+	public Composite getCanvas() {
+		return canvas;
+	}
+
+	public Point getMenuLocation() {
+		return canvas.toDisplay(canvas.getSize());
 	}
 
 	final class ShellPosition implements Runnable {
