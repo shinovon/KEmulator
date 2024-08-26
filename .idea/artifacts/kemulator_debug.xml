@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="kemulator-debug">
+    <output-path>$PROJECT_DIR$/home</output-path>
+    <root id="archive" name="kemulator-debug.jar">
+      <element id="module-output" name="m3g_lwjgl" />
+      <element id="module-output" name="micro3d_gl" />
+      <element id="module-output" name="KEmulator_base" />
+    </root>
+  </artifact>
+</component>

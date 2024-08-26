@@ -50,5 +50,6 @@ home/classwatcher.txt
 m3g_*.jar
 micro3d_*.jar
 KEmulator_x64.jar
+kemulator-debug.jar
 version.mf
 home/midlets.txt

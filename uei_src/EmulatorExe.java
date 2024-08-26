@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class EmulatorExe {
 
-	public static final String version = "1.6";
+	public static final String version = "1.7";
 	public static final boolean WINE = false;
 	public static final boolean NNX64 = false;
 
@@ -49,14 +49,14 @@ public class EmulatorExe {
 				System.out.println("KEmulator nnmod");
 			System.out.println("Profile: MIDP-2.1");
 			System.out.println("Configuration: CLDC-1.1");
-			System.out.println("Optional: JSR75-1.0, JSR82-1.0, JSR120-1.0, JSR135-1.0, JSR177_crypto-1.0, JSR179-1.0, JSR205-1.0, JSR234-1.0, JSR256-1.0, NOKIAUI-1.4, SAMSUNGAPI-1.0");
+			System.out.println("Optional: JSR75-1.0, JSR82-1.0, JSR120-1.0, JSR135-1.0, JSR177-1.0, JSR179-1.0, JSR205-1.0, JSR234-1.0, JSR256-1.0, NOKIAUI-1.4, SAMSUNGAPI-1.0, PiglerAPI-1.2");
 			return;
 		}
 		if(args[0].equals("-Xquery")) {
 			StringBuffer cp = new StringBuffer();
 			for(String f: new File(".").list(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
-					return name.endsWith(".jar") && !name.equals("emulator.jar") && !name.equals("KEmulator.jar");
+					return name.endsWith(".jar") && !name.equals("emulator.jar") && !name.equals("KEmulator.jar") && !name.equals("_kemulator-debug.jar");
 				}
 			})) {
 				try {
@@ -65,7 +65,11 @@ public class EmulatorExe {
 			}
 			if(cp.length() > 0) cp.setLength(cp.length() - 1);
 
-			System.out.println("device.list: KEmulator");
+			File debugJar = new File("./_kemulator-debug.jar");
+			
+			System.out.print("device.list: KEmulator");
+			if (debugJar.exists()) System.out.print(", KEmulatorDebug");
+			System.out.println();
 			System.out.println("uei.version: 1.0.2");
 			System.out.println("uei.arguments: Xquery,Xdebug,Xrunjdwp:transport,Xrunjdwp:address,Xrunjdwp:server,Xdescriptor,Xdevice");
 			if(WINE)
@@ -82,6 +86,24 @@ public class EmulatorExe {
 				System.out.println("KEmulator.bootclasspath: " + cp.toString().replace("Z:", ""));
 			else
 				System.out.println("KEmulator.bootclasspath: " + cp.toString());
+			
+			try {
+				if (debugJar.exists()) {
+					String s = debugJar.getCanonicalPath().replace("\\", "/") + ","
+							+ new File("./cldc.jar").getCanonicalPath().replace("\\", "/");
+					System.out.println();
+					System.out.println("KEmulatorDebug.screen.width: 240");
+					System.out.println("KEmulatorDebug.screen.height: 320");
+					System.out.println("KEmulatorDebug.screen.isColor: true");
+					System.out.println("KEmulatorDebug.screen.bitDepth: 16");
+					System.out.println("KEmulatorDebug.screen.isTouch: true");
+					System.out.println("KEmulatorDebug.security.domains: Trusted, Untrusted");
+					if(WINE)
+						System.out.println("KEmulatorDebug.bootclasspath: " + s.replace("Z:", ""));
+					else
+						System.out.println("KEmulatorDebug.bootclasspath: " + s);
+				}
+			} catch (Exception e) {}
 //			System.out.println("KEmulator.bootclasspath: " + path + "/KEmulator.jar");
 			return;
 		}
@@ -210,9 +232,11 @@ public class EmulatorExe {
 					cmd.add(args[i+=1]);
 					continue;
 				case "-keepinstalled": // ignore
+				case "-Xdebug":
 					continue;
 				default:
-					System.out.println("Unknown argument: " + arg);
+					if (!arg.startsWith("-agentlib:") && !arg.startsWith("-Xrun"))
+						System.out.println("Unknown argument: " + arg);
 					continue;
 			}
 		}

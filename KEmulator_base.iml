@@ -8,7 +8,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/midp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/nnapi" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/nokia" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/res" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/oem" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/3d" isTestSource="false" />
     </content>
@@ -19,5 +18,6 @@
     <orderEntry type="library" name="lwjgl" level="project" />
     <orderEntry type="module" module-name="micro3d_stub" />
     <orderEntry type="module" module-name="m3g_stub" />
+    <orderEntry type="module" module-name="KEmulator_res" exported="" />
   </component>
 </module>
