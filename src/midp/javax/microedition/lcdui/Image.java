@@ -3,7 +3,12 @@ package javax.microedition.lcdui;
 import emulator.graphics2D.*;
 import emulator.debug.*;
 import emulator.*;
+import emulator.graphics2D.awt.ImageAWT;
+import emulator.graphics2D.swt.FontSWT;
+import emulator.graphics2D.swt.ImageSWT;
+import emulator.ui.swt.EmulatorImpl;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class Image {
@@ -21,6 +26,16 @@ public class Image {
 		this.resetUsedRegion();
 		Profiler.totalImagePixelCount += this.getWidth() * this.getHeight();
 		++Profiler.totalImageInstances;
+	}
+
+	static org.eclipse.swt.graphics.Image getSWTImage(Image img) {
+		// TODO
+		if (img == null) return null;
+		if (Settings.g2d == 0) {
+			return (org.eclipse.swt.graphics.Image) img.imageImpl.getNative();
+		}
+		BufferedImage b = (BufferedImage) img.imageImpl.getNative();
+		return new org.eclipse.swt.graphics.Image(EmulatorImpl.getDisplay(), emulator.graphics2D.c.toSwt(b));
 	}
 
 	public void finalize() {
