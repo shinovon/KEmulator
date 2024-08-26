@@ -5,6 +5,7 @@ import emulator.custom.CustomMethod;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 
@@ -45,8 +46,11 @@ public abstract class MIDlet {
 			if (url.startsWith("vlc.exe \"")) {
 				url = "vlc:" + url.substring(9, url.length() - 1);
 			}
-			if (Settings.networkNotAvailable || !Permission.requestURLAccess(url)) {
-				return false;
+			if (!Permission.requestURLAccess(url)) {
+				throw new SecurityException();
+			}
+			if (Settings.networkNotAvailable) {
+				throw new ConnectionNotFoundException();
 			}
 			if (url.startsWith("file:///root/")) {
 				url = "file:///" + (Emulator.getUserPath().replace("\\", "/") +
@@ -82,6 +86,8 @@ public abstract class MIDlet {
 			}
 			return false;
 		} catch (ConnectionNotFoundException e) {
+			throw e;
+		} catch (SecurityException e) {
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
