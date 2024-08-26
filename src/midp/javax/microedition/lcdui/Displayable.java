@@ -7,6 +7,19 @@ import emulator.media.capture.CapturePlayerImpl;
 import emulator.*;
 import emulator.debug.*;
 import emulator.lcdui.a;
+import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.EmulatorScreen;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 public class Displayable {
 	public static final int X = 0;
@@ -15,7 +28,7 @@ public class Displayable {
 	public static final int H = 3;
 	String title;
 	Vector commands;
-	boolean aBoolean18;
+	boolean menuShown;
 	int anInt28;
 	CommandListener cmdListener;
 	Item selectedItem;
@@ -31,6 +44,13 @@ public class Displayable {
 	private static final Object frameLock = new Object();
 	private static final long MILLI_TO_NANO = 1000000L;
 
+	protected Composite swtContent;
+	private Rectangle swtContentArea;
+	private boolean swtInitialized;
+	private Menu swtMenu;
+	private SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
+	private MenuListener swtMenuListener = new SwtMenuListener();
+
 	public Displayable() {
 		super();
 		this.selectedItem = null;
@@ -42,10 +62,16 @@ public class Displayable {
 	}
 
 	public int getWidth() {
+		if (swtContentArea != null) {
+			return swtContentArea.width;
+		}
 		return this.w;
 	}
 
 	public int getHeight() {
+		if (swtContentArea != null) {
+			return swtContentArea.height;
+		}
 		return this.h;
 	}
 
@@ -169,13 +195,21 @@ public class Displayable {
 		}
 		if (KeyMapping.isRightSoft(n)) {
 			if (this.commands.size() > 2) {
-				if (b && this.aBoolean18) {
-					this.aBoolean18 = false;
-					this.refreshSoftMenu();
+				if (b && this.menuShown) {
+					this.menuShown = false;
+					if (swtMenu != null) {
+						hideSwtMenu();
+					} else {
+						this.refreshSoftMenu();
+					}
 				} else if (b) {
-					this.aBoolean18 = true;
+					this.menuShown = true;
 					this.anInt28 = 0;
-					this.refreshSoftMenu();
+					if (swtMenu != null) {
+						showSwtMenu();
+					} else {
+						this.refreshSoftMenu();
+					}
 				}
 			} else {
 				final Command rightSoftCommand = this.getRightSoftCommand();
@@ -198,6 +232,13 @@ public class Displayable {
 		return false;
 	}
 
+	public void callCommandAction(Command command) {
+		if (cmdListener != null && command != null) {
+			// TODO queue
+			cmdListener.commandAction(command, this);
+		}
+	}
+
 	public void setCommandListener(final CommandListener listener) {
 		this.cmdListener = listener;
 	}
@@ -212,6 +253,13 @@ public class Displayable {
 	public void invokeSizeChanged(final int w, final int h) {
 		this.w = Emulator.getEmulator().getScreen().getWidth();
 		this.h = Emulator.getEmulator().getScreen().getHeight();
+		if (swtContent != null) {
+			syncExec(new Runnable() {
+				public void run() {
+					swtUpdateSizes();
+				}
+			});
+		}
 		this.sizeChanged(w, h);
 		Emulator.getEventQueue().queueRepaint();
 	}
@@ -273,7 +321,7 @@ public class Displayable {
 			graphics.translate(translateX, translateY);
 		}
 		 */
-		if (!this.aBoolean18) {
+		if (!this.menuShown || swtMenu != null) {
 			return;
 		}
 		final int clipX = graphics.getClipX();
@@ -345,9 +393,175 @@ public class Displayable {
 		Graphics.resetXRayCache();
 	}
 
+
+	void constructSwt() {
+		syncExec(new Runnable() {
+			public void run() {
+				swtContent = constructSwtContent(SWT.NONE);
+				swtMenu = new Menu(swtContent);
+				swtContent.setMenu(swtMenu);
+				swtContentArea = layoutSwtContent();
+			}
+		});
+	}
+
+	protected Composite constructSwtContent(int style) {
+		return new Composite(getSwtParent(), SWT.NONE);
+	}
+
+	protected Rectangle layoutSwtContent() {
+		Rectangle area = getSwtParent().getClientArea();
+		swtContent.setBounds(0, 0, area.width, area.height);
+		return swtContent.getClientArea();
+	}
+
+	public Composite getSwtContent() {
+		return swtContent;
+	}
+
+	protected void finalize() throws Throwable {
+		syncExec(new Runnable() {
+			public void run() {
+				if (!swtContent.isDisposed()) {
+					swtContent.dispose();
+				}
+			}
+		});
+		super.finalize();
+	}
+
+	static Composite getSwtParent() {
+		return ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+	}
+
+	static void syncExec(Runnable r) {
+		EmulatorImpl.syncExec(r);
+	}
+
+	static void safeSyncExec(Runnable r) {
+		try {
+			EmulatorImpl.syncExec(r);
+		} catch (SWTException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			} else {
+				throw new RuntimeException(cause);
+			}
+		}
+	}
+
+	protected void shown() {
+	}
+
 	static {
 		Displayable.lastFrameTime = System.nanoTime();
 		Displayable.lastFpsUpdateTime = Displayable.lastFrameTime;
 		Displayable.framesCount = 0;
+	}
+
+	public void swtHidden() {
+	}
+
+	public void swtShown() {
+		if (swtContent != null && !swtContent.isDisposed()) {
+			swtUpdateSizes();
+		} else if (swtMenu == null) {
+			swtInitMenu();
+		}
+	}
+
+	void swtUpdateSizes() {
+		Rectangle newArea = layoutSwtContent();
+		if(swtContentArea == null || !swtInitialized
+				|| newArea.width != swtContentArea.width
+				|| newArea.height != swtContentArea.height)
+		{
+			swtInitialized = true;
+			swtContentArea = newArea;
+			swtResized(newArea.width, newArea.height);
+		}
+	}
+
+	void swtInitMenu() {
+		if (swtMenu != null) return;
+		swtMenu = new Menu(getSwtParent());
+		swtMenu.addMenuListener(swtMenuListener);
+		getSwtParent().setMenu(swtMenu);
+	}
+
+	void showSwtMenu() {
+		syncExec(new Runnable() {
+			@Override
+			public void run() {
+				swtUpdateMenuCommands();
+				Point p = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getMenuLocation();
+				swtMenu.setLocation(p);
+				swtMenu.setVisible(true);
+			}
+		});
+	}
+
+	void hideSwtMenu() {
+		syncExec(new Runnable() {
+			@Override
+			public void run() {
+				swtMenu.setVisible(false);
+			}
+		});
+	}
+
+	void swtUpdateMenuCommands() {
+		for (MenuItem mi: swtMenu.getItems()) {
+			mi.dispose();
+		}
+		for (int i = 1; i < commands.size(); i++) {
+			Command cmd = (Command) commands.get(i);
+			MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
+			mi.addSelectionListener(swtMenuSelectionListener);
+			mi.setData(cmd);
+			mi.setText(cmd.getLongLabel());
+		}
+	}
+
+	public void swtResized(int w, int h) {
+
+	}
+
+	public boolean getLeftRightLanguage() {
+		return true;
+	}
+
+	public boolean swtIsShown() {
+		return isShown();
+	}
+
+	Composite getContentComp()
+	{
+		return swtContent;
+	}
+
+	class SwtMenuSelectionListener implements SelectionListener {
+
+		public void widgetSelected(SelectionEvent e) {
+			try {
+				Command c = (Command) e.widget.getData();
+				callCommandAction(c);
+			} catch (Exception ignored) {}
+		}
+
+		public void widgetDefaultSelected(SelectionEvent e) {
+		}
+	}
+
+	class SwtMenuListener implements MenuListener {
+
+		public void menuHidden(MenuEvent menuEvent) {
+			menuShown = false;
+		}
+
+		public void menuShown(MenuEvent menuEvent) {
+			menuShown = true;
+		}
 	}
 }

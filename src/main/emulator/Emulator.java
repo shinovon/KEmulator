@@ -136,6 +136,7 @@ public class Emulator {
 
 	public static void setCanvas(final Canvas canvas) {
 		Emulator.currentCanvas = canvas;
+		Emulator.emulatorimpl.getEmulatorScreen().setCurrent(canvas);
 	}
 
 	public static Screen getScreen() {
@@ -144,6 +145,7 @@ public class Emulator {
 
 	public static void setScreen(final Screen screen) {
 		Emulator.currentScreen = screen;
+		Emulator.emulatorimpl.getEmulatorScreen().setCurrent(screen);
 	}
 
 	public static MIDlet getMIDlet() {
