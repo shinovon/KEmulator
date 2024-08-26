@@ -24,7 +24,9 @@ public abstract class MIDlet {
 	}
 
 	public String getAppProperty(final String s) {
-		return Emulator.getEmulator().getAppProperty(s);
+		String r = Emulator.getEmulator().getAppProperty(s);
+		Emulator.getEmulator().getLogStream().println("MIDlet.getAppProperty: " + s + "=" + r);
+		return r;
 	}
 
 	public void notifyDestroyed() {
@@ -42,7 +44,7 @@ public abstract class MIDlet {
 
 	public boolean platformRequest(String url) throws ConnectionNotFoundException {
 		try {
-			Emulator.getEmulator().getLogStream().println("platformRequest " + url);
+			Emulator.getEmulator().getLogStream().println("MIDlet.platformRequest: " + url);
 			if (url.startsWith("vlc.exe \"")) {
 				url = "vlc:" + url.substring(9, url.length() - 1);
 			}

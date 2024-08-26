@@ -1622,7 +1622,6 @@ public final class EmulatorScreen implements
 
 
 	public void setCurrent(final javax.microedition.lcdui.Displayable d) {
-		// TODO
 		display.syncExec(new Runnable() {
 			public void run() {
 				if (lastDisplayable != null) {
@@ -1634,13 +1633,11 @@ public final class EmulatorScreen implements
 					return;
 				}
 				lastDisplayable = d;
-				System.out.println("setCurrent " + d);
 				if (d instanceof javax.microedition.lcdui.Canvas) {
 					stackLayout.topControl = null;
 					swtContent = null;
 				} else {
 					Composite c = d.getSwtContent();
-					System.out.println("swtContent: " + c);
 					stackLayout.topControl = c;
 					swtContent = c;
 					if (c != null) {
