@@ -129,7 +129,8 @@ public class Controllers {
 	}
 
 	private static int method747(String s) {
-		if ((s = KeyMapping.replaceKey(Integer.parseInt(s))) == null) return 10000;
+		if (s == null || s.isEmpty() || (s = KeyMapping.replaceKey(Integer.parseInt(s))) == null)
+			return 10000;
 		return Integer.parseInt(s);
 	}
 
