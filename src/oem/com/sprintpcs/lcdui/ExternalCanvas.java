@@ -1,6 +1,7 @@
 package com.sprintpcs.lcdui;
 
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Graphics;
 
 public class ExternalCanvas extends Canvas {
 	public static final int AUTO_LCD = 27;
@@ -22,4 +23,5 @@ public class ExternalCanvas extends Canvas {
 
 	public void setLCD(int mode) {}
 
+	protected void paint(Graphics g) {}
 }
