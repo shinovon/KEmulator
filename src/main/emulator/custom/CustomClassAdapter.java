@@ -31,6 +31,9 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			} else if (desc.contains("tw/com/fareastone/v10/")) {
 				s4 = "tw/com/fareastone/v10/";
 				s5 = "com/vodafone/v10/";
+			} else if (desc.contains("com/bmc/media/")) {
+				s4 = "com/bmc/media/";
+				s5 = "com/sprintpcs/media/";
 			} else {
 				break Label_0037;
 			}
@@ -41,20 +44,18 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
 				Emulator.getEmulator().getLogStream().println("Patched paint method: " + className);
 			}
-		}
-		if ("playerUpdate".equals(name) && "(Ljavax/microedition/media/Player;Ljava/lang/String;Ljava/lang/Object;)V".equals(desc)) {
+		} else if ("playerUpdate".equals(name) && "(Ljavax/microedition/media/Player;Ljava/lang/String;Ljava/lang/Object;)V".equals(desc)) {
 			if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
 				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
 				Emulator.getEmulator().getLogStream().println("Patched playerUpdate method: " + className);
 			}
-		}
-		if("()V".equals(desc) && "java/lang/Thread".equals(parentClassName) &&
+		} else if ("()V".equals(desc) && "java/lang/Thread".equals(parentClassName) &&
 				("stop".equals(name) || "resume".equals(name) || "suspend".equals(name))) {
+			Emulator.getEmulator().getLogStream().println("Patched illegal Thread method name: " + className);
 			hasRenamedMethods = true;
 			renamedClasses.add(className.replace('.', '/'));
 			name = name + "_";
-		}
-		if (Settings.bypassVserv && "()V".equals(desc) && "startRealApp".equals(name) && acc == Opcodes.ACC_PRIVATE) {
+		} else if (Settings.bypassVserv && "()V".equals(desc) && "startRealApp".equals(name) && acc == Opcodes.ACC_PRIVATE) {
 			Emulator.getEmulator().getLogStream().println("Patched ALW1: " + className);
 			acc = Opcodes.ACC_PUBLIC;
 		}
@@ -88,6 +89,10 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			super.visit(n, n2, s, s2, s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"), array);
 			return;
 		}
+		if (s3.startsWith("com/bmc/media/")) {
+			super.visit(n, n2, s, s2, s3.replace("com/bmc/media/", "com/sprintpcs/media/"), array);
+			return;
+		}
 		super.visit(n, n2, s, s2, s3, array);
 	}
 
@@ -100,6 +105,8 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			s2 = s2.replace("com/gcjsp/v10/", "com/vodafone/v10/");
 		} else if (s2.contains("tw/com/fareastone/v10/")) {
 			s2 = s2.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
+		} else if (s2.contains("com/bmc/media/")) {
+			s2 = s2.replace("com/bmc/media/", "com/sprintpcs/media/");
 		}
 		return super.visitField(n, s, s2, s3, o);
 	}

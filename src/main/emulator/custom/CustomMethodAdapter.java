@@ -102,6 +102,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(acc, cls.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"), name, sign.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"));
 					return;
 				}
+				if (cls.startsWith("com/bmc/media/") || sign.contains("com/bmc/media/")) {
+					super.visitMethodInsn(acc, cls.replace("com/bmc/media/", "com/sprintpcs/media/"), name, sign.replace("com/bmc/media/", "com/sprintpcs/media/"));
+					return;
+				}
 				if (Settings.g3d == 0) {
 					if (cls.equals("javax/microedition/m3g/Transform")) {
 						if (!name.equals("finalize") && !name.contains("init>")) {
@@ -142,6 +146,9 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				} else if (sign.contains("tw/com/fareastone/v10/")) {
 					s5 = "tw/com/fareastone/v10/";
 					s6 = "com/vodafone/v10/";
+				} else if (sign.contains("com/bmc/media/")) {
+					s5 = "com/bmc/media/";
+					s6 = "com/sprintpcs/media/";
 				} else {
 					break Label_0576;
 				}
@@ -162,8 +169,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			s3 = "Lemulator/custom/subclass/Timer;";
 		} else if (s3.contains("com/gcjsp/v10/")) {
 			s3 = s3.replace("com/gcjsp/v10/", "com/vodafone/v10/");
-		} else if (s2.contains("tw/com/fareastone/v10/")) {
+		} else if (s3.contains("tw/com/fareastone/v10/")) {
 			s3 = s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
+		} else if (s3.contains("com/bmc/media/")) {
+			s3 = s3.replace("com/bmc/media/", "com/sprintpcs/media/");
 		}
 		super.visitFieldInsn(n, s, s2, s3);
 	}
@@ -252,6 +261,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 		}
 		if (s.startsWith("tw/com/fareastone/v10/")) {
 			super.visitTypeInsn(n, s.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"));
+			return;
+		}
+		if (s.startsWith("com/bmc/media/")) {
+			super.visitTypeInsn(n, s.replace("com/bmc/media/", "com/sprintpcs/media/"));
 			return;
 		}
 		super.visitTypeInsn(n, s);
