@@ -43,15 +43,20 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.17 [2024.08.xx]
+$v2.17 [2024.08.29]
+Features:
 ALW1, vServ bypass mode
 Global RMS records tree
 Security settings
 APIs disabling options
 3D profiler
-Custom system properties (like J2ME loader)
+Custom system properties (like in J2ME loader)
 MascotCapsule settings tab
-M3G optimizations
+List & TextBox with native Look and Feel
+UI Language chooser
+com.bmc.media support
+Muglet stub
+M3G rendering optimizations
 Improve BlackBerry API support
 Implement nokia.Sound(freq, duration)
 Added more API compatibility settings
@@ -60,13 +65,14 @@ Nokia DirectGraphics fixes
 Fix Form flickering
 GameCanvas buffer fixes
 Fix server socket connection
-Fix compatibility with older OpenGL
-Fix RecordStore.getSizeAvailable return value
+Fix compatibility with older OpenGL versions
+Fix RecordStore.getSizeAvailable
 Fix FileSystemListener
 Fix mp3 player streaming
 Player leaks fixes
 Controller input fixes
 Fixed built-in nokia font
+Fix png decoding
 
 $v2.16.2 [2024.06.05]
 Reworked "sync key events" setting
