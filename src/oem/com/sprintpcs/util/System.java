@@ -22,4 +22,16 @@ public class System {
 
 	public static void addSystemListener(SystemEventListener listener) {
 	}
+
+	public static String[] getPropertiesList() {
+		return null;
+	}
+
+	public static void setSystemSetting(String property, String value) {}
+
+	public static String getProtectedProperty(String property) {
+		return null;
+	}
+
+	public static void promptMasterVolume() {}
 }
