@@ -43,8 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.17 [2024.08.29]
-Features:
+$v2.17 [2024.08.30]
 ALW1, vServ bypass mode
 Global RMS records tree
 Security settings
@@ -55,12 +54,13 @@ MascotCapsule settings tab
 List & TextBox with native Look and Feel
 UI Language chooser
 com.bmc.media support
-Muglet stub
 M3G rendering optimizations
-Improve BlackBerry API support
-Implement nokia.Sound(freq, duration)
+More Sprint API stubs
+Implemented nokia.Sound(freq, duration)
+Improved BlackBerry API support
 Added more API compatibility settings
 Audio export, ott tones options are now disabled by default
+Added Portuguese, Spanish, Chinese, Ukrainian localizations
 Nokia DirectGraphics fixes
 Fix Form flickering
 GameCanvas buffer fixes
