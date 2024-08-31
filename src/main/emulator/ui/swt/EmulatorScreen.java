@@ -1625,6 +1625,7 @@ public final class EmulatorScreen implements
 		display.syncExec(new Runnable() {
 			public void run() {
 				if (lastDisplayable != null) {
+					if (swtContent != null) swtContent.setVisible(false);
 					lastDisplayable.swtHidden();
 					lastDisplayable = null;
 				}
@@ -1641,6 +1642,7 @@ public final class EmulatorScreen implements
 					stackLayout.topControl = c;
 					swtContent = c;
 					if (c != null) {
+						c.setVisible(true);
 						c.layout();
 					}
 				}

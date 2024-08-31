@@ -7,12 +7,11 @@ public class Alert extends Screen {
 	public static final Command DISMISS_COMMAND;
 	public static final int FOREVER = -2;
 	int timeout;
-	int time = 2000;
 	String string;
 	private String[] textArr;
 	Displayable lastDisplayed;
 	private Gauge gauge;
-	private long timeShown;
+	private long timeShown = System.currentTimeMillis();;
 
 	public Alert(final String s) {
 		this(s, null, null, null);
@@ -21,9 +20,7 @@ public class Alert extends Screen {
 	public Alert(final String s, final String aString172, final Image image, final AlertType alertType) {
 		super(s);
 		this.string = aString172;
-		final int n = getDefaultTimeout();
-		this.time = n;
-		this.timeout = n;
+		this.timeout = getDefaultTimeout();
 		this.lastDisplayed = Display.current;
 		super.addCommand(Alert.DISMISS_COMMAND);
 	}
@@ -44,7 +41,7 @@ public class Alert extends Screen {
 	}
 
 	public int getDefaultTimeout() {
-		return 1000;
+		return 2000;
 	}
 
 	public int getTimeout() {
@@ -56,7 +53,6 @@ public class Alert extends Screen {
 			throw new IllegalArgumentException("time should be positive");
 		}
 		this.timeout = n;
-		this.time = n;
 	}
 
 	protected void shown() {
@@ -92,7 +88,7 @@ public class Alert extends Screen {
 	}
 
 	protected void close() {
-		Emulator.getCurrentDisplay().setCurrent(this.lastDisplayed);
+		Emulator.getCurrentDisplay().setCurrent(lastDisplayed);
 	}
 
 	protected void paint(Graphics g) {
@@ -111,10 +107,12 @@ public class Alert extends Screen {
 			gauge.bounds[W] = bounds[W];
 			gauge.paint(g);
 		}
-		if (this.time > 0 && this.timeout != -2 && commands.size() <= 1) {
-			if (System.currentTimeMillis() - timeShown > time) {
-				this.close();
-			}
+		if (lastDisplayed != null
+				&& timeShown != 0
+				&& this.timeout > 0
+				&& commands.size() <= 1
+				&& System.currentTimeMillis() - timeShown > timeout) {
+			close();
 		}
 	}
 
