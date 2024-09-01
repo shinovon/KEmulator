@@ -368,6 +368,7 @@ LOAD_ZIP_ERROR=输入文件不是 JAR 或 ZIP 压缩包。
 
 LOAD_GDIPLUS_ERROR=无法加载 \" gdiplus.dll \" !!! 请下载并复制到 %system32% 路径。
 
+OPTION_SYSTEM_UI_LANGUAGE = 界面语言:
 PLATFORMREQUEST_ALERT=应用程序希望打开 URL
 PLATFORMREQUEST_VLC_ALERT=应用程序希望在 VLC 中打开 URL
 
