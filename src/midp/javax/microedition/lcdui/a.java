@@ -25,7 +25,7 @@ final class a {
 		this.aBoolean424 = true;
 	}
 
-	protected final void method211(final Graphics graphics, final boolean b) {
+	protected final void method211(final Graphics graphics, final boolean b, int y) {
 
 		graphics.setColor(-16777216);
 		final boolean b2 = this.choice.choiceType == 4;
@@ -36,13 +36,13 @@ final class a {
 		{
 			if (b2) {
 				if (!b3) {
-					anInt28 = this.choice.bounds[1];
+					anInt28 = y;
 					anInt29 = this.choice.anInt28;
 					break Label_0103;
 				}
 				anInt28 = this.choice.anInt28;
 			} else {
-				anInt28 = this.choice.bounds[1];
+				anInt28 = y;
 			}
 			anInt29 = this.bounds[1];
 		}

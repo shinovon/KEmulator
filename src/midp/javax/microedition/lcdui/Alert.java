@@ -104,8 +104,7 @@ public class Alert extends Screen {
 			gauge.screen = this;
 			gauge.bounds[X] = 0;
 			gauge.bounds[Y] = h;
-			gauge.bounds[W] = bounds[W];
-			gauge.paint(g);
+			gauge.paint(g, 0, h, bounds[W], 0/*gauge.getMinimumWidth()*/);
 		}
 		if (lastDisplayed != null
 				&& timeShown != 0

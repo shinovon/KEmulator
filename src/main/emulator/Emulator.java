@@ -35,7 +35,7 @@ import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator {
-	public static boolean debugBuild = true;
+	public static boolean debugBuild = false;
 	public static String version = "2.17";
 	public static String revision = "";
 	public static final int numericVersion = 20;

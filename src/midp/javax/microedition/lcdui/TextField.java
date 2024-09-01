@@ -111,45 +111,43 @@ public class TextField extends Item {
 		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 	}
 
-	protected void paint(final Graphics graphics) {
+	protected void paint(Graphics g, int x, int y, int w, int h) {
 		if (!this.isTextBox) {
-			super.paint(graphics);
+			super.paint(g, x, y, w, h);
 		} else {
-			graphics.setColor(-16777216);
+			g.setColor(-16777216);
 		}
-		int n = super.bounds[1];
-		int n2 = super.bounds[1];
+		int n = y;
 		if (super.labelArr != null && super.labelArr.length > 0) {
-			graphics.setFont(Item.font);
+			g.setFont(Item.font);
 			for (int i = 0; i < super.labelArr.length; ++i) {
-				graphics.drawString(super.labelArr[i], super.bounds[0] + 4, n + 2, 0);
+				g.drawString(super.labelArr[i], x + 4, n + 2, 0);
 				n += Item.font.getHeight() + 4;
 			}
-			n2 = n - 2;
 		}
-		final int n3 = super.bounds[3] - n + super.bounds[1] - 2;
+		final int n3 = super.bounds[3] - n + y - 2;
 		if (super.inFocus) {
-			graphics.setColor(-8355712);
+			g.setColor(-8355712);
 		}
-		graphics.drawRect(2, n2, super.bounds[2] - 4, n3);
-		graphics.setFont(Screen.font);
+		g.drawRect(2, n - 2, super.bounds[2] - 4, n3);
+		g.setFont(Screen.font);
 		if (super.inFocus) {
-			graphics.setColor(8617456);
+			g.setColor(8617456);
 		}
-		this.anInt29 = super.bounds[0] + 4;
+		this.anInt29 = x + 4;
 		this.anInt30 = n + 4;
 		for (int j = 0; j < this.textArr.length; ++j) {
-			graphics.drawString(this.textArr[j], super.bounds[0] + 4, n + 2, 0);
+			g.drawString(this.textArr[j], x + 4, n + 2, 0);
 			if ((n += Screen.font.getHeight() + 4) > super.screen.bounds[3]) {
 				return;
 			}
 		}
 	}
 
-	protected void layout() {
-		super.layout();
+	protected void layout(Row row) {
+		super.layout(row);
 		int n = 4;
-		final int n2 = this.getPreferredWidth() - 8;
+		final int n2 = row.getAvailableWidth(screen.bounds[W]) - 8;
 		if (super.label != null) {
 			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
 			n = 4 + (Item.font.getHeight() + 4) * super.labelArr.length;
@@ -161,15 +159,12 @@ public class TextField extends Item {
 		super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, super.screen.bounds[3]);
 	}
 
-	protected int getItemWidth() {
-		return getPreferredWidth();
+	public int getMinimumHeight() {
+		final Font font = Item.font;
+		return (font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return false;
-	}
-
-	protected boolean isFullWidthItem() {
+	boolean isFocusable() {
 		return true;
 	}
 }

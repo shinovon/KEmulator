@@ -7,6 +7,7 @@ import emulator.media.capture.CapturePlayerImpl;
 import emulator.*;
 import emulator.debug.*;
 import emulator.lcdui.a;
+import emulator.ui.IScreen;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.SWT;
@@ -92,9 +93,9 @@ public class Displayable {
 
 	protected void setItemCommands(final Item item) {
 		this.selectedItem = item;
-		if (item.itemCommands.size() > 0) {
-			for (int i = 0; i < item.itemCommands.size(); ++i) {
-				this.addCommand((Command) item.itemCommands.get(i));
+		if (item.commands.size() > 0) {
+			for (int i = 0; i < item.commands.size(); ++i) {
+				this.addCommand((Command) item.commands.get(i));
 			}
 		}
 	}
@@ -103,9 +104,9 @@ public class Displayable {
 		if (item == null) {
 			return;
 		}
-		if (item.itemCommands.size() > 0) {
-			for (int i = 0; i < item.itemCommands.size(); ++i) {
-				this.removeCommand((Command) item.itemCommands.get(i));
+		if (item.commands.size() > 0) {
+			for (int i = 0; i < item.commands.size(); ++i) {
+				this.removeCommand((Command) item.commands.get(i));
 			}
 		}
 		this.selectedItem = null;
@@ -185,7 +186,7 @@ public class Displayable {
 					if (this.cmdListener != null)
 						this.cmdListener.commandAction(leftSoftCommand, this);
 					else ((Alert) this).close();
-				} else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(leftSoftCommand)) {
+				} else if (this.selectedItem != null && this.selectedItem.commands.contains(leftSoftCommand)) {
 					this.selectedItem.itemCommandListener.commandAction(leftSoftCommand, this.selectedItem);
 				} else if (this.cmdListener != null) {
 					this.cmdListener.commandAction(leftSoftCommand, this);
@@ -220,7 +221,7 @@ public class Displayable {
 						if (this.cmdListener != null)
 							this.cmdListener.commandAction(rightSoftCommand, this);
 						else ((Alert) this).close();
-					} else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(rightSoftCommand)) {
+					} else if (this.selectedItem != null && this.selectedItem.commands.contains(rightSoftCommand)) {
 						this.selectedItem.itemCommandListener.commandAction(rightSoftCommand, this.selectedItem);
 					} else if (this.cmdListener != null) {
 						this.cmdListener.commandAction(rightSoftCommand, this);
@@ -251,8 +252,9 @@ public class Displayable {
 	}
 
 	public void invokeSizeChanged(final int w, final int h) {
-		this.w = Emulator.getEmulator().getScreen().getWidth();
-		this.h = Emulator.getEmulator().getScreen().getHeight();
+		IScreen s = Emulator.getEmulator().getScreen();
+		this.w = s.getWidth();
+		this.h = s.getHeight();
 		if (swtContent != null) {
 			syncExec(new Runnable() {
 				public void run() {

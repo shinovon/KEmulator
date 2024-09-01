@@ -236,18 +236,18 @@ public class ChoiceGroup
 		}
 	}
 
-	protected void paint(Graphics graphics) {
+	protected void paint(Graphics g, int x, int y, int w, int h) {
 		if (!this.aBoolean541) {
-			super.paint(graphics);
+			super.paint(g, x, y, w, h);
 		} else {
-			graphics.setColor(-16777216);
+			g.setColor(-16777216);
 		}
-		int n = this.bounds[1];
+		int n = y;
 		if (this.labelArr != null && this.labelArr.length > 0) {
-			graphics.setFont(Item.font);
+			g.setFont(Item.font);
 			int i = 0;
 			while (i < this.labelArr.length) {
-				graphics.drawString(this.labelArr[i], this.bounds[0] + 4, n + 2, 0);
+				g.drawString(this.labelArr[i], x + 4, n + 2, 0);
 				n += Item.font.getHeight() + 4;
 				++i;
 			}
@@ -261,36 +261,36 @@ public class ChoiceGroup
 					while (j < this.items.size()) {
 						a a2 = (a) this.items.get(j);
 						if (a2.aBoolean424) {
-							a2.method211(graphics, this.inFocus && j == this.currentPos);
+							a2.method211(g, this.inFocus && j == this.currentPos, y);
 						}
 						++j;
 					}
 				}
 				case POPUP: {
 					if (this.aBoolean542 && this.anIntArray179 != null) {
-						this.anInt28 = Math.max(this.bounds[1] - this.anInt29 / 2 - 4, 0);
+						this.anInt28 = Math.max(y - this.anInt29 / 2 - 4, 0);
 						a a2 = (a) this.items.get(0);
-						emulator.lcdui.a.method178(graphics, a2.bounds[0], this.anInt28 - 2, a2.bounds[2], this.anInt29 + 2);
+						emulator.lcdui.a.method178(g, x, this.anInt28 - 2, a2.bounds[2], this.anInt29 + 2);
 						int k = 0;
 						while (k < this.items.size()) {
 							a a3 = (a) this.items.get(k);
 							if (a3.aBoolean424) {
-								a3.method211(graphics, k == this.currentPos);
+								a3.method211(g, k == this.currentPos, y);
 							}
 							++k;
 						}
 						return;
 					}
 					try {
-						((a) this.items.get(this.currentSelect)).method211(graphics, this.inFocus);
+						((a) this.items.get(this.currentSelect)).method211(g, this.inFocus, y);
 					} catch (Exception ignored) {}
 				}
 			}
 		}
 	}
 
-	protected synchronized void layout() {
-		super.layout();
+	protected synchronized void layout(Row row) {
+		super.layout(row);
 		int n = 0;
 		if (this.label != null) {
 			int n2 = this.getPreferredWidth() - 8;
@@ -387,11 +387,12 @@ public class ChoiceGroup
 		}
 	}
 
-	protected int getItemWidth() {
+	public int getPreferredWidth() {
 		return -1;
 	}
 
-	protected boolean isFullWidthItem() {
-		return true;
+	public int getMinimumHeight() {
+		final Font font = Item.font;
+		return (font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 }

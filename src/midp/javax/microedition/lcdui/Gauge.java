@@ -66,10 +66,19 @@ public class Gauge extends Item {
 		return interact;
 	}
 
-	protected void paint(Graphics g) {
-		super.paint(g);
-		final Font font = (this.font != null) ? this.font : Screen.font;
+	protected void paint(Graphics g, int x, int y, int w, int h) {
+		super.paint(g, x, y, w, h);
+		final Font font = Item.font;
 		g.setFont(font);
+
+		h = font.getHeight();
+		int off = 2;
+		int yoff = 0;
+		if (label != null) {
+			g.drawString(label, x, y, 0);
+			yoff += h + 4;
+		}
+
 		if (!interact) {
 			int max = this.max;
 			int val = this.value;
@@ -97,38 +106,19 @@ public class Gauge extends Item {
 					}
 				}
 			}
-			int x = super.bounds[X];
-			int y = super.bounds[Y];
-			int w = super.bounds[W];
-			int h = font.getHeight();
-			int off = 2;
-			int yoff = 0;
-			if (label != null) {
-				g.drawString(label, x, y, 0);
-				yoff += h + 4;
-			}
 			g.setColor(0xababab);
 			g.drawRect(x, y + yoff, w, h);
 			g.setColor(0x0000ff);
 			g.fillRect(x + off, y + yoff + off, (int) ((double) w * ((double) val / (double) max)) - off - 1, h - off - 1);
 		} else {
 			//TODO
-			int x = super.bounds[X];
-			int y = super.bounds[Y];
-			int w = super.bounds[W];
-			int h = font.getHeight();
-			int yoff = 0;
-			if (label != null) {
-				g.drawString(label, x, y, 0);
-				yoff += h + 4;
-			}
 			g.drawString("UNIMPLEMENTED", x, y + yoff, 0);
 		}
 	}
 
-	public void layout() {
-		super.layout();
-		final Font font = (this.font != null) ? this.font : Screen.font;
+	public void layout(Row row) {
+		super.layout(row);
+		final Font font = Item.font;
 		if (!interact) {
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
@@ -141,15 +131,16 @@ public class Gauge extends Item {
 		}
 	}
 
-	protected int getItemWidth() {
-		return 0;
+	public int getPreferredWidth() {
+		return -1;
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return false;
+	public int getMinimumHeight() {
+		final Font font = Item.font;
+		return (font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 
-	protected boolean isFullWidthItem() {
+	boolean isFocusable() {
 		return true;
 	}
 }

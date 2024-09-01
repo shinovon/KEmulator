@@ -34,7 +34,7 @@ public abstract class Item {
 	boolean shownOnForm;
 	Command aCommand174;
 	public ItemCommandListener itemCommandListener;
-	public Vector itemCommands;
+	public Vector commands;
 	String label;
 	String[] labelArr;
 	Screen screen;
@@ -47,12 +47,13 @@ public abstract class Item {
 	Item(String label) {
 		this.label = label;
 		this.screen = null;
-		this.itemCommands = new Vector();
+		this.commands = new Vector();
 		bounds = new int[4];
 	}
 
 	public void setLabel(String label) {
 		this.label = label;
+		queueLayout();
 	}
 
 	public String getLabel() {
@@ -76,11 +77,11 @@ public abstract class Item {
 	}
 
 	protected boolean isLayoutAlignDefault() {
-		return !isLayoutLeft() && !isLayoutCenter() && !isLayoutRight();
+		return (layout & LAYOUT_CENTER) == 0;
 	}
 
 	protected boolean isLayoutLeft() {
-		return (layout & LAYOUT_LEFT) == LAYOUT_LEFT;
+		return (layout & LAYOUT_CENTER) == LAYOUT_LEFT;
 	}
 
 	protected boolean isLayoutCenter() {
@@ -88,19 +89,11 @@ public abstract class Item {
 	}
 
 	protected boolean isLayoutRight() {
-		return (layout & LAYOUT_RIGHT) == LAYOUT_RIGHT;
+		return (layout & LAYOUT_CENTER) == LAYOUT_RIGHT;
 	}
 
 	protected boolean isLayoutExpand() {
 		return (layout & LAYOUT_EXPAND) == LAYOUT_EXPAND;
-	}
-
-	protected boolean isLayoutNewLineBefore() {
-		return (layout & LAYOUT_NEWLINE_BEFORE) == LAYOUT_NEWLINE_BEFORE;
-	}
-
-	protected boolean isLayoutNewLineAfter() {
-		return (layout & LAYOUT_NEWLINE_AFTER) == LAYOUT_NEWLINE_AFTER;
 	}
 
 	public void addCommand(Command command) {
@@ -108,10 +101,10 @@ public abstract class Item {
 			throw new IllegalStateException();
 		} else if (command == null) {
 			throw new NullPointerException();
-		} else if (!this.itemCommands.contains(command)) {
+		} else if (!this.commands.contains(command)) {
 			int i;
-			for (i = 0; i < this.itemCommands.size(); ++i) {
-				Command command2 = (Command) this.itemCommands.get(i);
+			for (i = 0; i < this.commands.size(); ++i) {
+				Command command2 = (Command) this.commands.get(i);
 				if (command.getCommandType() > command2.getCommandType()
 						|| command.getCommandType() == command2.getCommandType()
 						&& command.getPriority() <= command2.getPriority()) {
@@ -119,7 +112,7 @@ public abstract class Item {
 				}
 			}
 
-			this.itemCommands.add(i, command);
+			this.commands.add(i, command);
 			if (this.screen != null && Emulator.getCurrentDisplay().getCurrent() == this.screen) {
 				this.screen.updateCommands();
 			}
@@ -128,12 +121,12 @@ public abstract class Item {
 	}
 
 	public void removeCommand(Command command) {
-		if (this.itemCommands.contains(command)) {
+		if (this.commands.contains(command)) {
 			if (command == this.aCommand174) {
 				this.aCommand174 = null;
 			}
 
-			this.itemCommands.remove(command);
+			this.commands.remove(command);
 			if (this.screen != null && Emulator.getCurrentDisplay().getCurrent() == this.screen) {
 				this.screen.updateCommands();
 			}
@@ -171,6 +164,9 @@ public abstract class Item {
 			this.preferredW = anInt180;
 			this.preferredH = anInt181;
 		}
+		if (screen != null) {
+			((Form) screen).queueLayout(this);
+		}
 	}
 
 	public int getMinimumWidth() {
@@ -194,9 +190,7 @@ public abstract class Item {
 
 	public void notifyStateChanged() {
 		if (screen == null) return;
-		if (!(this.screen instanceof Form)) {
-			//throw new IllegalStateException();
-		} else {
+		if (this.screen instanceof Form) {
 			if (((Form) this.screen).itemStateListener == null) return;
 			((Form) this.screen).itemStateListener.itemStateChanged(this);
 		}
@@ -218,16 +212,20 @@ public abstract class Item {
 
 	}
 
-	protected void paint(Graphics graphics) {
-		graphics.setColor(-16777216);
+	protected void paint(Graphics g, int x, int y, int w, int h, int line) {
+		paint(g, x, y, w, h);
+	}
+
+	protected void paint(Graphics g, int x, int y, int w, int h) {
+		g.setColor(-16777216);
 		if (this.inFocus) {
-			int w = getItemWidth() > 0 ? getItemWidth() + 1 : bounds[W];
-			a.method178(graphics, bounds[X], bounds[Y], w, bounds[H]);
+//			int w = getPreferredWidth() > 0 ? getPreferredWidth() + 1 : bounds[W];
+			a.method178(g, x, y, w, h);
 		}
 
 	}
 
-	protected void layout() {
+	protected void layout(Row row) {
 		bounds[X] = 0;
 		bounds[Y] = 0;
 		bounds[W] = this.screen.bounds[W];
@@ -264,19 +262,22 @@ public abstract class Item {
 
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
+	public boolean hasLayout(int l) {
+		return (layout & l) != 0;
+	}
+
+	boolean isFocusable() {
 		return false;
 	}
 
-	protected int getItemWidth() {
-		return 0;
+	boolean hasLabel() {
+		return label != null && !label.isEmpty();
 	}
 
-	protected boolean isFullWidthItem() {
-		return false;
-	}
 
-	protected void setInRow(boolean b) {
-
+	void queueLayout() {
+		if (screen != null) {
+			((Form) screen).queueLayout(this);
+		}
 	}
 }

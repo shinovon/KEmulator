@@ -35,6 +35,7 @@ public class ImageItem extends Item {
 
 	public void setImage(final Image anImage427) {
 		this.image = anImage427;
+		queueLayout();
 	}
 
 	public String getAltText() {
@@ -57,28 +58,26 @@ public class ImageItem extends Item {
 		return this.appearanceMode;
 	}
 
-	protected void paint(final Graphics graphics) {
-		super.paint(graphics);
-		final int x = super.bounds[X] + 2;
-		int y = super.bounds[Y] + 2;
+	protected void paint(final Graphics g, int x, int y, int w, int h) {
+		super.paint(g, x, y, w, h);
 		if (super.labelArr != null && super.labelArr.length > 0) {
-			graphics.setFont(Item.font);
+			g.setFont(Item.font);
 			for (String s : super.labelArr) {
-				graphics.drawString(s, super.bounds[X] + 4, y + 2, 0);
+				g.drawString(s, x + 4, y + 2, 0);
 				y += Item.font.getHeight() + 4;
 			}
 		}
-		if (image != null) graphics.drawImage(this.image, x, y, 0);
+		if (image != null) g.drawImage(this.image, x, y, 0);
 	}
 
-	protected void layout() {
-		super.layout();
+	protected void layout(Row row) {
+		super.layout(row);
 		int n = 0;
-		final int n2 = this.getPreferredWidth() - 8;
+		final int n2 = row.getAvailableWidth(screen.bounds[W]);
 		int[] tw = new int[1];
 		if (super.label != null) {
 			super.labelArr = c.textArr(super.label, Item.font, n2, n2, tw);
-			n = 0 + (Item.font.getHeight() + 4) * super.labelArr.length;
+			n = (Item.font.getHeight() + 4) * super.labelArr.length;
 		} else {
 			super.labelArr = null;
 		}
@@ -91,15 +90,19 @@ public class ImageItem extends Item {
 		super.bounds[H] = Math.min(n, super.screen.bounds[H]);
 	}
 
-	protected int getItemWidth() {
+	public int getPreferredWidth() {
 		return width;
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return !isLayoutExpand() && !isLayoutCenter();
+	public int getMinimumWidth() {
+		return Math.max(Item.font.stringWidth("..."), width);
 	}
 
-	protected boolean isFullWidthItem() {
-		return isLayoutExpand();
+	public int getMinimumHeight() {
+		return bounds[H];
+	}
+
+	boolean isFocusable() {
+		return commands.size() > 0;
 	}
 }

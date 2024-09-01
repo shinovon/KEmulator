@@ -135,7 +135,7 @@ public abstract class CustomItem extends Item {
 		img = null;
 	}
 
-	protected void paint(final Graphics graphics) {
+	protected void paint(final Graphics graphics, int x, int y, int w, int h) {
 		if (img == null) {
 			img = Image.createImage(Emulator.getEmulator().getScreen().getWidth(), Emulator.getEmulator().getScreen().getHeight());
 			g = this.img.getGraphics();
@@ -148,7 +148,7 @@ public abstract class CustomItem extends Item {
 		final int prefContentWidth = this.getPrefContentWidth(super.bounds[2]);
 		final int prefContentHeight = this.getPrefContentHeight(super.bounds[3]);
 		this.paint(this.g, prefContentWidth, prefContentHeight);
-		super.paint(graphics);
+		super.paint(g, x, y, w, h);
 		if (super.labelArr != null && super.labelArr.length > 0) {
 			graphics.setFont(Item.font);
 			for (int i = 0; i < super.labelArr.length; ++i) {
@@ -161,10 +161,10 @@ public abstract class CustomItem extends Item {
 		graphics.setClip(0, 0, super.screen.w, super.screen.h);
 	}
 
-	protected void layout() {
-		super.layout();
+	protected void layout(Row row) {
+		super.layout(row);
 		int n = 0;
-		final int n2 = this.getPreferredWidth() - 8;
+		final int n2 = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
 		if (super.label != null) {
 			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
 			n = 0 + (Item.font.getHeight() + 4) * super.labelArr.length;
@@ -178,5 +178,9 @@ public abstract class CustomItem extends Item {
 		if (screen == null) return false;
 		if (this.anIntArray429 == null) return false;
 		return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
+	}
+
+	boolean isFocusable() {
+		return true;
 	}
 }

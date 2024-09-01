@@ -9,7 +9,7 @@ public abstract class Screen extends Displayable {
 	static final Font font;
 	static final int fontHeight;
 	static final int fontHeight4;
-	Vector items;
+	final Vector items;
 	int anInt182;
 	int anInt349;
 	private long lastPressTime;
@@ -164,24 +164,24 @@ public abstract class Screen extends Displayable {
 //			selectedItem.pointerPressed(x, y);
 //			return;
 //		}
-		if (this.items.size() > 0) {
-			int j = 0;
-			while (j < this.items.size()) {
-				final Item futureSelect;
-				if ((futureSelect = (Item) this.items.get(j)).shownOnForm && BoundsUtils.collides(futureSelect.bounds, x, y)) {
-					if (futureSelect == selectedItem) {
-						selectedItem.pointerPressed(x, y);
-						return;
-					}
-					if (selectedItem != null) {
-						selectedItem.defocus();
-					}
-					(selectedItem = futureSelect).focus();
-				} else {
-					++j;
-				}
-			}
-		}
+//		if (this.items.size() > 0) {
+//			int j = 0;
+//			while (j < this.items.size()) {
+//				final Item futureSelect;
+//				if ((futureSelect = (Item) this.items.get(j)).shownOnForm && BoundsUtils.collides(futureSelect.bounds, x, y)) {
+//					if (futureSelect == selectedItem) {
+//						selectedItem.pointerPressed(x, y);
+//						return;
+//					}
+//					if (selectedItem != null) {
+//						selectedItem.defocus();
+//					}
+//					(selectedItem = futureSelect).focus();
+//				} else {
+//					++j;
+//				}
+//			}
+//		}
 	}
 
 	public void invokePointerReleased(final int n, final int n2) {
