@@ -4,14 +4,6 @@ import emulator.lcdui.BoundsUtils;
 import emulator.lcdui.c;
 
 import java.util.Vector;
-import javax.microedition.lcdui.Choice;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.a;
 
 public class ChoiceGroup
 		extends Item
@@ -25,6 +17,7 @@ public class ChoiceGroup
 	int anInt29;
 	Command aCommand540;
 	private int currentSelect;
+	private int currentPos;
 
 	public ChoiceGroup(String label, int choiceType) {
 		this(label, choiceType, new String[0], null);
@@ -67,6 +60,7 @@ public class ChoiceGroup
 			throw new NullPointerException();
 		}
 		this.items.add(new a(s, image, null, this));
+		layoutForm();
 		return this.items.size() - 1;
 	}
 
@@ -75,10 +69,12 @@ public class ChoiceGroup
 			throw new IndexOutOfBoundsException();
 		}
 		this.items.remove(n);
+		layoutForm();
 	}
 
 	public synchronized void deleteAll() {
 		this.items.removeAllElements();
+		layoutForm();
 	}
 
 	public void setFitPolicy(int anInt30) {
@@ -94,6 +90,7 @@ public class ChoiceGroup
 			throw new IndexOutOfBoundsException();
 		}
 		((a) this.items.get(n)).font = aFont420;
+		layoutForm();
 	}
 
 	public Font getFont(int n) {
@@ -113,6 +110,7 @@ public class ChoiceGroup
 			throw new NullPointerException();
 		}
 		this.items.insertElementAt(new a(s, image, null, this), n);
+		layoutForm();
 	}
 
 	public synchronized void set(int n, String s, Image image) {
@@ -120,6 +118,7 @@ public class ChoiceGroup
 			throw new NullPointerException();
 		}
 		this.items.set(n, new a(s, image, null, this));
+		layoutForm();
 	}
 
 	public synchronized void setSelectedFlags(boolean[] array) {
@@ -151,6 +150,7 @@ public class ChoiceGroup
 			((a) this.items.get(j)).sel = array[j];
 			++j;
 		}
+		repaintForm();
 	}
 
 	public int getSelectedFlags(boolean[] array) {
@@ -205,6 +205,7 @@ public class ChoiceGroup
 			return;
 		}
 		((a) this.items.get(n)).sel = flag;
+		repaintForm();
 	}
 
 	public int size() {
@@ -281,9 +282,9 @@ public class ChoiceGroup
 						}
 						return;
 					}
-					try {
-						((a) this.items.get(this.currentSelect)).method211(g, this.inFocus, y);
-					} catch (Exception ignored) {}
+//					try {
+//						((a) this.items.get(this.currentSelect)).method211(g, this.inFocus, y);
+//					} catch (Exception ignored) {}
 				}
 			}
 		}
@@ -351,25 +352,22 @@ public class ChoiceGroup
 		this.bounds[H] = Math.min(n, this.screen.bounds[H]);
 	}
 
-	protected boolean scrollUp() {
-		if (this.choiceType == 4 && this.aBoolean542) {
-			if (super.scrollUp()) {
-				this.currentPos = this.anIntArray179.length - 1;
-			}
-			return false;
+	boolean keyScroll(int key, boolean repeat) {
+		switch (key) {
+			case Canvas.UP:
+				if (currentPos-- < 0) {
+					currentPos = 0;
+					return false;
+				}
+				return true;
+			case Canvas.DOWN:
+				if (currentPos++ >= items.size()) {
+					currentPos = items.size() - 1;
+					return false;
+				}
+				return true;
 		}
-
-		return super.scrollUp();
-	}
-
-	protected boolean scrollDown() {
-		if (this.choiceType == 4 && this.aBoolean542) {
-			if (super.scrollDown()) {
-				this.currentPos = 0;
-			}
-			return false;
-		}
-		return super.scrollDown();
+		return false;
 	}
 
 	protected void pointerPressed(int x, int y) {
@@ -378,8 +376,6 @@ public class ChoiceGroup
 		while (i < this.items.size()) {
 			a a2 = (a) this.items.get(i);
 			System.arraycopy(a2.bounds, 0, array, 0, 4);
-			boolean n3 = true;
-			array[1] = array[1] + (this.aBoolean542 ? this.anInt28 : this.bounds[1]);
 			if (a2.aBoolean424 && BoundsUtils.collides(array, x, y)) {
 				this.currentPos = i;
 			}
@@ -394,5 +390,9 @@ public class ChoiceGroup
 	public int getMinimumHeight() {
 		final Font font = Item.font;
 		return (Item.font.getHeight() + 4) * (hasLabel() ? 2 : 1);
+	}
+
+	boolean isFocusable() {
+		return true;
 	}
 }

@@ -42,7 +42,6 @@ public abstract class Item {
 	int preferredWidth = -1;
 	int preferredHeight = -1;
 	int[] anIntArray179;
-	int currentPos;
 	private boolean sizeLocked;
 	boolean hidden;
 
@@ -55,7 +54,7 @@ public abstract class Item {
 
 	public void setLabel(String label) {
 		this.label = label;
-		queueLayout();
+		layoutForm();
 	}
 
 	public String getLabel() {
@@ -71,7 +70,7 @@ public abstract class Item {
 			throw new IllegalArgumentException();
 		}
 		this.layout = layout;
-		queueLayout();
+		layoutForm();
 	}
 
 	public void addCommand(Command command) {
@@ -176,7 +175,11 @@ public abstract class Item {
 		if (screen == null) return;
 		if (this.screen instanceof Form) {
 			if (((Form) this.screen).itemStateListener == null) return;
-			((Form) this.screen).itemStateListener.itemStateChanged(this);
+			try {
+				((Form) this.screen).itemStateListener.itemStateChanged(this);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -216,29 +219,6 @@ public abstract class Item {
 		bounds[H] = Screen.fontHeight4;
 	}
 
-	protected int getcurPage() {
-		return this.anIntArray179 != null && this.anIntArray179.length > 0 ? this.anIntArray179[this.currentPos] : 0;
-	}
-
-	protected boolean scrollUp() {
-		if (this.anIntArray179 != null && this.anIntArray179.length > 0 && this.currentPos > 0) {
-			--this.currentPos;
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	protected boolean scrollDown() {
-		if (this.anIntArray179 != null && this.anIntArray179.length > 0
-				&& this.currentPos < this.anIntArray179.length - 1) {
-			++this.currentPos;
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 	protected void pointerPressed(int n, int n2) {
 	}
 
@@ -254,10 +234,15 @@ public abstract class Item {
 		return label != null && !label.isEmpty();
 	}
 
-
-	void queueLayout() {
+	void layoutForm() {
 		if (screen != null) {
 			((Form) screen).queueLayout(this);
+		}
+	}
+
+	void repaintForm() {
+		if (screen != null) {
+			((Form) screen).repaintScreen();
 		}
 	}
 
@@ -267,5 +252,9 @@ public abstract class Item {
 
 	void hidden() {
 		hidden = true;
+	}
+
+	boolean keyScroll(int key, boolean repeat) {
+		return false;
 	}
 }

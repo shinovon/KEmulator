@@ -24,49 +24,46 @@ public abstract class CustomItem extends Item {
 
 	public int getGameAction(final int n) {
 		int n2 = 0;
-		int n3 = 0;
 		switch (n) {
 			case 49: {
-				n3 = 9;
+				n2 = 9;
 				break;
 			}
 			case 51: {
-				n3 = 10;
+				n2 = 10;
 				break;
 			}
 			case 55: {
-				n3 = 11;
+				n2 = 11;
 				break;
 			}
 			case 57: {
-				n3 = 12;
+				n2 = 12;
 				break;
 			}
 			default: {
 				if (n == KeyMapping.getArrowKeyFromDevice(1)) {
-					n3 = 1;
+					n2 = 1;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(6)) {
-					n3 = 6;
+					n2 = 6;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(2)) {
-					n3 = 2;
+					n2 = 2;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(5)) {
-					n3 = 5;
+					n2 = 5;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(8)) {
-					n3 = 8;
+					n2 = 8;
 					break;
 				}
-				return n2;
 			}
 		}
-		n2 = n3;
 		return n2;
 	}
 
@@ -91,9 +88,7 @@ public abstract class CustomItem extends Item {
 	protected abstract void paint(final Graphics p0, final int p1, final int p2);
 
 	protected final void repaint() {
-		if (screen != null) {
-			screen.repaintScreen();
-		}
+		repaintForm();
 	}
 
 	protected final void repaint(final int n, final int n2, final int n3, final int n4) {

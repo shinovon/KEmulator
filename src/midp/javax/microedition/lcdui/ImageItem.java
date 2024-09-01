@@ -35,7 +35,7 @@ public class ImageItem extends Item {
 
 	public void setImage(final Image anImage427) {
 		this.image = anImage427;
-		queueLayout();
+		layoutForm();
 	}
 
 	public String getAltText() {

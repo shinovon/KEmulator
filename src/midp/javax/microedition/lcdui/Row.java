@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 class Row {
 	ArrayList<RowItem> items = new ArrayList<RowItem>();
-	int width = 0;
-	int height = 0;
+	int width;
+	int height;
 	int y;
 
 	Row(int y) {
@@ -15,7 +15,6 @@ class Row {
 	void paint(Graphics g, int y, int w) {
 		int x = 0;
 		int rowHeight = height;
-//		System.out.println("+ROW " + this + " Y: " + y);
 		for (int i = 0, l = items.size(); i < l; ++i) {
 			RowItem o = items.get(i);
 			Item item = o.item;
@@ -52,12 +51,9 @@ class Row {
 
 			item.hidden = false;
 
-//			System.out.println(" ITEM " + item + " X: " + x + " W: " + itemWidth + " R: " + o.row);
 			item.paint(g, x, itemy, itemWidth, itemHeight, o.row);
 			x += itemWidth;
 		}
-//		System.out.println("-ROW " + this + " Y: " + y);
-//		System.out.println();
 	}
 
 	int getHeight() {
@@ -123,4 +119,47 @@ class Row {
 			}
 		}
 	}
+
+	static class RowItem {
+		Item item;
+		int row;
+
+		int x, y, width, height;
+
+		RowItem(Item item, int i, int x) {
+			this.item = item;
+			this.row = i;
+			this.x = x;
+		}
+
+		int getWidth(int available) {
+			int w;
+			if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
+				w = ((StringItem) item).getRowWidth(row);
+			} else {
+				w = item.getPreferredWidth();
+			}
+			if (w > available) {
+				return available;
+			}
+			if (w == -1 || item.hasLayout(Item.LAYOUT_EXPAND)) {
+				return available;
+			}
+			return w;
+		}
+
+		int getHeight() {
+			if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON) {
+				return item.getMinimumHeight();
+			}
+			return item.getPreferredHeight();
+		}
+
+		public String toString() {
+			return "{RowItem:" + item + "}";
+		}
+
+	}
 }
+
+

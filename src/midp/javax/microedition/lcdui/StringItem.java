@@ -29,7 +29,7 @@ public class StringItem extends Item {
 
 	public void setText(final String aString25) {
 		this.text = aString25;
-		queueLayout();
+		layoutForm();
 	}
 
 	public int getAppearanceMode() {
@@ -38,7 +38,7 @@ public class StringItem extends Item {
 
 	public void setFont(final Font aFont358) {
 		this.font = aFont358;
-		queueLayout();
+		layoutForm();
 	}
 
 	public Font getFont() {
@@ -154,7 +154,9 @@ public class StringItem extends Item {
 		if (isSizeLocked()) maxWidth = availableWidth;
 		int[] maxw = new int[1];
 		// TODO label layout
-		this.textArr = c.textArr((hasLabel() && mode != BUTTON) ? (super.label + "\n" + this.text) : this.text, font, availableWidth, maxWidth, maxw);
+		String s = (hasLabel() && mode != BUTTON) ? (super.label + "\n" + this.text) : this.text;
+//		while (s.endsWith("\n")) s = s.substring(0, s.length() - 1);
+		this.textArr = c.textArr(s, font, availableWidth, maxWidth, maxw);
 		width = textArr.length != 0 ? maxw[0] + 4 : 4;
 		final int fh = font.getHeight() + 4;
 		if (mode == BUTTON) {

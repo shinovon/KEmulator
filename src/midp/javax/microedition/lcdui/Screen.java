@@ -55,10 +55,6 @@ public abstract class Screen extends Displayable {
 			this.repaintScreen();
 			return;
 		}
-		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(n)) {
-			repaintScreen();
-			return;
-		}
 		if (focusedItem != null && n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)) {
 			focusedItem.itemApplyCommand();
 			return;
@@ -76,9 +72,6 @@ public abstract class Screen extends Displayable {
 
 	public void invokeKeyRepeated(final int n) {
 		if (swtContent != null) return;
-		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(n)) {
-			return;
-		}
 		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
 			keyScroll(Canvas.UP, true);
 		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
@@ -123,28 +116,6 @@ public abstract class Screen extends Displayable {
 			}
 		}
 		return false;
-//		if (selectedItem != null && selectedItem instanceof ChoiceGroup && ((ChoiceGroup) selectedItem).aBoolean542) {
-//			selectedItem.pointerPressed(x, y);
-//			return;
-//		}
-//		if (this.items.size() > 0) {
-//			int j = 0;
-//			while (j < this.items.size()) {
-//				final Item futureSelect;
-//				if ((futureSelect = (Item) this.items.get(j)).shownOnForm && BoundsUtils.collides(futureSelect.bounds, x, y)) {
-//					if (futureSelect == selectedItem) {
-//						selectedItem.pointerPressed(x, y);
-//						return;
-//					}
-//					if (selectedItem != null) {
-//						selectedItem.defocus();
-//					}
-//					(selectedItem = futureSelect).focus();
-//				} else {
-//					++j;
-//				}
-//			}
-//		}
 	}
 
 	public void invokePointerReleased(final int n, final int n2) {

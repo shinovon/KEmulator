@@ -38,7 +38,7 @@ public class TextField extends Item {
 
 	public void setString(final String aString25) {
 		this.string = aString25;
-		queueLayout();
+		layoutForm();
 	}
 
 	public int getChars(final char[] array) {

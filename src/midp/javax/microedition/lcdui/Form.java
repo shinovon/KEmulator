@@ -13,6 +13,8 @@ public class Form extends Screen {
 	private int layoutHeight;
 	private Row currentRow;
 	private int currentIndexInRow;
+	private Item scrollCurrentItem;
+	private Item scrollTargetItem;
 
 	public Form(final String s) {
 		this(s, null);
@@ -127,22 +129,54 @@ public class Form extends Screen {
 		if (rows.size() == 0) {
 			return;
 		}
+		if (scrollTargetItem == null) {
+			scrollTargetItem = getFirstVisibleItem();
+		}
+		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(key)) {
+			return;
+		}
 		switch (key) { // TODO
 			case Canvas.UP:
+				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
+					break;
+				}
 				scroll -= 40;
 				if (scroll < 0) scroll = 0;
 				focusItem(null);
 				break;
 			case Canvas.DOWN:
+				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
+					break;
+				}
 				scroll += 40;
 				focusItem(null);
 				break;
 			case Canvas.LEFT:
-				break;
+				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
+					break;
+				}
+				if (currentRow != null && currentIndexInRow > 0) {
+					Item item = getNextFocusableItemInRow(currentRow, currentIndexInRow, -1);
+					if (item != null) {
+						break;
+					}
+				}
+				keyScroll(Canvas.UP, repeat);
+				return;
 			case Canvas.RIGHT:
-				break;
+				if (currentRow != null && currentIndexInRow < currentRow.items.size()) {
+					getNextFocusableItemInRow(currentRow, currentIndexInRow, 1);
+					break;
+				}
+				keyScroll(Canvas.DOWN, repeat);
+				return;
 		}
 		repaintScreen();
+	}
+
+	private Item getNextFocusableItemInRow(Row row, int currentIdx, int dir) {
+		// TODO
+		return null;
 	}
 
 	public boolean invokePointerPressed(final int x, int y) {
@@ -155,17 +189,12 @@ public class Form extends Screen {
 			if (row.y + row.height < y + scroll) continue;
 			if (height < row.y - scroll) return false;
 			int ry = y + scroll - row.y;
-			for (RowItem o: row.items) {
+			for (Row.RowItem o: row.items) {
 				if (o.x <= x && o.x + o.width >= x && o.y <= ry && o.y + o.height >= ry) {
 					Item item = o.item;
-					System.out.println("Hit " + o.item);
 					if (item.isFocusable()) {
-						System.out.println("Focused");
-						if (focusedItem == item) {
-							focusedItem.pointerPressed(x, ry);
-						} else {
-							focusItem(item);
-						}
+						focusItem(item);
+						focusedItem.pointerPressed(x, ry);
 						repaintScreen();
 					}
 					return true;
@@ -176,12 +205,21 @@ public class Form extends Screen {
 	}
 
 	private void focusItem(Item item) {
+		if (focusedItem == item) return;
 		if (focusedItem != null) {
 			focusedItem.defocus();
 		}
 		focusedItem = item;
 		if (item != null) {
 			item.focus();
+		}
+	}
+
+	private Item getFirstVisibleItem() {
+		try {
+			return getFirstVisibleRow().getFirstItem();
+		} catch (Exception e) {
+			return null;
 		}
 	}
 
@@ -198,7 +236,6 @@ public class Form extends Screen {
 
 	protected void paint(final Graphics g) {
 		synchronized(items) {
-//			System.out.println(" == PAINT START == ");
 			if (rows.size() == 0) {
 				doLayout(0);
 			} else if (layout) {
@@ -227,7 +264,6 @@ public class Form extends Screen {
 				} else row.hidden();
 				y += rh;
 			}
-//			System.out.println(" == PAINT END == ");
 		}
 	}
 
@@ -297,14 +333,12 @@ public class Form extends Screen {
 	}
 
 	void queueLayout(int i) {
-		System.out.println("queueLayout " + i);
 		layoutStart = Math.min(layoutStart, i);
 		layout = true;
 		repaintScreen();
 	}
 
 	void queueLayout(Item item) {
-		System.out.println("queueLayout " + item);
 		if (item == null) return;
 		int i = items.indexOf(item);
 		if (i == -1) return;
@@ -312,7 +346,6 @@ public class Form extends Screen {
 	}
 
 	synchronized void doLayout(int i) {
-		System.out.println("doLayout " + i);
 		synchronized (items) {
 			layoutHeight = 0;
 			currentRow = null;
@@ -340,10 +373,7 @@ public class Form extends Screen {
 //			row = null;
 			for (int j = i; j < items.size(); j++) {
 				Item item = (Item) items.get(j);
-				if (row == null) {
-					row = newRow(row);
-				}
-				if (!((item instanceof StringItem
+				if (row == null || !((item instanceof StringItem
 						|| item instanceof ImageItem
 						|| item instanceof Spacer
 						|| item instanceof CustomItem)
@@ -353,13 +383,15 @@ public class Form extends Screen {
 						|| !row.canAdd(item, width)) {
 					row = newRow(row);
 				}
-				item.layout(row);
+				String text = null;
 				if(item instanceof StringItem
-						&& ((StringItem) item).getText() != null
-						&& ((StringItem) item).getText().startsWith("\n")) {
+						&& (text = ((StringItem) item).getText()) != null
+						&& !text.trim().isEmpty() && text.startsWith("\n")) {
 					row = newRow(row);
 				}
-				if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
+				item.layout(row);
+				if (item instanceof StringItem
+						&& ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
 					StringItem s = (StringItem) item;
 					int l = s.getRowsCount();
 					for (int k = 0; k < l; k++) {
@@ -369,12 +401,7 @@ public class Form extends Screen {
 				} else {
 					row.add(item, width);
 				}
-				if(item instanceof StringItem
-						&& ((StringItem) item).getText() != null
-						&& ((StringItem) item).getText().endsWith("\n")) {
-					row = newRow(row);
-				}
-				if (item.hasLayout(Item.LAYOUT_EXPAND) || item.hasLayout(Item.LAYOUT_NEWLINE_AFTER)) {
+				if((text != null && text.endsWith("\n")) || item.hasLayout(Item.LAYOUT_NEWLINE_AFTER)) {
 					row = newRow(row);
 				}
 			}
