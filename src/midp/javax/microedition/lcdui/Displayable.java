@@ -32,7 +32,7 @@ public class Displayable {
 	boolean menuShown;
 	int anInt28;
 	CommandListener cmdListener;
-	Item selectedItem;
+	Item focusedItem;
 	int w;
 	int h;
 	int[] bounds;
@@ -54,7 +54,7 @@ public class Displayable {
 
 	public Displayable() {
 		super();
-		this.selectedItem = null;
+		this.focusedItem = null;
 		this.cmdListener = null;
 		this.commands = new Vector();
 		this.w = Emulator.getEmulator().getScreen().getWidth();
@@ -85,14 +85,14 @@ public class Displayable {
 	}
 
 	protected void defocus() {
-		if (this.selectedItem != null) {
-			this.selectedItem.defocus();
-			this.selectedItem = null;
+		if (this.focusedItem != null) {
+			this.focusedItem.defocus();
+			this.focusedItem = null;
 		}
 	}
 
 	protected void setItemCommands(final Item item) {
-		this.selectedItem = item;
+		this.focusedItem = item;
 		if (item.commands.size() > 0) {
 			for (int i = 0; i < item.commands.size(); ++i) {
 				this.addCommand((Command) item.commands.get(i));
@@ -109,7 +109,7 @@ public class Displayable {
 				this.removeCommand((Command) item.commands.get(i));
 			}
 		}
-		this.selectedItem = null;
+		this.focusedItem = null;
 	}
 
 	protected void updateCommands() {
@@ -186,8 +186,8 @@ public class Displayable {
 					if (this.cmdListener != null)
 						this.cmdListener.commandAction(leftSoftCommand, this);
 					else ((Alert) this).close();
-				} else if (this.selectedItem != null && this.selectedItem.commands.contains(leftSoftCommand)) {
-					this.selectedItem.itemCommandListener.commandAction(leftSoftCommand, this.selectedItem);
+				} else if (this.focusedItem != null && this.focusedItem.commands.contains(leftSoftCommand)) {
+					this.focusedItem.itemCommandListener.commandAction(leftSoftCommand, this.focusedItem);
 				} else if (this.cmdListener != null) {
 					this.cmdListener.commandAction(leftSoftCommand, this);
 				}
@@ -201,7 +201,7 @@ public class Displayable {
 					if (swtMenu != null) {
 						hideSwtMenu();
 					} else {
-						this.refreshSoftMenu();
+						this.repaintScreen();
 					}
 				} else if (b) {
 					this.menuShown = true;
@@ -209,7 +209,7 @@ public class Displayable {
 					if (swtMenu != null) {
 						showSwtMenu();
 					} else {
-						this.refreshSoftMenu();
+						this.repaintScreen();
 					}
 				}
 			} else {
@@ -221,8 +221,8 @@ public class Displayable {
 						if (this.cmdListener != null)
 							this.cmdListener.commandAction(rightSoftCommand, this);
 						else ((Alert) this).close();
-					} else if (this.selectedItem != null && this.selectedItem.commands.contains(rightSoftCommand)) {
-						this.selectedItem.itemCommandListener.commandAction(rightSoftCommand, this.selectedItem);
+					} else if (this.focusedItem != null && this.focusedItem.commands.contains(rightSoftCommand)) {
+						this.focusedItem.itemCommandListener.commandAction(rightSoftCommand, this.focusedItem);
 					} else if (this.cmdListener != null) {
 						this.cmdListener.commandAction(rightSoftCommand, this);
 					}
@@ -293,20 +293,17 @@ public class Displayable {
 		}
 	}
 
-	void refreshSoftMenu() {
-		EventQueue j;
+	void repaintScreen() {
 		int n;
 		if (this instanceof Canvas) {
-			j = Emulator.getEventQueue();
-			n = 1;
+			n = EventQueue.EVENT_PAINT;
 		} else {
 			if (!(this instanceof Screen)) {
 				return;
 			}
-			j = Emulator.getEventQueue();
-			n = 4;
+			n = EventQueue.EVENT_SCREEN;
 		}
-		j.queue(n);
+		Emulator.getEventQueue().queue(n);
 	}
 
 	protected void paintSoftMenu(final Graphics graphics) {

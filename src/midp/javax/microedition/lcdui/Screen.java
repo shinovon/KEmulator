@@ -10,9 +10,8 @@ public abstract class Screen extends Displayable {
 	static final int fontHeight;
 	static final int fontHeight4;
 	final Vector items;
-	int anInt182;
-	int anInt349;
 	private long lastPressTime;
+	int scroll;
 
 	Screen() {
 		this("");
@@ -22,8 +21,6 @@ public abstract class Screen extends Displayable {
 		super();
 		super.title = ((s == null) ? "" : s);
 		this.items = new Vector();
-		this.anInt182 = 0;
-		this.anInt349 = -1;
 	}
 
 	public void invokeKeyPressed(final int n) {
@@ -55,86 +52,52 @@ public abstract class Screen extends Displayable {
 					super.menuShown = false;
 				}
 			}
-			this.refreshSoftMenu();
+			this.repaintScreen();
 			return;
 		}
-		if (selectedItem != null && selectedItem instanceof CustomItem && ((CustomItem) selectedItem).callTraverse(n)) {
+		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(n)) {
+			repaintScreen();
 			return;
 		}
-		if (selectedItem != null && n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)) {
-			selectedItem.itemApplyCommand();
+		if (focusedItem != null && n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)) {
+			focusedItem.itemApplyCommand();
 			return;
 		}
-		if (n == KeyMapping.getArrowKeyFromDevice(1)) {
-			if (this.items.size() > 0) {
-				final int index = this.items.indexOf(selectedItem);
-				if (selectedItem != null) {
-					if (!selectedItem.scrollUp()) {
-						return;
-					}
-					selectedItem.defocus();
-				}
-				Screen screen;
-				Vector vector;
-				int n4;
-				if (index == -1) {
-					screen = this;
-					vector = this.items;
-					n4 = this.items.size() - 1;
-				} else if (index > 0) {
-					screen = this;
-					vector = this.items;
-					n4 = index - 1;
-				} else {
-					screen = this;
-					vector = this.items;
-					n4 = 0;
-				}
-				screen.selectedItem = (Item) vector.get(n4);
-				selectedItem.focus();
-				if (!selectedItem.shownOnForm) {
-					this.anInt182 = this.items.indexOf(selectedItem);
-					this.anInt349 = -1;
-				}
-			}
-		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN) && this.items.size() > 0) {
-			final int index2 = this.items.indexOf(selectedItem);
-			if (selectedItem != null) {
-				if (!selectedItem.scrollDown()) {
-					return;
-				}
-				selectedItem.defocus();
-			}
-			Screen screen2;
-			Vector vector2;
-			int n5;
-			if (index2 == -1) {
-				screen2 = this;
-				vector2 = this.items;
-				n5 = 0;
-			} else if (index2 < this.items.size() - 1) {
-				screen2 = this;
-				vector2 = this.items;
-				n5 = index2 + 1;
-			} else {
-				screen2 = this;
-				vector2 = this.items;
-				n5 = this.items.size() - 1;
-			}
-			screen2.selectedItem = (Item) vector2.get(n5);
-			selectedItem.focus();
-			if (!selectedItem.shownOnForm) {
-				this.anInt182 = -1;
-				this.anInt349 = this.items.indexOf(selectedItem);
-			}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
+			keyScroll(Canvas.UP, false);
+		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
+			keyScroll(Canvas.DOWN, false);
+		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
+			keyScroll(Canvas.LEFT, false);
+		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
+			keyScroll(Canvas.RIGHT, false);
 		}
+	}
+
+	public void invokeKeyRepeated(final int n) {
+		if (swtContent != null) return;
+		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(n)) {
+			return;
+		}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
+			keyScroll(Canvas.UP, true);
+		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
+			keyScroll(Canvas.DOWN, true);
+		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
+			keyScroll(Canvas.LEFT, true);
+		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
+			keyScroll(Canvas.RIGHT, true);
+		}
+	}
+
+	protected void keyScroll(int key, boolean repeat) {
 	}
 
 	public void invokeKeyReleased(final int n) {
 	}
 
-	public void invokePointerPressed(final int x, final int y) {
-		if (swtContent != null) return;
+	public boolean invokePointerPressed(final int x, final int y) {
+		if (swtContent != null) return false;
 		if (super.menuShown) {
 			final int n3 = super.w >> 1;
 			final int anInt181 = Screen.fontHeight4;
@@ -154,12 +117,12 @@ public abstract class Screen extends Displayable {
 					if (BoundsUtils.collides(array, x, y)) {
 						super.cmdListener.commandAction((Command) super.commands.get(i + 1), this);
 						super.menuShown = false;
-						return;
+						return true;
 					}
 				}
 			}
-			return;
 		}
+		return false;
 //		if (selectedItem != null && selectedItem instanceof ChoiceGroup && ((ChoiceGroup) selectedItem).aBoolean542) {
 //			selectedItem.pointerPressed(x, y);
 //			return;
@@ -217,7 +180,7 @@ public abstract class Screen extends Displayable {
 		if (title == null)
 			title = "";
 		final int n;
-		final String value = String.valueOf(n = ((selectedItem != null) ? (this.items.indexOf(selectedItem) + 1) : this.items.size()));
+		final String value = String.valueOf(n = ((focusedItem != null) ? (this.items.indexOf(focusedItem) + 1) : this.items.size()));
 		final int n2 = (Screen.fontHeight4 >> 1) - 1;
 		final int stringWidth = Screen.font.stringWidth(title);
 		final int stringWidth2 = Screen.font.stringWidth(value);
@@ -239,7 +202,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	protected void drawScrollBar(final Graphics graphics) {
-		emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (selectedItem != null) ? this.items.indexOf(selectedItem) : -1);
+		emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
 	}
 
 	static {

@@ -95,7 +95,7 @@ public abstract class Canvas extends Displayable {
 					super.menuShown = false;
 				}
 			}
-			this.refreshSoftMenu();
+			this.repaintScreen();
 			return;
 		}
 		this.m_keyStates |= 1 << this.getGameAction(n);

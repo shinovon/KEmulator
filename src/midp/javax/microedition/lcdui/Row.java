@@ -6,6 +6,11 @@ class Row {
 	ArrayList<RowItem> items = new ArrayList<RowItem>();
 	int width = 0;
 	int height = 0;
+	int y;
+
+	Row(int y) {
+		this.y = y;
+	}
 
 	void paint(Graphics g, int y, int w) {
 		int x = 0;
@@ -40,6 +45,13 @@ class Row {
 				}
 			}
 
+			o.x = x;
+			o.y = itemy - y;
+			o.width = itemWidth;
+			o.height = itemHeight;
+
+			item.hidden = false;
+
 //			System.out.println(" ITEM " + item + " X: " + x + " W: " + itemWidth + " R: " + o.row);
 			item.paint(g, x, itemy, itemWidth, itemHeight, o.row);
 			x += itemWidth;
@@ -64,15 +76,17 @@ class Row {
 		return max - getWidth(max);
 	}
 
-	void add(Item item) {
-		items.add(new RowItem(item, 0));
-		width += item.getPreferredWidth();
-		int h = item.getPreferredHeight();
+	void add(Item item, int maxWidth) {
+		RowItem o;
+		items.add(o = new RowItem(item, 0, width));
+		width += o.getWidth(width - maxWidth);
+		int h = o.getHeight();
 		if (h > height) height = h;
 	}
 
-	void add(RowItem o, int maxWidth) {
-		items.add(o);
+	void add(Item item, int itemRow, int maxWidth) {
+		RowItem o;
+		items.add(o = new RowItem(item, itemRow, width));
 		width += o.getWidth(width - maxWidth);
 		int h = o.getHeight();
 		if (h > height) height = h;
@@ -98,6 +112,15 @@ class Row {
 			return items.get(0).item;
 		} catch (Exception e) {
 			return null;
+		}
+	}
+
+	public void hidden() {
+		for (RowItem o: items) {
+			Item item = o.item;
+			if (!item.hidden) {
+				item.hidden();
+			}
 		}
 	}
 }

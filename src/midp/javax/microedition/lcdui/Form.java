@@ -10,6 +10,9 @@ public class Form extends Screen {
 	private ArrayList<Row> rows;
 	private int layoutStart;
 	private boolean layout;
+	private int layoutHeight;
+	private Row currentRow;
+	private int currentIndexInRow;
 
 	public Form(final String s) {
 		this(s, null);
@@ -120,6 +123,75 @@ public class Form extends Screen {
 		this.itemStateListener = anItemStateListener858;
 	}
 
+	protected synchronized void keyScroll(int key, boolean repeat) {
+		if (rows.size() == 0) {
+			return;
+		}
+		switch (key) { // TODO
+			case Canvas.UP:
+				scroll -= 40;
+				if (scroll < 0) scroll = 0;
+				focusItem(null);
+				break;
+			case Canvas.DOWN:
+				scroll += 40;
+				focusItem(null);
+				break;
+			case Canvas.LEFT:
+				break;
+			case Canvas.RIGHT:
+				break;
+		}
+		repaintScreen();
+	}
+
+	public boolean invokePointerPressed(final int x, int y) {
+		if (super.invokePointerPressed(x, y)) return true;
+		if ((y -= bounds[Y]) < 0) return false;
+		int height = bounds[H];
+		Row row = getFirstVisibleRow();
+		if (row == null) return false;
+		do {
+			if (row.y + row.height < y + scroll) continue;
+			if (height < row.y - scroll) return false;
+			int ry = y + scroll - row.y;
+			for (RowItem o: row.items) {
+				if (o.x <= x && o.x + o.width >= x && o.y <= ry && o.y + o.height >= ry) {
+					Item item = o.item;
+					System.out.println("Hit " + o.item);
+					if (item.isFocusable()) {
+						System.out.println("Focused");
+						if (focusedItem == item) {
+							focusedItem.pointerPressed(x, ry);
+						} else {
+							focusItem(item);
+						}
+						repaintScreen();
+					}
+					return true;
+				}
+			}
+		} while ((row = getNextRow(null, row)) != null);
+		return false;
+	}
+
+	private void focusItem(Item item) {
+		if (focusedItem != null) {
+			focusedItem.defocus();
+		}
+		focusedItem = item;
+		if (item != null) {
+			item.focus();
+		}
+	}
+
+	private Row getFirstVisibleRow() {
+		for (Row row : rows) {
+			if (row.y + row.getHeight() - scroll > 0) return row;
+		}
+		return null;
+	}
+
 	public int size() {
 		return super.items.size();
 	}
@@ -127,28 +199,32 @@ public class Form extends Screen {
 	protected void paint(final Graphics g) {
 		synchronized(items) {
 //			System.out.println(" == PAINT START == ");
-			synchronized (items) {
-				if (rows.size() == 0) {
-					doLayout(0);
-				} else if (layout) {
-					doLayout(layoutStart);
-				}
-				layout = false;
-				layoutStart = Integer.MAX_VALUE;
+			if (rows.size() == 0) {
+				doLayout(0);
+			} else if (layout) {
+				doLayout(layoutStart);
 			}
+			layout = false;
+			layoutStart = Integer.MAX_VALUE;
 			int y = bounds[Y],
 				w = bounds[W],
 				h = bounds[H];
 			g.setClip(0, y, w, h);
-			int scroll = 0; // TODO
+
+			if (focusedItem != null && !isVisible(focusedItem)) {
+				scrollTo(focusedItem);
+			}
+			if (scroll > layoutHeight - h)
+				scroll = layoutHeight - h;
+			if (scroll < 0)
+				scroll = 0;
+
 			y -= scroll;
 			for (Row row : rows) {
 				int rh = row.getHeight();
 				if (y + rh > 0 && h > y) {
 					row.paint(g, y, w);
-				} else {
-					System.out.println("paint hidden " + y);
-				}
+				} else row.hidden();
 				y += rh;
 			}
 //			System.out.println(" == PAINT END == ");
@@ -163,10 +239,13 @@ public class Form extends Screen {
 	}
 
 	Row getNextRow(Item item, Row prevRow) {
-		for (int i = rows.indexOf(prevRow); i < rows.size(); i++) {
-			Row row = rows.get(i);
-			if (row.contains(item)) return row;
-		}
+		if (prevRow == null) return getFirstRow(item);
+		try {
+			for (int i = rows.indexOf(prevRow) + 1; i < rows.size(); i++) {
+				Row row = rows.get(i);
+				if (item == null || row.contains(item)) return row;
+			}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -197,10 +276,31 @@ public class Form extends Screen {
 		}
 	}
 
+	boolean isVisible(Item item) {
+		Row row = getFirstRow(item);
+		if (row == null) return false;
+		do {
+			if (isVisible(row)) return true;
+		} while ((row = getNextRow(item, row)) != null);
+		return false;
+	}
+
+	boolean isVisible(Row row) {
+		if (row == null) return false;
+		return row.y + row.height - scroll > 0 && bounds[H] > row.y - scroll;
+	}
+
+	void scrollTo(Item item) {
+		try {
+			scroll = getFirstRow(item).y;
+		} catch (Exception ignored) {}
+	}
+
 	void queueLayout(int i) {
 		System.out.println("queueLayout " + i);
 		layoutStart = Math.min(layoutStart, i);
 		layout = true;
+		repaintScreen();
 	}
 
 	void queueLayout(Item item) {
@@ -211,20 +311,23 @@ public class Form extends Screen {
 		queueLayout(i);
 	}
 
-	void doLayout(int i) {
+	synchronized void doLayout(int i) {
 		System.out.println("doLayout " + i);
 		synchronized (items) {
+			layoutHeight = 0;
+			currentRow = null;
 			if (items.size() == 0) {
 				rows.clear();
 				return;
 			}
 			int width = bounds[W];
 			Row row = null;
-			if (i < items.size()) {
-				row = getFirstRow((Item) items.get(i));
-			}
+//			if (i < items.size()) {
+//				row = getFirstRow((Item) items.get(i));
+//			}
 //			if (i == 0) {
-				rows.clear();
+			rows.clear();
+			i = 0;
 //			} else if (row != null) {
 //				int rowIdx = rows.indexOf(row);
 //				if (row.items.size() > 1) {
@@ -234,7 +337,7 @@ public class Form extends Screen {
 //					rows.remove(rowIdx);
 //				}
 //			}
-			row = null;
+//			row = null;
 			for (int j = i; j < items.size(); j++) {
 				Item item = (Item) items.get(j);
 				if (row == null) {
@@ -260,11 +363,11 @@ public class Form extends Screen {
 					StringItem s = (StringItem) item;
 					int l = s.getRowsCount();
 					for (int k = 0; k < l; k++) {
-						row.add(new RowItem(s, k), width);
+						row.add(s, k, width);
 						if (k != l - 1) row = newRow(row);
 					}
 				} else {
-					row.add(item);
+					row.add(item, width);
 				}
 				if(item instanceof StringItem
 						&& ((StringItem) item).getText() != null
@@ -275,12 +378,16 @@ public class Form extends Screen {
 					row = newRow(row);
 				}
 			}
+			if (row != null && !row.items.isEmpty()) {
+				layoutHeight += row.getHeight();
+			}
 		}
 	}
 
 	private Row newRow(Row row) {
 		if (row == null || !row.items.isEmpty()) {
-			rows.add(row = new Row());
+			if (row != null) layoutHeight += row.getHeight();
+			rows.add(row = new Row(layoutHeight));
 		}
 		return row;
 	}

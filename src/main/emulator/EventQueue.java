@@ -179,9 +179,9 @@ public final class EventQueue implements Runnable {
 			repainted = false;
 		}
 		if (n == EVENT_SCREEN) {
-			if (screen) {
-				return;
-			}
+//			if (screen) {
+//				return;
+//			}
 			screen = true;
 		}
 		if (n == EVENT_SHOW || n == EVENT_RESUME) {
@@ -308,11 +308,11 @@ public final class EventQueue implements Runnable {
 									.cloneImage(scr.getScreenImg());
 						} catch (Exception ignored) {}
 						scr.repaint();
-						try {
-							Thread.sleep(100L);
-						} catch (Exception ignored) {}
+//						try {
+//							Thread.sleep(100L);
+//						} catch (Exception ignored) {}
 						screen = false;
-						this.queue(EVENT_SCREEN);
+//						this.queue(EVENT_SCREEN);
 						break;
 					}
 					case EVENT_START: {
@@ -508,8 +508,8 @@ public final class EventQueue implements Runnable {
 					break;
 				}
 				case 2:
-					if (!canv) return;
-					((Canvas) d).invokeKeyRepeated(n);
+					if (canv) ((Canvas) d).invokeKeyRepeated(n);
+					else ((Screen) d).invokeKeyRepeated(n);
 					break;
 			}
 		} else {

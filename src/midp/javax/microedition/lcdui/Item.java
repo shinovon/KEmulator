@@ -44,6 +44,7 @@ public abstract class Item {
 	int[] anIntArray179;
 	int currentPos;
 	private boolean sizeLocked;
+	boolean hidden;
 
 	Item(String label) {
 		this.label = label;
@@ -241,10 +242,6 @@ public abstract class Item {
 	protected void pointerPressed(int n, int n2) {
 	}
 
-	void updateHidden() {
-
-	}
-
 	public boolean hasLayout(int l) {
 		return (layout & l) == l;
 	}
@@ -266,5 +263,9 @@ public abstract class Item {
 
 	boolean isSizeLocked() {
 		return sizeLocked;
+	}
+
+	void hidden() {
+		hidden = true;
 	}
 }

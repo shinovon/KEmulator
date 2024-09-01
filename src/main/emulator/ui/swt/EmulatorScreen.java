@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Screen;
 
 public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,
@@ -1715,7 +1716,9 @@ public final class EmulatorScreen implements
 		}
 		n = Integer.parseInt(r);
 		if (pressedKeys.contains(n)) {
-			if (Settings.enableKeyRepeat) {
+			if (Emulator.getCurrentDisplay().getCurrent() instanceof Screen) {
+				Emulator.getEventQueue().keyRepeat(n);
+			} else if (Settings.enableKeyRepeat) {
 				if (Settings.keyPressOnRepeat) {
 					Emulator.getEventQueue().keyPress(n);
 				} else {

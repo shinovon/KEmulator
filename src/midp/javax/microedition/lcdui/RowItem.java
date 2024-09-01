@@ -4,9 +4,12 @@ class RowItem {
 	Item item;
 	int row;
 
-	RowItem(Item item, int i) {
+	int x, y, width, height;
+
+	RowItem(Item item, int i, int x) {
 		this.item = item;
 		this.row = i;
+		this.x = x;
 	}
 
 	int getWidth(int available) {

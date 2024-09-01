@@ -91,9 +91,13 @@ public abstract class CustomItem extends Item {
 	protected abstract void paint(final Graphics p0, final int p1, final int p2);
 
 	protected final void repaint() {
+		if (screen != null) {
+			screen.repaintScreen();
+		}
 	}
 
 	protected final void repaint(final int n, final int n2, final int n3, final int n4) {
+		repaint();
 	}
 
 	protected boolean traverse(final int n, final int n2, final int n3, final int[] array) {
@@ -127,7 +131,8 @@ public abstract class CustomItem extends Item {
 	protected void hideNotify() {
 	}
 
-	void updateHidden() {
+	void hidden() {
+		super.hidden();
 		if (img == null) return;
 		g.dispose();
 		g = null;
