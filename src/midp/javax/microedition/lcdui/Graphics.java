@@ -267,6 +267,9 @@ public class Graphics
 			y -= font.getBaselinePosition();
 		}
 		this.impl.drawString(s, x, y + font.getBaselinePosition());
+		if (font.isUnderlined()) {
+			this.impl.drawLine(x, y + height, stringWidth, y + height);
+		}
 		if (xrayGraphics != null)
 			this.xrayFillRect(x, y, stringWidth, height, 255);
 	}
