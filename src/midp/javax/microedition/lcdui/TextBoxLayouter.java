@@ -16,16 +16,11 @@
 */
 package javax.microedition.lcdui;
 
+import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 
-class TextFieldLayouter extends ItemLayouter
+class TextBoxLayouter
 {
 
     /**
@@ -53,6 +48,18 @@ class TextFieldLayouter extends ItemLayouter
     // private static Control[] staticControls = new Control[6];
 
     private static boolean isCorrectText;
+
+    private static Shell staticShell;
+
+    static Shell swtGetStaticShell()
+    {
+        if(staticShell == null)
+        {
+            staticShell = new Shell(EmulatorImpl.getDisplay(), SWT.SYSTEM_MODAL | SWT.VERTICAL);
+            staticShell.getVerticalBar().setVisible(true);
+        }
+        return staticShell;
+    }
 
     /**
      * Get static eSWT control (ConstraintText or Text).

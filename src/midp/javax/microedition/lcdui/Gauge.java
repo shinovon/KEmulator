@@ -38,8 +38,8 @@ public class Gauge extends Item {
 		super.setItemCommandListener(l);
 	}
 
-	public void setPreferredSize(int width, int height) {
-		super.setPreferredSize(width, height);
+	public void setPreferredSize(int w, int h) {
+		super.setPreferredSize(w, h);
 	}
 
 	public void setDefaultCommand(Command cmd) {
@@ -122,22 +122,21 @@ public class Gauge extends Item {
 		if (!interact) {
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
-			super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
+			bounds[H] = Math.min(n2, screen.bounds[H]);
 		} else {
 			//TODO
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
-			super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
+			bounds[H] = Math.min(n2, screen.bounds[H]);
 		}
 	}
 
-	public int getPreferredWidth() {
-		return -1;
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Some example text") + 6;
 	}
 
 	public int getMinimumHeight() {
-		final Font font = Item.font;
-		return (font.getHeight() + 4) * (hasLabel() ? 2 : 1);
+		return (Item.font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 
 	boolean isFocusable() {

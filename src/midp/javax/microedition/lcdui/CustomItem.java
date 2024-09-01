@@ -167,11 +167,11 @@ public abstract class CustomItem extends Item {
 		final int n2 = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
 		if (super.label != null) {
 			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
-			n = 0 + (Item.font.getHeight() + 4) * super.labelArr.length;
+			n = (Item.font.getHeight() + 4) * super.labelArr.length;
 		} else {
 			super.labelArr = null;
 		}
-		super.bounds[3] = Math.min(n + (this.getPrefContentHeight(super.bounds[3]) + 4), super.screen.bounds[3]);
+		super.bounds[H] = Math.min(n + (this.getPrefContentHeight(super.bounds[H]) + 4), super.screen.bounds[H]);
 	}
 
 	protected boolean callTraverse(final int n) {

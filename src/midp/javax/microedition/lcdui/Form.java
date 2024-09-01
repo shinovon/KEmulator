@@ -1,7 +1,6 @@
 package javax.microedition.lcdui;
 
 import emulator.Emulator;
-import emulator.lcdui.*;
 import emulator.ui.IScreen;
 
 import java.util.ArrayList;
@@ -137,11 +136,15 @@ public class Form extends Screen {
 				layout = false;
 				layoutStart = Integer.MAX_VALUE;
 			}
-			int y = bounds[Y];
-			int w = bounds[W];
+			int y = bounds[Y],
+				w = bounds[W],
+				h = bounds[H];
+			g.setClip(0, y, w, h);
+			int scroll = 0; // TODO
+			y -= scroll;
 			for (Row row : rows) {
 				int rh = row.getHeight();
-				if (y + rh > 0) {
+				if (y + rh > 0 && h > y) {
 					row.paint(g, y, w);
 				} else {
 					System.out.println("paint hidden " + y);
@@ -237,23 +240,36 @@ public class Form extends Screen {
 				if (row == null) {
 					row = newRow(row);
 				}
-				if (!(item instanceof StringItem || item instanceof ImageItem || item instanceof Spacer)
-						|| item.hasLayout(Item.LAYOUT_NEWLINE_BEFORE) || !row.canAdd(item, width)) {
+				if (!((item instanceof StringItem
+						|| item instanceof ImageItem
+						|| item instanceof Spacer
+						|| item instanceof CustomItem)
+						|| (item.hasLayout(Item.LAYOUT_2) && !(item instanceof DateField)))
+						|| item.hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
+						|| item.hasLayout(Item.LAYOUT_CENTER)
+						|| !row.canAdd(item, width)) {
 					row = newRow(row);
 				}
 				item.layout(row);
-				if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON) {
+				if(item instanceof StringItem
+						&& ((StringItem) item).getText() != null
+						&& ((StringItem) item).getText().startsWith("\n")) {
+					row = newRow(row);
+				}
+				if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
 					StringItem s = (StringItem) item;
-					int l = s.textArr.length;
+					int l = s.getRowsCount();
 					for (int k = 0; k < l; k++) {
-						row.add(new RowObject(s, k));
+						row.add(new RowItem(s, k), width);
 						if (k != l - 1) row = newRow(row);
-					}
-					if(s.getText() != null && s.getText().endsWith("\n")) {
-						row = newRow(row);
 					}
 				} else {
 					row.add(item);
+				}
+				if(item instanceof StringItem
+						&& ((StringItem) item).getText() != null
+						&& ((StringItem) item).getText().endsWith("\n")) {
+					row = newRow(row);
 				}
 				if (item.hasLayout(Item.LAYOUT_EXPAND) || item.hasLayout(Item.LAYOUT_NEWLINE_AFTER)) {
 					row = newRow(row);

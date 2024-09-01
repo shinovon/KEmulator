@@ -7,7 +7,7 @@ public class StringItem extends Item {
 	private int mode;
 	Font font;
 	String[] textArr;
-	private int maxTextWidth;
+	private int width;
 
 	public StringItem(final String label, final String text) {
 		this(label, text, 0);
@@ -45,8 +45,8 @@ public class StringItem extends Item {
 		return this.font;
 	}
 
-	public void setPreferredSize(final int n, final int n2) {
-		super.setPreferredSize(n, n2);
+	public void setPreferredSize(final int w, final int h) {
+		super.setPreferredSize(w, h);
 	}
 
 	protected void paint(Graphics g, int x, int y, int w, int h, int row) {
@@ -65,7 +65,7 @@ public class StringItem extends Item {
 				g.setFont(Item.font);
 				String label = this.label.trim();
 				String[] tmp = c.textArr(label, Item.font, w, w);
-				g.drawString(label, x + 4, yo, 0);
+				g.drawString(tmp[0], x + 2, yo, 0);
 				yo += Item.font.getHeight() + 4;
 			}
 			g.setFont(font);
@@ -73,12 +73,12 @@ public class StringItem extends Item {
 			int fh = font.getHeight();
 			int o = g.getColor();
 			g.setColor(0xababab);
-			int lx = x + w - 6;
-			int ly = yo + h + 3 - 1;
-//			g.drawLine(x + 1, ly, lx, ly);
-//			g.drawLine(lx, ly, lx, yo + 1);
+			int lx = x + w - 3;
+			int ly = yo + h - 3;
+			g.drawLine(x + 1, ly, lx, ly);
+			g.drawLine(lx, ly, lx, yo + 1);
 			g.setColor(o);
-			g.drawRect(x + 2, yo, w - 4, h - 2);
+			g.drawRect(x + 1, yo, w - 3, h - 2);
 		} else {
 			g.setFont(font);
 			if (row >= textArr.length) return;
@@ -148,26 +148,27 @@ public class StringItem extends Item {
 	protected void layout(Row row) {
 		super.layout(row);
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		final int screenWidth = screen.bounds[W] - 8;
-		int availableWidth = Math.min(super.getPreferredWidth(), row.getAvailableWidth(screenWidth));
+		int preferredWidth = super.getPreferredWidth();
+		int maxWidth = screen.bounds[W] - 8;
+		int availableWidth = Math.min(preferredWidth, row.getAvailableWidth(maxWidth));
+		if (isSizeLocked()) maxWidth = availableWidth;
 		int[] maxw = new int[1];
-		this.textArr = c.textArr((hasLabel() && mode != BUTTON) ? (super.label + "\n" + this.text) : this.text, font, availableWidth, screenWidth, maxw);
-		if (textArr.length == 1) maxTextWidth = maxw[0] + 4;
-		else if (textArr.length == 0) maxTextWidth = 4;
-		else {
-			maxTextWidth = screenWidth + 4;
-		}
+		// TODO label layout
+		this.textArr = c.textArr((hasLabel() && mode != BUTTON) ? (super.label + "\n" + this.text) : this.text, font, availableWidth, maxWidth, maxw);
+		width = textArr.length != 0 ? maxw[0] + 4 : 4;
 		final int fh = font.getHeight() + 4;
 		if (mode == BUTTON) {
-			super.bounds[H] = fh + (hasLabel() ? Item.font.getHeight() + 4 : 0);
+			width = Math.min(maxWidth, font.stringWidth(textArr[0]) + 10);
+			textArr = new String[] { textArr[0] };
+			bounds[H] = fh + (hasLabel() ? Item.font.getHeight() + 4 : 0);
 		} else {
-			super.bounds[H] = fh * this.textArr.length;
+			bounds[H] = fh * this.textArr.length;
 		}
 	}
 
 	public int getMinimumWidth() {
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		return font.stringWidth("...");
+		return font.stringWidth("...") + 2;
 	}
 
 	public int getMinimumHeight() {
@@ -176,7 +177,7 @@ public class StringItem extends Item {
 	}
 
 	public int getPreferredWidth() {
-		return isLayoutExpand() ? super.getPreferredWidth() - 1 : maxTextWidth;
+		return hasLayout(LAYOUT_EXPAND) || isSizeLocked() ? super.getPreferredWidth() : width;
 	}
 
 	boolean isFocusable() {
@@ -187,5 +188,9 @@ public class StringItem extends Item {
 		if (textArr == null) return 0;
 		final Font font = (this.font != null) ? this.font : Screen.font;
 		return font.stringWidth(textArr[row]);
+	}
+
+	int getRowsCount() {
+		return textArr == null ? 0 : textArr.length;
 	}
 }

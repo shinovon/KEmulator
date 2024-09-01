@@ -38,6 +38,7 @@ public class TextField extends Item {
 
 	public void setString(final String aString25) {
 		this.string = aString25;
+		queueLayout();
 	}
 
 	public int getChars(final char[] array) {
@@ -75,8 +76,12 @@ public class TextField extends Item {
 		return this.maxSize;
 	}
 
-	public int setMaxSize(final int anInt349) {
-		return this.maxSize = anInt349;
+	public int setMaxSize(final int size) {
+		maxSize = size;
+		if (string != null && string.length() > size) {
+			setString(string.substring(0, size - 1));
+		}
+		return maxSize;
 	}
 
 	public int size() {
@@ -117,51 +122,46 @@ public class TextField extends Item {
 		} else {
 			g.setColor(-16777216);
 		}
-		int n = y;
-		if (super.labelArr != null && super.labelArr.length > 0) {
+		int yo = y;
+		if (labelArr != null && labelArr.length > 0) {
 			g.setFont(Item.font);
-			for (int i = 0; i < super.labelArr.length; ++i) {
-				g.drawString(super.labelArr[i], x + 4, n + 2, 0);
-				n += Item.font.getHeight() + 4;
+			for (int i = 0; i < labelArr.length; ++i) {
+				g.drawString(labelArr[i], x + 4, yo + 2, 0);
+				yo += Item.font.getHeight() + 4;
 			}
 		}
-		final int n3 = super.bounds[3] - n + y - 2;
-		if (super.inFocus) {
-			g.setColor(-8355712);
-		}
-		g.drawRect(2, n - 2, super.bounds[2] - 4, n3);
+		if (inFocus) g.setColor(-8355712);
+		g.drawRect(2, yo - 2, w - 4, bounds[H] - yo + y - 2);
 		g.setFont(Screen.font);
-		if (super.inFocus) {
-			g.setColor(8617456);
-		}
+		if (inFocus) g.setColor(8617456);
 		this.anInt29 = x + 4;
-		this.anInt30 = n + 4;
+		this.anInt30 = yo + 4;
 		for (int j = 0; j < this.textArr.length; ++j) {
-			g.drawString(this.textArr[j], x + 4, n + 2, 0);
-			if ((n += Screen.font.getHeight() + 4) > super.screen.bounds[3]) {
-				return;
-			}
+			g.drawString(this.textArr[j], x + 4, yo + 2, 0);
 		}
 	}
 
 	protected void layout(Row row) {
 		super.layout(row);
 		int n = 4;
-		final int n2 = row.getAvailableWidth(screen.bounds[W]) - 8;
-		if (super.label != null) {
-			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
-			n = 4 + (Item.font.getHeight() + 4) * super.labelArr.length;
+		final int availableWidth = row.getAvailableWidth(screen.bounds[W]) - 8;
+		if (hasLabel()) {
+			labelArr = c.textArr(label, Item.font, availableWidth, availableWidth);
+			n = 4 + (Item.font.getHeight() + 4) * labelArr.length;
 		} else {
-			super.labelArr = null;
+			labelArr = null;
 		}
 		final Font aFont173 = Screen.font;
-		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, n2, n2);
-		super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, super.screen.bounds[3]);
+		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, availableWidth, availableWidth);
+		bounds[H] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, screen.bounds[3]);
+	}
+
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Something") + 6;
 	}
 
 	public int getMinimumHeight() {
-		final Font font = Item.font;
-		return (font.getHeight() + 4) * (hasLabel() ? 2 : 1);
+		return (Item.font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 
 	boolean isFocusable() {

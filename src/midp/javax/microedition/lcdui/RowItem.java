@@ -1,22 +1,17 @@
 package javax.microedition.lcdui;
 
-class RowObject {
+class RowItem {
 	Item item;
 	int row;
 
-	RowObject(Item item, int i) {
+	RowItem(Item item, int i) {
 		this.item = item;
 		this.row = i;
 	}
 
-	int getMinimumWidth() {
-		return item.getMinimumWidth();
-	}
-
 	int getWidth(int available) {
 		int w;
-		if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON) {
-			// TODO
+		if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
 			w = ((StringItem) item).getRowWidth(row);
 		} else {
 			w = item.getPreferredWidth();

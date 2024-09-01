@@ -387,12 +387,12 @@ public class ChoiceGroup
 		}
 	}
 
-	public int getPreferredWidth() {
-		return -1;
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Some example text") + 6;
 	}
 
 	public int getMinimumHeight() {
 		final Font font = Item.font;
-		return (font.getHeight() + 4) * (hasLabel() ? 2 : 1);
+		return (Item.font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 }

@@ -39,10 +39,11 @@ public abstract class Item {
 	String[] labelArr;
 	Screen screen;
 	int layout;
-	int preferredW = -1;
-	int preferredH = -1;
+	int preferredWidth = -1;
+	int preferredHeight = -1;
 	int[] anIntArray179;
 	int currentPos;
+	private boolean sizeLocked;
 
 	Item(String label) {
 		this.label = label;
@@ -67,33 +68,9 @@ public abstract class Item {
 	public void setLayout(int layout) {
 		if ((layout & ~anInt24) != 0) {
 			throw new IllegalArgumentException();
-		} else {
-			this.layout = layout;
 		}
-	}
-
-	protected boolean isLayoutDefault() {
-		return layout == 0;
-	}
-
-	protected boolean isLayoutAlignDefault() {
-		return (layout & LAYOUT_CENTER) == 0;
-	}
-
-	protected boolean isLayoutLeft() {
-		return (layout & LAYOUT_CENTER) == LAYOUT_LEFT;
-	}
-
-	protected boolean isLayoutCenter() {
-		return (layout & LAYOUT_CENTER) == LAYOUT_CENTER;
-	}
-
-	protected boolean isLayoutRight() {
-		return (layout & LAYOUT_CENTER) == LAYOUT_RIGHT;
-	}
-
-	protected boolean isLayoutExpand() {
-		return (layout & LAYOUT_EXPAND) == LAYOUT_EXPAND;
+		this.layout = layout;
+		queueLayout();
 	}
 
 	public void addCommand(Command command) {
@@ -150,20 +127,26 @@ public abstract class Item {
 	}
 
 	public int getPreferredWidth() {
-		return this.preferredW != -1 ? this.preferredW : bounds[W];
+		if (preferredWidth != -1) return preferredWidth;
+		if (hasLayout(LAYOUT_SHRINK)) {
+			int w = getMinimumWidth();
+			if (w > 0) return w;
+		}
+		return bounds[W];
 	}
 
 	public int getPreferredHeight() {
-		return this.preferredH != -1 ? this.preferredH : bounds[H];
+		return this.preferredHeight != -1 ? this.preferredHeight : bounds[H];
 	}
 
-	public void setPreferredSize(int anInt180, int anInt181) {
+	public void setPreferredSize(int w, int h) {
 		if (this.screen instanceof Alert) {
 			throw new IllegalStateException();
 		} else {
-			this.preferredW = anInt180;
-			this.preferredH = anInt181;
+			this.preferredWidth = w;
+			this.preferredHeight = h;
 		}
+		sizeLocked = w != -1 || h != -1;
 		if (screen != null) {
 			((Form) screen).queueLayout(this);
 		}
@@ -263,7 +246,7 @@ public abstract class Item {
 	}
 
 	public boolean hasLayout(int l) {
-		return (layout & l) != 0;
+		return (layout & l) == l;
 	}
 
 	boolean isFocusable() {
@@ -279,5 +262,9 @@ public abstract class Item {
 		if (screen != null) {
 			((Form) screen).queueLayout(this);
 		}
+	}
+
+	boolean isSizeLocked() {
+		return sizeLocked;
 	}
 }

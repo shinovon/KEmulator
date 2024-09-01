@@ -3,7 +3,7 @@ package javax.microedition.lcdui;
 import java.util.ArrayList;
 
 class Row {
-	ArrayList<RowObject> items = new ArrayList<RowObject>();
+	ArrayList<RowItem> items = new ArrayList<RowItem>();
 	int width = 0;
 	int height = 0;
 
@@ -11,20 +11,35 @@ class Row {
 		int x = 0;
 		int rowHeight = height;
 //		System.out.println("+ROW " + this + " Y: " + y);
-		for (RowObject o: items) {
+		for (int i = 0, l = items.size(); i < l; ++i) {
+			RowItem o = items.get(i);
 			Item item = o.item;
-			int itemWidth = o.getWidth(w - x);
-			int itemHeight = rowHeight;
-			int itemy = y;
+			int availableWidth = w - x,
+				itemWidth = o.getWidth(availableWidth),
+				itemHeight = rowHeight,
+				itemy = y;
+
+			// vertical align
 			if (!item.hasLayout(Item.LAYOUT_VEXPAND)) {
 				if ((itemHeight = o.getHeight()) != rowHeight) {
 					if (item.hasLayout(Item.LAYOUT_VCENTER)) {
 						itemy += (rowHeight - itemHeight) / 2;
-					} else if (item.hasLayout(Item.LAYOUT_BOTTOM)) {
+					} else if (!item.hasLayout(Item.LAYOUT_TOP)) {
+						// bottom by default
 						itemy += rowHeight - itemHeight;
 					}
 				}
 			}
+
+			// horizontal align
+			if (i == l - 1) {
+				if (item.hasLayout(Item.LAYOUT_CENTER)) {
+					x += (availableWidth - itemWidth) / 2;
+				} else if (item.hasLayout(Item.LAYOUT_RIGHT)) {
+					x = Math.max(x, w - itemWidth);
+				}
+			}
+
 //			System.out.println(" ITEM " + item + " X: " + x + " W: " + itemWidth + " R: " + o.row);
 			item.paint(g, x, itemy, itemWidth, itemHeight, o.row);
 			x += itemWidth;
@@ -39,8 +54,8 @@ class Row {
 
 	int getWidth(int available) {
 		int x = 0;
-		for (RowObject o: items) {
-			x += o.getWidth(available - x	);
+		for (RowItem o: items) {
+			x += o.getWidth(available - x);
 		}
 		return x;
 	}
@@ -50,15 +65,15 @@ class Row {
 	}
 
 	void add(Item item) {
-		items.add(new RowObject(item, 0));
-		width += item.getMinimumWidth();
+		items.add(new RowItem(item, 0));
+		width += item.getPreferredWidth();
 		int h = item.getPreferredHeight();
 		if (h > height) height = h;
 	}
 
-	void add(RowObject o) {
+	void add(RowItem o, int maxWidth) {
 		items.add(o);
-		width += o.getMinimumWidth();
+		width += o.getWidth(width - maxWidth);
 		int h = o.getHeight();
 		if (h > height) height = h;
 	}
@@ -68,17 +83,17 @@ class Row {
 		Item lastItem = items.get(items.size() - 1).item;
 		return !lastItem.hasLayout(Item.LAYOUT_EXPAND)
 				&& !lastItem.hasLayout(Item.LAYOUT_NEWLINE_AFTER)
-				&& width + item.getMinimumWidth() < maxWidth;
+				&& width != maxWidth && width + item.getMinimumWidth() < maxWidth;
 	}
 
-	public boolean contains(Item item) {
-		for (RowObject o: items) {
+	boolean contains(Item item) {
+		for (RowItem o: items) {
 			return o.item == item;
 		}
 		return false;
 	}
 
-	public Item getFirstItem() {
+	Item getFirstItem() {
 		try {
 			return items.get(0).item;
 		} catch (Exception e) {

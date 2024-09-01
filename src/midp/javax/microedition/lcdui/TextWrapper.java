@@ -1298,7 +1298,7 @@ class TextWrapper
      */
     static boolean isValidText(String aText, int aConstraints)
     {
-        return TextFieldLayouter.checkText(aConstraints, aText);
+        return TextBoxLayouter.checkText(aConstraints, aText);
     }
 
 }

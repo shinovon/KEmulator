@@ -41,8 +41,8 @@ public class DateField extends Item {
 		super.paint(g, x, y, w, h);
 	}
 
-	public int getPreferredWidth() {
-		return -1;
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Some example text") + 6;
 	}
 
 	public int getMinimumHeight() {

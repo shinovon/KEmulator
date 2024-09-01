@@ -24,7 +24,7 @@ public class ImageItem extends Item {
 			throw new IllegalArgumentException();
 		}
 		this.image = anImage427;
-		super.layout = anInt178;
+		layout = anInt178;
 		this.altText = aString25;
 		this.appearanceMode = anInt179;
 	}
@@ -73,21 +73,24 @@ public class ImageItem extends Item {
 	protected void layout(Row row) {
 		super.layout(row);
 		int n = 0;
-		final int n2 = row.getAvailableWidth(screen.bounds[W]);
+		int w = row.getAvailableWidth(screen.bounds[W]);
+		if (image != null && !hasLayout(LAYOUT_EXPAND)) {
+			w = Math.min(image.getWidth(), w);
+		}
 		int[] tw = new int[1];
-		if (super.label != null) {
-			super.labelArr = c.textArr(super.label, Item.font, n2, n2, tw);
-			n = (Item.font.getHeight() + 4) * super.labelArr.length;
+		if (hasLabel()) {
+			labelArr = c.textArr(label, Item.font, w, w, tw);
+			n = (Item.font.getHeight() + 4) * labelArr.length;
 		} else {
-			super.labelArr = null;
+			labelArr = null;
 		}
 		int iw = 0;
-		if (this.image != null) {
+		if (image != null) {
 			iw = image.getWidth();
 			n += this.image.getHeight() + 4;
 		}
 		width = Math.max(iw + 2, tw[0] + 5);
-		super.bounds[H] = Math.min(n, super.screen.bounds[H]);
+		bounds[H] = Math.min(n, screen.bounds[H]);
 	}
 
 	public int getPreferredWidth() {
@@ -103,6 +106,6 @@ public class ImageItem extends Item {
 	}
 
 	boolean isFocusable() {
-		return commands.size() > 0;
+		return commands.size() > 0 || appearanceMode == BUTTON;
 	}
 }
