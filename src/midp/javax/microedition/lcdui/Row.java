@@ -7,13 +7,15 @@ class Row {
 	int width;
 	int height;
 	int y;
+	int dir;
 
-	Row(int y) {
+	Row(int y, int dir) {
 		this.y = y;
+		this.dir = dir;
 	}
 
 	void paint(Graphics g, int y, int w) {
-		int x = 0;
+		int x = dir == Item.LAYOUT_RIGHT ? w - width : dir == Item.LAYOUT_CENTER ? (w - width) / 2 : 0;
 		int rowHeight = height;
 		for (int i = 0, l = items.size(); i < l; ++i) {
 			RowItem o = items.get(i);
@@ -35,14 +37,9 @@ class Row {
 				}
 			}
 
-			// horizontal align
-			if (i == l - 1) {
-				if (item.hasLayout(Item.LAYOUT_CENTER)) {
-					x += (availableWidth - itemWidth) / 2;
-				} else if (item.hasLayout(Item.LAYOUT_RIGHT)) {
-					x = Math.max(x, w - itemWidth);
-				}
-			}
+//			if (i == l - 1 && item.hasLayout(Item.LAYOUT_CENTER)) {
+//				x += (availableWidth - itemWidth) / 2;
+//			}
 
 			o.x = x;
 			o.y = itemy - y;
@@ -75,7 +72,7 @@ class Row {
 	void add(Item item, int maxWidth) {
 		RowItem o;
 		items.add(o = new RowItem(item, 0, width));
-		width += o.getWidth(width - maxWidth);
+		width += o.getWidth(maxWidth - width);
 		int h = o.getHeight();
 		if (h > height) height = h;
 	}
@@ -83,7 +80,7 @@ class Row {
 	void add(Item item, int itemRow, int maxWidth) {
 		RowItem o;
 		items.add(o = new RowItem(item, itemRow, width));
-		width += o.getWidth(width - maxWidth);
+		width += o.getWidth(maxWidth - width);
 		int h = o.getHeight();
 		if (h > height) height = h;
 	}

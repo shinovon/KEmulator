@@ -15,6 +15,7 @@ public class Form extends Screen {
 	private Item scrollCurrentItem;
 	private Item scrollTargetItem;
 	private int lastScrollDirection;
+	private int currentDir;
 
 	public Form(final String s) {
 		this(s, null);
@@ -464,8 +465,8 @@ public class Form extends Screen {
 					layoutHeight += r.getHeight();
 				}
 			}
+			currentDir = row != null ? row.dir : Item.LAYOUT_LEFT;
 			row = null;
-			int currentDir = Item.LAYOUT_LEFT;
 			for (int j = i; j < items.size(); j++) {
 				Item item = (Item) items.get(j);
 				int itemDir = item.layout & (Item.LAYOUT_CENTER);
@@ -478,12 +479,11 @@ public class Form extends Screen {
 						|| item instanceof CustomItem)
 						|| (item.hasLayout(Item.LAYOUT_2) && !(item instanceof DateField)))
 						|| item.hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
-						|| item.hasLayout(Item.LAYOUT_CENTER)
 						|| (itemDir != currentDir)
 						|| !row.canAdd(item, width)) {
+					currentDir = itemDir;
 					row = newRow(row);
 				}
-				currentDir = itemDir;
 				String text = null;
 				if(item instanceof StringItem
 						&& (text = ((StringItem) item).getText()) != null
@@ -520,8 +520,8 @@ public class Form extends Screen {
 	private Row newRow(Row row) {
 		if (row == null || !row.items.isEmpty()) {
 			if (row != null) layoutHeight += row.getHeight();
-			rows.add(row = new Row(layoutHeight));
-		}
+			rows.add(row = new Row(layoutHeight, currentDir));
+		} else row.dir = currentDir;
 		return row;
 	}
 
