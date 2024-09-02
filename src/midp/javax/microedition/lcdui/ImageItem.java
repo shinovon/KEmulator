@@ -64,25 +64,25 @@ public class ImageItem extends Item {
 		if (labelArr != null && labelArr.length > 0) {
 			g.setFont(Item.font);
 			for (String s : labelArr) {
-				g.drawString(s, x + (w - Item.font.stringWidth(s)) / 2, y + 2, 0);
+				g.drawString(s, x + (w - Item.font.stringWidth(s)) / 2, yo + 2, 0);
 				yo += Item.font.getHeight() + 4;
 			}
 		}
 		if (appearanceMode == BUTTON) {
 			int o = g.getColor();
 			g.setColor(0xababab);
-			int lx = x + w - 3;
+			int lx = x + w - 1;
 			int ly = y + h - 3;
 			g.drawLine(x + 1, ly, lx, ly);
 			g.drawLine(lx, ly, lx, y + 1);
 			g.setColor(o);
-			g.drawRect(x + 1, y, w - 3, h - 2);
+			g.drawRect(x, y, w, h - 2);
 		}
 		if (image != null) {
 			// clip image
 			g.drawRegion(image, 0, 0,
 					Math.min(w, image.getWidth()), Math.min(h-yo+y, image.getHeight()), 0,
-					x, yo, 0);
+					x + (w - image.getWidth()) / 2, yo, 0);
 		}
 	}
 
@@ -110,7 +110,7 @@ public class ImageItem extends Item {
 	}
 
 	public int getPreferredWidth() {
-		return width;
+		return width + 2;
 	}
 
 	public int getMinimumWidth() {

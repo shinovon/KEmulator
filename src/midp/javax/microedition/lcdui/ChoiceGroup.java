@@ -272,20 +272,6 @@ public class ChoiceGroup
 					break;
 				}
 				case POPUP: {
-//					if (this.popupShown && this.anIntArray179 != null) {
-//						this.anInt28 = Math.max(y - this.anInt29 / 2 - 4, 0);
-//						a a2 = (a) this.items.get(0);
-//						emulator.lcdui.a.method178(g, x, this.anInt28 - 2, a2.bounds[2], this.anInt29 + 2);
-//						int k = 0;
-//						while (k < this.items.size()) {
-//							a a3 = (a) this.items.get(k);
-//							if (a3.aBoolean424) {
-//								a3.method211(g, k == this.currentPos, y);
-//							}
-//							++k;
-//						}
-//						return;
-//					}
 					try {
 						((a) this.items.get(this.currentSelect)).method211(g, this.focused, y);
 					} catch (Exception ignored) {}
