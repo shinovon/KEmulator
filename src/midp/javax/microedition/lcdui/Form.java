@@ -465,8 +465,13 @@ public class Form extends Screen {
 				}
 			}
 			row = null;
+			int currentDir = Item.LAYOUT_LEFT;
 			for (int j = i; j < items.size(); j++) {
 				Item item = (Item) items.get(j);
+				int itemDir = item.layout & (Item.LAYOUT_CENTER);
+				if (itemDir == 0) {
+					itemDir = currentDir;
+				}
 				if (row == null || !((item instanceof StringItem
 						|| item instanceof ImageItem
 						|| item instanceof Spacer
@@ -474,9 +479,11 @@ public class Form extends Screen {
 						|| (item.hasLayout(Item.LAYOUT_2) && !(item instanceof DateField)))
 						|| item.hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
 						|| item.hasLayout(Item.LAYOUT_CENTER)
+						|| (itemDir != currentDir)
 						|| !row.canAdd(item, width)) {
 					row = newRow(row);
 				}
+				currentDir = itemDir;
 				String text = null;
 				if(item instanceof StringItem
 						&& (text = ((StringItem) item).getText()) != null
@@ -495,7 +502,12 @@ public class Form extends Screen {
 				} else {
 					row.add(item, width);
 				}
-				if((text != null && text.endsWith("\n")) || item.hasLayout(Item.LAYOUT_NEWLINE_AFTER)) {
+				if((text != null && text.endsWith("\n"))
+						|| item.hasLayout(Item.LAYOUT_NEWLINE_AFTER)
+						|| item instanceof ChoiceGroup
+						|| item instanceof TextField
+						|| item instanceof DateField
+						|| item instanceof Gauge) {
 					row = newRow(row);
 				}
 			}
