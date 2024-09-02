@@ -21,9 +21,10 @@ public class TextField extends Item {
 	private int maxSize;
 	private int constraints;
 	private String[] textArr;
-	private int anInt29;
-	private int anInt30;
+	private int caretX;
+	private int caretY;
 	protected boolean isTextBox;
+	private boolean wasHidden;
 
 	public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
 		super(s);
@@ -108,11 +109,16 @@ public class TextField extends Item {
 
 	protected void focus() {
 		super.focus();
-		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.anInt29, this.anInt30);
+		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 	}
 
 	protected void defocus() {
 		super.defocus();
+		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+	}
+
+	public void hidden() {
+		wasHidden = true;
 		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 	}
 
@@ -130,14 +136,19 @@ public class TextField extends Item {
 				yo += Item.font.getHeight() + 4;
 			}
 		}
-		if (inFocus) g.setColor(-8355712);
-		g.drawRect(2, yo - 2, w - 4, bounds[H] - yo + y - 2);
+		if (focused) g.setColor(-8355712);
+		g.drawRect(2, yo, w - 4, bounds[H] - yo + y - 2);
 		g.setFont(Screen.font);
-		if (inFocus) g.setColor(8617456);
-		this.anInt29 = x + 4;
-		this.anInt30 = yo + 4;
+		if (focused) g.setColor(8617456);
+		if ((caretX != x + 4 || caretY != yo + 4 || wasHidden) && focused) {
+			wasHidden = false;
+			caretX = x + 4;
+			caretY = yo + 4;
+			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
+		}
 		for (int j = 0; j < this.textArr.length; ++j) {
 			g.drawString(this.textArr[j], x + 4, yo + 2, 0);
+			yo += Screen.font.getHeight() + 4;
 		}
 	}
 

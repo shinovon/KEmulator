@@ -68,8 +68,8 @@ public class StringItem extends Item {
 				yo += Item.font.getHeight() + 4;
 			}
 			g.setFont(font);
-			g.drawString(str, x + 4, yo, 0);
-			int fh = font.getHeight();
+			int textWidth = font.stringWidth(str);
+			g.drawString(str, x + (w - textWidth) / 2, yo, 0);
 			int o = g.getColor();
 			g.setColor(0xababab);
 			int lx = x + w - 3;

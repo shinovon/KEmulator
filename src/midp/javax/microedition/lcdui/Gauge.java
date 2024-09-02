@@ -129,11 +129,11 @@ public class Gauge extends Item {
 		if (!interactive) {
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
-			bounds[H] = Math.min(n2, screen.bounds[H]);
+			bounds[H] = n2;
 		} else {
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
-			bounds[H] = Math.min(n2, screen.bounds[H]);
+			bounds[H] = n2;
 		}
 	}
 

@@ -60,14 +60,30 @@ public class ImageItem extends Item {
 
 	protected void paint(final Graphics g, int x, int y, int w, int h) {
 		super.paint(g, x, y, w, h);
-		if (super.labelArr != null && super.labelArr.length > 0) {
+		int yo = y;
+		if (labelArr != null && labelArr.length > 0) {
 			g.setFont(Item.font);
-			for (String s : super.labelArr) {
-				g.drawString(s, x + 4, y + 2, 0);
-				y += Item.font.getHeight() + 4;
+			for (String s : labelArr) {
+				g.drawString(s, x + (w - Item.font.stringWidth(s)) / 2, y + 2, 0);
+				yo += Item.font.getHeight() + 4;
 			}
 		}
-		if (image != null) g.drawImage(this.image, x, y, 0);
+		if (appearanceMode == BUTTON) {
+			int o = g.getColor();
+			g.setColor(0xababab);
+			int lx = x + w - 3;
+			int ly = y + h - 3;
+			g.drawLine(x + 1, ly, lx, ly);
+			g.drawLine(lx, ly, lx, y + 1);
+			g.setColor(o);
+			g.drawRect(x + 1, y, w - 3, h - 2);
+		}
+		if (image != null) {
+			// clip image
+			g.drawRegion(image, 0, 0,
+					Math.min(w, image.getWidth()), Math.min(h-yo+y, image.getHeight()), 0,
+					x, yo, 0);
+		}
 	}
 
 	protected void layout(Row row) {

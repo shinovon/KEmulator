@@ -191,33 +191,33 @@ public class Graphics
 		}
 	}
 
-	public void drawRegion(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
+	public void drawRegion(final Image image, final int sx, final int sy, final int w, final int h, final int t, final int dx, final int dy, final int a) {
 		++Profiler.drawCallCount;
 		if (image == null) {
 			throw new NullPointerException();
 		}
-		if (n < 0 || n + n3 > image.getWidth() || n2 < 0 || n2 + n4 > image.getHeight()) {
+		if (sx < 0 || sx + w > image.getWidth() || sy < 0 || sy + h > image.getHeight()) {
 			throw new IllegalArgumentException("region exceeds the bounds of the source image");
 		}
 		if (image.getImpl() == this.image) {
 			throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
 		}
-		if (!method294(n8, 64)) {
+		if (!method294(a, 64)) {
 			throw new IllegalArgumentException();
 		}
 		final ITransform transform2 = this.impl.getTransform();
-		final ITransform transform = transform2.newTransform(n3, n4, n5, n6, n7, n8);
+		final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
 		this.impl.transform(transform);
-		this.impl.drawImage(image.getImpl(), n, n2, n3, n4, 0, 0, n3, n4);
+		this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, w, h);
 		this.impl.setTransform(transform2);
 		if (xrayGraphics != null) {
 			this.xrayGraphics.transform(transform);
-			this.method289(image, n, n2, 0, 0, n3, n4);
+			this.method289(image, sx, sy, 0, 0, w, h);
 			this.xrayGraphics.setTransform(transform2);
 		}
 		++image.usedCount;
 		++Profiler.drawRegionCallCount;
-		Profiler.drawRegionPixelCount += Math.abs(n3 * n4);
+		Profiler.drawRegionPixelCount += Math.abs(w * h);
 	}
 
 	public void drawRGB(final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final boolean b) {

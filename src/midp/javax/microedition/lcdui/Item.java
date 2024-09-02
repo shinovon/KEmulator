@@ -30,7 +30,7 @@ public abstract class Item {
 	static final int anInt24 = 32563;
 	static final Font font = Font.getFont(0, 1, 8);
 	int[] bounds;
-	boolean inFocus;
+	boolean focused;
 	boolean shownOnForm;
 	Command aCommand174;
 	public ItemCommandListener itemCommandListener;
@@ -182,7 +182,7 @@ public abstract class Item {
 	}
 
 	protected void focus() {
-		this.inFocus = true;
+		this.focused = true;
 		if (this.screen != null) {
 			this.screen.setItemCommands(this);
 		}
@@ -190,9 +190,9 @@ public abstract class Item {
 	}
 
 	protected void defocus() {
-		this.inFocus = false;
-		if (this.screen != null) {
-			this.screen.removeItemCommands(this);
+		focused = false;
+		if (screen != null) {
+			screen.removeItemCommands(this);
 		}
 
 	}
@@ -203,17 +203,15 @@ public abstract class Item {
 
 	protected void paint(Graphics g, int x, int y, int w, int h) {
 		g.setColor(-16777216);
-		if (this.inFocus) {
-//			int w = getPreferredWidth() > 0 ? getPreferredWidth() + 1 : bounds[W];
+		if (focused) {
 			a.method178(g, x, y, w, h);
 		}
-
 	}
 
 	protected void layout(Row row) {
 		bounds[X] = 0;
 		bounds[Y] = 0;
-		bounds[W] = this.screen.bounds[W];
+		bounds[W] = screen.bounds[W];
 		bounds[H] = Screen.fontHeight4;
 	}
 

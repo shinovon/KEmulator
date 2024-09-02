@@ -46,7 +46,7 @@ public class DateField extends Item {
 	}
 
 	public int getMinimumHeight() {
-		return Item.font.getHeight();
+		return Item.font.getHeight() + 4;
 	}
 
 	boolean isFocusable() {

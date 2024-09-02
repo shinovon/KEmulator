@@ -12,7 +12,7 @@ public class ChoiceGroup
 	int choiceType;
 	private int fitPolicy;
 	private Vector items;
-	boolean aBoolean542;
+	boolean popupShown;
 	int anInt28;
 	int anInt29;
 	Command aCommand540;
@@ -202,6 +202,8 @@ public class ChoiceGroup
 					++i;
 				}
 			}
+			if (choiceType == POPUP) layoutForm();
+			else repaintForm();
 			return;
 		}
 		((a) this.items.get(n)).sel = flag;
@@ -219,22 +221,24 @@ public class ChoiceGroup
 				this.screen.cmdListener.commandAction(this.aCommand540, this.screen);
 		}
 		if (this.choiceType == EXCLUSIVE) {
-			notifyStateChanged();
 			this.setSelectedIndex(this.currentPos, true);
+			notifyStateChanged();
 			return;
 		}
 		if (this.choiceType == MULTIPLE) {
-			notifyStateChanged();
 			this.setSelectedIndex(this.currentPos, !this.isSelected(this.currentPos));
+			notifyStateChanged();
 			return;
 		}
-		if (this.choiceType == POPUP) {
-			if (this.aBoolean542) {
-				notifyStateChanged();
-				this.setSelectedIndex(this.currentPos, true);
-			}
-			this.aBoolean542 = !this.aBoolean542;
-		}
+		// TODO
+//		if (this.choiceType == POPUP) {
+//			if (this.popupShown) {
+//				this.setSelectedIndex(this.currentPos, true);
+//				notifyStateChanged();
+//			}
+//			this.popupShown = !this.popupShown;
+//			layoutForm();
+//		}
 	}
 
 	protected void paint(Graphics g, int x, int y, int w, int h) {
@@ -262,13 +266,14 @@ public class ChoiceGroup
 					while (j < this.items.size()) {
 						a a2 = (a) this.items.get(j);
 						if (a2.aBoolean424) {
-							a2.method211(g, this.inFocus && j == this.currentPos, y);
+							a2.method211(g, this.focused && j == this.currentPos, y);
 						}
 						++j;
 					}
+					break;
 				}
 				case POPUP: {
-					if (this.aBoolean542 && this.anIntArray179 != null) {
+					if (this.popupShown && this.anIntArray179 != null) {
 						this.anInt28 = Math.max(y - this.anInt29 / 2 - 4, 0);
 						a a2 = (a) this.items.get(0);
 						emulator.lcdui.a.method178(g, x, this.anInt28 - 2, a2.bounds[2], this.anInt29 + 2);
@@ -282,9 +287,9 @@ public class ChoiceGroup
 						}
 						return;
 					}
-//					try {
-//						((a) this.items.get(this.currentSelect)).method211(g, this.inFocus, y);
-//					} catch (Exception ignored) {}
+					try {
+						((a) this.items.get(this.currentSelect)).method211(g, this.focused, y);
+					} catch (Exception ignored) {}
 				}
 			}
 		}
@@ -323,7 +328,7 @@ public class ChoiceGroup
 				a a2 = (a) this.items.get(this.getSelectedIndex());
 				a2.method212();
 				n += a2.bounds[H];
-				if (this.aBoolean542) {
+				if (this.popupShown) {
 					this.anIntArray179 = new int[this.items.size()];
 					this.anInt29 = 0;
 					int j = 0;
@@ -349,10 +354,28 @@ public class ChoiceGroup
 				this.anInt28 = n - a2.bounds[H];
 			}
 		}
-		this.bounds[H] = Math.min(n, this.screen.bounds[H]);
+		this.bounds[H] = n;
 	}
 
 	boolean keyScroll(int key, boolean repeat) {
+		if (choiceType == POPUP) {
+			int i = currentSelect;
+			switch (key) {
+				case Canvas.LEFT:
+					if (--i < 0) {
+						return false;
+					}
+					setSelectedIndex(i, true);
+					return true;
+				case Canvas.RIGHT:
+					if (++i >= items.size()) {
+						return false;
+					}
+					setSelectedIndex(i, true);
+					return true;
+			}
+			return false;
+		}
 		switch (key) {
 			case Canvas.UP:
 				if (--currentPos < 0) {
@@ -393,6 +416,13 @@ public class ChoiceGroup
 	}
 
 	boolean isFocusable() {
-		return true;
+		return items.size() > 0;
+	}
+
+	protected void defocus() {
+		super.defocus();
+		if (choiceType != POPUP) return;
+		popupShown = false;
+		layoutForm();
 	}
 }

@@ -26,10 +26,9 @@ final class a {
 	}
 
 	protected final void method211(final Graphics graphics, final boolean b, int y) {
-
 		graphics.setColor(-16777216);
 		final boolean b2 = this.choice.choiceType == 4;
-		final boolean b3 = this.choice.aBoolean542 && this.choice.anIntArray179 != null;
+		final boolean b3 = this.choice.popupShown && this.choice.anIntArray179 != null;
 		int anInt28 = 0;
 		int anInt29 = 0;
 		Label_0103:

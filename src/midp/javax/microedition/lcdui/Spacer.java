@@ -12,9 +12,7 @@ public class Spacer extends Item {
 	public void setMinimumSize(final int anInt349, final int anInt350) {
 		this.w = anInt349;
 		this.h = anInt350;
-		if (screen != null) {
-			((Form) screen).queueLayout(this);
-		}
+		layoutForm();
 	}
 
 	public void addCommand(final Command command) {

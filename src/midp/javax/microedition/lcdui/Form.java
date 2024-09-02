@@ -154,22 +154,18 @@ public class Form extends Screen {
 					scrollTargetItem = null;
 					lastScrollDirection = key;
 				}
-				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
-					focusItem(scrollTargetItem);
-					scrollCurrentItem = scrollTargetItem;
-					scrollTargetItem = null;
-					break;
-				}
 				if (scrollCurrentItem != null && scrollTargetItem == null) {
 					scrollTargetItem = getNextFocusableItem(scrollCurrentItem, -1);
 				}
-				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+				if (scrollTargetItem != null && isVisible(scrollTargetItem, 0)) {
 					focusItem(scrollTargetItem);
 					scrollCurrentItem = scrollTargetItem;
+//					if (isVisible(scrollTargetItem, height / 6)) {
 					scrollTargetItem = null;
 					break;
+//					}
 				}
-				scroll = Math.max(scroll - height / 8, 0);
+				scroll = Math.max(scroll - height / 6, 0);
 				break;
 			case Canvas.DOWN:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
@@ -180,22 +176,18 @@ public class Form extends Screen {
 					scrollTargetItem = null;
 					lastScrollDirection = key;
 				}
-				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
-					focusItem(scrollTargetItem);
-					scrollCurrentItem = scrollTargetItem;
-					scrollTargetItem = null;
-					break;
-				}
 				if (scrollCurrentItem != null && scrollTargetItem == null) {
 					scrollTargetItem = getNextFocusableItem(scrollCurrentItem, 1);
 				}
-				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+				if (scrollTargetItem != null && isVisible(scrollTargetItem, 0)) {
 					focusItem(scrollTargetItem);
 					scrollCurrentItem = scrollTargetItem;
+//					if (isVisible(scrollTargetItem, height / 6)) {
 					scrollTargetItem = null;
 					break;
+//					}
 				}
-				scroll = Math.min(scroll + height / 8, layoutHeight - height + bounds[Y]);
+				scroll = Math.min(scroll + height / 6, layoutHeight - height + bounds[Y]);
 				break;
 			case Canvas.LEFT:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
@@ -271,7 +263,7 @@ public class Form extends Screen {
 
 	void setCurrentItem(Item item) {
 		focusItem(item);
-		if (!isVisible(item)) scrollTo(item);
+		if (!isVisible(item, 0)) scrollTo(item);
 	}
 
 	private Row getFirstVisibleRow() {
@@ -340,15 +332,16 @@ public class Form extends Screen {
 			layoutStart = Integer.MAX_VALUE;
 			int y = bounds[Y],
 				w = bounds[W],
-				h = bounds[H];
-			g.setClip(0, y, w, h);
+				h = bounds[H],
+				sy = y;
+			g.setClip(0, sy, w, sy+h);
 
 			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
 				Item item = getFirstVisibleAndFocusableItem();
 				if (item != null) {
 					focusItem(item);
 				}
-			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
+			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem, 0)) {
 				scrollTo(focusedItem);
 			}
 			scroll = Math.max(0, Math.min(scroll, layoutHeight - h + bounds[Y]));
@@ -356,7 +349,7 @@ public class Form extends Screen {
 			y -= scroll;
 			for (Row row : rows) {
 				int rh = row.getHeight();
-				if (y + rh > 0 && h > y) {
+				if (y + rh > 0 && h + sy > y) {
 					row.paint(g, y, w);
 				} else row.hidden();
 				y += rh;
@@ -389,21 +382,21 @@ public class Form extends Screen {
 		return null;
 	}
 
-	boolean isVisible(Item item) {
-//		Row row = getFirstRow(item);
-//		if (row == null) return false;
-//		do {
-//			if (isVisible(row)) {
-//				return true;
-//			}
-//		} while ((row = getNextRow(item, row)) != null);
-//		return false;
-		return !item.hidden;
+	boolean isVisible(Item item, int offset) {
+		Row row = getFirstRow(item);
+		if (row == null) return false;
+		do {
+			if (isVisible(row, offset)) {
+				return true;
+			}
+		} while ((row = getNextRow(item, row)) != null);
+		return false;
+//		return !item.hidden;
 	}
 
-	boolean isVisible(Row row) {
+	boolean isVisible(Row row, int offset) {
 		if (row == null) return false;
-		return row.y + row.height - scroll > 0 && bounds[H] > row.y - scroll;
+		return row.y + row.height - scroll - offset > 0 && bounds[H] - offset > row.y - scroll;
 	}
 
 	void scrollTo(Item item) {
