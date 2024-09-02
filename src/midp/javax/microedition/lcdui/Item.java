@@ -147,9 +147,7 @@ public abstract class Item {
 			this.preferredHeight = h;
 		}
 		sizeLocked = w != -1 || h != -1;
-		if (screen != null) {
-			((Form) screen).queueLayout(this);
-		}
+		layoutForm();
 	}
 
 	public int getMinimumWidth() {

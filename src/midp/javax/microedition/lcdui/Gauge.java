@@ -48,6 +48,7 @@ public class Gauge extends Item {
 
 	public void setValue(int value) {
 		this.value = value;
+		repaintForm();
 	}
 
 	public int getValue() {
@@ -56,6 +57,7 @@ public class Gauge extends Item {
 
 	public void setMaxValue(int maxValue) {
 		max = maxValue;
+		repaintForm();
 	}
 
 	public int getMaxValue() {
@@ -129,7 +131,6 @@ public class Gauge extends Item {
 			if (label != null) n2 += font.getHeight() + 4;
 			bounds[H] = Math.min(n2, screen.bounds[H]);
 		} else {
-			//TODO
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
 			bounds[H] = Math.min(n2, screen.bounds[H]);
@@ -150,7 +151,6 @@ public class Gauge extends Item {
 
 	boolean keyScroll(int key, boolean repeat) {
 		if (interactive) {
-			System.out.println("s " + key);
 			if (key == Canvas.LEFT) {
 				if (--value < 0) {
 					value = 0;

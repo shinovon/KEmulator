@@ -162,6 +162,7 @@ public class Display {
 			throw new IllegalArgumentException();
 		}
 		this.setCurrent(item.screen);
+		((Form) item.screen).setCurrentItem(item);
 	}
 
 	static {

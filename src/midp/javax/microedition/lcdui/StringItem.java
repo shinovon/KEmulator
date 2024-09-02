@@ -60,7 +60,6 @@ public class StringItem extends Item {
 			if (str == null) str = text;
 			if (str == null) str = "...";
 			int yo = y;
-			int textWidth = font.stringWidth(str);
 			if (hasLabel()) {
 				g.setFont(Item.font);
 				String label = this.label.trim();
@@ -82,6 +81,9 @@ public class StringItem extends Item {
 		} else {
 			g.setFont(font);
 			if (row >= textArr.length) return;
+			if (isFocusable()) {
+				g.setColor(-11178603);
+			}
 			g.drawString(textArr[row], x, y, 0);
 		}
 

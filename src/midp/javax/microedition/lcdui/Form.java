@@ -169,8 +169,7 @@ public class Form extends Screen {
 					scrollTargetItem = null;
 					break;
 				}
-				scroll -= height / 8;
-				if (scroll < 0) scroll = 0;
+				scroll = Math.max(scroll - height / 8, 0);
 				break;
 			case Canvas.DOWN:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
@@ -196,8 +195,7 @@ public class Form extends Screen {
 					scrollTargetItem = null;
 					break;
 				}
-				scroll += height / 8;
-				scroll = Math.min(scroll, layoutHeight - height + bounds[Y]);
+				scroll = Math.min(scroll + height / 8, layoutHeight - height + bounds[Y]);
 				break;
 			case Canvas.LEFT:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
@@ -271,12 +269,9 @@ public class Form extends Screen {
 		}
 	}
 
-	private Item getFirstVisibleItem() {
-		try {
-			return getFirstVisibleRow().getFirstItem();
-		} catch (Exception e) {
-			return null;
-		}
+	void setCurrentItem(Item item) {
+		focusItem(item);
+		if (!isVisible(item)) scrollTo(item);
 	}
 
 	private Row getFirstVisibleRow() {
@@ -394,33 +389,6 @@ public class Form extends Screen {
 		return null;
 	}
 
-	Row getLastRow(Item item) {
-		Row row = getFirstRow(item);
-		if (row != null) {
-			for (int i = rows.indexOf(row); i < rows.size(); i++) {
-				Row tmp = rows.get(i);
-				if (row.contains(item)) row = tmp;
-			}
-		}
-		return row;
-	}
-
-	Row getFirstRow() {
-		try {
-			return rows.get(0);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	Row getLastRow() {
-		try {
-			return rows.get(rows.size() - 1);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
 	boolean isVisible(Item item) {
 //		Row row = getFirstRow(item);
 //		if (row == null) return false;
@@ -439,6 +407,7 @@ public class Form extends Screen {
 	}
 
 	void scrollTo(Item item) {
+		scrollCurrentItem = item;
 		try {
 			scroll = getFirstRow(item).y;
 		} catch (Exception ignored) {}
