@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Screen;
 
 public final class EmulatorScreen implements
@@ -1469,6 +1470,22 @@ public final class EmulatorScreen implements
 		this.canvas.addControlListener(this);
 		this.canvas.addPaintListener(this);
 		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
+		canvas.addListener(SWT.MenuDetect, new Listener() {
+			public void handleEvent(Event event) {
+				if (lastDisplayable != null && lastDisplayable instanceof Form) {
+					Point p = canvas.toControl(event.x, event.y);
+					int[] t = transformPointer(p.x, p.y);
+					javax.microedition.lcdui.Item item;
+					if (t[0] >= 0 && t[1] >= 0
+							&& (item = ((Form) lastDisplayable).getItemAt(t[0], t[1], null)) != null
+							&& item.commands.size() > 0) {
+						((Form) lastDisplayable).showMenu(item, -2, -2);
+						return;
+					}
+				}
+				event.doit = false;
+			}
+		});
 		stackLayout = new StackLayout();
 		canvas.setLayout(stackLayout);
 		this.keysState = new boolean[256];
@@ -1916,7 +1933,7 @@ public final class EmulatorScreen implements
 		return new int[]{x, y};
 	}
 
-	int[] transformCaret(int x, int y) {
+	public int[] transformCaret(int x, int y) {
 		// Map coordinates on window to canvas
 		int w, h;
 		if (rotation % 2 == 1) {

@@ -48,8 +48,8 @@ public class Displayable {
 	protected Composite swtContent;
 	private Rectangle swtContentArea;
 	private boolean swtInitialized;
-	private Menu swtMenu;
-	private SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
+	Menu swtMenu;
+	SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
 	private MenuListener swtMenuListener = new SwtMenuListener();
 
 	public Displayable() {
@@ -207,7 +207,7 @@ public class Displayable {
 					this.menuShown = true;
 					this.anInt28 = 0;
 					if (swtMenu != null) {
-						showSwtMenu();
+						showSwtMenu(false, -1, -1);
 					} else {
 						this.repaintScreen();
 					}
@@ -489,13 +489,22 @@ public class Displayable {
 		getSwtParent().setMenu(swtMenu);
 	}
 
-	void showSwtMenu() {
+	void showSwtMenu(final boolean item, final int x, final int y) {
 		syncExec(new Runnable() {
 			@Override
 			public void run() {
-				swtUpdateMenuCommands();
-				Point p = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getMenuLocation();
-				swtMenu.setLocation(p);
+				swtUpdateMenuCommands(item);
+				if (x != -2 && y != -2) {
+					Point p;
+					EmulatorScreen s = ((EmulatorScreen) Emulator.getEmulator().getScreen());
+					if (x != -1 || y != -1) {
+						int[] t = s.transformCaret(x, y);
+						p = s.getCanvas().toDisplay(new Point(t[0], t[1]));
+					} else {
+						p = s.getMenuLocation();
+					}
+					swtMenu.setLocation(p);
+				}
 				swtMenu.setVisible(true);
 			}
 		});
@@ -510,7 +519,7 @@ public class Displayable {
 		});
 	}
 
-	void swtUpdateMenuCommands() {
+	void swtUpdateMenuCommands(boolean item) {
 		for (MenuItem mi: swtMenu.getItems()) {
 			mi.dispose();
 		}
@@ -544,8 +553,18 @@ public class Displayable {
 
 		public void widgetSelected(SelectionEvent e) {
 			try {
-				Command c = (Command) e.widget.getData();
-				callCommandAction(c);
+				Object o = (Object) e.widget.getData();
+				if (o instanceof Command) {
+					callCommandAction((Command) o);
+				} else if (o instanceof ChoiceGroup) {
+					((ChoiceGroup) o).select(((MenuItem) e.widget).getText());
+				} else if (o instanceof Object[]) {
+					Command c = (Command) ((Object[]) o)[0];
+					Item item = (Item) ((Object[]) o)[1];
+					if (item.itemCommandListener != null) {
+						item.itemCommandListener.commandAction(c, item);
+					}
+				}
 			} catch (Exception ignored) {}
 		}
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Form extends Screen {
 	ItemStateListener itemStateListener;
-	private ArrayList<Row> rows;
+	private final ArrayList<Row> rows = new ArrayList<Row>();
 	private int layoutStart;
 	private boolean layout;
 	private int layoutHeight;
@@ -22,7 +22,6 @@ public class Form extends Screen {
 
 	public Form(final String s, final Item[] array) {
 		super(s);
-		rows = new ArrayList<Row>();
 		if (array != null) {
 			for (Item item : array) {
 				if (item == null) {
@@ -112,7 +111,11 @@ public class Form extends Screen {
 			throw new IllegalStateException();
 		}
 		synchronized (items) {
-			((Item) super.items.get(n)).screen = null;
+			Item prev = (Item) super.items.get(n);
+			if (prev == focusedItem) focusedItem = null;
+			if (prev == scrollCurrentItem) scrollCurrentItem = null;
+			if (prev == scrollTargetItem) scrollTargetItem = null;
+			prev.screen = null;
 			super.items.set(n, item);
 			item.screen = this;
 		}
@@ -138,6 +141,11 @@ public class Form extends Screen {
 			scrollTargetItem = getFirstVisibleAndFocusableItem();
 		}
 		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(key)) {
+			return;
+		}
+		if (scrollCurrentItem != null && focusedItem == null) {
+			focusItem(scrollCurrentItem);
+			repaintScreen();
 			return;
 		}
 		int height = bounds[H];
@@ -223,27 +231,36 @@ public class Form extends Screen {
 
 	public boolean invokePointerPressed(final int x, int y) {
 		if (super.invokePointerPressed(x, y)) return true;
-		if ((y -= bounds[Y]) < 0) return false;
+		int[] r = new int[2];
+		Item item = getItemAt(x, y, r);
+		if (item.isFocusable()) {
+			focusItem(item);
+			focusedItem.pointerPressed(r[0], r[1]);
+			repaintScreen();
+		}
+		return false;
+	}
+
+	public Item getItemAt(int x, int y, int[] transformed) {
+		if ((y -= bounds[Y]) < 0) return null;
 		int height = bounds[H];
 		Row row = getFirstVisibleRow();
-		if (row == null) return false;
+		if (row == null) return null;
 		do {
 			if (row.y + row.height < y + scroll) continue;
-			if (height < row.y - scroll) return false;
+			if (height < row.y - scroll) return null;
 			int ry = y + scroll - row.y;
 			for (Row.RowItem o: row.items) {
 				if (o.x <= x && o.x + o.width >= x && o.y <= ry && o.y + o.height >= ry) {
-					Item item = o.item;
-					if (item.isFocusable()) {
-						focusItem(item);
-						focusedItem.pointerPressed(x, ry);
-						repaintScreen();
+					if (transformed != null) {
+						transformed[0] = x - o.x;
+						transformed[1] = ry - o.y;
 					}
-					return true;
+					return o.item;
 				}
 			}
 		} while ((row = getNextRow(null, row)) != null);
-		return false;
+		return null;
 	}
 
 	private void focusItem(Item item) {
@@ -428,22 +445,26 @@ public class Form extends Screen {
 			}
 			int width = bounds[W];
 			Row row = null;
-//			if (i < items.size()) {
-//				row = getFirstRow((Item) items.get(i));
-//			}
-//			if (i == 0) {
-			rows.clear();
-			i = 0;
-//			} else if (row != null) {
-//				int rowIdx = rows.indexOf(row);
-//				if (row.items.size() > 1) {
-//					i = items.indexOf(row.getFirstItem());
-//				}
-//				while (rows.size() > rowIdx) {
-//					rows.remove(rowIdx);
-//				}
-//			}
-//			row = null;
+			if (i < items.size()) {
+				row = getFirstRow((Item) items.get(i));
+			}
+			if (i == 0) {
+				rows.clear();
+			} else if (row != null) {
+				int rowIdx = rows.indexOf(row);
+				if (row.items.size() > 1) {
+					i = items.indexOf(row.getFirstItem());
+				}
+				while (rows.size() > rowIdx) {
+					rows.remove(rowIdx);
+				}
+			}
+			if (rows.size() > 0) {
+				for (Row r: rows) {
+					layoutHeight += r.getHeight();
+				}
+			}
+			row = null;
 			for (int j = i; j < items.size(); j++) {
 				Item item = (Item) items.get(j);
 				if (row == null || !((item instanceof StringItem
@@ -490,6 +511,26 @@ public class Form extends Screen {
 			rows.add(row = new Row(layoutHeight));
 		}
 		return row;
+	}
+
+	public void showMenu(Item item, int x, int y) {
+		if (item == null) {
+			hideSwtMenu();
+			return;
+		}
+		int[] l = getLocationOnScreen(item);
+		showSwtMenu(true, x < 0 ? x : l[0] + x, y < 0 ? y : l[1] + y);
+	}
+
+	int[] getLocationOnScreen(Item item) {
+		int x = 0, y = 0;
+		try {
+			Row row = getFirstRow(item);
+			Row.RowItem o = row.items.get(row.indexOf(item));
+			x = o.x;
+			y = row.y + bounds[Y] + o.y - scroll;
+		} catch (Exception ignored) {}
+		return new int[] {x, y};
 	}
 
 	protected void sizeChanged(final int w, final int h) {

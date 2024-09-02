@@ -143,8 +143,8 @@ public abstract class CustomItem extends Item {
 		this.g.setColor(-1);
 		this.g.fillRect(0, 0, super.screen.w, super.screen.h);
 		this.g.setColor(0);
-		final int n = super.bounds[0] + 2;
-		int n2 = super.bounds[1] + 2;
+		final int n = x + 2;
+		int n2 = y + 2;
 		final int prefContentWidth = this.getPrefContentWidth(super.bounds[2]);
 		final int prefContentHeight = this.getPrefContentHeight(super.bounds[3]);
 		this.paint(this.g, prefContentWidth, prefContentHeight);
@@ -152,7 +152,7 @@ public abstract class CustomItem extends Item {
 		if (super.labelArr != null && super.labelArr.length > 0) {
 			graphics.setFont(Item.font);
 			for (int i = 0; i < super.labelArr.length; ++i) {
-				graphics.drawString(super.labelArr[i], super.bounds[0] + 4, n2 + 2, 0);
+				graphics.drawString(super.labelArr[i], x + 4, n2 + 2, 0);
 				n2 += Item.font.getHeight() + 4;
 			}
 		}
