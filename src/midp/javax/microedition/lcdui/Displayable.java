@@ -421,7 +421,7 @@ public class Displayable {
 	protected void finalize() throws Throwable {
 		syncExec(new Runnable() {
 			public void run() {
-				if (!swtContent.isDisposed()) {
+				if (swtContent != null && !swtContent.isDisposed()) {
 					swtContent.dispose();
 				}
 			}

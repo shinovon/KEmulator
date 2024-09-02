@@ -90,9 +90,6 @@ public class ImageItem extends Item {
 		super.layout(row);
 		int n = 0;
 		int w = row.getAvailableWidth(screen.bounds[W]);
-		if (image != null && !hasLayout(LAYOUT_EXPAND)) {
-			w = Math.min(image.getWidth(), w);
-		}
 		int[] tw = new int[1];
 		if (hasLabel()) {
 			labelArr = c.textArr(label, Item.font, w, w, tw);

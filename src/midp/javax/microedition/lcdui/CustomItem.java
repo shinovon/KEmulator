@@ -16,6 +16,8 @@ public abstract class CustomItem extends Item {
 	private Image img;
 	private Graphics g;
 	int[] anIntArray429;
+	private boolean wasHidden = true;
+	private int lastWidth, lastHeight;
 
 	protected CustomItem(final String s) {
 		super(s);
@@ -79,10 +81,11 @@ public abstract class CustomItem extends Item {
 
 	protected abstract int getPrefContentHeight(final int p0);
 
-	protected void sizeChanged(final int n, final int n2) {
+	protected void sizeChanged(final int w, final int h) {
 	}
 
 	protected final void invalidate() {
+		repaintForm();
 	}
 
 	protected abstract void paint(final Graphics p0, final int p1, final int p2);
@@ -133,9 +136,20 @@ public abstract class CustomItem extends Item {
 		g = null;
 		img.dispose();
 		img = null;
+		try {
+			wasHidden = true;
+			hideNotify();
+		} catch (Exception ignored) {}
 	}
 
 	protected void paint(final Graphics graphics, int x, int y, int w, int h) {
+		super.paint(graphics, x, y, w, h);
+		if (wasHidden) {
+			try {
+				showNotify();
+			} catch (Exception ignored) {}
+			wasHidden = false;
+		}
 		if (img == null) {
 			img = Image.createImage(Emulator.getEmulator().getScreen().getWidth(), Emulator.getEmulator().getScreen().getHeight());
 			g = this.img.getGraphics();
@@ -145,10 +159,9 @@ public abstract class CustomItem extends Item {
 		this.g.setColor(0);
 		final int n = x + 2;
 		int n2 = y + 2;
-		final int prefContentWidth = this.getPrefContentWidth(super.bounds[2]);
-		final int prefContentHeight = this.getPrefContentHeight(super.bounds[3]);
+		final int prefContentWidth = this.getPrefContentWidth(w);
+		final int prefContentHeight = this.getPrefContentHeight(h);
 		this.paint(this.g, prefContentWidth, prefContentHeight);
-		super.paint(g, x, y, w, h);
 		if (super.labelArr != null && super.labelArr.length > 0) {
 			graphics.setFont(Item.font);
 			for (int i = 0; i < super.labelArr.length; ++i) {
@@ -156,22 +169,33 @@ public abstract class CustomItem extends Item {
 				n2 += Item.font.getHeight() + 4;
 			}
 		}
-		graphics.setClip(n, n2, prefContentWidth, prefContentHeight);
-		graphics.drawImage(this.img, n, n2, 0);
-		graphics.setClip(0, 0, super.screen.w, super.screen.h);
+		graphics.drawRegion(img, 0, 0,
+				Math.min(img.getWidth(), Math.min(w, prefContentWidth)),
+				Math.min(img.getHeight(), Math.min(h-n2+y, prefContentHeight)), 0,
+				n, n2, 0);
 	}
 
 	protected void layout(Row row) {
 		super.layout(row);
 		int n = 0;
-		final int n2 = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
-		if (super.label != null) {
-			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
+		int w = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
+		if (hasLabel()) {
+			super.labelArr = c.textArr(super.label, Item.font, w, w);
 			n = (Item.font.getHeight() + 4) * super.labelArr.length;
 		} else {
 			super.labelArr = null;
 		}
-		super.bounds[H] = Math.min(n + (this.getPrefContentHeight(super.bounds[H]) + 4), super.screen.bounds[H]);
+		int h = getPrefContentHeight(bounds[H]);
+		bounds[H] = n + (h + 4);
+
+		w = getPreferredWidth();
+		if (lastWidth != w || lastHeight != h) {
+			try {
+				sizeChanged(w, h);
+			} catch (Exception ignored) {}
+			lastWidth = w;
+			lastHeight = h;
+		}
 	}
 
 	protected boolean callTraverse(final int n) {
