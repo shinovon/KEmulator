@@ -348,29 +348,29 @@ public class Form extends Screen {
 			layout = false;
 			layoutStart = Integer.MAX_VALUE;
 			int y = bounds[Y],
-				w = bounds[W],
-				h = bounds[H],
-				sy = y;
-			g.setClip(0, sy, w, sy+h);
+					w = bounds[W],
+					h = bounds[H],
+					sy = y;
+		}
+		g.setClip(0, sy, w, sy+h);
 
-			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
-				Item item = getFirstVisibleAndFocusableItem();
-				if (item != null) {
-					focusItem(item);
-				}
-			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem, 0)) {
-				scrollTo(focusedItem);
+		if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
+			Item item = getFirstVisibleAndFocusableItem();
+			if (item != null) {
+				focusItem(item);
 			}
-			scroll = Math.max(0, Math.min(scroll, layoutHeight - h + bounds[Y]));
+		} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem, 0)) {
+			scrollTo(focusedItem);
+		}
+		scroll = Math.max(0, Math.min(scroll, layoutHeight - h + bounds[Y]));
 
-			y -= scroll;
-			for (Row row : rows) {
-				int rh = row.getHeight();
-				if (y + rh > 0 && h + sy > y) {
-					row.paint(g, y, w);
-				} else row.hidden();
-				y += rh;
-			}
+		y -= scroll;
+		for (Row row : rows) {
+			int rh = row.getHeight();
+			if (y + rh > 0 && h + sy > y) {
+				row.paint(g, y, w);
+			} else row.hidden();
+			y += rh;
 		}
 	}
 
