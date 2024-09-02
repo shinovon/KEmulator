@@ -98,7 +98,7 @@ class Row {
 
 	boolean contains(Item item) {
 		for (RowItem o: items) {
-			return o.item == item;
+			if (o.item == item) return true;
 		}
 		return false;
 	}
@@ -118,6 +118,21 @@ class Row {
 				item.hidden();
 			}
 		}
+	}
+
+	public Item getFirstFocusableItem() {
+		for (RowItem o: items) {
+			Item item = o.item;
+			if (item.isFocusable()) return item;
+		}
+		return null;
+	}
+
+	public int indexOf(Item item) {
+		for (int i = 0, l = items.size(); i < l; i++) {
+			if (items.get(i).item == item) return i;
+		}
+		return -1;
 	}
 
 	static class RowItem {

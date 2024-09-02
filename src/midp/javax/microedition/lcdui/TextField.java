@@ -167,4 +167,8 @@ public class TextField extends Item {
 	boolean isFocusable() {
 		return true;
 	}
+
+	boolean keyScroll(int key, boolean repeat) {
+		return key == Canvas.LEFT || key == Canvas.RIGHT;
+	}
 }

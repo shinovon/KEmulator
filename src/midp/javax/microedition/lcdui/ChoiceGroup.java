@@ -355,13 +355,13 @@ public class ChoiceGroup
 	boolean keyScroll(int key, boolean repeat) {
 		switch (key) {
 			case Canvas.UP:
-				if (currentPos-- < 0) {
+				if (--currentPos < 0) {
 					currentPos = 0;
 					return false;
 				}
 				return true;
 			case Canvas.DOWN:
-				if (currentPos++ >= items.size()) {
+				if (++currentPos >= items.size()) {
 					currentPos = items.size() - 1;
 					return false;
 				}

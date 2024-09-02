@@ -11,10 +11,10 @@ public class Form extends Screen {
 	private int layoutStart;
 	private boolean layout;
 	private int layoutHeight;
-	private Row currentRow;
 	private int currentIndexInRow;
 	private Item scrollCurrentItem;
 	private Item scrollTargetItem;
+	private int lastScrollDirection;
 
 	public Form(final String s) {
 		this(s, null);
@@ -80,7 +80,11 @@ public class Form extends Screen {
 			throw new IndexOutOfBoundsException();
 		}
 		synchronized (items) {
-			((Item) super.items.get(n)).screen = null;
+			Item item = (Item) super.items.get(n);
+			if (item == focusedItem) focusedItem = null;
+			if (item == scrollCurrentItem) scrollCurrentItem = null;
+			if (item == scrollTargetItem) scrollTargetItem = null;
+			item.screen = null;
 			super.items.remove(n);
 		}
 		queueLayout(n);
@@ -93,6 +97,7 @@ public class Form extends Screen {
 			}
 			super.items.removeAllElements();
 		}
+		scrollTargetItem = scrollCurrentItem = focusedItem = null;
 		queueLayout(0);
 	}
 
@@ -129,54 +134,101 @@ public class Form extends Screen {
 		if (rows.size() == 0) {
 			return;
 		}
-		if (scrollTargetItem == null) {
-			scrollTargetItem = getFirstVisibleItem();
+		if (scrollTargetItem == null && scrollCurrentItem == null) {
+			scrollTargetItem = getFirstVisibleAndFocusableItem();
 		}
 		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(key)) {
 			return;
 		}
-		switch (key) { // TODO
+		int height = bounds[H];
+
+		Row currentRow = getFirstRow(scrollCurrentItem);
+
+		switch (key) {
 			case Canvas.UP:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
 					break;
 				}
-				scroll -= 40;
+				currentIndexInRow = 0;
+				if (lastScrollDirection != key) {
+					scrollTargetItem = null;
+					lastScrollDirection = key;
+				}
+				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+					focusItem(scrollTargetItem);
+					scrollCurrentItem = scrollTargetItem;
+					scrollTargetItem = null;
+					break;
+				}
+				if (scrollCurrentItem != null && scrollTargetItem == null) {
+					scrollTargetItem = getNextFocusableItem(scrollCurrentItem, -1);
+				}
+				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+					focusItem(scrollTargetItem);
+					scrollCurrentItem = scrollTargetItem;
+					scrollTargetItem = null;
+					break;
+				}
+				scroll -= height / 8;
 				if (scroll < 0) scroll = 0;
-				focusItem(null);
 				break;
 			case Canvas.DOWN:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
 					break;
 				}
-				scroll += 40;
-				focusItem(null);
+				currentIndexInRow = 0;
+				if (lastScrollDirection != key) {
+					scrollTargetItem = null;
+					lastScrollDirection = key;
+				}
+				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+					focusItem(scrollTargetItem);
+					scrollCurrentItem = scrollTargetItem;
+					scrollTargetItem = null;
+					break;
+				}
+				if (scrollCurrentItem != null && scrollTargetItem == null) {
+					scrollTargetItem = getNextFocusableItem(scrollCurrentItem, 1);
+				}
+				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+					focusItem(scrollTargetItem);
+					scrollCurrentItem = scrollTargetItem;
+					scrollTargetItem = null;
+					break;
+				}
+				scroll += height / 8;
+				scroll = Math.min(scroll, layoutHeight - height + bounds[Y]);
 				break;
 			case Canvas.LEFT:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
 					break;
 				}
-				if (currentRow != null && currentIndexInRow > 0) {
-					Item item = getNextFocusableItemInRow(currentRow, currentIndexInRow, -1);
-					if (item != null) {
+				if (currentRow != null && currentRow.items.size() > 1 && currentIndexInRow > 0) {
+					int i = getNextFocusableItemInRow(currentRow, currentIndexInRow, -1);
+					if (i != -1) {
+						currentIndexInRow = i;
+						focusItem(currentRow.items.get(i).item);
 						break;
 					}
 				}
 				keyScroll(Canvas.UP, repeat);
 				return;
 			case Canvas.RIGHT:
-				if (currentRow != null && currentIndexInRow < currentRow.items.size()) {
-					getNextFocusableItemInRow(currentRow, currentIndexInRow, 1);
+				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
 					break;
+				}
+				if (currentRow != null && currentRow.items.size() > 1 && currentIndexInRow < currentRow.items.size()) {
+					int i = getNextFocusableItemInRow(currentRow, currentIndexInRow, 1);
+					if (i != -1) {
+						currentIndexInRow = i;
+						focusItem(currentRow.items.get(i).item);
+						break;
+					}
 				}
 				keyScroll(Canvas.DOWN, repeat);
 				return;
 		}
 		repaintScreen();
-	}
-
-	private Item getNextFocusableItemInRow(Row row, int currentIdx, int dir) {
-		// TODO
-		return null;
 	}
 
 	public boolean invokePointerPressed(final int x, int y) {
@@ -209,6 +261,10 @@ public class Form extends Screen {
 		if (focusedItem != null) {
 			focusedItem.defocus();
 		}
+		try {
+			currentIndexInRow = getFirstRow(item).indexOf(item);
+		} catch (Exception ignored) {}
+		scrollCurrentItem = item;
 		focusedItem = item;
 		if (item != null) {
 			item.focus();
@@ -230,6 +286,50 @@ public class Form extends Screen {
 		return null;
 	}
 
+	private Item getFirstVisibleAndFocusableItem() {
+		try {
+			return getNextFocusableRow(null, 1).getFirstFocusableItem();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private Row getNextFocusableRow(Row prevRow, int dir) {
+		try {
+			for (int i = (prevRow == null ? rows.indexOf(getFirstVisibleRow()) : rows.indexOf(prevRow) + dir); i < rows.size() && i >= 0; i += dir) {
+				Row row = rows.get(i);
+				for (Row.RowItem o: row.items) {
+					if (o.item.isFocusable()) return row;
+				}
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	private int getNextFocusableItemInRow(Row row, int currentIdx, int dir) {
+		try {
+			for (int i = currentIdx + dir; i < row.items.size() && i >= 0; i += dir) {
+				Item item = row.items.get(i).item;
+				if (item.isFocusable()) return i;
+			}
+		} catch (Exception ignored) {}
+		return -1;
+	}
+
+	private Item getNextFocusableItem(Item prevItem, int dir) {
+		try {
+			for (int i = (getFirstRowIdx(prevItem) + dir); i < rows.size() && i >= 0; i += dir) {
+				Row row = rows.get(i);
+				for (Row.RowItem o: row.items) {
+					if (o.item != prevItem && o.item.isFocusable()) {
+						return o.item;
+					}
+				}
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public int size() {
 		return super.items.size();
 	}
@@ -248,13 +348,15 @@ public class Form extends Screen {
 				h = bounds[H];
 			g.setClip(0, y, w, h);
 
-			if (focusedItem != null && !isVisible(focusedItem)) {
+			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
+				Item item = getFirstVisibleAndFocusableItem();
+				if (item != null) {
+					focusItem(item);
+				}
+			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
 				scrollTo(focusedItem);
 			}
-			if (scroll > layoutHeight - h)
-				scroll = layoutHeight - h;
-			if (scroll < 0)
-				scroll = 0;
+			scroll = Math.max(0, Math.min(scroll, layoutHeight - h + bounds[Y]));
 
 			y -= scroll;
 			for (Row row : rows) {
@@ -272,6 +374,13 @@ public class Form extends Screen {
 			if (row.contains(item)) return row;
 		}
 		return null;
+	}
+
+	int getFirstRowIdx(Item item) {
+		for (int i = 0, l = rows.size(); i < l; ++i) {
+			if (rows.get(i).contains(item)) return i;
+		}
+		return -1;
 	}
 
 	Row getNextRow(Item item, Row prevRow) {
@@ -313,12 +422,15 @@ public class Form extends Screen {
 	}
 
 	boolean isVisible(Item item) {
-		Row row = getFirstRow(item);
-		if (row == null) return false;
-		do {
-			if (isVisible(row)) return true;
-		} while ((row = getNextRow(item, row)) != null);
-		return false;
+//		Row row = getFirstRow(item);
+//		if (row == null) return false;
+//		do {
+//			if (isVisible(row)) {
+//				return true;
+//			}
+//		} while ((row = getNextRow(item, row)) != null);
+//		return false;
+		return !item.hidden;
 	}
 
 	boolean isVisible(Row row) {
@@ -348,7 +460,6 @@ public class Form extends Screen {
 	synchronized void doLayout(int i) {
 		synchronized (items) {
 			layoutHeight = 0;
-			currentRow = null;
 			if (items.size() == 0) {
 				rows.clear();
 				return;
