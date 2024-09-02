@@ -265,6 +265,7 @@ OPTION_FONT_SMALL_SIZE=Tamaño pequeño:
 OPTION_FONT_TEST_TEXT=Probar texto:
 OPTION_FONT_TEST_TEXT_TXT=Este es un Ejemplo.
 
+OPTION_SYSTEM_UI_LANGUAGE=Idioma de la interfaz:
 OPTION_SYSTEM_XRAY_BG=Vista de rayos X: superponer imágenes
 OPTION_SYSTEM_XRAY_CLIP=Vista de rayos X: mostrar región de recorte de imagen
 OPTION_SYSTEM_INFO_COLOR=Información: mostrar color en (R,G,B)
@@ -273,7 +274,7 @@ OPTION_SYSTEM_AUTOGEN_JAD=Generar automáticamente archivo JAD con \“KEmu-Plat
 OPTION_SYSTEM_TRACK_NEW=Realizar seguimiento de operaciones \“new/new[]...\”
 OPTION_SYSTEM_TRACK_METHOD=Realizar seguimiento de llamadas a métodos
 OPTION_SYSTEM_DISCORD_RICHPRESENCE=Discord Rich Presence
-OPTION_SYSTEM_AWT_ANTIALIASING=Renderizado suave AWT
+OPTION_SYSTEM_AWT_ANTIALIASING=AWT Smooth drawing
 OPTION_SYSTEM_TEXT_ANTIALIASING=Antialiasing de texto
 OPTION_SYSTEM_FPS_COUNT=Contador de FPS
 
@@ -307,7 +308,7 @@ OPTION_NETWORK_PROXY_UNIMP=¡La prueba de proxy está subimplementada!
 
 OPTION_MEDIA_VLC_DIR=Ruta de VLC
 OPTION_MEDIA_VMS=Buscar VirtualMIDISynth como dispositivo MIDI
-OPTION_MEDIA_GLOBAL_MIDI=Permitir solo una reproducción MIDI a la vez (reduce el lag)
+OPTION_MEDIA_GLOBAL_MIDI=Permitir solo una reproducción MIDI a la vez (reduce el retardo)
 OPTION_MEDIA_REOPEN_MIDI=Reabrir siempre el dispositivo MIDI
 OPTION_MEDIA_DUMP=Habilitar la exportación de medios (mayor uso de memoria)
 OPTION_MEDIA_OTT=Reproducción de tonos Nokia (inestable)
