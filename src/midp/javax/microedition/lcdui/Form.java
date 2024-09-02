@@ -347,11 +347,11 @@ public class Form extends Screen {
 			}
 			layout = false;
 			layoutStart = Integer.MAX_VALUE;
-			int y = bounds[Y],
-					w = bounds[W],
-					h = bounds[H],
-					sy = y;
 		}
+		int y = bounds[Y],
+				w = bounds[W],
+				h = bounds[H],
+				sy = y;
 		g.setClip(0, sy, w, sy+h);
 
 		if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
