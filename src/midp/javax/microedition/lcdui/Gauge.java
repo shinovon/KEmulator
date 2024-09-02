@@ -8,7 +8,7 @@ public class Gauge extends Item {
 	public static final int INCREMENTAL_UPDATING = 3;
 	private int max;
 	private int value;
-	private boolean interact;
+	private boolean interactive;
 
 	private long lastIncrementTime;
 	private boolean continuosDir;
@@ -19,7 +19,7 @@ public class Gauge extends Item {
 		super(label);
 		value = initialValue;
 		max = maxValue;
-		interact = interactive;
+		this.interactive = interactive;
 	}
 
 	public void setLabel(String label) {
@@ -63,7 +63,7 @@ public class Gauge extends Item {
 	}
 
 	public boolean isInteractive() {
-		return interact;
+		return interactive;
 	}
 
 	protected void paint(Graphics g, int x, int y, int w, int h) {
@@ -72,14 +72,13 @@ public class Gauge extends Item {
 		g.setFont(font);
 
 		h = font.getHeight();
-		int off = 2;
 		int yoff = 0;
 		if (label != null) {
 			g.drawString(label, x, y, 0);
 			yoff += h + 4;
 		}
 
-		if (!interact) {
+		if (!interactive) {
 			int max = this.max;
 			int val = this.value;
 			if (max == -1) {
@@ -87,17 +86,13 @@ public class Gauge extends Item {
 					case -1: {
 						break;
 					}
-					default:
-						//TODO INCREMENTAL
+					default: //TODO
 					case CONTINUOUS_RUNNING: {
 						max = 50;
-						//if(System.currentTimeMillis() - lastIncrementTime > continousIncTime) {
 						if (!continuosDir)
 							continuosValue++;
 						else
 							continuosValue--;
-						//lastIncrementTime = System.currentTimeMillis();
-						//}
 						if (continuosValue >= max || continuosValue < 0) {
 							continuosDir = !continuosDir;
 						}
@@ -108,18 +103,28 @@ public class Gauge extends Item {
 			}
 			g.setColor(0xababab);
 			g.drawRect(x, y + yoff, w, h);
+			if (max <= 0 || val < 0) return;
 			g.setColor(0x0000ff);
-			g.fillRect(x + off, y + yoff + off, (int) ((double) w * ((double) val / (double) max)) - off - 1, h - off - 1);
+			g.fillRect(x + 2, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
 		} else {
-			//TODO
-			g.drawString("UNIMPLEMENTED", x, y + yoff, 0);
+			int xoff1 = Item.font.stringWidth("0") + 2;
+			int xoff2 = Item.font.stringWidth(Integer.toString(max)) + 2;
+			g.drawString("0", x + 2, y + yoff, 0);
+			g.drawString(Integer.toString(max), x + w - xoff2 + 2, y + yoff, 0);
+			w -= xoff1 + xoff2;
+			g.setColor(0xababab);
+			g.drawRect(x + xoff1, y + yoff, w, h);
+			int val = value;
+			if (max <= 0 || val < 0) return;
+			g.setColor(0x0000ff);
+			g.fillRect(x + 2 + xoff1, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
 		}
 	}
 
 	public void layout(Row row) {
 		super.layout(row);
 		final Font font = Item.font;
-		if (!interact) {
+		if (!interactive) {
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
 			bounds[H] = Math.min(n2, screen.bounds[H]);
@@ -141,5 +146,28 @@ public class Gauge extends Item {
 
 	boolean isFocusable() {
 		return true;
+	}
+
+	boolean keyScroll(int key, boolean repeat) {
+		if (interactive) {
+			System.out.println("s " + key);
+			if (key == Canvas.LEFT) {
+				if (--value < 0) {
+					value = 0;
+					return false;
+				}
+				notifyStateChanged();
+				return true;
+			}
+			if (key == Canvas.RIGHT) {
+				if (++value > max) {
+					value = max;
+					return false;
+				}
+				notifyStateChanged();
+				return true;
+			}
+		}
+		return false;
 	}
 }
