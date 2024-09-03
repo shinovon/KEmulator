@@ -73,11 +73,11 @@ public class StringItem extends Item {
 			int o = g.getColor();
 			g.setColor(0xababab);
 			int lx = x + w - 3;
-			int ly = yo + h - 3;
+			int ly = yo + h - yo + y - 3;
 			g.drawLine(x + 1, ly, lx, ly);
 			g.drawLine(lx, ly, lx, yo + 1);
 			g.setColor(o);
-			g.drawRect(x + 1, yo, w - 3, h - 2);
+			g.drawRect(x + 1, yo, w - 3, h - yo + y - 2);
 		} else {
 			g.setFont(font);
 			if (row >= textArr.length) return;
