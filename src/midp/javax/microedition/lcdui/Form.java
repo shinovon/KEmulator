@@ -340,15 +340,13 @@ public class Form extends Screen {
 	}
 
 	protected void paint(final Graphics g) {
-		synchronized(items) {
-			if (rows.size() == 0) {
-				doLayout(0);
-			} else if (layout) {
-				doLayout(layoutStart);
-			}
-			layout = false;
-			layoutStart = Integer.MAX_VALUE;
+		if (rows.size() == 0) {
+			doLayout(0);
+		} else if (layout) {
+			doLayout(layoutStart);
 		}
+		layout = false;
+		layoutStart = Integer.MAX_VALUE;
 		int y = bounds[Y],
 				w = bounds[W],
 				h = bounds[H],
@@ -438,7 +436,7 @@ public class Form extends Screen {
 	}
 
 	synchronized void doLayout(int i) {
-		synchronized (items) {
+		synchronized (rows) {
 			layoutHeight = 0;
 			if (items.size() == 0) {
 				rows.clear();
@@ -446,23 +444,25 @@ public class Form extends Screen {
 			}
 			int width = bounds[W];
 			Row row = null;
-			if (i < items.size()) {
-				row = getFirstRow((Item) items.get(i));
-			}
-			if (i == 0) {
-				rows.clear();
-			} else if (row != null) {
-				int rowIdx = rows.indexOf(row);
-				if (row.items.size() > 1) {
-					i = items.indexOf(row.getFirstItem());
+			synchronized (items) {
+				if (i < items.size()) {
+					row = getFirstRow((Item) items.get(i));
 				}
-				while (rows.size() > rowIdx) {
-					rows.remove(rowIdx);
+				if (i == 0) {
+					rows.clear();
+				} else if (row != null) {
+					int rowIdx = rows.indexOf(row);
+					if (row.items.size() > 1) {
+						i = items.indexOf(row.getFirstItem());
+					}
+					while (rows.size() > rowIdx) {
+						rows.remove(rowIdx);
+					}
 				}
-			}
-			if (rows.size() > 0) {
-				for (Row r: rows) {
-					layoutHeight += r.getHeight();
+				if (rows.size() > 0) {
+					for (Row r : rows) {
+						layoutHeight += r.getHeight();
+					}
 				}
 			}
 			currentDir = row != null ? row.dir : Item.LAYOUT_LEFT;
