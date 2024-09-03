@@ -477,7 +477,10 @@ public class Form extends Screen {
 						|| item instanceof ImageItem
 						|| item instanceof Spacer
 						|| item instanceof CustomItem)
-						|| (item.hasLayout(Item.LAYOUT_2) && !(item instanceof DateField)))
+						|| (item.hasLayout(Item.LAYOUT_2)
+						&& !(item instanceof DateField
+						|| item instanceof TextField
+						|| item instanceof ChoiceGroup)))
 						|| item.hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
 						|| (itemDir != currentDir)
 						|| !row.canAdd(item, width)) {
@@ -506,8 +509,7 @@ public class Form extends Screen {
 						|| item.hasLayout(Item.LAYOUT_NEWLINE_AFTER)
 						|| item instanceof ChoiceGroup
 						|| item instanceof TextField
-						|| item instanceof DateField
-						|| item instanceof Gauge) {
+						|| item instanceof DateField) {
 					row = newRow(row);
 				}
 			}
