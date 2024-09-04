@@ -120,6 +120,6 @@ public class ImageItem extends Item {
 	}
 
 	boolean isFocusable() {
-		return commands.size() > 0 || appearanceMode == BUTTON;
+		return (commands.size() > 0 || appearanceMode == BUTTON) && (image != null || hasLabel());
 	}
 }
