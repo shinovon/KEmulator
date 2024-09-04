@@ -290,7 +290,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button vmsCheck;
 	//    private Button reopenMidiCheck;
 	private Button globalMidiCheck;
-	private Button ignoreRegionRepaintCheck;
+//	private Button ignoreRegionRepaintCheck;
 	private Button fpsCounterCheck;
 //	private Button serialCallsCheck;
 	private Button keyPressOnRepeatCheck;
@@ -981,7 +981,7 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.searchVms = vmsCheck.getSelection();
 //        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 		Settings.oneMidiAtTime = globalMidiCheck.getSelection();
-		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
+//		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
 //		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
@@ -1838,11 +1838,11 @@ public final class Property implements IProperty, SelectionListener {
 		this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
 		softkeyMotFixCheck.setToolTipText("Compatibility tweak for certain Motorola Triplets games");
 
-		ignoreRegionRepaintCheck = new Button(coreApiGroup, SWT.CHECK);
-		ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
-		ignoreRegionRepaintCheck.setLayoutData(gridData);
-		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
-		ignoreRegionRepaintCheck.setToolTipText("Compatibility tweak for Opera Mini (breaks Fantasy Zone: Part 1)");
+//		ignoreRegionRepaintCheck = new Button(coreApiGroup, SWT.CHECK);
+//		ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
+//		ignoreRegionRepaintCheck.setLayoutData(gridData);
+//		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
+//		ignoreRegionRepaintCheck.setToolTipText("Compatibility tweak for Opera Mini (breaks Fantasy Zone: Part 1)");
 
 //		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
 //		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
