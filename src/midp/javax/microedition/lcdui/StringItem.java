@@ -80,71 +80,18 @@ public class StringItem extends Item {
 			g.drawRect(x + 1, yo, w - 3, h - yo + y - 2);
 		} else {
 			g.setFont(font);
-			if (row >= textArr.length) return;
-			if (isFocusable()) {
-				g.setColor(-11178603);
+			if (isFocusable()) g.setColor(-11178603);
+			if (isSizeLocked()) {
+				if (row != 0) return;
+				for (String s : textArr) {
+					g.drawString(s, x + 2, y, 0);
+					y += font.getHeight() + 4;
+				}
+				return;
 			}
-			g.drawString(textArr[row], x, y, 0);
+			if (textArr == null || row >= textArr.length) return;
+			g.drawString(textArr[row], x + 1, y, 0);
 		}
-
-//		if (mode == BUTTON) {
-//			//кнопка
-//			String str = null;
-//			// определение строки
-//			if (textArr != null) {
-//				str = textArr[0];
-//			}
-//			if (str == null) {
-//				str = text;
-//			}
-//			if (str == null) {
-//				str = "...";
-//			}
-//			// определение размера строки
-//			int j = 0;
-//			if (font != null && str != null)
-//				j = font.stringWidth(str);
-//
-//			if ((isLayoutExpand() && isLayoutAlignDefault()) || isLayoutCenter()) {
-//				bx = (bw - j) / 2 - 2;
-//				g.drawString(str, bx + 4, by + 1, 0);
-//			} else if (isLayoutLeft() || isLayoutDefault()) {
-//				g.drawString(str, bx + 4, by + 1, 0);
-//			} else if (isLayoutRight()) {
-//				//bx = (bw - j) - 8;
-//				g.drawString(str, bx + 4, by + 1, 0);
-//			}
-//			if (j > 0) {
-//				if (isLayoutExpand()) {
-//					j = bounds[W] - 8;
-//					bx = super.bounds[X];
-//				}
-//				int h = font.getHeight();
-//				//очертания кнопки
-//				int o = g.getColor();
-//				g.setColor(0xababab);
-//				bx = bx + 2;
-//				int lx = bx + 2 + j + 1;
-//				int ly = by + h + 3;
-//				g.drawLine(bx + 1, ly, lx, ly);
-//				g.drawLine(lx, ly, lx, by + 1);
-//				g.setColor(o);
-//				g.drawRect(bx, by, j + 4, h + 4);
-//			}
-//		} else {
-//			for (int i = this.getcurPage(); i < this.textArr.length; ++i) {
-//				int x = super.bounds[X] + 4;
-//				String s = textArr[i];
-//				int w = bounds[W];
-//				int tw = font.stringWidth(s);
-//				if (isLayoutCenter()) x = ((w - x) - tw) / 2 + x;
-//				else if (isLayoutRight()) x = ((w - x) - tw) + x;
-//				g.drawString(s, x, by + 2, 0);
-//				if ((by += font.getHeight() + 4) > super.screen.bounds[H]) {
-//					return;
-//				}
-//			}
-//		}
 	}
 
 	protected void layout(Row row) {
@@ -157,7 +104,6 @@ public class StringItem extends Item {
 		int[] maxw = new int[1];
 		// TODO label layout
 		String s = (hasLabel() && mode != BUTTON) ? (super.label + "\n" + this.text) : this.text;
-//		while (s.endsWith("\n")) s = s.substring(0, s.length() - 1);
 		this.textArr = c.textArr(s, font, availableWidth, maxWidth, maxw);
 		width = textArr.length != 0 ? maxw[0] + 4 : 4;
 		final int fh = font.getHeight() + 4;
@@ -177,7 +123,7 @@ public class StringItem extends Item {
 
 	public int getMinimumHeight() {
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		return (font.getHeight() + 4);
+		return (font.getHeight() + 4) + (hasLabel() ? Item.font.getHeight() + 4 : 0);
 	}
 
 	public int getPreferredWidth() {
@@ -191,7 +137,7 @@ public class StringItem extends Item {
 	int getRowWidth(int row) {
 		if (textArr == null) return 0;
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		return font.stringWidth(textArr[row]);
+		return font.stringWidth(textArr[row]) + 2;
 	}
 
 	int getRowsCount() {

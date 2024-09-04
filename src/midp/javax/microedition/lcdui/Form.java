@@ -482,8 +482,7 @@ public class Form extends Screen {
 						|| item instanceof TextField
 						|| item instanceof ChoiceGroup)))
 						|| item._hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
-						|| (itemDir != currentDir)
-						|| !row.canAdd(item, width)) {
+						|| (itemDir != currentDir)) {
 					currentDir = itemDir;
 					row = newRow(row);
 				}
@@ -494,6 +493,10 @@ public class Form extends Screen {
 					row = newRow(row);
 				}
 				item.layout(row);
+				// has to be checked after item size calculated
+				if (!row.canAdd(item, width)) {
+					row = newRow(row);
+				}
 				if (item instanceof StringItem
 						&& ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
 					StringItem s = (StringItem) item;

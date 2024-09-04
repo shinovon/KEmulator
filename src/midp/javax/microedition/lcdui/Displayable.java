@@ -30,7 +30,6 @@ public class Displayable {
 	String title;
 	Vector commands;
 	boolean menuShown;
-	int anInt28;
 	CommandListener cmdListener;
 	Item focusedItem;
 	int w;
@@ -42,7 +41,6 @@ public class Displayable {
 	private static long lastFpsUpdateTime;
 	private static int framesCount;
 	boolean fullScreen;
-	private static final Object frameLock = new Object();
 	private static final long MILLI_TO_NANO = 1000000L;
 
 	Composite swtContent;
@@ -51,6 +49,7 @@ public class Displayable {
 	Menu swtMenu;
 	SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
 	private MenuListener swtMenuListener = new SwtMenuListener();
+	private boolean forceUpdateSize;
 
 	public Displayable() {
 		super();
@@ -205,7 +204,6 @@ public class Displayable {
 					}
 				} else if (b) {
 					this.menuShown = true;
-					this.anInt28 = 0;
 					if (swtMenu != null) {
 						showSwtMenu(false, -1, -1);
 					} else {
@@ -260,20 +258,16 @@ public class Displayable {
 			s.repaint();
 			return;
 		}
-		if (this.w != w || this.h != h) {
+		if (this.w != w || this.h != h || forceUpdateSize) {
+			forceUpdateSize = false;
 			this.w = w;
 			this.h = h;
-			sizeChanged(bounds[W] = this.w - 4, bounds[H] = getActualHeight());
+			if (!fullScreen) {
+				h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+			}
+			sizeChanged(bounds[W] = this.w - 4, bounds[H] = h);
 		}
 		repaintScreen();
-	}
-
-	int getActualHeight() {
-		int h = Emulator.getEmulator().getScreen().getHeight();
-		if (!fullScreen) {
-			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
-		}
-		return h;
 	}
 
 	public Ticker getTicker() {
@@ -283,7 +277,7 @@ public class Displayable {
 	public void setTicker(final Ticker ticker) {
 		this.ticker = ticker;
 		this.tickerX = this.w;
-		updateSize();
+		updateSize(true);
 	}
 
 	protected void _paintTicker(final Graphics graphics) {
@@ -428,7 +422,7 @@ public class Displayable {
 	}
 
 	protected void _shown() {
-		updateSize();
+		updateSize(false);
 	}
 
 	static {
@@ -514,8 +508,9 @@ public class Displayable {
 
 	}
 
-	void updateSize() {
-		if(Emulator.getCurrentDisplay().getCurrent() != this) return;
+	void updateSize(boolean force) {
+		if (force) forceUpdateSize = true;
+		if (Emulator.getCurrentDisplay().getCurrent() != this || force) return;
 		IScreen s = Emulator.getEmulator().getScreen();
 		Emulator.getEventQueue().sizeChanged(s.getWidth(), s.getHeight());
 	}

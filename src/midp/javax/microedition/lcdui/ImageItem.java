@@ -79,10 +79,11 @@ public class ImageItem extends Item {
 			g.drawRect(x, y, w, h - 2);
 		}
 		if (image != null) {
+			int iw = Math.min(w, image.getWidth());
 			// clip image
 			g.drawRegion(image, 0, 0,
-					Math.min(w, image.getWidth()), Math.min(h-yo+y, image.getHeight()), 0,
-					x + (w - image.getWidth()) / 2, yo, 0);
+					iw, Math.min(h-yo+y, image.getHeight()), 0,
+					x + (w - iw) / 2, yo, 0);
 		}
 	}
 
@@ -100,7 +101,7 @@ public class ImageItem extends Item {
 		int iw = 0;
 		if (image != null) {
 			iw = image.getWidth();
-			n += this.image.getHeight() + 4;
+			n += image.getHeight() + 4;
 		}
 		width = Math.max(iw + 2, tw[0] + 5);
 		bounds[H] = Math.min(n, screen.bounds[H]);
@@ -111,7 +112,7 @@ public class ImageItem extends Item {
 	}
 
 	public int getMinimumWidth() {
-		return Math.max(Item.font.stringWidth("..."), width);
+		return getPreferredWidth();
 	}
 
 	public int getMinimumHeight() {

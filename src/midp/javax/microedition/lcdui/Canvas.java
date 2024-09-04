@@ -94,6 +94,14 @@ public abstract class Canvas extends Displayable {
 		}
 	}
 
+	int getActualHeight() {
+		int h = Emulator.getEmulator().getScreen().getHeight();
+		if (!fullScreen) {
+			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+		}
+		return h;
+	}
+
 	public void _invokeSizeChanged(int w, int h) {
 		if (!fullScreen) {
 			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
@@ -152,10 +160,10 @@ public abstract class Canvas extends Displayable {
 	public void setFullScreenMode(final boolean b) {
 		if (!Settings.ignoreFullScreen) {
 			fullScreen = b;
-			updateSize();
+			updateSize(true);
 		} else if (!fullScreen) {
 			fullScreen = true;
-			updateSize();
+			updateSize(true);
 		}
 	}
 
