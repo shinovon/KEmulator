@@ -38,6 +38,8 @@ public final class EventQueue implements Runnable {
 	private int[][] inputs;
 	private int inputsCount;
 	private final Object eventLock = new Object();
+	private boolean repaintPending;
+	private int repaintX, repaintY, repaintW, repaintH;
 
 	public EventQueue() {
 		events = new int[128];
@@ -114,11 +116,11 @@ public final class EventQueue implements Runnable {
 		} else try {
 			Displayable d = getCurrent();
 			if (d == null) return;
-			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokePointerReleased(x, y);
+			if (d instanceof Canvas) {
+				((Canvas) d).invokePointerReleased(x, y);
 				return;
 			}
-			Emulator.getScreen()._invokePointerReleased(x, y);
+			((Screen) d)._invokePointerReleased(x, y);
 		} catch (Throwable ignored) {}
 	}
 
@@ -128,11 +130,11 @@ public final class EventQueue implements Runnable {
 		} else try {
 			Displayable d = getCurrent();
 			if (d == null) return;
-			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokePointerDragged(x, y);
+			if (d instanceof Canvas) {
+				((Canvas) d).invokePointerDragged(x, y);
 				return;
 			}
-			Emulator.getScreen()._invokePointerDragged(x, y);
+			((Screen) d)._invokePointerDragged(x, y);
 		} catch (Throwable ignored) {}
 	}
 
@@ -152,8 +154,9 @@ public final class EventQueue implements Runnable {
 
 	public synchronized void queue(int n) {
 		if (n == EVENT_PAINT) {
-			if (events[0] == EVENT_PAINT && !repainted)
+			if (repaintPending)
 				return;
+			repaintPending = true;
 			repainted = false;
 		}
 		if (n == EVENT_SHOW || n == EVENT_RESUME) {
@@ -187,20 +190,31 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void queueRepaint() {
-		synchronized (eventArguments) {
-			eventArguments.add(null);
-		}
+		repaintX = repaintY = repaintW = repaintH = -1;
 		queue(EVENT_PAINT);
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
-		synchronized (eventArguments) {
-			if (Settings.ignoreRegionRepaint) {
-				eventArguments.add(null);
-			} else {
-				eventArguments.add(new int[]{x, y, w, h});
-			}
+		int x1 = x,
+			y1 = y,
+			x2 = x + w,
+			y2 = y + h;
+		Displayable d = getCurrent();
+		int sw = d.getWidth(), sh = d.getHeight();
+		if (repaintX != -1) {
+			x1 = Math.min(repaintX, x1);
+			y1 = Math.min(repaintY, y1);
+			x2 = Math.max(repaintX + repaintW, x2);
+			y2 = Math.max(repaintY + repaintH, y2);
 		}
+		if (x1 < 0) x1 = 0;
+		if (y1 < 0) y1 = 0;
+		if (x2 > sw) x2 = sw;
+		if (y2 > sh) y2 = sh;
+		repaintX = x1;
+		repaintY = y1;
+		repaintW = x2 - x1;
+		repaintH = y2 - y1;
 		queue(EVENT_PAINT);
 	}
 
@@ -253,7 +267,7 @@ public final class EventQueue implements Runnable {
 			if ("invokePaint".equals(st[i].getMethodName())) return;
 		}
 
-		if (t == eventThread || t == inputThread || Settings.forcePaintOnServiceRepaints) {
+		if (t == eventThread || t == inputThread || Settings.forcePaintOnServiceRepaints || !repaintPending) {
 			synchronized (lock) {
 				internalRepaint(-1, -1, -1, -1);
 			}
@@ -279,14 +293,9 @@ public final class EventQueue implements Runnable {
 				}
 				switch (event = nextEvent()) {
 					case EVENT_PAINT: {
-						int[] region = (int[]) nextArgument();
-						synchronized (lock) {
-							if (region == null) {
-								internalRepaint(-1, -1, -1, -1);
-							} else {
-								internalRepaint(region[0], region[1], region[2], region[3]);
-							}
-						}
+						int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
+						repaintX = repaintY = repaintW = repaintH = -1;
+						internalRepaint(x, y, w, h);
 						Displayable._fpsLimiter();
 						break;
 					}
@@ -322,7 +331,7 @@ public final class EventQueue implements Runnable {
 					case EVENT_SHOW: {
 						Displayable d = getCurrent();
 						if (!(getCurrent() instanceof Canvas)) break;
-						Emulator.getCanvas()._invokeShowNotify();
+						((Canvas) d)._invokeShowNotify();
 						break;
 					}
 					case EVENT_PAUSE: {
@@ -429,6 +438,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	private void internalRepaint(int x, int y, int w, int h) {
+		repaintPending = false;
 		try {
 			Canvas canvas = Emulator.getCanvas();
 			if (canvas == null
