@@ -292,7 +292,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button globalMidiCheck;
 	private Button ignoreRegionRepaintCheck;
 	private Button fpsCounterCheck;
-	private Button serialCallsCheck;
+//	private Button serialCallsCheck;
 	private Button keyPressOnRepeatCheck;
 	private Button antiAliasTextBtn;
 	private Composite disableApiComp;
@@ -979,7 +979,7 @@ public final class Property implements IProperty, SelectionListener {
 //        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 		Settings.oneMidiAtTime = globalMidiCheck.getSelection();
 		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
-		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
+//		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
@@ -1840,10 +1840,10 @@ public final class Property implements IProperty, SelectionListener {
 		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
 		ignoreRegionRepaintCheck.setToolTipText("Compatibility tweak for Opera Mini (breaks Fantasy Zone: Part 1)");
 
-		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
-		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
-		serialCallsCheck.setLayoutData(gridData);
-		serialCallsCheck.setSelection(Settings.processSerialCallsOutOfQueue);
+//		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
+//		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
+//		serialCallsCheck.setLayoutData(gridData);
+//		serialCallsCheck.setSelection(Settings.processSerialCallsOutOfQueue);
 
 		keyPressOnRepeatCheck = new Button(coreApiGroup, SWT.CHECK);
 		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
