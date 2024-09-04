@@ -312,6 +312,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Tree rmsTree;
 	private Button forceServicePaintCheck;
 	private Composite langComposite;
+	private Button pointerEventsCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -537,6 +538,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaints", "true"));
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
+			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -763,6 +765,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
+			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -984,6 +987,7 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
 		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
+		Settings.hasPointerEvents = pointerEventsCheck.getSelection();
 
 		String sysProps = propsText.getText();
 		Settings.systemProperties.clear();
@@ -1856,6 +1860,11 @@ public final class Property implements IProperty, SelectionListener {
 		forceServicePaintCheck.setLayoutData(gridData);
 		forceServicePaintCheck.setSelection(Settings.forcePaintOnServiceRepaints);
 		forceServicePaintCheck.setToolTipText("Compatibility tweak for games by SEGA China (breaks other games)");
+
+		pointerEventsCheck = new Button(coreApiGroup, SWT.CHECK);
+		pointerEventsCheck.setText(UILocale.get("OPTION_COREAPI_POINTER_EVENTS", "Canvas.hasPointerEvents() return value"));
+		pointerEventsCheck.setLayoutData(gridData);
+		pointerEventsCheck.setSelection(Settings.hasPointerEvents);
 	}
 
 	private void setupDisableApiComp() {

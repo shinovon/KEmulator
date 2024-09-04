@@ -3,7 +3,6 @@ package javax.microedition.lcdui;
 import java.util.*;
 
 import emulator.*;
-import emulator.lcdui.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -32,60 +31,35 @@ public abstract class Screen extends Displayable {
 			return;
 		}
 		this.lastPressTime = currentTimeMillis;
-		if (super.menuShown) {
-			if (n >= 49 && n <= 57) {
-				final int n2;
-				if ((n2 = n - 49 + 1) < super.commands.size()) {
-					super.cmdListener.commandAction((Command) super.commands.get(n2), this);
-					super.menuShown = false;
-				}
-			} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
-				if (super.anInt28 > 0) {
-					--super.anInt28;
-				}
-			} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
-				if (super.anInt28 < super.commands.size() - 2) {
-					++super.anInt28;
-				}
-			} else {
-				final int n3;
-				if (n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE) && (n3 = super.anInt28 + 1) < super.commands.size()) {
-					super.cmdListener.commandAction((Command) super.commands.get(n3), this);
-					super.menuShown = false;
-				}
-			}
-			this.repaintScreen();
-			return;
-		}
 		if (focusedItem != null && n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)) {
 			focusedItem.itemApplyCommand();
 			return;
 		}
 		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
-			keyScroll(Canvas.UP, false);
+			_keyScroll(Canvas.UP, false);
 		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
-			keyScroll(Canvas.DOWN, false);
+			_keyScroll(Canvas.DOWN, false);
 		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
-			keyScroll(Canvas.LEFT, false);
+			_keyScroll(Canvas.LEFT, false);
 		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
-			keyScroll(Canvas.RIGHT, false);
+			_keyScroll(Canvas.RIGHT, false);
 		}
 	}
 
-	public void invokeKeyRepeated(final int n) {
+	public void _invokeKeyRepeated(final int n) {
 		if (swtContent != null) return;
 		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
-			keyScroll(Canvas.UP, true);
+			_keyScroll(Canvas.UP, true);
 		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
-			keyScroll(Canvas.DOWN, true);
+			_keyScroll(Canvas.DOWN, true);
 		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
-			keyScroll(Canvas.LEFT, true);
+			_keyScroll(Canvas.LEFT, true);
 		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
-			keyScroll(Canvas.RIGHT, true);
+			_keyScroll(Canvas.RIGHT, true);
 		}
 	}
 
-	protected void keyScroll(int key, boolean repeat) {
+	protected void _keyScroll(int key, boolean repeat) {
 	}
 
 	public void _invokeKeyReleased(final int n) {
@@ -93,30 +67,6 @@ public abstract class Screen extends Displayable {
 
 	public boolean _invokePointerPressed(final int x, final int y) {
 		if (swtContent != null) return false;
-		if (super.menuShown) {
-			final int n3 = super.w >> 1;
-			final int anInt181 = Screen.fontHeight4;
-			final int n5;
-			final int n4 = (n5 = super.commands.size() - 1) * anInt181;
-			final int n6 = n3 - 1;
-			final int n7 = super.h - n4 - 1;
-			final int[] array;
-			if (BoundsUtils.collides(array = new int[]{n6, n7, n3, n4}, x, y)) {
-				array[0] = n6;
-				array[1] = n7;
-				array[2] = n3;
-				array[3] = anInt181;
-				int[] array2;
-				int n8;
-				for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
-					if (BoundsUtils.collides(array, x, y)) {
-						super.cmdListener.commandAction((Command) super.commands.get(i + 1), this);
-						super.menuShown = false;
-						return true;
-					}
-				}
-			}
-		}
 		return false;
 	}
 
@@ -126,7 +76,7 @@ public abstract class Screen extends Displayable {
 	public void _invokePointerDragged(final int n, final int n2) {
 	}
 
-	protected abstract void paint(final Graphics p0);
+	protected abstract void _paint(final Graphics p0);
 
 	public void _invokePaint(final Graphics graphics) {
 		if (swtContent != null) return;
@@ -137,17 +87,17 @@ public abstract class Screen extends Displayable {
 		graphics.setFont(Screen.font);
 		graphics.setStrokeStyle(0);
 		emulator.lcdui.a.method177(graphics, 0, 0, super.w, super.h, false);
-		this.drawTitleBar(graphics);
-		this.paint(graphics);
-		this.drawScrollBar(graphics);
-		this.paintTicker(graphics);
-		this.paintSoftMenu(graphics);
+		this._drawTitleBar(graphics);
+		this._paint(graphics);
+		this._drawScrollBar(graphics);
+		this._paintTicker(graphics);
+		this._paintSoftMenu(graphics);
 		graphics.setColor(color);
 		graphics.setFont(font);
 		graphics.setStrokeStyle(strokeStyle);
 	}
 
-	protected void drawTitleBar(final Graphics graphics) {
+	protected void _drawTitleBar(final Graphics graphics) {
 		if (swtContent != null) return;
 		String title = super.title;
 		if (title == null)
@@ -169,12 +119,9 @@ public abstract class Screen extends Displayable {
 	}
 
 	protected void sizeChanged(final int w, final int h) {
-		this.w = w;
-		this.h = h;
-		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
 	}
 
-	protected void drawScrollBar(final Graphics graphics) {
+	protected void _drawScrollBar(final Graphics graphics) {
 		emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
 	}
 

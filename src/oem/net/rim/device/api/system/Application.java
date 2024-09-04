@@ -15,7 +15,7 @@ public class Application {
 		if (instance == null) {
 			instance = new UiApplication();
 		}
-		emulator.Settings.aBoolean1274 = true;
+		emulator.Settings.blackberryApi = true;
 		return instance;
 	}
 

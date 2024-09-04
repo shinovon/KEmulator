@@ -53,7 +53,7 @@ public class Display {
 		}
 		if ((Display.current = d) != null) {
 			if (d instanceof Canvas) {
-				if (Settings.aBoolean1274) {
+				if (Settings.blackberryApi) {
 					((Canvas) d).setFullScreenMode(true);
 				}
 				Emulator.setCanvas((Canvas) d);
@@ -62,8 +62,8 @@ public class Display {
 					Emulator.getEventQueue().queueRepaint();
 			} else if (d instanceof Screen) {
 				Emulator.setScreen((Screen) d);
+				d._shown();
 				Emulator.getEventQueue().queue(EventQueue.EVENT_SCREEN);
-				((Screen) d).shown();
 				if (d instanceof TextBox) {
 					((TextBox) d).focusCaret();
 				}

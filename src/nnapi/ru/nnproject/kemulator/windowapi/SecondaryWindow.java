@@ -95,7 +95,7 @@ public final class SecondaryWindow {
                     screenBuffer.getHeight() != getHeight())
                 screenBuffer = new ImageAWT(new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB));
             if (listener != null)
-                listener.invokePaint(screenBuffer,null);
+                listener._invokePaint(screenBuffer,null);
             g.drawImage(screenBuffer.getBufferedImage(), 0, 0, null);
         }
 
@@ -103,11 +103,11 @@ public final class SecondaryWindow {
         }
 
         public void keyPressed(KeyEvent e) {
-            if (listener != null) listener.invokeKeyPressed(e.getKeyCode());
+            if (listener != null) listener._invokeKeyPressed(e.getKeyCode());
         }
 
         public void keyReleased(KeyEvent e) {
-            if (listener != null) listener.invokeKeyReleased(e.getKeyCode());
+            if (listener != null) listener._invokeKeyReleased(e.getKeyCode());
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -128,11 +128,11 @@ public final class SecondaryWindow {
         }
 
         public void componentResized(ComponentEvent e) {
-            if (listener != null) listener.invokeSizeChanged(getWidth(), getHeight());
+            if (listener != null) listener._invokeSizeChanged(getWidth(), getHeight());
         }
 
         public void componentMoved(ComponentEvent e) {
-            if (listener != null) listener.invokeSizeChanged(getWidth(), getHeight());
+            if (listener != null) listener._invokeSizeChanged(getWidth(), getHeight());
         }
 
         public void componentShown(ComponentEvent e) {
@@ -150,11 +150,11 @@ public final class SecondaryWindow {
         }
 
         public void windowOpened(WindowEvent e) {
-            if (listener != null) listener.invokeShowNotify();
+            if (listener != null) listener._invokeShowNotify();
         }
 
         public void windowClosing(WindowEvent e) {
-            if (listener != null) listener.invokeHideNotify();
+            if (listener != null) listener._invokeHideNotify();
         }
 
         public void windowClosed(WindowEvent e) {

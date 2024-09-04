@@ -134,7 +134,7 @@ public class Form extends Screen {
 		this.itemStateListener = anItemStateListener858;
 	}
 
-	protected synchronized void keyScroll(int key, boolean repeat) {
+	protected synchronized void _keyScroll(int key, boolean repeat) {
 		if (rows.size() == 0) {
 			return;
 		}
@@ -210,7 +210,7 @@ public class Form extends Screen {
 						break;
 					}
 				}
-				keyScroll(Canvas.UP, repeat);
+				_keyScroll(Canvas.UP, repeat);
 				return;
 			case Canvas.RIGHT:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
@@ -224,7 +224,7 @@ public class Form extends Screen {
 						break;
 					}
 				}
-				keyScroll(Canvas.DOWN, repeat);
+				_keyScroll(Canvas.DOWN, repeat);
 				return;
 		}
 		repaintScreen();
@@ -339,7 +339,7 @@ public class Form extends Screen {
 		return super.items.size();
 	}
 
-	protected void paint(final Graphics g) {
+	protected void _paint(final Graphics g) {
 		if (rows.size() == 0) {
 			doLayout(0);
 		} else if (layout) {
@@ -547,16 +547,9 @@ public class Form extends Screen {
 		return new int[] {x, y};
 	}
 
-	protected void sizeChanged(final int w, final int h) {
-		this.w = w;
-		this.h = h;
-		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
+	public void _invokeSizeChanged(int w, int h) {
+		super._invokeSizeChanged(w, h);
 		queueLayout(0);
-	}
-
-	protected void shown() {
-		IScreen s = Emulator.getEmulator().getScreen();
-		sizeChanged(s.getWidth(), s.getHeight());
 	}
 
 	public void _itemStateChanged(Item item) {

@@ -1,7 +1,7 @@
 package javax.microedition.lcdui;
 
 public class Ticker {
-	private String aString353;
+	private String string;
 
 	public Ticker(final String string) {
 		super();
@@ -12,10 +12,10 @@ public class Ticker {
 		if (aString353 == null) {
 			throw new NullPointerException();
 		}
-		this.aString353 = aString353;
+		this.string = aString353;
 	}
 
 	public String getString() {
-		return this.aString353;
+		return this.string;
 	}
 }

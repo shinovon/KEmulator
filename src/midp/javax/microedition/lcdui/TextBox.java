@@ -22,8 +22,8 @@ public class TextBox extends Screen {
 		constructSwt();
 	}
 
-	protected Composite constructSwtContent(int style) {
-		Composite c = super.constructSwtContent(style);
+	protected Composite _constructSwtContent(int style) {
+		Composite c = super._constructSwtContent(style);
 		textWrapper.swtConstruct(c, SWT.V_SCROLL);
 		return c;
 	}
@@ -256,7 +256,7 @@ public class TextBox extends Screen {
 
 	}
 
-	protected void paint(final Graphics graphics) {
+	protected void _paint(final Graphics graphics) {
 	}
 
 	protected void layout() {

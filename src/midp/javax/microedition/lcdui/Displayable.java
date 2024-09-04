@@ -41,11 +41,11 @@ public class Displayable {
 	private static long lastFrameTime;
 	private static long lastFpsUpdateTime;
 	private static int framesCount;
-	protected boolean nonFullScreen;
+	boolean fullScreen;
 	private static final Object frameLock = new Object();
 	private static final long MILLI_TO_NANO = 1000000L;
 
-	protected Composite swtContent;
+	Composite swtContent;
 	private Rectangle swtContentArea;
 	private boolean swtInitialized;
 	Menu swtMenu;
@@ -57,8 +57,9 @@ public class Displayable {
 		this.focusedItem = null;
 		this.cmdListener = null;
 		this.commands = new Vector();
-		this.w = Emulator.getEmulator().getScreen().getWidth();
-		this.h = Emulator.getEmulator().getScreen().getHeight();
+		IScreen s = Emulator.getEmulator().getScreen();
+		this.w = s.getWidth();
+		this.h = s.getHeight();
 		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
 	}
 
@@ -66,14 +67,14 @@ public class Displayable {
 		if (swtContentArea != null) {
 			return swtContentArea.width;
 		}
-		return this.w;
+		return bounds[W];
 	}
 
 	public int getHeight() {
 		if (swtContentArea != null) {
 			return swtContentArea.height;
 		}
-		return this.h;
+		return bounds[H];
 	}
 
 	public String getTitle() {
@@ -248,19 +249,31 @@ public class Displayable {
 	protected void sizeChanged(final int n, final int n2) {
 	}
 
-	public void invokeSizeChanged(final int w, final int h) {
+	public void _invokeSizeChanged(int w, int h) {
 		IScreen s = Emulator.getEmulator().getScreen();
-		this.w = s.getWidth();
-		this.h = s.getHeight();
 		if (swtContent != null) {
-			syncExec(new Runnable() {
+			asyncExec(new Runnable() {
 				public void run() {
 					swtUpdateSizes();
 				}
 			});
+			s.repaint();
+			return;
 		}
-		this.sizeChanged(w, h);
-		Emulator.getEventQueue().queueRepaint();
+		if (this.w != w || this.h != h) {
+			this.w = w;
+			this.h = h;
+			sizeChanged(bounds[W] = this.w - 4, bounds[H] = getActualHeight());
+		}
+		repaintScreen();
+	}
+
+	int getActualHeight() {
+		int h = Emulator.getEmulator().getScreen().getHeight();
+		if (!fullScreen) {
+			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+		}
+		return h;
 	}
 
 	public Ticker getTicker() {
@@ -269,13 +282,13 @@ public class Displayable {
 
 	public void setTicker(final Ticker ticker) {
 		this.ticker = ticker;
-		bounds[H] = h - (this.ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
 		this.tickerX = this.w;
+		updateSize();
 	}
 
-	protected void paintTicker(final Graphics graphics) {
+	protected void _paintTicker(final Graphics graphics) {
 		if (ticker == null) {
-			if (nonFullScreen) {
+			if (!fullScreen && this instanceof Canvas) {
 				graphics.setColor(-1);
 				graphics.fillRect(0, this.bounds[H], w, Screen.fontHeight4);
 			}
@@ -303,45 +316,8 @@ public class Displayable {
 		Emulator.getEventQueue().queue(n);
 	}
 
-	protected void paintSoftMenu(final Graphics graphics) {
+	protected void _paintSoftMenu(final Graphics graphics) {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
-		final int translateX = graphics.getTranslateX();
-		final int translateY = graphics.getTranslateY();
-		/*
-		if (Emulator.screenBrightness < 100) {
-			graphics.translate(-translateX, -translateY);
-			int alpha = (int) (((double) (100 - Emulator.screenBrightness) / 100d) * 255d);
-			// System.out.println(Integer.toHexString(alpha << 24));
-			DirectGraphicsInvoker.getDirectGraphics(graphics).setARGBColor(alpha << 24);
-			graphics.fillRect(0, 0, getWidth(), getHeight());
-			graphics.translate(translateX, translateY);
-		}
-		 */
-		if (!this.menuShown || swtMenu != null) {
-			return;
-		}
-		final int clipX = graphics.getClipX();
-		final int clipY = graphics.getClipY();
-		final int clipWidth = graphics.getClipWidth();
-		final int clipHeight = graphics.getClipHeight();
-		graphics.translate(-translateX, -translateY);
-		graphics.setClip(0, 0, this.w, this.h);
-		final int n = this.w >> 1;
-		final int anInt181 = Screen.fontHeight4;
-		final int n3;
-		final int n2 = (n3 = this.commands.size() - 1) * anInt181;
-		final int n4 = n - 1;
-		int n5 = this.h - n2 - 1;
-		a.method177(graphics, n4, n5, n, n2, true);
-		for (int i = 0; i < n3; ++i, n5 += anInt181) {
-			graphics.setColor(-16777216);
-			if (i == this.anInt28) {
-				a.method178(graphics, n4, n5, n, anInt181);
-			}
-			graphics.drawString(i + 1 + "." + ((Command) this.commands.get(i + 1)).getLongLabel(), n4 + 4, n5 + 2, 0);
-		}
-		graphics.translate(translateX, translateY);
-		graphics.setClip(clipX, clipY, clipWidth, clipHeight);
 	}
 
 	public static void _fpsLimiter() {
@@ -393,19 +369,19 @@ public class Displayable {
 	void constructSwt() {
 		syncExec(new Runnable() {
 			public void run() {
-				swtContent = constructSwtContent(SWT.NONE);
+				swtContent = _constructSwtContent(SWT.NONE);
 				swtMenu = new Menu(swtContent);
 				swtContent.setMenu(swtMenu);
-				swtContentArea = layoutSwtContent();
+				swtContentArea = _layoutSwtContent();
 			}
 		});
 	}
 
-	protected Composite constructSwtContent(int style) {
+	protected Composite _constructSwtContent(int style) {
 		return new Composite(getSwtParent(), SWT.NONE);
 	}
 
-	protected Rectangle layoutSwtContent() {
+	protected Rectangle _layoutSwtContent() {
 		Rectangle area = getSwtParent().getClientArea();
 		swtContent.setBounds(0, 0, area.width, area.height);
 		return swtContent.getClientArea();
@@ -434,6 +410,10 @@ public class Displayable {
 		EmulatorImpl.syncExec(r);
 	}
 
+	static void asyncExec(Runnable r) {
+		EmulatorImpl.asyncExec(r);
+	}
+
 	static void safeSyncExec(Runnable r) {
 		try {
 			EmulatorImpl.syncExec(r);
@@ -447,7 +427,8 @@ public class Displayable {
 		}
 	}
 
-	protected void shown() {
+	protected void _shown() {
+		updateSize();
 	}
 
 	static {
@@ -468,7 +449,7 @@ public class Displayable {
 	}
 
 	void swtUpdateSizes() {
-		Rectangle newArea = layoutSwtContent();
+		Rectangle newArea = _layoutSwtContent();
 		if(swtContentArea == null || !swtInitialized
 				|| newArea.width != swtContentArea.width
 				|| newArea.height != swtContentArea.height)
@@ -531,6 +512,12 @@ public class Displayable {
 
 	public void _swtResized(int w, int h) {
 
+	}
+
+	void updateSize() {
+		if(Emulator.getCurrentDisplay().getCurrent() != this) return;
+		IScreen s = Emulator.getEmulator().getScreen();
+		Emulator.getEventQueue().sizeChanged(s.getWidth(), s.getHeight());
 	}
 
 	class SwtMenuSelectionListener implements SelectionListener {

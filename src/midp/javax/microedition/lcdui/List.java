@@ -48,8 +48,8 @@ public class List extends Screen implements Choice {
 
 
 
-	protected Composite constructSwtContent(int style) {
-		Composite c = super.constructSwtContent(style);
+	protected Composite _constructSwtContent(int style) {
+		Composite c = super._constructSwtContent(style);
 		swtTable = new Table(c, getStyle(type));
 		return c;
 	}
@@ -307,10 +307,10 @@ public class List extends Screen implements Choice {
 		return choiceImpl.size();
 	}
 
-	protected void drawScrollBar(final Graphics graphics) {
+	protected void _drawScrollBar(final Graphics graphics) {
 	}
 
-	protected void paint(Graphics graphics) {
+	protected void _paint(Graphics graphics) {
 	}
 
 	protected void layout() {

@@ -381,7 +381,7 @@ public final class EmulatorScreen implements
 		if (this.pauseState == 1/* && Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()*/) {
 			this.initScreenBuffer(var1, var2);
 			this.zoom(this.zoom);
-			Emulator.getEventQueue().queue(Integer.MIN_VALUE, var1, var2);
+			Emulator.getEventQueue().sizeChanged(var1, var2);
 		}
 	}
 
@@ -553,7 +553,7 @@ public final class EmulatorScreen implements
 	public void setSize(int w, int h) {
 		if (getWidth() != w || getHeight() != h) {
 			initScreenBuffer(w, h);
-			Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
+			Emulator.getEventQueue().sizeChanged(w, h);
 			resized();
 		}
 	}
@@ -1344,7 +1344,7 @@ public final class EmulatorScreen implements
 			} else if (menuItem == resetSizeMenuItem) {
 				if (getWidth() != startWidth || getHeight() != startHeight) {
 					initScreenBuffer(startWidth, startHeight);
-					Emulator.getEventQueue().queue(Integer.MIN_VALUE, startWidth, startHeight);
+					Emulator.getEventQueue().sizeChanged(startWidth, startHeight);
 				}
 				zoomedWidth = startWidth;
 				zoomedHeight = startHeight;
@@ -1676,7 +1676,7 @@ public final class EmulatorScreen implements
 		}
 		if (!Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(n, true)) {
 			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokeKeyPressed(n);
+				Emulator.getCanvas()._invokeKeyPressed(n);
 				return;
 			}
 			Emulator.getScreen()._invokeKeyPressed(n);
@@ -1689,7 +1689,7 @@ public final class EmulatorScreen implements
 		}
 		if (!Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(n, false)) {
 			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokeKeyReleased(n);
+				Emulator.getCanvas()._invokeKeyReleased(n);
 				return;
 			}
 			Emulator.getScreen()._invokeKeyReleased(n);
@@ -2208,7 +2208,7 @@ public final class EmulatorScreen implements
 
 	private void mp(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas().invokeKeyPressed(i);
+			Emulator.getCanvas()._invokeKeyPressed(i);
 		} else {
 			Emulator.getScreen()._invokeKeyPressed(i);
 		}
@@ -2216,7 +2216,7 @@ public final class EmulatorScreen implements
 
 	private void mr(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas().invokeKeyReleased(i);
+			Emulator.getCanvas()._invokeKeyReleased(i);
 		} else {
 			Emulator.getScreen()._invokeKeyReleased(i);
 		}
@@ -2224,7 +2224,7 @@ public final class EmulatorScreen implements
 
 	private void mrp(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas().invokeKeyRepeated(i);
+			Emulator.getCanvas()._invokeKeyRepeated(i);
 		}
 	}
 
@@ -2319,7 +2319,7 @@ public final class EmulatorScreen implements
 					int h = (int) ((float) zoomedHeight / zoom);
 					if (pauseState != 0 && (getWidth() != w || getHeight() != h)) {
 						initScreenBuffer(w, h);
-						Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
+						Emulator.getEventQueue().sizeChanged(w, h);
 					}
 				} else if (Settings.resizeMode == 3) {
 					// Integer scaling

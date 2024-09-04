@@ -41,7 +41,7 @@ public final class Settings {
 	public static boolean showLogFrame;
 	public static boolean showInfoFrame;
 	public static boolean showMemViewFrame;
-	public static boolean aBoolean1274 = false;
+	public static boolean blackberryApi = false;
 	public static boolean canvasKeyboard;
 	public static boolean awtAntiAliasing;
 	public static boolean fpsMode;
@@ -118,4 +118,5 @@ public final class Settings {
 	public static boolean enableSecurity = true;
 	public static boolean ignoreServiceRepaints;
 	public static boolean dontRepaintOnSetCurrent;
+	public static boolean hasPointerEvents = true;
 }

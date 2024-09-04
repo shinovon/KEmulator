@@ -55,7 +55,8 @@ public class Alert extends Screen {
 		this.timeout = n;
 	}
 
-	protected void shown() {
+	protected void _shown() {
+		super._shown();
 		timeShown = System.currentTimeMillis();
 	}
 
@@ -91,7 +92,7 @@ public class Alert extends Screen {
 		Emulator.getCurrentDisplay().setCurrent(lastDisplayed);
 	}
 
-	protected void paint(Graphics g) {
+	protected void _paint(Graphics g) {
 		final int n = super.bounds[W] - 8;
 		this.textArr = c.textArr(this.string, Screen.font, n, n);
 		g.setColor(-16777216);
