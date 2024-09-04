@@ -230,10 +230,10 @@ public class Form extends Screen {
 		repaintScreen();
 	}
 
-	public boolean invokePointerPressed(final int x, int y) {
-		if (super.invokePointerPressed(x, y)) return true;
+	public boolean _invokePointerPressed(final int x, int y) {
+		if (super._invokePointerPressed(x, y)) return true;
 		int[] r = new int[2];
-		Item item = getItemAt(x, y, r);
+		Item item = _getItemAt(x, y, r);
 		if (item.isFocusable()) {
 			focusItem(item);
 			focusedItem.pointerPressed(r[0], r[1]);
@@ -242,7 +242,7 @@ public class Form extends Screen {
 		return false;
 	}
 
-	public Item getItemAt(int x, int y, int[] transformed) {
+	public Item _getItemAt(int x, int y, int[] transformed) {
 		if ((y -= bounds[Y]) < 0) return null;
 		int height = bounds[H];
 		Row row = getFirstVisibleRow();
@@ -477,11 +477,11 @@ public class Form extends Screen {
 						|| item instanceof ImageItem
 						|| item instanceof Spacer
 						|| item instanceof CustomItem)
-						|| (item.hasLayout(Item.LAYOUT_2)
+						|| (item._hasLayout(Item.LAYOUT_2)
 						&& !(item instanceof DateField
 						|| item instanceof TextField
 						|| item instanceof ChoiceGroup)))
-						|| item.hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
+						|| item._hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
 						|| (itemDir != currentDir)
 						|| !row.canAdd(item, width)) {
 					currentDir = itemDir;
@@ -506,7 +506,7 @@ public class Form extends Screen {
 					row.add(item, width);
 				}
 				if((text != null && text.endsWith("\n"))
-						|| item.hasLayout(Item.LAYOUT_NEWLINE_AFTER)
+						|| item._hasLayout(Item.LAYOUT_NEWLINE_AFTER)
 						|| item instanceof ChoiceGroup
 						|| item instanceof TextField
 						|| item instanceof DateField) {
@@ -527,7 +527,7 @@ public class Form extends Screen {
 		return row;
 	}
 
-	public void showMenu(Item item, int x, int y) {
+	public void _showMenu(Item item, int x, int y) {
 		if (item == null) {
 			hideSwtMenu();
 			return;
@@ -557,5 +557,10 @@ public class Form extends Screen {
 	protected void shown() {
 		IScreen s = Emulator.getEmulator().getScreen();
 		sizeChanged(s.getWidth(), s.getHeight());
+	}
+
+	public void _itemStateChanged(Item item) {
+		if (itemStateListener == null) return;
+		itemStateListener.itemStateChanged(item);
 	}
 }

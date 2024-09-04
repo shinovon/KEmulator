@@ -1477,9 +1477,9 @@ public final class EmulatorScreen implements
 					int[] t = transformPointer(p.x, p.y);
 					javax.microedition.lcdui.Item item;
 					if (t[0] >= 0 && t[1] >= 0
-							&& (item = ((Form) lastDisplayable).getItemAt(t[0], t[1], null)) != null
+							&& (item = ((Form) lastDisplayable)._getItemAt(t[0], t[1], null)) != null
 							&& item.commands.size() > 0) {
-						((Form) lastDisplayable).showMenu(item, -2, -2);
+						((Form) lastDisplayable)._showMenu(item, -2, -2);
 						return;
 					}
 				}
@@ -1644,7 +1644,7 @@ public final class EmulatorScreen implements
 			public void run() {
 				if (lastDisplayable != null) {
 					if (swtContent != null) swtContent.setVisible(false);
-					lastDisplayable.swtHidden();
+					lastDisplayable._swtHidden();
 					lastDisplayable = null;
 				}
 				if (d == null) {
@@ -1656,7 +1656,7 @@ public final class EmulatorScreen implements
 					stackLayout.topControl = null;
 					swtContent = null;
 				} else {
-					Composite c = d.getSwtContent();
+					Composite c = d._getSwtContent();
 					stackLayout.topControl = c;
 					swtContent = c;
 					if (c != null) {
@@ -1665,7 +1665,7 @@ public final class EmulatorScreen implements
 					}
 				}
 				canvas.layout();
-				lastDisplayable.swtShown();
+				lastDisplayable._swtShown();
 			}
 		});
 	}
@@ -1679,7 +1679,7 @@ public final class EmulatorScreen implements
 				Emulator.getCanvas().invokeKeyPressed(n);
 				return;
 			}
-			Emulator.getScreen().invokeKeyPressed(n);
+			Emulator.getScreen()._invokeKeyPressed(n);
 		}
 	}
 
@@ -1692,7 +1692,7 @@ public final class EmulatorScreen implements
 				Emulator.getCanvas().invokeKeyReleased(n);
 				return;
 			}
-			Emulator.getScreen().invokeKeyReleased(n);
+			Emulator.getScreen()._invokeKeyReleased(n);
 		}
 	}
 
@@ -1892,7 +1892,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		try {
-			Emulator.getScreen().invokeKeyPressed(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
+			Emulator.getScreen()._invokeKeyPressed(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -2210,7 +2210,7 @@ public final class EmulatorScreen implements
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
 			Emulator.getCanvas().invokeKeyPressed(i);
 		} else {
-			Emulator.getScreen().invokeKeyPressed(i);
+			Emulator.getScreen()._invokeKeyPressed(i);
 		}
 	}
 
@@ -2218,7 +2218,7 @@ public final class EmulatorScreen implements
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
 			Emulator.getCanvas().invokeKeyReleased(i);
 		} else {
-			Emulator.getScreen().invokeKeyReleased(i);
+			Emulator.getScreen()._invokeKeyReleased(i);
 		}
 	}
 

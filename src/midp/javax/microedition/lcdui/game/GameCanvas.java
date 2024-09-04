@@ -34,20 +34,20 @@ public abstract class GameCanvas extends Canvas {
 
 	public void flushGraphics(final int x, final int y, final int w, final int h) {
 		if (this != Emulator.getCurrentDisplay().getCurrent()) return;
-		Displayable.checkForSteps(null);
-		Displayable.fpsLimiter();
+		Displayable._checkForSteps(null);
+		Displayable._fpsLimiter();
 		paintSoftMenu(graphics == null ? getGraphics() : graphics);
 		Emulator.getEventQueue().gameGraphicsFlush(x, y, w, h);
-		Displayable.resetXRayGraphics();
+		Displayable._resetXRayGraphics();
 	}
 
 	public void flushGraphics() {
 		if (this != Emulator.getCurrentDisplay().getCurrent()) return;
-		Displayable.checkForSteps(null);
-		Displayable.fpsLimiter();
+		Displayable._checkForSteps(null);
+		Displayable._fpsLimiter();
 		paintSoftMenu(graphics == null ? getGraphics() : graphics);
 		Emulator.getEventQueue().gameGraphicsFlush();
-		Displayable.resetXRayGraphics();
+		Displayable._resetXRayGraphics();
 	}
 
 	public void invokeSizeChanged(int w, int h) {

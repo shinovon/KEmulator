@@ -26,11 +26,11 @@ class Row {
 				itemy = y;
 
 			// vertical align
-			if (!item.hasLayout(Item.LAYOUT_VEXPAND)) {
+			if (!item._hasLayout(Item.LAYOUT_VEXPAND)) {
 				if ((itemHeight = o.getHeight()) != rowHeight) {
-					if (item.hasLayout(Item.LAYOUT_VCENTER)) {
+					if (item._hasLayout(Item.LAYOUT_VCENTER)) {
 						itemy += (rowHeight - itemHeight) / 2;
-					} else if (!item.hasLayout(Item.LAYOUT_TOP)) {
+					} else if (!item._hasLayout(Item.LAYOUT_TOP)) {
 						// bottom by default
 						itemy += rowHeight - itemHeight;
 					}
@@ -88,8 +88,8 @@ class Row {
 	boolean canAdd(Item item, int maxWidth) {
 		if (items.isEmpty()) return true;
 		Item lastItem = items.get(items.size() - 1).item;
-		return !lastItem.hasLayout(Item.LAYOUT_EXPAND)
-				&& !lastItem.hasLayout(Item.LAYOUT_NEWLINE_AFTER)
+		return !lastItem._hasLayout(Item.LAYOUT_EXPAND)
+				&& !lastItem._hasLayout(Item.LAYOUT_NEWLINE_AFTER)
 				&& width != maxWidth && width + item.getMinimumWidth() < maxWidth;
 	}
 
@@ -154,7 +154,7 @@ class Row {
 			if (w > available) {
 				return available;
 			}
-			if (w == -1 || item.hasLayout(Item.LAYOUT_EXPAND)) {
+			if (w == -1 || item._hasLayout(Item.LAYOUT_EXPAND)) {
 				return available;
 			}
 			return w;

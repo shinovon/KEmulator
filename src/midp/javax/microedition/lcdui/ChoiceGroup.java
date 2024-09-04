@@ -13,7 +13,7 @@ public class ChoiceGroup
 	private int fitPolicy;
 	Vector items;
 	boolean popupShown;
-	int anInt28;
+	int popupY;
 	Command aCommand540;
 	private int currentSelect;
 	private int currentPos;
@@ -231,12 +231,12 @@ public class ChoiceGroup
 		}
 		if (this.choiceType == POPUP) {
 			if (this.popupShown) {
-				((Form) screen).showMenu(null, 0, 0);
+				((Form) screen)._showMenu(null, 0, 0);
 				this.popupShown = false;
 				return;
 			}
 			this.popupShown = true;
-			((Form) screen).showMenu(this, 4, anInt28);
+			((Form) screen)._showMenu(this, 4, anInt28);
 		}
 	}
 
@@ -314,7 +314,7 @@ public class ChoiceGroup
 				a2.method212();
 				n += a2.bounds[H];
 				this.anIntArray179 = null;
-				this.anInt28 = n - a2.bounds[H];
+				this.popupY = n - a2.bounds[H];
 			}
 		}
 		this.bounds[H] = n;

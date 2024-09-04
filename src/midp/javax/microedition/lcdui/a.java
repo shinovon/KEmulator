@@ -32,7 +32,7 @@ final class a {
 		int anInt29 = 0;
 		if (b2) {
 			anInt28 = y;
-			anInt29 = this.choice.anInt28;
+			anInt29 = this.choice.popupY;
 		} else {
 			anInt28 = y;
 			anInt29 = this.bounds[1];

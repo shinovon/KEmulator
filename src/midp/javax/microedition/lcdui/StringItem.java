@@ -181,7 +181,7 @@ public class StringItem extends Item {
 	}
 
 	public int getPreferredWidth() {
-		return hasLayout(LAYOUT_EXPAND) || isSizeLocked() ? super.getPreferredWidth() : width;
+		return _hasLayout(LAYOUT_EXPAND) || isSizeLocked() ? super.getPreferredWidth() : width;
 	}
 
 	boolean isFocusable() {

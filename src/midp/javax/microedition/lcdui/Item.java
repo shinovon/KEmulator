@@ -32,7 +32,7 @@ public abstract class Item {
 	int[] bounds;
 	boolean focused;
 	boolean shownOnForm;
-	Command aCommand174;
+	Command defaultCommand;
 	public ItemCommandListener itemCommandListener;
 	public Vector commands;
 	String label;
@@ -99,8 +99,8 @@ public abstract class Item {
 
 	public void removeCommand(Command command) {
 		if (this.commands.contains(command)) {
-			if (command == this.aCommand174) {
-				this.aCommand174 = null;
+			if (command == this.defaultCommand) {
+				this.defaultCommand = null;
 			}
 
 			this.commands.remove(command);
@@ -120,15 +120,14 @@ public abstract class Item {
 	}
 
 	protected void itemApplyCommand() {
-		if (this.itemCommandListener != null && this.aCommand174 != null) {
-			this.itemCommandListener.commandAction(this.aCommand174, this);
+		if (this.itemCommandListener != null && this.defaultCommand != null) {
+			Emulator.getEventQueue().commandAction(defaultCommand, this);
 		}
-
 	}
 
 	public int getPreferredWidth() {
 		if (preferredWidth != -1) return preferredWidth;
-		if (hasLayout(LAYOUT_SHRINK)) {
+		if (_hasLayout(LAYOUT_SHRINK)) {
 			int w = getMinimumWidth();
 			if (w > 0) return w;
 		}
@@ -162,7 +161,7 @@ public abstract class Item {
 		if (this.screen instanceof Alert) {
 			throw new IllegalStateException();
 		} else {
-			if ((this.aCommand174 = aCommand174) != null) {
+			if ((this.defaultCommand = aCommand174) != null) {
 				this.addCommand(aCommand174);
 			}
 
@@ -170,15 +169,8 @@ public abstract class Item {
 	}
 
 	public void notifyStateChanged() {
-		if (screen == null) return;
-		if (this.screen instanceof Form) {
-			if (((Form) this.screen).itemStateListener == null) return;
-			try {
-				((Form) this.screen).itemStateListener.itemStateChanged(this);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		if (screen == null || !(screen instanceof Form)) return;
+		Emulator.getEventQueue().itemStateChanged(this);
 	}
 
 	protected void focus() {
@@ -218,7 +210,7 @@ public abstract class Item {
 	protected void pointerPressed(int n, int n2) {
 	}
 
-	public boolean hasLayout(int l) {
+	public boolean _hasLayout(int l) {
 		return (layout & l) == l;
 	}
 
@@ -252,5 +244,15 @@ public abstract class Item {
 
 	boolean keyScroll(int key, boolean repeat) {
 		return false;
+	}
+
+	public Screen _getParent() {
+		return screen;
+	}
+
+	public void _callCommandAction(Command cmd) {
+		if (itemCommandListener != null && cmd != null) {
+			itemCommandListener.commandAction(cmd, this);
+		}
 	}
 }

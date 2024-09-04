@@ -154,7 +154,7 @@ public class Displayable {
 		if (this.commands.contains(command)) {
 			this.commands.remove(command);
 			if (Emulator.getCurrentDisplay().getCurrent() == this) {
-				this.updateCommands();
+				updateCommands();
 			}
 		}
 	}
@@ -182,14 +182,13 @@ public class Displayable {
 			if (b && leftSoftCommand != null) {
 				Emulator.getEmulator().getLogStream().println("Left command: " + leftSoftCommand);
 				if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
-					// XXX
-					if (this.cmdListener != null)
-						this.cmdListener.commandAction(leftSoftCommand, this);
-					else ((Alert) this).close();
+					if (cmdListener != null) {
+						Emulator.getEventQueue().commandAction(leftSoftCommand, this);
+					} else ((Alert) this).close();
 				} else if (this.focusedItem != null && this.focusedItem.commands.contains(leftSoftCommand)) {
-					this.focusedItem.itemCommandListener.commandAction(leftSoftCommand, this.focusedItem);
+					Emulator.getEventQueue().commandAction(leftSoftCommand, this.focusedItem);
 				} else if (this.cmdListener != null) {
-					this.cmdListener.commandAction(leftSoftCommand, this);
+					Emulator.getEventQueue().commandAction(leftSoftCommand, this);
 				}
 			}
 			return !Settings.motorolaSoftKeyFix;
@@ -209,7 +208,7 @@ public class Displayable {
 					if (swtMenu != null) {
 						showSwtMenu(false, -1, -1);
 					} else {
-						this.repaintScreen();
+						repaintScreen();
 					}
 				}
 			} else {
@@ -217,14 +216,13 @@ public class Displayable {
 				if (b && rightSoftCommand != null) {
 					Emulator.getEmulator().getLogStream().println("Right command: " + rightSoftCommand);
 					if (this instanceof Alert && rightSoftCommand == Alert.DISMISS_COMMAND) {
-						// XXX
-						if (this.cmdListener != null)
-							this.cmdListener.commandAction(rightSoftCommand, this);
-						else ((Alert) this).close();
+						if (this.cmdListener != null) {
+							Emulator.getEventQueue().commandAction(rightSoftCommand, this);
+						} else ((Alert) this).close();
 					} else if (this.focusedItem != null && this.focusedItem.commands.contains(rightSoftCommand)) {
-						this.focusedItem.itemCommandListener.commandAction(rightSoftCommand, this.focusedItem);
+						Emulator.getEventQueue().commandAction(rightSoftCommand, this.focusedItem);
 					} else if (this.cmdListener != null) {
-						this.cmdListener.commandAction(rightSoftCommand, this);
+						Emulator.getEventQueue().commandAction(rightSoftCommand, this);
 					}
 				}
 			}
@@ -233,9 +231,8 @@ public class Displayable {
 		return false;
 	}
 
-	public void callCommandAction(Command command) {
+	public void _callCommandAction(Command command) {
 		if (cmdListener != null && command != null) {
-			// TODO queue
 			cmdListener.commandAction(command, this);
 		}
 	}
@@ -347,7 +344,7 @@ public class Displayable {
 		graphics.setClip(clipX, clipY, clipWidth, clipHeight);
 	}
 
-	public static void fpsLimiter() {
+	public static void _fpsLimiter() {
 		if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
 			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
@@ -370,7 +367,7 @@ public class Displayable {
 		}
 	}
 
-	public static void checkForSteps(Object lock) {
+	public static void _checkForSteps(Object lock) {
 		if (Settings.steps >= 0) {
 			if (Settings.steps == 0) {
 				final long currentTimeMillis = System.currentTimeMillis();
@@ -388,7 +385,7 @@ public class Displayable {
 		}
 	}
 
-	public static void resetXRayGraphics() {
+	public static void _resetXRayGraphics() {
 		Graphics.resetXRayCache();
 	}
 
@@ -414,7 +411,7 @@ public class Displayable {
 		return swtContent.getClientArea();
 	}
 
-	public Composite getSwtContent() {
+	public Composite _getSwtContent() {
 		return swtContent;
 	}
 
@@ -459,10 +456,10 @@ public class Displayable {
 		Displayable.framesCount = 0;
 	}
 
-	public void swtHidden() {
+	public void _swtHidden() {
 	}
 
-	public void swtShown() {
+	public void _swtShown() {
 		if (swtContent != null && !swtContent.isDisposed()) {
 			swtUpdateSizes();
 		} else if (swtMenu == null) {
@@ -478,7 +475,7 @@ public class Displayable {
 		{
 			swtInitialized = true;
 			swtContentArea = newArea;
-			swtResized(newArea.width, newArea.height);
+			_swtResized(newArea.width, newArea.height);
 		}
 	}
 
@@ -532,21 +529,8 @@ public class Displayable {
 		}
 	}
 
-	public void swtResized(int w, int h) {
+	public void _swtResized(int w, int h) {
 
-	}
-
-	public boolean getLeftRightLanguage() {
-		return true;
-	}
-
-	public boolean swtIsShown() {
-		return isShown();
-	}
-
-	Composite getContentComp()
-	{
-		return swtContent;
 	}
 
 	class SwtMenuSelectionListener implements SelectionListener {
@@ -555,15 +539,13 @@ public class Displayable {
 			try {
 				Object o = (Object) e.widget.getData();
 				if (o instanceof Command) {
-					callCommandAction((Command) o);
+					Emulator.getEventQueue().commandAction((Command) o, Displayable.this);
 				} else if (o instanceof ChoiceGroup) {
 					((ChoiceGroup) o).select(((MenuItem) e.widget).getText());
 				} else if (o instanceof Object[]) {
 					Command c = (Command) ((Object[]) o)[0];
 					Item item = (Item) ((Object[]) o)[1];
-					if (item.itemCommandListener != null) {
-						item.itemCommandListener.commandAction(c, item);
-					}
+					Emulator.getEventQueue().commandAction(c, item);
 				}
 			} catch (Exception ignored) {}
 		}

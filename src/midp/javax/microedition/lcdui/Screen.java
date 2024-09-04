@@ -25,7 +25,7 @@ public abstract class Screen extends Displayable {
 		this.items = new Vector();
 	}
 
-	public void invokeKeyPressed(final int n) {
+	public void _invokeKeyPressed(final int n) {
 		if (swtContent != null) return;
 		final long currentTimeMillis;
 		if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
@@ -88,10 +88,10 @@ public abstract class Screen extends Displayable {
 	protected void keyScroll(int key, boolean repeat) {
 	}
 
-	public void invokeKeyReleased(final int n) {
+	public void _invokeKeyReleased(final int n) {
 	}
 
-	public boolean invokePointerPressed(final int x, final int y) {
+	public boolean _invokePointerPressed(final int x, final int y) {
 		if (swtContent != null) return false;
 		if (super.menuShown) {
 			final int n3 = super.w >> 1;
@@ -120,17 +120,17 @@ public abstract class Screen extends Displayable {
 		return false;
 	}
 
-	public void invokePointerReleased(final int n, final int n2) {
+	public void _invokePointerReleased(final int n, final int n2) {
 	}
 
-	public void invokePointerDragged(final int n, final int n2) {
+	public void _invokePointerDragged(final int n, final int n2) {
 	}
 
 	protected abstract void paint(final Graphics p0);
 
-	public void invokePaint(final Graphics graphics) {
+	public void _invokePaint(final Graphics graphics) {
 		if (swtContent != null) return;
-		Displayable.resetXRayGraphics();
+		Displayable._resetXRayGraphics();
 		final int color = graphics.getColor();
 		final int strokeStyle = graphics.getStrokeStyle();
 		final Font font = graphics.getFont();

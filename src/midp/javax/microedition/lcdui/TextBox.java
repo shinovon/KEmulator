@@ -1,13 +1,10 @@
 package javax.microedition.lcdui;
 
-import emulator.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Text;
 
 public class TextBox extends Screen {
 //	private TextField textField;
@@ -31,18 +28,18 @@ public class TextBox extends Screen {
 		return c;
 	}
 
-	public void swtShown() {
-		super.swtShown();
+	public void _swtShown() {
+		super._swtShown();
 		textWrapper.setModifyListener(swtModifyListener);
 	}
 
-	public void swtHidden() {
-		super.swtHidden();
+	public void _swtHidden() {
+		super._swtHidden();
 		textWrapper.setModifyListener(null);
 	}
 
-	public void swtResized(int w, int h) {
-		super.swtResized(w, h);
+	public void _swtResized(int w, int h) {
+		super._swtResized(w, h);
 		textWrapper.setBounds(swtContent.getClientArea());
 	}
 

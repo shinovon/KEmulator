@@ -438,7 +438,7 @@ public class List extends Screen implements Choice {
 			{
 				if(size() > 0)
 				{
-					callCommandAction(selectCommand);
+					_callCommandAction(selectCommand);
 				}
 			}
 		}
@@ -460,18 +460,18 @@ public class List extends Screen implements Choice {
 
 	}
 
-	public void swtShown() {
-		super.swtShown();
+	public void _swtShown() {
+		super._swtShown();
 		swtTable.addSelectionListener(swtTableListener);
 	}
 
-	public void swtHidden() {
-		super.swtHidden();
+	public void _swtHidden() {
+		super._swtHidden();
 		swtTable.removeSelectionListener(swtTableListener);
 	}
 
-	public void swtResized(int w, int h) {
-		super.swtResized(w, h);
+	public void _swtResized(int w, int h) {
+		super._swtResized(w, h);
 		swtTable.setBounds(swtContent.getClientArea());
 	}
 }
