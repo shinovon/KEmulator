@@ -33,7 +33,6 @@ public final class EventQueue implements Runnable {
 	private final Thread inputThread;
 	private final Object lock = new Object();
 	private final Object repaintLock = new Object();
-	private boolean repainted;
 	private boolean alive;
 	private int[][] inputs;
 	private int inputsCount;
@@ -157,7 +156,6 @@ public final class EventQueue implements Runnable {
 			if (repaintPending)
 				return;
 			repaintPending = true;
-			repainted = false;
 		}
 		if (n == EVENT_SHOW || n == EVENT_RESUME) {
 			paused = false;
@@ -260,26 +258,20 @@ public final class EventQueue implements Runnable {
 	public void serviceRepaints() {
 		if (Settings.ignoreServiceRepaints) return;
 		Thread t = Thread.currentThread();
-
 		// Sonic 2 Dash StackOverflowError fix
 		StackTraceElement[] st = t.getStackTrace();
 		for (int i = 1; i < st.length; i++) {
 			if ("invokePaint".equals(st[i].getMethodName())) return;
 		}
 
-		if (t == eventThread || t == inputThread || Settings.forcePaintOnServiceRepaints || !repaintPending) {
-			synchronized (lock) {
-				internalRepaint(-1, -1, -1, -1);
-			}
-			Displayable._fpsLimiter();
-			return;
+		synchronized (lock) {
+			if (!repaintPending) return;
+			repaintPending = false;
+			int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
+			repaintX = repaintY = repaintW = repaintH = -1;
+			internalRepaint(x, y, w, h);
 		}
-		if (repainted) return;
-		try {
-			synchronized (repaintLock) {
-				repaintLock.wait();
-			}
-		} catch (Exception ignored) {}
+		Displayable._fpsLimiter();
 	}
 
 	public void run() {
@@ -293,6 +285,7 @@ public final class EventQueue implements Runnable {
 				}
 				switch (event = nextEvent()) {
 					case EVENT_PAINT: {
+						if (!repaintPending) break;
 						int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
 						repaintX = repaintY = repaintW = repaintH = -1;
 						internalRepaint(x, y, w, h);
@@ -472,7 +465,6 @@ public final class EventQueue implements Runnable {
 			System.err.println("Exception in repaint!");
 			e.printStackTrace();
 		}
-		repainted = true;
 		try {
 			synchronized (repaintLock) {
 				repaintLock.notifyAll();
