@@ -12,7 +12,6 @@ public class ChoiceGroup
 	int choiceType;
 	private int fitPolicy;
 	Vector items;
-	boolean popupShown;
 	int popupY;
 	Command aCommand540;
 	private int currentSelect;
@@ -230,13 +229,7 @@ public class ChoiceGroup
 			return;
 		}
 		if (this.choiceType == POPUP) {
-			if (this.popupShown) {
-				((Form) screen)._showMenu(null, 0, 0);
-				this.popupShown = false;
-				return;
-			}
-			this.popupShown = true;
-			((Form) screen)._showMenu(this, 4, anInt28);
+			((Form) screen)._showMenu(this, 4, popupY);
 		}
 	}
 
@@ -384,7 +377,6 @@ public class ChoiceGroup
 	protected void defocus() {
 		super.defocus();
 		if (choiceType != POPUP) return;
-		popupShown = false;
 		layoutForm();
 	}
 

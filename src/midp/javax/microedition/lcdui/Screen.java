@@ -189,9 +189,10 @@ public abstract class Screen extends Displayable {
 		if (focusedItem instanceof ChoiceGroup && ((ChoiceGroup) focusedItem).choiceType == Choice.POPUP) {
 			for (int i = 0; i < ((ChoiceGroup) focusedItem).items.size(); i++) {
 				String s = ((ChoiceGroup) focusedItem).getString(i);
-				MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
+				MenuItem mi = new MenuItem(swtMenu, SWT.RADIO);
 				mi.addSelectionListener(swtMenuSelectionListener);
 				mi.setData(focusedItem);
+				if (((ChoiceGroup) focusedItem).isSelected(i)) mi.setSelection(true);
 				mi.setText(s);
 			}
 		} else {
