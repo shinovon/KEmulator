@@ -106,7 +106,7 @@ public abstract class Canvas extends Displayable {
 		if (!fullScreen) {
 			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
 		}
-		if (this.w != w || this.h != h) {
+		if (this.w != w || this.h != h || forceUpdateSize) {
 			this.w = w;
 			this.h = h;
 			sizeChanged(w, h);

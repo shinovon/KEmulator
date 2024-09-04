@@ -49,7 +49,7 @@ public class Displayable {
 	Menu swtMenu;
 	SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
 	private MenuListener swtMenuListener = new SwtMenuListener();
-	private boolean forceUpdateSize;
+	boolean forceUpdateSize;
 
 	public Displayable() {
 		super();
@@ -510,7 +510,7 @@ public class Displayable {
 
 	void updateSize(boolean force) {
 		if (force) forceUpdateSize = true;
-		if (Emulator.getCurrentDisplay().getCurrent() != this || force) return;
+		if (Emulator.getCurrentDisplay().getCurrent() != this) return;
 		IScreen s = Emulator.getEmulator().getScreen();
 		Emulator.getEventQueue().sizeChanged(s.getWidth(), s.getHeight());
 	}

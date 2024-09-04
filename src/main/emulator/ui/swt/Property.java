@@ -310,7 +310,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button securityCheck;
 	private Composite securityContent;
 	private Tree rmsTree;
-	private Button forceServicePaintCheck;
+//	private Button forceServicePaintCheck;
 	private Composite langComposite;
 	private Button pointerEventsCheck;
 //    private Button pollOnRepaintBtn;
@@ -986,7 +986,7 @@ public final class Property implements IProperty, SelectionListener {
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
-		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
+//		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
 		Settings.hasPointerEvents = pointerEventsCheck.getSelection();
 
 		String sysProps = propsText.getText();
@@ -1855,11 +1855,11 @@ public final class Property implements IProperty, SelectionListener {
 		keyPressOnRepeatCheck.setSelection(Settings.keyPressOnRepeat);
 		keyPressOnRepeatCheck.setToolTipText("Compatibility tweak for The Elder Scrolls: Oblivion");
 
-		forceServicePaintCheck = new Button(coreApiGroup, SWT.CHECK);
-		forceServicePaintCheck.setText(UILocale.get("OPTION_COREAPI_FORCE_SERVICE_REPAINTS", "Force paint on serviceRepaints()"));
-		forceServicePaintCheck.setLayoutData(gridData);
-		forceServicePaintCheck.setSelection(Settings.forcePaintOnServiceRepaints);
-		forceServicePaintCheck.setToolTipText("Compatibility tweak for games by SEGA China (breaks other games)");
+//		forceServicePaintCheck = new Button(coreApiGroup, SWT.CHECK);
+//		forceServicePaintCheck.setText(UILocale.get("OPTION_COREAPI_FORCE_SERVICE_REPAINTS", "Force paint on serviceRepaints()"));
+//		forceServicePaintCheck.setLayoutData(gridData);
+//		forceServicePaintCheck.setSelection(Settings.forcePaintOnServiceRepaints);
+//		forceServicePaintCheck.setToolTipText("Compatibility tweak for games by SEGA China (breaks other games)");
 
 		pointerEventsCheck = new Button(coreApiGroup, SWT.CHECK);
 		pointerEventsCheck.setText(UILocale.get("OPTION_COREAPI_POINTER_EVENTS", "Canvas.hasPointerEvents() return value"));
