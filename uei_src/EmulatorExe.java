@@ -153,9 +153,13 @@ public class EmulatorExe {
 				cmd.add(arg);
 				continue;
 			}
-			if (arg.startsWith("-Dfile.encoding")) {
+			if (arg.startsWith("-Dfile.encoding=")) {
 				cmd.add(arg);
 				encodingSet = true;
+				continue;
+			}
+			if(arg.startsWith("-D")) {
+				cmd.add(arg);
 				continue;
 			}
 		}
@@ -245,7 +249,7 @@ public class EmulatorExe {
 				case "-Xdebug":
 					continue;
 				default:
-					if (!arg.startsWith("-agentlib:") && !arg.startsWith("-Xrun"))
+					if (!arg.startsWith("-agentlib:") && !arg.startsWith("-Xrun") && !arg.startsWith("-D"))
 						System.out.println("Unknown argument: " + arg);
 					continue;
 			}
