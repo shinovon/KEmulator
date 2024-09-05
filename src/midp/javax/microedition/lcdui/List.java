@@ -354,9 +354,15 @@ public class List extends Screen implements Choice {
 		if(type == IMPLICIT || type == EXCLUSIVE)
 		{
 			int sel = choiceImpl.getSelectedIndex();
+			if (sel == -1 && choiceImpl.size() > 0) {
+				sel = 0;
+			}
 			if((sel == 0) || (swtTable.getSelectionIndex() != sel))
 			{
 				swtTable.setSelection(sel);
+			}
+			if (isShown()) {
+				swtTable.setFocus();
 			}
 		}
 		else
@@ -463,11 +469,15 @@ public class List extends Screen implements Choice {
 	public void _swtShown() {
 		super._swtShown();
 		swtTable.addSelectionListener(swtTableListener);
+		swtTable.addKeyListener(swtKeyListener);
+		updateSelection();
 	}
 
 	public void _swtHidden() {
 		super._swtHidden();
+		if (swtTable == null || swtTable.isDisposed()) return;
 		swtTable.removeSelectionListener(swtTableListener);
+		swtTable.removeKeyListener(swtKeyListener);
 	}
 
 	public void _swtResized(int w, int h) {

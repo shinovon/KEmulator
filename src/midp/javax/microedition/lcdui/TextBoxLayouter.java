@@ -23,109 +23,109 @@ import org.eclipse.swt.widgets.*;
 class TextBoxLayouter
 {
 
-    /**
-     * Key name for modify listener.
-     */
-    private static final String MODIFY_LISTENER = "modify";
+	/**
+	 * Key name for modify listener.
+	 */
+	private static final String MODIFY_LISTENER = "modify";
 
-    /**
-     * Key name for key listener.
-     */
-    private static final String KEY_LISTENER = "key";
+	/**
+	 * Key name for key listener.
+	 */
+	private static final String KEY_LISTENER = "key";
 
-    /**
-     * Key name for mouse listener.
-     */
-    private static final String MOUSE_LISTENER = "mouse";
-
-
-    /**
-     * Percentage of the whole screen.
-     */
-    private static final int TOTAL_PERCENTAGE = 100;
+	/**
+	 * Key name for mouse listener.
+	 */
+	private static final String MOUSE_LISTENER = "mouse";
 
 
-    // private static Control[] staticControls = new Control[6];
+	/**
+	 * Percentage of the whole screen.
+	 */
+	private static final int TOTAL_PERCENTAGE = 100;
 
-    private static boolean isCorrectText;
 
-    private static Shell staticShell;
+	// private static Control[] staticControls = new Control[6];
 
-    static Shell swtGetStaticShell()
-    {
-        if(staticShell == null)
-        {
-            staticShell = new Shell(EmulatorImpl.getDisplay(), SWT.SYSTEM_MODAL | SWT.VERTICAL);
-            staticShell.getVerticalBar().setVisible(true);
-        }
-        return staticShell;
-    }
+	private static boolean isCorrectText;
 
-    /**
-     * Get static eSWT control (ConstraintText or Text).
-     *
-     * @param constraint
-     */
-    static Control swtGetStaticTextControl(int constraint)
-    {
-        Control ret = null;
+	private static Shell staticShell;
 
-        /*
-        int maskedConstraint = constraint & TextField.CONSTRAINT_MASK;
+	static Shell swtGetStaticShell()
+	{
+		if(staticShell == null)
+		{
+			staticShell = new Shell(EmulatorImpl.getDisplay(), SWT.SYSTEM_MODAL | SWT.VERTICAL);
+			staticShell.getVerticalBar().setVisible(true);
+		}
+		return staticShell;
+	}
 
-        if (staticControls[maskedConstraint] == null) {
-            staticControls[maskedConstraint] = TextWrapper.swtConstructText(
-                    swtGetStaticShell(), SWT.MULTI | SWT.WRAP, constraint);
-            ret = staticControls[maskedConstraint];
-        }
-        */
+	/**
+	 * Get static eSWT control (ConstraintText or Text).
+	 *
+	 * @param constraint
+	 */
+	static Control swtGetStaticTextControl(int constraint)
+	{
+		Control ret = null;
 
-        return new Text(swtGetStaticShell(), SWT.MULTI | SWT.WRAP | SWT.BORDER);
-    }
+		/*
+		int maskedConstraint = constraint & TextField.CONSTRAINT_MASK;
 
-    /**
-     * Check that text satisfies specified constraints.
-     *
-     * @param constraint TextField.NUMERIC etc.
-     * @return true if text is correct for specified constraint.
-     */
-    static boolean checkText(final int constraint, final String text)
-    {
-        isCorrectText = true;
+		if (staticControls[maskedConstraint] == null) {
+			staticControls[maskedConstraint] = TextWrapper.swtConstructText(
+					swtGetStaticShell(), SWT.MULTI | SWT.WRAP, constraint);
+			ret = staticControls[maskedConstraint];
+		}
+		*/
 
-        try
-        {
-         	  if(constraint == TextField.NUMERIC && !text.equals(""))
-            {
-                Integer.parseInt(text);
-            }
-            else if(constraint == TextField.DECIMAL && !text.equals(""))
-            {
-                Float.parseFloat(text);
-            }
-        }
-        catch( NumberFormatException e )
-        {
-        	  // Illegal text
-            return false;
-        }
+		return new Text(swtGetStaticShell(), SWT.MULTI | SWT.WRAP | SWT.BORDER);
+	}
 
-        Displayable.syncExec(new Runnable()
-        {
-            public void run()
-            {
-                try
-                {
-                    TextWrapper.swtSetContent(
-                        swtGetStaticTextControl(constraint), text);
-                }
-                catch(IllegalArgumentException e)
-                {
-                    isCorrectText = false;
-                }
-            }
-        });
-        return isCorrectText;
-    }
+	/**
+	 * Check that text satisfies specified constraints.
+	 *
+	 * @param constraint TextField.NUMERIC etc.
+	 * @return true if text is correct for specified constraint.
+	 */
+	static boolean checkText(final int constraint, final String text)
+	{
+		isCorrectText = true;
+
+		try
+		{
+		 	  if(constraint == TextField.NUMERIC && !text.equals(""))
+			{
+				Integer.parseInt(text);
+			}
+			else if(constraint == TextField.DECIMAL && !text.equals(""))
+			{
+				Float.parseFloat(text);
+			}
+		}
+		catch( NumberFormatException e )
+		{
+			  // Illegal text
+			return false;
+		}
+
+		Displayable.syncExec(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					TextWrapper.swtSetContent(
+						swtGetStaticTextControl(constraint), text);
+				}
+				catch(IllegalArgumentException e)
+				{
+					isCorrectText = false;
+				}
+			}
+		});
+		return isCorrectText;
+	}
 
 }

@@ -7,7 +7,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 public class TextBox extends Screen {
-//	private TextField textField;
 
 	private SwtModifyListener swtModifyListener = new SwtModifyListener();
 
@@ -31,6 +30,7 @@ public class TextBox extends Screen {
 	public void _swtShown() {
 		super._swtShown();
 		textWrapper.setModifyListener(swtModifyListener);
+		textWrapper.setFocused(true);
 	}
 
 	public void _swtHidden() {

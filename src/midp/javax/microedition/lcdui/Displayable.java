@@ -12,10 +12,7 @@ import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -50,6 +47,7 @@ public class Displayable {
 	SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
 	private MenuListener swtMenuListener = new SwtMenuListener();
 	boolean forceUpdateSize;
+	static KeyListener swtKeyListener = new SwtKeyListener();
 
 	public Displayable() {
 		super();
@@ -544,6 +542,24 @@ public class Displayable {
 
 		public void menuShown(MenuEvent menuEvent) {
 			menuShown = true;
+		}
+	}
+
+	static class SwtKeyListener implements KeyListener {
+
+		public void keyPressed(KeyEvent keyEvent) {
+			int n = keyEvent.keyCode & 0xFEFFFFFF;
+			Displayable d = Emulator.getCurrentDisplay().getCurrent();
+			String r;
+			if ((keyEvent.character >= 33 && keyEvent.character <= 90)
+					|| (r = KeyMapping.replaceKey(n)) == null) return;
+			n = Integer.parseInt(r);
+			if (KeyMapping.isLeftSoft(n) || KeyMapping.isRightSoft(n)) {
+				d.handleSoftKeyAction(n, true);
+			}
+		}
+
+		public void keyReleased(KeyEvent keyEvent) {
 		}
 	}
 }
