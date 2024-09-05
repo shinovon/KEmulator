@@ -71,7 +71,7 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 		this.className = aString1165;
 	}
 
-	public final void visit(final int n, final int n2, final String s, final String s2, final String s3, final String[] array) {
+	public final void visit(final int n, final int n2, final String s, final String s2, String s3, final String[] array) {
 		parentClassName = s3;
 		if (s3.equals("java/util/TimerTask")) {
 			super.visit(n, n2, s, s2, "emulator/custom/subclass/SubTimerTask", array);
@@ -92,6 +92,9 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 		if (s3.startsWith("com/bmc/media/")) {
 			super.visit(n, n2, s, s2, s3.replace("com/bmc/media/", "com/sprintpcs/media/"), array);
 			return;
+		}
+		if (CustomClassLoader.isProtected(s3.replace('/', '.'), false)) {
+			s3 = "__".concat(s3);
 		}
 		super.visit(n, n2, s, s2, s3, array);
 	}

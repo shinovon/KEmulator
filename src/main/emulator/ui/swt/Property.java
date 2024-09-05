@@ -41,7 +41,6 @@ public final class Property implements IProperty, SelectionListener {
 			{"Advanced Media (JSR 234)", "javax.microedition.amms"},
 			{"OpenGL ES (JSR 239)", "javax.microedition.khronos"},
 			{"Sensor (JSR 256)", "javax.microedition.sensor"},
-			{"GameCanvas (MIDP 2.0)", "javax.microedition.lcdui.game"},
 
 			// вендоры
 			{"Nokia", "com.nokia.mid"},
@@ -79,6 +78,15 @@ public final class Property implements IProperty, SelectionListener {
 			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
 			{"KEmulator Window API", "ru.nnproject.kemulator.windowapi"},
 			{"KEmulator", "kemulator"}, // проприетарные пропы по типу kemulator.version
+
+			// отдельное
+
+			{"CustomItem (MIDP 2.0)", "javax.microedition.lcdui.CustomItem"},
+			{"Spacer (MIDP 2.0)", "javax.microedition.lcdui.Spacer"},
+			{"Game (MIDP 2.0)", "javax.microedition.lcdui.game"},
+
+			{"Float (CLDC 1.1)", "java.lang.Float"},
+			{"Double (CLDC 1.1)", "java.lang.Double"},
 	};
 
 	public static final String[][] PERMISSIONS = {

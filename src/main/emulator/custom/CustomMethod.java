@@ -231,6 +231,16 @@ public class CustomMethod {
 		return res;
 	}
 
+	public static void checkFloat()  {
+		if (CustomClassLoader.isProtected("java.lang.Float", true))
+			throw new Error("Float usage restricted");
+	}
+
+	public static void checkDouble()  {
+		if (CustomClassLoader.isProtected("java.lang.Double", true))
+			throw new Error("Double usage restricted");
+	}
+
 	static {
 		CustomMethod.aHashtable14 = new Hashtable();
 		try {
