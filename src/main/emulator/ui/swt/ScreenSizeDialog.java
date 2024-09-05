@@ -89,5 +89,7 @@ public class ScreenSizeDialog extends Dialog {
 		});
 
 		shell.setDefaultButton(ok);
+
+		width.setFocus();
 	}
 }
