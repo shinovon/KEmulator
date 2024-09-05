@@ -161,7 +161,7 @@ class Row {
 		}
 
 		int getHeight() {
-			if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON) {
+			if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
 				return item.getMinimumHeight();
 			}
 			return item.getPreferredHeight();

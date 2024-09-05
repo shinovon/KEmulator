@@ -123,7 +123,7 @@ public class StringItem extends Item {
 
 	public int getMinimumHeight() {
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		return (font.getHeight() + 4) + (hasLabel() ? Item.font.getHeight() + 4 : 0);
+		return (font.getHeight() + 4) + (hasLabel() && isSizeLocked() ? Item.font.getHeight() + 4 : 0);
 	}
 
 	public int getPreferredWidth() {
