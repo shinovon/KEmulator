@@ -2560,15 +2560,32 @@ public final class Property implements IProperty, SelectionListener {
 		if (!(file = new File(s)).exists() || !file.isDirectory()) {
 			file.mkdirs();
 		}
-		final String string = s + "/" + this.method355();
-		final File file2;
-		if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
-			file2.mkdirs();
-		}
-		return string + "/";
+//		final String string = s + "/" + this.method355();
+//		final File file2;
+//		if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
+//			file2.mkdirs();
+//		}
+		return s + "/";
 	}
 
 	private void method428() {
+		if (rmsTree != null) {
+			rmsTree.removeAll();
+			String rootPath = method374();
+			String[] list = new File(rootPath).list();
+			if (list != null) {
+				for (String s : list) {
+					String l = decodeBase64(s);
+					if (l == null) continue;
+					TreeItem t = new TreeItem(rmsTree, SWT.NONE);
+					t.setData("m" + s);
+					t.setText(l);
+
+					new TreeItem(t, SWT.NONE);
+				}
+			}
+			return;
+		}
 		aTable665.removeAll();
 		String[] rms = RecordStore.listRecordStores();
 		if (rms == null) return;
