@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class EmulatorExe {
 
-	public static final String version = "1.7";
+	public static final String version = "1.8";
 	public static final boolean WINE = false;
 	public static final boolean NNX64 = false;
 
@@ -129,6 +129,7 @@ public class EmulatorExe {
 
 		// jvm args
 		boolean xmxSet = false;
+		boolean encodingSet = false;
 		for(int i = 0; i < args.length; i++) {
 			String arg = args[i];
 			if(arg.startsWith("-Xmx")) {
@@ -152,6 +153,11 @@ public class EmulatorExe {
 				cmd.add(arg);
 				continue;
 			}
+			if (arg.startsWith("-Dfile.encoding")) {
+				cmd.add(arg);
+				encodingSet = true;
+				continue;
+			}
 		}
 		if(!xmxSet) {
 			cmd.add(WINE ? "-Xmx512M" : "-Xmx1G");
@@ -163,6 +169,10 @@ public class EmulatorExe {
 
 		if (os.startsWith("darwin")) {
 			cmd.add("-XstartOnFirstThread");
+		}
+
+		if (!encodingSet) {
+			cmd.add("-Dfile.encoding=UTF-8");
 		}
 
 		cmd.add("-javaagent:" + path + "/KEmulator.jar");
