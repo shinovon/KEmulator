@@ -257,12 +257,12 @@ public final class EventQueue implements Runnable {
 
 	public void serviceRepaints() {
 		if (Settings.ignoreServiceRepaints) return;
-		Thread t = Thread.currentThread();
-		// Sonic 2 Dash StackOverflowError fix
-		StackTraceElement[] st = t.getStackTrace();
-		for (int i = 1; i < st.length; i++) {
-			if ("invokePaint".equals(st[i].getMethodName())) return;
-		}
+//		Thread t = Thread.currentThread();
+//		// Sonic 2 Dash StackOverflowError fix
+//		StackTraceElement[] st = t.getStackTrace();
+//		for (int i = 1; i < st.length; i++) {
+//			if ("invokePaint".equals(st[i].getMethodName())) return;
+//		}
 
 		synchronized (lock) {
 			if (!repaintPending) return;
@@ -285,10 +285,13 @@ public final class EventQueue implements Runnable {
 				}
 				switch (event = nextEvent()) {
 					case EVENT_PAINT: {
-						if (!repaintPending) break;
-						int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
-						repaintX = repaintY = repaintW = repaintH = -1;
-						internalRepaint(x, y, w, h);
+						synchronized (lock) {
+							if (!repaintPending) break;
+							repaintPending = false;
+							int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
+							repaintX = repaintY = repaintW = repaintH = -1;
+							internalRepaint(x, y, w, h);
+						}
 						Displayable._fpsLimiter();
 						break;
 					}
