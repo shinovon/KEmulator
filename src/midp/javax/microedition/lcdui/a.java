@@ -28,27 +28,27 @@ final class a {
 	protected final void method211(final Graphics graphics, final boolean b, int y) {
 		graphics.setColor(-16777216);
 		final boolean b2 = this.choice.choiceType == Choice.POPUP;
-		int anInt28 = 0;
-		int anInt29 = 0;
-		if (b2) {
-			anInt28 = y;
-			anInt29 = this.choice.popupY;
-		} else {
-			anInt28 = y;
-			anInt29 = this.bounds[1];
-		}
-		int n = anInt28 + anInt29;
-		final int n2 = this.bounds[0] + 4;
+		int anInt28 = y;
+		int anInt29 = b2 ? choice.popupY : bounds[1];
+		int yo = anInt28 + anInt29;
+		final int x = this.bounds[0] + 4;
 		if (b) {
-			emulator.lcdui.a.method178(graphics, this.bounds[0] + 1, n - 2, this.bounds[2] - 2, this.bounds[3]);
+			emulator.lcdui.a.method178(graphics, this.bounds[0] + 1, yo - 2, this.bounds[2] - 2, this.bounds[3]);
 		}
-		emulator.lcdui.a.method180(graphics, n2, n + 3, this.sel, this.choice.choiceType);
+		emulator.lcdui.a.method180(graphics, x, yo + 3, this.sel, this.choice.choiceType);
 		final Font font = (this.font != null) ? this.font : Screen.font;
 		graphics.setFont(font);
+		if (image != null) {
+			graphics.drawRegion(image, 0, 0,
+					Math.min(image.getWidth(), 16), Math.min(image.getHeight(), 16), 0,
+					x + 16, yo + 2, 0);
+		}
 		if (this.str != null)
 			for (int i = 0; i < this.str.length; ++i) {
-				graphics.drawString(this.str[i], ((i == 0 && this.choice.choiceType != 3) ? (n2 + 10) : n2) + 4, n, 0);
-				n += font.getHeight() + 4;
+				graphics.drawString(this.str[i],
+						((i == 0 && this.choice.choiceType != 3) ? (x + 10) : x) + 4
+								+ (i == 0 && image != null ? 20 : 0), yo, 0);
+				yo += font.getHeight() + 4;
 			}
 	}
 
@@ -56,8 +56,8 @@ final class a {
 		this.bounds[0] = 0;
 		this.bounds[1] = 0;
 		this.bounds[2] = this.choice.bounds[2];
-		final int n2;
-		final int n = (n2 = this.choice.getPreferredWidth() - 8) - 12;
+		final int n2 = this.choice.getPreferredWidth() - 8;
+		final int n = n2 - 12 - (image != null ? 20 : 0);
 		final Font font = (this.font != null) ? this.font : Screen.font;
 		this.str = c.textArr(this.string, font, n, n2);
 		this.bounds[3] = (font.getHeight() + 4) * this.str.length;
