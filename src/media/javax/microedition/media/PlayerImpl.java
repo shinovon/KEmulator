@@ -567,6 +567,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			throw new IllegalStateException();
 		}
 		boolean midi = sequence instanceof Sequence;
+		if (state == UNREALIZED) {
+			realize();
+		}
 		if (state < PREFETCHED && midi) {
 			prefetch();
 		}
