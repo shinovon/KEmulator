@@ -587,6 +587,6 @@ public class Form extends Screen {
 	}
 
 	public int _repaintInterval() {
-		return hasGauges ? 500 : -1;
+		return hasGauges || ticker != null ? 500 : -1;
 	}
 }

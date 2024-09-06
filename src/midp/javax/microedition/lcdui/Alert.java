@@ -117,7 +117,7 @@ public class Alert extends Screen {
 	}
 
 	public int _repaintInterval() {
-		return gauge != null || timeout >= 0 ? 500 : -1;
+		return gauge != null || timeout >= 0 || ticker != null ? 500 : -1;
 	}
 
 	static {
