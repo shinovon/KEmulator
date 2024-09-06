@@ -119,7 +119,7 @@ public abstract class Item {
 		}
 	}
 
-	protected void itemApplyCommand() {
+	protected void _itemApplyCommand() {
 		if (this.itemCommandListener != null && this.defaultCommand != null) {
 			Emulator.getEventQueue().commandAction(defaultCommand, this);
 		}

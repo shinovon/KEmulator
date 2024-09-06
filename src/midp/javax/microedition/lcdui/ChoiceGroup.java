@@ -212,8 +212,8 @@ public class ChoiceGroup
 		return this.items.size();
 	}
 
-	protected void itemApplyCommand() {
-		super.itemApplyCommand();
+	protected void _itemApplyCommand() {
+		super._itemApplyCommand();
 		if (this.aBoolean541 && this.aCommand540 != null) {
 			if (screen.cmdListener != null)
 				this.screen.cmdListener.commandAction(this.aCommand540, this.screen);

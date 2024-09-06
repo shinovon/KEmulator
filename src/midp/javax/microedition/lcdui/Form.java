@@ -16,6 +16,7 @@ public class Form extends Screen {
 	private Item scrollTargetItem;
 	private int lastScrollDirection;
 	private int currentDir;
+	private boolean pointerGrabbed;
 
 	public Form(final String s) {
 		this(s, null);
@@ -232,6 +233,7 @@ public class Form extends Screen {
 
 	public boolean _invokePointerPressed(final int x, int y) {
 		if (super._invokePointerPressed(x, y)) return true;
+		pointerGrabbed = true;
 		int[] r = new int[2];
 		Item item = _getItemAt(x, y, r);
 		if (item.isFocusable()) {
@@ -240,6 +242,27 @@ public class Form extends Screen {
 			repaintScreen();
 		}
 		return false;
+	}
+
+	public void _invokePointerDragged(int x, int y) {
+		if (!pointerGrabbed) return;
+		int[] r = new int[2];
+		Item item = _getItemAt(x, y, r);
+		if (focusedItem == item && item instanceof CustomItem) {
+			((CustomItem) focusedItem).pointerDragged(r[0], r[1]);
+			repaintScreen();
+		}
+	}
+
+	public void _invokePointerReleased(int x, int y) {
+		if (!pointerGrabbed) return;
+		pointerGrabbed = false;
+		int[] r = new int[2];
+		Item item = _getItemAt(x, y, r);
+		if (focusedItem == item && item instanceof CustomItem) {
+			((CustomItem) focusedItem).pointerReleased(r[0], r[1]);
+			repaintScreen();
+		}
 	}
 
 	public Item _getItemAt(int x, int y, int[] transformed) {

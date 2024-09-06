@@ -11,7 +11,7 @@ public abstract class Screen extends Displayable {
 	static final int fontHeight;
 	static final int fontHeight4;
 	final Vector items;
-	private long lastPressTime;
+//	private long lastPressTime;
 	int scroll;
 
 	Screen() {
@@ -26,23 +26,34 @@ public abstract class Screen extends Displayable {
 
 	public void _invokeKeyPressed(final int n) {
 		if (swtContent != null) return;
-		final long currentTimeMillis;
-		if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
-			return;
-		}
-		this.lastPressTime = currentTimeMillis;
-		if (focusedItem != null && n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)) {
-			focusedItem.itemApplyCommand();
-			return;
-		}
+//		final long currentTimeMillis;
+//		if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
+//			return;
+//		}
+//		this.lastPressTime = currentTimeMillis;
 		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
 			_keyScroll(Canvas.UP, false);
-		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
+			return;
+		}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
 			_keyScroll(Canvas.DOWN, false);
-		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
+			return;
+		}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
 			_keyScroll(Canvas.LEFT, false);
-		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
+			return;
+		}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
 			_keyScroll(Canvas.RIGHT, false);
+			return;
+		}
+		if (focusedItem != null && focusedItem instanceof CustomItem) {
+			((CustomItem) focusedItem).keyPressed(n);
+			return;
+		}
+		if (focusedItem != null && n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)) {
+			focusedItem._itemApplyCommand();
+			return;
 		}
 	}
 
@@ -50,12 +61,23 @@ public abstract class Screen extends Displayable {
 		if (swtContent != null) return;
 		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
 			_keyScroll(Canvas.UP, true);
-		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
+			return;
+		}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)) {
 			_keyScroll(Canvas.DOWN, true);
-		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
+			return;
+		}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)) {
 			_keyScroll(Canvas.LEFT, true);
-		} else if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
+			return;
+		}
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
 			_keyScroll(Canvas.RIGHT, true);
+			return;
+		}
+		if (focusedItem != null && focusedItem instanceof CustomItem) {
+			((CustomItem) focusedItem).keyRepeated(n);
+			return;
 		}
 	}
 
@@ -63,6 +85,16 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void _invokeKeyReleased(final int n) {
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)
+				|| n == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)
+				|| n == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)
+				|| n == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT)) {
+			return;
+		}
+		if (focusedItem != null && focusedItem instanceof CustomItem) {
+			((CustomItem) focusedItem).keyReleased(n);
+			return;
+		}
 	}
 
 	public boolean _invokePointerPressed(final int x, final int y) {

@@ -25,7 +25,7 @@ public abstract class CustomItem extends Item {
 	}
 
 	public int getGameAction(final int n) {
-		int n2 = 0;
+		int n2 = n;
 		switch (n) {
 			case 49: {
 				n2 = 9;
@@ -106,6 +106,10 @@ public abstract class CustomItem extends Item {
 	}
 
 	protected void keyPressed(final int n) {
+		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.FIRE)
+				&& itemCommandListener != null && defaultCommand != null) {
+			Emulator.getEventQueue().commandAction(defaultCommand, this);
+		}
 	}
 
 	protected void keyReleased(final int n) {
@@ -176,6 +180,7 @@ public abstract class CustomItem extends Item {
 	}
 
 	protected void layout(Row row) {
+
 		super.layout(row);
 		int n = 0;
 		int w = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
