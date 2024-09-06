@@ -234,11 +234,11 @@ public class Form extends Screen {
 
 	public boolean _invokePointerPressed(final int x, int y) {
 		if (super._invokePointerPressed(x, y)) return true;
-		pointerGrabbed = true;
 		int[] r = new int[2];
 		Item item = _getItemAt(x, y, r);
 		if (item.isFocusable()) {
 			focusItem(item);
+			pointerGrabbed = true;
 			focusedItem.pointerPressed(r[0], r[1]);
 			repaintScreen();
 		}
@@ -251,7 +251,6 @@ public class Form extends Screen {
 		Item item = _getItemAt(x, y, r);
 		if (focusedItem == item && item instanceof CustomItem) {
 			((CustomItem) focusedItem).pointerDragged(r[0], r[1]);
-			repaintScreen();
 		}
 	}
 
