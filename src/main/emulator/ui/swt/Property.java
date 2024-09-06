@@ -41,7 +41,6 @@ public final class Property implements IProperty, SelectionListener {
 			{"Advanced Media (JSR 234)", "javax.microedition.amms"},
 			{"OpenGL ES (JSR 239)", "javax.microedition.khronos"},
 			{"Sensor (JSR 256)", "javax.microedition.sensor"},
-			{"GameCanvas (MIDP 2.0)", "javax.microedition.lcdui.game"},
 
 			// вендоры
 			{"Nokia", "com.nokia.mid"},
@@ -79,6 +78,15 @@ public final class Property implements IProperty, SelectionListener {
 			{"KEmulator Rich Presence", "ru.nnproject.kemulator.rpc"},
 			{"KEmulator Window API", "ru.nnproject.kemulator.windowapi"},
 			{"KEmulator", "kemulator"}, // проприетарные пропы по типу kemulator.version
+
+			// отдельное
+
+			{"CustomItem (MIDP 2.0)", "javax.microedition.lcdui.CustomItem"},
+			{"Spacer (MIDP 2.0)", "javax.microedition.lcdui.Spacer"},
+			{"Game (MIDP 2.0)", "javax.microedition.lcdui.game"},
+
+			{"Float (CLDC 1.1)", "java.lang.Float"},
+			{"Double (CLDC 1.1)", "java.lang.Double"},
 	};
 
 	public static final String[][] PERMISSIONS = {
@@ -290,9 +298,9 @@ public final class Property implements IProperty, SelectionListener {
 	private Button vmsCheck;
 	//    private Button reopenMidiCheck;
 	private Button globalMidiCheck;
-	private Button ignoreRegionRepaintCheck;
+//	private Button ignoreRegionRepaintCheck;
 	private Button fpsCounterCheck;
-	private Button serialCallsCheck;
+//	private Button serialCallsCheck;
 	private Button keyPressOnRepeatCheck;
 	private Button antiAliasTextBtn;
 	private Composite disableApiComp;
@@ -310,8 +318,9 @@ public final class Property implements IProperty, SelectionListener {
 	private Button securityCheck;
 	private Composite securityContent;
 	private Tree rmsTree;
-	private Button forceServicePaintCheck;
+//	private Button forceServicePaintCheck;
 	private Composite langComposite;
+	private Button pointerEventsCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -537,6 +546,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaints", "true"));
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
+			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -763,6 +773,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
+			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -978,12 +989,13 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.searchVms = vmsCheck.getSelection();
 //        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 		Settings.oneMidiAtTime = globalMidiCheck.getSelection();
-		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
-		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
+//		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
+//		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
-		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
+//		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
+		Settings.hasPointerEvents = pointerEventsCheck.getSelection();
 
 		String sysProps = propsText.getText();
 		Settings.systemProperties.clear();
@@ -1834,16 +1846,16 @@ public final class Property implements IProperty, SelectionListener {
 		this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
 		softkeyMotFixCheck.setToolTipText("Compatibility tweak for certain Motorola Triplets games");
 
-		ignoreRegionRepaintCheck = new Button(coreApiGroup, SWT.CHECK);
-		ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
-		ignoreRegionRepaintCheck.setLayoutData(gridData);
-		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
-		ignoreRegionRepaintCheck.setToolTipText("Compatibility tweak for Opera Mini (breaks Fantasy Zone: Part 1)");
+//		ignoreRegionRepaintCheck = new Button(coreApiGroup, SWT.CHECK);
+//		ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
+//		ignoreRegionRepaintCheck.setLayoutData(gridData);
+//		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
+//		ignoreRegionRepaintCheck.setToolTipText("Compatibility tweak for Opera Mini (breaks Fantasy Zone: Part 1)");
 
-		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
-		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
-		serialCallsCheck.setLayoutData(gridData);
-		serialCallsCheck.setSelection(Settings.processSerialCallsOutOfQueue);
+//		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
+//		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
+//		serialCallsCheck.setLayoutData(gridData);
+//		serialCallsCheck.setSelection(Settings.processSerialCallsOutOfQueue);
 
 		keyPressOnRepeatCheck = new Button(coreApiGroup, SWT.CHECK);
 		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
@@ -1851,11 +1863,16 @@ public final class Property implements IProperty, SelectionListener {
 		keyPressOnRepeatCheck.setSelection(Settings.keyPressOnRepeat);
 		keyPressOnRepeatCheck.setToolTipText("Compatibility tweak for The Elder Scrolls: Oblivion");
 
-		forceServicePaintCheck = new Button(coreApiGroup, SWT.CHECK);
-		forceServicePaintCheck.setText(UILocale.get("OPTION_COREAPI_FORCE_SERVICE_REPAINTS", "Force paint on serviceRepaints()"));
-		forceServicePaintCheck.setLayoutData(gridData);
-		forceServicePaintCheck.setSelection(Settings.forcePaintOnServiceRepaints);
-		forceServicePaintCheck.setToolTipText("Compatibility tweak for games by SEGA China (breaks other games)");
+//		forceServicePaintCheck = new Button(coreApiGroup, SWT.CHECK);
+//		forceServicePaintCheck.setText(UILocale.get("OPTION_COREAPI_FORCE_SERVICE_REPAINTS", "Force paint on serviceRepaints()"));
+//		forceServicePaintCheck.setLayoutData(gridData);
+//		forceServicePaintCheck.setSelection(Settings.forcePaintOnServiceRepaints);
+//		forceServicePaintCheck.setToolTipText("Compatibility tweak for games by SEGA China (breaks other games)");
+
+		pointerEventsCheck = new Button(coreApiGroup, SWT.CHECK);
+		pointerEventsCheck.setText(UILocale.get("OPTION_COREAPI_POINTER_EVENTS", "Canvas.hasPointerEvents() return value"));
+		pointerEventsCheck.setLayoutData(gridData);
+		pointerEventsCheck.setSelection(Settings.hasPointerEvents);
 	}
 
 	private void setupDisableApiComp() {
@@ -2551,15 +2568,32 @@ public final class Property implements IProperty, SelectionListener {
 		if (!(file = new File(s)).exists() || !file.isDirectory()) {
 			file.mkdirs();
 		}
-		final String string = s + "/" + this.method355();
-		final File file2;
-		if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
-			file2.mkdirs();
-		}
-		return string + "/";
+//		final String string = s + "/" + this.method355();
+//		final File file2;
+//		if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
+//			file2.mkdirs();
+//		}
+		return s + "/";
 	}
 
 	private void method428() {
+		if (rmsTree != null) {
+			rmsTree.removeAll();
+			String rootPath = method374();
+			String[] list = new File(rootPath).list();
+			if (list != null) {
+				for (String s : list) {
+					String l = decodeBase64(s);
+					if (l == null) continue;
+					TreeItem t = new TreeItem(rmsTree, SWT.NONE);
+					t.setData("m" + s);
+					t.setText(l);
+
+					new TreeItem(t, SWT.NONE);
+				}
+			}
+			return;
+		}
 		aTable665.removeAll();
 		String[] rms = RecordStore.listRecordStores();
 		if (rms == null) return;

@@ -24,7 +24,7 @@ public class ImageItem extends Item {
 			throw new IllegalArgumentException();
 		}
 		this.image = anImage427;
-		super.layout = anInt178;
+		layout = anInt178;
 		this.altText = aString25;
 		this.appearanceMode = anInt179;
 	}
@@ -35,6 +35,7 @@ public class ImageItem extends Item {
 
 	public void setImage(final Image anImage427) {
 		this.image = anImage427;
+		layoutForm();
 	}
 
 	public String getAltText() {
@@ -57,49 +58,68 @@ public class ImageItem extends Item {
 		return this.appearanceMode;
 	}
 
-	protected void paint(final Graphics graphics) {
-		super.paint(graphics);
-		final int x = super.bounds[X] + 2;
-		int y = super.bounds[Y] + 2;
-		if (super.labelArr != null && super.labelArr.length > 0) {
-			graphics.setFont(Item.font);
-			for (String s : super.labelArr) {
-				graphics.drawString(s, super.bounds[X] + 4, y + 2, 0);
-				y += Item.font.getHeight() + 4;
+	protected void paint(final Graphics g, int x, int y, int w, int h) {
+		super.paint(g, x, y, w, h);
+		int yo = y;
+		if (labelArr != null && labelArr.length > 0) {
+			g.setFont(Item.font);
+			for (String s : labelArr) {
+				g.drawString(s, x + (w - Item.font.stringWidth(s)) / 2, yo + 2, 0);
+				yo += Item.font.getHeight() + 4;
 			}
 		}
-		if (image != null) graphics.drawImage(this.image, x, y, 0);
+		if (appearanceMode == BUTTON) {
+			int o = g.getColor();
+			g.setColor(0xababab);
+			int lx = x + w - 1;
+			int ly = y + h - 3;
+			g.drawLine(x + 1, ly, lx, ly);
+			g.drawLine(lx, ly, lx, y + 1);
+			g.setColor(o);
+			g.drawRect(x, y, w, h - 2);
+		}
+		if (image != null) {
+			int iw = Math.min(w, image.getWidth());
+			// clip image
+			g.drawRegion(image, 0, 0,
+					iw, Math.min(h-yo+y, image.getHeight()), 0,
+					x + (w - iw) / 2, yo, 0);
+		}
 	}
 
-	protected void layout() {
-		super.layout();
+	protected void layout(Row row) {
+		super.layout(row);
 		int n = 0;
-		final int n2 = this.getPreferredWidth() - 8;
+		int w = row.getAvailableWidth(screen.bounds[W]);
 		int[] tw = new int[1];
-		if (super.label != null) {
-			super.labelArr = c.textArr(super.label, Item.font, n2, n2, tw);
-			n = 0 + (Item.font.getHeight() + 4) * super.labelArr.length;
+		if (hasLabel()) {
+			labelArr = c.textArr(label, Item.font, w, w, tw);
+			n = (Item.font.getHeight() + 4) * labelArr.length;
 		} else {
-			super.labelArr = null;
+			labelArr = null;
 		}
 		int iw = 0;
-		if (this.image != null) {
+		if (image != null) {
 			iw = image.getWidth();
-			n += this.image.getHeight() + 4;
+			n += image.getHeight() + 4;
 		}
 		width = Math.max(iw + 2, tw[0] + 5);
-		super.bounds[H] = Math.min(n, super.screen.bounds[H]);
+		bounds[H] = Math.min(n, screen.bounds[H]);
 	}
 
-	protected int getItemWidth() {
-		return width;
+	public int getPreferredWidth() {
+		return width + 2;
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return !isLayoutExpand() && !isLayoutCenter();
+	public int getMinimumWidth() {
+		return getPreferredWidth();
 	}
 
-	protected boolean isFullWidthItem() {
-		return isLayoutExpand();
+	public int getMinimumHeight() {
+		return bounds[H];
+	}
+
+	boolean isFocusable() {
+		return (commands.size() > 0 || appearanceMode == BUTTON) && (image != null || hasLabel());
 	}
 }

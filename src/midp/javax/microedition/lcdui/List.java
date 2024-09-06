@@ -48,8 +48,8 @@ public class List extends Screen implements Choice {
 
 
 
-	protected Composite constructSwtContent(int style) {
-		Composite c = super.constructSwtContent(style);
+	protected Composite _constructSwtContent(int style) {
+		Composite c = super._constructSwtContent(style);
 		swtTable = new Table(c, getStyle(type));
 		return c;
 	}
@@ -307,10 +307,10 @@ public class List extends Screen implements Choice {
 		return choiceImpl.size();
 	}
 
-	protected void drawScrollBar(final Graphics graphics) {
+	protected void _drawScrollBar(final Graphics graphics) {
 	}
 
-	protected void paint(Graphics graphics) {
+	protected void _paint(Graphics graphics) {
 	}
 
 	protected void layout() {
@@ -354,9 +354,15 @@ public class List extends Screen implements Choice {
 		if(type == IMPLICIT || type == EXCLUSIVE)
 		{
 			int sel = choiceImpl.getSelectedIndex();
+			if (sel == -1 && choiceImpl.size() > 0) {
+				sel = 0;
+			}
 			if((sel == 0) || (swtTable.getSelectionIndex() != sel))
 			{
 				swtTable.setSelection(sel);
+			}
+			if (isShown()) {
+				swtTable.setFocus();
 			}
 		}
 		else
@@ -438,7 +444,7 @@ public class List extends Screen implements Choice {
 			{
 				if(size() > 0)
 				{
-					callCommandAction(selectCommand);
+					_callCommandAction(selectCommand);
 				}
 			}
 		}
@@ -460,18 +466,22 @@ public class List extends Screen implements Choice {
 
 	}
 
-	public void swtShown() {
-		super.swtShown();
+	public void _swtShown() {
+		super._swtShown();
 		swtTable.addSelectionListener(swtTableListener);
+		swtTable.addKeyListener(swtKeyListener);
+		updateSelection();
 	}
 
-	public void swtHidden() {
-		super.swtHidden();
+	public void _swtHidden() {
+		super._swtHidden();
+		if (swtTable == null || swtTable.isDisposed()) return;
 		swtTable.removeSelectionListener(swtTableListener);
+		swtTable.removeKeyListener(swtKeyListener);
 	}
 
-	public void swtResized(int w, int h) {
-		super.swtResized(w, h);
+	public void _swtResized(int w, int h) {
+		super._swtResized(w, h);
 		swtTable.setBounds(swtContent.getClientArea());
 	}
 }

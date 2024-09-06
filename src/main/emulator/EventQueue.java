@@ -20,24 +20,25 @@ public final class EventQueue implements Runnable {
 	public static final int EVENT_PAUSE = 16;
 	public static final int EVENT_RESUME = 17;
 	public static final int EVENT_INPUT = 18;
+	public static final int EVENT_COMMAND = 19;
+	public static final int EVENT_ITEM_STATE = 20;
 
 	private int[] events;
 	private int count;
 	boolean running;
-	private final Vector serialEvents = new Vector();
+	private final Vector eventArguments = new Vector();
 	private final Thread eventThread;
 	private boolean paused;
 	private final InputThread input = new InputThread();
 	private final Thread inputThread;
-	private final int[] repaintRegion = new int[4];
 	private final Object lock = new Object();
 	private final Object repaintLock = new Object();
-	private boolean repainted;
 	private boolean alive;
 	private int[][] inputs;
 	private int inputsCount;
-	private boolean screen;
 	private final Object eventLock = new Object();
+	private boolean repaintPending;
+	private int repaintX, repaintY, repaintW, repaintH;
 
 	public EventQueue() {
 		events = new int[128];
@@ -94,36 +95,17 @@ public final class EventQueue implements Runnable {
 		} else input.queue(2, n, 0, true);
 	}
 
-	private static int method718(int n) {
-		if (n < 0) {
-			return (-n & 0xFFF) | 0x8000;
-		}
-		return n & 0xFFF;
-	}
-
-	private int method719(int i, int n, boolean b) {
-		int n2 = n & 0xFFF;
-		if (!b) {
-			return n2;
-		}
-		if ((i & 0x8000) != 0x0) {
-			return -n2;
-		}
-		return n2;
-	}
-
 	public void mouseDown(int x, int y) {
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {0, x, y, 0});
 		} else try {
-			if (Emulator.getCurrentDisplay().getCurrent() == null) {
+			Displayable d = getCurrent();
+			if (d == null) return;
+			if (d instanceof Canvas) {
+				((Canvas) d).invokePointerPressed(x, y);
 				return;
 			}
-			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokePointerPressed(x, y);
-				return;
-			}
-			Emulator.getScreen().invokePointerPressed(x, y);
+			((Screen) d)._invokePointerPressed(x, y);
 		} catch (Throwable ignored) {}
 	}
 
@@ -131,14 +113,13 @@ public final class EventQueue implements Runnable {
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {1, x, y, 0});
 		} else try {
-			if (Emulator.getCurrentDisplay().getCurrent() == null) {
+			Displayable d = getCurrent();
+			if (d == null) return;
+			if (d instanceof Canvas) {
+				((Canvas) d).invokePointerReleased(x, y);
 				return;
 			}
-			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokePointerReleased(x, y);
-				return;
-			}
-			Emulator.getScreen().invokePointerReleased(x, y);
+			((Screen) d)._invokePointerReleased(x, y);
 		} catch (Throwable ignored) {}
 	}
 
@@ -146,20 +127,18 @@ public final class EventQueue implements Runnable {
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {2, x, y, 0});
 		} else try {
-			if (Emulator.getCurrentDisplay().getCurrent() == null) {
+			Displayable d = getCurrent();
+			if (d == null) return;
+			if (d instanceof Canvas) {
+				((Canvas) d).invokePointerDragged(x, y);
 				return;
 			}
-			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokePointerDragged(x, y);
-				return;
-			}
-			Emulator.getScreen().invokePointerDragged(x, y);
+			((Screen) d)._invokePointerDragged(x, y);
 		} catch (Throwable ignored) {}
 	}
 
-	public void queue(int n, int x, int y) {
-		int n4 = n | method718(x) | method718(y) << 12;
-		queue(n4);
+	public void sizeChanged(int x, int y) {
+		queue(Integer.MIN_VALUE | (x & 0xFFF) | (y & 0xFFF) << 12);
 	}
 
 	private void queueInput(int[] o) {
@@ -174,24 +153,16 @@ public final class EventQueue implements Runnable {
 
 	public synchronized void queue(int n) {
 		if (n == EVENT_PAINT) {
-			if (events[0] == 1 && !repainted)
+			if (repaintPending)
 				return;
-			repainted = false;
-		}
-		if (n == EVENT_SCREEN) {
-			if (screen) {
-				return;
-			}
-			screen = true;
+			repaintPending = true;
 		}
 		if (n == EVENT_SHOW || n == EVENT_RESUME) {
 			paused = false;
 		}
-		synchronized (this) {
-			events[count++] = n;
-			if (count >= events.length) {
-				System.arraycopy(events, 0, events = new int[events.length * 2], 0, count);
-			}
+		events[count++] = n;
+		if (count >= events.length) {
+			System.arraycopy(events, 0, events = new int[events.length * 2], 0, count);
 		}
 		synchronized (eventLock) {
 			eventLock.notify();
@@ -200,29 +171,66 @@ public final class EventQueue implements Runnable {
 
 	private synchronized int nextEvent() {
 		if (count == 0) return 0;
-		synchronized (this) {
-			int n = events[0];
-			System.arraycopy(events, 1, events, 0, events.length - 1);
-			count--;
-			return n;
+		int n = events[0];
+		System.arraycopy(events, 1, events, 0, events.length - 1);
+		count--;
+		return n;
+	}
+
+	private Object nextArgument() {
+		Object a = null;
+		synchronized (eventArguments) {
+			if (!eventArguments.isEmpty()) {
+				a = eventArguments.remove(0);
+			}
 		}
+		return a;
 	}
 
 	public void queueRepaint() {
-		repaintRegion[0] = repaintRegion[1] = repaintRegion[2] = repaintRegion[3] = -1;
+		repaintX = repaintY = repaintW = repaintH = -1;
 		queue(EVENT_PAINT);
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
-		if (Settings.ignoreRegionRepaint) {
-			repaintRegion[0] = repaintRegion[1] = repaintRegion[2] = repaintRegion[3] = -1;
-		} else {
-			repaintRegion[0] = x;
-			repaintRegion[1] = y;
-			repaintRegion[2] = w;
-			repaintRegion[3] = h;
+		int x1 = x,
+			y1 = y,
+			x2 = x + w,
+			y2 = y + h;
+		Displayable d = getCurrent();
+		int sw = d.getWidth(), sh = d.getHeight();
+		if (repaintX != -1) {
+			x1 = Math.min(repaintX, x1);
+			y1 = Math.min(repaintY, y1);
+			x2 = Math.max(repaintX + repaintW, x2);
+			y2 = Math.max(repaintY + repaintH, y2);
 		}
+		if (x1 < 0) x1 = 0;
+		if (y1 < 0) y1 = 0;
+		if (x2 > sw) x2 = sw;
+		if (y2 > sh) y2 = sh;
+		repaintX = x1;
+		repaintY = y1;
+		repaintW = x2 - x1;
+		repaintH = y2 - y1;
 		queue(EVENT_PAINT);
+	}
+
+	public void itemStateChanged(Item item) {
+		eventArguments.add(item);
+		queue(EVENT_ITEM_STATE);
+	}
+
+	public void commandAction(Command command, Item item) {
+		eventArguments.add(command);
+		eventArguments.add(item);
+		queue(EVENT_COMMAND);
+	}
+
+	public void commandAction(Command command, Displayable d) {
+		eventArguments.add(command);
+		eventArguments.add(d);
+		queue(EVENT_COMMAND);
 	}
 
 	public void gameGraphicsFlush() {
@@ -249,31 +257,25 @@ public final class EventQueue implements Runnable {
 
 	public void serviceRepaints() {
 		if (Settings.ignoreServiceRepaints) return;
-		Thread t = Thread.currentThread();
+//		Thread t = Thread.currentThread();
+//		// Sonic 2 Dash StackOverflowError fix
+//		StackTraceElement[] st = t.getStackTrace();
+//		for (int i = 1; i < st.length; i++) {
+//			if ("invokePaint".equals(st[i].getMethodName())) return;
+//		}
 
-		// Sonic 2 Dash StackOverflowError fix
-		StackTraceElement[] st = t.getStackTrace();
-		for (int i = 1; i < st.length; i++) {
-			if ("invokePaint".equals(st[i].getMethodName())) return;
+		synchronized (lock) {
+			if (!repaintPending) return;
+			repaintPending = false;
+			int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
+			repaintX = repaintY = repaintW = repaintH = -1;
+			internalRepaint(x, y, w, h);
 		}
-
-		if (t == eventThread || t == inputThread || Settings.forcePaintOnServiceRepaints) {
-			synchronized (lock) {
-				internalRepaint();
-			}
-			Displayable.fpsLimiter();
-			return;
-		}
-		if (repainted) return;
-		try {
-			synchronized (repaintLock) {
-				repaintLock.wait();
-			}
-		} catch (Exception ignored) {}
+		Displayable._fpsLimiter();
 	}
 
 	public void run() {
-		int event;
+		int event = 0;
 		while (running) {
 			alive = true;
 			try {
@@ -284,9 +286,13 @@ public final class EventQueue implements Runnable {
 				switch (event = nextEvent()) {
 					case EVENT_PAINT: {
 						synchronized (lock) {
-							internalRepaint();
+							if (!repaintPending) break;
+							repaintPending = false;
+							int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
+							repaintX = repaintY = repaintW = repaintH = -1;
+							internalRepaint(x, y, w, h);
 						}
-						Displayable.fpsLimiter();
+						Displayable._fpsLimiter();
 						break;
 					}
 					case EVENT_CALL: {
@@ -294,60 +300,40 @@ public final class EventQueue implements Runnable {
 						break;
 					}
 					case EVENT_SCREEN: {
-						if (Emulator.getScreen() == null ||
-								Emulator.getCurrentDisplay().getCurrent() != Emulator.getScreen()) {
-							screen = false;
-							break;
-						}
+						Displayable d = getCurrent();
+						if (!(d instanceof Screen)) break;
 						IScreen scr = Emulator.getEmulator().getScreen();
 						final IImage backBufferImage3 = scr.getBackBufferImage();
 						final IImage xRayScreenImage3 = scr.getXRayScreenImage();
-						Emulator.getScreen().invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
+						((Screen) d)._invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
 						try {
 							(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
 									.cloneImage(scr.getScreenImg());
 						} catch (Exception ignored) {}
 						scr.repaint();
-						try {
-							Thread.sleep(100L);
-						} catch (Exception ignored) {}
-						screen = false;
-						this.queue(EVENT_SCREEN);
 						break;
 					}
 					case EVENT_START: {
-						if (Emulator.getMIDlet() != null) {
-							new Thread(new InvokeStartAppRunnable(this)).start();
-							break;
-						}
+						if (Emulator.getMIDlet() == null) break;
+						new Thread(new InvokeStartAppRunnable(this)).start();
 						break;
 					}
 					case EVENT_EXIT: {
 						this.stop();
-						if (Emulator.getMIDlet() != null) {
-							new Thread(new InvokeDestroyAppRunnable(this)).start();
-							break;
-						}
+						if (Emulator.getMIDlet() == null) break;
+						new Thread(new InvokeDestroyAppRunnable(this)).start();
 						break;
 					}
 					case EVENT_SHOW: {
-						if (Emulator.getCanvas() == null) {
-							break;
-						}
-						if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-							break;
-						}
-						Emulator.getCanvas().invokeShowNotify();
+						Displayable d = getCurrent();
+						if (!(getCurrent() instanceof Canvas)) break;
+						((Canvas) d)._invokeShowNotify();
 						break;
 					}
 					case EVENT_PAUSE: {
-						if (Emulator.getCanvas() == null) {
-							break;
-						}
-						if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-							break;
-						}
-						Emulator.getCanvas().invokeHideNotify();
+						Displayable d = getCurrent();
+						if (!(d instanceof Canvas)) break;
+						((Canvas) d)._invokeHideNotify();
 						this.paused = true;
 						if (Settings.startAppOnResume) {
 							try {
@@ -359,12 +345,8 @@ public final class EventQueue implements Runnable {
 						break;
 					}
 					case EVENT_RESUME: {
-						if (Emulator.getCanvas() == null) {
-							break;
-						}
-						if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-							break;
-						}
+						Displayable d = getCurrent();
+						if (!(d instanceof Canvas)) break;
 						if (Settings.startAppOnResume) {
 							try {
 								Emulator.getMIDlet().invokeStartApp();
@@ -372,21 +354,37 @@ public final class EventQueue implements Runnable {
 								e.printStackTrace();
 							}
 						}
-						Emulator.getCanvas().invokeShowNotify();
+						((Canvas) d)._invokeShowNotify();
 						break;
 					}
 					case EVENT_INPUT: {
 						if (inputsCount <= 0) break;
-						int[] e = null;
+						int[] e;
 						synchronized (this) {
 							e = inputs[0];
 							System.arraycopy(inputs, 1, inputs, 0, inputs.length - 1);
 							inputsCount--;
 						}
-						if (e != null) {
-							synchronized (lock) {
-								processInputEvent(e);
-							}
+						if (e == null) break;
+						synchronized (lock) {
+							processInputEvent(e);
+						}
+						break;
+					}
+					case EVENT_ITEM_STATE: {
+						Item item = (Item) nextArgument();
+						Screen screen = item._getParent();
+						if (!(screen instanceof Form) || screen != getCurrent()) break;
+						((Form) screen)._itemStateChanged(item);
+						break;
+					}
+					case EVENT_COMMAND: {
+						Command cmd = (Command) nextArgument();
+						Object target = nextArgument();
+						if (target instanceof Item) {
+							((Item) target)._callCommandAction(cmd);
+						} else {
+							((Displayable) target)._callCommandAction(cmd);
 						}
 						break;
 					}
@@ -396,69 +394,63 @@ public final class EventQueue implements Runnable {
 						}
 						break;
 					default:
-						if ((event & Integer.MIN_VALUE) != 0x0) {
-							if (Emulator.getCanvas() == null) {
-								if (Emulator.getScreen() != null)
-									Emulator.getScreen().invokeSizeChanged(this.method719(event, event, false), this
-											.method719(event, event >> 12, false));
-								break;
-							}
-							if (Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
-								break;
-							}
-							Emulator.getCanvas().invokeSizeChanged(this.method719(event, event, false), this
-									.method719(event, event >> 12, false));
-							break;
-						}
+						if ((event & Integer.MIN_VALUE) == 0) break;
+						Displayable d = getCurrent();
+						if (d == null) break;
+						d._invokeSizeChanged(
+								event & 0xFFF,
+								(event >> 12) & 0xFFF);
 						break;
 				}
 				if (Settings.processSerialCallsOutOfQueue)
 					processSerialEvent();
 			} catch (Throwable e) {
 				System.err.println("Exception in Event Thread!");
+				System.err.println("Event: " + event);
 				e.printStackTrace();
 			}
 		}
 	}
+
 	private void processSerialEvent() {
 		Runnable r = null;
-		synchronized (serialEvents) {
-			if (!serialEvents.isEmpty()) {
-				r = ((Runnable) serialEvents.remove(0));
+		synchronized (eventArguments) {
+			if (!eventArguments.isEmpty()) {
+				r = ((Runnable) eventArguments.remove(0));
 			}
 		}
-		if (r != null) {
-			synchronized (lock) {
-				r.run();
-			}
+		if (r == null) return;
+		synchronized (lock) {
+			r.run();
 		}
 	}
 
 	public void callSerially(Runnable run) {
-		synchronized (serialEvents) {
-			serialEvents.add(run);
+		synchronized (eventArguments) {
+			eventArguments.add(run);
 		}
 		if (!Settings.processSerialCallsOutOfQueue)
         	queue(EVENT_CALL);
 	}
 
-	private void internalRepaint() {
+	private void internalRepaint(int x, int y, int w, int h) {
+		repaintPending = false;
 		try {
 			Canvas canvas = Emulator.getCanvas();
 			if (canvas == null
 					|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 				return;
 			}
-			if (Settings.xrayView) Displayable.resetXRayGraphics();
+			if (Settings.xrayView) Displayable._resetXRayGraphics();
 			IScreen scr = Emulator.getEmulator().getScreen();
 			final IImage backBufferImage = scr.getBackBufferImage();
 			final IImage xRayScreenImage = scr.getXRayScreenImage();
-			Displayable.checkForSteps(lock);
+			Displayable._checkForSteps(lock);
 			try {
-				if (repaintRegion[0] == -1) { // full repaint
-					canvas.invokePaint(backBufferImage, xRayScreenImage);
+				if (x == -1) { // full repaint
+					canvas._invokePaint(backBufferImage, xRayScreenImage);
 				} else {
-					canvas.invokePaint(backBufferImage, xRayScreenImage, repaintRegion[0], repaintRegion[1], repaintRegion[2], repaintRegion[3]);
+					canvas._invokePaint(backBufferImage, xRayScreenImage, x, y, w, h);
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -481,12 +473,11 @@ public final class EventQueue implements Runnable {
 				repaintLock.notifyAll();
 			}
 		} catch (Exception ignored) {}
-		repainted = true;
 	}
 
 	void processInputEvent(int[] o) {
 		if (o == null) return;
-		Displayable d = Emulator.getCurrentDisplay().getCurrent();
+		Displayable d = getCurrent();
 		if (d == null) return;
 		boolean canv = d instanceof Canvas;
 		if (o[3] > 0) {
@@ -496,20 +487,20 @@ public final class EventQueue implements Runnable {
 				case 0: {
 					Application.internalKeyPress(n);
 					if (d.handleSoftKeyAction(n, true)) return;
-					if (canv) ((Canvas) d).invokeKeyPressed(n);
-					else ((Screen) d).invokeKeyPressed(n);
+					if (canv) ((Canvas) d)._invokeKeyPressed(n);
+					else ((Screen) d)._invokeKeyPressed(n);
 					break;
 				}
 				case 1: {
 					Application.internalKeyRelease(n);
 					if (d.handleSoftKeyAction(n, false)) return;
-					if (canv) ((Canvas) d).invokeKeyReleased(n);
-					else ((Screen) d).invokeKeyReleased(n);
+					if (canv) ((Canvas) d)._invokeKeyReleased(n);
+					else ((Screen) d)._invokeKeyReleased(n);
 					break;
 				}
 				case 2:
-					if (!canv) return;
-					((Canvas) d).invokeKeyRepeated(n);
+					if (canv) ((Canvas) d)._invokeKeyRepeated(n);
+					else ((Screen) d)._invokeKeyRepeated(n);
 					break;
 			}
 		} else {
@@ -519,18 +510,22 @@ public final class EventQueue implements Runnable {
 			switch (o[0]) {
 				case 0:
 					if (canv) ((Canvas) d).invokePointerPressed(x, y);
-					else ((Screen) d).invokePointerPressed(x, y);
+					else ((Screen) d)._invokePointerPressed(x, y);
 					break;
 				case 1:
 					if (canv) ((Canvas) d).invokePointerReleased(x, y);
-					else ((Screen) d).invokePointerReleased(x, y);
+					else ((Screen) d)._invokePointerReleased(x, y);
 					break;
 				case 2:
 					if (canv) ((Canvas) d).invokePointerDragged(x, y);
-					else ((Screen) d).invokePointerDragged(x, y);
+					else ((Screen) d)._invokePointerDragged(x, y);
 					break;
 			}
 		}
+	}
+
+	private Displayable getCurrent() {
+		return Emulator.getCurrentDisplay().getCurrent();
 	}
 
 	class InputThread implements Runnable {
@@ -580,7 +575,7 @@ public final class EventQueue implements Runnable {
 								}
 							} else processInputEvent(o);
 						} catch (Throwable e) {
-							System.out.println("Exception in Input Thread!");
+							System.err.println("Exception in Input Thread!");
 							e.printStackTrace();
 						}
 						synchronized (this) {
@@ -589,7 +584,7 @@ public final class EventQueue implements Runnable {
 						}
 					}
 				} catch (Throwable e) {
-					System.out.println("Exception in Input Thread!");
+					System.err.println("Exception in Input Thread!");
 					e.printStackTrace();
 				}
 			}

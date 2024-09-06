@@ -21,17 +21,17 @@ public final class Manager {
 
 	public static Player createPlayer(String s)
 			throws IOException, MediaException {
-		return null;
+		return new NativePlayer();
 	}
 
 	public static Player createPlayer(InputStream inputstream, String s)
 			throws IOException, MediaException {
-		return null;
+		return new NativePlayer();
 	}
 
 	public static Player createPlayer(DataSource datasource)
 			throws IOException, MediaException {
-		return null;
+		return new NativePlayer();
 	}
 
 	public static void playTone(int i, int j, int k)

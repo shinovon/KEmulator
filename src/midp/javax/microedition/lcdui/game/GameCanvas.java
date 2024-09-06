@@ -34,26 +34,26 @@ public abstract class GameCanvas extends Canvas {
 
 	public void flushGraphics(final int x, final int y, final int w, final int h) {
 		if (this != Emulator.getCurrentDisplay().getCurrent()) return;
-		Displayable.checkForSteps(null);
-		Displayable.fpsLimiter();
-		paintSoftMenu(graphics == null ? getGraphics() : graphics);
+		Displayable._checkForSteps(null);
+		Displayable._fpsLimiter();
+		_paintSoftMenu(graphics == null ? getGraphics() : graphics);
 		Emulator.getEventQueue().gameGraphicsFlush(x, y, w, h);
-		Displayable.resetXRayGraphics();
+		Displayable._resetXRayGraphics();
 	}
 
 	public void flushGraphics() {
 		if (this != Emulator.getCurrentDisplay().getCurrent()) return;
-		Displayable.checkForSteps(null);
-		Displayable.fpsLimiter();
-		paintSoftMenu(graphics == null ? getGraphics() : graphics);
+		Displayable._checkForSteps(null);
+		Displayable._fpsLimiter();
+		_paintSoftMenu(graphics == null ? getGraphics() : graphics);
 		Emulator.getEventQueue().gameGraphicsFlush();
-		Displayable.resetXRayGraphics();
+		Displayable._resetXRayGraphics();
 	}
 
-	public void invokeSizeChanged(int w, int h) {
+	public void _invokeSizeChanged(int w, int h) {
 		if (graphics != null) {
 			graphics.reset(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
 		}
-		super.invokeSizeChanged(w, h);
+		super._invokeSizeChanged(w, h);
 	}
 }

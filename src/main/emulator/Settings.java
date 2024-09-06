@@ -41,7 +41,7 @@ public final class Settings {
 	public static boolean showLogFrame;
 	public static boolean showInfoFrame;
 	public static boolean showMemViewFrame;
-	public static boolean aBoolean1274 = false;
+	public static boolean blackberryApi = false;
 	public static boolean canvasKeyboard;
 	public static boolean awtAntiAliasing;
 	public static boolean fpsMode;
@@ -97,7 +97,7 @@ public final class Settings {
 	public static boolean ignoreRegionRepaint;
 	public static boolean startAppOnResume = true;
 	public static int micro3d = 1; // 0 - dll, 1 - gl
-	public static boolean processSerialCallsOutOfQueue;
+	public static boolean processSerialCallsOutOfQueue; // Deprecated
 
 	public static boolean enableOTT;
 
@@ -118,4 +118,6 @@ public final class Settings {
 	public static boolean enableSecurity = true;
 	public static boolean ignoreServiceRepaints;
 	public static boolean dontRepaintOnSetCurrent;
+	public static boolean hasPointerEvents = true;
+	public static boolean dontCloseWavClip = false;
 }

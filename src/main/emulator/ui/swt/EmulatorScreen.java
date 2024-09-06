@@ -28,6 +28,8 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Screen;
 
 public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,
@@ -379,7 +381,7 @@ public final class EmulatorScreen implements
 		if (this.pauseState == 1/* && Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()*/) {
 			this.initScreenBuffer(var1, var2);
 			this.zoom(this.zoom);
-			Emulator.getEventQueue().queue(Integer.MIN_VALUE, var1, var2);
+			Emulator.getEventQueue().sizeChanged(var1, var2);
 		}
 	}
 
@@ -551,7 +553,7 @@ public final class EmulatorScreen implements
 	public void setSize(int w, int h) {
 		if (getWidth() != w || getHeight() != h) {
 			initScreenBuffer(w, h);
-			Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
+			Emulator.getEventQueue().sizeChanged(w, h);
 			resized();
 		}
 	}
@@ -1342,7 +1344,7 @@ public final class EmulatorScreen implements
 			} else if (menuItem == resetSizeMenuItem) {
 				if (getWidth() != startWidth || getHeight() != startHeight) {
 					initScreenBuffer(startWidth, startHeight);
-					Emulator.getEventQueue().queue(Integer.MIN_VALUE, startWidth, startHeight);
+					Emulator.getEventQueue().sizeChanged(startWidth, startHeight);
 				}
 				zoomedWidth = startWidth;
 				zoomedHeight = startHeight;
@@ -1468,6 +1470,22 @@ public final class EmulatorScreen implements
 		this.canvas.addControlListener(this);
 		this.canvas.addPaintListener(this);
 		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
+		canvas.addListener(SWT.MenuDetect, new Listener() {
+			public void handleEvent(Event event) {
+				if (lastDisplayable != null && lastDisplayable instanceof Form) {
+					Point p = canvas.toControl(event.x, event.y);
+					int[] t = transformPointer(p.x, p.y);
+					javax.microedition.lcdui.Item item;
+					if (t[0] >= 0 && t[1] >= 0
+							&& (item = ((Form) lastDisplayable)._getItemAt(t[0], t[1], null)) != null
+							&& item.commands.size() > 0) {
+						((Form) lastDisplayable)._showMenu(item, -2, -2);
+						return;
+					}
+				}
+				event.doit = false;
+			}
+		});
 		stackLayout = new StackLayout();
 		canvas.setLayout(stackLayout);
 		this.keysState = new boolean[256];
@@ -1626,7 +1644,7 @@ public final class EmulatorScreen implements
 			public void run() {
 				if (lastDisplayable != null) {
 					if (swtContent != null) swtContent.setVisible(false);
-					lastDisplayable.swtHidden();
+					lastDisplayable._swtHidden();
 					lastDisplayable = null;
 				}
 				if (d == null) {
@@ -1638,7 +1656,7 @@ public final class EmulatorScreen implements
 					stackLayout.topControl = null;
 					swtContent = null;
 				} else {
-					Composite c = d.getSwtContent();
+					Composite c = d._getSwtContent();
 					stackLayout.topControl = c;
 					swtContent = c;
 					if (c != null) {
@@ -1647,7 +1665,7 @@ public final class EmulatorScreen implements
 					}
 				}
 				canvas.layout();
-				lastDisplayable.swtShown();
+				lastDisplayable._swtShown();
 			}
 		});
 	}
@@ -1658,10 +1676,10 @@ public final class EmulatorScreen implements
 		}
 		if (!Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(n, true)) {
 			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokeKeyPressed(n);
+				Emulator.getCanvas()._invokeKeyPressed(n);
 				return;
 			}
-			Emulator.getScreen().invokeKeyPressed(n);
+			Emulator.getScreen()._invokeKeyPressed(n);
 		}
 	}
 
@@ -1671,10 +1689,10 @@ public final class EmulatorScreen implements
 		}
 		if (!Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(n, false)) {
 			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-				Emulator.getCanvas().invokeKeyReleased(n);
+				Emulator.getCanvas()._invokeKeyReleased(n);
 				return;
 			}
-			Emulator.getScreen().invokeKeyReleased(n);
+			Emulator.getScreen()._invokeKeyReleased(n);
 		}
 	}
 
@@ -1715,7 +1733,9 @@ public final class EmulatorScreen implements
 		}
 		n = Integer.parseInt(r);
 		if (pressedKeys.contains(n)) {
-			if (Settings.enableKeyRepeat) {
+			if (Emulator.getCurrentDisplay().getCurrent() instanceof Screen) {
+				Emulator.getEventQueue().keyRepeat(n);
+			} else if (Settings.enableKeyRepeat) {
 				if (Settings.keyPressOnRepeat) {
 					Emulator.getEventQueue().keyPress(n);
 				} else {
@@ -1872,7 +1892,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		try {
-			Emulator.getScreen().invokeKeyPressed(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
+			Emulator.getScreen()._invokeKeyPressed(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1913,7 +1933,7 @@ public final class EmulatorScreen implements
 		return new int[]{x, y};
 	}
 
-	int[] transformCaret(int x, int y) {
+	public int[] transformCaret(int x, int y) {
 		// Map coordinates on window to canvas
 		int w, h;
 		if (rotation % 2 == 1) {
@@ -2188,23 +2208,23 @@ public final class EmulatorScreen implements
 
 	private void mp(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas().invokeKeyPressed(i);
+			Emulator.getCanvas()._invokeKeyPressed(i);
 		} else {
-			Emulator.getScreen().invokeKeyPressed(i);
+			Emulator.getScreen()._invokeKeyPressed(i);
 		}
 	}
 
 	private void mr(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas().invokeKeyReleased(i);
+			Emulator.getCanvas()._invokeKeyReleased(i);
 		} else {
-			Emulator.getScreen().invokeKeyReleased(i);
+			Emulator.getScreen()._invokeKeyReleased(i);
 		}
 	}
 
 	private void mrp(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas().invokeKeyRepeated(i);
+			Emulator.getCanvas()._invokeKeyRepeated(i);
 		}
 	}
 
@@ -2299,7 +2319,7 @@ public final class EmulatorScreen implements
 					int h = (int) ((float) zoomedHeight / zoom);
 					if (pauseState != 0 && (getWidth() != w || getHeight() != h)) {
 						initScreenBuffer(w, h);
-						Emulator.getEventQueue().queue(Integer.MIN_VALUE, w, h);
+						Emulator.getEventQueue().sizeChanged(w, h);
 					}
 				} else if (Settings.resizeMode == 3) {
 					// Integer scaling

@@ -7,14 +7,12 @@ import emulator.media.capture.CapturePlayerImpl;
 import emulator.*;
 import emulator.debug.*;
 import emulator.lcdui.a;
+import emulator.ui.IScreen;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -29,9 +27,8 @@ public class Displayable {
 	String title;
 	Vector commands;
 	boolean menuShown;
-	int anInt28;
 	CommandListener cmdListener;
-	Item selectedItem;
+	Item focusedItem;
 	int w;
 	int h;
 	int[] bounds;
@@ -40,24 +37,26 @@ public class Displayable {
 	private static long lastFrameTime;
 	private static long lastFpsUpdateTime;
 	private static int framesCount;
-	protected boolean nonFullScreen;
-	private static final Object frameLock = new Object();
+	boolean fullScreen;
 	private static final long MILLI_TO_NANO = 1000000L;
 
-	protected Composite swtContent;
+	Composite swtContent;
 	private Rectangle swtContentArea;
 	private boolean swtInitialized;
-	private Menu swtMenu;
-	private SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
+	Menu swtMenu;
+	SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
 	private MenuListener swtMenuListener = new SwtMenuListener();
+	boolean forceUpdateSize;
+	static KeyListener swtKeyListener = new SwtKeyListener();
 
 	public Displayable() {
 		super();
-		this.selectedItem = null;
+		this.focusedItem = null;
 		this.cmdListener = null;
 		this.commands = new Vector();
-		this.w = Emulator.getEmulator().getScreen().getWidth();
-		this.h = Emulator.getEmulator().getScreen().getHeight();
+		IScreen s = Emulator.getEmulator().getScreen();
+		this.w = s.getWidth();
+		this.h = s.getHeight();
 		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
 	}
 
@@ -65,14 +64,14 @@ public class Displayable {
 		if (swtContentArea != null) {
 			return swtContentArea.width;
 		}
-		return this.w;
+		return bounds[W];
 	}
 
 	public int getHeight() {
 		if (swtContentArea != null) {
 			return swtContentArea.height;
 		}
-		return this.h;
+		return bounds[H];
 	}
 
 	public String getTitle() {
@@ -84,17 +83,17 @@ public class Displayable {
 	}
 
 	protected void defocus() {
-		if (this.selectedItem != null) {
-			this.selectedItem.defocus();
-			this.selectedItem = null;
+		if (this.focusedItem != null) {
+			this.focusedItem.defocus();
+			this.focusedItem = null;
 		}
 	}
 
 	protected void setItemCommands(final Item item) {
-		this.selectedItem = item;
-		if (item.itemCommands.size() > 0) {
-			for (int i = 0; i < item.itemCommands.size(); ++i) {
-				this.addCommand((Command) item.itemCommands.get(i));
+		this.focusedItem = item;
+		if (item.commands.size() > 0) {
+			for (int i = 0; i < item.commands.size(); ++i) {
+				this.addCommand((Command) item.commands.get(i));
 			}
 		}
 	}
@@ -103,12 +102,12 @@ public class Displayable {
 		if (item == null) {
 			return;
 		}
-		if (item.itemCommands.size() > 0) {
-			for (int i = 0; i < item.itemCommands.size(); ++i) {
-				this.removeCommand((Command) item.itemCommands.get(i));
+		if (item.commands.size() > 0) {
+			for (int i = 0; i < item.commands.size(); ++i) {
+				this.removeCommand((Command) item.commands.get(i));
 			}
 		}
-		this.selectedItem = null;
+		this.focusedItem = null;
 	}
 
 	protected void updateCommands() {
@@ -153,7 +152,7 @@ public class Displayable {
 		if (this.commands.contains(command)) {
 			this.commands.remove(command);
 			if (Emulator.getCurrentDisplay().getCurrent() == this) {
-				this.updateCommands();
+				updateCommands();
 			}
 		}
 	}
@@ -181,14 +180,13 @@ public class Displayable {
 			if (b && leftSoftCommand != null) {
 				Emulator.getEmulator().getLogStream().println("Left command: " + leftSoftCommand);
 				if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
-					// XXX
-					if (this.cmdListener != null)
-						this.cmdListener.commandAction(leftSoftCommand, this);
-					else ((Alert) this).close();
-				} else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(leftSoftCommand)) {
-					this.selectedItem.itemCommandListener.commandAction(leftSoftCommand, this.selectedItem);
+					if (cmdListener != null) {
+						Emulator.getEventQueue().commandAction(leftSoftCommand, this);
+					} else ((Alert) this).close();
+				} else if (this.focusedItem != null && this.focusedItem.commands.contains(leftSoftCommand)) {
+					Emulator.getEventQueue().commandAction(leftSoftCommand, this.focusedItem);
 				} else if (this.cmdListener != null) {
-					this.cmdListener.commandAction(leftSoftCommand, this);
+					Emulator.getEventQueue().commandAction(leftSoftCommand, this);
 				}
 			}
 			return !Settings.motorolaSoftKeyFix;
@@ -200,15 +198,14 @@ public class Displayable {
 					if (swtMenu != null) {
 						hideSwtMenu();
 					} else {
-						this.refreshSoftMenu();
+						this.repaintScreen();
 					}
 				} else if (b) {
 					this.menuShown = true;
-					this.anInt28 = 0;
 					if (swtMenu != null) {
-						showSwtMenu();
+						showSwtMenu(false, -1, -1);
 					} else {
-						this.refreshSoftMenu();
+						repaintScreen();
 					}
 				}
 			} else {
@@ -216,14 +213,13 @@ public class Displayable {
 				if (b && rightSoftCommand != null) {
 					Emulator.getEmulator().getLogStream().println("Right command: " + rightSoftCommand);
 					if (this instanceof Alert && rightSoftCommand == Alert.DISMISS_COMMAND) {
-						// XXX
-						if (this.cmdListener != null)
-							this.cmdListener.commandAction(rightSoftCommand, this);
-						else ((Alert) this).close();
-					} else if (this.selectedItem != null && this.selectedItem.itemCommands.contains(rightSoftCommand)) {
-						this.selectedItem.itemCommandListener.commandAction(rightSoftCommand, this.selectedItem);
+						if (this.cmdListener != null) {
+							Emulator.getEventQueue().commandAction(rightSoftCommand, this);
+						} else ((Alert) this).close();
+					} else if (this.focusedItem != null && this.focusedItem.commands.contains(rightSoftCommand)) {
+						Emulator.getEventQueue().commandAction(rightSoftCommand, this.focusedItem);
 					} else if (this.cmdListener != null) {
-						this.cmdListener.commandAction(rightSoftCommand, this);
+						Emulator.getEventQueue().commandAction(rightSoftCommand, this);
 					}
 				}
 			}
@@ -232,9 +228,8 @@ public class Displayable {
 		return false;
 	}
 
-	public void callCommandAction(Command command) {
+	public void _callCommandAction(Command command) {
 		if (cmdListener != null && command != null) {
-			// TODO queue
 			cmdListener.commandAction(command, this);
 		}
 	}
@@ -250,18 +245,27 @@ public class Displayable {
 	protected void sizeChanged(final int n, final int n2) {
 	}
 
-	public void invokeSizeChanged(final int w, final int h) {
-		this.w = Emulator.getEmulator().getScreen().getWidth();
-		this.h = Emulator.getEmulator().getScreen().getHeight();
+	public void _invokeSizeChanged(int w, int h) {
+		IScreen s = Emulator.getEmulator().getScreen();
 		if (swtContent != null) {
-			syncExec(new Runnable() {
+			asyncExec(new Runnable() {
 				public void run() {
 					swtUpdateSizes();
 				}
 			});
+			s.repaint();
+			return;
 		}
-		this.sizeChanged(w, h);
-		Emulator.getEventQueue().queueRepaint();
+		if (this.w != w || this.h != h || forceUpdateSize) {
+			forceUpdateSize = false;
+			this.w = w;
+			this.h = h;
+			if (!fullScreen) {
+				h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+			}
+			sizeChanged(bounds[W] = this.w - 4, bounds[H] = h);
+		}
+		repaintScreen();
 	}
 
 	public Ticker getTicker() {
@@ -270,13 +274,13 @@ public class Displayable {
 
 	public void setTicker(final Ticker ticker) {
 		this.ticker = ticker;
-		bounds[H] = h - (this.ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
 		this.tickerX = this.w;
+		updateSize(true);
 	}
 
-	protected void paintTicker(final Graphics graphics) {
+	protected void _paintTicker(final Graphics graphics) {
 		if (ticker == null) {
-			if (nonFullScreen) {
+			if (!fullScreen && this instanceof Canvas) {
 				graphics.setColor(-1);
 				graphics.fillRect(0, this.bounds[H], w, Screen.fontHeight4);
 			}
@@ -291,64 +295,24 @@ public class Displayable {
 		}
 	}
 
-	void refreshSoftMenu() {
-		EventQueue j;
+	void repaintScreen() {
 		int n;
 		if (this instanceof Canvas) {
-			j = Emulator.getEventQueue();
-			n = 1;
+			n = EventQueue.EVENT_PAINT;
 		} else {
 			if (!(this instanceof Screen)) {
 				return;
 			}
-			j = Emulator.getEventQueue();
-			n = 4;
+			n = EventQueue.EVENT_SCREEN;
 		}
-		j.queue(n);
+		Emulator.getEventQueue().queue(n);
 	}
 
-	protected void paintSoftMenu(final Graphics graphics) {
+	protected void _paintSoftMenu(final Graphics graphics) {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
-		final int translateX = graphics.getTranslateX();
-		final int translateY = graphics.getTranslateY();
-		/*
-		if (Emulator.screenBrightness < 100) {
-			graphics.translate(-translateX, -translateY);
-			int alpha = (int) (((double) (100 - Emulator.screenBrightness) / 100d) * 255d);
-			// System.out.println(Integer.toHexString(alpha << 24));
-			DirectGraphicsInvoker.getDirectGraphics(graphics).setARGBColor(alpha << 24);
-			graphics.fillRect(0, 0, getWidth(), getHeight());
-			graphics.translate(translateX, translateY);
-		}
-		 */
-		if (!this.menuShown || swtMenu != null) {
-			return;
-		}
-		final int clipX = graphics.getClipX();
-		final int clipY = graphics.getClipY();
-		final int clipWidth = graphics.getClipWidth();
-		final int clipHeight = graphics.getClipHeight();
-		graphics.translate(-translateX, -translateY);
-		graphics.setClip(0, 0, this.w, this.h);
-		final int n = this.w >> 1;
-		final int anInt181 = Screen.fontHeight4;
-		final int n3;
-		final int n2 = (n3 = this.commands.size() - 1) * anInt181;
-		final int n4 = n - 1;
-		int n5 = this.h - n2 - 1;
-		a.method177(graphics, n4, n5, n, n2, true);
-		for (int i = 0; i < n3; ++i, n5 += anInt181) {
-			graphics.setColor(-16777216);
-			if (i == this.anInt28) {
-				a.method178(graphics, n4, n5, n, anInt181);
-			}
-			graphics.drawString(i + 1 + "." + ((Command) this.commands.get(i + 1)).getLongLabel(), n4 + 4, n5 + 2, 0);
-		}
-		graphics.translate(translateX, translateY);
-		graphics.setClip(clipX, clipY, clipWidth, clipHeight);
 	}
 
-	public static void fpsLimiter() {
+	public static void _fpsLimiter() {
 		if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
 			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
@@ -371,7 +335,7 @@ public class Displayable {
 		}
 	}
 
-	public static void checkForSteps(Object lock) {
+	public static void _checkForSteps(Object lock) {
 		if (Settings.steps >= 0) {
 			if (Settings.steps == 0) {
 				final long currentTimeMillis = System.currentTimeMillis();
@@ -389,7 +353,7 @@ public class Displayable {
 		}
 	}
 
-	public static void resetXRayGraphics() {
+	public static void _resetXRayGraphics() {
 		Graphics.resetXRayCache();
 	}
 
@@ -397,32 +361,32 @@ public class Displayable {
 	void constructSwt() {
 		syncExec(new Runnable() {
 			public void run() {
-				swtContent = constructSwtContent(SWT.NONE);
+				swtContent = _constructSwtContent(SWT.NONE);
 				swtMenu = new Menu(swtContent);
 				swtContent.setMenu(swtMenu);
-				swtContentArea = layoutSwtContent();
+				swtContentArea = _layoutSwtContent();
 			}
 		});
 	}
 
-	protected Composite constructSwtContent(int style) {
+	protected Composite _constructSwtContent(int style) {
 		return new Composite(getSwtParent(), SWT.NONE);
 	}
 
-	protected Rectangle layoutSwtContent() {
+	protected Rectangle _layoutSwtContent() {
 		Rectangle area = getSwtParent().getClientArea();
 		swtContent.setBounds(0, 0, area.width, area.height);
 		return swtContent.getClientArea();
 	}
 
-	public Composite getSwtContent() {
+	public Composite _getSwtContent() {
 		return swtContent;
 	}
 
 	protected void finalize() throws Throwable {
 		syncExec(new Runnable() {
 			public void run() {
-				if (!swtContent.isDisposed()) {
+				if (swtContent != null && !swtContent.isDisposed()) {
 					swtContent.dispose();
 				}
 			}
@@ -438,6 +402,10 @@ public class Displayable {
 		EmulatorImpl.syncExec(r);
 	}
 
+	static void asyncExec(Runnable r) {
+		EmulatorImpl.asyncExec(r);
+	}
+
 	static void safeSyncExec(Runnable r) {
 		try {
 			EmulatorImpl.syncExec(r);
@@ -451,7 +419,8 @@ public class Displayable {
 		}
 	}
 
-	protected void shown() {
+	protected void _shown() {
+		updateSize(false);
 	}
 
 	static {
@@ -460,10 +429,10 @@ public class Displayable {
 		Displayable.framesCount = 0;
 	}
 
-	public void swtHidden() {
+	public void _swtHidden() {
 	}
 
-	public void swtShown() {
+	public void _swtShown() {
 		if (swtContent != null && !swtContent.isDisposed()) {
 			swtUpdateSizes();
 		} else if (swtMenu == null) {
@@ -472,14 +441,14 @@ public class Displayable {
 	}
 
 	void swtUpdateSizes() {
-		Rectangle newArea = layoutSwtContent();
+		Rectangle newArea = _layoutSwtContent();
 		if(swtContentArea == null || !swtInitialized
 				|| newArea.width != swtContentArea.width
 				|| newArea.height != swtContentArea.height)
 		{
 			swtInitialized = true;
 			swtContentArea = newArea;
-			swtResized(newArea.width, newArea.height);
+			_swtResized(newArea.width, newArea.height);
 		}
 	}
 
@@ -490,13 +459,22 @@ public class Displayable {
 		getSwtParent().setMenu(swtMenu);
 	}
 
-	void showSwtMenu() {
+	void showSwtMenu(final boolean item, final int x, final int y) {
 		syncExec(new Runnable() {
 			@Override
 			public void run() {
-				swtUpdateMenuCommands();
-				Point p = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getMenuLocation();
-				swtMenu.setLocation(p);
+				swtUpdateMenuCommands(item);
+				if (x != -2 && y != -2) {
+					Point p;
+					EmulatorScreen s = ((EmulatorScreen) Emulator.getEmulator().getScreen());
+					if (x != -1 || y != -1) {
+						int[] t = s.transformCaret(x, y);
+						p = s.getCanvas().toDisplay(new Point(t[0], t[1]));
+					} else {
+						p = s.getMenuLocation();
+					}
+					swtMenu.setLocation(p);
+				}
 				swtMenu.setVisible(true);
 			}
 		});
@@ -511,7 +489,7 @@ public class Displayable {
 		});
 	}
 
-	void swtUpdateMenuCommands() {
+	void swtUpdateMenuCommands(boolean item) {
 		for (MenuItem mi: swtMenu.getItems()) {
 			mi.dispose();
 		}
@@ -524,29 +502,31 @@ public class Displayable {
 		}
 	}
 
-	public void swtResized(int w, int h) {
+	public void _swtResized(int w, int h) {
 
 	}
 
-	public boolean getLeftRightLanguage() {
-		return true;
-	}
-
-	public boolean swtIsShown() {
-		return isShown();
-	}
-
-	Composite getContentComp()
-	{
-		return swtContent;
+	void updateSize(boolean force) {
+		if (force) forceUpdateSize = true;
+		if (Emulator.getCurrentDisplay().getCurrent() != this) return;
+		IScreen s = Emulator.getEmulator().getScreen();
+		Emulator.getEventQueue().sizeChanged(s.getWidth(), s.getHeight());
 	}
 
 	class SwtMenuSelectionListener implements SelectionListener {
 
 		public void widgetSelected(SelectionEvent e) {
 			try {
-				Command c = (Command) e.widget.getData();
-				callCommandAction(c);
+				Object o = (Object) e.widget.getData();
+				if (o instanceof Command) {
+					Emulator.getEventQueue().commandAction((Command) o, Displayable.this);
+				} else if (o instanceof ChoiceGroup) {
+					((ChoiceGroup) o).select(((MenuItem) e.widget).getText());
+				} else if (o instanceof Object[]) {
+					Command c = (Command) ((Object[]) o)[0];
+					Item item = (Item) ((Object[]) o)[1];
+					Emulator.getEventQueue().commandAction(c, item);
+				}
 			} catch (Exception ignored) {}
 		}
 
@@ -562,6 +542,24 @@ public class Displayable {
 
 		public void menuShown(MenuEvent menuEvent) {
 			menuShown = true;
+		}
+	}
+
+	static class SwtKeyListener implements KeyListener {
+
+		public void keyPressed(KeyEvent keyEvent) {
+			int n = keyEvent.keyCode & 0xFEFFFFFF;
+			Displayable d = Emulator.getCurrentDisplay().getCurrent();
+			String r;
+			if ((keyEvent.character >= 33 && keyEvent.character <= 90)
+					|| (r = KeyMapping.replaceKey(n)) == null) return;
+			n = Integer.parseInt(r);
+			if (KeyMapping.isLeftSoft(n) || KeyMapping.isRightSoft(n)) {
+				d.handleSoftKeyAction(n, true);
+			}
+		}
+
+		public void keyReleased(KeyEvent keyEvent) {
 		}
 	}
 }

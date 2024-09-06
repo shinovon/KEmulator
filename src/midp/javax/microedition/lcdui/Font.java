@@ -46,7 +46,6 @@ public class Font {
 		int anInt1316;
 		if (((anInt1316 = this.style) & 0x4) != 0x0) {
 			anInt1316 &= 0xFFFFFFFB;
-			Emulator.getEmulator().getLogStream().println("** Font STYLE_UNDERLINED not implemented.");
 		}
 		this.font = Emulator.getEmulator().newFont(n2, anInt1316);
 	}
@@ -55,7 +54,6 @@ public class Font {
 		int anInt1316;
 		if (((anInt1316 = this.style) & 0x4) != 0x0) {
 			anInt1316 &= 0xFFFFFFFB;
-			Emulator.getEmulator().getLogStream().println("** Font STYLE_UNDERLINED not implemented.");
 		}
 		this.font = Emulator.getEmulator().newFont(size, anInt1316);
 		return this;

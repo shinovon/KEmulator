@@ -38,7 +38,7 @@ public class Emulator {
 	public static boolean debugBuild = true;
 	public static String version = "2.17";
 	public static String revision = "";
-	public static final int numericVersion = 20;
+	public static final int numericVersion = 21;
 
 	static EmulatorImpl emulatorimpl;
 	private static MIDlet midlet;

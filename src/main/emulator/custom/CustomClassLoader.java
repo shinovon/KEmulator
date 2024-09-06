@@ -111,6 +111,8 @@ public final class CustomClassLoader extends ClassLoader {
 		if (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty())
 			return false;
 
+		if (s.startsWith("__")) return true;
+
 		if (stack) {
 			StackTraceElement[] st = Thread.currentThread().getStackTrace();
 			if ((st.length > 4 && !Emulator.jarClasses.contains(st[4].getClassName()))) {

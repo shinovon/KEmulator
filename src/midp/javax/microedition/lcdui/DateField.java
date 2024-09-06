@@ -37,19 +37,19 @@ public class DateField extends Item {
 		this.mode = anInt349;
 	}
 
-	protected void paint(final Graphics graphics) {
-		super.paint(graphics);
+	protected void paint(Graphics g, int x, int y, int w, int h) {
+		super.paint(g, x, y, w, h);
 	}
 
-	protected int getItemWidth() {
-		return 0;
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Some example text") + 6;
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return false;
+	public int getMinimumHeight() {
+		return Item.font.getHeight() + 4;
 	}
 
-	protected boolean isFullWidthItem() {
+	boolean isFocusable() {
 		return true;
 	}
 }

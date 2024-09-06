@@ -21,9 +21,10 @@ public class TextField extends Item {
 	private int maxSize;
 	private int constraints;
 	private String[] textArr;
-	private int anInt29;
-	private int anInt30;
+	private int caretX;
+	private int caretY;
 	protected boolean isTextBox;
+	private boolean wasHidden;
 
 	public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
 		super(s);
@@ -38,6 +39,7 @@ public class TextField extends Item {
 
 	public void setString(final String aString25) {
 		this.string = aString25;
+		layoutForm();
 	}
 
 	public int getChars(final char[] array) {
@@ -75,8 +77,12 @@ public class TextField extends Item {
 		return this.maxSize;
 	}
 
-	public int setMaxSize(final int anInt349) {
-		return this.maxSize = anInt349;
+	public int setMaxSize(final int size) {
+		maxSize = size;
+		if (string != null && string.length() > size) {
+			setString(string.substring(0, size - 1));
+		}
+		return maxSize;
 	}
 
 	public int size() {
@@ -103,7 +109,7 @@ public class TextField extends Item {
 
 	protected void focus() {
 		super.focus();
-		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.anInt29, this.anInt30);
+		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 	}
 
 	protected void defocus() {
@@ -111,65 +117,69 @@ public class TextField extends Item {
 		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 	}
 
-	protected void paint(final Graphics graphics) {
+	public void hidden() {
+		wasHidden = true;
+		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+	}
+
+	protected void paint(Graphics g, int x, int y, int w, int h) {
 		if (!this.isTextBox) {
-			super.paint(graphics);
+			super.paint(g, x, y, w, h);
 		} else {
-			graphics.setColor(-16777216);
+			g.setColor(-16777216);
 		}
-		int n = super.bounds[1];
-		int n2 = super.bounds[1];
-		if (super.labelArr != null && super.labelArr.length > 0) {
-			graphics.setFont(Item.font);
-			for (int i = 0; i < super.labelArr.length; ++i) {
-				graphics.drawString(super.labelArr[i], super.bounds[0] + 4, n + 2, 0);
-				n += Item.font.getHeight() + 4;
+		int yo = y;
+		if (labelArr != null && labelArr.length > 0) {
+			g.setFont(Item.font);
+			for (int i = 0; i < labelArr.length; ++i) {
+				g.drawString(labelArr[i], x + 4, yo + 2, 0);
+				yo += Item.font.getHeight() + 4;
 			}
-			n2 = n - 2;
 		}
-		final int n3 = super.bounds[3] - n + super.bounds[1] - 2;
-		if (super.inFocus) {
-			graphics.setColor(-8355712);
+		if (focused) g.setColor(-8355712);
+		g.drawRect(2, yo, w - 4, bounds[H] - yo + y - 2);
+		g.setFont(Screen.font);
+		if (focused) g.setColor(8617456);
+		if ((caretX != x + 4 || caretY != yo + 4 || wasHidden) && focused) {
+			wasHidden = false;
+			caretX = x + 4;
+			caretY = yo + 4;
+			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		}
-		graphics.drawRect(2, n2, super.bounds[2] - 4, n3);
-		graphics.setFont(Screen.font);
-		if (super.inFocus) {
-			graphics.setColor(8617456);
-		}
-		this.anInt29 = super.bounds[0] + 4;
-		this.anInt30 = n + 4;
 		for (int j = 0; j < this.textArr.length; ++j) {
-			graphics.drawString(this.textArr[j], super.bounds[0] + 4, n + 2, 0);
-			if ((n += Screen.font.getHeight() + 4) > super.screen.bounds[3]) {
-				return;
-			}
+			g.drawString(this.textArr[j], x + 4, yo + 2, 0);
+			yo += Screen.font.getHeight() + 4;
 		}
 	}
 
-	protected void layout() {
-		super.layout();
+	protected void layout(Row row) {
+		super.layout(row);
 		int n = 4;
-		final int n2 = this.getPreferredWidth() - 8;
-		if (super.label != null) {
-			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
-			n = 4 + (Item.font.getHeight() + 4) * super.labelArr.length;
+		final int availableWidth = row.getAvailableWidth(screen.bounds[W]) - 8;
+		if (hasLabel()) {
+			labelArr = c.textArr(label, Item.font, availableWidth, availableWidth);
+			n = 4 + (Item.font.getHeight() + 4) * labelArr.length;
 		} else {
-			super.labelArr = null;
+			labelArr = null;
 		}
 		final Font aFont173 = Screen.font;
-		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, n2, n2);
-		super.bounds[3] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, super.screen.bounds[3]);
+		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, availableWidth, availableWidth);
+		bounds[H] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, screen.bounds[3]);
 	}
 
-	protected int getItemWidth() {
-		return getPreferredWidth();
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Something") + 6;
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return false;
+	public int getMinimumHeight() {
+		return (Item.font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 
-	protected boolean isFullWidthItem() {
+	boolean isFocusable() {
 		return true;
+	}
+
+	boolean keyScroll(int key, boolean repeat) {
+		return key == Canvas.LEFT || key == Canvas.RIGHT;
 	}
 }

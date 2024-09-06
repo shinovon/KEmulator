@@ -2,7 +2,7 @@ package javax.microedition.lcdui;
 
 import emulator.*;
 import emulator.graphics2D.IImage;
-import emulator.lcdui.BoundsUtils;
+import emulator.ui.IScreen;
 
 public abstract class Canvas extends Displayable {
 	public static final int UP = 1;
@@ -35,7 +35,7 @@ public abstract class Canvas extends Displayable {
 		this.setFullScreenMode(false);
 	}
 
-	public void invokePaint(IImage buffer, IImage xray) {
+	public void _invokePaint(IImage buffer, IImage xray) {
 		if (!Settings.xrayView) xray = null;
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
@@ -43,11 +43,11 @@ public abstract class Canvas extends Displayable {
 		graphics.reset(buffer, xray);
 		this.paint(graphics);
 		graphics.reset(buffer, xray); // paintTicker fix
-		this.paintTicker(graphics);
-		this.paintSoftMenu(graphics);
+		this._paintTicker(graphics);
+		this._paintSoftMenu(graphics);
 	}
 
-	public void invokePaint(IImage buffer, IImage xray, int x, int y, int w, int h) {
+	public void _invokePaint(IImage buffer, IImage xray, int x, int y, int w, int h) {
 		if (!Settings.xrayView) xray = null;
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
@@ -56,11 +56,11 @@ public abstract class Canvas extends Displayable {
 		graphics.setClip(x, y, w, h);
 		this.paint(graphics);
 		graphics.reset(buffer, xray); // paintTicker fix
-		this.paintTicker(graphics);
-		this.paintSoftMenu(graphics);
+		this._paintTicker(graphics);
+		this._paintSoftMenu(graphics);
 	}
 
-	public void invokeKeyReleased(final int n) {
+	public void _invokeKeyReleased(final int n) {
 		int i = 1 << this.getGameAction(n);
 		if ((m_keyStates & i) != 0)
 			m_keyStates &= ~i;
@@ -72,54 +72,46 @@ public abstract class Canvas extends Displayable {
 		this.keyReleased(n);
 	}
 
-	public void invokeKeyPressed(final int n) {
-		if (super.menuShown) {
-			if (n >= 49 && n <= 57) {
-				final int n2;
-				if ((n2 = n - 49 + 1) < super.commands.size()) {
-					super.cmdListener.commandAction((Command) super.commands.get(n2), this);
-					super.menuShown = false;
-				}
-			} else if (n == KeyMapping.getArrowKeyFromDevice(UP)) {
-				if (super.anInt28 > 0) {
-					--super.anInt28;
-				}
-			} else if (n == KeyMapping.getArrowKeyFromDevice(DOWN)) {
-				if (super.anInt28 < super.commands.size() - 2) {
-					++super.anInt28;
-				}
-			} else {
-				final int n3;
-				if (n == KeyMapping.getArrowKeyFromDevice(FIRE) && (n3 = super.anInt28 + 1) < super.commands.size()) {
-					super.cmdListener.commandAction((Command) super.commands.get(n3), this);
-					super.menuShown = false;
-				}
-			}
-			this.refreshSoftMenu();
-			return;
-		}
+	public void _invokeKeyPressed(final int n) {
 		this.m_keyStates |= 1 << this.getGameAction(n);
 		this.vKeyStates |= getKeyBit(n);
 		this.keyPressed(n);
 	}
 
-	public void invokeKeyRepeated(final int n) {
+	public void _invokeKeyRepeated(final int n) {
 		this.keyRepeated(n);
 	}
 
-	public void invokeHideNotify() {
+	public void _invokeHideNotify() {
 		this.hideNotify();
 	}
 
-	public void invokeShowNotify() {
+	public void _invokeShowNotify() {
 		this.showNotify();
+		IScreen s = Emulator.getEmulator().getScreen();
+		if (this.w != s.getWidth() || this.h != getActualHeight()) {
+			_invokeSizeChanged(s.getWidth(), s.getHeight());
+		}
 	}
 
-	public void invokeSizeChanged(final int w, final int h) {
-		super.w = Emulator.getEmulator().getScreen().getWidth();
-		super.h = Emulator.getEmulator().getScreen().getHeight();
-		this.sizeChanged(w, h);
-		Emulator.getEventQueue().queueRepaint();
+	int getActualHeight() {
+		int h = Emulator.getEmulator().getScreen().getHeight();
+		if (!fullScreen) {
+			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+		}
+		return h;
+	}
+
+	public void _invokeSizeChanged(int w, int h) {
+		if (!fullScreen) {
+			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+		}
+		if (this.w != w || this.h != h || forceUpdateSize) {
+			this.w = w;
+			this.h = h;
+			sizeChanged(w, h);
+			if (!Settings.dontRepaintOnSetCurrent) repaint();
+		}
 	}
 
 	protected abstract void paint(final Graphics g);
@@ -157,17 +149,21 @@ public abstract class Canvas extends Displayable {
 	protected void showNotify() {
 	}
 
+	public int getWidth() {
+		return w;
+	}
+
+	public int getHeight() {
+		return h;
+	}
+
 	public void setFullScreenMode(final boolean b) {
 		if (!Settings.ignoreFullScreen) {
-			super.h = Emulator.getEmulator().getScreen().getHeight();
-			if (b) {
-				nonFullScreen = false;
-//                this.setTicker(null);
-				return;
-			}
-//            this.setTicker(new Ticker("setFullScreenMode(true) to remove me"));
-			nonFullScreen = true;
-			super.h -= Screen.fontHeight4;
+			fullScreen = b;
+			updateSize(true);
+		} else if (!fullScreen) {
+			fullScreen = true;
+			updateSize(true);
 		}
 	}
 
@@ -184,31 +180,6 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public void invokePointerPressed(final int n, final int n2) {
-		if (super.menuShown) {
-			final int n3 = super.w >> 1;
-			final int anInt181 = Screen.fontHeight4;
-			final int n5;
-			final int n4 = (n5 = super.commands.size() - 1) * anInt181;
-			final int n6 = n3 - 1;
-			final int n7 = super.h - n4 - 1;
-			final int[] array;
-			if (BoundsUtils.collides(array = new int[]{n6, n7, n3, n4}, n, n2)) {
-				array[0] = n6;
-				array[1] = n7;
-				array[2] = n3;
-				array[3] = anInt181;
-				int[] array2;
-				int n8;
-				for (int i = 0; i < n5; ++i, array2 = array, n8 = 1, array2[n8] += anInt181) {
-					if (BoundsUtils.collides(array, n, n2)) {
-						super.cmdListener.commandAction((Command) super.commands.get(i + 1), this);
-						super.menuShown = false;
-						return;
-					}
-				}
-			}
-			return;
-		}
 		this.pointerPressed(n, n2);
 	}
 
@@ -397,11 +368,11 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public boolean hasPointerEvents() {
-		return h >= 320;
+		return Settings.hasPointerEvents;
 	}
 
 	public boolean hasPointerMotionEvents() {
-		return h >= 320;
+		return Settings.hasPointerEvents;
 	}
 
 	public boolean hasRepeatEvents() {

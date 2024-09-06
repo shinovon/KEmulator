@@ -8,7 +8,7 @@ public class Gauge extends Item {
 	public static final int INCREMENTAL_UPDATING = 3;
 	private int max;
 	private int value;
-	private boolean interact;
+	private boolean interactive;
 
 	private long lastIncrementTime;
 	private boolean continuosDir;
@@ -19,7 +19,7 @@ public class Gauge extends Item {
 		super(label);
 		value = initialValue;
 		max = maxValue;
-		interact = interactive;
+		this.interactive = interactive;
 	}
 
 	public void setLabel(String label) {
@@ -38,8 +38,8 @@ public class Gauge extends Item {
 		super.setItemCommandListener(l);
 	}
 
-	public void setPreferredSize(int width, int height) {
-		super.setPreferredSize(width, height);
+	public void setPreferredSize(int w, int h) {
+		super.setPreferredSize(w, h);
 	}
 
 	public void setDefaultCommand(Command cmd) {
@@ -48,6 +48,7 @@ public class Gauge extends Item {
 
 	public void setValue(int value) {
 		this.value = value;
+		repaintForm();
 	}
 
 	public int getValue() {
@@ -56,6 +57,7 @@ public class Gauge extends Item {
 
 	public void setMaxValue(int maxValue) {
 		max = maxValue;
+		repaintForm();
 	}
 
 	public int getMaxValue() {
@@ -63,14 +65,22 @@ public class Gauge extends Item {
 	}
 
 	public boolean isInteractive() {
-		return interact;
+		return interactive;
 	}
 
-	protected void paint(Graphics g) {
-		super.paint(g);
-		final Font font = (this.font != null) ? this.font : Screen.font;
+	protected void paint(Graphics g, int x, int y, int w, int h) {
+		super.paint(g, x, y, w, h);
+		final Font font = Item.font;
 		g.setFont(font);
-		if (!interact) {
+
+		h = font.getHeight();
+		int yoff = 0;
+		if (label != null) {
+			g.drawString(label, x, y, 0);
+			yoff += h + 4;
+		}
+
+		if (!interactive) {
 			int max = this.max;
 			int val = this.value;
 			if (max == -1) {
@@ -78,17 +88,13 @@ public class Gauge extends Item {
 					case -1: {
 						break;
 					}
-					default:
-						//TODO INCREMENTAL
+					default: //TODO
 					case CONTINUOUS_RUNNING: {
 						max = 50;
-						//if(System.currentTimeMillis() - lastIncrementTime > continousIncTime) {
 						if (!continuosDir)
 							continuosValue++;
 						else
 							continuosValue--;
-						//lastIncrementTime = System.currentTimeMillis();
-						//}
 						if (continuosValue >= max || continuosValue < 0) {
 							continuosDir = !continuosDir;
 						}
@@ -97,59 +103,71 @@ public class Gauge extends Item {
 					}
 				}
 			}
-			int x = super.bounds[X];
-			int y = super.bounds[Y];
-			int w = super.bounds[W];
-			int h = font.getHeight();
-			int off = 2;
-			int yoff = 0;
-			if (label != null) {
-				g.drawString(label, x, y, 0);
-				yoff += h + 4;
-			}
 			g.setColor(0xababab);
 			g.drawRect(x, y + yoff, w, h);
+			if (max <= 0 || val < 0) return;
 			g.setColor(0x0000ff);
-			g.fillRect(x + off, y + yoff + off, (int) ((double) w * ((double) val / (double) max)) - off - 1, h - off - 1);
+			g.fillRect(x + 2, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
 		} else {
-			//TODO
-			int x = super.bounds[X];
-			int y = super.bounds[Y];
-			int w = super.bounds[W];
-			int h = font.getHeight();
-			int yoff = 0;
-			if (label != null) {
-				g.drawString(label, x, y, 0);
-				yoff += h + 4;
-			}
-			g.drawString("UNIMPLEMENTED", x, y + yoff, 0);
+			int xoff1 = Item.font.stringWidth("0") + 2;
+			int xoff2 = Item.font.stringWidth(Integer.toString(max)) + 2;
+			g.drawString("0", x + 2, y + yoff, 0);
+			g.drawString(Integer.toString(max), x + w - xoff2 + 2, y + yoff, 0);
+			w -= xoff1 + xoff2;
+			g.setColor(0xababab);
+			g.drawRect(x + xoff1, y + yoff, w, h);
+			int val = value;
+			if (max <= 0 || val < 0) return;
+			g.setColor(0x0000ff);
+			g.fillRect(x + 2 + xoff1, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
 		}
 	}
 
-	public void layout() {
-		super.layout();
-		final Font font = (this.font != null) ? this.font : Screen.font;
-		if (!interact) {
+	public void layout(Row row) {
+		super.layout(row);
+		final Font font = Item.font;
+		if (!interactive) {
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
-			super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
+			bounds[H] = n2;
 		} else {
-			//TODO
 			int n2 = font.getHeight() + 4;
 			if (label != null) n2 += font.getHeight() + 4;
-			super.bounds[H] = Math.min(n2, super.screen.bounds[H]);
+			bounds[H] = n2;
 		}
 	}
 
-	protected int getItemWidth() {
-		return 0;
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Some example text") + 6;
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
-		return false;
+	public int getMinimumHeight() {
+		return (Item.font.getHeight() + 4) * (hasLabel() ? 2 : 1);
 	}
 
-	protected boolean isFullWidthItem() {
+	boolean isFocusable() {
 		return true;
+	}
+
+	boolean keyScroll(int key, boolean repeat) {
+		if (interactive) {
+			if (key == Canvas.LEFT) {
+				if (--value < 0) {
+					value = 0;
+					return false;
+				}
+				notifyStateChanged();
+				return true;
+			}
+			if (key == Canvas.RIGHT) {
+				if (++value > max) {
+					value = max;
+					return false;
+				}
+				notifyStateChanged();
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -16,6 +16,8 @@ public abstract class CustomItem extends Item {
 	private Image img;
 	private Graphics g;
 	int[] anIntArray429;
+	private boolean wasHidden = true;
+	private int lastWidth, lastHeight;
 
 	protected CustomItem(final String s) {
 		super(s);
@@ -24,49 +26,46 @@ public abstract class CustomItem extends Item {
 
 	public int getGameAction(final int n) {
 		int n2 = 0;
-		int n3 = 0;
 		switch (n) {
 			case 49: {
-				n3 = 9;
+				n2 = 9;
 				break;
 			}
 			case 51: {
-				n3 = 10;
+				n2 = 10;
 				break;
 			}
 			case 55: {
-				n3 = 11;
+				n2 = 11;
 				break;
 			}
 			case 57: {
-				n3 = 12;
+				n2 = 12;
 				break;
 			}
 			default: {
 				if (n == KeyMapping.getArrowKeyFromDevice(1)) {
-					n3 = 1;
+					n2 = 1;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(6)) {
-					n3 = 6;
+					n2 = 6;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(2)) {
-					n3 = 2;
+					n2 = 2;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(5)) {
-					n3 = 5;
+					n2 = 5;
 					break;
 				}
 				if (n == KeyMapping.getArrowKeyFromDevice(8)) {
-					n3 = 8;
+					n2 = 8;
 					break;
 				}
-				return n2;
 			}
 		}
-		n2 = n3;
 		return n2;
 	}
 
@@ -82,18 +81,21 @@ public abstract class CustomItem extends Item {
 
 	protected abstract int getPrefContentHeight(final int p0);
 
-	protected void sizeChanged(final int n, final int n2) {
+	protected void sizeChanged(final int w, final int h) {
 	}
 
 	protected final void invalidate() {
+		repaintForm();
 	}
 
 	protected abstract void paint(final Graphics p0, final int p1, final int p2);
 
 	protected final void repaint() {
+		repaintForm();
 	}
 
 	protected final void repaint(final int n, final int n2, final int n3, final int n4) {
+		repaint();
 	}
 
 	protected boolean traverse(final int n, final int n2, final int n3, final int[] array) {
@@ -127,15 +129,27 @@ public abstract class CustomItem extends Item {
 	protected void hideNotify() {
 	}
 
-	void updateHidden() {
+	void hidden() {
+		super.hidden();
 		if (img == null) return;
 		g.dispose();
 		g = null;
 		img.dispose();
 		img = null;
+		try {
+			wasHidden = true;
+			hideNotify();
+		} catch (Exception ignored) {}
 	}
 
-	protected void paint(final Graphics graphics) {
+	protected void paint(final Graphics graphics, int x, int y, int w, int h) {
+		super.paint(graphics, x, y, w, h);
+		if (wasHidden) {
+			try {
+				showNotify();
+			} catch (Exception ignored) {}
+			wasHidden = false;
+		}
 		if (img == null) {
 			img = Image.createImage(Emulator.getEmulator().getScreen().getWidth(), Emulator.getEmulator().getScreen().getHeight());
 			g = this.img.getGraphics();
@@ -143,40 +157,54 @@ public abstract class CustomItem extends Item {
 		this.g.setColor(-1);
 		this.g.fillRect(0, 0, super.screen.w, super.screen.h);
 		this.g.setColor(0);
-		final int n = super.bounds[0] + 2;
-		int n2 = super.bounds[1] + 2;
-		final int prefContentWidth = this.getPrefContentWidth(super.bounds[2]);
-		final int prefContentHeight = this.getPrefContentHeight(super.bounds[3]);
+		final int n = x + 2;
+		int n2 = y + 2;
+		final int prefContentWidth = this.getPrefContentWidth(w);
+		final int prefContentHeight = this.getPrefContentHeight(h);
 		this.paint(this.g, prefContentWidth, prefContentHeight);
-		super.paint(graphics);
 		if (super.labelArr != null && super.labelArr.length > 0) {
 			graphics.setFont(Item.font);
 			for (int i = 0; i < super.labelArr.length; ++i) {
-				graphics.drawString(super.labelArr[i], super.bounds[0] + 4, n2 + 2, 0);
+				graphics.drawString(super.labelArr[i], x + 4, n2 + 2, 0);
 				n2 += Item.font.getHeight() + 4;
 			}
 		}
-		graphics.setClip(n, n2, prefContentWidth, prefContentHeight);
-		graphics.drawImage(this.img, n, n2, 0);
-		graphics.setClip(0, 0, super.screen.w, super.screen.h);
+		graphics.drawRegion(img, 0, 0,
+				Math.min(img.getWidth(), Math.min(w, prefContentWidth)),
+				Math.min(img.getHeight(), Math.min(h-n2+y, prefContentHeight)), 0,
+				n, n2, 0);
 	}
 
-	protected void layout() {
-		super.layout();
+	protected void layout(Row row) {
+		super.layout(row);
 		int n = 0;
-		final int n2 = this.getPreferredWidth() - 8;
-		if (super.label != null) {
-			super.labelArr = c.textArr(super.label, Item.font, n2, n2);
-			n = 0 + (Item.font.getHeight() + 4) * super.labelArr.length;
+		int w = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
+		if (hasLabel()) {
+			super.labelArr = c.textArr(super.label, Item.font, w, w);
+			n = (Item.font.getHeight() + 4) * super.labelArr.length;
 		} else {
 			super.labelArr = null;
 		}
-		super.bounds[3] = Math.min(n + (this.getPrefContentHeight(super.bounds[3]) + 4), super.screen.bounds[3]);
+		int h = getPrefContentHeight(bounds[H]);
+		bounds[H] = n + (h + 4);
+
+		w = getPreferredWidth();
+		if (lastWidth != w || lastHeight != h) {
+			try {
+				sizeChanged(w, h);
+			} catch (Exception ignored) {}
+			lastWidth = w;
+			lastHeight = h;
+		}
 	}
 
 	protected boolean callTraverse(final int n) {
 		if (screen == null) return false;
 		if (this.anIntArray429 == null) return false;
 		return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
+	}
+
+	boolean isFocusable() {
+		return true;
 	}
 }

@@ -121,4 +121,6 @@ public class Image extends com.siemens.mp.misc.NativeMem {
 	public static void mirrorImageVertically(javax.microedition.lcdui.Image image) {}
 
 	protected static void setNativeImage(javax.microedition.lcdui.Image img, Image simg) {}
+
+	public static void mirrorImageHorizontally(javax.microedition.lcdui.Image img) {}
 }

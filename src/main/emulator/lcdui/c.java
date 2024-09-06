@@ -35,18 +35,18 @@ public final class c {
 		}
 	}
 
-	public static String[] textArr(String s, Font font, int max, int var3, int[] w) {
+	public static String[] textArr(String s, Font font, int availableWidth, int maxWidth, int[] w) {
 		w[0] = 0;
 		if (s == null) return new String[0];
-		if (max > 0 && var3 > 0) {
+		if (availableWidth > 0 && maxWidth > 0) {
 			boolean var4 = s.indexOf(10) != -1;
-			if (font.stringWidth(s) <= max) {
+			if (font.stringWidth(s) <= availableWidth) {
 				setWidth(w, font.stringWidth(s));
 				return var4 ? split(s, '\n') : new String[]{s};
 			} else {
 				ArrayList list = new ArrayList();
 				if (!var4) {
-					splitToWidth(s, font, max, var3, list);
+					splitToWidth(s, font, availableWidth, maxWidth, list);
 				} else {
 					char[] var7 = s.toCharArray();
 					int var8 = 0;
@@ -54,14 +54,14 @@ public final class c {
 					for (int var9 = 0; var9 < var7.length; ++var9) {
 						if (var7[var9] == 10 || var9 == var7.length - 1) {
 							String var11 = var9 == var7.length - 1 ? new String(var7, var8, var9 + 1 - var8) : new String(var7, var8, var9 - var8);
-							if (setWidth(w, font.stringWidth(var11)) <= max) {
+							if (setWidth(w, font.stringWidth(var11)) <= availableWidth) {
 								list.add(var11);
 							} else {
-								splitToWidth(var11, font, max, var3, list);
+								splitToWidth(var11, font, availableWidth, maxWidth, list);
 							}
 
 							var8 = var9 + 1;
-							max = var3;
+							availableWidth = maxWidth;
 						}
 					}
 				}

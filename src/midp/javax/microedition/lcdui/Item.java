@@ -30,29 +30,31 @@ public abstract class Item {
 	static final int anInt24 = 32563;
 	static final Font font = Font.getFont(0, 1, 8);
 	int[] bounds;
-	boolean inFocus;
+	boolean focused;
 	boolean shownOnForm;
-	Command aCommand174;
+	Command defaultCommand;
 	public ItemCommandListener itemCommandListener;
-	public Vector itemCommands;
+	public Vector commands;
 	String label;
 	String[] labelArr;
 	Screen screen;
 	int layout;
-	int preferredW = -1;
-	int preferredH = -1;
+	int preferredWidth = -1;
+	int preferredHeight = -1;
 	int[] anIntArray179;
-	int currentPos;
+	private boolean sizeLocked;
+	boolean hidden;
 
 	Item(String label) {
 		this.label = label;
 		this.screen = null;
-		this.itemCommands = new Vector();
+		this.commands = new Vector();
 		bounds = new int[4];
 	}
 
 	public void setLabel(String label) {
 		this.label = label;
+		layoutForm();
 	}
 
 	public String getLabel() {
@@ -66,41 +68,9 @@ public abstract class Item {
 	public void setLayout(int layout) {
 		if ((layout & ~anInt24) != 0) {
 			throw new IllegalArgumentException();
-		} else {
-			this.layout = layout;
 		}
-	}
-
-	protected boolean isLayoutDefault() {
-		return layout == 0;
-	}
-
-	protected boolean isLayoutAlignDefault() {
-		return !isLayoutLeft() && !isLayoutCenter() && !isLayoutRight();
-	}
-
-	protected boolean isLayoutLeft() {
-		return (layout & LAYOUT_LEFT) == LAYOUT_LEFT;
-	}
-
-	protected boolean isLayoutCenter() {
-		return (layout & LAYOUT_CENTER) == LAYOUT_CENTER;
-	}
-
-	protected boolean isLayoutRight() {
-		return (layout & LAYOUT_RIGHT) == LAYOUT_RIGHT;
-	}
-
-	protected boolean isLayoutExpand() {
-		return (layout & LAYOUT_EXPAND) == LAYOUT_EXPAND;
-	}
-
-	protected boolean isLayoutNewLineBefore() {
-		return (layout & LAYOUT_NEWLINE_BEFORE) == LAYOUT_NEWLINE_BEFORE;
-	}
-
-	protected boolean isLayoutNewLineAfter() {
-		return (layout & LAYOUT_NEWLINE_AFTER) == LAYOUT_NEWLINE_AFTER;
+		this.layout = layout;
+		layoutForm();
 	}
 
 	public void addCommand(Command command) {
@@ -108,10 +78,10 @@ public abstract class Item {
 			throw new IllegalStateException();
 		} else if (command == null) {
 			throw new NullPointerException();
-		} else if (!this.itemCommands.contains(command)) {
+		} else if (!this.commands.contains(command)) {
 			int i;
-			for (i = 0; i < this.itemCommands.size(); ++i) {
-				Command command2 = (Command) this.itemCommands.get(i);
+			for (i = 0; i < this.commands.size(); ++i) {
+				Command command2 = (Command) this.commands.get(i);
 				if (command.getCommandType() > command2.getCommandType()
 						|| command.getCommandType() == command2.getCommandType()
 						&& command.getPriority() <= command2.getPriority()) {
@@ -119,7 +89,7 @@ public abstract class Item {
 				}
 			}
 
-			this.itemCommands.add(i, command);
+			this.commands.add(i, command);
 			if (this.screen != null && Emulator.getCurrentDisplay().getCurrent() == this.screen) {
 				this.screen.updateCommands();
 			}
@@ -128,12 +98,12 @@ public abstract class Item {
 	}
 
 	public void removeCommand(Command command) {
-		if (this.itemCommands.contains(command)) {
-			if (command == this.aCommand174) {
-				this.aCommand174 = null;
+		if (this.commands.contains(command)) {
+			if (command == this.defaultCommand) {
+				this.defaultCommand = null;
 			}
 
-			this.itemCommands.remove(command);
+			this.commands.remove(command);
 			if (this.screen != null && Emulator.getCurrentDisplay().getCurrent() == this.screen) {
 				this.screen.updateCommands();
 			}
@@ -150,27 +120,33 @@ public abstract class Item {
 	}
 
 	protected void itemApplyCommand() {
-		if (this.itemCommandListener != null && this.aCommand174 != null) {
-			this.itemCommandListener.commandAction(this.aCommand174, this);
+		if (this.itemCommandListener != null && this.defaultCommand != null) {
+			Emulator.getEventQueue().commandAction(defaultCommand, this);
 		}
-
 	}
 
 	public int getPreferredWidth() {
-		return this.preferredW != -1 ? this.preferredW : bounds[W];
+		if (preferredWidth != -1) return preferredWidth;
+		if (_hasLayout(LAYOUT_SHRINK)) {
+			int w = getMinimumWidth();
+			if (w > 0) return w;
+		}
+		return bounds[W];
 	}
 
 	public int getPreferredHeight() {
-		return this.preferredH != -1 ? this.preferredH : bounds[H];
+		return this.preferredHeight != -1 ? this.preferredHeight : bounds[H];
 	}
 
-	public void setPreferredSize(int anInt180, int anInt181) {
+	public void setPreferredSize(int w, int h) {
 		if (this.screen instanceof Alert) {
 			throw new IllegalStateException();
 		} else {
-			this.preferredW = anInt180;
-			this.preferredH = anInt181;
+			this.preferredWidth = w;
+			this.preferredHeight = h;
 		}
+		sizeLocked = w != -1 || h != -1;
+		layoutForm();
 	}
 
 	public int getMinimumWidth() {
@@ -185,7 +161,7 @@ public abstract class Item {
 		if (this.screen instanceof Alert) {
 			throw new IllegalStateException();
 		} else {
-			if ((this.aCommand174 = aCommand174) != null) {
+			if ((this.defaultCommand = aCommand174) != null) {
 				this.addCommand(aCommand174);
 			}
 
@@ -193,17 +169,12 @@ public abstract class Item {
 	}
 
 	public void notifyStateChanged() {
-		if (screen == null) return;
-		if (!(this.screen instanceof Form)) {
-			//throw new IllegalStateException();
-		} else {
-			if (((Form) this.screen).itemStateListener == null) return;
-			((Form) this.screen).itemStateListener.itemStateChanged(this);
-		}
+		if (screen == null || !(screen instanceof Form)) return;
+		Emulator.getEventQueue().itemStateChanged(this);
 	}
 
 	protected void focus() {
-		this.inFocus = true;
+		this.focused = true;
 		if (this.screen != null) {
 			this.screen.setItemCommands(this);
 		}
@@ -211,72 +182,77 @@ public abstract class Item {
 	}
 
 	protected void defocus() {
-		this.inFocus = false;
-		if (this.screen != null) {
-			this.screen.removeItemCommands(this);
+		focused = false;
+		if (screen != null) {
+			screen.removeItemCommands(this);
 		}
 
 	}
 
-	protected void paint(Graphics graphics) {
-		graphics.setColor(-16777216);
-		if (this.inFocus) {
-			int w = getItemWidth() > 0 ? getItemWidth() + 1 : bounds[W];
-			a.method178(graphics, bounds[X], bounds[Y], w, bounds[H]);
-		}
-
+	protected void paint(Graphics g, int x, int y, int w, int h, int line) {
+		paint(g, x, y, w, h);
 	}
 
-	protected void layout() {
+	protected void paint(Graphics g, int x, int y, int w, int h) {
+		g.setColor(-16777216);
+		if (focused) {
+			a.method178(g, x, y, w, h);
+		}
+	}
+
+	protected void layout(Row row) {
 		bounds[X] = 0;
 		bounds[Y] = 0;
-		bounds[W] = this.screen.bounds[W];
+		bounds[W] = screen.bounds[W];
 		bounds[H] = Screen.fontHeight4;
-	}
-
-	protected int getcurPage() {
-		return this.anIntArray179 != null && this.anIntArray179.length > 0 ? this.anIntArray179[this.currentPos] : 0;
-	}
-
-	protected boolean scrollUp() {
-		if (this.anIntArray179 != null && this.anIntArray179.length > 0 && this.currentPos > 0) {
-			--this.currentPos;
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	protected boolean scrollDown() {
-		if (this.anIntArray179 != null && this.anIntArray179.length > 0
-				&& this.currentPos < this.anIntArray179.length - 1) {
-			++this.currentPos;
-			return false;
-		} else {
-			return true;
-		}
 	}
 
 	protected void pointerPressed(int n, int n2) {
 	}
 
-	void updateHidden() {
-
+	public boolean _hasLayout(int l) {
+		return (layout & l) == l;
 	}
 
-	protected boolean allowNextItemPlaceSameRow() {
+	boolean isFocusable() {
 		return false;
 	}
 
-	protected int getItemWidth() {
-		return 0;
+	boolean hasLabel() {
+		return label != null && !label.isEmpty();
 	}
 
-	protected boolean isFullWidthItem() {
+	void layoutForm() {
+		if (screen != null) {
+			((Form) screen).queueLayout(this);
+		}
+	}
+
+	void repaintForm() {
+		if (screen != null) {
+			((Form) screen).repaintScreen();
+		}
+	}
+
+	boolean isSizeLocked() {
+		return sizeLocked;
+	}
+
+	void hidden() {
+		hidden = true;
+	}
+
+	boolean keyScroll(int key, boolean repeat) {
 		return false;
 	}
 
-	protected void setInRow(boolean b) {
+	public Screen _getParent() {
+		return screen;
+	}
 
+	public void _callCommandAction(Command cmd) {
+		if (itemCommandListener != null && cmd != null) {
+			itemCommandListener.commandAction(cmd, this);
+		}
 	}
 }

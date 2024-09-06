@@ -287,6 +287,9 @@ OPTION_COREAPI_NO_NETWORK=Отключить доступ к сети
 OPTION_COREAPI_SYNC_KEYEVENTS=Синхронизировать события клавиш
 OPTION_COREAPI_SOFTKEY_FIX=Отправлять keyPressed вместе с commandAction
 OPTION_COREAPI_IGNORE_REGION_REPAINT=Всегда перерисовывать экран полностью
+OPTION_COREAPI_KEYPRESS_ON_REPEAT=Send keyPressed on repeats
+OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Force paint on serviceRepaints()
+OPTION_COREAPI_POINTER_EVENTS=Canvas.hasPointerEvents() return value
 
 OPTION_RECORDS_RMS_FOLDER=Папка RMS:
 OPTION_RECORDS_RMS_TEXT=Записи текущего мидлета:

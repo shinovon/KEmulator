@@ -148,7 +148,7 @@ public class Manager {
 					}
 					// other protocols
 					if (locator.indexOf(58) != -1) {
-						return createPlayer(((InputConnection) Connector.open(locator)).openInputStream(), contentType);
+						return createPlayer(Connector.openInputStream(locator), contentType);
 					}
 					// jar resources
 					return createPlayer(CustomJarResources.getResourceAsStream(locator), contentType);
@@ -189,11 +189,11 @@ public class Manager {
 		}
 		if (player == null) {
 			// TODO: parse header data
-			BufferDataSource bds = new BufferDataSource(src);
-			byte[] header = bds.getHeader();
-			if (checkMp3Header(header)) {
-
-			}
+//			BufferDataSource bds = new BufferDataSource(src);
+//			byte[] header = bds.getHeader();
+//			if (checkMp3Header(header)) {
+//
+//			}
 			//player = new PlayerImpl(bds);
 		}
 		if (player == null) {
@@ -209,7 +209,7 @@ public class Manager {
 	}
 
 	private static boolean checkMp3Header(byte[] header) {
-		return header[0] == MP3_HEADER[0] && header[2] == MP3_HEADER[2] && header[3] == MP3_HEADER[3];
+		return header[0] == MP3_HEADER[0] && header[1] == MP3_HEADER[1] && header[2] == MP3_HEADER[2];
 	}
 
 	private static boolean checkMpeg1_2video(byte[] header) {
@@ -319,8 +319,7 @@ public class Manager {
 		if (locator.startsWith("http://") || locator.startsWith("https://")) {
 			try {
 				c = getContentTypeHttp(locator);
-			} catch (IOException ignored) {
-			}
+			} catch (IOException ignored) {}
 			if (c == null || c.equals("text/plain")) c = getContentTypeFromURL(locator);
 		} else {
 			c = getContentTypeFromURL(locator);

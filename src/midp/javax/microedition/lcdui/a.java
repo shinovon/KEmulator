@@ -25,25 +25,16 @@ final class a {
 		this.aBoolean424 = true;
 	}
 
-	protected final void method211(final Graphics graphics, final boolean b) {
-
+	protected final void method211(final Graphics graphics, final boolean b, int y) {
 		graphics.setColor(-16777216);
-		final boolean b2 = this.choice.choiceType == 4;
-		final boolean b3 = this.choice.aBoolean542 && this.choice.anIntArray179 != null;
+		final boolean b2 = this.choice.choiceType == Choice.POPUP;
 		int anInt28 = 0;
 		int anInt29 = 0;
-		Label_0103:
-		{
-			if (b2) {
-				if (!b3) {
-					anInt28 = this.choice.bounds[1];
-					anInt29 = this.choice.anInt28;
-					break Label_0103;
-				}
-				anInt28 = this.choice.anInt28;
-			} else {
-				anInt28 = this.choice.bounds[1];
-			}
+		if (b2) {
+			anInt28 = y;
+			anInt29 = this.choice.popupY;
+		} else {
+			anInt28 = y;
 			anInt29 = this.bounds[1];
 		}
 		int n = anInt28 + anInt29;
@@ -51,14 +42,12 @@ final class a {
 		if (b) {
 			emulator.lcdui.a.method178(graphics, this.bounds[0] + 1, n - 2, this.bounds[2] - 2, this.bounds[3]);
 		}
-		if (!b2 || !b3) {
-			emulator.lcdui.a.method180(graphics, n2, n + 3, this.sel, this.choice.choiceType);
-		}
+		emulator.lcdui.a.method180(graphics, n2, n + 3, this.sel, this.choice.choiceType);
 		final Font font = (this.font != null) ? this.font : Screen.font;
 		graphics.setFont(font);
 		if (this.str != null)
 			for (int i = 0; i < this.str.length; ++i) {
-				graphics.drawString(this.str[i], ((i == 0 && this.choice.choiceType != 3 && !b3) ? (n2 + 10) : n2) + 4, n, 0);
+				graphics.drawString(this.str[i], ((i == 0 && this.choice.choiceType != 3) ? (n2 + 10) : n2) + 4, n, 0);
 				n += font.getHeight() + 4;
 			}
 	}

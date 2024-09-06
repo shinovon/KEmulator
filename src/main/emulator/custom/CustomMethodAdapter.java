@@ -271,6 +271,12 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitIntInsn(final int n, final int n2) {
+		if (n2 == 6 && CustomClassLoader.isProtected("java.lang.Float", false)) {
+			super.visitMethodInsn(184, "emulator/custom/CustomMethod", "checkFloat", "()V");
+		}
+		if (n2 == 7 && CustomClassLoader.isProtected("java.lang.Double", false)) {
+			super.visitMethodInsn(184, "emulator/custom/CustomMethod", "checkDouble", "()V");
+		}
 		Label_0116:
 		{
 			if (Settings.enableNewTrack && n == 188) {

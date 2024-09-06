@@ -1,8 +1,8 @@
 package javax.microedition.lcdui;
 
 public class Spacer extends Item {
-	private int anInt349;
-	private int anInt28;
+	private int w;
+	private int h;
 
 	public Spacer(final int n, final int n2) {
 		super(null);
@@ -10,8 +10,9 @@ public class Spacer extends Item {
 	}
 
 	public void setMinimumSize(final int anInt349, final int anInt350) {
-		this.anInt349 = anInt349;
-		this.anInt28 = anInt350;
+		this.w = anInt349;
+		this.h = anInt350;
+		layoutForm();
 	}
 
 	public void addCommand(final Command command) {
@@ -26,17 +27,29 @@ public class Spacer extends Item {
 		throw new IllegalStateException();
 	}
 
-	protected void paint(final Graphics graphics) {
-		super.paint(graphics);
+	protected void layout(Row row) {
+		super.layout(row);
+		super.bounds[W] = Math.min(this.w + 4, row.getAvailableWidth(screen.bounds[W]));
+		super.bounds[H] = Math.min(this.h + 4, super.screen.bounds[H]);
 	}
 
-	protected void layout() {
-		super.layout();
-		super.bounds[2] = Math.min(this.anInt349 + 4, super.screen.bounds[2]);
-		super.bounds[3] = Math.min(this.anInt28 + 4, super.screen.bounds[3]);
+	public int getMinimumWidth() {
+		return w;
 	}
 
-	public int getItemWidth() {
+	public int getMinimumHeight() {
+		return h;
+	}
+
+	public int getPreferredWidth() {
 		return getMinimumWidth();
+	}
+
+	public int getPreferredHeight() {
+		return getMinimumHeight();
+	}
+
+	boolean isFocusable() {
+		return false;
 	}
 }

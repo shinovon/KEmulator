@@ -4,14 +4,6 @@ import emulator.lcdui.BoundsUtils;
 import emulator.lcdui.c;
 
 import java.util.Vector;
-import javax.microedition.lcdui.Choice;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.a;
 
 public class ChoiceGroup
 		extends Item
@@ -19,12 +11,11 @@ public class ChoiceGroup
 	boolean aBoolean541;
 	int choiceType;
 	private int fitPolicy;
-	private Vector items;
-	boolean aBoolean542;
-	int anInt28;
-	int anInt29;
+	Vector items;
+	int popupY;
 	Command aCommand540;
 	private int currentSelect;
+	private int currentPos;
 
 	public ChoiceGroup(String label, int choiceType) {
 		this(label, choiceType, new String[0], null);
@@ -67,6 +58,7 @@ public class ChoiceGroup
 			throw new NullPointerException();
 		}
 		this.items.add(new a(s, image, null, this));
+		layoutForm();
 		return this.items.size() - 1;
 	}
 
@@ -75,10 +67,12 @@ public class ChoiceGroup
 			throw new IndexOutOfBoundsException();
 		}
 		this.items.remove(n);
+		layoutForm();
 	}
 
 	public synchronized void deleteAll() {
 		this.items.removeAllElements();
+		layoutForm();
 	}
 
 	public void setFitPolicy(int anInt30) {
@@ -94,6 +88,7 @@ public class ChoiceGroup
 			throw new IndexOutOfBoundsException();
 		}
 		((a) this.items.get(n)).font = aFont420;
+		layoutForm();
 	}
 
 	public Font getFont(int n) {
@@ -113,6 +108,7 @@ public class ChoiceGroup
 			throw new NullPointerException();
 		}
 		this.items.insertElementAt(new a(s, image, null, this), n);
+		layoutForm();
 	}
 
 	public synchronized void set(int n, String s, Image image) {
@@ -120,6 +116,7 @@ public class ChoiceGroup
 			throw new NullPointerException();
 		}
 		this.items.set(n, new a(s, image, null, this));
+		layoutForm();
 	}
 
 	public synchronized void setSelectedFlags(boolean[] array) {
@@ -151,6 +148,7 @@ public class ChoiceGroup
 			((a) this.items.get(j)).sel = array[j];
 			++j;
 		}
+		repaintForm();
 	}
 
 	public int getSelectedFlags(boolean[] array) {
@@ -202,9 +200,12 @@ public class ChoiceGroup
 					++i;
 				}
 			}
+			if (choiceType == POPUP) layoutForm();
+			else repaintForm();
 			return;
 		}
 		((a) this.items.get(n)).sel = flag;
+		repaintForm();
 	}
 
 	public int size() {
@@ -218,36 +219,32 @@ public class ChoiceGroup
 				this.screen.cmdListener.commandAction(this.aCommand540, this.screen);
 		}
 		if (this.choiceType == EXCLUSIVE) {
-			notifyStateChanged();
 			this.setSelectedIndex(this.currentPos, true);
+			notifyStateChanged();
 			return;
 		}
 		if (this.choiceType == MULTIPLE) {
-			notifyStateChanged();
 			this.setSelectedIndex(this.currentPos, !this.isSelected(this.currentPos));
+			notifyStateChanged();
 			return;
 		}
 		if (this.choiceType == POPUP) {
-			if (this.aBoolean542) {
-				notifyStateChanged();
-				this.setSelectedIndex(this.currentPos, true);
-			}
-			this.aBoolean542 = !this.aBoolean542;
+			((Form) screen)._showMenu(this, 4, popupY);
 		}
 	}
 
-	protected void paint(Graphics graphics) {
+	protected void paint(Graphics g, int x, int y, int w, int h) {
 		if (!this.aBoolean541) {
-			super.paint(graphics);
+			super.paint(g, x, y, w, h);
 		} else {
-			graphics.setColor(-16777216);
+			g.setColor(-16777216);
 		}
-		int n = this.bounds[1];
+		int n = y;
 		if (this.labelArr != null && this.labelArr.length > 0) {
-			graphics.setFont(Item.font);
+			g.setFont(Item.font);
 			int i = 0;
 			while (i < this.labelArr.length) {
-				graphics.drawString(this.labelArr[i], this.bounds[0] + 4, n + 2, 0);
+				g.drawString(this.labelArr[i], x + 4, n + 2, 0);
 				n += Item.font.getHeight() + 4;
 				++i;
 			}
@@ -261,36 +258,23 @@ public class ChoiceGroup
 					while (j < this.items.size()) {
 						a a2 = (a) this.items.get(j);
 						if (a2.aBoolean424) {
-							a2.method211(graphics, this.inFocus && j == this.currentPos);
+							a2.method211(g, this.focused && j == this.currentPos, y);
 						}
 						++j;
 					}
+					break;
 				}
 				case POPUP: {
-					if (this.aBoolean542 && this.anIntArray179 != null) {
-						this.anInt28 = Math.max(this.bounds[1] - this.anInt29 / 2 - 4, 0);
-						a a2 = (a) this.items.get(0);
-						emulator.lcdui.a.method178(graphics, a2.bounds[0], this.anInt28 - 2, a2.bounds[2], this.anInt29 + 2);
-						int k = 0;
-						while (k < this.items.size()) {
-							a a3 = (a) this.items.get(k);
-							if (a3.aBoolean424) {
-								a3.method211(graphics, k == this.currentPos);
-							}
-							++k;
-						}
-						return;
-					}
 					try {
-						((a) this.items.get(this.currentSelect)).method211(graphics, this.inFocus);
+						((a) this.items.get(this.currentSelect)).method211(g, this.focused, y);
 					} catch (Exception ignored) {}
 				}
 			}
 		}
 	}
 
-	protected synchronized void layout() {
-		super.layout();
+	protected synchronized void layout(Row row) {
+		super.layout(row);
 		int n = 0;
 		if (this.label != null) {
 			int n2 = this.getPreferredWidth() - 8;
@@ -322,54 +306,47 @@ public class ChoiceGroup
 				a a2 = (a) this.items.get(this.getSelectedIndex());
 				a2.method212();
 				n += a2.bounds[H];
-				if (this.aBoolean542) {
-					this.anIntArray179 = new int[this.items.size()];
-					this.anInt29 = 0;
-					int j = 0;
-					while (j < this.items.size()) {
-						this.anInt29 += ((a) this.items.get(j)).bounds[H];
-						++j;
-					}
-					int n3 = 0;
-					int k = 0;
-					while (k < this.items.size()) {
-						a a3 = (a) this.items.get(k);
-						a3.method212();
-						a3.bounds[Y] = n3;
-						n3 += a3.bounds[H];
-						a3.bounds[X] = this.screen.bounds[W] / 4;
-						a3.bounds[W] = this.screen.bounds[W] / 2;
-						this.anIntArray179[k] = k++;
-					}
-					break;
-				}
 				this.anIntArray179 = null;
-				this.anInt29 = -1;
-				this.anInt28 = n - a2.bounds[H];
+				this.popupY = n - a2.bounds[H];
 			}
 		}
-		this.bounds[H] = Math.min(n, this.screen.bounds[H]);
+		this.bounds[H] = n;
 	}
 
-	protected boolean scrollUp() {
-		if (this.choiceType == 4 && this.aBoolean542) {
-			if (super.scrollUp()) {
-				this.currentPos = this.anIntArray179.length - 1;
+	boolean keyScroll(int key, boolean repeat) {
+		if (choiceType == POPUP) {
+			int i = currentSelect;
+			switch (key) {
+				case Canvas.LEFT:
+					if (--i < 0) {
+						return false;
+					}
+					setSelectedIndex(i, true);
+					return true;
+				case Canvas.RIGHT:
+					if (++i >= items.size()) {
+						return false;
+					}
+					setSelectedIndex(i, true);
+					return true;
 			}
 			return false;
 		}
-
-		return super.scrollUp();
-	}
-
-	protected boolean scrollDown() {
-		if (this.choiceType == 4 && this.aBoolean542) {
-			if (super.scrollDown()) {
-				this.currentPos = 0;
-			}
-			return false;
+		switch (key) {
+			case Canvas.UP:
+				if (--currentPos < 0) {
+					currentPos = 0;
+					return false;
+				}
+				return true;
+			case Canvas.DOWN:
+				if (++currentPos >= items.size()) {
+					currentPos = items.size() - 1;
+					return false;
+				}
+				return true;
 		}
-		return super.scrollDown();
+		return false;
 	}
 
 	protected void pointerPressed(int x, int y) {
@@ -378,8 +355,6 @@ public class ChoiceGroup
 		while (i < this.items.size()) {
 			a a2 = (a) this.items.get(i);
 			System.arraycopy(a2.bounds, 0, array, 0, 4);
-			boolean n3 = true;
-			array[1] = array[1] + (this.aBoolean542 ? this.anInt28 : this.bounds[1]);
 			if (a2.aBoolean424 && BoundsUtils.collides(array, x, y)) {
 				this.currentPos = i;
 			}
@@ -387,11 +362,30 @@ public class ChoiceGroup
 		}
 	}
 
-	protected int getItemWidth() {
-		return -1;
+	public int getMinimumWidth() {
+		return Item.font.stringWidth("Some example text") + 6;
 	}
 
-	protected boolean isFullWidthItem() {
-		return true;
+	public int getMinimumHeight() {
+		return (Item.font.getHeight() + 4) * (hasLabel() ? 2 : 1);
+	}
+
+	boolean isFocusable() {
+		return items.size() > 0;
+	}
+
+	protected void defocus() {
+		super.defocus();
+		if (choiceType != POPUP) return;
+		layoutForm();
+	}
+
+	void select(String s) {
+		for (int i = 0; i < items.size(); i++) {
+			if (s.equals(((a) items.get(i)).string)) {
+				setSelectedIndex(i, true);
+				return;
+			}
+		}
 	}
 }
