@@ -55,6 +55,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		state = UNREALIZED;
 		listeners = new Vector<PlayerListener>();
 		timeBase = Manager.getSystemTimeBase();
+		volumeControl = new VolumeControlImpl(this);
+		toneControl = new ToneControlImpl();
 		if (Settings.enableMediaDump) players.add(this);
 	}
 
@@ -101,8 +103,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	}
 
 	private void amr(final InputStream inputStream) throws IOException {
-		volumeControl = new VolumeControlImpl(this);
-		toneControl = new ToneControlImpl();
 		controls = new Control[]{toneControl, volumeControl};
 		try {
 			final byte[] b;
@@ -125,8 +125,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	}
 
 	private void wav(final InputStream inputStream) throws IOException {
-		toneControl = new ToneControlImpl();
-		volumeControl = new VolumeControlImpl(this);
 		controls = new Control[]{toneControl, volumeControl};
 		try {
 			sequence = AudioSystem.getAudioInputStream(inputStream);
@@ -162,8 +160,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	}
 
 	private void wav(final URL url) throws IOException {
-		toneControl = new ToneControlImpl();
-		volumeControl = new VolumeControlImpl(this);
 		controls = new Control[]{toneControl, volumeControl};
 		try {
 			sequence = AudioSystem.getAudioInputStream(url);
@@ -207,8 +203,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			sequence = null;
 		}
 		midiControl = new MIDIControlImpl(this);
-		toneControl = new ToneControlImpl();
-		volumeControl = new VolumeControlImpl(this);
 		controls = new Control[]{toneControl, volumeControl, midiControl};
 	}
 
@@ -484,7 +478,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						e.printStackTrace();
 						throw new IOException(e);
 					}
-					volumeControl = new VolumeControlImpl(this);
 					controls = new Control[]{volumeControl};
 				} else {
 					try {
@@ -552,7 +545,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
 				}
-				volumeControl = new VolumeControlImpl(this);
 				controls = new Control[]{volumeControl};
 				setLevel(level);
 				listeners = new Vector();
