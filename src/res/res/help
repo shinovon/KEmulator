@@ -43,6 +43,25 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.17.1 [2024.09.06]
+LCDUI:
+  Full Form layout support as specified in MIDP 2.0
+  New Canvas.serviceRepaints() implementation
+  Serialized commandAction() & itemStateChanged() events
+  Improved sizeChanged() event
+  Canvas.setFullScreenMode() fixes
+  Added "Canvas.hasPointerEvents() return value" setting
+  Improved Canvas regional repaints support
+  Fixed List & TextBox focus loss
+  Returned softkeys handling in List & TextBox
+  Implemented underlined Font style
+  Fixed Alert timeout (~v2.13 bug)
+Added Float, Double to "Disable APIs" list
+Changed Player.realize() behavior
+More Siemens API stubs
+UEI: UTF-8 console output
+Fixed crash on RMS tab reload in settings
+
 $v2.17 [2024.08.30]
 ALW1, vServ bypass mode
 Global RMS records tree
