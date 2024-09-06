@@ -794,7 +794,7 @@ public class Emulator {
 		getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
 		Class<?> midletClass;
 		try {
-			midletClass = Class.forName(Emulator.midletClassName, true, Emulator.customClassLoader);
+			midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
