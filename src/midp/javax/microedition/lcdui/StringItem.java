@@ -81,7 +81,7 @@ public class StringItem extends Item {
 		} else {
 			g.setFont(font);
 			if (isFocusable()) g.setColor(-11178603);
-			if (isSizeLocked()) {
+			if (isSizeLocked() || hasLabel()) {
 				if (row != 0) return;
 				for (String s : textArr) {
 					g.drawString(s, x + 2, y, 0);
@@ -97,10 +97,15 @@ public class StringItem extends Item {
 	protected void layout(Row row) {
 		super.layout(row);
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		int preferredWidth = super.getPreferredWidth();
 		int maxWidth = screen.bounds[W] - 8;
+		int preferredWidth = this.preferredWidth != -1 ? super.getPreferredWidth() : maxWidth;
 		int availableWidth = Math.min(preferredWidth, row.getAvailableWidth(maxWidth));
-		if (isSizeLocked()) maxWidth = availableWidth;
+		if (isSizeLocked() || hasLabel()) maxWidth = availableWidth;
+
+		int min = getMinimumWidth();
+		if (availableWidth < min) availableWidth = min;
+		if (maxWidth < min) maxWidth = min;
+
 		int[] maxw = new int[1];
 		// TODO label layout
 		String s = (hasLabel() && mode != BUTTON) ? (super.label + "\n" + this.text) : this.text;
@@ -127,7 +132,7 @@ public class StringItem extends Item {
 	}
 
 	public int getPreferredWidth() {
-		return _hasLayout(LAYOUT_EXPAND) || isSizeLocked() ? super.getPreferredWidth() : width;
+		return _hasLayout(LAYOUT_EXPAND) || super.isSizeLocked() ? super.getPreferredWidth() : width;
 	}
 
 	boolean isFocusable() {

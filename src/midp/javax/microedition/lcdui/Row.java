@@ -90,7 +90,8 @@ class Row {
 		Item lastItem = items.get(items.size() - 1).item;
 		return !lastItem._hasLayout(Item.LAYOUT_EXPAND)
 				&& !lastItem._hasLayout(Item.LAYOUT_NEWLINE_AFTER)
-				&& width != maxWidth && width + item.getMinimumWidth() < maxWidth;
+				&& width != maxWidth
+				&& width + (item._hasLayout(Item.LAYOUT_SHRINK) ? item.getMinimumWidth() : item.getPreferredWidth()) < maxWidth;
 	}
 
 	boolean contains(Item item) {
@@ -146,7 +147,9 @@ class Row {
 
 		int getWidth(int available) {
 			int w;
-			if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
+			if (item instanceof StringItem
+					&& ((StringItem) item).getAppearanceMode() != Item.BUTTON
+					&& !item.isSizeLocked() && !item.hasLabel()) {
 				w = ((StringItem) item).getRowWidth(row);
 			} else {
 				w = item.getPreferredWidth();
@@ -161,7 +164,9 @@ class Row {
 		}
 
 		int getHeight() {
-			if (item instanceof StringItem && ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
+			if (item instanceof StringItem
+					&& ((StringItem) item).getAppearanceMode() != Item.BUTTON
+					&& !item.isSizeLocked() && !item.hasLabel()) {
 				return ((StringItem) item).getRowHeight(row);
 			}
 			return item.getPreferredHeight();

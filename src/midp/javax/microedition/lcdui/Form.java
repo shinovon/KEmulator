@@ -511,17 +511,19 @@ public class Form extends Screen {
 				}
 				String text = null;
 				if(item instanceof StringItem
-						&& (text = ((StringItem) item).getText()) != null
-						&& !text.trim().isEmpty() && text.startsWith("\n")) {
+						&& (((text = ((StringItem) item).getText()) != null
+						&& !text.trim().isEmpty() && text.startsWith("\n"))
+						|| ((StringItem) item).getAppearanceMode() != Item.BUTTON && item.hasLabel())) {
 					row = newRow(row);
 				}
 				item.layout(row);
 				// has to be checked after item size calculated
 				if (!row.canAdd(item, width)) {
 					row = newRow(row);
+					item.layout(row);
 				}
 				if (item instanceof StringItem
-						&& ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked()) {
+						&& ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked() && !item.hasLabel()) {
 					StringItem s = (StringItem) item;
 					int l = s.getRowsCount();
 					for (int k = 0; k < l; k++) {
