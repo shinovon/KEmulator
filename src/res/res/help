@@ -54,6 +54,7 @@ LCDUI:
   Improved Canvas regional repaints support
   Fixed List & TextBox focus loss
   Returned softkeys handling in List & TextBox
+  Images support in ChoiceGroup
   Implemented underlined Font style
   Fixed Alert timeout (~v2.13 bug)
 Added Float, Double to "Disable APIs" list
