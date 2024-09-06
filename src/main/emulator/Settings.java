@@ -119,4 +119,5 @@ public final class Settings {
 	public static boolean ignoreServiceRepaints;
 	public static boolean dontRepaintOnSetCurrent;
 	public static boolean hasPointerEvents = true;
+	public static boolean dontCloseWavClip = false;
 }

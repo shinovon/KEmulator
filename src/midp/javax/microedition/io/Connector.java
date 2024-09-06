@@ -93,20 +93,12 @@ public class Connector {
 
 	public static DataInputStream openDataInputStream(final String s) throws IOException {
 		final InputConnection inputConnection = (InputConnection) open(s, 1);
-		try {
-			return inputConnection.openDataInputStream();
-		} finally {
-			inputConnection.close();
-		}
+		return inputConnection.openDataInputStream();
 	}
 
 	public static DataOutputStream openDataOutputStream(final String s) throws IOException {
 		final OutputConnection outputConnection = (OutputConnection) open(s, 2);
-		try {
-			return outputConnection.openDataOutputStream();
-		} finally {
-			outputConnection.close();
-		}
+		return outputConnection.openDataOutputStream();
 	}
 
 	public static InputStream openInputStream(final String s) throws IOException {

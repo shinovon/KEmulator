@@ -7,6 +7,7 @@ import emulator.media.EmulatorMIDI;
 import java.io.*;
 import java.net.URL;
 
+import javax.microedition.io.Connector;
 import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
 import javax.microedition.media.protocol.SourceStream;
@@ -46,6 +47,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private final Object playLock = new Object();
 	private Sequencer midiSequencer;
 	private boolean stopped;
+	private InputStream inputStream;
+	private boolean realized;
 
 	public PlayerImpl() {
 		loopCount = 1;
@@ -66,52 +69,11 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		init(inputStream, contentType);
 	}
 
-	private void init(final InputStream inputStream, String contentType) throws IOException {
-		if (contentType == null)
-			contentType = "";
-		this.contentType = (contentType = contentType.toLowerCase());
-		if (dataLen == 0) dataLen = inputStream.available();
-		if (contentType.equals("audio/amr")) {
-			amr(inputStream);
-		} else if (contentType.equals("audio/x-wav") || contentType.equals("audio/wav")) {
-			wav(inputStream);
-		} else if (contentType.equals("audio/x-midi") || contentType.equals("audio/midi")) {
-			midi(inputStream);
-		} else if (contentType.equals("audio/mpeg") || contentType.equals("audio/mp3")) {
-			try {
-				InputStream i = inputStream;
-				if (i instanceof ByteArrayInputStream && Settings.enableMediaDump) {
-					data = CustomJarResources.getBytes(i);
-					i = new ByteArrayInputStream(data);
-				}
-				sequence = new javazoom.jl.player.Player(i, false);
-			} catch (JavaLayerException e) {
-				e.printStackTrace();
-				throw new IOException(e);
-			}
-			volumeControl = new VolumeControlImpl(this);
-			controls = new Control[]{volumeControl};
-		} else {
-			try {
-				midi(inputStream);
-			} catch (Exception e) {
-				try {
-					wav(inputStream);
-				} catch (Exception e2) {
-					try {
-						amr(inputStream);
-					} catch (Exception e3) {
-						Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
-						sequence = null;
-					}
-				}
-			}
-		}
-		setLevel(level);
-	}
-
-	public PlayerImpl(String locator, String contentType, DataSource src) {
+	public PlayerImpl(String locator, String contentType, DataSource src) throws IOException {
 		this();
+		if (locator != null) {
+			inputStream = Connector.openInputStream(locator);
+		}
 		this.contentType = contentType;
 		this.dataSource = src;
 	}
@@ -123,13 +85,25 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			dataLen = (int) new File(src).length();
 			wav(new URL("file:///" + src));
 			setLevel(level);
+			realized = true;
 		} else {
 			dataLen = (int) new File(src).length();
 			init(new FileInputStream(src), contentType);
 		}
 	}
 
+	private void init(final InputStream inputStream, String contentType) throws IOException {
+		if (contentType == null)
+			contentType = "";
+		this.contentType = contentType.toLowerCase();
+		if (dataLen == 0) dataLen = inputStream.available();
+		this.inputStream = inputStream;
+	}
+
 	private void amr(final InputStream inputStream) throws IOException {
+		volumeControl = new VolumeControlImpl(this);
+		toneControl = new ToneControlImpl();
+		controls = new Control[]{toneControl, volumeControl};
 		try {
 			final byte[] b;
 			if ((b = emulator.media.amr.a.method476(CustomJarResources.getBytes(inputStream))) == null) {
@@ -148,12 +122,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			sequence = null;
 			throw new IOException("AMR realize error!", e);
 		}
-		toneControl = new ToneControlImpl();
-		volumeControl = new VolumeControlImpl(this);
-		controls = new Control[]{toneControl, volumeControl};
 	}
 
 	private void wav(final InputStream inputStream) throws IOException {
+		toneControl = new ToneControlImpl();
+		volumeControl = new VolumeControlImpl(this);
+		controls = new Control[]{toneControl, volumeControl};
 		try {
 			sequence = AudioSystem.getAudioInputStream(inputStream);
 		} catch (Exception e) {
@@ -185,12 +159,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			sequence = null;
 			throw new IOException();
 		}
-		toneControl = new ToneControlImpl();
-		volumeControl = new VolumeControlImpl(this);
-		controls = new Control[]{toneControl, volumeControl};
 	}
 
 	private void wav(final URL url) throws IOException {
+		toneControl = new ToneControlImpl();
+		volumeControl = new VolumeControlImpl(this);
+		controls = new Control[]{toneControl, volumeControl};
 		try {
 			sequence = AudioSystem.getAudioInputStream(url);
 		} catch (Exception e) {
@@ -222,9 +196,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			sequence = null;
 			throw new IOException();
 		}
-		toneControl = new ToneControlImpl();
-		volumeControl = new VolumeControlImpl(this);
-		controls = new Control[]{toneControl, volumeControl};
 	}
 
 	private void midi(final InputStream inputStream) throws IOException {
@@ -316,7 +287,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			} catch (MediaException ignored) {}
 			return;
 		}
-		if (sequence instanceof Clip) {
+		if (sequence instanceof Clip && !Settings.dontCloseWavClip) {
 			try {
 				((Clip) sequence).close();
 			} catch (Exception ignored) {}
@@ -490,6 +461,54 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 		if (state == UNREALIZED) {
 			state = REALIZED;
+		}
+		if (realized) return;
+		realized = true;
+		if (inputStream != null) {
+			try {
+				if ("audio/amr".equals(contentType)) {
+					amr(inputStream);
+				} else if ("audio/x-wav".equals(contentType) || "audio/wav".equals(contentType)) {
+					wav(inputStream);
+				} else if ("audio/x-midi".equals(contentType) || "audio/midi".equals(contentType)) {
+					midi(inputStream);
+				} else if ("audio/mpeg".equals(contentType) || "audio/mp3".equals(contentType)) {
+					try {
+						InputStream i = inputStream;
+						if (i instanceof ByteArrayInputStream && Settings.enableMediaDump) {
+							data = CustomJarResources.getBytes(i);
+							i = new ByteArrayInputStream(data);
+						}
+						sequence = new javazoom.jl.player.Player(i, false);
+					} catch (JavaLayerException e) {
+						e.printStackTrace();
+						throw new IOException(e);
+					}
+					volumeControl = new VolumeControlImpl(this);
+					controls = new Control[]{volumeControl};
+				} else {
+					try {
+						midi(inputStream);
+					} catch (Exception e) {
+						try {
+							wav(inputStream);
+						} catch (Exception e2) {
+							try {
+								amr(inputStream);
+							} catch (Exception e3) {
+								Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
+								sequence = null;
+							}
+						}
+					}
+				}
+				setLevel(level);
+				return;
+			} catch (IOException e) {
+				throw new MediaException(e);
+			} finally {
+				inputStream = null;
+			}
 		}
 		if (dataSource != null) {
 			try {
