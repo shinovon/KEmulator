@@ -792,7 +792,7 @@ public final class EmulatorScreen implements
 		canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
 		canvasKeyboardMenuItem.addSelectionListener(this);
 		this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
-		fpsModeMenuItem.setText("FPS Mode\tAlt+F");
+		fpsModeMenuItem.setText(UILocale.get("MENU_TOOL_FPS_MODE", "FPS Mode") + "\tAlt+F");
 		fpsModeMenuItem.setSelection(Settings.fpsMode);
 		fpsModeMenuItem.addSelectionListener(this);
 		fpsModeMenuItem.setAccelerator(SWT.ALT + 'F');

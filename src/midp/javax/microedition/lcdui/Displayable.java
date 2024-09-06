@@ -112,7 +112,7 @@ public class Displayable {
 
 	protected void updateCommands() {
 		final String commandLeft = (this.commands.size() > 0) ? this.getLeftSoftCommand().getLongLabel() : "";
-		final String commandRight = (this.commands.size() > 2) ? "Menu"
+		final String commandRight = (this.commands.size() > 2) ? UILocale.get("LCDUI_MENU_COMMAND", "Menu")
 				: ((this.commands.size() < 2) ? "" : this.getRightSoftCommand().getLongLabel());
 		Emulator.getEmulator().getScreen().setCommandLeft(commandLeft);
 		Emulator.getEmulator().getScreen().setCommandRight(commandRight);

@@ -72,6 +72,7 @@ MENU_TOOL_CAPTURE_CLIP=Скриншот в буфер обмена
 MENU_TOOL_SHOW_TRACK_INFO=Вкл. отслеживание вызовов
 
 MENU_TOOL_QWERTY_MODE=Режим QWERTY
+MENU_TOOL_FPS_MODE=Режим FPS
 MENU_TOOL_DISABLE_NETWORK_ACCESS=Отключить доступ к сети
 
 #Command bar
@@ -115,6 +116,36 @@ ABOUT_ONLINE_MANUAL=Online Manual
 KEYPAD_FRAME_TITLE=Кейпад
 KEYPAD_FRAME_LSK=ЛСК
 KEYPAD_FRAME_RSK=ПСК
+
+
+#M3G View
+
+M3G_VIEW_TITLE   = M3G View
+M3G_VIEW_CAMERA  = Camera
+M3G_VIEW_LIGHT   = Light
+M3G_VIEW_DISPLAY = Display
+
+M3G_VIEW_LIGHT_SCENE   = Scene Graphics
+M3G_VIEW_LIGHT_VIEW    = Viewer Light
+M3G_VIEW_LIGHT_SETTING = Light Setting
+
+M3G_VIEW_CAMERA_ORBIT  = Orbit
+M3G_VIEW_CAMERA_PAN    = Pan
+M3G_VIEW_CAMERA_DOLLY  = Dolly
+M3G_VIEW_CAMERA_ZOOM   = Zoom
+M3G_VIEW_CAMERA_PROJECTION  = Projection Mode
+M3G_VIEW_CAMERA_PERSPECTIVE = Perspective Projection
+M3G_VIEW_CAMERA_PARALLEL    = Parallel Projection
+
+M3G_VIEW_CAMERA_CLIP_PLANES   = Clipping Planes
+M3G_VIEW_CAMEAR_FIELD_OF_VIEW = Field of View
+M3G_VIEW_CAMEAR_POSITION      = Camera Position
+M3G_VIEW_CAMEAR_RESET         = Reset Camera
+
+M3G_VIEW_DISPLAY_COORDINATE   = Coordinate Axis
+M3G_VIEW_DISPLAY_SHOW_GRID    = Show Grid
+M3G_VIEW_DISPLAY_SHOW_XRAY    = Show Xray
+M3G_VIEW_DISPLAY_UPDATE_WORLD=Update World
 
 
 #Log Frame
@@ -368,4 +399,8 @@ PERMISSION_CAMERA=Разрешить приложению использоват
 SECURITY_ALERT_TITLE=Безопасность
 
 SCREEN_SIZE_DIALOG_TITLE=Изменение размера экрана
+
+LCDUI_ALERT_DISMISS_COMMAND=Ок
+LCDUI_LIST_SELECT_COMMAND=Выбрать
+LCDUI_MENU_COMMAND=Меню
 

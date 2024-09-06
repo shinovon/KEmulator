@@ -121,6 +121,6 @@ public class Alert extends Screen {
 	}
 
 	static {
-		DISMISS_COMMAND = new Command("OK", 4, 0);
+		DISMISS_COMMAND = new Command(UILocale.get("LCDUI_ALERT_DISMISS_COMMAND", "OK"), 4, 0);
 	}
 }

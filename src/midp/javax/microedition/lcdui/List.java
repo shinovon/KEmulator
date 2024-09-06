@@ -1,5 +1,6 @@
 package javax.microedition.lcdui;
 
+import emulator.UILocale;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -8,7 +9,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 public class List extends Screen implements Choice {
-	public static final Command SELECT_COMMAND = new Command("Select", 1, 0);
+	public static final Command SELECT_COMMAND = new Command(UILocale.get("LCDUI_LIST_SELECT_COMMAND", "Select"), 1, 0);
 	private int type;
 	private Table swtTable;
 	private ChoiceImpl choiceImpl;
