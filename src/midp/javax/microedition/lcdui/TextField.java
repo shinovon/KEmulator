@@ -24,7 +24,7 @@ public class TextField extends Item {
 	private int caretX;
 	private int caretY;
 	protected boolean isTextBox;
-	private boolean wasHidden;
+	private boolean updateFocus;
 
 	public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
 		super(s);
@@ -110,16 +110,18 @@ public class TextField extends Item {
 	protected void focus() {
 		super.focus();
 		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
+		updateFocus = true;
 	}
 
 	protected void defocus() {
+		if (focused || !updateFocus) Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		super.defocus();
-		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+		updateFocus = true;
 	}
 
 	public void hidden() {
-		wasHidden = true;
-		Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+		if (focused || !updateFocus) Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+		updateFocus = true;
 	}
 
 	protected void paint(Graphics g, int x, int y, int w, int h) {
@@ -140,8 +142,8 @@ public class TextField extends Item {
 		g.drawRect(2, yo, w - 4, bounds[H] - yo + y - 2);
 		g.setFont(Screen.font);
 		if (focused) g.setColor(8617456);
-		if ((caretX != x + 4 || caretY != yo + 4 || wasHidden) && focused) {
-			wasHidden = false;
+		if ((caretX != x + 4 || caretY != yo + 4 || updateFocus) && focused) {
+			updateFocus = false;
 			caretX = x + 4;
 			caretY = yo + 4;
 			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
