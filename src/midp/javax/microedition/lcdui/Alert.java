@@ -109,11 +109,15 @@ public class Alert extends Screen {
 		}
 		if (lastDisplayed != null
 				&& timeShown != 0
-				&& this.timeout > 0
+				&& timeout >= 0
 				&& commands.size() <= 1
 				&& System.currentTimeMillis() - timeShown > timeout) {
 			close();
 		}
+	}
+
+	public int _repaintInterval() {
+		return gauge != null || timeout >= 0 ? 500 : -1;
 	}
 
 	static {

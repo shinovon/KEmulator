@@ -223,14 +223,14 @@ public abstract class Item {
 	}
 
 	void layoutForm() {
-		if (screen != null) {
+		if (screen != null && screen instanceof Form) {
 			((Form) screen).queueLayout(this);
 		}
 	}
 
 	void repaintForm() {
 		if (screen != null) {
-			((Form) screen).repaintScreen();
+			screen.repaintScreen();
 		}
 	}
 

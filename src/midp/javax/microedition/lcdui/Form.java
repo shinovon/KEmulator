@@ -17,6 +17,7 @@ public class Form extends Screen {
 	private int lastScrollDirection;
 	private int currentDir;
 	private boolean pointerGrabbed;
+	private boolean hasGauges;
 
 	public Form(final String s) {
 		this(s, null);
@@ -492,6 +493,7 @@ public class Form extends Screen {
 			row = null;
 			for (int j = i; j < items.size(); j++) {
 				Item item = (Item) items.get(j);
+				if (item instanceof Gauge) hasGauges = true;
 				int itemDir = item.layout & (Item.LAYOUT_CENTER);
 				if (itemDir == 0) {
 					itemDir = currentDir;
@@ -583,5 +585,9 @@ public class Form extends Screen {
 	public void _itemStateChanged(Item item) {
 		if (itemStateListener == null) return;
 		itemStateListener.itemStateChanged(item);
+	}
+
+	public int _repaintInterval() {
+		return hasGauges ? 500 : -1;
 	}
 }

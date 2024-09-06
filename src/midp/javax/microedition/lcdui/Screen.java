@@ -185,6 +185,10 @@ public abstract class Screen extends Displayable {
 		}
 	}
 
+	public int _repaintInterval() {
+		return -1;
+	}
+
 	static {
 		font = Font.getDefaultFont();
 		fontHeight = Screen.font.getHeight();

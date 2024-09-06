@@ -8,6 +8,8 @@ import emulator.ui.IScreen;
 import net.rim.device.api.system.Application;
 import emulator.graphics2D.*;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 public final class EventQueue implements Runnable {
@@ -39,6 +41,9 @@ public final class EventQueue implements Runnable {
 	private final Object eventLock = new Object();
 	private boolean repaintPending;
 	private int repaintX, repaintY, repaintW, repaintH;
+
+	private Timer screenTimer;
+	private TimerTask screenTimerTask;
 
 	public EventQueue() {
 		events = new int[128];
@@ -311,6 +316,22 @@ public final class EventQueue implements Runnable {
 									.cloneImage(scr.getScreenImg());
 						} catch (Exception ignored) {}
 						scr.repaint();
+						int interval = ((Screen) d)._repaintInterval();
+						if (interval > 0) {
+							synchronized (lock) {
+								if (screenTimer == null) {
+									screenTimer = new Timer();
+								}
+								if (screenTimerTask != null) {
+									try {
+										screenTimerTask.cancel();
+									} catch (Exception ignored) {}
+									screenTimerTask = null;
+								}
+								screenTimerTask = new ScreenTimerTask();
+								screenTimer.schedule(screenTimerTask, interval);
+							}
+						}
 						break;
 					}
 					case EVENT_START: {
@@ -590,4 +611,10 @@ public final class EventQueue implements Runnable {
 			}
 		}
 	}
+
+	private class ScreenTimerTask extends TimerTask {
+		public void run() {
+			queue(EVENT_SCREEN);
+		}
+	};
 }
