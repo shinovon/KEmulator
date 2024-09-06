@@ -83,11 +83,24 @@ public class StringItem extends Item {
 			if (isFocusable()) g.setColor(-11178603);
 			if (isSizeLocked() || hasLabel()) {
 				if (row != 0) return;
+				g.setFont(Item.font);
+				if (labelArr != null) for (String s : labelArr) {
+					g.drawString(s, x + 2, y, 0);
+					y += Item.font.getHeight() + 4;
+				}
+				g.setFont(font);
 				for (String s : textArr) {
 					g.drawString(s, x + 2, y, 0);
 					y += font.getHeight() + 4;
 				}
 				return;
+			}
+			if (labelArr != null) {
+				if (row < labelArr.length) {
+					g.drawString(labelArr[row], x + 1, y, 0);
+					return;
+				}
+				row -= labelArr.length;
 			}
 			if (textArr == null || row >= textArr.length) return;
 			g.drawString(textArr[row], x + 1, y, 0);
@@ -107,17 +120,23 @@ public class StringItem extends Item {
 		if (maxWidth < min) maxWidth = min;
 
 		int[] maxw = new int[1];
-		// TODO label layout
-		String s = (hasLabel() && mode != BUTTON) ? (super.label + "\n" + this.text) : this.text;
-		this.textArr = c.textArr(s, font, availableWidth, maxWidth, maxw);
-		width = textArr.length != 0 ? maxw[0] + 4 : 4;
+		int w = 0;
+		if (hasLabel() && mode != BUTTON) {
+			labelArr = c.textArr(label, Item.font, maxWidth, maxWidth, maxw);
+			if (labelArr.length != 0) w = maxw[0] + 4;
+		} else {
+			labelArr = null;
+		}
+		textArr = c.textArr(text, font, availableWidth, maxWidth, maxw);
+		width = Math.max(w, textArr.length != 0 ? maxw[0] + 4 : 4);
 		final int fh = font.getHeight() + 4;
 		if (mode == BUTTON) {
 			width = Math.min(maxWidth, font.stringWidth(textArr[0]) + 10);
 			textArr = new String[] { textArr[0] };
 			bounds[H] = fh + (hasLabel() ? Item.font.getHeight() + 4 : 0);
 		} else {
-			bounds[H] = fh * this.textArr.length;
+			bounds[H] = fh * textArr.length
+					+ (labelArr != null ? (Item.font.getHeight() + 4) * labelArr.length : 0);
 		}
 	}
 
@@ -140,17 +159,23 @@ public class StringItem extends Item {
 	}
 
 	int getRowWidth(int row) {
+		if (labelArr != null) {
+			if (row < labelArr.length)
+				return Screen.font.stringWidth(labelArr[row]) + 2;
+			row -= labelArr.length;
+		}
 		if (textArr == null) return 0;
-		final Font font = (this.font != null) ? this.font : Screen.font;
-		return font.stringWidth(textArr[row]) + 2;
+		return ((font != null) ? font : Screen.font).stringWidth(textArr[row]) + 2;
 	}
 
 	int getRowHeight(int row) {
-		final Font font = (this.font != null) ? this.font : Screen.font;
-		return font.getHeight() + 4;
+		if (labelArr != null && row < labelArr.length) {
+			return Screen.font.getHeight() + 4;
+		}
+		return ((font != null) ? font : Screen.font).getHeight() + 4;
 	}
 
 	int getRowsCount() {
-		return textArr == null ? 0 : textArr.length;
+		return (textArr == null ? 0 : textArr.length) + ((labelArr == null ? 0 : labelArr.length));
 	}
 }
