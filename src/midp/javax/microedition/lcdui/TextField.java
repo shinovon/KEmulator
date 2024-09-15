@@ -107,24 +107,24 @@ public class TextField extends Item {
 	public void setInitialInputMode(final String s) {
 	}
 
-	protected void focus() {
+	void focus() {
 		super.focus();
 		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		updateFocus = true;
 	}
 
-	protected void defocus() {
+	void defocus() {
 		if (focused || !updateFocus) Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		super.defocus();
 		updateFocus = true;
 	}
 
-	public void hidden() {
+	void hidden() {
 		if (focused || !updateFocus) Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		updateFocus = true;
 	}
 
-	protected void paint(Graphics g, int x, int y, int w, int h) {
+	void paint(Graphics g, int x, int y, int w, int h) {
 		if (!this.isTextBox) {
 			super.paint(g, x, y, w, h);
 		} else {
@@ -154,7 +154,7 @@ public class TextField extends Item {
 		}
 	}
 
-	protected void layout(Row row) {
+	void layout(Row row) {
 		super.layout(row);
 		int n = 4;
 		final int availableWidth = row.getAvailableWidth(screen.bounds[W]) - 8;

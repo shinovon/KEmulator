@@ -1,8 +1,5 @@
 package javax.microedition.lcdui;
 
-import emulator.Emulator;
-import emulator.ui.IScreen;
-
 import java.util.ArrayList;
 
 public class Form extends Screen {
@@ -168,7 +165,7 @@ public class Form extends Screen {
 				if (scrollCurrentItem != null && scrollTargetItem == null) {
 					scrollTargetItem = getNextFocusableItem(scrollCurrentItem, -1);
 				}
-				if (scrollTargetItem != null && isVisible(scrollTargetItem, 0)) {
+				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
 					focusItem(scrollTargetItem);
 					scrollCurrentItem = scrollTargetItem;
 //					if (isVisible(scrollTargetItem, height / 6)) {
@@ -190,7 +187,7 @@ public class Form extends Screen {
 				if (scrollCurrentItem != null && scrollTargetItem == null) {
 					scrollTargetItem = getNextFocusableItem(scrollCurrentItem, 1);
 				}
-				if (scrollTargetItem != null && isVisible(scrollTargetItem, 0)) {
+				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
 					focusItem(scrollTargetItem);
 					scrollCurrentItem = scrollTargetItem;
 //					if (isVisible(scrollTargetItem, height / 6)) {
@@ -304,7 +301,7 @@ public class Form extends Screen {
 
 	void setCurrentItem(Item item) {
 		focusItem(item);
-		if (!isVisible(item, 0)) scrollTo(item);
+		if (!isVisible(item)) scrollTo(item);
 	}
 
 	private Row getFirstVisibleRow() {
@@ -381,7 +378,7 @@ public class Form extends Screen {
 			if (item != null) {
 				focusItem(item);
 			}
-		} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem, 0)) {
+		} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
 			scrollTo(focusedItem);
 		}
 		scroll = Math.max(0, Math.min(scroll, layoutHeight - h + bounds[Y]));
@@ -421,11 +418,11 @@ public class Form extends Screen {
 		return null;
 	}
 
-	boolean isVisible(Item item, int offset) {
+	boolean isVisible(Item item) {
 		Row row = getFirstRow(item);
 		if (row == null) return false;
 		do {
-			if (isVisible(row, offset)) {
+			if (isVisible(row)) {
 				return true;
 			}
 		} while ((row = getNextRow(item, row)) != null);
@@ -433,9 +430,9 @@ public class Form extends Screen {
 //		return !item.hidden;
 	}
 
-	boolean isVisible(Row row, int offset) {
+	boolean isVisible(Row row) {
 		if (row == null) return false;
-		return row.y + row.height - scroll - offset > 0 && bounds[H] - offset > row.y - scroll;
+		return row.y + row.height - scroll > 0 && bounds[H] > row.y - scroll;
 	}
 
 	void scrollTo(Item item) {
@@ -461,7 +458,7 @@ public class Form extends Screen {
 	synchronized void doLayout(int i) {
 		synchronized (rows) {
 			layoutHeight = 0;
-			if (items.size() == 0) {
+			if (items.isEmpty()) {
 				rows.clear();
 				return;
 			}
@@ -482,7 +479,7 @@ public class Form extends Screen {
 						rows.remove(rowIdx);
 					}
 				}
-				if (rows.size() > 0) {
+				if (!rows.isEmpty()) {
 					for (Row r : rows) {
 						layoutHeight += r.getHeight();
 					}
@@ -584,6 +581,12 @@ public class Form extends Screen {
 	public void _itemStateChanged(Item item) {
 		if (itemStateListener == null) return;
 		itemStateListener.itemStateChanged(item);
+	}
+
+	void repaintScreen(Item item) {
+		if (isVisible(item)) {
+			repaintScreen();
+		}
 	}
 
 	public int _repaintInterval() {

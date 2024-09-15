@@ -68,7 +68,7 @@ public class Gauge extends Item {
 		return interactive;
 	}
 
-	protected void paint(Graphics g, int x, int y, int w, int h) {
+	void paint(Graphics g, int x, int y, int w, int h) {
 		super.paint(g, x, y, w, h);
 		final Font font = Item.font;
 		g.setFont(font);
@@ -123,7 +123,7 @@ public class Gauge extends Item {
 		}
 	}
 
-	public void layout(Row row) {
+	void layout(Row row) {
 		super.layout(row);
 		final Font font = Item.font;
 		if (!interactive) {

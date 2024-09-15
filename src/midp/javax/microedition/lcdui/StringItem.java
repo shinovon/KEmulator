@@ -49,7 +49,7 @@ public class StringItem extends Item {
 		super.setPreferredSize(w, h);
 	}
 
-	protected void paint(Graphics g, int x, int y, int w, int h, int row) {
+	void paint(Graphics g, int x, int y, int w, int h, int row) {
 		super.paint(g, x, y, w, h);
 
 		final Font font = (this.font != null) ? this.font : Screen.font;
@@ -107,7 +107,7 @@ public class StringItem extends Item {
 		}
 	}
 
-	protected void layout(Row row) {
+	void layout(Row row) {
 		super.layout(row);
 		final Font font = (this.font != null) ? this.font : Screen.font;
 		int maxWidth = screen.bounds[W] - 8;

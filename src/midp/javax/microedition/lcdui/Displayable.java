@@ -308,6 +308,10 @@ public class Displayable {
 		Emulator.getEventQueue().queue(n);
 	}
 
+	void repaintScreen(Item item) {
+		repaintScreen();
+	}
+
 	protected void _paintSoftMenu(final Graphics graphics) {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
 	}

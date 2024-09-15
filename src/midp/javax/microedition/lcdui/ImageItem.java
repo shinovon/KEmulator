@@ -58,7 +58,7 @@ public class ImageItem extends Item {
 		return this.appearanceMode;
 	}
 
-	protected void paint(final Graphics g, int x, int y, int w, int h) {
+	void paint(final Graphics g, int x, int y, int w, int h) {
 		super.paint(g, x, y, w, h);
 		int yo = y;
 		if (labelArr != null && labelArr.length > 0) {
@@ -87,7 +87,7 @@ public class ImageItem extends Item {
 		}
 	}
 
-	protected void layout(Row row) {
+	void layout(Row row) {
 		super.layout(row);
 		int n = 0;
 		int w = row.getAvailableWidth(screen.bounds[W]);

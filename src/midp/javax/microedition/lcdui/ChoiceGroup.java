@@ -233,7 +233,7 @@ public class ChoiceGroup
 		}
 	}
 
-	protected void paint(Graphics g, int x, int y, int w, int h) {
+	void paint(Graphics g, int x, int y, int w, int h) {
 		if (!this.aBoolean541) {
 			super.paint(g, x, y, w, h);
 		} else {
@@ -273,7 +273,7 @@ public class ChoiceGroup
 		}
 	}
 
-	protected synchronized void layout(Row row) {
+	synchronized void layout(Row row) {
 		super.layout(row);
 		int n = 0;
 		if (this.label != null) {

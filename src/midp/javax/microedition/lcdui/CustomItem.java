@@ -146,7 +146,7 @@ public abstract class CustomItem extends Item {
 		} catch (Exception ignored) {}
 	}
 
-	protected void paint(final Graphics graphics, int x, int y, int w, int h) {
+	void paint(final Graphics graphics, int x, int y, int w, int h) {
 		super.paint(graphics, x, y, w, h);
 		if (wasHidden) {
 			try {
@@ -179,8 +179,7 @@ public abstract class CustomItem extends Item {
 				n, n2, 0);
 	}
 
-	protected void layout(Row row) {
-
+	void layout(Row row) {
 		super.layout(row);
 		int n = 0;
 		int w = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);

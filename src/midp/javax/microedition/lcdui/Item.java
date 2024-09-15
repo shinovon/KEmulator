@@ -164,7 +164,6 @@ public abstract class Item {
 			if ((this.defaultCommand = aCommand174) != null) {
 				this.addCommand(aCommand174);
 			}
-
 		}
 	}
 
@@ -173,34 +172,32 @@ public abstract class Item {
 		Emulator.getEventQueue().itemStateChanged(this);
 	}
 
-	protected void focus() {
+	void focus() {
 		this.focused = true;
 		if (this.screen != null) {
 			this.screen.setItemCommands(this);
 		}
-
 	}
 
-	protected void defocus() {
+	void defocus() {
 		focused = false;
 		if (screen != null) {
 			screen.removeItemCommands(this);
 		}
-
 	}
 
-	protected void paint(Graphics g, int x, int y, int w, int h, int line) {
+	void paint(Graphics g, int x, int y, int w, int h, int line) {
 		paint(g, x, y, w, h);
 	}
 
-	protected void paint(Graphics g, int x, int y, int w, int h) {
+	void paint(Graphics g, int x, int y, int w, int h) {
 		g.setColor(-16777216);
 		if (focused) {
 			a.method178(g, x, y, w, h);
 		}
 	}
 
-	protected void layout(Row row) {
+	void layout(Row row) {
 		bounds[X] = 0;
 		bounds[Y] = 0;
 		bounds[W] = screen.bounds[W];
@@ -230,7 +227,7 @@ public abstract class Item {
 
 	void repaintForm() {
 		if (screen != null) {
-			screen.repaintScreen();
+			screen.repaintScreen(this);
 		}
 	}
 
