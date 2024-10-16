@@ -21,7 +21,7 @@ public class FunLight {
 	}
 
 	public static Region getRegion(int i) {
-		return null;
+		return new Region_Blank();
 	}
 
 	public static int[] getRegionsIDs() {
