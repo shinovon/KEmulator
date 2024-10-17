@@ -621,7 +621,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			if (t.isAlive()) {
 				try {
 					synchronized (t) {
-						t.wait();
+						t.wait(1000);
 					}
 				} catch (Exception ignored) {}
 			}
