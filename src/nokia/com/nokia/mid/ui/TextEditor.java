@@ -1,6 +1,6 @@
 package com.nokia.mid.ui;
 
-public class TextEditor {
+public class TextEditor extends CanvasItem {
 	// TODO
 	public static TextEditor createTextEditor(
 			String text,
