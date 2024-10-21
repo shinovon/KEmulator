@@ -9,7 +9,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	HttpURLConnection connection;
 	private boolean closed;
 	private String url;
-	private boolean setted;
+	private boolean userAgentSet;
 
 	private void method134(final String s) {
 		if (this.url.startsWith("http://10.0.0.172")) {
@@ -35,6 +35,10 @@ final class HttpConnectionImpl implements HttpConnection {
 		this.connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setDoInput(true);
 		connection.setDoOutput(true);
+	}
+
+	private void connect() {
+		setUserAgent();
 	}
 
 	public final String getURL() {
@@ -91,6 +95,7 @@ final class HttpConnectionImpl implements HttpConnection {
 					x = "UNTRUSTED/1.0";
 				}
 				connection.setRequestProperty("User-Agent", s2 + (x == null ? "" : (" " + x)));
+				userAgentSet = true;
 			}
 			return;
 		}
@@ -101,13 +106,13 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final int getResponseCode() throws IOException {
-		setUserAgent();
 		if (Settings.networkNotAvailable) {
 			return 502;
 		}
 		if (this.connection == null) {
 			return 200;
 		}
+		connect();
 		try {
 			return this.connection.getResponseCode();
 		} catch (ConnectException e) {
@@ -116,7 +121,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final String getResponseMessage() throws IOException {
-		setUserAgent();
+		connect();
 		if (this.connection == null) {
 			return "OK";
 		}
@@ -124,34 +129,42 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final long getExpiration() throws IOException {
+		connect();
 		return this.connection.getExpiration();
 	}
 
 	public final long getDate() throws IOException {
+		connect();
 		return this.connection.getDate();
 	}
 
 	public final long getLastModified() throws IOException {
+		connect();
 		return this.connection.getLastModified();
 	}
 
 	public final String getHeaderField(final String s) throws IOException {
+		connect();
 		return this.connection.getHeaderField(s);
 	}
 
 	public final int getHeaderFieldInt(final String s, final int n) throws IOException {
+		connect();
 		return this.connection.getHeaderFieldInt(s, n);
 	}
 
 	public final long getHeaderFieldDate(final String s, final long n) throws IOException {
+		connect();
 		return this.connection.getHeaderFieldDate(s, n);
 	}
 
 	public final String getHeaderField(final int n) throws IOException {
+		connect();
 		return this.connection.getHeaderField(n);
 	}
 
 	public final String getHeaderFieldKey(final int n) throws IOException {
+		connect();
 		return this.connection.getHeaderFieldKey(n);
 	}
 
@@ -179,10 +192,8 @@ final class HttpConnectionImpl implements HttpConnection {
 	 * @author Shinovon
 	 */
 	public final InputStream openInputStream() throws IOException {
-		setUserAgent();
-		if (this.closed) {
-			throw new IOException();
-		}
+		if (this.closed) throw new IOException();
+		connect();
 		try {
 			return this.connection.getInputStream();
 		} catch (IOException e) {
@@ -193,8 +204,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	private void setUserAgent() {
-		if (setted)
-			return;
+		if (userAgentSet) return;
 		try {
 			if (getRequestProperty("User-Agent") == null) {
 				if (Emulator.httpUserAgent != null) {
@@ -208,7 +218,7 @@ final class HttpConnectionImpl implements HttpConnection {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		setted = true;
+		userAgentSet = true;
 	}
 
 	public final DataOutputStream openDataOutputStream() throws IOException {
@@ -216,10 +226,8 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
-		setUserAgent();
-		if (this.closed) {
-			throw new IOException();
-		}
+		if (this.closed) throw new IOException();
+		connect();
 		try {
 			return this.connection.getOutputStream();
 		} catch (Exception ex) {
