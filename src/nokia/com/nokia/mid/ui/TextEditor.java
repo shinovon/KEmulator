@@ -36,7 +36,6 @@ public class TextEditor extends CanvasItem {
 			int width,
 			int height)
 	{
-		System.out.println("a");
 		return new TextEditor(text, maxSize, constraints, width, height, false);
 	}
 
@@ -124,7 +123,7 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public void setCaret(int index) {
-
+		// TODO
 	}
 
 	public int getCaretPosition() {
@@ -236,6 +235,7 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public String getSelection() {
+		// TODO
 		return null;
 	}
 
@@ -248,6 +248,7 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public void setMultiline(boolean aMultiline) {
+		// TODO
 		iMultiline = aMultiline;
 	}
 
@@ -292,7 +293,6 @@ public class TextEditor extends CanvasItem {
 				h = getHeight(),
 				x = getPositionX(),
 				y = getPositionY();
-		System.out.println("te " + x + " " + y + " " + w + " " + h + " " + " " + iFocused);
 		Font font = getFont();
 		g.setFont(font);
 

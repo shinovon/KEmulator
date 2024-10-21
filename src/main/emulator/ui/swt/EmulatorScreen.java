@@ -173,6 +173,7 @@ public final class EmulatorScreen implements
 	private Composite swtContent;
 	private Displayable lastDisplayable;
 	private boolean painted;
+	private final Vector<String> caretKeys = new Vector<String>();
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -1647,10 +1648,8 @@ public final class EmulatorScreen implements
 					lastDisplayable._swtHidden();
 					lastDisplayable = null;
 				}
-				if (d == null) {
-
-					return;
-				}
+				if (d == null) return;
+				
 				lastDisplayable = d;
 				if (d instanceof javax.microedition.lcdui.Canvas) {
 					stackLayout.topControl = null;
@@ -1705,10 +1704,14 @@ public final class EmulatorScreen implements
 			this.zoomIn();
 			return;
 		}
-		this.caret.keyPressed(keyEvent);
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
 		if (keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
 			n = keyEvent.character;
+		if (this.caret.keyPressed(keyEvent) && lastDisplayable instanceof javax.microedition.lcdui.Canvas) {
+			String r = mapKey(n);
+			if (r != null) caretKeys.add(r);
+			return;
+		}
 		handleKeyPress(n);
 	}
 
@@ -1719,6 +1722,14 @@ public final class EmulatorScreen implements
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
 		if (keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
 			n = keyEvent.character;
+		if (!caretKeys.isEmpty()) {
+			String r = mapKey(n);
+			if (r == null) return;
+			if (caretKeys.contains(r)) {
+				caretKeys.remove(r);
+				return;
+			}
+		}
 		handleKeyRelease(n);
 	}
 
@@ -1727,10 +1738,8 @@ public final class EmulatorScreen implements
 		if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
 			return;
 		}
-		final String r;
-		if ((r = KeyMapping.replaceKey(n)) == null) {
-			return;
-		}
+		String r = mapKey(n);
+		if (r == null) return;
 		n = Integer.parseInt(r);
 		if (pressedKeys.contains(n)) {
 			if (Emulator.getCurrentDisplay().getCurrent() instanceof Screen) {
@@ -1763,10 +1772,8 @@ public final class EmulatorScreen implements
 		if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
 			return;
 		}
-		final String r;
-		if ((r = KeyMapping.replaceKey(n)) == null) {
-			return;
-		}
+		String r = mapKey(n);
+		if (r == null) return;
 		n = Integer.parseInt(r);
 		synchronized (pressedKeys) {
 			if (win && !pressedKeys.contains(n)) {
@@ -1798,6 +1805,13 @@ public final class EmulatorScreen implements
 		if ((r = KeyMapping.replaceKey(n)) == null) {
 			return;
 		}
+		if (!caretKeys.isEmpty()) {
+			// TODO
+			if (caretKeys.contains(r)) {
+				caretKeys.remove(r);
+				return;
+			}
+		}
 		n = Integer.parseInt(r);
 		synchronized (pressedKeys) {
 			if (!pressedKeys.contains(n)) {
@@ -1813,6 +1827,14 @@ public final class EmulatorScreen implements
 			Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
 		}
 		Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
+	}
+
+	private String mapKey(int n) {
+		final String r;
+		if ((r = KeyMapping.replaceKey(n)) == null) {
+			return null;
+		}
+		return r;
 	}
 
 	private int key(int n) {

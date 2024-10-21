@@ -142,8 +142,8 @@ public final class CaretImpl implements ICaret {
 		}
 	}
 
-	public final void keyPressed(KeyEvent var1) {
-		if (this.item == null) return;
+	public final boolean keyPressed(KeyEvent var1) {
+		if (this.item == null) return false;
 		if (!(item instanceof TextField || item instanceof TextEditor)) {
 			if (item instanceof DateField) {
 				char c = var1.character;
@@ -152,7 +152,7 @@ public final class CaretImpl implements ICaret {
 					((DateField) item)._input(c);
 				}
 			}
-			return;
+			return true;
 		}
 
 		int w = (item instanceof TextEditor ? ((TextEditor) item).getWidth() : ((Item) item).getPreferredWidth()) - 8;
@@ -324,6 +324,7 @@ public final class CaretImpl implements ICaret {
 				this.caretPosition += var4[var11].length();
 			}
 		}
+		return true;
 	}
 
 
