@@ -176,7 +176,7 @@ public final class ImageAWT implements IImage {
 				g = ((ImageAWT) image).g2d = img.createGraphics();
 			}
 		}
-		g.drawImage(img, x, y, w, h, null);
+		g.drawImage(img, x, y, x + w, y + h, x, y, x + w, y + h, null);
 	}
 
 	public void copyImage(IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty) {
