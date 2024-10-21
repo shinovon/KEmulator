@@ -51,6 +51,7 @@ public class Display {
 		if (Display.current != null) {
 			Display.current.defocus();
 		}
+		Emulator.getEmulator().getScreen().getCaret().displayableChanged();
 		if ((Display.current = d) != null) {
 			if (d instanceof Canvas) {
 				if (Settings.blackberryApi) {

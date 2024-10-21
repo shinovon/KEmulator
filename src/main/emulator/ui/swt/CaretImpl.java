@@ -1,8 +1,8 @@
 package emulator.ui.swt;
 
+import com.nokia.mid.ui.TextEditor;
 import emulator.Emulator;
 import emulator.ui.*;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Canvas;
 
@@ -22,7 +22,7 @@ public final class CaretImpl implements ICaret {
 	private int caretLocY;
 	private int caretX;
 	private int caretY;
-	private Item item;
+	private Object item;
 	private int caretPosition;
 	private int caretCol;
 	private int caretRow;
@@ -51,35 +51,55 @@ public final class CaretImpl implements ICaret {
 	public final void setWindowZoom(final float aFloat840) {
 		this.zoom = aFloat840;
 		if (this.swtCaret.isVisible()) {
-			this.swtCaret.setSize(Math.min(1, (int) aFloat840), (int) (CaretImpl.font.getBaselinePosition() * aFloat840));
+			Font font = item instanceof TextEditor ? ((TextEditor) item).getFont() : CaretImpl.font;
+			this.swtCaret.setSize(Math.min(1, (int) aFloat840), (int) (font.getBaselinePosition() * aFloat840));
 			this.setCaretLocation(this.caretLocX, this.caretLocY);
 		}
 	}
 
-	public final void focusItem(final Item aTextField842, final int anInt844, final int anInt845) {
-		this.item = aTextField842;
-		this.caretX = anInt844;
-		this.caretY = anInt845;
+	public final void focusItem(final Object item, final int x, final int y) {
+		Object tmp = this.item;
+		this.item = item;
+		if (tmp != item && tmp instanceof TextEditor) {
+			((TextEditor) tmp).setFocus(false);
+		}
+		this.caretX = x;
+		this.caretY = y;
 		this.caretPosition = 0;
 		this.caretCol = 0;
 		this.caretRow = 0;
 		EmulatorImpl.syncExec(new Class121(this));
 	}
 
-	public final void defocusItem(final Item item) {
+	public final void defocusItem(final Object item) {
 		if (this.item == item) {
+			Object tmp = this.item;
 			this.item = null;
+			if (tmp instanceof TextEditor) {
+				((TextEditor) tmp).setFocus(false);
+			}
 			EmulatorImpl.syncExec(new Class115(this));
 		}
 	}
 
+	public void displayableChanged() {
+		if (this.item == null) return;
+		Object tmp = this.item;
+		item = null;
+		if (tmp instanceof TextEditor) {
+			((TextEditor) tmp).setFocus(false);
+		}
+		EmulatorImpl.syncExec(new Class115(this));
+	}
+
 	public final void mouseDown(int x, int y) {
-		if (item == null || !(item instanceof TextField)) return;
+		if (item == null || !(item instanceof TextField || item instanceof TextEditor)) return;
+		Font font = item instanceof TextEditor ? ((TextEditor) item).getFont() : CaretImpl.font;
 		int textHeight = font.getHeight() + 4;
 		int line = (y - this.caretY) / textHeight;
-		int w = this.item.getPreferredWidth() - 8;
+		int w = (item instanceof TextEditor ? ((TextEditor) item).getWidth() : ((Item) item).getPreferredWidth()) - 8;
 		String[] arr;
-		String s = ((TextField) item).getString();
+		String s = item instanceof TextEditor ? ((TextEditor) item).getContent() : ((TextField) item).getString();
 		if (s == null) s = "";
 		if ((arr = c.textArr(s, font, w, w)) != null
 				&& line >= 0 && line < arr.length) {
@@ -124,7 +144,7 @@ public final class CaretImpl implements ICaret {
 
 	public final void keyPressed(KeyEvent var1) {
 		if (this.item == null) return;
-		if (!(item instanceof TextField)) {
+		if (!(item instanceof TextField || item instanceof TextEditor)) {
 			if (item instanceof DateField) {
 				char c = var1.character;
 				if (c == '\n' || c == '\r') c = 0;
@@ -134,11 +154,13 @@ public final class CaretImpl implements ICaret {
 			}
 			return;
 		}
-		int var2 = this.item.getPreferredWidth() - 8;
-		String var3 = ((TextField) item).getString();
-		if (var3 == null) var3 = "";
+
+		int w = (item instanceof TextEditor ? ((TextEditor) item).getWidth() : ((Item) item).getPreferredWidth()) - 8;
+		String text = item instanceof TextEditor ? ((TextEditor) item).getContent() : ((TextField) item).getString();
+		Font font = item instanceof TextEditor ? ((TextEditor) item).getFont() : CaretImpl.font;
+		if (text == null) text = "";
 		String[] var4;
-		if ((var4 = c.textArr(var3, font, var2, var2)) != null && this.caretRow >= 0 && this.caretRow < var4.length) {
+		if ((var4 = c.textArr(text, font, w, w)) != null && this.caretRow >= 0 && this.caretRow < var4.length) {
 			int var5 = font.getHeight() + 4;
 			String var6;
 			int var7 = (var6 = var4[this.caretRow]).length();
@@ -230,7 +252,7 @@ public final class CaretImpl implements ICaret {
 							var6.substring(this.caretCol, var7);
 						}
 
-						var3 = var3.substring(0, this.caretPosition - 1) + var3.substring(this.caretPosition);
+						text = text.substring(0, this.caretPosition - 1) + text.substring(this.caretPosition);
 					}
 				case '\t':
 				case '\n':
@@ -254,14 +276,15 @@ public final class CaretImpl implements ICaret {
 							var6.substring(this.caretCol, var7);
 						}
 
-						var3 = var3.substring(0, this.caretPosition) + var3.substring(this.caretPosition + 1);
+						text = text.substring(0, this.caretPosition) + text.substring(this.caretPosition + 1);
 					}
 					break;
 				default:
-					if (var1.character >= 32 && var3.length() < ((TextField) item).getMaxSize()) {
+					int max = item instanceof TextEditor ? ((TextEditor) item).getMaxSize() : ((TextField) item).getMaxSize();
+					if (var1.character >= 32 && text.length() < max) {
 						try {
-							var3 = var3.substring(0, this.caretPosition) + var1.character + var3.substring(this.caretPosition);
-							if (var1.character != 32 || var3.charAt(this.caretPosition + 1) == 32) {
+							text = text.substring(0, this.caretPosition) + var1.character + text.substring(this.caretPosition);
+							if (var1.character != 32 || text.charAt(this.caretPosition + 1) == 32) {
 								if (this.caretCol == var7 && this.caretRow < var4.length - 1) {
 									++this.caretRow;
 									var7 = (var6 = var4[this.caretRow]).length();
@@ -272,7 +295,7 @@ public final class CaretImpl implements ICaret {
 
 								var8 = var8 + var1.character;
 								++this.caretCol;
-								if (font.stringWidth(var8) > var2) {
+								if (font.stringWidth(var8) > w) {
 									var9 = "";
 									var8 = var9 + var1.character;
 									this.caretCol = 1;
@@ -286,8 +309,13 @@ public final class CaretImpl implements ICaret {
 			int var10 = font.stringWidth(var8);
 			this.setCaretLocation(this.caretX + var10, this.caretY + this.caretRow * var5);
 			if (var1.character != 0) {
-				((TextField) item).setString(var3);
-				this.item.notifyStateChanged();
+				if (item instanceof TextEditor) {
+					((TextEditor) item).setContent(text);
+					((TextEditor) item)._contentChanged();
+				} else {
+					((TextField) item).setString(text);
+					((Item) item).notifyStateChanged();
+				}
 			}
 
 			this.caretPosition = this.caretCol;

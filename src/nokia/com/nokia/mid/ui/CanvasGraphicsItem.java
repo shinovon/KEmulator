@@ -18,7 +18,6 @@ public abstract class CanvasGraphicsItem extends CanvasItem {
 		this.iParent = null;
 
 		this.iVisible = false;
-		throw new RuntimeException("Not implemented yet.");
 	}
 
 	public void setParent(Object parent) {
@@ -27,7 +26,13 @@ public abstract class CanvasGraphicsItem extends CanvasItem {
 			throw new IllegalArgumentException("The object is not a valid parent object");
 		}
 		if (parent != this.iParent) {
+			if (iParent != null) {
+				((Canvas) iParent)._removeNokiaCanvasItem(this);
+			}
 			this.iParent = parent;
+			if (iParent != null) {
+				((Canvas) iParent)._addNokiaCanvasItem(this);
+			}
 		}
 	}
 
@@ -75,7 +80,7 @@ public abstract class CanvasGraphicsItem extends CanvasItem {
 
 	}
 
-	void Repaint(Graphics aGraphics) {
+	public void _invokePaint(Graphics aGraphics) {
 		paint(aGraphics);
 	}
 }

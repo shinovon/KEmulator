@@ -473,6 +473,11 @@ public class Graphics
 		this.impl.setColor(n, false);
 	}
 
+	public void _setColor(final int n) {
+		++Profiler.drawCallCount;
+		this.impl.setColor(n, true);
+	}
+
 	public void setColor(final int n, final int n2, final int n3) {
 		++Profiler.drawCallCount;
 		this.impl.setColor(n, n2, n3);
@@ -537,7 +542,7 @@ public class Graphics
 		Graphics.xrayCache = new Vector();
 	}
 
-	public void reset(IImage i1, IImage i2) {
+	public void _reset(IImage i1, IImage i2) {
 		if (i1 != image) {
 			this.image = i1;
 			this.impl = i1.createGraphics();
@@ -549,6 +554,10 @@ public class Graphics
 			else
 				xrayGraphics = null;
 		}
+		_reset();
+	}
+
+	void _reset() {
 		setColor(0);
 		setFont(Font.getDefaultFont());
 		setStrokeStyle(SOLID);

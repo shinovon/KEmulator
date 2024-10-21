@@ -65,7 +65,7 @@ public class DeviceControl {
 			return 0;
 		}
 		try {
-			return Emulator.getCanvas().getKeyStatesVodafone();
+			return Emulator.getCanvas()._getKeyStatesVodafone();
 		} catch (Exception ignored) {}
 		return 0;
 	}

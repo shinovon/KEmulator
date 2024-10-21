@@ -1,8 +1,13 @@
 package javax.microedition.lcdui;
 
+import com.nokia.mid.ui.CanvasGraphicsItem;
+import com.nokia.mid.ui.CanvasItem;
+import com.nokia.mid.ui.TextEditor;
 import emulator.*;
 import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
+
+import java.util.ArrayList;
 
 public abstract class Canvas extends Displayable {
 	public static final int UP = 1;
@@ -29,10 +34,13 @@ public abstract class Canvas extends Displayable {
 	protected int m_keyStates;
 	private Graphics graphics;
 	private int vKeyStates;
+	private final ArrayList<CanvasItem> nokiaCanvasItems;
+	private CanvasItem tappedCanvasItem;
 
 	protected Canvas() {
 		super();
 		this.setFullScreenMode(false);
+		nokiaCanvasItems = new ArrayList<CanvasItem>();
 	}
 
 	public void _invokePaint(IImage buffer, IImage xray) {
@@ -40,9 +48,9 @@ public abstract class Canvas extends Displayable {
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
 		}
-		graphics.reset(buffer, xray);
+		graphics._reset(buffer, xray);
 		this.paint(graphics);
-		graphics.reset(buffer, xray); // paintTicker fix
+		graphics._reset(buffer, xray); // paintTicker fix
 		this._paintTicker(graphics);
 		this._paintSoftMenu(graphics);
 	}
@@ -52,12 +60,30 @@ public abstract class Canvas extends Displayable {
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
 		}
-		graphics.reset(buffer, xray);
+		graphics._reset(buffer, xray);
 		graphics.setClip(x, y, w, h);
 		this.paint(graphics);
-		graphics.reset(buffer, xray); // paintTicker fix
+		graphics._reset(buffer, xray); // paintTicker fix
 		this._paintTicker(graphics);
 		this._paintSoftMenu(graphics);
+	}
+
+	protected void _paintSoftMenu(Graphics graphics) {
+		super._paintSoftMenu(graphics);
+		for (CanvasItem i: nokiaCanvasItems) {
+			if (!i.isVisible()) continue;
+			// TODO z-position
+			if (i instanceof CanvasGraphicsItem) {
+				graphics.setClip(i.getPositionX(), i.getPositionY(), i.getWidth(), i.getHeight());
+				graphics.translate(-i.getPositionX(), -i.getPositionY());
+				((CanvasGraphicsItem) i)._invokePaint(graphics);
+				graphics._reset();
+				continue;
+			}
+			if (i instanceof TextEditor) {
+				((TextEditor) i)._invokePaint(graphics);
+			}
+		}
 	}
 
 	public void _invokeKeyReleased(final int n) {
@@ -179,16 +205,31 @@ public abstract class Canvas extends Displayable {
 	protected void pointerDragged(final int n, final int n2) {
 	}
 
-	public void invokePointerPressed(final int n, final int n2) {
-		this.pointerPressed(n, n2);
+	public void invokePointerPressed(final int x, final int y) {
+		CanvasItem i = getCanvasItemAt(x, y);
+		if (i != null) {
+			tappedCanvasItem = i;
+			if (i instanceof TextEditor) {
+				((TextEditor) i).setFocus(true);
+			}
+			return;
+		}
+		this.pointerPressed(x, y);
 	}
 
-	public void invokePointerReleased(final int n, final int n2) {
-		this.pointerReleased(n, n2);
+	public void invokePointerReleased(final int x, final int y) {
+		if (tappedCanvasItem != null) {
+			tappedCanvasItem = null;
+			return;
+		}
+		this.pointerReleased(x, y);
 	}
 
-	public void invokePointerDragged(final int n, final int n2) {
-		this.pointerDragged(n, n2);
+	public void invokePointerDragged(final int x, final int y) {
+		if (tappedCanvasItem != null) {
+			return;
+		}
+		this.pointerDragged(x, y);
 	}
 
 	public int getGameAction(final int n) {
@@ -433,7 +474,27 @@ public abstract class Canvas extends Displayable {
 		}
 	}
 
-	public int getKeyStatesVodafone() {
+	public int _getKeyStatesVodafone() {
 		return vKeyStates;
+	}
+
+	public void _removeNokiaCanvasItem(CanvasItem i) {
+		nokiaCanvasItems.remove(i);
+	}
+
+	public void _addNokiaCanvasItem(CanvasItem i) {
+		nokiaCanvasItems.add(i);
+	}
+
+	private CanvasItem getCanvasItemAt(int x, int y) {
+		if (nokiaCanvasItems.isEmpty()) return null;
+		for (CanvasItem i : nokiaCanvasItems) {
+			if (!i.isVisible()) continue;
+			int ix = i.getPositionX();
+			int iy = i.getPositionY();
+			if (x >= ix && x <= ix + i.getWidth() && y >= iy && y <= iy + i.getHeight())
+				return i;
+		}
+		return null;
 	}
 }

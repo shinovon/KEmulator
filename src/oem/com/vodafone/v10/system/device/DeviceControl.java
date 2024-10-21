@@ -58,7 +58,7 @@ public class DeviceControl {
 				return 100;
 			case KEY_STATE:
 				try {
-					return Emulator.getCanvas().getKeyStatesVodafone();
+					return Emulator.getCanvas()._getKeyStatesVodafone();
 				} catch (Exception ignored) {}
 				return 0;
 			default:

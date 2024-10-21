@@ -93,6 +93,7 @@ public class TextField extends Item {
 	}
 
 	public int getCaretPosition() {
+		if (!focused) return 0;
 		return Emulator.getEmulator().getScreen().getCaret().getCaretPosition();
 	}
 

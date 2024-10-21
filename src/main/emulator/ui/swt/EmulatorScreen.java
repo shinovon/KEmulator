@@ -2011,9 +2011,7 @@ public final class EmulatorScreen implements
 			}
 			pointerState = true;
 			Emulator.getEventQueue().mouseDown(i[0], i[1]);
-			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getScreen()) {
-				this.caret.mouseDown(i[0], i[1]);
-			}
+			caret.mouseDown(i[0], i[1]);
 		}
 	}
 

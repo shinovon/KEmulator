@@ -13,7 +13,6 @@ public abstract class CanvasItem {
 	static final String ERROR_NO_PARENT = "Parent has not been set";
 
 	public void setParent(Object parent) {
-		iParent = parent;
 	}
 
 	public synchronized Object getParent() {
@@ -21,8 +20,6 @@ public abstract class CanvasItem {
 	}
 
 	public void setSize(int width, int height) {
-		iWidth = width;
-		iHeight = height;
 	}
 
 	public int getHeight() {
@@ -45,7 +42,6 @@ public abstract class CanvasItem {
 	}
 
 	public void setVisible(boolean visible) {
-		iVisible = visible;
 	}
 
 	public boolean isVisible() {

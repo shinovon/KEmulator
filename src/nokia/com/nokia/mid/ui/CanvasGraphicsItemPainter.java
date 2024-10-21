@@ -10,6 +10,5 @@ public abstract class CanvasGraphicsItemPainter {
 	protected abstract void Repaint(int paramInt1, int paramInt2, int paramInt3, int paramInt4);
 
 	protected void Repaint(Graphics aGraphics) {
-		this.iItem.Repaint(aGraphics);
 	}
 }

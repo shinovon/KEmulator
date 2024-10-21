@@ -52,7 +52,7 @@ public abstract class GameCanvas extends Canvas {
 
 	public void _invokeSizeChanged(int w, int h) {
 		if (graphics != null) {
-			graphics.reset(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
+			graphics._reset(Emulator.getEmulator().getScreen().getBackBufferImage(), Emulator.getEmulator().getScreen().getXRayScreenImage());
 		}
 		super._invokeSizeChanged(w, h);
 	}
