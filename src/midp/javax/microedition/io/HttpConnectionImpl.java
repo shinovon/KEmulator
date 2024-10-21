@@ -37,10 +37,6 @@ final class HttpConnectionImpl implements HttpConnection {
 		connection.setDoOutput(true);
 	}
 
-	private void connect() {
-		setUserAgent();
-	}
-
 	public final String getURL() {
 		return this.connection.getURL().toString();
 	}
@@ -87,22 +83,17 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final void setRequestProperty(final String s, final String s2) throws IOException {
-		if (s.equalsIgnoreCase("User-Agent")) {
-			if(s2 != null && s2.length() > 0) {
-				String x = null;
-				DevicePlatform c = Devices.getPlatform(Emulator.deviceName);
-				if(c.exists("SW_PLATFORM") || c.exists("SW_PLATFORM_VERSION"))  {
-					x = "UNTRUSTED/1.0";
-				}
-				connection.setRequestProperty("User-Agent", s2 + (x == null ? "" : (" " + x)));
-				userAgentSet = true;
-			}
-			return;
+		if ("User-Agent".equalsIgnoreCase(s) && s2 != null && s2.length() > 0) {
+			userAgentSet = true;
 		}
-		if (s.equalsIgnoreCase("X-Online-Host")) {
+		if ("X-Online-Host".equalsIgnoreCase(s)) {
 			method134(s2);
 		}
 		connection.setRequestProperty(s, s2);
+	}
+
+	private void connect() {
+		setUserAgent();
 	}
 
 	public final int getResponseCode() throws IOException {
@@ -173,14 +164,17 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final String getType() {
+		connect();
 		return this.connection.getContentType();
 	}
 
 	public final String getEncoding() {
+		connect();
 		return this.connection.getContentEncoding();
 	}
 
 	public final long getLength() {
+		connect();
 		return this.connection.getContentLength();
 	}
 
@@ -188,9 +182,6 @@ final class HttpConnectionImpl implements HttpConnection {
 		return new DataInputStream(this.openInputStream());
 	}
 
-	/**
-	 * @author Shinovon
-	 */
 	public final InputStream openInputStream() throws IOException {
 		if (this.closed) throw new IOException();
 		connect();

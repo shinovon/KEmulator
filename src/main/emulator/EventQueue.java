@@ -262,13 +262,6 @@ public final class EventQueue implements Runnable {
 
 	public void serviceRepaints() {
 		if (Settings.ignoreServiceRepaints) return;
-//		Thread t = Thread.currentThread();
-//		// Sonic 2 Dash StackOverflowError fix
-//		StackTraceElement[] st = t.getStackTrace();
-//		for (int i = 1; i < st.length; i++) {
-//			if ("invokePaint".equals(st[i].getMethodName())) return;
-//		}
-
 		synchronized (lock) {
 			if (!repaintPending) return;
 			repaintPending = false;
