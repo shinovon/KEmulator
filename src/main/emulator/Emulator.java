@@ -1020,6 +1020,20 @@ public class Emulator implements Runnable {
 
 		cmd.add("-javaagent:" + getAbsoluteFile());
 
+		if (isJava9()) {
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.lang=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.lang.reflect=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.io=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.util=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/sun.misc=ALL-UNNAMED");
+			cmd.add("--enable-native-access=ALL-UNNAMED");
+		}
+
 		cmd.add("emulator.Emulator");
 		if (s == null) {
 			for (String a : Emulator.commandLineArguments) {
