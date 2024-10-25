@@ -127,6 +127,9 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public int getCaretPosition() {
+		if (iFocused) {
+			return Emulator.getEmulator().getScreen().getCaret().getCaretPosition();
+		}
 		return 0;
 	}
 

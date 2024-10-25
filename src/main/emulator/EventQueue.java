@@ -269,7 +269,7 @@ public final class EventQueue implements Runnable {
 			repaintX = repaintY = repaintW = repaintH = -1;
 			internalRepaint(x, y, w, h);
 		}
-		Displayable._fpsLimiter();
+		Displayable._fpsLimiter(true);
 	}
 
 	public void run() {
@@ -290,7 +290,7 @@ public final class EventQueue implements Runnable {
 							repaintX = repaintY = repaintW = repaintH = -1;
 							internalRepaint(x, y, w, h);
 						}
-						Displayable._fpsLimiter();
+						Displayable._fpsLimiter(true);
 						break;
 					}
 					case EVENT_CALL: {
@@ -403,6 +403,7 @@ public final class EventQueue implements Runnable {
 						break;
 					}
 					case 0:
+						Displayable._fpsLimiter(false);
 						synchronized (eventLock) {
 							eventLock.wait(1000);
 						}

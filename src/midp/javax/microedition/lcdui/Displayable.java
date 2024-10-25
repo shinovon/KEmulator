@@ -316,8 +316,8 @@ public class Displayable {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
 	}
 
-	public static void _fpsLimiter() {
-		if (Settings.speedModifier == 1 && Settings.frameRate <= 120) {
+	public static void _fpsLimiter(boolean b) {
+		if (b && Settings.speedModifier == 1 && Settings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
 			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
 
@@ -330,7 +330,7 @@ public class Displayable {
 		}
 		lastFrameTime = System.nanoTime();
 
-		++framesCount;
+		if (b) ++framesCount;
 		long l = lastFrameTime - lastFpsUpdateTime;
 		if (l >= 2000L * MILLI_TO_NANO) {
 			Profiler.FPS = (int) (((framesCount * 1000L + 500) * MILLI_TO_NANO) / l);
