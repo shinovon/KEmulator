@@ -811,7 +811,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
-			properties.setProperty("WavCache", String.valueOf(Settings.wavCache);
+			properties.setProperty("WavCache", String.valueOf(Settings.wavCache));
 
 			properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
 			properties.setProperty("UILanguage", Settings.uiLanguage);
