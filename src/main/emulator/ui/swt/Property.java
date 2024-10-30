@@ -651,7 +651,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "false"));
 			Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
 			Settings.enableMediaDump = Boolean.parseBoolean(properties.getProperty("EnableMediaDump", "false"));
-			Settings.enableOTT = Boolean.parseBoolean(properties.getProperty("EnableOTT", "false"));
+			Settings.enableOTT = Boolean.parseBoolean(properties.getProperty("EnableOTT", "true"));
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
