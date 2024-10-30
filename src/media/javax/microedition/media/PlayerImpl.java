@@ -13,6 +13,7 @@ import javax.microedition.media.protocol.DataSource;
 import javax.microedition.media.protocol.SourceStream;
 
 import java.util.*;
+import java.util.zip.CRC32;
 import javax.sound.sampled.*;
 import javax.sound.midi.*;
 
@@ -50,6 +51,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private boolean stopped;
 	private InputStream inputStream;
 	private boolean realized;
+
+	private static final Vector<WavCacheKey> wavCacheKeys = new Vector<>();
+	private static final Vector<Clip> wavCacheEntries = new Vector<>();
 
 	public PlayerImpl() {
 		loopCount = 1;
@@ -120,8 +124,20 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private void wav(InputStream inputStream) throws IOException {
 		controls = new Control[]{toneControl, volumeControl};
 		byte[] data;
+		WavCacheKey key = null;
 		try {
 			data = CustomJarResources.getBytes(inputStream);
+			if (Settings.wavCache) {
+				key = new WavCacheKey(data);
+				synchronized (wavCacheKeys) {
+					int i = wavCacheKeys.indexOf(key);
+					if (i != -1) {
+						sequence = wavCacheEntries.get(i);
+						setMediaTime(0);
+						return;
+					}
+				}
+			}
 
 			inputStream = this.inputStream = new ByteArrayInputStream(data);
 
@@ -159,6 +175,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					.addLineListener(this);
 			clip.open(audioInputStream);
 			sequence = clip;
+
+			if (Settings.wavCache) {
+				synchronized (wavCacheKeys) {
+					while (wavCacheKeys.size() > 10) {
+						wavCacheEntries.remove(0);
+						wavCacheKeys.remove(0);
+					}
+					wavCacheEntries.insertElementAt(clip, wavCacheKeys.size());
+					wavCacheKeys.addElement(key);
+				}
+			}
 
 		} catch (Exception e) {
 			sequence = null;
@@ -820,6 +847,33 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	public void meta(MetaMessage meta) {
 		if (meta.getType() == 0x2F) {
 			notifyCompleted();
+		}
+	}
+
+	private static long crcUtil(byte[] b) {
+		CRC32 crc = new CRC32();
+		crc.update(b);
+		return crc.getValue();
+	}
+
+	static class WavCacheKey {
+		int length;
+		long crc;
+
+		WavCacheKey(byte[] b) {
+			length = b.length;
+			crc = crcUtil(b);
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			if (other instanceof WavCacheKey) {
+				return length == ((WavCacheKey) other).length && crc == ((WavCacheKey) other).crc;
+			}
+			if (other instanceof byte[]) {
+				return ((byte[]) other).length == length && crcUtil((byte[]) other) == crc;
+			}
+			return false;
 		}
 	}
 }
