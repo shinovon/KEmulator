@@ -309,7 +309,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence == null) return 0;
 		double res;
 		if (sequence instanceof Sequence) {
-			res = ((Sequence) sequence).getMicrosecondLength() / 1000000D;
+			return ((Sequence) sequence).getMicrosecondLength();
 		} else if (sequence instanceof Clip) {
 			final Clip clip;
 			res = (clip = (Clip) sequence).getBufferSize()
@@ -359,9 +359,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			((Clip) sequence).setMicrosecondPosition(t);
 		} else if (sequence instanceof Sequence) {
 			ms = ((Sequence) sequence).getMicrosecondLength();
-			if (t < ms) {
-				ms = t;
-			}
+			if (t < ms) ms = t;
+			if (ms < 0) ms = 0;
 			midiPosition = ms;
 			try {
 				if (midiSequencer != null)
@@ -423,20 +422,20 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				e.printStackTrace();
 				throw new MediaException(e);
 			}
-			try {
-				if (sequence != null) {
-					if (Settings.oneMidiAtTime) {
-						EmulatorMIDI.setSequence((Sequence) sequence);
-					} else {
-						initMidiSequencer();
-						midiSequencer.setSequence((Sequence) sequence);
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				sequence = null;
-				throw new MediaException(e);
-			}
+//			try {
+//				if (sequence != null) {
+//					if (Settings.oneMidiAtTime) {
+//						EmulatorMIDI.setSequence((Sequence) sequence);
+//					} else {
+//						initMidiSequencer();
+//						midiSequencer.setSequence((Sequence) sequence);
+//					}
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				sequence = null;
+//				throw new MediaException(e);
+//			}
 		}
 		if (dataSource != null) {
 			try {
@@ -668,7 +667,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						initMidiSequencer();
 						sequencer = midiSequencer;
 						sequencer.setSequence((Sequence) sequence);
-						sequencer.setMicrosecondPosition(midiPosition);
+						if (midiSequencer == null || midiPosition >= getDuration()) {
+							sequencer.setMicrosecondPosition(midiPosition);
+						}
 						sequencer.start();
 					}
 					if (b) {
