@@ -578,6 +578,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
 
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
+			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
 
 			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "true"));
 			Settings.uiLanguage = properties.getProperty("UILanguage", "en");
@@ -810,6 +811,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
+			properties.setProperty("WavCache", String.valueOf(Settings.wavCache);
 
 			properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
 			properties.setProperty("UILanguage", Settings.uiLanguage);
