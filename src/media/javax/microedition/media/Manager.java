@@ -117,9 +117,8 @@ public class Manager {
 				return new VLCPlayerImpl(s, contentType);
 			}
 			if (s.startsWith("file:///")) {
-				String f = null;
 				FileConnectionImpl fc = (FileConnectionImpl) Connector.open(s);
-				f = fc.getRealPath();
+				String f = fc.getRealPath();
 				fc.close();
 				return new PlayerImpl(f, contentType);
 			}

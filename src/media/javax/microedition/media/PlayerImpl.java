@@ -16,6 +16,7 @@ import java.util.*;
 import javax.sound.sampled.*;
 import javax.sound.midi.*;
 
+import emulator.media.WavImaAdpcmDecoder;
 import emulator.media.tone.ToneControlImpl;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
@@ -80,18 +81,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		this.dataSource = src;
 	}
 
-	public PlayerImpl(String src, String contentType) throws IOException {
+	public PlayerImpl(String file, String contentType) throws IOException {
 		this();
-		if ("audio/wav".equals(contentType)) {
-			this.contentType = contentType.toLowerCase();
-			dataLen = (int) new File(src).length();
-			wav(new URL("file:///" + src));
-			setLevel(level);
-			realized = true;
-		} else {
-			dataLen = (int) new File(src).length();
-			init(new FileInputStream(src), contentType);
-		}
+		dataLen = (int) new File(file).length();
+		init(new FileInputStream(file), contentType);
 	}
 
 	private void init(final InputStream inputStream, String contentType) throws IOException {
@@ -110,7 +103,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				throw new MediaException("Cannot parse AMR data");
 			}
 			if (Settings.enableMediaDump) data = b;
-			InputStream i = new ByteArrayInputStream(b);
+			InputStream i = this.inputStream = new ByteArrayInputStream(b);
 			final AudioFormat audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 8000.0f, 16, 1, 2, 8000.0f, false);
 			final AudioInputStream audioInputStream = new AudioInputStream(i, audioFormat, -1L);
 			final Clip clip;
@@ -124,10 +117,23 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 	}
 
-	private void wav(final InputStream inputStream) throws IOException {
+	private void wav(InputStream inputStream) throws IOException {
 		controls = new Control[]{toneControl, volumeControl};
+		byte[] data;
 		try {
-			sequence = AudioSystem.getAudioInputStream(inputStream);
+			data = CustomJarResources.getBytes(inputStream);
+
+			inputStream = this.inputStream = new ByteArrayInputStream(data);
+
+			inputStream.mark(60);
+			int[] wavHeaderData = WavImaAdpcmDecoder.readHeader(inputStream);
+			inputStream.reset();
+
+			if (wavHeaderData[0] != 17) {
+				sequence = AudioSystem.getAudioInputStream(inputStream);
+			} else {
+				sequence = AudioSystem.getAudioInputStream(this.inputStream = WavImaAdpcmDecoder.decodeImaAdpcm(inputStream, wavHeaderData));
+			}
 		} catch (Exception e) {
 			System.out.println("WAV realize error: " + e);
 			sequence = null;
@@ -153,41 +159,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					.addLineListener(this);
 			clip.open(audioInputStream);
 			sequence = clip;
-		} catch (Exception e) {
-			sequence = null;
-			throw new IOException();
-		}
-	}
 
-	private void wav(final URL url) throws IOException {
-		controls = new Control[]{toneControl, volumeControl};
-		try {
-			sequence = AudioSystem.getAudioInputStream(url);
-		} catch (Exception e) {
-			System.out.println("WAV realize error: " + e);
-			sequence = null;
-			//throw new IOException("WAV realize error!", e);
-			return;
-		}
-		try {
-			AudioInputStream audioInputStream;
-			AudioFormat format;
-			if ((format = (audioInputStream = (AudioInputStream) sequence).getFormat())
-					.getEncoding() == AudioFormat.Encoding.ULAW || format.getEncoding() == AudioFormat.Encoding.ALAW) {
-				final AudioFormat audioFormat;
-				audioInputStream = AudioSystem
-						.getAudioInputStream(audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, format
-								.getSampleRate(), format.getSampleSizeInBits() * 2, format
-								.getChannels(), format.getFrameSize()
-								* 2, format.getFrameRate(), true), audioInputStream);
-				format = audioFormat;
-			}
-			final Clip anObject298;
-			(anObject298 = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioInputStream
-					.getFormat(), (int) audioInputStream.getFrameLength() * format.getFrameSize())))
-					.addLineListener(this);
-			anObject298.open(audioInputStream);
-			sequence = anObject298;
 		} catch (Exception e) {
 			sequence = null;
 			throw new IOException();
@@ -198,7 +170,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		try {
 			byte[] data = CustomJarResources.getBytes(inputStream);
 			if (Settings.enableMediaDump) this.data = data;
-			sequence = MidiSystem.getSequence(new ByteArrayInputStream(data));
+			sequence = MidiSystem.getSequence(this.inputStream = new ByteArrayInputStream(data));
 		} catch (Exception e) {
 			sequence = null;
 		}
@@ -255,10 +227,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			if (Settings.oneMidiAtTime) {
 				EmulatorMIDI.close();
 			}
-		} else if (sequence instanceof Clip) {
+		}
+//		else if (sequence instanceof Clip) {
 //			try {
 //				((Clip) sequence).close();
 //			} catch (Exception ignored) {}
+//		}
+		if (inputStream != null) {
+//			try {
+//				inputStream.close();
+//			} catch (Exception ignored) {}
+			inputStream = null;
 		}
 		if (dataSource != null && !dataSourceDisconnected) {
 			dataSource.disconnect();
@@ -279,12 +258,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			try {
 				stop();
 			} catch (MediaException ignored) {}
-			return;
 		}
-		if (sequence instanceof Clip && !Settings.dontCloseWavClip) {
-			try {
-				((Clip) sequence).close();
-			} catch (Exception ignored) {}
+//		if (sequence instanceof Clip) {
+//			try {
+//				((Clip) sequence).close();
+//			} catch (Exception ignored) {}
+//		}
+		if (inputStream != null) {
+//			try {
+//				inputStream.close();
+//			} catch (Exception ignored) {}
+			inputStream = null;
 		}
 		if (state == PREFETCHED) {
 			state = REALIZED;
@@ -352,10 +336,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence == null) return 0;
 		long ms = 0L;
 		if (sequence instanceof Clip) {
-			ms = ((Clip) sequence).getMicrosecondPosition();
-			if (t < ms) {
-				ms = t;
-			}
+			ms = ((Clip) sequence).getMicrosecondLength();
+			if (t < ms) ms = t;
+			if (ms < 0) ms = 0;
 			((Clip) sequence).setMicrosecondPosition(t);
 		} else if (sequence instanceof Sequence) {
 			ms = ((Sequence) sequence).getMicrosecondLength();
@@ -468,9 +451,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				} else if ("audio/mpeg".equals(contentType) || "audio/mp3".equals(contentType)) {
 					try {
 						InputStream i = inputStream;
-						if (i instanceof ByteArrayInputStream && Settings.enableMediaDump) {
+						if (i instanceof ByteArrayInputStream || Settings.enableMediaDump) {
 							data = CustomJarResources.getBytes(i);
-							i = new ByteArrayInputStream(data);
+							i = this.inputStream = new ByteArrayInputStream(data);
 						}
 						sequence = new javazoom.jl.player.Player(i, false);
 					} catch (JavaLayerException e) {
@@ -750,6 +733,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	}
 
 	public void setLevel(int n) {
+		if (n > 100) n = 100;
+		if (n < 0) n = 0;
 		if (level != n) notifyListeners(PlayerListener.VOLUME_CHANGED, n);
 		level = n;
 		if (sequence == null) return;
@@ -758,8 +743,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			try {
 				((FloatControl) ((Clip) sequence).getControl(FloatControl.Type.MASTER_GAIN))
 						.setValue((float) (Math.log((n2 == 0.0) ? 1.0E-4 : n2) / Math.log(10.0) * 20.0));
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 			return;
 		}
 		if (sequence instanceof Sequence) {
