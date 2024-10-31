@@ -5,7 +5,6 @@ import emulator.custom.CustomJarResources;
 import emulator.media.EmulatorMIDI;
 
 import java.io.*;
-import java.net.URL;
 
 import javax.microedition.io.Connector;
 import javax.microedition.media.control.*;
@@ -17,7 +16,6 @@ import java.util.zip.CRC32;
 import javax.sound.sampled.*;
 import javax.sound.midi.*;
 
-import emulator.media.WavImaAdpcmDecoder;
 import emulator.media.tone.ToneControlImpl;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
@@ -45,7 +43,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private boolean dataSourceDisconnected;
 	private int level = 100;
 	private byte[] data;
-	private long midiPosition;
+	private long mediaTime;
 	private final Object playLock = new Object();
 	private Sequencer midiSequencer;
 	private boolean stopped;
@@ -116,8 +114,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			clip.open(audioInputStream);
 			sequence = clip;
 		} catch (Exception e) {
+			System.out.println("AMR realize error: " + e);
 			sequence = null;
-			throw new IOException("AMR realize error!", e);
+//			throw new IOException("AMR realize error!", e);
 		}
 	}
 
@@ -126,37 +125,25 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		byte[] data;
 		WavCacheKey key = null;
 		try {
-			data = CustomJarResources.getBytes(inputStream);
-			if (Settings.wavCache) {
-				key = new WavCacheKey(data);
-				synchronized (wavCacheKeys) {
-					int i = wavCacheKeys.indexOf(key);
-					if (i != -1) {
-						sequence = wavCacheEntries.get(i);
-						setMediaTime(0);
-						return;
+			if (inputStream instanceof ByteArrayInputStream || Settings.enableMediaDump) {
+				data = CustomJarResources.getBytes(inputStream);
+				if (Settings.wavCache) {
+					key = new WavCacheKey(data);
+					synchronized (wavCacheKeys) {
+						int i = wavCacheKeys.indexOf(key);
+						if (i != -1) {
+							sequence = wavCacheEntries.get(i);
+							setMediaTime(0);
+							return;
+						}
 					}
 				}
+
+				inputStream = this.inputStream = new ByteArrayInputStream(data);
 			}
 
-			inputStream = this.inputStream = new ByteArrayInputStream(data);
+			sequence = AudioSystem.getAudioInputStream(inputStream);
 
-			inputStream.mark(60);
-			int[] wavHeaderData = WavImaAdpcmDecoder.readHeader(inputStream);
-			inputStream.reset();
-
-			if (wavHeaderData[0] != 17) {
-				sequence = AudioSystem.getAudioInputStream(inputStream);
-			} else {
-				sequence = AudioSystem.getAudioInputStream(this.inputStream = WavImaAdpcmDecoder.decodeImaAdpcm(inputStream, wavHeaderData));
-			}
-		} catch (Exception e) {
-			System.out.println("WAV realize error: " + e);
-			sequence = null;
-			//throw new IOException("WAV realize error!", e);
-			return;
-		}
-		try {
 			AudioInputStream audioInputStream;
 			AudioFormat format;
 			if ((format = (audioInputStream = (AudioInputStream) sequence).getFormat())
@@ -176,20 +163,19 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			clip.open(audioInputStream);
 			sequence = clip;
 
-			if (Settings.wavCache) {
+			if (Settings.wavCache && key != null) {
 				synchronized (wavCacheKeys) {
-					while (wavCacheKeys.size() > 10) {
+					while (wavCacheKeys.size() > 20) {
 						wavCacheEntries.remove(0);
 						wavCacheKeys.remove(0);
 					}
-					wavCacheEntries.insertElementAt(clip, wavCacheKeys.size());
+					wavCacheEntries.insertElementAt((Clip) sequence, wavCacheKeys.size());
 					wavCacheKeys.addElement(key);
 				}
 			}
-
 		} catch (Exception e) {
+			System.out.println("WAV realize error: " + e);
 			sequence = null;
-			throw new IOException();
 		}
 	}
 
@@ -331,30 +317,26 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			} catch (ArithmeticException e) {
 				return -1;
 			}
-		} else {
-			return 0;
-		}
+		} else return 0;
 		return (long) (res * 1000000D);
 	}
 
 	public long getMediaTime() {
-		if (sequence == null) return 0;
+		if (sequence == null) return mediaTime;
 		if (sequence instanceof Clip) {
-			return ((Clip) sequence).getMicrosecondPosition();
+			return mediaTime = ((Clip) sequence).getMicrosecondPosition();
 		}
 		if (sequence instanceof Sequence) {
 			try {
 				if (midiSequencer != null)
-					midiPosition = midiSequencer.getMicrosecondPosition();
+					mediaTime = midiSequencer.getMicrosecondPosition();
 				else if (Settings.oneMidiAtTime && EmulatorMIDI.currentPlayer == this && midiPlaying)
-					midiPosition = EmulatorMIDI.getMicrosecondPosition();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return midiPosition;
+					mediaTime = EmulatorMIDI.getMicrosecondPosition();
+			} catch (Exception ignored) {}
+			return mediaTime;
 		}
 		if (sequence instanceof javazoom.jl.player.Player) {
-			return ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
+			return mediaTime = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
 		}
 		return TIME_UNKNOWN;
 	}
@@ -366,12 +348,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			ms = ((Clip) sequence).getMicrosecondLength();
 			if (t < ms) ms = t;
 			if (ms < 0) ms = 0;
-			((Clip) sequence).setMicrosecondPosition(t);
+			((Clip) sequence).setMicrosecondPosition(mediaTime = t);
 		} else if (sequence instanceof Sequence) {
 			ms = ((Sequence) sequence).getMicrosecondLength();
 			if (t < ms) ms = t;
 			if (ms < 0) ms = 0;
-			midiPosition = ms;
+			mediaTime = ms;
 			try {
 				if (midiSequencer != null)
 					midiSequencer.setMicrosecondPosition(ms);
@@ -409,7 +391,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				}
 			}
 		}
-		return ms;
+		return mediaTime = ms;
 	}
 
 	public int getState() {
@@ -671,19 +653,19 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				if (sequence instanceof Sequence) {
 					Sequencer sequencer = null;
 					if (globalMidi) {
-						EmulatorMIDI.start(this, (Sequence) sequence, midiPosition);
+						EmulatorMIDI.start(this, (Sequence) sequence, mediaTime);
 						EmulatorMIDI.currentPlayer = this;
 					} else {
 						initMidiSequencer();
 						sequencer = midiSequencer;
 						sequencer.setSequence((Sequence) sequence);
-						if (midiSequencer == null || midiPosition >= getDuration()) {
-							sequencer.setMicrosecondPosition(midiPosition);
+						if (midiSequencer == null || mediaTime >= getDuration()) {
+							sequencer.setMicrosecondPosition(mediaTime);
 						}
 						sequencer.start();
 					}
 					if (b) {
-						notifyListeners(PlayerListener.STARTED, midiPosition = globalMidi ? EmulatorMIDI.getMicrosecondPosition() : midiSequencer.getMicrosecondPosition());
+						notifyListeners(PlayerListener.STARTED, mediaTime = globalMidi ? EmulatorMIDI.getMicrosecondPosition() : midiSequencer.getMicrosecondPosition());
 						b = false;
 					}
 					midiPlaying = true;
@@ -695,10 +677,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					complete = this.complete;
 					midiPlaying = false;
 					if (globalMidi) {
-						midiPosition = EmulatorMIDI.getMicrosecondPosition();
+						mediaTime = EmulatorMIDI.getMicrosecondPosition();
 						EmulatorMIDI.stop();
 					} else {
-						midiPosition = sequencer.getMicrosecondPosition();
+						mediaTime = sequencer.getMicrosecondPosition();
 						sequencer.stop();
 					}
 				} else if (sequence instanceof Clip) {
