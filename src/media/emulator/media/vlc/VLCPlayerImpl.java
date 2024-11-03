@@ -90,6 +90,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	private VolumeControl volumeControl;
 	private RateControl rateControl;
 	private StopTimeControl stopTimeControl;
+	private MetaDataControl metaDataControl;
 
 	long stopTime = StopTimeControl.RESET;
 	private boolean stoppedAtTime;
@@ -100,6 +101,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		volumeControl = new VolumeControlImpl(this);
 		rateControl = new RateControlImpl(this);
 		stopTimeControl = new StopTimeControlImpl(this);
+		metaDataControl = new MetaDataControlImpl(this);
 		controls = new Control[]{videoControl, volumeControl, rateControl, stopTimeControl};
 		this.timeBase = Manager.getSystemTimeBase();
 		PlayerImpl.players.add(this);
@@ -241,6 +243,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (s.contains("StopTimeControl")) {
 			return stopTimeControl;
 		}
+		if (s.contains("MetaDataControl")) {
+			return metaDataControl;
+		}
 		return null;
 	}
 
@@ -282,29 +287,29 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 						e.printStackTrace();
 					}
 				}
-				boolean bufferToFile = inputStream instanceof ByteArrayInputStream && false;
-				if (!bufferToFile) {
-					mediaCallback = new VLCCallbackStream(inputStream, dataLen);
-				} else {
-					try {
-						Manager.log("buffering to file");
-						File d = new File(System.getProperty("java.io.tmpdir"));
-						tempFile = new File(d.getPath() + File.separator + "kemtempmedia");
-						tempFile.deleteOnExit();
-						if (tempFile.exists())
-							tempFile.delete();
-						FileOutputStream fos = new FileOutputStream(tempFile);
-						CustomJarResources.write(inputStream, fos);
-						fos.close();
-						dataLen = (int) tempFile.length();
-						this.mediaUrl = tempFile.toString();
-						mediaCallback = new RandomAccessFileMedia(tempFile);
-						Manager.log("buffered " + mediaUrl);
-					} catch (Exception e) {
-						e.printStackTrace();
-						throw new MediaException("failed to write temp file");
-					}
-				}
+//				boolean bufferToFile = inputStream instanceof ByteArrayInputStream && false;
+//				if (!bufferToFile) {
+				mediaCallback = new VLCCallbackStream(inputStream, dataLen);
+//				} else {
+//					try {
+//						Manager.log("buffering to file");
+//						File d = new File(System.getProperty("java.io.tmpdir"));
+//						tempFile = new File(d.getPath() + File.separator + "kemtempmedia");
+//						tempFile.deleteOnExit();
+//						if (tempFile.exists())
+//							tempFile.delete();
+//						FileOutputStream fos = new FileOutputStream(tempFile);
+//						CustomJarResources.write(inputStream, fos);
+//						fos.close();
+//						dataLen = (int) tempFile.length();
+//						this.mediaUrl = tempFile.toString();
+//						mediaCallback = new RandomAccessFileMedia(tempFile);
+//						Manager.log("buffered " + mediaUrl);
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//						throw new MediaException("failed to write temp file");
+//					}
+//				}
 			} else if (dataSource != null) {
 				mediaCallback = new VLCCallbackSourceStream(dataSource);
 			}
@@ -375,7 +380,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			return;
 		}
 		state = CLOSED;
-		inst = null;
+		if (inst == this) inst = null;
 		if (playing) {
 			try {
 				this.stop();
