@@ -1,5 +1,6 @@
 package javax.microedition.lcdui;
 
+import emulator.Emulator;
 import emulator.lcdui.BoundsUtils;
 import emulator.lcdui.c;
 
@@ -216,7 +217,7 @@ public class ChoiceGroup
 		super._itemApplyCommand();
 		if (this.aBoolean541 && this.aCommand540 != null) {
 			if (screen.cmdListener != null)
-				this.screen.cmdListener.commandAction(this.aCommand540, this.screen);
+				Emulator.getEventQueue().commandAction(this.aCommand540, this.screen);
 		}
 		if (this.choiceType == EXCLUSIVE) {
 			this.setSelectedIndex(this.currentPos, true);

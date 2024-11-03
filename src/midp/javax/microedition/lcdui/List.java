@@ -1,5 +1,6 @@
 package javax.microedition.lcdui;
 
+import emulator.Emulator;
 import emulator.UILocale;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -445,7 +446,7 @@ public class List extends Screen implements Choice {
 			{
 				if(size() > 0)
 				{
-					_callCommandAction(selectCommand);
+					Emulator.getEventQueue().commandAction(selectCommand, List.this);
 				}
 			}
 		}
