@@ -287,10 +287,12 @@ public class Displayable {
 			return;
 		}
 		a.method181(graphics, 0, Screen.fontHeight4 + this.bounds[H] - 1, this.w, Screen.fontHeight4);
+		String t = ticker.getString();
+		if (t == null) return;
 		graphics.setFont(Screen.font);
-		graphics.drawString(this.ticker.getString(), this.tickerX, Screen.fontHeight4 + this.bounds[H] - 1 + 2, 0);
+		graphics.drawString(t, this.tickerX, Screen.fontHeight4 + this.bounds[H] - 1 + 2, 0);
 		this.tickerX -= 5;
-		if (this.tickerX < -Screen.font.stringWidth(this.ticker.getString())) {
+		if (this.tickerX < -Screen.font.stringWidth(t)) {
 			this.tickerX = this.w;
 		}
 	}
