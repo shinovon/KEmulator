@@ -76,6 +76,7 @@ public class Emulator implements Runnable {
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
 	private static Class<?> midletClass;
+	private static boolean forked;
 
 	private static void initRichPresence() {
 		if (!Settings.rpc)
@@ -741,6 +742,13 @@ public class Emulator implements Runnable {
 		parseLaunchArgs(commandLineArguments);
 		// Force m3g engine to LWJGL in x64 build
 		if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
+
+		// Restart with additional arguments required for specific os or java version
+		if (!forked && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
+			loadGame(null, false);
+			return;
+		}
+
 		platform.load3D();
 		vlcCheckerThread.start();
 		Controllers.refresh(true);
@@ -903,6 +911,8 @@ public class Emulator implements Runnable {
 				installed = true;
 			} else if (key.equalsIgnoreCase("uei")) {
 				Settings.uei = true;
+			} else if (key.equalsIgnoreCase("s")) {
+				forked = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
@@ -1061,6 +1071,8 @@ public class Emulator implements Runnable {
 		cmd.add(mascotEngine == 0 ? "-mascotdll" : "-mascotgl");
 
 		if (installed) cmd.add("-installed");
+
+		cmd.add("-s");
 
 		getEmulator().disposeSubWindows();
 		notifyDestroyed();
