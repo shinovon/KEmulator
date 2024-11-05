@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class EmulatorExe {
 
-	public static final String version = "1.8";
+	public static final String version = "1.9";
 	public static final boolean WINE = false;
 	public static final boolean NNX64 = false;
 
@@ -167,11 +167,13 @@ public class EmulatorExe {
 			cmd.add(WINE ? "-Xmx512M" : "-Xmx1G");
 		}
 
+		cmd.add("-Djava.library.path=" + path);
+
 		if("false".equals(System.getProperty("sun.java3d.d3d"))) {
 			cmd.add("-Dsun.java3d.d3d=false");
 		}
 
-		if (os.startsWith("darwin")) {
+		if (os.startsWith("darwin") || os.startsWith("mac os")) {
 			cmd.add("-XstartOnFirstThread");
 		}
 

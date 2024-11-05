@@ -744,7 +744,7 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
 		// Restart with additional arguments required for specific os or java version
-		if (!forked && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
+		if (!(forked || Settings.uei) && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
 			loadGame(null, false);
 			return;
 		}
