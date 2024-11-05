@@ -284,7 +284,16 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		}
 		String arch = osa.contains("amd64") ? "x86_64" : osa.contains("86") ? "x86" : osa;
 		String swtFileName = "swt-" + os + "-" + arch + ".jar";
-		addToClassPath(swtFileName);
+		try {
+			addToClassPath(swtFileName);
+		} catch (RuntimeException e) {
+			// Check if SWT is already loaded
+			try {
+				Class.forName("org.eclipse.swt.SWT");
+			} catch (ClassNotFoundException e2) {
+				throw e;
+			}
+		}
 	}
 
 	private static void addToClassPath(String s) {
