@@ -25,11 +25,10 @@ public final class FontSWT implements IFont {
 	}
 
 	private void metrics() {
-		if (gc != null && !gc.isDisposed())
-			gc.dispose();
-		(this.gc = new GC(new Image(null, 1, 1))).setFont(this.font);
-
-
+		if (gc == null) {
+			gc = new GC(new Image(null, 1, 1));
+		}
+		gc.setFont(this.font);
 	}
 
 
@@ -42,8 +41,7 @@ public final class FontSWT implements IFont {
 				if (gc != null && !gc.isDisposed()) {
 					gc.dispose();
 				}
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		});
 	}
 

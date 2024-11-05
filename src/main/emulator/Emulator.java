@@ -1036,6 +1036,8 @@ public class Emulator implements Runnable {
 			cmd.add("--add-opens");
 			cmd.add("java.base/java.lang.reflect=ALL-UNNAMED");
 			cmd.add("--add-opens");
+			cmd.add("java.base/java.lang.ref=ALL-UNNAMED");
+			cmd.add("--add-opens");
 			cmd.add("java.base/java.io=ALL-UNNAMED");
 			cmd.add("--add-opens");
 			cmd.add("java.base/java.util=ALL-UNNAMED");

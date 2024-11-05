@@ -118,8 +118,10 @@ public final class Graphics2DAWT implements IGraphics2D {
 	}
 
 	public final void setFont(final IFont font) {
-		this.font = (FontAWT) font;
-		g.setFont(((FontAWT) font).getAWTFont());
+		try {
+			this.font = (FontAWT) font;
+			g.setFont(((FontAWT) font).getAWTFont());
+		} catch (Exception ignored) {}
 	}
 
 	public final void setStrokeStyle(final int anInt12) {
