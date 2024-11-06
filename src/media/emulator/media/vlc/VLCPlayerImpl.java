@@ -154,11 +154,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	public static void draw(Graphics g, Object obj) {
-		if (inst != null) {
-			if (obj == inst.canvas) {
-				inst.paint(g);
-			}
-		}
+		if (inst == null || obj != inst.canvas)
+			return;
+		inst.paint(g);
 	}
 
 	private void paint(Graphics g) {

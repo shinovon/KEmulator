@@ -445,9 +445,11 @@ public class Manager {
 	}
 
 	public static boolean isLibVlcSupported() {
-		while (libVlcState == 0) {
-			Thread.yield();
-		}
+		try {
+			while (libVlcState == 0) {
+				Thread.sleep(5);
+			}
+		} catch (Exception ignored) {}
 		return libVlcState == 1;
 	}
 
@@ -508,8 +510,7 @@ public class Manager {
 			}
 			NativeDiscovery nd = new NativeDiscovery(list.toArray(new NativeDiscoveryStrategy[0]));
 			boolean b = nd.discover();
-			if (b) libVlcState = 1;
-			else libVlcState = -1;
+			libVlcState = b ? 1 : -1;
 			if (b) {
 				log("LibVlc loaded");
 				return;
@@ -519,7 +520,6 @@ public class Manager {
 		}
 		log("LibVlc not loaded");
 		libVlcState = -1;
-		return;
 	}
 
 	public synchronized static void playTone(int note, int duration, int volume) throws MediaException {
