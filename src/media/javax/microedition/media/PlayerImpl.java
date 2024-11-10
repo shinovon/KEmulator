@@ -50,8 +50,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private InputStream inputStream;
 	private boolean realized;
 
-	private static final Vector<WavCacheKey> wavCacheKeys = new Vector<>();
-	private static final Vector<Clip> wavCacheEntries = new Vector<>();
+	private static final Vector<WavCache> wavCache = new Vector<>();
+
+	private WavCache cacheRef;
 
 	public PlayerImpl() {
 		loopCount = 1;
@@ -123,16 +124,19 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private void wav(InputStream inputStream) throws IOException {
 		controls = new Control[]{toneControl, volumeControl};
 		byte[] data;
-		WavCacheKey key = null;
+		WavCache key = null;
 		try {
 			if (inputStream instanceof ByteArrayInputStream || Settings.enableMediaDump) {
 				data = CustomJarResources.getBytes(inputStream);
 				if (Settings.wavCache) {
-					key = new WavCacheKey(data);
-					synchronized (wavCacheKeys) {
-						int i = wavCacheKeys.indexOf(key);
+					key = new WavCache(data);
+					synchronized (wavCache) {
+						int i = wavCache.indexOf(key);
 						if (i != -1) {
-							sequence = wavCacheEntries.get(i);
+							key = wavCache.get(i);
+							sequence = key.clip;
+							cacheRef = key;
+							key.setPlayer(this);
 							setMediaTime(0);
 							return;
 						}
@@ -159,18 +163,15 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			final Clip clip;
 			(clip = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioInputStream
 					.getFormat(), (int) audioInputStream.getFrameLength() * format.getFrameSize())))
-					.addLineListener(this);
+					.addLineListener(Settings.wavCache ? key : this);
 			clip.open(audioInputStream);
 			sequence = clip;
 
 			if (Settings.wavCache && key != null) {
-				synchronized (wavCacheKeys) {
-					while (wavCacheKeys.size() > 20) {
-						wavCacheEntries.remove(0);
-						wavCacheKeys.remove(0);
-					}
-					wavCacheEntries.insertElementAt((Clip) sequence, wavCacheKeys.size());
-					wavCacheKeys.addElement(key);
+				synchronized (wavCache) {
+					key.clip = (Clip) sequence;
+					key.setPlayer(this);
+					cacheRef = key;
 				}
 			}
 		} catch (Exception e) {
@@ -585,6 +586,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					setMediaTime(0);
 					complete = false;
 				}
+				if (cacheRef != null) {
+					cacheRef.setPlayer(this);
+				}
 				stopped = false;
 				(playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
 			}
@@ -838,24 +842,40 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		return crc.getValue();
 	}
 
-	static class WavCacheKey {
+	static class WavCache implements LineListener {
 		int length;
 		long crc;
+		Set<Player> references;
+		PlayerImpl currentPlayer;
+		Clip clip;
 
-		WavCacheKey(byte[] b) {
+		WavCache(byte[] b) {
 			length = b.length;
 			crc = crcUtil(b);
 		}
 
+		void setPlayer(PlayerImpl player) {
+			if (references == null)
+				references = Collections.newSetFromMap(new WeakHashMap());
+			currentPlayer = player;
+			references.add(player);
+		}
+
 		@Override
 		public boolean equals(Object other) {
-			if (other instanceof WavCacheKey) {
-				return length == ((WavCacheKey) other).length && crc == ((WavCacheKey) other).crc;
+			if (other instanceof WavCache) {
+				return length == ((WavCache) other).length && crc == ((WavCache) other).crc;
 			}
 			if (other instanceof byte[]) {
 				return ((byte[]) other).length == length && crcUtil((byte[]) other) == crc;
 			}
 			return false;
+		}
+
+		public void update(LineEvent event) {
+			if (event.getType() == LineEvent.Type.STOP && currentPlayer != null) {
+				currentPlayer.notifyCompleted();
+			}
 		}
 	}
 }
