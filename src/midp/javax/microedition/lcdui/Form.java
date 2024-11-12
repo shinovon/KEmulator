@@ -233,7 +233,7 @@ public class Form extends Screen {
 		if (super._invokePointerPressed(x, y)) return true;
 		int[] r = new int[2];
 		Item item = _getItemAt(x, y, r);
-		if (item.isFocusable()) {
+		if (item != null && item.isFocusable()) {
 			focusItem(item);
 			pointerGrabbed = true;
 			focusedItem.pointerPressed(r[0], r[1]);
