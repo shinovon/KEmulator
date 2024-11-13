@@ -183,13 +183,19 @@ public final class ImageAWT implements IImage {
 
 	private int[] getInternalData() {
 		if (data == null) {
+			// TODO: catch ClassCastException
 			data = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 		}
 		return data;
 	}
 
 	public int size() {
-		return getInternalData().length;
+		DataBuffer d = img.getRaster().getDataBuffer();
+		int size = d.getSize();
+		if (d instanceof DataBufferInt) {
+			size *= 4;
+		}
+		return size;
 	}
 
 	public Object getNative() {
