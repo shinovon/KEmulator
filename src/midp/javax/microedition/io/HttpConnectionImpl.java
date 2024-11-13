@@ -9,7 +9,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	HttpURLConnection connection;
 	private boolean closed;
 	private String url;
-	private boolean userAgentSet;
+	private boolean connected;
 
 	private void method134(final String s) {
 		if (this.url.startsWith("http://10.0.0.172")) {
@@ -83,9 +83,6 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final void setRequestProperty(final String s, final String s2) throws IOException {
-		if ("User-Agent".equalsIgnoreCase(s) && s2 != null && s2.length() > 0) {
-			userAgentSet = true;
-		}
 		if ("X-Online-Host".equalsIgnoreCase(s)) {
 			method134(s2);
 		}
@@ -93,7 +90,21 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	private void connect() {
-		setUserAgent();
+		if (connected) return;
+		connected = true;
+		try {
+			if (getRequestProperty("User-Agent") == null) {
+				if (Emulator.httpUserAgent != null) {
+					connection.setRequestProperty("User-Agent",
+							Emulator.httpUserAgent);
+				} else {
+					connection.setRequestProperty("User-Agent",
+							Emulator.deviceName + " (KEmulator/" + Emulator.version + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public final int getResponseCode() throws IOException {
@@ -192,24 +203,6 @@ final class HttpConnectionImpl implements HttpConnection {
 			if(i != null) return i;
 			throw e;
 		}
-	}
-
-	private void setUserAgent() {
-		if (userAgentSet) return;
-		try {
-			if (getRequestProperty("User-Agent") == null) {
-				if (Emulator.httpUserAgent != null) {
-					connection.setRequestProperty("User-Agent",
-							Emulator.httpUserAgent);
-				} else {
-					connection.setRequestProperty("User-Agent",
-							Emulator.deviceName + " (KEmulator/" + Emulator.version + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		userAgentSet = true;
 	}
 
 	public final DataOutputStream openDataOutputStream() throws IOException {

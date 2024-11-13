@@ -43,7 +43,7 @@ MENU_VIEW_SENSOR=Симулятор акселерометра
 MENU_VIEW_LOG=Логи
 
 MENU_VIEW_OPTIONS=Опции...
-MENU_VIEW_HELP=О Программе
+MENU_VIEW_HELP=О программе
 
 MENU_TOOL_ZOOMIN=Увеличить
 MENU_TOOL_ZOOMOUT=Уменьшить
