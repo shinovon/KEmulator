@@ -106,6 +106,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(acc, cls.replace("com/bmc/media/", "com/sprintpcs/media/"), name, sign.replace("com/bmc/media/", "com/sprintpcs/media/"));
 					return;
 				}
+				if (cls.equals("com/immersion/VibeTonz") && acc == Opcodes.INVOKESTATIC) {
+					super.visitMethodInsn(acc, cls.concat("Static"), name, sign);
+					return;
+				}
 				if (Settings.g3d == 0) {
 					if (cls.equals("javax/microedition/m3g/Transform")) {
 						if (!name.equals("finalize") && !name.contains("init>")) {
