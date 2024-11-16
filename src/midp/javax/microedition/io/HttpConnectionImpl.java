@@ -106,7 +106,7 @@ final class HttpConnectionImpl implements HttpConnection {
 		}
 		connection.connect();
 		try {
-			headerOffset = connection.getHeaderField(0) == null && connection.getHeaderField(1) != null ? 1 : 0;
+			headerOffset = connection.getHeaderFieldKey(0) == null && connection.getHeaderFieldKey(1) != null ? 1 : 0;
 		} catch (Exception ignored) {}
 	}
 
