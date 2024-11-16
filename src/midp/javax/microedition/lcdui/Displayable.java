@@ -57,7 +57,11 @@ public class Displayable {
 		IScreen s = Emulator.getEmulator().getScreen();
 		this.w = s.getWidth();
 		this.h = s.getHeight();
-		this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
+		if (this instanceof Canvas) {
+			this.bounds = new int[]{0, 0, this.w, this.h - Screen.fontHeight4};
+		} else {
+			this.bounds = new int[]{0, Screen.fontHeight4, this.w - 4, this.h - Screen.fontHeight4};
+		}
 	}
 
 	public int getWidth() {

@@ -51,8 +51,7 @@ public abstract class Canvas extends Displayable {
 		graphics._reset(buffer, xray);
 		this.paint(graphics);
 		graphics._reset(buffer, xray); // paintTicker fix
-		this._paintTicker(graphics);
-		this._paintSoftMenu(graphics);
+		this._paintOverlay(graphics);
 	}
 
 	public void _invokePaint(IImage buffer, IImage xray, int x, int y, int w, int h) {
@@ -64,11 +63,11 @@ public abstract class Canvas extends Displayable {
 		graphics.setClip(x, y, w, h);
 		this.paint(graphics);
 		graphics._reset(buffer, xray); // paintTicker fix
-		this._paintTicker(graphics);
-		this._paintSoftMenu(graphics);
+		this._paintOverlay(graphics);
 	}
 
-	protected void _paintSoftMenu(Graphics graphics) {
+	protected void _paintOverlay(Graphics graphics) {
+		super._paintTicker(graphics);
 		super._paintSoftMenu(graphics);
 		for (CanvasItem i: nokiaCanvasItems) {
 			if (!i.isVisible()) continue;
@@ -133,8 +132,8 @@ public abstract class Canvas extends Displayable {
 			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
 		}
 		if (this.w != w || this.h != h || forceUpdateSize) {
-			this.w = w;
-			this.h = h;
+			this.w = bounds[W] = w;
+			this.h = bounds[H] = h;
 			sizeChanged(w, h);
 			if (!Settings.dontRepaintOnSetCurrent) repaint();
 		}
