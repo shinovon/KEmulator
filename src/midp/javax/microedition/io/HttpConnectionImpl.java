@@ -7,9 +7,9 @@ import java.io.*;
 
 final class HttpConnectionImpl implements HttpConnection {
 	HttpURLConnection connection;
-	private boolean closed;
 	private String url;
-	private boolean connected;
+	private int state;
+	private int headerOffset;
 
 	private void method134(final String s) {
 		if (this.url.startsWith("http://10.0.0.172")) {
@@ -30,7 +30,6 @@ final class HttpConnectionImpl implements HttpConnection {
 	public HttpConnectionImpl(String url) throws IOException {
 		super();
 		this.url = url;
-		this.closed = false;
 		Emulator.getEmulator().getLogStream().println("Connect to: " + url);
 		this.connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setDoInput(true);
@@ -89,9 +88,9 @@ final class HttpConnectionImpl implements HttpConnection {
 		connection.setRequestProperty(s, s2);
 	}
 
-	private void connect() {
-		if (connected) return;
-		connected = true;
+	private void connect() throws IOException {
+		if (state != 0) return;
+		state = 1;
 		try {
 			if (getRequestProperty("User-Agent") == null) {
 				if (Emulator.httpUserAgent != null) {
@@ -105,6 +104,10 @@ final class HttpConnectionImpl implements HttpConnection {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		connection.connect();
+		try {
+			headerOffset = connection.getHeaderField(0) == null && connection.getHeaderField(1) != null ? 1 : 0;
+		} catch (Exception ignored) {}
 	}
 
 	public final int getResponseCode() throws IOException {
@@ -162,31 +165,45 @@ final class HttpConnectionImpl implements HttpConnection {
 
 	public final String getHeaderField(final int n) throws IOException {
 		connect();
-		return this.connection.getHeaderField(n);
+		return this.connection.getHeaderField(n + headerOffset);
 	}
 
 	public final String getHeaderFieldKey(final int n) throws IOException {
 		connect();
-		return this.connection.getHeaderFieldKey(n);
+		return this.connection.getHeaderFieldKey(n + headerOffset);
 	}
 
 	public final void close() throws IOException {
-		this.closed = true;
+		if (state == 2) return;
+		state = 2;
+		connection.disconnect();
 	}
 
 	public final String getType() {
-		connect();
-		return this.connection.getContentType();
+		try {
+			connect();
+			return this.connection.getContentType();
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 	public final String getEncoding() {
-		connect();
-		return this.connection.getContentEncoding();
+		try {
+			connect();
+			return this.connection.getContentEncoding();
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 	public final long getLength() {
-		connect();
-		return this.connection.getContentLength();
+		try {
+			connect();
+			return this.connection.getContentLength();
+		} catch (IOException e) {
+			return -1;
+		}
 	}
 
 	public final DataInputStream openDataInputStream() throws IOException {
@@ -194,7 +211,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final InputStream openInputStream() throws IOException {
-		if (this.closed) throw new IOException();
+		if (state != 1) throw new IOException();
 		connect();
 		try {
 			return this.connection.getInputStream();
@@ -210,7 +227,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
-		if (this.closed) throw new IOException();
+		if (state != 1) throw new IOException();
 		connect();
 		try {
 			return this.connection.getOutputStream();
