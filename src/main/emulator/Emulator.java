@@ -336,8 +336,16 @@ public class Emulator implements Runnable {
 		}
 	}
 
-	public static String getTitleVersionString() {
-		return platform.getTitleName() + " " + version + (Settings.uei ? " (UEI)" : "");
+	public static String getTitle(String s) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(platform.getTitleName()).append(' ').append(version);
+		if (s != null) {
+			sb.append(" - ").append(s);
+		} else if (midletJar != null) {
+			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty("MIDlet-Name"));
+		}
+		if (Settings.uei) sb.append(" (UEI)");
+		return sb.toString();
 	}
 
 	public static String getCmdVersionString() {

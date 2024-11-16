@@ -615,7 +615,7 @@ public final class EmulatorScreen implements
 		layout.verticalSpacing = 0;
 		layout.makeColumnsEqualWidth = false;
 		(this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
-				.setText(Emulator.getTitleVersionString());
+				.setText(Emulator.getTitle(null));
 		shell.addListener(SWT.Close, event -> CustomMethod.close());
 		this.shell.setLayout(layout);
 		try {
@@ -1663,10 +1663,23 @@ public final class EmulatorScreen implements
 						c.layout();
 					}
 				}
+				updateTitle();
 				canvas.layout();
 				lastDisplayable._swtShown();
 			}
 		});
+	}
+
+	public void updateTitle() {
+		String title = null;
+		if (lastDisplayable == null ||
+				(title = lastDisplayable.getTitle()) == null ||
+				(title = title.trim()).isEmpty()) {
+			title = Emulator.getTitle(null);
+		} else {
+			title = Emulator.getTitle(title);
+		}
+		shell.setText(title);
 	}
 
 	private static void method578(final int n) {

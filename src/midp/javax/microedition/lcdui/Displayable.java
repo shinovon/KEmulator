@@ -244,6 +244,13 @@ public class Displayable {
 
 	public void setTitle(final String title) {
 		this.title = title;
+		if (isShown()) {
+			syncExec(new Runnable() {
+				public void run() {
+					((EmulatorScreen) Emulator.getEmulator().getScreen()).updateTitle();
+				}
+			});
+		}
 	}
 
 	protected void sizeChanged(final int n, final int n2) {
