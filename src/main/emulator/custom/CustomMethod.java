@@ -44,6 +44,14 @@ public class CustomMethod {
 		boolean b = true;
 		if (Settings.systemProperties != null && Settings.systemProperties.containsKey(prop)) {
 			res = Settings.systemProperties.get(prop);
+			if (res.startsWith(":")) {
+				res = res.substring(1);
+				if (res.equals("null")) {
+					res = null;
+				} else {
+					res = System.getProperty(res);
+				}
+			}
 		} else {
 			if (prop.equalsIgnoreCase("fileconn.dir.private")) {
 				res = "file://root/private_" + Emulator.midletClassName.replace("\\", "_").replace("/", "_").replace(".", "_") + "/";
