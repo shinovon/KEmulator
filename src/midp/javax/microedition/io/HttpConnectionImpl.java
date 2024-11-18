@@ -108,6 +108,7 @@ final class HttpConnectionImpl implements HttpConnection {
 		try {
 			headerOffset = connection.getHeaderFieldKey(0) == null && connection.getHeaderFieldKey(1) != null ? 1 : 0;
 		} catch (Exception ignored) {}
+		NetworkLog.httpConnected(this, connection);
 	}
 
 	public final int getResponseCode() throws IOException {
@@ -214,10 +215,10 @@ final class HttpConnectionImpl implements HttpConnection {
 		if (state != 1) throw new IOException();
 		connect();
 		try {
-			return this.connection.getInputStream();
+			return NetworkLog.httpInput(this, this.connection.getInputStream());
 		} catch (IOException e) {
 			InputStream i = this.connection.getErrorStream();
-			if(i != null) return i;
+			if(i != null) return NetworkLog.httpInput(this, i);
 			throw e;
 		}
 	}
@@ -228,7 +229,6 @@ final class HttpConnectionImpl implements HttpConnection {
 
 	public final OutputStream openOutputStream() throws IOException {
 		if (state != 1) throw new IOException();
-		connect();
 		try {
 			return this.connection.getOutputStream();
 		} catch (Exception ex) {

@@ -119,7 +119,7 @@ public class Permission {
 		return dialogResult == SWT.YES;
 	}
 
-	public static void checkPermission(String x) {
+	public static boolean returnPermission(String x) {
 		//0: always ask
 		//1: ask once if yes, ask next time if no is pressed
 		//2: always allowed
@@ -129,26 +129,26 @@ public class Permission {
 		switch (getPermissionLevel(x)) {
 			case ask_always:
 				if (!showConfirmDialog(localizePerm(x), null))
-					throw new SecurityException(x);
+					return false;
 				allowPerms.add(x);
 				break;
 			case ask_always_until_yes:
 				if (allowPerms.contains(x))
-					return;
+					return true;
 				if (!showConfirmDialog(localizePerm(x), null))
-					throw new SecurityException(x);
+					return false;
 				allowPerms.add(x);
 			case allowed:
 			default:
 				break;
 			case never:
-				throw new SecurityException(x);
+				return false;
 			case ask_always_until_no:
 				if (notAllowPerms.contains(x))
-					return;
+					return false;
 				if (!showConfirmDialog(localizePerm(x), null)) {
 					notAllowPerms.add(x);
-					throw new SecurityException(x);
+					return false;
 				}
 				allowPerms.add(x);
 				break;
@@ -156,14 +156,19 @@ public class Permission {
 				if (notAllowPerms.contains(x))
 					throw new SecurityException(x);
 				if (allowPerms.contains(x))
-					return;
+					return true;
 				if (!showConfirmDialog(localizePerm(x), null)) {
 					notAllowPerms.add(x);
-					throw new SecurityException(x);
+					return false;
 				}
 				allowPerms.add(x);
 				break;
 		}
+		return true;
+	}
+
+	public static void checkPermission(String x) {
+		if (!returnPermission(x)) throw new SecurityException(x);
 	}
 
 	private static String localizePerm(String x) {

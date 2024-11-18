@@ -28,62 +28,65 @@ public class Connector {
 		return open(s, n, false);
 	}
 
-	public static Connection open(final String s, final int n, final boolean b) throws IOException {
-		if (s.startsWith("resource:")) {
-			return new ResourceConnectionImpl(s);
+	public static Connection open(final String url, final int n, final boolean b) throws IOException {
+		if (url.startsWith("resource:")) {
+			return NetworkLog.created(url, new ResourceConnectionImpl(url));
 		}
-		if(s.startsWith("vserv:")) {
-			return new VServConnectionWrapper(s);
+		if(url.startsWith("vserv:")) {
+			return NetworkLog.created(url, new VServConnectionWrapper(url));
 		}
-		if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
+		if (url.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
 			Permission.checkPermission("connector.open.file");
-			return new FileConnectionImpl(s);
+			return NetworkLog.created(url, new FileConnectionImpl(url));
 		}
-		if (s.startsWith("sms://") && !Settings.protectedPackages.contains("javax.wireless.messaging")) {
+		if (url.startsWith("sms://") && !Settings.protectedPackages.contains("javax.wireless.messaging")) {
 			Permission.checkPermission("connector.open.sms");
-			return new MessageConnectionImpl(s);
+			return NetworkLog.created(url, new MessageConnectionImpl(url));
 		}
-		if (s.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
+		if (url.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
 			final SensorInfo[] sensors;
-			if ((sensors = SensorManager.findSensors(s)).length > 0) {
+			if ((sensors = SensorManager.findSensors(url)).length > 0) {
 				((SensorImpl) sensors[0]).method239();
 				return (SensorConnection) sensors[0];
 			}
 			return null;
 		} else {
 			if (Settings.networkNotAvailable) {
-				Emulator.getEmulator().getLogStream().println("MIDlet tried to open: " + s);
+				Emulator.getEmulator().getLogStream().println("MIDlet tried to open: " + url);
+				NetworkLog.openFailed(url, "Blocked");
 				throw new IOException("Network not available");
 			}
-			if (s.startsWith("http://")) {
-				Permission.checkPermission("connector.open.http");
-				return checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
+			if (url.startsWith("http://")) {
+				NetworkLog.checkOpen(url, "connector.open.http");
+				return NetworkLog.created(url, checkVserv(url) ? new VServConnectionWrapper(url) : new HttpConnectionImpl(url));
 			}
-			if (s.startsWith("https://")) {
-				Permission.checkPermission("connector.open.http");
-				return checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
+			if (url.startsWith("https://")) {
+				NetworkLog.checkOpen(url, "connector.open.http");
+				return NetworkLog.created(url, checkVserv(url) ? new VServConnectionWrapper(url) : new HttpConnectionImpl(url));
 			}
-			if (s.startsWith("socket://:")) {
-				Permission.checkPermission("connector.open.serversocket");
-				return new ServerSocketImpl(s);
+			if (url.startsWith("socket://:")) {
+				NetworkLog.checkOpen(url, "connector.open.serversocket");
+				return NetworkLog.created(url, new ServerSocketImpl(url));
 			}
-			if (s.startsWith("socket://")) {
-				Permission.checkPermission("connector.open.socket");
-				return new SocketConnectionImpl(s);
+			if (url.startsWith("socket://")) {
+				NetworkLog.checkOpen(url, "connector.open.socket");
+				return NetworkLog.created(url, new SocketConnectionImpl(url));
 			}
 			Connection openPrim = null;
 			String protocol = "";
-			if (s.indexOf(':') != -1) {
-				protocol = s.substring(0, s.indexOf(':'));
+			if (url.indexOf(':') != -1) {
+				protocol = url.substring(0, url.indexOf(':'));
 			} else {
-				throw new ConnectionNotFoundException("unknown protocol: " + s);
+				NetworkLog.openFailed(url, "Unknown protocol");
+				throw new ConnectionNotFoundException("unknown protocol: " + url);
 			}
 			try {
-				openPrim = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + protocol + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(':') + 1), n, b);
+				openPrim = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + protocol + ".Protocol").newInstance()).openPrim(url.substring(url.indexOf(':') + 1), n, b);
 			} catch (Exception ex) {
-				throw new ConnectionNotFoundException("unknown protocol: " + s);
+				NetworkLog.openFailed(url, "Unknown protocol");
+				throw new ConnectionNotFoundException("unknown protocol: " + url);
 			}
-			return openPrim;
+			return NetworkLog.created(url, openPrim);
 		}
 	}
 
