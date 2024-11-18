@@ -46,7 +46,7 @@ public final class c {
 			} else {
 				ArrayList list = new ArrayList();
 				if (!var4) {
-					splitToWidth(s, font, availableWidth, maxWidth, list);
+					splitToWidth(s, font, availableWidth, maxWidth, list, w);
 				} else {
 					char[] var7 = s.toCharArray();
 					int var8 = 0;
@@ -57,7 +57,7 @@ public final class c {
 							if (setWidth(w, font.stringWidth(var11)) <= availableWidth) {
 								list.add(var11);
 							} else {
-								splitToWidth(var11, font, availableWidth, maxWidth, list);
+								splitToWidth(var11, font, availableWidth, maxWidth, list, w);
 							}
 
 							var8 = var9 + 1;
@@ -87,7 +87,7 @@ public final class c {
 			} else {
 				ArrayList list = new ArrayList();
 				if (!var4) {
-					splitToWidth(s, font, x1, x2, list);
+					splitToWidth(s, font, x1, x2, list, null);
 				} else {
 					char[] var7 = s.toCharArray();
 					int var8 = 0;
@@ -98,7 +98,7 @@ public final class c {
 							if (font.stringWidth(var11) <= x1) {
 								list.add(var11);
 							} else {
-								splitToWidth(var11, font, x1, x2, list);
+								splitToWidth(var11, font, x1, x2, list, null);
 							}
 
 							var8 = var9 + 1;
@@ -114,7 +114,7 @@ public final class c {
 		}
 	}
 
-	private static void splitToWidth(String s, Font font, int x1, int x2, ArrayList list) {
+	private static void splitToWidth(String s, Font font, int x1, int x2, ArrayList list, int[] tw) {
 		char[] arr = s.toCharArray();
 		int k = 0;
 		int i = 0;
@@ -132,8 +132,12 @@ public final class c {
 							break;
 						}
 					}
-
-					list.add(new String(arr, k, j - k));
+					String t = new String(arr, k, j - k);
+					if (tw != null) {
+						int rw = font.stringWidth(t);
+						if (rw > tw[0]) tw[0] = rw;
+					}
+					list.add(t);
 					k = arr[j] != ' ' && arr[j] != '\n' ? j : j + 1;
 					w = 0;
 					i = k;
