@@ -228,7 +228,6 @@ final class HttpConnectionImpl implements HttpConnection {
 
 	public final OutputStream openOutputStream() throws IOException {
 		if (state != 1) throw new IOException();
-		connect();
 		try {
 			return this.connection.getOutputStream();
 		} catch (Exception ex) {
