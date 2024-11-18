@@ -167,7 +167,7 @@ public class TextField extends Item {
 		}
 		final Font aFont173 = Screen.font;
 		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, availableWidth, availableWidth);
-		bounds[H] = Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, screen.bounds[3]);
+		bounds[H] = Math.max(getMinimumHeight(), Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, screen.bounds[H]));
 	}
 
 	public int getMinimumWidth() {
