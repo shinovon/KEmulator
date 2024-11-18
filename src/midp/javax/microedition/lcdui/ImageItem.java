@@ -93,6 +93,8 @@ public class ImageItem extends Item {
 		int w = row.getAvailableWidth(screen.bounds[W]);
 		int[] tw = new int[1];
 		if (hasLabel()) {
+			int min = Item.font.stringWidth("...") + 2;
+			if (w < min) w = min;
 			labelArr = c.textArr(label, Item.font, w, w, tw);
 			n = (Item.font.getHeight() + 4) * labelArr.length;
 		} else {
@@ -108,11 +110,20 @@ public class ImageItem extends Item {
 	}
 
 	public int getPreferredWidth() {
+		if (super.isSizeLocked() && preferredWidth != -1) return preferredWidth;
 		return width + 2;
 	}
 
 	public int getMinimumWidth() {
-		return getPreferredWidth();
+		int w = getPreferredWidth();
+		if (w < 4) {
+			w = image != null ? image.getWidth() + 4 : 4;
+			if (hasLabel()) {
+				int m = Item.font.stringWidth("...") + 2;
+				if (w < m) w = m;
+			}
+		}
+		return w;
 	}
 
 	public int getMinimumHeight() {
