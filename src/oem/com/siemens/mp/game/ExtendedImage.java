@@ -131,7 +131,7 @@ public class ExtendedImage extends com.siemens.mp.misc.NativeMem {
 			for (int i = 0, k = 0; i < dataLen; i++) {
 				final int data = pixels[i];
 				for (int j = 3; j >= 0; j--) {
-					int color = (data >> j) & 0b11;
+					int color = (data >> j) & 3;
 					if (color == 0) {
 						colors[k++] = 0;
 					} else {

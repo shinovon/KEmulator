@@ -21,7 +21,7 @@ public class Permission {
 	private static int dialogResult;
 	private static final Vector<String> allowPerms = new Vector();
 	private static final Vector<String> notAllowPerms = new Vector();
-	public static final Map<String, Integer> permissions = new HashMap<>();
+	public static final Map<String, Integer> permissions = new HashMap<String, Integer>();
 	private static String imei;
 	public static boolean askPermissions = true;
 	public static boolean askImei = true;

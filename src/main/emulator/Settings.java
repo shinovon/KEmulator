@@ -113,7 +113,7 @@ public final class Settings {
 	public static boolean enableMediaDump;
 
 	public static final Set<String> protectedPackages = new HashSet<String>();
-	public static final Map<String, String> systemProperties = new HashMap<>();
+	public static final Map<String, String> systemProperties = new HashMap<String, String>();
 
 	public static boolean enableSecurity = true;
 	public static boolean ignoreServiceRepaints;

@@ -43,8 +43,8 @@ public abstract class Event {
 
 	// Static initialization
 	static {
-		returnPositionStack = new Stack<>();
-		currentBlockNumStack = new Stack<>();
+		returnPositionStack = new Stack<Integer>();
+		currentBlockNumStack = new Stack<Integer>();
 	}
 
 	protected Event(byte[] sequence, MidiSequence midiSequence) {
@@ -57,10 +57,10 @@ public abstract class Event {
 	 */
 	public void reset() {
 		if (!returnPositionStack.empty()) {
-			returnPositionStack = new Stack<>();
+			returnPositionStack = new Stack<Integer>();
 		}
 		if (!currentBlockNumStack.isEmpty()) {
-			currentBlockNumStack = new Stack<>();
+			currentBlockNumStack = new Stack<Integer>();
 		}
 	}
 

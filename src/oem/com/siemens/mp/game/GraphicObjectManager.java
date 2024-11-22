@@ -31,7 +31,7 @@ import javax.microedition.lcdui.Image;
 
 public class GraphicObjectManager extends com.siemens.mp.misc.NativeMem {
 
-	private Vector<GraphicObject> v = new Vector<>();
+	private Vector<GraphicObject> v = new Vector<GraphicObject>();
 
 	public void addObject(GraphicObject gobject) {
 		v.addElement(gobject);

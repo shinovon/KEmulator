@@ -9,7 +9,7 @@ import java.util.Set;
 
 public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 	static boolean hasRenamedMethods;
-	static Set<String> renamedClasses = new HashSet<>();
+	static Set<String> renamedClasses = new HashSet<String>();
 
 	private String className;
 	private String parentClassName;

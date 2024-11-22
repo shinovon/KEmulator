@@ -50,7 +50,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private InputStream inputStream;
 	private boolean realized;
 
-	private static final Vector<WavCache> wavCache = new Vector<>();
+	private static final Vector<WavCache> wavCache = new Vector<WavCache>();
 
 	private WavCache cacheRef;
 

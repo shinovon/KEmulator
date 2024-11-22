@@ -29,7 +29,7 @@ public class File {
 	public static final int OUTSIDE_STORAGE_PATH = 0;
 	public static final String STORAGE_DRIVE = "a:";
 
-	private static final ArrayList<RandomAccessFile> OPENED_FILES = new ArrayList<>();
+	private static final ArrayList<RandomAccessFile> OPENED_FILES = new ArrayList<RandomAccessFile>();
 	private static int lastDescriptor;
 
 	public static String buildPath(String fileName) {
@@ -54,18 +54,36 @@ public class File {
 	public static int copy(String sourcePath, String destPath) throws IOException {
 		java.io.File source = getFile(sourcePath);
 		java.io.File dest = getFile(destPath);
-		try (FileInputStream fis = new FileInputStream(source);
-			 FileChannel sourceChannel = fis.getChannel();
-			 FileOutputStream fos = new FileOutputStream(dest);
-			 FileChannel destChannel = fos.getChannel()) {
-			destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+		FileInputStream fis = new FileInputStream(source);
+		try {
+			FileChannel sourceChannel = fis.getChannel();
+			try {
+				FileOutputStream fos = new FileOutputStream(dest);
+				try {
+					FileChannel destChannel = fos.getChannel();
+					try {
+						destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+					} finally {
+						destChannel.close();
+					}
+				} finally {
+					fos.close();
+				}
+			} finally {
+				sourceChannel.close();
+			}
+		} finally {
+			fis.close();
 		}
 		return 1;
 	}
 
 	public static int debugWrite(String fileName, String infoString) throws IOException {
-		try (FileWriter writer = new FileWriter(getFile(fileName), true)) {
+		FileWriter writer = new FileWriter(getFile(fileName), true);
+		try {
 			writer.write(infoString);
+		} finally {
+			writer.close();
 		}
 		return 1;
 	}

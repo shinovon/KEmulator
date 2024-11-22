@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Stack;
 
 public class FigureImpl {
-	final Stack<RenderNode.FigureNode> stack = new Stack<>();
+	final Stack<RenderNode.FigureNode> stack = new Stack<RenderNode.FigureNode>();
 	Model model;
 	private int pattern;
 

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public abstract class ACanvas
 		extends Canvas
 		implements SequenceInterface {
-	private static ArrayList<ACanvas.CharacterCommand> commands = new ArrayList<>();
+	private static ArrayList<ACanvas.CharacterCommand> commands = new ArrayList<ACanvas.CharacterCommand>();
 	private Image spriteImage;
 	private Graphics graphics;
 	private int[] palette;

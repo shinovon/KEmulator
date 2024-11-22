@@ -29,7 +29,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 public abstract class SpriteCanvas extends Canvas {
-	private static ArrayList<CharacterCommand> commands = new ArrayList<>();
+	private static ArrayList<CharacterCommand> commands = new ArrayList<CharacterCommand>();
 	private Image spriteImage;
 	private Graphics graphics;
 	private int[] palette;

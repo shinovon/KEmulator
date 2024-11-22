@@ -63,7 +63,7 @@ public class Render {
 	private final Rectangle gClip = new Rectangle();
 	private final Rectangle clip = new Rectangle();
 	private boolean backCopied;
-	private final LinkedList<RenderNode> stack = new LinkedList<>();
+	private final LinkedList<RenderNode> stack = new LinkedList<RenderNode>();
 	private int flushStep;
 	private final boolean postCopy2D = !Settings.mascotNo2DMixing;
 	private final boolean preCopy2D = !Settings.mascotIgnoreBackground;

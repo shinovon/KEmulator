@@ -23,7 +23,7 @@ import javax.microedition.lcdui.Graphics;
 import ru.woesss.j2me.micro3d.Render;
 
 public class Renderer {
-	private final LinkedList<RenderProxy.RenderNode> stack = new LinkedList<>();
+	private final LinkedList<RenderProxy.RenderNode> stack = new LinkedList<RenderProxy.RenderNode>();
 
 	public Renderer() {}
 

@@ -31,7 +31,7 @@ public class EventList extends Event {
 	EventList(byte[] sequence, MidiSequence midiSequence) {
 		super(sequence, midiSequence);
 
-		events = new Vector<>(EVENT_PROCESSOR_COUNT);
+		events = new Vector<Event>(EVENT_PROCESSOR_COUNT);
 
 		events.addElement(new ToneEvent(sequence, midiSequence));
 		events.addElement(new BlockStartEvent(sequence, midiSequence));
