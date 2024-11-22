@@ -1,5 +1,7 @@
 package com.nokia.mid.ui;
 
+import emulator.Emulator;
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -20,11 +22,9 @@ public abstract class Clipboard {
 		try {
 			if (t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 				text = (String) t.getTransferData(DataFlavor.stringFlavor);
-				System.out.println("Clipboard contents: " + text);
+				Emulator.getEmulator().getLogStream().println("Clipboard contents: " + text);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception ignored) {}
 
 		if (text == null) {
 			text = "";

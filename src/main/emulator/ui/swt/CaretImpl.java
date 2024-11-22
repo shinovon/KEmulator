@@ -1,8 +1,10 @@
 package emulator.ui.swt;
 
+import com.nokia.mid.ui.Clipboard;
 import com.nokia.mid.ui.TextEditor;
 import emulator.Emulator;
 import emulator.ui.*;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Canvas;
 
@@ -142,11 +144,11 @@ public final class CaretImpl implements ICaret {
 		}
 	}
 
-	public final boolean keyPressed(KeyEvent var1) {
+	public final boolean keyPressed(KeyEvent event) {
 		if (this.item == null) return false;
 		if (!(item instanceof TextField || item instanceof TextEditor)) {
 			if (item instanceof DateField) {
-				char c = var1.character;
+				char c = event.character;
 				if (c == '\n' || c == '\r') c = 0;
 				if (c >= '0' && c <= '9' || c == 0) {
 					((DateField) item)._input(c);
@@ -155,6 +157,21 @@ public final class CaretImpl implements ICaret {
 			return true;
 		}
 
+		// handle ctrl+v
+		if ((event.stateMask & SWT.CONTROL) == SWT.CONTROL && event.character == 0x16) {
+			String s = Clipboard.copyFromClipboard();
+			if (s == null || s.length() == 0) return false;
+			char[] c = s.toCharArray();
+			for (int i = 0; i < c.length; ++i) {
+				type(c[i], 0, i == c.length - 1);
+			}
+			return true;
+		}
+
+		return type(event.character, event.keyCode, true);
+	}
+
+	private boolean type(char character, int keyCode, boolean event) {
 		int w = (item instanceof TextEditor ? ((TextEditor) item).getWidth() : ((Item) item).getPreferredWidth()) - 8;
 		String text = item instanceof TextEditor ? ((TextEditor) item).getContent() : ((TextField) item).getString();
 		Font font = item instanceof TextEditor ? ((TextEditor) item).getFont() : CaretImpl.font;
@@ -164,14 +181,14 @@ public final class CaretImpl implements ICaret {
 			int var5 = font.getHeight() + 4;
 			String var6;
 			int var7 = (var6 = var4[this.caretRow]).length();
-			if (var1.character == 0) {
+			if (character == 0) {
 				label131:
 				{
 					CaretImpl var10000;
 					int var10001;
 					label118:
 					{
-						switch (var1.keyCode) {
+						switch (keyCode) {
 							case 16777219:
 								var10000 = this;
 								var10001 = this.caretCol - 1;
@@ -232,7 +249,7 @@ public final class CaretImpl implements ICaret {
 			String var8 = var6.substring(0, this.caretCol);
 			var6.substring(this.caretCol, var7);
 			String var9 = null;
-			switch (var1.character) {
+			switch (character) {
 				case '\b':
 					if (this.caretCol == 0) {
 						if (this.caretRow > 0) {
@@ -281,10 +298,10 @@ public final class CaretImpl implements ICaret {
 					break;
 				default:
 					int max = item instanceof TextEditor ? ((TextEditor) item).getMaxSize() : ((TextField) item).getMaxSize();
-					if (var1.character >= 32 && text.length() < max) {
+					if (character >= 32 && text.length() < max) {
 						try {
-							text = text.substring(0, this.caretPosition) + var1.character + text.substring(this.caretPosition);
-							if (var1.character != 32 || text.charAt(this.caretPosition + 1) == 32) {
+							text = text.substring(0, this.caretPosition) + character + text.substring(this.caretPosition);
+							if (character != 32 || text.charAt(this.caretPosition + 1) == 32) {
 								if (this.caretCol == var7 && this.caretRow < var4.length - 1) {
 									++this.caretRow;
 									var7 = (var6 = var4[this.caretRow]).length();
@@ -293,11 +310,11 @@ public final class CaretImpl implements ICaret {
 									var6.substring(this.caretCol, var7);
 								}
 
-								var8 = var8 + var1.character;
+								var8 = var8 + character;
 								++this.caretCol;
 								if (font.stringWidth(var8) > w) {
 									var9 = "";
-									var8 = var9 + var1.character;
+									var8 = var9 + character;
 									this.caretCol = 1;
 									++this.caretRow;
 								}
@@ -308,13 +325,13 @@ public final class CaretImpl implements ICaret {
 
 			int var10 = font.stringWidth(var8);
 			this.setCaretLocation(this.caretX + var10, this.caretY + this.caretRow * var5);
-			if (var1.character != 0) {
+			if (character != 0) {
 				if (item instanceof TextEditor) {
 					((TextEditor) item).setContent(text);
-					((TextEditor) item)._contentChanged();
+					if (event) ((TextEditor) item)._contentChanged();
 				} else {
 					((TextField) item).setString(text);
-					((Item) item).notifyStateChanged();
+					if (event) ((Item) item).notifyStateChanged();
 				}
 			}
 
