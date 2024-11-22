@@ -369,7 +369,7 @@ public class Emulator implements Runnable {
 				}
 				final File file3 = file2;
 				if (file.exists()) {
-					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
+					(props = new Properties()).load(new FileInputStream(file3));
 					final Enumeration<Object> keys = props.keys();
 					while (keys.hasMoreElements()) {
 						final String s = (String) keys.nextElement();
@@ -397,7 +397,7 @@ public class Emulator implements Runnable {
 					} catch (Exception ex2) {
 						final InputStream inputStream;
 						(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
-						(props = new Properties()).load(new InputStreamReader(inputStream, "UTF-8"));
+						(props = new Properties()).load(inputStream);
 						inputStream.close();
 						final Enumeration<Object> keys2 = props.keys();
 						while (keys2.hasMoreElements()) {
@@ -454,7 +454,7 @@ public class Emulator implements Runnable {
 				Properties aProperties1369 = null;
 				final File file4;
 				if (Emulator.jadPath != null && (file4 = new File(Emulator.jadPath)).exists()) {
-					(aProperties1369 = new Properties()).load(new InputStreamReader(new FileInputStream(file4), "UTF-8"));
+					(aProperties1369 = new Properties()).load(new FileInputStream(file4));
 					final Enumeration keys3 = (aProperties1369).keys();
 					while (keys3.hasMoreElements()) {
 						final String s3 = (String) keys3.nextElement();
@@ -1049,7 +1049,7 @@ public class Emulator implements Runnable {
 			File file = new File(jadPath);
 			if (file.exists()) {
 				Properties properties = new Properties();
-				properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+				properties.load(new FileInputStream(file));
 				return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
 			}
 		} catch (Exception ignored) {}

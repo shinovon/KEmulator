@@ -6,14 +6,6 @@ import emulator.custom.*;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.ToneManager;
-import uk.co.caprica.vlcj.binding.LibC;
-import uk.co.caprica.vlcj.binding.RuntimeUtil;
-import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
-import uk.co.caprica.vlcj.factory.discovery.strategy.BaseNativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.LinuxNativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.NativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.OsxNativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.WindowsNativeDiscoveryStrategy;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -454,71 +446,6 @@ public class Manager {
 	}
 
 	public static void checkLibVlcSupport() {
-		/*
-		if(Settings.vlcDir == null) {
-			try {
-				File f = new File("./libvlc.dll");
-				if(!f.exists()) {
-					log("Vlc path not set");
-					libVlcState = -1;
-					return;
-				}
-			} catch (Exception e) {
-			}
-		}
-		*/
-		try {
-			List<NativeDiscoveryStrategy> list = new ArrayList<NativeDiscoveryStrategy>();
-			if (Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
-				NativeDiscoveryStrategy win = new BaseNativeDiscoveryStrategy(new String[]{
-						"libvlc\\.dll",
-						"libvlccore\\.dll"
-				}, new String[]{
-						"%s\\plugins",
-						"%s\\vlc\\plugins"
-				}) {
-
-					@Override
-					public boolean supported() {
-						// kemulator is windows only
-						return Emulator.isX64() ? RuntimeUtil.isWindows() : true;
-					}
-
-					@Override
-					public List<String> discoveryDirectories() {
-						List<String> directories = new ArrayList<String>();
-						try {
-							directories.add(new File(Settings.vlcDir).getCanonicalPath());
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						return directories;
-					}
-
-					@Override
-					protected boolean setPluginPath(String pluginPath) {
-						return LibC.INSTANCE._putenv(String.format("%s=%s", PLUGIN_ENV_NAME, pluginPath)) == 0;
-					}
-
-				};
-				list.add(win);
-			}
-			list.add(new WindowsNativeDiscoveryStrategy());
-			if (Emulator.isX64()) {
-				list.add(new OsxNativeDiscoveryStrategy());
-				list.add(new LinuxNativeDiscoveryStrategy());
-			}
-			NativeDiscovery nd = new NativeDiscovery(list.toArray(new NativeDiscoveryStrategy[0]));
-			boolean b = nd.discover();
-			libVlcState = b ? 1 : -1;
-			if (b) {
-				log("LibVlc loaded");
-				return;
-			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		log("LibVlc not loaded");
 		libVlcState = -1;
 	}
 

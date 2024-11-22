@@ -1,10 +1,8 @@
 <component name="libraryTable">
   <library name="libraries">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/vlcj-natives-4.1.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jinput.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jutils.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/vlcj-4.7.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/zip.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/asm-all-5.2.jar!/" />
     </CLASSES>

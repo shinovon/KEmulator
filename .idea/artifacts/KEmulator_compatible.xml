@@ -5,9 +5,7 @@
       <element id="module-output" name="KEmulator_win" />
       <element id="module-output" name="KEmulator_base" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl_util.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/vlcj-4.7.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/vlcj-natives-4.1.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jinput.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jutils.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/zip.jar" path-in-jar="/" />

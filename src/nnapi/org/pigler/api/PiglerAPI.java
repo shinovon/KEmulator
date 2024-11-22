@@ -31,12 +31,7 @@ public class PiglerAPI {
     }
 
     public int init() {
-        if(!SystemTray.isSupported()) {
-            throw new PiglerException("Not supported");
-        }
-        appName = "KEmulator";
-        SoftNotificationImpl.setPigler(this);
-        return 0;
+        throw new PiglerException("Not supported");
     }
 
     public int init(String appName) throws Exception {
@@ -50,9 +45,6 @@ public class PiglerAPI {
     }
 
     public int createNotification(String title, String text, Image icon, boolean removeOnTap) throws Exception {
-        created = true;
-        SoftNotificationImpl.trayIcon.displayMessage(title, text, TrayIcon.MessageType.NONE);
-        updateNotification(2100, icon);
         return 2100;
     }
 
@@ -62,16 +54,9 @@ public class PiglerAPI {
     }
 
     public void updateNotification(int uid, String title, String text) throws Exception {
-        SoftNotificationImpl.trayIcon.displayMessage(title, text, TrayIcon.MessageType.NONE);
     }
 
     public void updateNotification(int uid, Image icon) throws Exception {
-        if(icon != null)
-            try {
-                SoftNotificationImpl.trayIcon.setImage(((ImageAWT) icon.getImpl()).getBufferedImage());
-                SoftNotificationImpl.trayIcon.setImageAutoSize(true);
-            } catch (Exception ignored) {
-            }
     }
 
     public void removeNotification(int uid) throws Exception {

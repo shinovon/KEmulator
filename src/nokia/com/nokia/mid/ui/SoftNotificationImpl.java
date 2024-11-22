@@ -20,8 +20,6 @@ public class SoftNotificationImpl extends SoftNotification {
 	private String groupText;
 	private String text;
 	private boolean hasImage;
-	public static TrayIcon trayIcon;
-	public static SystemTray tray;
 	private static SoftNotificationImpl lastInst;
 
 	public SoftNotificationImpl(int aNotificationId) {
@@ -60,11 +58,6 @@ public class SoftNotificationImpl extends SoftNotification {
 	}
 
 	public void post() throws SoftNotificationException {
-		try {
-			trayIcon.displayMessage(groupText, text == null ? "" : text, hasImage ? MessageType.NONE : MessageType.INFO);
-		} catch (Exception e) {
-			throw new SoftNotificationException(e.toString());
-		}
 	}
 
 	public void remove() throws SoftNotificationException {
@@ -86,28 +79,9 @@ public class SoftNotificationImpl extends SoftNotification {
 	}
 
 	public void setImage(byte[] aImageData) throws SoftNotificationException {
-		try {
-			trayIcon.setImage(ImageIO.read(new ByteArrayInputStream(aImageData)));
-		} catch (IOException e) {
-			throw new SoftNotificationException(e.toString());
-		}
-		hasImage = true;
-		trayIcon.setImageAutoSize(true);
 	}
 
 	static {
-		try {
-			tray = SystemTray.getSystemTray();
-			trayIcon = new TrayIcon(ImageIO.read(SoftNotification.class.getResourceAsStream("/res/icon")), Emulator.getMidletName());
-			trayIcon.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					action(1);
-				}
-			});
-			tray.add(trayIcon);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	protected static void action(int i) {

@@ -22,17 +22,10 @@ class RateControlImpl implements RateControl {
 	}
 
 	public int getRate() {
-		if (player.released || player.mediaPlayer == null)
-			throw new IllegalStateException();
-		return (int) (player.mediaPlayer.status().rate() * 100000);
+		return 0;
 	}
 
 	public int setRate(int millirate) {
-		if (player.released || player.mediaPlayer == null)
-			throw new IllegalStateException();
-		if (millirate > MAX_RATE) millirate = MAX_RATE;
-		if (millirate < MIN_RATE) millirate = MIN_RATE;
-		player.mediaPlayer.controls().setRate(millirate / 100000F);
 		return getRate();
 	}
 }

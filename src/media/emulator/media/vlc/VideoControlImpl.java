@@ -52,53 +52,15 @@ class VideoControlImpl implements VideoControl {
 	}
 
 	public int getSourceHeight() {
-		if (player.released || player.mediaPlayer == null) {
-			throw new IllegalStateException();
-		}
-		try {
-			if (player.mediaPlayer.video().videoDimension() == null) {
-				player.mediaPlayer.media().parsing().parse();
-				Thread.sleep(100L);
-			}
-			player.sourceHeight = player.mediaPlayer.video().videoDimension().height;
-		} catch (Exception ignored) {}
-		if (player.sourceHeight == 0)
-			player.sourceHeight = player.bufferHeight;
 		return player.sourceHeight;
 	}
 
 	public int getSourceWidth() {
-		if (player.released || player.mediaPlayer == null) {
-			throw new IllegalStateException();
-		}
-		try {
-			if (player.mediaPlayer.video().videoDimension() == null) {
-				player.mediaPlayer.media().parsing().parse();
-				Thread.sleep(100L);
-			}
-			player.sourceWidth = player.mediaPlayer.video().videoDimension().width;
-		} catch (Exception ignored) {}
-		if (player.sourceWidth == 0)
-			player.sourceWidth = player.bufferWidth;
 		return player.sourceWidth;
 	}
 
 	public byte[] getSnapshot(String p0) throws MediaException {
-		if (player.released || player.mediaPlayer == null)
-			throw new IllegalStateException();
-		if (player.img != null) {
-			return VLCPlayerImpl.imgToBytes(player.img);
-		}
-		try {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageIO.write(player.mediaPlayer.snapshots().get(), "JPEG", os);
-			byte[] bytes = os.toByteArray();
-			os.close();
-			return bytes;
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new MediaException(e);
-		}
+		return null;
 	}
 
 

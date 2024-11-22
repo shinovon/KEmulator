@@ -44,7 +44,6 @@ public final class EmulatorImpl implements IEmulator {
 		this.aClass161_1387 = new KeyPad();
 		this.classWatcher = new Watcher(0);
 		this.profiler = new Watcher(1);
-		this.aClass110_1382 = new MemoryView();
 		this.aClass46_1381 = new Methods();
 	}
 
@@ -90,6 +89,9 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 	public final MemoryView method823() {
+		if (aClass110_1382 == null) {
+			aClass110_1382 = new MemoryView();
+		}
 		return this.aClass110_1382;
 	}
 
@@ -119,9 +121,9 @@ public final class EmulatorImpl implements IEmulator {
 		this.ilogstream.method330();
 		this.aClass83_1389.method482();
 		this.aClass108_1390.method608();
-		Settings.showMemViewFrame = this.aClass110_1382.method622();
+		Settings.showMemViewFrame = aClass110_1382 != null && this.aClass110_1382.method622();
 		this.aClass46_1381.method446();
-		this.aClass110_1382.method656();
+		if (aClass110_1382 != null) this.aClass110_1382.method656();
 		this.classWatcher.dispose();
 		this.profiler.dispose();
 		if (aClass90_1384 != null)
@@ -235,7 +237,6 @@ public final class EmulatorImpl implements IEmulator {
 	/**
 	 * updateLanguage
 	 */
-	@Override
 	public void updateLanguage() {
 		getEmulatorScreen().updateLanguage();
 	}

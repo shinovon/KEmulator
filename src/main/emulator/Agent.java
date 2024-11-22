@@ -8,15 +8,15 @@ import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 
 public class Agent {
-	private static Instrumentation inst;
-
-	public static void premain(String a, Instrumentation inst) {
-		Agent.inst = inst;
-	}
-
-	public static void agentmain(String a, Instrumentation inst) {
-		Agent.inst = inst;
-	}
+//	private static Instrumentation inst;
+//
+//	public static void premain(String a, Instrumentation inst) {
+//		Agent.inst = inst;
+//	}
+//
+//	public static void agentmain(String a, Instrumentation inst) {
+//		Agent.inst = inst;
+//	}
 
 	public static void addClassPath(File f) throws Exception {
 		ClassLoader cl = ClassLoader.getSystemClassLoader();

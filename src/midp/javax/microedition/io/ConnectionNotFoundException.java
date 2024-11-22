@@ -10,7 +10,6 @@ public class ConnectionNotFoundException extends IOException {
 	}
 
 	public ConnectionNotFoundException(Exception e) {
-		super(e);
 	}
 
 	public ConnectionNotFoundException(String s) {

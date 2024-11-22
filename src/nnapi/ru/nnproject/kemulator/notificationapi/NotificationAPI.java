@@ -19,6 +19,6 @@ public class NotificationAPI {
 	}
 
 	public static boolean isSupported() {
-		return SystemTray.isSupported();
+		return false;
 	}
 }

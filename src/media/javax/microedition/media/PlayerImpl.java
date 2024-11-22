@@ -25,7 +25,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private static int count;
 	private static boolean midiPlaying;
 
-	public static Set<Player> players = Collections.newSetFromMap(new WeakHashMap());
+	public static Set<Player> players = new HashSet<Player>();
 	Object sequence;
 	Thread playerThread;
 	boolean complete;
@@ -469,7 +469,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						sequence = new javazoom.jl.player.Player(i, false);
 					} catch (JavaLayerException e) {
 						e.printStackTrace();
-						throw new IOException(e);
+						throw new IOException(e.toString());
 					}
 					controls = new Control[]{volumeControl};
 				} else {
@@ -812,7 +812,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				ext = "mp3";
 			}
 		}
-		if (ext.isEmpty()) return "audio" + hashCode();
+		if (ext.length() == 0) return "audio" + hashCode();
 		return hashCode() + "." + ext;
 	}
 
@@ -846,7 +846,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	static class WavCache implements LineListener {
 		int length;
 		long crc;
-		Set<Player> references;
+//		Set<Player> references;
 		PlayerImpl currentPlayer;
 		Clip clip;
 
@@ -856,10 +856,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 
 		void setPlayer(PlayerImpl player) {
-			if (references == null)
-				references = Collections.newSetFromMap(new WeakHashMap());
+//			if (references == null)
+//				references = Collections.newSetFromMap(new WeakHashMap());
 			currentPlayer = player;
-			references.add(player);
+//			references.add(player);
 		}
 
 		@Override
