@@ -140,6 +140,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 							setMediaTime(0);
 							return;
 						}
+						wavCache.add(key);
 					}
 				}
 
