@@ -21,10 +21,10 @@ public class Agent {
 	public static void addClassPath(File f) throws Exception {
 		ClassLoader cl = ClassLoader.getSystemClassLoader();
 
-		if (!(cl instanceof URLClassLoader)) {
-			inst.appendToSystemClassLoaderSearch(new JarFile(f));
-			return;
-		}
+//		if (!(cl instanceof URLClassLoader)) {
+//			inst.appendToSystemClassLoaderSearch(new JarFile(f));
+//			return;
+//		}
 
 		Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
 		m.setAccessible(true);

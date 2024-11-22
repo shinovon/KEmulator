@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.List;
 
 import org.eclipse.swt.widgets.*;
+import sun.misc.BASE64Decoder;
 
 import javax.microedition.rms.RecordStore;
 
@@ -555,7 +556,7 @@ public final class Property implements IProperty, SelectionListener {
 
 			String[] sysProps = properties.getProperty("SystemProperties", "").split("\n");
             for (String s : sysProps) {
-                if ((s = s.trim()).isEmpty()) continue;
+                if ((s = s.trim()).length() == 0) continue;
                 int i = s.indexOf(':');
                 if (i == -1) continue;
                 String k = s.substring(0, i).trim();
@@ -1001,10 +1002,10 @@ public final class Property implements IProperty, SelectionListener {
 
 		String sysProps = propsText.getText();
 		Settings.systemProperties.clear();
-		if (!sysProps.isEmpty()) {
+		if (sysProps.length() != 0) {
 			String[] a = sysProps.split("\n");
 			for (String s: a) {
-				if ((s = s.trim()).isEmpty()) continue;
+				if ((s = s.trim()).length() == 0) continue;
 				int i = s.indexOf(':');
 				if (i == -1) continue;
 				String k = s.substring(0, i).trim();
@@ -2461,7 +2462,7 @@ public final class Property implements IProperty, SelectionListener {
 		} else {
 			rmsTree = new Tree(recordsComp, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 			rmsTree.setLayoutData(layoutData3);
-			String rootPath = getRmsFolderPath();
+			final String rootPath = getRmsFolderPath();
 			rmsTree.addTreeListener(new TreeListener() {
 				public void treeCollapsed(TreeEvent treeEvent) {
 				}
@@ -2542,7 +2543,7 @@ public final class Property implements IProperty, SelectionListener {
 
 	private String decodeBase64(String name) {
 		try {
-			return new String(Base64.getDecoder().decode(name.replace('-', '/').getBytes("UTF-8")), "UTF-8");
+			return new String(new BASE64Decoder().decodeBuffer(name.replace('-', '/')), "UTF-8");
 		} catch (Exception e) {
 			return null;
 		}

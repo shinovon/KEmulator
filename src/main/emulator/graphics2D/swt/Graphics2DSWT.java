@@ -28,15 +28,16 @@ public final class Graphics2DSWT implements IGraphics2D {
 	}
 
 	public final void finalize() {
-		EmulatorImpl.asyncExec(() -> {
-			try {
-				if (!gc.isDisposed()) {
-					gc.dispose();
-				}
-				if (!color.isDisposed()) {
-					color.dispose();
-				}
-			} catch (Exception ignored) {
+		EmulatorImpl.asyncExec(new Runnable() {
+			public void run() {
+				try {
+					if (!gc.isDisposed()) {
+						gc.dispose();
+					}
+					if (!color.isDisposed()) {
+						color.dispose();
+					}
+				} catch (Exception ignored) {}
 			}
 		});
 	}

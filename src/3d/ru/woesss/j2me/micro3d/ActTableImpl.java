@@ -45,7 +45,7 @@ public class ActTableImpl {
 		}
 		try {
 			actions = Loader.loadMtraData(b, offset, length);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			System.err.println("Error loading data");
 			e.printStackTrace();
 			throw e;

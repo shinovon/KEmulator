@@ -63,10 +63,7 @@ public class FileConnectionImpl implements FileConnection {
 	}
 
 	public long availableSize() {
-		if (file == null) {
-			return 1000000000L;
-		}
-		return file.getFreeSpace();
+		return 1000000000L;
 	}
 
 	public boolean canRead() {

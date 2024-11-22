@@ -121,7 +121,11 @@ public class File {
 	}
 
 	public static String[] list(String pathName, boolean includeHidden) throws IOException {
-		FilenameFilter filter = includeHidden ? null : (dir, name) -> name.charAt(0) != '.';
+		FilenameFilter filter = includeHidden ? null : new FilenameFilter() {
+			public boolean accept(java.io.File dir, String name) {
+				return name.charAt(0) != '.';
+			}
+		};
 		String[] files = getFile(pathName).list(filter);
 		if (files == null) {
 			return new String[0];
@@ -160,7 +164,7 @@ public class File {
 	}
 
 	public static int spaceAvailable() throws IOException {
-		return (int) new java.io.File(Emulator.getUserPath()).getFreeSpace();
+		return 100000000;
 	}
 
 	public static void truncate(int fileDescriptor, int size) throws IOException {

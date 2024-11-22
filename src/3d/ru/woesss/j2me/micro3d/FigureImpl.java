@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Stack;
 
 public class FigureImpl {
@@ -51,7 +52,7 @@ public class FigureImpl {
 		}
 		try {
 			init(b, offset, length);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			System.err.println("Error loading data");
 			e.printStackTrace();
 			throw e;
@@ -82,14 +83,16 @@ public class FigureImpl {
 
 	private void sortPolygons() {
 		Model.Polygon[] polygonsT = model.polygonsT;
-		Arrays.sort(polygonsT, (a, b) -> {
-			if (a.blendMode != b.blendMode) {
-				return a.blendMode - b.blendMode;
+		Arrays.sort(polygonsT, new Comparator<Model.Polygon>() {
+			public int compare(Model.Polygon a, Model.Polygon b) {
+				if (a.blendMode != b.blendMode) {
+					return a.blendMode - b.blendMode;
+				}
+				if (a.face != b.face) {
+					return a.face - b.face;
+				}
+				return a.doubleFace - b.doubleFace;
 			}
-			if (a.face != b.face) {
-				return a.face - b.face;
-			}
-			return a.doubleFace - b.doubleFace;
 		});
 		int[][][] subMeshesLengthsT = model.subMeshesLengthsT;
 		int[] indexArray = model.indices;
@@ -103,11 +106,13 @@ public class FigureImpl {
 		}
 
 		Model.Polygon[] polygonsC = model.polygonsC;
-		Arrays.sort(polygonsC, (a, b) -> {
-			if (a.blendMode != b.blendMode) {
-				return a.blendMode - b.blendMode;
+		Arrays.sort(polygonsC, new Comparator<Model.Polygon>() {
+			public int compare(Model.Polygon a, Model.Polygon b) {
+				if (a.blendMode != b.blendMode) {
+					return a.blendMode - b.blendMode;
+				}
+				return a.doubleFace - b.doubleFace;
 			}
-			return a.doubleFace - b.doubleFace;
 		});
 		int[][] subMeshesLengthsC = model.subMeshesLengthsC;
 		for (Model.Polygon p : polygonsC) {

@@ -17,8 +17,6 @@ import javax.microedition.media.control.VideoControl;
 import emulator.Emulator;
 import emulator.media.vlc.VLCPlayerImpl;
 
-import com.github.sarxos.webcam.Webcam;
-
 import emulator.Permission;
 import emulator.graphics2D.awt.ImageAWT;
 
@@ -27,7 +25,7 @@ public class CapturePlayerImpl implements Player {
 	public static CapturePlayerImpl inst;
 
 	private VideoControl videoControl;
-	private Webcam webcam;
+	private Object webcam;
 	public boolean visible;
 	public Object canvas;
 
@@ -54,13 +52,7 @@ public class CapturePlayerImpl implements Player {
 	private int state = UNREALIZED;
 
 	public CapturePlayerImpl() throws MediaException {
-		webcam = Webcam.getDefault();
-		if (webcam == null) throw new MediaException("No capture devices found!");
-		videoControl = new CameraVideoControlImpl(this);
-		focusControl = new FocusControlImpl();
-		flashControl = new FlashControlImpl();
-		cameraControl = new CameraControlImpl();
-		scaleh = Math.max(webcam.getViewSize().height, Emulator.getEmulator().getScreen().getHeight());
+		throw new MediaException("Not supported");
 	}
 
 	public Control getControl(String s) {
@@ -90,7 +82,6 @@ public class CapturePlayerImpl implements Player {
 		if (state == CLOSED) return;
 		state = CLOSED;
 		started = false;
-		webcam.close();
 		inst = null;
 	}
 
@@ -141,7 +132,6 @@ public class CapturePlayerImpl implements Player {
 			realize();
 		}
 		Permission.checkPermission("media.camera");
-		webcam.open();
 		started = true;
 		state = STARTED;
 	}
@@ -194,65 +184,24 @@ public class CapturePlayerImpl implements Player {
 	}
 
 	public byte[] getSnapshot(String p0) throws MediaException {
-		if (!started) throw new MediaException("Not visible");
-		int w = 0;
-		int h = 0;
-		try {
-			if (p0 != null) {
-				String[] ar = p0.split("&");
-				for (String s : ar) {
-					if (s.startsWith("width=")) {
-						w = Integer.parseInt(s.replace("width=", ""));
-						continue;
-					}
-					if (s.startsWith("height=")) {
-						h = Integer.parseInt(s.replace("height=", ""));
-						continue;
-					}
-				}
-			}
-		} catch (Exception ignored) {}
-		try {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			BufferedImage img = webcam.getImage();
-			if (w > 0 && h > 0) {
-				img = VLCPlayerImpl.resize(img, w, h);
-			}
-			ImageIO.write(img, "JPEG", os);
-			byte[] bytes = os.toByteArray();
-			os.close();
-			return bytes;
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new MediaException(e);
-		}
+		return null;
 	}
 
 	public void setDisplayFullScreen(boolean p0) {
 	}
 
 	public int getSourceHeight() {
-		return webcam.getViewSize().height;
+		return 0;
 	}
 
 	public int getSourceWidth() {
-		return webcam.getViewSize().width;
+		return 0;
 	}
 
 	public void paint(Graphics g) {
-		if (visible && started) {
-			try {
-				g.drawImage(new Image(new ImageAWT(VLCPlayerImpl.resize(webcam.getImage(), -1, scaleh))), locx, locy, 0);
-			} catch (Exception ignored) {}
-		}
 	}
 
 	public void paint(Graphics g, int w, int h) {
-		if (started) {
-			try {
-				g.drawImage(new Image(new ImageAWT(VLCPlayerImpl.resize(webcam.getImage(), -1, h))), 0, 0, 0);
-			} catch (Exception ignored) {}
-		}
 	}
 
 	public static void draw(Graphics g, Object obj) {

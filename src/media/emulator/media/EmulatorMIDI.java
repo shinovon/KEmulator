@@ -99,23 +99,9 @@ public class EmulatorMIDI {
 	}
 
 	public static void setMIDIChannelVolume(final int n, final int n2) {
-		try {
-			Receiver r = getMidiReceiver();
-			ShortMessage shortMessage = new ShortMessage(ShortMessage.CONTROL_CHANGE, n, 7, n2);
-			r.send(shortMessage, -1L);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	public static void shortMidiEvent(int type, int data1, int data2) {
-		try {
-			Receiver r = getMidiReceiver();
-			ShortMessage shortMessage = new ShortMessage(type, data1, data2);
-			r.send(shortMessage, -1L);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	public static int longMidiEvent(byte[] data, int offset, int length) {

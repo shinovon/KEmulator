@@ -19,7 +19,7 @@ public final class KeyMapping {
 	}
 
 	public static String keyToString(final String s) {
-		if (s.isEmpty()) return "";
+		if (s.length() == 0) return "";
 		final String s2;
 		if ((s2 = (String) KeyMapping.keysTable.get(s)) != null) {
 			return s2;
@@ -32,7 +32,7 @@ public final class KeyMapping {
 	}
 
 	public static String method601(final String s) {
-		if (s.isEmpty()) return "";
+		if (s.length() == 0) return "";
 		final Enumeration<String> keys = KeyMapping.keysTable.keys();
 		String value = null;
 		while (keys.hasMoreElements()) {
@@ -138,13 +138,13 @@ public final class KeyMapping {
 	}
 
 	public static boolean isLeftSoft(final int n) {
-		if (KeyMapping.deviceKeycodes[17].isEmpty()) return false;
+		if (KeyMapping.deviceKeycodes[17].length() == 0) return false;
 		String s = replaceKey(Integer.parseInt(KeyMapping.deviceKeycodes[17]));
 		return s != null && Integer.parseInt(s) == n;
 	}
 
 	public static boolean isRightSoft(final int n) {
-		if (KeyMapping.deviceKeycodes[18].isEmpty()) return false;
+		if (KeyMapping.deviceKeycodes[18].length() == 0) return false;
 		String s = replaceKey(Integer.parseInt(KeyMapping.deviceKeycodes[18]));
 		return s != null && Integer.parseInt(s) == n;
 	}

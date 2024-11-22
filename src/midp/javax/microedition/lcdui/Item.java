@@ -216,7 +216,7 @@ public abstract class Item {
 	}
 
 	boolean hasLabel() {
-		return label != null && !label.isEmpty();
+		return label != null && label.length() != 0;
 	}
 
 	void layoutForm() {

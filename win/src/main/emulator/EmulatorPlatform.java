@@ -153,7 +153,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	public long getDC(long handle) throws Exception {
-		return (int) getDC.invoke(null, (int) handle);
+		return (int) ((Integer) getDC.invoke(null, (int) handle));
 	}
 
 	public void releaseDC(long handle, long dc) throws Exception {

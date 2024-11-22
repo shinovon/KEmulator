@@ -616,7 +616,11 @@ public final class EmulatorScreen implements
 		layout.makeColumnsEqualWidth = false;
 		(this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
 				.setText(Emulator.getTitle(null));
-		shell.addListener(SWT.Close, event -> CustomMethod.close());
+		shell.addListener(SWT.Close, new Listener() {
+			public void handleEvent(Event event) {
+				CustomMethod.close();
+			}
+		});
 		this.shell.setLayout(layout);
 		try {
 			if (f == null) {
@@ -1470,7 +1474,6 @@ public final class EmulatorScreen implements
 		this.canvas.getShell().addMouseTrackListener(this);
 		this.canvas.addControlListener(this);
 		this.canvas.addPaintListener(this);
-		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
 		canvas.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
 				if (lastDisplayable != null && lastDisplayable instanceof Form) {
@@ -1674,7 +1677,7 @@ public final class EmulatorScreen implements
 		String title = null;
 		if (lastDisplayable == null ||
 				(title = lastDisplayable.getTitle()) == null ||
-				(title = title.trim()).isEmpty()) {
+				(title = title.trim()).length() == 0) {
 			title = Emulator.getTitle(null);
 		} else {
 			title = Emulator.getTitle(title);
@@ -2106,16 +2109,6 @@ public final class EmulatorScreen implements
 		final int yoff = 1;
 		final boolean d = true;
 		if (Settings.fpsMode) {
-			if (!mset) {
-				Color white = display.getSystemColor(SWT.COLOR_WHITE);
-				Color black = display.getSystemColor(SWT.COLOR_BLACK);
-				PaletteData palette = new PaletteData(white.getRGB(), black.getRGB());
-				ImageData sourceData = new ImageData(16, 16, 1, palette);
-				sourceData.transparentPixel = 0;
-				Cursor cursor = new Cursor(display, sourceData, 0, 0);
-				this.canvas.getShell().setCursor(cursor);
-				mset = true;
-			}
 			Point center = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
 			int dx = mouseEvent.x - canvas.getSize().x / 2;
 			int dy = mouseEvent.y - (canvas.getSize().y / 2 - 1);
@@ -2404,7 +2397,7 @@ public final class EmulatorScreen implements
 
 	private void method589() {
 		final DropTarget dropTarget;
-		(dropTarget = new DropTarget(this.canvas, 19)).setTransfer(FileTransfer.getInstance());
+		(dropTarget = new DropTarget(this.canvas, 19)).setTransfer(new Transfer[]{FileTransfer.getInstance()});
 		dropTarget.addDropListener(new Class29(this));
 	}
 

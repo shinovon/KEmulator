@@ -119,12 +119,13 @@ public class PiglerAPI {
         tapped = true;
         if(launch)
             try {
-                EmulatorImpl.asyncExec(() -> {
-                    try {
-                        Shell shell = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell();
-                        shell.setMinimized(false);
-                        shell.setActive();
-                    } catch (Exception ignored) {
+                EmulatorImpl.asyncExec(new Runnable() {
+                    public void run() {
+                        try {
+                            Shell shell = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell();
+                            shell.setMinimized(false);
+                            shell.setActive();
+                        } catch (Exception ignored) {}
                     }
                 });
             } catch (Exception ignored) {}

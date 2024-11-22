@@ -307,7 +307,7 @@ public class TextEditor extends CanvasItem {
 			caretY = y + 4;
 			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		}
-		if (iContent.isEmpty() && !iFocused) {
+		if (iContent.length() == 0 && !iFocused) {
 			g.setColor(0xaaaaaa);
 			g.drawString("Tap", x + 4, y + 2, 0);
 			return;

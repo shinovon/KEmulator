@@ -78,14 +78,10 @@ public abstract class MIDlet {
 				}
 				throw new ConnectionNotFoundException("vlc dir not set");
 			}
-			if (Desktop.getDesktop().isDesktopSupported()) {
-				Desktop.getDesktop().browse(new URI(url));
-			} else {
-				if (Emulator.isX64()) {
-					throw new ConnectionNotFoundException("not supported");
-				}
-				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+			if (Emulator.isX64()) {
+				throw new ConnectionNotFoundException("not supported");
 			}
+			Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
 			return false;
 		} catch (ConnectionNotFoundException e) {
 			throw e;

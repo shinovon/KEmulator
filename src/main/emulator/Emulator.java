@@ -23,11 +23,6 @@ import emulator.ui.IScreen;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
-import com.github.sarxos.webcam.Webcam;
-
-import club.minnced.discord.rpc.DiscordEventHandlers;
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
 import emulator.media.MMFPlayer;
@@ -81,43 +76,9 @@ public class Emulator implements Runnable {
 	private static void initRichPresence() {
 		if (!Settings.rpc)
 			return;
-		final DiscordRPC rpc = (DiscordRPC) (Emulator.rpc = DiscordRPC.INSTANCE);
-		DiscordEventHandlers handlers = new DiscordEventHandlers();
-//        handlers.ready = new DiscordEventHandlers.OnReady() {
-//            public void accept(DiscordUser user) {}
-//        };
-		rpc.Discord_Initialize("823522436444192818", handlers, true, "");
-		DiscordRichPresence presence = new DiscordRichPresence();
-		presence.startTimestamp = rpcStartTimestamp = System.currentTimeMillis() / 1000;
-		presence.state = "No MIDlet loaded";
-		rpc.Discord_UpdatePresence(presence);
-		rpcCallbackThread = new Thread("KEmulator RPC-Callback-Handler") {
-			public void run() {
-				while (true) {
-					rpc.Discord_RunCallbacks();
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						break;
-					}
-				}
-			}
-		};
-		rpcCallbackThread.start();
 	}
 
 	public static void updatePresence() {
-		DiscordRPC rpc = (DiscordRPC) Emulator.rpc;
-		if (rpc == null)
-			return;
-		DiscordRichPresence presence = new DiscordRichPresence();
-		presence.state = rpcState;
-		presence.details = rpcDetails;
-		presence.startTimestamp = rpcStartTimestamp;
-		presence.endTimestamp = rpcEndTimestamp;
-		presence.partySize = rpcPartySize;
-		presence.partyMax = rpcPartyMax;
-		rpc.Discord_UpdatePresence(presence);
 	}
 
 	private Emulator() {
@@ -667,18 +628,6 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 
-		if (!platform.isX64())
-			try {
-				Webcam w = Webcam.getDefault();
-				if (w != null) {
-					System.setProperty("supports.video.capture", "true");
-					System.setProperty("supports.photo.capture", "true");
-					System.setProperty("supports.mediacapabilities", "camera");
-					System.setProperty("camera.orientations", "devcam0:inwards");
-					Dimension d = w.getViewSize();
-					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
-				}
-			} catch (Throwable ignored) {}
 
 		try {
 			String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
@@ -1087,7 +1036,7 @@ public class Emulator implements Runnable {
 		getEmulator().disposeSubWindows();
 		notifyDestroyed();
 		try {
-			new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
+			new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -1100,7 +1049,7 @@ public class Emulator implements Runnable {
 			File file = new File(jadPath);
 			if (file.exists()) {
 				Properties properties = new Properties();
-				properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+				properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 				return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
 			}
 		} catch (Exception ignored) {}
@@ -1116,7 +1065,11 @@ public class Emulator implements Runnable {
 		Emulator.jarClasses = new Vector();
 		Emulator.deviceName = "SonyEricssonK800";
 		Emulator.deviceFile = "/res/plat";
-		vlcCheckerThread = new Thread(() -> Manager.checkLibVlcSupport());
+		vlcCheckerThread = new Thread(new Runnable() {
+			public void run() {
+				Manager.checkLibVlcSupport();
+			}
+		});
 	}
 
 	public static String getMidletName() {

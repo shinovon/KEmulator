@@ -67,7 +67,7 @@ public final class M3GLoader {
 			} catch (IOException var3) {
 				throw var3;
 			} catch (Exception var4) {
-				throw new IOException(var4);
+				throw new IOException(var4.toString());
 			}
 		}
 	}
@@ -83,7 +83,7 @@ public final class M3GLoader {
 			} catch (IOException var4) {
 				throw var4;
 			} catch (Exception var5) {
-				throw new IOException(var5);
+				throw new IOException(var5.toString());
 			}
 		}
 	}

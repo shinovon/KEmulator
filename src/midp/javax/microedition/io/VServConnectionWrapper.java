@@ -129,7 +129,7 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final InputStream openInputStream() throws IOException {
-		return new ByteArrayInputStream("resource://!blank".getBytes(StandardCharsets.UTF_8));
+		return new ByteArrayInputStream("resource://!blank".getBytes("UTF-8"));
 	}
 
 	public final DataOutputStream openDataOutputStream() throws IOException {

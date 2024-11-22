@@ -112,7 +112,7 @@ public class Controllers {
 
 	public static String getBind(int controllerId, int n2) {
 		String s = Controllers.binds[controllerId][n2];
-		if (!s.isEmpty() && !s.equalsIgnoreCase("LEFT") && !s.equalsIgnoreCase("RIGHT") && !s.equalsIgnoreCase("UP") && !s.equalsIgnoreCase("DOWN")) {
+		if (s.length() != 0 && !s.equalsIgnoreCase("LEFT") && !s.equalsIgnoreCase("RIGHT") && !s.equalsIgnoreCase("UP") && !s.equalsIgnoreCase("DOWN")) {
 			s = "B_" + s;
 		}
 		return s;
@@ -129,7 +129,7 @@ public class Controllers {
 	}
 
 	private static int method747(String s) {
-		if (s == null || s.isEmpty() || (s = KeyMapping.replaceKey(Integer.parseInt(s))) == null)
+		if (s == null || s.length() == 0 || (s = KeyMapping.replaceKey(Integer.parseInt(s))) == null)
 			return 10000;
 		return Integer.parseInt(s);
 	}

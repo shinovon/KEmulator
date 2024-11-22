@@ -69,8 +69,8 @@ abstract class Program {
 	}
 
 	private int createProgram(String vertexShader, String fragmentShader) throws IOException {
-		String vertexShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(vertexShader)), StandardCharsets.UTF_8);
-		String fragmentShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(fragmentShader)), StandardCharsets.UTF_8);
+		String vertexShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(vertexShader)), "UTF-8");
+		String fragmentShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(fragmentShader)), "UTF-8");
 
 		System.out.println("loadShader " + vertexShader);
 		int vertexId = loadShader(GL_VERTEX_SHADER, vertexShaderCode);

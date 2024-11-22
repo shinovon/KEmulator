@@ -3,6 +3,8 @@ package com.nokia.mid.ui;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -97,7 +99,11 @@ public class SoftNotificationImpl extends SoftNotification {
 		try {
 			tray = SystemTray.getSystemTray();
 			trayIcon = new TrayIcon(ImageIO.read(SoftNotification.class.getResourceAsStream("/res/icon")), Emulator.getMidletName());
-			trayIcon.addActionListener(e -> action(1));
+			trayIcon.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					action(1);
+				}
+			});
 			tray.add(trayIcon);
 		} catch (Exception ex) {
 			ex.printStackTrace();

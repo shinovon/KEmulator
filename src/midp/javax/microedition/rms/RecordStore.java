@@ -5,6 +5,8 @@ import java.util.*;
 import emulator.*;
 import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import java.io.*;
 
@@ -166,13 +168,7 @@ public class RecordStore {
 	}
 
 	public int getSizeAvailable() throws RecordStoreNotOpenException {
-		int r;
-		try {
-			r = (int) Math.min(32000000L, new File(rootPath).getUsableSpace());
-		} catch (Exception e) {
-			r = 32000000;
-		}
-		logln("getSizeAvailable: " + r);
+		int r = 32000000;
 		return r;
 	}
 
@@ -500,7 +496,7 @@ public class RecordStore {
 
 	private static String encodeBase64(String name) {
 		try {
-			return new String(Base64.getEncoder().encode(name.getBytes("UTF-8")), "UTF-8").replace('/', '-');
+			return new String(new BASE64Encoder().encode(name.getBytes("UTF-8")).getBytes(), "UTF-8").replace('/', '-');
 		} catch (Exception e) {
 			return name;
 		}
@@ -508,7 +504,7 @@ public class RecordStore {
 
 	private static String decodeBase64(String name) {
 		try {
-			return new String(Base64.getDecoder().decode(name.replace('-', '/').getBytes("UTF-8")), "UTF-8");
+			return new String(new BASE64Decoder().decodeBuffer(name.replace('-', '/')), "UTF-8");
 		} catch (Exception e) {
 			return name;
 		}

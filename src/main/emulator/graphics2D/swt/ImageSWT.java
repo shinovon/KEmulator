@@ -77,18 +77,19 @@ public final class ImageSWT implements IImage {
 	}
 
 	public final void finalize() {
-		EmulatorImpl.asyncExec(() -> {
-			try {
-				if (img != null && !img.isDisposed()) {
-					img.dispose();
-				}
-				if (graphics != null) {
-					graphics.finalize();
-					graphics = null;
-				}
-			} catch (Exception ignored) {
+		EmulatorImpl.asyncExec(new Runnable() {
+			public void run() {
+				try {
+					if (img != null && !img.isDisposed()) {
+						img.dispose();
+					}
+					if (graphics != null) {
+						graphics.finalize();
+						graphics = null;
+					}
+				} catch (Exception ignored) {}
+				mutable = false;
 			}
-			mutable = false;
 		});
 	}
 

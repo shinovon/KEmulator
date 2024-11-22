@@ -238,10 +238,11 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	public void finalize() {
-		EmulatorImpl.asyncExec(() -> {
-			try {
-				if (!aGC814.isDisposed()) aGC814.dispose();
-			} catch (Exception ignored) {
+		EmulatorImpl.asyncExec(new Runnable() {
+			public void run() {
+				try {
+					if (!aGC814.isDisposed()) aGC814.dispose();
+				} catch (Exception ignored) {}
 			}
 		});
 	}

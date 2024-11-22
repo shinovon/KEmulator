@@ -79,7 +79,7 @@ public final class RenderPipe {
 				Sprite3D spr = (Sprite3D) node;
 
 				if (spr.getAppearance() != null && spr.getCropWidth() != 0 && spr.getCropHeight() != 0) {
-					roList.add(new RenderObject(node, trans, 0, this));
+					insertNodeInList(new RenderObject(node, trans, 0, this));
 				}
 			} else {
 				if (node instanceof Mesh) {
@@ -87,7 +87,7 @@ public final class RenderPipe {
 
 					for (int i = 0; i < submeshes; ++i) {
 						if (((Mesh) node).getAppearance(i) != null) {
-							roList.add(new RenderObject(node, trans, i, this));
+							insertNodeInList(new RenderObject(node, trans, i, this));
 						}
 					}
 
@@ -122,8 +122,15 @@ public final class RenderPipe {
 		}
 	}
 
-	public void sortNodes() {
-		roList.sort(Comparator.comparingInt((RenderObject renderObject) -> renderObject.sortKey));
+	private void insertNodeInList(RenderObject ro) {
+		int index;
+
+		for (index = 0; index < roList.size(); index++) {
+			RenderObject ro2 = (RenderObject) roList.get(index);
+			if(ro2.sortKey >= ro.sortKey) break;
+		}
+
+		roList.insertElementAt(ro, index);
 	}
 
 	public void setRenderInvisibleNodes(boolean render) {

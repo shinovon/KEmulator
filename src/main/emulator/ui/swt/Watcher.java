@@ -421,72 +421,74 @@ public final class Watcher implements Runnable, DisposeListener {
 			(exportBtn = new Button(this.shell, SWT.PUSH)).setText("Export");
 			exportBtn.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent selectionEvent) {
-					new Thread(() -> {
-						try {
-							File file = new File(Emulator.getUserPath() + "/classwatcher.txt");
-							if (!file.exists()) file.createNewFile();
-							PrintStream ps = new PrintStream(new FileOutputStream(file));
+					new Thread(new Runnable() {
+						public void run() {
 							try {
-								final List list = Arrays.asList(table.keySet().toArray());
-								Collections.sort((List<Comparable>) list);
-								for (Object o : list) {
-									ps.println(o);
-									final Instance c = (Instance) table.get(o);
-									c.method879(null);
-									Vector fields = c.getFields();
-									for (int i = 0; i < fields.size(); ++i) {
-										final Object f = fields.get(i);
-										if (f instanceof Field) {
-											final Field field = (Field) c.getFields().get(i);
-											Class type = field.getType();
-											ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.method869(type) + " " + field.getName());
-											try {
-												Object v = field.get(c.getInstance());
-												if (type.isArray()) {
-													int l = Array.getLength(v);
-													ps.println(" = " + ClassTypes.method869(v.getClass()).replaceFirst("\\[\\]", "[" + l + "]"));
-													ps.print(" [");
-													for (int n = 0; n < l; n++) {
-														ps.print(ClassTypes.asd(v, n, false));
-														if (n != l - 1) ps.print(", ");
-													}
-													ps.println("]");
-												} else {
-													String s = v.toString();
-													if (v instanceof String) {
-														StringBuilder sb = new StringBuilder();
-														sb.append('"');
-														for (char ch : s.toCharArray()) {
-															if (ch == '\r') {
-																sb.append("\\r");
-																continue;
-															}
-															if (ch == '\n') {
-																sb.append("\\n");
-																continue;
-															}
-															sb.append(ch);
+								File file = new File(Emulator.getUserPath() + "/classwatcher.txt");
+								if (!file.exists()) file.createNewFile();
+								PrintStream ps = new PrintStream(new FileOutputStream(file));
+								try {
+									final List list = Arrays.asList(table.keySet().toArray());
+									Collections.sort((List<Comparable>) list);
+									for (Object o : list) {
+										ps.println(o);
+										final Instance c = (Instance) table.get(o);
+										c.method879(null);
+										Vector fields = c.getFields();
+										for (int i = 0; i < fields.size(); ++i) {
+											final Object f = fields.get(i);
+											if (f instanceof Field) {
+												final Field field = (Field) c.getFields().get(i);
+												Class type = field.getType();
+												ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.method869(type) + " " + field.getName());
+												try {
+													Object v = field.get(c.getInstance());
+													if (type.isArray()) {
+														int l = Array.getLength(v);
+														ps.println(" = " + ClassTypes.method869(v.getClass()).replaceFirst("\\[\\]", "[" + l + "]"));
+														ps.print(" [");
+														for (int n = 0; n < l; n++) {
+															ps.print(ClassTypes.asd(v, n, false));
+															if (n != l - 1) ps.print(", ");
 														}
-														sb.append('"');
-														s = sb.toString();
+														ps.println("]");
+													} else {
+														String s = v.toString();
+														if (v instanceof String) {
+															StringBuilder sb = new StringBuilder();
+															sb.append('"');
+															for (char ch : s.toCharArray()) {
+																if (ch == '\r') {
+																	sb.append("\\r");
+																	continue;
+																}
+																if (ch == '\n') {
+																	sb.append("\\n");
+																	continue;
+																}
+																sb.append(ch);
+															}
+															sb.append('"');
+															s = sb.toString();
+														}
+														ps.println(" = " + s);
 													}
-													ps.println(" = " + s);
+												} catch (NullPointerException e) {
+													ps.println(" = null");
+												} catch (Exception e) {
+													ps.println();
+													ps.println(" " + e);
 												}
-											} catch (NullPointerException e) {
-												ps.println(" = null");
-											} catch (Exception e) {
-												ps.println();
-												ps.println(" " + e);
 											}
 										}
+										ps.println();
 									}
-									ps.println();
+								} finally {
+									ps.close();
 								}
-							} finally {
-								ps.close();
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
-						} catch (Exception e) {
-							e.printStackTrace();
 						}
 					}).start();
 				}

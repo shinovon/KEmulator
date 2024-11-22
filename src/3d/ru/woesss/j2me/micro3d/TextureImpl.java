@@ -65,7 +65,7 @@ public final class TextureImpl {
 		}
 		try {
 			image = Loader.loadBmpData(b, offset, length);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			System.err.println("Error loading data");
 			e.printStackTrace();
 			throw e;

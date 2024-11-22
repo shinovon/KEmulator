@@ -510,7 +510,7 @@ public class Form extends Screen {
 				String text = null;
 				if(item instanceof StringItem
 						&& (((text = ((StringItem) item).getText()) != null
-						&& !text.trim().isEmpty() && text.startsWith("\n"))
+						&& text.trim().length() != 0 && text.startsWith("\n"))
 						|| ((StringItem) item).getAppearanceMode() != Item.BUTTON && item.hasLabel())) {
 					row = newRow(row);
 				}

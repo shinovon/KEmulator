@@ -121,7 +121,7 @@ final class HttpConnectionImpl implements HttpConnection {
 		try {
 			return this.connection.getResponseCode();
 		} catch (ConnectException e) {
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		}
 	}
 
