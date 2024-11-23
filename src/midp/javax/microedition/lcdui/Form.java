@@ -465,11 +465,15 @@ public class Form extends Screen {
 			int width = bounds[W];
 			Row row = null;
 			synchronized (items) {
-				if (i < items.size()) {
-					row = getFirstRow((Item) items.get(i));
+				while (row == null && i > 0) {
+					if (i < items.size()) {
+						row = getFirstRow((Item) items.get(i));
+					}
+					i--;
 				}
 				if (i == 0) {
 					rows.clear();
+					row = null;
 				} else if (row != null) {
 					int rowIdx = rows.indexOf(row);
 					if (row.items.size() > 1) {
@@ -485,6 +489,7 @@ public class Form extends Screen {
 					}
 				}
 			}
+
 			currentDir = row != null ? row.dir : Item.LAYOUT_LEFT;
 			row = null;
 			for (int j = i; j < items.size(); j++) {
