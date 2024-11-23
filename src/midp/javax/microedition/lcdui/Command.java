@@ -1,6 +1,6 @@
 package javax.microedition.lcdui;
 
-public class Command {
+public class Command implements Comparable {
 	public static final int SCREEN = 1;
 	public static final int BACK = 2;
 	public static final int CANCEL = 3;
@@ -9,10 +9,10 @@ public class Command {
 	public static final int STOP = 6;
 	public static final int EXIT = 7;
 	public static final int ITEM = 8;
-	private int anInt360;
-	private int anInt362;
-	private String aString361;
-	private String aString363;
+	private int type;
+	private int priority;
+	private String label;
+	private String longLabel;
 
 	public Command(final String s, final int n, final int n2) {
 		this(s, s, n, n2);
@@ -20,29 +20,34 @@ public class Command {
 
 	public Command(final String aString361, final String aString362, final int anInt360, final int anInt361) {
 		super();
-		this.anInt360 = anInt360;
-		this.anInt362 = anInt361;
-		this.aString361 = aString361;
-		this.aString363 = aString362;
+		this.type = anInt360;
+		this.priority = anInt361;
+		this.label = aString361;
+		this.longLabel = aString362;
 	}
 
 	public int getCommandType() {
-		return this.anInt360;
+		return this.type;
 	}
 
 	public String getLabel() {
-		return this.aString361;
+		return this.label;
 	}
 
 	public String getLongLabel() {
-		return this.aString363;
+		return this.longLabel;
 	}
 
 	public int getPriority() {
-		return this.anInt362;
+		return this.priority;
 	}
 
 	public String toString() {
-		return this.aString363;
+		return this.longLabel;
+	}
+
+	public int compareTo(Object o) {
+		if (!(o instanceof Command)) return 0;
+		return priority - ((Command) o).priority;
 	}
 }

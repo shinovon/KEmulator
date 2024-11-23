@@ -45,9 +45,13 @@ public class Displayable {
 	private boolean swtInitialized;
 	Menu swtMenu;
 	SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
-	private MenuListener swtMenuListener = new SwtMenuListener();
+	private final MenuListener swtMenuListener = new SwtMenuListener();
 	boolean forceUpdateSize;
 	static KeyListener swtKeyListener = new SwtKeyListener();
+
+	private Command leftCommand;
+	private Command rightCommand;
+	private final Vector<Command> menuCommands = new Vector<Command>();
 
 	public Displayable() {
 		super();
@@ -95,31 +99,61 @@ public class Displayable {
 
 	protected void setItemCommands(final Item item) {
 		this.focusedItem = item;
-		if (item.commands.size() > 0) {
-			for (int i = 0; i < item.commands.size(); ++i) {
-				this.addCommand((Command) item.commands.get(i));
-			}
-		}
+		updateCommands();
 	}
 
 	protected void removeItemCommands(final Item item) {
-		if (item == null) {
-			return;
-		}
-		if (item.commands.size() > 0) {
-			for (int i = 0; i < item.commands.size(); ++i) {
-				this.removeCommand((Command) item.commands.get(i));
-			}
-		}
+		if (item == null || item != focusedItem) return;
 		this.focusedItem = null;
+		updateCommands();
 	}
 
 	protected void updateCommands() {
-		final String commandLeft = (this.commands.size() > 0) ? this.getLeftSoftCommand().getLongLabel() : "";
-		final String commandRight = (this.commands.size() > 2) ? UILocale.get("LCDUI_MENU_COMMAND", "Menu")
-				: ((this.commands.size() < 2) ? "" : this.getRightSoftCommand().getLongLabel());
-		Emulator.getEmulator().getScreen().setCommandLeft(commandLeft);
-		Emulator.getEmulator().getScreen().setCommandRight(commandRight);
+		leftCommand = null;
+		rightCommand = null;
+		Command ok = null;
+		int startIdx = 0;
+		menuCommands.clear();
+
+		Command[] arr = (Command[]) commands.toArray(new Command[0]);
+		Arrays.sort(arr);
+
+		if (focusedItem != null && (startIdx = focusedItem.commands.size()) > 0) {
+			menuCommands.addAll(focusedItem.commands);
+		}
+		menuCommands.addAll(Arrays.asList(arr));
+
+		for (Command cmd: arr) {
+			int type = cmd.getCommandType();
+			switch (type) {
+				case Command.OK: {
+					if (ok != null) continue;
+					ok = cmd;
+					menuCommands.remove(cmd);
+					menuCommands.insertElementAt(cmd, startIdx);
+					break;
+				}
+				case Command.BACK:
+				case Command.EXIT: {
+					if (rightCommand != null) continue;
+					rightCommand = cmd;
+					menuCommands.remove(cmd);
+					break;
+				}
+			}
+		}
+
+		String leftLabel = "", rightLabel = "";
+		if (menuCommands.size() > 1) {
+			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
+		} else if(leftCommand != null) {
+			leftLabel = leftCommand.getLabel();
+		}
+		if (rightCommand != null) {
+			rightLabel = rightCommand.getLabel();
+		}
+		Emulator.getEmulator().getScreen().setCommandLeft(leftLabel);
+		Emulator.getEmulator().getScreen().setCommandRight(rightLabel);
 	}
 
 	protected boolean isCommandsEmpty() {
@@ -130,23 +164,7 @@ public class Displayable {
 		if (command == null || this.commands.contains(command)) {
 			return;
 		}
-		int i;
-		for (i = 0; i < this.commands.size(); ++i) {
-			if (command.getCommandType() == 7) {
-				break;
-			}
-			final Command command2;
-			if ((command2 = (Command) this.commands.get(i)).getCommandType() != 7) {
-				if (command.getCommandType() > command2.getCommandType()) {
-					break;
-				}
-				if (command.getCommandType() == command2.getCommandType()
-						&& command.getPriority() < command2.getPriority()) {
-					break;
-				}
-			}
-		}
-		this.commands.add(i, command);
+		this.commands.add(command);
 		if (Emulator.getCurrentDisplay().getCurrent() == this) {
 			this.updateCommands();
 		}
@@ -162,41 +180,22 @@ public class Displayable {
 	}
 
 	protected Command getLeftSoftCommand() {
-		if (this.commands.size() > 0) {
-			return (Command) this.commands.get(0);
+		if (this.menuCommands.size() > 0) {
+			return menuCommands.get(0);
 		}
 		return null;
 	}
 
 	protected Command getRightSoftCommand() {
 		if (this.commands.size() > 1) {
-			return (Command) this.commands.get(1);
+			return rightCommand;
 		}
 		return null;
 	}
 
 	public boolean handleSoftKeyAction(final int n, final boolean b) {
-		if (this.cmdListener == null && this instanceof Canvas) {
-			return false;
-		}
 		if (KeyMapping.isLeftSoft(n)) {
-			final Command leftSoftCommand = this.getLeftSoftCommand();
-			if (b && leftSoftCommand != null) {
-				Emulator.getEmulator().getLogStream().println("Left command: " + leftSoftCommand);
-				if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
-					if (cmdListener != null) {
-						Emulator.getEventQueue().commandAction(leftSoftCommand, this);
-					} else ((Alert) this).close();
-				} else if (this.focusedItem != null && this.focusedItem.commands.contains(leftSoftCommand)) {
-					Emulator.getEventQueue().commandAction(leftSoftCommand, this.focusedItem);
-				} else if (this.cmdListener != null) {
-					Emulator.getEventQueue().commandAction(leftSoftCommand, this);
-				}
-			}
-			return !Settings.motorolaSoftKeyFix;
-		}
-		if (KeyMapping.isRightSoft(n)) {
-			if (this.commands.size() > 2) {
+			if (menuCommands.size() > 1) {
 				if (b && this.menuShown) {
 					this.menuShown = false;
 					if (swtMenu != null) {
@@ -213,18 +212,34 @@ public class Displayable {
 					}
 				}
 			} else {
-				final Command rightSoftCommand = this.getRightSoftCommand();
-				if (b && rightSoftCommand != null) {
-					Emulator.getEmulator().getLogStream().println("Right command: " + rightSoftCommand);
-					if (this instanceof Alert && rightSoftCommand == Alert.DISMISS_COMMAND) {
-						if (this.cmdListener != null) {
-							Emulator.getEventQueue().commandAction(rightSoftCommand, this);
+				final Command leftSoftCommand = this.getLeftSoftCommand();
+				if (b && leftSoftCommand != null) {
+					Emulator.getEmulator().getLogStream().println("Left command: " + leftSoftCommand);
+					if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
+						if (cmdListener != null) {
+							Emulator.getEventQueue().commandAction(leftSoftCommand, this);
 						} else ((Alert) this).close();
-					} else if (this.focusedItem != null && this.focusedItem.commands.contains(rightSoftCommand)) {
-						Emulator.getEventQueue().commandAction(rightSoftCommand, this.focusedItem);
+					} else if (this.focusedItem != null && this.focusedItem.commands.contains(leftSoftCommand)) {
+						Emulator.getEventQueue().commandAction(leftSoftCommand, this.focusedItem);
 					} else if (this.cmdListener != null) {
-						Emulator.getEventQueue().commandAction(rightSoftCommand, this);
+						Emulator.getEventQueue().commandAction(leftSoftCommand, this);
 					}
+				}
+			}
+			return !Settings.motorolaSoftKeyFix;
+		}
+		if (KeyMapping.isRightSoft(n)) {
+			final Command rightSoftCommand = this.getRightSoftCommand();
+			if (b && rightSoftCommand != null) {
+				Emulator.getEmulator().getLogStream().println("Right command: " + rightSoftCommand);
+				if (this instanceof Alert && rightSoftCommand == Alert.DISMISS_COMMAND) {
+					if (this.cmdListener != null) {
+						Emulator.getEventQueue().commandAction(rightSoftCommand, this);
+					} else ((Alert) this).close();
+				} else if (this.focusedItem != null && this.focusedItem.commands.contains(rightSoftCommand)) {
+					Emulator.getEventQueue().commandAction(rightSoftCommand, this.focusedItem);
+				} else if (this.cmdListener != null) {
+					Emulator.getEventQueue().commandAction(rightSoftCommand, this);
 				}
 			}
 			return !Settings.motorolaSoftKeyFix;
@@ -510,8 +525,8 @@ public class Displayable {
 		for (MenuItem mi: swtMenu.getItems()) {
 			mi.dispose();
 		}
-		for (int i = 1; i < commands.size(); i++) {
-			Command cmd = (Command) commands.get(i);
+		for (int i = 0; i < menuCommands.size(); i++) {
+			Command cmd = (Command) menuCommands.get(i);
 			MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
 			mi.addSelectionListener(swtMenuSelectionListener);
 			mi.setData(cmd);
