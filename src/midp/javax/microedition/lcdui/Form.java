@@ -469,7 +469,7 @@ public class Form extends Screen {
 					if (i < items.size()) {
 						row = getFirstRow((Item) items.get(i));
 					}
-					i--;
+					if (row == null) i--;
 				}
 				if (i == 0) {
 					rows.clear();
