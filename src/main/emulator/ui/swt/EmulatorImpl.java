@@ -235,7 +235,6 @@ public final class EmulatorImpl implements IEmulator {
 	/**
 	 * updateLanguage
 	 */
-	@Override
 	public void updateLanguage() {
 		getEmulatorScreen().updateLanguage();
 	}
