@@ -2466,7 +2466,7 @@ public final class EmulatorScreen implements
 	}
 
 	public Point getMenuLocation() {
-		return leftSoftLabel.toDisplay(0, 0);
+		return leftSoftLabel.toDisplay(0, leftSoftLabel.getSize().y);
 	}
 
 	/**
