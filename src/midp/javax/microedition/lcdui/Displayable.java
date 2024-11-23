@@ -187,10 +187,7 @@ public class Displayable {
 	}
 
 	protected Command getRightSoftCommand() {
-		if (this.commands.size() > 1) {
-			return rightCommand;
-		}
-		return null;
+		return rightCommand;
 	}
 
 	public boolean handleSoftKeyAction(final int n, final boolean b) {
