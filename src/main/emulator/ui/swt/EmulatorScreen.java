@@ -44,8 +44,8 @@ public final class EmulatorScreen implements
 
 	private Shell shell;
 	private Canvas canvas;
-	private CLabel aCLabel970;
-	private CLabel aCLabel984;
+	private CLabel leftSoftLabel;
+	private CLabel rightSoftLabel;
 	private CLabel statusLabel;
 	private Menu aMenu971;
 	private Menu menuMidlet;
@@ -631,14 +631,14 @@ public final class EmulatorScreen implements
 			shell.setFont(f);
 		} catch (Error ignored) {}
 		this.method588();
-		(this.aCLabel970 = new CLabel(this.shell, 0)).setText("\t");
-		this.aCLabel970.setLayoutData(layoutData3);
-		this.aCLabel970.addMouseListener(new Class43(this));
+		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
+		this.leftSoftLabel.setLayoutData(layoutData3);
+		this.leftSoftLabel.addMouseListener(new Class43(this));
 		(this.statusLabel = new CLabel(this.shell, 16777216)).setText("");
 		this.statusLabel.setLayoutData(layoutData);
-		(this.aCLabel984 = new CLabel(this.shell, 131072)).setText("\t");
-		this.aCLabel984.setLayoutData(layoutData2);
-		this.aCLabel984.addMouseListener(new Class50(this));
+		(this.rightSoftLabel = new CLabel(this.shell, 131072)).setText("\t");
+		this.rightSoftLabel.setLayoutData(layoutData2);
+		this.rightSoftLabel.addMouseListener(new Class50(this));
 		this.method586();
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new Class53(this));
@@ -2422,7 +2422,7 @@ public final class EmulatorScreen implements
 	}
 
 	static CLabel method563(final EmulatorScreen class93) {
-		return class93.aCLabel970;
+		return class93.leftSoftLabel;
 	}
 
 	static String method573(final EmulatorScreen class93) {
@@ -2430,7 +2430,7 @@ public final class EmulatorScreen implements
 	}
 
 	static CLabel method574(final EmulatorScreen class93) {
-		return class93.aCLabel984;
+		return class93.rightSoftLabel;
 	}
 
 	static int method566(final EmulatorScreen class93) {
@@ -2459,7 +2459,7 @@ public final class EmulatorScreen implements
 	}
 
 	public Point getMenuLocation() {
-		return canvas.toDisplay(canvas.getSize());
+		return leftSoftLabel.toDisplay(0, leftSoftLabel.getSize().y);
 	}
 
 	/**

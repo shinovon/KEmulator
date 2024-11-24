@@ -12,10 +12,6 @@ public class CameraVideoControlImpl implements VideoControl {
 	int dh;
 	int sw;
 	int sh;
-	boolean visible;
-	boolean dfull;
-	private Object dcanv;
-	private int dmode;
 
 	public CameraVideoControlImpl(final Object o) {
 		super();
@@ -61,14 +57,11 @@ public class CameraVideoControlImpl implements VideoControl {
 
 	@Override
 	public Object initDisplayMode(int p0, Object p1) {
-		dcanv = p1;
-		dmode = p0;
 		return p.initDisplayMode(p0, p1);
 	}
 
 	@Override
 	public void setDisplayFullScreen(boolean p0) {
-		dfull = p0;
 		p.setDisplayFullScreen(p0);
 	}
 
@@ -88,7 +81,6 @@ public class CameraVideoControlImpl implements VideoControl {
 
 	@Override
 	public void setVisible(boolean p0) {
-		visible = p0;
 		p.setVisible(p0);
 	}
 

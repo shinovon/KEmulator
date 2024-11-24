@@ -211,7 +211,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final InputStream openInputStream() throws IOException {
-		if (state != 1) throw new IOException();
+		if (state == 2) throw new IOException();
 		connect();
 		try {
 			return this.connection.getInputStream();
@@ -227,7 +227,7 @@ final class HttpConnectionImpl implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
-		if (state != 1) throw new IOException();
+		if (state != 0) throw new IOException();
 		try {
 			return this.connection.getOutputStream();
 		} catch (Exception ex) {

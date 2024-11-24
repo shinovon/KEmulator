@@ -43,6 +43,37 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.17.4 [2024.11.23]
+Fixed critical bug in HttpConnection after v17.3
+Changed commands placement
+Bug fixes in LCDUI
+
+$v2.17.3 [2024.11.22]
+Implemented Siemens S60 Game API
+Custom system properties mapping
+Ctrl+V handling in TextField
+Improved com.immersion.VibeTonz support
+Adding app title to the title of window
+Glitches when resizing non-fullscreen Canvas
+HttpConnection headers starting from index 1
+ImageItem layout
+
+$v2.17.2 [2024.11.13]
+TextEditor, CanvasItem from Nokia UI 1.4
+LCDUI DateField
+FunLight.setRegion(I)
+MetaDataControl in VLCPlayerImpl
+WAV Player cache
+Enabled Nokia OTT by default
+Snake 3 specific fix in MMAPI
+Freezing at start in some LCDUI applications
+GameCanvas.flushGraphics(IIII)
+commandAction in List, ChoiceGroup
+FPS counter not updating on idle
+NPE when clicking on Form
+Performance issues with event queue
+Java 9+ specific fixes
+
 $v2.17.1 [2024.09.06]
 LCDUI:
   Full Form layout support as specified in MIDP 2.0
