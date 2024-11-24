@@ -786,10 +786,10 @@ public final class EmulatorScreen implements
 		this.captureToClipboardMenuItem.setAccelerator(65603);
 		this.captureToClipboardMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuTool, 2);
-		(this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tF3");
+		(this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tCtrl+F3");
 		this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
 		this.showTrackInfoMenuItem.addSelectionListener(this);
-		this.showTrackInfoMenuItem.setAccelerator(16777228);
+		this.showTrackInfoMenuItem.setAccelerator(SWT.CONTROL | SWT.F3);
 
 		this.canvasKeyboardMenuItem = new MenuItem(this.menuTool, 32);
 		canvasKeyboardMenuItem.setText(UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
