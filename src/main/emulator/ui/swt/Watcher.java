@@ -26,7 +26,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	private Button aButton549;
 	private Button aButton558;
 	private Display aDisplay550;
-	private boolean aBoolean560;
+	private boolean visible;
 	private Map table;
 	private int type;
 	private Tree aTree554;
@@ -302,7 +302,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.aBoolean561 = false;
-		this.aBoolean560 = true;
+		this.visible = true;
 		EmulatorImpl.asyncExec(this.aClass5_556);
 		if (type == 0) Watcher.aVector548.addElement(this);
 		while (!this.shell.isDisposed()) {
@@ -310,7 +310,7 @@ public final class Watcher implements Runnable, DisposeListener {
 				this.aDisplay550.sleep();
 			}
 		}
-		this.aBoolean560 = false;
+		this.visible = false;
 		return;
 
 	}
@@ -321,11 +321,11 @@ public final class Watcher implements Runnable, DisposeListener {
 		if (this.shell != null && !this.shell.isDisposed()) {
 			this.shell.dispose();
 		}
-		this.aBoolean560 = false;
+		this.visible = false;
 	}
 
 	public final boolean method313() {
-		return this.aBoolean560;
+		return this.visible;
 	}
 
 	private void method323() {
@@ -345,7 +345,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	}
 
 	public final void run() {
-		if (this.table.size() == 0 || !this.aBoolean560 || this.aBoolean559 || this.aBoolean561) {
+		if (this.table.size() == 0 || !this.visible || this.aBoolean559 || this.aBoolean561) {
 			return;
 		}
 		this.aBoolean559 = true;

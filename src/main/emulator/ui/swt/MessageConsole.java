@@ -16,11 +16,11 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
 public final class MessageConsole implements IMessage, ControlListener, DisposeListener {
-	private Shell aShell868;
+	private Shell shell;
 	private boolean aBoolean869;
 	private Vector aVector870;
 	static String aString871;
-	private boolean aBoolean875;
+	private boolean visible;
 	private Group aGroup872;
 	private Group aGroup876;
 	private Button aButton873;
@@ -33,7 +33,7 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 
 	public MessageConsole() {
 		super();
-		this.aShell868 = null;
+		this.shell = null;
 		this.aGroup872 = null;
 		this.aGroup876 = null;
 		this.aButton873 = null;
@@ -80,44 +80,44 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 	}
 
 	public final boolean method479() {
-		return this.aBoolean875;
+		return this.visible;
 	}
 
 	public final Shell method480() {
-		return this.aShell868;
+		return this.shell;
 	}
 
 	public final void method481(final Shell aShell879) {
 		this.method487();
 		final Display current = Display.getCurrent();
 		this.aShell879 = aShell879;
-		this.aShell868.setLocation(aShell879.getLocation().x - aShell879.getSize().x, aShell879.getLocation().y);
-		this.aShell868.setSize(aShell879.getSize());
-		this.aBoolean875 = true;
+		this.shell.setLocation(aShell879.getLocation().x - aShell879.getSize().x, aShell879.getLocation().y);
+		this.shell.setSize(aShell879.getSize());
+		this.visible = true;
 		this.aBoolean881 = true;
-		this.aShell868.open();
-		this.aShell868.addControlListener(this);
-		this.aShell868.addDisposeListener(this);
-		while (!this.aShell868.isDisposed()) {
+		this.shell.open();
+		this.shell.addControlListener(this);
+		this.shell.addDisposeListener(this);
+		while (!this.shell.isDisposed()) {
 			if (!current.readAndDispatch()) {
 				current.sleep();
 			}
 		}
-		this.aBoolean875 = false;
+		this.visible = false;
 	}
 
-	public final void method482() {
-		if (this.aShell868 != null && !this.aShell868.isDisposed()) {
-			this.aShell868.dispose();
+	public final void dispose() {
+		if (this.shell != null && !this.shell.isDisposed()) {
+			this.shell.dispose();
 		}
-		this.aBoolean875 = false;
+		this.visible = false;
 	}
 
 	private void method487() {
-		(this.aShell868 = new Shell()).setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
-		this.aShell868.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.aShell868.setLayout(new GridLayout());
-		this.aShell868.setSize(new Point(100, 200));
+		(this.shell = new Shell()).setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
+		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+		this.shell.setLayout(new GridLayout());
+		this.shell.setSize(new Point(100, 200));
 		this.method490();
 		this.method491();
 	}
@@ -142,7 +142,7 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 		layoutData2.horizontalSpan = 2;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 2;
-		(this.aGroup872 = new Group(this.aShell868, 0)).setLayout(layout);
+		(this.aGroup872 = new Group(this.shell, 0)).setLayout(layout);
 		this.aGroup872.setText(UILocale.get("SMS_CONSOLE_SEND_TO", "Send to midlet"));
 		this.aGroup872.setLayoutData(layoutData);
 		(this.aStyledText874 = new StyledText(this.aGroup872, 2624)).setLayoutData(layoutData2);
@@ -160,7 +160,7 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		gridData.verticalAlignment = 4;
-		(this.aGroup876 = new Group(this.aShell868, 0)).setLayout(new GridLayout());
+		(this.aGroup876 = new Group(this.shell, 0)).setLayout(new GridLayout());
 		this.aGroup876.setText(UILocale.get("SMS_CONSOLE_RECEIVE", "Receive from midlet"));
 		this.aGroup876.setLayoutData(gridData);
 		(this.aButton873 = new Button(this.aGroup876, 32)).setText(UILocale.get("SMS_CONSOLE_BLOCK", "Block the received message"));
@@ -176,8 +176,8 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 	public final void controlMoved(final ControlEvent controlEvent) {
 		MessageConsole class83;
 		boolean aBoolean881;
-		if (Math.abs(this.aShell879.getLocation().x - this.aShell868.getSize().x - this.aShell868.getLocation().x) < 10 && Math.abs(this.aShell879.getLocation().y - this.aShell868.getLocation().y) < 20) {
-			this.aShell868.setLocation(this.aShell879.getLocation().x - this.aShell868.getSize().x, this.aShell879.getLocation().y);
+		if (Math.abs(this.aShell879.getLocation().x - this.shell.getSize().x - this.shell.getLocation().x) < 10 && Math.abs(this.aShell879.getLocation().y - this.shell.getLocation().y) < 20) {
+			this.shell.setLocation(this.aShell879.getLocation().x - this.shell.getSize().x, this.aShell879.getLocation().y);
 			class83 = this;
 			aBoolean881 = true;
 		} else {
@@ -191,7 +191,7 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
-		this.method482();
+		this.dispose();
 	}
 
 	static StyledText method483(final MessageConsole class83) {

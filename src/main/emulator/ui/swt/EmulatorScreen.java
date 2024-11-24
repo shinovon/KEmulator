@@ -1195,30 +1195,30 @@ public final class EmulatorScreen implements
 			}
 			if (menuItem == this.logMenuItem) {
 				if (((Log) Emulator.getEmulator().getLogStream()).isLogOpen()) {
-					((Log) Emulator.getEmulator().getLogStream()).method330();
+					((Log) Emulator.getEmulator().getLogStream()).dispose();
 					return;
 				}
 				((Log) Emulator.getEmulator().getLogStream()).method329(this.shell);
 				return;
 			}
 			if (menuItem == this.keypadMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).method826().method834()) {
-					((EmulatorImpl) Emulator.getEmulator()).method826().method836();
+				if (((EmulatorImpl) Emulator.getEmulator()).getKeyPad().method834()) {
+					((EmulatorImpl) Emulator.getEmulator()).getKeyPad().dipose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).method826().method835(this.shell);
+				((EmulatorImpl) Emulator.getEmulator()).getKeyPad().method835(this.shell);
 				return;
 			}
 			if (menuItem == this.infosMenuItem) {
 				this.infosEnabled = this.infosMenuItem.getSelection();
 				if (this.infosEnabled) {
 					this.canvas.setCursor(new Cursor(EmulatorScreen.display, 2));
-					((EmulatorImpl) Emulator.getEmulator()).method825().method607(this.shell);
+					((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(this.shell);
 					return;
 				}
 				this.canvas.setCursor(new Cursor(EmulatorScreen.display, 0));
 				this.canvas.redraw();
-				((EmulatorImpl) Emulator.getEmulator()).method825().method608();
+				((EmulatorImpl) Emulator.getEmulator()).getInfos().dispose();
 				return;
 			}
 			if (menuItem == this.rotateScreenMenuItem) {
@@ -1268,7 +1268,7 @@ public final class EmulatorScreen implements
 			}
 			if (menuItem == this.smsConsoleMenuItem) {
 				if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
-					((MessageConsole) Emulator.getEmulator().getMessage()).method482();
+					((MessageConsole) Emulator.getEmulator().getMessage()).dispose();
 					return;
 				}
 				((MessageConsole) Emulator.getEmulator().getMessage()).method481(this.shell);
@@ -1307,19 +1307,19 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.methodsMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).method824().method438()) {
-					((EmulatorImpl) Emulator.getEmulator()).method824().method446();
+				if (((EmulatorImpl) Emulator.getEmulator()).getMethods().method438()) {
+					((EmulatorImpl) Emulator.getEmulator()).getMethods().dispose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).method824().method436();
+				((EmulatorImpl) Emulator.getEmulator()).getMethods().method436();
 				return;
 			}
 			if (menuItem == this.memoryViewMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).method823().method622()) {
-					((EmulatorImpl) Emulator.getEmulator()).method823().method656();
+				if (((EmulatorImpl) Emulator.getEmulator()).getMemory().isShown()) {
+					((EmulatorImpl) Emulator.getEmulator()).getMemory().dispose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).method823().method621();
+				((EmulatorImpl) Emulator.getEmulator()).getMemory().method621();
 			}
 		} else if (parent == menuResize) {
 			if (menuItem == centerOnScreenMenuItem) {
@@ -1451,7 +1451,7 @@ public final class EmulatorScreen implements
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
         "," + (int)((this.mouseYRelease - this.mouseYPress) / this.zoom) + ")";
         */
-		((EmulatorImpl) Emulator.getEmulator()).method825().method609(this.aString1008);
+		((EmulatorImpl) Emulator.getEmulator()).getInfos().method609(this.aString1008);
 	}
 
 	private void method588() {
@@ -2300,11 +2300,11 @@ public final class EmulatorScreen implements
 			}
 		}
 		final Shell method330;
-		if (((EmulatorImpl) Emulator.getEmulator()).method825().method610() && !(method330 = ((EmulatorImpl) Emulator.getEmulator()).method825().method611()).isDisposed()) {
+		if (((EmulatorImpl) Emulator.getEmulator()).getInfos().isShown() && !(method330 = ((EmulatorImpl) Emulator.getEmulator()).getInfos().method611()).isDisposed()) {
 			method330.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 		}
 		final Shell method331;
-		if (((EmulatorImpl) Emulator.getEmulator()).method826().method834() && !(method331 = ((EmulatorImpl) Emulator.getEmulator()).method826().method833()).isDisposed()) {
+		if (((EmulatorImpl) Emulator.getEmulator()).getKeyPad().method834() && !(method331 = ((EmulatorImpl) Emulator.getEmulator()).getKeyPad().method833()).isDisposed()) {
 			method331.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 		}
 	}
@@ -2564,7 +2564,7 @@ public final class EmulatorScreen implements
 				case 0: {
 					if (Settings.showMemViewFrame) {
 						this.aClass93_1059.memoryViewMenuItem.setSelection(true);
-						((EmulatorImpl) Emulator.getEmulator()).method823().method621();
+						((EmulatorImpl) Emulator.getEmulator()).getMemory().method621();
 						return;
 					}
 					break;
@@ -2581,7 +2581,7 @@ public final class EmulatorScreen implements
 					if (Settings.showInfoFrame) {
 						this.aClass93_1059.infosMenuItem.setSelection(true);
 						EmulatorScreen.method558(this.aClass93_1059).setCursor(new Cursor(EmulatorScreen.method564(), 2));
-						((EmulatorImpl) Emulator.getEmulator()).method825().method607(EmulatorScreen.method561(this.aClass93_1059));
+						((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(EmulatorScreen.method561(this.aClass93_1059));
 						break;
 					}
 					break;

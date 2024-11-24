@@ -18,7 +18,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
 public final class Methods implements Runnable, DisposeListener {
-	private Shell aShell784;
+	private Shell shell;
 	private SashForm aSashForm785;
 	private Composite aComposite787;
 	private Button aButton783;
@@ -31,14 +31,14 @@ public final class Methods implements Runnable, DisposeListener {
 	private Button aButton799;
 	private StyledText aStyledText790;
 	private Display aDisplay791;
-	private boolean aBoolean793;
+	private boolean visible;
 	private static NumberFormat aNumberFormat794;
 	private int anInt786;
 	private ArrayList anArrayList792;
 
 	public Methods() {
 		super();
-		this.aShell784 = null;
+		this.shell = null;
 		this.aSashForm785 = null;
 		this.aComposite787 = null;
 		this.aButton783 = null;
@@ -98,7 +98,7 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	public final void run() {
-		if (!this.aBoolean793) {
+		if (!this.visible) {
 			return;
 		}
 		try {
@@ -133,35 +133,35 @@ public final class Methods implements Runnable, DisposeListener {
 		}
 		this.method449();
 		this.aDisplay791 = Display.getCurrent();
-		this.aShell784.setLocation(this.aDisplay791.getClientArea().width - this.aShell784.getSize().x >> 1, this.aDisplay791.getClientArea().height - this.aShell784.getSize().y >> 1);
-		this.aShell784.open();
-		this.aShell784.addDisposeListener(this);
-		this.aBoolean793 = true;
+		this.shell.setLocation(this.aDisplay791.getClientArea().width - this.shell.getSize().x >> 1, this.aDisplay791.getClientArea().height - this.shell.getSize().y >> 1);
+		this.shell.open();
+		this.shell.addDisposeListener(this);
+		this.visible = true;
 		this.method448();
-		while (!this.aShell784.isDisposed()) {
+		while (!this.shell.isDisposed()) {
 			if (!this.aDisplay791.readAndDispatch()) {
 				this.aDisplay791.sleep();
 			}
 		}
-		this.aBoolean793 = false;
+		this.visible = false;
 	}
 
-	public final void method446() {
-		if (this.aShell784 != null && !this.aShell784.isDisposed()) {
-			this.aShell784.dispose();
+	public final void dispose() {
+		if (this.shell != null && !this.shell.isDisposed()) {
+			this.shell.dispose();
 		}
-		this.aBoolean793 = false;
+		this.visible = false;
 	}
 
 	public final boolean method438() {
-		return this.aBoolean793;
+		return this.visible;
 	}
 
 	private void method449() {
-		(this.aShell784 = new Shell(1264)).setText(UILocale.get("METHOD_FRAME_TITLE", "Methods"));
-		this.aShell784.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.aShell784.setSize(new Point(752, 483));
-		this.aShell784.setLayout(new GridLayout());
+		(this.shell = new Shell(1264)).setText(UILocale.get("METHOD_FRAME_TITLE", "Methods"));
+		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+		this.shell.setSize(new Point(752, 483));
+		this.shell.setLayout(new GridLayout());
 		this.method450();
 	}
 
@@ -171,7 +171,7 @@ public final class Methods implements Runnable, DisposeListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.verticalAlignment = 4;
-		(this.aSashForm785 = new SashForm(this.aShell784, 0)).setOrientation(512);
+		(this.aSashForm785 = new SashForm(this.shell, 0)).setOrientation(512);
 		this.method451();
 		this.aSashForm785.setLayoutData(layoutData);
 		this.method452();
@@ -277,7 +277,7 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
-		this.method446();
+		this.dispose();
 	}
 
 	static Table method441(final Methods class46) {
@@ -285,7 +285,7 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	static Shell method442(final Methods class46) {
-		return class46.aShell784;
+		return class46.shell;
 	}
 
 	static void method443(final Methods class46, final TableItem[] array) {

@@ -6,35 +6,35 @@ import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 
 public final class InfosBox {
-	private Shell aShell1069;
+	private Shell shell;
 	private Display aDisplay1070;
 	private CLabel aCLabel1071;
-	private boolean aBoolean1072;
+	private boolean visible;
 
 	public InfosBox() {
 		super();
-		this.aShell1069 = null;
+		this.shell = null;
 		this.aCLabel1071 = null;
 	}
 
 	public final void method607(final Shell shell) {
 		this.aDisplay1070 = Display.getCurrent();
 		this.method612(shell);
-		this.aShell1069.setLocation(shell.getLocation().x + shell.getSize().x, shell.getLocation().y);
-		this.aShell1069.open();
-		this.aBoolean1072 = true;
+		this.shell.setLocation(shell.getLocation().x + shell.getSize().x, shell.getLocation().y);
+		this.shell.open();
+		this.visible = true;
 		shell.forceActive();
-		while (!this.aShell1069.isDisposed()) {
+		while (!this.shell.isDisposed()) {
 			if (!this.aDisplay1070.readAndDispatch()) {
 				this.aDisplay1070.sleep();
 			}
 		}
-		this.aBoolean1072 = false;
+		this.visible = false;
 	}
 
-	public final void method608() {
-		if (this.aShell1069 != null && !this.aShell1069.isDisposed()) {
-			this.aShell1069.dispose();
+	public final void dispose() {
+		if (this.shell != null && !this.shell.isDisposed()) {
+			this.shell.dispose();
 		}
 	}
 
@@ -42,12 +42,12 @@ public final class InfosBox {
 		this.aCLabel1071.setText(text);
 	}
 
-	public final boolean method610() {
-		return this.aBoolean1072;
+	public final boolean isShown() {
+		return this.visible;
 	}
 
 	public final Shell method611() {
-		return this.aShell1069;
+		return this.shell;
 	}
 
 	private void method612(final Shell shell) {
@@ -62,10 +62,10 @@ public final class InfosBox {
 		layout.marginWidth = 1;
 		layout.marginHeight = 1;
 		layout.horizontalSpacing = 0;
-		(this.aShell1069 = new Shell(shell, 8)).setLayout(layout);
-		this.aShell1069.setSize(new Point(130, 50));
-		this.aShell1069.setBackground(this.aDisplay1070.getSystemColor(2));
-		(this.aCLabel1071 = new CLabel(this.aShell1069, 0)).setText("Pos(0,0)\nColr(0)\nRect(0,0,0,0)");
+		(this.shell = new Shell(shell, 8)).setLayout(layout);
+		this.shell.setSize(new Point(130, 50));
+		this.shell.setBackground(this.aDisplay1070.getSystemColor(2));
+		(this.aCLabel1071 = new CLabel(this.shell, 0)).setText("Pos(0,0)\nColr(0)\nRect(0,0,0,0)");
 		this.aCLabel1071.setLayoutData(layoutData);
 		this.aCLabel1071.setBackground(this.aDisplay1070.getSystemColor(13));
 	}

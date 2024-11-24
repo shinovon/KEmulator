@@ -211,7 +211,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 		this.aBoolean1406 = false;
 	}
 
-	public final void method836() {
+	public final void dipose() {
 		if (this.aShell1404 != null && !this.aShell1404.isDisposed()) {
 			this.aShell1404.dispose();
 		}
@@ -228,7 +228,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
-		this.method836();
+		this.dipose();
 	}
 
 	static void method837(final KeyPad class161, final int n) {
