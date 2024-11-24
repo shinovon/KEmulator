@@ -269,7 +269,7 @@ public final class EmulatorScreen implements
 			shell.setSize(sizeW, sizeH);
 		if (maximized)
 			shell.setMaximized(true);
-		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
+//		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 1));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 2));
 		this.shell.open();
@@ -1319,7 +1319,7 @@ public final class EmulatorScreen implements
 					((EmulatorImpl) Emulator.getEmulator()).getMemory().dispose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).getMemory().method621();
+				((EmulatorImpl) Emulator.getEmulator()).getMemory().open();
 			}
 		} else if (parent == menuResize) {
 			if (menuItem == centerOnScreenMenuItem) {
@@ -2479,6 +2479,13 @@ public final class EmulatorScreen implements
 		this.canvas.redraw();
 	}
 
+	public void appStarting(boolean first) {
+	}
+
+	public void appStarted(boolean first) {
+		if (first) EmulatorImpl.asyncExec(new WindowOpen(this, 0));
+	}
+
 	final class ShellPosition implements Runnable {
 		int anInt1478;
 		int anInt1481;
@@ -2548,7 +2555,7 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	final class WindowOpen implements Runnable {
+	public final class WindowOpen implements Runnable {
 		int anInt1058;
 		private final EmulatorScreen aClass93_1059;
 
@@ -2562,9 +2569,10 @@ public final class EmulatorScreen implements
 		public void run() {
 			switch (this.anInt1058) {
 				case 0: {
-					if (Settings.showMemViewFrame) {
+					MemoryView m = ((EmulatorImpl) Emulator.getEmulator()).getMemory();
+					if (Settings.showMemViewFrame && !m.isShown()) {
 						this.aClass93_1059.memoryViewMenuItem.setSelection(true);
-						((EmulatorImpl) Emulator.getEmulator()).getMemory().method621();
+						m.open();
 						return;
 					}
 					break;

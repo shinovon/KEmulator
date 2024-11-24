@@ -31,7 +31,7 @@ public final class MemoryView implements DisposeListener {
 	private CLabel totalmemLbl;
 	private CLabel aCLabel1136;
 	private CLabel aCLabel1140;
-	private Display aDisplay1093;
+	private Display display;
 	private Memory memoryMgr;
 	private boolean visible;
 	private TabFolder aTabFolder1097;
@@ -149,24 +149,25 @@ public final class MemoryView implements DisposeListener {
 		this.aCLabel1155 = null;
 		this.aProgressBar1092 = null;
 		this.pauseAudioBtn = null;
-		this.aDisplay1093 = EmulatorImpl.getDisplay();
+		this.display = EmulatorImpl.getDisplay();
 		this.memoryMgr = new Memory();
 		this.classRefsVector = new Vector();
 		this.anArrayList1110 = new ArrayList();
 	}
 
-	public final void method621() {
+	public final void open() {
 		this.method665();
-		this.shell.setLocation(this.aDisplay1093.getClientArea().width - this.shell.getSize().x >> 1, this.aDisplay1093.getClientArea().height - this.shell.getSize().y >> 1);
+		this.shell.setLocation(this.display.getClientArea().width - this.shell.getSize().x >> 1, this.display.getClientArea().height - this.shell.getSize().y >> 1);
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.method692();
 		this.visible = true;
 		while (!this.shell.isDisposed()) {
-			if (!this.aDisplay1093.readAndDispatch()) {
-				this.aDisplay1093.sleep();
+			if (!this.display.readAndDispatch()) {
+				this.display.sleep();
 			}
 		}
+		Settings.showMemViewFrame = false;
 		if (this.autoUpdateThread != null && this.autoUpdateThread.isAlive()) {
 			this.autoUpdateThread.interrupt();
 		}

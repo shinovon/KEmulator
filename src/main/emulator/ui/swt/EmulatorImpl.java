@@ -44,7 +44,6 @@ public final class EmulatorImpl implements IEmulator {
 		this.keyPad = new KeyPad();
 		this.classWatcher = new Watcher(0);
 		this.profiler = new Watcher(1);
-		this.memoryView = new MemoryView();
 		this.methods = new Methods();
 	}
 
@@ -90,6 +89,9 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 	public final MemoryView getMemory() {
+		if (memoryView == null) {
+			this.memoryView = new MemoryView();
+		}
 		return this.memoryView;
 	}
 
