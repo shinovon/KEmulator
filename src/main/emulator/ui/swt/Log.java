@@ -121,7 +121,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 		this.logOpen = false;
 	}
 
-	public final void method330() {
+	public final void dispose() {
 		if (this.logShell != null && !this.logShell.isDisposed()) {
 			this.logShell.dispose();
 		}
@@ -157,7 +157,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
-		this.method330();
+		this.dispose();
 	}
 
 	public void run() {

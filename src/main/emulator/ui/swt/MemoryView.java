@@ -18,7 +18,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
 public final class MemoryView implements DisposeListener {
-	private Shell aShell1080;
+	private Shell shell;
 	private Button aButton1081;
 	private Button aButton1104;
 	private CLabel aCLabel1082;
@@ -31,9 +31,9 @@ public final class MemoryView implements DisposeListener {
 	private CLabel totalmemLbl;
 	private CLabel aCLabel1136;
 	private CLabel aCLabel1140;
-	private Display aDisplay1093;
+	private Display display;
 	private Memory memoryMgr;
-	private boolean aBoolean1094;
+	private boolean visible;
 	private TabFolder aTabFolder1097;
 	private Composite aComposite1098;
 	private Composite audioControlComp;
@@ -102,7 +102,7 @@ public final class MemoryView implements DisposeListener {
 
 	public MemoryView() {
 		super();
-		this.aShell1080 = null;
+		this.shell = null;
 		this.aButton1081 = null;
 		this.aButton1104 = null;
 		this.aCLabel1082 = null;
@@ -149,40 +149,41 @@ public final class MemoryView implements DisposeListener {
 		this.aCLabel1155 = null;
 		this.aProgressBar1092 = null;
 		this.pauseAudioBtn = null;
-		this.aDisplay1093 = EmulatorImpl.getDisplay();
+		this.display = EmulatorImpl.getDisplay();
 		this.memoryMgr = new Memory();
 		this.classRefsVector = new Vector();
 		this.anArrayList1110 = new ArrayList();
 	}
 
-	public final void method621() {
+	public final void open() {
 		this.method665();
-		this.aShell1080.setLocation(this.aDisplay1093.getClientArea().width - this.aShell1080.getSize().x >> 1, this.aDisplay1093.getClientArea().height - this.aShell1080.getSize().y >> 1);
-		this.aShell1080.open();
-		this.aShell1080.addDisposeListener(this);
+		this.shell.setLocation(this.display.getClientArea().width - this.shell.getSize().x >> 1, this.display.getClientArea().height - this.shell.getSize().y >> 1);
+		this.shell.open();
+		this.shell.addDisposeListener(this);
 		this.method692();
-		this.aBoolean1094 = true;
-		while (!this.aShell1080.isDisposed()) {
-			if (!this.aDisplay1093.readAndDispatch()) {
-				this.aDisplay1093.sleep();
+		this.visible = true;
+		while (!this.shell.isDisposed()) {
+			if (!this.display.readAndDispatch()) {
+				this.display.sleep();
 			}
 		}
+		Settings.showMemViewFrame = false;
 		if (this.autoUpdateThread != null && this.autoUpdateThread.isAlive()) {
 			this.autoUpdateThread.interrupt();
 		}
 		this.memoryMgr.aVector1463.clear();
-		this.aBoolean1094 = false;
+		this.visible = false;
 	}
 
-	public final void method656() {
-		if (this.aShell1080 != null && !this.aShell1080.isDisposed()) {
-			this.aShell1080.dispose();
+	public final void dispose() {
+		if (this.shell != null && !this.shell.isDisposed()) {
+			this.shell.dispose();
 		}
-		this.aBoolean1094 = false;
+		this.visible = false;
 	}
 
-	public final boolean method622() {
-		return this.aBoolean1094;
+	public final boolean isShown() {
+		return this.visible;
 	}
 
 	private void method665() {
@@ -240,27 +241,27 @@ public final class MemoryView implements DisposeListener {
 		gridData9.horizontalAlignment = 4;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 7;
-		(this.aShell1080 = new Shell(1264)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
-		this.aShell1080.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.aShell1080.setLayout(layout);
-		(this.aShell1080).setSize(new Point(740, 466));
-		(this.aButton1081 = new Button(this.aShell1080, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
+		(this.shell = new Shell(1264)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
+		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+		this.shell.setLayout(layout);
+		(this.shell).setSize(new Point(740, 466));
+		(this.aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
 		(this.aButton1081).setLayoutData(layoutData6);
 		this.aButton1081.addSelectionListener(new Class129(this));
-		(this.aButton1104 = new Button(this.aShell1080, 32)).setText(UILocale.get("MEMORY_VIEW_AUTO_UPDATE", "AutoUpdate"));
+		(this.aButton1104 = new Button(this.shell, 32)).setText(UILocale.get("MEMORY_VIEW_AUTO_UPDATE", "AutoUpdate"));
 		(this.aButton1104).setLayoutData(layoutData4);
 		this.aButton1104.addSelectionListener(new Class70(this));
-		(this.aCLabel1105 = new CLabel(this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_BYTECODE_SIZE", "ByteCode Size:"));
+		(this.aCLabel1105 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_BYTECODE_SIZE", "ByteCode Size:"));
 		(this.aCLabel1105).setLayoutData(layoutData);
-		(this.bytecodeSizeLbl = new CLabel(this.aShell1080, 0)).setText("0              bytes");
+		(this.bytecodeSizeLbl = new CLabel(this.shell, 0)).setText("0              bytes");
 		(this.bytecodeSizeLbl).setLayoutData(gridData3);
-		(this.aCLabel1128 = new CLabel(this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_TOTALMEM_SIZE", "Total Memory Used:"));
+		(this.aCLabel1128 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_TOTALMEM_SIZE", "Total Memory Used:"));
 		(this.aCLabel1128).setLayoutData(gridData);
-		(this.totalmemLbl = new CLabel(this.aShell1080, 0)).setText("0");
+		(this.totalmemLbl = new CLabel(this.shell, 0)).setText("0");
 		(this.totalmemLbl).setLayoutData(gridData2);
 
 
-		Button gcButton = new Button(aShell1080, SWT.PUSH);
+		Button gcButton = new Button(shell, SWT.PUSH);
 		gcButton.setText("GC");
 		gcButton.setLayoutData(gridData9);
 		gcButton.addSelectionListener(new SelectionAdapter() {
@@ -268,20 +269,20 @@ public final class MemoryView implements DisposeListener {
 				System.gc();
 			}
 		});
-		(this.aCLabel1082 = new CLabel(this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_INTERVAL", "Interval(milli sec):"));
+		(this.aCLabel1082 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_INTERVAL", "Interval(milli sec):"));
 		(this.aCLabel1082).setLayoutData(layoutData3);
-		(this.aText1087 = new Text(this.aShell1080, 2048)).setText("1000");
+		(this.aText1087 = new Text(this.shell, 2048)).setText("1000");
 		(this.aText1087).setLayoutData(layoutData5);
-		(this.aCLabel1114 = new CLabel(this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_OBJECT_SIZE", "Objects Size:"));
+		(this.aCLabel1114 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_OBJECT_SIZE", "Objects Size:"));
 		this.aCLabel1114.setLayoutData(layoutData2);
-		(this.objectsSizeLbl = new CLabel(this.aShell1080, 0)).setText("0");
+		(this.objectsSizeLbl = new CLabel(this.shell, 0)).setText("0");
 		this.objectsSizeLbl.setLayoutData(gridData7);
-		(this.aCLabel1136 = new CLabel(this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_MAX_OBJECT_SIZE", "Max Objects Size:"));
+		(this.aCLabel1136 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_MAX_OBJECT_SIZE", "Max Objects Size:"));
 		this.aCLabel1136.setLayoutData(gridData);
-		(this.aCLabel1140 = new CLabel(this.aShell1080, 0)).setText("0");
+		(this.aCLabel1140 = new CLabel(this.shell, 0)).setText("0");
 		this.aCLabel1140.setLayoutData(gridData2);
-		(this.jvmmem1Label = new CLabel(this.aShell1080, 0)).setText(UILocale.get("MEMORY_VIEW_JVM_MEMORY", "Real usage:"));
-		(this.jvmmemLabel = new CLabel(this.aShell1080, 0)).setText("0");
+		(this.jvmmem1Label = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_JVM_MEMORY", "Real usage:"));
+		(this.jvmmemLabel = new CLabel(this.shell, 0)).setText("0");
 		this.jvmmemLabel.setLayoutData(gridData8);
 		this.method687();
 	}
@@ -435,11 +436,11 @@ public final class MemoryView implements DisposeListener {
 		this.aCanvas1095.addPaintListener(new Class26(this));
 		this.aCanvas1095.addMouseListener(new Class25(this));
 		this.aCanvas1095.getVerticalBar().addSelectionListener(new Class23(this));
-		this.aMenu1084 = new Menu(this.aShell1080, 8);
+		this.aMenu1084 = new Menu(this.shell, 8);
 		final MenuItem menuItem;
 		(menuItem = new MenuItem(this.aMenu1084, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_AS", "Save As..."));
 		menuItem.addSelectionListener(new Class36(this));
-		this.aMenu1113 = new Menu(this.aShell1080, 8);
+		this.aMenu1113 = new Menu(this.shell, 8);
 		final MenuItem menuItem2;
 		(menuItem2 = new MenuItem(this.aMenu1113, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Save All Images..."));
 		menuItem2.addSelectionListener(new Class33(this));
@@ -452,7 +453,7 @@ public final class MemoryView implements DisposeListener {
 		layoutData.verticalAlignment = 4;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.grabExcessHorizontalSpace = true;
-		(this.aSashForm1083 = new SashForm(this.aShell1080, 0)).setOrientation(512);
+		(this.aSashForm1083 = new SashForm(this.shell, 0)).setOrientation(512);
 		this.aSashForm1083.setLayoutData(layoutData);
 		this.method688();
 		this.method672();
@@ -524,7 +525,7 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	private void method691() {
-		if (this.aShell1080.isDisposed()) {
+		if (this.shell.isDisposed()) {
 			return;
 		}
 		try {
@@ -794,12 +795,12 @@ public final class MemoryView implements DisposeListener {
 		}
 		final Object value;
 		if ((value = this.classRefsVector.get(this.classTable.getSelectionIndex())) != null && emulator.debug.ClassTypes.method871(value.getClass())) {
-			new Watcher(value).method311(this.aShell1080);
+			new Watcher(value).method311(this.shell);
 		}
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
-		this.method656();
+		this.dispose();
 	}
 
 	static void method647(final MemoryView class110) {
@@ -947,7 +948,7 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	static Shell method632(final MemoryView class110) {
-		return class110.aShell1080;
+		return class110.shell;
 	}
 
 	static Image method640(final MemoryView class110) {

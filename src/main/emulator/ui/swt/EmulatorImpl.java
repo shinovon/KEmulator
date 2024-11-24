@@ -16,36 +16,35 @@ import emulator.graphics3D.*;
 
 public final class EmulatorImpl implements IEmulator {
 	private static Display display;
-	private Vector aVector1379;
+	private Vector plugins;
 	private int screenDepth;
-	private Methods aClass46_1381;
-	private MemoryView aClass110_1382;
+	private Methods methods;
+	private MemoryView memoryView;
 	private Watcher classWatcher;
 	private Watcher profiler;
 	private Property iproperty;
 	private EmulatorScreen iscreen;
 	private Log ilogstream;
-	private KeyPad aClass161_1387;
-	private InfosBox aClass108_1390;
-	private M3GViewUI aClass90_1384;
-	private MessageConsole aClass83_1389;
+	private KeyPad keyPad;
+	private InfosBox infos;
+	private M3GViewUI m3gView;
+	private MessageConsole sms;
 	public Properties midletProps;
 	private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
 
 	public EmulatorImpl() {
 		super();
 		EmulatorImpl.display = new Display();
-		this.aVector1379 = new Vector();
+		this.plugins = new Vector();
 		this.screenDepth = EmulatorImpl.display.getDepth();
 		this.iproperty = new Property();
 		this.ilogstream = new Log();
-		this.aClass83_1389 = new MessageConsole();
-		this.aClass108_1390 = new InfosBox();
-		this.aClass161_1387 = new KeyPad();
+		this.sms = new MessageConsole();
+		this.infos = new InfosBox();
+		this.keyPad = new KeyPad();
 		this.classWatcher = new Watcher(0);
 		this.profiler = new Watcher(1);
-		this.aClass110_1382 = new MemoryView();
-		this.aClass46_1381 = new Methods();
+		this.methods = new Methods();
 	}
 
 	public static void dispose() {
@@ -89,53 +88,56 @@ public final class EmulatorImpl implements IEmulator {
 		return this.profiler;
 	}
 
-	public final MemoryView method823() {
-		return this.aClass110_1382;
+	public final MemoryView getMemory() {
+		if (memoryView == null) {
+			this.memoryView = new MemoryView();
+		}
+		return this.memoryView;
 	}
 
-	public final Methods method824() {
-		return this.aClass46_1381;
+	public final Methods getMethods() {
+		return this.methods;
 	}
 
-	public final InfosBox method825() {
-		return this.aClass108_1390;
+	public final InfosBox getInfos() {
+		return this.infos;
 	}
 
-	public final KeyPad method826() {
-		return this.aClass161_1387;
+	public final KeyPad getKeyPad() {
+		return this.keyPad;
 	}
 
 	public final M3GViewUI getM3GView() {
-		if (aClass90_1384 == null) {
-			this.aClass90_1384 = new M3GViewUI();
+		if (m3gView == null) {
+			this.m3gView = new M3GViewUI();
 		}
-		return this.aClass90_1384;
+		return this.m3gView;
 	}
 
 	public final void disposeSubWindows() {
 		Settings.showLogFrame = this.ilogstream.isLogOpen();
-		Settings.showInfoFrame = this.aClass108_1390.method610();
-		this.aClass161_1387.method836();
-		this.ilogstream.method330();
-		this.aClass83_1389.method482();
-		this.aClass108_1390.method608();
-		Settings.showMemViewFrame = this.aClass110_1382.method622();
-		this.aClass46_1381.method446();
-		this.aClass110_1382.method656();
+		Settings.showInfoFrame = this.infos.isShown();
+		this.keyPad.dipose();
+		this.ilogstream.dispose();
+		this.sms.dispose();
+		this.infos.dispose();
+		Settings.showMemViewFrame = this.memoryView.isShown();
+		this.methods.dispose();
+		if (memoryView != null) this.memoryView.dispose();
 		this.classWatcher.dispose();
 		this.profiler.dispose();
-		if (aClass90_1384 != null)
-			this.aClass90_1384.close();
+		if (m3gView != null)
+			this.m3gView.close();
 		while (Watcher.aVector548.size() > 0) {
 			((Watcher) Watcher.aVector548.get(0)).dispose();
 		}
-		for (Object o : this.aVector1379) {
+		for (Object o : this.plugins) {
 			((IPlugin) o).close();
 		}
 	}
 
 	public final void pushPlugin(final IPlugin plugin) {
-		this.aVector1379.add(plugin);
+		this.plugins.add(plugin);
 	}
 
 	public final ILogStream getLogStream() {
@@ -151,7 +153,7 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 	public final IMessage getMessage() {
-		return this.aClass83_1389;
+		return this.sms;
 	}
 
 	public final IFont newFont(final int size, final int style) {
@@ -219,8 +221,8 @@ public final class EmulatorImpl implements IEmulator {
 		for (int i = 0; i < Watcher.aVector548.size(); ++i) {
 			asyncExec((Runnable) Watcher.aVector548.get(i));
 		}
-		if (this.aClass46_1381.method438()) {
-			asyncExec(this.aClass46_1381);
+		if (this.methods.method438()) {
+			asyncExec(this.methods);
 		}
 	}
 

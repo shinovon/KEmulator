@@ -333,7 +333,7 @@ public final class EventQueue implements Runnable {
 						}
 						case EVENT_START: {
 							if (Emulator.getMIDlet() == null) break;
-							new Thread(new InvokeStartAppRunnable(this)).start();
+							new Thread(new InvokeStartAppRunnable(true)).start();
 							break;
 						}
 						case EVENT_EXIT: {
@@ -367,7 +367,7 @@ public final class EventQueue implements Runnable {
 							if (!(d instanceof Canvas)) break;
 							if (Settings.startAppOnResume) {
 								try {
-									Emulator.getMIDlet().invokeStartApp();
+									new Thread(new InvokeStartAppRunnable(false)).start();
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
