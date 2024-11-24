@@ -146,7 +146,9 @@ public class Displayable {
 		String leftLabel = "", rightLabel = "";
 		if (menuCommands.size() > 1) {
 			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
-		} else if(leftCommand != null) {
+		} else if (menuCommands.size() != 0) {
+			leftLabel = menuCommands.get(0).getLabel();
+		} else if (leftCommand != null) {
 			leftLabel = leftCommand.getLabel();
 		}
 		if (rightCommand != null) {
@@ -180,10 +182,10 @@ public class Displayable {
 	}
 
 	protected Command getLeftSoftCommand() {
-		if (this.menuCommands.size() > 0) {
+		if (this.menuCommands.size() != 0) {
 			return menuCommands.get(0);
 		}
-		return null;
+		return leftCommand;
 	}
 
 	protected Command getRightSoftCommand() {
