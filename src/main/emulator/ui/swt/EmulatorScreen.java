@@ -47,7 +47,7 @@ public final class EmulatorScreen implements
 	private CLabel leftSoftLabel;
 	private CLabel rightSoftLabel;
 	private CLabel statusLabel;
-	private Menu aMenu971;
+	private Menu menu;
 	private Menu menuMidlet;
 	private Menu menuTool;
 	private Menu menuView;
@@ -635,19 +635,22 @@ public final class EmulatorScreen implements
 		(this.rightSoftLabel = new CLabel(this.shell, 131072)).setText("\t");
 		this.rightSoftLabel.setLayoutData(layoutData2);
 		this.rightSoftLabel.addMouseListener(new Class50(this));
-		this.method586();
+		this.initMenu();
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new Class53(this));
 	}
 
-	private void method586() {
-		this.aMenu971 = new Menu(this.shell, 2);
+	private void initMenu() {
+		if (menu != null) {
+			menu.dispose();
+		}
+		this.menu = new Menu(this.shell, 2);
 		final MenuItem menuItemMidlet;
-		(menuItemMidlet = new MenuItem(this.aMenu971, 64)).setText(UILocale.get("MENU_MIDLET", "Midlet"));
+		(menuItemMidlet = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_MIDLET", "Midlet"));
 		final MenuItem menuItemTool;
-		(menuItemTool = new MenuItem(this.aMenu971, 64)).setText(UILocale.get("MENU_TOOL", "Tool"));
+		(menuItemTool = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_TOOL", "Tool"));
 		final MenuItem menuItemView;
-		(menuItemView = new MenuItem(this.aMenu971, 64)).setText(UILocale.get("MENU_VIEW", "View"));
+		(menuItemView = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_VIEW", "View"));
 		this.menuView = new Menu(menuItemView);
 		(this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
 		this.infosMenuItem.addSelectionListener(this);
@@ -900,7 +903,7 @@ public final class EmulatorScreen implements
 		toggleMenuAccelerators(!Settings.canvasKeyboard);
 
 		setFpsMode(Settings.fpsMode);
-		this.shell.setMenuBar(this.aMenu971);
+		this.shell.setMenuBar(this.menu);
 	}
 
 
@@ -2473,7 +2476,7 @@ public final class EmulatorScreen implements
 	 * updateLanguage
 	 */
 	public void updateLanguage() {
-		method586();
+		initMenu();
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		updateStatus();
 		this.canvas.redraw();
