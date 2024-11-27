@@ -10,4 +10,6 @@ public interface ICaret {
 	int getCaretPosition();
 
 	void displayableChanged();
+
+    void updateText(Object item, String text);
 }

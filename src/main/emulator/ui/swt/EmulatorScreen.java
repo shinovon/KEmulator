@@ -2006,6 +2006,41 @@ public final class EmulatorScreen implements
 		return new int[]{x, y};
 	}
 
+	public int[] transformCaretSize(int x, int y) {
+		// Map coordinates on window to canvas
+		int w, h;
+		if (rotation % 2 == 1) {
+			w = getHeight();
+			h = getWidth();
+			x = (int) (x / ((float) w / screenWidth));
+			y = (int) (y / ((float) h / screenHeight));
+		} else {
+			w = getWidth();
+			h = getHeight();
+			x = (int) (x / ((float) w / screenWidth));
+			y = (int) (y / ((float) h / screenHeight));
+		}
+		int tmp;
+		switch (this.rotation) {
+			case 0:
+				break;
+			case 1:
+				tmp = x;
+				x = y;
+				y = w - tmp;
+				break;
+			case 2:
+				x = w - x;
+				y = h - y;
+				break;
+			case 3:
+				tmp = x;
+				x = h - y;
+				y = tmp;
+		}
+		return new int[]{x, y};
+	}
+
 	public void mouseDown(final MouseEvent mouseEvent) {
 		if (this.infosEnabled && !this.mouseDownInfos) {
 			this.mouseXPress = mouseEvent.x;
