@@ -86,6 +86,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		final Instance c;
 		(c = (Instance) this.table.get(this.aString551))
 				.method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
+		updateTitle(c);
 		this.aTree554.removeAll();
 		for (int i = 0; i < c.getFields().size(); ++i) {
 			final Object value;
@@ -104,6 +105,19 @@ public final class Watcher implements Runnable, DisposeListener {
 				if (this.type == 0) {
 					this.aTree554.getItem(i).setText(2, value.getClass().getName());
 				}
+			}
+		}
+	}
+
+	private void updateTitle(Instance c) {
+		if (type == 0) {
+			Object o = c.getInstance();
+			if (o != null) {
+				String s = o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
+				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (" + s + ')');
+			} else {
+				String s = c.getCls().getName();
+				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (static " + s + ')');
 			}
 		}
 	}
@@ -261,7 +275,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		int x, y;
 		switch (this.type) {
 			case 0: {
-				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
+//				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
 				if (parent != null) {
 					x = parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x) / 2;
 					y = parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y) / 2;
