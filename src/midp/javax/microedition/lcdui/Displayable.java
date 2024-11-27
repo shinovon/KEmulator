@@ -193,6 +193,9 @@ public class Displayable {
 	}
 
 	public boolean handleSoftKeyAction(final int n, final boolean b) {
+		if (cmdListener == null && this instanceof Canvas) {
+			return false;
+		}
 		if (KeyMapping.isLeftSoft(n)) {
 			if (menuCommands.size() > 1) {
 				if (b && this.menuShown) {
