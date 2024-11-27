@@ -132,13 +132,13 @@ public class StringItem extends Item {
 		} else {
 			labelArr = null;
 		}
+		textArr = c.textArr(text, font, availableWidth, maxWidth, maxw);
 		final int fh = font.getHeight() + 4;
 		if (mode == BUTTON) {
 			width = Math.max(w, Math.min(maxWidth, font.stringWidth(textArr[0]) + 10));
 			textArr = new String[] { textArr[0] };
 			bounds[H] = fh + (hasLabel() ? Item.font.getHeight() + 4 : 0);
 		} else {
-			textArr = c.textArr(text, font, availableWidth, maxWidth, maxw);
 			width = Math.max(w, textArr.length != 0 ? maxw[0] + 4 : 4);
 			bounds[H] = fh * textArr.length
 					+ (labelArr != null ? (Item.font.getHeight() + 4) * labelArr.length : 0);
