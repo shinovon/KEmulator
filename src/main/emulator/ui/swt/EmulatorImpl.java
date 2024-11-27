@@ -121,7 +121,7 @@ public final class EmulatorImpl implements IEmulator {
 		this.ilogstream.dispose();
 		this.sms.dispose();
 		this.infos.dispose();
-		Settings.showMemViewFrame = this.memoryView.isShown();
+		Settings.showMemViewFrame = memoryView != null && this.memoryView.isShown();
 		this.methods.dispose();
 		if (memoryView != null) this.memoryView.dispose();
 		this.classWatcher.dispose();

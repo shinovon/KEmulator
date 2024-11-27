@@ -121,20 +121,25 @@ public class StringItem extends Item {
 
 		int[] maxw = new int[1];
 		int w = 0;
-		if (hasLabel() && mode != BUTTON) {
-			labelArr = c.textArr(label, Item.font, maxWidth, maxWidth, maxw);
-			if (labelArr.length != 0) w = maxw[0] + 4;
+		if (hasLabel()) {
+			if (mode == BUTTON) {
+				String[] a = c.textArr(label.trim(), Item.font, maxWidth, maxWidth, maxw);
+				if (a.length != 0) w = Item.font.stringWidth(a[0].trim());
+			} else {
+				labelArr = c.textArr(label, Item.font, maxWidth, maxWidth, maxw);
+				if (labelArr.length != 0) w = maxw[0] + 4;
+			}
 		} else {
 			labelArr = null;
 		}
 		textArr = c.textArr(text, font, availableWidth, maxWidth, maxw);
-		width = Math.max(w, textArr.length != 0 ? maxw[0] + 4 : 4);
 		final int fh = font.getHeight() + 4;
 		if (mode == BUTTON) {
-			width = Math.min(maxWidth, font.stringWidth(textArr[0]) + 10);
+			width = Math.max(w, Math.min(maxWidth, font.stringWidth(textArr[0]) + 10));
 			textArr = new String[] { textArr[0] };
 			bounds[H] = fh + (hasLabel() ? Item.font.getHeight() + 4 : 0);
 		} else {
+			width = Math.max(w, textArr.length != 0 ? maxw[0] + 4 : 4);
 			bounds[H] = fh * textArr.length
 					+ (labelArr != null ? (Item.font.getHeight() + 4) * labelArr.length : 0);
 		}
