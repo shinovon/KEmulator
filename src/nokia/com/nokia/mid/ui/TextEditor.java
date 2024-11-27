@@ -125,7 +125,9 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public void setCaret(int index) {
-		// TODO
+		if (iFocused) {
+			Emulator.getEmulator().getScreen().getCaret().setCaret(index);
+		}
 	}
 
 	public int getCaretPosition() {
@@ -240,11 +242,15 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public void setSelection(int index, int length) {
-
+		if (iFocused) {
+			Emulator.getEmulator().getScreen().getCaret().setSelection(index, length);
+		}
 	}
 
 	public String getSelection() {
-		// TODO
+		if (iFocused) {
+			return Emulator.getEmulator().getScreen().getCaret().getSelection();
+		}
 		return null;
 	}
 

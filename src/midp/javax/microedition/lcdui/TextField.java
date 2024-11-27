@@ -39,7 +39,7 @@ public class TextField extends Item {
 
 	public void setString(final String aString25) {
 		this.string = aString25;
-		if (focused && !_isUneditable())
+		if (focused)
 			Emulator.getEmulator().getScreen().getCaret().updateText(this, string);
 		layoutForm();
 	}
@@ -95,7 +95,7 @@ public class TextField extends Item {
 	}
 
 	public int getCaretPosition() {
-		if (!focused || _isUneditable()) return 0;
+		if (!focused) return 0;
 		return Emulator.getEmulator().getScreen().getCaret().getCaretPosition();
 	}
 
@@ -112,21 +112,19 @@ public class TextField extends Item {
 
 	void focus() {
 		super.focus();
-		if (!_isUneditable())
-			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
+		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		updateFocus = true;
 	}
 
 	void defocus() {
-		if (!_isUneditable() && (focused || !updateFocus))
+		if (focused || !updateFocus)
 			Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		super.defocus();
 		updateFocus = true;
 	}
 
 	void hidden() {
-		if (_isUneditable()) return;
-		if (!_isUneditable() && (focused || !updateFocus))
+		if (focused || !updateFocus)
 			Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		updateFocus = true;
 	}
@@ -149,7 +147,7 @@ public class TextField extends Item {
 		g.drawRect(x + 2, yo, w - 4, bounds[H] - yo + y - 2);
 		g.setFont(Screen.font);
 		if (focused) g.setColor(8617456);
-		if ((caretX != x + 3 || caretY != yo + 1 || updateFocus) && focused && !_isUneditable()) {
+		if ((caretX != x + 3 || caretY != yo + 1 || updateFocus) && focused) {
 			updateFocus = false;
 			caretX = x + 3;
 			caretY = yo + 1;

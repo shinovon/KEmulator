@@ -48,7 +48,38 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public final int getCaretPosition() {
-		return this.caretPosition;
+		EmulatorImpl.syncExec( new Runnable() {
+			public void run() {
+				try {
+					caretPosition = swtText.getCaretPosition();
+				} catch (Exception ignored) {}
+			}
+		});
+		return caretPosition;
+	}
+
+	public final String getSelection() {
+		return swtText.getSelectionText();
+	}
+
+	public void setCaret(final int index) {
+		EmulatorImpl.syncExec( new Runnable() {
+			public void run() {
+				try {
+					swtText.setSelection(index);
+				} catch (Exception ignored) {}
+			}
+		});
+	}
+
+	public void setSelection(final int index, final int length) {
+		EmulatorImpl.syncExec( new Runnable() {
+			public void run() {
+				try {
+					swtText.setSelection(index, length);
+				} catch (Exception ignored) {}
+			}
+		});
 	}
 
 	public final void a(Transform paramTransform, int paramInt) {
