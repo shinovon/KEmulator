@@ -43,6 +43,9 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.17.5 [2024.11.27]
+Bug fixes
+
 $v2.17.4 [2024.11.23]
 Fixed critical bug in HttpConnection after v17.3
 Changed commands placement
