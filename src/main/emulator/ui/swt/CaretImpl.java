@@ -146,7 +146,10 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 					swtCaret.setVisible(false);
 					swtText.setVisible(true);
 					swtText.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
-					swtText.setText(item instanceof TextField ? ((TextField) item).getString() : ((TextEditor) item).getContent());
+
+					try {
+						swtText.setText(item instanceof TextField ? ((TextField) item).getString() : ((TextEditor) item).getContent());
+					} catch (Exception ignored) {}
 					swtText.setFocus();
 				}
 				setWindowZoom(zoom);
@@ -178,7 +181,9 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		if (item != this.item) return;
 		EmulatorImpl.syncExec(new Runnable() {
 			public final void run() {
-				swtText.setText(text);
+				try {
+					swtText.setText(text);
+				} catch (Exception ignored) {}
 			}
 		});
 	}
