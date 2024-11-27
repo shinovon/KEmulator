@@ -12,13 +12,15 @@ public final class FontSWT implements IFont {
 		this(s, n, n2, false);
 	}
 
-	public FontSWT(final String s, final int size, final int n2, boolean height) {
+	public FontSWT(final String s, int size, final int n2, boolean height) {
 		super();
+		size = Math.max(1, (int) (size * 0.75f) - 1);
 		this.font = new Font(null, s, size, n2);
 		metrics();
 		if (height && getHeight() != size) {
 			float f = ((float) charWidth('W') / (float) getHeight()) * (float) size;
 			font.dispose();
+			gc.dispose();
 			this.font = new Font(null, s, (int) f, n2);
 			metrics();
 		}
