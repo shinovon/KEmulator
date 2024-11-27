@@ -176,6 +176,7 @@ public final class CaretImpl implements ICaret {
 		String text = item instanceof TextEditor ? ((TextEditor) item).getContent() : ((TextField) item).getString();
 		Font font = item instanceof TextEditor ? ((TextEditor) item).getFont() : CaretImpl.font;
 		if (text == null) text = "";
+		if (caretPosition > text.length()) caretPosition = text.length();
 		String[] var4;
 		if ((var4 = c.textArr(text, font, w, w)) != null && this.caretRow >= 0 && this.caretRow < var4.length) {
 			int var5 = font.getHeight() + 4;
@@ -301,23 +302,21 @@ public final class CaretImpl implements ICaret {
 					if (character >= 32 && text.length() < max) {
 						try {
 							text = text.substring(0, this.caretPosition) + character + text.substring(this.caretPosition);
-							if (character != 32 || text.charAt(this.caretPosition + 1) == 32) {
-								if (this.caretCol == var7 && this.caretRow < var4.length - 1) {
-									++this.caretRow;
-									var7 = (var6 = var4[this.caretRow]).length();
-									this.caretCol = 0;
-									var8 = var6.substring(0, this.caretCol);
-									var6.substring(this.caretCol, var7);
-								}
+							if (this.caretCol == var7 && this.caretRow < var4.length - 1) {
+								++this.caretRow;
+								var7 = (var6 = var4[this.caretRow]).length();
+								this.caretCol = 0;
+								var8 = var6.substring(0, this.caretCol);
+								var6.substring(this.caretCol, var7);
+							}
 
-								var8 = var8 + character;
-								++this.caretCol;
-								if (font.stringWidth(var8) > w) {
-									var9 = "";
-									var8 = var9 + character;
-									this.caretCol = 1;
-									++this.caretRow;
-								}
+							var8 = var8 + character;
+							++this.caretCol;
+							if (font.stringWidth(var8) > w) {
+								var9 = "";
+								var8 = var9 + character;
+								this.caretCol = 1;
+								++this.caretRow;
 							}
 						} catch (Exception ignored) {}
 					}
