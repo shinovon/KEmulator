@@ -260,12 +260,12 @@ public class Render {
 		program.use();
 
 		BG_VBO.rewind();
-		glVertexAttribPointer(program.aPosition, 2, false, 4 * 4, BG_VBO);
+		glVertexAttribPointer(program.aPosition, 2, GL_FLOAT, false, 4 * 4, BG_VBO);
 		glEnableVertexAttribArray(program.aPosition);
 
 		// координаты текстур
 		BG_VBO.position(2);
-		glVertexAttribPointer(program.aTexture, 2, false, 4 * 4, BG_VBO);
+		glVertexAttribPointer(program.aTexture, 2, GL_FLOAT, false, 4 * 4, BG_VBO);
 		glEnableVertexAttribArray(program.aTexture);
 
 		if (preProcess) {
@@ -608,7 +608,7 @@ public class Render {
 			program.setLight(node.light);
 			program.setToonShading(node.attrs, node.toonThreshold, node.toonHigh, node.toonLow);
 
-			glVertexAttribPointer(program.aNormal, 3, false, 3 * 4, (FloatBuffer) node.normals.rewind());
+			glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.normals.rewind());
 			glEnableVertexAttribArray(program.aNormal);
 		} else {
 			glVertexAttrib2f(program.aMaterial, 0, 0);
@@ -618,7 +618,7 @@ public class Render {
 
 		program.bindMatrices(MVP_TMP, node.viewMatrix);
 
-		glVertexAttribPointer(program.aPosition, 3, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
+		glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
 		glEnableVertexAttribArray(program.aPosition);
 
 		if ((command & PDATA_COLOR_MASK) == Graphics3D.PDATA_COLOR_PER_COMMAND) {
@@ -651,7 +651,7 @@ public class Render {
 			program.setLight(node.light);
 			program.setToonShading(node.attrs, node.toonThreshold, node.toonHigh, node.toonLow);
 
-			glVertexAttribPointer(program.aNormal, 3, false, 3 * 4, (FloatBuffer) node.normals.rewind());
+			glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.normals.rewind());
 			glEnableVertexAttribArray(program.aNormal);
 		} else {
 			glVertexAttrib3f(program.aMaterial, 0, 0, command & Graphics3D.PATTR_COLORKEY);
@@ -661,7 +661,7 @@ public class Render {
 
 		program.bindMatrices(MVP_TMP, node.viewMatrix);
 
-		glVertexAttribPointer(program.aPosition, 3, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
+		glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
 		glEnableVertexAttribArray(program.aPosition);
 
 		glVertexAttribPointer(program.aColorData, 2, GL_UNSIGNED_BYTE, false, 2, (ByteBuffer) node.texCoords.rewind());
@@ -1251,7 +1251,7 @@ public class Render {
 				Program.Sprite program = Program.sprite;
 				program.use();
 
-				glVertexAttribPointer(program.aPosition, 4, false, 4 * 4, (FloatBuffer) node.vertices.rewind());
+				glVertexAttribPointer(program.aPosition, 4, GL_FLOAT, false, 4 * 4, (FloatBuffer) node.vertices.rewind());
 				glEnableVertexAttribArray(program.aPosition);
 
 				glVertexAttribPointer(program.aColorData, 2, GL_UNSIGNED_BYTE, false, 2, (ByteBuffer) node.texCoords.rewind());
@@ -1275,7 +1275,7 @@ public class Render {
 		glVertexAttrib2f(program.aMaterial, 0, 0);
 		program.bindMatrices(MVP_TMP, node.viewMatrix);
 
-		glVertexAttribPointer(program.aPosition, 3, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
+		glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
 		glEnableVertexAttribArray(program.aPosition);
 
 		if ((node.command & PDATA_COLOR_MASK) == Graphics3D.PDATA_COLOR_PER_COMMAND) {

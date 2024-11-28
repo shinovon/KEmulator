@@ -1,8 +1,30 @@
 <component name="libraryTable">
   <library name="lwjgl">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/lwjgl.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/lwjgl_util.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-assimp-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-assimp-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-assimp.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-egl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-glfw-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-glfw-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-glfw.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-lwjglx.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-nanovg-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-nanovg-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-nanovg.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-opengl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-opengl-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-opengl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-opengles-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-opengles-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-opengles.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-stb-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-stb-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl-stb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl/lwjgl3-awt-0.1.8.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

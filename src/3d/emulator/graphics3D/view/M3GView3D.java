@@ -235,7 +235,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				Transform var7;
 				(var7 = new Transform()).set(var4);
 				var7.transpose();
-				GL11.glMultMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var7.getImpl()).m_matrix));
+				GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var7.getImpl()).m_matrix));
 			}
 
 			this.setupAppearance(var3, false);
@@ -366,9 +366,9 @@ public final class M3GView3D implements PaintListener, Runnable {
 					var6.transpose();
 					GL11.glViewport(var23, viewportHeight - var24 - var26, var25, var26);
 					GL11.glMatrixMode(5889);
-					GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
 					GL11.glMatrixMode(5888);
-					GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
 					GL11.glDisable(2896);
 					var27 = memoryBuffers.getImageBuffer(var1.getImage().getImageData());
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
@@ -416,40 +416,40 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 	public final boolean useContext(Canvas canvas) {
 		M3GView3D.canvas = canvas;
-		usePbuffer = !(canvas instanceof GLCanvas);
+		usePbuffer = !(canvas instanceof GLCanvas) || true;
 
-		if (!usePbuffer) {
-			if (useWgl) {
-				try {
-					IEmulatorPlatform pl = Emulator.getPlatform();
-					canvasHandle = ReflectUtil.getHandle(canvas);
-					long dc = pl.getDC(canvasHandle);
-					wglHandle = pl.createGLContext(dc, false);
-					pl.releaseDC(canvasHandle, dc);
-				} catch (Exception ignored) {}
-				if (wglHandle == 0) { // check if wgl failed
-					usePbuffer = true;
-					EmulatorImpl.syncExec(this);
-					return true;
-				}
-			}
-			setCurrent();
-			try {
-				GLContext.useContext(canvas);
-			} catch (Exception e) {
-				e.printStackTrace();
-				Emulator.getEmulator().getLogStream().println("useContext() error!!");
-				try {
-					GLContext.useContext(null);
-				} catch (Exception ignored) {}
-//                usePbuffer = true;
-//                EmulatorImpl.syncExec(this);
-//                return true;
-				return false;
-			}
-
-			hints();
-		}
+//		if (!usePbuffer) {
+//			if (useWgl) {
+//				try {
+//					IEmulatorPlatform pl = Emulator.getPlatform();
+//					canvasHandle = ReflectUtil.getHandle(canvas);
+//					long dc = pl.getDC(canvasHandle);
+//					wglHandle = pl.createGLContext(dc, false);
+//					pl.releaseDC(canvasHandle, dc);
+//				} catch (Exception ignored) {}
+//				if (wglHandle == 0) { // check if wgl failed
+//					usePbuffer = true;
+//					EmulatorImpl.syncExec(this);
+//					return true;
+//				}
+//			}
+//			setCurrent();
+//			try {
+//				GLContext.useContext(canvas);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				Emulator.getEmulator().getLogStream().println("useContext() error!!");
+//				try {
+//					GLContext.useContext(null);
+//				} catch (Exception ignored) {}
+////                usePbuffer = true;
+////                EmulatorImpl.syncExec(this);
+////                return true;
+//				return false;
+//			}
+//
+//			hints();
+//		}
 
 		if (usePbuffer) {
 			EmulatorImpl.syncExec(this);
@@ -483,7 +483,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 		}
 	}
 
-	public final void setCurrent(int w, int h) throws LWJGLException {
+	public final void setCurrent(int w, int h) throws Exception {
 		if (!usePbuffer) {
 			setCurrent();
 			return;
@@ -571,13 +571,15 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 	public static void releaseContext() {
 		try {
-			GLContext.useContext(null);
+			if (usePbuffer)
+				pbufferContext.releaseContext();
+//			GLContext.useContext(null);
 		} catch (Exception ignored) {}
-		if (useWgl) {
-			try {
-				Emulator.getPlatform().deleteGLContext(wglHandle);
-			} catch (Exception ignored) {}
-		}
+//		if (useWgl) {
+//			try {
+//				Emulator.getPlatform().deleteGLContext(wglHandle);
+//			} catch (Exception ignored) {}
+//		}
 	}
 
 	public static void setCamera(Camera var0, Transform var1) {
@@ -732,16 +734,16 @@ public final class M3GView3D implements PaintListener, Runnable {
 			float[] tmpCol = new float[4];
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.AMBIENT));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_AMBIENT, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, memoryBuffers.getFloatBuffer(tmpCol));
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.DIFFUSE));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, memoryBuffers.getFloatBuffer(tmpCol));
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.EMISSIVE));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_EMISSION, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, memoryBuffers.getFloatBuffer(tmpCol));
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.SPECULAR));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, memoryBuffers.getFloatBuffer(tmpCol));
 
 			GL11.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat.getShininess());
 
@@ -766,7 +768,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			float[] fogColor = new float[4];
 			G3DUtils.fillFloatColor(fogColor, fog.getColor());
 			fogColor[3] = 1.0F;
-			GL11.glFog(GL_FOG_COLOR, memoryBuffers.getFloatBuffer(fogColor));
+			GL11.glFogfv(GL_FOG_COLOR, memoryBuffers.getFloatBuffer(fogColor));
 
 			GL11.glFogf(GL_FOG_START, fog.getNearDistance());
 			GL11.glFogf(GL_FOG_END, fog.getFarDistance());
@@ -795,9 +797,9 @@ public final class M3GView3D implements PaintListener, Runnable {
 			GL11.glEnableClientState(GL_NORMAL_ARRAY);
 			glEnable(GL_NORMALIZE);
 			if (normals.getComponentType() == 1) {
-				GL11.glNormalPointer(0, memoryBuffers.getNormalBuffer(normals.getByteValues()));
+				GL11.glNormalPointer(0, GL_BYTE,memoryBuffers.getNormalBuffer(normals.getByteValues()));
 			} else {
-				GLExtensions.glNormalPointer(0, memoryBuffers.getNormalBuffer(normals.getShortValues()));
+				GL11.glNormalPointer(0, GL_SHORT, memoryBuffers.getNormalBuffer(normals.getShortValues()));
 			}
 		} else {
 			GL11.glDisableClientState(GL_NORMAL_ARRAY);
@@ -808,10 +810,10 @@ public final class M3GView3D implements PaintListener, Runnable {
 		GL11.glEnableClientState(GL_VERTEX_ARRAY);
 		if (positions.getComponentType() == 1) {
 			byte[] posesBArr = positions.getByteValues();
-			GL11.glVertexPointer(positions.getComponentCount(), 0, memoryBuffers.getVertexBuffer(posesBArr));
+			GL11.glVertexPointer(positions.getComponentCount(), GL_BYTE, 0, memoryBuffers.getVertexBuffer(posesBArr));
 		} else {
 			short[] posesSArr = positions.getShortValues();
-			GL11.glVertexPointer(positions.getComponentCount(), 0, memoryBuffers.getVertexBuffer(posesSArr));
+			GL11.glVertexPointer(positions.getComponentCount(), GL_SHORT, 0, memoryBuffers.getVertexBuffer(posesSArr));
 		}
 
 		GL11.glMatrixMode(GL_MODELVIEW);
@@ -943,14 +945,14 @@ public final class M3GView3D implements PaintListener, Runnable {
 				} else {
 					texCoordBuffer = memoryBuffers.getTexCoordBuffer(texCoords.getShortValues(), i);
 				}
-				GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, texCoordBuffer);
+				GL11.glTexCoordPointer(texCoords.getComponentCount(), GL_SHORT, 0, texCoordBuffer);
 
 				Transform tmpMat = new Transform();
 				texture2D.getCompositeTransform(tmpMat);
 				tmpMat.transpose();
 
 				GL11.glMatrixMode(GL_TEXTURE);
-				GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+				GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 				GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
 				GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 			}
@@ -997,12 +999,12 @@ public final class M3GView3D implements PaintListener, Runnable {
 			camera.getProjection(tmpMat);
 			tmpMat.transpose();
 			GL11.glMatrixMode(GL_PROJECTION);
-			GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+			GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
 			tmpMat.set(cameraTransform);
 			tmpMat.transpose();
 			GL11.glMatrixMode(GL_MODELVIEW);
-			GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+			GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 		}
 	}
 
@@ -1040,7 +1042,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 			GL11.glPushMatrix();
 			GL11.glMatrixMode(GL_MODELVIEW);
-			GL11.glMultMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+			GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
 			int lightId = GL_LIGHT0 + usedLights;
 			usedLights++;
@@ -1048,9 +1050,9 @@ public final class M3GView3D implements PaintListener, Runnable {
 			float[] lightColor = new float[]{0, 0, 0, 1}; //rgba
 
 			//Set default light preferences?
-			GL11.glLight(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
-			GL11.glLight(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
-			GL11.glLight(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
+			GL11.glLightfv(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
+			GL11.glLightfv(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
+			GL11.glLightfv(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
 
 			GL11.glLightf(lightId, GL_CONSTANT_ATTENUATION, 1.0F);
 			GL11.glLightf(lightId, GL_LINEAR_ATTENUATION, 0.0F);
@@ -1065,7 +1067,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				tmpLightPos = LightsCache.LOCAL_ORIGIN;
 			}
 
-			GL11.glLight(lightId, GL_POSITION, memoryBuffers.getFloatBuffer(tmpLightPos));
+			GL11.glLightfv(lightId, GL_POSITION, memoryBuffers.getFloatBuffer(tmpLightPos));
 
 			G3DUtils.fillFloatColor(lightColor, light.getColor());
 			float lightIntensity = light.getIntensity();
@@ -1077,14 +1079,14 @@ public final class M3GView3D implements PaintListener, Runnable {
 			int lightMode = light.getMode();
 
 			if (lightMode == Light.AMBIENT) {
-				GL11.glLight(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
+				GL11.glLightfv(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
 			} else {
-				GL11.glLight(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
-				GL11.glLight(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
+				GL11.glLightfv(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
+				GL11.glLightfv(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
 			}
 
 			if (lightMode == Light.SPOT) {
-				GL11.glLight(lightId, GL_SPOT_DIRECTION, memoryBuffers.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
+				GL11.glLightfv(lightId, GL_SPOT_DIRECTION, memoryBuffers.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
 				GL11.glLightf(lightId, GL_SPOT_CUTOFF, light.getSpotAngle());
 				GL11.glLightf(lightId, GL_SPOT_EXPONENT, light.getSpotExponent());
 			}
