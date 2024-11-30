@@ -712,7 +712,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			GL11.glEnableClientState(GL_COLOR_ARRAY);
 			if (colors.getComponentType() == 1) {
 				byte[] colorsBArr = colors.getByteValues();
-				GL11.glColorPointer(alphaFactor == 1.0F ? colors.getComponentCount() : 4, 5121, 0, memoryBuffers.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount()));
+				GL11.glColorPointer(alphaFactor == 1.0F ? colors.getComponentCount() : 4, GL_UNSIGNED_BYTE, 0, memoryBuffers.getColorBuffer(colorsBArr, alphaFactor, colors.getVertexCount()));
 			}
 		}
 
@@ -721,9 +721,9 @@ public final class M3GView3D implements PaintListener, Runnable {
 			GL11.glEnableClientState(GL_NORMAL_ARRAY);
 			glEnable(GL_NORMALIZE);
 			if (normals.getComponentType() == 1) {
-				GL11.glNormalPointer(0, GL_BYTE, memoryBuffers.getNormalBuffer(normals.getByteValues()));
+				GL11.glNormalPointer(GL_BYTE, 0, memoryBuffers.getNormalBuffer(normals.getByteValues()));
 			} else {
-				GL11.glNormalPointer(0, GL_SHORT, memoryBuffers.getNormalBuffer(normals.getShortValues()));
+				GL11.glNormalPointer(GL_SHORT, 0, memoryBuffers.getNormalBuffer(normals.getShortValues()));
 			}
 		} else {
 			GL11.glDisableClientState(GL_NORMAL_ARRAY);
@@ -734,7 +734,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 		GL11.glEnableClientState(GL_VERTEX_ARRAY);
 		if (positions.getComponentType() == 1) {
 			byte[] posesBArr = positions.getByteValues();
-			GL11.glVertexPointer(positions.getComponentCount(), GL_BYTE, 0, memoryBuffers.getVertexBuffer(posesBArr));
+			GL11.glVertexPointer(positions.getComponentCount(), GL_SHORT, 0, memoryBuffers.getVertexBuffer(posesBArr));
 		} else {
 			short[] posesSArr = positions.getShortValues();
 			GL11.glVertexPointer(positions.getComponentCount(), GL_SHORT, 0, memoryBuffers.getVertexBuffer(posesSArr));

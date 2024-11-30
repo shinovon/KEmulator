@@ -667,7 +667,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			n3 = n2;
 			floatBuffer = floatBuffer2;
 		}
-		GL11.glNormalPointer(n3, GL_FLOAT, floatBuffer);
+		GL11.glNormalPointer(GL_FLOAT, n3, floatBuffer);
 	}
 
 	public synchronized void glOrthof(final float n, final float n2, final float n3, final float n4, final float n5, final float n6) {

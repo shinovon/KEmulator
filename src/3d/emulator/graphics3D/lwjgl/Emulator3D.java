@@ -816,7 +816,7 @@ public final class Emulator3D implements IGraphics3D {
 		GL11.glEnableClientState(GL_VERTEX_ARRAY);
 		if (positions.getComponentType() == 1) {
 			byte[] posesBArr = positions.getByteValues();
-			GL11.glVertexPointer(positions.getComponentCount(), GL_BYTE, 0, memoryBuffers.getVertexBuffer(posesBArr));
+			GL11.glVertexPointer(positions.getComponentCount(), GL_SHORT, 0, memoryBuffers.getVertexBuffer(posesBArr));
 		} else {
 			short[] posesSArr = positions.getShortValues();
 			GL11.glVertexPointer(positions.getComponentCount(), GL_SHORT, 0, memoryBuffers.getVertexBuffer(posesSArr));
@@ -1012,10 +1012,10 @@ public final class Emulator3D implements IGraphics3D {
 			}
 		}
 
-//		int err = GL11.glGetError();
-//		if (err != GL11.GL_NO_ERROR) {
-//			Emulator.getEmulator().getLogStream().println("GL Error: " + err + " " + Util.translateGLErrorString(err));
-//		}
+		int err = GL11.glGetError();
+		if (err != GL11.GL_NO_ERROR) {
+			Emulator.getEmulator().getLogStream().println("GL Error: " + err);
+		}
 		if (exiting) {
 			releaseContext();
 			throw new IllegalStateException("exiting");
