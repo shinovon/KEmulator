@@ -4,14 +4,16 @@ import emulator.debug.Profiler3D;
 import emulator.graphics2D.awt.Graphics2DAWT;
 import emulator.graphics3D.*;
 
-import java.awt.*;
 import java.util.*;
 
 import emulator.*;
 import emulator.graphics3D.m3g.*;
+import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.EmulatorScreen;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.*;
 import org.lwjgl.opengl.*;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -22,8 +24,8 @@ import java.awt.image.*;
 import java.nio.*;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
-import javax.swing.JFrame;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
@@ -32,23 +34,18 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 public final class Emulator3D implements IGraphics3D {
 
 	private static Emulator3D instance;
-	private final LWJGLUtility memoryBuffers;
+	private final LWJGLUtil memoryBuffers;
 	private final RenderPipe renderPipe;
 	private Object target;
 	private boolean depthBufferEnabled;
 	private int hints;
 	private static int targetWidth;
 	private static int targetHeight;
-	private static Pbuffer pbufferContext;
 	private static ByteBuffer buffer;
 	private static BufferedImage awtBufferImage;
 	private static ImageData swtBufferImage;
 	public static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
 	private static final Hashtable properties = new Hashtable();
-	private static PixelFormat pixelFormat;
-	private long wglContextHandle;
-	private Image swtImage;
-	private GC swtGC;
 	private float depthRangeNear;
 	private float depthRangeFar;
 	private int viewportX;
@@ -68,13 +65,16 @@ public final class Emulator3D implements IGraphics3D {
 	public static final int MaxLights = 8;
 	public static final int MaxTransformsPerVertex = 4;
 	private boolean exiting;
-	private String contextRes;
 	private final Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
-	private static boolean useDisplay;
-	private static boolean useWgl;
 
-	private Canvas tmpCanvas;
 	private boolean flipImage;
+
+	private static Canvas glCanvas;
+	private static GLCapabilities capabilities;
+
+	private int lastWidth, lastHeight;
+	private static long window;
+	private boolean initialized;
 
 	private Emulator3D() {
 		instance = this;
@@ -95,7 +95,7 @@ public final class Emulator3D implements IGraphics3D {
 		properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
 		properties.put("version", "nnmod " + Emulator.version + (Emulator.revision.length() > 0 ? " (git: " + Emulator.revision + ")" : ""));
 
-		memoryBuffers = new LWJGLUtility();
+		memoryBuffers = new LWJGLUtil();
 		renderPipe = new RenderPipe();
 	}
 
@@ -105,37 +105,6 @@ public final class Emulator3D implements IGraphics3D {
 		}
 
 		return instance;
-	}
-
-	public static PixelFormat pixelFormat() {
-		if (pixelFormat == null) {
-			int samples = 4;
-			int bpp = Emulator.getEmulator().getScreenDepth();
-
-			while (true) {
-				try {
-					pixelFormat = new PixelFormat(bpp, 0, 24, 0, samples);
-					new Pbuffer(1, 1, pixelFormat, null, null).destroy();
-					break;
-				} catch (Exception e) {
-					if ((samples >>= 1) == 0) {
-						try {
-							pixelFormat = new PixelFormat(bpp, 0, 24, 0, 0);
-							new Pbuffer(1, 1, pixelFormat, null, null).destroy();
-						} catch (Exception e2) {
-							pixelFormat = new PixelFormat();
-						}
-						break;
-					}
-				}
-			}
-		}
-
-		return pixelFormat;
-	}
-
-	public static boolean isPbufferSupported() {
-		return !useDisplay && !useWgl;
 	}
 
 	public synchronized final void bindTarget(Object target) {
@@ -166,54 +135,70 @@ public final class Emulator3D implements IGraphics3D {
 		}
 
 		try {
-			String s = w + "x" + h;
-			if (useWgl) {
-				bindWgl(w, h);
-			} else if (useDisplay) {
-				if (contextRes != null && !contextRes.equals(s)) {
-					tmpCanvas.setBounds(0, 0, w, h);
-				}
-				contextRes = s;
-				Display.makeCurrent();
-			} else {
-				try {
-					if (contextRes != null && !contextRes.equals(s)) {
-						pbufferContext.makeCurrent();
-						releaseTextures();
-						pbufferContext.destroy();
-						pbufferContext = null;
+			if (!initialized) {
+				EmulatorImpl.syncExec(new Runnable() {
+					public void run() {
+						try {
+							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
+							glCanvas.setSize(w, h);
+							glCanvas.setVisible(false);
+						} catch (Exception e) {
+							e.printStackTrace();
+							glCanvas = null;
+						}
 					}
-					if (pbufferContext == null) {
-						pbufferContext = new Pbuffer(w, h, pixelFormat(), null);
-						contextRes = s;
-					}
+				});
 
-					pbufferContext.makeCurrent();
+				try {
+					if (glCanvas == null) throw new Exception();
+					GLCanvasUtil.makeCurrent(glCanvas);
+					capabilities = GL.createCapabilities();
 				} catch (Exception e) {
 					e.printStackTrace();
-					try {
-						// мега костыль
-						JFrame tmpFrame = new JFrame();
-						tmpCanvas = new Canvas();
-						tmpCanvas.setBounds(0, 0, w, h);
-						tmpFrame.add(tmpCanvas);
-						tmpFrame.pack();
-						tmpFrame.setVisible(true);
 
-						Display.setParent(tmpCanvas);
-						tmpFrame.setVisible(false);
-						Display.create(pixelFormat());
+					glCanvas.dispose();
+					glCanvas = null;
 
-						useDisplay = true;
-					} catch (Exception e2) {
-						e2.printStackTrace();
-						if (Emulator.isX64()) throw e2;
-						bindWgl(w, h);
-					}
+					System.out.println("Creating invisible glfw window");
+					if (!glfwInit())
+						throw new Exception("glfwInit");
+
+					glfwDefaultWindowHints();
+					glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+					glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
+					window = glfwCreateWindow(w, h, "M3G", 0, 0);
+					if (window == 0)
+						throw new Exception("Window creation failed");
+
+					glfwMakeContextCurrent(window);
+					capabilities = GL.createCapabilities();
+				}
+
+				System.out.println(GL11.glGetString(GL_VERSION));
+				System.out.println(GL11.glGetString(GL_VENDOR));
+				System.out.println(GL11.glGetString(GL_RENDERER));
+				initialized = true;
+			} else {
+				if (window != 0) {
+					glfwMakeContextCurrent(window);
+				} else {
+					GLCanvasUtil.makeCurrent(glCanvas);
 				}
 			}
 
 			if (targetWidth != w || targetHeight != h) {
+				if (glCanvas != null) {
+					EmulatorImpl.asyncExec(new Runnable() {
+						public void run() {
+							glCanvas.setSize(w, h);
+							glCanvas.setVisible(false);
+						}
+					});
+				} else {
+					glfwSetWindowSize(window, w, h);
+				}
 				if (Settings.g2d == 1) {
 					awtBufferImage = new BufferedImage(w, h, 4);
 				} else {
@@ -234,6 +219,7 @@ public final class Emulator3D implements IGraphics3D {
 		}
 	}
 
+
 	public synchronized void releaseTarget() {
 		Profiler3D.releaseTargetCallCount++;
 
@@ -250,66 +236,14 @@ public final class Emulator3D implements IGraphics3D {
 		}
 
 		this.target = null;
-		if (pbufferContext != null) {
-			try {
-				pbufferContext.releaseContext();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			this.releaseContext();
-		}
+		this.releaseContext();
 	}
 
 	public static boolean useGL11() {
-		return useWgl;
-	}
-
-	private void bindWgl(int var1, int var2) throws Exception {
-//		if (this.swtImage == null || this.swtImage.getBounds().width != var1 || this.swtImage.getBounds().height != var2) {
-//			if (this.swtImage != null) {
-//				this.swtImage.dispose();
-//				this.swtGC.dispose();
-//				Emulator.getPlatform().deleteGLContext(wglContextHandle);
-//			}
-//
-//			ImageData var3 = new ImageData(var1, var2, 32, swtPalleteData);
-//			this.swtImage = new Image(null, var3);
-//			this.swtGC = new GC(this.swtImage);
-//			this.wglContextHandle = Emulator.getPlatform().createGLContext(swtGC.handle, false);
-//			if (this.wglContextHandle == 0) {
-//				this.swtGC.dispose();
-//				this.swtImage.dispose();
-//				throw new IllegalArgumentException();
-//			}
-//		}
-//
-//		if (!Emulator.getPlatform().isGLContextCurrent(swtImage.handle)) {
-//			Emulator.getPlatform().setGLContextCurrent(this.swtGC.handle, this.wglContextHandle);
-//
-//			try {
-//				GLContext.useContext(this.swtImage);
-//			} catch (Exception var6) {
-//				throw new IllegalArgumentException();
-//			}
-//		}
-//		useWgl = true;
-		throw new IllegalArgumentException();
+		return !capabilities.OpenGL12;
 	}
 
 	private void releaseContext() {
-//		if (swtGC != null) try {
-//			Emulator.getPlatform().releaseGLContext(this.swtGC.handle);
-//		} catch (Throwable ignored) {}
-		if (useDisplay) {
-			try {
-				Display.releaseContext();
-			} catch (Exception ignored) {}
-			return;
-		}
-//		try {
-//			GLContext.useContext(null);
-//		} catch (Exception ignored) {}
 	}
 
 	public void swapBuffers() {
@@ -586,7 +520,7 @@ public final class Emulator3D implements IGraphics3D {
 			GL11.glDisable(GL_LIGHT0 + i);
 		}
 
-		if (!useGL11() && GLContext.getCapabilities().GL_ARB_color_buffer_float) {
+		if (!useGL11() && capabilities.GL_ARB_color_buffer_float) {
 			ARBColorBufferFloat.glClampColorARB(
 					ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
 					Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE
@@ -973,7 +907,7 @@ public final class Emulator3D implements IGraphics3D {
 							texFormat = GL_RGBA;
 					}
 
-					if (!useGL11() && GLContext.getCapabilities().OpenGL14)
+					if (!useGL11() && capabilities.OpenGL14)
 						GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
 
 					GL11.glTexImage2D(GL_TEXTURE_2D, 0,
@@ -1328,26 +1262,18 @@ public final class Emulator3D implements IGraphics3D {
 	public static void exit() {
 		if (instance == null)
 			return;
-		Emulator3D inst = instance;
-		if ((!useDisplay && pbufferContext == null) || inst.exiting) return;
-		inst.exiting = true;
-		synchronized (inst) {
-			if (useDisplay) {
-				try {
-					Display.makeCurrent();
-					inst.releaseTextures();
-					Display.releaseContext();
-//					Display.destroy();
-				} catch (Exception ignored) {}
-				return;
-			}
-			try {
-				// try to make context current
-				pbufferContext.makeCurrent();
-				inst.releaseTextures();
-				pbufferContext.destroy();
-				pbufferContext = null;
-			} catch (Exception ignored) {}
+		instance.dispose();
+	}
+
+	private synchronized void dispose() {
+		exiting = true;
+//		makeCurrent(context);
+//		releaseTextures();
+		if (glCanvas != null) {
+			glCanvas.dispose();
+		}
+		if (window != 0) {
+			glfwDestroyWindow(window);
 		}
 	}
 

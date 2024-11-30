@@ -1,8 +1,7 @@
 package emulator.ui.swt;
 
-import emulator.Emulator;
 import emulator.UILocale;
-import emulator.graphics3D.lwjgl.Emulator3D;
+import emulator.graphics3D.lwjgl.GLCanvasUtil;
 import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
@@ -18,8 +17,6 @@ import org.eclipse.swt.layout.*;
 import emulator.graphics3D.*;
 
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.opengl.GLCanvas;
-import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.*;
 
 public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyListener, MouseWheelListener {
@@ -285,9 +282,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		// TODO camera rotation
 
 		try {
-			if (!m3gview.isCurrent()) {
-				m3gview.setCurrent(this.aRectangle903.width, this.aRectangle903.height);
-			}
+			m3gview.setCurrent(this.aRectangle903.width, this.aRectangle903.height);
 			this.cameraTransform.setIdentity();
 			this.cameraTransform.postTranslate(this.cameraX, this.cameraY, this.cameraZ);
 			this.cameraTransform.postRotateQuat(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
@@ -458,26 +453,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.verticalAlignment = 4;
 		try {
-			if (!Emulator.os.startsWith("windows") && Emulator3D.isPbufferSupported()) throw new Exception();
-
-			GLData gld = new GLData();
-			gld.depthSize = Emulator.getEmulator().getScreenDepth();
-			gld.doubleBuffer = true;
-
-			int samples = 4;
-			while (true) {
-				try {
-					gld.samples = samples;
-					canvas = new GLCanvas(this.aComposite907, 264192, gld);
-					break;
-				} catch (Exception e) {
-					if ((samples >>= 1) == 0) {
-						gld.samples = samples;
-						canvas = new GLCanvas(this.aComposite907, 264192, gld);
-						break;
-					}
-				}
-			}
+			canvas = GLCanvasUtil.initGLCanvas(aComposite907, 264192, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (canvas != null) canvas.dispose();
@@ -839,7 +815,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		}
 
 		public final void run() {
-			M3GViewUI.method243(this.aClass90_1207, aClass90_1207.m3gview.useContext(aClass90_1207.canvas));
+			M3GViewUI.method243(this.aClass90_1207, aClass90_1207.m3gview.init(aClass90_1207.canvas));
 			while (aClass90_1207.canvas != null) {
 				if (aClass90_1207.canvas.isDisposed()) {
 					return;

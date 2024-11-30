@@ -7,8 +7,6 @@ import java.util.*;
 import org.lwjgl.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengles.GLES;
-import org.lwjgl.opengles.GLES20;
 
 import java.nio.*;
 

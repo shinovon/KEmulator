@@ -37,7 +37,6 @@ import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.lwjgl.Emulator3D;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.Util;
 import ru.woesss.j2me.micro3d.RenderNode.FigureNode;
 
 public class Render {
@@ -85,9 +84,8 @@ public class Render {
 	static void checkGlError(String glOperation) {
 		int error = glGetError();
 		if (error != GL_NO_ERROR) {
-			String s = Util.translateGLErrorString(error);
-			System.err.println(glOperation + ": glError " + s);
-			throw new RuntimeException(glOperation + ": glError " + s);
+			System.err.println(glOperation + ": glError " + error);
+			throw new RuntimeException(glOperation + ": glError " + error);
 		}
 	}
 

@@ -1,14 +1,13 @@
 package emulator.graphics3D.view;
 
 import emulator.Emulator;
-import emulator.IEmulatorPlatform;
-import emulator.ReflectUtil;
 import emulator.Settings;
 import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.lwjgl.LWJGLUtility;
+import emulator.graphics3D.lwjgl.GLCanvasUtil;
+import emulator.graphics3D.lwjgl.LWJGLUtil;
 import emulator.graphics3D.m3g.*;
 
 import java.nio.ByteBuffer;
@@ -42,19 +41,19 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.opengl.GLCanvas;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.*;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 public final class M3GView3D implements PaintListener, Runnable {
 	private static M3GView3D instance;
-	private LWJGLUtility memoryBuffers;
+	private LWJGLUtil memoryBuffers;
 	private RenderPipe renderPipe;
 	private boolean xray;
 	private int viewportWidth;
@@ -68,17 +67,16 @@ public final class M3GView3D implements PaintListener, Runnable {
 	private static Vector lights = new Vector();
 	private static Vector lightsTransforms = new Vector();
 	private static Canvas canvas;
-	private static Pbuffer pbufferContext;
 	private static ByteBuffer buffer;
 	private static ImageData bufferImage;
-	private static boolean usePbuffer;
-	private static boolean useWgl;
+	private GLCapabilities capabilities;
+	private static long window;
 
 	private M3GView3D() {
 		instance = this;
 		this.depthRangeNear = 0.0F;
 		this.depthRangeFar = 1.0F;
-		memoryBuffers = new LWJGLUtility();
+		memoryBuffers = new LWJGLUtil();
 		renderPipe = new RenderPipe();
 	}
 
@@ -414,46 +412,35 @@ public final class M3GView3D implements PaintListener, Runnable {
 		}
 	}
 
-	public final boolean useContext(Canvas canvas) {
+	public final boolean init(Canvas canvas) {
 		M3GView3D.canvas = canvas;
-		usePbuffer = !(canvas instanceof GLCanvas) || true;
 
-//		if (!usePbuffer) {
-//			if (useWgl) {
-//				try {
-//					IEmulatorPlatform pl = Emulator.getPlatform();
-//					canvasHandle = ReflectUtil.getHandle(canvas);
-//					long dc = pl.getDC(canvasHandle);
-//					wglHandle = pl.createGLContext(dc, false);
-//					pl.releaseDC(canvasHandle, dc);
-//				} catch (Exception ignored) {}
-//				if (wglHandle == 0) { // check if wgl failed
-//					usePbuffer = true;
-//					EmulatorImpl.syncExec(this);
-//					return true;
-//				}
-//			}
-//			setCurrent();
-//			try {
-//				GLContext.useContext(canvas);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				Emulator.getEmulator().getLogStream().println("useContext() error!!");
-//				try {
-//					GLContext.useContext(null);
-//				} catch (Exception ignored) {}
-////                usePbuffer = true;
-////                EmulatorImpl.syncExec(this);
-////                return true;
-//				return false;
-//			}
-//
-//			hints();
-//		}
+		try {
+			GLCanvasUtil.makeCurrent(canvas);
+			capabilities = GL.createCapabilities();
+		} catch (Exception e) {
+			if (window == 0) {
+				if (!glfwInit())
+					return false;
 
-		if (usePbuffer) {
-			EmulatorImpl.syncExec(this);
+				glfwDefaultWindowHints();
+				glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+				glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
+				Point size = canvas.getSize();
+
+				window = glfwCreateWindow(size.x, size.y, "M3GView", 0, 0);
+				if (window == 0)
+					return false;
+			}
+
+			glfwMakeContextCurrent(window);
+			capabilities = GL.createCapabilities();
 		}
+		System.out.println(GL11.glGetString(GL_VERSION));
+		System.out.println(GL11.glGetString(GL_VENDOR));
+		System.out.println(GL11.glGetString(GL_RENDERER));
+		hints();
 
 		return true;
 	}
@@ -468,41 +455,13 @@ public final class M3GView3D implements PaintListener, Runnable {
 		GL11.glEnable(GL_DITHER);
 	}
 
-	public final void setCurrent() {
-		if (useWgl) {
-			try {
-				if (!isCurrent()) {
-					IEmulatorPlatform pl = Emulator.getPlatform();
-					pl.setGLContextCurrent(pl.getDC(canvasHandle), wglHandle);
-				}
-			} catch (Exception ignored) {}
-			return;
-		}
-		if (!((GLCanvas) canvas).isCurrent()) {
-			((GLCanvas) canvas).setCurrent();
-		}
-	}
-
 	public final void setCurrent(int w, int h) throws Exception {
-		if (!usePbuffer) {
-			setCurrent();
-			return;
-		}
-		if (viewportWidth != w || viewportHeight != h) {
-			if (pbufferContext != null) {
-				pbufferContext.makeCurrent();
-				pbufferContext.destroy();
-			}
-			pbufferContext = null;
-		}
-		if (pbufferContext == null) {
+		if (viewportHeight != w || viewportHeight != h) {
 			viewportWidth = w;
 			viewportHeight = h;
-			pbufferContext = new Pbuffer(w, h, Emulator3D.pixelFormat(), null, null);
-			bufferImage = new ImageData(w, h, 32, Emulator3D.swtPalleteData);
-			buffer = BufferUtils.createByteBuffer(w * h * 4);
-			pbufferContext.makeCurrent();
-			hints();
+			if (window != 0) {
+				glfwSetWindowSize(window, w, h);
+			}
 		}
 	}
 
@@ -516,35 +475,8 @@ public final class M3GView3D implements PaintListener, Runnable {
 		}
 	}
 
-	public boolean isCurrent() {
-		if (useWgl) {
-			try {
-				IEmulatorPlatform pl = Emulator.getPlatform();
-				long dc = pl.getDC(canvasHandle);
-				boolean ret = pl.isGLContextCurrent(dc);
-				pl.releaseDC(canvasHandle, dc);
-				return ret;
-			} catch (Exception e) {
-				return false;
-			}
-		}
-		if (usePbuffer) {
-			return false;
-		}
-		return ((GLCanvas) canvas).isCurrent();
-	}
-
 	public void swapBuffers() {
-		if (useWgl) {
-			try {
-				IEmulatorPlatform pl = Emulator.getPlatform();
-				long dc = pl.getDC(canvasHandle);
-				pl.swapBuffers(dc);
-				pl.releaseDC(canvasHandle, dc);
-			} catch (Exception ignored) {}
-			return;
-		}
-		if (usePbuffer) {
+		if (window != 0) {
 			buffer.rewind();
 			GL11.glReadPixels(0, 0, viewportWidth, viewportHeight, 6408, 5121, buffer);
 			int var8 = bufferImage.width << 2;
@@ -558,7 +490,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			EmulatorImpl.syncExec(this);
 			return;
 		}
-		((GLCanvas) canvas).swapBuffers();
+		GLCanvasUtil.swapBuffers(canvas);
 	}
 
 	public void run() {
@@ -570,16 +502,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 	}
 
 	public static void releaseContext() {
-		try {
-			if (usePbuffer)
-				pbufferContext.releaseContext();
-//			GLContext.useContext(null);
-		} catch (Exception ignored) {}
-//		if (useWgl) {
-//			try {
-//				Emulator.getPlatform().deleteGLContext(wglHandle);
-//			} catch (Exception ignored) {}
-//		}
+		System.out.println("releaseContext");
 	}
 
 	public static void setCamera(Camera var0, Transform var1) {
@@ -797,7 +720,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			GL11.glEnableClientState(GL_NORMAL_ARRAY);
 			glEnable(GL_NORMALIZE);
 			if (normals.getComponentType() == 1) {
-				GL11.glNormalPointer(0, GL_BYTE,memoryBuffers.getNormalBuffer(normals.getByteValues()));
+				GL11.glNormalPointer(0, GL_BYTE, memoryBuffers.getNormalBuffer(normals.getByteValues()));
 			} else {
 				GL11.glNormalPointer(0, GL_SHORT, memoryBuffers.getNormalBuffer(normals.getShortValues()));
 			}
@@ -981,7 +904,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 		}
 		int err = GL11.glGetError();
 		if (err != GL11.GL_NO_ERROR) {
-			Emulator.getEmulator().getLogStream().println("M3GView GL Error: " + err + " " + Util.translateGLErrorString(err));
+			Emulator.getEmulator().getLogStream().println("M3GView GL Error: " + err);
 		}
 	}
 

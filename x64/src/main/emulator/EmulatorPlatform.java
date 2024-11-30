@@ -89,6 +89,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		System.setProperty("jna.nosys", "true");
 		System.setProperty("org.lwjgl.librarypath", Emulator.getAbsolutePath());
 		loadSWTLibrary();
+		loadLWJGLNatives();
 	}
 
 	public boolean supportsMascotCapsule() {
@@ -279,13 +280,12 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		if (os == null) {
 			throw new RuntimeException("unsupported os: " + osn);
 		}
-		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64")) {
+		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64") && !osa.contains("arm")) {
 			throw new RuntimeException("unsupported arch: " + osa);
 		}
-		String arch = osa.contains("amd64") ? "x86_64" : osa.contains("86") ? "x86" : osa;
-		String swtFileName = "swt-" + os + "-" + arch + ".jar";
+		String arch = osa.contains("amd64") ? "x86_64" : osa.contains("86") ? "x86" : osa.contains("arm") ? "armhf" : osa;
 		try {
-			addToClassPath(swtFileName);
+			addToClassPath("swt-" + os + "-" + arch + ".jar");
 		} catch (RuntimeException e) {
 			// Check if SWT is already loaded
 			try {
@@ -296,8 +296,34 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		}
 	}
 
+	private static void loadLWJGLNatives() {
+		String osn = System.getProperty("os.name").toLowerCase();
+		String osa = System.getProperty("os.arch").toLowerCase();
+		String os =
+				osn.contains("win") ? "windows" :
+						osn.contains("mac") ? "macos" :
+								osn.contains("linux") || osn.contains("nix") ? "linux" :
+										null;
+		if (os == null) {
+			return;
+		}
+		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64") && !osa.contains("arm")) {
+			return;
+		}
+		String arch = os + (osa.contains("amd64") ? "" : osa.contains("86") ? "-x86" : osa.contains("aarch64") ? "-arm64" : osa.contains("arm") ? "-arm32" : "");
+		try {
+			addToClassPath("lwjgl-natives-" + arch + ".jar");
+			addToClassPath("lwjgl-glfw-swt-natives-" + arch + ".jar");
+			addToClassPath("lwjgl-opengl-swt-natives-" + arch + ".jar");
+			addToClassPath("lwjgl3-swt-" + arch + ".jar");
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private static void addToClassPath(String s) {
 		try {
+			System.out.println("addToClassPath " + s);
 			Agent.addClassPath(new File(Emulator.getAbsolutePath() + File.separatorChar + s));
 		} catch (Exception e) {
 			throw new RuntimeException(s, e);
