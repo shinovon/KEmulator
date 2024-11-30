@@ -69,7 +69,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 	private static Canvas canvas;
 	private static ByteBuffer buffer;
 	private static ImageData bufferImage;
-	private GLCapabilities capabilities;
+	private static GLCapabilities capabilities;
 	private static long window;
 
 	private M3GView3D() {
@@ -419,6 +419,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			GLCanvasUtil.makeCurrent(canvas);
 			capabilities = GL.createCapabilities();
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (window == 0) {
 				if (!glfwInit())
 					return false;
@@ -909,7 +910,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 	}
 
 	private static boolean useGL11() {
-		return false;
+		return !capabilities.OpenGL12;
 //        return useSoftwareWgl;
 	}
 

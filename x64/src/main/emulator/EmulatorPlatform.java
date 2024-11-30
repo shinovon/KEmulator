@@ -313,8 +313,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		String arch = os + (osa.contains("amd64") ? "" : osa.contains("86") ? "-x86" : osa.contains("aarch64") ? "-arm64" : osa.contains("arm") ? "-arm32" : "");
 		try {
 			addToClassPath("lwjgl-natives-" + arch + ".jar");
-			addToClassPath("lwjgl-glfw-swt-natives-" + arch + ".jar");
-			addToClassPath("lwjgl-opengl-swt-natives-" + arch + ".jar");
+			addToClassPath("lwjgl-glfw-natives-" + arch + ".jar");
+			addToClassPath("lwjgl-opengl-natives-" + arch + ".jar");
 			addToClassPath("lwjgl3-swt-" + arch + ".jar");
 		} catch (RuntimeException e) {
 			e.printStackTrace();

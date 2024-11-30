@@ -157,8 +157,10 @@ public final class Emulator3D implements IGraphics3D {
 				} catch (Exception e) {
 					e.printStackTrace();
 
-					glCanvas.dispose();
-					glCanvas = null;
+					if (glCanvas != null) {
+						glCanvas.dispose();
+						glCanvas = null;
+					}
 
 					System.out.println("Creating invisible glfw window");
 					if (!glfwInit())
