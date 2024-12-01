@@ -516,11 +516,11 @@ public final class M3GView3D implements PaintListener, Runnable {
 	public static void releaseContext() {
 		if (window != 0) {
 			glfwMakeContextCurrent(0);
-		} else {
-			try {
-				GLCanvasUtil.releaseContext(canvas);
-			} catch (Exception e) {}
+			return;
 		}
+		try {
+			GLCanvasUtil.releaseContext(canvas);
+		} catch (Exception ignored) {}
 	}
 
 	public static void setCamera(Camera var0, Transform var1) {
@@ -776,8 +776,10 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 				Image2D image2D = texture2D.getImage();
 				scaleBias[3] = 0.0F;
-				GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
-				GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
+				if (!useGL11()) {
+					GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
+					GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
+				}
 
 				GL11.glEnable(GL_TEXTURE_2D);
 				GL11.glBindTexture(GL_TEXTURE_2D, var10.get(i));
@@ -823,7 +825,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 						texFormat = GL_RGBA;
 				}
 
-                /*if (!useGL11())
+                /*if (!useGL11() && capabilities.OpenGL14)
                     GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);*/
 
 				GL11.glTexImage2D(GL_TEXTURE_2D, 0,
@@ -833,10 +835,10 @@ public final class M3GView3D implements PaintListener, Runnable {
 				);
 
 				GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-						texture2D.getWrappingS() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+						texture2D.getWrappingS() == Texture2D.WRAP_CLAMP && !useGL11() ? GL_CLAMP_TO_EDGE : GL_REPEAT
 				);
 				GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-						texture2D.getWrappingT() == Texture2D.WRAP_CLAMP ? GL_CLAMP_TO_EDGE : GL_REPEAT
+						texture2D.getWrappingT() == Texture2D.WRAP_CLAMP && !useGL11() ? GL_CLAMP_TO_EDGE : GL_REPEAT
 				);
 
 				int levelFilter = texture2D.getLevelFilter();
@@ -903,12 +905,14 @@ public final class M3GView3D implements PaintListener, Runnable {
 				GL11.glDrawElements(GL_TRIANGLE_STRIP, memoryBuffers.getElementsBuffer(indexStrip));
 			}
 
-			for (int i = 0; i < Emulator3D.NumTextureUnits; ++i) {
-				if (GL11.glIsTexture(var10.get(i))) {
-					GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
-					GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
-					GL11.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-					GL11.glDisable(GL_TEXTURE_2D);
+			if (!useGL11()) {
+				for (int i = 0; i < Emulator3D.NumTextureUnits; ++i) {
+					if (GL11.glIsTexture(var10.get(i))) {
+						GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
+						GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
+						GL11.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+						GL11.glDisable(GL_TEXTURE_2D);
+					}
 				}
 			}
 
@@ -955,7 +959,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			GL11.glDisable(GL_LIGHT0 + i);
 		}
 
-		if (!useGL11()) {
+		if (!useGL11() && capabilities.GL_ARB_color_buffer_float) {
 			ARBColorBufferFloat.glClampColorARB(
 					ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
 					Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE

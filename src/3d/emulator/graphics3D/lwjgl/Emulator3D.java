@@ -272,11 +272,11 @@ public final class Emulator3D implements IGraphics3D {
 	private void releaseContext() {
 		if (window != 0) {
 			glfwMakeContextCurrent(0);
-		} else {
-			try {
-				GLCanvasUtil.releaseContext(glCanvas);
-			} catch (Exception e) {}
+			return;
 		}
+		try {
+			GLCanvasUtil.releaseContext(glCanvas);
+		} catch (Exception ignored) {}
 	}
 
 	public void swapBuffers() {
