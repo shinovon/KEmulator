@@ -72,7 +72,6 @@ public final class Emulator3D implements IGraphics3D {
 	private static Canvas glCanvas;
 	private static GLCapabilities capabilities;
 
-	private int lastWidth, lastHeight;
 	private static long window;
 	private boolean initialized;
 
@@ -136,6 +135,11 @@ public final class Emulator3D implements IGraphics3D {
 
 		try {
 			if (!initialized) {
+				Thread.dumpStack();
+
+				if (glCanvas != null) {
+					disposeGlCanvas();
+				}
 				EmulatorImpl.syncExec(new Runnable() {
 					public void run() {
 						try {
@@ -164,21 +168,22 @@ public final class Emulator3D implements IGraphics3D {
 					e.printStackTrace();
 
 					if (glCanvas != null) {
-						glCanvas.dispose();
-						glCanvas = null;
+						disposeGlCanvas();
 					}
 
-					System.out.println("Creating invisible glfw window");
-					if (!glfwInit())
-						throw new Exception("glfwInit");
+					if (window == 0) {
+						System.out.println("Creating invisible glfw window");
+						if (!glfwInit())
+							throw new Exception("glfwInit");
 
-					glfwDefaultWindowHints();
-					glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-					glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+						glfwDefaultWindowHints();
+						glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+						glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-					window = glfwCreateWindow(w, h, "M3G", 0, 0);
-					if (window == 0)
-						throw new Exception("Window creation failed");
+						window = glfwCreateWindow(w, h, "M3G", 0, 0);
+						if (window == 0)
+							throw new Exception("Window creation failed");
+					}
 
 					glfwMakeContextCurrent(window);
 					getCapabilities();
@@ -265,6 +270,13 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	private void releaseContext() {
+		if (window != 0) {
+			glfwMakeContextCurrent(0);
+		} else {
+			try {
+				GLCanvasUtil.releaseContext(glCanvas);
+			} catch (Exception e) {}
+		}
 	}
 
 	public void swapBuffers() {
@@ -1288,13 +1300,21 @@ public final class Emulator3D implements IGraphics3D {
 		instance.dispose();
 	}
 
+	private void disposeGlCanvas() {
+		if (glCanvas == null) return;
+		EmulatorImpl.syncExec(new Runnable() {
+			public void run() {
+				glCanvas.dispose();
+				glCanvas = null;
+			}
+		});
+	}
+
 	private synchronized void dispose() {
 		exiting = true;
 //		makeCurrent(context);
 //		releaseTextures();
-		if (glCanvas != null) {
-			glCanvas.dispose();
-		}
+		disposeGlCanvas();
 		if (window != 0) {
 			glfwDestroyWindow(window);
 		}

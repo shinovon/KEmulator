@@ -438,9 +438,6 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 			EmulatorImpl.syncExec(this);
 		}
-		System.out.println(GL11.glGetString(GL_VERSION));
-		System.out.println(GL11.glGetString(GL_VENDOR));
-		System.out.println(GL11.glGetString(GL_RENDERER));
 		hints();
 
 		return true;
@@ -517,7 +514,13 @@ public final class M3GView3D implements PaintListener, Runnable {
 	}
 
 	public static void releaseContext() {
-		System.out.println("releaseContext");
+		if (window != 0) {
+			glfwMakeContextCurrent(0);
+		} else {
+			try {
+				GLCanvasUtil.releaseContext(canvas);
+			} catch (Exception e) {}
+		}
 	}
 
 	public static void setCamera(Camera var0, Transform var1) {
