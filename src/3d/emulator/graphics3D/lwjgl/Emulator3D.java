@@ -142,8 +142,8 @@ public final class Emulator3D implements IGraphics3D {
 							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
 							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
 							glCanvas.setSize(w, h);
-							glCanvas.setVisible(false);
-						} catch (Exception e) {
+							glCanvas.setVisible(true);
+						} catch (Throwable e) {
 							e.printStackTrace();
 							glCanvas = null;
 						}
@@ -153,7 +153,12 @@ public final class Emulator3D implements IGraphics3D {
 				try {
 					if (glCanvas == null) throw new Exception();
 					GLCanvasUtil.makeCurrent(glCanvas);
-					capabilities = GL.createCapabilities();
+					getCapabilities();
+					EmulatorImpl.asyncExec(new Runnable() {
+						public void run() {
+							glCanvas.setVisible(false);
+						}
+					});
 				} catch (Exception e) {
 					e.printStackTrace();
 
@@ -175,7 +180,7 @@ public final class Emulator3D implements IGraphics3D {
 						throw new Exception("Window creation failed");
 
 					glfwMakeContextCurrent(window);
-					capabilities = GL.createCapabilities();
+					getCapabilities();
 				}
 
 				System.out.println(GL11.glGetString(GL_VERSION));
@@ -188,6 +193,7 @@ public final class Emulator3D implements IGraphics3D {
 				} else {
 					GLCanvasUtil.makeCurrent(glCanvas);
 				}
+				getCapabilities();
 			}
 
 			if (targetWidth != w || targetHeight != h) {
@@ -218,6 +224,18 @@ public final class Emulator3D implements IGraphics3D {
 			e.printStackTrace();
 			this.target = null;
 			throw new IllegalArgumentException();
+		}
+	}
+
+	private void getCapabilities() {
+		if (capabilities == null) {
+			capabilities = GL.createCapabilities();
+		} else {
+			try {
+				capabilities = GL.getCapabilities();
+			} catch (Exception e) {
+				capabilities = GL.createCapabilities();
+			}
 		}
 	}
 
@@ -254,6 +272,12 @@ public final class Emulator3D implements IGraphics3D {
 
 	public final void swapBuffers(boolean flip, int x, int y, int width, int height) {
 		Profiler3D.LWJGL_buffersSwapCount++;
+
+		if (window != 0) {
+			glfwSwapBuffers(window);
+		} else {
+			GLCanvasUtil.swapBuffers(glCanvas);
+		}
 
 		if (this.target != null) {
 			if (this.target instanceof Image2D) {
@@ -1015,10 +1039,6 @@ public final class Emulator3D implements IGraphics3D {
 		int err = GL11.glGetError();
 		if (err != GL11.GL_NO_ERROR) {
 			Emulator.getEmulator().getLogStream().println("GL Error: " + err);
-		}
-		if (exiting) {
-			releaseContext();
-			throw new IllegalStateException("exiting");
 		}
 	}
 

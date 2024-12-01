@@ -417,7 +417,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 		try {
 			GLCanvasUtil.makeCurrent(canvas);
-			capabilities = GL.createCapabilities();
+			getCapabilities();
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (window == 0) {
@@ -428,15 +428,15 @@ public final class M3GView3D implements PaintListener, Runnable {
 				glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 				glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-				Point size = canvas.getSize();
-
-				window = glfwCreateWindow(size.x, size.y, "M3GView", 0, 0);
+				window = glfwCreateWindow(400, 300, "M3GView", 0, 0);
 				if (window == 0)
 					return false;
 			}
 
 			glfwMakeContextCurrent(window);
-			capabilities = GL.createCapabilities();
+			getCapabilities();
+
+			EmulatorImpl.syncExec(this);
 		}
 		System.out.println(GL11.glGetString(GL_VERSION));
 		System.out.println(GL11.glGetString(GL_VENDOR));
@@ -444,6 +444,18 @@ public final class M3GView3D implements PaintListener, Runnable {
 		hints();
 
 		return true;
+	}
+
+	private void getCapabilities() {
+		if (capabilities == null) {
+			capabilities = GL.createCapabilities();
+		} else {
+			try {
+				capabilities = GL.getCapabilities();
+			} catch (Exception e) {
+				capabilities = GL.createCapabilities();
+			}
+		}
 	}
 
 	private void hints() {

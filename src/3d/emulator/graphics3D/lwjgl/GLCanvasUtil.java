@@ -1,6 +1,7 @@
 package emulator.graphics3D.lwjgl;
 
 import emulator.Emulator;
+import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -21,7 +22,8 @@ public class GLCanvasUtil {
             try {
                 System.out.println("Initializing eclipse GLCanvas");
                 org.eclipse.swt.opengl.GLData gld = new org.eclipse.swt.opengl.GLData();
-                gld.depthSize = Emulator.getEmulator().getScreenDepth();
+                gld.depthSize = Math.min(24, Emulator.getEmulator().getScreenDepth());
+                System.out.println("Depth: " + gld.depthSize + " (" + Emulator.getEmulator().getScreenDepth() + ")");
                 gld.doubleBuffer = true;
 
                 int samples = 4;
@@ -48,7 +50,8 @@ public class GLCanvasUtil {
         if (c == null) {
             System.out.println("Initializing lwjglx GLCanvas");
             org.lwjgl.opengl.swt.GLData gld = new org.lwjgl.opengl.swt.GLData();
-            gld.depthSize = Emulator.getEmulator().getScreenDepth();
+            gld.depthSize = Math.min(24, Emulator.getEmulator().getScreenDepth());
+            System.out.println("Depth: " + gld.depthSize + " (" + Emulator.getEmulator().getScreenDepth() + ")");
             gld.doubleBuffer = true;
 
             int samples = 4;

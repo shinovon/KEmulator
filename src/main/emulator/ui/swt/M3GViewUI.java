@@ -454,7 +454,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		layoutData.verticalAlignment = 4;
 		try {
 			canvas = GLCanvasUtil.initGLCanvas(aComposite907, 264192, 0);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			if (canvas != null) canvas.dispose();
 			canvas = new Canvas(this.aComposite907, 264192);
