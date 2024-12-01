@@ -473,6 +473,8 @@ public final class M3GView3D implements PaintListener, Runnable {
 			viewportWidth = w;
 			viewportHeight = h;
 			if (window != 0) {
+				bufferImage = new ImageData(w, h, 32, Emulator3D.swtPalleteData);
+				buffer = BufferUtils.createByteBuffer(w * h * 4);
 				glfwSetWindowSize(window, w, h);
 			}
 		}
