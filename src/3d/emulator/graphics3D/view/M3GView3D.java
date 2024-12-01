@@ -513,7 +513,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			canvas.addPaintListener(this);
 			return;
 		}
-		canvas.redraw();
+		if (!canvas.isDisposed()) canvas.redraw();
 	}
 
 	public static void releaseContext() {

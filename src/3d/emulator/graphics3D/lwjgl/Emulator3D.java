@@ -141,7 +141,7 @@ public final class Emulator3D implements IGraphics3D {
 						try {
 							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
 							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
-							glCanvas.setSize(w, h);
+							glCanvas.setSize(1, 1);
 							glCanvas.setVisible(true);
 						} catch (Throwable e) {
 							e.printStackTrace();
@@ -156,6 +156,7 @@ public final class Emulator3D implements IGraphics3D {
 					getCapabilities();
 					EmulatorImpl.asyncExec(new Runnable() {
 						public void run() {
+							glCanvas.setSize(w, h);
 							glCanvas.setVisible(false);
 						}
 					});

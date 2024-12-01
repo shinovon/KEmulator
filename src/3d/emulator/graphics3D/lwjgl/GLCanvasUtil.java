@@ -1,7 +1,6 @@
 package emulator.graphics3D.lwjgl;
 
 import emulator.Emulator;
-import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -15,7 +14,6 @@ public class GLCanvasUtil {
 	private static Method isCurrentMethod;
     private static Method swapBuffersMethod;
 
-    //
     public static Canvas initGLCanvas(Composite parent, int style, int type) throws Exception {
         Canvas c = null;
         if (type != 2) {
