@@ -446,12 +446,12 @@ public final class M3GView3D implements PaintListener, Runnable {
 	private void getCapabilities() {
 		if (capabilities == null) {
 			capabilities = GL.createCapabilities();
-		} else {
-			try {
-				capabilities = GL.getCapabilities();
-			} catch (Exception e) {
-				capabilities = GL.createCapabilities();
-			}
+			return;
+		}
+		try {
+			capabilities = GL.getCapabilities();
+		} catch (Exception e) {
+			capabilities = GL.createCapabilities();
 		}
 	}
 
@@ -490,7 +490,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 	public void swapBuffers() {
 		if (window != 0) {
 			buffer.rewind();
-			GL11.glReadPixels(0, 0, viewportWidth, viewportHeight, 6408, 5121, buffer);
+			GL11.glReadPixels(0, 0, viewportWidth, viewportHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 			int var8 = bufferImage.width << 2;
 			int var10 = bufferImage.data.length - var8;
 

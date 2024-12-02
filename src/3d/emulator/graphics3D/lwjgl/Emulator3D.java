@@ -10,6 +10,8 @@ import emulator.*;
 import emulator.graphics3D.m3g.*;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.*;
@@ -135,8 +137,6 @@ public final class Emulator3D implements IGraphics3D {
 
 		try {
 			if (!initialized) {
-				Thread.dumpStack();
-
 				if (glCanvas != null) {
 					disposeGlCanvas();
 				}
@@ -147,6 +147,9 @@ public final class Emulator3D implements IGraphics3D {
 							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
 							glCanvas.setSize(1, 1);
 							glCanvas.setVisible(true);
+							try {
+								GLCanvasUtil.releaseContext(glCanvas);
+							} catch (Exception ignored) {}
 						} catch (Throwable e) {
 							e.printStackTrace();
 							glCanvas = null;
@@ -158,9 +161,14 @@ public final class Emulator3D implements IGraphics3D {
 					if (glCanvas == null) throw new Exception();
 					GLCanvasUtil.makeCurrent(glCanvas);
 					getCapabilities();
-					EmulatorImpl.asyncExec(new Runnable() {
-						public void run() {
-							glCanvas.setSize(w, h);
+
+					glCanvas.addControlListener(new ControlListener() {
+						public void controlMoved(ControlEvent controlEvent) {
+						}
+
+						public void controlResized(ControlEvent controlEvent) {
+							if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
+							glCanvas.setSize(targetWidth, targetHeight);
 							glCanvas.setVisible(false);
 						}
 					});
@@ -236,12 +244,12 @@ public final class Emulator3D implements IGraphics3D {
 	private void getCapabilities() {
 		if (capabilities == null) {
 			capabilities = GL.createCapabilities();
-		} else {
-			try {
-				capabilities = GL.getCapabilities();
-			} catch (Exception e) {
-				capabilities = GL.createCapabilities();
-			}
+			return;
+		}
+		try {
+			capabilities = GL.getCapabilities();
+		} catch (Exception e) {
+			capabilities = GL.createCapabilities();
 		}
 	}
 
@@ -286,17 +294,17 @@ public final class Emulator3D implements IGraphics3D {
 	public final void swapBuffers(boolean flip, int x, int y, int width, int height) {
 		Profiler3D.LWJGL_buffersSwapCount++;
 
-		if (window != 0) {
-			glfwSwapBuffers(window);
-		} else {
-			GLCanvasUtil.swapBuffers(glCanvas);
-		}
+//		if (window != 0) {
+//			glfwSwapBuffers(window);
+//		} else if (glCanvas != null) {
+//			GLCanvasUtil.swapBuffers(glCanvas);
+//		}
 
 		if (this.target != null) {
 			if (this.target instanceof Image2D) {
 				Image2D var9 = (Image2D) this.target;
 				buffer.rewind();
-				GL11.glReadPixels(x, y, width, height, 6408, 5121, buffer);
+				GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 				byte[] var11 = new byte[width * height * 4];
 				int w = width << 2;
 				int off = var11.length - w;
