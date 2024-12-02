@@ -20,9 +20,8 @@ public class GLCanvasUtil {
 			try {
 				System.out.println("Initializing eclipse GLCanvas");
 				org.eclipse.swt.opengl.GLData gld = new org.eclipse.swt.opengl.GLData();
-				gld.depthSize = Math.min(24, Emulator.getEmulator().getScreenDepth());
-				System.out.println("Depth: " + gld.depthSize + " (" + Emulator.getEmulator().getScreenDepth() + ")");
-				gld.doubleBuffer = true;
+//				gld.depthSize = Math.min(24, Emulator.getEmulator().getScreenDepth());
+//				gld.doubleBuffer = true;
 
 				int samples = 4;
 				while (true) {
@@ -39,7 +38,6 @@ public class GLCanvasUtil {
 					}
 				}
 
-				System.out.println("Samples: " + samples);
 			} catch (Exception e) {
 				if (type == 1) throw e;
 				e.printStackTrace();
@@ -67,7 +65,7 @@ public class GLCanvasUtil {
 				}
 			}
 
-			System.out.println("Samples: " + samples);
+			releaseContext(c);
 		}
 
 		return c;

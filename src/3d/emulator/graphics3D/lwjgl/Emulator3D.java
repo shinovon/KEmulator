@@ -147,9 +147,6 @@ public final class Emulator3D implements IGraphics3D {
 							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
 							glCanvas.setSize(1, 1);
 							glCanvas.setVisible(true);
-							try {
-								GLCanvasUtil.releaseContext(glCanvas);
-							} catch (Exception ignored) {}
 						} catch (Throwable e) {
 							e.printStackTrace();
 							glCanvas = null;
@@ -162,14 +159,18 @@ public final class Emulator3D implements IGraphics3D {
 					GLCanvasUtil.makeCurrent(glCanvas);
 					getCapabilities();
 
-					glCanvas.addControlListener(new ControlListener() {
-						public void controlMoved(ControlEvent controlEvent) {
-						}
+					EmulatorImpl.syncExec(new Runnable() {
+						public void run() {
+							glCanvas.addControlListener(new ControlListener() {
+								public void controlMoved(ControlEvent controlEvent) {
+								}
 
-						public void controlResized(ControlEvent controlEvent) {
-							if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
-							glCanvas.setSize(targetWidth, targetHeight);
-							glCanvas.setVisible(false);
+								public void controlResized(ControlEvent controlEvent) {
+									if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
+									glCanvas.setSize(targetWidth, targetHeight);
+									glCanvas.setVisible(false);
+								}
+							});
 						}
 					});
 				} catch (Exception e) {
