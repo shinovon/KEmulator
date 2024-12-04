@@ -83,7 +83,7 @@ abstract class Program {
 
 		glLinkProgram(program);                  // create OpenGL program executables
 		IntBuffer status = BufferUtils.createIntBuffer(1);
-		glGetProgram(program, GL_LINK_STATUS, status);
+		glGetProgramiv(program, GL_LINK_STATUS, status);
 		if (status.get(0) == 0) {
 			String s = glGetProgramInfoLog(program, 512);
 			System.out.println("createProgram: " + s);
@@ -114,7 +114,7 @@ abstract class Program {
 		glShaderSource(shader, shaderCode);
 		glCompileShader(shader);
 		IntBuffer status = BufferUtils.createIntBuffer(1);
-		glGetShader(shader, GL_COMPILE_STATUS, status);
+		glGetShaderiv(shader, GL_COMPILE_STATUS, status);
 		if (status.get(0) == 0) {
 			String s = glGetShaderInfoLog(shader, 512);
 			System.out.println("loadShader: " + s);
@@ -224,8 +224,8 @@ abstract class Program {
 			for (float f: mv) mvBuffer.put(f);
 			mvBuffer.rewind();
 
-			glUniformMatrix4(uMatrix, false, mvpBuffer);
-			glUniformMatrix3(uNormalMatrix, false, mvBuffer);
+			glUniformMatrix4fv(uMatrix, false, mvpBuffer);
+			glUniformMatrix3fv(uNormalMatrix, false, mvBuffer);
 		}
 
 		void setSphere(TextureImpl sphere) {
@@ -338,8 +338,8 @@ abstract class Program {
 			for (float f: mv) mvBuffer.put(f);
 			mvBuffer.rewind();
 
-			glUniformMatrix4(uMatrix, false, mvpBuffer);
-			glUniformMatrix3(uNormalMatrix, false, mvBuffer);
+			glUniformMatrix4fv(uMatrix, false, mvpBuffer);
+			glUniformMatrix3fv(uNormalMatrix, false, mvBuffer);
 		}
 
 		void setSphere(TextureImpl sphere) {

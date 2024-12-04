@@ -4,14 +4,18 @@ import emulator.debug.Profiler3D;
 import emulator.graphics2D.awt.Graphics2DAWT;
 import emulator.graphics3D.*;
 
-import java.awt.*;
 import java.util.*;
 
 import emulator.*;
 import emulator.graphics3D.m3g.*;
+import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.EmulatorScreen;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.*;
 import org.lwjgl.opengl.*;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -22,8 +26,8 @@ import java.awt.image.*;
 import java.nio.*;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
-import javax.swing.JFrame;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
@@ -32,23 +36,18 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 public final class Emulator3D implements IGraphics3D {
 
 	private static Emulator3D instance;
-	private final LWJGLUtility memoryBuffers;
+	private final LWJGLUtil memoryBuffers;
 	private final RenderPipe renderPipe;
 	private Object target;
 	private boolean depthBufferEnabled;
 	private int hints;
 	private static int targetWidth;
 	private static int targetHeight;
-	private static Pbuffer pbufferContext;
 	private static ByteBuffer buffer;
 	private static BufferedImage awtBufferImage;
 	private static ImageData swtBufferImage;
 	public static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
 	private static final Hashtable properties = new Hashtable();
-	private static PixelFormat pixelFormat;
-	private long wglContextHandle;
-	private Image swtImage;
-	private GC swtGC;
 	private float depthRangeNear;
 	private float depthRangeFar;
 	private int viewportX;
@@ -68,13 +67,15 @@ public final class Emulator3D implements IGraphics3D {
 	public static final int MaxLights = 8;
 	public static final int MaxTransformsPerVertex = 4;
 	private boolean exiting;
-	private String contextRes;
 	private final Map<Integer, Image2D> texturesTable = new WeakHashMap<Integer, Image2D>();
-	private static boolean useDisplay;
-	private static boolean useWgl;
 
-	private Canvas tmpCanvas;
 	private boolean flipImage;
+
+	private static Canvas glCanvas;
+	private static GLCapabilities capabilities;
+
+	private static long window;
+	private boolean initialized;
 
 	private Emulator3D() {
 		instance = this;
@@ -95,7 +96,7 @@ public final class Emulator3D implements IGraphics3D {
 		properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
 		properties.put("version", "nnmod " + Emulator.version + (Emulator.revision.length() > 0 ? " (git: " + Emulator.revision + ")" : ""));
 
-		memoryBuffers = new LWJGLUtility();
+		memoryBuffers = new LWJGLUtil();
 		renderPipe = new RenderPipe();
 	}
 
@@ -105,37 +106,6 @@ public final class Emulator3D implements IGraphics3D {
 		}
 
 		return instance;
-	}
-
-	public static PixelFormat pixelFormat() {
-		if (pixelFormat == null) {
-			int samples = 4;
-			int bpp = Emulator.getEmulator().getScreenDepth();
-
-			while (true) {
-				try {
-					pixelFormat = new PixelFormat(bpp, 0, 24, 0, samples);
-					new Pbuffer(1, 1, pixelFormat, null, null).destroy();
-					break;
-				} catch (Exception e) {
-					if ((samples >>= 1) == 0) {
-						try {
-							pixelFormat = new PixelFormat(bpp, 0, 24, 0, 0);
-							new Pbuffer(1, 1, pixelFormat, null, null).destroy();
-						} catch (Exception e2) {
-							pixelFormat = new PixelFormat();
-						}
-						break;
-					}
-				}
-			}
-		}
-
-		return pixelFormat;
-	}
-
-	public static boolean isPbufferSupported() {
-		return !useDisplay && !useWgl;
 	}
 
 	public synchronized final void bindTarget(Object target) {
@@ -166,54 +136,92 @@ public final class Emulator3D implements IGraphics3D {
 		}
 
 		try {
-			String s = w + "x" + h;
-			if (useWgl) {
-				bindWgl(w, h);
-			} else if (useDisplay) {
-				if (contextRes != null && !contextRes.equals(s)) {
-					tmpCanvas.setBounds(0, 0, w, h);
+			if (!initialized) {
+				if (glCanvas != null) {
+					disposeGlCanvas();
 				}
-				contextRes = s;
-				Display.makeCurrent();
-			} else {
-				try {
-					if (contextRes != null && !contextRes.equals(s)) {
-						pbufferContext.makeCurrent();
-						releaseTextures();
-						pbufferContext.destroy();
-						pbufferContext = null;
+				EmulatorImpl.syncExec(new Runnable() {
+					public void run() {
+						try {
+							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
+							glCanvas.setSize(1, 1);
+							glCanvas.setVisible(true);
+						} catch (Throwable e) {
+							e.printStackTrace();
+							glCanvas = null;
+						}
 					}
-					if (pbufferContext == null) {
-						pbufferContext = new Pbuffer(w, h, pixelFormat(), null);
-						contextRes = s;
-					}
+				});
 
-					pbufferContext.makeCurrent();
+				try {
+					if (glCanvas == null) throw new Exception();
+					GLCanvasUtil.makeCurrent(glCanvas);
+					getCapabilities();
+
+					EmulatorImpl.syncExec(new Runnable() {
+						public void run() {
+							glCanvas.addControlListener(new ControlListener() {
+								public void controlMoved(ControlEvent controlEvent) {
+								}
+
+								public void controlResized(ControlEvent controlEvent) {
+									if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
+									glCanvas.setSize(targetWidth, targetHeight);
+									glCanvas.setVisible(false);
+								}
+							});
+						}
+					});
 				} catch (Exception e) {
 					e.printStackTrace();
-					try {
-						// мега костыль
-						JFrame tmpFrame = new JFrame();
-						tmpCanvas = new Canvas();
-						tmpCanvas.setBounds(0, 0, w, h);
-						tmpFrame.add(tmpCanvas);
-						tmpFrame.pack();
-						tmpFrame.setVisible(true);
 
-						Display.setParent(tmpCanvas);
-						tmpFrame.setVisible(false);
-						Display.create(pixelFormat());
-
-						useDisplay = true;
-					} catch (Exception e2) {
-						e2.printStackTrace();
-						if (Emulator.isX64()) throw e2;
-						bindWgl(w, h);
+					if (glCanvas != null) {
+						disposeGlCanvas();
 					}
+
+					if (window == 0) {
+						System.out.println("Creating invisible glfw window");
+						if (!glfwInit())
+							throw new Exception("glfwInit");
+
+						glfwDefaultWindowHints();
+						glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+						glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
+						window = glfwCreateWindow(w, h, "M3G", 0, 0);
+						if (window == 0)
+							throw new Exception("Window creation failed");
+					}
+
+					glfwMakeContextCurrent(window);
+					getCapabilities();
 				}
+
+				System.out.println(GL11.glGetString(GL_VERSION));
+				System.out.println(GL11.glGetString(GL_VENDOR));
+				System.out.println(GL11.glGetString(GL_RENDERER));
+				initialized = true;
+			} else {
+				if (window != 0) {
+					glfwMakeContextCurrent(window);
+				} else {
+					GLCanvasUtil.makeCurrent(glCanvas);
+				}
+				getCapabilities();
 			}
 
 			if (targetWidth != w || targetHeight != h) {
+				if (glCanvas != null) {
+					EmulatorImpl.asyncExec(new Runnable() {
+						public void run() {
+							glCanvas.setSize(w, h);
+							glCanvas.setVisible(false);
+						}
+					});
+				} else {
+					glfwSetWindowSize(window, w, h);
+				}
 				if (Settings.g2d == 1) {
 					awtBufferImage = new BufferedImage(w, h, 4);
 				} else {
@@ -234,6 +242,19 @@ public final class Emulator3D implements IGraphics3D {
 		}
 	}
 
+	private void getCapabilities() {
+		if (capabilities == null) {
+			capabilities = GL.createCapabilities();
+			return;
+		}
+		try {
+			capabilities = GL.getCapabilities();
+		} catch (Exception e) {
+			capabilities = GL.createCapabilities();
+		}
+	}
+
+
 	public synchronized void releaseTarget() {
 		Profiler3D.releaseTargetCallCount++;
 
@@ -250,64 +271,20 @@ public final class Emulator3D implements IGraphics3D {
 		}
 
 		this.target = null;
-		if (pbufferContext != null) {
-			try {
-				pbufferContext.releaseContext();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			this.releaseContext();
-		}
+		this.releaseContext();
 	}
 
 	public static boolean useGL11() {
-		return useWgl;
-	}
-
-	private void bindWgl(int var1, int var2) throws Exception {
-		if (this.swtImage == null || this.swtImage.getBounds().width != var1 || this.swtImage.getBounds().height != var2) {
-			if (this.swtImage != null) {
-				this.swtImage.dispose();
-				this.swtGC.dispose();
-				Emulator.getPlatform().deleteGLContext(wglContextHandle);
-			}
-
-			ImageData var3 = new ImageData(var1, var2, 32, swtPalleteData);
-			this.swtImage = new Image(null, var3);
-			this.swtGC = new GC(this.swtImage);
-			this.wglContextHandle = Emulator.getPlatform().createGLContext(swtGC.handle, false);
-			if (this.wglContextHandle == 0) {
-				this.swtGC.dispose();
-				this.swtImage.dispose();
-				throw new IllegalArgumentException();
-			}
-		}
-
-		if (!Emulator.getPlatform().isGLContextCurrent(swtImage.handle)) {
-			Emulator.getPlatform().setGLContextCurrent(this.swtGC.handle, this.wglContextHandle);
-
-			try {
-				GLContext.useContext(this.swtImage);
-			} catch (Exception var6) {
-				throw new IllegalArgumentException();
-			}
-		}
-		useWgl = true;
+		return !capabilities.OpenGL12;
 	}
 
 	private void releaseContext() {
-		if (swtGC != null) try {
-			Emulator.getPlatform().releaseGLContext(this.swtGC.handle);
-		} catch (Throwable ignored) {}
-		if (useDisplay) {
-			try {
-				Display.releaseContext();
-			} catch (Exception ignored) {}
+		if (window != 0) {
+			glfwMakeContextCurrent(0);
 			return;
 		}
 		try {
-			GLContext.useContext(null);
+			GLCanvasUtil.releaseContext(glCanvas);
 		} catch (Exception ignored) {}
 	}
 
@@ -318,11 +295,17 @@ public final class Emulator3D implements IGraphics3D {
 	public final void swapBuffers(boolean flip, int x, int y, int width, int height) {
 		Profiler3D.LWJGL_buffersSwapCount++;
 
+//		if (window != 0) {
+//			glfwSwapBuffers(window);
+//		} else if (glCanvas != null) {
+//			GLCanvasUtil.swapBuffers(glCanvas);
+//		}
+
 		if (this.target != null) {
 			if (this.target instanceof Image2D) {
 				Image2D var9 = (Image2D) this.target;
 				buffer.rewind();
-				GL11.glReadPixels(x, y, width, height, 6408, 5121, buffer);
+				GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 				byte[] var11 = new byte[width * height * 4];
 				int w = width << 2;
 				int off = var11.length - w;
@@ -571,12 +554,12 @@ public final class Emulator3D implements IGraphics3D {
 			CameraCache.camera.getProjection(tmpMat);
 			tmpMat.transpose();
 			GL11.glMatrixMode(GL_PROJECTION);
-			GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+			GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
 			tmpMat.set(CameraCache.invCam);
 			tmpMat.transpose();
 			GL11.glMatrixMode(GL_MODELVIEW);
-			GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+			GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 		}
 	}
 
@@ -585,7 +568,7 @@ public final class Emulator3D implements IGraphics3D {
 			GL11.glDisable(GL_LIGHT0 + i);
 		}
 
-		if (!useGL11() && GLContext.getCapabilities().GL_ARB_color_buffer_float) {
+		if (!useGL11() && capabilities.GL_ARB_color_buffer_float) {
 			ARBColorBufferFloat.glClampColorARB(
 					ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
 					Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE
@@ -613,7 +596,7 @@ public final class Emulator3D implements IGraphics3D {
 
 			GL11.glPushMatrix();
 			GL11.glMatrixMode(GL_MODELVIEW);
-			GL11.glMultMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+			GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 
 			int lightId = GL_LIGHT0 + usedLights;
 			usedLights++;
@@ -621,9 +604,9 @@ public final class Emulator3D implements IGraphics3D {
 			float[] lightColor = new float[]{0, 0, 0, 1}; //rgba
 
 			//Set default light preferences?
-			GL11.glLight(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
-			GL11.glLight(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
-			GL11.glLight(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
+			GL11.glLightfv(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
+			GL11.glLightfv(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
+			GL11.glLightfv(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
 
 			GL11.glLightf(lightId, GL_CONSTANT_ATTENUATION, 1.0F);
 			GL11.glLightf(lightId, GL_LINEAR_ATTENUATION, 0.0F);
@@ -638,7 +621,7 @@ public final class Emulator3D implements IGraphics3D {
 				tmpLightPos = LightsCache.LOCAL_ORIGIN;
 			}
 
-			GL11.glLight(lightId, GL_POSITION, memoryBuffers.getFloatBuffer(tmpLightPos));
+			GL11.glLightfv(lightId, GL_POSITION, memoryBuffers.getFloatBuffer(tmpLightPos));
 
 			G3DUtils.fillFloatColor(lightColor, light.getColor());
 			float lightIntensity = light.getIntensity();
@@ -650,14 +633,14 @@ public final class Emulator3D implements IGraphics3D {
 			int lightMode = light.getMode();
 
 			if (lightMode == Light.AMBIENT) {
-				GL11.glLight(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
+				GL11.glLightfv(lightId, GL_AMBIENT, memoryBuffers.getFloatBuffer(lightColor));
 			} else {
-				GL11.glLight(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
-				GL11.glLight(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
+				GL11.glLightfv(lightId, GL_DIFFUSE, memoryBuffers.getFloatBuffer(lightColor));
+				GL11.glLightfv(lightId, GL_SPECULAR, memoryBuffers.getFloatBuffer(lightColor));
 			}
 
 			if (lightMode == Light.SPOT) {
-				GL11.glLight(lightId, GL_SPOT_DIRECTION, memoryBuffers.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
+				GL11.glLightfv(lightId, GL_SPOT_DIRECTION, memoryBuffers.getFloatBuffer(LightsCache.NEGATIVE_Z_AXIS));
 				GL11.glLightf(lightId, GL_SPOT_CUTOFF, light.getSpotAngle());
 				GL11.glLightf(lightId, GL_SPOT_EXPONENT, light.getSpotExponent());
 			}
@@ -688,7 +671,7 @@ public final class Emulator3D implements IGraphics3D {
 				Transform tmpMat = new Transform();
 				tmpMat.set(trans);
 				tmpMat.transpose();
-				GL11.glMultMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+				GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 			}
 
 			setupAppearance(ap, false);
@@ -797,16 +780,16 @@ public final class Emulator3D implements IGraphics3D {
 			float[] tmpCol = new float[4];
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.AMBIENT));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_AMBIENT, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, memoryBuffers.getFloatBuffer(tmpCol));
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.DIFFUSE));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, memoryBuffers.getFloatBuffer(tmpCol));
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.EMISSIVE));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_EMISSION, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, memoryBuffers.getFloatBuffer(tmpCol));
 
 			G3DUtils.fillFloatColor(tmpCol, mat.getColor(Material.SPECULAR));
-			GL11.glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, memoryBuffers.getFloatBuffer(tmpCol));
+			GL11.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, memoryBuffers.getFloatBuffer(tmpCol));
 
 			GL11.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat.getShininess());
 
@@ -830,7 +813,7 @@ public final class Emulator3D implements IGraphics3D {
 			float[] fogColor = new float[4];
 			G3DUtils.fillFloatColor(fogColor, fog.getColor());
 			fogColor[3] = 1.0F;
-			GL11.glFog(GL_FOG_COLOR, memoryBuffers.getFloatBuffer(fogColor));
+			GL11.glFogfv(GL_FOG_COLOR, memoryBuffers.getFloatBuffer(fogColor));
 
 			GL11.glFogf(GL_FOG_START, fog.getNearDistance());
 			GL11.glFogf(GL_FOG_END, fog.getFarDistance());
@@ -866,9 +849,9 @@ public final class Emulator3D implements IGraphics3D {
 			GL11.glEnableClientState(GL_NORMAL_ARRAY);
 //			glEnable(GL_NORMALIZE);
 			if (normals.getComponentType() == 1) {
-				GL11.glNormalPointer(0, memoryBuffers.getNormalBuffer(normals.getByteValues()));
+				GL11.glNormalPointer(GL_BYTE, 0, memoryBuffers.getNormalBuffer(normals.getByteValues()));
 			} else {
-				GLExtensions.glNormalPointer(0, memoryBuffers.getNormalBuffer(normals.getShortValues()));
+				GL11.glNormalPointer(GL_SHORT, 0, memoryBuffers.getNormalBuffer(normals.getShortValues()));
 			}
 		} else {
 			GL11.glDisableClientState(GL_NORMAL_ARRAY);
@@ -879,10 +862,10 @@ public final class Emulator3D implements IGraphics3D {
 		GL11.glEnableClientState(GL_VERTEX_ARRAY);
 		if (positions.getComponentType() == 1) {
 			byte[] posesBArr = positions.getByteValues();
-			GL11.glVertexPointer(positions.getComponentCount(), 0, memoryBuffers.getVertexBuffer(posesBArr));
+			GL11.glVertexPointer(positions.getComponentCount(), GL_SHORT, 0, memoryBuffers.getVertexBuffer(posesBArr));
 		} else {
 			short[] posesSArr = positions.getShortValues();
-			GL11.glVertexPointer(positions.getComponentCount(), 0, memoryBuffers.getVertexBuffer(posesSArr));
+			GL11.glVertexPointer(positions.getComponentCount(), GL_SHORT, 0, memoryBuffers.getVertexBuffer(posesSArr));
 		}
 
 		GL11.glMatrixMode(GL_MODELVIEW);
@@ -947,7 +930,7 @@ public final class Emulator3D implements IGraphics3D {
 				float[] blendColor = new float[4];
 				G3DUtils.fillFloatColor(blendColor, texture2D.getBlendColor());
 				blendColor[3] = 1.0F;
-				GL11.glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, memoryBuffers.getFloatBuffer(blendColor));
+				GL11.glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, memoryBuffers.getFloatBuffer(blendColor));
 
 				if (!image2D.isLoaded()) {
 					image2D.setLoaded(true);
@@ -972,7 +955,7 @@ public final class Emulator3D implements IGraphics3D {
 							texFormat = GL_RGBA;
 					}
 
-					if (!useGL11() && GLContext.getCapabilities().OpenGL14)
+					if (!useGL11() && capabilities.OpenGL14)
 						GL11.glTexParameteri(GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL_TRUE);
 
 					GL11.glTexImage2D(GL_TEXTURE_2D, 0,
@@ -1037,7 +1020,7 @@ public final class Emulator3D implements IGraphics3D {
 				} else {
 					texCoordBuffer = memoryBuffers.getTexCoordBuffer(texCoords.getShortValues(), i);
 				}
-				GL11.glTexCoordPointer(texCoords.getComponentCount(), 0, texCoordBuffer);
+				GL11.glTexCoordPointer(texCoords.getComponentCount(), GL_SHORT, 0, texCoordBuffer);
 
 
 				Transform tmpMat = new Transform();
@@ -1045,7 +1028,7 @@ public final class Emulator3D implements IGraphics3D {
 				tmpMat.transpose();
 
 				GL11.glMatrixMode(GL_TEXTURE);
-				GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+				GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
 				GL11.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
 				GL11.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 			}
@@ -1075,13 +1058,9 @@ public final class Emulator3D implements IGraphics3D {
 			}
 		}
 
-//		int err = GL11.glGetError();
-//		if (err != GL11.GL_NO_ERROR) {
-//			Emulator.getEmulator().getLogStream().println("GL Error: " + err + " " + Util.translateGLErrorString(err));
-//		}
-		if (exiting) {
-			releaseContext();
-			throw new IllegalStateException("exiting");
+		int err = GL11.glGetError();
+		if (err != GL11.GL_NO_ERROR) {
+			Emulator.getEmulator().getLogStream().println("GL Error: " + err);
 		}
 	}
 
@@ -1251,9 +1230,9 @@ public final class Emulator3D implements IGraphics3D {
 					var6.transpose();
 					GL11.glViewport(var23, targetHeight - var24 - var26, var25, var26);
 					GL11.glMatrixMode(5889);
-					GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
 					GL11.glMatrixMode(5888);
-					GL11.glLoadMatrix(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
 					GL11.glDisable(2896);
 //					var27 = sprite.getImage().getBuffer();
 					var27 = memoryBuffers.getImageBuffer(sprite.getImage().getImageData());
@@ -1327,26 +1306,26 @@ public final class Emulator3D implements IGraphics3D {
 	public static void exit() {
 		if (instance == null)
 			return;
-		Emulator3D inst = instance;
-		if ((!useDisplay && pbufferContext == null) || inst.exiting) return;
-		inst.exiting = true;
-		synchronized (inst) {
-			if (useDisplay) {
-				try {
-					Display.makeCurrent();
-					inst.releaseTextures();
-					Display.releaseContext();
-//					Display.destroy();
-				} catch (Exception ignored) {}
-				return;
+		instance.dispose();
+	}
+
+	private void disposeGlCanvas() {
+		if (glCanvas == null) return;
+		EmulatorImpl.syncExec(new Runnable() {
+			public void run() {
+				glCanvas.dispose();
+				glCanvas = null;
 			}
-			try {
-				// try to make context current
-				pbufferContext.makeCurrent();
-				inst.releaseTextures();
-				pbufferContext.destroy();
-				pbufferContext = null;
-			} catch (Exception ignored) {}
+		});
+	}
+
+	private synchronized void dispose() {
+		exiting = true;
+//		makeCurrent(context);
+//		releaseTextures();
+		disposeGlCanvas();
+		if (window != 0) {
+			glfwDestroyWindow(window);
 		}
 	}
 

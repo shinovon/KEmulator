@@ -103,12 +103,12 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(n2)).put(array, n3, GLConfiguration.method769());
 		intBuffer.position(0);
-		GL15.glGetBufferParameter(n, n2, intBuffer);
+		GL15.glGetBufferParameteriv(n, n2, intBuffer);
 	}
 
 	public final synchronized void glGetBufferParameteriv(final int n, final int n2, final IntBuffer intBuffer) {
 		this.checkThread();
-		GL15.glGetBufferParameter(n, n2, intBuffer);
+		GL15.glGetBufferParameteriv(n, n2, intBuffer);
 	}
 
 	public final synchronized void glColorPointer(final int n, final int n2, final int n3, final int n4) {
@@ -224,7 +224,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-		org.lwjgl.opengl.GL11.glGetFloat(n, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetFloatv(n, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			array[n2 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
@@ -234,7 +234,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-		org.lwjgl.opengl.GL11.glGetFloat(n, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetFloatv(n, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
@@ -244,7 +244,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-		org.lwjgl.opengl.GL11.glGetFloat(n, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetFloatv(n, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			array[n2 + i] = floatBuffer.get(i);
 		}
@@ -254,7 +254,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(16);
-		org.lwjgl.opengl.GL11.glGetFloat(n, floatBuffer2);
+		org.lwjgl.opengl.GL11.glGetFloatv(n, floatBuffer2);
 		for (int i = 0; i < method768; ++i) {
 			floatBuffer.put(floatBuffer2.get(i));
 		}
@@ -264,7 +264,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		org.lwjgl.opengl.GL11.glGetLight(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetLightfv(n, n2, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = floatBuffer.get(i);
 		}
@@ -272,14 +272,14 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 
 	public final synchronized void glGetLightfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		this.checkThread();
-		org.lwjgl.opengl.GL11.glGetLight(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetLightfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glGetLightxv(final int n, final int n2, final int[] array, final int n3) {
 		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		org.lwjgl.opengl.GL11.glGetLight(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetLightfv(n, n2, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
@@ -289,7 +289,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		org.lwjgl.opengl.GL11.glGetLight(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetLightfv(n, n2, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
@@ -299,7 +299,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		org.lwjgl.opengl.GL11.glGetMaterial(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetMaterialfv(n, n2, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = floatBuffer.get(i);
 		}
@@ -307,14 +307,14 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 
 	public final synchronized void glGetMaterialfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		this.checkThread();
-		org.lwjgl.opengl.GL11.glGetMaterial(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetMaterialfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glGetMaterialxv(final int n, final int n2, final int[] array, final int n3) {
 		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		org.lwjgl.opengl.GL11.glGetMaterial(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetMaterialfv(n, n2, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
@@ -324,7 +324,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		org.lwjgl.opengl.GL11.glGetMaterial(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetMaterialfv(n, n2, floatBuffer);
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
@@ -334,40 +334,41 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		if (array == null || array.length < 1) {
 			throw new IllegalArgumentException();
 		}
-		array[0] = org.lwjgl.opengl.GL11.glGetPointer(n, (long) array[0].remaining());
+		// TODO
+//		array[0] = org.lwjgl.opengl.GL11.glGetPointerv(n, (long) array[0].remaining());
 	}
 
 	public final synchronized void glGetTexEnvfv(final int n, final int n2, final float[] array, final int n3) {
 		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexEnv(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexEnvfv(n, n2, floatBuffer);
 		floatBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexEnvfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		this.checkThread();
-		org.lwjgl.opengl.GL11.glGetTexEnv(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexEnvfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glGetTexEnviv(final int n, final int n2, final int[] array, final int n3) {
 		this.checkThread();
 		final int method775;
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexEnv(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glGetTexEnviv(n, n2, intBuffer);
 		intBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexEnviv(final int n, final int n2, final IntBuffer intBuffer) {
 		this.checkThread();
-		org.lwjgl.opengl.GL11.glGetTexEnv(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glGetTexEnviv(n, n2, intBuffer);
 	}
 
 	public final synchronized void glGetTexEnvxv(final int n, final int n2, final int[] array, final int n3) {
 		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexEnv(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexEnvfv(n, n2, floatBuffer);
 		for (int i = 0; i < method775; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
@@ -377,7 +378,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexEnv(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexEnvfv(n, n2, floatBuffer);
 		for (int i = 0; i < method775; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
@@ -387,33 +388,33 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexParameter(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexParameterfv(n, n2, floatBuffer);
 		floatBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexParameterfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		this.checkThread();
-		org.lwjgl.opengl.GL11.glGetTexParameter(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexParameterfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glGetTexParameteriv(final int n, final int n2, final int[] array, final int n3) {
 		this.checkThread();
 		final int method775;
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexParameter(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glGetTexParameteriv(n, n2, intBuffer);
 		intBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexParameteriv(final int n, final int n2, final IntBuffer intBuffer) {
 		this.checkThread();
-		org.lwjgl.opengl.GL11.glGetTexParameter(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glGetTexParameteriv(n, n2, intBuffer);
 	}
 
 	public final synchronized void glGetTexParameterxv(final int n, final int n2, final int[] array, final int n3) {
 		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexParameter(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexParameterfv(n, n2, floatBuffer);
 		for (int i = 0; i < method775; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
@@ -423,7 +424,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		org.lwjgl.opengl.GL11.glGetTexParameter(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexParameterfv(n, n2, floatBuffer);
 		for (int i = 0; i < method775; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
@@ -586,13 +587,13 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
 		floatBuffer.position(0);
-		org.lwjgl.opengl.GL11.glTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glTexGenfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glTexGenfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		this.checkThread();
 		method805();
-		org.lwjgl.opengl.GL11.glTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glTexGenfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final int[] array, final int n3) {
@@ -602,13 +603,13 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
 		intBuffer.position(0);
-		org.lwjgl.opengl.GL11.glTexGen(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glTexGeniv(n, n2, intBuffer);
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final IntBuffer intBuffer) {
 		this.checkThread();
 		method805();
-		org.lwjgl.opengl.GL11.glTexGen(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glTexGeniv(n, n2, intBuffer);
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final int[] array, final int n3) {
@@ -620,7 +621,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 			floatBuffer.put(array[i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		org.lwjgl.opengl.GL11.glTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glTexGenfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -632,7 +633,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 			floatBuffer.put(intBuffer.get() / 65536.0f);
 		}
 		floatBuffer.position(0);
-		org.lwjgl.opengl.GL11.glTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glTexGenfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glGetTexGenfv(final int n, final int n2, final float[] array, final int n3) {
@@ -640,14 +641,14 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
-		org.lwjgl.opengl.GL11.glGetTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexGenfv(n, n2, floatBuffer);
 		floatBuffer.get(array, n3, method771);
 	}
 
 	public final synchronized void glGetTexGenfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		this.checkThread();
 		method805();
-		org.lwjgl.opengl.GL11.glGetTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexGenfv(n, n2, floatBuffer);
 	}
 
 	public final synchronized void glGetTexGeniv(final int n, final int n2, final int[] array, final int n3) {
@@ -655,14 +656,14 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		method805();
 		final int method771;
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(method771 = GLConfiguration.method771());
-		org.lwjgl.opengl.GL11.glGetTexGen(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glGetTexGeniv(n, n2, intBuffer);
 		intBuffer.get(array, n3, method771);
 	}
 
 	public final synchronized void glGetTexGeniv(final int n, final int n2, final IntBuffer intBuffer) {
 		this.checkThread();
 		method805();
-		org.lwjgl.opengl.GL11.glGetTexGen(n, n2, intBuffer);
+		org.lwjgl.opengl.GL11.glGetTexGeniv(n, n2, intBuffer);
 	}
 
 	public final synchronized void glGetTexGenxv(final int n, final int n2, final int[] array, final int n3) {
@@ -670,7 +671,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
-		org.lwjgl.opengl.GL11.glGetTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexGenfv(n, n2, floatBuffer);
 		for (int i = 0; i < method771; ++i) {
 			array[i + n3] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
@@ -681,7 +682,7 @@ public final class GL11Impl extends GL10Impl implements GL11, GL11Ext, GL11Exten
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
-		org.lwjgl.opengl.GL11.glGetTexGen(n, n2, floatBuffer);
+		org.lwjgl.opengl.GL11.glGetTexGenfv(n, n2, floatBuffer);
 		for (int i = 0; i < method771; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}

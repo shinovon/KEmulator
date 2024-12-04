@@ -115,7 +115,7 @@ public class GL10Impl implements GL10, GL10Ext {
 	public synchronized void glColorPointer(final int n, final int n2, final int n3, final Buffer buffer) {
 		checkThread();
 		if (n2 == 5121) {
-			GL11.glColorPointer(n, true, n3, (ByteBuffer) buffer);
+			GL11.glColorPointer(n, n2, n3, (ByteBuffer) buffer);
 			return;
 		}
 		int n4;
@@ -141,7 +141,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			n5 = n3;
 			floatBuffer = floatBuffer2;
 		}
-		GL11.glColorPointer(n4, n5, floatBuffer);
+		GL11.glColorPointer(n4, GL_FLOAT, n5, floatBuffer);
 	}
 
 	public synchronized void glCompressedTexImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final Buffer buffer) {
@@ -269,12 +269,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n))).put(array, n2, method768);
 		floatBuffer.position(0);
-		GL11.glFog(n, floatBuffer);
+		GL11.glFogfv(n, floatBuffer);
 	}
 
 	public synchronized void glFogfv(final int n, final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glFog(n, floatBuffer);
+		GL11.glFogfv(n, floatBuffer);
 	}
 
 	public synchronized void glFogx(final int n, final int n2) {
@@ -290,7 +290,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n2 + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glFog(n, floatBuffer);
+		GL11.glFogfv(n, floatBuffer);
 	}
 
 	public synchronized void glFogxv(final int n, final IntBuffer intBuffer) {
@@ -302,7 +302,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get(position + i) / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glFog(n, floatBuffer);
+		GL11.glFogfv(n, floatBuffer);
 	}
 
 	public synchronized void glFrontFace(final int n) {
@@ -336,7 +336,7 @@ public class GL10Impl implements GL10, GL10Ext {
 		checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final ByteBuffer byteBuffer = BufferUtils.createByteBuffer(16);
-		GL11.glGetBoolean(n, byteBuffer);
+		GL11.glGetBooleanv(n, byteBuffer);
 		for (int i = 0; i < method768; ++i) {
 			array[n2 + i] = (byteBuffer.get(i) == 1);
 		}
@@ -346,7 +346,7 @@ public class GL10Impl implements GL10, GL10Ext {
 		checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final ByteBuffer byteBuffer = BufferUtils.createByteBuffer(16);
-		GL11.glGetBoolean(n, byteBuffer);
+		GL11.glGetBooleanv(n, byteBuffer);
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put(byteBuffer.get(i));
 		}
@@ -356,7 +356,7 @@ public class GL10Impl implements GL10, GL10Ext {
 		checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(16);
-		GL11.glGetInteger(n, intBuffer);
+		GL11.glGetIntegerv(n, intBuffer);
 		intBuffer.get(array, n2, method768);
 	}
 
@@ -364,7 +364,7 @@ public class GL10Impl implements GL10, GL10Ext {
 		checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final IntBuffer intBuffer2 = BufferUtils.createIntBuffer(16);
-		GL11.glGetInteger(n, intBuffer2);
+		GL11.glGetIntegerv(n, intBuffer2);
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put(intBuffer2.get(i));
 		}
@@ -396,12 +396,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method772 = GLConfiguration.method772(n))).put(array, n2, method772);
 		floatBuffer.position(0);
-		GL11.glLightModel(n, floatBuffer);
+		GL11.glLightModelfv(n, floatBuffer);
 	}
 
 	public synchronized void glLightModelfv(final int n, final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glLightModel(n, floatBuffer);
+		GL11.glLightModelfv(n, floatBuffer);
 	}
 
 	public synchronized void glLightModelx(final int n, final int n2) {
@@ -417,7 +417,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n2 + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glLightModel(n, floatBuffer);
+		GL11.glLightModelfv(n, floatBuffer);
 	}
 
 	public synchronized void glLightModelxv(final int n, final IntBuffer intBuffer) {
@@ -429,7 +429,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get(position + i) / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glLightModel(n, floatBuffer);
+		GL11.glLightModelfv(n, floatBuffer);
 	}
 
 	public synchronized void glLightf(final int n, final int n2, final float n3) {
@@ -443,12 +443,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method770 = GLConfiguration.method770(n2))).put(array, n3, method770);
 		floatBuffer.position(0);
-		GL11.glLight(n, n2, floatBuffer);
+		GL11.glLightfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glLightfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glLight(n, n2, floatBuffer);
+		GL11.glLightfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glLightx(final int n, final int n2, final int n3) {
@@ -464,7 +464,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n3 + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glLight(n, n2, floatBuffer);
+		GL11.glLightfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glLightxv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -476,7 +476,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get(position + i) / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glLight(n, n2, floatBuffer);
+		GL11.glLightfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glLineWidth(final float n) {
@@ -499,12 +499,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(16)).put(array, n, 16);
 		floatBuffer.position(0);
-		GL11.glLoadMatrix(floatBuffer);
+		GL11.glLoadMatrixf(floatBuffer);
 	}
 
 	public synchronized void glLoadMatrixf(final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glLoadMatrix(floatBuffer);
+		GL11.glLoadMatrixf(floatBuffer);
 	}
 
 	public synchronized void glLoadMatrixx(final int[] array, final int n) {
@@ -514,7 +514,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glLoadMatrix(floatBuffer);
+		GL11.glLoadMatrixf(floatBuffer);
 	}
 
 	public synchronized void glLoadMatrixx(final IntBuffer intBuffer) {
@@ -524,7 +524,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get() / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glLoadMatrix(floatBuffer);
+		GL11.glLoadMatrixf(floatBuffer);
 	}
 
 	public synchronized void glLogicOp(final int n) {
@@ -543,12 +543,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method773 = GLConfiguration.method773(n2))).put(array, n3, method773);
 		floatBuffer.position(0);
-		GL11.glMaterial(n, n2, floatBuffer);
+		GL11.glMaterialfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glMaterialfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glMaterial(n, n2, floatBuffer);
+		GL11.glMaterialfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glMaterialx(final int n, final int n2, final int n3) {
@@ -564,7 +564,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n3 + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glMaterial(n, n2, floatBuffer);
+		GL11.glMaterialfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glMaterialxv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -576,7 +576,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get(position + i) / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glMaterial(n, n2, floatBuffer);
+		GL11.glMaterialfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glMatrixMode(final int anInt1354) {
@@ -589,12 +589,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(16)).put(array, n, 16);
 		floatBuffer.position(0);
-		GL11.glMultMatrix(floatBuffer);
+		GL11.glMultMatrixf(floatBuffer);
 	}
 
 	public synchronized void glMultMatrixf(final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glMultMatrix(floatBuffer);
+		GL11.glMultMatrixf(floatBuffer);
 	}
 
 	public synchronized void glMultMatrixx(final int[] array, final int n) {
@@ -604,7 +604,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glMultMatrix(floatBuffer);
+		GL11.glMultMatrixf(floatBuffer);
 	}
 
 	public synchronized void glMultMatrixx(final IntBuffer intBuffer) {
@@ -614,7 +614,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get() / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glMultMatrix(floatBuffer);
+		GL11.glMultMatrixf(floatBuffer);
 	}
 
 	public synchronized void glMultiTexCoord4f(final int n, final float n2, final float n3, final float n4, final float n5) {
@@ -640,11 +640,11 @@ public class GL10Impl implements GL10, GL10Ext {
 	public synchronized void glNormalPointer(final int n, final int n2, final Buffer buffer) {
 		checkThread();
 		if (n == 5120) {
-			GL11.glNormalPointer(n2, (ByteBuffer) buffer);
+			GL11.glNormalPointer(n, n2, (ByteBuffer) buffer);
 			return;
 		}
 		if (n == 5122) {
-			GLExtensions.glNormalPointer(n2, (ShortBuffer) buffer);
+			GL11.glNormalPointer(n, n2, (ShortBuffer) buffer);
 			return;
 		}
 		int n3;
@@ -667,7 +667,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			n3 = n2;
 			floatBuffer = floatBuffer2;
 		}
-		GL11.glNormalPointer(n3, floatBuffer);
+		GL11.glNormalPointer(GL_FLOAT, n3, floatBuffer);
 	}
 
 	public synchronized void glOrthof(final float n, final float n2, final float n3, final float n4, final float n5, final float n6) {
@@ -696,12 +696,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method774 = GLConfiguration.method774(n))).put(array, n2, method774);
 		floatBuffer.position(0);
-		GL14.glPointParameter(n, floatBuffer);
+		GL14.glPointParameterfv(n, floatBuffer);
 	}
 
 	public synchronized void glPointParameterfv(final int n, final FloatBuffer floatBuffer) {
 		checkThread();
-		GL14.glPointParameter(n, floatBuffer);
+		GL14.glPointParameterfv(n, floatBuffer);
 	}
 
 	public synchronized void glPointParameterx(final int n, final int n2) {
@@ -717,7 +717,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n2 + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL14.glPointParameter(n, floatBuffer);
+		GL14.glPointParameterfv(n, floatBuffer);
 	}
 
 	public synchronized void glPointParameterxv(final int n, final IntBuffer intBuffer) {
@@ -729,7 +729,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get(position + i) / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL14.glPointParameter(n, floatBuffer);
+		GL14.glPointParameterfv(n, floatBuffer);
 	}
 
 	public synchronized void glPointSize(final float n) {
@@ -839,19 +839,19 @@ public class GL10Impl implements GL10, GL10Ext {
 	public synchronized void glTexCoordPointer(final int n, final int n2, final int n3, final Buffer buffer) {
 		checkThread();
 		if (n2 == 5126) {
-			final FloatBuffer floatBuffer;
-			final int remaining = (floatBuffer = (FloatBuffer) buffer).remaining();
-			final int position = floatBuffer.position();
-			final DoubleBuffer doubleBuffer = BufferUtils.createDoubleBuffer(remaining);
-			for (int i = 0; i < remaining; ++i) {
-				doubleBuffer.put(floatBuffer.get(position + i));
-			}
-			doubleBuffer.rewind();
-			GL11.glTexCoordPointer(n, n3, doubleBuffer);
+//			final FloatBuffer floatBuffer;
+//			final int remaining = (floatBuffer = (FloatBuffer) buffer).remaining();
+//			final int position = floatBuffer.position();
+//			final DoubleBuffer doubleBuffer = BufferUtils.createDoubleBuffer(remaining);
+//			for (int i = 0; i < remaining; ++i) {
+//				doubleBuffer.put(floatBuffer.get(position + i));
+//			}
+//			doubleBuffer.rewind();
+			GL11.glTexCoordPointer(n, n2, n3, (FloatBuffer) buffer);
 			return;
 		}
 		if (n2 == 5122) {
-			GL11.glTexCoordPointer(n, n3, (ShortBuffer) buffer);
+			GL11.glTexCoordPointer(n, n2, n3, (ShortBuffer) buffer);
 			return;
 		}
 		FloatBuffer floatBuffer2;
@@ -877,7 +877,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			}
 			floatBuffer2.position(0);
 		}
-		GL11.glTexCoordPointer(n, n3, floatBuffer2);
+		GL11.glTexCoordPointer(n, GL_FLOAT, n3, floatBuffer2);
 	}
 
 	public synchronized void glTexEnvi(final int n, final int n2, final int n3) {
@@ -891,12 +891,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(method775 = GLConfiguration.method775(n2))).put(array, n3, method775);
 		intBuffer.position(0);
-		GL11.glTexEnv(n, n2, intBuffer);
+		GL11.glTexEnviv(n, n2, intBuffer);
 	}
 
 	public synchronized void glTexEnviv(final int n, final int n2, final IntBuffer intBuffer) {
 		checkThread();
-		GL11.glTexEnv(n, n2, intBuffer);
+		GL11.glTexEnviv(n, n2, intBuffer);
 	}
 
 	public synchronized void glTexEnvf(final int n, final int n2, final float n3) {
@@ -910,12 +910,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2))).put(array, n3, method775);
 		floatBuffer.position(0);
-		GL11.glTexEnv(n, n2, floatBuffer);
+		GL11.glTexEnvfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexEnvfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glTexEnv(n, n2, floatBuffer);
+		GL11.glTexEnvfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexEnvx(final int n, final int n2, final int n3) {
@@ -931,7 +931,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n3 + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glTexEnv(n, n2, floatBuffer);
+		GL11.glTexEnvfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexEnvxv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -942,7 +942,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get() / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glTexEnv(n, n2, floatBuffer);
+		GL11.glTexEnvfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8, final Buffer buffer) {
@@ -976,12 +976,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method776 = GLConfiguration.method776(n2))).put(array, n3, method776);
 		floatBuffer.position(0);
-		GL11.glTexParameter(n, n2, floatBuffer);
+		GL11.glTexParameterfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexParameterfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		checkThread();
-		GL11.glTexParameter(n, n2, floatBuffer);
+		GL11.glTexParameterfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexParameteri(final int n, final int n2, final int n3) {
@@ -995,12 +995,12 @@ public class GL10Impl implements GL10, GL10Ext {
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(method776 = GLConfiguration.method776(n2))).put(array, n3, method776);
 		intBuffer.position(0);
-		GL11.glTexParameter(n, n2, intBuffer);
+		GL11.glTexParameteriv(n, n2, intBuffer);
 	}
 
 	public synchronized void glTexParameteriv(final int n, final int n2, final IntBuffer intBuffer) {
 		checkThread();
-		GL11.glTexParameter(n, n2, intBuffer);
+		GL11.glTexParameteriv(n, n2, intBuffer);
 	}
 
 	public synchronized void glTexParameterxv(final int n, final int n2, final int[] array, final int n3) {
@@ -1011,7 +1011,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(array[n3 + i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glTexParameter(n, n2, floatBuffer);
+		GL11.glTexParameterfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexParameterxv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -1022,7 +1022,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			floatBuffer.put(intBuffer.get() / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glTexParameter(n, n2, floatBuffer);
+		GL11.glTexParameterfv(n, n2, floatBuffer);
 	}
 
 	public synchronized void glTexSubImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8, final Buffer buffer) {
@@ -1060,11 +1060,11 @@ public class GL10Impl implements GL10, GL10Ext {
 			for (int i = 0; i < remaining; ++i) {
 				shortBuffer.put(i, byteBuffer.get(position + i));
 			}
-			GL11.glVertexPointer(n, n3, shortBuffer);
+			GL11.glVertexPointer(n, GL_SHORT, n3, shortBuffer);
 			return;
 		}
 		if (n2 == 5122) {
-			GL11.glVertexPointer(n, n3, (ShortBuffer) buffer);
+			GL11.glVertexPointer(n, GL_SHORT, n3, (ShortBuffer) buffer);
 			return;
 		}
 		int n4;
@@ -1090,7 +1090,7 @@ public class GL10Impl implements GL10, GL10Ext {
 			n5 = n3;
 			floatBuffer = floatBuffer2;
 		}
-		GL11.glVertexPointer(n4, n5, floatBuffer);
+		GL11.glVertexPointer(n4, GL_FLOAT, n5, floatBuffer);
 	}
 
 	public synchronized void glViewport(final int n, final int n2, final int n3, final int n4) {
