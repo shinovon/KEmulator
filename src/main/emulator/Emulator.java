@@ -341,7 +341,7 @@ public class Emulator implements Runnable {
 		sb.append(platform.getTitleName()).append(' ').append(version);
 		if (s != null) {
 			sb.append(" - ").append(s);
-		} else if (midletJar != null) {
+		} else if (midletJar != null && Emulator.emulatorimpl.midletProps != null) {
 			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty("MIDlet-Name"));
 		}
 		if (Settings.uei) sb.append(" (UEI)");
@@ -394,7 +394,7 @@ public class Emulator implements Runnable {
 		return null;
 	}
 
-	public static boolean getJarClasses() {
+	public static boolean getJarClasses() throws Exception {
 		try {
 			if (Emulator.midletClassName == null) {
 				Properties props = null;
@@ -459,8 +459,7 @@ public class Emulator implements Runnable {
 								String v = props.getProperty(s);
 								v = v.substring(0, v.indexOf(","));
 								midletKeys.add(n + " (" + v + ")");
-							} catch (Exception ignored) {
-							}
+							} catch (Exception ignored) {}
 						}
 					}
 					if (midletKeys.size() > 0) {
@@ -506,11 +505,12 @@ public class Emulator implements Runnable {
 				Emulator.emulatorimpl.midletProps = aProperties1369;
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			if (ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
-				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file is not JAR or ZIP archive."));
+				ex.printStackTrace();
+				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file is not JAR or ZIP archive."), CustomMethod.getStackTrace(ex));
+				return false;
 			}
-			return false;
+			throw ex;
 		}
 		loadTargetDevice();
 		return true;
@@ -742,94 +742,105 @@ public class Emulator implements Runnable {
 			return;
 		}
 		try {
-			platform.loadLibraries();
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + e.getMessage());
-			System.exit(0);
-			return;
-		}
-		EmulatorMIDI.initDevices();
-		Emulator.commandLineArguments = commandLineArguments;
-		UILocale.initLocale();
-		parseLaunchArgs(commandLineArguments); //
-		Emulator.emulatorimpl = new EmulatorImpl();
-		parseLaunchArgs(commandLineArguments);
-		// Force m3g engine to LWJGL in x64 build
-		if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
+			try {
+				platform.loadLibraries();
+			} catch (Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + e.getMessage());
+				System.exit(0);
+				return;
+			}
+			EmulatorMIDI.initDevices();
+			Emulator.commandLineArguments = commandLineArguments;
+			UILocale.initLocale();
+			parseLaunchArgs(commandLineArguments); //
+			Emulator.emulatorimpl = new EmulatorImpl();
+			parseLaunchArgs(commandLineArguments);
+			// Force m3g engine to LWJGL in x64 build
+			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
-		// Restart with additional arguments required for specific os or java version
-		if (!(forked || Settings.uei) && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
-			loadGame(null, false);
-			return;
-		}
+			// Restart with additional arguments required for specific os or java version
+			if (!(forked || Settings.uei) && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
+				loadGame(null, false);
+				return;
+			}
 
-		platform.load3D();
-		vlcCheckerThread.start();
-		Controllers.refresh(true);
-		Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on " +
-				System.getProperty("os.name") + " (" + System.getProperty("os.version") + "), Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
-		Devices.load(Emulator.deviceFile);
-		tryToSetDevice(Emulator.deviceName);
-		setupMRUList();
-		initRichPresence();
-		if (Emulator.midletClassName == null && Emulator.midletJar == null) {
-			Emulator.emulatorimpl.getEmulatorScreen().start(false);
-			EmulatorImpl.dispose();
-			System.exit(0);
-			return;
-		}
-		Emulator.record = new KeyRecords();
-		getLibraries();
-		if (!getJarClasses()) {
-			Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
-			System.exit(1);
-			return;
-		}
-		InputStream inputStream = null;
-		final String appProperty;
-		if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
-			iconPath = appProperty;
-			inputStream = emulator.custom.CustomJarResources.getResourceAsStream(appProperty);
-		} else {
-			final String appProperty2;
-			if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
-				try {
-					String s = appProperty2.split(",")[1].trim();
-					iconPath = s;
-					inputStream = emulator.custom.CustomJarResources.getResourceAsStream(s);
-				} catch (Exception ex3) {
-					ex3.printStackTrace();
+			platform.load3D();
+			vlcCheckerThread.start();
+			Controllers.refresh(true);
+			Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on " +
+					System.getProperty("os.name") + " (" + System.getProperty("os.version") + "), Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
+			Devices.load(Emulator.deviceFile);
+			tryToSetDevice(Emulator.deviceName);
+			setupMRUList();
+			initRichPresence();
+			if (Emulator.midletClassName == null && Emulator.midletJar == null) {
+				Emulator.emulatorimpl.getEmulatorScreen().start(false);
+				EmulatorImpl.dispose();
+				System.exit(0);
+				return;
+			}
+			Emulator.record = new KeyRecords();
+			getLibraries();
+			try {
+				if (!getJarClasses()) {
+					Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
+					System.exit(1);
+					return;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."), CustomMethod.getStackTrace(e));
+				System.exit(1);
+				return;
+			}
+			InputStream inputStream = null;
+			final String appProperty;
+			if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
+				iconPath = appProperty;
+				inputStream = emulator.custom.CustomJarResources.getResourceAsStream(appProperty);
+			} else {
+				final String appProperty2;
+				if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
+					try {
+						String s = appProperty2.split(",")[1].trim();
+						iconPath = s;
+						inputStream = emulator.custom.CustomJarResources.getResourceAsStream(s);
+					} catch (Exception ex3) {
+						ex3.printStackTrace();
+					}
 				}
 			}
-		}
-		if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
-			Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-			Emulator.rpcDetails = Settings.uei ? "UEI" : new File(midletJar).getName();
-			updatePresence();
-		}
-		Emulator.emulatorimpl.getEmulatorScreen().setWindowIcon(inputStream);
-		setProperties();
-		if (Emulator.midletClassName == null) {
-			Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
-			System.exit(1);
-			return;
-		}
-		getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
-		try {
-			midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
+			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
+				Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+				Emulator.rpcDetails = Settings.uei ? "UEI" : new File(midletJar).getName();
+				updatePresence();
+			}
+			Emulator.emulatorimpl.getEmulatorScreen().setWindowIcon(inputStream);
+			setProperties();
+			if (Emulator.midletClassName == null) {
+				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+				System.exit(1);
+				return;
+			}
+			getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
+			try {
+				midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
+			} catch (Throwable e) {
+				e.printStackTrace();
+				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+				System.exit(1);
+				return;
+			}
+			Emulator.eventQueue = new EventQueue();
+			new Thread(new Emulator()).start();
+			Emulator.emulatorimpl.getEmulatorScreen().start(true);
 		} catch (Throwable e) {
 			e.printStackTrace();
-			Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
-			System.exit(1);
-			return;
 		}
-		Emulator.eventQueue = new EventQueue();
-		new Thread(new Emulator()).start();
-		Emulator.emulatorimpl.getEmulatorScreen().start(true);
 		try {
 			EmulatorImpl.dispose();
-		} catch (Exception ignored) {}
+		} catch (Throwable ignored) {}
 		System.exit(0);
 	}
 
@@ -1161,7 +1172,7 @@ public class Emulator implements Runnable {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			Emulator.eventQueue.stop();
-			Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName);
+			Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
 			System.exit(1);
 			return;
 		}
