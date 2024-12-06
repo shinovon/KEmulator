@@ -426,7 +426,7 @@ public class Emulator implements Runnable {
 						Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
 					}
 				}
-				if (props == null) {
+				if (props == null || !props.containsKey("MIDlet-1")) {
 					try {
 						final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
 						props = new Properties();
