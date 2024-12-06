@@ -42,7 +42,11 @@ public class ReflectUtil {
 		try {
 			Class<?> cl = c.getClass();
 			Field f = cl.getField("handle");
-			return f.getLong(c);
+			try {
+				return f.getLong(c);
+			} catch (Exception e) {
+				return f.getInt(c);
+			}
 		} catch (Exception e) {
 			throw new Error(e);
 		}

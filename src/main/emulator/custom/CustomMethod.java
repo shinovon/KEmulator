@@ -206,8 +206,7 @@ public class CustomMethod {
 	}
 
 	public static void exit(int i) {
-		close();
-		System.exit(i);
+		Emulator.getMIDlet().notifyDestroyed();
 	}
 
 	public static void close() {
@@ -225,7 +224,7 @@ public class CustomMethod {
 		}
 	}
 
-	private static String getStackTrace(Throwable t) {
+	public static String getStackTrace(Throwable t) {
 		String res = null;
 		if (t != null) {
 			try {

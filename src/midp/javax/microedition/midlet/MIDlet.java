@@ -32,7 +32,10 @@ public abstract class MIDlet {
 	public void notifyDestroyed() {
 		if (destroyed) return;
 		destroyed = true;
-		Emulator.getEmulator().getLogStream().println("Notify Destroyed");
+		Emulator.getEmulator().getLogStream().println("Destroy stack trace:");
+		for (StackTraceElement e : new Exception().getStackTrace()) {
+			Emulator.getEmulator().getLogStream().println("\tat " + e.toString());
+		}
 		Emulator.notifyDestroyed();
 		Emulator.getEmulator().getLogStream().println("Exiting Emulator");
 		CustomMethod.close();

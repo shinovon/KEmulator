@@ -219,7 +219,7 @@ public final class EmulatorScreen implements
 
 	public void showMessage(final String message) {
 		try {
-			setWindowOnTop(getHandle(shell), true);
+			setWindowOnTop(ReflectUtil.getHandle(shell), true);
 		} catch (Throwable ignored) {}
 		final MessageBox messageBox;
 		(messageBox = new MessageBox(this.shell)).setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
@@ -227,13 +227,39 @@ public final class EmulatorScreen implements
 		messageBox.open();
 	}
 
-	private static long getHandle(Control c) {
+	public void showMessage(String title, String detail) {
 		try {
-			Class<?> cl = c.getClass();
-			Field f = cl.getField("handle");
-			return f.getLong(c);
-		} catch (Exception e) {
-			throw new Error(e);
+			setWindowOnTop(ReflectUtil.getHandle(shell), true);
+		} catch (Throwable ignored) {}
+
+		Shell shell = new Shell(this.shell, SWT.DIALOG_TRIM);
+		shell.setSize(450, 300);
+		shell.setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
+		shell.setLayout(new GridLayout(1, false));
+
+		Composite composite = new Composite(shell, SWT.NONE);
+		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		Label label = new Label(composite, SWT.NONE);
+		label.setText(title);
+
+		Composite composite_1 = new Composite(shell, SWT.NONE);
+		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		composite_1.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		Text text = new Text(composite_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+		text.setText(detail);
+
+//		shell.pack();
+		Rectangle clientArea = EmulatorScreen.display.getClientArea();
+		Point size = shell.getSize();
+		shell.setLocation((clientArea.width - size.x) / 2, (clientArea.height - size.y) / 2);
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!EmulatorScreen.display.readAndDispatch()) {
+				EmulatorScreen.display.sleep();
+			}
 		}
 	}
 
@@ -674,7 +700,7 @@ public final class EmulatorScreen implements
 		(this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
 		this.forcePaintMenuItem.addSelectionListener(this);
 		try {
-			setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+			setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
 		} catch (Throwable ignored) {}
 		new MenuItem(this.menuView, 2);
 		(this.keypadMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
@@ -1194,7 +1220,7 @@ public final class EmulatorScreen implements
 			if (menuItem == this.alwaysOnTopMenuItem) {
 				Settings.alwaysOnTop = this.alwaysOnTopMenuItem.getSelection();
 				try {
-					setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+					setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
 				} catch (Throwable ignored) {}
 				return;
 			}
@@ -1395,8 +1421,17 @@ public final class EmulatorScreen implements
 	private static void setWindowOnTop(final long handle, final boolean b) {
 		// TODO
 		try {
-			OS.SetWindowPos((int) handle, b ? -1 : -2, 0, 0, 0, 0, 19);
+			Class cls = OS.class;
+			Method setWindowPos;
+			try {
+				setWindowPos = cls.getMethod("SetWindowPos", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
+				setWindowPos.invoke(null, (int) handle, b ? -1 : -2, 0, 0, 0, 0, 19);
+			} catch (Exception e) {
+				setWindowPos = cls.getMethod("SetWindowPos", long.class, long.class, int.class, int.class, int.class, int.class, int.class);
+				setWindowPos.invoke(null, handle, b ? -1L : -2L, 0, 0, 0, 0, 19);
+			}
 		} catch (Throwable ignored) {}
+
 	}
 
 	private void updatePauseState() {

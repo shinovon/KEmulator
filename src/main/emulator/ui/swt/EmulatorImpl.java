@@ -228,7 +228,7 @@ public final class EmulatorImpl implements IEmulator {
 
 	public final String getAppProperty(final String s) {
 		final String property;
-		if ((property = this.midletProps.getProperty(s)) != null) {
+		if (midletProps != null && (property = this.midletProps.getProperty(s)) != null) {
 			return property.trim();
 		}
 		return null;
