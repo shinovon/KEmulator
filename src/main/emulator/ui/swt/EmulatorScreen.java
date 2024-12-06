@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.custom.CustomJarResources;
 import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.custom.*;
 import emulator.graphics2D.swt.ImageSWT;
@@ -174,6 +175,7 @@ public final class EmulatorScreen implements
 	private Displayable lastDisplayable;
 	private boolean painted;
 	private final Vector<String> caretKeys = new Vector<String>();
+	private int midletSelection;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -2557,6 +2559,49 @@ public final class EmulatorScreen implements
 
 	public void appStarted(boolean first) {
 		if (first) EmulatorImpl.asyncExec(new WindowOpen(this, 0));
+	}
+
+	public int showMidletChoice(Vector<String> midletKeys) {
+		midletSelection = -1;
+
+		Shell shell = new Shell(this.shell, SWT.DIALOG_TRIM);
+		shell.setSize(300, 400);
+		shell.setText("Choose MIDlet to run");
+		shell.setLayout(new GridLayout(1, false));
+
+		Table table = new Table(shell, SWT.BORDER | SWT.SINGLE);
+		table.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent arg0) {
+				midletSelection = table.getSelectionIndex();
+				shell.close();
+			}
+		});
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+		Composite composite = new Composite(shell, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		for (String k : midletKeys) {
+			String[] p = Emulator.getEmulator().getAppProperty(k).split(",");
+			TableItem t = new TableItem(table, SWT.NONE);
+			t.setText(0, p[0].trim());
+			try {
+				t.setImage(0, new Image(EmulatorImpl.getDisplay(), CustomJarResources.getResourceAsStream(p[1].trim())));
+			} catch (Exception ignored) {}
+		}
+
+		Rectangle clientArea = EmulatorScreen.display.getClientArea();
+		Point size = shell.getSize();
+		shell.setLocation((clientArea.width - size.x) / 2, (clientArea.height - size.y) / 2);
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!EmulatorScreen.display.readAndDispatch()) {
+				EmulatorScreen.display.sleep();
+			}
+		}
+
+		return midletSelection;
 	}
 
 	final class ShellPosition implements Runnable {
