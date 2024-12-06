@@ -426,7 +426,7 @@ public class Emulator implements Runnable {
 						Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
 					}
 				}
-				if (props == null) {
+				if (props == null || !props.containsKey("MIDlet-1")) {
 					try {
 						final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
 						props = new Properties();
@@ -736,12 +736,19 @@ public class Emulator implements Runnable {
 			}
 		} catch (Exception ignored) {}
 		String arch = System.getProperty("os.arch");
-		if (!platform.isX64() && !arch.equals("x86")) {
+		if (!platform.isX64() && !arch.contains("86")) {
 			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try x64 version instead.");
 			System.exit(0);
 			return;
 		}
-		platform.loadLibraries();
+		try {
+			platform.loadLibraries();
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + e.getMessage());
+			System.exit(0);
+			return;
+		}
 		EmulatorMIDI.initDevices();
 		Emulator.commandLineArguments = commandLineArguments;
 		UILocale.initLocale();
