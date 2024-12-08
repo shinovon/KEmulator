@@ -50,14 +50,14 @@ public final class Property implements IProperty, SelectionListener {
 			{"Sony Ericsson", "com.sonyericsson"},
 			{"Motorola", "com.motorola"},
 			{"Vodafone", "com.vodafone"},
-			{"LG", "mmpp"},
+			{"LG MMPP", "mmpp"},
 
 			// nokia по отдельности
 			{"Nokia UI", "com.nokia.mid.ui"},
 			{"Nokia Sound", "com.nokia.mid.sound"},
 			{"Nokia M3D(O)", "com.nokia.mid.m3d"},
 			{"Nokia Location", "com.nokia.mid.location"},
-			{"Nokia InApp", "com.nokia.mid.payment"},
+			{"Nokia In-App", "com.nokia.mid.payment"},
 			{"Nokia IAPInfo (Stub)", "com.nokia.mid.iapinfo"},
 
 			{"MascotCapsule", "com.mascotcapsule"},

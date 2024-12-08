@@ -2,10 +2,10 @@ package com.motorola.funlight;
 
 class Factory {
 	public static Region getRegion(int i) {
-		return null;
+		return FunLight.getRegion(i);
 	}
 
 	public static Region[] getRegions() {
-		return null;
+		return FunLight.getRegions();
 	}
 }
