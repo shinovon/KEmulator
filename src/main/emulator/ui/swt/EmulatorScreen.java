@@ -611,8 +611,10 @@ public final class EmulatorScreen implements
 		var9.append((int) (this.zoom * 100.0F));
 		var9.append("%");
 		var9.append(var8);
-		var9.append(this.pauseStateStrings[this.pauseState]);
-		var9.append(var8);
+		if (pauseState != 1) {
+			var9.append(this.pauseStateStrings[this.pauseState]);
+			var9.append(var8);
+		}
 		if (this.pauseState == 1 && Settings.fpsCounter) {
 			var9.append(Profiler.FPS);
 			var9.append(" FPS");

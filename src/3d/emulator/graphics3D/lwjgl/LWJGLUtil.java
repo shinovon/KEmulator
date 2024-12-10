@@ -4,7 +4,7 @@ import java.nio.*;
 
 import org.lwjgl.BufferUtils;
 
-public final class LWJGLUtility {
+public final class LWJGLUtil {
 	private ByteBuffer normalByteBuffer;
 	private ShortBuffer normalShortBuffer;
 	private ByteBuffer colorBuffer;
@@ -15,7 +15,7 @@ public final class LWJGLUtility {
 	private ByteBuffer imageBuffer;
 	private FloatBuffer floatBuffer;
 
-	public LWJGLUtility() {
+	public LWJGLUtil() {
 		final int initVerticesCount = 1024 * 4;
 
 		normalByteBuffer = BufferUtils.createByteBuffer(initVerticesCount * 3);

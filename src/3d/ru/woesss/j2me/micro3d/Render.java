@@ -37,7 +37,6 @@ import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.lwjgl.Emulator3D;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.Util;
 import ru.woesss.j2me.micro3d.RenderNode.FigureNode;
 
 public class Render {
@@ -85,9 +84,8 @@ public class Render {
 	static void checkGlError(String glOperation) {
 		int error = glGetError();
 		if (error != GL_NO_ERROR) {
-			String s = Util.translateGLErrorString(error);
-			System.err.println(glOperation + ": glError " + s);
-			throw new RuntimeException(glOperation + ": glError " + s);
+			System.err.println(glOperation + ": glError " + error);
+			throw new RuntimeException(glOperation + ": glError " + error);
 		}
 	}
 
@@ -260,12 +258,12 @@ public class Render {
 		program.use();
 
 		BG_VBO.rewind();
-		glVertexAttribPointer(program.aPosition, 2, false, 4 * 4, BG_VBO);
+		glVertexAttribPointer(program.aPosition, 2, GL_FLOAT, false, 4 * 4, BG_VBO);
 		glEnableVertexAttribArray(program.aPosition);
 
 		// координаты текстур
 		BG_VBO.position(2);
-		glVertexAttribPointer(program.aTexture, 2, false, 4 * 4, BG_VBO);
+		glVertexAttribPointer(program.aTexture, 2, GL_FLOAT, false, 4 * 4, BG_VBO);
 		glEnableVertexAttribArray(program.aTexture);
 
 		if (preProcess) {
@@ -608,7 +606,7 @@ public class Render {
 			program.setLight(node.light);
 			program.setToonShading(node.attrs, node.toonThreshold, node.toonHigh, node.toonLow);
 
-			glVertexAttribPointer(program.aNormal, 3, false, 3 * 4, (FloatBuffer) node.normals.rewind());
+			glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.normals.rewind());
 			glEnableVertexAttribArray(program.aNormal);
 		} else {
 			glVertexAttrib2f(program.aMaterial, 0, 0);
@@ -618,7 +616,7 @@ public class Render {
 
 		program.bindMatrices(MVP_TMP, node.viewMatrix);
 
-		glVertexAttribPointer(program.aPosition, 3, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
+		glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
 		glEnableVertexAttribArray(program.aPosition);
 
 		if ((command & PDATA_COLOR_MASK) == Graphics3D.PDATA_COLOR_PER_COMMAND) {
@@ -651,7 +649,7 @@ public class Render {
 			program.setLight(node.light);
 			program.setToonShading(node.attrs, node.toonThreshold, node.toonHigh, node.toonLow);
 
-			glVertexAttribPointer(program.aNormal, 3, false, 3 * 4, (FloatBuffer) node.normals.rewind());
+			glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.normals.rewind());
 			glEnableVertexAttribArray(program.aNormal);
 		} else {
 			glVertexAttrib3f(program.aMaterial, 0, 0, command & Graphics3D.PATTR_COLORKEY);
@@ -661,7 +659,7 @@ public class Render {
 
 		program.bindMatrices(MVP_TMP, node.viewMatrix);
 
-		glVertexAttribPointer(program.aPosition, 3, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
+		glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
 		glEnableVertexAttribArray(program.aPosition);
 
 		glVertexAttribPointer(program.aColorData, 2, GL_UNSIGNED_BYTE, false, 2, (ByteBuffer) node.texCoords.rewind());
@@ -1251,7 +1249,7 @@ public class Render {
 				Program.Sprite program = Program.sprite;
 				program.use();
 
-				glVertexAttribPointer(program.aPosition, 4, false, 4 * 4, (FloatBuffer) node.vertices.rewind());
+				glVertexAttribPointer(program.aPosition, 4, GL_FLOAT, false, 4 * 4, (FloatBuffer) node.vertices.rewind());
 				glEnableVertexAttribArray(program.aPosition);
 
 				glVertexAttribPointer(program.aColorData, 2, GL_UNSIGNED_BYTE, false, 2, (ByteBuffer) node.texCoords.rewind());
@@ -1275,7 +1273,7 @@ public class Render {
 		glVertexAttrib2f(program.aMaterial, 0, 0);
 		program.bindMatrices(MVP_TMP, node.viewMatrix);
 
-		glVertexAttribPointer(program.aPosition, 3, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
+		glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, (FloatBuffer) node.vertices.rewind());
 		glEnableVertexAttribArray(program.aPosition);
 
 		if ((node.command & PDATA_COLOR_MASK) == Graphics3D.PDATA_COLOR_PER_COMMAND) {

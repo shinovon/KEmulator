@@ -14,48 +14,6 @@ import java.nio.IntBuffer;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
 
-	private static Class wglClass;
-	private static Class pixelFormatDescriptorClass;
-	private static Method ChoosePixelFormat;
-	private static Method SetPixelFormat;
-	private static Method wglCreateContext;
-	private static Method wglDeleteContext;
-	private static Method wglMakeCurrent;
-	private static Method wglGetCurrentContext;
-	private static Class osClass;
-	private static Method getDC;
-	private static Method releaseDC;
-	private static Method SwapBuffers;
-
-	static {
-		try {
-			wglClass = Class.forName("org.eclipse.swt.internal.opengl.win32.WGL");
-			pixelFormatDescriptorClass = Class.forName("org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR");
-			osClass = Class.forName("org.eclipse.swt.internal.win32.OS");
-
-			ChoosePixelFormat = ReflectUtil.getMethod(wglClass, "ChoosePixelFormat", long.class, pixelFormatDescriptorClass);
-			if (ChoosePixelFormat != null) {
-				SetPixelFormat = ReflectUtil.getMethod(wglClass, "SetPixelFormat", long.class, int.class, pixelFormatDescriptorClass);
-				wglCreateContext = ReflectUtil.getMethod(wglClass, "wglCreateContext", long.class);
-				wglMakeCurrent = ReflectUtil.getMethod(wglClass, "wglMakeCurrent", long.class, long.class);
-				wglDeleteContext = ReflectUtil.getMethod(wglClass, "wglDeleteContext", long.class);
-				getDC = ReflectUtil.getMethod(osClass, "getDC", long.class);
-				releaseDC = ReflectUtil.getMethod(osClass, "releaseDC", long.class, long.class);
-				SwapBuffers = ReflectUtil.getMethod(wglClass, "wglSwapBuffers", long.class);
-			} else {
-				ChoosePixelFormat = ReflectUtil.getMethod(wglClass, "ChoosePixelFormat", int.class, pixelFormatDescriptorClass);
-				SetPixelFormat = ReflectUtil.getMethod(wglClass, "SetPixelFormat", int.class, int.class, pixelFormatDescriptorClass);
-				wglCreateContext = ReflectUtil.getMethod(wglClass, "wglCreateContext", int.class);
-				wglMakeCurrent = ReflectUtil.getMethod(wglClass, "wglMakeCurrent", int.class, int.class);
-				wglDeleteContext = ReflectUtil.getMethod(wglClass, "wglDeleteContext", int.class);
-				getDC = ReflectUtil.getMethod(osClass, "getDC", int.class);
-				releaseDC = ReflectUtil.getMethod(osClass, "releaseDC", int.class, int.class);
-				SwapBuffers = ReflectUtil.getMethod(wglClass, "wglSwapBuffers", int.class);
-			}
-			wglGetCurrentContext = ReflectUtil.getMethod(wglClass, "wglGetCurrentContext");
-		} catch (Throwable ignored) {}
-	}
-
 	public boolean isX64() {
 		return true;
 	}
@@ -87,8 +45,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
 	public void loadLibraries() {
 		System.setProperty("jna.nosys", "true");
-		System.setProperty("org.lwjgl.librarypath", Emulator.getAbsolutePath());
 		loadSWTLibrary();
+		loadLWJGLNatives();
 	}
 
 	public boolean supportsMascotCapsule() {
@@ -122,115 +80,6 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
 	public IGraphics3D getGraphics3D() {
 		return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
-	}
-
-	public long createGLContext(long gcHandle, boolean b) throws Exception {
-		if (wglClass == null) {
-			throw new UnsupportedOperationException();
-		}
-		Object var4 = pixelFormatDescriptorClass.newInstance();
-		pixelFormatDescriptorClass.getField("nSize").set(var4, (short) 40);
-		pixelFormatDescriptorClass.getField("nVersion").set(var4, (short) 1);
-		pixelFormatDescriptorClass.getField("dwFlags").set(var4, 37 + (b ? 20 : 0));
-		pixelFormatDescriptorClass.getField("iPixelType").set(var4, (byte) 0);
-		pixelFormatDescriptorClass.getField("cColorBits").set(var4, (byte) Emulator.getEmulator().getScreenDepth());
-		pixelFormatDescriptorClass.getField("iLayerType").set(var4, (byte) 0);
-		int var5;
-		try {
-			var5 = (Integer) ChoosePixelFormat.invoke(null, gcHandle, var4);
-		} catch (IllegalArgumentException e) {
-			var5 = (Integer) ChoosePixelFormat.invoke(null, (int) gcHandle, var4);
-		}
-		if (var5 == 0) {
-			return 0;
-		}
-
-		try {
-			if (!((Boolean) SetPixelFormat.invoke(null, gcHandle, var5, var4))) {
-				return 0;
-			}
-		} catch (IllegalArgumentException e) {
-			if (!((Boolean) SetPixelFormat.invoke(null, (int) gcHandle, var5, var4))) {
-				return 0;
-			}
-		}
-
-		try {
-			return (Long) wglCreateContext.invoke(null, gcHandle);
-		} catch (IllegalArgumentException e) {
-			return (Integer) wglCreateContext.invoke(null, (int) gcHandle);
-		}
-	}
-
-	private long wglGetCurrentContext() throws Exception {
-		Object o = wglGetCurrentContext.invoke(null);
-		if (o instanceof Long) return (Long) o;
-		return (Integer) o;
-	}
-
-	public boolean isGLContextCurrent(long imgHandle) throws Exception {
-		if (wglClass == null) {
-			throw new UnsupportedOperationException();
-		}
-		return wglGetCurrentContext() == imgHandle;
-	}
-
-	public void setGLContextCurrent(long gcHandle, long contextHandle) throws Exception {
-		if (wglClass == null) {
-			throw new UnsupportedOperationException();
-		}
-		while (wglGetCurrentContext() > 0) ;
-		try {
-			wglMakeCurrent.invoke(null, gcHandle, contextHandle);
-		} catch (IllegalArgumentException e) {
-			wglMakeCurrent.invoke(null, (int) gcHandle, (int) contextHandle);
-		}
-	}
-
-	public void releaseGLContext(long gcHandle) throws Exception {
-		if (wglClass == null) {
-			throw new UnsupportedOperationException();
-		}
-		try {
-			wglMakeCurrent.invoke(null, gcHandle, -1L);
-		} catch (IllegalArgumentException e) {
-			wglMakeCurrent.invoke(null, (int) gcHandle, -1);
-		}
-	}
-
-	public void deleteGLContext(long contextHandle) throws Exception {
-		if (wglClass == null) {
-			throw new UnsupportedOperationException();
-		}
-		try {
-			wglDeleteContext.invoke(null, contextHandle);
-		} catch (IllegalArgumentException e) {
-			wglDeleteContext.invoke(null, (int) contextHandle);
-		}
-	}
-
-	public long getDC(long handle) throws Exception {
-		try {
-			return (Long) getDC.invoke(null, handle);
-		} catch (IllegalArgumentException e) {
-			return (Integer) getDC.invoke(null, (int) handle);
-		}
-	}
-
-	public void releaseDC(long handle, long dc) throws Exception {
-		try {
-			releaseDC.invoke(null, handle, dc);
-		} catch (IllegalArgumentException e) {
-			releaseDC.invoke(null, (int) handle, (int) dc);
-		}
-	}
-
-	public void swapBuffers(long dc) throws Exception {
-		try {
-			SwapBuffers.invoke(null, dc);
-		} catch (IllegalArgumentException e) {
-			SwapBuffers.invoke(null, (int) dc);
-		}
 	}
 
 	public void load3D() {
@@ -307,6 +156,31 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 			} catch (ClassNotFoundException e2) {
 				throw e;
 			}
+		}
+	}
+
+	private static void loadLWJGLNatives() {
+		String osn = System.getProperty("os.name").toLowerCase();
+		String osa = System.getProperty("os.arch").toLowerCase();
+		String os =
+				osn.contains("win") ? "windows" :
+						osn.contains("mac") ? "macos" :
+								osn.contains("linux") || osn.contains("nix") ? "linux" :
+										null;
+		if (os == null) {
+			return;
+		}
+		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64") && !osa.contains("arm")) {
+			return;
+		}
+		String arch = os + (osa.contains("amd64") ? "" : osa.contains("86") ? "-x86" : osa.contains("aarch64") ? "-arm64" : osa.contains("arm") ? "-arm32" : "");
+		try {
+			addToClassPath("lwjgl-natives-" + arch + ".jar");
+			addToClassPath("lwjgl-glfw-natives-" + arch + ".jar");
+			addToClassPath("lwjgl-opengl-natives-" + arch + ".jar");
+			addToClassPath("lwjgl3-swt-" + arch + ".jar");
+		} catch (RuntimeException e) {
+			e.printStackTrace();
 		}
 	}
 
