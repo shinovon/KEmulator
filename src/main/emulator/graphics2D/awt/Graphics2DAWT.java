@@ -150,31 +150,35 @@ public final class Graphics2DAWT implements IGraphics2D {
 	}
 
 	public final int getClipHeight() {
-		if (g.getClipBounds() == null) {
+		Rectangle r = g.getClipBounds();
+		if (r == null) {
 			return this.height;
 		}
-		return g.getClipBounds().height;
+		return r.height;
 	}
 
 	public final int getClipWidth() {
-		if (g.getClipBounds() == null) {
+		Rectangle r = g.getClipBounds();
+		if (r == null) {
 			return this.width;
 		}
-		return g.getClipBounds().width;
+		return r.width;
 	}
 
 	public final int getClipX() {
-		if (g.getClipBounds() == null) {
+		Rectangle r = g.getClipBounds();
+		if (r == null) {
 			return 0;
 		}
-		return g.getClipBounds().x;
+		return r.x;
 	}
 
 	public final int getClipY() {
-		if (g.getClipBounds() == null) {
+		Rectangle r = g.getClipBounds();
+		if (r == null) {
 			return 0;
 		}
-		return g.getClipBounds().y;
+		return r.y;
 	}
 
 	public final int getColor() {

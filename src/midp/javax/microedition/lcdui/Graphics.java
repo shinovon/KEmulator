@@ -311,29 +311,33 @@ public class Graphics
 		int clipY = n4;
 		int clipX2 = n3 + n5;
 		int clipY2 = n4 + n6;
-		if (clipX < this.getClipX()) {
-			clipX = this.getClipX();
+		int curClipX = getClipX(),
+			curClipY = getClipY(),
+			curClipW = getClipWidth(),
+			curClipH = getClipHeight();
+		if (clipX < curClipX) {
+			clipX = curClipX;
 		}
-		if (clipX2 < this.getClipX()) {
-			clipX2 = this.getClipX();
+		if (clipX2 < curClipX) {
+			clipX2 = curClipX;
 		}
-		if (clipY < this.getClipY()) {
-			clipY = this.getClipY();
+		if (clipY < curClipY) {
+			clipY = curClipY;
 		}
-		if (clipY2 < this.getClipY()) {
-			clipY2 = this.getClipY();
+		if (clipY2 < curClipY) {
+			clipY2 = curClipY;
 		}
-		if (clipX > this.getClipX() + this.getClipWidth()) {
-			clipX = this.getClipX() + this.getClipWidth();
+		if (clipX > curClipX + curClipW) {
+			clipX = curClipX + curClipW;
 		}
-		if (clipX2 > this.getClipX() + this.getClipWidth()) {
-			clipX2 = this.getClipX() + this.getClipWidth();
+		if (clipX2 > curClipX + curClipW) {
+			clipX2 = curClipX + curClipW;
 		}
-		if (clipY > this.getClipY() + this.getClipHeight()) {
-			clipY = this.getClipY() + this.getClipHeight();
+		if (clipY > curClipY + curClipH) {
+			clipY = curClipY + curClipH;
 		}
-		if (clipY2 > this.getClipY() + this.getClipHeight()) {
-			clipY2 = this.getClipY() + this.getClipHeight();
+		if (clipY2 > curClipY + curClipH) {
+			clipY2 = curClipY + curClipH;
 		}
 		final int n7 = clipX2 - clipX;
 		final int n8 = clipY2 - clipY;
