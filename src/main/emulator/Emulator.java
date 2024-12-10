@@ -456,29 +456,28 @@ public class Emulator implements Runnable {
 							String num = s.substring("MIDlet-".length());
 							try {
 								int n = Integer.parseInt(num);
-								String v = props.getProperty(s);
-								v = v.substring(0, v.indexOf(","));
-								midletKeys.add(n + " (" + v + ")");
+								midletKeys.add(s);
 							} catch (Exception ignored) {}
 						}
 					}
-					if (midletKeys.size() > 0) {
-						String[] arr = midletKeys.toArray(new String[0]);
-						// TODO список на swt
-						String c = (String) JOptionPane.showInputDialog(null, "Choose MIDlet to run", "KEmulator", JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
-						if (c == null) {
+					if (midletKeys.size() != 0) {
+						// must have to load device before screen is initialized
+						loadTargetDevice();
+
+						int n = emulatorimpl.getEmulatorScreen().showMidletChoice(midletKeys);
+						if (n == -1) {
 							CustomMethod.close();
 							System.exit(0);
 							return false;
 						}
-						c = props.getProperty("MIDlet-" + c.substring(0, c.indexOf(' ')));
+						String c = props.getProperty(midletKeys.get(n));
 						Emulator.midletClassName = c.substring(c.lastIndexOf(",") + 1).trim();
+						return true;
 					}
-				} else {
-					Emulator.midletClassName = props.getProperty("MIDlet-1");
-					if (Emulator.midletClassName != null) {
-						Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
-					}
+				}
+				Emulator.midletClassName = props.getProperty("MIDlet-1");
+				if (Emulator.midletClassName != null) {
+					Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
 				}
 			} else {
 				if (Emulator.classPath == null) {
