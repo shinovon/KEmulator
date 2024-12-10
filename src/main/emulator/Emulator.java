@@ -305,11 +305,11 @@ public class Emulator implements Runnable {
 				final String device = p.getProperty(key, null);
 				if (device != null) {
 					tryToSetDevice(device);
+					return;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return;
 		}
 
 		propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + File.separatorChar + "kemulator.cfg";
@@ -667,7 +667,7 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 
-		if (!platform.isX64())
+		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null) {
 			try {
 				Webcam w = Webcam.getDefault();
 				if (w != null) {
@@ -679,6 +679,7 @@ public class Emulator implements Runnable {
 					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
 				}
 			} catch (Throwable ignored) {}
+		}
 
 		try {
 			String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");

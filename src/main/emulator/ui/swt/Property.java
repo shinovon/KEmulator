@@ -274,13 +274,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Text localeText;
 	private Button keymapClearBtn;
 
-	/**
-	 * language label
-	 */
 	private CLabel labelLanguage;
-	/**
-	 * language Combo
-	 */
 	private Combo languageCombo;
 
 	private Composite keyMapControllerComp;
@@ -977,8 +971,10 @@ public final class Property implements IProperty, SelectionListener {
 
 		//set UILanguage
 		Settings.uiLanguage = languageCombo.getText().trim();
-		UILocale.initLocale();
-		Emulator.getEmulator().updateLanguage();
+		if (!languageCombo.getText().trim().equals(Settings.uiLanguage)) {
+			UILocale.initLocale();
+			Emulator.getEmulator().updateLanguage();
+		}
 
 		Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
 		Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
