@@ -43,6 +43,17 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.18 [2024.12.10]
+Reimplemented LCDUI TextField on SWT
+Rewrote MIDlet choice window on SWT
+M3G support on ARM
+Linux arm32 support
+Improved startup error messages
+Fixed crash with faulty JADs
+Fixed VLC player error on deallocate
+LCDUI Font implementation improvements
+Updated lwjgl to 3.3.3
+
 $v2.17.5 [2024.11.27]
 Bug fixes
 
@@ -57,9 +68,9 @@ Custom system properties mapping
 Ctrl+V handling in TextField
 Improved com.immersion.VibeTonz support
 Adding app title to the title of window
-Glitches when resizing non-fullscreen Canvas
-HttpConnection headers starting from index 1
-ImageItem layout
+Fixed glitches when resizing non-fullscreen Canvas
+Fixed HttpConnection headers starting from index 1
+Fixed ImageItem layout
 
 $v2.17.2 [2024.11.13]
 TextEditor, CanvasItem from Nokia UI 1.4
@@ -1023,7 +1034,7 @@ Motorola iDEN API (multimedia, micro3d)
 $[Libs]
 swt-4.20 / 4.7 (32-bit)
 asm-5.2
-lwjgl-2.9.4
+lwjgl-3.3.3
 java-discord-rpc-2.0.1
 jinput
 jna-5.2.0
