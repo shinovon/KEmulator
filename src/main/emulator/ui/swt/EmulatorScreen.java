@@ -61,6 +61,7 @@ public final class EmulatorScreen implements
 	public static int sizeW;
 	public static int sizeH;
 	public static boolean maximized;
+	public static boolean defaultSize;
 	private Transform paintTransform;
 	private int rotation;
 	private int rotatedWidth;
@@ -266,10 +267,11 @@ public final class EmulatorScreen implements
 	}
 
 	private void getWindowPos() {
-		locX = shell.getLocation().x;
-		locY = shell.getLocation().y;
 		maximized = shell.getMaximized();
 		if (!maximized) {
+			locX = shell.getLocation().x;
+			locY = shell.getLocation().y;
+
 			sizeW = shell.getSize().x;
 			sizeH = shell.getSize().y;
 		}
@@ -293,8 +295,11 @@ public final class EmulatorScreen implements
 			EmulatorScreen.locY = EmulatorScreen.display.getClientArea().height - this.shell.getSize().y >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
-		if (sizeW > 10 && sizeH > 10 && Settings.resizeMode != 0)
+		if (sizeW > 10 && sizeH > 10 && Settings.resizeMode != 0 && !defaultSize) {
 			shell.setSize(sizeW, sizeH);
+		} else {
+			defaultSize = true;
+		}
 		if (maximized)
 			shell.setMaximized(true);
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
@@ -453,8 +458,10 @@ public final class EmulatorScreen implements
 			int h;
 			int sx = Math.max(0, screenX);
 			int sy = Math.max(0, screenY);
-			if (screenWidth != 0 && screenHeight != 0 &&
-					(Settings.resizeMode == 2 || Settings.resizeMode == 3)) {
+			if (screenWidth != 0 && screenHeight != 0
+					&& (Settings.resizeMode == 2 || Settings.resizeMode == 3)
+					&& !defaultSize
+			) {
 				w = (int) (bw * zoom) + canvas.getBorderWidth() * 2 + sx * 2;
 				h = (int) (bh * zoom) + canvas.getBorderWidth() * 2 + sy * 2;
 			} else {
@@ -1260,7 +1267,9 @@ public final class EmulatorScreen implements
 			if (menuItem == this.rotate90MenuItem) {
 				rotate90degrees(false);
 				resized();
-				if (Settings.resizeMode == 0) zoom(zoom);
+				if (Settings.resizeMode == 0 || defaultSize) {
+					zoom(zoom);
+				}
 				return;
 			}
 			if (menuItem == this.forcePaintMenuItem) {
@@ -1618,6 +1627,9 @@ public final class EmulatorScreen implements
 		screenY = y;
 		screenWidth = scaledWidth;
 		screenHeight = scaledHeight;
+		if (!maximized) {
+			defaultSize = screenWidth == (int) (origWidth * zoom) && screenHeight == (int) (origHeight * zoom);
+		}
 		gc.setAdvanced(false);
 		this.method565(gc);
 		if (wasResized) {
@@ -2561,7 +2573,7 @@ public final class EmulatorScreen implements
 	public int showMidletChoice(Vector<String> midletKeys) {
 		midletSelection = -1;
 
-		Shell shell = new Shell(this.shell, SWT.DIALOG_TRIM);
+		Shell shell = new Shell(EmulatorImpl.getDisplay(), SWT.DIALOG_TRIM);
 		shell.setSize(300, 400);
 		shell.setText("Choose MIDlet to run");
 		shell.setLayout(new GridLayout(1, false));

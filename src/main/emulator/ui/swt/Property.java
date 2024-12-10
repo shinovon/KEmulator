@@ -622,6 +622,7 @@ public final class Property implements IProperty, SelectionListener {
 			EmulatorScreen.sizeW = Integer.parseInt(properties.getProperty("SizeW", "-1"));
 			EmulatorScreen.sizeH = Integer.parseInt(properties.getProperty("SizeH", "-1"));
 			EmulatorScreen.maximized = Boolean.parseBoolean(properties.getProperty("Maximized", "false"));
+			EmulatorScreen.defaultSize = Boolean.parseBoolean(properties.getProperty("DefaultSize", "true"));
 
 			Settings.alwaysOnTop = Boolean.parseBoolean(properties.getProperty("AlwaysOnTop", "false"));
 
@@ -844,6 +845,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
 			properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
 			properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
+			properties.setProperty("DefaultSize", String.valueOf(EmulatorScreen.defaultSize));
 
 			properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
 
