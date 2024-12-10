@@ -5,7 +5,7 @@ import emulator.*;
 
 public class Font {
 	IFont font;
-	int anInt1313;
+	int face;
 	int size;
 	int style;
 	public static final int STYLE_PLAIN = 0;
@@ -24,7 +24,7 @@ public class Font {
 
 	public Font(final int anInt1313, final int style, final int anInt1315) {
 		super();
-		this.anInt1313 = anInt1313;
+		this.face = anInt1313;
 		this.size = anInt1315;
 		this.style = style;
 		int n = 0;
@@ -109,7 +109,7 @@ public class Font {
 	}
 
 	public int getFace() {
-		return this.anInt1313;
+		return this.face;
 	}
 
 	public boolean isPlain() {
@@ -117,15 +117,15 @@ public class Font {
 	}
 
 	public boolean isBold() {
-		return this.style == 1;
+		return (this.style & STYLE_BOLD) == STYLE_BOLD;
 	}
 
 	public boolean isItalic() {
-		return this.style == 2;
+		return(this.style & STYLE_ITALIC) == STYLE_ITALIC;
 	}
 
 	public boolean isUnderlined() {
-		return this.style == 4;
+		return (this.style & STYLE_UNDERLINED) == STYLE_UNDERLINED;
 	}
 
 	public int getBaselinePosition() {

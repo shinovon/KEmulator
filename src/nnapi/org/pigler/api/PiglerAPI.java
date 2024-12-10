@@ -46,7 +46,7 @@ public class PiglerAPI {
     }
 
     public int getAPIVersion() {
-        return 3;
+        return 4;
     }
 
     public int createNotification(String title, String text, Image icon, boolean removeOnTap) throws Exception {
@@ -66,18 +66,24 @@ public class PiglerAPI {
     }
 
     public void updateNotification(int uid, Image icon) throws Exception {
-        if(icon != null)
-            try {
-                SoftNotificationImpl.trayIcon.setImage(((ImageAWT) icon.getImpl()).getBufferedImage());
-                SoftNotificationImpl.trayIcon.setImageAutoSize(true);
-            } catch (Exception ignored) {
-            }
+        if(icon == null) return;
+        try {
+            SoftNotificationImpl.trayIcon.setImage(((ImageAWT) icon.getImpl()).getBufferedImage());
+            SoftNotificationImpl.trayIcon.setImageAutoSize(true);
+        } catch (Exception ignored) {}
     }
 
     public void removeNotification(int uid) throws Exception {
+        if (uid == 2100) {
+            created = false;
+        }
     }
 
     public int removeAllNotifications() {
+        if (created) {
+            created = false;
+            return 1;
+        }
         return 0;
     }
 
@@ -113,6 +119,22 @@ public class PiglerAPI {
 
     public int getNotificationsCount() {
         return created ? 1 : 0;
+    }
+
+    public int getGlobalNotificationsCount() throws Exception {
+        return created ? 1 : 0;
+    }
+
+    public boolean isSingleLine() {
+        return false;
+    }
+
+    public int getIconSize() {
+        return 52;
+    }
+
+    public void showGlobalPopup(String title, String text, int flags) {
+        throw new PiglerException("showGlobalPopup not supported");
     }
 
     public void _callback(int i) {

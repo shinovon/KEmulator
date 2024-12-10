@@ -178,12 +178,9 @@ public abstract class Canvas extends Displayable {
 		return w;
 	}
 
-	public int getHeight() {
-		return h;
-	}
-
 	public void setFullScreenMode(final boolean b) {
 		if (!Settings.ignoreFullScreen) {
+			if (b == fullScreen) return;
 			fullScreen = b;
 			updateSize(true);
 		} else if (!fullScreen) {

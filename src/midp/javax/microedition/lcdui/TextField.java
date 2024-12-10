@@ -39,6 +39,8 @@ public class TextField extends Item {
 
 	public void setString(final String aString25) {
 		this.string = aString25;
+		if (focused)
+			Emulator.getEmulator().getScreen().getCaret().updateText(this, string);
 		layoutForm();
 	}
 
@@ -115,13 +117,15 @@ public class TextField extends Item {
 	}
 
 	void defocus() {
-		if (focused || !updateFocus) Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+		if (focused || !updateFocus)
+			Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		super.defocus();
 		updateFocus = true;
 	}
 
 	void hidden() {
-		if (focused || !updateFocus) Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+		if (focused || !updateFocus)
+			Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		updateFocus = true;
 	}
 
@@ -140,19 +144,16 @@ public class TextField extends Item {
 			}
 		}
 		if (focused) g.setColor(-8355712);
-		g.drawRect(2, yo, w - 4, bounds[H] - yo + y - 2);
+		g.drawRect(x + 2, yo, w - 4, bounds[H] - yo + y - 2);
 		g.setFont(Screen.font);
 		if (focused) g.setColor(8617456);
-		if ((caretX != x + 4 || caretY != yo + 4 || updateFocus) && focused) {
+		if ((caretX != x + 3 || caretY != yo + 1 || updateFocus) && focused) {
 			updateFocus = false;
-			caretX = x + 4;
-			caretY = yo + 4;
+			caretX = x + 3;
+			caretY = yo + 1;
 			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		}
-		for (int j = 0; j < this.textArr.length; ++j) {
-			g.drawString(this.textArr[j], x + 4, yo + 2, 0);
-			yo += Screen.font.getHeight() + 4;
-		}
+		g.drawString(this.textArr[0], x + 4, yo + 2, 0);
 	}
 
 	void layout(Row row) {
@@ -167,7 +168,7 @@ public class TextField extends Item {
 		}
 		final Font aFont173 = Screen.font;
 		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, availableWidth, availableWidth);
-		bounds[H] = Math.max(getMinimumHeight(), Math.min(n + (aFont173.getHeight() + 4) * this.textArr.length, screen.bounds[H]));
+		bounds[H] = Math.max(getMinimumHeight(), Math.min(n + (aFont173.getHeight() + 4), screen.bounds[H]));
 	}
 
 	public int getMinimumWidth() {
@@ -184,5 +185,23 @@ public class TextField extends Item {
 
 	boolean keyScroll(int key, boolean repeat) {
 		return key == Canvas.LEFT || key == Canvas.RIGHT;
+	}
+
+	public int _getTextAreaWidth() {
+		return screen.bounds[W] - 5;
+	}
+
+	public int _getTextAreaHeight() {
+		return Screen.font.getHeight() + 5;
+	}
+
+	 public boolean _isUneditable() {
+		return (constraints & UNEDITABLE) == UNEDITABLE;
+	 }
+
+	public void _setString(String text) {
+		this.string = text;
+		layoutForm();
+		notifyStateChanged();
 	}
 }

@@ -274,6 +274,11 @@ public class Displayable {
 	}
 
 	public void _invokeSizeChanged(int w, int h) {
+		_invokeSizeChanged(w, h, true);
+	}
+
+
+	void _invokeSizeChanged(int w, int h, boolean b) {
 		IScreen s = Emulator.getEmulator().getScreen();
 		if (swtContent != null) {
 			asyncExec(new Runnable() {
@@ -291,7 +296,12 @@ public class Displayable {
 			if (!fullScreen) {
 				h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
 			}
-			sizeChanged(bounds[W] = this.w - 4, bounds[H] = h);
+			if (!(this instanceof Canvas)) {
+				w -= 4;
+			}
+			bounds[W] = w;
+			bounds[H] = h;
+			if (b) sizeChanged(w, h);
 		}
 		repaintScreen();
 	}
@@ -541,9 +551,13 @@ public class Displayable {
 	}
 
 	void updateSize(boolean force) {
-		if (force) forceUpdateSize = true;
-		if (Emulator.getCurrentDisplay().getCurrent() != this) return;
 		IScreen s = Emulator.getEmulator().getScreen();
+		if (force) {
+			forceUpdateSize = true;
+			_invokeSizeChanged(s.getWidth(), s.getHeight(), false);
+			forceUpdateSize = true;
+		}
+		if (Emulator.getCurrentDisplay().getCurrent() != this) return;
 		Emulator.getEventQueue().sizeChanged(s.getWidth(), s.getHeight());
 	}
 

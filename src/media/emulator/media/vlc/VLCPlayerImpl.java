@@ -392,9 +392,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 				mediaPlayer.release();
 				released = true;
 			}
-		} catch (Error e) {
-			e.printStackTrace();
-		}
+		} catch (Error ignored) {}
 		if (dataSource != null) {
 			dataSource.disconnect();
 		}
@@ -414,9 +412,14 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 				return;
 			}
 		}
-		if (!released)
-			mediaPlayer.release();
-		released = true;
+		try {
+			if (mediaPlayer == null) {
+				released = true;
+			} else if (!released) {
+				mediaPlayer.release();
+				released = true;
+			}
+		} catch (Error ignored) {}
 		if (this.state == PREFETCHED) {
 			state = REALIZED;
 		} else {

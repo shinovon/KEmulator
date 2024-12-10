@@ -43,6 +43,9 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.17.5 [2024.11.27]
+Bug fixes
+
 $v2.17.4 [2024.11.23]
 Fixed critical bug in HttpConnection after v17.3
 Changed commands placement
@@ -979,26 +982,42 @@ v0.1.0 [2006.06.15]
 ==================
 $[Supported APIs]
 MIDP 2.0 (JSR118)
-NokiaUI 1.4 (except TextEditor)
+FileConnection (JSR75)
+Wireless Messaging API 1.0 (JSR120)
+MMAPI (JSR135)
+Location (JSR179)
+M3G 1.1 (JSR184)
+OpenGL ES (JSR239)
+Mobile Sensor API (JSR256)
+NokiaUI 1.4
 Samsung 1.0 (win32 only)
 Sprint 1.0
 Siemens API
-WMA 1.0 (JSR120)
-Sensor (JSR256)
-M3G 1.1 (JSR184)
-OpenGL ES (JSR239)
 MascotCapsule v3
-SoftBank MEXA
+SoftBank MEXA (com.mexa, com.jblend, com.j_phone)
 Nokia M3D(O)
-Vodafone API
+Vodafone API 1.0
 PantechAudio (win32 only)
+LG MMPP API (mmpp.media)
+Siemens S60 Game API (com.siemens.s60.lcdui.game)
+Pigler Notifications API (org.pigler)
+com.gcjsp.v10
+tw.com.fareastone.v10
+com.bmc.media
 
 $[Stub APIs]
-JSR 211 ContentHandler
-Nokia InApp
+PIM (JSR75)
+Bluetooth (JSR82)
+ContentHandler (JSR211)
+AMMS (JSR234)
+Nokia In-App
+Nokia IAPInfo API
 Immersion VibeTonz
 com.nec
-com.motorola
+BlackBerry API (net.rim.device.api)
+Motorola FunLights API 1.0
+Motorola VibeLight API
+Motorola iDEN API (multimedia, micro3d)
 
 ==================
 $[Libs]
@@ -1006,6 +1025,7 @@ swt-4.20 / 4.7 (32-bit)
 asm-5.2
 lwjgl-2.9.4
 java-discord-rpc-2.0.1
+jinput
 jna-5.2.0
 webcam-capture-0.3.12
 slf4j-api-1.7.2

@@ -10,4 +10,12 @@ public interface ICaret {
 	int getCaretPosition();
 
 	void displayableChanged();
+
+    void updateText(Object item, String text);
+
+	void setSelection(int index, int length);
+
+	String getSelection();
+
+	void setCaret(int index);
 }

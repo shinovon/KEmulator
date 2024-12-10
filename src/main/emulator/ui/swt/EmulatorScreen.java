@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.custom.CustomJarResources;
 import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.custom.*;
 import emulator.graphics2D.swt.ImageSWT;
@@ -60,6 +61,7 @@ public final class EmulatorScreen implements
 	public static int sizeW;
 	public static int sizeH;
 	public static boolean maximized;
+	public static boolean defaultSize;
 	private Transform paintTransform;
 	private int rotation;
 	private int rotatedWidth;
@@ -174,6 +176,7 @@ public final class EmulatorScreen implements
 	private Displayable lastDisplayable;
 	private boolean painted;
 	private final Vector<String> caretKeys = new Vector<String>();
+	private int midletSelection;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -219,7 +222,7 @@ public final class EmulatorScreen implements
 
 	public void showMessage(final String message) {
 		try {
-			setWindowOnTop(getHandle(shell), true);
+			setWindowOnTop(ReflectUtil.getHandle(shell), true);
 		} catch (Throwable ignored) {}
 		final MessageBox messageBox;
 		(messageBox = new MessageBox(this.shell)).setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
@@ -227,21 +230,48 @@ public final class EmulatorScreen implements
 		messageBox.open();
 	}
 
-	private static long getHandle(Control c) {
+	public void showMessage(String title, String detail) {
 		try {
-			Class<?> cl = c.getClass();
-			Field f = cl.getField("handle");
-			return f.getLong(c);
-		} catch (Exception e) {
-			throw new Error(e);
+			setWindowOnTop(ReflectUtil.getHandle(shell), true);
+		} catch (Throwable ignored) {}
+
+		Shell shell = new Shell(this.shell, SWT.DIALOG_TRIM);
+		shell.setSize(450, 300);
+		shell.setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
+		shell.setLayout(new GridLayout(1, false));
+
+		Composite composite = new Composite(shell, SWT.NONE);
+		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		Label label = new Label(composite, SWT.NONE);
+		label.setText(title);
+
+		Composite composite_1 = new Composite(shell, SWT.NONE);
+		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		composite_1.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		Text text = new Text(composite_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+		text.setText(detail);
+
+//		shell.pack();
+		Rectangle clientArea = EmulatorScreen.display.getClientArea();
+		Point size = shell.getSize();
+		shell.setLocation((clientArea.width - size.x) / 2, (clientArea.height - size.y) / 2);
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!EmulatorScreen.display.readAndDispatch()) {
+				EmulatorScreen.display.sleep();
+			}
 		}
 	}
 
 	private void getWindowPos() {
-		locX = shell.getLocation().x;
-		locY = shell.getLocation().y;
 		maximized = shell.getMaximized();
 		if (!maximized) {
+			locX = shell.getLocation().x;
+			locY = shell.getLocation().y;
+
 			sizeW = shell.getSize().x;
 			sizeH = shell.getSize().y;
 		}
@@ -265,8 +295,11 @@ public final class EmulatorScreen implements
 			EmulatorScreen.locY = EmulatorScreen.display.getClientArea().height - this.shell.getSize().y >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
-		if (sizeW > 10 && sizeH > 10 && Settings.resizeMode != 0)
+		if (sizeW > 10 && sizeH > 10 && Settings.resizeMode != 0 && !defaultSize) {
 			shell.setSize(sizeW, sizeH);
+		} else {
+			defaultSize = true;
+		}
 		if (maximized)
 			shell.setMaximized(true);
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
@@ -425,8 +458,10 @@ public final class EmulatorScreen implements
 			int h;
 			int sx = Math.max(0, screenX);
 			int sy = Math.max(0, screenY);
-			if (screenWidth != 0 && screenHeight != 0 &&
-					(Settings.resizeMode == 2 || Settings.resizeMode == 3)) {
+			if (screenWidth != 0 && screenHeight != 0
+					&& (Settings.resizeMode == 2 || Settings.resizeMode == 3)
+					&& !defaultSize
+			) {
 				w = (int) (bw * zoom) + canvas.getBorderWidth() * 2 + sx * 2;
 				h = (int) (bh * zoom) + canvas.getBorderWidth() * 2 + sy * 2;
 			} else {
@@ -676,7 +711,7 @@ public final class EmulatorScreen implements
 		(this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
 		this.forcePaintMenuItem.addSelectionListener(this);
 		try {
-			setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+			setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
 		} catch (Throwable ignored) {}
 		new MenuItem(this.menuView, 2);
 		(this.keypadMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
@@ -1196,7 +1231,7 @@ public final class EmulatorScreen implements
 			if (menuItem == this.alwaysOnTopMenuItem) {
 				Settings.alwaysOnTop = this.alwaysOnTopMenuItem.getSelection();
 				try {
-					setWindowOnTop(getHandle(shell), Settings.alwaysOnTop);
+					setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
 				} catch (Throwable ignored) {}
 				return;
 			}
@@ -1236,7 +1271,9 @@ public final class EmulatorScreen implements
 			if (menuItem == this.rotate90MenuItem) {
 				rotate90degrees(false);
 				resized();
-				if (Settings.resizeMode == 0) zoom(zoom);
+				if (Settings.resizeMode == 0 || defaultSize) {
+					zoom(zoom);
+				}
 				return;
 			}
 			if (menuItem == this.forcePaintMenuItem) {
@@ -1397,8 +1434,17 @@ public final class EmulatorScreen implements
 	private static void setWindowOnTop(final long handle, final boolean b) {
 		// TODO
 		try {
-			OS.SetWindowPos((int) handle, b ? -1 : -2, 0, 0, 0, 0, 19);
+			Class cls = OS.class;
+			Method setWindowPos;
+			try {
+				setWindowPos = cls.getMethod("SetWindowPos", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
+				setWindowPos.invoke(null, (int) handle, b ? -1 : -2, 0, 0, 0, 0, 19);
+			} catch (Exception e) {
+				setWindowPos = cls.getMethod("SetWindowPos", long.class, long.class, int.class, int.class, int.class, int.class, int.class);
+				setWindowPos.invoke(null, handle, b ? -1L : -2L, 0, 0, 0, 0, 19);
+			}
 		} catch (Throwable ignored) {}
+
 	}
 
 	private void updatePauseState() {
@@ -1584,6 +1630,9 @@ public final class EmulatorScreen implements
 		screenY = y;
 		screenWidth = scaledWidth;
 		screenHeight = scaledHeight;
+		if (!maximized) {
+			defaultSize = screenWidth == (int) (origWidth * zoom) && screenHeight == (int) (origHeight * zoom);
+		}
 		gc.setAdvanced(false);
 		this.method565(gc);
 		if (wasResized) {
@@ -1987,6 +2036,41 @@ public final class EmulatorScreen implements
 			h = getHeight();
 			x = (int) (x / ((float) w / screenWidth)) + screenX;
 			y = (int) (y / ((float) h / screenHeight)) + screenY;
+		}
+		int tmp;
+		switch (this.rotation) {
+			case 0:
+				break;
+			case 1:
+				tmp = x;
+				x = y;
+				y = w - tmp;
+				break;
+			case 2:
+				x = w - x;
+				y = h - y;
+				break;
+			case 3:
+				tmp = x;
+				x = h - y;
+				y = tmp;
+		}
+		return new int[]{x, y};
+	}
+
+	public int[] transformCaretSize(int x, int y) {
+		// Map coordinates on window to canvas
+		int w, h;
+		if (rotation % 2 == 1) {
+			w = getHeight();
+			h = getWidth();
+			x = (int) (x / ((float) w / screenWidth));
+			y = (int) (y / ((float) h / screenHeight));
+		} else {
+			w = getWidth();
+			h = getHeight();
+			x = (int) (x / ((float) w / screenWidth));
+			y = (int) (y / ((float) h / screenHeight));
 		}
 		int tmp;
 		switch (this.rotation) {
@@ -2465,9 +2549,6 @@ public final class EmulatorScreen implements
 		return leftSoftLabel.toDisplay(0, leftSoftLabel.getSize().y);
 	}
 
-	/**
-	 * updateLanguage
-	 */
 	public void updateLanguage() {
 		initMenu();
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -2480,6 +2561,49 @@ public final class EmulatorScreen implements
 
 	public void appStarted(boolean first) {
 		if (first) EmulatorImpl.asyncExec(new WindowOpen(this, 0));
+	}
+
+	public int showMidletChoice(Vector<String> midletKeys) {
+		midletSelection = -1;
+
+		final Shell shell = new Shell(EmulatorImpl.getDisplay(), SWT.DIALOG_TRIM);
+		shell.setSize(300, 400);
+		shell.setText("Choose MIDlet to run");
+		shell.setLayout(new GridLayout(1, false));
+
+		final Table table = new Table(shell, SWT.BORDER | SWT.SINGLE);
+		table.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent arg0) {
+				midletSelection = table.getSelectionIndex();
+				shell.close();
+			}
+		});
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+		Composite composite = new Composite(shell, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		for (String k : midletKeys) {
+			String[] p = Emulator.getEmulator().getAppProperty(k).split(",");
+			TableItem t = new TableItem(table, SWT.NONE);
+			t.setText(0, p[0].trim());
+			try {
+				t.setImage(0, new Image(EmulatorImpl.getDisplay(), CustomJarResources.getResourceAsStream(p[1].trim())));
+			} catch (Exception ignored) {}
+		}
+
+		Rectangle clientArea = EmulatorScreen.display.getClientArea();
+		Point size = shell.getSize();
+		shell.setLocation((clientArea.width - size.x) / 2, (clientArea.height - size.y) / 2);
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!EmulatorScreen.display.readAndDispatch()) {
+				EmulatorScreen.display.sleep();
+			}
+		}
+
+		return midletSelection;
 	}
 
 	final class ShellPosition implements Runnable {

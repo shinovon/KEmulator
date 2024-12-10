@@ -260,7 +260,6 @@ public class DateField extends Item {
 	}
 
 	public synchronized void _input(char n) {
-		System.out.println("input " + n);
 		int pos = this.pos;
 		if (mode == TIME) pos += 3;
 		Calendar c = Calendar.getInstance();

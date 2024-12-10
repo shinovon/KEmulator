@@ -271,21 +271,35 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	private static void loadSWTLibrary() {
 		String osn = System.getProperty("os.name").toLowerCase();
 		String osa = System.getProperty("os.arch").toLowerCase();
-		String os =
-				osn.contains("win") ? "win32" :
-						osn.contains("mac") ? "macosx" :
-								osn.contains("linux") || osn.contains("nix") ? "gtk-linux" :
-										null;
-		if (os == null) {
-			throw new RuntimeException("unsupported os: " + osn);
+
+		String os;
+		if (osn.contains("win")) {
+			os = "win32";
+		} else if (osn.contains("mac")) {
+			os = "macosx";
+		} else if (osn.contains("linux") || osn.contains("nix")) {
+			os = "gtk-linux";
+		} else {
+			throw new RuntimeException("Unsupported os: " + osn);
 		}
-		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64")) {
-			throw new RuntimeException("unsupported arch: " + osa);
+
+		String arch;
+		if (osa.contains("amd64")) {
+			arch = "x86_64";
+		} else if (osa.contains("86")) {
+			arch = "x86";
+		} else if (osa.contains("aarch64") || osa.contains("armv8")) {
+			arch = "aarch64";
+		} else if (osa.contains("arm")) {
+			arch = "armhf";
+		} else if (osa.contains("ppc") || osa.contains("riscv")) {
+			arch = osa;
+		} else {
+			throw new RuntimeException("Unsupported arch: " + osa);
 		}
-		String arch = osa.contains("amd64") ? "x86_64" : osa.contains("86") ? "x86" : osa;
-		String swtFileName = "swt-" + os + "-" + arch + ".jar";
+
 		try {
-			addToClassPath(swtFileName);
+			addToClassPath("swt-" + os + "-" + arch + ".jar");
 		} catch (RuntimeException e) {
 			// Check if SWT is already loaded
 			try {

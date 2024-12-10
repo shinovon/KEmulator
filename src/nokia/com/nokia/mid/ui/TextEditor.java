@@ -86,6 +86,7 @@ public class TextEditor extends CanvasItem {
 		}
 		iWidth = width;
 		iHeight = height;
+		updateFocus = true;
 		layout();
 		repaint();
 	}
@@ -93,6 +94,7 @@ public class TextEditor extends CanvasItem {
 	public void setPosition(int x, int y) {
 		iPositionX = x;
 		iPositionY = y;
+		updateFocus = true;
 		repaint();
 	}
 
@@ -123,7 +125,9 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public void setCaret(int index) {
-		// TODO
+		if (iFocused) {
+			Emulator.getEmulator().getScreen().getCaret().setCaret(index);
+		}
 	}
 
 	public int getCaretPosition() {
@@ -146,6 +150,7 @@ public class TextEditor extends CanvasItem {
 			font = Font.getDefaultFont();
 		}
 		iFont = font;
+		updateFocus = true;
 	}
 
 	public int getBackgroundColor() {
@@ -179,6 +184,9 @@ public class TextEditor extends CanvasItem {
 			throw new IllegalArgumentException("content");
 		}
 		iContent = content;
+
+		if (iVisible)
+			Emulator.getEmulator().getScreen().getCaret().updateText(this, iContent);
 		
 		layout();
 		repaint();
@@ -234,11 +242,15 @@ public class TextEditor extends CanvasItem {
 	}
 
 	public void setSelection(int index, int length) {
-
+		if (iFocused) {
+			Emulator.getEmulator().getScreen().getCaret().setSelection(index, length);
+		}
 	}
 
 	public String getSelection() {
-		// TODO
+		if (iFocused) {
+			return Emulator.getEmulator().getScreen().getCaret().getSelection();
+		}
 		return null;
 	}
 
@@ -259,7 +271,7 @@ public class TextEditor extends CanvasItem {
 		if (iHeight == -1) {
 			return Math.max(getFont().getHeight() + 4, iContentHeight);
 		}
-		return Math.max(iHeight, iContentHeight);
+		return iHeight;
 	}
 
 	public int getWidth() {
@@ -301,10 +313,10 @@ public class TextEditor extends CanvasItem {
 
 		g._setColor(iFocused && iFocusBgColorSet ? iFocusBgColor : iBgColor);
 		g.fillRect(x, y, w, h);
-		if ((caretX != x + 4 || caretY != y + 4 || updateFocus) && iFocused) {
+		if ((caretX != x || caretY != y || updateFocus) && iFocused) {
 			updateFocus = false;
-			caretX = x + 4;
-			caretY = y + 4;
+			caretX = x;
+			caretY = y;
 			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		}
 		if (iContent.length() == 0 && !iFocused) {
@@ -314,13 +326,26 @@ public class TextEditor extends CanvasItem {
 		}
 		g._setColor(iFocused && iFocusFgColorSet ? iFocusFgColor : iFgColor);
 
-		for (int j = 0; j < textArr.length; ++j) {
+		if (!iMultiline) {
+			g.drawString(textArr[0], x + 4, y + 2, 0);
+			return;
+		}
+		int th = font.getHeight() + 4;
+		int l = 0;
+		while(th * textArr.length > h + (th * l)) {
+			l++;
+		}
+		for (int j = l; j < textArr.length; ++j) {
 			g.drawString(textArr[j], x + 4, y + 2, 0);
-			y += font.getHeight() + 4;
+			y += th;
 		}
 	}
 
-	public void _contentChanged() {
+	public void _contentChanged(String s) {
+		iContent = s;
+
+		layout();
+		repaint();
 		if (iListener != null) {
 			iListener.inputAction(this, TextEditorListener.ACTION_CONTENT_CHANGE);
 		}
