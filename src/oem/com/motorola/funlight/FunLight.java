@@ -29,7 +29,7 @@ public class FunLight {
 	}
 
 	public static Region[] getRegions() {
-		return null;
+		return new Region[] { new Region_Blank() };
 	}
 
 	public static void releaseControl() {

@@ -663,7 +663,7 @@ public class Emulator implements Runnable {
 		System.setProperty("com.nokia.pointer.number", "0");
 		System.setProperty("kemulator.hwid", getHWID());
 		System.setProperty("microedition.amms.version", "1.0");
-		System.setProperty("org.pigler.api.version", "1.2-kemulator");
+		System.setProperty("org.pigler.api.version", "1.4-kemulator");
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 
