@@ -274,13 +274,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Text localeText;
 	private Button keymapClearBtn;
 
-	/**
-	 * language label
-	 */
 	private CLabel labelLanguage;
-	/**
-	 * language Combo
-	 */
 	private Combo languageCombo;
 
 	private Composite keyMapControllerComp;
@@ -628,6 +622,7 @@ public final class Property implements IProperty, SelectionListener {
 			EmulatorScreen.sizeW = Integer.parseInt(properties.getProperty("SizeW", "-1"));
 			EmulatorScreen.sizeH = Integer.parseInt(properties.getProperty("SizeH", "-1"));
 			EmulatorScreen.maximized = Boolean.parseBoolean(properties.getProperty("Maximized", "false"));
+			EmulatorScreen.defaultSize = Boolean.parseBoolean(properties.getProperty("DefaultSize", "true"));
 
 			Settings.alwaysOnTop = Boolean.parseBoolean(properties.getProperty("AlwaysOnTop", "false"));
 
@@ -850,6 +845,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
 			properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
 			properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
+			properties.setProperty("DefaultSize", String.valueOf(EmulatorScreen.defaultSize));
 
 			properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
 
@@ -977,8 +973,10 @@ public final class Property implements IProperty, SelectionListener {
 
 		//set UILanguage
 		Settings.uiLanguage = languageCombo.getText().trim();
-		UILocale.initLocale();
-		Emulator.getEmulator().updateLanguage();
+		if (!languageCombo.getText().trim().equals(Settings.uiLanguage)) {
+			UILocale.initLocale();
+			Emulator.getEmulator().updateLanguage();
+		}
 
 		Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
 		Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
