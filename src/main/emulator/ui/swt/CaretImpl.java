@@ -1,6 +1,5 @@
 package emulator.ui.swt;
 
-import com.nokia.mid.ui.Clipboard;
 import com.nokia.mid.ui.TextEditor;
 import emulator.Emulator;
 import emulator.Settings;
@@ -18,7 +17,7 @@ import org.eclipse.swt.graphics.Transform;
 
 public final class CaretImpl implements ICaret, ModifyListener, TraverseListener, FocusListener {
 	private static final Font font;
-	private final Text swtText;
+	private Text swtText;
 	private Canvas swtCanvas;
 	private Caret swtCaret;
 	private float zoom;
@@ -26,7 +25,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	private int caretLocY;
 	private int caretX;
 	private int caretY;
-	private Object item;
+	private Object currentItem;
 	private int caretPosition;
 	private int caretCol;
 	private int caretRow;
@@ -37,17 +36,11 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		this.swtCanvas = aCanvas838;
 		(this.swtCaret = new Caret(this.swtCanvas, 0)).setVisible(false);
 
-		swtText = new Text(swtCanvas, SWT.MULTI | SWT.WRAP);
-
-		swtText.setVisible(false);
-		swtText.addModifyListener(this);
-		swtText.addTraverseListener(this);
-		swtText.addFocusListener(this);
-
 		this.zoom = 1.0f;
 	}
 
 	public final int getCaretPosition() {
+		if (swtText == null || currentItem == null) return 0;
 		EmulatorImpl.syncExec( new Runnable() {
 			public void run() {
 				try {
@@ -59,10 +52,12 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public final String getSelection() {
+		if (swtText == null || currentItem == null) return null;
 		return swtText.getSelectionText();
 	}
 
 	public void setCaret(final int index) {
+		if (swtText == null || currentItem == null) return;
 		EmulatorImpl.syncExec( new Runnable() {
 			public void run() {
 				try {
@@ -73,6 +68,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public void setSelection(final int index, final int length) {
+		if (swtText == null || currentItem == null) return;
 		EmulatorImpl.syncExec( new Runnable() {
 			public void run() {
 				try {
@@ -90,28 +86,28 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		this.caretLocY = y;
 		int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaret(x, y);
 		swtCaret.setLocation(i[0], i[1]);
-		swtText.setLocation(i[0], i[1]);
+		if (swtText != null) swtText.setLocation(i[0], i[1]);
 	}
 
 	public final void setWindowZoom(final float aFloat840) {
 		this.zoom = aFloat840;
-		if (item != null) {
+		if (currentItem != null) {
 			if (swtFont != null && !swtFont.isDisposed()) {
 				swtText.setFont(null);
 				swtFont.dispose();
 			}
-			if (item instanceof DateField) {
+			if (currentItem instanceof DateField) {
 				this.swtCaret.setSize(Math.min(1, (int) aFloat840), (int) (font.getBaselinePosition() * aFloat840));
 				this.setCaretLocation(this.caretLocX, this.caretLocY);
 //				swtCaret.setVisible(true);
 			} else {
 				int w, h;
-				if (item instanceof TextEditor) {
-					w = ((TextEditor) item).getWidth();
-					h = ((TextEditor) item).getHeight();
+				if (currentItem instanceof TextEditor) {
+					w = ((TextEditor) currentItem).getWidth();
+					h = ((TextEditor) currentItem).getHeight();
 				} else {
-					w = ((TextField) item)._getTextAreaWidth();
-					h = ((TextField) item)._getTextAreaHeight();
+					w = ((TextField) currentItem)._getTextAreaWidth();
+					h = ((TextField) currentItem)._getTextAreaHeight();
 				}
 				swtFont = new org.eclipse.swt.graphics.Font(swtCanvas.getDisplay(),
 						Emulator.getEmulator().getProperty().getDefaultFontName(),
@@ -126,32 +122,50 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public final void focusItem(final Object item, final int x, final int y) {
-		Object tmp = this.item;
-		this.item = item;
+		Object tmp;
+		synchronized (this) {
+			tmp = this.currentItem;
+			this.currentItem = item;
+		}
 		if (tmp != item && tmp instanceof TextEditor) {
 			((TextEditor) tmp).setFocus(false);
 		}
+
 		this.caretX = x;
 		this.caretY = y;
 		this.caretPosition = 0;
 		this.caretCol = 0;
 		this.caretRow = 0;
+
+		final Object lastItem = tmp;
 		EmulatorImpl.syncExec(new Runnable() {
 			public final void run() {
-				setCaretLocation(caretX, caretY);
-				if (CaretImpl.this.item instanceof DateField) {
-					swtText.setVisible(false);
+				if (lastItem != item && swtText != null) {
+					if (!swtText.isDisposed()) swtText.dispose();
+					swtText = null;
+				}
+
+				if (item instanceof DateField) {
 					swtCaret.setVisible(true);
 				} else {
 					swtCaret.setVisible(false);
-					swtText.setVisible(true);
-					swtText.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
 
-					try {
-						swtText.setText(item instanceof TextField ? ((TextField) item).getString() : ((TextEditor) item).getContent());
-					} catch (Exception ignored) {}
-					swtText.setFocus();
+					Text text = swtText;
+					if (text == null) {
+						text = new Text(swtCanvas, SWT.MULTI | SWT.WRAP);
+						text.setText(item instanceof TextField ? ((TextField) item).getString() : ((TextEditor) item).getContent());
+						text.setData(item);
+						text.addModifyListener(CaretImpl.this);
+						text.addTraverseListener(CaretImpl.this);
+						text.addFocusListener(CaretImpl.this);
+						swtText = text;
+					}
+
+					text.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
+					text.setVisible(true);
+					text.setFocus();
 				}
+				setCaretLocation(caretX, caretY);
 				setWindowZoom(zoom);
 				((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(false);
 			}
@@ -159,26 +173,30 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public final void defocusItem(final Object item) {
-		if (this.item == item) {
-			Object tmp = this.item;
-			this.item = null;
-			if (tmp instanceof TextEditor) {
-				((TextEditor) tmp).setFocus(false);
-			}
-			EmulatorImpl.syncExec(new Runnable() {
-				public final void run() {
-					swtText.setVisible(false);
-					swtCaret.setVisible(false);
-					swtCanvas.setFocus();
-					if (!Settings.canvasKeyboard)
-						((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(true);
-				}
-			});
+		Object tmp;
+		synchronized (this) {
+			tmp = this.currentItem;
+			if (tmp != item) return;
+			this.currentItem = null;
 		}
+		if (tmp instanceof TextEditor) {
+			((TextEditor) tmp).setFocus(false);
+		}
+		EmulatorImpl.syncExec(new Runnable() {
+			public final void run() {
+				if (swtText != null && !swtText.isDisposed()) {
+					swtText.dispose();
+					swtText = null;
+				}
+				swtCaret.setVisible(false);
+				if (!Settings.canvasKeyboard)
+					((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(true);
+			}
+		});
 	}
 
 	public void updateText(Object item, final String text) {
-		if (item != this.item) return;
+		if (item != this.currentItem || swtText == null) return;
 		EmulatorImpl.syncExec(new Runnable() {
 			public final void run() {
 				try {
@@ -189,8 +207,8 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public void displayableChanged() {
-		if (this.item == null) return;
-		defocusItem(item);
+		if (this.currentItem == null) return;
+		defocusItem(currentItem);
 	}
 
 	public final void mouseDown(int x, int y) {
@@ -244,199 +262,12 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public final boolean keyPressed(KeyEvent event) {
-		if (this.item == null) return false;
-		if (!(item instanceof TextField || item instanceof TextEditor)) {
-			if (item instanceof DateField) {
-				char c = event.character;
-				if (c == '\n' || c == '\r') c = 0;
-				if (c >= '0' && c <= '9' || c == 0) {
-					((DateField) item)._input(c);
-				}
-			}
-			return true;
-		}
-
-		// handle ctrl+v
-//		if ((event.stateMask & SWT.CONTROL) == SWT.CONTROL && event.character == 0x16) {
-//			String s = Clipboard.copyFromClipboard();
-//			if (s == null || s.length() == 0) return false;
-//			char[] c = s.toCharArray();
-//			for (int i = 0; i < c.length; ++i) {
-//				type(c[i], 0, i == c.length - 1);
-//			}
-//			return true;
-//		}
-//
-//		return type(event.character, event.keyCode, true);
-		return true;
-	}
-
-	private boolean type(char character, int keyCode, boolean event) {
-		int w = (item instanceof TextEditor ? ((TextEditor) item).getWidth() : ((Item) item).getPreferredWidth()) - 8;
-		String text = item instanceof TextEditor ? ((TextEditor) item).getContent() : ((TextField) item).getString();
-		Font font = item instanceof TextEditor ? ((TextEditor) item).getFont() : CaretImpl.font;
-		if (text == null) text = "";
-		if (caretPosition > text.length()) caretPosition = text.length();
-		String[] var4;
-		if ((var4 = c.textArr(text, font, w, w)) != null && this.caretRow >= 0 && this.caretRow < var4.length) {
-			int var5 = font.getHeight() + 4;
-			String var6;
-			int var7 = (var6 = var4[this.caretRow]).length();
-			if (character == 0) {
-				label131:
-				{
-					CaretImpl var10000;
-					int var10001;
-					label118:
-					{
-						switch (keyCode) {
-							case 16777219:
-								var10000 = this;
-								var10001 = this.caretCol - 1;
-								break;
-							case 16777220:
-								var10000 = this;
-								var10001 = this.caretCol + 1;
-								break;
-							case 16777221:
-							case 16777222:
-							default:
-								break label118;
-							case 16777223:
-								var10000 = this;
-								var10001 = 0;
-								break;
-							case 16777224:
-								var10000 = this;
-								var10001 = var7;
-						}
-
-						var10000.caretCol = var10001;
-					}
-
-					label112:
-					{
-						if (this.caretCol < 0) {
-							if (this.caretRow <= 0) {
-								var10000 = this;
-								var10001 = 0;
-								break label112;
-							}
-
-							--this.caretRow;
-							var7 = (var6 = var4[this.caretRow]).length();
-						} else {
-							if (this.caretCol <= var7) {
-								break label131;
-							}
-
-							if (this.caretRow < var4.length - 1) {
-								++this.caretRow;
-								var7 = (var6 = var4[this.caretRow]).length();
-								var10000 = this;
-								var10001 = 0;
-								break label112;
-							}
-						}
-
-						var10000 = this;
-						var10001 = var7;
-					}
-
-					var10000.caretCol = var10001;
-				}
-			}
-
-			String var8 = var6.substring(0, this.caretCol);
-			var6.substring(this.caretCol, var7);
-			String var9 = null;
-			switch (character) {
-				case '\b':
-					if (this.caretCol == 0) {
-						if (this.caretRow > 0) {
-							--this.caretRow;
-							var7 = (var6 = var4[this.caretRow]).length();
-							this.caretCol = var7;
-							var8 = var6.substring(0, this.caretCol);
-							var6.substring(this.caretCol, var7);
-						}
-					} else {
-						var8 = var6.substring(0, --this.caretCol);
-						if (this.caretCol == 0 && this.caretRow > 0) {
-							--this.caretRow;
-							var7 = (var6 = var4[this.caretRow]).length();
-							this.caretCol = var7;
-							var8 = var6.substring(0, this.caretCol);
-							var6.substring(this.caretCol, var7);
-						}
-
-						text = text.substring(0, this.caretPosition - 1) + text.substring(this.caretPosition);
-					}
-				case '\t':
-				case '\n':
-				case '\r':
-					break;
-				case '\u007f':
-					if (this.caretCol == var7) {
-						if (this.caretRow < var4.length - 1) {
-							++this.caretRow;
-							var7 = (var6 = var4[this.caretRow]).length();
-							this.caretCol = 0;
-							var8 = var6.substring(0, this.caretCol);
-							var6.substring(this.caretCol, var7);
-						}
-					} else {
-						if (var6.substring(this.caretCol + 1, var7).length() == 0 && this.caretCol == 0 && this.caretRow > 0) {
-							--this.caretRow;
-							var7 = (var6 = var4[this.caretRow]).length();
-							this.caretCol = var7;
-							var8 = var6.substring(0, this.caretCol);
-							var6.substring(this.caretCol, var7);
-						}
-
-						text = text.substring(0, this.caretPosition) + text.substring(this.caretPosition + 1);
-					}
-					break;
-				default:
-					int max = item instanceof TextEditor ? ((TextEditor) item).getMaxSize() : ((TextField) item).getMaxSize();
-					if (character >= 32 && text.length() < max) {
-						try {
-							text = text.substring(0, this.caretPosition) + character + text.substring(this.caretPosition);
-							if (this.caretCol == var7 && this.caretRow < var4.length - 1) {
-								++this.caretRow;
-								var7 = (var6 = var4[this.caretRow]).length();
-								this.caretCol = 0;
-								var8 = var6.substring(0, this.caretCol);
-								var6.substring(this.caretCol, var7);
-							}
-
-							var8 = var8 + character;
-							++this.caretCol;
-							if (font.stringWidth(var8) > w) {
-								var9 = "";
-								var8 = var9 + character;
-								this.caretCol = 1;
-								++this.caretRow;
-							}
-						} catch (Exception ignored) {}
-					}
-			}
-
-			int var10 = font.stringWidth(var8);
-			this.setCaretLocation(this.caretX + var10, this.caretY + this.caretRow * var5);
-			if (character != 0) {
-				if (item instanceof TextEditor) {
-					((TextEditor) item)._contentChanged(text);
-				} else {
-					((TextField) item)._setString(text);
-				}
-			}
-
-			this.caretPosition = this.caretCol;
-
-			for (int var11 = 0; var11 < this.caretRow; ++var11) {
-				this.caretPosition += var4[var11].length();
-			}
+		if (this.currentItem == null || !(currentItem instanceof DateField))
+			return false;
+		char c = event.character;
+		if (c == '\n' || c == '\r') c = 0;
+		if (c >= '0' && c <= '9' || c == 0) {
+			((DateField) currentItem)._input(c);
 		}
 		return true;
 	}
@@ -462,17 +293,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		font = Font.getDefaultFont();
 	}
 
-	public void modifyText(ModifyEvent modifyEvent) {
-		String text = swtText.getText();
-		if (item == null) return;
-		if (item instanceof TextEditor) {
-			if (text.equals(((TextEditor) item).getContent())) return;
-			((TextEditor) item)._contentChanged(text);
-		} else {
-			if (text.equals(((TextField) item).getString())) return;
-			((TextField) item)._setString(text);
-		}
-	}
+
 
 	public void keyTraversed(TraverseEvent e) {
 		int l = swtText.getText().length();
@@ -482,7 +303,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 			case SWT.TRAVERSE_ESCAPE:
 			case SWT.TRAVERSE_TAB_PREVIOUS:
 			case SWT.TRAVERSE_TAB_NEXT:
-				defocusItem(item);
+				defocusItem(currentItem);
 				break;
 //			case SWT.TRAVERSE_ARROW_PREVIOUS:
 //				if (i == 0) defocusItem(item);
@@ -494,7 +315,17 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		}
 	}
 
-
+	public void modifyText(ModifyEvent modifyEvent) {
+		String text = ((Text) modifyEvent.widget).getText();
+		Object item = modifyEvent.widget.getData();
+		if (item instanceof TextEditor) {
+			if (text.equals(((TextEditor) item).getContent())) return;
+			((TextEditor) item)._contentChanged(text);
+		} else {
+			if (text.equals(((TextField) item).getString())) return;
+			((TextField) item)._setString(text);
+		}
+	}
 
 	public void focusGained(FocusEvent e) {
 		if (e.widget != swtText) {

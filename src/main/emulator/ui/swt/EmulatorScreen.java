@@ -1869,7 +1869,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		final String r;
-		if ((r = KeyMapping.replaceKey(n)) == null) {
+		if ((r = mapKey(n)) == null) {
 			return;
 		}
 		if (!caretKeys.isEmpty()) {
@@ -1897,11 +1897,7 @@ public final class EmulatorScreen implements
 	}
 
 	private String mapKey(int n) {
-		final String r;
-		if ((r = KeyMapping.replaceKey(n)) == null) {
-			return null;
-		}
-		return r;
+		return KeyMapping.replaceKey(n);
 	}
 
 	private int key(int n) {
@@ -2731,16 +2727,17 @@ public final class EmulatorScreen implements
 		if (this.pauseState == 0 || Settings.playingRecordedKeys || !Settings.fpsMode) {
 			return;
 		}
-		int k = 0;
-		if (arg0.count < 0) {
-			k = Integer.parseInt(KeyMapping.replaceKey(2));
-		} else if (arg0.count > 0) {
-			k = Integer.parseInt(KeyMapping.replaceKey(1));
-		}
-		if (k != 0) {
-			mp(k);
-			mr(k);
-		}
-
+		try {
+			int k = 0;
+			if (arg0.count < 0) {
+				k = Integer.parseInt(mapKey(2));
+			} else if (arg0.count > 0) {
+				k = Integer.parseInt(mapKey(1));
+			}
+			if (k != 0) {
+				Emulator.getEventQueue().keyPress(k);
+				Emulator.getEventQueue().keyRelease(k);
+			}
+		} catch (Exception ignored) {}
 	}
 }
