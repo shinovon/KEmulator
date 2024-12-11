@@ -1172,7 +1172,11 @@ public class Emulator implements Runnable {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			Emulator.eventQueue.stop();
-			Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+			EmulatorImpl.syncExec(new Runnable() {
+				public void run() {
+					Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+				}
+			});
 			System.exit(1);
 			return;
 		}
