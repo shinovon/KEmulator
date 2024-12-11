@@ -25,6 +25,7 @@ public class TextField extends Item {
 	private int caretY;
 	protected boolean isTextBox;
 	private boolean updateFocus;
+	private boolean swtFocused;
 
 	public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
 		super(s);
@@ -39,7 +40,7 @@ public class TextField extends Item {
 
 	public void setString(final String aString25) {
 		this.string = aString25;
-		if (focused)
+		if (swtFocused)
 			Emulator.getEmulator().getScreen().getCaret().updateText(this, string);
 		layoutForm();
 	}
@@ -95,7 +96,7 @@ public class TextField extends Item {
 	}
 
 	public int getCaretPosition() {
-		if (!focused) return 0;
+		if (!swtFocused) return 0;
 		return Emulator.getEmulator().getScreen().getCaret().getCaretPosition();
 	}
 
@@ -113,19 +114,24 @@ public class TextField extends Item {
 	void focus() {
 		super.focus();
 		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
+		swtFocused = true;
 		updateFocus = true;
 	}
 
 	void defocus() {
-		if (focused || !updateFocus)
+		if (focused || !updateFocus) {
 			Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+			swtFocused = false;
+		}
 		super.defocus();
 		updateFocus = true;
 	}
 
 	void hidden() {
-		if (focused || !updateFocus)
+		if (focused || !updateFocus) {
 			Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
+			swtFocused = false;
+		}
 		updateFocus = true;
 	}
 
@@ -147,7 +153,7 @@ public class TextField extends Item {
 		g.drawRect(x + 2, yo, w - 4, bounds[H] - yo + y - 2);
 		g.setFont(Screen.font);
 		if (focused) g.setColor(8617456);
-		if ((caretX != x + 3 || caretY != yo + 1 || updateFocus) && focused) {
+		if ((caretX != x + 3 || caretY != yo + 1 || updateFocus) && focused && swtFocused) {
 			updateFocus = false;
 			caretX = x + 3;
 			caretY = yo + 1;
@@ -203,5 +209,13 @@ public class TextField extends Item {
 		this.string = text;
 		layoutForm();
 		notifyStateChanged();
+	}
+
+	public void _swtFocusLost() {
+		swtFocused = false;
+	}
+
+	protected void _itemApplyCommand() {
+		focus();
 	}
 }

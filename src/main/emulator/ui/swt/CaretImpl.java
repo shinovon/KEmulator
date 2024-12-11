@@ -16,7 +16,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Transform;
 
 public final class CaretImpl implements ICaret, ModifyListener, TraverseListener, FocusListener {
-	private static final Font font;
+	private static Font font;
 	private Text swtText;
 	private Canvas swtCanvas;
 	private Caret swtCaret;
@@ -127,8 +127,12 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 			tmp = this.currentItem;
 			this.currentItem = item;
 		}
-		if (tmp != item && tmp instanceof TextEditor) {
-			((TextEditor) tmp).setFocus(false);
+		if (tmp != item) {
+			if (tmp instanceof TextEditor) {
+				((TextEditor) tmp).setFocus(false);
+			} else if (tmp instanceof TextField) {
+				((TextField) tmp)._swtFocusLost();
+			}
 		}
 
 		this.caretX = x;
@@ -136,6 +140,12 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		this.caretPosition = 0;
 		this.caretCol = 0;
 		this.caretRow = 0;
+
+		if (item instanceof TextEditor) {
+			font = ((TextEditor) item).getFont();
+		} else {
+			font = Font.getDefaultFont();
+		}
 
 		final Object lastItem = tmp;
 		EmulatorImpl.syncExec(new Runnable() {
@@ -152,7 +162,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 					Text text = swtText;
 					if (text == null) {
-						text = new Text(swtCanvas, SWT.MULTI | SWT.WRAP);
+						text = new Text(swtCanvas, item instanceof TextField ? SWT.MULTI : SWT.MULTI | SWT.WRAP);
 						text.setText(item instanceof TextField ? ((TextField) item).getString() : ((TextEditor) item).getContent());
 						text.setData(item);
 						text.addModifyListener(CaretImpl.this);
@@ -181,6 +191,8 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		}
 		if (tmp instanceof TextEditor) {
 			((TextEditor) tmp).setFocus(false);
+		} else if (tmp instanceof TextField) {
+			((TextField) tmp)._swtFocusLost();
 		}
 		EmulatorImpl.syncExec(new Runnable() {
 			public final void run() {
@@ -212,53 +224,6 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public final void mouseDown(int x, int y) {
-//		if (item == null || !(item instanceof TextField || item instanceof TextEditor)) return;
-//		Font font = item instanceof TextEditor ? ((TextEditor) item).getFont() : CaretImpl.font;
-//		int textHeight = font.getHeight() + 4;
-//		int line = (y - this.caretY) / textHeight;
-//		int w = (item instanceof TextEditor ? ((TextEditor) item).getWidth() : ((Item) item).getPreferredWidth()) - 8;
-//		String[] arr;
-//		String s = item instanceof TextEditor ? ((TextEditor) item).getContent() : ((TextField) item).getString();
-//		if (s == null) s = "";
-//		if ((arr = c.textArr(s, font, w, w)) != null
-//				&& line >= 0 && line < arr.length) {
-//			int lineLength = arr[line].length();
-//			int var9 = 0;
-//			int var10 = 0;
-//			this.caretCol = 0;
-//
-//			int var11;
-//			for (var11 = x - this.caretX; this.caretCol <= lineLength; ++this.caretCol) {
-//				var10 = var9;
-//				if ((var9 = font.substringWidth(arr[line], 0, this.caretCol)) >= var11) {
-//					break;
-//				}
-//			}
-//
-//			int var12 = (var9 - var10) / 2;
-//			int var10002;
-//			if (var11 >= var10 + var12) {
-//				var10002 = var9;
-//			} else {
-//				--this.caretCol;
-//				var10002 = var10;
-//			}
-//
-//			this.setCaretLocation(caretX + var10002, this.caretY + line * textHeight);
-//			this.caretRow = line;
-//			this.caretCol = Math.min(Math.max(0, this.caretCol), lineLength);
-//			int var10001 = this.caretCol;
-//
-//			while (true) {
-//				this.caretPosition = var10001;
-//				if (line <= 0) {
-//					return;
-//				}
-//
-//				--line;
-//				var10001 = this.caretPosition + arr[line].length();
-//			}
-//		}
 	}
 
 	public final boolean keyPressed(KeyEvent event) {

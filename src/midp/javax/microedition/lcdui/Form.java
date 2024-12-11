@@ -149,6 +149,7 @@ public class Form extends Screen {
 			return;
 		}
 		int height = bounds[H];
+		final int scrollAmount = Math.max(8, height / 6);
 
 		Row currentRow = getFirstRow(scrollCurrentItem);
 
@@ -159,6 +160,9 @@ public class Form extends Screen {
 				}
 				currentIndexInRow = 0;
 				if (lastScrollDirection != key) {
+					if (scrollCurrentItem != null && !isVisible(scrollCurrentItem)) {
+						scrollCurrentItem = null;
+					}
 					scrollTargetItem = null;
 					lastScrollDirection = key;
 				}
@@ -168,12 +172,24 @@ public class Form extends Screen {
 				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
 					focusItem(scrollTargetItem);
 					scrollCurrentItem = scrollTargetItem;
-//					if (isVisible(scrollTargetItem, height / 6)) {
+					if (scrollTargetItem instanceof TextField || scrollTargetItem instanceof DateField) {
+						if (!isTopVisible(scrollTargetItem)) {
+							scroll = Math.min(getFirstRow(scrollTargetItem).y, layoutHeight - height + bounds[Y]);
+						}
+						scrollTargetItem = null;
+						break;
+					}
+					if (isTopVisible(scrollTargetItem)) {
+						scrollTargetItem = null;
+						break;
+					}
+				}
+				scroll = Math.max(scroll - scrollAmount, 0);
+
+				if (scrollTargetItem != null && isVisible(scrollTargetItem) && isTopVisible(scrollTargetItem)) {
 					scrollTargetItem = null;
 					break;
-//					}
 				}
-				scroll = Math.max(scroll - height / 6, 0);
 				break;
 			case Canvas.DOWN:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
@@ -181,6 +197,9 @@ public class Form extends Screen {
 				}
 				currentIndexInRow = 0;
 				if (lastScrollDirection != key) {
+					if (scrollCurrentItem != null && !isVisible(scrollCurrentItem)) {
+						scrollCurrentItem = null;
+					}
 					scrollTargetItem = null;
 					lastScrollDirection = key;
 				}
@@ -190,12 +209,24 @@ public class Form extends Screen {
 				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
 					focusItem(scrollTargetItem);
 					scrollCurrentItem = scrollTargetItem;
-//					if (isVisible(scrollTargetItem, height / 6)) {
+					if (scrollTargetItem instanceof TextField || scrollTargetItem instanceof DateField) {
+						if (!isEndVisible(scrollTargetItem)) {
+							scroll = Math.min(getFirstRow(scrollTargetItem).y, layoutHeight - height + bounds[Y]);
+						}
+						scrollTargetItem = null;
+						break;
+					}
+					if (isEndVisible(scrollTargetItem)) {
+						scrollTargetItem = null;
+						break;
+					}
+				}
+				scroll = Math.min(scroll + scrollAmount, layoutHeight - height + bounds[Y]);
+
+				if (scrollTargetItem != null && isVisible(scrollTargetItem) && isEndVisible(scrollTargetItem)) {
 					scrollTargetItem = null;
 					break;
-//					}
 				}
-				scroll = Math.min(scroll + height / 6, layoutHeight - height + bounds[Y]);
 				break;
 			case Canvas.LEFT:
 				if (focusedItem != null && focusedItem.keyScroll(key, repeat)) {
@@ -400,6 +431,18 @@ public class Form extends Screen {
 		return null;
 	}
 
+	Row getLastRow(Item item) {
+		Row row = getFirstRow(item);
+		if (row != null) {
+			for (int i = rows.indexOf(row); i < rows.size(); i++) {
+				Row tmp = rows.get(i);
+				if (!tmp.contains(item)) break;
+				row = tmp;
+			}
+		}
+		return row;
+	}
+
 	int getFirstRowIdx(Item item) {
 		for (int i = 0, l = rows.size(); i < l; ++i) {
 			if (rows.get(i).contains(item)) return i;
@@ -427,7 +470,18 @@ public class Form extends Screen {
 			}
 		} while ((row = getNextRow(item, row)) != null);
 		return false;
-//		return !item.hidden;
+	}
+
+	boolean isTopVisible(Item item) {
+		Row row = getFirstRow(item);
+		if (row == null) return false;
+		return row.y - scroll >= 0 && bounds[H] > row.y - scroll;
+	}
+
+	boolean isEndVisible(Item item) {
+		Row row = getLastRow(item);
+		if (row == null) return false;
+		return row.y + row.height - scroll > 0 && bounds[H] > row.y + row.height - scroll;
 	}
 
 	boolean isVisible(Row row) {

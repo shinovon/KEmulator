@@ -106,7 +106,7 @@ public class ImageItem extends Item {
 			n += image.getHeight() + 4;
 		}
 		width = Math.max(iw + 2, tw[0] + 5);
-		bounds[H] = Math.min(n, screen.bounds[H]);
+		bounds[H] = n;
 	}
 
 	public int getPreferredWidth() {
