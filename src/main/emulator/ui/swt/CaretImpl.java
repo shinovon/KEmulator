@@ -261,22 +261,42 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 
 	public void keyTraversed(TraverseEvent e) {
-		int l = swtText.getText().length();
-		int i = swtText.getCaretPosition(), y = swtText.getCaretLineNumber(), h = swtText.getTopIndex();
-		int k = e.keyCode;
+		String text = swtText.getText();
+		int length = text.length();
+		int pos = swtText.getCaretPosition(),
+			line = swtText.getCaretLineNumber(),
+			key = e.keyCode;
+		Object item = e.widget.getData();
 		switch (e.detail) {
 			case SWT.TRAVERSE_ESCAPE:
 			case SWT.TRAVERSE_TAB_PREVIOUS:
 			case SWT.TRAVERSE_TAB_NEXT:
 				defocusItem(currentItem);
 				break;
-//			case SWT.TRAVERSE_ARROW_PREVIOUS:
-//				if (i == 0) defocusItem(item);
-//				break;
-//
-//			case SWT.TRAVERSE_ARROW_NEXT:
-//				if (i == l) defocusItem(item);
-//				break;
+			case SWT.TRAVERSE_ARROW_PREVIOUS:
+			case SWT.TRAVERSE_ARROW_NEXT:
+				if (item instanceof TextEditor) break;
+				if (length == 0) {
+					defocusItem(item);
+					break;
+				}
+				boolean b = false;
+				switch (key) {
+					case SWT.ARROW_UP:
+						b = line == 0;
+						break;
+					case SWT.ARROW_DOWN:
+						b = !text.contains("\n");
+						break;
+					case SWT.ARROW_LEFT:
+						b = pos == 0;
+						break;
+					case SWT.ARROW_RIGHT:
+						b = pos == length;
+						break;
+				}
+				if (b) defocusItem(item);
+				break;
 		}
 	}
 
