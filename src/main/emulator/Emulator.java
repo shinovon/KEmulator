@@ -1177,7 +1177,6 @@ public class Emulator implements Runnable {
 					Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
 				}
 			});
-			System.exit(1);
 			return;
 		}
 		Emulator.emulatorimpl.getClassWatcher().fill();
