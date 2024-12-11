@@ -13,8 +13,7 @@ public abstract class PIM {
 	public static final int READ_WRITE = 3;
 
 	public static PIM getInstance() {
-		//TODO
-		return null;
+		return new PIMImpl();
 	}
 
 	public abstract PIMList openPIMList(int paramInt1, int paramInt2)
