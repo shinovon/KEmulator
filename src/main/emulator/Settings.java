@@ -66,7 +66,6 @@ public final class Settings {
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
 	public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill, 3 - integer
 	public static boolean keepAspectRatio = true;
-	public static boolean integerResize = false;
 	public static boolean patchSynchronizedPaint = true;
 
 	//m3g
@@ -108,7 +107,6 @@ public final class Settings {
 	public static boolean mascotBackgroundFilter;
 
 	public static boolean keyPressOnRepeat;
-	public static boolean forcePaintOnServiceRepaints = false;
 	public static boolean bypassVserv = true;
 	public static boolean enableMediaDump;
 

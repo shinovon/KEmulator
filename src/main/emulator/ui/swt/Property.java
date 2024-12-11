@@ -537,7 +537,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
 			Settings.processSerialCallsOutOfQueue = Boolean.parseBoolean(properties.getProperty("ProcessSerialCallsOutOfQueue", "false"));
 			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
-			Settings.forcePaintOnServiceRepaints = Boolean.parseBoolean(properties.getProperty("ForcePaintOnServiceRepaints", "true"));
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
 			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
@@ -614,7 +613,6 @@ public final class Property implements IProperty, SelectionListener {
 			}
 			Settings.resizeMode = Integer.parseInt(properties.getProperty("ResizeMode", "2"));
 			Settings.keepAspectRatio = Boolean.parseBoolean(properties.getProperty("KeepAspectRatio", "true"));
-			Settings.integerResize = Boolean.parseBoolean(properties.getProperty("IntegerResize", "false"));
 
 			// window
 			EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", "-1"));
@@ -766,7 +764,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
 			properties.setProperty("ProcessSerialCallsOutOfQueue", String.valueOf(Settings.processSerialCallsOutOfQueue));
 			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
-			properties.setProperty("ForcePaintOnServiceRepaints", String.valueOf(Settings.forcePaintOnServiceRepaints));
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
 			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
@@ -837,7 +834,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
 			properties.setProperty("ResizeMode", String.valueOf(Settings.resizeMode));
 			properties.setProperty("KeepAspectRatio", String.valueOf(Settings.keepAspectRatio));
-			properties.setProperty("IntegerResize", String.valueOf(Settings.integerResize));
 
 			// window
 			properties.setProperty("LocationX", String.valueOf(EmulatorScreen.locX));
