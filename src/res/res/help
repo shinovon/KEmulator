@@ -51,7 +51,8 @@ Linux arm32 support
 Improved startup error messages
 Fixed crash with faulty JADs
 Fixed VLC player error on deallocate
-LCDUI Font implementation improvements
+Improved font implementation
+Improved form scrolling
 Updated lwjgl to 3.3.3
 
 $v2.17.5 [2024.11.27]

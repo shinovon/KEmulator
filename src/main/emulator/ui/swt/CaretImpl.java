@@ -162,8 +162,11 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 					Text text = swtText;
 					if (text == null) {
-						text = new Text(swtCanvas, item instanceof TextField ? SWT.MULTI : SWT.MULTI | SWT.WRAP);
-						text.setText(item instanceof TextField ? ((TextField) item).getString() : ((TextEditor) item).getContent());
+						text = new Text(swtCanvas,
+								item instanceof TextField || !((TextEditor) item).isMultiline()
+										? SWT.MULTI : SWT.MULTI | SWT.WRAP);
+						text.setText(item instanceof TextField ?
+								((TextField) item).getString() : ((TextEditor) item).getContent());
 						text.setData(item);
 						text.addModifyListener(CaretImpl.this);
 						text.addTraverseListener(CaretImpl.this);
