@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.18 [2024.12.10]
+$v2.18 [2024.12.16]
 Reimplemented LCDUI TextField on SWT
 Rewrote MIDlet choice window on SWT
 M3G support on ARM
@@ -53,6 +53,7 @@ Fixed crash with faulty JADs
 Fixed VLC player error on deallocate
 Improved font implementation
 Improved form scrolling
+Updated PIM api stub
 Updated lwjgl to 3.3.3
 
 $v2.17.5 [2024.11.27]

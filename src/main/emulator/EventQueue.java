@@ -423,8 +423,6 @@ public final class EventQueue implements Runnable {
 							break;
 						}
 					}
-					if (Settings.processSerialCallsOutOfQueue)
-						processSerialEvent();
 					Thread.sleep(1);
 				} catch (Throwable e) {
 					System.err.println("Exception in Event Thread!");
@@ -452,8 +450,7 @@ public final class EventQueue implements Runnable {
 		synchronized (eventArguments) {
 			eventArguments.add(run);
 		}
-		if (!Settings.processSerialCallsOutOfQueue)
-        	queue(EVENT_CALL);
+		queue(EVENT_CALL);
 	}
 
 	private void internalRepaint(int x, int y, int w, int h) {

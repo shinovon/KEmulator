@@ -535,7 +535,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
 			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
-			Settings.processSerialCallsOutOfQueue = Boolean.parseBoolean(properties.getProperty("ProcessSerialCallsOutOfQueue", "false"));
 			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
@@ -762,7 +761,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
 			properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
-			properties.setProperty("ProcessSerialCallsOutOfQueue", String.valueOf(Settings.processSerialCallsOutOfQueue));
 			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
