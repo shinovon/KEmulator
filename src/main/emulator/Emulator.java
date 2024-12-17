@@ -36,9 +36,9 @@ import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator implements Runnable {
 	public static boolean debugBuild = true;
-	public static String version = "2.17.6";
+	public static String version = "2.18";
 	public static String revision = "";
-	public static final int numericVersion = 26;
+	public static final int numericVersion = 27;
 
 	static EmulatorImpl emulatorimpl;
 	private static MIDlet midlet;
