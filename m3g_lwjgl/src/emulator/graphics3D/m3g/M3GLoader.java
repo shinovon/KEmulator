@@ -558,8 +558,8 @@ public final class M3GLoader {
 		if (var4) {
 			var10000 = new Image2D(var3, var5, var6);
 		} else {
-			byte[] var8;
-			if ((var8 = new byte[(int) method702(var1)]).length > 0) {
+			byte[] var8 = new byte[(int) method702(var1)];
+			if (var8.length > 0) {
 				var1.read(var8);
 			}
 

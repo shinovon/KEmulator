@@ -3,7 +3,6 @@ package emulator;
 import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
-import org.eclipse.swt.internal.opengl.win32.PIXELFORMATDESCRIPTOR;
 import ru.woesss.j2me.micro3d.TextureImpl;
 
 import java.io.File;

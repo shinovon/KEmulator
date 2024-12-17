@@ -1054,7 +1054,17 @@ public class Emulator implements Runnable {
 			cmd.add("-XstartOnFirstThread");
 		}
 
-		cmd.add("-javaagent:" + getAbsoluteFile());
+		
+		if (debugBuild) {
+			File f = new File(getAbsolutePath() + "/../eclipse/KEmulator_base/agent.jar");
+			if (f.exists()) {
+				cmd.add("-javaagent:" + f);
+			} else {
+				cmd.add("-javaagent:" + getAbsoluteFile());
+			}
+		} else {
+			cmd.add("-javaagent:" + getAbsoluteFile());
+		}
 
 		if (isJava9()) {
 			cmd.add("--add-opens");
@@ -1069,7 +1079,8 @@ public class Emulator implements Runnable {
 			cmd.add("java.base/java.util=ALL-UNNAMED");
 			cmd.add("--add-opens");
 			cmd.add("java.base/sun.misc=ALL-UNNAMED");
-			cmd.add("--enable-native-access=ALL-UNNAMED");
+			if (isJava17())
+				cmd.add("--enable-native-access=ALL-UNNAMED");
 		}
 
 		cmd.add("emulator.Emulator");
@@ -1157,10 +1168,26 @@ public class Emulator implements Runnable {
 	public static IGraphics3D getGraphics3D() {
 		return platform.getGraphics3D();
 	}
+	
+	public static int getJavaVersionMajor() {
+		try {
+			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
+		} catch (Throwable e) {
+			return 0;
+		}
+	}
 
 	public static boolean isJava9() {
 		try {
-			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 9;
+			return getJavaVersionMajor() >= 9;
+		} catch (Throwable e) {
+			return false;
+		}
+	}
+
+	public static boolean isJava17() {
+		try {
+			return getJavaVersionMajor() >= 17;
 		} catch (Throwable e) {
 			return false;
 		}
