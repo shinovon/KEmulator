@@ -6,6 +6,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/KEmulator_base"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/KEmulator_base"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -18,7 +18,7 @@
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>G:/IdeaProjects/KEmulator/m3g_lwjgl/src</location>
+			<locationURI>KEM_LOC/m3g_lwjgl/src</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
