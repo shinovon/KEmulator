@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main"/>
+	<classpathentry kind="src" path="src/3d"/>
+	<classpathentry kind="src" path="src/midp"/>
+	<classpathentry kind="src" path="src/nokia"/>
+	<classpathentry kind="src" path="src/media"/>
+	<classpathentry kind="src" path="src/nnapi"/>
+	<classpathentry kind="src" path="src/oem"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/KEmulator_res"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/m3g_stub"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/micro3d_stub"/>
+	<classpathentry kind="lib" path="lib/asm-all-5.2.jar"/>
+	<classpathentry kind="lib" path="lib/bridj-0.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/java-discord-rpc-2.0.1-all.jar"/>
+	<classpathentry kind="lib" path="lib/jinput.jar"/>
+	<classpathentry kind="lib" path="lib/jna-5.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-platform-5.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jutils.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl3-swt-common.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-glfw.jar"/>
+	<classpathentry kind="lib" path="lib/lwjgl-opengl.jar"/>
+	<classpathentry kind="lib" path="lib/vlcj-4.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/vlcj-natives-4.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/webcam-capture-0.3.12.jar"/>
+	<classpathentry kind="lib" path="lib/zip.jar"/>
+	<classpathentry kind="lib" path="home/swt-win32-x86.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

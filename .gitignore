@@ -22,9 +22,6 @@
 # virtual machine crash logs
 hs_err_pid*
 
-# eclipse dirs
-.settings
-
 *.cmd
 *.bat
 
