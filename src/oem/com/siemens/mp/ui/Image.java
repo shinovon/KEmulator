@@ -1,7 +1,7 @@
 package com.siemens.mp.ui;
 
-import java.io.IOException;
 import javax.microedition.lcdui.Graphics;
+import java.io.IOException;
 
 public class Image extends com.siemens.mp.misc.NativeMem {
 

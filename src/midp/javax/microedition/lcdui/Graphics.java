@@ -1,15 +1,17 @@
 package javax.microedition.lcdui;
 
-import java.util.*;
-
-import emulator.*;
-import emulator.debug.*;
-import emulator.graphics2D.*;
-
 import com.jblend.graphics.j3d.Effect3D;
 import com.jblend.graphics.j3d.Figure;
 import com.jblend.graphics.j3d.FigureLayout;
 import com.jblend.graphics.j3d.Texture;
+import emulator.Emulator;
+import emulator.Settings;
+import emulator.debug.Profiler;
+import emulator.graphics2D.IGraphics2D;
+import emulator.graphics2D.IImage;
+import emulator.graphics2D.ITransform;
+
+import java.util.Vector;
 
 
 public class Graphics

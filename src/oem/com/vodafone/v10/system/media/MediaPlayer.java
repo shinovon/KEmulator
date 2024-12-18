@@ -16,10 +16,9 @@
 
 package com.vodafone.v10.system.media;
 
-import java.io.IOException;
-
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
+import java.io.IOException;
 
 public class MediaPlayer extends Canvas {
 	public static final int ERROR = 65536;

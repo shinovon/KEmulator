@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.*;
+import emulator.UILocale;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 final class M3GViewCameraPosListener extends SelectionAdapter {
 	private final M3GViewUI aClass90_1302;

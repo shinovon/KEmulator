@@ -16,9 +16,9 @@
  */
 package com.mascotcapsule.micro3d.v3;
 
-import java.io.IOException;
-
 import ru.woesss.micro3d.PlatformHelper;
+
+import java.io.IOException;
 
 public class Figure {
     private int nPointer;

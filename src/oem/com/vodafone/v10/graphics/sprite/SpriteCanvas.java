@@ -16,17 +16,14 @@
 
 package com.vodafone.v10.graphics.sprite;
 
-import com.j_phone.amuse.ACanvas;
 import emulator.Emulator;
 import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
 
-import java.util.ArrayList;
-
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+import java.util.ArrayList;
 
 public abstract class SpriteCanvas extends Canvas {
 	private static ArrayList<CharacterCommand> commands = new ArrayList<CharacterCommand>();

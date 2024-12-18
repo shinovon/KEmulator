@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Shell;
 
 final class Class81 extends SelectionAdapter {
 	private final Shell aShell866;

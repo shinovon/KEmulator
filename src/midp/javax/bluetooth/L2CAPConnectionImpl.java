@@ -1,8 +1,10 @@
 package javax.bluetooth;
 
-import java.net.*;
-import java.io.*;
-import javax.microedition.io.*;
+import javax.microedition.io.Connection;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 public class L2CAPConnectionImpl implements L2CAPConnection {
 	Socket socket;

@@ -1,7 +1,7 @@
 package javax.bluetooth;
 
-import java.io.*;
-import javax.microedition.io.*;
+import javax.microedition.io.Connection;
+import java.io.IOException;
 
 public class RemoteDevice {
 	protected RemoteDevice(final String s) {

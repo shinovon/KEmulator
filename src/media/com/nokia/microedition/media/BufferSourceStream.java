@@ -1,7 +1,7 @@
 package com.nokia.microedition.media;
 
-import java.io.IOException;
 import javax.microedition.media.protocol.SourceStream;
+import java.io.IOException;
 
 public class BufferSourceStream extends InputStreamSourceStream {
 	private static final int BUFFER_SIZE = 5120;

@@ -1,15 +1,16 @@
 package javax.microedition.lcdui;
 
-import emulator.graphics2D.*;
-import emulator.debug.*;
-import emulator.*;
-import emulator.graphics2D.awt.ImageAWT;
-import emulator.graphics2D.swt.FontSWT;
-import emulator.graphics2D.swt.ImageSWT;
+import emulator.Devices;
+import emulator.Emulator;
+import emulator.Settings;
+import emulator.debug.Profiler;
+import emulator.graphics2D.IImage;
 import emulator.ui.swt.EmulatorImpl;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class Image {
 	private boolean mutable;

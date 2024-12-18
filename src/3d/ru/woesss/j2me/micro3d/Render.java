@@ -16,28 +16,28 @@
 
 package ru.woesss.j2me.micro3d;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-
 import com.mascotcapsule.micro3d.v3.Graphics3D;
-
-import java.awt.Rectangle;
-import java.nio.*;
-import java.util.LinkedList;
-
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
-
 import emulator.Settings;
 import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.lwjgl.Emulator3D;
 import org.lwjgl.opengl.GL11;
 import ru.woesss.j2me.micro3d.RenderNode.FigureNode;
+
+import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
+import java.awt.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.LinkedList;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
 
 public class Render {
 	private static final FloatBuffer BG_VBO = BufferUtils.createFloatBuffer(8 * 2)

@@ -1,8 +1,9 @@
 package emulator;
 
-import java.text.*;
-import java.util.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public final class KeyRecords {
 	private String aString1156;

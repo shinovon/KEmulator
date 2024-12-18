@@ -1,7 +1,9 @@
 package emulator.ui.swt;
 
-import emulator.*;
-import org.eclipse.swt.dnd.*;
+import emulator.Emulator;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
 
 final class Class29 extends DropTargetAdapter {
 	Class29(final EmulatorScreen class93) {

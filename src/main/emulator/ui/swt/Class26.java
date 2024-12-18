@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 
 final class Class26 implements PaintListener {
 	private final MemoryView aClass110_595;

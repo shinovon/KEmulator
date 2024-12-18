@@ -1,7 +1,8 @@
 package javax.microedition.io.file;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 final class FileConnectionListEn2 implements Enumeration {
 	int ind;

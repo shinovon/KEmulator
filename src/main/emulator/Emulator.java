@@ -1,6 +1,27 @@
 package emulator;
 
-import java.awt.Dimension;
+import club.minnced.discord.rpc.DiscordEventHandlers;
+import club.minnced.discord.rpc.DiscordRPC;
+import club.minnced.discord.rpc.DiscordRichPresence;
+import com.github.sarxos.webcam.Webcam;
+import emulator.custom.CustomClassLoader;
+import emulator.custom.CustomMethod;
+import emulator.graphics3D.IGraphics3D;
+import emulator.media.EmulatorMIDI;
+import emulator.media.MMFPlayer;
+import emulator.ui.IEmulator;
+import emulator.ui.IScreen;
+import emulator.ui.swt.EmulatorImpl;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipFile;
+
+import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Display;
+import javax.microedition.lcdui.Screen;
+import javax.microedition.media.Manager;
+import javax.microedition.midlet.MIDlet;
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -8,31 +29,6 @@ import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Screen;
-import javax.microedition.media.Manager;
-import javax.microedition.midlet.MIDlet;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import emulator.graphics3D.IGraphics3D;
-import emulator.media.EmulatorMIDI;
-import emulator.ui.IScreen;
-import org.apache.tools.zip.ZipEntry;
-import org.apache.tools.zip.ZipFile;
-
-import com.github.sarxos.webcam.Webcam;
-
-import club.minnced.discord.rpc.DiscordEventHandlers;
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
-import emulator.custom.CustomClassLoader;
-import emulator.custom.CustomMethod;
-import emulator.media.MMFPlayer;
-import emulator.ui.IEmulator;
-import emulator.ui.swt.EmulatorImpl;
 
 public class Emulator implements Runnable {
 	public static boolean debugBuild = true;

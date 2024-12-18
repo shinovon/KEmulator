@@ -16,11 +16,11 @@
  */
 package com.mascotcapsule.micro3d.v3;
 
-import java.io.IOException;
-
 import emulator.Emulator;
 import emulator.graphics2D.IImage;
 import ru.woesss.micro3d.PlatformHelper;
+
+import java.io.IOException;
 
 public class Texture {
     int nPointer;

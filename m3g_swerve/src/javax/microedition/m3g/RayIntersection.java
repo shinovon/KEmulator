@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.*;
+import emulator.i;
 
 public class RayIntersection {
     int swerveHandle;

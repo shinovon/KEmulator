@@ -16,9 +16,8 @@
 
 package com.jblend.graphics.j3d;
 
-import java.io.IOException;
-
 import javax.microedition.lcdui.Image;
+import java.io.IOException;
 
 public class Texture {
 	public final com.mascotcapsule.micro3d.v3.Texture impl;

@@ -3,8 +3,8 @@ package javax.microedition.m3g;
 import emulator.debug.Memory;
 import emulator.i;
 
-import java.util.Hashtable;
 import javax.microedition.lcdui.Graphics;
+import java.util.Hashtable;
 
 public class Graphics3D {
     Object bbPixels = null;

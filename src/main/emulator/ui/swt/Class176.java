@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.*;
+import emulator.KeyMapping;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 
 final class Class176 extends KeyAdapter {
 	private final Property aClass38_1445;

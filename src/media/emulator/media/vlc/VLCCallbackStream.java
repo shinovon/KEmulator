@@ -1,9 +1,9 @@
 package emulator.media.vlc;
 
+import uk.co.caprica.vlcj.media.callback.nonseekable.NonSeekableInputStreamMedia;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import uk.co.caprica.vlcj.media.callback.nonseekable.NonSeekableInputStreamMedia;
 
 public class VLCCallbackStream extends NonSeekableInputStreamMedia {
 

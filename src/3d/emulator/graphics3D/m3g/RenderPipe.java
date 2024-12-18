@@ -1,13 +1,8 @@
 package emulator.graphics3D.m3g;
 
+import javax.microedition.m3g.*;
 import java.util.Comparator;
 import java.util.Vector;
-import javax.microedition.m3g.Group;
-import javax.microedition.m3g.Mesh;
-import javax.microedition.m3g.Node;
-import javax.microedition.m3g.SkinnedMesh;
-import javax.microedition.m3g.Sprite3D;
-import javax.microedition.m3g.Transform;
 
 public final class RenderPipe {
 	private Node parentNode;

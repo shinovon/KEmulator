@@ -1,16 +1,21 @@
 package emulator.graphics2D.awt;
 
+import emulator.graphics2D.IGraphics2D;
+import emulator.graphics2D.IImage;
 import org.eclipse.swt.SWTException;
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 
-import emulator.graphics2D.*;
-
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.Color;
-import java.io.*;
-import javax.imageio.*;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 public final class ImageAWT implements IImage {

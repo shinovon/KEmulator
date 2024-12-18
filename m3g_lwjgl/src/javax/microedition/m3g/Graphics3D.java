@@ -5,12 +5,12 @@ import emulator.Settings;
 import emulator.debug.Profiler3D;
 import emulator.graphics3D.IGraphics3D;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.m3g.LightsCache;
 import emulator.graphics3D.m3g.CameraCache;
+import emulator.graphics3D.m3g.LightsCache;
 
-import java.util.Hashtable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+import java.util.Hashtable;
 
 public class Graphics3D {
 	public static final int ANTIALIAS = 2;

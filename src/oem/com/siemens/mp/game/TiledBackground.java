@@ -18,7 +18,7 @@ package com.siemens.mp.game;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import java.awt.Rectangle;
+import java.awt.*;
 
 public class TiledBackground extends GraphicObject {
 	private static final String TAG = TiledBackground.class.getName();

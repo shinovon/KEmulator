@@ -1,11 +1,7 @@
 package emulator.graphics3D.m3g;
 
+import javax.microedition.m3g.*;
 import java.util.Vector;
-import javax.microedition.m3g.Group;
-import javax.microedition.m3g.Light;
-import javax.microedition.m3g.Node;
-import javax.microedition.m3g.Transform;
-import javax.microedition.m3g.World;
 
 public final class LightsCache {
 	public static final float[] LOCAL_ORIGIN = new float[]{0.0F, 0.0F, 0.0F, 1.0F};

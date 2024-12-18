@@ -1,6 +1,6 @@
 package emulator.ui.effect;
 
-import java.util.*;
+import java.util.Random;
 
 public final class a {
 	int anInt316;

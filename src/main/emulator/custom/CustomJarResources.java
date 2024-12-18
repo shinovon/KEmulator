@@ -1,9 +1,11 @@
 package emulator.custom;
 
-import emulator.*;
-import org.apache.tools.zip.*;
+import emulator.Emulator;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipFile;
 
-import javax.microedition.io.*;
+import javax.microedition.io.Connector;
+import javax.microedition.io.InputConnection;
 import java.io.*;
 
 public final class CustomJarResources {

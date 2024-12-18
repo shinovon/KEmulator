@@ -1,7 +1,8 @@
 package javax.microedition.media.protocol;
 
-import java.io.*;
-import javax.microedition.media.*;
+import javax.microedition.media.Control;
+import javax.microedition.media.Controllable;
+import java.io.IOException;
 
 public abstract class DataSource implements Controllable {
 	private String loc;

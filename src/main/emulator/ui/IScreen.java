@@ -1,6 +1,6 @@
 package emulator.ui;
 
-import emulator.graphics2D.*;
+import emulator.graphics2D.IImage;
 
 public interface IScreen {
 	IImage getScreenImg();

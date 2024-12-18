@@ -1,7 +1,8 @@
 package emulator;
 
-import java.util.*;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.PropertyResourceBundle;
 
 public final class UILocale {
 	static PropertyResourceBundle bundle;

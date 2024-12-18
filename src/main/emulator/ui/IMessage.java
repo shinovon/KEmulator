@@ -1,7 +1,8 @@
 package emulator.ui;
 
-import javax.wireless.messaging.*;
-import java.io.*;
+import javax.wireless.messaging.Message;
+import java.io.IOException;
+import java.io.InterruptedIOException;
 
 public interface IMessage {
 	Message receive(final String p0) throws IOException, InterruptedIOException;

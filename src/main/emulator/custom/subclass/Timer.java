@@ -1,6 +1,6 @@
 package emulator.custom.subclass;
 
-import java.util.*;
+import java.util.Date;
 
 public class Timer {
 	private TaskQueue queue;

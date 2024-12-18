@@ -1,15 +1,15 @@
 package javax.microedition.midlet;
 
-import emulator.*;
+import emulator.Emulator;
+import emulator.Permission;
+import emulator.Settings;
 import emulator.custom.CustomMethod;
 
-import java.awt.Desktop;
+import javax.microedition.io.ConnectionNotFoundException;
+import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
-
-import javax.microedition.io.*;
 
 public abstract class MIDlet {
 	private boolean destroyed;

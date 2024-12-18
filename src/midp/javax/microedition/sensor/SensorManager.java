@@ -1,6 +1,6 @@
 package javax.microedition.sensor;
 
-import emulator.sensor.*;
+import emulator.sensor.SensorMan;
 
 public class SensorManager {
 	public SensorManager() {

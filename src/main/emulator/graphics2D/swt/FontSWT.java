@@ -1,8 +1,10 @@
 package emulator.graphics2D.swt;
 
-import emulator.graphics2D.*;
+import emulator.graphics2D.IFont;
 import emulator.ui.swt.EmulatorImpl;
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 
 public final class FontSWT implements IFont {
 	private Font font;

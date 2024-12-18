@@ -1,8 +1,8 @@
 package javax.microedition.amms.control.tuner;
 
-import java.util.Date;
 import javax.microedition.media.Control;
 import javax.microedition.media.MediaException;
+import java.util.Date;
 
 public abstract interface RDSControl extends Control {
 	public static final String RDS_NEW_DATA = "RDS_NEW_DATA";

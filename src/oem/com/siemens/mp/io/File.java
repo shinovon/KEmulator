@@ -17,12 +17,12 @@
 
 package com.siemens.mp.io;
 
+import emulator.Emulator;
+
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import emulator.Emulator;
 
 public class File {
 	public static final int INSIDE_STORAGE_PATH = 1;

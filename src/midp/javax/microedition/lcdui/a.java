@@ -1,6 +1,6 @@
 package javax.microedition.lcdui;
 
-import emulator.lcdui.*;
+import emulator.lcdui.c;
 
 /**
  * ChoiceGroupItem

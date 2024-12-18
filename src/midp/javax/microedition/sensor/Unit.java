@@ -1,6 +1,6 @@
 package javax.microedition.sensor;
 
-import java.util.*;
+import java.util.Hashtable;
 
 public class Unit {
 	private static Hashtable aHashtable1317;

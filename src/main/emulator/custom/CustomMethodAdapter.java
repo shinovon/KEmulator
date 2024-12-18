@@ -1,7 +1,10 @@
 package emulator.custom;
 
-import org.objectweb.asm.*;
-import emulator.*;
+import emulator.Emulator;
+import emulator.Settings;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 public final class CustomMethodAdapter extends MethodVisitor implements Opcodes {
 	private int anInt1185;

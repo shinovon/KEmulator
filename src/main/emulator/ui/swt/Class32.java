@@ -1,9 +1,11 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.widgets.*;
-import emulator.*;
+import emulator.Emulator;
+import emulator.KeyMapping;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Screen;
 
 final class Class32 implements Listener {
 	private final EmulatorScreen aClass93_617;

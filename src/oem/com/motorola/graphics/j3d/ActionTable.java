@@ -16,9 +16,9 @@
 
 package com.motorola.graphics.j3d;
 
-import java.io.IOException;
-
 import ru.woesss.j2me.micro3d.ActTableImpl;
+
+import java.io.IOException;
 
 public class ActionTable {
 	final ActTableImpl impl;

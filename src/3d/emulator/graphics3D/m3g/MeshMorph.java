@@ -4,9 +4,9 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
+import javax.microedition.m3g.*;
 import java.util.Hashtable;
 import java.util.Vector;
-import javax.microedition.m3g.*;
 
 public final class MeshMorph {
 	private static MeshMorph inst;

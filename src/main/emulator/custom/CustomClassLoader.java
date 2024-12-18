@@ -1,10 +1,17 @@
 package emulator.custom;
 
-import emulator.*;
-import org.objectweb.asm.*;
-import org.apache.tools.zip.*;
+import emulator.Emulator;
+import emulator.Settings;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipFile;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 public final class CustomClassLoader extends ClassLoader {
 	public CustomClassLoader(final ClassLoader classLoader) {

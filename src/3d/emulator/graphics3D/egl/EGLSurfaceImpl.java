@@ -1,8 +1,8 @@
 package emulator.graphics3D.egl;
 
-import javax.microedition.khronos.egl.*;
-import java.util.*;
-import javax.microedition.lcdui.*;
+import javax.microedition.khronos.egl.EGLSurface;
+import javax.microedition.lcdui.Graphics;
+import java.util.Hashtable;
 
 /**
  * EGLSurfaceImpl

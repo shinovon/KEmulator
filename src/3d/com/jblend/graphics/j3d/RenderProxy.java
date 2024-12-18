@@ -16,9 +16,8 @@
 
 package com.jblend.graphics.j3d;
 
-import java.util.WeakHashMap;
-
 import javax.microedition.lcdui.Graphics;
+import java.util.WeakHashMap;
 
 public class RenderProxy {
 	private static final WeakHashMap<Graphics, com.mascotcapsule.micro3d.v3.Graphics3D> renders = new WeakHashMap();

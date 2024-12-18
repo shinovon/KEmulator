@@ -1,7 +1,7 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
 final class Class56 extends MouseAdapter {
 	private final M3GViewUI aClass90_822;

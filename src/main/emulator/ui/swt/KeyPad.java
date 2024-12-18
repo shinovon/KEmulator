@@ -1,10 +1,20 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.graphics.*;
-import emulator.*;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
+import emulator.Emulator;
+import emulator.KeyMapping;
+import emulator.UILocale;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public final class KeyPad implements ControlListener, DisposeListener {
 	private Shell aShell1404;

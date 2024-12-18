@@ -1,6 +1,6 @@
 package javax.bluetooth;
 
-import javax.microedition.io.*;
+import javax.microedition.io.Connection;
 
 public class LocalDevice {
 	public LocalDevice() {

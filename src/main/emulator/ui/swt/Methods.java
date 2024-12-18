@@ -1,21 +1,22 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.custom.*;
-
-import java.text.*;
-
+import emulator.Settings;
+import emulator.UILocale;
 import emulator.custom.h;
 import emulator.custom.h.MethodInfo;
-
-import java.util.*;
-import java.util.List;
-
-import emulator.*;
-
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.*;
 
 public final class Methods implements Runnable, DisposeListener {
 	private Shell shell;

@@ -24,10 +24,9 @@
 
 package com.siemens.mp.game;
 
-import java.util.Vector;
-
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+import java.util.Vector;
 
 public class GraphicObjectManager extends com.siemens.mp.misc.NativeMem {
 

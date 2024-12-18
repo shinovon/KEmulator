@@ -16,9 +16,9 @@
  */
 package com.mascotcapsule.micro3d.v3;
 
-import javax.microedition.lcdui.Graphics;
-
 import ru.woesss.micro3d.PlatformHelper;
+
+import javax.microedition.lcdui.Graphics;
 
 public class Graphics3D {
     public static final int COMMAND_LIST_VERSION_1_0 = -33554431;

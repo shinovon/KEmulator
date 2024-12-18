@@ -1,6 +1,7 @@
 package emulator.media;
 
-import emulator.*;
+import emulator.Emulator;
+import emulator.i;
 
 public class MMFPlayer {
 	static boolean initialized;

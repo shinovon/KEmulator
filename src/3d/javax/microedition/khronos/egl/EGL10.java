@@ -1,6 +1,8 @@
 package javax.microedition.khronos.egl;
 
-import emulator.graphics3D.egl.*;
+import emulator.graphics3D.egl.EGLContextImpl;
+import emulator.graphics3D.egl.EGLDisplayImpl;
+import emulator.graphics3D.egl.EGLSurfaceImpl;
 
 public interface EGL10 extends EGL {
 	public static final Object EGL_DEFAULT_DISPLAY = new Object();

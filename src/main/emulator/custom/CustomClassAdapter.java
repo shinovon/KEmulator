@@ -2,7 +2,10 @@ package emulator.custom;
 
 import emulator.Emulator;
 import emulator.Settings;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.util.HashSet;
 import java.util.Set;

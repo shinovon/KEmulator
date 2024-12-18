@@ -1,6 +1,8 @@
 package emulator.graphics3D.egl;
 
-import javax.microedition.khronos.egl.*;
+import javax.microedition.khronos.egl.EGL11;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
 
 /**
  * EGL11

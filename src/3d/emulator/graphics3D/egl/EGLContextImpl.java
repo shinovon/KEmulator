@@ -1,8 +1,8 @@
 package emulator.graphics3D.egl;
 
-import javax.microedition.khronos.egl.*;
-import java.util.*;
-import javax.microedition.khronos.opengles.*;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.opengles.GL;
+import java.util.Hashtable;
 
 /**
  * EGLContext

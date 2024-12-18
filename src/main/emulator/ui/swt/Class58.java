@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
 import emulator.graphics3D.view.M3GView3D;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 final class Class58 implements Listener {
 	private final M3GViewUI aClass90_824;

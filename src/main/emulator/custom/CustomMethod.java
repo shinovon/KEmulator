@@ -1,15 +1,15 @@
 package emulator.custom;
 
-import java.util.*;
-
-import javax.microedition.media.Manager;
-
-import emulator.debug.*;
-import emulator.*;
+import emulator.Emulator;
+import emulator.Permission;
+import emulator.Settings;
 import emulator.custom.h.MethodInfo;
+import emulator.debug.Profiler;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
+import javax.microedition.media.Manager;
 import java.io.*;
+import java.util.Hashtable;
 
 public class CustomMethod {
 	private static long aLong13;

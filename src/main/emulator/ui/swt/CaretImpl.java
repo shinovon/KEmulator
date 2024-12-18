@@ -3,17 +3,17 @@ package emulator.ui.swt;
 import com.nokia.mid.ui.TextEditor;
 import emulator.Emulator;
 import emulator.Settings;
-import emulator.ui.*;
+import emulator.ui.ICaret;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.widgets.Canvas;
-
-import javax.microedition.lcdui.*;
-import javax.microedition.lcdui.Item;
-
-import emulator.lcdui.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Caret;
+import org.eclipse.swt.widgets.Text;
+
+import javax.microedition.lcdui.DateField;
+import javax.microedition.lcdui.Font;
+import javax.microedition.lcdui.TextField;
 
 public final class CaretImpl implements ICaret, ModifyListener, TraverseListener, FocusListener {
 	private static Font font;

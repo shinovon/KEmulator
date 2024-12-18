@@ -1,12 +1,12 @@
 package org.objectweb.asm.util;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractVisitor extends MethodVisitor {
 	public static final String[] OPCODES;

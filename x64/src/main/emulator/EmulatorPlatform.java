@@ -6,10 +6,6 @@ import emulator.graphics3D.IGraphics3D;
 import ru.woesss.j2me.micro3d.TextureImpl;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.IntBuffer;
 
 public class EmulatorPlatform implements IEmulatorPlatform {

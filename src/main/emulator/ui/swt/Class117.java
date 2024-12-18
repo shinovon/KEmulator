@@ -1,7 +1,9 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.*;
+import emulator.DevicePlatform;
+import emulator.Devices;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 
 final class Class117 implements ModifyListener {
 	private final Property aClass38_1183;

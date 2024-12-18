@@ -1,7 +1,7 @@
 package com.nec.io;
 
-import java.io.IOException;
 import javax.microedition.io.StreamConnection;
+import java.io.IOException;
 
 public abstract interface SocketConnection
 		extends StreamConnection {

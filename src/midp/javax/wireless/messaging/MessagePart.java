@@ -1,6 +1,9 @@
 package javax.wireless.messaging;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MessagePart {
 	static int anInt158;

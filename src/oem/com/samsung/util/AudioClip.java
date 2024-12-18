@@ -3,13 +3,13 @@ package com.samsung.util;
 import emulator.custom.CustomJarResources;
 import emulator.media.MMFPlayer;
 
+import javax.microedition.media.Player;
+import javax.microedition.media.PlayerImpl;
+import javax.microedition.media.PlayerListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.microedition.media.Player;
-import javax.microedition.media.PlayerImpl;
-import javax.microedition.media.PlayerListener;
 
 public class AudioClip {
 	public static final int TYPE_MMF = 1;

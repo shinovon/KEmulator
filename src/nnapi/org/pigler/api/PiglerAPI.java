@@ -1,15 +1,13 @@
 package org.pigler.api;
 
 import com.nokia.mid.ui.SoftNotificationImpl;
-
-import javax.microedition.lcdui.Image;
-
 import emulator.Emulator;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.widgets.Shell;
 
+import javax.microedition.lcdui.Image;
 import java.awt.*;
 
 /**

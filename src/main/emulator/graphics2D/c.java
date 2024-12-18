@@ -1,9 +1,11 @@
 package emulator.graphics2D;
 
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 
-import java.awt.image.*;
 import java.awt.*;
+import java.awt.image.*;
 
 public final class c {
 	private static final PaletteData palleteData;

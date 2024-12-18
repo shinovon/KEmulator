@@ -1,6 +1,7 @@
 package javax.microedition.lcdui.game;
 
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 public class TiledLayer extends Layer {
 	private int cellHeight;

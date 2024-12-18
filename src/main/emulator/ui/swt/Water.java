@@ -1,6 +1,6 @@
 package emulator.ui.swt;
 
-import emulator.ui.effect.*;
+import emulator.ui.effect.a;
 
 final class Water implements Runnable {
 	private final About.WaterTask aClass39_939;

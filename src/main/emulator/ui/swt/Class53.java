@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 
 final class Class53 extends ShellAdapter {
 	private final EmulatorScreen aClass93_804;

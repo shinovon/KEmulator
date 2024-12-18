@@ -1,7 +1,9 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TreeItem;
 
 final class Class18 extends FocusAdapter {
 	private final TreeItem aTreeItem583;

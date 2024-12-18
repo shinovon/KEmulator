@@ -1,8 +1,11 @@
 package emulator.graphics3D.lwjgl;
 
-import java.nio.*;
-
 import org.lwjgl.BufferUtils;
+
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 public final class LWJGLUtil {
 	private ByteBuffer normalByteBuffer;

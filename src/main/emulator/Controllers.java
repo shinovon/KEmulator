@@ -1,10 +1,12 @@
 package emulator;
 
-import java.util.*;
-
-import net.java.games.input.*;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Event;
 
 import javax.microedition.lcdui.Canvas;
+import java.util.ArrayList;
 
 public class Controllers {
 	private static final ArrayList controllers = new ArrayList();

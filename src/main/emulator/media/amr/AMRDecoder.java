@@ -1,6 +1,6 @@
 package emulator.media.amr;
 
-import emulator.*;
+import emulator.i;
 
 public class AMRDecoder {
 	static boolean aBoolean444;

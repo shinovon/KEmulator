@@ -16,11 +16,7 @@
 
 package ru.woesss.j2me.micro3d;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 
 public class BufferUtils {
 	private BufferUtils(){}

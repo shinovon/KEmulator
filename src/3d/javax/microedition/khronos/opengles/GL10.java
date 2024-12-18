@@ -1,6 +1,8 @@
 package javax.microedition.khronos.opengles;
 
-import java.nio.*;
+import java.nio.Buffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public interface GL10 extends GL {
 	public static final int GL_DEPTH_BUFFER_BIT = 256;

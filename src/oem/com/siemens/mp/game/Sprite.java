@@ -18,7 +18,7 @@ package com.siemens.mp.game;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import java.awt.Rectangle;
+import java.awt.*;
 
 public class Sprite extends GraphicObject {
 	private Image sprite;

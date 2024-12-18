@@ -1,11 +1,6 @@
 package com.nokia.mid.impl.isa.location;
 
-import javax.microedition.location.Criteria;
-import javax.microedition.location.Location;
-import javax.microedition.location.LocationException;
-import javax.microedition.location.LocationListener;
-import javax.microedition.location.LocationProvider;
-import javax.microedition.location.QualifiedCoordinates;
+import javax.microedition.location.*;
 
 public class LocationProviderDefault extends LocationProvider {
 	private static final int LOC_STATUS_OK = 0;

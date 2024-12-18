@@ -1,6 +1,7 @@
 package emulator.sensor;
 
-import javax.microedition.sensor.*;
+import javax.microedition.sensor.Condition;
+import javax.microedition.sensor.ConditionListener;
 
 final class e {
 	private ConditionListener aConditionListener476;

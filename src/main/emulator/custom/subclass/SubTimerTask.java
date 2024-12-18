@@ -1,6 +1,6 @@
 package emulator.custom.subclass;
 
-import java.util.*;
+import java.util.TimerTask;
 
 public abstract class SubTimerTask extends TimerTask implements Runnable {
 	final Object lock;

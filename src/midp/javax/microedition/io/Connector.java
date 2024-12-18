@@ -1,14 +1,16 @@
 package javax.microedition.io;
 
-import javax.microedition.io.file.*;
-import javax.wireless.messaging.*;
+import com.sun.cdc.io.ConnectionBaseInterface;
+import emulator.Emulator;
+import emulator.Permission;
+import emulator.Settings;
+import emulator.sensor.SensorImpl;
 
-import emulator.sensor.*;
-import emulator.*;
-
-import com.sun.cdc.io.*;
-
-import javax.microedition.sensor.*;
+import javax.microedition.io.file.FileConnectionImpl;
+import javax.microedition.sensor.SensorConnection;
+import javax.microedition.sensor.SensorInfo;
+import javax.microedition.sensor.SensorManager;
+import javax.wireless.messaging.MessageConnectionImpl;
 import java.io.*;
 
 public class Connector {

@@ -16,18 +16,17 @@
 
 package ru.woesss.j2me.micro3d;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL13.*;
-
 import emulator.Settings;
 import emulator.custom.CustomJarResources;
 
+import javax.microedition.lcdui.Image;
 import java.io.IOException;
 import java.nio.IntBuffer;
 
-
-import javax.microedition.lcdui.Image;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public final class TextureImpl {
 	static int sLastId;

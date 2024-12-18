@@ -1,6 +1,6 @@
 package emulator.media;
 
-import emulator.*;
+import emulator.Emulator;
 
 public final class b {
 	a ana1225;

@@ -1,13 +1,12 @@
 package emulator;
 
-import javax.microedition.lcdui.*;
-
 import com.j_phone.amuse.ACanvas;
 import com.vodafone.v10.graphics.sprite.SpriteCanvas;
+import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
 import net.rim.device.api.system.Application;
-import emulator.graphics2D.*;
 
+import javax.microedition.lcdui.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;

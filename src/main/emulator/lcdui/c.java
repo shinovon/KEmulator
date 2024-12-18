@@ -1,7 +1,7 @@
 package emulator.lcdui;
 
-import java.util.*;
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Font;
+import java.util.ArrayList;
 
 public final class c {
 	public c() {

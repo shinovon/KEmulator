@@ -1,8 +1,8 @@
 package javax.microedition.m3g;
 
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.graphics3D.m3g.MeshMorph;
 import emulator.graphics3D.m3g.BoneTransform;
+import emulator.graphics3D.m3g.MeshMorph;
 
 import java.util.Hashtable;
 import java.util.Vector;

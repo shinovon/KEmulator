@@ -2,7 +2,8 @@ package javax.microedition.media.control;
 
 import emulator.media.EmulatorMIDI;
 
-import javax.microedition.media.*;
+import javax.microedition.media.MediaException;
+import javax.microedition.media.Player;
 
 public class MIDIControlImpl implements MIDIControl {
 	static final int PROGRAM_CHANGE = 0xC0;

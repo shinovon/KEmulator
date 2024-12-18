@@ -1,6 +1,6 @@
 package emulator.ui.swt;
 
-import java.util.*;
+import java.util.Comparator;
 
 final class Class9 implements Comparator {
 	private final int a;

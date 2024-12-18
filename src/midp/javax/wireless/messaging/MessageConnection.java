@@ -1,7 +1,8 @@
 package javax.wireless.messaging;
 
-import javax.microedition.io.*;
-import java.io.*;
+import javax.microedition.io.Connection;
+import java.io.IOException;
+import java.io.InterruptedIOException;
 
 public interface MessageConnection extends Connection {
 	public static final String TEXT_MESSAGE = "text";

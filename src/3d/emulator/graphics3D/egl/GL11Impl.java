@@ -1,15 +1,14 @@
 package emulator.graphics3D.egl;
 
-import javax.microedition.khronos.opengles.*;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL15;
+
+import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL11;
-
-import org.lwjgl.*;
-
+import javax.microedition.khronos.opengles.GL11Ext;
+import javax.microedition.khronos.opengles.GL11ExtensionPack;
 import java.nio.*;
-
-import org.lwjgl.opengl.*;
-
-import javax.microedition.khronos.egl.*;
 
 /**
  * GL11

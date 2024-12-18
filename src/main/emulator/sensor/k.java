@@ -1,7 +1,8 @@
 package emulator.sensor;
 
 import javax.microedition.sensor.*;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Vector;
 
 public final class k implements Channel, ChannelInfo, Runnable {
 	private MeasurementRange[] aMeasurementRangeArray489;

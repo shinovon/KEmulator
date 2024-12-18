@@ -1,6 +1,6 @@
 package emulator.sensor;
 
-import javax.microedition.sensor.*;
+import javax.microedition.sensor.SensorInfo;
 
 public final class SensorUtil {
 	private int position;

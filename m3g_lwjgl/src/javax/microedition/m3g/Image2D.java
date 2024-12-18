@@ -4,8 +4,6 @@ import emulator.graphics2D.IImage;
 import emulator.graphics3D.lwjgl.Emulator3D;
 
 import javax.microedition.lcdui.Image;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class Image2D extends Object3D {
 	public static final int ALPHA = 96;

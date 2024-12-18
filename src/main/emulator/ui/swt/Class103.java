@@ -1,9 +1,10 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 import javax.microedition.rms.RecordStore;
-import java.io.*;
+import java.io.File;
 
 final class Class103 extends SelectionAdapter {
 	private final Property aClass38_1057;

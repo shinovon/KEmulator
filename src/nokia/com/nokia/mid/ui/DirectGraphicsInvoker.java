@@ -1,10 +1,10 @@
 package com.nokia.mid.ui;
 
+import emulator.Emulator;
+
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-
-import emulator.Emulator;
 
 public abstract class DirectGraphicsInvoker {
 	private static DirectGraphicsInvoker sInvoker;

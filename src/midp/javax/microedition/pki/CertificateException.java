@@ -1,6 +1,6 @@
 package javax.microedition.pki;
 
-import java.io.*;
+import java.io.IOException;
 
 public class CertificateException extends IOException {
 	private static final long serialVersionUID = 1L;

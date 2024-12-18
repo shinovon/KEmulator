@@ -1,27 +1,26 @@
 package emulator.debug;
 
-import emulator.*;
-
-import javax.microedition.lcdui.*;
-
-import com.nokia.mid.sound.*;
-
-import javax.microedition.m3g.*;
-
-import emulator.graphics2D.*;
-
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
-
+import com.nokia.mid.sound.Sound;
+import com.samsung.util.AudioClip;
+import emulator.Emulator;
+import emulator.Settings;
+import emulator.graphics2D.IImage;
+import emulator.media.vlc.VLCPlayerImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.apache.tools.zip.ZipFile;
-import com.samsung.util.AudioClip;
 
-import javax.microedition.media.*;
-import javax.microedition.media.control.*;
-
-import emulator.media.vlc.VLCPlayerImpl;
+import javax.microedition.lcdui.Image;
+import javax.microedition.m3g.*;
+import javax.microedition.media.Player;
+import javax.microedition.media.PlayerImpl;
+import javax.microedition.media.control.VolumeControlImpl;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public final class Memory {
 

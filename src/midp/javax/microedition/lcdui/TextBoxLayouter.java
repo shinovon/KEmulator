@@ -18,7 +18,9 @@ package javax.microedition.lcdui;
 
 import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 class TextBoxLayouter
 {

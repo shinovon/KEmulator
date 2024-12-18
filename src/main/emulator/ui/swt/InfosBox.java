@@ -1,9 +1,11 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.custom.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public final class InfosBox {
 	private Shell shell;

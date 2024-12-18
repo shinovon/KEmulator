@@ -1,25 +1,20 @@
 package emulator.media.vlc;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.awt.image.ComponentSampleModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Vector;
+import emulator.Emulator;
+import emulator.graphics2D.awt.ImageAWT;
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.media.MediaRef;
+import uk.co.caprica.vlcj.media.TrackType;
+import uk.co.caprica.vlcj.media.callback.CallbackMedia;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import uk.co.caprica.vlcj.player.base.MediaPlayerEventListener;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+import uk.co.caprica.vlcj.player.embedded.videosurface.CallbackVideoSurface;
+import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.RenderCallback;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32BufferFormat;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -31,24 +26,14 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
-
-import emulator.Emulator;
-import emulator.custom.CustomJarResources;
-import emulator.graphics2D.awt.ImageAWT;
-import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
-import uk.co.caprica.vlcj.media.MediaRef;
-import uk.co.caprica.vlcj.media.TrackType;
-import uk.co.caprica.vlcj.media.callback.CallbackMedia;
-import uk.co.caprica.vlcj.media.callback.seekable.RandomAccessFileMedia;
-import uk.co.caprica.vlcj.player.base.MediaPlayer;
-import uk.co.caprica.vlcj.player.base.MediaPlayerEventListener;
-import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
-import uk.co.caprica.vlcj.player.embedded.videosurface.CallbackVideoSurface;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.RenderCallback;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32BufferFormat;
-import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters;
+import java.awt.*;
+import java.awt.image.*;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 

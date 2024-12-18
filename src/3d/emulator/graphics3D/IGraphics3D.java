@@ -1,7 +1,7 @@
 package emulator.graphics3D;
 
-import java.util.*;
 import javax.microedition.m3g.*;
+import java.util.Hashtable;
 
 public interface IGraphics3D {
 	void setHints(final int p0);

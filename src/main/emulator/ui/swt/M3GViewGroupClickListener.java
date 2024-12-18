@@ -1,10 +1,13 @@
 package emulator.ui.swt;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TreeItem;
 
-import javax.microedition.m3g.Node;
 import javax.microedition.m3g.Group;
+import javax.microedition.m3g.Node;
 
 final class M3GViewGroupClickListener implements Listener {
 	M3GViewGroupClickListener(final M3GViewUI m3gViewUI) {

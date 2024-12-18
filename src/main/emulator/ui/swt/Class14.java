@@ -1,7 +1,7 @@
 package emulator.ui.swt;
 
-import emulator.*;
-import emulator.debug.*;
+import emulator.Emulator;
+import emulator.debug.Instance;
 
 final class Class14 implements Runnable {
 	private final Watcher aClass5_587;

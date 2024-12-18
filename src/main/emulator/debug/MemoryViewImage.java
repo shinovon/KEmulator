@@ -1,12 +1,10 @@
 package emulator.debug;
 
-import javax.microedition.lcdui.*;
+import emulator.Emulator;
+import emulator.graphics2D.IImage;
 
-import emulator.graphics2D.*;
-
-import javax.microedition.m3g.*;
-
-import emulator.*;
+import javax.microedition.lcdui.Image;
+import javax.microedition.m3g.Image2D;
 
 public final class MemoryViewImage extends Image {
 	public MemoryViewImage(final IImage image) {

@@ -1,13 +1,13 @@
 package com.sprintpcs.media;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import javax.microedition.io.Connector;
 import javax.microedition.io.InputConnection;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class Clip {
 	protected int priority;

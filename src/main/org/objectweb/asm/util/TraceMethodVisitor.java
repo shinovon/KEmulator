@@ -1,9 +1,12 @@
 package org.objectweb.asm.util;
 
-import java.util.*;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.signature.SignatureReader;
 
-import org.objectweb.asm.*;
-import org.objectweb.asm.signature.*;
+import java.util.HashMap;
 
 public class TraceMethodVisitor extends TraceAbstractVisitor {
 	protected MethodVisitor mv;

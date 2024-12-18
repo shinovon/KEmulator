@@ -1,8 +1,8 @@
 package javax.microedition.io.file;
 
-import javax.microedition.io.*;
+import javax.microedition.io.StreamConnection;
 import java.io.*;
-import java.util.*;
+import java.util.Enumeration;
 
 public interface FileConnection extends StreamConnection {
 	boolean isOpen();

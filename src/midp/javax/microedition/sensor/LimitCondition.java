@@ -1,6 +1,6 @@
 package javax.microedition.sensor;
 
-import emulator.sensor.*;
+import emulator.sensor.i;
 
 public class LimitCondition implements Condition {
 	private final double aDouble378;

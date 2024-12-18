@@ -17,16 +17,15 @@ package emulator.media.tone;
 
 import emulator.media.EmulatorMIDI;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.microedition.media.*;
 import javax.microedition.media.control.ToneControl;
 import javax.microedition.media.control.VolumeControlImpl;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MIDITonePlayer implements Player, ToneControl, Runnable
 {

@@ -1,11 +1,11 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.*;
+import emulator.UILocale;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.DirectoryDialog;
 
-import javax.microedition.lcdui.*;
-
-import org.eclipse.swt.widgets.*;
+import javax.microedition.lcdui.Image;
 
 final class Class33 extends SelectionAdapter {
 	private final MemoryView aClass110_618;

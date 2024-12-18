@@ -1,8 +1,10 @@
 package javax.microedition.lcdui.game;
 
-import emulator.*;
+import emulator.Emulator;
 
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Graphics;
 
 public abstract class GameCanvas extends Canvas {
 	public static final int UP_PRESSED = 2;

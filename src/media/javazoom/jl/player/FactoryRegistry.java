@@ -20,10 +20,10 @@
 
 package javazoom.jl.player;
 
+import javazoom.jl.decoder.JavaLayerException;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-import javazoom.jl.decoder.JavaLayerException;
 
 /**
  * The <code>FactoryRegistry</code> class stores the factories

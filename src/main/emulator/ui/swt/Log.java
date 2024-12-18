@@ -1,15 +1,20 @@
 package emulator.ui.swt;
 
-import emulator.ui.*;
-import org.eclipse.swt.custom.*;
+import emulator.Emulator;
+import emulator.UILocale;
+import emulator.ui.ILogStream;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import java.io.*;
-
-import org.eclipse.swt.layout.*;
-import emulator.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
 
 public final class Log implements ILogStream, ControlListener, DisposeListener, Runnable {
 	private Shell logShell;

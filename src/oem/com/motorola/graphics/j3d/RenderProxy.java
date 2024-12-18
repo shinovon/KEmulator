@@ -17,11 +17,10 @@
 package com.motorola.graphics.j3d;
 
 import com.mascotcapsule.micro3d.v3.Graphics3D;
-
-import javax.microedition.lcdui.Graphics;
-
 import ru.woesss.j2me.micro3d.MathUtil;
 import ru.woesss.j2me.micro3d.Render;
+
+import javax.microedition.lcdui.Graphics;
 
 public class RenderProxy {
 

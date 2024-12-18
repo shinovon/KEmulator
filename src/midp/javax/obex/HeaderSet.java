@@ -1,6 +1,6 @@
 package javax.obex;
 
-import java.io.*;
+import java.io.IOException;
 
 public interface HeaderSet {
 	public static final int COUNT = 192;

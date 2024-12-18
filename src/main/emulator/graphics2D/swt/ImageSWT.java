@@ -1,11 +1,14 @@
 package emulator.graphics2D.swt;
 
+import emulator.graphics2D.IGraphics2D;
+import emulator.graphics2D.IImage;
 import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
-import emulator.graphics2D.*;
 
-import java.io.*;
-import javax.imageio.*;
+import javax.imageio.ImageIO;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
 
 /*
  * swt image

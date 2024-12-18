@@ -1,6 +1,6 @@
 package javax.microedition.lcdui.game;
 
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Graphics;
 
 public class LayerManager {
 	private int size;

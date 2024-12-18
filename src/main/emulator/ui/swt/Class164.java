@@ -1,13 +1,16 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.*;
+import emulator.Emulator;
+import emulator.UILocale;
 import emulator.custom.h;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.FileDialog;
 
-import java.io.*;
-import java.util.*;
-
-import org.eclipse.swt.widgets.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.Enumeration;
 
 final class Class164 extends SelectionAdapter {
 	private final Methods aClass46_1432;

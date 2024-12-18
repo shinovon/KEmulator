@@ -1,19 +1,29 @@
 package emulator.ui.swt;
 
-import emulator.ui.*;
+import emulator.Emulator;
+import emulator.UILocale;
+import emulator.ui.IMessage;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Shell;
 
-import java.util.*;
-
-import org.eclipse.swt.custom.*;
-
-import java.io.*;
-import javax.wireless.messaging.*;
-
-import emulator.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
+import javax.wireless.messaging.BinaryMessage;
+import javax.wireless.messaging.Message;
+import javax.wireless.messaging.TextMessage;
+import javax.wireless.messaging.TextMessageImpl;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.util.Vector;
 
 public final class MessageConsole implements IMessage, ControlListener, DisposeListener {
 	private Shell shell;

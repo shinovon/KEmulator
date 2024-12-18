@@ -1,8 +1,9 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
-import javax.microedition.m3g.*;
+import javax.microedition.m3g.Node;
 
 final class M3GViewNodeRightClickListener extends MouseAdapter {
 	private final M3GViewUI aClass90_802;

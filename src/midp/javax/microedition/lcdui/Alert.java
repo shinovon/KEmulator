@@ -1,7 +1,8 @@
 package javax.microedition.lcdui;
 
-import emulator.*;
-import emulator.lcdui.*;
+import emulator.Emulator;
+import emulator.UILocale;
+import emulator.lcdui.c;
 
 public class Alert extends Screen {
 	public static final Command DISMISS_COMMAND;

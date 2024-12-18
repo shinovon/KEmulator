@@ -1,6 +1,6 @@
 package javax.microedition.media.control;
 
-import javax.microedition.media.*;
+import javax.microedition.media.Control;
 
 public interface RateControl extends Control {
 	int getMaxRate();

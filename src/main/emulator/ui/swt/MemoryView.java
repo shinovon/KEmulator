@@ -1,21 +1,27 @@
 package emulator.ui.swt;
 
+import emulator.Settings;
+import emulator.UILocale;
+import emulator.debug.Memory;
+import emulator.debug.MemoryViewImage;
 import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.*;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 
 import javax.microedition.lcdui.Image;
-
-import org.eclipse.swt.layout.*;
-import emulator.*;
-
 import java.util.*;
-
-import org.eclipse.swt.graphics.*;
-import emulator.debug.*;
-
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
 
 public final class MemoryView implements DisposeListener {
 	private Shell shell;

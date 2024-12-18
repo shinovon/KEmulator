@@ -1,10 +1,10 @@
 package com.nokia.microedition.media;
 
-import java.io.IOException;
-import java.io.InputStream;
 import javax.microedition.media.Control;
 import javax.microedition.media.protocol.ContentDescriptor;
 import javax.microedition.media.protocol.SourceStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class InputStreamSourceStream implements SourceStream {
 	protected InputStream iInputStream = null;

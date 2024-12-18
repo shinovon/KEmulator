@@ -1,7 +1,7 @@
 package emulator.sensor;
 
-import java.io.*;
 import javax.microedition.sensor.*;
+import java.io.IOException;
 
 public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDataListener {
 	private String description;

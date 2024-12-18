@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
 final class Class12 extends MouseAdapter {
 	private final Watcher aClass5_577;

@@ -1,7 +1,7 @@
 package javax.microedition.content;
 
-import java.io.IOException;
 import javax.microedition.io.Connection;
+import java.io.IOException;
 
 public final class Invocation {
 	public static final int ACTIVE = 2;

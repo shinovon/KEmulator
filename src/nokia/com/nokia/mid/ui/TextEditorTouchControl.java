@@ -16,8 +16,6 @@
 */
 package com.nokia.mid.ui;
 
-import com.nokia.mid.ui.TextEditorListener;
-
 /**
  * Touch-devices can use a virtual control-panel to replace physical keys, and to facilitate
  * textual input. The purpose of this interface is to provide some level of access and control over such a panel, when

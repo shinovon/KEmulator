@@ -1,9 +1,14 @@
 package emulator.sensor;
 
-import emulator.*;
+import emulator.Emulator;
 
-import java.net.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 public final class f {
 	protected boolean aBoolean472;

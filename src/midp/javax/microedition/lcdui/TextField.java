@@ -1,7 +1,7 @@
 package javax.microedition.lcdui;
 
-import emulator.*;
-import emulator.lcdui.*;
+import emulator.Emulator;
+import emulator.lcdui.c;
 
 public class TextField extends Item {
 	public static final int ANY = 0;

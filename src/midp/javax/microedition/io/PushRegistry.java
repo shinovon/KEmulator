@@ -1,6 +1,6 @@
 package javax.microedition.io;
 
-import java.io.*;
+import java.io.IOException;
 
 public class PushRegistry {
 	private PushRegistry() {

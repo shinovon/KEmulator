@@ -1,6 +1,7 @@
 package javax.microedition.io.file;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 final class FileSystemRegistryEn implements Enumeration {
 	int anInt367;

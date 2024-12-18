@@ -1,10 +1,10 @@
 package javax.microedition.lcdui;
 
-import java.util.*;
-
-import emulator.*;
+import emulator.KeyMapping;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MenuItem;
+
+import java.util.Vector;
 
 public abstract class Screen extends Displayable {
 	static final Font font;

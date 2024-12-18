@@ -1,8 +1,9 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.*;
-import org.eclipse.swt.widgets.*;
+import emulator.UILocale;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.FileDialog;
 
 final class Class36 extends SelectionAdapter {
 	private final MemoryView aClass110_621;

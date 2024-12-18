@@ -1,7 +1,7 @@
 package com.nokia.microedition.media;
 
-import java.io.IOException;
 import javax.microedition.media.Control;
+import java.io.IOException;
 
 public abstract interface SeekControl
 		extends Control {

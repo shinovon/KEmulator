@@ -2,7 +2,10 @@ package javax.microedition.io;
 
 import emulator.Emulator;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 final class ResourceConnectionImpl implements InputConnection {
 	String url;

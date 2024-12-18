@@ -17,8 +17,6 @@
 
 package com.nokia.mid.ui;
 
-import com.nokia.mid.ui.TextEditorTouchControl;
-
 /**
  * This interface provides access to extended functionality related to the TextEditor-API
  * The object returned by the method {@link com.nokia.mid.ui.TextEditor#createTextEditor(int, int, int, int)} and

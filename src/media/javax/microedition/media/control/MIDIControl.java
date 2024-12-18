@@ -1,6 +1,7 @@
 package javax.microedition.media.control;
 
-import javax.microedition.media.*;
+import javax.microedition.media.Control;
+import javax.microedition.media.MediaException;
 
 public interface MIDIControl extends Control {
 	public static final int CONTROL_CHANGE = 176;

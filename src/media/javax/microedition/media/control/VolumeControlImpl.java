@@ -1,6 +1,7 @@
 package javax.microedition.media.control;
 
-import javax.microedition.media.*;
+import javax.microedition.media.Player;
+import javax.microedition.media.PlayerImpl;
 
 public class VolumeControlImpl implements VolumeControl {
 	Player player;

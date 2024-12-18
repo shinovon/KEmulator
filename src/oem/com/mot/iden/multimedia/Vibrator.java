@@ -2,8 +2,6 @@ package com.mot.iden.multimedia;
 
 import emulator.Emulator;
 
-import java.util.TimerTask;
-
 public class Vibrator
 		extends Thread {
 	public static final int MAX_VIBRATE_TIME = 500;

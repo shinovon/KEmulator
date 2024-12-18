@@ -1,10 +1,11 @@
 package javax.microedition.m3g;
 
-import javax.microedition.lcdui.*;
-import java.io.*;
-import java.util.*;
+import emulator.i;
 
-import emulator.*;
+import javax.microedition.lcdui.Image;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Hashtable;
 
 public class Loader {
     int swerveHandle;

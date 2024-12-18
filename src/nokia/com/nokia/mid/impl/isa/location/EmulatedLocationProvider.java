@@ -1,16 +1,11 @@
 package com.nokia.mid.impl.isa.location;
 
+import javax.microedition.io.Connector;
+import javax.microedition.io.file.FileConnection;
+import javax.microedition.location.*;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Vector;
-import javax.microedition.io.Connector;
-import javax.microedition.io.file.FileConnection;
-import javax.microedition.location.Criteria;
-import javax.microedition.location.Location;
-import javax.microedition.location.LocationException;
-import javax.microedition.location.LocationListener;
-import javax.microedition.location.LocationProvider;
-import javax.microedition.location.QualifiedCoordinates;
 
 public class EmulatedLocationProvider extends LocationProvider {
 	LocationListenerUpdater listenerThread;

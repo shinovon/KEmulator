@@ -2,31 +2,28 @@ package javax.microedition.media;
 
 import emulator.Emulator;
 import emulator.Settings;
-import emulator.custom.*;
+import emulator.custom.CustomJarResources;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.ToneManager;
+import emulator.media.vlc.VLCPlayerImpl;
 import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
-import uk.co.caprica.vlcj.factory.discovery.strategy.BaseNativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.LinuxNativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.NativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.OsxNativeDiscoveryStrategy;
-import uk.co.caprica.vlcj.factory.discovery.strategy.WindowsNativeDiscoveryStrategy;
+import uk.co.caprica.vlcj.factory.discovery.strategy.*;
 
-import java.io.*;
+import javax.microedition.io.Connector;
+import javax.microedition.io.HttpConnection;
+import javax.microedition.io.InputConnection;
+import javax.microedition.io.file.FileConnectionImpl;
+import javax.microedition.media.protocol.DataSource;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-
-import javax.microedition.io.*;
-import javax.microedition.io.file.FileConnectionImpl;
-import javax.microedition.media.protocol.DataSource;
-
-import emulator.media.vlc.VLCPlayerImpl;
-
-import com.nokia.microedition.media.BufferDataSource;
 
 public class Manager {
 	public static final String TONE_DEVICE_LOCATOR = "device://tone";

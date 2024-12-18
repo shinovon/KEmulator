@@ -1,9 +1,9 @@
 package javax.microedition.io.file;
 
-import emulator.*;
+import emulator.Emulator;
 
-import java.util.*;
 import java.io.*;
+import java.util.Enumeration;
 
 public class FileConnectionImpl implements FileConnection {
 	private String origUrl;

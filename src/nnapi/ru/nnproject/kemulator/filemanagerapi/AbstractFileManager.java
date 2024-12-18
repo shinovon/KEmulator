@@ -1,9 +1,8 @@
 package ru.nnproject.kemulator.filemanagerapi;
 
+import javax.microedition.io.file.FileConnection;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import javax.microedition.io.file.FileConnection;
 
 public interface AbstractFileManager {
 

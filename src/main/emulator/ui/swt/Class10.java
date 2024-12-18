@@ -1,8 +1,9 @@
 package emulator.ui.swt;
 
 import emulator.Emulator;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 final class Class10 implements Runnable {
 	private final M3GViewUI.Refresher a;

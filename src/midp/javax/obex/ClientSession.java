@@ -1,7 +1,7 @@
 package javax.obex;
 
-import javax.microedition.io.*;
-import java.io.*;
+import javax.microedition.io.Connection;
+import java.io.IOException;
 
 public interface ClientSession extends Connection {
 	void setAuthenticator(final Authenticator p0);

@@ -1,6 +1,6 @@
 package javax.microedition.lcdui;
 
-import emulator.lcdui.*;
+import emulator.lcdui.c;
 
 public class ImageItem extends Item {
 	public static final int LAYOUT_DEFAULT = 0;

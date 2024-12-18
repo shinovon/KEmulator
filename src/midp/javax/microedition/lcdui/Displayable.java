@@ -1,12 +1,9 @@
 package javax.microedition.lcdui;
 
-import java.util.*;
-
-import emulator.media.capture.CapturePlayerImpl;
-
 import emulator.*;
-import emulator.debug.*;
+import emulator.debug.Profiler;
 import emulator.lcdui.a;
+import emulator.media.capture.CapturePlayerImpl;
 import emulator.ui.IScreen;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
@@ -18,6 +15,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+
+import java.util.Arrays;
+import java.util.Vector;
 
 public class Displayable {
 	public static final int X = 0;

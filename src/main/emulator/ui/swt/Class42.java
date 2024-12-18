@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 final class Class42 extends SelectionAdapter {
 	private final EmulatorScreen aClass93_778;

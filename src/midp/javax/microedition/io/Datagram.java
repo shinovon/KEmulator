@@ -1,6 +1,8 @@
 package javax.microedition.io;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public interface Datagram extends DataInput, DataOutput {
 	String getAddress();

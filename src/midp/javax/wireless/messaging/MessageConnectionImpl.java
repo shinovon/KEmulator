@@ -1,8 +1,10 @@
 package javax.wireless.messaging;
 
-import emulator.*;
+import emulator.Emulator;
+import emulator.Permission;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InterruptedIOException;
 
 public class MessageConnectionImpl implements MessageConnection {
 	private final String aString314;

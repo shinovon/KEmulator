@@ -1,36 +1,40 @@
 package emulator.ui.swt;
 
-import emulator.custom.CustomJarResources;
-import emulator.graphics2D.awt.ImageAWT;
-import org.eclipse.swt.custom.*;
-import emulator.graphics2D.swt.ImageSWT;
-import emulator.graphics2D.*;
-import emulator.debug.*;
 import emulator.*;
+import emulator.custom.CustomJarResources;
 import emulator.custom.CustomMethod;
-
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.*;
-
-import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.win32.*;
-import org.eclipse.swt.dnd.*;
-import emulator.ui.*;
-
-import java.text.*;
-import java.util.*;
-
-import org.eclipse.swt.widgets.*;
-
+import emulator.debug.Profiler;
+import emulator.debug.Profiler3D;
+import emulator.graphics2D.IImage;
+import emulator.graphics2D.awt.ImageAWT;
+import emulator.graphics2D.swt.ImageSWT;
+import emulator.ui.ICaret;
+import emulator.ui.IScreen;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.win32.OS;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Screen;
+import java.io.File;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Vector;
 
 public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,

@@ -1,9 +1,10 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.custom.*;
+import emulator.custom.h;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
-import java.util.*;
+import java.util.Enumeration;
 
 final class Class170 extends SelectionAdapter {
 	Class170(final Methods class46) {

@@ -1,18 +1,26 @@
 package emulator.ui.swt;
 
-import emulator.ui.effect.a;
+import emulator.Emulator;
 import emulator.graphics2D.swt.ImageSWT;
-
-import org.eclipse.swt.layout.*;
-import emulator.*;
-import org.eclipse.swt.custom.*;
-import org.eclipse.swt.graphics.*;
-
-import java.io.*;
-import java.util.*;
-
-import org.eclipse.swt.events.*;
+import emulator.ui.effect.a;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public final class About implements MouseListener, MouseMoveListener {
 	private Shell aShell806;

@@ -1,11 +1,14 @@
 package emulator.graphics2D.awt;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.*;
-import java.awt.*;
-
 import emulator.Settings;
-import emulator.graphics2D.*;
+import emulator.graphics2D.IFont;
+import emulator.graphics2D.IGraphics2D;
+import emulator.graphics2D.IImage;
+import emulator.graphics2D.ITransform;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 public final class Graphics2DAWT implements IGraphics2D {
 	Graphics2D g;

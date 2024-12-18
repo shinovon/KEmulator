@@ -1,7 +1,9 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TreeItem;
 
 final class Class20 extends KeyAdapter {
 	private final TreeItem aTreeItem587;

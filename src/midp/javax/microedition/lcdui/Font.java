@@ -1,7 +1,7 @@
 package javax.microedition.lcdui;
 
-import emulator.graphics2D.*;
-import emulator.*;
+import emulator.Emulator;
+import emulator.graphics2D.IFont;
 
 public class Font {
 	IFont font;

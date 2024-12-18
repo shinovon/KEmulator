@@ -1,6 +1,7 @@
 package javax.microedition.io.file;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
 
 public final class FileFilterr implements FileFilter {
 	private boolean includeHidden;

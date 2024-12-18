@@ -1,8 +1,8 @@
 package emulator.graphics2D.awt;
 
-import emulator.graphics2D.*;
+import emulator.graphics2D.ITransform;
 
-import java.awt.geom.*;
+import java.awt.geom.AffineTransform;
 
 public final class TransformAWT implements ITransform {
 	private AffineTransform transform;

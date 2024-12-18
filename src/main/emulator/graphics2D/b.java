@@ -1,6 +1,7 @@
 package emulator.graphics2D;
 
-import emulator.*;
+import emulator.Emulator;
+import emulator.Settings;
 
 public final class b {
 	private static IImage anIImage351;

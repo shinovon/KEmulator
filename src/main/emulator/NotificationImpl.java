@@ -1,14 +1,11 @@
 package emulator;
 
-import java.awt.Image;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
-import java.awt.TrayIcon.MessageType;
-
-import javax.imageio.ImageIO;
-
 import ru.nnproject.kemulator.notificationapi.AbstractNotification;
 import ru.nnproject.kemulator.notificationapi.NotificationException;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.TrayIcon.MessageType;
 
 public class NotificationImpl implements AbstractNotification {
 

@@ -16,11 +16,10 @@
 
 package com.motorola.iden.micro3d;
 
-import java.util.LinkedList;
+import ru.woesss.j2me.micro3d.Render;
 
 import javax.microedition.lcdui.Graphics;
-
-import ru.woesss.j2me.micro3d.Render;
+import java.util.LinkedList;
 
 public class Renderer {
 	private final LinkedList<RenderProxy.RenderNode> stack = new LinkedList<RenderProxy.RenderNode>();

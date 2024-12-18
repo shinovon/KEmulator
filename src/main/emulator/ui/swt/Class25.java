@@ -1,7 +1,9 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Menu;
 
 final class Class25 extends MouseAdapter {
 	private final MemoryView aClass110_594;

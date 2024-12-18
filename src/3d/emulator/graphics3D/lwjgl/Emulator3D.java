@@ -1,31 +1,38 @@
 package emulator.graphics3D.lwjgl;
 
+import emulator.Emulator;
+import emulator.Settings;
 import emulator.debug.Profiler3D;
 import emulator.graphics2D.awt.Graphics2DAWT;
-import emulator.graphics3D.*;
-
-import java.util.*;
-
-import emulator.*;
+import emulator.graphics2D.swt.Graphics2DSWT;
+import emulator.graphics3D.G3DUtils;
+import emulator.graphics3D.IGraphics3D;
+import emulator.graphics3D.Transform3D;
+import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.m3g.*;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
-import org.lwjgl.*;
-import org.lwjgl.opengl.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.*;
 
-import emulator.graphics2D.swt.Graphics2DSWT;
-
-import java.awt.image.*;
-import java.nio.*;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.m3g.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Vector;
+import java.util.WeakHashMap;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;

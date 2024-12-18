@@ -1,7 +1,7 @@
 package javax.microedition.sensor;
 
-import javax.microedition.io.*;
-import java.io.*;
+import javax.microedition.io.Connection;
+import java.io.IOException;
 
 public interface SensorConnection extends Connection {
 	public static final int STATE_CLOSED = 4;

@@ -1,23 +1,24 @@
 package emulator.ui.swt;
 
 import emulator.UILocale;
+import emulator.debug.Memory;
+import emulator.graphics3D.Quaternion;
+import emulator.graphics3D.Transform3D;
+import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.lwjgl.GLCanvasUtil;
 import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.*;
-
-import javax.microedition.m3g.*;
-import javax.microedition.m3g.Group;
-import javax.microedition.m3g.Transform;
-
-import emulator.debug.Memory;
-
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.layout.*;
-import emulator.graphics3D.*;
-
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+
+import javax.microedition.m3g.Group;
+import javax.microedition.m3g.*;
 
 public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyListener, MouseWheelListener {
 	private Shell shell;

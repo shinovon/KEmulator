@@ -1,6 +1,7 @@
 package javax.microedition.io.file;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 public class FileSystemRegistry {
 	static Vector aVector1364 = new Vector();

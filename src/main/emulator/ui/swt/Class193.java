@@ -1,7 +1,7 @@
 package emulator.ui.swt;
 
-import emulator.*;
-import org.eclipse.swt.widgets.*;
+import emulator.Controllers;
+import org.eclipse.swt.widgets.Text;
 
 final class Class193 implements Runnable {
 	private final Property aClass38_1497;

@@ -1,9 +1,9 @@
 package javax.microedition.amms;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import javax.microedition.media.Controllable;
 import javax.microedition.media.MediaException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public abstract interface MediaProcessor extends Controllable {
 	public static final int REALIZED = 200;

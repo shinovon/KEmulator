@@ -1,6 +1,7 @@
 package emulator.sensor;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 public final class h implements SensorProperties {
 	private Hashtable aHashtable446;

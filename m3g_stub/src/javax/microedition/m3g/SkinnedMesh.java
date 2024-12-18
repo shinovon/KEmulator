@@ -1,6 +1,5 @@
 package javax.microedition.m3g;
 
-import java.util.Hashtable;
 import java.util.Vector;
 
 public class SkinnedMesh

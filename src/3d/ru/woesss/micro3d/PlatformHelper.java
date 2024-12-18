@@ -16,11 +16,10 @@
  */
 package ru.woesss.micro3d;
 
-import java.io.IOException;
+import emulator.custom.CustomJarResources;
 
 import javax.microedition.lcdui.Graphics;
-
-import emulator.custom.CustomJarResources;
+import java.io.IOException;
 
 public class PlatformHelper {
 

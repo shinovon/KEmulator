@@ -16,9 +16,9 @@
 
 package com.mascotcapsule.micro3d.v3;
 
-import java.io.IOException;
-
 import ru.woesss.j2me.micro3d.ActTableImpl;
+
+import java.io.IOException;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ActionTable {

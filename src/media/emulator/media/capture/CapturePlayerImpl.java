@@ -1,8 +1,10 @@
 package emulator.media.capture;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import com.github.sarxos.webcam.Webcam;
+import emulator.Emulator;
+import emulator.Permission;
+import emulator.graphics2D.awt.ImageAWT;
+import emulator.media.vlc.VLCPlayerImpl;
 
 import javax.imageio.ImageIO;
 import javax.microedition.amms.control.camera.CameraControl;
@@ -13,14 +15,9 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Item;
 import javax.microedition.media.*;
 import javax.microedition.media.control.VideoControl;
-
-import emulator.Emulator;
-import emulator.media.vlc.VLCPlayerImpl;
-
-import com.github.sarxos.webcam.Webcam;
-
-import emulator.Permission;
-import emulator.graphics2D.awt.ImageAWT;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class CapturePlayerImpl implements Player {
 

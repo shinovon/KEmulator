@@ -1,7 +1,7 @@
 package javax.obex;
 
-import javax.microedition.io.*;
-import java.io.*;
+import javax.microedition.io.ContentConnection;
+import java.io.IOException;
 
 public interface Operation extends ContentConnection {
 	void abort() throws IOException;

@@ -1,6 +1,9 @@
 package javax.microedition.khronos.opengles;
 
-import java.nio.*;
+import java.nio.Buffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 public interface GL11Ext extends GL {
 	public static final int GL_TEXTURE_CROP_RECT_OES = 35741;

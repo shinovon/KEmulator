@@ -1,7 +1,7 @@
 package javax.microedition.media.protocol;
 
-import javax.microedition.media.*;
-import java.io.*;
+import javax.microedition.media.Controllable;
+import java.io.IOException;
 
 public interface SourceStream extends Controllable {
 	public static final int NOT_SEEKABLE = 0;

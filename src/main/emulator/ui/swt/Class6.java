@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.TreeAdapter;
+import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.widgets.TreeItem;
 
 final class Class6 extends TreeAdapter {
 	private final Watcher aClass5_562;

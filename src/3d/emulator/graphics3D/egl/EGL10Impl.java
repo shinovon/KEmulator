@@ -1,11 +1,12 @@
 package emulator.graphics3D.egl;
 
+import org.lwjgl.opengl.GL11;
+
 import javax.microedition.khronos.egl.*;
-import javax.microedition.lcdui.*;
-
-import org.lwjgl.opengl.*;
-
-import javax.microedition.m3g.*;
+import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
+import javax.microedition.m3g.Background;
+import javax.microedition.m3g.Image2D;
 
 /**
  * EGL10

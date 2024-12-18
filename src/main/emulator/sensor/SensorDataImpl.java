@@ -1,6 +1,7 @@
 package emulator.sensor;
 
-import javax.microedition.sensor.*;
+import javax.microedition.sensor.ChannelInfo;
+import javax.microedition.sensor.Data;
 
 public final class SensorDataImpl implements Data {
 	private ChannelInfo aChannelInfo478;

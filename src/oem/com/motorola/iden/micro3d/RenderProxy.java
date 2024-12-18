@@ -17,12 +17,7 @@
 package com.motorola.iden.micro3d;
 
 import com.mascotcapsule.micro3d.v3.Graphics3D;
-
-import ru.woesss.j2me.micro3d.ActTableImpl;
-import ru.woesss.j2me.micro3d.FigureImpl;
-import ru.woesss.j2me.micro3d.MathUtil;
-import ru.woesss.j2me.micro3d.Render;
-import ru.woesss.j2me.micro3d.TextureImpl;
+import ru.woesss.j2me.micro3d.*;
 
 public class RenderProxy {
 

@@ -1,8 +1,10 @@
 package emulator.graphics2D;
 
-import java.awt.image.*;
-import java.awt.datatransfer.*;
-import java.io.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 final class a implements Transferable {
 	private BufferedImage aBufferedImage350;

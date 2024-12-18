@@ -1,9 +1,9 @@
 package emulator.graphics2D.awt;
 
-import emulator.graphics2D.*;
+import emulator.graphics2D.IFont;
 
 import java.awt.*;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 
 /**
  * FontAWT

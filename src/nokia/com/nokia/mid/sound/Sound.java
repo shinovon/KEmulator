@@ -1,13 +1,11 @@
 package com.nokia.mid.sound;
 
-import emulator.Emulator;
 import emulator.Settings;
 import emulator.media.b;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.MidiToneConstants;
 import emulator.media.tone.ToneManager;
 
-import java.io.ByteArrayInputStream;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
@@ -15,6 +13,7 @@ import javax.microedition.media.PlayerListener;
 import javax.microedition.media.control.MIDIControl;
 import javax.microedition.media.control.VolumeControl;
 import javax.microedition.media.control.VolumeControlImpl;
+import java.io.ByteArrayInputStream;
 
 public class Sound {
 	public static final int SOUND_PLAYING = 0;

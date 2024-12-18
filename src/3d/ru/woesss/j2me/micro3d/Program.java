@@ -16,11 +16,6 @@
 
 package ru.woesss.j2me.micro3d;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.ARBES2Compatibility.*;
-
 import com.mascotcapsule.micro3d.v3.Graphics3D;
 import emulator.Settings;
 import emulator.custom.CustomJarResources;
@@ -30,6 +25,12 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
+
+import static org.lwjgl.opengl.ARBES2Compatibility.glReleaseShaderCompiler;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL20.*;
 
 abstract class Program {
 	static Tex tex;

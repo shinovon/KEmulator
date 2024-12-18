@@ -1,7 +1,8 @@
 package emulator.ui;
 
-import emulator.graphics2D.*;
-import emulator.graphics3D.*;
+import emulator.graphics2D.IFont;
+import emulator.graphics2D.IImage;
+import emulator.graphics3D.IGraphics3D;
 
 import java.io.IOException;
 

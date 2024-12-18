@@ -1,6 +1,6 @@
 package javax.wireless.messaging;
 
-import java.util.*;
+import java.util.Date;
 
 public interface Message {
 	String getAddress();

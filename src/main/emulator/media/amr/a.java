@@ -1,6 +1,6 @@
 package emulator.media.amr;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
 
 public final class a {
 	public static boolean aBoolean = true;

@@ -1,8 +1,8 @@
 package ru.nnproject.kemulator.notificationapi;
 
-import java.awt.SystemTray;
-
 import emulator.NotificationImpl;
+
+import java.awt.*;
 
 /**
  * @deprecated Replaced by NokiaUI

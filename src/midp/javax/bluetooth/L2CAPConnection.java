@@ -1,7 +1,7 @@
 package javax.bluetooth;
 
-import javax.microedition.io.*;
-import java.io.*;
+import javax.microedition.io.Connection;
+import java.io.IOException;
 
 public interface L2CAPConnection extends Connection {
 	public static final int DEFAULT_MTU = 672;

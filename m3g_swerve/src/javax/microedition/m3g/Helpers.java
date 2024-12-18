@@ -1,11 +1,15 @@
 package javax.microedition.m3g;
 
-import emulator.custom.*;
+import emulator.custom.CustomJarResources;
 
-import javax.microedition.io.*;
-import java.io.*;
-import java.net.*;
-import javax.microedition.lcdui.*;
+import javax.microedition.io.Connector;
+import javax.microedition.io.HttpConnection;
+import javax.microedition.io.InputConnection;
+import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 
 class Helpers {
     private static int[] pixels;

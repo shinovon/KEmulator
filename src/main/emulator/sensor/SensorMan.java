@@ -1,7 +1,10 @@
 package emulator.sensor;
 
-import java.util.*;
-import javax.microedition.sensor.*;
+import javax.microedition.sensor.MeasurementRange;
+import javax.microedition.sensor.SensorInfo;
+import javax.microedition.sensor.SensorListener;
+import javax.microedition.sensor.Unit;
+import java.util.Vector;
 
 public final class SensorMan {
 	private static final SensorImpl[] ajArray447;

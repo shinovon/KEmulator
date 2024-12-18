@@ -1,9 +1,12 @@
 package javax.microedition.io;
 
-import java.net.*;
+import emulator.Emulator;
+import emulator.Settings;
 
-import emulator.*;
 import java.io.*;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 final class HttpConnectionImpl implements HttpConnection {
 	HttpURLConnection connection;

@@ -1,7 +1,10 @@
 package emulator.sensor;
 
-import java.util.*;
-import javax.microedition.sensor.*;
+import javax.microedition.sensor.Condition;
+import javax.microedition.sensor.LimitCondition;
+import javax.microedition.sensor.ObjectCondition;
+import javax.microedition.sensor.RangeCondition;
+import java.util.Vector;
 
 public final class b {
 	public b() {

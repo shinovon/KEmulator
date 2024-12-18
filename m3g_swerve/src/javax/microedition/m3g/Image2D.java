@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Image;
 
 public class Image2D extends Object3D {
     public static final int ALPHA = 96;

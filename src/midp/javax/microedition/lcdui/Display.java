@@ -1,9 +1,11 @@
 package javax.microedition.lcdui;
 
-import java.util.*;
-import javax.microedition.midlet.*;
+import emulator.Emulator;
+import emulator.EventQueue;
+import emulator.Settings;
 
-import emulator.*;
+import javax.microedition.midlet.MIDlet;
+import java.util.Hashtable;
 
 public class Display {
 	public static final int LIST_ELEMENT = 1;

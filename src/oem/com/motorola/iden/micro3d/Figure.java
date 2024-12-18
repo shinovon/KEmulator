@@ -16,9 +16,9 @@
 
 package com.motorola.iden.micro3d;
 
-import java.io.IOException;
-
 import ru.woesss.j2me.micro3d.FigureImpl;
+
+import java.io.IOException;
 
 public class Figure extends Object3D {
 	final FigureImpl impl;

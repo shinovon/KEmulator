@@ -1,8 +1,11 @@
 package emulator;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Properties;
 
 public final class DevicePlatform {
 	String name;

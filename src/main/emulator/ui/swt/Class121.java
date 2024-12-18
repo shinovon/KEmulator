@@ -1,6 +1,6 @@
 package emulator.ui.swt;
 
-import emulator.*;
+import emulator.Emulator;
 
 final class Class121 implements Runnable {
 	private final CaretImpl i;

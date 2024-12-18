@@ -1,24 +1,23 @@
 package javax.microedition.media;
 
-import emulator.*;
+import emulator.Emulator;
+import emulator.Settings;
 import emulator.custom.CustomJarResources;
 import emulator.media.EmulatorMIDI;
-
-import java.io.*;
-
-import javax.microedition.io.Connector;
-import javax.microedition.media.control.*;
-import javax.microedition.media.protocol.DataSource;
-import javax.microedition.media.protocol.SourceStream;
-
-import java.util.*;
-import java.util.zip.CRC32;
-import javax.sound.sampled.*;
-import javax.sound.midi.*;
-
 import emulator.media.tone.ToneControlImpl;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
+
+import javax.microedition.io.Connector;
+import javax.microedition.media.control.MIDIControlImpl;
+import javax.microedition.media.control.VolumeControlImpl;
+import javax.microedition.media.protocol.DataSource;
+import javax.microedition.media.protocol.SourceStream;
+import javax.sound.midi.*;
+import javax.sound.sampled.*;
+import java.io.*;
+import java.util.*;
+import java.util.zip.CRC32;
 
 public class PlayerImpl implements Player, Runnable, LineListener, MetaEventListener {
 

@@ -2,8 +2,6 @@ package com.nokia.mid.payment;
 
 import java.io.InputStream;
 
-import emulator.custom.CustomJarResources;
-
 public final class IAPClientPaymentManager {
 	public static final int DEFAULT_AUTHENTICATION = 0;
 	public static final int ONLY_IN_SILENT_AUTHENTICATION = 1;

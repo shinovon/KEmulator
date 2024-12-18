@@ -2,7 +2,6 @@ package com.mexa.lcdui;
 
 import com.nokia.mid.ui.DirectGraphics;
 import com.nokia.mid.ui.DirectUtils;
-import emulator.Settings;
 
 import javax.microedition.lcdui.Graphics;
 

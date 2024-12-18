@@ -1,7 +1,7 @@
 package emulator.graphics3D.egl;
 
-import javax.microedition.khronos.egl.*;
-import java.util.*;
+import javax.microedition.khronos.egl.EGLDisplay;
+import java.util.Hashtable;
 
 /**
  * EGLDisplayImpl

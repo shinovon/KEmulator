@@ -1,6 +1,6 @@
 package javax.bluetooth;
 
-import java.io.*;
+import java.io.IOException;
 
 public interface ServiceRecord {
 	public static final int NOAUTHENTICATE_NOENCRYPT = 0;

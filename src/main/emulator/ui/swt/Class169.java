@@ -1,8 +1,8 @@
 package emulator.ui.swt;
 
-import java.util.*;
+import emulator.custom.h;
 
-import emulator.custom.*;
+import java.util.Comparator;
 
 final class Class169 implements Comparator {
 	private final int anInt1438;

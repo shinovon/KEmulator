@@ -16,13 +16,12 @@
 
 package com.vodafone.v10.sound;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
 import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class Sound {
 	private Player player;

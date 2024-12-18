@@ -2,7 +2,7 @@ package javax.microedition.media;
 
 import emulator.media.tone.ToneControlImpl;
 
-import javax.microedition.media.control.*;
+import javax.microedition.media.control.VolumeControlImpl;
 
 public class ToneImpl implements Player {
 	Control toneControl;

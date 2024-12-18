@@ -1,7 +1,7 @@
 package javax.microedition.media.control;
 
-import javax.microedition.media.*;
-import java.io.*;
+import javax.microedition.media.Control;
+import java.io.OutputStream;
 
 public interface RecordControl extends Control {
 	void commit();

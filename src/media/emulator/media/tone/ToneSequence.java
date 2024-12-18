@@ -17,10 +17,9 @@
 
 package emulator.media.tone;
 
+import javax.microedition.media.control.ToneControl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import javax.microedition.media.control.ToneControl;
 
 /**
  * This class represents tone sequence for tone to midi conversion

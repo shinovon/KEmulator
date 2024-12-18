@@ -2,7 +2,7 @@ package com.nokia.mid.ui;
 
 import emulator.Emulator;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;

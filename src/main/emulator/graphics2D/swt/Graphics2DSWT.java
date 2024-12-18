@@ -1,9 +1,12 @@
 package emulator.graphics2D.swt;
 
+import emulator.graphics2D.IFont;
+import emulator.graphics2D.IGraphics2D;
+import emulator.graphics2D.IImage;
+import emulator.graphics2D.ITransform;
 import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.*;
-import emulator.graphics2D.*;
 
 public final class Graphics2DSWT implements IGraphics2D {
 	GC gc;

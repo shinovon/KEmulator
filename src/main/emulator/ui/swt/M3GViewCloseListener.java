@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 
 final class M3GViewCloseListener extends ShellAdapter {
 	private final M3GViewUI aClass90_800;

@@ -1,18 +1,22 @@
 package emulator.ui.swt;
 
+import emulator.Devices;
+import emulator.Emulator;
+import emulator.Settings;
+import emulator.graphics2D.IFont;
+import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.FontAWT;
 import emulator.graphics2D.awt.ImageAWT;
-import org.eclipse.swt.widgets.*;
-
-import java.io.IOException;
-import java.util.*;
-
-import emulator.*;
-import emulator.ui.*;
-import emulator.graphics2D.*;
 import emulator.graphics2D.swt.FontSWT;
 import emulator.graphics2D.swt.ImageSWT;
-import emulator.graphics3D.*;
+import emulator.graphics3D.IGraphics3D;
+import emulator.ui.*;
+import org.eclipse.swt.widgets.Display;
+
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 public final class EmulatorImpl implements IEmulator {
 	private static Display display;

@@ -4,6 +4,7 @@ import com.j_phone.system.MailListener;
 import com.j_phone.system.RingStateListener;
 import com.j_phone.system.ScheduledAlarmListener;
 import com.j_phone.system.TelephonyListener;
+
 import javax.microedition.midlet.MIDlet;
 
 public abstract class ResidentMIDlet extends MIDlet implements TelephonyListener, MailListener, ScheduledAlarmListener, RingStateListener

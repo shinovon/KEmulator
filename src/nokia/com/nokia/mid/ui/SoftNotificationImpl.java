@@ -1,15 +1,13 @@
 package com.nokia.mid.ui;
 
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
+import emulator.Emulator;
+import org.pigler.api.PiglerAPI;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
-import emulator.Emulator;
-import org.pigler.api.PiglerAPI;
 
 public class SoftNotificationImpl extends SoftNotification {
 

@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.layout.*;
-import emulator.*;
+import emulator.UILocale;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 public final class M3GViewCameraSetDialog extends Dialog {

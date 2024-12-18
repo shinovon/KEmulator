@@ -1,8 +1,10 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.*;
-import org.eclipse.swt.widgets.*;
+import emulator.Emulator;
+import emulator.UILocale;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.DirectoryDialog;
 
 final class Class101 extends SelectionAdapter {
 	private final Property aClass38_1055;

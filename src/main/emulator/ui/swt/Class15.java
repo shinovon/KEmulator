@@ -1,7 +1,7 @@
 package emulator.ui.swt;
 
-import java.util.*;
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Image;
+import java.util.Comparator;
 
 final class Class15 implements Comparator {
 	private final MemoryView aClass110_580;

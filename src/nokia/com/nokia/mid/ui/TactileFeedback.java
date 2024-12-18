@@ -1,9 +1,9 @@
 package com.nokia.mid.ui;
 
+import org.eclipse.swt.widgets.Control;
+
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.CustomItem;
-
-import org.eclipse.swt.widgets.Control;
 
 public class TactileFeedback {
 	public static final int FEEDBACK_STYLE_BASIC = 1;

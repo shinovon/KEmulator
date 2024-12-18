@@ -1,9 +1,10 @@
 package emulator.ui.swt;
 
+import emulator.Settings;
 import emulator.graphics2D.awt.ImageAWT;
-import org.eclipse.swt.events.*;
-import emulator.*;
-import emulator.graphics2D.swt.*;
+import emulator.graphics2D.swt.ImageSWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 
 final class Class190 implements PaintListener {
 	private final Property aClass38_1483;

@@ -1,12 +1,13 @@
 package javax.microedition.rms;
 
-import java.util.*;
-
-import emulator.*;
+import emulator.Emulator;
 import emulator.ui.IEmulator;
 import emulator.ui.swt.EmulatorImpl;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Vector;
 
 public class RecordStore {
 	private static Vector openRecordStores = new Vector();

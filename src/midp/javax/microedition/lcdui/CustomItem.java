@@ -1,7 +1,8 @@
 package javax.microedition.lcdui;
 
-import emulator.*;
-import emulator.lcdui.*;
+import emulator.Emulator;
+import emulator.KeyMapping;
+import emulator.lcdui.c;
 
 public abstract class CustomItem extends Item {
 	protected static final int TRAVERSE_HORIZONTAL = 1;

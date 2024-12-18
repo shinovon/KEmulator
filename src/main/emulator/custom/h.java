@@ -1,15 +1,23 @@
 package emulator.custom;
 
-import emulator.*;
-import org.objectweb.asm.tree.*;
-import org.apache.tools.zip.*;
-
-import java.io.*;
-import java.util.*;
-
-import org.objectweb.asm.commons.*;
+import emulator.Emulator;
+import emulator.Settings;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipFile;
 import org.objectweb.asm.*;
-import org.objectweb.asm.util.*;
+import org.objectweb.asm.commons.Method;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.AbstractVisitor;
+import org.objectweb.asm.util.TraceMethodVisitor;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 public final class h {
 	public static Hashtable aHashtable1061;

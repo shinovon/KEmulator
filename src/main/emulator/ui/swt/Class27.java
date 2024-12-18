@@ -1,7 +1,8 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.*;
-import emulator.debug.*;
+import emulator.debug.Memory;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 final class Class27 extends SelectionAdapter {
 	private final MemoryView aClass110_596;

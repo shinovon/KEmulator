@@ -1,28 +1,33 @@
 package emulator.ui.swt;
 
-import emulator.graphics2D.awt.FontAWT;
-import emulator.ui.*;
-import org.eclipse.swt.layout.*;
-
-import java.nio.charset.*;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.*;
 import emulator.*;
-
-import org.eclipse.swt.graphics.*;
+import emulator.graphics2D.IFont;
+import emulator.graphics2D.IGraphics2D;
+import emulator.graphics2D.IImage;
+import emulator.graphics2D.awt.FontAWT;
+import emulator.graphics2D.swt.FontSWT;
+import emulator.ui.IProperty;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.*;
-import emulator.graphics2D.swt.*;
-import emulator.graphics2D.*;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.List;
-
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 import javax.microedition.rms.RecordStore;
+import java.io.*;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.nio.charset.Charset;
+import java.util.List;
+import java.util.*;
 
 public final class Property implements IProperty, SelectionListener {
 

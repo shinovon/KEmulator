@@ -1,8 +1,9 @@
 package javax.microedition.io;
 
-import java.net.*;
-import emulator.*;
+import emulator.Emulator;
+
 import java.io.*;
+import java.net.Socket;
 
 final class SocketConnectionImpl implements SocketConnection
 {

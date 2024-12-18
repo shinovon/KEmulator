@@ -3,7 +3,9 @@ package javax.microedition.lcdui;
 import com.nokia.mid.ui.CanvasGraphicsItem;
 import com.nokia.mid.ui.CanvasItem;
 import com.nokia.mid.ui.TextEditor;
-import emulator.*;
+import emulator.Emulator;
+import emulator.KeyMapping;
+import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
 

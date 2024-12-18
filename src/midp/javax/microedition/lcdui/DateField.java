@@ -3,7 +3,9 @@ package javax.microedition.lcdui;
 import emulator.Emulator;
 import emulator.lcdui.c;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class DateField extends Item {
 	public static final int DATE = 1;
