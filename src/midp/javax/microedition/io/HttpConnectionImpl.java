@@ -104,9 +104,7 @@ final class HttpConnectionImpl implements HttpConnection {
 							Emulator.deviceName + " (KEmulator/" + Emulator.version + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception ignored) {}
 		connection.connect();
 		try {
 			headerOffset = connection.getHeaderFieldKey(0) == null && connection.getHeaderFieldKey(1) != null ? 1 : 0;
