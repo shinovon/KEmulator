@@ -179,17 +179,19 @@ public class Graphics
 	}
 
 	private void _drawRegion(final IImage image, final int n, final int n2, final int n3, final int n4, final ITransform transform, final int n5) {
-		final ITransform transform2 = this.impl.getTransform();
-		this.impl.transform(transform);
-		this.impl.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
-		this.impl.setTransform(transform2);
-		if (n5 >= 0 && Settings.xrayView && xrayGraphics != null) {
-			this.xrayGraphics.transform(transform);
-			if (Settings.xrayOverlapScreen) {
-				this.xrayGraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
+		synchronized (this) {
+			final ITransform transform2 = this.impl.getTransform();
+			this.impl.transform(transform);
+			this.impl.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
+			this.impl.setTransform(transform2);
+			if (n5 >= 0 && Settings.xrayView && xrayGraphics != null) {
+				this.xrayGraphics.transform(transform);
+				if (Settings.xrayOverlapScreen) {
+					this.xrayGraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
+				}
+				this.xrayFillRect(0, 0, n3, n4, n5);
+				this.xrayGraphics.setTransform(transform2);
 			}
-			this.xrayFillRect(0, 0, n3, n4, n5);
-			this.xrayGraphics.setTransform(transform2);
 		}
 	}
 
@@ -207,15 +209,17 @@ public class Graphics
 		if (!method294(a, 64)) {
 			throw new IllegalArgumentException();
 		}
-		final ITransform transform2 = this.impl.getTransform();
-		final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
-		this.impl.transform(transform);
-		this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, w, h);
-		this.impl.setTransform(transform2);
-		if (xrayGraphics != null) {
-			this.xrayGraphics.transform(transform);
-			this.method289(image, sx, sy, 0, 0, w, h);
-			this.xrayGraphics.setTransform(transform2);
+		synchronized (this) {
+			final ITransform transform2 = this.impl.getTransform();
+			final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
+			this.impl.transform(transform);
+			this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, w, h);
+			this.impl.setTransform(transform2);
+			if (xrayGraphics != null) {
+				this.xrayGraphics.transform(transform);
+				this.method289(image, sx, sy, 0, 0, w, h);
+				this.xrayGraphics.setTransform(transform2);
+			}
 		}
 		++image.usedCount;
 		++Profiler.drawRegionCallCount;
