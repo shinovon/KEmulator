@@ -13,6 +13,7 @@ import emulator.graphics3D.IGraphics3D;
 import emulator.ui.*;
 import org.eclipse.swt.widgets.Display;
 
+import javax.microedition.lcdui.Font;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -164,7 +165,7 @@ public final class EmulatorImpl implements IEmulator {
 		if (Settings.g2d == 0) {
 			String s = this.iproperty.getDefaultFontName() + "." + size + "." + style;
 			if (swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), size, style);
+			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), size, style & ~Font.STYLE_UNDERLINED);
 			swtFontsCache.put(s, f);
 			return f;
 		}
@@ -178,7 +179,7 @@ public final class EmulatorImpl implements IEmulator {
 		if (Settings.g2d == 0) {
 			String s = this.iproperty.getDefaultFontName() + ".-" + height + "." + style;
 			if (swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), height, style, true);
+			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), height, style & ~Font.STYLE_UNDERLINED, true);
 			swtFontsCache.put(s, f);
 			return f;
 		}

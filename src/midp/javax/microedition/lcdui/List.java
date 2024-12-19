@@ -1,7 +1,10 @@
 package javax.microedition.lcdui;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.UILocale;
+import emulator.graphics2D.swt.FontSWT;
+import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -274,6 +277,26 @@ public class List extends Screen implements Choice {
 	}
 
 	public void setFont(int n, Font font) {
+		choiceImpl.setFont(n, font);
+		syncExec(new Runnable()
+		{
+			public void run()
+			{
+				org.eclipse.swt.graphics.Font swtFont = null;
+				if (font != null) {
+					if (Settings.g2d == 0) {
+						swtFont = ((FontSWT) font.getImpl()).method297();
+					} else {
+						swtFont = new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
+								Emulator.getEmulator().getProperty().getDefaultFontName(),
+								Math.max(2, (int) (font.getHeight() * 0.7f) - 1),
+								font.getStyle() & ~Font.STYLE_UNDERLINED);
+					}
+				}
+				TableItem item = swtTable.getItem(n);
+				item.setFont(0, swtFont);
+			}
+		});
 	}
 
 	/**
