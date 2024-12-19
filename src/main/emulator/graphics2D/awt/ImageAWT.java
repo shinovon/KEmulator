@@ -29,9 +29,11 @@ public final class ImageAWT implements IImage {
 		try {
 			img = emulator.graphics2D.c.toAwt(new ImageData(new ByteArrayInputStream(array)));
 		} catch (SWTException e) {
-			if (!"Invalid image".equals(e.getMessage()))
+			if (!("Invalid image".equals(e.getMessage())
+					|| "Unsupported or unrecognized format".equals(e.getMessage())))
 				throw e;
 			img = ImageIO.read(new ByteArrayInputStream(array));
+			if (img == null) throw new IOException();
 		}
 	}
 
