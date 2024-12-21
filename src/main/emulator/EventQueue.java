@@ -103,43 +103,19 @@ public final class EventQueue implements Runnable {
 	public void mouseDown(int x, int y) {
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {0, x, y, 0});
-		} else try {
-			Displayable d = getCurrent();
-			if (d == null) return;
-			if (d instanceof Canvas) {
-				((Canvas) d).invokePointerPressed(x, y);
-				return;
-			}
-			((Screen) d)._invokePointerPressed(x, y);
-		} catch (Throwable ignored) {}
+		} else input.queue(0, x, y, false);
 	}
 
 	public void mouseUp(int x, int y) {
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {1, x, y, 0});
-		} else try {
-			Displayable d = getCurrent();
-			if (d == null) return;
-			if (d instanceof Canvas) {
-				((Canvas) d).invokePointerReleased(x, y);
-				return;
-			}
-			((Screen) d)._invokePointerReleased(x, y);
-		} catch (Throwable ignored) {}
+		} else input.queue(1, x, y, false);
 	}
 
 	public void mouseDrag(int x, int y) {
 		if (Settings.synchronizeKeyEvents) {
 			queueInput(new int[] {2, x, y, 0});
-		} else try {
-			Displayable d = getCurrent();
-			if (d == null) return;
-			if (d instanceof Canvas) {
-				((Canvas) d).invokePointerDragged(x, y);
-				return;
-			}
-			((Screen) d)._invokePointerDragged(x, y);
-		} catch (Throwable ignored) {}
+		} else input.queue(2, x, y, false);
 	}
 
 	public void sizeChanged(int x, int y) {
