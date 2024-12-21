@@ -2461,6 +2461,9 @@ public final class EmulatorScreen implements
 			zoomedWidth = getWidth();
 			zoomedHeight = getHeight();
 		}
+		if (swtContent != null && lastDisplayable != null) {
+			lastDisplayable._swtUpdateSizes();
+		}
 		canvas.redraw();
 	}
 

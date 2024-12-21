@@ -16,6 +16,8 @@
 
 package ru.woesss.j2me.micro3d;
 
+import emulator.Emulator;
+
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -62,7 +64,7 @@ public class Utils {
 	}
 
 	public static String getVersion() {
-		return "asd";
+		return "KEmulator " + Emulator.version;
 	}
 
 	public static void multiplyMV(float[] v, float[] m) {

@@ -764,8 +764,10 @@ public class Emulator implements Runnable {
 			platform.load3D();
 			vlcCheckerThread.start();
 			Controllers.refresh(true);
-			Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on " +
-					System.getProperty("os.name") + " (" + System.getProperty("os.version") + "), Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
+			Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on "
+					+ System.getProperty("os.name") + ' ' + System.getProperty("os.arch")
+					+ " (" + System.getProperty("os.version") + "), Java: "
+					+ System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
 			Devices.load(Emulator.deviceFile);
 			tryToSetDevice(Emulator.deviceName);
 			setupMRUList();

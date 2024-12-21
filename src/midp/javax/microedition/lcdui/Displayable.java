@@ -283,7 +283,7 @@ public class Displayable {
 		if (swtContent != null) {
 			asyncExec(new Runnable() {
 				public void run() {
-					swtUpdateSizes();
+					_swtUpdateSizes();
 				}
 			});
 			s.repaint();
@@ -478,13 +478,13 @@ public class Displayable {
 
 	public void _swtShown() {
 		if (swtContent != null && !swtContent.isDisposed()) {
-			swtUpdateSizes();
+			_swtUpdateSizes();
 		} else if (swtMenu == null) {
 			swtInitMenu();
 		}
 	}
 
-	void swtUpdateSizes() {
+	public void _swtUpdateSizes() {
 		Rectangle newArea = _layoutSwtContent();
 		if(swtContentArea == null || !swtInitialized
 				|| newArea.width != swtContentArea.width
