@@ -134,7 +134,9 @@ public class Displayable {
 					break;
 				}
 				case Command.BACK:
-				case Command.EXIT: {
+				case Command.EXIT:
+				case Command.CANCEL:
+				case Command.STOP: {
 					if (rightCommand != null) continue;
 					rightCommand = cmd;
 					menuCommands.remove(cmd);
