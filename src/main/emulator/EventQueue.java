@@ -174,9 +174,8 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
-		if (Settings.j2lStyleFpsLimit) {
+		if (Settings.j2lStyleFpsLimit)
 			Displayable._fpsLimiter(true);
-		}
 
 		int x1 = x,
 			y1 = y,
@@ -249,7 +248,8 @@ public final class EventQueue implements Runnable {
 			repaintX = repaintY = repaintW = repaintH = -1;
 			internalRepaint(x, y, w, h);
 		}
-		Displayable._fpsLimiter(true);
+		if (!Settings.j2lStyleFpsLimit)
+			Displayable._fpsLimiter(true);
 	}
 
 	public void run() {
@@ -271,7 +271,8 @@ public final class EventQueue implements Runnable {
 								repaintX = repaintY = repaintW = repaintH = -1;
 								internalRepaint(x, y, w, h);
 							}
-							if (!Settings.j2lStyleFpsLimit) Displayable._fpsLimiter(true);
+							if (!Settings.j2lStyleFpsLimit)
+								Displayable._fpsLimiter(true);
 							break;
 						}
 						case EVENT_CALL: {
