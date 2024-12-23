@@ -174,6 +174,10 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
+		if (Settings.j2lStyleFpsLimit) {
+			Displayable._fpsLimiter(true);
+		}
+
 		int x1 = x,
 			y1 = y,
 			x2 = x + w,
@@ -267,7 +271,7 @@ public final class EventQueue implements Runnable {
 								repaintX = repaintY = repaintW = repaintH = -1;
 								internalRepaint(x, y, w, h);
 							}
-							Displayable._fpsLimiter(true);
+							if (!Settings.j2lStyleFpsLimit) Displayable._fpsLimiter(true);
 							break;
 						}
 						case EVENT_CALL: {
@@ -284,8 +288,7 @@ public final class EventQueue implements Runnable {
 							try {
 								(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
 										.cloneImage(scr.getScreenImg());
-							} catch (Exception ignored) {
-							}
+							} catch (Exception ignored) {}
 							scr.repaint();
 							int interval = ((Screen) d)._repaintInterval();
 							if (interval > 0) {
@@ -398,7 +401,7 @@ public final class EventQueue implements Runnable {
 							break;
 						}
 					}
-					Thread.sleep(1);
+					if (Settings.queueSleep) Thread.sleep(1);
 				} catch (Throwable e) {
 					System.err.println("Exception in Event Thread!");
 					System.err.println("Event: " + event);
