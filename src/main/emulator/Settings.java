@@ -117,6 +117,6 @@ public final class Settings {
 	public static boolean dontRepaintOnSetCurrent;
 	public static boolean hasPointerEvents = true;
 	public static boolean wavCache = true;
-	public static boolean queueSleep = false;
-	public static boolean j2lStyleFpsLimit = false;
+	public static boolean queueSleep = true;
+	public static boolean j2lStyleFpsLimit;
 }

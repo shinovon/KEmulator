@@ -320,6 +320,7 @@ public final class Property implements IProperty, SelectionListener {
 //	private Button forceServicePaintCheck;
 	private Composite langComposite;
 	private Button pointerEventsCheck;
+	private Button fpsLimitJlCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -544,6 +545,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
 			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
+			Settings.j2lStyleFpsLimit = Boolean.parseBoolean(properties.getProperty("FPSLimitJLStyle", "false"));
+			Settings.queueSleep = Boolean.parseBoolean(properties.getProperty("EventQueueSleep", "true"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -770,6 +773,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
 			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
+			properties.setProperty("FPSLimitJLStyle", String.valueOf(Settings.j2lStyleFpsLimit));
+			properties.setProperty("EventQueueSleep", String.valueOf(Settings.queueSleep));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -995,6 +1000,7 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
 //		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
 		Settings.hasPointerEvents = pointerEventsCheck.getSelection();
+		Settings.j2lStyleFpsLimit = fpsLimitJlCheck.getSelection();
 
 		String sysProps = propsText.getText();
 		Settings.systemProperties.clear();
@@ -1898,6 +1904,12 @@ public final class Property implements IProperty, SelectionListener {
 		pointerEventsCheck.setText(UILocale.get("OPTION_COREAPI_POINTER_EVENTS", "Canvas.hasPointerEvents() return value"));
 		pointerEventsCheck.setLayoutData(gridData);
 		pointerEventsCheck.setSelection(Settings.hasPointerEvents);
+
+		fpsLimitJlCheck = new Button(coreApiGroup, SWT.CHECK);
+		fpsLimitJlCheck.setText(UILocale.get("OPTION_COREAPI_FPS_LIMIT_JL", "J2ME-Loader style FPS limit"));
+		fpsLimitJlCheck.setLayoutData(gridData);
+		fpsLimitJlCheck.setSelection(Settings.j2lStyleFpsLimit);
+		fpsLimitJlCheck.setToolTipText("Compatibility tweak for chinese version of Castlevania");
 	}
 
 	private void setupDisableApiComp() {
