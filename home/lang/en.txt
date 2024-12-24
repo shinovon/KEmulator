@@ -91,6 +91,8 @@ LINK_JAR_FILE=Specify a jar file
 DIALOG_OK=OK
 DIALOG_CANCEL=Cancel
 DIALOG_SET=Set
+DIALOG_YES=Yes
+DIALOG_NO=No
 
 
 #Info show
@@ -299,6 +301,8 @@ OPTION_FONT_TEST_TEXT=Test Text:
 OPTION_FONT_TEST_TEXT_TXT=This is an Example.
 
 OPTION_SYSTEM_UI_LANGUAGE=UI Language:
+OPTION_SYSTEM_UPDATE_BRANCH=Update branch:
+OPTION_SYSTEM_AUTO_UPDATES=Automatically check for updates
 OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images
 OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region
 OPTION_SYSTEM_INFO_COLOR=Info View: Show color in (R,G,B)
@@ -399,6 +403,13 @@ PERMISSION_CAMERA=Allow the application to use camera?
 SECURITY_ALERT_TITLE=Security
 
 SCREEN_SIZE_DIALOG_TITLE=Set screen size
+
+START_MIDLET_CHOICE_TITLE=Choose MIDlet to run
+
+UPDATE_TITLE=KEmulator Update
+START_AUTO_UPDATE_TEXT=Do you want to receive automatic updates?
+UPDATE_ALREADY_LATEST_TEXT=You already have the latest version of KEmulator.
+UPDATE_AVAILABLE_TEXT=A new version is available.\nDo you want to download it?
 
 LCDUI_ALERT_DISMISS_COMMAND=OK
 LCDUI_LIST_SELECT_COMMAND=Select

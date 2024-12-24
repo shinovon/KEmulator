@@ -279,8 +279,8 @@ public final class Property implements IProperty, SelectionListener {
 	private Text localeText;
 	private Button keymapClearBtn;
 
-	private CLabel labelLanguage;
 	private Combo languageCombo;
+	private Combo updateBranchCombo;
 
 	private Composite keyMapControllerComp;
 	private Composite keyMapTabComp;
@@ -321,6 +321,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite langComposite;
 	private Button pointerEventsCheck;
 	private Button fpsLimitJlCheck;
+	private Button autoUpdatesBtn;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -576,6 +577,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.enableNewTrack = Boolean.parseBoolean(properties.getProperty("EnableNewTrack", "false"));
 			Settings.enableMethodTrack = Boolean.parseBoolean(properties.getProperty("EnableMethodTrack", "false"));
 			Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
+			Settings.updateBranch = properties.getProperty("UpdateBranch", Emulator.debugBuild ? "dev" : "stable");
+			Settings.autoUpdate = Integer.parseInt(properties.getProperty("AutoUpdate", "0"));
 
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
@@ -797,8 +800,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
 
-			properties.setProperty("UILanguage", Settings.uiLanguage);
-
 			// emulator
 			properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
 			properties.setProperty("XRayOverLapScreen", String.valueOf(Settings.xrayOverlapScreen));
@@ -809,6 +810,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("EnableNewTrack", String.valueOf(Settings.enableNewTrack));
 			properties.setProperty("EnableMethodTrack", String.valueOf(Settings.enableMethodTrack));
 			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
+			properties.setProperty("UpdateBranch", Settings.updateBranch);
+			properties.setProperty("AutoUpdate", String.valueOf(Settings.autoUpdate));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 			properties.setProperty("WavCache", String.valueOf(Settings.wavCache));
@@ -982,6 +985,8 @@ public final class Property implements IProperty, SelectionListener {
 			Emulator.getEmulator().updateLanguage();
 		}
 
+		Settings.updateBranch = updateBranchCombo.getText().trim();
+
 		Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
 		Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
 		Settings.m3gDisableLightClamp = m3gDisableLightClamp.getSelection();
@@ -1019,6 +1024,8 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.enableMediaDump = mediaDumpCheck.getSelection();
 		Settings.enableOTT = ottCheck.getSelection();
 		Settings.enableSecurity = securityCheck.getSelection();
+
+		Settings.autoUpdate = autoUpdatesBtn.getSelection() ? 2 : 1;
 
 //		try {
 //			Emulator.getEmulator().getScreen().setSize(Integer.parseInt(screenWidthText.getText()), Integer.parseInt(screenHeightText.getText()));
@@ -1090,9 +1097,9 @@ public final class Property implements IProperty, SelectionListener {
 		labelLayoutData.horizontalAlignment = GridData.FILL;
 		labelLayoutData.verticalAlignment = GridData.CENTER;
 
-		labelLanguage = new CLabel(langComposite, SWT.NONE);
-		labelLanguage.setText(UILocale.get("OPTION_SYSTEM_UI_LANGUAGE", "UI Language:"));
-		labelLanguage.setLayoutData(labelLayoutData);
+		CLabel label = new CLabel(langComposite, SWT.NONE);
+		label.setText(UILocale.get("OPTION_SYSTEM_UI_LANGUAGE", "UI Language:"));
+		label.setLayoutData(labelLayoutData);
 
 		final GridData comboLayoutData = new GridData();
 		comboLayoutData.horizontalAlignment = GridData.FILL;
@@ -1114,6 +1121,26 @@ public final class Property implements IProperty, SelectionListener {
 			}
 		}
 		languageCombo.setText(Settings.uiLanguage);
+
+		final GridData labelLayoutData2 = new GridData();
+		labelLayoutData2.horizontalAlignment = GridData.FILL;
+		labelLayoutData2.verticalAlignment = GridData.CENTER;
+
+		label = new CLabel(langComposite, SWT.NONE);
+		label.setText(UILocale.get("OPTION_SYSTEM_UPDATE_BRANCH", "Update branch:"));
+		label.setLayoutData(labelLayoutData2);
+
+		final GridData comboLayoutData2 = new GridData();
+		comboLayoutData2.horizontalAlignment = GridData.FILL;
+		comboLayoutData2.grabExcessHorizontalSpace = true;
+
+		updateBranchCombo = new Combo(langComposite, 12);
+		updateBranchCombo.setLayoutData(comboLayoutData2);
+		updateBranchCombo.setFont(f);
+		updateBranchCombo.add("stable");
+		updateBranchCombo.add("dev");
+
+		updateBranchCombo.setText(Settings.updateBranch);
 	}
 
 	private void method379() {
@@ -2231,6 +2258,9 @@ public final class Property implements IProperty, SelectionListener {
 		(this.sysChecksGroup = new Group(this.systemComp, 0)).setLayout(new GridLayout());
 		this.sysChecksGroup.setLayoutData(layoutData);
 		genLanguageList();
+		autoUpdatesBtn = new Button(this.sysChecksGroup, 32);
+		autoUpdatesBtn.setText(UILocale.get("OPTION_SYSTEM_AUTO_UPDATES", "Automatically check for updates"));
+		autoUpdatesBtn.setSelection(Settings.autoUpdate == 2);
 		(this.aButton746 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_XRAY_BG", "X-Ray View: OverLap images."));
 		this.aButton746.setSelection(Settings.xrayOverlapScreen);
 		(this.aButton749 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_XRAY_CLIP", "X-Ray View: Show image clipping region."));

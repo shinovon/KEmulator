@@ -113,6 +113,7 @@ public final class EmulatorScreen implements
 	MenuItem captureToClipboardMenuItem;
 	MenuItem showTrackInfoMenuItem;
 	MenuItem helpMenuItem;
+	MenuItem updateMenuItem;
 	MenuItem optionsMenuItem;
 	MenuItem xrayViewMenuItem;
 	MenuItem infosMenuItem;
@@ -180,7 +181,7 @@ public final class EmulatorScreen implements
 	private Displayable lastDisplayable;
 	private boolean painted;
 	private final Vector<String> caretKeys = new Vector<String>();
-	private int midletSelection;
+	protected int dialogSelection;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -292,11 +293,12 @@ public final class EmulatorScreen implements
 		}
 		this.pauseState = (midletLoaded ? 1 : 0);
 		this.updatePauseState();
+		Rectangle clientArea = EmulatorScreen.display.getClientArea();
 		if (EmulatorScreen.locX < 0) {
-			EmulatorScreen.locX = EmulatorScreen.display.getClientArea().width - this.shell.getSize().x >> 1;
+			EmulatorScreen.locX = clientArea.width - this.shell.getSize().x >> 1;
 		}
 		if (EmulatorScreen.locY < 0) {
-			EmulatorScreen.locY = EmulatorScreen.display.getClientArea().height - this.shell.getSize().y >> 1;
+			EmulatorScreen.locY = clientArea.height - this.shell.getSize().y >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
 		if (sizeW > 10 && sizeH > 10 && Settings.resizeMode != 0 && !defaultSize) {
@@ -742,6 +744,8 @@ public final class EmulatorScreen implements
 		this.optionsMenuItem.addSelectionListener(this);
 		(this.helpMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
 		this.helpMenuItem.addSelectionListener(this);
+		(this.updateMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_CHECK_UPDATE", "Check for Updates"));
+		this.updateMenuItem.addSelectionListener(this);
 
 		menuItemView.setMenu(this.menuView);
 		this.menuTool = new Menu(menuItemTool);
@@ -1224,6 +1228,30 @@ public final class EmulatorScreen implements
 		if (parent == this.menuView) {
 			if (menuItem == this.helpMenuItem) {
 				new About().method454(this.shell);
+				return;
+			}
+			if (menuItem == updateMenuItem) {
+				if (Updater.state == Updater.STATE_BUSY) return;
+				new Thread() {
+					public void run() {
+						Updater.checkUpdate();
+						if (Updater.state == Updater.STATE_UPDATE_AVAILABLE) {
+							EmulatorImpl.asyncExec(new Runnable() {
+								public void run() {
+									showUpdateDialog(1);
+								}
+							});
+							return;
+						}
+						if (Updater.state == Updater.STATE_UP_TO_DATE) {
+							EmulatorImpl.syncExec(new Runnable() {
+								public void run() {
+									showMessage(UILocale.get("UPDATE_ALREADY_LATEST_TEXT", "You already have the latest version of KEmulator."));
+								}
+							});
+						}
+					}
+				}.start();
 				return;
 			}
 			if (menuItem == this.optionsMenuItem) {
@@ -2576,17 +2604,17 @@ public final class EmulatorScreen implements
 	}
 
 	public int showMidletChoice(Vector<String> midletKeys) {
-		midletSelection = -1;
+		dialogSelection = -1;
 
 		Shell shell = new Shell(EmulatorImpl.getDisplay(), SWT.DIALOG_TRIM);
 		shell.setSize(300, 400);
-		shell.setText("Choose MIDlet to run");
+		shell.setText(UILocale.get("START_MIDLET_CHOICE_TITLE", "Choose MIDlet to run"));
 		shell.setLayout(new GridLayout(1, false));
 
 		Table table = new Table(shell, SWT.BORDER | SWT.SINGLE);
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent arg0) {
-				midletSelection = table.getSelectionIndex();
+				dialogSelection = table.getSelectionIndex();
 				shell.close();
 			}
 		});
@@ -2607,7 +2635,7 @@ public final class EmulatorScreen implements
 
 		Rectangle clientArea = EmulatorScreen.display.getClientArea();
 		Point size = shell.getSize();
-		shell.setLocation((clientArea.width - size.x) / 2, (clientArea.height - size.y) / 2);
+		shell.setLocation((clientArea.width + clientArea.x - size.x) / 2 , (clientArea.height + clientArea.y - size.y) / 2);
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!EmulatorScreen.display.readAndDispatch()) {
@@ -2615,7 +2643,74 @@ public final class EmulatorScreen implements
 			}
 		}
 
-		return midletSelection;
+		return dialogSelection;
+	}
+
+	public int showUpdateDialog(int type) {
+		dialogSelection = 0;
+
+		Shell shell = new Shell(EmulatorImpl.getDisplay(), SWT.DIALOG_TRIM);
+		shell.setSize(360, 120);
+		shell.setText(UILocale.get("START_AUTO_UPDATE_TITLE", "Auto-Update"));
+		shell.setLayout(new GridLayout(1, false));
+
+		Composite composite = new Composite(shell, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
+		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		Label label = new Label(composite, SWT.NONE);
+		switch (type) {
+			case 0:
+				label.setText(UILocale.get("START_AUTO_UPDATE_TEXT", "Do you want to receive automatic updates?"));
+				break;
+			case 1:
+				label.setText(UILocale.get("UPDATE_AVAILABLE_TEXT", "A new version is available.\nDo you want to download it?"));
+				break;
+		}
+
+
+		Composite composite_1 = new Composite(shell, SWT.NONE);
+		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
+		composite_1.setLayout(new GridLayout(2, true));
+
+		Button yes = new Button(composite_1, SWT.NONE);
+		yes.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				dialogSelection = 2;
+				shell.close();
+			}
+		});
+		yes.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
+		yes.setText(UILocale.get("START_AUTO_UPDATE_YES", "Yes"));
+
+		Button no = new Button(composite_1, SWT.NONE);
+		no.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				dialogSelection = 1;
+				shell.close();
+			}
+		});
+		no.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
+		no.setText(UILocale.get("START_AUTO_UPDATE_NO", "No"));
+
+		shell.pack();
+		Rectangle clientArea = EmulatorScreen.display.getClientArea();
+		Point size = shell.getSize();
+		shell.setLocation((clientArea.width + clientArea.x - size.x) / 2, (clientArea.height + clientArea.y - size.y) / 2);
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!EmulatorScreen.display.readAndDispatch()) {
+				EmulatorScreen.display.sleep();
+			}
+		}
+
+		if (type == 1 && dialogSelection == 2) {
+			Updater.startUpdater(true);
+		}
+
+		return dialogSelection;
 	}
 
 	final class ShellPosition implements Runnable {

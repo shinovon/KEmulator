@@ -2,6 +2,7 @@ package emulator.ui.swt;
 
 import emulator.Emulator;
 import emulator.UILocale;
+import emulator.custom.CustomMethod;
 import emulator.ui.ILogStream;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlEvent;
@@ -61,6 +62,10 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 	public final void stdout(final String s) {
 		this.logStream.orig.println(s);
 		queuePrint(s + "\n");
+	}
+
+	public void println(Throwable e) {
+		println(CustomMethod.getStackTrace(e));
 	}
 
 	public final void printStackTrace(final String s) {

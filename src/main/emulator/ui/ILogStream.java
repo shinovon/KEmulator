@@ -10,4 +10,6 @@ public interface ILogStream {
 	void printStackTrace(final String p0);
 
 	void stdout(final String p0);
+
+	void println(Throwable e);
 }

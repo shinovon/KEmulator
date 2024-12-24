@@ -11,10 +11,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.1";
+	private static final String VERSION = "0.2";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
 	
@@ -66,6 +68,7 @@ public class KEmulatorUpdater implements Runnable {
 			}
 			
 			if (currentVersion == 0 || type == null) {
+				fail("Not enough arguments", null);
 				exitDelay(0);
 				return;
 			}
@@ -92,18 +95,19 @@ public class KEmulatorUpdater implements Runnable {
 				try {
 					if ("stable".equals(branch)) {
 						int latest = Integer.parseInt(
-								getHttpString(UPDATE_URL + type + "/" + branch + "/version.txt"));
+								getHttpString(UPDATE_URL + branch + "/version.txt"));
 						if (latest == currentVersion) {
 							state("Already up to date!");
 							Thread.sleep(3000);
 							break update;
 						}
 					} else {
-						String s = getHttpString(UPDATE_URL + type + "/" + branch + "/version.mf");
-						// TODO
+						String s = getHttpString(UPDATE_URL + branch + "/version.mf");
+						// TODO parse and check if up to date
 					}
 				} catch (Exception e) {
 					fail("Failed to get latest version info", e);
+					return;
 				}
 				
 				state("Deleting KEmulator.jar");
@@ -114,6 +118,7 @@ public class KEmulatorUpdater implements Runnable {
 					}
 				} catch (IOException e) {
 					fail("Failed to delete KEmulator.jar", e);
+					return;
 				}
 				
 				if (!x64) {
@@ -135,35 +140,54 @@ public class KEmulatorUpdater implements Runnable {
 				try {
 					state("Downloading KEmulator.jar");
 					download(UPDATE_URL
-							+ type + "/" + branch
+							+ branch + "/" + type
 							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), kemulatorJar);
 				} catch (IOException e) {
 					fail("Failed to download KEmulator.jar", e);
+					return;
+				}
+				
+				Path tempZip = Files.createTempFile(null, ".zip");
+				try {
+					state("Downloading lang.zip");
+					download(UPDATE_URL + branch + "/lang.zip", tempZip);
+				} catch (IOException e) {
+					fail("Failed to download lang.zip", e);
+					return;
+				}
+				
+				try {
+					state("Extracting lang.zip");
+					extract(tempZip, kemulatorDir.resolve("lang"));
+				} catch (IOException e) {
+					fail("Failed to extract lang.zip", e);
+					return;
 				}
 				
 				if (!x64) {
 					try {
 						state("Downloading m3g_lwjgl.jar");
 						download(UPDATE_URL
-								+ type + "/" + branch + "/m3g_lwjgl.jar",
+								+ branch + "/" + type + "/m3g_lwjgl.jar",
 								kemulatorDir.resolve("m3g_lwjgl.jar"));
 	
 						state("Downloading m3g_swerve.jar");
 						download(UPDATE_URL
-								+ type + "/" + branch + "/m3g_swerve.jar",
+								+ branch + "/" + type + "/m3g_swerve.jar",
 								kemulatorDir.resolve("m3g_swerve.jar"));
 	
 						state("Downloading micro3d_gl.jar");
 						download(UPDATE_URL
-								+ type + "/" + branch + "/micro3d_gl.jar",
+								+ branch + "/" + type + "/micro3d_gl.jar",
 								kemulatorDir.resolve("micro3d_gl.jar"));
 	
 						state("Downloading micro3d_dll.jar");
 						download(UPDATE_URL
-								+ type + "/" + branch + "/micro3d_dll.jar",
+								+ branch + "/" + type + "/micro3d_dll.jar",
 								kemulatorDir.resolve("micro3d_dll.jar"));
 					} catch (IOException e) {
 						fail("Failed to download KEmulator.jar", e);
+						return;
 					}
 				}
 				
@@ -293,7 +317,8 @@ public class KEmulatorUpdater implements Runnable {
 	}
 	
 	static void state(String message) {
-		label.setText(message);
+		if (label != null)
+			label.setText(message);
 		log(message, true);
 	}
 	
@@ -316,10 +341,18 @@ public class KEmulatorUpdater implements Runnable {
 //		if (show) textArea.setText(log.toString());
 	}
 	
+	static int getJavaVersionMajor() {
+		try {
+			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
+		} catch (Throwable e) {
+			return 0;
+		}
+	}
+
+	
 	// http utils
 	
 	static void download(String url, Path path) throws IOException {
-
 		ReadableByteChannel inChannel = null;
 		FileOutputStream fileStream = null;
 		FileChannel fileChannel = null;
@@ -360,6 +393,7 @@ public class KEmulatorUpdater implements Runnable {
 	static InputStream getHttpStream(String url) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "KEmulatorUpdater/" + VERSION);
+		connection.setRequestProperty("Accept-Encoding", "gzip");
 		int responseCode = connection.getResponseCode();
 		if (responseCode == 404) {
 			throw new FileNotFoundException(url);
@@ -375,12 +409,34 @@ public class KEmulatorUpdater implements Runnable {
 		return inputStream;
 	}
 	
-	static int getJavaVersionMajor() {
+	// zip
+	
+	static void extract(Path archive, Path outDir) throws IOException {
+		ZipInputStream zipStream = new ZipInputStream(Files.newInputStream(archive));
+		ReadableByteChannel inChannel = Channels.newChannel(zipStream);
 		try {
-			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
-		} catch (Throwable e) {
-			return 0;
+			ZipEntry zipEntry;
+			while ((zipEntry = zipStream.getNextEntry()) != null) {
+				String name = zipEntry.getName();
+				boolean isDir = zipEntry.isDirectory();
+				Path path = outDir.resolve(name);
+				if (isDir) {
+					if (Files.notExists(path)) {
+						Files.createDirectory(path);
+					}
+				} else {
+					FileOutputStream fileStream = new FileOutputStream(path.toFile());
+					try {
+						fileStream.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+					} finally {
+						fileStream.close();
+					}
+				}
+				
+			}
+		} finally {
+			zipStream.close();
+			inChannel.close();
 		}
 	}
-
 }

@@ -91,6 +91,8 @@ LINK_JAR_FILE=Открыть JAR
 DIALOG_OK=OK
 DIALOG_CANCEL=Отмена
 DIALOG_SET=ОК
+DIALOG_YES=Да
+DIALOG_NO=Нет
 
 
 #Info show
@@ -399,6 +401,13 @@ PERMISSION_CAMERA=Разрешить приложению использоват
 SECURITY_ALERT_TITLE=Безопасность
 
 SCREEN_SIZE_DIALOG_TITLE=Изменение размера экрана
+
+START_MIDLET_CHOICE_TITLE=Выбор MIDlet'а для запуска
+
+UPDATE_TITLE=Обновление KEmulator
+START_AUTO_UPDATE_TEXT=Вы хотите получать автоматические обновления?
+UPDATE_ALREADY_LATEST_TEXT=You already have the latest version of KEmulator.
+UPDATE_AVAILABLE_TEXT=A new version is available.\nDo you want to download it?
 
 LCDUI_ALERT_DISMISS_COMMAND=Ок
 LCDUI_LIST_SELECT_COMMAND=Выбрать

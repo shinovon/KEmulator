@@ -64,7 +64,7 @@ public class Emulator implements Runnable {
 	public static int rpcPartyMax;
 
 	public static String httpUserAgent;
-	private final static Thread vlcCheckerThread;
+	private final static Thread backgroundThread;
 	private static IEmulatorPlatform platform;
 	public static boolean installed;
 
@@ -73,6 +73,7 @@ public class Emulator implements Runnable {
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
 	private static Class<?> midletClass;
 	private static boolean forked;
+	private static boolean updated;
 
 	private static void initRichPresence() {
 		if (!Settings.rpc)
@@ -251,7 +252,6 @@ public class Emulator implements Runnable {
 					in.close();
 				}
 			}
-			IScreen scr = Emulator.getEmulator().getScreen();
 			StringBuilder s = new StringBuilder("!");
 
 			s.append(Emulator.deviceName).append(';')
@@ -269,7 +269,7 @@ public class Emulator implements Runnable {
 			properties.setProperty(key, s.toString());
 			FileOutputStream out = new FileOutputStream(propsPath);
 			try {
-				properties.store(out, "KEmulator platforms");
+				properties.store(out, "KEmulator MIDlets database");
 			} finally {
 				out.close();
 			}
@@ -762,7 +762,6 @@ public class Emulator implements Runnable {
 			}
 
 			platform.load3D();
-			vlcCheckerThread.start();
 			Controllers.refresh(true);
 			Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on "
 					+ System.getProperty("os.name") + ' ' + System.getProperty("os.arch")
@@ -772,6 +771,12 @@ public class Emulator implements Runnable {
 			tryToSetDevice(Emulator.deviceName);
 			setupMRUList();
 			initRichPresence();
+
+			if (Settings.autoUpdate == 0) {
+				Settings.autoUpdate = Emulator.emulatorimpl.getEmulatorScreen().showUpdateDialog(0);
+			}
+			backgroundThread.start();
+
 			if (Emulator.midletClassName == null && Emulator.midletJar == null) {
 				Emulator.emulatorimpl.getEmulatorScreen().start(false);
 				EmulatorImpl.dispose();
@@ -937,6 +942,8 @@ public class Emulator implements Runnable {
 				Settings.uei = true;
 			} else if (key.equalsIgnoreCase("s")) {
 				forked = true;
+			} else if (key.equalsIgnoreCase("s")) {
+				updated = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
@@ -1143,7 +1150,18 @@ public class Emulator implements Runnable {
 		Emulator.jarClasses = new Vector();
 		Emulator.deviceName = "SonyEricssonK800";
 		Emulator.deviceFile = "/res/plat";
-		vlcCheckerThread = new Thread(() -> Manager.checkLibVlcSupport());
+		backgroundThread = new Thread(new Runnable() {
+			public void run() {
+				Manager.checkLibVlcSupport();
+				if (!updated && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
+					EmulatorImpl.asyncExec(new Runnable() {
+						public void run() {
+							Emulator.emulatorimpl.getEmulatorScreen().showUpdateDialog(1);
+						}
+					});
+				}
+			}
+		});
 	}
 
 	public static String getMidletName() {

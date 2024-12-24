@@ -119,4 +119,6 @@ public final class Settings {
 	public static boolean wavCache = true;
 	public static boolean queueSleep = true;
 	public static boolean j2lStyleFpsLimit;
+	public static String updateBranch = "stable";
+	public static int autoUpdate = 0; // 0 - not asked, 1 - manual, 2 - automatic
 }
