@@ -347,7 +347,9 @@ public class Displayable {
 			}
 			n = EventQueue.EVENT_SCREEN;
 		}
-		Emulator.getEventQueue().queue(n);
+		try {
+			Emulator.getEventQueue().queue(n);
+		} catch (Exception ignored) {}
 	}
 
 	void repaintScreen(Item item) {

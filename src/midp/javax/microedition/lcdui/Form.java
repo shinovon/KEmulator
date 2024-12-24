@@ -34,7 +34,6 @@ public class Form extends Screen {
 				item.screen = this;
 			}
 		}
-		queueLayout(0);
 	}
 
 	public int append(final Item item) {
