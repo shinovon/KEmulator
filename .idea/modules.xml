@@ -13,6 +13,7 @@
       <module fileurl="file://$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" filepath="$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" />
       <module fileurl="file://$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" filepath="$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" />
       <module fileurl="file://$PROJECT_DIR$/micro3d_stub/micro3d_stub.iml" filepath="$PROJECT_DIR$/micro3d_stub/micro3d_stub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/updater/updater.iml" filepath="$PROJECT_DIR$/updater/updater.iml" />
     </modules>
   </component>
 </project>

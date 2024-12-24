@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class EmulatorExe {
 
-	public static final String version = "1.9";
+	public static final String version = "1.10";
 	public static final boolean WINE = false;
 	public static final boolean NNX64 = false;
 
@@ -183,6 +183,24 @@ public class EmulatorExe {
 
 		cmd.add("-javaagent:" + path + "/KEmulator.jar");
 
+		
+		if (getJavaVersionMajor() >= 9) {
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.lang=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.lang.reflect=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.lang.ref=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.io=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/java.util=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/sun.misc=ALL-UNNAMED");
+			if (getJavaVersionMajor() >= 17)
+				cmd.add("--enable-native-access=ALL-UNNAMED");
+		}
+
 		// main class
 		cmd.add("emulator.Emulator");
 
@@ -296,6 +314,14 @@ public class EmulatorExe {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	static int getJavaVersionMajor() {
+		try {
+			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
+		} catch (Throwable e) {
+			return 0;
+		}
 	}
 
 	static class InputStreamCopier extends Thread {
