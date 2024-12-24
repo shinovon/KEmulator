@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.2";
+	private static final String VERSION = "0.3";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
 	
@@ -36,6 +36,9 @@ public class KEmulatorUpdater implements Runnable {
 	private static String type;
 	private static String branch = "stable";
 	private static boolean runAfterDone;
+	private static boolean installed;
+	private static String jar;
+	private static String jad;
 
 	public static void main(String[] args) {
 		kemulatorDir = Paths.get(".");
@@ -62,6 +65,15 @@ public class KEmulatorUpdater implements Runnable {
 						break;
 					case "-run":
 						runAfterDone = true;
+						break;
+					case "-installed":
+						installed = true;
+						break;
+					case "-jar":
+						jar = args[++i];
+						break;
+					case "-jad":
+						jad = args[++i];
 						break;
 					}
 				}
@@ -293,6 +305,19 @@ public class KEmulatorUpdater implements Runnable {
 		
 		cmd.add("-s");
 		cmd.add("-updated");
+		
+		if (installed)
+			cmd.add("-installed");
+		
+		if (jar != null) {
+			cmd.add("-jar");
+			cmd.add(jar);
+		}
+		
+		if (jad != null) {
+			cmd.add("-jad");
+			cmd.add(jad);
+		}
 		
 		new ProcessBuilder(new String[0])
 			.directory(kemulatorDir.toFile())

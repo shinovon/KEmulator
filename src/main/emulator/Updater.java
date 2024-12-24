@@ -127,6 +127,15 @@ public class Updater {
 		if (restart)
 			cmd.add("-run");
 
+		if (Emulator.jadPath != null) {
+			cmd.add("-jad");
+			cmd.add(Emulator.jadPath);
+		}
+		if (Emulator.midletJar != null) {
+			cmd.add("-jar");
+			cmd.add(Emulator.midletJar);
+		}
+
 		Emulator.getEmulator().disposeSubWindows();
 		Emulator.notifyDestroyed();
 		try {
