@@ -43,6 +43,14 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.18.1 [2024.12.24]
+Automatic updates checking
+Added J2ME-Loader style fps limit (fixes Castlevania chinese version)
+Implemented List.setFont
+Fixed TextBox resize
+Fix for Java 9-16
+Fixed key mapping
+
 $v2.18 [2024.12.16]
 Reimplemented LCDUI TextField on SWT
 Rewrote MIDlet choice window on SWT

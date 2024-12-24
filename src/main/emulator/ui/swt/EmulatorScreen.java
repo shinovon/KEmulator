@@ -2651,7 +2651,7 @@ public final class EmulatorScreen implements
 
 		Shell shell = new Shell(EmulatorImpl.getDisplay(), SWT.DIALOG_TRIM);
 		shell.setSize(360, 120);
-		shell.setText(UILocale.get("START_AUTO_UPDATE_TITLE", "Auto-Update"));
+		shell.setText(UILocale.get("UPDATE_TITLE", "KEmulator Update"));
 		shell.setLayout(new GridLayout(1, false));
 
 		Composite composite = new Composite(shell, SWT.NONE);
