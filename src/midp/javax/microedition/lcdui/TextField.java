@@ -35,11 +35,14 @@ public class TextField extends Item {
 	}
 
 	public String getString() {
+		if (string == null) {
+			return "";
+		}
 		return this.string;
 	}
 
-	public void setString(final String aString25) {
-		this.string = aString25;
+	public void setString(String s) {
+		this.string = s == null ? "" : s;
 		if (swtFocused)
 			Emulator.getEmulator().getScreen().getCaret().updateText(this, string);
 		layoutForm();
