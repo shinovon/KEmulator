@@ -114,6 +114,11 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	private static void loadSWTLibrary() {
+		if (new File(Emulator.getAbsolutePath() + File.separatorChar + "swt-custom.jar").exists()) {
+			addToClassPath("swt-custom.jar");
+			return;
+		}
+
 		String osn = System.getProperty("os.name").toLowerCase();
 		String osa = System.getProperty("os.arch").toLowerCase();
 
