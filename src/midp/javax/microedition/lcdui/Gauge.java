@@ -17,9 +17,9 @@ public class Gauge extends Item {
 
 	public Gauge(String label, boolean interactive, int maxValue, int initialValue) {
 		super(label);
-		value = initialValue;
-		max = maxValue;
 		this.interactive = interactive;
+		setMaxValue(maxValue);
+		setValue(initialValue);
 	}
 
 	public void setLabel(String label) {
@@ -47,6 +47,13 @@ public class Gauge extends Item {
 	}
 
 	public void setValue(int value) {
+		if (max == INDEFINITE) {
+			if (value < 0) value = 0;
+			else if (value > INCREMENTAL_UPDATING) value = INCREMENTAL_UPDATING;
+		} else {
+			if (value < 0) value = 0;
+			else if (value > max) value = max;
+		}
 		this.value = value;
 		repaintForm();
 	}
@@ -56,6 +63,18 @@ public class Gauge extends Item {
 	}
 
 	public void setMaxValue(int maxValue) {
+		if ((interactive && maxValue == INDEFINITE)
+			|| (maxValue != INDEFINITE && maxValue <= 0)) {
+			throw new IllegalArgumentException();
+		}
+		if (maxValue != max) {
+			value = 0;
+		}
+		if (maxValue != INDEFINITE) {
+			if (value > maxValue) {
+				value = maxValue;
+			}
+		}
 		max = maxValue;
 		repaintForm();
 	}

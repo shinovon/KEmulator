@@ -165,7 +165,7 @@ public class Image {
 			return createImage(emulator.custom.CustomJarResources.getResourceAsStream(string));
 		} catch (Exception ex) {
 			//ex.printStackTrace();
-			throw new IOException(string);
+			throw new IOException(string, ex);
 		}
 	}
 
