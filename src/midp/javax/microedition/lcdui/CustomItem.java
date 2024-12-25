@@ -19,6 +19,9 @@ public abstract class CustomItem extends Item {
 	int[] anIntArray429;
 	private boolean wasHidden = true;
 	private int lastWidth, lastHeight;
+	private boolean repaintPending;
+	private int contentWidth;
+	private int contentHeight;
 
 	protected CustomItem(final String s) {
 		super(s);
@@ -86,12 +89,14 @@ public abstract class CustomItem extends Item {
 	}
 
 	protected final void invalidate() {
+		repaintPending = true;
 		repaintForm();
 	}
 
 	protected abstract void paint(final Graphics p0, final int p1, final int p2);
 
 	protected final void repaint() {
+		repaintPending = true;
 		repaintForm();
 	}
 
@@ -158,15 +163,18 @@ public abstract class CustomItem extends Item {
 		if (img == null) {
 			img = Image.createImage(Emulator.getEmulator().getScreen().getWidth(), Emulator.getEmulator().getScreen().getHeight());
 			g = this.img.getGraphics();
+			repaintPending = true;
 		}
-		this.g.setColor(-1);
-		this.g.fillRect(0, 0, super.screen.w, super.screen.h);
-		this.g.setColor(0);
 		final int n = x + 2;
 		int n2 = y + 2;
-		final int prefContentWidth = this.getPrefContentWidth(w);
-		final int prefContentHeight = this.getPrefContentHeight(h);
-		this.paint(this.g, prefContentWidth, prefContentHeight);
+		if (repaintPending) {
+			this.g.setColor(-1);
+			this.g.fillRect(0, 0, super.screen.w, super.screen.h);
+			this.g.setColor(0);
+			contentWidth = this.getPrefContentWidth(w);
+			contentHeight = this.getPrefContentHeight(h);
+			this.paint(this.g, contentWidth, contentHeight);
+		}
 		if (super.labelArr != null && super.labelArr.length > 0) {
 			graphics.setFont(Item.font);
 			for (int i = 0; i < super.labelArr.length; ++i) {
@@ -175,8 +183,8 @@ public abstract class CustomItem extends Item {
 			}
 		}
 		graphics.drawRegion(img, 0, 0,
-				Math.min(img.getWidth(), Math.min(w, prefContentWidth)),
-				Math.min(img.getHeight(), Math.min(h-n2+y, prefContentHeight)), 0,
+				Math.min(img.getWidth(), Math.min(w, contentWidth)),
+				Math.min(img.getHeight(), Math.min(h-n2+y, contentHeight)), 0,
 				n, n2, 0);
 	}
 
