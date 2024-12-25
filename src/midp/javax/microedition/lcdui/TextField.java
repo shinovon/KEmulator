@@ -218,4 +218,7 @@ public class TextField extends Item {
 	protected void _itemApplyCommand() {
 		focus();
 	}
+	
+	public void setPreferredSize(int width, int height) {
+	}
 }
