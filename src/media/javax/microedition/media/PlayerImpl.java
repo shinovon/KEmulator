@@ -591,6 +591,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				}
 				stopped = false;
 				(playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
+			} else {
+				notifyListeners(PlayerListener.STARTED, 0);
+				notifyListeners(PlayerListener.END_OF_MEDIA, 0);
+				return;
 			}
 			setLevel(level);
 			state = STARTED;
