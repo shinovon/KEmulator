@@ -2649,62 +2649,21 @@ public final class EmulatorScreen implements
 	public int showUpdateDialog(int type) {
 		dialogSelection = 0;
 
-		Shell shell = new Shell(EmulatorImpl.getDisplay(), SWT.DIALOG_TRIM);
-		shell.setSize(360, 120);
-		shell.setText(UILocale.get("UPDATE_TITLE", "KEmulator Update"));
-		shell.setLayout(new GridLayout(1, false));
-
-		Composite composite = new Composite(shell, SWT.NONE);
-		composite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
-		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
-
-		Label label = new Label(composite, SWT.NONE);
+		try {
+			setWindowOnTop(ReflectUtil.getHandle(shell), true);
+		} catch (Throwable ignored) {}
+		MessageBox messageBox = new MessageBox(this.shell, SWT.YES | SWT.NO | SWT.CLOSE);
+		messageBox.setText(UILocale.get("UPDATE_TITLE", "KEmulator Update"));
 		switch (type) {
 			case 0:
-				label.setText(UILocale.get("START_AUTO_UPDATE_TEXT", "Do you want to receive automatic updates?"));
+				messageBox.setMessage(UILocale.get("START_AUTO_UPDATE_TEXT", "Do you want to receive automatic updates?"));
 				break;
 			case 1:
-				label.setText(UILocale.get("UPDATE_AVAILABLE_TEXT", "A new version is available.\nDo you want to download it?"));
+				messageBox.setMessage(UILocale.get("UPDATE_AVAILABLE_TEXT", "A new version is available.\nDo you want to download it?"));
 				break;
 		}
-
-
-		Composite composite_1 = new Composite(shell, SWT.NONE);
-		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
-		composite_1.setLayout(new GridLayout(2, true));
-
-		Button yes = new Button(composite_1, SWT.NONE);
-		yes.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				dialogSelection = 2;
-				shell.close();
-			}
-		});
-		yes.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
-		yes.setText(UILocale.get("START_AUTO_UPDATE_YES", "Yes"));
-
-		Button no = new Button(composite_1, SWT.NONE);
-		no.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				dialogSelection = 1;
-				shell.close();
-			}
-		});
-		no.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
-		no.setText(UILocale.get("START_AUTO_UPDATE_NO", "No"));
-
-		shell.pack();
-		Rectangle clientArea = EmulatorScreen.display.getClientArea();
-		Point size = shell.getSize();
-		shell.setLocation((clientArea.width + clientArea.x - size.x) / 2, (clientArea.height + clientArea.y - size.y) / 2);
-		shell.open();
-		while (!shell.isDisposed()) {
-			if (!EmulatorScreen.display.readAndDispatch()) {
-				EmulatorScreen.display.sleep();
-			}
-		}
+		int r = messageBox.open();
+		dialogSelection = r == SWT.YES ? 2 : r == SWT.NO ? 1 : 0;
 
 		if (type == 1 && dialogSelection == 2) {
 			Updater.startUpdater(true);
