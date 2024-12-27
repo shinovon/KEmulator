@@ -50,6 +50,8 @@ Implemented List.setFont
 Fixed TextBox resizing
 Fixed restart on Java 9-16
 Fixed key mapping
+Updated vlcj
+
 
 $v2.18 [2024.12.16]
 Reimplemented LCDUI TextField on SWT
