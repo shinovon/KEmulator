@@ -1,6 +1,7 @@
 package emulator.media.vlc;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.graphics2D.awt.ImageAWT;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.media.MediaRef;
@@ -79,7 +80,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	long stopTime = StopTimeControl.RESET;
 	private boolean stoppedAtTime;
-	private final Object globalLock = new Object();
+	private final Object vlcLock = new Object();
 
 	private VLCPlayerImpl() {
 		this.listeners = new Vector();
@@ -90,7 +91,8 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		metaDataControl = new MetaDataControlImpl(this);
 		controls = new Control[]{videoControl, volumeControl, rateControl, stopTimeControl};
 		this.timeBase = Manager.getSystemTimeBase();
-		PlayerImpl.players.add(this);
+		if (Settings.enableMediaDump)
+			PlayerImpl.players.add(this);
 	}
 
 	public VLCPlayerImpl(String url) throws IOException {
@@ -273,6 +275,11 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 				}
 //				boolean bufferToFile = inputStream instanceof ByteArrayInputStream && false;
 //				if (!bufferToFile) {
+				try {
+					if (inputStream instanceof ByteArrayInputStream) {
+						dataLen = inputStream.available();
+					}
+				} catch (Exception ignored) {}
 				mediaCallback = new VLCCallbackStream(inputStream, dataLen);
 //				} else {
 //					try {
@@ -311,23 +318,25 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			return;
 		}
 		if (!prepared) {
-			load();
-			try {
-				if (mediaCallback != null) {
-					if (!mediaPlayer.media().prepare(mediaCallback)) {
-						Manager.log("Failed to prepare");
-						throw new MediaException("failed to prepare");
+			synchronized (vlcLock) {
+				load();
+				try {
+					if (mediaCallback != null) {
+						if (!mediaPlayer.media().prepare(mediaCallback)) {
+							Manager.log("Failed to prepare");
+							throw new MediaException("failed to prepare");
+						}
+					} else {
+						if (!mediaPlayer.media().prepare(mediaUrl)) {
+							Manager.log("Failed to prepare");
+							throw new MediaException("failed to prepare");
+						}
 					}
-				} else {
-					if (!mediaPlayer.media().prepare(mediaUrl)) {
-						Manager.log("Failed to prepare");
-						throw new MediaException("failed to prepare");
-					}
+				} catch (MediaException e) {
+					throw e;
+				} catch (Exception e) {
+					throw new MediaException(e);
 				}
-			} catch (MediaException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new MediaException(e);
 			}
 			prepared = true;
 		}
@@ -346,11 +355,13 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			if (factory == null) {
 				factory = new MediaPlayerFactory();
 			}
-			mediaPlayer = factory.mediaPlayers().newEmbeddedMediaPlayer();
+			synchronized (vlcLock) {
+				mediaPlayer = factory.mediaPlayers().newEmbeddedMediaPlayer();
 
-			mediaPlayer.events().addMediaPlayerEventListener(this);
+				mediaPlayer.events().addMediaPlayerEventListener(this);
 
-			mediaPlayer.videoSurface().set(new MyVideoSurface());
+				mediaPlayer.videoSurface().set(new MyVideoSurface());
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new MediaException(e);
@@ -364,6 +375,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (this.state == CLOSED) {
 			return;
 		}
+		PlayerImpl.players.remove(this);
 		state = CLOSED;
 		if (inst == this) inst = null;
 		if (playing) {
@@ -372,14 +384,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			} catch (Exception ignored) {
 			}
 		}
-		try {
-			if (mediaPlayer == null) {
-				released = true;
-			} else if (!released) {
-				mediaPlayer.release();
-				released = true;
-			}
-		} catch (Error ignored) {}
+		released = true;
 		if (dataSource != null) {
 			dataSource.disconnect();
 		}
@@ -391,7 +396,8 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (this.state == 0) {
 			throw new IllegalStateException("closed");
 		}
-		if (this.state == STARTED) {
+		PlayerImpl.players.remove(this);
+		if (playing) {
 			try {
 				this.stop();
 				return;
@@ -399,14 +405,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 				return;
 			}
 		}
-		try {
-			if (mediaPlayer == null) {
-				released = true;
-			} else if (!released) {
-				mediaPlayer.release();
-				released = true;
-			}
-		} catch (Error ignored) {}
+		released = true;
 		if (this.state == PREFETCHED) {
 			state = REALIZED;
 		} else {
@@ -432,10 +431,15 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			if (!prepared) {
 				prefetch();
 			}
-			mediaPlayer.controls().start();
+			PlayerImpl.players.add(this);
+			synchronized (vlcLock) {
+				mediaPlayer.controls().start();
+			}
 			if (volume == -1) {
 				notifyListeners(PlayerListener.VOLUME_CHANGED, volume = 50);
-				mediaPlayer.audio().setVolume(volume);
+				synchronized (vlcLock) {
+					mediaPlayer.audio().setVolume(volume);
+				}
 			}
 			playing = true;
 			state = STARTED;
@@ -451,7 +455,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			throw new IllegalStateException("closed");
 		}
 		if (playing) {
-			mediaPlayer.controls().pause();
+			synchronized (vlcLock) {
+				mediaPlayer.controls().pause();
+			}
 			if (state == STARTED)
 				state = PREFETCHED;
 			playing = false;
@@ -489,7 +495,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	public long setMediaTime(long p0) throws MediaException {
-		mediaPlayer.controls().setTime(p0 / 1000L);
+		synchronized (vlcLock) {
+			mediaPlayer.controls().setTime(p0 / 1000L);
+		}
 		return mediaPlayer.status().time() * 1000L;
 	}
 
@@ -504,12 +512,14 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			started = true;
 		}
 		if ("stopped".equals(s) || "endOfMedia".equals(s)) {
+			if (!Settings.enableMediaDump)
+				PlayerImpl.players.remove(this);
 			if (state == STARTED) {
 				state = PREFETCHED;
 			}
 			started = false;
 		}
-		if (listeners == null)
+		if (released || listeners == null)
 			return;
 		try {
 			final Enumeration<PlayerListener> elements = this.listeners.elements();
@@ -523,7 +533,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	public void setLoopCount(int p0) {
 		if (p0 == -1) {
-			mediaPlayer.controls().setRepeat(true);
+			synchronized (vlcLock) {
+				mediaPlayer.controls().setRepeat(true);
+			}
 		}
 	}
 
@@ -684,6 +696,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	@Override
 	public void paused(MediaPlayer arg0) {
+		if (released) return;
 		this.state = PREFETCHED;
 		if (stoppedAtTime) {
 			notifyListeners(PlayerListener.STOPPED_AT_TIME, getMediaTime());
@@ -713,6 +726,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	@Override
 	public void stopped(MediaPlayer arg0) {
+		if (released) return;
 		this.state = PREFETCHED;
 		if (stoppedAtTime) {
 			notifyListeners(PlayerListener.STOPPED_AT_TIME, getMediaTime());
@@ -765,6 +779,17 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	public void playing(MediaPlayer mediaPlayer) {
 		Manager.log("vlcplayer started");
 		notifyListeners(PlayerListener.STARTED, getMediaTime());
+	}
+
+	protected void finalize() {
+		if (mediaPlayer == null) return;
+		try {
+			synchronized (vlcLock) {
+				mediaPlayer.release();
+				mediaPlayer = null;
+			}
+		} catch (Throwable ignored) {}
+		released = true;
 	}
 
 }
