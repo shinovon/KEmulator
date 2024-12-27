@@ -58,7 +58,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	public boolean fullscreen;
 	private boolean prepared;
 	public int bufferWidth, bufferHeight;
-	private MediaPlayerFactory factory;
+	private static MediaPlayerFactory factory;
 	EmbeddedMediaPlayer mediaPlayer;
 	public BufferedImage img;
 	public ByteBuffer bb;
@@ -79,6 +79,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	long stopTime = StopTimeControl.RESET;
 	private boolean stoppedAtTime;
+	private final Object globalLock = new Object();
 
 	private VLCPlayerImpl() {
 		this.listeners = new Vector();
@@ -311,15 +312,14 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		}
 		if (!prepared) {
 			load();
-			// startPaused() вместо prepare()
 			try {
 				if (mediaCallback != null) {
-					if (!mediaPlayer.media().startPaused(mediaCallback)) {
+					if (!mediaPlayer.media().prepare(mediaCallback)) {
 						Manager.log("Failed to prepare");
 						throw new MediaException("failed to prepare");
 					}
 				} else {
-					if (!mediaPlayer.media().startPaused(mediaUrl)) {
+					if (!mediaPlayer.media().prepare(mediaUrl)) {
 						Manager.log("Failed to prepare");
 						throw new MediaException("failed to prepare");
 					}
@@ -343,13 +343,15 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		}
 		inst = this;
 		try {
-			factory = new MediaPlayerFactory();
+			if (factory == null) {
+				factory = new MediaPlayerFactory();
+			}
 			mediaPlayer = factory.mediaPlayers().newEmbeddedMediaPlayer();
 
 			mediaPlayer.events().addMediaPlayerEventListener(this);
 
 			mediaPlayer.videoSurface().set(new MyVideoSurface());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new MediaException(e);
 		}
@@ -429,9 +431,8 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (this.state != STARTED) {
 			if (!prepared) {
 				prefetch();
-			} else {
-				mediaPlayer.controls().play();
 			}
+			mediaPlayer.controls().start();
 			if (volume == -1) {
 				notifyListeners(PlayerListener.VOLUME_CHANGED, volume = 50);
 				mediaPlayer.audio().setVolume(volume);

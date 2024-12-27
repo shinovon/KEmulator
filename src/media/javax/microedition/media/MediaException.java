@@ -11,7 +11,7 @@ public class MediaException extends Exception {
 		super(s);
 	}
 
-	public MediaException(Exception e) {
+	public MediaException(Throwable e) {
 		super(e);
 	}
 }
