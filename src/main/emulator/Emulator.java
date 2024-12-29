@@ -429,6 +429,7 @@ public class Emulator implements Runnable {
 						for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
 							props.put(entry.getKey().toString(), entry.getValue());
 						}
+						if (!props.containsKey("MIDlet-1")) throw new Exception();
 					} catch (Exception ex2) {
 						final InputStream inputStream;
 						(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);

@@ -66,6 +66,7 @@ public final class EventQueue implements Runnable {
 						} else if ((System.currentTimeMillis() - time) > 5000) {
 							time = System.currentTimeMillis();
 							Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
+							Displayable._fpsLimiter(false);
 						}
 						sleep(100);
 					}
