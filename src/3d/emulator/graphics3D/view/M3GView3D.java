@@ -53,6 +53,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 	private static ImageData bufferImage;
 	private static GLCapabilities capabilities;
 	private static long window;
+	private boolean paintListenerSet;
 
 	private M3GView3D() {
 		instance = this;
@@ -470,6 +471,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 	}
 
 	public void swapBuffers() {
+		GL11.glFinish();
 		if (window != 0) {
 			buffer.rewind();
 			GL11.glReadPixels(0, 0, viewportWidth, viewportHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
@@ -480,19 +482,23 @@ public final class M3GView3D implements PaintListener, Runnable {
 				buffer.get(bufferImage.data, var10, var8);
 				var10 -= var8;
 			}
-
-			EmulatorImpl.syncExec(this);
-			return;
 		}
-		GLCanvasUtil.swapBuffers(canvas);
+		EmulatorImpl.syncExec(this);
 	}
 
 	public void run() {
-		if (bufferImage == null) {
+		if (window != 0 && !paintListenerSet) {
+			paintListenerSet = true;
 			canvas.addPaintListener(this);
 			return;
 		}
-		if (!canvas.isDisposed()) canvas.redraw();
+		try {
+			if (canvas.isDisposed()) return;
+			if (window == 0) {
+				GLCanvasUtil.swapBuffers(canvas);
+			}
+			canvas.redraw();
+		} catch (Exception ignored) {}
 	}
 
 	public static void releaseContext() {

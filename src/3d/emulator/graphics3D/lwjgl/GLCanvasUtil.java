@@ -140,6 +140,11 @@ public class GLCanvasUtil {
 						.getDeclaredMethod("swapBuffers", org.lwjgl.opengl.swt.GLCanvas.class);
 				swapBuffersMethod.setAccessible(true);
 			}
+			if (platformCanvas == null) {
+				Field p = org.lwjgl.opengl.swt.GLCanvas.class.getDeclaredField("platformCanvas");
+				p.setAccessible(true);
+				platformCanvas = p.get(null);
+			}
 
 			swapBuffersMethod.invoke(platformCanvas, canvas);
 		} catch (Exception e) {
