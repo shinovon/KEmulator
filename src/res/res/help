@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.18.1 [2024.12.24]
+$v2.18.1 [2024.12.29]
 Automatic updates checking
 Added J2ME-Loader style fps limit (fixes Castlevania chinese version)
 Implemented List.setFont
@@ -51,7 +51,9 @@ Fixed TextBox resizing
 Fixed restart on Java 9-16
 Fixed key mapping
 Updated vlcj
-
+Fixed m3gview render
+Added flush immediately m3g setting
+Fixed softkeys in some games
 
 $v2.18 [2024.12.16]
 Reimplemented LCDUI TextField on SWT
