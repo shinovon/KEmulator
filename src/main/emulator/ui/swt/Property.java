@@ -2093,7 +2093,7 @@ public final class Property implements IProperty, SelectionListener {
 		m3gDisableLightClamp.setSelection(Settings.m3gDisableLightClamp);
 
 		m3gFlushImmediately = new Button(lwjglGroup, SWT.CHECK);
-		m3gFlushImmediately.setText(UILocale.get("OPTION_M3G_FLUSH_IMMEDIATELY", "Flush contents immediately"));
+		m3gFlushImmediately.setText(UILocale.get("OPTION_M3G_FLUSH_IMMEDIATELY", "Flush contents immediately (slow!)"));
 		m3gFlushImmediately.setLayoutData(labelGridData);
 		m3gFlushImmediately.setSelection(Settings.m3gFlushImmediately);
 		m3gFlushImmediately.setToolTipText("Fixes background in Angry Birds Seasons");
