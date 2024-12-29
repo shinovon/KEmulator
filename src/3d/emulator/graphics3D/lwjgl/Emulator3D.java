@@ -244,6 +244,8 @@ public final class Emulator3D implements IGraphics3D {
 			this.target = null;
 			throw new IllegalArgumentException();
 		}
+		if (Settings.m3gFlushImmediately)
+			swapBuffers();
 	}
 
 	private void getCapabilities() {
@@ -263,7 +265,8 @@ public final class Emulator3D implements IGraphics3D {
 		Profiler3D.releaseTargetCallCount++;
 
 		GL11.glFinish();
-		swapBuffers();
+		if (!Settings.m3gFlushImmediately)
+			swapBuffers();
 
 		while (!unusedGLTextures.isEmpty())
 			releaseTexture(unusedGLTextures.get(0));
@@ -474,6 +477,8 @@ public final class Emulator3D implements IGraphics3D {
 		} else {
 			GL11.glClear(GL_COLOR_BUFFER_BIT | (depthBufferEnabled ? GL_DEPTH_BUFFER_BIT : 0));
 		}
+		if (Settings.m3gFlushImmediately)
+			swapBuffers();
 	}
 
 	private void drawBackgroundImage(Background bg) {
@@ -1108,6 +1113,8 @@ public final class Emulator3D implements IGraphics3D {
 
 		renderPipe.clear();
 		MeshMorph.getInstance().clearCache();
+		if (Settings.m3gFlushImmediately)
+			swapBuffers();
 	}
 
 	private void renderSprite(Sprite3D sprite, Transform var2, float alphaFactor) {

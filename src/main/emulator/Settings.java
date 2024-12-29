@@ -72,6 +72,7 @@ public final class Settings {
 	public static boolean m3gIgnoreOverwrite;
 	public static boolean m3gForcePerspectiveCorrection;
 	public static boolean m3gDisableLightClamp;
+	public static boolean m3gFlushImmediately;
 
 	public static final int APP_CONTROLLED = 0;
 

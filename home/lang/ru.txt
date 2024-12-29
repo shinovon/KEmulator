@@ -355,6 +355,7 @@ OPTION_M3G_LWJGL_SETTINGS=Настройки LWJGL
 OPTION_M3G_IGNORE_OVERWRITE=Игнорировать флаг OVERWRITE
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Принудительно использовать перспективную коррекцию
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Отключить ограничение яркости света
+OPTION_M3G_FLUSH_IMMEDIATELY=Сразу обновлять содержимое
 
 OPTION_M3G_AA=Сглаживание:
 OPTION_M3G_APP_CONTROLLED=Использовать параметры приложения

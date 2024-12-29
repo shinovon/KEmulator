@@ -322,6 +322,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button pointerEventsCheck;
 	private Button fpsLimitJlCheck;
 	private Button autoUpdatesBtn;
+	private Button m3gFlushImmediately;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -638,6 +639,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.m3gIgnoreOverwrite = Boolean.parseBoolean(properties.getProperty("M3GIgnoreOverwrite", "false"));
 			Settings.m3gForcePerspectiveCorrection = Boolean.parseBoolean(properties.getProperty("M3GForcePerspectiveCorrection", "false"));
 			Settings.m3gDisableLightClamp = Boolean.parseBoolean(properties.getProperty("M3GDisableLightClamp", "false"));
+			Settings.m3gFlushImmediately = Boolean.parseBoolean(properties.getProperty("M3GFlushImmediately", "false"));
 
 			Settings.m3gAA = Integer.parseInt(properties.getProperty("M3GAA", "0"));
 			Settings.m3gTexFilter = Integer.parseInt(properties.getProperty("M3GTexFilter", "0"));
@@ -860,6 +862,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("M3GIgnoreOverwrite", String.valueOf(Settings.m3gIgnoreOverwrite));
 			properties.setProperty("M3GForcePerspectiveCorrection", String.valueOf(Settings.m3gForcePerspectiveCorrection));
 			properties.setProperty("M3GDisableLightClamp", String.valueOf(Settings.m3gDisableLightClamp));
+			properties.setProperty("M3GFlushImmediately", String.valueOf(Settings.m3gFlushImmediately));
 
 			properties.setProperty("M3GAA", String.valueOf(Settings.m3gAA));
 			properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
@@ -990,6 +993,7 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
 		Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
 		Settings.m3gDisableLightClamp = m3gDisableLightClamp.getSelection();
+		Settings.m3gFlushImmediately = m3gFlushImmediately.getSelection();
 
 		Settings.m3gAA = m3gAACombo.getSelectionIndex();
 		Settings.m3gTexFilter = m3gTexFilterCombo.getSelectionIndex();
@@ -2087,6 +2091,12 @@ public final class Property implements IProperty, SelectionListener {
 		m3gDisableLightClamp.setText(UILocale.get("OPTION_M3G_DISABLE_LIGHT_CLAMPING", "Disable light clamping"));
 		m3gDisableLightClamp.setLayoutData(labelGridData);
 		m3gDisableLightClamp.setSelection(Settings.m3gDisableLightClamp);
+
+		m3gFlushImmediately = new Button(lwjglGroup, SWT.CHECK);
+		m3gFlushImmediately.setText(UILocale.get("OPTION_M3G_FLUSH_IMMEDIATELY", "Flush contents immediately"));
+		m3gFlushImmediately.setLayoutData(labelGridData);
+		m3gFlushImmediately.setSelection(Settings.m3gFlushImmediately);
+		m3gFlushImmediately.setToolTipText("Fixes background in Angry Birds Seasons");
 
 		final GridData dataFillLabel = new GridData();
 		dataFillLabel.horizontalAlignment = SWT.FILL;
