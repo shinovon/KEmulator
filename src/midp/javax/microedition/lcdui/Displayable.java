@@ -215,22 +215,23 @@ public class Displayable {
 						repaintScreen();
 					}
 				}
-			} else {
-				final Command leftSoftCommand = this.getLeftSoftCommand();
-				if (b && leftSoftCommand != null) {
-					Emulator.getEmulator().getLogStream().println("Left command: " + leftSoftCommand);
-					if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
-						if (cmdListener != null) {
-							Emulator.getEventQueue().commandAction(leftSoftCommand, this);
-						} else ((Alert) this).close();
-					} else if (this.focusedItem != null && this.focusedItem.commands.contains(leftSoftCommand)) {
-						Emulator.getEventQueue().commandAction(leftSoftCommand, this.focusedItem);
-					} else if (this.cmdListener != null) {
+				return !Settings.motorolaSoftKeyFix;
+			}
+
+			final Command leftSoftCommand = this.getLeftSoftCommand();
+			if (b && leftSoftCommand != null) {
+				Emulator.getEmulator().getLogStream().println("Left command: " + leftSoftCommand);
+				if (this instanceof Alert && leftSoftCommand == Alert.DISMISS_COMMAND) {
+					if (cmdListener != null) {
 						Emulator.getEventQueue().commandAction(leftSoftCommand, this);
-					}
+					} else ((Alert) this).close();
+				} else if (this.focusedItem != null && this.focusedItem.commands.contains(leftSoftCommand)) {
+					Emulator.getEventQueue().commandAction(leftSoftCommand, this.focusedItem);
+				} else if (this.cmdListener != null) {
+					Emulator.getEventQueue().commandAction(leftSoftCommand, this);
 				}
 			}
-			return !Settings.motorolaSoftKeyFix;
+			return leftSoftCommand != null && !Settings.motorolaSoftKeyFix;
 		}
 		if (KeyMapping.isRightSoft(n)) {
 			final Command rightSoftCommand = this.getRightSoftCommand();
@@ -246,7 +247,7 @@ public class Displayable {
 					Emulator.getEventQueue().commandAction(rightSoftCommand, this);
 				}
 			}
-			return !Settings.motorolaSoftKeyFix;
+			return rightSoftCommand != null && !Settings.motorolaSoftKeyFix;
 		}
 		return false;
 	}
