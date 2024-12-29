@@ -188,7 +188,7 @@ public final class Emulator3D implements IGraphics3D {
 					}
 
 					if (window == 0) {
-						System.out.println("Creating invisible glfw window");
+						Emulator.getEmulator().getLogStream().println("Creating invisible glfw window");
 						if (!glfwInit())
 							throw new Exception("glfwInit");
 
@@ -204,10 +204,7 @@ public final class Emulator3D implements IGraphics3D {
 					glfwMakeContextCurrent(window);
 					getCapabilities();
 				}
-
-				System.out.println(GL11.glGetString(GL_VERSION));
-				System.out.println(GL11.glGetString(GL_VENDOR));
-				System.out.println(GL11.glGetString(GL_RENDERER));
+				Emulator.getEmulator().getLogStream().println("GL Renderer: " + GL11.glGetString(GL_RENDERER));
 				initialized = true;
 			} else {
 				if (window != 0) {
@@ -304,6 +301,7 @@ public final class Emulator3D implements IGraphics3D {
 
 //		if (window != 0) {
 //			glfwSwapBuffers(window);
+//			glfwPollEvents();
 //		} else if (glCanvas != null) {
 //			GLCanvasUtil.swapBuffers(glCanvas);
 //		}

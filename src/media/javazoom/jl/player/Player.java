@@ -200,7 +200,6 @@ public class Player
 
 	public void reset() {
 		if (!isBuffered) return;
-		System.out.println("reset");
 		dataIndex = positionOffset = 0;
 		reset = true;
 		try {
@@ -226,7 +225,6 @@ public class Player
 		synchronized (dataStream) {
 			dataStream.notifyAll();
 		}
-		System.out.println("reset done");
 	}
 
 	public int getBitrate() {
