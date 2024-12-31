@@ -52,8 +52,9 @@ Fixed restart on Java 9-16
 Fixed key mapping
 Updated vlcj
 Fixed m3gview render
-Added flush immediately m3g setting
+Added flush immediately m3g setting (fixes Angry Birds Seasons)
 Fixed softkeys in some games
+Synchronized Graphics.drawRegion (Galaxy on Fire 2 fix)
 
 $v2.18 [2024.12.16]
 Reimplemented LCDUI TextField on SWT
