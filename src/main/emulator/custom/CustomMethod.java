@@ -6,6 +6,7 @@ import emulator.Settings;
 import emulator.custom.h.MethodInfo;
 import emulator.debug.Profiler;
 import emulator.graphics3D.lwjgl.Emulator3D;
+import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
 import java.io.*;
@@ -87,6 +88,13 @@ public class CustomMethod {
 				res = String.valueOf(Manager.isLibVlcSupported());
 			} else if (prop.equals("com.nokia.pointer.number")) {
 				b = false;
+				try {
+					res = Emulator.getEventQueue().getPointerNumber();
+				} catch (Exception ignored) {}
+			} else if (prop.equals("kemulator.touch.enabled")) {
+				try {
+					res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
+				} catch (Exception ignored) {}
 			} else if (prop.equals("microedition.locale")) {
 				res = Settings.locale;
 			} else if (prop.equals("microedition.encoding")) {

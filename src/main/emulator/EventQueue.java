@@ -24,22 +24,25 @@ public final class EventQueue implements Runnable {
 	public static final int EVENT_COMMAND = 19;
 	public static final int EVENT_ITEM_STATE = 20;
 
+	boolean running;
 	private int[] events;
 	private int count;
-	boolean running;
 	private final Vector eventArguments = new Vector();
 	private final Thread eventThread;
 	private boolean paused;
-	private final InputThread input = new InputThread();
-	private final Thread inputThread;
 	private final Object lock = new Object();
-	private final Object repaintLock = new Object();
 	private boolean alive;
-	private int[][] inputs;
-	private int inputsCount;
 	private final Object eventLock = new Object();
+
+	private final Object repaintLock = new Object();
 	private boolean repaintPending;
 	private int repaintX, repaintY, repaintW, repaintH;
+
+	private int[][] inputs;
+	private int inputsCount;
+	private final InputThread input = new InputThread();
+	private final Thread inputThread;
+	private String pointerNumber;
 
 	private Timer screenTimer;
 	private TimerTask screenTimerTask;
@@ -83,40 +86,40 @@ public final class EventQueue implements Runnable {
 	public void keyPress(int n) {
 		if (n == 10000) return;
 		if (Settings.synchronizeKeyEvents) {
-			queueInput(new int[] {0, n, 0, 1});
-		} else input.queue(0, n, 0, true);
+			queueInput(new int[] {0, n, 0, -1});
+		} else input.queue(0, n, 0, -1);
 	}
 
 	public void keyRelease(int n) {
 		if (n == 10000) return;
 		if (Settings.synchronizeKeyEvents) {
-			queueInput(new int[] {1, n, 0, 1});
-		} else input.queue(1, n, 0, true);
+			queueInput(new int[] {1, n, 0, -1});
+		} else input.queue(1, n, 0, -1);
 	}
 
 	public void keyRepeat(int n) {
 		if (n == 10000) return;
 		if (Settings.synchronizeKeyEvents) {
-			queueInput(new int[] {2, n, 0, 1});
-		} else input.queue(2, n, 0, true);
+			queueInput(new int[] {2, n, 0, -1});
+		} else input.queue(2, n, 0, -1);
 	}
 
-	public void mouseDown(int x, int y) {
+	public void mouseDown(int x, int y, int pointer) {
 		if (Settings.synchronizeKeyEvents) {
-			queueInput(new int[] {0, x, y, 0});
-		} else input.queue(0, x, y, false);
+			queueInput(new int[] {0, x, y, pointer});
+		} else input.queue(0, x, y, pointer);
 	}
 
-	public void mouseUp(int x, int y) {
+	public void mouseUp(int x, int y, int pointer) {
 		if (Settings.synchronizeKeyEvents) {
-			queueInput(new int[] {1, x, y, 0});
-		} else input.queue(1, x, y, false);
+			queueInput(new int[] {1, x, y, pointer});
+		} else input.queue(1, x, y, pointer);
 	}
 
-	public void mouseDrag(int x, int y) {
+	public void mouseDrag(int x, int y, int pointer) {
 		if (Settings.synchronizeKeyEvents) {
-			queueInput(new int[] {2, x, y, 0});
-		} else input.queue(2, x, y, false);
+			queueInput(new int[] {2, x, y, pointer});
+		} else input.queue(2, x, y, pointer);
 	}
 
 	public void sizeChanged(int x, int y) {
@@ -480,7 +483,8 @@ public final class EventQueue implements Runnable {
 		Displayable d = getCurrent();
 		if (d == null) return;
 		boolean canv = d instanceof Canvas;
-		if (o[3] > 0) {
+		int pointer = o[3];
+		if (pointer == -1) {
 			// keyboard
 			int n = o[1];
 			switch (o[0]) {
@@ -504,6 +508,7 @@ public final class EventQueue implements Runnable {
 					break;
 			}
 		} else {
+			pointerNumber = String.valueOf(pointer);
 			// mouse
 			int x = o[1];
 			int y = o[2];
@@ -521,11 +526,16 @@ public final class EventQueue implements Runnable {
 					else ((Screen) d)._invokePointerDragged(x, y);
 					break;
 			}
+			pointerNumber = null;
 		}
 	}
 
 	private Displayable getCurrent() {
 		return Emulator.getCurrentDisplay().getCurrent();
+	}
+
+	public String getPointerNumber() {
+		return pointerNumber;
 	}
 
 	class InputThread implements Runnable {
@@ -538,8 +548,8 @@ public final class EventQueue implements Runnable {
 			elements = new Object[16];
 		}
 
-		public void queue(int state, int arg1, int arg2, boolean key) {
-			append(new int[]{state, arg1, arg2, key ? 1 : 0});
+		public void queue(int state, int arg1, int arg2, int pointer) {
+			append(new int[]{state, arg1, arg2, pointer});
 		}
 
 		private void append(Object o) {

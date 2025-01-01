@@ -40,7 +40,7 @@ public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,
 		ControlListener, KeyListener, MouseListener,
 		MouseMoveListener, SelectionListener, MouseWheelListener,
-		MouseTrackListener {
+		MouseTrackListener, TouchListener {
 	private static Display display;
 	private static int threadCount;
 	private final int startWidth;
@@ -182,6 +182,11 @@ public final class EmulatorScreen implements
 	private boolean painted;
 	private final Vector<String> caretKeys = new Vector<String>();
 	protected int dialogSelection;
+	private boolean midletSupportsMultitouch;
+	private boolean touchEnabled;
+	private final Vector<Long> touchIds = new Vector<Long>();
+	private int lastPointerX;
+	private int lastPointerY;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -311,6 +316,12 @@ public final class EmulatorScreen implements
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 1));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 2));
+
+		if (midletLoaded) {
+			String s = Emulator.getEmulator().getAppProperty("Nokia-UI-Enhancement");
+			midletSupportsMultitouch = s != null && s.contains("EnableMultiPointTouchEvents");
+		}
+
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.shell.addControlListener(this);
@@ -1570,6 +1581,12 @@ public final class EmulatorScreen implements
 				event.doit = false;
 			}
 		});
+		try {
+			canvas.setTouchEnabled(true);
+			touchEnabled = canvas.getTouchEnabled();
+			canvas.addTouchListener(this);
+		} catch (Throwable ignored) {}
+
 		stackLayout = new StackLayout();
 		canvas.setLayout(stackLayout);
 		this.keysState = new boolean[256];
@@ -2128,82 +2145,84 @@ public final class EmulatorScreen implements
 			this.mouseYRelease = mouseEvent.y;
 			this.mouseDownInfos = true;
 		}
-		if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+		if (this.pauseState == 0 || Settings.playingRecordedKeys
+			|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
-		if (Emulator.getCurrentDisplay().getCurrent() != null) {
-			if (Settings.fpsMode && mouseEvent.button == 3) {
-				if (Settings.fpsGame == 2)
-					handleKeyPress(57);
-				else if (Settings.fpsGame == 1)
-					mp(42);
-				else if (Settings.fpsGame == 0)
-					mp(KeyMapping.soft2());
-				else if (Settings.fpsGame == 3)
-					mp(KeyMapping.soft1());
-				return;
-			}
-			if (Settings.fpsMode && mouseEvent.button == 2) {
-				if (Settings.fpsGame == 1)
-					mp(KeyMapping.soft2());
-				else if (Settings.fpsGame == 0)
-					mp(KeyMapping.soft1());
-				return;
-			}
-			if (Settings.fpsMode && mouseEvent.button == 1) {
-				if (Settings.fpsGame == 2)
-					handleKeyPress(13);
-				else
-					mp(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
-				return;
-			}
-			int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
-			if (i[0] < 0 || i[1] < 0 || i[0] >= getWidth() || i[1] >= getHeight()) {
-				return;
-			}
-			pointerState = true;
-			Emulator.getEventQueue().mouseDown(i[0], i[1]);
-			caret.mouseDown(i[0], i[1]);
+		if (Settings.fpsMode && mouseEvent.button == 3) {
+			if (Settings.fpsGame == 2)
+				handleKeyPress(57);
+			else if (Settings.fpsGame == 1)
+				mp(42);
+			else if (Settings.fpsGame == 0)
+				mp(KeyMapping.soft2());
+			else if (Settings.fpsGame == 3)
+				mp(KeyMapping.soft1());
+			return;
 		}
+		if (Settings.fpsMode && mouseEvent.button == 2) {
+			if (Settings.fpsGame == 1)
+				mp(KeyMapping.soft2());
+			else if (Settings.fpsGame == 0)
+				mp(KeyMapping.soft1());
+			return;
+		}
+		if (Settings.fpsMode && mouseEvent.button == 1) {
+			if (Settings.fpsGame == 2)
+				handleKeyPress(13);
+			else
+				mp(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
+			return;
+		}
+		int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
+		if (i[0] < 0 || i[1] < 0 || i[0] >= getWidth() || i[1] >= getHeight()) {
+			return;
+		}
+		pointerState = true;
+		Emulator.getEventQueue().mouseDown(i[0], i[1], 0);
+		lastPointerX = i[0];
+		lastPointerY = i[1];
+		caret.mouseDown(i[0], i[1]);
 	}
 
 	public void mouseUp(final MouseEvent mouseEvent) {
 		this.mouseDownInfos = false;
-		if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+		if (this.pauseState == 0 || Settings.playingRecordedKeys
+				|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
-		if (Emulator.getCurrentDisplay().getCurrent() != null) {
-			if (Settings.fpsMode && mouseEvent.button == 3) {
-				if (Settings.fpsGame == 2)
-					handleKeyRelease(57);
-				else if (Settings.fpsGame == 1)
-					mr(42);
-				else if (Settings.fpsGame == 0)
-					mr(KeyMapping.soft2());
-				else if (Settings.fpsGame == 3)
-					mr(KeyMapping.soft1());
-				return;
-			}
-
-			if (Settings.fpsMode && mouseEvent.button == 2) {
-				if (Settings.fpsGame == 1)
-					mr(KeyMapping.soft2());
-				else if (Settings.fpsGame == 0)
-					mr(KeyMapping.soft1());
-				return;
-			}
-			if (Settings.fpsMode && mouseEvent.button == 1) {
-				if (Settings.fpsGame == 2)
-					handleKeyRelease(13);
-				else
-					mr(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
-				return;
-			}
-			if (!pointerState) return;
-			pointerState = false;
-			int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
-			Emulator.getEventQueue().mouseUp(i[0], i[1]);
+		if (Settings.fpsMode && mouseEvent.button == 3) {
+			if (Settings.fpsGame == 2)
+				handleKeyRelease(57);
+			else if (Settings.fpsGame == 1)
+				mr(42);
+			else if (Settings.fpsGame == 0)
+				mr(KeyMapping.soft2());
+			else if (Settings.fpsGame == 3)
+				mr(KeyMapping.soft1());
+			return;
 		}
+
+		if (Settings.fpsMode && mouseEvent.button == 2) {
+			if (Settings.fpsGame == 1)
+				mr(KeyMapping.soft2());
+			else if (Settings.fpsGame == 0)
+				mr(KeyMapping.soft1());
+			return;
+		}
+		if (Settings.fpsMode && mouseEvent.button == 1) {
+			if (Settings.fpsGame == 2)
+				handleKeyRelease(13);
+			else
+				mr(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
+			return;
+		}
+		if (!pointerState) return;
+		pointerState = false;
+		int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
+		lastPointerX = i[0];
+		lastPointerY = i[1];
+		Emulator.getEventQueue().mouseUp(i[0], i[1], 0);
 	}
 
 	public void mouseMove(final MouseEvent mouseEvent) {
@@ -2216,7 +2235,8 @@ public final class EmulatorScreen implements
 			this.updateInfos(mouseEvent.x, mouseEvent.y);
 //            return;
 		}
-		if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+		if (this.pauseState == 0 || Settings.playingRecordedKeys
+				|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
 		final int xoff = 1;
@@ -2347,37 +2367,51 @@ public final class EmulatorScreen implements
 			this.canvas.getShell().setCursor(cursor);
 			mset = false;
 		}
-		if (pointerState && (mouseEvent.stateMask & 0x80000) != 0x0 && Emulator.getCurrentDisplay().getCurrent() != null) {
+		if (pointerState && (mouseEvent.stateMask & 0x80000) != 0x0) {
 			int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
-			if (i[0] < 0 || i[1] < 0 || i[0] >= getWidth() || i[1] >= getHeight()) {
+			if (i[0] < 0 || i[1] < 0 || i[0] >= getWidth() || i[1] >= getHeight()
+					|| (lastPointerX == i[0] && lastPointerY == i[1])) {
 				return;
 			}
-			Emulator.getEventQueue().mouseDrag(i[0], i[1]);
+			lastPointerX = i[0];
+			lastPointerY = i[1];
+			Emulator.getEventQueue().mouseDrag(i[0], i[1], 0);
 		}
 	}
 
-	private void mp(int i) {
-		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas()._invokeKeyPressed(i);
-		} else {
-			Emulator.getScreen()._invokeKeyPressed(i);
+	public void touch(TouchEvent touchEvent) {
+		if (!midletSupportsMultitouch) {
+			return;
+		}
+		for (Touch touch: touchEvent.touches) {
+			Point p = canvas.toControl(touch.x, touch.y);
+			int[] pos = transformPointer(p.x, p.y);
+			int id;
+			if (touch.primary) {
+//				id = 0;
+				continue;
+			}
+			id = touchIds.indexOf(touch.id);
+			if (id == -1) {
+				touchIds.add(touch.id);
+				id = touchIds.size();
+			} else id++;
+
+			switch (touch.state) {
+				case SWT.TOUCHSTATE_DOWN:
+					Emulator.getEventQueue().mouseDown(pos[0], pos[1], id);
+					break;
+				case SWT.TOUCHSTATE_UP:
+					Emulator.getEventQueue().mouseUp(pos[0], pos[1], id);
+					touchIds.remove(touch.id);
+					break;
+				case SWT.TOUCHSTATE_MOVE:
+					Emulator.getEventQueue().mouseDrag(pos[0], pos[1], id);
+					break;
+
+			}
 		}
 	}
-
-	private void mr(int i) {
-		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas()._invokeKeyReleased(i);
-		} else {
-			Emulator.getScreen()._invokeKeyReleased(i);
-		}
-	}
-
-	private void mrp(int i) {
-		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
-			Emulator.getCanvas()._invokeKeyRepeated(i);
-		}
-	}
-
 
 	public void mouseEnter(MouseEvent arg0) {}
 
@@ -2493,6 +2527,28 @@ public final class EmulatorScreen implements
 			lastDisplayable._swtUpdateSizes();
 		}
 		canvas.redraw();
+	}
+
+	private void mp(int i) {
+		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+			Emulator.getCanvas()._invokeKeyPressed(i);
+		} else {
+			Emulator.getScreen()._invokeKeyPressed(i);
+		}
+	}
+
+	private void mr(int i) {
+		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+			Emulator.getCanvas()._invokeKeyReleased(i);
+		} else {
+			Emulator.getScreen()._invokeKeyReleased(i);
+		}
+	}
+
+	private void mrp(int i) {
+		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+			Emulator.getCanvas()._invokeKeyRepeated(i);
+		}
 	}
 
 	public void startVibra(final long aLong1013) {
@@ -2670,6 +2726,10 @@ public final class EmulatorScreen implements
 		}
 
 		return dialogSelection;
+	}
+
+	public boolean getTouchEnabled() {
+		return touchEnabled;
 	}
 
 	final class ShellPosition implements Runnable {
