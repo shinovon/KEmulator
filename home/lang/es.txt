@@ -47,7 +47,7 @@ MENU_VIEW_HELP=Acerca de
 MENU_TOOL_ZOOMIN=Acercar
 MENU_TOOL_ZOOMOUT=Alejar
 MENU_TOOL_INTERPOSE=Interpolación
-MENU_TOOL_INTER_NEAREST=Nearest Neighbor
+MENU_TOOL_INTER_NEAREST=Por aproximación
 MENU_TOOL_INTER_HIGH=Calidad alta
 MENU_TOOL_INTER_LOW=Calidad baja
 
@@ -71,6 +71,7 @@ MENU_TOOL_CAPTURE_CLIP=Capturar en Portapapeles
 MENU_TOOL_SHOW_TRACK_INFO=Mostrar información de seguimiento
 
 MENU_TOOL_QWERTY_MODE=Modo QWERTY
+MENU_TOOL_FPS_MODE=Modo FPS
 MENU_TOOL_DISABLE_NETWORK_ACCESS=Deshabilitar acceso a red
 
 #Command bar
@@ -89,6 +90,8 @@ LINK_JAR_FILE=Especificar un archivo JAR
 DIALOG_OK=Aceptar
 DIALOG_CANCEL=Cancelar
 DIALOG_SET=Establecer
+DIALOG_YES=Sí
+DIALOG_NO=No
 
 
 #Info show
@@ -119,6 +122,36 @@ KEYPAD_FRAME_RSK=Tecla de función derecha
 #Log Frame
 
 LOG_FRAME_TITLE=Registro
+
+
+#M3G View
+
+M3G_VIEW_TITLE   = Visor M3G
+M3G_VIEW_CAMERA  = Cámara
+M3G_VIEW_LIGHT   = Luz
+M3G_VIEW_DISPLAY = Pantalla
+
+M3G_VIEW_LIGHT_SCENE   = Gráficos de escena
+M3G_VIEW_LIGHT_VIEW    = Luz del visor
+M3G_VIEW_LIGHT_SETTING = Configuración de luz
+
+M3G_VIEW_CAMERA_ORBIT  = Órbita
+M3G_VIEW_CAMERA_PAN    = Panorámica
+M3G_VIEW_CAMERA_DOLLY  = Desplazamiento
+M3G_VIEW_CAMERA_ZOOM   = Zoom
+M3G_VIEW_CAMERA_PROJECTION  = Modo de proyección
+M3G_VIEW_CAMERA_PERSPECTIVE = Proyección en perspectiva
+M3G_VIEW_CAMERA_PARALLEL    = Proyección paralela
+
+M3G_VIEW_CAMERA_CLIP_PLANES   = Recorte de planos
+M3G_VIEW_CAMEAR_FIELD_OF_VIEW = Campo de visión
+M3G_VIEW_CAMEAR_POSITION      = Posición de la cámara
+M3G_VIEW_CAMEAR_RESET         = Restablecer cámara
+
+M3G_VIEW_DISPLAY_COORDINATE   = Ejes de coordenadas
+M3G_VIEW_DISPLAY_SHOW_GRID    = Mostrar cuadrícula
+M3G_VIEW_DISPLAY_SHOW_XRAY    = Modo rayos X
+M3G_VIEW_DISPLAY_UPDATE_WORLD = Actualizar mundo
 
 
 #MemoryView
@@ -266,6 +299,8 @@ OPTION_FONT_TEST_TEXT=Probar texto:
 OPTION_FONT_TEST_TEXT_TXT=Este es un Ejemplo.
 
 OPTION_SYSTEM_UI_LANGUAGE=Idioma de la interfaz:
+OPTION_SYSTEM_UPDATE_BRANCH=Rama de actualización:
+OPTION_SYSTEM_AUTO_UPDATES=Buscar actualizaciones automáticamente
 OPTION_SYSTEM_XRAY_BG=Vista de rayos X: superponer imágenes
 OPTION_SYSTEM_XRAY_CLIP=Vista de rayos X: mostrar región de recorte de imagen
 OPTION_SYSTEM_INFO_COLOR=Información: mostrar color en (R,G,B)
@@ -285,6 +320,9 @@ OPTION_COREAPI_NO_NETWORK=Restringir las conexiones de red
 OPTION_COREAPI_SYNC_KEYEVENTS=Sincronizar eventos de teclado
 OPTION_COREAPI_SOFTKEY_FIX=Enviar keyPressed con commandAction
 OPTION_COREAPI_IGNORE_REGION_REPAINT=Redibujar siempre la pantalla completamente
+OPTION_COREAPI_KEYPRESS_ON_REPEAT=Enviar keyPressed en repeticiones
+OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Forzar redibujado en serviceRepaints()
+OPTION_COREAPI_POINTER_EVENTS=Devolver valor Canvas.hasPointerEvents()
 
 OPTION_RECORDS_RMS_FOLDER=Carpeta de RMS:
 OPTION_RECORDS_RMS_TEXT=Todos los registros en el MIDlet actual:
@@ -317,6 +355,7 @@ OPTION_M3G_LWJGL_SETTINGS=Configuración de LWJGL
 OPTION_M3G_IGNORE_OVERWRITE=Ignorar la indicación OVERWRITE
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Forzar corrección de perspectiva
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Deshabilitar limitación de luz
+OPTION_M3G_FLUSH_IMMEDIATELY=Vaciar contenido inmediatamente (lento)
 
 OPTION_M3G_AA=Antialiasing:
 OPTION_M3G_APP_CONTROLLED=Controlado por la aplicación
@@ -324,7 +363,7 @@ OPTION_M3G_FORCE_OFF=Forzar activación
 OPTION_M3G_FORCE_ON=Forzar desactivación
 
 OPTION_M3G_TEXTURE_FILTER=Filtro de texturas:
-OPTION_M3G_FORCE_NEAREST=Forzar nearest
+OPTION_M3G_FORCE_NEAREST=Forzar por aproximación
 OPTION_M3G_FORCE_LINEAR=Forzar lineal
 
 OPTION_M3G_MIPMAPPING=Mipmapping:
@@ -364,3 +403,12 @@ SECURITY_ALERT_TITLE=Seguridad
 
 SCREEN_SIZE_DIALOG_TITLE=Establecer tamaño de pantalla
 
+START_MIDLET_CHOICE_TITLE=Elegir MIDlet para ejecutar
+UPDATE_TITLE=Actualización de KEmulator
+START_AUTO_UPDATE_TEXT=¿Deseas recibir actualizaciones automáticas?
+UPDATE_ALREADY_LATEST_TEXT=Ya tienes la versión más reciente de KEmulator.
+UPDATE_AVAILABLE_TEXT=Hay una nueva versión disponible.\n¿Deseas descargarla?
+
+LCDUI_ALERT_DISMISS_COMMAND=Aceptar
+LCDUI_LIST_SELECT_COMMAND=Seleccionar
+LCDUI_MENU_COMMAND=Menú
