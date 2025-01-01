@@ -349,7 +349,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			ms = ((Clip) sequence).getMicrosecondLength();
 			if (t < ms) ms = t;
 			if (ms < 0) ms = 0;
-			((Clip) sequence).setMicrosecondPosition(mediaTime = t);
+			synchronized (sequence) {
+				((Clip) sequence).setMicrosecondPosition(mediaTime = t);
+			}
 		} else if (sequence instanceof Sequence) {
 			ms = ((Sequence) sequence).getMicrosecondLength();
 			if (t < ms) ms = t;
@@ -693,7 +695,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					}
 				} else if (sequence instanceof Clip) {
 					Clip clip = (Clip) sequence;
-					clip.start();
+					synchronized (clip) {
+						clip.start();
+					}
 					if (b) {
 						notifyListeners(PlayerListener.STARTED, getMediaTime());
 						b = false;
@@ -702,7 +706,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						playLock.wait();
 					}
 					complete = this.complete;
-					clip.stop();
+					synchronized (clip) {
+						clip.stop();
+					}
 				} else if (sequence instanceof javazoom.jl.player.Player) {
 					if (b) {
 						notifyListeners(PlayerListener.STARTED, getMediaTime());
@@ -757,10 +763,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence == null) return;
 		final double n2 = n / 100.0;
 		if (sequence instanceof Clip) {
-			try {
-				((FloatControl) ((Clip) sequence).getControl(FloatControl.Type.MASTER_GAIN))
-						.setValue((float) (Math.log((n2 == 0.0) ? 1.0E-4 : n2) / Math.log(10.0) * 20.0));
-			} catch (Exception ignored) {}
+			synchronized (sequence) {
+				try {
+					((FloatControl) ((Clip) sequence).getControl(FloatControl.Type.MASTER_GAIN))
+							.setValue((float) (Math.log((n2 == 0.0) ? 1.0E-4 : n2) / Math.log(10.0) * 20.0));
+				} catch (Exception ignored) {}
+			}
 			return;
 		}
 		if (sequence instanceof Sequence) {
@@ -861,6 +869,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		void setPlayer(PlayerImpl player) {
 			if (references == null)
 				references = Collections.newSetFromMap(new WeakHashMap());
+			try {
+				currentPlayer.stop();
+			} catch (Exception ignored) {}
 			currentPlayer = player;
 			references.add(player);
 		}
