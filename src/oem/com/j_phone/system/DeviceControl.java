@@ -17,6 +17,7 @@
 package com.j_phone.system;
 
 import emulator.Emulator;
+import emulator.custom.CustomMethod;
 
 import javax.microedition.midlet.MIDlet;
 
@@ -113,11 +114,11 @@ public class DeviceControl {
 	}
 
 	public String getMyTelNumber() {
-		return null;
+		return "123";
 	}
 
 	public String getIMEI() {
-		return null;
+		return CustomMethod.getProperty("device.imei");
 	}
 
 	public int getTransmissionRate() {

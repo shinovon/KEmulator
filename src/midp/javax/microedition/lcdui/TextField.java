@@ -27,11 +27,11 @@ public class TextField extends Item {
 	private boolean updateFocus;
 	private boolean swtFocused;
 
-	public TextField(final String s, final String aString25, final int anInt349, final int anInt350) {
-		super(s);
-		this.string = aString25;
-		this.maxSize = anInt349;
-		this.constraints = anInt350;
+	public TextField(final String label, final String text, final int maxSize, final int constraints) {
+		super(label);
+		this.string = text;
+		this.maxSize = maxSize;
+		this.constraints = constraints;
 	}
 
 	public String getString() {

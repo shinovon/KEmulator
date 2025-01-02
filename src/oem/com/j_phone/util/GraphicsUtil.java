@@ -16,24 +16,30 @@ public class GraphicsUtil {
 	public static final int STRETCH_QUALITY_LOW = 1;
 	public static final int STRETCH_QUALITY_HIGH = 2;
 
-	public static int getPixel(Graphics paramGraphics, int paramInt1, int paramInt2) {
-		return paramGraphics.getImage().getRGB(paramInt1, paramInt2);
+	public static int getPixel(Graphics g, int x, int y) {
+		return g.getImage().getRGB(x, y);
 	}
 
-	public static void setPixel(Graphics paramGraphics, int paramInt1, int paramInt2) {
-		paramGraphics.getImage().setRGB(paramInt1, paramInt2, 0);
+	public static void setPixel(Graphics g, int x, int y) {
+		g.getImage().setRGB(x, y, 0);
 	}
 
-	public static void setPixel(Graphics paramGraphics, int paramInt1, int paramInt2, int paramInt3) {
-		paramGraphics.getImage().setRGB(paramInt1, paramInt2, paramInt3);
+	public static void setPixel(Graphics g, int x, int y, int color) {
+		g.getImage().setRGB(x, y, color);
 	}
 
-	public static void drawRegion(Graphics paramGraphics, Image paramImage, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7, int paramInt8) {
+	public static void drawRegion(Graphics g, Image src, int x_src, int y_src, int width, int height, int transform,
+								  int x_dest, int y_dest, int anchor) {
+		g.drawRegion(src, x_src, y_src, width, height, transform, x_dest, y_dest, anchor);
 	}
 
-	public static void drawRegion(Graphics paramGraphics, Image paramImage, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7, int paramInt8, int paramInt9, int paramInt10, int paramInt11) {
+	public static void drawRegion(Graphics g, Image src, int x_src, int y_src, int width, int height, int transform,
+								  int x_dest, int y_dest, int width_dest, int height_dest, int anchor,
+								  int stretch_quality) {
+		g.drawRegion(src, x_src, y_src, width, height, transform, x_dest, y_dest, anchor);
 	}
 
-	public static void drawPseudoTransparentImage(Graphics paramGraphics, Image paramImage, int paramInt1, int paramInt2, int paramInt3, short paramShort, int paramInt4) {
+	public static void drawPseudoTransparentImage(Graphics g, Image src, int x_dest, int y_dest, int anchor, short mask_pattern, int element_size) {
+		g.drawImage(src, x_dest, y_dest, anchor);
 	}
 }

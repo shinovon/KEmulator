@@ -17,15 +17,18 @@
 package com.jblend.media.smaf.phrase;
 
 public class PhraseTrack extends PhraseTrackBase {
+	private Phrase phrase;
+
 	PhraseTrack(int id) {
 		super(id);
 	}
 
 	public void setPhrase(Phrase p) {
+		phrase = p;
 	}
 
 	public Phrase getPhrase() {
-		return null;
+		return phrase;
 	}
 
 	public void removePhrase() {

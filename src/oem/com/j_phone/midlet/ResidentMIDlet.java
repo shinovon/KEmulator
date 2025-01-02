@@ -7,8 +7,7 @@ import com.j_phone.system.TelephonyListener;
 
 import javax.microedition.midlet.MIDlet;
 
-public abstract class ResidentMIDlet extends MIDlet implements TelephonyListener, MailListener, ScheduledAlarmListener, RingStateListener
-{
+public abstract class ResidentMIDlet extends MIDlet implements TelephonyListener, MailListener, ScheduledAlarmListener, RingStateListener {
 	public abstract void ring(String paramString1, String paramString2);
 
 	public abstract void ignored();

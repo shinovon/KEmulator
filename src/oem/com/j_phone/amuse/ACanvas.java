@@ -122,7 +122,9 @@ public abstract class ACanvas
 		int patternNo;
 	}
 
-	public final void sequenceStart() {}
+	public final void sequenceStart() {
+	}
 
-	public final void sequenceStop() {}
+	public final void sequenceStop() {
+	}
 }

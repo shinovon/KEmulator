@@ -1150,7 +1150,9 @@ public final class EmulatorScreen implements
 					this.pauseScreen();
 					this.canvas.redraw();
 				} else {
-					Emulator.getCanvas().repaint();
+					try {
+						Emulator.getCanvas().repaint();
+					} catch (Exception ignored) {}
 				}
 				this.updatePauseState();
 				return;

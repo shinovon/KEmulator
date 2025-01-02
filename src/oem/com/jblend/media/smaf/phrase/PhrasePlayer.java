@@ -46,11 +46,11 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrack(int track) {
-		return null;
+		return new PhraseTrack(track);
 	}
 
 	public AudioPhraseTrack getAudioTrack(int track) {
-		return null;
+		return new AudioPhraseTrack(track);
 	}
 
 	public void disposeTrack(PhraseTrack t) {

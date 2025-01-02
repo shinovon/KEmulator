@@ -1,7 +1,6 @@
 package com.j_phone.system;
 
-public abstract interface MailTransportListener
-{
+public abstract interface MailTransportListener {
 	public static final int MAIL_SUCCEEDED = 0;
 	public static final int MAIL_FAILED = -1;
 	public static final int MAIL_STOP = -2;
