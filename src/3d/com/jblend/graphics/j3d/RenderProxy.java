@@ -104,26 +104,30 @@ public class RenderProxy {
 	}
 
 	private static com.mascotcapsule.micro3d.v3.Effect3D getMascotEffect(Effect3D effect) {
+		if (effect == null) return null;
 		com.mascotcapsule.micro3d.v3.Effect3D r = new com.mascotcapsule.micro3d.v3.Effect3D();
 		r.setShading(effect.shading);
 		r.setLight(getMascotLight(effect.light));
-		r.setSphereTexture(effect.texture.impl);
+		r.setSphereTexture(effect.texture == null ? null : effect.texture.impl);
 		r.setToonParams(effect.toonThreshold, effect.toonHigh, effect.toonLow);
 		r.setTransparency(effect.isTransparency);
 		return r;
 	}
 
 	private static com.mascotcapsule.micro3d.v3.Texture getMascotTexture(Texture texture) {
+		if (texture == null) return null;
 		return texture.impl;
 	}
 
 	private static com.mascotcapsule.micro3d.v3.FigureLayout getMascotLayout(FigureLayout layout) {
+		if (layout == null) return null;
 		com.mascotcapsule.micro3d.v3.FigureLayout r = new com.mascotcapsule.micro3d.v3.FigureLayout(getMascotAffine(layout.getAffineTrans()),
 				layout.scaleX, layout.scaleY, layout.centerY, layout.centerY);
 		return r;
 	}
 
 	private static com.mascotcapsule.micro3d.v3.AffineTrans getMascotAffine(AffineTrans a) {
+		if (a == null) return null;
 		int[] out = new int[12];
 		int offset = 0;
 		out[offset++] = a.m00;
@@ -142,17 +146,19 @@ public class RenderProxy {
 	}
 
 	private static com.mascotcapsule.micro3d.v3.Light getMascotLight(Light light) {
+		if (light == null) return null;
 		return new com.mascotcapsule.micro3d.v3.Light(getMascotVector(light.getDirection()), light.getDirIntensity(), light.getAmbIntensity());
 	}
 
 	private static com.mascotcapsule.micro3d.v3.Vector3D getMascotVector(Vector3D vector) {
+		if (vector == null) return null;
 		return new com.mascotcapsule.micro3d.v3.Vector3D(vector.x, vector.y, vector.z);
 	}
 
 	private static com.mascotcapsule.micro3d.v3.Texture[] getMascotTextures(Texture[] textures) {
 		com.mascotcapsule.micro3d.v3.Texture[] r = new com.mascotcapsule.micro3d.v3.Texture[textures.length];
 		for(int i = 0; i < r.length; i++) {
-			r[i] = textures[i].impl;
+			r[i] = textures[i] == null ? null : textures[i].impl;
 		}
 		return r;
 	}
