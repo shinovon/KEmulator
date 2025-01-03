@@ -1154,7 +1154,7 @@ public class Emulator implements Runnable {
 		backgroundThread = new Thread(new Runnable() {
 			public void run() {
 				Manager.checkLibVlcSupport();
-				if (!updated && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
+				if (!updated && !Settings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
 					EmulatorImpl.asyncExec(new Runnable() {
 						public void run() {
 							Emulator.emulatorimpl.getEmulatorScreen().showUpdateDialog(1);
