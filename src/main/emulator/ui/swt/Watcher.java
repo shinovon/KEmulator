@@ -91,9 +91,12 @@ public final class Watcher implements Runnable, DisposeListener {
 
 	private void method322() {
 		this.aString551 = this.aCombo546.getText();
-		final Instance c;
-		(c = (Instance) this.table.get(this.aString551))
-				.method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
+		final Instance c = (Instance) this.table.get(this.aString551);
+		if (c == null) {
+			this.aTree554.removeAll();
+			return;
+		}
+		c.method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
 		updateTitle(c);
 		this.aTree554.removeAll();
 		for (int i = 0; i < c.getFields().size(); ++i) {
@@ -118,7 +121,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	}
 
 	private void updateTitle(Instance c) {
-		if (type == 0) {
+		if (type == 0 && c != null) {
 			Object o = c.getInstance();
 			if (o != null) {
 				String s = o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
