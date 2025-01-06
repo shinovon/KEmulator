@@ -4,7 +4,7 @@
 
 #Main Frame
 
-MENU_MIDLET=Midlet
+MENU_MIDLET=MIDlet
 MENU_TOOL=Ferramentas
 MENU_VIEW=Visualizar
 
@@ -15,11 +15,11 @@ MENU_MIDLET_2D_ENGINE=Engine 2D
 MENU_MIDLET_M3G_ENGINE=Engine M3G
 MENU_MIDLET_M3D_ENGINE=Engine MascotCapsule
 
-MENU_MIDLET_JAD=Abrir JAD com o Bloco de Notas
+MENU_MIDLET_JAD=Abrir JAD com o Notepad
 MENU_MIDLET_SUSPEND=Suspender
-MENU_MIDLET_RESUME=Resumir
-MENU_MIDLET_PAUSE_STEP=Pausar/Step
-MENU_MIDLET_PLAY_RESUME=Reproduzir/Resumir
+MENU_MIDLET_RESUME=Retomar
+MENU_MIDLET_PAUSE_STEP=Pausar / Avançar um frame
+MENU_MIDLET_PLAY_RESUME=Retomar
 
 MENU_MIDLET_RESTART=Reiniciar
 MENU_MIDLET_EXIT=Sair
@@ -27,51 +27,52 @@ MENU_MIDLET_EXIT=Sair
 
 MENU_VIEW_INFO=Informações
 MENU_VIEW_XRAY=Visão Raio-X
-MENU_VIEW_TOP=Sempre No Topo
-MENU_VIEW_ROTATE=Rotacionar Tela
-MENU_VIEW_FORCE_PAINT=Forçar Pintura
-MENU_VIEW_ROTATE_90=Rotacionar 90 Graus
+MENU_VIEW_TOP=Sempre no topo
+MENU_VIEW_ROTATE=Girar tela
+MENU_VIEW_FORCE_PAINT=Forçar pintura
+MENU_VIEW_ROTATE_90=Girar em 90 graus
 
 MENU_VIEW_KEYPAD=Teclado
-MENU_VIEW_WATCHES=Classes
+MENU_VIEW_WATCHES=Observador de Classes
 MENU_VIEW_PROFILER=Analisador
-MENU_VIEW_METHODS=Métodos
+MENU_VIEW_METHODS=Methods
 MENU_VIEW_MEMORY=Visualização de Memória
 MENU_VIEW_M3GVIEW=Visão M3G
-MENU_VIEW_SMS=Console SMS
-MENU_VIEW_SENSOR=Simulador de Sensor
-MENU_VIEW_LOG=Log
+MENU_VIEW_SMS=Console de SMS
+MENU_VIEW_SENSOR=Simulador de sensor
+MENU_VIEW_LOG=Logs
 
 MENU_VIEW_OPTIONS=Opções...
 MENU_VIEW_HELP=Sobre
 
-MENU_TOOL_ZOOMIN=Aumentar Zoom
-MENU_TOOL_ZOOMOUT=Diminuir Zoom
+MENU_TOOL_ZOOMIN=Mais zoom
+MENU_TOOL_ZOOMOUT=Menos zoom
 MENU_TOOL_INTERPOSE=Interpolação
-MENU_TOOL_INTER_NEAREST=Mais Próximo
-MENU_TOOL_INTER_HIGH=Alta Qualidade
-MENU_TOOL_INTER_LOW=Baixa Qualidade
+MENU_TOOL_INTER_NEAREST=MaisPróximo
+MENU_TOOL_INTER_HIGH=AltaQualidade
+MENU_TOOL_INTER_LOW=BaixaQualidade
 
 MENU_TOOL_RESIZE_MODE=Exibição
 MENU_TOOL_RESIZE_MODE_CENTER=Sem escalonamento adaptativo
 MENU_TOOL_RESIZE_MODE_SYNC=Sincronizar com o tamanho da janela
 MENU_TOOL_RESIZE_MODE_FILL=Ajustar à janela
-MENU_TOOL_RESIZE_MODE_FILL_INT=Ajustar à janela (Escalonamento Inteiro)
+MENU_TOOL_RESIZE_MODE_FILL_INT=Ajustar à janela (Escalonamento por inteiro)
 MENU_TOOL_RESIZE_KEEP_PROPORTIONS=Manter proporção
 MENU_TOOL_RESIZE_RESET=Redefinir tamanho da janela
 MENU_TOOL_RESIZE_SET=Definir tamanho da tela
 
-MENU_TOOL_SPEEDUP=Aumentar Velocidade
-MENU_TOOL_SPEEDDOWN=Diminuir Velocidade
+MENU_TOOL_SPEEDUP=Aumentar velocidade
+MENU_TOOL_SPEEDDOWN=Diminuir velocidade
 
 MENU_TOOL_RECORD_KEY=Gravar Teclas
-MENU_TOOL_AUTO_PLAY=Habilitar Reprodução Automática
-MENU_TOOL_CAPTURE_FILE=Capturar para Arquivo
-MENU_TOOL_CAPTURE_CLIP=Capturar para Área de Transferência
+MENU_TOOL_AUTO_PLAY=Habilitar auto-play
+MENU_TOOL_CAPTURE_FILE=Capturar tela para arquivo
+MENU_TOOL_CAPTURE_CLIP=Capturar tela para área de transferência
 
 MENU_TOOL_SHOW_TRACK_INFO=Mostrar Informações da Faixa
 
 MENU_TOOL_QWERTY_MODE=Modo QWERTY
+MENU_TOOL_FPS_MODE=Modo FPS
 MENU_TOOL_DISABLE_NETWORK_ACCESS=Desabilitar acesso à rede
 
 #Command bar
@@ -84,29 +85,32 @@ MAIN_INFO_BAR_PAUSED=PAUSADO
 
 SAVE_TO_FILE=Salvar em arquivo
 OPEN_JAR_FILE=Abrir um arquivo JAR
-OPEN_REC_FILE=Abrir um arquivo de registro
+OPEN_REC_FILE=Abrir um arquivo de auto-play
 LINK_JAR_FILE=Especificar um arquivo JAR
 
 DIALOG_OK=OK
 DIALOG_CANCEL=Cancelar
 DIALOG_SET=Definir
+DIALOG_YES=Sim
+DIALOG_NO=Não
 
 
 #Info show
 
-INFO_FRAME_POS=Posição
+INFO_FRAME_POS=Pos
 INFO_FRAME_COLOR=Cor
 INFO_FRAME_RECT=R
 
+
 #About Frame
 
-ABOUT_FRAME_TITLE=Sobre & Ajuda
+ABOUT_FRAME_TITLE=Sobre e Ajuda
 ABOUT_INFO_EMULATOR=Emulador de Jogos Móveis
-ABOUT_INFO_APIS=APIs Suportadas
+ABOUT_INFO_APIS=APIs suportadas
 
 ABOUT_AUTHOR=Autor
-ABOUT_CHACK_NEW_VER=Verificar nova versão
-ABOUT_ONLINE_MANUAL=Manual Online
+ABOUT_CHACK_NEW_VER=Verificar novas versões
+ABOUT_ONLINE_MANUAL=Manual online
 
 
 #Keypad
@@ -118,7 +122,37 @@ KEYPAD_FRAME_RSK=Tecla Soft Direita
 
 #Log Frame
 
-LOG_FRAME_TITLE=Registro
+LOG_FRAME_TITLE=Logs
+
+
+#M3G View
+
+M3G_VIEW_TITLE   = Visualização de M3G
+M3G_VIEW_CAMERA  = Câmera
+M3G_VIEW_LIGHT   = Luzes
+M3G_VIEW_DISPLAY = Exibir
+
+M3G_VIEW_LIGHT_SCENE   = Gráficos da Cena
+M3G_VIEW_LIGHT_VIEW    = Visualizador de Luz
+M3G_VIEW_LIGHT_SETTING = Configurações de Luz
+
+M3G_VIEW_CAMERA_ORBIT  = Orbit
+M3G_VIEW_CAMERA_PAN    = Pan
+M3G_VIEW_CAMERA_DOLLY  = Dolly
+M3G_VIEW_CAMERA_ZOOM   = Zoom
+M3G_VIEW_CAMERA_PROJECTION  = Modo de Projeção
+M3G_VIEW_CAMERA_PERSPECTIVE = Projeção de Perspectiva
+M3G_VIEW_CAMERA_PARALLEL    = Projeção Paralela
+
+M3G_VIEW_CAMERA_CLIP_PLANES   = Planos de Recorte
+M3G_VIEW_CAMEAR_FIELD_OF_VIEW = Campo de Visão
+M3G_VIEW_CAMEAR_POSITION      = Posição da Câmera
+M3G_VIEW_CAMEAR_RESET         = Resetar Câmera
+
+M3G_VIEW_DISPLAY_COORDINATE   = Eixos de Coordenada
+M3G_VIEW_DISPLAY_SHOW_GRID    = Mostrar grade
+M3G_VIEW_DISPLAY_SHOW_XRAY    = Mostrar Raios-X
+M3G_VIEW_DISPLAY_UPDATE_WORLD=Atualizar Mundo
 
 
 #MemoryView
@@ -179,10 +213,10 @@ MEMORY_VIEW_REFERENCE=Referência
 
 SMS_CONSOLE_TITLE=Console de SMS
 
-SMS_CONSOLE_SEND_TO=Enviar para midlet
+SMS_CONSOLE_SEND_TO=Enviar para MIDlet
 SMS_CONSOLE_CLEAR=Limpar
 SMS_CONSOLE_SEND=Enviar
-SMS_CONSOLE_RECEIVE=Receber de midlet
+SMS_CONSOLE_RECEIVE=Receber de um MIDlet
 SMS_CONSOLE_BLOCK=Bloquear a mensagem recebida
 
 
@@ -203,7 +237,7 @@ WATCHES_FRAME_PROFILER=Monitor de Profiler
 
 #Option Frame
 
-OPTION_FRAME_TITLE=Opções & Propriedades
+OPTION_FRAME_TITLE=Opções e Propriedades
 
 OPTION_TAB_CUSTOM=Geral
 OPTION_TAB_KEYMAP=Mapeamento de Teclas
@@ -233,9 +267,9 @@ OPTION_CUSTOM_KEY_UP=Para Cima:
 OPTION_CUSTOM_KEY_DOWN=Para Baixo:
 OPTION_CUSTOM_KEY_LEFT=Esquerda:
 OPTION_CUSTOM_KEY_RIGHT=Direita:
-OPTION_CUSTOM_LOCALE=Localidade MIDP:
+OPTION_CUSTOM_LOCALE=Local do MIDP:
 
-OPTION_KEYMAP_CONTROLLER=Controlador:
+OPTION_KEYMAP_CONTROLLER=Controle:
 OPTION_KEYMAP_REFRESH=Atualizar
 OPTION_KEYMAP_KEY_CACHE=Habilitar Cache de Teclas
 OPTION_KEYMAP_LSK=Tecla Soft Esquerda:
@@ -266,14 +300,17 @@ OPTION_FONT_SMALL_SIZE=Tamanho Pequeno:
 OPTION_FONT_TEST_TEXT=Texto de Teste:
 OPTION_FONT_TEST_TEXT_TXT=Este é um Exemplo.
 
-OPTION_SYSTEM_XRAY_BG=Visão de Raios-X: Sobrepor imagens
-OPTION_SYSTEM_XRAY_CLIP=Visão de Raios-X: Mostrar região de recorte de imagem
+OPTION_SYSTEM_UI_LANGUAGE=Idioma da interface:
+OPTION_SYSTEM_UPDATE_BRANCH=Branch para atualizações:
+OPTION_SYSTEM_AUTO_UPDATES=Checar automaticamente por atualizações
+OPTION_SYSTEM_XRAY_BG=Visão Raio-X: Sobrepor imagens
+OPTION_SYSTEM_XRAY_CLIP=Visão Raio-X: Mostrar região de recorte de imagem
 OPTION_SYSTEM_INFO_COLOR=Visualização de Informações: Mostrar cor em (R,G,B)
 OPTION_SYSTEM_RELEASED_IMG=Visualização de Memória: Registrar imagens liberadas
-OPTION_SYSTEM_AUTOGEN_JAD=Gerar automaticamente arquivo Jad com "KEmu-Platform"
-OPTION_SYSTEM_TRACK_NEW=Rastrear operações "new/new[]..."
+OPTION_SYSTEM_AUTOGEN_JAD=Gerar automaticamente arquivo Jad com \"KEmu-Platform\"
+OPTION_SYSTEM_TRACK_NEW=Rastrear operações \"new/new[]...\"
 OPTION_SYSTEM_TRACK_METHOD=Rastrear chamadas de métodos
-OPTION_SYSTEM_DISCORD_RICHPRESENCE=Presença Rica no Discord
+OPTION_SYSTEM_DISCORD_RICHPRESENCE=Rich Presence no Discord
 OPTION_SYSTEM_AWT_ANTIALIASING=Suavização AWT
 OPTION_SYSTEM_TEXT_ANTIALIASING=Suavização de Texto
 OPTION_SYSTEM_FPS_COUNT=Contador de FPS
@@ -285,12 +322,15 @@ OPTION_COREAPI_NO_NETWORK=Restringir conexões de rede
 OPTION_COREAPI_SYNC_KEYEVENTS=Sincronizar eventos de tecla
 OPTION_COREAPI_SOFTKEY_FIX=Enviar keyPressed com commandAction
 OPTION_COREAPI_IGNORE_REGION_REPAINT=Sempre repintar a tela totalmente
+OPTION_COREAPI_KEYPRESS_ON_REPEAT=Enviar keyPressed em repetições
+OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Forçar pintura em serviceRepaints()
+OPTION_COREAPI_POINTER_EVENTS= Valor de retorno de Canvas.hasPointerEvents()
 
-OPTION_RECORDS_RMS_FOLDER=Pasta RMS:
-OPTION_RECORDS_RMS_TEXT=Todos os Registros no midlet atual:
+OPTION_RECORDS_RMS_FOLDER=Pasta para RMS:
+OPTION_RECORDS_RMS_TEXT=Todos os Registros no MIDlet atual:
 OPTION_RECORDS_SELECT_ALL=Selecionar Todos
 OPTION_RECORDS_CLEAR_RECORD=Limpar Registros Selecionados
-OPTION_RECORDS_OPEN_DIRECTORY=Selecionar um diretório para rms
+OPTION_RECORDS_OPEN_DIRECTORY=Selecionar um diretório para RMS
 OPTION_RECORDS_CHOOSE_DIR=Escolher um diretório
 
 OPTION_NETWORK_PROXY=Proxy
@@ -304,7 +344,7 @@ OPTION_NETWORK_CONNECT=Conectar
 
 OPTION_NETWORK_PROXY_TEST=Teste de Proxy
 OPTION_NETWORK_PROXY_EMPTY=Host de proxy vazio!
-OPTION_NETWORK_PROXY_UNIMP=Teste de proxy não totalmente implementado!
+OPTION_NETWORK_PROXY_UNIMP=Teste de proxy não está totalmente implementado!
 
 OPTION_MEDIA_VLC_DIR=Diretório do VLC
 OPTION_MEDIA_VMS=Procurar VirtualMIDISynth como dispositivo MIDI
@@ -312,11 +352,13 @@ OPTION_MEDIA_GLOBAL_MIDI=Permitir apenas uma reprodução MIDI por vez (reduz o 
 OPTION_MEDIA_REOPEN_MIDI=Reabrir dispositivo MIDI a cada vez
 OPTION_MEDIA_DUMP=Habilitar exportação de mídia (uso mais alto de memória)
 OPTION_MEDIA_OTT=Reprodução de Tom Nokia (instável)
+OPTION_MEDIA_OTT=Nokia Tone Playback (instável)
 
 OPTION_M3G_LWJGL_SETTINGS=Configurações LWJGL
 OPTION_M3G_IGNORE_OVERWRITE=Ignorar sugestão OVERWRITE
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Forçar correção de perspectiva
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Desativar limitação de luz
+OPTION_M3G_FLUSH_IMMEDIATELY=Limpar conteúdos imediatamente (lento!)
 
 OPTION_M3G_AA=Anti-aliasing:
 OPTION_M3G_APP_CONTROLLED=Controlado pelo aplicativo
@@ -324,7 +366,7 @@ OPTION_M3G_FORCE_OFF=Forçar desligado
 OPTION_M3G_FORCE_ON=Forçar ligado
 
 OPTION_M3G_TEXTURE_FILTER=Filtro de Textura:
-OPTION_M3G_FORCE_NEAREST=Forçar o mais próximo
+OPTION_M3G_FORCE_NEAREST=Forçar mais próximo
 OPTION_M3G_FORCE_LINEAR=Forçar linear
 
 OPTION_M3G_MIPMAPPING=Mipmapping:
@@ -363,3 +405,14 @@ PERMISSION_CAMERA=Permitir que o aplicativo use a câmera?
 SECURITY_ALERT_TITLE=Segurança
 
 SCREEN_SIZE_DIALOG_TITLE=Definir tamanho da tela
+
+START_MIDLET_CHOICE_TITLE=Escolha o MIDlet para executar
+
+UPDATE_TITLE=Atualização do KEmulator
+START_AUTO_UPDATE_TEXT=Você deseja receber atualizações automáticas?
+UPDATE_ALREADY_LATEST_TEXT=Você já tem a versão mais recente do KEmulator.
+UPDATE_AVAILABLE_TEXT=Uma nova versão está disponível.\nVocê deseja baixá-la?
+
+LCDUI_ALERT_DISMISS_COMMAND=OK
+LCDUI_LIST_SELECT_COMMAND=Selecionar
+LCDUI_MENU_COMMAND=Menu
