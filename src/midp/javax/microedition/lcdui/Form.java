@@ -425,7 +425,8 @@ public class Form extends Screen {
 
 	Row getFirstRow(Item item) {
 		for (Row row : rows) {
-			if (row.contains(item)) return row;
+			if (row != null && row.contains(item))
+				return row;
 		}
 		return null;
 	}
@@ -461,13 +462,15 @@ public class Form extends Screen {
 	}
 
 	boolean isVisible(Item item) {
-		Row row = getFirstRow(item);
-		if (row == null) return false;
-		do {
-			if (isVisible(row)) {
-				return true;
-			}
-		} while ((row = getNextRow(item, row)) != null);
+		synchronized (rows) {
+			Row row = getFirstRow(item);
+			if (row == null) return false;
+			do {
+				if (isVisible(row)) {
+					return true;
+				}
+			} while ((row = getNextRow(item, row)) != null);
+		}
 		return false;
 	}
 
