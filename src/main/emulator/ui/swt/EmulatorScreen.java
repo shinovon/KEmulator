@@ -306,7 +306,7 @@ public final class EmulatorScreen implements
 			EmulatorScreen.locY = clientArea.height - this.shell.getSize().y >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
-		if (sizeW > 10 && sizeH > 10 && Settings.resizeMode != 0 && !defaultSize) {
+		if (sizeW > 10 && sizeH > 10 && !defaultSize) {
 			shell.setSize(sizeW, sizeH);
 		} else {
 			defaultSize = true;
@@ -1681,7 +1681,7 @@ public final class EmulatorScreen implements
 		screenWidth = scaledWidth;
 		screenHeight = scaledHeight;
 		if (!maximized) {
-			defaultSize = screenWidth == (int) (origWidth * zoom) && screenHeight == (int) (origHeight * zoom);
+			defaultSize = Settings.resizeMode != 1 && screenWidth == (int) (origWidth * zoom) && screenHeight == (int) (origHeight * zoom);
 		}
 		gc.setAdvanced(false);
 		this.method565(gc);
