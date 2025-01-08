@@ -2835,6 +2835,7 @@ public final class EmulatorScreen implements
 				}
 				case 2: {
 					if (Settings.showInfoFrame) {
+						infosEnabled = true;
 						this.aClass93_1059.infosMenuItem.setSelection(true);
 						EmulatorScreen.method558(this.aClass93_1059).setCursor(new Cursor(EmulatorScreen.method564(), 2));
 						((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(EmulatorScreen.method561(this.aClass93_1059));
