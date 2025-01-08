@@ -280,7 +280,6 @@ public class Displayable {
 		_invokeSizeChanged(w, h, true);
 	}
 
-
 	void _invokeSizeChanged(int w, int h, boolean b) {
 		IScreen s = Emulator.getEmulator().getScreen();
 		if (swtContent != null) {
@@ -361,7 +360,7 @@ public class Displayable {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
 	}
 
-	public static void _fpsLimiter(boolean b) {
+	public static synchronized void _fpsLimiter(boolean b) {
 		if (b && Settings.speedModifier == 1 && Settings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
 			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
