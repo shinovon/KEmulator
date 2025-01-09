@@ -49,7 +49,7 @@ public final class FontSWT implements IFont {
 		});
 	}
 
-	public final Font method297() {
+	public final Font getSWTFont() {
 		return this.font;
 	}
 

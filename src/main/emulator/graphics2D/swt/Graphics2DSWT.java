@@ -98,7 +98,7 @@ public final class Graphics2DSWT implements IGraphics2D {
 	}
 
 	public final void setFont(final IFont font) {
-		this.gc.setFont(((FontSWT) font).method297());
+		this.gc.setFont(((FontSWT) font).getSWTFont());
 	}
 
 	public final void drawString(final String s, final int n, final int n2) {

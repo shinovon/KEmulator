@@ -282,19 +282,7 @@ public class List extends Screen implements Choice {
 		{
 			public void run()
 			{
-				org.eclipse.swt.graphics.Font swtFont = null;
-				if (font != null) {
-					if (Settings.g2d == 0) {
-						swtFont = ((FontSWT) font.getImpl()).method297();
-					} else {
-						swtFont = new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
-								Emulator.getEmulator().getProperty().getDefaultFontName(),
-								Math.max(2, (int) (font.getHeight() * 0.7f) - 1),
-								font.getStyle() & ~Font.STYLE_UNDERLINED);
-					}
-				}
-				TableItem item = swtTable.getItem(n);
-				item.setFont(0, swtFont);
+				swtSetItemFont(n);
 			}
 		});
 	}
@@ -431,9 +419,19 @@ public class List extends Screen implements Choice {
 
 	private void swtSetItemFont(int index)
 	{
-//		org.eclipse.swt.graphics.Font font = Font.getSWTFont(choiceImpl
-//				.getFont(index));
-//		swtTable.getItem(index).setFont(0, font);
+		Font font = choiceImpl.getFont(index);
+		org.eclipse.swt.graphics.Font swtFont = null;
+		if (font != null) {
+			if (Settings.g2d == 0) {
+				swtFont = ((FontSWT) font.getImpl()).getSWTFont();
+			} else {
+				swtFont = new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
+						Emulator.getEmulator().getProperty().getDefaultFontName(),
+						Math.max(2, (int) (font.getHeight() * 0.7f) - 1),
+						font.getStyle() & ~Font.STYLE_UNDERLINED);
+			}
+		}
+		swtTable.getItem(index).setFont(0, swtFont);
 	}
 
 	private void swtDeleteAllItems()

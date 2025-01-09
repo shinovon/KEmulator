@@ -30,7 +30,7 @@ public final class EventQueue implements Runnable {
 	private final Vector eventArguments = new Vector();
 	private final Thread eventThread;
 	private boolean paused;
-	private final Object lock = new Object();
+	private final Object callbackLock = new Object();
 	private boolean alive;
 	private final Object eventLock = new Object();
 
@@ -173,35 +173,39 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void queueRepaint() {
-		repaintX = repaintY = repaintW = repaintH = -1;
-		queue(EVENT_PAINT);
+		synchronized (repaintLock) {
+			repaintX = repaintY = repaintW = repaintH = -1;
+			queue(EVENT_PAINT);
+		}
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
 		if (Settings.j2lStyleFpsLimit)
 			Displayable._fpsLimiter(true);
 
-		int x1 = x,
-			y1 = y,
-			x2 = x + w,
-			y2 = y + h;
-		Displayable d = getCurrent();
-		int sw = d.getWidth(), sh = d.getHeight();
-		if (repaintX != -1) {
-			x1 = Math.min(repaintX, x1);
-			y1 = Math.min(repaintY, y1);
-			x2 = Math.max(repaintX + repaintW, x2);
-			y2 = Math.max(repaintY + repaintH, y2);
+		synchronized (repaintLock) {
+			int x1 = x,
+					y1 = y,
+					x2 = x + w,
+					y2 = y + h;
+			Displayable d = getCurrent();
+			int sw = d.getWidth(), sh = d.getHeight();
+			if (repaintX != -1) {
+				x1 = Math.min(repaintX, x1);
+				y1 = Math.min(repaintY, y1);
+				x2 = Math.max(repaintX + repaintW, x2);
+				y2 = Math.max(repaintY + repaintH, y2);
+			}
+			if (x1 < 0) x1 = 0;
+			if (y1 < 0) y1 = 0;
+			if (x2 > sw) x2 = sw;
+			if (y2 > sh) y2 = sh;
+			repaintX = x1;
+			repaintY = y1;
+			repaintW = x2 - x1;
+			repaintH = y2 - y1;
+			queue(EVENT_PAINT);
 		}
-		if (x1 < 0) x1 = 0;
-		if (y1 < 0) y1 = 0;
-		if (x2 > sw) x2 = sw;
-		if (y2 > sh) y2 = sh;
-		repaintX = x1;
-		repaintY = y1;
-		repaintW = x2 - x1;
-		repaintH = y2 - y1;
-		queue(EVENT_PAINT);
 	}
 
 	public void itemStateChanged(Item item) {
@@ -222,7 +226,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void gameGraphicsFlush() {
-		synchronized (lock) {
+		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
 			final IImage screenImage = scr.getScreenImg();
 			final IImage backBufferImage2 = scr.getBackBufferImage();
@@ -233,7 +237,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void gameGraphicsFlush(int x, int y, int w, int h) {
-		synchronized (lock) {
+		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
 			final IImage screenImage = scr.getScreenImg();
 			final IImage backBufferImage2 = scr.getBackBufferImage();
@@ -245,7 +249,7 @@ public final class EventQueue implements Runnable {
 
 	public void serviceRepaints() {
 		if (Settings.ignoreServiceRepaints) return;
-		synchronized (lock) {
+		synchronized (callbackLock) {
 			if (!repaintPending) return;
 			repaintPending = false;
 			int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
@@ -268,7 +272,7 @@ public final class EventQueue implements Runnable {
 				try {
 					switch (event = nextEvent()) {
 						case EVENT_PAINT: {
-							synchronized (lock) {
+							synchronized (callbackLock) {
 								if (!repaintPending) break;
 								repaintPending = false;
 								int x = repaintX, y = repaintY, w = repaintW, h = repaintH;
@@ -297,7 +301,7 @@ public final class EventQueue implements Runnable {
 							scr.repaint();
 							int interval = ((Screen) d)._repaintInterval();
 							if (interval > 0) {
-								synchronized (lock) {
+								synchronized (callbackLock) {
 									if (screenTimer == null) {
 										screenTimer = new Timer();
 									}
@@ -373,7 +377,7 @@ public final class EventQueue implements Runnable {
 								inputsCount--;
 							}
 							if (e == null) break;
-							synchronized (lock) {
+							synchronized (callbackLock) {
 								processInputEvent(e);
 							}
 							break;
@@ -429,7 +433,7 @@ public final class EventQueue implements Runnable {
 			}
 		}
 		if (r == null) return;
-		synchronized (lock) {
+		synchronized (callbackLock) {
 			r.run();
 		}
 	}
@@ -453,7 +457,7 @@ public final class EventQueue implements Runnable {
 			IScreen scr = Emulator.getEmulator().getScreen();
 			final IImage backBufferImage = scr.getBackBufferImage();
 			final IImage xRayScreenImage = scr.getXRayScreenImage();
-			Displayable._checkForSteps(lock);
+			Displayable._checkForSteps(callbackLock);
 			try {
 				if (x == -1) { // full repaint
 					canvas._invokePaint(backBufferImage, xRayScreenImage);
@@ -476,11 +480,6 @@ public final class EventQueue implements Runnable {
 			System.err.println("Exception in repaint!");
 			e.printStackTrace();
 		}
-		try {
-			synchronized (repaintLock) {
-				repaintLock.notifyAll();
-			}
-		} catch (Exception ignored) {}
 	}
 
 	void processInputEvent(int[] o) {
@@ -585,7 +584,7 @@ public final class EventQueue implements Runnable {
 						try {
 							int[] o = (int[]) elements[0];
 							if (Settings.synchronizeKeyEvents) {
-								synchronized (lock) {
+								synchronized (callbackLock) {
 									processInputEvent(o);
 								}
 							} else processInputEvent(o);
