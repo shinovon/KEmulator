@@ -54,7 +54,8 @@ public class Display {
 			Display.current.defocus();
 		}
 		Emulator.getEmulator().getScreen().getCaret().displayableChanged();
-		if ((Display.current = d) != null) {
+		if (d != null) {
+			Display.current = d;
 			if (d instanceof Canvas) {
 				if (Settings.blackberryApi) {
 					((Canvas) d).setFullScreenMode(true);
