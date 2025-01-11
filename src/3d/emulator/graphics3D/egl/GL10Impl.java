@@ -12,8 +12,6 @@ import javax.microedition.khronos.opengles.GL10Ext;
 import java.nio.*;
 import java.util.Hashtable;
 
-import static org.lwjgl.opengl.GL11.GL_DOUBLE;
-
 /**
  * GL10
  */
@@ -446,9 +444,9 @@ public class GL10Impl implements GL10, GL10Ext {
 
 	public synchronized void glLightfv(final int n, final int n2, final float[] array, final int n3) {
 		checkThread();
-		final int method770;
-		final FloatBuffer floatBuffer;
-		(floatBuffer = BufferUtils.createFloatBuffer(method770 = GLConfiguration.method770(n2))).put(array, n3, method770);
+		final int method770 = GLConfiguration.method770(n2);
+		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(4);
+		floatBuffer.put(array, n3, method770);
 		floatBuffer.position(0);
 		GL11.glLightfv(n, n2, floatBuffer);
 	}

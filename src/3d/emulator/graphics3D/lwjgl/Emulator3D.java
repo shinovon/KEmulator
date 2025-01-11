@@ -84,6 +84,7 @@ public final class Emulator3D implements IGraphics3D {
 	private static long window;
 	private boolean initialized;
 	private boolean egl;
+	private Thread targetThread;
 
 	private Emulator3D() {
 		instance = this;
@@ -149,9 +150,14 @@ public final class Emulator3D implements IGraphics3D {
 		}
 
 		try {
-			if (!initialized) {
+			if (!initialized || targetThread != Thread.currentThread()) {
+				targetThread = Thread.currentThread();
 				if (glCanvas != null) {
 					disposeGlCanvas();
+				}
+				if (window != 0) {
+					glfwDestroyWindow(window);
+					window = 0;
 				}
 				if (!forceWindow) {
 					EmulatorImpl.syncExec(new Runnable() {
@@ -170,7 +176,7 @@ public final class Emulator3D implements IGraphics3D {
 				}
 
 				try {
-					if (glCanvas == null) throw new IllegalStateException();
+					if (glCanvas == null) throw new Exception("glCanvas == null");
 					GLCanvasUtil.makeCurrent(glCanvas);
 					getCapabilities();
 
@@ -189,7 +195,7 @@ public final class Emulator3D implements IGraphics3D {
 						}
 					});
 				} catch (Exception e) {
-					if (!(e instanceof IllegalStateException))
+					if (!"glCanvas == null".equals(e.getMessage()))
 						e.printStackTrace();
 
 					if (glCanvas != null) {
@@ -206,11 +212,17 @@ public final class Emulator3D implements IGraphics3D {
 						glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 						window = glfwCreateWindow(w, h, "M3G", 0, 0);
-						if (window == 0)
-							throw new Exception("Window creation failed");
+						if (window == 0) {
+							throw new Exception("Window creation failed (GLFW Error: " + glfwGetError(null) + ")");
+						}
 					}
 
+
 					glfwMakeContextCurrent(window);
+					int error = glfwGetError(null);
+					if (error != 0) {
+						Emulator.getEmulator().getLogStream().println("GLFW Error: " + error);
+					}
 					getCapabilities();
 				}
 				Emulator.getEmulator().getLogStream().println("GL Renderer: " + GL11.glGetString(GL_RENDERER));
