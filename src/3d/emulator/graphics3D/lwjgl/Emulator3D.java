@@ -83,6 +83,7 @@ public final class Emulator3D implements IGraphics3D {
 
 	private static long window;
 	private boolean initialized;
+	private boolean egl;
 
 	private Emulator3D() {
 		instance = this;
@@ -115,7 +116,11 @@ public final class Emulator3D implements IGraphics3D {
 		return instance;
 	}
 
-	public synchronized final void bindTarget(Object target) {
+	public void bindTarget(Object target) {
+		bindTarget(target, false);
+	}
+
+	public synchronized final void bindTarget(Object target, boolean forceWindow) {
 		if (exiting) {
 			// Infinite lock instead just throwing an exception
 			try {
@@ -123,6 +128,7 @@ public final class Emulator3D implements IGraphics3D {
 			} catch (InterruptedException ignored) {}
 			throw new IllegalStateException("exiting");
 		}
+		this.egl = forceWindow;
 		Profiler3D.bindTargetCallCount++;
 
 		int w;
@@ -147,22 +153,24 @@ public final class Emulator3D implements IGraphics3D {
 				if (glCanvas != null) {
 					disposeGlCanvas();
 				}
-				EmulatorImpl.syncExec(new Runnable() {
-					public void run() {
-						try {
-							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
-							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
-							glCanvas.setSize(1, 1);
-							glCanvas.setVisible(true);
-						} catch (Throwable e) {
-							e.printStackTrace();
-							glCanvas = null;
+				if (!forceWindow) {
+					EmulatorImpl.syncExec(new Runnable() {
+						public void run() {
+							try {
+								Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+								glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
+								glCanvas.setSize(1, 1);
+								glCanvas.setVisible(true);
+							} catch (Throwable e) {
+								e.printStackTrace();
+								glCanvas = null;
+							}
 						}
-					}
-				});
+					});
+				}
 
 				try {
-					if (glCanvas == null) throw new Exception();
+					if (glCanvas == null) throw new IllegalStateException();
 					GLCanvasUtil.makeCurrent(glCanvas);
 					getCapabilities();
 
@@ -181,7 +189,8 @@ public final class Emulator3D implements IGraphics3D {
 						}
 					});
 				} catch (Exception e) {
-					e.printStackTrace();
+					if (!(e instanceof IllegalStateException))
+						e.printStackTrace();
 
 					if (glCanvas != null) {
 						disposeGlCanvas();
@@ -264,17 +273,19 @@ public final class Emulator3D implements IGraphics3D {
 	public synchronized void releaseTarget() {
 		Profiler3D.releaseTargetCallCount++;
 
-		GL11.glFinish();
-		if (!Settings.m3gFlushImmediately)
-			swapBuffers();
+		if (!egl) {
+			GL11.glFinish();
+			if (!Settings.m3gFlushImmediately)
+				swapBuffers();
 
-		while (!unusedGLTextures.isEmpty())
-			releaseTexture(unusedGLTextures.get(0));
+			while (!unusedGLTextures.isEmpty())
+				releaseTexture(unusedGLTextures.get(0));
 
-		if (exiting) {
-			while (!usedGLTextures.isEmpty())
-				releaseTexture(usedGLTextures.get(0));
-			return;
+			if (exiting) {
+				while (!usedGLTextures.isEmpty())
+					releaseTexture(usedGLTextures.get(0));
+				return;
+			}
 		}
 
 		this.target = null;

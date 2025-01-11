@@ -4,12 +4,15 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL10Ext;
 import java.nio.*;
 import java.util.Hashtable;
+
+import static org.lwjgl.opengl.GL11.GL_DOUBLE;
 
 /**
  * GL10
@@ -115,44 +118,45 @@ public class GL10Impl implements GL10, GL10Ext {
 
 	public synchronized void glColorPointer(final int n, final int n2, final int n3, final Buffer buffer) {
 		checkThread();
-		if (n2 == 5121) {
-			GL11.glColorPointer(n, n2, n3, (ByteBuffer) buffer);
-			return;
-		}
-		int n4;
-		int n5;
-		FloatBuffer floatBuffer;
-		if (n2 == 5126) {
-			n4 = n;
-			n5 = n3;
-			floatBuffer = (FloatBuffer) buffer;
-		} else {
-			if (n2 != 5132) {
-				return;
-			}
-			final IntBuffer intBuffer;
-			final int remaining = (intBuffer = (IntBuffer) buffer).remaining();
-			final int position = intBuffer.position();
-			final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(remaining);
-			for (int i = 0; i < remaining; ++i) {
-				floatBuffer2.put(intBuffer.get(position + i) / 65536.0f);
-			}
-			floatBuffer2.position(0);
-			n4 = n;
-			n5 = n3;
-			floatBuffer = floatBuffer2;
-		}
-		GL11.glColorPointer(n4, GL_FLOAT, n5, floatBuffer);
+		GL11.glColorPointer(n, n2, n3, MemoryUtil.memAddress(buffer));
+//		if (n2 == 5121) {
+//			GL11.glColorPointer(n, n2, n3, (ByteBuffer) buffer);
+//			return;
+//		}
+//		int n4;
+//		int n5;
+//		FloatBuffer floatBuffer;
+//		if (n2 == 5126) {
+//			n4 = n;
+//			n5 = n3;
+//			floatBuffer = (FloatBuffer) buffer;
+//		} else {
+//			if (n2 != 5132) {
+//				return;
+//			}
+//			final IntBuffer intBuffer;
+//			final int remaining = (intBuffer = (IntBuffer) buffer).remaining();
+//			final int position = intBuffer.position();
+//			final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(remaining);
+//			for (int i = 0; i < remaining; ++i) {
+//				floatBuffer2.put(intBuffer.get(position + i) / 65536.0f);
+//			}
+//			floatBuffer2.position(0);
+//			n4 = n;
+//			n5 = n3;
+//			floatBuffer = floatBuffer2;
+//		}
+//		GL11.glColorPointer(n4, GL_FLOAT, n5, floatBuffer);
 	}
 
 	public synchronized void glCompressedTexImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final Buffer buffer) {
 		checkThread();
-		GL13.glCompressedTexImage2D(n, n2, n3, n4, n5, n6, (ByteBuffer) buffer);
+		GL13.glCompressedTexImage2D(n, n2, n3, n4, n5, n6, n7, MemoryUtil.memAddress(buffer));
 	}
 
 	public synchronized void glCompressedTexSubImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8, final Buffer buffer) {
 		checkThread();
-		GL13.glCompressedTexSubImage2D(n, n2, n3, n4, n5, n6, n7, (ByteBuffer) buffer);
+		GL13.glCompressedTexSubImage2D(n, n2, n3, n4, n5, n6, n7, n8, MemoryUtil.memAddress(buffer));
 	}
 
 	public synchronized void glCopyTexImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
@@ -231,7 +235,9 @@ public class GL10Impl implements GL10, GL10Ext {
 		}
 		if (n3 == 5123) {
 			GL11.glDrawElements(n, (ShortBuffer) buffer);
+			return;
 		}
+		GL11.glDrawElements(n, n2, n3, MemoryUtil.memAddress(buffer));
 	}
 
 	public synchronized void glEnable(final int n) {
@@ -640,35 +646,36 @@ public class GL10Impl implements GL10, GL10Ext {
 
 	public synchronized void glNormalPointer(final int n, final int n2, final Buffer buffer) {
 		checkThread();
-		if (n == 5120) {
-			GL11.glNormalPointer(n, n2, (ByteBuffer) buffer);
-			return;
-		}
-		if (n == 5122) {
-			GL11.glNormalPointer(n, n2, (ShortBuffer) buffer);
-			return;
-		}
-		int n3;
-		FloatBuffer floatBuffer;
-		if (n == 5126) {
-			n3 = n2;
-			floatBuffer = (FloatBuffer) buffer;
-		} else {
-			if (n != 5132) {
-				return;
-			}
-			final IntBuffer intBuffer;
-			final int remaining = (intBuffer = (IntBuffer) buffer).remaining();
-			final int position = intBuffer.position();
-			final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(remaining);
-			for (int i = 0; i < remaining; ++i) {
-				floatBuffer2.put(intBuffer.get(position + i) / 65536.0f);
-			}
-			floatBuffer2.position(0);
-			n3 = n2;
-			floatBuffer = floatBuffer2;
-		}
-		GL11.glNormalPointer(GL_FLOAT, n3, floatBuffer);
+		GL11.glNormalPointer(n, n2, MemoryUtil.memAddress(buffer));
+//		if (n == 5120) {
+//			GL11.glNormalPointer(n, n2, (ByteBuffer) buffer);
+//			return;
+//		}
+//		if (n == 5122) {
+//			GL11.glNormalPointer(n, n2, (ShortBuffer) buffer);
+//			return;
+//		}
+//		int n3;
+//		FloatBuffer floatBuffer;
+//		if (n == 5126) {
+//			n3 = n2;
+//			floatBuffer = (FloatBuffer) buffer;
+//		} else {
+//			if (n != 5132) {
+//				return;
+//			}
+//			final IntBuffer intBuffer;
+//			final int remaining = (intBuffer = (IntBuffer) buffer).remaining();
+//			final int position = intBuffer.position();
+//			final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(remaining);
+//			for (int i = 0; i < remaining; ++i) {
+//				floatBuffer2.put(intBuffer.get(position + i) / 65536.0f);
+//			}
+//			floatBuffer2.position(0);
+//			n3 = n2;
+//			floatBuffer = floatBuffer2;
+//		}
+//		GL11.glNormalPointer(GL_FLOAT, n3, floatBuffer);
 	}
 
 	public synchronized void glOrthof(final float n, final float n2, final float n3, final float n4, final float n5, final float n6) {
@@ -839,7 +846,10 @@ public class GL10Impl implements GL10, GL10Ext {
 
 	public synchronized void glTexCoordPointer(final int n, final int n2, final int n3, final Buffer buffer) {
 		checkThread();
-		if (n2 == 5126) {
+
+		GL11.glTexCoordPointer(n, n2, n3, MemoryUtil.memAddress(buffer));
+
+//		if (n2 == 5126) {
 //			final FloatBuffer floatBuffer;
 //			final int remaining = (floatBuffer = (FloatBuffer) buffer).remaining();
 //			final int position = floatBuffer.position();
@@ -848,37 +858,38 @@ public class GL10Impl implements GL10, GL10Ext {
 //				doubleBuffer.put(floatBuffer.get(position + i));
 //			}
 //			doubleBuffer.rewind();
-			GL11.glTexCoordPointer(n, n2, n3, (FloatBuffer) buffer);
-			return;
-		}
-		if (n2 == 5122) {
-			GL11.glTexCoordPointer(n, n2, n3, (ShortBuffer) buffer);
-			return;
-		}
-		FloatBuffer floatBuffer2;
-		if (n2 == 5120) {
-			final ByteBuffer byteBuffer;
-			final int remaining2 = (byteBuffer = (ByteBuffer) buffer).remaining();
-			final int position2 = byteBuffer.position();
-			floatBuffer2 = BufferUtils.createFloatBuffer(remaining2);
-			for (int j = 0; j < remaining2; ++j) {
-				floatBuffer2.put(byteBuffer.get(position2 + j));
-			}
-			floatBuffer2.rewind();
-		} else {
-			if (n2 != 5132) {
-				return;
-			}
-			final IntBuffer intBuffer;
-			final int remaining3 = (intBuffer = (IntBuffer) buffer).remaining();
-			final int position3 = intBuffer.position();
-			floatBuffer2 = BufferUtils.createFloatBuffer(remaining3);
-			for (int k = 0; k < remaining3; ++k) {
-				floatBuffer2.put(intBuffer.get(position3 + k) / 65536.0f);
-			}
-			floatBuffer2.position(0);
-		}
-		GL11.glTexCoordPointer(n, GL_FLOAT, n3, floatBuffer2);
+//			GL11.glTexCoordPointer(n, GL_DOUBLE, n3, MemoryUtil.memAddress(doubleBuffer));
+////			GL11.glTexCoordPointer(n, n2, n3, (FloatBuffer) buffer);
+//			return;
+//		}
+//		if (n2 == 5122) {
+//			GL11.glTexCoordPointer(n, n2, n3, (ShortBuffer) buffer);
+//			return;
+//		}
+//		FloatBuffer floatBuffer2;
+//		if (n2 == 5120) {
+//			final ByteBuffer byteBuffer;
+//			final int remaining2 = (byteBuffer = (ByteBuffer) buffer).remaining();
+//			final int position2 = byteBuffer.position();
+//			floatBuffer2 = BufferUtils.createFloatBuffer(remaining2);
+//			for (int j = 0; j < remaining2; ++j) {
+//				floatBuffer2.put(byteBuffer.get(position2 + j));
+//			}
+//			floatBuffer2.rewind();
+//		} else {
+//			if (n2 != 5132) {
+//				return;
+//			}
+//			final IntBuffer intBuffer;
+//			final int remaining3 = (intBuffer = (IntBuffer) buffer).remaining();
+//			final int position3 = intBuffer.position();
+//			floatBuffer2 = BufferUtils.createFloatBuffer(remaining3);
+//			for (int k = 0; k < remaining3; ++k) {
+//				floatBuffer2.put(intBuffer.get(position3 + k) / 65536.0f);
+//			}
+//			floatBuffer2.position(0);
+//		}
+//		GL11.glTexCoordPointer(n, GL_FLOAT, n3, floatBuffer2);
 	}
 
 	public synchronized void glTexEnvi(final int n, final int n2, final int n3) {
@@ -1053,45 +1064,46 @@ public class GL10Impl implements GL10, GL10Ext {
 
 	public synchronized void glVertexPointer(final int n, final int n2, final int n3, final Buffer buffer) {
 		checkThread();
-		if (n2 == 5120) {
-			final ByteBuffer byteBuffer;
-			final int remaining = (byteBuffer = (ByteBuffer) buffer).remaining();
-			final int position = byteBuffer.position();
-			final ShortBuffer shortBuffer = BufferUtils.createShortBuffer(remaining);
-			for (int i = 0; i < remaining; ++i) {
-				shortBuffer.put(i, byteBuffer.get(position + i));
-			}
-			GL11.glVertexPointer(n, GL_SHORT, n3, shortBuffer);
-			return;
-		}
-		if (n2 == 5122) {
-			GL11.glVertexPointer(n, GL_SHORT, n3, (ShortBuffer) buffer);
-			return;
-		}
-		int n4;
-		int n5;
-		FloatBuffer floatBuffer;
-		if (n2 == 5126) {
-			n4 = n;
-			n5 = n3;
-			floatBuffer = (FloatBuffer) buffer;
-		} else {
-			if (n2 != 5132) {
-				return;
-			}
-			final IntBuffer intBuffer;
-			final int remaining2 = (intBuffer = (IntBuffer) buffer).remaining();
-			final int position2 = intBuffer.position();
-			final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(remaining2);
-			for (int j = 0; j < remaining2; ++j) {
-				floatBuffer2.put(intBuffer.get(position2 + j) / 65536.0f);
-			}
-			floatBuffer2.position(0);
-			n4 = n;
-			n5 = n3;
-			floatBuffer = floatBuffer2;
-		}
-		GL11.glVertexPointer(n4, GL_FLOAT, n5, floatBuffer);
+		GL11.glVertexPointer(n, n2, n3, MemoryUtil.memAddress(buffer));
+//		if (n2 == 5120) {
+//			final ByteBuffer byteBuffer;
+//			final int remaining = (byteBuffer = (ByteBuffer) buffer).remaining();
+//			final int position = byteBuffer.position();
+//			final ShortBuffer shortBuffer = BufferUtils.createShortBuffer(remaining);
+//			for (int i = 0; i < remaining; ++i) {
+//				shortBuffer.put(i, byteBuffer.get(position + i));
+//			}
+//			GL11.glVertexPointer(n, GL_SHORT, n3, shortBuffer);
+//			return;
+//		}
+//		if (n2 == 5122) {
+//			GL11.glVertexPointer(n, GL_SHORT, n3, (ShortBuffer) buffer);
+//			return;
+//		}
+//		int n4;
+//		int n5;
+//		FloatBuffer floatBuffer;
+//		if (n2 == 5126) {
+//			n4 = n;
+//			n5 = n3;
+//			floatBuffer = (FloatBuffer) buffer;
+//		} else {
+//			if (n2 != 5132) {
+//				return;
+//			}
+//			final IntBuffer intBuffer;
+//			final int remaining2 = (intBuffer = (IntBuffer) buffer).remaining();
+//			final int position2 = intBuffer.position();
+//			final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(remaining2);
+//			for (int j = 0; j < remaining2; ++j) {
+//				floatBuffer2.put(intBuffer.get(position2 + j) / 65536.0f);
+//			}
+//			floatBuffer2.position(0);
+//			n4 = n;
+//			n5 = n3;
+//			floatBuffer = floatBuffer2;
+//		}
+//		GL11.glVertexPointer(n4, GL_FLOAT, n5, floatBuffer);
 	}
 
 	public synchronized void glViewport(final int n, final int n2, final int n3, final int n4) {

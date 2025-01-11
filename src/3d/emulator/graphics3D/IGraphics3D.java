@@ -12,7 +12,9 @@ public interface IGraphics3D {
 
 	boolean isDepthBufferEnabled();
 
-	void bindTarget(final Object p0);
+	void bindTarget(Object target);
+
+	void bindTarget(final Object p0, boolean forceWindow);
 
 	void releaseTarget();
 
