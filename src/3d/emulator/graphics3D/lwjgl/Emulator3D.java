@@ -225,7 +225,7 @@ public final class Emulator3D implements IGraphics3D {
 					}
 					getCapabilities();
 				}
-				Emulator.getEmulator().getLogStream().println("GL Renderer: " + GL11.glGetString(GL_RENDERER));
+				Emulator.getEmulator().getLogStream().println("GL Renderer: " + GL11.glGetString(GL_RENDERER) + " (" + GL11.glGetString(GL_VENDOR) + ")");
 				initialized = true;
 			} else {
 				if (window != 0) {

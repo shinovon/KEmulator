@@ -178,6 +178,16 @@ public class GLCanvasUtil {
 				ctx.set(canvas, (Integer) (int) context);
 			}
 		} else if (canvas instanceof org.lwjgl.opengl.swt.GLCanvas) {
+			if (platformCanvas == null) {
+				Field p = org.lwjgl.opengl.swt.GLCanvas.class.getDeclaredField("platformCanvas");
+				p.setAccessible(true);
+				platformCanvas = p.get(null);
+			}
+			if (makeCurrentMethod == null) {
+				makeCurrentMethod = Class.forName("org.lwjgl.opengl.swt.PlatformGLCanvas")
+						.getDeclaredMethod("makeCurrent", org.lwjgl.opengl.swt.GLCanvas.class, long.class);
+				makeCurrentMethod.setAccessible(true);
+			}
 			makeCurrentMethod.invoke(platformCanvas, canvas, 0);
 		} else {
 			throw new IllegalArgumentException();
