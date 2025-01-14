@@ -132,7 +132,10 @@ public class StringItem extends Item {
 		} else {
 			labelArr = null;
 		}
-		textArr = c.textArr(text, font, availableWidth, maxWidth, maxw);
+		String s = text;
+		if (s.startsWith("\n")) s = s.substring(1);
+		if (s.endsWith("\n")) s = s.substring(0, s.length() - 1);
+		textArr = c.textArr(s, font, availableWidth, maxWidth, maxw);
 		final int fh = font.getHeight() + 4;
 		if (mode == BUTTON) {
 			width = Math.max(w, Math.min(maxWidth, font.stringWidth(textArr[0]) + 10));
