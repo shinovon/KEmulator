@@ -169,7 +169,7 @@ public class Displayable {
 			return;
 		}
 		this.commands.add(command);
-		if (Emulator.getCurrentDisplay().getCurrent() == this) {
+		if (isShown()) {
 			this.updateCommands();
 		}
 	}
@@ -177,7 +177,7 @@ public class Displayable {
 	public void removeCommand(final Command command) {
 		if (this.commands.contains(command)) {
 			this.commands.remove(command);
-			if (Emulator.getCurrentDisplay().getCurrent() == this) {
+			if (isShown()) {
 				updateCommands();
 			}
 		}
@@ -338,6 +338,7 @@ public class Displayable {
 	}
 
 	void repaintScreen() {
+		if (!isShown()) return;
 		int n;
 		if (this instanceof Canvas) {
 			n = EventQueue.EVENT_PAINT;
