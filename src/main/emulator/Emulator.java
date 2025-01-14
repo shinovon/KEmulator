@@ -104,9 +104,9 @@ public class Emulator implements Runnable {
 	}
 
 	public static void updatePresence() {
-		DiscordRPC rpc = (DiscordRPC) Emulator.rpc;
 		if (rpc == null)
 			return;
+		DiscordRPC rpc = (DiscordRPC) Emulator.rpc;
 		DiscordRichPresence presence = new DiscordRichPresence();
 		presence.state = rpcState;
 		presence.details = rpcDetails;
@@ -943,7 +943,7 @@ public class Emulator implements Runnable {
 				Settings.uei = true;
 			} else if (key.equalsIgnoreCase("s")) {
 				forked = true;
-			} else if (key.equalsIgnoreCase("s")) {
+			} else if (key.equalsIgnoreCase("updated")) {
 				updated = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
@@ -1083,8 +1083,6 @@ public class Emulator implements Runnable {
 			cmd.add("java.base/java.io=ALL-UNNAMED");
 			cmd.add("--add-opens");
 			cmd.add("java.base/java.util=ALL-UNNAMED");
-			cmd.add("--add-opens");
-			cmd.add("java.base/sun.misc=ALL-UNNAMED");
 			if (isJava17())
 				cmd.add("--enable-native-access=ALL-UNNAMED");
 		}

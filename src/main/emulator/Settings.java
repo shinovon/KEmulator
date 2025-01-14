@@ -86,6 +86,8 @@ public final class Settings {
 			MIP_ANISO_2 = 4, MIP_ANISO_4 = 5, MIP_ANISO_8 = 6, MIP_ANISO_16 = 7;
 	public static int m3gMipmapping;
 
+	public static int m3gContextMode; // 0 - auto, 1 - glcanvas, 2 - lwjglx canvas, 3 - glfw window
+
 	public static boolean writeKemCfg = false;
 
 	public static boolean reopenMidiDevice = true;

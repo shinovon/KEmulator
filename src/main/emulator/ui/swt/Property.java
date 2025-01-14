@@ -644,6 +644,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.m3gAA = Integer.parseInt(properties.getProperty("M3GAA", "0"));
 			Settings.m3gTexFilter = Integer.parseInt(properties.getProperty("M3GTexFilter", "0"));
 			Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
+			Settings.m3gContextMode = Integer.parseInt(properties.getProperty("M3GContextMode", "0"));
 
 			// mascot`
 			Settings.mascotNo2DMixing = Boolean.parseBoolean(properties.getProperty("MascotNo2DMixing", "false"));
@@ -867,6 +868,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("M3GAA", String.valueOf(Settings.m3gAA));
 			properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
 			properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
+			properties.setProperty("M3GContextMode", String.valueOf(Settings.m3gContextMode));
 
 			// mascot
 			properties.setProperty("MascotNo2DMixing", String.valueOf(Settings.mascotNo2DMixing));

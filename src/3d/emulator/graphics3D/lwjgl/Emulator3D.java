@@ -159,12 +159,12 @@ public final class Emulator3D implements IGraphics3D {
 					glfwDestroyWindow(window);
 					window = 0;
 				}
-				if (!forceWindow) {
+				if (!forceWindow && Settings.m3gContextMode != 3) {
 					EmulatorImpl.syncExec(new Runnable() {
 						public void run() {
 							try {
 								Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
-								glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, 0);
+								glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, Settings.m3gContextMode);
 								glCanvas.setSize(1, 1);
 								glCanvas.setVisible(true);
 							} catch (Throwable e) {
