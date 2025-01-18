@@ -184,7 +184,9 @@ public final class Memory {
 					if (img != null)
 						this.images.add(new MemoryViewImage(img));
 				} else if (o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
-					this.images.add(Emulator.getPlatform().convertMicro3DTexture(o));
+					IImage img = MemoryViewImage.createFromMicro3DTexture(o);
+					if (img != null)
+						this.images.add(new MemoryViewImage(img));
 				}
 			} catch (NoClassDefFoundError ignored) {}
 		}

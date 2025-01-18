@@ -53,27 +53,6 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		return true;
 	}
 
-	public MemoryViewImage convertMicro3DTexture(Object o) {
-		try {
-			Class cls = o.getClass();
-			TextureImpl impl = (TextureImpl) cls.getField("impl").get(o);
-			if (impl == null)
-				return null;
-			IntBuffer ib = impl.image.getRaster().asIntBuffer();
-			int w = impl.getWidth(), h = impl.getHeight();
-			IImage img = Emulator.getEmulator().newImage(w, h, true);
-			int[] data = img.getData();
-			int i = data.length - w;
-
-			for (int j = h; j > 0; --j) {
-				ib.get(data, i, w);
-				i -= w;
-			}
-			return new MemoryViewImage(img);
-		} catch (Exception ignored) {}
-		return null;
-	}
-
 	public IGraphics3D getGraphics3D() {
 		return emulator.graphics3D.lwjgl.Emulator3D.getInstance();
 	}

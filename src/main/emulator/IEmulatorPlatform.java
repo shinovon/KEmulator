@@ -20,7 +20,5 @@ public interface IEmulatorPlatform {
 
 	boolean supportsMascotCapsule();
 
-	MemoryViewImage convertMicro3DTexture(Object o);
-
 	IGraphics3D getGraphics3D();
 }

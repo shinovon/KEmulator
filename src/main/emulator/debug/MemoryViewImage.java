@@ -1,10 +1,13 @@
 package emulator.debug;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.graphics2D.IImage;
+import ru.woesss.j2me.micro3d.TextureImpl;
 
 import javax.microedition.lcdui.Image;
 import javax.microedition.m3g.Image2D;
+import java.nio.IntBuffer;
 
 public final class MemoryViewImage extends Image {
 	public MemoryViewImage(final IImage image) {
@@ -77,5 +80,37 @@ public final class MemoryViewImage extends Image {
 
 		image.setData(data);
 		return image;
+	}
+
+	public static IImage createFromMicro3DTexture(Object tex) {
+		Class texCls = tex.getClass();
+
+		try {
+			if (Settings.micro3d == 1) {
+				TextureImpl texImpl = (TextureImpl) texCls.getField("impl").get(tex);
+				if (texImpl == null) return null;
+
+				IntBuffer texPixels = texImpl.image.getRaster().asIntBuffer();
+
+				int w = texImpl.getWidth(), h = texImpl.getHeight();
+				IImage img = Emulator.getEmulator().newImage(w, h, true);
+				int[] data = img.getData();
+
+				for (int i = 0; i < w * h; i++) {
+					int col = texPixels.get(i);
+					data[i] = 0xff000000 |
+							((col & 0x00ff0000) >> 16) |
+							(col & 0x0000ff00) |
+							((col & 0x000000ff) << 16);
+				}
+
+				return img;
+			} else {
+				IImage img = (IImage) texCls.getField("debugImage").get(tex);
+				return img;
+			}
+		} catch (Exception ignored) {}
+
+		return null;
 	}
 }
