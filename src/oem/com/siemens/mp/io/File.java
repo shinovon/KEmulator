@@ -23,13 +23,15 @@ import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class File {
 	public static final int INSIDE_STORAGE_PATH = 1;
 	public static final int OUTSIDE_STORAGE_PATH = 0;
 	public static final String STORAGE_DRIVE = "a:";
 
-	private static final ArrayList<RandomAccessFile> OPENED_FILES = new ArrayList<RandomAccessFile>();
+	private static final Map<Integer, RandomAccessFile> OPENED_FILES = new HashMap<Integer, RandomAccessFile>();
 	private static int lastDescriptor;
 
 	public static String buildPath(String fileName) {
@@ -134,7 +136,7 @@ public class File {
 		java.io.File file = getFile(fileName);
 		RandomAccessFile raf = new RandomAccessFile(file, "rw");
 		int fd = ++lastDescriptor;
-		OPENED_FILES.add(fd, raf);
+		OPENED_FILES.put(fd, raf);
 		return fd;
 	}
 
