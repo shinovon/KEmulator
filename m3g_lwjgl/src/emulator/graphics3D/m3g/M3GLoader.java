@@ -343,17 +343,19 @@ public final class M3GLoader {
 			this.aVector1092.addElement(var5);
 		}
 
-		Hashtable var10 = new Hashtable();
 		long var6 = method702(var2);
 
-		while (var6-- > 0L) {
-			int var8 = (int) method702(var2);
-			byte[] var9 = new byte[(int) method702(var2)];
-			var2.read(var9);
-			var10.put(new Integer(var8), var9);
-		}
+		if (var6 != 0) {
+			Hashtable var10 = new Hashtable();
+			while (var6-- > 0L) {
+				int var8 = (int) method702(var2);
+				byte[] var9 = new byte[(int) method702(var2)];
+				var2.read(var9);
+				var10.put(new Integer(var8), var9);
+			}
 
-		var1.setUserObject(var10);
+			var1.setUserObject(var10);
+		}
 	}
 
 	private void method737(Transformable var1, InputStream var2) throws IOException {
