@@ -97,10 +97,11 @@ public class Alert extends Screen {
 		final int n = super.bounds[W] - 8;
 		this.textArr = c.textArr(this.string, Screen.font, n, n);
 		g.setColor(-16777216);
-		int h = Screen.fontHeight4;
+		int h = Screen.fontHeight4 - scroll;
+		g.setClip(bounds[X], bounds[Y], n, bounds[H]);
 		for (int i = 0; i < this.textArr.length; ++i) {
 			g.drawString(this.textArr[i], 4, h + 2, 0);
-			h += Screen.font.getHeight() + 4;
+			h += Screen.fontHeight4;
 		}
 		if (gauge != null) {
 			gauge.screen = this;
@@ -119,6 +120,18 @@ public class Alert extends Screen {
 
 	public int _repaintInterval() {
 		return gauge != null || timeout >= 0 || ticker != null ? 500 : -1;
+	}
+
+	protected void _keyScroll(int key, boolean repeat) {
+		if (key == Canvas.UP) {
+			scroll = Math.max(0, scroll - Screen.fontHeight4);
+			repaintScreen();
+			return;
+		}
+		if (key == Canvas.DOWN) {
+			scroll = Math.min(textArr != null ? Screen.fontHeight4 * textArr.length : 0, scroll + Screen.fontHeight4);
+			repaintScreen();
+		}
 	}
 
 	static {
