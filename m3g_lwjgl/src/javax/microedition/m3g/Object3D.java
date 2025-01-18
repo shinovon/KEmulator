@@ -111,7 +111,6 @@ public abstract class Object3D implements Cloneable {
 	}
 
 	public Object getUserObject() {
-		System.out.println("getUserObject " + userObject);
 		return this.userObject;
 	}
 
