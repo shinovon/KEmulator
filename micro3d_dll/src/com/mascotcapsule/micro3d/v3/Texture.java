@@ -83,6 +83,7 @@ public class Texture {
 
             int width;
             int height;
+            int numColors;
             boolean reversed;
             if (dibHeaderSize == 12) {
                 width = data[pos++] & 0xff | (data[pos++] & 0xff) << 8;
@@ -92,6 +93,7 @@ public class Texture {
                 if (bpp != 8) {
                     throw new RuntimeException("Unsupported BMP format: bpp = " + bpp);
                 }
+                numColors = 256;
                 reversed = true;
             } else if (dibHeaderSize == 40) {
                 width = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
@@ -115,13 +117,17 @@ public class Texture {
                 if (compression != 0) {
                     throw new RuntimeException("Unsupported BMP format: compression = " + compression);
                 }
-                pos += 20;
+                pos += 12;
+                numColors = data[pos++] & 0xff | (data[pos++] & 0xff) << 8
+                        | (data[pos++] & 0xff) << 16 | data[pos++] << 24;
+                if(numColors == 0) numColors = 256;
+                pos += 4;
             } else {
                 throw new RuntimeException("Unsupported BMP version = " + dibHeaderSize);
             }
 
             int paletteOffset = 14 + dibHeaderSize;
-            if(rasterOffset < paletteOffset + 256 * 4) rasterOffset = paletteOffset + 256 * 4;
+            if(rasterOffset < paletteOffset + numColors * 4) rasterOffset = paletteOffset + numColors * 4;
 
             IImage image = Emulator.getEmulator().newImage(width, height, true);
             int[] rgb = image.getData();

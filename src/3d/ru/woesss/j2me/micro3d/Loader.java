@@ -295,6 +295,7 @@ class Loader {
 
 		int width;
 		int height;
+		int numColors;
 		boolean reversed;
 		if (dibHeaderSize == BMP_VERSION_CORE) {
 			width = loader.readUShort();
@@ -304,6 +305,7 @@ class Loader {
 			if (bpp != 8) {
 				throw new RuntimeException("Unsupported BMP format: bpp = " + bpp);
 			}
+			numColors = 256;
 			reversed = true;
 		} else if (dibHeaderSize == BMP_VERSION_3) {
 			width = loader.readInt();
@@ -324,14 +326,17 @@ class Loader {
 			if (compression != 0) {
 				throw new RuntimeException("Unsupported BMP format: compression = " + compression);
 			}
-			loader.skip(20);
+			loader.skip(12);
+			numColors = loader.readInt();
+			if(numColors == 0) numColors = 256;
+			loader.skip(4);
 		} else {
 			throw new RuntimeException("Unsupported BMP version = " + dibHeaderSize);
 		}
 
 		int paletteOffset = BMP_FILE_HEADER_SIZE + dibHeaderSize;
 		//Fix for broken bmp files
-		if(rasterOffset < paletteOffset + 256 * 4) rasterOffset = paletteOffset + 256 * 4;
+		if(rasterOffset < paletteOffset + numColors * 4) rasterOffset = paletteOffset + numColors * 4;
 
 		TextureData textureData = new TextureData(width, height);
 		ByteBuffer raster = textureData.getRaster();
