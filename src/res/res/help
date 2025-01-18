@@ -43,6 +43,20 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.18.2 [2025.01.19]
+Symbian Anna multitouch api support
+More SoftBank api stubs
+Fixed Class Watcher crash
+Fixed lcdui Form crash
+Fixed window size not saving in sync mode
+Fixed infos not updating after restart
+OpenGL ES API fixes
+Fixed NPE in com.jblend.graphics.j3d
+Made Alert scrollable
+Fixed Siemens API File
+Fixed underlined font
+Fixed MascotCapsule textures loading
+
 $v2.18.1 [2024.12.29]
 Automatic updates checking
 Added J2ME-Loader style fps limit (fixes Castlevania chinese version)
