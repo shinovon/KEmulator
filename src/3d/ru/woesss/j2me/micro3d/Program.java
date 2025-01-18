@@ -166,9 +166,6 @@ abstract class Program {
 		int uToonHigh;
 		int uToonLow;
 
-		private FloatBuffer mvpBuffer;
-		private FloatBuffer mvBuffer;
-
 		Color() {
 			super(VERTEX, FRAGMENT);
 		}
@@ -211,22 +208,8 @@ abstract class Program {
 		}
 
 		void bindMatrices(float[] mvp, float[] mv) {
-//			glUniformMatrix4fv(uMatrix, 1, false, mvp, 0);
-//			glUniformMatrix3fv(uNormalMatrix, 1, false, mv, 0);
-			if(mvpBuffer == null || mvpBuffer.capacity() < mvp.length)
-				mvpBuffer = BufferUtils.createFloatBuffer(mvp.length);
-			mvpBuffer.rewind();
-			for (float f: mvp) mvpBuffer.put(f);
-			mvpBuffer.rewind();
-
-			if(mvBuffer == null || mvBuffer.capacity() < mv.length)
-				mvBuffer = BufferUtils.createFloatBuffer(mv.length);
-			mvBuffer.rewind();
-			for (float f: mv) mvBuffer.put(f);
-			mvBuffer.rewind();
-
-			glUniformMatrix4fv(uMatrix, false, mvpBuffer);
-			glUniformMatrix3fv(uNormalMatrix, false, mvBuffer);
+			glUniformMatrix4fv(uMatrix, false, mvp);
+			glUniformMatrix3fv(uNormalMatrix, false, mv);
 		}
 
 		void setSphere(TextureImpl sphere) {
@@ -266,9 +249,6 @@ abstract class Program {
 		int uToonThreshold;
 		int uToonHigh;
 		int uToonLow;
-
-		private FloatBuffer mvpBuffer;
-		private FloatBuffer mvBuffer;
 
 		Tex() {
 			super(VERTEX, FRAGMENT);
@@ -325,22 +305,8 @@ abstract class Program {
 		}
 
 		void bindMatrices(float[] mvp, float[] mv) {
-//			glUniformMatrix4fv(uMatrix, 1, false, mvp, 0);
-//			glUniformMatrix3fv(uNormalMatrix, 1, false, mv, 0);
-			if(mvpBuffer == null || mvpBuffer.capacity() < mvp.length)
-				mvpBuffer = BufferUtils.createFloatBuffer(mvp.length);
-			mvpBuffer.rewind();
-			for (float f: mvp) mvpBuffer.put(f);
-			mvpBuffer.rewind();
-
-			if(mvBuffer == null || mvBuffer.capacity() < mv.length)
-				mvBuffer = BufferUtils.createFloatBuffer(mv.length);
-			mvBuffer.rewind();
-			for (float f: mv) mvBuffer.put(f);
-			mvBuffer.rewind();
-
-			glUniformMatrix4fv(uMatrix, false, mvpBuffer);
-			glUniformMatrix3fv(uNormalMatrix, false, mvBuffer);
+			glUniformMatrix4fv(uMatrix, false, mvp);
+			glUniformMatrix3fv(uNormalMatrix, false, mv);
 		}
 
 		void setSphere(TextureImpl sphere) {
