@@ -121,6 +121,7 @@ public class Texture {
             }
 
             int paletteOffset = 14 + dibHeaderSize;
+            if(rasterOffset < paletteOffset + 256 * 4) rasterOffset = paletteOffset + 256 * 4;
 
             IImage image = Emulator.getEmulator().newImage(width, height, true);
             int[] rgb = image.getData();
