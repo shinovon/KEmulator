@@ -274,7 +274,7 @@ public class Graphics
 		}
 		this.impl.drawString(s, x, y + font.getBaselinePosition());
 		if (font.isUnderlined()) {
-			this.impl.drawLine(x, y + height, stringWidth, y + height);
+			this.impl.drawLine(x, y + height, x + stringWidth, y + height);
 		}
 		if (xrayGraphics != null)
 			this.xrayFillRect(x, y, stringWidth, height, 255);
