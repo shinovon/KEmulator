@@ -145,7 +145,7 @@ public class FigureImpl {
 		final SparseIntArray dynamic = act.dynamic;
 		if (dynamic != null) {
 			int iFrame = frame < 0 ? 0 : frame >> 16;
-			for (int i = dynamic.size() - 1; i >= 0; i--) {
+			for (int i = 0; i <= dynamic.size(); i++) {
 				if (dynamic.keyAt(i) <= iFrame) {
 					pattern = dynamic.valueAt(i);
 					applyPattern();
