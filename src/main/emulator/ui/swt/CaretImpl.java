@@ -15,7 +15,7 @@ import javax.microedition.lcdui.DateField;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.TextField;
 
-public final class CaretImpl implements ICaret, ModifyListener, TraverseListener, FocusListener {
+public final class CaretImpl implements ICaret, ModifyListener, TraverseListener, FocusListener, KeyListener {
 	private static Font font;
 	private Text swtText;
 	private Canvas swtCanvas;
@@ -171,6 +171,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 						text.addModifyListener(CaretImpl.this);
 						text.addTraverseListener(CaretImpl.this);
 						text.addFocusListener(CaretImpl.this);
+						text.addKeyListener(CaretImpl.this);
 						swtText = text;
 					}
 
@@ -229,7 +230,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	public final void mouseDown(int x, int y) {
 	}
 
-	public final boolean keyPressed(KeyEvent event) {
+	public final boolean _keyPressed(KeyEvent event) {
 		if (this.currentItem == null || !(currentItem instanceof DateField))
 			return false;
 		char c = event.character;
@@ -238,6 +239,18 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 			((DateField) currentItem)._input(c);
 		}
 		return true;
+	}
+
+	public void keyPressed(KeyEvent keyEvent) {
+		if (keyEvent.keyCode == SWT.F1 || keyEvent.keyCode == SWT.F2 || keyEvent.keyCode == SWT.F3) {
+			((EmulatorScreen) Emulator.getEmulator().getScreen()).keyPressed(keyEvent);
+		}
+	}
+
+	public void keyReleased(KeyEvent keyEvent) {
+		if (keyEvent.keyCode == SWT.F1 || keyEvent.keyCode == SWT.F2 || keyEvent.keyCode == SWT.F3) {
+			((EmulatorScreen) Emulator.getEmulator().getScreen()).keyReleased(keyEvent);
+		}
 	}
 
 

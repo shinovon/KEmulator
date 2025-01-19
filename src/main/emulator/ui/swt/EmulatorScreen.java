@@ -1825,7 +1825,7 @@ public final class EmulatorScreen implements
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
 		if (keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
 			n = keyEvent.character;
-		if (this.caret.keyPressed(keyEvent) && lastDisplayable instanceof javax.microedition.lcdui.Canvas) {
+		if (this.caret._keyPressed(keyEvent) && lastDisplayable instanceof javax.microedition.lcdui.Canvas) {
 			String r = mapKey(n);
 			if (r != null) caretKeys.add(r);
 			return;
