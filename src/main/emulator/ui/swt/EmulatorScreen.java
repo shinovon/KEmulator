@@ -180,7 +180,6 @@ public final class EmulatorScreen implements
 	private Composite swtContent;
 	private Displayable lastDisplayable;
 	private boolean painted;
-	private final Vector<String> caretKeys = new Vector<String>();
 	protected int dialogSelection;
 	private boolean midletSupportsMultitouch;
 	private boolean touchEnabled;
@@ -1823,13 +1822,9 @@ public final class EmulatorScreen implements
 			return;
 		}
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
+		caret._keyPressed(keyEvent);
 		if (keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
 			n = keyEvent.character;
-		if (this.caret._keyPressed(keyEvent) && lastDisplayable instanceof javax.microedition.lcdui.Canvas) {
-			String r = mapKey(n);
-			if (r != null) caretKeys.add(r);
-			return;
-		}
 		handleKeyPress(n);
 	}
 
@@ -1840,14 +1835,6 @@ public final class EmulatorScreen implements
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
 		if (keyEvent.character >= 33 && keyEvent.character <= 90 && Settings.canvasKeyboard && !(n >= 48 && n <= 57))
 			n = keyEvent.character;
-		if (!caretKeys.isEmpty()) {
-			String r = mapKey(n);
-			if (r == null) return;
-			if (caretKeys.contains(r)) {
-				caretKeys.remove(r);
-				return;
-			}
-		}
 		handleKeyRelease(n);
 	}
 
@@ -1922,13 +1909,6 @@ public final class EmulatorScreen implements
 		final String r;
 		if ((r = mapKey(n)) == null) {
 			return;
-		}
-		if (!caretKeys.isEmpty()) {
-			// TODO
-			if (caretKeys.contains(r)) {
-				caretKeys.remove(r);
-				return;
-			}
 		}
 		n = Integer.parseInt(r);
 		synchronized (pressedKeys) {
