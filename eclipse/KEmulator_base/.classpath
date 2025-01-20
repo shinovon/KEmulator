@@ -26,10 +26,11 @@
 	<classpathentry kind="lib" path="lib/lwjgl3-swt-common.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl-glfw.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl-opengl.jar"/>
-	<classpathentry kind="lib" path="lib/vlcj-4.7.1.jar"/>
-	<classpathentry kind="lib" path="lib/vlcj-natives-4.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/vlcj-4.7.3.jar"/>
+	<classpathentry kind="lib" path="lib/vlcj-natives-4.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/webcam-capture-0.3.12.jar"/>
 	<classpathentry kind="lib" path="lib/zip.jar"/>
 	<classpathentry kind="lib" path="home/swt-win32-x86.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
+
