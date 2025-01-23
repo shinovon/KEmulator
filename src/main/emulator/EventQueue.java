@@ -355,7 +355,6 @@ public final class EventQueue implements Runnable {
 						}
 						case EVENT_RESUME: {
 							Displayable d = getCurrent();
-							if (!(d instanceof Canvas)) break;
 							if (Settings.startAppOnResume) {
 								try {
 									Thread t = new Thread(new InvokeStartAppRunnable(false));
@@ -365,6 +364,7 @@ public final class EventQueue implements Runnable {
 									e.printStackTrace();
 								}
 							}
+							if (!(d instanceof Canvas)) break;
 							((Canvas) d)._invokeShowNotify();
 							break;
 						}
