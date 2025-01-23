@@ -122,11 +122,12 @@ public class Gauge extends Item {
 					}
 				}
 			}
+			w -= 4;
 			g.setColor(0xababab);
-			g.drawRect(x, y + yoff, w, h);
+			g.drawRect(x + 2, y + yoff, w, h);
 			if (max <= 0 || val < 0) return;
 			g.setColor(0x0000ff);
-			g.fillRect(x + 2, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
+			g.fillRect(x + 4, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
 		} else {
 			int xoff1 = Item.font.stringWidth("0") + 2;
 			int xoff2 = Item.font.stringWidth(Integer.toString(max)) + 2;

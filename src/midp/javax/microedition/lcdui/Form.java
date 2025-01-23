@@ -421,6 +421,7 @@ public class Form extends Screen {
 			} else row.hidden();
 			y += rh;
 		}
+		g.setClip(0, 0, this.w, this.h);
 	}
 
 	Row getFirstRow(Item item) {
