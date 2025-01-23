@@ -283,14 +283,14 @@ public class DateField extends Item {
 					setDate(c.getTime());
 				}
 			} else if (buffer.length() >= 2 || n == 0) {
-				int i = Math.max(1, Integer.parseInt(buffer.toString()));
+				int i = Math.max(0, Integer.parseInt(buffer.toString()));
 				switch (pos) {
 					case 0:
-						i = Math.min(i, monthDays(c.get(Calendar.MONTH), c.get(Calendar.YEAR)));
+						i = Math.min(Math.max(1, i), monthDays(c.get(Calendar.MONTH), c.get(Calendar.YEAR)));
 						c.set(Calendar.DAY_OF_MONTH, i);
 						break;
 					case 1:
-						i = Math.min(i, 12) - 1;
+						i = Math.max(1, Math.min(i, 12)) - 1;
 						c.set(Calendar.DAY_OF_MONTH,
 								Math.min(c.get(Calendar.DAY_OF_MONTH),
 								monthDays(i, c.get(Calendar.YEAR))));
