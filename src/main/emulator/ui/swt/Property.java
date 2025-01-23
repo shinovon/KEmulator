@@ -323,6 +323,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button fpsLimitJlCheck;
 	private Button autoUpdatesBtn;
 	private Button m3gFlushImmediately;
+	private Button keymapResetBtn;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -495,6 +496,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("GL") ? 1 : 0);
 
 			Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
+			Settings.syncFlush = Boolean.parseBoolean(properties.getProperty("SyncFlush", "false"));
 
 			// keyboard mappings
 			KeyMapping.mapDeviceKey(0, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_0")));
@@ -731,7 +733,9 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("2D_Graphics_Engine", (Settings.g2d == 0) ? "SWT" : "AWT");
 			properties.setProperty("3D_Graphics_Engine", (Settings.g3d == 0) ? "SWERVE" : "LWJ");
 			properties.setProperty("Micro3D_Engine", (Settings.micro3d == 0) ? "DLL" : "GL");
+
 			properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
+			properties.setProperty("SyncFlush", String.valueOf(Settings.syncFlush));
 
 			// keyboard mappings
 			properties.setProperty("MAP_KEY_NUM_0", KeyMapping.get(0));
@@ -1558,7 +1562,7 @@ public final class Property implements IProperty, SelectionListener {
 		keyMapControllerComp = new Composite(keyMapTabComp, 0);
 		keyMapControllerComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		l = new GridLayout();
-		l.numColumns = 5;
+		l.numColumns = 6;
 		keyMapControllerComp.setLayout(l);
 
 		keyMapBindsComp = new Composite(keyMapTabComp, 0);
@@ -1767,6 +1771,62 @@ public final class Property implements IProperty, SelectionListener {
 						Controllers.bind(controllerCombo.getSelectionIndex() - 1, i, "");
 					}
 				}
+			}
+		});
+		keymapResetBtn = new Button(this.keyMapControllerComp, 8388616);
+		keymapResetBtn.setText(UILocale.get("OPTION_KEYMAP_RESET", "Reset"));
+		GridData layoutData4 = new GridData();
+		layoutData4.horizontalAlignment = 2;
+		layoutData4.verticalAlignment = 2;
+		this.keymapResetBtn.setLayoutData(layoutData4);
+		this.keymapResetBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (controllerCombo.getText().equals("Keyboard")) {
+					KeyMapping.mapDeviceKey(0, "48");
+					KeyMapping.mapDeviceKey(1, "55");
+					KeyMapping.mapDeviceKey(2, "56");
+					KeyMapping.mapDeviceKey(3, "57");
+					KeyMapping.mapDeviceKey(4, "52");
+					KeyMapping.mapDeviceKey(5, "53");
+					KeyMapping.mapDeviceKey(6, "54");
+					KeyMapping.mapDeviceKey(7, "49");
+					KeyMapping.mapDeviceKey(8, "50");
+					KeyMapping.mapDeviceKey(9, "51");
+					KeyMapping.mapDeviceKey(10, "42");
+					KeyMapping.mapDeviceKey(11, "47");
+					KeyMapping.mapDeviceKey(12, "1");
+					KeyMapping.mapDeviceKey(13, "2");
+					KeyMapping.mapDeviceKey(14, "3");
+					KeyMapping.mapDeviceKey(15, "4");
+					KeyMapping.mapDeviceKey(16, "13");
+					KeyMapping.mapDeviceKey(17, "10");
+					KeyMapping.mapDeviceKey(18, "11");
+					for (int i = 0; i < Property.aStringArray661.length; i++) {
+						Property.aStringArray661[i] = KeyMapping.get(i);
+					}
+				} else {
+					int i = controllerCombo.getSelectionIndex() - 1;
+					Controllers.bind(i, 0, "0");
+					Controllers.bind(i, 1, "1");
+					Controllers.bind(i, 2, "2");
+					Controllers.bind(i, 3, "3");
+					Controllers.bind(i, 4, "4");
+					Controllers.bind(i, 5, "5");
+					Controllers.bind(i, 6, "6");
+					Controllers.bind(i, 7, "7");
+					Controllers.bind(i, 8, "8");
+					Controllers.bind(i, 9, "12");
+					Controllers.bind(i, 10, "13");
+					Controllers.bind(i, 11, "14");
+					Controllers.bind(i, 12, "UP");
+					Controllers.bind(i, 13, "DOWN");
+					Controllers.bind(i, 14, "LEFT");
+					Controllers.bind(i, 15, "RIGHT");
+					Controllers.bind(i, 16, "9");
+					Controllers.bind(i, 17, "10");
+					Controllers.bind(i, 18, "11");
+				}
+				method406();
 			}
 		});
 		this.method402();
