@@ -657,7 +657,7 @@ public final class Property implements IProperty, SelectionListener {
 			// media
 			Settings.vlcDir = properties.getProperty("VlcDir", "");
 			Settings.searchVms = Boolean.parseBoolean(properties.getProperty("MIDISearchVMS", "true"));
-			Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "false"));
+			Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "true"));
 			Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
 			Settings.enableMediaDump = Boolean.parseBoolean(properties.getProperty("EnableMediaDump", "false"));
 			Settings.enableOTT = Boolean.parseBoolean(properties.getProperty("EnableOTT", "true"));
