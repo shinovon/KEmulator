@@ -154,10 +154,11 @@ public class DateField extends Item {
 			}
 			g.drawString(s, xo, yo, 0);
 			if (pos == 2) cx = xo + Screen.font.stringWidth(s);
-			xo += width2 +  width3 + 8;
+			xo += width2 + width3 + 8;
 			pos -= 3;
 		}
 		if ((mode & TIME) != 0) {
+			g.setColor(0);
 			if (focused && pos == 0) {
 				if (typing) {
 					s = buffer.toString();
@@ -192,7 +193,7 @@ public class DateField extends Item {
 				if (s.length() < 2) s = "0".concat(s);
 			}
 			g.drawString(s, xo, yo, 0);
-			if (pos == 2) cx = xo + Screen.font.stringWidth(s);
+			if (pos == 1) cx = xo + Screen.font.stringWidth(s);
 		}
 		if ((caretX != cx || caretY != yo + 2 || updateFocus) && focused) {
 			updateFocus = false;
@@ -297,12 +298,12 @@ public class DateField extends Item {
 						c.set(Calendar.MONTH, i);
 						break;
 					case 3:
-						i = Math.min(i, 24);
+						i = Math.min(i, 23);
 						c.set(Calendar.HOUR_OF_DAY, i);
 						c.set(Calendar.SECOND, 0);
 						break;
 					case 4:
-						i = Math.min(i, 60);
+						i = Math.min(i, 59);
 						c.set(Calendar.MINUTE, i);
 						c.set(Calendar.SECOND, 0);
 						break;

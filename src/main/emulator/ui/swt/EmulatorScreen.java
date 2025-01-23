@@ -2655,8 +2655,10 @@ public final class EmulatorScreen implements
 
 		Table table = new Table(shell, SWT.BORDER | SWT.SINGLE);
 		table.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent arg0) {
-				dialogSelection = table.getSelectionIndex();
+			public void widgetSelected(SelectionEvent e) {
+				// TODO
+				if ((dialogSelection = table.getSelectionIndex()) == -1)
+					return;
 				shell.close();
 			}
 		});
