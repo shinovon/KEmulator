@@ -98,7 +98,7 @@ public class Alert extends Screen {
 		this.textArr = c.textArr(this.string, Screen.font, n, n);
 		g.setColor(-16777216);
 		int h = Screen.fontHeight4 - scroll;
-		g.setClip(bounds[X], bounds[Y], n, bounds[H]);
+		g.setClip(bounds[X], bounds[Y], bounds[W], bounds[H]);
 		for (int i = 0; i < this.textArr.length; ++i) {
 			g.drawString(this.textArr[i], 4, h + 2, 0);
 			h += Screen.fontHeight4;
