@@ -6,7 +6,9 @@ import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
 
 import javax.microedition.lcdui.Canvas;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Set;
 
 public class Controllers {
 	private static final ArrayList controllers = new ArrayList();
@@ -27,7 +29,7 @@ public class Controllers {
 			return;
 		}
 		try {
-			Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
+			Controller[] controllers = getDefaultEnvironment().getControllers();
 			ArrayList list = new ArrayList<Controller>();
 			for (Controller controller : controllers) {
 				if (!controller.getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
@@ -161,12 +163,36 @@ public class Controllers {
 		}
 	}
 
+	private static ControllerEnvironment getDefaultEnvironment() throws Exception {
+		if (Emulator.isJava9()) {
+			return ControllerEnvironment.getDefaultEnvironment();
+		}
+		Constructor<ControllerEnvironment> constructor = (Constructor<ControllerEnvironment>)
+				Class.forName("net.java.games.input.DefaultControllerEnvironment").getDeclaredConstructors()[0];
+		constructor.setAccessible(true);
+		return constructor.newInstance();
+	}
+
 	private static void reset() {
 		Controllers.loaded = false;
 		Controllers.controllers.clear();
 		Controllers.count = 0;
 		Controllers.arrowKeysState = null;
 		Controllers.binds = null;
+
+		try {
+			Set<Thread> threads = Thread.getAllStackTraces().keySet();
+			for (Thread thread : threads) {
+				if (thread.getClass().getName().equals("net.java.games.input.RawInputEventQueue$QueueThread")) {
+					thread.interrupt();
+					try {
+						thread.join();
+					} catch (InterruptedException e) {
+						thread.interrupt();
+					}
+				}
+			}
+		} catch (Exception ignored) {}
 	}
 
 	public static void poll() {
