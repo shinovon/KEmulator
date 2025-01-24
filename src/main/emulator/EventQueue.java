@@ -572,10 +572,9 @@ public final class EventQueue implements Runnable {
 		public void run() {
 			while (running) {
 				try {
-					if (!added)
-						synchronized (readLock) {
-							readLock.wait();
-						}
+					synchronized (readLock) {
+						if (!added) readLock.wait();
+					}
 					added = false;
 					while (Emulator.getMIDlet() == null || paused) {
 						Thread.sleep(5);
