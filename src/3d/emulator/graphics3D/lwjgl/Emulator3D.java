@@ -87,8 +87,9 @@ public final class Emulator3D implements IGraphics3D, Runnable {
     private static final Object m3gTasksLock = new Object();
     private static final Vector<Runnable> m3gTasks = new Vector();
     private static boolean threadBound;
+	private boolean added;
 
-    private Emulator3D() {
+	private Emulator3D() {
 		instance = this;
 		properties.put("supportAntialiasing", Boolean.TRUE);
 		properties.put("supportTrueColor", Boolean.TRUE);
@@ -391,7 +392,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	}
 
 	private void setupDepth() {
-		sync(() -> GL11.glDepthRange(depthRangeNear, depthRangeFar));
+		async(() -> GL11.glDepthRange(depthRangeNear, depthRangeFar));
 	}
 
 	public final void setViewport(int x, int y, int w, int h) {
@@ -402,14 +403,14 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	}
 
 	private void setupViewport() {
-        sync(() -> {
+        async(() -> {
             GL11.glViewport(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
             GL11.glScissor(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
         });
 	}
 
 	public final void clearBackgound(Object bgObj) {
-        sync(() -> {
+        async(() -> {
             Background bg = (Background) bgObj;
 
             setupViewport();
@@ -1336,13 +1337,16 @@ public final class Emulator3D implements IGraphics3D, Runnable {
     public void run() {
         try {
             while (true) {
-                synchronized (m3gTasksLock) {
-                    m3gTasksLock.wait();
-                }
+				if (!added) {
+					synchronized (m3gTasksLock) {
+						m3gTasksLock.wait();
+					}
+				} else added = false;
                 Runnable task;
                 while (!m3gTasks.isEmpty()) {
 					synchronized (m3gTasks) {
-						task = m3gTasks.get(0);
+						if ((task = m3gTasks.get(0)) == null)
+							continue;
 						m3gTasks.removeElementAt(0);
 					}
 					System.out.println("- " + task);
@@ -1370,6 +1374,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
     public void sync(Runnable r) throws M3GException {
         if (Thread.currentThread() == m3gThread) {
+			System.out.println("> " + r);
             try {
                 r.run();
             } catch (Exception e) {
@@ -1380,9 +1385,10 @@ public final class Emulator3D implements IGraphics3D, Runnable {
         M3GTask task = new M3GTask(r);
 		System.out.println("+ " + task);
         synchronized (task) {
+			m3gTasks.add(task);
+			added = true;
             synchronized (m3gTasksLock) {
-                m3gTasks.add(task);
-                m3gTasksLock.notifyAll();
+                m3gTasksLock.notify();
             }
             try {
                 task.wait();
@@ -1396,9 +1402,16 @@ public final class Emulator3D implements IGraphics3D, Runnable {
     }
 
     public void async(Runnable r) {
+		if (Thread.currentThread() == m3gThread) {
+			System.out.println("> " + r);
+			r.run();
+			return;
+		}
+		System.out.println("+a " + r);
+		m3gTasks.add(new M3GTask(r));
+		added = true;
         synchronized (m3gTasksLock) {
-            m3gTasks.add(new M3GTask(r));
-            m3gTasksLock.notifyAll();
+            m3gTasksLock.notify();
         }
     }
 
