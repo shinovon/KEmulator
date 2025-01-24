@@ -85,9 +85,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	private static boolean threadBound;
 	private final Thread taskThread;
 	private final Object tasksAddLock = new Object();
-	private final Object tasksExpandLock = new Object();
-	private Runnable[] tasks = new Runnable[16];
-	private int taskCount;
+	private final Vector<M3GTask> tasks = new Vector<M3GTask>();
 	private boolean taskAdded;
 
 	private Emulator3D() {
@@ -113,6 +111,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		renderPipe = new RenderPipe();
         
         taskThread = new Thread(this, "KEmulator-M3G");
+		taskThread.setPriority(5);
         taskThread.start();
 	}
 
@@ -1333,42 +1332,124 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		flipImage = b;
 	}
 
+	private void bindM3GThread(int w, int h, boolean forceWindow) throws Exception {
+		if (!initialized) {
+			if (glCanvas != null) {
+				disposeGlCanvas();
+			}
+			if (window != 0) {
+				glfwDestroyWindow(window);
+				window = 0;
+			}
+			if (!forceWindow && Settings.m3gContextMode != 3) {
+				EmulatorImpl.syncExec(new Runnable() {
+					public void run() {
+						try {
+							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, Settings.m3gContextMode);
+							glCanvas.setSize(1, 1);
+							glCanvas.setVisible(true);
+						} catch (Throwable e) {
+							e.printStackTrace();
+							glCanvas = null;
+						}
+					}
+				});
+			}
+
+			try {
+				if (glCanvas == null) throw new Exception("glCanvas == null");
+				GLCanvasUtil.makeCurrent(glCanvas);
+				getCapabilities();
+
+				EmulatorImpl.syncExec(new Runnable() {
+					public void run() {
+						glCanvas.addControlListener(new ControlListener() {
+							public void controlMoved(ControlEvent controlEvent) {
+							}
+
+							public void controlResized(ControlEvent controlEvent) {
+								if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
+								glCanvas.setSize(targetWidth, targetHeight);
+								glCanvas.setVisible(false);
+							}
+						});
+					}
+				});
+			} catch (Exception e) {
+				if (!"glCanvas == null".equals(e.getMessage()))
+					e.printStackTrace();
+
+				if (glCanvas != null) {
+					disposeGlCanvas();
+				}
+
+				if (window == 0) {
+					Emulator.getEmulator().getLogStream().println("Creating invisible glfw window");
+					if (!glfwInit())
+						throw new Exception("glfwInit");
+
+					glfwDefaultWindowHints();
+					glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+					glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
+					window = glfwCreateWindow(w, h, "M3G", 0, 0);
+					if (window == 0) {
+						throw new Exception("Window creation failed (GLFW Error: " + glfwGetError(null) + ")");
+					}
+				}
+
+
+				glfwMakeContextCurrent(window);
+				int error = glfwGetError(null);
+				if (error != 0) {
+					Emulator.getEmulator().getLogStream().println("GLFW Error: " + error);
+				}
+				getCapabilities();
+			}
+			Emulator.getEmulator().getLogStream().println("GL Renderer: " + GL11.glGetString(GL_RENDERER) + " (" + GL11.glGetString(GL_VENDOR) + ")");
+			initialized = true;
+		} else {
+			if (window != 0) {
+				glfwMakeContextCurrent(window);
+			} else {
+				GLCanvasUtil.makeCurrent(glCanvas);
+			}
+			getCapabilities();
+		}
+		threadBound = true;
+	}
+
     // m3g thread
 
     public void run() {
         try {
             while (true) {
-				if (!taskAdded) {
-					synchronized (tasksAddLock) {
-						tasksAddLock.wait();
-					}
-				} else taskAdded = false;
+				synchronized (tasksAddLock) {
+					if (!taskAdded) tasksAddLock.wait();
+				}
+				taskAdded = false;
 
-                Runnable task;
-                while (taskCount != 0) {
-					if ((task = tasks[0]) == null)
-						continue;
+                M3GTask task;
+                while (!tasks.isEmpty()) {
+					synchronized (tasks) {
+						if ((task = tasks.get(0)) == null)
+							continue;
+						tasks.removeElementAt(0);
+					}
 					System.out.println("++ " + task);
                     synchronized (task) {
                         try {
                             task.run();
                         } catch (Throwable e) {
-                            if (task instanceof M3GTask) {
-                                ((M3GTask) task).exception = e;
-                            } else {
-                                System.out.println("Exception in M3G thread");
-                                e.printStackTrace();
-                            }
-                        }
-						synchronized (tasksExpandLock) {
-							System.arraycopy(tasks, 1, tasks, 0, tasks.length - 1);
-							tasks[--taskCount] = null;
+							task.exception = e;
+                        } finally {
+							System.out.println("-- " + task);
+							task.notifyAll();
 						}
-						System.out.println("- " + task);
-						task.notifyAll();
                     }
                 }
-            }
+			}
         } catch (Throwable e) {
             System.out.println("Uncaught exception in M3G thread");
             e.printStackTrace();
@@ -1385,19 +1466,23 @@ public final class Emulator3D implements IGraphics3D, Runnable {
             }
             return;
         }
+
         M3GTask task = new M3GTask(r);
 		System.out.println("+ " + task);
+		addTask(task);
+
         synchronized (task) {
-			addTask(task);
-            try {
-                task.wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-			System.out.println("--- " + task);
-        }
-        if (task.exception != null) {
-            throw new M3GException(task.exception);
+			while (!task.done()) {
+				try {
+					task.wait();
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			System.out.println("- " + task);
+			if (task.exception != null) {
+				throw new M3GException(task.exception);
+			}
         }
     }
 
@@ -1407,110 +1492,18 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 			r.run();
 			return;
 		}
+
 		System.out.println("+a " + r);
 		addTask(new M3GTask(r));
     }
 
 	private void addTask(M3GTask task) {
-		synchronized (tasksExpandLock) {
-			if (taskCount + 1 >= tasks.length) {
-				System.arraycopy(tasks, 0, tasks = new Runnable[tasks.length * 2], 0, taskCount);
-			}
-		}
-		tasks[taskCount++] = new M3GTask(task);
+		tasks.add(task);
 		taskAdded = true;
 		synchronized (tasksAddLock) {
-			tasksAddLock.notify();
+			tasksAddLock.notifyAll();
 		}
 	}
-
-    private void bindM3GThread(int w, int h, boolean forceWindow) throws Exception {
-        if (!initialized) {
-            if (glCanvas != null) {
-                disposeGlCanvas();
-            }
-            if (window != 0) {
-                glfwDestroyWindow(window);
-                window = 0;
-            }
-            if (!forceWindow && Settings.m3gContextMode != 3) {
-                EmulatorImpl.syncExec(new Runnable() {
-                    public void run() {
-                        try {
-                            Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
-                            glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, Settings.m3gContextMode);
-                            glCanvas.setSize(1, 1);
-                            glCanvas.setVisible(true);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                            glCanvas = null;
-                        }
-                    }
-                });
-            }
-
-            try {
-                if (glCanvas == null) throw new Exception("glCanvas == null");
-                GLCanvasUtil.makeCurrent(glCanvas);
-                getCapabilities();
-
-                EmulatorImpl.syncExec(new Runnable() {
-                    public void run() {
-                        glCanvas.addControlListener(new ControlListener() {
-                            public void controlMoved(ControlEvent controlEvent) {
-                            }
-
-                            public void controlResized(ControlEvent controlEvent) {
-                                if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
-                                glCanvas.setSize(targetWidth, targetHeight);
-                                glCanvas.setVisible(false);
-                            }
-                        });
-                    }
-                });
-            } catch (Exception e) {
-                if (!"glCanvas == null".equals(e.getMessage()))
-                    e.printStackTrace();
-
-                if (glCanvas != null) {
-                    disposeGlCanvas();
-                }
-
-                if (window == 0) {
-                    Emulator.getEmulator().getLogStream().println("Creating invisible glfw window");
-                    if (!glfwInit())
-                        throw new Exception("glfwInit");
-
-                    glfwDefaultWindowHints();
-                    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-                    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
-                    window = glfwCreateWindow(w, h, "M3G", 0, 0);
-                    if (window == 0) {
-                        throw new Exception("Window creation failed (GLFW Error: " + glfwGetError(null) + ")");
-                    }
-                }
-
-
-                glfwMakeContextCurrent(window);
-                int error = glfwGetError(null);
-                if (error != 0) {
-                    Emulator.getEmulator().getLogStream().println("GLFW Error: " + error);
-                }
-                getCapabilities();
-            }
-            Emulator.getEmulator().getLogStream().println("GL Renderer: " + GL11.glGetString(GL_RENDERER) + " (" + GL11.glGetString(GL_VENDOR) + ")");
-        	initialized = true;
-		} else {
-            if (window != 0) {
-                glfwMakeContextCurrent(window);
-            } else {
-                GLCanvasUtil.makeCurrent(glCanvas);
-            }
-            getCapabilities();
-        }
-        threadBound = true;
-    }
 
     static class M3GTask implements Runnable {
         private Runnable run;
@@ -1522,7 +1515,12 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
         public void run() {
             run.run();
+			run = null;
         }
+
+		public boolean done() {
+			return run == null || exception != null;
+		}
 
 		public String toString() {
 			return "M3GTask@" + hashCode() + ":" + run;
