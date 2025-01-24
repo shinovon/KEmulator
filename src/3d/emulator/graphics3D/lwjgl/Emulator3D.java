@@ -109,10 +109,9 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
 		memoryBuffers = new LWJGLUtil();
 		renderPipe = new RenderPipe();
-		
+
 		taskThread = new Thread(this, "KEmulator-M3G");
 		taskThread.setPriority(5);
-		taskThread.start();
 	}
 
 	public static Emulator3D getInstance() {
@@ -137,6 +136,10 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		}
 		this.egl = forceWindow;
 		Profiler3D.bindTargetCallCount++;
+
+		if (!taskThread.isAlive()) {
+			taskThread.start();
+		}
 
 		int w;
 		int h;

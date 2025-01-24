@@ -137,7 +137,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public synchronized void queue(int n) {
-		if (n == EVENT_PAINT) {
+		if (n == EVENT_PAINT || n == EVENT_SCREEN) {
 			if (repaintPending)
 				return;
 			repaintPending = true;
@@ -289,6 +289,7 @@ public final class EventQueue implements Runnable {
 						}
 						case EVENT_SCREEN: {
 							Displayable d = getCurrent();
+							repaintPending = false;
 							if (!(d instanceof Screen)) break;
 							IScreen scr = Emulator.getEmulator().getScreen();
 							final IImage backBufferImage3 = scr.getBackBufferImage();

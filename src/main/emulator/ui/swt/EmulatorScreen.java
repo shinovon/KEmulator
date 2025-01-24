@@ -186,6 +186,7 @@ public final class EmulatorScreen implements
 	private final Vector<Long> touchIds = new Vector<Long>();
 	private int lastPointerX;
 	private int lastPointerY;
+	private boolean paintPending;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -593,9 +594,11 @@ public final class EmulatorScreen implements
 		}
 		if (Settings.syncFlush) {
 			EmulatorImpl.syncExec(this);
-		} else {
-			EmulatorImpl.asyncExec(this);
+			return;
 		}
+		if (paintPending) return;
+		paintPending = true;
+		EmulatorImpl.asyncExec(this);
 	}
 
 	public int getWidth() {
@@ -1723,6 +1726,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void run() {
+		paintPending = false;
 		if (this.pauseState != 1) {
 			return;
 		}
