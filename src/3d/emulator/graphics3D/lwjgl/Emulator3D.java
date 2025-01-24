@@ -42,7 +42,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	private static Emulator3D instance;
 	private final LWJGLUtil memoryBuffers;
 	private final RenderPipe renderPipe;
-    private Object target;
+	private Object target;
 	private boolean depthBufferEnabled;
 	private int hints;
 	private static int targetWidth;
@@ -109,10 +109,10 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
 		memoryBuffers = new LWJGLUtil();
 		renderPipe = new RenderPipe();
-        
-        taskThread = new Thread(this, "KEmulator-M3G");
+		
+		taskThread = new Thread(this, "KEmulator-M3G");
 		taskThread.setPriority(5);
-        taskThread.start();
+		taskThread.start();
 	}
 
 	public static Emulator3D getInstance() {
@@ -155,15 +155,16 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 			h = ((Image2D) this.target).getHeight();
 		}
 
-        if (!threadBound) {
-           sync(() -> {
-               try {
-                   bindM3GThread(w, h, forceWindow);
-               } catch (Exception e) {
-                   throw new M3GException(e);
-               }
-           });
-        }
+		if (!threadBound || !Settings.m3gThread) {
+			threadBound = true;
+			sync(() -> {
+			   try {
+				   bindM3GThread(w, h, forceWindow);
+			   } catch (Exception e) {
+				   throw new M3GException(e);
+			   }
+			});
+		}
 
 		try {
 			if (targetWidth != w || targetHeight != h) {
@@ -175,7 +176,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 						}
 					});
 				} else {
-					sync(() -> glfwSetWindowSize(window, w, h));
+					async(() -> glfwSetWindowSize(window, w, h));
 				}
 				if (Settings.g2d == 1) {
 					awtBufferImage = new BufferedImage(w, h, 4);
@@ -187,13 +188,13 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 				targetHeight = h;
 			}
 
-            sync(() -> {
-                GL11.glEnable(GL_SCISSOR_TEST);
-                GL11.glEnable(GL_NORMALIZE);
-                GL11.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-                if (Settings.m3gFlushImmediately)
-                    swapBuffers();
-            });
+			async(() -> {
+				GL11.glEnable(GL_SCISSOR_TEST);
+				GL11.glEnable(GL_NORMALIZE);
+				GL11.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+				if (Settings.m3gFlushImmediately)
+					swapBuffers();
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.target = null;
@@ -218,20 +219,24 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		Profiler3D.releaseTargetCallCount++;
 
 		if (!egl) {
-            sync(() -> {
-                GL11.glFinish();
-                if (!Settings.m3gFlushImmediately)
-                    swapBuffers();
+			sync(() -> {
+				GL11.glFinish();
+				if (!Settings.m3gFlushImmediately)
+					swapBuffers();
 
-                while (!unusedGLTextures.isEmpty())
-                    releaseTexture(unusedGLTextures.get(0));
+				while (!unusedGLTextures.isEmpty())
+					releaseTexture(unusedGLTextures.get(0));
 
-                if (exiting) {
-                    while (!usedGLTextures.isEmpty())
-                        releaseTexture(usedGLTextures.get(0));
-                    return;
-                }
-            });
+				if (exiting) {
+					while (!usedGLTextures.isEmpty())
+						releaseTexture(usedGLTextures.get(0));
+					return;
+				}
+			});
+		}
+
+		if (!Settings.m3gThread) {
+			releaseContext();
 		}
 
 		this.target = null;
@@ -256,8 +261,8 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	}
 
 	public final void swapBuffers(boolean flip, int x, int y, int width, int height) {
-        sync(() -> {
-            Profiler3D.LWJGL_buffersSwapCount++;
+		sync(() -> {
+			Profiler3D.LWJGL_buffersSwapCount++;
 
 //		if (window != 0) {
 //			glfwSwapBuffers(window);
@@ -266,73 +271,73 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 //			GLCanvasUtil.swapBuffers(glCanvas);
 //		}
 
-            if (this.target != null) {
-                if (this.target instanceof Image2D) {
-                    Image2D var9 = (Image2D) this.target;
-                    buffer.rewind();
-                    GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-                    byte[] var11 = new byte[width * height * 4];
-                    int w = width << 2;
-                    int off = var11.length - w;
+			if (this.target != null) {
+				if (this.target instanceof Image2D) {
+					Image2D var9 = (Image2D) this.target;
+					buffer.rewind();
+					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+					byte[] var11 = new byte[width * height * 4];
+					int w = width << 2;
+					int off = var11.length - w;
 
-                    for (int i = height; i > 0; --i) {
-                        buffer.get(var11, off, w);
-                        off -= w;
-                    }
+					for (int i = height; i > 0; --i) {
+						buffer.get(var11, off, w);
+						off -= w;
+					}
 
-                    if (var9.getFormat() == 100) {
-                        var9.set(x, y, var9.getWidth(), var9.getHeight(), var11);
-                    } else {
-                        byte[] data = new byte[var9.getWidth() * var9.getHeight() * 3];
-                        int var6 = var11.length - 1;
+					if (var9.getFormat() == 100) {
+						var9.set(x, y, var9.getWidth(), var9.getHeight(), var11);
+					} else {
+						byte[] data = new byte[var9.getWidth() * var9.getHeight() * 3];
+						int var6 = var11.length - 1;
 
-                        for (int var7 = data.length - 1; var7 >= 0; data[var7--] = var11[var6--]) {
-                            --var6;
-                            data[var7--] = var11[var6--];
-                            data[var7--] = var11[var6--];
-                        }
+						for (int var7 = data.length - 1; var7 >= 0; data[var7--] = var11[var6--]) {
+							--var6;
+							data[var7--] = var11[var6--];
+							data[var7--] = var11[var6--];
+						}
 
-                        var9.set(x, y, var9.getWidth(), var9.getHeight(), data);
-                    }
-                } else if (Settings.g2d == 0) {
-                    buffer.rewind();
-                    GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-                    int w = swtBufferImage.width << 2;
-                    int off = swtBufferImage.data.length - w;
+						var9.set(x, y, var9.getWidth(), var9.getHeight(), data);
+					}
+				} else if (Settings.g2d == 0) {
+					buffer.rewind();
+					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+					int w = swtBufferImage.width << 2;
+					int off = swtBufferImage.data.length - w;
 
-                    for (int i = swtBufferImage.height; i > 0; --i) {
-                        buffer.get(swtBufferImage.data, off, w);
-                        off -= w;
-                    }
+					for (int i = swtBufferImage.height; i > 0; --i) {
+						buffer.get(swtBufferImage.data, off, w);
+						off -= w;
+					}
 
-                    Image var12 = new Image(null, swtBufferImage);
-                    ((Graphics2DSWT) ((Graphics) this.target).getImpl()).gc().drawImage(var12, 0, 0);
-                    var12.dispose();
-                } else {
-                    buffer.rewind();
-                    GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-                    int[] data = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
-                    IntBuffer ib = buffer.asIntBuffer();
-                    int off;
+					Image var12 = new Image(null, swtBufferImage);
+					((Graphics2DSWT) ((Graphics) this.target).getImpl()).gc().drawImage(var12, 0, 0);
+					var12.dispose();
+				} else {
+					buffer.rewind();
+					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+					int[] data = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
+					IntBuffer ib = buffer.asIntBuffer();
+					int off;
 
-                    if (flip) {
-                        off = 0;
-                        for (int i = height; i > 0; --i) {
-                            ib.get(data, off, width);
-                            off += width;
-                        }
-                    } else {
-                        off = data.length - width;
-                        for (int i = height; i > 0; --i) {
-                            ib.get(data, off, width);
-                            off -= width;
-                        }
-                    }
+					if (flip) {
+						off = 0;
+						for (int i = height; i > 0; --i) {
+							ib.get(data, off, width);
+							off += width;
+						}
+					} else {
+						off = data.length - width;
+						for (int i = height; i > 0; --i) {
+							ib.get(data, off, width);
+							off -= width;
+						}
+					}
 
-                    ((Graphics2DAWT) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, x, y, null);
-                }
-            }
-        });
+					((Graphics2DAWT) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, x, y, null);
+				}
+			}
+		});
 	}
 
 	public final void enableDepthBuffer(boolean enabled) {
@@ -347,7 +352,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		this.hints = hints;
 
 		if (target != null) {
-            sync(this::setHintsInternal);
+			async(this::setHintsInternal);
 		}
 	}
 
@@ -403,43 +408,43 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	}
 
 	private void setupViewport() {
-        async(() -> {
-            GL11.glViewport(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
-            GL11.glScissor(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
-        });
+		async(() -> {
+			GL11.glViewport(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
+			GL11.glScissor(viewportX, targetHeight - viewportY - viewportHeight, viewportWidth, viewportHeight);
+		});
 	}
 
 	public final void clearBackgound(Object bgObj) {
-        async(() -> {
-            Background bg = (Background) bgObj;
+		async(() -> {
+			Background bg = (Background) bgObj;
 
-            setupViewport();
-            setupDepth();
+			setupViewport();
+			setupDepth();
 
-            GL11.glClearDepth(1);
-            GL11.glDepthMask(true);
-            GL11.glColorMask(true, true, true, true);
+			GL11.glClearDepth(1);
+			GL11.glDepthMask(true);
+			GL11.glColorMask(true, true, true, true);
 
-            int bgColor = bg != null && !Settings.xrayView ? bg.getColor() : 0;
-            GL11.glClearColor(
-                    G3DUtils.getFloatColor(bgColor, 16),
-                    G3DUtils.getFloatColor(bgColor, 8),
-                    G3DUtils.getFloatColor(bgColor, 0),
-                    G3DUtils.getFloatColor(bgColor, 24)
-            );
+			int bgColor = bg != null && !Settings.xrayView ? bg.getColor() : 0;
+			GL11.glClearColor(
+					G3DUtils.getFloatColor(bgColor, 16),
+					G3DUtils.getFloatColor(bgColor, 8),
+					G3DUtils.getFloatColor(bgColor, 0),
+					G3DUtils.getFloatColor(bgColor, 24)
+			);
 
-            if (bg != null && !Settings.xrayView) {
-                int colorClear = bg.isColorClearEnabled() ? GL_COLOR_BUFFER_BIT : 0;
-                int depthClear = depthBufferEnabled && bg.isDepthClearEnabled() ? GL_DEPTH_BUFFER_BIT : 0;
-                GL11.glClear(colorClear | depthClear);
+			if (bg != null && !Settings.xrayView) {
+				int colorClear = bg.isColorClearEnabled() ? GL_COLOR_BUFFER_BIT : 0;
+				int depthClear = depthBufferEnabled && bg.isDepthClearEnabled() ? GL_DEPTH_BUFFER_BIT : 0;
+				GL11.glClear(colorClear | depthClear);
 
-                drawBackgroundImage(bg);
-            } else {
-                GL11.glClear(GL_COLOR_BUFFER_BIT | (depthBufferEnabled ? GL_DEPTH_BUFFER_BIT : 0));
-            }
-            if (Settings.m3gFlushImmediately)
-                swapBuffers();
-        });
+				drawBackgroundImage(bg);
+			} else {
+				GL11.glClear(GL_COLOR_BUFFER_BIT | (depthBufferEnabled ? GL_DEPTH_BUFFER_BIT : 0));
+			}
+			if (Settings.m3gFlushImmediately)
+				swapBuffers();
+		});
 	}
 
 	private void drawBackgroundImage(Background bg) {
@@ -628,30 +633,28 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	}
 
 	public final void render(VertexBuffer vb, IndexBuffer ib, Appearance ap, Transform trans, int scope) {
-        sync(() -> {
-            renderVertex(vb, ib, ap, trans, scope, 1.0F);
-        });
+		sync(() -> {
+			renderVertex(vb, ib, ap, trans, scope, 1.0F);
+		});
 	}
 
 	private void renderVertex(VertexBuffer vb, IndexBuffer ib, Appearance ap, Transform trans, int scope, float alphaFactor) {
-        sync(() -> {
-            if ((CameraCache.camera.getScope() & scope) != 0) {
-                setupViewport();
-                setupDepth();
-                setupCamera();
-                setupLights(LightsCache.m_lights, LightsCache.m_lightsTransform, scope);
+		if ((CameraCache.camera.getScope() & scope) != 0) {
+			setupViewport();
+			setupDepth();
+			setupCamera();
+			setupLights(LightsCache.m_lights, LightsCache.m_lightsTransform, scope);
 
-                if (trans != null) {
-                    Transform tmpMat = new Transform();
-                    tmpMat.set(trans);
-                    tmpMat.transpose();
-                    GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
-                }
+			if (trans != null) {
+				Transform tmpMat = new Transform();
+				tmpMat.set(trans);
+				tmpMat.transpose();
+				GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) tmpMat.getImpl()).m_matrix));
+			}
 
-                setupAppearance(ap, false);
-                draw(vb, ib, ap, alphaFactor);
-            }
-        });
+			setupAppearance(ap, false);
+			draw(vb, ib, ap, alphaFactor);
+		}
 	}
 
 	private void setupAppearance(Appearance ap, boolean spriteMode) {
@@ -799,6 +802,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	}
 
 	private void draw(VertexBuffer vb, IndexBuffer indices, Appearance ap, float alphaFactor) {
+		if (exiting) return;
 		Profiler3D.LWJGL_drawCallCount++;
 
 		VertexArray colors = vb.getColors();
@@ -1040,24 +1044,24 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	}
 
 	public synchronized void render(World world) {
-        sync(() -> {
-            Transform camTrans = new Transform();
-            world.getActiveCamera().getTransformTo(world, camTrans);
-            CameraCache.setCamera(world.getActiveCamera(), camTrans);
+		sync(() -> {
+			Transform camTrans = new Transform();
+			world.getActiveCamera().getTransformTo(world, camTrans);
+			CameraCache.setCamera(world.getActiveCamera(), camTrans);
 
-            clearBackgound(world.getBackground());
-            LightsCache.addLightsFromWorld(world);
-            renderPipe.pushRenderNode(world, null);
+			clearBackgound(world.getBackground());
+			LightsCache.addLightsFromWorld(world);
+			renderPipe.pushRenderNode(world, null);
 
-            renderPushedNodes();
-        });
+			renderPushedNodes();
+		});
 	}
 
 	public synchronized void render(Node node, Transform transform) {
-        sync(() -> {
-            renderPipe.pushRenderNode(node, transform);
-            renderPushedNodes();
-        });
+		sync(() -> {
+			renderPipe.pushRenderNode(node, transform);
+			renderPushedNodes();
+		});
 	}
 
 	private void renderPushedNodes() {
@@ -1302,7 +1306,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
 	private void dispose() {
 		exiting = true;
-		if (initialized) {
+		if (initialized && Settings.m3gThread) {
 			sync(() -> {
 				releaseTextures();
 				releaseContext();
@@ -1420,57 +1424,56 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 			}
 			getCapabilities();
 		}
-		threadBound = true;
 	}
 
-    // m3g thread
+	// m3g thread
 
-    public void run() {
-        try {
-            while (true) {
+	public void run() {
+		try {
+			while (true) {
 				synchronized (tasksAddLock) {
 					if (!taskAdded) tasksAddLock.wait();
 				}
 				taskAdded = false;
 
-                M3GTask task;
-                while (!tasks.isEmpty()) {
+				M3GTask task;
+				while (!tasks.isEmpty()) {
 					synchronized (tasks) {
 						if ((task = tasks.get(0)) == null)
 							continue;
 						tasks.removeElementAt(0);
 					}
-                    synchronized (task) {
-                        try {
-                            task.run();
-                        } catch (Throwable e) {
+					synchronized (task) {
+						try {
+							task.run();
+						} catch (Throwable e) {
 							task.exception = e;
-                        } finally {
+						} finally {
 							task.notifyAll();
 						}
-                    }
-                }
+					}
+				}
 			}
-        } catch (Throwable e) {
-            System.err.println("Uncaught exception in M3G thread");
-            e.printStackTrace();
-        }
-    }
+		} catch (Throwable e) {
+			System.err.println("Uncaught exception in M3G thread");
+			e.printStackTrace();
+		}
+	}
 
-    public void sync(Runnable r) throws M3GException {
-        if (Thread.currentThread() == taskThread) {
-            try {
-                r.run();
-            } catch (Exception e) {
-                throw new M3GException(e);
-            }
-            return;
-        }
+	public void sync(Runnable r) throws M3GException {
+		if (Thread.currentThread() == taskThread || !Settings.m3gThread) {
+			try {
+				r.run();
+			} catch (Exception e) {
+				throw new M3GException(e);
+			}
+			return;
+		}
 
-        M3GTask task = new M3GTask(r);
+		M3GTask task = new M3GTask(r);
 		addTask(task);
 
-        synchronized (task) {
+		synchronized (task) {
 			while (!task.done()) {
 				try {
 					task.wait();
@@ -1481,17 +1484,17 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 			if (task.exception != null) {
 				throw new M3GException(task.exception);
 			}
-        }
-    }
+		}
+	}
 
-    public void async(Runnable r) {
-		if (Thread.currentThread() == taskThread) {
+	public void async(Runnable r) {
+		if (Thread.currentThread() == taskThread || !Settings.m3gThread) {
 			r.run();
 			return;
 		}
 
 		addTask(new M3GTask(r));
-    }
+	}
 
 	private void addTask(M3GTask task) {
 		tasks.add(task);
@@ -1501,18 +1504,18 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		}
 	}
 
-    static class M3GTask implements Runnable {
-        private Runnable run;
-        Throwable exception;
+	static class M3GTask implements Runnable {
+		private Runnable run;
+		Throwable exception;
 
-        public M3GTask(Runnable r) {
-            this.run = r;
-        }
+		public M3GTask(Runnable r) {
+			this.run = r;
+		}
 
-        public void run() {
-            run.run();
+		public void run() {
+			run.run();
 			run = null;
-        }
+		}
 
 		public boolean done() {
 			return run == null || exception != null;
@@ -1521,11 +1524,11 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		public String toString() {
 			return "M3GTask@" + hashCode() + ":" + run;
 		}
-    }
+	}
 
-    public static class M3GException extends RuntimeException {
-        public M3GException(Throwable cause) {
-            super(cause);
-        }
-    }
+	public static class M3GException extends RuntimeException {
+		public M3GException(Throwable cause) {
+			super(cause);
+		}
+	}
 }

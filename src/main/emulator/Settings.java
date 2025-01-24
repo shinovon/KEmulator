@@ -125,4 +125,5 @@ public final class Settings {
 	public static String updateBranch = "stable";
 	public static int autoUpdate = 0; // 0 - not asked, 1 - manual, 2 - automatic
 	public static boolean syncFlush = true;
+	public static boolean m3gThread = true;
 }

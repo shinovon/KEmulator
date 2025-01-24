@@ -642,6 +642,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.m3gForcePerspectiveCorrection = Boolean.parseBoolean(properties.getProperty("M3GForcePerspectiveCorrection", "false"));
 			Settings.m3gDisableLightClamp = Boolean.parseBoolean(properties.getProperty("M3GDisableLightClamp", "false"));
 			Settings.m3gFlushImmediately = Boolean.parseBoolean(properties.getProperty("M3GFlushImmediately", "false"));
+			Settings.m3gThread = Boolean.parseBoolean(properties.getProperty("M3GThread", "true"));
 
 			Settings.m3gAA = Integer.parseInt(properties.getProperty("M3GAA", "0"));
 			Settings.m3gTexFilter = Integer.parseInt(properties.getProperty("M3GTexFilter", "0"));
@@ -868,6 +869,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("M3GForcePerspectiveCorrection", String.valueOf(Settings.m3gForcePerspectiveCorrection));
 			properties.setProperty("M3GDisableLightClamp", String.valueOf(Settings.m3gDisableLightClamp));
 			properties.setProperty("M3GFlushImmediately", String.valueOf(Settings.m3gFlushImmediately));
+			properties.setProperty("M3GThread", String.valueOf(Settings.m3gThread));
 
 			properties.setProperty("M3GAA", String.valueOf(Settings.m3gAA));
 			properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
