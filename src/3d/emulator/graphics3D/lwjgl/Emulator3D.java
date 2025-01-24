@@ -1302,10 +1302,12 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
 	private void dispose() {
 		exiting = true;
-        sync(() -> {
-            releaseTextures();
-            releaseContext();
-        });
+		if (initialized) {
+			sync(() -> {
+				releaseTextures();
+				releaseContext();
+			});
+		}
 		disposeGlCanvas();
 		if (window != 0) {
 			glfwDestroyWindow(window);
@@ -1341,6 +1343,7 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 				glfwDestroyWindow(window);
 				window = 0;
 			}
+			if (exiting) return;
 			if (!forceWindow && Settings.m3gContextMode != 3) {
 				EmulatorImpl.syncExec(new Runnable() {
 					public void run() {

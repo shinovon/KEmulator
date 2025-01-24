@@ -1,9 +1,11 @@
 package emulator.graphics3D.egl;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL11Ext;
@@ -15,91 +17,86 @@ import java.nio.*;
  */
 public final class GL11Impl extends GL10Impl implements javax.microedition.khronos.opengles.GL11, GL11Ext, GL11ExtensionPack {
 	public final synchronized boolean glIsBuffer(final int n) {
-		this.checkThread();
-		return GL15.glIsBuffer(n);
+		EGL10Impl.g3d.sync(() -> temp = GL15.glIsBuffer(n));
+		return (boolean) temp;
 	}
 
 	public final synchronized boolean glIsEnabled(final int n) {
-		this.checkThread();
-		return GL11.glIsEnabled(n);
+		EGL10Impl.g3d.sync(() -> temp = GL11.glIsEnabled(n));
+		return (boolean) temp;
 	}
 
 	public final synchronized boolean glIsTexture(final int n) {
-		this.checkThread();
-		return GL11.glIsTexture(n);
+		EGL10Impl.g3d.sync(() -> GL11.glIsTexture(n));
+		return (boolean) temp;
 	}
 
 	public final synchronized void glGenBuffers(final int n, final int[] array, final int n2) {
-		this.checkThread();
-		final IntBuffer intBuffer;
-		GL15.glGenBuffers(intBuffer = BufferUtils.createIntBuffer(n));
+		final IntBuffer intBuffer = BufferUtils.createIntBuffer(n);
+		EGL10Impl.g3d.sync(() -> GL15.glGenBuffers(intBuffer));
 		intBuffer.get(array, n2, n);
 	}
 
 	public final synchronized void glGenBuffers(final int n, final IntBuffer intBuffer) {
-		EGL10Impl.g3d.async(() -> GL15.glGenBuffers(intBuffer));
+		EGL10Impl.g3d.sync(() -> GL15.glGenBuffers(intBuffer));
 	}
 
 	public final synchronized void glDeleteBuffers(final int n, final int[] array, final int n2) {
-		this.checkThread();
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(n)).put(array, n2, n);
 		intBuffer.position(0);
-		GL15.glDeleteBuffers(intBuffer);
-	}
-
-	public final synchronized void glDeleteBuffers(final int n, final IntBuffer intBuffer) {
 		EGL10Impl.g3d.async(() -> GL15.glDeleteBuffers(intBuffer));
 	}
 
+	public final synchronized void glDeleteBuffers(final int n, final IntBuffer intBuffer) {
+		EGL10Impl.g3d.sync(() -> GL15.glDeleteBuffers(intBuffer));
+	}
+
 	public final synchronized void glBindBuffer(final int n, final int n2) {
-		EGL10Impl.g3d.async(() -> GL15.glBindBuffer(n, n2));
+		EGL10Impl.g3d.sync(() -> GL15.glBindBuffer(n, n2));
 	}
 
 	public final synchronized void glBufferData(final int n, final int n2, final Buffer buffer, final int n3) {
-		this.checkThread();
 		if (buffer instanceof ByteBuffer) {
-			GL15.glBufferData(n, (ByteBuffer) buffer, n3);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferData(n, (ByteBuffer) buffer, n3));
 			return;
 		}
 		if (buffer instanceof ShortBuffer) {
-			GL15.glBufferData(n, (ShortBuffer) buffer, n3);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferData(n, (ShortBuffer) buffer, n3));
 			return;
 		}
 		if (buffer instanceof IntBuffer) {
-			GL15.glBufferData(n, (IntBuffer) buffer, n3);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferData(n, (IntBuffer) buffer, n3));
 			return;
 		}
 		if (buffer instanceof FloatBuffer) {
-			GL15.glBufferData(n, (FloatBuffer) buffer, n3);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferData(n, (FloatBuffer) buffer, n3));
 		}
 	}
 
 	public final synchronized void glBufferSubData(final int n, final int n2, final int n3, final Buffer buffer) {
-		this.checkThread();
 		if (buffer instanceof ByteBuffer) {
-			GL15.glBufferSubData(n, (long) n2, (ByteBuffer) buffer);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferSubData(n, (long) n2, (ByteBuffer) buffer));
 			return;
 		}
 		if (buffer instanceof ShortBuffer) {
-			GL15.glBufferSubData(n, (long) n2, (ShortBuffer) buffer);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferSubData(n, (long) n2, (ShortBuffer) buffer));
 			return;
 		}
 		if (buffer instanceof IntBuffer) {
-			GL15.glBufferSubData(n, (long) n2, (IntBuffer) buffer);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferSubData(n, (long) n2, (IntBuffer) buffer));
 			return;
 		}
 		if (buffer instanceof FloatBuffer) {
-			GL15.glBufferSubData(n, (long) n2, (FloatBuffer) buffer);
+			EGL10Impl.g3d.sync(() -> GL15.glBufferSubData(n, (long) n2, (FloatBuffer) buffer));
 		}
 	}
 
 	public final synchronized void glGetBufferParameteriv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(n2)).put(array, n3, GLConfiguration.method769());
 		intBuffer.position(0);
-		GL15.glGetBufferParameteriv(n, n2, intBuffer);
+		EGL10Impl.g3d.async(() -> GL15.glGetBufferParameteriv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glGetBufferParameteriv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -123,58 +120,52 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glDrawElements(final int n, final int n2, final int n3, final int n4) {
-		this.checkThread();
-		GL11.glDrawElements(n, n2, n3, (long) n4);
+		EGL10Impl.g3d.async(() -> GL11.glDrawElements(n, n2, n3, (long) n4));
 	}
 
 	public final synchronized void glClipPlanef(final int n, final float[] array, final int n2) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer;
 		(doubleBuffer = BufferUtils.createDoubleBuffer(4)).put(array[n2]);
 		doubleBuffer.put(array[n2 + 1]);
 		doubleBuffer.put(array[n2 + 2]);
 		doubleBuffer.put(array[n2 + 3]);
 		doubleBuffer.position(0);
-		GL11.glClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glClipPlanef(final int n, final FloatBuffer floatBuffer) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer;
 		(doubleBuffer = BufferUtils.createDoubleBuffer(4)).put(floatBuffer.get());
 		doubleBuffer.put(floatBuffer.get());
 		doubleBuffer.put(floatBuffer.get());
 		doubleBuffer.put(floatBuffer.get());
 		doubleBuffer.position(0);
-		GL11.glClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glClipPlanex(final int n, final int[] array, final int n2) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer;
 		(doubleBuffer = BufferUtils.createDoubleBuffer(4)).put(array[n2] / 65536.0f);
 		doubleBuffer.put(array[n2 + 1] / 65536.0f);
 		doubleBuffer.put(array[n2 + 2] / 65536.0f);
 		doubleBuffer.put(array[n2 + 3] / 65536.0f);
 		doubleBuffer.position(0);
-		GL11.glClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glClipPlanex(final int n, final IntBuffer intBuffer) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer;
 		(doubleBuffer = BufferUtils.createDoubleBuffer(4)).put(intBuffer.get() / 65536.0f);
 		doubleBuffer.put(intBuffer.get() / 65536.0f);
 		doubleBuffer.put(intBuffer.get() / 65536.0f);
 		doubleBuffer.put(intBuffer.get() / 65536.0f);
 		doubleBuffer.position(0);
-		GL11.glClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glGetClipPlanef(final int n, final float[] array, final int n2) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer = BufferUtils.createDoubleBuffer(4);
-		GL11.glGetClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetClipPlane(n, doubleBuffer));
 		array[n2] = (float) doubleBuffer.get(0);
 		array[n2 + 1] = (float) doubleBuffer.get(1);
 		array[n2 + 2] = (float) doubleBuffer.get(2);
@@ -182,9 +173,8 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetClipPlanef(final int n, final FloatBuffer floatBuffer) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer = BufferUtils.createDoubleBuffer(4);
-		GL11.glGetClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetClipPlane(n, doubleBuffer));
 		floatBuffer.put((float) doubleBuffer.get(0));
 		floatBuffer.put((float) doubleBuffer.get(1));
 		floatBuffer.put((float) doubleBuffer.get(2));
@@ -192,9 +182,8 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetClipPlanex(final int n, final int[] array, final int n2) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer = BufferUtils.createDoubleBuffer(4);
-		GL11.glGetClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetClipPlane(n, doubleBuffer));
 		array[n2] = (int) (doubleBuffer.get(0) * 65536.0);
 		array[n2 + 1] = (int) (doubleBuffer.get(1) * 65536.0);
 		array[n2 + 2] = (int) (doubleBuffer.get(2) * 65536.0);
@@ -202,9 +191,8 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetClipPlanex(final int n, final IntBuffer intBuffer) {
-		this.checkThread();
 		final DoubleBuffer doubleBuffer = BufferUtils.createDoubleBuffer(4);
-		GL11.glGetClipPlane(n, doubleBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetClipPlane(n, doubleBuffer));
 		intBuffer.put((int) (doubleBuffer.get(0) * 65536.0));
 		intBuffer.put((int) (doubleBuffer.get(1) * 65536.0));
 		intBuffer.put((int) (doubleBuffer.get(2) * 65536.0));
@@ -212,110 +200,98 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetFixedv(final int n, final int[] array, final int n2) {
-		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-		GL11.glGetFloatv(n, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetFloatv(n, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			array[n2 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
 	}
 
 	public final synchronized void glGetFixedv(final int n, final IntBuffer intBuffer) {
-		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-		GL11.glGetFloatv(n, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetFloatv(n, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
 	}
 
 	public final synchronized void glGetFloatv(final int n, final float[] array, final int n2) {
-		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-		GL11.glGetFloatv(n, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetFloatv(n, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			array[n2 + i] = floatBuffer.get(i);
 		}
 	}
 
 	public final synchronized void glGetFloatv(final int n, final FloatBuffer floatBuffer) {
-		this.checkThread();
 		final int method768 = GLConfiguration.method768(n);
 		final FloatBuffer floatBuffer2 = BufferUtils.createFloatBuffer(16);
-		GL11.glGetFloatv(n, floatBuffer2);
+		EGL10Impl.g3d.sync(() -> GL11.glGetFloatv(n, floatBuffer2));
 		for (int i = 0; i < method768; ++i) {
 			floatBuffer.put(floatBuffer2.get(i));
 		}
 	}
 
 	public final synchronized void glGetLightfv(final int n, final int n2, final float[] array, final int n3) {
-		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		GL11.glGetLightfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetLightfv(n, n2, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = floatBuffer.get(i);
 		}
 	}
 
 	public final synchronized void glGetLightfv(final int n, final int n2, final FloatBuffer floatBuffer) {
-		this.checkThread();
-		GL11.glGetLightfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetLightfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetLightxv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		GL11.glGetLightfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetLightfv(n, n2, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
 	}
 
 	public final synchronized void glGetLightxv(final int n, final int n2, final IntBuffer intBuffer) {
-		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		GL11.glGetLightfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetLightfv(n, n2, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
 	}
 
 	public final synchronized void glGetMaterialfv(final int n, final int n2, final float[] array, final int n3) {
-		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		GL11.glGetMaterialfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetMaterialfv(n, n2, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = floatBuffer.get(i);
 		}
 	}
 
 	public final synchronized void glGetMaterialfv(final int n, final int n2, final FloatBuffer floatBuffer) {
-		this.checkThread();
-		GL11.glGetMaterialfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetMaterialfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetMaterialxv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		GL11.glGetMaterialfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetMaterialfv(n, n2, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
 	}
 
 	public final synchronized void glGetMaterialxv(final int n, final int n2, final IntBuffer intBuffer) {
-		this.checkThread();
 		final int method768;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method768 = GLConfiguration.method768(n2));
-		GL11.glGetMaterialfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetMaterialfv(n, n2, floatBuffer));
 		for (int i = 0; i < method768; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
@@ -326,219 +302,194 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 			throw new IllegalArgumentException();
 		}
 		// TODO
-//		array[0] = GL11.glGetPointerv(n, (long) array[0].remaining());
+//		PointerBuffer pointerBuffer = BufferUtils.createPointerBuffer(1);
+//		EGL10Impl.g3d.sync(() -> GL11.glGetPointerv(n, pointerBuffer));
+//		array[0] = pointerBuffer.get();
 	}
 
 	public final synchronized void glGetTexEnvfv(final int n, final int n2, final float[] array, final int n3) {
-		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexEnvfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexEnvfv(n, n2, floatBuffer));
 		floatBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexEnvfv(final int n, final int n2, final FloatBuffer floatBuffer) {
-		this.checkThread();
-		GL11.glGetTexEnvfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexEnvfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetTexEnviv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		final int method775;
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexEnviv(n, n2, intBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexEnviv(n, n2, intBuffer));
 		intBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexEnviv(final int n, final int n2, final IntBuffer intBuffer) {
-		EGL10Impl.g3d.async(() -> GL11.glGetTexEnviv(n, n2, intBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexEnviv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glGetTexEnvxv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexEnvfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexEnvfv(n, n2, floatBuffer));
 		for (int i = 0; i < method775; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
 	}
 
 	public final synchronized void glGetTexEnvxv(final int n, final int n2, final IntBuffer intBuffer) {
-		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexEnvfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexEnvfv(n, n2, floatBuffer));
 		for (int i = 0; i < method775; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
 	}
 
 	public final synchronized void glGetTexParameterfv(final int n, final int n2, final float[] array, final int n3) {
-		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexParameterfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexParameterfv(n, n2, floatBuffer));
 		floatBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexParameterfv(final int n, final int n2, final FloatBuffer floatBuffer) {
-		EGL10Impl.g3d.async(() -> GL11.glGetTexParameterfv(n, n2, floatBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexParameterfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetTexParameteriv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		final int method775;
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexParameteriv(n, n2, intBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexParameteriv(n, n2, intBuffer));
 		intBuffer.get(array, n3, method775);
 	}
 
 	public final synchronized void glGetTexParameteriv(final int n, final int n2, final IntBuffer intBuffer) {
-		EGL10Impl.g3d.async(() -> GL11.glGetTexParameteriv(n, n2, intBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexParameteriv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glGetTexParameterxv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexParameterfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexParameterfv(n, n2, floatBuffer));
 		for (int i = 0; i < method775; ++i) {
 			array[n3 + i] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
 	}
 
 	public final synchronized void glGetTexParameterxv(final int n, final int n2, final IntBuffer intBuffer) {
-		this.checkThread();
 		final int method775;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method775 = GLConfiguration.method775(n2));
-		GL11.glGetTexParameterfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexParameterfv(n, n2, floatBuffer));
 		for (int i = 0; i < method775; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
 	}
 
 	public final synchronized void glDrawTexsOES(final short n, final short n2, final short n3, final short n4, final short n5) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexiOES(final int n, final int n2, final int n3, final int n4, final int n5) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexfOES(final float n, final float n2, final float n3, final float n4, final float n5) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexxOES(final int n, final int n2, final int n3, final int n4, final int n5) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexsvOES(final short[] array, final int n) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexsvOES(final ShortBuffer shortBuffer) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexivOES(final int[] array, final int n) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexivOES(final IntBuffer intBuffer) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexxvOES(final int[] array, final int n) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexxvOES(final IntBuffer intBuffer) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexfvOES(final float[] array, final int n) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexfvOES(final FloatBuffer floatBuffer) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1325) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glCurrentPaletteMatrixOES(final int n) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1326) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
 	}
 
 	public final synchronized void glLoadPaletteFromModelViewMatrixOES() {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1326) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1326) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final int n4) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1326) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1326) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final int n4) {
-		this.checkThread();
 		if (!GLConfiguration.aBoolean1326) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
@@ -552,7 +503,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glTexGenf(final int n, final int n2, final float n3) {
 		method805();
-		GL11.glTexGenf(n, n2, n3);
+		EGL10Impl.g3d.async(() -> GL11.glTexGenf(n, n2, n3));
 	}
 
 	public final synchronized void glTexGeni(final int n, final int n2, final int n3) {
@@ -566,13 +517,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glTexGenfv(final int n, final int n2, final float[] array, final int n3) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
 		floatBuffer.position(0);
-		GL11.glTexGenfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glTexGenfv(final int n, final int n2, final FloatBuffer floatBuffer) {
@@ -581,13 +531,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
 		intBuffer.position(0);
-		GL11.glTexGeniv(n, n2, intBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glTexGeniv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -596,7 +545,6 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
@@ -604,11 +552,10 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 			floatBuffer.put(array[i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glTexGenfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final IntBuffer intBuffer) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
@@ -616,55 +563,50 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 			floatBuffer.put(intBuffer.get() / 65536.0f);
 		}
 		floatBuffer.position(0);
-		GL11.glTexGenfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.async(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetTexGenfv(final int n, final int n2, final float[] array, final int n3) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
-		GL11.glGetTexGenfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexGenfv(n, n2, floatBuffer));
 		floatBuffer.get(array, n3, method771);
 	}
 
 	public final synchronized void glGetTexGenfv(final int n, final int n2, final FloatBuffer floatBuffer) {
-		this.checkThread();
 		method805();
-		GL11.glGetTexGenfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetTexGeniv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(method771 = GLConfiguration.method771());
-		GL11.glGetTexGeniv(n, n2, intBuffer);
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexGeniv(n, n2, intBuffer));
 		intBuffer.get(array, n3, method771);
 	}
 
 	public final synchronized void glGetTexGeniv(final int n, final int n2, final IntBuffer intBuffer) {
 		method805();
-		EGL10Impl.g3d.async(() -> GL11.glGetTexGeniv(n, n2, intBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glGetTexGeniv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glGetTexGenxv(final int n, final int n2, final int[] array, final int n3) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
-		GL11.glGetTexGenfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() ->GL11.glGetTexGenfv(n, n2, floatBuffer));
 		for (int i = 0; i < method771; ++i) {
 			array[i + n3] = (int) (floatBuffer.get(i) * 65536.0f);
 		}
 	}
 
 	public final synchronized void glGetTexGenxv(final int n, final int n2, final IntBuffer intBuffer) {
-		this.checkThread();
 		method805();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
-		GL11.glGetTexGenfv(n, n2, floatBuffer);
+		EGL10Impl.g3d.sync(() ->GL11.glGetTexGenfv(n, n2, floatBuffer));
 		for (int i = 0; i < method771; ++i) {
 			intBuffer.put((int) (floatBuffer.get(i) * 65536.0f));
 		}
@@ -691,7 +633,6 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized boolean glIsRenderbufferOES(final int n) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 		return true;
 	}
@@ -754,43 +695,35 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized int glCheckFramebufferStatusOES(final int n) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 		return 0;
 	}
 
 	public final synchronized void glFramebufferTexture2DOES(final int n, final int n2, final int n3, final int n4, final int n5) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glFramebufferRenderbufferOES(final int n, final int n2, final int n3, final int n4) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGetFramebufferAttachmentParameterivOES(final int n, final int n2, final int n3, final int[] array, final int n4) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGetFramebufferAttachmentParameterivOES(final int n, final int n2, final int n3, final IntBuffer intBuffer) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGenerateMipmapOES(final int n) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glPointSizePointerOES(final int n, final int n2, final Buffer buffer) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glPointSizePointerOES(final int n, final int n2, final int n3) {
-		this.checkThread();
 		System.out.println("OES is not implemented.");
 	}
 

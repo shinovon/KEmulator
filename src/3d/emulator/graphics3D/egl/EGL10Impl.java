@@ -309,18 +309,20 @@ public class EGL10Impl implements EGL10 {
 			(background = new Background()).setColor(GL10Impl.anInt1359);
 			background.setImage(new Image2D(99, new Image(graphics.getImage())));
 			background.setCrop(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
-			EGL10Impl.g3d.clearBackgound(background);
-			if (GL10Impl.aBoolean1355) {
-				GL11.glEnable(2896);
-			} else {
-				GL11.glDisable(2896);
-			}
-			if (GL10Impl.aBoolean1358) {
-				GL11.glEnable(2912);
-			} else {
-				GL11.glDisable(2912);
-			}
-			GL11.glMatrixMode(GL10Impl.anInt1354);
+			EGL10Impl.g3d.sync(() -> {
+				EGL10Impl.g3d.clearBackgound(background);
+				if (GL10Impl.aBoolean1355) {
+					GL11.glEnable(2896);
+				} else {
+					GL11.glDisable(2896);
+				}
+				if (GL10Impl.aBoolean1358) {
+					GL11.glEnable(2912);
+				} else {
+					GL11.glDisable(2912);
+				}
+				GL11.glMatrixMode(GL10Impl.anInt1354);
+			});
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
