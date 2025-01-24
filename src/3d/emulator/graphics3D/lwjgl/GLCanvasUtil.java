@@ -119,9 +119,10 @@ public class GLCanvasUtil {
 			ctx.setAccessible(true);
 
 			long context;
-			try {
+
+			if (ctx.getType().equals(long.class)) {
 				context = ctx.getLong(canvas);
-			} catch (Exception e) {
+			} else {
 				context = ctx.getInt(canvas);
 			}
 			return context;
@@ -159,22 +160,19 @@ public class GLCanvasUtil {
 			ctx.setAccessible(true);
 
 			long context;
-			try {
+			if (ctx.getType().equals(long.class)) {
 				context = ctx.getLong(canvas);
-			} catch (Exception e) {
-				context = ctx.getInt(canvas);
-			}
-
-			try {
 				ctx.set(canvas, (Long) 0L);
-			} catch (Exception e) {
+			} else {
+				context = ctx.getInt(canvas);
 				ctx.set(canvas, (Integer) 0);
 			}
+
 			((org.eclipse.swt.opengl.GLCanvas) canvas).setCurrent();
 
-			try {
+			if (ctx.getType().equals(long.class)) {
 				ctx.set(canvas, (Long) context);
-			} catch (Exception e) {
+			} else {
 				ctx.set(canvas, (Integer) (int) context);
 			}
 		} else if (canvas instanceof org.lwjgl.opengl.swt.GLCanvas) {

@@ -343,7 +343,11 @@ public class Form extends Screen {
 
 	private Item getFirstVisibleAndFocusableItem() {
 		try {
-			return getNextFocusableRow(null, 1).getFirstFocusableItem();
+			Row row = getNextFocusableRow(null, 1);
+			if (row == null) {
+				return null;
+			}
+			return row.getFirstFocusableItem();
 		} catch (Exception e) {
 			return null;
 		}

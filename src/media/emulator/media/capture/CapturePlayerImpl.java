@@ -3,6 +3,7 @@ package emulator.media.capture;
 import com.github.sarxos.webcam.Webcam;
 import emulator.Emulator;
 import emulator.Permission;
+import emulator.graphics2D.awt.AWTImageUtils;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.media.vlc.VLCPlayerImpl;
 
@@ -213,7 +214,7 @@ public class CapturePlayerImpl implements Player {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			BufferedImage img = webcam.getImage();
 			if (w > 0 && h > 0) {
-				img = VLCPlayerImpl.resize(img, w, h);
+				img = AWTImageUtils.resize(img, w, h);
 			}
 			ImageIO.write(img, "JPEG", os);
 			byte[] bytes = os.toByteArray();
@@ -239,7 +240,7 @@ public class CapturePlayerImpl implements Player {
 	public void paint(Graphics g) {
 		if (visible && started) {
 			try {
-				g.drawImage(new Image(new ImageAWT(VLCPlayerImpl.resize(webcam.getImage(), -1, scaleh))), locx, locy, 0);
+				g.drawImage(new Image(new ImageAWT(AWTImageUtils.resize(webcam.getImage(), -1, scaleh))), locx, locy, 0);
 			} catch (Exception ignored) {}
 		}
 	}
@@ -247,7 +248,7 @@ public class CapturePlayerImpl implements Player {
 	public void paint(Graphics g, int w, int h) {
 		if (started) {
 			try {
-				g.drawImage(new Image(new ImageAWT(VLCPlayerImpl.resize(webcam.getImage(), -1, h))), 0, 0, 0);
+				g.drawImage(new Image(new ImageAWT(AWTImageUtils.resize(webcam.getImage(), -1, h))), 0, 0, 0);
 			} catch (Exception ignored) {}
 		}
 	}

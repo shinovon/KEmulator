@@ -133,7 +133,9 @@ public abstract class Canvas extends Displayable {
 		if (!fullScreen) {
 			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
 		}
+		System.out.println("invokeSizeChanged " + w + " " + h);
 		if (this.w != w || this.h != h || forceUpdateSize) {
+			System.out.println("2invokeSizeChanged " + this.w + " " + this.h + forceUpdateSize);
 			this.w = bounds[W] = w;
 			this.h = bounds[H] = h;
 			sizeChanged(w, h);
