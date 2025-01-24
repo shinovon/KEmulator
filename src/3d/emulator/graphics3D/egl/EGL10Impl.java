@@ -13,7 +13,7 @@ import javax.microedition.m3g.Image2D;
  */
 public class EGL10Impl implements EGL10 {
 	static EGL10Impl egl;
-	static emulator.graphics3D.lwjgl.Emulator3D ab1332;
+	static emulator.graphics3D.lwjgl.Emulator3D g3d;
 
 	public EGL10Impl() {
 		super();
@@ -22,7 +22,7 @@ public class EGL10Impl implements EGL10 {
 	public static EGL10Impl getEgl() {
 		if (EGL10Impl.egl == null) {
 			EGL10Impl.egl = new EGL11Impl();
-			EGL10Impl.ab1332 = emulator.graphics3D.lwjgl.Emulator3D.getInstance();
+			EGL10Impl.g3d = emulator.graphics3D.lwjgl.Emulator3D.getInstance();
 		}
 		return EGL10Impl.egl;
 	}
@@ -247,7 +247,7 @@ public class EGL10Impl implements EGL10 {
 				GL10Impl.drawSurfaceThread.remove(c);
 				GL10Impl.readSurfaceThread.remove(c);
 				GL10Impl.threadToContext.remove(currentThread);
-				EGL10Impl.ab1332.releaseTarget();
+				EGL10Impl.g3d.releaseTarget();
 			}
 		} else {
 			final EGLContextImpl c2;
@@ -259,8 +259,8 @@ public class EGL10Impl implements EGL10 {
 			GL10Impl.drawSurfaceThread.put(c2, draw);
 			GL10Impl.readSurfaceThread.put(c2, read);
 			GL10Impl.threadToContext.put(currentThread, context);
-			EGL10Impl.ab1332.bindTarget(c2.method762().method784(), true);
-			GL11.glEnable(2884);
+			EGL10Impl.g3d.bindTarget(c2.method762().method784(), true);
+			EGL10Impl.g3d.async(() -> GL11.glEnable(2884));
 		}
 		return true;
 	}
@@ -279,7 +279,7 @@ public class EGL10Impl implements EGL10 {
 
 	public boolean eglSwapBuffers(final EGLDisplay eglDisplay, final EGLSurface eglSurface) {
 		try {
-			EGL10Impl.ab1332.swapBuffers();
+			EGL10Impl.g3d.swapBuffers();
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -293,7 +293,7 @@ public class EGL10Impl implements EGL10 {
 
 	public boolean eglWaitGL() {
 		try {
-			EGL10Impl.ab1332.swapBuffers();
+			EGL10Impl.g3d.swapBuffers();
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -304,12 +304,12 @@ public class EGL10Impl implements EGL10 {
 	public boolean eglWaitNative(final int n, final Object o) {
 		try {
 			final Graphics graphics = (Graphics) o;
-			EGL10Impl.ab1332.setViewport(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
+			EGL10Impl.g3d.setViewport(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
 			final Background background;
 			(background = new Background()).setColor(GL10Impl.anInt1359);
 			background.setImage(new Image2D(99, new Image(graphics.getImage())));
 			background.setCrop(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
-			EGL10Impl.ab1332.clearBackgound(background);
+			EGL10Impl.g3d.clearBackgound(background);
 			if (GL10Impl.aBoolean1355) {
 				GL11.glEnable(2896);
 			} else {
