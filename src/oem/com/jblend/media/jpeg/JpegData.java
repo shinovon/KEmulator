@@ -1,6 +1,7 @@
 package com.jblend.media.jpeg;
 
 import com.jblend.media.MediaData;
+import emulator.custom.CustomJarResources;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ public class JpegData
 
 	public JpegData(String paramString)
 			throws IOException {
-		super();
+		this(CustomJarResources.getBytes(paramString));
 	}
 
 	public JpegData(byte[] paramArrayOfByte) {

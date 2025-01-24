@@ -144,6 +144,11 @@ public class Displayable {
 				}
 			}
 		}
+		if (rightCommand == null && menuCommands.size() > 1) {
+			Command cmd = menuCommands.lastElement();
+			rightCommand = cmd;
+			menuCommands.remove(cmd);
+		}
 
 		String leftLabel = "", rightLabel = "";
 		if (menuCommands.size() > 1) {

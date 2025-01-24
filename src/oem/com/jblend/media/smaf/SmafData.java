@@ -1,6 +1,7 @@
 package com.jblend.media.smaf;
 
 import com.jblend.media.MediaData;
+import emulator.custom.CustomJarResources;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ public class SmafData extends MediaData {
 	}
 
 	public SmafData(String name) throws IOException {
-
+		this(CustomJarResources.getBytes(name));
 	}
 
 	public SmafData(byte[] data) {

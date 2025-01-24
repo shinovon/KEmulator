@@ -1,5 +1,11 @@
 package com.j_phone.io;
 
+import com.jblend.media.MediaData;
+import com.jblend.media.MediaFactory;
+import com.jblend.media.MediaPlayer;
+import com.jblend.media.smaf.SmafData;
+import emulator.custom.CustomJarResources;
+
 import java.io.IOException;
 
 public final class FileUtility {
@@ -18,6 +24,7 @@ public final class FileUtility {
 	public void play(String paramString)
 			throws IOException {
 		System.out.println("FileUtility.play " + paramString);
+		play(CustomJarResources.getBytes(paramString), 1);
 	}
 
 //    public void play(MailData paramMailData, int paramInt)
@@ -29,25 +36,25 @@ public final class FileUtility {
 		System.out.println("FileUtility.play bytes " + paramInt);
 	}
 
-//    public MediaPlayer getMediaPlayer(String paramString)
-//            throws IOException {
-//        return null;
-//    }
-//
-//    public MediaPlayer getMediaPlayer(String paramString, int paramInt)
-//            throws IOException {
-//        return null;
-//    }
-//
-//    public MediaData getMediaData(String paramString)
-//            throws IOException {
-//        return null;
-//    }
-//
-//    public MediaData getMediaData(String paramString, int paramInt)
-//            throws IOException {
-//        return null;
-//    }
+    public MediaPlayer getMediaPlayer(String paramString)
+            throws IOException {
+        return MediaFactory.getMediaPlayer(paramString);
+    }
+
+    public MediaPlayer getMediaPlayer(String paramString, int paramInt)
+            throws IOException {
+		return MediaFactory.getMediaPlayer(paramString, paramInt);
+    }
+
+    public MediaData getMediaData(String paramString)
+            throws IOException {
+        return new SmafData(paramString);
+    }
+
+    public MediaData getMediaData(String paramString, int paramInt)
+            throws IOException {
+		return new SmafData(paramString);
+    }
 
 	public int getFreeSpace(String paramString)
 			throws IOException {
