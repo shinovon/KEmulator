@@ -71,7 +71,7 @@ public class Render {
 	private TextureImpl targetTexture;
 	private ByteBuffer imageBuffer;
 
-	private Emulator3D emulator3d;
+	private Emulator3D g3d;
 	private boolean wasBinded;
 
 	/**
@@ -94,69 +94,72 @@ public class Render {
 	}
 
 	private void init() {
-		emulator3d = Emulator3D.getInstance();
-		emulator3d.setFlipImage(true);
+		g3d = Emulator3D.getInstance();
+		g3d.setFlipImage(true);
 	}
 
 	public synchronized void bind(Graphics graphics) {
 		Profiler3D.MC3D_bindGraphicsCallCount++;
 
 		this.targetGraphics = graphics;
-		IImage bitmap = graphics.getImage();
-		int width = bitmap.getWidth();
-		int height = bitmap.getHeight();
-		if (emulator3d == null) {
+		if (g3d == null) {
 			init();
 		}
-		if (env.width != width || env.height != height) {
-			try {
-				if (wasBinded) emulator3d.releaseTarget();
-			} catch (Exception ignored) {}
-			emulator3d.bindTarget(graphics);
-			wasBinded = true;
+		g3d.sync(() -> {
+			IImage bitmap = graphics.getImage();
+			int width = bitmap.getWidth();
+			int height = bitmap.getHeight();
 
-			glViewport(0, 0, width, height);
-			Program.create();
-			env.width = width;
-			env.height = height;
-			glClearColor(0, 0, 0, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
-		} else {
-			emulator3d.bindTarget(graphics);
-			glViewport(0, 0, width, height);
-		}
-		Rectangle clip = this.clip;
-		clip.setBounds(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
-		int l = clip.x;
-		int t = clip.y;
-		int w = clip.width;
-		int h = clip.height;
-		gClip.setBounds(l, t, w, h);
-		if (l == 0 && t == 0 && w == env.width && h == env.height) {
-			glDisable(GL_SCISSOR_TEST);
-		} else {
-			glEnable(GL_SCISSOR_TEST);
-			glScissor(l, t, w, h);
-		}
-		glClear(GL_DEPTH_BUFFER_BIT);
+			if (env.width != width || env.height != height) {
+				try {
+					if (wasBinded) g3d.releaseTarget();
+				} catch (Exception ignored) {}
+				g3d.bindTarget(graphics);
+				wasBinded = true;
 
-		boolean aa = Settings.m3gAA == Settings.AA_ON;
+				glViewport(0, 0, width, height);
+				Program.create();
+				env.width = width;
+				env.height = height;
+				glClearColor(0, 0, 0, 1);
+				glClear(GL_COLOR_BUFFER_BIT);
+			} else {
+				g3d.bindTarget(graphics);
+				glViewport(0, 0, width, height);
+			}
+			Rectangle clip = this.clip;
+			clip.setBounds(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
+			int l = clip.x;
+			int t = clip.y;
+			int w = clip.width;
+			int h = clip.height;
+			gClip.setBounds(l, t, w, h);
+			if (l == 0 && t == 0 && w == env.width && h == env.height) {
+				glDisable(GL_SCISSOR_TEST);
+			} else {
+				glEnable(GL_SCISSOR_TEST);
+				glScissor(l, t, w, h);
+			}
+			glClear(GL_DEPTH_BUFFER_BIT);
 
-		if (aa) {
-			GL11.glEnable(GL_POINT_SMOOTH);
-			GL11.glEnable(GL_LINE_SMOOTH);
-			GL11.glEnable(GL_POLYGON_SMOOTH);
-			if (!Emulator3D.useGL11())
-				GL11.glEnable(GL_MULTISAMPLE);
-		} else {
-			GL11.glDisable(GL_POINT_SMOOTH);
-			GL11.glDisable(GL_LINE_SMOOTH);
-			GL11.glDisable(GL_POLYGON_SMOOTH);
-			if (!Emulator3D.useGL11())
-				GL11.glDisable(GL_MULTISAMPLE);
-		}
+			boolean aa = Settings.m3gAA == Settings.AA_ON;
 
-		backCopied = false;
+			if (aa) {
+				GL11.glEnable(GL_POINT_SMOOTH);
+				GL11.glEnable(GL_LINE_SMOOTH);
+				GL11.glEnable(GL_POLYGON_SMOOTH);
+				if (!Emulator3D.useGL11())
+					GL11.glEnable(GL_MULTISAMPLE);
+			} else {
+				GL11.glDisable(GL_POINT_SMOOTH);
+				GL11.glDisable(GL_LINE_SMOOTH);
+				GL11.glDisable(GL_POLYGON_SMOOTH);
+				if (!Emulator3D.useGL11())
+					GL11.glDisable(GL_MULTISAMPLE);
+			}
+
+			backCopied = false;
+		});
 	}
 
 	public synchronized void bind(TextureImpl tex) {
@@ -165,41 +168,43 @@ public class Render {
 		targetTexture = tex;
 		int width = tex.getWidth();
 		int height = tex.getHeight();
-		if (emulator3d == null) {
+		if (g3d == null) {
 			init();
 		}
-		if (env.width != width || env.height != height) {
-			if (wasBinded) emulator3d.releaseTarget();
-			emulator3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
+		g3d.sync(() -> {
+			if (env.width != width || env.height != height) {
+				if (wasBinded) g3d.releaseTarget();
+				g3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
 
-			glViewport(0, 0, width, height);
-			Program.create();
-			env.width = width;
-			env.height = height;
-		} else {
-			emulator3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
-			glViewport(0, 0, width, height);
-		}
-		Rectangle clip = this.clip;
-		clip.setBounds(0, 0, width, height);
-		int l = clip.x;
-		int t = clip.y;
-		int w = clip.width;
-		int h = clip.height;
-		gClip.setBounds(l, t, w, h);
-		if (l == 0 && t == 0 && w == env.width && h == env.height) {
-			glDisable(GL_SCISSOR_TEST);
-		} else {
-			glEnable(GL_SCISSOR_TEST);
-			glScissor(l, t, w, h);
-		}
-		glClearColor(
-				((clearColor >> 16) & 0xff) / 255.0f,
-				((clearColor >> 8) & 0xff) / 255.0f,
-				(clearColor & 0xff) / 255.0f,
-				1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		backCopied = false;
+				glViewport(0, 0, width, height);
+				Program.create();
+				env.width = width;
+				env.height = height;
+			} else {
+				g3d.bindTarget(Image.createImage(width, height, 0).getGraphics());
+				glViewport(0, 0, width, height);
+			}
+			Rectangle clip = this.clip;
+			clip.setBounds(0, 0, width, height);
+			int l = clip.x;
+			int t = clip.y;
+			int w = clip.width;
+			int h = clip.height;
+			gClip.setBounds(l, t, w, h);
+			if (l == 0 && t == 0 && w == env.width && h == env.height) {
+				glDisable(GL_SCISSOR_TEST);
+			} else {
+				glEnable(GL_SCISSOR_TEST);
+				glScissor(l, t, w, h);
+			}
+			glClearColor(
+					((clearColor >> 16) & 0xff) / 255.0f,
+					((clearColor >> 8) & 0xff) / 255.0f,
+					(clearColor & 0xff) / 255.0f,
+					1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			backCopied = false;
+		});
 	}
 
 	private static void applyBlending(int blendMode) {
@@ -330,7 +335,7 @@ public class Render {
 	@Override
 	protected void finalize() throws Throwable {
 		try {
-			emulator3d.releaseTarget();
+			g3d.releaseTarget();
 		} finally {
 			super.finalize();
 		}
@@ -350,105 +355,107 @@ public class Render {
 					  int toonLow) {
 		Profiler3D.MC3D_renderFigureCallCount++;
 
-		boolean isTransparency = (attrs & Graphics3D.ENV_ATTR_SEMI_TRANSPARENT) != 0;
-		if (!isTransparency && flushStep == 2) {
-			return;
-		} else if (!model.hasPolyT && !model.hasPolyC) {
-			return;
-		}
-
-		glEnable(GL_DEPTH_TEST);
-		glDepthMask(flushStep == 1);
-		MathUtil.multiplyMM(MVP_TMP, projMatrix, viewMatrix);
-		if (bufHandles == null) {
-			bufHandles = BufferUtils.createIntBuffer(3);
-			glGenBuffers(/*3, */bufHandles);
-		}
-		try {
-			glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(0));
-			glBufferData(GL_ARRAY_BUFFER, /*vertices.capacity() * 4, */(FloatBuffer) vertices.rewind(), GL_STREAM_DRAW);
-
-			ByteBuffer texCoords = model.texCoordArray;
-			glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(1));
-			glBufferData(GL_ARRAY_BUFFER, /*texCoords.capacity(), */(ByteBuffer) texCoords.rewind(), GL_STREAM_DRAW);
-
-			boolean isLight = (attrs & Graphics3D.ENV_ATTR_LIGHTING) != 0 && normals != null;
-			if (isLight) {
-				glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(2));
-				glBufferData(GL_ARRAY_BUFFER, /*normals.capacity() * 4, */(FloatBuffer) normals.rewind(), GL_STREAM_DRAW);
+		g3d.sync(() -> {
+			boolean isTransparency = (attrs & Graphics3D.ENV_ATTR_SEMI_TRANSPARENT) != 0;
+			if (!isTransparency && flushStep == 2) {
+				return;
+			} else if (!model.hasPolyT && !model.hasPolyC) {
+				return;
 			}
-			if (model.hasPolyT) {
-				final Program.Tex program = Program.tex;
-				program.use();
 
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(flushStep == 1);
+			MathUtil.multiplyMM(MVP_TMP, projMatrix, viewMatrix);
+			if (bufHandles == null) {
+				bufHandles = BufferUtils.createIntBuffer(3);
+				glGenBuffers(/*3, */bufHandles);
+			}
+			try {
 				glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(0));
-				glEnableVertexAttribArray(program.aPosition);
-				glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, 0);
+				glBufferData(GL_ARRAY_BUFFER, /*vertices.capacity() * 4, */(FloatBuffer) vertices.rewind(), GL_STREAM_DRAW);
 
+				ByteBuffer texCoords = model.texCoordArray;
 				glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(1));
-				glEnableVertexAttribArray(program.aColorData);
-				glVertexAttribPointer(program.aColorData, 2, GL_UNSIGNED_BYTE, false, 5, 0);
-				glEnableVertexAttribArray(program.aMaterial);
-				glVertexAttribPointer(program.aMaterial, 3, GL_UNSIGNED_BYTE, false, 5, 2);
+				glBufferData(GL_ARRAY_BUFFER, /*texCoords.capacity(), */(ByteBuffer) texCoords.rewind(), GL_STREAM_DRAW);
 
+				boolean isLight = (attrs & Graphics3D.ENV_ATTR_LIGHTING) != 0 && normals != null;
 				if (isLight) {
 					glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(2));
-					glEnableVertexAttribArray(program.aNormal);
-					glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, 0);
-					program.setToonShading(attrs, toonThreshold, toonHigh, toonLow);
-					program.setLight(light);
-					program.setSphere((attrs & Graphics3D.ENV_ATTR_SPHERE_MAP) == 0 ? null : specular);
-				} else {
+					glBufferData(GL_ARRAY_BUFFER, /*normals.capacity() * 4, */(FloatBuffer) normals.rewind(), GL_STREAM_DRAW);
+				}
+				if (model.hasPolyT) {
+					final Program.Tex program = Program.tex;
+					program.use();
+
+					glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(0));
+					glEnableVertexAttribArray(program.aPosition);
+					glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, 0);
+
+					glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(1));
+					glEnableVertexAttribArray(program.aColorData);
+					glVertexAttribPointer(program.aColorData, 2, GL_UNSIGNED_BYTE, false, 5, 0);
+					glEnableVertexAttribArray(program.aMaterial);
+					glVertexAttribPointer(program.aMaterial, 3, GL_UNSIGNED_BYTE, false, 5, 2);
+
+					if (isLight) {
+						glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(2));
+						glEnableVertexAttribArray(program.aNormal);
+						glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, 0);
+						program.setToonShading(attrs, toonThreshold, toonHigh, toonLow);
+						program.setLight(light);
+						program.setSphere((attrs & Graphics3D.ENV_ATTR_SPHERE_MAP) == 0 ? null : specular);
+					} else {
+						glDisableVertexAttribArray(program.aNormal);
+						program.setLight(null);
+					}
+
+					program.bindMatrices(MVP_TMP, viewMatrix);
+					// Draw triangles
+					renderModel(textures, model, isTransparency);
+					glDisableVertexAttribArray(program.aPosition);
+					glDisableVertexAttribArray(program.aColorData);
+					glDisableVertexAttribArray(program.aMaterial);
 					glDisableVertexAttribArray(program.aNormal);
-					program.setLight(null);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
 				}
 
-				program.bindMatrices(MVP_TMP, viewMatrix);
-				// Draw triangles
-				renderModel(textures, model, isTransparency);
-				glDisableVertexAttribArray(program.aPosition);
-				glDisableVertexAttribArray(program.aColorData);
-				glDisableVertexAttribArray(program.aMaterial);
-				glDisableVertexAttribArray(program.aNormal);
+				if (model.hasPolyC) {
+					final Program.Color program = Program.color;
+					program.use();
+
+					int offset = model.numVerticesPolyT;
+					glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(0));
+					glEnableVertexAttribArray(program.aPosition);
+					glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, 3 * 4 * offset);
+
+					glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(1));
+					glVertexAttribPointer(program.aColorData, 3, GL_UNSIGNED_BYTE, true, 5, 5 * offset);
+					glEnableVertexAttribArray(program.aColorData);
+					glEnableVertexAttribArray(program.aMaterial);
+					glVertexAttribPointer(program.aMaterial, 2, GL_UNSIGNED_BYTE, false, 5, 5 * offset + 3);
+
+					if (isLight) {
+						glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(2));
+						glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, 3 * 4 * offset);
+						glEnableVertexAttribArray(program.aNormal);
+						program.setLight(light);
+						program.setSphere((attrs & Graphics3D.ENV_ATTR_SPHERE_MAP) == 0 ? null : specular);
+						program.setToonShading(attrs, toonThreshold, toonHigh, toonLow);
+					} else {
+						glDisableVertexAttribArray(program.aNormal);
+						program.setLight(null);
+					}
+					program.bindMatrices(MVP_TMP, viewMatrix);
+					renderModel(model, isTransparency);
+					glDisableVertexAttribArray(program.aPosition);
+					glDisableVertexAttribArray(program.aColorData);
+					glDisableVertexAttribArray(program.aMaterial);
+					glDisableVertexAttribArray(program.aNormal);
+				}
+			} finally {
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
-
-			if (model.hasPolyC) {
-				final Program.Color program = Program.color;
-				program.use();
-
-				int offset = model.numVerticesPolyT;
-				glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(0));
-				glEnableVertexAttribArray(program.aPosition);
-				glVertexAttribPointer(program.aPosition, 3, GL_FLOAT, false, 3 * 4, 3 * 4 * offset);
-
-				glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(1));
-				glVertexAttribPointer(program.aColorData, 3, GL_UNSIGNED_BYTE, true, 5, 5 * offset);
-				glEnableVertexAttribArray(program.aColorData);
-				glEnableVertexAttribArray(program.aMaterial);
-				glVertexAttribPointer(program.aMaterial, 2, GL_UNSIGNED_BYTE, false, 5, 5 * offset + 3);
-
-				if (isLight) {
-					glBindBuffer(GL_ARRAY_BUFFER, bufHandles.get(2));
-					glVertexAttribPointer(program.aNormal, 3, GL_FLOAT, false, 3 * 4, 3 * 4 * offset);
-					glEnableVertexAttribArray(program.aNormal);
-					program.setLight(light);
-					program.setSphere((attrs & Graphics3D.ENV_ATTR_SPHERE_MAP) == 0 ? null : specular);
-					program.setToonShading(attrs, toonThreshold, toonHigh, toonLow);
-				} else {
-					glDisableVertexAttribArray(program.aNormal);
-					program.setLight(null);
-				}
-				program.bindMatrices(MVP_TMP, viewMatrix);
-				renderModel(model, isTransparency);
-				glDisableVertexAttribArray(program.aPosition);
-				glDisableVertexAttribArray(program.aColorData);
-				glDisableVertexAttribArray(program.aMaterial);
-				glDisableVertexAttribArray(program.aNormal);
-			}
-		} finally {
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
+		});
 	}
 
 	private void renderModel(TextureImpl[] textures, Model model, boolean enableBlending) {
@@ -547,18 +554,20 @@ public class Render {
 	public synchronized void release() {
 		Profiler3D.MC3D_releaseCallCount++;
 
-		stack.clear();
-		if (targetTexture != null) {
-			glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
-			targetTexture = null;
-		} else if (targetGraphics != null) {
-			if (postCopy2D) {
-				copy2d(false);
+		g3d.sync(() -> {
+			stack.clear();
+			if (targetTexture != null) {
+				glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
+				targetTexture = null;
+			} else if (targetGraphics != null) {
+				if (postCopy2D) {
+					copy2d(false);
+				}
+				swapBuffers();
+				targetGraphics = null;
 			}
-			swapBuffers();
-			targetGraphics = null;
-		}
-		emulator3d.releaseTarget();
+		});
+		g3d.releaseTarget();
 	}
 
 	public synchronized void flush() {
@@ -567,27 +576,29 @@ public class Render {
 		if (stack.isEmpty()) {
 			return;
 		}
-		try {
-			if (!backCopied && preCopy2D) {
-				copy2d(true);
+		g3d.sync(() -> {
+			try {
+				if (!backCopied && preCopy2D) {
+					copy2d(true);
+				}
+				flushStep = 1;
+				for (RenderNode r : stack) {
+					r.render(this);
+				}
+				flushStep = 2;
+				for (RenderNode r : stack) {
+					r.render(this);
+					r.recycle();
+				}
+				glDisable(GL_BLEND);
+				glDepthMask(true);
+				glClear(GL_DEPTH_BUFFER_BIT);
+				glFlush();
+			} finally {
+				stack.clear();
+				swapBuffers();
 			}
-			flushStep = 1;
-			for (RenderNode r : stack) {
-				r.render(this);
-			}
-			flushStep = 2;
-			for (RenderNode r : stack) {
-				r.render(this);
-				r.recycle();
-			}
-			glDisable(GL_BLEND);
-			glDepthMask(true);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glFlush();
-		} finally {
-			stack.clear();
-			swapBuffers();
-		}
+		});
 	}
 
 	private void renderMeshC(RenderNode.PrimitiveNode node) {
@@ -784,18 +795,20 @@ public class Render {
 	}
 
 	private void updateClip() {
-		Rectangle clip = this.clip;
-		int l = clip.x;
-		int t = clip.y;
-		int w = clip.width;
-		int h = clip.height;
-		if (l == 0 && t == 0 && w == env.width && h == env.height) {
-			glDisable(GL_SCISSOR_TEST);
-		} else {
-			glEnable(GL_SCISSOR_TEST);
-			glScissor(l, t, w, h);
-		}
-		swapBuffers();
+		g3d.sync(() -> {
+			Rectangle clip = this.clip;
+			int l = clip.x;
+			int t = clip.y;
+			int w = clip.width;
+			int h = clip.height;
+			if (l == 0 && t == 0 && w == env.width && h == env.height) {
+				glDisable(GL_SCISSOR_TEST);
+			} else {
+				glEnable(GL_SCISSOR_TEST);
+				glScissor(l, t, w, h);
+			}
+			swapBuffers();
+		});
 	}
 
 	public synchronized void postFigure(FigureImpl figure) {
@@ -1108,54 +1121,56 @@ public class Render {
 	public synchronized void drawFigure(FigureImpl figure) {
 		Profiler3D.MC3D_drawFigureCallCount++;
 
-		if (!backCopied && preCopy2D) {
-			copy2d(true);
-		}
-		try {
-			Model model = figure.model;
-			figure.prepareBuffers();
-
-			flushStep = 1;
-			for (RenderNode r : stack) {
-				r.render(this);
+		g3d.sync(() -> {
+			if (!backCopied && preCopy2D) {
+				copy2d(true);
 			}
-			renderFigure(model,
-					env.textures,
-					env.attrs,
-					env.projMatrix,
-					env.viewMatrix,
-					model.vertexArray,
-					model.normalsArray,
-					env.light,
-					env.specular,
-					env.toonThreshold,
-					env.toonHigh,
-					env.toonLow);
+			try {
+				Model model = figure.model;
+				figure.prepareBuffers();
 
-			flushStep = 2;
-			for (RenderNode r : stack) {
-				r.render(this);
-				r.recycle();
+				flushStep = 1;
+				for (RenderNode r : stack) {
+					r.render(this);
+				}
+				renderFigure(model,
+						env.textures,
+						env.attrs,
+						env.projMatrix,
+						env.viewMatrix,
+						model.vertexArray,
+						model.normalsArray,
+						env.light,
+						env.specular,
+						env.toonThreshold,
+						env.toonHigh,
+						env.toonLow);
+
+				flushStep = 2;
+				for (RenderNode r : stack) {
+					r.render(this);
+					r.recycle();
+				}
+				renderFigure(model,
+						env.textures,
+						env.attrs,
+						env.projMatrix,
+						env.viewMatrix,
+						model.vertexArray,
+						model.normalsArray,
+						env.light,
+						env.specular,
+						env.toonThreshold,
+						env.toonHigh,
+						env.toonLow);
+
+				glDisable(GL_BLEND);
+				glDepthMask(true);
+				glClear(GL_DEPTH_BUFFER_BIT);
+			} finally {
+				swapBuffers();
 			}
-			renderFigure(model,
-					env.textures,
-					env.attrs,
-					env.projMatrix,
-					env.viewMatrix,
-					model.vertexArray,
-					model.normalsArray,
-					env.light,
-					env.specular,
-					env.toonThreshold,
-					env.toonHigh,
-					env.toonLow);
-
-			glDisable(GL_BLEND);
-			glDepthMask(true);
-			glClear(GL_DEPTH_BUFFER_BIT);
-		} finally {
-			swapBuffers();
-		}
+		});
 	}
 
 	public void reset() {
@@ -1448,35 +1463,37 @@ public class Render {
 		if (stack.isEmpty()) {
 			return;
 		}
-		try {
-			copy2d(true);
-			flushStep = 1;
-			for (RenderNode r : stack) {
-				r.render(this);
+		g3d.sync(() -> {
+			try {
+				copy2d(true);
+				flushStep = 1;
+				for (RenderNode r : stack) {
+					r.render(this);
+				}
+				flushStep = 2;
+				for (RenderNode r : stack) {
+					r.render(this);
+					r.recycle();
+				}
+				glDisable(GL_BLEND);
+				glDepthMask(true);
+				glClear(GL_DEPTH_BUFFER_BIT);
+				glFlush();
+				if (targetTexture != null) {
+					glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
+				} else if (targetGraphics != null) {
+					swapBuffers();
+				}
+			} finally {
+				stack.clear();
 			}
-			flushStep = 2;
-			for (RenderNode r : stack) {
-				r.render(this);
-				r.recycle();
-			}
-			glDisable(GL_BLEND);
-			glDepthMask(true);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glFlush();
-			if (targetTexture != null) {
-				glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
-			} else if (targetGraphics != null) {
-				swapBuffers();
-			}
-		} finally {
-			stack.clear();
-		}
+		});
 	}
 
 	private void swapBuffers() {
 		if (targetGraphics == null) return;
 		Rectangle clip = this.clip;
-		emulator3d.swapBuffers(true, clip.x, clip.y, clip.width, clip.height);
+		g3d.swapBuffers(true, clip.x, clip.y, clip.width, clip.height);
 	}
 
 	static class Environment {

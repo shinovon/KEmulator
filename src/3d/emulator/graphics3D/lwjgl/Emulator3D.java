@@ -1502,11 +1502,9 @@ public final class Emulator3D implements IGraphics3D, Runnable {
         }
     }
 
-    static class M3GException extends RuntimeException {
-
+    public static class M3GException extends RuntimeException {
         public M3GException(Throwable cause) {
             super(cause);
         }
-
     }
 }
