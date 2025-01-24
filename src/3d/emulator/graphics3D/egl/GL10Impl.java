@@ -95,23 +95,23 @@ public class GL10Impl implements GL10, GL10Ext {
 	}
 
 	public synchronized void glColorPointer(final int n, final int n2, final int n3, final Buffer buffer) {
-		EGL10Impl.g3d.async(() -> GL11.glColorPointer(n, n2, n3, MemoryUtil.memAddress(buffer)));
+		EGL10Impl.g3d.sync(() -> GL11.glColorPointer(n, n2, n3, MemoryUtil.memAddress(buffer)));
 	}
 
 	public synchronized void glCompressedTexImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final Buffer buffer) {
-		EGL10Impl.g3d.async(() -> GL13.glCompressedTexImage2D(n, n2, n3, n4, n5, n6, n7, MemoryUtil.memAddress(buffer)));
+		EGL10Impl.g3d.sync(() -> GL13.glCompressedTexImage2D(n, n2, n3, n4, n5, n6, n7, MemoryUtil.memAddress(buffer)));
 	}
 
 	public synchronized void glCompressedTexSubImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8, final Buffer buffer) {
-		EGL10Impl.g3d.async(() -> GL13.glCompressedTexSubImage2D(n, n2, n3, n4, n5, n6, n7, n8, MemoryUtil.memAddress(buffer)));
+		EGL10Impl.g3d.sync(() -> GL13.glCompressedTexSubImage2D(n, n2, n3, n4, n5, n6, n7, n8, MemoryUtil.memAddress(buffer)));
 	}
 
 	public synchronized void glCopyTexImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-		EGL10Impl.g3d.async(() -> GL11.glCopyTexImage2D(n, n2, n3, n4, n5, n6, n7, n8));
+		EGL10Impl.g3d.sync(() -> GL11.glCopyTexImage2D(n, n2, n3, n4, n5, n6, n7, n8));
 	}
 
 	public synchronized void glCopyTexSubImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-		EGL10Impl.g3d.async(() -> GL11.glCopyTexSubImage2D(n, n2, n3, n4, n5, n6, n7, n8));
+		EGL10Impl.g3d.sync(() -> GL11.glCopyTexSubImage2D(n, n2, n3, n4, n5, n6, n7, n8));
 	}
 
 	public synchronized void glCullFace(final int n) {
@@ -122,11 +122,11 @@ public class GL10Impl implements GL10, GL10Ext {
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(n)).put(array, n2, n);
 		intBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glDeleteTextures(intBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glDeleteTextures(intBuffer));
 	}
 
 	public synchronized void glDeleteTextures(final int n, final IntBuffer intBuffer) {
-		EGL10Impl.g3d.async(() -> GL11.glDeleteTextures(intBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glDeleteTextures(intBuffer));
 	}
 
 	public synchronized void glDepthFunc(final int n) {
@@ -159,11 +159,11 @@ public class GL10Impl implements GL10, GL10Ext {
 	}
 
 	public synchronized void glDrawArrays(final int n, final int n2, final int n3) {
-		EGL10Impl.g3d.async(() -> GL11.glDrawArrays(n, n2, n3));
+		EGL10Impl.g3d.sync(() -> GL11.glDrawArrays(n, n2, n3));
 	}
 
 	public synchronized void glDrawElements(final int n, final int n2, final int n3, final Buffer buffer) {
-		EGL10Impl.g3d.async(() -> GL11.glDrawElements(n, n2, n3, MemoryUtil.memAddress(buffer)));
+		EGL10Impl.g3d.sync(() -> GL11.glDrawElements(n, n2, n3, MemoryUtil.memAddress(buffer)));
 	}
 
 	public synchronized void glEnable(final int n) {

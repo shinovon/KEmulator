@@ -45,7 +45,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(n)).put(array, n2, n);
 		intBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL15.glDeleteBuffers(intBuffer));
+		EGL10Impl.g3d.sync(() -> GL15.glDeleteBuffers(intBuffer));
 	}
 
 	public final synchronized void glDeleteBuffers(final int n, final IntBuffer intBuffer) {
@@ -96,31 +96,31 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(n2)).put(array, n3, GLConfiguration.method769());
 		intBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL15.glGetBufferParameteriv(n, n2, intBuffer));
+		EGL10Impl.g3d.sync(() -> GL15.glGetBufferParameteriv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glGetBufferParameteriv(final int n, final int n2, final IntBuffer intBuffer) {
-		EGL10Impl.g3d.async(() -> GL15.glGetBufferParameteriv(n, n2, intBuffer));
+		EGL10Impl.g3d.sync(() -> GL15.glGetBufferParameteriv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glColorPointer(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.async(() -> GL11.glColorPointer(n, n2, n3, (long) n4));
+		EGL10Impl.g3d.sync(() -> GL11.glColorPointer(n, n2, n3, (long) n4));
 	}
 
 	public final synchronized void glNormalPointer(final int n, final int n2, final int n3) {
-		EGL10Impl.g3d.async(() -> GL11.glNormalPointer(n, n2, (long) n3));
+		EGL10Impl.g3d.sync(() -> GL11.glNormalPointer(n, n2, (long) n3));
 	}
 
 	public final synchronized void glTexCoordPointer(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.async(() -> GL11.glTexCoordPointer(n, n2, n3, (long) n4));
+		EGL10Impl.g3d.sync(() -> GL11.glTexCoordPointer(n, n2, n3, (long) n4));
 	}
 
 	public final synchronized void glVertexPointer(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.async(() -> GL11.glVertexPointer(n, n2, n3, (long) n4));
+		EGL10Impl.g3d.sync(() -> GL11.glVertexPointer(n, n2, n3, (long) n4));
 	}
 
 	public final synchronized void glDrawElements(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.async(() -> GL11.glDrawElements(n, n2, n3, (long) n4));
+		EGL10Impl.g3d.sync(() -> GL11.glDrawElements(n, n2, n3, (long) n4));
 	}
 
 	public final synchronized void glClipPlanef(final int n, final float[] array, final int n2) {
