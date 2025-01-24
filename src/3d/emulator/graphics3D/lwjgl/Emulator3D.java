@@ -1437,28 +1437,25 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 							continue;
 						tasks.removeElementAt(0);
 					}
-					System.out.println("++ " + task);
                     synchronized (task) {
                         try {
                             task.run();
                         } catch (Throwable e) {
 							task.exception = e;
                         } finally {
-							System.out.println("-- " + task);
 							task.notifyAll();
 						}
                     }
                 }
 			}
         } catch (Throwable e) {
-            System.out.println("Uncaught exception in M3G thread");
+            System.err.println("Uncaught exception in M3G thread");
             e.printStackTrace();
         }
     }
 
     public void sync(Runnable r) throws M3GException {
         if (Thread.currentThread() == taskThread) {
-			System.out.println("> " + r);
             try {
                 r.run();
             } catch (Exception e) {
@@ -1468,7 +1465,6 @@ public final class Emulator3D implements IGraphics3D, Runnable {
         }
 
         M3GTask task = new M3GTask(r);
-		System.out.println("+ " + task);
 		addTask(task);
 
         synchronized (task) {
@@ -1479,7 +1475,6 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 					throw new RuntimeException(e);
 				}
 			}
-			System.out.println("- " + task);
 			if (task.exception != null) {
 				throw new M3GException(task.exception);
 			}
@@ -1488,12 +1483,10 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
     public void async(Runnable r) {
 		if (Thread.currentThread() == taskThread) {
-			System.out.println("> " + r);
 			r.run();
 			return;
 		}
 
-		System.out.println("+a " + r);
 		addTask(new M3GTask(r));
     }
 
