@@ -120,6 +120,15 @@ public final class Emulator3D implements IGraphics3D {
 		return instance;
 	}
 
+	public void start() {
+		if (executorService != null) return;
+		executorService = Executors.newSingleThreadExecutor((r) -> {
+			Thread t = new Thread(r, "KEmulator-M3G");
+			t.setPriority(5);
+			return executorThread = t;
+		});
+	}
+
 	public void bindTarget(Object target) {
 		bindTarget(target, false);
 	}
@@ -134,14 +143,6 @@ public final class Emulator3D implements IGraphics3D {
 		}
 		this.egl = forceWindow;
 		Profiler3D.bindTargetCallCount++;
-
-		if (executorService == null) {
-			executorService = Executors.newSingleThreadExecutor((r) -> {
-				Thread t = new Thread(r, "KEmulator-M3G");
-				t.setPriority(5);
-				return executorThread = t;
-			});
-		}
 
 		int w;
 		int h;
@@ -159,6 +160,8 @@ public final class Emulator3D implements IGraphics3D {
 			w = ((Image2D) this.target).getWidth();
 			h = ((Image2D) this.target).getHeight();
 		}
+
+		start();
 
 		if (!threadBound || !Settings.m3gThread) {
 			threadBound = true;
