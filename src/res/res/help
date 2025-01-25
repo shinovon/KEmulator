@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.18.2 [2025.01.23]
+$v2.19 [2025.01.25]
 Symbian Anna multitouch api support
 More SoftBank api stubs
 Fixed Class Watcher crash
@@ -59,6 +59,10 @@ Fixed MascotCapsule textures loading
 Fixed MascotCapsule textures appearance in MemoryView
 Added reset key mappings button
 Fixed controllers detection
+Made 3D APIs thread-safe (fixes some games, but less performance)
+Fixed MIDlet choice selection focus
+Fixed lcdui Gauge, DateField appearance
+Added sync flush setting
 
 $v2.18.1 [2024.12.29]
 Automatic updates checking
