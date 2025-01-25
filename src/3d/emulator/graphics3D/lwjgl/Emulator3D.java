@@ -1461,28 +1461,6 @@ public final class Emulator3D implements IGraphics3D {
 		executorService.execute(r);
 	}
 
-	static class M3GTask implements Runnable {
-		private Runnable run;
-		Throwable exception;
-
-		public M3GTask(Runnable r) {
-			this.run = r;
-		}
-
-		public void run() {
-			run.run();
-			run = null;
-		}
-
-		public boolean done() {
-			return run == null || exception != null;
-		}
-
-		public String toString() {
-			return "M3GTask@" + hashCode() + ":" + run;
-		}
-	}
-
 	public static class M3GException extends RuntimeException {
 		public M3GException(Throwable cause) {
 			super(cause);

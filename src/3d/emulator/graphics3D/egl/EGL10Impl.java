@@ -13,7 +13,7 @@ import javax.microedition.m3g.Image2D;
  */
 public class EGL10Impl implements EGL10 {
 	static EGL10Impl egl;
-	static emulator.graphics3D.lwjgl.Emulator3D g3d;
+	public static emulator.graphics3D.lwjgl.Emulator3D g3d;
 
 	public EGL10Impl() {
 		super();

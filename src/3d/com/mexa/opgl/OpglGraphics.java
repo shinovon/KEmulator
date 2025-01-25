@@ -20,6 +20,7 @@ import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.Graphics2DAWT;
 import emulator.graphics2D.swt.Graphics2DSWT;
+import emulator.graphics3D.egl.EGL10Impl;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -798,7 +799,7 @@ public class OpglGraphics {
 
 	public void glLightfv(int light, int pname, float[] params) {
 
-		gl.glLightfv(light, pname, params, 0);
+		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glLightfv(light, pname, params));
 
 	}
 
@@ -834,7 +835,7 @@ public class OpglGraphics {
 
 	public void glMaterialfv(int face, int pname, float[] params) {
 
-		gl.glMaterialfv(face, pname, params, 0);
+		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glMaterialfv(face, pname, params));
 
 	}
 
@@ -845,8 +846,7 @@ public class OpglGraphics {
 	}
 
 	public void glMultMatrixf(float[] m) {
-
-		gl.glMultMatrixf(m, 0);
+		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glMultMatrixf(m));
 
 	}
 
@@ -1113,9 +1113,7 @@ public class OpglGraphics {
 	}
 
 	public void glGetTexEnvfv(int env, int pname, float[] params) {
-//
-//		((GL11Ext) gl).glGetTexEnvfv(env, pname, params, 0);
-//
+		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glGetTexEnvfv(env, pname, params));
 	}
 
 	public void glGetTexParameterfv(int target, int pname, float[] params) {
@@ -1144,23 +1142,17 @@ public class OpglGraphics {
 
 	public boolean glIsBuffer(int buffer) {
 
-		gl.glIsBuffer(buffer);
-
-		return false;
+		return gl.glIsBuffer(buffer);
 	}
 
 	public boolean glIsEnabled(int cap) {
 
-		gl.glIsEnabled(cap);
-
-		return false;
+		return gl.glIsEnabled(cap);
 	}
 
 	public boolean glIsTexture(int texture) {
 
-		gl.glIsTexture(texture);
-
-		return false;
+		return gl.glIsTexture(texture);
 	}
 
 	public void glPointParameterf(int pname, float param) {
@@ -1212,9 +1204,9 @@ public class OpglGraphics {
 	}
 
 	public void glPointSizePointerOES(int type, int stride, int offset) {
-//
-//		((GL11Ext) gl).glPointSizePointerOES(type, stride, offset);
-//
+
+		gl.glPointSizePointerOES(type, stride, offset);
+
 	}
 
 	public void glCurrentPaletteMatrixOES(int index) {

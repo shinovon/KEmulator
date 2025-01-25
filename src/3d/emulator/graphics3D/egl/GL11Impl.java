@@ -27,7 +27,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized boolean glIsTexture(final int n) {
-		EGL10Impl.g3d.sync(() -> GL11.glIsTexture(n));
+		EGL10Impl.g3d.sync(() -> temp = GL11.glIsTexture(n));
 		return (boolean) temp;
 	}
 
@@ -130,7 +130,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		doubleBuffer.put(array[n2 + 2]);
 		doubleBuffer.put(array[n2 + 3]);
 		doubleBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glClipPlanef(final int n, final FloatBuffer floatBuffer) {
@@ -140,7 +140,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		doubleBuffer.put(floatBuffer.get());
 		doubleBuffer.put(floatBuffer.get());
 		doubleBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glClipPlanex(final int n, final int[] array, final int n2) {
@@ -150,7 +150,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		doubleBuffer.put(array[n2 + 2] / 65536.0f);
 		doubleBuffer.put(array[n2 + 3] / 65536.0f);
 		doubleBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glClipPlanex(final int n, final IntBuffer intBuffer) {
@@ -160,7 +160,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		doubleBuffer.put(intBuffer.get() / 65536.0f);
 		doubleBuffer.put(intBuffer.get() / 65536.0f);
 		doubleBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glClipPlane(n, doubleBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glClipPlane(n, doubleBuffer));
 	}
 
 	public final synchronized void glGetClipPlanef(final int n, final float[] array, final int n2) {
@@ -503,17 +503,17 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glTexGenf(final int n, final int n2, final float n3) {
 		method805();
-		EGL10Impl.g3d.async(() -> GL11.glTexGenf(n, n2, n3));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGenf(n, n2, n3));
 	}
 
 	public final synchronized void glTexGeni(final int n, final int n2, final int n3) {
 		method805();
-		EGL10Impl.g3d.async(() -> GL11.glTexGeni(n, n2, n3));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGeni(n, n2, n3));
 	}
 
 	public final synchronized void glTexGenx(final int n, final int n2, final int n3) {
 		method805();
-		EGL10Impl.g3d.async(() -> GL11.glTexGenf(n, n2, n3 / 65536.0f));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGenf(n, n2, n3 / 65536.0f));
 	}
 
 	public final synchronized void glTexGenfv(final int n, final int n2, final float[] array, final int n3) {
@@ -522,12 +522,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
 		floatBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glTexGenfv(n, n2, floatBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glTexGenfv(final int n, final int n2, final FloatBuffer floatBuffer) {
 		method805();
-		EGL10Impl.g3d.async(() -> GL11.glTexGenfv(n, n2, floatBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final int[] array, final int n3) {
@@ -536,12 +536,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
 		intBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glTexGeniv(n, n2, intBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGeniv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final IntBuffer intBuffer) {
 		method805();
-		EGL10Impl.g3d.async(() -> GL11.glTexGeniv(n, n2, intBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGeniv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final int[] array, final int n3) {
@@ -552,7 +552,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 			floatBuffer.put(array[i] / 65536.0f);
 		}
 		floatBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glTexGenfv(n, n2, floatBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final IntBuffer intBuffer) {
@@ -563,7 +563,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 			floatBuffer.put(intBuffer.get() / 65536.0f);
 		}
 		floatBuffer.position(0);
-		EGL10Impl.g3d.async(() -> GL11.glTexGenfv(n, n2, floatBuffer));
+		EGL10Impl.g3d.sync(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetTexGenfv(final int n, final int n2, final float[] array, final int n3) {
@@ -616,14 +616,14 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		if (!GLConfiguration.aBoolean1328) {
 			throw new UnsupportedOperationException("OES_blend_subtract extension not available");
 		}
-		EGL10Impl.g3d.async(() -> GL14.glBlendEquation(n));
+		EGL10Impl.g3d.sync(() -> GL14.glBlendEquation(n));
 	}
 
 	public final synchronized void glBlendFuncSeparate(final int n, final int n2, final int n3, final int n4) {
 		if (!GLConfiguration.aBoolean1329) {
 			throw new UnsupportedOperationException("OES_blend_func_separate extension not available");
 		}
-		EGL10Impl.g3d.async(() -> GL14.glBlendFuncSeparate(n, n2, n3, n4));
+		EGL10Impl.g3d.sync(() -> GL14.glBlendFuncSeparate(n, n2, n3, n4));
 	}
 
 	public final synchronized void glBlendEquationSeparate(final int n, final int n2) {
