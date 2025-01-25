@@ -30,6 +30,9 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT;
@@ -37,7 +40,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
-public final class Emulator3D implements IGraphics3D, Runnable {
+public final class Emulator3D implements IGraphics3D {
 
 	private static Emulator3D instance;
 	private final LWJGLUtil memoryBuffers;
@@ -83,10 +86,8 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 	private boolean egl;
 
 	private static boolean threadBound;
-	private final Thread taskThread;
-	private final Object tasksAddLock = new Object();
-	private final Vector<M3GTask> tasks = new Vector<M3GTask>();
-	private boolean taskAdded;
+	private ExecutorService executorService;
+	private Thread executorThread;
 
 	private Emulator3D() {
 		instance = this;
@@ -109,9 +110,6 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
 		memoryBuffers = new LWJGLUtil();
 		renderPipe = new RenderPipe();
-
-		taskThread = new Thread(this, "KEmulator-M3G");
-		taskThread.setPriority(5);
 	}
 
 	public static Emulator3D getInstance() {
@@ -137,8 +135,12 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 		this.egl = forceWindow;
 		Profiler3D.bindTargetCallCount++;
 
-		if (!taskThread.isAlive()) {
-			taskThread.start();
+		if (executorService == null) {
+			executorService = Executors.newSingleThreadExecutor((r) -> {
+				Thread t = new Thread(r, "KEmulator-M3G");
+				t.setPriority(5);
+				return executorThread = t;
+			});
 		}
 
 		int w;
@@ -1431,40 +1433,8 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 
 	// m3g thread
 
-	public void run() {
-		try {
-			while (true) {
-				synchronized (tasksAddLock) {
-					if (!taskAdded) tasksAddLock.wait();
-				}
-				taskAdded = false;
-
-				M3GTask task;
-				while (!tasks.isEmpty()) {
-					synchronized (tasks) {
-						if ((task = tasks.get(0)) == null)
-							continue;
-						tasks.removeElementAt(0);
-					}
-					synchronized (task) {
-						try {
-							task.run();
-						} catch (Throwable e) {
-							task.exception = e;
-						} finally {
-							task.notifyAll();
-						}
-					}
-				}
-			}
-		} catch (Throwable e) {
-			System.err.println("Uncaught exception in M3G thread");
-			e.printStackTrace();
-		}
-	}
-
 	public void sync(Runnable r) throws M3GException {
-		if (Thread.currentThread() == taskThread || !Settings.m3gThread) {
+		if (Thread.currentThread() == executorThread || !Settings.m3gThread) {
 			try {
 				r.run();
 			} catch (Exception e) {
@@ -1473,38 +1443,22 @@ public final class Emulator3D implements IGraphics3D, Runnable {
 			return;
 		}
 
-		M3GTask task = new M3GTask(r);
-		addTask(task);
-
-		synchronized (task) {
-			while (!task.done()) {
-				try {
-					task.wait();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			if (task.exception != null) {
-				throw new M3GException(task.exception);
-			}
+		try {
+			executorService.submit(r).get();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			throw new M3GException(e.getCause());
 		}
 	}
 
 	public void async(Runnable r) {
-		if (Thread.currentThread() == taskThread || !Settings.m3gThread) {
+		if (Thread.currentThread() == executorThread || !Settings.m3gThread) {
 			r.run();
 			return;
 		}
 
-		addTask(new M3GTask(r));
-	}
-
-	private void addTask(M3GTask task) {
-		tasks.add(task);
-		taskAdded = true;
-		synchronized (tasksAddLock) {
-			tasksAddLock.notifyAll();
-		}
+		executorService.execute(r);
 	}
 
 	static class M3GTask implements Runnable {
