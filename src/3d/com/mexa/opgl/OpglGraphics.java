@@ -419,7 +419,6 @@ public class OpglGraphics {
 	private int height;
 	private EGLSurface eglWindowSurface;
 	private java.nio.ByteBuffer pixelBuffer;
-//	private final Matrix matrix = new Matrix();
 
 	private static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
 	private static BufferedImage awtImageBuffer;
@@ -472,7 +471,6 @@ public class OpglGraphics {
 			} else {
 				awtImageBuffer = new BufferedImage(width, height, 4);
 			}
-//			imageBuffer = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 			pixelBuffer = java.nio.ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
 
 			if (eglWindowSurface != null) {
@@ -489,16 +487,13 @@ public class OpglGraphics {
 
 			bindEglContext();
 			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-//			matrix.setScale(1.0f, -1.0f, width / 2.0f, height / 2.0f);
 		}
-		//releaseEglContext();
 	}
 
 	public void release() {
 		if (graphics == null || pixelBuffer == null || width <= 0 || height <= 0) {
 			return;
 		}
-		//bindEglContext();
 		gl.glFinish();
 		gl.glReadPixels(0, 0, width, height, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, pixelBuffer.rewind());
 
@@ -526,8 +521,6 @@ public class OpglGraphics {
 
 			((Graphics2DAWT) graphics.getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
 		}
-//		imageBuffer.copyPixelsFromBuffer(pixelBuffer.rewind());
-//		graphics.getCanvas().drawBitmap(imageBuffer, matrix, null);
 		releaseEglContext();
 		graphics = null;
 	}
@@ -589,9 +582,7 @@ public class OpglGraphics {
 	}
 
 	public void glColorPointer(int size, int type, int stride, int offset) {
-
 		gl.glColorPointer(size, type, stride, offset);
-
 	}
 
 	public void glCompressedTexImage2D(int target,
@@ -601,9 +592,7 @@ public class OpglGraphics {
 									   int height,
 									   int border,
 									   ByteBuffer data) {
-
 		gl.glCompressedTexImage2D(target, level, internalformat, width, height, border, data.length(), data.getNioBuffer());
-
 	}
 
 	public void glCompressedTexSubImage2D(int target,
@@ -614,9 +603,7 @@ public class OpglGraphics {
 										  int height,
 										  int format,
 										  ByteBuffer data) {
-
 		gl.glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data.length(), data.getNioBuffer());
-
 	}
 
 	public void glCopyTexImage2D(int target,
@@ -627,9 +614,7 @@ public class OpglGraphics {
 								 int width,
 								 int height,
 								 int border) {
-
 		gl.glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
-
 	}
 
 	public void glCopyTexSubImage2D(int target,
@@ -640,346 +625,232 @@ public class OpglGraphics {
 									int y,
 									int width,
 									int height) {
-
 		gl.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
-
 	}
 
 	public void glCullFace(int mode) {
-
 		gl.glCullFace(mode);
-
 	}
 
 	public void glDeleteTextures(int[] textures) {
-
 		gl.glDeleteTextures(textures.length, textures, 0);
-
 	}
 
 	public void glDepthFunc(int func) {
-
 		gl.glDepthFunc(func);
-
 	}
 
 	public void glDepthMask(boolean flag) {
-
 		gl.glDepthMask(flag);
-
 	}
 
 	public void glDepthRangef(float zNear, float zFar) {
-
 		gl.glDepthRangef(zNear, zFar);
-
 	}
 
 	public void glDisable(int cap) {
-
 		gl.glDisable(cap);
-
 	}
 
 	public void glDisableClientState(int array) {
-
 		gl.glDisableClientState(array);
-
 	}
 
 	public void glDrawArrays(int mode, int first, int count) {
-
 		gl.glDrawArrays(mode, first, count);
-
 	}
 
 	public void glDrawElements(int mode, int type, Buffer indices) {
-
 		gl.glDrawElements(mode, indices.length(), type, indices.getNioBuffer());
-
 	}
 
 	public void glDrawElements(int mode, int count, int type, int offset) {
-
 		gl.glDrawElements(mode, count, type, offset);
-
 	}
 
 	public void glEnable(int cap) {
-
 		gl.glEnable(cap);
-
 	}
 
 	public void glEnableClientState(int array) {
-
 		gl.glEnableClientState(array);
-
 	}
 
 	public void glFlush() {
-
 		gl.glFlush();
-
 	}
 
 	public void glFogf(int pname, float param) {
-
 		gl.glFogf(pname, param);
-
 	}
 
 	public void glFogfv(int pname, float[] params) {
-
 		gl.glFogfv(pname, params, 0);
-
 	}
 
 	public void glFrontFace(int mode) {
-
 		gl.glFrontFace(mode);
-
 	}
 
 	public void glFrustumf(float left, float right, float bottom, float top, float zNear, float zFar) {
-
 		gl.glFrustumf(left, right, bottom, top, zNear, zFar);
-
 	}
 
 	public void glGenTextures(int[] textures) {
-
 		gl.glGenTextures(textures.length, textures, 0);
-
 	}
 
 	public int glGetError() {
-
-		int error = gl.glGetError();
-
-		return error;
+		return gl.glGetError();
 	}
 
 	public void glGetIntegerv(int pname, int[] params) {
-
 		gl.glGetIntegerv(pname, params, 0);
-
 	}
 
 	public String glGetString(int name) {
-
-		String s = gl.glGetString(name);
-
-		return s;
+		return gl.glGetString(name);
 	}
 
 	public void glHint(int target, int mode) {
-
 		gl.glHint(target, mode);
-
 	}
 
 	public void glLightModelf(int pname, float param) {
-
 		gl.glLightModelf(pname, param);
-
 	}
 
 	public void glLightModelfv(int pname, float[] params) {
-
 		gl.glLightModelfv(pname, params, 0);
-
 	}
 
 	public void glLightf(int light, int pname, float param) {
-
 		gl.glLightf(light, pname, param);
-
 	}
 
 	public void glLightfv(int light, int pname, float[] params) {
-
-		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glLightfv(light, pname, params));
-
+		gl.glLightfv(light, pname, params, 0);
+//		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glLightfv(light, pname, params));
 	}
 
 	public void glLineWidth(float width) {
-
 		gl.glLineWidth(width);
-
 	}
 
 	public void glLoadIdentity() {
-
 		gl.glLoadIdentity();
-
 	}
 
 	public void glLoadMatrixf(float[] m) {
-
 		gl.glLoadMatrixf(m, 0);
-
 	}
 
 	public void glLogicOp(int opcode) {
-
 		gl.glLogicOp(opcode);
-
 	}
 
 	public void glMaterialf(int face, int pname, float param) {
-
 		gl.glMaterialf(face, pname, param);
-
 	}
 
 	public void glMaterialfv(int face, int pname, float[] params) {
-
 		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glMaterialfv(face, pname, params));
-
 	}
 
 	public void glMatrixMode(int mode) {
-
 		gl.glMatrixMode(mode);
-
 	}
 
 	public void glMultMatrixf(float[] m) {
 		EGL10Impl.g3d.sync(() -> org.lwjgl.opengl.GL11.glMultMatrixf(m));
-
 	}
 
 	public void glMultiTexCoord4f(int target, float s, float t, float r, float q) {
-
 		gl.glMultiTexCoord4f(target, s, t, r, q);
-
 	}
 
 	public void glNormal3f(float nx, float ny, float nz) {
-
 		gl.glNormal3f(nx, ny, nz);
-
 	}
 
 	public void glNormalPointer(int type, int stride, Buffer pointer) {
-
 		gl.glNormalPointer(type, stride, pointer.getNioBuffer());
-
 	}
 
 	public void glNormalPointer(int type, int stride, int offset) {
-
 		gl.glNormalPointer(type, stride, offset);
-
 	}
 
 	public void glOrthof(float left, float right, float bottom, float top, float zNear, float zFar) {
-
 		gl.glOrthof(left, right, bottom, top, zNear, zFar);
-
 	}
 
 	public void glPixelStorei(int pname, int param) {
-
 		gl.glPixelStorei(pname, param);
-
 	}
 
 	public void glPointSize(float size) {
-
 		gl.glPointSize(size);
-
 	}
 
 	public void glPolygonOffset(float factor, float units) {
-
 		gl.glPolygonOffset(factor, units);
-
 	}
 
 	public void glPopMatrix() {
-
 		gl.glPopMatrix();
-
 	}
 
 	public void glPushMatrix() {
-
 		gl.glPushMatrix();
-
 	}
 
 	public void glRotatef(float angle, float x, float y, float z) {
-
 		gl.glRotatef(angle, x, y, z);
-
 	}
 
 	public void glSampleCoverage(float value, boolean invert) {
-
 		gl.glSampleCoverage(value, invert);
-
 	}
 
 	public void glScalef(float x, float y, float z) {
-
 		gl.glScalef(x, y, z);
-
 	}
 
 	public void glScissor(int x, int y, int width, int height) {
-
 		gl.glScissor(x, y, width, height);
-
 	}
 
 	public void glShadeModel(int mode) {
-
 		gl.glShadeModel(mode);
-
 	}
 
 	public void glStencilFunc(int func, int ref, int mask) {
-
 		gl.glStencilFunc(func, ref, mask);
-
 	}
 
 	public void glStencilMask(int mask) {
-
 		gl.glStencilMask(mask);
-
 	}
 
 	public void glStencilOp(int fail, int zfail, int zpass) {
-
 		gl.glStencilOp(fail, zfail, zpass);
-
 	}
 
 	public void glTexCoordPointer(int size, int type, int stride, Buffer pointer) {
-
 		gl.glTexCoordPointer(size, type, stride, pointer.getNioBuffer());
-
 	}
 
 	public void glTexCoordPointer(int size, int type, int stride, int offset) {
-
 		gl.glTexCoordPointer(size, type, stride, offset);
-
 	}
 
 	public void glTexEnvf(int target, int pname, float param) {
-
 		gl.glTexEnvf(target, pname, param);
-
 	}
 
 	public void glTexEnvfv(int target, int pname, float[] params) {
-
 		gl.glTexEnvfv(target, pname, params, 0);
-
 	}
 
 	public void glTexImage2D(int target,
@@ -991,15 +862,11 @@ public class OpglGraphics {
 							 int format,
 							 int type,
 							 Buffer pixels) {
-
 		gl.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels.getNioBuffer());
-
 	}
 
 	public void glTexParameterf(int target, int pname, float param) {
-
 		gl.glTexParameterf(target, pname, param);
-
 	}
 
 	public void glTexSubImage2D(int target,
@@ -1011,105 +878,71 @@ public class OpglGraphics {
 								int format,
 								int type,
 								Buffer pixels) {
-
 		gl.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels.getNioBuffer());
-
 	}
 
 	public void glTranslatef(float x, float y, float z) {
-
 		gl.glTranslatef(x, y, z);
-
 	}
 
 	public void glVertexPointer(int size, int type, int stride, Buffer pointer) {
-
 		gl.glVertexPointer(size, type, stride, pointer.getNioBuffer());
-
 	}
 
 	public void glVertexPointer(int size, int type, int stride, int offset) {
-
 		gl.glVertexPointer(size, type, stride, offset);
-
 	}
 
 	public void glViewport(int x, int y, int width, int height) {
-
 		gl.glViewport(x, y, width, height);
-
 	}
 
 	public void glBindBuffer(int target, int buffer) {
-
 		gl.glBindBuffer(target, buffer);
-
 	}
 
 	public void glBufferData(int target, Buffer data, int usage) {
-
 		gl.glBufferData(target, data.length(), data.getNioBuffer(), usage);
-
 	}
 
 	public void glBufferSubData(int target, int offset, Buffer data) {
-
 		gl.glBufferSubData(target, offset, data.length(), data.getNioBuffer());
-
 	}
 
 	public void glClipPlanef(int plane, float[] equation) {
-
 		gl.glClipPlanef(plane, equation, 0);
-
 	}
 
 	public void glColor4ub(byte red, byte green, byte blue, byte alpha) {
-
 		gl.glColor4ub(red, green, blue, alpha);
-
 	}
 
 	public void glDeleteBuffers(int[] buffers) {
-
 		gl.glDeleteBuffers(buffers.length, buffers, 0);
-
 	}
 
 	public void glGetBooleanv(int pname, boolean[] params) {
-
 		gl.glGetBooleanv(pname, params, 0);
-
 	}
 
 	public void glGetBufferParameteriv(int target, int pname, int[] params) {
-
 		gl.glGetBufferParameteriv(target, pname, params, 0);
-
 	}
 
 	public void glGetClipPlanef(int pname, float[] equation) {
-
 		gl.glGetClipPlanef(pname, equation, 0);
-
 	}
 
 	public void glGetFloatv(int pname, float[] params) {
-
 		gl.glGetFloatv(pname, params, 0);
-
 	}
 
 	public void glGetLightfv(int light, int pname, float[] params) {
-
 		gl.glGetLightfv(light, pname, params, 0);
-
 	}
 
 	public void glGetMaterialfv(int face, int pname, float[] params) {
-
 		gl.glGetMaterialfv(face, pname, params, 0);
-
 	}
 
 	public void glGetTexEnvfv(int env, int pname, float[] params) {
@@ -1117,72 +950,51 @@ public class OpglGraphics {
 	}
 
 	public void glGetTexParameterfv(int target, int pname, float[] params) {
-
 		gl.glGetTexParameterfv(target, pname, params, 0);
-
 	}
 
 	public void glGenBuffers(int[] buffers) {
-
 		gl.glGenBuffers(buffers.length, buffers, 0);
-
 	}
 
 	public void glGetTexEnviv(int env, int pname, int[] params) {
-
 		gl.glGetTexEnviv(env, pname, params, 0);
-
 	}
 
 	public void glGetTexParameteriv(int target, int pname, int[] params) {
-
 		gl.glGetTexParameteriv(target, pname, params, 0);
-
 	}
 
 	public boolean glIsBuffer(int buffer) {
-
 		return gl.glIsBuffer(buffer);
 	}
 
 	public boolean glIsEnabled(int cap) {
-
 		return gl.glIsEnabled(cap);
 	}
 
 	public boolean glIsTexture(int texture) {
-
 		return gl.glIsTexture(texture);
 	}
 
 	public void glPointParameterf(int pname, float param) {
-
 		gl.glPointParameterf(pname, param);
-
 	}
 
 	public void glPointParameterfv(int pname, float[] params) {
-
 		gl.glPointParameterfv(pname, params, 0);
-
 	}
 
 	public void glTexEnvi(int target, int pname, int param) {
-
 		gl.glTexEnvi(target, pname, param);
-
 	}
 
 	public void glTexEnviv(int target, int pname, int[] params) {
-
 		gl.glTexEnviv(target, pname, params, 0);
-
 	}
 
 	public void glTexParameterfv(int target, int pname, float[] params) {
-
 		gl.glTexParameterfv(target, pname, params, 0);
-
 	}
 
 	public void glTexParameteri(int target, int pname, int param) {
@@ -1192,74 +1004,50 @@ public class OpglGraphics {
 	}
 
 	public void glTexParameteriv(int target, int pname, int[] params) {
-
 		gl.glTexParameteriv(target, pname, params, 0);
-
 	}
 
 	public void glPointSizePointerOES(int type, int stride, Buffer pointer) {
-
 		gl.glPointSizePointerOES(type, stride, pointer.getNioBuffer());
-
 	}
 
 	public void glPointSizePointerOES(int type, int stride, int offset) {
-
 		gl.glPointSizePointerOES(type, stride, offset);
-
 	}
 
 	public void glCurrentPaletteMatrixOES(int index) {
-
 		((GL11Ext) gl).glCurrentPaletteMatrixOES(index);
-
 	}
 
 	public void glLoadPaletteFromModelViewMatrixOES() {
-
 		((GL11Ext) gl).glLoadPaletteFromModelViewMatrixOES();
-
 	}
 
 	public void glMatrixIndexPointerOES(int size, int type, int stride, Buffer pointer) {
-
 		((GL11Ext) gl).glMatrixIndexPointerOES(size, type, stride, pointer.getNioBuffer());
-
 	}
 
 	public void glMatrixIndexPointerOES(int size, int type, int stride, int offset) {
-
 		((GL11Ext) gl).glMatrixIndexPointerOES(size, type, stride, offset);
-
 	}
 
 	public void glWeightPointerOES(int size, int type, int stride, Buffer pointer) {
-
 		((GL11Ext) gl).glWeightPointerOES(size, type, stride, pointer.getNioBuffer());
-
 	}
 
 	public void glWeightPointerOES(int size, int type, int stride, int offset) {
-
 		((GL11Ext) gl).glWeightPointerOES(size, type, stride, offset);
-
 	}
 
 	public void glDrawTexsOES(short x, short y, short z, short width, short height) {
-
 		((GL11Ext) gl).glDrawTexsOES(x, y, z, width, height);
-
 	}
 
 	public void glDrawTexiOES(int x, int y, int z, int width, int height) {
-
 		((GL11Ext) gl).glDrawTexiOES(x, y, z, width, height);
-
 	}
 
 	public void glDrawTexfOES(float x, float y, float z, float width, float height) {
-
 		((GL11Ext) gl).glDrawTexfOES(x, y, z, width, height);
-
 	}
 }
