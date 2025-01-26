@@ -23,30 +23,38 @@ abstract class PhraseTrackBase {
 	public static final int PAUSED = 5;
 	public static final int DEFAULT_VOLUME = 100;
 	public static final int DEFAULT_PANPOT = 64;
+	private int state;
+	private boolean muted;
 
 	PhraseTrackBase(int id) {
+		state = READY;
 	}
 
 	public void removePhrase() {
 	}
 
 	public void play() {
+		state = PLAYING;
 	}
 
 	public void play(int loop) {
+		state = PLAYING;
 	}
 
 	public void stop() {
+		state = PAUSED;
 	}
 
 	public void pause() {
+		state = PAUSED;
 	}
 
 	public void resume() {
+		state = PLAYING;
 	}
 
 	public int getState() {
-		return PLAYING;
+		return state;
 	}
 
 	public void setVolume(int value) {
@@ -64,10 +72,11 @@ abstract class PhraseTrackBase {
 	}
 
 	public void mute(boolean mute) {
+		muted = mute;
 	}
 
 	public boolean isMute() {
-		return true;
+		return muted;
 	}
 
 	public int getID() {
