@@ -1007,6 +1007,11 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.m3gTexFilter = m3gTexFilterCombo.getSelectionIndex();
 		Settings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
 
+		Settings.mascotIgnoreBackground = mascotBackgroundFilterCheck.getSelection();
+		Settings.mascotTextureFilter = mascotTextureFilterCheck.getSelection();
+		Settings.mascotBackgroundFilter = mascotBackgroundFilterCheck.getSelection();
+		Settings.mascotNo2DMixing = mascotNo2DMixingCheck.getSelection();
+
 		Settings.searchVms = vmsCheck.getSelection();
 //        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 		Settings.oneMidiAtTime = globalMidiCheck.getSelection();
