@@ -408,7 +408,7 @@ public class OpglGraphics {
 	public static final int GL_XOR = 5382;
 	public static final int GL_ZERO = 0;
 
-	private static final OpglGraphics INSTANCE = new OpglGraphics();
+	private static OpglGraphics INSTANCE;
 	private final EGL10 egl;
 	private final EGLDisplay eglDisplay;
 	private final EGLConfig eglConfig;
@@ -425,6 +425,7 @@ public class OpglGraphics {
 	private static ImageData swtImageBuffer;
 
 	private OpglGraphics() {
+		Settings.m3gThread = true;
 		egl = (EGL10) EGLContext.getEGL();
 		eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
 		egl.eglInitialize(eglDisplay, null);
@@ -447,6 +448,9 @@ public class OpglGraphics {
 	}
 
 	public static synchronized OpglGraphics getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new OpglGraphics();
+		}
 		return INSTANCE;
 	}
 
