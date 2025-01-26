@@ -18,27 +18,29 @@ package com.jblend.graphics.j3d;
 
 import java.io.IOException;
 
+import ru.woesss.j2me.micro3d.FigureImpl;
+
 public class Figure {
 	Texture[] textures;
-	com.mascotcapsule.micro3d.v3.Figure impl;
+	FigureImpl impl;
 
-	
+
 	public Figure(byte[] b) {
-		impl = new com.mascotcapsule.micro3d.v3.Figure(b);
+		impl = new FigureImpl(b);
 	}
 
-	
+
 	public Figure(String name) throws IOException {
-		impl = new com.mascotcapsule.micro3d.v3.Figure(name);
+		impl = new FigureImpl(name);
 	}
 
-	
+
 	/** @noinspection unused*/
 	public int getNumPattern() {
 		return impl.getNumPattern();
 	}
 
-	
+
 	/** @noinspection unused*/
 	public int getNumTextures() {
 		if (textures == null) {
@@ -47,12 +49,12 @@ public class Figure {
 		return textures.length;
 	}
 
-	
+
 	public void setPattern(int idx) {
 		impl.setPattern(idx);
 	}
 
-	
+
 	/** @noinspection unused*/
 	public void setPosture(ActionTable actionTable, int action, int frame) {
 		if (actionTable == null) {

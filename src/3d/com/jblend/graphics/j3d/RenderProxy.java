@@ -16,11 +16,17 @@
 
 package com.jblend.graphics.j3d;
 
-import javax.microedition.lcdui.Graphics;
+import static ru.woesss.j2me.micro3d.MathUtil.TO_FLOAT;
+
 import java.util.WeakHashMap;
 
+import javax.microedition.lcdui.Graphics;
+
+import ru.woesss.j2me.micro3d.Render;
+import ru.woesss.j2me.micro3d.TextureImpl;
+
 public class RenderProxy {
-	private static final WeakHashMap<Graphics, com.mascotcapsule.micro3d.v3.Graphics3D> renders = new WeakHashMap();
+	private static final WeakHashMap<Graphics, Render> renders = new WeakHashMap<>();
 
 	public static void drawCommandList(Graphics g,
 									   Texture[] textures,
@@ -32,9 +38,16 @@ public class RenderProxy {
 		if (layout == null || effect == null || commandList == null) {
 			throw new NullPointerException();
 		}
-		com.mascotcapsule.micro3d.v3.Graphics3D render = getRender(g);
+		Render render = getRender(g);
 
-		render.drawCommandList(getMascotTextures(textures), x, y, getMascotLayout(layout), getMascotEffect(effect), commandList);
+		RenderProxy.getViewTrans(layout.affine, render.getViewMatrix(), 0);
+		RenderProxy.setTextureArray(render, textures);
+		RenderProxy.setAffineArray(render, layout.affineArray);
+		render.setCenter(layout.centerX + x, layout.centerY + y);
+		RenderProxy.setProjection(render, layout);
+		RenderProxy.setEffects(render, effect);
+
+		render.drawCommandList(commandList);
 	}
 
 	public static void drawCommandList(Graphics g,
@@ -47,9 +60,18 @@ public class RenderProxy {
 		if (layout == null || effect == null || commandList == null) {
 			throw new NullPointerException();
 		}
-		com.mascotcapsule.micro3d.v3.Graphics3D render = getRender(g);
+		Render render = getRender(g);
 
-		render.drawCommandList(getMascotTexture(texture), x, y, getMascotLayout(layout), getMascotEffect(effect), commandList);
+		RenderProxy.getViewTrans(layout.affine, render.getViewMatrix(), 0);
+		RenderProxy.setAffineArray(render, layout.affineArray);
+		render.setCenter(layout.centerX + x, layout.centerY + y);
+		RenderProxy.setProjection(render, layout);
+		RenderProxy.setEffects(render, effect);
+		if (texture != null) {
+			render.setTexture(texture.impl);
+		}
+
+		render.drawCommandList(commandList);
 	}
 
 	public static void drawFigure(Graphics g, Figure figure, int x, int y,
@@ -57,13 +79,22 @@ public class RenderProxy {
 		if (figure == null || layout == null || effect == null) {
 			throw new NullPointerException();
 		}
-		com.mascotcapsule.micro3d.v3.Graphics3D render = getRender(g);
+		Render render = getRender(g);
 
-		render.drawFigure(figure.impl, x, y, getMascotLayout(layout), getMascotEffect(effect));
+		RenderProxy.getViewTrans(layout.affine, render.getViewMatrix(), 0);
+		render.setCenter(layout.centerX + x, layout.centerY + y);
+		RenderProxy.setProjection(render, layout);
+		RenderProxy.setEffects(render, effect);
+		Texture texture = figure.textures[0];
+		if (texture != null) {
+			render.setTexture(texture.impl);
+		}
+
+		render.drawFigure(figure.impl);
 	}
 
 	public static void flush(Graphics g) {
-		getRender(g).flush();
+		getRender(g).flushToBuffer();
 	}
 
 	public static void renderFigure(Graphics g, Figure figure, int x, int y,
@@ -72,9 +103,15 @@ public class RenderProxy {
 			throw new NullPointerException();
 		}
 
-		com.mascotcapsule.micro3d.v3.Graphics3D render = getRender(g);
+		Render render = getRender(g);
 
-		render.renderFigure(figure.impl, x, y, getMascotLayout(layout), getMascotEffect(effect));
+		getViewTrans(layout.affine, render.getViewMatrix(), 0);
+		setTextureArray(render, figure.textures);
+		render.setCenter(layout.centerX + x, layout.centerY + y);
+		RenderProxy.setProjection(render, layout);
+		RenderProxy.setEffects(render, effect);
+
+		render.postFigure(figure.impl);
 	}
 
 	public static void renderPrimitives(Graphics g, Texture texture, int x, int y,
@@ -88,78 +125,145 @@ public class RenderProxy {
 		if (command < 0 || numPrimitives <= 0 || numPrimitives >= 256) {
 			throw new IllegalArgumentException();
 		}
-		com.mascotcapsule.micro3d.v3.Graphics3D render = getRender(g);
+		Render render = getRender(g);
 
-		render.renderPrimitives(getMascotTexture(texture), x, y, getMascotLayout(layout), getMascotEffect(effect), command, numPrimitives, vertexCoords, normals, textureCoords, colors);
+		RenderProxy.getViewTrans(layout.affine, render.getViewMatrix(), 0);
+		render.setCenter(layout.centerX + x, layout.centerY + y);
+		RenderProxy.setProjection(render, layout);
+		RenderProxy.setEffects(render, effect);
+		if (texture != null) {
+			render.setTexture(texture.impl);
+		}
+
+		render.postPrimitives(command | numPrimitives << 16, vertexCoords, 0, normals, 0, textureCoords, 0, colors, 0);
 	}
 
-	public static com.mascotcapsule.micro3d.v3.Graphics3D getRender(Graphics g) {
-		com.mascotcapsule.micro3d.v3.Graphics3D render = renders.get(g);
+	private static Render getRender(Graphics g) {
+		Render render = renders.get(g);
 		if (render == null) {
-			render = new com.mascotcapsule.micro3d.v3.Graphics3D();
+			render = new Render();
 			render.bind(g);
 			renders.put(g, render);
 		}
 		return render;
 	}
 
-	private static com.mascotcapsule.micro3d.v3.Effect3D getMascotEffect(Effect3D effect) {
-		if (effect == null) return null;
-		com.mascotcapsule.micro3d.v3.Effect3D r = new com.mascotcapsule.micro3d.v3.Effect3D();
-		r.setShading(effect.shading);
-		r.setLight(getMascotLight(effect.light));
-		r.setSphereTexture(effect.texture == null ? null : effect.texture.impl);
-		r.setToonParams(effect.toonThreshold, effect.toonHigh, effect.toonLow);
-		r.setTransparency(effect.isTransparency);
-		return r;
-	}
-
-	private static com.mascotcapsule.micro3d.v3.Texture getMascotTexture(Texture texture) {
-		if (texture == null) return null;
-		return texture.impl;
-	}
-
-	private static com.mascotcapsule.micro3d.v3.FigureLayout getMascotLayout(FigureLayout layout) {
-		if (layout == null) return null;
-		com.mascotcapsule.micro3d.v3.FigureLayout r = new com.mascotcapsule.micro3d.v3.FigureLayout(getMascotAffine(layout.getAffineTrans()),
-				layout.scaleX, layout.scaleY, layout.centerY, layout.centerY);
-		return r;
-	}
-
-	private static com.mascotcapsule.micro3d.v3.AffineTrans getMascotAffine(AffineTrans a) {
-		if (a == null) return null;
-		int[] out = new int[12];
-		int offset = 0;
-		out[offset++] = a.m00;
-		out[offset++] = a.m01;
-		out[offset++] = a.m02;
+	private static void getViewTrans(AffineTrans a, float[] out, int n) {
+		int offset = n * 12;
+		out[offset++] = a.m00 * TO_FLOAT;
+		out[offset++] = a.m10 * TO_FLOAT;
+		out[offset++] = a.m20 * TO_FLOAT;
+		out[offset++] = a.m01 * TO_FLOAT;
+		out[offset++] = a.m11 * TO_FLOAT;
+		out[offset++] = a.m21 * TO_FLOAT;
+		out[offset++] = a.m02 * TO_FLOAT;
+		out[offset++] = a.m12 * TO_FLOAT;
+		out[offset++] = a.m22 * TO_FLOAT;
 		out[offset++] = a.m03;
-		out[offset++] = a.m10;
-		out[offset++] = a.m11;
-		out[offset++] = a.m12;
 		out[offset++] = a.m13;
-		out[offset++] = a.m20;
-		out[offset++] = a.m21;
-		out[offset++] = a.m22;
 		out[offset  ] = a.m23;
-		return new com.mascotcapsule.micro3d.v3.AffineTrans(out);
 	}
 
-	private static com.mascotcapsule.micro3d.v3.Light getMascotLight(Light light) {
-		if (light == null) return null;
-		return new com.mascotcapsule.micro3d.v3.Light(getMascotVector(light.getDirection()), light.getDirIntensity(), light.getAmbIntensity());
-	}
-
-	private static com.mascotcapsule.micro3d.v3.Vector3D getMascotVector(Vector3D vector) {
-		if (vector == null) return null;
-		return new com.mascotcapsule.micro3d.v3.Vector3D(vector.x, vector.y, vector.z);
-	}
-
-	private static com.mascotcapsule.micro3d.v3.Texture[] getMascotTextures(Texture[] textures) {
-		com.mascotcapsule.micro3d.v3.Texture[] r = new com.mascotcapsule.micro3d.v3.Texture[textures.length];
-		for(int i = 0; i < r.length; i++) {
-			r[i] = textures[i] == null ? null : textures[i].impl;
+	private static void setTextureArray(Render render, Texture[] textures) {
+		if (textures != null) {
+			int len = textures.length;
+			if (len > 0) {
+				if (len > 16) {
+					len = 16;
+				}
+				TextureImpl[] texArray = new TextureImpl[len];
+				for (int i = 0; i < len; i++) {
+					Texture texture = textures[i];
+					if (texture == null) {
+						throw new NullPointerException();
+					}
+					texArray[i] = texture.impl;
+				}
+				render.setTextureArray(texArray);
+			}
 		}
-		return r;
+	}
+
+	private static void setEffects(Render render, Effect3D effect) {
+		int attrs = render.getAttributes();
+		Light light = effect.light;
+		if (light != null) {
+			int ambIntensity = light.ambIntensity;
+			int dirIntensity = light.dirIntensity;
+			Vector3D dir = light.direction;
+			render.setLight(ambIntensity, dirIntensity, dir.x, dir.y, dir.z);
+			attrs |= Graphics3D.ENV_ATTR_LIGHTING;
+		} else {
+			attrs &= ~Graphics3D.ENV_ATTR_LIGHTING;
+		}
+
+		int shading = effect.shading;
+		if (shading == Effect3D.TOON_SHADING) {
+			attrs |= Graphics3D.ENV_ATTR_TOON_SHADING;
+			render.setToonParam(effect.toonThreshold, effect.toonHigh, effect.toonLow);
+		} else {
+			attrs &= ~Graphics3D.ENV_ATTR_TOON_SHADING;
+		}
+
+
+		boolean isBlend = effect.isTransparency;
+		if (isBlend) {
+			attrs |= Graphics3D.ENV_ATTR_SEMI_TRANSPARENT;
+		} else {
+			attrs &= ~Graphics3D.ENV_ATTR_SEMI_TRANSPARENT;
+		}
+
+		Texture specular = effect.texture;
+		if (specular != null) {
+			attrs |= Graphics3D.ENV_ATTR_SPHERE_MAP;
+			render.setSphereTexture(specular.impl);
+		} else {
+			attrs &= ~Graphics3D.ENV_ATTR_SPHERE_MAP;
+		}
+
+		render.setAttribute(attrs);
+	}
+
+	private static void setProjection(Render render, FigureLayout layout) {
+		switch (layout.projection) {
+			case Graphics3D.COMMAND_PARALLEL_SCALE: {
+				int sx = layout.scaleX;
+				int sy = layout.scaleY;
+				render.setOrthographicScale(sx, sy);
+				break;
+			}
+			case Graphics3D.COMMAND_PARALLEL_SIZE: {
+				int w = layout.parallelWidth;
+				int h = layout.parallelHeight;
+				render.setOrthographicWH(w, h);
+				break;
+			}
+			case Graphics3D.COMMAND_PERSPECTIVE_FOV: {
+				int near = layout.near;
+				int far = layout.far;
+				int angle = layout.angle;
+				render.setPerspectiveFov(near, far, angle);
+				break;
+			}
+			case Graphics3D.COMMAND_PERSPECTIVE_WH: {
+				int w = layout.perspectiveWidth;
+				int h = layout.perspectiveHeight;
+				int near = layout.near;
+				int far = layout.far;
+				render.setPerspectiveWH(near, far, w, h);
+				break;
+			}
+		}
+	}
+
+	private static void setAffineArray(Render render, AffineTrans[] affineArray) {
+		if (affineArray != null) {
+			int len = affineArray.length;
+			float[] transArray = new float[len * 12];
+			for (int i = 0; i < len; i++) {
+				getViewTrans(affineArray[i], transArray, i);
+			}
+			render.setViewTransArray(transArray);
+		}
 	}
 }

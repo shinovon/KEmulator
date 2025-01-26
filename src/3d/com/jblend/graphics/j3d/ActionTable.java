@@ -18,15 +18,17 @@ package com.jblend.graphics.j3d;
 
 import java.io.IOException;
 
+import ru.woesss.j2me.micro3d.ActTableImpl;
+
 public class ActionTable {
-	final com.mascotcapsule.micro3d.v3.ActionTable impl;
+	final ActTableImpl impl;
 
 	public ActionTable(byte[] b) {
-		impl = new com.mascotcapsule.micro3d.v3.ActionTable(b);
+		impl = new ActTableImpl(b);
 	}
 
 	public ActionTable(String name) throws IOException {
-		impl = new com.mascotcapsule.micro3d.v3.ActionTable(name);
+		impl = new ActTableImpl(name);
 	}
 
 	public int getNumAction() {

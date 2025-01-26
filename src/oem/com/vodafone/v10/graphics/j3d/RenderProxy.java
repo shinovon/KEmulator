@@ -17,10 +17,10 @@
 package com.vodafone.v10.graphics.j3d;
 
 import javax.microedition.lcdui.Graphics;
-
-import static com.jblend.graphics.j3d.RenderProxy.getRender;
+import java.util.WeakHashMap;
 
 public class RenderProxy {
+	private static final WeakHashMap<Graphics, com.mascotcapsule.micro3d.v3.Graphics3D> renders = new WeakHashMap();
 
 	public static void drawFigure(Graphics g, Figure figure, int x, int y,
 								  FigureLayout layout, Effect3D effect) {
@@ -80,5 +80,15 @@ public class RenderProxy {
 			r[i] = textures[i].impl;
 		}
 		return r;
+	}
+
+	public static com.mascotcapsule.micro3d.v3.Graphics3D getRender(Graphics g) {
+		com.mascotcapsule.micro3d.v3.Graphics3D render = renders.get(g);
+		if (render == null) {
+			render = new com.mascotcapsule.micro3d.v3.Graphics3D();
+			render.bind(g);
+			renders.put(g, render);
+		}
+		return render;
 	}
 }
