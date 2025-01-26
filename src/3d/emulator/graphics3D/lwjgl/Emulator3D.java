@@ -310,39 +310,46 @@ public final class Emulator3D implements IGraphics3D {
 				} else if (Settings.g2d == 0) {
 					buffer.rewind();
 					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-					int w = swtBufferImage.width << 2;
-					int off = swtBufferImage.data.length - w;
 
-					for (int i = swtBufferImage.height; i > 0; --i) {
-						buffer.get(swtBufferImage.data, off, w);
-						off -= w;
+					for (int yy = 0; yy < height; yy++) {
+						int yWrite = swtBufferImage.height - 1 - yy;
+						int writePos = yWrite * swtBufferImage.width * 4;
+						int readPos = yy * width * 4;
+
+						buffer.position(readPos);
+						buffer.get(swtBufferImage.data, writePos, width * 4);
 					}
 
 					Image var12 = new Image(null, swtBufferImage);
-					((Graphics2DSWT) ((Graphics) this.target).getImpl()).gc().drawImage(var12, 0, 0);
+					((Graphics2DSWT) ((Graphics) this.target).getImpl()).gc().drawImage(
+							var12,
+							0, 0, width, height,
+							x, y, width, height
+					);
 					var12.dispose();
 				} else {
 					buffer.rewind();
 					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 					int[] data = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
 					IntBuffer ib = buffer.asIntBuffer();
-					int off;
 
-					if (flip) {
-						off = 0;
-						for (int i = height; i > 0; --i) {
-							ib.get(data, off, width);
-							off += width;
-						}
-					} else {
-						off = data.length - width;
-						for (int i = height; i > 0; --i) {
-							ib.get(data, off, width);
-							off -= width;
-						}
+					for (int yy = 0; yy < height; yy++) {
+						int yWrite = yy;
+						if(!flip) yWrite = awtBufferImage.getHeight() - 1 - yWrite;
+
+						int writePos = yWrite * awtBufferImage.getWidth();
+						int readPos = yy * width;
+
+						ib.position(readPos);
+						ib.get(data, writePos, width);
 					}
 
-					((Graphics2DAWT) ((Graphics) this.target).getImpl()).g().drawImage(awtBufferImage, x, y, null);
+					((Graphics2DAWT) ((Graphics) this.target).getImpl()).g().drawImage(
+							awtBufferImage,
+							x, y, x + width, y + height,
+							0, 0, width, height,
+							null
+					);
 				}
 			}
 		});
