@@ -260,7 +260,7 @@ public class EGL10Impl implements EGL10 {
 			GL10Impl.readSurfaceThread.put(c2, read);
 			GL10Impl.threadToContext.put(currentThread, context);
 			EGL10Impl.g3d.bindTarget(c2.method762().method784(), true);
-			EGL10Impl.g3d.async(() -> GL11.glEnable(2884));
+//			EGL10Impl.g3d.async(() -> GL11.glEnable(2884));
 		}
 		return true;
 	}

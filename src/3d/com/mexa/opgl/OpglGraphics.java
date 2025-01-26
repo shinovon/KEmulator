@@ -487,15 +487,15 @@ public class OpglGraphics {
 					EGL10.EGL_NONE};
 			eglWindowSurface = egl.eglCreatePbufferSurface(eglDisplay, eglConfig, surface_attribs);
 
-//			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			bindEglContext();
+			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 //			matrix.setScale(1.0f, -1.0f, width / 2.0f, height / 2.0f);
 		}
-		bindEglContext();
 		//releaseEglContext();
 	}
 
 	public void release() {
-		if (pixelBuffer == null || width <= 0 || height <= 0) {
+		if (graphics == null || pixelBuffer == null || width <= 0 || height <= 0) {
 			return;
 		}
 		//bindEglContext();
