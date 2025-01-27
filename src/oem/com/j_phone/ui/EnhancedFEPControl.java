@@ -1,7 +1,6 @@
 package com.j_phone.ui;
 
 import emulator.Emulator;
-import emulator.UILocale;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import emulator.ui.swt.InputDialog;

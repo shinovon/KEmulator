@@ -10,7 +10,6 @@ import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulator;
-import emulator.ui.IScreen;
 import emulator.ui.swt.EmulatorImpl;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -452,7 +451,7 @@ public class Emulator implements Runnable {
 						if (s.startsWith("MIDlet-")) {
 							String num = s.substring("MIDlet-".length());
 							try {
-								int n = Integer.parseInt(num);
+								Integer.parseInt(num);
 								midletKeys.add(s);
 							} catch (Exception ignored) {}
 						}

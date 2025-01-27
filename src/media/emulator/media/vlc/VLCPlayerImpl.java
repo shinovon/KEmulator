@@ -28,7 +28,6 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
-import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import java.lang.reflect.Field;
