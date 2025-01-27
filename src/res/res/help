@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.19 [2025.01.25]
+$v2.19 [2025.01.27]
 Symbian Anna multitouch api support
 More SoftBank api stubs
 Fixed Class Watcher crash
@@ -51,11 +51,11 @@ Fixed lcdui Form crash
 Fixed window size not saving in sync mode
 Fixed infos not updating after restart
 OpenGL ES API fixes
-Fixed NPE in com.jblend.graphics.j3d
+Fixed com.jblend.graphics.j3d
 Made Alert scrollable
 Fixed Siemens API File
 Fixed underlined font
-Fixed MascotCapsule textures loading
+Fixed MascotCapsule-GL textures loading
 Fixed MascotCapsule textures appearance in MemoryView
 Added reset key mappings button
 Fixed controllers detection
@@ -63,6 +63,8 @@ Made 3D APIs thread-safe (fixes some games, but less performance)
 Fixed MIDlet choice selection focus
 Fixed lcdui Gauge, DateField appearance
 Added sync flush setting
+Fixed MEXA OpglGraphics
+Fixed MascotCapsule-GL uv colors, buffers copying
 
 $v2.18.1 [2024.12.29]
 Automatic updates checking
