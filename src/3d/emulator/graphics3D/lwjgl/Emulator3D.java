@@ -430,7 +430,7 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public final void clearBackgound(Object bgObj) {
-		async(() -> {
+		sync(() -> {
 			Background bg = (Background) bgObj;
 
 			setupViewport();
