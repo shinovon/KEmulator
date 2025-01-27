@@ -3,7 +3,6 @@ package emulator;
 import emulator.custom.CustomJarResources;
 import emulator.custom.CustomMethod;
 
-import javax.microedition.io.Connector;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
