@@ -773,7 +773,7 @@ public class Emulator implements Runnable {
 			initRichPresence();
 
 			if (Settings.autoUpdate == 0) {
-				Settings.autoUpdate = Emulator.emulatorimpl.getEmulatorScreen().showUpdateDialog(0);
+				Settings.autoUpdate = updated ? 2 : Emulator.emulatorimpl.getEmulatorScreen().showUpdateDialog(0);
 			}
 			backgroundThread.start();
 
