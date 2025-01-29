@@ -640,22 +640,33 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glDeleteRenderbuffersOES(final int n, final int[] array, final int n2) {
 		checkFramebufferExt();
-		EGL10Impl.g3d.sync(() -> GL30.glDeleteRenderbuffers(array));
+		IntBuffer intBuffer = BufferUtils.createIntBuffer(n);
+		intBuffer.put(array, n2, n);
+		intBuffer.position(0);
+		EGL10Impl.g3d.sync(() -> GL30.glDeleteRenderbuffers(intBuffer));
 	}
 
 	public final synchronized void glDeleteRenderbuffersOES(final int n, final IntBuffer intBuffer) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		int l = intBuffer.limit();
+		intBuffer.limit(n + intBuffer.position());
+		EGL10Impl.g3d.sync(() -> GL30.glDeleteRenderbuffers(intBuffer));
+		intBuffer.limit(l);
 	}
 
 	public final synchronized void glGenRenderbuffersOES(final int n, final int[] array, final int n2) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		IntBuffer intBuffer = BufferUtils.createIntBuffer(n);
+		EGL10Impl.g3d.sync(() -> GL30.glGenRenderbuffers(intBuffer));
+		intBuffer.get(array, n2, n);
 	}
 
 	public final synchronized void glGenRenderbuffersOES(final int n, final IntBuffer intBuffer) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		int l = intBuffer.limit();
+		intBuffer.limit(n + intBuffer.position());
+		EGL10Impl.g3d.sync(() -> GL30.glGenRenderbuffers(intBuffer));
+		intBuffer.limit(l);
 	}
 
 	public final synchronized void glRenderbufferStorageOES(final int n, final int n2, final int n3, final int n4) {
@@ -665,12 +676,15 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glGetRenderbufferParameterivOES(final int n, final int n2, final int[] array, final int n3) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		int length = 1; // TODO ?
+		IntBuffer intBuffer = BufferUtils.createIntBuffer(length);
+		EGL10Impl.g3d.sync(() -> GL30.glGetRenderbufferParameteriv(n, n2, intBuffer));
+		intBuffer.get(array, n, length);
 	}
 
 	public final synchronized void glGetRenderbufferParameterivOES(final int n, final int n2, final IntBuffer intBuffer) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		EGL10Impl.g3d.sync(() -> GL30.glGetRenderbufferParameteriv(n, n2, intBuffer));
 	}
 
 	public final synchronized boolean glIsFramebufferOES(final int n) {
@@ -686,22 +700,33 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glDeleteFramebuffersOES(final int n, final int[] array, final int n2) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		IntBuffer intBuffer = BufferUtils.createIntBuffer(n);
+		intBuffer.put(array, n2, n);
+		intBuffer.position(0);
+		EGL10Impl.g3d.sync(() -> GL30.glDeleteFramebuffers(intBuffer));
 	}
 
 	public final synchronized void glDeleteFramebuffersOES(final int n, final IntBuffer intBuffer) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		int l = intBuffer.limit();
+		intBuffer.limit(n + intBuffer.position());
+		EGL10Impl.g3d.sync(() -> GL30.glDeleteFramebuffers(intBuffer));
+		intBuffer.limit(l);
 	}
 
 	public final synchronized void glGenFramebuffersOES(final int n, final int[] array, final int n2) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		IntBuffer intBuffer = BufferUtils.createIntBuffer(n);
+		EGL10Impl.g3d.sync(() -> GL30.glGenFramebuffers(intBuffer));
+		intBuffer.get(array, n2, n);
 	}
 
 	public final synchronized void glGenFramebuffersOES(final int n, final IntBuffer intBuffer) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		int l = intBuffer.limit();
+		intBuffer.limit(n + intBuffer.position());
+		EGL10Impl.g3d.sync(() -> GL30.glGenFramebuffers(intBuffer));
+		intBuffer.limit(l);
 	}
 
 	public final synchronized int glCheckFramebufferStatusOES(final int n) {
@@ -722,12 +747,15 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glGetFramebufferAttachmentParameterivOES(final int n, final int n2, final int n3, final int[] array, final int n4) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		int length = 1; // TODO ?
+		IntBuffer intBuffer = BufferUtils.createIntBuffer(length);
+		EGL10Impl.g3d.sync(() -> GL30.glGetFramebufferAttachmentParameteriv(n, n2, n3, intBuffer));
+		intBuffer.get(array, n, length);
 	}
 
 	public final synchronized void glGetFramebufferAttachmentParameterivOES(final int n, final int n2, final int n3, final IntBuffer intBuffer) {
 		checkFramebufferExt();
-		System.out.println("OES is not implemented.");
+		EGL10Impl.g3d.sync(() -> GL30.glGetFramebufferAttachmentParameteriv(n, n2, n3, intBuffer));
 	}
 
 	public final synchronized void glGenerateMipmapOES(final int n) {
