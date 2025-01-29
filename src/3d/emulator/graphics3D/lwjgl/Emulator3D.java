@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.*;
 
 import javax.microedition.lcdui.Graphics;
@@ -1380,7 +1381,6 @@ public final class Emulator3D implements IGraphics3D {
 			}
 
 			try {
-				if (glCanvas == null) throw new Exception("glCanvas == null");
 				GLCanvasUtil.makeCurrent(glCanvas);
 				getCapabilities();
 
@@ -1399,17 +1399,18 @@ public final class Emulator3D implements IGraphics3D {
 					}
 				});
 			} catch (Exception e) {
-				if (!"glCanvas == null".equals(e.getMessage()))
-					e.printStackTrace();
-
+				e.printStackTrace();
 				if (glCanvas != null) {
 					disposeGlCanvas();
+					glCanvas = null;
 				}
-
+			}
+			if (glCanvas == null) {
 				if (window == 0) {
 					Emulator.getEmulator().getLogStream().println("Creating invisible glfw window");
 					if (!glfwInit())
 						throw new Exception("glfwInit");
+					GLFWErrorCallback.createPrint(System.err).set();
 
 					glfwDefaultWindowHints();
 					glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
