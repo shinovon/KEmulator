@@ -1,12 +1,13 @@
 package emulator.graphics3D.egl;
 
 public final class GLConfiguration {
-	public static boolean aBoolean1325;
-	public static boolean aBoolean1326;
-	public static boolean aBoolean1327;
-	public static boolean aBoolean1328;
-	public static boolean aBoolean1329;
-	public static boolean aBoolean1330;
+	public static boolean OES_draw_texture;
+	public static boolean OES_matrix_pallete;
+	public static boolean OES_texture_cube_map;
+	public static boolean OES_blend_subtract;
+	public static boolean OES_blend_func_separate;
+	public static boolean OES_blend_equations_separate;
+	public static boolean OES_framebuffer_object;
 
 	public GLConfiguration() {
 		super();
@@ -253,11 +254,11 @@ public final class GLConfiguration {
 	}
 
 	static {
-		GLConfiguration.aBoolean1325 = false;
-		GLConfiguration.aBoolean1326 = false;
-		GLConfiguration.aBoolean1327 = true;
-		GLConfiguration.aBoolean1328 = true;
-		GLConfiguration.aBoolean1329 = true;
-		GLConfiguration.aBoolean1330 = false;
+		GLConfiguration.OES_draw_texture = false;
+		GLConfiguration.OES_matrix_pallete = true;
+		GLConfiguration.OES_texture_cube_map = true;
+		GLConfiguration.OES_blend_subtract = true;
+		GLConfiguration.OES_blend_func_separate = true;
+		GLConfiguration.OES_blend_equations_separate = true;
 	}
 }

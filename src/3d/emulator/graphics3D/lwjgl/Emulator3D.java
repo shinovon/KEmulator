@@ -9,6 +9,7 @@ import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.IGraphics3D;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
+import emulator.graphics3D.egl.GLConfiguration;
 import emulator.graphics3D.m3g.*;
 import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
@@ -168,7 +169,7 @@ public final class Emulator3D implements IGraphics3D {
 			threadBound = true;
 			sync(() -> {
 			   try {
-				   bindM3GThread(w, h, forceWindow);
+				   bindM3GThread(w, h, egl);
 			   } catch (Exception e) {
 				   throw new M3GException(e);
 			   }
@@ -214,6 +215,13 @@ public final class Emulator3D implements IGraphics3D {
 	private void getCapabilities() {
 		if (capabilities == null) {
 			capabilities = GL.createCapabilities();
+//			GLConfiguration.OES_draw_texture = false;
+			GLConfiguration.OES_matrix_pallete = capabilities.GL_ARB_matrix_palette;
+//			GLConfiguration.OES_texture_cube_map = capabilities.GL_ARB_texture_cube_map;
+			GLConfiguration.OES_blend_subtract = capabilities.OpenGL14 /*|| capabilities.GL_EXT_blend_subtract*/;
+			GLConfiguration.OES_blend_func_separate = capabilities.OpenGL14 /*|| capabilities.GL_EXT_blend_func_separate*/;
+			GLConfiguration.OES_blend_equations_separate = capabilities.OpenGL20 /*|| capabilities.GL_EXT_blend_equation_separate*/;
+			GLConfiguration.OES_framebuffer_object = capabilities.OpenGL30 /* || capabilities.GL_EXT_framebuffer_object*/;
 			return;
 		}
 		try {
@@ -222,7 +230,6 @@ public final class Emulator3D implements IGraphics3D {
 			capabilities = GL.createCapabilities();
 		}
 	}
-
 
 	public synchronized void releaseTarget() {
 		Profiler3D.releaseTargetCallCount++;

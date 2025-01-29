@@ -1,10 +1,7 @@
 package emulator.graphics3D.egl;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryUtil;
 
 import javax.microedition.khronos.egl.EGLContext;
@@ -388,136 +385,127 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glDrawTexsOES(final short n, final short n2, final short n3, final short n4, final short n5) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		this.glDrawTexfOES(n, n2, n3, n4, n5);
 	}
 
 	public final synchronized void glDrawTexiOES(final int n, final int n2, final int n3, final int n4, final int n5) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		this.glDrawTexfOES(n, n2, n3, n4, n5);
 	}
 
 	public final synchronized void glDrawTexfOES(final float n, final float n2, final float n3, final float n4, final float n5) {
-		if (!GLConfiguration.aBoolean1325) {
+		if (!GLConfiguration.OES_draw_texture) {
 			throw new UnsupportedOperationException("OES_draw_texture extension not available");
 		}
 	}
 
 	public final synchronized void glDrawTexxOES(final int n, final int n2, final int n3, final int n4, final int n5) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		this.glDrawTexfOES(n / 65536.0f, n2 / 65536.0f, n3 / 65536.0f, n4 / 65536.0f, n5 / 65536.0f);
 	}
 
 	public final synchronized void glDrawTexsvOES(final short[] array, final int n) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		this.glDrawTexfOES(array[n], array[n + 1], array[n + 2], array[n + 3], array[n + 4]);
 	}
 
 	public final synchronized void glDrawTexsvOES(final ShortBuffer shortBuffer) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		short[] a = new short[5];
+		shortBuffer.get(a);
+		this.glDrawTexsvOES(a, 0);
 	}
 
 	public final synchronized void glDrawTexivOES(final int[] array, final int n) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		this.glDrawTexfOES(array[n], array[n + 1], array[n + 2], array[n + 3], array[n + 4]);
 	}
 
 	public final synchronized void glDrawTexivOES(final IntBuffer intBuffer) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		int[] a = new int[5];
+		intBuffer.get(a);
+		this.glDrawTexivOES(a, 0);
 	}
 
 	public final synchronized void glDrawTexxvOES(final int[] array, final int n) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		this.glDrawTexfOES(array[n] / 65536.0f, array[n + 1] / 65536.0f, array[n + 2] / 65536.0f, array[n + 3] / 65536.0f, array[n + 4] / 65536.0f);
 	}
 
 	public final synchronized void glDrawTexxvOES(final IntBuffer intBuffer) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		int[] a = new int[5];
+		intBuffer.get(a);
+		this.glDrawTexxvOES(a, 0);
 	}
 
 	public final synchronized void glDrawTexfvOES(final float[] array, final int n) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		this.glDrawTexfOES(array[n], array[n + 1], array[n + 2], array[n + 3], array[n + 4]);
 	}
 
 	public final synchronized void glDrawTexfvOES(final FloatBuffer floatBuffer) {
-		if (!GLConfiguration.aBoolean1325) {
-			throw new UnsupportedOperationException("OES_draw_texture extension not available");
-		}
+		float[] a = new float[5];
+		floatBuffer.get(a);
+		this.glDrawTexfvOES(a, 0);
 	}
 
 	public final synchronized void glCurrentPaletteMatrixOES(final int n) {
-		if (!GLConfiguration.aBoolean1326) {
+		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
+		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glCurrentPaletteMatrixARB(n));
 	}
 
 	public final synchronized void glLoadPaletteFromModelViewMatrixOES() {
-		if (!GLConfiguration.aBoolean1326) {
+		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
-		if (!GLConfiguration.aBoolean1326) {
+		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
+		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glMatrixIndexPointerARB(n, n2, n3, MemoryUtil.memAddress(buffer)));
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final int n4) {
-		if (!GLConfiguration.aBoolean1326) {
+		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
+		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glMatrixIndexPointerARB(n, n2, n3, (long) n4));
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
-		if (!GLConfiguration.aBoolean1326) {
+		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
+		EGL10Impl.g3d.sync(() -> ARBVertexBlend.glWeightPointerARB(n, n2, n3, MemoryUtil.memAddress(buffer)));
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final int n4) {
-		if (!GLConfiguration.aBoolean1326) {
+		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
+		EGL10Impl.g3d.sync(() -> ARBVertexBlend.glWeightPointerARB(n, n2, n3, (long) n4));
 	}
 
-	private static void method805() {
-		if (!GLConfiguration.aBoolean1327) {
+	private static void checkTextureCubeMapExt() {
+		if (!GLConfiguration.OES_texture_cube_map) {
 			throw new UnsupportedOperationException("OES_texture_cube_map extension not available");
 		}
 	}
 
 	public final synchronized void glTexGenf(final int n, final int n2, final float n3) {
-		method805();
+		checkTextureCubeMapExt();
 		EGL10Impl.g3d.sync(() -> GL11.glTexGenf(n, n2, n3));
 	}
 
 	public final synchronized void glTexGeni(final int n, final int n2, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		EGL10Impl.g3d.sync(() -> GL11.glTexGeni(n, n2, n3));
 	}
 
 	public final synchronized void glTexGenx(final int n, final int n2, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		EGL10Impl.g3d.sync(() -> GL11.glTexGenf(n, n2, n3 / 65536.0f));
 	}
 
 	public final synchronized void glTexGenfv(final int n, final int n2, final float[] array, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final FloatBuffer floatBuffer;
 		(floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
@@ -526,12 +514,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glTexGenfv(final int n, final int n2, final FloatBuffer floatBuffer) {
-		method805();
+		checkTextureCubeMapExt();
 		EGL10Impl.g3d.sync(() -> GL11.glTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final int[] array, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final IntBuffer intBuffer;
 		(intBuffer = BufferUtils.createIntBuffer(method771 = GLConfiguration.method771())).put(array, n3, method771);
@@ -540,12 +528,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glTexGeniv(final int n, final int n2, final IntBuffer intBuffer) {
-		method805();
+		checkTextureCubeMapExt();
 		EGL10Impl.g3d.sync(() -> GL11.glTexGeniv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final int[] array, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
 		for (int i = 0; i < method771; ++i) {
@@ -556,7 +544,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glTexGenxv(final int n, final int n2, final IntBuffer intBuffer) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
 		for (int i = 0; i < method771; ++i) {
@@ -567,7 +555,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetTexGenfv(final int n, final int n2, final float[] array, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
 		EGL10Impl.g3d.sync(() -> GL11.glGetTexGenfv(n, n2, floatBuffer));
@@ -575,12 +563,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetTexGenfv(final int n, final int n2, final FloatBuffer floatBuffer) {
-		method805();
+		checkTextureCubeMapExt();
 		EGL10Impl.g3d.sync(() -> GL11.glGetTexGenfv(n, n2, floatBuffer));
 	}
 
 	public final synchronized void glGetTexGeniv(final int n, final int n2, final int[] array, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final IntBuffer intBuffer = BufferUtils.createIntBuffer(method771 = GLConfiguration.method771());
 		EGL10Impl.g3d.sync(() -> GL11.glGetTexGeniv(n, n2, intBuffer));
@@ -588,12 +576,12 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetTexGeniv(final int n, final int n2, final IntBuffer intBuffer) {
-		method805();
+		checkTextureCubeMapExt();
 		EGL10Impl.g3d.sync(() -> GL11.glGetTexGeniv(n, n2, intBuffer));
 	}
 
 	public final synchronized void glGetTexGenxv(final int n, final int n2, final int[] array, final int n3) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
 		EGL10Impl.g3d.sync(() ->GL11.glGetTexGenfv(n, n2, floatBuffer));
@@ -603,7 +591,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glGetTexGenxv(final int n, final int n2, final IntBuffer intBuffer) {
-		method805();
+		checkTextureCubeMapExt();
 		final int method771;
 		final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(method771 = GLConfiguration.method771());
 		EGL10Impl.g3d.sync(() ->GL11.glGetTexGenfv(n, n2, floatBuffer));
@@ -613,110 +601,138 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	public final synchronized void glBlendEquation(final int n) {
-		if (!GLConfiguration.aBoolean1328) {
+		if (!GLConfiguration.OES_blend_subtract) {
 			throw new UnsupportedOperationException("OES_blend_subtract extension not available");
 		}
 		EGL10Impl.g3d.sync(() -> GL14.glBlendEquation(n));
 	}
 
 	public final synchronized void glBlendFuncSeparate(final int n, final int n2, final int n3, final int n4) {
-		if (!GLConfiguration.aBoolean1329) {
+		if (!GLConfiguration.OES_blend_func_separate) {
 			throw new UnsupportedOperationException("OES_blend_func_separate extension not available");
 		}
 		EGL10Impl.g3d.sync(() -> GL14.glBlendFuncSeparate(n, n2, n3, n4));
 	}
 
 	public final synchronized void glBlendEquationSeparate(final int n, final int n2) {
-		if (!GLConfiguration.aBoolean1330) {
+		if (!GLConfiguration.OES_blend_equations_separate) {
 			throw new UnsupportedOperationException("OES_blend_equations_separate extension not available");
+		}
+		EGL10Impl.g3d.sync(() -> GL20.glBlendEquationSeparate(n, n2));
+	}
+
+	private void checkFramebufferExt() {
+		if (!GLConfiguration.OES_framebuffer_object) {
+			throw new UnsupportedOperationException("OES_framebuffer_object extension not available");
 		}
 	}
 
 	public final synchronized boolean glIsRenderbufferOES(final int n) {
-		System.out.println("OES is not implemented.");
-		return true;
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> temp = GL30.glIsRenderbuffer(n));
+		return (boolean) temp;
 	}
 
 	public final synchronized void glBindRenderbufferOES(final int n, final int n2) {
-		System.out.println("OES is not implemented.");
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> GL30.glBindRenderbuffer(n, n2));
 	}
 
 	public final synchronized void glDeleteRenderbuffersOES(final int n, final int[] array, final int n2) {
-		System.out.println("OES is not implemented.");
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> GL30.glDeleteRenderbuffers(array));
 	}
 
 	public final synchronized void glDeleteRenderbuffersOES(final int n, final IntBuffer intBuffer) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGenRenderbuffersOES(final int n, final int[] array, final int n2) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGenRenderbuffersOES(final int n, final IntBuffer intBuffer) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glRenderbufferStorageOES(final int n, final int n2, final int n3, final int n4) {
-		System.out.println("OES is not implemented.");
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> GL30.glRenderbufferStorage(n, n2, n3, n4));
 	}
 
 	public final synchronized void glGetRenderbufferParameterivOES(final int n, final int n2, final int[] array, final int n3) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGetRenderbufferParameterivOES(final int n, final int n2, final IntBuffer intBuffer) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized boolean glIsFramebufferOES(final int n) {
-		System.out.println("OES is not implemented.");
-		return true;
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> temp = GL30.glIsFramebuffer(n));
+		return (boolean) temp;
 	}
 
 	public final synchronized void glBindFramebufferOES(final int n, final int n2) {
-		System.out.println("OES is not implemented.");
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> GL30.glBindFramebuffer(n, n2));
 	}
 
 	public final synchronized void glDeleteFramebuffersOES(final int n, final int[] array, final int n2) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glDeleteFramebuffersOES(final int n, final IntBuffer intBuffer) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGenFramebuffersOES(final int n, final int[] array, final int n2) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGenFramebuffersOES(final int n, final IntBuffer intBuffer) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized int glCheckFramebufferStatusOES(final int n) {
-		System.out.println("OES is not implemented.");
-		return 0;
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> temp = GL30.glCheckFramebufferStatus(n));
+		return (int) temp;
 	}
 
 	public final synchronized void glFramebufferTexture2DOES(final int n, final int n2, final int n3, final int n4, final int n5) {
-		System.out.println("OES is not implemented.");
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> GL30.glFramebufferTexture2D(n, n2, n3, n4, n5));
 	}
 
 	public final synchronized void glFramebufferRenderbufferOES(final int n, final int n2, final int n3, final int n4) {
-		System.out.println("OES is not implemented.");
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> GL30.glFramebufferRenderbuffer(n, n2, n3, n4));
 	}
 
 	public final synchronized void glGetFramebufferAttachmentParameterivOES(final int n, final int n2, final int n3, final int[] array, final int n4) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGetFramebufferAttachmentParameterivOES(final int n, final int n2, final int n3, final IntBuffer intBuffer) {
+		checkFramebufferExt();
 		System.out.println("OES is not implemented.");
 	}
 
 	public final synchronized void glGenerateMipmapOES(final int n) {
-		System.out.println("OES is not implemented.");
+		checkFramebufferExt();
+		EGL10Impl.g3d.sync(() -> GL30.glGenerateMipmap(n));
 	}
 
 	public final synchronized void glPointSizePointerOES(final int n, final int n2, final Buffer buffer) {
