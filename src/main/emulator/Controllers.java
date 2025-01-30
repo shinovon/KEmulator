@@ -201,9 +201,7 @@ public class Controllers {
 		}
 		for (int i = 0; i < Controllers.count; ++i) {
 			Controller controller = getController(i);
-			if (!controller.poll()) {
-				continue;
-			}
+			controller.poll();
 			Event event = new Event();
 			while (controller.getEventQueue().getNextEvent(event)) {
 				Component.Identifier identifier = event.getComponent().getIdentifier();
@@ -212,7 +210,7 @@ public class Controllers {
 				if (identifier instanceof Component.Identifier.Button) {
 					boolean b = method748(name);
 					int key = map(i, name);
-					if (key == 10000) return;
+					if (key == 10000) continue;
 					if (value == 1.0f) {
 						if (!b) Emulator.getEventQueue().keyPress(key);
 					} else {
