@@ -1371,12 +1371,13 @@ public final class Emulator3D implements IGraphics3D {
 				window = 0;
 			}
 			if (exiting) return;
+			int mode = Settings.m3gContextMode == 0 && Emulator.win ? 2 : Settings.m3gContextMode;
 			if (!forceWindow && Settings.m3gContextMode != 3) {
 				EmulatorImpl.syncExec(new Runnable() {
 					public void run() {
 						try {
 							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
-							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, Settings.m3gContextMode);
+							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, mode);
 							glCanvas.setSize(1, 1);
 							glCanvas.setVisible(true);
 						} catch (Throwable e) {
@@ -1455,6 +1456,8 @@ public final class Emulator3D implements IGraphics3D {
 		if (Thread.currentThread() == executorThread || !Settings.m3gThread) {
 			try {
 				r.run();
+			} catch (RuntimeException e) {
+				throw e;
 			} catch (Exception e) {
 				throw new M3GException(e);
 			}
@@ -1466,7 +1469,11 @@ public final class Emulator3D implements IGraphics3D {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (ExecutionException e) {
-			throw new M3GException(e.getCause());
+			Throwable cause = e.getCause();
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			}
+			throw new M3GException(cause);
 		}
 	}
 
