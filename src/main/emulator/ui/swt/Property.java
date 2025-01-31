@@ -204,9 +204,9 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite coreApiComp;
 	private Group coreApiGroup;
 	private Group sysChecksGroup;
-	private Button aButton724;
-	private Button aButton728;
-	private Button aButton732;
+	private Button vibrationCheck;
+	private Button keyRepeatCheck;
+	private Button canvasFullscreenCheck;
 	private Button noNetworkBtn;
 	private Button aButton746;
 	private Button aButton749;
@@ -325,6 +325,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button m3gFlushImmediately;
 	private Button keymapResetBtn;
 	private Button asyncFlushCheck;
+	private Button m3gThreadCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -961,11 +962,11 @@ public final class Property implements IProperty, SelectionListener {
 			KeyMapping.keyCacheStack.clear();
 			Settings.enableKeyCache = this.aButton696.getSelection();
 		}
-		if (Settings.enableVibration != this.aButton724.getSelection() && !(Settings.enableVibration = this.aButton724.getSelection())) {
+		if (Settings.enableVibration != this.vibrationCheck.getSelection() && !(Settings.enableVibration = this.vibrationCheck.getSelection())) {
 			Emulator.getEmulator().getScreen().stopVibra();
 		}
-		Settings.enableKeyRepeat = this.aButton728.getSelection();
-		Settings.ignoreFullScreen = this.aButton732.getSelection();
+		Settings.enableKeyRepeat = this.keyRepeatCheck.getSelection();
+		Settings.ignoreFullScreen = this.canvasFullscreenCheck.getSelection();
 		Settings.networkNotAvailable = this.noNetworkBtn.getSelection();
 		Settings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
 		Settings.motorolaSoftKeyFix = softkeyMotFixCheck.getSelection();
@@ -1953,21 +1954,21 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.verticalAlignment = 4;
 		(this.coreApiGroup = new Group(this.coreApiComp, 0)).setLayout(new GridLayout());
 		this.coreApiGroup.setLayoutData(layoutData);
-		(this.aButton724 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
-		this.aButton724.setLayoutData(gridData);
-		this.aButton724.setSelection(Settings.enableVibration);
+		(this.vibrationCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
+		this.vibrationCheck.setLayoutData(gridData);
+		this.vibrationCheck.setSelection(Settings.enableVibration);
 		// автор подсказок - twospaces TODO: localize
-		aButton724.setToolTipText("Shakes the window during vibration");
+		vibrationCheck.setToolTipText("Shakes the window during vibration");
 
-		(this.aButton728 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_KEY_REPEAT", "Enable Canvas.keyRepeated(int)."));
-		this.aButton728.setLayoutData(gridData);
-		this.aButton728.setSelection(Settings.enableKeyRepeat);
-		aButton728.setToolTipText("Enables key repeats");
+		(this.keyRepeatCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_KEY_REPEAT", "Enable Canvas.keyRepeated(int)."));
+		this.keyRepeatCheck.setLayoutData(gridData);
+		this.keyRepeatCheck.setSelection(Settings.enableKeyRepeat);
+		keyRepeatCheck.setToolTipText("Enables key repeats");
 
-		(this.aButton732 = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
-		this.aButton732.setLayoutData(gridData);
-		this.aButton732.setSelection(Settings.ignoreFullScreen);
-		aButton732.setToolTipText("Forces full screen mode");
+		(this.canvasFullscreenCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
+		this.canvasFullscreenCheck.setLayoutData(gridData);
+		this.canvasFullscreenCheck.setSelection(Settings.ignoreFullScreen);
+		canvasFullscreenCheck.setToolTipText("Forces full screen mode");
 
 		(this.synchronizeKeyEventsCheck = new Button(this.coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
 		this.synchronizeKeyEventsCheck.setLayoutData(gridData);
@@ -2017,6 +2018,7 @@ public final class Property implements IProperty, SelectionListener {
 		asyncFlushCheck.setText(UILocale.get("OPTION_COREAPI_ASYNC_FLUSH", "Async flush"));
 		asyncFlushCheck.setLayoutData(gridData);
 		asyncFlushCheck.setSelection(Settings.asyncFlush);
+		asyncFlushCheck.setToolTipText("If disabled, window refresh delay is passed to app");
 	}
 
 	private void setupDisableApiComp() {
@@ -2173,6 +2175,12 @@ public final class Property implements IProperty, SelectionListener {
 		m3gFlushImmediately.setLayoutData(labelGridData);
 		m3gFlushImmediately.setSelection(Settings.m3gFlushImmediately);
 		m3gFlushImmediately.setToolTipText("Fixes background in Angry Birds Seasons");
+
+		m3gThreadCheck = new Button(lwjglGroup, SWT.CHECK);
+		m3gThreadCheck.setText(UILocale.get("OPTION_M3G_THREAD", "Single threaded M3G"));
+		m3gThreadCheck.setLayoutData(labelGridData);
+		m3gThreadCheck.setSelection(Settings.m3gThread);
+		m3gThreadCheck.setToolTipText("Fixes some games, but less performance");
 
 		final GridData dataFillLabel = new GridData();
 		dataFillLabel.horizontalAlignment = SWT.FILL;

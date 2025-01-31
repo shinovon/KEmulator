@@ -326,6 +326,7 @@ OPTION_COREAPI_IGNORE_REGION_REPAINT=Always repaint screen fully
 OPTION_COREAPI_KEYPRESS_ON_REPEAT=Send keyPressed on repeats
 OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Force paint on serviceRepaints()
 OPTION_COREAPI_POINTER_EVENTS=Canvas.hasPointerEvents() return value
+OPTION_COREAPI_ASYNC_FLUSH=Async flush
 
 OPTION_RECORDS_RMS_FOLDER=RMS Folder:
 OPTION_RECORDS_RMS_TEXT=All Records in current midlet:
@@ -359,6 +360,7 @@ OPTION_M3G_IGNORE_OVERWRITE=Ignore OVERWRITE hint
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Force perspective correction
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Disable light clamping
 OPTION_M3G_FLUSH_IMMEDIATELY=Flush contents immediately (slow!)
+OPTION_M3G_THREAD=Single threaded M3G
 
 OPTION_M3G_AA=Anti-aliasing:
 OPTION_M3G_APP_CONTROLLED=Application-controlled

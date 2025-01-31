@@ -302,6 +302,8 @@ OPTION_FONT_TEST_TEXT=Пример:
 OPTION_FONT_TEST_TEXT_TXT=This is an Example.
 
 OPTION_SYSTEM_UI_LANGUAGE=Язык интерфейса:
+OPTION_SYSTEM_UPDATE_BRANCH=Ветка обновлений:
+OPTION_SYSTEM_AUTO_UPDATES=Автоматически проверять наличие обновлений
 OPTION_SYSTEM_XRAY_BG=X-Ray View: OverLap images.
 OPTION_SYSTEM_XRAY_CLIP=X-Ray View: Show image clipping region.
 OPTION_SYSTEM_INFO_COLOR=Info View: Показывать цвет в формате (R,G,B).
@@ -321,9 +323,10 @@ OPTION_COREAPI_NO_NETWORK=Отключить доступ к сети
 OPTION_COREAPI_SYNC_KEYEVENTS=Синхронизировать события клавиш
 OPTION_COREAPI_SOFTKEY_FIX=Отправлять keyPressed вместе с commandAction
 OPTION_COREAPI_IGNORE_REGION_REPAINT=Всегда перерисовывать экран полностью
-OPTION_COREAPI_KEYPRESS_ON_REPEAT=Send keyPressed on repeats
+OPTION_COREAPI_KEYPRESS_ON_REPEAT=Отправлять keyPressed вместо повторов
 OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Force paint on serviceRepaints()
-OPTION_COREAPI_POINTER_EVENTS=Canvas.hasPointerEvents() return value
+OPTION_COREAPI_POINTER_EVENTS=Возвращаемое значение Canvas.hasPointerEvents()
+OPTION_COREAPI_ASYNC_FLUSH=Async flush
 
 OPTION_RECORDS_RMS_FOLDER=Папка RMS:
 OPTION_RECORDS_RMS_TEXT=Записи текущего мидлета:
@@ -357,6 +360,7 @@ OPTION_M3G_IGNORE_OVERWRITE=Игнорировать флаг OVERWRITE
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Принудительно использовать перспективную коррекцию
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Отключить ограничение яркости света
 OPTION_M3G_FLUSH_IMMEDIATELY=Сразу обновлять содержимое (медленно!)
+OPTION_M3G_THREAD=Однопоточный M3G
 
 OPTION_M3G_AA=Сглаживание:
 OPTION_M3G_APP_CONTROLLED=Использовать параметры приложения
