@@ -231,13 +231,15 @@ public class Controllers {
 						filterY(i, value, true);
 						continue;
 					}
-					if (name.equalsIgnoreCase("z")) {
-						filterX(i, value, false);
-						continue;
-					}
-					if (name.equalsIgnoreCase("rz")) {
-						filterY(i, value, false);
-						continue;
+					if (!controller.getName().toLowerCase().contains("xbox")) {
+						if (name.equalsIgnoreCase("z")) {
+							filterX(i, value, false);
+							continue;
+						}
+						if (name.equalsIgnoreCase("rz")) {
+							filterY(i, value, false);
+							continue;
+						}
 					}
 				}
 			}
