@@ -201,7 +201,9 @@ public class Controllers {
 		}
 		for (int i = 0; i < Controllers.count; ++i) {
 			Controller controller = getController(i);
-			controller.poll();
+			if (!controller.poll()) {
+				continue;
+			}
 			Event event = new Event();
 			while (controller.getEventQueue().getNextEvent(event)) {
 				Component.Identifier identifier = event.getComponent().getIdentifier();
