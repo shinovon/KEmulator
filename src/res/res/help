@@ -50,7 +50,7 @@ Fixed Class Watcher crash
 Fixed lcdui Form crash
 Fixed window size not saving in sync mode
 Fixed infos not updating after restart
-OpenGL ES API fixes
+OpenGL ES API fixes & improvements
 Fixed com.jblend.graphics.j3d
 Made Alert scrollable
 Fixed Siemens API File
@@ -58,13 +58,15 @@ Fixed underlined font
 Fixed MascotCapsule-GL textures loading
 Fixed MascotCapsule textures appearance in MemoryView
 Added reset key mappings button
-Fixed controllers detection
+Fixed controllers detection on refresh
 Made 3D APIs thread-safe (fixes some games, but less performance)
 Fixed MIDlet choice selection focus
 Fixed lcdui Gauge, DateField appearance
 Added sync flush setting
 Fixed MEXA OpglGraphics
 Fixed MascotCapsule-GL uv colors, buffers copying
+Fixed 3D on older Windows versions
+Update lwjgl to 3.3.4
 
 $v2.18.1 [2024.12.29]
 Automatic updates checking
