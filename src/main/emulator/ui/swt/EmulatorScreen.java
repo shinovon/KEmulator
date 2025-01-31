@@ -592,13 +592,13 @@ public final class EmulatorScreen implements
 				method580(Integer.parseInt(substring2));
 			}
 		}
-		if (Settings.syncFlush) {
-			EmulatorImpl.syncExec(this);
+		if (Settings.asyncFlush) {
+			if (paintPending) return;
+			paintPending = true;
+			EmulatorImpl.asyncExec(this);
 			return;
 		}
-		if (paintPending) return;
-		paintPending = true;
-		EmulatorImpl.asyncExec(this);
+		EmulatorImpl.syncExec(this);
 	}
 
 	public int getWidth() {

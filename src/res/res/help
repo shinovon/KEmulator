@@ -59,7 +59,7 @@ Fixed MascotCapsule-GL textures loading
 Fixed MascotCapsule textures appearance in MemoryView
 Added reset key mappings button
 Fixed controllers detection on refresh
-Made 3D APIs thread-safe (fixes some games, but less performance)
+Made 3D APIs thread-safe
 Fixed MIDlet choice selection focus
 Fixed lcdui Gauge, DateField appearance
 Added sync flush setting

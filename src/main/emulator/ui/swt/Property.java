@@ -324,6 +324,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button autoUpdatesBtn;
 	private Button m3gFlushImmediately;
 	private Button keymapResetBtn;
+	private Button asyncFlushCheck;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -496,7 +497,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("DLL") ? 0 : 1);
 
 			Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
-			Settings.syncFlush = Boolean.parseBoolean(properties.getProperty("SyncFlush", "false"));
+			Settings.asyncFlush = Boolean.parseBoolean(properties.getProperty("AsyncFlush", "true"));
 
 			// keyboard mappings
 			KeyMapping.mapDeviceKey(0, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_0")));
@@ -736,7 +737,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("Micro3D_Engine", (Settings.micro3d == 0) ? "DLL" : "GL");
 
 			properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
-			properties.setProperty("SyncFlush", String.valueOf(Settings.syncFlush));
+			properties.setProperty("AsyncFlush", String.valueOf(Settings.asyncFlush));
 
 			// keyboard mappings
 			properties.setProperty("MAP_KEY_NUM_0", KeyMapping.get(0));
@@ -1023,6 +1024,7 @@ public final class Property implements IProperty, SelectionListener {
 //		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
 		Settings.hasPointerEvents = pointerEventsCheck.getSelection();
 		Settings.j2lStyleFpsLimit = fpsLimitJlCheck.getSelection();
+		Settings.asyncFlush = asyncFlushCheck.getSelection();
 
 		String sysProps = propsText.getText();
 		Settings.systemProperties.clear();
@@ -2010,6 +2012,11 @@ public final class Property implements IProperty, SelectionListener {
 		fpsLimitJlCheck.setLayoutData(gridData);
 		fpsLimitJlCheck.setSelection(Settings.j2lStyleFpsLimit);
 		fpsLimitJlCheck.setToolTipText("Compatibility tweak for chinese version of Castlevania");
+
+		asyncFlushCheck = new Button(coreApiGroup, SWT.CHECK);
+		asyncFlushCheck.setText(UILocale.get("OPTION_COREAPI_ASYNC_FLUSH", "Async flush"));
+		asyncFlushCheck.setLayoutData(gridData);
+		asyncFlushCheck.setSelection(Settings.asyncFlush);
 	}
 
 	private void setupDisableApiComp() {

@@ -39,8 +39,7 @@ public final class Graphics2DSWT implements IGraphics2D {
 				if (!color.isDisposed()) {
 					color.dispose();
 				}
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		});
 	}
 

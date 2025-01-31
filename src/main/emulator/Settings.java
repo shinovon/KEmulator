@@ -73,6 +73,7 @@ public final class Settings {
 	public static boolean m3gForcePerspectiveCorrection;
 	public static boolean m3gDisableLightClamp;
 	public static boolean m3gFlushImmediately;
+	public static boolean m3gThread = true;
 
 	public static final int APP_CONTROLLED = 0;
 
@@ -124,6 +125,5 @@ public final class Settings {
 	public static boolean j2lStyleFpsLimit;
 	public static String updateBranch = "stable";
 	public static int autoUpdate = 0; // 0 - not asked, 1 - manual, 2 - automatic
-	public static boolean syncFlush = false;
-	public static boolean m3gThread = true;
+	public static boolean asyncFlush = true;
 }
