@@ -228,10 +228,12 @@ public final class EventQueue implements Runnable {
 	public void gameGraphicsFlush() {
 		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
-			final IImage screenImage = scr.getScreenImg();
-			final IImage backBufferImage2 = scr.getBackBufferImage();
-			final IImage xRayScreenImage2 = scr.getXRayScreenImage();
-			(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+			if (Settings.asyncFlush) {
+				final IImage screenImage = scr.getScreenImg();
+				final IImage backBufferImage2 = scr.getBackBufferImage();
+				final IImage xRayScreenImage2 = scr.getXRayScreenImage();
+				(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+			}
 			scr.repaint();
 		}
 	}
@@ -239,10 +241,12 @@ public final class EventQueue implements Runnable {
 	public void gameGraphicsFlush(int x, int y, int w, int h) {
 		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
-			final IImage screenImage = scr.getScreenImg();
-			final IImage backBufferImage2 = scr.getBackBufferImage();
-			final IImage xRayScreenImage2 = scr.getXRayScreenImage();
-			(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage, x, y, w, h);
+			if (Settings.asyncFlush) {
+				final IImage screenImage = scr.getScreenImg();
+				final IImage backBufferImage2 = scr.getBackBufferImage();
+				final IImage xRayScreenImage2 = scr.getXRayScreenImage();
+				(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage, x, y, w, h);
+			}
 			scr.repaint();
 		}
 	}
@@ -295,10 +299,12 @@ public final class EventQueue implements Runnable {
 							final IImage backBufferImage3 = scr.getBackBufferImage();
 							final IImage xRayScreenImage3 = scr.getXRayScreenImage();
 							((Screen) d)._invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
-							try {
-								(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
-										.cloneImage(scr.getScreenImg());
-							} catch (Exception ignored) {}
+							if (Settings.asyncFlush) {
+								try {
+									(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
+											.cloneImage(scr.getScreenImg());
+								} catch (Exception ignored) {}
+							}
 							scr.repaint();
 							int interval = ((Screen) d)._repaintInterval();
 							if (interval > 0) {
@@ -472,7 +478,7 @@ public final class EventQueue implements Runnable {
 				((SpriteCanvas) canvas)._skipCopy = false;
 			} else if (canvas instanceof ACanvas && ((ACanvas) canvas)._skipCopy) {
 				((ACanvas) canvas)._skipCopy = false;
-			} else {
+			} else if (Settings.asyncFlush) {
 				(Settings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
 			}

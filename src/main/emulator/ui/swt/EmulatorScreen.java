@@ -539,6 +539,7 @@ public final class EmulatorScreen implements
 	}
 
 	public IImage getBackBufferImage() {
+		if (!Settings.asyncFlush) return getScreenImg();
 		synchronized (this) {
 			if (Settings.g2d == 0) {
 				return this.backBufferImageSwt;
