@@ -689,6 +689,7 @@ public class Emulator implements Runnable {
 					Settings.fpsGame = 3;
 				}
 			}
+			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 		} catch (Exception ignored) {}
 	}
 

@@ -126,4 +126,6 @@ public final class Settings {
 	public static String updateBranch = "stable";
 	public static int autoUpdate = 0; // 0 - not asked, 1 - manual, 2 - automatic
 	public static boolean asyncFlush = true;
+
+	public static boolean softbankApi = false;
 }

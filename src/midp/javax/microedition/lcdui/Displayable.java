@@ -203,6 +203,7 @@ public class Displayable {
 		if (cmdListener == null && this instanceof Canvas) {
 			return false;
 		}
+		boolean fix = Settings.motorolaSoftKeyFix || Settings.softbankApi;
 		if (KeyMapping.isLeftSoft(n)) {
 			if (menuCommands.size() > 1) {
 				if (b && this.menuShown) {
@@ -220,7 +221,7 @@ public class Displayable {
 						repaintScreen();
 					}
 				}
-				return !Settings.motorolaSoftKeyFix;
+				return !fix;
 			}
 
 			final Command leftSoftCommand = this.getLeftSoftCommand();
@@ -236,7 +237,7 @@ public class Displayable {
 					Emulator.getEventQueue().commandAction(leftSoftCommand, this);
 				}
 			}
-			return leftSoftCommand != null && !Settings.motorolaSoftKeyFix;
+			return leftSoftCommand != null && !fix;
 		}
 		if (KeyMapping.isRightSoft(n)) {
 			final Command rightSoftCommand = this.getRightSoftCommand();
@@ -252,7 +253,7 @@ public class Displayable {
 					Emulator.getEventQueue().commandAction(rightSoftCommand, this);
 				}
 			}
-			return rightSoftCommand != null && !Settings.motorolaSoftKeyFix;
+			return rightSoftCommand != null && !fix;
 		}
 		return false;
 	}
