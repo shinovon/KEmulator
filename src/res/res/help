@@ -64,7 +64,7 @@ Fixed MIDlet choice selection focus
 Fixed lcdui Gauge, DateField appearance
 Added sync flush setting
 Fixed MEXA OpglGraphics
-Fixed MascotCapsule-GL uv colors, buffers copying
+Fixed MascotCapsule-GL uv colors, buffers copying, clipping
 Fixed 3D on older Windows versions
 Update lwjgl to 3.3.4
 

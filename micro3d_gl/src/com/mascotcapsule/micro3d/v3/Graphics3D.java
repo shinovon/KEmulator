@@ -83,7 +83,17 @@ public class Graphics3D {
             throw new IllegalStateException("Target already bound");
         }
         render = Render.getRender();
-        render.bind(graphics);
+        render.bind(graphics, true);
+        this.graphics = graphics;
+    }
+
+    // internal
+    public final synchronized void bind(Graphics graphics, boolean doClip) {
+        if (graphics == null) {
+            throw new NullPointerException("Argument 'Graphics' is NULL");
+        }
+        render = Render.getRender();
+        render.bind(graphics, doClip);
         this.graphics = graphics;
     }
 

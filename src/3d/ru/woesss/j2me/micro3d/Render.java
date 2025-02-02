@@ -99,7 +99,7 @@ public class Render {
 		g3d.start();
 	}
 
-	public synchronized void bind(Graphics graphics) {
+	public synchronized void bind(Graphics graphics, boolean doClip) {
 		Profiler3D.MC3D_bindGraphicsCallCount++;
 
 		this.targetGraphics = graphics;
@@ -129,7 +129,12 @@ public class Render {
 				glViewport(0, 0, width, height);
 			}
 			Rectangle clip = this.clip;
-			clip.setBounds(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
+			if (doClip) {
+				clip.setBounds(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
+			} else {
+				clip.width = width;
+				clip.height = height;
+			}
 			int l = clip.x;
 			int t = clip.y;
 			int w = clip.width;

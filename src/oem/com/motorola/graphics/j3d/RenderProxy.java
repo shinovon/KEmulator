@@ -30,7 +30,7 @@ public class RenderProxy {
 			throw new NullPointerException();
 		}
 		Render render = Render.getRender();
-		render.bind(g);
+		render.bind(g, false);
 
 		getViewTrans(layout.affine, render.getViewMatrix());
 		render.setCenter(layout.centerX + x, layout.centerY + y);

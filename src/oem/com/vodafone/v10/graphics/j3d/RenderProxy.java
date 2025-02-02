@@ -16,6 +16,8 @@
 
 package com.vodafone.v10.graphics.j3d;
 
+import emulator.Settings;
+
 import javax.microedition.lcdui.Graphics;
 import java.util.WeakHashMap;
 
@@ -33,6 +35,7 @@ public class RenderProxy {
 	}
 
 	private static com.mascotcapsule.micro3d.v3.Effect3D getMascotEffect(Effect3D effect) {
+		if (effect == null) return null;
 		com.mascotcapsule.micro3d.v3.Effect3D r = new com.mascotcapsule.micro3d.v3.Effect3D();
 		r.setShading(effect.shading);
 		r.setLight(getMascotLight(effect.light));
@@ -91,7 +94,11 @@ public class RenderProxy {
 		com.mascotcapsule.micro3d.v3.Graphics3D render = renders.get(g);
 		if (render == null) {
 			render = new com.mascotcapsule.micro3d.v3.Graphics3D();
-			render.bind(g);
+//			if (Settings.micro3d == 1) {
+			render.bind(g, false);
+//			} else {
+//				render.bind(g);
+//			}
 			renders.put(g, render);
 		}
 		return render;

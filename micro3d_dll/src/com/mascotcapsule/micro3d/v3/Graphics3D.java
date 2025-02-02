@@ -101,6 +101,33 @@ public class Graphics3D {
         this.captured = false;
     }
 
+    // internal
+    public final synchronized void bind(Graphics graphics, boolean doClip) {
+        if (this.isBound) {
+            throw new IllegalStateException("Target already bound");
+        }
+        this.mGraphics = graphics;
+        int width = PlatformHelper.getWidth(graphics);
+        int height = PlatformHelper.getHeight(graphics);
+        int cx, cy, cw, ch;
+        if (doClip) {
+            cx = graphics.getClipX() + graphics.getTranslateX();
+            cy = graphics.getClipY() + graphics.getTranslateY();
+            cw = graphics.getClipWidth();
+            ch = graphics.getClipHeight();
+        } else {
+            cx = cy = 0;
+            cw = width;
+            ch = height;
+        }
+        if ((this.mBuffer == null) || (this.mBuffer.length != width * height)) {
+            this.mBuffer = new int[width * height];
+        }
+        nBind(this.mBuffer, width, height, cx, cy, cw, ch);
+        this.isBound = true;
+        this.captured = false;
+    }
+
     public final void dispose() {
         if (this.nPointer != 0) {
             nFinalize();

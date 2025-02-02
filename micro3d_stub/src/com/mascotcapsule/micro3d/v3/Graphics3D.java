@@ -57,6 +57,10 @@ public class Graphics3D {
             throws IllegalStateException, NullPointerException {
     }
 
+    public final synchronized void bind(Graphics paramGraphics, boolean b)
+            throws IllegalStateException, NullPointerException {
+    }
+
     public final synchronized void release(Graphics paramGraphics)
             throws IllegalArgumentException, NullPointerException {
     }

@@ -49,7 +49,7 @@ public class Renderer {
 
 	public void paint(Graphics g) {
 		Render render = Render.getRender();
-		render.bind(g);
+		render.bind(g, false);
 		for (RenderProxy.RenderNode node : stack) {
 			node.push(render);
 		}

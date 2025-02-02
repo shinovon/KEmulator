@@ -142,7 +142,7 @@ public class RenderProxy {
 		Render render = renders.get(g);
 		if (render == null) {
 			render = new Render();
-			render.bind(g);
+			render.bind(g, false);
 			renders.put(g, render);
 		}
 		return render;
