@@ -287,7 +287,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		switch (this.type) {
 			case 0: {
 //				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
-				if (parent != null) {
+				if (parent != null && !parent.isDisposed()) {
 					x = parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x) / 2;
 					y = parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y) / 2;
 					shell.setLocation(x, y);

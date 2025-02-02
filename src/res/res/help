@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.19 [2025.01.27]
+$v2.19 [2025.02.02]
 Symbian Anna multitouch api support
 More SoftBank api stubs
 Fixed Class Watcher crash

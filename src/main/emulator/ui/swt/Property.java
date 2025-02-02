@@ -2018,7 +2018,7 @@ public final class Property implements IProperty, SelectionListener {
 		asyncFlushCheck.setText(UILocale.get("OPTION_COREAPI_ASYNC_FLUSH", "Async flush"));
 		asyncFlushCheck.setLayoutData(gridData);
 		asyncFlushCheck.setSelection(Settings.asyncFlush);
-		asyncFlushCheck.setToolTipText("If disabled, window refresh delay is passed to app");
+		asyncFlushCheck.setToolTipText("If disabled, window refresh delay is passed to app. Restart after changing this property.");
 	}
 
 	private void setupDisableApiComp() {
@@ -2180,7 +2180,7 @@ public final class Property implements IProperty, SelectionListener {
 		m3gThreadCheck.setText(UILocale.get("OPTION_M3G_THREAD", "Single threaded M3G"));
 		m3gThreadCheck.setLayoutData(labelGridData);
 		m3gThreadCheck.setSelection(Settings.m3gThread);
-		m3gThreadCheck.setToolTipText("Fixes some games, but less performance");
+		m3gThreadCheck.setToolTipText("Fixes some games, but less performance. Restart after changing this property.");
 
 		final GridData dataFillLabel = new GridData();
 		dataFillLabel.horizontalAlignment = SWT.FILL;
