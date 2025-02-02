@@ -808,7 +808,7 @@ public class Render {
 				glEnable(GL_SCISSOR_TEST);
 				glScissor(l, t, w, h);
 			}
-			swapBuffers();
+//			swapBuffers();
 		});
 	}
 
@@ -1169,7 +1169,7 @@ public class Render {
 				glDepthMask(true);
 				glClear(GL_DEPTH_BUFFER_BIT);
 			} finally {
-				swapBuffers();
+//				swapBuffers();
 			}
 		});
 	}
@@ -1461,10 +1461,10 @@ public class Render {
 	public synchronized void flushToBuffer() {
 		Profiler3D.MC3D_flushCallCount++;
 
-		if (stack.isEmpty()) {
-			return;
-		}
 		g3d.sync(() -> {
+			if (stack.isEmpty()) {
+				return;
+			}
 			try {
 				copy2d(true);
 				flushStep = 1;
