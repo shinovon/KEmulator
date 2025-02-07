@@ -1,4 +1,4 @@
-#K-Emulator 2.18.1 - Ukrainian Localize
+#K-Emulator 2.19 - Ukrainian Localize
 #Stanley Kid (stanley.udr.kid@gmail.com)
 MENU_MIDLET=Мідлет
 MENU_TOOL=Засоби
@@ -211,6 +211,7 @@ OPTION_KEYMAP_PAD_UP=↑:
 OPTION_KEYMAP_PAD_DOWN=↓:
 OPTION_KEYMAP_PAD_MIDDLE=СКН:
 OPTION_KEYMAP_CLEAR=Очистити
+OPTION_KEYMAP_RESET=Відновити
 OPTION_FONT_DEFAULT_FONT=Типовий шрифт:
 OPTION_FONT_LARGE_SIZE=Великий розмір:
 OPTION_FONT_MIDDLE_SIZE=Середній розмір:
@@ -241,6 +242,7 @@ OPTION_COREAPI_IGNORE_REGION_REPAINT=Завжди перемальовувати
 OPTION_COREAPI_KEYPRESS_ON_REPEAT=Надсилати keyPressed на повтори
 OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Примусово перемальовувати на serviceRepaints()
 OPTION_COREAPI_POINTER_EVENTS=Повертати значення Canvas.hasPointerEvents()
+OPTION_COREAPI_ASYNC_FLUSH=Очищувати асинхронно
 OPTION_RECORDS_RMS_FOLDER=RMS-тека:
 OPTION_RECORDS_RMS_TEXT=Усі записи поточного мідлету:
 OPTION_RECORDS_SELECT_ALL=Вибрати всі
@@ -269,6 +271,7 @@ OPTION_M3G_IGNORE_OVERWRITE=Ігнорувати підказку перезап
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Примусово виправляти вигляд
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Вимкнути обмеження освітлення
 OPTION_M3G_FLUSH_IMMEDIATELY=Очищувати вміст негайно (повільно!)
+OPTION_M3G_THREAD=Однопотоковий M3G
 OPTION_M3G_AA=Згладжування:
 OPTION_M3G_APP_CONTROLLED=Керовано додатком
 OPTION_M3G_FORCE_OFF=Без примусу
