@@ -31,9 +31,9 @@ import java.util.jar.Manifest;
 
 public class Emulator implements Runnable {
 	public static boolean debugBuild = true;
-	public static String version = "2.19";
+	public static String version = "2.19.1";
 	public static String revision = "";
-	public static final int numericVersion = 30;
+	public static final int numericVersion = 31;
 
 	static EmulatorImpl emulatorimpl;
 	private static MIDlet midlet;
