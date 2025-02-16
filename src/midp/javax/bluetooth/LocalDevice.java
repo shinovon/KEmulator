@@ -3,20 +3,29 @@ package javax.bluetooth;
 import javax.microedition.io.Connection;
 
 public class LocalDevice {
+	private static LocalDevice localDevice;
+	private DiscoveryAgent discoveryAgent;
+
 	public LocalDevice() {
 		super();
 	}
 
 	public static LocalDevice getLocalDevice() throws BluetoothStateException {
-		return null;
+		if (localDevice == null) {
+			localDevice = new LocalDevice();
+		}
+		return localDevice;
 	}
 
 	public DiscoveryAgent getDiscoveryAgent() {
-		return null;
+		if (discoveryAgent == null) {
+			discoveryAgent = new DiscoveryAgent();
+		}
+		return discoveryAgent;
 	}
 
 	public String getFriendlyName() {
-		return "";
+		return "KEmulator";
 	}
 
 	public DeviceClass getDeviceClass() {
