@@ -6,6 +6,7 @@ import emulator.Settings;
 import emulator.custom.h.MethodInfo;
 import emulator.debug.Profiler;
 import emulator.graphics3D.lwjgl.Emulator3D;
+import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
@@ -72,9 +73,6 @@ public class CustomMethod {
 				} else if (prop.equals("com.nokia.memoryramtotal")) {
 					res = String.valueOf(r.maxMemory());
 				}
-			} else if (prop.equals("kemulator.threadtrace")) {
-				b = false;
-				res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
 			} else if (((prop.equalsIgnoreCase("com.nokia.mid.imei") || prop.equalsIgnoreCase("com.nokia.imei"))
 					&& !Settings.protectedPackages.contains("com.nokia.mid")) ||
 					prop.equalsIgnoreCase("device.imei") ||
@@ -84,16 +82,10 @@ public class CustomMethod {
 					(prop.equalsIgnoreCase("com.siemens.IMEI") && !Settings.protectedPackages.contains("com.siemens"))
 			) {
 				res = Permission.askIMEI();
-			} else if (prop.equals("kemulator.libvlc.supported")) {
-				res = String.valueOf(Manager.isLibVlcSupported());
 			} else if (prop.equals("com.nokia.pointer.number")) {
 				b = false;
 				try {
 					res = Emulator.getEventQueue().getPointerNumber();
-				} catch (Exception ignored) {}
-			} else if (prop.equals("kemulator.touch.enabled")) {
-				try {
-					res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
 				} catch (Exception ignored) {}
 			} else if (prop.equals("microedition.locale")) {
 				res = Settings.locale;
@@ -103,6 +95,29 @@ public class CustomMethod {
 				res = "";
 			} else if(prop.equals("fileconn.dir.roots.names")) {
 				res = "Root";
+			} else if(prop.startsWith("kemulator")) {
+				try {
+					if (prop.equals("kemulator.libvlc.supported")) {
+						res = String.valueOf(Manager.isLibVlcSupported());
+					} else if (prop.equals("kemulator.threadtrace")) {
+						b = false;
+						res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
+					} else if (prop.equals("kemulator.touch.enabled")) {
+						res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
+					} else if (prop.startsWith("kemulator.set.title=")) {
+						if ((res = prop.substring(prop.indexOf('=') + 1)).equals("null")) {
+							res = null;
+						}
+						Settings.customTitle = res;
+
+						EmulatorImpl.syncExec(new Runnable() {
+							public void run() {
+								((EmulatorScreen) Emulator.getEmulator().getScreen()).updateTitle();
+							}
+						});
+						res = "true";
+					}
+				} catch (Exception ignored) {}
 			}
 			// Hide properties of disabled APIs
 			if(!Settings.protectedPackages.isEmpty()) {

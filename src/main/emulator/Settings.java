@@ -128,4 +128,5 @@ public final class Settings {
 	public static boolean asyncFlush = true;
 
 	public static boolean softbankApi = false;
+    public static String customTitle;
 }

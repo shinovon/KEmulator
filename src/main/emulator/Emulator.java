@@ -332,6 +332,7 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getTitle(String s) {
+		if (Settings.customTitle != null) return Settings.customTitle;
 		StringBuilder sb = new StringBuilder();
 		sb.append(platform.getTitleName()).append(' ').append(version);
 		if (s != null) {
