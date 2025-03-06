@@ -134,7 +134,9 @@ public class StringItem extends Item {
 		}
 		String s = text;
 		if (s.startsWith("\n")) s = s.substring(1);
-		if (s.endsWith("\n")) s = s.substring(0, s.length() - 1);
+		if (s.endsWith("\n") && !_hasLayout(Item.LAYOUT_NEWLINE_AFTER)) {
+			s = s.substring(0, s.length() - 1);
+		}
 		textArr = c.textArr(s, font, availableWidth, maxWidth, maxw);
 		final int fh = font.getHeight() + 4;
 		if (mode == BUTTON) {
@@ -159,8 +161,7 @@ public class StringItem extends Item {
 	}
 
 	public int getPreferredWidth() {
-		return _hasLayout(LAYOUT_EXPAND) || (super.isSizeLocked() && preferredWidth != -1) ?
-				super.getPreferredWidth() : width;
+		return super.isSizeLocked() && preferredWidth != -1 ? super.getPreferredWidth() : width;
 	}
 
 	boolean isFocusable() {

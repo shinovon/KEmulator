@@ -88,7 +88,7 @@ class Row {
 	boolean canAdd(Item item, int maxWidth) {
 		if (items.isEmpty()) return true;
 		Item lastItem = items.get(items.size() - 1).item;
-		return !lastItem._hasLayout(Item.LAYOUT_EXPAND)
+		return !item._hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
 				&& !lastItem._hasLayout(Item.LAYOUT_NEWLINE_AFTER)
 				&& width != maxWidth
 				&& width + (item._hasLayout(Item.LAYOUT_SHRINK) ? item.getMinimumWidth() : item.getPreferredWidth()) < maxWidth;

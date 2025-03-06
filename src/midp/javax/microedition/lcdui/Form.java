@@ -597,7 +597,7 @@ public class Form extends Screen {
 				} else {
 					row.add(item, width);
 				}
-				if((text != null && text.endsWith("\n"))
+				if((text != null && text.endsWith("\n") && !item._hasLayout(Item.LAYOUT_NEWLINE_AFTER))
 						|| item._hasLayout(Item.LAYOUT_NEWLINE_AFTER)
 						|| item instanceof ChoiceGroup
 						|| item instanceof TextField
