@@ -119,9 +119,10 @@ public final class ClassTypes {
 					boolean b = "true".indexOf(lowerCase) == 0;
 					if (!b) {
 						try {
-						b = Integer.parseInt(var2, var4) != 0;
+							b = Integer.parseInt(var2, var4) != 0;
 						}
 						catch (java.lang.NumberFormatException e){
+							b = false;
 						}    	
 					}
 					Array.setBoolean(var0, var1, b);
