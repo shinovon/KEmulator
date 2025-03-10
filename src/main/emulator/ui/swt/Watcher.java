@@ -682,8 +682,8 @@ public final class Watcher implements Runnable, DisposeListener {
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCombo546 = new Combo(this.shell, 8)).setLayoutData(layoutData);
-		aCombo546.setVisibleItemCount(8);
+		(this.aCombo546 = new Combo(this.shell, SWT.READ_ONLY)).setLayoutData(layoutData);
+		aCombo546.setVisibleItemCount(24);
 		this.aCombo546.addModifyListener(new Class16(this));
 	}
 
