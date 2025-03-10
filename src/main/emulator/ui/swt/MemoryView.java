@@ -55,7 +55,7 @@ public final class MemoryView implements DisposeListener {
 	private Button aButton1137;
 	private Button aButton1141;
 	private Canvas aCanvas1095;
-	private SashForm aSashForm1083;
+	private SashForm horizontalSeparator;
 	private Composite aComposite1116;
 	private SashForm aSashForm1103;
 	private Table table;
@@ -136,7 +136,7 @@ public final class MemoryView implements DisposeListener {
 		this.aButton1137 = null;
 		this.aButton1141 = null;
 		this.aCanvas1095 = null;
-		this.aSashForm1083 = null;
+		this.horizontalSeparator = null;
 		this.aComposite1116 = null;
 		this.aSashForm1103 = null;
 		this.table = null;
@@ -294,7 +294,7 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	private void method672() {
-		this.aTabFolder1097 = new TabFolder(this.aSashForm1083, 0);
+		this.aTabFolder1097 = new TabFolder(this.horizontalSeparator, 0);
 		this.method677();
 		this.method681();
 		final TabItem tabItem;
@@ -459,17 +459,20 @@ public final class MemoryView implements DisposeListener {
 		layoutData.verticalAlignment = 4;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.grabExcessHorizontalSpace = true;
-		(this.aSashForm1083 = new SashForm(this.shell, 0)).setOrientation(512);
-		this.aSashForm1083.setLayoutData(layoutData);
+		(this.horizontalSeparator = new SashForm(this.shell, 0)).setOrientation(SWT.VERTICAL);
+		this.horizontalSeparator.setSashWidth(5);
+		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+
+		this.horizontalSeparator.setLayoutData(layoutData);
 		this.method688();
 		this.method672();
-		this.aSashForm1083.setWeights(new int[]{4, 6});
+		this.horizontalSeparator.setWeights(new int[]{4, 6});
 	}
 
 	private void method688() {
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 1;
-		this.aComposite1116 = new Composite(this.aSashForm1083, 0);
+		this.aComposite1116 = new Composite(this.horizontalSeparator, 0);
 		this.method689();
 		this.aComposite1116.setLayout(layout);
 	}
