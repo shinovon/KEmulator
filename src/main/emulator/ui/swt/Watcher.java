@@ -439,7 +439,6 @@ public final class Watcher implements Runnable, DisposeListener {
 		}
 	}
 
-	// Method to update stored proportions based on current column widths
 	private void updateProportionsFromColumnWidths() {
 		collumnIsDragged = true;
 		int minColWidth = (this.minWindowWidth - 10)/3;
@@ -602,7 +601,6 @@ public final class Watcher implements Runnable, DisposeListener {
 		treeColumn.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
-				// Only update proportions on manual column resize
 				if (!isBeingResized) {
 					updateProportionsFromColumnWidths();
 				}
@@ -638,12 +636,8 @@ public final class Watcher implements Runnable, DisposeListener {
 					if (aTree554.getVerticalBar() != null && aTree554.getVerticalBar().isVisible()) {
 						totalWidth -= aTree554.getVerticalBar().getSize().x;
 					}
-
-					// Begin Update to prevent recursive calls
 					aTree554.setRedraw(false);
-
 					if (treeColumn3 != null) {
-						// Apply stored proportions for 3 columns
 						int minWidth = 60;
 						int width1 = Math.max(minWidth, Math.round(propCol1 * totalWidth));
 						int width2 = Math.max(minWidth, Math.round(propCol2 * totalWidth));
@@ -653,15 +647,12 @@ public final class Watcher implements Runnable, DisposeListener {
 						treeColumn2.setWidth(width2);
 						treeColumn3.setWidth(width3);
 					} else {
-						// Apply stored proportions for 2 columns
 						int minWidth = 60;
 						int width1 = Math.max(minWidth, Math.round(propCol1 * totalWidth));
 						int width2 = Math.max(minWidth, totalWidth - width1);
-
 						treeColumn.setWidth(width1);
 						treeColumn2.setWidth(width2);
 					}
-
 					aTree554.setRedraw(true);
 					Display.getDefault().timerExec(50, new Runnable() {
 						@Override
