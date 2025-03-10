@@ -6,12 +6,10 @@ import emulator.debug.Instance;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TreeEditor;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -29,10 +27,10 @@ public final class Watcher implements Runnable, DisposeListener {
 	private Shell parentShell;
 	private Shell shell;
 	private Combo aCombo546;
-	private Text aText543;
+	private Text filterInput;
 	private CLabel aCLabel547;
-	private Button aButton549;
-	private Button aButton558;
+	private Button filterSwitch;
+	private Button hexDecSwitch;
 	private Display aDisplay550;
 	private boolean visible;
 	private Map table;
@@ -46,31 +44,44 @@ public final class Watcher implements Runnable, DisposeListener {
 	private boolean aBoolean561;
 	boolean aBoolean545;
 	boolean aBoolean559;
+	private float propCol1;
+	private float propCol2;
+	private float propCol3;
+	private TreeColumn treeColumn;
+	private TreeColumn treeColumn2;
+	private TreeColumn treeColumn3;
+	public boolean isBeingResized;
+	public boolean collumnIsDragged;
+	private int defWindowWidth;
+	private int defWindowHeight;
+	private int minWindowWidth;
+	private int minWindowHeight;
 
 	public Watcher(final int anInt553) {
 		super();
 		this.shell = null;
 		this.aCombo546 = null;
-		this.aText543 = null;
+		this.filterInput = null;
 		this.aCLabel547 = null;
-		this.aButton549 = null;
-		this.aButton558 = null;
+		this.filterSwitch = null;
+		this.hexDecSwitch = null;
 		this.aTree554 = null;
 		this.aTreeEditor555 = null;
 		this.aDisplay550 = EmulatorImpl.getDisplay();
 		this.type = anInt553;
 		this.table = new LinkedHashMap();
 		this.aClass5_556 = this;
+		this.commonInit();
 	}
 
 	public Watcher(final Object o) {
 		super();
 		this.shell = null;
 		this.aCombo546 = null;
-		this.aText543 = null;
+		this.filterInput = null;
 		this.aCLabel547 = null;
-		this.aButton549 = null;
-		this.aButton558 = null;
+		this.filterSwitch = null;
+		this.hexDecSwitch = null;
 		this.aTree554 = null;
 		this.aTreeEditor555 = null;
 		if (o == null) {
@@ -83,6 +94,18 @@ public final class Watcher implements Runnable, DisposeListener {
 		(c = new Instance(o.getClass().getName(), o)).method879(null);
 		this.table.put(o.toString(), c);
 		this.aClass5_556 = this;
+		this.aClass5_556 = this;
+		this.commonInit();
+
+	}
+
+	private final void commonInit(){
+		this.isBeingResized = false;
+		this.collumnIsDragged = false;
+		this.defWindowWidth = 640;
+		this.defWindowHeight = 480;
+		this.minWindowWidth = 200;
+		this.minWindowHeight = 210;
 	}
 
 	public final void fill() {
@@ -96,7 +119,7 @@ public final class Watcher implements Runnable, DisposeListener {
 			this.aTree554.removeAll();
 			return;
 		}
-		c.method879(this.aButton549.getSelection() ? this.aText543.getText() : null);
+		c.method879(this.filterSwitch.getSelection() ? this.filterInput.getText() : null);
 		updateTitle(c);
 		this.aTree554.removeAll();
 		for (int i = 0; i < c.getFields().size(); ++i) {
@@ -383,7 +406,7 @@ public final class Watcher implements Runnable, DisposeListener {
 					this.aBoolean559 = false;
 					return;
 				}
-				final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, this.aButton558.getSelection());
+				final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, this.hexDecSwitch.getSelection());
 				if (this.aBoolean545) {
 					this.aBoolean559 = false;
 					return;
@@ -407,7 +430,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		}
 		if (treeItem.getExpanded()) {
 			for (int i = treeItem.getItemCount() - 1; i >= 0; --i) {
-				final String method872 = ClassTypes.method872(o, i, this.aButton558.getSelection());
+				final String method872 = ClassTypes.method872(o, i, this.hexDecSwitch.getSelection());
 				final Object value = Array.get(o, i);
 				final TreeItem item;
 				(item = treeItem.getItem(i)).setText(1, method872);
@@ -415,6 +438,36 @@ public final class Watcher implements Runnable, DisposeListener {
 			}
 		}
 	}
+
+	// Method to update stored proportions based on current column widths
+	private void updateProportionsFromColumnWidths() {
+		collumnIsDragged = true;
+		int minColWidth = (this.minWindowWidth - 10)/3;
+		int colW = Math.max(minColWidth, this.treeColumn.getWidth());
+		int colW2 = Math.max(minColWidth, this.treeColumn2.getWidth());
+
+		if (this.treeColumn3 != null) {
+			int colW3 = Math.max(minColWidth, this.treeColumn3.getWidth());
+			float totalColW = colW + colW2 + colW3;
+
+			this.propCol1 = colW / totalColW;
+			this.propCol2 = colW2 / totalColW;
+			this.propCol3 = colW3 / totalColW;
+		} else {
+			float totalColW = colW + colW2;
+
+			this.propCol1 = colW / totalColW;
+			this.propCol2 = colW2 / totalColW;
+		}
+
+		Display.getDefault().timerExec(50, new Runnable() {
+			@Override
+			public void run() {
+				collumnIsDragged = false;
+			}
+		});
+	}
+
 
 	private void method324() {
 		final GridData layoutData;
@@ -434,13 +487,9 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.shell.setLayout(layout);
 		(this.aCLabel547 = new CLabel(this.shell, 0)).setText("Classes:");
 		this.method325();
-		this.shell.setSize(new Point(351, 286));
-		(this.aButton549 = new Button(this.shell, 32)).setText("Filter:");
-		this.aButton549.addSelectionListener(new Class139(this));
-		(this.aText543 = new Text(this.shell, 2048)).setLayoutData(layoutData2);
-		this.aText543.addModifyListener(new Class141(this));
-		(this.aButton558 = new Button(this.shell, 32)).setText("HEX");
-		this.aButton558.addSelectionListener(new Class8(this));
+		this.shell.setSize(this.defWindowWidth, this.defWindowHeight);
+		this.shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
+
 		if (this.type == 0) {
 			Button exportBtn;
 			(exportBtn = new Button(this.shell, SWT.PUSH)).setText("Export");
@@ -517,29 +566,124 @@ public final class Watcher implements Runnable, DisposeListener {
 				}
 			});
 		}
-		(this.aTree554 = new Tree(this.shell, 67584)).setHeaderVisible(true);
+
+		(this.aTree554 = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL)).setHeaderVisible(true);
 		this.aTree554.setLinesVisible(true);
 		this.aTree554.setLayoutData(layoutData);
 		this.aTree554.setToolTipText("Right click to open a Object Watcher");
 		this.aTree554.addTreeListener(new Class6(this));
 		this.aTree554.addMouseListener(new Class12(this));
-		final TreeColumn treeColumn;
-		(treeColumn = new TreeColumn(this.aTree554, 16384)).setWidth(150);
+
+		int colWidth = (int)Math.round((this.shell.getSize().x -10)/3);
+		this.treeColumn = new TreeColumn(this.aTree554, SWT.LEFT);
 		treeColumn.setText("Variable");
-		treeColumn.setMoveable(true);
-		final TreeColumn treeColumn2;
-		(treeColumn2 = new TreeColumn(this.aTree554, 16384)).setWidth(150);
+		treeColumn.setMoveable(false);
+		treeColumn.setWidth(colWidth);
+
+		this.treeColumn2 = new TreeColumn(this.aTree554, SWT.LEFT);
 		treeColumn2.setText("Value");
-		treeColumn2.setMoveable(true);
-		this.aTreeEditor555 = new TreeEditor(this.aTree554);
-		this.aTreeEditor555.horizontalAlignment = 16384;
-		this.aTreeEditor555.grabHorizontal = true;
+		treeColumn2.setMoveable(false);
+		treeColumn2.setWidth(colWidth);
+
+
 		if (this.type == 0) {
-			final TreeColumn treeColumn3;
-			(treeColumn3 = new TreeColumn(this.aTree554, 16384)).setWidth(150);
-			treeColumn3.setText("Type");
-			treeColumn3.setMoveable(true);
+			this.treeColumn3 = new TreeColumn(this.aTree554, SWT.LEFT);
+			this.treeColumn3.setText("Type");
+			this.treeColumn3.setMoveable(false);
+			this.treeColumn3.setWidth(colWidth);
+			this.propCol1 = 0.33f;
+			this.propCol2 = 0.33f;
+			this.propCol3 = 0.34f;
+		} else {
+			this.treeColumn3 = null;
+			this.propCol1 = 0.5f;
+			this.propCol2 = 0.5f;
 		}
+		treeColumn.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				// Only update proportions on manual column resize
+				if (!isBeingResized) {
+					updateProportionsFromColumnWidths();
+				}
+			}
+		});
+
+		treeColumn2.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				if (!isBeingResized) {
+					updateProportionsFromColumnWidths();
+                }
+			}
+		});
+
+		if (treeColumn3 != null) {
+			treeColumn3.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(ControlEvent e) {
+					if (!isBeingResized) {
+						updateProportionsFromColumnWidths();
+					}
+				}
+			});
+		}
+		this.aTree554.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				if (!collumnIsDragged) {
+					isBeingResized = true;
+					Rectangle area = aTree554.getClientArea();
+					int totalWidth = shell.getSize().x - 10;
+					if (aTree554.getVerticalBar() != null && aTree554.getVerticalBar().isVisible()) {
+						totalWidth -= aTree554.getVerticalBar().getSize().x;
+					}
+
+					// Begin Update to prevent recursive calls
+					aTree554.setRedraw(false);
+
+					if (treeColumn3 != null) {
+						// Apply stored proportions for 3 columns
+						int minWidth = 60;
+						int width1 = Math.max(minWidth, Math.round(propCol1 * totalWidth));
+						int width2 = Math.max(minWidth, Math.round(propCol2 * totalWidth));
+						int width3 = Math.max(minWidth, totalWidth - width1 - width2);
+
+						treeColumn.setWidth(width1);
+						treeColumn2.setWidth(width2);
+						treeColumn3.setWidth(width3);
+					} else {
+						// Apply stored proportions for 2 columns
+						int minWidth = 60;
+						int width1 = Math.max(minWidth, Math.round(propCol1 * totalWidth));
+						int width2 = Math.max(minWidth, totalWidth - width1);
+
+						treeColumn.setWidth(width1);
+						treeColumn2.setWidth(width2);
+					}
+
+					aTree554.setRedraw(true);
+					Display.getDefault().timerExec(50, new Runnable() {
+						@Override
+						public void run() {
+							isBeingResized = false;
+						}
+					});
+
+				}
+			}
+		});
+
+		this.aTreeEditor555 = new TreeEditor(this.aTree554);
+		this.aTreeEditor555.horizontalAlignment = SWT.LEFT;
+		this.aTreeEditor555.grabHorizontal = true;
+
+		(this.filterSwitch = new Button(this.shell, 32)).setText("Filter:");
+		this.filterSwitch.addSelectionListener(new Class139(this));
+		(this.filterInput = new Text(this.shell, 2048)).setLayoutData(layoutData2);
+		this.filterInput.addModifyListener(new Class141(this));
+		(this.hexDecSwitch = new Button(this.shell, 32)).setText("HEX");
+		this.hexDecSwitch.addSelectionListener(new Class8(this));
 	}
 
 	private void method325() {
@@ -577,7 +721,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	}
 
 	static Button method312(final Watcher class5) {
-		return class5.aButton549;
+		return class5.filterSwitch;
 	}
 
 	static void method316(final Watcher class5, final TreeItem treeItem) {
