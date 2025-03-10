@@ -163,7 +163,17 @@ public final class ClassTypes {
 			} else if (var1.getType() == Byte.TYPE) {
 				var1.setByte(var0, (byte) Integer.parseInt(var2, var3));
 			} else if (var1.getType() == Boolean.TYPE) {
-				var1.setBoolean(var0, Boolean.valueOf(var2).booleanValue());
+				String lowerCase = var2.toLowerCase();
+				boolean b = "true".indexOf(lowerCase) == 0;
+				if (!b) {
+					try {
+						b = Integer.parseInt(var2, var3) != 0;
+					}
+					catch (java.lang.NumberFormatException e){
+						b = false;
+					}
+				}
+				var1.setBoolean(var0, b);
 			} else if (var1.getType() == Float.TYPE) {
 				var1.setFloat(var0, Float.parseFloat(var2));
 			} else if (var1.getType() == Double.TYPE) {
