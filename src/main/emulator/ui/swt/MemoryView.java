@@ -163,7 +163,10 @@ public final class MemoryView implements DisposeListener {
 
 	public final void open() {
 		this.method665();
-		this.shell.setLocation(this.display.getClientArea().width - this.shell.getSize().x >> 1, this.display.getClientArea().height - this.shell.getSize().y >> 1);
+		this.shell.setLocation(
+                (int) (this.display.getClientArea().height * 0.025), //- this.shell.getSize().x >> 3,
+                (int) (this.display.getClientArea().height * 0.025)// - this.shell.getSize().y >> 2
+		);
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.method692();
@@ -250,7 +253,14 @@ public final class MemoryView implements DisposeListener {
 		(this.shell = new Shell(1264)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
 		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setLayout(layout);
-		(this.shell).setSize(new Point(740, 466));
+
+		//(int)(this.display.getClientArea().width * 0.33);
+		//(int)(this.display.getClientArea().height * 0.8);
+		this.shell.setSize(
+				(int)(this.display.getClientArea().width * 0.4),
+				(int)(this.display.getClientArea().height * 0.95)
+		);
+
 		(this.aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
 		(this.aButton1081).setLayoutData(layoutData6);
 		this.aButton1081.addSelectionListener(new Class129(this));
@@ -462,7 +472,6 @@ public final class MemoryView implements DisposeListener {
 		(this.horizontalSeparator = new SashForm(this.shell, 0)).setOrientation(SWT.VERTICAL);
 		this.horizontalSeparator.setSashWidth(5);
 		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-
 		this.horizontalSeparator.setLayoutData(layoutData);
 		this.method688();
 		this.method672();
