@@ -14,7 +14,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -303,16 +302,77 @@ public final class MemoryView implements DisposeListener {
 		this.method687();
 	}
 
-	private void method672() {
+	private void initTabs() {
 		this.aTabFolder1097 = new TabFolder(this.horizontalSeparator, 0);
+
 		this.method677();
 		this.method681();
+
+
+		final TabItem tabItemMemory;
+		(tabItemMemory = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_MEMORY", "Objects"));
+
 		final TabItem tabItem;
 		(tabItem = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_IMAGES", "Images"));
 		tabItem.setControl(this.aComposite1098);
+
 		final TabItem tabItem2;
 		(tabItem2 = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
 		tabItem2.setControl(this.audioControlComp);
+
+
+		Composite memoryComp = new Composite(this.aTabFolder1097, 0);
+		GridLayout memoryLayout = new GridLayout(1, false);
+		memoryComp.setLayout(memoryLayout);
+
+		SashForm tablesSash = new SashForm(memoryComp, SWT.HORIZONTAL);
+		GridData sashLayoutData = new GridData();
+		sashLayoutData.horizontalAlignment = GridData.FILL;
+		sashLayoutData.grabExcessHorizontalSpace = true;
+		sashLayoutData.grabExcessVerticalSpace = true;
+		sashLayoutData.verticalAlignment = GridData.FILL;
+		tablesSash.setLayoutData(sashLayoutData);
+
+		this.table = new Table(tablesSash, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
+		this.table.setHeaderVisible(true);
+		this.table.setLinesVisible(true);
+		this.table.addSelectionListener(new Class34(this));
+
+		final TableColumn tableColumn;
+		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
+		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
+		tableColumn.addSelectionListener(new Class31(this));
+
+		final TableColumn tableColumn2;
+		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
+		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
+		tableColumn2.addSelectionListener(new Class140(this));
+
+		final TableColumn tableColumn3;
+		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
+		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
+		tableColumn3.addSelectionListener(new Class17(this));
+
+		this.classTable = new Table(tablesSash, 67584);
+		this.classTable.setHeaderVisible(true);
+		this.classTable.setLinesVisible(true);
+		this.classTable.addSelectionListener(new Class19(this));
+		this.classTable.addMouseListener(new Class13(this));
+
+		final TableColumn tableColumn4;
+		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
+		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
+
+		final TableColumn tableColumn5;
+		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
+		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
+
+		final TableColumn tableColumn6;
+		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
+		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
+		tablesSash.setWeights(new int[]{1, 1});
+
+		tabItemMemory.setControl(memoryComp);
 	}
 
 	private void method677() {
@@ -469,15 +529,13 @@ public final class MemoryView implements DisposeListener {
 		layoutData.verticalAlignment = 4;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.grabExcessHorizontalSpace = true;
-		(this.horizontalSeparator = new SashForm(this.shell, 0)).setOrientation(SWT.VERTICAL);
-		this.horizontalSeparator.setSashWidth(5);
-		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-		this.horizontalSeparator.setLayoutData(layoutData);
-		this.method688();
-		this.method672();
-		this.horizontalSeparator.setWeights(new int[]{4, 6});
-	}
 
+		(this.horizontalSeparator = new SashForm(this.shell, 0)).setOrientation(SWT.VERTICAL);
+		this.horizontalSeparator.setLayoutData(layoutData);
+		this.initTabs();
+
+	}
+/*
 	private void method688() {
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 1;
@@ -522,7 +580,7 @@ public final class MemoryView implements DisposeListener {
 		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
 	}
-
+*/
 	private void method690() {
 		if (this.aBoolean1118) {
 			return;
