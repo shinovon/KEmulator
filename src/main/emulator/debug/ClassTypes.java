@@ -106,34 +106,41 @@ public final class ClassTypes {
 				}
 
 				Class cls;
-				if ((cls = var0.getClass().getComponentType()) == Long.TYPE) {
-					Array.setLong(var0, var1, Long.parseLong(var2, var4));
-				} else if (cls == Integer.TYPE) {
-					Array.setInt(var0, var1, Integer.parseInt(var2, var4));
-				} else if (cls == Short.TYPE) {
-					Array.setShort(var0, var1, (short) Integer.parseInt(var2, var4));
-				} else if (cls == Byte.TYPE) {
-					Array.setByte(var0, var1, (byte) Integer.parseInt(var2, var4));
-				} else if (cls == Boolean.TYPE) {
-					String lowerCase = var2.toLowerCase();
-					boolean b = "true".indexOf(lowerCase) == 0;
-					if (!b) {
-						try {
-							b = Integer.parseInt(var2, var4) != 0;
+				try {
+					if ((cls = var0.getClass().getComponentType()) == Long.TYPE) {
+						Array.setLong(var0, var1, Long.parseLong(var2, var4));
+					} else if (cls == Integer.TYPE) {
+						if (var4 == 16)
+							Array.setInt(var0, var1, Integer.parseUnsignedInt(var2, var4));
+						else if (var4 == 10)
+							Array.setInt(var0, var1, Integer.parseInt(var2, var4));
+					} else if (cls == Short.TYPE) {
+						Array.setShort(var0, var1, (short) Integer.parseInt(var2, var4));
+					} else if (cls == Byte.TYPE) {
+						Array.setByte(var0, var1, (byte) Integer.parseInt(var2, var4));
+					} else if (cls == Boolean.TYPE) {
+						String lowerCase = var2.toLowerCase();
+						boolean b = "true".indexOf(lowerCase) == 0;
+						if (!b) {
+							try {
+								b = Integer.parseInt(var2, var4) != 0;
+							} catch (java.lang.NumberFormatException e) {
+								b = false;
+							}
 						}
-						catch (java.lang.NumberFormatException e){
-							b = false;
-						}    	
+						Array.setBoolean(var0, var1, b);
+					} else if (cls == Float.TYPE) {
+						Array.setFloat(var0, var1, Float.parseFloat(var2));
+					} else if (cls == Double.TYPE) {
+						Array.setDouble(var0, var1, Double.parseDouble(var2));
+					} else if (cls == Character.TYPE) {
+						Array.setChar(var0, var1, var2.charAt(0));
+					} else if (cls == String.class) {
+						Array.set(var0, var1, var2);
 					}
-					Array.setBoolean(var0, var1, b);
-				} else if (cls == Float.TYPE) {
-					Array.setFloat(var0, var1, Float.parseFloat(var2));
-				} else if (cls == Double.TYPE) {
-					Array.setDouble(var0, var1, Double.parseDouble(var2));
-				} else if (cls == Character.TYPE) {
-					Array.setChar(var0, var1, var2.charAt(0));
-				} else if (cls == String.class) {
-					Array.set(var0, var1, var2);
+				}
+				catch (java.lang.NumberFormatException e){
+					Emulator.getEmulator().getLogStream().println(e.toString());
 				}
 			}
 		}
@@ -157,7 +164,10 @@ public final class ClassTypes {
 			if (var1.getType() == Long.TYPE) {
 				var1.setLong(var0, Long.parseLong(var2, var3));
 			} else if (var1.getType() == Integer.TYPE) {
-				var1.setInt(var0, Integer.parseInt(var2, var3));
+				if (var3 == 16)
+					var1.setInt(var0, Integer.parseUnsignedInt(var2, var3));
+				else if (var3 == 10)
+					var1.setInt(var0, Integer.parseInt(var2, var3));
 			} else if (var1.getType() == Short.TYPE) {
 				var1.setShort(var0, (short) Integer.parseInt(var2, var3));
 			} else if (var1.getType() == Byte.TYPE) {
