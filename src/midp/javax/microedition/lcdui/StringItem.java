@@ -85,12 +85,12 @@ public class StringItem extends Item {
 				if (row != 0) return;
 				g.setFont(Item.font);
 				if (labelArr != null) for (String s : labelArr) {
-					g.drawString(s, x + 2, y, 0);
+					g.drawString(s, x, y, 0);
 					y += Item.font.getHeight() + 4;
 				}
 				g.setFont(font);
 				for (String s : textArr) {
-					g.drawString(s, x + 2, y, 0);
+					g.drawString(s, x, y, 0);
 					y += font.getHeight() + 4;
 				}
 				return;
@@ -144,7 +144,7 @@ public class StringItem extends Item {
 			textArr = new String[] { textArr[0] };
 			bounds[H] = fh + (hasLabel() ? Item.font.getHeight() + 4 : 0);
 		} else {
-			width = Math.max(w, textArr.length != 0 ? maxw[0] + 4 : 4);
+			width = Math.max(w, textArr.length != 0 ? maxw[0] : 4);
 			bounds[H] = fh * textArr.length
 					+ (labelArr != null ? (Item.font.getHeight() + 4) * labelArr.length : 0);
 		}
@@ -175,7 +175,7 @@ public class StringItem extends Item {
 			row -= labelArr.length;
 		}
 		if (textArr == null) return 0;
-		return ((font != null) ? font : Screen.font).stringWidth(textArr[row]) + 2;
+		return ((font != null) ? font : Screen.font).stringWidth(textArr[row]);
 	}
 
 	int getRowHeight(int row) {
