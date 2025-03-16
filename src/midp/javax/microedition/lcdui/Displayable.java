@@ -52,6 +52,7 @@ public class Displayable {
 	private Command leftCommand;
 	private Command rightCommand;
 	private final Vector<Command> menuCommands = new Vector<Command>();
+	final Object lock = new Object();
 
 	public Displayable() {
 		super();
@@ -319,27 +320,31 @@ public class Displayable {
 	}
 
 	public void setTicker(final Ticker ticker) {
-		this.ticker = ticker;
-		this.tickerX = this.w;
-		updateSize(true);
+		synchronized (lock) {
+			this.ticker = ticker;
+			this.tickerX = this.w;
+			updateSize(true);
+		}
 	}
 
 	protected void _paintTicker(final Graphics graphics) {
-		if (ticker == null) {
-			if (!fullScreen && this instanceof Canvas) {
-				graphics.setColor(-1);
-				graphics.fillRect(0, this.bounds[H], w, Screen.fontHeight4);
+		synchronized (lock) {
+			if (ticker == null) {
+				if (!fullScreen && this instanceof Canvas) {
+					graphics.setColor(-1);
+					graphics.fillRect(0, this.bounds[H], w, Screen.fontHeight4);
+				}
+				return;
 			}
-			return;
-		}
-		a.method181(graphics, 0, Screen.fontHeight4 + this.bounds[H] - 1, this.w, Screen.fontHeight4);
-		String t = ticker.getString();
-		if (t == null) return;
-		graphics.setFont(Screen.font);
-		graphics.drawString(t, this.tickerX, Screen.fontHeight4 + this.bounds[H] - 1 + 2, 0);
-		this.tickerX -= 5;
-		if (this.tickerX < -Screen.font.stringWidth(t)) {
-			this.tickerX = this.w;
+			a.method181(graphics, 0, Screen.fontHeight4 + this.bounds[H] - 1, this.w, Screen.fontHeight4);
+			String t = ticker.getString();
+			if (t == null) return;
+			graphics.setFont(Screen.font);
+			graphics.drawString(t, this.tickerX, Screen.fontHeight4 + this.bounds[H] - 1 + 2, 0);
+			this.tickerX -= 5;
+			if (this.tickerX < -Screen.font.stringWidth(t)) {
+				this.tickerX = this.w;
+			}
 		}
 	}
 
