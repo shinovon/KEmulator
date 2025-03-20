@@ -253,7 +253,7 @@ OPTION_TAB_SYSTEM_PROPERTIES=Propiedades
 
 OPTION_CUSTOM_DEVICE=Dispositivo seleccionado:
 OPTION_CUSTOM_ENCODING=Codificación predeterminada:
-OPTION_CUSTOM_MAX_FPS=Máximo de FPS:
+OPTION_CUSTOM_MAX_FPS=Límite de FPS:
 
 OPTION_CUSTOM_PROPERTIES=Propiedades personalizadas
 OPTION_CUSTOM_SCREEN_WIDTH=Ancho de la pantalla:
@@ -290,6 +290,7 @@ OPTION_KEYMAP_PAD_UP=Flecha arriba:
 OPTION_KEYMAP_PAD_DOWN=Flecha abajo:
 OPTION_KEYMAP_PAD_MIDDLE=Tecla central:
 OPTION_KEYMAP_CLEAR=Limpiar
+OPTION_KEYMAP_RESET=Restablecer
 
 OPTION_FONT_DEFAULT_FONT=Fuente predeterminada:
 OPTION_FONT_LARGE_SIZE=Tamaño grande:
@@ -323,6 +324,7 @@ OPTION_COREAPI_IGNORE_REGION_REPAINT=Redibujar siempre la pantalla completamente
 OPTION_COREAPI_KEYPRESS_ON_REPEAT=Enviar keyPressed en repeticiones
 OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Forzar redibujado en serviceRepaints()
 OPTION_COREAPI_POINTER_EVENTS=Devolver valor Canvas.hasPointerEvents()
+OPTION_COREAPI_ASYNC_FLUSH=Vaciado asincrónico
 
 OPTION_RECORDS_RMS_FOLDER=Carpeta de RMS:
 OPTION_RECORDS_RMS_TEXT=Todos los registros en el MIDlet actual:
@@ -356,6 +358,7 @@ OPTION_M3G_IGNORE_OVERWRITE=Ignorar la indicación OVERWRITE
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Forzar corrección de perspectiva
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Deshabilitar limitación de luz
 OPTION_M3G_FLUSH_IMMEDIATELY=Vaciar contenido inmediatamente (lento)
+OPTION_M3G_THREAD=Ejecutar en un solo hilo
 
 OPTION_M3G_AA=Antialiasing:
 OPTION_M3G_APP_CONTROLLED=Controlado por la aplicación
