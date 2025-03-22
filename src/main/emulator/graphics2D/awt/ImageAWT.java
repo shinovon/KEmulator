@@ -173,24 +173,24 @@ public final class ImageAWT implements IImage {
 		emulator.graphics2D.c.setClipboard(img);
 	}
 
-	public final void cloneImage(final IImage image) {
-		System.arraycopy(getInternalData(), 0, ((ImageAWT) image).getInternalData(), 0, data.length);
+	public final void cloneImage(final IImage sourceImg) {
+		System.arraycopy(getInternalData(), 0, ((ImageAWT) sourceImg).getInternalData(), 0, data.length);
 	}
 
-	public void cloneImage(IImage image, int x, int y, int w, int h) {
-		Graphics2D g = ((ImageAWT) image).g2d;
+	public void cloneImage(IImage sourceImg, int x, int y, int w, int h) {
+		Graphics2D g = ((ImageAWT) sourceImg).g2d;
 		if (g == null) {
-			if (((ImageAWT) image).graphics != null) {
-				g = ((ImageAWT) image).graphics.g;
+			if (((ImageAWT) sourceImg).graphics != null) {
+				g = ((ImageAWT) sourceImg).graphics.g;
 			} else {
-				g = ((ImageAWT) image).g2d = img.createGraphics();
+				g = ((ImageAWT) sourceImg).g2d = img.createGraphics();
 			}
 		}
 		g.drawImage(img, x, y, x + w, y + h, x, y, x + w, y + h, null);
 	}
 
-	public void copyImage(IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty) {
-		((Graphics2DAWT)g).g().drawImage(img, tx, ty, tx + w, ty + h, sx, sy, sx + w, sy + h, null);
+	public void copyImage(IGraphics2D destGraphics, int sx, int sy, int w, int h, int tx, int ty) {
+		((Graphics2DAWT) destGraphics).g().drawImage(img, tx, ty, tx + w, ty + h, sx, sy, sx + w, sy + h, null);
 	}
 
 	private int[] getInternalData() {

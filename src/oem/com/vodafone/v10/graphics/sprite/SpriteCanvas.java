@@ -23,40 +23,51 @@ import emulator.ui.IScreen;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import java.util.ArrayList;
 
 public abstract class SpriteCanvas extends Canvas {
-	private static ArrayList<CharacterCommand> commands = new ArrayList<CharacterCommand>();
-	private Image spriteImage;
-	private Graphics graphics;
+	public static Image _virtualImage;
+	public static Graphics _virtualGraphics;
+
+	public Image _frameImage;
+	protected Graphics frameGraphics;
+
 	private int[] palette;
 	private byte[] patternData;
 	private int[] pixels;
 
-	private Graphics bufferGraphics;
 	private Graphics screenGraphics;
 
-	public boolean _skipCopy;
+	protected int scrollX, scrollY;
 
 	public SpriteCanvas(int numPalettes, int numPatterns) {
 		super();
 		this.palette = new int[numPalettes];
 		this.patternData = new byte[numPatterns * 64];
 		this.pixels = new int[64];
+
+		if (_virtualImage == null) {
+			_virtualImage = Image.createImage(getVirtualWidth(), getVirtualHeight(), 0);
+			_virtualGraphics = _virtualImage.getGraphics();
+		}
 	}
 
 	public void createFrameBuffer(int fw, int fh) {
-		spriteImage = Image.createImage(fw, fh, -1);
-		graphics = spriteImage.getGraphics();
+		System.out.println("createFrameBuffer " + fw + " " + fh);
+		if (fw == 0 || fh == 0) {
+			fw = getVirtualWidth();
+			fh = getVirtualHeight();
+		}
+		_frameImage = Image.createImage(fw, fh, 0);
+		frameGraphics = _frameImage.getGraphics();
 	}
 
 	public void disposeFrameBuffer() {
-		spriteImage = null;
-		graphics = null;
+		_frameImage = null;
+		frameGraphics = null;
 	}
 
 	public void copyArea(int sx, int sy, int fw, int fh, int tx, int ty) {
-		Emulator.getEmulator().getScreen().getBackBufferImage().copyImage(graphics.getImpl(), sx, sy, fw, fh, tx, ty);
+		_virtualImage.getImpl().copyImage(frameGraphics.getImpl(), sx, sy, fw, fh, tx, ty);
 	}
 
 	public void copyFullScreen(int tx, int ty) {
@@ -67,16 +78,17 @@ public abstract class SpriteCanvas extends Canvas {
 		IScreen screen = Emulator.getEmulator().getScreen();
 		IImage screenImage = screen.getScreenImg();
 
-		screen.getBackBufferImage().cloneImage(screenImage);
+		if (screenGraphics == null) {
+			screenGraphics = new Graphics(screenImage, null);
+		} else {
+			screenGraphics._reset(screenImage, null);
+		}
 
-		if (bufferGraphics == null)
-			bufferGraphics = new Graphics(screenImage, null);
-		bufferGraphics.drawImage(spriteImage, tx, ty, 0);
+		screenGraphics.drawImage(_frameImage, tx, ty, 0);
 
-		_skipCopy = true;
-
-		graphics.setColor(0);
-		graphics.fillRect(0, 0, spriteImage.getWidth(), spriteImage.getHeight());
+		frameGraphics.setColor(0);
+		frameGraphics.getImage().setAlpha(0, 0, _frameImage.getWidth(), _frameImage.getHeight(), 0);
+		screen.repaint();
 	}
 
 	public void setPalette(int index, int palette) {
@@ -89,41 +101,62 @@ public abstract class SpriteCanvas extends Canvas {
 
 	public static short createCharacterCommand(int offset, boolean transparent, int rotation,
 											   boolean isUpsideDown, boolean isRightsideLeft, int patternNo) {
-		CharacterCommand command = new CharacterCommand();
-		command.offset = offset;
-		command.transparent = transparent;
-		command.rotation = rotation;
-		command.isUpsideDown = isUpsideDown;
-		command.isRightsideLeft = isRightsideLeft;
-		command.patternNo = patternNo;
-		commands.add(command);
-		return (short) (commands.size() - 1);
+		int i = (offset & 0x7) << 13;
+
+		if (transparent) {
+			i |= 0x1000;
+		}
+
+		i |= (rotation & 0x3) << 10;
+
+		if (isUpsideDown) {
+			i |= 0x200;
+		}
+		if (isRightsideLeft) {
+			i |= 0x100;
+		}
+		i |= patternNo & 0xFF;
+
+		return (short) i;
+	}
+
+	private synchronized void drawChar(short command, boolean bg) {
+		int n = command & 0xFFFF;
+		int offset = (n >> 13) & 0x7;
+		int rotation = (n >> 10) & 0x3;
+		boolean transparent = (n & 0x1000) != 0;
+		boolean isUpsideDown = (n & 0x200) != 0;
+		boolean isRightsideLeft = (n & 0x100) != 0;
+		int patternNo = n & 0xff;
+
+		for (int x1 = 0; x1 < 8; x1++) {
+			for (int y1 = 0; y1 < 8; y1++) {
+				int i = (isUpsideDown ? 7 - y1 : y1) * 8 + (isRightsideLeft ? 7 - x1 : x1);
+				int colorId = patternData[patternNo * 64 + i];
+				if (rotation == 1) { // 90
+					i = (7 - x1) * 8 + y1;
+				} else if (rotation == 2) { // 180
+					i = (7 - y1) * 8 + (7 - x1);
+				} else if (rotation == 3) { // 270
+					i = x1 * 8 + (7 - y1);
+				} else { // 0
+					i = y1 * 8 + x1;
+				}
+				pixels[i] = transparent && colorId == 0 ? (bg ? 0xFF000000 : 0) : (palette[colorId] + (offset * 32));
+			}
+		}
 	}
 
 	public void drawSpriteChar(short command, short x, short y) {
-		CharacterCommand c = commands.get(command);
-		for (int x1 = 0; x1 < 8; x1++) {
-			for (int y1 = 0; y1 < 8; y1++) {
-				int i = (c.isUpsideDown ? 7 - y1 : y1) * 8 + (c.isRightsideLeft ? 7 - x1 : x1);
-				int colorId = patternData[c.patternNo * 64 + i];
-				pixels[y1 * 8 + x1] = c.transparent && colorId == 0 ? 0 : palette[colorId];
-			}
-		}
-		graphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
+		// draw on framebuffer
+		drawChar(command, false);
+		frameGraphics.drawRGB(pixels, 0, 8, x, y, 8, 8, true);
 	}
 
 	public void drawBackground(short command, short x, short y) {
-		CharacterCommand c = commands.get(command);
-		for (int x1 = 0; x1 < 8; x1++) {
-			for (int y1 = 0; y1 < 8; y1++) {
-				int i = (c.isUpsideDown ? 7 - y1 : y1) * 8 + (c.isRightsideLeft ? 7 - x1 : x1);
-				int colorId = patternData[c.patternNo * 64 + i];
-				pixels[y1 * 8 + x1] = palette[colorId];
-			}
-		}
-		if (screenGraphics == null)
-			screenGraphics = new Graphics(Emulator.getEmulator().getScreen().getBackBufferImage(), null);
-		screenGraphics.drawRGB(pixels, 0, 8, x * 8, y * 8, 8, 8, true);
+		// draw on virtual screen
+		drawChar(command, true);
+		_virtualGraphics.drawRGB(pixels, 0, 8, x * 8, y * 8, 8, 8, true);
 	}
 
 	public static int getVirtualWidth() {
@@ -132,14 +165,5 @@ public abstract class SpriteCanvas extends Canvas {
 
 	public static int getVirtualHeight() {
 		return Emulator.getEmulator().getScreen().getHeight();
-	}
-
-	private static class CharacterCommand {
-		int offset; // TODO
-		boolean transparent;
-		int rotation; // TODO
-		boolean isUpsideDown;
-		boolean isRightsideLeft;
-		int patternNo;
 	}
 }

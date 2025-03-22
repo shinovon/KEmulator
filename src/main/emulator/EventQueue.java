@@ -1,6 +1,5 @@
 package emulator;
 
-import com.j_phone.amuse.ACanvas;
 import com.vodafone.v10.graphics.sprite.SpriteCanvas;
 import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
@@ -462,8 +461,14 @@ public final class EventQueue implements Runnable {
 			}
 			if (Settings.xrayView) Displayable._resetXRayGraphics();
 			IScreen scr = Emulator.getEmulator().getScreen();
-			final IImage backBufferImage = scr.getBackBufferImage();
-			final IImage xRayScreenImage = scr.getXRayScreenImage();
+			IImage backBufferImage, xRayScreenImage;
+			if (canvas instanceof SpriteCanvas) {
+				backBufferImage = SpriteCanvas._virtualImage.getImpl();
+				xRayScreenImage = null;
+			} else {
+				backBufferImage = scr.getBackBufferImage();
+				xRayScreenImage = scr.getXRayScreenImage();
+			}
 			Displayable._checkForSteps(callbackLock);
 			try {
 				if (x == -1) { // full repaint
@@ -474,9 +479,12 @@ public final class EventQueue implements Runnable {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			if (canvas instanceof SpriteCanvas && ((SpriteCanvas) canvas)._skipCopy) {
-				((SpriteCanvas) canvas)._skipCopy = false;
-			} else if (Settings.asyncFlush) {
+			if (canvas instanceof SpriteCanvas) {
+				backBufferImage.cloneImage(scr.getScreenImg());
+				scr.repaint();
+				return;
+			}
+			if (Settings.asyncFlush) {
 				(Settings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
 			}

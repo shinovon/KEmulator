@@ -16,7 +16,7 @@ public class PhrasePlayer {
 	}
 
 	public int getTrackCount() {
-		return 0;
+		return 16;
 	}
 
 	public PhraseTrack getTrack(int paramInt) {

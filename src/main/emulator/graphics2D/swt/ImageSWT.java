@@ -338,16 +338,16 @@ public final class ImageSWT implements IImage {
 		emulator.graphics2D.c.setClipboard(emulator.graphics2D.c.toAwtForCapture(this.imgdata));
 	}
 
-	public final void cloneImage(final IImage image) {
-		image.setData(this.getData());
+	public final void cloneImage(final IImage sourceImg) {
+		sourceImg.setData(this.getData());
 	}
 
-	public void cloneImage(IImage image, int x, int y, int w, int h) {
+	public void cloneImage(IImage sourceImg, int x, int y, int w, int h) {
 		// TODO
-		image.setData(this.getData());
+		sourceImg.setData(this.getData());
 	}
 
-	public void copyImage(IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty) {
+	public void copyImage(IGraphics2D destGraphics, int sx, int sy, int w, int h, int tx, int ty) {
 		// TODO
 	}
 
