@@ -6,9 +6,7 @@ import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
 
 import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 
 /*
  * swt image
@@ -323,6 +321,14 @@ public final class ImageSWT implements IImage {
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 		}
+	}
+
+
+	public void write(OutputStream out, String format) throws IOException {
+		if (this.mutable) {
+			this.imgdata = this.img.getImageData();
+		}
+		ImageIO.write(emulator.graphics2D.c.toAwtForCapture(this.imgdata), format, out);
 	}
 
 	public final void copyToClipBoard() {

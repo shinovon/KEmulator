@@ -3,9 +3,14 @@ package com.j_phone.system;
 import javax.microedition.lcdui.Image;
 
 public class SubDisplay {
+	private static SubDisplay instance;
+
 	public static SubDisplay getInstance()
 			throws RuntimeException {
-		return null;
+		if (instance == null) {
+			return instance = new SubDisplay(0);
+		}
+		return instance;
 	}
 
 	public int getWidth() {
@@ -29,7 +34,7 @@ public class SubDisplay {
 	}
 
 	public int numColors() {
-		return 0;
+		return 1;
 	}
 
 	public void setViewPort(int paramInt1, int paramInt2)

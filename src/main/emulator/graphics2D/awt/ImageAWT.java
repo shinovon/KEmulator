@@ -16,6 +16,7 @@ import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 public final class ImageAWT implements IImage {
@@ -162,6 +163,10 @@ public final class ImageAWT implements IImage {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	public void write(OutputStream out, String format) throws IOException {
+		ImageIO.write(img, format, out);
 	}
 
 	public final void copyToClipBoard() {

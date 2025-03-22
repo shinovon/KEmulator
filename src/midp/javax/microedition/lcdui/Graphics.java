@@ -226,6 +226,37 @@ public class Graphics
 		Profiler.drawRegionPixelCount += Math.abs(w * h);
 	}
 
+	public void _drawRegion(final Image image, final int sx, final int sy, final int w, final int h, final int t, final int dx, final int dy, int dw, int dh, final int a) {
+		++Profiler.drawCallCount;
+		if (image == null) {
+			throw new NullPointerException();
+		}
+		if (sx < 0 || sx + w > image.getWidth() || sy < 0 || sy + h > image.getHeight()) {
+			throw new IllegalArgumentException("region exceeds the bounds of the source image");
+		}
+		if (image.getImpl() == this.image) {
+			throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
+		}
+		if (!method294(a, 64)) {
+			throw new IllegalArgumentException();
+		}
+		synchronized (this) {
+			final ITransform transform2 = this.impl.getTransform();
+			final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
+			this.impl.transform(transform);
+			this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, dw, dh);
+			this.impl.setTransform(transform2);
+			if (xrayGraphics != null) {
+				this.xrayGraphics.transform(transform);
+				this.method289(image, sx, sy, 0, 0, dw, dh);
+				this.xrayGraphics.setTransform(transform2);
+			}
+		}
+		++image.usedCount;
+		++Profiler.drawRegionCallCount;
+		Profiler.drawRegionPixelCount += Math.abs(w * h);
+	}
+
 	public void drawRGB(final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final boolean b) {
 		++Profiler.drawCallCount;
 		if (array == null) {

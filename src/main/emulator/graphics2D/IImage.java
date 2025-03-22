@@ -1,5 +1,9 @@
 package emulator.graphics2D;
 
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.io.OutputStream;
+
 public interface IImage {
 	IGraphics2D createGraphics();
 
@@ -22,6 +26,8 @@ public interface IImage {
 	void setAlpha(final int p0, final int p1, final int p2, final int p3, final int p4);
 
 	void saveToFile(final String p0);
+
+	void write(OutputStream out, String format) throws IOException;
 
 	void copyToClipBoard();
 

@@ -17,7 +17,7 @@ public final class a {
 		var0.setColor(-1644826);
 		var0.fillRect(var1 + 1, var2 + 1, var3 - 2, var4 - 2);
 		var0.setColor(-11178603);
-		var0.drawRect(var1 + 1, var2 + 1, var3 - 2, var4 - 2);
+		var0.drawRect(var1, var2, var3, var4);
 		var0.setColor(-11178603);
 	}
 

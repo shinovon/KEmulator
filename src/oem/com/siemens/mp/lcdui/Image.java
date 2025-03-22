@@ -19,7 +19,11 @@ package com.siemens.mp.lcdui;
 import emulator.Emulator;
 import emulator.Settings;
 
+import javax.microedition.io.Connector;
+import javax.microedition.io.file.FileConnection;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class Image extends com.siemens.mp.ui.Image {
 
@@ -36,12 +40,17 @@ public class Image extends com.siemens.mp.ui.Image {
 		javax.microedition.lcdui.Image img = javax.microedition.lcdui.Image.createImage(resname);
 
 		if (scaleToWidth != 0 || scaleToHeight != 0) {
-			if (scaleToWidth == 0) scaleToWidth = img.getWidth();
-			if (scaleToHeight == 0) scaleToHeight = img.getHeight();
-
-			if (Settings.g2d == 1) {
-
+			if (scaleToWidth == 0) {
+				scaleToWidth = (int) (((double) img.getWidth() / img.getHeight()) * scaleToHeight);
+			} else if (scaleToHeight == 0) {
+				scaleToHeight = (int) (((double) img.getHeight() / img.getWidth()) * scaleToWidth);
 			}
+
+			javax.microedition.lcdui.Image newImage = javax.microedition.lcdui.Image.createImage(scaleToWidth, scaleToHeight);
+
+
+
+			return newImage;
 		}
 
 		return img;
@@ -56,7 +65,22 @@ public class Image extends com.siemens.mp.ui.Image {
 		image.getImpl().setRGB(x, y, color);
 	}
 
+	public static void writeImageToFile(javax.microedition.lcdui.Image img, String file)
+			throws IOException {
+		FileConnection f = (FileConnection) Connector.open("file://" + file);
+		try (OutputStream out = f.openOutputStream()) {
+			img.getImpl().write(out, "png");
+		} finally {
+			f.close();
+		}
+	}
+
 	public static void writeBmpToFile(javax.microedition.lcdui.Image image, String filename) throws IOException {
-		// TODO
+		FileConnection f = (FileConnection) Connector.open("file://" + filename);
+		try (OutputStream out = f.openOutputStream()) {
+			image.getImpl().write(out, "bmp");
+		} finally {
+			f.close();
+		}
 	}
 }

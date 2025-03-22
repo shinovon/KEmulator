@@ -476,8 +476,6 @@ public final class EventQueue implements Runnable {
 			}
 			if (canvas instanceof SpriteCanvas && ((SpriteCanvas) canvas)._skipCopy) {
 				((SpriteCanvas) canvas)._skipCopy = false;
-			} else if (canvas instanceof ACanvas && ((ACanvas) canvas)._skipCopy) {
-				((ACanvas) canvas)._skipCopy = false;
 			} else if (Settings.asyncFlush) {
 				(Settings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
