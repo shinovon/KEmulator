@@ -36,7 +36,7 @@ public abstract class SpriteCanvas extends Canvas {
 	private int[] pixels;
 
 	private Graphics screenGraphics;
-
+	public boolean _skipCopy;
 	protected int scrollX, scrollY;
 
 	public SpriteCanvas(int numPalettes, int numPatterns) {
@@ -52,7 +52,6 @@ public abstract class SpriteCanvas extends Canvas {
 	}
 
 	public void createFrameBuffer(int fw, int fh) {
-		System.out.println("createFrameBuffer " + fw + " " + fh);
 		if (fw == 0 || fh == 0) {
 			fw = getVirtualWidth();
 			fh = getVirtualHeight();
@@ -68,6 +67,7 @@ public abstract class SpriteCanvas extends Canvas {
 
 	public void copyArea(int sx, int sy, int fw, int fh, int tx, int ty) {
 		_virtualImage.getImpl().copyImage(frameGraphics.getImpl(), sx, sy, fw, fh, tx, ty);
+		_skipCopy = true;
 	}
 
 	public void copyFullScreen(int tx, int ty) {
@@ -132,7 +132,7 @@ public abstract class SpriteCanvas extends Canvas {
 		for (int x1 = 0; x1 < 8; x1++) {
 			for (int y1 = 0; y1 < 8; y1++) {
 				int i = (isUpsideDown ? 7 - y1 : y1) * 8 + (isRightsideLeft ? 7 - x1 : x1);
-				int colorId = patternData[patternNo * 64 + i];
+				int colorId = patternData[patternNo * 64 + i] & 0xFF;
 				if (rotation == 1) { // 90
 					i = (7 - x1) * 8 + y1;
 				} else if (rotation == 2) { // 180
