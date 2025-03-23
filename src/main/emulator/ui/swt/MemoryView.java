@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
 import emulator.debug.Memory;
@@ -14,7 +15,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -40,7 +40,7 @@ public final class MemoryView implements DisposeListener {
 	private Display display;
 	private Memory memoryMgr;
 	private boolean visible;
-	private TabFolder aTabFolder1097;
+	private TabFolder bottomTabs;
 	private Composite aComposite1098;
 	private Composite audioControlComp;
 	private CLabel aCLabel1143;
@@ -55,7 +55,7 @@ public final class MemoryView implements DisposeListener {
 	private Button aButton1137;
 	private Button aButton1141;
 	private Canvas aCanvas1095;
-	private SashForm aSashForm1083;
+	private SashForm horizontalSeparator;
 	private Composite aComposite1116;
 	private SashForm aSashForm1103;
 	private Table table;
@@ -105,6 +105,9 @@ public final class MemoryView implements DisposeListener {
 	private CLabel jvmmemLabel;
 	private int sortColumn = -1;
 	private Button exportAudioBtn;
+	private int SOUNDS_TAB_ID;
+	private int IMAGES_TAB_ID;
+	private int OBJECTS_TAB_ID;
 
 	public MemoryView() {
 		super();
@@ -121,7 +124,7 @@ public final class MemoryView implements DisposeListener {
 		this.totalmemLbl = null;
 		this.aCLabel1136 = null;
 		this.aCLabel1140 = null;
-		this.aTabFolder1097 = null;
+		this.bottomTabs = null;
 		this.aComposite1098 = null;
 		this.audioControlComp = null;
 		this.aCLabel1143 = null;
@@ -136,7 +139,7 @@ public final class MemoryView implements DisposeListener {
 		this.aButton1137 = null;
 		this.aButton1141 = null;
 		this.aCanvas1095 = null;
-		this.aSashForm1083 = null;
+		this.horizontalSeparator = null;
 		this.aComposite1116 = null;
 		this.aSashForm1103 = null;
 		this.table = null;
@@ -163,7 +166,11 @@ public final class MemoryView implements DisposeListener {
 
 	public final void open() {
 		this.method665();
-		this.shell.setLocation(this.display.getClientArea().width - this.shell.getSize().x >> 1, this.display.getClientArea().height - this.shell.getSize().y >> 1);
+		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
+		this.shell.setLocation(
+				clientArea.x + (int) (clientArea.height * 0.025), //- this.shell.getSize().x >> 3,
+				clientArea.y + (int) (clientArea.height * 0.025)// - this.shell.getSize().y >> 2
+		);
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.method692();
@@ -250,7 +257,15 @@ public final class MemoryView implements DisposeListener {
 		(this.shell = new Shell(1264)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
 		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setLayout(layout);
-		(this.shell).setSize(new Point(740, 466));
+
+		//(int)(this.display.getClientArea().width * 0.33);
+		//(int)(this.display.getClientArea().height * 0.8);
+		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
+		this.shell.setSize(
+				 (int)(clientArea.width * 0.4),
+				(int)(clientArea.height * 0.95)
+		);
+
 		(this.aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
 		(this.aButton1081).setLayoutData(layoutData6);
 		this.aButton1081.addSelectionListener(new Class129(this));
@@ -293,16 +308,86 @@ public final class MemoryView implements DisposeListener {
 		this.method687();
 	}
 
-	private void method672() {
-		this.aTabFolder1097 = new TabFolder(this.aSashForm1083, 0);
+	private void initTabs() {
+		this.bottomTabs = new TabFolder(this.horizontalSeparator, 0);
+
 		this.method677();
 		this.method681();
+
+		int tabIndex = 0;
+
 		final TabItem tabItem;
-		(tabItem = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_IMAGES", "Images"));
+		(tabItem = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_IMAGES", "Images"));
 		tabItem.setControl(this.aComposite1098);
+		this.IMAGES_TAB_ID = tabIndex;
+		tabIndex++;
+
 		final TabItem tabItem2;
-		(tabItem2 = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
+		(tabItem2 = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
 		tabItem2.setControl(this.audioControlComp);
+		this.SOUNDS_TAB_ID = tabIndex;
+		tabIndex++;
+		/*
+		final TabItem tabItemMemory;
+		(tabItemMemory = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_MEMORY", "Objects"));
+		this.OBJECTS_TAB_ID = tabIndex;
+		tabIndex++;
+
+
+		Composite memoryComp = new Composite(this.bottomTabs, 0);
+		GridLayout memoryLayout = new GridLayout(1, false);
+		memoryComp.setLayout(memoryLayout);
+
+		SashForm tablesSash = new SashForm(memoryComp, SWT.HORIZONTAL);
+		GridData sashLayoutData = new GridData();
+		sashLayoutData.horizontalAlignment = GridData.FILL;
+		sashLayoutData.grabExcessHorizontalSpace = true;
+		sashLayoutData.grabExcessVerticalSpace = true;
+		sashLayoutData.verticalAlignment = GridData.FILL;
+		tablesSash.setLayoutData(sashLayoutData);
+
+		this.table = new Table(tablesSash, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
+		this.table.setHeaderVisible(true);
+		this.table.setLinesVisible(true);
+		this.table.addSelectionListener(new Class34(this));
+
+		final TableColumn tableColumn;
+		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
+		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
+		tableColumn.addSelectionListener(new Class31(this));
+
+		final TableColumn tableColumn2;
+		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
+		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
+		tableColumn2.addSelectionListener(new Class140(this));
+
+		final TableColumn tableColumn3;
+		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
+		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
+		tableColumn3.addSelectionListener(new Class17(this));
+
+		this.classTable = new Table(tablesSash, 67584);
+		this.classTable.setHeaderVisible(true);
+		this.classTable.setLinesVisible(true);
+		this.classTable.addSelectionListener(new Class19(this));
+		this.classTable.addMouseListener(new Class13(this));
+
+		final TableColumn tableColumn4;
+		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
+		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
+
+		final TableColumn tableColumn5;
+		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
+		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
+
+		final TableColumn tableColumn6;
+		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
+		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
+		tablesSash.setWeights(new int[]{1, 1});
+
+		tabItemMemory.setControl(memoryComp);
+		*/
+
 	}
 
 	private void method677() {
@@ -314,7 +399,7 @@ public final class MemoryView implements DisposeListener {
 		(layout = new GridLayout()).numColumns = 7;
 		layout.marginHeight = 2;
 		layout.marginWidth = 0;
-		(this.aComposite1098 = new Composite(this.aTabFolder1097, 0)).setLayout(layout);
+		(this.aComposite1098 = new Composite(this.bottomTabs, 0)).setLayout(layout);
 		(this.aCLabel1143 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_ZOOM", "Zoom:"));
 		this.method684();
 		(this.aCLabel1146 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
@@ -355,7 +440,7 @@ public final class MemoryView implements DisposeListener {
 		layoutData.horizontalAlignment = 4;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 9;
-		(this.audioControlComp = new Composite(this.aTabFolder1097, 0)).setLayout(layout);
+		(this.audioControlComp = new Composite(this.bottomTabs, 0)).setLayout(layout);
 		(this.startAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Start"));
 		(this.pauseAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
 		this.pauseAudioBtn.addSelectionListener(new Class28(this));
@@ -459,17 +544,21 @@ public final class MemoryView implements DisposeListener {
 		layoutData.verticalAlignment = 4;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.grabExcessHorizontalSpace = true;
-		(this.aSashForm1083 = new SashForm(this.shell, 0)).setOrientation(512);
-		this.aSashForm1083.setLayoutData(layoutData);
+
+		(this.horizontalSeparator = new SashForm(this.shell, 0)).setOrientation(SWT.VERTICAL);
+		this.horizontalSeparator.setSashWidth(5);
+		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+		this.horizontalSeparator.setLayoutData(layoutData);
 		this.method688();
-		this.method672();
-		this.aSashForm1083.setWeights(new int[]{4, 6});
+		this.initTabs();
+		this.horizontalSeparator.setWeights(new int[]{4, 6});
+
 	}
 
 	private void method688() {
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 1;
-		this.aComposite1116 = new Composite(this.aSashForm1083, 0);
+		this.aComposite1116 = new Composite(this.horizontalSeparator, 0);
 		this.method689();
 		this.aComposite1116.setLayout(layout);
 	}
@@ -485,11 +574,11 @@ public final class MemoryView implements DisposeListener {
 		this.table.setLinesVisible(true);
 		this.table.addSelectionListener(new Class34(this));
 		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.table, 0)).setWidth(100);
+		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
 		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
 		tableColumn.addSelectionListener(new Class31(this));
 		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(100);
+		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
 		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
 		tableColumn2.addSelectionListener(new Class140(this));
 		final TableColumn tableColumn3;
@@ -501,10 +590,10 @@ public final class MemoryView implements DisposeListener {
 		this.classTable.addSelectionListener(new Class19(this));
 		this.classTable.addMouseListener(new Class13(this));
 		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
 		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
 		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
 		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
 		final TableColumn tableColumn6;
 		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
@@ -535,7 +624,7 @@ public final class MemoryView implements DisposeListener {
 			return;
 		}
 		try {
-			if (this.aTabFolder1097.getSelectionIndex() == 0) {
+			if (this.bottomTabs.getSelectionIndex() == this.IMAGES_TAB_ID) {
 				this.aCanvas1095.redraw();
 			} else {
 				this.method695();
