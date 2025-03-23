@@ -134,15 +134,16 @@ public abstract class SpriteCanvas extends Canvas {
 				int i = (isUpsideDown ? 7 - y1 : y1) * 8 + (isRightsideLeft ? 7 - x1 : x1);
 				int colorId = patternData[patternNo * 64 + i] & 0xFF;
 				if (rotation == 1) { // 90
-					i = (7 - x1) * 8 + y1;
+					i = (7 - y1) + x1 * 8;
 				} else if (rotation == 2) { // 180
 					i = (7 - y1) * 8 + (7 - x1);
 				} else if (rotation == 3) { // 270
-					i = x1 * 8 + (7 - y1);
+					i = y1 + (7 - x1) * 8;
 				} else { // 0
 					i = y1 * 8 + x1;
 				}
-				pixels[i] = transparent && colorId == 0 ? (bg ? 0xFF000000 : 0) : (palette[colorId] + (offset * 32));
+				pixels[i] = transparent && colorId == 0 ? (bg ? 0xFF000000 : 0)
+						: (palette[(colorId + (offset * 32)) & 0xFF]);
 			}
 		}
 	}

@@ -480,9 +480,7 @@ public final class EventQueue implements Runnable {
 				ex.printStackTrace();
 			}
 			if (canvas instanceof SpriteCanvas) {
-				if (((SpriteCanvas) canvas)._skipCopy) {
-					((SpriteCanvas) canvas)._skipCopy = false;
-				} else {
+				if (!((SpriteCanvas) canvas)._skipCopy) {
 					backBufferImage.cloneImage(scr.getScreenImg());
 					scr.repaint();
 				}
