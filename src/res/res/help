@@ -43,6 +43,16 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.19.2 [2025.03.23]
+StringItem layout improvements
+Fixed FileConnection filter
+Fixed Ticker bug
+Properly implemented SpriteCanvas/ACanvas
+Implemented com.j_phone.amuse.j3d
+
+$v2.19.1 [2025.02.12]
+Update LWJGL to 3.3.6
+
 $v2.19 [2025.02.02]
 Symbian Anna multitouch api support
 More SoftBank api stubs
