@@ -265,9 +265,9 @@ public final class EmulatorScreen implements
 		text.setText(detail);
 
 //		shell.pack();
-		Rectangle clientArea = EmulatorScreen.display.getClientArea();
+		Rectangle clientArea = this.shell.getMonitor().getClientArea();
 		Point size = shell.getSize();
-		shell.setLocation((clientArea.width - size.x) / 2, (clientArea.height - size.y) / 2);
+		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!EmulatorScreen.display.readAndDispatch()) {
@@ -298,12 +298,12 @@ public final class EmulatorScreen implements
 		}
 		this.pauseState = (midletLoaded ? 1 : 0);
 		this.updatePauseState();
-		Rectangle clientArea = EmulatorScreen.display.getClientArea();
-		if (EmulatorScreen.locX < 0) {
-			EmulatorScreen.locX = clientArea.width - this.shell.getSize().x >> 1;
+		Rectangle clientArea = EmulatorScreen.display.getPrimaryMonitor().getClientArea();
+		if (EmulatorScreen.locX == Integer.MIN_VALUE) {
+			EmulatorScreen.locX = clientArea.x - (clientArea.width + this.shell.getSize().x) >> 1;
 		}
-		if (EmulatorScreen.locY < 0) {
-			EmulatorScreen.locY = clientArea.height - this.shell.getSize().y >> 1;
+		if (EmulatorScreen.locY == Integer.MIN_VALUE) {
+			EmulatorScreen.locY = clientArea.y - (clientArea.height + this.shell.getSize().y) >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
 		if (sizeW > 10 && sizeH > 10 && !defaultSize) {
@@ -2724,9 +2724,9 @@ public final class EmulatorScreen implements
 			} catch (Exception ignored) {}
 		}
 
-		Rectangle clientArea = EmulatorScreen.display.getClientArea();
+		Rectangle clientArea = this.shell.getMonitor().getClientArea();
 		Point size = shell.getSize();
-		shell.setLocation((clientArea.width + clientArea.x - size.x) / 2 , (clientArea.height + clientArea.y - size.y) / 2);
+		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2 , clientArea.y + (clientArea.height - size.y) / 2);
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!EmulatorScreen.display.readAndDispatch()) {

@@ -631,8 +631,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.keepAspectRatio = Boolean.parseBoolean(properties.getProperty("KeepAspectRatio", "true"));
 
 			// window
-			EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", "-1"));
-			EmulatorScreen.locY = Integer.parseInt(properties.getProperty("LocationY", "-1"));
+			EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", String.valueOf(Integer.MIN_VALUE)));
+			EmulatorScreen.locY = Integer.parseInt(properties.getProperty("LocationY", String.valueOf(Integer.MIN_VALUE)));
 			EmulatorScreen.sizeW = Integer.parseInt(properties.getProperty("SizeW", "-1"));
 			EmulatorScreen.sizeH = Integer.parseInt(properties.getProperty("SizeH", "-1"));
 			EmulatorScreen.maximized = Boolean.parseBoolean(properties.getProperty("Maximized", "false"));
