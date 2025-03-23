@@ -39,7 +39,7 @@ public final class MemoryView implements DisposeListener {
 	private Display display;
 	private Memory memoryMgr;
 	private boolean visible;
-	private TabFolder aTabFolder1097;
+	private TabFolder bottomTabs;
 	private Composite aComposite1098;
 	private Composite audioControlComp;
 	private CLabel aCLabel1143;
@@ -104,6 +104,9 @@ public final class MemoryView implements DisposeListener {
 	private CLabel jvmmemLabel;
 	private int sortColumn = -1;
 	private Button exportAudioBtn;
+	private int SOUNDS_TAB_ID;
+	private int IMAGES_TAB_ID;
+	private int OBJECTS_TAB_ID;
 
 	public MemoryView() {
 		super();
@@ -120,7 +123,7 @@ public final class MemoryView implements DisposeListener {
 		this.totalmemLbl = null;
 		this.aCLabel1136 = null;
 		this.aCLabel1140 = null;
-		this.aTabFolder1097 = null;
+		this.bottomTabs = null;
 		this.aComposite1098 = null;
 		this.audioControlComp = null;
 		this.aCLabel1143 = null;
@@ -303,25 +306,32 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	private void initTabs() {
-		this.aTabFolder1097 = new TabFolder(this.horizontalSeparator, 0);
+		this.bottomTabs = new TabFolder(this.horizontalSeparator, 0);
 
 		this.method677();
 		this.method681();
 
-
-		final TabItem tabItemMemory;
-		(tabItemMemory = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_MEMORY", "Objects"));
+		int tabIndex = 0;
 
 		final TabItem tabItem;
-		(tabItem = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_IMAGES", "Images"));
+		(tabItem = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_IMAGES", "Images"));
 		tabItem.setControl(this.aComposite1098);
+		this.IMAGES_TAB_ID = tabIndex;
+		tabIndex++;
 
 		final TabItem tabItem2;
-		(tabItem2 = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
+		(tabItem2 = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
 		tabItem2.setControl(this.audioControlComp);
+		this.SOUNDS_TAB_ID = tabIndex;
+		tabIndex++;
+
+		final TabItem tabItemMemory;
+		(tabItemMemory = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_MEMORY", "Objects"));
+		this.OBJECTS_TAB_ID = tabIndex;
+		tabIndex++;
 
 
-		Composite memoryComp = new Composite(this.aTabFolder1097, 0);
+		Composite memoryComp = new Composite(this.bottomTabs, 0);
 		GridLayout memoryLayout = new GridLayout(1, false);
 		memoryComp.setLayout(memoryLayout);
 
@@ -384,7 +394,7 @@ public final class MemoryView implements DisposeListener {
 		(layout = new GridLayout()).numColumns = 7;
 		layout.marginHeight = 2;
 		layout.marginWidth = 0;
-		(this.aComposite1098 = new Composite(this.aTabFolder1097, 0)).setLayout(layout);
+		(this.aComposite1098 = new Composite(this.bottomTabs, 0)).setLayout(layout);
 		(this.aCLabel1143 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_ZOOM", "Zoom:"));
 		this.method684();
 		(this.aCLabel1146 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
@@ -425,7 +435,7 @@ public final class MemoryView implements DisposeListener {
 		layoutData.horizontalAlignment = 4;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 9;
-		(this.audioControlComp = new Composite(this.aTabFolder1097, 0)).setLayout(layout);
+		(this.audioControlComp = new Composite(this.bottomTabs, 0)).setLayout(layout);
 		(this.startAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Start"));
 		(this.pauseAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
 		this.pauseAudioBtn.addSelectionListener(new Class28(this));
@@ -605,7 +615,7 @@ public final class MemoryView implements DisposeListener {
 			return;
 		}
 		try {
-			if (this.aTabFolder1097.getSelectionIndex() == 0) {
+			if (this.bottomTabs.getSelectionIndex() == this.IMAGES_TAB_ID) {
 				this.aCanvas1095.redraw();
 			} else {
 				this.method695();
