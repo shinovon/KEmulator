@@ -324,7 +324,7 @@ public final class MemoryView implements DisposeListener {
 		tabItem2.setControl(this.audioControlComp);
 		this.SOUNDS_TAB_ID = tabIndex;
 		tabIndex++;
-
+		/*
 		final TabItem tabItemMemory;
 		(tabItemMemory = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_MEMORY", "Objects"));
 		this.OBJECTS_TAB_ID = tabIndex;
@@ -383,6 +383,8 @@ public final class MemoryView implements DisposeListener {
 		tablesSash.setWeights(new int[]{1, 1});
 
 		tabItemMemory.setControl(memoryComp);
+		*/
+
 	}
 
 	private void method677() {
@@ -541,11 +543,15 @@ public final class MemoryView implements DisposeListener {
 		layoutData.grabExcessHorizontalSpace = true;
 
 		(this.horizontalSeparator = new SashForm(this.shell, 0)).setOrientation(SWT.VERTICAL);
+		this.horizontalSeparator.setSashWidth(5);
+		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 		this.horizontalSeparator.setLayoutData(layoutData);
+		this.method688();
 		this.initTabs();
+		this.horizontalSeparator.setWeights(new int[]{4, 6});
 
 	}
-/*
+
 	private void method688() {
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 1;
@@ -565,11 +571,11 @@ public final class MemoryView implements DisposeListener {
 		this.table.setLinesVisible(true);
 		this.table.addSelectionListener(new Class34(this));
 		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.table, 0)).setWidth(100);
+		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
 		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
 		tableColumn.addSelectionListener(new Class31(this));
 		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(100);
+		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
 		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
 		tableColumn2.addSelectionListener(new Class140(this));
 		final TableColumn tableColumn3;
@@ -581,16 +587,16 @@ public final class MemoryView implements DisposeListener {
 		this.classTable.addSelectionListener(new Class19(this));
 		this.classTable.addMouseListener(new Class13(this));
 		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
 		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
 		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
 		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
 		final TableColumn tableColumn6;
 		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
 	}
-*/
+
 	private void method690() {
 		if (this.aBoolean1118) {
 			return;
