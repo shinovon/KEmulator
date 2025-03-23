@@ -1,6 +1,7 @@
 package javax.microedition.lcdui;
 
-import emulator.lcdui.c;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
 
 public class ImageItem extends Item {
 	public static final int LAYOUT_DEFAULT = 0;
@@ -62,20 +63,20 @@ public class ImageItem extends Item {
 		super.paint(g, x, y, w, h);
 		int yo = y;
 		if (labelArr != null && labelArr.length > 0) {
-			g.setFont(Item.font);
+			g.setFont(labelFont);
+			g.setColor(focused ? LCDUIUtils.highlightForegroundColor : labelColor);
 			for (String s : labelArr) {
-				g.drawString(s, x + (w - Item.font.stringWidth(s)) / 2, yo + 2, 0);
-				yo += Item.font.getHeight() + 4;
+				g.drawString(s, x + (w - labelFont.stringWidth(s)) / 2, yo + 2, 0);
+				yo += labelFont.getHeight() + 4;
 			}
 		}
 		if (appearanceMode == BUTTON) {
-			int o = g.getColor();
-			g.setColor(0xababab);
+			g.setColor(LCDUIUtils.buttonBorderColor);
 			int lx = x + w - 1;
 			int ly = y + h - 3;
 			g.drawLine(x + 1, ly, lx, ly);
 			g.drawLine(lx, ly, lx, y + 1);
-			g.setColor(o);
+			g.setColor(focused ? LCDUIUtils.highlightForegroundColor : LCDUIUtils.foregroundColor);
 			g.drawRect(x, y, w, h - 2);
 		}
 		if (image != null) {
@@ -93,10 +94,10 @@ public class ImageItem extends Item {
 		int w = row.getAvailableWidth(screen.bounds[W]);
 		int[] tw = new int[1];
 		if (hasLabel()) {
-			int min = Item.font.stringWidth("...") + 2;
+			int min = labelFont.stringWidth("...") + 2;
 			if (w < min) w = min;
-			labelArr = c.textArr(label, Item.font, w, w, tw);
-			n = (Item.font.getHeight() + 4) * labelArr.length;
+			labelArr = TextUtils.textArr(label, labelFont, w, w, tw);
+			n = (labelFont.getHeight() + 4) * labelArr.length;
 		} else {
 			labelArr = null;
 		}
@@ -119,7 +120,7 @@ public class ImageItem extends Item {
 		if (w < 4) {
 			w = image != null ? image.getWidth() + 4 : 4;
 			if (hasLabel()) {
-				int m = Item.font.stringWidth("...") + 2;
+				int m = labelFont.stringWidth("...") + 2;
 				if (w < m) w = m;
 			}
 		}

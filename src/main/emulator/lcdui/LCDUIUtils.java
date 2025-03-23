@@ -2,9 +2,16 @@ package emulator.lcdui;
 
 import javax.microedition.lcdui.Graphics;
 
-public final class a {
-	public static void method177(Graphics var0, int var1, int var2, int var3, int var4, boolean var5) {
-		var0.setColor(-1052432);
+public final class LCDUIUtils {
+	public static int backgroundColor = 0xFFEFF0F0; // 0xFFEFF0F0
+	public static int foregroundColor = 0xFF000000; // 0xFF000000
+	public static int highlightForegroundColor = 0xFF556D95;
+	public static int highlightBackgroundColor = 0xFFE6E6E6;
+	public static int buttonBorderColor = 0xFFABABAB;
+	public static int gaugeColor = 0xFF0000FF;
+
+	public static void drawDisplayableBackground(Graphics var0, int var1, int var2, int var3, int var4, boolean var5) {
+		var0.setColor(backgroundColor);
 		var0.fillRect(var1, var2, var3, var4);
 		if (var5) {
 			var0.setColor(-8355712);
@@ -13,16 +20,15 @@ public final class a {
 
 	}
 
-	public static void method178(Graphics var0, int var1, int var2, int var3, int var4) {
-		var0.setColor(-1644826);
-		var0.fillRect(var1 + 1, var2 + 1, var3 - 2, var4 - 2);
-		var0.setColor(-11178603);
-		var0.drawRect(var1, var2, var3, var4);
-		var0.setColor(-11178603);
+	public static void drawSelectedItemBackground(Graphics g, int x, int y, int w, int h) {
+		g.setColor(highlightBackgroundColor);
+		g.fillRect(x + 1, y + 1, w - 2, h - 2);
+		g.setColor(highlightForegroundColor);
+		g.drawRect(x, y, w, h);
 	}
 
-	public static void method181(Graphics var0, int var1, int var2, int var3, int var4) {
-		var0.setColor(-1052432);
+	public static void drawTickerBackground(Graphics var0, int var1, int var2, int var3, int var4) {
+		var0.setColor(backgroundColor);
 		var0.fillRect(var1, var2, var3, var4);
 		int var5 = var0.getStrokeStyle();
 		var0.setColor(8874950);
@@ -30,10 +36,10 @@ public final class a {
 		var0.drawLine(var1, var2, var1 + var3, var2);
 		var0.drawLine(var1, var2 + var4, var1 + var3, var2 + var4);
 		var0.setStrokeStyle(var5);
-		var0.setColor(-16777216);
+		var0.setColor(foregroundColor);
 	}
 
-	public static void method179(Graphics var0, int var1, int var2, int var3, int var4, int var5, int var6) {
+	public static void drawScrollbar(Graphics var0, int var1, int var2, int var3, int var4, int var5, int var6) {
 		var0.setColor(12697332);
 		var0.fillRect(var1, var2, var3, var4);
 		if (var5 > 0 && var6 >= 0 && var6 < var5) {
@@ -45,7 +51,7 @@ public final class a {
 
 	}
 
-	public static void method180(Graphics var0, int var1, int var2, boolean var3, int var4) {
+	public static void drawChoiceItem(Graphics var0, int var1, int var2, boolean var3, int var4) {
 		Graphics var10000;
 		int var10001;
 		int var10002;

@@ -2,7 +2,8 @@ package javax.microedition.lcdui;
 
 import emulator.Emulator;
 import emulator.lcdui.BoundsUtils;
-import emulator.lcdui.c;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
 
 import java.util.Vector;
 
@@ -238,15 +239,15 @@ public class ChoiceGroup
 		if (!this.aBoolean541) {
 			super.paint(g, x, y, w, h);
 		} else {
-			g.setColor(-16777216);
+			g.setColor(LCDUIUtils.foregroundColor);
 		}
 		int n = y;
 		if (this.labelArr != null && this.labelArr.length > 0) {
-			g.setFont(Item.font);
+			g.setFont(labelFont);
 			int i = 0;
 			while (i < this.labelArr.length) {
 				g.drawString(this.labelArr[i], x + 4, n + 2, 0);
-				n += Item.font.getHeight() + 4;
+				n += labelFont.getHeight() + 4;
 				++i;
 			}
 		}
@@ -279,8 +280,8 @@ public class ChoiceGroup
 		int n = 0;
 		if (this.label != null) {
 			int n2 = this.getPreferredWidth() - 8;
-			this.labelArr = c.textArr(this.label, Item.font, n2, n2);
-			n = (Item.font.getHeight() + 4) * this.labelArr.length;
+			this.labelArr = TextUtils.textArr(this.label, labelFont, n2, n2);
+			n = (labelFont.getHeight() + 4) * this.labelArr.length;
 		} else {
 			this.labelArr = null;
 		}

@@ -111,6 +111,11 @@ class TextWrapper
 		}
 	}
 
+	void swtSetFont(org.eclipse.swt.graphics.Font font) {
+		if (control == null) return;
+		control.setFont(font);
+	}
+
 	/**
 	 * Delete subset of characters from content.
 	 *

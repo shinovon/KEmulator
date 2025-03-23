@@ -3,8 +3,8 @@ package emulator.lcdui;
 import javax.microedition.lcdui.Font;
 import java.util.ArrayList;
 
-public final class c {
-	public c() {
+public final class TextUtils {
+	public TextUtils() {
 		super();
 	}
 
@@ -37,7 +37,7 @@ public final class c {
 
 	public static String[] textArr(String s, Font font, int availableWidth, int maxWidth, int[] w) {
 		w[0] = 0;
-		if (s == null) return new String[0];
+		if (s == null || maxWidth < font.charWidth(' ') + 8) return new String[0];
 		if (availableWidth > 0 && maxWidth > 0) {
 			boolean var4 = s.indexOf(10) != -1;
 			if (font.stringWidth(s) <= availableWidth) {
@@ -79,7 +79,7 @@ public final class c {
 	}
 
 	public static String[] textArr(String s, Font font, int x1, int x2) {
-		if (s == null) return new String[0];
+		if (s == null || x2 < font.charWidth(' ') + 8) return new String[0];
 		if (x1 > 0 && x2 > 0) {
 			boolean var4 = s.indexOf('\n') != -1;
 			if (font.stringWidth(s) <= x1) {

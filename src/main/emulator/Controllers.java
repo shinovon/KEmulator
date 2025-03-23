@@ -32,7 +32,8 @@ public class Controllers {
 			Controller[] controllers = getDefaultEnvironment().getControllers();
 			ArrayList list = new ArrayList<Controller>();
 			for (Controller controller : controllers) {
-				if (!controller.getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
+				if (!controller.getType().equals(Controller.Type.KEYBOARD)
+						&& !controller.getType().equals(Controller.Type.MOUSE)) {
 					String s = controller.getName();
 					if (s.contains("tablet")) continue;
 					if (s.contains("STAR")) continue;
@@ -116,7 +117,10 @@ public class Controllers {
 
 	public static String getBind(int controllerId, int n2) {
 		String s = Controllers.binds[controllerId][n2];
-		if (!s.isEmpty() && !s.equalsIgnoreCase("LEFT") && !s.equalsIgnoreCase("RIGHT") && !s.equalsIgnoreCase("UP") && !s.equalsIgnoreCase("DOWN")) {
+		if (!s.isEmpty() && !s.equalsIgnoreCase("LEFT")
+				&& !s.equalsIgnoreCase("RIGHT")
+				&& !s.equalsIgnoreCase("UP")
+				&& !s.equalsIgnoreCase("DOWN")) {
 			s = "B_" + s;
 		}
 		return s;
@@ -233,7 +237,7 @@ public class Controllers {
 						filterY(i, value, true);
 						continue;
 					}
-					if (!controller.getName().toLowerCase().contains("xbox")) {
+					if (!controller.getName().toLowerCase().contains("xbox") && !Settings.ignoreControllerZAxis) {
 						if (name.equalsIgnoreCase("z")) {
 							filterX(i, value, false);
 							continue;

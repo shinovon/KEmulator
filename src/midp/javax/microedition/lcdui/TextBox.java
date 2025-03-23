@@ -24,6 +24,7 @@ public class TextBox extends Screen {
 	protected Composite _constructSwtContent(int style) {
 		Composite c = super._constructSwtContent(style);
 		textWrapper.swtConstruct(c, SWT.V_SCROLL);
+		textWrapper.swtSetFont(Font.getDefaultSWTFont());
 		return c;
 	}
 
@@ -40,6 +41,7 @@ public class TextBox extends Screen {
 
 	public void _swtResized(int w, int h) {
 		super._swtResized(w, h);
+		textWrapper.swtSetFont(Font.getDefaultSWTFont());
 		textWrapper.setBounds(swtContent.getClientArea());
 	}
 

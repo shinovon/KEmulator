@@ -3,7 +3,6 @@ package com.j_phone.amuse.j3d;
 import com.jblend.ui.SequenceInterface;
 import emulator.Emulator;
 import emulator.graphics2D.IImage;
-import emulator.ui.IScreen;
 import ru.woesss.j2me.micro3d.MathUtil;
 import ru.woesss.j2me.micro3d.Render;
 

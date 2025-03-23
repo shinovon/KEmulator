@@ -1,7 +1,8 @@
 package javax.microedition.lcdui;
 
 import emulator.Emulator;
-import emulator.lcdui.c;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
 
 public class TextField extends Item {
 	public static final int ANY = 0;
@@ -142,26 +143,27 @@ public class TextField extends Item {
 		if (!this.isTextBox) {
 			super.paint(g, x, y, w, h);
 		} else {
-			g.setColor(-16777216);
+			g.setColor(LCDUIUtils.foregroundColor);
 		}
 		int yo = y;
 		if (labelArr != null && labelArr.length > 0) {
-			g.setFont(Item.font);
+			g.setFont(labelFont);
 			for (int i = 0; i < labelArr.length; ++i) {
 				g.drawString(labelArr[i], x + 4, yo + 2, 0);
-				yo += Item.font.getHeight() + 4;
+				yo += labelFont.getHeight() + 4;
 			}
 		}
-		if (focused) g.setColor(-8355712);
+		if (focused) g.setColor(0xFF808080);
 		g.drawRect(x + 2, yo, w - 4, bounds[H] - yo + y - 2);
 		g.setFont(Screen.font);
-		if (focused) g.setColor(8617456);
+		if (focused) g.setColor(0xFF837DF0);
 		if ((caretX != x + 3 || caretY != yo + 1 || updateFocus) && focused && swtFocused) {
 			updateFocus = false;
 			caretX = x + 3;
 			caretY = yo + 1;
 			Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		}
+		if (textArr.length == 0) return;
 		g.drawString(this.textArr[0], x + 4, yo + 2, 0);
 	}
 
@@ -170,13 +172,13 @@ public class TextField extends Item {
 		int n = 4;
 		final int availableWidth = row.getAvailableWidth(screen.bounds[W]) - 8;
 		if (hasLabel()) {
-			labelArr = c.textArr(label, Item.font, availableWidth, availableWidth);
-			n = 4 + (Item.font.getHeight() + 4) * labelArr.length;
+			labelArr = TextUtils.textArr(label, labelFont, availableWidth, availableWidth);
+			n = 4 + (labelFont.getHeight() + 4) * labelArr.length;
 		} else {
 			labelArr = null;
 		}
 		final Font aFont173 = Screen.font;
-		this.textArr = c.textArr((this.string == null) ? "" : this.string, aFont173, availableWidth, availableWidth);
+		this.textArr = TextUtils.textArr((this.string == null) ? "" : this.string, aFont173, availableWidth, availableWidth);
 		bounds[H] = Math.max(getMinimumHeight(), Math.min(n + (aFont173.getHeight() + 4), screen.bounds[H]));
 	}
 

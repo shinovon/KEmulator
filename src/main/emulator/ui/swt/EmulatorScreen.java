@@ -1698,6 +1698,46 @@ public final class EmulatorScreen implements
 		}
 	}
 
+	public float getZoom() {
+		if (Settings.resizeMode == 0) {
+			return zoom;
+		}
+
+		Rectangle size = canvas.getClientArea();
+
+		int origWidth = getWidth();
+		int origHeight = getHeight();
+		int canvasWidth;
+		int canvasHeight;
+		int scaledWidth = zoomedWidth;
+		int scaledHeight = zoomedHeight;
+
+		if (rotation % 2 == 1) {
+			// swap width & height if rotated by 90 or 270 degrees
+			canvasWidth = size.height;
+			canvasHeight = size.width;
+			if (Settings.resizeMode != 3 && (Settings.resizeMode == 2 || !painted)) {
+				scaledWidth = zoomedHeight;
+				scaledHeight = zoomedWidth;
+			}
+		} else {
+			canvasWidth = size.width;
+			canvasHeight = size.height;
+		}
+
+		// Keep proportions
+		final float ratio = (float) origWidth / (float) origHeight;
+		if (Settings.keepAspectRatio && ratio != ((float) scaledWidth / (float) scaledHeight)) {
+			scaledWidth = (int) ((float) scaledHeight * ratio);
+			if (scaledWidth > canvasWidth) {
+				scaledWidth = canvasWidth;
+				scaledHeight = (int) ((float) scaledWidth * ((float) origHeight / (float) origWidth));
+			}
+		}
+
+		return ((float) scaledWidth / (float) origWidth);
+	}
+
 	private void method565(final GC gc) {
 		if (this.infosEnabled && (this.mouseXPress != this.mouseXRelease || this.mouseYPress != this.mouseYRelease)) {
 			try {

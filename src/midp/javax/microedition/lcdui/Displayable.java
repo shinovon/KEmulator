@@ -2,7 +2,8 @@ package javax.microedition.lcdui;
 
 import emulator.*;
 import emulator.debug.Profiler;
-import emulator.lcdui.a;
+import emulator.graphics2D.swt.FontSWT;
+import emulator.lcdui.LCDUIUtils;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.ui.IScreen;
 import emulator.ui.swt.EmulatorImpl;
@@ -10,9 +11,11 @@ import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -336,7 +339,7 @@ public class Displayable {
 				}
 				return;
 			}
-			a.method181(graphics, 0, Screen.fontHeight4 + this.bounds[H] - 1, this.w, Screen.fontHeight4);
+			LCDUIUtils.drawTickerBackground(graphics, 0, Screen.fontHeight4 + this.bounds[H] - 1, this.w, Screen.fontHeight4);
 			String t = ticker.getString();
 			if (t == null) return;
 			graphics.setFont(Screen.font);
@@ -429,11 +432,24 @@ public class Displayable {
 		});
 	}
 
-	protected Composite _constructSwtContent(int style) {
-		return new Composite(getSwtParent(), SWT.NONE);
+	Composite _constructSwtContent(int style) {
+		Composite c = new Composite(getSwtParent(), SWT.NONE);
+
+		_setSwtStyle(c);
+
+		return c;
 	}
 
-	protected Rectangle _layoutSwtContent() {
+	void _setSwtStyle(Control c) {
+		int color = LCDUIUtils.backgroundColor;
+		c.setBackground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
+		color = LCDUIUtils.foregroundColor;
+		c.setForeground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
+
+		c.setFont(Font.getDefaultSWTFont());
+	}
+
+	Rectangle _layoutSwtContent() {
 		Rectangle area = getSwtParent().getClientArea();
 		swtContent.setBounds(0, 0, area.width, area.height);
 		return swtContent.getClientArea();
@@ -563,7 +579,7 @@ public class Displayable {
 	}
 
 	public void _swtResized(int w, int h) {
-
+		swtContent.setFont(Font.getDefaultSWTFont());
 	}
 
 	void updateSize(boolean force) {

@@ -3,6 +3,7 @@ package emulator;
 import java.util.*;
 
 public final class Settings {
+	// original settings
 	public static int g2d = 1; // swt - 0, awt - 1
 	public static boolean enableVibration;
 	public static boolean enableKeyRepeat;
@@ -42,6 +43,9 @@ public final class Settings {
 	public static boolean showInfoFrame;
 	public static boolean showMemViewFrame;
 	public static boolean blackberryApi = false;
+
+	// nnmod
+
 	public static boolean canvasKeyboard;
 	public static boolean awtAntiAliasing;
 	public static boolean fpsMode;
@@ -67,6 +71,7 @@ public final class Settings {
 	public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill, 3 - integer
 	public static boolean keepAspectRatio = true;
 	public static boolean patchSynchronizedPaint = true;
+	public static boolean patchSynchronizedPlayerUpdate = true;
 
 	//m3g
 	public static boolean m3gIgnoreOverwrite;
@@ -129,4 +134,7 @@ public final class Settings {
 
 	public static boolean softbankApi = false;
     public static String customTitle;
+
+	public static boolean ignoreControllerZAxis;
+	public static boolean disableCamera;
 }

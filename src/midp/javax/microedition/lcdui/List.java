@@ -4,10 +4,12 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
 import emulator.graphics2D.swt.FontSWT;
+import emulator.lcdui.LCDUIUtils;
 import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -56,6 +58,8 @@ public class List extends Screen implements Choice {
 	protected Composite _constructSwtContent(int style) {
 		Composite c = super._constructSwtContent(style);
 		swtTable = new Table(c, getStyle(type));
+		_setSwtStyle(swtTable);
+
 		return c;
 	}
 
@@ -331,7 +335,7 @@ public class List extends Screen implements Choice {
 
 	private int getStyle(int listType)
 	{
-		int tableStyle = SWT.NONE;
+		int tableStyle = SWT.V_SCROLL;
 		switch(listType)
 		{
 			case Choice.IMPLICIT:
@@ -420,18 +424,7 @@ public class List extends Screen implements Choice {
 	private void swtSetItemFont(int index)
 	{
 		Font font = choiceImpl.getFont(index);
-		org.eclipse.swt.graphics.Font swtFont = null;
-		if (font != null) {
-			if (Settings.g2d == 0) {
-				swtFont = ((FontSWT) font.getImpl()).getSWTFont();
-			} else {
-				swtFont = new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
-						Emulator.getEmulator().getProperty().getDefaultFontName(),
-						Math.max(2, (int) (font.getHeight() * 0.7f) - 1),
-						font.getStyle() & ~Font.STYLE_UNDERLINED);
-			}
-		}
-		swtTable.getItem(index).setFont(0, swtFont);
+		swtTable.getItem(index).setFont(0, font == null ? null : Font.getSWTFont(font));
 	}
 
 	private void swtDeleteAllItems()
@@ -505,6 +498,7 @@ public class List extends Screen implements Choice {
 
 	public void _swtResized(int w, int h) {
 		super._swtResized(w, h);
+		swtTable.setFont(Font.getDefaultSWTFont());
 		swtTable.setBounds(swtContent.getClientArea());
 	}
 }

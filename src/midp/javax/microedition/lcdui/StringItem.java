@@ -1,6 +1,7 @@
 package javax.microedition.lcdui;
 
-import emulator.lcdui.c;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
 
 public class StringItem extends Item {
 	private String text;
@@ -8,6 +9,11 @@ public class StringItem extends Item {
 	Font font;
 	String[] textArr;
 	private int width;
+
+	private int textColor = LCDUIUtils.foregroundColor;
+	private int focusableTextColor = LCDUIUtils.highlightForegroundColor;
+	private int focusedColor = LCDUIUtils.highlightForegroundColor;
+	private int focusedBackgroundColor = LCDUIUtils.highlightBackgroundColor;
 
 	public StringItem(final String label, final String text) {
 		this(label, text, 0);
@@ -50,58 +56,72 @@ public class StringItem extends Item {
 	}
 
 	void paint(Graphics g, int x, int y, int w, int h, int row) {
-		super.paint(g, x, y, w, h);
+//		super.paint(g, x, y, w, h);
 
 		final Font font = (this.font != null) ? this.font : Screen.font;
 
 		if (mode == BUTTON) {
+			if (focused) {
+				g.setColor(focusedBackgroundColor);
+				g.fillRect(x + 2, y + 2, w - 4, h - 4);
+			}
 			String str = null;
-			if (textArr != null) str = textArr[0];
+			if (textArr != null && textArr.length != 0) str = textArr[0];
 			if (str == null) str = text;
 			if (str == null) str = "...";
 			int yo = y;
 			if (hasLabel()) {
-				g.setFont(Item.font);
+				g.setFont(labelFont);
+				g.setColor(focused ? focusedColor : labelColor);
 				String label = this.label.trim();
-				String[] tmp = c.textArr(label, Item.font, w, w);
+				String[] tmp = TextUtils.textArr(label, labelFont, w, w);
 				g.drawString(tmp[0], x + 2, yo, 0);
-				yo += Item.font.getHeight() + 4;
+				yo += labelFont.getHeight() + 4;
 			}
 			g.setFont(font);
+			g.setColor(focused ? focusedColor : textColor);
 			int textWidth = font.stringWidth(str);
 			g.drawString(str, x + (w - textWidth) / 2, yo, 0);
-			int o = g.getColor();
-			g.setColor(0xababab);
+			g.setColor(LCDUIUtils.buttonBorderColor);
 			int lx = x + w - 3;
 			int ly = yo + h - yo + y - 3;
-			g.drawLine(x + 1, ly, lx, ly);
+			g.drawLine(x + 2, ly, lx, ly);
 			g.drawLine(lx, ly, lx, yo + 1);
-			g.setColor(o);
-			g.drawRect(x + 1, yo, w - 3, h - yo + y - 2);
+			g.setColor(focused ? focusedColor : LCDUIUtils.foregroundColor);
+			g.drawRect(x + 2, yo, w - 4, h - yo + y - 2);
 		} else {
-			g.setFont(font);
-			if (isFocusable()) g.setColor(-11178603);
+			if (focused) {
+				g.setColor(focusedBackgroundColor);
+				g.fillRect(x + 1, y + 1, w - 2, h - 2);
+				g.setColor(focusedColor);
+				g.drawRect(x, y + 1, w, h - 2);
+			}
 			if (isSizeLocked() || hasLabel()) {
 				if (row != 0) return;
-				g.setFont(Item.font);
+				g.setFont(labelFont);
+				g.setColor(focused ? focusedColor : labelColor);
 				if (labelArr != null) for (String s : labelArr) {
 					g.drawString(s, x, y, 0);
-					y += Item.font.getHeight() + 4;
+					y += labelFont.getHeight() + 4;
 				}
 				g.setFont(font);
 				for (String s : textArr) {
 					g.drawString(s, x, y, 0);
-					y += font.getHeight() + 4;
+					y += font.getHeight() + 2;
 				}
 				return;
 			}
 			if (labelArr != null) {
+				g.setFont(labelFont);
+				g.setColor(focused ? focusedColor : labelColor);
 				if (row < labelArr.length) {
 					g.drawString(labelArr[row], x + 1, y, 0);
 					return;
 				}
 				row -= labelArr.length;
 			}
+			g.setFont(font);
+			g.setColor(focused ? focusedColor : (isFocusable() ? focusableTextColor : textColor));
 			if (textArr == null || row >= textArr.length) return;
 			g.drawString(textArr[row], x + 1, y, 0);
 		}
@@ -123,10 +143,10 @@ public class StringItem extends Item {
 		int w = 0;
 		if (hasLabel()) {
 			if (mode == BUTTON) {
-				String[] a = c.textArr(label.trim(), Item.font, maxWidth, maxWidth, maxw);
-				if (a.length != 0) w = Item.font.stringWidth(a[0].trim());
+				String[] a = TextUtils.textArr(label.trim(), labelFont, maxWidth, maxWidth, maxw);
+				if (a.length != 0) w = labelFont.stringWidth(a[0].trim());
 			} else {
-				labelArr = c.textArr(label, Item.font, maxWidth, maxWidth, maxw);
+				labelArr = TextUtils.textArr(label, labelFont, maxWidth, maxWidth, maxw);
 				if (labelArr.length != 0) w = maxw[0] + 4;
 			}
 		} else {
@@ -137,16 +157,16 @@ public class StringItem extends Item {
 		if (s.endsWith("\n") && !_hasLayout(Item.LAYOUT_NEWLINE_AFTER)) {
 			s = s.substring(0, s.length() - 1);
 		}
-		textArr = c.textArr(s, font, availableWidth, maxWidth, maxw);
-		final int fh = font.getHeight() + 4;
+		textArr = TextUtils.textArr(s, font, availableWidth, maxWidth, maxw);
+		final int fh = font.getHeight() + 2;
 		if (mode == BUTTON) {
-			width = Math.max(w, Math.min(maxWidth, font.stringWidth(textArr[0]) + 10));
-			textArr = new String[] { textArr[0] };
-			bounds[H] = fh + (hasLabel() ? Item.font.getHeight() + 4 : 0);
+			width = Math.max(w, Math.min(maxWidth, textArr.length != 0 ? font.stringWidth(textArr[0]) + 10 : 4));
+			textArr = textArr.length != 0 ? new String[] { textArr[0] } : textArr;
+			bounds[H] = fh + 2 + (hasLabel() ? labelFont.getHeight() + 4 : 0);
 		} else {
 			width = Math.max(w, textArr.length != 0 ? maxw[0] : 4);
 			bounds[H] = fh * textArr.length
-					+ (labelArr != null ? (Item.font.getHeight() + 4) * labelArr.length : 0);
+					+ (labelArr != null ? (labelFont.getHeight() + 4) * labelArr.length : 0);
 		}
 	}
 
@@ -157,7 +177,7 @@ public class StringItem extends Item {
 
 	public int getMinimumHeight() {
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		return (font.getHeight() + 4) + (hasLabel() ? Item.font.getHeight() + 4 : 0);
+		return (font.getHeight() + 2) + (hasLabel() ? labelFont.getHeight() + 4 : 0);
 	}
 
 	public int getPreferredWidth() {
@@ -171,7 +191,7 @@ public class StringItem extends Item {
 	int getRowWidth(int row) {
 		if (labelArr != null) {
 			if (row < labelArr.length)
-				return Screen.font.stringWidth(labelArr[row]) + 2;
+				return labelFont.stringWidth(labelArr[row]) + 2;
 			row -= labelArr.length;
 		}
 		if (textArr == null) return 0;
@@ -180,12 +200,26 @@ public class StringItem extends Item {
 
 	int getRowHeight(int row) {
 		if (labelArr != null && row < labelArr.length) {
-			return Screen.font.getHeight() + 4;
+			return labelFont.getHeight() + 4;
 		}
-		return ((font != null) ? font : Screen.font).getHeight() + 4;
+		return ((font != null) ? font : Screen.font).getHeight() + 2;
 	}
 
 	int getRowsCount() {
 		return (textArr == null ? 0 : textArr.length) + ((labelArr == null ? 0 : labelArr.length));
+	}
+
+	public void _setColor(int type, int color) {
+		switch (type) {
+			case 0:
+				textColor = focusableTextColor = color;
+				break;
+			case 1:
+				focusedColor = color;
+				break;
+			case 2:
+				focusedBackgroundColor = color;
+				break;
+		}
 	}
 }

@@ -1,5 +1,7 @@
 package javax.microedition.lcdui;
 
+import emulator.lcdui.LCDUIUtils;
+
 public class Gauge extends Item {
 	public static final int INDEFINITE = -1;
 	public static final int CONTINUOUS_IDLE = 0;
@@ -123,10 +125,10 @@ public class Gauge extends Item {
 				}
 			}
 			w -= 4;
-			g.setColor(0xababab);
+			g.setColor(LCDUIUtils.buttonBorderColor);
 			g.drawRect(x + 2, y + yoff, w, h);
 			if (max <= 0 || val < 0) return;
-			g.setColor(0x0000ff);
+			g.setColor(LCDUIUtils.gaugeColor);
 			g.fillRect(x + 4, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
 		} else {
 			int xoff1 = Item.font.stringWidth("0") + 2;
@@ -134,11 +136,11 @@ public class Gauge extends Item {
 			g.drawString("0", x + 2, y + yoff, 0);
 			g.drawString(Integer.toString(max), x + w - xoff2 + 2, y + yoff, 0);
 			w -= xoff1 + xoff2;
-			g.setColor(0xababab);
+			g.setColor(LCDUIUtils.buttonBorderColor);
 			g.drawRect(x + xoff1, y + yoff, w, h);
 			int val = value;
 			if (max <= 0 || val < 0) return;
-			g.setColor(0x0000ff);
+			g.setColor(LCDUIUtils.gaugeColor);
 			g.fillRect(x + 2 + xoff1, y + yoff + 2, (int) ((double) w * ((double) val / (double) max)) - 3, h - 3);
 		}
 	}

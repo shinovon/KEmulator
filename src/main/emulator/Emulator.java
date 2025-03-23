@@ -663,7 +663,7 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 
-		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null) {
+		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
 			try {
 				Webcam w = Webcam.getDefault();
 				if (w != null) {
