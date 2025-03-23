@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
 import emulator.debug.Memory;
@@ -165,9 +166,10 @@ public final class MemoryView implements DisposeListener {
 
 	public final void open() {
 		this.method665();
+		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
 		this.shell.setLocation(
-                (int) (this.display.getClientArea().height * 0.025), //- this.shell.getSize().x >> 3,
-                (int) (this.display.getClientArea().height * 0.025)// - this.shell.getSize().y >> 2
+				clientArea.x + (int) (clientArea.height * 0.025), //- this.shell.getSize().x >> 3,
+				clientArea.y + (int) (clientArea.height * 0.025)// - this.shell.getSize().y >> 2
 		);
 		this.shell.open();
 		this.shell.addDisposeListener(this);
@@ -258,9 +260,10 @@ public final class MemoryView implements DisposeListener {
 
 		//(int)(this.display.getClientArea().width * 0.33);
 		//(int)(this.display.getClientArea().height * 0.8);
+		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
 		this.shell.setSize(
-				(int)(this.display.getClientArea().width * 0.4),
-				(int)(this.display.getClientArea().height * 0.95)
+				 (int)(clientArea.width * 0.4),
+				(int)(clientArea.height * 0.95)
 		);
 
 		(this.aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
