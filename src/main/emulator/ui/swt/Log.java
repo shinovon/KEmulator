@@ -24,7 +24,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 	boolean logOpen;
 	StyledText styledText;
 	Shell parentShell;
-	private boolean aBoolean576;
+	private boolean attachedToParent;
 	final StringBuffer printQueue = new StringBuffer();
 
 	public Log() {
@@ -89,7 +89,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 	}
 
 
-	private void method332() {
+	private void loadLogFile() {
 		try {
 			final BufferedReader bufferedReader = new BufferedReader(new FileReader(Emulator.getUserPath() + "/log.txt"));
 			String line;
@@ -110,19 +110,19 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 		return this.logShell;
 	}
 
-	public final void method329(final Shell aShell575) {
-		this.method334();
-		this.method332();
+	public final void createWindow(final Shell parent) {
+		this.initWindows();
+		this.loadLogFile();
 		final Display current = Display.getCurrent();
-		this.parentShell = aShell575;
-		this.logShell.setLocation(aShell575.getLocation().x + aShell575.getSize().x, aShell575.getLocation().y);
-		this.logShell.setSize(aShell575.getSize());
+		this.parentShell = parent;
+		this.logShell.setLocation(parent.getLocation().x + parent.getSize().x, parent.getLocation().y);
+		this.logShell.setSize(parent.getSize());
 		this.logOpen = true;
-		this.aBoolean576 = true;
+		this.attachedToParent = true;
 		this.logShell.open();
 		this.logShell.addControlListener(this);
 		this.logShell.addDisposeListener(this);
-		aShell575.setFocus();
+		parent.setFocus();
 		while (!this.logShell.isDisposed()) {
 			if (!current.readAndDispatch()) {
 				current.sleep();
@@ -138,7 +138,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 		this.logOpen = false;
 	}
 
-	private void method334() {
+	private void initWindows() {
 		final FillLayout layout;
 		(layout = new FillLayout()).spacing = 0;
 		layout.marginWidth = 1;
@@ -150,16 +150,16 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 		this.styledText = new StyledText(this.logShell, 2816);
 	}
 
-	public final boolean method333() {
-		return this.aBoolean576;
+	public final boolean isAttachedToParent() {
+		return this.attachedToParent;
 	}
 
 	public final void controlMoved(final ControlEvent controlEvent) {
 		if (Math.abs(this.parentShell.getLocation().x + this.parentShell.getSize().x - this.logShell.getLocation().x) < 10 && Math.abs(this.parentShell.getLocation().y - this.logShell.getLocation().y) < 20) {
 			this.logShell.setLocation(this.parentShell.getLocation().x + this.parentShell.getSize().x, this.parentShell.getLocation().y);
-			aBoolean576 = true;
+			attachedToParent = true;
 		} else {
-			aBoolean576 = false;
+			attachedToParent = false;
 		}
 	}
 
