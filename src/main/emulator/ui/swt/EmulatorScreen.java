@@ -1290,7 +1290,7 @@ public final class EmulatorScreen implements
 					((Log) Emulator.getEmulator().getLogStream()).dispose();
 					return;
 				}
-				((Log) Emulator.getEmulator().getLogStream()).method329(this.shell);
+				((Log) Emulator.getEmulator().getLogStream()).createWindow(this.shell);
 				return;
 			}
 			if (menuItem == this.keypadMenuItem) {
@@ -2470,9 +2470,9 @@ public final class EmulatorScreen implements
 			return;
 		this.getWindowPos();
 		if (((Log) Emulator.getEmulator().getLogStream()).isLogOpen()) {
-			final Shell method328 = ((Log) Emulator.getEmulator().getLogStream()).getLogShell();
-			if (((Log) Emulator.getEmulator().getLogStream()).method333() && !method328.isDisposed()) {
-				method328.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
+			final Shell logWindow = ((Log) Emulator.getEmulator().getLogStream()).getLogShell();
+			if (((Log) Emulator.getEmulator().getLogStream()).isAttachedToParent() && !logWindow.isDisposed()) {
+				logWindow.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 			}
 		}
 		if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
@@ -2861,7 +2861,7 @@ public final class EmulatorScreen implements
 				case 1: {
 					if (Settings.showLogFrame) {
 						this.aClass93_1059.logMenuItem.setSelection(true);
-						((Log) Emulator.getEmulator().getLogStream()).method329(EmulatorScreen.method561(this.aClass93_1059));
+						((Log) Emulator.getEmulator().getLogStream()).createWindow(EmulatorScreen.method561(this.aClass93_1059));
 						return;
 					}
 					break;
