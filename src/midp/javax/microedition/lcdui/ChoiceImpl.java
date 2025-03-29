@@ -101,7 +101,7 @@ final class ChoiceImpl
 	/**
 	 * Append item with specified text and image.
 	 */
-	int append(String text, Image image)
+	synchronized int append(String text, Image image)
 	{
 		validateString(text);
 		ChoiceData data = new ChoiceData(text, image, Font.getDefaultFont(),
@@ -114,7 +114,7 @@ final class ChoiceImpl
 	/**
 	 * Insert item with specified text and image.
 	 */
-	void insert(int elementNum, String text, Image image)
+	synchronized void insert(int elementNum, String text, Image image)
 	{
 		validateString(text);
 		validatePosition(elementNum, size() + 1);
@@ -126,7 +126,7 @@ final class ChoiceImpl
 	/**
 	 * Set item with specified text and image.
 	 */
-	void set(int elementNum, String text, Image image)
+	synchronized void set(int elementNum, String text, Image image)
 	{
 		validateString(text);
 		validatePosition(elementNum, size());
@@ -138,7 +138,7 @@ final class ChoiceImpl
 	/**
 	 * Set item's font.
 	 */
-	void setFont(int elementNum, Font font)
+	synchronized void setFont(int elementNum, Font font)
 	{
 		validatePosition(elementNum, size());
 		Font checkedFont = (font == null ? Font.getDefaultFont() : font);
@@ -148,7 +148,7 @@ final class ChoiceImpl
 	/**
 	 * Delete item from specified position.
 	 */
-	void delete(int elementNum)
+	synchronized void delete(int elementNum)
 	{
 		validatePosition(elementNum, size());
 		if(!multiSel && isSelected(elementNum) && size() > 1)
@@ -171,7 +171,7 @@ final class ChoiceImpl
 	/**
 	 * Delete all items.
 	 */
-	void deleteAll()
+	synchronized void deleteAll()
 	{
 		items.removeAllElements();
 	}
@@ -187,7 +187,7 @@ final class ChoiceImpl
 	/**
 	 * Get the Font of a given item.
 	 */
-	Font getFont(int elementNum)
+	synchronized Font getFont(int elementNum)
 	{
 		validatePosition(elementNum, size());
 		return ((ChoiceData) items.elementAt(elementNum)).font;
@@ -196,7 +196,7 @@ final class ChoiceImpl
 	/**
 	 * Get the image of a given item.
 	 */
-	Image getImage(int elementNum)
+	synchronized Image getImage(int elementNum)
 	{
 		validatePosition(elementNum, size());
 		return ((ChoiceData) items.elementAt(elementNum)).img;
@@ -205,7 +205,7 @@ final class ChoiceImpl
 	/**
 	 * Get the text of a given item.
 	 */
-	String getString(int elementNum)
+	synchronized String getString(int elementNum)
 	{
 		validatePosition(elementNum, size());
 		return ((ChoiceData) items.elementAt(elementNum)).text;
@@ -232,7 +232,7 @@ final class ChoiceImpl
 	 * Get the selection index. Returns the first selection index if multiple
 	 * selection is allowed.
 	 */
-	int getSelectedIndex()
+	synchronized int getSelectedIndex()
 	{
 		final int size = size();
 		if(!multiSel)
@@ -251,7 +251,7 @@ final class ChoiceImpl
 	/**
 	 * Checks if an item is selected.
 	 */
-	boolean isSelected(int elementNum)
+	synchronized boolean isSelected(int elementNum)
 	{
 		validatePosition(elementNum, size());
 		return ((ChoiceData) items.elementAt(elementNum)).sel;
@@ -260,7 +260,7 @@ final class ChoiceImpl
 	/**
 	 * Sets an item's selection.
 	 */
-	void setSelected(int elementNum, boolean select)
+	synchronized void setSelected(int elementNum, boolean select)
 	{
 		validatePosition(elementNum, size());
 		if(multiSel)
@@ -286,7 +286,7 @@ final class ChoiceImpl
 	/**
 	 * Get selection flags.
 	 */
-	int getSelectedFlags(boolean[] selectedArray)
+	synchronized int getSelectedFlags(boolean[] selectedArray)
 	{
 		validateSelectedArray(selectedArray);
 		final int size = size();
@@ -310,7 +310,7 @@ final class ChoiceImpl
 	/**
 	 * Set selection flags.
 	 */
-	void setSelectedFlags(boolean[] selectedArray)
+	synchronized void setSelectedFlags(boolean[] selectedArray)
 	{
 		validateSelectedArray(selectedArray);
 		final int size = size();
@@ -344,7 +344,7 @@ final class ChoiceImpl
 	 *
 	 * @return the lists size
 	 */
-	int size()
+	synchronized int size()
 	{
 		return items.size();
 	}
@@ -355,7 +355,7 @@ final class ChoiceImpl
 	 * @param position an index of the text array
 	 * @param upperBoundary upper boundary for position
 	 */
-	private void validatePosition(int position, int upperBoundary)
+	private synchronized void validatePosition(int position, int upperBoundary)
 	{
 		if(position < 0 || position >= upperBoundary)
 		{

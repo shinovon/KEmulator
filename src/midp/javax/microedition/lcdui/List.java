@@ -10,7 +10,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -59,6 +61,27 @@ public class List extends Screen implements Choice {
 		Composite c = super._constructSwtContent(style);
 		swtTable = new Table(c, getStyle(type));
 		_setSwtStyle(swtTable);
+
+		swtTable.addListener(SWT.MeasureItem, event -> {
+			TableItem item = (TableItem)event.item;
+			String text = item.getText(event.index);
+			Point size = event.gc.textExtent(text);
+			event.width = size.x + 2;
+			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON) {
+				event.height = Math.max(event.height, size.y);
+			}
+		});
+		swtTable.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
+		swtTable.addListener(SWT.PaintItem, event -> {
+			TableItem item = (TableItem)event.item;
+			String text = item.getText(event.index);
+			int yOffset = 0;
+			if (event.index == 1) {
+				Point size = event.gc.textExtent(text);
+				yOffset = Math.max(0, (event.height - size.y) / 2);
+			}
+			event.gc.drawText(text, event.x, event.y + yOffset, true);
+		});
 
 		return c;
 	}
@@ -499,6 +522,7 @@ public class List extends Screen implements Choice {
 	public void _swtResized(int w, int h) {
 		super._swtResized(w, h);
 		swtTable.setFont(Font.getDefaultSWTFont());
+		swtTable.pack();
 		swtTable.setBounds(swtContent.getClientArea());
 	}
 }
