@@ -30,4 +30,8 @@ public class Form extends javax.microedition.lcdui.Form {
 
 	public void setKeyDispatcher(KeyDispatcher dispatcher) {
 	}
+
+	public int appendStaticItem(Item item) {
+		return append(item);
+	}
 }

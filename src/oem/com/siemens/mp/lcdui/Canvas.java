@@ -17,4 +17,17 @@
 package com.siemens.mp.lcdui;
 
 public abstract class Canvas extends javax.microedition.lcdui.Canvas {
+
+	public void setCenterKeyIcon(short s) {
+
+	}
+
+	public static void setCenterKeyIcon(javax.microedition.lcdui.Canvas c, short s) {
+
+	}
+
+	public void setFullScreenMode(boolean b) {
+		super.setFullScreenMode(b);
+	}
+
 }

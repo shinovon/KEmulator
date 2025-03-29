@@ -83,4 +83,10 @@ public class Image extends com.siemens.mp.ui.Image {
 			f.close();
 		}
 	}
+
+	public static javax.microedition.lcdui.Image clipAndScaleImage(
+			javax.microedition.lcdui.Image img, int n1, int n2, int n3, int n4, int n5, int n6) {
+		// TODO
+		return img;
+	}
 }

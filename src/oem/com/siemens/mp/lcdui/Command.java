@@ -17,6 +17,14 @@
 package com.siemens.mp.lcdui;
 
 public class Command extends javax.microedition.lcdui.Command {
+	public Command(final String s, final int n, final int n2) {
+		super(s, s, n, n2);
+	}
+
+	public Command(final String s, String s2, final int n, final int n2) {
+		super(s, s2, n, n2);
+	}
+
 
 	public Command(String shortLabel, String longLabel, int commandType, int priority, char iconId) {
 		super(shortLabel, longLabel, commandType, priority);
