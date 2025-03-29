@@ -65,6 +65,7 @@ public class List extends Screen implements Choice {
 		swtTable.addListener(SWT.MeasureItem, event -> {
 			TableItem item = (TableItem)event.item;
 			String text = item.getText(event.index);
+			event.gc.setFont(item.getFont());
 			Point size = event.gc.textExtent(text);
 			event.width = size.x + 2;
 			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON) {
@@ -75,6 +76,7 @@ public class List extends Screen implements Choice {
 		swtTable.addListener(SWT.PaintItem, event -> {
 			TableItem item = (TableItem)event.item;
 			String text = item.getText(event.index);
+			event.gc.setFont(item.getFont());
 			int yOffset = 0;
 			if (event.index == 1) {
 				Point size = event.gc.textExtent(text);
