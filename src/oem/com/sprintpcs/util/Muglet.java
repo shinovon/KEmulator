@@ -11,7 +11,7 @@ public class Muglet {
 	}
 
 	public String getURI() {
-		return null;
+		return "";
 	}
 
 	public String getReferringURI() {
