@@ -425,6 +425,7 @@ public class Displayable {
 		syncExec(new Runnable() {
 			public void run() {
 				swtContent = _constructSwtContent(SWT.NONE);
+				swtContent.setVisible(false);
 				swtMenu = new Menu(swtContent);
 				swtContent.setMenu(swtMenu);
 				swtContentArea = _layoutSwtContent();
