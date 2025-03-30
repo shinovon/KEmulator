@@ -447,7 +447,7 @@ public class Displayable {
 		color = LCDUIUtils.foregroundColor;
 		c.setForeground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
 
-		c.setFont(Font.getDefaultSWTFont());
+		c.setFont(Font.getDefaultSWTFont(!(this instanceof List)));
 	}
 
 	Rectangle _layoutSwtContent() {
@@ -580,7 +580,7 @@ public class Displayable {
 	}
 
 	public void _swtResized(int w, int h) {
-		swtContent.setFont(Font.getDefaultSWTFont());
+		swtContent.setFont(Font.getDefaultSWTFont(!(this instanceof List)));
 	}
 
 	void updateSize(boolean force) {

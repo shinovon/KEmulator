@@ -140,12 +140,12 @@ public class Font {
 		return getDefaultFont();
 	}
 
-	static org.eclipse.swt.graphics.Font getSWTFont(Font font) {
+	static org.eclipse.swt.graphics.Font getSWTFont(Font font, boolean autoScale) {
 		if (font == null) return null;
 		if (Settings.g2d == 0) {
 			return ((FontSWT) font.getImpl()).getSWTFont();
 		} else {
-			float zoom = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() * 0.68f;
+			float zoom = (autoScale ? ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() : 1f) * 0.68f;
 			return new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
 					Emulator.getEmulator().getProperty().getDefaultFontName(),
 					Math.max(2, (int) (font.getHeight() * zoom) - 1),
@@ -153,8 +153,8 @@ public class Font {
 		}
 	}
 
-	static org.eclipse.swt.graphics.Font getDefaultSWTFont() {
-		float zoom = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() * 0.68f;
+	static org.eclipse.swt.graphics.Font getDefaultSWTFont(boolean autoScale) {
+		float zoom = (autoScale ? ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() : 1f) * 0.68f;
 		return new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
 				Emulator.getEmulator().getProperty().getDefaultFontName(),
 				Math.max(2, (int) (Screen.font.getHeight() * zoom) - 1), 0);

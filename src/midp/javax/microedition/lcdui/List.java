@@ -10,6 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -66,23 +67,59 @@ public class List extends Screen implements Choice {
 			TableItem item = (TableItem)event.item;
 			String text = item.getText(event.index);
 			event.gc.setFont(item.getFont());
-			Point size = event.gc.textExtent(text);
-			event.width = size.x + 2;
+			int i = SWT.DRAW_TRANSPARENT;
 			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON) {
-				event.height = Math.max(event.height, size.y);
+				i |= SWT.DRAW_DELIMITER | SWT.DRAW_TAB;
 			}
+			Point size = event.gc.textExtent(text, i);
+			org.eclipse.swt.graphics.Image img = (org.eclipse.swt.graphics.Image) item.getData(); //item.getImage();
+//			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON && text.indexOf('\n') != -1) {
+//				event.height = event.gc.textExtent("A\nA").y;
+//			} else {
+			event.height = size.y;
+//			}
+			int imgWidth = 0;
+			if (img != null) {
+				ImageData data = img.getImageData();
+				imgWidth = data.width;
+				int imgHeight = data.height;
+				if (imgWidth != 0 && imgHeight != 0) {
+					size.x += (int) ((float) (event.height * imgWidth) / imgHeight);
+				}
+			}
+			event.width = size.x + 2;
 		});
 		swtTable.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
 		swtTable.addListener(SWT.PaintItem, event -> {
 			TableItem item = (TableItem)event.item;
+			org.eclipse.swt.graphics.Image img = (org.eclipse.swt.graphics.Image) item.getData(); //item.getImage();
 			String text = item.getText(event.index);
 			event.gc.setFont(item.getFont());
+			int imgWidth = 0;
+			if (img != null) {
+				ImageData data = img.getImageData();
+				imgWidth = data.width;
+				int imgHeight = data.height;
+				if (imgWidth != 0 && imgHeight != 0) {
+					int dstWidth = (int) ((float) (event.height * imgWidth) / imgHeight);
+					event.gc.drawImage(img, 0, 0, imgWidth, imgHeight,
+							event.x, event.y,
+							dstWidth, event.height);
+					imgWidth = dstWidth;
+				} else {
+					imgWidth = 0;
+				}
+			}
 			int yOffset = 0;
 			if (event.index == 1) {
 				Point size = event.gc.textExtent(text);
 				yOffset = Math.max(0, (event.height - size.y) / 2);
 			}
-			event.gc.drawText(text, event.x, event.y + yOffset, true);
+			int i = SWT.DRAW_TRANSPARENT;
+			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON) {
+				i |= SWT.DRAW_DELIMITER | SWT.DRAW_TAB;
+			}
+			event.gc.drawText(text, event.x + imgWidth, event.y + yOffset, i);
 		});
 
 		return c;
@@ -428,7 +465,8 @@ public class List extends Screen implements Choice {
 	{
 		TableItem item = new TableItem(swtTable, SWT.NONE, index);
 		Image img = choiceImpl.getImage(index);
-		item.setImage(0, Image.getSWTImage(img));
+//		item.setImage(0, Image.getSWTImage(img));
+		item.setData(Image.getSWTImage(img));
 		item.setText(0, choiceImpl.getString(index));
 	}
 
@@ -436,7 +474,8 @@ public class List extends Screen implements Choice {
 	{
 		TableItem item = swtTable.getItem(index);
 		Image img = choiceImpl.getImage(index);
-		item.setImage(0, Image.getSWTImage(img));
+//		item.setImage(0, Image.getSWTImage(img));
+		item.setData(Image.getSWTImage(img));
 		item.setText(0, choiceImpl.getString(index));
 	}
 
@@ -449,7 +488,7 @@ public class List extends Screen implements Choice {
 	private void swtSetItemFont(int index)
 	{
 		Font font = choiceImpl.getFont(index);
-		swtTable.getItem(index).setFont(0, font == null ? null : Font.getSWTFont(font));
+		swtTable.getItem(index).setFont(0, font == null ? null : Font.getSWTFont(font, false));
 	}
 
 	private void swtDeleteAllItems()
@@ -523,7 +562,7 @@ public class List extends Screen implements Choice {
 
 	public void _swtResized(int w, int h) {
 		super._swtResized(w, h);
-		swtTable.setFont(Font.getDefaultSWTFont());
+		swtTable.setFont(Font.getDefaultSWTFont(false));
 		swtTable.pack();
 		swtTable.setBounds(swtContent.getClientArea());
 	}
