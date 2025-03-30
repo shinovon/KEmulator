@@ -500,7 +500,13 @@ public class Form extends Screen {
 		scrollCurrentItem = item;
 		try {
 			scroll = getFirstRow(item).y;
-		} catch (Exception ignored) {}
+		} catch (Exception e) {
+			queueLayout(item);
+			doLayout(0);
+			try {
+				scroll = getFirstRow(item).y;
+			} catch (Exception ignored) {}
+		}
 	}
 
 	void queueLayout(int i) {
