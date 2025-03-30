@@ -5,9 +5,10 @@ import javax.microedition.lcdui.Graphics;
 public final class LCDUIUtils {
 	public static int backgroundColor = 0xFFEFF0F0; // 0xFFEFF0F0
 	public static int foregroundColor = 0xFF000000; // 0xFF000000
-	public static int highlightForegroundColor = 0xFF556D95;
-	public static int highlightBackgroundColor = 0xFFE6E6E6;
-	public static int buttonBorderColor = 0xFFABABAB;
+	public static int highlightedForegroundColor = 0xFF556D95;
+	public static int highlightedBackgroundColor = 0xFFE6E6E6;
+	public static int borderColor = 0xFFABABAB;
+	public static int highlightedBorderColor =  0xFF556D95;
 	public static int gaugeColor = 0xFF0000FF;
 
 	public static void drawDisplayableBackground(Graphics var0, int var1, int var2, int var3, int var4, boolean var5) {
@@ -21,9 +22,9 @@ public final class LCDUIUtils {
 	}
 
 	public static void drawSelectedItemBackground(Graphics g, int x, int y, int w, int h) {
-		g.setColor(highlightBackgroundColor);
+		g.setColor(highlightedBackgroundColor);
 		g.fillRect(x + 1, y + 1, w - 2, h - 2);
-		g.setColor(highlightForegroundColor);
+		g.setColor(highlightedBorderColor);
 		g.drawRect(x, y, w, h);
 	}
 

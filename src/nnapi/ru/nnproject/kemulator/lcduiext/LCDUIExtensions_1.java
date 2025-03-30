@@ -2,6 +2,7 @@ package ru.nnproject.kemulator.lcduiext;
 
 import emulator.lcdui.LCDUIUtils;
 
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
@@ -24,20 +25,23 @@ public class LCDUIExtensions_1 {
 	// 4 - button border
 	public static void setGlobalColor(int type, int color) {
 		switch (type) {
-			case 0:
+			case Display.COLOR_FOREGROUND:
 				LCDUIUtils.foregroundColor = color;
 				break;
-			case 1:
+			case Display.COLOR_BACKGROUND:
 				LCDUIUtils.backgroundColor = color;
 				break;
-			case 2:
-				LCDUIUtils.highlightForegroundColor = color;
+			case Display.COLOR_HIGHLIGHTED_BACKGROUND:
+				LCDUIUtils.highlightedBackgroundColor = color;
 				break;
-			case 3:
-				LCDUIUtils.highlightBackgroundColor = color;
+			case Display.COLOR_HIGHLIGHTED_FOREGROUND:
+				LCDUIUtils.highlightedForegroundColor = color;
 				break;
-			case 4:
-				LCDUIUtils.buttonBorderColor = color;
+			case Display.COLOR_BORDER:
+				LCDUIUtils.borderColor = color;
+				break;
+			case Display.COLOR_HIGHLIGHTED_BORDER:
+				LCDUIUtils.highlightedBorderColor = color;
 				break;
 		}
 	}

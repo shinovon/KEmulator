@@ -3,6 +3,7 @@ package javax.microedition.lcdui;
 import emulator.Emulator;
 import emulator.EventQueue;
 import emulator.Settings;
+import emulator.lcdui.LCDUIUtils;
 
 import javax.microedition.midlet.MIDlet;
 import java.util.Hashtable;
@@ -110,18 +111,13 @@ public class Display {
 	}
 
 	public int getBestImageWidth(final int n) {
-		switch (n) {
-			case Display.LIST_ELEMENT:
-			case Display.CHOICE_GROUP_ELEMENT:
-			case Display.ALERT:
-				return 16;
-		}
-		return 0;
+		return getBestImageHeight(n);
 	}
 
 	public int getBestImageHeight(final int n) {
 		switch (n) {
 			case Display.LIST_ELEMENT:
+				return 48;
 			case Display.CHOICE_GROUP_ELEMENT:
 			case Display.ALERT:
 				return 16;
@@ -134,6 +130,20 @@ public class Display {
 	}
 
 	public int getColor(final int n) {
+		switch (n) {
+			case COLOR_BACKGROUND:
+				return LCDUIUtils.backgroundColor;
+			case COLOR_FOREGROUND:
+				return LCDUIUtils.foregroundColor;
+			case COLOR_HIGHLIGHTED_BACKGROUND:
+				return LCDUIUtils.highlightedBackgroundColor;
+			case COLOR_HIGHLIGHTED_FOREGROUND:
+				return LCDUIUtils.highlightedForegroundColor;
+			case COLOR_BORDER:
+				return LCDUIUtils.borderColor;
+			case COLOR_HIGHLIGHTED_BORDER:
+				return LCDUIUtils.highlightedBorderColor;
+		}
 		return 0;
 	}
 

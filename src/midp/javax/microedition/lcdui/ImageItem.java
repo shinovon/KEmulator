@@ -64,19 +64,19 @@ public class ImageItem extends Item {
 		int yo = y;
 		if (labelArr != null && labelArr.length > 0) {
 			g.setFont(labelFont);
-			g.setColor(focused ? LCDUIUtils.highlightForegroundColor : labelColor);
+			g.setColor(focused ? LCDUIUtils.highlightedForegroundColor : labelColor);
 			for (String s : labelArr) {
 				g.drawString(s, x + (w - labelFont.stringWidth(s)) / 2, yo + 2, 0);
 				yo += labelFont.getHeight() + 4;
 			}
 		}
 		if (appearanceMode == BUTTON) {
-			g.setColor(LCDUIUtils.buttonBorderColor);
+			g.setColor(LCDUIUtils.borderColor);
 			int lx = x + w - 1;
 			int ly = y + h - 3;
 			g.drawLine(x + 1, ly, lx, ly);
 			g.drawLine(lx, ly, lx, y + 1);
-			g.setColor(focused ? LCDUIUtils.highlightForegroundColor : LCDUIUtils.foregroundColor);
+			g.setColor(focused ? LCDUIUtils.highlightedForegroundColor : LCDUIUtils.foregroundColor);
 			g.drawRect(x, y, w, h - 2);
 		}
 		if (image != null) {

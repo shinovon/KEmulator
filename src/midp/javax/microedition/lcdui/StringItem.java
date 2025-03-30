@@ -11,9 +11,9 @@ public class StringItem extends Item {
 	private int width;
 
 	private int textColor = LCDUIUtils.foregroundColor;
-	private int focusableTextColor = LCDUIUtils.highlightForegroundColor;
-	private int focusedColor = LCDUIUtils.highlightForegroundColor;
-	private int focusedBackgroundColor = LCDUIUtils.highlightBackgroundColor;
+	private int focusableTextColor = LCDUIUtils.highlightedForegroundColor;
+	private int focusedColor = LCDUIUtils.highlightedForegroundColor;
+	private int focusedBackgroundColor = LCDUIUtils.highlightedBackgroundColor;
 
 	public StringItem(final String label, final String text) {
 		this(label, text, 0);
@@ -82,7 +82,7 @@ public class StringItem extends Item {
 			g.setColor(focused ? focusedColor : textColor);
 			int textWidth = font.stringWidth(str);
 			g.drawString(str, x + (w - textWidth) / 2, yo, 0);
-			g.setColor(LCDUIUtils.buttonBorderColor);
+			g.setColor(LCDUIUtils.borderColor);
 			int lx = x + w - 3;
 			int ly = yo + h - yo + y - 3;
 			g.drawLine(x + 2, ly, lx, ly);
