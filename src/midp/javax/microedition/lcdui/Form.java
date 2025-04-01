@@ -418,12 +418,14 @@ public class Form extends Screen {
 		scroll = Math.max(0, Math.min(scroll, layoutHeight - h + bounds[Y]));
 
 		y -= scroll;
-		for (Row row : rows) {
-			int rh = row.getHeight();
-			if (y + rh > 0 && h + sy > y) {
-				row.paint(g, y, w);
-			} else row.hidden();
-			y += rh;
+		synchronized (rows) {
+			for (Row row : rows) {
+				int rh = row.getHeight();
+				if (y + rh > 0 && h + sy > y) {
+					row.paint(g, y, w);
+				} else row.hidden();
+				y += rh;
+			}
 		}
 		g.setClip(0, 0, this.w, this.h);
 	}
