@@ -85,7 +85,7 @@ public class Form extends Screen {
 			item.screen = null;
 			super.items.remove(n);
 		}
-		queueLayout(n);
+		queueLayout(n - 1);
 	}
 
 	public void deleteAll() {
@@ -512,6 +512,7 @@ public class Form extends Screen {
 	}
 
 	void queueLayout(int i) {
+		if (i < 0) i = 0;
 		layoutStart = Math.min(layoutStart, i);
 		layout = true;
 		repaintScreen();
