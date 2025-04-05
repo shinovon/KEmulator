@@ -92,7 +92,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	public final void setWindowZoom(final float aFloat840) {
 		this.zoom = aFloat840;
 		if (currentItem != null) {
-			if (swtFont != null && !swtFont.isDisposed()) {
+			if (swtFont != null && !swtFont.isDisposed() && swtText != null) {
 				swtText.setFont(null);
 				swtFont.dispose();
 			}

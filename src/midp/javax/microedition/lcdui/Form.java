@@ -533,6 +533,16 @@ public class Form extends Screen {
 				return;
 			}
 			int width = bounds[W];
+			int prevScroll = this.scroll;
+			int prevScrollItemY = 0;
+			Item scrollItem = this.scrollCurrentItem;
+			if (scrollItem != null) {
+				try {
+					prevScrollItemY = getFirstRow(scrollItem).y;
+				} catch (Exception ignored) {
+				}
+			}
+
 			Row row = null;
 			synchronized (items) {
 				while (row == null && i > 0) {
@@ -616,6 +626,13 @@ public class Form extends Screen {
 			}
 			if (row != null && !row.items.isEmpty()) {
 				layoutHeight += row.getHeight();
+			}
+
+			if (prevScrollItemY != 0) {
+				int s = prevScroll - prevScrollItemY;
+				try {
+					scroll = s + getFirstRow(scrollItem).y;
+				} catch (Exception ignored) {}
 			}
 		}
 	}
