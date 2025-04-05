@@ -477,6 +477,7 @@ public class List extends Screen implements Choice {
 //		item.setImage(0, Image.getSWTImage(img));
 		item.setData(Image.getSWTImage(img));
 		item.setText(0, choiceImpl.getString(index));
+		swtTable.redraw();
 	}
 
 	private void swtDeleteItem(int index)
