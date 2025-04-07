@@ -494,7 +494,7 @@ public final class Property implements IProperty, SelectionListener {
 			this.left = properties.getProperty("KEY_LEFT", "-3");
 			this.right = properties.getProperty("KEY_RIGHT", "-4");
 			Settings.g2d = (properties.getProperty("2D_Graphics_Engine", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
-			Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("DLL") ? 0 : 1);
+			Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("SWERVE") ? 0 : 1);
 			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("DLL") ? 0 : 1);
 
 			Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
