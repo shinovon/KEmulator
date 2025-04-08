@@ -55,6 +55,7 @@ public class Displayable {
 	private Command leftCommand;
 	private Command rightCommand;
 	private final Vector<Command> menuCommands = new Vector<Command>();
+	private final Vector<Command> itemCommands = new Vector<Command>();
 	final Object lock = new Object();
 
 	public Displayable() {
@@ -118,12 +119,13 @@ public class Displayable {
 		Command ok = null;
 		int startIdx = 0;
 		menuCommands.clear();
+		itemCommands.clear();
 
 		Command[] arr = (Command[]) commands.toArray(new Command[0]);
 		Arrays.sort(arr);
 
 		if (focusedItem != null && (startIdx = focusedItem.commands.size()) > 0) {
-			menuCommands.addAll(focusedItem.commands);
+			itemCommands.addAll(focusedItem.commands);
 		}
 		menuCommands.addAll(Arrays.asList(arr));
 
@@ -155,7 +157,7 @@ public class Displayable {
 		}
 
 		String leftLabel = "", rightLabel = "";
-		if (menuCommands.size() > 1) {
+		if (menuCommands.size() > 1 || itemCommands.size() != 0) {
 			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
 		} else if (menuCommands.size() != 0) {
 			leftLabel = menuCommands.get(0).getLabel();
@@ -569,6 +571,13 @@ public class Displayable {
 	void swtUpdateMenuCommands(boolean item) {
 		for (MenuItem mi: swtMenu.getItems()) {
 			mi.dispose();
+		}
+		for (int i = 0; i < itemCommands.size(); i++) {
+			Command cmd = (Command) itemCommands.get(i);
+			MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
+			mi.addSelectionListener(swtMenuSelectionListener);
+			mi.setData(new Object[] {cmd, focusedItem});
+			mi.setText(cmd.getLongLabel());
 		}
 		for (int i = 0; i < menuCommands.size(); i++) {
 			Command cmd = (Command) menuCommands.get(i);
