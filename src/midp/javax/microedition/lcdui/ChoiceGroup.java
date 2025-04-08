@@ -50,7 +50,7 @@ public class ChoiceGroup
 			this.items.add(new a(strs[j], imgs == null ? null : imgs[j], null, this));
 			++j;
 		}
-		if (this.items.size() > 0) {
+		if (choiceType != MULTIPLE && this.items.size() > 0) {
 			((a) this.items.get(0)).sel = true;
 		}
 	}

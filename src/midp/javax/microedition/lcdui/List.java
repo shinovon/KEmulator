@@ -563,7 +563,7 @@ public class List extends Screen implements Choice {
 
 	public void _swtResized(int w, int h) {
 		super._swtResized(w, h);
-		swtTable.setFont(Font.getDefaultSWTFont(false));
+//		swtTable.setFont(Font.getDefaultSWTFont(false));
 		swtTable.pack();
 		swtTable.setBounds(swtContent.getClientArea());
 	}

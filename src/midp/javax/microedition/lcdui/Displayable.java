@@ -580,7 +580,8 @@ public class Displayable {
 	}
 
 	public void _swtResized(int w, int h) {
-		swtContent.setFont(Font.getDefaultSWTFont(!(this instanceof List)));
+		if (this instanceof List) return;
+		swtContent.setFont(Font.getDefaultSWTFont(true));
 	}
 
 	void updateSize(boolean force) {

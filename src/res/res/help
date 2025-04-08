@@ -49,6 +49,10 @@ Fixed FileConnection filter
 Fixed Ticker bug
 Properly implemented SpriteCanvas/ACanvas
 Implemented com.j_phone.amuse.j3d
+Implemented Display.getColor()
+Fixed Display.setCurrentItem()
+Fixed Form.delete()
+Implemented List.setFitPolicy()
 
 $v2.19.1 [2025.02.12]
 Update LWJGL to 3.3.6
