@@ -73,6 +73,7 @@ public class Emulator implements Runnable {
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
 	public static final boolean macos = os.startsWith("darwin") || os.startsWith("mac os");
+	public static final boolean isPortable = checkIsPortable();
 	private static Class<?> midletClass;
 	private static boolean forked;
 	private static boolean updated;
@@ -1040,7 +1041,7 @@ public class Emulator implements Runnable {
 		return s;
 	}
 
-	public static boolean isPortable() {
+	private static boolean checkIsPortable() {
 		String path = getAbsoluteFile();
 		// if kemu jar is read-only, it's probably somewhere in system folders.
 		if (Files.exists(Paths.get(path)) && !Files.isWritable(Paths.get(path)))
@@ -1059,13 +1060,31 @@ public class Emulator implements Runnable {
 			return true;
 		}
 		if (win) {
+			// installer will write to registry path to installed jar. Let's check it.
+			try {
+				Process regRequest = Runtime.getRuntime().exec("reg query \"HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator\" /v JarInstalledPath");
+				StringBuilder sw = new StringBuilder();
+				try (InputStream is = regRequest.getInputStream()) {
+					int c;
+					while ((c = is.read()) != -1)
+						sw.append((char) c);
+				}
+				String output = sw.toString();
+				int i = output.indexOf("REG_SZ");
+				if (i != -1) {
+					String pathFromReg = output.substring(i + 6).trim();
+					if (Files.isSameFile(Paths.get(pathFromReg), Paths.get(path)))
+						return false; // we are running "installed" instance
+				}
+			} catch (IOException e) {
+				// ignore
+			}
+
 			// installed into appdata
 			if (path.contains("\\Users\\") && path.contains("\\AppData\\Local\\"))
 				return false;
-			// we installed into... pf?
-			if (path.contains(":\\Program Files\\"))
-				return false;
 
+			// all other cases will be handled by writeablility check above.
 			return true;
 		}
 
@@ -1076,7 +1095,7 @@ public class Emulator implements Runnable {
 	public static String getUserPath() {
 		installed:
 		{
-			if (!isPortable()) {
+			if (!isPortable) {
 				String s;
 				if (linux) {
 					s = System.getenv("HOME") + "/.local/share/KEmulator/";
