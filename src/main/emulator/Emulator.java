@@ -181,6 +181,35 @@ public class Emulator implements Runnable {
 		saveTargetDevice();
 	}
 
+	public static void openFileExternally(final String fileName) {
+		try {
+			if (win) {
+				// I intentionally use this only for windows.
+				Desktop.getDesktop().open(new File(fileName));
+				return;
+			}
+			if (macos) {
+				Runtime.getRuntime().exec("open \"" + fileName + "\"");
+				return;
+			}
+			if (linux) {
+				// I have no idea how to open files if there is no XDG.
+				// see https://github.com/ppy/osu/discussions/24499#discussioncomment-6698365 for fun.
+				if (Files.isExecutable(Paths.get("/usr/bin/xdg-open")))
+					Runtime.getRuntime().exec("/usr/bin/xdg-open \"" + fileName + "\"");
+				else if (Files.isExecutable(Paths.get("/usr/bin/gedit")))
+					// let's try gedit? it seems like the most well-known one.
+					Runtime.getRuntime().exec("/usr/bin/gedit \"" + fileName + "\"");
+				else
+					getEmulator().getScreen().showMessage("Non XDG compliant systems are not supported.");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		getEmulator().getScreen().showMessage("Failed to open file.");
+	}
+
 	private static void generateJad() {
 		if (Emulator.midletJar == null) {
 			return;
