@@ -477,7 +477,7 @@ public class Emulator implements Runnable {
 				final String[] split = Emulator.classPath.split(";");
 				for (int i = 0; i < split.length; ++i) {
 					Emulator.emulatorimpl.getLogStream().println("Get classes from " + split[i]);
-					method281(new File(split[i]), null);
+					loadClassesFrom(new File(split[i]), null);
 				}
 				Properties aProperties1369 = null;
 				final File file4;
@@ -506,13 +506,13 @@ public class Emulator implements Runnable {
 		return true;
 	}
 
-	private static void method281(final File file, String s) {
+	private static void loadClassesFrom(final File file, String s) {
 		s = ((s != null) ? (s + ".") : "");
 		final File[] listFiles = file.listFiles();
 		for (int i = 0; i < listFiles.length; ++i) {
 			final String string = s + listFiles[i].getName();
 			if (listFiles[i].isDirectory()) {
-				method281(listFiles[i], string);
+				loadClassesFrom(listFiles[i], string);
 			} else if (string.endsWith(".class")) {
 				Emulator.jarClasses.add(string.substring(0, string.length() - 6));
 				Emulator.emulatorimpl.getLogStream().println("Get class " + string.substring(0, string.length() - 6));
@@ -668,7 +668,8 @@ public class Emulator implements Runnable {
 					Dimension d = w.getViewSize();
 					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 		}
 
 		try {
