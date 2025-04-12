@@ -370,19 +370,13 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getJadPath() {
-		File file = null;
-		Label_0068:
-		{
-			File file2;
-			if (Emulator.jadPath != null) {
-				file2 = new File(Emulator.jadPath);
-			} else {
-				if (Emulator.midletJar == null) {
-					break Label_0068;
-				}
-				file2 = new File(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad");
-			}
-			file = file2;
+		File file;
+		if (Emulator.jadPath != null) {
+			file = new File(Emulator.jadPath);
+		} else if (Emulator.midletJar != null) {
+			file = new File(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad");
+		} else {
+			return null;
 		}
 		if (file.exists()) {
 			return file.getAbsolutePath();
