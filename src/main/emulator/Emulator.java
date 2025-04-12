@@ -72,6 +72,7 @@ public class Emulator implements Runnable {
 	public static final String os = System.getProperty("os.name").toLowerCase();
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
+	public static final boolean macos = os.startsWith("darwin") || os.startsWith("mac os");
 	private static Class<?> midletClass;
 	private static boolean forked;
 	private static boolean updated;
@@ -758,7 +759,7 @@ public class Emulator implements Runnable {
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
 			// Restart with additional arguments required for specific os or java version
-			if (!(forked || Settings.uei) && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
+			if (!(forked || Settings.uei) && (macos || isJava9())) {
 				loadGame(null, false);
 				return;
 			}
