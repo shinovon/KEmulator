@@ -24,6 +24,9 @@ import java.awt.*;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -65,7 +68,6 @@ public class Emulator implements Runnable {
 	public static String httpUserAgent;
 	private final static Thread backgroundThread;
 	private static IEmulatorPlatform platform;
-	public static boolean installed;
 
 	public static final String os = System.getProperty("os.name").toLowerCase();
 	public static final boolean win = os.startsWith("win");
@@ -933,8 +935,6 @@ public class Emulator implements Runnable {
 				Settings.micro3d = 0;
 			} else if (key.equalsIgnoreCase("log")) {
 				Settings.showLogFrame = true;
-			} else if (key.equalsIgnoreCase("installed")) {
-				installed = true;
 			} else if (key.equalsIgnoreCase("uei")) {
 				Settings.uei = true;
 			} else if (key.equalsIgnoreCase("s")) {
@@ -1006,22 +1006,63 @@ public class Emulator implements Runnable {
 		return s;
 	}
 
+	public static boolean isPortable() {
+		String path = getAbsoluteFile();
+		// if kemu jar is read-only, it's probably somewhere in system folders.
+		if (Files.exists(Paths.get(path)) && !Files.isWritable(Paths.get(path)))
+			return false;
+
+		// we may live in system folders but are writable (container, misconfiguration, etc.)
+		if (linux) {
+			// we installed from package
+			if (path.startsWith("/opt/") || path.startsWith("/usr/") || path.startsWith("/bin/"))
+				return false;
+			// we live in ~.local/bin
+			if (path.contains("/home/") && path.contains("/.local/"))
+				return false;
+			//TODO flatpack/snap?
+
+			return true;
+		}
+		if (win) {
+			// installed into appdata
+			if (path.contains("\\Users\\") && path.contains("\\AppData\\Local\\"))
+				return false;
+			// we installed into... pf?
+			if (path.contains(":\\Program Files\\"))
+				return false;
+
+			return true;
+		}
+
+		// non-".app" program management on macos is messy so doing nothing
+		return true;
+	}
+
 	public static String getUserPath() {
 		installed:
 		{
-			if (installed) {
+			if (!isPortable()) {
 				String s;
 				if (linux) {
-					s = "~/local/share/KEmulator";
+					s = System.getenv("HOME") + "/.local/share/KEmulator/";
 				} else {
 					s = System.getenv("APPDATA");
 					if (s == null)
 						break installed;
 					s += "\\KEmulator";
 				}
-				File f = new File(s);
-				if ((f.exists() && f.isDirectory()) || f.mkdir())
+				Path p = Paths.get(s);
+				if (Files.exists(p) && Files.isDirectory(p))
 					return s;
+
+				try {
+					Files.createDirectories(p);
+				} catch (IOException e) {
+					break installed;
+				}
+
+				return s;
 			}
 		}
 		return getAbsolutePath();
@@ -1108,8 +1149,6 @@ public class Emulator implements Runnable {
 		cmd.add(engine2d == 0 ? "-swt" : "-awt");
 		cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
 		cmd.add(mascotEngine == 0 ? "-mascotdll" : "-mascotgl");
-
-		if (installed) cmd.add("-installed");
 
 		cmd.add("-s");
 

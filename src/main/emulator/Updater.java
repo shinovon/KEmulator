@@ -120,9 +120,6 @@ public class Updater {
 		cmd.add("-branch");
 		cmd.add(Settings.updateBranch);
 
-		if (Emulator.installed)
-			cmd.add("-installed");
-
 		if (restart)
 			cmd.add("-run");
 
