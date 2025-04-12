@@ -1080,11 +1080,13 @@ public class Emulator implements Runnable {
 				String s;
 				if (linux) {
 					s = System.getenv("HOME") + "/.local/share/KEmulator/";
-				} else {
+				} else if (win) {
 					s = System.getenv("APPDATA");
 					if (s == null)
 						break installed;
 					s += "\\KEmulator";
+				} else {
+					break installed;
 				}
 				Path p = Paths.get(s);
 				if (Files.exists(p) && Files.isDirectory(p))
