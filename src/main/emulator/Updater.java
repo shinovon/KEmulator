@@ -9,6 +9,9 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -70,8 +73,19 @@ public class Updater {
 		try {
 			downloadUpdater();
 		} catch (Exception e) {
+			String path = Emulator.getAbsolutePath();
+			if (Files.exists(Paths.get(path)) && !Files.isWritable(Paths.get(path))) {
+				// emulator is in system folder or on read-only disk.
+				if (Emulator.linux && Files.exists(Paths.get("/usr/bin/pacman"))) {
+					Emulator.getEmulator().getScreen().showMessage("You are running system-wide installation. Use your package manager (i.e. \"yay -S kemulatornnmod-bin\").");
+				} else {
+					Emulator.getEmulator().getScreen().showMessage("KEmulator is installed in read-only location. Use external software management tools or restart KEmulator with admin/root permissions.");
+				}
+				return;
+			}
+			Emulator.getEmulator().getScreen().showMessage("Failed to download update helper.");
 			e.printStackTrace();
-			// TODO error message
+			return;
 		}
 
 		if (!new File(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar").exists())
