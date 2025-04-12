@@ -172,13 +172,13 @@ public class Emulator implements Runnable {
 		MMFPlayer.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
-			method280();
+			generateJad();
 			return;
 		}
 		saveTargetDevice();
 	}
 
-	private static void method280() {
+	private static void generateJad() {
 		if (Emulator.midletJar == null) {
 			return;
 		}
