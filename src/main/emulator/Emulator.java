@@ -450,7 +450,8 @@ public class Emulator implements Runnable {
 							try {
 								Integer.parseInt(num);
 								midletKeys.add(s);
-							} catch (Exception ignored) {}
+							} catch (Exception ignored) {
+							}
 						}
 					}
 					if (midletKeys.size() != 0) {
@@ -688,7 +689,8 @@ public class Emulator implements Runnable {
 				}
 			}
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	private static String getHWID() {
@@ -729,7 +731,8 @@ public class Emulator implements Runnable {
 					break;
 				}
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		String arch = System.getProperty("os.arch");
 		if (!platform.isX64() && !arch.contains("86")) {
 			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try x64 version instead.");
@@ -842,7 +845,8 @@ public class Emulator implements Runnable {
 		}
 		try {
 			EmulatorImpl.dispose();
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 		System.exit(0);
 	}
 
@@ -853,7 +857,7 @@ public class Emulator implements Runnable {
 			String[] a = deviceName.split(";");
 			c = new String[a.length][2];
 			int idx = 0;
-			for (String s: a) {
+			for (String s : a) {
 				int i = s.indexOf(':');
 				if (i == -1) {
 					deviceName = s;
@@ -869,7 +873,7 @@ public class Emulator implements Runnable {
 		}
 		Emulator.emulatorimpl.getProperty().setCustomProperties();
 		if (c != null) {
-			for (String[] p: c) {
+			for (String[] p : c) {
 				if (p == null || p[0] == null) continue;
 				Devices.setProperty(p[0], p[1]);
 			}
@@ -1097,7 +1101,7 @@ public class Emulator implements Runnable {
 			cmd.add("-XstartOnFirstThread");
 		}
 
-		
+
 		if (debugBuild) {
 			File f = new File(getAbsolutePath() + "/../eclipse/KEmulator_base/agent.jar");
 			if (f.exists()) {
@@ -1171,7 +1175,8 @@ public class Emulator implements Runnable {
 				properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 				return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		return null;
 	}
 
@@ -1218,7 +1223,7 @@ public class Emulator implements Runnable {
 	public static IGraphics3D getGraphics3D() {
 		return platform.getGraphics3D();
 	}
-	
+
 	public static int getJavaVersionMajor() {
 		try {
 			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
