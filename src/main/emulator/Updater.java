@@ -64,23 +64,6 @@ public class Updater {
 		}
 	}
 
-	public static void downloadUpdater() throws IOException {
-		ReadableByteChannel inChannel = null;
-		FileOutputStream fileStream = null;
-		FileChannel fileChannel = null;
-		try {
-			inChannel = Channels.newChannel(getHttpStream(UPDATER_URL));
-			fileStream = new FileOutputStream(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar");
-
-			fileChannel = fileStream.getChannel();
-			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
-		} finally {
-			if (inChannel != null) inChannel.close();
-			if (fileChannel != null) fileChannel.close();
-			if (fileStream != null) fileStream.close();
-		}
-	}
-
 	public static void startUpdater(boolean restart) {
 		Emulator.getEmulator().getLogStream().println("Starting updater");
 
@@ -143,7 +126,24 @@ public class Updater {
 		System.exit(0);
 	}
 
-	static InputStream getHttpStream(String url) throws IOException {
+	private static void downloadUpdater() throws IOException {
+		ReadableByteChannel inChannel = null;
+		FileOutputStream fileStream = null;
+		FileChannel fileChannel = null;
+		try {
+			inChannel = Channels.newChannel(getHttpStream(UPDATER_URL));
+			fileStream = new FileOutputStream(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar");
+
+			fileChannel = fileStream.getChannel();
+			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
+		} finally {
+			if (inChannel != null) inChannel.close();
+			if (fileChannel != null) fileChannel.close();
+			if (fileStream != null) fileStream.close();
+		}
+	}
+
+	private static InputStream getHttpStream(String url) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "KEmulator/" + Emulator.version);
 		connection.setUseCaches(false);
