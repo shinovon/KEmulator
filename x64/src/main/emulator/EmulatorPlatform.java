@@ -109,7 +109,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		}
 
 		String arch;
-		if (osa.contains("amd64") || osa.contains("x64_64")) {
+		if (osa.contains("amd64") || osa.contains("x86_64")) {
 			arch = "x86_64";
 		} else if (osa.contains("86")) {
 			arch = "x86";
