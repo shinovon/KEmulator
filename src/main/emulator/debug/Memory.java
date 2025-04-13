@@ -531,26 +531,26 @@ public final class Memory {
 		}
 	}
 
-	public static void playerAct(final Object o, final int n) {
+	public static void playerAct(final Object o, final PlayerActionType n) {
 		if (o instanceof Sound) {
 			final Sound sound = (Sound) o;
 			try {
 				switch (n) {
-					case 0: {
+					case resume: {
 						sound.resume();
 						break;
 					}
-					case 1: {
+					case pause: {
 						final long mediaTime = sound.m_player.getMediaTime();
 						sound.stop();
 						sound.m_player.setMediaTime(mediaTime);
 						break;
 					}
-					case 2: {
+					case stop: {
 						sound.stop();
 						break;
 					}
-					case 3: {
+					case export: {
 						try {
 							byte[] b = sound.getData();
 							String s = sound.getExportName();
@@ -573,19 +573,19 @@ public final class Memory {
 		if (o instanceof AudioClip) {
 			final AudioClip audioClip = (AudioClip) o;
 			switch (n) {
-				case 0: {
+				case resume: {
 					audioClip.play(audioClip.loopCount, audioClip.volume);
 					break;
 				}
-				case 1: {
+				case pause: {
 					audioClip.pause();
 					break;
 				}
-				case 2: {
+				case stop: {
 					audioClip.stop();
 					break;
 				}
-				case 3: {
+				case export: {
 					try {
 						byte[] b = audioClip.getData();
 						String s = audioClip.getExportName();
@@ -607,20 +607,20 @@ public final class Memory {
 			final VLCPlayerImpl v = (VLCPlayerImpl) o;
 			try {
 				switch (n) {
-					case 0: {
+					case resume: {
 						v.start();
 						break;
 					}
-					case 1: {
+					case pause: {
 						final long mediaTime2 = v.getMediaTime();
 						v.stop();
 						v.setMediaTime(mediaTime2);
 					}
-					case 2: {
+					case stop: {
 						v.stop();
 						break;
 					}
-					case 3: {
+					case export: {
 						((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export not supported!");
 						break;
 					}
@@ -636,21 +636,21 @@ public final class Memory {
 		final PlayerImpl playerImpl = (PlayerImpl) o;
 		try {
 			switch (n) {
-				case 0: {
+				case resume: {
 					playerImpl.start();
 					break;
 				}
-				case 1: {
+				case pause: {
 					final long mediaTime2 = playerImpl.getMediaTime();
 					playerImpl.stop();
 					playerImpl.setMediaTime(mediaTime2);
 					break;
 				}
-				case 2: {
+				case stop: {
 					playerImpl.stop();
 					break;
 				}
-				case 3: {
+				case export: {
 					try {
 						byte[] b = playerImpl.getData();
 						String s = "audio" + playerImpl.getExportName();

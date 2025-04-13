@@ -5,6 +5,7 @@ import emulator.Settings;
 import emulator.UILocale;
 import emulator.debug.Memory;
 import emulator.debug.MemoryViewImage;
+import emulator.debug.PlayerActionType;
 import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -443,10 +444,10 @@ public final class MemoryView implements DisposeListener {
 		(this.audioControlComp = new Composite(this.bottomTabs, 0)).setLayout(layout);
 		(this.startAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Start"));
 		(this.pauseAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
-		this.pauseAudioBtn.addSelectionListener(new Class28(this));
-		this.startAudioBtn.addSelectionListener(new Class7(this));
+		this.pauseAudioBtn.addSelectionListener(new PlayerPauseHandler(this));
+		this.startAudioBtn.addSelectionListener(new PlayerResumeHandler(this));
 		(this.stopAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_STOP", "Stop"));
-		this.stopAudioBtn.addSelectionListener(new Class27(this));
+		this.stopAudioBtn.addSelectionListener(new PlayerStopHandler(this));
 		(this.aCLabel1153 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_VOLUME", "Volume:"));
 		(this.aCLabel1154 = new CLabel(this.audioControlComp, 0)).setText("0   ");
 		(this.aScale1089 = new Scale(this.audioControlComp, 0)).addSelectionListener(new Class21(this));
@@ -460,7 +461,7 @@ public final class MemoryView implements DisposeListener {
 				if (soundsTable.getSelectionIndex() != -1 &&
 						soundsTable.getSelectionIndex() < memoryMgr.players.size() &&
 						(value = memoryMgr.players.get(soundsTable.getSelectionIndex())) != null) {
-					Memory.playerAct(value, 3);
+					Memory.playerAct(value, PlayerActionType.export);
 				}
 			}
 		});
