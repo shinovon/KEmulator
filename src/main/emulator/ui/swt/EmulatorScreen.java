@@ -1179,6 +1179,8 @@ public final class EmulatorScreen implements
 					final String jadPath;
 					if ((jadPath = Emulator.getJadPath()) != null) {
 						Emulator.openFileExternally(jadPath);
+					} else {
+						showMessage("The application doesn't have JAD with it.");
 					}
 				} catch (Exception ignored) {}
 				this.updatePauseState();
