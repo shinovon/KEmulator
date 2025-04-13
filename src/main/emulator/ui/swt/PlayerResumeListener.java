@@ -6,10 +6,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
 
-final class PlayerResumeHandler extends SelectionAdapter {
+final class PlayerResumeListener extends SelectionAdapter {
 	private final MemoryView aClass110_563;
 
-	PlayerResumeHandler(final MemoryView aClass110_563) {
+	PlayerResumeListener(final MemoryView aClass110_563) {
 		super();
 		this.aClass110_563 = aClass110_563;
 	}

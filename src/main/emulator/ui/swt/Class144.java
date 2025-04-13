@@ -13,6 +13,6 @@ final class Class144 extends SelectionAdapter {
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
 		MemoryView.method627(this.aClass110_1303, MemoryView.method657(this.aClass110_1303).getSelection());
-		MemoryView.method647(this.aClass110_1303);
+		this.aClass110_1303.updateEverything();
 	}
 }

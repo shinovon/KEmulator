@@ -17,6 +17,6 @@ final class Class123 extends SelectionAdapter {
 		for (int i = 0; i < MemoryView.method629(this.aClass110_1206).images.size(); ++i) {
 			((Image) MemoryView.method629(this.aClass110_1206).images.get(i)).resetUsedRegion();
 		}
-		MemoryView.method647(this.aClass110_1206);
+		this.aClass110_1206.updateEverything();
 	}
 }

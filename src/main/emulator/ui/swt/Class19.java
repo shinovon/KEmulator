@@ -14,7 +14,7 @@ final class Class19 extends SelectionAdapter {
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
 		if (MemoryView.method639(this.aClass110_586)) {
 			MemoryView.method683(this.aClass110_586, MemoryView.method670(this.aClass110_586).getSelectionIndex());
-			MemoryView.method642(this.aClass110_586).redraw();
+            this.aClass110_586.imagesCanvas.redraw();
 		}
 	}
 }

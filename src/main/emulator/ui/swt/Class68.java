@@ -12,7 +12,8 @@ final class Class68 extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		MemoryView.method679(this.aClass110_851, MemoryView.method682(this.aClass110_851).getSelection());
-		MemoryView.method647(this.aClass110_851);
-	}
+		final boolean aBoolean1131 = MemoryView.method682(this.aClass110_851).getSelection();
+		this.aClass110_851.showReleasedImages = aBoolean1131;
+		this.aClass110_851.updateEverything();
+    }
 }

@@ -13,7 +13,7 @@ final class Class22 implements ModifyListener {
 
 	public final void modifyText(final ModifyEvent modifyEvent) {
 		MemoryView.method662(this.aClass110_591, MemoryView.method654(this.aClass110_591).getSelectionIndex());
-		MemoryView.method661(this.aClass110_591);
+		this.aClass110_591.resortImages();
 		MemoryView.method668(this.aClass110_591);
 	}
 }

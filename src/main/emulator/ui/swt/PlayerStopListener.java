@@ -5,10 +5,10 @@ import emulator.debug.PlayerActionType;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-final class PlayerStopHandler extends SelectionAdapter {
+final class PlayerStopListener extends SelectionAdapter {
 	private final MemoryView aClass110_596;
 
-	PlayerStopHandler(final MemoryView aClass110_596) {
+	PlayerStopListener(final MemoryView aClass110_596) {
 		super();
 		this.aClass110_596 = aClass110_596;
 	}
