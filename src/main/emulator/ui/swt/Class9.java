@@ -4,11 +4,11 @@ import java.util.Comparator;
 
 final class Class9 implements Comparator {
 	private final int a;
-	private final MemoryView aC;
+	private final MemoryView mv;
 
 	Class9(final MemoryView aClass110_566, final int anInt565) {
 		super();
-		this.aC = aClass110_566;
+		this.mv = aClass110_566;
 		this.a = anInt565;
 	}
 
@@ -24,22 +24,22 @@ final class Class9 implements Comparator {
 					var10000 = ((String) var1).compareTo((String) var2);
 					break label20;
 				case 1:
-					var10000 = MemoryView.method629(this.aC).method866(var1);
-					var10001 = MemoryView.method629(this.aC).method866(var2);
+					var10000 = this.mv.memoryMgr.method866(var1);
+					var10001 = this.mv.memoryMgr.method866(var2);
 					break;
 				case 2:
-					var10000 = MemoryView.method629(this.aC).method867(var1);
-					var10001 = MemoryView.method629(this.aC).method867(var2);
+					var10000 = this.mv.memoryMgr.method867(var1);
+					var10001 = this.mv.memoryMgr.method867(var2);
 					break;
 				default:
-					return MemoryView.method664(this.aC).getSortDirection() == 128 ? var3 : -var3;
+					return mv.getTheTable().getSortDirection() == 128 ? var3 : -var3;
 			}
 
 			var10000 -= var10001;
 		}
 
 		var3 = var10000;
-		return MemoryView.method664(this.aC).getSortDirection() == 128 ? var3 : -var3;
+		return mv.getTheTable().getSortDirection() == 128 ? var3 : -var3;
 
 	}
 }

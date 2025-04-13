@@ -8,7 +8,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -250,7 +249,7 @@ public final class Watcher implements Runnable, DisposeListener {
 			}
 		}
 		if (o != null && ClassTypes.method871(clazz)) {
-			new Watcher(o).method311(this.parentShell);
+			new Watcher(o).open(this.parentShell);
 		}
 	}
 
@@ -303,7 +302,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.aBoolean545 = false;
 	}
 
-	public final void method311(final Shell parent) {
+	public final void open(final Shell parent) {
 		this.method324();
 		this.method323();
 		int x, y;

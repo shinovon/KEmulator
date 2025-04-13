@@ -16,8 +16,10 @@ final class PlayerResumeListener extends SelectionAdapter {
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
 		final Object value;
-		if (MemoryView.method649(this.aClass110_563).getSelectionIndex() != -1 && MemoryView.method649(this.aClass110_563).getSelectionIndex() < MemoryView.method629(this.aClass110_563).players.size() && (value = MemoryView.method629(this.aClass110_563).players.get(MemoryView.method649(this.aClass110_563).getSelectionIndex())) != null) {
-			Memory.playerAct(value, PlayerActionType.resume);
+		if (MemoryView.method649(this.aClass110_563).getSelectionIndex() != -1 && MemoryView.method649(this.aClass110_563).getSelectionIndex() < this.aClass110_563.memoryMgr.players.size()) {
+			if ((value = this.aClass110_563.memoryMgr.players.get(MemoryView.method649(this.aClass110_563).getSelectionIndex())) != null) {
+				Memory.playerAct(value, PlayerActionType.resume);
+			}
 		}
 	}
 }

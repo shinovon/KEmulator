@@ -12,9 +12,9 @@ final class ImagesCanvasRepainter implements PaintListener {
 	}
 
 	public final void paintControl(final PaintEvent paintEvent) {
-		MemoryView.method669(this.mv, this.mv.imagesCanvas.getSize().x);
-		MemoryView.method675(this.mv, this.mv.imagesCanvas.getSize().y);
-		MemoryView.method680(this.mv, this.mv.imagesCanvas.getVerticalBar().getSelection());
+		this.mv.imagesCanvasWidth = this.mv.imagesCanvas.getSize().x;
+		this.mv.imagesCanvasHeight = this.mv.imagesCanvas.getSize().y;
+		this.mv.imagesCanvasScroll = this.mv.imagesCanvas.getVerticalBar().getSelection();
 		this.mv.paintImagesCanvas(paintEvent.gc);
 	}
 }

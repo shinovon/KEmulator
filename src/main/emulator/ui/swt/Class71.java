@@ -12,7 +12,7 @@ final class Class71 extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		MemoryView.method629(this.aClass110_854).releasedImages.clear();
+		this.aClass110_854.memoryMgr.releasedImages.clear();
 		this.aClass110_854.updateEverything();
 	}
 }

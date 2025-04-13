@@ -18,10 +18,10 @@ final class ImagesCanvasListener extends MouseAdapter {
 		if (mouseEvent.button == 3) {
 			Canvas canvas = this.mv.imagesCanvas;
 			Menu menu;
-			if (this.mv.checkImageClicked(mouseEvent.x, mouseEvent.y)) {
-				menu = MemoryView.method643(this.mv);
+			if (this.mv.selectImageClicked(mouseEvent.x, mouseEvent.y)) {
+				menu = this.mv.menuSaveOne;
 			} else {
-				menu = MemoryView.method663(this.mv);
+				menu = this.mv.menuSaveAll;
 			}
 			canvas.setMenu(menu);
 		}

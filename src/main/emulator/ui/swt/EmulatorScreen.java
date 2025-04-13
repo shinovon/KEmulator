@@ -1389,7 +1389,7 @@ public final class EmulatorScreen implements
 					((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().dispose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().method311(this.shell);
+				((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().open(this.shell);
 				return;
 			}
 			if (menuItem == this.profilerMenuItem) {
@@ -1397,7 +1397,7 @@ public final class EmulatorScreen implements
 					((EmulatorImpl) Emulator.getEmulator()).getProfiler().dispose();
 					return;
 				}
-				((EmulatorImpl) Emulator.getEmulator()).getProfiler().method311(this.shell);
+				((EmulatorImpl) Emulator.getEmulator()).getProfiler().open(this.shell);
 				return;
 			}
 			if (menuItem == this.methodsMenuItem) {

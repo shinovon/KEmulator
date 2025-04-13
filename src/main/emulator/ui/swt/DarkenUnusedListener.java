@@ -12,7 +12,6 @@ final class DarkenUnusedListener extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-        this.mv.darkenUnused = MemoryView.method666(this.mv).getSelection();
-		this.mv.updateEverything();
+        mv.setDarkenUnused();
     }
 }

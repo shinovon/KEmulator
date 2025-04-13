@@ -3,15 +3,15 @@ package emulator.ui.swt;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 
-final class ImagesZoomListener implements ModifyListener {
+final class ImagesSortingListener implements ModifyListener {
 	private final MemoryView mv;
 
-	ImagesZoomListener(final MemoryView mv) {
+	ImagesSortingListener(final MemoryView mv) {
 		super();
 		this.mv = mv;
 	}
 
 	public final void modifyText(final ModifyEvent modifyEvent) {
-		mv.setImagesScaling();
+		mv.setImagesSorting();
 	}
 }

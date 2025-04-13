@@ -12,6 +12,6 @@ final class Class31 extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		MemoryView.method623(this.aClass110_616, 0);
+		this.aClass110_616.changeClassesSort(0);
 	}
 }
