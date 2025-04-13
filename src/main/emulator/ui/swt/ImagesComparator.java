@@ -3,12 +3,12 @@ package emulator.ui.swt;
 import javax.microedition.lcdui.Image;
 import java.util.Comparator;
 
-final class Class15 implements Comparator {
-	private final MemoryView aClass110_580;
+final class ImagesComparator implements Comparator {
+	private final MemoryView mv;
 
-	Class15(final MemoryView aClass110_580) {
+	ImagesComparator(final MemoryView mv) {
 		super();
-		this.aClass110_580 = aClass110_580;
+		this.mv = mv;
 	}
 
 	public final int compare(final Object o, final Object o2) {
@@ -19,14 +19,14 @@ final class Class15 implements Comparator {
 		{
 			int usedCount = 0;
 			int usedCount2 = 0;
-			switch (MemoryView.method645(this.aClass110_580)) {
+			switch (mv.getSortingMethod()) {
 				case 0: {
-					for (int i = 0; i < MemoryView.method634().size(); ++i) {
-						if (o == MemoryView.method634().get(i)) {
+					for (int i = 0; i < MemoryView.allImages.size(); ++i) {
+						if (o == MemoryView.allImages.get(i)) {
 							n = 1;
 							break;
 						}
-						if (o2 == MemoryView.method634().get(i)) {
+						if (o2 == MemoryView.allImages.get(i)) {
 							n = -1;
 							break;
 						}
@@ -46,7 +46,7 @@ final class Class15 implements Comparator {
 			}
 			n = usedCount - usedCount2;
 		}
-		if (MemoryView.method660(this.aClass110_580)) {
+		if (mv.getSortByAscending()) {
 			return n;
 		}
 		return -n;

@@ -12,6 +12,6 @@ final class Class23 extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		MemoryView.method642(this.aClass110_592).redraw();
+        this.aClass110_592.imagesCanvas.redraw();
 	}
 }

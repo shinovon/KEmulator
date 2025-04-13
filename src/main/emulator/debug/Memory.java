@@ -24,13 +24,13 @@ import java.util.Vector;
 
 public final class Memory {
 
-	public Hashtable table;
+	public Hashtable classesTable;
 	public Vector instances;
-	public Vector images;
-	public Vector aVector1463;
-	public Vector players;
-	public Vector m3gObjects;
-	private Vector checkClasses;
+	public Vector images = new Vector();
+	public Vector releasedImages = new Vector();
+	public Vector players = new Vector();
+	public Vector m3gObjects = new Vector();
+	private final Vector checkClasses = new Vector();
 	static Class _J;
 	static Class _I;
 	static Class _S;
@@ -45,7 +45,7 @@ public final class Memory {
 
 	public Memory() {
 		super();
-		this.table = new Hashtable();
+		this.classesTable = new Hashtable();
 		this.instances = new Vector() {
 			public synchronized int indexOf(Object o, int index) {
 				if (o == null) {
@@ -60,11 +60,6 @@ public final class Memory {
 				return -1;
 			}
 		};
-		this.images = new Vector();
-		this.aVector1463 = new Vector();
-		this.players = new Vector();
-		this.m3gObjects = new Vector();
-		checkClasses = new Vector();
 		checkClasses.add("javax.microedition.lcdui.ImageItem");
 		checkClasses.add("javax.microedition.lcdui.CustomItem");
 		checkClasses.add("javax.microedition.lcdui.List");
@@ -74,15 +69,15 @@ public final class Memory {
 		checkClasses.add("javax.microedition.lcdui.Graphics");
 	}
 
-	public final void method846() {
+	public void updateEverything() {
 		if (Settings.recordReleasedImg) {
 			for (int i = 0; i < this.images.size(); ++i) {
-				if (!this.aVector1463.contains(this.images.get(i))) {
-					this.aVector1463.addElement(this.images.get(i));
+				if (!this.releasedImages.contains(this.images.get(i))) {
+					this.releasedImages.addElement(this.images.get(i));
 				}
 			}
 		}
-		this.table.clear();
+		this.classesTable.clear();
 		this.instances.clear();
 		this.images.clear();
 		this.players.clear();
@@ -144,17 +139,17 @@ public final class Memory {
 	}
 
 	private void method847(final Class clazz, final Object o, final String s, boolean vector) {
-		String s2 = clazz.getName();
+		String clazzName = clazz.getName();
 		if (clazz.isArray()) {
-			s2 = ClassTypes.method869(clazz);
+			clazzName = ClassTypes.method869(clazz);
 		}
-		ClassInfo classInfo = (ClassInfo) this.table.get(s2);
+		ClassInfo classInfo = (ClassInfo) this.classesTable.get(clazzName);
 		if (clazz.isInterface()) {
 			return;
 		}
 		if (classInfo == null) {
 			classInfo = new ClassInfo(this, clazz.getName());
-			this.table.put(s2, classInfo);
+			this.classesTable.put(clazzName, classInfo);
 		} else if (o == null) {
 			return;
 		}
@@ -171,8 +166,8 @@ public final class Memory {
 			try {
 				if (o instanceof Image) {
 					this.images.add(o);
-					if (Settings.recordReleasedImg && this.aVector1463.contains(o)) {
-						this.aVector1463.removeElement(o);
+					if (Settings.recordReleasedImg && this.releasedImages.contains(o)) {
+						this.releasedImages.removeElement(o);
 					}
 				} else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
 					if (!PlayerImpl.players.contains(o))
@@ -366,7 +361,7 @@ public final class Memory {
 
 	public final int objectsSize() {
 		int n = 0;
-		final Enumeration<ClassInfo> elements = this.table.elements();
+		final Enumeration<ClassInfo> elements = this.classesTable.elements();
 		while (elements.hasMoreElements()) {
 			n += elements.nextElement().size();
 		}
@@ -531,26 +526,26 @@ public final class Memory {
 		}
 	}
 
-	public static void playerAct(final Object o, final int n) {
+	public static void playerAct(final Object o, final PlayerActionType n) {
 		if (o instanceof Sound) {
 			final Sound sound = (Sound) o;
 			try {
 				switch (n) {
-					case 0: {
+					case resume: {
 						sound.resume();
 						break;
 					}
-					case 1: {
+					case pause: {
 						final long mediaTime = sound.m_player.getMediaTime();
 						sound.stop();
 						sound.m_player.setMediaTime(mediaTime);
 						break;
 					}
-					case 2: {
+					case stop: {
 						sound.stop();
 						break;
 					}
-					case 3: {
+					case export: {
 						try {
 							byte[] b = sound.getData();
 							String s = sound.getExportName();
@@ -573,19 +568,19 @@ public final class Memory {
 		if (o instanceof AudioClip) {
 			final AudioClip audioClip = (AudioClip) o;
 			switch (n) {
-				case 0: {
+				case resume: {
 					audioClip.play(audioClip.loopCount, audioClip.volume);
 					break;
 				}
-				case 1: {
+				case pause: {
 					audioClip.pause();
 					break;
 				}
-				case 2: {
+				case stop: {
 					audioClip.stop();
 					break;
 				}
-				case 3: {
+				case export: {
 					try {
 						byte[] b = audioClip.getData();
 						String s = audioClip.getExportName();
@@ -607,20 +602,20 @@ public final class Memory {
 			final VLCPlayerImpl v = (VLCPlayerImpl) o;
 			try {
 				switch (n) {
-					case 0: {
+					case resume: {
 						v.start();
 						break;
 					}
-					case 1: {
+					case pause: {
 						final long mediaTime2 = v.getMediaTime();
 						v.stop();
 						v.setMediaTime(mediaTime2);
 					}
-					case 2: {
+					case stop: {
 						v.stop();
 						break;
 					}
-					case 3: {
+					case export: {
 						((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export not supported!");
 						break;
 					}
@@ -636,21 +631,21 @@ public final class Memory {
 		final PlayerImpl playerImpl = (PlayerImpl) o;
 		try {
 			switch (n) {
-				case 0: {
+				case resume: {
 					playerImpl.start();
 					break;
 				}
-				case 1: {
+				case pause: {
 					final long mediaTime2 = playerImpl.getMediaTime();
 					playerImpl.stop();
 					playerImpl.setMediaTime(mediaTime2);
 					break;
 				}
-				case 2: {
+				case stop: {
 					playerImpl.stop();
 					break;
 				}
-				case 3: {
+				case export: {
 					try {
 						byte[] b = playerImpl.getData();
 						String s = "audio" + playerImpl.getExportName();
@@ -680,7 +675,7 @@ public final class Memory {
 
 	public final int method866(final Object o) {
 		try {
-			return ((ClassInfo) this.table.get(o)).instancesCount;
+			return ((ClassInfo) this.classesTable.get(o)).instancesCount;
 		} catch (NullPointerException ignored) {
 		}
 		return 0;
@@ -688,14 +683,14 @@ public final class Memory {
 
 	public final int method867(final Object o) {
 		try {
-			return ((ClassInfo) this.table.get(o)).size();
+			return ((ClassInfo) this.classesTable.get(o)).size();
 		} catch (NullPointerException ignored) {
 		}
 		return 0;
 	}
 
 	public final Vector objs(final Object o) {
-		return ((ClassInfo) this.table.get(o)).objs;
+		return ((ClassInfo) this.classesTable.get(o)).objs;
 	}
 
 	public static String refs(final Object o) {

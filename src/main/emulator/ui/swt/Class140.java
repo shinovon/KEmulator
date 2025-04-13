@@ -4,14 +4,14 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
 final class Class140 extends SelectionAdapter {
-	private final MemoryView aClass110_1299;
+	private final MemoryView mv;
 
-	Class140(final MemoryView aClass110_1299) {
+	Class140(final MemoryView mv) {
 		super();
-		this.aClass110_1299 = aClass110_1299;
+		this.mv = mv;
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		MemoryView.method623(this.aClass110_1299, 1);
+		this.mv.changeClassesSort(1);
 	}
 }

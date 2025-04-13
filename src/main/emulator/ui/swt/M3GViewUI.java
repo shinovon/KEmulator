@@ -184,7 +184,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	}
 
 	private void addM3GObjects() {
-		this.memory.method846();
+		this.memory.updateEverything();
 		this.aTree896.removeAll();
 
 		for (int i = 0; i < this.memory.m3gObjects.size(); ++i) {
