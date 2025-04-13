@@ -68,7 +68,6 @@ public final class MemoryView implements DisposeListener {
 	private boolean sortImagesByAscending;
 	Menu menuSaveOne;
 	Menu menuSaveAll;
-	private int anInt1117;
 	private int bytecodeSize;
 	private int objectsSize;
 	private int maxObjectsSize;
@@ -706,7 +705,7 @@ public final class MemoryView implements DisposeListener {
 		final Color foreground = new Color(null, 0, 0, 255);
 		gc.setBackground(background);
 		gc.fillRectangle(0, 0, this.imagesCanvasWidth, this.imagesCanvasHeight);
-		this.anInt1117 = 0;
+		int totalAllocatedPixels = 0;
 		this.drawnImagesBounds.clear();
 		for (int size = MemoryView.imagesToShow.size(), i = 0; i < size; ++i) {
 			Image image;
@@ -763,7 +762,7 @@ public final class MemoryView implements DisposeListener {
 			}
 			n2 += n3 + 10;
 			max = Math.max(max, n4);
-			this.anInt1117 += image.getWidth() * image.getHeight() * 2;
+			totalAllocatedPixels += image.getWidth() * image.getHeight();
 		}
 		background.dispose();
 		color.dispose();
@@ -773,7 +772,7 @@ public final class MemoryView implements DisposeListener {
 		this.imagesCanvas.getVerticalBar().setMaximum(this.anInt1144);
 		this.imagesCanvas.getVerticalBar().setThumb(Math.min(this.anInt1144, this.imagesCanvas.getClientArea().height));
 		this.imagesCanvas.getVerticalBar().setIncrement(10);
-		this.imagesTotalSizeLabel.setText(this.anInt1117 + " bytes");
+		this.imagesTotalSizeLabel.setText(totalAllocatedPixels + " pixels");
 	}
 
 	private void updatePlayersView() {
