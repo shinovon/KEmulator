@@ -137,6 +137,7 @@ public final class EmulatorImpl implements IEmulator {
 		Settings.showMemViewFrame = memoryView != null && this.memoryView.isShown();
 		this.methods.dispose();
 		if (memoryView != null) this.memoryView.dispose();
+		if (mediaView != null) mediaView.dispose();
 		this.classWatcher.dispose();
 		this.profiler.dispose();
 		if (m3gView != null)
