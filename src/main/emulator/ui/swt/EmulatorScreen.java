@@ -751,7 +751,7 @@ public final class EmulatorScreen implements
 		(this.methodsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_METHODS", "Methods"));
 		this.methodsMenuItem.addSelectionListener(this);
 		(this.memoryViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
-		(this.mediaViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEDIA", "Media view"));
+		(this.mediaViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEDIA", "Media View"));
 		(this.m3gViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
 		m3gViewMenuItem.setEnabled(Settings.g3d == 1);
 		this.m3gViewMenuItem.addSelectionListener(this);
