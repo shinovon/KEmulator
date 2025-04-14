@@ -1,10 +1,15 @@
 package emulator.ui.swt;
 
+import com.nokia.mid.sound.Sound;
+import com.samsung.util.AudioClip;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
 import emulator.debug.Memory;
 import emulator.debug.PlayerActionType;
+import emulator.media.capture.CapturePlayerImpl;
+import emulator.media.tone.MIDITonePlayer;
+import emulator.media.vlc.VLCPlayerImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.*;
@@ -12,6 +17,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+
+import javax.microedition.media.MIDIImpl;
+import javax.microedition.media.PlayerImpl;
+import javax.microedition.media.ToneImpl;
 
 /**
  * Tool window that allows user to inspect, modify and export active media players.
@@ -129,7 +138,7 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 			final Object value = this.memoryMgr.players.get(k);
 			final TableItem item = table.getItem(k);
 			int msLen = Memory.getPlayerDurationMs(value);
-			String lengthText = msLen < 0 ? "Unknown": (formatTime(msLen)+String.format(".%1$03d", msLen%1000));
+			String lengthText = msLen < 0 ? "Unknown" : (formatTime(msLen) + String.format(".%1$03d", msLen % 1000));
 			int loopCount = Memory.getPlayerLoopCount(value);
 			item.setText(0, value.toString());
 			item.setText(1, Memory.playerType(value));
@@ -137,7 +146,7 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 			item.setText(3, lengthText);
 			item.setText(4, loopCount < 0 ? "∞" : String.valueOf(loopCount));
 			item.setText(5, String.valueOf(Memory.getPlayerDataLength(value)));
-			item.setText(6, "Unknown");
+			item.setText(6, getImplementation(value));
 		}
 		updateControls();
 	}
@@ -176,10 +185,30 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		}
 	}
 
-	private String formatTime(int ms) {
+	private static String formatTime(int ms) {
 		if (ms < 0)
 			return "??:??";
 		return String.format("%1$02d:%2$02d", ms / 60000, ms / 1000 % 60);
+	}
+
+	private static String getImplementation(Object player) {
+		if (player instanceof AudioClip) {
+			AudioClip ac = ((AudioClip) player);
+			if (ac.type == AudioClip.TYPE_MMF)
+				return "ma3smwemu";
+			return getImplementation(ac.m_player);
+		}
+		if (player instanceof VLCPlayerImpl)
+			return "VLC";
+		if(player instanceof Sound)
+			return getImplementation(((Sound) player).m_player);
+		if(player instanceof ToneImpl || player instanceof MIDITonePlayer || player instanceof MIDIImpl)
+			return "JVM MIDI";
+		if(player instanceof CapturePlayerImpl)
+			return "Capture";
+		if(player instanceof PlayerImpl)
+			return ((PlayerImpl)player).getReadableImplementationType();
+		return "Unknown";
 	}
 
 	private void balanceItemsCount() {

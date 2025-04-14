@@ -19,7 +19,7 @@ public class AudioClip {
 	public int dataLen;
 	public int loopCount;
 	public int volume;
-	private int type;
+	public int type;
 	private byte[] data;
 	private boolean mmfInit;
 	public static final int STATUS_STOP = 0;
