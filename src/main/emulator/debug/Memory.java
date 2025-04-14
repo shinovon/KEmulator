@@ -43,7 +43,14 @@ public final class Memory {
 	public static final Object m3gLock = new Object();
 	public static boolean debuggingM3G;
 
-	public Memory() {
+	private static Memory inst;
+	public static Memory getInstance(){
+		if(inst == null){
+			inst = new Memory();
+		}
+		return inst;
+	}
+	private Memory() {
 		super();
 		this.classesTable = new Hashtable();
 		this.instances = new Vector() {

@@ -100,7 +100,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		this.camera = new Camera();
 		this.cameraTransform = new Transform();
 		this.quaternion = new Quaternion();
-		this.memory = new Memory();
+		this.memory = Memory.getInstance();
 		this.m3gview = M3GView3D.getViewInstance();
 	}
 

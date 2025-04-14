@@ -159,7 +159,7 @@ public final class MemoryView implements DisposeListener {
 		this.audioProgressBar = null;
 		this.pauseAudioBtn = null;
 		this.display = EmulatorImpl.getDisplay();
-		this.memoryMgr = new Memory();
+		this.memoryMgr = Memory.getInstance();
 		this.classRefsVector = new Vector();
 		this.classesList = new ArrayList();
 	}
