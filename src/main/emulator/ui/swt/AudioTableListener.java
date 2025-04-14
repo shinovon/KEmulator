@@ -17,7 +17,7 @@ final class AudioTableListener extends SelectionAdapter {
 		if (mv.getSelectedAudioIndex() != -1 && mv.getSelectedAudioIndex() < this.mv.memoryMgr.players.size()) {
 			if ((value = this.mv.memoryMgr.players.get(mv.getSelectedAudioIndex())) != null) {
 				mv.volumeScale.setSelection(Memory.volume(value));
-				this.mv.audioVolumeLable.setText(String.valueOf(mv.volumeScale.getSelection()));
+				this.mv.audioVolumeLabel.setText(String.valueOf(mv.volumeScale.getSelection()));
 				this.mv.audioProgressBar.setSelection(Memory.progress(value));
 			}
 		}

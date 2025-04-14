@@ -96,7 +96,7 @@ public final class MemoryView implements DisposeListener {
 	private Button stopAudioBtn;
 	private CLabel aCLabel1153;
 	Scale volumeScale;
-	CLabel audioVolumeLable;
+	CLabel audioVolumeLabel;
 	private Table soundsTable;
 	private CLabel aCLabel1155;
 	ProgressBar audioProgressBar;
@@ -153,7 +153,7 @@ public final class MemoryView implements DisposeListener {
 		this.stopAudioBtn = null;
 		this.aCLabel1153 = null;
 		this.volumeScale = null;
-		this.audioVolumeLable = null;
+		this.audioVolumeLabel = null;
 		this.soundsTable = null;
 		this.aCLabel1155 = null;
 		this.audioProgressBar = null;
@@ -449,7 +449,7 @@ public final class MemoryView implements DisposeListener {
 		(this.stopAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_STOP", "Stop"));
 		this.stopAudioBtn.addSelectionListener(new PlayerStopListener(this));
 		(this.aCLabel1153 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_VOLUME", "Volume:"));
-		(this.audioVolumeLable = new CLabel(this.audioControlComp, 0)).setText("0   ");
+		(this.audioVolumeLabel = new CLabel(this.audioControlComp, 0)).setText("0   ");
 		(this.volumeScale = new Scale(this.audioControlComp, 0)).addSelectionListener(new VolumeScaleListener(this));
 		(this.aCLabel1155 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_PROGRESS", "Progress:"));
 		(this.audioProgressBar = new ProgressBar(this.audioControlComp, 65536)).setSelection(0);
@@ -798,7 +798,7 @@ public final class MemoryView implements DisposeListener {
 		final Object value2;
 		if (this.soundsTable.getSelectionIndex() != -1 && this.soundsTable.getSelectionIndex() < this.memoryMgr.players.size() && (value2 = this.memoryMgr.players.get(this.soundsTable.getSelectionIndex())) != null) {
 			this.volumeScale.setSelection(Memory.volume(value2));
-			this.audioVolumeLable.setText(String.valueOf(this.volumeScale.getSelection()));
+			this.audioVolumeLabel.setText(String.valueOf(this.volumeScale.getSelection()));
 			this.audioProgressBar.setSelection(Memory.progress(value2));
 		}
 	}
