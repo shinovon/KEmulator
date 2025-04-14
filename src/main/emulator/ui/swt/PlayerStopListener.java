@@ -17,7 +17,7 @@ final class PlayerStopListener extends SelectionAdapter {
 		final Object value;
 		if (MemoryView.method649(this.aClass110_596).getSelectionIndex() != -1 && MemoryView.method649(this.aClass110_596).getSelectionIndex() < this.aClass110_596.memoryMgr.players.size()) {
 			if ((value = this.aClass110_596.memoryMgr.players.get(MemoryView.method649(this.aClass110_596).getSelectionIndex())) != null) {
-				Memory.playerAct(value, PlayerActionType.stop);
+				Memory.modifyPlayer(value, PlayerActionType.stop);
 			}
 		}
 	}

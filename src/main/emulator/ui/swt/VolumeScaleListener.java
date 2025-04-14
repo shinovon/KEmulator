@@ -18,7 +18,7 @@ final class VolumeScaleListener extends SelectionAdapter {
 		int selected = mv.getSelectedAudioIndex();
 		if (selected != -1 && selected < this.mv.memoryMgr.players.size()) {
 			if ((value = this.mv.memoryMgr.players.get(mv.getSelectedAudioIndex())) != null) {
-				Memory.setVolume(value, mv.volumeScale.getSelection());
+				Memory.setPlayerVolume(value, mv.volumeScale.getSelection());
 			}
 		}
 	}

@@ -102,13 +102,13 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		table.addSelectionListener(this);
 		table.setLayoutData(gd2);
 
-		addTableColumn("Instance",200);
+		addTableColumn("Instance", 200);
 		addTableColumn("Content type", 100);
 		addTableColumn("State", 89);
 		addTableColumn("Duration", 80);
 		addTableColumn("Loops", 50);
-		addTableColumn("Data size",80);
-		addTableColumn("Implementation",100);
+		addTableColumn("Data size", 80);
+		addTableColumn("Implementation", 100);
 
 		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
 		shell.setSize(
@@ -128,14 +128,15 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		for (int k = 0; k < this.memoryMgr.players.size(); ++k) {
 			final Object value = this.memoryMgr.players.get(k);
 			final TableItem item = table.getItem(k);
-			int msLen = Memory.durationMs(value);
+			int msLen = Memory.getPlayerDurationMs(value);
+			String lengthText = msLen < 0 ? "Unknown": (formatTime(msLen)+String.format(".%1$03d", msLen%1000));
+			int loopCount = Memory.getPlayerLoopCount(value);
 			item.setText(0, value.toString());
 			item.setText(1, Memory.playerType(value));
 			item.setText(2, Memory.playerStateStr(value));
-			item.setText(3, msLen < 0 ? "Unknown" : (msLen + " ms"));
-			int loopCount = Memory.loopCount(value);
+			item.setText(3, lengthText);
 			item.setText(4, loopCount < 0 ? "∞" : String.valueOf(loopCount));
-			item.setText(5, String.valueOf(Memory.dataLen(value)));
+			item.setText(5, String.valueOf(Memory.getPlayerDataLength(value)));
 			item.setText(6, "Unknown");
 		}
 		updateControls();
@@ -159,11 +160,26 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		pauseBtn.setEnabled(true);
 		stopBtn.setEnabled(true);
 		exportBtn.setEnabled(Settings.enableMediaDump);
-		volumeValueLabel.setText(Memory.volume(player) + "%");
+		volumeValueLabel.setText(Memory.getPlayerVolume(player) + "%");
 		volumeScale.setEnabled(true);
-		volumeScale.setSelection(Memory.volume(player));
-		timeLabel.setText("TODO");
-		timeBar.setSelection(Memory.progress(player));
+		volumeScale.setSelection(Memory.getPlayerVolume(player));
+		try {
+			int total = Memory.getPlayerDurationMs(player);
+			int now = Memory.getPlayerCurrentMs(player);
+			timeLabel.setText(formatTime(now) + "/" + formatTime(total));
+			if (total > 0 && now >= 0)
+				timeBar.setSelection(now * 100 / total);
+			else
+				timeBar.setSelection(0);
+		} catch (Exception e) {
+			timeLabel.setText("Error");
+		}
+	}
+
+	private String formatTime(int ms) {
+		if (ms < 0)
+			return "??:??";
+		return String.format("%1$02d:%2$02d", ms / 60000, ms / 1000 % 60);
 	}
 
 	private void balanceItemsCount() {
@@ -190,27 +206,27 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 			return;
 		}
 		if (e.widget == resumeBtn) {
-			Memory.playerAct(getSelectedPlayer(), PlayerActionType.resume);
+			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.resume);
 			updateControls();
 			return;
 		}
 		if (e.widget == pauseBtn) {
-			Memory.playerAct(getSelectedPlayer(), PlayerActionType.pause);
+			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.pause);
 			updateControls();
 			return;
 		}
 		if (e.widget == stopBtn) {
-			Memory.playerAct(getSelectedPlayer(), PlayerActionType.stop);
+			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.stop);
 			updateControls();
 			return;
 		}
 		if (e.widget == exportBtn) {
-			Memory.playerAct(getSelectedPlayer(), PlayerActionType.export);
+			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.export);
 			updateControls();
 			return;
 		}
 		if (e.widget == volumeScale) {
-			Memory.setVolume(getSelectedPlayer(), volumeScale.getSelection());
+			Memory.setPlayerVolume(getSelectedPlayer(), volumeScale.getSelection());
 			updateControls();
 			return;
 		}

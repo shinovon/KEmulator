@@ -461,7 +461,7 @@ public final class MemoryView implements DisposeListener {
 				if (soundsTable.getSelectionIndex() != -1 &&
 						soundsTable.getSelectionIndex() < memoryMgr.players.size() &&
 						(value = memoryMgr.players.get(soundsTable.getSelectionIndex())) != null) {
-					Memory.playerAct(value, PlayerActionType.export);
+					Memory.modifyPlayer(value, PlayerActionType.export);
 				}
 			}
 		});
@@ -792,14 +792,14 @@ public final class MemoryView implements DisposeListener {
 			(item = this.soundsTable.getItem(k)).setText(0, value.toString());
 			item.setText(1, Memory.playerType(value));
 			item.setText(2, Memory.playerStateStr(value));
-			item.setText(3, String.valueOf(Memory.loopCount(value)));
-			item.setText(4, String.valueOf(Memory.dataLen(value)));
+			item.setText(3, String.valueOf(Memory.getPlayerLoopCount(value)));
+			item.setText(4, String.valueOf(Memory.getPlayerDataLength(value)));
 		}
 		final Object value2;
 		if (this.soundsTable.getSelectionIndex() != -1 && this.soundsTable.getSelectionIndex() < this.memoryMgr.players.size() && (value2 = this.memoryMgr.players.get(this.soundsTable.getSelectionIndex())) != null) {
-			this.volumeScale.setSelection(Memory.volume(value2));
+			this.volumeScale.setSelection(Memory.getPlayerVolume(value2));
 			this.audioVolumeLabel.setText(String.valueOf(this.volumeScale.getSelection()));
-			this.audioProgressBar.setSelection(Memory.progress(value2));
+			this.audioProgressBar.setSelection(0);
 		}
 	}
 

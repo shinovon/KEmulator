@@ -93,7 +93,8 @@ public final class Memory {
 		this.m3gObjects.clear();
 		try {
 			this.players.addAll(PlayerImpl.players);
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
 			final String s = (String) Emulator.jarClasses.get(j);
 			Class cls = null;
@@ -107,7 +108,8 @@ public final class Memory {
 			} else {
 				try {
 					cls = cls(s);
-				} catch (Throwable ignored) {}
+				} catch (Throwable ignored) {
+				}
 				o = null;
 			}
 			if (cls != null)
@@ -118,7 +120,8 @@ public final class Memory {
 			final String s = (String) checkClasses.get(j);
 			try {
 				cls = cls(s);
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 			if (cls != null)
 				method847(cls, null, s, false);
 		}
@@ -144,7 +147,8 @@ public final class Memory {
 				}
 				Thread.sleep(5);
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	private void method847(final Class clazz, final Object o, final String s, boolean vector) {
@@ -192,7 +196,8 @@ public final class Memory {
 					if (img != null)
 						this.images.add(new MemoryViewImage(img));
 				}
-			} catch (NoClassDefFoundError ignored) {}
+			} catch (NoClassDefFoundError ignored) {
+			}
 		}
 		if (o != null && clazz.isArray()) {
 			Class clazz2 = clazz;
@@ -245,7 +250,8 @@ public final class Memory {
 					}
 					return;
 				}
-			} catch (NoClassDefFoundError ignored) {}
+			} catch (NoClassDefFoundError ignored) {
+			}
 			if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || InputStream.class.isAssignableFrom(clazz)) {
 				final Field[] f = fields(clazz);
 				for (int k = 0; k < f.length; ++k) {
@@ -442,29 +448,53 @@ public final class Memory {
 		}
 	}
 
-	public static int loopCount(final Object o) {
+	public static int getPlayerLoopCount(final Object o) {
 		if (o instanceof Sound && ((Sound) o).m_player instanceof PlayerImpl) {
 			return ((PlayerImpl) ((Sound) o).m_player).loopCount;
 		}
 		if (o instanceof AudioClip) {
 			return ((AudioClip) o).loopCount;
 		}
-		if (!(o instanceof PlayerImpl)) {
-			return 0;
-		}
-		return ((PlayerImpl) o).loopCount;
-	}
-
-	public static int durationMs(final Object o) {
 		if (o instanceof PlayerImpl) {
-			long dur = ((PlayerImpl) o).getDuration();
-			if (dur < 0) return -1;
-			return (int) (dur / 1000);
+			return ((PlayerImpl) o).loopCount;
 		}
-		return -1; //TODO
+		return 0;
 	}
 
-	public static int dataLen(final Object o) {
+	public static int getPlayerDurationMs(final Object o) {
+		if (o == null)
+			return -1;
+		if (o instanceof Sound) {
+			return getPlayerDurationMs(((Sound) o).m_player);
+		}
+		if (o instanceof AudioClip) {
+			return getPlayerDurationMs(((AudioClip) o).m_player);
+		}
+		if (o instanceof Player) {
+			long dur = ((Player) o).getDuration();
+			if (dur < 0) return -1;
+			return (int) (dur / 1000L);
+		}
+		return -1;
+	}
+
+	public static int getPlayerCurrentMs(final Object o) {
+		if (o == null)
+			return -1;
+		if (o instanceof Sound)
+			return getPlayerCurrentMs(((Sound) o).m_player);
+		if (o instanceof AudioClip)
+			return getPlayerCurrentMs(((AudioClip) o).m_player);
+		if (o instanceof Player) {
+			long l = ((Player) o).getMediaTime();
+			if (l < 0)
+				return -1;
+			return (int) (l / 1000L);
+		}
+		return -1;
+	}
+
+	public static int getPlayerDataLength(final Object o) {
 		if (o instanceof Sound) {
 			return ((Sound) o).dataLen;
 		}
@@ -480,31 +510,7 @@ public final class Memory {
 		return ((PlayerImpl) o).dataLen;
 	}
 
-	public static int progress(final Object o) {
-		try {
-			if (o instanceof Sound) {
-				final Sound sound = (Sound) o;
-				return (int) (sound.m_player.getMediaTime() * 100L / (sound.m_player.getDuration() / 1000L));
-			}
-			if (o instanceof AudioClip) {
-				return 0;
-			}
-
-			if (o instanceof VLCPlayerImpl) {
-				final VLCPlayerImpl v = (VLCPlayerImpl) o;
-				return (int) (((double) v.getMediaTime() / (double) v.getDuration()) * 100D);
-			}
-			if (!(o instanceof PlayerImpl)) {
-				return 0;
-			}
-			final PlayerImpl playerImpl = (PlayerImpl) o;
-			return (int) (((double) playerImpl.getMediaTime() / (double) playerImpl.getDuration()) * 100D);
-		} catch (Exception ex) {
-			return 0;
-		}
-	}
-
-	public static int volume(final Object o) {
+	public static int getPlayerVolume(final Object o) {
 		try {
 			if (o instanceof Sound) {
 				return ((Sound) o).getGain();
@@ -516,16 +522,16 @@ public final class Memory {
 			if (o instanceof VLCPlayerImpl) {
 				return ((VolumeControlImpl) ((VLCPlayerImpl) o).getControl("VolumeControl")).getLevel();
 			}
-			if (!(o instanceof PlayerImpl)) {
-				return 0;
+			if (o instanceof PlayerImpl) {
+				return ((VolumeControlImpl) ((PlayerImpl) o).getControl("VolumeControl")).getLevel();
 			}
-			return ((VolumeControlImpl) ((PlayerImpl) o).getControl("VolumeControl")).getLevel();
+			return 0;
 		} catch (Exception ex) {
 			return 0;
 		}
 	}
 
-	public static void setVolume(final Object o, final int n) {
+	public static void setPlayerVolume(final Object o, final int n) {
 		try {
 			if (o instanceof Sound) {
 				((Sound) o).setGain(n);
@@ -544,7 +550,7 @@ public final class Memory {
 		}
 	}
 
-	public static void playerAct(final Object o, final PlayerActionType n) {
+	public static void modifyPlayer(final Object o, final PlayerActionType n) {
 		if (o instanceof Sound) {
 			final Sound sound = (Sound) o;
 			try {
@@ -760,7 +766,8 @@ public final class Memory {
 								final Image2D image2D = (Image2D) o;
 								res += image2D.size();
 							}
-						} catch (NoClassDefFoundError ignored) {}
+						} catch (NoClassDefFoundError ignored) {
+						}
                         /*if (!(cls == Vector.class || cls == Hashtable.class
                                 || cls == StringItem.class || cls == Command.class
                                 || cls == cls("javax.microedition.lcdui.a")
