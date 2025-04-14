@@ -855,6 +855,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	}
 
 	public String getReadableImplementationType() {
+		if(sequence == null)
+			return "Empty player";
 		if(sequence instanceof Sequence)
 			return "JVM MIDI";
 		if(sequence instanceof Clip)
