@@ -131,28 +131,37 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 	}
 
 	private void updateAll() {
+		if (shell.isDisposed())
+			return;
 		memoryMgr.updateEverything();
 		balanceItemsCount();
 
 		for (int k = 0; k < this.memoryMgr.players.size(); ++k) {
 			final Object value = this.memoryMgr.players.get(k);
 			final TableItem item = table.getItem(k);
-			int msLen = Memory.getPlayerDurationMs(value);
-			String lengthText = msLen < 0 ? "Unknown" : (formatTime(msLen) + String.format(".%1$03d", msLen % 1000));
-			int loopCount = Memory.getPlayerLoopCount(value);
-			item.setText(0, value.toString());
-			item.setText(1, Memory.playerType(value));
-			item.setText(2, Memory.playerStateStr(value));
-			item.setText(3, lengthText);
-			item.setText(4, loopCount < 0 ? "∞" : String.valueOf(loopCount));
-			item.setText(5, String.valueOf(Memory.getPlayerDataLength(value)));
-			item.setText(6, getImplementation(value));
+			item.setData(value);
+			updateTableLine(item);
 		}
 		updateControls();
 	}
 
+	private void updateTableLine(TableItem item) {
+		Object value = item.getData();
+		int msLen = Memory.getPlayerDurationMs(value);
+		String lengthText = msLen < 0 ? "Unknown" : (formatTime(msLen) + String.format(".%1$03d", msLen % 1000));
+		int loopCount = Memory.getPlayerLoopCount(value);
+		item.setText(0, value.toString());
+		item.setText(1, Memory.playerType(value));
+		item.setText(2, Memory.playerStateStr(value));
+		item.setText(3, lengthText);
+		item.setText(4, loopCount < 0 ? "∞" : String.valueOf(loopCount));
+		item.setText(5, String.valueOf(Memory.getPlayerDataLength(value)));
+		item.setText(6, getImplementation(value));
+	}
+
 	private void updateControls() {
-		if (table.getSelectionIndex() == -1 || table.getSelectionIndex() > memoryMgr.players.size()) {
+		final Object player = getSelectedPlayer();
+		if (player == null) {
 			resumeBtn.setEnabled(false);
 			pauseBtn.setEnabled(false);
 			stopBtn.setEnabled(false);
@@ -164,7 +173,7 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 			timeBar.setSelection(0);
 			return;
 		}
-		final Object player = getSelectedPlayer();
+
 		resumeBtn.setEnabled(true);
 		pauseBtn.setEnabled(true);
 		stopBtn.setEnabled(true);
@@ -200,14 +209,14 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		}
 		if (player instanceof VLCPlayerImpl)
 			return "VLC";
-		if(player instanceof Sound)
+		if (player instanceof Sound)
 			return getImplementation(((Sound) player).m_player);
-		if(player instanceof ToneImpl || player instanceof MIDITonePlayer || player instanceof MIDIImpl)
+		if (player instanceof ToneImpl || player instanceof MIDITonePlayer || player instanceof MIDIImpl)
 			return "JVM MIDI";
-		if(player instanceof CapturePlayerImpl)
+		if (player instanceof CapturePlayerImpl)
 			return "Capture";
-		if(player instanceof PlayerImpl)
-			return ((PlayerImpl)player).getReadableImplementationType();
+		if (player instanceof PlayerImpl)
+			return ((PlayerImpl) player).getReadableImplementationType();
 		return "Unknown";
 	}
 
@@ -225,7 +234,10 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 	}
 
 	private Object getSelectedPlayer() {
-		return memoryMgr.players.get(table.getSelectionIndex());
+		TableItem[] sel = table.getSelection();
+		if (sel != null && sel.length >= 1)
+			return sel[0].getData();
+		return null;
 	}
 
 	@Override
