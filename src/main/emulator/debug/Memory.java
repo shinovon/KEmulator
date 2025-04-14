@@ -44,12 +44,14 @@ public final class Memory {
 	public static boolean debuggingM3G;
 
 	private static Memory inst;
-	public static Memory getInstance(){
-		if(inst == null){
+
+	public static Memory getInstance() {
+		if (inst == null) {
 			inst = new Memory();
 		}
 		return inst;
 	}
+
 	private Memory() {
 		super();
 		this.classesTable = new Hashtable();
@@ -451,6 +453,15 @@ public final class Memory {
 			return 0;
 		}
 		return ((PlayerImpl) o).loopCount;
+	}
+
+	public static int durationMs(final Object o) {
+		if (o instanceof PlayerImpl) {
+			long dur = ((PlayerImpl) o).getDuration();
+			if (dur < 0) return -1;
+			return (int) (dur / 1000);
+		}
+		return -1; //TODO
 	}
 
 	public static int dataLen(final Object o) {

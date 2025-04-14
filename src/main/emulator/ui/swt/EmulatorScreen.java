@@ -126,6 +126,7 @@ public final class EmulatorScreen implements
 	MenuItem profilerMenuItem;
 	MenuItem methodsMenuItem;
 	MenuItem memoryViewMenuItem;
+	MenuItem mediaViewMenuItem;
 	MenuItem smsConsoleMenuItem;
 	MenuItem sensorMenuItem;
 	MenuItem networkKillswitchMenuItem;
@@ -745,10 +746,12 @@ public final class EmulatorScreen implements
 		(this.methodsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_METHODS", "Methods"));
 		this.methodsMenuItem.addSelectionListener(this);
 		(this.memoryViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
+		(this.mediaViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEDIA", "Media view"));
 		(this.m3gViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
 		m3gViewMenuItem.setEnabled(Settings.g3d == 1);
 		this.m3gViewMenuItem.addSelectionListener(this);
 		this.memoryViewMenuItem.addSelectionListener(this);
+		this.mediaViewMenuItem.addSelectionListener(this);
 		(this.smsConsoleMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SMS", "SMS Console"));
 		this.smsConsoleMenuItem.addSelectionListener(this);
 		(this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
@@ -1414,6 +1417,13 @@ public final class EmulatorScreen implements
 					return;
 				}
 				((EmulatorImpl) Emulator.getEmulator()).getMemory().open();
+			}
+			if (menuItem == this.mediaViewMenuItem) {
+				if (((EmulatorImpl) Emulator.getEmulator()).getMedia().isShown()) {
+					((EmulatorImpl) Emulator.getEmulator()).getMedia().dispose();
+					return;
+				}
+				((EmulatorImpl) Emulator.getEmulator()).getMedia().open();
 			}
 		} else if (parent == menuResize) {
 			if (menuItem == centerOnScreenMenuItem) {

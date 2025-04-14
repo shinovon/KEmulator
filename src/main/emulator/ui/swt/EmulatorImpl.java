@@ -25,6 +25,7 @@ public final class EmulatorImpl implements IEmulator {
 	private int screenDepth;
 	private Methods methods;
 	private MemoryView memoryView;
+	private MediaView mediaView;
 	private Watcher classWatcher;
 	private Watcher profiler;
 	private Property iproperty;
@@ -98,6 +99,13 @@ public final class EmulatorImpl implements IEmulator {
 			this.memoryView = new MemoryView();
 		}
 		return this.memoryView;
+	}
+
+	public final MediaView getMedia() {
+		if (mediaView == null) {
+			this.mediaView = new MediaView();
+		}
+		return this.mediaView;
 	}
 
 	public final Methods getMethods() {

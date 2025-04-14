@@ -1,0 +1,252 @@
+package emulator.ui.swt;
+
+import emulator.Emulator;
+import emulator.Settings;
+import emulator.UILocale;
+import emulator.debug.Memory;
+import emulator.debug.PlayerActionType;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+
+/**
+ * Tool window that allows user to inspect, modify and export active media players.
+ */
+public class MediaView extends SelectionAdapter implements DisposeListener, SelectionListener, Runnable {
+
+	private Shell shell;
+	private final Display display = EmulatorImpl.getDisplay();
+	private final Memory memoryMgr = Memory.getInstance();
+	private Button resumeBtn;
+	private Button pauseBtn;
+	private Button stopBtn;
+	private Button exportBtn;
+	private CLabel volumeLabel;
+	private CLabel volumeValueLabel;
+	private Scale volumeScale;
+	private CLabel timeLabel;
+	private ProgressBar timeBar;
+	private Table table;
+	private boolean visible;
+
+	public void open() {
+		createShell();
+		shell.open();
+		shell.addDisposeListener(this);
+		updateAll();
+		new Thread(this).start();
+		this.visible = true;
+		while (!this.shell.isDisposed()) {
+			if (!this.display.readAndDispatch()) {
+				this.display.sleep();
+			}
+		}
+		this.visible = false;
+	}
+
+	private void createShell() {
+		shell = new Shell(SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN);
+		shell.setText(UILocale.get("MEDIA_VIEW_TITLE", "Media view"));
+		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+		this.shell.setLayout(new GridLayout(9, false));
+
+		resumeBtn = new Button(shell, SWT.FLAT);
+		resumeBtn.setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Resume"));
+		resumeBtn.addSelectionListener(this);
+
+		pauseBtn = new Button(shell, SWT.FLAT);
+		pauseBtn.setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
+		pauseBtn.addSelectionListener(this);
+
+		stopBtn = new Button(shell, SWT.FLAT);
+		stopBtn.setText(UILocale.get("MEMORY_VIEW_SOUND_STOP", "Stop"));
+		stopBtn.addSelectionListener(this);
+
+		exportBtn = new Button(shell, SWT.FLAT);
+		exportBtn.setText(UILocale.get("MEMORY_VIEW_SOUND_EXPORT", "Export"));
+		exportBtn.addSelectionListener(this);
+
+		volumeLabel = new CLabel(shell, SWT.NONE);
+		volumeLabel.setText(UILocale.get("MEMORY_VIEW_VOLUME_LABEL", "Volume"));
+
+		volumeValueLabel = new CLabel(shell, SWT.NONE);
+		volumeValueLabel.setText("000%");
+
+		volumeScale = new Scale(shell, SWT.HORIZONTAL);
+		volumeScale.setMaximum(100);
+		volumeScale.addSelectionListener(this);
+
+		timeLabel = new CLabel(shell, SWT.NONE);
+		timeLabel.setText("0000:00/0000:00");
+
+		GridData gd1 = new GridData();
+		gd1.grabExcessHorizontalSpace = true;
+		gd1.verticalAlignment = GridData.CENTER;
+		gd1.horizontalAlignment = GridData.FILL;
+		timeBar = new ProgressBar(shell, SWT.SMOOTH);
+		timeBar.setLayoutData(gd1);
+
+		GridData gd2 = new GridData();
+		gd2.grabExcessHorizontalSpace = true;
+		gd2.grabExcessVerticalSpace = true;
+		gd2.verticalAlignment = GridData.FILL;
+		gd2.horizontalAlignment = GridData.FILL;
+		gd2.horizontalSpan = 9;
+		table = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		table.addSelectionListener(this);
+		table.setLayoutData(gd2);
+
+		addTableColumn("Instance",200);
+		addTableColumn("Content type", 100);
+		addTableColumn("State", 89);
+		addTableColumn("Duration", 80);
+		addTableColumn("Loops", 50);
+		addTableColumn("Data size",80);
+		addTableColumn("Implementation",100);
+
+		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
+		shell.setSize(
+				(int) (clientArea.width * 0.4),
+				(int) (clientArea.height * 0.6)
+		);
+		shell.setLocation(
+				clientArea.x + (int) (clientArea.height * 0.025),
+				clientArea.y + (int) (clientArea.height * 0.025)
+		);
+	}
+
+	private void updateAll() {
+		memoryMgr.updateEverything();
+		balanceItemsCount();
+
+		for (int k = 0; k < this.memoryMgr.players.size(); ++k) {
+			final Object value = this.memoryMgr.players.get(k);
+			final TableItem item = table.getItem(k);
+			int msLen = Memory.durationMs(value);
+			item.setText(0, value.toString());
+			item.setText(1, Memory.playerType(value));
+			item.setText(2, Memory.playerStateStr(value));
+			item.setText(3, msLen < 0 ? "Unknown" : (msLen + " ms"));
+			int loopCount = Memory.loopCount(value);
+			item.setText(4, loopCount < 0 ? "∞" : String.valueOf(loopCount));
+			item.setText(5, String.valueOf(Memory.dataLen(value)));
+			item.setText(6, "Unknown");
+		}
+		updateControls();
+	}
+
+	private void updateControls() {
+		if (table.getSelectionIndex() == -1 || table.getSelectionIndex() > memoryMgr.players.size()) {
+			resumeBtn.setEnabled(false);
+			pauseBtn.setEnabled(false);
+			stopBtn.setEnabled(false);
+			exportBtn.setEnabled(false);
+			volumeValueLabel.setText("???%");
+			volumeScale.setSelection(0);
+			volumeScale.setEnabled(false);
+			timeLabel.setText("??:??/??:??");
+			timeBar.setSelection(0);
+			return;
+		}
+		final Object player = getSelectedPlayer();
+		resumeBtn.setEnabled(true);
+		pauseBtn.setEnabled(true);
+		stopBtn.setEnabled(true);
+		exportBtn.setEnabled(Settings.enableMediaDump);
+		volumeValueLabel.setText(Memory.volume(player) + "%");
+		volumeScale.setEnabled(true);
+		volumeScale.setSelection(Memory.volume(player));
+		timeLabel.setText("TODO");
+		timeBar.setSelection(Memory.progress(player));
+	}
+
+	private void balanceItemsCount() {
+		int now = table.getItemCount();
+		if (this.memoryMgr.players.size() > now) {
+			for (int i = memoryMgr.players.size() - now; i > 0; --i) {
+				new TableItem(this.table, 0);
+			}
+		} else {
+			for (int j = memoryMgr.players.size(); j < now; ++j) {
+				table.remove(j);
+			}
+		}
+	}
+
+	private Object getSelectedPlayer() {
+		return memoryMgr.players.get(table.getSelectionIndex());
+	}
+
+	@Override
+	public final void widgetSelected(final SelectionEvent e) {
+		if (e.widget == table) {
+			updateControls();
+			return;
+		}
+		if (e.widget == resumeBtn) {
+			Memory.playerAct(getSelectedPlayer(), PlayerActionType.resume);
+			updateControls();
+			return;
+		}
+		if (e.widget == pauseBtn) {
+			Memory.playerAct(getSelectedPlayer(), PlayerActionType.pause);
+			updateControls();
+			return;
+		}
+		if (e.widget == stopBtn) {
+			Memory.playerAct(getSelectedPlayer(), PlayerActionType.stop);
+			updateControls();
+			return;
+		}
+		if (e.widget == exportBtn) {
+			Memory.playerAct(getSelectedPlayer(), PlayerActionType.export);
+			updateControls();
+			return;
+		}
+		if (e.widget == volumeScale) {
+			Memory.setVolume(getSelectedPlayer(), volumeScale.getSelection());
+			updateControls();
+			return;
+		}
+	}
+
+	@Override
+	public void widgetDisposed(DisposeEvent disposeEvent) {
+		this.dispose();
+	}
+
+	public final boolean isShown() {
+		return this.visible;
+	}
+
+	public final void dispose() {
+		if (this.shell != null && !this.shell.isDisposed()) {
+			this.shell.dispose();
+		}
+		this.visible = false;
+	}
+
+	public void run() {
+		try {
+			Thread.sleep(1000);
+			do {
+				EmulatorImpl.syncExec(this::updateAll);
+				Thread.sleep(1000);
+			} while (visible && !this.shell.isDisposed());
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void addTableColumn(String name, int width) {
+		TableColumn tc = new TableColumn(table, SWT.NONE);
+		tc.setText(name);
+		tc.setWidth(width);
+	}
+}

@@ -13,7 +13,7 @@ final class VolumeScaleListener extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		this.mv.audioVolumeLable.setText(String.valueOf(mv.volumeScale.getSelection()));
+		this.mv.audioVolumeLabel.setText(String.valueOf(mv.volumeScale.getSelection()));
 		final Object value;
 		int selected = mv.getSelectedAudioIndex();
 		if (selected != -1 && selected < this.mv.memoryMgr.players.size()) {
