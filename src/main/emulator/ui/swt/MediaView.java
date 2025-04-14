@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.*;
 import javax.microedition.media.MIDIImpl;
 import javax.microedition.media.PlayerImpl;
 import javax.microedition.media.ToneImpl;
+import java.util.Arrays;
+import java.util.Vector;
 
 /**
  * Tool window that allows user to inspect, modify and export active media players.
@@ -34,7 +36,6 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 	private Button pauseBtn;
 	private Button stopBtn;
 	private Button exportBtn;
-	private CLabel volumeLabel;
 	private CLabel volumeValueLabel;
 	private Scale volumeScale;
 	private CLabel timeLabel;
@@ -79,7 +80,7 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		exportBtn.setText(UILocale.get("MEMORY_VIEW_SOUND_EXPORT", "Export"));
 		exportBtn.addSelectionListener(this);
 
-		volumeLabel = new CLabel(shell, SWT.NONE);
+		CLabel volumeLabel = new CLabel(shell, SWT.NONE);
 		volumeLabel.setText(UILocale.get("MEMORY_VIEW_VOLUME_LABEL", "Volume"));
 
 		volumeValueLabel = new CLabel(shell, SWT.NONE);
@@ -134,14 +135,28 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		if (shell.isDisposed())
 			return;
 		memoryMgr.updateEverything();
-		balanceItemsCount();
+		Vector players = new Vector(memoryMgr.players);
+		Vector<TableItem> lines = new Vector<>(Arrays.asList(table.getItems()));
 
-		for (int k = 0; k < this.memoryMgr.players.size(); ++k) {
-			final Object value = this.memoryMgr.players.get(k);
-			final TableItem item = table.getItem(k);
-			item.setData(value);
-			updateTableLine(item);
+		while (!lines.isEmpty()) {
+			TableItem line = lines.lastElement();
+			if (players.contains(line.getData())) {
+				// player is still alive
+				updateTableLine(line);
+				players.remove(line.getData());
+				lines.remove(lines.size() - 1);
+				continue;
+			}
+			// player is dead
+			table.remove(lines.size() - 1);
+			lines.remove(lines.size() - 1);
 		}
+		for (Object player : players) {
+			TableItem line = new TableItem(this.table, 0);
+			line.setData(player);
+			updateTableLine(line);
+		}
+
 		updateControls();
 	}
 
@@ -218,19 +233,6 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		if (player instanceof PlayerImpl)
 			return ((PlayerImpl) player).getReadableImplementationType();
 		return "Unknown";
-	}
-
-	private void balanceItemsCount() {
-		int now = table.getItemCount();
-		if (this.memoryMgr.players.size() > now) {
-			for (int i = memoryMgr.players.size() - now; i > 0; --i) {
-				new TableItem(this.table, 0);
-			}
-		} else {
-			for (int j = memoryMgr.players.size(); j < now; ++j) {
-				table.remove(j);
-			}
-		}
 	}
 
 	private Object getSelectedPlayer() {
