@@ -9,6 +9,6 @@ final class Class41 implements Runnable {
 	}
 
 	public final void run() {
-		EmulatorScreen.method563(this.aClass93_777).setText(EmulatorScreen.method560(this.aClass93_777));
+		EmulatorScreen.getLeftSoftLabel(this.aClass93_777).setText(EmulatorScreen.method560(this.aClass93_777));
 	}
 }

@@ -228,13 +228,15 @@ public final class EmulatorScreen implements
 		}
 		try {
 			this.shell.setImage(new Image(null, inputStream));
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	public void showMessage(final String message) {
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(shell), true);
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 		final MessageBox messageBox;
 		(messageBox = new MessageBox(this.shell)).setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
 		messageBox.setMessage(message);
@@ -244,7 +246,8 @@ public final class EmulatorScreen implements
 	public void showMessage(String title, String detail) {
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(shell), true);
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 
 		Shell shell = new Shell(this.shell, SWT.DIALOG_TRIM);
 		shell.setSize(450, 300);
@@ -687,7 +690,8 @@ public final class EmulatorScreen implements
 				f = new Font(shell.getDisplay(), fd);
 			}
 			shell.setFont(f);
-		} catch (Error ignored) {}
+		} catch (Error ignored) {
+		}
 		this.method588();
 		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
 		this.leftSoftLabel.setLayoutData(layoutData3);
@@ -735,7 +739,8 @@ public final class EmulatorScreen implements
 		this.forcePaintMenuItem.addSelectionListener(this);
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 		new MenuItem(this.menuView, 2);
 		(this.keypadMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
 		this.keypadMenuItem.addSelectionListener(this);
@@ -1162,7 +1167,8 @@ public final class EmulatorScreen implements
 				} else {
 					try {
 						Emulator.getCanvas().repaint();
-					} catch (Exception ignored) {}
+					} catch (Exception ignored) {
+					}
 				}
 				this.updatePauseState();
 				return;
@@ -1183,7 +1189,8 @@ public final class EmulatorScreen implements
 					if ((jadPath = Emulator.getJadPath()) != null) {
 						Runtime.getRuntime().exec("notepad.exe " + jadPath);
 					}
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 				this.updatePauseState();
 				return;
 			}
@@ -1285,7 +1292,8 @@ public final class EmulatorScreen implements
 				Settings.alwaysOnTop = this.alwaysOnTopMenuItem.getSelection();
 				try {
 					setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
-				} catch (Throwable ignored) {}
+				} catch (Throwable ignored) {
+				}
 				return;
 			}
 			if (menuItem == this.logMenuItem) {
@@ -1359,7 +1367,8 @@ public final class EmulatorScreen implements
 							array[1] = "/c \" java -jar " + f.getAbsolutePath() + " \"";
 							Runtime.getRuntime().exec(array);
 						}
-					} catch (Exception ignored) {}
+					} catch (Exception ignored) {
+					}
 				}
 				return;
 			}
@@ -1503,7 +1512,8 @@ public final class EmulatorScreen implements
 				setWindowPos = cls.getMethod("SetWindowPos", long.class, long.class, int.class, int.class, int.class, int.class, int.class);
 				setWindowPos.invoke(null, handle, b ? -1L : -2L, 0, 0, 0, 0, 19);
 			}
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 
 	}
 
@@ -1604,7 +1614,8 @@ public final class EmulatorScreen implements
 			canvas.setTouchEnabled(true);
 			touchEnabled = canvas.getTouchEnabled();
 			canvas.addTouchListener(this);
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 
 		stackLayout = new StackLayout();
 		canvas.setLayout(stackLayout);
@@ -1691,7 +1702,8 @@ public final class EmulatorScreen implements
 					// Hold image (paused)
 					gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
 				}
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 		}
 		screenX = x;
 		screenY = y;
@@ -1755,7 +1767,8 @@ public final class EmulatorScreen implements
 				gc.setForeground(EmulatorScreen.display.getSystemColor(1));
 				gc.drawRectangle(this.mouseXPress, this.mouseYPress, this.mouseXRelease - this.mouseXPress, this.mouseYRelease - this.mouseYPress);
 				OS_SetROP2(gc, 13);
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 		}
 	}
 
@@ -1812,7 +1825,7 @@ public final class EmulatorScreen implements
 					lastDisplayable = null;
 				}
 				if (d == null) return;
-				
+
 				lastDisplayable = d;
 				if (d instanceof javax.microedition.lcdui.Canvas) {
 					stackLayout.topControl = null;
@@ -2187,7 +2200,7 @@ public final class EmulatorScreen implements
 			this.mouseDownInfos = true;
 		}
 		if (this.pauseState == 0 || Settings.playingRecordedKeys
-			|| Emulator.getCurrentDisplay().getCurrent() == null) {
+				|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
 		if (Settings.fpsMode && mouseEvent.button == 3) {
@@ -2424,7 +2437,7 @@ public final class EmulatorScreen implements
 		if (!midletSupportsMultitouch) {
 			return;
 		}
-		for (Touch touch: touchEvent.touches) {
+		for (Touch touch : touchEvent.touches) {
 			Point p = canvas.toControl(touch.x, touch.y);
 			int[] pos = transformPointer(p.x, p.y);
 			int id;
@@ -2454,7 +2467,8 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	public void mouseEnter(MouseEvent arg0) {}
+	public void mouseEnter(MouseEvent arg0) {
+	}
 
 	public void mouseExit(MouseEvent e) {
 		if (Settings.fpsMode) {
@@ -2637,7 +2651,7 @@ public final class EmulatorScreen implements
 		return EmulatorScreen.display;
 	}
 
-	static Canvas method558(final EmulatorScreen class93) {
+	static Canvas getCanvas(final EmulatorScreen class93) {
 		return class93.canvas;
 	}
 
@@ -2645,7 +2659,7 @@ public final class EmulatorScreen implements
 		return class93.aString983;
 	}
 
-	static CLabel method563(final EmulatorScreen class93) {
+	static CLabel getLeftSoftLabel(final EmulatorScreen class93) {
 		return class93.leftSoftLabel;
 	}
 
@@ -2653,7 +2667,7 @@ public final class EmulatorScreen implements
 		return class93.aString989;
 	}
 
-	static CLabel method574(final EmulatorScreen class93) {
+	static CLabel getRightSoftLabel(final EmulatorScreen class93) {
 		return class93.rightSoftLabel;
 	}
 
@@ -2713,6 +2727,7 @@ public final class EmulatorScreen implements
 			public void widgetSelected(SelectionEvent e) {
 				dialogSelection = table.getSelectionIndex();
 			}
+
 			public void widgetDefaultSelected(SelectionEvent e) {
 				if ((dialogSelection = table.getSelectionIndex()) == -1)
 					return;
@@ -2731,12 +2746,13 @@ public final class EmulatorScreen implements
 			t.setText(0, p[0].trim());
 			try {
 				t.setImage(0, new Image(EmulatorImpl.getDisplay(), CustomJarResources.getResourceAsStream(p[1].trim())));
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 		}
 
 		Rectangle clientArea = this.shell.getMonitor().getClientArea();
 		Point size = shell.getSize();
-		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2 , clientArea.y + (clientArea.height - size.y) / 2);
+		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!EmulatorScreen.display.readAndDispatch()) {
@@ -2752,7 +2768,8 @@ public final class EmulatorScreen implements
 
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(shell), true);
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 		MessageBox messageBox = new MessageBox(this.shell, SWT.YES | SWT.NO | SWT.CLOSE);
 		messageBox.setText(UILocale.get("UPDATE_TITLE", "KEmulator Update"));
 		switch (type) {
@@ -2841,28 +2858,28 @@ public final class EmulatorScreen implements
 					}
 					stop = true;
 				}
-			} catch (InterruptedException ignored) {}
+			} catch (InterruptedException ignored) {
+			}
 			this.aClass93_1196.vibraThread = null;
 		}
 	}
 
 	public final class WindowOpen implements Runnable {
-		int anInt1058;
-		private final EmulatorScreen aClass93_1059;
+		int target;
+		private final EmulatorScreen screen;
 
-		WindowOpen(final EmulatorScreen aClass93_1059, final int anInt1058) {
+		WindowOpen(final EmulatorScreen screen, final int target) {
 			super();
-			this.aClass93_1059 = aClass93_1059;
-			this.anInt1058 = 0;
-			this.anInt1058 = anInt1058;
+			this.screen = screen;
+			this.target = target;
 		}
 
 		public void run() {
-			switch (this.anInt1058) {
+			switch (this.target) {
 				case 0: {
 					MemoryView m = ((EmulatorImpl) Emulator.getEmulator()).getMemory();
 					if (Settings.showMemViewFrame && !m.isShown()) {
-						this.aClass93_1059.memoryViewMenuItem.setSelection(true);
+						this.screen.memoryViewMenuItem.setSelection(true);
 						m.open();
 						return;
 					}
@@ -2870,8 +2887,8 @@ public final class EmulatorScreen implements
 				}
 				case 1: {
 					if (Settings.showLogFrame) {
-						this.aClass93_1059.logMenuItem.setSelection(true);
-						((Log) Emulator.getEmulator().getLogStream()).createWindow(EmulatorScreen.method561(this.aClass93_1059));
+						this.screen.logMenuItem.setSelection(true);
+						((Log) Emulator.getEmulator().getLogStream()).createWindow(EmulatorScreen.method561(this.screen));
 						return;
 					}
 					break;
@@ -2879,9 +2896,9 @@ public final class EmulatorScreen implements
 				case 2: {
 					if (Settings.showInfoFrame) {
 						infosEnabled = true;
-						this.aClass93_1059.infosMenuItem.setSelection(true);
-						EmulatorScreen.method558(this.aClass93_1059).setCursor(new Cursor(EmulatorScreen.method564(), 2));
-						((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(EmulatorScreen.method561(this.aClass93_1059));
+						this.screen.infosMenuItem.setSelection(true);
+						EmulatorScreen.getCanvas(this.screen).setCursor(new Cursor(EmulatorScreen.method564(), 2));
+						((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(EmulatorScreen.method561(this.screen));
 						break;
 					}
 					break;
@@ -2905,6 +2922,7 @@ public final class EmulatorScreen implements
 				Emulator.getEventQueue().keyPress(k);
 				Emulator.getEventQueue().keyRelease(k);
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 }
