@@ -1121,7 +1121,11 @@ public class Emulator implements Runnable {
 		getEmulator().disposeSubWindows();
 		notifyDestroyed();
 		try {
-			new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
+			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
+			// something inside SWT libs setting this to X11 on dual-server systems.
+			// GTK is clever enough to decide itself, so clearing it
+			newKem.environment().remove("GDK_BACKEND");
+			newKem.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
