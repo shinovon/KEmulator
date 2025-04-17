@@ -507,6 +507,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		filterInput = new Text(this.shell, 2048);
 		filterInput.setLayoutData(layoutData2);
 		filterInput.setMessage("Filter fields");
+		filterInput.setToolTipText("Filtering will be performed only by fields' names.");
 		filterInput.addModifyListener(this::onFilterTextModify);
 
 		hexDecSwitch = new Button(this.shell, 32);
