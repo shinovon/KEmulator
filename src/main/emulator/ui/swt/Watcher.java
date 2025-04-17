@@ -439,11 +439,10 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		layoutData2.grabExcessHorizontalSpace = true;
 		layoutData2.verticalAlignment = 2;
 		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 6;
+		(layout = new GridLayout()).numColumns = 2;
 		(this.shell = new Shell()).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setLayout(layout);
-		new CLabel(this.shell, 0).setText("Classes:");
 		createClassCombo();
 		shell.setSize(this.defWindowWidth, this.defWindowHeight);
 		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
