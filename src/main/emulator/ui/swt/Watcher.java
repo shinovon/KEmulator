@@ -208,7 +208,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	public void treeCollapsed(TreeEvent var1) {
 	}
 
-	public final void method307(final TreeItem[] array) {
+	public final void openWatcherForSelected() {
+		TreeItem[] array = tree.getSelection();
 		if (array == null || array.length == 0) {
 			return;
 		}
@@ -239,7 +240,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 	}
 
-	public void startFieldEditing(final TreeItem[] array) {
+	public void startFieldEditingForSelected() {
+		TreeItem[] array = tree.getSelection();
 		if (array == null || array.length == 0) {
 			return;
 		}
@@ -449,7 +451,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.tree.setLayoutData(layoutData);
 		this.tree.setToolTipText("Right click to open a Object Watcher");
 		this.tree.addTreeListener(this);
-		this.tree.addMouseListener(new Class12(this));
+		this.tree.addMouseListener(new WatcherTreeMouseHandler(this));
 
 		int colWidth = (int) Math.round((this.shell.getSize().x - 10) / 3);
 		this.treeColumn = new TreeColumn(this.tree, SWT.LEFT);
@@ -649,10 +651,6 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
 		this.dispose();
-	}
-
-	static Tree method309(final Watcher class5) {
-		return class5.tree;
 	}
 
 }
