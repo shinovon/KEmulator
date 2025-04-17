@@ -293,39 +293,12 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.createWidgets();
 		this.fillClassCombo();
 		this.updateContent();
-		int x, y;
-		switch (this.type) {
-			case Instance: {
-				if (parent != null && !parent.isDisposed()) {
-					x = parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x) / 2;
-					y = parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y) / 2;
-					shell.setLocation(x, y);
-					break;
-				}
-				x = this.display.getClientArea().width - this.shell.getSize().x >> 1;
-				y = this.display.getClientArea().height - this.shell.getSize().y >> 1;
-				shell.setLocation(x, y);
-				break;
-			}
-			case Static: {
-				if (!parent.getMaximized()) {
-					this.shell.setSize(parent.getSize());
-					x = parent.getLocation().x - this.shell.getSize().x;
-					y = parent.getLocation().y;
-					shell.setLocation(x, y);
-				}
-				break;
-			}
-			case Profiler: {
-				if (!parent.getMaximized()) {
-					this.shell.setSize(parent.getSize());
-					x = parent.getLocation().x - this.shell.getSize().x;
-					y = parent.getLocation().y;
-					shell.setLocation(x, y);
-				}
-				break;
-			}
+		if (!parent.getMaximized()) {
+			this.shell.setSize(parent.getSize());
 		}
+		int x = parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x) / 2;
+		int y = parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y) / 2;
+		shell.setLocation(x, y);
 		this.parentShell = parent;
 		this.shell.open();
 		this.shell.addDisposeListener(this);
