@@ -36,7 +36,6 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private TreeEditor treeEditor;
 	public static Vector<Watcher> activeWatchers = new Vector();
 	private boolean disposed;
-	boolean valueSetInProgress;
 	boolean updateInProgress;
 	private float propCol1;
 	private float propCol2;
@@ -244,21 +243,16 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			return;
 		}
 		final TreeItem treeItem = array[0];
-		final Text control = new Text(this.tree, 0);
-		control.setText(treeItem.getText(1));
-		control.selectAll();
-		control.setFocus();
-		WatcherFieldEditorHandler handler = new WatcherFieldEditorHandler(this, treeItem, control);
-		control.addFocusListener(handler);
-		control.addKeyListener(handler);
-		this.treeEditor.setEditor(control, treeItem, 1);
-	}
+		Instance c = getWatched();
 
-	public void finishFieldEditing(final TreeItem treeItem, final String valueToSet) {
-		final Instance c = getWatched();
-		this.valueSetInProgress = true;
+		Object target;
+		Field targetField;
+		int targetIndex;
+
 		if (treeItem.getParentItem() == null) {
-			ClassTypes.setFieldValue(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), valueToSet);
+			target = c.getInstance();
+			targetField = (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem));
+			targetIndex = 0;
 		} else {
 			TreeItem parentItem = treeItem;
 			final Stack stack = new Stack<TreeItem>();
@@ -268,7 +262,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			}
 			int n = parentItem.getParent().indexOf(parentItem);
 			Object o = ClassTypes.getFieldValue(c.getInstance(), (Field) c.getFields().get(n));
-			Object o2 = null;
+			Object o2;
 			Label_0140:
 			while (true) {
 				o2 = o;
@@ -282,11 +276,22 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				}
 				break;
 			}
-			if (o2 != null) {
-				ClassTypes.setArrayValue(o2, n, valueToSet);
-			}
+			target = o2;
+			targetIndex = n;
+			targetField = null;
 		}
-		this.valueSetInProgress = false;
+
+		if (target == null && targetField == null)
+			return;
+
+		final Text control = new Text(this.tree, 0);
+		control.setText(treeItem.getText(1));
+		control.selectAll();
+		control.setFocus();
+		WatcherFieldEditorHandler handler = new WatcherFieldEditorHandler(this, treeItem, control, target, targetField, targetIndex);
+		control.addFocusListener(handler);
+		control.addKeyListener(handler);
+		this.treeEditor.setEditor(control, treeItem, 1);
 	}
 
 	public final void open(final Shell parent) {
@@ -341,7 +346,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 	}
 
-	public final void run() {
+	// see WatcherFieldEditorHandler - it locks "this" while writes the new value.
+	public synchronized final void run() {
 		if (this.selectableClasses.isEmpty() || !this.visible || this.updateInProgress || this.disposed) {
 			return;
 		}
@@ -356,16 +362,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 					return;
 				}
 				final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, this.hexDecSwitch.getSelection());
-				if (this.valueSetInProgress) {
-					this.updateInProgress = false;
-					return;
-				}
 				final TreeItem item;
 				(item = this.tree.getItem(n++)).setText(1, s);
-				if (this.valueSetInProgress) {
-					this.updateInProgress = false;
-					return;
-				}
 				this.fillArraySubtree(ClassTypes.getFieldValue(c.getInstance(), field), item);
 			}
 		} catch (Exception ignored) {
@@ -532,12 +530,14 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		(this.classCombo = new Combo(this.shell, SWT.READ_ONLY)).setLayoutData(layoutData);
 		classCombo.setVisibleItemCount(24);
 		this.fillClassCombo();
-		this.classCombo.addModifyListener((ModifyEvent me) -> {
-			valueSetInProgress = true;
+		this.classCombo.addModifyListener(this::onClassSelect);
+	}
+
+	private void onClassSelect(ModifyEvent me) {
+		synchronized (this) {
 			updateContent();
-			valueSetInProgress = false;
-			run();
-		});
+		}
+		run();
 	}
 
 	private void exportValues() {
@@ -612,5 +612,4 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
 		this.dispose();
 	}
-
 }
