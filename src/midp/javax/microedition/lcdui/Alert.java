@@ -127,11 +127,13 @@ public class Alert extends Screen {
 		if (key == Canvas.UP) {
 			scroll = Math.max(0, scroll - Screen.fontHeight4);
 			repaintScreen();
+			timeout = -2;
 			return;
 		}
 		if (key == Canvas.DOWN) {
 			scroll = Math.min(textArr != null ? Screen.fontHeight4 * textArr.length : 0, scroll + Screen.fontHeight4);
 			repaintScreen();
+			timeout = -2;
 		}
 	}
 

@@ -60,10 +60,10 @@ public final class EmulatorScreen implements
 	private Menu menuM3GEngine;
 	private Menu aMenu1018;
 	private Menu menuInterpolation;
-	public static int locX;
-	public static int locY;
-	public static int sizeW;
-	public static int sizeH;
+	public static int locX = Integer.MIN_VALUE;
+	public static int locY = Integer.MIN_VALUE;
+	public static int sizeW = -1;
+	public static int sizeH = -1;
 	public static boolean maximized;
 	public static boolean defaultSize;
 	private Transform paintTransform;

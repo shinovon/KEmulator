@@ -589,7 +589,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
 
-			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "true"));
+			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "false"));
 			Settings.uiLanguage = properties.getProperty("UILanguage", "en");
 			Settings.writeKemCfg = Boolean.parseBoolean(properties.getProperty("WriteKemulatorCfg", "false"));
 
