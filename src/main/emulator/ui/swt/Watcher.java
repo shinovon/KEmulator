@@ -29,6 +29,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private Text filterInput;
 	private Button filterSwitch;
 	private Button hexDecSwitch;
+	private Button exportBtn;
 	private boolean visible;
 	public final Map<String, Instance> selectableClasses = new HashMap<>();
 	public final WatcherType type;
@@ -437,83 +438,10 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
 
 		if (this.type != WatcherType.Profiler) {
-			Button exportBtn = new Button(this.shell, SWT.PUSH);
+			exportBtn = new Button(this.shell, SWT.PUSH);
 			exportBtn.setText("Export");
 			exportBtn.setToolTipText("Watcher content will be saved to data folder");
-			exportBtn.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent selectionEvent) {
-					new Thread(this::exportValues).start();
-				}
-
-				private void exportValues() {
-					try {
-						File file = new File(Emulator.getUserPath() + "/classwatcher.txt");
-						if (!file.exists()) file.createNewFile();
-						PrintStream ps = new PrintStream(new FileOutputStream(file));
-						try {
-							final List list = Arrays.asList(selectableClasses.keySet().toArray());
-							Collections.sort((List<Comparable>) list);
-							for (Object o : list) {
-								ps.println(o);
-								final Instance c = (Instance) selectableClasses.get(o);
-								c.updateFields(null);
-								Vector fields = c.getFields();
-								for (int i = 0; i < fields.size(); ++i) {
-									final Object f = fields.get(i);
-									if (f instanceof Field) {
-										final Field field = (Field) c.getFields().get(i);
-										Class type = field.getType();
-										ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.getReadableClassName(type) + " " + field.getName());
-										try {
-											Object v = field.get(c.getInstance());
-											if (type.isArray()) {
-												int l = Array.getLength(v);
-												ps.println(" = " + ClassTypes.getReadableClassName(v.getClass()).replaceFirst("\\[\\]", "[" + l + "]"));
-												ps.print(" [");
-												for (int n = 0; n < l; n++) {
-													ps.print(ClassTypes.asd(v, n, false));
-													if (n != l - 1) ps.print(", ");
-												}
-												ps.println("]");
-											} else {
-												String s = v.toString();
-												if (v instanceof String) {
-													StringBuilder sb = new StringBuilder();
-													sb.append('"');
-													for (char ch : s.toCharArray()) {
-														if (ch == '\r') {
-															sb.append("\\r");
-															continue;
-														}
-														if (ch == '\n') {
-															sb.append("\\n");
-															continue;
-														}
-														sb.append(ch);
-													}
-													sb.append('"');
-													s = sb.toString();
-												}
-												ps.println(" = " + s);
-											}
-										} catch (NullPointerException e) {
-											ps.println(" = null");
-										} catch (Exception e) {
-											ps.println();
-											ps.println(" " + e);
-										}
-									}
-								}
-								ps.println();
-							}
-						} finally {
-							ps.close();
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
+			exportBtn.addSelectionListener(this);
 		}
 
 		(this.tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL)).setHeaderVisible(true);
@@ -622,6 +550,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		} else if (se.widget == filterSwitch) {
 			updateContent();
 			EmulatorImpl.asyncExec(this);
+		} else if(se.widget == exportBtn) {
+			new Thread(this::exportValues).start();
 		}
 	}
 
@@ -646,6 +576,75 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			valueSetInProgress = false;
 			run();
 		});
+	}
+
+	private void exportValues() {
+		try {
+			File file = new File(Emulator.getUserPath() + "/classwatcher.txt");
+			if (!file.exists()) file.createNewFile();
+			PrintStream ps = new PrintStream(new FileOutputStream(file));
+			try {
+				final List list = Arrays.asList(selectableClasses.keySet().toArray());
+				Collections.sort((List<Comparable>) list);
+				for (Object o : list) {
+					ps.println(o);
+					final Instance c = (Instance) selectableClasses.get(o);
+					c.updateFields(null);
+					Vector fields = c.getFields();
+					for (int i = 0; i < fields.size(); ++i) {
+						final Object f = fields.get(i);
+						if (f instanceof Field) {
+							final Field field = (Field) c.getFields().get(i);
+							Class type = field.getType();
+							ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.getReadableClassName(type) + " " + field.getName());
+							try {
+								Object v = field.get(c.getInstance());
+								if (type.isArray()) {
+									int l = Array.getLength(v);
+									ps.println(" = " + ClassTypes.getReadableClassName(v.getClass()).replaceFirst("\\[\\]", "[" + l + "]"));
+									ps.print(" [");
+									for (int n = 0; n < l; n++) {
+										ps.print(ClassTypes.asd(v, n, false));
+										if (n != l - 1) ps.print(", ");
+									}
+									ps.println("]");
+								} else {
+									String s = v.toString();
+									if (v instanceof String) {
+										StringBuilder sb = new StringBuilder();
+										sb.append('"');
+										for (char ch : s.toCharArray()) {
+											if (ch == '\r') {
+												sb.append("\\r");
+												continue;
+											}
+											if (ch == '\n') {
+												sb.append("\\n");
+												continue;
+											}
+											sb.append(ch);
+										}
+										sb.append('"');
+										s = sb.toString();
+									}
+									ps.println(" = " + s);
+								}
+							} catch (NullPointerException e) {
+								ps.println(" = null");
+							} catch (Exception e) {
+								ps.println();
+								ps.println(" " + e);
+							}
+						}
+					}
+					ps.println();
+				}
+			} finally {
+				ps.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
