@@ -511,6 +511,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 		hexDecSwitch = new Button(this.shell, 32);
 		hexDecSwitch.setText("HEX");
+		hexDecSwitch.setToolTipText("If checked, numbers will be show in hexadecimal form.");
 		hexDecSwitch.addSelectionListener(this);
 	}
 
