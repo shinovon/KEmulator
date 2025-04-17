@@ -13,6 +13,6 @@ final class Class139 extends SelectionAdapter {
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
 		Watcher.method317(this.aClass5_1298);
-		EmulatorImpl.asyncExec(Watcher.method308(this.aClass5_1298));
+		EmulatorImpl.asyncExec(this.aClass5_1298);
 	}
 }

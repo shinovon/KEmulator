@@ -14,7 +14,7 @@ final class Class141 implements ModifyListener {
 	public final void modifyText(final ModifyEvent modifyEvent) {
 		if (Watcher.method312(this.aClass5_1300).getSelection()) {
 			Watcher.method317(this.aClass5_1300);
-			EmulatorImpl.asyncExec(Watcher.method308(this.aClass5_1300));
+			EmulatorImpl.asyncExec(this.aClass5_1300);
 		}
 	}
 }

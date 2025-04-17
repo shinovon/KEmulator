@@ -48,8 +48,8 @@ public final class EmulatorImpl implements IEmulator {
 		this.sms = new MessageConsole();
 		this.infos = new InfosBox();
 		this.keyPad = new KeyPad();
-		this.classWatcher = new Watcher(0);
-		this.profiler = new Watcher(1);
+		this.classWatcher = Watcher.createForStatics();
+		this.profiler = Watcher.createForProfiler();
 		this.methods = new Methods();
 	}
 
@@ -142,8 +142,8 @@ public final class EmulatorImpl implements IEmulator {
 		this.profiler.dispose();
 		if (m3gView != null)
 			this.m3gView.close();
-		while (Watcher.aVector548.size() > 0) {
-			((Watcher) Watcher.aVector548.get(0)).dispose();
+		while (Watcher.activeWatchers.size() > 0) {
+			((Watcher) Watcher.activeWatchers.get(0)).dispose();
 		}
 		for (Object o : this.plugins) {
 			((IPlugin) o).close();
@@ -229,11 +229,8 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 	public final void syncValues() {
-		if (Watcher.profiler != null) {
-			syncExec(Watcher.profiler);
-		}
-		for (int i = 0; i < Watcher.aVector548.size(); ++i) {
-			asyncExec((Runnable) Watcher.aVector548.get(i));
+		for (int i = 0; i < Watcher.activeWatchers.size(); ++i) {
+			asyncExec((Runnable) Watcher.activeWatchers.get(i));
 		}
 		if (this.methods.method438()) {
 			asyncExec(this.methods);
