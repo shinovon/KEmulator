@@ -8,7 +8,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -42,15 +41,14 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private float propCol1;
 	private float propCol2;
 	private float propCol3;
-	private TreeColumn treeColumn;
-	private TreeColumn treeColumn2;
-	private TreeColumn treeColumn3;
-	public boolean isBeingResized = false;
-	public boolean collumnIsDragged = false;
+	private TreeColumn column1;
+	private TreeColumn column2;
+	private TreeColumn column3;
 	private final int defWindowWidth = 640;
 	private final int defWindowHeight = 480;
 	private final int minWindowWidth = 200;
 	private final int minWindowHeight = 210;
+	private long lastShellResizeEvent;
 
 	private Watcher(final WatcherType type) {
 		super();
@@ -303,6 +301,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.parentShell = parent;
 		this.shell.open();
 		this.shell.addDisposeListener(this);
+		updateColumnSizes();
 		this.disposed = false;
 		this.visible = true;
 		EmulatorImpl.asyncExec(this);
@@ -390,33 +389,32 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	private void updateProportionsFromColumnWidths() {
-		collumnIsDragged = true;
-		int minColWidth = (this.minWindowWidth - 10) / 3;
-		int colW = Math.max(minColWidth, this.treeColumn.getWidth());
-		int colW2 = Math.max(minColWidth, this.treeColumn2.getWidth());
+		if (System.currentTimeMillis() - lastShellResizeEvent < 100)
+			return;
+		float sum = tree.getClientArea().width;
 
-		if (this.treeColumn3 != null) {
-			int colW3 = Math.max(minColWidth, this.treeColumn3.getWidth());
-			float totalColW = colW + colW2 + colW3;
+		propCol1 = column1.getWidth() / sum;
 
-			this.propCol1 = colW / totalColW;
-			this.propCol2 = colW2 / totalColW;
-			this.propCol3 = colW3 / totalColW;
+		if (column3 == null) {
+			propCol2 = 1f - propCol1;
 		} else {
-			float totalColW = colW + colW2;
-
-			this.propCol1 = colW / totalColW;
-			this.propCol2 = colW2 / totalColW;
+			propCol2 = column2.getWidth() / sum;
+			propCol3 = 1f - (propCol1 + propCol2);
 		}
-
-		Display.getDefault().timerExec(50, new Runnable() {
-			@Override
-			public void run() {
-				collumnIsDragged = false;
-			}
-		});
 	}
 
+	private void updateColumnSizes() {
+		lastShellResizeEvent = System.currentTimeMillis(); // https://stackoverflow.com/questions/2074966/detecting-when-a-user-is-finished-resizing-swt-shell
+		int width = tree.getClientArea().width;
+		tree.setRedraw(false);
+
+		column1.setWidth((int) (width * propCol1) - 1);
+		column2.setWidth((int) (width * propCol2) - 1);
+		if (column3 != null)
+			column3.setWidth((int) (width * propCol3) - 1);
+
+		tree.setRedraw(true);
+	}
 
 	private void createWidgets() {
 		final GridData layoutData;
@@ -455,82 +453,41 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 		tree.addTreeListener(this);
 
+		this.column1 = new TreeColumn(this.tree, SWT.LEFT);
+		column1.setText("Variable");
+		column1.setMoveable(false);
 
-		int colWidth = (int) Math.round((this.shell.getSize().x - 10) / 3);
-		this.treeColumn = new TreeColumn(this.tree, SWT.LEFT);
-		treeColumn.setText("Variable");
-		treeColumn.setMoveable(false);
-		treeColumn.setWidth(colWidth);
+		this.column2 = new TreeColumn(this.tree, SWT.LEFT);
+		column2.setText("Value");
+		column2.setMoveable(false);
 
-		this.treeColumn2 = new TreeColumn(this.tree, SWT.LEFT);
-		treeColumn2.setText("Value");
-		treeColumn2.setMoveable(false);
-		treeColumn2.setWidth(colWidth);
 
-		ControlAdapter onTreeResized = new ControlAdapter() {
-			@Override
+		ControlAdapter onColumnResized = new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				if (!isBeingResized) {
-					updateProportionsFromColumnWidths();
-				}
+				updateProportionsFromColumnWidths();
+			}
+		};
+		ControlAdapter onTreeResized = new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				updateColumnSizes();
 			}
 		};
 
-		treeColumn.addControlListener(onTreeResized);
-		treeColumn2.addControlListener(onTreeResized);
+		column1.addControlListener(onColumnResized);
+		column2.addControlListener(onColumnResized);
 
 		if (this.type != WatcherType.Profiler) {
-			this.treeColumn3 = new TreeColumn(this.tree, SWT.LEFT);
-			this.treeColumn3.setText("Type");
-			this.treeColumn3.setMoveable(false);
-			this.treeColumn3.setWidth(colWidth);
-			treeColumn3.addControlListener(onTreeResized);
-			this.propCol1 = 0.33f;
-			this.propCol2 = 0.33f;
-			this.propCol3 = 0.34f;
+			this.column3 = new TreeColumn(this.tree, SWT.LEFT);
+			this.column3.setText("Type");
+			this.column3.setMoveable(false);
+			column3.addControlListener(onColumnResized);
+			propCol1 = propCol2 = propCol3 = 1f / 3f;
 		} else {
-			this.treeColumn3 = null;
-			this.propCol1 = 0.5f;
-			this.propCol2 = 0.5f;
+			column3 = null;
+			propCol1 = propCol2 = 0.5f;
 		}
-		this.tree.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				if (!collumnIsDragged) {
-					isBeingResized = true;
-					Rectangle area = tree.getClientArea();
-					int totalWidth = shell.getSize().x - 10;
-					if (tree.getVerticalBar() != null && tree.getVerticalBar().isVisible()) {
-						totalWidth -= tree.getVerticalBar().getSize().x;
-					}
-					tree.setRedraw(false);
-					if (treeColumn3 != null) {
-						int minWidth = 60;
-						int width1 = Math.max(minWidth, Math.round(propCol1 * totalWidth));
-						int width2 = Math.max(minWidth, Math.round(propCol2 * totalWidth));
-						int width3 = Math.max(minWidth, totalWidth - width1 - width2);
 
-						treeColumn.setWidth(width1);
-						treeColumn2.setWidth(width2);
-						treeColumn3.setWidth(width3);
-					} else {
-						int minWidth = 60;
-						int width1 = Math.max(minWidth, Math.round(propCol1 * totalWidth));
-						int width2 = Math.max(minWidth, totalWidth - width1);
-						treeColumn.setWidth(width1);
-						treeColumn2.setWidth(width2);
-					}
-					tree.setRedraw(true);
-					Display.getDefault().timerExec(50, new Runnable() {
-						@Override
-						public void run() {
-							isBeingResized = false;
-						}
-					});
-
-				}
-			}
-		});
+		this.shell.addControlListener(onTreeResized);
 
 		this.treeEditor = new TreeEditor(this.tree);
 		this.treeEditor.horizontalAlignment = SWT.LEFT;
