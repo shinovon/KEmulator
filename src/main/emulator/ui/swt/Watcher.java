@@ -439,12 +439,10 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		shell.setSize(this.defWindowWidth, this.defWindowHeight);
 		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
 
-		if (this.type != WatcherType.Profiler) {
-			exportBtn = new Button(this.shell, SWT.PUSH);
-			exportBtn.setText("Export");
-			exportBtn.setToolTipText("Watcher content will be saved to data folder");
-			exportBtn.addSelectionListener(this);
-		}
+		exportBtn = new Button(this.shell, SWT.PUSH);
+		exportBtn.setText("Export");
+		exportBtn.setToolTipText("Watcher content will be saved to data folder");
+		exportBtn.addSelectionListener(this);
 
 		(this.tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL)).setHeaderVisible(true);
 		this.tree.setLinesVisible(true);
