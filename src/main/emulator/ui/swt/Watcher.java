@@ -428,21 +428,23 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	private void createWidgets() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 6;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 4;
-		layoutData2.grabExcessHorizontalSpace = true;
-		layoutData2.verticalAlignment = 2;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 2;
-		(this.shell = new Shell()).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
-		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.shell.setLayout(layout);
+		final GridData treeLayout = new GridData();
+		treeLayout.horizontalAlignment = 4;
+		treeLayout.horizontalSpan = 2;
+		treeLayout.grabExcessHorizontalSpace = true;
+		treeLayout.grabExcessVerticalSpace = true;
+		treeLayout.verticalAlignment = 4;
+		final GridData filterLayout = new GridData();
+		filterLayout.horizontalAlignment = 4;
+		filterLayout.grabExcessHorizontalSpace = true;
+		filterLayout.verticalAlignment = 2;
+		final GridLayout shellLayout = new GridLayout();
+		shellLayout.numColumns = 2;
+
+		shell = new Shell();
+		shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
+		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+		shell.setLayout(shellLayout);
 		shell.setSize(this.defWindowWidth, this.defWindowHeight);
 		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
 
@@ -456,7 +458,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
-		tree.setLayoutData(layoutData);
+		tree.setLayoutData(treeLayout);
 		if (this.type != WatcherType.Profiler) {
 			tree.setToolTipText("Right click: open watcher\nDouble click: edit value");
 			tree.addMouseListener(new WatcherTreeMouseHandler(this));
@@ -477,7 +479,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				updateProportionsFromColumnWidths();
 			}
 		};
-		ControlAdapter onTreeResized = new ControlAdapter() {
+		ControlAdapter onShellResized = new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
 				updateColumnSizes();
 			}
@@ -497,14 +499,14 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			propCol1 = propCol2 = 0.5f;
 		}
 
-		this.shell.addControlListener(onTreeResized);
+		this.shell.addControlListener(onShellResized);
 
 		this.treeEditor = new TreeEditor(this.tree);
 		this.treeEditor.horizontalAlignment = SWT.LEFT;
 		this.treeEditor.grabHorizontal = true;
 
 		filterInput = new Text(this.shell, 2048);
-		filterInput.setLayoutData(layoutData2);
+		filterInput.setLayoutData(filterLayout);
 		filterInput.setMessage("Filter fields");
 		filterInput.setToolTipText("Filtering will be performed only by fields' names.");
 		filterInput.addModifyListener(this::onFilterTextModify);
