@@ -443,15 +443,15 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		(this.shell = new Shell()).setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setLayout(layout);
-		createClassCombo();
 		shell.setSize(this.defWindowWidth, this.defWindowHeight);
 		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
 
-		exportBtn = new Button(this.shell, SWT.PUSH);
-		exportBtn.setText("Export");
-		exportBtn.setToolTipText("Watcher content will be saved to data folder");
-		exportBtn.addSelectionListener(this);
+		createClassCombo();
 
+		hexDecSwitch = new Button(this.shell, 32);
+		hexDecSwitch.setText("HEX");
+		hexDecSwitch.setToolTipText("If checked, numbers will be show in hexadecimal form.");
+		hexDecSwitch.addSelectionListener(this);
 
 		tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tree.setHeaderVisible(true);
@@ -509,10 +509,11 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		filterInput.setToolTipText("Filtering will be performed only by fields' names.");
 		filterInput.addModifyListener(this::onFilterTextModify);
 
-		hexDecSwitch = new Button(this.shell, 32);
-		hexDecSwitch.setText("HEX");
-		hexDecSwitch.setToolTipText("If checked, numbers will be show in hexadecimal form.");
-		hexDecSwitch.addSelectionListener(this);
+		exportBtn = new Button(this.shell, SWT.PUSH);
+		exportBtn.setText("Export");
+		exportBtn.setToolTipText("Watcher content will be saved to data folder");
+		exportBtn.addSelectionListener(this);
+
 	}
 
 	public void widgetSelected(final SelectionEvent se) {
