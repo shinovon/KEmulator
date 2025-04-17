@@ -26,7 +26,6 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private Shell shell;
 	private Combo classCombo;
 	private Text filterInput;
-	private Button filterSwitch;
 	private Button hexDecSwitch;
 	private Button exportBtn;
 	private boolean visible;
@@ -87,7 +86,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			tree.removeAll();
 			return;
 		}
-		c.updateFields(this.filterSwitch.getSelection() ? this.filterInput.getText() : null);
+		String filterText = filterInput.getText();
+		c.updateFields(filterText.isEmpty() ? null : filterText);
 
 		switch (type) {
 			case Static: {
@@ -504,12 +504,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.treeEditor.horizontalAlignment = SWT.LEFT;
 		this.treeEditor.grabHorizontal = true;
 
-		filterSwitch = new Button(this.shell, 32);
-		filterSwitch.setText("Filter:");
-		filterSwitch.addSelectionListener(this);
-
 		filterInput = new Text(this.shell, 2048);
 		filterInput.setLayoutData(layoutData2);
+		filterInput.setMessage("Filter fields");
 		filterInput.addModifyListener(this::onFilterTextModify);
 
 		hexDecSwitch = new Button(this.shell, 32);
@@ -517,11 +514,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		hexDecSwitch.addSelectionListener(this);
 	}
 
-	public final void widgetSelected(final SelectionEvent se) {
+	public void widgetSelected(final SelectionEvent se) {
 		if (se.widget == hexDecSwitch) {
-			EmulatorImpl.asyncExec(this);
-		} else if (se.widget == filterSwitch) {
-			updateContent();
 			EmulatorImpl.asyncExec(this);
 		} else if (se.widget == exportBtn) {
 			new Thread(this::exportValues).start();
@@ -529,10 +523,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	private void onFilterTextModify(ModifyEvent modifyEvent) {
-		if (filterSwitch.getSelection()) {
-			updateContent();
-			EmulatorImpl.asyncExec(this);
-		}
+		updateContent();
+		EmulatorImpl.asyncExec(this);
 	}
 
 	private void createClassCombo() {
