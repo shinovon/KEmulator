@@ -444,12 +444,17 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		exportBtn.setToolTipText("Watcher content will be saved to data folder");
 		exportBtn.addSelectionListener(this);
 
-		(this.tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL)).setHeaderVisible(true);
-		this.tree.setLinesVisible(true);
-		this.tree.setLayoutData(layoutData);
-		this.tree.setToolTipText("Right click to open a Object Watcher");
-		this.tree.addTreeListener(this);
-		this.tree.addMouseListener(new WatcherTreeMouseHandler(this));
+
+		tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
+		tree.setHeaderVisible(true);
+		tree.setLinesVisible(true);
+		tree.setLayoutData(layoutData);
+		if (this.type != WatcherType.Profiler) {
+			tree.setToolTipText("Right click: open watcher\nDouble click: edit value");
+			tree.addMouseListener(new WatcherTreeMouseHandler(this));
+		}
+		tree.addTreeListener(this);
+
 
 		int colWidth = (int) Math.round((this.shell.getSize().x - 10) / 3);
 		this.treeColumn = new TreeColumn(this.tree, SWT.LEFT);
@@ -550,7 +555,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		} else if (se.widget == filterSwitch) {
 			updateContent();
 			EmulatorImpl.asyncExec(this);
-		} else if(se.widget == exportBtn) {
+		} else if (se.widget == exportBtn) {
 			new Thread(this::exportValues).start();
 		}
 	}
