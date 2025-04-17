@@ -86,7 +86,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			tree.removeAll();
 			return;
 		}
-		String filterText = filterInput.getText();
+		String filterText = filterInput == null ? "" : filterInput.getText();
 		c.updateFields(filterText.isEmpty() ? null : filterText);
 
 		switch (type) {
@@ -374,7 +374,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 					this.updateInProgress = false;
 					return;
 				}
-				final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, this.hexDecSwitch.getSelection());
+				final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, hexDecSwitch != null && hexDecSwitch.getSelection());
 				final TreeItem item;
 				(item = this.tree.getItem(n++)).setText(1, s);
 				this.fillArraySubtree(ClassTypes.getFieldValue(c.getInstance(), field), item);
@@ -392,7 +392,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			for (int i = treeItem.getItemCount() - 1; i >= 0; --i) {
 				final TreeItem item = treeItem.getItem(i);
 				// readable value
-				item.setText(1, ClassTypes.getArrayValue(o, i, this.hexDecSwitch.getSelection()));
+				item.setText(1, ClassTypes.getArrayValue(o, i, hexDecSwitch != null && hexDecSwitch.getSelection()));
 				// recursion for int[][][]... case
 				fillArraySubtree(Array.get(o, i), item);
 			}
@@ -428,32 +428,36 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	private void createWidgets() {
-		final GridData treeLayout = new GridData();
-		treeLayout.horizontalAlignment = 4;
-		treeLayout.horizontalSpan = 2;
-		treeLayout.grabExcessHorizontalSpace = true;
-		treeLayout.grabExcessVerticalSpace = true;
-		treeLayout.verticalAlignment = 4;
-		final GridData filterLayout = new GridData();
-		filterLayout.horizontalAlignment = 4;
-		filterLayout.grabExcessHorizontalSpace = true;
-		filterLayout.verticalAlignment = 2;
-		final GridLayout shellLayout = new GridLayout();
-		shellLayout.numColumns = 2;
-
 		shell = new Shell();
 		shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
 		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		shell.setLayout(shellLayout);
+
 		shell.setSize(this.defWindowWidth, this.defWindowHeight);
 		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
 
-		createClassCombo();
+		boolean isClassComboUseful = createClassCombo();
 
-		hexDecSwitch = new Button(this.shell, 32);
-		hexDecSwitch.setText("HEX");
-		hexDecSwitch.setToolTipText("If checked, numbers will be show in hexadecimal form.");
-		hexDecSwitch.addSelectionListener(this);
+		final GridLayout shellLayout = new GridLayout();
+		shellLayout.numColumns = isClassComboUseful ? 2 : 3;
+		shell.setLayout(shellLayout);
+
+		if (isClassComboUseful)
+			createExportBtn();
+
+		if (type != WatcherType.Profiler) {
+			createFilter();
+			createHexSwitch();
+		}
+
+		if (!isClassComboUseful)
+			createExportBtn();
+
+		final GridData treeLayout = new GridData();
+		treeLayout.horizontalAlignment = 4;
+		treeLayout.horizontalSpan = isClassComboUseful ? 2 : 3;
+		treeLayout.grabExcessHorizontalSpace = true;
+		treeLayout.grabExcessVerticalSpace = true;
+		treeLayout.verticalAlignment = 4;
 
 		tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tree.setHeaderVisible(true);
@@ -504,18 +508,32 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.treeEditor = new TreeEditor(this.tree);
 		this.treeEditor.horizontalAlignment = SWT.LEFT;
 		this.treeEditor.grabHorizontal = true;
+	}
 
+	private void createFilter() {
+		final GridData filterLayout = new GridData();
+		filterLayout.horizontalAlignment = 4;
+		filterLayout.grabExcessHorizontalSpace = true;
+		filterLayout.verticalAlignment = 2;
 		filterInput = new Text(this.shell, 2048);
 		filterInput.setLayoutData(filterLayout);
 		filterInput.setMessage("Filter fields");
 		filterInput.setToolTipText("Filtering will be performed only by fields' names.");
 		filterInput.addModifyListener(this::onFilterTextModify);
+	}
 
+	private void createHexSwitch() {
+		hexDecSwitch = new Button(this.shell, 32);
+		hexDecSwitch.setText("HEX");
+		hexDecSwitch.setToolTipText("If checked, numbers will be shown in hexadecimal form.");
+		hexDecSwitch.addSelectionListener(this);
+	}
+
+	private void createExportBtn() {
 		exportBtn = new Button(this.shell, SWT.PUSH);
 		exportBtn.setText("Export");
 		exportBtn.setToolTipText("Watcher content will be saved to data folder");
 		exportBtn.addSelectionListener(this);
-
 	}
 
 	public void widgetSelected(final SelectionEvent se) {
@@ -531,15 +549,28 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		EmulatorImpl.asyncExec(this);
 	}
 
-	private void createClassCombo() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		(this.classCombo = new Combo(this.shell, SWT.READ_ONLY)).setLayoutData(layoutData);
+	private boolean createClassCombo() {
+		classCombo = new Combo(this.shell, SWT.READ_ONLY);
 		classCombo.setVisibleItemCount(24);
-		this.fillClassCombo();
-		this.classCombo.addModifyListener(this::onClassSelect);
+		fillClassCombo();
+		classCombo.addModifyListener(this::onClassSelect);
+		boolean isUseful = classCombo.getItemCount() > 1;
+
+		if (isUseful) {
+			final GridData layoutData = new GridData();
+			(layoutData).horizontalAlignment = 4;
+			layoutData.grabExcessHorizontalSpace = true;
+			layoutData.verticalAlignment = 2;
+			classCombo.setLayoutData(layoutData);
+		} else {
+			final GridData layoutData = new GridData();
+			layoutData.exclude = true;
+			classCombo.setLayoutData(layoutData);
+			classCombo.setSize(0, 0);
+			classCombo.setVisible(false);
+		}
+
+		return isUseful;
 	}
 
 	private void onClassSelect(ModifyEvent me) {
