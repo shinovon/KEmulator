@@ -32,6 +32,7 @@ final class ClassListFiller implements Runnable {
 							e.printStackTrace();
 						}
 					}
+					break;
 				}
 				case Profiler: {
 					final Instance c2 = new Instance("emulator.debug.Profiler", null);
