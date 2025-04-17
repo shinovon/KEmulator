@@ -4,7 +4,6 @@ import emulator.Emulator;
 import emulator.debug.ClassTypes;
 import emulator.debug.Instance;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
@@ -33,19 +32,15 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	public final WatcherType type;
 	private Tree tree;
 	private TreeEditor treeEditor;
-	public static Vector<Watcher> activeWatchers = new Vector();
+	public static final Vector<Watcher> activeWatchers = new Vector();
 	private boolean disposed;
-	boolean updateInProgress;
+	private boolean updateInProgress;
 	private float propCol1;
 	private float propCol2;
 	private float propCol3;
 	private TreeColumn column1;
 	private TreeColumn column2;
 	private TreeColumn column3;
-	private final int defWindowWidth = 640;
-	private final int defWindowHeight = 480;
-	private final int minWindowWidth = 200;
-	private final int minWindowHeight = 210;
 	private long lastShellResizeEvent;
 
 	private Watcher(final WatcherType type) {
@@ -68,14 +63,13 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.selectableClasses.put(o.toString(), c);
 	}
 
-	public final void fillClassList() {
+	public void fillClassList() {
 		new Thread(new ClassListFiller(this)).start();
 	}
 
 	public Instance getWatched() {
 		return this.selectableClasses.get(classCombo.getText());
 	}
-
 
 	/**
 	 * Call this to update window title and tree layout.
@@ -167,7 +161,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		new TreeItem(treeItem, 0).setText(0, "");
 	}
 
-	public final void treeExpanded(final TreeEvent treeEvent) {
+	public void treeExpanded(final TreeEvent treeEvent) {
 		TreeItem item = (TreeItem) treeEvent.item;
 		if (item.getExpanded()) {
 			return;
@@ -432,8 +426,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
 		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 
-		shell.setSize(this.defWindowWidth, this.defWindowHeight);
-		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
+		shell.setSize(640, 480);
+		shell.setMinimumSize(200, 210);
 
 		boolean isClassComboUseful = createClassCombo();
 
