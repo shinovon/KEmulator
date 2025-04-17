@@ -245,14 +245,17 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		final TreeItem treeItem = array[0];
 		Instance c = getWatched();
 
+		// target will be null for static fields.
 		Object target;
+		// field will be null if we will work with an array.
 		Field targetField;
+		// index will contain sane value if target is array.
 		int targetIndex;
 
 		if (treeItem.getParentItem() == null) {
 			target = c.getInstance();
 			targetField = (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem));
-			targetIndex = 0;
+			targetIndex = -1;
 		} else {
 			TreeItem parentItem = treeItem;
 			final Stack stack = new Stack<TreeItem>();
@@ -281,8 +284,18 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			targetField = null;
 		}
 
+		// somehow nothing to edit was found
 		if (target == null && targetField == null)
 			return;
+
+		if (targetField != null) {
+			// not an array. Checking target type.
+			if (!ClassTypes.canSetFieldValue(targetField))
+				return;
+			// attempt to edit "instance" field over null instance
+			if (target == null && !Modifier.isStatic(targetField.getModifiers()))
+				return;
+		}
 
 		final Text control = new Text(this.tree, 0);
 		control.setText(treeItem.getText(1));

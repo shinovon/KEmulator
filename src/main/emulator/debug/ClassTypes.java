@@ -123,8 +123,7 @@ public final class ClassTypes {
 					} else if (cls == String.class) {
 						Array.set(obj, index, value);
 					}
-				}
-				catch (java.lang.NumberFormatException e){
+				} catch (java.lang.NumberFormatException e) {
 					Emulator.getEmulator().getLogStream().println(e.toString());
 				}
 			}
@@ -163,8 +162,7 @@ public final class ClassTypes {
 				if (!b) {
 					try {
 						b = Integer.parseInt(var2, var3) != 0;
-					}
-					catch (java.lang.NumberFormatException e){
+					} catch (java.lang.NumberFormatException e) {
 						b = false;
 					}
 				}
@@ -173,21 +171,38 @@ public final class ClassTypes {
 				var1.setFloat(var0, Float.parseFloat(var2));
 			} else if (var1.getType() == Double.TYPE) {
 				var1.setDouble(var0, Double.parseDouble(var2));
-			} else {
-				if (var1.getType() != Character.TYPE) {
-					if (var1.getType() == String.class) {
-						var1.set(var0, var2);
-					}
-
-					return;
-				}
-
+			} else if (var1.getType() == Character.TYPE) {
 				var1.setChar(var0, var2.charAt(0));
+			} else if (var1.getType() == String.class) {
+				var1.set(var0, var2);
 			}
 		} catch (Exception var4) {
 			Emulator.getEmulator().getLogStream().println(var4.toString());
 		}
+	}
 
+	// must be synced with method above!
+	public static boolean canSetFieldValue(Field var1) {
+		if (var1.getType() == Long.TYPE) {
+			return true;
+		} else if (var1.getType() == Integer.TYPE) {
+			return true;
+		} else if (var1.getType() == Short.TYPE) {
+			return true;
+		} else if (var1.getType() == Byte.TYPE) {
+			return true;
+		} else if (var1.getType() == Boolean.TYPE) {
+			return true;
+		} else if (var1.getType() == Float.TYPE) {
+			return true;
+		} else if (var1.getType() == Double.TYPE) {
+			return true;
+		} else if (var1.getType() == Character.TYPE) {
+			return true;
+		} else if (var1.getType() == String.class) {
+			return true;
+		}
+		return false;
 	}
 
 	public static Object getFieldValue(Object var0, Field var1) {
