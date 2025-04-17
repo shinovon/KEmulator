@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 
 public final class ClassTypes {
 
-	public static String method869(Class c) {
+	public static String getReadableClassName(Class c) {
 		return !c.isArray() ? c.getName() : method870(c.getName());
 	}
 
@@ -26,23 +26,6 @@ public final class ClassTypes {
 					break;
 				case 'D':
 					s = "double";
-					break;
-				case 'E':
-				case 'G':
-				case 'H':
-				case 'K':
-				case 'M':
-				case 'N':
-				case 'O':
-				case 'P':
-				case 'Q':
-				case 'R':
-				case 'T':
-				case 'U':
-				case 'W':
-				case 'X':
-				case 'Y':
-				default:
 					break;
 				case 'F':
 					s = "float";
@@ -64,6 +47,8 @@ public final class ClassTypes {
 					break;
 				case 'Z':
 					s = "boolean";
+				default:
+					break;
 			}
 
 			StringBuilder sBuilder = new StringBuilder(s);
@@ -220,7 +205,7 @@ public final class ClassTypes {
 		Object e = Array.get(obj, var1);
 		return (e == null ? "null" : (cls == Integer.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getInt(obj, var1)) : String.valueOf(Array.getInt(obj, var1))) : (cls == Boolean.TYPE ? String.valueOf(Array.getBoolean(obj, var1)) : (cls == Byte.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getByte(obj, var1)) : String.valueOf(Array.getByte(obj, var1))) : (cls == Short.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getShort(obj, var1)) : String.valueOf(Array.getShort(obj, var1))) : (cls == Long.TYPE ? (var2 ? "0x" + Long.toHexString(Array.getLong(obj, var1)) : String.valueOf(Array.getLong(obj, var1))) : (cls == Float.TYPE ? String.valueOf(Array.getFloat(obj, var1)) : (cls == Double.TYPE ? String.valueOf(Array.getDouble(obj, var1)) : (cls == Character.TYPE ? String.valueOf(Array.getChar(obj, var1)) : (cls == String.class ? String.valueOf(e) :
 				(!cls.isArray() ? e.toString() :
-						ClassTypes.method869(e.getClass()).replaceFirst("\\[\\]", "[" + Array.getLength(e) + "]")
+						ClassTypes.getReadableClassName(e.getClass()).replaceFirst("\\[\\]", "[" + Array.getLength(e) + "]")
 				)))))))))));
 	}
 }

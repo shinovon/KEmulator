@@ -21,7 +21,7 @@ final class ClassListFiller implements Runnable {
 						final String s = (String) Emulator.jarClasses.get(i);
 						try {
 							final Instance c;
-							if ((c = new Instance(s, s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null)).method879(null)) {
+							if ((c = new Instance(s, s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null)).updateFields(null)) {
 								String s2 = c.toString();
 								if (c.getCls().getSuperclass() != null) {
 									s2 = s2 + "@" + c.getCls().getSuperclass().getName();
@@ -36,11 +36,11 @@ final class ClassListFiller implements Runnable {
 				}
 				case Profiler: {
 					final Instance c2 = new Instance("emulator.debug.Profiler", null);
-					c2.method879(null);
-					((Map) this.watcher.selectableClasses).put("System profiler", c2);
+					c2.updateFields(null);
+					((Map) this.watcher.selectableClasses).put(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler monitor"), c2);
 
 					final Instance c3 = new Instance("emulator.debug.Profiler3D", null);
-					((Map) this.watcher.selectableClasses).put("3D profiler", c3);
+					((Map) this.watcher.selectableClasses).put(emulator.UILocale.get("WATCHES_FRAME_PROFILER_3D", "3D profiler monitor"), c3);
 					break;
 				}
 			}

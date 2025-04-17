@@ -22,7 +22,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.*;
 
-public final class Watcher implements Runnable, DisposeListener {
+public final class Watcher extends SelectionAdapter implements Runnable, DisposeListener, TreeListener {
 	private Shell parentShell;
 	private Shell shell;
 	private Combo classCombo;
@@ -33,9 +33,8 @@ public final class Watcher implements Runnable, DisposeListener {
 	private boolean visible;
 	public final Map<String, Instance> selectableClasses = new HashMap<>();
 	public final WatcherType type;
-	private Tree aTree554;
+	private Tree tree;
 	private TreeEditor aTreeEditor555;
-	private String aString551;
 	public static Vector<Watcher> activeWatchers = new Vector();
 	private boolean disposed;
 	boolean aBoolean545;
@@ -70,7 +69,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	public Watcher(final Object o) {
 		this(WatcherType.Instance);
 		final Instance c = new Instance(o.getClass().getName(), o);
-		c.method879(null);
+		c.updateFields(null);
 		this.selectableClasses.put(o.toString(), c);
 	}
 
@@ -78,55 +77,67 @@ public final class Watcher implements Runnable, DisposeListener {
 		new Thread(new ClassListFiller(this)).start();
 	}
 
-	private void method322() {
-		this.aString551 = this.classCombo.getText();
-		final Instance c = (Instance) this.selectableClasses.get(this.aString551);
+	public Instance getWatched() {
+		return this.selectableClasses.get(classCombo.getText());
+	}
+
+
+	/**
+	 * Call this to update window title and tree layout.
+	 */
+	private void updateContent() {
+		final Instance c = getWatched();
 		if (c == null) {
-			this.aTree554.removeAll();
+			tree.removeAll();
 			return;
 		}
-		c.method879(this.filterSwitch.getSelection() ? this.filterInput.getText() : null);
-		updateTitle(c);
-		this.aTree554.removeAll();
+		c.updateFields(this.filterSwitch.getSelection() ? this.filterInput.getText() : null);
+
+		switch (type) {
+			case Static: {
+				String s = c.getCls().getName();
+				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (static " + s + ')');
+				break;
+			}
+			case Profiler:
+				// it's already localized
+				shell.setText(classCombo.getText());
+				break;
+			case Instance: {
+				Object o = c.getInstance();
+				String s = o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
+				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (" + s + ')');
+				break;
+			}
+		}
+
+		tree.removeAll();
 		for (int i = 0; i < c.getFields().size(); ++i) {
-			final Object value;
-			if ((value = c.getFields().get(i)) instanceof Field) {
+			final Object value = c.getFields().get(i);
+			if (value instanceof Field) {
 				final Field field = (Field) c.getFields().get(i);
-				final TreeItem treeItem;
-				(treeItem = new TreeItem(this.aTree554, 0)).setText(0, field.getName());
-				if (this.type == WatcherType.Instance) {
-					this.aTree554.getItem(i).setText(2, ClassTypes.method869(field.getType()));
+				final TreeItem treeItem = new TreeItem(this.tree, 0);
+				treeItem.setText(0, field.getName());
+				if (this.type != WatcherType.Profiler) {
+					this.tree.getItem(i).setText(2, ClassTypes.getReadableClassName(field.getType()));
 					if (field.getType().isArray()) {
 						new TreeItem(treeItem, 0).setText(0, "");
 					}
 				}
 			} else {
-				new TreeItem(this.aTree554, 0).setText(0, value.getClass().getName());
+				new TreeItem(this.tree, 0).setText(0, value.getClass().getName());
 				if (this.type == WatcherType.Instance) {
-					this.aTree554.getItem(i).setText(2, value.getClass().getName());
+					this.tree.getItem(i).setText(2, value.getClass().getName());
 				}
 			}
 		}
 	}
 
-	private void updateTitle(Instance c) {
-		if (type == WatcherType.Instance && c != null) {
-			Object o = c.getInstance();
-			if (o != null) {
-				String s = o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
-				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (" + s + ')');
-			} else {
-				String s = c.getCls().getName();
-				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (static " + s + ')');
-			}
-		}
-	}
-
 	private void method301(final Instance c, final Field field, final TreeItem treeItem) {
-		final String method869 = ClassTypes.method869(field.getType());
+		final String name = ClassTypes.getReadableClassName(field.getType());
 		if (field.getType().isArray()) {
 			final Object method870 = ClassTypes.getFieldValue(c.getInstance(), field);
-			method305(method870, method303(method870, method869.substring(0, method869.length() - 2)), treeItem);
+			method305(method870, method303(method870, name.substring(0, name.length() - 2)), treeItem);
 		}
 	}
 
@@ -160,13 +171,18 @@ public final class Watcher implements Runnable, DisposeListener {
 		new TreeItem(treeItem, 0).setText(0, "");
 	}
 
-	private void method306(final TreeItem treeItem) {
-		final Instance c = (Instance) this.selectableClasses.get(this.aString551);
-		if (treeItem.getParentItem() == null) {
-			this.method301(c, (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), treeItem);
+	public final void treeExpanded(final TreeEvent treeEvent) {
+		TreeItem item = (TreeItem) treeEvent.item;
+		if (item.getExpanded()) {
 			return;
 		}
-		TreeItem parentItem = treeItem;
+		final Instance c = getWatched();
+		if (item.getParentItem() == null) {
+			this.method301(c, (Field) c.getFields().get(item.getParent().indexOf(item)), item);
+			EmulatorImpl.asyncExec(this);
+			return;
+		}
+		TreeItem parentItem = item;
 		final Stack stack = new Stack<TreeItem>();
 		while (parentItem.getParentItem() != null) {
 			stack.push(parentItem);
@@ -174,7 +190,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		}
 		final Field field = (Field) c.getFields().get(parentItem.getParent().indexOf(parentItem));
 		Object o = ClassTypes.getFieldValue(c.getInstance(), field);
-		final String method869 = ClassTypes.method869(field.getType());
+		final String method869 = ClassTypes.getReadableClassName(field.getType());
 		String s = method303(o, method869.substring(0, method869.length() - 2));
 		String s2;
 		while (true) {
@@ -186,14 +202,18 @@ public final class Watcher implements Runnable, DisposeListener {
 			o = Array.get(o, treeItem2.getParentItem().indexOf(treeItem2));
 			s = s2.substring(0, s2.length() - 2);
 		}
-		method305(o, s2, treeItem);
+		method305(o, s2, item);
+		EmulatorImpl.asyncExec(this);
+	}
+
+	public void treeCollapsed(TreeEvent var1) {
 	}
 
 	public final void method307(final TreeItem[] array) {
 		if (array == null || array.length == 0) {
 			return;
 		}
-		final Instance c = (Instance) this.selectableClasses.get(this.aString551);
+		final Instance c = getWatched();
 		Object o;
 		Class<?> clazz;
 		if (array[0].getParentItem() == null) {
@@ -226,7 +246,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		}
 		final TreeItem treeItem = array[0];
 		final Control control;
-		((Text) (control = new Text(this.aTree554, 0))).setText(treeItem.getText(1));
+		((Text) (control = new Text(this.tree, 0))).setText(treeItem.getText(1));
 		((Text) control).selectAll();
 		control.setFocus();
 		control.addFocusListener(new Class18(this, treeItem, (Text) control));
@@ -235,7 +255,7 @@ public final class Watcher implements Runnable, DisposeListener {
 	}
 
 	private void method310(final TreeItem treeItem, final String s) {
-		final Instance c = (Instance) this.selectableClasses.get(this.aString551);
+		final Instance c = getWatched();
 		this.aBoolean545 = true;
 		if (treeItem.getParentItem() == null) {
 			ClassTypes.setFieldValue(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), s);
@@ -271,11 +291,11 @@ public final class Watcher implements Runnable, DisposeListener {
 
 	public final void open(final Shell parent) {
 		this.createWidgets();
-		this.updateClassCombo();
+		this.fillClassCombo();
+		this.updateContent();
 		int x, y;
 		switch (this.type) {
 			case Instance: {
-//				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
 				if (parent != null && !parent.isDisposed()) {
 					x = parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x) / 2;
 					y = parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y) / 2;
@@ -288,7 +308,6 @@ public final class Watcher implements Runnable, DisposeListener {
 				break;
 			}
 			case Static: {
-				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler Monitor"));
 				if (!parent.getMaximized()) {
 					this.shell.setSize(parent.getSize());
 					x = parent.getLocation().x - this.shell.getSize().x;
@@ -298,8 +317,6 @@ public final class Watcher implements Runnable, DisposeListener {
 				break;
 			}
 			case Profiler: {
-				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_PROFILER_3D", "3D Profiler Monitor"));
-
 				if (!parent.getMaximized()) {
 					this.shell.setSize(parent.getSize());
 					x = parent.getLocation().x - this.shell.getSize().x;
@@ -337,7 +354,7 @@ public final class Watcher implements Runnable, DisposeListener {
 		return this.visible;
 	}
 
-	private void updateClassCombo() {
+	private void fillClassCombo() {
 		if (!this.selectableClasses.isEmpty()) {
 			Set<String> classes = selectableClasses.keySet();
 			final List list = Arrays.asList(classes.toArray());
@@ -348,7 +365,6 @@ public final class Watcher implements Runnable, DisposeListener {
 			}
 			this.classCombo.select(0);
 		}
-		this.method322();
 	}
 
 	public final void run() {
@@ -356,7 +372,7 @@ public final class Watcher implements Runnable, DisposeListener {
 			return;
 		}
 		this.aBoolean559 = true;
-		final Instance c = (Instance) this.selectableClasses.get(this.aString551);
+		final Instance c = getWatched();
 		int n = 0;
 		try {
 			for (int i = 0; i < c.getFields().size(); ++i) {
@@ -371,7 +387,7 @@ public final class Watcher implements Runnable, DisposeListener {
 					return;
 				}
 				final TreeItem item;
-				(item = this.aTree554.getItem(n++)).setText(1, s);
+				(item = this.tree.getItem(n++)).setText(1, s);
 				if (this.aBoolean545) {
 					this.aBoolean559 = false;
 					return;
@@ -468,19 +484,19 @@ public final class Watcher implements Runnable, DisposeListener {
 							for (Object o : list) {
 								ps.println(o);
 								final Instance c = (Instance) selectableClasses.get(o);
-								c.method879(null);
+								c.updateFields(null);
 								Vector fields = c.getFields();
 								for (int i = 0; i < fields.size(); ++i) {
 									final Object f = fields.get(i);
 									if (f instanceof Field) {
 										final Field field = (Field) c.getFields().get(i);
 										Class type = field.getType();
-										ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.method869(type) + " " + field.getName());
+										ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.getReadableClassName(type) + " " + field.getName());
 										try {
 											Object v = field.get(c.getInstance());
 											if (type.isArray()) {
 												int l = Array.getLength(v);
-												ps.println(" = " + ClassTypes.method869(v.getClass()).replaceFirst("\\[\\]", "[" + l + "]"));
+												ps.println(" = " + ClassTypes.getReadableClassName(v.getClass()).replaceFirst("\\[\\]", "[" + l + "]"));
 												ps.print(" [");
 												for (int n = 0; n < l; n++) {
 													ps.print(ClassTypes.asd(v, n, false));
@@ -528,30 +544,42 @@ public final class Watcher implements Runnable, DisposeListener {
 			});
 		}
 
-		(this.aTree554 = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL)).setHeaderVisible(true);
-		this.aTree554.setLinesVisible(true);
-		this.aTree554.setLayoutData(layoutData);
-		this.aTree554.setToolTipText("Right click to open a Object Watcher");
-		this.aTree554.addTreeListener(new Class6(this));
-		this.aTree554.addMouseListener(new Class12(this));
+		(this.tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL)).setHeaderVisible(true);
+		this.tree.setLinesVisible(true);
+		this.tree.setLayoutData(layoutData);
+		this.tree.setToolTipText("Right click to open a Object Watcher");
+		this.tree.addTreeListener(this);
+		this.tree.addMouseListener(new Class12(this));
 
 		int colWidth = (int) Math.round((this.shell.getSize().x - 10) / 3);
-		this.treeColumn = new TreeColumn(this.aTree554, SWT.LEFT);
+		this.treeColumn = new TreeColumn(this.tree, SWT.LEFT);
 		treeColumn.setText("Variable");
 		treeColumn.setMoveable(false);
 		treeColumn.setWidth(colWidth);
 
-		this.treeColumn2 = new TreeColumn(this.aTree554, SWT.LEFT);
+		this.treeColumn2 = new TreeColumn(this.tree, SWT.LEFT);
 		treeColumn2.setText("Value");
 		treeColumn2.setMoveable(false);
 		treeColumn2.setWidth(colWidth);
 
+		ControlAdapter onTreeResized = new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				if (!isBeingResized) {
+					updateProportionsFromColumnWidths();
+				}
+			}
+		};
 
-		if (this.type == WatcherType.Instance) {
-			this.treeColumn3 = new TreeColumn(this.aTree554, SWT.LEFT);
+		treeColumn.addControlListener(onTreeResized);
+		treeColumn2.addControlListener(onTreeResized);
+
+		if (this.type != WatcherType.Profiler) {
+			this.treeColumn3 = new TreeColumn(this.tree, SWT.LEFT);
 			this.treeColumn3.setText("Type");
 			this.treeColumn3.setMoveable(false);
 			this.treeColumn3.setWidth(colWidth);
+			treeColumn3.addControlListener(onTreeResized);
 			this.propCol1 = 0.33f;
 			this.propCol2 = 0.33f;
 			this.propCol3 = 0.34f;
@@ -560,45 +588,17 @@ public final class Watcher implements Runnable, DisposeListener {
 			this.propCol1 = 0.5f;
 			this.propCol2 = 0.5f;
 		}
-		treeColumn.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				if (!isBeingResized) {
-					updateProportionsFromColumnWidths();
-				}
-			}
-		});
-
-		treeColumn2.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				if (!isBeingResized) {
-					updateProportionsFromColumnWidths();
-				}
-			}
-		});
-
-		if (treeColumn3 != null) {
-			treeColumn3.addControlListener(new ControlAdapter() {
-				@Override
-				public void controlResized(ControlEvent e) {
-					if (!isBeingResized) {
-						updateProportionsFromColumnWidths();
-					}
-				}
-			});
-		}
-		this.aTree554.addControlListener(new ControlAdapter() {
+		this.tree.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
 				if (!collumnIsDragged) {
 					isBeingResized = true;
-					Rectangle area = aTree554.getClientArea();
+					Rectangle area = tree.getClientArea();
 					int totalWidth = shell.getSize().x - 10;
-					if (aTree554.getVerticalBar() != null && aTree554.getVerticalBar().isVisible()) {
-						totalWidth -= aTree554.getVerticalBar().getSize().x;
+					if (tree.getVerticalBar() != null && tree.getVerticalBar().isVisible()) {
+						totalWidth -= tree.getVerticalBar().getSize().x;
 					}
-					aTree554.setRedraw(false);
+					tree.setRedraw(false);
 					if (treeColumn3 != null) {
 						int minWidth = 60;
 						int width1 = Math.max(minWidth, Math.round(propCol1 * totalWidth));
@@ -615,7 +615,7 @@ public final class Watcher implements Runnable, DisposeListener {
 						treeColumn.setWidth(width1);
 						treeColumn2.setWidth(width2);
 					}
-					aTree554.setRedraw(true);
+					tree.setRedraw(true);
 					Display.getDefault().timerExec(50, new Runnable() {
 						@Override
 						public void run() {
@@ -627,16 +627,34 @@ public final class Watcher implements Runnable, DisposeListener {
 			}
 		});
 
-		this.aTreeEditor555 = new TreeEditor(this.aTree554);
+		this.aTreeEditor555 = new TreeEditor(this.tree);
 		this.aTreeEditor555.horizontalAlignment = SWT.LEFT;
 		this.aTreeEditor555.grabHorizontal = true;
 
-		(this.filterSwitch = new Button(this.shell, 32)).setText("Filter:");
-		this.filterSwitch.addSelectionListener(new Class139(this));
+		filterSwitch = new Button(this.shell, 32);
+		filterSwitch.setText("Filter:");
+		filterSwitch.addSelectionListener(this);
 		(this.filterInput = new Text(this.shell, 2048)).setLayoutData(layoutData2);
-		this.filterInput.addModifyListener(new Class141(this));
-		(this.hexDecSwitch = new Button(this.shell, 32)).setText("HEX");
-		this.hexDecSwitch.addSelectionListener(new Class8(this));
+		this.filterInput.addModifyListener(this::onFilterTextModify);
+		hexDecSwitch = new Button(this.shell, 32);
+		hexDecSwitch.setText("HEX");
+		hexDecSwitch.addSelectionListener(this);
+	}
+
+	public final void widgetSelected(final SelectionEvent se) {
+		if (se.widget == hexDecSwitch) {
+			EmulatorImpl.asyncExec(this);
+		} else if (se.widget == filterSwitch) {
+			updateContent();
+			EmulatorImpl.asyncExec(this);
+		}
+	}
+
+	private void onFilterTextModify(ModifyEvent modifyEvent) {
+		if (filterSwitch.getSelection()) {
+			updateContent();
+			EmulatorImpl.asyncExec(this);
+		}
 	}
 
 	private void method325() {
@@ -646,7 +664,12 @@ public final class Watcher implements Runnable, DisposeListener {
 		layoutData.verticalAlignment = 2;
 		(this.classCombo = new Combo(this.shell, SWT.READ_ONLY)).setLayoutData(layoutData);
 		classCombo.setVisibleItemCount(24);
-		this.classCombo.addModifyListener(new Class16(this));
+		this.classCombo.addModifyListener((ModifyEvent me) -> {
+			aBoolean545 = true;
+			updateContent();
+			aBoolean545 = false;
+			run();
+		});
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
@@ -657,20 +680,8 @@ public final class Watcher implements Runnable, DisposeListener {
 		class5.method310(treeItem, s);
 	}
 
-	static void method317(final Watcher class5) {
-		class5.method322();
-	}
-
-	static Button method312(final Watcher class5) {
-		return class5.filterSwitch;
-	}
-
-	static void method316(final Watcher class5, final TreeItem treeItem) {
-		class5.method306(treeItem);
-	}
-
 	static Tree method309(final Watcher class5) {
-		return class5.aTree554;
+		return class5.tree;
 	}
 
 	static void method319(final Watcher class5, final TreeItem[] array) {
