@@ -24,6 +24,9 @@ import java.awt.*;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -65,11 +68,12 @@ public class Emulator implements Runnable {
 	public static String httpUserAgent;
 	private final static Thread backgroundThread;
 	private static IEmulatorPlatform platform;
-	public static boolean installed;
 
 	public static final String os = System.getProperty("os.name").toLowerCase();
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
+	public static final boolean macos = os.startsWith("darwin") || os.startsWith("mac os");
+	public static final boolean isPortable = checkIsPortable();
 	private static Class<?> midletClass;
 	private static boolean forked;
 	private static boolean updated;
@@ -172,13 +176,42 @@ public class Emulator implements Runnable {
 		MMFPlayer.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
-			method280();
+			generateJad();
 			return;
 		}
 		saveTargetDevice();
 	}
 
-	private static void method280() {
+	public static void openFileExternally(final String fileName) {
+		try {
+			if (win) {
+				// I intentionally use this only for windows.
+				Desktop.getDesktop().open(new File(fileName));
+				return;
+			}
+			if (macos) {
+				Runtime.getRuntime().exec("open \"" + fileName + "\"");
+				return;
+			}
+			if (linux) {
+				// I have no idea how to open files if there is no XDG.
+				// see https://github.com/ppy/osu/discussions/24499#discussioncomment-6698365 for fun.
+				if (Files.isExecutable(Paths.get("/usr/bin/xdg-open")))
+					Runtime.getRuntime().exec("/usr/bin/xdg-open \"" + fileName + "\"");
+				else if (Files.isExecutable(Paths.get("/usr/bin/gedit")))
+					// let's try gedit? it seems like the most well-known one.
+					Runtime.getRuntime().exec("/usr/bin/gedit \"" + fileName + "\"");
+				else
+					getEmulator().getScreen().showMessage("Non XDG compliant systems are not supported.");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		getEmulator().getScreen().showMessage("Failed to open file.");
+	}
+
+	private static void generateJad() {
 		if (Emulator.midletJar == null) {
 			return;
 		}
@@ -370,19 +403,13 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getJadPath() {
-		File file = null;
-		Label_0068:
-		{
-			File file2;
-			if (Emulator.jadPath != null) {
-				file2 = new File(Emulator.jadPath);
-			} else {
-				if (Emulator.midletJar == null) {
-					break Label_0068;
-				}
-				file2 = new File(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad");
-			}
-			file = file2;
+		File file;
+		if (Emulator.jadPath != null) {
+			file = new File(Emulator.jadPath);
+		} else if (Emulator.midletJar != null) {
+			file = new File(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad");
+		} else {
+			return null;
 		}
 		if (file.exists()) {
 			return file.getAbsolutePath();
@@ -454,7 +481,8 @@ public class Emulator implements Runnable {
 							try {
 								Integer.parseInt(num);
 								midletKeys.add(s);
-							} catch (Exception ignored) {}
+							} catch (Exception ignored) {
+							}
 						}
 					}
 					if (midletKeys.size() != 0) {
@@ -483,7 +511,7 @@ public class Emulator implements Runnable {
 				final String[] split = Emulator.classPath.split(";");
 				for (int i = 0; i < split.length; ++i) {
 					Emulator.emulatorimpl.getLogStream().println("Get classes from " + split[i]);
-					method281(new File(split[i]), null);
+					loadClassesFrom(new File(split[i]), null);
 				}
 				Properties aProperties1369 = null;
 				final File file4;
@@ -512,13 +540,13 @@ public class Emulator implements Runnable {
 		return true;
 	}
 
-	private static void method281(final File file, String s) {
+	private static void loadClassesFrom(final File file, String s) {
 		s = ((s != null) ? (s + ".") : "");
 		final File[] listFiles = file.listFiles();
 		for (int i = 0; i < listFiles.length; ++i) {
 			final String string = s + listFiles[i].getName();
 			if (listFiles[i].isDirectory()) {
-				method281(listFiles[i], string);
+				loadClassesFrom(listFiles[i], string);
 			} else if (string.endsWith(".class")) {
 				Emulator.jarClasses.add(string.substring(0, string.length() - 6));
 				Emulator.emulatorimpl.getLogStream().println("Get class " + string.substring(0, string.length() - 6));
@@ -674,7 +702,8 @@ public class Emulator implements Runnable {
 					Dimension d = w.getViewSize();
 					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 		}
 
 		try {
@@ -691,7 +720,8 @@ public class Emulator implements Runnable {
 				}
 			}
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	private static String getHWID() {
@@ -732,7 +762,8 @@ public class Emulator implements Runnable {
 					break;
 				}
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		String arch = System.getProperty("os.arch");
 		if (!platform.isX64() && !arch.contains("86")) {
 			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try x64 version instead.");
@@ -758,7 +789,7 @@ public class Emulator implements Runnable {
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
 			// Restart with additional arguments required for specific os or java version
-			if (!(forked || Settings.uei) && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
+			if (!(forked || Settings.uei) && (macos || isJava9())) {
 				loadGame(null, false);
 				return;
 			}
@@ -845,7 +876,8 @@ public class Emulator implements Runnable {
 		}
 		try {
 			EmulatorImpl.dispose();
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 		System.exit(0);
 	}
 
@@ -856,7 +888,7 @@ public class Emulator implements Runnable {
 			String[] a = deviceName.split(";");
 			c = new String[a.length][2];
 			int idx = 0;
-			for (String s: a) {
+			for (String s : a) {
 				int i = s.indexOf(':');
 				if (i == -1) {
 					deviceName = s;
@@ -872,7 +904,7 @@ public class Emulator implements Runnable {
 		}
 		Emulator.emulatorimpl.getProperty().setCustomProperties();
 		if (c != null) {
-			for (String[] p: c) {
+			for (String[] p : c) {
 				if (p == null || p[0] == null) continue;
 				Devices.setProperty(p[0], p[1]);
 			}
@@ -938,8 +970,6 @@ public class Emulator implements Runnable {
 				Settings.micro3d = 0;
 			} else if (key.equalsIgnoreCase("log")) {
 				Settings.showLogFrame = true;
-			} else if (key.equalsIgnoreCase("installed")) {
-				installed = true;
 			} else if (key.equalsIgnoreCase("uei")) {
 				Settings.uei = true;
 			} else if (key.equalsIgnoreCase("s")) {
@@ -1011,22 +1041,83 @@ public class Emulator implements Runnable {
 		return s;
 	}
 
+	private static boolean checkIsPortable() {
+		String path = getAbsoluteFile();
+		// if kemu jar is read-only, it's probably somewhere in system folders.
+		if (Files.exists(Paths.get(path)) && !Files.isWritable(Paths.get(path)))
+			return false;
+
+		// we may live in system folders but are writable (container, misconfiguration, etc.)
+		if (linux) {
+			// we installed from package
+			if (path.startsWith("/opt/") || path.startsWith("/usr/") || path.startsWith("/bin/"))
+				return false;
+			// we live in ~.local/bin
+			if (path.contains("/home/") && path.contains("/.local/"))
+				return false;
+			//TODO flatpack/snap?
+
+			return true;
+		}
+		if (win) {
+			// installer will write to registry path to installed jar. Let's check it.
+			try {
+				Process regRequest = Runtime.getRuntime().exec("reg query \"HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator\" /v JarInstalledPath");
+				StringBuilder sw = new StringBuilder();
+				try (InputStream is = regRequest.getInputStream()) {
+					int c;
+					while ((c = is.read()) != -1)
+						sw.append((char) c);
+				}
+				String output = sw.toString();
+				int i = output.indexOf("REG_SZ");
+				if (i != -1) {
+					String pathFromReg = output.substring(i + 6).trim();
+					if (Files.isSameFile(Paths.get(pathFromReg), Paths.get(path)))
+						return false; // we are running "installed" instance
+				}
+			} catch (IOException e) {
+				// ignore
+			}
+
+			// installed into appdata
+			if (path.contains("\\Users\\") && path.contains("\\AppData\\Local\\"))
+				return false;
+
+			// all other cases will be handled by writeablility check above.
+			return true;
+		}
+
+		// non-".app" program management on macos is messy so doing nothing
+		return true;
+	}
+
 	public static String getUserPath() {
 		installed:
 		{
-			if (installed) {
+			if (!isPortable) {
 				String s;
 				if (linux) {
-					s = "~/local/share/KEmulator";
-				} else {
+					s = System.getenv("HOME") + "/.local/share/KEmulator/";
+				} else if (win) {
 					s = System.getenv("APPDATA");
 					if (s == null)
 						break installed;
 					s += "\\KEmulator";
+				} else {
+					break installed;
 				}
-				File f = new File(s);
-				if ((f.exists() && f.isDirectory()) || f.mkdir())
+				Path p = Paths.get(s);
+				if (Files.exists(p) && Files.isDirectory(p))
 					return s;
+
+				try {
+					Files.createDirectories(p);
+				} catch (IOException e) {
+					break installed;
+				}
+
+				return s;
 			}
 		}
 		return getAbsolutePath();
@@ -1061,7 +1152,7 @@ public class Emulator implements Runnable {
 			cmd.add("-XstartOnFirstThread");
 		}
 
-		
+
 		if (debugBuild) {
 			File f = new File(getAbsolutePath() + "/../eclipse/KEmulator_base/agent.jar");
 			if (f.exists()) {
@@ -1114,14 +1205,16 @@ public class Emulator implements Runnable {
 		cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
 		cmd.add(mascotEngine == 0 ? "-mascotdll" : "-mascotgl");
 
-		if (installed) cmd.add("-installed");
-
 		cmd.add("-s");
 
 		getEmulator().disposeSubWindows();
 		notifyDestroyed();
 		try {
-			new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
+			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
+			// something inside SWT libs setting this to X11 on dual-server systems.
+			// GTK is clever enough to decide itself, so clearing it
+			newKem.environment().remove("GDK_BACKEND");
+			newKem.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -1137,7 +1230,8 @@ public class Emulator implements Runnable {
 				properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 				return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		return null;
 	}
 
@@ -1184,7 +1278,7 @@ public class Emulator implements Runnable {
 	public static IGraphics3D getGraphics3D() {
 		return platform.getGraphics3D();
 	}
-	
+
 	public static int getJavaVersionMajor() {
 		try {
 			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);

@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.19.2 [2025.03.23]
+$v2.19.2 [2025.04.15]
 StringItem layout improvements
 Fixed FileConnection filter
 Fixed Ticker bug
@@ -53,6 +53,10 @@ Implemented Display.getColor()
 Fixed Display.setCurrentItem()
 Fixed Form.delete()
 Implemented List.setFitPolicy()
+Auto scaling element images in List
+Fixed selection in ChoiceGroup MULTIPLE mode
+Fixed SWT library loading on Intel Mac
+Fixed M3G depth buffer
 
 $v2.19.1 [2025.02.12]
 Update LWJGL to 3.3.6

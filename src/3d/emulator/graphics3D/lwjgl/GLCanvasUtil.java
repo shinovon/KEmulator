@@ -20,7 +20,7 @@ public class GLCanvasUtil {
 			try {
 				Emulator.getEmulator().getLogStream().println("Initializing GLCanvas from swt");
 				org.eclipse.swt.opengl.GLData gld = new org.eclipse.swt.opengl.GLData();
-//				gld.depthSize = Math.min(24, Emulator.getEmulator().getScreenDepth());
+				gld.depthSize = Math.min(24, Emulator.getEmulator().getScreenDepth());
 //				gld.doubleBuffer = true;
 
 				int samples = 4;
