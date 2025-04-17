@@ -489,8 +489,9 @@ public final class Watcher implements Runnable, DisposeListener {
 		this.shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
 
 		if (this.type == 0) {
-			Button exportBtn;
-			(exportBtn = new Button(this.shell, SWT.PUSH)).setText("Export");
+			Button exportBtn = new Button(this.shell, SWT.PUSH);
+			exportBtn.setText("Export");
+			exportBtn.setToolTipText("Watcher content will be saved to data folder");
 			exportBtn.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent selectionEvent) {
 					new Thread(() -> {

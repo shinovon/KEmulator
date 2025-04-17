@@ -9,6 +9,9 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -64,31 +67,25 @@ public class Updater {
 		}
 	}
 
-	public static void downloadUpdater() throws IOException {
-		ReadableByteChannel inChannel = null;
-		FileOutputStream fileStream = null;
-		FileChannel fileChannel = null;
-		try {
-			inChannel = Channels.newChannel(getHttpStream(UPDATER_URL));
-			fileStream = new FileOutputStream(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar");
-
-			fileChannel = fileStream.getChannel();
-			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
-		} finally {
-			if (inChannel != null) inChannel.close();
-			if (fileChannel != null) fileChannel.close();
-			if (fileStream != null) fileStream.close();
-		}
-	}
-
 	public static void startUpdater(boolean restart) {
 		Emulator.getEmulator().getLogStream().println("Starting updater");
 
 		try {
 			downloadUpdater();
 		} catch (Exception e) {
+			String path = Emulator.getAbsolutePath();
+			if (Files.exists(Paths.get(path)) && !Files.isWritable(Paths.get(path))) {
+				// emulator is in system folder or on read-only disk.
+				if (Emulator.linux && Files.exists(Paths.get("/usr/bin/pacman"))) {
+					Emulator.getEmulator().getScreen().showMessage("You are running system-wide installation. Use your package manager (i.e. \"yay -S kemulatornnmod-bin\").");
+				} else {
+					Emulator.getEmulator().getScreen().showMessage("KEmulator is installed in read-only location. Use external software management tools or restart KEmulator with admin/root permissions.");
+				}
+				return;
+			}
+			Emulator.getEmulator().getScreen().showMessage("Failed to download update helper.");
 			e.printStackTrace();
-			// TODO error message
+			return;
 		}
 
 		if (!new File(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar").exists())
@@ -120,9 +117,6 @@ public class Updater {
 		cmd.add("-branch");
 		cmd.add(Settings.updateBranch);
 
-		if (Emulator.installed)
-			cmd.add("-installed");
-
 		if (restart)
 			cmd.add("-run");
 
@@ -146,7 +140,24 @@ public class Updater {
 		System.exit(0);
 	}
 
-	static InputStream getHttpStream(String url) throws IOException {
+	private static void downloadUpdater() throws IOException {
+		ReadableByteChannel inChannel = null;
+		FileOutputStream fileStream = null;
+		FileChannel fileChannel = null;
+		try {
+			inChannel = Channels.newChannel(getHttpStream(UPDATER_URL));
+			fileStream = new FileOutputStream(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar");
+
+			fileChannel = fileStream.getChannel();
+			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
+		} finally {
+			if (inChannel != null) inChannel.close();
+			if (fileChannel != null) fileChannel.close();
+			if (fileStream != null) fileStream.close();
+		}
+	}
+
+	private static InputStream getHttpStream(String url) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "KEmulator/" + Emulator.version);
 		connection.setUseCaches(false);

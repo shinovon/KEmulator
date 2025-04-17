@@ -26,4 +26,6 @@ public interface IScreen {
 	ICaret getCaret();
 
 	void setSize(int w, int h);
+
+	void showMessage(final String message);
 }
