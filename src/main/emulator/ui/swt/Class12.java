@@ -18,6 +18,6 @@ final class Class12 extends MouseAdapter {
 	}
 
 	public final void mouseDoubleClick(final MouseEvent mouseEvent) {
-		Watcher.method319(this.aClass5_577, Watcher.method309(this.aClass5_577).getSelection());
+		this.aClass5_577.startFieldEditing(Watcher.method309(this.aClass5_577).getSelection());
 	}
 }

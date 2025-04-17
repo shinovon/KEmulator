@@ -29,16 +29,15 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private Text filterInput;
 	private Button filterSwitch;
 	private Button hexDecSwitch;
-	private Display display;
 	private boolean visible;
 	public final Map<String, Instance> selectableClasses = new HashMap<>();
 	public final WatcherType type;
 	private Tree tree;
-	private TreeEditor aTreeEditor555;
+	private TreeEditor treeEditor;
 	public static Vector<Watcher> activeWatchers = new Vector();
 	private boolean disposed;
-	boolean aBoolean545;
-	boolean aBoolean559;
+	boolean valueSetInProgress;
+	boolean updateInProgress;
 	private float propCol1;
 	private float propCol2;
 	private float propCol3;
@@ -54,7 +53,6 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	private Watcher(final WatcherType type) {
 		super();
-		this.display = EmulatorImpl.getDisplay();
 		this.type = type;
 	}
 
@@ -240,25 +238,26 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 	}
 
-	private void method320(final TreeItem[] array) {
+	public void startFieldEditing(final TreeItem[] array) {
 		if (array == null || array.length == 0) {
 			return;
 		}
 		final TreeItem treeItem = array[0];
-		final Control control;
-		((Text) (control = new Text(this.tree, 0))).setText(treeItem.getText(1));
-		((Text) control).selectAll();
+		final Text control = new Text(this.tree, 0);
+		control.setText(treeItem.getText(1));
+		control.selectAll();
 		control.setFocus();
-		control.addFocusListener(new Class18(this, treeItem, (Text) control));
-		control.addKeyListener(new Class20(this, treeItem, (Text) control));
-		this.aTreeEditor555.setEditor(control, treeItem, 1);
+		WatcherFieldEditorHandler handler = new WatcherFieldEditorHandler(this, treeItem, control);
+		control.addFocusListener(handler);
+		control.addKeyListener(handler);
+		this.treeEditor.setEditor(control, treeItem, 1);
 	}
 
-	private void method310(final TreeItem treeItem, final String s) {
+	public void finishFieldEditing(final TreeItem treeItem, final String valueToSet) {
 		final Instance c = getWatched();
-		this.aBoolean545 = true;
+		this.valueSetInProgress = true;
 		if (treeItem.getParentItem() == null) {
-			ClassTypes.setFieldValue(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), s);
+			ClassTypes.setFieldValue(c.getInstance(), (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem)), valueToSet);
 		} else {
 			TreeItem parentItem = treeItem;
 			final Stack stack = new Stack<TreeItem>();
@@ -283,16 +282,15 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				break;
 			}
 			if (o2 != null) {
-				ClassTypes.method873(o2, n, s);
+				ClassTypes.setArrayValue(o2, n, valueToSet);
 			}
 		}
-		this.aBoolean545 = false;
+		this.valueSetInProgress = false;
 	}
 
 	public final void open(final Shell parent) {
-		this.createWidgets();
-		this.fillClassCombo();
-		this.updateContent();
+		createWidgets();
+		updateContent();
 		if (!parent.getMaximized()) {
 			this.shell.setSize(parent.getSize());
 		}
@@ -306,9 +304,10 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.visible = true;
 		EmulatorImpl.asyncExec(this);
 		Watcher.activeWatchers.addElement(this);
+		Display display = EmulatorImpl.getDisplay();
 		while (!this.shell.isDisposed()) {
-			if (!this.display.readAndDispatch()) {
-				this.display.sleep();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 		this.visible = false;
@@ -341,48 +340,48 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	public final void run() {
-		if (this.selectableClasses.size() == 0 || !this.visible || this.aBoolean559 || this.disposed) {
+		if (this.selectableClasses.isEmpty() || !this.visible || this.updateInProgress || this.disposed) {
 			return;
 		}
-		this.aBoolean559 = true;
+		this.updateInProgress = true;
 		final Instance c = getWatched();
 		int n = 0;
 		try {
 			for (int i = 0; i < c.getFields().size(); ++i) {
 				final Field field = (Field) c.getFields().get(i);
 				if (this.disposed) {
-					this.aBoolean559 = false;
+					this.updateInProgress = false;
 					return;
 				}
 				final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, this.hexDecSwitch.getSelection());
-				if (this.aBoolean545) {
-					this.aBoolean559 = false;
+				if (this.valueSetInProgress) {
+					this.updateInProgress = false;
 					return;
 				}
 				final TreeItem item;
 				(item = this.tree.getItem(n++)).setText(1, s);
-				if (this.aBoolean545) {
-					this.aBoolean559 = false;
+				if (this.valueSetInProgress) {
+					this.updateInProgress = false;
 					return;
 				}
-				this.method318(ClassTypes.getFieldValue(c.getInstance(), field), item);
+				this.fillArraySubtree(ClassTypes.getFieldValue(c.getInstance(), field), item);
 			}
 		} catch (Exception ignored) {
 		}
-		this.aBoolean559 = false;
+		this.updateInProgress = false;
 	}
 
-	private void method318(final Object o, final TreeItem treeItem) {
+	private void fillArraySubtree(final Object o, final TreeItem treeItem) {
 		if (o == null) {
 			return;
 		}
 		if (treeItem.getExpanded()) {
 			for (int i = treeItem.getItemCount() - 1; i >= 0; --i) {
-				final String method872 = ClassTypes.method872(o, i, this.hexDecSwitch.getSelection());
-				final Object value = Array.get(o, i);
-				final TreeItem item;
-				(item = treeItem.getItem(i)).setText(1, method872);
-				this.method318(value, item);
+				final TreeItem item = treeItem.getItem(i);
+				// readable value
+				item.setText(1, ClassTypes.getArrayValue(o, i, this.hexDecSwitch.getSelection()));
+				// recursion for int[][][]... case
+				fillArraySubtree(Array.get(o, i), item);
 			}
 		}
 	}
@@ -433,11 +432,11 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setLayout(layout);
 		new CLabel(this.shell, 0).setText("Classes:");
-		this.method325();
-		this.shell.setSize(this.defWindowWidth, this.defWindowHeight);
-		this.shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
+		createClassCombo();
+		shell.setSize(this.defWindowWidth, this.defWindowHeight);
+		shell.setMinimumSize(this.minWindowWidth, this.minWindowHeight);
 
-		if (this.type == WatcherType.Instance) {
+		if (this.type != WatcherType.Profiler) {
 			Button exportBtn = new Button(this.shell, SWT.PUSH);
 			exportBtn.setText("Export");
 			exportBtn.setToolTipText("Watcher content will be saved to data folder");
@@ -600,15 +599,18 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			}
 		});
 
-		this.aTreeEditor555 = new TreeEditor(this.tree);
-		this.aTreeEditor555.horizontalAlignment = SWT.LEFT;
-		this.aTreeEditor555.grabHorizontal = true;
+		this.treeEditor = new TreeEditor(this.tree);
+		this.treeEditor.horizontalAlignment = SWT.LEFT;
+		this.treeEditor.grabHorizontal = true;
 
 		filterSwitch = new Button(this.shell, 32);
 		filterSwitch.setText("Filter:");
 		filterSwitch.addSelectionListener(this);
-		(this.filterInput = new Text(this.shell, 2048)).setLayoutData(layoutData2);
-		this.filterInput.addModifyListener(this::onFilterTextModify);
+
+		filterInput = new Text(this.shell, 2048);
+		filterInput.setLayoutData(layoutData2);
+		filterInput.addModifyListener(this::onFilterTextModify);
+
 		hexDecSwitch = new Button(this.shell, 32);
 		hexDecSwitch.setText("HEX");
 		hexDecSwitch.addSelectionListener(this);
@@ -630,17 +632,18 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 	}
 
-	private void method325() {
+	private void createClassCombo() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
 		(this.classCombo = new Combo(this.shell, SWT.READ_ONLY)).setLayoutData(layoutData);
 		classCombo.setVisibleItemCount(24);
+		this.fillClassCombo();
 		this.classCombo.addModifyListener((ModifyEvent me) -> {
-			aBoolean545 = true;
+			valueSetInProgress = true;
 			updateContent();
-			aBoolean545 = false;
+			valueSetInProgress = false;
 			run();
 		});
 	}
@@ -649,15 +652,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.dispose();
 	}
 
-	static void method315(final Watcher class5, final TreeItem treeItem, final String s) {
-		class5.method310(treeItem, s);
-	}
-
 	static Tree method309(final Watcher class5) {
 		return class5.tree;
 	}
 
-	static void method319(final Watcher class5, final TreeItem[] array) {
-		class5.method320(array);
-	}
 }
