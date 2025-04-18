@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.*;
 
 public final class Watcher extends SelectionAdapter implements Runnable, DisposeListener, TreeListener {
-	private Shell parentShell;
 	private Shell shell;
 	private Combo classCombo;
 	private Text filterInput;
@@ -227,7 +226,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			}
 		}
 		if (o != null && ClassTypes.method871(clazz)) {
-			new Watcher(o).open(this.parentShell);
+			new Watcher(o).open(shell);
 		}
 	}
 
@@ -304,18 +303,23 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	public final void open(final Shell parent) {
 		createWidgets();
 		updateContent();
-		if (!parent.getMaximized()) {
-			this.shell.setSize(parent.getSize());
+
+		int offset;
+		if (parent.getMaximized()) {
+			shell.setSize(300, 400);
+			offset = 0;
+		} else {
+			shell.setSize(parent.getSize());
+			offset = 40;
 		}
-		int x = parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x) / 2;
-		int y = parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y) / 2;
+		int x = parent.getLocation().x + offset + (parent.getSize().x - shell.getSize().x) / 2;
+		int y = parent.getLocation().y + offset + (parent.getSize().y - shell.getSize().y) / 2;
 		shell.setLocation(x, y);
-		this.parentShell = parent;
-		this.shell.open();
-		this.shell.addDisposeListener(this);
+		shell.open();
+		shell.addDisposeListener(this);
 		updateColumnSizes();
-		this.disposed = false;
-		this.visible = true;
+		disposed = false;
+		visible = true;
 		EmulatorImpl.asyncExec(this);
 		Watcher.activeWatchers.addElement(this);
 		Display display = EmulatorImpl.getDisplay();
@@ -324,7 +328,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				display.sleep();
 			}
 		}
-		this.visible = false;
+		visible = false;
 	}
 
 	public final void dispose() {
@@ -426,7 +430,6 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Watches"));
 		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 
-		shell.setSize(640, 480);
 		shell.setMinimumSize(160, 140);
 
 		boolean isClassComboUseful = createClassCombo();
