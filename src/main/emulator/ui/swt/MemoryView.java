@@ -5,7 +5,6 @@ import emulator.Settings;
 import emulator.UILocale;
 import emulator.debug.Memory;
 import emulator.debug.MemoryViewImage;
-import emulator.debug.PlayerActionType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
@@ -26,42 +25,28 @@ import java.util.List;
 
 public final class MemoryView implements DisposeListener {
 	private Shell shell;
-	private Button aButton1081;
 	private Button autoUpdateBtn;
-	private CLabel aCLabel1082;
 	private Text autoUpdateIntervalText;
-	private CLabel aCLabel1105;
-	private CLabel aCLabel1114;
 	private CLabel bytecodeSizeLbl;
 	private CLabel objectsSizeLbl;
-	private CLabel aCLabel1128;
 	private CLabel totalmemLbl;
-	private CLabel aCLabel1136;
 	private CLabel maxmemLbl;
-	private final Display display;
-	public final Memory memoryMgr;
+	private final Display display = EmulatorImpl.getDisplay();
+	public final Memory memoryMgr = Memory.getInstance();
 	private boolean visible;
-	private TabFolder bottomTabs;
 	private Composite aComposite1098;
-	private Composite audioControlComp;
-	private CLabel aCLabel1143;
 	private Combo imageScaleCombo;
-	private CLabel aCLabel1146;
 	private Combo imagesSortingMethodCombo;
 	private Button aButton1115;
 	private Button aButton1121;
 	private Button aButton1125;
 	private Button aButton1129;
 	private Button aButton1133;
-	private Button aButton1137;
-	private Button aButton1141;
 	public Canvas imagesCanvas;
 	private SashForm horizontalSeparator;
 	private Composite aComposite1116;
-	private SashForm aSashForm1103;
 	private Table table;
 	private Table classTable;
-	private CLabel aCLabel1149;
 	private CLabel imagesTotalSizeLabel;
 	private double imageScaling;
 	private int imagesSortingMethod;
@@ -78,91 +63,21 @@ public final class MemoryView implements DisposeListener {
 	private boolean updateInProgress;
 	int imagesCanvasWidth;
 	int imagesCanvasHeight;
-	private int anInt1144;
 	int imagesCanvasScroll;
-	private boolean imagesDrawn;
-	private boolean imagesNeverDrawn;
+	private boolean imagesDrawn = true;
+	private boolean imagesNeverDrawn = true;
 	private boolean showReleasedImages;
 	private boolean darkenUnused;
 	private boolean imgClassSelected;
 	private int selectedImageObjectIndex;
-	private Hashtable drawnImagesBounds;
+	private final Hashtable drawnImagesBounds = new Hashtable();
 	private Image selectedImage;
-	private ArrayList classesList;
-	private Vector classRefsVector;
+	private ArrayList classesList = new ArrayList();
+	private final Vector classRefsVector = new Vector();
 	private AutoUpdate autoUpdater;
 	private Thread autoUpdateThread;
-	private Button startAudioBtn;
-	private Button stopAudioBtn;
-	private CLabel aCLabel1153;
-	Scale volumeScale;
-	CLabel audioVolumeLable;
-	private Table soundsTable;
-	private CLabel aCLabel1155;
-	ProgressBar audioProgressBar;
-	private Button pauseAudioBtn;
-	private CLabel jvmmem1Label;
 	private CLabel jvmmemLabel;
 	private int sortColumn = -1;
-	private Button exportAudioBtn;
-	private int SOUNDS_TAB_ID;
-	private int IMAGES_TAB_ID;
-	private int OBJECTS_TAB_ID;
-
-	public MemoryView() {
-		super();
-		this.shell = null;
-		this.aButton1081 = null;
-		this.autoUpdateBtn = null;
-		this.aCLabel1082 = null;
-		this.autoUpdateIntervalText = null;
-		this.aCLabel1105 = null;
-		this.aCLabel1114 = null;
-		this.bytecodeSizeLbl = null;
-		this.objectsSizeLbl = null;
-		this.aCLabel1128 = null;
-		this.totalmemLbl = null;
-		this.aCLabel1136 = null;
-		this.maxmemLbl = null;
-		this.bottomTabs = null;
-		this.aComposite1098 = null;
-		this.audioControlComp = null;
-		this.aCLabel1143 = null;
-		this.imageScaleCombo = null;
-		this.aCLabel1146 = null;
-		this.imagesSortingMethodCombo = null;
-		this.aButton1115 = null;
-		this.aButton1121 = null;
-		this.aButton1125 = null;
-		this.aButton1129 = null;
-		this.aButton1133 = null;
-		this.aButton1137 = null;
-		this.aButton1141 = null;
-		this.imagesCanvas = null;
-		this.horizontalSeparator = null;
-		this.aComposite1116 = null;
-		this.aSashForm1103 = null;
-		this.table = null;
-		this.classTable = null;
-		this.aCLabel1149 = null;
-		this.imagesTotalSizeLabel = null;
-		this.imagesDrawn = true;
-		this.imagesNeverDrawn = true;
-		this.drawnImagesBounds = new Hashtable();
-		this.startAudioBtn = null;
-		this.stopAudioBtn = null;
-		this.aCLabel1153 = null;
-		this.volumeScale = null;
-		this.audioVolumeLable = null;
-		this.soundsTable = null;
-		this.aCLabel1155 = null;
-		this.audioProgressBar = null;
-		this.pauseAudioBtn = null;
-		this.display = EmulatorImpl.getDisplay();
-		this.memoryMgr = new Memory();
-		this.classRefsVector = new Vector();
-		this.classesList = new ArrayList();
-	}
 
 	public final void open() {
 		this.createShell();
@@ -188,14 +103,14 @@ public final class MemoryView implements DisposeListener {
 		this.visible = false;
 	}
 
-	public final void dispose() {
+	public void dispose() {
 		if (this.shell != null && !this.shell.isDisposed()) {
 			this.shell.dispose();
 		}
 		this.visible = false;
 	}
 
-	public final boolean isShown() {
+	public boolean isShown() {
 		return this.visible;
 	}
 
@@ -254,30 +169,32 @@ public final class MemoryView implements DisposeListener {
 		gridData9.horizontalAlignment = 4;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 7;
-		(this.shell = new Shell(1264)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
+		final int shellStyle = SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN;
+		(this.shell = new Shell(shellStyle)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
 		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setLayout(layout);
 
-		//(int)(this.display.getClientArea().width * 0.33);
-		//(int)(this.display.getClientArea().height * 0.8);
 		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
 		this.shell.setSize(
 				(int) (clientArea.width * 0.4),
 				(int) (clientArea.height * 0.95)
 		);
 
-		(this.aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
-		(this.aButton1081).setLayoutData(layoutData6);
-		this.aButton1081.addSelectionListener(new MemoryViewUpdateListener(this));
+		Button aButton1081;
+		(aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
+		(aButton1081).setLayoutData(layoutData6);
+		aButton1081.addSelectionListener(new MemoryViewUpdateListener(this));
 		(this.autoUpdateBtn = new Button(this.shell, 32)).setText(UILocale.get("MEMORY_VIEW_AUTO_UPDATE", "AutoUpdate"));
 		(this.autoUpdateBtn).setLayoutData(layoutData4);
 		this.autoUpdateBtn.addSelectionListener(new MemoryViewAutoUpdateListener(this));
-		(this.aCLabel1105 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_BYTECODE_SIZE", "ByteCode Size:"));
-		(this.aCLabel1105).setLayoutData(layoutData);
+		CLabel aCLabel1105;
+		(aCLabel1105 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_BYTECODE_SIZE", "ByteCode Size:"));
+		(aCLabel1105).setLayoutData(layoutData);
 		(this.bytecodeSizeLbl = new CLabel(this.shell, 0)).setText("0              bytes");
 		(this.bytecodeSizeLbl).setLayoutData(gridData3);
-		(this.aCLabel1128 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_TOTALMEM_SIZE", "Total Memory Used:"));
-		(this.aCLabel1128).setLayoutData(gridData);
+		CLabel aCLabel1128;
+		(aCLabel1128 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_TOTALMEM_SIZE", "Total Memory Used:"));
+		(aCLabel1128).setLayoutData(gridData);
 		(this.totalmemLbl = new CLabel(this.shell, 0)).setText("0");
 		(this.totalmemLbl).setLayoutData(gridData2);
 
@@ -290,104 +207,25 @@ public final class MemoryView implements DisposeListener {
 				System.gc();
 			}
 		});
-		(this.aCLabel1082 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_INTERVAL", "Interval(milli sec):"));
-		(this.aCLabel1082).setLayoutData(layoutData3);
+		CLabel aCLabel1082;
+		(aCLabel1082 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_INTERVAL", "Interval(milli sec):"));
+		(aCLabel1082).setLayoutData(layoutData3);
 		(this.autoUpdateIntervalText = new Text(this.shell, 2048)).setText("1000");
 		(this.autoUpdateIntervalText).setLayoutData(layoutData5);
-		(this.aCLabel1114 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_OBJECT_SIZE", "Objects Size:"));
-		this.aCLabel1114.setLayoutData(layoutData2);
+		CLabel aCLabel1114;
+		(aCLabel1114 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_OBJECT_SIZE", "Objects Size:"));
+		aCLabel1114.setLayoutData(layoutData2);
 		(this.objectsSizeLbl = new CLabel(this.shell, 0)).setText("0");
 		this.objectsSizeLbl.setLayoutData(gridData7);
-		(this.aCLabel1136 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_MAX_OBJECT_SIZE", "Max Objects Size:"));
-		this.aCLabel1136.setLayoutData(gridData);
+		CLabel aCLabel1136;
+		(aCLabel1136 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_MAX_OBJECT_SIZE", "Max Objects Size:"));
+		aCLabel1136.setLayoutData(gridData);
 		(this.maxmemLbl = new CLabel(this.shell, 0)).setText("0");
 		this.maxmemLbl.setLayoutData(gridData2);
-		(this.jvmmem1Label = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_JVM_MEMORY", "Real usage:"));
+		new CLabel(this.shell, 0).setText(UILocale.get("MEMORY_VIEW_JVM_MEMORY", "Real usage:"));
 		(this.jvmmemLabel = new CLabel(this.shell, 0)).setText("0");
 		this.jvmmemLabel.setLayoutData(gridData8);
 		this.createSeparator();
-	}
-
-	private void initTabs() {
-		this.bottomTabs = new TabFolder(this.horizontalSeparator, 0);
-
-		this.createControlsForImagesView();
-		this.createControlsForPlayersView();
-
-		int tabIndex = 0;
-
-		final TabItem tabItem;
-		(tabItem = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_IMAGES", "Images"));
-		tabItem.setControl(this.aComposite1098);
-		this.IMAGES_TAB_ID = tabIndex;
-		tabIndex++;
-
-		final TabItem tabItem2;
-		(tabItem2 = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
-		tabItem2.setControl(this.audioControlComp);
-		this.SOUNDS_TAB_ID = tabIndex;
-		tabIndex++;
-		/*
-		final TabItem tabItemMemory;
-		(tabItemMemory = new TabItem(this.bottomTabs, 0)).setText(UILocale.get("MEMORY_VIEW_MEMORY", "Objects"));
-		this.OBJECTS_TAB_ID = tabIndex;
-		tabIndex++;
-
-
-		Composite memoryComp = new Composite(this.bottomTabs, 0);
-		GridLayout memoryLayout = new GridLayout(1, false);
-		memoryComp.setLayout(memoryLayout);
-
-		SashForm tablesSash = new SashForm(memoryComp, SWT.HORIZONTAL);
-		GridData sashLayoutData = new GridData();
-		sashLayoutData.horizontalAlignment = GridData.FILL;
-		sashLayoutData.grabExcessHorizontalSpace = true;
-		sashLayoutData.grabExcessVerticalSpace = true;
-		sashLayoutData.verticalAlignment = GridData.FILL;
-		tablesSash.setLayoutData(sashLayoutData);
-
-		this.table = new Table(tablesSash, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
-		this.table.setHeaderVisible(true);
-		this.table.setLinesVisible(true);
-		this.table.addSelectionListener(new Class34(this));
-
-		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
-		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
-		tableColumn.addSelectionListener(new Class31(this));
-
-		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
-		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
-		tableColumn2.addSelectionListener(new Class140(this));
-
-		final TableColumn tableColumn3;
-		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
-		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
-		tableColumn3.addSelectionListener(new Class17(this));
-
-		this.classTable = new Table(tablesSash, 67584);
-		this.classTable.setHeaderVisible(true);
-		this.classTable.setLinesVisible(true);
-		this.classTable.addSelectionListener(new Class19(this));
-		this.classTable.addMouseListener(new Class13(this));
-
-		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
-		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
-
-		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
-		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
-
-		final TableColumn tableColumn6;
-		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
-		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
-		tablesSash.setWeights(new int[]{1, 1});
-
-		tabItemMemory.setControl(memoryComp);
-		*/
-
 	}
 
 	private void createControlsForImagesView() {
@@ -399,19 +237,20 @@ public final class MemoryView implements DisposeListener {
 		(layout = new GridLayout()).numColumns = 7;
 		layout.marginHeight = 2;
 		layout.marginWidth = 0;
-		(this.aComposite1098 = new Composite(this.bottomTabs, 0)).setLayout(layout);
-		(this.aCLabel1143 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_ZOOM", "Zoom:"));
+		(this.aComposite1098 = new Composite(this.horizontalSeparator, 0)).setLayout(layout);
+		new CLabel(this.aComposite1098, 0).setText(UILocale.get("MEMORY_VIEW_ZOOM", "Zoom:"));
 		this.createZoomCombo();
-		(this.aCLabel1146 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
+		new CLabel(this.aComposite1098, 0).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
 		this.createSortByCombo();
 		(this.aButton1121 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_IMAGES_DRAWN", "Images Drawn"));
 		this.aButton1121.setSelection(true);
 		this.aButton1121.addSelectionListener(new ImagesDrawnListener(this));
 		(this.aButton1129 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_UNUSED_REGION", "Darken Unused Regions"));
 		this.aButton1129.addSelectionListener(new DarkenUnusedListener(this));
-		(this.aButton1137 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_RESET_IMAGE", "Reset Image Usage"));
-		this.aButton1137.addSelectionListener(new ResetUsageListener(this));
-		(this.aCLabel1149 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SIZE", "Size") + ":");
+		Button aButton1137;
+		(aButton1137 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_RESET_IMAGE", "Reset Image Usage"));
+		aButton1137.addSelectionListener(new ResetUsageListener(this));
+		new CLabel(this.aComposite1098, 0).setText(UILocale.get("MEMORY_VIEW_SIZE", "Size") + ":");
 		(this.imagesTotalSizeLabel = new CLabel(this.aComposite1098, 0)).setText("");
 		this.imagesTotalSizeLabel.setLayoutData(layoutData);
 		(this.aButton1115 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_ASCEND", "Ascending"));
@@ -425,67 +264,11 @@ public final class MemoryView implements DisposeListener {
 		(this.aButton1133 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_RELEASED_IMAGES", "Released Images"));
 		this.aButton1133.setEnabled(Settings.recordReleasedImg);
 		this.aButton1133.addSelectionListener(new ShowReleasedImagesListener(this));
-		(this.aButton1141 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_CLEAR_RELEASED_IMAGES", "Clear Released Images"));
-		this.aButton1141.setEnabled(Settings.recordReleasedImg);
-		this.aButton1141.addSelectionListener(new Class71(this));
+		Button aButton1141;
+		(aButton1141 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_CLEAR_RELEASED_IMAGES", "Clear Released Images"));
+		aButton1141.setEnabled(Settings.recordReleasedImg);
+		aButton1141.addSelectionListener(new Class71(this));
 		this.method686();
-	}
-
-	private void createControlsForPlayersView() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalSpan = 8;
-		layoutData.verticalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.horizontalAlignment = 4;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 9;
-		(this.audioControlComp = new Composite(this.bottomTabs, 0)).setLayout(layout);
-		(this.startAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Start"));
-		(this.pauseAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
-		this.pauseAudioBtn.addSelectionListener(new PlayerPauseListener(this));
-		this.startAudioBtn.addSelectionListener(new PlayerResumeListener(this));
-		(this.stopAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_STOP", "Stop"));
-		this.stopAudioBtn.addSelectionListener(new PlayerStopListener(this));
-		(this.aCLabel1153 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_VOLUME", "Volume:"));
-		(this.audioVolumeLable = new CLabel(this.audioControlComp, 0)).setText("0   ");
-		(this.volumeScale = new Scale(this.audioControlComp, 0)).addSelectionListener(new VolumeScaleListener(this));
-		(this.aCLabel1155 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_PROGRESS", "Progress:"));
-		(this.audioProgressBar = new ProgressBar(this.audioControlComp, 65536)).setSelection(0);
-
-		(this.exportAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_EXPORT", "Export"));
-		this.exportAudioBtn.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(final SelectionEvent selectionEvent) {
-				Object value;
-				if (soundsTable.getSelectionIndex() != -1 &&
-						soundsTable.getSelectionIndex() < memoryMgr.players.size() &&
-						(value = memoryMgr.players.get(soundsTable.getSelectionIndex())) != null) {
-					Memory.playerAct(value, PlayerActionType.export);
-				}
-			}
-		});
-		final Color foreground = new Color(Display.getCurrent(), 217, 108, 0);
-		this.audioProgressBar.setForeground(foreground);
-		foreground.dispose();
-		(this.soundsTable = new Table(this.audioControlComp, 67584)).setHeaderVisible(true);
-		this.soundsTable.setLayoutData(layoutData);
-		this.soundsTable.setLinesVisible(true);
-		this.soundsTable.addSelectionListener(new AudioTableListener(this));
-		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
-		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn2.setText(UILocale.get("MEMORY_VIEW_CONTENT_TYPE", "ContentType"));
-		final TableColumn tableColumn3;
-		(tableColumn3 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn3.setText(UILocale.get("MEMORY_VIEW_STATE", "State"));
-		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn4.setText(UILocale.get("MEMORY_VIEW_LOOP_COUNT", "LoopCount"));
-		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn5.setText(UILocale.get("MEMORY_VIEW_DATA_SIZE", "DataSize"));
 	}
 
 	private void createZoomCombo() {
@@ -550,7 +333,8 @@ public final class MemoryView implements DisposeListener {
 		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 		this.horizontalSeparator.setLayoutData(layoutData);
 		this.method688();
-		this.initTabs();
+		this.createControlsForImagesView();
+
 		this.horizontalSeparator.setWeights(new int[]{4, 6});
 
 	}
@@ -569,8 +353,9 @@ public final class MemoryView implements DisposeListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.verticalAlignment = 4;
-		(this.aSashForm1103 = new SashForm(this.aComposite1116, 0)).setLayoutData(layoutData);
-		(this.table = new Table(this.aSashForm1103, 67584)).setHeaderVisible(true);
+		SashForm aSashForm1103;
+		(aSashForm1103 = new SashForm(this.aComposite1116, 0)).setLayoutData(layoutData);
+		(this.table = new Table(aSashForm1103, 67584)).setHeaderVisible(true);
 		this.table.setLinesVisible(true);
 		this.table.addSelectionListener(new TableListener(this));
 		final TableColumn tableColumn;
@@ -585,7 +370,7 @@ public final class MemoryView implements DisposeListener {
 		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
 		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
 		tableColumn3.addSelectionListener(new Class17(this));
-		(this.classTable = new Table(this.aSashForm1103, 67584)).setHeaderVisible(true);
+		(this.classTable = new Table(aSashForm1103, 67584)).setHeaderVisible(true);
 		this.classTable.setLinesVisible(true);
 		this.classTable.addSelectionListener(new Class19(this));
 		this.classTable.addMouseListener(new ClassTableListener(this));
@@ -619,11 +404,7 @@ public final class MemoryView implements DisposeListener {
 		if (this.shell.isDisposed())
 			return;
 		try {
-			if (this.bottomTabs.getSelectionIndex() == this.IMAGES_TAB_ID) {
-				this.imagesCanvas.redraw();
-			} else {
-				this.updatePlayersView();
-			}
+			this.imagesCanvas.redraw();
 			this.updateClassesView();
 		} catch (Exception ignored) {
 		}
@@ -697,7 +478,7 @@ public final class MemoryView implements DisposeListener {
 		int n = 12 - this.imagesCanvasScroll;
 		int n2 = 10;
 		int max = 0;
-		this.anInt1144 = 0;
+		int anInt1144 = 0;
 		final Color background = new Color(null, 151, 150, 147);
 		final Color color = new Color(null, 255, 0, 0);
 		final Color color2 = new Color(null, 0, 0, 0);
@@ -768,38 +549,11 @@ public final class MemoryView implements DisposeListener {
 		color.dispose();
 		color2.dispose();
 		color3.dispose();
-		this.anInt1144 = n + max + this.imagesCanvasScroll + 10;
-		this.imagesCanvas.getVerticalBar().setMaximum(this.anInt1144);
-		this.imagesCanvas.getVerticalBar().setThumb(Math.min(this.anInt1144, this.imagesCanvas.getClientArea().height));
+		anInt1144 = n + max + this.imagesCanvasScroll + 10;
+		this.imagesCanvas.getVerticalBar().setMaximum(anInt1144);
+		this.imagesCanvas.getVerticalBar().setThumb(Math.min(anInt1144, this.imagesCanvas.getClientArea().height));
 		this.imagesCanvas.getVerticalBar().setIncrement(10);
 		this.imagesTotalSizeLabel.setText(totalAllocatedPixels + " pixels");
-	}
-
-	private void updatePlayersView() {
-		if (this.memoryMgr.players.size() > this.soundsTable.getItemCount()) {
-			for (int i = this.memoryMgr.players.size() - this.soundsTable.getItemCount(); i > 0; --i) {
-				new TableItem(this.soundsTable, 0);
-			}
-		} else {
-			for (int j = this.memoryMgr.players.size(); j < this.soundsTable.getItemCount(); ++j) {
-				this.soundsTable.remove(j);
-			}
-		}
-		for (int k = 0; k < this.memoryMgr.players.size(); ++k) {
-			final Object value = this.memoryMgr.players.get(k);
-			final TableItem item;
-			(item = this.soundsTable.getItem(k)).setText(0, value.toString());
-			item.setText(1, Memory.playerType(value));
-			item.setText(2, Memory.playerStateStr(value));
-			item.setText(3, String.valueOf(Memory.loopCount(value)));
-			item.setText(4, String.valueOf(Memory.dataLen(value)));
-		}
-		final Object value2;
-		if (this.soundsTable.getSelectionIndex() != -1 && this.soundsTable.getSelectionIndex() < this.memoryMgr.players.size() && (value2 = this.memoryMgr.players.get(this.soundsTable.getSelectionIndex())) != null) {
-			this.volumeScale.setSelection(Memory.volume(value2));
-			this.audioVolumeLable.setText(String.valueOf(this.volumeScale.getSelection()));
-			this.audioProgressBar.setSelection(Memory.progress(value2));
-		}
 	}
 
 	void changeClassesSort(final int n) {
@@ -935,15 +689,6 @@ public final class MemoryView implements DisposeListener {
 		darkenUnused = aButton1129.getSelection();
 		updateEverything();
 	}
-
-	static Table method649(final MemoryView class110) {
-		return class110.soundsTable;
-	}
-
-	int getSelectedAudioIndex() {
-		return soundsTable.getSelectionIndex();
-	}
-
 
 	void setImagesScaling() {
 		double i = imageScaleCombo.getSelectionIndex();
