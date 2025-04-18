@@ -427,7 +427,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 
 		shell.setSize(640, 480);
-		shell.setMinimumSize(200, 210);
+		shell.setMinimumSize(160, 140);
 
 		boolean isClassComboUseful = createClassCombo();
 
@@ -464,7 +464,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		tree.addTreeListener(this);
 
 		this.column1 = new TreeColumn(this.tree, SWT.LEFT);
-		column1.setText("Variable");
+		column1.setText("Name");
 		column1.setMoveable(false);
 
 		this.column2 = new TreeColumn(this.tree, SWT.LEFT);
