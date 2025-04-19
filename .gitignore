@@ -38,7 +38,6 @@ kemulator.cfg
 # vlc dirs
 plugins
 
-.idea/uiDesigner.xml
 config_fast.txt
 m3g_*.jar
 micro3d_*.jar
