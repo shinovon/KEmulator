@@ -1,3 +1,6 @@
 rms
 file
 capture
+!.package
+!KEmulator*.bat
+!kemulator.sh
