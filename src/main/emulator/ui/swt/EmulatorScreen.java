@@ -612,15 +612,15 @@ public final class EmulatorScreen implements
 					paintTransform.translate(screenX, screenY);
 					break;
 				case 1:
-					this.paintTransform.translate(screenY + rotatedWidth, screenX);
+					this.paintTransform.translate(screenY + rotatedWidth * realZoom, screenX);
 					this.paintTransform.rotate(90.0F);
 					break;
 				case 2:
-					this.paintTransform.translate(screenX + rotatedWidth, screenY + rotatedHeight);
+					this.paintTransform.translate(screenX + rotatedWidth * realZoom, screenY + rotatedHeight * realZoom);
 					this.paintTransform.rotate(180.0F);
 					break;
 				case 3:
-					this.paintTransform.translate(screenY, screenX + rotatedHeight);
+					this.paintTransform.translate(screenY, screenX + rotatedHeight * realZoom);
 					this.paintTransform.rotate(270.0F);
 			}
 			caret.a(this.paintTransform, this.rotation);
