@@ -308,7 +308,8 @@ public final class EmulatorScreen implements
 				shell.setSize(sizeW, sizeH);
 
 			windowResizedByUser = false;
-			onWindowResized();
+			windowDecorationHeight = shell.getSize().y - shell.getClientArea().height;
+			updateCanvasRect(true, false);
 			windowResizedByUser = true;
 
 		} catch (Exception ex) {
@@ -525,8 +526,9 @@ public final class EmulatorScreen implements
 			case Manual: {
 				// windows' WM can resize our window because it wants to. First flag is tracking, did user ever touched the window. If no (=true), then size is ignored
 				boolean windowWasPerfect = windowAutosized || (canvas.getClientArea().width == screenWidth && canvas.getClientArea().height == screenHeight);
-				// we simply apply userZoom.
-				int cw = (int) (rotatedWidth * Settings.canvasScale + cbw2);
+				// 120px is windows minimal limit. Accounting for that fixes frame "sticking" to left side.
+				int cw = Math.max(120, (int) (rotatedWidth * Settings.canvasScale + cbw2));
+
 				int ch = (int) (rotatedHeight * Settings.canvasScale + cbw2);
 				realZoom = Settings.canvasScale;
 				boolean overflow = cw > shell.getClientArea().width || ch > shell.getClientArea().height - statusH;
