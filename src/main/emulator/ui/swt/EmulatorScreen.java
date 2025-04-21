@@ -481,6 +481,7 @@ public final class EmulatorScreen implements
 		if (windowWasResizedByUser || decorHChanged)
 			// if user is not dragging window and decor height changed - window should be resized automatically.
 			updateCanvasRect(decorHChanged && !windowWasResizedByUser, false);
+		updateStatus();
 	}
 
 	/**
