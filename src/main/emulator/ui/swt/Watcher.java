@@ -7,6 +7,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -325,37 +327,61 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	private void setInitialRect(Shell parent) {
-		// for any maximized parent place at bottom-center
+		String type = String.valueOf(parent.getData("TYPE"));
+		final int WIDTH = 400;
+		final int HEIGHT = 500;
+		final int OFFSET = 40;
+		Rectangle dsp = EmulatorImpl.getDisplay().getClientArea();
+
+		// for any maximized parent place at bottom-center except main window
 		if (parent.getMaximized()) {
-			shell.setSize(400, 500);
-			int x = parent.getLocation().x + parent.getSize().x / 2 - 200;
-			int y = parent.getLocation().y + parent.getSize().y - 500;
+			if (Objects.equals(type, "null")) {
+				int x = parent.getLocation().x + parent.getSize().x - WIDTH;
+				int y = parent.getLocation().y + parent.getSize().y - HEIGHT;
+				shell.setLocation(x, y);
+				return;
+			}
+			shell.setSize(WIDTH, HEIGHT);
+			int x = parent.getLocation().x + parent.getSize().x / 2 - WIDTH / 2;
+			int y = parent.getLocation().y + parent.getSize().y - HEIGHT;
 			shell.setLocation(x, y);
 			return;
 		}
 
-		switch (String.valueOf(parent.getData("TYPE"))) {
+		switch (type) {
 			case Watcher.SHELL_TYPE: {
 				// parent is watcher
-				shell.setSize(parent.getSize());
-				shell.setLocation(parent.getLocation().x + 40, parent.getLocation().y + 40);
+				Point ps = parent.getSize();
+				Point plc = parent.getLocation();
+
+				shell.setSize(ps);
+
+				if (plc.y + OFFSET + ps.y > dsp.height) {
+					// y overflow
+					shell.setLocation(plc.x - OFFSET, OFFSET);
+				} else if (plc.x + OFFSET + ps.x > dsp.width) {
+					// x overflow
+					shell.setLocation(plc.x - OFFSET, plc.y + OFFSET);
+				} else {
+					shell.setLocation(plc.x + OFFSET, plc.y + OFFSET);
+				}
 				break;
 			}
 			case MemoryView.SHELL_TYPE: {
 				// parent is memview
-				shell.setSize(400, 500);
+				shell.setSize(WIDTH, HEIGHT);
 				shell.setLocation(parent.getLocation().x + parent.getSize().x + 10, parent.getLocation().y);
 				break;
 			}
 			default: {
 				// parent is main window
-				shell.setSize(400, 500);
-				if (parent.getSize().x < 500 || parent.getSize().y < 600) {
+				shell.setSize(WIDTH, HEIGHT);
+				if (parent.getSize().x < WIDTH + 100 || parent.getSize().y < HEIGHT + 100) {
 					shell.setLocation(parent.getLocation().x + parent.getSize().x + 10, parent.getLocation().y);
 					break;
 				}
-				int x = parent.getLocation().x + parent.getSize().x - 400;
-				int y = parent.getLocation().y + parent.getSize().y - 500;
+				int x = parent.getLocation().x + parent.getSize().x - WIDTH;
+				int y = parent.getLocation().y + parent.getSize().y - HEIGHT;
 				shell.setLocation(x, y);
 				break;
 			}
