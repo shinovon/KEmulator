@@ -42,6 +42,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private TreeColumn column3;
 	private long lastShellResizeEvent;
 
+	public static final String SHELL_TYPE = "WATCHER";
+
 	private Watcher(final WatcherType type) {
 		super();
 		this.type = type;
@@ -307,6 +309,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 		shell.open();
 		shell.addDisposeListener(this);
+		shell.setData("TYPE", SHELL_TYPE);
 		updateColumnSizes();
 		disposed = false;
 		visible = true;
