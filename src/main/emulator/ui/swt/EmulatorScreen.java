@@ -484,16 +484,19 @@ public final class EmulatorScreen implements
 	 */
 	private void updateCanvasRect(boolean allowWindowResize, boolean forceWindowReset) {
 		// applying rotation
+		// nonrotated - size, visible from midlet. Equal to rotated on 0° and 180°.
+		int nonRotatedW = getWidth();
+		int nonRotatedH = getHeight();
 		switch (this.rotation) {
 			case 0:
 			case 2:
-				rotatedWidth = getWidth();
-				rotatedHeight = getHeight();
+				rotatedWidth = nonRotatedW;
+				rotatedHeight = nonRotatedH;
 				break;
 			case 1:
 			case 3:
-				rotatedWidth = getHeight();
-				rotatedHeight = getWidth();
+				rotatedWidth = nonRotatedH;
+				rotatedHeight = nonRotatedW;
 				break;
 		}
 
@@ -533,23 +536,21 @@ public final class EmulatorScreen implements
 				rotatedWidth = (int) ((float) availableSpaceX / Settings.canvasScale);
 				rotatedHeight = (int) ((float) availableSpaceY / Settings.canvasScale);
 				realZoom = Settings.canvasScale;
-				int w = 0;
-				int h = 0;
 				switch (this.rotation) {
 					case 0:
 					case 2:
-						w = rotatedWidth;
-						h = rotatedHeight;
+						nonRotatedW = rotatedWidth;
+						nonRotatedH = rotatedHeight;
 						break;
 					case 1:
 					case 3:
-						w = rotatedHeight;
-						h = rotatedWidth;
+						nonRotatedW = rotatedHeight;
+						nonRotatedH = rotatedWidth;
 						break;
 				}
-				if (pauseState != 0 && (getWidth() != w || getHeight() != h)) {
-					initScreenBuffer(w, h);
-					Emulator.getEventQueue().sizeChanged(w, h);
+				if (pauseState != 0 && (getWidth() != nonRotatedW || getHeight() != nonRotatedH)) {
+					initScreenBuffer(nonRotatedW, nonRotatedH);
+					Emulator.getEventQueue().sizeChanged(nonRotatedW, nonRotatedH);
 				}
 
 				break;
@@ -574,31 +575,42 @@ public final class EmulatorScreen implements
 				throw new IllegalStateException("Unknown resize mode: " + Settings.resizeMode);
 		}
 
-		screenWidth = (int) (rotatedWidth * realZoom);
-		screenHeight = (int) (rotatedHeight * realZoom);
-		screenX = (availableSpaceX - screenWidth) / 2;
-		screenY = (availableSpaceY - screenHeight) / 2;
+		screenWidth = (int) (nonRotatedW * realZoom);
+		screenHeight = (int) (nonRotatedH * realZoom);
+		switch (this.rotation) {
+			case 0:
+			case 2:
+				screenX = (availableSpaceX - screenWidth) / 2;
+				screenY = (availableSpaceY - screenHeight) / 2;
+				break;
+			case 1:
+			case 3:
+				screenY = (availableSpaceY - screenWidth) / 2;
+				screenX = (availableSpaceX - screenHeight) / 2;
+				break;
+		}
+
 
 		if (getScreenImg() != null) {
 			wasResized = true;
-			Rectangle size = canvas.getClientArea();
 			if (paintTransform == null)
 				paintTransform = new Transform(null);
 
 			paintTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
 			switch (this.rotation) {
 				case 0:
+					paintTransform.translate(screenX, screenY);
 					break;
 				case 1:
-					this.paintTransform.translate(size.width, 0.0F);
+					this.paintTransform.translate(screenX+rotatedWidth, screenY);
 					this.paintTransform.rotate(90.0F);
 					break;
 				case 2:
-					this.paintTransform.translate(size.width, size.height);
+					this.paintTransform.translate(screenX+rotatedWidth, screenY+rotatedHeight);
 					this.paintTransform.rotate(180.0F);
 					break;
 				case 3:
-					this.paintTransform.translate(0.0F, size.height);
+					this.paintTransform.translate(screenX, screenY+rotatedHeight);
 					this.paintTransform.rotate(270.0F);
 			}
 			caret.a(this.paintTransform, this.rotation);
@@ -1738,11 +1750,11 @@ public final class EmulatorScreen implements
 					if (screenX == 0 && screenY == 0 && origWidth == screenWidth && origHeight == screenHeight) {
 						buf.copyToScreen(gc);
 					} else {
-						buf.copyToScreen(gc, 0, 0, origWidth, origHeight, screenX, screenY, screenWidth, screenHeight);
+						buf.copyToScreen(gc, 0, 0, origWidth, origHeight, 0, 0, screenWidth, screenHeight);
 					}
 				} else {
 					// Hold image (paused)
-					gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, screenX, screenY, screenWidth, screenHeight);
+					gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, 0, 0, screenWidth, screenHeight);
 				}
 			} catch (Exception ignored) {
 			}
@@ -1753,10 +1765,6 @@ public final class EmulatorScreen implements
 			caret.setWindowZoom((float) screenHeight / (float) origHeight);
 			wasResized = false;
 		}
-	}
-
-	public float getZoom() {
-		return realZoom;
 	}
 
 	private void drawMouseInputInfo(final GC gc) {
@@ -1786,6 +1794,10 @@ public final class EmulatorScreen implements
 		} catch (Exception e) {
 			throw new Error(e);
 		}
+	}
+
+	public float getZoom() {
+		return realZoom;
 	}
 
 	public void run() {
