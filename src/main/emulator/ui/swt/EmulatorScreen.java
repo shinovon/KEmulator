@@ -585,8 +585,8 @@ public final class EmulatorScreen implements
 				break;
 			case 1:
 			case 3:
-				screenY = (availableSpaceY - screenWidth) / 2;
-				screenX = (availableSpaceX - screenHeight) / 2;
+				screenY = (availableSpaceX - screenHeight) / 2;
+				screenX = (availableSpaceY - screenWidth) / 2;
 				break;
 		}
 
@@ -602,7 +602,7 @@ public final class EmulatorScreen implements
 					paintTransform.translate(screenX, screenY);
 					break;
 				case 1:
-					this.paintTransform.translate(screenX+rotatedWidth, screenY);
+					this.paintTransform.translate(screenY+rotatedWidth, screenX);
 					this.paintTransform.rotate(90.0F);
 					break;
 				case 2:
@@ -610,7 +610,7 @@ public final class EmulatorScreen implements
 					this.paintTransform.rotate(180.0F);
 					break;
 				case 3:
-					this.paintTransform.translate(screenX, screenY+rotatedHeight);
+					this.paintTransform.translate(screenY, screenX+rotatedHeight);
 					this.paintTransform.rotate(270.0F);
 			}
 			caret.a(this.paintTransform, this.rotation);
