@@ -305,7 +305,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	public final void open(final Shell parent) {
 		createWidgets();
 		updateContent();
-		setInitialPosition(parent);
+		setInitialRect(parent);
 
 		shell.open();
 		shell.addDisposeListener(this);
@@ -324,18 +324,38 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		visible = false;
 	}
 
-	private void setInitialPosition(Shell parent) {
-		int offset;
+	private void setInitialRect(Shell parent) {
+		// for any maximized parent place at bottom-center
 		if (parent.getMaximized()) {
 			shell.setSize(300, 400);
-			offset = 0;
-		} else {
-			shell.setSize(parent.getSize());
-			offset = 40;
+			int x = parent.getLocation().x + parent.getSize().x / 2 - 150;
+			int y = parent.getLocation().y + parent.getSize().y - 400;
+			shell.setLocation(x, y);
+			return;
 		}
-		int x = parent.getLocation().x + offset + (parent.getSize().x - shell.getSize().x) / 2;
-		int y = parent.getLocation().y + offset + (parent.getSize().y - shell.getSize().y) / 2;
-		shell.setLocation(x, y);
+
+		switch (parent.getData("TYPE").toString()) {
+			case Watcher.SHELL_TYPE: {
+				// parent is watcher
+				shell.setSize(parent.getSize());
+				shell.setLocation(parent.getLocation().x + 40, parent.getLocation().y + 40);
+				break;
+			}
+			case MemoryView.SHELL_TYPE: {
+				// parent is memview
+				shell.setSize(300, 400);
+				shell.setLocation(parent.getLocation().x + parent.getSize().x + 10, parent.getLocation().y);
+				break;
+			}
+			default: {
+				// parent is main window
+				shell.setSize(300, 400);
+				int x = parent.getLocation().x + parent.getSize().x / 2 - 150;
+				int y = parent.getLocation().y + parent.getSize().y / 2 - 200;
+				shell.setLocation(x, y);
+				break;
+			}
+		}
 	}
 
 	public final void dispose() {
