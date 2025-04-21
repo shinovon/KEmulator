@@ -306,8 +306,6 @@ public final class EmulatorScreen implements
 		try {
 			if (sizeW > 0 && sizeH > 0)
 				shell.setSize(sizeW, sizeH);
-			if (maximized)
-				shell.setMaximized(true);
 
 			windowResizedByUser = false;
 			onWindowResized();
@@ -340,6 +338,10 @@ public final class EmulatorScreen implements
 		shell.open();
 		shell.addDisposeListener(this);
 		shell.addControlListener(this);
+
+		if (maximized)
+			shell.setMaximized(true);
+
 		win = Emulator.win;
 		if (win) {
 			new Thread("KEmulator keyboard poll thread") {
