@@ -58,8 +58,6 @@ public final class EmulatorScreen implements
 	private Menu menuView;
 	private Menu menu2dEngine;
 	private Menu menuM3GEngine;
-	private Menu aMenu1018;
-	private Menu menuInterpolation;
 	public static int locX = Integer.MIN_VALUE;
 	public static int locY = Integer.MIN_VALUE;
 	public static int sizeW = -1;
@@ -105,7 +103,7 @@ public final class EmulatorScreen implements
 	MenuItem zoomOutMenuItem;
 	MenuItem interposeNearestMenuItem;
 	MenuItem interposeLowMenuItem;
-	MenuItem interposeHightMenuItem;
+	MenuItem interposeHighMenuItem;
 	MenuItem speedUpMenuItem;
 	MenuItem slowDownMenuItem;
 	MenuItem recordKeysMenuItem;
@@ -920,16 +918,52 @@ public final class EmulatorScreen implements
 		(this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tPad-");
 		this.zoomOutMenuItem.addSelectionListener(this);
 
-		final MenuItem interpolationMenuItem;
-		(interpolationMenuItem = new MenuItem(this.menuTool, 64)).setText(UILocale.get("MENU_TOOL_INTERPOSE", "Interpolation"));
-		this.menuInterpolation = new Menu(this.shell, 4194308);
-		(this.interposeNearestMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(UILocale.get("MENU_TOOL_INTER_NEAREST", "NearestNeighbor"));
-		this.interposeNearestMenuItem.setSelection(true);
-		this.interposeNearestMenuItem.addSelectionListener(new Class52(this));
-		(this.interposeLowMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(UILocale.get("MENU_TOOL_INTER_LOW", "LowQuality"));
-		this.interposeLowMenuItem.addSelectionListener(new Class55(this));
-		(this.interposeHightMenuItem = new MenuItem(this.menuInterpolation, 16)).setText(UILocale.get("MENU_TOOL_INTER_HIGH", "HighQuality"));
-		this.interposeHightMenuItem.addSelectionListener(new Class42(this));
+		SelectionAdapter interpolationListener = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (e.widget == interposeNearestMenuItem) {
+					interpolation = SWT.NONE;
+
+					interposeNearestMenuItem.setSelection(true);
+					interposeLowMenuItem.setSelection(false);
+					interposeHighMenuItem.setSelection(false);
+				} else if (e.widget == interposeLowMenuItem) {
+					interpolation = SWT.LOW;
+
+					interposeNearestMenuItem.setSelection(false);
+					interposeLowMenuItem.setSelection(true);
+					interposeHighMenuItem.setSelection(false);
+				} else if (e.widget == interposeHighMenuItem) {
+					interpolation = SWT.HIGH;
+
+					interposeNearestMenuItem.setSelection(false);
+					interposeLowMenuItem.setSelection(false);
+					interposeHighMenuItem.setSelection(true);
+				}
+
+				repaint();
+			}
+		};
+
+		final MenuItem interpolationMenuItem = new MenuItem(this.menuTool, 64);
+		interpolationMenuItem.setText(UILocale.get("MENU_TOOL_INTERPOSE", "Interpolation"));
+
+		Menu menuInterpolation = new Menu(this.shell, 4194308);
+
+		interposeNearestMenuItem = new MenuItem(menuInterpolation, 16);
+		interposeNearestMenuItem.setText(UILocale.get("MENU_TOOL_INTER_NEAREST", "NearestNeighbor"));
+		interposeNearestMenuItem.setSelection(interpolation == 0);
+		interposeNearestMenuItem.addSelectionListener(interpolationListener);
+
+		interposeLowMenuItem = new MenuItem(menuInterpolation, 16);
+		interposeLowMenuItem.setText(UILocale.get("MENU_TOOL_INTER_LOW", "LowQuality"));
+		interposeNearestMenuItem.setSelection(interpolation == 1);
+		interposeLowMenuItem.addSelectionListener(interpolationListener);
+
+		interposeHighMenuItem = new MenuItem(menuInterpolation, 16);
+		interposeHighMenuItem.setText(UILocale.get("MENU_TOOL_INTER_HIGH", "HighQuality"));
+		interposeNearestMenuItem.setSelection(interpolation == 2);
+		interposeHighMenuItem.addSelectionListener(interpolationListener);
+
 		interpolationMenuItem.setMenu(menuInterpolation);
 
 		MenuItem resizeMenuItem = new MenuItem(menuTool, 64);
@@ -1014,16 +1048,16 @@ public final class EmulatorScreen implements
 		this.loadAutoPlayMenuItem.addSelectionListener(this);
 		final MenuItem menuItem5;
 		(menuItem5 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_RECENTLY", "Recent jarfiles"));
-		this.aMenu1018 = new Menu(this.shell, 4194308);
+		Menu aMenu1018 = new Menu(this.shell, 4194308);
 		for (int n = 1; n < 5 && !Settings.recentJars[n].equals(""); ++n) {
 			final String s = Settings.recentJars[n];
 			final String f = s.substring(s.lastIndexOf(s.lastIndexOf(92) > 0 ? 92 : 47) + 1).trim();
-			final MenuItem menuItem6 = new MenuItem(this.aMenu1018, 8);
+			final MenuItem menuItem6 = new MenuItem(aMenu1018, 8);
 			menuItem6.setText("&" + n + " " + f + " " + (s.length() > 10 ? ('[' + s.substring(0, 10) + "...]") : ('[' + s + ']')));
 			menuItem6.setAccelerator(SWT.MOD1 + 49 + n - 1);
 			menuItem6.addSelectionListener(new Class45(this, n));
 		}
-		menuItem5.setMenu(this.aMenu1018);
+		menuItem5.setMenu(aMenu1018);
 		new MenuItem(this.menuMidlet, 2);
 		(this.openJadMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_JAD", "Open JAD with Notepad") + "\tCtrl+D");
 		this.openJadMenuItem.addSelectionListener(this);
@@ -2641,12 +2675,6 @@ public final class EmulatorScreen implements
 
 	static boolean[] method556(final EmulatorScreen class93) {
 		return class93.keysState;
-	}
-
-	static void setInterpolation(final EmulatorScreen class93, final int anInt1020) {
-		class93.interpolation = anInt1020;
-
-		class93.repaint();
 	}
 
 	static long method559(final EmulatorScreen class93, final long aLong1017) {
