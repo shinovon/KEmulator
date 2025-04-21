@@ -297,6 +297,8 @@ public final class EmulatorScreen implements
 	}
 
 	public void start(final boolean midletLoaded) {
+		this.pauseState = (midletLoaded ? 1 : 0);
+		this.updatePauseState();
 		try {
 			if (sizeW > 0 && sizeH > 0)
 				shell.setSize(sizeW, sizeH);
@@ -313,8 +315,7 @@ public final class EmulatorScreen implements
 			System.exit(1);
 			return;
 		}
-		this.pauseState = (midletLoaded ? 1 : 0);
-		this.updatePauseState();
+
 		Rectangle clientArea = EmulatorScreen.display.getPrimaryMonitor().getClientArea();
 		if (EmulatorScreen.locX == Integer.MIN_VALUE) {
 			EmulatorScreen.locX = clientArea.x - (clientArea.width + this.shell.getSize().x) >> 1;
@@ -444,7 +445,7 @@ public final class EmulatorScreen implements
 				Settings.resizeMode = ResizeMethod.Fit;
 				syncScalingModeSelection();
 			}
-			this.initScreenBuffer(x, y);
+			initScreenBuffer(x, y); // it's set automatically only in follow mode
 			updateCanvasRect(true, false);
 			Emulator.getEventQueue().sizeChanged(x, y);
 		}
