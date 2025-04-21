@@ -139,4 +139,6 @@ public final class Settings {
 
 	public static boolean ignoreControllerZAxis;
 	public static boolean disableCamera;
+
+	public static int interpolation;
 }

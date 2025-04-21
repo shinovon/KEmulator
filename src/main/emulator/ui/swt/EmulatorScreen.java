@@ -146,7 +146,6 @@ public final class EmulatorScreen implements
 	private boolean infosEnabled;
 	private String aString1008;
 	private CaretImpl caret;
-	private int interpolation;
 	private boolean[] keysState;
 	private int mouseXPress;
 	private int mouseXRelease;
@@ -921,19 +920,19 @@ public final class EmulatorScreen implements
 		SelectionAdapter interpolationListener = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (e.widget == interposeNearestMenuItem) {
-					interpolation = SWT.NONE;
+					Settings.interpolation = SWT.NONE;
 
 					interposeNearestMenuItem.setSelection(true);
 					interposeLowMenuItem.setSelection(false);
 					interposeHighMenuItem.setSelection(false);
 				} else if (e.widget == interposeLowMenuItem) {
-					interpolation = SWT.LOW;
+					Settings.interpolation = SWT.LOW;
 
 					interposeNearestMenuItem.setSelection(false);
 					interposeLowMenuItem.setSelection(true);
 					interposeHighMenuItem.setSelection(false);
 				} else if (e.widget == interposeHighMenuItem) {
-					interpolation = SWT.HIGH;
+					Settings.interpolation = SWT.HIGH;
 
 					interposeNearestMenuItem.setSelection(false);
 					interposeLowMenuItem.setSelection(false);
@@ -951,17 +950,17 @@ public final class EmulatorScreen implements
 
 		interposeNearestMenuItem = new MenuItem(menuInterpolation, 16);
 		interposeNearestMenuItem.setText(UILocale.get("MENU_TOOL_INTER_NEAREST", "NearestNeighbor"));
-		interposeNearestMenuItem.setSelection(interpolation == 0);
+		interposeNearestMenuItem.setSelection(Settings.interpolation == 0);
 		interposeNearestMenuItem.addSelectionListener(interpolationListener);
 
 		interposeLowMenuItem = new MenuItem(menuInterpolation, 16);
 		interposeLowMenuItem.setText(UILocale.get("MENU_TOOL_INTER_LOW", "LowQuality"));
-		interposeLowMenuItem.setSelection(interpolation == 1);
+		interposeLowMenuItem.setSelection(Settings.interpolation == 1);
 		interposeLowMenuItem.addSelectionListener(interpolationListener);
 
 		interposeHighMenuItem = new MenuItem(menuInterpolation, 16);
 		interposeHighMenuItem.setText(UILocale.get("MENU_TOOL_INTER_HIGH", "HighQuality"));
-		interposeHighMenuItem.setSelection(interpolation == 2);
+		interposeHighMenuItem.setSelection(Settings.interpolation == 2);
 		interposeHighMenuItem.addSelectionListener(interpolationListener);
 
 		interpolationMenuItem.setMenu(menuInterpolation);
@@ -1780,7 +1779,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 
-		gc.setInterpolation(this.interpolation);
+		gc.setInterpolation(Settings.interpolation);
 		int origWidth = getWidth();
 		int origHeight = getHeight();
 

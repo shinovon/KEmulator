@@ -629,6 +629,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 			Settings.resizeMode = ResizeMethod.fromInt(Integer.parseInt(properties.getProperty("ResizeMode", "2")));
 			Settings.keepAspectRatio = Boolean.parseBoolean(properties.getProperty("KeepAspectRatio", "true"));
+			Settings.interpolation = Integer.parseInt(properties.getProperty("Interpolation", "0"));
 
 			// window
 			EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", String.valueOf(Integer.MIN_VALUE)));
@@ -856,6 +857,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("CanvasScale", String.valueOf(Math.round(Settings.canvasScale*100)));
 			properties.setProperty("ResizeMode", Settings.resizeMode.toString());
 			properties.setProperty("KeepAspectRatio", String.valueOf(Settings.keepAspectRatio));
+			properties.setProperty("Interpolation", String.valueOf(Settings.interpolation));
 
 			// window
 			properties.setProperty("LocationX", String.valueOf(EmulatorScreen.locX));
