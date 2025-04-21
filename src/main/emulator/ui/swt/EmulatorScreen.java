@@ -299,12 +299,13 @@ public final class EmulatorScreen implements
 
 	public void start(final boolean midletLoaded) {
 		this.pauseState = (midletLoaded ? 1 : 0);
-		this.updatePauseState();
+		this.updatePauseState(); // updated before canvas rect because it checks for pauseState inside
 		try {
 			if (sizeW > 0 && sizeH > 0)
 				shell.setSize(sizeW, sizeH);
 
 			windowResizedByUser = false;
+			// window was already resized to minimum so it's safe to capture decor height (potentially with multiline menu)
 			windowDecorationHeight = shell.getSize().y - shell.getClientArea().height;
 			updateCanvasRect(true, false);
 			windowResizedByUser = true;
@@ -335,8 +336,10 @@ public final class EmulatorScreen implements
 
 		shell.open();
 		shell.addDisposeListener(this);
-		shell.addControlListener(this);
+		shell.addControlListener(this); // added only here to avoid firing multiple times while setting shell up
 
+		// when set in try above (i.e. before open), win10 for some reason ignores it. layout() did not help.
+		// probably may be fixed by event queue clear call (readAndDispatch?)
 		if (maximized)
 			shell.setMaximized(true);
 
