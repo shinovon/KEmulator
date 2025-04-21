@@ -181,7 +181,11 @@ public final class EmulatorScreen implements
 	 * Sets to true after any change to canvas size.
 	 */
 	private boolean wasResized;
+	/**
+	 * Flag to block size set event recursion.
+	 */
 	private boolean windowResizedByUser = true;
+	private boolean windowAutosized = true;
 	private StackLayout stackLayout;
 	private Composite swtContent;
 	private Displayable lastDisplayable;
@@ -440,8 +444,7 @@ public final class EmulatorScreen implements
 
 	public void setSize(int x, int y) {
 		if (this.pauseState == 1) {
-			if (Settings.resizeMode == ResizeMethod.FollowWindowSize)
-			{
+			if (Settings.resizeMode == ResizeMethod.FollowWindowSize) {
 				Settings.resizeMode = ResizeMethod.Fit;
 				syncScalingModeSelection();
 			}
@@ -461,6 +464,10 @@ public final class EmulatorScreen implements
 		boolean windowWasResizedByUser = windowResizedByUser;
 		// next resize won't be ours
 		windowResizedByUser = true;
+
+		if (windowWasResizedByUser)
+			windowAutosized = false;
+
 		// this will change if:
 		// - menu strip wrapped to 2+ lines instead of 1
 		// - WM theme change on CSD
@@ -514,7 +521,8 @@ public final class EmulatorScreen implements
 		// applying zoom
 		switch (Settings.resizeMode) {
 			case Manual: {
-				boolean windowWasPerfect = canvas.getClientArea().width == screenWidth && canvas.getClientArea().height == screenHeight;
+				// windows' WM can resize our window because it wants to. First flag is tracking, did user ever touched the window. If no (=true), then size is ignored
+				boolean windowWasPerfect = windowAutosized || (canvas.getClientArea().width == screenWidth && canvas.getClientArea().height == screenHeight);
 				// we simply apply userZoom.
 				int cw = (int) (rotatedWidth * Settings.canvasScale + cbw2);
 				int ch = (int) (rotatedHeight * Settings.canvasScale + cbw2);
@@ -530,6 +538,7 @@ public final class EmulatorScreen implements
 					availableSpaceX = cw - cbw2;
 					availableSpaceY = ch - cbw2;
 					shell.setSize(cw + decorW, ch + statusH + windowDecorationHeight);
+					windowAutosized = true;
 				}
 				break;
 			}
@@ -603,15 +612,15 @@ public final class EmulatorScreen implements
 					paintTransform.translate(screenX, screenY);
 					break;
 				case 1:
-					this.paintTransform.translate(screenY+rotatedWidth, screenX);
+					this.paintTransform.translate(screenY + rotatedWidth, screenX);
 					this.paintTransform.rotate(90.0F);
 					break;
 				case 2:
-					this.paintTransform.translate(screenX+rotatedWidth, screenY+rotatedHeight);
+					this.paintTransform.translate(screenX + rotatedWidth, screenY + rotatedHeight);
 					this.paintTransform.rotate(180.0F);
 					break;
 				case 3:
-					this.paintTransform.translate(screenY, screenX+rotatedHeight);
+					this.paintTransform.translate(screenY, screenX + rotatedHeight);
 					this.paintTransform.rotate(270.0F);
 			}
 			caret.a(this.paintTransform, this.rotation);
