@@ -956,12 +956,12 @@ public final class EmulatorScreen implements
 
 		interposeLowMenuItem = new MenuItem(menuInterpolation, 16);
 		interposeLowMenuItem.setText(UILocale.get("MENU_TOOL_INTER_LOW", "LowQuality"));
-		interposeNearestMenuItem.setSelection(interpolation == 1);
+		interposeLowMenuItem.setSelection(interpolation == 1);
 		interposeLowMenuItem.addSelectionListener(interpolationListener);
 
 		interposeHighMenuItem = new MenuItem(menuInterpolation, 16);
 		interposeHighMenuItem.setText(UILocale.get("MENU_TOOL_INTER_HIGH", "HighQuality"));
-		interposeNearestMenuItem.setSelection(interpolation == 2);
+		interposeHighMenuItem.setSelection(interpolation == 2);
 		interposeHighMenuItem.addSelectionListener(interpolationListener);
 
 		interpolationMenuItem.setMenu(menuInterpolation);
