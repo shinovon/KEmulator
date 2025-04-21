@@ -12,7 +12,7 @@ final class Class52 extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		EmulatorScreen.method562(this.aClass93_803, 0);
+		EmulatorScreen.setInterpolation(this.aClass93_803, 0);
 		this.aClass93_803.interposeNearestMenuItem.setSelection(true);
 		this.aClass93_803.interposeLowMenuItem.setSelection(false);
 		this.aClass93_803.interposeHightMenuItem.setSelection(false);

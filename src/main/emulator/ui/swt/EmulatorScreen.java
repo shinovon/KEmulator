@@ -2642,8 +2642,10 @@ public final class EmulatorScreen implements
 		return class93.keysState;
 	}
 
-	static int method562(final EmulatorScreen class93, final int anInt1020) {
-		return class93.interpolation = anInt1020;
+	static void setInterpolation(final EmulatorScreen class93, final int anInt1020) {
+		class93.interpolation = anInt1020;
+
+		class93.repaint();
 	}
 
 	static long method559(final EmulatorScreen class93, final long aLong1017) {
