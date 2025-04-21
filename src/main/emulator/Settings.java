@@ -1,5 +1,7 @@
 package emulator;
 
+import emulator.ui.swt.ResizeMethod;
+
 import java.util.*;
 
 public final class Settings {
@@ -11,7 +13,7 @@ public final class Settings {
 	public static boolean alwaysOnTop;
 	public static boolean enableKeyCache;
 	public static boolean rightClickMenu;
-	public static int canvasScale = 100;
+	public static float canvasScale;
 	public static int frameRate = 60;
 	public static int steps = -1;
 	public static long aLong1235;
@@ -68,7 +70,7 @@ public final class Settings {
 	public static boolean synchronizeKeyEvents = true;
 	public static boolean motorolaSoftKeyFix = false;
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
-	public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill, 3 - integer
+	public static ResizeMethod resizeMode = ResizeMethod.Fit;
 	public static boolean keepAspectRatio = true;
 	public static boolean patchSynchronizedPaint = true;
 	public static boolean patchSynchronizedPlayerUpdate = true;

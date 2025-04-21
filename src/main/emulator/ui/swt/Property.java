@@ -623,11 +623,11 @@ public final class Property implements IProperty, SelectionListener {
 			}
 
 			// display
-			Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(100)));
-			if (Settings.canvasScale < 100 || Settings.canvasScale % 50 != 0) {
-				Settings.canvasScale = 100;
+			Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(1)))/100f;
+			if (Settings.canvasScale < 1f || Settings.canvasScale % 0.5f != 0) {
+				Settings.canvasScale = 1f;
 			}
-			Settings.resizeMode = Integer.parseInt(properties.getProperty("ResizeMode", "2"));
+			Settings.resizeMode = ResizeMethod.fromInt(Integer.parseInt(properties.getProperty("ResizeMode", "2")));
 			Settings.keepAspectRatio = Boolean.parseBoolean(properties.getProperty("KeepAspectRatio", "true"));
 
 			// window
@@ -636,7 +636,6 @@ public final class Property implements IProperty, SelectionListener {
 			EmulatorScreen.sizeW = Integer.parseInt(properties.getProperty("SizeW", "-1"));
 			EmulatorScreen.sizeH = Integer.parseInt(properties.getProperty("SizeH", "-1"));
 			EmulatorScreen.maximized = Boolean.parseBoolean(properties.getProperty("Maximized", "false"));
-			EmulatorScreen.defaultSize = Boolean.parseBoolean(properties.getProperty("DefaultSize", "true"));
 
 			Settings.alwaysOnTop = Boolean.parseBoolean(properties.getProperty("AlwaysOnTop", "false"));
 
@@ -854,8 +853,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("TextAntiAliasing", String.valueOf(Settings.textAntiAliasing));
 
 			// display
-			properties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
-			properties.setProperty("ResizeMode", String.valueOf(Settings.resizeMode));
+			properties.setProperty("CanvasScale", String.valueOf(Math.round(Settings.canvasScale*100)));
+			properties.setProperty("ResizeMode", Settings.resizeMode.toString());
 			properties.setProperty("KeepAspectRatio", String.valueOf(Settings.keepAspectRatio));
 
 			// window
@@ -864,7 +863,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
 			properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
 			properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
-			properties.setProperty("DefaultSize", String.valueOf(EmulatorScreen.defaultSize));
 
 			properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
 

@@ -65,14 +65,15 @@ public final class EmulatorScreen implements
 	public static int sizeW = -1;
 	public static int sizeH = -1;
 	public static boolean maximized;
-	public static boolean defaultSize;
 	private Transform paintTransform;
 	private int rotation;
 	private int rotatedWidth;
 	private int rotatedHeight;
-	private float zoom;
-	private int zoomedWidth;
-	private int zoomedHeight;
+	/**
+	 * Real zoom, applied at last canvas invalidation. Usually doesn't match {@link Settings#canvasScale}.
+	 */
+	private float realZoom;
+	private int windowDecorationHeight;
 	private Image screenImg;
 	private ImageSWT screenCopySwt;
 	private ImageSWT screenImageSwt;
@@ -83,8 +84,8 @@ public final class EmulatorScreen implements
 	private ImageAWT backBufferImageAwt;
 	private ImageAWT xrayScreenImageAwt;
 	private static long aLong982;
-	private String aString983;
-	private String aString989;
+	private String leftCmdText;
+	private String rightCmdText;
 	MenuItem awt2dMenuItem;
 	MenuItem swt2dMenuItem;
 
@@ -176,7 +177,11 @@ public final class EmulatorScreen implements
 	private MenuItem glM3DMenuItem;
 	private MenuItem softM3DMenuItem;
 	private Menu menuM3DEngine;
+	/**
+	 * Sets to true after any change to canvas size.
+	 */
 	private boolean wasResized;
+	private boolean windowResizedByUser = true;
 	private StackLayout stackLayout;
 	private Composite swtContent;
 	private Displayable lastDisplayable;
@@ -293,7 +298,15 @@ public final class EmulatorScreen implements
 
 	public void start(final boolean midletLoaded) {
 		try {
-			this.zoom(Settings.canvasScale / 100.0f);
+			if (sizeW > 0 && sizeH > 0)
+				shell.setSize(sizeW, sizeH);
+			if (maximized)
+				shell.setMaximized(true);
+
+			windowResizedByUser = false;
+			onWindowResized();
+			windowResizedByUser = true;
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			this.showMessage(UILocale.get("LOAD_GDIPLUS_ERROR", "Can't load \" gdiplus.dll \" !!! Plz download & copy to %system32% path."));
@@ -310,13 +323,7 @@ public final class EmulatorScreen implements
 			EmulatorScreen.locY = clientArea.y - (clientArea.height + this.shell.getSize().y) >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
-		if (sizeW > 10 && sizeH > 10 && !defaultSize) {
-			shell.setSize(sizeW, sizeH);
-		} else {
-			defaultSize = true;
-		}
-		if (maximized)
-			shell.setMaximized(true);
+
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 1));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 2));
@@ -326,9 +333,9 @@ public final class EmulatorScreen implements
 			midletSupportsMultitouch = s != null && s.contains("EnableMultiPointTouchEvents");
 		}
 
-		this.shell.open();
-		this.shell.addDisposeListener(this);
-		this.shell.addControlListener(this);
+		shell.open();
+		shell.addDisposeListener(this);
+		shell.addControlListener(this);
 		win = Emulator.win;
 		if (win) {
 			new Thread("KEmulator keyboard poll thread") {
@@ -431,84 +438,194 @@ public final class EmulatorScreen implements
 		}
 	}
 
-
-	private void rotate(int var1, int var2) {
-		if (this.pauseState == 1/* && Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()*/) {
-			this.initScreenBuffer(var1, var2);
-			this.zoom(this.zoom);
-			Emulator.getEventQueue().sizeChanged(var1, var2);
+	public void setSize(int x, int y) {
+		if (this.pauseState == 1) {
+			if (Settings.resizeMode == ResizeMethod.FollowWindowSize)
+				Settings.resizeMode = ResizeMethod.Fit;
+			this.initScreenBuffer(x, y);
+			updateCanvasRect(true, false);
+			Emulator.getEventQueue().sizeChanged(x, y);
 		}
 	}
 
-	private void rotate90degrees(boolean update) {
-		if (!update) {
-			this.rotation += 1;
-			this.rotation %= 4;
-		}
-		int w = getWidth();
-		int h = getHeight();
+	private void rotate90degrees() {
+		this.rotation += 1;
+		this.rotation %= 4;
+		updateCanvasRect(true, false);
+	}
+
+	private void onWindowResized() {
+		boolean windowWasResizedByUser = windowResizedByUser;
+		// next resize won't be ours
+		windowResizedByUser = true;
+		// this will change if:
+		// - menu strip wrapped to 2+ lines instead of 1
+		// - WM theme change on CSD
+		int newDecorH = shell.getSize().y - shell.getClientArea().height;
+		boolean decorHChanged = newDecorH != windowDecorationHeight;
+		windowDecorationHeight = newDecorH;
+		// if triggered by our resize AND decor did not change we do not want recursion
+		if (windowWasResizedByUser || decorHChanged)
+			// if user is not dragging window and decor height changed - window should be resized automatically.
+			updateCanvasRect(decorHChanged && !windowWasResizedByUser, false);
+	}
+
+	/**
+	 * Entry point for sizing update.
+	 * <p>
+	 * Updates {@link #realZoom}, {@link #rotatedWidth}, {@link #rotatedHeight},
+	 * {@link #screenX}, {@link #screenY}, {@link #screenWidth}, {@link #screenHeight} as side effect.
+	 *
+	 * @param allowWindowResize Allow to resize window if in manual mode and user did not touch the window or canvas overflowed.
+	 * @param forceWindowReset  If true and in manual mode, resets window size. First argument will be ignored.
+	 * @see #onWindowResized()
+	 */
+	private void updateCanvasRect(boolean allowWindowResize, boolean forceWindowReset) {
+		// applying rotation
 		switch (this.rotation) {
 			case 0:
 			case 2:
-				this.rotatedWidth = w;
-				this.rotatedHeight = h;
+				rotatedWidth = getWidth();
+				rotatedHeight = getHeight();
 				break;
 			case 1:
 			case 3:
-				this.rotatedWidth = h;
-				this.rotatedHeight = w;
+				rotatedWidth = getHeight();
+				rotatedHeight = getWidth();
 				break;
 		}
-	}
 
+		// calculating zoom
+		int decorW = shell.getSize().x - shell.getClientArea().width;
+		int statusH = statusLabel.getSize().y;
+		int cbw2 = canvas.getBorderWidth() * 2;
+		int availableSpaceX = shell.getClientArea().width - cbw2;
+		int availableSpaceY = shell.getClientArea().height - cbw2 - statusH;
+		float suggestedFitZoom = Math.min(availableSpaceX / (float) rotatedWidth, availableSpaceY / (float) rotatedHeight);
 
-	private void zoom(float zoom) {
-		if (Settings.resizeMode == 3) {
-			zoom = (int) zoom;
-		}
-		this.zoom = zoom;
-		rotate90degrees(true);
-		Settings.canvasScale = (int) (zoom * 100.0F);
-		Point size = canvas.getSize();
-		if (!shell.getMaximized()) {
-			int i1 = this.shell.getSize().x - size.x;
-			int i2 = this.shell.getSize().y - size.y;
-			int bw = getWidth();
-			int bh = getHeight();
-			int w;
-			int h;
-			int sx = Math.max(0, screenX);
-			int sy = Math.max(0, screenY);
-			if (screenWidth != 0 && screenHeight != 0
-					&& (Settings.resizeMode == 2 || Settings.resizeMode == 3)
-					&& !defaultSize
-			) {
-				w = (int) (bw * zoom) + canvas.getBorderWidth() * 2 + sx * 2;
-				h = (int) (bh * zoom) + canvas.getBorderWidth() * 2 + sy * 2;
-			} else {
-				w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2 + sx * 2;
-				h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2 + sy * 2;
+		// canvas size is managed automatically by layout.
+
+		// applying zoom
+		switch (Settings.resizeMode) {
+			case Manual: {
+				boolean windowWasPerfect = canvas.getClientArea().width == screenWidth && canvas.getClientArea().height == screenHeight;
+				// we simply apply userZoom.
+				int cw = (int) (rotatedWidth * Settings.canvasScale + cbw2);
+				int ch = (int) (rotatedHeight * Settings.canvasScale + cbw2);
+				realZoom = Settings.canvasScale;
+				boolean overflow = cw > shell.getClientArea().width || ch > shell.getClientArea().height - statusH;
+				boolean autoResize = allowWindowResize && (windowWasPerfect || overflow) && !shell.getMaximized();
+				if (forceWindowReset) {
+					windowResizedByUser = false;
+					shell.setMaximized(false);
+				}
+				if (autoResize || forceWindowReset) {
+					windowResizedByUser = false;
+					availableSpaceX = cw - cbw2;
+					availableSpaceY = ch - cbw2;
+					shell.setSize(cw + decorW, ch + statusH + windowDecorationHeight);
+				}
+				break;
 			}
-			this.canvas.setSize(w, h);
-			size = canvas.getSize();
-			this.shell.setSize(size.x + i1, size.y + i2);
-		}
-		resized();
-		this.canvas.redraw();
-		this.updateStatus();
-	}
+			case FollowWindowSize: {
+				rotatedWidth = (int) ((float) availableSpaceX / Settings.canvasScale);
+				rotatedHeight = (int) ((float) availableSpaceY / Settings.canvasScale);
+				realZoom = Settings.canvasScale;
+				int w = 0;
+				int h = 0;
+				switch (this.rotation) {
+					case 0:
+					case 2:
+						w = rotatedWidth;
+						h = rotatedHeight;
+						break;
+					case 1:
+					case 3:
+						w = rotatedHeight;
+						h = rotatedWidth;
+						break;
+				}
+				if (pauseState != 0 && (getWidth() != w || getHeight() != h)) {
+					initScreenBuffer(w, h);
+					Emulator.getEventQueue().sizeChanged(w, h);
+				}
 
+				break;
+			}
+			case Fit: {
+				// applying suggested zoom.
+				realZoom = suggestedFitZoom;
+				break;
+			}
+			case FitInteger: {
+				float roundedZoom;
+				if (suggestedFitZoom >= 1f) {
+					roundedZoom = (float) Math.floor(suggestedFitZoom);
+				} else {
+					// rounds to 50%, 33%, 25%, 20%, etc.
+					roundedZoom = (float) (1d / Math.ceil(1d / suggestedFitZoom));
+				}
+				realZoom = roundedZoom;
+				break;
+			}
+			default:
+				throw new IllegalStateException("Unknown resize mode: " + Settings.resizeMode);
+		}
+
+		screenWidth = (int) (rotatedWidth * realZoom);
+		screenHeight = (int) (rotatedHeight * realZoom);
+		screenX = (availableSpaceX - screenWidth) / 2;
+		screenY = (availableSpaceY - screenHeight) / 2;
+
+		if (getScreenImg() != null) {
+			wasResized = true;
+			Rectangle size = canvas.getClientArea();
+			if (paintTransform == null)
+				paintTransform = new Transform(null);
+
+			paintTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
+			switch (this.rotation) {
+				case 0:
+					break;
+				case 1:
+					this.paintTransform.translate(size.width, 0.0F);
+					this.paintTransform.rotate(90.0F);
+					break;
+				case 2:
+					this.paintTransform.translate(size.width, size.height);
+					this.paintTransform.rotate(180.0F);
+					break;
+				case 3:
+					this.paintTransform.translate(0.0F, size.height);
+					this.paintTransform.rotate(270.0F);
+			}
+			caret.a(this.paintTransform, this.rotation);
+			if (swtContent != null && lastDisplayable != null) {
+				lastDisplayable._swtUpdateSizes();
+			}
+		}
+		canvas.redraw();
+		updateStatus();
+	}
 
 	private void zoomIn() {
-		if (zoom < 10f) {
-			zoom(Math.min(10f, zoom + (Settings.resizeMode == 3 ? 1 : .5f)));
+		if (Settings.resizeMode == ResizeMethod.Fit || Settings.resizeMode == ResizeMethod.FitInteger) {
+			Settings.resizeMode = ResizeMethod.Manual;
+			Settings.canvasScale = (float) (Math.floor(realZoom * 2) / 2d);
+			syncScalingModeSelection();
 		}
+		Settings.canvasScale = Math.min(10f, Settings.canvasScale + 0.5f);
+		updateCanvasRect(true, false);
 	}
 
 	private void zoomOut() {
-		if (zoom > 1f) {
-			zoom(Math.max(1f, zoom - (Settings.resizeMode == 3 ? 1 : .5f)));
+		if (Settings.resizeMode == ResizeMethod.Fit || Settings.resizeMode == ResizeMethod.FitInteger) {
+			Settings.resizeMode = ResizeMethod.Manual;
+			Settings.canvasScale = (float) (Math.ceil(realZoom * 2) / 2d);
+			syncScalingModeSelection();
 		}
+		Settings.canvasScale = Math.max(1f, Settings.canvasScale - 0.5f);
+		updateCanvasRect(true, false);
 	}
 
 	private void pauseScreen() {
@@ -614,29 +731,21 @@ public final class EmulatorScreen implements
 		return this.getScreenImg().getHeight();
 	}
 
-	public void setSize(int w, int h) {
-		if (getWidth() != w || getHeight() != h) {
-			initScreenBuffer(w, h);
-			Emulator.getEventQueue().sizeChanged(w, h);
-			resized();
-		}
-	}
-
-	public void setCommandLeft(final String aString983) {
-		this.aString983 = aString983;
+	public void setCommandLeft(final String text) {
+		this.leftCmdText = text;
 		EmulatorImpl.syncExec(new Class41(this));
 	}
 
-	public void setCommandRight(final String aString989) {
-		this.aString989 = aString989;
+	public void setCommandRight(final String text) {
+		this.rightCmdText = text;
 		EmulatorImpl.syncExec(new Class40(this));
 	}
 
 
 	private void updateStatus() {
-		String var8 = this.zoom == 1.0F ? " " : "  ";
+		String var8 = this.realZoom == 1.0F ? " " : "  ";
 		StringBuffer var9 = new StringBuffer();
-		var9.append((int) (this.zoom * 100.0F));
+		var9.append((int) (this.realZoom * 100.0F));
 		var9.append("%");
 		var9.append(var8);
 		if (pauseState != 1) {
@@ -682,7 +791,8 @@ public final class EmulatorScreen implements
 		(this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
 				.setText(Emulator.getTitle(null));
 		shell.addListener(SWT.Close, event -> CustomMethod.close());
-		this.shell.setLayout(layout);
+		shell.setMinimumSize(120, 50); // windows uses 120px as hard limit for width
+		shell.setLayout(layout);
 		try {
 			if (f == null) {
 				FontData fd = shell.getFont().getFontData()[0];
@@ -717,6 +827,7 @@ public final class EmulatorScreen implements
 		(menuItemTool = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_TOOL", "Tool"));
 		final MenuItem menuItemView;
 		(menuItemView = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_VIEW", "View"));
+
 		this.menuView = new Menu(menuItemView);
 		(this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
 		this.infosMenuItem.addSelectionListener(this);
@@ -825,11 +936,11 @@ public final class EmulatorScreen implements
 
 		resizeMenuItem.setMenu(menuResize);
 
-		if (Settings.resizeMode == 1) {
+		if (Settings.resizeMode == ResizeMethod.FollowWindowSize) {
 			syncSizeMenuItem.setSelection(true);
-		} else if (Settings.resizeMode == 2) {
+		} else if (Settings.resizeMode == ResizeMethod.Fit) {
 			fillScreenMenuItem.setSelection(true);
-		} else if (Settings.resizeMode == 3) {
+		} else if (Settings.resizeMode == ResizeMethod.FitInteger) {
 			integerScalingMenuItem.setSelection(true);
 		} else {
 			centerOnScreenMenuItem.setSelection(true);
@@ -1327,16 +1438,12 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.rotateScreenMenuItem) {
-				this.rotate(this.getHeight(), this.getWidth());
+				this.setSize(this.getHeight(), this.getWidth());
 				return;
 			}
 
 			if (menuItem == this.rotate90MenuItem) {
-				rotate90degrees(false);
-				resized();
-				if (Settings.resizeMode == 0 || defaultSize) {
-					zoom(zoom);
-				}
+				rotate90degrees();
 				return;
 			}
 			if (menuItem == this.forcePaintMenuItem) {
@@ -1438,68 +1545,49 @@ public final class EmulatorScreen implements
 			}
 		} else if (parent == menuResize) {
 			if (menuItem == centerOnScreenMenuItem) {
-				Settings.resizeMode = 0;
-				fillScreenMenuItem.setSelection(false);
-				syncSizeMenuItem.setSelection(false);
-				integerScalingMenuItem.setSelection(false);
+				Settings.resizeMode = ResizeMethod.Manual;
+				syncScalingModeSelection();
+				// see zoomIn/zoomOut
+				Settings.canvasScale = (float) (Math.floor(realZoom * 2) / 2d);
+				updateCanvasRect(true, false);
 			} else if (menuItem == syncSizeMenuItem) {
-				Settings.resizeMode = 1;
-				centerOnScreenMenuItem.setSelection(false);
-				fillScreenMenuItem.setSelection(false);
-				integerScalingMenuItem.setSelection(false);
+				Settings.resizeMode = ResizeMethod.FollowWindowSize;
+				syncScalingModeSelection();
+				updateCanvasRect(true, false);
 			} else if (menuItem == fillScreenMenuItem) {
-				Settings.resizeMode = 2;
-				centerOnScreenMenuItem.setSelection(false);
-				syncSizeMenuItem.setSelection(false);
-				integerScalingMenuItem.setSelection(false);
+				Settings.resizeMode = ResizeMethod.Fit;
+				syncScalingModeSelection();
+				updateCanvasRect(true, false);
 			} else if (menuItem == integerScalingMenuItem) {
-				Settings.resizeMode = 3;
-				centerOnScreenMenuItem.setSelection(false);
-				syncSizeMenuItem.setSelection(false);
-				fillScreenMenuItem.setSelection(false);
+				Settings.resizeMode = ResizeMethod.FitInteger;
+				syncScalingModeSelection();
+				updateCanvasRect(true, false);
 			} else if (menuItem == resetSizeMenuItem) {
 				if (getWidth() != startWidth || getHeight() != startHeight) {
 					initScreenBuffer(startWidth, startHeight);
 					Emulator.getEventQueue().sizeChanged(startWidth, startHeight);
 				}
-				zoomedWidth = startWidth;
-				zoomedHeight = startHeight;
-				rotation = 0;
-				rotate90degrees(true);
-				Point size = canvas.getSize();
-				int i1 = shell.getSize().x - size.x;
-				int i2 = shell.getSize().y - size.y;
-				int w = startWidth + canvas.getBorderWidth() * 2;
-				int h = startHeight + canvas.getBorderWidth() * 2;
-				zoom = 1;
-				Settings.canvasScale = 100;
-				canvas.setSize(w, h);
-				size = canvas.getSize();
-				shell.setSize(size.x + i1, size.y + i2);
-				return;
+
+				Settings.resizeMode = ResizeMethod.Manual;
+				Settings.canvasScale = Math.round(realZoom);
+				updateCanvasRect(true, true);
 			} else if (menuItem == changeResMenuItem) {
 				ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
 				int[] r = d.open();
 				if (r != null) {
-					rotate(r[0], r[1]);
-					if (Settings.resizeMode == 1) {
-						rotate90degrees(true);
-						Point size = canvas.getSize();
-						int i1 = this.shell.getSize().x - size.x;
-						int i2 = this.shell.getSize().y - size.y;
-						int w = (int) ((float) rotatedWidth * zoom) + canvas.getBorderWidth() * 2;
-						int h = (int) ((float) rotatedHeight * zoom) + canvas.getBorderWidth() * 2;
-						this.canvas.setSize(w, h);
-						size = canvas.getSize();
-						this.shell.setSize(size.x + i1, size.y + i2);
-					} else {
-						resized();
-					}
+					if (Settings.resizeMode == ResizeMethod.FollowWindowSize)
+						Settings.resizeMode = ResizeMethod.Fit;
+					setSize(r[0], r[1]);
 				}
-				return;
 			}
-			resized();
 		}
+	}
+
+	private void syncScalingModeSelection() {
+		centerOnScreenMenuItem.setSelection(Settings.resizeMode == ResizeMethod.Manual);
+		fillScreenMenuItem.setSelection(Settings.resizeMode == ResizeMethod.Fit);
+		integerScalingMenuItem.setSelection(Settings.resizeMode == ResizeMethod.FitInteger);
+		syncSizeMenuItem.setSelection(Settings.resizeMode == ResizeMethod.FollowWindowSize);
 	}
 
 	private static void setWindowOnTop(final long handle, final boolean b) {
@@ -1593,7 +1681,6 @@ public final class EmulatorScreen implements
 		this.canvas.addMouseWheelListener(this);
 		this.canvas.addMouseMoveListener(this);
 		this.canvas.getShell().addMouseTrackListener(this);
-		this.canvas.addControlListener(this);
 		this.canvas.addPaintListener(this);
 		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
 		canvas.addListener(SWT.MenuDetect, new Listener() {
@@ -1628,56 +1715,27 @@ public final class EmulatorScreen implements
 	}
 
 	public void paintControl(final PaintEvent paintEvent) {
-		final GC gc;
-		(gc = paintEvent.gc).setInterpolation(this.interpolation);
+		final GC gc = paintEvent.gc;
 		Rectangle size = canvas.getClientArea();
 
+		if (this.pauseState == 0) {
+			// Game not running, show info label
+			gc.setBackground(EmulatorScreen.display.getSystemColor(22));
+			gc.fillRectangle(0, 0, size.width, size.height);
+			gc.setForeground(EmulatorScreen.display.getSystemColor(21));
+			gc.setFont(f);
+			gc.drawText(Emulator.getInfoString(), size.width >> 3, size.height >> 3, true);
+			return;
+		}
+
+		gc.setInterpolation(this.interpolation);
 		int origWidth = getWidth();
 		int origHeight = getHeight();
-		int canvasWidth;
-		int canvasHeight;
-		int scaledWidth = zoomedWidth;
-		int scaledHeight = zoomedHeight;
-
-		if (rotation % 2 == 1) {
-			// swap width & height if rotated by 90 or 270 degrees
-			canvasWidth = size.height;
-			canvasHeight = size.width;
-			if (Settings.resizeMode != 3 && (Settings.resizeMode == 2 || !painted)) {
-				scaledWidth = zoomedHeight;
-				scaledHeight = zoomedWidth;
-			}
-		} else {
-			canvasWidth = size.width;
-			canvasHeight = size.height;
-		}
-		painted = true;
-
-		// Keep proportions
-		final float ratio = (float) origWidth / (float) origHeight;
-		if (Settings.keepAspectRatio && ratio != ((float) scaledWidth / (float) scaledHeight)) {
-			scaledWidth = (int) ((float) scaledHeight * ratio);
-			if (scaledWidth > canvasWidth) {
-				scaledWidth = canvasWidth;
-				scaledHeight = (int) ((float) scaledWidth * ((float) origHeight / (float) origWidth));
-			}
-		}
-
-		if (Settings.resizeMode != 0) {
-			zoom = ((float) scaledWidth / (float) origWidth);
-			Settings.canvasScale = (int) (zoom * 100F);
-		} else if (zoom != 1f) {
-			scaledWidth *= zoom;
-			scaledHeight *= zoom;
-		}
-
-		int x = (canvasWidth - scaledWidth) / 2;
-		int y = (canvasHeight - scaledHeight) / 2;
 
 		if (swtContent == null) {
 			try {
 				// Fill background
-				if (x > 0 || y > 0 || scaledWidth != origWidth || scaledHeight != origHeight) {
+				if (screenX > 0 || screenY > 0) {
 					gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
 					gc.fillRectangle(0, 0, size.width, size.height);
 				}
@@ -1685,37 +1743,21 @@ public final class EmulatorScreen implements
 				gc.setTransform(this.paintTransform);
 				// Draw canvas buffer
 				if (this.screenImg == null || this.screenImg.isDisposed()) {
-					if (this.pauseState == 0) {
-						// Game not running, show info label
-						gc.setBackground(EmulatorScreen.display.getSystemColor(22));
-						gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
-						gc.setForeground(EmulatorScreen.display.getSystemColor(21));
-						gc.setFont(f);
-						gc.drawText(Emulator.getInfoString(), canvasWidth >> 3, canvasHeight >> 3, true);
+					IImage buf = Settings.g2d == 1 ? screenCopyAwt : screenCopySwt;
+					if (screenX == 0 && screenY == 0 && origWidth == screenWidth && origHeight == screenHeight) {
+						buf.copyToScreen(gc);
 					} else {
-						IImage buf = Settings.g2d == 1 ? screenCopyAwt : screenCopySwt;
-						if (x == 0 && y == 0 && origWidth == scaledWidth && origHeight == scaledHeight) {
-							buf.copyToScreen(gc);
-						} else {
-							buf.copyToScreen(gc, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
-						}
+						buf.copyToScreen(gc, 0, 0, origWidth, origHeight, screenX, screenY, screenWidth, screenHeight);
 					}
 				} else {
 					// Hold image (paused)
-					gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, x, y, scaledWidth, scaledHeight);
+					gc.drawImage(this.screenImg, 0, 0, origWidth, origHeight, screenX, screenY, screenWidth, screenHeight);
 				}
 			} catch (Exception ignored) {
 			}
 		}
-		screenX = x;
-		screenY = y;
-		screenWidth = scaledWidth;
-		screenHeight = scaledHeight;
-		if (!maximized) {
-			defaultSize = Settings.resizeMode != 1 && screenWidth == (int) (origWidth * zoom) && screenHeight == (int) (origHeight * zoom);
-		}
 		gc.setAdvanced(false);
-		this.method565(gc);
+		drawMouseInputInfo(gc);
 		if (wasResized) {
 			caret.setWindowZoom((float) screenHeight / (float) origHeight);
 			wasResized = false;
@@ -1723,46 +1765,10 @@ public final class EmulatorScreen implements
 	}
 
 	public float getZoom() {
-		if (Settings.resizeMode == 0) {
-			return zoom;
-		}
-
-		Rectangle size = canvas.getClientArea();
-
-		int origWidth = getWidth();
-		int origHeight = getHeight();
-		int canvasWidth;
-		int canvasHeight;
-		int scaledWidth = zoomedWidth;
-		int scaledHeight = zoomedHeight;
-
-		if (rotation % 2 == 1) {
-			// swap width & height if rotated by 90 or 270 degrees
-			canvasWidth = size.height;
-			canvasHeight = size.width;
-			if (Settings.resizeMode != 3 && (Settings.resizeMode == 2 || !painted)) {
-				scaledWidth = zoomedHeight;
-				scaledHeight = zoomedWidth;
-			}
-		} else {
-			canvasWidth = size.width;
-			canvasHeight = size.height;
-		}
-
-		// Keep proportions
-		final float ratio = (float) origWidth / (float) origHeight;
-		if (Settings.keepAspectRatio && ratio != ((float) scaledWidth / (float) scaledHeight)) {
-			scaledWidth = (int) ((float) scaledHeight * ratio);
-			if (scaledWidth > canvasWidth) {
-				scaledWidth = canvasWidth;
-				scaledHeight = (int) ((float) scaledWidth * ((float) origHeight / (float) origWidth));
-			}
-		}
-
-		return ((float) scaledWidth / (float) origWidth);
+		return realZoom;
 	}
 
-	private void method565(final GC gc) {
+	private void drawMouseInputInfo(final GC gc) {
 		if (this.infosEnabled && (this.mouseXPress != this.mouseXRelease || this.mouseYPress != this.mouseYRelease)) {
 			try {
 				OS_SetROP2(gc, 7);
@@ -2518,72 +2524,9 @@ public final class EmulatorScreen implements
 	}
 
 	public void controlResized(final ControlEvent controlEvent) {
+		onWindowResized();
 		this.controlMoved(controlEvent);
-		resized();
-	}
 
-	private void resized() {
-		if (getScreenImg() == null) return;
-		wasResized = true;
-		Rectangle size = canvas.getClientArea();
-		int origWidth = getWidth();
-		int origHeight = getHeight();
-
-		if (this.paintTransform == null) {
-			this.paintTransform = new Transform(null);
-		}
-
-		this.paintTransform.setElements(1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
-		switch (this.rotation) {
-			case 0:
-				break;
-			case 1:
-				this.paintTransform.translate(size.width, 0.0F);
-				this.paintTransform.rotate(90.0F);
-				break;
-			case 2:
-				this.paintTransform.translate(size.width, size.height);
-				this.paintTransform.rotate(180.0F);
-				break;
-			case 3:
-				this.paintTransform.translate(0.0F, size.height);
-				this.paintTransform.rotate(270.0F);
-		}
-		caret.a(this.paintTransform, this.rotation);
-		if (Settings.resizeMode > 0) {
-			synchronized (this) {
-				if (Settings.resizeMode == 1) {
-					// Sync canvas size
-					zoomedWidth = rotation % 2 == 1 ? size.height : size.width;
-					zoomedHeight = rotation % 2 == 1 ? size.width : size.height;
-					int w = (int) ((float) zoomedWidth / zoom);
-					int h = (int) ((float) zoomedHeight / zoom);
-					if (pauseState != 0 && (getWidth() != w || getHeight() != h)) {
-						initScreenBuffer(w, h);
-						Emulator.getEventQueue().sizeChanged(w, h);
-					}
-				} else if (Settings.resizeMode == 3) {
-					// Integer scaling
-					float f = Math.min((float) (rotation % 2 == 1 ? size.height : size.width) / (float) origWidth, (float) (rotation % 2 == 1 ? size.width : size.height) / (float) origHeight);
-					f = (int) (f - (f % 1));
-					if (f < 1) f = 1;
-					zoomedWidth = (int) ((float) origWidth * f);
-					zoomedHeight = (int) ((float) origHeight * f);
-				} else {
-					// Fit
-					zoomedWidth = size.width;
-					zoomedHeight = size.height;
-				}
-			}
-		} else {
-			// No scaling / center
-			zoomedWidth = getWidth();
-			zoomedHeight = getHeight();
-		}
-		if (swtContent != null && lastDisplayable != null) {
-			lastDisplayable._swtUpdateSizes();
-		}
-		canvas.redraw();
 	}
 
 	private void mp(int i) {
@@ -2645,6 +2588,7 @@ public final class EmulatorScreen implements
 		return this.caret;
 	}
 
+
 	static Shell method561(final EmulatorScreen class93) {
 		return class93.shell;
 	}
@@ -2658,7 +2602,7 @@ public final class EmulatorScreen implements
 	}
 
 	static String method560(final EmulatorScreen class93) {
-		return class93.aString983;
+		return class93.leftCmdText;
 	}
 
 	static CLabel getLeftSoftLabel(final EmulatorScreen class93) {
@@ -2666,7 +2610,7 @@ public final class EmulatorScreen implements
 	}
 
 	static String method573(final EmulatorScreen class93) {
-		return class93.aString989;
+		return class93.rightCmdText;
 	}
 
 	static CLabel getRightSoftLabel(final EmulatorScreen class93) {
