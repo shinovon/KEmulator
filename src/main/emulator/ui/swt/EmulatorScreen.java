@@ -323,7 +323,6 @@ public final class EmulatorScreen implements
 			EmulatorScreen.locY = clientArea.y - (clientArea.height + this.shell.getSize().y) >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
-
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 1));
 		EmulatorImpl.asyncExec(new WindowOpen(this, 2));
@@ -441,7 +440,10 @@ public final class EmulatorScreen implements
 	public void setSize(int x, int y) {
 		if (this.pauseState == 1) {
 			if (Settings.resizeMode == ResizeMethod.FollowWindowSize)
+			{
 				Settings.resizeMode = ResizeMethod.Fit;
+				syncScalingModeSelection();
+			}
 			this.initScreenBuffer(x, y);
 			updateCanvasRect(true, false);
 			Emulator.getEventQueue().sizeChanged(x, y);
@@ -936,16 +938,7 @@ public final class EmulatorScreen implements
 
 		resizeMenuItem.setMenu(menuResize);
 
-		if (Settings.resizeMode == ResizeMethod.FollowWindowSize) {
-			syncSizeMenuItem.setSelection(true);
-		} else if (Settings.resizeMode == ResizeMethod.Fit) {
-			fillScreenMenuItem.setSelection(true);
-		} else if (Settings.resizeMode == ResizeMethod.FitInteger) {
-			integerScalingMenuItem.setSelection(true);
-		} else {
-			centerOnScreenMenuItem.setSelection(true);
-		}
-
+		syncScalingModeSelection();
 
 		new MenuItem(menuTool, 2);
 		(this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDUP", "Speed Up") + "\tAlt+>");
@@ -1575,8 +1568,6 @@ public final class EmulatorScreen implements
 				ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
 				int[] r = d.open();
 				if (r != null) {
-					if (Settings.resizeMode == ResizeMethod.FollowWindowSize)
-						Settings.resizeMode = ResizeMethod.Fit;
 					setSize(r[0], r[1]);
 				}
 			}
