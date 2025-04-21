@@ -303,18 +303,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	public final void open(final Shell parent) {
 		createWidgets();
 		updateContent();
+		setInitialPosition(parent);
 
-		int offset;
-		if (parent.getMaximized()) {
-			shell.setSize(300, 400);
-			offset = 0;
-		} else {
-			shell.setSize(parent.getSize());
-			offset = 40;
-		}
-		int x = parent.getLocation().x + offset + (parent.getSize().x - shell.getSize().x) / 2;
-		int y = parent.getLocation().y + offset + (parent.getSize().y - shell.getSize().y) / 2;
-		shell.setLocation(x, y);
 		shell.open();
 		shell.addDisposeListener(this);
 		updateColumnSizes();
@@ -329,6 +319,20 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			}
 		}
 		visible = false;
+	}
+
+	private void setInitialPosition(Shell parent) {
+		int offset;
+		if (parent.getMaximized()) {
+			shell.setSize(300, 400);
+			offset = 0;
+		} else {
+			shell.setSize(parent.getSize());
+			offset = 40;
+		}
+		int x = parent.getLocation().x + offset + (parent.getSize().x - shell.getSize().x) / 2;
+		int y = parent.getLocation().y + offset + (parent.getSize().y - shell.getSize().y) / 2;
+		shell.setLocation(x, y);
 	}
 
 	public final void dispose() {
