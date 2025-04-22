@@ -522,8 +522,14 @@ public final class EmulatorScreen implements
 
 		// canvas size is managed automatically by layout.
 
+		ResizeMethod mode = Settings.resizeMode;
+		if (forceWindowReset) {
+			// FIXME: hack for temporarily moving to manual mode to reset window size
+			mode = ResizeMethod.Manual;
+		}
+
 		// applying zoom
-		switch (Settings.resizeMode) {
+		switch (mode) {
 			case Manual: {
 				// windows' WM can resize our window because it wants to. First flag is tracking, did user ever touched the window. If no (=true), then size is ignored
 				boolean windowWasPerfect = windowAutosized || (canvas.getClientArea().width == screenWidth && canvas.getClientArea().height == screenHeight);
@@ -534,12 +540,11 @@ public final class EmulatorScreen implements
 				realZoom = Settings.canvasScale;
 				boolean overflow = cw > shell.getClientArea().width || ch > shell.getClientArea().height - statusH;
 				boolean autoResize = allowWindowResize && (windowWasPerfect || overflow) && !shell.getMaximized();
-				if (forceWindowReset) {
-					windowResizedByUser = false;
-					shell.setMaximized(false);
-				}
 				if (autoResize || forceWindowReset) {
 					windowResizedByUser = false;
+					if (forceWindowReset) {
+						shell.setMaximized(false);
+					}
 					availableSpaceX = cw - cbw2;
 					availableSpaceY = ch - cbw2;
 					shell.setSize(cw + decorW, ch + statusH + windowDecorationHeight);
@@ -1624,9 +1629,7 @@ public final class EmulatorScreen implements
 					Emulator.getEventQueue().sizeChanged(startWidth, startHeight);
 				}
 
-				Settings.resizeMode = ResizeMethod.Manual;
-				Settings.canvasScale = Math.round(realZoom);
-				syncScalingModeSelection();
+				Settings.canvasScale = 1f;
 				updateCanvasRect(true, true);
 			} else if (menuItem == changeResMenuItem) {
 				ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
