@@ -581,7 +581,7 @@ public final class EmulatorScreen implements
 
 				int ch = (int) (rotatedHeight * finalZoom + cbw2);
 				realZoom = finalZoom;
-				boolean overflow = cw > shell.getClientArea().width || ch > shell.getClientArea().height - statusH;
+				boolean overflow = !rotate && (cw > shell.getClientArea().width || ch > shell.getClientArea().height - statusH);
 				boolean autoResize = allowWindowResize && (windowWasPerfect || overflow) && !shell.getMaximized();
 				if (autoResize || forceWindowReset) {
 					windowResizedByUser = false;
@@ -591,7 +591,15 @@ public final class EmulatorScreen implements
 					availableSpaceX = cw - cbw2;
 					availableSpaceY = ch - cbw2;
 					shell.setSize(cw + decorW, ch + statusH + windowDecorationHeight);
-					windowAutosized = true;
+					if (!rotate) {
+						windowAutosized = true;
+					}
+				}
+
+				if (rotate) {
+					// recurse to rescale after rotation
+					updateCanvasRect(true, false, false);
+					return;
 				}
 				break;
 			}
