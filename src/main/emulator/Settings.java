@@ -135,7 +135,6 @@ public final class Settings {
 	public static boolean softbankApi = false;
     public static String customTitle;
 
-	public static boolean ignoreControllerZAxis;
 	public static boolean disableCamera;
 
 	// 0: ignored
@@ -153,4 +152,6 @@ public final class Settings {
 
 	// controller axis threshold
 	public static float minAxis = 0.05f, maxAxis = 0.7f;
+	public static boolean inverseAxis;
+	public static String defaultController;
 }

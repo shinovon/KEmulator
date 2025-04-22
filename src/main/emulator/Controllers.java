@@ -304,14 +304,7 @@ public class Controllers {
 		if (Math.abs(f) <= Settings.minAxis && Math.abs(axisState[n][axis]) <= Settings.minAxis)
 			return;
 		axisState[n][axis] = f;
-
-		// ???
-		boolean inv = false;
-		if (mode < 0) {
-			inv = true;
-			mode = -mode;
-		}
-
+		if (Settings.inverseAxis) f = -f;
 		switch (mode) {
 			case 0: // ignore
 				break;
