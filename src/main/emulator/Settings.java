@@ -138,5 +138,19 @@ public final class Settings {
 	public static boolean ignoreControllerZAxis;
 	public static boolean disableCamera;
 
-	public static boolean controllerPovMap = false; // false - POV axis maps to dpad binds, true - directly to dpad keys
+	// 0: ignored
+	// 1: map horizontal, 2 - map vertical
+	// 3: direct dpad horizontal, 4: direct dpad vertical
+	// TODO inverse
+	public static int controllerPovXMap = 0,
+			controllerPovYMap = 0,
+			controllerXMap = 0,
+			controllerYMap = 0,
+			controllerZMap = 0,
+			controllerRXMap = 0,
+			controllerRYMap = 0,
+			controllerRZMap = 0;
+
+	// controller axis threshold
+	public static float minAxis = 0.05f, maxAxis = 0.7f;
 }
