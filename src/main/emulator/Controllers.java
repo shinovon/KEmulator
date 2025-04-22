@@ -304,26 +304,26 @@ public class Controllers {
 		if (Math.abs(f) <= Settings.minAxis && Math.abs(axisState[n][axis]) <= Settings.minAxis)
 			return;
 		axisState[n][axis] = f;
-		if (Settings.inverseAxis) f = -f;
 		switch (mode) {
 			case 0: // ignore
 				break;
 			case 1: // map horizontal
-				handleX(n, f, true);
+				horizontal(n, f, true);
 				break;
 			case 2: // map vertical
-				handleY(n, f, true);
+				vertical(n, f, true);
 				break;
 			case 4: // direct horizontal
-				handleX(n, f, false);
+				horizontal(n, f, false);
 				break;
 			case 5: // direct vertical
-				handleY(n, f, false);
+				vertical(n, f, false);
 				break;
 		}
 	}
 
-	private static void handleX(int n, float f, boolean map) {
+	private static void horizontal(int n, float f, boolean map) {
+		if (Settings.controllerInverseHor) f = -f;
 		if (map) {
 			if (f < -Settings.maxAxis) {
 				if (method748("LEFT")) return;
@@ -365,7 +365,8 @@ public class Controllers {
 		}
 	}
 
-	private static void handleY(int n, float f, boolean map) {
+	private static void vertical(int n, float f, boolean map) {
+		if (Settings.controllerInverseVer) f = -f;
 		if (map) {
 			if (f < -Settings.maxAxis) {
 				if (method748("UP")) return;

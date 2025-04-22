@@ -140,7 +140,6 @@ public final class Settings {
 	// 0: ignored
 	// 1: map horizontal, 2 - map vertical
 	// 3: direct dpad horizontal, 4: direct dpad vertical
-	// TODO inverse
 	public static int controllerPovXMap = 1,
 			controllerPovYMap = 2,
 			controllerXMap = 1,
@@ -152,6 +151,7 @@ public final class Settings {
 
 	// controller axis threshold
 	public static float minAxis = 0.05f, maxAxis = 0.7f;
-	public static boolean inverseAxis;
+	public static boolean controllerInverseHor;
+	public static boolean controllerInverseVer;
 	public static String defaultController;
 }
