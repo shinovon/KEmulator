@@ -1624,7 +1624,7 @@ public final class EmulatorScreen implements
 					Emulator.getEventQueue().sizeChanged(startWidth, startHeight);
 				}
 
-				Settings.resizeMode = ResizeMethod.Manual;
+//				Settings.resizeMode = ResizeMethod.Manual;
 				Settings.canvasScale = Math.round(realZoom);
 				syncScalingModeSelection();
 				updateCanvasRect(true, true);
