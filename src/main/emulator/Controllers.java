@@ -247,22 +247,22 @@ public class Controllers {
 						continue;
 					}
 //					if (!controller.getName().toLowerCase().contains("xbox") && !Settings.ignoreControllerZAxis) {
-						if (name.equalsIgnoreCase("z")) {
-							filter(i, value, AXIS_Z);
-							continue;
-						}
-						if (name.equalsIgnoreCase("rz")) {
-							filter(i, value, AXIS_RZ);
-							continue;
-						}
-						if (name.equalsIgnoreCase("rx")) {
-							filter(i, value, AXIS_RX);
-							continue;
-						}
-						if (name.equalsIgnoreCase("ry")) {
-							filter(i, value, AXIS_RY);
-							continue;
-						}
+					if (name.equalsIgnoreCase("z")) {
+						filter(i, value, AXIS_Z);
+						continue;
+					}
+					if (name.equalsIgnoreCase("rz")) {
+						filter(i, value, AXIS_RZ);
+						continue;
+					}
+					if (name.equalsIgnoreCase("rx")) {
+						filter(i, value, AXIS_RX);
+						continue;
+					}
+					if (name.equalsIgnoreCase("ry")) {
+						filter(i, value, AXIS_RY);
+						continue;
+					}
 //					}
 				}
 			}
