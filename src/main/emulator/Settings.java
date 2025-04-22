@@ -48,10 +48,7 @@ public final class Settings {
 
 	public static boolean canvasKeyboard;
 	public static boolean awtAntiAliasing;
-	public static boolean fpsMode;
 	public static boolean textAntiAliasing = true;
-	// 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS, 3 - QUANTUM FIXME
-	public static int fpsGame;
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
 	public static String locale = "en-US";

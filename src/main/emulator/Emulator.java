@@ -707,18 +707,6 @@ public class Emulator implements Runnable {
 		}
 
 		try {
-			String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-			String midletVendor = Emulator.emulatorimpl.getAppProperty("MIDlet-Vendor");
-			if (midlet != null) {
-				// TODO this is stupid
-				if (midlet.equalsIgnoreCase("bounce tales")) {
-					Settings.fpsGame = 1;
-				} else if (midlet.equalsIgnoreCase("micro counter strike")) {
-					Settings.fpsGame = 2;
-				} else if (midlet.equalsIgnoreCase("quantum") || (midletVendor != null && midletVendor.toLowerCase().contains("ae-mods"))) {
-					Settings.fpsGame = 3;
-				}
-			}
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 		} catch (Exception ignored) {
 		}
