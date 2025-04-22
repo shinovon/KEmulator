@@ -1318,7 +1318,7 @@ public final class EmulatorScreen implements
 				this.infosEnabled = this.infosMenuItem.getSelection();
 				if (this.infosEnabled) {
 					this.canvas.setCursor(new Cursor(EmulatorScreen.display, 2));
-					((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(this.shell);
+					((EmulatorImpl) Emulator.getEmulator()).getInfos().open(this.shell);
 					return;
 				}
 				this.canvas.setCursor(new Cursor(EmulatorScreen.display, 0));
@@ -1576,7 +1576,7 @@ public final class EmulatorScreen implements
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
         "," + (int)((this.mouseYRelease - this.mouseYPress) / this.zoom) + ")";
         */
-		((EmulatorImpl) Emulator.getEmulator()).getInfos().method609(this.aString1008);
+		((EmulatorImpl) Emulator.getEmulator()).getInfos().setText(this.aString1008);
 	}
 
 	private void method588() {
@@ -2508,7 +2508,7 @@ public final class EmulatorScreen implements
 			}
 		}
 		final Shell method330;
-		if (((EmulatorImpl) Emulator.getEmulator()).getInfos().isShown() && !(method330 = ((EmulatorImpl) Emulator.getEmulator()).getInfos().method611()).isDisposed()) {
+		if (((EmulatorImpl) Emulator.getEmulator()).getInfos().isShown() && !(method330 = ((EmulatorImpl) Emulator.getEmulator()).getInfos().getShell()).isDisposed()) {
 			method330.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 		}
 		final Shell method331;
@@ -2900,7 +2900,7 @@ public final class EmulatorScreen implements
 						infosEnabled = true;
 						this.screen.infosMenuItem.setSelection(true);
 						EmulatorScreen.getCanvas(this.screen).setCursor(new Cursor(EmulatorScreen.method564(), 2));
-						((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(EmulatorScreen.method561(this.screen));
+						((EmulatorImpl) Emulator.getEmulator()).getInfos().open(EmulatorScreen.method561(this.screen));
 						break;
 					}
 					break;
