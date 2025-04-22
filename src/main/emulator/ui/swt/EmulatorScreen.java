@@ -344,7 +344,7 @@ public final class EmulatorScreen implements
 						b = true;
 						while (shell != null && !shell.isDisposed()) {
 							display.asyncExec(this);
-							Thread.sleep(20);
+							Thread.sleep(10);
 						}
 					} catch (Exception e) {
 						System.err.println("Exception in keyboard poll thread");
