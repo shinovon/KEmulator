@@ -84,8 +84,8 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	public final void setCaretLocation(final int x, final int y) {
 		this.caretLocX = x;
 		this.caretLocY = y;
-		int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaret(x, y);
-		swtCaret.setLocation(i[0], i[1]);
+		int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaret(x, y, true);
+		if (swtCaret != null) swtCaret.setLocation(i[0], i[1]);
 		if (swtText != null) swtText.setLocation(i[0], i[1]);
 	}
 
@@ -112,8 +112,9 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 				swtFont = new org.eclipse.swt.graphics.Font(swtCanvas.getDisplay(),
 						Emulator.getEmulator().getProperty().getDefaultFontName(),
 						Math.max(2, (int) (font.getHeight() * zoom * 0.7f) - 1), 0);
+				if (swtText == null) return;
 				swtText.setFont(swtFont);
-				int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaretSize(w, h);
+				int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaret(w, h, false);
 				this.swtText.setSize(Math.max(1, i[0]), Math.max(1, i[1]));
 				this.setCaretLocation(this.caretLocX, this.caretLocY);
 				swtText.setVisible(true);
