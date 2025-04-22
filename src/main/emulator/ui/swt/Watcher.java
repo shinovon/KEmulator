@@ -331,7 +331,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		final int WIDTH = 400;
 		final int HEIGHT = 500;
 		final int OFFSET = 40;
-		Rectangle dsp = EmulatorImpl.getDisplay().getClientArea();
+		Rectangle dsp = shell.getMonitor().getClientArea();
 
 		// for any maximized parent place at bottom-center except main window
 		if (parent.getMaximized()) {
