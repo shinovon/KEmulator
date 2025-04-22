@@ -307,7 +307,7 @@ public final class EmulatorScreen implements
 			windowResizedByUser = false;
 			// window was already resized to minimum so it's safe to capture decor height (potentially with multiline menu)
 			windowDecorationHeight = shell.getSize().y - shell.getClientArea().height;
-			updateCanvasRect(true, false);
+			updateCanvasRect(true, false, false);
 			windowResizedByUser = true;
 
 		} catch (Exception ex) {
@@ -452,7 +452,7 @@ public final class EmulatorScreen implements
 				syncScalingModeSelection();
 			}
 			initScreenBuffer(x, y); // it's set automatically only in follow mode
-			updateCanvasRect(true, false);
+			updateCanvasRect(true, false, true);
 			Emulator.getEventQueue().sizeChanged(x, y);
 		}
 	}
@@ -460,7 +460,7 @@ public final class EmulatorScreen implements
 	private void rotate90degrees() {
 		this.rotation += 1;
 		this.rotation %= 4;
-		updateCanvasRect(true, false);
+		updateCanvasRect(true, false, true);
 	}
 
 	private void onWindowResized() {
@@ -480,7 +480,7 @@ public final class EmulatorScreen implements
 		// if triggered by our resize AND decor did not change we do not want recursion
 		if (windowWasResizedByUser || decorHChanged)
 			// if user is not dragging window and decor height changed - window should be resized automatically.
-			updateCanvasRect(decorHChanged && !windowWasResizedByUser, false);
+			updateCanvasRect(decorHChanged && !windowWasResizedByUser, false, false);
 		updateStatus();
 	}
 
@@ -494,7 +494,7 @@ public final class EmulatorScreen implements
 	 * @param forceWindowReset  If true and in manual mode, resets window size. First argument will be ignored.
 	 * @see #onWindowResized()
 	 */
-	private void updateCanvasRect(boolean allowWindowResize, boolean forceWindowReset) {
+	private void updateCanvasRect(boolean allowWindowResize, boolean forceWindowReset, boolean rotate) {
 		// applying rotation
 		// nonrotated - size, visible from midlet. Equal to rotated on 0° and 180°.
 		int nonRotatedW = getWidth();
@@ -528,30 +528,10 @@ public final class EmulatorScreen implements
 			mode = ResizeMethod.Manual;
 		}
 
+		float finalZoom = suggestedFitZoom;
+
 		// applying zoom
 		switch (mode) {
-			case Manual: {
-				// windows' WM can resize our window because it wants to. First flag is tracking, did user ever touched the window. If no (=true), then size is ignored
-				boolean windowWasPerfect = windowAutosized || (canvas.getClientArea().width == screenWidth && canvas.getClientArea().height == screenHeight);
-				// 120px is windows minimal limit. Accounting for that fixes frame "sticking" to left side.
-				int cw = Math.max(120, (int) (rotatedWidth * Settings.canvasScale + cbw2));
-
-				int ch = (int) (rotatedHeight * Settings.canvasScale + cbw2);
-				realZoom = Settings.canvasScale;
-				boolean overflow = cw > shell.getClientArea().width || ch > shell.getClientArea().height - statusH;
-				boolean autoResize = allowWindowResize && (windowWasPerfect || overflow) && !shell.getMaximized();
-				if (autoResize || forceWindowReset) {
-					windowResizedByUser = false;
-					if (forceWindowReset) {
-						shell.setMaximized(false);
-					}
-					availableSpaceX = cw - cbw2;
-					availableSpaceY = ch - cbw2;
-					shell.setSize(cw + decorW, ch + statusH + windowDecorationHeight);
-					windowAutosized = true;
-				}
-				break;
-			}
 			case FollowWindowSize: {
 				rotatedWidth = (int) ((float) availableSpaceX / Settings.canvasScale);
 				rotatedHeight = (int) ((float) availableSpaceY / Settings.canvasScale);
@@ -575,20 +555,44 @@ public final class EmulatorScreen implements
 
 				break;
 			}
-			case Fit: {
-				// applying suggested zoom.
-				realZoom = suggestedFitZoom;
-				break;
-			}
-			case FitInteger: {
-				float roundedZoom;
+			case FitInteger:
 				if (suggestedFitZoom >= 1f) {
-					roundedZoom = (float) Math.floor(suggestedFitZoom);
+					finalZoom = (float) Math.floor(suggestedFitZoom);
 				} else {
 					// rounds to 50%, 33%, 25%, 20%, etc.
-					roundedZoom = (float) (1d / Math.ceil(1d / suggestedFitZoom));
+					finalZoom = (float) (1d / Math.ceil(1d / suggestedFitZoom));
 				}
-				realZoom = roundedZoom;
+
+			case Fit:
+				if (!rotate) {
+					realZoom = finalZoom;
+					break;
+				}
+				finalZoom = realZoom;
+
+			case Manual: {
+				if (mode == ResizeMethod.Manual) {
+					finalZoom = Settings.canvasScale;
+				}
+				// windows' WM can resize our window because it wants to. First flag is tracking, did user ever touched the window. If no (=true), then size is ignored
+				boolean windowWasPerfect = windowAutosized || (canvas.getClientArea().width == screenWidth && canvas.getClientArea().height == screenHeight);
+				// 120px is windows minimal limit. Accounting for that fixes frame "sticking" to left side.
+				int cw = Math.max(120, (int) (rotatedWidth * finalZoom + cbw2));
+
+				int ch = (int) (rotatedHeight * finalZoom + cbw2);
+				realZoom = finalZoom;
+				boolean overflow = cw > shell.getClientArea().width || ch > shell.getClientArea().height - statusH;
+				boolean autoResize = allowWindowResize && (windowWasPerfect || overflow) && !shell.getMaximized();
+				if (autoResize || forceWindowReset) {
+					windowResizedByUser = false;
+					if (forceWindowReset) {
+						shell.setMaximized(false);
+					}
+					availableSpaceX = cw - cbw2;
+					availableSpaceY = ch - cbw2;
+					shell.setSize(cw + decorW, ch + statusH + windowDecorationHeight);
+					windowAutosized = true;
+				}
 				break;
 			}
 			default:
@@ -649,7 +653,7 @@ public final class EmulatorScreen implements
 			syncScalingModeSelection();
 		}
 		Settings.canvasScale = Math.min(10f, Settings.canvasScale + 0.5f);
-		updateCanvasRect(true, false);
+		updateCanvasRect(true, false, false);
 	}
 
 	private void zoomOut() {
@@ -659,7 +663,7 @@ public final class EmulatorScreen implements
 			syncScalingModeSelection();
 		}
 		Settings.canvasScale = Math.max(1f, Settings.canvasScale - 0.5f);
-		updateCanvasRect(true, false);
+		updateCanvasRect(true, false, false);
 	}
 
 	private void pauseScreen() {
@@ -1610,19 +1614,19 @@ public final class EmulatorScreen implements
 				syncScalingModeSelection();
 				// see zoomIn/zoomOut
 				Settings.canvasScale = (float) (Math.floor(realZoom * 2) / 2d);
-				updateCanvasRect(true, false);
+				updateCanvasRect(true, false, false);
 			} else if (menuItem == syncSizeMenuItem) {
 				Settings.resizeMode = ResizeMethod.FollowWindowSize;
 				syncScalingModeSelection();
-				updateCanvasRect(true, false);
+				updateCanvasRect(true, false, false);
 			} else if (menuItem == fillScreenMenuItem) {
 				Settings.resizeMode = ResizeMethod.Fit;
 				syncScalingModeSelection();
-				updateCanvasRect(true, false);
+				updateCanvasRect(true, false, false);
 			} else if (menuItem == integerScalingMenuItem) {
 				Settings.resizeMode = ResizeMethod.FitInteger;
 				syncScalingModeSelection();
-				updateCanvasRect(true, false);
+				updateCanvasRect(true, false, false);
 			} else if (menuItem == resetSizeMenuItem) {
 				if (getWidth() != startWidth || getHeight() != startHeight) {
 					initScreenBuffer(startWidth, startHeight);
@@ -1630,7 +1634,7 @@ public final class EmulatorScreen implements
 				}
 
 				Settings.canvasScale = 1f;
-				updateCanvasRect(true, true);
+				updateCanvasRect(true, true, false);
 			} else if (menuItem == changeResMenuItem) {
 				ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
 				int[] r = d.open();
