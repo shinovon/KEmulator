@@ -1626,6 +1626,7 @@ public final class EmulatorScreen implements
 
 				Settings.resizeMode = ResizeMethod.Manual;
 				Settings.canvasScale = Math.round(realZoom);
+				syncScalingModeSelection();
 				updateCanvasRect(true, true);
 			} else if (menuItem == changeResMenuItem) {
 				ScreenSizeDialog d = new ScreenSizeDialog(shell, getWidth(), getHeight());
