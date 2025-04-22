@@ -137,4 +137,6 @@ public final class Settings {
 
 	public static boolean ignoreControllerZAxis;
 	public static boolean disableCamera;
+
+	public static boolean controllerPovMap = false; // false - POV axis maps to dpad binds, true - directly to dpad keys
 }

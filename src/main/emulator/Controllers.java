@@ -265,7 +265,7 @@ public class Controllers {
 	}
 
 	private static void handleX(int n, float f, boolean pov) {
-		if (pov) {
+		if (pov == Settings.controllerPovMap) {
 			if (f < -0.7f) {
 				if (method748("LEFT")) return;
 				if (Controllers.arrowKeysState[n][0])
@@ -307,7 +307,7 @@ public class Controllers {
 	}
 
 	private static void handleY(int n, float f, boolean pov) {
-		if (pov) {
+		if (pov == Settings.controllerPovMap) {
 			if (f < -0.7f) {
 				if (method748("UP")) return;
 				if (Controllers.arrowKeysState[n][2])
@@ -330,13 +330,13 @@ public class Controllers {
 			return;
 		}
 		if (f < -0.7f) {
-			if (method748("UP")) return;
+			//if (method748("UP")) return;
 			if (Controllers.arrowKeysState[n][6])
 				return;
 			Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.UP));
 			Controllers.arrowKeysState[n][6] = true;
 		} else if (f > 0.7f) {
-			if (method748("DOWN")) return;
+			//if (method748("DOWN")) return;
 			if (Controllers.arrowKeysState[n][7])
 				return;
 			Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN));
