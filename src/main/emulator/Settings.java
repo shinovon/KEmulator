@@ -71,7 +71,6 @@ public final class Settings {
 	public static boolean motorolaSoftKeyFix = false;
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
 	public static ResizeMethod resizeMode = ResizeMethod.Fit;
-	public static boolean keepAspectRatio = true;
 	public static boolean patchSynchronizedPaint = true;
 	public static boolean patchSynchronizedPlayerUpdate = true;
 

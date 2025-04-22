@@ -628,7 +628,6 @@ public final class Property implements IProperty, SelectionListener {
 				Settings.canvasScale = 1f;
 			}
 			Settings.resizeMode = ResizeMethod.fromInt(Integer.parseInt(properties.getProperty("ResizeMode", "2")));
-			Settings.keepAspectRatio = Boolean.parseBoolean(properties.getProperty("KeepAspectRatio", "true"));
 			Settings.interpolation = Integer.parseInt(properties.getProperty("Interpolation", "0"));
 
 			// window
@@ -856,7 +855,6 @@ public final class Property implements IProperty, SelectionListener {
 			// display
 			properties.setProperty("CanvasScale", String.valueOf(Math.round(Settings.canvasScale*100)));
 			properties.setProperty("ResizeMode", Settings.resizeMode.toString());
-			properties.setProperty("KeepAspectRatio", String.valueOf(Settings.keepAspectRatio));
 			properties.setProperty("Interpolation", String.valueOf(Settings.interpolation));
 
 			// window
