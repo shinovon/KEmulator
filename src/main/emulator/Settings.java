@@ -142,14 +142,14 @@ public final class Settings {
 	// 1: map horizontal, 2 - map vertical
 	// 3: direct dpad horizontal, 4: direct dpad vertical
 	// TODO inverse
-	public static int controllerPovXMap = 0,
-			controllerPovYMap = 0,
-			controllerXMap = 0,
-			controllerYMap = 0,
-			controllerZMap = 0,
+	public static int controllerPovXMap = 1,
+			controllerPovYMap = 2,
+			controllerXMap = 1,
+			controllerYMap = 2,
+			controllerZMap = 3, // should be ignored on xbox
 			controllerRXMap = 0,
 			controllerRYMap = 0,
-			controllerRZMap = 0;
+			controllerRZMap = 4; // should be ignored on xbox
 
 	// controller axis threshold
 	public static float minAxis = 0.05f, maxAxis = 0.7f;
