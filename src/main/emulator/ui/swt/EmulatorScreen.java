@@ -858,10 +858,14 @@ public final class EmulatorScreen implements
 		canvasKeyboardMenuItem.setText(UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
 		canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
 		canvasKeyboardMenuItem.addSelectionListener(this);
+
 		this.networkKillswitchMenuItem = new MenuItem(this.menuTool, 32);
 		networkKillswitchMenuItem.setText(UILocale.get("MENU_TOOL_DISABLE_NETWORK_ACCESS", "Disable network access"));
 		networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
 		networkKillswitchMenuItem.addSelectionListener(this);
+
+		menuItemTool.setMenu(this.menuTool);
+
 		this.menuMidlet = new Menu(menuItemMidlet);
 		(this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar..."));
 		this.loadJarMenuItem.addSelectionListener(this);
