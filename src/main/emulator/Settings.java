@@ -132,6 +132,23 @@ public final class Settings {
 	public static boolean softbankApi = false;
     public static String customTitle;
 
-	public static boolean ignoreControllerZAxis;
 	public static boolean disableCamera;
+
+	// 0: ignored
+	// 1: map horizontal, 2 - map vertical
+	// 3: direct dpad horizontal, 4: direct dpad vertical
+	// 5: map to own button
+	public static int controllerPovXMap = 1,
+			controllerPovYMap = 2,
+			controllerXMap = 1,
+			controllerYMap = 2,
+			controllerZMap = 3, // should be ignored on xbox
+			controllerRXMap = 5,
+			controllerRYMap = 5,
+			controllerRZMap = 4; // should be ignored on xbox
+
+	// controller axis threshold
+	public static float axisFilter = 0.05f, axisThreshold = 0.7f;
+	public static boolean controllerInverseHor;
+	public static boolean controllerInverseVer;
 }
