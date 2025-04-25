@@ -1374,7 +1374,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.watchesMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().method313()) {
+				if (((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().isVisible()) {
 					((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().dispose();
 					return;
 				}
@@ -1382,7 +1382,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.profilerMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).getProfiler().method313()) {
+				if (((EmulatorImpl) Emulator.getEmulator()).getProfiler().isVisible()) {
 					((EmulatorImpl) Emulator.getEmulator()).getProfiler().dispose();
 					return;
 				}

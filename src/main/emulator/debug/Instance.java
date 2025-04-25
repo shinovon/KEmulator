@@ -21,7 +21,7 @@ public final class Instance {
 		this.instance = anObject1496;
 	}
 
-	public final boolean method879(final String s) {
+	public final boolean updateFields(final String s) {
 		this.fields.removeAllElements();
 		if (this.aClass.isArray()) {
 			if (this.instance != null) {

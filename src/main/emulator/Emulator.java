@@ -1304,8 +1304,8 @@ public class Emulator implements Runnable {
 			});
 			return;
 		}
-		Emulator.emulatorimpl.getClassWatcher().fill();
-		Emulator.emulatorimpl.getProfiler().fill();
+		Emulator.emulatorimpl.getClassWatcher().fillClassList();
+		Emulator.emulatorimpl.getProfiler().fillClassList();
 		Emulator.eventQueue.queue(EventQueue.EVENT_START);
 	}
 }
