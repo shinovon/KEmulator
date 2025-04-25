@@ -2,7 +2,6 @@ package javax.microedition.lcdui;
 
 import emulator.*;
 import emulator.debug.Profiler;
-import emulator.graphics2D.swt.FontSWT;
 import emulator.lcdui.LCDUIUtils;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.ui.IScreen;
