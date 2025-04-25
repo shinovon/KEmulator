@@ -89,7 +89,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		switch (type) {
 			case Static: {
 				String s = c.getCls().getName();
-				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (static " + s + ')');
+				this.shell.setText(s + " (static) - " + emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
 				break;
 			}
 			case Profiler:
@@ -98,8 +98,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				break;
 			case Instance: {
 				Object o = c.getInstance();
-				String s = o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
-				this.shell.setText(emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher") + " (" + s + ')');
+				String s = o.getClass().getName();
+				String hash = Integer.toHexString(o.hashCode());
+				this.shell.setText(s + " (" + hash + ") - " + emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
 				break;
 			}
 		}
