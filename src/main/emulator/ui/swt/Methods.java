@@ -10,6 +10,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -31,7 +32,7 @@ public final class Methods implements Runnable, DisposeListener {
 	private Text aText789;
 	private Button aButton799;
 	private StyledText aStyledText790;
-	private Display aDisplay791;
+	private Display display;
 	private boolean visible;
 	private static NumberFormat aNumberFormat794;
 	private int anInt786;
@@ -133,15 +134,17 @@ public final class Methods implements Runnable, DisposeListener {
 			h.method591();
 		}
 		this.method449();
-		this.aDisplay791 = Display.getCurrent();
-		this.shell.setLocation(this.aDisplay791.getClientArea().width - this.shell.getSize().x >> 1, this.aDisplay791.getClientArea().height - this.shell.getSize().y >> 1);
+		this.display = Display.getCurrent();
+		Rectangle clientArea = shell.getMonitor().getClientArea();
+		Point size = shell.getSize();
+		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.visible = true;
 		this.method448();
 		while (!this.shell.isDisposed()) {
-			if (!this.aDisplay791.readAndDispatch()) {
-				this.aDisplay791.sleep();
+			if (!this.display.readAndDispatch()) {
+				this.display.sleep();
 			}
 		}
 		this.visible = false;

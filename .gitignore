@@ -33,21 +33,14 @@ mapping*.txt
 *.exe
 
 # emulator files
-log.txt
-property.txt
-track.txt
 kemulator.cfg
 
 # vlc dirs
 plugins
 
-.idea/uiDesigner.xml
 config_fast.txt
-home/classwatcher.txt
 m3g_*.jar
 micro3d_*.jar
 KEmulator_x64.jar
 kemulator-debug.jar
 version.mf
-home/midlets.txt
-home/updater.jar

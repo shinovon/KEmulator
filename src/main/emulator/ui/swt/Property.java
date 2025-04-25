@@ -617,11 +617,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.awtAntiAliasing = Boolean.parseBoolean(properties.getProperty("AWTAntiAliasing", "false"));
 			Settings.textAntiAliasing = Boolean.parseBoolean(properties.getProperty("TextAntiAliasing", "true"));
 
-			if (Emulator.getEmulator() != null && Emulator.getEmulator().getScreen() != null) {
-				((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(!Settings.canvasKeyboard);
-				((EmulatorScreen) Emulator.getEmulator().getScreen()).setFpsMode(Settings.fpsMode);
-			}
-
 			// display
 			Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(1)))/100f;
 			if (Settings.canvasScale < 1f || Settings.canvasScale % 0.5f != 0) {

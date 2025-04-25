@@ -547,7 +547,7 @@ public class Displayable {
 					Point p;
 					EmulatorScreen s = ((EmulatorScreen) Emulator.getEmulator().getScreen());
 					if (x != -1 || y != -1) {
-						int[] t = s.transformCaret(x, y);
+						int[] t = s.transformCaret(x, y, true);
 						p = s.getCanvas().toDisplay(new Point(t[0], t[1]));
 					} else {
 						p = s.getMenuLocation();

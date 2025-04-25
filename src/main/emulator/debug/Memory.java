@@ -154,7 +154,7 @@ public final class Memory {
 	private void method847(final Class clazz, final Object o, final String s, boolean vector) {
 		String clazzName = clazz.getName();
 		if (clazz.isArray()) {
-			clazzName = ClassTypes.method869(clazz);
+			clazzName = ClassTypes.getReadableClassName(clazz);
 		}
 		ClassInfo classInfo = (ClassInfo) this.classesTable.get(clazzName);
 		if (clazz.isInterface()) {

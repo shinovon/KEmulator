@@ -1,0 +1,15 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name=KEmulator
+GenericName=MIDP emulator
+GenericName[ru]=Эмулятор MIDP
+Comment=Emulator for j2me, CLDC, MIDP applications and games
+Comment[ru]=Эмулятор для игр и приложений j2me, CLDC, MIDP
+Keywords=symbian;j2me;java;midp;cldc;emulator;kemnn;nnmod;
+Exec=/usr/bin/kemulator %f
+Icon=cc.nnproject.kemulator
+Terminal=false
+Type=Application
+Categories=Application;Game;
+MimeType=application/java-archive;application/x-java-archive;text/vnd.sun.j2me.app-descriptor;

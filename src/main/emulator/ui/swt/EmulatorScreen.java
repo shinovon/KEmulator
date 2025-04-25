@@ -130,7 +130,6 @@ public final class EmulatorScreen implements
 	MenuItem sensorMenuItem;
 	MenuItem networkKillswitchMenuItem;
 	private MenuItem canvasKeyboardMenuItem;
-	private MenuItem fpsModeMenuItem;
 	private MenuItem changeResMenuItem;
 	private Menu menuResize;
 	private MenuItem centerOnScreenMenuItem;
@@ -155,13 +154,6 @@ public final class EmulatorScreen implements
 	private Vibrate vibraThread;
 	private long vibra;
 	private long vibraStart;
-	private boolean fpsWasRight;
-	private boolean fpsWasLeft;
-	private boolean fpsWasntHor;
-	private boolean mset;
-	private boolean fpsWasUp;
-	private boolean fpsWasBottom;
-	private boolean fpsWasntVer;
 	private MenuItem rotate90MenuItem;
 	private final Vector<Integer> pressedKeys = new Vector<Integer>();
 	static Font f;
@@ -358,7 +350,7 @@ public final class EmulatorScreen implements
 						b = true;
 						while (shell != null && !shell.isDisposed()) {
 							display.asyncExec(this);
-							Thread.sleep(20);
+							Thread.sleep(10);
 						}
 					} catch (Exception e) {
 						System.err.println("Exception in keyboard poll thread");
@@ -1050,16 +1042,14 @@ public final class EmulatorScreen implements
 		canvasKeyboardMenuItem.setText(UILocale.get("MENU_TOOL_QWERTY_MODE", "QWERTY Mode"));
 		canvasKeyboardMenuItem.setSelection(Settings.canvasKeyboard);
 		canvasKeyboardMenuItem.addSelectionListener(this);
-		this.fpsModeMenuItem = new MenuItem(this.menuTool, 32);
-		fpsModeMenuItem.setText(UILocale.get("MENU_TOOL_FPS_MODE", "FPS Mode") + "\tAlt+F");
-		fpsModeMenuItem.setSelection(Settings.fpsMode);
-		fpsModeMenuItem.addSelectionListener(this);
-		fpsModeMenuItem.setAccelerator(SWT.ALT + 'F');
-		menuItemTool.setMenu(this.menuTool);
+
 		this.networkKillswitchMenuItem = new MenuItem(this.menuTool, 32);
 		networkKillswitchMenuItem.setText(UILocale.get("MENU_TOOL_DISABLE_NETWORK_ACCESS", "Disable network access"));
 		networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
 		networkKillswitchMenuItem.addSelectionListener(this);
+
+		menuItemTool.setMenu(this.menuTool);
+
 		this.menuMidlet = new Menu(menuItemMidlet);
 		(this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar..."));
 		this.loadJarMenuItem.addSelectionListener(this);
@@ -1157,21 +1147,12 @@ public final class EmulatorScreen implements
 
 		toggleMenuAccelerators(!Settings.canvasKeyboard);
 
-		setFpsMode(Settings.fpsMode);
 		this.shell.setMenuBar(this.menu);
 	}
 
 
 	void toggleMenuAccelerators(final boolean b) {
 		this.captureToFileMenuItem.setAccelerator(b ? SWT.CONTROL | 67 : 0);
-	}
-
-
-	void setFpsMode(boolean b) {
-		if (b) {
-			Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2);
-			display.setCursorLocation(pt);
-		}
 	}
 
 	public static void pause() {
@@ -1221,12 +1202,6 @@ public final class EmulatorScreen implements
 				if (menuItem == canvasKeyboardMenuItem) {
 					Settings.canvasKeyboard = canvasKeyboardMenuItem.getSelection();
 					toggleMenuAccelerators(!Settings.canvasKeyboard);
-					return;
-				}
-
-				if (menuItem == fpsModeMenuItem) {
-					Settings.fpsMode = fpsModeMenuItem.getSelection();
-					setFpsMode(true);
 					return;
 				}
 
@@ -1502,7 +1477,7 @@ public final class EmulatorScreen implements
 				this.infosEnabled = this.infosMenuItem.getSelection();
 				if (this.infosEnabled) {
 					this.canvas.setCursor(new Cursor(EmulatorScreen.display, 2));
-					((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(this.shell);
+					((EmulatorImpl) Emulator.getEmulator()).getInfos().open(this.shell);
 					return;
 				}
 				this.canvas.setCursor(new Cursor(EmulatorScreen.display, 0));
@@ -1579,7 +1554,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.watchesMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().method313()) {
+				if (((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().isVisible()) {
 					((EmulatorImpl) Emulator.getEmulator()).getClassWatcher().dispose();
 					return;
 				}
@@ -1587,7 +1562,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.profilerMenuItem) {
-				if (((EmulatorImpl) Emulator.getEmulator()).getProfiler().method313()) {
+				if (((EmulatorImpl) Emulator.getEmulator()).getProfiler().isVisible()) {
 					((EmulatorImpl) Emulator.getEmulator()).getProfiler().dispose();
 					return;
 				}
@@ -1734,7 +1709,7 @@ public final class EmulatorScreen implements
         (int)(this.mouseYPress / this.zoom) + "," + (int)((this.mouseXRelease - this.mouseXPress) / this.zoom) +
         "," + (int)((this.mouseYRelease - this.mouseYPress) / this.zoom) + ")";
         */
-		((EmulatorImpl) Emulator.getEmulator()).getInfos().method609(this.aString1008);
+		((EmulatorImpl) Emulator.getEmulator()).getInfos().setText(this.aString1008);
 	}
 
 	private void method588() {
@@ -2199,54 +2174,19 @@ public final class EmulatorScreen implements
 		return new int[]{x, y};
 	}
 
-	public int[] transformCaret(int x, int y) {
+	public int[] transformCaret(int x, int y, boolean offset) {
 		// Map coordinates on window to canvas
 		int w, h;
 		if (rotation % 2 == 1) {
 			w = getHeight();
 			h = getWidth();
-			x = (int) (x / ((float) w / screenWidth)) + screenX;
-			y = (int) (y / ((float) h / screenHeight)) + screenY;
+			x = (int) (x / ((float) w / screenWidth)) + (offset ? screenX : 0);
+			y = (int) (y / ((float) h / screenHeight)) + (offset ? screenY : 0);
 		} else {
 			w = getWidth();
 			h = getHeight();
-			x = (int) (x / ((float) w / screenWidth)) + screenX;
-			y = (int) (y / ((float) h / screenHeight)) + screenY;
-		}
-		int tmp;
-		switch (this.rotation) {
-			case 0:
-				break;
-			case 1:
-				tmp = x;
-				x = y;
-				y = w - tmp;
-				break;
-			case 2:
-				x = w - x;
-				y = h - y;
-				break;
-			case 3:
-				tmp = x;
-				x = h - y;
-				y = tmp;
-		}
-		return new int[]{x, y};
-	}
-
-	public int[] transformCaretSize(int x, int y) {
-		// Map coordinates on window to canvas
-		int w, h;
-		if (rotation % 2 == 1) {
-			w = getHeight();
-			h = getWidth();
-			x = (int) (x / ((float) w / screenWidth));
-			y = (int) (y / ((float) h / screenHeight));
-		} else {
-			w = getWidth();
-			h = getHeight();
-			x = (int) (x / ((float) w / screenWidth));
-			y = (int) (y / ((float) h / screenHeight));
+			x = (int) (x / ((float) w / screenWidth)) + (offset ? screenX : 0);
+			y = (int) (y / ((float) h / screenHeight)) + (offset ? screenY : 0);
 		}
 		int tmp;
 		switch (this.rotation) {
@@ -2281,31 +2221,6 @@ public final class EmulatorScreen implements
 				|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
-		if (Settings.fpsMode && mouseEvent.button == 3) {
-			if (Settings.fpsGame == 2)
-				handleKeyPress(57);
-			else if (Settings.fpsGame == 1)
-				mp(42);
-			else if (Settings.fpsGame == 0)
-				mp(KeyMapping.soft2());
-			else if (Settings.fpsGame == 3)
-				mp(KeyMapping.soft1());
-			return;
-		}
-		if (Settings.fpsMode && mouseEvent.button == 2) {
-			if (Settings.fpsGame == 1)
-				mp(KeyMapping.soft2());
-			else if (Settings.fpsGame == 0)
-				mp(KeyMapping.soft1());
-			return;
-		}
-		if (Settings.fpsMode && mouseEvent.button == 1) {
-			if (Settings.fpsGame == 2)
-				handleKeyPress(13);
-			else
-				mp(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
-			return;
-		}
 		int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
 		if (i[0] < 0 || i[1] < 0 || i[0] >= getWidth() || i[1] >= getHeight()) {
 			return;
@@ -2321,32 +2236,6 @@ public final class EmulatorScreen implements
 		this.mouseDownInfos = false;
 		if (this.pauseState == 0 || Settings.playingRecordedKeys
 				|| Emulator.getCurrentDisplay().getCurrent() == null) {
-			return;
-		}
-		if (Settings.fpsMode && mouseEvent.button == 3) {
-			if (Settings.fpsGame == 2)
-				handleKeyRelease(57);
-			else if (Settings.fpsGame == 1)
-				mr(42);
-			else if (Settings.fpsGame == 0)
-				mr(KeyMapping.soft2());
-			else if (Settings.fpsGame == 3)
-				mr(KeyMapping.soft1());
-			return;
-		}
-
-		if (Settings.fpsMode && mouseEvent.button == 2) {
-			if (Settings.fpsGame == 1)
-				mr(KeyMapping.soft2());
-			else if (Settings.fpsGame == 0)
-				mr(KeyMapping.soft1());
-			return;
-		}
-		if (Settings.fpsMode && mouseEvent.button == 1) {
-			if (Settings.fpsGame == 2)
-				handleKeyRelease(13);
-			else
-				mr(KeyMapping.getArrowKeyFromDevice(javax.microedition.lcdui.Canvas.FIRE));
 			return;
 		}
 		if (!pointerState) return;
@@ -2370,134 +2259,6 @@ public final class EmulatorScreen implements
 		if (this.pauseState == 0 || Settings.playingRecordedKeys
 				|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
-		}
-		final int xoff = 1;
-		final int yoff = 1;
-		final boolean d = true;
-		if (Settings.fpsMode) {
-			if (!mset) {
-				Color white = display.getSystemColor(SWT.COLOR_WHITE);
-				Color black = display.getSystemColor(SWT.COLOR_BLACK);
-				PaletteData palette = new PaletteData(white.getRGB(), black.getRGB());
-				ImageData sourceData = new ImageData(16, 16, 1, palette);
-				sourceData.transparentPixel = 0;
-				Cursor cursor = new Cursor(display, sourceData, 0, 0);
-				this.canvas.getShell().setCursor(cursor);
-				mset = true;
-			}
-			Point center = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
-			int dx = mouseEvent.x - canvas.getSize().x / 2;
-			int dy = mouseEvent.y - (canvas.getSize().y / 2 - 1);
-			if (canvas.toControl(display.getCursorLocation()).x == canvas.getSize().x / 2 && d) {
-				if (fpsWasRight) {
-					mr(-4);
-					fpsWasRight = false;
-				}
-
-				if (fpsWasLeft) {
-					mr(-3);
-					fpsWasLeft = false;
-				}
-				if (fpsWasUp) {
-					mr('3');
-					fpsWasUp = false;
-				}
-				if (fpsWasBottom) {
-					mr('1');
-					fpsWasBottom = false;
-				}
-				return;
-			}
-			display.setCursorLocation(center);
-			if (dx > xoff) {
-				// right
-				if (fpsWasLeft) {
-					mr(-3);
-					fpsWasLeft = false;
-				}
-				if (!fpsWasRight) mp(-4);
-				else mrp(-4);
-				fpsWasRight = true;
-			} else if (dx < -xoff) {
-				// left
-				if (fpsWasRight) {
-					mr(-4);
-					fpsWasRight = false;
-				}
-				if (!fpsWasLeft) mp(-3);
-				else mrp(-3);
-				fpsWasLeft = true;
-			} else if (dx == 0) {
-				fpsWasntHor = true;
-				if (fpsWasRight) {
-					mr(-4);
-					fpsWasRight = false;
-				}
-
-				if (fpsWasLeft) {
-					mr(-3);
-					fpsWasLeft = false;
-				}
-			} else if (Math.abs(dx) <= xoff && !fpsWasntHor) {
-				if (fpsWasRight) {
-					mr(-4);
-					fpsWasRight = false;
-				}
-
-				if (fpsWasLeft) {
-					mr(-3);
-					fpsWasLeft = false;
-				}
-			}
-			if (dx != 0) fpsWasntHor = false;
-			if (Settings.fpsGame == 3) {
-				if (dy > yoff) {
-					// bottom
-					if (fpsWasUp) {
-						mr('3');
-						fpsWasUp = false;
-					}
-					if (!fpsWasBottom) mp('1');
-					else mrp('1');
-					fpsWasBottom = true;
-				} else if (dy < -yoff) {
-					// up
-					if (fpsWasBottom) {
-						mr('1');
-						fpsWasBottom = false;
-					}
-					if (!fpsWasUp) mp('3');
-					else mrp('3');
-					fpsWasUp = true;
-				} else if (dy == 0) {
-					fpsWasntVer = true;
-					if (fpsWasBottom) {
-						mr('1');
-						fpsWasBottom = false;
-					}
-
-					if (fpsWasUp) {
-						mr('3');
-						fpsWasUp = false;
-					}
-				} else if (Math.abs(dy) <= yoff && !fpsWasntVer) {
-					if (fpsWasBottom) {
-						mr('1');
-						fpsWasBottom = false;
-					}
-
-					if (fpsWasUp) {
-						mr('3');
-						fpsWasUp = false;
-					}
-				}
-				if (dy != 0) fpsWasntVer = false;
-			}
-			return;
-		} else if (mset) {
-			Cursor cursor = new Cursor(display, SWT.CURSOR_ARROW);
-			this.canvas.getShell().setCursor(cursor);
-			mset = false;
 		}
 		if (pointerState && (mouseEvent.stateMask & 0x80000) != 0x0) {
 			int[] i = transformPointer(mouseEvent.x, mouseEvent.y);
@@ -2549,10 +2310,6 @@ public final class EmulatorScreen implements
 	}
 
 	public void mouseExit(MouseEvent e) {
-		if (Settings.fpsMode) {
-			Point pt = canvas.toDisplay(canvas.getSize().x / 2, canvas.getSize().y / 2 - 1);
-			display.setCursorLocation(pt);
-		}
 	}
 
 	public void mouseHover(MouseEvent arg0) {
@@ -2584,7 +2341,7 @@ public final class EmulatorScreen implements
 			}
 		}
 		final Shell method330;
-		if (((EmulatorImpl) Emulator.getEmulator()).getInfos().isShown() && !(method330 = ((EmulatorImpl) Emulator.getEmulator()).getInfos().method611()).isDisposed()) {
+		if (((EmulatorImpl) Emulator.getEmulator()).getInfos().isShown() && !(method330 = ((EmulatorImpl) Emulator.getEmulator()).getInfos().getShell()).isDisposed()) {
 			method330.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 		}
 		final Shell method331;
@@ -2910,7 +2667,7 @@ public final class EmulatorScreen implements
 						infosEnabled = true;
 						this.screen.infosMenuItem.setSelection(true);
 						EmulatorScreen.getCanvas(this.screen).setCursor(new Cursor(EmulatorScreen.method564(), 2));
-						((EmulatorImpl) Emulator.getEmulator()).getInfos().method607(EmulatorScreen.method561(this.screen));
+						((EmulatorImpl) Emulator.getEmulator()).getInfos().open(EmulatorScreen.method561(this.screen));
 						break;
 					}
 					break;
@@ -2920,7 +2677,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void mouseScrolled(MouseEvent arg0) {
-		if (this.pauseState == 0 || Settings.playingRecordedKeys || !Settings.fpsMode) {
+		if (this.pauseState == 0 || Settings.playingRecordedKeys) {
 			return;
 		}
 		try {

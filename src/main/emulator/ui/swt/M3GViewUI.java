@@ -154,8 +154,10 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
 	public final void method226() {
 		this.method543();
-		final Display current = Display.getCurrent();
-		this.shell.setLocation(current.getClientArea().width - this.shell.getSize().x >> 1, current.getClientArea().height - this.shell.getSize().y >> 1);
+		Display display = Display.getCurrent();
+		Rectangle clientArea = shell.getMonitor().getClientArea();
+		Point size = shell.getSize();
+		this.shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.setDefaultPreferences();
@@ -163,8 +165,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		new Thread(new Refresher(this)).start();
 		new Thread(new Flusher(this)).start();
 		while (!this.shell.isDisposed()) {
-			if (!current.readAndDispatch()) {
-				current.sleep();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 	}

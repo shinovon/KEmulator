@@ -79,6 +79,8 @@ public final class MemoryView implements DisposeListener {
 	private CLabel jvmmemLabel;
 	private int sortColumn = -1;
 
+	public static final String SHELL_TYPE = "MEMORY_VIEW";
+
 	public final void open() {
 		this.createShell();
 		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
@@ -173,6 +175,7 @@ public final class MemoryView implements DisposeListener {
 		(this.shell = new Shell(shellStyle)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
 		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setLayout(layout);
+		shell.setData("TYPE", SHELL_TYPE);
 
 		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
 		this.shell.setSize(

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>cc.nnproject.kemulator</id>
+ 	<metadata_license>CC0-1.0</metadata_license>
+ 	<project_license>Custom</project_license>
+ 	<name>KEmulator</name>
+	<summary>MIDP emulator</summary>
+	<description>
+		<p>Emulator for j2me, CLDC, MIDP applications and games</p>
+	</description>
+	<url type="homepage">https://nnp.nnchan.ru/kem</url>
+	<project_group>nnproject</project_group>
+	<developer_name>Shinovon</developer_name>
+	<launchable type="desktop-id">cc.nnproject.kemulator.desktop</launchable>
+	<provides>
+		<binary>kemulator</binary>
+	</provides>
+</component>

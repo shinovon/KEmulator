@@ -18,7 +18,11 @@ final class Class193 implements Runnable {
 		}
 		final String method749;
 		String string;
-		if (!(string = (method749 = Controllers.method749())).equalsIgnoreCase("LEFT") && !string.equalsIgnoreCase("RIGHT") && !string.equalsIgnoreCase("UP") && !string.equalsIgnoreCase("DOWN")) {
+		if (!(string = (method749 = Controllers.method749())).equalsIgnoreCase("LEFT")
+				&& !string.equalsIgnoreCase("RIGHT")
+				&& !string.equalsIgnoreCase("UP")
+				&& !string.equalsIgnoreCase("DOWN")
+				&& !string.startsWith("Axis")) {
 			string = "B_" + string;
 		}
 		--selectionIndex;

@@ -43,7 +43,7 @@ log.txt      log file
 
 ==================
 $[Changelog]
-$v2.19.2 [2025.04.15]
+$v2.19.2 [2025.04.24]
 StringItem layout improvements
 Fixed FileConnection filter
 Fixed Ticker bug
@@ -55,8 +55,12 @@ Fixed Form.delete()
 Implemented List.setFitPolicy()
 Auto scaling element images in List
 Fixed selection in ChoiceGroup MULTIPLE mode
-Fixed SWT library loading on Intel Mac
+Fixed SWT library loading on Mac OS
 Fixed M3G depth buffer
+Updated starter scripts
+Improved controller support
+Removed "FPS mode"
+Fixed bugs on multi-monitor setup
 
 $v2.19.1 [2025.02.12]
 Update LWJGL to 3.3.6

@@ -34,9 +34,9 @@ import java.util.jar.Manifest;
 
 public class Emulator implements Runnable {
 	public static boolean debugBuild = true;
-	public static String version = "2.19.1";
+	public static String version = "2.19.2";
 	public static String revision = "";
-	public static final int numericVersion = 31;
+	public static final int numericVersion = 32;
 
 	static EmulatorImpl emulatorimpl;
 	private static MIDlet midlet;
@@ -707,18 +707,6 @@ public class Emulator implements Runnable {
 		}
 
 		try {
-			String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-			String midletVendor = Emulator.emulatorimpl.getAppProperty("MIDlet-Vendor");
-			if (midlet != null) {
-				// TODO this is stupid
-				if (midlet.equalsIgnoreCase("bounce tales")) {
-					Settings.fpsGame = 1;
-				} else if (midlet.equalsIgnoreCase("micro counter strike")) {
-					Settings.fpsGame = 2;
-				} else if (midlet.equalsIgnoreCase("quantum") || (midletVendor != null && midletVendor.toLowerCase().contains("ae-mods"))) {
-					Settings.fpsGame = 3;
-				}
-			}
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 		} catch (Exception ignored) {
 		}
@@ -765,8 +753,8 @@ public class Emulator implements Runnable {
 		} catch (Exception ignored) {
 		}
 		String arch = System.getProperty("os.arch");
-		if (!platform.isX64() && !arch.contains("86")) {
-			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try x64 version instead.");
+		if (!platform.isX64() && (!arch.contains("86") || !win)) {
+			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try multi-platform version instead.");
 			System.exit(0);
 			return;
 		}
@@ -1316,8 +1304,8 @@ public class Emulator implements Runnable {
 			});
 			return;
 		}
-		Emulator.emulatorimpl.getClassWatcher().fill();
-		Emulator.emulatorimpl.getProfiler().fill();
+		Emulator.emulatorimpl.getClassWatcher().fillClassList();
+		Emulator.emulatorimpl.getProfiler().fillClassList();
 		Emulator.eventQueue.queue(EventQueue.EVENT_START);
 	}
 }
