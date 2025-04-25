@@ -333,18 +333,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		final int OFFSET = 40;
 		Rectangle dsp = shell.getMonitor().getClientArea();
 
-		// for any maximized parent place at bottom-center except main window
 		if (parent.getMaximized()) {
-			if (Objects.equals(type, "null")) {
-				int x = parent.getLocation().x + parent.getSize().x - WIDTH;
-				int y = parent.getLocation().y + parent.getSize().y - HEIGHT;
-				shell.setLocation(x, y);
-				return;
-			}
+			// let WM choose position
 			shell.setSize(WIDTH, HEIGHT);
-			int x = parent.getLocation().x + parent.getSize().x / 2 - WIDTH / 2;
-			int y = parent.getLocation().y + parent.getSize().y - HEIGHT;
-			shell.setLocation(x, y);
 			return;
 		}
 
