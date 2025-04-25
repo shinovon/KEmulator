@@ -855,7 +855,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				if (aClass90_830.canvas.isDisposed()) {
 					return;
 				}
-				EmulatorImpl.syncExec(new Class10(this));
+				SWTFrontend.syncExec(new Class10(this));
 				try {
 					Thread.sleep(10L);
 				} catch (Exception ignored) {}

@@ -83,7 +83,7 @@ public class Permission {
 			return null;
 		if (!askImei) return "0000000000000000";
 		if (imei != null) return imei;
-		String s = Emulator.emulatorimpl.getScreen().showIMEIDialog();
+		String s = Emulator.getEmulator().getScreen().showIMEIDialog();
 		if (s == null) {
 			notAllowPerms.add("imei");
 		}
@@ -92,7 +92,7 @@ public class Permission {
 	}
 
 	public static boolean showConfirmDialog(final String message) {
-		return Emulator.emulatorimpl.getScreen().showSecurityDialog(message);
+		return Emulator.getEmulator().getScreen().showSecurityDialog(message);
 	}
 
 	public static void checkPermission(String x) {
@@ -177,6 +177,6 @@ public class Permission {
 					": " + url);
 		}
 
-		return Emulator.emulatorimpl.getScreen().showSecurityDialog(text);
+		return Emulator.getEmulator().getScreen().showSecurityDialog(text);
 	}
 }

@@ -173,7 +173,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		final Instance c = getWatched();
 		if (item.getParentItem() == null) {
 			this.method301(c, (Field) c.getFields().get(item.getParent().indexOf(item)), item);
-			EmulatorImpl.asyncExec(this);
+			SWTFrontend.asyncExec(this);
 			return;
 		}
 		TreeItem parentItem = item;
@@ -197,7 +197,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			s = s2.substring(0, s2.length() - 2);
 		}
 		method305(o, s2, item);
-		EmulatorImpl.asyncExec(this);
+		SWTFrontend.asyncExec(this);
 	}
 
 	public void treeCollapsed(TreeEvent var1) {
@@ -316,9 +316,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		updateColumnSizes();
 		disposed = false;
 		visible = true;
-		EmulatorImpl.asyncExec(this);
+		SWTFrontend.asyncExec(this);
 		Watcher.activeWatchers.addElement(this);
-		Display display = EmulatorImpl.getDisplay();
+		Display display = SWTFrontend.getDisplay();
 		while (!this.shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -584,7 +584,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	public void widgetSelected(final SelectionEvent se) {
 		if (se.widget == hexDecSwitch) {
-			EmulatorImpl.asyncExec(this);
+			SWTFrontend.asyncExec(this);
 		} else if (se.widget == exportBtn) {
 			new Thread(this::exportValues).start();
 		}
@@ -592,7 +592,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	private void onFilterTextModify(ModifyEvent modifyEvent) {
 		updateContent();
-		EmulatorImpl.asyncExec(this);
+		SWTFrontend.asyncExec(this);
 	}
 
 	private boolean createClassCombo() {

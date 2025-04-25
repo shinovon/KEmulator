@@ -4,7 +4,7 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.graphics2D.IFont;
 import emulator.graphics2D.swt.FontSWT;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 
 public class Font {
@@ -146,7 +146,7 @@ public class Font {
 			return ((FontSWT) font.getImpl()).getSWTFont();
 		} else {
 			float zoom = (autoScale ? ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() : 1f) * 0.68f;
-			return new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
+			return new org.eclipse.swt.graphics.Font(SWTFrontend.getDisplay(),
 					Emulator.getEmulator().getProperty().getDefaultFontName(),
 					Math.max(2, (int) (font.getHeight() * zoom) - 1),
 					font.getStyle() & ~Font.STYLE_UNDERLINED);
@@ -155,7 +155,7 @@ public class Font {
 
 	static org.eclipse.swt.graphics.Font getDefaultSWTFont(boolean autoScale) {
 		float zoom = (autoScale ? ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() : 1f) * 0.68f;
-		return new org.eclipse.swt.graphics.Font(EmulatorImpl.getDisplay(),
+		return new org.eclipse.swt.graphics.Font(SWTFrontend.getDisplay(),
 				Emulator.getEmulator().getProperty().getDefaultFontName(),
 				Math.max(2, (int) (Screen.font.getHeight() * zoom) - 1), 0);
 	}

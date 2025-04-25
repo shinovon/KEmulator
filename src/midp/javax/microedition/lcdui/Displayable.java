@@ -5,7 +5,7 @@ import emulator.debug.Profiler;
 import emulator.lcdui.LCDUIUtils;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.ui.IScreen;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -276,7 +276,7 @@ public class Displayable {
 	public void setTitle(final String title) {
 		this.title = title;
 		if (isShown()) {
-			syncExec(() -> Emulator.getEmulator().getScreen().updateTitle());
+			Emulator.getEmulator().getScreen().updateTitle();
 		}
 	}
 
@@ -473,16 +473,16 @@ public class Displayable {
 	}
 
 	static void syncExec(Runnable r) {
-		EmulatorImpl.syncExec(r);
+		SWTFrontend.syncExec(r);
 	}
 
 	static void asyncExec(Runnable r) {
-		EmulatorImpl.asyncExec(r);
+		SWTFrontend.asyncExec(r);
 	}
 
 	static void safeSyncExec(Runnable r) {
 		try {
-			EmulatorImpl.syncExec(r);
+			SWTFrontend.syncExec(r);
 		} catch (SWTException e) {
 			Throwable cause = e.getCause();
 			if (cause instanceof RuntimeException) {

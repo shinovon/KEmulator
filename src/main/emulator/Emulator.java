@@ -9,8 +9,8 @@ import emulator.custom.CustomMethod;
 import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
-import emulator.ui.IEmulator;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.IEmulatorFrontend;
+import emulator.ui.swt.SWTFrontend;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -38,7 +38,7 @@ public class Emulator implements Runnable {
 	public static String revision = "";
 	public static final int numericVersion = 32;
 
-	static EmulatorImpl emulatorimpl;
+	private static SWTFrontend emulatorimpl;
 	private static MIDlet midlet;
 	private static Canvas currentCanvas;
 	private static Screen currentScreen;
@@ -124,8 +124,8 @@ public class Emulator implements Runnable {
 		super();
 	}
 
-	public static IEmulator getEmulator() {
-		return Emulator.emulatorimpl;
+	public static IEmulatorFrontend getEmulator() {
+		return emulatorimpl;
 	}
 
 	public static KeyRecords getRobot() {
@@ -771,7 +771,7 @@ public class Emulator implements Runnable {
 			Emulator.commandLineArguments = commandLineArguments;
 			UILocale.initLocale();
 			parseLaunchArgs(commandLineArguments); //
-			Emulator.emulatorimpl = new EmulatorImpl();
+			Emulator.emulatorimpl = new SWTFrontend();
 			parseLaunchArgs(commandLineArguments);
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
@@ -800,7 +800,7 @@ public class Emulator implements Runnable {
 
 			if (Emulator.midletClassName == null && Emulator.midletJar == null) {
 				Emulator.emulatorimpl.getScreen().startEmpty();
-				EmulatorImpl.dispose();
+				emulatorimpl.dispose();
 				System.exit(0);
 				return;
 			}
@@ -863,7 +863,7 @@ public class Emulator implements Runnable {
 			e.printStackTrace();
 		}
 		try {
-			EmulatorImpl.dispose();
+			emulatorimpl.dispose();
 		} catch (Throwable ignored) {
 		}
 		System.exit(0);
@@ -1236,7 +1236,7 @@ public class Emulator implements Runnable {
 			public void run() {
 				Manager.checkLibVlcSupport();
 				if (!updated && !Settings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
-					EmulatorImpl.asyncExec(new Runnable() {
+					SWTFrontend.asyncExec(new Runnable() {
 						public void run() {
 							Emulator.emulatorimpl.getScreen().showUpdateDialog(1);
 						}
@@ -1297,7 +1297,7 @@ public class Emulator implements Runnable {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			Emulator.eventQueue.stop();
-			EmulatorImpl.syncExec(new Runnable() {
+			SWTFrontend.syncExec(new Runnable() {
 				public void run() {
 					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
 				}

@@ -1926,7 +1926,7 @@ public final class Property implements IProperty, SelectionListener {
 		if (this.controllerCombo == null || this.controllerCombo.isDisposed()) {
 			return false;
 		}
-		EmulatorImpl.asyncExec(new Class193(this));
+		SWTFrontend.asyncExec(new Class193(this));
 		return true;
 	}
 

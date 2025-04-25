@@ -1,8 +1,8 @@
 package javax.microedition.rms;
 
 import emulator.Emulator;
-import emulator.ui.IEmulator;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.IEmulatorFrontend;
+import emulator.ui.swt.SWTFrontend;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -32,8 +32,8 @@ public class RecordStore {
 
 	static {
 		try {
-			IEmulator em = Emulator.getEmulator();
-			if (((EmulatorImpl) em).midletProps != null) {
+			IEmulatorFrontend em = Emulator.getEmulator();
+			if (((SWTFrontend) em).midletProps != null) {
 				homeRootPath = getRootPath(null, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name"));
 				logln("midlet rms path: " + homeRootPath);
 			}
@@ -227,7 +227,7 @@ public class RecordStore {
 		if (!file.exists() || !file.isDirectory() || !new File(rootPath + "idx").exists()) {
 			throw new RecordStoreNotFoundException(name);
 		}
-		IEmulator e = Emulator.getEmulator();
+		IEmulatorFrontend e = Emulator.getEmulator();
 		return new RecordStore(name, rootPath, vendorName.equals(e.getAppProperty("MIDlet-Vendor")) && suiteName.equals(e.getAppProperty("MIDlet-Name")), true);
 	}
 

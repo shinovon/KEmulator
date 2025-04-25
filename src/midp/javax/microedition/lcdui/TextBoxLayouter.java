@@ -16,7 +16,7 @@
 */
 package javax.microedition.lcdui;
 
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -57,7 +57,7 @@ class TextBoxLayouter
 	{
 		if(staticShell == null)
 		{
-			staticShell = new Shell(EmulatorImpl.getDisplay(), SWT.SYSTEM_MODAL | SWT.VERTICAL);
+			staticShell = new Shell(SWTFrontend.getDisplay(), SWT.SYSTEM_MODAL | SWT.VERTICAL);
 			staticShell.getVerticalBar().setVisible(true);
 		}
 		return staticShell;
