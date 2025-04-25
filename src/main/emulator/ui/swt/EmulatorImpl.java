@@ -29,7 +29,7 @@ public final class EmulatorImpl implements IEmulator {
 	private Watcher classWatcher;
 	private Watcher profiler;
 	private Property iproperty;
-	private EmulatorScreen iscreen;
+	private EmulatorScreen screen;
 	private Log ilogstream;
 	private KeyPad keyPad;
 	private InfosBox infos;
@@ -77,13 +77,6 @@ public final class EmulatorImpl implements IEmulator {
 
 	public final int getScreenDepth() {
 		return this.screenDepth;
-	}
-
-	public final EmulatorScreen getEmulatorScreen() {
-		if (this.iscreen == null) {
-			this.iscreen = new EmulatorScreen(Devices.getPropertyInt("SCREEN_WIDTH"), Devices.getPropertyInt("SCREEN_HEIGHT"));
-		}
-		return this.iscreen;
 	}
 
 	public final Watcher getClassWatcher() {
@@ -163,7 +156,10 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 	public final IScreen getScreen() {
-		return this.iscreen;
+		if (screen == null) {
+			screen = new EmulatorScreen(Devices.getPropertyInt("SCREEN_WIDTH"), Devices.getPropertyInt("SCREEN_HEIGHT"));
+		}
+		return screen;
 	}
 
 	public final IMessage getMessage() {
@@ -249,6 +245,6 @@ public final class EmulatorImpl implements IEmulator {
 	 * updateLanguage
 	 */
 	public void updateLanguage() {
-		getEmulatorScreen().updateLanguage();
+		((EmulatorScreen) getScreen()).updateLanguage();
 	}
 }

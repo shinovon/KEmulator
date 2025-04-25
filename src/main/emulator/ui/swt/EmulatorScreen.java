@@ -289,7 +289,17 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	public void start(final boolean midletLoaded) {
+	// these two must be COMPLETELY separate paths, but we have what we have.
+
+	public void startWithMidlet(){
+		start(true);
+	}
+
+	public void startEmpty() {
+		start(false);
+	}
+
+	void start(final boolean midletLoaded) {
 		this.pauseState = (midletLoaded ? 1 : 0);
 		this.updatePauseState(); // updated before canvas rect because it checks for pauseState inside
 		try {
@@ -2557,6 +2567,28 @@ public final class EmulatorScreen implements
 		}
 
 		return dialogSelection;
+	}
+
+	public boolean showSecurityDialog(final String message) {
+		final boolean[] ok = new boolean[1];
+		shell.getDisplay().syncExec(() -> {
+			MessageBox messageBox = new MessageBox(shell, SWT.YES | SWT.NO);
+			messageBox.setMessage(message);
+			messageBox.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
+			ok[0] = messageBox.open()== SWT.YES;
+		});
+		return ok[0];
+	}
+
+	public String showIMEIDialog() {
+		InputDialog imeiDialog = new InputDialog(shell);
+		shell.getDisplay().syncExec(() -> {
+			imeiDialog.setMessage("Application asks for IMEI");
+			imeiDialog.setInput("0000000000000000");
+			imeiDialog.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
+			imeiDialog.open();
+		});
+		return imeiDialog.getInput();
 	}
 
 	public boolean getTouchEnabled() {

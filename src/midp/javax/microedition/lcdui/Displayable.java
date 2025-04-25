@@ -276,11 +276,7 @@ public class Displayable {
 	public void setTitle(final String title) {
 		this.title = title;
 		if (isShown()) {
-			syncExec(new Runnable() {
-				public void run() {
-					((EmulatorScreen) Emulator.getEmulator().getScreen()).updateTitle();
-				}
-			});
+			syncExec(() -> Emulator.getEmulator().getScreen().updateTitle());
 		}
 	}
 
