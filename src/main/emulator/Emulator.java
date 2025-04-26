@@ -10,6 +10,7 @@ import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
+import emulator.ui.bridge.BridgeFrontend;
 import emulator.ui.swt.SWTFrontend;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -38,7 +39,7 @@ public class Emulator implements Runnable {
 	public static String revision = "";
 	public static final int numericVersion = 32;
 
-	private static SWTFrontend emulatorimpl;
+	private static IEmulatorFrontend emulatorimpl;
 	private static MIDlet midlet;
 	private static Canvas currentCanvas;
 	private static Screen currentScreen;
@@ -77,6 +78,7 @@ public class Emulator implements Runnable {
 	private static Class<?> midletClass;
 	private static boolean forked;
 	private static boolean updated;
+	private static boolean bridge;
 
 	private static void initRichPresence() {
 		if (!Settings.rpc)
@@ -767,7 +769,10 @@ public class Emulator implements Runnable {
 			Emulator.commandLineArguments = commandLineArguments;
 			UILocale.initLocale();
 			parseLaunchArgs(commandLineArguments); //
-			Emulator.emulatorimpl = new SWTFrontend();
+			if (bridge)
+				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
+			else
+				Emulator.emulatorimpl = new SWTFrontend();
 			parseLaunchArgs(commandLineArguments);
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
@@ -960,6 +965,8 @@ public class Emulator implements Runnable {
 				forked = true;
 			} else if (key.equalsIgnoreCase("updated")) {
 				updated = true;
+			} else if (key.equals("bridge")) {
+				bridge = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
@@ -1294,7 +1301,7 @@ public class Emulator implements Runnable {
 			emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
 			return;
 		}
-		if(Emulator.getEmulator() instanceof SWTFrontend){
+		if (Emulator.getEmulator() instanceof SWTFrontend) {
 			SWTFrontend swt = (SWTFrontend) Emulator.getEmulator();
 			swt.getClassWatcher().fillClassList();
 			swt.getProfiler().fillClassList();
