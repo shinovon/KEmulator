@@ -311,10 +311,10 @@ public final class EmulatorScreen implements
 
 		Rectangle clientArea = EmulatorScreen.display.getPrimaryMonitor().getClientArea();
 		if (EmulatorScreen.locX == Integer.MIN_VALUE) {
-			EmulatorScreen.locX = clientArea.x - (clientArea.width + this.shell.getSize().x) >> 1;
+			EmulatorScreen.locX = clientArea.x + (clientArea.width - shell.getSize().x) >> 1;
 		}
 		if (EmulatorScreen.locY == Integer.MIN_VALUE) {
-			EmulatorScreen.locY = clientArea.y - (clientArea.height + this.shell.getSize().y) >> 1;
+			EmulatorScreen.locY = clientArea.y + (clientArea.height - shell.getSize().y) >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
