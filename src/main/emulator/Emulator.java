@@ -217,17 +217,17 @@ public class Emulator implements Runnable {
 		}
 		try {
 			final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad"), "UTF-8");
-			final Enumeration<Object> keys = (Emulator.emulatorimpl.midletProps).keys();
+			final Enumeration<Object> keys = (Emulator.emulatorimpl.getAppProperties()).keys();
 			while (keys.hasMoreElements()) {
 				final String s;
 				if (!(s = (String) keys.nextElement()).equalsIgnoreCase("KEmu-Platform")) {
-					outputStreamWriter.write(s + ": " + Emulator.emulatorimpl.midletProps.getProperty(s) + "\r\n");
+					outputStreamWriter.write(s + ": " + Emulator.emulatorimpl.getAppProperties().getProperty(s) + "\r\n");
 				}
 			}
-			if (Emulator.emulatorimpl.midletProps.getProperty("MIDlet-Jar-URL") == null) {
+			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-URL") == null) {
 				outputStreamWriter.write("MIDlet-Jar-URL: " + new File(Emulator.midletJar).getName() + "\r\n");
 			}
-			if (Emulator.emulatorimpl.midletProps.getProperty("MIDlet-Jar-Size") == null) {
+			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-Size") == null) {
 				outputStreamWriter.write("MIDlet-Jar-Size: " + new File(Emulator.midletJar).length() + "\r\n");
 			}
 			outputStreamWriter.write("KEmu-Platform: " + Emulator.deviceName + "\r\n");
@@ -236,10 +236,6 @@ public class Emulator implements Runnable {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	public static Properties getMidletProperties() {
-		return Emulator.emulatorimpl.midletProps;
 	}
 
 	private static void saveTargetDevice() {
@@ -312,7 +308,7 @@ public class Emulator implements Runnable {
 
 	private static void loadTargetDevice() {
 		final String property;
-		if ((property = Emulator.emulatorimpl.midletProps.getProperty("KEmu-Platform")) != null) {
+		if ((property = Emulator.emulatorimpl.getAppProperties().getProperty("KEmu-Platform")) != null) {
 			tryToSetDevice(property);
 			return;
 		}
@@ -370,7 +366,7 @@ public class Emulator implements Runnable {
 		sb.append(platform.getTitleName()).append(' ').append(version);
 		if (s != null) {
 			sb.append(" - ").append(s);
-		} else if (midletJar != null && Emulator.emulatorimpl.midletProps != null) {
+		} else if (midletJar != null && Emulator.emulatorimpl.getAppProperties() != null) {
 			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty("MIDlet-Name"));
 		}
 		if (Settings.uei) sb.append(" (UEI)");
@@ -469,7 +465,7 @@ public class Emulator implements Runnable {
 						}
 					}
 				}
-				Emulator.emulatorimpl.midletProps = props;
+				Emulator.emulatorimpl.setAppProperties(props);
 				if (props.containsKey("MIDlet-2") && props.containsKey("MIDlet-1")) {
 					// find all midlets and show choice window
 					Vector<String> midletKeys = new Vector<String>();
@@ -526,7 +522,7 @@ public class Emulator implements Runnable {
 				if (aProperties1369 == null) {
 					aProperties1369 = new Properties();
 				}
-				Emulator.emulatorimpl.midletProps = aProperties1369;
+				Emulator.emulatorimpl.setAppProperties(aProperties1369);
 			}
 		} catch (Exception ex) {
 			if (ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
@@ -1298,8 +1294,11 @@ public class Emulator implements Runnable {
 			emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
 			return;
 		}
-		Emulator.emulatorimpl.getClassWatcher().fillClassList();
-		Emulator.emulatorimpl.getProfiler().fillClassList();
+		if(Emulator.getEmulator() instanceof SWTFrontend){
+			SWTFrontend swt = (SWTFrontend) Emulator.getEmulator();
+			swt.getClassWatcher().fillClassList();
+			swt.getProfiler().fillClassList();
+		}
 		Emulator.eventQueue.queue(EventQueue.EVENT_START);
 	}
 }
