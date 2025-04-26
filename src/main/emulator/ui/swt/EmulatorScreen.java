@@ -189,7 +189,7 @@ public final class EmulatorScreen implements
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
-		display = SWTFrontend.getDisplay();
+		display = Display.getCurrent();
 		this.initShell();
 		this.initScreenBuffer(startWidth = n, startHeight = n2);
 		this.updatePauseState();
@@ -2498,7 +2498,8 @@ public final class EmulatorScreen implements
 	}
 
 	public void appStarted(boolean first) {
-		if (first) SWTFrontend.asyncExec(new WindowOpen(this, 0));
+		if (first) // display is already set at this moment
+			display.asyncExec(new WindowOpen(this, 0));
 	}
 
 	public int showMidletChoice(Vector<String> midletKeys) {

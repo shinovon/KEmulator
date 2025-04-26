@@ -246,7 +246,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	public void finalize() {
-		SWTFrontend.asyncExec(() -> {
+		aShell806.getDisplay().asyncExec(() -> {
 			try {
 				if (!aGC814.isDisposed()) aGC814.dispose();
 			} catch (Exception ignored) {

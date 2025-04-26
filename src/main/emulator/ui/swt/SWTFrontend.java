@@ -226,10 +226,10 @@ public final class SWTFrontend implements IEmulatorFrontend {
 
 	public final void syncValues() {
 		for (int i = 0; i < Watcher.activeWatchers.size(); ++i) {
-			asyncExec((Runnable) Watcher.activeWatchers.get(i));
+			display.asyncExec(Watcher.activeWatchers.get(i));
 		}
 		if (this.methods.method438()) {
-			asyncExec(this.methods);
+			display.asyncExec(this.methods);
 		}
 	}
 

@@ -121,7 +121,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 	};
 
-	private static Display aDisplay656;
+	private static Display display;
 	private Shell setsShell;
 	private Combo aCombo657;
 	private CLabel aCLabel658;
@@ -335,9 +335,9 @@ public final class Property implements IProperty, SelectionListener {
 		UILocale.initLocale();
 	}
 
-	public void method354(final Shell shell) {
-		Property.aDisplay656 = shell.getDisplay();
-		this.method372(shell);
+	public void open(final Shell parent) {
+		display = parent.getDisplay();
+		this.method372(parent);
 		this.setsShell.pack();
 		this.setsShell.setSize(480, this.setsShell.getSize().y);
 		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
@@ -349,11 +349,11 @@ public final class Property implements IProperty, SelectionListener {
 //			screenHeightText.setText("" + scr.getHeight());
 //		} catch (Exception ignored) {}
 
-		this.setsShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.setsShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.setsShell.getSize().y >> 1));
+		this.setsShell.setLocation(parent.getLocation().x + (parent.getSize().x - this.setsShell.getSize().x >> 1), parent.getLocation().y + (parent.getSize().y - this.setsShell.getSize().y >> 1));
 		this.setsShell.open();
 		while (!this.setsShell.isDisposed()) {
-			if (!Property.aDisplay656.readAndDispatch()) {
-				Property.aDisplay656.sleep();
+			if (!Property.display.readAndDispatch()) {
+				Property.display.sleep();
 			}
 		}
 		this.anIImage671 = null;
@@ -1926,7 +1926,7 @@ public final class Property implements IProperty, SelectionListener {
 		if (this.controllerCombo == null || this.controllerCombo.isDisposed()) {
 			return false;
 		}
-		SWTFrontend.asyncExec(new Class193(this));
+		display.asyncExec(new Class193(this));
 		return true;
 	}
 
@@ -2435,7 +2435,7 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.horizontalAlignment = 4;
 		(this.aCombo689 = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
 		this.aCombo689.addModifyListener(new Class191(this));
-		final FontData[] fontList = Property.aDisplay656.getFontList(null, true);
+		final FontData[] fontList = Property.display.getFontList(null, true);
 		final ArrayList<Comparable> list = new ArrayList<Comparable>();
 		list.add("Nokia");
 		list.add("Series 60");
@@ -2444,7 +2444,7 @@ public final class Property implements IProperty, SelectionListener {
 				list.add(fontData.getName());
 			}
 		}
-		final FontData[] fontList2 = Property.aDisplay656.getFontList(null, false);
+		final FontData[] fontList2 = Property.display.getFontList(null, false);
 		for (FontData fontData : fontList2) {
 			if (!list.contains(fontData.getName()) && !fontData.getName().startsWith("@")) {
 				list.add(fontData.getName());
