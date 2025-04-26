@@ -1,7 +1,6 @@
 package emulator.graphics2D.swt;
 
 import emulator.graphics2D.IFont;
-import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -37,16 +36,12 @@ public final class FontSWT implements IFont {
 
 
 	public final void finalize() {
-		SWTFrontend.asyncExec(() -> {
-			try {
-				if (font != null && !font.isDisposed()) {
-					font.dispose();
-				}
-				if (gc != null && !gc.isDisposed()) {
-					gc.dispose();
-				}
-			} catch (Exception ignored) {}
-		});
+		if (font != null && !font.isDisposed()) {
+			font.dispose();
+		}
+		if (gc != null && !gc.isDisposed()) {
+			gc.dispose();
+		}
 	}
 
 	public final Font getSWTFont() {
