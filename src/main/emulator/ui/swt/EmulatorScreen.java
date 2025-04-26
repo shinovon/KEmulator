@@ -189,7 +189,7 @@ public final class EmulatorScreen implements
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
-		EmulatorScreen.display = SWTFrontend.getDisplay();
+		display = SWTFrontend.getDisplay();
 		this.initShell();
 		this.initScreenBuffer(startWidth = n, startHeight = n2);
 		this.updatePauseState();
@@ -272,8 +272,8 @@ public final class EmulatorScreen implements
 		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		shell.open();
 		while (!shell.isDisposed()) {
-			if (!EmulatorScreen.display.readAndDispatch()) {
-				EmulatorScreen.display.sleep();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 	}
@@ -319,7 +319,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 
-		Rectangle clientArea = EmulatorScreen.display.getPrimaryMonitor().getClientArea();
+		Rectangle clientArea = display.getPrimaryMonitor().getClientArea();
 		if (EmulatorScreen.locX == Integer.MIN_VALUE) {
 			EmulatorScreen.locX = clientArea.x - (clientArea.width + this.shell.getSize().x) >> 1;
 		}
@@ -328,8 +328,8 @@ public final class EmulatorScreen implements
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
-		SWTFrontend.asyncExec(new WindowOpen(this, 1));
-		SWTFrontend.asyncExec(new WindowOpen(this, 2));
+		display.asyncExec(new WindowOpen(this, 1));
+		display.asyncExec(new WindowOpen(this, 2));
 
 		if (midletLoaded) {
 			String s = Emulator.getEmulator().getAppProperty("Nokia-UI-Enhancement");
@@ -372,8 +372,8 @@ public final class EmulatorScreen implements
 		try {
 			while (this.shell != null && !this.shell.isDisposed()) {
 				//pollKeyboard(canvas);
-				if (!EmulatorScreen.display.readAndDispatch()) {
-					EmulatorScreen.display.sleep();
+				if (!display.readAndDispatch()) {
+					display.sleep();
 				}
 			}
 		} catch (Error e) {
@@ -689,7 +689,7 @@ public final class EmulatorScreen implements
 		}
 		if (this.pauseState == 2) {
 			gc.setAlpha(100);
-			gc.setBackground(EmulatorScreen.display.getSystemColor(15));
+			gc.setBackground(display.getSystemColor(15));
 			gc.fillRectangle(0, 0, this.getWidth(), this.getHeight());
 		}
 		gc.dispose();
@@ -765,10 +765,10 @@ public final class EmulatorScreen implements
 		if (Settings.asyncFlush) {
 			if (paintPending) return;
 			paintPending = true;
-			SWTFrontend.asyncExec(this);
+			display.asyncExec(this);
 			return;
 		}
-		SWTFrontend.syncExec(this);
+		display.syncExec(this);
 	}
 
 	public int getWidth() {
@@ -781,12 +781,12 @@ public final class EmulatorScreen implements
 
 	public void setCommandLeft(final String text) {
 		this.leftCmdText = text;
-		SWTFrontend.syncExec(new Class41(this));
+		display.syncExec(new Class41(this));
 	}
 
 	public void setCommandRight(final String text) {
 		this.rightCmdText = text;
-		SWTFrontend.syncExec(new Class40(this));
+		display.syncExec(new Class40(this));
 	}
 
 
@@ -1437,7 +1437,7 @@ public final class EmulatorScreen implements
 					public void run() {
 						Updater.checkUpdate();
 						if (Updater.state == Updater.STATE_UPDATE_AVAILABLE) {
-							SWTFrontend.asyncExec(new Runnable() {
+							display.asyncExec(new Runnable() {
 								public void run() {
 									showUpdateDialog(1);
 								}
@@ -1445,7 +1445,7 @@ public final class EmulatorScreen implements
 							return;
 						}
 						if (Updater.state == Updater.STATE_UP_TO_DATE) {
-							SWTFrontend.syncExec(new Runnable() {
+							display.syncExec(new Runnable() {
 								public void run() {
 									showMessage(UILocale.get("UPDATE_ALREADY_LATEST_TEXT", "You already have the latest version of KEmulator."));
 								}
@@ -1486,11 +1486,11 @@ public final class EmulatorScreen implements
 			if (menuItem == this.infosMenuItem) {
 				this.infosEnabled = this.infosMenuItem.getSelection();
 				if (this.infosEnabled) {
-					this.canvas.setCursor(new Cursor(EmulatorScreen.display, 2));
+					this.canvas.setCursor(new Cursor(display, 2));
 					((SWTFrontend) Emulator.getEmulator()).getInfos().open(this.shell);
 					return;
 				}
-				this.canvas.setCursor(new Cursor(EmulatorScreen.display, 0));
+				this.canvas.setCursor(new Cursor(display, 0));
 				this.canvas.redraw();
 				((SWTFrontend) Emulator.getEmulator()).getInfos().dispose();
 				return;
@@ -1775,9 +1775,9 @@ public final class EmulatorScreen implements
 
 		if (this.pauseState == 0) {
 			// Game not running, show info label
-			gc.setBackground(EmulatorScreen.display.getSystemColor(22));
+			gc.setBackground(display.getSystemColor(22));
 			gc.fillRectangle(0, 0, size.width, size.height);
-			gc.setForeground(EmulatorScreen.display.getSystemColor(21));
+			gc.setForeground(display.getSystemColor(21));
 			gc.setFont(f);
 			gc.drawText(Emulator.getInfoString(), size.width >> 3, size.height >> 3, true);
 			return;
@@ -1791,7 +1791,7 @@ public final class EmulatorScreen implements
 			try {
 				// Fill background
 				if (screenX > 0 || screenY > 0) {
-					gc.setBackground(EmulatorScreen.display.getSystemColor(SWT.COLOR_BLACK));
+					gc.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
 					gc.fillRectangle(0, 0, size.width, size.height);
 				}
 				// Apply transform
@@ -1823,7 +1823,7 @@ public final class EmulatorScreen implements
 		if (this.infosEnabled && (this.mouseXPress != this.mouseXRelease || this.mouseYPress != this.mouseYRelease)) {
 			try {
 				OS_SetROP2(gc, 7);
-				gc.setForeground(EmulatorScreen.display.getSystemColor(1));
+				gc.setForeground(display.getSystemColor(1));
 				gc.drawRectangle(this.mouseXPress, this.mouseYPress, this.mouseXRelease - this.mouseXPress, this.mouseYRelease - this.mouseYPress);
 				OS_SetROP2(gc, 13);
 			} catch (Throwable ignored) {
@@ -2538,8 +2538,8 @@ public final class EmulatorScreen implements
 		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		shell.open();
 		while (!shell.isDisposed()) {
-			if (!EmulatorScreen.display.readAndDispatch()) {
-				EmulatorScreen.display.sleep();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 
@@ -2650,14 +2650,14 @@ public final class EmulatorScreen implements
 					while (System.currentTimeMillis() - this.aClass93_1196.vibraStart < this.aClass93_1196.vibra && !this.stop) {
 						if (EmulatorScreen.method566(this.aClass93_1196) != 2) {
 							if (EmulatorScreen.this.shell.isDisposed()) return;
-							SWTFrontend.syncExec(shellPosition);
+							display.syncExec(shellPosition);
 							this.anInt1197 = shellPosition.anInt1478;
 							this.anInt1198 = shellPosition.anInt1481;
 							if (this.anInt1193++ > 10) {
-								SWTFrontend.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197 + this.aRandom1195.nextInt() % 5, this.anInt1198 + this.aRandom1195.nextInt() % 5, false));
+								display.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197 + this.aRandom1195.nextInt() % 5, this.anInt1198 + this.aRandom1195.nextInt() % 5, false));
 								this.anInt1193 = 0;
 							}
-							SWTFrontend.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197, this.anInt1198, false));
+							display.asyncExec(this.aClass93_1196.new ShellPosition(aClass93_1196, this.anInt1197, this.anInt1198, false));
 						}
 						Thread.sleep(1L);
 					}

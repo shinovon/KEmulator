@@ -295,7 +295,7 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		try {
 			Thread.sleep(1000);
 			do {
-				SWTFrontend.syncExec(this::updateAll);
+				display.syncExec(this::updateAll);
 				Thread.sleep(1000);
 			} while (visible && !this.shell.isDisposed());
 		} catch (InterruptedException e) {
