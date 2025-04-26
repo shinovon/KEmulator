@@ -162,34 +162,6 @@ public abstract class Screen extends Displayable {
 		LCDUIUtils.drawScrollbar(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
 	}
 
-	void swtUpdateMenuCommands(boolean item) {
-		if (focusedItem == null || !item) {
-			super.swtUpdateMenuCommands(false);
-			return;
-		}
-		for (MenuItem mi: swtMenu.getItems()) {
-			mi.dispose();
-		}
-		if (focusedItem instanceof ChoiceGroup && ((ChoiceGroup) focusedItem).choiceType == Choice.POPUP) {
-			for (int i = 0; i < ((ChoiceGroup) focusedItem).items.size(); i++) {
-				String s = ((ChoiceGroup) focusedItem).getString(i);
-				MenuItem mi = new MenuItem(swtMenu, SWT.RADIO);
-				mi.addSelectionListener(swtMenuSelectionListener);
-				mi.setData(focusedItem);
-				if (((ChoiceGroup) focusedItem).isSelected(i)) mi.setSelection(true);
-				mi.setText(s);
-			}
-		} else {
-			for (int i = 0; i < focusedItem.commands.size(); i++) {
-				Command c = (Command) focusedItem.commands.get(i);
-				MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
-				mi.addSelectionListener(swtMenuSelectionListener);
-				mi.setData(new Object[] {c, focusedItem});
-				mi.setText(c.getLongLabel());
-			}
-		}
-	}
-
 	public int _repaintInterval() {
 		return -1;
 	}

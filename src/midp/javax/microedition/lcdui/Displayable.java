@@ -4,19 +4,18 @@ import emulator.*;
 import emulator.debug.Profiler;
 import emulator.lcdui.LCDUIUtils;
 import emulator.media.capture.CapturePlayerImpl;
+import emulator.ui.CommandsMenuPosition;
 import emulator.ui.IScreen;
 import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
+import emulator.ui.TargetedCommand;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -45,16 +44,12 @@ public class Displayable {
 	Composite swtContent;
 	private Rectangle swtContentArea;
 	private boolean swtInitialized;
-	Menu swtMenu;
-	SelectionListener swtMenuSelectionListener = new SwtMenuSelectionListener();
-	private final MenuListener swtMenuListener = new SwtMenuListener();
 	boolean forceUpdateSize;
 	static KeyListener swtKeyListener = new SwtKeyListener();
 
 	private Command leftCommand;
 	private Command rightCommand;
 	private final Vector<Command> menuCommands = new Vector<Command>();
-	private final Vector<Command> itemCommands = new Vector<Command>();
 	final Object lock = new Object();
 
 	public Displayable() {
@@ -118,17 +113,16 @@ public class Displayable {
 		Command ok = null;
 		int startIdx = 0;
 		menuCommands.clear();
-		itemCommands.clear();
 
 		Command[] arr = (Command[]) commands.toArray(new Command[0]);
 		Arrays.sort(arr);
 
-		if (focusedItem != null && (startIdx = focusedItem.commands.size()) > 0) {
-			itemCommands.addAll(focusedItem.commands);
+		if (focusedItem != null) {
+			startIdx = focusedItem.commands.size();
 		}
 		menuCommands.addAll(Arrays.asList(arr));
 
-		for (Command cmd: arr) {
+		for (Command cmd : arr) {
 			int type = cmd.getCommandType();
 			switch (type) {
 				case Command.OK: {
@@ -156,7 +150,7 @@ public class Displayable {
 		}
 
 		String leftLabel = "", rightLabel = "";
-		if (menuCommands.size() > 1 || itemCommands.size() != 0) {
+		if (menuCommands.size() > 1 || (focusedItem != null && !focusedItem.commands.isEmpty())) {
 			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
 		} else if (menuCommands.size() != 0) {
 			leftLabel = menuCommands.get(0).getLabel();
@@ -166,8 +160,7 @@ public class Displayable {
 		if (rightCommand != null) {
 			rightLabel = rightCommand.getLabel();
 		}
-		Emulator.getEmulator().getScreen().setCommandLeft(leftLabel);
-		Emulator.getEmulator().getScreen().setCommandRight(rightLabel);
+		Emulator.getEmulator().getScreen().setPrimaryCommands(leftLabel, rightLabel);
 	}
 
 	protected boolean isCommandsEmpty() {
@@ -211,20 +204,10 @@ public class Displayable {
 		boolean fix = Settings.motorolaSoftKeyFix || Settings.softbankApi;
 		if (KeyMapping.isLeftSoft(n)) {
 			if (menuCommands.size() > 1) {
-				if (b && this.menuShown) {
-					this.menuShown = false;
-					if (swtMenu != null) {
-						hideSwtMenu();
-					} else {
-						this.repaintScreen();
-					}
-				} else if (b) {
-					this.menuShown = true;
-					if (swtMenu != null) {
-						showSwtMenu(false, -1, -1);
-					} else {
-						repaintScreen();
-					}
+				if (b) {
+					Vector<TargetedCommand> cmds = new Vector<>();
+					buildScreenCommands(cmds);
+					Emulator.getEmulator().getScreen().showCommandsList(cmds, CommandsMenuPosition.CommandsButton, 0, 0);
 				}
 				return !fix;
 			}
@@ -357,7 +340,8 @@ public class Displayable {
 		}
 		try {
 			Emulator.getEventQueue().queue(n);
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	void repaintScreen(Item item) {
@@ -377,7 +361,8 @@ public class Displayable {
 			if (delta > 0) {
 				try {
 					Thread.sleep(delta / MILLI_TO_NANO/*, (int) (delta % MILLI_TO_NANO)*/);
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 			}
 		}
 		lastFrameTime = System.nanoTime();
@@ -402,7 +387,8 @@ public class Displayable {
 							lock.wait(50L);
 						}
 					}
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 				Settings.aLong1235 += System.currentTimeMillis() - currentTimeMillis;
 			}
 			--Settings.steps;
@@ -419,8 +405,6 @@ public class Displayable {
 			public void run() {
 				swtContent = _constructSwtContent(SWT.NONE);
 				swtContent.setVisible(false);
-				swtMenu = new Menu(swtContent);
-				swtContent.setMenu(swtMenu);
 				swtContentArea = _layoutSwtContent();
 			}
 		});
@@ -428,9 +412,7 @@ public class Displayable {
 
 	Composite _constructSwtContent(int style) {
 		Composite c = new Composite(getSwtParent(), SWT.NONE);
-
 		_setSwtStyle(c);
-
 		return c;
 	}
 
@@ -454,11 +436,9 @@ public class Displayable {
 	}
 
 	protected void finalize() throws Throwable {
-		syncExec(new Runnable() {
-			public void run() {
-				if (swtContent != null && !swtContent.isDisposed()) {
-					swtContent.dispose();
-				}
+		syncExec(() -> {
+			if (swtContent != null && !swtContent.isDisposed()) {
+				swtContent.dispose();
 			}
 		});
 		super.finalize();
@@ -501,79 +481,52 @@ public class Displayable {
 	public void _swtShown() {
 		if (swtContent != null && !swtContent.isDisposed()) {
 			_swtUpdateSizes();
-		} else if (swtMenu == null) {
-			swtInitMenu();
 		}
 	}
 
 	public void _swtUpdateSizes() {
 		Rectangle newArea = _layoutSwtContent();
-		if(swtContentArea == null || !swtInitialized
+		if (swtContentArea == null || !swtInitialized
 				|| newArea.width != swtContentArea.width
-				|| newArea.height != swtContentArea.height)
-		{
+				|| newArea.height != swtContentArea.height) {
 			swtInitialized = true;
 			swtContentArea = newArea;
 			_swtResized(newArea.width, newArea.height);
 		}
 	}
 
-	void swtInitMenu() {
-		if (swtMenu != null) return;
-		swtMenu = new Menu(getSwtParent());
-		swtMenu.addMenuListener(swtMenuListener);
-		getSwtParent().setMenu(swtMenu);
+	Vector<TargetedCommand> buildAllCommands() {
+		Vector<TargetedCommand> cmds = new Vector<>();
+		buildItemCommands(cmds);
+		buildScreenCommands(cmds);
+		return cmds;
 	}
 
-	void showSwtMenu(final boolean item, final int x, final int y) {
-		syncExec(new Runnable() {
-			@Override
-			public void run() {
-				swtUpdateMenuCommands(item);
-				if (x != -2 && y != -2) {
-					Point p;
-					EmulatorScreen s = ((EmulatorScreen) Emulator.getEmulator().getScreen());
-					if (x != -1 || y != -1) {
-						int[] t = s.transformCaret(x, y, true);
-						p = s.getCanvas().toDisplay(new Point(t[0], t[1]));
-					} else {
-						p = s.getMenuLocation();
-					}
-					swtMenu.setLocation(p);
-				}
-				swtMenu.setVisible(true);
-			}
-		});
-	}
-
-	void hideSwtMenu() {
-		syncExec(new Runnable() {
-			@Override
-			public void run() {
-				swtMenu.setVisible(false);
-			}
-		});
-	}
-
-	void swtUpdateMenuCommands(boolean item) {
-		for (MenuItem mi: swtMenu.getItems()) {
-			mi.dispose();
+	private void buildItemCommands(Vector<TargetedCommand> cmds) {
+		if (focusedItem == null) {
+			return;
 		}
-		for (int i = 0; i < itemCommands.size(); i++) {
-			Command cmd = (Command) itemCommands.get(i);
-			MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
-			mi.addSelectionListener(swtMenuSelectionListener);
-			mi.setData(new Object[] {cmd, focusedItem});
-			mi.setText(cmd.getLongLabel());
+		if (focusedItem instanceof ChoiceGroup && ((ChoiceGroup) focusedItem).choiceType == Choice.POPUP) {
+			ChoiceGroup cg = (ChoiceGroup) focusedItem;
+			for (int i = 0; i < cg.items.size(); i++) {
+				String s = cg.getString(i);
+				cmds.add(new TargetedCommand(cg, i, cg.isSelected(i)));
+			}
+		} else {
+			for (int i = 0; i < focusedItem.commands.size(); i++) {
+				Command cmd = focusedItem.commands.get(i);
+				cmds.add(new TargetedCommand(cmd, focusedItem));
+			}
 		}
+	}
+
+	private void buildScreenCommands(Vector<TargetedCommand> cmds) {
 		for (int i = 0; i < menuCommands.size(); i++) {
-			Command cmd = (Command) menuCommands.get(i);
-			MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
-			mi.addSelectionListener(swtMenuSelectionListener);
-			mi.setData(cmd);
-			mi.setText(cmd.getLongLabel());
+			Command cmd = menuCommands.get(i);
+			cmds.add(new TargetedCommand(cmd, this));
 		}
 	}
+
 
 	public void _swtResized(int w, int h) {
 		if (this instanceof List) return;
@@ -589,38 +542,6 @@ public class Displayable {
 		}
 		if (Emulator.getCurrentDisplay().getCurrent() != this) return;
 		Emulator.getEventQueue().sizeChanged(s.getWidth(), s.getHeight());
-	}
-
-	class SwtMenuSelectionListener implements SelectionListener {
-
-		public void widgetSelected(SelectionEvent e) {
-			try {
-				Object o = (Object) e.widget.getData();
-				if (o instanceof Command) {
-					Emulator.getEventQueue().commandAction((Command) o, Displayable.this);
-				} else if (o instanceof ChoiceGroup) {
-					((ChoiceGroup) o).select(((MenuItem) e.widget).getText());
-				} else if (o instanceof Object[]) {
-					Command c = (Command) ((Object[]) o)[0];
-					Item item = (Item) ((Object[]) o)[1];
-					Emulator.getEventQueue().commandAction(c, item);
-				}
-			} catch (Exception ignored) {}
-		}
-
-		public void widgetDefaultSelected(SelectionEvent e) {
-		}
-	}
-
-	class SwtMenuListener implements MenuListener {
-
-		public void menuHidden(MenuEvent menuEvent) {
-			menuShown = false;
-		}
-
-		public void menuShown(MenuEvent menuEvent) {
-			menuShown = true;
-		}
 	}
 
 	static class SwtKeyListener implements KeyListener {

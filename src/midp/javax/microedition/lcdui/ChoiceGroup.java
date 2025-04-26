@@ -4,6 +4,10 @@ import emulator.Emulator;
 import emulator.lcdui.BoundsUtils;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
+import emulator.ui.CommandsMenuPosition;
+import emulator.ui.TargetedCommand;
+import emulator.ui.swt.EmulatorScreen;
+import org.eclipse.swt.graphics.Point;
 
 import java.util.Vector;
 
@@ -231,7 +235,11 @@ public class ChoiceGroup
 			return;
 		}
 		if (this.choiceType == POPUP) {
-			((Form) screen)._showMenu(this, 4, popupY);
+			int[] l = ((Form) screen).getLocationOnScreen(this);
+			final int y = popupY < 0 ? popupY : l[1] + popupY;
+			Vector<TargetedCommand> cmds = screen.buildAllCommands();
+			Emulator.getEmulator().getScreen().showCommandsList(cmds, CommandsMenuPosition.Custom, l[0] + 4, y);
+
 		}
 	}
 
