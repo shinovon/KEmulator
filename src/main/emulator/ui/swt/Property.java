@@ -684,8 +684,8 @@ public final class Property implements IProperty, SelectionListener {
 			this.down = "-2";
 			this.left = "-3";
 			this.right = "-4";
-			EmulatorScreen.locX = -1;
-			EmulatorScreen.locY = -1;
+			EmulatorScreen.locX = Integer.MIN_VALUE;
+			EmulatorScreen.locY = Integer.MIN_VALUE;
 			Settings.fileEncoding = "ISO-8859-1";
 			Settings.autoGenJad = false;
 			Settings.enableNewTrack = false;
@@ -705,6 +705,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.showLogFrame = false;
 			Settings.showInfoFrame = false;
 			Settings.showMemViewFrame = false;
+			Settings.canvasScale = 1f;
 		}
 	}
 
