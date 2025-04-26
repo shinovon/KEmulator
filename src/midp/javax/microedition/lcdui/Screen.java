@@ -1,20 +1,35 @@
 package javax.microedition.lcdui;
 
+import emulator.Emulator;
 import emulator.KeyMapping;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
+import emulator.ui.IScreen;
+import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.MenuItem;
 
 import java.util.Vector;
 
 public abstract class Screen extends Displayable {
-	static final Font font;
-	static final int fontHeight;
-	static final int fontHeight4;
+	static final Font font = Font.getDefaultFont();
+	static final int fontHeight = font.getHeight();
+	static final int fontHeight4 = fontHeight + 4;
 	final Vector items;
-//	private long lastPressTime;
+	//	private long lastPressTime;
 	int scroll;
+
+	Composite swtContent;
+	private Rectangle swtContentArea;
+	private boolean swtInitialized;
+
+	static KeyListener swtKeyListener = new SwtKeyListener();
 
 	Screen() {
 		this("");
@@ -158,6 +173,29 @@ public abstract class Screen extends Displayable {
 	protected void sizeChanged(final int w, final int h) {
 	}
 
+	void _invokeSizeChanged(int w, int h, boolean b) {
+		if (swtContent != null) {
+			swtContent.getDisplay().asyncExec(this::_swtUpdateSizes);
+			Emulator.getEmulator().getScreen().repaint();
+			return;
+		}
+		super._invokeSizeChanged(w, h, b);
+	}
+
+	public int getWidth() {
+		if (swtContentArea != null) {
+			return swtContentArea.width;
+		}
+		return bounds[W];
+	}
+
+	public int getHeight() {
+		if (swtContentArea != null) {
+			return swtContentArea.height;
+		}
+		return bounds[H];
+	}
+
 	protected void _drawScrollBar(final Graphics graphics) {
 		LCDUIUtils.drawScrollbar(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
 	}
@@ -166,9 +204,94 @@ public abstract class Screen extends Displayable {
 		return -1;
 	}
 
-	static {
-		font = Font.getDefaultFont();
-		fontHeight = Screen.font.getHeight();
-		fontHeight4 = Screen.fontHeight + 4;
+	Composite _constructSwtContent(int style) {
+		Composite c = new Composite(getSwtParent(), SWT.NONE);
+		_setSwtStyle(c);
+		return c;
+	}
+
+	void constructSwt() {
+		syncExec(new Runnable() {
+			public void run() {
+				swtContent = _constructSwtContent(SWT.NONE);
+				swtContent.setVisible(false);
+				swtContentArea = _layoutSwtContent();
+			}
+		});
+	}
+
+	Rectangle _layoutSwtContent() {
+		Rectangle area = getSwtParent().getClientArea();
+		swtContent.setBounds(0, 0, area.width, area.height);
+		return swtContent.getClientArea();
+	}
+
+	public Composite _getSwtContent() {
+		return swtContent;
+	}
+
+	protected void finalize() throws Throwable {
+		syncExec(() -> {
+			if (swtContent != null && !swtContent.isDisposed()) {
+				swtContent.dispose();
+			}
+		});
+		super.finalize();
+	}
+
+	static Composite getSwtParent() {
+		return ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+	}
+
+	public void _swtHidden() {
+	}
+
+	public void _swtShown() {
+		if (swtContent != null && !swtContent.isDisposed()) {
+			_swtUpdateSizes();
+		}
+	}
+
+	public void _swtUpdateSizes() {
+		Rectangle newArea = _layoutSwtContent();
+		if (swtContentArea == null || !swtInitialized
+				|| newArea.width != swtContentArea.width
+				|| newArea.height != swtContentArea.height) {
+			swtInitialized = true;
+			swtContentArea = newArea;
+			_swtResized(newArea.width, newArea.height);
+		}
+	}
+
+	public void _swtResized(int w, int h) {
+		if (this instanceof List) return;
+		swtContent.setFont(Font.getDefaultSWTFont(true));
+	}
+
+	void _setSwtStyle(Control c) {
+		int color = LCDUIUtils.backgroundColor;
+		c.setBackground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
+		color = LCDUIUtils.foregroundColor;
+		c.setForeground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
+
+		c.setFont(Font.getDefaultSWTFont(!(this instanceof List)));
+	}
+
+	static class SwtKeyListener implements KeyListener {
+
+		public void keyPressed(KeyEvent keyEvent) {
+			int n = keyEvent.keyCode & 0xFEFFFFFF;
+			Displayable d = Emulator.getCurrentDisplay().getCurrent();
+			String r;
+			if ((keyEvent.character >= 33 && keyEvent.character <= 90)
+					|| (r = KeyMapping.replaceKey(n)) == null) return;
+			n = Integer.parseInt(r);
+			if (KeyMapping.isLeftSoft(n) || KeyMapping.isRightSoft(n)) {
+				d.handleSoftKeyAction(n, true);
+			}
+		}
+
+		public void keyReleased(KeyEvent keyEvent) {
+		}
 	}
 }

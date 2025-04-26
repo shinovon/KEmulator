@@ -654,8 +654,8 @@ public final class EmulatorScreen implements
 					this.paintTransform.rotate(270.0F);
 			}
 			caret.a(this.paintTransform, this.rotation);
-			if (swtContent != null && lastDisplayable != null) {
-				lastDisplayable._swtUpdateSizes();
+			if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen) {
+				((Screen) lastDisplayable)._swtUpdateSizes();
 			}
 		}
 		canvas.redraw();
@@ -1917,7 +1917,7 @@ public final class EmulatorScreen implements
 			public void run() {
 				if (lastDisplayable != null) {
 					if (swtContent != null) swtContent.setVisible(false);
-					lastDisplayable._swtHidden();
+					((Screen) lastDisplayable)._swtHidden();
 					lastDisplayable = null;
 				}
 				if (d == null) return;
@@ -1926,8 +1926,8 @@ public final class EmulatorScreen implements
 				if (d instanceof javax.microedition.lcdui.Canvas) {
 					stackLayout.topControl = null;
 					swtContent = null;
-				} else {
-					Composite c = d._getSwtContent();
+				} else if (d instanceof Screen) {
+					Composite c = ((Screen) d)._getSwtContent();
 					stackLayout.topControl = c;
 					swtContent = c;
 					if (c != null) {
@@ -1937,7 +1937,8 @@ public final class EmulatorScreen implements
 				}
 				updateTitleInternal();
 				canvas.layout();
-				lastDisplayable._swtShown();
+				if (lastDisplayable instanceof Screen)
+					((Screen) lastDisplayable)._swtShown();
 			}
 		});
 	}

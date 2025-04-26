@@ -7,15 +7,8 @@ import emulator.media.capture.CapturePlayerImpl;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.IScreen;
 import emulator.ui.swt.SWTFrontend;
-import emulator.ui.swt.EmulatorScreen;
 import emulator.ui.TargetedCommand;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -27,7 +20,6 @@ public class Displayable {
 	public static final int H = 3;
 	String title;
 	Vector commands;
-	boolean menuShown;
 	CommandListener cmdListener;
 	Item focusedItem;
 	int w;
@@ -40,12 +32,7 @@ public class Displayable {
 	private static int framesCount;
 	boolean fullScreen;
 	private static final long MILLI_TO_NANO = 1000000L;
-
-	Composite swtContent;
-	private Rectangle swtContentArea;
-	private boolean swtInitialized;
 	boolean forceUpdateSize;
-	static KeyListener swtKeyListener = new SwtKeyListener();
 
 	private Command leftCommand;
 	private Command rightCommand;
@@ -68,16 +55,10 @@ public class Displayable {
 	}
 
 	public int getWidth() {
-		if (swtContentArea != null) {
-			return swtContentArea.width;
-		}
 		return bounds[W];
 	}
 
 	public int getHeight() {
-		if (swtContentArea != null) {
-			return swtContentArea.height;
-		}
 		return bounds[H];
 	}
 
@@ -271,12 +252,6 @@ public class Displayable {
 	}
 
 	void _invokeSizeChanged(int w, int h, boolean b) {
-		IScreen s = Emulator.getEmulator().getScreen();
-		if (swtContent != null) {
-			swtContent.getDisplay().asyncExec(this::_swtUpdateSizes);
-			s.repaint();
-			return;
-		}
 		if (this.w != w || this.h != h || forceUpdateSize) {
 			forceUpdateSize = false;
 			this.w = w;
@@ -399,55 +374,6 @@ public class Displayable {
 		Graphics.resetXRayCache();
 	}
 
-
-	void constructSwt() {
-		syncExec(new Runnable() {
-			public void run() {
-				swtContent = _constructSwtContent(SWT.NONE);
-				swtContent.setVisible(false);
-				swtContentArea = _layoutSwtContent();
-			}
-		});
-	}
-
-	Composite _constructSwtContent(int style) {
-		Composite c = new Composite(getSwtParent(), SWT.NONE);
-		_setSwtStyle(c);
-		return c;
-	}
-
-	void _setSwtStyle(Control c) {
-		int color = LCDUIUtils.backgroundColor;
-		c.setBackground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
-		color = LCDUIUtils.foregroundColor;
-		c.setForeground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
-
-		c.setFont(Font.getDefaultSWTFont(!(this instanceof List)));
-	}
-
-	Rectangle _layoutSwtContent() {
-		Rectangle area = getSwtParent().getClientArea();
-		swtContent.setBounds(0, 0, area.width, area.height);
-		return swtContent.getClientArea();
-	}
-
-	public Composite _getSwtContent() {
-		return swtContent;
-	}
-
-	protected void finalize() throws Throwable {
-		syncExec(() -> {
-			if (swtContent != null && !swtContent.isDisposed()) {
-				swtContent.dispose();
-			}
-		});
-		super.finalize();
-	}
-
-	static Composite getSwtParent() {
-		return ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
-	}
-
 	static void syncExec(Runnable r) {
 		SWTFrontend.syncExec(r);
 	}
@@ -473,26 +399,6 @@ public class Displayable {
 		Displayable.lastFrameTime = System.nanoTime();
 		Displayable.lastFpsUpdateTime = Displayable.lastFrameTime;
 		Displayable.framesCount = 0;
-	}
-
-	public void _swtHidden() {
-	}
-
-	public void _swtShown() {
-		if (swtContent != null && !swtContent.isDisposed()) {
-			_swtUpdateSizes();
-		}
-	}
-
-	public void _swtUpdateSizes() {
-		Rectangle newArea = _layoutSwtContent();
-		if (swtContentArea == null || !swtInitialized
-				|| newArea.width != swtContentArea.width
-				|| newArea.height != swtContentArea.height) {
-			swtInitialized = true;
-			swtContentArea = newArea;
-			_swtResized(newArea.width, newArea.height);
-		}
 	}
 
 	Vector<TargetedCommand> buildAllCommands() {
@@ -527,12 +433,6 @@ public class Displayable {
 		}
 	}
 
-
-	public void _swtResized(int w, int h) {
-		if (this instanceof List) return;
-		swtContent.setFont(Font.getDefaultSWTFont(true));
-	}
-
 	void updateSize(boolean force) {
 		IScreen s = Emulator.getEmulator().getScreen();
 		if (force) {
@@ -542,23 +442,5 @@ public class Displayable {
 		}
 		if (Emulator.getCurrentDisplay().getCurrent() != this) return;
 		Emulator.getEventQueue().sizeChanged(s.getWidth(), s.getHeight());
-	}
-
-	static class SwtKeyListener implements KeyListener {
-
-		public void keyPressed(KeyEvent keyEvent) {
-			int n = keyEvent.keyCode & 0xFEFFFFFF;
-			Displayable d = Emulator.getCurrentDisplay().getCurrent();
-			String r;
-			if ((keyEvent.character >= 33 && keyEvent.character <= 90)
-					|| (r = KeyMapping.replaceKey(n)) == null) return;
-			n = Integer.parseInt(r);
-			if (KeyMapping.isLeftSoft(n) || KeyMapping.isRightSoft(n)) {
-				d.handleSoftKeyAction(n, true);
-			}
-		}
-
-		public void keyReleased(KeyEvent keyEvent) {
-		}
 	}
 }
