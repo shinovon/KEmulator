@@ -36,6 +36,8 @@ public interface IScreen {
 
 	void showMessage(final String title, final String detail);
 
+	void showMessageThreadSafe(final String title, final String detail);
+
 	int showMidletChoice(Vector<String> midletKeys);
 
 	int showUpdateDialog(int type);

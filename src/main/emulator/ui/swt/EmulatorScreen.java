@@ -278,6 +278,10 @@ public final class EmulatorScreen implements
 		}
 	}
 
+	public void showMessageThreadSafe(final String title, final String detail) {
+		display.syncExec(() -> showMessage(title, detail));
+	}
+
 	private void getWindowPos() {
 		maximized = shell.getMaximized();
 		if (!maximized) {
