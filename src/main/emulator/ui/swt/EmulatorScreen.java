@@ -299,7 +299,7 @@ public final class EmulatorScreen implements
 			windowResizedByUser = false;
 			// window was already resized to minimum so it's safe to capture decor height (potentially with multiline menu)
 			windowDecorationHeight = shell.getSize().y - shell.getClientArea().height;
-			updateCanvasRect(true, false, false);
+			updateCanvasRect(true, sizeW <= 0 || sizeH <= 0, false);
 			windowResizedByUser = true;
 
 		} catch (Exception ex) {
