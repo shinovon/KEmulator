@@ -1460,7 +1460,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.optionsMenuItem) {
-				((Property) Emulator.getEmulator().getProperty()).method354(this.shell);
+				((Property) Emulator.getEmulator().getProperty()).open(this.shell);
 				return;
 			}
 			if (menuItem == this.alwaysOnTopMenuItem) {
@@ -1548,7 +1548,7 @@ public final class EmulatorScreen implements
 					((MessageConsole) Emulator.getEmulator().getMessage()).dispose();
 					return;
 				}
-				((MessageConsole) Emulator.getEmulator().getMessage()).method481(this.shell);
+				((MessageConsole) Emulator.getEmulator().getMessage()).open(this.shell);
 				return;
 			}
 			if (menuItem == m3gViewMenuItem) {
