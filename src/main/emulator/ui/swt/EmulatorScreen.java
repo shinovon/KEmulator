@@ -2555,6 +2555,10 @@ public final class EmulatorScreen implements
 		if (type == 1 && dialogSelection == 2) {
 			Updater.startUpdater(true);
 		}
+		try {
+			setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
+		} catch (Throwable ignored) {
+		}
 
 		return dialogSelection;
 	}
