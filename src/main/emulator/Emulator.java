@@ -1296,12 +1296,8 @@ public class Emulator implements Runnable {
 			midletClass.newInstance();
 		} catch (Throwable e) {
 			e.printStackTrace();
-			Emulator.eventQueue.stop();
-			SWTFrontend.syncExec(new Runnable() {
-				public void run() {
-					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
-				}
-			});
+			eventQueue.stop();
+			emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
 			return;
 		}
 		Emulator.emulatorimpl.getClassWatcher().fillClassList();
