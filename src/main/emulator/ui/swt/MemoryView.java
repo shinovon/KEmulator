@@ -763,10 +763,9 @@ public final class MemoryView implements DisposeListener {
 			while (this.shouldRun && !mv.getShell().isDisposed()) {
 				try {
 					if (System.currentTimeMillis() - this.currentMillis > this.updateInterval && !mv.isUpdating()) {
-						this.mv.updateModel();
-						SWTFrontend.syncExec(mv::updateView);
-
-						this.currentMillis = System.currentTimeMillis();
+						mv.updateModel();
+						mv.getShell().getDisplay().syncExec(mv::updateView);
+						currentMillis = System.currentTimeMillis();
 					}
 					Thread.sleep(1L);
 				} catch (InterruptedException ignored) {
