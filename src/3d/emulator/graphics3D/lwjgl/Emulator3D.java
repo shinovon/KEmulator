@@ -140,7 +140,8 @@ public final class Emulator3D implements IGraphics3D {
 			// Infinite lock instead just throwing an exception
 			try {
 				wait();
-			} catch (InterruptedException ignored) {}
+			} catch (InterruptedException ignored) {
+			}
 			throw new IllegalStateException("exiting");
 		}
 		this.egl = forceWindow;
@@ -168,22 +169,20 @@ public final class Emulator3D implements IGraphics3D {
 		if (!threadBound || !Settings.m3gThread) {
 			threadBound = true;
 			sync(() -> {
-			   try {
-				   bindM3GThread(w, h, egl);
-			   } catch (Exception e) {
-				   throw new M3GException(e);
-			   }
+				try {
+					bindM3GThread(w, h, egl);
+				} catch (Exception e) {
+					throw new M3GException(e);
+				}
 			});
 		}
 
 		try {
 			if (targetWidth != w || targetHeight != h) {
 				if (glCanvas != null) {
-					SWTFrontend.asyncExec(new Runnable() {
-						public void run() {
-							glCanvas.setSize(w, h);
-							glCanvas.setVisible(false);
-						}
+					glCanvas.getDisplay().asyncExec(() -> {
+						glCanvas.setSize(w, h);
+						glCanvas.setVisible(false);
 					});
 				} else {
 					async(() -> glfwSetWindowSize(window, w, h));
@@ -269,7 +268,8 @@ public final class Emulator3D implements IGraphics3D {
 		}
 		try {
 			GLCanvasUtil.releaseContext(glCanvas);
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	public void swapBuffers() {
@@ -343,7 +343,7 @@ public final class Emulator3D implements IGraphics3D {
 
 					for (int yy = 0; yy < height; yy++) {
 						int yWrite = yy;
-						if(!flip) yWrite = awtBufferImage.getHeight() - 1 - yWrite;
+						if (!flip) yWrite = awtBufferImage.getHeight() - 1 - yWrite;
 
 						int writePos = yWrite * awtBufferImage.getWidth();
 						int readPos = yy * width;
@@ -1319,11 +1319,9 @@ public final class Emulator3D implements IGraphics3D {
 
 	private void disposeGlCanvas() {
 		if (glCanvas == null) return;
-		SWTFrontend.syncExec(new Runnable() {
-			public void run() {
-				glCanvas.dispose();
-				glCanvas = null;
-			}
+		glCanvas.getDisplay().syncExec(() -> {
+			glCanvas.dispose();
+			glCanvas = null;
 		});
 	}
 
@@ -1392,20 +1390,16 @@ public final class Emulator3D implements IGraphics3D {
 				GLCanvasUtil.makeCurrent(glCanvas);
 				getCapabilities();
 
-				SWTFrontend.syncExec(new Runnable() {
-					public void run() {
-						glCanvas.addControlListener(new ControlListener() {
-							public void controlMoved(ControlEvent controlEvent) {
-							}
-
-							public void controlResized(ControlEvent controlEvent) {
-								if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
-								glCanvas.setSize(targetWidth, targetHeight);
-								glCanvas.setVisible(false);
-							}
-						});
+				glCanvas.getDisplay().syncExec(() -> glCanvas.addControlListener(new ControlListener() {
+					public void controlMoved(ControlEvent controlEvent) {
 					}
-				});
+
+					public void controlResized(ControlEvent controlEvent) {
+						if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
+						glCanvas.setSize(targetWidth, targetHeight);
+						glCanvas.setVisible(false);
+					}
+				}));
 			} catch (Exception e) {
 				e.printStackTrace();
 				if (glCanvas != null) {

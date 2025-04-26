@@ -189,7 +189,7 @@ public final class EmulatorScreen implements
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
-		display = Display.getCurrent();
+		display = SWTFrontend.getDisplay();
 		this.initShell();
 		this.initScreenBuffer(startWidth = n, startHeight = n2);
 		this.updatePauseState();

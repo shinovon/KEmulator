@@ -833,7 +833,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				}
 				try {
 					Thread.sleep(10L);
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 			}
 		}
 
@@ -843,27 +844,25 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	}
 
 	final static class Refresher implements Runnable {
-		final M3GViewUI aClass90_830;
+		final M3GViewUI ui;
 
-		private Refresher(final M3GViewUI aClass90_830) {
+		private Refresher(final M3GViewUI ui) {
 			super();
-			this.aClass90_830 = aClass90_830;
+			this.ui = ui;
 		}
 
 		public final void run() {
-			while (aClass90_830.canvas != null) {
-				if (aClass90_830.canvas.isDisposed()) {
+			while (ui.canvas != null) {
+				if (ui.canvas.isDisposed()) {
 					return;
 				}
-				SWTFrontend.syncExec(new Class10(this));
+				ui.canvas.getDisplay().syncExec(new Class10(this));
 				try {
 					Thread.sleep(10L);
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 			}
 		}
 
-		Refresher(final M3GViewUI class90, final M3GViewLightSceneListener class91) {
-			this(class90);
-		}
 	}
 }

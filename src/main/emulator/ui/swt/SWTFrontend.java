@@ -69,12 +69,6 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		}
 	}
 
-	public static void asyncExec(final Runnable runnable) {
-		if (!display.isDisposed()) {
-			display.asyncExec(runnable);
-		}
-	}
-
 	public final int getScreenDepth() {
 		return this.screenDepth;
 	}
