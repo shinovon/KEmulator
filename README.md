@@ -2,7 +2,7 @@
 Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 
 ## Links
-- [Homepage](https://nnproject.cc/kem)
+- [Webpage](https://nnproject.cc/kem)
 - [Discord server](https://discord.gg/ETvTpMehXV)
 - [Telegram channel](https://t.me/nnmidlets)
 
@@ -30,7 +30,7 @@ System:
 - File>Import...>General>Existing Projects into Workspace
 - Locate `eclipse` directory, select all projects and click Finish.
 ### Running
-- File>Import...>Run/Debug>Launch Debug Configurations
+- File>Import...>Run/Debug>Launch Configurations
 - Locate `eclipse/run` directory, select all configurations and click Finish
 - Fix Runtime JRE if necessary. When running `KEmulator_win`, make sure 32-bit JRE is selected
 ### Building
