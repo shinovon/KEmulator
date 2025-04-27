@@ -61,6 +61,9 @@ Updated starter scripts
 Improved controller support
 Removed "FPS mode"
 Fixed bugs on multi-monitor setup
+Split Media View and Memory View
+Improved working in installed state
+Fixed a XWayland-related bug
 
 $v2.19.1 [2025.02.12]
 Update LWJGL to 3.3.6

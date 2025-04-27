@@ -313,7 +313,7 @@ public final class EmulatorScreen implements
 			windowResizedByUser = false;
 			// window was already resized to minimum so it's safe to capture decor height (potentially with multiline menu)
 			windowDecorationHeight = shell.getSize().y - shell.getClientArea().height;
-			updateCanvasRect(true, false, false);
+			updateCanvasRect(true, sizeW <= 0 || sizeH <= 0, false);
 			windowResizedByUser = true;
 
 		} catch (Exception ex) {
@@ -325,10 +325,10 @@ public final class EmulatorScreen implements
 
 		Rectangle clientArea = display.getPrimaryMonitor().getClientArea();
 		if (EmulatorScreen.locX == Integer.MIN_VALUE) {
-			EmulatorScreen.locX = clientArea.x - (clientArea.width + this.shell.getSize().x) >> 1;
+			EmulatorScreen.locX = clientArea.x + (clientArea.width - shell.getSize().x) >> 1;
 		}
 		if (EmulatorScreen.locY == Integer.MIN_VALUE) {
-			EmulatorScreen.locY = clientArea.y - (clientArea.height + this.shell.getSize().y) >> 1;
+			EmulatorScreen.locY = clientArea.y + (clientArea.height - shell.getSize().y) >> 1;
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
@@ -2573,6 +2573,10 @@ public final class EmulatorScreen implements
 
 		if (type == 1 && dialogSelection == 2) {
 			Updater.startUpdater(true);
+		}
+		try {
+			setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
+		} catch (Throwable ignored) {
 		}
 
 		return dialogSelection;
