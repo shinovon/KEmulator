@@ -883,7 +883,7 @@ public final class EmulatorScreen implements
 		this.menuView = new Menu(menuItemView);
 		(this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
 		this.infosMenuItem.addSelectionListener(this);
-		(this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tCtrl+X");
+		(this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tAlt+X");
 		this.xrayViewMenuItem.addSelectionListener(this);
 		if (!Emulator.isX64()) {
 			(this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
@@ -1041,10 +1041,10 @@ public final class EmulatorScreen implements
 		this.enableAutoplayMenuItem.setSelection(Settings.playingRecordedKeys);
 		this.enableAutoplayMenuItem.setEnabled(Settings.playingRecordedKeys);
 		new MenuItem(this.menuTool, 2);
-		(this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tCtrl+C");
+		(this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tAlt+C");
 		this.captureToFileMenuItem.addSelectionListener(this);
-		(this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+C");
-		this.captureToClipboardMenuItem.setAccelerator(65603);
+		(this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+S");
+		this.captureToClipboardMenuItem.setAccelerator(SWT.ALT | 'S');
 		this.captureToClipboardMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuTool, 2);
 		(this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tCtrl+F3");
@@ -1145,7 +1145,7 @@ public final class EmulatorScreen implements
 		menuItemMidlet.setMenu(this.menuMidlet);
 
 		this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
-		this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
+		this.xrayViewMenuItem.setAccelerator(SWT.ALT | 88);
 		if (alwaysOnTopMenuItem != null)
 			this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
 		this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
@@ -1166,7 +1166,7 @@ public final class EmulatorScreen implements
 
 
 	void toggleMenuAccelerators(final boolean b) {
-		this.captureToFileMenuItem.setAccelerator(b ? SWT.CONTROL | 67 : 0);
+		this.captureToFileMenuItem.setAccelerator(b ? SWT.ALT | 67 : 0);
 	}
 
 	public static void pause() {
