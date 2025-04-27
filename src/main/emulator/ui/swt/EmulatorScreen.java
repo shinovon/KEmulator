@@ -1917,7 +1917,8 @@ public final class EmulatorScreen implements
 			public void run() {
 				if (lastDisplayable != null) {
 					if (swtContent != null) swtContent.setVisible(false);
-					((Screen) lastDisplayable)._swtHidden();
+					if (lastDisplayable instanceof Screen)
+						((Screen) lastDisplayable)._swtHidden();
 					lastDisplayable = null;
 				}
 				if (d == null) return;
