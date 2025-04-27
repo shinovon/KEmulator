@@ -6,7 +6,7 @@ import emulator.Settings;
 import emulator.custom.h.MethodInfo;
 import emulator.debug.Profiler;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
@@ -110,11 +110,7 @@ public class CustomMethod {
 						}
 						Settings.customTitle = res;
 
-						EmulatorImpl.syncExec(new Runnable() {
-							public void run() {
-								((EmulatorScreen) Emulator.getEmulator().getScreen()).updateTitle();
-							}
-						});
+						Emulator.getEmulator().getScreen().updateTitle();
 						res = "true";
 					}
 				} catch (Exception ignored) {}

@@ -41,7 +41,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 	public final int getCaretPosition() {
 		if (swtText == null || currentItem == null) return 0;
-		EmulatorImpl.syncExec( new Runnable() {
+		SWTFrontend.syncExec(new Runnable() {
 			public void run() {
 				try {
 					caretPosition = swtText.getCaretPosition();
@@ -58,7 +58,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 	public void setCaret(final int index) {
 		if (swtText == null || currentItem == null) return;
-		EmulatorImpl.syncExec( new Runnable() {
+		SWTFrontend.syncExec(new Runnable() {
 			public void run() {
 				try {
 					swtText.setSelection(index);
@@ -69,7 +69,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 	public void setSelection(final int index, final int length) {
 		if (swtText == null || currentItem == null) return;
-		EmulatorImpl.syncExec( new Runnable() {
+		SWTFrontend.syncExec(new Runnable() {
 			public void run() {
 				try {
 					swtText.setSelection(index, length);
@@ -149,7 +149,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		}
 
 		final Object lastItem = tmp;
-		EmulatorImpl.syncExec(new Runnable() {
+		SWTFrontend.syncExec(new Runnable() {
 			public final void run() {
 				if (lastItem != item && swtText != null) {
 					if (!swtText.isDisposed()) swtText.dispose();
@@ -199,7 +199,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		} else if (tmp instanceof TextField) {
 			((TextField) tmp)._swtFocusLost();
 		}
-		EmulatorImpl.syncExec(new Runnable() {
+		SWTFrontend.syncExec(new Runnable() {
 			public final void run() {
 				if (swtText != null && !swtText.isDisposed()) {
 					swtText.dispose();
@@ -214,7 +214,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 	public void updateText(Object item, final String text) {
 		if (item != this.currentItem || swtText == null) return;
-		EmulatorImpl.syncExec(new Runnable() {
+		SWTFrontend.syncExec(new Runnable() {
 			public final void run() {
 				try {
 					swtText.setText(text);

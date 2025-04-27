@@ -5,7 +5,7 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler;
 import emulator.graphics2D.IImage;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +36,7 @@ public class Image {
 			return (org.eclipse.swt.graphics.Image) img.imageImpl.getNative();
 		}
 		BufferedImage b = (BufferedImage) img.imageImpl.getNative();
-		return new org.eclipse.swt.graphics.Image(EmulatorImpl.getDisplay(), emulator.graphics2D.c.toSwt(b));
+		return new org.eclipse.swt.graphics.Image(SWTFrontend.getDisplay(), emulator.graphics2D.c.toSwt(b));
 	}
 
 	public void finalize() {

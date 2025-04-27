@@ -30,7 +30,7 @@ import java.util.Vector;
 public class MediaView extends SelectionAdapter implements DisposeListener, SelectionListener, Runnable {
 
 	private Shell shell;
-	private final Display display = EmulatorImpl.getDisplay();
+	private final Display display = SWTFrontend.getDisplay();
 	private final Memory memoryMgr = Memory.getInstance();
 	private Button resumeBtn;
 	private Button pauseBtn;
@@ -295,7 +295,7 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		try {
 			Thread.sleep(1000);
 			do {
-				EmulatorImpl.syncExec(this::updateAll);
+				display.syncExec(this::updateAll);
 				Thread.sleep(1000);
 			} while (visible && !this.shell.isDisposed());
 		} catch (InterruptedException e) {

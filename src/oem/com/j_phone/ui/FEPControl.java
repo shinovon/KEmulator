@@ -1,7 +1,7 @@
 package com.j_phone.ui;
 
 import emulator.Emulator;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 import emulator.ui.swt.InputDialog;
 
@@ -13,7 +13,7 @@ public final class FEPControl {
 	}
 
 	public String getInputText(String text, int inputMode, int length, boolean paramBoolean) {
-		EmulatorImpl.getDisplay().syncExec(new Runnable() {
+		SWTFrontend.getDisplay().syncExec(new Runnable() {
 			public void run() {
 				inputDialog = new InputDialog(((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell());
 				inputDialog.setInput(text);

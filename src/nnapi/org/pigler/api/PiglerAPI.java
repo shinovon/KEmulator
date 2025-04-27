@@ -3,7 +3,7 @@ package org.pigler.api;
 import com.nokia.mid.ui.SoftNotificationImpl;
 import emulator.Emulator;
 import emulator.graphics2D.awt.ImageAWT;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.widgets.Shell;
 
@@ -139,7 +139,7 @@ public class PiglerAPI {
         tapped = true;
         if(launch)
             try {
-                EmulatorImpl.asyncExec(() -> {
+                SWTFrontend.asyncExec(() -> {
                     try {
                         Shell shell = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell();
                         shell.setMinimized(false);

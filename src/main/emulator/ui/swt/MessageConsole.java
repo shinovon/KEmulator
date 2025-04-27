@@ -86,7 +86,7 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 			MessageConsole.aString871 = sb.append(payloadText).toString();
 		}
 		Emulator.getEmulator().getLogStream().println(MessageConsole.aString871);
-		EmulatorImpl.syncExec(new Textout(this));
+		SWTFrontend.syncExec(new Textout(this));
 	}
 
 	public final boolean method479() {

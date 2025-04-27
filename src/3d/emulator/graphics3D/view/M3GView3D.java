@@ -12,7 +12,7 @@ import emulator.graphics3D.m3g.LightsCache;
 import emulator.graphics3D.m3g.MeshMorph;
 import emulator.graphics3D.m3g.RenderObject;
 import emulator.graphics3D.m3g.RenderPipe;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
@@ -419,7 +419,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			glfwMakeContextCurrent(window);
 			getCapabilities();
 
-			EmulatorImpl.syncExec(this);
+			SWTFrontend.syncExec(this);
 		}
 		hints();
 
@@ -483,7 +483,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				var10 -= var8;
 			}
 		}
-		EmulatorImpl.syncExec(this);
+		SWTFrontend.syncExec(this);
 	}
 
 	public void run() {

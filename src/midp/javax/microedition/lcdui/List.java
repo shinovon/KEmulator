@@ -1,19 +1,13 @@
 package javax.microedition.lcdui;
 
 import emulator.Emulator;
-import emulator.Settings;
 import emulator.UILocale;
-import emulator.graphics2D.swt.FontSWT;
-import emulator.lcdui.LCDUIUtils;
-import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 

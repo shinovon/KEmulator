@@ -18,6 +18,7 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -338,9 +339,7 @@ public final class Memory {
 				method849(clazz.getSuperclass(), vector);
 			}
 			final Field[] declaredFields = clazz.getDeclaredFields();
-			for (int i = 0; i < declaredFields.length; ++i) {
-				vector.add(declaredFields[i]);
-			}
+			Collections.addAll(vector, declaredFields);
 		} catch (Error ignored) {
 		}
 	}
@@ -374,7 +373,7 @@ public final class Memory {
 		return n;
 	}
 
-	public final int objectsSize() {
+	public int objectsSize() {
 		int n = 0;
 		final Enumeration<ClassInfo> elements = this.classesTable.elements();
 		while (elements.hasMoreElements()) {
@@ -575,12 +574,12 @@ public final class Memory {
 							String s = sound.getExportName();
 							if (b != null) {
 								exportAudio(b, sound.getExportName());
-								((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Saved: " + s);
+								Emulator.getEmulator().getScreen().showMessage("Saved: " + s);
 							} else {
-								((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export failed: unsupported stream type");
+								Emulator.getEmulator().getScreen().showMessage("Export failed: unsupported stream type");
 							}
 						} catch (Exception e) {
-							((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export failed: " + e.toString());
+							Emulator.getEmulator().getScreen().showMessage("Export failed: " + e);
 						}
 						break;
 					}
@@ -610,12 +609,12 @@ public final class Memory {
 						String s = audioClip.getExportName();
 						if (b != null) {
 							exportAudio(b, s);
-							((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Saved: " + s);
+							Emulator.getEmulator().getScreen().showMessage("Saved: " + s);
 						} else {
-							((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export failed: unsupported stream type");
+							Emulator.getEmulator().getScreen().showMessage("Export failed: unsupported stream type");
 						}
 					} catch (Exception e) {
-						((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export failed: " + e.toString());
+						Emulator.getEmulator().getScreen().showMessage("Export failed: " + e);
 					}
 					break;
 				}
@@ -640,7 +639,7 @@ public final class Memory {
 						break;
 					}
 					case export: {
-						((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export not supported!");
+						Emulator.getEmulator().getScreen().showMessage("Export not supported!");
 						break;
 					}
 				}
@@ -675,12 +674,12 @@ public final class Memory {
 						String s = "audio" + playerImpl.getExportName();
 						if (b != null) {
 							exportAudio(b, s);
-							((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Saved: " + s);
+							Emulator.getEmulator().getScreen().showMessage("Saved: " + s);
 						} else {
-							((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export failed: unsupported stream type");
+							Emulator.getEmulator().getScreen().showMessage("Export failed: unsupported stream type");
 						}
 					} catch (Exception e) {
-						((EmulatorScreen) Emulator.getEmulator().getScreen()).showMessage("Export failed: " + e.toString());
+						Emulator.getEmulator().getScreen().showMessage("Export failed: " + e);
 					}
 				}
 			}
@@ -845,7 +844,7 @@ public final class Memory {
 		int anInt1487;
 		Vector objs;
 
-		public final int size() {
+		public int size() {
 			int anInt1487 = this.anInt1487;
 			for (int i = this.objs.size() - 1; i >= 0; --i) {
 				anInt1487 += ((ObjInstance) this.objs.get(i)).size;
@@ -853,7 +852,7 @@ public final class Memory {
 			return anInt1487;
 		}
 
-		public final int compareTo(final Object o) {
+		public int compareTo(final Object o) {
 			return this.s.compareTo(((ClassInfo) o).s);
 		}
 

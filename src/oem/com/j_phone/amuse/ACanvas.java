@@ -3,13 +3,6 @@ package com.j_phone.amuse;
 import com.jblend.ui.SequenceInterface;
 import com.vodafone.v10.graphics.sprite.SpriteCanvas;
 import emulator.Emulator;
-import emulator.graphics2D.IImage;
-import emulator.ui.IScreen;
-
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
-import java.util.ArrayList;
 
 public abstract class ACanvas
 		extends SpriteCanvas

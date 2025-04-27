@@ -16,7 +16,7 @@
 */
 package javax.microedition.lcdui;
 
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -392,7 +392,7 @@ class TextWrapper
 					bgCol.dispose();
 					bgCol = null;
 				}
-				bgCol = new Color(EmulatorImpl.getDisplay(),
+				bgCol = new Color(SWTFrontend.getDisplay(),
 								  red, green, blue);
 			}
 		});
@@ -576,7 +576,7 @@ class TextWrapper
 					fgCol.dispose();
 					fgCol = null;
 				}
-				fgCol = new Color(EmulatorImpl.getDisplay(),
+				fgCol = new Color(SWTFrontend.getDisplay(),
 								  red, green, blue);
 			}
 		});

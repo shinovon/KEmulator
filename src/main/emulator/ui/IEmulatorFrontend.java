@@ -6,7 +6,7 @@ import emulator.graphics3D.IGraphics3D;
 
 import java.io.IOException;
 
-public interface IEmulator {
+public interface IEmulatorFrontend {
 	IMessage getMessage();
 
 	ILogStream getLogStream();
@@ -37,6 +37,7 @@ public interface IEmulator {
 
 	String getAppProperty(final String p0);
 
-    void updateLanguage();
+	void updateLanguage();
 
+	void dispose();
 }

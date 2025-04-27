@@ -19,7 +19,7 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
-public final class EmulatorImpl implements IEmulator {
+public final class SWTFrontend implements IEmulatorFrontend {
 	private static Display display;
 	private Vector plugins;
 	private int screenDepth;
@@ -29,7 +29,7 @@ public final class EmulatorImpl implements IEmulator {
 	private Watcher classWatcher;
 	private Watcher profiler;
 	private Property iproperty;
-	private EmulatorScreen iscreen;
+	private EmulatorScreen screen;
 	private Log ilogstream;
 	private KeyPad keyPad;
 	private InfosBox infos;
@@ -38,11 +38,11 @@ public final class EmulatorImpl implements IEmulator {
 	public Properties midletProps;
 	private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
 
-	public EmulatorImpl() {
+	public SWTFrontend() {
 		super();
-		EmulatorImpl.display = new Display();
+		display = new Display();
 		this.plugins = new Vector();
-		this.screenDepth = EmulatorImpl.display.getDepth();
+		this.screenDepth = SWTFrontend.display.getDepth();
 		this.iproperty = new Property();
 		this.ilogstream = new Log();
 		this.sms = new MessageConsole();
@@ -53,37 +53,30 @@ public final class EmulatorImpl implements IEmulator {
 		this.methods = new Methods();
 	}
 
-	public static void dispose() {
-		if (!EmulatorImpl.display.isDisposed()) {
-			EmulatorImpl.display.dispose();
+	public void dispose() {
+		if (!display.isDisposed()) {
+			display.dispose();
 		}
 	}
 
 	public static Display getDisplay() {
-		return EmulatorImpl.display;
+		return display;
 	}
 
 	public static void syncExec(final Runnable runnable) {
-		if (!EmulatorImpl.display.isDisposed()) {
-			EmulatorImpl.display.syncExec(runnable);
+		if (!display.isDisposed()) {
+			display.syncExec(runnable);
 		}
 	}
 
 	public static void asyncExec(final Runnable runnable) {
-		if (!EmulatorImpl.display.isDisposed()) {
-			EmulatorImpl.display.asyncExec(runnable);
+		if (!display.isDisposed()) {
+			display.asyncExec(runnable);
 		}
 	}
 
 	public final int getScreenDepth() {
 		return this.screenDepth;
-	}
-
-	public final EmulatorScreen getEmulatorScreen() {
-		if (this.iscreen == null) {
-			this.iscreen = new EmulatorScreen(Devices.getPropertyInt("SCREEN_WIDTH"), Devices.getPropertyInt("SCREEN_HEIGHT"));
-		}
-		return this.iscreen;
 	}
 
 	public final Watcher getClassWatcher() {
@@ -163,7 +156,10 @@ public final class EmulatorImpl implements IEmulator {
 	}
 
 	public final IScreen getScreen() {
-		return this.iscreen;
+		if (screen == null) {
+			screen = new EmulatorScreen(Devices.getPropertyInt("SCREEN_WIDTH"), Devices.getPropertyInt("SCREEN_HEIGHT"));
+		}
+		return screen;
 	}
 
 	public final IMessage getMessage() {
@@ -249,6 +245,6 @@ public final class EmulatorImpl implements IEmulator {
 	 * updateLanguage
 	 */
 	public void updateLanguage() {
-		getEmulatorScreen().updateLanguage();
+		((EmulatorScreen) getScreen()).updateLanguage();
 	}
 }

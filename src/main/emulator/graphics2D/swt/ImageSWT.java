@@ -2,7 +2,7 @@ package emulator.graphics2D.swt;
 
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.graphics.*;
 
 import javax.imageio.ImageIO;
@@ -78,7 +78,7 @@ public final class ImageSWT implements IImage {
 	}
 
 	public final void finalize() {
-		EmulatorImpl.asyncExec(() -> {
+		SWTFrontend.asyncExec(() -> {
 			try {
 				if (img != null && !img.isDisposed()) {
 					img.dispose();

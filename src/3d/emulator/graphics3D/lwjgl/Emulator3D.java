@@ -11,7 +11,7 @@ import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
 import emulator.graphics3D.egl.GLConfiguration;
 import emulator.graphics3D.m3g.*;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -179,7 +179,7 @@ public final class Emulator3D implements IGraphics3D {
 		try {
 			if (targetWidth != w || targetHeight != h) {
 				if (glCanvas != null) {
-					EmulatorImpl.asyncExec(new Runnable() {
+					SWTFrontend.asyncExec(new Runnable() {
 						public void run() {
 							glCanvas.setSize(w, h);
 							glCanvas.setVisible(false);
@@ -1319,7 +1319,7 @@ public final class Emulator3D implements IGraphics3D {
 
 	private void disposeGlCanvas() {
 		if (glCanvas == null) return;
-		EmulatorImpl.syncExec(new Runnable() {
+		SWTFrontend.syncExec(new Runnable() {
 			public void run() {
 				glCanvas.dispose();
 				glCanvas = null;
@@ -1373,7 +1373,7 @@ public final class Emulator3D implements IGraphics3D {
 			if (exiting) return;
 			int mode = Settings.m3gContextMode == 0 && Emulator.win ? 2 : Settings.m3gContextMode;
 			if (!forceWindow && Settings.m3gContextMode != 3) {
-				EmulatorImpl.syncExec(new Runnable() {
+				SWTFrontend.syncExec(new Runnable() {
 					public void run() {
 						try {
 							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
@@ -1392,7 +1392,7 @@ public final class Emulator3D implements IGraphics3D {
 				GLCanvasUtil.makeCurrent(glCanvas);
 				getCapabilities();
 
-				EmulatorImpl.syncExec(new Runnable() {
+				SWTFrontend.syncExec(new Runnable() {
 					public void run() {
 						glCanvas.addControlListener(new ControlListener() {
 							public void controlMoved(ControlEvent controlEvent) {

@@ -31,7 +31,7 @@ public final class MemoryView implements DisposeListener {
 	private CLabel objectsSizeLbl;
 	private CLabel totalmemLbl;
 	private CLabel maxmemLbl;
-	private final Display display = EmulatorImpl.getDisplay();
+	private final Display display = SWTFrontend.getDisplay();
 	public final Memory memoryMgr = Memory.getInstance();
 	private boolean visible;
 	private Composite aComposite1098;
@@ -764,7 +764,7 @@ public final class MemoryView implements DisposeListener {
 				try {
 					if (System.currentTimeMillis() - this.currentMillis > this.updateInterval && !mv.isUpdating()) {
 						this.mv.updateModel();
-						EmulatorImpl.syncExec(mv::updateView);
+						SWTFrontend.syncExec(mv::updateView);
 
 						this.currentMillis = System.currentTimeMillis();
 					}
