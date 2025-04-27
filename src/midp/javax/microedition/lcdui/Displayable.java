@@ -124,7 +124,9 @@ public class Displayable {
 		Arrays.sort(arr);
 
 		if (focusedItem != null && (startIdx = focusedItem.commands.size()) > 0) {
-			itemCommands.addAll(focusedItem.commands);
+			Command[] arr2 = (Command[]) focusedItem.commands.toArray(new Command[0]);
+			Arrays.sort(arr2);
+			itemCommands.addAll(Arrays.asList(arr2));
 		}
 		menuCommands.addAll(Arrays.asList(arr));
 
@@ -156,7 +158,7 @@ public class Displayable {
 		}
 
 		String leftLabel = "", rightLabel = "";
-		if (menuCommands.size() > 1 || itemCommands.size() != 0) {
+		if (menuCommands.size() + itemCommands.size() > 1) {
 			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
 		} else if (menuCommands.size() != 0) {
 			leftLabel = menuCommands.get(0).getLabel();
@@ -194,6 +196,9 @@ public class Displayable {
 	}
 
 	protected Command getLeftSoftCommand() {
+		if (this.itemCommands.size() != 0) {
+			return itemCommands.get(0);
+		}
 		if (this.menuCommands.size() != 0) {
 			return menuCommands.get(0);
 		}
@@ -210,7 +215,7 @@ public class Displayable {
 		}
 		boolean fix = Settings.motorolaSoftKeyFix || Settings.softbankApi;
 		if (KeyMapping.isLeftSoft(n)) {
-			if (menuCommands.size() > 1) {
+			if (menuCommands.size() + itemCommands.size() > 1) {
 				if (b && this.menuShown) {
 					this.menuShown = false;
 					if (swtMenu != null) {
