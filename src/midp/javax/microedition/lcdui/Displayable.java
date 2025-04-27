@@ -414,18 +414,9 @@ public class Displayable {
 	static void buildItemCommands(Vector<TargetedCommand> cmds, Item target) {
 		if (target == null)
 			return;
-		if (target instanceof ChoiceGroup && ((ChoiceGroup) target).choiceType == Choice.POPUP) {
-			ChoiceGroup cg = (ChoiceGroup) target;
-			for (int i = 0; i < cg.items.size(); i++) {
-				String s = cg.getString(i);
-				cmds.add(new TargetedCommand(cg, i, cg.isSelected(i)));
-			}
-		} else {
-			Vector<Command> targetCommands = target.commands;
-			for (int i = 0; i < targetCommands.size(); i++) {
-				Command cmd = targetCommands.get(i);
-				cmds.add(new TargetedCommand(cmd, target));
-			}
+		Vector<Command> targetCommands = target.commands;
+		for (Command cmd : targetCommands) {
+			cmds.add(new TargetedCommand(cmd, target));
 		}
 	}
 
