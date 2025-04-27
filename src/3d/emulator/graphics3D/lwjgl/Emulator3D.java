@@ -1370,9 +1370,9 @@ public final class Emulator3D implements IGraphics3D {
 			}
 			if (exiting) return;
 			int mode = Settings.m3gContextMode == 0 && Emulator.win ? 2 : Settings.m3gContextMode;
-			if (!forceWindow && Settings.m3gContextMode != 3) {
-				SWTFrontend.syncExec(new Runnable() {
-					public void run() {
+			if (!forceWindow && Settings.m3gContextMode != 3 && Emulator.getEmulator() instanceof SWTFrontend) {
+				try {
+					SWTFrontend.syncExec(() -> {
 						try {
 							Composite parent = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
 							glCanvas = GLCanvasUtil.initGLCanvas(parent, 0, mode);
@@ -1382,8 +1382,11 @@ public final class Emulator3D implements IGraphics3D {
 							e.printStackTrace();
 							glCanvas = null;
 						}
-					}
-				});
+					});
+				} catch (Throwable e) {
+					e.printStackTrace();
+					glCanvas = null;
+				}
 			}
 
 			try {
