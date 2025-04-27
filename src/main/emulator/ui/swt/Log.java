@@ -174,7 +174,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 		try {
 			while (true) {
 				if (printQueue.length() > 0) {
-					logShell.getDisplay().syncExec(new Textout(this));
+					SWTFrontend.getDisplay().syncExec(new Textout(this));
 				} else {
 					synchronized (printQueue) {
 						printQueue.wait();
