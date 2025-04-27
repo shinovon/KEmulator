@@ -1778,6 +1778,10 @@ public final class EmulatorScreen implements
 			for (MenuItem mi : commandsMenu.getItems()) {
 				mi.dispose();
 			}
+			if (cmds.isEmpty()) {
+				commandsMenu.setVisible(false);
+				return;
+			}
 			for (TargetedCommand cmd : cmds) {
 				MenuItem mi = new MenuItem(commandsMenu, cmd.isChoice() ? SWT.RADIO : SWT.PUSH);
 				mi.setText(cmd.text);
