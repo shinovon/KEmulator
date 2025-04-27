@@ -92,15 +92,10 @@ public class Displayable {
 		leftCommand = null;
 		rightCommand = null;
 		Command ok = null;
-		int startIdx = 0;
 		menuCommands.clear();
 
 		Command[] arr = (Command[]) commands.toArray(new Command[0]);
 		Arrays.sort(arr);
-
-		if (focusedItem != null) {
-			startIdx = focusedItem.commands.size();
-		}
 		menuCommands.addAll(Arrays.asList(arr));
 
 		for (Command cmd : arr) {
@@ -110,7 +105,7 @@ public class Displayable {
 					if (ok != null) continue;
 					ok = cmd;
 					menuCommands.remove(cmd);
-					menuCommands.insertElementAt(cmd, startIdx);
+					menuCommands.insertElementAt(cmd, 0);
 					break;
 				}
 				case Command.BACK:
@@ -145,7 +140,10 @@ public class Displayable {
 	}
 
 	private boolean hasMenuOnLeft() {
-		return menuCommands.size() > 1 || (focusedItem != null && !focusedItem.commands.isEmpty());
+		int count = menuCommands.size();
+		if (focusedItem != null && !focusedItem.commands.isEmpty())
+			count += focusedItem.commands.size();
+		return count > 1;
 	}
 
 	protected boolean isCommandsEmpty() {
@@ -172,7 +170,10 @@ public class Displayable {
 	}
 
 	protected Command getLeftSoftCommand() {
-		if (this.menuCommands.size() != 0) {
+		if (focusedItem != null && !focusedItem.commands.isEmpty()) {
+			return focusedItem.commands.get(0);
+		}
+		if (!menuCommands.isEmpty()) {
 			return menuCommands.get(0);
 		}
 		return leftCommand;

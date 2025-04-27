@@ -235,6 +235,14 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		return null;
 	}
 
+	public Properties getAppProperties() {
+		return midletProps;
+	}
+
+	public void setAppProperties(final Properties p) {
+		midletProps = p;
+	}
+
 	/**
 	 * updateLanguage
 	 */

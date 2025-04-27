@@ -5,6 +5,7 @@ import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
 
 import java.io.IOException;
+import java.util.Properties;
 
 public interface IEmulatorFrontend {
 	IMessage getMessage();
@@ -36,6 +37,10 @@ public interface IEmulatorFrontend {
 	void syncValues();
 
 	String getAppProperty(final String p0);
+
+	Properties getAppProperties();
+
+	void setAppProperties(final Properties p);
 
 	void updateLanguage();
 
