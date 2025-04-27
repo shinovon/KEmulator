@@ -50,7 +50,20 @@ public interface IScreen {
 
 	void updateTitle();
 
-	void startWithMidlet();
+	/**
+	 * Runs frontend without MIDlet. This must block until exit.
+	 */
+	void runEmpty();
 
-	void startEmpty();
+	/**
+	 * Runs frontend with MIDlet. This must block until exit.
+	 */
+	void runWithMidlet();
+
+	/**
+	 * Called once MIDlet successfully started.
+	 *
+	 * @param first Was this the first call to startApp() ?
+	 */
+	void appStarted(boolean first);
 }

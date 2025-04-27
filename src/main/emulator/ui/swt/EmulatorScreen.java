@@ -295,11 +295,11 @@ public final class EmulatorScreen implements
 
 	// these two must be COMPLETELY separate paths, but we have what we have.
 
-	public void startWithMidlet() {
+	public void runWithMidlet() {
 		start(true);
 	}
 
-	public void startEmpty() {
+	public void runEmpty() {
 		start(false);
 	}
 
@@ -2492,9 +2492,6 @@ public final class EmulatorScreen implements
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		updateStatus();
 		this.canvas.redraw();
-	}
-
-	public void appStarting(boolean first) {
 	}
 
 	public void appStarted(boolean first) {
