@@ -278,6 +278,10 @@ public final class EmulatorScreen implements
 		}
 	}
 
+	public void showMessageThreadSafe(final String title, final String detail) {
+		display.syncExec(() -> showMessage(title, detail));
+	}
+
 	private void getWindowPos() {
 		maximized = shell.getMaximized();
 		if (!maximized) {
@@ -1456,7 +1460,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.optionsMenuItem) {
-				((Property) Emulator.getEmulator().getProperty()).method354(this.shell);
+				((Property) Emulator.getEmulator().getProperty()).open(this.shell);
 				return;
 			}
 			if (menuItem == this.alwaysOnTopMenuItem) {
@@ -1544,7 +1548,7 @@ public final class EmulatorScreen implements
 					((MessageConsole) Emulator.getEmulator().getMessage()).dispose();
 					return;
 				}
-				((MessageConsole) Emulator.getEmulator().getMessage()).method481(this.shell);
+				((MessageConsole) Emulator.getEmulator().getMessage()).open(this.shell);
 				return;
 			}
 			if (menuItem == m3gViewMenuItem) {
@@ -2494,7 +2498,8 @@ public final class EmulatorScreen implements
 	}
 
 	public void appStarted(boolean first) {
-		if (first) SWTFrontend.asyncExec(new WindowOpen(this, 0));
+		if (first) // display is already set at this moment
+			display.asyncExec(new WindowOpen(this, 0));
 	}
 
 	public int showMidletChoice(Vector<String> midletKeys) {

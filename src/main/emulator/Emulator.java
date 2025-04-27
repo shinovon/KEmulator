@@ -1236,11 +1236,9 @@ public class Emulator implements Runnable {
 			public void run() {
 				Manager.checkLibVlcSupport();
 				if (!updated && !Settings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
-					SWTFrontend.asyncExec(new Runnable() {
-						public void run() {
-							Emulator.emulatorimpl.getScreen().showUpdateDialog(1);
-						}
-					});
+					if (emulatorimpl instanceof SWTFrontend) {
+						SWTFrontend.getDisplay().asyncExec(() -> getEmulator().getScreen().showUpdateDialog(1));
+					}
 				}
 			}
 		});
@@ -1296,12 +1294,8 @@ public class Emulator implements Runnable {
 			midletClass.newInstance();
 		} catch (Throwable e) {
 			e.printStackTrace();
-			Emulator.eventQueue.stop();
-			SWTFrontend.syncExec(new Runnable() {
-				public void run() {
-					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
-				}
-			});
+			eventQueue.stop();
+			emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
 			return;
 		}
 		Emulator.emulatorimpl.getClassWatcher().fillClassList();

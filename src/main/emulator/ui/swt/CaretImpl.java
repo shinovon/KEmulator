@@ -9,6 +9,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Caret;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 
 import javax.microedition.lcdui.DateField;
@@ -16,9 +17,10 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.TextField;
 
 public final class CaretImpl implements ICaret, ModifyListener, TraverseListener, FocusListener, KeyListener {
-	private static Font font;
+	private static Font font = Font.getDefaultFont();
 	private Text swtText;
 	private Canvas swtCanvas;
+	private Display display;
 	private Caret swtCaret;
 	private float zoom;
 	private int caretLocX;
@@ -31,49 +33,48 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	private int caretRow;
 	private org.eclipse.swt.graphics.Font swtFont;
 
-	public CaretImpl(final Canvas aCanvas838) {
+	public CaretImpl(final Canvas canvas) {
 		super();
-		this.swtCanvas = aCanvas838;
-		(this.swtCaret = new Caret(this.swtCanvas, 0)).setVisible(false);
-
+		swtCanvas = canvas;
+		display = canvas.getDisplay();
+		swtCaret = new Caret(this.swtCanvas, 0);
+		swtCaret.setVisible(false);
 		this.zoom = 1.0f;
+
 	}
 
-	public final int getCaretPosition() {
+	public int getCaretPosition() {
 		if (swtText == null || currentItem == null) return 0;
-		SWTFrontend.syncExec(new Runnable() {
-			public void run() {
-				try {
-					caretPosition = swtText.getCaretPosition();
-				} catch (Exception ignored) {}
+		display.syncExec(() -> {
+			try {
+				caretPosition = swtText.getCaretPosition();
+			} catch (Exception ignored) {
 			}
 		});
 		return caretPosition;
 	}
 
-	public final String getSelection() {
+	public String getSelection() {
 		if (swtText == null || currentItem == null) return null;
 		return swtText.getSelectionText();
 	}
 
 	public void setCaret(final int index) {
 		if (swtText == null || currentItem == null) return;
-		SWTFrontend.syncExec(new Runnable() {
-			public void run() {
-				try {
-					swtText.setSelection(index);
-				} catch (Exception ignored) {}
+		display.syncExec(() -> {
+			try {
+				swtText.setSelection(index);
+			} catch (Exception ignored) {
 			}
 		});
 	}
 
 	public void setSelection(final int index, final int length) {
 		if (swtText == null || currentItem == null) return;
-		SWTFrontend.syncExec(new Runnable() {
-			public void run() {
-				try {
-					swtText.setSelection(index, length);
-				} catch (Exception ignored) {}
+		display.syncExec(() -> {
+			try {
+				swtText.setSelection(index, length);
+			} catch (Exception ignored) {
 			}
 		});
 	}
@@ -149,45 +150,43 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		}
 
 		final Object lastItem = tmp;
-		SWTFrontend.syncExec(new Runnable() {
-			public final void run() {
-				if (lastItem != item && swtText != null) {
-					if (!swtText.isDisposed()) swtText.dispose();
-					swtText = null;
-				}
-
-				if (item instanceof DateField) {
-					swtCaret.setVisible(true);
-				} else {
-					swtCaret.setVisible(false);
-
-					Text text = swtText;
-					if (text == null) {
-						text = new Text(swtCanvas,
-								item instanceof TextField || !((TextEditor) item).isMultiline()
-										? SWT.MULTI : SWT.MULTI | SWT.WRAP);
-						text.setText(item instanceof TextField ?
-								((TextField) item).getString() : ((TextEditor) item).getContent());
-						text.setData(item);
-						text.addModifyListener(CaretImpl.this);
-						text.addTraverseListener(CaretImpl.this);
-						text.addFocusListener(CaretImpl.this);
-						text.addKeyListener(CaretImpl.this);
-						swtText = text;
-					}
-
-					text.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
-					text.setVisible(true);
-					text.setFocus();
-				}
-				setCaretLocation(caretX, caretY);
-				setWindowZoom(zoom);
-				((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(false);
+		display.syncExec(() -> {
+			if (lastItem != item && swtText != null) {
+				if (!swtText.isDisposed()) swtText.dispose();
+				swtText = null;
 			}
+
+			if (item instanceof DateField) {
+				swtCaret.setVisible(true);
+			} else {
+				swtCaret.setVisible(false);
+
+				Text text = swtText;
+				if (text == null) {
+					text = new Text(swtCanvas,
+							item instanceof TextField || !((TextEditor) item).isMultiline()
+									? SWT.MULTI : SWT.MULTI | SWT.WRAP);
+					text.setText(item instanceof TextField ?
+							((TextField) item).getString() : ((TextEditor) item).getContent());
+					text.setData(item);
+					text.addModifyListener(CaretImpl.this);
+					text.addTraverseListener(CaretImpl.this);
+					text.addFocusListener(CaretImpl.this);
+					text.addKeyListener(CaretImpl.this);
+					swtText = text;
+				}
+
+				text.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
+				text.setVisible(true);
+				text.setFocus();
+			}
+			setCaretLocation(caretX, caretY);
+			setWindowZoom(zoom);
+			((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(false);
 		});
 	}
 
-	public final void defocusItem(final Object item) {
+	public void defocusItem(final Object item) {
 		Object tmp;
 		synchronized (this) {
 			tmp = this.currentItem;
@@ -199,26 +198,23 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		} else if (tmp instanceof TextField) {
 			((TextField) tmp)._swtFocusLost();
 		}
-		SWTFrontend.syncExec(new Runnable() {
-			public final void run() {
-				if (swtText != null && !swtText.isDisposed()) {
-					swtText.dispose();
-					swtText = null;
-				}
-				swtCaret.setVisible(false);
-				if (!Settings.canvasKeyboard)
-					((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(true);
+		display.syncExec(() -> {
+			if (swtText != null && !swtText.isDisposed()) {
+				swtText.dispose();
+				swtText = null;
 			}
+			swtCaret.setVisible(false);
+			if (!Settings.canvasKeyboard)
+				((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(true);
 		});
 	}
 
 	public void updateText(Object item, final String text) {
 		if (item != this.currentItem || swtText == null) return;
-		SWTFrontend.syncExec(new Runnable() {
-			public final void run() {
-				try {
-					swtText.setText(text);
-				} catch (Exception ignored) {}
+		display.syncExec(() -> {
+			try {
+				swtText.setText(text);
+			} catch (Exception ignored) {
 			}
 		});
 	}
@@ -254,35 +250,12 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		}
 	}
 
-
-	static int caretX(final CaretImpl class67) {
-		return class67.caretX;
-	}
-
-	static int caretY(final CaretImpl class67) {
-		return class67.caretY;
-	}
-
-	static Caret caret(final CaretImpl class67) {
-		return class67.swtCaret;
-	}
-
-	static float caretFloat(final CaretImpl class67) {
-		return class67.zoom;
-	}
-
-	static {
-		font = Font.getDefaultFont();
-	}
-
-
-
 	public void keyTraversed(TraverseEvent e) {
 		String text = swtText.getText();
 		int length = text.length();
 		int pos = swtText.getCaretPosition(),
-			line = swtText.getCaretLineNumber(),
-			key = e.keyCode;
+				line = swtText.getCaretLineNumber(),
+				key = e.keyCode;
 		Object item = e.widget.getData();
 		switch (e.detail) {
 			case SWT.TRAVERSE_ESCAPE:

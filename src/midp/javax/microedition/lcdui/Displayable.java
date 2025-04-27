@@ -290,11 +290,7 @@ public class Displayable {
 	void _invokeSizeChanged(int w, int h, boolean b) {
 		IScreen s = Emulator.getEmulator().getScreen();
 		if (swtContent != null) {
-			asyncExec(new Runnable() {
-				public void run() {
-					_swtUpdateSizes();
-				}
-			});
+			swtContent.getDisplay().asyncExec(this::_swtUpdateSizes);
 			s.repaint();
 			return;
 		}
@@ -474,10 +470,6 @@ public class Displayable {
 
 	static void syncExec(Runnable r) {
 		SWTFrontend.syncExec(r);
-	}
-
-	static void asyncExec(Runnable r) {
-		SWTFrontend.asyncExec(r);
 	}
 
 	static void safeSyncExec(Runnable r) {

@@ -4,7 +4,6 @@ import emulator.graphics2D.IFont;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.ITransform;
-import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.*;
 
@@ -31,16 +30,12 @@ public final class Graphics2DSWT implements IGraphics2D {
 	}
 
 	public final void finalize() {
-		SWTFrontend.asyncExec(() -> {
-			try {
-				if (!gc.isDisposed()) {
-					gc.dispose();
-				}
-				if (!color.isDisposed()) {
-					color.dispose();
-				}
-			} catch (Exception ignored) {}
-		});
+		if (!gc.isDisposed()) {
+			gc.dispose();
+		}
+		if (!color.isDisposed()) {
+			color.dispose();
+		}
 	}
 
 	public final void setAlpha(final int alpha) {

@@ -233,7 +233,8 @@ public final class About implements MouseListener, MouseMoveListener {
 
 		public final void run() {
 			About.method457(this.aClass54_775).method136(this.aClass54_775.anIntArray815, this.aClass54_775.anIntArray818);
-			SWTFrontend.syncExec(new Water(this, aClass54_775.ana811));
+			//TODO DEOBFUSCATE ALL THIS MESS
+			SWTFrontend.getDisplay().syncExec(new Water(this, aClass54_775.ana811));
 		}
 
 		WaterTask(final About class54, final Class158 class55) {
@@ -246,7 +247,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	public void finalize() {
-		SWTFrontend.asyncExec(() -> {
+		aShell806.getDisplay().asyncExec(() -> {
 			try {
 				if (!aGC814.isDisposed()) aGC814.dispose();
 			} catch (Exception ignored) {

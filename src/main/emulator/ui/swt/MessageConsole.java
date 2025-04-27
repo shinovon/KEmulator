@@ -38,7 +38,7 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 	private StyledText aStyledText877;
 	private Button aButton878;
 	private Button aButton880;
-	private Shell aShell879;
+	private Shell parent;
 	private boolean aBoolean881;
 
 	public MessageConsole() {
@@ -86,7 +86,7 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 			MessageConsole.aString871 = sb.append(payloadText).toString();
 		}
 		Emulator.getEmulator().getLogStream().println(MessageConsole.aString871);
-		SWTFrontend.syncExec(new Textout(this));
+		shell.getDisplay().syncExec(new Textout(this));
 	}
 
 	public final boolean method479() {
@@ -97,12 +97,12 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 		return this.shell;
 	}
 
-	public final void method481(final Shell aShell879) {
+	public final void open(final Shell parent) {
 		this.method487();
-		final Display current = Display.getCurrent();
-		this.aShell879 = aShell879;
-		this.shell.setLocation(aShell879.getLocation().x - aShell879.getSize().x, aShell879.getLocation().y);
-		this.shell.setSize(aShell879.getSize());
+		final Display current = parent.getDisplay();
+		this.parent = parent;
+		this.shell.setLocation(parent.getLocation().x - parent.getSize().x, parent.getLocation().y);
+		this.shell.setSize(parent.getSize());
 		this.visible = true;
 		this.aBoolean881 = true;
 		this.shell.open();
@@ -186,8 +186,8 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 	public final void controlMoved(final ControlEvent controlEvent) {
 		MessageConsole class83;
 		boolean aBoolean881;
-		if (Math.abs(this.aShell879.getLocation().x - this.shell.getSize().x - this.shell.getLocation().x) < 10 && Math.abs(this.aShell879.getLocation().y - this.shell.getLocation().y) < 20) {
-			this.shell.setLocation(this.aShell879.getLocation().x - this.shell.getSize().x, this.aShell879.getLocation().y);
+		if (Math.abs(this.parent.getLocation().x - this.shell.getSize().x - this.shell.getLocation().x) < 10 && Math.abs(this.parent.getLocation().y - this.shell.getLocation().y) < 20) {
+			this.shell.setLocation(this.parent.getLocation().x - this.shell.getSize().x, this.parent.getLocation().y);
 			class83 = this;
 			aBoolean881 = true;
 		} else {

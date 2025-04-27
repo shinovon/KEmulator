@@ -24,6 +24,7 @@ import java.util.*;
 
 public final class Watcher extends SelectionAdapter implements Runnable, DisposeListener, TreeListener {
 	private Shell shell;
+	private Display display;
 	private Combo classCombo;
 	private Text filterInput;
 	private Button hexDecSwitch;
@@ -173,7 +174,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		final Instance c = getWatched();
 		if (item.getParentItem() == null) {
 			this.method301(c, (Field) c.getFields().get(item.getParent().indexOf(item)), item);
-			SWTFrontend.asyncExec(this);
+			display.asyncExec(this);
 			return;
 		}
 		TreeItem parentItem = item;
@@ -197,7 +198,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			s = s2.substring(0, s2.length() - 2);
 		}
 		method305(o, s2, item);
-		SWTFrontend.asyncExec(this);
+		display.asyncExec(this);
 	}
 
 	public void treeCollapsed(TreeEvent var1) {
@@ -306,6 +307,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	public final void open(final Shell parent) {
+		display = parent.getDisplay();
 		createWidgets();
 		updateContent();
 		setInitialRect(parent);
@@ -316,7 +318,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		updateColumnSizes();
 		disposed = false;
 		visible = true;
-		SWTFrontend.asyncExec(this);
+		display.asyncExec(this);
 		Watcher.activeWatchers.addElement(this);
 		Display display = SWTFrontend.getDisplay();
 		while (!this.shell.isDisposed()) {
@@ -584,7 +586,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	public void widgetSelected(final SelectionEvent se) {
 		if (se.widget == hexDecSwitch) {
-			SWTFrontend.asyncExec(this);
+			display.asyncExec(this);
 		} else if (se.widget == exportBtn) {
 			new Thread(this::exportValues).start();
 		}
@@ -592,7 +594,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	private void onFilterTextModify(ModifyEvent modifyEvent) {
 		updateContent();
-		SWTFrontend.asyncExec(this);
+		display.asyncExec(this);
 	}
 
 	private boolean createClassCombo() {

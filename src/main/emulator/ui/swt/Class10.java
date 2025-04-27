@@ -15,19 +15,19 @@ final class Class10 implements Runnable {
 
 	public final void run() {
 		try {
-			if (a.aClass90_830.canvas != null) {
-				((EmulatorScreen) Emulator.getEmulator().getScreen()).pollKeyboard(a.aClass90_830.canvas);
+			if (a.ui.canvas != null) {
+				((EmulatorScreen) Emulator.getEmulator().getScreen()).pollKeyboard(a.ui.canvas);
 			}
-			if (M3GViewUI.method232(a.aClass90_830)) {
-				if (!M3GViewUI.method242(a.aClass90_830)) {
-					M3GViewUI.method511(a.aClass90_830);
-					a.aClass90_830.aBoolean909 = true;
+			if (M3GViewUI.method232(a.ui)) {
+				if (!M3GViewUI.method242(a.ui)) {
+					M3GViewUI.method511(a.ui);
+					a.ui.aBoolean909 = true;
 					return;
 				}
 			} else {
-				final Rectangle clientArea = a.aClass90_830.canvas.getClientArea();
+				final Rectangle clientArea = a.ui.canvas.getClientArea();
 				final GC gc;
-				(gc = new GC(a.aClass90_830.canvas)).setBackground(Display.getCurrent().getSystemColor(2));
+				(gc = new GC(a.ui.canvas)).setBackground(Display.getCurrent().getSystemColor(2));
 				gc.fillRectangle(clientArea);
 				gc.setForeground(Display.getCurrent().getSystemColor(3));
 				gc.drawString("M3GView init .....", clientArea.width >> 2, clientArea.height >> 2, true);

@@ -13,11 +13,11 @@ public final class InfosBox {
 	private boolean visible;
 
 	public void open(final Shell parent) {
-		Display display = Display.getCurrent();
 		createShell(parent);
 		shell.setLocation(parent.getLocation().x + parent.getSize().x, parent.getLocation().y);
 		shell.open();
 
+		Display display = parent.getDisplay();
 		visible = true;
 		parent.forceActive();
 		while (!shell.isDisposed()) {
@@ -47,7 +47,7 @@ public final class InfosBox {
 	}
 
 	private void createShell(final Shell parent) {
-		Display display = Display.getCurrent();
+		Display display = parent.getDisplay();
 
 		final GridData layoutData = new GridData();
 		layoutData.grabExcessHorizontalSpace = true;

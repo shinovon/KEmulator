@@ -419,7 +419,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			glfwMakeContextCurrent(window);
 			getCapabilities();
 
-			SWTFrontend.syncExec(this);
+			SWTFrontend.getDisplay().syncExec(this);
 		}
 		hints();
 
@@ -483,7 +483,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				var10 -= var8;
 			}
 		}
-		SWTFrontend.syncExec(this);
+		SWTFrontend.getDisplay().syncExec(this);
 	}
 
 	public void run() {
