@@ -412,7 +412,7 @@ public final class EmulatorScreen implements
 		final boolean active = canvas.getDisplay().getActiveShell() == shell &&
 				shell.isVisible() &&
 				canvas.isFocusControl();
-		if (!active) return;
+//		if (!active) return;
 		try {
 			if (win32OS == null)
 				win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
