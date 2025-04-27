@@ -403,32 +403,31 @@ public class Displayable {
 
 	Vector<TargetedCommand> buildAllCommands() {
 		Vector<TargetedCommand> cmds = new Vector<>();
-		buildItemCommands(cmds);
+		buildItemCommands(cmds, focusedItem);
 		buildScreenCommands(cmds);
 		return cmds;
 	}
 
-	private void buildItemCommands(Vector<TargetedCommand> cmds) {
-		if (focusedItem == null) {
+	static void buildItemCommands(Vector<TargetedCommand> cmds, Item target) {
+		if (target == null)
 			return;
-		}
-		if (focusedItem instanceof ChoiceGroup && ((ChoiceGroup) focusedItem).choiceType == Choice.POPUP) {
-			ChoiceGroup cg = (ChoiceGroup) focusedItem;
+		if (target instanceof ChoiceGroup && ((ChoiceGroup) target).choiceType == Choice.POPUP) {
+			ChoiceGroup cg = (ChoiceGroup) target;
 			for (int i = 0; i < cg.items.size(); i++) {
 				String s = cg.getString(i);
 				cmds.add(new TargetedCommand(cg, i, cg.isSelected(i)));
 			}
 		} else {
-			for (int i = 0; i < focusedItem.commands.size(); i++) {
-				Command cmd = focusedItem.commands.get(i);
-				cmds.add(new TargetedCommand(cmd, focusedItem));
+			Vector<Command> targetCommands = target.commands;
+			for (int i = 0; i < targetCommands.size(); i++) {
+				Command cmd = targetCommands.get(i);
+				cmds.add(new TargetedCommand(cmd, target));
 			}
 		}
 	}
 
-	private void buildScreenCommands(Vector<TargetedCommand> cmds) {
-		for (int i = 0; i < menuCommands.size(); i++) {
-			Command cmd = menuCommands.get(i);
+	void buildScreenCommands(Vector<TargetedCommand> cmds) {
+		for (Command cmd : menuCommands) {
 			cmds.add(new TargetedCommand(cmd, this));
 		}
 	}

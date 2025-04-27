@@ -239,7 +239,6 @@ public class ChoiceGroup
 			final int y = popupY < 0 ? popupY : l[1] + popupY;
 			Vector<TargetedCommand> cmds = screen.buildAllCommands();
 			Emulator.getEmulator().getScreen().showCommandsList(cmds, CommandsMenuPosition.Custom, l[0] + 4, y);
-
 		}
 	}
 

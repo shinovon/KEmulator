@@ -660,8 +660,10 @@ public class Form extends Screen {
 	public boolean _tryShowMenuAt(int x, int y) {
 		Item item = _getItemAt(x, y, null);
 		if (item != null && !item.commands.isEmpty()) {
-			Vector<TargetedCommand> cmds = buildAllCommands();
-			Emulator.getEmulator().getScreen().showCommandsList(cmds, CommandsMenuPosition.Cursor, 0,0);
+			Vector<TargetedCommand> commands = new Vector<>();
+			buildItemCommands(commands, item);
+			buildScreenCommands(commands);
+			Emulator.getEmulator().getScreen().showCommandsList(commands, CommandsMenuPosition.Cursor, 0,0);
 			return true;
 		}
 		return false;
