@@ -131,9 +131,9 @@ public class Displayable {
 		}
 
 		String leftLabel = "", rightLabel = "";
-		if (menuCommands.size() > 1 || (focusedItem != null && !focusedItem.commands.isEmpty())) {
+		if (hasMenuOnLeft()) {
 			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
-		} else if (menuCommands.size() != 0) {
+		} else if (!menuCommands.isEmpty()) {
 			leftLabel = menuCommands.get(0).getLabel();
 		} else if (leftCommand != null) {
 			leftLabel = leftCommand.getLabel();
@@ -142,6 +142,10 @@ public class Displayable {
 			rightLabel = rightCommand.getLabel();
 		}
 		Emulator.getEmulator().getScreen().setPrimaryCommands(leftLabel, rightLabel);
+	}
+
+	private boolean hasMenuOnLeft() {
+		return menuCommands.size() > 1 || (focusedItem != null && !focusedItem.commands.isEmpty());
 	}
 
 	protected boolean isCommandsEmpty() {
@@ -184,10 +188,9 @@ public class Displayable {
 		}
 		boolean fix = Settings.motorolaSoftKeyFix || Settings.softbankApi;
 		if (KeyMapping.isLeftSoft(n)) {
-			if (menuCommands.size() > 1) {
+			if (hasMenuOnLeft()) {
 				if (b) {
-					Vector<TargetedCommand> cmds = new Vector<>();
-					buildScreenCommands(cmds);
+					Vector<TargetedCommand> cmds = buildAllCommands();
 					Emulator.getEmulator().getScreen().showCommandsList(cmds, CommandsMenuPosition.CommandsButton, 0, 0);
 				}
 				return !fix;
