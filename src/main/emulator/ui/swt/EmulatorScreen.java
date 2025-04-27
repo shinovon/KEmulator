@@ -1793,12 +1793,16 @@ public final class EmulatorScreen implements
 			}
 			if (target == CommandsMenuPosition.CommandsButton) {
 				commandsMenu.setLocation(getMenuLocation());
+				commandsMenu.setVisible(true);
 			} else if (target == CommandsMenuPosition.Custom) {
 				int[] t = transformCaret(tx, ty, true);
 				Point p = getCanvas().toDisplay(new Point(t[0], t[1]));
 				commandsMenu.setLocation(p);
+				commandsMenu.setVisible(true);
 			}
-			commandsMenu.setVisible(true);
+
+			// menu under cursor is always triggered by right click, so not showing it again because GTK breaks.
+
 		});
 	}
 
