@@ -18,6 +18,7 @@ package javax.microedition.lcdui;
 
 import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -813,6 +814,18 @@ class TextWrapper
 			control = null;
 		}
 		return parent;
+	}
+
+	void addKeyListener(KeyListener l) {
+		if (control == null)
+			return;
+		control.addKeyListener(l);
+	}
+
+	void removeKeyListener(KeyListener l) {
+		if (control == null)
+			return;
+		control.removeKeyListener(l);
 	}
 
 	/**

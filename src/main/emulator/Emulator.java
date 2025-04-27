@@ -795,7 +795,7 @@ public class Emulator implements Runnable {
 			backgroundThread.start();
 
 			if (Emulator.midletClassName == null && Emulator.midletJar == null) {
-				Emulator.emulatorimpl.getScreen().startEmpty();
+				Emulator.emulatorimpl.getScreen().runEmpty();
 				emulatorimpl.dispose();
 				System.exit(0);
 				return;
@@ -854,7 +854,7 @@ public class Emulator implements Runnable {
 			}
 			Emulator.eventQueue = new EventQueue();
 			new Thread(new Emulator()).start();
-			Emulator.emulatorimpl.getScreen().startWithMidlet();
+			Emulator.emulatorimpl.getScreen().runWithMidlet();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

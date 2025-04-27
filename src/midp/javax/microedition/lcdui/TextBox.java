@@ -31,12 +31,14 @@ public class TextBox extends Screen {
 	public void _swtShown() {
 		super._swtShown();
 		textWrapper.setModifyListener(swtModifyListener);
+		textWrapper.addKeyListener(swtKeyListener);
 		textWrapper.setFocused(true);
 	}
 
 	public void _swtHidden() {
 		super._swtHidden();
 		textWrapper.setModifyListener(null);
+		textWrapper.removeKeyListener(swtKeyListener);
 	}
 
 	public void _swtResized(int w, int h) {
