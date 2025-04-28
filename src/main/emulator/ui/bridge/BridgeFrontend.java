@@ -123,6 +123,7 @@ public class BridgeFrontend implements IEmulatorFrontend {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				bb.clear();
 				commandsCounter++;
 			}
 			sendToState('M', baos.toByteArray());
