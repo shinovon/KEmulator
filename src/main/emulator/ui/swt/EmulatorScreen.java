@@ -8,8 +8,10 @@ import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.graphics2D.swt.ImageSWT;
+import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
+import emulator.ui.TargetedCommand;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StackLayout;
@@ -82,8 +84,6 @@ public final class EmulatorScreen implements
 	private ImageAWT backBufferImageAwt;
 	private ImageAWT xrayScreenImageAwt;
 	private static long aLong982;
-	private String leftCmdText;
-	private String rightCmdText;
 	MenuItem awt2dMenuItem;
 	MenuItem swt2dMenuItem;
 
@@ -186,6 +186,8 @@ public final class EmulatorScreen implements
 	private int lastPointerX;
 	private int lastPointerY;
 	private boolean paintPending;
+
+	private Menu commandsMenu;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -652,8 +654,8 @@ public final class EmulatorScreen implements
 					this.paintTransform.rotate(270.0F);
 			}
 			caret.a(this.paintTransform, this.rotation);
-			if (swtContent != null && lastDisplayable != null) {
-				lastDisplayable._swtUpdateSizes();
+			if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen) {
+				((Screen) lastDisplayable)._swtUpdateSizes();
 			}
 		}
 		canvas.redraw();
@@ -783,16 +785,12 @@ public final class EmulatorScreen implements
 		return this.getScreenImg().getHeight();
 	}
 
-	public void setCommandLeft(final String text) {
-		this.leftCmdText = text;
-		display.syncExec(new Class41(this));
+	public void setPrimaryCommands(final String left, final String right) {
+		display.syncExec(() -> {
+			leftSoftLabel.setText(left);
+			rightSoftLabel.setText(right);
+		});
 	}
-
-	public void setCommandRight(final String text) {
-		this.rightCmdText = text;
-		display.syncExec(new Class40(this));
-	}
-
 
 	private void updateStatus() {
 		String var8 = this.realZoom == 1.0F ? " " : "  ";
@@ -854,7 +852,7 @@ public final class EmulatorScreen implements
 			shell.setFont(f);
 		} catch (Error ignored) {
 		}
-		this.method588();
+		initCanvas();
 		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
 		this.leftSoftLabel.setLayoutData(layoutData3);
 		this.leftSoftLabel.addMouseListener(new Class43(this));
@@ -863,7 +861,7 @@ public final class EmulatorScreen implements
 		(this.rightSoftLabel = new CLabel(this.shell, 131072)).setText("\t");
 		this.rightSoftLabel.setLayoutData(layoutData2);
 		this.rightSoftLabel.addMouseListener(new Class50(this));
-		this.initMenu();
+		initMenu();
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new Class53(this));
 	}
@@ -1726,7 +1724,7 @@ public final class EmulatorScreen implements
 		((SWTFrontend) Emulator.getEmulator()).getInfos().setText(this.aString1008);
 	}
 
-	private void method588() {
+	private void initCanvas() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 3;
 		layoutData.verticalAlignment = 4;
@@ -1747,12 +1745,10 @@ public final class EmulatorScreen implements
 				if (lastDisplayable != null && lastDisplayable instanceof Form) {
 					Point p = canvas.toControl(event.x, event.y);
 					int[] t = transformPointer(p.x, p.y);
-					javax.microedition.lcdui.Item item;
-					if (t[0] >= 0 && t[1] >= 0
-							&& (item = ((Form) lastDisplayable)._getItemAt(t[0], t[1], null)) != null
-							&& item.commands.size() > 0) {
-						((Form) lastDisplayable)._showMenu(item, -2, -2);
-						return;
+					if (t[0] >= 0 && t[1] >= 0) {
+						Form form = (Form) lastDisplayable;
+						if (form._tryShowMenuAt(t[0], t[1]))
+							return;
 					}
 				}
 				event.doit = false;
@@ -1771,6 +1767,47 @@ public final class EmulatorScreen implements
 		this.method589();
 		this.caret = new CaretImpl(this.canvas);
 		shell.layout();
+
+		commandsMenu = new Menu(canvas);
+		canvas.setMenu(commandsMenu);
+	}
+
+	public void showCommandsList(final Vector<TargetedCommand> cmds, CommandsMenuPosition target, int tx, int ty) {
+		display.syncExec(() -> {
+			CommandsMenuListener listener = new CommandsMenuListener();
+			for (MenuItem mi : commandsMenu.getItems()) {
+				mi.dispose();
+			}
+			if (cmds.isEmpty()) {
+				commandsMenu.setVisible(false);
+				return;
+			}
+			for (TargetedCommand cmd : cmds) {
+				MenuItem mi = new MenuItem(commandsMenu, cmd.isChoice() ? SWT.RADIO : SWT.PUSH);
+				mi.setText(cmd.text);
+				mi.setData(cmd);
+				mi.addSelectionListener(listener);
+				if (cmd.wasSelected)
+					mi.setSelection(true);
+
+			}
+			if (target == CommandsMenuPosition.CommandsButton) {
+				commandsMenu.setLocation(getMenuLocation());
+				commandsMenu.setVisible(true);
+			} else if (target == CommandsMenuPosition.Custom) {
+				int[] t = transformCaret(tx, ty, true);
+				Point p = getCanvas().toDisplay(new Point(t[0], t[1]));
+				commandsMenu.setLocation(p);
+				commandsMenu.setVisible(true);
+			}
+
+			// menu under cursor is always triggered by right click, so not showing it again because GTK breaks.
+
+		});
+	}
+
+	public void forceCloseCommandsList() {
+		display.syncExec(() -> commandsMenu.setVisible(false));
 	}
 
 	public void paintControl(final PaintEvent paintEvent) {
@@ -1888,7 +1925,8 @@ public final class EmulatorScreen implements
 			public void run() {
 				if (lastDisplayable != null) {
 					if (swtContent != null) swtContent.setVisible(false);
-					lastDisplayable._swtHidden();
+					if (lastDisplayable instanceof Screen)
+						((Screen) lastDisplayable)._swtHidden();
 					lastDisplayable = null;
 				}
 				if (d == null) return;
@@ -1897,8 +1935,8 @@ public final class EmulatorScreen implements
 				if (d instanceof javax.microedition.lcdui.Canvas) {
 					stackLayout.topControl = null;
 					swtContent = null;
-				} else {
-					Composite c = d._getSwtContent();
+				} else if (d instanceof Screen) {
+					Composite c = ((Screen) d)._getSwtContent();
 					stackLayout.topControl = c;
 					swtContent = c;
 					if (c != null) {
@@ -1908,7 +1946,8 @@ public final class EmulatorScreen implements
 				}
 				updateTitleInternal();
 				canvas.layout();
-				lastDisplayable._swtShown();
+				if (lastDisplayable instanceof Screen)
+					((Screen) lastDisplayable)._swtShown();
 			}
 		});
 	}
@@ -2444,22 +2483,6 @@ public final class EmulatorScreen implements
 
 	static Canvas getCanvas(final EmulatorScreen class93) {
 		return class93.canvas;
-	}
-
-	static String method560(final EmulatorScreen class93) {
-		return class93.leftCmdText;
-	}
-
-	static CLabel getLeftSoftLabel(final EmulatorScreen class93) {
-		return class93.leftSoftLabel;
-	}
-
-	static String method573(final EmulatorScreen class93) {
-		return class93.rightCmdText;
-	}
-
-	static CLabel getRightSoftLabel(final EmulatorScreen class93) {
-		return class93.rightSoftLabel;
 	}
 
 	static int method566(final EmulatorScreen class93) {

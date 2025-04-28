@@ -33,7 +33,7 @@ public abstract class Item {
 	boolean focused;
 	Command defaultCommand;
 	public ItemCommandListener itemCommandListener;
-	public Vector commands;
+	public Vector<Command> commands;
 	String label;
 	String[] labelArr;
 	Screen screen;

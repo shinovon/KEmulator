@@ -4,6 +4,10 @@ import emulator.Emulator;
 import emulator.lcdui.BoundsUtils;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
+import emulator.ui.CommandsMenuPosition;
+import emulator.ui.TargetedCommand;
+import emulator.ui.swt.EmulatorScreen;
+import org.eclipse.swt.graphics.Point;
 
 import java.util.Vector;
 
@@ -231,8 +235,18 @@ public class ChoiceGroup
 			return;
 		}
 		if (this.choiceType == POPUP) {
-			((Form) screen)._showMenu(this, 4, popupY);
+			int[] l = ((Form) screen).getLocationOnScreen(this);
+			final int y = popupY < 0 ? popupY : l[1] + popupY;
+			Emulator.getEmulator().getScreen().showCommandsList(buildPopupList(), CommandsMenuPosition.Custom, l[0] + 4, y);
 		}
+	}
+
+	private Vector<TargetedCommand> buildPopupList() {
+		Vector<TargetedCommand> cmds = new Vector<>();
+		for (int i = 0; i < this.items.size(); i++) {
+			cmds.add(new TargetedCommand(this, i, this.isSelected(i)));
+		}
+		return cmds;
 	}
 
 	void paint(Graphics g, int x, int y, int w, int h) {
@@ -269,7 +283,8 @@ public class ChoiceGroup
 				case POPUP: {
 					try {
 						((a) this.items.get(this.currentSelect)).method211(g, this.focused, y);
-					} catch (Exception ignored) {}
+					} catch (Exception ignored) {
+					}
 				}
 			}
 		}

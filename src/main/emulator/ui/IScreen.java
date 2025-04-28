@@ -18,9 +18,11 @@ public interface IScreen {
 
 	int getHeight();
 
-	void setCommandLeft(final String p0);
+	void setPrimaryCommands(final String left, final String right);
 
-	void setCommandRight(final String p0);
+	void showCommandsList(Vector<TargetedCommand> cmds, CommandsMenuPosition target, int tx, int ty);
+
+	void forceCloseCommandsList();
 
 	void startVibra(final long p0);
 
