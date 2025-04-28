@@ -50,36 +50,34 @@ public final class b {
 		image.setData(data);
 	}
 
-	public static IImage method163(final int[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
-		method161(n3, n4);
+	public static IImage method163(final int[] rgbData, final boolean processAlpha, int offset, final int scanlength, final int width, final int height) {
+		method161(width, height);
 		int[] data = null;
-		Label_0039:
-		{
-			int[] array2;
-			if (Settings.g2d == 0) {
-				array2 = emulator.graphics2D.b.anIntArray352;
-			} else {
-				if (Settings.g2d != 1) {
-					break Label_0039;
-				}
-				array2 = emulator.graphics2D.b.anIImage351.getData();
-			}
+		int[] array2;
+		if (Settings.g2d == Settings.SWT) {
+			array2 = b.anIntArray352;
+			data = array2;
+		} else if (Settings.g2d == Settings.AWT){
+			array2 = b.anIImage351.getData();
 			data = array2;
 		}
 		int n5 = 0;
-		for (int i = 0; i < n4; ++i) {
-			System.arraycopy(array, n, data, n5, n3);
-			if (!b) {
-				for (int j = 0; j < n3; ++j) {
+		for (int i = 0; i < height; ++i) {
+			System.arraycopy(rgbData, offset, data, n5, width);
+			if (!processAlpha) {
+				for (int j = 0; j < width; ++j) {
 					final int n6 = n5 + j;
 					data[n6] |= 0xFF000000;
 				}
 			}
-			n5 += emulator.graphics2D.b.anIImage351.getWidth();
-			n += n2;
+			n5 += b.anIImage351.getWidth();
+			offset += scanlength;
 		}
-		emulator.graphics2D.b.anIImage351.setData(data);
-		return emulator.graphics2D.b.anIImage351;
+		if (b.anIImage351.gaveDataRefernce()) {
+			return b.anIImage351;
+		}
+		b.anIImage351.setData(data);
+		return b.anIImage351;
 	}
 
 	public static IImage method164(final short[] array, final boolean b, int n, final int n2, final int n3, final int n4) {

@@ -6,7 +6,9 @@ import java.util.*;
 
 public final class Settings {
 	// original settings
-	public static int g2d = 1; // swt - 0, awt - 1
+	public static final int AWT = 1;
+	public static final int SWT = 0;
+	public static int g2d = AWT; // swt - 0, awt - 1
 	public static boolean enableVibration;
 	public static boolean enableKeyRepeat;
 	public static boolean ignoreFullScreen;

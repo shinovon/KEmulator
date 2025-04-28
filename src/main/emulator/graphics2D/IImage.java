@@ -15,6 +15,8 @@ public interface IImage {
 
 	int[] getData();
 
+	boolean gaveDataRefernce();
+
 	void setData(final int[] p0);
 
 	int getRGB(final int x, final int y);

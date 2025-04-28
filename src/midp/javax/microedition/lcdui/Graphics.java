@@ -257,14 +257,14 @@ public class Graphics
 		Profiler.drawRegionPixelCount += Math.abs(w * h);
 	}
 
-	public void drawRGB(final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final boolean b) {
+	public void drawRGB(final int[] rgbData, final int offset, final int scanlength, final int x, final int y, final int width, final int height, final boolean processAlpha) {
 		++Profiler.drawCallCount;
-		if (array == null) {
+		if (rgbData == null) {
 			throw new NullPointerException();
 		}
-		this._drawRegion(emulator.graphics2D.b.method163(array, b, n, n2, n5, n6), 0, 0, n5, n6, this.impl.getTransform().newTransform(n5, n6, 0, n3, n4, 0), 16711680);
+		this._drawRegion(emulator.graphics2D.b.method163(rgbData, processAlpha, offset, scanlength, width, height), 0, 0, width, height, this.impl.getTransform().newTransform(width, height, 0, x, y, 0), 0xFF0000);
 		++Profiler.drawRGBCallCount;
-		Profiler.drawRGBPixelCount += Math.abs(n5 * n6);
+		Profiler.drawRGBPixelCount += Math.abs(width * height);
 	}
 
 	public void drawChar(final char c, final int n, final int n2, final int n3) {
