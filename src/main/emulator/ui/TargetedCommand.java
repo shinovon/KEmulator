@@ -12,6 +12,9 @@ public class TargetedCommand {
 	public final Displayable screen;
 	public final Item item;
 	public final int selectionIndex;
+	/**
+	 * True if this command is an element of POPUP choice, and it was selected at moment of menu creation.
+	 */
 	public final boolean wasSelected;
 	public final String text;
 

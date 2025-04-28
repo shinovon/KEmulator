@@ -121,6 +121,10 @@ public class BridgeFrontend implements IEmulatorFrontend {
 					commandsCache.put(commandsCounter, command);
 					bb.putInt(id);
 					baos.write(bb.array());
+					if (command.isChoice())
+						baos.write(command.wasSelected ? 2 : 1);
+					else
+						baos.write(0);
 					baos.write(command.text.getBytes(StandardCharsets.UTF_8));
 					baos.write((byte) 0);
 
