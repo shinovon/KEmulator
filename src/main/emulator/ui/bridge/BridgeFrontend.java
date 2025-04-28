@@ -109,17 +109,23 @@ public class BridgeFrontend implements IEmulatorFrontend {
 				sendToState('O', new byte[0]);
 				return;
 			}
-			ByteBuffer bb = ByteBuffer.allocate(512);
+			ByteBuffer bb = ByteBuffer.allocate(4);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			bb.putInt(list.size());
 			for (TargetedCommand command : list) {
 				int id = commandsCounter;
 				commandsCache.put(commandsCounter, command);
 				bb.putInt(id);
-				bb.put(command.text.getBytes(StandardCharsets.UTF_8));
-				bb.put((byte) 0);
+				try {
+					baos.write(bb.array());
+					baos.write(command.text.getBytes(StandardCharsets.UTF_8));
+					baos.write((byte) 0);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				commandsCounter++;
 			}
-			sendToState('M', bb.array());
+			sendToState('M', baos.toByteArray());
 		}
 	}
 
