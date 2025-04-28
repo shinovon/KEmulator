@@ -33,11 +33,12 @@ public class RecordStore {
 	static {
 		try {
 			IEmulatorFrontend em = Emulator.getEmulator();
-			if (((SWTFrontend) em).midletProps != null) {
+			if (em.getAppProperties() != null) {
 				homeRootPath = getRootPath(null, em.getAppProperty("MIDlet-Vendor"), em.getAppProperty("MIDlet-Name"));
 				logln("midlet rms path: " + homeRootPath);
 			}
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
