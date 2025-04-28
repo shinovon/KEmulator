@@ -2,6 +2,7 @@ package emulator.ui.bridge;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.custom.CustomJarResources;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.ui.CommandsMenuPosition;
@@ -154,7 +155,19 @@ final class BridgeOutput implements IScreen {
 
 	@Override
 	public void setWindowIcon(InputStream inputStream) {
-
+		try {
+			ImageAWT img = new ImageAWT(CustomJarResources.getBytes(inputStream));
+			int[] rgba = img.getData();
+			ByteBuffer bb = ByteBuffer.allocate(4 + rgba.length * 4);
+			bb.putShort((short) img.getWidth());
+			bb.putShort((short) img.getHeight());
+			for (int i = 0; i < rgba.length; i++) {
+				bb.putInt(rgba[i]);
+			}
+			bridge.sendToState('I', bb.array());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
