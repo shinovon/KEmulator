@@ -104,29 +104,33 @@ public class BridgeFrontend implements IEmulatorFrontend {
 
 	public void requestCommandsChoice(Vector<TargetedCommand> list) {
 		synchronized (stateWriteLock) {
-			commandsCache.clear();
-			if (list == null || list.isEmpty()) {
-				sendToState('O', new byte[0]);
-				return;
-			}
-			ByteBuffer bb = ByteBuffer.allocate(4);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			bb.putInt(list.size());
-			for (TargetedCommand command : list) {
-				int id = commandsCounter;
-				commandsCache.put(commandsCounter, command);
-				bb.putInt(id);
-				try {
+			try {
+
+				commandsCache.clear();
+				if (list == null || list.isEmpty()) {
+					sendToState('O', new byte[0]);
+					return;
+				}
+				ByteBuffer bb = ByteBuffer.allocate(4);
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				bb.putInt(list.size());
+				baos.write(bb.array());
+				bb.clear();
+				for (TargetedCommand command : list) {
+					int id = commandsCounter;
+					commandsCache.put(commandsCounter, command);
+					bb.putInt(id);
 					baos.write(bb.array());
 					baos.write(command.text.getBytes(StandardCharsets.UTF_8));
 					baos.write((byte) 0);
-				} catch (IOException e) {
-					e.printStackTrace();
+
+					bb.clear();
+					commandsCounter++;
 				}
-				bb.clear();
-				commandsCounter++;
+				sendToState('M', baos.toByteArray());
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			sendToState('M', baos.toByteArray());
 		}
 	}
 
