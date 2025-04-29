@@ -201,7 +201,7 @@ public final class ImageSWT implements IImage {
 		return this.rgb;
 	}
 	
-	public boolean gaveDataRefernce() {
+	public boolean directAccess() {
 		return false;
 	}
 

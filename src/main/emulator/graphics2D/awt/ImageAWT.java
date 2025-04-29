@@ -24,7 +24,7 @@ public final class ImageAWT implements IImage {
 	private Graphics2DAWT graphics;
 	private Graphics2D g2d;
 	private int[] data;
-	private boolean gaveDataReference;
+	private boolean directAccess;
 
 	public ImageAWT(final byte[] array) throws IOException {
 		super();
@@ -97,12 +97,12 @@ public final class ImageAWT implements IImage {
 	public final int[] getData() {
 		try {
 			final int[] data = getInternalData();
-			gaveDataReference = true;
+			directAccess = true;
 			if (!img.getColorModel().hasAlpha()) {
 				for (int i = data.length - 1; i >= 0; --i) {
 					data[i] |= 0xFF000000;
 				}
-				gaveDataReference = false;
+				directAccess = false;
 			}
 			return data;
 		} catch (ClassCastException e) {
@@ -116,16 +116,21 @@ public final class ImageAWT implements IImage {
 						(data[i++] & 0xFF);
 //            	intdata[i] = data[i];
 			}
-			gaveDataReference = false;
+			directAccess = false;
 			return intdata;
 		}
 	}
 
-	public final boolean gaveDataRefernce() {return this.gaveDataReference;}
+	public final boolean directAccess() {
+		return this.directAccess;
+	}
 
 	public final void setData(final int[] array) {
 		final int[] data = getInternalData();
-		if (array.length != data.length) return;
+		if (array == data)
+			return;
+		if (array.length != data.length)
+			return; // TODO throw exception?
 		System.arraycopy(array, 0, data, 0, array.length);
 	}
 
