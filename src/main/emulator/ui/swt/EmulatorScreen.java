@@ -883,13 +883,16 @@ public final class EmulatorScreen implements
 	}
 
 	private void changeFullscreen() {
-		shell.setMenuBar(null);
+//		shell.setMenuBar(null);
+		Shell tempShell = new Shell();
+		canvas.setParent(tempShell);
 		shell.removeDisposeListener(this);
 		shell.removeControlListener(this);
 		shell.dispose();
 		maximized = false;
 		initShell();
 		start(pauseState != 0);
+		tempShell.dispose();
 	}
 
 	private void initMenu() {
@@ -1760,6 +1763,10 @@ public final class EmulatorScreen implements
 	}
 
 	private void initCanvas() {
+		if (canvas != null) {
+			canvas.setParent(shell);
+			return;
+		}
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 3;
 		layoutData.verticalAlignment = 4;
@@ -1768,7 +1775,7 @@ public final class EmulatorScreen implements
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.horizontalAlignment = 4;
 		// 0x20040800, 537135104
-		(this.canvas = new Canvas(this.shell, Settings.fullscreenWindow ? SWT.DOUBLE_BUFFERED | SWT.ON_TOP : SWT.DOUBLE_BUFFERED | SWT.ON_TOP | SWT.BORDER)).setLayoutData(layoutData);
+		(this.canvas = new Canvas(this.shell, SWT.DOUBLE_BUFFERED | SWT.ON_TOP)).setLayoutData(layoutData);
 		this.canvas.addKeyListener(this);
 		this.canvas.addMouseListener(this);
 		this.canvas.addMouseWheelListener(this);
