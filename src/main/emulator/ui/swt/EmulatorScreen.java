@@ -350,6 +350,9 @@ public final class EmulatorScreen implements
 		// probably may be fixed by event queue clear call (readAndDispatch?)
 		if (maximized)
 			shell.setMaximized(true);
+		if (Settings.fullscreenWindow)
+			shell.setMaximized(true);
+//			shell.setFullScreen(true);
 
 		win = Emulator.win;
 		if (win) {
@@ -503,6 +506,11 @@ public final class EmulatorScreen implements
 	 * @see #onWindowResized()
 	 */
 	private void updateCanvasRect(boolean allowWindowResize, boolean forceWindowReset, boolean rotate) {
+		if (shell.getFullScreen() || Settings.fullscreenWindow) {
+			allowWindowResize = false;
+			forceWindowReset = false;
+		}
+
 		// applying rotation
 		// nonrotated - size, visible from midlet. Equal to rotated on 0° and 180°.
 		int nonRotatedW = getWidth();
@@ -522,7 +530,7 @@ public final class EmulatorScreen implements
 
 		// calculating zoom
 		int decorW = shell.getSize().x - shell.getClientArea().width;
-		int statusH = statusLabel.getSize().y;
+		int statusH = Settings.fullscreenWindow ? 0 : statusLabel.getSize().y;
 		int cbw2 = canvas.getBorderWidth() * 2;
 		int availableSpaceX = shell.getClientArea().width - cbw2;
 		int availableSpaceY = shell.getClientArea().height - cbw2 - statusH;
@@ -816,21 +824,6 @@ public final class EmulatorScreen implements
 
 
 	private void initShell() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = false;
-		layoutData.verticalAlignment = 2;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 3;
-		layoutData2.verticalSpan = 1;
-		layoutData2.grabExcessHorizontalSpace = false;
-		layoutData2.verticalAlignment = 2;
-		final GridData layoutData3;
-		(layoutData3 = new GridData()).horizontalAlignment = 1;
-		layoutData3.verticalSpan = 1;
-		layoutData3.grabExcessHorizontalSpace = false;
-		layoutData3.verticalAlignment = 2;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 3;
 		layout.horizontalSpacing = 5;
@@ -838,7 +831,7 @@ public final class EmulatorScreen implements
 		layout.marginHeight = 0;
 		layout.verticalSpacing = 0;
 		layout.makeColumnsEqualWidth = false;
-		(this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
+		(this.shell = new Shell(Settings.fullscreenWindow ? SWT.NONE : SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
 				.setText(Emulator.getTitle(null));
 		shell.addListener(SWT.Close, event -> CustomMethod.close());
 		shell.setMinimumSize(120, 50); // windows uses 120px as hard limit for width
@@ -854,16 +847,39 @@ public final class EmulatorScreen implements
 		}
 		initCanvas();
 		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
-		this.leftSoftLabel.setLayoutData(layoutData3);
 		this.leftSoftLabel.addMouseListener(new Class43(this));
 		(this.statusLabel = new CLabel(this.shell, 16777216)).setText("");
-		this.statusLabel.setLayoutData(layoutData);
 		(this.rightSoftLabel = new CLabel(this.shell, 131072)).setText("\t");
-		this.rightSoftLabel.setLayoutData(layoutData2);
 		this.rightSoftLabel.addMouseListener(new Class50(this));
 		initMenu();
+		setFullscreen(Settings.fullscreenWindow);
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new Class53(this));
+	}
+
+	private void setFullscreen(boolean fullscreen) {
+		final GridData layoutData;
+		(layoutData = new GridData()).horizontalAlignment = 4;
+		layoutData.grabExcessHorizontalSpace = true;
+		layoutData.grabExcessVerticalSpace = false;
+		layoutData.verticalAlignment = 2;
+		layoutData.exclude = fullscreen;
+		final GridData layoutData2;
+		(layoutData2 = new GridData()).horizontalAlignment = 3;
+		layoutData2.verticalSpan = 1;
+		layoutData2.grabExcessHorizontalSpace = false;
+		layoutData2.verticalAlignment = 2;
+		layoutData2.exclude = fullscreen;
+		final GridData layoutData3;
+		(layoutData3 = new GridData()).horizontalAlignment = 1;
+		layoutData3.verticalSpan = 1;
+		layoutData3.grabExcessHorizontalSpace = false;
+		layoutData3.verticalAlignment = 2;
+		layoutData3.exclude = fullscreen;
+		this.leftSoftLabel.setLayoutData(layoutData3);
+		this.statusLabel.setLayoutData(layoutData);
+		this.rightSoftLabel.setLayoutData(layoutData2);
+		shell.setMenuBar(Settings.fullscreenWindow ? null : menu);
 	}
 
 	private void initMenu() {
@@ -1732,7 +1748,8 @@ public final class EmulatorScreen implements
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.horizontalAlignment = 4;
-		(this.canvas = new Canvas(this.shell, 537135104)).setLayoutData(layoutData);
+		// 0x20040800, 537135104
+		(this.canvas = new Canvas(this.shell, Settings.fullscreenWindow ? SWT.DOUBLE_BUFFERED | SWT.ON_TOP : SWT.DOUBLE_BUFFERED | SWT.ON_TOP | SWT.BORDER)).setLayoutData(layoutData);
 		this.canvas.addKeyListener(this);
 		this.canvas.addMouseListener(this);
 		this.canvas.addMouseWheelListener(this);
