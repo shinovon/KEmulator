@@ -1,6 +1,5 @@
 package emulator.graphics2D;
 
-import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -14,6 +13,8 @@ public interface IImage {
 	int getHeight();
 
 	int[] getData();
+
+	boolean directAccess();
 
 	void setData(final int[] p0);
 
