@@ -4,36 +4,30 @@ import emulator.Emulator;
 import emulator.Settings;
 
 public final class b {
-	private static IImage anIImage351;
-	private static int[] anIntArray352;
+	private static IImage bufferImage;
+	private static int[] bufferData;
 
 	public b() {
 		super();
 	}
 
-	private static void method161(int max, int max2) {
-		if (b.anIImage351 == null || max > b.anIImage351.getWidth() || max2 > b.anIImage351.getHeight()) {
+	private static void createBuffer(int max, int max2) {
+		if (b.bufferImage == null || max > b.bufferImage.getWidth() || max2 > b.bufferImage.getHeight()) {
 			max = Math.max(max, Emulator.getEmulator().getScreen().getWidth());
 			max2 = Math.max(max2, Emulator.getEmulator().getScreen().getHeight());
-			b.anIImage351 = Emulator.getEmulator().newImage(max, max2, true);
+			b.bufferImage = Emulator.getEmulator().newImage(max, max2, true);
 			if (Settings.g2d == 0) {
-				b.anIntArray352 = new int[max * max2];
+				b.bufferData = new int[max * max2];
 			}
 		}
 	}
 
 	public static void method162(final IImage image, final int[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
 		int[] data = null;
-		Label_0042:
-		{
-			if (Settings.g2d == 0) {
-				data = new int[image.getWidth() * image.getHeight()];
-			} else {
-				if (Settings.g2d != 1) {
-					break Label_0042;
-				}
-				data = image.getData();
-			}
+		if (Settings.g2d == 0) {
+			data = new int[image.getWidth() * image.getHeight()];
+		} else if (Settings.g2d == 1) {
+			data = image.getData();
 		}
 		int n5 = 0;
 		for (int i = 0; i < n4; ++i) {
@@ -47,56 +41,44 @@ public final class b {
 			n5 += image.getWidth();
 			n += n2;
 		}
-		image.setData(data);
+		if (!image.directAccess()) {
+			image.setData(data);
+		}
 	}
 
-	public static IImage method163(final int[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
-		method161(n3, n4);
+	public static IImage method163(final int[] rgbData, final boolean processAlpha, int offset, final int scanlength, final int width, final int height) {
+		createBuffer(width, height);
 		int[] data = null;
-		Label_0039:
-		{
-			int[] array2;
-			if (Settings.g2d == 0) {
-				array2 = emulator.graphics2D.b.anIntArray352;
-			} else {
-				if (Settings.g2d != 1) {
-					break Label_0039;
-				}
-				array2 = emulator.graphics2D.b.anIImage351.getData();
-			}
-			data = array2;
+		if (Settings.g2d == Settings.G2D_SWT) {
+			data = b.bufferData;
+		} else if (Settings.g2d == Settings.G2D_AWT){
+			data = b.bufferImage.getData();
 		}
 		int n5 = 0;
-		for (int i = 0; i < n4; ++i) {
-			System.arraycopy(array, n, data, n5, n3);
-			if (!b) {
-				for (int j = 0; j < n3; ++j) {
+		for (int i = 0; i < height; ++i) {
+			System.arraycopy(rgbData, offset, data, n5, width);
+			if (!processAlpha) {
+				for (int j = 0; j < width; ++j) {
 					final int n6 = n5 + j;
 					data[n6] |= 0xFF000000;
 				}
 			}
-			n5 += emulator.graphics2D.b.anIImage351.getWidth();
-			n += n2;
+			n5 += b.bufferImage.getWidth();
+			offset += scanlength;
 		}
-		emulator.graphics2D.b.anIImage351.setData(data);
-		return emulator.graphics2D.b.anIImage351;
+		if (!b.bufferImage.directAccess()) {
+			b.bufferImage.setData(data);
+		}
+		return b.bufferImage;
 	}
 
 	public static IImage method164(final short[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
-		method161(n3, n4);
+		createBuffer(n3, n4);
 		int[] data = null;
-		Label_0039:
-		{
-			int[] array2;
-			if (Settings.g2d == 0) {
-				array2 = emulator.graphics2D.b.anIntArray352;
-			} else {
-				if (Settings.g2d != 1) {
-					break Label_0039;
-				}
-				array2 = emulator.graphics2D.b.anIImage351.getData();
-			}
-			data = array2;
+		if (Settings.g2d == 0) {
+			data = bufferData;
+		} else if (Settings.g2d == 1) {
+			data = bufferImage.getData();
 		}
 		int n5 = 0;
 		for (int i = 0; i < n4; ++i) {
@@ -110,10 +92,12 @@ public final class b {
 				data[n7++] = n9;
 			}
 			n += n2;
-			n5 += emulator.graphics2D.b.anIImage351.getWidth();
+			n5 += bufferImage.getWidth();
 		}
-		emulator.graphics2D.b.anIImage351.setData(data);
-		return emulator.graphics2D.b.anIImage351;
+		if (!bufferImage.directAccess()) {
+			bufferImage.setData(data);
+		}
+		return bufferImage;
 	}
 
 	public static void method165(final IImage image, final int[] array, int n, final int n2, final int n3, final int n4, final int n5, final int n6) {

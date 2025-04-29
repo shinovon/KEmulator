@@ -200,6 +200,10 @@ public final class ImageSWT implements IImage {
 		}
 		return this.rgb;
 	}
+	
+	public boolean directAccess() {
+		return false;
+	}
 
 	public final void setAlpha(int n, int n2, int n3, int n4, final int n5) {
 		if (n >= this.imgdata.width || n2 >= this.imgdata.height) {
