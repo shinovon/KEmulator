@@ -1672,7 +1672,6 @@ public final class EmulatorScreen implements
 					setSize(r[0], r[1]);
 				}
 			} else if (menuItem == fullscreenMenuItem) {
-				// TODO
 				fullscreen = fullscreenMenuItem.getSelection();
 				changeFullscreen();
 			}
