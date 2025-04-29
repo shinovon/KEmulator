@@ -65,6 +65,7 @@ public final class EmulatorScreen implements
 	public static int sizeW = -1;
 	public static int sizeH = -1;
 	public static boolean maximized;
+	public static boolean fullscreen;
 	private Transform paintTransform;
 	private int rotation;
 	private int rotatedWidth;
@@ -288,7 +289,7 @@ public final class EmulatorScreen implements
 
 	private void getWindowPos() {
 		maximized = shell.getMaximized();
-		if (!maximized && !Settings.fullscreenWindow) {
+		if (!maximized && !fullscreen) {
 			locX = shell.getLocation().x;
 			locY = shell.getLocation().y;
 
@@ -352,7 +353,7 @@ public final class EmulatorScreen implements
 		// probably may be fixed by event queue clear call (readAndDispatch?)
 		if (maximized)
 			shell.setMaximized(true);
-		if (Settings.fullscreenWindow) {
+		if (fullscreen) {
 			Settings.resizeMode = ResizeMethod.Fit;
 			shell.setMaximized(true);
 //			shell.setFullScreen(true);
@@ -510,7 +511,7 @@ public final class EmulatorScreen implements
 	 * @see #onWindowResized()
 	 */
 	private void updateCanvasRect(boolean allowWindowResize, boolean forceWindowReset, boolean rotate) {
-		if (shell.getFullScreen() || Settings.fullscreenWindow) {
+		if (shell.getFullScreen() || fullscreen) {
 			allowWindowResize = false;
 			forceWindowReset = false;
 		}
@@ -534,7 +535,7 @@ public final class EmulatorScreen implements
 
 		// calculating zoom
 		int decorW = shell.getSize().x - shell.getClientArea().width;
-		int statusH = Settings.fullscreenWindow ? 0 : statusLabel.getSize().y;
+		int statusH = fullscreen ? 0 : statusLabel.getSize().y;
 		int cbw2 = canvas.getBorderWidth() * 2;
 		int availableSpaceX = shell.getClientArea().width - cbw2;
 		int availableSpaceY = shell.getClientArea().height - cbw2 - statusH;
@@ -831,7 +832,7 @@ public final class EmulatorScreen implements
 		layout.marginHeight = 0;
 		layout.verticalSpacing = 0;
 		layout.makeColumnsEqualWidth = false;
-		(this.shell = new Shell(Settings.fullscreenWindow ? SWT.NONE : SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
+		(this.shell = new Shell(fullscreen ? SWT.NONE : SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
 				.setText(Emulator.getTitle(null));
 		shell.addListener(SWT.Close, event -> CustomMethod.close());
 		shell.setMinimumSize(120, 50); // windows uses 120px as hard limit for width
@@ -852,7 +853,7 @@ public final class EmulatorScreen implements
 		(this.rightSoftLabel = new CLabel(this.shell, 131072)).setText("\t");
 		this.rightSoftLabel.addMouseListener(new Class50(this));
 		initMenu();
-		setFullscreen(Settings.fullscreenWindow);
+		setFullscreen(fullscreen);
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new Class53(this));
 	}
@@ -879,7 +880,7 @@ public final class EmulatorScreen implements
 		this.leftSoftLabel.setLayoutData(layoutData3);
 		this.statusLabel.setLayoutData(layoutData);
 		this.rightSoftLabel.setLayoutData(layoutData2);
-		shell.setMenuBar(Settings.fullscreenWindow ? null : menu);
+		shell.setMenuBar(fullscreen ? null : menu);
 	}
 
 	private void changeFullscreen() {
@@ -1052,7 +1053,7 @@ public final class EmulatorScreen implements
 		fullscreenMenuItem = new MenuItem(menuResize, SWT.CHECK);
 		fullscreenMenuItem.setText(UILocale.get("MENU_TOOL_TOGGLE_FULLSCREEN", "Toggle fullscreen") + "\tF11");
 		fullscreenMenuItem.addSelectionListener(this);
-		fullscreenMenuItem.setSelection(Settings.fullscreenWindow);
+		fullscreenMenuItem.setSelection(fullscreen);
 
 		resizeMenuItem.setMenu(menuResize);
 
@@ -1672,7 +1673,7 @@ public final class EmulatorScreen implements
 				}
 			} else if (menuItem == fullscreenMenuItem) {
 				// TODO
-				Settings.fullscreenWindow = fullscreenMenuItem.getSelection();
+				fullscreen = fullscreenMenuItem.getSelection();
 				changeFullscreen();
 			}
 		}
@@ -2061,7 +2062,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (keyEvent.keyCode == SWT.F11) {
-			fullscreenMenuItem.setSelection(Settings.fullscreenWindow = !Settings.fullscreenWindow);
+			fullscreenMenuItem.setSelection(fullscreen = !fullscreen);
 			changeFullscreen();
 			return;
 		}
