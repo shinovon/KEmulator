@@ -288,7 +288,7 @@ public final class EmulatorScreen implements
 
 	private void getWindowPos() {
 		maximized = shell.getMaximized();
-		if (!maximized) {
+		if (!maximized && !Settings.fullscreenWindow) {
 			locX = shell.getLocation().x;
 			locY = shell.getLocation().y;
 
@@ -899,7 +899,7 @@ public final class EmulatorScreen implements
 		if (menu != null) {
 			menu.dispose();
 		}
-		this.menu = new Menu(this.shell, 2);
+		this.menu = new Menu(this.shell, SWT.BAR);
 		final MenuItem menuItemMidlet;
 		(menuItemMidlet = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_MIDLET", "Midlet"));
 		final MenuItem menuItemTool;
