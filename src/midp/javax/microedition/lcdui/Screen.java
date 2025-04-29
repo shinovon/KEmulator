@@ -280,6 +280,10 @@ public abstract class Screen extends Displayable {
 	static class SwtKeyListener implements KeyListener {
 
 		public void keyPressed(KeyEvent keyEvent) {
+			if (keyEvent.keyCode == SWT.F11 || keyEvent.keyCode == 16777261 || keyEvent.keyCode == 16777259) {
+				((EmulatorScreen) Emulator.getEmulator().getScreen()).keyPressed(keyEvent);
+				return;
+			}
 			int n = keyEvent.keyCode & 0xFEFFFFFF;
 			Displayable d = Emulator.getCurrentDisplay().getCurrent();
 			String r;

@@ -154,5 +154,5 @@ public final class Settings {
 	public static boolean controllerInverseHor;
 	public static boolean controllerInverseVer;
 
-	public static boolean fullscreenWindow = true;
+	public static boolean fullscreenWindow;
 }

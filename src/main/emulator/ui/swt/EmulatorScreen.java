@@ -138,6 +138,7 @@ public final class EmulatorScreen implements
 	private MenuItem integerScalingMenuItem;
 	private MenuItem m3gViewMenuItem;
 	private MenuItem resetSizeMenuItem;
+	private MenuItem fullscreenMenuItem;
 	private static int captureFileCounter;
 	private static String aString993;
 	private int pauseState;
@@ -188,6 +189,7 @@ public final class EmulatorScreen implements
 	private boolean paintPending;
 
 	private Menu commandsMenu;
+	private boolean exiting;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -350,9 +352,11 @@ public final class EmulatorScreen implements
 		// probably may be fixed by event queue clear call (readAndDispatch?)
 		if (maximized)
 			shell.setMaximized(true);
-		if (Settings.fullscreenWindow)
+		if (Settings.fullscreenWindow) {
+			Settings.resizeMode = ResizeMethod.Fit;
 			shell.setMaximized(true);
 //			shell.setFullScreen(true);
+		}
 
 		win = Emulator.win;
 		if (win) {
@@ -661,10 +665,6 @@ public final class EmulatorScreen implements
 					this.paintTransform.translate(screenY, screenX + rotatedHeight * realZoom);
 					this.paintTransform.rotate(270.0F);
 			}
-			caret.a(this.paintTransform, this.rotation);
-			if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen) {
-				((Screen) lastDisplayable)._swtUpdateSizes();
-			}
 		}
 		canvas.redraw();
 		updateStatus();
@@ -882,6 +882,16 @@ public final class EmulatorScreen implements
 		shell.setMenuBar(Settings.fullscreenWindow ? null : menu);
 	}
 
+	private void changeFullscreen() {
+		shell.setMenuBar(null);
+		shell.removeDisposeListener(this);
+		shell.removeControlListener(this);
+		shell.dispose();
+		maximized = false;
+		initShell();
+		start(pauseState != 0);
+	}
+
 	private void initMenu() {
 		if (menu != null) {
 			menu.dispose();
@@ -1035,6 +1045,11 @@ public final class EmulatorScreen implements
 		resetSizeMenuItem = new MenuItem(menuResize, SWT.PUSH);
 		resetSizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_RESET", "Reset window size"));
 		resetSizeMenuItem.addSelectionListener(this);
+
+		fullscreenMenuItem = new MenuItem(menuResize, SWT.CHECK);
+		fullscreenMenuItem.setText(UILocale.get("MENU_TOOL_TOGGLE_FULLSCREEN", "Toggle fullscreen") + "\tF11");
+		fullscreenMenuItem.addSelectionListener(this);
+		fullscreenMenuItem.setSelection(Settings.fullscreenWindow);
 
 		resizeMenuItem.setMenu(menuResize);
 
@@ -1652,6 +1667,10 @@ public final class EmulatorScreen implements
 				if (r != null) {
 					setSize(r[0], r[1]);
 				}
+			} else if (menuItem == fullscreenMenuItem) {
+				// TODO
+				Settings.fullscreenWindow = fullscreenMenuItem.getSelection();
+				changeFullscreen();
 			}
 		}
 	}
@@ -1757,6 +1776,20 @@ public final class EmulatorScreen implements
 		this.canvas.getShell().addMouseTrackListener(this);
 		this.canvas.addPaintListener(this);
 		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
+		canvas.addControlListener(new ControlListener() {
+			@Override
+			public void controlMoved(ControlEvent controlEvent) {
+
+			}
+
+			@Override
+			public void controlResized(ControlEvent controlEvent) {
+				caret.a(paintTransform, rotation);
+				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen) {
+					((Screen) lastDisplayable)._swtUpdateSizes();
+				}
+			}
+		});
 		canvas.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
 				if (lastDisplayable != null && lastDisplayable instanceof Form) {
@@ -2018,6 +2051,11 @@ public final class EmulatorScreen implements
 		}
 		if (keyEvent.keyCode == 16777259/*&& (keyEvent.stateMask & SWT.CONTROL) != 0*/) {
 			this.zoomIn();
+			return;
+		}
+		if (keyEvent.keyCode == SWT.F11) {
+			fullscreenMenuItem.setSelection(Settings.fullscreenWindow = !Settings.fullscreenWindow);
+			changeFullscreen();
 			return;
 		}
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
@@ -2391,6 +2429,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void widgetDisposed(final DisposeEvent disposeEvent) {
+		exiting = true;
 		Emulator.getEmulator().disposeSubWindows();
 		Emulator.notifyDestroyed();
 		if (this.pauseState != 0) {
@@ -2427,7 +2466,6 @@ public final class EmulatorScreen implements
 	public void controlResized(final ControlEvent controlEvent) {
 		onWindowResized();
 		this.controlMoved(controlEvent);
-
 	}
 
 	private void mp(int i) {

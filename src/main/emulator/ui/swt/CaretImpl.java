@@ -239,13 +239,13 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	}
 
 	public void keyPressed(KeyEvent keyEvent) {
-		if (keyEvent.keyCode == SWT.F1 || keyEvent.keyCode == SWT.F2 || keyEvent.keyCode == SWT.F3) {
+		if (keyEvent.keyCode == SWT.F1 || keyEvent.keyCode == SWT.F2 || keyEvent.keyCode == SWT.F3 || keyEvent.keyCode == SWT.F11) {
 			((EmulatorScreen) Emulator.getEmulator().getScreen()).keyPressed(keyEvent);
 		}
 	}
 
 	public void keyReleased(KeyEvent keyEvent) {
-		if (keyEvent.keyCode == SWT.F1 || keyEvent.keyCode == SWT.F2 || keyEvent.keyCode == SWT.F3) {
+		if (keyEvent.keyCode == SWT.F1 || keyEvent.keyCode == SWT.F2 || keyEvent.keyCode == SWT.F3 || keyEvent.keyCode == SWT.F11) {
 			((EmulatorScreen) Emulator.getEmulator().getScreen()).keyReleased(keyEvent);
 		}
 	}
