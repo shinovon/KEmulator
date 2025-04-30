@@ -65,6 +65,7 @@ public final class EmulatorScreen implements
 	public static int sizeW = -1;
 	public static int sizeH = -1;
 	public static boolean maximized;
+	public static boolean fullscreen;
 	private Transform paintTransform;
 	private int rotation;
 	private int rotatedWidth;
@@ -138,6 +139,7 @@ public final class EmulatorScreen implements
 	private MenuItem integerScalingMenuItem;
 	private MenuItem m3gViewMenuItem;
 	private MenuItem resetSizeMenuItem;
+	private MenuItem fullscreenMenuItem;
 	private static int captureFileCounter;
 	private static String aString993;
 	private int pauseState;
@@ -188,6 +190,7 @@ public final class EmulatorScreen implements
 	private boolean paintPending;
 
 	private Menu commandsMenu;
+	private boolean exiting;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -286,7 +289,7 @@ public final class EmulatorScreen implements
 
 	private void getWindowPos() {
 		maximized = shell.getMaximized();
-		if (!maximized) {
+		if (!maximized && !fullscreen) {
 			locX = shell.getLocation().x;
 			locY = shell.getLocation().y;
 
@@ -350,6 +353,11 @@ public final class EmulatorScreen implements
 		// probably may be fixed by event queue clear call (readAndDispatch?)
 		if (maximized)
 			shell.setMaximized(true);
+		if (fullscreen) {
+			Settings.resizeMode = ResizeMethod.Fit;
+			shell.setMaximized(true);
+//			shell.setFullScreen(true);
+		}
 
 		win = Emulator.win;
 		if (win) {
@@ -503,6 +511,11 @@ public final class EmulatorScreen implements
 	 * @see #onWindowResized()
 	 */
 	private void updateCanvasRect(boolean allowWindowResize, boolean forceWindowReset, boolean rotate) {
+		if (shell.getFullScreen() || fullscreen) {
+			allowWindowResize = false;
+			forceWindowReset = false;
+		}
+
 		// applying rotation
 		// nonrotated - size, visible from midlet. Equal to rotated on 0° and 180°.
 		int nonRotatedW = getWidth();
@@ -522,7 +535,7 @@ public final class EmulatorScreen implements
 
 		// calculating zoom
 		int decorW = shell.getSize().x - shell.getClientArea().width;
-		int statusH = statusLabel.getSize().y;
+		int statusH = fullscreen ? 0 : statusLabel.getSize().y;
 		int cbw2 = canvas.getBorderWidth() * 2;
 		int availableSpaceX = shell.getClientArea().width - cbw2;
 		int availableSpaceY = shell.getClientArea().height - cbw2 - statusH;
@@ -652,10 +665,6 @@ public final class EmulatorScreen implements
 				case 3:
 					this.paintTransform.translate(screenY, screenX + rotatedHeight * realZoom);
 					this.paintTransform.rotate(270.0F);
-			}
-			caret.a(this.paintTransform, this.rotation);
-			if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen) {
-				((Screen) lastDisplayable)._swtUpdateSizes();
 			}
 		}
 		canvas.redraw();
@@ -816,21 +825,6 @@ public final class EmulatorScreen implements
 
 
 	private void initShell() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = false;
-		layoutData.verticalAlignment = 2;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 3;
-		layoutData2.verticalSpan = 1;
-		layoutData2.grabExcessHorizontalSpace = false;
-		layoutData2.verticalAlignment = 2;
-		final GridData layoutData3;
-		(layoutData3 = new GridData()).horizontalAlignment = 1;
-		layoutData3.verticalSpan = 1;
-		layoutData3.grabExcessHorizontalSpace = false;
-		layoutData3.verticalAlignment = 2;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 3;
 		layout.horizontalSpacing = 5;
@@ -838,7 +832,7 @@ public final class EmulatorScreen implements
 		layout.marginHeight = 0;
 		layout.verticalSpacing = 0;
 		layout.makeColumnsEqualWidth = false;
-		(this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
+		(this.shell = new Shell(fullscreen ? SWT.NONE : SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
 				.setText(Emulator.getTitle(null));
 		shell.addListener(SWT.Close, event -> CustomMethod.close());
 		shell.setMinimumSize(120, 50); // windows uses 120px as hard limit for width
@@ -854,23 +848,59 @@ public final class EmulatorScreen implements
 		}
 		initCanvas();
 		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
-		this.leftSoftLabel.setLayoutData(layoutData3);
 		this.leftSoftLabel.addMouseListener(new Class43(this));
 		(this.statusLabel = new CLabel(this.shell, 16777216)).setText("");
-		this.statusLabel.setLayoutData(layoutData);
 		(this.rightSoftLabel = new CLabel(this.shell, 131072)).setText("\t");
-		this.rightSoftLabel.setLayoutData(layoutData2);
 		this.rightSoftLabel.addMouseListener(new Class50(this));
 		initMenu();
+		setFullscreen(fullscreen);
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new Class53(this));
+	}
+
+	private void setFullscreen(boolean fullscreen) {
+		final GridData layoutData;
+		(layoutData = new GridData()).horizontalAlignment = 4;
+		layoutData.grabExcessHorizontalSpace = true;
+		layoutData.grabExcessVerticalSpace = false;
+		layoutData.verticalAlignment = 2;
+		layoutData.exclude = fullscreen;
+		final GridData layoutData2;
+		(layoutData2 = new GridData()).horizontalAlignment = 3;
+		layoutData2.verticalSpan = 1;
+		layoutData2.grabExcessHorizontalSpace = false;
+		layoutData2.verticalAlignment = 2;
+		layoutData2.exclude = fullscreen;
+		final GridData layoutData3;
+		(layoutData3 = new GridData()).horizontalAlignment = 1;
+		layoutData3.verticalSpan = 1;
+		layoutData3.grabExcessHorizontalSpace = false;
+		layoutData3.verticalAlignment = 2;
+		layoutData3.exclude = fullscreen;
+		this.leftSoftLabel.setLayoutData(layoutData3);
+		this.statusLabel.setLayoutData(layoutData);
+		this.rightSoftLabel.setLayoutData(layoutData2);
+		shell.setMenuBar(fullscreen ? null : menu);
+	}
+
+	private void changeFullscreen() {
+//		shell.setMenuBar(null);
+		Shell tempShell = new Shell();
+		canvas.setParent(tempShell);
+		shell.removeDisposeListener(this);
+		shell.removeControlListener(this);
+		shell.dispose();
+		maximized = false;
+		initShell();
+		start(pauseState != 0);
+		tempShell.dispose();
 	}
 
 	private void initMenu() {
 		if (menu != null) {
 			menu.dispose();
 		}
-		this.menu = new Menu(this.shell, 2);
+		this.menu = new Menu(this.shell, SWT.BAR);
 		final MenuItem menuItemMidlet;
 		(menuItemMidlet = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_MIDLET", "Midlet"));
 		final MenuItem menuItemTool;
@@ -1019,6 +1049,11 @@ public final class EmulatorScreen implements
 		resetSizeMenuItem = new MenuItem(menuResize, SWT.PUSH);
 		resetSizeMenuItem.setText(UILocale.get("MENU_TOOL_RESIZE_RESET", "Reset window size"));
 		resetSizeMenuItem.addSelectionListener(this);
+
+		fullscreenMenuItem = new MenuItem(menuResize, SWT.CHECK);
+		fullscreenMenuItem.setText(UILocale.get("MENU_TOOL_TOGGLE_FULLSCREEN", "Toggle fullscreen") + "\tF11");
+		fullscreenMenuItem.addSelectionListener(this);
+		fullscreenMenuItem.setSelection(fullscreen);
 
 		resizeMenuItem.setMenu(menuResize);
 
@@ -1636,6 +1671,9 @@ public final class EmulatorScreen implements
 				if (r != null) {
 					setSize(r[0], r[1]);
 				}
+			} else if (menuItem == fullscreenMenuItem) {
+				fullscreen = fullscreenMenuItem.getSelection();
+				changeFullscreen();
 			}
 		}
 	}
@@ -1725,6 +1763,10 @@ public final class EmulatorScreen implements
 	}
 
 	private void initCanvas() {
+		if (canvas != null) {
+			canvas.setParent(shell);
+			return;
+		}
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 3;
 		layoutData.verticalAlignment = 4;
@@ -1732,7 +1774,8 @@ public final class EmulatorScreen implements
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.horizontalAlignment = 4;
-		(this.canvas = new Canvas(this.shell, 537135104)).setLayoutData(layoutData);
+		// 0x20040800, 537135104
+		(this.canvas = new Canvas(this.shell, SWT.DOUBLE_BUFFERED | SWT.ON_TOP)).setLayoutData(layoutData);
 		this.canvas.addKeyListener(this);
 		this.canvas.addMouseListener(this);
 		this.canvas.addMouseWheelListener(this);
@@ -1740,6 +1783,20 @@ public final class EmulatorScreen implements
 		this.canvas.getShell().addMouseTrackListener(this);
 		this.canvas.addPaintListener(this);
 		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
+		canvas.addControlListener(new ControlListener() {
+			@Override
+			public void controlMoved(ControlEvent controlEvent) {
+
+			}
+
+			@Override
+			public void controlResized(ControlEvent controlEvent) {
+				caret.a(paintTransform, rotation);
+				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen) {
+					((Screen) lastDisplayable)._swtUpdateSizes();
+				}
+			}
+		});
 		canvas.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
 				if (lastDisplayable != null && lastDisplayable instanceof Form) {
@@ -2001,6 +2058,11 @@ public final class EmulatorScreen implements
 		}
 		if (keyEvent.keyCode == 16777259/*&& (keyEvent.stateMask & SWT.CONTROL) != 0*/) {
 			this.zoomIn();
+			return;
+		}
+		if (keyEvent.keyCode == SWT.F11) {
+			fullscreenMenuItem.setSelection(fullscreen = !fullscreen);
+			changeFullscreen();
 			return;
 		}
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
@@ -2374,6 +2436,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void widgetDisposed(final DisposeEvent disposeEvent) {
+		exiting = true;
 		Emulator.getEmulator().disposeSubWindows();
 		Emulator.notifyDestroyed();
 		if (this.pauseState != 0) {
@@ -2410,7 +2473,6 @@ public final class EmulatorScreen implements
 	public void controlResized(final ControlEvent controlEvent) {
 		onWindowResized();
 		this.controlMoved(controlEvent);
-
 	}
 
 	private void mp(int i) {
