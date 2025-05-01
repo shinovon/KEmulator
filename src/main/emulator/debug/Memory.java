@@ -90,7 +90,7 @@ public final class Memory {
 
 		// players
 		try {
-			players.clear();
+			players.clear(); // here go mmapi ones. Others will be collected from heap later.
 			players.addAll(PlayerImpl.players);
 		} catch (Exception e) {
 			e.printStackTrace();
