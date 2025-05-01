@@ -422,50 +422,53 @@ public final class MemoryView implements DisposeListener {
 		gc.fillRectangle(0, 0, this.imagesCanvasWidth, this.imagesCanvasHeight);
 		int totalAllocatedPixels = 0;
 		this.drawnImagesBounds.clear();
-		for (int size = MemoryView.imagesToShow.size(), i = 0; i < size; ++i) {
-			Image image;
-			try {
-				image = MemoryView.imagesToShow.get(i);
-			} catch (Exception ex) {
-				break;
-			}
-			final int n3 = (int) (image.getWidth() * this.imageScaling);
-			final int n4 = (int) (image.getHeight() * this.imageScaling);
-			if (n2 + n3 + 30 > this.imagesCanvasWidth) {
-				n2 = 10;
-				n += max + 12;
-				max = 0;
-			}
-			if (n + n4 > 0 || n > this.imagesCanvasHeight) {
+		synchronized (MemoryView.updateLock) {
+			final int size = MemoryView.imagesToShow.size();
+			for (int i = 0; i < size; ++i) {
+				Image image;
 				try {
-					image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-					if (this.darkenUnused) {
-						image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
+					image = MemoryView.imagesToShow.get(i);
+				} catch (Exception ex) {
+					break;
 				}
-				if (image instanceof MemoryViewImage) {
-					gc.setForeground(foreground);
-					gc.drawString("Tex", n2 - 1, n + 1 - gc.getFontMetrics().getHeight(), true);
-				} else {
-					GC gc2;
-					Color foreground2;
-					if (this.imgClassSelected && this.selectedImageObjectIndex >= 0 && this.selectedImageObjectIndex < MemoryView.allImages.size() && MemoryView.allImages.get(this.selectedImageObjectIndex) == image) {
-						gc2 = gc;
-						foreground2 = color3;
+				final int n3 = (int) (image.getWidth() * this.imageScaling);
+				final int n4 = (int) (image.getHeight() * this.imageScaling);
+				if (n2 + n3 + 30 > this.imagesCanvasWidth) {
+					n2 = 10;
+					n += max + 12;
+					max = 0;
+				}
+				if (n + n4 > 0 || n > this.imagesCanvasHeight) {
+					try {
+						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+						if (this.darkenUnused) {
+							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if (image instanceof MemoryViewImage) {
+						gc.setForeground(foreground);
+						gc.drawString("Tex", n2 - 1, n + 1 - gc.getFontMetrics().getHeight(), true);
 					} else {
-						gc2 = gc;
-						foreground2 = ((i < this.imagesCount) ? color2 : color);
+						GC gc2;
+						Color foreground2;
+						if (this.imgClassSelected && this.selectedImageObjectIndex >= 0 && this.selectedImageObjectIndex < MemoryView.allImages.size() && MemoryView.allImages.get(this.selectedImageObjectIndex) == image) {
+							gc2 = gc;
+							foreground2 = color3;
+						} else {
+							gc2 = gc;
+							foreground2 = ((i < this.imagesCount) ? color2 : color);
+						}
+						gc2.setForeground(foreground2);
 					}
-					gc2.setForeground(foreground2);
+					gc.drawRectangle(n2 - 1, n - 1, n3 + 1, n4 + 1);
+					this.drawnImagesBounds.put(new Rectangle(n2 - 1, n - 1, n3 + 1, n4 + 1), image);
 				}
-				gc.drawRectangle(n2 - 1, n - 1, n3 + 1, n4 + 1);
-				this.drawnImagesBounds.put(new Rectangle(n2 - 1, n - 1, n3 + 1, n4 + 1), image);
+				n2 += n3 + 10;
+				max = Math.max(max, n4);
+				totalAllocatedPixels += image.getWidth() * image.getHeight();
 			}
-			n2 += n3 + 10;
-			max = Math.max(max, n4);
-			totalAllocatedPixels += image.getWidth() * image.getHeight();
 		}
 		background.dispose();
 		color.dispose();
