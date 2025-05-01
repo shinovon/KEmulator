@@ -220,21 +220,24 @@ public final class Memory {
 				}
 			} else if (o instanceof Vector) {
 				final Enumeration<Object> elements = (Enumeration<Object>) ((Vector) o).elements();
+				int index = 0;
 				while (elements.hasMoreElements()) {
-					final Object nextElement;
-					if ((nextElement = elements.nextElement()) != null) {
-						this.collectObjects(nextElement.getClass(), nextElement, path + "(VectorElement)", true);
+					final Object nextElement = elements.nextElement();
+					if (nextElement != null) {
+						this.collectObjects(nextElement.getClass(), nextElement, path + '[' + index + ']', true);
 					}
+					index++;
 				}
 				return;
 			}
 			if (o instanceof Hashtable) {
-				final Enumeration<Object> keys = (Enumeration<Object>) ((Hashtable) o).keys();
+				Hashtable h = (Hashtable) o;
+				final Enumeration<Object> keys = h.keys();
 				while (keys.hasMoreElements()) {
-					final Object nextElement2 = keys.nextElement();
-					final Object value2;
-					if ((value2 = ((Hashtable) o).get(nextElement2)) != null) {
-						this.collectObjects(value2.getClass(), value2, path + "(HashtableKey=" + nextElement2 + ")", true);
+					final Object key = keys.nextElement();
+					final Object val = h.get(key);
+					if (val != null) {
+						this.collectObjects(val.getClass(), val, path + '[' + key + ']', true);
 					}
 				}
 				return;
