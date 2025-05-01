@@ -183,8 +183,8 @@ public final class Memory {
 						this.releasedImages.removeElement(o);
 					}
 				} else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
-					if (!PlayerImpl.players.contains(o))
-						this.players.add(o);
+					if (!players.contains(o))
+						players.add(o);
 				} else if (o instanceof Node) {
 					this.m3gObjects.add(o);
 				} else if (o instanceof Image2D) {
