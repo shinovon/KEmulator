@@ -5,6 +5,7 @@ import com.samsung.util.AudioClip;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
+import emulator.debug.MediaUtils;
 import emulator.debug.Memory;
 import emulator.debug.PlayerActionType;
 import emulator.media.capture.CapturePlayerImpl;
@@ -162,15 +163,15 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 
 	private void updateTableLine(TableItem item) {
 		Object value = item.getData();
-		int msLen = Memory.getPlayerDurationMs(value);
+		int msLen = MediaUtils.getPlayerDurationMs(value);
 		String lengthText = msLen < 0 ? "Unknown" : (formatTime(msLen) + String.format(".%1$03d", msLen % 1000));
-		int loopCount = Memory.getPlayerLoopCount(value);
+		int loopCount = MediaUtils.getPlayerLoopCount(value);
 		item.setText(0, value.toString());
-		item.setText(1, Memory.getPlayerType(value));
-		item.setText(2, Memory.playerStateStr(value));
+		item.setText(1, MediaUtils.getPlayerType(value));
+		item.setText(2, MediaUtils.playerStateStr(value));
 		item.setText(3, lengthText);
 		item.setText(4, loopCount < 0 ? "∞" : String.valueOf(loopCount));
-		item.setText(5, String.valueOf(Memory.getPlayerDataLength(value)));
+		item.setText(5, String.valueOf(MediaUtils.getPlayerDataLength(value)));
 		item.setText(6, getImplementation(value));
 	}
 
@@ -193,12 +194,12 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		pauseBtn.setEnabled(true);
 		stopBtn.setEnabled(true);
 		exportBtn.setEnabled(Settings.enableMediaDump);
-		volumeValueLabel.setText(Memory.getPlayerVolume(player) + "%");
+		volumeValueLabel.setText(MediaUtils.getPlayerVolume(player) + "%");
 		volumeScale.setEnabled(true);
-		volumeScale.setSelection(Memory.getPlayerVolume(player));
+		volumeScale.setSelection(MediaUtils.getPlayerVolume(player));
 		try {
-			int total = Memory.getPlayerDurationMs(player);
-			int now = Memory.getPlayerCurrentMs(player);
+			int total = MediaUtils.getPlayerDurationMs(player);
+			int now = MediaUtils.getPlayerCurrentMs(player);
 			timeLabel.setText(formatTime(now) + "/" + formatTime(total));
 			if (total > 0 && now >= 0)
 				timeBar.setSelection(now * 100 / total);
@@ -249,27 +250,27 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 			return;
 		}
 		if (e.widget == resumeBtn) {
-			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.resume);
+			MediaUtils.modifyPlayer(getSelectedPlayer(), PlayerActionType.resume);
 			updateControls();
 			return;
 		}
 		if (e.widget == pauseBtn) {
-			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.pause);
+			MediaUtils.modifyPlayer(getSelectedPlayer(), PlayerActionType.pause);
 			updateControls();
 			return;
 		}
 		if (e.widget == stopBtn) {
-			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.stop);
+			MediaUtils.modifyPlayer(getSelectedPlayer(), PlayerActionType.stop);
 			updateControls();
 			return;
 		}
 		if (e.widget == exportBtn) {
-			Memory.modifyPlayer(getSelectedPlayer(), PlayerActionType.export);
+			MediaUtils.modifyPlayer(getSelectedPlayer(), PlayerActionType.export);
 			updateControls();
 			return;
 		}
 		if (e.widget == volumeScale) {
-			Memory.setPlayerVolume(getSelectedPlayer(), volumeScale.getSelection());
+			MediaUtils.setPlayerVolume(getSelectedPlayer(), volumeScale.getSelection());
 			updateControls();
 			return;
 		}

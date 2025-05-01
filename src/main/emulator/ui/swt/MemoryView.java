@@ -5,6 +5,7 @@ import emulator.Settings;
 import emulator.UILocale;
 import emulator.debug.Memory;
 import emulator.debug.MemoryViewImage;
+import emulator.debug.ObjInstance;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
@@ -615,14 +616,14 @@ public final class MemoryView implements DisposeListener {
 		classTable.removeAll();
 		classRefsVector.removeAllElements();
 		String text = array[0].getText(0);
-		Vector<Memory.ObjInstance> objs = this.memoryMgr.objs(text);
+		Vector<ObjInstance> objs = this.memoryMgr.objs(text);
 		if (text.equalsIgnoreCase("javax.microedition.lcdui.Image")) {
 			imgClassSelected = true;
 			selectedImageObjectIndex = -1;
 		} else {
 			imgClassSelected = false;
 		}
-		for (Memory.ObjInstance o : objs) {
+		for (ObjInstance o : objs) {
 			TableItem ti = new TableItem(classTable, 0);
 			ti.setText(0, o.reference);
 			String s = String.valueOf(o.value);
