@@ -140,26 +140,6 @@ public class Font {
 		return getDefaultFont();
 	}
 
-	static org.eclipse.swt.graphics.Font getSWTFont(Font font, boolean autoScale) {
-		if (font == null) return null;
-		if (Settings.g2d == 0) {
-			return ((FontSWT) font.getImpl()).getSWTFont();
-		} else {
-			float zoom = (autoScale ? ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() : 1f) * 0.68f;
-			return new org.eclipse.swt.graphics.Font(SWTFrontend.getDisplay(),
-					Emulator.getEmulator().getProperty().getDefaultFontName(),
-					Math.max(2, (int) (font.getHeight() * zoom) - 1),
-					font.getStyle() & ~Font.STYLE_UNDERLINED);
-		}
-	}
-
-	static org.eclipse.swt.graphics.Font getDefaultSWTFont(boolean autoScale) {
-		float zoom = (autoScale ? ((EmulatorScreen) Emulator.getEmulator().getScreen()).getZoom() : 1f) * 0.68f;
-		return new org.eclipse.swt.graphics.Font(SWTFrontend.getDisplay(),
-				Emulator.getEmulator().getProperty().getDefaultFontName(),
-				Math.max(2, (int) (Screen.font.getHeight() * zoom) - 1), 0);
-	}
-
 	static {
 		Font.defaultFont = null;
 	}

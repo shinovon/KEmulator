@@ -1792,7 +1792,8 @@ public final class EmulatorScreen implements
 			@Override
 			public void controlResized(ControlEvent controlEvent) {
 				caret.a(paintTransform, rotation);
-				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen) {
+				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen
+						&& ((Screen)lastDisplayable)._isSWT()) {
 					((Screen) lastDisplayable)._swtUpdateSizes();
 				}
 			}
@@ -1993,7 +1994,7 @@ public final class EmulatorScreen implements
 					stackLayout.topControl = null;
 					swtContent = null;
 				} else if (d instanceof Screen) {
-					Composite c = ((Screen) d)._getSwtContent();
+					Composite c = (Composite) ((Screen) d)._getSwtContent();
 					stackLayout.topControl = c;
 					swtContent = c;
 					if (c != null) {

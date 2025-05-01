@@ -14,13 +14,16 @@
 * Description:
 *
 */
-package javax.microedition.lcdui;
+package emulator.lcdui;
 
 import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.TextField;
 
 class TextBoxLayouter
 {
@@ -112,7 +115,7 @@ class TextBoxLayouter
 			return false;
 		}
 
-		Displayable.syncExec(new Runnable()
+		SWTScreen.syncExec(new Runnable()
 		{
 			public void run()
 			{

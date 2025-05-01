@@ -14,8 +14,11 @@
 * Description:
 *
 */
-package javax.microedition.lcdui;
+package emulator.lcdui;
 
+import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.Font;
+import javax.microedition.lcdui.Image;
 import java.util.Vector;
 
 /**

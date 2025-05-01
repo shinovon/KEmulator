@@ -6,9 +6,7 @@ import emulator.lcdui.LCDUIUtils;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.IScreen;
-import emulator.ui.swt.SWTFrontend;
 import emulator.ui.TargetedCommand;
-import org.eclipse.swt.SWTException;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -376,23 +374,6 @@ public class Displayable {
 
 	public static void _resetXRayGraphics() {
 		Graphics.resetXRayCache();
-	}
-
-	static void syncExec(Runnable r) {
-		SWTFrontend.syncExec(r);
-	}
-
-	static void safeSyncExec(Runnable r) {
-		try {
-			SWTFrontend.syncExec(r);
-		} catch (SWTException e) {
-			Throwable cause = e.getCause();
-			if (cause instanceof RuntimeException) {
-				throw (RuntimeException) cause;
-			} else {
-				throw new RuntimeException(cause);
-			}
-		}
 	}
 
 	protected void _shown() {

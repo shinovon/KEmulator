@@ -29,16 +29,6 @@ public class Image {
 		++Profiler.totalImageInstances;
 	}
 
-	static org.eclipse.swt.graphics.Image getSWTImage(Image img) {
-		// TODO
-		if (img == null) return null;
-		if (Settings.g2d == 0) {
-			return (org.eclipse.swt.graphics.Image) img.imageImpl.getNative();
-		}
-		BufferedImage b = (BufferedImage) img.imageImpl.getNative();
-		return new org.eclipse.swt.graphics.Image(SWTFrontend.getDisplay(), emulator.graphics2D.c.toSwt(b));
-	}
-
 	public void finalize() {
 		Profiler.totalImagePixelCount -= this.getWidth() * this.getHeight();
 		--Profiler.totalImageInstances;
