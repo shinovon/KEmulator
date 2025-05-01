@@ -58,8 +58,8 @@ public final class MemoryView implements DisposeListener {
 	private int objectsSize;
 	private int maxObjectsSize;
 	private static final Object updateLock = new Object();
-	static final Vector allImages = new Vector();
-	static final ArrayList imagesToShow = new ArrayList();
+	static final Vector<Image> allImages = new Vector();
+	static final ArrayList<Image> imagesToShow = new ArrayList();
 	private int imagesCount;
 	private boolean updateInProgress;
 	int imagesCanvasWidth;
@@ -71,7 +71,7 @@ public final class MemoryView implements DisposeListener {
 	private boolean darkenUnused;
 	private boolean imgClassSelected;
 	private int selectedImageObjectIndex;
-	private final Hashtable drawnImagesBounds = new Hashtable();
+	private final Hashtable<Rectangle, Image> drawnImagesBounds = new Hashtable();
 	private Image selectedImage;
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
@@ -428,7 +428,7 @@ public final class MemoryView implements DisposeListener {
 
 	public void resortImages() {
 		synchronized (MemoryView.updateLock) {
-			((List<Object>) MemoryView.imagesToShow).sort(new ImagesComparator(this));
+			MemoryView.imagesToShow.sort(new ImagesComparator(this));
 		}
 	}
 
@@ -442,9 +442,9 @@ public final class MemoryView implements DisposeListener {
 				Image image;
 				try {
 					if (i < imagesCount) {
-						image = (Image) this.memoryMgr.images.get(i);
+						image = this.memoryMgr.images.get(i);
 					} else {
-						image = (Image) this.memoryMgr.releasedImages.get(i - imagesCount);
+						image = this.memoryMgr.releasedImages.get(i - imagesCount);
 					}
 				} catch (Exception ex) {
 					break;
@@ -470,7 +470,7 @@ public final class MemoryView implements DisposeListener {
 		while (keys.hasMoreElements()) {
 			final Rectangle rectangle;
 			if ((rectangle = keys.nextElement()).contains(x, y)) {
-				this.selectedImage = (Image) this.drawnImagesBounds.get(rectangle);
+				selectedImage = drawnImagesBounds.get(rectangle);
 				return true;
 			}
 		}
@@ -494,7 +494,7 @@ public final class MemoryView implements DisposeListener {
 		for (int size = MemoryView.imagesToShow.size(), i = 0; i < size; ++i) {
 			Image image;
 			try {
-				image = (Image) MemoryView.imagesToShow.get(i);
+				image = MemoryView.imagesToShow.get(i);
 			} catch (Exception ex) {
 				break;
 			}
