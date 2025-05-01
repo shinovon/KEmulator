@@ -162,14 +162,6 @@ public abstract class Screen extends Displayable {
 		super._invokeSizeChanged(w, h, b);
 	}
 
-	public int getWidth() {
-		return bounds[W];
-	}
-
-	public int getHeight() {
-		return bounds[H];
-	}
-
 	protected void _drawScrollBar(final Graphics graphics) {
 		LCDUIUtils.drawScrollbar(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
 	}
