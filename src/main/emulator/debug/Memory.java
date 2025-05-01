@@ -36,7 +36,6 @@ public final class Memory {
 	static Class _C;
 
 	public static final Object m3gLock = new Object();
-	public static boolean debuggingM3G;
 
 	private static Memory inst;
 
@@ -130,8 +129,6 @@ public final class Memory {
 		}
 
 		if (m3gObjects.size() == 0) return;
-
-		debuggingM3G = true;
 
 		if (Settings.g3d == 1) {
 			// lwjgl engine
