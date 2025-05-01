@@ -101,7 +101,6 @@ public abstract class Screen extends Displayable {
 	}
 
 	public boolean _invokePointerPressed(final int x, final int y) {
-		if (_isSWT()) return false;
 		return false;
 	}
 

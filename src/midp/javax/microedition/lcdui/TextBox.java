@@ -216,4 +216,8 @@ public class TextBox extends Screen {
 		return impl.getHeight();
 	}
 
+	public boolean _isSWT() {
+		return impl.isSWT();
+	}
+
 }
