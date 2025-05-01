@@ -10,8 +10,11 @@ import javax.microedition.m3g.Image2D;
 import java.nio.IntBuffer;
 
 public final class MemoryViewImage extends Image {
-	public MemoryViewImage(final IImage image) {
+	public final MemoryViewImageType type;
+
+	public MemoryViewImage(final IImage image, MemoryViewImageType type) {
 		super(image);
+		this.type = type;
 	}
 
 	public static IImage createFromM3GImage(final Image2D img2d) {
