@@ -59,6 +59,7 @@ public final class MemoryView implements DisposeListener {
 	private boolean showReleasedImages;
 	private boolean darkenUnused;
 	private boolean imgClassSelected;
+	private boolean drawImagesInfo = true;
 	private Image selectedImage;
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
@@ -394,9 +395,12 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	public void paintImagesCanvas(final GC gc) {
+		final int fh = gc.getFontMetrics().getHeight();
 		int canvasW = imagesCanvas.getClientArea().width;
 		int canvasH = imagesCanvas.getClientArea().height;
-		int y = 12 - this.imagesCanvasScroll;
+		int y = 10 - this.imagesCanvasScroll;
+		if (drawImagesInfo)
+			y += fh * 3;
 		int x = 10;
 		int max = 0;
 		final Color background = new Color(null, 151, 150, 147);
@@ -406,6 +410,7 @@ public final class MemoryView implements DisposeListener {
 		final Color texColor = new Color(null, 0, 0, 255);
 		gc.setBackground(background);
 		gc.fillRectangle(0, 0, canvasW, canvasH);
+		gc.setInterpolation(SWT.NONE);
 		int pixels2d = 0;
 		int pixels3d = 0;
 		synchronized (MemoryView.updateLock) {
@@ -417,7 +422,9 @@ public final class MemoryView implements DisposeListener {
 				final int imgH = (int) (image.getHeight() * this.imageScaling);
 				if (x + imgW + 30 > canvasW) {
 					x = 10;
-					y += max + 12;
+					y += max + 10;
+					if (drawImagesInfo)
+						y += fh * 3;
 					max = 0;
 				}
 				if (y + imgH > 0 || y > canvasH) {
@@ -429,7 +436,7 @@ public final class MemoryView implements DisposeListener {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (item.type == MemoryViewImageType.Lcdui) {
+					if (item.type == MemoryViewImageType.LCDUI) {
 						if (this.imgClassSelected && selectedImage == image) {
 							gc.setForeground(selectedColor);
 						} else {
@@ -437,20 +444,24 @@ public final class MemoryView implements DisposeListener {
 						}
 					} else {
 						gc.setForeground(texColor);
-						gc.drawString(item.type.toString(), x - 1, y + 1 - gc.getFontMetrics().getHeight(), true);
 					}
+
+					gc.drawString(item.getCaption(), x - 1, y + 1 - fh * 3, true);
+					gc.drawString(image.getWidth() + "*" + image.getHeight(), x - 1, y + 1 - fh * 2, true);
+					gc.drawString("x" + image.getUsedCount(), x - 1, y + 1 - fh, true);
 					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
 					item.drawnRect = new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1);
 				} else {
 					item.drawnRect = null; // skipped, no valid used area.
 				}
-				if (item.type == MemoryViewImageType.Lcdui) {
+				if (item.type == MemoryViewImageType.LCDUI) {
 					if (!item.released)
 						pixels2d += image.getWidth() * image.getHeight();
 				} else {
 					pixels3d += image.getWidth() * image.getHeight();
 				}
-				x += imgW + 10;
+				int minImgW = drawImagesInfo ? 30 : 0;
+				x += Math.max(imgW, minImgW) + 10;
 				max = Math.max(max, imgH);
 			}
 		}

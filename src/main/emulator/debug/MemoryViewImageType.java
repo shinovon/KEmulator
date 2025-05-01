@@ -1,7 +1,7 @@
 package emulator.debug;
 
 public enum MemoryViewImageType {
-	Lcdui,
+	LCDUI,
 	M3G,
 	Micro3D
 }

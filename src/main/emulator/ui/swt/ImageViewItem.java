@@ -24,7 +24,11 @@ public class ImageViewItem {
 		if (image instanceof MemoryViewImage) {
 			type = ((MemoryViewImage) image).type;
 		} else {
-			type = MemoryViewImageType.Lcdui;
+			type = MemoryViewImageType.LCDUI;
 		}
+	}
+
+	public String getCaption() {
+		return type.toString();
 	}
 }
