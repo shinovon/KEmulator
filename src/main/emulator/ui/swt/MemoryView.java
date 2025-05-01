@@ -54,8 +54,6 @@ public final class MemoryView implements DisposeListener {
 	static final ArrayList<Image> imagesToShow = new ArrayList();
 	private int imagesCount;
 	private boolean updateInProgress;
-	int imagesCanvasWidth;
-	int imagesCanvasHeight;
 	int imagesCanvasScroll;
 	private boolean imagesDrawn = true;
 	private boolean imagesNeverDrawn = true;
@@ -409,72 +407,64 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	public void paintImagesCanvas(final GC gc) {
-		int n = 12 - this.imagesCanvasScroll;
-		int n2 = 10;
+		int canvasW = imagesCanvas.getClientArea().width;
+		int canvasH = imagesCanvas.getClientArea().height;
+		int y = 12 - this.imagesCanvasScroll;
+		int x = 10;
 		int max = 0;
-		int anInt1144 = 0;
 		final Color background = new Color(null, 151, 150, 147);
-		final Color color = new Color(null, 255, 0, 0);
-		final Color color2 = new Color(null, 0, 0, 0);
-		final Color color3 = new Color(null, 0, 255, 0);
+		final Color releasedColor = new Color(null, 255, 0, 0);
+		final Color regularColor = new Color(null, 0, 0, 0);
+		final Color selectedColor = new Color(null, 0, 255, 0);
 		final Color foreground = new Color(null, 0, 0, 255);
 		gc.setBackground(background);
-		gc.fillRectangle(0, 0, this.imagesCanvasWidth, this.imagesCanvasHeight);
+		gc.fillRectangle(0, 0, canvasW, canvasH);
 		int totalAllocatedPixels = 0;
-		this.drawnImagesBounds.clear();
 		synchronized (MemoryView.updateLock) {
+			drawnImagesBounds.clear();
 			final int size = MemoryView.imagesToShow.size();
 			for (int i = 0; i < size; ++i) {
-				Image image;
-				try {
-					image = MemoryView.imagesToShow.get(i);
-				} catch (Exception ex) {
-					break;
-				}
-				final int n3 = (int) (image.getWidth() * this.imageScaling);
-				final int n4 = (int) (image.getHeight() * this.imageScaling);
-				if (n2 + n3 + 30 > this.imagesCanvasWidth) {
-					n2 = 10;
-					n += max + 12;
+				Image image = MemoryView.imagesToShow.get(i);
+				final int imgW = (int) (image.getWidth() * this.imageScaling);
+				final int imgH = (int) (image.getHeight() * this.imageScaling);
+				if (x + imgW + 30 > canvasW) {
+					x = 10;
+					y += max + 12;
 					max = 0;
 				}
-				if (n + n4 > 0 || n > this.imagesCanvasHeight) {
+				if (y + imgH > 0 || y > canvasH) {
 					try {
-						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						if (this.darkenUnused) {
-							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					if (image instanceof MemoryViewImage) {
 						gc.setForeground(foreground);
-						gc.drawString("Tex", n2 - 1, n + 1 - gc.getFontMetrics().getHeight(), true);
+						gc.drawString("Tex", x - 1, y + 1 - gc.getFontMetrics().getHeight(), true);
 					} else {
-						GC gc2;
-						Color foreground2;
 						if (this.imgClassSelected && this.selectedImageObjectIndex >= 0 && this.selectedImageObjectIndex < MemoryView.allImages.size() && MemoryView.allImages.get(this.selectedImageObjectIndex) == image) {
-							gc2 = gc;
-							foreground2 = color3;
+							gc.setForeground(selectedColor);
 						} else {
-							gc2 = gc;
-							foreground2 = ((i < this.imagesCount) ? color2 : color);
+							gc.setForeground(((i < this.imagesCount) ? regularColor : releasedColor));
 						}
-						gc2.setForeground(foreground2);
+
 					}
-					gc.drawRectangle(n2 - 1, n - 1, n3 + 1, n4 + 1);
-					this.drawnImagesBounds.put(new Rectangle(n2 - 1, n - 1, n3 + 1, n4 + 1), image);
+					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
+					drawnImagesBounds.put(new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1), image);
 				}
-				n2 += n3 + 10;
-				max = Math.max(max, n4);
+				x += imgW + 10;
+				max = Math.max(max, imgH);
 				totalAllocatedPixels += image.getWidth() * image.getHeight();
 			}
 		}
 		background.dispose();
-		color.dispose();
-		color2.dispose();
-		color3.dispose();
-		anInt1144 = n + max + this.imagesCanvasScroll + 10;
+		releasedColor.dispose();
+		regularColor.dispose();
+		selectedColor.dispose();
+		int anInt1144 = y + max + this.imagesCanvasScroll + 10;
 		this.imagesCanvas.getVerticalBar().setMaximum(anInt1144);
 		this.imagesCanvas.getVerticalBar().setThumb(Math.min(anInt1144, this.imagesCanvas.getClientArea().height));
 		this.imagesCanvas.getVerticalBar().setIncrement(10);
