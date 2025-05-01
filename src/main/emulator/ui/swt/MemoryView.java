@@ -436,13 +436,7 @@ public final class MemoryView implements DisposeListener {
 				n += max + 12;
 				max = 0;
 			}
-			Label_0547:
-			{
-				if (n + n4 <= 0) {
-					if (n <= this.imagesCanvasHeight) {
-						break Label_0547;
-					}
-				}
+			if (n + n4 > 0 || n > this.imagesCanvasHeight) {
 				try {
 					image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
 					if (this.darkenUnused) {
