@@ -3,7 +3,7 @@ package emulator.ui.swt;
 import javax.microedition.lcdui.Image;
 import java.util.Comparator;
 
-final class ImagesComparator implements Comparator<Image> {
+final class ImagesComparator implements Comparator<ImageViewItem> {
 	private final MemoryView mv;
 
 	ImagesComparator(final MemoryView mv) {
@@ -11,7 +11,9 @@ final class ImagesComparator implements Comparator<Image> {
 		this.mv = mv;
 	}
 
-	public final int compare(final Image o1, final Image o2) {
+	public final int compare(final ImageViewItem i1, final ImageViewItem i2) {
+		Image o1 = i1.image;
+		Image o2 = i2.image;
 		int n = 0;
 		Label_0142:
 		{

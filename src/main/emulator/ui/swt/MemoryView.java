@@ -4,7 +4,7 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
 import emulator.debug.Memory;
-import emulator.debug.MemoryViewImage;
+import emulator.debug.MemoryViewImageType;
 import emulator.debug.ObjInstance;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -51,8 +51,7 @@ public final class MemoryView implements DisposeListener {
 	private int maxObjectsSize;
 	private static final Object updateLock = new Object();
 	static final Vector<Image> allImages = new Vector();
-	static final ArrayList<Image> imagesToShow = new ArrayList();
-	private int imagesCount;
+	static final ArrayList<ImageViewItem> imagesToShow = new ArrayList<>();
 	private boolean updateInProgress;
 	int imagesCanvasScroll;
 	private boolean imagesDrawn = true;
@@ -60,8 +59,6 @@ public final class MemoryView implements DisposeListener {
 	private boolean showReleasedImages;
 	private boolean darkenUnused;
 	private boolean imgClassSelected;
-	private int selectedImageObjectIndex;
-	private final Hashtable<Rectangle, Image> drawnImagesBounds = new Hashtable();
 	private Image selectedImage;
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
@@ -71,7 +68,7 @@ public final class MemoryView implements DisposeListener {
 
 	public static final String SHELL_TYPE = "MEMORY_VIEW";
 
-	public final void open() {
+	public void open() {
 		this.createShell();
 		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
 		this.shell.setLocation(
@@ -363,44 +360,32 @@ public final class MemoryView implements DisposeListener {
 
 	private void updateImagesList() {
 		synchronized (MemoryView.updateLock) {
-			final int imagesCount = this.memoryMgr.images.size();
-			final int n = this.memoryMgr.images.size() + (this.showReleasedImages ? this.memoryMgr.releasedImages.size() : 0);
 			MemoryView.allImages.clear();
 			MemoryView.imagesToShow.clear();
-			for (int i = 0; i < n; ++i) {
-				Image image;
-				try {
-					if (i < imagesCount) {
-						image = this.memoryMgr.images.get(i);
-					} else {
-						image = this.memoryMgr.releasedImages.get(i - imagesCount);
-					}
-				} catch (Exception ex) {
-					break;
-				}
-				MemoryView.allImages.add(image);
-				if (i < imagesCount && (image.getUsedCount() <= 0 || !this.imagesDrawn)) {
-					if (image.getUsedCount() != 0) {
-						continue;
-					}
-					if (!this.imagesNeverDrawn) {
-						continue;
-					}
-				}
-				MemoryView.imagesToShow.add(image);
+			for (Image image : this.memoryMgr.images) {
+				allImages.add(image);
+				boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
+				if (add)
+					MemoryView.imagesToShow.add(new ImageViewItem(image, false));
+
 			}
-			this.imagesCount = imagesCount;
+			if (showReleasedImages) {
+				for (Image image : this.memoryMgr.releasedImages) {
+					allImages.add(image);
+					MemoryView.imagesToShow.add(new ImageViewItem(image, false));
+				}
+			}
 		}
 		this.resortImages();
 	}
 
 	public boolean selectImageClicked(final int x, final int y) {
 		synchronized (MemoryView.updateLock) {
-			final Enumeration<Rectangle> keys = this.drawnImagesBounds.keys();
-			while (keys.hasMoreElements()) {
-				final Rectangle rectangle;
-				if ((rectangle = keys.nextElement()).contains(x, y)) {
-					selectedImage = drawnImagesBounds.get(rectangle);
+			for (ImageViewItem image : imagesToShow) {
+				if (image.drawnRect == null)
+					continue;
+				if (image.drawnRect.contains(x, y)) {
+					selectedImage = image.image;
 					return true;
 				}
 			}
@@ -418,15 +403,16 @@ public final class MemoryView implements DisposeListener {
 		final Color releasedColor = new Color(null, 255, 0, 0);
 		final Color regularColor = new Color(null, 0, 0, 0);
 		final Color selectedColor = new Color(null, 0, 255, 0);
-		final Color foreground = new Color(null, 0, 0, 255);
+		final Color texColor = new Color(null, 0, 0, 255);
 		gc.setBackground(background);
 		gc.fillRectangle(0, 0, canvasW, canvasH);
-		int totalAllocatedPixels = 0;
+		int pixels2d = 0;
+		int pixels3d = 0;
 		synchronized (MemoryView.updateLock) {
-			drawnImagesBounds.clear();
 			final int size = MemoryView.imagesToShow.size();
 			for (int i = 0; i < size; ++i) {
-				Image image = MemoryView.imagesToShow.get(i);
+				ImageViewItem item = MemoryView.imagesToShow.get(i);
+				Image image = item.image;
 				final int imgW = (int) (image.getWidth() * this.imageScaling);
 				final int imgH = (int) (image.getHeight() * this.imageScaling);
 				if (x + imgW + 30 > canvasW) {
@@ -443,23 +429,29 @@ public final class MemoryView implements DisposeListener {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (image instanceof MemoryViewImage) {
-						gc.setForeground(foreground);
-						gc.drawString("Tex", x - 1, y + 1 - gc.getFontMetrics().getHeight(), true);
-					} else {
-						if (this.imgClassSelected && this.selectedImageObjectIndex >= 0 && this.selectedImageObjectIndex < MemoryView.allImages.size() && MemoryView.allImages.get(this.selectedImageObjectIndex) == image) {
+					if (item.type == MemoryViewImageType.Lcdui) {
+						if (this.imgClassSelected && selectedImage == image) {
 							gc.setForeground(selectedColor);
 						} else {
-							gc.setForeground(((i < this.imagesCount) ? regularColor : releasedColor));
+							gc.setForeground(item.released ? releasedColor : regularColor);
 						}
-
+					} else {
+						gc.setForeground(texColor);
+						gc.drawString(item.type.toString(), x - 1, y + 1 - gc.getFontMetrics().getHeight(), true);
 					}
 					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
-					drawnImagesBounds.put(new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1), image);
+					item.drawnRect = new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1);
+				} else {
+					item.drawnRect = null; // skipped, no valid used area.
+				}
+				if (item.type == MemoryViewImageType.Lcdui) {
+					if (!item.released)
+						pixels2d += image.getWidth() * image.getHeight();
+				} else {
+					pixels3d += image.getWidth() * image.getHeight();
 				}
 				x += imgW + 10;
 				max = Math.max(max, imgH);
-				totalAllocatedPixels += image.getWidth() * image.getHeight();
 			}
 		}
 		background.dispose();
@@ -470,7 +462,7 @@ public final class MemoryView implements DisposeListener {
 		this.imagesCanvas.getVerticalBar().setMaximum(anInt1144);
 		this.imagesCanvas.getVerticalBar().setThumb(Math.min(anInt1144, this.imagesCanvas.getClientArea().height));
 		this.imagesCanvas.getVerticalBar().setIncrement(10);
-		imageControls.updateStats(totalAllocatedPixels);
+		imageControls.updateStats(pixels2d + pixels3d);
 	}
 
 	void changeClassesSort(final int n) {
@@ -529,12 +521,8 @@ public final class MemoryView implements DisposeListener {
 		classTable.removeAll();
 		String text = array[0].getText(0);
 		Vector<ObjInstance> objs = this.memoryMgr.objs(text);
-		if (text.equalsIgnoreCase("javax.microedition.lcdui.Image")) {
-			imgClassSelected = true;
-			selectedImageObjectIndex = -1;
-		} else {
-			imgClassSelected = false;
-		}
+		imgClassSelected = text.equalsIgnoreCase("javax.microedition.lcdui.Image");
+		selectedImage = null;
 		for (ObjInstance o : objs) {
 			TableItem ti = new TableItem(classTable, 0);
 			if (o.paths.isEmpty())
@@ -554,7 +542,7 @@ public final class MemoryView implements DisposeListener {
 		}
 	}
 
-	public final void widgetDisposed(final DisposeEvent disposeEvent) {
+	public void widgetDisposed(final DisposeEvent disposeEvent) {
 		this.dispose();
 	}
 
@@ -633,10 +621,15 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	void trySetImageSelectedIndexForClasses() {
-		if (imgClassSelected) {
-			selectedImageObjectIndex = classTable.getSelectionIndex();
-			imagesCanvas.redraw();
-		}
+		if (!imgClassSelected)
+			return;
+		TableItem[] array = classTable.getSelection();
+		if (array == null || array.length < 1)
+			return;
+		final Object value = ((ObjInstance) array[0].getData()).value;
+		if (value instanceof Image)
+			selectedImage = (Image) value;
+		imagesCanvas.redraw();
 	}
 
 	void openWatcherForSelected() {
@@ -676,7 +669,7 @@ public final class MemoryView implements DisposeListener {
 			mv.autoUpdater = this;
 		}
 
-		public final void run() {
+		public void run() {
 			this.currentMillis = System.currentTimeMillis();
 			while (this.shouldRun && !mv.getShell().isDisposed()) {
 				try {
