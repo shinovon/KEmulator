@@ -625,7 +625,8 @@ public final class MemoryView implements DisposeListener {
 		}
 		for (ObjInstance o : objs) {
 			TableItem ti = new TableItem(classTable, 0);
-			ti.setText(0, o.paths.get(0)); //TODO display other paths
+			ti.setText(0, String.join("; ", o.paths));
+			//TODO display other paths
 			String s = String.valueOf(o.value);
 			//XXX
 			if (s.length() > 128) {
