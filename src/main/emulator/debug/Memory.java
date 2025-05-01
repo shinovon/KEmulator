@@ -151,36 +151,40 @@ public final class Memory {
 		}
 	}
 
-	private void collectObjects(final Class clazz, final Object o, final String s, boolean vector) {
+	private void collectObjects(final Class clazz, final Object o, final String path, boolean vector) {
+		if (clazz.isInterface())
+			return;
+
 		String clazzName = clazz.getName();
 		if (clazz.isArray()) {
 			clazzName = ClassTypes.getReadableClassName(clazz);
 		}
+
+
 		ClassInfo classInfo = this.classesTable.get(clazzName);
-		if (clazz.isInterface()) {
-			return;
-		}
 		if (classInfo == null) {
 			classInfo = new ClassInfo(this, clazz);
 			this.classesTable.put(clazzName, classInfo);
 		} else if (o == null) {
+			// In the end of this method there is a pass over static fields.
+			// We want it to fire only once. This return will trigger on 2nd+ pass over null object.
 			return;
 		}
+
 		if (o != null) {
-			try {
-				if (this.instances.contains(o)) {
-					return;
-				}
-			} catch (Exception ignored) {
+
+			if (this.instances.contains(o)) {
+				return;
 			}
+
 			++classInfo.instancesCount;
-			classInfo.objs.add(new ObjInstance(this, s, o));
-			this.instances.add(o);
+			classInfo.objs.add(new ObjInstance(this, path, o));
+			instances.add(o);
 			try {
 				if (o instanceof Image) {
 					this.images.add((Image) o);
 					if (Settings.recordReleasedImg && this.releasedImages.contains(o)) {
-						this.releasedImages.removeElement(o);
+						this.releasedImages.removeElement(o); // this image is still alive
 					}
 				} else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
 					if (!players.contains(o))
@@ -198,29 +202,28 @@ public final class Memory {
 				}
 			} catch (NoClassDefFoundError ignored) {
 			}
-		}
-		if (o != null && clazz.isArray()) {
-			Class clazz2 = clazz;
-			Class componentType;
-			while ((componentType = clazz2.getComponentType()).getComponentType() != null) {
-				clazz2 = componentType;
-			}
-			if (!ClassTypes.method871(componentType) && componentType != String.class) {
-				return;
-			}
-			for (int i = 0; i < Array.getLength(o); ++i) {
-				final Object value;
-				if ((value = Array.get(o, i)) != null) {
-					this.collectObjects(value.getClass(), value, s + '[' + i + ']', true);
+
+			if (clazz.isArray()) {
+				Class clazz2 = clazz;
+				Class componentType;
+				while ((componentType = clazz2.getComponentType()).getComponentType() != null) {
+					clazz2 = componentType;
 				}
-			}
-		} else {
-			if (o instanceof Vector) {
+				if (!ClassTypes.method871(componentType) && componentType != String.class) {
+					return;
+				}
+				for (int i = 0; i < Array.getLength(o); ++i) {
+					final Object value;
+					if ((value = Array.get(o, i)) != null) {
+						this.collectObjects(value.getClass(), value, path + '[' + i + ']', true);
+					}
+				}
+			} else if (o instanceof Vector) {
 				final Enumeration<Object> elements = (Enumeration<Object>) ((Vector) o).elements();
 				while (elements.hasMoreElements()) {
 					final Object nextElement;
 					if ((nextElement = elements.nextElement()) != null) {
-						this.collectObjects(nextElement.getClass(), nextElement, s + "(VectorElement)", true);
+						this.collectObjects(nextElement.getClass(), nextElement, path + "(VectorElement)", true);
 					}
 				}
 				return;
@@ -231,7 +234,7 @@ public final class Memory {
 					final Object nextElement2 = keys.nextElement();
 					final Object value2;
 					if ((value2 = ((Hashtable) o).get(nextElement2)) != null) {
-						this.collectObjects(value2.getClass(), value2, s + "(HashtableKey=" + nextElement2 + ")", true);
+						this.collectObjects(value2.getClass(), value2, path + "(HashtableKey=" + nextElement2 + ")", true);
 					}
 				}
 				return;
@@ -243,7 +246,7 @@ public final class Memory {
 						final String name = method845[j].getName();
 						method845[j].setAccessible(true);
 						final Object method846 = ClassTypes.getFieldValue(o, method845[j]);
-						final String string = s + '.' + name;
+						final String string = path + '.' + name;
 						if (!method845[j].getType().isPrimitive() && method846 != null) {
 							this.collectObjects(method846.getClass(), method846, string, false);
 						}
@@ -252,18 +255,19 @@ public final class Memory {
 				}
 			} catch (NoClassDefFoundError ignored) {
 			}
-			if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || InputStream.class.isAssignableFrom(clazz)) {
-				final Field[] f = fields(clazz);
-				for (int k = 0; k < f.length; ++k) {
-					final String name2 = f[k].getName();
-					//if ((o instanceof Item || o instanceof Screen) && f[k].getType() == int[].class) continue;
-					if (!Modifier.isFinal(f[k].getModifiers()) || !f[k].getType().isPrimitive()) {
-						f[k].setAccessible(true);
-						final Object method848 = ClassTypes.getFieldValue(o, f[k]);
-						final String string2 = s + '.' + name2;
-						if (!f[k].getType().isPrimitive() && method848 != null) {
-							this.collectObjects(method848.getClass(), method848, string2, false);
-						}
+		}
+
+		if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || InputStream.class.isAssignableFrom(clazz)) {
+			final Field[] f = fields(clazz);
+			for (int k = 0; k < f.length; ++k) {
+				final String name2 = f[k].getName();
+				//if ((o instanceof Item || o instanceof Screen) && f[k].getType() == int[].class) continue;
+				if (!Modifier.isFinal(f[k].getModifiers()) || !f[k].getType().isPrimitive()) {
+					f[k].setAccessible(true);
+					final Object method848 = ClassTypes.getFieldValue(o, f[k]);
+					final String string2 = path + '.' + name2;
+					if (!f[k].getType().isPrimitive() && method848 != null) {
+						this.collectObjects(method848.getClass(), method848, string2, false);
 					}
 				}
 			}
