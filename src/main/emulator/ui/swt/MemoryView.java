@@ -72,7 +72,7 @@ public final class MemoryView implements DisposeListener {
 	private int selectedImageObjectIndex;
 	private final Hashtable drawnImagesBounds = new Hashtable();
 	private Image selectedImage;
-	private ArrayList classesList = new ArrayList();
+	private ArrayList<String> classesList = new ArrayList<>();
 	private final Vector classRefsVector = new Vector();
 	private AutoUpdate autoUpdater;
 	private Thread autoUpdateThread;
@@ -394,7 +394,7 @@ public final class MemoryView implements DisposeListener {
 		try {
 			this.memoryMgr.updateEverything();
 			this.updateImagesList();
-			this.bytecodeSize = Memory.bytecodeSize();
+			this.bytecodeSize = Memory.getBytecodeSize();
 			this.objectsSize = this.memoryMgr.objectsSize();
 			this.maxObjectsSize = Math.max(this.maxObjectsSize, this.objectsSize);
 		} catch (Throwable ex) {
@@ -569,24 +569,24 @@ public final class MemoryView implements DisposeListener {
 
 	private void resortClasses() {
 		if (sortColumn == -1) return;
-		Collections.sort(this.classesList, new Class9(this, sortColumn));
+		classesList.sort(new ClassListComparator(this, sortColumn));
 		for (int i = 0; i < this.classesList.size(); ++i) {
-			final Object value = this.classesList.get(i);
+			final String value = this.classesList.get(i);
 			final TableItem item;
-			(item = this.table.getItem(i)).setText(0, (String) value);
-			item.setText(1, String.valueOf(this.memoryMgr.method866(value)));
-			item.setText(2, String.valueOf(this.memoryMgr.method867(value)));
+			(item = this.table.getItem(i)).setText(0, value);
+			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
+			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
 		}
 	}
 
 	private void updateClassesView() {
 		this.classesList = Collections.list(this.memoryMgr.classesTable.keys());
 		for (int i = 0; i < this.classesList.size(); ++i) {
-			if (this.memoryMgr.method867(this.classesList.get(i)) == 0) {
+			if (this.memoryMgr.totalObjectsSize(this.classesList.get(i)) == 0) {
 				this.classesList.remove(i--);
 			}
 		}
-		Collections.sort((java.util.List<Comparable>) this.classesList);
+		Collections.sort(this.classesList);
 		if (this.classesList.size() > this.table.getItemCount()) {
 			for (int j = this.classesList.size() - this.table.getItemCount(); j > 0; --j) {
 				new TableItem(this.table, 0);
@@ -597,11 +597,11 @@ public final class MemoryView implements DisposeListener {
 			}
 		}
 		for (int k = 0; k < this.classesList.size(); ++k) {
-			final Object value = this.classesList.get(k);
+			final String value = this.classesList.get(k);
 			final TableItem item;
-			(item = this.table.getItem(k)).setText(0, (String) value);
-			item.setText(1, String.valueOf(this.memoryMgr.method866(value)));
-			item.setText(2, String.valueOf(this.memoryMgr.method867(value)));
+			(item = this.table.getItem(k)).setText(0, value);
+			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
+			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
 		}
 		//this.aTable1096.setSortColumn(this.aTable1096.getColumn(0));
 		//this.aTable1096.setSortDirection(128);
@@ -615,24 +615,24 @@ public final class MemoryView implements DisposeListener {
 		classTable.removeAll();
 		classRefsVector.removeAllElements();
 		String text = array[0].getText(0);
-		Vector objs = this.memoryMgr.objs(text);
+		Vector<Memory.ObjInstance> objs = this.memoryMgr.objs(text);
 		if (text.equalsIgnoreCase("javax.microedition.lcdui.Image")) {
 			imgClassSelected = true;
 			selectedImageObjectIndex = -1;
 		} else {
 			imgClassSelected = false;
 		}
-		for (Object o : objs) {
+		for (Memory.ObjInstance o : objs) {
 			TableItem ti = new TableItem(classTable, 0);
-			ti.setText(0, Memory.refs(o));
-			String s = String.valueOf(Memory.val(o));
+			ti.setText(0, o.reference);
+			String s = String.valueOf(o.value);
 			//XXX
 			if (s.length() > 128) {
 				s = s.substring(0, 127) + "...";
 			}
 			ti.setText(1, s);
-			ti.setText(2, String.valueOf(Memory.size(o)));
-			classRefsVector.add(Memory.val(o));
+			ti.setText(2, String.valueOf(o.size));
+			classRefsVector.add(o.value);
 		}
 	}
 

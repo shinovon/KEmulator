@@ -166,7 +166,7 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		String lengthText = msLen < 0 ? "Unknown" : (formatTime(msLen) + String.format(".%1$03d", msLen % 1000));
 		int loopCount = Memory.getPlayerLoopCount(value);
 		item.setText(0, value.toString());
-		item.setText(1, Memory.playerType(value));
+		item.setText(1, Memory.getPlayerType(value));
 		item.setText(2, Memory.playerStateStr(value));
 		item.setText(3, lengthText);
 		item.setText(4, loopCount < 0 ? "∞" : String.valueOf(loopCount));

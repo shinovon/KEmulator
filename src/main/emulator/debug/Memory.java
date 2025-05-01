@@ -6,7 +6,6 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.media.vlc.VLCPlayerImpl;
-import emulator.ui.swt.EmulatorScreen;
 import org.apache.tools.zip.ZipFile;
 
 import javax.microedition.lcdui.Image;
@@ -18,20 +17,17 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 
 public final class Memory {
 
-	public Hashtable classesTable;
+	public Hashtable<String, ClassInfo> classesTable = new Hashtable<>();
 	public Vector instances;
-	public Vector images = new Vector();
-	public Vector releasedImages = new Vector();
+	public Vector<Image> images = new Vector<>();
+	public Vector<Image> releasedImages = new Vector<>();
 	public Vector players = new Vector();
 	public Vector m3gObjects = new Vector();
-	private final Vector checkClasses = new Vector();
+	private final Vector<String> checkClasses = new Vector<>();
 	static Class _J;
 	static Class _I;
 	static Class _S;
@@ -55,7 +51,6 @@ public final class Memory {
 
 	private Memory() {
 		super();
-		this.classesTable = new Hashtable();
 		this.instances = new Vector() {
 			public synchronized int indexOf(Object o, int index) {
 				if (o == null) {
@@ -114,17 +109,17 @@ public final class Memory {
 				o = null;
 			}
 			if (cls != null)
-				method847(cls, o, s, false);
+				collectObjects(cls, o, s, false);
 		}
 		for (int j = 0; j < checkClasses.size(); ++j) {
 			Class cls = null;
-			final String s = (String) checkClasses.get(j);
+			final String s = checkClasses.get(j);
 			try {
 				cls = cls(s);
 			} catch (Throwable ignored) {
 			}
 			if (cls != null)
-				method847(cls, null, s, false);
+				collectObjects(cls, null, s, false);
 		}
 
 		if (m3gObjects.size() == 0) return;
@@ -152,17 +147,17 @@ public final class Memory {
 		}
 	}
 
-	private void method847(final Class clazz, final Object o, final String s, boolean vector) {
+	private void collectObjects(final Class clazz, final Object o, final String s, boolean vector) {
 		String clazzName = clazz.getName();
 		if (clazz.isArray()) {
 			clazzName = ClassTypes.getReadableClassName(clazz);
 		}
-		ClassInfo classInfo = (ClassInfo) this.classesTable.get(clazzName);
+		ClassInfo classInfo = this.classesTable.get(clazzName);
 		if (clazz.isInterface()) {
 			return;
 		}
 		if (classInfo == null) {
-			classInfo = new ClassInfo(this, clazz.getName());
+			classInfo = new ClassInfo(this, clazz);
 			this.classesTable.put(clazzName, classInfo);
 		} else if (o == null) {
 			return;
@@ -179,7 +174,7 @@ public final class Memory {
 			this.instances.add(o);
 			try {
 				if (o instanceof Image) {
-					this.images.add(o);
+					this.images.add((Image)o);
 					if (Settings.recordReleasedImg && this.releasedImages.contains(o)) {
 						this.releasedImages.removeElement(o);
 					}
@@ -212,7 +207,7 @@ public final class Memory {
 			for (int i = 0; i < Array.getLength(o); ++i) {
 				final Object value;
 				if ((value = Array.get(o, i)) != null) {
-					this.method847(value.getClass(), value, s + '[' + i + ']', true);
+					this.collectObjects(value.getClass(), value, s + '[' + i + ']', true);
 				}
 			}
 		} else {
@@ -221,7 +216,7 @@ public final class Memory {
 				while (elements.hasMoreElements()) {
 					final Object nextElement;
 					if ((nextElement = elements.nextElement()) != null) {
-						this.method847(nextElement.getClass(), nextElement, s + "(VectorElement)", true);
+						this.collectObjects(nextElement.getClass(), nextElement, s + "(VectorElement)", true);
 					}
 				}
 				return;
@@ -232,7 +227,7 @@ public final class Memory {
 					final Object nextElement2 = keys.nextElement();
 					final Object value2;
 					if ((value2 = ((Hashtable) o).get(nextElement2)) != null) {
-						this.method847(value2.getClass(), value2, s + "(HashtableKey=" + nextElement2 + ")", true);
+						this.collectObjects(value2.getClass(), value2, s + "(HashtableKey=" + nextElement2 + ")", true);
 					}
 				}
 				return;
@@ -246,7 +241,7 @@ public final class Memory {
 						final Object method846 = ClassTypes.getFieldValue(o, method845[j]);
 						final String string = s + '.' + name;
 						if (!method845[j].getType().isPrimitive() && method846 != null) {
-							this.method847(method846.getClass(), method846, string, false);
+							this.collectObjects(method846.getClass(), method846, string, false);
 						}
 					}
 					return;
@@ -263,7 +258,7 @@ public final class Memory {
 						final Object method848 = ClassTypes.getFieldValue(o, f[k]);
 						final String string2 = s + '.' + name2;
 						if (!f[k].getType().isPrimitive() && method848 != null) {
-							this.method847(method848.getClass(), method848, string2, false);
+							this.collectObjects(method848.getClass(), method848, string2, false);
 						}
 					}
 				}
@@ -324,27 +319,23 @@ public final class Memory {
 	}
 
 	private static Field[] fields(final Class clazz) {
-		final Vector vector = new Vector<Field>();
-		method849(clazz, vector);
+		final Vector<Field> vector = new Vector<>();
+		addFieldsWithSupers(clazz, vector);
 		final Field[] array = new Field[vector.size()];
-		for (int i = 0; i < array.length; ++i) {
-			array[i] = (Field) vector.get(i);
-		}
-		return array;
+		return vector.toArray(array);
 	}
 
-	private static void method849(final Class clazz, final Vector vector) {
+	private static void addFieldsWithSupers(final Class clazz, final Vector<Field> vector) {
 		try {
 			if (clazz.getSuperclass() != null) {
-				method849(clazz.getSuperclass(), vector);
+				addFieldsWithSupers(clazz.getSuperclass(), vector);
 			}
-			final Field[] declaredFields = clazz.getDeclaredFields();
-			Collections.addAll(vector, declaredFields);
+			Collections.addAll(vector, clazz.getDeclaredFields());
 		} catch (Error ignored) {
 		}
 	}
 
-	public static int bytecodeSize() {
+	public static int getBytecodeSize() {
 		int n = 0;
 		try {
 			if (Emulator.midletJar != null) {
@@ -382,7 +373,7 @@ public final class Memory {
 		return n;
 	}
 
-	public static String playerType(final Object o) {
+	public static String getPlayerType(final Object o) {
 		if (o instanceof Sound) {
 			return ((Sound) o).getType();
 		}
@@ -696,49 +687,38 @@ public final class Memory {
 		o.close();
 	}
 
-	public final int method866(final Object o) {
+	public final int instancesCount(final String o) {
 		try {
-			return ((ClassInfo) this.classesTable.get(o)).instancesCount;
+			return this.classesTable.get(o).instancesCount;
 		} catch (NullPointerException ignored) {
 		}
 		return 0;
 	}
 
-	public final int method867(final Object o) {
+	public final int totalObjectsSize(final String o) {
 		try {
-			return ((ClassInfo) this.classesTable.get(o)).size();
+			return this.classesTable.get(o).size();
 		} catch (NullPointerException ignored) {
 		}
 		return 0;
 	}
 
-	public final Vector objs(final Object o) {
-		return ((ClassInfo) this.classesTable.get(o)).objs;
+	public final Vector<ObjInstance> objs(final String o) {
+		return this.classesTable.get(o).objs;
 	}
 
-	public static String refs(final Object o) {
-		return ((ObjInstance) o).ref;
-	}
-
-	public static Object val(final Object o) {
-		return ((ObjInstance) o).val;
-	}
-
-	public static int size(final Object o) {
-		return ((ObjInstance) o).size;
-	}
-
-	public final int size(Class c, Object o, String s) {
-		return size(c, o);
-	}
 
 	public final int size(final Class cls, final Object o) {
 		final Field[] fields = fields(cls);
 		int res = 0;
-		for (int i = 0; i < fields.length; ++i) {
-			final Field field;
-			final Class<?> type = (field = fields[i]).getType();
-			if ((!Modifier.isFinal(field.getModifiers()) || !type.isPrimitive()) && (!Modifier.isStatic(field.getModifiers()) || o == null)) {
+
+		// fields
+		for (Field field : fields) {
+			final Class type = field.getType();
+			if ((Modifier.isFinal(field.getModifiers()) && type.isPrimitive()))
+				continue; // constant primitive field
+
+			if (!Modifier.isStatic(field.getModifiers()) || o == null) {
 				if (Modifier.isStatic(field.getModifiers()) || o != null) {
 					if (type == Long.TYPE || type == Double.TYPE) {
 						res += 24;
@@ -748,36 +728,35 @@ public final class Memory {
 				}
 			}
 		}
-		if (o != null) {
-			if (cls.isArray()) {
-				res += this.arraySize(cls, o);
-			} else {
-				res += 12;
-				if (cls == String.class) {
-					res += 2 + ((String) o).length();
-				} else {
-					if (cls == Image.class) {
-						final Image image = (Image) o;
-						res += image.size();
-					} else {
-						try {
-							if (cls == Image2D.class) {
-								final Image2D image2D = (Image2D) o;
-								res += image2D.size();
-							}
-						} catch (NoClassDefFoundError ignored) {
-						}
-                        /*if (!(cls == Vector.class || cls == Hashtable.class
-                                || cls == StringItem.class || cls == Command.class
-                                || cls == cls("javax.microedition.lcdui.a")
-                                ))
-                            return res + o.toString().length();
-                        else */
-						return res;
-					}
-				}
-			}
+
+		if (o == null)
+			return res;
+
+		if (cls.isArray()) {
+			return res + this.arraySize(cls, o);
 		}
+
+		res += 12;
+
+		if (cls == String.class) {
+			res += 2 + ((String) o).length();
+			return res;
+		}
+
+		if (cls == Image.class) {
+			final Image image = (Image) o;
+			res += image.size();
+		} else {
+			try {
+				if (cls == Image2D.class) {
+					final Image2D image2D = (Image2D) o;
+					res += image2D.size();
+				}
+			} catch (NoClassDefFoundError ignored) {
+			}
+			return res;
+		}
+
 		return res;
 	}
 
@@ -815,6 +794,12 @@ public final class Memory {
 		return n;
 	}
 
+	/**
+	 * Gets {@link Class} by name.
+	 *
+	 * @param s Class' name.
+	 * @return Class object.
+	 */
 	static Class cls(final String s) {
 		Class<?> forName;
 		try {
@@ -825,43 +810,43 @@ public final class Memory {
 		return forName;
 	}
 
-	private final class ObjInstance {
-		String ref;
-		Object val;
-		int size;
+	public static final class ObjInstance {
+		public final String reference;
+		public final Object value;
+		public final int size;
 
-		ObjInstance(final Memory a, final String s, final Object o) {
+		ObjInstance(final Memory a, final String ref, final Object o) {
 			super();
-			this.ref = s;
-			this.val = o;
-			this.size = a.size(o.getClass(), o, s);
+			this.reference = ref;
+			this.value = o;
+			this.size = a.size(o.getClass(), o);
 		}
 	}
 
-	private final class ClassInfo implements Comparable {
-		String s;
+	public static final class ClassInfo implements Comparable<ClassInfo> {
+		final String name;
 		int instancesCount;
-		int anInt1487;
-		Vector objs;
+		final int staticsSize;
+		public final Vector<ObjInstance> objs;
 
 		public int size() {
-			int anInt1487 = this.anInt1487;
+			int total = this.staticsSize;
 			for (int i = this.objs.size() - 1; i >= 0; --i) {
-				anInt1487 += ((ObjInstance) this.objs.get(i)).size;
+				total += this.objs.get(i).size;
 			}
-			return anInt1487;
+			return total;
 		}
 
-		public int compareTo(final Object o) {
-			return this.s.compareTo(((ClassInfo) o).s);
+		public int compareTo(final ClassInfo o) {
+			return this.name.compareTo(o.name);
 		}
 
-		ClassInfo(final Memory m, final String aString1484) {
+		ClassInfo(final Memory m, final Class cls) {
 			super();
 			this.objs = new Vector();
 			this.instancesCount = 0;
-			this.anInt1487 = m.size(cls(aString1484), null);
-			this.s = aString1484;
+			this.staticsSize = m.size(cls, null);
+			this.name = cls.getName();
 		}
 	}
 }
