@@ -444,18 +444,12 @@ public final class MemoryView implements DisposeListener {
 					}
 				}
 				try {
-					if (Settings.g2d == 1) {
-						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-						if (this.darkenUnused) {
-							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-						}
-					} else if (Settings.g2d == 0) {
-						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-						if (this.darkenUnused) {
-							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-						}
+					image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+					if (this.darkenUnused) {
+						image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
 					}
-				} catch (Exception ignored) {
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				if (image instanceof MemoryViewImage) {
 					gc.setForeground(foreground);
