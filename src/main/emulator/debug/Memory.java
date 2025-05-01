@@ -174,6 +174,12 @@ public final class Memory {
 		if (o != null) {
 
 			if (this.instances.contains(o)) {
+				for (ObjInstance obj : classInfo.objs) {
+					if (obj.value == o) {
+						if (!obj.paths.contains(path))
+							obj.paths.add(path);
+					}
+				}
 				return;
 			}
 
@@ -200,7 +206,8 @@ public final class Memory {
 					if (img != null)
 						this.images.add(new MemoryViewImage(img));
 				}
-			} catch (NoClassDefFoundError ignored) {
+			} catch (NoClassDefFoundError e) {
+				e.printStackTrace();
 			}
 
 			if (clazz.isArray()) {
@@ -256,7 +263,8 @@ public final class Memory {
 					}
 					return;
 				}
-			} catch (NoClassDefFoundError ignored) {
+			} catch (NoClassDefFoundError e) {
+				e.printStackTrace();
 			}
 		}
 
