@@ -73,24 +73,31 @@ public final class Memory {
 	}
 
 	public void updateEverything() {
+		// copy still alive images
 		if (Settings.recordReleasedImg) {
-			for (int i = 0; i < this.images.size(); ++i) {
-				if (!this.releasedImages.contains(this.images.get(i))) {
-					this.releasedImages.addElement(this.images.get(i));
+			for (Image image : images) {
+				if (!releasedImages.contains(image)) {
+					releasedImages.addElement(image);
 				}
 			}
 		}
-		this.classesTable.clear();
-		this.instances.clear();
-		this.images.clear();
-		this.players.clear();
-		this.m3gObjects.clear();
+
+		// clears
+		classesTable.clear();
+		instances.clear();
+		images.clear();
+		m3gObjects.clear();
+
+		// players
 		try {
-			this.players.addAll(PlayerImpl.players);
-		} catch (Exception ignored) {
+			players.clear();
+			players.addAll(PlayerImpl.players);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
-			final String s = (String) Emulator.jarClasses.get(j);
+
+		// iterate global roots
+		for (final String s : Emulator.jarClasses) {
 			Class cls = null;
 			Object o;
 			if (Emulator.getMIDlet().getClass().getName().equals(s)) {
@@ -102,22 +109,24 @@ public final class Memory {
 			} else {
 				try {
 					cls = cls(s);
-				} catch (Throwable ignored) {
+				} catch (Throwable e) {
+					e.printStackTrace();
 				}
 				o = null;
 			}
 			if (cls != null)
 				collectObjects(cls, o, s, false);
 		}
-		for (int j = 0; j < checkClasses.size(); ++j) {
+
+		// iterate via lcdui static roots
+		for (String checkClass : checkClasses) {
 			Class cls = null;
-			final String s = checkClasses.get(j);
 			try {
-				cls = cls(s);
+				cls = cls(checkClass);
 			} catch (Throwable ignored) {
 			}
 			if (cls != null)
-				collectObjects(cls, null, s, false);
+				collectObjects(cls, null, checkClass, false);
 		}
 
 		if (m3gObjects.size() == 0) return;
