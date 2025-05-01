@@ -395,15 +395,17 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	public boolean selectImageClicked(final int x, final int y) {
-		final Enumeration<Rectangle> keys = this.drawnImagesBounds.keys();
-		while (keys.hasMoreElements()) {
-			final Rectangle rectangle;
-			if ((rectangle = keys.nextElement()).contains(x, y)) {
-				selectedImage = drawnImagesBounds.get(rectangle);
-				return true;
+		synchronized (MemoryView.updateLock) {
+			final Enumeration<Rectangle> keys = this.drawnImagesBounds.keys();
+			while (keys.hasMoreElements()) {
+				final Rectangle rectangle;
+				if ((rectangle = keys.nextElement()).contains(x, y)) {
+					selectedImage = drawnImagesBounds.get(rectangle);
+					return true;
+				}
 			}
+			return false;
 		}
-		return false;
 	}
 
 	public void paintImagesCanvas(final GC gc) {
