@@ -1,11 +1,7 @@
 package javax.microedition.lcdui;
 
 import emulator.Emulator;
-import emulator.Settings;
 import emulator.graphics2D.IFont;
-import emulator.graphics2D.swt.FontSWT;
-import emulator.ui.swt.SWTFrontend;
-import emulator.ui.swt.EmulatorScreen;
 
 public class Font {
 	IFont font;

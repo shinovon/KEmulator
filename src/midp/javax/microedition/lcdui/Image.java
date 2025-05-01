@@ -5,7 +5,6 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler;
 import emulator.graphics2D.IImage;
-import emulator.ui.swt.SWTFrontend;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;

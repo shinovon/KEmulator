@@ -17,4 +17,8 @@ public interface IScreenImpl {
 	void swtUpdateSizes();
 
 	Object getSwtContent();
+
+	int getWidth();
+
+	int getHeight();
 }

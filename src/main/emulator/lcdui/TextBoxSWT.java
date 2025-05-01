@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.TextBox;
 
 public class TextBoxSWT extends SWTScreen implements ITextBoxImpl {
 
@@ -16,7 +17,7 @@ public class TextBoxSWT extends SWTScreen implements ITextBoxImpl {
 
 	private int numLines;
 
-	public TextBoxSWT(String title, String text, int maxSize, int constraints) {
+	public TextBoxSWT(TextBox textBox, String title, String text, int maxSize, int constraints) {
 		textWrapper = new TextWrapper(text, maxSize, constraints);
 		constructSwt();
 	}

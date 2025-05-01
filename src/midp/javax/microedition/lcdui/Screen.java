@@ -160,25 +160,14 @@ public abstract class Screen extends Displayable {
 	}
 
 	void _invokeSizeChanged(int w, int h, boolean b) {
-//		if (swtContent != null) {
-//			swtContent.getDisplay().asyncExec(this::_swtUpdateSizes);
-//			Emulator.getEmulator().getScreen().repaint();
-//			return;
-//		}
 		super._invokeSizeChanged(w, h, b);
 	}
 
 	public int getWidth() {
-//		if (swtContentArea != null) {
-//			return swtContentArea.width;
-//		}
 		return bounds[W];
 	}
 
 	public int getHeight() {
-//		if (swtContentArea != null) {
-//			return swtContentArea.height;
-//		}
 		return bounds[H];
 	}
 

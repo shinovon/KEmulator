@@ -9,7 +9,7 @@ public class TextBox extends Screen {
 
 	public TextBox(String title, String text, int maxSize, int constraints) {
 		super(title);
-		impl = new TextBoxSWT(title, text, maxSize, constraints);
+		impl = new TextBoxSWT(this, title, text, maxSize, constraints);
 	}
 
 	protected void focusCaret() {
@@ -206,6 +206,14 @@ public class TextBox extends Screen {
 
 	public Object _getSwtContent() {
 		return impl.getSwtContent();
+	}
+
+	public int getWidth() {
+		return impl.getWidth();
+	}
+
+	public int getHeight() {
+		return impl.getHeight();
 	}
 
 }
