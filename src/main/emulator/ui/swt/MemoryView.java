@@ -74,7 +74,6 @@ public final class MemoryView implements DisposeListener {
 	private final Hashtable drawnImagesBounds = new Hashtable();
 	private Image selectedImage;
 	private ArrayList<String> classesList = new ArrayList<>();
-	private final Vector classRefsVector = new Vector();
 	private AutoUpdate autoUpdater;
 	private Thread autoUpdateThread;
 	private CLabel jvmmemLabel;
@@ -614,7 +613,6 @@ public final class MemoryView implements DisposeListener {
 			return;
 		}
 		classTable.removeAll();
-		classRefsVector.removeAllElements();
 		String text = array[0].getText(0);
 		Vector<ObjInstance> objs = this.memoryMgr.objs(text);
 		if (text.equalsIgnoreCase("javax.microedition.lcdui.Image")) {
@@ -634,7 +632,7 @@ public final class MemoryView implements DisposeListener {
 			}
 			ti.setText(1, s);
 			ti.setText(2, String.valueOf(o.size));
-			classRefsVector.add(o.value);
+			ti.setData(o);
 		}
 	}
 
@@ -728,8 +726,8 @@ public final class MemoryView implements DisposeListener {
 		if (array == null || array.length < 1) {
 			return;
 		}
-		final Object value;
-		if ((value = classRefsVector.get(classTable.getSelectionIndex())) != null && emulator.debug.ClassTypes.method871(value.getClass())) {
+		final Object value = ((ObjInstance) array[0].getData()).value;
+		if (value != null && emulator.debug.ClassTypes.method871(value.getClass())) {
 			new Watcher(value).open(shell);
 		}
 	}
