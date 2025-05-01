@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.*;
 
 import javax.microedition.lcdui.Image;
 import java.util.*;
-import java.util.List;
 
 public final class MemoryView implements DisposeListener {
 	private Shell shell;
@@ -36,20 +35,13 @@ public final class MemoryView implements DisposeListener {
 	public final Memory memoryMgr = Memory.getInstance();
 	private boolean visible;
 	private Composite aComposite1098;
-	private Combo imageScaleCombo;
-	private Combo imagesSortingMethodCombo;
-	private Button aButton1115;
-	private Button aButton1121;
-	private Button aButton1125;
-	private Button aButton1129;
-	private Button aButton1133;
+	private ImageViewControls imageControls;
 	public Canvas imagesCanvas;
 	private SashForm horizontalSeparator;
 	private Composite aComposite1116;
 	private Table table;
 	private Table classTable;
-	private CLabel imagesTotalSizeLabel;
-	private double imageScaling;
+	private double imageScaling = 1d;
 	private int imagesSortingMethod;
 	private boolean sortImagesByAscending;
 	Menu menuSaveOne;
@@ -232,79 +224,18 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	private void createControlsForImagesView() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalSpan = 2;
-		layoutData.verticalAlignment = 2;
-		layoutData.horizontalAlignment = 4;
 		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 7;
+		(layout = new GridLayout()).numColumns = 1;
 		layout.marginHeight = 2;
 		layout.marginWidth = 0;
 		(this.aComposite1098 = new Composite(this.horizontalSeparator, 0)).setLayout(layout);
-		new CLabel(this.aComposite1098, 0).setText(UILocale.get("MEMORY_VIEW_ZOOM", "Zoom:"));
-		this.createZoomCombo();
-		new CLabel(this.aComposite1098, 0).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
-		this.createSortByCombo();
-		(this.aButton1121 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_IMAGES_DRAWN", "Images Drawn"));
-		this.aButton1121.setSelection(true);
-		this.aButton1121.addSelectionListener(new ImagesDrawnListener(this));
-		(this.aButton1129 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_UNUSED_REGION", "Darken Unused Regions"));
-		this.aButton1129.addSelectionListener(new DarkenUnusedListener(this));
-		Button aButton1137;
-		(aButton1137 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_RESET_IMAGE", "Reset Image Usage"));
-		aButton1137.addSelectionListener(new ResetUsageListener(this));
-		new CLabel(this.aComposite1098, 0).setText(UILocale.get("MEMORY_VIEW_SIZE", "Size") + ":");
-		(this.imagesTotalSizeLabel = new CLabel(this.aComposite1098, 0)).setText("");
-		this.imagesTotalSizeLabel.setLayoutData(layoutData);
-		(this.aButton1115 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_ASCEND", "Ascending"));
-		this.aButton1115.setEnabled(true);
-		this.aButton1115.setSelection(true);
-		this.sortImagesByAscending = true;
-		this.aButton1115.addSelectionListener(new ImagesAscendListener(this));
-		(this.aButton1125 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_IMAGE_NEVER_DRAW", "Images Never Drawn"));
-		this.aButton1125.setSelection(true);
-		this.aButton1125.addSelectionListener(new ImagesNotDrawnListener(this));
-		(this.aButton1133 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_RELEASED_IMAGES", "Released Images"));
-		this.aButton1133.setEnabled(Settings.recordReleasedImg);
-		this.aButton1133.addSelectionListener(new ShowReleasedImagesListener(this));
-		Button aButton1141;
-		(aButton1141 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_CLEAR_RELEASED_IMAGES", "Clear Released Images"));
-		aButton1141.setEnabled(Settings.recordReleasedImg);
-		aButton1141.addSelectionListener(new Class71(this));
-		this.method686();
+		imageControls = new ImageViewControls(aComposite1098, this);
+		this.createImagesCanvas();
 	}
 
-	private void createZoomCombo() {
-		this.imageScaleCombo = new Combo(this.aComposite1098, 8);
-		this.imageScaleCombo.add("50%");
-		this.imageScaleCombo.add("100%");
-		this.imageScaleCombo.add("200%");
-		this.imageScaleCombo.add("300%");
-		this.imageScaleCombo.add("400%");
-		this.imageScaleCombo.setText("100%");
-		this.imageScaling = 1;
-		this.imageScaleCombo.addModifyListener(new ImagesZoomListener(this));
-	}
-
-	private void createSortByCombo() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 1;
-		layoutData.grabExcessHorizontalSpace = false;
-		layoutData.verticalAlignment = 2;
-		(this.imagesSortingMethodCombo = new Combo(this.aComposite1098, 8)).setEnabled(true);
-		this.imagesSortingMethodCombo.setLayoutData(layoutData);
-		this.imagesSortingMethodCombo.add(UILocale.get("MEMORY_VIEW_SORT_REFERENCE", "Reference"));
-		this.imagesSortingMethodCombo.add(UILocale.get("MEMORY_VIEW_SORT_SIZE", "Size"));
-		this.imagesSortingMethodCombo.add(UILocale.get("MEMORY_VIEW_SORT_DRAW_COUNT", "Draw Count"));
-		this.imagesSortingMethodCombo.setText(UILocale.get("MEMORY_VIEW_SORT_REFERENCE", "Reference"));
-		this.imagesSortingMethod = 0;
-		this.imagesSortingMethodCombo.addModifyListener(new ImagesSortingListener(this));
-	}
-
-	private void method686() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 7;
+	private void createImagesCanvas() {
+		final GridData layoutData = new GridData();
+		layoutData.horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.verticalAlignment = 4;
@@ -556,7 +487,7 @@ public final class MemoryView implements DisposeListener {
 		this.imagesCanvas.getVerticalBar().setMaximum(anInt1144);
 		this.imagesCanvas.getVerticalBar().setThumb(Math.min(anInt1144, this.imagesCanvas.getClientArea().height));
 		this.imagesCanvas.getVerticalBar().setIncrement(10);
-		this.imagesTotalSizeLabel.setText(totalAllocatedPixels + " pixels");
+		imageControls.updateStats(totalAllocatedPixels);
 	}
 
 	void changeClassesSort(final int n) {
@@ -665,44 +596,44 @@ public final class MemoryView implements DisposeListener {
 		}
 	}
 
-	public void setImagesDrawn() {
-		imagesDrawn = aButton1121.getSelection();
+	public void setImagesDrawn(boolean b) {
+		imagesDrawn = b;
 		updateEverything();
 	}
 
-	void setImagesNotDrawn() {
-		imagesNeverDrawn = aButton1125.getSelection();
+	void setImagesNotDrawn(boolean b) {
+		imagesNeverDrawn = b;
 		updateEverything();
 	}
 
-	void setImagesAscend() {
-		sortImagesByAscending = aButton1115.getSelection();
+	void setImagesAscend(boolean b) {
+		sortImagesByAscending = b;
 		resortImages();
 		updateView();
 	}
 
-	void setImagesSorting() {
-		imagesSortingMethod = imagesSortingMethodCombo.getSelectionIndex();
+	void setImagesSorting(int i) {
+		imagesSortingMethod = i;
 		resortImages();
 		updateView();
 	}
 
-	void setShowReleasedImages() {
-		showReleasedImages = aButton1133.getSelection();
+	void setShowReleasedImages(boolean b) {
+		showReleasedImages = b;
 		updateEverything();
 	}
 
-	void setDarkenUnused() {
-		darkenUnused = aButton1129.getSelection();
+	void setDarkenUnused(boolean b) {
+		darkenUnused = b;
 		updateEverything();
 	}
 
-	void setImagesScaling() {
-		double i = imageScaleCombo.getSelectionIndex();
-		if (i == 0) {
-			i = 0.5d;
+	void setImagesScaling(int i) {
+		double s = i;
+		if (s == 0) {
+			s = 0.5d;
 		}
-		imageScaling = i;
+		imageScaling = s;
 		updateView();
 	}
 
