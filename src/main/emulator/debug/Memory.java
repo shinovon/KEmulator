@@ -265,16 +265,7 @@ public final class Memory {
 			}
 			try {
 				if (o instanceof Object3D) {
-					final Field[] method845 = fields(clazz);
-					for (int j = 0; j < method845.length; ++j) {
-						final String name = method845[j].getName();
-						method845[j].setAccessible(true);
-						final Object method846 = ClassTypes.getFieldValue(o, method845[j]);
-						final String string = path + '.' + name;
-						if (!method845[j].getType().isPrimitive() && method846 != null) {
-							this.collectObjects(method846.getClass(), method846, string, false);
-						}
-					}
+					iterateFields(clazz, o, path);
 					return;
 				}
 			} catch (NoClassDefFoundError e) {
@@ -283,18 +274,27 @@ public final class Memory {
 		}
 
 		if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || InputStream.class.isAssignableFrom(clazz)) {
-			final Field[] f = fields(clazz);
-			for (int k = 0; k < f.length; ++k) {
-				final String name2 = f[k].getName();
-				//if ((o instanceof Item || o instanceof Screen) && f[k].getType() == int[].class) continue;
-				if (!Modifier.isFinal(f[k].getModifiers()) || !f[k].getType().isPrimitive()) {
-					f[k].setAccessible(true);
-					final Object method848 = ClassTypes.getFieldValue(o, f[k]);
-					final String string2 = path + '.' + name2;
-					if (!f[k].getType().isPrimitive() && method848 != null) {
-						this.collectObjects(method848.getClass(), method848, string2, false);
-					}
-				}
+			iterateFields(clazz, o, path);
+		}
+	}
+
+	private void iterateFields(Class clazz, Object o, String path) {
+		final Field[] fields = fields(clazz);
+		for (Field f : fields) {
+			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive())
+				continue; // const field
+
+			final String fieldName = f.getName();
+			f.setAccessible(true);
+
+			final Object value = ClassTypes.getFieldValue(o, f);
+			final String newPath;
+			if (Modifier.isStatic(f.getModifiers()))
+				newPath = clazz.getName() + '.' + fieldName;
+			else
+				newPath = path + '.' + fieldName;
+			if (!f.getType().isPrimitive() && value != null) {
+				this.collectObjects(value.getClass(), value, newPath, false);
 			}
 		}
 	}
