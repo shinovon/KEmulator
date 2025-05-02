@@ -7,7 +7,6 @@ import emulator.debug.Memory;
 import emulator.debug.MemoryViewImageType;
 import emulator.debug.ObjInstance;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
@@ -22,20 +21,14 @@ import java.util.*;
 
 public final class MemoryView implements DisposeListener, ControlListener {
 	private Shell shell;
-	private Button autoUpdateBtn;
-	private Text autoUpdateIntervalText;
-	private CLabel bytecodeSizeLbl;
-	private CLabel objectsSizeLbl;
-	private CLabel totalmemLbl;
-	private CLabel maxmemLbl;
-	private final Display display = SWTFrontend.getDisplay();
 	public final Memory memoryMgr = Memory.getInstance();
 	private boolean visible;
 	private Composite imagesPanel;
 	private ImageViewControls imageControls;
+	private MemoryViewControls memoryControls;
 	public Canvas imagesCanvas;
 	private SashForm horizontalSeparator;
-	private Composite aComposite1116;
+	private Composite memoryPanel;
 	private Table table;
 	private Table classTable;
 	private double imageScaling = 1d;
@@ -43,8 +36,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private boolean sortImagesByAscending;
 	Menu menuSaveOne;
 	Menu menuSaveAll;
-	private int objectsSize;
-	private int maxObjectsSize;
 	private static final Object updateLock = new Object();
 	static final Vector<Image> allImages = new Vector();
 	static final ArrayList<ImageViewItem> imagesToShow = new ArrayList<>();
@@ -61,8 +52,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private Image selectedImage;
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
-	private Thread autoUpdateThread;
-	private CLabel jvmmemLabel;
 	private int sortColumn = -1;
 
 	public static final String SHELL_TYPE = "MEMORY_VIEW";
@@ -79,15 +68,15 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		shell.addControlListener(this);
 		updateEverything();
 		visible = true;
-		while (!this.shell.isDisposed()) {
-			if (!this.display.readAndDispatch()) {
-				this.display.sleep();
+		Display display = shell.getDisplay();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 		Settings.showMemViewFrame = false;
-		if (this.autoUpdateThread != null && this.autoUpdateThread.isAlive()) {
-			this.autoUpdateThread.interrupt();
-		}
+		if (autoUpdater != null)
+			autoUpdater.stopThread();
 		this.memoryMgr.releasedImages.clear();
 		this.visible = false;
 	}
@@ -104,65 +93,13 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	}
 
 	private void createShell() {
-		final GridData gridData;
-		(gridData = new GridData()).horizontalAlignment = 4;
-		gridData.verticalAlignment = 2;
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.verticalAlignment = 2;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 4;
-		layoutData2.verticalAlignment = 2;
-		final GridData layoutData3;
-		(layoutData3 = new GridData()).horizontalAlignment = 4;
-		layoutData3.verticalAlignment = 2;
-		final GridData layoutData4;
-		(layoutData4 = new GridData()).horizontalSpan = 2;
-		layoutData4.verticalAlignment = 2;
-		layoutData4.grabExcessHorizontalSpace = false;
-		layoutData4.horizontalAlignment = 4;
-		final GridData gridData2;
-		(gridData2 = new GridData()).horizontalAlignment = 4;
-		gridData2.grabExcessHorizontalSpace = false;
-		gridData2.verticalAlignment = 2;
-		final GridData gridData3;
-		(gridData3 = new GridData()).horizontalAlignment = 4;
-		gridData3.grabExcessHorizontalSpace = false;
-		gridData3.verticalAlignment = 2;
-		final GridData gridData4;
-		(gridData4 = new GridData()).horizontalAlignment = 4;
-		gridData4.grabExcessHorizontalSpace = false;
-		gridData4.horizontalSpan = 3;
-		gridData4.verticalAlignment = 2;
-		final GridData layoutData5;
-		(layoutData5 = new GridData()).horizontalAlignment = 4;
-		layoutData5.grabExcessHorizontalSpace = false;
-		layoutData5.horizontalIndent = 0;
-		layoutData5.verticalAlignment = 2;
-		final GridData layoutData6;
-		(layoutData6 = new GridData()).verticalAlignment = 2;
-		layoutData6.verticalSpan = 1;
-		layoutData6.grabExcessHorizontalSpace = false;
-		layoutData6.horizontalAlignment = 4;
-		final GridData gridData7;
-		(gridData7 = new GridData()).horizontalAlignment = 4;
-		gridData7.grabExcessHorizontalSpace = false;
-		gridData7.verticalAlignment = 2;
-		final GridData gridData8;
-		(gridData8 = new GridData()).horizontalAlignment = 4;
-		gridData8.grabExcessHorizontalSpace = false;
-		gridData8.verticalAlignment = 2;
-		final GridData gridData9;
-		(gridData9 = new GridData()).verticalAlignment = 2;
-		gridData9.grabExcessHorizontalSpace = false;
-		gridData9.horizontalAlignment = 4;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 7;
 		final int shellStyle = SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN;
-		(this.shell = new Shell(shellStyle)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
+		shell = new Shell(shellStyle);
+		shell.setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
 		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.shell.setLayout(layout);
+		this.shell.setLayout(new GridLayout(1, true));
 		shell.setData("TYPE", SHELL_TYPE);
+		shell.setMinimumSize(320, 300);
 
 		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
 		this.shell.setSize(
@@ -170,55 +107,72 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				(int) (clientArea.height * 0.95)
 		);
 
-		Button aButton1081;
-		(aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
-		(aButton1081).setLayoutData(layoutData6);
-		aButton1081.addSelectionListener(new MemoryViewUpdateListener(this));
-		(this.autoUpdateBtn = new Button(this.shell, 32)).setText(UILocale.get("MEMORY_VIEW_AUTO_UPDATE", "AutoUpdate"));
-		(this.autoUpdateBtn).setLayoutData(layoutData4);
-		this.autoUpdateBtn.addSelectionListener(new MemoryViewAutoUpdateListener(this));
-		CLabel aCLabel1105;
-		(aCLabel1105 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_BYTECODE_SIZE", "ByteCode Size:"));
-		(aCLabel1105).setLayoutData(layoutData);
-		(this.bytecodeSizeLbl = new CLabel(this.shell, 0)).setText("0              bytes");
-		(this.bytecodeSizeLbl).setLayoutData(gridData3);
-		CLabel aCLabel1128;
-		(aCLabel1128 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_TOTALMEM_SIZE", "Total Memory Used:"));
-		(aCLabel1128).setLayoutData(gridData);
-		(this.totalmemLbl = new CLabel(this.shell, 0)).setText("0");
-		(this.totalmemLbl).setLayoutData(gridData2);
+		final GridData controlsLayout = new GridData();
+		controlsLayout.horizontalAlignment = 4;
+		controlsLayout.grabExcessHorizontalSpace = true;
+		controlsLayout.verticalAlignment = 4;
+		memoryControls = new MemoryViewControls(shell, this);
+		memoryControls.setLayoutData(controlsLayout);
 
-
-		Button gcButton = new Button(shell, SWT.PUSH);
-		gcButton.setText("GC");
-		gcButton.setLayoutData(gridData9);
-		gcButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent selectionEvent) {
-				System.gc();
-			}
-		});
-		CLabel aCLabel1082;
-		(aCLabel1082 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_INTERVAL", "Interval(milli sec):"));
-		(aCLabel1082).setLayoutData(layoutData3);
-		(this.autoUpdateIntervalText = new Text(this.shell, 2048)).setText("1000");
-		(this.autoUpdateIntervalText).setLayoutData(layoutData5);
-		CLabel aCLabel1114;
-		(aCLabel1114 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_OBJECT_SIZE", "Objects Size:"));
-		aCLabel1114.setLayoutData(layoutData2);
-		(this.objectsSizeLbl = new CLabel(this.shell, 0)).setText("0");
-		this.objectsSizeLbl.setLayoutData(gridData7);
-		CLabel aCLabel1136;
-		(aCLabel1136 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_MAX_OBJECT_SIZE", "Max Objects Size:"));
-		aCLabel1136.setLayoutData(gridData);
-		(this.maxmemLbl = new CLabel(this.shell, 0)).setText("0");
-		this.maxmemLbl.setLayoutData(gridData2);
-		new CLabel(this.shell, 0).setText(UILocale.get("MEMORY_VIEW_JVM_MEMORY", "Real usage:"));
-		(this.jvmmemLabel = new CLabel(this.shell, 0)).setText("0");
-		this.jvmmemLabel.setLayoutData(gridData8);
 		this.createSeparator();
 	}
 
-	private void createControlsForImagesView() {
+	private void createSeparator() {
+		final GridData layoutData = new GridData();
+		layoutData.horizontalAlignment = 4;
+		layoutData.verticalAlignment = 4;
+		layoutData.grabExcessVerticalSpace = true;
+		layoutData.grabExcessHorizontalSpace = true;
+
+		horizontalSeparator = new SashForm(this.shell, 0);
+		horizontalSeparator.setOrientation(SWT.VERTICAL);
+		this.horizontalSeparator.setSashWidth(5);
+		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+		this.horizontalSeparator.setLayoutData(layoutData);
+
+		createMemoryView();
+		createImagesView();
+
+		horizontalSeparator.setWeights(new int[]{4, 6});
+	}
+
+	private void createMemoryView() {
+		SashForm memoryPanel = new SashForm(this.horizontalSeparator, 0);
+
+		table = new Table(memoryPanel, 67584);
+		table.setHeaderVisible(true);
+		this.table.setLinesVisible(true);
+		this.table.addSelectionListener(new TableListener(this));
+		final TableColumn tableColumn;
+		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
+		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
+		tableColumn.addSelectionListener(new Class31(this));
+		final TableColumn tableColumn2;
+		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
+		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
+		tableColumn2.addSelectionListener(new Class140(this));
+		final TableColumn tableColumn3;
+		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
+		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
+		tableColumn3.addSelectionListener(new Class17(this));
+
+		classTable = new Table(memoryPanel, 67584);
+		classTable.setHeaderVisible(true);
+		this.classTable.setLinesVisible(true);
+		this.classTable.addSelectionListener(new Class19(this));
+		this.classTable.addMouseListener(new ClassTableListener(this));
+		final TableColumn tableColumn4;
+		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
+		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
+		final TableColumn tableColumn5;
+		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
+		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
+		final TableColumn tableColumn6;
+		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
+		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
+	}
+
+	private void createImagesView() {
 		final GridLayout layout = new GridLayout(1, true);
 		layout.marginHeight = 2;
 		layout.marginWidth = 0;
@@ -238,6 +192,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		canvasLayout.grabExcessHorizontalSpace = true;
 		canvasLayout.grabExcessVerticalSpace = true;
 		canvasLayout.verticalAlignment = 4;
+
 		imagesCanvas = new Canvas(this.imagesPanel, 537135616);
 		imagesCanvas.setLayout(null);
 		this.imagesCanvas.setLayoutData(canvasLayout);
@@ -255,79 +210,12 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		menuItem2.addSelectionListener(new SaveAllImagesListener(this));
 	}
 
-	private void createSeparator() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalSpan = 7;
-		layoutData.horizontalAlignment = 4;
-		layoutData.verticalAlignment = 4;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.grabExcessHorizontalSpace = true;
-
-		(this.horizontalSeparator = new SashForm(this.shell, 0)).setOrientation(SWT.VERTICAL);
-		this.horizontalSeparator.setSashWidth(5);
-		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-		this.horizontalSeparator.setLayoutData(layoutData);
-		this.method688();
-		this.createControlsForImagesView();
-
-		this.horizontalSeparator.setWeights(new int[]{4, 6});
-
-	}
-
-	private void method688() {
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 1;
-		this.aComposite1116 = new Composite(this.horizontalSeparator, 0);
-		this.method689();
-		this.aComposite1116.setLayout(layout);
-	}
-
-	private void method689() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
-		SashForm aSashForm1103;
-		(aSashForm1103 = new SashForm(this.aComposite1116, 0)).setLayoutData(layoutData);
-		(this.table = new Table(aSashForm1103, 67584)).setHeaderVisible(true);
-		this.table.setLinesVisible(true);
-		this.table.addSelectionListener(new TableListener(this));
-		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
-		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
-		tableColumn.addSelectionListener(new Class31(this));
-		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
-		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
-		tableColumn2.addSelectionListener(new Class140(this));
-		final TableColumn tableColumn3;
-		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
-		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
-		tableColumn3.addSelectionListener(new Class17(this));
-		(this.classTable = new Table(aSashForm1103, 67584)).setHeaderVisible(true);
-		this.classTable.setLinesVisible(true);
-		this.classTable.addSelectionListener(new Class19(this));
-		this.classTable.addMouseListener(new ClassTableListener(this));
-		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
-		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
-		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
-		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
-		final TableColumn tableColumn6;
-		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
-		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
-	}
-
 	private void updateModel() {
 		if (this.updateInProgress) return;
 		this.updateInProgress = true;
 		try {
 			this.memoryMgr.updateEverything();
 			this.updateImagesList();
-			this.objectsSize = this.memoryMgr.objectsSize();
-			this.maxObjectsSize = Math.max(this.maxObjectsSize, this.objectsSize);
 		} catch (Throwable ex) {
 			ex.printStackTrace();
 		}
@@ -340,16 +228,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		try {
 			this.imagesCanvas.redraw();
 			this.updateClassesView();
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		int bytecodeSize = Memory.getBytecodeSize();
-		this.bytecodeSizeLbl.setText(bytecodeSize + " bytes");
-		this.objectsSizeLbl.setText(this.objectsSize + " bytes");
-		this.totalmemLbl.setText(bytecodeSize + this.objectsSize + " bytes");
-		this.maxmemLbl.setText(this.maxObjectsSize + " bytes");
-		long t = Runtime.getRuntime().totalMemory();
-		long f = Runtime.getRuntime().freeMemory();
-		this.jvmmemLabel.setText(((t - f) / 1024L) + "/" + (t / 1024L) + " kb");
+		memoryControls.refreshStats();
 		resortClasses();
 	}
 
@@ -591,24 +473,16 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		this.dispose();
 	}
 
-	void setAutoUpdate() {
-		if (autoUpdateBtn.getSelection()) {
-			final long updateInterval;
-			if ((updateInterval = Long.parseLong(autoUpdateIntervalText.getText().trim())) > 0L) {
-				if (autoUpdater != null) {
-					autoUpdater.shouldRun = false;
-				}
-				autoUpdater = new MemoryView.AutoUpdate(this, updateInterval);
-				autoUpdateThread = new Thread(autoUpdater);
-				autoUpdateThread.start();
-			}
-			return;
-		}
+	void setAutoUpdate(boolean enabled, int interval) {
 		if (autoUpdater != null) {
-			autoUpdater.shouldRun = false;
-			if (autoUpdateThread.isAlive()) {
-				autoUpdateThread.interrupt();
-			}
+			autoUpdater.stopThread();
+			autoUpdater = null;
+		}
+		if (enabled) {
+			if (interval < 10)
+				throw new IllegalArgumentException("Too small update interval");
+			autoUpdater = new AutoUpdate(this, interval);
+			autoUpdater.start();
 		}
 	}
 
@@ -726,7 +600,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		imagesPanel.layout(true, true);
 	}
 
-	public static final class AutoUpdate implements Runnable {
+	public static final class AutoUpdate extends Thread {
 		boolean shouldRun;
 		long currentMillis;
 		long updateInterval;
@@ -754,6 +628,12 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				}
 			}
 			this.mv.autoUpdater = this;
+		}
+
+		public void stopThread() {
+			shouldRun = false;
+			if (isAlive())
+				interrupt();
 		}
 	}
 }

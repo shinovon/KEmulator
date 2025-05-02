@@ -154,8 +154,8 @@ public class ImageViewControls extends Composite implements SelectionListener, M
 	public void updateStats(int pixels2d, int pixels3d, int count2d, int count3d) {
 		String text = "Total (LCDUI+3D): " + (pixels2d + pixels3d) + "px";
 		totalPixelsLabel.setText(text);
-		String t2d = "LCDUI: " + count2d + " images, " + pixels2d + "px (" + (pixels2d / 1024) + "kpx) in total";
-		String t3d = "M3G+Micro3D: " + count3d + " images, " + pixels3d + "px (" + (pixels3d / 1024) + "kpx) in total";
+		String t2d = "LCDUI: " + count2d + " images, " + pixels2d + "px (" + (pixels2d / 1024) + "Kipx) in total";
+		String t3d = "M3G+Micro3D: " + count3d + " images, " + pixels3d + "px (" + (pixels3d / 1024) + "Kipx) in total";
 		String tip = "To estimate memory usage, multiply numbers by 4.";
 		String tip2 = "Real memory usage will differ per device due to different formats.";
 		totalPixelsLabel.setToolTipText(t2d + "\n" + t3d + "\n\n" + tip + "\n" + tip2);
