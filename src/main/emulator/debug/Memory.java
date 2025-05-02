@@ -199,12 +199,24 @@ public final class Memory {
 					this.m3gObjects.add(o);
 				} else if (o instanceof Image2D) {
 					IImage img = MemoryViewImage.createFromM3GImage((Image2D) o);
-					if (img != null)
-						this.images.add(new MemoryViewImage(img, MemoryViewImageType.M3G));
+					if (img != null) {
+						MemoryViewImage mvi = new MemoryViewImage(img, MemoryViewImageType.M3G, o);
+						this.images.add(mvi);
+						int i = releasedImages.indexOf(mvi);
+						if (i >= 0) {
+							this.releasedImages.remove(i); // this image is still alive
+						}
+					}
 				} else if (o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
 					IImage img = MemoryViewImage.createFromMicro3DTexture(o);
-					if (img != null)
-						this.images.add(new MemoryViewImage(img, MemoryViewImageType.Micro3D));
+					if (img != null) {
+						MemoryViewImage mvi = new MemoryViewImage(img, MemoryViewImageType.Micro3D, o);
+						this.images.add(mvi);
+						int i = releasedImages.indexOf(mvi);
+						if (i >= 0) {
+							this.releasedImages.remove(i); // this image is still alive
+						}
+					}
 				}
 			} catch (NoClassDefFoundError e) {
 				e.printStackTrace();
@@ -333,7 +345,14 @@ public final class Memory {
 
 			IImage img = MemoryViewImage.createFromM3GImage(img2d);
 			if (img != null)
-				this.images.add(new MemoryViewImage(img, MemoryViewImageType.M3G));
+			{
+				MemoryViewImage mvi = new MemoryViewImage(img, MemoryViewImageType.M3G, img2d);
+				this.images.add(mvi);
+				int i = releasedImages.indexOf(mvi);
+				if (i >= 0) {
+					this.releasedImages.remove(i); // this image is still alive
+				}
+			}
 		}
 	}
 
