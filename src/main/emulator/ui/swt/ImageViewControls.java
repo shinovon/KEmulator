@@ -66,11 +66,13 @@ public class ImageViewControls extends Composite implements SelectionListener, M
 		{
 			infos = new Button(displays, 32);
 			infos.setText("Infos");
+			infos.setToolTipText("Show image type, size and usage counter");
 			infos.setSelection(false);
 			infos.addSelectionListener(this);
 
 			darkenUnused = new Button(displays, 32);
 			darkenUnused.setText(UILocale.get("MEMORY_VIEW_UNUSED_REGION", "Used regions"));
+			darkenUnused.setToolTipText("Shade image regions those were never drawn");
 			darkenUnused.setSelection(false);
 			darkenUnused.addSelectionListener(this);
 
