@@ -110,7 +110,7 @@ public class ImageViewControls extends Composite implements SelectionListener, M
 
 			drawReleased = new Button(filters, 32);
 			drawReleased.setText(UILocale.get("MEMORY_VIEW_RELEASED_IMAGES", "Released"));
-			draw3d.setToolTipText("Show released LCDUI images. For alive ones, try \"LCDUI\" toggle");
+			drawReleased.setToolTipText("Show released LCDUI images. For alive ones, try \"LCDUI\" toggle");
 			drawReleased.setEnabled(Settings.recordReleasedImg);
 			drawReleased.setSelection(false);
 			drawReleased.addSelectionListener(this);
