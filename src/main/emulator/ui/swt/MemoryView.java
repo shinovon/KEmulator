@@ -443,11 +443,13 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (item.type == MemoryViewImageType.LCDUI) {
+					if (item.released) {
+						gc.setForeground(releasedColor);
+					} else if (item.type == MemoryViewImageType.LCDUI) {
 						if (this.imgClassSelected && selectedImage == image) {
 							gc.setForeground(selectedColor);
 						} else {
-							gc.setForeground(item.released ? releasedColor : regularColor);
+							gc.setForeground(regularColor);
 						}
 					} else {
 						gc.setForeground(texColor);
