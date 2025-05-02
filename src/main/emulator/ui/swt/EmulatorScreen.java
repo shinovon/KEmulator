@@ -1782,7 +1782,6 @@ public final class EmulatorScreen implements
 		this.canvas.addMouseMoveListener(this);
 		this.canvas.getShell().addMouseTrackListener(this);
 		this.canvas.addPaintListener(this);
-		this.canvas.addListener(SWT.MouseVerticalWheel, new Class32(this));
 		canvas.addControlListener(new ControlListener() {
 			@Override
 			public void controlMoved(ControlEvent controlEvent) {
