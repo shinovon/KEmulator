@@ -425,10 +425,12 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		int x = 10;
 		int max = 0;
 		final Color background = new Color(null, 151, 150, 147);
-		final Color releasedColor = new Color(null, 255, 0, 0);
 		final Color regularColor = new Color(null, 0, 0, 0);
+
+		final Color releasedColor = new Color(null, 200, 0, 0);
 		final Color selectedColor = new Color(null, 0, 255, 0);
-		final Color texColor = new Color(null, 0, 0, 255);
+		final Color texColor = new Color(null, 0, 0, 200);
+
 		gc.setBackground(background);
 		gc.fillRectangle(0, 0, canvasW, canvasH);
 		gc.setInterpolation(SWT.NONE);
@@ -472,9 +474,12 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					}
 
 					if (drawImagesInfo) {
-						gc.drawString(item.getCaption(), x - 1, y + 1 - fh * 3, true);
-						gc.drawString(image.getWidth() + "*" + image.getHeight(), x - 1, y + 1 - fh * 2, true);
-						gc.drawString("x" + image.getUsedCount(), x - 1, y + 1 - fh, true);
+						gc.drawString(item.getCaption(), x - 1, y - fh * 3, true);
+						gc.drawString(image.getWidth() + "*" + image.getHeight(), x - 1, y - fh * 2, true);
+						if (item.released)
+							gc.drawString("Released", x - 1, y - fh, true);
+						else
+							gc.drawString("x" + image.getUsedCount(), x - 1, y - fh, true);
 					}
 					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
 					item.drawnRect = new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1);

@@ -29,8 +29,6 @@ public class ImageViewItem {
 	}
 
 	public String getCaption() {
-		if (released)
-			return "Dead";
 		return type.toString();
 	}
 }
