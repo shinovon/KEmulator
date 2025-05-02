@@ -39,6 +39,8 @@ public final class Memory {
 
 	private static Memory inst;
 
+	private static int bytecodeSize = -1;
+
 	public static Memory getInstance() {
 		if (inst == null) {
 			inst = new Memory();
@@ -344,8 +346,7 @@ public final class Memory {
 			this.instances.add(img2d);
 
 			IImage img = MemoryViewImage.createFromM3GImage(img2d);
-			if (img != null)
-			{
+			if (img != null) {
 				MemoryViewImage mvi = new MemoryViewImage(img, MemoryViewImageType.M3G, img2d);
 				this.images.add(mvi);
 				int i = releasedImages.indexOf(mvi);
@@ -374,6 +375,8 @@ public final class Memory {
 	}
 
 	public static int getBytecodeSize() {
+		if (bytecodeSize >= 0)
+			return bytecodeSize;
 		int n = 0;
 		try {
 			if (Emulator.midletJar != null) {
@@ -399,6 +402,7 @@ public final class Memory {
 			}
 		} catch (Exception ignored) {
 		}
+		bytecodeSize = n;
 		return n;
 	}
 

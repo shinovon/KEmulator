@@ -43,7 +43,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private boolean sortImagesByAscending;
 	Menu menuSaveOne;
 	Menu menuSaveAll;
-	private int bytecodeSize;
 	private int objectsSize;
 	private int maxObjectsSize;
 	private static final Object updateLock = new Object();
@@ -327,7 +326,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		try {
 			this.memoryMgr.updateEverything();
 			this.updateImagesList();
-			this.bytecodeSize = Memory.getBytecodeSize();
 			this.objectsSize = this.memoryMgr.objectsSize();
 			this.maxObjectsSize = Math.max(this.maxObjectsSize, this.objectsSize);
 		} catch (Throwable ex) {
@@ -344,9 +342,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			this.updateClassesView();
 		} catch (Exception ignored) {
 		}
-		this.bytecodeSizeLbl.setText(this.bytecodeSize + " bytes");
+		int bytecodeSize = Memory.getBytecodeSize();
+		this.bytecodeSizeLbl.setText(bytecodeSize + " bytes");
 		this.objectsSizeLbl.setText(this.objectsSize + " bytes");
-		this.totalmemLbl.setText(this.bytecodeSize + this.objectsSize + " bytes");
+		this.totalmemLbl.setText(bytecodeSize + this.objectsSize + " bytes");
 		this.maxmemLbl.setText(this.maxObjectsSize + " bytes");
 		long t = Runtime.getRuntime().totalMemory();
 		long f = Runtime.getRuntime().freeMemory();
