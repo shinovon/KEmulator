@@ -2,11 +2,11 @@ package emulator.ui.swt;
 
 import emulator.debug.Memory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public class MemoryViewControls extends Composite implements SelectionListener, ModifyListener, Runnable, FocusListener {
@@ -15,9 +15,9 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 	private final Button autoUpdate;
 	private final Text autoUpdateInterval;
 	private final Button updateNow;
-	private final CLabel objectsSize;
-	private final CLabel totalSize;
-	private final CLabel jvmSize;
+	private final Label objectsSize;
+	private final Label totalSize;
+	private final Label jvmSize;
 	private final Button gc;
 
 	private int maxObjectsSize = 0;
@@ -44,25 +44,25 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 		autoUpdateInterval.addModifyListener(this);
 		autoUpdateInterval.addFocusListener(this);
 
-		new CLabel(this, 0).setText("ms ");
+		new Label(this, 0).setText("ms ");
 
 		updateNow = new Button(this, SWT.PUSH);
 		updateNow.setText("Update now");
 		updateNow.addSelectionListener(this);
 
-		CLabel bytecodeSize = new CLabel(this, 0);
+		Label bytecodeSize = new Label(this, 0);
 		bytecodeSize.setText("Bytecode size: " + Memory.getBytecodeSize() + "B  ");
 		bytecodeSize.setToolTipText("Total size of all loaded classes in bytes");
 
-		objectsSize = new CLabel(this, 0);
-		objectsSize.setText("Objects (now/max): ????????B/????????B");
+		objectsSize = new Label(this, 0);
+		objectsSize.setText("Objects (now/max): ????????B/????????B  ");
 		objectsSize.setToolTipText("Total size of objects heap");
 
-		totalSize = new CLabel(this, 0);
-		totalSize.setText("Total memory used: ?????KiB");
+		totalSize = new Label(this, 0);
+		totalSize.setText("Total memory used: ?????KiB  ");
 
-		jvmSize = new CLabel(this, 0);
-		jvmSize.setText("Real usage: ????/????MiB ");
+		jvmSize = new Label(this, 0);
+		jvmSize.setText("Real usage: ????/????MiB  ");
 		jvmSize.setToolTipText("Total memory, taken by KEmulator");
 
 		gc = new Button(this, SWT.PUSH);

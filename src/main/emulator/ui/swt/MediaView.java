@@ -12,7 +12,6 @@ import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.vlc.VLCPlayerImpl;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -37,9 +36,9 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 	private Button pauseBtn;
 	private Button stopBtn;
 	private Button exportBtn;
-	private CLabel volumeValueLabel;
+	private Label volumeValueLabel;
 	private Scale volumeScale;
-	private CLabel timeLabel;
+	private Label timeLabel;
 	private ProgressBar timeBar;
 	private Table table;
 	private boolean visible;
@@ -81,17 +80,17 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 		exportBtn.setText(UILocale.get("MEMORY_VIEW_SOUND_EXPORT", "Export"));
 		exportBtn.addSelectionListener(this);
 
-		CLabel volumeLabel = new CLabel(shell, SWT.NONE);
+		Label volumeLabel = new Label(shell, SWT.NONE);
 		volumeLabel.setText(UILocale.get("MEMORY_VIEW_VOLUME_LABEL", "Volume"));
 
-		volumeValueLabel = new CLabel(shell, SWT.NONE);
+		volumeValueLabel = new Label(shell, SWT.NONE);
 		volumeValueLabel.setText("000%");
 
 		volumeScale = new Scale(shell, SWT.HORIZONTAL);
 		volumeScale.setMaximum(100);
 		volumeScale.addSelectionListener(this);
 
-		timeLabel = new CLabel(shell, SWT.NONE);
+		timeLabel = new Label(shell, SWT.NONE);
 		timeLabel.setText("0000:00/0000:00");
 
 		GridData gd1 = new GridData();

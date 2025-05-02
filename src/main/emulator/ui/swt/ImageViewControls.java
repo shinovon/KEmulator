@@ -3,7 +3,6 @@ package emulator.ui.swt;
 import emulator.Settings;
 import emulator.UILocale;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -11,10 +10,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.*;
 
 public class ImageViewControls extends Composite implements SelectionListener, ModifyListener {
 
@@ -30,7 +26,7 @@ public class ImageViewControls extends Composite implements SelectionListener, M
 	private final Button draw3d;
 	private final Button clearReleasedBtn;
 
-	private final CLabel totalPixelsLabel;
+	private final Label totalPixelsLabel;
 	private final MemoryView mv;
 
 	public ImageViewControls(Composite parent, MemoryView mv) {
@@ -46,7 +42,7 @@ public class ImageViewControls extends Composite implements SelectionListener, M
 		scale = new Combo(this, 8);
 		initZoomCombo();
 
-		new CLabel(this, 0).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
+		new Label(this, 0).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
 		sortingMethod = new Combo(this, 8);
 		initSortByCombo();
 
@@ -121,7 +117,7 @@ public class ImageViewControls extends Composite implements SelectionListener, M
 		Group stats = new Group(this, 0);
 		stats.setText("Statistics");
 		stats.setLayout(new RowLayout());
-		totalPixelsLabel = new CLabel(stats, 0);
+		totalPixelsLabel = new Label(stats, 0);
 		totalPixelsLabel.setText("? pixels");
 		totalPixelsLabel.setLayoutData(new RowData(200, 20));
 
