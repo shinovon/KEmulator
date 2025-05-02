@@ -392,6 +392,17 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					continue;
 				if (image.drawnRect.contains(x, y)) {
 					selectedImage = image.image;
+					if (!imgClassSelected)
+						return true;
+					for (int i = 0; i < classTable.getItemCount(); i++) {
+						ObjInstance o = (ObjInstance) classTable.getItem(i).getData();
+						if (o.value == selectedImage) {
+							classTable.select(i);
+							imagesCanvas.redraw();
+							return true;
+						}
+					}
+					imagesCanvas.redraw();
 					return true;
 				}
 			}
