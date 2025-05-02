@@ -378,7 +378,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			if (showReleasedImages) {
 				for (Image image : this.memoryMgr.releasedImages) {
 					allImages.add(image);
-					MemoryView.imagesToShow.add(new ImageViewItem(image, false));
+					MemoryView.imagesToShow.add(new ImageViewItem(image, true));
 				}
 			}
 		}
