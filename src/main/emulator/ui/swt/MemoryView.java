@@ -9,10 +9,7 @@ import emulator.debug.ObjInstance;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
@@ -23,7 +20,7 @@ import org.eclipse.swt.widgets.*;
 import javax.microedition.lcdui.Image;
 import java.util.*;
 
-public final class MemoryView implements DisposeListener {
+public final class MemoryView implements DisposeListener, ControlListener {
 	private Shell shell;
 	private Button autoUpdateBtn;
 	private Text autoUpdateIntervalText;
@@ -34,7 +31,7 @@ public final class MemoryView implements DisposeListener {
 	private final Display display = SWTFrontend.getDisplay();
 	public final Memory memoryMgr = Memory.getInstance();
 	private boolean visible;
-	private Composite aComposite1098;
+	private Composite imagesPanel;
 	private ImageViewControls imageControls;
 	public Canvas imagesCanvas;
 	private SashForm horizontalSeparator;
@@ -56,10 +53,12 @@ public final class MemoryView implements DisposeListener {
 	int imagesCanvasScroll;
 	private boolean imagesDrawn = true;
 	private boolean imagesNeverDrawn = true;
-	private boolean showReleasedImages;
-	private boolean darkenUnused;
+	private boolean showReleasedImages = false;
+	private boolean show2dImages = true;
+	private boolean show3dImages = true;
+	private boolean darkenUnused = false;
 	private boolean imgClassSelected;
-	private boolean drawImagesInfo = true;
+	private boolean drawImagesInfo = false;
 	private Image selectedImage;
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
@@ -70,16 +69,17 @@ public final class MemoryView implements DisposeListener {
 	public static final String SHELL_TYPE = "MEMORY_VIEW";
 
 	public void open() {
-		this.createShell();
+		createShell();
 		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
-		this.shell.setLocation(
+		shell.setLocation(
 				clientArea.x + (int) (clientArea.height * 0.025), //- this.shell.getSize().x >> 3,
 				clientArea.y + (int) (clientArea.height * 0.025)// - this.shell.getSize().y >> 2
 		);
-		this.shell.open();
-		this.shell.addDisposeListener(this);
+		shell.open();
+		shell.addDisposeListener(this);
+		shell.addControlListener(this);
 		updateEverything();
-		this.visible = true;
+		visible = true;
 		while (!this.shell.isDisposed()) {
 			if (!this.display.readAndDispatch()) {
 				this.display.sleep();
@@ -220,26 +220,27 @@ public final class MemoryView implements DisposeListener {
 	}
 
 	private void createControlsForImagesView() {
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 1;
+		final GridLayout layout = new GridLayout(1, true);
 		layout.marginHeight = 2;
 		layout.marginWidth = 0;
-		(this.aComposite1098 = new Composite(this.horizontalSeparator, 0)).setLayout(layout);
-		imageControls = new ImageViewControls(aComposite1098, this);
-		this.createImagesCanvas();
-	}
 
-	private void createImagesCanvas() {
-		final GridData layoutData = new GridData();
-		layoutData.horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
-		((this.imagesCanvas = new Canvas(this.aComposite1098, 537135616))).setLayout(null);
-		this.imagesCanvas.setLayoutData(layoutData);
+		this.imagesPanel = new Composite(this.horizontalSeparator, 0);
+		imagesPanel.setLayout(layout);
+
+		imageControls = new ImageViewControls(imagesPanel, this);
+
+		final GridData canvasLayout = new GridData();
+		canvasLayout.horizontalAlignment = 4;
+		canvasLayout.grabExcessHorizontalSpace = true;
+		canvasLayout.grabExcessVerticalSpace = true;
+		canvasLayout.verticalAlignment = 4;
+		imagesCanvas = new Canvas(this.imagesPanel, 537135616);
+		imagesCanvas.setLayout(null);
+		this.imagesCanvas.setLayoutData(canvasLayout);
 		this.imagesCanvas.addPaintListener(new ImagesCanvasRepainter(this));
 		this.imagesCanvas.addMouseListener(new ImagesCanvasListener(this));
 		this.imagesCanvas.getVerticalBar().addSelectionListener(new Class23(this));
+
 		this.menuSaveOne = new Menu(this.shell, 8);
 		final MenuItem menuItem;
 		(menuItem = new MenuItem(this.menuSaveOne, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_AS", "Save As..."));
@@ -366,8 +367,12 @@ public final class MemoryView implements DisposeListener {
 			for (Image image : this.memoryMgr.images) {
 				allImages.add(image);
 				boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
-				if (add)
-					MemoryView.imagesToShow.add(new ImageViewItem(image, false));
+				if (!add)
+					continue;
+				ImageViewItem i = new ImageViewItem(image, false);
+				boolean add2 = (show2dImages && i.type == MemoryViewImageType.LCDUI) || (show3dImages && i.type != MemoryViewImageType.LCDUI);
+				if (add2)
+					MemoryView.imagesToShow.add(i);
 
 			}
 			if (showReleasedImages) {
@@ -413,6 +418,8 @@ public final class MemoryView implements DisposeListener {
 		gc.setInterpolation(SWT.NONE);
 		int pixels2d = 0;
 		int pixels3d = 0;
+		int count2d = 0;
+		int count3d = 0;
 		synchronized (MemoryView.updateLock) {
 			final int size = MemoryView.imagesToShow.size();
 			for (int i = 0; i < size; ++i) {
@@ -446,19 +453,24 @@ public final class MemoryView implements DisposeListener {
 						gc.setForeground(texColor);
 					}
 
-					gc.drawString(item.getCaption(), x - 1, y + 1 - fh * 3, true);
-					gc.drawString(image.getWidth() + "*" + image.getHeight(), x - 1, y + 1 - fh * 2, true);
-					gc.drawString("x" + image.getUsedCount(), x - 1, y + 1 - fh, true);
+					if (drawImagesInfo) {
+						gc.drawString(item.getCaption(), x - 1, y + 1 - fh * 3, true);
+						gc.drawString(image.getWidth() + "*" + image.getHeight(), x - 1, y + 1 - fh * 2, true);
+						gc.drawString("x" + image.getUsedCount(), x - 1, y + 1 - fh, true);
+					}
 					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
 					item.drawnRect = new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1);
 				} else {
 					item.drawnRect = null; // skipped, no valid used area.
 				}
 				if (item.type == MemoryViewImageType.LCDUI) {
-					if (!item.released)
+					if (!item.released) {
 						pixels2d += image.getWidth() * image.getHeight();
+						count2d++;
+					}
 				} else {
 					pixels3d += image.getWidth() * image.getHeight();
+					count3d++;
 				}
 				int minImgW = drawImagesInfo ? 30 : 0;
 				x += Math.max(imgW, minImgW) + 10;
@@ -473,7 +485,7 @@ public final class MemoryView implements DisposeListener {
 		this.imagesCanvas.getVerticalBar().setMaximum(anInt1144);
 		this.imagesCanvas.getVerticalBar().setThumb(Math.min(anInt1144, this.imagesCanvas.getClientArea().height));
 		this.imagesCanvas.getVerticalBar().setIncrement(10);
-		imageControls.updateStats(pixels2d + pixels3d);
+		imageControls.updateStats(pixels2d, pixels3d, count2d, count3d);
 	}
 
 	void changeClassesSort(final int n) {
@@ -605,6 +617,21 @@ public final class MemoryView implements DisposeListener {
 		updateEverything();
 	}
 
+	void setShow2dImages(boolean b) {
+		show2dImages = b;
+		updateEverything();
+	}
+
+	void setShow3dImages(boolean b) {
+		show3dImages = b;
+		updateEverything();
+	}
+
+	void setShowImagesInfo(boolean b) {
+		drawImagesInfo = b;
+		updateView();
+	}
+
 	void setDarkenUnused(boolean b) {
 		darkenUnused = b;
 		updateEverything();
@@ -664,6 +691,17 @@ public final class MemoryView implements DisposeListener {
 
 	public boolean isUpdating() {
 		return updateInProgress;
+	}
+
+	@Override
+	public void controlMoved(ControlEvent controlEvent) {
+
+	}
+
+	@Override
+	public void controlResized(ControlEvent controlEvent) {
+		imageControls.layout(true, true);
+		imagesPanel.layout(true, true);
 	}
 
 	public static final class AutoUpdate implements Runnable {
