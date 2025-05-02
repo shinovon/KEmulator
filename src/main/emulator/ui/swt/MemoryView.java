@@ -228,6 +228,11 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		imagesPanel.setLayout(layout);
 
 		imageControls = new ImageViewControls(imagesPanel, this);
+		final GridData controlsLayout = new GridData();
+		controlsLayout.horizontalAlignment = 4;
+		controlsLayout.grabExcessHorizontalSpace = true;
+		controlsLayout.verticalAlignment = 4;
+		imageControls.setLayoutData(controlsLayout);
 
 		final GridData canvasLayout = new GridData();
 		canvasLayout.horizontalAlignment = 4;
