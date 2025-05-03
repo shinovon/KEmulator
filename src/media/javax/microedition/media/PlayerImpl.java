@@ -45,6 +45,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private long mediaTime;
 	private final Object playLock = new Object();
 	private Sequencer midiSequencer;
+	private Synthesizer midiSynthesizer;
 	private boolean stopped;
 	private InputStream inputStream;
 	private boolean realized;
@@ -234,12 +235,16 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence instanceof javazoom.jl.player.Player) {
 			((javazoom.jl.player.Player) sequence).close();
 		} else if (sequence instanceof Sequence) {
+			if (midiSynthesizer != null) {
+				midiSynthesizer.close();
+				midiSynthesizer = null;
+			}
 			if (midiSequencer != null) {
 				midiSequencer.close();
 				midiSequencer = null;
 			}
 			if (Settings.oneMidiAtTime) {
-				EmulatorMIDI.close();
+				EmulatorMIDI.close(false);
 			}
 		}
 //		else if (sequence instanceof Clip) {
@@ -577,7 +582,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 							} catch (Exception ignored) {}
 //                        throw new MediaException("MIDI is currently playing");
 						}
-						EmulatorMIDI.close();
+						EmulatorMIDI.close(false);
 					}
 					if (midiSequencer != null) {
 						midiSequencer.close();
@@ -836,10 +841,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 
 	private void initMidiSequencer() throws MidiUnavailableException {
 		if (midiSequencer != null) return;
-		midiSequencer = MidiSystem.getSequencer();
-		EmulatorMIDI.setupSequencer(midiSequencer);
-		midiSequencer.addMetaEventListener(this);
+		midiSequencer = MidiSystem.getSequencer(false);
+		midiSynthesizer = MidiSystem.getSynthesizer();
+		midiSynthesizer.open();
+		midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
 		midiSequencer.open();
+		midiSequencer.addMetaEventListener(this);
 	}
 
 	public void meta(MetaMessage meta) {
