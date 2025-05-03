@@ -6,6 +6,7 @@ import emulator.UILocale;
 import emulator.debug.Memory;
 import emulator.debug.MemoryViewImageType;
 import emulator.debug.ObjInstance;
+import emulator.debug.ReferencePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.*;
@@ -29,8 +30,8 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	public Canvas imagesCanvas;
 	private SashForm horizontalSeparator;
 	private Composite memoryPanel;
-	private Table table;
 	private Table classTable;
+	private Table objectsTable;
 	private double imageScaling = 1d;
 	private int imagesSortingMethod;
 	private boolean sortImagesByAscending;
@@ -55,6 +56,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private int sortColumn = -1;
 
 	public static final String SHELL_TYPE = "MEMORY_VIEW";
+	private Group objectPaths;
 
 	public void open() {
 		createShell();
@@ -139,37 +141,49 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private void createMemoryView() {
 		SashForm memoryPanel = new SashForm(this.horizontalSeparator, 0);
 
-		table = new Table(memoryPanel, 67584);
-		table.setHeaderVisible(true);
-		this.table.setLinesVisible(true);
-		this.table.addSelectionListener(new TableListener(this));
-		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.table, 0)).setWidth(170);
-		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
-		tableColumn.addSelectionListener(new Class31(this));
-		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(70);
-		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
-		tableColumn2.addSelectionListener(new Class140(this));
-		final TableColumn tableColumn3;
-		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
-		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
-		tableColumn3.addSelectionListener(new Class17(this));
-
 		classTable = new Table(memoryPanel, 67584);
 		classTable.setHeaderVisible(true);
 		this.classTable.setLinesVisible(true);
-		this.classTable.addSelectionListener(new Class19(this));
-		this.classTable.addMouseListener(new ClassTableListener(this));
+		this.classTable.addSelectionListener(new TableListener(this));
+		final TableColumn tableColumn;
+		(tableColumn = new TableColumn(this.classTable, 0)).setWidth(170);
+		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
+		tableColumn.addSelectionListener(new Class31(this));
+		final TableColumn tableColumn2;
+		(tableColumn2 = new TableColumn(this.classTable, 0)).setWidth(70);
+		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
+		tableColumn2.addSelectionListener(new Class140(this));
+		final TableColumn tableColumn3;
+		(tableColumn3 = new TableColumn(this.classTable, 0)).setWidth(100);
+		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
+		tableColumn3.addSelectionListener(new Class17(this));
+
+		SashForm objectsPanel = new SashForm(memoryPanel, 0);
+		objectsPanel.setOrientation(SWT.VERTICAL);
+
+		objectsTable = new Table(objectsPanel, 67584);
+		objectsTable.setHeaderVisible(true);
+		this.objectsTable.setLinesVisible(true);
+		ObjectsTableListener otl = new ObjectsTableListener(this);
+		this.objectsTable.addSelectionListener(otl);
+		this.objectsTable.addMouseListener(otl);
 		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(230);
+		(tableColumn4 = new TableColumn(this.objectsTable, 0)).setWidth(230);
 		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
 		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(70);
+		(tableColumn5 = new TableColumn(this.objectsTable, 0)).setWidth(70);
 		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
 		final TableColumn tableColumn6;
-		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn6 = new TableColumn(this.objectsTable, 0)).setWidth(100);
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
+
+		objectPaths = new Group(objectsPanel, SWT.V_SCROLL);
+		objectPaths.setText("Pathes to the object");
+		GridLayout gl = new GridLayout(1, false);
+		objectPaths.setLayout(gl);
+		clearObjectPaths();
+
+		objectsPanel.setWeights(new int[]{8, 2});
 	}
 
 	private void createImagesView() {
@@ -282,10 +296,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					selectedImage = image.image;
 					if (!imgClassSelected)
 						return true;
-					for (int i = 0; i < classTable.getItemCount(); i++) {
-						ObjInstance o = (ObjInstance) classTable.getItem(i).getData();
+					for (int i = 0; i < objectsTable.getItemCount(); i++) {
+						ObjInstance o = (ObjInstance) objectsTable.getItem(i).getData();
 						if (o.value == selectedImage) {
-							classTable.select(i);
+							objectsTable.select(i);
 							imagesCanvas.redraw();
 							return true;
 						}
@@ -395,9 +409,9 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	}
 
 	void changeClassesSort(final int n) {
-		this.table.setSortColumn(this.table.getColumn(n));
-		int x = (this.table.getSortDirection() == 128) ? 1024 : 128;
-		this.table.setSortDirection(x);
+		this.classTable.setSortColumn(this.classTable.getColumn(n));
+		int x = (this.classTable.getSortDirection() == 128) ? 1024 : 128;
+		this.classTable.setSortDirection(x);
 		sortColumn = n;
 		resortClasses();
 	}
@@ -408,7 +422,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		for (int i = 0; i < this.classesList.size(); ++i) {
 			final String value = this.classesList.get(i);
 			final TableItem item;
-			(item = this.table.getItem(i)).setText(0, value);
+			(item = this.classTable.getItem(i)).setText(0, value);
 			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
 			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
 		}
@@ -422,19 +436,19 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			}
 		}
 		Collections.sort(this.classesList);
-		if (this.classesList.size() > this.table.getItemCount()) {
-			for (int j = this.classesList.size() - this.table.getItemCount(); j > 0; --j) {
-				new TableItem(this.table, 0);
+		if (this.classesList.size() > this.classTable.getItemCount()) {
+			for (int j = this.classesList.size() - this.classTable.getItemCount(); j > 0; --j) {
+				new TableItem(this.classTable, 0);
 			}
 		} else {
-			while (this.table.getItemCount() > this.classesList.size()) {
-				this.table.remove(this.classesList.size());
+			while (this.classTable.getItemCount() > this.classesList.size()) {
+				this.classTable.remove(this.classesList.size());
 			}
 		}
 		for (int k = 0; k < this.classesList.size(); ++k) {
 			final String value = this.classesList.get(k);
 			final TableItem item;
-			(item = this.table.getItem(k)).setText(0, value);
+			(item = this.classTable.getItem(k)).setText(0, value);
 			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
 			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
 		}
@@ -443,17 +457,17 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	}
 
 	void onTableItemSelection() {
-		TableItem[] array = table.getSelection();
+		TableItem[] array = classTable.getSelection();
 		if (array == null || array.length < 1) {
 			return;
 		}
-		classTable.removeAll();
+		objectsTable.removeAll();
 		String text = array[0].getText(0);
 		Vector<ObjInstance> objs = this.memoryMgr.objs(text);
 		imgClassSelected = text.equalsIgnoreCase("javax.microedition.lcdui.Image");
 		selectedImage = null;
 		for (ObjInstance o : objs) {
-			TableItem ti = new TableItem(classTable, 0);
+			TableItem ti = new TableItem(objectsTable, 0);
 			if (o.paths.isEmpty())
 				ti.setText(0, "Unknown reference");
 			else if (o.paths.size() == 1)
@@ -469,6 +483,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			ti.setText(2, String.valueOf(o.size));
 			ti.setData(o);
 		}
+		clearObjectPaths();
 	}
 
 	public void widgetDisposed(final DisposeEvent disposeEvent) {
@@ -553,23 +568,43 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	}
 
 	Table getTheTable() {
-		return table;
+		return classTable;
 	}
 
-	void trySetImageSelectedIndexForClasses() {
-		if (!imgClassSelected)
+	void updateSelectedObject() {
+		TableItem[] array = objectsTable.getSelection();
+		if (array == null || array.length < 1) {
+			clearObjectPaths();
 			return;
-		TableItem[] array = classTable.getSelection();
-		if (array == null || array.length < 1)
-			return;
-		final Object value = ((ObjInstance) array[0].getData()).value;
-		if (value instanceof Image)
-			selectedImage = (Image) value;
-		imagesCanvas.redraw();
+		}
+
+		ObjInstance inst = (ObjInstance) array[0].getData();
+		displayObjectPaths(inst);
+		if (imgClassSelected) {
+			if (inst.value instanceof Image)
+				selectedImage = (Image) inst.value;
+			imagesCanvas.redraw();
+		}
+	}
+
+	private void clearObjectPaths() {
+		for (Control c : objectPaths.getChildren())
+			c.dispose();
+		new Label(objectPaths, 0).setText("No objects selected. Select an object to inspect it.");
+		objectPaths.layout(true, true);
+	}
+
+	private void displayObjectPaths(ObjInstance inst) {
+		for (Control c : objectPaths.getChildren())
+			c.dispose();
+		for (ReferencePath o : inst.paths) {
+			new ReferencePathDisplay(objectPaths, o);
+		}
+		objectPaths.layout(true, true);
 	}
 
 	void openWatcherForSelected() {
-		TableItem[] array = classTable.getSelection();
+		TableItem[] array = objectsTable.getSelection();
 		if (array == null || array.length < 1) {
 			return;
 		}
@@ -604,7 +639,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	public static final class AutoUpdate extends Thread {
 		boolean shouldRun;
-		long currentMillis;
+		long lastUpdate;
 		long updateInterval;
 		private final MemoryView mv;
 
@@ -613,23 +648,21 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			this.mv = mv;
 			this.updateInterval = updateInterval;
 			this.shouldRun = true;
-			mv.autoUpdater = this;
 		}
 
 		public void run() {
-			this.currentMillis = System.currentTimeMillis();
+			this.lastUpdate = System.currentTimeMillis();
 			while (this.shouldRun && !mv.getShell().isDisposed()) {
 				try {
-					if (System.currentTimeMillis() - this.currentMillis > this.updateInterval && !mv.isUpdating()) {
+					if (System.currentTimeMillis() - this.lastUpdate > this.updateInterval && !mv.isUpdating()) {
 						mv.updateModel();
 						mv.getShell().getDisplay().syncExec(mv::updateView);
-						currentMillis = System.currentTimeMillis();
+						lastUpdate = System.currentTimeMillis();
 					}
-					Thread.sleep(1L);
+					Thread.sleep(10L);
 				} catch (InterruptedException ignored) {
 				}
 			}
-			this.mv.autoUpdater = this;
 		}
 
 		public void stopThread() {

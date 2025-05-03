@@ -67,6 +67,13 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.selectableClasses.put(o.toString(), c);
 	}
 
+	public Watcher(final Class cls) {
+		this(WatcherType.Static);
+		final Instance c = new Instance(cls.getName(), null);
+		c.updateFields(null);
+		this.selectableClasses.put(cls.getName(), c);
+	}
+
 	public void fillClassList() {
 		new Thread(new ClassListFiller(this)).start();
 	}

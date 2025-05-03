@@ -44,6 +44,10 @@ public class ReferencePath {
 		return n;
 	}
 
+	public ReferencePathEntry[] getPath() {
+		return path.toArray(new ReferencePathEntry[0]);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

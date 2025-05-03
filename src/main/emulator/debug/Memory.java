@@ -528,7 +528,7 @@ public final class Memory {
 	 * @param s Class' name.
 	 * @return Class object.
 	 */
-	static Class cls(final String s) {
+	public static Class cls(final String s) {
 		Class<?> forName;
 		try {
 			forName = Class.forName(s, false, Emulator.getCustomClassLoader());

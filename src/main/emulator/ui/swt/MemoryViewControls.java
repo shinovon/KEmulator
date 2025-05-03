@@ -84,6 +84,7 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 		objectsSize.setText("Objects (now/max): " + objSize + "B/" + maxObjectsSize + "B  ");
 		totalSize.setText("Total memory used: " + ((objSize + Memory.getBytecodeSize()) / 1024) + "KiB  ");
 		jvmSize.setText("Real usage: " + ((t - f) / 1048576) + "/" + (t / 1048576) + "MiB  ");
+		this.layout();
 	}
 
 	@Override
