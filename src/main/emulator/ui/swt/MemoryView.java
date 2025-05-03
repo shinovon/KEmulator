@@ -290,10 +290,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				if (image.drawnRect == null)
 					continue;
 				if (image.drawnRect.contains(x, y)) {
-					if (image.image instanceof MemoryViewImage)
-						selectedObject = ((MemoryViewImage) image.image).source;
-					else
-						selectedObject = image.image;
+					selectedObject = image.source;
 					TableItem[] array = classTable.getSelection();
 					if (array == null || array.length < 1 || !selectedObject.getClass().getName().equals(array[0].getData())) {
 						// reselecting proper class
@@ -328,7 +325,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		int canvasH = imagesCanvas.getClientArea().height;
 		int y = 10 - this.imagesCanvasScroll;
 		if (drawImagesInfo)
-			y += fh * 3;
+			y += fh * 4;
 		int x = 10;
 		int max = 0;
 		final Color background = new Color(null, 151, 150, 147);
@@ -349,14 +346,14 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			final int size = MemoryView.imagesToShow.size();
 			for (int i = 0; i < size; ++i) {
 				ImageViewItem item = MemoryView.imagesToShow.get(i);
-				Image image = item.image;
+				Image image = item.drawable;
 				final int imgW = (int) (image.getWidth() * this.imageScaling);
 				final int imgH = (int) (image.getHeight() * this.imageScaling);
 				if (x + imgW + 30 > canvasW) {
 					x = 10;
 					y += max + 10;
 					if (drawImagesInfo)
-						y += fh * 3;
+						y += fh * 4;
 					max = 0;
 				}
 				if (y + imgH > 0 || y > canvasH) {
@@ -370,7 +367,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					}
 					if (item.released) {
 						gc.setForeground(releasedColor);
-					} else if (selectedObject == image || (image instanceof MemoryViewImage && ((MemoryViewImage) image).source == selectedObject)) {
+					} else if (item.source == selectedObject) {
 						gc.setForeground(selectedColor);
 					} else if (item.type == MemoryViewImageType.LCDUI) {
 						gc.setForeground(regularColor);
@@ -379,7 +376,8 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					}
 
 					if (drawImagesInfo) {
-						gc.drawString(item.getCaption(), x - 1, y - fh * 3, true);
+						gc.drawString(item.getCaption(), x - 1, y - fh * 4, true);
+						gc.drawString(item.type2, x - 1, y - fh * 3, true);
 						gc.drawString(image.getWidth() + "*" + image.getHeight(), x - 1, y - fh * 2, true);
 						if (item.released)
 							gc.drawString("Released", x - 1, y - fh, true);
@@ -400,7 +398,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					pixels3d += image.getWidth() * image.getHeight();
 					count3d++;
 				}
-				int minImgW = drawImagesInfo ? 30 : 0;
+				int minImgW = drawImagesInfo ? 50 : 0;
 				x += Math.max(imgW, minImgW) + 10;
 				max = Math.max(max, imgH);
 			}

@@ -22,7 +22,7 @@ final class SaveAllImagesListener extends SelectionAdapter {
 		if ((open = directoryDialog.open()) != null) {
 			for (int i = 0; i < MemoryView.imagesToShow.size(); ++i) {
 				try {
-					MemoryView.imagesToShow.get(i).image.getImpl().saveToFile(open + "/" + i + ".png");
+					MemoryView.imagesToShow.get(i).drawable.getImpl().saveToFile(open + "/" + i + ".png");
 				} catch (Exception ignored) {
 				}
 			}
