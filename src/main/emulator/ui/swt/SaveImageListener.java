@@ -5,6 +5,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.FileDialog;
 
+import javax.microedition.lcdui.Image;
+
 final class SaveImageListener extends SelectionAdapter {
 	private final MemoryView mv;
 
@@ -18,8 +20,8 @@ final class SaveImageListener extends SelectionAdapter {
 		(fileDialog = new FileDialog(mv.getShell(), 8192)).setText(UILocale.get("MEMORY_VIEW_SAVE_TO_FILE", "Save to file"));
 		fileDialog.setFilterExtensions(new String[]{"*.png"});
 		final String open;
-		if ((open = fileDialog.open()) != null && mv.getSelectedImage() != null) {
-			mv.getSelectedImage().getImpl().saveToFile(open);
+		if ((open = fileDialog.open()) != null && mv.getSelectedImage() instanceof Image) {
+			((Image) mv.getSelectedImage()).getImpl().saveToFile(open);
 		}
 	}
 }

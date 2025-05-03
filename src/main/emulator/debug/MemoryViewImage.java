@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public final class MemoryViewImage extends Image {
 	public final MemoryViewImageType type;
-	private final Object source;
+	public final Object source;
 
 	public MemoryViewImage(final IImage image, MemoryViewImageType type, Object source) {
 		super(image);

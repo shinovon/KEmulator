@@ -13,7 +13,7 @@ final class TableListener extends SelectionAdapter {
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
 		try {
-			mv.onTableItemSelection();
+			mv.onClassTableItemSelection();
 		} catch (Exception ignored) {
 		}
 	}

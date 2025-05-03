@@ -24,7 +24,7 @@ final class ObjectsTableListener extends MouseAdapter implements SelectionListen
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		mv.updateSelectedObject();
+		mv.onObjectTableItemSelection();
 	}
 
 	@Override

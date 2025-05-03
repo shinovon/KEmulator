@@ -3,10 +3,7 @@ package emulator.ui.swt;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
-import emulator.debug.Memory;
-import emulator.debug.MemoryViewImageType;
-import emulator.debug.ObjInstance;
-import emulator.debug.ReferencePath;
+import emulator.debug.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.*;
@@ -48,9 +45,9 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private boolean show2dImages = true;
 	private boolean show3dImages = true;
 	private boolean darkenUnused = false;
-	private boolean imgClassSelected;
+
 	private boolean drawImagesInfo = false;
-	private Image selectedImage;
+	private Object selectedObject;
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
 	private int sortColumn = -1;
@@ -293,13 +290,26 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				if (image.drawnRect == null)
 					continue;
 				if (image.drawnRect.contains(x, y)) {
-					selectedImage = image.image;
-					if (!imgClassSelected)
-						return true;
+					if (image.image instanceof MemoryViewImage)
+						selectedObject = ((MemoryViewImage) image.image).source;
+					else
+						selectedObject = image.image;
+					TableItem[] array = classTable.getSelection();
+					if (array == null || array.length < 1 || !selectedObject.getClass().getName().equals(array[0].getData())) {
+						// reselecting proper class
+						for (TableItem ti : classTable.getItems()) {
+							if (selectedObject.getClass().getName().equals(ti.getData())) {
+								classTable.setSelection(ti);
+								break;
+							}
+						}
+						onClassTableItemSelection();
+					}
 					for (int i = 0; i < objectsTable.getItemCount(); i++) {
 						ObjInstance o = (ObjInstance) objectsTable.getItem(i).getData();
-						if (o.value == selectedImage) {
+						if (o.value == selectedObject) {
 							objectsTable.select(i);
+							onObjectTableItemSelection();
 							imagesCanvas.redraw();
 							return true;
 						}
@@ -360,12 +370,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					}
 					if (item.released) {
 						gc.setForeground(releasedColor);
+					} else if (selectedObject == image || (image instanceof MemoryViewImage && ((MemoryViewImage) image).source == selectedObject)) {
+						gc.setForeground(selectedColor);
 					} else if (item.type == MemoryViewImageType.LCDUI) {
-						if (this.imgClassSelected && selectedImage == image) {
-							gc.setForeground(selectedColor);
-						} else {
-							gc.setForeground(regularColor);
-						}
+						gc.setForeground(regularColor);
 					} else {
 						gc.setForeground(texColor);
 					}
@@ -419,13 +427,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private void resortClasses() {
 		if (sortColumn == -1) return;
 		classesList.sort(new ClassListComparator(this, sortColumn));
-		for (int i = 0; i < this.classesList.size(); ++i) {
-			final String value = this.classesList.get(i);
-			final TableItem item;
-			(item = this.classTable.getItem(i)).setText(0, value);
-			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
-			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
-		}
+		setClassTableContent();
 	}
 
 	private void updateClassesView() {
@@ -445,27 +447,30 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				this.classTable.remove(this.classesList.size());
 			}
 		}
-		for (int k = 0; k < this.classesList.size(); ++k) {
-			final String value = this.classesList.get(k);
-			final TableItem item;
-			(item = this.classTable.getItem(k)).setText(0, value);
-			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
-			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
-		}
-		//this.aTable1096.setSortColumn(this.aTable1096.getColumn(0));
-		//this.aTable1096.setSortDirection(128);
+		setClassTableContent();
 	}
 
-	void onTableItemSelection() {
+	private void setClassTableContent() {
+		for (int i = 0; i < this.classesList.size(); ++i) {
+			final String value = this.classesList.get(i);
+			final TableItem item = this.classTable.getItem(i);
+			item.setText(0, value);
+			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
+			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
+			item.setData(value);
+		}
+	}
+
+	void onClassTableItemSelection() {
 		TableItem[] array = classTable.getSelection();
 		if (array == null || array.length < 1) {
 			return;
 		}
 		objectsTable.removeAll();
-		String text = array[0].getText(0);
-		Vector<ObjInstance> objs = this.memoryMgr.objs(text);
-		imgClassSelected = text.equalsIgnoreCase("javax.microedition.lcdui.Image");
-		selectedImage = null;
+		String cls = (String) array[0].getData();
+		Vector<ObjInstance> objs = this.memoryMgr.objs(cls);
+		if (selectedObject != null && !selectedObject.getClass().getName().equals(cls))
+			selectedObject = null;
 		for (ObjInstance o : objs) {
 			TableItem ti = new TableItem(objectsTable, 0);
 			if (o.paths.isEmpty())
@@ -563,15 +568,15 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		return shell;
 	}
 
-	Image getSelectedImage() {
-		return selectedImage;
+	Object getSelectedImage() {
+		return selectedObject;
 	}
 
 	Table getTheTable() {
 		return classTable;
 	}
 
-	void updateSelectedObject() {
+	void onObjectTableItemSelection() {
 		TableItem[] array = objectsTable.getSelection();
 		if (array == null || array.length < 1) {
 			clearObjectPaths();
@@ -580,11 +585,9 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 		ObjInstance inst = (ObjInstance) array[0].getData();
 		displayObjectPaths(inst);
-		if (imgClassSelected) {
-			if (inst.value instanceof Image)
-				selectedImage = (Image) inst.value;
-			imagesCanvas.redraw();
-		}
+		selectedObject = inst.value;
+		imagesCanvas.redraw();
+
 	}
 
 	private void clearObjectPaths() {
