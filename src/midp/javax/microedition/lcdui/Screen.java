@@ -3,7 +3,6 @@ package javax.microedition.lcdui;
 import emulator.KeyMapping;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
-import emulator.lcdui.SWTScreen;
 
 import java.util.Vector;
 
@@ -14,8 +13,6 @@ public abstract class Screen extends Displayable {
 	final Vector items;
 	//	private long lastPressTime;
 	int scroll;
-
-	protected SWTScreen swtImpl;
 
 	Screen() {
 		this("");
