@@ -6,8 +6,6 @@ import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.TargetedCommand;
-import emulator.ui.swt.EmulatorScreen;
-import org.eclipse.swt.graphics.Point;
 
 import java.util.Vector;
 

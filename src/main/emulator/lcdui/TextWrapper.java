@@ -14,7 +14,7 @@
 * Description:
 *
 */
-package javax.microedition.lcdui;
+package emulator.lcdui;
 
 import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.SWT;
@@ -27,6 +27,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
+
+import javax.microedition.lcdui.Font;
+import javax.microedition.lcdui.TextField;
 
 /**
  * Dynamic Text component implementation over the Text/ConstrainedText
@@ -84,7 +87,7 @@ class TextWrapper
 	 */
 	void construct(final Composite parent, final int addStyle)
 	{
-		Displayable.safeSyncExec(new Runnable()
+		SWTScreen.safeSyncExec(new Runnable()
 		{
 			public void run()
 			{
@@ -141,7 +144,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -158,7 +161,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -184,7 +187,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -219,7 +222,7 @@ class TextWrapper
 		retLineCount = 1;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -238,7 +241,7 @@ class TextWrapper
 		retLineHeight = 1;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -256,7 +259,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -287,7 +290,7 @@ class TextWrapper
 		retSelectedStr = "";
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -305,7 +308,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -324,7 +327,7 @@ class TextWrapper
 		retTopPixel = 0;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -384,7 +387,7 @@ class TextWrapper
 	 */
 	void setBackgroundColor(final int alpha, final int red, final int green, final int blue)
 	{
-		Displayable.safeSyncExec(new Runnable()
+		SWTScreen.safeSyncExec(new Runnable()
 		{
 			public void run()
 			{
@@ -416,7 +419,7 @@ class TextWrapper
 		height = aBounds.height;
 		if(control != null && width >= 0 && height >= 0)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -436,7 +439,7 @@ class TextWrapper
 		caret = aPosition;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -460,7 +463,7 @@ class TextWrapper
 		constraints = aConstraints;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -497,7 +500,7 @@ class TextWrapper
 		caret = text.length();
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -518,7 +521,7 @@ class TextWrapper
 		font = aFont;
 //		if(control != null)
 //		{
-//			Displayable.safeSyncExec(new Runnable()
+//			SWTScreen.safeSyncExec(new Runnable()
 //			{
 //				public void run()
 //				{
@@ -548,7 +551,7 @@ class TextWrapper
 		focused = aFocused;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -568,7 +571,7 @@ class TextWrapper
 	 */
 	void setForegroundColor(final int alpha, final int red, final int green, final int blue)
 	{
-		Displayable.safeSyncExec(new Runnable()
+		SWTScreen.safeSyncExec(new Runnable()
 		{
 			public void run()
 			{
@@ -591,7 +594,7 @@ class TextWrapper
 		inputMode = aInputMode;
 		if(control != null && control instanceof Text)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -623,7 +626,7 @@ class TextWrapper
 		maxSize = aMaxSize;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -642,7 +645,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -663,7 +666,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -687,7 +690,7 @@ class TextWrapper
 		y = aY;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -707,7 +710,7 @@ class TextWrapper
 	{
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -730,7 +733,7 @@ class TextWrapper
 		height = aHeight;
 		if(control != null && width >= 0 && height >= 0)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{
@@ -748,7 +751,7 @@ class TextWrapper
 		visible = aVisible;
 		if(control != null)
 		{
-			Displayable.safeSyncExec(new Runnable()
+			SWTScreen.safeSyncExec(new Runnable()
 			{
 				public void run()
 				{

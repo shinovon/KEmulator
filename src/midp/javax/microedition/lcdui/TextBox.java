@@ -1,53 +1,19 @@
 package javax.microedition.lcdui;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import emulator.lcdui.ITextBoxImpl;
+import emulator.lcdui.TextBoxSWT;
 
 public class TextBox extends Screen {
-
-	private SwtModifyListener swtModifyListener = new SwtModifyListener();
-
-	private TextWrapper textWrapper;
-
-	private int numLines;
-	private boolean firstDisplayable = false;
+	
+	ITextBoxImpl impl;
 
 	public TextBox(String title, String text, int maxSize, int constraints) {
 		super(title);
-		textWrapper = new TextWrapper(text, maxSize, constraints);
-		constructSwt();
-	}
-
-	protected Composite _constructSwtContent(int style) {
-		Composite c = super._constructSwtContent(style);
-		textWrapper.swtConstruct(c, SWT.V_SCROLL);
-		textWrapper.swtSetFont(Font.getDefaultSWTFont(true));
-		return c;
-	}
-
-	public void _swtShown() {
-		super._swtShown();
-		textWrapper.setModifyListener(swtModifyListener);
-		textWrapper.addKeyListener(swtKeyListener);
-		textWrapper.setFocused(true);
-	}
-
-	public void _swtHidden() {
-		super._swtHidden();
-		textWrapper.setModifyListener(null);
-		textWrapper.removeKeyListener(swtKeyListener);
-	}
-
-	public void _swtResized(int w, int h) {
-		super._swtResized(w, h);
-		textWrapper.swtSetFont(Font.getDefaultSWTFont(false));
-		textWrapper.setBounds(swtContent.getClientArea());
+		impl = new TextBoxSWT(this, title, text, maxSize, constraints);
 	}
 
 	protected void focusCaret() {
+		impl.focusCaret();
 	}
 
 	/**
@@ -57,7 +23,7 @@ public class TextBox extends Screen {
 	 */
 	public int getCaretPosition()
 	{
-		return textWrapper.getCaretPosition();
+		return impl.getCaretPosition();
 	}
 
 	/**
@@ -67,7 +33,7 @@ public class TextBox extends Screen {
 	 */
 	public String getString()
 	{
-		return textWrapper.getContent();
+		return impl.getString();
 	}
 
 	/**
@@ -77,7 +43,7 @@ public class TextBox extends Screen {
 	 */
 	public void setString(String newText)
 	{
-		textWrapper.setContent(newText);
+		impl.setString(newText);
 	}
 
 	/**
@@ -88,17 +54,7 @@ public class TextBox extends Screen {
 	 */
 	public int getChars(char[] charData)
 	{
-		if(charData == null)
-		{
-			throw new NullPointerException();
-		}
-		if(charData.length < getString().length())
-		{
-			throw new ArrayIndexOutOfBoundsException();
-		}
-		String content = textWrapper.getContent();
-		content.getChars(0, content.length(), charData, 0);
-		return content.length();
+		return impl.getChars(charData);
 	}
 
 	/**
@@ -111,19 +67,7 @@ public class TextBox extends Screen {
 	 */
 	public void setChars(char[] charData, int offset, int length)
 	{
-		String extractedString = null;
-		if(charData != null)
-		{
-			try
-			{
-				extractedString = new String(charData, offset, length);
-			}
-			catch(IndexOutOfBoundsException e)
-			{
-				throw new ArrayIndexOutOfBoundsException();
-			}
-		}
-		textWrapper.setContent(extractedString);
+		impl.setChars(charData, offset, length);
 	}
 
 	/**
@@ -134,7 +78,7 @@ public class TextBox extends Screen {
 	 */
 	public void insert(String text, int position)
 	{
-		textWrapper.insert(text, position);
+		impl.insert(text, position);
 	}
 
 	/**
@@ -160,7 +104,7 @@ public class TextBox extends Screen {
 		{
 			throw new ArrayIndexOutOfBoundsException();
 		}
-		textWrapper.insert(extractedString, position);
+		impl.insert(extractedString, position);
 	}
 
 	/**
@@ -171,7 +115,7 @@ public class TextBox extends Screen {
 	 */
 	public void delete(int offset, int length)
 	{
-		textWrapper.delete(offset, length);
+		impl.delete(offset, length);
 	}
 
 	/**
@@ -181,7 +125,7 @@ public class TextBox extends Screen {
 	 */
 	public int getMaxSize()
 	{
-		return textWrapper.getMaxSize();
+		return impl.getMaxSize();
 	}
 
 	/**
@@ -193,8 +137,7 @@ public class TextBox extends Screen {
 	 */
 	public int setMaxSize(int newMaxSize)
 	{
-		textWrapper.setMaxSize(newMaxSize);
-		return textWrapper.getMaxSize();
+		return impl.setMaxSize(newMaxSize);
 	}
 
 	/**
@@ -204,7 +147,7 @@ public class TextBox extends Screen {
 	 */
 	public int size()
 	{
-		return textWrapper.getSize();
+		return impl.size();
 	}
 
 	/**
@@ -214,10 +157,7 @@ public class TextBox extends Screen {
 	 */
 	public void setConstraints(int newConstraints)
 	{
-		textWrapper.setConstraints(newConstraints);
-
-		if(!textWrapper.isValidText(getString() , textWrapper.getTypeConstraint(newConstraints)))
-			setString("");
+		impl.setConstraints(newConstraints);
 	}
 
 	/**
@@ -227,7 +167,7 @@ public class TextBox extends Screen {
 	 */
 	public int getConstraints()
 	{
-		return textWrapper.getConstraints();
+		return impl.getConstraints();
 	}
 
 	/**
@@ -237,36 +177,47 @@ public class TextBox extends Screen {
 	 */
 	public void setInitialInputMode(String inputMode)
 	{
-		textWrapper.setInputMode(inputMode);
-	}
-
-	/**
-	 * Text modify listener.
-	 */
-	class SwtModifyListener implements ModifyListener
-	{
-
-		public void modifyText(ModifyEvent me)
-		{
-			int lines = TextWrapper.swtGetLineCount((Control) me.widget);
-			if(numLines != lines)
-			{
-				// the number of lines changed
-				numLines = lines;
-//				swtSetPreferredContentSize(-1, textWrapper
-//						.getPreferredHeight(Config.TEXTBOX_MAX_VISIBLE_LINES));
-			}
-		}
-
+		impl.setInitialInputMode(inputMode);
 	}
 
 	protected void _paint(final Graphics graphics) {
+		impl.paint(graphics);
 	}
 
 	protected void layout() {
+		impl.layout();
 	}
 
 	protected void defocus() {
+		impl.defocus();
+	}
+
+	public void _swtShown() {
+		impl.swtShown();
+	}
+
+	public void _swtHidden() {
+		impl.swtHidden();
+	}
+
+	public void _swtUpdateSizes() {
+		impl.swtUpdateSizes();
+	}
+
+	public Object _getSwtContent() {
+		return impl.getSwtContent();
+	}
+
+	public int getWidth() {
+		return impl.getWidth();
+	}
+
+	public int getHeight() {
+		return impl.getHeight();
+	}
+
+	public boolean _isSWT() {
+		return impl.isSWT();
 	}
 
 }

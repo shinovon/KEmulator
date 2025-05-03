@@ -1,19 +1,8 @@
 package javax.microedition.lcdui;
 
-import emulator.Emulator;
 import emulator.KeyMapping;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
-import emulator.ui.IScreen;
-import emulator.ui.swt.EmulatorScreen;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.MenuItem;
 
 import java.util.Vector;
 
@@ -24,12 +13,6 @@ public abstract class Screen extends Displayable {
 	final Vector items;
 	//	private long lastPressTime;
 	int scroll;
-
-	Composite swtContent;
-	private Rectangle swtContentArea;
-	private boolean swtInitialized;
-
-	static KeyListener swtKeyListener = new SwtKeyListener();
 
 	Screen() {
 		this("");
@@ -42,7 +25,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void _invokeKeyPressed(final int n) {
-		if (swtContent != null) return;
+		if (_isSWT()) return;
 //		final long currentTimeMillis;
 //		if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
 //			return;
@@ -75,7 +58,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void _invokeKeyRepeated(final int n) {
-		if (swtContent != null) return;
+		if (_isSWT()) return;
 		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
 			_keyScroll(Canvas.UP, true);
 			return;
@@ -115,7 +98,6 @@ public abstract class Screen extends Displayable {
 	}
 
 	public boolean _invokePointerPressed(final int x, final int y) {
-		if (swtContent != null) return false;
 		return false;
 	}
 
@@ -128,7 +110,7 @@ public abstract class Screen extends Displayable {
 	protected abstract void _paint(final Graphics p0);
 
 	public void _invokePaint(final Graphics graphics) {
-		if (swtContent != null) return;
+		if (_isSWT()) return;
 		Displayable._resetXRayGraphics();
 		final int color = graphics.getColor();
 		final int strokeStyle = graphics.getStrokeStyle();
@@ -147,7 +129,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	protected void _drawTitleBar(final Graphics graphics) {
-		if (swtContent != null) return;
+		if (_isSWT()) return;
 		String title = super.title == null ? "" : super.title.trim();
 		final int n;
 		final String value = String.valueOf(n = ((focusedItem != null) ? (this.items.indexOf(focusedItem) + 1) : this.items.size()));
@@ -174,26 +156,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	void _invokeSizeChanged(int w, int h, boolean b) {
-		if (swtContent != null) {
-			swtContent.getDisplay().asyncExec(this::_swtUpdateSizes);
-			Emulator.getEmulator().getScreen().repaint();
-			return;
-		}
 		super._invokeSizeChanged(w, h, b);
-	}
-
-	public int getWidth() {
-		if (swtContentArea != null) {
-			return swtContentArea.width;
-		}
-		return bounds[W];
-	}
-
-	public int getHeight() {
-		if (swtContentArea != null) {
-			return swtContentArea.height;
-		}
-		return bounds[H];
 	}
 
 	protected void _drawScrollBar(final Graphics graphics) {
@@ -204,98 +167,20 @@ public abstract class Screen extends Displayable {
 		return -1;
 	}
 
-	Composite _constructSwtContent(int style) {
-		Composite c = new Composite(getSwtParent(), SWT.NONE);
-		_setSwtStyle(c);
-		return c;
+	public boolean _isSWT() {
+		return false;
 	}
 
-	void constructSwt() {
-		syncExec(new Runnable() {
-			public void run() {
-				swtContent = _constructSwtContent(SWT.NONE);
-				swtContent.setVisible(false);
-				swtContentArea = _layoutSwtContent();
-			}
-		});
-	}
-
-	Rectangle _layoutSwtContent() {
-		Rectangle area = getSwtParent().getClientArea();
-		swtContent.setBounds(0, 0, area.width, area.height);
-		return swtContent.getClientArea();
-	}
-
-	public Composite _getSwtContent() {
-		return swtContent;
-	}
-
-	protected void finalize() throws Throwable {
-		syncExec(() -> {
-			if (swtContent != null && !swtContent.isDisposed()) {
-				swtContent.dispose();
-			}
-		});
-		super.finalize();
-	}
-
-	static Composite getSwtParent() {
-		return ((EmulatorScreen) Emulator.getEmulator().getScreen()).getCanvas();
+	public void _swtShown() {
 	}
 
 	public void _swtHidden() {
 	}
 
-	public void _swtShown() {
-		if (swtContent != null && !swtContent.isDisposed()) {
-			_swtUpdateSizes();
-		}
-	}
-
 	public void _swtUpdateSizes() {
-		Rectangle newArea = _layoutSwtContent();
-		if (swtContentArea == null || !swtInitialized
-				|| newArea.width != swtContentArea.width
-				|| newArea.height != swtContentArea.height) {
-			swtInitialized = true;
-			swtContentArea = newArea;
-			_swtResized(newArea.width, newArea.height);
-		}
 	}
 
-	public void _swtResized(int w, int h) {
-		if (this instanceof List) return;
-		swtContent.setFont(Font.getDefaultSWTFont(true));
-	}
-
-	void _setSwtStyle(Control c) {
-		int color = LCDUIUtils.backgroundColor;
-		c.setBackground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
-		color = LCDUIUtils.foregroundColor;
-		c.setForeground(new Color(null, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF));
-
-		c.setFont(Font.getDefaultSWTFont(!(this instanceof List)));
-	}
-
-	static class SwtKeyListener implements KeyListener {
-
-		public void keyPressed(KeyEvent keyEvent) {
-			if (keyEvent.keyCode == SWT.F11 || keyEvent.keyCode == 16777261 || keyEvent.keyCode == 16777259) {
-				((EmulatorScreen) Emulator.getEmulator().getScreen()).keyPressed(keyEvent);
-				return;
-			}
-			int n = keyEvent.keyCode & 0xFEFFFFFF;
-			Displayable d = Emulator.getCurrentDisplay().getCurrent();
-			String r;
-			if ((keyEvent.character >= 33 && keyEvent.character <= 90)
-					|| (r = KeyMapping.replaceKey(n)) == null) return;
-			n = Integer.parseInt(r);
-			if (KeyMapping.isLeftSoft(n) || KeyMapping.isRightSoft(n)) {
-				d.handleSoftKeyAction(n, true);
-			}
-		}
-
-		public void keyReleased(KeyEvent keyEvent) {
-		}
+	public Object _getSwtContent() {
+		return null;
 	}
 }

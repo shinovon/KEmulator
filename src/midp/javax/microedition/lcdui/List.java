@@ -1,25 +1,15 @@
 package javax.microedition.lcdui;
 
-import emulator.Emulator;
 import emulator.UILocale;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
+import emulator.lcdui.IListImpl;
+import emulator.lcdui.ListSWT;
 
 public class List extends Screen implements Choice {
 	public static final Command SELECT_COMMAND = new Command(UILocale.get("LCDUI_LIST_SELECT_COMMAND", "Select"), 1, 0);
-	private int type;
-	private Table swtTable;
-	private ChoiceImpl choiceImpl;
-	private Command selectCommand = List.SELECT_COMMAND;
+	private IListImpl impl;
 
-	private SwtTableSelectionListener swtTableListener =
-			new SwtTableSelectionListener();
+	private int type;
+	private Command selectCommand = List.SELECT_COMMAND;
 
 	public List(String s, int n) {
 		this(s, n, new String[0], null);
@@ -31,92 +21,7 @@ public class List extends Screen implements Choice {
 			throw new IllegalArgumentException();
 		}
 		this.type = type;
-		constructSwt();
-		switch(type)
-		{
-			case Choice.IMPLICIT:
-			case Choice.EXCLUSIVE:
-				choiceImpl = new ChoiceImpl(false);
-				break;
-			case Choice.MULTIPLE:
-				choiceImpl = new ChoiceImpl(true);
-				break;
-		}
-		choiceImpl.check(text, img);
-		for(int i = 0; i < text.length; i++)
-		{
-			append(text[i], img != null
-					? img[i] : null);
-		}
-	}
-
-
-
-	protected Composite _constructSwtContent(int style) {
-		Composite c = super._constructSwtContent(style);
-		swtTable = new Table(c, getStyle(type));
-		_setSwtStyle(swtTable);
-
-		swtTable.addListener(SWT.MeasureItem, event -> {
-			TableItem item = (TableItem)event.item;
-			String text = item.getText(event.index);
-			event.gc.setFont(item.getFont());
-			int i = SWT.DRAW_TRANSPARENT;
-			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON) {
-				i |= SWT.DRAW_DELIMITER | SWT.DRAW_TAB;
-			}
-			Point size = event.gc.textExtent(text, i);
-			org.eclipse.swt.graphics.Image img = (org.eclipse.swt.graphics.Image) item.getData(); //item.getImage();
-//			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON && text.indexOf('\n') != -1) {
-//				event.height = event.gc.textExtent("A\nA").y;
-//			} else {
-			event.height = size.y;
-//			}
-			int imgWidth = 0;
-			if (img != null) {
-				ImageData data = img.getImageData();
-				imgWidth = data.width;
-				int imgHeight = data.height;
-				if (imgWidth != 0 && imgHeight != 0) {
-					size.x += (int) ((float) (event.height * imgWidth) / imgHeight);
-				}
-			}
-			event.width = size.x + 2;
-		});
-		swtTable.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
-		swtTable.addListener(SWT.PaintItem, event -> {
-			TableItem item = (TableItem)event.item;
-			org.eclipse.swt.graphics.Image img = (org.eclipse.swt.graphics.Image) item.getData(); //item.getImage();
-			String text = item.getText(event.index);
-			event.gc.setFont(item.getFont());
-			int imgWidth = 0;
-			if (img != null) {
-				ImageData data = img.getImageData();
-				imgWidth = data.width;
-				int imgHeight = data.height;
-				if (imgWidth != 0 && imgHeight != 0) {
-					int dstWidth = (int) ((float) (event.height * imgWidth) / imgHeight);
-					event.gc.drawImage(img, 0, 0, imgWidth, imgHeight,
-							event.x, event.y,
-							dstWidth, event.height);
-					imgWidth = dstWidth;
-				} else {
-					imgWidth = 0;
-				}
-			}
-			int yOffset = 0;
-			if (event.index == 1) {
-				Point size = event.gc.textExtent(text);
-				yOffset = Math.max(0, (event.height - size.y) / 2);
-			}
-			int i = SWT.DRAW_TRANSPARENT;
-			if (choiceImpl.getFitPolicy() == Choice.TEXT_WRAP_ON) {
-				i |= SWT.DRAW_DELIMITER | SWT.DRAW_TAB;
-			}
-			event.gc.drawText(text, event.x + imgWidth, event.y + yOffset, i);
-		});
-
-		return c;
+		impl = new ListSWT(this, title, type, text, img);
 	}
 
 	public void setSelectCommand(Command cmd) {
@@ -154,16 +59,7 @@ public class List extends Screen implements Choice {
 	 */
 	public int append(String text, Image img)
 	{
-		final int index = choiceImpl.append(text, img);
-		syncExec(new Runnable()
-		{
-			public void run()
-			{
-				swtInsertItem(index);
-				swtUpdateSelection();
-			}
-		});
-		return index;
+		return impl.append(text, img);
 	}
 
 	/**
@@ -175,16 +71,7 @@ public class List extends Screen implements Choice {
 	 */
 	public void insert(int position, String text, Image img)
 	{
-		choiceImpl.insert(position, text, img);
-		final int index = position; // index of added element
-		syncExec(new Runnable()
-		{
-			public void run()
-			{
-				swtInsertItem(index);
-				swtUpdateSelection();
-			}
-		});
+		impl.insert(position, text, img);
 	}
 
 	/**
@@ -196,16 +83,7 @@ public class List extends Screen implements Choice {
 	 */
 	public void set(int position, String text, Image img)
 	{
-		choiceImpl.set(position, text, img);
-		final int index = position; // index of changed element
-		syncExec(new Runnable()
-		{
-			public void run()
-			{
-				swtSetItem(index);
-				swtUpdateSelection();
-			}
-		});
+		impl.set(position, text, img);
 	}
 
 	/**
@@ -215,19 +93,7 @@ public class List extends Screen implements Choice {
 	 */
 	public void delete(int position)
 	{
-		if (position < 0 || ( position >= size()))
-		{
-			throw new IndexOutOfBoundsException();
-		}
-		final int index = position; // index of changed element
-		syncExec(new Runnable()
-		{
-			public void run()
-			{
-				swtDeleteItem(index);
-				swtUpdateSelection();
-			}
-		});
+		impl.delete(position);
 	}
 
 	/**
@@ -235,17 +101,7 @@ public class List extends Screen implements Choice {
 	 */
 	public void deleteAll()
 	{
-		if(type != Choice.IMPLICIT)
-		{
-			choiceImpl.deleteAll();
-		}
-		syncExec(new Runnable()
-		{
-			public void run()
-			{
-				swtDeleteAllItems();
-			}
-		});
+		impl.deleteAll();
 	}
 
 	/**
@@ -255,7 +111,7 @@ public class List extends Screen implements Choice {
 	 */
 	public int getFitPolicy()
 	{
-		return choiceImpl.getFitPolicy();
+		return impl.getFitPolicy();
 	}
 
 	/**
@@ -266,7 +122,7 @@ public class List extends Screen implements Choice {
 	 */
 	public Font getFont(int position)
 	{
-		return choiceImpl.getFont(position);
+		return impl.getFont(position);
 	}
 
 	/**
@@ -277,7 +133,7 @@ public class List extends Screen implements Choice {
 	 */
 	public Image getImage(int position)
 	{
-		return choiceImpl.getImage(position);
+		return impl.getImage(position);
 	}
 
 	/**
@@ -288,7 +144,7 @@ public class List extends Screen implements Choice {
 	 */
 	public String getString(int position)
 	{
-		return choiceImpl.getString(position);
+		return impl.getString(position);
 	}
 
 	/**
@@ -299,7 +155,7 @@ public class List extends Screen implements Choice {
 	 */
 	public int getSelectedFlags(boolean[] selectedArray)
 	{
-		return choiceImpl.getSelectedFlags(selectedArray);
+		return impl.getSelectedFlags(selectedArray);
 	}
 
 	/**
@@ -309,7 +165,7 @@ public class List extends Screen implements Choice {
 	 */
 	public int getSelectedIndex()
 	{
-		return choiceImpl.getSelectedIndex();
+		return impl.getSelectedIndex();
 	}
 
 	/**
@@ -320,31 +176,16 @@ public class List extends Screen implements Choice {
 	 */
 	public boolean isSelected(int position)
 	{
-		return choiceImpl.isSelected(position);
+		return impl.isSelected(position);
 	}
 
 	public void setFitPolicy(int newFitPolicy)
 	{
-		choiceImpl.setFitPolicy(newFitPolicy);
-//		syncExec(new Runnable()
-//		{
-//			public void run()
-//			{
-//				swtTable.setWordWrap(choiceImpl.getFitPolicy()
-//						== Choice.TEXT_WRAP_ON);
-//			}
-//		});
+		impl.setFitPolicy(newFitPolicy);
 	}
 
 	public void setFont(int n, Font font) {
-		choiceImpl.setFont(n, font);
-		syncExec(new Runnable()
-		{
-			public void run()
-			{
-				swtSetItemFont(n);
-			}
-		});
+		impl.setFont(n, font);
 	}
 
 	/**
@@ -354,8 +195,7 @@ public class List extends Screen implements Choice {
 	 */
 	public void setSelectedFlags(boolean[] selectedArray)
 	{
-		choiceImpl.setSelectedFlags(selectedArray);
-		updateSelection();
+		impl.setSelectedFlags(selectedArray);
 	}
 
 	/**
@@ -366,8 +206,7 @@ public class List extends Screen implements Choice {
 	 */
 	public void setSelectedIndex(int position, boolean select)
 	{
-		choiceImpl.setSelected(position, select);
-		updateSelection();
+		impl.setSelectedIndex(position, select);
 	}
 
 	/**
@@ -377,188 +216,42 @@ public class List extends Screen implements Choice {
 	 */
 	public int size()
 	{
-		return choiceImpl.size();
+		return impl.size();
 	}
 
 	protected void _drawScrollBar(final Graphics graphics) {
+		impl.drawScrollBar(graphics);
 	}
 
 	protected void _paint(Graphics graphics) {
+		impl.paint(graphics);
 	}
 
 	protected void layout() {
+		impl.layout();
 	}
 
-	private int getStyle(int listType)
-	{
-		int tableStyle = SWT.V_SCROLL;
-		switch(listType)
-		{
-			case Choice.IMPLICIT:
-				tableStyle |= SWT.SINGLE;
-				break;
-			case Choice.EXCLUSIVE:
-				tableStyle |= SWT.SINGLE | SWT.RADIO;
-				break;
-			case Choice.MULTIPLE:
-				tableStyle |= SWT.MULTI | SWT.CHECK;
-				break;
-			default:
-				break;
-		}
-		return tableStyle;
+	public Command _getSelectCommand() {
+		return selectCommand;
 	}
 
-	private void updateSelection()
-	{
-		syncExec(new Runnable()
-		{
-			public void run()
-			{
-				swtUpdateSelection();
-			}
-		});
-	}
-	/**
-	 * Update eSWT Table selection.
-	 */
-	private void swtUpdateSelection()
-	{
-		if(type == IMPLICIT || type == EXCLUSIVE)
-		{
-			int sel = choiceImpl.getSelectedIndex();
-			if (sel == -1 && choiceImpl.size() > 0) {
-				sel = 0;
-			}
-			if((sel == 0) || (swtTable.getSelectionIndex() != sel))
-			{
-				swtTable.setSelection(sel);
-			}
-			if (isShown()) {
-				swtTable.setFocus();
-			}
-		}
-		else
-		{
-			int size = choiceImpl.size();
-			for(int i = 0; i < size; i++)
-			{
-				if(choiceImpl.isSelected(i))
-				{
-					swtTable.select(i);
-				}
-				else
-				{
-					swtTable.deselect(i);
-				}
-			}
-		}
-	}
-
-	private void swtInsertItem(int index)
-	{
-		TableItem item = new TableItem(swtTable, SWT.NONE, index);
-		Image img = choiceImpl.getImage(index);
-//		item.setImage(0, Image.getSWTImage(img));
-		item.setData(Image.getSWTImage(img));
-		item.setText(0, choiceImpl.getString(index));
-	}
-
-	private void swtSetItem(int index)
-	{
-		TableItem item = swtTable.getItem(index);
-		Image img = choiceImpl.getImage(index);
-//		item.setImage(0, Image.getSWTImage(img));
-		item.setData(Image.getSWTImage(img));
-		item.setText(0, choiceImpl.getString(index));
-		swtTable.redraw();
-	}
-
-	private void swtDeleteItem(int index)
-	{
-		swtTable.getItem(index).dispose();
-		choiceImpl.delete(index);
-	}
-
-	private void swtSetItemFont(int index)
-	{
-		Font font = choiceImpl.getFont(index);
-		swtTable.getItem(index).setFont(0, font == null ? null : Font.getSWTFont(font, false));
-	}
-
-	private void swtDeleteAllItems()
-	{
-		for(int i = swtTable.getItemCount() - 1; i >= 0; i--)
-		{
-			if(type == Choice.IMPLICIT)
-			{
-				choiceImpl.delete(i);
-			}
-			swtTable.getItem(i).dispose();
-		}
-	}
-
-	class SwtTableSelectionListener implements SelectionListener
-	{
-
-		private void update(SelectionEvent se)
-		{
-			if(se.widget != null && se.item != null)
-			{
-				int index = ((Table) se.widget).indexOf((TableItem) se.item);
-				if(index >= 0)
-				{
-					choiceImpl.setSelected(index, !isSelected(index));
-				}
-			}
-		}
-
-		public void widgetDefaultSelected(SelectionEvent se)
-		{
-			if(type == Choice.IMPLICIT)
-			{
-				if(size() > 0)
-				{
-					Emulator.getEventQueue().commandAction(selectCommand, List.this);
-				}
-			}
-		}
-
-		public void widgetSelected(SelectionEvent se)
-		{
-			if(type == Choice.IMPLICIT || type == Choice.EXCLUSIVE)
-			{
-				update(se);
-			}
-			else if(type == Choice.MULTIPLE)
-			{
-				if(se.detail == SWT.CHECK)
-				{
-					update(se);
-				}
-			}
-		}
-
+	public boolean _isSWT() {
+		return impl.isSWT();
 	}
 
 	public void _swtShown() {
-		super._swtShown();
-		swtTable.addSelectionListener(swtTableListener);
-		swtTable.addKeyListener(swtKeyListener);
-		updateSelection();
+		impl.swtShown();
 	}
 
 	public void _swtHidden() {
-		super._swtHidden();
-		if (swtTable == null || swtTable.isDisposed()) return;
-		swtTable.removeSelectionListener(swtTableListener);
-		swtTable.removeKeyListener(swtKeyListener);
+		impl.swtHidden();
 	}
 
-	public void _swtResized(int w, int h) {
-		super._swtResized(w, h);
-//		swtTable.setFont(Font.getDefaultSWTFont(false));
-		swtTable.pack();
-		swtTable.setBounds(swtContent.getClientArea());
+	public void _swtUpdateSizes() {
+		impl.swtUpdateSizes();
+	}
+
+	public Object _getSwtContent() {
+		return impl.getSwtContent();
 	}
 }
