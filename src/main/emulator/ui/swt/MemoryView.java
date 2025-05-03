@@ -178,7 +178,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
 
 		objectPaths = new Group(objectsPanel, SWT.V_SCROLL);
-		objectPaths.setText("Pathes to the object");
+		objectPaths.setText("Paths to the object");
 		GridLayout gl = new GridLayout(1, false);
 		objectPaths.setLayout(gl);
 		clearObjectPaths();
