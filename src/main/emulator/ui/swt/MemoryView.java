@@ -24,7 +24,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private Composite imagesPanel;
 	private ImageViewControls imageControls;
 	private MemoryViewControls memoryControls;
-	public Canvas imagesCanvas;
+	private Canvas imagesCanvas;
 	private SashForm horizontalSeparator;
 	private Composite memoryPanel;
 	private Table classTable;
@@ -32,8 +32,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private double imageScaling = 1d;
 	private int imagesSortingMethod;
 	private boolean sortImagesByAscending;
-	Menu menuSaveOne;
-	Menu menuSaveAll;
 	private static final Object updateLock = new Object();
 	static final Vector<Image> allImages = new Vector();
 	static final ArrayList<ImageViewItem> imagesToShow = new ArrayList<>();
@@ -207,18 +205,20 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		imagesCanvas = new Canvas(this.imagesPanel, 537135616);
 		imagesCanvas.setLayout(null);
 		this.imagesCanvas.setLayoutData(canvasLayout);
-		this.imagesCanvas.addPaintListener(new ImagesCanvasRepainter(this));
-		this.imagesCanvas.addMouseListener(new ImagesCanvasListener(this));
-		this.imagesCanvas.getVerticalBar().addSelectionListener(new Class23(this));
+		ImagesCanvasListener listener = new ImagesCanvasListener(this, imagesCanvas);
+		this.imagesCanvas.addPaintListener(listener);
+		this.imagesCanvas.addMouseListener(listener);
+		this.imagesCanvas.getVerticalBar().addSelectionListener(listener);
 
-		this.menuSaveOne = new Menu(this.shell, 8);
-		final MenuItem menuItem;
-		(menuItem = new MenuItem(this.menuSaveOne, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_AS", "Save As..."));
+		Menu menuSave = new Menu(this.shell, 8);
+		final MenuItem menuItem = new MenuItem(menuSave, 8);
+		menuItem.setText(UILocale.get("MEMORY_VIEW_SAVE_ONE", "Export selected image"));
 		menuItem.addSelectionListener(new SaveImageListener(this));
-		this.menuSaveAll = new Menu(this.shell, 8);
-		final MenuItem menuItem2;
-		(menuItem2 = new MenuItem(this.menuSaveAll, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Save All Images..."));
+		final MenuItem menuItem2 = new MenuItem(menuSave, 8);
+		menuItem2.setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Export all images"));
 		menuItem2.addSelectionListener(new SaveAllImagesListener(this));
+
+		imagesCanvas.setMenu(menuSave);
 	}
 
 	private void updateModel() {
@@ -284,7 +284,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		this.resortImages();
 	}
 
-	public boolean selectImageClicked(final int x, final int y) {
+	public void selectImageClicked(final int x, final int y) {
 		synchronized (MemoryView.updateLock) {
 			for (ImageViewItem image : imagesToShow) {
 				if (image.drawnRect == null)
@@ -308,14 +308,13 @@ public final class MemoryView implements DisposeListener, ControlListener {
 							objectsTable.select(i);
 							onObjectTableItemSelection();
 							imagesCanvas.redraw();
-							return true;
+							return;
 						}
 					}
 					imagesCanvas.redraw();
-					return true;
+					return;
 				}
 			}
-			return false;
 		}
 	}
 
@@ -613,6 +612,24 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		if (value != null && emulator.debug.ClassTypes.isObject(value.getClass())) {
 			new Watcher(value).open(shell);
 		}
+	}
+
+	void exportSelectedImage() {
+		if (getSelectedImage() != null) {
+			for (ImageViewItem item : imagesToShow) {
+				if (item.source == getSelectedImage()) {
+					final FileDialog fileDialog;
+					(fileDialog = new FileDialog(getShell(), 8192)).setText(UILocale.get("MEMORY_VIEW_SAVE_TO_FILE", "Save to file"));
+					fileDialog.setFilterExtensions(new String[]{"*.png"});
+					final String open;
+					if ((open = fileDialog.open()) != null) {
+						item.drawable.getImpl().saveToFile(open);
+					}
+					return;
+				}
+			}
+		}
+		Emulator.getEmulator().getScreen().showMessage("No images selected. Click at one to select it.");
 	}
 
 	int getSortingMethod() {

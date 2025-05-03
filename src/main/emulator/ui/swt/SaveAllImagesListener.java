@@ -15,7 +15,7 @@ final class SaveAllImagesListener extends SelectionAdapter {
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
 		final DirectoryDialog directoryDialog;
-		(directoryDialog = new DirectoryDialog(mv.getShell())).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL_IMAGES", "Save all images"));
+		(directoryDialog = new DirectoryDialog(mv.getShell())).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Export all images"));
 		directoryDialog.setMessage(UILocale.get("MEMORY_VIEW_CHOOSE_DIRECTORY", "Choose a directory"));
 		directoryDialog.setFilterPath(System.getProperty("user.dir"));
 		final String open;
