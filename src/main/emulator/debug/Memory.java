@@ -73,7 +73,7 @@ public final class Memory {
 		checkClasses.add("javax.microedition.lcdui.Graphics");
 	}
 
-	public void updateEverything() {
+	public synchronized void updateEverything() {
 		// copy still alive images
 		if (Settings.recordReleasedImg) {
 			for (Image image : images) {

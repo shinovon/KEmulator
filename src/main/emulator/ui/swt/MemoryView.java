@@ -250,16 +250,18 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		synchronized (MemoryView.updateLock) {
 			MemoryView.allImages.clear();
 			MemoryView.imagesToShow.clear();
-			for (Image image : this.memoryMgr.images) {
-				allImages.add(image);
-				boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
-				if (!add)
-					continue;
-				ImageViewItem i = new ImageViewItem(image, false);
-				boolean add2 = (show2dImages && i.type == MemoryViewImageType.LCDUI) || (show3dImages && i.type != MemoryViewImageType.LCDUI);
-				if (add2)
-					MemoryView.imagesToShow.add(i);
+			synchronized (this.memoryMgr) {
+				for (Image image : this.memoryMgr.images) {
+					allImages.add(image);
+					boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
+					if (!add)
+						continue;
+					ImageViewItem i = new ImageViewItem(image, false);
+					boolean add2 = (show2dImages && i.type == MemoryViewImageType.LCDUI) || (show3dImages && i.type != MemoryViewImageType.LCDUI);
+					if (add2)
+						MemoryView.imagesToShow.add(i);
 
+				}
 			}
 			if (showReleasedImages) {
 				for (Image image : this.memoryMgr.releasedImages) {
