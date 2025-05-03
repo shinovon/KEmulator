@@ -116,7 +116,7 @@ public final class Memory {
 				o = null;
 			}
 			if (cls != null)
-				collectObjects(cls, o, s, false);
+				collectObjects(cls, o, new ReferencePath(s, o != null), false);
 		}
 
 		// iterate via lcdui static roots
@@ -127,7 +127,7 @@ public final class Memory {
 			} catch (Throwable ignored) {
 			}
 			if (cls != null)
-				collectObjects(cls, null, checkClass, false);
+				collectObjects(cls, null, new ReferencePath(checkClass, true), false);
 		}
 
 		if (m3gObjects.size() == 0) return;
@@ -153,7 +153,7 @@ public final class Memory {
 		}
 	}
 
-	private void collectObjects(final Class clazz, final Object o, final String path, boolean vector) {
+	private void collectObjects(final Class clazz, final Object o, final ReferencePath path, boolean vector) {
 		if (clazz.isInterface())
 			return;
 
@@ -230,13 +230,13 @@ public final class Memory {
 				while ((componentType = clazz2.getComponentType()).getComponentType() != null) {
 					clazz2 = componentType;
 				}
-				if (!ClassTypes.method871(componentType) && componentType != String.class) {
+				if (!ClassTypes.isObject(componentType) && componentType != String.class) {
 					return;
 				}
 				for (int i = 0; i < Array.getLength(o); ++i) {
 					final Object value;
 					if ((value = Array.get(o, i)) != null) {
-						this.collectObjects(value.getClass(), value, path + '[' + i + ']', true);
+						this.collectObjects(value.getClass(), value, path.append(value, i), true);
 					}
 				}
 			} else if (o instanceof Vector) {
@@ -245,7 +245,7 @@ public final class Memory {
 				while (elements.hasMoreElements()) {
 					final Object nextElement = elements.nextElement();
 					if (nextElement != null) {
-						this.collectObjects(nextElement.getClass(), nextElement, path + '[' + index + ']', true);
+						this.collectObjects(nextElement.getClass(), nextElement, path.append(nextElement, index), true);
 					}
 					index++;
 				}
@@ -258,7 +258,7 @@ public final class Memory {
 					final Object key = keys.nextElement();
 					final Object val = h.get(key);
 					if (val != null) {
-						this.collectObjects(val.getClass(), val, path + '[' + key + ']', true);
+						this.collectObjects(val.getClass(), val, path.append(val, key.toString(), true), true);
 					}
 				}
 				return;
@@ -278,7 +278,7 @@ public final class Memory {
 		}
 	}
 
-	private void iterateFields(Class clazz, Object o, String path) {
+	private void iterateFields(Class clazz, Object o, ReferencePath path) {
 		final Field[] fields = fields(clazz);
 		for (Field f : fields) {
 			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive())
@@ -288,11 +288,11 @@ public final class Memory {
 			f.setAccessible(true);
 
 			final Object value = ClassTypes.getFieldValue(o, f);
-			final String newPath;
+			final ReferencePath newPath;
 			if (Modifier.isStatic(f.getModifiers()))
-				newPath = clazz.getName() + '.' + fieldName;
+				newPath = new ReferencePath(clazz.getName(), true).append(value, fieldName, false);
 			else
-				newPath = path + '.' + fieldName;
+				newPath = path.append(value, fieldName, false);
 			if (!f.getType().isPrimitive() && value != null) {
 				this.collectObjects(value.getClass(), value, newPath, false);
 			}
@@ -510,7 +510,7 @@ public final class Memory {
 		} else {
 			for (int i = Array.getLength(o) - 1; i >= 0; --i) {
 				final Object value;
-				if ((value = Array.get(o, i)) != null && !ClassTypes.method871(clazz.getComponentType())) {
+				if ((value = Array.get(o, i)) != null && !ClassTypes.isObject(clazz.getComponentType())) {
 					n += this.size(value.getClass(), value);
 				} else if (value != null && value.getClass().isArray()) {
 					n += 16;

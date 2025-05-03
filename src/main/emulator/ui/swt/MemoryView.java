@@ -455,7 +455,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			if (o.paths.isEmpty())
 				ti.setText(0, "Unknown reference");
 			else if (o.paths.size() == 1)
-				ti.setText(0, o.paths.get(0));
+				ti.setText(0, o.paths.get(0).toString());
 			else
 				ti.setText(0, o.paths.get(0) + "; " + (o.paths.size() - 1) + " more");
 			String s = String.valueOf(o.value);
@@ -572,7 +572,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			return;
 		}
 		final Object value = ((ObjInstance) array[0].getData()).value;
-		if (value != null && emulator.debug.ClassTypes.method871(value.getClass())) {
+		if (value != null && emulator.debug.ClassTypes.isObject(value.getClass())) {
 			new Watcher(value).open(shell);
 		}
 	}
