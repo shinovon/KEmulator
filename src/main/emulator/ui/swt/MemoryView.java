@@ -35,7 +35,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private static final Object updateLock = new Object();
 	static final Vector<Image> allImages = new Vector();
 	static final ArrayList<ImageViewItem> imagesToShow = new ArrayList<>();
-	private boolean updateInProgress;
 	int imagesCanvasScroll;
 	private boolean imagesDrawn = true;
 	private boolean imagesNeverDrawn = true;
@@ -222,15 +221,14 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	}
 
 	private void updateModel() {
-		if (this.updateInProgress) return;
-		this.updateInProgress = true;
-		try {
-			this.memoryMgr.updateEverything();
-			this.updateImagesList();
-		} catch (Throwable ex) {
-			ex.printStackTrace();
+		synchronized (MemoryView.updateLock) {
+			try {
+				this.memoryMgr.updateEverything();
+				this.updateImagesList();
+			} catch (Throwable ex) {
+				ex.printStackTrace();
+			}
 		}
-		this.updateInProgress = false;
 	}
 
 	public void updateView() {
@@ -640,10 +638,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		return sortImagesByAscending;
 	}
 
-	public boolean isUpdating() {
-		return updateInProgress;
-	}
-
 	@Override
 	public void controlMoved(ControlEvent controlEvent) {
 
@@ -657,7 +651,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	public static final class AutoUpdate extends Thread {
 		boolean shouldRun;
-		long lastUpdate;
 		long updateInterval;
 		private final MemoryView mv;
 
@@ -669,15 +662,11 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		}
 
 		public void run() {
-			this.lastUpdate = System.currentTimeMillis();
 			while (this.shouldRun && !mv.getShell().isDisposed()) {
 				try {
-					if (System.currentTimeMillis() - this.lastUpdate > this.updateInterval && !mv.isUpdating()) {
-						mv.updateModel();
-						mv.getShell().getDisplay().syncExec(mv::updateView);
-						lastUpdate = System.currentTimeMillis();
-					}
-					Thread.sleep(10L);
+					mv.updateModel();
+					mv.getShell().getDisplay().syncExec(mv::updateView);
+					Thread.sleep(updateInterval);
 				} catch (InterruptedException ignored) {
 				}
 			}
