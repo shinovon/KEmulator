@@ -43,6 +43,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private boolean show2dImages = true;
 	private boolean show3dImages = true;
 	private boolean darkenUnused = false;
+	private boolean displayPkgNames = true;
 
 	private boolean drawImagesInfo = false;
 	private Object selectedObject;
@@ -313,18 +314,24 @@ public final class MemoryView implements DisposeListener, ControlListener {
 						}
 						onClassTableItemSelection();
 					}
-					for (int i = 0; i < objectsTable.getItemCount(); i++) {
-						ObjInstance o = (ObjInstance) objectsTable.getItem(i).getData();
-						if (o.value == selectedObject) {
-							objectsTable.select(i);
-							onObjectTableItemSelection();
-							imagesCanvas.redraw();
-							return;
-						}
-					}
+					syncObjectSelection();
 					imagesCanvas.redraw();
 					return;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Sets selection in table to {@link #selectedObject}.
+	 */
+	private void syncObjectSelection() {
+		for (int i = 0; i < objectsTable.getItemCount(); i++) {
+			ObjInstance o = (ObjInstance) objectsTable.getItem(i).getData();
+			if (o.value == selectedObject) {
+				objectsTable.select(i);
+				onObjectTableItemSelection();
+				return;
 			}
 		}
 	}
@@ -462,7 +469,12 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		for (int i = 0; i < this.classesList.size(); ++i) {
 			final String value = this.classesList.get(i);
 			final TableItem item = this.classTable.getItem(i);
-			item.setText(0, value);
+			if (displayPkgNames)
+				item.setText(0, value);
+			else {
+				String[] split = value.split("\\.");
+				item.setText(0, split[split.length - 1]);
+			}
 			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
 			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
 			item.setData(value);
@@ -484,9 +496,9 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			if (o.paths.isEmpty())
 				ti.setText(0, "Unknown reference");
 			else if (o.paths.size() == 1)
-				ti.setText(0, o.paths.get(0).toString());
+				ti.setText(0, o.paths.get(0).toString(displayPkgNames));
 			else
-				ti.setText(0, o.paths.get(0) + "; " + (o.paths.size() - 1) + " more");
+				ti.setText(0, o.paths.get(0).toString(displayPkgNames) + "; " + (o.paths.size() - 1) + " more");
 			String s = String.valueOf(o.value);
 			//XXX
 			if (s.length() > 128) {
@@ -572,6 +584,14 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		updateView();
 	}
 
+	void setPkgNamesDisplay(boolean b) {
+		displayPkgNames = b;
+		updateClassesView();
+		onClassTableItemSelection();
+		syncObjectSelection();
+		onObjectTableItemSelection();
+	}
+
 	Shell getShell() {
 		return shell;
 	}
@@ -595,7 +615,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		displayObjectPaths(inst);
 		selectedObject = inst.value;
 		imagesCanvas.redraw();
-
 	}
 
 	private void clearObjectPaths() {
@@ -603,6 +622,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			c.dispose();
 		new Label(objectPathsContainer, 0).setText("No objects selected. Select an object to inspect it.");
 		objectPaths.setText("Paths to the object");
+		objectPaths.layout(true, true);
 		relayoutObjectSizes();
 	}
 
@@ -610,9 +630,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		for (Control c : objectPathsContainer.getChildren())
 			c.dispose();
 		for (ReferencePath o : inst.paths) {
-			new ReferencePathDisplay(objectPathsContainer, o);
+			new ReferencePathDisplay(objectPathsContainer, o, displayPkgNames);
 		}
 		objectPaths.setText("Paths to the object (" + inst.paths.size() + ")");
+		objectPaths.layout(true, true);
 		relayoutObjectSizes();
 	}
 

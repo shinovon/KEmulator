@@ -19,6 +19,7 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 	private final Label totalSize;
 	private final Label jvmSize;
 	private final Button gc;
+	private final Button packages;
 
 	private int maxObjectsSize = 0;
 	private int objSize;
@@ -69,6 +70,12 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 		gc.setText("GC");
 		gc.setToolTipText("Perform garbage collection");
 		gc.addSelectionListener(this);
+
+		packages = new Button(this, 32);
+		packages.setText("Pkg names");
+		packages.setToolTipText("If disabled, package names in class names will be hidden. Disable if you want to see \"Display\" instead of \"javax.microedition.lcdui.Display\".");
+		packages.setSelection(true);
+		packages.addSelectionListener(this);
 	}
 
 	public void refreshStats() {
@@ -97,6 +104,8 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 			mv.updateEverything();
 			System.gc();
 			refreshStats(); // one more call after gc
+		} else if(e.widget == packages){
+			mv.setPkgNamesDisplay(packages.getSelection());
 		}
 	}
 

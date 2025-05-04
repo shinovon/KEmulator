@@ -63,8 +63,17 @@ public class ReferencePath {
 
 	@Override
 	public String toString() {
+		return toString(true);
+	}
+
+	public String toString(boolean showPkgName) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(root);
+		if (!showPkgName && isRootStatic) {
+			String[] split = root.split("\\.");
+			sb.append(split[split.length - 1]);
+		} else {
+			sb.append(root);
+		}
 		for (ReferencePathEntry entry : path) {
 			if (!entry.isIndex)
 				sb.append('.');

@@ -17,7 +17,7 @@ public class ReferencePathDisplay extends Composite implements SelectionListener
 
 	private final String rootName;
 
-	public ReferencePathDisplay(Composite parent, ReferencePath path) {
+	public ReferencePathDisplay(Composite parent, ReferencePath path, boolean fullNames) {
 		super(parent, 0);
 		final GridData gd = new GridData();
 		gd.horizontalAlignment = 4;
@@ -33,7 +33,12 @@ public class ReferencePathDisplay extends Composite implements SelectionListener
 		if (path.isRootStatic) {
 			rootName = path.root;
 			Link l = new Link(this, SWT.NONE);
-			l.setText("<a>" + path.root + "</a>");
+			if (fullNames)
+				l.setText("<a>" + path.root + "</a>");
+			else {
+				String[] split = path.root.split("\\.");
+				l.setText("<a>" + split[split.length - 1] + "</a>");
+			}
 			l.setToolTipText("Static class, click to open watcher");
 			l.setLinkForeground(null);
 			l.addSelectionListener(this);
