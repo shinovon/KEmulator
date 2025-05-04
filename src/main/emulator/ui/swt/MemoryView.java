@@ -6,6 +6,7 @@ import emulator.UILocale;
 import emulator.debug.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -51,6 +52,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	public static final String SHELL_TYPE = "MEMORY_VIEW";
 	private Group objectPaths;
+	private Composite objectPathsContainer;
 
 	public void open() {
 		createShell();
@@ -61,7 +63,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		);
 		shell.open();
 		shell.addDisposeListener(this);
-		shell.addControlListener(this);
 		updateEverything();
 		visible = true;
 		Display display = shell.getDisplay();
@@ -171,10 +172,22 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		(tableColumn6 = new TableColumn(this.objectsTable, 0)).setWidth(100);
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
 
-		objectPaths = new Group(objectsPanel, SWT.V_SCROLL);
-		objectPaths.setText("Paths to the object");
-		GridLayout gl = new GridLayout(1, false);
-		objectPaths.setLayout(gl);
+		// borders
+		objectPaths = new Group(objectsPanel, SWT.NONE);
+		objectPaths.setLayout(new GridLayout(1, false));
+		objectPaths.addControlListener(this);
+		// inner scroll
+		ScrolledComposite sc = new ScrolledComposite(objectPaths, SWT.V_SCROLL);
+		final GridData gd = new GridData();
+		gd.horizontalAlignment = 4;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = true;
+		gd.verticalAlignment = 4;
+		sc.setLayoutData(gd);
+		// scrolled content
+		objectPathsContainer = new Composite(sc, 0);
+		objectPathsContainer.setLayout(new GridLayout(1, false));
+		sc.setContent(objectPathsContainer);
 		clearObjectPaths();
 
 		objectsPanel.setWeights(new int[]{8, 2});
@@ -586,19 +599,25 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	}
 
 	private void clearObjectPaths() {
-		for (Control c : objectPaths.getChildren())
+		for (Control c : objectPathsContainer.getChildren())
 			c.dispose();
-		new Label(objectPaths, 0).setText("No objects selected. Select an object to inspect it.");
-		objectPaths.layout(true, true);
+		new Label(objectPathsContainer, 0).setText("No objects selected. Select an object to inspect it.");
+		objectPaths.setText("Paths to the object");
+		relayoutObjectSizes();
 	}
 
 	private void displayObjectPaths(ObjInstance inst) {
-		for (Control c : objectPaths.getChildren())
+		for (Control c : objectPathsContainer.getChildren())
 			c.dispose();
 		for (ReferencePath o : inst.paths) {
-			new ReferencePathDisplay(objectPaths, o);
+			new ReferencePathDisplay(objectPathsContainer, o);
 		}
-		objectPaths.layout(true, true);
+		objectPaths.setText("Paths to the object (" + inst.paths.size() + ")");
+		relayoutObjectSizes();
+	}
+
+	private void relayoutObjectSizes() {
+		objectPathsContainer.setSize(objectPathsContainer.computeSize(objectPathsContainer.getParent().getSize().x, -1));
 	}
 
 	void openWatcherForSelected() {
@@ -645,8 +664,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	@Override
 	public void controlResized(ControlEvent controlEvent) {
-		imageControls.layout(true, true);
-		imagesPanel.layout(true, true);
+		relayoutObjectSizes();
 	}
 
 	public static final class AutoUpdate extends Thread {
