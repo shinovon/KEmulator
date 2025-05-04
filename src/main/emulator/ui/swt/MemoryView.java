@@ -139,8 +139,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 		classTable = new Table(memoryPanel, 67584);
 		classTable.setHeaderVisible(true);
-		this.classTable.setLinesVisible(true);
-		this.classTable.addSelectionListener(new TableListener(this));
+		classTable.setLinesVisible(true);
+		TableListener tl = new TableListener(this);
+		classTable.addSelectionListener(tl);
+		classTable.addMouseListener(tl);
 		final TableColumn tableColumn;
 		(tableColumn = new TableColumn(this.classTable, 0)).setWidth(170);
 		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
@@ -649,6 +651,18 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		final Object value = ((ObjInstance) array[0].getData()).value;
 		if (value != null && emulator.debug.ClassTypes.isObject(value.getClass())) {
 			new Watcher(value).open(shell);
+		}
+	}
+
+	void openWatcherForSelectedClass() {
+		TableItem[] array = classTable.getSelection();
+		if (array == null || array.length < 1) {
+			return;
+		}
+		try {
+			new Watcher(Memory.cls(array[0].getData().toString())).open(getShell());
+		} catch (Exception ignored) {
+			// arrays will throw
 		}
 	}
 
