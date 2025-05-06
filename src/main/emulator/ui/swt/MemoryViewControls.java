@@ -33,11 +33,11 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 		rl.wrap = true;
 		rl.center = true;
 		rl.type = SWT.HORIZONTAL;
-		rl.spacing = 2;
+		rl.spacing = 8;
 		setLayout(rl);
 
 		autoUpdate = new Button(this, 32);
-		autoUpdate.setText("Autoupdate: each ");
+		autoUpdate.setText("Autoupdate: each");
 		autoUpdate.addSelectionListener(this);
 
 		autoUpdateInterval = new Text(this, 2048);
@@ -45,14 +45,14 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 		autoUpdateInterval.addModifyListener(this);
 		autoUpdateInterval.addFocusListener(this);
 
-		new Label(this, 0).setText("ms ");
+		new Label(this, 0).setText("ms");
 
 		updateNow = new Button(this, SWT.PUSH);
 		updateNow.setText("Update now");
 		updateNow.addSelectionListener(this);
 
 		Label bytecodeSize = new Label(this, 0);
-		bytecodeSize.setText("Bytecode size: " + Memory.getBytecodeSize() + "B  ");
+		bytecodeSize.setText("Bytecode size: " + Memory.getBytecodeSize() + "B    ");
 		bytecodeSize.setToolTipText("Total size of all loaded classes in bytes");
 
 		objectsSize = new Label(this, 0);
@@ -88,9 +88,9 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 	public void run() {
 		long t = Runtime.getRuntime().totalMemory();
 		long f = Runtime.getRuntime().freeMemory();
-		objectsSize.setText("Objects (now/max): " + objSize + "B/" + maxObjectsSize + "B  ");
-		totalSize.setText("Total memory used: " + ((objSize + Memory.getBytecodeSize()) / 1024) + "KiB  ");
-		jvmSize.setText("Real usage: " + ((t - f) / 1048576) + "/" + (t / 1048576) + "MiB  ");
+		objectsSize.setText("Objects (now/max): " + objSize + "B/" + maxObjectsSize + "B    ");
+		totalSize.setText("Total memory used: " + ((objSize + Memory.getBytecodeSize()) / 1024) + "KiB    ");
+		jvmSize.setText("Real usage: " + ((t - f) / 1048576) + "/" + (t / 1048576) + "MiB    ");
 		this.layout();
 	}
 
