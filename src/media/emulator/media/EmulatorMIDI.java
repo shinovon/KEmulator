@@ -8,16 +8,16 @@ import javax.sound.midi.*;
 
 public class EmulatorMIDI {
 	public static Player currentPlayer;
-	private static MidiDevice.Info[] midideviceinfo;
+	private static MidiDevice.Info[] deviceInfo;
 	private static Sequencer sequencer;
 	private static Synthesizer synthesizer;
 	private static MidiDevice device;
 	private static Receiver receiver;
 
 	public static void initDevices() {
-		if (midideviceinfo != null)
+		if (deviceInfo != null)
 			return;
-		midideviceinfo = MidiSystem.getMidiDeviceInfo();
+		deviceInfo = MidiSystem.getMidiDeviceInfo();
 	}
 
 	public static void initDevice() throws MidiUnavailableException {
@@ -26,7 +26,7 @@ public class EmulatorMIDI {
 
 	public static void initDevice(boolean noVms) throws MidiUnavailableException {
 		if (receiver == null && Settings.searchVms && !noVms) {
-			for (MidiDevice.Info info : midideviceinfo) {
+			for (MidiDevice.Info info : deviceInfo) {
 				if (info.getName().toLowerCase().contains("virtualmidisynth")) {
 					device = MidiSystem.getMidiDevice(info);
 					device.open();
