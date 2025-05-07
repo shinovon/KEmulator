@@ -154,4 +154,5 @@ public final class Settings {
 	public static float axisFilter = 0.05f, axisThreshold = 0.7f;
 	public static boolean controllerInverseHor;
 	public static boolean controllerInverseVer;
+	public static boolean altLessSpeedShortcuts;
 }
