@@ -107,6 +107,7 @@ public final class EmulatorScreen implements
 	MenuItem interposeHighMenuItem;
 	MenuItem speedUpMenuItem;
 	MenuItem slowDownMenuItem;
+	MenuItem resetSpeedMenuItem;
 	MenuItem recordKeysMenuItem;
 	MenuItem enableAutoplayMenuItem;
 	MenuItem captureToFileMenuItem;
@@ -1064,6 +1065,9 @@ public final class EmulatorScreen implements
 		this.speedUpMenuItem.addSelectionListener(this);
 		(this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDDOWN", "Slow Down") + "\tAlt+<");
 		this.slowDownMenuItem.addSelectionListener(this);
+		this.resetSpeedMenuItem = new MenuItem(this.menuTool, 8);
+		this.resetSpeedMenuItem.setText(UILocale.get("MENU_TOOL_SPEEDRESET", "Reset Speed") + "\tAlt+?");
+		this.resetSpeedMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuTool, 2);
 		(this.recordKeysMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_RECORD_KEY", "Record Keys"));
 		this.recordKeysMenuItem.addSelectionListener(this);
@@ -1186,6 +1190,7 @@ public final class EmulatorScreen implements
 		this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
 		this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
 		this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
+		this.resetSpeedMenuItem.setAccelerator(SWT.ALT | '/');
 		this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
 		this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
 		this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
@@ -1268,7 +1273,10 @@ public final class EmulatorScreen implements
 					this.zoomOut();
 					return;
 				}
-				if (menuItem == this.speedUpMenuItem) {
+				if (menuItem == this.resetSpeedMenuItem){
+					Settings.speedModifier = 1;
+					this.updateStatus();
+				} else if (menuItem == this.speedUpMenuItem) {
 					if (Settings.speedModifier == -1) {
 						Settings.speedModifier = 1;
 						this.updateStatus();
