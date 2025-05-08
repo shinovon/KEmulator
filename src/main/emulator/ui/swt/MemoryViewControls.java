@@ -4,10 +4,7 @@ import emulator.debug.Memory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 
 public class MemoryViewControls extends Composite implements SelectionListener, ModifyListener, Runnable, FocusListener {
 
@@ -51,20 +48,33 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 		updateNow.setText("Update now");
 		updateNow.addSelectionListener(this);
 
-		Label bytecodeSize = new Label(this, 0);
-		bytecodeSize.setText("Bytecode size: " + Memory.getBytecodeSize() + "B    ");
-		bytecodeSize.setToolTipText("Total size of all loaded classes in bytes");
+		Group bytecodeSizeGroup = new Group(this, SWT.NONE);
+		bytecodeSizeGroup.setText("Bytecode size");
+		bytecodeSizeGroup.setToolTipText("Total size of all loaded classes in bytes");
+		bytecodeSizeGroup.setLayout(new RowLayout());
+		Label bytecodeSize = new Label(bytecodeSizeGroup, 0);
+		bytecodeSize.setText(Memory.getBytecodeSize() + " bytes");
 
-		objectsSize = new Label(this, 0);
-		objectsSize.setText("Objects (now/max): ????????B/????????B  ");
-		objectsSize.setToolTipText("Total size of objects heap");
+		Group objectsSizeGroup = new Group(this, SWT.NONE);
+		objectsSizeGroup.setText("Objects size");
+		objectsSizeGroup.setToolTipText("Total size of objects heap");
+		objectsSizeGroup.setLayout(new RowLayout());
+		new Label(objectsSizeGroup, 0).setText("Now/max: ");
+		objectsSize = new Label(objectsSizeGroup, 0);
+		objectsSize.setText("????????B/????????B");
 
-		totalSize = new Label(this, 0);
-		totalSize.setText("Total memory used: ?????KiB  ");
+		Group totalSizeGroup = new Group(this, SWT.NONE);
+		totalSizeGroup.setText("Total memory used");
+		totalSizeGroup.setLayout(new RowLayout());
+		totalSize = new Label(totalSizeGroup, 0);
+		totalSize.setText("?????KiB");
 
-		jvmSize = new Label(this, 0);
-		jvmSize.setText("Real usage: ????/????MiB  ");
-		jvmSize.setToolTipText("Total memory, taken by KEmulator");
+		Group jvmSizeGroup = new Group(this, SWT.NONE);
+		jvmSizeGroup.setText("Real usage");
+		jvmSizeGroup.setToolTipText("Total memory, taken by KEmulator");
+		jvmSizeGroup.setLayout(new RowLayout());
+		jvmSize = new Label(jvmSizeGroup, 0);
+		jvmSize.setText("????/????MiB");
 
 		gc = new Button(this, SWT.PUSH);
 		gc.setText("GC");
@@ -88,10 +98,10 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 	public void run() {
 		long t = Runtime.getRuntime().totalMemory();
 		long f = Runtime.getRuntime().freeMemory();
-		objectsSize.setText("Objects (now/max): " + objSize + "B/" + maxObjectsSize + "B    ");
-		totalSize.setText("Total memory used: " + ((objSize + Memory.getBytecodeSize()) / 1024) + "KiB    ");
-		jvmSize.setText("Real usage: " + ((t - f) / 1048576) + "/" + (t / 1048576) + "MiB    ");
-		this.layout();
+		objectsSize.setText(objSize + "B / " + maxObjectsSize + "B");
+		totalSize.setText(((objSize + Memory.getBytecodeSize()) / 1024) + "KiB");
+		jvmSize.setText(((t - f) / 1048576) + "/" + (t / 1048576) + "MiB");
+		this.layout(true, true);
 	}
 
 	@Override
@@ -104,7 +114,7 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 			mv.updateEverything();
 			System.gc();
 			refreshStats(); // one more call after gc
-		} else if(e.widget == packages){
+		} else if (e.widget == packages) {
 			mv.setPkgNamesDisplay(packages.getSelection());
 		}
 	}
