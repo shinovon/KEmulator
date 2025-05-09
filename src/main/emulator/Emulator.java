@@ -1003,6 +1003,17 @@ public class Emulator implements Runnable {
 		return true;
 	}
 
+	public static String getProcessOutput(String commandline) throws IOException {
+		Process regRequest = Runtime.getRuntime().exec(commandline);
+		StringBuilder sw = new StringBuilder();
+		try (InputStream is = regRequest.getInputStream()) {
+			int c;
+			while ((c = is.read()) != -1)
+				sw.append((char) c);
+		}
+		return sw.toString();
+	}
+
 	public static String getAbsoluteFile() {
 		String s = System.getProperty("user.dir");
 		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
@@ -1053,14 +1064,7 @@ public class Emulator implements Runnable {
 		if (win) {
 			// installer will write to registry path to installed jar. Let's check it.
 			try {
-				Process regRequest = Runtime.getRuntime().exec("reg query \"HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator\" /v JarInstalledPath");
-				StringBuilder sw = new StringBuilder();
-				try (InputStream is = regRequest.getInputStream()) {
-					int c;
-					while ((c = is.read()) != -1)
-						sw.append((char) c);
-				}
-				String output = sw.toString();
+				String output = getProcessOutput("reg query \"HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator\" /v JarInstalledPath");
 				int i = output.indexOf("REG_SZ");
 				if (i != -1) {
 					String pathFromReg = output.substring(i + 6).trim();
