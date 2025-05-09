@@ -164,8 +164,8 @@ public class Graphics
 				n2 = n5 - height;
 			}
 
-			this.impl.drawImage(image.getImpl(), n, n2);
-			this.method289(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
+			impl.drawImage(image.getImpl(), n, n2);
+			updateDebugData(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
 			++image.usedCount;
 			++Profiler.drawImageCallCount;
 			Profiler.drawImagePixelCount += image.getWidth() * image.getHeight();
@@ -217,8 +217,10 @@ public class Graphics
 			this.impl.setTransform(transform2);
 			if (xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
-				this.method289(image, sx, sy, 0, 0, w, h);
+				this.updateDebugData(image, sx, sy, 0, 0, w, h);
 				this.xrayGraphics.setTransform(transform2);
+			} else {
+				updateDebugData(image, sx, sy, 0, 0, w, h);
 			}
 		}
 		++image.usedCount;
@@ -248,8 +250,10 @@ public class Graphics
 			this.impl.setTransform(transform2);
 			if (xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
-				this.method289(image, sx, sy, 0, 0, dw, dh);
+				this.updateDebugData(image, sx, sy, 0, 0, dw, dh);
 				this.xrayGraphics.setTransform(transform2);
+			} else {
+				updateDebugData(image, sx, sy, 0, 0, dw, dh);
 			}
 		}
 		++image.usedCount;
@@ -343,7 +347,7 @@ public class Graphics
 		this.impl.fillPolygon(this.anIntArray521);
 	}
 
-	private void method289(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
+	private void updateDebugData(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
 		int clipX = n3;
 		int clipY = n4;
 		int clipX2 = n3 + n5;

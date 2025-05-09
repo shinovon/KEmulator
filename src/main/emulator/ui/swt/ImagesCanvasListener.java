@@ -1,29 +1,35 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Menu;
 
-final class ImagesCanvasListener extends MouseAdapter {
+final class ImagesCanvasListener extends MouseAdapter implements SelectionListener, PaintListener {
 	private final MemoryView mv;
+	private final Canvas canvas;
 
-	ImagesCanvasListener(final MemoryView mv) {
+	ImagesCanvasListener(final MemoryView mv, final Canvas canvas) {
 		super();
 		this.mv = mv;
+		this.canvas = canvas;
 	}
 
 	public final void mouseDown(final MouseEvent mouseEvent) {
-		this.mv.imagesCanvas.forceFocus();
-		if (mouseEvent.button == 3) {
-			Canvas canvas = this.mv.imagesCanvas;
-			Menu menu;
-			if (this.mv.selectImageClicked(mouseEvent.x, mouseEvent.y)) {
-				menu = this.mv.menuSaveOne;
-			} else {
-				menu = this.mv.menuSaveAll;
-			}
-			canvas.setMenu(menu);
-		}
+		mv.selectImageClicked(mouseEvent.x, mouseEvent.y);
+	}
+
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+		canvas.redraw();
+	}
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent e) {
+
+	}
+
+	public final void paintControl(final PaintEvent paintEvent) {
+		mv.imagesCanvasScroll = canvas.getVerticalBar().getSelection();
+		mv.paintImagesCanvas(paintEvent.gc);
 	}
 }
