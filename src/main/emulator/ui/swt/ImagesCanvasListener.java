@@ -14,15 +14,11 @@ final class ImagesCanvasListener extends MouseAdapter {
 	}
 
 	public final void mouseDown(final MouseEvent mouseEvent) {
-		this.mv.imagesCanvas.forceFocus();
+		boolean selectionResult = this.mv.selectImageClicked(mouseEvent.x, mouseEvent.y);
 		if (mouseEvent.button == 3) {
+			this.mv.imagesCanvas.forceFocus();
 			Canvas canvas = this.mv.imagesCanvas;
-			Menu menu;
-			if (this.mv.selectImageClicked(mouseEvent.x, mouseEvent.y)) {
-				menu = this.mv.menuSaveOne;
-			} else {
-				menu = this.mv.menuSaveAll;
-			}
+			Menu menu = selectionResult ? mv.menuSaveOne : mv.menuSaveAll;
 			canvas.setMenu(menu);
 		}
 	}

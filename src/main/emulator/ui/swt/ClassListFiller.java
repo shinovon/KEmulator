@@ -18,7 +18,7 @@ final class ClassListFiller implements Runnable {
 			switch (this.watcher.type) {
 				case Static: {
 					for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
-						final String s = (String) Emulator.jarClasses.get(i);
+						final String s = Emulator.jarClasses.get(i);
 						try {
 							final Instance c;
 							if ((c = new Instance(s, s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null)).updateFields(null)) {
