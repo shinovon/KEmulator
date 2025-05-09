@@ -647,7 +647,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 			Settings.m3gContextMode = Integer.parseInt(properties.getProperty("M3GContextMode", "0"));
 
-			// mascot`
+			// mascot
 			Settings.mascotNo2DMixing = Boolean.parseBoolean(properties.getProperty("MascotNo2DMixing", "false"));
 			Settings.mascotIgnoreBackground = Boolean.parseBoolean(properties.getProperty("MascotIgnoreBackground", "false"));
 			Settings.mascotTextureFilter = Boolean.parseBoolean(properties.getProperty("MascotTextureFilter", "false"));
@@ -666,6 +666,13 @@ public final class Property implements IProperty, SelectionListener {
 
 			// security
 			Settings.enableSecurity = Boolean.parseBoolean(properties.getProperty("SecurityEnabled", "true"));
+
+			// devutils
+			Settings.ideaPath = properties.getProperty("IdeaPath", null);
+			Settings.eclipsePath = properties.getProperty("EclipsePath", null);
+			Settings.proguardPath = properties.getProperty("ProguardPath", null);
+			Settings.j2meDocsPath = properties.getProperty("J2MEDocsPath", null);
+			Settings.ideaJdkTablePatched = Boolean.parseBoolean(properties.getProperty("IdeaJdkTablePatched", "false"));
 
 			fileInputStream.close();
 		} catch (Exception ex) {
@@ -898,6 +905,13 @@ public final class Property implements IProperty, SelectionListener {
 			for (String k: Permission.permissions.keySet()) {
 				properties.setProperty("Security." + k, Permission.getPermissionLevelString(k));
 			}
+
+			// devutils
+			properties.setProperty("IdeaPath", Settings.ideaPath);
+			properties.setProperty("EclipsePath", Settings.eclipsePath);
+			properties.setProperty("ProguardPath", Settings.proguardPath);
+			properties.setProperty("J2MEDocsPath", Settings.j2meDocsPath);
+			properties.setProperty("IdeaJdkTablePatched", String.valueOf(Settings.ideaJdkTablePatched));
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
