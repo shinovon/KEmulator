@@ -907,10 +907,10 @@ public final class Property implements IProperty, SelectionListener {
 			}
 
 			// devutils
-			properties.setProperty("IdeaPath", Settings.ideaPath);
-			properties.setProperty("EclipsePath", Settings.eclipsePath);
-			properties.setProperty("ProguardPath", Settings.proguardPath);
-			properties.setProperty("J2MEDocsPath", Settings.j2meDocsPath);
+			if (Settings.ideaPath != null) properties.setProperty("IdeaPath", Settings.ideaPath);
+			if (Settings.eclipsePath != null) properties.setProperty("EclipsePath", Settings.eclipsePath);
+			if (Settings.proguardPath != null) properties.setProperty("ProguardPath", Settings.proguardPath);
+			if (Settings.j2meDocsPath != null) properties.setProperty("J2MEDocsPath", Settings.j2meDocsPath);
 			properties.setProperty("IdeaJdkTablePatched", String.valueOf(Settings.ideaJdkTablePatched));
 
 			properties.store(fileOutputStream, "KEmulator properties");
