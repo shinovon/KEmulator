@@ -15,6 +15,7 @@ import emulator.ui.swt.SWTFrontend;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
+import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Screen;
@@ -23,6 +24,7 @@ import javax.microedition.midlet.MIDlet;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -211,6 +213,41 @@ public class Emulator implements Runnable {
 		}
 
 		getEmulator().getScreen().showMessage("Failed to open file.");
+	}
+
+	public static void openUrlExternally(final String url) throws ConnectionNotFoundException {
+		if (linux) {
+			if (Files.isExecutable(Paths.get("/usr/bin/xdg-open"))) {
+				try {
+					Runtime.getRuntime().exec("/usr/bin/xdg-open \"" + url + "\"");
+					return;
+				} catch (IOException ignored) {
+				}
+			}
+		}
+		if (macos) {
+			try {
+				Runtime.getRuntime().exec("open \"" + url + "\"");
+				return;
+			} catch (IOException ignored) {
+			}
+		}
+		try {
+			if (Desktop.isDesktopSupported()) {
+				Desktop.getDesktop().browse(new URI(url));
+				return;
+			}
+		} catch (Exception ignored) {
+		}
+
+		if(win) {
+			try {
+				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+				return;
+			} catch (IOException ignored) {
+			}
+		}
+		throw new ConnectionNotFoundException("not supported");
 	}
 
 	private static void generateJad() {
