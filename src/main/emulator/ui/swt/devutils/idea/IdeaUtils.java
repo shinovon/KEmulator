@@ -4,6 +4,7 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.ui.swt.devutils.JavaTypeValidator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -48,6 +49,11 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	private Button chooseProjectsPath;
 	private Button createProject;
 	private Button fixClonedBtn;
+
+	private StyledText log;
+
+	public static final String proguardUrl = "https://nnproject.cc/dl/d/proguard.zip";
+	private Button proguardAutoBtn;
 
 	public IdeaUtils(Shell parent) {
 		shell = new Shell(parent, SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN);
@@ -140,11 +146,11 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 		if (Settings.proguardPath == null) {
 			// proguard installation
 
+			new Label(shell, SWT.NONE).setText("ProGuard is needed for packaging MIDlets into JARs.");
 			Group pgGroup = new Group(shell, SWT.NONE);
-			pgGroup.setText("ProGuard setup");
+			pgGroup.setText("Manual setup");
 			pgGroup.setLayout(genGLo());
 			pgGroup.setLayoutData(genGd());
-			new Label(pgGroup, SWT.NONE).setText("ProGuard is needed for packaging MIDlets into JARs.");
 			nnchanProguardBtn = new Button(pgGroup, SWT.PUSH);
 			nnchanProguardBtn.setText("Download v6.2.2 from nnproject archive");
 			nnchanProguardBtn.addSelectionListener(this);
@@ -156,6 +162,20 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			selectProguardBtn = new Button(pgGroup, SWT.PUSH);
 			selectProguardBtn.setText("Choose proguard JAR");
 			selectProguardBtn.addSelectionListener(this);
+
+			if (this instanceof IdeaUtilsXdgLinux) {
+				Group autoGroup = new Group(shell, SWT.NONE);
+				autoGroup.setText("Auto setup");
+				autoGroup.setLayout(genGLo());
+				autoGroup.setLayoutData(genGd());
+
+				proguardAutoBtn = new Button(autoGroup, SWT.PUSH);
+				proguardAutoBtn.setText("Do it");
+				proguardAutoBtn.addSelectionListener(this);
+
+				new Label(autoGroup, SWT.NONE).setText("Warning: XDG/GNU/Linux expected.");
+				new Label(autoGroup, SWT.NONE).setText("Will be used: wget, bash, unzip, install, pkexec.");
+			}
 
 			shell.layout(true, true);
 			return;
@@ -297,6 +317,20 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 		shell.layout(true, true);
 	}
 
+	private void makeLogWindow() {
+		for (Control c : shell.getChildren())
+			c.dispose();
+
+		log = new StyledText(shell, SWT.V_SCROLL | SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
+		GridData gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL;
+		gd.verticalAlignment = GridData.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = true;
+		log.setLayoutData(gd);
+		shell.layout(true, true);
+	}
+
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		if (e.widget == ideaDownloadLink) {
@@ -309,7 +343,18 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 		} else if (e.widget == githubProguardBtn) {
 			Emulator.openUrlExternallySilent("https://github.com/Guardsquare/proguard/releases/");
 		} else if (e.widget == nnchanProguardBtn) {
-			Emulator.openUrlExternallySilent("https://nnproject.cc/dl/d/proguard.zip");
+			Emulator.openUrlExternallySilent(proguardUrl);
+		} else if (e.widget == proguardAutoBtn) {
+			makeLogWindow();
+			new Thread(() -> {
+				try {
+					Settings.proguardPath = autoInstallProguard();
+					shell.getDisplay().syncExec(this::refreshContent);
+				} catch (Exception ex) {
+					shell.getDisplay().syncExec(() -> errorMsg("Failed to install proguard", ex.toString()));
+					shell.getDisplay().syncExec(this::refreshContent);
+				}
+			}).start();
 		} else if (e.widget == selectProguardBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose ProGuard JAR binary (\"path/proguard/lib/proguard.jar\")");
@@ -499,6 +544,16 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	protected abstract Set<IdeaInstallation> getIdeaInstallationPath();
 
 	protected abstract String getDefaultJdkTablePath() throws IOException;
+
+	protected abstract String autoInstallProguard() throws IOException, InterruptedException;
+
+	protected void appendLog(char c) {
+		shell.getDisplay().asyncExec(() -> log.append(String.valueOf(c)));
+	}
+
+	protected void appendLog(String s) {
+		shell.getDisplay().asyncExec(() -> log.append(s));
+	}
 
 	protected static IdeaInstallation fromPath(String path) throws IOException {
 		String[] output = Emulator.getProcessOutput(path + " --version").split(System.lineSeparator());

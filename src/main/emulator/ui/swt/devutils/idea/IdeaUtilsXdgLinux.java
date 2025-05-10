@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +37,46 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		String[] version = fromPath(Settings.ideaPath).version.split(" ")[2].split("\\.");
 		cfgFolder += version[0] + "." + version[1];
 		return cfgFolder;
+	}
+
+	protected String autoInstallProguard() throws IOException, InterruptedException {
+		if (Files.exists(Paths.get("/opt/proguard6.2.2")))
+			throw new IllegalArgumentException("Folder \"/opt/proguard6.2.2\" already exists. Maybe you already installed it?");
+		String tempZipName = "/tmp/proguard" + System.currentTimeMillis() + ".zip";
+		String tempFolderName = "/tmp/proguard" + System.currentTimeMillis() + "_ext";
+		appendLog("Downloading with wget, wait...\n");
+		Process wget = Runtime.getRuntime().exec(new String[]{"/usr/bin/wget", "-O", tempZipName, proguardUrl});
+		try (InputStream is = wget.getInputStream()) {
+			int c;
+			while ((c = is.read()) != -1) {
+				appendLog((char) c);
+			}
+		}
+		while (wget.isAlive())
+			Thread.sleep(100);
+		if (wget.exitValue() != 0)
+			throw new RuntimeException("wget failed, code: " + wget.exitValue());
+
+		appendLog("\nExtracting archive...\n");
+		Process unzip = Runtime.getRuntime().exec(new String[]{"/usr/bin/unzip", "-q", tempZipName, "-d", tempFolderName});
+		try (InputStream is = unzip.getInputStream()) {
+			int c;
+			while ((c = is.read()) != -1) {
+				appendLog((char) c);
+			}
+		}
+		while (unzip.isAlive())
+			Thread.sleep(100);
+		if (unzip.exitValue() != 0)
+			throw new RuntimeException("unzip failed, code: " + wget.exitValue());
+
+		appendLog("\nRunning installation...\n");
+		Process pkexec = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "bash", "-c", "/usr/bin/install -Dm644 " + tempFolderName + "/proguard6.2.2/lib/* -t /opt/proguard6.2.2/"});
+		while (pkexec.isAlive())
+			Thread.sleep(100);
+		if (pkexec.exitValue() != 0)
+			throw new RuntimeException("pkexec failed, code: " + pkexec.exitValue());
+		return "/opt/proguard6.2.2/proguard.jar";
 	}
 
 	//#region Launcher pathfinder
