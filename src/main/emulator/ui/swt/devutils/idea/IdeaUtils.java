@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 
@@ -371,12 +372,16 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			dd.setFilterPath("docs");
 			String path = dd.open();
 			if (path == null) return;
-			if (Files.exists(Paths.get(path, "midp-2.0", "javax", "microedition", "midlet", "MIDlet.html"))) {
+			try {
+				int found = Files.list(Paths.get(path)).filter(p -> Files.exists(p.resolve("javax").resolve("microedition").resolve("midlet").resolve("MIDlet.html"))).collect(Collectors.toList()).size();
+				if (found == 0)
+					throw new RuntimeException();
 				Settings.j2meDocsPath = path;
 				refreshContent();
-				return;
+			} catch (IOException ex) {
+				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
+
 			}
-			errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
 		} else if (e.widget == autoConfigBtn) {
 			try {
 				String path = getDefaultJdkTablePath() + "/options/jdk.table.xml";
