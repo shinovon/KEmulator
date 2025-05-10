@@ -1,6 +1,7 @@
 package emulator.ui.swt.devutils;
 
 import emulator.Emulator;
+import emulator.ui.swt.devutils.idea.IdeaUtilsWindows;
 import emulator.ui.swt.devutils.idea.IdeaUtilsXdgLinux;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -56,19 +57,23 @@ public class DevUtilsMainWindow implements DisposeListener, SelectionListener {
 		gd1.horizontalSpan = 2;
 		welcomeLabel.setLayoutData(gd1);
 
-		eclipse = new Button(shell, SWT.FLAT);
-		eclipse.setText("Eclipse JDT + MTJ");
 		GridData gd2 = new GridData();
 		gd2.horizontalAlignment = GridData.FILL;
-		gd2.verticalAlignment = GridData.FILL;
-		eclipse.setLayoutData(gd2);
-		eclipse.addSelectionListener(this);
+		gd2.verticalAlignment = GridData.CENTER;
+		Label temp = new Label(shell, 0);
+		temp.setText("Eclipse JDT + MTJ (not supported yet)");
+		temp.setLayoutData(gd2);
+		temp.setAlignment(SWT.CENTER);
+//		eclipse = new Button(shell, SWT.FLAT);
+//		eclipse.setText("Eclipse JDT + MTJ");
+//		eclipse.setLayoutData(gd2);
+//		eclipse.addSelectionListener(this);
 
-		idea = new Button(shell, SWT.FLAT);
-		idea.setText("Intellij IDEA");
 		GridData gd3 = new GridData();
 		gd3.horizontalAlignment = GridData.FILL;
 		gd3.verticalAlignment = GridData.FILL;
+		idea = new Button(shell, SWT.FLAT);
+		idea.setText("Intellij IDEA");
 		idea.setLayoutData(gd3);
 		idea.addSelectionListener(this);
 	}
@@ -110,7 +115,7 @@ public class DevUtilsMainWindow implements DisposeListener, SelectionListener {
 			if (Emulator.linux)
 				new IdeaUtilsXdgLinux(parent).open();
 			else
-				; // win
+				new IdeaUtilsWindows(parent).open();
 			shell.dispose();
 		}
 	}
