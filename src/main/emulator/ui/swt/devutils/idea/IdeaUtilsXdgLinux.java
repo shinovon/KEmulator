@@ -1,6 +1,5 @@
 package emulator.ui.swt.devutils.idea;
 
-import emulator.Emulator;
 import emulator.Settings;
 import org.eclipse.swt.widgets.Shell;
 
