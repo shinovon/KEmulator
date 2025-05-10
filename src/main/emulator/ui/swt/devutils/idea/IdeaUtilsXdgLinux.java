@@ -1,5 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
+import emulator.Emulator;
 import emulator.Settings;
 import org.eclipse.swt.widgets.Shell;
 
@@ -19,8 +20,8 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 	}
 
 	@Override
-	protected Set<IdeaInstallation> getIdeaInstallationPath() {
-		Set<IdeaInstallation> set = new HashSet<>();
+	protected Set<String> getIdeaInstallationPath() {
+		Set<String> set = new HashSet<>();
 		checkPath(set);
 		checkDesktopFiles(set);
 		//checkStandardLocations(set);
@@ -34,7 +35,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 			cfgFolder = System.getenv("HOME") + "/.config";
 		}
 		cfgFolder += "/JetBrains/IntelliJIdea";
-		String[] version = fromPath(Settings.ideaPath).version.split(" ")[2].split("\\.");
+		String[] version = getVersion(Settings.ideaPath).split(" ")[2].split("\\.");
 		cfgFolder += version[0] + "." + version[1];
 		return cfgFolder;
 	}
@@ -86,22 +87,19 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 
 	//#region Launcher pathfinder
 
-	private static void checkPath(Set<IdeaInstallation> set) {
+	private static void checkPath(Set<String> set) {
 		String pathEnv = System.getenv("PATH");
 		if (pathEnv == null) return;
 
 		for (String root : pathEnv.split(":")) {
 			File f = new File(root, "idea");
 			if (f.exists()) {
-				try {
-					set.add(fromPath(f.getAbsolutePath()));
-				} catch (IOException ignored) {
-				}
+				set.add(f.getAbsolutePath());
 			}
 		}
 	}
 
-	private static void checkDesktopFiles(Set<IdeaInstallation> set) {
+	private static void checkDesktopFiles(Set<String> set) {
 		Path[] appDirs = new Path[]{
 				Paths.get("/usr/share/applications"),
 				Paths.get(System.getProperty("user.home"), ".local/share/applications")
@@ -118,10 +116,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 					String binPath = parseExecFromDesktopFile(path);
 					if (binPath == null) continue;
 					if (binPath.endsWith("idea") || binPath.endsWith("idea.sh") || binPath.endsWith("idea64.sh")) {
-						try {
-							set.add(fromPath(binPath));
-						} catch (IOException ignored) {
-						}
+						set.add(binPath);
 					}
 				}
 			} catch (IOException e) {
@@ -152,7 +147,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		return null;
 	}
 
-	private static void checkStandardLocations(Set<IdeaInstallation> set) {
+	private static void checkStandardLocations(Set<String> set) {
 		String[] locations = new String[]{
 				"/opt",
 				System.getProperty("user.home") + "/.local/share/JetBrains",
@@ -171,10 +166,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 						.collect(Collectors.toList());
 
 				for (String path : result) {
-					try {
-						set.add(fromPath(path));
-					} catch (IOException ignored) {
-					}
+					set.add(path);
 				}
 			} catch (IOException e) {
 				// ignored
@@ -183,4 +175,17 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 	}
 
 	//#endregion
+
+	protected static String getVersion(String path) throws IOException {
+		String[] output = Emulator.getProcessOutput(new String[]{path, "--version"}).split(System.lineSeparator());
+		String ver = null;
+		for (String line : output) {
+			if (line.startsWith("IntelliJ")) {
+				ver = line;
+				break;
+			}
+		}
+		if (ver == null) throw new IllegalArgumentException();
+		return ver;
+	}
 }

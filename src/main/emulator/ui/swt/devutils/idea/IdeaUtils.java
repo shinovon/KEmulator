@@ -99,15 +99,15 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 
 			new Label(findGroup, SWT.NONE).setText("Please choose an IDEA installation you are going to work with.");
 
-			Set<IdeaInstallation> existing = getIdeaInstallationPath();
+			Set<String> existing = getIdeaInstallationPath();
 			if (existing.isEmpty()) {
 				new Label(findGroup, SWT.NONE).setText("Failed to automatically find any installed IDEAs!");
 			} else {
-				for (IdeaInstallation installation : existing) {
+				for (String installation : existing) {
+					new Label(findGroup, 0).setText(installation);
 					Button b = new Button(findGroup, SWT.FLAT);
-					b.setText(installation.version);
-					b.setToolTipText(installation.path);
-					b.setData(installation.path);
+					b.setText("Use this");
+					b.setData(installation);
 					b.addSelectionListener(this);
 				}
 			}
@@ -530,20 +530,8 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			fd.setFilterExtensions(new String[]{"idea", "idea*.sh"});
 		String path = fd.open();
 		if (path == null) return;
-		try {
-			IdeaInstallation ii = fromPath(path);
-
-			final MessageBox mb = new MessageBox(this.shell, SWT.ICON_INFORMATION | SWT.OK | SWT.CANCEL);
-			mb.setText("Custom IDEA location");
-			mb.setMessage("IDEA version: \"" + ii.version + "\"\nDo you want to use it?");
-			if (mb.open() == SWT.OK) {
-				Settings.ideaPath = path;
-				refreshContent();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			errorMsg("Custom IntelliJ IDEA location", "Failed to get IDEA version from selected binary. Logs may help you.");
-		}
+		Settings.ideaPath = path;
+		refreshContent();
 	}
 
 	@Override
@@ -554,7 +542,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	public void widgetDisposed(DisposeEvent e) {
 	}
 
-	protected abstract Set<IdeaInstallation> getIdeaInstallationPath();
+	protected abstract Set<String> getIdeaInstallationPath();
 
 	protected abstract String getDefaultJdkTablePath() throws IOException;
 
@@ -566,19 +554,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 
 	protected void appendLog(String s) {
 		shell.getDisplay().asyncExec(() -> log.append(s));
-	}
-
-	protected static IdeaInstallation fromPath(String path) throws IOException {
-		String[] output = Emulator.getProcessOutput(new String[]{path, "--version"}).split(System.lineSeparator());
-		String ver = null;
-		for (String line : output) {
-			if (line.startsWith("IntelliJ")) {
-				ver = line;
-				break;
-			}
-		}
-		if (ver == null) throw new IllegalArgumentException();
-		return new IdeaInstallation(ver, path);
 	}
 
 	private static boolean isValidRepoName(String input) {

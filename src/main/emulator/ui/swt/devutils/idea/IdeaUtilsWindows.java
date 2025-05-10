@@ -3,10 +3,8 @@ package emulator.ui.swt.devutils.idea;
 import emulator.Emulator;
 import org.eclipse.swt.widgets.Shell;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,8 +18,8 @@ public class IdeaUtilsWindows extends IdeaUtils {
 	}
 
 	@Override
-	protected Set<IdeaInstallation> getIdeaInstallationPath() {
-		Set<IdeaInstallation> set = new HashSet<>();
+	protected Set<String> getIdeaInstallationPath() {
+		Set<String> set = new HashSet<>();
 		//checkToolboxPaths(set);
 		checkStartMenuShortcuts(set);
 		return set;
@@ -39,7 +37,7 @@ public class IdeaUtilsWindows extends IdeaUtils {
 
 	//#region Binary pathfinder
 
-	private static void checkStartMenuShortcuts(Set<IdeaInstallation> set) {
+	private static void checkStartMenuShortcuts(Set<String> set) {
 		List<Path> startMenuDirs = new ArrayList<>();
 		String programData = System.getenv("ProgramData");
 		if (programData != null) {
@@ -72,7 +70,7 @@ public class IdeaUtilsWindows extends IdeaUtils {
 						}).filter(Objects::nonNull).collect(Collectors.toList());
 				for (String path : result) {
 					try {
-						set.add(fromPath(path));
+						set.add(path);
 					} catch (Exception ignored) {
 					}
 				}
@@ -81,7 +79,7 @@ public class IdeaUtilsWindows extends IdeaUtils {
 		}
 	}
 
-	private static void checkToolboxPaths(Set<IdeaInstallation> set) {
+	private static void checkToolboxPaths(Set<String> set) {
 		String localAppData = System.getenv("LOCALAPPDATA");
 		if (localAppData == null)
 			return;
@@ -98,7 +96,8 @@ public class IdeaUtilsWindows extends IdeaUtils {
 					.findFirst()
 					.orElse(null);
 			try {
-				set.add(fromPath(path));
+				if (path != null)
+					set.add(path);
 			} catch (Exception ignored) {
 			}
 		} catch (IOException ignored) {
