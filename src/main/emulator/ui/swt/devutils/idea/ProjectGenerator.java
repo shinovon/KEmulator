@@ -60,7 +60,7 @@ public class ProjectGenerator {
 
 		// root
 
-		try (BufferedWriter gi = new BufferedWriter(new FileWriter(Paths.get(dir,".gitignore").toString(), true))){
+		try (BufferedWriter gi = new BufferedWriter(new FileWriter(Paths.get(dir, ".gitignore").toString(), true))) {
 			gi.write(".idea/runConfigurations");
 			gi.newLine();
 			gi.write("proguard.cfg");
@@ -70,7 +70,18 @@ public class ProjectGenerator {
 		generateProGuardConfig(dir, projectName);
 
 		// code
-		Files.copy(Paths.get(appDescriptorPath), Paths.get(dir, "META-INF", "MANIFEST.MF"));
+		List<String> manifest = Files.readAllLines(Paths.get(appDescriptorPath));
+		boolean hasVersion = false;
+		for (String line : manifest) {
+			if (line.startsWith("Manifest-Version:")) {
+				hasVersion = true;
+				break;
+			}
+		}
+		if (!hasVersion) {
+			manifest.add(0, "Manifest-Version: 1.0");
+		}
+		Files.write(Paths.get(dir, "META-INF", "MANIFEST.MF"), manifest);
 		String midletClassName = getMidletClassNameFromMF(dir);
 
 		// ide config
