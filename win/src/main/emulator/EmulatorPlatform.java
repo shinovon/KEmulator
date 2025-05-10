@@ -101,6 +101,10 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		return "swt-win-x86.jar";
 	}
 
+	public String[] getLwjglLibraryNames(){
+		return new String[0];
+	}
+
 	private static void addToClassPath(String s) {
 		try {
 			Agent.addClassPath(new File(Emulator.getAbsolutePath() + File.separatorChar + s));

@@ -23,4 +23,6 @@ public interface IEmulatorPlatform {
 	IGraphics3D getGraphics3D();
 
 	String getSwtLibraryName();
+
+	String[] getLwjglLibraryNames();
 }

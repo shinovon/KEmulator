@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -52,17 +50,14 @@ public class JdkTablePatcher {
 			"siemensio.jar",
 	};
 
-	private static String[] getRuntimeJars() {
-		return new String[]{
-				"KEmulator.jar",
-				"lwjgl-glfw-natives-linux.jar",
-				"lwjgl-natives-linux.jar",
-				"lwjgl-opengl-natives-linux.jar",
-				"lwjgl3-swt-linux.jar",
-				"m3g_lwjgl.jar",
-				"micro3d_gl.jar",
-				Emulator.platform.getSwtLibraryName()
-		};
+	private static List<String> getRuntimeJars() {
+		Vector<String> libs = new Vector<>();
+		libs.add("KEmulator.jar");
+		libs.addAll(Arrays.asList(Emulator.platform.getLwjglLibraryNames()));
+		libs.add(Emulator.platform.getSwtLibraryName());
+		libs.add("m3g_lwjgl.jar");
+		libs.add("micro3d_gl.jar");
+		return libs;
 	}
 
 	//#region API
@@ -137,7 +132,7 @@ public class JdkTablePatcher {
 
 		addElement(doc, jdk, "name", "1.8 CLDC Devtime");
 		addElement(doc, jdk, "type", "JavaSDK");
-		addElement(doc, jdk, "version", "1.8.0_442");
+		addElement(doc, jdk, "version", System.getProperty("java.version"));
 		addElement(doc, jdk, "homePath", java8Path);
 
 		Element roots = doc.createElement("roots");
@@ -156,7 +151,7 @@ public class JdkTablePatcher {
 
 		addElement(doc, jdk, "name", "1.8 CLDC Runtime");
 		addElement(doc, jdk, "type", "JavaSDK");
-		addElement(doc, jdk, "version", "1.8.0_442");
+		addElement(doc, jdk, "version", System.getProperty("java.version"));
 		addElement(doc, jdk, "homePath", java8Path);
 
 		Element roots = doc.createElement("roots");
@@ -177,13 +172,12 @@ public class JdkTablePatcher {
 
 	private static Element createAnnotationsPath(Document doc) {
 		Element annotationsPath = doc.createElement("annotationsPath");
-		Element root1 = doc.createElement("root");
-		root1.setAttribute("type", "composite");
+		Element root = doc.createElement("root");
+		root.setAttribute("type", "composite");
 		Element childRoot = doc.createElement("root");
 		childRoot.setAttribute("url", "jar://$APPLICATION_HOME_DIR$/plugins/java/lib/resources/jdkAnnotations.jar!/");
 		childRoot.setAttribute("type", "simple");
-		root1.appendChild(childRoot);
-		Element root = root1;
+		root.appendChild(childRoot);
 		annotationsPath.appendChild(root);
 		return annotationsPath;
 	}
