@@ -240,7 +240,7 @@ public class Emulator implements Runnable {
 		} catch (Exception ignored) {
 		}
 
-		if(win) {
+		if (win) {
 			try {
 				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
 				return;
@@ -248,6 +248,14 @@ public class Emulator implements Runnable {
 			}
 		}
 		throw new ConnectionNotFoundException("not supported");
+	}
+
+	public static void openUrlExternallySilent(String url) {
+		try {
+			openUrlExternally(url);
+		} catch (ConnectionNotFoundException e) {
+			getEmulator().getScreen().showMessage("Failed to open URL.");
+		}
 	}
 
 	private static void generateJad() {
