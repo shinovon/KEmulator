@@ -351,7 +351,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 					Settings.proguardPath = autoInstallProguard();
 					shell.getDisplay().syncExec(this::refreshContent);
 				} catch (Exception ex) {
-					shell.getDisplay().syncExec(() -> errorMsg("Failed to install proguard", ex.toString()));
+					shell.getDisplay().syncExec(() -> errorMsg("Failed to install proguard", ex.getMessage()));
 					shell.getDisplay().syncExec(this::refreshContent);
 				}
 			}).start();
