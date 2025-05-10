@@ -52,10 +52,17 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 				appendLog((char) c);
 			}
 		}
-		while (wget.isAlive())
-			Thread.sleep(100);
-		if (wget.exitValue() != 0)
-			throw new RuntimeException("wget failed, code: " + wget.exitValue());
+		wget.waitFor();
+		switch (wget.exitValue()) {
+			case 0:
+				break;
+			case 3:
+				throw new IOException("I/O error when writing downloaded file");
+			case 4:
+				throw new IOException("Network error");
+			default:
+				throw new RuntimeException("wget failed with exit code: " + wget.exitValue());
+		}
 
 		appendLog("\nExtracting archive...\n");
 		Process unzip = Runtime.getRuntime().exec(new String[]{"/usr/bin/unzip", "-q", tempZipName, "-d", tempFolderName});
@@ -65,15 +72,13 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 				appendLog((char) c);
 			}
 		}
-		while (unzip.isAlive())
-			Thread.sleep(100);
+		unzip.waitFor();
 		if (unzip.exitValue() != 0)
 			throw new RuntimeException("unzip failed, code: " + wget.exitValue());
 
 		appendLog("\nRunning installation...\n");
 		Process pkexec = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "bash", "-c", "/usr/bin/install -Dm644 " + tempFolderName + "/proguard6.2.2/lib/* -t /opt/proguard6.2.2/"});
-		while (pkexec.isAlive())
-			Thread.sleep(100);
+		pkexec.waitFor();
 		if (pkexec.exitValue() != 0)
 			throw new RuntimeException("pkexec failed, code: " + pkexec.exitValue());
 		return "/opt/proguard6.2.2/proguard.jar";
