@@ -569,7 +569,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	}
 
 	protected static IdeaInstallation fromPath(String path) throws IOException {
-		String[] output = Emulator.getProcessOutput(path + " --version").split(System.lineSeparator());
+		String[] output = Emulator.getProcessOutput(new String[]{path, "--version"}).split(System.lineSeparator());
 		String ver = null;
 		for (String line : output) {
 			if (line.startsWith("IntelliJ")) {
