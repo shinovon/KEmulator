@@ -4,8 +4,6 @@ import emulator.Emulator;
 import emulator.Settings;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Vector;
 
 public class ProjectConfigGenerator {
 

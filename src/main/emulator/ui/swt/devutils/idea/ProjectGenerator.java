@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ProjectGenerator {
 
 		// code
 		Files.write(Paths.get(dir, "META-INF", "MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
-		String midletCodePath = generateDummyMidlet(location, projectName, midletClassName, dir);
+		String midletCodePath = generateDummyMidlet(dir, midletClassName);
 
 		// ide config
 		generateMiscXmls(dir, projectName);
@@ -145,11 +146,22 @@ public class ProjectGenerator {
 		Files.write(Paths.get(dir, ".idea", "modules.xml"), ProjectConfigGenerator.buildModulesFile(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static String generateDummyMidlet(String location, String projectName, String midletName, String dir) throws IOException {
-		Files.createDirectories(Paths.get(dir + "/src/" + ProjectConfigGenerator.splitByLastDot(midletName)[0].replace('.', '/')));
-		String midletCodePath = location + "/" + projectName + "/src/" + midletName.replace('.', '/') + ".java";
-		Files.write(Paths.get(midletCodePath), ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
-		return midletCodePath;
+	private static String generateDummyMidlet(String dir, String midletName) throws IOException {
+		String srcFolder = Paths.get(dir, "src").toString();
+		Path midletCodePath;
+		if (midletName.indexOf('.') != -1) {
+			String[] splitted = ProjectConfigGenerator.splitByLastDot(midletName);
+			String[] packagesNames = splitted[0].split("\\.");
+			Path midletFolder = Paths.get(srcFolder, packagesNames);
+			Files.createDirectories(midletFolder);
+			midletCodePath = midletFolder.resolve(splitted[1] + ".java");
+			Files.write(midletCodePath, ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
+		} else {
+			midletCodePath = Paths.get(srcFolder, midletName + ".java");
+			Files.write(midletCodePath, ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
+		}
+
+		return midletCodePath.toString();
 	}
 
 	private static void generateProGuardConfig(String dir, String projName) throws IOException {
