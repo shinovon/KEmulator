@@ -25,8 +25,8 @@ public class ProjectConfigGenerator {
 			"out/\n" +
 			"!**/src/main/**/out/\n" +
 			"!**/src/test/**/out/\n" +
-			"proguard.cfg\n"+
-			".idea/runConfigurations\n"+
+			"proguard.cfg\n" +
+			".idea/runConfigurations\n" +
 			"\n" +
 			"### Eclipse ###\n" +
 			".apt_generated\n" +
@@ -77,19 +77,26 @@ public class ProjectConfigGenerator {
 			"</module>";
 
 	public static String buildProguardConfig(String dir, String name) {
-		Vector<String> libs = new Vector<>();
+		StringBuilder sb = new StringBuilder();
 		for (String l : JdkTablePatcher.DEV_TIME_JARS) {
-			libs.add(Paths.get(Emulator.getAbsolutePath(), "uei", l).toString());
+			sb.append("-libraryjars '");
+			sb.append(Paths.get(Emulator.getAbsolutePath(), "uei", l));
+			sb.append("'");
+			sb.append(System.lineSeparator());
 		}
-
-		return "-libraryjars " + String.join(Emulator.win ? ";" : ":", libs) + "\n" +
-				"-injars      " + dir + "/deployed/raw/" + name + ".jar\n" +
-				"-outjar      " + dir + "/deployed/" + name + "_release.jar\n" +
-				"-printseeds  " + dir + "/deployed/pro_seeds.txt\n" +
-				"-printmapping " + dir + "/deployed/pro_map.txt\n" +
-				"-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.3 -optimizations !library/*,!code/simplification/object\n" +
-				"\n" +
-				"-keep public class * extends javax.microedition.midlet.MIDlet\n";
+		sb.append("-injars '").append(Paths.get(dir, "deployed", "raw", name + ".jar")).append("'");
+		sb.append(System.lineSeparator());
+		sb.append("-outjars '").append(Paths.get(dir, "deployed", name + "_release.jar")).append("'");
+		sb.append(System.lineSeparator());
+		sb.append("-printseeds '").append(Paths.get(dir, "deployed", "pro_seeds.txt")).append("'");
+		sb.append(System.lineSeparator());
+		sb.append("-printmapping '").append(Paths.get(dir, "deployed", "pro_map.txt")).append("'");
+		sb.append(System.lineSeparator());
+		sb.append("-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.3 -optimizations !library/*,!code/simplification/object");
+		sb.append(System.lineSeparator());
+		sb.append("-keep public class * extends javax.microedition.midlet.MIDlet");
+		sb.append(System.lineSeparator());
+		return sb.toString();
 	}
 
 	public static String buildManifest(String projName, String className, String appName) {
