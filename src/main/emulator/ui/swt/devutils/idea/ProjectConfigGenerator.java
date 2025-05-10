@@ -87,7 +87,7 @@ public class ProjectConfigGenerator {
 				"-outjar      " + dir + "/deployed/" + name + "_release.jar\n" +
 				"-printseeds  " + dir + "/deployed/pro_seeds.txt\n" +
 				"-printmapping " + dir + "/deployed/pro_map.txt\n" +
-				"-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.3 -allowaccessmodification -optimizations !library/*,!code/simplification/object -optimizationpasses 6\n" +
+				"-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.3 -optimizations !library/*,!code/simplification/object\n" +
 				"\n" +
 				"-keep public class * extends javax.microedition.midlet.MIDlet\n";
 	}
