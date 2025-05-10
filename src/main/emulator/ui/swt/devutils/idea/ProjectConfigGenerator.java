@@ -100,14 +100,18 @@ public class ProjectConfigGenerator {
 	}
 
 	public static String buildManifest(String projName, String className, String appName) {
-		return "Manifest-Version: 1.0\n" +
-				"MicroEdition-Configuration: CLDC-1.1\n" +
-				"MicroEdition-Profile: MIDP-2.0\n" +
-				"MIDlet-Vendor: Anonymous developer\n" +
-				"MIDlet-Version: 0.0.1\n" +
-				"MIDlet-Name: " + appName + "\n" +
-				"MIDlet-1: " + appName + ",," + className + "\n" +
-				"MIDlet-Jar-URL: " + projName + "_release.jar\n";
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Manifest-Version: 1.0").append(System.lineSeparator());
+		sb.append("MicroEdition-Configuration: CLDC-1.1").append(System.lineSeparator());
+		sb.append("MicroEdition-Profile: MIDP-2.0").append(System.lineSeparator());
+		sb.append("MIDlet-Vendor: Anonymous developer").append(System.lineSeparator());
+		sb.append("MIDlet-Version: 0.0.1").append(System.lineSeparator());
+		sb.append("MIDlet-Name: ").append(appName).append(System.lineSeparator());
+		sb.append("MIDlet-1: ").append(appName).append(",,").append(className).append(System.lineSeparator());
+		sb.append("MIDlet-Jar-URL: ").append(projName).append("_release.jar").append(System.lineSeparator());
+
+		return sb.toString();
 	}
 
 	public static String buildDummyMidlet(String className) {
