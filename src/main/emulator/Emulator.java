@@ -1177,7 +1177,7 @@ public class Emulator implements Runnable {
 		String parent = Paths.get(realHome).getParent().toString();
 		if (Files.exists(Paths.get(parent, "bin", win ? "javac.exe" : "javac"))) {
 			// we run with JRE in JDK
-			return realHome;
+			return parent;
 		}
 		// standalone JRE
 		return null;

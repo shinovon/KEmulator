@@ -229,6 +229,7 @@ public class JdkTablePatcher {
 		Path libPath = Paths.get(java8Path, "jre", "lib");
 		try (Stream<Path> stream = Files.walk(libPath)) {
 			stream.filter(p -> p.toString().endsWith(".jar"))
+					.filter(p -> !(p.toString().contains("security") && p.toString().contains("policy")))
 					.forEach(p -> paths.add("jar://" + p.toString().replace("\\", "/") + "!/"));
 		} catch (IOException e) {
 			e.printStackTrace();
