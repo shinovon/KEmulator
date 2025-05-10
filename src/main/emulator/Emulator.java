@@ -1163,6 +1163,26 @@ public class Emulator implements Runnable {
 		return getAbsolutePath();
 	}
 
+	/**
+	 * Attempts to find JDK near JRE KEmulator is running on.
+	 *
+	 * @return Null on failure, JDK home on success.
+	 */
+	public static String getJdkHome() {
+		String realHome = System.getProperty("java.home");
+		if (Files.exists(Paths.get(realHome, "bin", win ? "javac.exe" : "javac"))) {
+			// we run with JDK
+			return realHome;
+		}
+		String parent = Paths.get(realHome).getParent().toString();
+		if (Files.exists(Paths.get(parent, "bin", win ? "javac.exe" : "javac"))) {
+			// we run with JRE in JDK
+			return realHome;
+		}
+		// standalone JRE
+		return null;
+	}
+
 	public static void loadGame(String s, boolean b) {
 		loadGame(s, Settings.g2d, Settings.g3d, Settings.micro3d, b);
 	}
