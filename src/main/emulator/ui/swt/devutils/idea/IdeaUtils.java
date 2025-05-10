@@ -5,10 +5,7 @@ import emulator.Settings;
 import emulator.ui.swt.devutils.JavaTypeValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -18,6 +15,7 @@ import org.eclipse.swt.widgets.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +36,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	private Link ideaDownloadLink;
 	private Button jmeDocsBtn;
 	private Button selectJmeDocsBtn;
-	private Button autoConfigBtn;
 	private Button manualConfigBtn;
 	private Button skipPatchBtn;
 	private Button doPatchBtn;
@@ -212,10 +209,23 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 				new Label(jvmSetupGroup, SWT.NONE).setText("CLDC/MIDP projects need specific JDK setup in IDEA.");
 				new Label(jvmSetupGroup, SWT.NONE).setText("This will be done automatically.");
 				try {
-					String path = getDefaultJdkTablePath(); // may fail
-					autoConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
-					autoConfigBtn.setText("Edit \"" + path + "\"");
-					autoConfigBtn.addSelectionListener(this);
+					for (String path : getDefaultJdkSettingsFolder()) {
+						Button autoConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
+						autoConfigBtn.setText("Edit \"" + path + "\"");
+						autoConfigBtn.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent selectionEvent) {
+								try {
+									String table = Paths.get(path, "options", "jdk.table.xml").toString();
+									alreadyPatched = JdkTablePatcher.checkJdkTable(table);
+									jdkTablePath = table;
+									refreshContent();
+								} catch (Exception ex) {
+									errorMsg("Config location", "Failed to check config table. Logs may help you.\n\nException: " + ex);
+								}
+							}
+						});
+					}
 				} catch (Exception e) {
 					new Label(jvmSetupGroup, SWT.NONE).setText("Failed to automatically find config folder!");
 				}
@@ -382,15 +392,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
 
 			}
-		} else if (e.widget == autoConfigBtn) {
-			try {
-				String path = getDefaultJdkTablePath() + "/options/jdk.table.xml";
-				alreadyPatched = JdkTablePatcher.checkJdkTable(path);
-				jdkTablePath = path;
-				refreshContent();
-			} catch (Exception ex) {
-				errorMsg("Config location", "Failed to check config table. Logs may help you.\n\nException: " + ex);
-			}
 		} else if (e.widget == manualConfigBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose IDEA JDK table (\"IntelliJIdeaXXXX.Y/options/jdk.table.xml\")");
@@ -549,7 +550,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 
 	protected abstract Set<String> getIdeaInstallationPath();
 
-	protected abstract String getDefaultJdkTablePath() throws IOException;
+	protected abstract List<String> getDefaultJdkSettingsFolder() throws IOException;
 
 	protected abstract String autoInstallProguard() throws IOException, InterruptedException;
 

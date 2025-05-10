@@ -26,8 +26,12 @@ public class IdeaUtilsWindows extends IdeaUtils {
 	}
 
 	@Override
-	protected String getDefaultJdkTablePath() {
-		throw new UnsupportedOperationException("Not supported yet.");
+	protected List<String> getDefaultJdkSettingsFolder() throws IOException {
+		String home = System.getenv("USERPROFILE");
+		Path path = Paths.get(home, "AppData", "Roaming", "JetBrains");
+		try (Stream<Path> list = Files.list(path)) {
+			return list.filter(p -> p.getFileName().toString().toLowerCase().contains("idea")).map(Path::toString).collect(Collectors.toList());
+		}
 	}
 
 	@Override

@@ -29,7 +29,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 	}
 
 	@Override
-	protected String getDefaultJdkTablePath() throws IOException {
+	protected List<String> getDefaultJdkSettingsFolder() throws IOException {
 		String cfgFolder = System.getenv("XDG_CONFIG_HOME");
 		if (cfgFolder == null) {
 			cfgFolder = System.getenv("HOME") + "/.config";
@@ -37,7 +37,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		cfgFolder += "/JetBrains/IntelliJIdea";
 		String[] version = getVersion(Settings.ideaPath).split(" ")[2].split("\\.");
 		cfgFolder += version[0] + "." + version[1];
-		return cfgFolder;
+		return Collections.singletonList(cfgFolder);
 	}
 
 	protected String autoInstallProguard() throws IOException, InterruptedException {
