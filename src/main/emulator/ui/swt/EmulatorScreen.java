@@ -12,6 +12,7 @@ import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
+import emulator.ui.swt.devutils.DevUtilsMainWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StackLayout;
@@ -129,6 +130,7 @@ public final class EmulatorScreen implements
 	MenuItem mediaViewMenuItem;
 	MenuItem smsConsoleMenuItem;
 	MenuItem sensorMenuItem;
+	MenuItem devUtilsMenuItem;
 	MenuItem networkKillswitchMenuItem;
 	private MenuItem canvasKeyboardMenuItem;
 	private MenuItem changeResMenuItem;
@@ -952,7 +954,9 @@ public final class EmulatorScreen implements
 		this.smsConsoleMenuItem.addSelectionListener(this);
 		(this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
 		this.sensorMenuItem.addSelectionListener(this);
-
+		devUtilsMenuItem = new MenuItem(this.menuView, 8);
+		devUtilsMenuItem.setText("Developer utils");
+		devUtilsMenuItem.addSelectionListener(this);
 		(this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
 		this.logMenuItem.addSelectionListener(this);
 
@@ -1576,6 +1580,10 @@ public final class EmulatorScreen implements
 				}
 				return;
 			}
+			if (menuItem == devUtilsMenuItem) {
+				new DevUtilsMainWindow(shell).open();
+				return;
+			}
 			if (menuItem == this.smsConsoleMenuItem) {
 				if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
 					((MessageConsole) Emulator.getEmulator().getMessage()).dispose();
@@ -1792,7 +1800,7 @@ public final class EmulatorScreen implements
 			public void controlResized(ControlEvent controlEvent) {
 				caret.a(paintTransform, rotation);
 				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen
-						&& ((Screen)lastDisplayable)._isSWT()) {
+						&& ((Screen) lastDisplayable)._isSWT()) {
 					((Screen) lastDisplayable)._swtUpdateSizes();
 				}
 			}
