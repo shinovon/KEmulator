@@ -20,10 +20,15 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 public abstract class IdeaUtils implements DisposeListener, SelectionListener {
+
+	// state
+	private boolean didInstallation = false;
+	private String jdkTablePath = null;
+	private boolean alreadyPatched = false;
+
+	// view
 	private final Shell shell;
 	private Button chooseIdeaManuallyBtn;
-
-	private boolean didInstallation = false;
 	private Button refreshInstalledListBtn;
 	private Button nnchanProguardBtn;
 	private Button githubProguardBtn;
@@ -31,9 +36,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	private Link ideaDownloadLink;
 	private Button jmeDocsBtn;
 	private Button selectJmeDocsBtn;
-
-	private String jdkTablePath = null;
-	private boolean alreadyPatched = false;
 	private Button autoConfigBtn;
 	private Button manualConfigBtn;
 	private Button skipPatchBtn;
@@ -46,7 +48,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	private Button chooseProjectsPath;
 	private Button createProject;
 	private Button fixClonedBtn;
-
 
 	public IdeaUtils(Shell parent) {
 		shell = new Shell(parent, SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN);
@@ -190,8 +191,9 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 				new Label(jvmSetupGroup, SWT.NONE).setText("CLDC/MIDP projects need specific JDK setup in IDEA.");
 				new Label(jvmSetupGroup, SWT.NONE).setText("This will be done automatically.");
 				try {
+					String path = getDefaultJdkTablePath(); // may fail
 					autoConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
-					autoConfigBtn.setText("Edit \"" + getDefaultJdkTablePath() + "\"");
+					autoConfigBtn.setText("Edit \"" + path + "\"");
 					autoConfigBtn.addSelectionListener(this);
 				} catch (IOException e) {
 					new Label(jvmSetupGroup, SWT.NONE).setText("Failed to automatically find config folder!");
@@ -227,7 +229,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 					new Label(jvmSetupGroup, SWT.NONE).setText("You should not relocate them after the setup, or things will break.");
 				}
 			}
-
 
 			shell.layout(true, true);
 			return;
@@ -300,29 +301,16 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	public void widgetSelected(SelectionEvent e) {
 		if (e.widget == ideaDownloadLink) {
 			Emulator.openUrlExternallySilent("https://www.jetbrains.com/idea/download/");
-			return;
-		}
-		if (e.widget == refreshInstalledListBtn) {
+		} else if (e.widget == refreshInstalledListBtn) {
 			didInstallation = true;
 			refreshContent();
-			return;
-		}
-		if (e.widget == chooseIdeaManuallyBtn) {
+		} else if (e.widget == chooseIdeaManuallyBtn) {
 			chooseIdeaLauncherManually();
-			return;
-		}
-
-		if (e.widget == githubProguardBtn) {
+		} else if (e.widget == githubProguardBtn) {
 			Emulator.openUrlExternallySilent("https://github.com/Guardsquare/proguard/releases/");
-			return;
-		}
-
-		if (e.widget == nnchanProguardBtn) {
+		} else if (e.widget == nnchanProguardBtn) {
 			Emulator.openUrlExternallySilent("https://nnproject.cc/dl/d/proguard.zip");
-			return;
-		}
-
-		if (e.widget == selectProguardBtn) {
+		} else if (e.widget == selectProguardBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose ProGuard JAR binary (\"path/proguard/lib/proguard.jar\")");
 			fd.setFilterExtensions(new String[]{"proguard.jar"});
@@ -330,15 +318,9 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			if (path == null) return;
 			Settings.proguardPath = path;
 			refreshContent();
-			return;
-		}
-
-		if (e.widget == jmeDocsBtn) {
+		} else if (e.widget == jmeDocsBtn) {
 			Emulator.openUrlExternallySilent("https://github.com/nikita36078/J2ME_Docs/");
-			return;
-		}
-
-		if (e.widget == selectJmeDocsBtn) {
+		} else if (e.widget == selectJmeDocsBtn) {
 			DirectoryDialog dd = new DirectoryDialog(shell, SWT.OPEN);
 			dd.setText("Choose \"docs\" folder");
 			dd.setFilterPath("docs");
@@ -350,10 +332,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 				return;
 			}
 			errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
-			return;
-		}
-
-		if (e.widget == autoConfigBtn) {
+		} else if (e.widget == autoConfigBtn) {
 			try {
 				String path = getDefaultJdkTablePath() + "/options/jdk.table.xml";
 				alreadyPatched = JdkTablePatcher.checkJdkTable(path);
@@ -362,10 +341,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			} catch (Exception ex) {
 				errorMsg("Config location", "Failed to check config table. Logs may help you.\n\nException: " + ex);
 			}
-			return;
-		}
-
-		if (e.widget == manualConfigBtn) {
+		} else if (e.widget == manualConfigBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose IDEA JDK table (\"IntelliJIdeaXXXX.Y/options/jdk.table.xml\")");
 			fd.setFilterExtensions(new String[]{"jdk.table.xml"});
@@ -378,115 +354,112 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			} catch (Exception ex) {
 				errorMsg("Config location", "Failed to check config table. Logs may help you.\n\nException: " + ex);
 			}
-			return;
-		}
-
-		if (e.widget == skipPatchBtn) {
+		} else if (e.widget == skipPatchBtn) {
 			Settings.ideaJdkTablePatched = true;
 			refreshContent();
-			return;
-		}
-
-		if (e.widget == doPatchBtn) {
-			try {
-				JdkTablePatcher.updateJdkTable(jdkTablePath);
-				Settings.ideaJdkTablePatched = true;
-				refreshContent();
-			} catch (Exception ex) {
-				errorMsg("Config patch", "Failed to modify config table. Logs may help you.\n\nException: " + ex);
-			}
-			return;
-		}
-
-		if (e.widget == chooseProjectsPath) {
+		} else if (e.widget == doPatchBtn) {
+			patchJdkTable();
+		} else if (e.widget == chooseProjectsPath) {
 			DirectoryDialog dd = new DirectoryDialog(shell, SWT.OPEN);
 			dd.setText("Choose folder where you store your projects");
 			String path = dd.open();
 			if (path != null)
 				reposPath.setText(path);
-			return;
-		}
-
-		if (e.widget == createProject) {
-			String repoName = projectName.getText();
-			String className = midletClassName.getText();
-			String appName = midletName.getText();
-			String location = reposPath.getText();
-
-			if (repoName == null || repoName.isEmpty()) {
-				errorMsg("Project creation", "Project name must not be empty.");
-				return;
-			}
-			if (!isValidRepoName(repoName)) {
-				errorMsg("Project creation", "Project name must meet certain restrictions, check tooltip on the field.");
-				return;
-			}
-			if (className == null || className.isEmpty()) {
-				errorMsg("Project creation", "Class name must not be empty.");
-				return;
-			}
-			if (!JavaTypeValidator.isValidJavaTypeName(className)) {
-				errorMsg("Project creation", "Class name must be a valid Java class name.");
-				return;
-			}
-			if (appName == null || appName.isEmpty()) {
-				errorMsg("Project creation", "MIDlet name must not be empty.");
-				return;
-			}
-			if (location.endsWith("/") || location.endsWith("\\"))
-				location = location.substring(0, location.length() - 1);
-			if (!Files.exists(Paths.get(location))) {
-				errorMsg("Project creation", "Location for project doesn't exist.");
-				return;
-			}
-			if (Files.exists(Paths.get(location, repoName))) {
-				errorMsg("Project creation", "Folder with the specified name already exists. Do something with it.");
-				return;
-			}
-			try {
-				String code = ProjectGenerator.create(location, repoName, className, appName);
-				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, Paths.get(location, repoName).toString(), code});
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				errorMsg("Project creation", "Failed to generate project: " + ex.getMessage());
-			}
-		}
-
-		if (e.widget == fixClonedBtn) {
-			FileDialog fd = new FileDialog(shell, SWT.OPEN);
-			fd.setText("Choose IDEA project file");
-			fd.setFilterExtensions(new String[]{"*.iml"});
-			String path = fd.open();
-			if (path == null) return;
-			try {
-				String dir = ProjectGenerator.fixCloned(path);
-				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				errorMsg("Project restore", "Failed to generate project: " + ex.getMessage());
-			}
-		}
-
-		if (e.widget == chooseEclipse) {
-			FileDialog fd = new FileDialog(shell, SWT.OPEN);
-			fd.setText("Choose Eclipse application manifest");
-			fd.setFilterExtensions(new String[]{"Application Descriptor"});
-			String path = fd.open();
-			if (path == null) return;
-			try {
-				String dir = ProjectGenerator.convertEclipse(path);
-				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				errorMsg("Project conversion", "Failed to convert project: " + ex.getMessage());
-			}
-			return;
-		}
-
-		if (e.widget instanceof Button && e.widget.getData() instanceof String) {
+		} else if (e.widget == createProject) {
+			createProject();
+		} else if (e.widget == fixClonedBtn) {
+			restoreProject();
+		} else if (e.widget == chooseEclipse) {
+			convertProject();
+		} else if (e.widget instanceof Button && e.widget.getData() instanceof String) {
 			// idea path
 			Settings.ideaPath = e.widget.getData().toString();
 			refreshContent();
+		}
+	}
+
+	private void patchJdkTable() {
+		try {
+			JdkTablePatcher.updateJdkTable(jdkTablePath);
+			Settings.ideaJdkTablePatched = true;
+			refreshContent();
+		} catch (Exception ex) {
+			errorMsg("Config patch", "Failed to modify config table. Logs may help you.\n\nException: " + ex);
+		}
+	}
+
+	private void createProject() {
+		String repoName = projectName.getText();
+		String className = midletClassName.getText();
+		String appName = midletName.getText();
+		String location = reposPath.getText();
+
+		if (repoName == null || repoName.isEmpty()) {
+			errorMsg("Project creation", "Project name must not be empty.");
+			return;
+		}
+		if (!isValidRepoName(repoName)) {
+			errorMsg("Project creation", "Project name must meet certain restrictions, check tooltip on the field.");
+			return;
+		}
+		if (className == null || className.isEmpty()) {
+			errorMsg("Project creation", "Class name must not be empty.");
+			return;
+		}
+		if (!JavaTypeValidator.isValidJavaTypeName(className)) {
+			errorMsg("Project creation", "Class name must be a valid Java class name.");
+			return;
+		}
+		if (appName == null || appName.isEmpty()) {
+			errorMsg("Project creation", "MIDlet name must not be empty.");
+			return;
+		}
+		if (location.endsWith("/") || location.endsWith("\\"))
+			location = location.substring(0, location.length() - 1);
+		if (!Files.exists(Paths.get(location))) {
+			errorMsg("Project creation", "Location for project doesn't exist.");
+			return;
+		}
+		if (Files.exists(Paths.get(location, repoName))) {
+			errorMsg("Project creation", "Folder with the specified name already exists. Do something with it.");
+			return;
+		}
+		try {
+			String code = ProjectGenerator.create(location, repoName, className, appName);
+			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, Paths.get(location, repoName).toString(), code});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			errorMsg("Project creation", "Failed to generate project: " + ex.getMessage());
+		}
+	}
+
+	private void restoreProject() {
+		FileDialog fd = new FileDialog(shell, SWT.OPEN);
+		fd.setText("Choose IDEA project file");
+		fd.setFilterExtensions(new String[]{"*.iml"});
+		String path = fd.open();
+		if (path == null) return;
+		try {
+			String dir = ProjectGenerator.fixCloned(path);
+			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			errorMsg("Project restore", "Failed to generate project: " + ex.getMessage());
+		}
+	}
+
+	private void convertProject() {
+		FileDialog fd = new FileDialog(shell, SWT.OPEN);
+		fd.setText("Choose Eclipse application descriptor");
+		fd.setFilterExtensions(new String[]{"Application Descriptor"});
+		String path = fd.open();
+		if (path == null) return;
+		try {
+			String dir = ProjectGenerator.convertEclipse(path);
+			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			errorMsg("Project conversion", "Failed to convert project: " + ex.getMessage());
 		}
 	}
 
@@ -511,10 +484,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			final MessageBox mb = new MessageBox(this.shell, SWT.ICON_ERROR | SWT.OK);
-			mb.setText("Custom IntelliJ IDEA location");
-			mb.setMessage("Failed to get IDEA version from selected binary. Logs may help you.");
-			mb.open();
+			errorMsg("Custom IntelliJ IDEA location", "Failed to get IDEA version from selected binary. Logs may help you.");
 		}
 	}
 
@@ -524,7 +494,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 
 	@Override
 	public void widgetDisposed(DisposeEvent e) {
-
 	}
 
 	protected abstract Set<IdeaInstallation> getIdeaInstallationPath();
