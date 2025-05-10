@@ -433,6 +433,8 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 				errorMsg("Project creation", "MIDlet name must not be empty.");
 				return;
 			}
+			if (location.endsWith("/") || location.endsWith("\\"))
+				location = location.substring(0, location.length() - 1);
 			if (!Files.exists(Paths.get(location))) {
 				errorMsg("Project creation", "Location for project doesn't exist.");
 				return;
