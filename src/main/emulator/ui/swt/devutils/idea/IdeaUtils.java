@@ -525,7 +525,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 		FileDialog fd = new FileDialog(shell, SWT.OPEN);
 		fd.setText("Choose IDEA binary (\"idea\", \"idea.exe\" or \"idea.sh\")");
 		if (Emulator.win)
-			fd.setFilterExtensions(new String[]{"idea.exe"});
+			fd.setFilterExtensions(new String[]{"idea*.exe", "idea*.bat"});
 		else if (Emulator.linux)
 			fd.setFilterExtensions(new String[]{"idea", "idea*.sh"});
 		String path = fd.open();
