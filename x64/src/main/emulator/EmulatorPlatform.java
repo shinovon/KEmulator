@@ -88,43 +88,16 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		}
 	}
 
-	private static void loadSWTLibrary() {
+	private void loadSWTLibrary() {
 		if (new File(Emulator.getAbsolutePath() + File.separatorChar + "swt-custom.jar").exists()) {
 			addToClassPath("swt-custom.jar");
 			return;
 		}
 
-		String osn = System.getProperty("os.name").toLowerCase();
-		String osa = System.getProperty("os.arch").toLowerCase();
-
-		String os;
-		if (osn.contains("win")) {
-			os = "win32";
-		} else if (osn.contains("mac")) {
-			os = "macosx";
-		} else if (osn.contains("linux") || osn.contains("nix")) {
-			os = "gtk-linux";
-		} else {
-			throw new RuntimeException("Unsupported os: " + osn);
-		}
-
-		String arch;
-		if (osa.contains("amd64") || osa.contains("x86_64")) {
-			arch = "x86_64";
-		} else if (osa.contains("86")) {
-			arch = "x86";
-		} else if (osa.contains("aarch64") || osa.contains("armv8")) {
-			arch = "aarch64";
-		} else if (osa.contains("arm")) {
-			arch = "armhf";
-		} else if (osa.contains("ppc") || osa.contains("riscv")) {
-			arch = osa;
-		} else {
-			throw new RuntimeException("Unsupported arch: " + osa);
-		}
+		String swtLibName = getSwtLibraryName();
 
 		try {
-			addToClassPath("swt-" + os + "-" + arch + ".jar");
+			addToClassPath(swtLibName);
 		} catch (RuntimeException e) {
 			// Check if SWT is already loaded
 			try {
@@ -158,6 +131,38 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String getSwtLibraryName() {
+		String osn = System.getProperty("os.name").toLowerCase();
+		String osa = System.getProperty("os.arch").toLowerCase();
+
+		String os;
+		if (osn.contains("win")) {
+			os = "win32";
+		} else if (osn.contains("mac")) {
+			os = "macosx";
+		} else if (osn.contains("linux") || osn.contains("nix")) {
+			os = "gtk-linux";
+		} else {
+			throw new RuntimeException("Unsupported os: " + osn);
+		}
+
+		String arch;
+		if (osa.contains("amd64") || osa.contains("x86_64")) {
+			arch = "x86_64";
+		} else if (osa.contains("86")) {
+			arch = "x86";
+		} else if (osa.contains("aarch64") || osa.contains("armv8")) {
+			arch = "aarch64";
+		} else if (osa.contains("arm")) {
+			arch = "armhf";
+		} else if (osa.contains("ppc") || osa.contains("riscv")) {
+			arch = osa;
+		} else {
+			throw new RuntimeException("Unsupported arch: " + osa);
+		}
+		return "swt-" + os + "-" + arch + ".jar";
 	}
 
 	private static void addToClassPath(String s) {

@@ -70,7 +70,7 @@ public class Emulator implements Runnable {
 
 	public static String httpUserAgent;
 	private final static Thread backgroundThread;
-	private static IEmulatorPlatform platform;
+	public static IEmulatorPlatform platform;
 
 	public static final String os = System.getProperty("os.name").toLowerCase();
 	public static final boolean win = os.startsWith("win");

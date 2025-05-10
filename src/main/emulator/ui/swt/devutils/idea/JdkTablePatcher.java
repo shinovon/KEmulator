@@ -60,7 +60,8 @@ public class JdkTablePatcher {
 				"lwjgl-opengl-natives-linux.jar",
 				"lwjgl3-swt-linux.jar",
 				"m3g_lwjgl.jar",
-				"swt-gtk-linux-x86_64.jar"
+				"micro3d_gl.jar",
+				Emulator.platform.getSwtLibraryName()
 		};
 	}
 

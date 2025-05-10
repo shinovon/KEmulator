@@ -21,4 +21,6 @@ public interface IEmulatorPlatform {
 	boolean supportsMascotCapsule();
 
 	IGraphics3D getGraphics3D();
+
+	String getSwtLibraryName();
 }
