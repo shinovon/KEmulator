@@ -143,28 +143,41 @@ public class ProjectConfigGenerator {
 	}
 
 	public static String buildModulesFile(String projectName) {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-				"<project version=\"4\">\n" +
-				"  <component name=\"ProjectModuleManager\">\n" +
-				"    <modules>\n" +
-				"      <module fileurl=\"file://$PROJECT_DIR$/" + projectName + ".iml\" filepath=\"$PROJECT_DIR$/" + projectName + ".iml\" />\n" +
-				"    </modules>\n" +
-				"  </component>\n" +
-				"</project>";
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(System.lineSeparator());
+		sb.append("<project version=\"4\">").append(System.lineSeparator());
+		sb.append("  <component name=\"ProjectModuleManager\">").append(System.lineSeparator());
+		sb.append("    <modules>").append(System.lineSeparator());
+		sb.append("      <module fileurl=\"file://$PROJECT_DIR$/")
+				.append(projectName)
+				.append(".iml\" filepath=\"$PROJECT_DIR$/")
+				.append(projectName)
+				.append(".iml\" />")
+				.append(System.lineSeparator());
+		sb.append("    </modules>").append(System.lineSeparator());
+		sb.append("  </component>").append(System.lineSeparator());
+		sb.append("</project>");
+
+		return sb.toString();
 	}
 
 	public static String buildArtifactConfig(String projectName) {
-		return "<component name=\"ArtifactManager\">\n" +
-				"  <artifact type=\"jar\" name=\"" + projectName + "\">\n" +
-				"    <output-path>$PROJECT_DIR$/deployed/raw</output-path>\n" +
-				"    <root id=\"archive\" name=\"" + projectName + ".jar\">\n" +
-				"      <element id=\"directory\" name=\"META-INF\">\n" +
-				"        <element id=\"file-copy\" path=\"$PROJECT_DIR$/META-INF/MANIFEST.MF\" />\n" +
-				"      </element>\n" +
-				"      <element id=\"module-output\" name=\"" + projectName + "\" />\n" +
-				"    </root>\n" +
-				"  </artifact>\n" +
-				"</component>";
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("<component name=\"ArtifactManager\">").append(System.lineSeparator());
+		sb.append("  <artifact type=\"jar\" name=\"").append(projectName).append("\">").append(System.lineSeparator());
+		sb.append("    <output-path>$PROJECT_DIR$/deployed/raw</output-path>").append(System.lineSeparator());
+		sb.append("    <root id=\"archive\" name=\"").append(projectName).append(".jar\">").append(System.lineSeparator());
+		sb.append("      <element id=\"directory\" name=\"META-INF\">").append(System.lineSeparator());
+		sb.append("        <element id=\"file-copy\" path=\"$PROJECT_DIR$/META-INF/MANIFEST.MF\" />").append(System.lineSeparator());
+		sb.append("      </element>").append(System.lineSeparator());
+		sb.append("      <element id=\"module-output\" name=\"").append(projectName).append("\" />").append(System.lineSeparator());
+		sb.append("    </root>").append(System.lineSeparator());
+		sb.append("  </artifact>").append(System.lineSeparator());
+		sb.append("</component>");
+
+		return sb.toString();
 	}
 
 	public static String buildKemRunConfig(String projectName, String className) {
