@@ -3,6 +3,10 @@ package emulator.ui.swt.devutils.idea;
 import emulator.Emulator;
 import emulator.Settings;
 
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Vector;
+
 public class ProjectConfigGenerator {
 
 	public static final String encodingFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -21,6 +25,7 @@ public class ProjectConfigGenerator {
 			"out/\n" +
 			"!**/src/main/**/out/\n" +
 			"!**/src/test/**/out/\n" +
+			"proguard.cfg\n"+
 			"\n" +
 			"### Eclipse ###\n" +
 			".apt_generated\n" +
@@ -71,7 +76,20 @@ public class ProjectConfigGenerator {
 			"</module>";
 
 	public static String buildProguardConfig(String location, String name) {
-		return ""; // TODO
+		Vector<String> libs = new Vector<>();
+		for (String l : JdkTablePatcher.DEV_TIME_JARS) {
+			libs.add(Paths.get(Emulator.getAbsolutePath(), "uei", l).toString());
+		}
+
+		String dir = location + "/" + name;
+		return "-libraryjars " + String.join(":", libs) + "\n" +
+				"-injars      " + dir + "/deployed/raw/" + name + ".jar\n" +
+				"-outjar      " + dir + "/deployed/" + name + "_release.jar\n" +
+				"-printseeds  " + dir + "/deployed/pro_seeds.txt\n" +
+				"-printmapping " + dir + "/deployed/pro_map.txt\n" +
+				"-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.3 -allowaccessmodification -optimizations !library/*,!code/simplification/object -optimizationpasses 6\n" +
+				"\n" +
+				"-keep public class * extends javax.microedition.midlet.MIDlet\n";
 	}
 
 	public static String buildManifest(String projName, String className, String appName) {
