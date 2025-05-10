@@ -172,13 +172,6 @@ public class JdkTablePatcher {
 
 	private static Element createAnnotationsPath(Document doc) {
 		Element annotationsPath = doc.createElement("annotationsPath");
-		Element root = doc.createElement("root");
-		root.setAttribute("type", "composite");
-		Element childRoot = doc.createElement("root");
-		childRoot.setAttribute("url", "jar://$APPLICATION_HOME_DIR$/plugins/java/lib/resources/jdkAnnotations.jar!/");
-		childRoot.setAttribute("type", "simple");
-		root.appendChild(childRoot);
-		annotationsPath.appendChild(root);
 		return annotationsPath;
 	}
 
