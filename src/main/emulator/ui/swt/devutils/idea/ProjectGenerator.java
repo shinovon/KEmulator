@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class ProjectGenerator {
 
@@ -22,7 +23,7 @@ public class ProjectGenerator {
 		// root
 		Files.write(Paths.get(location, projectName, ".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
 		Files.write(Paths.get(location, projectName, projectName + ".iml"), ProjectConfigGenerator.imlFile.getBytes(StandardCharsets.UTF_8));
-		Files.write(Paths.get(location, projectName, "proguard.cfg"), ProjectConfigGenerator.buildProguardConfig(location, projectName).getBytes(StandardCharsets.UTF_8));
+		Files.write(Paths.get(location, projectName, "proguard.cfg"), ProjectConfigGenerator.buildProguardConfig(location + "/" + projectName, projectName).getBytes(StandardCharsets.UTF_8));
 
 		// code
 		Files.write(Paths.get(location, projectName, "META-INF", "MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletName, readableName).getBytes(StandardCharsets.UTF_8));
@@ -46,5 +47,36 @@ public class ProjectGenerator {
 		return midletCodePath;
 	}
 
+	public static String fixCloned(String imlPath) throws IOException {
+		if (!imlPath.endsWith(".iml"))
+			throw new IllegalArgumentException();
+		String dir = Paths.get(imlPath).getParent().toString();
+		String projName = Paths.get(imlPath).getFileName().toString();
+		projName = projName.substring(0, projName.lastIndexOf('.'));
+
+		String midletName = null;
+
+		List<String> manifest = Files.readAllLines(Paths.get(dir, "META-INF", "MANIFEST.MF"), StandardCharsets.UTF_8);
+		for (String line : manifest) {
+			if (line.startsWith("MIDlet-1:")) {
+				String[] split = line.split(",");
+				midletName = split[split.length - 1].trim();
+				break;
+			}
+		}
+		if (midletName == null)
+			throw new IllegalArgumentException("Broken manifest file");
+
+		Files.createDirectories(Paths.get(dir, "bin"));
+		Files.createDirectories(Paths.get(dir, "deployed"));
+		Files.createDirectories(Paths.get(dir, ".idea", "runConfigurations"));
+
+		Files.write(Paths.get(dir, "proguard.cfg"), ProjectConfigGenerator.buildProguardConfig(dir, projName).getBytes(StandardCharsets.UTF_8));
+
+		Files.write(Paths.get(dir, ".idea", "runConfigurations", "Run_with_KEmulator.xml"), ProjectConfigGenerator.buildKemRunConfig(projName, midletName).getBytes(StandardCharsets.UTF_8));
+		Files.write(Paths.get(dir, ".idea", "runConfigurations", "Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projName).getBytes(StandardCharsets.UTF_8));
+
+		return dir;
+	}
 
 }

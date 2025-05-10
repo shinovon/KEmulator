@@ -45,6 +45,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 	private Text reposPath;
 	private Button chooseProjectsPath;
 	private Button createProject;
+	private Button fixClonedBtn;
 
 
 	public IdeaUtils(Shell parent) {
@@ -233,6 +234,18 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 		}
 
 		// project creation
+
+		Group fixupIdeaClonedProject = new Group(shell, SWT.NONE);
+		fixupIdeaClonedProject.setText("Fix a project after git clone");
+		fixupIdeaClonedProject.setLayout(genGLo());
+		fixupIdeaClonedProject.setLayoutData(genGd());
+
+		new Label(fixupIdeaClonedProject, SWT.NONE).setText("Project configuration keeps a lot of absolute paths specific to each machine.");
+		new Label(fixupIdeaClonedProject, SWT.NONE).setText("Affected files are ignored by git. This button will prepare cloned project for work on this machine.");
+		fixClonedBtn = new Button(fixupIdeaClonedProject, SWT.FLAT);
+		fixClonedBtn.setText("Choose a project");
+		fixClonedBtn.addSelectionListener(this);
+		new Label(fixupIdeaClonedProject, SWT.NONE).setText("Warning: this expects that the project structure was generated using this toolkit!");
 
 		Group createNewProject = new Group(shell, SWT.NONE);
 		createNewProject.setText("Create new project");
@@ -431,6 +444,21 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				errorMsg("Project creation", "Failed to generate project: " + ex.getMessage());
+			}
+		}
+
+		if (e.widget == fixClonedBtn) {
+			FileDialog fd = new FileDialog(shell, SWT.OPEN);
+			fd.setText("Choose IDEA project file");
+			fd.setFilterExtensions(new String[]{"*.iml"});
+			String path = fd.open();
+			if (path == null) return;
+			try {
+				String dir = ProjectGenerator.fixCloned(path);
+				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				errorMsg("Project restore", "Failed to generate project: " + ex.getMessage());
 			}
 		}
 

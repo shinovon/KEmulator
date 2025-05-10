@@ -76,13 +76,12 @@ public class ProjectConfigGenerator {
 			"  </component>\n" +
 			"</module>";
 
-	public static String buildProguardConfig(String location, String name) {
+	public static String buildProguardConfig(String dir, String name) {
 		Vector<String> libs = new Vector<>();
 		for (String l : JdkTablePatcher.DEV_TIME_JARS) {
 			libs.add(Paths.get(Emulator.getAbsolutePath(), "uei", l).toString());
 		}
 
-		String dir = location + "/" + name;
 		return "-libraryjars " + String.join(":", libs) + "\n" +
 				"-injars      " + dir + "/deployed/raw/" + name + ".jar\n" +
 				"-outjar      " + dir + "/deployed/" + name + "_release.jar\n" +
