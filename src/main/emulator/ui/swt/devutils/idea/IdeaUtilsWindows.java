@@ -1,5 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
+import emulator.Emulator;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.BufferedReader;
@@ -21,7 +22,7 @@ public class IdeaUtilsWindows extends IdeaUtils {
 	@Override
 	protected Set<IdeaInstallation> getIdeaInstallationPath() {
 		Set<IdeaInstallation> set = new HashSet<>();
-		checkToolboxPaths(set);
+		//checkToolboxPaths(set);
 		checkStartMenuShortcuts(set);
 		return set;
 	}
@@ -56,15 +57,10 @@ public class IdeaUtilsWindows extends IdeaUtils {
 						.map(p -> {
 							try {
 								String shortcutPath = p.toString().replace("'", "''");
-								Process process = new ProcessBuilder("powershell", "-Command",
-										"$sh = New-Object -ComObject WScript.Shell; $sc = $sh.CreateShortcut('" + shortcutPath + "'); $sc.TargetPath"
-								).start();
-								String targetPath;
-								try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-									targetPath = reader.readLine();
-								}
-								process.waitFor();
-								if (targetPath != null && (targetPath.endsWith("idea64.exe") || targetPath.endsWith("idea.exe"))) {
+								String output = Emulator.getProcessOutput(new String[]{"powershell", "-Command",
+										"$sh = New-Object -ComObject WScript.Shell; $sc = $sh.CreateShortcut('" + shortcutPath + "'); $sc.TargetPath"});
+								String targetPath = output.trim();
+								if (targetPath.endsWith("idea64.exe") || targetPath.endsWith("idea.exe")) {
 									File exeFile = new File(targetPath);
 									if (exeFile.exists()) {
 										return targetPath;
