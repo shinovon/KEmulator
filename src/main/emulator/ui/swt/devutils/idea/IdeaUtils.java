@@ -216,7 +216,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 					autoConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
 					autoConfigBtn.setText("Edit \"" + path + "\"");
 					autoConfigBtn.addSelectionListener(this);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					new Label(jvmSetupGroup, SWT.NONE).setText("Failed to automatically find config folder!");
 				}
 				new Label(jvmSetupGroup, SWT.NONE).setText("If you use non-standard setup:");
