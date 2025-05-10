@@ -502,9 +502,22 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener {
 		try {
 			String dir = ProjectGenerator.convertEclipse(path);
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+			MessageBox mb = new MessageBox(this.shell, SWT.ICON_INFORMATION | SWT.OK);
+			mb.setText("Project conversion");
+			mb.setMessage("Your project was converted and will open in IDEA in few seconds. There are some important notes:\n\n" +
+					"- You can still use Eclipse JDT/MTJ to work on the project.\n" +
+					"- IDEA and Eclipse use different files for MIDlet suite manifest. Synchronize them by hand.\n" +
+					"- IDEA provides bad support for global package classes. Get rid of them.\n" +
+					"- Artifact building will provide you non-pre-verified JAR, it's not ready to be run on real devices.\n" +
+					"- To get a JAR ready for deployment, use \"Package\" run configuration. The file will be \"./deployed/PROJNAME_release.jar\".\n" +
+					"- Pre-verification is done via ProGuard as part of optimization/obfuscation pass. Edit ProGuard config manually to skip it.");
+			mb.open();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			errorMsg("Project conversion", "Failed to convert project: " + ex.getMessage());
+			if (ex instanceof IllegalArgumentException)
+				errorMsg("Project conversion", "Failed to convert project: " + ex.getMessage());
+			else
+				errorMsg("Project conversion", "Failed to convert project: " + ex);
 		}
 	}
 
