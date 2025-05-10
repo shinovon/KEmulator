@@ -219,7 +219,7 @@ public class Emulator implements Runnable {
 		if (linux) {
 			if (Files.isExecutable(Paths.get("/usr/bin/xdg-open"))) {
 				try {
-					Runtime.getRuntime().exec("/usr/bin/xdg-open \"" + url + "\"");
+					Runtime.getRuntime().exec(new String[]{"/usr/bin/xdg-open", url});
 					return;
 				} catch (IOException ignored) {
 				}
