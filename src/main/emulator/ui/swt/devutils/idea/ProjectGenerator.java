@@ -1,5 +1,7 @@
 package emulator.ui.swt.devutils.idea;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -8,28 +10,28 @@ import java.util.List;
 
 public class ProjectGenerator {
 
-	public static String create(String location, String projectName, String midletName, String readableName) throws IOException {
+	public static String create(String location, String projectName, String midletClassName, String readableName) throws IOException {
 		String dir = Paths.get(location, projectName).toAbsolutePath().toString();
 
 		createDirectories(dir);
 
 		// root
 		Files.write(Paths.get(dir, ".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
-		generateIML(projectName, dir);
+		generateIML(dir, projectName);
 		generateProGuardConfig(dir, projectName);
 
 		// code
-		Files.write(Paths.get(dir, "META-INF", "MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletName, readableName).getBytes(StandardCharsets.UTF_8));
-		String midletCodePath = generateDummyMidlet(location, projectName, midletName, dir);
+		Files.write(Paths.get(dir, "META-INF", "MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
+		String midletCodePath = generateDummyMidlet(location, projectName, midletClassName, dir);
 
 		// ide config
-		generateMiscXmls(projectName, dir);
+		generateMiscXmls(dir, projectName);
 
 		// jars
-		generateBuildConfigs(projectName, dir);
+		generateBuildConfigs(dir, projectName);
 
 		// run configs
-		generateRunConfigs(dir, projectName, midletName);
+		generateRunConfigs(dir, projectName, midletClassName);
 
 		return midletCodePath;
 	}
@@ -50,6 +52,39 @@ public class ProjectGenerator {
 		return dir;
 	}
 
+	public static String convertEclipse(String appDescriptorPath) throws IOException {
+		String dir = Paths.get(appDescriptorPath).getParent().toString();
+		String projectName = Paths.get(appDescriptorPath).getParent().getFileName().toString(); //folder name
+
+		createDirectories(dir);
+
+		// root
+
+		try (BufferedWriter gi = new BufferedWriter(new FileWriter(Paths.get(dir,".gitignore").toString(), true))){
+			gi.write(".idea/runConfigurations");
+			gi.newLine();
+			gi.write("proguard.cfg");
+			gi.newLine();
+		}
+		generateIML(dir, projectName);
+		generateProGuardConfig(dir, projectName);
+
+		// code
+		Files.copy(Paths.get(appDescriptorPath), Paths.get(dir, "META-INF", "MANIFEST.MF"));
+		String midletClassName = getMidletClassNameFromMF(dir);
+
+		// ide config
+		generateMiscXmls(dir, projectName);
+
+		// jars
+		generateBuildConfigs(dir, projectName);
+
+		// run configs
+		generateRunConfigs(dir, projectName, midletClassName);
+
+		return dir;
+	}
+
 	//#region impls
 
 	private static void createDirectories(String dir) throws IOException {
@@ -63,7 +98,7 @@ public class ProjectGenerator {
 		Files.createDirectories(Paths.get(dir, "META-INF"));
 	}
 
-	private static void generateIML(String projectName, String dir) throws IOException {
+	private static void generateIML(String dir, String projectName) throws IOException {
 		Files.write(Paths.get(dir, projectName + ".iml"), ProjectConfigGenerator.imlFile.getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -87,11 +122,11 @@ public class ProjectGenerator {
 		Files.write(Paths.get(dir, ".idea", "runConfigurations", "Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void generateBuildConfigs(String projectName, String dir) throws IOException {
+	private static void generateBuildConfigs(String dir, String projectName) throws IOException {
 		Files.write(Paths.get(dir, ".idea", "artifacts", projectName + ".xml"), ProjectConfigGenerator.buildArtifactConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void generateMiscXmls(String projectName, String dir) throws IOException {
+	private static void generateMiscXmls(String dir, String projectName) throws IOException {
 		Files.write(Paths.get(dir, ".idea", "encodings.xml"), ProjectConfigGenerator.encodingFile.getBytes(StandardCharsets.UTF_8));
 		Files.write(Paths.get(dir, ".idea", "misc.xml"), ProjectConfigGenerator.miscFile.getBytes(StandardCharsets.UTF_8));
 		Files.write(Paths.get(dir, ".idea", ".gitignore"), ProjectConfigGenerator.ideaGitignoreFile.getBytes(StandardCharsets.UTF_8));
