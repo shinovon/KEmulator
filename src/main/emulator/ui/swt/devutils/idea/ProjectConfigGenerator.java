@@ -26,6 +26,7 @@ public class ProjectConfigGenerator {
 			"!**/src/main/**/out/\n" +
 			"!**/src/test/**/out/\n" +
 			"proguard.cfg\n"+
+			".idea/runConfigurations\n"+
 			"\n" +
 			"### Eclipse ###\n" +
 			".apt_generated\n" +
