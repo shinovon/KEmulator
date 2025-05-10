@@ -115,20 +115,31 @@ public class ProjectConfigGenerator {
 	}
 
 	public static String buildDummyMidlet(String className) {
-		String[] splitted = splitByLastDot(className);
-		return "package " + splitted[0] + ";\n" +
-				"import javax.microedition.lcdui.Display;\n" +
-				"import javax.microedition.lcdui.Form;\n" +
-				"import javax.microedition.midlet.MIDlet;\n" +
-				"public class " + splitted[1] + " extends MIDlet {\n" +
-				"    protected void startApp() {\n" +
-				"        Form f = new Form(\"Test MIDlet\");\n" +
-				"        f.append(\"Hello world, I guess?\");\n" +
-				"        Display.getDisplay(this).setCurrent(f);\n" +
-				"    }\n" +
-				"    protected void pauseApp() {}\n" +
-				"    protected void destroyApp(boolean b) {}\n" +
-				"}\n";
+		String clsName;
+		StringBuilder sb = new StringBuilder();
+
+		if (className.indexOf('.') != -1) {
+			String[] splitted = splitByLastDot(className);
+			clsName = splitted[1];
+			sb.append("package ").append(splitted[0]).append(";").append(System.lineSeparator());
+		} else {
+			clsName = className;
+		}
+
+		sb.append("import javax.microedition.lcdui.Display;").append(System.lineSeparator());
+		sb.append("import javax.microedition.lcdui.Form;").append(System.lineSeparator());
+		sb.append("import javax.microedition.midlet.MIDlet;").append(System.lineSeparator());
+		sb.append("public class ").append(clsName).append(" extends MIDlet {").append(System.lineSeparator());
+		sb.append("    protected void startApp() {").append(System.lineSeparator());
+		sb.append("        Form f = new Form(\"Test MIDlet\");").append(System.lineSeparator());
+		sb.append("        f.append(\"Hello world, I guess?\");").append(System.lineSeparator());
+		sb.append("        Display.getDisplay(this).setCurrent(f);").append(System.lineSeparator());
+		sb.append("    }").append(System.lineSeparator());
+		sb.append("    protected void pauseApp() {}").append(System.lineSeparator());
+		sb.append("    protected void destroyApp(boolean b) {}").append(System.lineSeparator());
+		sb.append("}").append(System.lineSeparator());
+
+		return sb.toString();
 	}
 
 	public static String buildModulesFile(String projectName) {
