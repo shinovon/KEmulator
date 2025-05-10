@@ -82,7 +82,7 @@ public class ProjectConfigGenerator {
 			libs.add(Paths.get(Emulator.getAbsolutePath(), "uei", l).toString());
 		}
 
-		return "-libraryjars " + String.join(":", libs) + "\n" +
+		return "-libraryjars " + String.join(Emulator.win ? ";" : ":", libs) + "\n" +
 				"-injars      " + dir + "/deployed/raw/" + name + ".jar\n" +
 				"-outjar      " + dir + "/deployed/" + name + "_release.jar\n" +
 				"-printseeds  " + dir + "/deployed/pro_seeds.txt\n" +
