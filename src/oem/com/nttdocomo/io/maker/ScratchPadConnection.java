@@ -18,14 +18,11 @@ public class ScratchPadConnection implements StreamConnection {
 		this.b = b;
 		this.c = c;
 		this.d = d;
-		this.a = new RandomAccessFile(b, "rw");
-		if (this.a.length() == 0L) {
-			this.a.setLength(Integer.parseInt(Emulator.getEmulator().getAppProperty("SPsize")));
-		}
+
 	}
 
 	public void close() throws IOException {
-		this.a.close();
+		if (a != null) this.a.close();
 	}
 
 	public DataInputStream openDataInputStream() throws IOException {
@@ -43,6 +40,12 @@ public class ScratchPadConnection implements StreamConnection {
 	}
 
 	public OutputStream openOutputStream() throws IOException {
+		if (a == null) {
+			this.a = new RandomAccessFile(b, "rw");
+			if (this.a.length() == 0L) {
+				this.a.setLength(Integer.parseInt(Emulator.getEmulator().getAppProperty("SPsize")));
+			}
+		}
 		this.a.seek(this.c);
 		return (OutputStream) new ScratchpadOutputStream((OutputStream) new FileOutputStream(this.a.getFD()));
 	}
@@ -67,7 +70,11 @@ public class ScratchPadConnection implements StreamConnection {
 			hashtable.put(nextToken.substring(0, index).trim(), nextToken.substring(index + 1).trim());
 		}
 		final String midletJar = Emulator.midletJar;
-		final String string = midletJar.substring(0, midletJar.length() - 4) + int1 + ".scr";
+		String string = midletJar.substring(0, midletJar.length() - 4);
+		if (int1 != 0) {
+			string += int1;
+		}
+		string += ".sp";
 		String s3 = hashtable.get("pos");
 		if (s3 == null) {
 			s3 = "0";
