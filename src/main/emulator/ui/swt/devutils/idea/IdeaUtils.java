@@ -58,7 +58,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	private Button useProguardFromOptBtn;
 	private Label creationStatus;
 	private Group createNewProject;
-	private Button ueiJavadocsBtn;
 	private Button useDocsFromUsr;
 	private Button installDocsToUsr;
 
@@ -204,16 +203,12 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			try {
 				Path path = Paths.get(Emulator.getAbsolutePath(), "uei", "javadocs");
 				checkDocsPathValid(path);
-				Group ueiDocsGroup = new Group(shell, SWT.NONE);
-				ueiDocsGroup.setText("Built-in javadocs");
-				ueiDocsGroup.setLayout(genGLo());
-				ueiDocsGroup.setLayoutData(genGd());
-				ueiJavadocsBtn = new Button(ueiDocsGroup, SWT.PUSH);
-				ueiJavadocsBtn.setText("Use docs from UEI folder");
-				ueiJavadocsBtn.addSelectionListener(this);
-				ueiJavadocsBtn.setData(path.toString());
+				Settings.j2meDocsPath = path.toAbsolutePath().toString();
+				// skipping the screen entirely if there are builtin javadocs
+				refreshContent();
+				return;
 			} catch (Exception e) {
-				new Label(shell, SWT.NONE).setText("UEI libs don't contain javadocs. You need an external source of them.");
+				new Label(shell, SWT.NONE).setText("UEI libs contain no javadocs. You need an external source of them.");
 			}
 
 			// docs installation
@@ -480,9 +475,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
 
 			}
-		} else if (e.widget == ueiJavadocsBtn) {
-			Settings.j2meDocsPath = ueiJavadocsBtn.getData().toString();
-			refreshContent();
 		} else if (e.widget == useDocsFromUsr) {
 			Settings.j2meDocsPath = JAVADOCS_DEFAULT_PATH;
 			refreshContent();
