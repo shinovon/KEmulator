@@ -47,7 +47,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		String tempFolderName = "/tmp/proguard" + System.currentTimeMillis() + "_ext";
 
 		appendLog("Downloading with wget, wait...\n");
-		downloadWithWget(proguardUrl, tempZipName);
+		downloadWithWget(PROGUARD_URL, tempZipName);
 
 		appendLog("\nExtracting archive...\n");
 		unzip(tempZipName, tempFolderName);
@@ -61,14 +61,14 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 	}
 
 	protected String autoInstallDocs() throws IOException, InterruptedException {
-		if (Files.exists(Paths.get("/usr/share/doc/j2me")))
-			throw new IllegalArgumentException("Folder \"/usr/share/doc/j2me\" already exists. Maybe you already installed it?");
+		if (Files.exists(Paths.get(JAVADOCS_DEFAULT_PATH)))
+			throw new IllegalArgumentException("Folder \"" + JAVADOCS_DEFAULT_PATH + "\" already exists. Maybe you already installed it?");
 
 		String tempZipName = "/tmp/j2medocs" + System.currentTimeMillis() + ".zip";
 		String tempFolderName = "/tmp/j2medocs" + System.currentTimeMillis() + "_ext";
 
 		appendLog("Downloading with wget, wait...\n");
-		downloadWithWget(javadocsUrl, tempZipName);
+		downloadWithWget(JAVADOCS_URL, tempZipName);
 
 		appendLog("\nExtracting archive...\n");
 		unzip(tempZipName, tempFolderName);
@@ -77,12 +77,14 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", tempFolderName + "/J2ME_Docs-master/docs/BlackBerry_API_7_1_0"}).waitFor();
 
 		appendLog("\nRunning installation...\n");
-		int c = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "/usr/bin/cp", "-r", tempFolderName + "/J2ME_Docs-master/docs/", "/usr/share/doc/j2me"}).waitFor();
+		int c = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "/usr/bin/cp", "-r", tempFolderName + "/J2ME_Docs-master/docs/", JAVADOCS_DEFAULT_PATH}).waitFor();
 		if (c != 0) {
 			throw new RuntimeException("pkexec or cp failed, code: " + c);
 		}
-		return "/usr/share/doc/j2me";
+		return JAVADOCS_DEFAULT_PATH;
 	}
+
+	//#region External tools
 
 	private void downloadWithWget(String from, String to) throws IOException, InterruptedException {
 		Process wget = Runtime.getRuntime().exec(new String[]{"/usr/bin/wget", "-v", "-O", to, from});
@@ -117,7 +119,9 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 			throw new RuntimeException("unzip failed, code: " + unzip.exitValue());
 	}
 
-	//#region Launcher pathfinder
+	//#endregion
+
+	//#region IDEA tools
 
 	private static void checkPath(Set<String> set) {
 		String pathEnv = System.getenv("PATH");
@@ -206,8 +210,6 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		}
 	}
 
-	//#endregion
-
 	protected static String getVersion(String path) throws IOException {
 		String[] output = Emulator.getProcessOutput(new String[]{path, "--version"}).split(System.lineSeparator());
 		String ver = null;
@@ -220,4 +222,6 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		if (ver == null) throw new IllegalArgumentException();
 		return ver;
 	}
+
+	//#endregion
 }

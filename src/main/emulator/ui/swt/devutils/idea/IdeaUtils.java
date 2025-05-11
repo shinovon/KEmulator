@@ -18,10 +18,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class IdeaUtils implements DisposeListener, SelectionListener, ModifyListener {
+
+	public static final String JAVADOCS_DEFAULT_PATH = "/usr/share/doc/j2me";
+	public static final String PROGUARD_URL = "https://nnproject.cc/dl/d/proguard.zip";
+	public static final String JAVADOCS_URL = "https://github.com/nikita36078/J2ME_Docs/archive/refs/heads/master.zip";
 
 	// state
 	private boolean didInstallation = false;
@@ -49,11 +52,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	private Button chooseProjectsPath;
 	private Button createProject;
 	private Button fixClonedBtn;
-
 	private StyledText log;
-
-	public static final String proguardUrl = "https://nnproject.cc/dl/d/proguard.zip";
-	public static final String javadocsUrl = "https://github.com/nikita36078/J2ME_Docs/archive/refs/heads/master.zip";
 	private Button proguardAutoBtn;
 	private Button restartSetup;
 	private Button useProguardFromOptBtn;
@@ -242,8 +241,8 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 				autoGroup.setLayoutData(genGd());
 
 				try {
-					checkDocsPathValid(Paths.get("/usr/share/doc/j2me"));
-					new Label(autoGroup, SWT.NONE).setText("Found installed documentation at /usr/share/doc/j2me");
+					checkDocsPathValid(Paths.get(JAVADOCS_DEFAULT_PATH));
+					new Label(autoGroup, SWT.NONE).setText("Found installed documentation at " + JAVADOCS_DEFAULT_PATH);
 					useDocsFromUsr = new Button(autoGroup, SWT.PUSH);
 					useDocsFromUsr.setText("Use it");
 					useDocsFromUsr.addSelectionListener(this);
@@ -442,7 +441,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 		} else if (e.widget == githubProguardBtn) {
 			Emulator.openUrlExternallySilent("https://github.com/Guardsquare/proguard/releases/");
 		} else if (e.widget == nnchanProguardBtn) {
-			Emulator.openUrlExternallySilent(proguardUrl);
+			Emulator.openUrlExternallySilent(PROGUARD_URL);
 		} else if (e.widget == proguardAutoBtn) {
 			makeLogWindow();
 			new Thread(() -> {
@@ -485,7 +484,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			Settings.j2meDocsPath = ueiJavadocsBtn.getData().toString();
 			refreshContent();
 		} else if (e.widget == useDocsFromUsr) {
-			Settings.j2meDocsPath = "/usr/share/doc/j2me";
+			Settings.j2meDocsPath = JAVADOCS_DEFAULT_PATH;
 			refreshContent();
 		} else if (e.widget == installDocsToUsr) {
 			makeLogWindow();
