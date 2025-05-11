@@ -73,8 +73,9 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		appendLog("\nExtracting archive...\n");
 		unzip(tempZipName, tempFolderName);
 
-		appendLog("\nDeleting BB docs...\n");
+		appendLog("\nDeleting unneeded docs...\n");
 		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", tempFolderName + "/J2ME_Docs-master/docs/BlackBerry_API_7_1_0"}).waitFor();
+		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", tempFolderName + "/J2ME_Docs-master/docs/midp-3_0-fr-javadoc"}).waitFor();
 
 		appendLog("\nRunning installation...\n");
 		int c = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "/usr/bin/cp", "-r", tempFolderName + "/J2ME_Docs-master/docs/", JAVADOCS_DEFAULT_PATH}).waitFor();
