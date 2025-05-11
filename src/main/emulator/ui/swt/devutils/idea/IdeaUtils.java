@@ -25,6 +25,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	public static final String JAVADOCS_DEFAULT_PATH = "/usr/share/doc/j2me";
 	public static final String PROGUARD_URL = "https://nnproject.cc/dl/d/proguard.zip";
 	public static final String JAVADOCS_URL = "https://github.com/nikita36078/J2ME_Docs/archive/refs/heads/master.zip";
+	public static final String PROGUARD_DEFAULT_PATH = "/opt/proguard6.2.2/proguard.jar";
 
 	// state
 	private boolean didInstallation = false;
@@ -55,7 +56,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	private StyledText log;
 	private Button proguardAutoBtn;
 	private Button restartSetup;
-	private Button useProguardFromOptBtn;
 	private Label creationStatus;
 	private Group createNewProject;
 	private Button useDocsFromUsr;
@@ -182,11 +182,11 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 				autoGroup.setLayout(genGLo());
 				autoGroup.setLayoutData(genGd());
 
-				if (Files.exists(Paths.get("/opt", "proguard6.2.2", "proguard.jar"))) {
-					new Label(autoGroup, SWT.NONE).setText("Found installed ProGuard at /opt/proguard6.2.2");
-					useProguardFromOptBtn = new Button(autoGroup, SWT.PUSH);
-					useProguardFromOptBtn.setText("Use it");
-					useProguardFromOptBtn.addSelectionListener(this);
+				if (Files.exists(Paths.get(PROGUARD_DEFAULT_PATH))) {
+					Settings.proguardPath = PROGUARD_DEFAULT_PATH;
+					// skipping the screen entirely if there is an installed proguard
+					refreshContent();
+					return;
 				} else {
 					proguardAutoBtn = new Button(autoGroup, SWT.PUSH);
 					proguardAutoBtn.setText("Do it");
@@ -455,9 +455,6 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			String path = fd.open();
 			if (path == null) return;
 			Settings.proguardPath = path;
-			refreshContent();
-		} else if (e.widget == useProguardFromOptBtn) {
-			Settings.proguardPath = "/opt/proguard6.2.2/proguard.jar";
 			refreshContent();
 		} else if (e.widget == jmeDocsBtn) {
 			Emulator.openUrlExternallySilent("https://github.com/nikita36078/J2ME_Docs/");
