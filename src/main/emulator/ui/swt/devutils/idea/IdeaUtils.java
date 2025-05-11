@@ -14,10 +14,12 @@ import org.eclipse.swt.widgets.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class IdeaUtils implements DisposeListener, SelectionListener, ModifyListener {
 
@@ -56,6 +58,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	private Button useProguardFromOptBtn;
 	private Label creationStatus;
 	private Group createNewProject;
+	private Button ueiJavadocsBtn;
 
 	public IdeaUtils(Shell parent) {
 		shell = new Shell(parent, SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN);
@@ -196,16 +199,34 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 		}
 
 		if (Settings.j2meDocsPath == null) {
+			try {
+				Path path = Paths.get(Emulator.getAbsolutePath(), "uei", "javadocs");
+				checkDocsPathValid(path);
+				Group ueiDocsGroup = new Group(shell, SWT.NONE);
+				ueiDocsGroup.setText("Built-in javadocs");
+				ueiDocsGroup.setLayout(genGLo());
+				ueiDocsGroup.setLayoutData(genGd());
+				ueiJavadocsBtn = new Button(ueiDocsGroup, SWT.PUSH);
+				ueiJavadocsBtn.setText("Use docs from UEI folder");
+				ueiJavadocsBtn.addSelectionListener(this);
+				ueiJavadocsBtn.setData(path.toString());
+			} catch (Exception e) {
+				new Label(shell, SWT.NONE).setText("UEI libs don't contain javadocs. You need an external source of them.");
+			}
+
 			// docs installation
 			Group jmeDocsGroup = new Group(shell, SWT.NONE);
-			jmeDocsGroup.setText("Documentation setup");
+			jmeDocsGroup.setText("External javadocs: manual setup");
 			jmeDocsGroup.setLayout(genGLo());
 			jmeDocsGroup.setLayoutData(genGd());
 
-			new Label(jmeDocsGroup, SWT.NONE).setText("Download nikita36068's documentation archive - will be used as javadocs.");
+			new Label(jmeDocsGroup, SWT.NONE).setText("Download them from one of the sources, or take from SDK.");
 			jmeDocsBtn = new Button(jmeDocsGroup, SWT.PUSH);
-			jmeDocsBtn.setText("Open repository");
+			jmeDocsBtn.setText("Nikita36068's GitHub documentation repository");
 			jmeDocsBtn.addSelectionListener(this);
+			Button b = new Button(jmeDocsGroup, SWT.PUSH);
+			b.setText("Archive at nnproject");
+			b.setEnabled(false);
 			new Label(jmeDocsGroup, SWT.NONE).setText("Select location where you placed them.");
 			selectJmeDocsBtn = new Button(jmeDocsGroup, SWT.PUSH);
 			selectJmeDocsBtn.setText("Choose documentation root");
@@ -421,15 +442,16 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			String path = dd.open();
 			if (path == null) return;
 			try {
-				int found = Files.list(Paths.get(path)).filter(p -> Files.exists(p.resolve("javax").resolve("microedition").resolve("midlet").resolve("MIDlet.html"))).collect(Collectors.toList()).size();
-				if (found == 0)
-					throw new RuntimeException();
+				checkDocsPathValid(Paths.get(path));
 				Settings.j2meDocsPath = path;
 				refreshContent();
 			} catch (IOException ex) {
 				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
 
 			}
+		} else if (e.widget == ueiJavadocsBtn) {
+			Settings.j2meDocsPath = ueiJavadocsBtn.getData().toString();
+			refreshContent();
 		} else if (e.widget == manualConfigBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose IDEA JDK table (\"IntelliJIdeaXXXX.Y/options/jdk.table.xml\")");
@@ -468,6 +490,14 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			jdkTablePath = null;
 			didInstallation = false;
 			refreshContent();
+		}
+	}
+
+	private static void checkDocsPathValid(Path path) throws IOException, RuntimeException {
+		try (Stream<Path> list = Files.list(path)) {
+			long found = list.filter(p -> Files.exists(p.resolve("javax").resolve("microedition").resolve("midlet").resolve("MIDlet.html"))).count();
+			if (found == 0)
+				throw new RuntimeException();
 		}
 	}
 
