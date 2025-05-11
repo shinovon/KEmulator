@@ -59,31 +59,30 @@ public class IdeaUtilsWindows extends IdeaUtils {
 
 		for (Path dir : startMenuDirs) {
 			if (!Files.exists(dir)) continue;
-			try (Stream<Path> stream = Files.walk(dir)) {
-				List<String> result = stream.filter(p -> p.getFileName().toString().endsWith(".lnk"))
-						.map(p -> {
-							try {
-								String shortcutPath = p.toString().replace("'", "''");
-								String output = Emulator.getProcessOutput(new String[]{"powershell", "-Command",
-										"$sh = New-Object -ComObject WScript.Shell; $sc = $sh.CreateShortcut('" + shortcutPath + "'); $sc.TargetPath"});
-								String targetPath = output.trim();
-								if (targetPath.endsWith("idea64.exe") || targetPath.endsWith("idea.exe")) {
-									File exeFile = new File(targetPath);
-									if (exeFile.exists()) {
-										return targetPath;
-									}
-								}
-							} catch (Exception ignored) {
-							}
-							return null;
-						}).filter(Objects::nonNull).collect(Collectors.toList());
-				for (String path : result) {
-					try {
-						set.add(path);
-					} catch (Exception ignored) {
-					}
+			try {
+				String dirPath = dir.toString().replace("'", "''");
+				String powershellCommand = "$shell = New-Object -ComObject WScript.Shell; " +
+						"Get-ChildItem -Path '" + dirPath + "' -Recurse -Filter *.lnk | " +
+						"ForEach-Object { " +
+						"    try { " +
+						"        $sc = $shell.CreateShortcut($_.FullName); " +
+						"        $targetPath = $sc.TargetPath; " +
+						"        if ($targetPath -match '\\\\(idea64|idea)\\.exe$') { " +
+						"            if (Test-Path -LiteralPath $targetPath -PathType Leaf) { " +
+						"                $targetPath " +
+						"            } " +
+						"        } " +
+						"    } catch {} " +
+						"}";
+
+				String output = Emulator.getProcessOutput(new String[]{"powershell", "-Command", powershellCommand});
+
+				for (String i : output.split("[\\r\\n]+")) {
+					i = i.trim();
+					if (!i.isEmpty())
+						set.add(i);
 				}
-			} catch (IOException ignored) {
+			} catch (Exception ignored) {
 			}
 		}
 	}
