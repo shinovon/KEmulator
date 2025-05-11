@@ -14,6 +14,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class DevUtilsMainWindow implements DisposeListener, SelectionListener {
 
 	private Button eclipse;
@@ -40,6 +43,11 @@ public class DevUtilsMainWindow implements DisposeListener, SelectionListener {
 
 		if (Emulator.getJdkHome() == null) {
 			errorState("KEmulator is launched with JRE without JDK.", "Please install JDK 1.8 (not JRE!) and run KEmulator with it.");
+			return;
+		}
+
+		if (!Files.exists(Paths.get(Emulator.getAbsolutePath(), "uei", "cldc11.jar"))) {
+			errorState("UEI directory is missing in your KEmulator setup.", "It contains libraries for your IDE. Find a proper KEmulator package.");
 			return;
 		}
 
