@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -49,6 +50,8 @@ public class JdkTablePatcher {
 			"samsungapi.jar",
 			"siemensio.jar",
 	};
+	public static final String CLDC_DEVTIME = "1.8 CLDC Devtime";
+	public static final String CLDC_RUNTIME = "1.8 CLDC Runtime";
 
 	private static List<String> getRuntimeJars() {
 		Vector<String> libs = new Vector<>();
@@ -60,21 +63,23 @@ public class JdkTablePatcher {
 
 	//#region API
 
-	public static boolean checkJdkTable(String tablePath) throws ParserConfigurationException, IOException, SAXException {
+	public static boolean checkJdkTable(String tablePath) throws ParserConfigurationException, IOException, SAXException, TransformerException {
 		Element projectJdkTable = getProjectJdkTableElement(loadDocument(tablePath));
-		return jdkExists(projectJdkTable, "1.8 CLDC Devtime") && jdkExists(projectJdkTable, "1.8 CLDC Runtime");
+		return jdkExists(projectJdkTable, CLDC_DEVTIME) && jdkExists(projectJdkTable, CLDC_RUNTIME);
 	}
 
 	public static void updateJdkTable(String configFilePath) throws ParserConfigurationException, IOException, SAXException, TransformerException {
-		String java8OpenJdkPath = Emulator.getJdkHome();
+		String jdk = Emulator.getJdkHome();
 
 		Document doc = loadDocument(configFilePath);
 		Element projectJdkTable = getProjectJdkTableElement(doc);
 
-		if (!jdkExists(projectJdkTable, "1.8 CLDC Devtime"))
-			projectJdkTable.appendChild(createDevTimeJdk(doc, java8OpenJdkPath));
-		if (!jdkExists(projectJdkTable, "1.8 CLDC Runtime"))
-			projectJdkTable.appendChild(createRuntimeJdk(doc, java8OpenJdkPath));
+		if (jdkExists(projectJdkTable, CLDC_DEVTIME))
+			removeJdk(projectJdkTable, CLDC_DEVTIME);
+		projectJdkTable.appendChild(createDevTimeJdk(doc, jdk));
+		if (jdkExists(projectJdkTable, CLDC_RUNTIME))
+			removeJdk(projectJdkTable, CLDC_RUNTIME);
+		projectJdkTable.appendChild(createRuntimeJdk(doc, jdk));
 
 		saveDocument(doc, configFilePath);
 	}
@@ -83,8 +88,51 @@ public class JdkTablePatcher {
 
 	//#region IO
 
-	private static Document loadDocument(String path) throws ParserConfigurationException, IOException, SAXException {
-		return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(path));
+	private static Document loadDocument(String path) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		File configFile = new File(path);
+
+		// There is no table - create it.
+		if (!configFile.exists() || configFile.length() == 0) {
+			Document newDoc = builder.newDocument();
+			Element application = newDoc.createElement("application");
+			Element component = newDoc.createElement("component");
+			component.setAttribute("name", "ProjectJdkTable");
+
+			application.appendChild(component);
+			newDoc.appendChild(application);
+
+			saveDocument(newDoc, path);
+		}
+
+		Document doc = builder.parse(configFile);
+		Element root = doc.getDocumentElement();
+
+		if (!"application".equals(root.getNodeName())) {
+			throw new SAXException("Invalid root element: " + root.getNodeName());
+		}
+
+		NodeList components = root.getElementsByTagName("component");
+		boolean hasJdkTable = false;
+
+		for (int i = 0; i < components.getLength(); i++) {
+			Element comp = (Element) components.item(i);
+			if ("ProjectJdkTable".equals(comp.getAttribute("name"))) {
+				hasJdkTable = true;
+				break;
+			}
+		}
+
+		// Создаем недостающий компонент
+		if (!hasJdkTable) {
+			Element component = doc.createElement("component");
+			component.setAttribute("name", "ProjectJdkTable");
+			root.appendChild(component);
+		}
+
+		return doc;
+
 	}
 
 	private static void saveDocument(Document doc, String path) throws TransformerException {
@@ -92,7 +140,7 @@ public class JdkTablePatcher {
 		Transformer transformer = transformerFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 		DOMSource source = new DOMSource(doc);
 		StreamResult result = new StreamResult(new File(path));
 		transformer.transform(source, result);
@@ -101,6 +149,26 @@ public class JdkTablePatcher {
 	//#endregion
 
 	//#region Implementation
+
+	private static void removeJdk(Element projectJdkTable, String jdkName) {
+		NodeList jdks = projectJdkTable.getElementsByTagName("jdk");
+		List<Element> toRemove = new ArrayList<>();
+
+		for (int i = 0; i < jdks.getLength(); i++) {
+			Element jdk = (Element) jdks.item(i);
+			Element nameElement = (Element) jdk.getElementsByTagName("name").item(0);
+			if (jdkName.equals(nameElement.getAttribute("value"))) {
+				toRemove.add(jdk);
+			}
+		}
+
+		if (toRemove.isEmpty())
+			throw new RuntimeException("Empty list for deletion!");
+
+		for (Element node : toRemove) {
+			projectJdkTable.removeChild(node);
+		}
+	}
 
 	private static Element getProjectJdkTableElement(Document doc) {
 		NodeList components = doc.getElementsByTagName("component");
@@ -131,7 +199,7 @@ public class JdkTablePatcher {
 
 		addElement(doc, jdk, "name", "1.8 CLDC Devtime");
 		addElement(doc, jdk, "type", "JavaSDK");
-		addElement(doc, jdk, "version", System.getProperty("java.version"));
+		addElement(doc, jdk, "version", "1.8.0");
 		addElement(doc, jdk, "homePath", java8Path);
 
 		Element roots = doc.createElement("roots");
@@ -150,7 +218,7 @@ public class JdkTablePatcher {
 
 		addElement(doc, jdk, "name", "1.8 CLDC Runtime");
 		addElement(doc, jdk, "type", "JavaSDK");
-		addElement(doc, jdk, "version", System.getProperty("java.version"));
+		addElement(doc, jdk, "version", "1.8.0");
 		addElement(doc, jdk, "homePath", java8Path);
 
 		Element roots = doc.createElement("roots");
@@ -171,6 +239,9 @@ public class JdkTablePatcher {
 
 	private static Element createAnnotationsPath(Document doc) {
 		Element annotationsPath = doc.createElement("annotationsPath");
+		Element root = doc.createElement("root");
+		root.setAttribute("type", "composite");
+		annotationsPath.appendChild(root);
 		return annotationsPath;
 	}
 
@@ -189,7 +260,11 @@ public class JdkTablePatcher {
 	}
 
 	private static Element createSourcePath(Document doc) {
-		return doc.createElement("sourcePath");
+		Element sourcePath = doc.createElement("sourcePath");
+		Element root = doc.createElement("root");
+		root.setAttribute("type", "composite");
+		sourcePath.appendChild(root);
+		return sourcePath;
 	}
 
 	private static Element createCompositeRoot(Document doc, List<String> urls) {
