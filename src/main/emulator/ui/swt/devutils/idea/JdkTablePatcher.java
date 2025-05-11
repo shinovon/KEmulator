@@ -55,8 +55,6 @@ public class JdkTablePatcher {
 		libs.add("KEmulator.jar");
 		libs.addAll(Arrays.asList(Emulator.platform.getLwjglLibraryNames()));
 		libs.add(Emulator.platform.getSwtLibraryName());
-		libs.add("m3g_lwjgl.jar");
-		libs.add("micro3d_gl.jar");
 		return libs;
 	}
 
