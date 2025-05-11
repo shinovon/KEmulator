@@ -45,16 +45,54 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 			throw new IllegalArgumentException("Folder \"/opt/proguard6.2.2\" already exists. Maybe you already installed it?");
 		String tempZipName = "/tmp/proguard" + System.currentTimeMillis() + ".zip";
 		String tempFolderName = "/tmp/proguard" + System.currentTimeMillis() + "_ext";
+
 		appendLog("Downloading with wget, wait...\n");
-		Process wget = Runtime.getRuntime().exec(new String[]{"/usr/bin/wget", "-O", tempZipName, proguardUrl});
+		downloadWithWget(proguardUrl, tempZipName);
+
+		appendLog("\nExtracting archive...\n");
+		unzip(tempZipName, tempFolderName);
+
+		appendLog("\nRunning installation...\n");
+		Process pkexec = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "bash", "-c", "/usr/bin/install -Dm644 " + tempFolderName + "/proguard6.2.2/lib/* -t /opt/proguard6.2.2/"});
+		pkexec.waitFor();
+		if (pkexec.exitValue() != 0)
+			throw new RuntimeException("pkexec or install failed, code: " + pkexec.exitValue());
+		return "/opt/proguard6.2.2/proguard.jar";
+	}
+
+	protected String autoInstallDocs() throws IOException, InterruptedException {
+		if (Files.exists(Paths.get("/usr/share/doc/j2me")))
+			throw new IllegalArgumentException("Folder \"/usr/share/doc/j2me\" already exists. Maybe you already installed it?");
+
+		String tempZipName = "/tmp/j2medocs" + System.currentTimeMillis() + ".zip";
+		String tempFolderName = "/tmp/j2medocs" + System.currentTimeMillis() + "_ext";
+
+		appendLog("Downloading with wget, wait...\n");
+		downloadWithWget(javadocsUrl, tempZipName);
+
+		appendLog("\nExtracting archive...\n");
+		unzip(tempZipName, tempFolderName);
+
+		appendLog("\nDeleting BB docs...\n");
+		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", tempFolderName + "/J2ME_Docs-master/docs/BlackBerry_API_7_1_0"}).waitFor();
+
+		appendLog("\nRunning installation...\n");
+		int c = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "/usr/bin/cp", "-r", tempFolderName + "/J2ME_Docs-master/docs/", "/usr/share/doc/j2me"}).waitFor();
+		if (c != 0) {
+			throw new RuntimeException("pkexec or cp failed, code: " + c);
+		}
+		return "/usr/share/doc/j2me";
+	}
+
+	private void downloadWithWget(String from, String to) throws IOException, InterruptedException {
+		Process wget = Runtime.getRuntime().exec(new String[]{"/usr/bin/wget", "-v", "-O", to, from});
 		try (InputStream is = wget.getInputStream()) {
 			int c;
 			while ((c = is.read()) != -1) {
 				appendLog((char) c);
 			}
 		}
-		wget.waitFor();
-		switch (wget.exitValue()) {
+		switch (wget.waitFor()) {
 			case 0:
 				break;
 			case 3:
@@ -64,9 +102,10 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 			default:
 				throw new RuntimeException("wget failed with exit code: " + wget.exitValue());
 		}
+	}
 
-		appendLog("\nExtracting archive...\n");
-		Process unzip = Runtime.getRuntime().exec(new String[]{"/usr/bin/unzip", "-q", tempZipName, "-d", tempFolderName});
+	private void unzip(String zip, String target) throws IOException, InterruptedException {
+		Process unzip = Runtime.getRuntime().exec(new String[]{"/usr/bin/unzip", "-q", zip, "-d", target});
 		try (InputStream is = unzip.getInputStream()) {
 			int c;
 			while ((c = is.read()) != -1) {
@@ -75,14 +114,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		}
 		unzip.waitFor();
 		if (unzip.exitValue() != 0)
-			throw new RuntimeException("unzip failed, code: " + wget.exitValue());
-
-		appendLog("\nRunning installation...\n");
-		Process pkexec = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "bash", "-c", "/usr/bin/install -Dm644 " + tempFolderName + "/proguard6.2.2/lib/* -t /opt/proguard6.2.2/"});
-		pkexec.waitFor();
-		if (pkexec.exitValue() != 0)
-			throw new RuntimeException("pkexec failed, code: " + pkexec.exitValue());
-		return "/opt/proguard6.2.2/proguard.jar";
+			throw new RuntimeException("unzip failed, code: " + unzip.exitValue());
 	}
 
 	//#region Launcher pathfinder

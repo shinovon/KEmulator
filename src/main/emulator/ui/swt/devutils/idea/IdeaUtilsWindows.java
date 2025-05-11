@@ -39,6 +39,11 @@ public class IdeaUtilsWindows extends IdeaUtils {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
+	@Override
+	protected String autoInstallDocs() throws IOException, InterruptedException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
 	//#region Binary pathfinder
 
 	private static void checkStartMenuShortcuts(Set<String> set) {

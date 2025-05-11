@@ -53,12 +53,15 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	private StyledText log;
 
 	public static final String proguardUrl = "https://nnproject.cc/dl/d/proguard.zip";
+	public static final String javadocsUrl = "https://github.com/nikita36078/J2ME_Docs/archive/refs/heads/master.zip";
 	private Button proguardAutoBtn;
 	private Button restartSetup;
 	private Button useProguardFromOptBtn;
 	private Label creationStatus;
 	private Group createNewProject;
 	private Button ueiJavadocsBtn;
+	private Button useDocsFromUsr;
+	private Button installDocsToUsr;
 
 	public IdeaUtils(Shell parent) {
 		shell = new Shell(parent, SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN);
@@ -182,7 +185,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 				autoGroup.setLayoutData(genGd());
 
 				if (Files.exists(Paths.get("/opt", "proguard6.2.2", "proguard.jar"))) {
-					new Label(autoGroup, SWT.NONE).setText("Found installed ProGuard at /opt/proguard6.2.2 !");
+					new Label(autoGroup, SWT.NONE).setText("Found installed ProGuard at /opt/proguard6.2.2");
 					useProguardFromOptBtn = new Button(autoGroup, SWT.PUSH);
 					useProguardFromOptBtn.setText("Use it");
 					useProguardFromOptBtn.addSelectionListener(this);
@@ -231,6 +234,35 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			selectJmeDocsBtn = new Button(jmeDocsGroup, SWT.PUSH);
 			selectJmeDocsBtn.setText("Choose documentation root");
 			selectJmeDocsBtn.addSelectionListener(this);
+
+			if (this instanceof IdeaUtilsXdgLinux) {
+				Group autoGroup = new Group(shell, SWT.NONE);
+				autoGroup.setText("External javadocs: auto setup");
+				autoGroup.setLayout(genGLo());
+				autoGroup.setLayoutData(genGd());
+
+				try {
+					checkDocsPathValid(Paths.get("/usr/share/doc/j2me"));
+					new Label(autoGroup, SWT.NONE).setText("Found installed documentation at /usr/share/doc/j2me");
+					useDocsFromUsr = new Button(autoGroup, SWT.PUSH);
+					useDocsFromUsr.setText("Use it");
+					useDocsFromUsr.addSelectionListener(this);
+				} catch (Exception e) {
+					installDocsToUsr = new Button(autoGroup, SWT.PUSH);
+					installDocsToUsr.setText("Do it");
+					installDocsToUsr.addSelectionListener(this);
+					new Label(autoGroup, SWT.NONE).setText("Required tools: wget, unzip, rm, cp, pkexec.");
+				}
+			}
+
+			Group onlineGroup = new Group(shell, SWT.NONE);
+			onlineGroup.setText("Online javadocs");
+			onlineGroup.setLayout(genGLo());
+			onlineGroup.setLayoutData(genGd());
+
+			Button b1 = new Button(onlineGroup, SWT.PUSH);
+			b1.setText("Use nikita36068's repo as web docs");
+			b1.setEnabled(false);
 
 			shell.layout(true, true);
 			return;
@@ -452,6 +484,20 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 		} else if (e.widget == ueiJavadocsBtn) {
 			Settings.j2meDocsPath = ueiJavadocsBtn.getData().toString();
 			refreshContent();
+		} else if (e.widget == useDocsFromUsr) {
+			Settings.j2meDocsPath = "/usr/share/doc/j2me";
+			refreshContent();
+		} else if (e.widget == installDocsToUsr) {
+			makeLogWindow();
+			new Thread(() -> {
+				try {
+					Settings.j2meDocsPath = autoInstallDocs();
+					shell.getDisplay().syncExec(this::refreshContent);
+				} catch (Exception ex) {
+					shell.getDisplay().syncExec(() -> errorMsg("Failed to install javadocs", ex.getMessage()));
+					shell.getDisplay().syncExec(this::refreshContent);
+				}
+			}).start();
 		} else if (e.widget == manualConfigBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose IDEA JDK table (\"IntelliJIdeaXXXX.Y/options/jdk.table.xml\")");
@@ -635,6 +681,8 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	protected abstract List<String> getDefaultJdkSettingsFolder() throws IOException;
 
 	protected abstract String autoInstallProguard() throws IOException, InterruptedException;
+
+	protected abstract String autoInstallDocs() throws IOException, InterruptedException;
 
 	protected void appendLog(char c) {
 		shell.getDisplay().asyncExec(() -> log.append(String.valueOf(c)));
