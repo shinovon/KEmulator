@@ -370,6 +370,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 		midletName.addModifyListener(this);
 
 		reposPath = new Text(createNewProject, 2048);
+		reposPath.setText(Settings.lastIdeaRepoPath);
 		reposPath.setMessage("Project location");
 		reposPath.setToolTipText("Location of folder where the project's folder will be created.\nExample: \"" + (Emulator.linux ? "/mnt/projects/" : "D:\\projects\\") + "\"");
 		reposPath.setLayoutData(new RowData(400, SWT.DEFAULT));
@@ -561,6 +562,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 		}
 		try {
 			String code = ProjectGenerator.create(location, repoName, className, appName);
+			Settings.lastIdeaRepoPath = location;
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, Paths.get(location, repoName).toString(), code});
 		} catch (Exception ex) {
 			ex.printStackTrace();
