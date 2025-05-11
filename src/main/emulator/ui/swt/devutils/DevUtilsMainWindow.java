@@ -67,15 +67,12 @@ public class DevUtilsMainWindow implements DisposeListener, SelectionListener {
 
 		GridData gd2 = new GridData();
 		gd2.horizontalAlignment = GridData.FILL;
-		gd2.verticalAlignment = GridData.CENTER;
-		Label temp = new Label(shell, 0);
-		temp.setText("Eclipse JDT + MTJ (not supported yet)");
-		temp.setLayoutData(gd2);
-		temp.setAlignment(SWT.CENTER);
-//		eclipse = new Button(shell, SWT.FLAT);
-//		eclipse.setText("Eclipse JDT + MTJ");
-//		eclipse.setLayoutData(gd2);
-//		eclipse.addSelectionListener(this);
+		gd2.verticalAlignment = GridData.FILL;
+		eclipse = new Button(shell, SWT.FLAT);
+		eclipse.setText("Eclipse JDT + MTJ (not supported yet)");
+		eclipse.setLayoutData(gd2);
+		eclipse.addSelectionListener(this);
+		eclipse.setEnabled(false);
 
 		GridData gd3 = new GridData();
 		gd3.horizontalAlignment = GridData.FILL;
