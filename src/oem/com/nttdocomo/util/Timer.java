@@ -2,7 +2,7 @@ package com.nttdocomo.util;
 
 public final class Timer implements TimeKeeper {
 	public int getResolution() {
-		return 0;
+		return 1;
 	}
 
 	public void start() {

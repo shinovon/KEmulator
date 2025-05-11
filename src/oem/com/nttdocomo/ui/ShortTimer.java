@@ -7,11 +7,11 @@ public final class ShortTimer implements TimeKeeper {
 	}
 
 	public static ShortTimer getShortTimer(final Canvas canvas, final int n, final int n2, final boolean b) {
-		return null;
+		return new ShortTimer();
 	}
 
 	public int getResolution() {
-		return 0;
+		return 1;
 	}
 
 	public void start() {
