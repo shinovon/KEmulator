@@ -7,6 +7,7 @@ import com.jblend.graphics.j3d.Texture;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler;
+import emulator.graphics2D.GraphicsUtils;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.ITransform;
@@ -195,6 +196,15 @@ public class Graphics
 		}
 	}
 
+	public void _drawRegion(final IImage image, final int n, final int n2, final int n3, final int n4, int n5, int n6, final ITransform transform) {
+		synchronized (this) {
+			final ITransform transform2 = this.impl.getTransform();
+			this.impl.transform(transform);
+			this.impl.drawImage(image, 0, 0, n5, n6, n, n2, n + n3, n2 + n4);
+			this.impl.setTransform(transform2);
+		}
+	}
+
 	public void drawRegion(final Image image, final int sx, final int sy, final int w, final int h, final int t, final int dx, final int dy, final int a) {
 		++Profiler.drawCallCount;
 		if (image == null) {
@@ -262,7 +272,7 @@ public class Graphics
 		if (rgbData == null) {
 			throw new NullPointerException();
 		}
-		this._drawRegion(emulator.graphics2D.b.method163(rgbData, processAlpha, offset, scanlength, width, height), 0, 0, width, height, this.impl.getTransform().newTransform(width, height, 0, x, y, 0), 0xFF0000);
+		this._drawRegion(GraphicsUtils.setImageData(rgbData, processAlpha, offset, scanlength, width, height), 0, 0, width, height, this.impl.getTransform().newTransform(width, height, 0, x, y, 0), 0xFF0000);
 		++Profiler.drawRGBCallCount;
 		Profiler.drawRGBPixelCount += Math.abs(width * height);
 	}
@@ -648,5 +658,22 @@ public class Graphics
 
 	public void renderPrimitives(Texture texture, int x, int y, FigureLayout layout, Effect3D effect, int command, int numPrimitives, int[] vertexCoords, int[] normals, int[] textureCoords, int[] colors) {
 		com.jblend.graphics.j3d.RenderProxy.renderPrimitives(this, texture, x, y, layout, effect, command, numPrimitives, vertexCoords, normals, textureCoords, colors);
+	}
+
+	public Graphics _copy() {
+		Graphics g = new Graphics(image, xrayImage);
+		g.translate(tx, ty);
+		g.setColor(getColor());
+		g.setClip(getClipX(), getClipY(), getClipWidth(), getClipHeight());
+		g.setStrokeStyle(getStrokeStyle());
+		return g;
+	}
+
+	public int _getWidth() {
+		return image.getWidth();
+	}
+
+	public int _getHeight() {
+		return image.getHeight();
 	}
 }

@@ -134,7 +134,8 @@ public class Displayable {
 		if (rightCommand != null) {
 			rightLabel = rightCommand.getLabel();
 		}
-		Emulator.getEmulator().getScreen().setPrimaryCommands(leftLabel, rightLabel);
+		Emulator.getEmulator().getScreen().setLeftSoftLabel(leftLabel);
+		Emulator.getEmulator().getScreen().setRightSoftLabel(rightLabel);
 	}
 
 	private boolean hasMenuOnLeft() {

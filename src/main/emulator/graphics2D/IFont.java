@@ -8,4 +8,6 @@ public interface IFont {
 	int getHeight();
 
 	int getAscent();
+
+	int getDescent();
 }

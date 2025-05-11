@@ -3,26 +3,26 @@ package emulator.graphics2D;
 import emulator.Emulator;
 import emulator.Settings;
 
-public final class b {
+public final class GraphicsUtils {
 	private static IImage bufferImage;
 	private static int[] bufferData;
 
-	public b() {
+	public GraphicsUtils() {
 		super();
 	}
 
 	private static void createBuffer(int max, int max2) {
-		if (b.bufferImage == null || max > b.bufferImage.getWidth() || max2 > b.bufferImage.getHeight()) {
+		if (GraphicsUtils.bufferImage == null || max > GraphicsUtils.bufferImage.getWidth() || max2 > GraphicsUtils.bufferImage.getHeight()) {
 			max = Math.max(max, Emulator.getEmulator().getScreen().getWidth());
 			max2 = Math.max(max2, Emulator.getEmulator().getScreen().getHeight());
-			b.bufferImage = Emulator.getEmulator().newImage(max, max2, true);
+			GraphicsUtils.bufferImage = Emulator.getEmulator().newImage(max, max2, true);
 			if (Settings.g2d == 0) {
-				b.bufferData = new int[max * max2];
+				GraphicsUtils.bufferData = new int[max * max2];
 			}
 		}
 	}
 
-	public static void method162(final IImage image, final int[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
+	public static void setImageData(final IImage image, final int[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
 		int[] data = null;
 		if (Settings.g2d == 0) {
 			data = new int[image.getWidth() * image.getHeight()];
@@ -46,13 +46,13 @@ public final class b {
 		}
 	}
 
-	public static IImage method163(final int[] rgbData, final boolean processAlpha, int offset, final int scanlength, final int width, final int height) {
+	public static IImage setImageData(final int[] rgbData, final boolean processAlpha, int offset, final int scanlength, final int width, final int height) {
 		createBuffer(width, height);
 		int[] data = null;
 		if (Settings.g2d == Settings.G2D_SWT) {
-			data = b.bufferData;
+			data = GraphicsUtils.bufferData;
 		} else if (Settings.g2d == Settings.G2D_AWT){
-			data = b.bufferImage.getData();
+			data = GraphicsUtils.bufferImage.getData();
 		}
 		int n5 = 0;
 		for (int i = 0; i < height; ++i) {
@@ -63,16 +63,16 @@ public final class b {
 					data[n6] |= 0xFF000000;
 				}
 			}
-			n5 += b.bufferImage.getWidth();
+			n5 += GraphicsUtils.bufferImage.getWidth();
 			offset += scanlength;
 		}
-		if (!b.bufferImage.directAccess()) {
-			b.bufferImage.setData(data);
+		if (!GraphicsUtils.bufferImage.directAccess()) {
+			GraphicsUtils.bufferImage.setData(data);
 		}
-		return b.bufferImage;
+		return GraphicsUtils.bufferImage;
 	}
 
-	public static IImage method164(final short[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
+	public static IImage setImageData(final short[] array, final boolean b, int n, final int n2, final int n3, final int n4) {
 		createBuffer(n3, n4);
 		int[] data = null;
 		if (Settings.g2d == 0) {
@@ -100,7 +100,7 @@ public final class b {
 		return bufferImage;
 	}
 
-	public static void method165(final IImage image, final int[] array, int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
+	public static void getImageData(final IImage image, final int[] array, int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
 		final int[] data = image.getData();
 		int n7 = n4 * image.getWidth() + n3;
 		for (int i = 0; i < n6; ++i) {
@@ -110,7 +110,7 @@ public final class b {
 		}
 	}
 
-	public static void method166(final IImage image, final short[] array, int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
+	public static void getImageData(final IImage image, final short[] array, int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
 		for (int i = 0; i < n6; ++i) {
 			int n7 = n;
 			for (int j = 0; j < n5; ++j) {

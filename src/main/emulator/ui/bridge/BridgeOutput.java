@@ -31,6 +31,9 @@ final class BridgeOutput implements IScreen {
 
 	private final Object lock = new Object();
 
+	private String leftSoftLabel;
+	private String rightSoftLabel;
+
 	BridgeOutput(BridgeFrontend bridge, int w, int h) {
 		this.bridge = bridge;
 		this.screenImageAwt = new ImageAWT(w, h, false, -1);
@@ -111,9 +114,20 @@ final class BridgeOutput implements IScreen {
 	}
 
 	@Override
-	public void setPrimaryCommands(String left, String right) {
-		byte[] l = left == null ? (new byte[0]) : left.getBytes(StandardCharsets.UTF_8);
-		byte[] r = right == null ? (new byte[0]) : right.getBytes(StandardCharsets.UTF_8);
+	public void setLeftSoftLabel(String label) {
+		leftSoftLabel = label;
+		sendLabels();
+	}
+
+	@Override
+	public void setRightSoftLabel(String label) {
+		rightSoftLabel = label;
+		sendLabels();
+	}
+
+	private void sendLabels() {
+		byte[] l = leftSoftLabel == null ? (new byte[0]) : leftSoftLabel.getBytes(StandardCharsets.UTF_8);
+		byte[] r = rightSoftLabel == null ? (new byte[0]) : rightSoftLabel.getBytes(StandardCharsets.UTF_8);
 		ByteBuffer bb = ByteBuffer.allocate(l.length + 1 + r.length);
 		bb.put(l);
 		bb.put((byte) 0);

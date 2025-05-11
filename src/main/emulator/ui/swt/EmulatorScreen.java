@@ -794,10 +794,15 @@ public final class EmulatorScreen implements
 		return this.getScreenImg().getHeight();
 	}
 
-	public void setPrimaryCommands(final String left, final String right) {
+	public void setLeftSoftLabel(final String label) {
 		display.syncExec(() -> {
-			leftSoftLabel.setText(left);
-			rightSoftLabel.setText(right);
+			leftSoftLabel.setText(label);
+		});
+	}
+
+	public void setRightSoftLabel(final String label) {
+		display.syncExec(() -> {
+			rightSoftLabel.setText(label);
 		});
 	}
 
@@ -1312,7 +1317,7 @@ public final class EmulatorScreen implements
 				pauseStep();
 				final FileDialog fileDialog2;
 				(fileDialog2 = new FileDialog(this.shell, 4096)).setText(UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
-				fileDialog2.setFilterExtensions(new String[]{"*.jar;*.jad", "*.*"});
+				fileDialog2.setFilterExtensions(new String[]{"*.jar;*.jad;*.jam", "*.*"});
 				final String open2;
 				if ((open2 = fileDialog2.open()) != null) {
 					Settings.recordedKeysFile = null;

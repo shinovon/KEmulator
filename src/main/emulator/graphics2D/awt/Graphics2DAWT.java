@@ -96,6 +96,17 @@ public final class Graphics2DAWT implements IGraphics2D {
 		g.drawPolygon(array2, array3, n);
 	}
 
+	public final void drawPolyline(final int[] array) {
+		final int n;
+		final int[] array2 = new int[n = array.length >> 1];
+		final int[] array3 = new int[n];
+		for (int i = 0; i < n; ++i) {
+			array2[i] = array[i << 1];
+			array3[i] = array[(i << 1) + 1];
+		}
+		g.drawPolyline(array2, array3, n);
+	}
+
 	public final void drawString(final String s, final int x, final int y) {
 		g.drawString(s, x, y);
 	}

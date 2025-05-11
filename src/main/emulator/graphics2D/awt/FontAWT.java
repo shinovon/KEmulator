@@ -67,4 +67,8 @@ public final class FontAWT implements IFont {
 	public final int getAscent() {
 		return this.metrics.getAscent();
 	}
+
+	public final int getDescent() {
+		return this.metrics.getAscent();
+	}
 }

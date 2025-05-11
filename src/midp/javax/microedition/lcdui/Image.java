@@ -4,9 +4,9 @@ import emulator.Devices;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler;
+import emulator.graphics2D.GraphicsUtils;
 import emulator.graphics2D.IImage;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -160,12 +160,12 @@ public class Image {
 
 	public static Image createRGBImage(final int[] array, final int n, final int n2, final boolean b) {
 		final Image image;
-		emulator.graphics2D.b.method162((image = new Image(Emulator.getEmulator().newImage(n, n2, b))).imageImpl, array, b, 0, n, n, n2);
+		GraphicsUtils.setImageData((image = new Image(Emulator.getEmulator().newImage(n, n2, b))).imageImpl, array, b, 0, n, n, n2);
 		return image;
 	}
 
 	public void getRGB(final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		emulator.graphics2D.b.method165(this.imageImpl, array, n, n2, n3, n4, n5, n6);
+		GraphicsUtils.getImageData(this.imageImpl, array, n, n2, n3, n4, n5, n6);
 	}
 
 	public static Image createImage(InputStream var0, int var1) throws IOException {
