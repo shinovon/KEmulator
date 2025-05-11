@@ -43,6 +43,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 	protected String autoInstallProguard() throws IOException, InterruptedException {
 		if (Files.exists(Paths.get("/opt/proguard6.2.2")))
 			throw new IllegalArgumentException("Folder \"/opt/proguard6.2.2\" already exists. Maybe you already installed it?");
+
 		String tempZipName = "/tmp/proguard" + System.currentTimeMillis() + ".zip";
 		String tempFolderName = "/tmp/proguard" + System.currentTimeMillis() + "_ext";
 
@@ -54,9 +55,13 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 
 		appendLog("\nRunning installation...\n");
 		Process pkexec = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "bash", "-c", "/usr/bin/install -Dm644 " + tempFolderName + "/proguard6.2.2/lib/* -t /opt/proguard6.2.2/"});
-		pkexec.waitFor();
-		if (pkexec.exitValue() != 0)
+		if (pkexec.waitFor() != 0)
 			throw new RuntimeException("pkexec or install failed, code: " + pkexec.exitValue());
+
+		appendLog("\nDeleting caches...\n");
+		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", tempFolderName}).waitFor();
+		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", tempZipName}).waitFor();
+
 		return "/opt/proguard6.2.2/proguard.jar";
 	}
 
@@ -79,9 +84,13 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 
 		appendLog("\nRunning installation...\n");
 		int c = Runtime.getRuntime().exec(new String[]{"/usr/bin/pkexec", "/usr/bin/cp", "-r", tempFolderName + "/J2ME_Docs-master/docs/", JAVADOCS_DEFAULT_PATH}).waitFor();
-		if (c != 0) {
+		if (c != 0)
 			throw new RuntimeException("pkexec or cp failed, code: " + c);
-		}
+
+		appendLog("\nDeleting caches...\n");
+		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", tempFolderName}).waitFor();
+		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", tempZipName}).waitFor();
+
 		return JAVADOCS_DEFAULT_PATH;
 	}
 
