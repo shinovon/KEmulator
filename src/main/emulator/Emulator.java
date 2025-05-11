@@ -416,7 +416,7 @@ public class Emulator implements Runnable {
 		if (s != null) {
 			sb.append(" - ").append(s);
 		} else if (midletJar != null && Emulator.emulatorimpl.getAppProperties() != null) {
-			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty("MIDlet-Name"));
+			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty(Emulator.doja ? "AppName" : "MIDlet-Name"));
 		}
 		if (Settings.uei) sb.append(" (UEI)");
 		return sb.toString();
@@ -479,7 +479,7 @@ public class Emulator implements Runnable {
 				}
 				if (file.exists()) {
 					doja = file.getName().endsWith(".jam");
-					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file), doja ? "Shift_JIS" : "UTF-8"));
 					final Enumeration<Object> keys = props.keys();
 					while (keys.hasMoreElements()) {
 						final String s = (String) keys.nextElement();
@@ -882,21 +882,22 @@ public class Emulator implements Runnable {
 				return;
 			}
 			InputStream inputStream = null;
-			final String appProperty;
-			if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
-				iconPath = appProperty;
-				inputStream = emulator.custom.CustomJarResources.getResourceAsStream(appProperty);
-			} else {
-				final String appProperty2;
-				if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
-					try {
-						String s = appProperty2.split(",")[1].trim();
-						iconPath = s;
-						inputStream = emulator.custom.CustomJarResources.getResourceAsStream(s);
-					} catch (Exception ex3) {
-						ex3.printStackTrace();
+			try {
+				String iconPath;
+				if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
+					Emulator.iconPath = iconPath;
+					inputStream = emulator.custom.CustomJarResources.getResourceAsStream(iconPath);
+				} else if ((iconPath = Emulator.emulatorimpl.getAppProperty("AppIcon")) != null) {
+					Emulator.iconPath = iconPath = iconPath.split(",")[0].trim();
+					inputStream = emulator.custom.CustomJarResources.getResourceAsStream(iconPath);
+				} else {
+					if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
+						Emulator.iconPath = iconPath = iconPath.split(",")[1].trim();
+						inputStream = emulator.custom.CustomJarResources.getResourceAsStream(iconPath);
 					}
 				}
+			} catch (Exception ex3) {
+				ex3.printStackTrace();
 			}
 			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
 				Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");

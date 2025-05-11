@@ -57,7 +57,7 @@ public abstract class IApplication {
 	}
 
 	public final String getParameter(final String s) {
-		return null;
+		return Emulator.getEmulator().getAppProperty(s);
 	}
 
 	public final String getSourceURL() {
