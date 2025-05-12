@@ -143,8 +143,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			installGroup.setLayoutData(genGd());
 
 			if (didInstallation) {
-				new Label(installGroup, SWT.NONE).setText("If it didn't show up in list above:");
-				new Label(installGroup, SWT.NONE).setText("Make sure you created desktop shortcut or added launcher to $PATH.");
+				new Label(installGroup, SWT.NONE).setText("If it didn't appear in list, make sure you create launch menu entry.");
 				refreshInstalledListBtn = new Button(installGroup, SWT.PUSH);
 				refreshInstalledListBtn.setText("Refresh again");
 				refreshInstalledListBtn.addSelectionListener(this);
@@ -588,6 +587,11 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	}
 
 	private void patchJdkTable() {
+		Path lockFile = Paths.get(jdkTablePath).getParent().getParent().resolve(".lock");
+		if (Files.exists(lockFile)) {
+			errorMsg("Config location", "Your IntelliJ IDEA is running. Close it to continue.");
+			return;
+		}
 		try {
 			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs);
 			Settings.ideaJdkTablePatched = true;
