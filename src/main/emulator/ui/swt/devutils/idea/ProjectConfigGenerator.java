@@ -84,7 +84,7 @@ public class ProjectConfigGenerator {
 		}
 		sb.append("-injars '").append(Paths.get(dir, "deployed", "raw", name + ".jar")).append("'");
 		sb.append(System.lineSeparator());
-		sb.append("-outjars '").append(Paths.get(dir, "deployed", name + "_release.jar")).append("'");
+		sb.append("-outjars '").append(Paths.get(dir, "deployed", name + ".jar")).append("'");
 		sb.append(System.lineSeparator());
 		sb.append("-printseeds '").append(Paths.get(dir, "deployed", "pro_seeds.txt")).append("'");
 		sb.append(System.lineSeparator());

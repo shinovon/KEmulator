@@ -684,7 +684,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 					"- IDEA and Eclipse use different files for MIDlet suite manifest. Synchronize them by hand.\n" +
 					"- IDEA provides bad support for global package classes. Get rid of them.\n" +
 					"- Artifact building will provide you non-pre-verified JAR, it's not ready to be run on real devices.\n" +
-					"- To get a JAR ready for deployment, use \"Package\" run configuration. The file will be \"./deployed/PROJNAME_release.jar\".\n" +
+					"- To get a JAR ready for deployment, use \"Package\" run configuration. The file will be \"./deployed/PROJECTNAME.jar\".\n" +
 					"- Pre-verification is done via ProGuard as part of optimization/obfuscation pass. Edit ProGuard config manually to skip it.");
 			mb.open();
 		} catch (Exception ex) {
