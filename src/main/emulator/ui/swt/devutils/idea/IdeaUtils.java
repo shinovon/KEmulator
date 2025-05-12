@@ -3,6 +3,8 @@ package emulator.ui.swt.devutils.idea;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.ui.swt.devutils.JavaTypeValidator;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipFile;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.*;
@@ -13,9 +15,12 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -25,12 +30,13 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	public static final String JAVADOCS_DEFAULT_PATH = "/usr/share/doc/j2me";
 	public static final String PROGUARD_URL = "https://nnproject.cc/dl/d/proguard.zip";
 	public static final String JAVADOCS_URL = "https://github.com/nikita36078/J2ME_Docs/archive/refs/heads/master.zip";
-	public static final String PROGUARD_DEFAULT_PATH = "/opt/proguard6.2.2/proguard.jar";
+	public static final String PROGUARD_DEFAULT_PATH_UNIX = "/opt/proguard6.2.2/proguard.jar";
 
 	// state
 	private boolean didInstallation = false;
 	private String jdkTablePath = null;
 	private boolean alreadyPatched = false;
+	private boolean useOnlineDocs = false;
 
 	// view
 	private final Shell shell;
@@ -60,6 +66,9 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	private Group createNewProject;
 	private Button useDocsFromUsr;
 	private Button installDocsToUsr;
+	private final Path proguardDefaultLocalPath = Paths.get(Emulator.getAbsolutePath(), "proguard.jar");
+	private Button proguardAutoLocalBtn;
+	private Button useOnlineDocsBtn;
 
 	public IdeaUtils(Shell parent) {
 		shell = new Shell(parent, SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN);
@@ -176,30 +185,50 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			selectProguardBtn.setText("Choose proguard JAR");
 			selectProguardBtn.addSelectionListener(this);
 
-			if (this instanceof IdeaUtilsXdgLinux) {
-				Group autoGroup = new Group(shell, SWT.NONE);
-				autoGroup.setText("Auto setup");
-				autoGroup.setLayout(genGLo());
-				autoGroup.setLayoutData(genGd());
+			Group autoGroup = new Group(shell, SWT.NONE);
+			autoGroup.setText("Auto setup");
+			autoGroup.setLayout(genGLo());
+			autoGroup.setLayoutData(genGd());
 
-				if (Files.exists(Paths.get(PROGUARD_DEFAULT_PATH))) {
-					Settings.proguardPath = PROGUARD_DEFAULT_PATH;
-					// skipping the screen entirely if there is an installed proguard
+			boolean autoSetupAvailable = false;
+
+			// skipping the screen entirely if there is an installed proguard
+			if (Files.exists(proguardDefaultLocalPath)) {
+				Settings.proguardPath = proguardDefaultLocalPath.toString();
+				refreshContent();
+				return;
+			}
+
+			if (this instanceof IdeaUtilsXdgLinux) {
+				if (Files.exists(Paths.get(PROGUARD_DEFAULT_PATH_UNIX))) {
+					Settings.proguardPath = PROGUARD_DEFAULT_PATH_UNIX;
 					refreshContent();
 					return;
-				} else {
-					proguardAutoBtn = new Button(autoGroup, SWT.PUSH);
-					proguardAutoBtn.setText("Do it");
-					proguardAutoBtn.addSelectionListener(this);
-					new Label(autoGroup, SWT.NONE).setText("Required tools: wget, bash, unzip, install, pkexec.");
 				}
+				proguardAutoBtn = new Button(autoGroup, SWT.PUSH);
+				proguardAutoBtn.setText("Install to /opt/");
+				proguardAutoBtn.addSelectionListener(this);
+				new Label(autoGroup, SWT.NONE).setText("Required tools: wget, bash, unzip, install, pkexec.");
+				autoSetupAvailable = true;
 			}
+
+			if (Emulator.isPortable) {
+				proguardAutoLocalBtn = new Button(autoGroup, SWT.PUSH);
+				proguardAutoLocalBtn.setText("Install to KEmulator folder");
+				proguardAutoLocalBtn.addSelectionListener(this);
+				autoSetupAvailable = true;
+			}
+
+			if (!autoSetupAvailable)
+				new Label(autoGroup, SWT.NONE).setText("Not available");
 
 			shell.layout(true, true);
 			return;
 		}
 
-		if (Settings.j2meDocsPath == null) {
+		// user may live with null docs path, when using online ones.
+		// Skipping this step if table is already patched.
+		if (Settings.j2meDocsPath == null && !useOnlineDocs && !Settings.ideaJdkTablePatched) {
 			try {
 				Path path = Paths.get(Emulator.getAbsolutePath(), "uei", "javadocs");
 				checkDocsPathValid(path);
@@ -254,9 +283,10 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			onlineGroup.setLayout(genGLo());
 			onlineGroup.setLayoutData(genGd());
 
-			Button b1 = new Button(onlineGroup, SWT.PUSH);
-			b1.setText("Use nikita36068's repo as web docs");
-			b1.setEnabled(false);
+			useOnlineDocsBtn = new Button(onlineGroup, SWT.PUSH);
+			useOnlineDocsBtn.setText("Use nikita36068's repo as web docs");
+			useOnlineDocsBtn.addSelectionListener(this);
+			new Label(onlineGroup, SWT.NONE).setText("Not all docs will be connected, only the most important ones.");
 
 			shell.layout(true, true);
 			return;
@@ -315,7 +345,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 					new Label(jvmSetupGroup, SWT.NONE).setText(jdkTablePath);
 
 					doPatchBtn = new Button(jvmSetupGroup, SWT.PUSH);
-					doPatchBtn.setText("Patch the table");
+					doPatchBtn.setText("Edit the table");
 					doPatchBtn.addSelectionListener(this);
 
 					new Label(jvmSetupGroup, SWT.NONE).setText("Note: this will write to config paths to:");
@@ -449,6 +479,18 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 					shell.getDisplay().syncExec(this::refreshContent);
 				}
 			}).start();
+		} else if (e.widget == proguardAutoLocalBtn) {
+			makeLogWindow();
+			new Thread(() -> {
+				try {
+					autoInstallProguardLocally();
+					Settings.proguardPath = proguardDefaultLocalPath.toString();
+					shell.getDisplay().syncExec(this::refreshContent);
+				} catch (Exception ex) {
+					shell.getDisplay().syncExec(() -> errorMsg("Failed to install proguard", ex.getMessage()));
+					shell.getDisplay().syncExec(this::refreshContent);
+				}
+			}).start();
 		} else if (e.widget == selectProguardBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose ProGuard JAR binary (\"path/proguard/lib/proguard.jar\")");
@@ -468,6 +510,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			try {
 				checkDocsPathValid(Paths.get(path));
 				Settings.j2meDocsPath = path;
+				Settings.ideaJdkTablePatched = false;
 				refreshContent();
 			} catch (IOException ex) {
 				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
@@ -475,18 +518,24 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			}
 		} else if (e.widget == useDocsFromUsr) {
 			Settings.j2meDocsPath = JAVADOCS_DEFAULT_PATH;
+			Settings.ideaJdkTablePatched = false;
 			refreshContent();
 		} else if (e.widget == installDocsToUsr) {
 			makeLogWindow();
 			new Thread(() -> {
 				try {
 					Settings.j2meDocsPath = autoInstallDocs();
+					Settings.ideaJdkTablePatched = false;
 					shell.getDisplay().syncExec(this::refreshContent);
 				} catch (Exception ex) {
 					shell.getDisplay().syncExec(() -> errorMsg("Failed to install javadocs", ex.getMessage()));
 					shell.getDisplay().syncExec(this::refreshContent);
 				}
 			}).start();
+		} else if (e.widget == useOnlineDocsBtn) {
+			useOnlineDocs = true;
+			Settings.ideaJdkTablePatched = false;
+			refreshContent();
 		} else if (e.widget == manualConfigBtn) {
 			FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			fd.setText("Choose IDEA JDK table (\"IntelliJIdeaXXXX.Y/options/jdk.table.xml\")");
@@ -524,6 +573,8 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			Settings.ideaPath = null;
 			jdkTablePath = null;
 			didInstallation = false;
+			alreadyPatched = false;
+			useOnlineDocs = false;
 			refreshContent();
 		}
 	}
@@ -538,7 +589,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 
 	private void patchJdkTable() {
 		try {
-			JdkTablePatcher.updateJdkTable(jdkTablePath);
+			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs);
 			Settings.ideaJdkTablePatched = true;
 			refreshContent();
 		} catch (Exception ex) {
@@ -673,6 +724,31 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	protected abstract String autoInstallProguard() throws IOException, InterruptedException;
 
 	protected abstract String autoInstallDocs() throws IOException, InterruptedException;
+
+	protected void autoInstallProguardLocally() throws IOException {
+		if (!Emulator.isPortable)
+			throw new UnsupportedOperationException();
+
+		Path tempZip = Files.createTempFile("proguard", ".zip").toAbsolutePath();
+		try {
+			appendLog("Downloading manually, wait...\n");
+			try (InputStream in = new URL(PROGUARD_URL).openStream()) {
+				Files.copy(in, tempZip, StandardCopyOption.REPLACE_EXISTING);
+			}
+			appendLog("Installing...\n");
+
+			ZipFile zipFile = new ZipFile(tempZip.toString());
+			ZipEntry entry = zipFile.getEntry("proguard6.2.2/lib/proguard.jar");
+
+			if (entry == null) throw new IOException("Broken archive");
+
+			try (InputStream entryStream = zipFile.getInputStream(entry)) {
+				Files.copy(entryStream, proguardDefaultLocalPath, StandardCopyOption.REPLACE_EXISTING);
+			}
+		} finally {
+			Files.deleteIfExists(tempZip);
+		}
+	}
 
 	protected void appendLog(char c) {
 		shell.getDisplay().asyncExec(() -> log.append(String.valueOf(c)));

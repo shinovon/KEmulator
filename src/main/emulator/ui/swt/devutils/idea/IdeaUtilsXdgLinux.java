@@ -62,7 +62,7 @@ public class IdeaUtilsXdgLinux extends IdeaUtils {
 		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", tempFolderName}).waitFor();
 		Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", tempZipName}).waitFor();
 
-		return PROGUARD_DEFAULT_PATH;
+		return PROGUARD_DEFAULT_PATH_UNIX;
 	}
 
 	protected String autoInstallDocs() throws IOException, InterruptedException {

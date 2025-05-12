@@ -50,6 +50,18 @@ public class JdkTablePatcher {
 			"samsungapi.jar",
 			"siemensio.jar",
 	};
+	public static final String[] NIKITA_DOCS = new String[]{
+			"https://nikita36078.github.io/J2ME_Docs/docs/cldc-1.1",
+			"https://nikita36078.github.io/J2ME_Docs/docs/midp-2.0",
+			"https://nikita36078.github.io/J2ME_Docs/docs/jsr75",
+			"https://nikita36078.github.io/J2ME_Docs/docs/jsr75-pim",
+			"https://nikita36078.github.io/J2ME_Docs/docs/jsr82_1.1.1_javadoc",
+			"https://nikita36078.github.io/J2ME_Docs/docs/jsr135",
+			"https://nikita36078.github.io/J2ME_Docs/docs/jsr179-1_1-mrel-javadoc",
+			"https://nikita36078.github.io/J2ME_Docs/docs/jsr184",
+			"https://nikita36078.github.io/J2ME_Docs/docs/nokiaapi2"
+
+	};
 	public static final String CLDC_DEVTIME = "1.8 CLDC Devtime";
 	public static final String CLDC_RUNTIME = "1.8 CLDC Runtime";
 
@@ -68,7 +80,7 @@ public class JdkTablePatcher {
 		return jdkExists(projectJdkTable, CLDC_DEVTIME) && jdkExists(projectJdkTable, CLDC_RUNTIME);
 	}
 
-	public static void updateJdkTable(String configFilePath) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+	public static void updateJdkTable(String configFilePath, boolean onlineDocs) throws ParserConfigurationException, IOException, SAXException, TransformerException {
 		String jdk = Emulator.getJdkHome();
 
 		Document doc = loadDocument(configFilePath);
@@ -76,7 +88,7 @@ public class JdkTablePatcher {
 
 		if (jdkExists(projectJdkTable, CLDC_DEVTIME))
 			removeJdk(projectJdkTable, CLDC_DEVTIME);
-		projectJdkTable.appendChild(createDevTimeJdk(doc, jdk));
+		projectJdkTable.appendChild(createDevTimeJdk(doc, jdk, onlineDocs));
 		if (jdkExists(projectJdkTable, CLDC_RUNTIME))
 			removeJdk(projectJdkTable, CLDC_RUNTIME);
 		projectJdkTable.appendChild(createRuntimeJdk(doc, jdk));
@@ -193,7 +205,7 @@ public class JdkTablePatcher {
 		return false;
 	}
 
-	private static Element createDevTimeJdk(Document doc, String java8Path) {
+	private static Element createDevTimeJdk(Document doc, String java8Path, boolean onlineDocs) {
 		Element jdk = doc.createElement("jdk");
 		jdk.setAttribute("version", "2");
 
@@ -205,7 +217,7 @@ public class JdkTablePatcher {
 		Element roots = doc.createElement("roots");
 		roots.appendChild(createAnnotationsPath(doc));
 		roots.appendChild(createClassPath(doc, getDevTimeClassPaths()));
-		roots.appendChild(createJavadocPath(doc, getDevTimeJavadocPaths(Settings.j2meDocsPath)));
+		roots.appendChild(createJavadocPath(doc, onlineDocs ? Arrays.asList(NIKITA_DOCS) : getDevTimeJavadocPaths(Settings.j2meDocsPath)));
 		roots.appendChild(createSourcePath(doc));
 
 		jdk.appendChild(roots);
