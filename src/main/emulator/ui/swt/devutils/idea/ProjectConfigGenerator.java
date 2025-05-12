@@ -201,7 +201,7 @@ public class ProjectConfigGenerator {
 				"    <option name=\"PROGRAM_PARAMETERS\" value=\"@proguard.cfg\" />\n" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
-				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8\" />\n" +
+				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <method v=\"2\">\n" +
 				"      <option name=\"BuildArtifacts\" enabled=\"true\">\n" +
 				"        <artifact name=\"" + projectName + "\" />\n" +
