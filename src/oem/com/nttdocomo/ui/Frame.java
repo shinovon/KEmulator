@@ -7,17 +7,19 @@ import emulator.*;
 public abstract class Frame {
 	public static final int SOFT_KEY_1 = 0;
 	public static final int SOFT_KEY_2 = 1;
+	int backgroundColor = -1;
 	Displayable a;
 
 	public final int getWidth() {
-		return 0;
+		return Emulator.getEmulator().getScreen().getWidth();
 	}
 
 	public final int getHeight() {
-		return 0;
+		return Emulator.getEmulator().getScreen().getHeight();
 	}
 
 	public void setBackground(final int n) {
+		backgroundColor = n;
 	}
 
 	public void setSoftLabel(final int n, String s) {

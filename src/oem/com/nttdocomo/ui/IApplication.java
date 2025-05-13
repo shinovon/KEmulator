@@ -69,6 +69,11 @@ public abstract class IApplication {
 	}
 
 	public static final IApplication getCurrentApp() {
+		if (IApplicationMIDlet.pIApplication == null) {
+			IApplicationMIDlet.pIApplication = new IApplication() {
+				public void start() {}
+			};
+		}
 		return IApplicationMIDlet.pIApplication;
 	}
 

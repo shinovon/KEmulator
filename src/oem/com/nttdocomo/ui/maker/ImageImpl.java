@@ -26,6 +26,10 @@ public class ImageImpl extends Image {
 	}
 
 	public Graphics getGraphics() {
-		return new Graphics(this.impl.getGraphics());
+		return new Graphics(null, this.impl.getGraphics());
+	}
+
+	public void setAlpha(int i) {
+		// TODO
 	}
 }

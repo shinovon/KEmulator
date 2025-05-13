@@ -29,4 +29,8 @@ public abstract class Image {
 	public Graphics getGraphics() {
 		return null;
 	}
+
+	public void setAlpha(int i) {
+
+	}
 }

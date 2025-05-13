@@ -14,30 +14,34 @@
  * limitations under the License.
  */
 
-package com.j_phone.amuse.j3d;
+package com.nttdocomo.opt.ui.j3d;
 
-import ru.woesss.j2me.micro3d.FigureImpl;
+import emulator.custom.CustomJarResources;
+import ru.woesss.j2me.micro3d.ActTableImpl;
 
 import java.io.IOException;
+import java.io.InputStream;
 
-public class Figure {
-	public FigureImpl impl;
+public class ActionTable {
+	final ActTableImpl impl;
 
-	public Figure(byte[] b) {
-		impl = new FigureImpl(b);
+	public ActionTable(byte[] b) {
+		impl = new ActTableImpl(b);
 	}
 
-
-	public Figure(String name) throws IOException {
-		impl = new FigureImpl(name);
+	public ActionTable(String name) throws IOException {
+		impl = new ActTableImpl(name);
 	}
 
+	public ActionTable(InputStream inputStream) throws IOException {
+		this(CustomJarResources.getBytes(inputStream));
+	}
 
-	/** @noinspection unused*/
-	public void setPosture(ActionTable actionTable, int action, int frame) {
-		if (actionTable == null) {
-			throw new NullPointerException();
-		}
-		impl.setPosture(actionTable.impl, action, frame);
+	public int getNumAction() {
+		return impl.getNumActions();
+	}
+
+	public int getMaxFrame(int idx) {
+		return impl.getNumFrames(idx);
 	}
 }

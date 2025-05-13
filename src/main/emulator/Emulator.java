@@ -912,6 +912,7 @@ public class Emulator implements Runnable {
 				return;
 			}
 			if (doja) {
+				Emulator.eventQueue = new EventQueue();
 				midlet = new IApplicationMIDlet(Emulator.midletClassName.trim());
 			} else {
 				getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
@@ -923,8 +924,8 @@ public class Emulator implements Runnable {
 					System.exit(1);
 					return;
 				}
+				Emulator.eventQueue = new EventQueue();
 			}
-			Emulator.eventQueue = new EventQueue();
 			new Thread(new Emulator()).start();
 			Emulator.emulatorimpl.getScreen().runWithMidlet();
 		} catch (Throwable e) {

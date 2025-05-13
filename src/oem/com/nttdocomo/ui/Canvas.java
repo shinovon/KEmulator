@@ -1,5 +1,6 @@
 package com.nttdocomo.ui;
 
+import com.nttdocomo.opt.ui.j3d.Micro3DGraphics;
 import com.nttdocomo.ui.maker.*;
 
 import javax.microedition.lcdui.*;
@@ -15,15 +16,13 @@ public abstract class Canvas extends Frame {
 	}
 
 	public Graphics getGraphics() {
-		return new Graphics(((CanvasImpl) this.a).createGraphics());
+		return new Micro3DGraphics(this, ((CanvasImpl) this.a).createGraphics());
 	}
 
 	public abstract void paint(final Graphics p0);
 
 	public void repaint() {
-		this.b = true;
-		((CanvasImpl) this.a).repaint();
-		this.b = false;
+		repaint(0, 0, getWidth(), getHeight());
 	}
 
 	public void repaint(final int n, final int n2, final int n3, final int n4) {

@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.j_phone.amuse.j3d;
+package com.nttdocomo.opt.ui.j3d;
 
+import emulator.custom.CustomJarResources;
 import ru.woesss.j2me.micro3d.FigureImpl;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Figure {
-	public FigureImpl impl;
+	Texture texture;
+	FigureImpl impl;
+
 
 	public Figure(byte[] b) {
 		impl = new FigureImpl(b);
 	}
 
 
-	public Figure(String name) throws IOException {
-		impl = new FigureImpl(name);
+	public Figure(InputStream inputStream) throws IOException {
+		impl = new FigureImpl(CustomJarResources.getBytes(inputStream));
 	}
-
 
 	/** @noinspection unused*/
 	public void setPosture(ActionTable actionTable, int action, int frame) {
@@ -39,5 +42,14 @@ public class Figure {
 			throw new NullPointerException();
 		}
 		impl.setPosture(actionTable.impl, action, frame);
+	}
+
+	public void setTexture(Texture tex) {
+		if (tex == null)
+			throw new NullPointerException();
+		if (tex.forenv)
+			throw new IllegalArgumentException();
+
+		texture = tex;
 	}
 }

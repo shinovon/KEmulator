@@ -5,8 +5,6 @@ import javax.microedition.lcdui.game.*;
 import com.nttdocomo.ui.maker.*;
 
 import java.awt.*;
-import java.awt.image.*;
-import javax.microedition.lcdui.*;
 
 import emulator.graphics2D.GraphicsUtils;
 
@@ -17,7 +15,8 @@ public class Graphics {
 	public static final int FLIP_ROTATE = 3;
 	public static final int FLIP_ROTATE_LEFT = 4;
 	public static final int FLIP_ROTATE_RIGHT = 5;
-	javax.microedition.lcdui.Graphics a;
+	private final Frame owner;
+	protected javax.microedition.lcdui.Graphics impl;
 	boolean b;
 	int c;
 	int d;
@@ -38,15 +37,16 @@ public class Graphics {
 	public static final int OLIVE = 14;
 	public static final int SILVER = 15;
 
-	public Graphics(final javax.microedition.lcdui.Graphics a) {
-		this.a = a;
+	public Graphics(Frame owner, final javax.microedition.lcdui.Graphics a) {
+		this.owner = owner;
+		this.impl = a;
 		this.b = true;
 		this.c = 0;
 		this.d = 0;
 	}
 
 	public Graphics copy() {
-		return new Graphics(this.a._copy());
+		return new Graphics(owner, this.impl._copy());
 	}
 
 	public void dispose() {
@@ -75,11 +75,15 @@ public class Graphics {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.translate(n - this.a.getTranslateX(), n2 - this.a.getTranslateY());
+		this.impl.translate(n - this.impl.getTranslateX(), n2 - this.impl.getTranslateY());
 	}
 
 	public static int getColorOfRGB(final int n, final int n2, final int n3) {
 		return new Color(n, n2, n3).getRGB();
+	}
+
+	public static int getColorOfRGB(final int n, final int n2, final int n3, int n4) {
+		return new Color(n, n2, n3, n4).getRGB();
 	}
 
 	public static int getColorOfName(final int n) {
@@ -142,14 +146,14 @@ public class Graphics {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.setColor(color);
+		this.impl.setColor(color);
 	}
 
 	public void setFont(final Font font) {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.setFont(font.getImpl());
+		this.impl.setFont(font.getImpl());
 	}
 
 	public void clearRect(final int n, final int n2, final int n3, final int n4) {
@@ -159,17 +163,21 @@ public class Graphics {
 		if (n3 < 0 || n4 < 0) {
 			throw new IllegalArgumentException("width or height should be positive");
 		}
-		final int color = this.a.getColor();
-		this.a.setColor(0);
-		this.a.fillRect(n, n2, n3, n4);
-		this.a.setColor(color);
+		final int color = this.impl.getColor();
+		int bgcolor = -1;
+		if (owner != null) {
+			bgcolor = owner.backgroundColor;
+		}
+		this.impl.setColor(bgcolor);
+		this.impl.fillRect(n, n2, n3, n4);
+		this.impl.setColor(color);
 	}
 
 	public void drawLine(final int n, final int n2, final int n3, final int n4) {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.drawLine(n, n2, n3, n4);
+		this.impl.drawLine(n, n2, n3, n4);
 	}
 
 	public void drawRect(final int n, final int n2, final int n3, final int n4) {
@@ -179,7 +187,7 @@ public class Graphics {
 		if (n3 < 0 || n4 < 0) {
 			throw new IllegalArgumentException("width or height should be positive");
 		}
-		this.a.drawRect(n, n2, n3, n4);
+		this.impl.drawRect(n, n2, n3, n4);
 	}
 
 	public void fillRect(final int n, final int n2, final int n3, final int n4) {
@@ -189,7 +197,7 @@ public class Graphics {
 		if (n3 < 0 || n4 < 0) {
 			throw new IllegalArgumentException("width or height should be positive");
 		}
-		this.a.fillRect(n, n2, n3, n4);
+		this.impl.fillRect(n, n2, n3, n4);
 	}
 
 	protected int getMidp2Transformation() {
@@ -227,11 +235,11 @@ public class Graphics {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.drawRegion(((ImageImpl) image).getImpl(), 0, 0, image.getWidth(), image.getHeight(), this.getMidp2Transformation(), n, n2, 0);
+		this.impl.drawRegion(((ImageImpl) image).getImpl(), 0, 0, image.getWidth(), image.getHeight(), this.getMidp2Transformation(), n, n2, 0);
 	}
 
-	public void drawImage(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		this.a.drawRegion(((ImageImpl) image).getImpl(), n3, n4, n5, n6, this.getMidp2Transformation(), n, n2, 0);
+	public void drawImage(final Image image, final int dx, final int dy, final int sx, final int sy, final int w, final int h) {
+		this.impl.drawRegion(((ImageImpl) image).getImpl(), sx, sy, w, h, this.getMidp2Transformation(), dx, dy, 0);
 	}
 
 	public void drawPolyline(final int[] array, final int[] array2, final int n) {
@@ -243,7 +251,7 @@ public class Graphics {
 			arrayOfInt3[(i << 1)] = array[i];
 			arrayOfInt3[((i << 1) + 1)] = array2[i];
 		}
-		this.a.getImpl().drawPolyline(arrayOfInt3);
+		this.impl.getImpl().drawPolyline(arrayOfInt3);
 	}
 
 	public void drawPolyline(final int[] array, final int[] array2, final int n, final int n2) {
@@ -263,7 +271,7 @@ public class Graphics {
 			arrayOfInt3[(i << 1)] = array[i];
 			arrayOfInt3[((i << 1) + 1)] = array2[i];
 		}
-		this.a.getImpl().fillPolygon(arrayOfInt3);
+		this.impl.getImpl().fillPolygon(arrayOfInt3);
 	}
 
 	public void fillPolygon(final int[] array, final int[] array2, final int n, final int n2) {
@@ -278,7 +286,7 @@ public class Graphics {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.drawString(s, n, n2, 36);
+		this.impl.drawString(s, n, n2, 36);
 	}
 
 	public void drawChars(final char[] array, final int n, final int n2, final int n3, final int n4) {
@@ -295,25 +303,26 @@ public class Graphics {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.setClip(n, n2, n3, n4);
+		this.impl.setClip(n, n2, n3, n4);
 	}
 
 	public void clipRect(final int n, final int n2, final int n3, final int n4) {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.clipRect(n, n2, n3, n4);
+		this.impl.clipRect(n, n2, n3, n4);
 	}
 
 	public void clearClip() {
 		if (!this.b) {
 			throw new UIException(1, "Graphics disposed");
 		}
-		this.a.setClip(-this.a.getTranslateX(), -this.a.getTranslateY(), this.a._getWidth(), this.a._getHeight());
+		this.impl.setClip(0, 0, this.impl._getWidth(), this.impl._getHeight());
 	}
 
+
 	public void copyArea(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		this.a.copyArea(n, n2, n3, n4, n + n5, n2 + n6, 0);
+		this.impl.copyArea(n, n2, n3, n4, n + n5, n2 + n6, 0);
 	}
 
 	public void setFlipMode(final int d) {
@@ -321,15 +330,15 @@ public class Graphics {
 	}
 
 	public void drawScaledImage(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-		this.a._drawRegion(((ImageImpl) image).getImpl().getImpl(), n5, n6, n7, n8, n3, n4, this.a.getImpl().getTransform().newTransform(n3, n4, this.getMidp2Transformation(), n, n2, 0));
+		this.impl._drawRegion(((ImageImpl) image).getImpl().getImpl(), n5, n6, n7, n8, n3, n4, this.impl.getImpl().getTransform().newTransform(n3, n4, this.getMidp2Transformation(), n, n2, 0));
 	}
 
 	public void drawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		this.a.drawArc(n, n2, n3, n4, n5, n6);
+		this.impl.drawArc(n, n2, n3, n4, n5, n6);
 	}
 
 	public void fillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		this.a.fillArc(n, n2, n3, n4, n5, n6);
+		this.impl.fillArc(n, n2, n3, n4, n5, n6);
 	}
 
 	public int getPixel(final int n, final int n2) {
@@ -337,7 +346,7 @@ public class Graphics {
 	}
 
 	public int getRGBPixel(final int n, final int n2) {
-		return this.a.getImage().getRGB(n, n2);
+		return this.impl.getImage().getRGB(n, n2);
 	}
 
 	public int[] getPixels(final int n, final int n2, final int n3, final int n4, final int[] array, final int n5) {
@@ -348,19 +357,19 @@ public class Graphics {
 		if (array == null) {
 			array = new int[n3 * n4];
 		}
-		GraphicsUtils.getImageData(this.a.getImage(), array, n5, n3, n, n2, n3, n4);
+		GraphicsUtils.getImageData(this.impl.getImage(), array, n5, n3, n, n2, n3, n4);
 		return array;
 	}
 
 	public void setPixel(final int n, final int n2) {
-		this.a.fillRect(n, n2, 1, 1);
+		this.impl.fillRect(n, n2, 1, 1);
 	}
 
 	public void setPixel(final int n, final int n2, final int color) {
-		final int color2 = this.a.getColor();
-		this.a.setColor(color);
+		final int color2 = this.impl.getColor();
+		this.impl.setColor(color);
 		this.setPixel(n, n2);
-		this.a.setColor(color2);
+		this.impl.setColor(color2);
 	}
 
 	public void setRGBPixel(final int n, final int n2, final int n3) {
@@ -372,7 +381,7 @@ public class Graphics {
 	}
 
 	public void setRGBPixels(final int n, final int n2, final int n3, final int n4, final int[] array, final int n5) {
-		this.a.drawRGB(array, n5, n3, n, n2, n3, n4, false);
+		this.impl.drawRGB(array, n5, n3, n, n2, n3, n4, false);
 	}
 
 	public void drawSpriteSet(final SpriteSet set) {

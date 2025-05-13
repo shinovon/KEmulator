@@ -1,5 +1,6 @@
 package com.nttdocomo.ui.maker;
 
+import com.nttdocomo.opt.ui.j3d.Micro3DGraphics;
 import com.nttdocomo.ui.Canvas;
 import emulator.Emulator;
 import emulator.KeyMapping;
@@ -28,7 +29,7 @@ public class CanvasImpl extends GameCanvas {
 
 	public void paint(Graphics var1) {
 		Image var2 = b();
-		this.c.paint(new com.nttdocomo.ui.Graphics(var2.getGraphics()));
+		this.c.paint(new Micro3DGraphics(c, var2.getGraphics()));
 		var1.drawImage(var2, 0, 0, 0);
 	}
 
