@@ -31,7 +31,7 @@ public class ScratchPadConnection implements StreamConnection {
 
 	public InputStream openInputStream() throws IOException {
 		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(CustomJarResources.getBytes((InputStream) new BufferedInputStream(new FileInputStream(this.b))));
-		byteArrayInputStream.skip(this.c);
+		byteArrayInputStream.skip(64 + this.c);
 		return (InputStream) new ScratchpadInputStream((InputStream) byteArrayInputStream);
 	}
 
@@ -46,7 +46,7 @@ public class ScratchPadConnection implements StreamConnection {
 				this.a.setLength(Integer.parseInt(Emulator.getEmulator().getAppProperty("SPsize")));
 			}
 		}
-		this.a.seek(this.c);
+		this.a.seek(64 + this.c);
 		return (OutputStream) new ScratchpadOutputStream((OutputStream) new FileOutputStream(this.a.getFD()));
 	}
 
