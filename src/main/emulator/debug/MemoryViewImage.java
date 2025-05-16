@@ -8,10 +8,29 @@ import ru.woesss.j2me.micro3d.TextureImpl;
 import javax.microedition.lcdui.Image;
 import javax.microedition.m3g.Image2D;
 import java.nio.IntBuffer;
+import java.util.Objects;
 
 public final class MemoryViewImage extends Image {
-	public MemoryViewImage(final IImage image) {
+	public final MemoryViewImageType type;
+	public final Object source;
+
+	public MemoryViewImage(final IImage image, MemoryViewImageType type, Object source) {
 		super(image);
+		this.type = type;
+		this.source = source;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		MemoryViewImage that = (MemoryViewImage) o;
+		return source.equals(that.source);
+	}
+
+	@Override
+	public int hashCode() {
+		return source.hashCode();
 	}
 
 	public static IImage createFromM3GImage(final Image2D img2d) {
@@ -109,7 +128,8 @@ public final class MemoryViewImage extends Image {
 				IImage img = (IImage) texCls.getField("debugImage").get(tex);
 				return img;
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 
 		return null;
 	}

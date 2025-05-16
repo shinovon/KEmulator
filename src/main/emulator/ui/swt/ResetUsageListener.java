@@ -15,7 +15,7 @@ final class ResetUsageListener extends SelectionAdapter {
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
 		for (int i = 0; i < this.mv.memoryMgr.images.size(); ++i) {
-			((Image) this.mv.memoryMgr.images.get(i)).resetUsedRegion();
+			this.mv.memoryMgr.images.get(i).resetUsedRegion();
 		}
 		this.mv.updateEverything();
 	}

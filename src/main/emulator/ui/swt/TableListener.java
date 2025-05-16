@@ -1,9 +1,8 @@
 package emulator.ui.swt;
 
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.*;
 
-final class TableListener extends SelectionAdapter {
+final class TableListener extends MouseAdapter implements SelectionListener {
 	private final MemoryView mv;
 
 	TableListener(final MemoryView mv) {
@@ -11,10 +10,21 @@ final class TableListener extends SelectionAdapter {
 		this.mv = mv;
 	}
 
-	public final void widgetSelected(final SelectionEvent selectionEvent) {
+	public void mouseDown(final MouseEvent mouseEvent) {
+		if (mouseEvent.button == 3) {
+			mv.openWatcherForSelectedClass();
+		}
+	}
+
+	public void widgetSelected(final SelectionEvent selectionEvent) {
 		try {
-			mv.onTableItemSelection();
+			mv.onClassTableItemSelection();
 		} catch (Exception ignored) {
 		}
+	}
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent selectionEvent) {
+
 	}
 }
