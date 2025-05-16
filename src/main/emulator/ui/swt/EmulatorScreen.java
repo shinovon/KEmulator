@@ -180,7 +180,6 @@ public final class EmulatorScreen implements
 	private StackLayout stackLayout;
 	private Composite swtContent;
 	private Displayable lastDisplayable;
-	private boolean painted;
 	protected int dialogSelection;
 	private boolean midletSupportsMultitouch;
 	private boolean touchEnabled;
@@ -190,7 +189,7 @@ public final class EmulatorScreen implements
 	private boolean paintPending;
 
 	private Menu commandsMenu;
-	private boolean exiting;
+	private String leftSoftLabelText, rightSoftLabelText;
 
 	public EmulatorScreen(final int n, final int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -795,12 +794,18 @@ public final class EmulatorScreen implements
 	}
 
 	public void setLeftSoftLabel(final String label) {
+		if (leftSoftLabelText != null && leftSoftLabelText.equals(label))
+			return;
+		leftSoftLabelText = label;
 		display.syncExec(() -> {
 			leftSoftLabel.setText(label);
 		});
 	}
 
 	public void setRightSoftLabel(final String label) {
+		if (rightSoftLabelText != null && rightSoftLabelText.equals(label))
+			return;
+		rightSoftLabelText = label;
 		display.syncExec(() -> {
 			rightSoftLabel.setText(label);
 		});
@@ -2441,7 +2446,6 @@ public final class EmulatorScreen implements
 	}
 
 	public void widgetDisposed(final DisposeEvent disposeEvent) {
-		exiting = true;
 		Emulator.getEmulator().disposeSubWindows();
 		Emulator.notifyDestroyed();
 		if (this.pauseState != 0) {
