@@ -5,8 +5,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.DirectoryDialog;
 
-import javax.microedition.lcdui.Image;
-
 final class SaveAllImagesListener extends SelectionAdapter {
 	private final MemoryView mv;
 
@@ -24,7 +22,7 @@ final class SaveAllImagesListener extends SelectionAdapter {
 		if ((open = directoryDialog.open()) != null) {
 			for (int i = 0; i < MemoryView.imagesToShow.size(); ++i) {
 				try {
-					((Image) MemoryView.imagesToShow.get(i)).getImpl().saveToFile(open + "/" + i + ".png");
+					MemoryView.imagesToShow.get(i).image.getImpl().saveToFile(open + "/" + i + ".png");
 				} catch (Exception ignored) {
 				}
 			}

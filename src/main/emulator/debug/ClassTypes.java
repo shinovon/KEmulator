@@ -61,7 +61,7 @@ public final class ClassTypes {
 		return s;
 	}
 
-	public static boolean method871(final Class clazz) {
+	public static boolean isObject(final Class clazz) {
 		return clazz != Integer.TYPE &&
 				clazz != Boolean.TYPE &&
 				clazz != Byte.TYPE &&
