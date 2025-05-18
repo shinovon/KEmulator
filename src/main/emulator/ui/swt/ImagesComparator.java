@@ -12,8 +12,8 @@ final class ImagesComparator implements Comparator<ImageViewItem> {
 	}
 
 	public final int compare(final ImageViewItem i1, final ImageViewItem i2) {
-		Image o1 = i1.image;
-		Image o2 = i2.image;
+		Image o1 = i1.drawable;
+		Image o2 = i2.drawable;
 		int n = 0;
 		Label_0142:
 		{
