@@ -49,7 +49,7 @@ public class Emulator implements Runnable {
 	private static EventQueue eventQueue;
 	private static KeyRecords record;
 	public static Vector jarLibrarys;
-	public static Vector jarClasses;
+	public static Vector<String> jarClasses;
 	public static String midletJar;
 	public static String midletClassName;
 	public static String classPath;

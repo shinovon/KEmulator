@@ -67,6 +67,13 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.selectableClasses.put(o.toString(), c);
 	}
 
+	public Watcher(final Class cls) {
+		this(WatcherType.Static);
+		final Instance c = new Instance(cls.getName(), null);
+		c.updateFields(null);
+		this.selectableClasses.put(cls.getName(), c);
+	}
+
 	public void fillClassList() {
 		new Thread(new ClassListFiller(this)).start();
 	}
@@ -231,7 +238,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				o = Array.get(o, index);
 			}
 		}
-		if (o != null && ClassTypes.method871(clazz)) {
+		if (o != null && ClassTypes.isObject(clazz)) {
 			new Watcher(o).open(shell);
 		}
 	}
