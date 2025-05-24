@@ -29,11 +29,17 @@ public class CustomMethod {
 
 	public static void gc() {
 		++Profiler.gcCallCount;
+		if (!Settings.ignoreGc) {
+			System.gc();
+		}
 	}
 
 	public static void yield() throws InterruptedException {
-//        Thread.sleep(1L);
-		Thread.yield();
+		if (Settings.patchYield) {
+			Thread.sleep(1L);
+		} else {
+			Thread.yield();
+		}
 	}
 
 	public static void sleep(long t) throws InterruptedException {
