@@ -331,7 +331,7 @@ public class Displayable {
 	}
 
 	public static synchronized void _fpsLimiter(boolean b) {
-		if (b && Settings.speedModifier == 1 && Settings.frameRate <= 120) {
+		if (b && (Settings.speedModifier == 1 || Settings.patchSleep) && Settings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
 			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
 

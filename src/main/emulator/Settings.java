@@ -161,6 +161,10 @@ public final class Settings {
 	public static String proguardPath;
 	public static String j2meDocsPath;
 	public static boolean ideaJdkTablePatched = false;
+
 	public static boolean patchYield;
 	public static boolean ignoreGc = true;
+	public static boolean patchSleep;
+	public static boolean ignoreSleep;
+	public static boolean applySpeedToSleep;
 }

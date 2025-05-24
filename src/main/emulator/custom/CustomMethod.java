@@ -43,6 +43,14 @@ public class CustomMethod {
 	}
 
 	public static void sleep(long t) throws InterruptedException {
+		if (Settings.ignoreSleep) return;
+		if (Settings.applySpeedToSleep && Settings.speedModifier != 1 && t > 1) {
+			if (Settings.speedModifier < 0) {
+				t = t * ((100L - Settings.speedModifier * 1024L) / 100L);
+			} else {
+				t = t / Settings.speedModifier;
+			}
+		}
 		Thread.sleep(t);
 	}
 
