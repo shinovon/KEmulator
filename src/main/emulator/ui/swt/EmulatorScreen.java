@@ -2685,14 +2685,15 @@ public final class EmulatorScreen implements
 	}
 
 	public String showIMEIDialog() {
-		InputDialog imeiDialog = new InputDialog(shell);
+		InputDialog imeiDialog[] = new InputDialog[1];
 		shell.getDisplay().syncExec(() -> {
-			imeiDialog.setMessage("Application asks for IMEI");
-			imeiDialog.setInput("0000000000000000");
-			imeiDialog.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
-			imeiDialog.open();
+			imeiDialog[0] = new InputDialog(shell);
+			imeiDialog[0].setMessage("Application asks for IMEI");
+			imeiDialog[0].setInput("0000000000000000");
+			imeiDialog[0].setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
+			imeiDialog[0].open();
 		});
-		return imeiDialog.getInput();
+		return imeiDialog[0].getInput();
 	}
 
 	public boolean getTouchEnabled() {
