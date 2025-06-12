@@ -842,9 +842,13 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private void initMidiSequencer() throws MidiUnavailableException {
 		if (midiSequencer != null) return;
 		midiSequencer = MidiSystem.getSequencer(false);
-		midiSynthesizer = MidiSystem.getSynthesizer();
-		midiSynthesizer.open();
-		midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
+		if (EmulatorMIDI.useExternalReceiver()) {
+			EmulatorMIDI.setupSequencer(midiSequencer);
+		} else {
+			midiSynthesizer = MidiSystem.getSynthesizer();
+			midiSynthesizer.open();
+			midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
+		}
 		midiSequencer.open();
 		midiSequencer.addMetaEventListener(this);
 	}
