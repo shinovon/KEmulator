@@ -17,7 +17,7 @@
 package com.nttdocomo.opt.ui.j3d;
 
 import com.nttdocomo.ui.UIException;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import ru.woesss.j2me.micro3d.TextureImpl;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class Texture {
 
 	public Texture(InputStream inputStream, boolean isForEnv) throws IOException {
 		this.forenv = isForEnv;
-		impl = new TextureImpl(CustomJarResources.getBytes(inputStream));
+		impl = new TextureImpl(ResourceManager.getBytes(inputStream));
 	}
 
 	public void setNormalShader() {

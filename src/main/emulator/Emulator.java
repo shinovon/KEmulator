@@ -7,6 +7,7 @@ import com.github.sarxos.webcam.Webcam;
 import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
+import emulator.custom.ResourceManager;
 import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
@@ -886,14 +887,14 @@ public class Emulator implements Runnable {
 				String iconPath;
 				if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
 					Emulator.iconPath = iconPath;
-					inputStream = emulator.custom.CustomJarResources.getResourceAsStream(iconPath);
+					inputStream = ResourceManager.getResourceAsStream(iconPath);
 				} else if ((iconPath = Emulator.emulatorimpl.getAppProperty("AppIcon")) != null) {
 					Emulator.iconPath = iconPath = iconPath.split(",")[0].trim();
-					inputStream = emulator.custom.CustomJarResources.getResourceAsStream(iconPath);
+					inputStream = ResourceManager.getResourceAsStream(iconPath);
 				} else {
 					if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
 						Emulator.iconPath = iconPath = iconPath.split(",")[1].trim();
-						inputStream = emulator.custom.CustomJarResources.getResourceAsStream(iconPath);
+						inputStream = ResourceManager.getResourceAsStream(iconPath);
 					}
 				}
 			} catch (Exception ex3) {

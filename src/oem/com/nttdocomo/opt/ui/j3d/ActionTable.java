@@ -16,7 +16,7 @@
 
 package com.nttdocomo.opt.ui.j3d;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import ru.woesss.j2me.micro3d.ActTableImpl;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class ActionTable {
 	}
 
 	public ActionTable(InputStream inputStream) throws IOException {
-		this(CustomJarResources.getBytes(inputStream));
+		this(ResourceManager.getBytes(inputStream));
 	}
 
 	public int getNumAction() {

@@ -2,7 +2,7 @@ package javax.microedition.media;
 
 import emulator.Emulator;
 import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.ToneManager;
@@ -68,7 +68,7 @@ public class Manager {
 		// buffer
 		boolean buf = Settings.playerBufferAll;
 		if (buf && !(inputStream instanceof ByteArrayInputStream))
-			return new PlayerImpl(new ByteArrayInputStream(CustomJarResources.getBytes(inputStream)), s);
+			return new PlayerImpl(new ByteArrayInputStream(ResourceManager.getBytes(inputStream)), s);
 		else
 			return new PlayerImpl(inputStream, s);
 	}
@@ -107,7 +107,7 @@ public class Manager {
 				return new VLCPlayerImpl(s, contentType);
 			}
 			// jar resources
-			return new VLCPlayerImpl(CustomJarResources.getResourceAsStream(s), contentType);
+			return new VLCPlayerImpl(ResourceManager.getResourceAsStream(s), contentType);
 		} else if (contentType != null && contentType.startsWith("audio/")) {
 			if (s.startsWith("rtsp://") || s.startsWith("rtp://") || isAudioContentTypeRequiresLibVlc(contentType)) {
 				requireLibVlc();
@@ -122,7 +122,7 @@ public class Manager {
 			if (s.indexOf(58) != -1) {
 				return createPlayer(((InputConnection) Connector.open(s)).openInputStream(), contentType);
 			}
-			return createPlayer(CustomJarResources.getResourceAsStream(s), contentType);
+			return createPlayer(ResourceManager.getResourceAsStream(s), contentType);
 		}
 		throw new MediaException("Unknown content type");
 	}
@@ -147,7 +147,7 @@ public class Manager {
 						return createPlayer(Connector.openInputStream(locator), contentType);
 					}
 					// jar resources
-					return createPlayer(CustomJarResources.getResourceAsStream(locator), contentType);
+					return createPlayer(ResourceManager.getResourceAsStream(locator), contentType);
 				} else {
 					// streaming datasource
 					player = new PlayerImpl(contentType, src);

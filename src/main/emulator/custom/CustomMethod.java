@@ -6,7 +6,6 @@ import emulator.Settings;
 import emulator.custom.h.MethodInfo;
 import emulator.debug.Profiler;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
@@ -168,7 +167,7 @@ public class CustomMethod {
 	}
 
 	public static InputStream getResourceAsStream(final Object o, final String s) {
-		return CustomJarResources.getResourceAsStream(o, s);
+		return ResourceManager.getResourceAsStream(o, s);
 	}
 
 	public static void showTrackInfo(final String s) {

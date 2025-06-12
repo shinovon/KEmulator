@@ -1,7 +1,7 @@
 package emulator.graphics3D.m3g;
 
 import emulator.Emulator;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
@@ -1096,12 +1096,12 @@ public final class M3GLoader {
 		if (var1.indexOf(58) != -1) {
 			return method709(var1);
 		} else if (var1.charAt(0) == 47) {
-			return CustomJarResources.getResourceAsStream(var1);
+			return ResourceManager.getResourceAsStream(var1);
 		} else if (this.aString1089 == null) {
 			throw new IOException("Relative URI.");
 		} else {
 			String var2;
-			return (var2 = this.aString1089.substring(0, this.aString1089.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? CustomJarResources.getResourceAsStream(var2) : method709(var2);
+			return (var2 = this.aString1089.substring(0, this.aString1089.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? ResourceManager.getResourceAsStream(var2) : method709(var2);
 		}
 	}
 

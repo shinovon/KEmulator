@@ -3,6 +3,7 @@ package javax.microedition.lcdui;
 import emulator.Devices;
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.custom.ResourceManager;
 import emulator.debug.Profiler;
 import emulator.graphics2D.GraphicsUtils;
 import emulator.graphics2D.IImage;
@@ -101,7 +102,7 @@ public class Image {
 			throw new NullPointerException();
 		}
 		try {
-			return decode(emulator.custom.CustomJarResources.getBytes(inputStream));
+			return decode(ResourceManager.getBytes(inputStream));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new IOException();
@@ -151,7 +152,7 @@ public class Image {
 			if (!string.startsWith("/")) {
 				string = "/" + string;
 			}
-			return createImage(emulator.custom.CustomJarResources.getResourceAsStream(string));
+			return createImage(ResourceManager.getResourceAsStream(string));
 		} catch (Exception ex) {
 			//ex.printStackTrace();
 			throw new IOException(string, ex);

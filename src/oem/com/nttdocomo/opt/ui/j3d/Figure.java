@@ -16,7 +16,7 @@
 
 package com.nttdocomo.opt.ui.j3d;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import ru.woesss.j2me.micro3d.FigureImpl;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class Figure {
 
 
 	public Figure(InputStream inputStream) throws IOException {
-		impl = new FigureImpl(CustomJarResources.getBytes(inputStream));
+		impl = new FigureImpl(ResourceManager.getBytes(inputStream));
 	}
 
 	/** @noinspection unused*/

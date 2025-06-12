@@ -4,7 +4,7 @@ import javax.microedition.io.*;
 import java.io.*;
 
 import emulator.*;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ public class ScratchPadConnection implements StreamConnection {
 	}
 
 	public InputStream openInputStream() throws IOException {
-		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(CustomJarResources.getBytes((InputStream) new BufferedInputStream(new FileInputStream(this.b))));
+		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(ResourceManager.getBytes((InputStream) new BufferedInputStream(new FileInputStream(this.b))));
 		byteArrayInputStream.skip(64 + this.c);
 		return (InputStream) new ScratchpadInputStream((InputStream) byteArrayInputStream);
 	}

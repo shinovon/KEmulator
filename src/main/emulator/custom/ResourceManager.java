@@ -8,41 +8,41 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.InputConnection;
 import java.io.*;
 
-public final class CustomJarResources {
-	public CustomJarResources() {
+public final class ResourceManager {
+	public ResourceManager() {
 	}
 
 	public static InputStream getResourceAsStream(final String s) {
+		String name = s;
+		byte[] data;
 		try {
 			if (Emulator.midletJar != null) {
-				String substring = s;
-				while (substring.length() > 0 && substring.startsWith("/")) {
-					substring = substring.substring(1);
+				while (name.length() > 0 && name.startsWith("/")) {
+					name = name.substring(1);
 				}
 				final ZipFile zipFile;
 				final ZipEntry entry;
-				if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(substring)) == null) {
+				if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(name)) == null) {
 					Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (null)");
 					throw new IOException();
 				}
-				final byte[] array = new byte[(int) entry.getSize()];
-				Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + array.length + ")");
-				new DataInputStream(zipFile.getInputStream(entry)).readFully(array);
-				return new ByteArrayInputStream(array);
+				data = new byte[(int) entry.getSize()];
+				Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + data.length + ")");
+				new DataInputStream(zipFile.getInputStream(entry)).readFully(data);
 			} else {
 				final File fileFromClassPath;
 				if ((fileFromClassPath = Emulator.getFileFromClassPath(s)) == null || !fileFromClassPath.exists()) {
 					Emulator.getEmulator().getLogStream().println("Custom.path.getResourceStream: " + s + " (null)");
 					throw new IOException();
 				}
-				final byte[] array2 = new byte[(int) fileFromClassPath.length()];
+				data = new byte[(int) fileFromClassPath.length()];
 				Emulator.getEmulator().getLogStream().println("Custom.path.getResourceStream: " + s + " (" + fileFromClassPath.length() + ")");
-				new DataInputStream(new FileInputStream(fileFromClassPath)).readFully(array2);
-				return new ByteArrayInputStream(array2);
+				new DataInputStream(new FileInputStream(fileFromClassPath)).readFully(data);
 			}
 		} catch (Exception ex) {
 			return Emulator.class.getResourceAsStream(s);
 		}
+		return new ResourceStream(data, name);
 	}
 
 	public static InputStream getResourceAsStream(final Object o, String substring) {

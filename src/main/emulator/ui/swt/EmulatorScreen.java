@@ -1,7 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.*;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.custom.CustomMethod;
 import emulator.debug.Profiler;
 import emulator.debug.Profiler3D;
@@ -2624,7 +2624,7 @@ public final class EmulatorScreen implements
 			TableItem t = new TableItem(table, SWT.NONE);
 			t.setText(0, p[0].trim());
 			try {
-				t.setImage(0, new Image(SWTFrontend.getDisplay(), CustomJarResources.getResourceAsStream(p[1].trim())));
+				t.setImage(0, new Image(SWTFrontend.getDisplay(), ResourceManager.getResourceAsStream(p[1].trim())));
 			} catch (Exception ignored) {
 			}
 		}
