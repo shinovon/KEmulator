@@ -105,7 +105,6 @@ public class BridgeFrontend implements IEmulatorFrontend {
 	public void requestCommandsChoice(Vector<TargetedCommand> list) {
 		synchronized (stateWriteLock) {
 			try {
-
 				commandsCache.clear();
 				if (list == null || list.isEmpty()) {
 					sendToState('O', new byte[0]);
@@ -117,6 +116,7 @@ public class BridgeFrontend implements IEmulatorFrontend {
 				baos.write(bb.array());
 				bb.clear();
 				for (TargetedCommand command : list) {
+					if (command == null) continue;
 					int id = commandsCounter;
 					commandsCache.put(commandsCounter, command);
 					bb.putInt(id);

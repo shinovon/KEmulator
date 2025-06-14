@@ -390,6 +390,8 @@ public class Displayable {
 	Vector<TargetedCommand> buildAllCommands() {
 		Vector<TargetedCommand> cmds = new Vector<>();
 		buildItemCommands(cmds, focusedItem);
+		// separator
+		if (!cmds.isEmpty()) cmds.add(null);
 		buildScreenCommands(cmds);
 		return cmds;
 	}

@@ -1850,6 +1850,10 @@ public final class EmulatorScreen implements
 				return;
 			}
 			for (TargetedCommand cmd : cmds) {
+				if (cmd == null) {
+					new MenuItem(commandsMenu, SWT.SEPARATOR);
+					continue;
+				}
 				MenuItem mi = new MenuItem(commandsMenu, cmd.isChoice() ? SWT.RADIO : SWT.PUSH);
 				mi.setText(cmd.text);
 				mi.setData(cmd);
