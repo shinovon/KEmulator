@@ -113,6 +113,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(acc, cls.concat("Static"), name, sign);
 					return;
 				}
+				if (cls.equals("com/siemens/mp/io/Connection") && acc == Opcodes.INVOKESTATIC) {
+					super.visitMethodInsn(acc, cls, name.concat("Compat"), sign);
+					return;
+				}
 				if (Settings.g3d == 0) {
 					if (cls.equals("javax/microedition/m3g/Transform")) {
 						if (!name.equals("finalize") && !name.contains("init>")) {
