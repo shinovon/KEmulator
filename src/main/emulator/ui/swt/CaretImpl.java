@@ -90,7 +90,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		if (swtText != null) swtText.setLocation(i[0], i[1]);
 	}
 
-	public synchronized final void setWindowZoom(final float aFloat840) {
+	public final void setWindowZoom(final float aFloat840) {
 		this.zoom = aFloat840;
 		Object item = currentItem;
 		if (item != null) {
@@ -124,7 +124,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		}
 	}
 
-	public synchronized final void focusItem(final Object item, final int x, final int y) {
+	public final void focusItem(final Object item, final int x, final int y) {
 		Object tmp;
 		synchronized (this) {
 			tmp = this.currentItem;
@@ -187,7 +187,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		});
 	}
 
-	public synchronized void defocusItem(final Object item) {
+	public void defocusItem(final Object item) {
 		Object tmp;
 		synchronized (this) {
 			tmp = this.currentItem;
@@ -210,7 +210,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		});
 	}
 
-	public synchronized void updateText(Object item, final String text) {
+	public void updateText(Object item, final String text) {
 		if (item != this.currentItem || swtText == null) return;
 		display.syncExec(() -> {
 			try {
