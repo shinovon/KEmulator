@@ -386,7 +386,8 @@ public final class EventQueue implements Runnable {
 							synchronized (callbackLock) {
 								processInputEvent(e);
 							}
-							break;
+							// skip 1ms delay
+							continue;
 						}
 						case EVENT_ITEM_STATE: {
 							Item item = (Item) nextArgument();
