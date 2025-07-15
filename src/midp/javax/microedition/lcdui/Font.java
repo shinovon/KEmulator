@@ -22,32 +22,32 @@ public class Font {
 	public static final int FONT_STATIC_TEXT = 0;
 	public static final int FONT_INPUT_TEXT = 1;
 
-	public Font(final int anInt1313, final int style, final int anInt1315) {
+	public Font(final int face, final int style, final int size) {
 		super();
-		this.face = anInt1313;
-		this.size = anInt1315;
+		this.face = face;
+		this.size = size;
 		this.style = style;
-		int n = 0;
-		switch (this.size) {
-			case 0: {
-				n = Emulator.getEmulator().getProperty().getFontMediumSize();
+		int mappedSize = 0;
+		switch (size) {
+			case SIZE_MEDIUM: {
+				mappedSize = Emulator.getEmulator().getProperty().getFontMediumSize();
 				break;
 			}
-			case 16: {
-				n = Emulator.getEmulator().getProperty().getFontLargeSize();
+			case SIZE_LARGE: {
+				mappedSize = Emulator.getEmulator().getProperty().getFontLargeSize();
 				break;
 			}
+			case SIZE_SMALL:
 			default: {
-				n = Emulator.getEmulator().getProperty().getFontSmallSize();
+				mappedSize = Emulator.getEmulator().getProperty().getFontSmallSize();
 				break;
 			}
 		}
-		final int n2 = n;
-		int anInt1316;
-		if (((anInt1316 = this.style) & 0x4) != 0x0) {
-			anInt1316 &= 0xFFFFFFFB;
+		int filteredStyle;
+		if (((filteredStyle = this.style) & STYLE_UNDERLINED) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
 		}
-		this.font = Emulator.getEmulator().newFont(n2, anInt1316);
+		this.font = Emulator.getEmulator().newFont(face, mappedSize, filteredStyle);
 	}
 
 	public Font deriveFont(int size) {
@@ -55,7 +55,7 @@ public class Font {
 		if (((anInt1316 = this.style) & 0x4) != 0x0) {
 			anInt1316 &= 0xFFFFFFFB;
 		}
-		this.font = Emulator.getEmulator().newFont(size, anInt1316);
+		this.font = Emulator.getEmulator().newFont(face, size, anInt1316);
 		return this;
 	}
 

@@ -369,6 +369,11 @@ public final class Property implements IProperty, SelectionListener {
 		return this.defaultFont;
 	}
 
+	public String getMonospaceFontName() {
+		// TODO
+		return "Consolas";
+	}
+
 	public int getFontSmallSize() {
 		return this.fontSmallSize;
 	}

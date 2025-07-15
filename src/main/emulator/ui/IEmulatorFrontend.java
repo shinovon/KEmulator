@@ -22,7 +22,7 @@ public interface IEmulatorFrontend {
 
 	void disposeSubWindows();
 
-	IFont newFont(final int size, final int style);
+	IFont newFont(int face, final int size, final int style);
 
 	IFont newCustomFont(final int height, final int style);
 

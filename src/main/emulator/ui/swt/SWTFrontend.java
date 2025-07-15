@@ -160,7 +160,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		return this.sms;
 	}
 
-	public final IFont newFont(final int size, final int style) {
+	public final IFont newFont(int face, final int size, final int style) {
 		if (Settings.g2d == 0) {
 			String s = this.iproperty.getDefaultFontName() + "." + size + "." + style;
 			if (swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
@@ -169,7 +169,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 			return f;
 		}
 		if (Settings.g2d == 1) {
-			return new FontAWT(this.iproperty.getDefaultFontName(), size, style, false);
+			return new FontAWT(face == Font.FACE_MONOSPACE ? iproperty.getMonospaceFontName() : this.iproperty.getDefaultFontName(), size, style, false);
 		}
 		return null;
 	}
