@@ -417,6 +417,7 @@ public final class EventQueue implements Runnable {
 							if (d instanceof Canvas) {
 								((Canvas) d)._invokeHideNotify();
 							}
+							break;
 						}
 						case 0: {
 							synchronized (eventLock) {
