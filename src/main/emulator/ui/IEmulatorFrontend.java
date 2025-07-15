@@ -24,7 +24,7 @@ public interface IEmulatorFrontend {
 
 	IFont newFont(int face, final int size, final int style);
 
-	IFont newCustomFont(final int height, final int style);
+	IFont newCustomFont(int face, final int height, final int style);
 
 	IImage newImage(final int p0, final int p1, final boolean transparent);
 

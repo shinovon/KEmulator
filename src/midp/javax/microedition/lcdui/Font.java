@@ -51,17 +51,21 @@ public class Font {
 	}
 
 	public Font deriveFont(int size) {
-		int anInt1316;
-		if (((anInt1316 = this.style) & 0x4) != 0x0) {
-			anInt1316 &= 0xFFFFFFFB;
+		int filteredStyle;
+		if (((filteredStyle = this.style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
 		}
-		this.font = Emulator.getEmulator().newFont(face, size, anInt1316);
+		this.font = Emulator.getEmulator().newFont(face, size, filteredStyle);
 		return this;
 	}
 
 	public Font deriveFont(int style, int height) {
-		this.style = 0;
-		this.font = Emulator.getEmulator().newCustomFont(height, 0);
+		this.style = style;
+		int filteredStyle;
+		if (((filteredStyle = this.style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
+		}
+		this.font = Emulator.getEmulator().newCustomFont(face, height, filteredStyle);
 		return this;
 	}
 

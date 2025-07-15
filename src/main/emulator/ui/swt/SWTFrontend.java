@@ -160,30 +160,39 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		return this.sms;
 	}
 
+	private String getFontName(int face) {
+		if (face == Font.FACE_MONOSPACE) {
+			return iproperty.getMonospaceFontName();
+		}
+		return iproperty.getDefaultFontName();
+	}
+
 	public final IFont newFont(int face, final int size, final int style) {
+		String name = getFontName(face);
 		if (Settings.g2d == 0) {
-			String s = this.iproperty.getDefaultFontName() + "." + size + "." + style;
+			String s = name + "." + size + "." + style;
 			if (swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), size, style & ~Font.STYLE_UNDERLINED);
+			FontSWT f = new FontSWT(name, size, style & ~Font.STYLE_UNDERLINED);
 			swtFontsCache.put(s, f);
 			return f;
 		}
 		if (Settings.g2d == 1) {
-			return new FontAWT(face == Font.FACE_MONOSPACE ? iproperty.getMonospaceFontName() : this.iproperty.getDefaultFontName(), size, style, false);
+			return new FontAWT(name, size, style, false);
 		}
 		return null;
 	}
 
-	public final IFont newCustomFont(final int height, final int style) {
+	public final IFont newCustomFont(int face, final int height, final int style) {
+		String name = getFontName(face);
 		if (Settings.g2d == 0) {
-			String s = this.iproperty.getDefaultFontName() + ".-" + height + "." + style;
+			String s = name + ".-" + height + "." + style;
 			if (swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), height, style & ~Font.STYLE_UNDERLINED, true);
+			FontSWT f = new FontSWT(name, height, style & ~Font.STYLE_UNDERLINED, true);
 			swtFontsCache.put(s, f);
 			return f;
 		}
 		if (Settings.g2d == 1) {
-			return new FontAWT(this.iproperty.getDefaultFontName(), height, style, true);
+			return new FontAWT(name, height, style, true);
 		}
 		return null;
 	}
