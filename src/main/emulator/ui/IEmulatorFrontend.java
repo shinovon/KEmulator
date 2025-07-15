@@ -5,6 +5,7 @@ import emulator.graphics2D.IImage;
 import emulator.graphics3D.IGraphics3D;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public interface IEmulatorFrontend {
@@ -24,7 +25,11 @@ public interface IEmulatorFrontend {
 
 	IFont newFont(int face, final int size, final int style);
 
-	IFont newCustomFont(int face, final int height, final int style);
+	IFont newCustomFont(int face, final int size, final int style, boolean height);
+
+	IFont newFont(String name, int style, int pixelSize);
+
+	IFont loadFont(InputStream inputStream, int size) throws IOException;
 
 	IImage newImage(final int p0, final int p1, final boolean transparent);
 

@@ -19,6 +19,16 @@ public class Graphics
 		implements com.vodafone.v10.graphics.j3d.Graphics3D,
 		com.motorola.graphics.j3d.Graphics3D,
 		com.jblend.graphics.j3d.Graphics3D {
+	public static final int HCENTER = 1;
+	public static final int VCENTER = 2;
+	public static final int LEFT = 4;
+	public static final int RIGHT = 8;
+	public static final int TOP = 16;
+	public static final int BOTTOM = 32;
+	public static final int BASELINE = 64;
+	public static final int SOLID = 0;
+	public static final int DOTTED = 1;
+
 	IGraphics2D impl;
 	IImage image;
 	IImage copyimage;
@@ -29,15 +39,8 @@ public class Graphics
 	int ty;
 	Font font;
 	int[] anIntArray521;
-	public static final int HCENTER = 1;
-	public static final int VCENTER = 2;
-	public static final int LEFT = 4;
-	public static final int RIGHT = 8;
-	public static final int TOP = 16;
-	public static final int BOTTOM = 32;
-	public static final int BASELINE = 64;
-	public static final int SOLID = 0;
-	public static final int DOTTED = 1;
+	private int alpha;
+	private boolean alphaSet;
 
 	public Graphics(final IImage i1, final IImage i2) {
 		super();
@@ -51,6 +54,7 @@ public class Graphics
 			this.xrayImage = i2;
 			(this.xrayGraphics = i2.createGraphics()).setAlpha(60);
 		}
+		alpha = 255;
 		this.setFont(Font.getDefaultFont());
 	}
 
@@ -525,16 +529,31 @@ public class Graphics
 
 	public void setColor(final int n) {
 		++Profiler.drawCallCount;
+		alpha = 255;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, false);
 	}
 
 	public void _setColor(final int n) {
 		++Profiler.drawCallCount;
+		alpha = n >> 24;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, true);
 	}
 
 	public void setColor(final int n, final int n2, final int n3) {
 		++Profiler.drawCallCount;
+		alpha = 255;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, n2, n3);
 	}
 
@@ -679,5 +698,24 @@ public class Graphics
 
 	public int _getHeight() {
 		return image.getHeight();
+	}
+
+	// MIDP 3.0
+
+	public void setAlpha(int a) {
+		alphaSet = true;
+		this.impl.setAlpha(alpha = a);
+	}
+
+	public void setAlphaColor(int ARGB) {
+		_setColor(ARGB);
+	}
+
+	public void setAlphaColor(int a, int r, int g, int b) {
+		_setColor((a << 24) | (r << 16) | (g << 8) | b);
+	}
+
+	public int getAlpha() {
+		return alpha;
 	}
 }

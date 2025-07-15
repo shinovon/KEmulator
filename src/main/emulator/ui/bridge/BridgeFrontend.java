@@ -180,8 +180,18 @@ public class BridgeFrontend implements IEmulatorFrontend {
 	}
 
 	@Override
-	public IFont newCustomFont(int face, int height, int style) {
-		return new FontAWT(this.iproperty.getDefaultFontName(), height, style, true);
+	public IFont newCustomFont(int face, int size, int style, boolean height) {
+		return new FontAWT(this.iproperty.getDefaultFontName(), size, style, height);
+	}
+
+	@Override
+	public IFont newFont(String name, int size, int style) {
+		return new FontAWT(name, size, style, false);
+	}
+
+	@Override
+	public IFont loadFont(InputStream fontData, int size) {
+		return null;
 	}
 
 	@Override

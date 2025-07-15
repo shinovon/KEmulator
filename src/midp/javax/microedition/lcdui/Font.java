@@ -3,6 +3,9 @@ package javax.microedition.lcdui;
 import emulator.Emulator;
 import emulator.graphics2D.IFont;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public class Font {
 	IFont font;
 	int face;
@@ -50,23 +53,11 @@ public class Font {
 		this.font = Emulator.getEmulator().newFont(face, mappedSize, filteredStyle);
 	}
 
-	public Font deriveFont(int size) {
-		int filteredStyle;
-		if (((filteredStyle = this.style) & 0x4) != 0x0) {
-			filteredStyle &= 0xFFFFFFFB;
-		}
-		this.font = Emulator.getEmulator().newFont(face, size, filteredStyle);
-		return this;
-	}
-
-	public Font deriveFont(int style, int height) {
+	private Font(int face, int size, int style, IFont impl)  {
+		this.face = face;
+		this.size = size;
 		this.style = style;
-		int filteredStyle;
-		if (((filteredStyle = this.style) & 0x4) != 0x0) {
-			filteredStyle &= 0xFFFFFFFB;
-		}
-		this.font = Emulator.getEmulator().newCustomFont(face, height, filteredStyle);
-		return this;
+		this.font = impl;
 	}
 
 	public IFont getImpl() {
@@ -140,7 +131,88 @@ public class Font {
 		return getDefaultFont();
 	}
 
-	static {
-		Font.defaultFont = null;
+	public static Font _getNokiaUiFont(int face, int style, int height) {
+		int filteredStyle;
+		if (((filteredStyle = style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
+		}
+		IFont font = Emulator.getEmulator().newCustomFont(face, height, filteredStyle, true);
+		return new Font(face, style, Font.SIZE_MEDIUM, font);
+	}
+
+	// MIDP 3.0
+
+	public static Font createFont(InputStream fontData) throws IOException {
+		int size = Emulator.getEmulator().getProperty().getFontMediumSize();
+		IFont font = Emulator.getEmulator().loadFont(fontData, size);
+		if (font == null) {
+			return getDefaultFont();
+		}
+		return new Font(FACE_SYSTEM, size, SIZE_MEDIUM, font);
+	}
+
+	public static Font getFont(String name, int style, int pixelSize) {
+		int filteredStyle;
+		if (((filteredStyle = style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
+		}
+		if (pixelSize <= 0) {
+			pixelSize = Emulator.getEmulator().getProperty().getFontMediumSize();
+		}
+		IFont font = Emulator.getEmulator().newFont(name, pixelSize, filteredStyle);
+		return new Font(FACE_SYSTEM, style, SIZE_MEDIUM, font);
+	}
+
+	public Font deriveFont(int pixelSize) {
+		return deriveFont(style, pixelSize);
+	}
+
+	public Font deriveFont(int style, int pixelSize) {
+		this.style = style;
+		int filteredStyle;
+		if (((filteredStyle = this.style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
+		}
+		if (pixelSize <= 0) {
+			pixelSize = Emulator.getEmulator().getProperty().getFontMediumSize();
+		}
+		IFont font = Emulator.getEmulator().newCustomFont(face, pixelSize, filteredStyle, false);
+		return new Font(face, style, size, font);
+	}
+
+	public String getFamily() {
+		return font.getFamily();
+	}
+
+	public String getName() {
+		return font.getName();
+	}
+
+	public String getFontName() {
+		return font.getFontName();
+	}
+
+	public int getPixelSize() {
+		return font.getPixelSize();
+	}
+
+	public int getAscent() {
+		return font.getAscent();
+	}
+
+	public int getDescent() {
+		return font.getDescent();
+	}
+
+	public int getMaxAscent() {
+		return font.getMaxAscent();
+	}
+
+	public int getMaxDescent() {
+		return font.getMaxDescent();
+	}
+
+	public int getLeading() {
+		return font.getLeading();
 	}
 }
