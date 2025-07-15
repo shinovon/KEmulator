@@ -191,11 +191,18 @@ public final class EmulatorScreen implements
 	private Menu commandsMenu;
 	private String leftSoftLabelText, rightSoftLabelText;
 
-	public EmulatorScreen(final int n, final int n2) {
+	public EmulatorScreen(int n, int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		display = SWTFrontend.getDisplay();
 		this.initShell();
-		this.initScreenBuffer(startWidth = n, startHeight = n2);
+		try {
+			this.initScreenBuffer(n, n2);
+		} catch (Throwable e) {
+			Emulator.getEmulator().getLogStream().println("Failed to initialize screen buffer with size " + n + "x" + n2 + ", falling back to 240x320.");
+			e.printStackTrace();
+			this.initScreenBuffer(n = 240, n2 = 320);
+		}
+		startWidth = n; startHeight = n2;
 		this.updatePauseState();
 	}
 
