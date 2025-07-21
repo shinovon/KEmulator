@@ -37,6 +37,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 	private String jdkTablePath = null;
 	private boolean alreadyPatched = false;
 	private boolean useOnlineDocs = false;
+	private String localDocsPath;
 
 	// view
 	private final Shell shell;
@@ -227,11 +228,11 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 
 		// user may live with null docs path, when using online ones.
 		// Skipping this step if table is already patched.
-		if (Settings.j2meDocsPath == null && !useOnlineDocs && !Settings.ideaJdkTablePatched) {
+		if (localDocsPath == null && !useOnlineDocs && !Settings.ideaJdkTablePatched) {
 			try {
 				Path path = Paths.get(Emulator.getAbsolutePath(), "uei", "javadocs");
 				checkDocsPathValid(path);
-				Settings.j2meDocsPath = path.toAbsolutePath().toString();
+				localDocsPath = path.toAbsolutePath().toString();
 				// skipping the screen entirely if there are builtin javadocs
 				refreshContent();
 				return;
@@ -508,7 +509,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			if (path == null) return;
 			try {
 				checkDocsPathValid(Paths.get(path));
-				Settings.j2meDocsPath = path;
+				localDocsPath = path;
 				Settings.ideaJdkTablePatched = false;
 				refreshContent();
 			} catch (IOException ex) {
@@ -516,14 +517,14 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 
 			}
 		} else if (e.widget == useDocsFromUsr) {
-			Settings.j2meDocsPath = JAVADOCS_DEFAULT_PATH;
+			localDocsPath = JAVADOCS_DEFAULT_PATH;
 			Settings.ideaJdkTablePatched = false;
 			refreshContent();
 		} else if (e.widget == installDocsToUsr) {
 			makeLogWindow();
 			new Thread(() -> {
 				try {
-					Settings.j2meDocsPath = autoInstallDocs();
+					localDocsPath = autoInstallDocs();
 					Settings.ideaJdkTablePatched = false;
 					shell.getDisplay().syncExec(this::refreshContent);
 				} catch (Exception ex) {
@@ -568,12 +569,12 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 		} else if (e.widget == restartSetup) {
 			Settings.ideaJdkTablePatched = false;
 			Settings.proguardPath = null;
-			Settings.j2meDocsPath = null;
 			Settings.ideaPath = null;
 			jdkTablePath = null;
 			didInstallation = false;
 			alreadyPatched = false;
 			useOnlineDocs = false;
+			localDocsPath = null;
 			refreshContent();
 		}
 	}
@@ -593,7 +594,7 @@ public abstract class IdeaUtils implements DisposeListener, SelectionListener, M
 			return;
 		}
 		try {
-			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs);
+			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath);
 			Settings.ideaJdkTablePatched = true;
 			refreshContent();
 		} catch (Exception ex) {

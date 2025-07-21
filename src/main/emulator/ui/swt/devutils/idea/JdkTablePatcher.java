@@ -80,7 +80,17 @@ public class JdkTablePatcher {
 		return jdkExists(projectJdkTable, CLDC_DEVTIME) && jdkExists(projectJdkTable, CLDC_RUNTIME);
 	}
 
-	public static void updateJdkTable(String configFilePath, boolean onlineDocs) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+	/**
+	 * Updates IDEA's JDK table with our entries.
+	 *
+	 * @param configFilePath Path to config xml.
+	 * @param localDocs      Path to folder with javadocs. Pass null to use nikita's repo as "online" docs.
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws TransformerException
+	 */
+	public static void updateJdkTable(String configFilePath, String localDocs) throws ParserConfigurationException, IOException, SAXException, TransformerException {
 		String jdk = Emulator.getJdkHome();
 
 		Document doc = loadDocument(configFilePath);
@@ -88,7 +98,7 @@ public class JdkTablePatcher {
 
 		if (jdkExists(projectJdkTable, CLDC_DEVTIME))
 			removeJdk(projectJdkTable, CLDC_DEVTIME);
-		projectJdkTable.appendChild(createDevTimeJdk(doc, jdk, onlineDocs));
+		projectJdkTable.appendChild(createDevTimeJdk(doc, jdk, localDocs));
 		if (jdkExists(projectJdkTable, CLDC_RUNTIME))
 			removeJdk(projectJdkTable, CLDC_RUNTIME);
 		projectJdkTable.appendChild(createRuntimeJdk(doc, jdk));
@@ -205,7 +215,7 @@ public class JdkTablePatcher {
 		return false;
 	}
 
-	private static Element createDevTimeJdk(Document doc, String java8Path, boolean onlineDocs) {
+	private static Element createDevTimeJdk(Document doc, String java8Path, String localDocs) {
 		Element jdk = doc.createElement("jdk");
 		jdk.setAttribute("version", "2");
 
@@ -217,7 +227,7 @@ public class JdkTablePatcher {
 		Element roots = doc.createElement("roots");
 		roots.appendChild(createAnnotationsPath(doc));
 		roots.appendChild(createClassPath(doc, getDevTimeClassPaths()));
-		roots.appendChild(createJavadocPath(doc, onlineDocs ? Arrays.asList(NIKITA_DOCS) : getDevTimeJavadocPaths(Settings.j2meDocsPath)));
+		roots.appendChild(createJavadocPath(doc, localDocs == null ? Arrays.asList(NIKITA_DOCS) : getDevTimeJavadocPaths(localDocs)));
 		roots.appendChild(createSourcePath(doc));
 
 		jdk.appendChild(roots);

@@ -156,10 +156,8 @@ public final class Settings {
 	public static boolean controllerInverseVer;
 
 	// devutils
-	public static String ideaPath;
-	public static String eclipsePath;
-	public static String proguardPath;
-	public static String j2meDocsPath;
+	public static String ideaPath; // absolute path to idea binary
+	public static String proguardPath; // absolute path to proguard.jar
 	public static boolean ideaJdkTablePatched = false;
-	public static String lastIdeaRepoPath = "";
+	public static String lastIdeaRepoPath = ""; // where last project was created
 }
