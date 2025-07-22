@@ -11,7 +11,9 @@ import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
 import emulator.ui.bridge.BridgeFrontend;
+import emulator.ui.swt.Property;
 import emulator.ui.swt.SWTFrontend;
+import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -1042,6 +1044,12 @@ public class Emulator implements Runnable {
 					getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
 				} else if (key.equalsIgnoreCase("key")) {
 					KeyMapping.keyArg(value);
+				} else if (key.equals("new-project")) {
+					new Property();
+					IdeaUtils.createProjectCLI(value);
+				} else if (key.equals("restore")) {
+					new Property();
+					IdeaUtils.restoreProjectCLI(value);
 				}
 			}
 		}

@@ -11,7 +11,9 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 
+import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class IdeaUtils implements SelectionListener, ModifyListener {
@@ -306,6 +308,78 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			if (ex instanceof IllegalArgumentException)
 				errorMsg("Project conversion", "Failed to convert project: " + ex.getMessage());
 			else errorMsg("Project conversion", "Failed to convert project: " + ex);
+		}
+	}
+
+	//#endregion
+
+	//#region CLI implementation
+
+	public static void restoreProjectCLI(String path) {
+		if (!Settings.ideaJdkTablePatched) {
+			System.out.println("IDE support is not configured, please run setup first.");
+			System.exit(2);
+		}
+		File folder = new File(path);
+		for (File file : folder.listFiles()) {
+			if (file.getName().endsWith(".iml")) {
+				String imlPath = file.getAbsolutePath();
+				try {
+					System.out.println("Fixing project at " + imlPath);
+					ProjectGenerator.fixCloned(imlPath);
+					System.out.println("OK");
+					System.exit(0);
+				} catch (Exception ex) {
+					System.out.println("Failed!");
+					System.out.println(ex.getMessage());
+					System.exit(1);
+				}
+			}
+		}
+
+		System.out.println("No IML files found. Exiting.");
+		System.exit(1);
+	}
+
+	public static void createProjectCLI(String path) {
+		if (!Settings.ideaJdkTablePatched) {
+			System.out.println("IDE support is not configured, please run setup first.");
+			System.exit(2);
+		}
+
+		try {
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+			System.out.println("Please enter project name.");
+			System.out.println("Name of folder, JAR file, various configurations. Only ASCII letters, numbers, hyphen and underscore allowed.");
+			System.out.print("> ");
+			String name = br.readLine();
+
+			System.out.println("Please enter MIDlet class name.");
+			System.out.println("Full name of your MIDlet class. Must be valid java type name.");
+			System.out.print("> ");
+			String className = br.readLine();
+
+			System.out.println("Please enter MIDlet name.");
+			System.out.println("Name of your MIDlet, shown to user. Can contain any symbols except commas, just make sure your target device has enough fonts to display the name.");
+			System.out.print("> ");
+			String midletName = br.readLine();
+
+			String validation = validateInput(name, className, midletName, path);
+			if (validation != null) {
+				System.out.println(validation);
+				System.exit(1);
+			}
+
+			ProjectGenerator.create(path, name, className, midletName);
+			Settings.lastIdeaRepoPath = path;
+			System.out.println("OK");
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
 		}
 	}
 
