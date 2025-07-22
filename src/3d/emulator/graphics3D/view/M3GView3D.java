@@ -795,6 +795,11 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 				GL11.glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blendMode);
 
+				float[] blendColor = new float[4];
+				G3DUtils.fillFloatColor(blendColor, texture2D.getBlendColor());
+				blendColor[3] = 1.0F;
+				GL11.glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, memoryBuffers.getFloatBuffer(blendColor));
+
 				short texFormat = GL_RGB;
 				switch (image2D.getFormat()) {
 					case Image2D.ALPHA:
