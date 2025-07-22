@@ -38,6 +38,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private boolean alreadyPatched = false;
 	private boolean useOnlineDocs = false;
 	private String localDocsPath;
+	private String jdkHome;
 
 	// view
 	private final Shell shell;
@@ -121,6 +122,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			shell.layout(true, true);
 			return;
 		}
+
+		jdkHome = Emulator.getJdkHome();
 
 		if (!Files.exists(Paths.get(Emulator.getAbsolutePath(), "uei", "cldc11.jar"))) {
 			new Label(shell, SWT.NONE).setText("UEI directory is missing in your KEmulator setup.");
@@ -516,7 +519,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			return false;
 		}
 		try {
-			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath);
+			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath, jdkHome);
 			Settings.ideaJdkTablePatched = true;
 		} catch (Exception ex) {
 			errorMsg("Config patch", "Failed to modify config table. Logs may help you.\n\nException: " + ex);

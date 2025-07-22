@@ -85,23 +85,22 @@ public class JdkTablePatcher {
 	 *
 	 * @param configFilePath Path to config xml.
 	 * @param localDocs      Path to folder with javadocs. Pass null to use nikita's repo as "online" docs.
+	 * @param jdk8home Path to JDK 1.8 "home".
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws TransformerException
 	 */
-	public static void updateJdkTable(String configFilePath, String localDocs) throws ParserConfigurationException, IOException, SAXException, TransformerException {
-		String jdk = Emulator.getJdkHome();
-
+	public static void updateJdkTable(String configFilePath, String localDocs, String jdk8home) throws ParserConfigurationException, IOException, SAXException, TransformerException {
 		Document doc = loadDocument(configFilePath);
 		Element projectJdkTable = getProjectJdkTableElement(doc);
 
 		if (jdkExists(projectJdkTable, CLDC_DEVTIME))
 			removeJdk(projectJdkTable, CLDC_DEVTIME);
-		projectJdkTable.appendChild(createDevTimeJdk(doc, jdk, localDocs));
+		projectJdkTable.appendChild(createDevTimeJdk(doc, jdk8home, localDocs));
 		if (jdkExists(projectJdkTable, CLDC_RUNTIME))
 			removeJdk(projectJdkTable, CLDC_RUNTIME);
-		projectJdkTable.appendChild(createRuntimeJdk(doc, jdk));
+		projectJdkTable.appendChild(createRuntimeJdk(doc, jdk8home));
 
 		saveDocument(doc, configFilePath);
 	}
