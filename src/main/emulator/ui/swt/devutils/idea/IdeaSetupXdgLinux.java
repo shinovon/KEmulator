@@ -14,8 +14,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class IdeaUtilsXdgLinux extends IdeaUtils {
-	public IdeaUtilsXdgLinux(Shell parent) {
+public class IdeaSetupXdgLinux extends IdeaSetup {
+	public IdeaSetupXdgLinux(Shell parent) {
 		super(parent);
 	}
 

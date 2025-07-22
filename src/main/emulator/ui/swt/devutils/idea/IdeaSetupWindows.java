@@ -3,7 +3,6 @@ package emulator.ui.swt.devutils.idea;
 import emulator.Emulator;
 import org.eclipse.swt.widgets.Shell;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,8 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class IdeaUtilsWindows extends IdeaUtils {
-	public IdeaUtilsWindows(Shell parent) {
+public class IdeaSetupWindows extends IdeaSetup {
+	public IdeaSetupWindows(Shell parent) {
 		super(parent);
 	}
 

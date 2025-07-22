@@ -12,7 +12,7 @@ import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
-import emulator.ui.swt.devutils.DevUtilsMainWindow;
+import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StackLayout;
@@ -955,7 +955,7 @@ public final class EmulatorScreen implements
 		(this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
 		this.sensorMenuItem.addSelectionListener(this);
 		devUtilsMenuItem = new MenuItem(this.menuView, 8);
-		devUtilsMenuItem.setText("Developer utils");
+		devUtilsMenuItem.setText("IntelliJ IDEA support");
 		devUtilsMenuItem.addSelectionListener(this);
 		(this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
 		this.logMenuItem.addSelectionListener(this);
@@ -1581,7 +1581,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == devUtilsMenuItem) {
-				new DevUtilsMainWindow(shell).open();
+				IdeaUtils.open(shell);
 				return;
 			}
 			if (menuItem == this.smsConsoleMenuItem) {
