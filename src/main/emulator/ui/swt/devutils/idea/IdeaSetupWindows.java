@@ -74,7 +74,7 @@ public class IdeaSetupWindows extends IdeaSetup {
 						"    } catch {} " +
 						"}";
 
-				String output = Emulator.getProcessOutput(new String[]{"powershell", "-Command", powershellCommand});
+				String output = Emulator.getProcessOutput(new String[]{"powershell", "-Command", powershellCommand}, false);
 
 				for (String i : output.split("[\\r\\n]+")) {
 					i = i.trim();

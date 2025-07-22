@@ -221,7 +221,7 @@ public class IdeaSetupXdgLinux extends IdeaSetup {
 	}
 
 	protected static String getVersion(String path) throws IOException {
-		String[] output = Emulator.getProcessOutput(new String[]{path, "--version"}).split(System.lineSeparator());
+		String[] output = Emulator.getProcessOutput(new String[]{path, "--version"}, false).split(System.lineSeparator());
 		String ver = null;
 		for (String line : output) {
 			if (line.startsWith("IntelliJ")) {

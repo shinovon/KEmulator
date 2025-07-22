@@ -61,6 +61,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private final Path proguardDefaultLocalPath = Paths.get(Emulator.getAbsolutePath(), "proguard.jar");
 	private Button proguardAutoLocalBtn;
 	private Button useOnlineDocsBtn;
+	private Button selectJdkBtn;
 
 	public IdeaSetup(Shell parent) {
 		if (Settings.ideaJdkTablePatched)
@@ -108,22 +109,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			shell.layout(true, true);
 			return;
 		}
-		if (Emulator.isJava9()) {
-			new Label(shell, SWT.NONE).setText("KEmulator is launched with java " + System.getProperty("java.version") + ".");
-			new Label(shell, SWT.NONE).setText("Please install JDK 1.8 and run KEmulator with it.");
-			new Label(shell, SWT.NONE).setText("It will be used in IDE for project compilation/running.");
-			shell.layout(true, true);
-			return;
-		}
-
-		if (Emulator.getJdkHome() == null) {
-			new Label(shell, SWT.NONE).setText("KEmulator is launched with JRE without JDK.");
-			new Label(shell, SWT.NONE).setText("Please install JDK 1.8 (not JRE!) and run KEmulator with it.");
-			shell.layout(true, true);
-			return;
-		}
-
-		jdkHome = Emulator.getJdkHome();
 
 		if (!Files.exists(Paths.get(Emulator.getAbsolutePath(), "uei", "cldc11.jar"))) {
 			new Label(shell, SWT.NONE).setText("UEI directory is missing in your KEmulator setup.");
@@ -180,7 +165,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				ideaDownloadLink.setText("1. Go to <a>download page</a>, grab a release and install it.");
 				ideaDownloadLink.addSelectionListener(this);
 				new Label(installGroup, SWT.NONE).setText("2. Launch installed IDE, activate a license and create desktop shortcut.");
-				new Label(installGroup, SWT.NONE).setText("3. Do NOT touch any settings related to JDK kits. Close IDE and return here.");
+				new Label(installGroup, SWT.NONE).setText("3. Do NOT touch any settings related to JDKs. Close IDE and return here.");
 
 				refreshInstalledListBtn = new Button(installGroup, SWT.PUSH);
 				refreshInstalledListBtn.setText("I did it, refresh list of installed IDEs");
@@ -307,6 +292,85 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			useOnlineDocsBtn.setText("Use nikita36068's repo as web docs");
 			useOnlineDocsBtn.addSelectionListener(this);
 			new Label(onlineGroup, SWT.NONE).setText("Not all docs will be connected, only the most important ones.");
+
+			shell.layout(true, true);
+			return;
+		}
+
+		// JDK 1.8 for use in IDE
+		if (jdkHome == null) {
+			if (Emulator.isJava9()) {
+				new Label(shell, SWT.NONE).setText("KEmulator is launched with java " + System.getProperty("java.version") + ".");
+				new Label(shell, SWT.NONE).setText("Please install JDK 1.8 and select it.");
+				new Label(shell, SWT.NONE).setText("You can run KEmulator with it for auto setup.");
+			} else {
+				String _jdkHome = Emulator.getJdkHome();
+				if (_jdkHome == null) {
+					if (this instanceof IdeaSetupXdgLinux) {
+						if (Files.exists(Paths.get("/usr/lib/jvm/java-8-openjdk/bin/java"))) {
+							try {
+								if (Emulator.getProcessOutput(new String[]{"/usr/lib/jvm/java-8-openjdk/bin/java", "-version"}, true).contains("1.8.")) {
+									jdkHome = "/usr/lib/jvm/java-8-openjdk";
+									refreshContent();
+									return;
+								}
+							} catch (IOException e) {
+								// ignore
+							}
+						}
+					}
+					new Label(shell, SWT.NONE).setText("KEmulator is launched with JRE without JDK.");
+					new Label(shell, SWT.NONE).setText("Please install JDK 1.8 and select it.");
+					new Label(shell, SWT.NONE).setText("You can run KEmulator with it for auto setup.");
+				} else {
+					jdkHome = _jdkHome;
+					refreshContent();
+					return;
+				}
+			}
+
+			if (this instanceof IdeaSetupWindows) {
+				Group jdkSetupGroup = new Group(shell, SWT.NONE);
+				jdkSetupGroup.setText("JDKs from PATH");
+				jdkSetupGroup.setLayout(genGLo());
+				jdkSetupGroup.setLayoutData(genGd());
+
+				String[] paths = System.getenv("PATH").split(";");
+				boolean found = false;
+				for (String path : paths) {
+					Path ppath = Paths.get(path);
+					if (Files.exists(ppath.resolve("java.exe")) && Files.exists(ppath.resolve("javac.exe"))) {
+						try {
+							if (Emulator.getProcessOutput(new String[]{ppath.resolve("java.exe").toAbsolutePath().toString(), "-version"}, true).contains("1.8.")) {
+								found = true;
+								Button b = new Button(jdkSetupGroup, SWT.FLAT);
+								b.setText(path);
+								b.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent selectionEvent) {
+										jdkHome = ppath.getParent().toAbsolutePath().toString();
+										refreshContent();
+									}
+								});
+							}
+						} catch (IOException e) {
+							// ignore
+						}
+					}
+				}
+				if (!found) {
+					new Label(jdkSetupGroup, SWT.NONE).setText("Nothing found.");
+				}
+			} // in linux it's expected at /usr/lib/jvm, if it's not there we can't do much.
+
+			Group manualJdkSetupGroup = new Group(shell, SWT.NONE);
+			manualJdkSetupGroup.setText("Manual selection");
+			manualJdkSetupGroup.setLayout(genGLo());
+			manualJdkSetupGroup.setLayoutData(genGd());
+
+			selectJdkBtn = new Button(manualJdkSetupGroup, SWT.PUSH);
+			selectJdkBtn.setText("Choose JDK home");
+			selectJdkBtn.addSelectionListener(this);
 
 			shell.layout(true, true);
 			return;
@@ -500,6 +564,28 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			} else {
 				refreshContent();
 			}
+		} else if (e.widget == selectJdkBtn) {
+			DirectoryDialog dd = new DirectoryDialog(shell, SWT.OPEN);
+			dd.setText("Choose JDK home folder");
+			String path = dd.open();
+			if (path == null) return;
+			Path ppath = Paths.get(path);
+			if (Files.exists(ppath.resolve("bin").resolve(Emulator.win ? "java.exe" : "java")) &&
+					Files.exists(ppath.resolve("bin").resolve(Emulator.win ? "javac.exe" : "javac"))) {
+				try {
+					if (Emulator.getProcessOutput(new String[]{ppath.resolve("bin").resolve(Emulator.win ? "java.exe" : "java").toAbsolutePath().toString(), "-version"}, true).contains("1.8.")) {
+						jdkHome = path;
+						refreshContent();
+					} else {
+						errorMsg("JDK home", "Selected JDK says it's not 1.8.");
+					}
+				} catch (IOException ex) {
+					// ignore
+				}
+			} else {
+				errorMsg("JDK home", "Selected folder is not JDK home. Select a folder with \"bin\", \"jre\", \"lib\" subfolders.");
+			}
+
 		}
 	}
 
