@@ -51,13 +51,13 @@ elif [[ "$1" == -* ]]; then
 	echo "When using direct emulator configuration, please pass absolute paths!"
 	#TODO invent something to resolve jads/cp paths
 	cd $KEM_DIR
-	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" -s "$@"
+	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" -s $@
 	exit $?
 else
     # JAR file for launch
 	USER_JAR=$(realpath "$1")
 	cd $KEM_DIR
 	shift
-	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" -jar "$USER_JAR" -s "$@"
+	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" -jar "$USER_JAR" -s $@
 	exit $?
 fi
