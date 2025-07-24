@@ -383,5 +383,29 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		}
 	}
 
+	public static void convertProjectCLI(String path) {
+		try {
+			ProjectGenerator.convertEclipse(Paths.get(path).resolve("Application Descriptor").toAbsolutePath().toString());
+			System.out.println("OK");
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
+		}
+	}
+
+	public static void editProjectCLI(String path) {
+		try {
+			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, path});
+			System.out.println("OK");
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
+		}
+	}
+
 	//#endregion
 }

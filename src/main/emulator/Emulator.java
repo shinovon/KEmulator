@@ -1050,6 +1050,12 @@ public class Emulator implements Runnable {
 				} else if (key.equals("restore")) {
 					new Property();
 					IdeaUtils.restoreProjectCLI(value);
+				} else if (key.equals("convert")) {
+					new Property();
+					IdeaUtils.convertProjectCLI(value);
+				} else if (key.equals("edit")) {
+					new Property();
+					IdeaUtils.editProjectCLI(value);
 				}
 			}
 		}
