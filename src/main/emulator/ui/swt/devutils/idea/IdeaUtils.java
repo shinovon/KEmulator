@@ -351,17 +351,17 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-			System.out.println("Please enter project name.");
+			System.out.println("\033[92mPlease enter project name.\033[0m");
 			System.out.println("Name of folder, JAR file, various configurations. Only ASCII letters, numbers, hyphen and underscore allowed.");
 			System.out.print("> ");
 			String name = br.readLine();
 
-			System.out.println("Please enter MIDlet class name.");
+			System.out.println("\033[92mPlease enter MIDlet class name.\033[0m");
 			System.out.println("Full name of your MIDlet class. Must be valid java type name.");
 			System.out.print("> ");
 			String className = br.readLine();
 
-			System.out.println("Please enter MIDlet name.");
+			System.out.println("\033[92mPlease enter MIDlet name.\033[0m");
 			System.out.println("Name of your MIDlet, shown to user. Can contain any symbols except commas, just make sure your target device has enough fonts to display the name.");
 			System.out.print("> ");
 			String midletName = br.readLine();
