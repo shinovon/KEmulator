@@ -42,7 +42,7 @@ if [ -z "$1" ]; then
 	exit $?
 elif [[ "$1" == "-new-project" || "$1" == "-restore" || "$1" == "-convert" || "$1" == "-edit" ]]; then
     # utils for IntelliJ IDEA
-	$CALL_PWD=$PWD
+	CALL_PWD="$PWD"
 	cd $KEM_DIR
 	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" "$1" "$CALL_PWD" -s
 	exit $?
