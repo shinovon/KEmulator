@@ -42,8 +42,6 @@ public final class M3GView3D implements PaintListener, Runnable {
 	private int viewportHeight;
 	private float depthRangeNear;
 	private float depthRangeFar;
-	private static long canvasHandle;
-	private static long wglHandle;
 	private static Camera camera;
 	private static Transform cameraTransform = new Transform();
 	private static Vector lights = new Vector();
