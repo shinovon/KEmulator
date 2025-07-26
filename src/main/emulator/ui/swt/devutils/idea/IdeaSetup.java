@@ -555,7 +555,9 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			}
 		} else if (e.widget == skipPatchBtn) {
 			Settings.ideaJdkTablePatched = true;
-			refreshContent();
+			shell.close();
+			shell.dispose();
+			IdeaUtils.open(parent);
 		} else if (e.widget == doPatchBtn) {
 			if (patchJdkTable()) {
 				shell.close();
