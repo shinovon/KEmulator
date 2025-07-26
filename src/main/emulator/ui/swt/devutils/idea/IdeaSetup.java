@@ -56,7 +56,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private Button doPatchBtn;
 	private StyledText log;
 	private Button proguardAutoBtn;
-	private Button useDocsFromUsr;
 	private Button installDocsToUsr;
 	private final Path proguardDefaultLocalPath = Paths.get(Emulator.getAbsolutePath(), "proguard.jar");
 	private Button proguardAutoLocalBtn;
@@ -240,9 +239,20 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				// skipping the screen entirely if there are builtin javadocs
 				refreshContent();
 				return;
-			} catch (Exception e) {
-				new Label(shell, SWT.NONE).setText("UEI libs contain no javadocs. You need an external source of them.");
+			} catch (Exception ignored) {
 			}
+			if (this instanceof IdeaSetupXdgLinux) {
+				try {
+					checkDocsPathValid(Paths.get(JAVADOCS_DEFAULT_PATH));
+					localDocsPath = Paths.get(JAVADOCS_DEFAULT_PATH).toAbsolutePath().toString();
+					// skipping the screen entirely if there are installed javadocs
+					refreshContent();
+					return;
+				} catch (Exception ignored) {
+				}
+			}
+
+			new Label(shell, SWT.NONE).setText("UEI libs contain no javadocs. You need an external source of them.");
 
 			// docs installation
 			Group jmeDocsGroup = new Group(shell, SWT.NONE);
@@ -267,18 +277,11 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			autoGroup.setLayout(genGLo());
 			autoGroup.setLayoutData(genGd());
 			if (this instanceof IdeaSetupXdgLinux) {
-				try {
-					checkDocsPathValid(Paths.get(JAVADOCS_DEFAULT_PATH));
-					new Label(autoGroup, SWT.NONE).setText("Found installed documentation at " + JAVADOCS_DEFAULT_PATH);
-					useDocsFromUsr = new Button(autoGroup, SWT.PUSH);
-					useDocsFromUsr.setText("Use it");
-					useDocsFromUsr.addSelectionListener(this);
-				} catch (Exception e) {
-					installDocsToUsr = new Button(autoGroup, SWT.PUSH);
-					installDocsToUsr.setText("Do it");
-					installDocsToUsr.addSelectionListener(this);
-					new Label(autoGroup, SWT.NONE).setText("Required tools: wget, unzip, rm, cp, pkexec.");
-				}
+				installDocsToUsr = new Button(autoGroup, SWT.PUSH);
+				installDocsToUsr.setText("Install to /usr/");
+				installDocsToUsr.addSelectionListener(this);
+				new Label(autoGroup, SWT.NONE).setText("Required tools: wget, unzip, rm, cp, pkexec.");
+
 			} else {
 				new Label(autoGroup, SWT.NONE).setText("Not available.");
 			}
@@ -521,10 +524,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
 
 			}
-		} else if (e.widget == useDocsFromUsr) {
-			localDocsPath = JAVADOCS_DEFAULT_PATH;
-			Settings.ideaJdkTablePatched = false;
-			refreshContent();
 		} else if (e.widget == installDocsToUsr) {
 			makeLogWindow();
 			new Thread(() -> {
