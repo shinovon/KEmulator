@@ -67,7 +67,6 @@ public class ProjectGenerator {
 			throw new FileNotFoundException("MANIFEST.MF file is missing. Please repair your project structure by hand first.");
 		} else {
 			if (isEclipse && !Files.isSymbolicLink(mfPath)) {
-				if(Files.isDirectory(appDecrPath)) throw new RuntimeException("Project setup where");
 				List<String> ideaMf = Files.readAllLines(mfPath);
 				List<String> eclipseMf = Files.readAllLines(appDecrPath);
 				boolean match = ideaMf.equals(eclipseMf);
