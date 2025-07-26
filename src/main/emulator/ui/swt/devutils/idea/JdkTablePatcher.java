@@ -85,7 +85,7 @@ public class JdkTablePatcher {
 	 *
 	 * @param configFilePath Path to config xml.
 	 * @param localDocs      Path to folder with javadocs. Pass null to use nikita's repo as "online" docs.
-	 * @param jdk8home Path to JDK 1.8 "home".
+	 * @param jdk8home       Path to JDK 1.8 "home".
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
@@ -334,7 +334,11 @@ public class JdkTablePatcher {
 	private static List<String> getDevTimeJavadocPaths(String javadocBase) {
 		List<String> paths = new ArrayList<>();
 		try (Stream<Path> s = Files.list(Paths.get(javadocBase))) {
-			s.filter(Files::isDirectory).forEach(p -> paths.add("file://" + p.toString().replace("\\", "/")));
+			s.filter(Files::isDirectory).forEach(p -> {
+				if (p.endsWith("KTF_WIPI_API") || p.endsWith("WIPI_API_1_1_1") || p.endsWith("midp-3_0-fr-javadoc") || p.endsWith("BlackBerry_API_7_1_0"))
+					return;
+				paths.add("file://" + p.toString().replace("\\", "/"));
+			});
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
