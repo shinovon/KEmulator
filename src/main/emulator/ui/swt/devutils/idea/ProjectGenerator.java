@@ -231,16 +231,15 @@ public class ProjectGenerator {
 	}
 
 	private static void symlinkManifests(String dir) throws IOException, InterruptedException {
-		int code;
+		ProcessBuilder pb = new ProcessBuilder();
 		if (Emulator.win) {
-			throw new Error("not impl");
+			pb.command("cmd.exe", "/C", "mklink MANIFEST.MF ..\\Application Descriptor");
 		} else {
-			ProcessBuilder pb = new ProcessBuilder();
 			pb.command("/usr/bin/ln", "../Application Descriptor", "MANIFEST.MF");
-			pb.directory(new File(dir + "/META-INF"));
-			code = pb.start().waitFor();
 		}
 
+		pb.directory(new File(dir + "/META-INF"));
+		int code = pb.start().waitFor();
 		if (code != 0) {
 			throw new RuntimeException((Emulator.win ? "mklink" : "ln") + " returned non-zero code: " + code + ". " + SYMLINK_FAIL_MSG);
 		}
