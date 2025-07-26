@@ -94,6 +94,32 @@ public class ProjectConfigGenerator {
 		sb.append(System.lineSeparator());
 		sb.append("-keep public class * extends javax.microedition.midlet.MIDlet");
 		sb.append(System.lineSeparator());
+		sb.append("-assumenosideeffects public class java.lang.StringBuffer {");
+		sb.append(System.lineSeparator());
+		sb.append("    public java.lang.String toString();");
+		sb.append(System.lineSeparator());
+		sb.append("    public char charAt(int);");
+		sb.append(System.lineSeparator());
+		sb.append("    public int capacity();");
+		sb.append(System.lineSeparator());
+		sb.append("    public int codePointAt(int);");
+		sb.append(System.lineSeparator());
+		sb.append("    public int codePointBefore(int);");
+		sb.append(System.lineSeparator());
+		sb.append("    public int indexOf(java.lang.String,int);");
+		sb.append(System.lineSeparator());
+		sb.append("    public int lastIndexOf(java.lang.String);");
+		sb.append(System.lineSeparator());
+		sb.append("    public int lastIndexOf(java.lang.String,int);");
+		sb.append(System.lineSeparator());
+		sb.append("    public int length();");
+		sb.append(System.lineSeparator());
+		sb.append("    public java.lang.String substring(int);");
+		sb.append(System.lineSeparator());
+		sb.append("    public java.lang.String substring(int,int);");
+		sb.append(System.lineSeparator());
+		sb.append("}");
+		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
 
