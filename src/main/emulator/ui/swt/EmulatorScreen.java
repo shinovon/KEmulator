@@ -1305,6 +1305,8 @@ public final class EmulatorScreen implements
 		} else if (parent == this.menuMidlet) {
 			boolean equals = false;
 			if (menuItem == this.exitMenuItem) {
+				shell.close();
+				Thread.yield();
 				this.shell.dispose();
 				return;
 			}
