@@ -282,7 +282,9 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		String path = fd.open();
 		if (path == null) return;
 		try {
-			String dir = ProjectGenerator.fixCloned(path);
+			String dir = ProjectGenerator.fixCloned(path, () -> {
+				errorMsg("Failed to create symbolic link", ProjectGenerator.SYMLINK_FAIL_MSG + "\n\nSee log/stdout for error code.");
+			});
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -301,7 +303,12 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
 			MessageBox mb = new MessageBox(this.shell, SWT.ICON_INFORMATION | SWT.OK);
 			mb.setText("Project conversion");
-			mb.setMessage("Your project was converted and will open in IDEA in few seconds. There are some important notes:\n\n" + "- You can still use Eclipse JDT/MTJ to work on the project.\n" + "- IDEA and Eclipse use different files for MIDlet suite manifest. Synchronize them by hand.\n" + "- IDEA provides bad support for global package classes. Get rid of them.\n" + "- Artifact building will provide you non-pre-verified JAR, it's not ready to be run on real devices.\n" + "- To get a JAR ready for deployment, use \"Package\" run configuration. The file will be \"./deployed/PROJECTNAME.jar\".\n" + "- Pre-verification is done via ProGuard as part of optimization/obfuscation pass. Edit ProGuard config manually to skip it.");
+			mb.setMessage("Your project was converted and will open in IDEA in few seconds. There are some important notes:\n\n" +
+					"- You can still use Eclipse JDT/MTJ to work on the project.\n" +
+					"- IDEA provides bad support for global package classes. Get rid of them.\n" +
+					"- Artifact building will provide you non-pre-verified JAR, it's not ready to be run on real devices.\n" +
+					"- To get a JAR ready for deployment, use \"Package\" run configuration. The file will be \"./deployed/PROJECTNAME.jar\".\n" +
+					"- Pre-verification is done via ProGuard as part of optimization/obfuscation pass. Edit ProGuard config manually to skip it.");
 			mb.open();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -326,7 +333,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 				String imlPath = file.getAbsolutePath();
 				try {
 					System.out.println("Fixing project at " + imlPath);
-					ProjectGenerator.fixCloned(imlPath);
+					ProjectGenerator.fixCloned(imlPath,()->System.out.println("Failed to restore symlink. Your MANIFEST.MF and Application Descriptor are now independent files."));
 					System.out.println("OK");
 					System.exit(0);
 				} catch (Exception ex) {

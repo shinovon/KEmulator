@@ -1,8 +1,8 @@
 package emulator.ui.swt.devutils.idea;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import emulator.Emulator;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +13,9 @@ public class ProjectGenerator {
 
 	public static final String PROGUARD_LOCAL_CFG = "proguard-local.cfg";
 	public static final String PROGUARD_GLOBAL_CFG = "proguard.cfg";
+	public static final String SYMLINK_FAIL_MSG = "Please do something so symlinks begin to work at your project location. " +
+			"This may include tweaking your FS/mount options, moving the project to another FS, enabling Windows Developer Mode, running from admin/sudo, etc. " +
+			"Also check git settings for related options.";
 
 	public static String create(String location, String projectName, String midletClassName, String readableName) throws IOException {
 		String dir = Paths.get(location, projectName).toAbsolutePath().toString();
@@ -41,10 +44,52 @@ public class ProjectGenerator {
 	}
 
 
-	public static String fixCloned(String imlPath) throws IOException {
+	public static String fixCloned(String imlPath, Runnable onSymlinkFail) throws IOException, InterruptedException {
 		if (!imlPath.endsWith(".iml"))
 			throw new IllegalArgumentException();
 		String dir = Paths.get(imlPath).getParent().toString();
+		Path appDecrPath = Paths.get(dir, "Application Descriptor");
+		Path mfPath = Paths.get(dir, "META-INF", "MANIFEST.MF");
+
+		boolean isEclipse = Files.exists(appDecrPath);
+		if (!Files.exists(mfPath)) {
+			if (isEclipse) {
+				// this may happen if user unpacks dual eclipse/idea project, attempts to restore it but symlinking fails with KEm crashing.
+				// let's silently repair this.
+				try {
+					symlinkManifests(dir);
+				} catch (IOException e) {
+					System.out.println(e);
+					Files.copy(appDecrPath, mfPath);
+					onSymlinkFail.run();
+				}
+			}
+			throw new FileNotFoundException("MANIFEST.MF file is missing. Please repair your project structure by hand first.");
+		} else {
+			if (isEclipse && !Files.isSymbolicLink(mfPath)) {
+				if(Files.isDirectory(appDecrPath)) throw new RuntimeException("Project setup where");
+				List<String> ideaMf = Files.readAllLines(mfPath);
+				List<String> eclipseMf = Files.readAllLines(appDecrPath);
+				boolean match = ideaMf.equals(eclipseMf);
+				if (match) {
+					// manifests are equal so symlink them
+					try {
+						Files.delete(mfPath);
+						symlinkManifests(dir);
+					} catch (IOException e) {
+						System.out.println(e);
+						Files.copy(appDecrPath, mfPath);
+						onSymlinkFail.run();
+					}
+				} else {
+					throw new RuntimeException("Application Descriptor and MANIFEST.MF do not match. " +
+							"Please synchronize them by hand and run restore again. " +
+							"If you run into issues, copypaste correct version into Application Descriptor and delete MANIFEST.MF, " +
+							"it will be automatically restored.");
+				}
+			}
+		}
+
 		String projectName = Paths.get(imlPath).getFileName().toString();
 		projectName = projectName.substring(0, projectName.lastIndexOf('.'));
 		String midletName = getMidletClassNameFromMF(dir);
@@ -56,9 +101,15 @@ public class ProjectGenerator {
 		return dir;
 	}
 
-	public static String convertEclipse(String appDescriptorPath) throws IOException {
+	public static String convertEclipse(String appDescriptorPath) throws IOException, InterruptedException {
 		String dir = Paths.get(appDescriptorPath).getParent().toString();
 		String projectName = Paths.get(appDescriptorPath).getParent().getFileName().toString(); //folder name
+
+		if (Files.exists(Paths.get(dir, "META-INF", "MANIFEST.MF"))) {
+			throw new RuntimeException("META-INF/MANIFEST.MF already exists! " +
+					"Eclipse projects are supposed to work with \"Application Descriptor\" file. " +
+					"Synchronize their contents by hand and delete MANIFEST.MF file. It will be recreated soon.");
+		}
 
 		createDirectories(dir);
 
@@ -73,19 +124,10 @@ public class ProjectGenerator {
 		generateIML(dir, projectName);
 		generateProGuardConfig(dir, projectName);
 
-		// code
-		List<String> manifest = Files.readAllLines(Paths.get(appDescriptorPath));
-		boolean hasVersion = false;
-		for (String line : manifest) {
-			if (line.startsWith("Manifest-Version:")) {
-				hasVersion = true;
-				break;
-			}
-		}
-		if (!hasVersion) {
-			manifest.add(0, "Manifest-Version: 1.0");
-		}
-		Files.write(Paths.get(dir, "META-INF", "MANIFEST.MF"), manifest);
+		// manifest
+		fixManifestWithVersion(appDescriptorPath);
+		symlinkManifests(dir);
+
 		String midletClassName = getMidletClassNameFromMF(dir);
 
 		// ide config
@@ -98,6 +140,21 @@ public class ProjectGenerator {
 		generateRunConfigs(dir, projectName, midletClassName);
 
 		return dir;
+	}
+
+	private static void fixManifestWithVersion(String mfPath) throws IOException {
+		List<String> manifest = Files.readAllLines(Paths.get(mfPath));
+		boolean hasVersion = false;
+		for (String line : manifest) {
+			if (line.startsWith("Manifest-Version:")) {
+				hasVersion = true;
+				break;
+			}
+		}
+		if (!hasVersion) {
+			manifest.add(0, "Manifest-Version: 1.0");
+			Files.write(Paths.get(mfPath), manifest);
+		}
 	}
 
 	//#region impls
@@ -171,6 +228,22 @@ public class ProjectGenerator {
 		Files.write(Paths.get(dir, PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir, projName).getBytes(StandardCharsets.UTF_8));
 		if (!Files.exists(Paths.get(dir, PROGUARD_GLOBAL_CFG))) {
 			Files.write(Paths.get(dir, PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
+		}
+	}
+
+	private static void symlinkManifests(String dir) throws IOException, InterruptedException {
+		int code;
+		if (Emulator.win) {
+			throw new Error("not impl");
+		} else {
+			ProcessBuilder pb = new ProcessBuilder();
+			pb.command("/usr/bin/ln", "../Application Descriptor", "MANIFEST.MF");
+			pb.directory(new File(dir + "/META-INF"));
+			code = pb.start().waitFor();
+		}
+
+		if (code != 0) {
+			throw new RuntimeException((Emulator.win ? "mklink" : "ln") + " returned non-zero code: " + code + ". " + SYMLINK_FAIL_MSG);
 		}
 	}
 
