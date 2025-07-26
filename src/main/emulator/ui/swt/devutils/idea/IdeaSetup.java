@@ -415,14 +415,15 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			manualConfigBtn.addSelectionListener(this);
 		} else {
 			if (alreadyPatched) {
-				new Label(jvmSetupGroup, SWT.NONE).setText("Your JDK table is already set up.");
+				new Label(jvmSetupGroup, SWT.NONE).setText("Your JDK table looks like already set up.");
+				new Label(jvmSetupGroup, SWT.NONE).setText("If skipping, everything you choose on previous steps will be discarded.");
 
 				skipPatchBtn = new Button(jvmSetupGroup, SWT.PUSH);
-				skipPatchBtn.setText("Continue without doing anything");
+				skipPatchBtn.setText("Leave old configuration");
 				skipPatchBtn.addSelectionListener(this);
 
 				doPatchBtn = new Button(jvmSetupGroup, SWT.PUSH);
-				doPatchBtn.setText("Recreate entries");
+				doPatchBtn.setText("Apply new configuration");
 				doPatchBtn.addSelectionListener(this);
 			} else {
 				new Label(jvmSetupGroup, SWT.NONE).setText("Config file:");
