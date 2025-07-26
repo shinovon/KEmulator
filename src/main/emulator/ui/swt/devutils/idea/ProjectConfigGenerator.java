@@ -209,7 +209,8 @@ public class ProjectConfigGenerator {
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"MAIN_CLASS_NAME\" value=\"emulator.Emulator\" />\n" +
 				"    <module name=\"" + projectName + "\" />\n" +
-				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-cp $PROJECT_DIR$/bin/production/" + projectName + " -midlet " + className + "\" />\n" +
+				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-cp $PROJECT_DIR$/bin/production/" + projectName + " -midlet " + className + " -jad $PROJECT_DIR$/META-INF/MANIFEST.MF -uei\" />\n" +
+				"    <option name=\"VM_PARAMETERS\" value=\"-XX:+IgnoreUnrecognizedVMOptions -Djna.nosys=true -Dfile.encoding=UTF-8 -XstartOnFirstThread\" />" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"" + Emulator.getAbsolutePath() + "\" />\n" +
 				"    <method v=\"2\">\n" +
 				"      <option name=\"Make\" enabled=\"true\" />\n" +
