@@ -11,6 +11,9 @@ import java.util.List;
 
 public class ProjectGenerator {
 
+	public static final String PROGUARD_LOCAL_CFG = "proguard-local.cfg";
+	public static final String PROGUARD_GLOBAL_CFG = "proguard.cfg";
+
 	public static String create(String location, String projectName, String midletClassName, String readableName) throws IOException {
 		String dir = Paths.get(location, projectName).toAbsolutePath().toString();
 
@@ -64,7 +67,7 @@ public class ProjectGenerator {
 		try (BufferedWriter gi = new BufferedWriter(new FileWriter(Paths.get(dir, ".gitignore").toString(), true))) {
 			gi.write(".idea/runConfigurations");
 			gi.newLine();
-			gi.write("proguard.cfg");
+			gi.write(PROGUARD_LOCAL_CFG);
 			gi.newLine();
 		}
 		generateIML(dir, projectName);
@@ -165,7 +168,10 @@ public class ProjectGenerator {
 	}
 
 	private static void generateProGuardConfig(String dir, String projName) throws IOException {
-		Files.write(Paths.get(dir, "proguard.cfg"), ProjectConfigGenerator.buildProguardConfig(dir, projName).getBytes(StandardCharsets.UTF_8));
+		Files.write(Paths.get(dir, PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir, projName).getBytes(StandardCharsets.UTF_8));
+		if (!Files.exists(Paths.get(dir, PROGUARD_GLOBAL_CFG))) {
+			Files.write(Paths.get(dir, PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
+		}
 	}
 
 	//#endregion

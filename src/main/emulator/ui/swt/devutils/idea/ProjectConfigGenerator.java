@@ -23,7 +23,7 @@ public class ProjectConfigGenerator {
 			"out/\n" +
 			"!**/src/main/**/out/\n" +
 			"!**/src/test/**/out/\n" +
-			"proguard.cfg\n" +
+			ProjectGenerator.PROGUARD_LOCAL_CFG + "\n" +
 			".idea/runConfigurations\n" +
 			"\n" +
 			"### Eclipse ###\n" +
@@ -32,8 +32,6 @@ public class ProjectConfigGenerator {
 			".factorypath\n" +
 			".project\n" +
 			".settings\n" +
-			".springBeans\n" +
-			".sts4-cache\n" +
 			"bin/\n" +
 			"deployed/\n" +
 			"!**/src/main/**/bin/\n" +
@@ -74,7 +72,7 @@ public class ProjectConfigGenerator {
 			"  </component>\n" +
 			"</module>";
 
-	public static String buildProguardConfig(String dir, String name) {
+	public static String buildLocalProguardConfig(String dir, String name) {
 		StringBuilder sb = new StringBuilder();
 		for (String l : JdkTablePatcher.DEV_TIME_JARS) {
 			sb.append("-libraryjars '");
@@ -133,7 +131,7 @@ public class ProjectConfigGenerator {
 		sb.append("MIDlet-Version: 0.0.1").append(System.lineSeparator());
 		sb.append("MIDlet-Name: ").append(appName).append(System.lineSeparator());
 		sb.append("MIDlet-1: ").append(appName).append(",,").append(className).append(System.lineSeparator());
-		sb.append("MIDlet-Jar-URL: ").append(projName).append("_release.jar").append(System.lineSeparator());
+		sb.append("MIDlet-Jar-URL: ").append(projName).append(".jar").append(System.lineSeparator());
 
 		return sb.toString();
 	}
@@ -224,7 +222,7 @@ public class ProjectConfigGenerator {
 		return "<component name=\"ProjectRunConfigurationManager\">\n" +
 				"  <configuration default=\"false\" name=\"Package\" type=\"JarApplication\">\n" +
 				"    <option name=\"JAR_PATH\" value=\"" + Settings.proguardPath + "\" />\n" +
-				"    <option name=\"PROGRAM_PARAMETERS\" value=\"@proguard.cfg\" />\n" +
+				"    <option name=\"PROGRAM_PARAMETERS\" value=\"@" + ProjectGenerator.PROGUARD_LOCAL_CFG + " @" + ProjectGenerator.PROGUARD_GLOBAL_CFG + "\" />\n" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
