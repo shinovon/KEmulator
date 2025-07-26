@@ -22,7 +22,8 @@ final class Class29 extends DropTargetAdapter {
 
 	public final void drop(final DropTargetEvent dropTargetEvent) {
 		final String[] array;
-		if (FileTransfer.getInstance().isSupportedType(dropTargetEvent.currentDataType) && (array = (String[]) dropTargetEvent.data).length > 0 && (array[0].toLowerCase().endsWith(".jar") || array[0].toLowerCase().endsWith(".jad"))) {
+		if (FileTransfer.getInstance().isSupportedType(dropTargetEvent.currentDataType) && (array = (String[]) dropTargetEvent.data).length > 0 &&
+				(array[0].toLowerCase().endsWith(".jar") || array[0].toLowerCase().endsWith(".jad") || array[0].toLowerCase().endsWith(".jam"))) {
 			Emulator.loadGame(array[0], false);
 		}
 	}

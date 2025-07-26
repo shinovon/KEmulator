@@ -292,6 +292,7 @@ OPTION_KEYMAP_PAD_UP=Pad_Cima:
 OPTION_KEYMAP_PAD_DOWN=Pad_Baixo:
 OPTION_KEYMAP_PAD_MIDDLE=Pad_Meio:
 OPTION_KEYMAP_CLEAR=Limpar
+OPTION_KEYMAP_RESET=Resetar
 
 OPTION_FONT_DEFAULT_FONT=Fonte Padrão:
 OPTION_FONT_LARGE_SIZE=Tamanho Grande:
@@ -325,6 +326,7 @@ OPTION_COREAPI_IGNORE_REGION_REPAINT=Sempre repintar a tela totalmente
 OPTION_COREAPI_KEYPRESS_ON_REPEAT=Enviar keyPressed em repetições
 OPTION_COREAPI_FORCE_SERVICE_REPAINTS=Forçar pintura em serviceRepaints()
 OPTION_COREAPI_POINTER_EVENTS= Valor de retorno de Canvas.hasPointerEvents()
+OPTION_COREAPI_ASYNC_FLUSH=Limpeza assíncrona
 
 OPTION_RECORDS_RMS_FOLDER=Pasta para RMS:
 OPTION_RECORDS_RMS_TEXT=Todos os Registros no MIDlet atual:
@@ -352,13 +354,13 @@ OPTION_MEDIA_GLOBAL_MIDI=Permitir apenas uma reprodução MIDI por vez (reduz o 
 OPTION_MEDIA_REOPEN_MIDI=Reabrir dispositivo MIDI a cada vez
 OPTION_MEDIA_DUMP=Habilitar exportação de mídia (uso mais alto de memória)
 OPTION_MEDIA_OTT=Reprodução de Tom Nokia (instável)
-OPTION_MEDIA_OTT=Nokia Tone Playback (instável)
 
 OPTION_M3G_LWJGL_SETTINGS=Configurações LWJGL
 OPTION_M3G_IGNORE_OVERWRITE=Ignorar sugestão OVERWRITE
 OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION=Forçar correção de perspectiva
 OPTION_M3G_DISABLE_LIGHT_CLAMPING=Desativar limitação de luz
 OPTION_M3G_FLUSH_IMMEDIATELY=Limpar conteúdos imediatamente (lento!)
+OPTION_M3G_THREAD=M3G só em uma thread
 
 OPTION_M3G_AA=Anti-aliasing:
 OPTION_M3G_APP_CONTROLLED=Controlado pelo aplicativo
@@ -416,3 +418,4 @@ UPDATE_AVAILABLE_TEXT=Uma nova versão está disponível.\nVocê deseja baixá-l
 LCDUI_ALERT_DISMISS_COMMAND=OK
 LCDUI_LIST_SELECT_COMMAND=Selecionar
 LCDUI_MENU_COMMAND=Menu
+

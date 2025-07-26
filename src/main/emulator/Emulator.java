@@ -4,8 +4,10 @@ import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
 import com.github.sarxos.webcam.Webcam;
+import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
+import emulator.custom.ResourceManager;
 import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
@@ -50,7 +52,7 @@ public class Emulator implements Runnable {
 	private static EventQueue eventQueue;
 	private static KeyRecords record;
 	public static Vector jarLibrarys;
-	public static Vector jarClasses;
+	public static Vector<String> jarClasses;
 	public static String midletJar;
 	public static String midletClassName;
 	public static String classPath;
@@ -83,6 +85,7 @@ public class Emulator implements Runnable {
 	private static boolean forked;
 	private static boolean updated;
 	private static boolean bridge;
+	public static boolean doja;
 
 	private static void initRichPresence() {
 		if (!Settings.rpc)
@@ -416,7 +419,7 @@ public class Emulator implements Runnable {
 		if (s != null) {
 			sb.append(" - ").append(s);
 		} else if (midletJar != null && Emulator.emulatorimpl.getAppProperties() != null) {
-			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty("MIDlet-Name"));
+			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty(Emulator.doja ? "AppName" : "MIDlet-Name"));
 		}
 		if (Settings.uei) sb.append(" (UEI)");
 		return sb.toString();
@@ -466,21 +469,32 @@ public class Emulator implements Runnable {
 		try {
 			if (Emulator.midletClassName == null) {
 				Properties props = null;
-				File file2;
 				File file;
 				if (Emulator.jadPath != null) {
-					file = (file2 = new File(Emulator.jadPath));
+					file = new File(Emulator.jadPath);
 				} else {
 					final StringBuffer sb = new StringBuffer();
-					file = (file2 = new File(sb.append(Emulator.midletJar, 0, Emulator.midletJar.length() - 3).append("jad").toString()));
+					file = new File(sb.append(Emulator.midletJar, 0, Emulator.midletJar.length() - 3).append("jad").toString());
+					if (!file.exists()) {
+						sb.setCharAt(sb.length() - 1, 'm');
+						file = new File(sb.toString());
+					}
 				}
-				final File file3 = file2;
 				if (file.exists()) {
-					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
+					doja = file.getName().endsWith(".jam");
+					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file), doja ? "Shift_JIS" : "UTF-8"));
 					final Enumeration<Object> keys = props.keys();
 					while (keys.hasMoreElements()) {
 						final String s = (String) keys.nextElement();
 						props.put(s, props.getProperty(s));
+					}
+				}
+				if (doja) {
+					Emulator.emulatorimpl.getLogStream().println("Running DoJa");
+					System.out.println(props);
+					if (Emulator.midletJar == null) {
+						String s = file.getName();
+						Emulator.midletJar = s.substring(0, s.length() - 1) + 'r';
 					}
 				}
 				Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
@@ -494,14 +508,14 @@ public class Emulator implements Runnable {
 						Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
 					}
 				}
-				if (props == null || !props.containsKey("MIDlet-1")) {
+				if (props == null || !props.containsKey(doja ? "AppClass" : "MIDlet-1")) {
 					try {
 						final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
 						props = new Properties();
 						for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
 							props.put(entry.getKey().toString(), entry.getValue());
 						}
-						if (!props.containsKey("MIDlet-1")) throw new Exception();
+						if (!props.containsKey(doja ? "AppClass" : "MIDlet-1")) throw new Exception();
 					} catch (Exception ex2) {
 						final InputStream inputStream;
 						(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
@@ -545,9 +559,13 @@ public class Emulator implements Runnable {
 						return true;
 					}
 				}
-				Emulator.midletClassName = props.getProperty("MIDlet-1");
-				if (Emulator.midletClassName != null) {
-					Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
+				if (doja) {
+					Emulator.midletClassName = props.getProperty("AppClass");
+				} else {
+					Emulator.midletClassName = props.getProperty("MIDlet-1");
+					if (Emulator.midletClassName != null) {
+						Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
+					}
 				}
 			} else {
 				if (Emulator.classPath == null) {
@@ -867,21 +885,22 @@ public class Emulator implements Runnable {
 				return;
 			}
 			InputStream inputStream = null;
-			final String appProperty;
-			if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
-				iconPath = appProperty;
-				inputStream = emulator.custom.CustomJarResources.getResourceAsStream(appProperty);
-			} else {
-				final String appProperty2;
-				if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
-					try {
-						String s = appProperty2.split(",")[1].trim();
-						iconPath = s;
-						inputStream = emulator.custom.CustomJarResources.getResourceAsStream(s);
-					} catch (Exception ex3) {
-						ex3.printStackTrace();
+			try {
+				String iconPath;
+				if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
+					Emulator.iconPath = iconPath;
+					inputStream = ResourceManager.getResourceAsStream(iconPath);
+				} else if ((iconPath = Emulator.emulatorimpl.getAppProperty("AppIcon")) != null) {
+					Emulator.iconPath = iconPath = iconPath.split(",")[0].trim();
+					inputStream = ResourceManager.getResourceAsStream(iconPath);
+				} else {
+					if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
+						Emulator.iconPath = iconPath = iconPath.split(",")[1].trim();
+						inputStream = ResourceManager.getResourceAsStream(iconPath);
 					}
 				}
+			} catch (Exception ex3) {
+				ex3.printStackTrace();
 			}
 			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
 				Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
@@ -895,16 +914,21 @@ public class Emulator implements Runnable {
 				System.exit(1);
 				return;
 			}
-			getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
-			try {
-				midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
-			} catch (Throwable e) {
-				e.printStackTrace();
-				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
-				System.exit(1);
-				return;
+			if (doja) {
+				Emulator.eventQueue = new EventQueue();
+				midlet = new IApplicationMIDlet(Emulator.midletClassName.trim());
+			} else {
+				getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
+				try {
+					midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
+				} catch (Throwable e) {
+					e.printStackTrace();
+					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+					System.exit(1);
+					return;
+				}
+				Emulator.eventQueue = new EventQueue();
 			}
-			Emulator.eventQueue = new EventQueue();
 			new Thread(new Emulator()).start();
 			Emulator.emulatorimpl.getScreen().runWithMidlet();
 		} catch (Throwable e) {
@@ -955,7 +979,7 @@ public class Emulator implements Runnable {
 		if (array.length < 1) {
 			return false;
 		}
-		if (array.length == 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad"))) {
+		if (array.length == 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad")) || array[0].endsWith(".jam")) {
 			String path = array[0];
 			if (path.endsWith(".jar")) {
 				try {
@@ -973,7 +997,7 @@ public class Emulator implements Runnable {
 			String key = array[i].trim();
 			if (key.startsWith("-")) {
 				key = key.substring(1).toLowerCase();
-			} else if (i == array.length - 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad"))) {
+			} else if (i == array.length - 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad") || array[0].endsWith(".jam"))) {
 				String path = array[0];
 				if (path.endsWith(".jar")) {
 					try {
@@ -1261,7 +1285,7 @@ public class Emulator implements Runnable {
 					continue;
 				cmd.add(a);
 			}
-		} else if (s.endsWith(".jad")) {
+		} else if (s.endsWith(".jad") || s.endsWith(".jam")) {
 			cmd.add("-jad");
 			cmd.add(s);
 			cmd.add("-jar");
@@ -1300,6 +1324,9 @@ public class Emulator implements Runnable {
 		try {
 			File file = new File(jadPath);
 			if (file.exists()) {
+				if (jadPath.endsWith(".jam")) {
+					return jadPath.substring(0, jadPath.length() - 1) + 'r';
+				}
 				Properties properties = new Properties();
 				properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 				return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
@@ -1376,13 +1403,15 @@ public class Emulator implements Runnable {
 	}
 
 	public void run() {
-		try {
-			midletClass.newInstance();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			eventQueue.stop();
-			emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
-			return;
+		if (!doja) {
+			try {
+				midletClass.newInstance();
+			} catch (Throwable e) {
+				e.printStackTrace();
+				eventQueue.stop();
+				emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+				return;
+			}
 		}
 		if (Emulator.getEmulator() instanceof SWTFrontend) {
 			SWTFrontend swt = (SWTFrontend) Emulator.getEmulator();

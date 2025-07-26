@@ -1,6 +1,6 @@
 package emulator;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.custom.CustomMethod;
 
 import java.io.*;
@@ -10,7 +10,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -49,7 +48,7 @@ public class Updater {
 					state = Emulator.revision.equals(s) ?
 							STATE_UP_TO_DATE : STATE_UPDATE_AVAILABLE;
 				} else {
-					s = new String(CustomJarResources.getBytes(inputStream), "UTF-8");
+					s = new String(ResourceManager.getBytes(inputStream), "UTF-8");
 					if (s.length() == 0) throw new IOException();
 
 					state = Integer.parseInt(s) > Emulator.numericVersion ?

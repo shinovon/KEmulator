@@ -662,7 +662,7 @@ public class Form extends Screen {
 		if (item != null && !item.commands.isEmpty()) {
 			Vector<TargetedCommand> commands = new Vector<>();
 			buildItemCommands(commands, item);
-			buildScreenCommands(commands);
+//			buildScreenCommands(commands);
 			Emulator.getEmulator().getScreen().showCommandsList(commands, CommandsMenuPosition.Cursor, 0,0);
 			return true;
 		}

@@ -1,15 +1,13 @@
 package emulator.ui.bridge;
 
 import emulator.Emulator;
-import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
-import org.omg.CORBA.Environment;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
@@ -30,6 +28,9 @@ final class BridgeOutput implements IScreen {
 	private boolean firstFrame = true;
 
 	private final Object lock = new Object();
+
+	private String leftSoftLabel;
+	private String rightSoftLabel;
 
 	BridgeOutput(BridgeFrontend bridge, int w, int h) {
 		this.bridge = bridge;
@@ -111,9 +112,20 @@ final class BridgeOutput implements IScreen {
 	}
 
 	@Override
-	public void setPrimaryCommands(String left, String right) {
-		byte[] l = left == null ? (new byte[0]) : left.getBytes(StandardCharsets.UTF_8);
-		byte[] r = right == null ? (new byte[0]) : right.getBytes(StandardCharsets.UTF_8);
+	public void setLeftSoftLabel(String label) {
+		leftSoftLabel = label;
+		sendLabels();
+	}
+
+	@Override
+	public void setRightSoftLabel(String label) {
+		rightSoftLabel = label;
+		sendLabels();
+	}
+
+	private void sendLabels() {
+		byte[] l = leftSoftLabel == null ? (new byte[0]) : leftSoftLabel.getBytes(StandardCharsets.UTF_8);
+		byte[] r = rightSoftLabel == null ? (new byte[0]) : rightSoftLabel.getBytes(StandardCharsets.UTF_8);
 		ByteBuffer bb = ByteBuffer.allocate(l.length + 1 + r.length);
 		bb.put(l);
 		bb.put((byte) 0);
@@ -156,7 +168,7 @@ final class BridgeOutput implements IScreen {
 	@Override
 	public void setWindowIcon(InputStream inputStream) {
 		try {
-			ImageAWT img = new ImageAWT(CustomJarResources.getBytes(inputStream));
+			ImageAWT img = new ImageAWT(ResourceManager.getBytes(inputStream));
 			int[] rgba = img.getData();
 			ByteBuffer bb = ByteBuffer.allocate(4 + rgba.length * 4);
 			bb.putShort((short) img.getWidth());

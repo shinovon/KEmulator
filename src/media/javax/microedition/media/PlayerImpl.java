@@ -2,7 +2,7 @@ package javax.microedition.media;
 
 import emulator.Emulator;
 import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.media.EmulatorMIDI;
 import emulator.media.tone.ToneControlImpl;
 import javazoom.jl.decoder.Header;
@@ -102,7 +102,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		controls = new Control[]{toneControl, volumeControl};
 		try {
 			final byte[] b;
-			if ((b = emulator.media.amr.a.method476(CustomJarResources.getBytes(inputStream))) == null) {
+			if ((b = emulator.media.amr.a.method476(ResourceManager.getBytes(inputStream))) == null) {
 				throw new MediaException("Cannot parse AMR data");
 			}
 			if (Settings.enableMediaDump) data = b;
@@ -127,7 +127,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		WavCache key = null;
 		try {
 			if (inputStream instanceof ByteArrayInputStream || Settings.enableMediaDump) {
-				data = CustomJarResources.getBytes(inputStream);
+				data = ResourceManager.getBytes(inputStream);
 				if (Settings.wavCache) {
 					key = new WavCache(data);
 					synchronized (wavCache) {
@@ -183,7 +183,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
-			byte[] data = CustomJarResources.getBytes(inputStream);
+			byte[] data = ResourceManager.getBytes(inputStream);
 			if (Settings.enableMediaDump) this.data = data;
 			sequence = MidiSystem.getSequence(this.inputStream = new ByteArrayInputStream(data));
 		} catch (Exception e) {
@@ -469,7 +469,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					try {
 						InputStream i = inputStream;
 						if (i instanceof ByteArrayInputStream || Settings.enableMediaDump) {
-							data = CustomJarResources.getBytes(i);
+							data = ResourceManager.getBytes(i);
 							i = this.inputStream = new ByteArrayInputStream(data);
 						}
 						sequence = new javazoom.jl.player.Player(i, false);
@@ -842,9 +842,13 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private void initMidiSequencer() throws MidiUnavailableException {
 		if (midiSequencer != null) return;
 		midiSequencer = MidiSystem.getSequencer(false);
-		midiSynthesizer = MidiSystem.getSynthesizer();
-		midiSynthesizer.open();
-		midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
+		if (EmulatorMIDI.useExternalReceiver()) {
+			EmulatorMIDI.setupSequencer(midiSequencer);
+		} else {
+			midiSynthesizer = MidiSystem.getSynthesizer();
+			midiSynthesizer.open();
+			midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
+		}
 		midiSequencer.open();
 		midiSequencer.addMetaEventListener(this);
 	}

@@ -1,6 +1,7 @@
 package javax.microedition.io;
 
 import emulator.Emulator;
+import emulator.custom.ResourceManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -24,7 +25,7 @@ final class ResourceConnectionImpl implements InputConnection {
 	}
 
 	public final InputStream openInputStream() throws IOException {
-		return "!blank".equals(url) ? new ByteArrayInputStream(new byte[0]) : emulator.custom.CustomJarResources.getResourceAsStream(url);
+		return "!blank".equals(url) ? new ByteArrayInputStream(new byte[0]) : ResourceManager.getResourceAsStream(url);
 	}
 
 	public final void close() {

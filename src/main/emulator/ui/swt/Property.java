@@ -369,6 +369,11 @@ public final class Property implements IProperty, SelectionListener {
 		return this.defaultFont;
 	}
 
+	public String getMonospaceFontName() {
+		// TODO
+		return "Consolas";
+	}
+
 	public int getFontSmallSize() {
 		return this.fontSmallSize;
 	}
@@ -554,6 +559,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
 			Settings.j2lStyleFpsLimit = Boolean.parseBoolean(properties.getProperty("FPSLimitJLStyle", "false"));
 			Settings.queueSleep = Boolean.parseBoolean(properties.getProperty("EventQueueSleep", "true"));
+			Settings.patchYield = Boolean.parseBoolean(properties.getProperty("PatchYield", "false"));
+			Settings.ignoreGc = Boolean.parseBoolean(properties.getProperty("IgnoreGC", "true"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -792,6 +799,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
 			properties.setProperty("FPSLimitJLStyle", String.valueOf(Settings.j2lStyleFpsLimit));
 			properties.setProperty("EventQueueSleep", String.valueOf(Settings.queueSleep));
+			properties.setProperty("PatchYield", String.valueOf(Settings.patchYield));
+			properties.setProperty("IgnoreGC", String.valueOf(Settings.ignoreGc));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {

@@ -18,11 +18,10 @@ package ru.woesss.j2me.micro3d;
 
 import com.mascotcapsule.micro3d.v3.Graphics3D;
 import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -70,8 +69,8 @@ abstract class Program {
 	}
 
 	private int createProgram(String vertexShader, String fragmentShader) throws IOException {
-		String vertexShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(vertexShader)), StandardCharsets.UTF_8);
-		String fragmentShaderCode = new String(CustomJarResources.getBytes(getClass().getResourceAsStream(fragmentShader)), StandardCharsets.UTF_8);
+		String vertexShaderCode = new String(ResourceManager.getBytes(getClass().getResourceAsStream(vertexShader)), StandardCharsets.UTF_8);
+		String fragmentShaderCode = new String(ResourceManager.getBytes(getClass().getResourceAsStream(fragmentShader)), StandardCharsets.UTF_8);
 
 		System.out.println("loadShader " + vertexShader);
 		int vertexId = loadShader(GL_VERTEX_SHADER, vertexShaderCode);

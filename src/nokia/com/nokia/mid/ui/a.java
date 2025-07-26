@@ -7,7 +7,7 @@ import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.ITransform;
 import emulator.graphics2D.awt.TransformAWT;
-import emulator.graphics2D.b;
+import emulator.graphics2D.GraphicsUtils;
 import emulator.graphics2D.swt.TransformSWT;
 
 import javax.microedition.lcdui.Graphics;
@@ -52,7 +52,7 @@ final class a
 	}
 
 	public final void drawPixels(short[] paramArrayOfShort, boolean paramBoolean, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7, int paramInt8) {
-		IImage localIImage = b.method164(paramArrayOfShort, paramBoolean, paramInt1, paramInt2, paramInt5, paramInt6);
+		IImage localIImage = GraphicsUtils.setImageData(paramArrayOfShort, paramBoolean, paramInt1, paramInt2, paramInt5, paramInt6);
 		ITransform localITransform = this.impl.getTransform().newTransform(paramInt5, paramInt6, a(paramInt7), paramInt3, paramInt4, 0);
 		this.gc.drawRegion(localIImage, 0, 0, paramInt5, paramInt6, localITransform, 65280);
 		Profiler.nokiaDrawPixelCallCount += 1;
@@ -114,7 +114,7 @@ final class a
 	}
 
 	public final void drawPixels(int[] paramArrayOfInt, boolean paramBoolean, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7, int paramInt8) {
-		IImage localIImage = b.method163(paramArrayOfInt, paramBoolean, paramInt1, paramInt2, paramInt5, paramInt6);
+		IImage localIImage = GraphicsUtils.setImageData(paramArrayOfInt, paramBoolean, paramInt1, paramInt2, paramInt5, paramInt6);
 		ITransform localITransform = this.impl.getTransform().newTransform(paramInt5, paramInt6, a(paramInt7), paramInt3, paramInt4, 0);
 		this.gc.drawRegion(localIImage, 0, 0, paramInt5, paramInt6, localITransform, 65280);
 		Profiler.nokiaDrawPixelCallCount += 1;
@@ -170,11 +170,11 @@ final class a
 	}
 
 	public final void getPixels(int[] pixels, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7) {
-		b.method165(this.gc.getImage(), pixels, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
+		GraphicsUtils.getImageData(this.gc.getImage(), pixels, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
 	}
 
 	public final void getPixels(short[] pixels, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6, int paramInt7) {
-		b.method166(this.gc.getImage(), pixels, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
+		GraphicsUtils.getImageData(this.gc.getImage(), pixels, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
 	}
 
 	public final void getPixels(byte[] pixels, byte[] transparencyMask, int offset, int scanLength, int x, int y, int width, int height, int format) {

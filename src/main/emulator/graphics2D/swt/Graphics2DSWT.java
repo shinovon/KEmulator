@@ -91,6 +91,10 @@ public final class Graphics2DSWT implements IGraphics2D {
 		this.gc.drawPolygon(array);
 	}
 
+	public final void drawPolyline(final int[] array) {
+		this.gc.drawPolyline(array);
+	}
+
 	public final void setFont(final IFont font) {
 		this.gc.setFont(((FontSWT) font).getSWTFont());
 	}

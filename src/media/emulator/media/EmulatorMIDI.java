@@ -14,6 +14,10 @@ public class EmulatorMIDI {
 	private static MidiDevice device;
 	private static Receiver receiver;
 
+	public static boolean useExternalReceiver() {
+		return Settings.searchVms && receiver != null && synthesizer == null;
+	}
+
 	public static void initDevices() {
 		if (deviceInfo != null)
 			return;

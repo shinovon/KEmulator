@@ -23,6 +23,8 @@ public interface IGraphics2D {
 
 	void drawPolygon(final int[] p0);
 
+	void drawPolyline(final int[] p0);
+
 	void drawString(final String p0, final int p1, final int p2);
 
 	void drawImage(final IImage p0, final int p1, final int p2);

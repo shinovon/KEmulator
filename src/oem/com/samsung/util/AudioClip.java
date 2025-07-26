@@ -1,6 +1,6 @@
 package com.samsung.util;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.media.MMFPlayer;
 
 import javax.microedition.media.Player;
@@ -34,7 +34,7 @@ public class AudioClip {
 	}
 
 	public AudioClip(int type, String s) throws IOException {
-		InputStream is = CustomJarResources.getResourceAsStream(s);
+		InputStream is = ResourceManager.getResourceAsStream(s);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] b = new byte[512];
 		while (is.available() > 0) {

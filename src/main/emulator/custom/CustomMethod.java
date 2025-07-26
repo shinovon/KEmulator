@@ -6,7 +6,6 @@ import emulator.Settings;
 import emulator.custom.h.MethodInfo;
 import emulator.debug.Profiler;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
@@ -29,14 +28,28 @@ public class CustomMethod {
 
 	public static void gc() {
 		++Profiler.gcCallCount;
+		if (!Settings.ignoreGc) {
+			System.gc();
+		}
 	}
 
 	public static void yield() throws InterruptedException {
-//        Thread.sleep(1L);
-		Thread.yield();
+		if (Settings.patchYield) {
+			Thread.sleep(1L);
+		} else {
+			Thread.yield();
+		}
 	}
 
 	public static void sleep(long t) throws InterruptedException {
+		if (Settings.ignoreSleep) return;
+		if (Settings.applySpeedToSleep && Settings.speedModifier != 1 && t > 1) {
+			if (Settings.speedModifier < 0) {
+				t = t * ((100L - Settings.speedModifier * 1024L) / 100L);
+			} else {
+				t = t / Settings.speedModifier;
+			}
+		}
 		Thread.sleep(t);
 	}
 
@@ -154,7 +167,7 @@ public class CustomMethod {
 	}
 
 	public static InputStream getResourceAsStream(final Object o, final String s) {
-		return CustomJarResources.getResourceAsStream(o, s);
+		return ResourceManager.getResourceAsStream(o, s);
 	}
 
 	public static void showTrackInfo(final String s) {
