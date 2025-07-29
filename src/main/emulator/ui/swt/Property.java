@@ -593,6 +593,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
 			Settings.updateBranch = properties.getProperty("UpdateBranch", Emulator.debugBuild ? "dev" : "stable");
 			Settings.autoUpdate = Integer.parseInt(properties.getProperty("AutoUpdate", "0"));
+			Settings.altLessSpeedShortcuts = Boolean.parseBoolean(properties.getProperty("AltLessSpeedShortcuts", "false"));
 
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
@@ -838,6 +839,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
 			properties.setProperty("UpdateBranch", Settings.updateBranch);
 			properties.setProperty("AutoUpdate", String.valueOf(Settings.autoUpdate));
+			if (properties.getProperty("AltLessSpeedShortcuts") == null) //overwrite only if not in the file, can be changed only externaly
+				properties.setProperty("AltLessSpeedShortcuts",String.valueOf(Settings.altLessSpeedShortcuts));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 			properties.setProperty("WavCache", String.valueOf(Settings.wavCache));
