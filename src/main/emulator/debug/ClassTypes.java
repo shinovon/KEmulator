@@ -141,7 +141,7 @@ public final class ClassTypes {
 	public static void setFieldValue(Object var0, Field var1, String var2) {
 		try {
 			int var3;
-			if ((var3 = var2.startsWith("0x") ? 16 : var2.startsWith("0b") ? 2 : 10) == 16) {
+			if ((var3 = var2.startsWith("0x") ? 16 : var2.startsWith("0b") ? 2 : 10) != 10) {
 				var2 = var2.substring(2);
 			}
 
