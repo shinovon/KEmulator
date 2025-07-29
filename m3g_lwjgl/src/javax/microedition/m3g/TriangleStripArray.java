@@ -133,8 +133,13 @@ public class TriangleStripArray extends IndexBuffer {
 
 		for (int i = 0; i < stripCount; i++) {
 			for (int j = 0; j < stripLengths[i] - 2; j++) {
-				indices[k++] = super.indices[m + 0];
-				indices[k++] = super.indices[m + 1];
+				if ((j & 1) == 0) {
+					indices[k++] = super.indices[m + 0];
+					indices[k++] = super.indices[m + 1];
+				} else {
+					indices[k++] = super.indices[m + 1];
+					indices[k++] = super.indices[m + 0];
+				}
 				indices[k++] = super.indices[m + 2];
 				m++;
 			}
