@@ -107,6 +107,7 @@ public final class EmulatorScreen implements
 	MenuItem interposeHighMenuItem;
 	MenuItem speedUpMenuItem;
 	MenuItem slowDownMenuItem;
+	MenuItem resetSpeedMenuItem;
 	MenuItem recordKeysMenuItem;
 	MenuItem enableAutoplayMenuItem;
 	MenuItem captureToFileMenuItem;
@@ -1077,10 +1078,13 @@ public final class EmulatorScreen implements
 		syncScalingModeSelection();
 
 		new MenuItem(menuTool, 2);
-		(this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDUP", "Speed Up") + "\tAlt+>");
+		(this.speedUpMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDUP", "Speed Up") + (!Settings.altLessSpeedShortcuts ? "\tAlt+>" : "\t>"));
 		this.speedUpMenuItem.addSelectionListener(this);
-		(this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDDOWN", "Slow Down") + "\tAlt+<");
+		(this.slowDownMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_SPEEDDOWN", "Slow Down") + (!Settings.altLessSpeedShortcuts ? "\tAlt+<" : "\t<"));
 		this.slowDownMenuItem.addSelectionListener(this);
+		this.resetSpeedMenuItem = new MenuItem(this.menuTool, 8);
+		this.resetSpeedMenuItem.setText(UILocale.get("MENU_TOOL_SPEEDRESET", "Reset Speed") + (!Settings.altLessSpeedShortcuts ? "\tAlt+?" : "\t?"));
+		this.resetSpeedMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuTool, 2);
 		(this.recordKeysMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_RECORD_KEY", "Record Keys"));
 		this.recordKeysMenuItem.addSelectionListener(this);
@@ -1201,8 +1205,9 @@ public final class EmulatorScreen implements
 		this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
 		this.rotate90MenuItem.setAccelerator(SWT.ALT | 89);
 		this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
-		this.speedUpMenuItem.setAccelerator(SWT.ALT | 46);
-		this.slowDownMenuItem.setAccelerator(SWT.ALT | 44);
+		this.speedUpMenuItem.setAccelerator(!Settings.altLessSpeedShortcuts ? SWT.ALT | 46 : 46);
+		this.slowDownMenuItem.setAccelerator(!Settings.altLessSpeedShortcuts ? SWT.ALT | 44 : 44);
+		this.resetSpeedMenuItem.setAccelerator(!Settings.altLessSpeedShortcuts ? SWT.ALT | '/' : '/');
 		this.suspendMenuItem.setAccelerator(SWT.CONTROL | 83);
 		this.resumeMenuItem.setAccelerator(SWT.CONTROL | 69);
 		this.openJadMenuItem.setAccelerator(SWT.CONTROL | 68);
@@ -1285,7 +1290,10 @@ public final class EmulatorScreen implements
 					this.zoomOut();
 					return;
 				}
-				if (menuItem == this.speedUpMenuItem) {
+				if (menuItem == this.resetSpeedMenuItem){
+					Settings.speedModifier = 1;
+					this.updateStatus();
+				} else if (menuItem == this.speedUpMenuItem) {
 					if (Settings.speedModifier == -1) {
 						Settings.speedModifier = 1;
 						this.updateStatus();
