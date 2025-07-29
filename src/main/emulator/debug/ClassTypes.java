@@ -141,14 +141,14 @@ public final class ClassTypes {
 	public static void setFieldValue(Object var0, Field var1, String var2) {
 		try {
 			int var3;
-			if ((var3 = var2.startsWith("0x") ? 16 : 10) == 16) {
+			if ((var3 = var2.startsWith("0x") ? 16 : var2.startsWith("0b") ? 2 : 10) == 16) {
 				var2 = var2.substring(2);
 			}
 
 			if (var1.getType() == Long.TYPE) {
 				var1.setLong(var0, Long.parseLong(var2, var3));
 			} else if (var1.getType() == Integer.TYPE) {
-				if (var3 == 16)
+				if (var3 == 16 || var3 == 2)
 					var1.setInt(var0, Integer.parseUnsignedInt(var2, var3));
 				else if (var3 == 10)
 					var1.setInt(var0, Integer.parseInt(var2, var3));
