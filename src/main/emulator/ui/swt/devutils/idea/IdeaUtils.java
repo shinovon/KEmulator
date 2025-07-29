@@ -281,11 +281,17 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		fd.setFilterExtensions(new String[]{"*.iml"});
 		String path = fd.open();
 		if (path == null) return;
+		if (!path.endsWith(".iml")) {
+			errorMsg("Project restore", "Selected not an IDEA project file.");
+			return;
+		}
+		String dir = Paths.get(path).getParent().toString();
 		try {
-			String dir = ProjectGenerator.fixCloned(path, () -> {
+			boolean runIdea = ProjectGenerator.fixCloned(dir, () -> {
 				errorMsg("Failed to create symbolic link", ProjectGenerator.SYMLINK_FAIL_MSG + "\n\nSee log/stdout for error code.");
 			});
-			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+			if (runIdea)
+				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			errorMsg("Project restore", "Failed to generate project: " + ex.getMessage() + "\nNote that this works only with projects created by KEmulator.");
@@ -327,25 +333,16 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			System.out.println("IDE support is not configured, please run setup first.");
 			System.exit(2);
 		}
-		File folder = new File(path);
-		for (File file : folder.listFiles()) {
-			if (file.getName().endsWith(".iml")) {
-				String imlPath = file.getAbsolutePath();
-				try {
-					System.out.println("Fixing project at " + imlPath);
-					ProjectGenerator.fixCloned(imlPath,()->System.out.println("Failed to restore symlink. Your MANIFEST.MF and Application Descriptor are now independent files."));
-					System.out.println("OK");
-					System.exit(0);
-				} catch (Exception ex) {
-					System.out.println("Failed!");
-					System.out.println(ex.getMessage());
-					System.exit(1);
-				}
-			}
+		try {
+			System.out.println("Fixing project at " + path);
+			ProjectGenerator.fixCloned(path, () -> System.out.println("Failed to restore symlink. Your MANIFEST.MF and Application Descriptor are now independent files."));
+			System.out.println("OK");
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
 		}
-
-		System.out.println("No IML files found. Exiting.");
-		System.exit(1);
 	}
 
 	public static void createProjectCLI(String path) {

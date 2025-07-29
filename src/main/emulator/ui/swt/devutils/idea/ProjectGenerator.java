@@ -44,10 +44,15 @@ public class ProjectGenerator {
 	}
 
 
-	public static String fixCloned(String imlPath, Runnable onSymlinkFail) throws IOException, InterruptedException {
-		if (!imlPath.endsWith(".iml"))
-			throw new IllegalArgumentException();
-		String dir = Paths.get(imlPath).getParent().toString();
+	public static boolean fixCloned(String dir, Runnable onSymlinkFail) throws IOException, InterruptedException {
+		File folder = new File(dir);
+		boolean imlFound = false;
+		for (File file : folder.listFiles()) {
+			if (file.getName().endsWith(".iml")) {
+				imlFound = true;
+				break;
+			}
+		}
 		Path appDecrPath = Paths.get(dir, "Application Descriptor");
 		Path mfPath = Paths.get(dir, "META-INF", "MANIFEST.MF");
 
@@ -89,15 +94,17 @@ public class ProjectGenerator {
 			}
 		}
 
-		String projectName = Paths.get(imlPath).getFileName().toString();
-		projectName = projectName.substring(0, projectName.lastIndexOf('.'));
+		String projectName = Paths.get(dir).getFileName().toString();
 		String midletName = getMidletClassNameFromMF(dir);
 
 		createDirectories(dir);
 		generateProGuardConfig(dir, projectName);
-		generateRunConfigs(dir, projectName, midletName);
+		if (imlFound)
+			generateRunConfigs(dir, projectName, midletName);
+		else
+			System.out.println("No IML found! IDEA configs will not be created.");
 
-		return dir;
+		return imlFound;
 	}
 
 	public static String convertEclipse(String appDescriptorPath) throws IOException, InterruptedException {
