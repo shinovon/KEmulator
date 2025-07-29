@@ -138,43 +138,43 @@ public final class ClassTypes {
 		}
 	}
 
-	public static void setFieldValue(Object var0, Field var1, String var2) {
+	public static void setFieldValue(Object obj, Field field, String s) {
 		try {
-			int var3;
-			if ((var3 = var2.startsWith("0x") ? 16 : 10) == 16) {
-				var2 = var2.substring(2);
+			int radix;
+			String n = s;
+			if ((radix = s.startsWith("0x") ? 16 : s.startsWith("0b") ? 2 : 10) != 10) {
+				n = s.substring(2);
 			}
 
-			if (var1.getType() == Long.TYPE) {
-				var1.setLong(var0, Long.parseLong(var2, var3));
-			} else if (var1.getType() == Integer.TYPE) {
-				if (var3 == 16)
-					var1.setInt(var0, Integer.parseUnsignedInt(var2, var3));
-				else if (var3 == 10)
-					var1.setInt(var0, Integer.parseInt(var2, var3));
-			} else if (var1.getType() == Short.TYPE) {
-				var1.setShort(var0, (short) Integer.parseInt(var2, var3));
-			} else if (var1.getType() == Byte.TYPE) {
-				var1.setByte(var0, (byte) Integer.parseInt(var2, var3));
-			} else if (var1.getType() == Boolean.TYPE) {
-				String lowerCase = var2.toLowerCase();
-				boolean b = "true".indexOf(lowerCase) == 0;
+			if (field.getType() == Long.TYPE) {
+				field.setLong(obj, Long.parseLong(n, radix));
+			} else if (field.getType() == Integer.TYPE) {
+				if (radix == 16 || radix == 2)
+					field.setInt(obj, Integer.parseUnsignedInt(n, radix));
+				else if (radix == 10)
+					field.setInt(obj, Integer.parseInt(n, radix));
+			} else if (field.getType() == Short.TYPE) {
+				field.setShort(obj, (short) Integer.parseInt(n, radix));
+			} else if (field.getType() == Byte.TYPE) {
+				field.setByte(obj, (byte) Integer.parseInt(n, radix));
+			} else if (field.getType() == Boolean.TYPE) {
+				boolean b = "true".indexOf(s.toLowerCase()) == 0;
 				if (!b) {
 					try {
-						b = Integer.parseInt(var2, var3) != 0;
+						b = Integer.parseInt(n, radix) != 0;
 					} catch (java.lang.NumberFormatException e) {
 						b = false;
 					}
 				}
-				var1.setBoolean(var0, b);
-			} else if (var1.getType() == Float.TYPE) {
-				var1.setFloat(var0, Float.parseFloat(var2));
-			} else if (var1.getType() == Double.TYPE) {
-				var1.setDouble(var0, Double.parseDouble(var2));
-			} else if (var1.getType() == Character.TYPE) {
-				var1.setChar(var0, var2.charAt(0));
-			} else if (var1.getType() == String.class) {
-				var1.set(var0, var2);
+				field.setBoolean(obj, b);
+			} else if (field.getType() == Float.TYPE) {
+				field.setFloat(obj, Float.parseFloat(s));
+			} else if (field.getType() == Double.TYPE) {
+				field.setDouble(obj, Double.parseDouble(s));
+			} else if (field.getType() == Character.TYPE) {
+				field.setChar(obj, s.charAt(0));
+			} else if (field.getType() == String.class) {
+				field.set(obj, s);
 			}
 		} catch (Exception var4) {
 			Emulator.getEmulator().getLogStream().println(var4.toString());

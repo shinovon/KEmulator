@@ -167,4 +167,5 @@ public final class Settings {
 	public static boolean patchSleep;
 	public static boolean ignoreSleep;
 	public static boolean applySpeedToSleep;
+	public static boolean altLessSpeedShortcuts;
 }

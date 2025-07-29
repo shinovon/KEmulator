@@ -997,17 +997,16 @@ public class Emulator implements Runnable {
 			String key = array[i].trim();
 			if (key.startsWith("-")) {
 				key = key.substring(1).toLowerCase();
-			} else if (i == array.length - 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad") || array[0].endsWith(".jam"))) {
-				String path = array[0];
-				if (path.endsWith(".jar")) {
+			} else if (key.endsWith(".jar") || key.endsWith(".jad") || key.endsWith(".jam")) {
+				if (key.endsWith(".jar")) {
 					try {
-						Emulator.midletJar = new File(path).getCanonicalPath();
+						Emulator.midletJar = new File(key).getCanonicalPath();
 					} catch (Exception e) {
-						Emulator.midletJar = path;
+						Emulator.midletJar = key;
 					}
 				} else {
-					Emulator.jadPath = path;
-					Emulator.midletJar = getMidletJarUrl(path);
+					Emulator.jadPath = key;
+					Emulator.midletJar = getMidletJarUrl(key);
 				}
 			}
 			String value = null;
