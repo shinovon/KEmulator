@@ -2,7 +2,6 @@ package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
 import emulator.Settings;
-import emulator.ui.swt.devutils.JavaTypeValidator;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.eclipse.swt.SWT;
@@ -10,7 +9,6 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 
@@ -399,7 +397,10 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 								String table = Paths.get(path, "options", "jdk.table.xml").toString();
 								alreadyPatched = JdkTablePatcher.checkJdkTable(table);
 								jdkTablePath = table;
-								refreshContent();
+								if (alreadyPatched)
+									refreshContent();
+								else
+									patchJdkTable();
 							} catch (Exception ex) {
 								errorMsg("Config location", "Failed to check config table. Logs may help you.\n\nException: " + ex);
 							}
@@ -416,6 +417,12 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			manualConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
 			manualConfigBtn.setText("Choose the file");
 			manualConfigBtn.addSelectionListener(this);
+
+			new Label(shell, SWT.NONE).setText("Note: this will write to config paths to:");
+			new Label(shell, SWT.NONE).setText("1. Running instance of KEmulator");
+			new Label(shell, SWT.NONE).setText("2. Selected JDK");
+			new Label(shell, SWT.NONE).setText("3. Selected javadocs");
+			new Label(shell, SWT.NONE).setText("You should not relocate them after the setup, or things will break.");
 		} else {
 			if (alreadyPatched) {
 				new Label(jvmSetupGroup, SWT.NONE).setText("Your JDK table looks like already set up.");
@@ -429,18 +436,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				doPatchBtn.setText("Apply new configuration");
 				doPatchBtn.addSelectionListener(this);
 			} else {
-				new Label(jvmSetupGroup, SWT.NONE).setText("Config file:");
-				new Label(jvmSetupGroup, SWT.NONE).setText(jdkTablePath);
-
-				doPatchBtn = new Button(jvmSetupGroup, SWT.PUSH);
-				doPatchBtn.setText("Edit the table");
-				doPatchBtn.addSelectionListener(this);
-
-				new Label(jvmSetupGroup, SWT.NONE).setText("Note: this will write to config paths to:");
-				new Label(jvmSetupGroup, SWT.NONE).setText("1. Running KEmulator");
-				new Label(jvmSetupGroup, SWT.NONE).setText("2. JRE, used to run this KEmulator");
-				new Label(jvmSetupGroup, SWT.NONE).setText("3. Javadocs that you installed in previous step");
-				new Label(jvmSetupGroup, SWT.NONE).setText("You should not relocate them after the setup, or things will break.");
+				throw new RuntimeException("Invalid state: not patched.");
 			}
 		}
 
@@ -548,7 +544,10 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			try {
 				alreadyPatched = JdkTablePatcher.checkJdkTable(path);
 				jdkTablePath = path;
-				refreshContent();
+				if (alreadyPatched)
+					refreshContent();
+				else
+					patchJdkTable();
 			} catch (Exception ex) {
 				errorMsg("Config location", "Failed to check config table. Logs may help you.\nException: " + ex);
 			}
@@ -558,17 +557,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			shell.dispose();
 			IdeaUtils.open(parent);
 		} else if (e.widget == doPatchBtn) {
-			if (patchJdkTable()) {
-				shell.close();
-				shell.dispose();
-				final MessageBox mb = new MessageBox(parent, SWT.ICON_INFORMATION | SWT.OK);
-				mb.setText("Configuration is done.");
-				mb.setMessage("If you encounter code analysis errors (all imports are red, broken autocompletion), try doing \"File > Invalidate caches\".");
-				mb.open();
-				IdeaUtils.open(parent);
-			} else {
-				refreshContent();
-			}
+			patchJdkTable();
 		} else if (e.widget == selectJdkBtn) {
 			DirectoryDialog dd = new DirectoryDialog(shell, SWT.OPEN);
 			dd.setText("Choose JDK home folder");
@@ -602,21 +591,31 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		}
 	}
 
-	private boolean patchJdkTable() {
+	private void patchJdkTable() {
 		Path lockFile = Paths.get(jdkTablePath).getParent().getParent().resolve(".lock");
 		if (Files.exists(lockFile)) {
-			jdkTablePath = null;
 			errorMsg("Config location", "Your IntelliJ IDEA is running. Close it to continue.");
-			return false;
+			jdkTablePath = null;
+			refreshContent();
+			return;
 		}
 		try {
 			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath, jdkHome);
 			Settings.ideaJdkTablePatched = true;
 		} catch (Exception ex) {
 			errorMsg("Config patch", "Failed to modify config table. Logs may help you.\n\nException: " + ex);
-			return false;
+			jdkTablePath = null;
+			refreshContent();
+			return;
 		}
-		return true;
+		shell.close();
+		shell.dispose();
+		final MessageBox mb = new MessageBox(parent, SWT.ICON_INFORMATION | SWT.OK);
+		mb.setText("Configuration is done.");
+		mb.setMessage("If you encounter code analysis errors (all imports are red, broken autocompletion), try doing \"File > Invalidate caches\".");
+		mb.open();
+		IdeaUtils.open(parent);
+
 	}
 
 	private void chooseIdeaLauncherManually() {
