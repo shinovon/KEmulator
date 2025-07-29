@@ -30,7 +30,8 @@ public class Image extends com.siemens.mp.ui.Image {
 	public static javax.microedition.lcdui.Image createImageFromFile(
 			String resname, boolean scaleToFullScreen) throws IOException {
 		if (scaleToFullScreen) {
-			return createImageFromFile(resname, Emulator.getScreen().getWidth(), Emulator.getScreen().getHeight());
+			return createImageFromFile(resname, Emulator.getEmulator().getScreen().getWidth(),
+					Emulator.getEmulator().getScreen().getHeight());
 		}
 		return javax.microedition.lcdui.Image.createImage(resname);
 	}

@@ -53,6 +53,7 @@ public class Display {
 		}
 		if (Display.current != null) {
 			Display.current.defocus();
+			Emulator.getEventQueue().notifyHidden(d);
 		}
 		Emulator.getEmulator().getScreen().getCaret().displayableChanged();
 		if (d != null) {

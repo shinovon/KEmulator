@@ -8,4 +8,20 @@ public interface IFont {
 	int getHeight();
 
 	int getAscent();
+
+	int getDescent();
+
+	int getMaxAscent();
+
+	int getMaxDescent();
+
+	int getLeading();
+
+	int getPixelSize();
+
+	String getFamily();
+
+	String getName();
+
+	String getFontName();
 }

@@ -82,7 +82,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	public final void a(Transform paramTransform, int paramInt) {
 	}
 
-	public final void setCaretLocation(final int x, final int y) {
+	public synchronized final void setCaretLocation(final int x, final int y) {
 		this.caretLocX = x;
 		this.caretLocY = y;
 		int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaret(x, y, true);
@@ -92,23 +92,24 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 	public final void setWindowZoom(final float aFloat840) {
 		this.zoom = aFloat840;
-		if (currentItem != null) {
+		Object item = currentItem;
+		if (item != null) {
 			if (swtFont != null && !swtFont.isDisposed() && swtText != null) {
 				swtText.setFont(null);
 				swtFont.dispose();
 			}
-			if (currentItem instanceof DateField) {
+			if (item instanceof DateField) {
 				this.swtCaret.setSize(Math.min(1, (int) aFloat840), (int) (font.getBaselinePosition() * aFloat840));
 				this.setCaretLocation(this.caretLocX, this.caretLocY);
 //				swtCaret.setVisible(true);
 			} else {
 				int w, h;
-				if (currentItem instanceof TextEditor) {
-					w = ((TextEditor) currentItem).getWidth();
-					h = ((TextEditor) currentItem).getHeight();
+				if (item instanceof TextEditor) {
+					w = ((TextEditor) item).getWidth();
+					h = ((TextEditor) item).getHeight();
 				} else {
-					w = ((TextField) currentItem)._getTextAreaWidth();
-					h = ((TextField) currentItem)._getTextAreaHeight();
+					w = ((TextField) item)._getTextAreaWidth();
+					h = ((TextField) item)._getTextAreaHeight();
 				}
 				swtFont = new org.eclipse.swt.graphics.Font(swtCanvas.getDisplay(),
 						Emulator.getEmulator().getProperty().getDefaultFontName(),

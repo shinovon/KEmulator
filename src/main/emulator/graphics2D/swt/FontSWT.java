@@ -69,7 +69,41 @@ public final class FontSWT implements IFont {
 		return this.gc.getFontMetrics().getAscent();
 	}
 
+	public final int getDescent() {
+		return this.gc.getFontMetrics().getDescent();
+	}
+
 	public final int getLeading() {
 		return this.gc.getFontMetrics().getLeading();
+	}
+
+	public final int getMaxAscent() {
+		// TODO
+		return this.gc.getFontMetrics().getAscent();
+	}
+
+	public final int getMaxDescent() {
+		// TODO
+		return this.gc.getFontMetrics().getDescent();
+	}
+
+	public int getPixelSize() {
+		// TODO
+		return this.gc.getFontMetrics().getHeight();
+	}
+
+	public String getFamily() {
+		// TODO
+		return "";
+	}
+
+	public String getName() {
+		// TODO
+		return "";
+	}
+
+	public String getFontName() {
+		// TODO
+		return "";
 	}
 }

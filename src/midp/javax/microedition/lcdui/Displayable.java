@@ -134,7 +134,8 @@ public class Displayable {
 		if (rightCommand != null) {
 			rightLabel = rightCommand.getLabel();
 		}
-		Emulator.getEmulator().getScreen().setPrimaryCommands(leftLabel, rightLabel);
+		Emulator.getEmulator().getScreen().setLeftSoftLabel(leftLabel);
+		Emulator.getEmulator().getScreen().setRightSoftLabel(rightLabel);
 	}
 
 	private boolean hasMenuOnLeft() {
@@ -330,7 +331,7 @@ public class Displayable {
 	}
 
 	public static synchronized void _fpsLimiter(boolean b) {
-		if (b && Settings.speedModifier == 1 && Settings.frameRate <= 120) {
+		if (b && (Settings.speedModifier == 1 || (Settings.patchSleep && Settings.applySpeedToSleep)) && Settings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
 			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
 
@@ -389,6 +390,8 @@ public class Displayable {
 	Vector<TargetedCommand> buildAllCommands() {
 		Vector<TargetedCommand> cmds = new Vector<>();
 		buildItemCommands(cmds, focusedItem);
+		// separator
+		if (!cmds.isEmpty()) cmds.add(null);
 		buildScreenCommands(cmds);
 		return cmds;
 	}

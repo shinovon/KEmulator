@@ -1,7 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.*;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.custom.CustomMethod;
 import emulator.debug.Profiler;
 import emulator.debug.Profiler3D;
@@ -181,7 +181,6 @@ public final class EmulatorScreen implements
 	private StackLayout stackLayout;
 	private Composite swtContent;
 	private Displayable lastDisplayable;
-	private boolean painted;
 	protected int dialogSelection;
 	private boolean midletSupportsMultitouch;
 	private boolean touchEnabled;
@@ -191,13 +190,20 @@ public final class EmulatorScreen implements
 	private boolean paintPending;
 
 	private Menu commandsMenu;
-	private boolean exiting;
+	private String leftSoftLabelText, rightSoftLabelText;
 
-	public EmulatorScreen(final int n, final int n2) {
+	public EmulatorScreen(int n, int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		display = SWTFrontend.getDisplay();
 		this.initShell();
-		this.initScreenBuffer(startWidth = n, startHeight = n2);
+		try {
+			this.initScreenBuffer(n, n2);
+		} catch (Throwable e) {
+			Emulator.getEmulator().getLogStream().println("Failed to initialize screen buffer with size " + n + "x" + n2 + ", falling back to 240x320.");
+			e.printStackTrace();
+			this.initScreenBuffer(n = 240, n2 = 320);
+		}
+		startWidth = n; startHeight = n2;
 		this.updatePauseState();
 	}
 
@@ -795,10 +801,21 @@ public final class EmulatorScreen implements
 		return this.getScreenImg().getHeight();
 	}
 
-	public void setPrimaryCommands(final String left, final String right) {
+	public void setLeftSoftLabel(final String label) {
+		if (leftSoftLabelText != null && leftSoftLabelText.equals(label))
+			return;
+		leftSoftLabelText = label;
 		display.syncExec(() -> {
-			leftSoftLabel.setText(left);
-			rightSoftLabel.setText(right);
+			leftSoftLabel.setText(label);
+		});
+	}
+
+	public void setRightSoftLabel(final String label) {
+		if (rightSoftLabelText != null && rightSoftLabelText.equals(label))
+			return;
+		rightSoftLabelText = label;
+		display.syncExec(() -> {
+			rightSoftLabel.setText(label);
 		});
 	}
 
@@ -1320,7 +1337,7 @@ public final class EmulatorScreen implements
 				pauseStep();
 				final FileDialog fileDialog2;
 				(fileDialog2 = new FileDialog(this.shell, 4096)).setText(UILocale.get("OPEN_JAR_FILE", "Open a jar file"));
-				fileDialog2.setFilterExtensions(new String[]{"*.jar;*.jad", "*.*"});
+				fileDialog2.setFilterExtensions(new String[]{"*.jar;*.jad;*.jam", "*.*"});
 				final String open2;
 				if ((open2 = fileDialog2.open()) != null) {
 					Settings.recordedKeysFile = null;
@@ -1848,6 +1865,10 @@ public final class EmulatorScreen implements
 				return;
 			}
 			for (TargetedCommand cmd : cmds) {
+				if (cmd == null) {
+					new MenuItem(commandsMenu, SWT.SEPARATOR);
+					continue;
+				}
 				MenuItem mi = new MenuItem(commandsMenu, cmd.isChoice() ? SWT.RADIO : SWT.PUSH);
 				mi.setText(cmd.text);
 				mi.setData(cmd);
@@ -2444,7 +2465,6 @@ public final class EmulatorScreen implements
 	}
 
 	public void widgetDisposed(final DisposeEvent disposeEvent) {
-		exiting = true;
 		Emulator.getEmulator().disposeSubWindows();
 		Emulator.notifyDestroyed();
 		if (this.pauseState != 0) {
@@ -2623,7 +2643,7 @@ public final class EmulatorScreen implements
 			TableItem t = new TableItem(table, SWT.NONE);
 			t.setText(0, p[0].trim());
 			try {
-				t.setImage(0, new Image(SWTFrontend.getDisplay(), CustomJarResources.getResourceAsStream(p[1].trim())));
+				t.setImage(0, new Image(SWTFrontend.getDisplay(), ResourceManager.getResourceAsStream(p[1].trim())));
 			} catch (Exception ignored) {
 			}
 		}
@@ -2684,14 +2704,15 @@ public final class EmulatorScreen implements
 	}
 
 	public String showIMEIDialog() {
-		InputDialog imeiDialog = new InputDialog(shell);
+		InputDialog imeiDialog[] = new InputDialog[1];
 		shell.getDisplay().syncExec(() -> {
-			imeiDialog.setMessage("Application asks for IMEI");
-			imeiDialog.setInput("0000000000000000");
-			imeiDialog.setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
-			imeiDialog.open();
+			imeiDialog[0] = new InputDialog(shell);
+			imeiDialog[0].setMessage("Application asks for IMEI");
+			imeiDialog[0].setInput("0000000000000000");
+			imeiDialog[0].setText(UILocale.get("SECURITY_ALERT_TITLE", "Security"));
+			imeiDialog[0].open();
 		});
-		return imeiDialog.getInput();
+		return imeiDialog[0].getInput();
 	}
 
 	public boolean getTouchEnabled() {

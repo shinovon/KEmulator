@@ -154,5 +154,18 @@ public final class Settings {
 	public static float axisFilter = 0.05f, axisThreshold = 0.7f;
 	public static boolean controllerInverseHor;
 	public static boolean controllerInverseVer;
+
+	// devutils
+	public static String ideaPath;
+	public static String eclipsePath;
+	public static String proguardPath;
+	public static String j2meDocsPath;
+	public static boolean ideaJdkTablePatched = false;
+
+	public static boolean patchYield;
+	public static boolean ignoreGc = true;
+	public static boolean patchSleep;
+	public static boolean ignoreSleep;
+	public static boolean applySpeedToSleep;
 	public static boolean altLessSpeedShortcuts;
 }

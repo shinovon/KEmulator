@@ -369,6 +369,11 @@ public final class Property implements IProperty, SelectionListener {
 		return this.defaultFont;
 	}
 
+	public String getMonospaceFontName() {
+		// TODO
+		return "Consolas";
+	}
+
 	public int getFontSmallSize() {
 		return this.fontSmallSize;
 	}
@@ -554,6 +559,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
 			Settings.j2lStyleFpsLimit = Boolean.parseBoolean(properties.getProperty("FPSLimitJLStyle", "false"));
 			Settings.queueSleep = Boolean.parseBoolean(properties.getProperty("EventQueueSleep", "true"));
+			Settings.patchYield = Boolean.parseBoolean(properties.getProperty("PatchYield", "false"));
+			Settings.ignoreGc = Boolean.parseBoolean(properties.getProperty("IgnoreGC", "true"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -648,7 +655,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 			Settings.m3gContextMode = Integer.parseInt(properties.getProperty("M3GContextMode", "0"));
 
-			// mascot`
+			// mascot
 			Settings.mascotNo2DMixing = Boolean.parseBoolean(properties.getProperty("MascotNo2DMixing", "false"));
 			Settings.mascotIgnoreBackground = Boolean.parseBoolean(properties.getProperty("MascotIgnoreBackground", "false"));
 			Settings.mascotTextureFilter = Boolean.parseBoolean(properties.getProperty("MascotTextureFilter", "false"));
@@ -667,6 +674,13 @@ public final class Property implements IProperty, SelectionListener {
 
 			// security
 			Settings.enableSecurity = Boolean.parseBoolean(properties.getProperty("SecurityEnabled", "true"));
+
+			// devutils
+			Settings.ideaPath = properties.getProperty("IdeaPath", null);
+			Settings.eclipsePath = properties.getProperty("EclipsePath", null);
+			Settings.proguardPath = properties.getProperty("ProguardPath", null);
+			Settings.j2meDocsPath = properties.getProperty("J2MEDocsPath", null);
+			Settings.ideaJdkTablePatched = Boolean.parseBoolean(properties.getProperty("IdeaJdkTablePatched", "false"));
 
 			fileInputStream.close();
 		} catch (Exception ex) {
@@ -787,6 +801,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
 			properties.setProperty("FPSLimitJLStyle", String.valueOf(Settings.j2lStyleFpsLimit));
 			properties.setProperty("EventQueueSleep", String.valueOf(Settings.queueSleep));
+			properties.setProperty("PatchYield", String.valueOf(Settings.patchYield));
+			properties.setProperty("IgnoreGC", String.valueOf(Settings.ignoreGc));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -901,6 +917,13 @@ public final class Property implements IProperty, SelectionListener {
 			for (String k: Permission.permissions.keySet()) {
 				properties.setProperty("Security." + k, Permission.getPermissionLevelString(k));
 			}
+
+			// devutils
+			if (Settings.ideaPath != null) properties.setProperty("IdeaPath", Settings.ideaPath);
+			if (Settings.eclipsePath != null) properties.setProperty("EclipsePath", Settings.eclipsePath);
+			if (Settings.proguardPath != null) properties.setProperty("ProguardPath", Settings.proguardPath);
+			if (Settings.j2meDocsPath != null) properties.setProperty("J2MEDocsPath", Settings.j2meDocsPath);
+			properties.setProperty("IdeaJdkTablePatched", String.valueOf(Settings.ideaJdkTablePatched));
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();

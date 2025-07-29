@@ -18,7 +18,9 @@ public interface IScreen {
 
 	int getHeight();
 
-	void setPrimaryCommands(final String left, final String right);
+	void setLeftSoftLabel(final String label);
+
+	void setRightSoftLabel(final String label);
 
 	void showCommandsList(Vector<TargetedCommand> cmds, CommandsMenuPosition target, int tx, int ty);
 

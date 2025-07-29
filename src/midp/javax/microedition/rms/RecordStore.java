@@ -312,12 +312,17 @@ public class RecordStore {
 		try {
 			File file = new File(rootPath + recordId + ".rms");
 			int length = (int) file.length();
+			if (length > b.length - offset) {
+				throw new ArrayIndexOutOfBoundsException(length);
+			}
 			DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
 			dataInputStream.readFully(b, offset, length);
 			dataInputStream.close();
 			return length;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw e;
 		} catch (Exception e) {
-			throw new RecordStoreException("recordId=" + recordId);
+			throw new RecordStoreException("recordId=" + recordId, e);
 		}
 	}
 
@@ -375,10 +380,13 @@ public class RecordStore {
 				file = new File(rootPath + count + ".rms");
 				if (!file.exists()) file.createNewFile();
 				OutputStream fileOutputStream = new FileOutputStream(file);
-				if (data != null) {
-					fileOutputStream.write(data, offset, length);
+				try {
+					if (data != null) {
+						fileOutputStream.write(data, offset, length);
+					}
+				} finally {
+					fileOutputStream.close();
 				}
-				fileOutputStream.close();
 				writeIndex();
 			} catch (Exception e) {
 				throw new RecordStoreException(e.toString());
@@ -408,14 +416,17 @@ public class RecordStore {
 				}
 				file = new File(rootPath + recordId + ".rms");
 				if (!file.exists()) file.createNewFile();
-				OutputStream fileOutputStream = new FileOutputStream(file);
-				if (data != null) {
-					fileOutputStream.write(data, offset, length);
+				FileOutputStream fileOutputStream = new FileOutputStream(file);
+				try {
+					if (data != null) {
+						fileOutputStream.write(data, offset, length);
+					}
+				} finally {
+					fileOutputStream.close();
 				}
-				fileOutputStream.close();
 				writeIndex();
 			} catch (Exception e) {
-				throw new RecordStoreException("recordId=" + recordId);
+				throw new RecordStoreException("recordId=" + recordId, e);
 			}
 			recordChanged(recordId);
 		}
@@ -448,16 +459,19 @@ public class RecordStore {
 			file = new File(rootPath + "idx");
 			if (!file.exists()) file.createNewFile();
 			DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file));
-			dataOutputStream.writeInt(count);
-			dataOutputStream.writeInt(records.size());
-			for (int i = 0; i < records.size(); ++i) {
-				dataOutputStream.writeInt(((Integer) records.elementAt(i)).intValue());
+			try {
+				dataOutputStream.writeInt(count);
+				dataOutputStream.writeInt(records.size());
+				for (int i = 0; i < records.size(); ++i) {
+					dataOutputStream.writeInt(((Integer) records.elementAt(i)).intValue());
+				}
+				dataOutputStream.writeLong(lastModified);
+				dataOutputStream.writeInt(version);
+				dataOutputStream.writeInt(authmode);
+				dataOutputStream.writeBoolean(writable);
+			} finally {
+				dataOutputStream.close();
 			}
-			dataOutputStream.writeLong(lastModified);
-			dataOutputStream.writeInt(version);
-			dataOutputStream.writeInt(authmode);
-			dataOutputStream.writeBoolean(writable);
-			dataOutputStream.close();
 		} catch (Exception e) {
 			throw new RecordStoreException(name);
 		}

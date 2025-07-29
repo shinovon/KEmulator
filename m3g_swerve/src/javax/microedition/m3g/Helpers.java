@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
@@ -17,7 +17,7 @@ class Helpers {
     static InputStream openInputStream(final String s) throws IOException {
         try {
             if (s.charAt(0) == '/') {
-                return CustomJarResources.getResourceAsStream(s);
+                return ResourceManager.getResourceAsStream(s);
             }
             final InputConnection inputConnection;
             final String headerField;

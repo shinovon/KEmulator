@@ -16,7 +16,7 @@
  */
 package ru.woesss.micro3d;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import javax.microedition.lcdui.Graphics;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class PlatformHelper {
 
 	public static byte[] getResourceBytes(String s) {
 		try {
-			return CustomJarResources.getBytes(s);
+			return ResourceManager.getBytes(s);
 		} catch (IOException e) {
 			return null;
 		}

@@ -16,7 +16,7 @@
 
 package com.jblend.media.smaf.phrase;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.io.IOException;
 
@@ -25,7 +25,7 @@ abstract class PhraseBase {
 	}
 
 	public PhraseBase(String url) throws IOException {
-		this(CustomJarResources.getBytes(url));
+		this(ResourceManager.getBytes(url));
 	}
 
 	public int getSize() {

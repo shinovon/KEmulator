@@ -21,7 +21,7 @@ import ru.woesss.j2me.micro3d.FigureImpl;
 import java.io.IOException;
 
 public class Figure {
-	FigureImpl impl;
+	public FigureImpl impl;
 
 	public Figure(byte[] b) {
 		impl = new FigureImpl(b);

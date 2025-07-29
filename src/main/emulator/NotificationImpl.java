@@ -1,5 +1,6 @@
 package emulator;
 
+import emulator.custom.ResourceManager;
 import ru.nnproject.kemulator.notificationapi.AbstractNotification;
 import ru.nnproject.kemulator.notificationapi.NotificationException;
 
@@ -23,7 +24,7 @@ public class NotificationImpl implements AbstractNotification {
 			tray = SystemTray.getSystemTray();
 			Image image;
 			if (imgpath != null) {
-				image = ImageIO.read(emulator.custom.CustomJarResources.getResourceAsStream(imgpath));
+				image = ImageIO.read(ResourceManager.getResourceAsStream(imgpath));
 			} else {
 				image = ImageIO.read(getClass().getResourceAsStream("/res/icon"));
 			}
