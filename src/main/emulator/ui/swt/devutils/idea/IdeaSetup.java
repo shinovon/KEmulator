@@ -522,7 +522,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				refreshContent();
 			} catch (IOException ex) {
 				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
-
 			}
 		} else if (e.widget == installDocsToUsr) {
 			makeLogWindow();
@@ -562,6 +561,10 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			if (patchJdkTable()) {
 				shell.close();
 				shell.dispose();
+				final MessageBox mb = new MessageBox(parent, SWT.ICON_INFORMATION | SWT.OK);
+				mb.setText("Configuration is done.");
+				mb.setMessage("If you encounter code analysis errors (all imports are red, broken autocompletion), try doing \"File > Invalidate caches\".");
+				mb.open();
 				IdeaUtils.open(parent);
 			} else {
 				refreshContent();
