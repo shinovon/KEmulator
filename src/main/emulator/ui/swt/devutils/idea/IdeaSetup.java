@@ -601,6 +601,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		}
 		try {
 			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath, jdkHome);
+			String repairer = Paths.get(Settings.ideaPath).getParent().resolve(Emulator.win ? "repair.exe" : "repair").toAbsolutePath().toString();
+			Runtime.getRuntime().exec(new String[]{repairer, "caches", "--clear"}).waitFor();
 			Settings.ideaJdkTablePatched = true;
 		} catch (Exception ex) {
 			errorMsg("Config patch", "Failed to modify config table. Logs may help you.\n\nException: " + ex);
@@ -610,10 +612,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		}
 		shell.close();
 		shell.dispose();
-		final MessageBox mb = new MessageBox(parent, SWT.ICON_INFORMATION | SWT.OK);
-		mb.setText("Configuration is done.");
-		mb.setMessage("If you encounter code analysis errors (all imports are red, broken autocompletion), try doing \"File > Invalidate caches\".");
-		mb.open();
 		IdeaUtils.open(parent);
 
 	}
