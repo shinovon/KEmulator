@@ -3,7 +3,6 @@ package emulator;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import com.github.sarxos.webcam.Webcam;
 import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
@@ -751,21 +750,6 @@ public class Emulator implements Runnable {
 		System.setProperty("org.pigler.api.version", "1.4-kemulator");
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
-
-		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
-			try {
-				Webcam w = Webcam.getDefault();
-				if (w != null) {
-					System.setProperty("supports.video.capture", "true");
-					System.setProperty("supports.photo.capture", "true");
-					System.setProperty("supports.mediacapabilities", "camera");
-					System.setProperty("camera.orientations", "devcam0:inwards");
-					Dimension d = w.getViewSize();
-					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
-				}
-			} catch (Throwable ignored) {
-			}
-		}
 
 		try {
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
