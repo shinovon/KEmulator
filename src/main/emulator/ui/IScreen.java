@@ -70,4 +70,6 @@ public interface IScreen {
 	 * @param first Was this the first call to startApp() ?
 	 */
 	void appStarted(boolean first);
+
+	boolean isShown();
 }

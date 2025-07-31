@@ -130,7 +130,7 @@ public final class CustomClassLoader extends ClassLoader {
 		}
 
 		if (Settings.protectedPackages.contains(s)
-				|| (Settings.hideEmulation && !s.equals("emulator.custom.CustomMethod") && s.startsWith("emulator.") && !Emulator.jarClasses.contains(s)))
+				|| (Settings.hideEmulation && !s.startsWith("emulator.custom.") && s.startsWith("emulator.") && !Emulator.jarClasses.contains(s)))
 			return true;
 
 		if (Settings.hideEmulation

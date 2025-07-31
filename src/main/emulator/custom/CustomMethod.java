@@ -312,7 +312,7 @@ public class CustomMethod {
 	}
 
 	public static Class forName(String s) throws ClassNotFoundException {
-		if (Settings.hideEmulation && "emulator.custom.CustomMethod".equals(s)) {
+		if (Settings.hideEmulation && s.startsWith("emulator.custom.")) {
 			throw new ClassNotFoundException(s);
 		}
 		return Class.forName(s);
