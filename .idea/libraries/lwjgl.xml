@@ -5,10 +5,10 @@
       <root url="jar://$PROJECT_DIR$/lib/lwjgl-opengl.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/lwjgl.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/lwjgl3-swt-common.jar!/" />
-      <root url="jar://$PROJECT_DIR$/home/lwjgl-glfw-natives-windows-x86.jar!/" />
-      <root url="jar://$PROJECT_DIR$/home/lwjgl-natives-windows-x86.jar!/" />
-      <root url="jar://$PROJECT_DIR$/home/lwjgl-opengl-natives-windows-x86.jar!/" />
-      <root url="jar://$PROJECT_DIR$/home/lwjgl3-swt-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/platform/lwjgl-glfw-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/platform/lwjgl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/platform/lwjgl-opengl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/platform/lwjgl3-swt-windows-x86.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

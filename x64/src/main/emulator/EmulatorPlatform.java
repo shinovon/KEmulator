@@ -89,7 +89,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	private static void loadSWTLibrary() {
-		if (new File(Emulator.getAbsolutePath() + File.separatorChar + "swt-custom.jar").exists()) {
+		if (new File(Emulator.getAbsolutePath() + File.separatorChar + "platform" + File.separatorChar + "swt-custom.jar").exists()) {
 			addToClassPath("swt-custom.jar");
 			return;
 		}
@@ -162,7 +162,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
 	private static void addToClassPath(String s) {
 		try {
-			Agent.addClassPath(new File(Emulator.getAbsolutePath() + File.separatorChar + s));
+			Agent.addClassPath(new File(Emulator.getAbsolutePath() + File.separatorChar + "platform" + File.separatorChar + s));
 		} catch (Exception e) {
 			throw new RuntimeException(s, e);
 		}
