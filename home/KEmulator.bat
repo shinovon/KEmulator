@@ -1,4 +1,4 @@
-@rem KEmulator nnx64 starter
+@rem KEmulator nnx64 starter, only for JRE 8!
 
 @echo off
 set dir=%~dp0
