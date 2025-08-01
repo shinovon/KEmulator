@@ -108,7 +108,7 @@ public class ProjectGenerator {
 			try {
 				generateProGuardConfig(dirp, projectName, ProjectConfigGenerator.extractLibrariesListFromIML(Paths.get(imlPath)));
 			} catch (Exception e) {
-				System.out.println("Failed to parse IML!");
+				System.out.println("Failed to parse IML! No libraries will be exported.");
 				generateProGuardConfig(dirp, projectName, new String[0]);
 			}
 			generateRunConfigs(dirp, projectName, midletName);
