@@ -1,5 +1,6 @@
 package emulator.custom;
 
+import com.github.sarxos.webcam.Webcam;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
@@ -9,6 +10,7 @@ import emulator.graphics3D.lwjgl.Emulator3D;
 import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
+import java.awt.*;
 import java.io.*;
 import java.util.Hashtable;
 
@@ -71,7 +73,7 @@ public class CustomMethod {
 			if (prop.equalsIgnoreCase("fileconn.dir.private")) {
 				res = "file://root/private_" + Emulator.midletClassName.replace("\\", "_").replace("/", "_").replace(".", "_") + "/";
 			} else if (prop.equalsIgnoreCase("user.name")) {
-				res = "KEmulator";
+				res = Settings.hideEmulation ? null : "KEmulator";
 			} else if (prop.equalsIgnoreCase("console.encoding")) {
 				res = System.getProperty("file.encoding");
 			} else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
@@ -106,28 +108,57 @@ public class CustomMethod {
 				res = Settings.fileEncoding;
 			} else if (prop.equals("Platform")) {
 				res = "";
-			} else if(prop.equals("fileconn.dir.roots.names")) {
+			} else if (prop.equals("fileconn.dir.roots.names")) {
 				res = "Root";
 			} else if(prop.startsWith("kemulator")) {
-				try {
-					if (prop.equals("kemulator.libvlc.supported")) {
-						res = String.valueOf(Manager.isLibVlcSupported());
-					} else if (prop.equals("kemulator.threadtrace")) {
-						b = false;
-						res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
-					} else if (prop.equals("kemulator.touch.enabled")) {
-						res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
-					} else if (prop.startsWith("kemulator.set.title=")) {
-						if ((res = prop.substring(prop.indexOf('=') + 1)).equals("null")) {
-							res = null;
-						}
-						Settings.customTitle = res;
+				if (Settings.hideEmulation) {
+					res = null;
+				} else {
+					try {
+						if (prop.equals("kemulator.libvlc.supported")) {
+							res = String.valueOf(Manager.isLibVlcSupported());
+						} else if (prop.equals("kemulator.threadtrace")) {
+							b = false;
+							res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
+						} else if (prop.equals("kemulator.touch.enabled")) {
+							res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
+						} else if (prop.startsWith("kemulator.set.title=")) {
+							if ((res = prop.substring(prop.indexOf('=') + 1)).equals("null")) {
+								res = null;
+							}
+							Settings.customTitle = res;
 
-						Emulator.getEmulator().getScreen().updateTitle();
-						res = "true";
+							Emulator.getEmulator().getScreen().updateTitle();
+							res = "true";
+						}
+					} catch (Exception ignored) {
 					}
-				} catch (Exception ignored) {}
-			}
+				}
+			} else if (res == null
+					&& (prop.equals("supports.video.capture")
+					|| prop.equals("supports.photo.capture")
+					|| prop.equals("supports.mediacapabilities")
+					|| prop.equals("camera.orientations")
+					|| prop.equals("camera.resolutions"))) {
+				if (!Emulator.getPlatform().isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
+					try {
+						Webcam w = Webcam.getDefault();
+						if (w != null) {
+							System.setProperty("supports.video.capture", "true");
+							System.setProperty("supports.photo.capture", "true");
+							System.setProperty("supports.mediacapabilities", "camera");
+							System.setProperty("camera.orientations", "devcam0:inwards");
+							Dimension d = w.getViewSize();
+							System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
+						}
+					} catch (Throwable ignored) {
+					}
+				}
+				res = System.getProperty(prop);
+			} else if (Settings.hideEmulation) {
+					if (prop.startsWith("os.") || prop.startsWith("java."))
+						res = null;
+				}
 			// Hide properties of disabled APIs
 			if(!Settings.protectedPackages.isEmpty()) {
 				if (CustomClassLoader.isProtected(prop, false) || CustomClassLoader.isProtected("javax." + prop, false)) {
@@ -278,6 +309,13 @@ public class CustomMethod {
 	public static void checkDouble()  {
 		if (CustomClassLoader.isProtected("java.lang.Double", true))
 			throw new Error("Double usage restricted");
+	}
+
+	public static Class forName(String s) throws ClassNotFoundException {
+		if (Settings.hideEmulation && s.startsWith("emulator.custom.")) {
+			throw new ClassNotFoundException(s);
+		}
+		return Class.forName(s);
 	}
 
 	static {

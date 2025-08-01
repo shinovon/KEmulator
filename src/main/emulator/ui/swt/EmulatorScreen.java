@@ -2612,6 +2612,12 @@ public final class EmulatorScreen implements
 			display.asyncExec(new WindowOpen(this, 0));
 	}
 
+	public boolean isShown() {
+		boolean[] r = new boolean[1];
+		display.syncExec(() -> r[0] = shell.isVisible() && !shell.getMinimized());
+		return r[0];
+	}
+
 	public int showMidletChoice(Vector<String> midletKeys) {
 		dialogSelection = -1;
 

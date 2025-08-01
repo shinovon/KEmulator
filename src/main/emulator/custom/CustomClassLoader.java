@@ -129,8 +129,15 @@ public final class CustomClassLoader extends ClassLoader {
 			}
 		}
 
-		if (Settings.protectedPackages.contains(s))
+		if (Settings.protectedPackages.contains(s)
+				|| (Settings.hideEmulation && !s.startsWith("emulator.custom.") && s.startsWith("emulator.") && !Emulator.jarClasses.contains(s)))
 			return true;
+
+		if (Settings.hideEmulation
+				&& (s.startsWith("java.applet") || s.startsWith("java.awt") || s.startsWith("java.swing")
+				|| s.startsWith("org.eclipse.swt") || s.startsWith("ru.nnproject")))
+			return true;
+
 		int idx = -1;
 		while ((idx = s.indexOf('.', idx + 1)) != -1) {
 			if (Settings.protectedPackages.contains(s.substring(0, idx))) return true;

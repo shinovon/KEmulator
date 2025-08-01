@@ -264,4 +264,8 @@ final class BridgeOutput implements IScreen {
 		if (first)
 			new Thread(new BridgeInput(bridge)).start();
 	}
+
+	public boolean isShown() {
+		return true;
+	}
 }

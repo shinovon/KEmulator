@@ -68,6 +68,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getResourceAsStream", "(Ljava/lang/Object;Ljava/lang/String;)Ljava/io/InputStream;");
 					return;
 				}
+				if (Settings.hideEmulation && name.equals("forName")) {
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "forName", "(Ljava/lang/String;)Ljava/lang/Class;");
+					return;
+				}
 			} else if (cls.equals("java/lang/String")) {
 				if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
 					this.method707(1);
