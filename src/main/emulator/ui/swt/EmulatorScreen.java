@@ -42,7 +42,7 @@ public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,
 		ControlListener, KeyListener, MouseListener,
 		MouseMoveListener, SelectionListener, MouseWheelListener,
-		MouseTrackListener, TouchListener {
+		MouseTrackListener, TouchListener, Listener {
 	private static Display display;
 	private static int threadCount;
 	private final int startWidth;
@@ -1807,6 +1807,7 @@ public final class EmulatorScreen implements
 		this.canvas.addMouseMoveListener(this);
 		this.canvas.getShell().addMouseTrackListener(this);
 		this.canvas.addPaintListener(this);
+		canvas.addListener(SWT.MouseHorizontalWheel, this);
 		canvas.addControlListener(new ControlListener() {
 			@Override
 			public void controlMoved(ControlEvent controlEvent) {
@@ -2854,6 +2855,27 @@ public final class EmulatorScreen implements
 				Emulator.getEventQueue().keyRelease(k);
 			}
 		} catch (Exception ignored) {
+		}
+	}
+
+	public void handleEvent(Event event) {
+		if (event.type == SWT.MouseHorizontalWheel) {
+			if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+				return;
+			}
+			try {
+				int k = 0;
+				if (event.count < 0) {
+					k = Integer.parseInt(mapKey(3));
+				} else if (event.count > 0) {
+					k = Integer.parseInt(mapKey(4));
+				}
+				if (k != 0) {
+					Emulator.getEventQueue().keyPress(k);
+					Emulator.getEventQueue().keyRelease(k);
+				}
+			} catch (Exception ignored) {
+			}
 		}
 	}
 }
