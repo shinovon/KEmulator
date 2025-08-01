@@ -29,6 +29,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	public static final String PROGUARD_URL = "https://nnproject.cc/dl/d/proguard.zip";
 	public static final String JAVADOCS_URL = "https://github.com/nikita36078/J2ME_Docs/archive/refs/heads/master.zip";
 	public static final String PROGUARD_DEFAULT_PATH_UNIX = "/opt/proguard6.2.2/proguard.jar";
+	public static final String DEB_DEFAULT_JDK = "/usr/lib/jvm/java-8-openjdk";
+	public static final String RPM_DEFAULT_JDK = "/usr/lib/jvm/java-1.8-openjdk";
 
 	// state
 	private boolean didInstallation = false;
@@ -304,15 +306,24 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				String _jdkHome = Emulator.getJdkHome();
 				if (_jdkHome == null) {
 					if (this instanceof IdeaSetupXdgLinux) {
-						if (Files.exists(Paths.get("/usr/lib/jvm/java-8-openjdk/bin/java"))) {
+						if (Files.exists(Paths.get(DEB_DEFAULT_JDK + "/bin/java"))) {
 							try {
-								if (Emulator.getProcessOutput(new String[]{"/usr/lib/jvm/java-8-openjdk/bin/java", "-version"}, true).contains("1.8.")) {
-									jdkHome = "/usr/lib/jvm/java-8-openjdk";
+								if (Emulator.getProcessOutput(new String[]{DEB_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
+									jdkHome = DEB_DEFAULT_JDK;
 									refreshContent();
 									return;
 								}
-							} catch (IOException e) {
-								// ignore
+							} catch (IOException ignored) {
+							}
+						}
+						if (Files.exists(Paths.get(RPM_DEFAULT_JDK + "/bin/java"))) {
+							try {
+								if (Emulator.getProcessOutput(new String[]{RPM_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
+									jdkHome = RPM_DEFAULT_JDK;
+									refreshContent();
+									return;
+								}
+							} catch (IOException ignored) {
 							}
 						}
 					}

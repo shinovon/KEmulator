@@ -7,6 +7,9 @@ JAVA="java"
 if [ -x "/usr/lib/jvm/java-8-openjdk/bin/java" ]; then
     JAVA="/usr/lib/jvm/java-8-openjdk/bin/java"
 fi
+if [ -x "/usr/lib/jvm/java-1.8-openjdk/bin/java" ]; then
+    JAVA="/usr/lib/jvm/java-1.8-openjdk/bin/java"
+fi
 JAVA_VER=$($JAVA -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{sub("^$", "0", $2); print $1$2}')
 
 # absolute paths to this starter
