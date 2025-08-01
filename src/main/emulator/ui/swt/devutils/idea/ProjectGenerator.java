@@ -1,7 +1,10 @@
 package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -17,18 +20,18 @@ public class ProjectGenerator {
 			"This may include tweaking your FS/mount options, moving the project to another FS, enabling Windows Developer Mode, running from admin/sudo, etc. " +
 			"Also check git settings for related options.";
 
-	public static String create(String location, String projectName, String midletClassName, String readableName) throws IOException {
-		String dir = Paths.get(location, projectName).toAbsolutePath().toString();
+	public static String create(String location, String projectName, String midletClassName, String readableName) throws IOException, ParserConfigurationException, TransformerException, SAXException {
+		Path dir = Paths.get(location, projectName).toAbsolutePath();
 
 		createDirectories(dir);
 
 		// root
-		Files.write(Paths.get(dir, ".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
-		generateIML(dir, projectName);
+		Files.write(dir.resolve(".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
+		ProjectConfigGenerator.generateIML(null, dir.resolve(projectName + ".iml"));
 		generateProGuardConfig(dir, projectName);
 
 		// code
-		Files.write(Paths.get(dir, "META-INF", "MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve("META-INF").resolve("MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
 		String midletCodePath = generateDummyMidlet(dir, midletClassName);
 
 		// ide config
@@ -53,8 +56,9 @@ public class ProjectGenerator {
 				break;
 			}
 		}
-		Path appDecrPath = Paths.get(dir, "Application Descriptor");
-		Path mfPath = Paths.get(dir, "META-INF", "MANIFEST.MF");
+		Path dirp = Paths.get(dir);
+		Path appDecrPath = dirp.resolve("Application Descriptor");
+		Path mfPath = dirp.resolve("META-INF").resolve("MANIFEST.MF");
 
 		boolean isEclipse = Files.exists(appDecrPath);
 		if (!Files.exists(mfPath)) {
@@ -94,24 +98,24 @@ public class ProjectGenerator {
 			}
 		}
 
-		String projectName = Paths.get(dir).getFileName().toString();
-		String midletName = getMidletClassNameFromMF(dir);
+		String projectName = dirp.getFileName().toString();
+		String midletName = getMidletClassNameFromMF(dirp);
 
-		createDirectories(dir);
-		generateProGuardConfig(dir, projectName);
+		createDirectories(dirp);
+		generateProGuardConfig(dirp, projectName);
 		if (imlFound)
-			generateRunConfigs(dir, projectName, midletName);
+			generateRunConfigs(dirp, projectName, midletName);
 		else
 			System.out.println("No IML found! IDEA configs will not be created.");
 
 		return imlFound;
 	}
 
-	public static String convertEclipse(String appDescriptorPath) throws IOException, InterruptedException {
-		String dir = Paths.get(appDescriptorPath).getParent().toString();
-		String projectName = Paths.get(appDescriptorPath).getParent().getFileName().toString(); //folder name
+	public static String convertEclipse(String appDescriptorPath) throws IOException, InterruptedException, ParserConfigurationException, TransformerException, SAXException {
+		Path dir = Paths.get(appDescriptorPath).getParent().toAbsolutePath();
+		String projectName = dir.getFileName().toString(); //folder name
 
-		if (Files.exists(Paths.get(dir, "META-INF", "MANIFEST.MF"))) {
+		if (Files.exists(dir.resolve("META-INF").resolve("MANIFEST.MF"))) {
 			throw new RuntimeException("META-INF/MANIFEST.MF already exists! " +
 					"Eclipse projects are supposed to work with \"Application Descriptor\" file. " +
 					"Synchronize their contents by hand and delete MANIFEST.MF file. It will be recreated soon.");
@@ -121,18 +125,18 @@ public class ProjectGenerator {
 
 		// root
 
-		try (BufferedWriter gi = new BufferedWriter(new FileWriter(Paths.get(dir, ".gitignore").toString(), true))) {
+		try (BufferedWriter gi = new BufferedWriter(new FileWriter(dir.resolve(".gitignore").toString(), true))) {
 			gi.write(".idea/runConfigurations");
 			gi.newLine();
 			gi.write(PROGUARD_LOCAL_CFG);
 			gi.newLine();
 		}
-		generateIML(dir, projectName);
+		ProjectConfigGenerator.generateIML(dir.resolve(".classpath"), dir.resolve(projectName + ".iml"));
 		generateProGuardConfig(dir, projectName);
 
 		// manifest
 		fixManifestWithVersion(appDescriptorPath);
-		symlinkManifests(dir);
+		symlinkManifests(dir.toString());
 
 		String midletClassName = getMidletClassNameFromMF(dir);
 
@@ -145,7 +149,7 @@ public class ProjectGenerator {
 		// run configs
 		generateRunConfigs(dir, projectName, midletClassName);
 
-		return dir;
+		return dir.toString();
 	}
 
 	private static void fixManifestWithVersion(String mfPath) throws IOException {
@@ -165,24 +169,20 @@ public class ProjectGenerator {
 
 	//#region impls
 
-	private static void createDirectories(String dir) throws IOException {
-		Files.createDirectories(Paths.get(dir, ".idea"));
-		Files.createDirectories(Paths.get(dir, ".idea", "artifacts"));
-		Files.createDirectories(Paths.get(dir, ".idea", "runConfigurations"));
-		Files.createDirectories(Paths.get(dir, "src"));
-		Files.createDirectories(Paths.get(dir, "res"));
-		Files.createDirectories(Paths.get(dir, "bin"));
-		Files.createDirectories(Paths.get(dir, "deployed"));
-		Files.createDirectories(Paths.get(dir, "META-INF"));
+	private static void createDirectories(Path dir) throws IOException {
+		Files.createDirectories(dir.resolve(".idea"));
+		Files.createDirectories(dir.resolve(".idea").resolve("artifacts"));
+		Files.createDirectories(dir.resolve(".idea").resolve("runConfigurations"));
+		Files.createDirectories(dir.resolve("src"));
+		Files.createDirectories(dir.resolve("res"));
+		Files.createDirectories(dir.resolve("bin"));
+		Files.createDirectories(dir.resolve("deployed"));
+		Files.createDirectories(dir.resolve("META-INF"));
 	}
 
-	private static void generateIML(String dir, String projectName) throws IOException {
-		Files.write(Paths.get(dir, projectName + ".iml"), ProjectConfigGenerator.imlFile.getBytes(StandardCharsets.UTF_8));
-	}
-
-	private static String getMidletClassNameFromMF(String dir) throws IOException {
+	private static String getMidletClassNameFromMF(Path dir) throws IOException {
 		String midletName = null;
-		List<String> manifest = Files.readAllLines(Paths.get(dir, "META-INF", "MANIFEST.MF"), StandardCharsets.UTF_8);
+		List<String> manifest = Files.readAllLines(dir.resolve("META-INF").resolve("MANIFEST.MF"), StandardCharsets.UTF_8);
 		for (String line : manifest) {
 			if (line.startsWith("MIDlet-1:")) {
 				String[] split = line.split(",");
@@ -195,45 +195,45 @@ public class ProjectGenerator {
 		return midletName;
 	}
 
-	private static void generateRunConfigs(String dir, String projectName, String midletName) throws IOException {
-		Files.write(Paths.get(dir, ".idea", "runConfigurations", "Run_with_KEmulator.xml"), ProjectConfigGenerator.buildKemRunConfig(projectName, midletName).getBytes(StandardCharsets.UTF_8));
-		Files.write(Paths.get(dir, ".idea", "runConfigurations", "Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
+	private static void generateRunConfigs(Path dir, String projectName, String midletName) throws IOException {
+		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Run_with_KEmulator.xml"), ProjectConfigGenerator.buildKemRunConfig(projectName, midletName).getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void generateBuildConfigs(String dir, String projectName) throws IOException {
-		Files.write(Paths.get(dir, ".idea", "artifacts", projectName + ".xml"), ProjectConfigGenerator.buildArtifactConfig(projectName).getBytes(StandardCharsets.UTF_8));
+	private static void generateBuildConfigs(Path dir, String projectName) throws IOException {
+		Files.write(dir.resolve(".idea").resolve("artifacts").resolve(projectName + ".xml"), ProjectConfigGenerator.buildArtifactConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void generateMiscXmls(String dir, String projectName) throws IOException {
-		Files.write(Paths.get(dir, ".idea", "encodings.xml"), ProjectConfigGenerator.encodingFile.getBytes(StandardCharsets.UTF_8));
-		Files.write(Paths.get(dir, ".idea", "misc.xml"), ProjectConfigGenerator.miscFile.getBytes(StandardCharsets.UTF_8));
-		Files.write(Paths.get(dir, ".idea", ".gitignore"), ProjectConfigGenerator.ideaGitignoreFile.getBytes(StandardCharsets.UTF_8));
-		Files.write(Paths.get(dir, ".idea", ".name"), projectName.getBytes(StandardCharsets.UTF_8));
-		Files.write(Paths.get(dir, ".idea", "modules.xml"), ProjectConfigGenerator.buildModulesFile(projectName).getBytes(StandardCharsets.UTF_8));
+	private static void generateMiscXmls(Path dir, String projectName) throws IOException {
+		Files.write(dir.resolve(".idea").resolve("encodings.xml"), ProjectConfigGenerator.encodingFile.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve("misc.xml"), ProjectConfigGenerator.miscFile.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve(".gitignore"), ProjectConfigGenerator.ideaGitignoreFile.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve(".name"), projectName.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve("modules.xml"), ProjectConfigGenerator.buildModulesFile(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static String generateDummyMidlet(String dir, String midletName) throws IOException {
-		String srcFolder = Paths.get(dir, "src").toString();
+	private static String generateDummyMidlet(Path dir, String midletName) throws IOException {
+		Path src = dir.resolve("src");
 		Path midletCodePath;
 		if (midletName.indexOf('.') != -1) {
 			String[] splitted = ProjectConfigGenerator.splitByLastDot(midletName);
 			String[] packagesNames = splitted[0].split("\\.");
-			Path midletFolder = Paths.get(srcFolder, packagesNames);
+			Path midletFolder = Paths.get(src.toString(), packagesNames);
 			Files.createDirectories(midletFolder);
 			midletCodePath = midletFolder.resolve(splitted[1] + ".java");
 			Files.write(midletCodePath, ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
 		} else {
-			midletCodePath = Paths.get(srcFolder, midletName + ".java");
+			midletCodePath = src.resolve(midletName + ".java");
 			Files.write(midletCodePath, ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
 		}
 
 		return midletCodePath.toString();
 	}
 
-	private static void generateProGuardConfig(String dir, String projName) throws IOException {
-		Files.write(Paths.get(dir, PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir, projName).getBytes(StandardCharsets.UTF_8));
-		if (!Files.exists(Paths.get(dir, PROGUARD_GLOBAL_CFG))) {
-			Files.write(Paths.get(dir, PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
+	private static void generateProGuardConfig(Path dir, String projName) throws IOException {
+		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName).getBytes(StandardCharsets.UTF_8));
+		if (!Files.exists(dir.resolve(PROGUARD_GLOBAL_CFG))) {
+			Files.write(dir.resolve(PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
 		}
 	}
 

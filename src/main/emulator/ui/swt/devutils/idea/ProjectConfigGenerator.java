@@ -2,7 +2,19 @@ package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
 import emulator.Settings;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ProjectConfigGenerator {
@@ -58,20 +70,6 @@ public class ProjectConfigGenerator {
 			"# Datasource local storage ignored files\n" +
 			"/dataSources/\n" +
 			"/dataSources.local.xml\n";
-
-	public static final String imlFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-			"<module type=\"JAVA_MODULE\" version=\"4\">\n" +
-			"  <component name=\"NewModuleRootManager\" LANGUAGE_LEVEL=\"JDK_1_3\" inherit-compiler-output=\"true\">\n" +
-			"    <exclude-output />\n" +
-			"    <content url=\"file://$MODULE_DIR$\">\n" +
-			"      <sourceFolder url=\"file://$MODULE_DIR$/res\" type=\"java-resource\" />\n" +
-			"      <sourceFolder url=\"file://$MODULE_DIR$/src\" isTestSource=\"false\" />\n" +
-			"      <excludeFolder url=\"file://$MODULE_DIR$/deployed\" />\n" +
-			"    </content>\n" +
-			"    <orderEntry type=\"inheritedJdk\" />\n" +
-			"    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n" +
-			"  </component>\n" +
-			"</module>";
 
 	public static String buildLocalProguardConfig(String dir, String name) {
 		StringBuilder sb = new StringBuilder();
@@ -235,6 +233,79 @@ public class ProjectConfigGenerator {
 				"    </method>\n" +
 				"  </configuration>\n" +
 				"</component>";
+	}
+
+	public static void generateIML(Path eclipseClasspath, Path imlFile) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		Document doc = builder.newDocument();
+
+		Element module = doc.createElement("module");
+		module.setAttribute("type", "JAVA_MODULE");
+		module.setAttribute("version", "4");
+		doc.appendChild(module);
+
+		Element component = doc.createElement("component");
+		component.setAttribute("name", "NewModuleRootManager");
+		component.setAttribute("LANGUAGE_LEVEL", "JDK_1_3");
+		component.setAttribute("inherit-compiler-output", "true");
+		module.appendChild(component);
+
+		component.appendChild(doc.createElement("exclude-output"));
+
+		Element content = doc.createElement("content");
+		content.setAttribute("url", "file://$MODULE_DIR$");
+		component.appendChild(content);
+
+		Element orderEntry1 = doc.createElement("orderEntry");
+		orderEntry1.setAttribute("type", "inheritedJdk");
+		component.appendChild(orderEntry1);
+
+		Element orderEntry2 = doc.createElement("orderEntry");
+		orderEntry2.setAttribute("type", "sourceFolder");
+		orderEntry2.setAttribute("forTests", "false");
+		component.appendChild(orderEntry2);
+
+		if (eclipseClasspath == null) {
+			addSourceFolder(doc, content, "res");
+			addSourceFolder(doc, content, "src");
+		} else {
+			Document inputDoc = builder.parse(eclipseClasspath.toFile());
+			NodeList entries = inputDoc.getElementsByTagName("classpathentry");
+			for (int i = 0; i < entries.getLength(); i++) {
+				Element entry = (Element) entries.item(i);
+				String kind = entry.getAttribute("kind");
+				if (!"src".equals(kind))
+					continue;
+
+				String path = entry.getAttribute("path");
+				addSourceFolder(doc, content, path);
+			}
+		}
+
+		Element excludeFolder = doc.createElement("excludeFolder");
+		excludeFolder.setAttribute("url", "file://$MODULE_DIR$/deployed");
+		content.appendChild(excludeFolder);
+
+		TransformerFactory factory = TransformerFactory.newInstance();
+		Transformer transformer = factory.newTransformer();
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
+
+		DOMSource source = new DOMSource(doc);
+		StreamResult result = new StreamResult(imlFile.toFile());
+		transformer.transform(source, result);
+	}
+
+	private static void addSourceFolder(Document doc, Element content, String path) {
+		Element sourceFolder = doc.createElement("sourceFolder");
+		sourceFolder.setAttribute("url", "file://$MODULE_DIR$/" + path);
+		if (path.endsWith("res"))
+			sourceFolder.setAttribute("type", "java-resource");
+		else
+			sourceFolder.setAttribute("isTestSource", "false");
+		content.appendChild(sourceFolder);
 	}
 
 	public static String[] splitByLastDot(String input) {
