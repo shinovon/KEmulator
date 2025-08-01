@@ -66,6 +66,7 @@ public class ProjectConfigGenerator {
 			"    <content url=\"file://$MODULE_DIR$\">\n" +
 			"      <sourceFolder url=\"file://$MODULE_DIR$/res\" type=\"java-resource\" />\n" +
 			"      <sourceFolder url=\"file://$MODULE_DIR$/src\" isTestSource=\"false\" />\n" +
+			"      <excludeFolder url=\"file://$MODULE_DIR$/deployed\" />\n" +
 			"    </content>\n" +
 			"    <orderEntry type=\"inheritedJdk\" />\n" +
 			"    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n" +
