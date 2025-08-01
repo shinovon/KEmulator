@@ -1,6 +1,7 @@
 package javax.microedition.lcdui;
 
-import emulator.lcdui.c;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
 
 /**
  * ChoiceGroupItem
@@ -26,16 +27,16 @@ final class a {
 	}
 
 	protected final void method211(final Graphics graphics, final boolean b, int y) {
-		graphics.setColor(-16777216);
+		graphics.setColor(LCDUIUtils.foregroundColor);
 		final boolean b2 = this.choice.choiceType == Choice.POPUP;
 		int anInt28 = y;
 		int anInt29 = b2 ? choice.popupY : bounds[1];
 		int yo = anInt28 + anInt29;
 		final int x = this.bounds[0] + 4;
 		if (b) {
-			emulator.lcdui.a.method178(graphics, this.bounds[0] + 1, yo - 2, this.bounds[2] - 2, this.bounds[3]);
+			LCDUIUtils.drawSelectedItemBackground(graphics, this.bounds[0] + 1, yo - 2, this.bounds[2] - 2, this.bounds[3]);
 		}
-		emulator.lcdui.a.method180(graphics, x, yo + 3, this.sel, this.choice.choiceType);
+		LCDUIUtils.drawChoiceItem(graphics, x, yo + 3, this.sel, this.choice.choiceType);
 		final Font font = (this.font != null) ? this.font : Screen.font;
 		graphics.setFont(font);
 		if (image != null) {
@@ -59,7 +60,7 @@ final class a {
 		final int n2 = this.choice.getPreferredWidth() - 8;
 		final int n = n2 - 12 - (image != null ? 20 : 0);
 		final Font font = (this.font != null) ? this.font : Screen.font;
-		this.str = c.textArr(this.string, font, n, n2);
+		this.str = TextUtils.textArr(this.string, font, n, n2);
 		this.bounds[3] = (font.getHeight() + 4) * this.str.length;
 	}
 

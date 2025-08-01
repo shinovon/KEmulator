@@ -1,3 +1,14 @@
 rms
 file
 capture
+
+log.txt
+property.txt
+track.txt
+classwatcher.txt
+midlets.txt
+updater.jar
+
+!.package
+!KEmulator*.bat
+!kemulator.sh

@@ -56,6 +56,10 @@ public class MathUtil {
 		return (int) Math.round(Math.sqrt(x));
 	}
 
+	public static int iAtan2(int y, int x) {
+		return (int) Math.round(Math.atan2(y / 4096D, x / 4096D) * 4096);
+	}
+
 	static void multiplyMM(float[] m, float[] pm, float[] mvm) {
 		float l00 = pm[0], l01 = pm[4], l02 = pm[ 8], l03 = pm[12];
 		float l10 = pm[1], l11 = pm[5], l12 = pm[ 9], l13 = pm[13];

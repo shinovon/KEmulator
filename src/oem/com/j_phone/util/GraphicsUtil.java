@@ -36,7 +36,7 @@ public class GraphicsUtil {
 	public static void drawRegion(Graphics g, Image src, int x_src, int y_src, int width, int height, int transform,
 								  int x_dest, int y_dest, int width_dest, int height_dest, int anchor,
 								  int stretch_quality) {
-		g.drawRegion(src, x_src, y_src, width, height, transform, x_dest, y_dest, anchor);
+		g._drawRegion(src, x_src, y_src, width, height, transform, x_dest, y_dest, width_dest, height_dest, anchor);
 	}
 
 	public static void drawPseudoTransparentImage(Graphics g, Image src, int x_dest, int y_dest, int anchor, short mask_pattern, int element_size) {

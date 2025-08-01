@@ -121,7 +121,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 	};
 
-	private static Display aDisplay656;
+	private static Display display;
 	private Shell setsShell;
 	private Combo aCombo657;
 	private CLabel aCLabel658;
@@ -335,9 +335,9 @@ public final class Property implements IProperty, SelectionListener {
 		UILocale.initLocale();
 	}
 
-	public void method354(final Shell shell) {
-		Property.aDisplay656 = shell.getDisplay();
-		this.method372(shell);
+	public void open(final Shell parent) {
+		display = parent.getDisplay();
+		this.method372(parent);
 		this.setsShell.pack();
 		this.setsShell.setSize(480, this.setsShell.getSize().y);
 		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
@@ -349,11 +349,11 @@ public final class Property implements IProperty, SelectionListener {
 //			screenHeightText.setText("" + scr.getHeight());
 //		} catch (Exception ignored) {}
 
-		this.setsShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.setsShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.setsShell.getSize().y >> 1));
+		this.setsShell.setLocation(parent.getLocation().x + (parent.getSize().x - this.setsShell.getSize().x >> 1), parent.getLocation().y + (parent.getSize().y - this.setsShell.getSize().y >> 1));
 		this.setsShell.open();
 		while (!this.setsShell.isDisposed()) {
-			if (!Property.aDisplay656.readAndDispatch()) {
-				Property.aDisplay656.sleep();
+			if (!Property.display.readAndDispatch()) {
+				Property.display.sleep();
 			}
 		}
 		this.anIImage671 = null;
@@ -367,6 +367,11 @@ public final class Property implements IProperty, SelectionListener {
 
 	public String getDefaultFontName() {
 		return this.defaultFont;
+	}
+
+	public String getMonospaceFontName() {
+		// TODO
+		return "Consolas";
 	}
 
 	public int getFontSmallSize() {
@@ -494,7 +499,7 @@ public final class Property implements IProperty, SelectionListener {
 			this.left = properties.getProperty("KEY_LEFT", "-3");
 			this.right = properties.getProperty("KEY_RIGHT", "-4");
 			Settings.g2d = (properties.getProperty("2D_Graphics_Engine", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
-			Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("DLL") ? 0 : 1);
+			Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("SWERVE") ? 0 : 1);
 			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("DLL") ? 0 : 1);
 
 			Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
@@ -544,6 +549,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.synchronizeKeyEvents = Boolean.parseBoolean(properties.getProperty("SynchronizeKeyEvents", "false"));
 			Settings.motorolaSoftKeyFix = Boolean.parseBoolean(properties.getProperty("MotorolaSoftKeyFix", "false"));
 			Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
+			Settings.patchSynchronizedPlayerUpdate = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPlayerUpdate", "true"));
 			Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
 			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
@@ -553,6 +559,9 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
 			Settings.j2lStyleFpsLimit = Boolean.parseBoolean(properties.getProperty("FPSLimitJLStyle", "false"));
 			Settings.queueSleep = Boolean.parseBoolean(properties.getProperty("EventQueueSleep", "true"));
+			Settings.patchYield = Boolean.parseBoolean(properties.getProperty("PatchYield", "false"));
+			Settings.ignoreGc = Boolean.parseBoolean(properties.getProperty("IgnoreGC", "true"));
+			Settings.ignoreSleep = Boolean.parseBoolean(properties.getProperty("IgnoreThreadSleep", "false"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -584,11 +593,12 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
 			Settings.updateBranch = properties.getProperty("UpdateBranch", Emulator.debugBuild ? "dev" : "stable");
 			Settings.autoUpdate = Integer.parseInt(properties.getProperty("AutoUpdate", "0"));
+			Settings.altLessSpeedShortcuts = Boolean.parseBoolean(properties.getProperty("AltLessSpeedShortcuts", "false"));
 
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
 
-			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "true"));
+			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "false"));
 			Settings.uiLanguage = properties.getProperty("UILanguage", "en");
 			Settings.writeKemCfg = Boolean.parseBoolean(properties.getProperty("WriteKemulatorCfg", "false"));
 
@@ -616,26 +626,21 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.awtAntiAliasing = Boolean.parseBoolean(properties.getProperty("AWTAntiAliasing", "false"));
 			Settings.textAntiAliasing = Boolean.parseBoolean(properties.getProperty("TextAntiAliasing", "true"));
 
-			if (Emulator.getEmulator() != null && Emulator.getEmulator().getScreen() != null) {
-				((EmulatorScreen) Emulator.getEmulator().getScreen()).toggleMenuAccelerators(!Settings.canvasKeyboard);
-				((EmulatorScreen) Emulator.getEmulator().getScreen()).setFpsMode(Settings.fpsMode);
-			}
-
 			// display
-			Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(100)));
-			if (Settings.canvasScale < 100 || Settings.canvasScale % 50 != 0) {
-				Settings.canvasScale = 100;
+			Settings.canvasScale = Integer.parseInt(properties.getProperty("CanvasScale", String.valueOf(1)))/100f;
+			if (Settings.canvasScale < 1f || Settings.canvasScale % 0.5f != 0) {
+				Settings.canvasScale = 1f;
 			}
-			Settings.resizeMode = Integer.parseInt(properties.getProperty("ResizeMode", "2"));
-			Settings.keepAspectRatio = Boolean.parseBoolean(properties.getProperty("KeepAspectRatio", "true"));
+			Settings.resizeMode = ResizeMethod.fromInt(Integer.parseInt(properties.getProperty("ResizeMode", "2")));
+			Settings.interpolation = Integer.parseInt(properties.getProperty("Interpolation", "0"));
 
 			// window
-			EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", "-1"));
-			EmulatorScreen.locY = Integer.parseInt(properties.getProperty("LocationY", "-1"));
+			EmulatorScreen.locX = Integer.parseInt(properties.getProperty("LocationX", String.valueOf(Integer.MIN_VALUE)));
+			EmulatorScreen.locY = Integer.parseInt(properties.getProperty("LocationY", String.valueOf(Integer.MIN_VALUE)));
 			EmulatorScreen.sizeW = Integer.parseInt(properties.getProperty("SizeW", "-1"));
 			EmulatorScreen.sizeH = Integer.parseInt(properties.getProperty("SizeH", "-1"));
 			EmulatorScreen.maximized = Boolean.parseBoolean(properties.getProperty("Maximized", "false"));
-			EmulatorScreen.defaultSize = Boolean.parseBoolean(properties.getProperty("DefaultSize", "true"));
+			EmulatorScreen.fullscreen = Boolean.parseBoolean(properties.getProperty("FullscreenWindow", "false"));
 
 			Settings.alwaysOnTop = Boolean.parseBoolean(properties.getProperty("AlwaysOnTop", "false"));
 
@@ -651,7 +656,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 			Settings.m3gContextMode = Integer.parseInt(properties.getProperty("M3GContextMode", "0"));
 
-			// mascot`
+			// mascot
 			Settings.mascotNo2DMixing = Boolean.parseBoolean(properties.getProperty("MascotNo2DMixing", "false"));
 			Settings.mascotIgnoreBackground = Boolean.parseBoolean(properties.getProperty("MascotIgnoreBackground", "false"));
 			Settings.mascotTextureFilter = Boolean.parseBoolean(properties.getProperty("MascotTextureFilter", "false"));
@@ -671,6 +676,13 @@ public final class Property implements IProperty, SelectionListener {
 			// security
 			Settings.enableSecurity = Boolean.parseBoolean(properties.getProperty("SecurityEnabled", "true"));
 
+			// devutils
+			Settings.ideaPath = properties.getProperty("IdeaPath", null);
+			Settings.eclipsePath = properties.getProperty("EclipsePath", null);
+			Settings.proguardPath = properties.getProperty("ProguardPath", null);
+			Settings.j2meDocsPath = properties.getProperty("J2MEDocsPath", null);
+			Settings.ideaJdkTablePatched = Boolean.parseBoolean(properties.getProperty("IdeaJdkTablePatched", "false"));
+
 			fileInputStream.close();
 		} catch (Exception ex) {
 			if (!(ex instanceof FileNotFoundException)) {
@@ -689,8 +701,8 @@ public final class Property implements IProperty, SelectionListener {
 			this.down = "-2";
 			this.left = "-3";
 			this.right = "-4";
-			EmulatorScreen.locX = -1;
-			EmulatorScreen.locY = -1;
+			EmulatorScreen.locX = Integer.MIN_VALUE;
+			EmulatorScreen.locY = Integer.MIN_VALUE;
 			Settings.fileEncoding = "ISO-8859-1";
 			Settings.autoGenJad = false;
 			Settings.enableNewTrack = false;
@@ -710,6 +722,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.showLogFrame = false;
 			Settings.showInfoFrame = false;
 			Settings.showMemViewFrame = false;
+			Settings.canvasScale = 1f;
 		}
 	}
 
@@ -779,6 +792,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
 			properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
 			properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
+			properties.setProperty("PatchSynchronizedPlayerUpdater", String.valueOf(Settings.patchSynchronizedPlayerUpdate));
 			properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
 			properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
@@ -788,6 +802,9 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
 			properties.setProperty("FPSLimitJLStyle", String.valueOf(Settings.j2lStyleFpsLimit));
 			properties.setProperty("EventQueueSleep", String.valueOf(Settings.queueSleep));
+			properties.setProperty("PatchYield", String.valueOf(Settings.patchYield));
+			properties.setProperty("IgnoreGC", String.valueOf(Settings.ignoreGc));
+			properties.setProperty("IgnoreThreadSleep", String.valueOf(Settings.ignoreSleep));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -822,6 +839,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
 			properties.setProperty("UpdateBranch", Settings.updateBranch);
 			properties.setProperty("AutoUpdate", String.valueOf(Settings.autoUpdate));
+			if (properties.getProperty("AltLessSpeedShortcuts") == null) //overwrite only if not in the file, can be changed only externaly
+				properties.setProperty("AltLessSpeedShortcuts",String.valueOf(Settings.altLessSpeedShortcuts));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 			properties.setProperty("WavCache", String.valueOf(Settings.wavCache));
@@ -852,9 +871,9 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("TextAntiAliasing", String.valueOf(Settings.textAntiAliasing));
 
 			// display
-			properties.setProperty("CanvasScale", String.valueOf(Settings.canvasScale));
-			properties.setProperty("ResizeMode", String.valueOf(Settings.resizeMode));
-			properties.setProperty("KeepAspectRatio", String.valueOf(Settings.keepAspectRatio));
+			properties.setProperty("CanvasScale", String.valueOf(Math.round(Settings.canvasScale*100)));
+			properties.setProperty("ResizeMode", Settings.resizeMode.toString());
+			properties.setProperty("Interpolation", String.valueOf(Settings.interpolation));
 
 			// window
 			properties.setProperty("LocationX", String.valueOf(EmulatorScreen.locX));
@@ -862,7 +881,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("SizeW", String.valueOf(EmulatorScreen.sizeW));
 			properties.setProperty("SizeH", String.valueOf(EmulatorScreen.sizeH));
 			properties.setProperty("Maximized", String.valueOf(EmulatorScreen.maximized));
-			properties.setProperty("DefaultSize", String.valueOf(EmulatorScreen.defaultSize));
+			properties.setProperty("FullscreenWindow", String.valueOf(EmulatorScreen.fullscreen));
 
 			properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
 
@@ -900,6 +919,13 @@ public final class Property implements IProperty, SelectionListener {
 			for (String k: Permission.permissions.keySet()) {
 				properties.setProperty("Security." + k, Permission.getPermissionLevelString(k));
 			}
+
+			// devutils
+			if (Settings.ideaPath != null) properties.setProperty("IdeaPath", Settings.ideaPath);
+			if (Settings.eclipsePath != null) properties.setProperty("EclipsePath", Settings.eclipsePath);
+			if (Settings.proguardPath != null) properties.setProperty("ProguardPath", Settings.proguardPath);
+			if (Settings.j2meDocsPath != null) properties.setProperty("J2MEDocsPath", Settings.j2meDocsPath);
+			properties.setProperty("IdeaJdkTablePatched", String.valueOf(Settings.ideaJdkTablePatched));
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
@@ -1931,7 +1957,7 @@ public final class Property implements IProperty, SelectionListener {
 		if (this.controllerCombo == null || this.controllerCombo.isDisposed()) {
 			return false;
 		}
-		EmulatorImpl.asyncExec(new Class193(this));
+		display.asyncExec(new Class193(this));
 		return true;
 	}
 
@@ -2440,7 +2466,7 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.horizontalAlignment = 4;
 		(this.aCombo689 = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
 		this.aCombo689.addModifyListener(new Class191(this));
-		final FontData[] fontList = Property.aDisplay656.getFontList(null, true);
+		final FontData[] fontList = Property.display.getFontList(null, true);
 		final ArrayList<Comparable> list = new ArrayList<Comparable>();
 		list.add("Nokia");
 		list.add("Series 60");
@@ -2449,7 +2475,7 @@ public final class Property implements IProperty, SelectionListener {
 				list.add(fontData.getName());
 			}
 		}
-		final FontData[] fontList2 = Property.aDisplay656.getFontList(null, false);
+		final FontData[] fontList2 = Property.display.getFontList(null, false);
 		for (FontData fontData : fontList2) {
 			if (!list.contains(fontData.getName()) && !fontData.getName().startsWith("@")) {
 				list.add(fontData.getName());

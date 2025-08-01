@@ -1,6 +1,5 @@
 package emulator;
 
-import com.j_phone.amuse.ACanvas;
 import com.vodafone.v10.graphics.sprite.SpriteCanvas;
 import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
@@ -23,6 +22,7 @@ public final class EventQueue implements Runnable {
 	public static final int EVENT_INPUT = 18;
 	public static final int EVENT_COMMAND = 19;
 	public static final int EVENT_ITEM_STATE = 20;
+	public static final int EVENT_HIDE = 21;
 
 	boolean running;
 	private int[] events;
@@ -264,6 +264,11 @@ public final class EventQueue implements Runnable {
 			Displayable._fpsLimiter(true);
 	}
 
+	public void notifyHidden(Displayable d) {
+		eventArguments.add(d);
+		queue(EVENT_HIDE);
+	}
+
 	public void run() {
 		int event = 0;
 		try {
@@ -387,7 +392,8 @@ public final class EventQueue implements Runnable {
 							synchronized (callbackLock) {
 								processInputEvent(e);
 							}
-							break;
+							// skip 1ms delay
+							continue;
 						}
 						case EVENT_ITEM_STATE: {
 							Item item = (Item) nextArgument();
@@ -403,6 +409,13 @@ public final class EventQueue implements Runnable {
 								((Item) target)._callCommandAction(cmd);
 							} else {
 								((Displayable) target)._callCommandAction(cmd);
+							}
+							break;
+						}
+						case EVENT_HIDE: {
+							Displayable d = (Displayable) nextArgument();
+							if (d instanceof Canvas) {
+								((Canvas) d)._invokeHideNotify();
 							}
 							break;
 						}
@@ -462,8 +475,14 @@ public final class EventQueue implements Runnable {
 			}
 			if (Settings.xrayView) Displayable._resetXRayGraphics();
 			IScreen scr = Emulator.getEmulator().getScreen();
-			final IImage backBufferImage = scr.getBackBufferImage();
-			final IImage xRayScreenImage = scr.getXRayScreenImage();
+			IImage backBufferImage, xRayScreenImage;
+			if (canvas instanceof SpriteCanvas) {
+				backBufferImage = SpriteCanvas._virtualImage.getImpl();
+				xRayScreenImage = null;
+			} else {
+				backBufferImage = scr.getBackBufferImage();
+				xRayScreenImage = scr.getXRayScreenImage();
+			}
 			Displayable._checkForSteps(callbackLock);
 			try {
 				if (x == -1) { // full repaint
@@ -474,11 +493,14 @@ public final class EventQueue implements Runnable {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			if (canvas instanceof SpriteCanvas && ((SpriteCanvas) canvas)._skipCopy) {
-				((SpriteCanvas) canvas)._skipCopy = false;
-			} else if (canvas instanceof ACanvas && ((ACanvas) canvas)._skipCopy) {
-				((ACanvas) canvas)._skipCopy = false;
-			} else if (Settings.asyncFlush) {
+			if (canvas instanceof SpriteCanvas) {
+				if (!((SpriteCanvas) canvas)._skipCopy) {
+					backBufferImage.cloneImage(scr.getScreenImg());
+					scr.repaint();
+				}
+				return;
+			}
+			if (Settings.asyncFlush) {
 				(Settings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
 			}

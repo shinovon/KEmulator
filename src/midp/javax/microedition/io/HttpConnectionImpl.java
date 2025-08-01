@@ -8,7 +8,7 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-final class HttpConnectionImpl implements HttpConnection {
+public final class HttpConnectionImpl implements HttpConnection {
 	HttpURLConnection connection;
 	private String url;
 	private int state;

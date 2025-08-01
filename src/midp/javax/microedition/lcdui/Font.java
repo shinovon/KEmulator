@@ -3,6 +3,9 @@ package javax.microedition.lcdui;
 import emulator.Emulator;
 import emulator.graphics2D.IFont;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public class Font {
 	IFont font;
 	int face;
@@ -22,47 +25,39 @@ public class Font {
 	public static final int FONT_STATIC_TEXT = 0;
 	public static final int FONT_INPUT_TEXT = 1;
 
-	public Font(final int anInt1313, final int style, final int anInt1315) {
+	public Font(final int face, final int style, final int size) {
 		super();
-		this.face = anInt1313;
-		this.size = anInt1315;
+		this.face = face;
+		this.size = size;
 		this.style = style;
-		int n = 0;
-		switch (this.size) {
-			case 0: {
-				n = Emulator.getEmulator().getProperty().getFontMediumSize();
+		int mappedSize = 0;
+		switch (size) {
+			case SIZE_MEDIUM: {
+				mappedSize = Emulator.getEmulator().getProperty().getFontMediumSize();
 				break;
 			}
-			case 16: {
-				n = Emulator.getEmulator().getProperty().getFontLargeSize();
+			case SIZE_LARGE: {
+				mappedSize = Emulator.getEmulator().getProperty().getFontLargeSize();
 				break;
 			}
+			case SIZE_SMALL:
 			default: {
-				n = Emulator.getEmulator().getProperty().getFontSmallSize();
+				mappedSize = Emulator.getEmulator().getProperty().getFontSmallSize();
 				break;
 			}
 		}
-		final int n2 = n;
-		int anInt1316;
-		if (((anInt1316 = this.style) & 0x4) != 0x0) {
-			anInt1316 &= 0xFFFFFFFB;
+		int filteredStyle;
+		if (((filteredStyle = this.style) & STYLE_UNDERLINED) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
 		}
-		this.font = Emulator.getEmulator().newFont(n2, anInt1316);
+		this.font = Emulator.getEmulator().newFont(face, mappedSize, filteredStyle);
 	}
 
-	public Font deriveFont(int size) {
-		int anInt1316;
-		if (((anInt1316 = this.style) & 0x4) != 0x0) {
-			anInt1316 &= 0xFFFFFFFB;
-		}
-		this.font = Emulator.getEmulator().newFont(size, anInt1316);
-		return this;
-	}
-
-	public Font deriveFont(int style, int height) {
-		this.style = 0;
-		this.font = Emulator.getEmulator().newCustomFont(height, 0);
-		return this;
+	private Font(int face, int size, int style, IFont impl)  {
+		this.face = face;
+		this.size = size;
+		this.style = style;
+		this.font = impl;
 	}
 
 	public IFont getImpl() {
@@ -136,7 +131,88 @@ public class Font {
 		return getDefaultFont();
 	}
 
-	static {
-		Font.defaultFont = null;
+	public static Font _getNokiaUiFont(int face, int style, int height) {
+		int filteredStyle;
+		if (((filteredStyle = style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
+		}
+		IFont font = Emulator.getEmulator().newCustomFont(face, height, filteredStyle, true);
+		return new Font(face, style, Font.SIZE_MEDIUM, font);
+	}
+
+	// MIDP 3.0
+
+	public static Font createFont(InputStream fontData) throws IOException {
+		int size = Emulator.getEmulator().getProperty().getFontMediumSize();
+		IFont font = Emulator.getEmulator().loadFont(fontData, size);
+		if (font == null) {
+			return getDefaultFont();
+		}
+		return new Font(FACE_SYSTEM, size, SIZE_MEDIUM, font);
+	}
+
+	public static Font getFont(String name, int style, int pixelSize) {
+		int filteredStyle;
+		if (((filteredStyle = style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
+		}
+		if (pixelSize <= 0) {
+			pixelSize = Emulator.getEmulator().getProperty().getFontMediumSize();
+		}
+		IFont font = Emulator.getEmulator().newFont(name, pixelSize, filteredStyle);
+		return new Font(FACE_SYSTEM, style, SIZE_MEDIUM, font);
+	}
+
+	public Font deriveFont(int pixelSize) {
+		return deriveFont(style, pixelSize);
+	}
+
+	public Font deriveFont(int style, int pixelSize) {
+		this.style = style;
+		int filteredStyle;
+		if (((filteredStyle = this.style) & 0x4) != 0x0) {
+			filteredStyle &= 0xFFFFFFFB;
+		}
+		if (pixelSize <= 0) {
+			pixelSize = Emulator.getEmulator().getProperty().getFontMediumSize();
+		}
+		IFont font = Emulator.getEmulator().newCustomFont(face, pixelSize, filteredStyle, false);
+		return new Font(face, style, size, font);
+	}
+
+	public String getFamily() {
+		return font.getFamily();
+	}
+
+	public String getName() {
+		return font.getName();
+	}
+
+	public String getFontName() {
+		return font.getFontName();
+	}
+
+	public int getPixelSize() {
+		return font.getPixelSize();
+	}
+
+	public int getAscent() {
+		return font.getAscent();
+	}
+
+	public int getDescent() {
+		return font.getDescent();
+	}
+
+	public int getMaxAscent() {
+		return font.getMaxAscent();
+	}
+
+	public int getMaxDescent() {
+		return font.getMaxDescent();
+	}
+
+	public int getLeading() {
+		return font.getLeading();
 	}
 }

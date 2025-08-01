@@ -7,6 +7,7 @@ import com.jblend.graphics.j3d.Texture;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler;
+import emulator.graphics2D.GraphicsUtils;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.ITransform;
@@ -18,6 +19,16 @@ public class Graphics
 		implements com.vodafone.v10.graphics.j3d.Graphics3D,
 		com.motorola.graphics.j3d.Graphics3D,
 		com.jblend.graphics.j3d.Graphics3D {
+	public static final int HCENTER = 1;
+	public static final int VCENTER = 2;
+	public static final int LEFT = 4;
+	public static final int RIGHT = 8;
+	public static final int TOP = 16;
+	public static final int BOTTOM = 32;
+	public static final int BASELINE = 64;
+	public static final int SOLID = 0;
+	public static final int DOTTED = 1;
+
 	IGraphics2D impl;
 	IImage image;
 	IImage copyimage;
@@ -28,15 +39,8 @@ public class Graphics
 	int ty;
 	Font font;
 	int[] anIntArray521;
-	public static final int HCENTER = 1;
-	public static final int VCENTER = 2;
-	public static final int LEFT = 4;
-	public static final int RIGHT = 8;
-	public static final int TOP = 16;
-	public static final int BOTTOM = 32;
-	public static final int BASELINE = 64;
-	public static final int SOLID = 0;
-	public static final int DOTTED = 1;
+	private int alpha;
+	private boolean alphaSet;
 
 	public Graphics(final IImage i1, final IImage i2) {
 		super();
@@ -50,6 +54,7 @@ public class Graphics
 			this.xrayImage = i2;
 			(this.xrayGraphics = i2.createGraphics()).setAlpha(60);
 		}
+		alpha = 255;
 		this.setFont(Font.getDefaultFont());
 	}
 
@@ -164,8 +169,8 @@ public class Graphics
 				n2 = n5 - height;
 			}
 
-			this.impl.drawImage(image.getImpl(), n, n2);
-			this.method289(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
+			impl.drawImage(image.getImpl(), n, n2);
+			updateDebugData(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
 			++image.usedCount;
 			++Profiler.drawImageCallCount;
 			Profiler.drawImagePixelCount += image.getWidth() * image.getHeight();
@@ -195,6 +200,15 @@ public class Graphics
 		}
 	}
 
+	public void _drawRegion(final IImage image, final int n, final int n2, final int n3, final int n4, int n5, int n6, final ITransform transform) {
+		synchronized (this) {
+			final ITransform transform2 = this.impl.getTransform();
+			this.impl.transform(transform);
+			this.impl.drawImage(image, 0, 0, n5, n6, n, n2, n + n3, n2 + n4);
+			this.impl.setTransform(transform2);
+		}
+	}
+
 	public void drawRegion(final Image image, final int sx, final int sy, final int w, final int h, final int t, final int dx, final int dy, final int a) {
 		++Profiler.drawCallCount;
 		if (image == null) {
@@ -217,8 +231,10 @@ public class Graphics
 			this.impl.setTransform(transform2);
 			if (xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
-				this.method289(image, sx, sy, 0, 0, w, h);
+				this.updateDebugData(image, sx, sy, 0, 0, w, h);
 				this.xrayGraphics.setTransform(transform2);
+			} else {
+				updateDebugData(image, sx, sy, 0, 0, w, h);
 			}
 		}
 		++image.usedCount;
@@ -226,14 +242,47 @@ public class Graphics
 		Profiler.drawRegionPixelCount += Math.abs(w * h);
 	}
 
-	public void drawRGB(final int[] array, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final boolean b) {
+	public void _drawRegion(final Image image, final int sx, final int sy, final int w, final int h, final int t, final int dx, final int dy, int dw, int dh, final int a) {
 		++Profiler.drawCallCount;
-		if (array == null) {
+		if (image == null) {
 			throw new NullPointerException();
 		}
-		this._drawRegion(emulator.graphics2D.b.method163(array, b, n, n2, n5, n6), 0, 0, n5, n6, this.impl.getTransform().newTransform(n5, n6, 0, n3, n4, 0), 16711680);
+		if (sx < 0 || sx + w > image.getWidth() || sy < 0 || sy + h > image.getHeight()) {
+			throw new IllegalArgumentException("region exceeds the bounds of the source image");
+		}
+		if (image.getImpl() == this.image) {
+			throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
+		}
+		if (!method294(a, 64)) {
+			throw new IllegalArgumentException();
+		}
+		synchronized (this) {
+			final ITransform transform2 = this.impl.getTransform();
+			final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
+			this.impl.transform(transform);
+			this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, dw, dh);
+			this.impl.setTransform(transform2);
+			if (xrayGraphics != null) {
+				this.xrayGraphics.transform(transform);
+				this.updateDebugData(image, sx, sy, 0, 0, dw, dh);
+				this.xrayGraphics.setTransform(transform2);
+			} else {
+				updateDebugData(image, sx, sy, 0, 0, dw, dh);
+			}
+		}
+		++image.usedCount;
+		++Profiler.drawRegionCallCount;
+		Profiler.drawRegionPixelCount += Math.abs(w * h);
+	}
+
+	public void drawRGB(final int[] rgbData, final int offset, final int scanlength, final int x, final int y, final int width, final int height, final boolean processAlpha) {
+		++Profiler.drawCallCount;
+		if (rgbData == null) {
+			throw new NullPointerException();
+		}
+		this._drawRegion(GraphicsUtils.setImageData(rgbData, processAlpha, offset, scanlength, width, height), 0, 0, width, height, this.impl.getTransform().newTransform(width, height, 0, x, y, 0), 0xFF0000);
 		++Profiler.drawRGBCallCount;
-		Profiler.drawRGBPixelCount += Math.abs(n5 * n6);
+		Profiler.drawRGBPixelCount += Math.abs(width * height);
 	}
 
 	public void drawChar(final char c, final int n, final int n2, final int n3) {
@@ -312,7 +361,7 @@ public class Graphics
 		this.impl.fillPolygon(this.anIntArray521);
 	}
 
-	private void method289(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
+	private void updateDebugData(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
 		int clipX = n3;
 		int clipY = n4;
 		int clipX2 = n3 + n5;
@@ -480,16 +529,31 @@ public class Graphics
 
 	public void setColor(final int n) {
 		++Profiler.drawCallCount;
+		alpha = 255;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, false);
 	}
 
 	public void _setColor(final int n) {
 		++Profiler.drawCallCount;
+		alpha = n >> 24;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, true);
 	}
 
 	public void setColor(final int n, final int n2, final int n3) {
 		++Profiler.drawCallCount;
+		alpha = 255;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, n2, n3);
 	}
 
@@ -617,5 +681,41 @@ public class Graphics
 
 	public void renderPrimitives(Texture texture, int x, int y, FigureLayout layout, Effect3D effect, int command, int numPrimitives, int[] vertexCoords, int[] normals, int[] textureCoords, int[] colors) {
 		com.jblend.graphics.j3d.RenderProxy.renderPrimitives(this, texture, x, y, layout, effect, command, numPrimitives, vertexCoords, normals, textureCoords, colors);
+	}
+
+	public Graphics _copy() {
+		Graphics g = new Graphics(image, xrayImage);
+		g.translate(tx, ty);
+		g.setColor(getColor());
+		g.setClip(getClipX(), getClipY(), getClipWidth(), getClipHeight());
+		g.setStrokeStyle(getStrokeStyle());
+		return g;
+	}
+
+	public int _getWidth() {
+		return image.getWidth();
+	}
+
+	public int _getHeight() {
+		return image.getHeight();
+	}
+
+	// MIDP 3.0
+
+	public void setAlpha(int a) {
+		alphaSet = true;
+		this.impl.setAlpha(alpha = a);
+	}
+
+	public void setAlphaColor(int ARGB) {
+		_setColor(ARGB);
+	}
+
+	public void setAlphaColor(int a, int r, int g, int b) {
+		_setColor((a << 24) | (r << 16) | (g << 8) | b);
+	}
+
+	public int getAlpha() {
+		return alpha;
 	}
 }

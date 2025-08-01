@@ -43,6 +43,31 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.19.2 [2025.04.24]
+StringItem layout improvements
+Fixed FileConnection filter
+Fixed Ticker bug
+Properly implemented SpriteCanvas/ACanvas
+Implemented com.j_phone.amuse.j3d
+Implemented Display.getColor()
+Fixed Display.setCurrentItem()
+Fixed Form.delete()
+Implemented List.setFitPolicy()
+Auto scaling element images in List
+Fixed selection in ChoiceGroup MULTIPLE mode
+Fixed SWT library loading on Mac OS
+Fixed M3G depth buffer
+Updated starter scripts
+Improved controller support
+Removed "FPS mode"
+Fixed bugs on multi-monitor setup
+Split Media View and Memory View
+Improved working in installed state
+Fixed a XWayland-related bug
+
+$v2.19.1 [2025.02.12]
+Update LWJGL to 3.3.6
+
 $v2.19 [2025.02.02]
 Symbian Anna multitouch api support
 More SoftBank api stubs

@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.3";
+	private static final String VERSION = "0.4";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
 	
@@ -199,6 +199,22 @@ public class KEmulatorUpdater implements Runnable {
 								kemulatorDir.resolve("micro3d_dll.jar"));
 					} catch (IOException e) {
 						fail("Failed to download KEmulator.jar", e);
+						return;
+					}
+				} else {
+					try {
+						state("Downloading lwjgl.zip");
+						download(UPDATE_URL + branch + "/lwjgl.zip", tempZip);
+					} catch (IOException e) {
+						fail("Failed to download lwjgl.zip", e);
+						return;
+					}
+
+					try {
+						state("Extracting lwjgl.zip");
+						extract(tempZip, kemulatorDir);
+					} catch (IOException e) {
+						fail("Failed to extract lwjgl.zip", e);
 						return;
 					}
 				}

@@ -28,14 +28,28 @@ public class CustomMethod {
 
 	public static void gc() {
 		++Profiler.gcCallCount;
+		if (!Settings.ignoreGc) {
+			System.gc();
+		}
 	}
 
 	public static void yield() throws InterruptedException {
-//        Thread.sleep(1L);
-		Thread.yield();
+		if (Settings.patchYield) {
+			Thread.sleep(1L);
+		} else {
+			Thread.yield();
+		}
 	}
 
 	public static void sleep(long t) throws InterruptedException {
+		if (Settings.ignoreSleep) return;
+		if (Settings.applySpeedToSleep && Settings.speedModifier != 1 && t > 1) {
+			if (Settings.speedModifier < 0) {
+				t = t * ((100L - Settings.speedModifier * 1024L) / 100L);
+			} else {
+				t = t / Settings.speedModifier;
+			}
+		}
 		Thread.sleep(t);
 	}
 
@@ -72,9 +86,6 @@ public class CustomMethod {
 				} else if (prop.equals("com.nokia.memoryramtotal")) {
 					res = String.valueOf(r.maxMemory());
 				}
-			} else if (prop.equals("kemulator.threadtrace")) {
-				b = false;
-				res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
 			} else if (((prop.equalsIgnoreCase("com.nokia.mid.imei") || prop.equalsIgnoreCase("com.nokia.imei"))
 					&& !Settings.protectedPackages.contains("com.nokia.mid")) ||
 					prop.equalsIgnoreCase("device.imei") ||
@@ -84,16 +95,10 @@ public class CustomMethod {
 					(prop.equalsIgnoreCase("com.siemens.IMEI") && !Settings.protectedPackages.contains("com.siemens"))
 			) {
 				res = Permission.askIMEI();
-			} else if (prop.equals("kemulator.libvlc.supported")) {
-				res = String.valueOf(Manager.isLibVlcSupported());
 			} else if (prop.equals("com.nokia.pointer.number")) {
 				b = false;
 				try {
 					res = Emulator.getEventQueue().getPointerNumber();
-				} catch (Exception ignored) {}
-			} else if (prop.equals("kemulator.touch.enabled")) {
-				try {
-					res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
 				} catch (Exception ignored) {}
 			} else if (prop.equals("microedition.locale")) {
 				res = Settings.locale;
@@ -103,6 +108,25 @@ public class CustomMethod {
 				res = "";
 			} else if(prop.equals("fileconn.dir.roots.names")) {
 				res = "Root";
+			} else if(prop.startsWith("kemulator")) {
+				try {
+					if (prop.equals("kemulator.libvlc.supported")) {
+						res = String.valueOf(Manager.isLibVlcSupported());
+					} else if (prop.equals("kemulator.threadtrace")) {
+						b = false;
+						res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
+					} else if (prop.equals("kemulator.touch.enabled")) {
+						res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
+					} else if (prop.startsWith("kemulator.set.title=")) {
+						if ((res = prop.substring(prop.indexOf('=') + 1)).equals("null")) {
+							res = null;
+						}
+						Settings.customTitle = res;
+
+						Emulator.getEmulator().getScreen().updateTitle();
+						res = "true";
+					}
+				} catch (Exception ignored) {}
 			}
 			// Hide properties of disabled APIs
 			if(!Settings.protectedPackages.isEmpty()) {
@@ -143,7 +167,7 @@ public class CustomMethod {
 	}
 
 	public static InputStream getResourceAsStream(final Object o, final String s) {
-		return CustomJarResources.getResourceAsStream(o, s);
+		return ResourceManager.getResourceAsStream(o, s);
 	}
 
 	public static void showTrackInfo(final String s) {

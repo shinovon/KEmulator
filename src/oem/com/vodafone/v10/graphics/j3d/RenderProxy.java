@@ -39,7 +39,7 @@ public class RenderProxy {
 		com.mascotcapsule.micro3d.v3.Effect3D r = new com.mascotcapsule.micro3d.v3.Effect3D();
 		r.setShading(effect.shading);
 		r.setLight(getMascotLight(effect.light));
-		r.setSphereTexture(effect.texture.impl);
+		if (effect.texture != null) r.setSphereTexture(effect.texture.impl);
 		r.setToonParams(effect.toonThreshold, effect.toonHigh, effect.toonLow);
 		r.setTransparency(effect.isTransparency);
 		return r;

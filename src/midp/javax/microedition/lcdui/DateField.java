@@ -1,7 +1,7 @@
 package javax.microedition.lcdui;
 
 import emulator.Emulator;
-import emulator.lcdui.c;
+import emulator.lcdui.TextUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -79,10 +79,10 @@ public class DateField extends Item {
 		g.setColor(0);
 		int yo = y;
 		if (labelArr != null && labelArr.length > 0) {
-			g.setFont(Item.font);
+			g.setFont(labelFont);
 			for (int i = 0; i < labelArr.length; ++i) {
 				g.drawString(labelArr[i], x + 4, yo + 2, 0);
-				yo += Item.font.getHeight() + 4;
+				yo += labelFont.getHeight() + 4;
 			}
 		}
 		if (focused) g.setColor(-8355712);
@@ -208,8 +208,8 @@ public class DateField extends Item {
 		int n = 4;
 		final int availableWidth = row.getAvailableWidth(screen.bounds[W]) - 8;
 		if (hasLabel()) {
-			labelArr = c.textArr(label, Item.font, availableWidth, availableWidth);
-			n = 4 + (Item.font.getHeight() + 4) * labelArr.length;
+			labelArr = TextUtils.textArr(label, labelFont, availableWidth, availableWidth);
+			n = 4 + (labelFont.getHeight() + 4) * labelArr.length;
 		} else {
 			labelArr = null;
 		}

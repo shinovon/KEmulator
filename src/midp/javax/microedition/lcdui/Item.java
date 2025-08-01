@@ -1,7 +1,7 @@
 package javax.microedition.lcdui;
 
 import emulator.Emulator;
-import emulator.lcdui.a;
+import emulator.lcdui.LCDUIUtils;
 
 import java.util.Vector;
 
@@ -31,10 +31,9 @@ public abstract class Item {
 	static final Font font = Font.getFont(0, 1, 8);
 	int[] bounds;
 	boolean focused;
-	boolean shownOnForm;
 	Command defaultCommand;
 	public ItemCommandListener itemCommandListener;
-	public Vector commands;
+	public Vector<Command> commands;
 	String label;
 	String[] labelArr;
 	Screen screen;
@@ -44,6 +43,9 @@ public abstract class Item {
 	int[] anIntArray179;
 	private boolean sizeLocked;
 	boolean hidden;
+
+	Font labelFont = font;
+	int labelColor = LCDUIUtils.foregroundColor;
 
 	Item(String label) {
 		this.label = label;
@@ -191,9 +193,9 @@ public abstract class Item {
 	}
 
 	void paint(Graphics g, int x, int y, int w, int h) {
-		g.setColor(-16777216);
+		g.setColor(LCDUIUtils.foregroundColor);
 		if (focused) {
-			a.method178(g, x, y, w, h);
+			LCDUIUtils.drawSelectedItemBackground(g, x, y, w, h);
 		}
 	}
 
@@ -251,5 +253,13 @@ public abstract class Item {
 		if (itemCommandListener != null && cmd != null) {
 			itemCommandListener.commandAction(cmd, this);
 		}
+	}
+
+	public void _setLabelFont(Font font) {
+		labelFont = font == null ? Screen.font : font;
+	}
+
+	public void _setLabelColor(int color) {
+		labelColor = color;
 	}
 }

@@ -1,4 +1,4 @@
-#K-Emulator 2.19 - Ukrainian Localize
+#K-Emulator 2.19.2 - Ukrainian Localize
 #Stanley Kid (stanley.udr.kid@gmail.com)
 MENU_MIDLET=Мідлет
 MENU_TOOL=Засоби
@@ -116,21 +116,20 @@ MEMORY_VIEW_IMAGES=Зображення
 MEMORY_VIEW_SOUNDS=Звуки
 MEMORY_VIEW_ZOOM=Масштаб:
 MEMORY_VIEW_SORT=Сортувати:
-MEMORY_VIEW_SIZE=Розмір:
+MEMORY_VIEW_SIZE=Розмір
 MEMORY_VIEW_ASCEND=Зростання
-MEMORY_VIEW_IMAGES_DRAWN=Показані зображення
-MEMORY_VIEW_UNUSED_REGION=Затемнити невикористані області
-MEMORY_VIEW_RESET_IMAGE=Перезавантажити використання зображень
-MEMORY_VIEW_IMAGE_NEVER_DRAW=Непоказані зображення
-MEMORY_VIEW_RELEASED_IMAGES=Виконані зображення
+MEMORY_VIEW_IMAGES_DRAWN=Використані
+MEMORY_VIEW_UNUSED_REGION=Використані ділянки
+MEMORY_VIEW_RESET_IMAGE=Перезавантажити використання
+MEMORY_VIEW_IMAGE_NEVER_DRAW=Невикористані
+MEMORY_VIEW_RELEASED_IMAGES=Виконані
 MEMORY_VIEW_CLEAR_RELEASED_IMAGES=Очистити виконані зображення
 MEMORY_VIEW_SORT_REFERENCE=Довідка
 MEMORY_VIEW_SORT_SIZE=Розмір
 MEMORY_VIEW_SORT_DRAW_COUNT=Кількість показів
-MEMORY_VIEW_SAVE_AS=Зберегти як...
+MEMORY_VIEW_SAVE_ONE=Експортувати вибране зображення
 MEMORY_VIEW_SAVE_TO_FILE=Зберегти до файлу
-MEMORY_VIEW_SAVE_ALL=Зберегти всі зображення...
-MEMORY_VIEW_SAVE_ALL_IMAGES=Зберегти всі
+MEMORY_VIEW_SAVE_ALL=Експортувати всі зображення
 MEMORY_VIEW_CHOOSE_DIRECTORY=Вибери теку.
 MEMORY_VIEW_SOUND_START=Розпочати
 MEMORY_VIEW_SOUND_PAUSE=Призупинити

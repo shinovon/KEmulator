@@ -16,9 +16,18 @@ public class Controllers {
 	private static boolean loaded;
 	private static String[][] binds;
 	private static boolean[][] arrowKeysState;
-	private static String aString1292;
-	private static float lastX;
-	private static float lastY;
+	private static String bind;
+	private static float[][] axisState;
+
+	private static final int AXIS_POV = -1;
+	private static final int AXIS_X = 0;
+	private static final int AXIS_Y = 1;
+	private static final int AXIS_Z = 2;
+	private static final int AXIS_RZ = 3;
+	private static final int AXIS_RX = 4;
+	private static final int AXIS_RY = 5;
+	private static final int AXIS_POV_X = 6;
+	private static final int AXIS_POV_Y = 7;
 
 	public Controllers() {
 		super();
@@ -32,7 +41,8 @@ public class Controllers {
 			Controller[] controllers = getDefaultEnvironment().getControllers();
 			ArrayList list = new ArrayList<Controller>();
 			for (Controller controller : controllers) {
-				if (!controller.getType().equals(Controller.Type.KEYBOARD) && !controller.getType().equals(Controller.Type.MOUSE)) {
+				if (!controller.getType().equals(Controller.Type.KEYBOARD)
+						&& !controller.getType().equals(Controller.Type.MOUSE)) {
 					String s = controller.getName();
 					if (s.contains("tablet")) continue;
 					if (s.contains("STAR")) continue;
@@ -96,6 +106,13 @@ public class Controllers {
 			Controllers.binds[i][16] = "9";
 			Controllers.binds[i][17] = "10";
 			Controllers.binds[i][18] = "11";
+
+			// TODO remove
+			if (name.toLowerCase().contains("xbox")) {
+				Settings.controllerZMap = 5;
+				Settings.controllerRZMap = 5;
+			}
+
 			if (Settings.controllerBinds.containsKey(name + ".0")) {
 				for (int j = 0; j < 19; j++) {
 					String s = Settings.controllerBinds.get(name + "." + j);
@@ -116,7 +133,13 @@ public class Controllers {
 
 	public static String getBind(int controllerId, int n2) {
 		String s = Controllers.binds[controllerId][n2];
-		if (!s.isEmpty() && !s.equalsIgnoreCase("LEFT") && !s.equalsIgnoreCase("RIGHT") && !s.equalsIgnoreCase("UP") && !s.equalsIgnoreCase("DOWN")) {
+		if (s.startsWith("Axis")) {
+			return s;
+		}
+		if (!s.isEmpty() && !s.equalsIgnoreCase("LEFT")
+				&& !s.equalsIgnoreCase("RIGHT")
+				&& !s.equalsIgnoreCase("UP")
+				&& !s.equalsIgnoreCase("DOWN")) {
 			s = "B_" + s;
 		}
 		return s;
@@ -138,13 +161,13 @@ public class Controllers {
 		return Integer.parseInt(s);
 	}
 
-	private static boolean method748(String aString1292) {
-		Controllers.aString1292 = aString1292;
+	private static boolean bindChange(String aString1292) {
+		Controllers.bind = aString1292;
 		return Emulator.getEmulator().getProperty().updateController();
 	}
 
 	public static String method749() {
-		return Controllers.aString1292;
+		return Controllers.bind;
 	}
 
 	public static void refresh(boolean b) {
@@ -154,6 +177,7 @@ public class Controllers {
 				init();
 				if (Controllers.count > 0) {
 					Controllers.arrowKeysState = new boolean[Controllers.count][8];
+					Controllers.axisState = new float[Controllers.count][8];
 					initBinds();
 				}
 			} catch (Exception ex) {
@@ -210,139 +234,243 @@ public class Controllers {
 				String name = identifier.getName();
 				float value = event.getValue();
 				if (identifier instanceof Component.Identifier.Button) {
-					boolean b = method748(name);
 					int key = map(i, name);
-					if (key == 10000) continue;
 					if (value == 1.0f) {
-						if (!b) Emulator.getEventQueue().keyPress(key);
-					} else {
-						Emulator.getEventQueue().keyRelease(key);
+						if (bindChange(name) || key == 10000)
+							continue;
+						dispatchKeyEvent(key, true);
+					} else if (key != 10000) {
+						dispatchKeyEvent(key, false);
 					}
 				} else if (identifier.equals(Component.Identifier.Axis.POV)) {
-					handleX(i, povX(value), true);
-					handleY(i, povY(value), true);
+					filter(i, value, AXIS_POV);
 				} else {
 					if (Math.abs(value) < 0.05f) {
 						value = 0.0f;
 					}
 					if (name.equalsIgnoreCase("x")) {
-						filterX(i, value, true);
+						filter(i, value, AXIS_X);
 						continue;
 					}
 					if (name.equalsIgnoreCase("y")) {
-						filterY(i, value, true);
+						filter(i, value, AXIS_Y);
 						continue;
 					}
-					if (!controller.getName().toLowerCase().contains("xbox")) {
-						if (name.equalsIgnoreCase("z")) {
-							filterX(i, value, false);
-							continue;
-						}
-						if (name.equalsIgnoreCase("rz")) {
-							filterY(i, value, false);
-							continue;
-						}
+					if (name.equalsIgnoreCase("z")) {
+						filter(i, value, AXIS_Z);
+						continue;
+					}
+					if (name.equalsIgnoreCase("rz")) {
+						filter(i, value, AXIS_RZ);
+						continue;
+					}
+					if (name.equalsIgnoreCase("rx")) {
+						filter(i, value, AXIS_RX);
+						continue;
+					}
+					if (name.equalsIgnoreCase("ry")) {
+						filter(i, value, AXIS_RY);
+						continue;
 					}
 				}
 			}
 		}
 	}
 
-	private static void filterX(int n, float f, boolean pov) {
-		if (Math.abs(f) <= 0.05f && Math.abs(lastX) <= 0.05f) return;
-		handleX(n, f, pov);
-		lastX = f;
+	private static void filter(int n, float f, int axis) {
+		int mode = 0;
+		switch (axis) {
+			case AXIS_POV:
+				filter(n, povX(f), AXIS_POV_X);
+				filter(n, povY(f), AXIS_POV_Y);
+				return;
+			case AXIS_X:
+				mode = Settings.controllerXMap;
+				break;
+			case AXIS_Y:
+				mode = Settings.controllerYMap;
+				break;
+			case AXIS_Z:
+				mode = Settings.controllerZMap;
+				break;
+			case AXIS_RX:
+				mode = Settings.controllerRXMap;
+				break;
+			case AXIS_RY:
+				mode = Settings.controllerRYMap;
+				break;
+			case AXIS_RZ:
+				mode = Settings.controllerRZMap;
+				break;
+			case AXIS_POV_X:
+				mode = Settings.controllerPovXMap;
+				break;
+			case AXIS_POV_Y:
+				mode = Settings.controllerPovYMap;
+				break;
+		}
+		if (Math.abs(f) <= Settings.axisFilter && Math.abs(axisState[n][axis]) <= Settings.axisFilter)
+			return;
+		switch (mode) {
+			case 0: // ignore
+				break;
+			case 1: // map horizontal
+				horizontal(n, f, true);
+				break;
+			case 2: // map vertical
+				vertical(n, f, true);
+				break;
+			case 3: // direct horizontal
+				horizontal(n, f, false);
+				break;
+			case 4: // direct vertical
+				vertical(n, f, false);
+				break;
+			case 5: // map to button
+				String name = null;
+				switch (axis) {
+					case AXIS_X:
+						name = "Axis_X";
+						break;
+					case AXIS_Y:
+						name = "Axis_Y";
+						break;
+					case AXIS_Z:
+						name = "Axis_Z";
+						break;
+					case AXIS_RX:
+						name = "Axis_RX";
+						break;
+					case AXIS_RY:
+						name = "Axis_RY";
+						break;
+					case AXIS_RZ:
+						name = "Axis_RZ";
+						break;
+					case AXIS_POV_X:
+						name = "Axis_POV_X";
+						break;
+					case AXIS_POV_Y:
+						name = "Axis_POV_Y";
+						break;
+					default:
+						break;
+				}
+				int key = map(n, name);
+
+				if (f >= Settings.axisThreshold) {
+					if (bindChange(name)
+							|| key == 10000
+							|| axisState[n][axis] >= Settings.axisThreshold)
+						break;
+
+					dispatchKeyEvent(key, true);
+				} else {
+					if (axisState[n][axis] < Settings.axisThreshold
+							|| key == 10000)
+						break;
+
+					dispatchKeyEvent(key, false);
+				}
+				break;
+		}
+		axisState[n][axis] = f;
 	}
 
-	private static void filterY(int n, float f, boolean pov) {
-		if (Math.abs(f) <= 0.05f && Math.abs(lastY) <= 0.05f) return;
-		handleY(n, f, pov);
-		lastY = f;
-	}
-
-	private static void handleX(int n, float f, boolean pov) {
-		if (pov) {
-			if (f < -0.7f) {
-				if (method748("LEFT")) return;
+	private static void horizontal(int n, float f, boolean map) {
+		if (Settings.controllerInverseHor) f = -f;
+		if (map) {
+			if (f <= -Settings.axisThreshold) {
+				if (bindChange("LEFT")) return;
 				if (Controllers.arrowKeysState[n][0])
 					return;
-				Emulator.getEventQueue().keyPress(map(n, "LEFT"));
+				dispatchKeyEvent(map(n, "LEFT"), true);
 				Controllers.arrowKeysState[n][0] = true;
-			} else if (f > 0.7f) {
-				if (method748("RIGHT")) return;
+			} else if (f >= Settings.axisThreshold) {
+				if (bindChange("RIGHT")) return;
 				if (Controllers.arrowKeysState[n][1])
 					return;
-				Emulator.getEventQueue().keyPress(map(n, "RIGHT"));
+				dispatchKeyEvent(map(n, "RIGHT"), true);
 				Controllers.arrowKeysState[n][1] = true;
 			} else if (Controllers.arrowKeysState[n][0]) {
-				Emulator.getEventQueue().keyRelease(map(n, "LEFT"));
+				dispatchKeyEvent(map(n, "LEFT"), false);
 				Controllers.arrowKeysState[n][0] = false;
 			} else if (Controllers.arrowKeysState[n][1]) {
-				Emulator.getEventQueue().keyRelease(map(n, "RIGHT"));
+				dispatchKeyEvent(map(n, "RIGHT"), false);
 				Controllers.arrowKeysState[n][1] = false;
 			}
 			return;
 		}
-		if (f < -0.7f) {
+		if (f <= -Settings.axisThreshold) {
 			if (Controllers.arrowKeysState[n][4])
 				return;
-			Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT), true);
 			Controllers.arrowKeysState[n][4] = true;
-		} else if (f > 0.7f) {
+		} else if (f >= Settings.axisThreshold) {
 			if (Controllers.arrowKeysState[n][5])
 				return;
-			Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT), true);
 			Controllers.arrowKeysState[n][5] = true;
 		} else if (Controllers.arrowKeysState[n][4]) {
-			Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.LEFT), false);
 			Controllers.arrowKeysState[n][4] = false;
 		} else if (Controllers.arrowKeysState[n][5]) {
-			Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT), false);
 			Controllers.arrowKeysState[n][5] = false;
 		}
 	}
 
-	private static void handleY(int n, float f, boolean pov) {
-		if (pov) {
-			if (f < -0.7f) {
-				if (method748("UP")) return;
+	private static void vertical(int n, float f, boolean map) {
+		if (Settings.controllerInverseVer) f = -f;
+		if (map) {
+			if (f <= -Settings.axisThreshold) {
+				if (bindChange("UP")) return;
 				if (Controllers.arrowKeysState[n][2])
 					return;
-				Emulator.getEventQueue().keyPress(map(n, "UP"));
+				dispatchKeyEvent(map(n, "UP"), true);
 				Controllers.arrowKeysState[n][2] = true;
-			} else if (f > 0.7f) {
-				if (method748("DOWN")) return;
+			} else if (f >= Settings.axisThreshold) {
+				if (bindChange("DOWN")) return;
 				if (Controllers.arrowKeysState[n][3])
 					return;
-				Emulator.getEventQueue().keyPress(map(n, "DOWN"));
+				dispatchKeyEvent(map(n, "DOWN"), true);
 				Controllers.arrowKeysState[n][3] = true;
 			} else if (Controllers.arrowKeysState[n][2]) {
-				Emulator.getEventQueue().keyRelease(map(n, "UP"));
+				dispatchKeyEvent(map(n, "UP"), false);
 				Controllers.arrowKeysState[n][2] = false;
 			} else if (Controllers.arrowKeysState[n][3]) {
-				Emulator.getEventQueue().keyRelease(map(n, "DOWN"));
+				dispatchKeyEvent(map(n, "DOWN"), false);
 				Controllers.arrowKeysState[n][3] = false;
 			}
 			return;
 		}
-		if (f < -0.7f) {
-			if (method748("UP")) return;
+		if (f <= -Settings.axisThreshold) {
 			if (Controllers.arrowKeysState[n][6])
 				return;
-			Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.UP));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.UP), true);
 			Controllers.arrowKeysState[n][6] = true;
-		} else if (f > 0.7f) {
-			if (method748("DOWN")) return;
+		} else if (f >= Settings.axisThreshold) {
 			if (Controllers.arrowKeysState[n][7])
 				return;
-			Emulator.getEventQueue().keyPress(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN), true);
 			Controllers.arrowKeysState[n][7] = true;
 		} else if (Controllers.arrowKeysState[n][6]) {
-			Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.UP));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.UP), false);
 			Controllers.arrowKeysState[n][6] = false;
 		} else if (Controllers.arrowKeysState[n][7]) {
-			Emulator.getEventQueue().keyRelease(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN));
+			dispatchKeyEvent(KeyMapping.getArrowKeyFromDevice(Canvas.DOWN), false);
 			Controllers.arrowKeysState[n][7] = false;
+		}
+	}
+	
+	private static void dispatchKeyEvent(int key, boolean state) {
+		EventQueue queue = Emulator.getEventQueue();
+		if (queue == null || key == 10000) return;
+		
+		if (state) {
+			queue.keyPress(key);
+		} else {
+			queue.keyRelease(key);
 		}
 	}
 

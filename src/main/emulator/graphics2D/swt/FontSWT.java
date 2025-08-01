@@ -1,7 +1,6 @@
 package emulator.graphics2D.swt;
 
 import emulator.graphics2D.IFont;
-import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -37,16 +36,12 @@ public final class FontSWT implements IFont {
 
 
 	public final void finalize() {
-		EmulatorImpl.asyncExec(() -> {
-			try {
-				if (font != null && !font.isDisposed()) {
-					font.dispose();
-				}
-				if (gc != null && !gc.isDisposed()) {
-					gc.dispose();
-				}
-			} catch (Exception ignored) {}
-		});
+		if (font != null && !font.isDisposed()) {
+			font.dispose();
+		}
+		if (gc != null && !gc.isDisposed()) {
+			gc.dispose();
+		}
 	}
 
 	public final Font getSWTFont() {
@@ -74,7 +69,41 @@ public final class FontSWT implements IFont {
 		return this.gc.getFontMetrics().getAscent();
 	}
 
+	public final int getDescent() {
+		return this.gc.getFontMetrics().getDescent();
+	}
+
 	public final int getLeading() {
 		return this.gc.getFontMetrics().getLeading();
+	}
+
+	public final int getMaxAscent() {
+		// TODO
+		return this.gc.getFontMetrics().getAscent();
+	}
+
+	public final int getMaxDescent() {
+		// TODO
+		return this.gc.getFontMetrics().getDescent();
+	}
+
+	public int getPixelSize() {
+		// TODO
+		return this.gc.getFontMetrics().getHeight();
+	}
+
+	public String getFamily() {
+		// TODO
+		return "";
+	}
+
+	public String getName() {
+		// TODO
+		return "";
+	}
+
+	public String getFontName() {
+		// TODO
+		return "";
 	}
 }

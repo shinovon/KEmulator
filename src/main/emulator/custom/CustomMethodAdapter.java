@@ -59,10 +59,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "yield", sign);
 					return;
 				}
-//				if (name.equals("sleep")) {
-//					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "sleep", sign);
-//					return;
-//				}
+				if ((Settings.patchSleep || Settings.ignoreSleep) && name.equals("sleep")) {
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "sleep", sign);
+					return;
+				}
 			} else if (cls.equals("java/lang/Class")) {
 				if (name.equals("getResourceAsStream")) {
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getResourceAsStream", "(Ljava/lang/Object;Ljava/lang/String;)Ljava/io/InputStream;");
@@ -111,6 +111,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				}
 				if (cls.equals("com/immersion/VibeTonz") && acc == Opcodes.INVOKESTATIC) {
 					super.visitMethodInsn(acc, cls.concat("Static"), name, sign);
+					return;
+				}
+				if (cls.equals("com/siemens/mp/io/Connection") && acc == Opcodes.INVOKESTATIC) {
+					super.visitMethodInsn(acc, cls, name.concat("Compat"), sign);
 					return;
 				}
 				if (Settings.g3d == 0) {

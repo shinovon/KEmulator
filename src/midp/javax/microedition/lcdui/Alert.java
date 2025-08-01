@@ -2,7 +2,8 @@ package javax.microedition.lcdui;
 
 import emulator.Emulator;
 import emulator.UILocale;
-import emulator.lcdui.c;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
 
 public class Alert extends Screen {
 	public static final Command DISMISS_COMMAND;
@@ -95,8 +96,8 @@ public class Alert extends Screen {
 
 	protected void _paint(Graphics g) {
 		final int n = super.bounds[W] - 8;
-		this.textArr = c.textArr(this.string, Screen.font, n, n);
-		g.setColor(-16777216);
+		this.textArr = TextUtils.textArr(this.string, Screen.font, n, n);
+		g.setColor(LCDUIUtils.foregroundColor);
 		int h = Screen.fontHeight4 - scroll;
 		g.setClip(bounds[X], bounds[Y], bounds[W], bounds[H]);
 		for (int i = 0; i < this.textArr.length; ++i) {
@@ -126,11 +127,13 @@ public class Alert extends Screen {
 		if (key == Canvas.UP) {
 			scroll = Math.max(0, scroll - Screen.fontHeight4);
 			repaintScreen();
+			timeout = -2;
 			return;
 		}
 		if (key == Canvas.DOWN) {
 			scroll = Math.min(textArr != null ? Screen.fontHeight4 * textArr.length : 0, scroll + Screen.fontHeight4);
 			repaintScreen();
+			timeout = -2;
 		}
 	}
 

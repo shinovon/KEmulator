@@ -1,5 +1,6 @@
 package javax.microedition.io;
 
+import com.nttdocomo.io.maker.ScratchPadConnection;
 import com.sun.cdc.io.ConnectionBaseInterface;
 import emulator.Emulator;
 import emulator.Permission;
@@ -37,6 +38,9 @@ public class Connector {
 		if(s.startsWith("vserv:")) {
 			return new VServConnectionWrapper(s);
 		}
+		if (s.startsWith("scratchpad:")) {
+			return ScratchPadConnection.open(s);
+		}
 		if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
 			Permission.checkPermission("connector.open.file");
 			return new FileConnectionImpl(s);
@@ -59,6 +63,9 @@ public class Connector {
 			}
 			if (s.startsWith("http://")) {
 				Permission.checkPermission("connector.open.http");
+				if (Emulator.doja) {
+					return new com.nttdocomo.io.maker.HttpConnectionImpl(s, n);
+				}
 				return checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
 			}
 			if (s.startsWith("https://")) {

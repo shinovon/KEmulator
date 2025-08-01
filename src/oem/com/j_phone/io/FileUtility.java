@@ -4,7 +4,7 @@ import com.jblend.media.MediaData;
 import com.jblend.media.MediaFactory;
 import com.jblend.media.MediaPlayer;
 import com.jblend.media.smaf.SmafData;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.io.IOException;
 
@@ -24,7 +24,7 @@ public final class FileUtility {
 	public void play(String paramString)
 			throws IOException {
 		System.out.println("FileUtility.play " + paramString);
-		play(CustomJarResources.getBytes(paramString), 1);
+		play(ResourceManager.getBytes(paramString), 1);
 	}
 
 //    public void play(MailData paramMailData, int paramInt)

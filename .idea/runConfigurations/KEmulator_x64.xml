@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="KEmulator_x64" type="Application" factoryName="Application">
+    <classpathModifications>
+      <entry exclude="true" path="$PROJECT_DIR$/home/swt-win32-x86.jar" />
+      <entry exclude="true" path="$PROJECT_DIR$/bin/production/micro3d_stub" />
+    </classpathModifications>
+    <option name="MAIN_CLASS_NAME" value="emulator.Emulator" />
+    <module name="KEmulator_x64" />
+    <option name="PROGRAM_PARAMETERS" value="-s" />
+    <option name="VM_PARAMETERS" value="-javaagent:&quot;$PROJECT_DIR$/eclipse/KEmulator_base/agent.jar&quot;" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/home" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

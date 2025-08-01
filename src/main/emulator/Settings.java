@@ -1,16 +1,20 @@
 package emulator;
 
+import emulator.ui.swt.ResizeMethod;
+
 import java.util.*;
 
 public final class Settings {
-	public static int g2d = 1; // swt - 0, awt - 1
+	// original settings
+	public static final int G2D_SWT = 0, G2D_AWT = 1;
+	public static int g2d = G2D_AWT; // swt - 0, awt - 1
 	public static boolean enableVibration;
 	public static boolean enableKeyRepeat;
 	public static boolean ignoreFullScreen;
 	public static boolean alwaysOnTop;
 	public static boolean enableKeyCache;
 	public static boolean rightClickMenu;
-	public static int canvasScale = 100;
+	public static float canvasScale;
 	public static int frameRate = 60;
 	public static int steps = -1;
 	public static long aLong1235;
@@ -42,12 +46,12 @@ public final class Settings {
 	public static boolean showInfoFrame;
 	public static boolean showMemViewFrame;
 	public static boolean blackberryApi = false;
+
+	// nnmod
+
 	public static boolean canvasKeyboard;
 	public static boolean awtAntiAliasing;
-	public static boolean fpsMode;
 	public static boolean textAntiAliasing = true;
-	// 0 - OTHER, 1 - BOUNCETALES, 2 - MICRO CS, 3 - QUANTUM FIXME
-	public static int fpsGame;
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
 	public static String locale = "en-US";
@@ -64,9 +68,9 @@ public final class Settings {
 	public static boolean synchronizeKeyEvents = true;
 	public static boolean motorolaSoftKeyFix = false;
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
-	public static int resizeMode = 2; // 0 - center, 1 - sync, 2 - fill, 3 - integer
-	public static boolean keepAspectRatio = true;
+	public static ResizeMethod resizeMode = ResizeMethod.Fit;
 	public static boolean patchSynchronizedPaint = true;
+	public static boolean patchSynchronizedPlayerUpdate = true;
 
 	//m3g
 	public static boolean m3gIgnoreOverwrite;
@@ -101,7 +105,7 @@ public final class Settings {
 	public static boolean startAppOnResume = true;
 	public static int micro3d = 1; // 0 - dll, 1 - gl
 
-	public static boolean enableOTT;
+	public static boolean enableOTT = true;
 
 	// mascot
 	public static boolean mascotNo2DMixing;
@@ -128,4 +132,40 @@ public final class Settings {
 	public static boolean asyncFlush = true;
 
 	public static boolean softbankApi = false;
+    public static String customTitle;
+
+	public static boolean disableCamera;
+
+	public static int interpolation;
+	// 0: ignored
+	// 1: map horizontal, 2 - map vertical
+	// 3: direct dpad horizontal, 4: direct dpad vertical
+	// 5: map to own button
+	public static int controllerPovXMap = 1,
+			controllerPovYMap = 2,
+			controllerXMap = 1,
+			controllerYMap = 2,
+			controllerZMap = 3, // should be ignored on xbox
+			controllerRXMap = 5,
+			controllerRYMap = 5,
+			controllerRZMap = 4; // should be ignored on xbox
+
+	// controller axis threshold
+	public static float axisFilter = 0.05f, axisThreshold = 0.7f;
+	public static boolean controllerInverseHor;
+	public static boolean controllerInverseVer;
+
+	// devutils
+	public static String ideaPath;
+	public static String eclipsePath;
+	public static String proguardPath;
+	public static String j2meDocsPath;
+	public static boolean ideaJdkTablePatched = false;
+
+	public static boolean patchYield;
+	public static boolean ignoreGc = true;
+	public static boolean patchSleep;
+	public static boolean ignoreSleep;
+	public static boolean applySpeedToSleep;
+	public static boolean altLessSpeedShortcuts;
 }

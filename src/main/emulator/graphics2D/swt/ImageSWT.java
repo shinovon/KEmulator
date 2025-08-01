@@ -2,13 +2,10 @@ package emulator.graphics2D.swt;
 
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
-import emulator.ui.swt.EmulatorImpl;
 import org.eclipse.swt.graphics.*;
 
 import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 
 /*
  * swt image
@@ -80,19 +77,14 @@ public final class ImageSWT implements IImage {
 	}
 
 	public final void finalize() {
-		EmulatorImpl.asyncExec(() -> {
-			try {
-				if (img != null && !img.isDisposed()) {
-					img.dispose();
-				}
-				if (graphics != null) {
-					graphics.finalize();
-					graphics = null;
-				}
-			} catch (Exception ignored) {
-			}
-			mutable = false;
-		});
+		if (img != null && !img.isDisposed()) {
+			img.dispose();
+		}
+		if (graphics != null) {
+			graphics.finalize();
+			graphics = null;
+		}
+		mutable = false;
 	}
 
 	public final IGraphics2D createGraphics() {
@@ -207,6 +199,10 @@ public final class ImageSWT implements IImage {
 			}
 		}
 		return this.rgb;
+	}
+	
+	public boolean directAccess() {
+		return false;
 	}
 
 	public final void setAlpha(int n, int n2, int n3, int n4, final int n5) {
@@ -325,6 +321,14 @@ public final class ImageSWT implements IImage {
 		}
 	}
 
+
+	public void write(OutputStream out, String format) throws IOException {
+		if (this.mutable) {
+			this.imgdata = this.img.getImageData();
+		}
+		ImageIO.write(emulator.graphics2D.c.toAwtForCapture(this.imgdata), format, out);
+	}
+
 	public final void copyToClipBoard() {
 		if (this.mutable) {
 			this.imgdata = this.img.getImageData();
@@ -332,16 +336,16 @@ public final class ImageSWT implements IImage {
 		emulator.graphics2D.c.setClipboard(emulator.graphics2D.c.toAwtForCapture(this.imgdata));
 	}
 
-	public final void cloneImage(final IImage image) {
-		image.setData(this.getData());
+	public final void cloneImage(final IImage sourceImg) {
+		sourceImg.setData(this.getData());
 	}
 
-	public void cloneImage(IImage image, int x, int y, int w, int h) {
+	public void cloneImage(IImage sourceImg, int x, int y, int w, int h) {
 		// TODO
-		image.setData(this.getData());
+		sourceImg.setData(this.getData());
 	}
 
-	public void copyImage(IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty) {
+	public void copyImage(IGraphics2D destGraphics, int sx, int sy, int w, int h, int tx, int ty) {
 		// TODO
 	}
 

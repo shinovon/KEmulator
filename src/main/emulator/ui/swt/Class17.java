@@ -12,6 +12,6 @@ final class Class17 extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		MemoryView.method623(this.aClass110_582, 2);
+		this.aClass110_582.changeClassesSort(2);
 	}
 }

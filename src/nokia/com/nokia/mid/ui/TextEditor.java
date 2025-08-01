@@ -1,7 +1,7 @@
 package com.nokia.mid.ui;
 
 import emulator.Emulator;
-import emulator.lcdui.c;
+import emulator.lcdui.TextUtils;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
@@ -353,7 +353,7 @@ public class TextEditor extends CanvasItem {
 	private void layout() {
 		int availableWidth = getWidth() - 8;
 		Font font = getFont();
-		textArr = c.textArr(iContent, font, availableWidth, availableWidth);
+		textArr = TextUtils.textArr(iContent, font, availableWidth, availableWidth);
 		iContentHeight = 4 + (font.getHeight() + 4) * textArr.length;
 	}
 

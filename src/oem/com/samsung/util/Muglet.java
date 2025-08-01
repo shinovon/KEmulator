@@ -2,7 +2,7 @@ package com.samsung.util;
 
 public class Muglet {
 	public static Muglet getMuglet() {
-		return null;
+		return new Muglet();
 	}
 
 	public String getMediaType() {
@@ -10,7 +10,7 @@ public class Muglet {
 	}
 
 	public String getURI() {
-		return null;
+		return "";
 	}
 
 	public String getReferringURI() {

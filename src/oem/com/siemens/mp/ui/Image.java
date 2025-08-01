@@ -4,6 +4,7 @@ import javax.microedition.lcdui.Graphics;
 import java.io.IOException;
 
 public class Image extends com.siemens.mp.misc.NativeMem {
+	public static final int COLOR_BMP_8BIT = 5;
 
 	public Image() {
 	}
@@ -118,9 +119,12 @@ public class Image extends com.siemens.mp.misc.NativeMem {
 		return p | a;
 	}
 
-	public static void mirrorImageVertically(javax.microedition.lcdui.Image image) {}
-
+	public static void mirrorImageVertically(javax.microedition.lcdui.Image image) {
+		// TODO
+	}
 	protected static void setNativeImage(javax.microedition.lcdui.Image img, Image simg) {}
 
-	public static void mirrorImageHorizontally(javax.microedition.lcdui.Image img) {}
+	public static void mirrorImageHorizontally(javax.microedition.lcdui.Image img) {
+		// TODO
+	}
 }

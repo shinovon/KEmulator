@@ -4,16 +4,20 @@ import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
 import com.github.sarxos.webcam.Webcam;
+import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
+import emulator.custom.ResourceManager;
 import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
-import emulator.ui.IEmulator;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.IEmulatorFrontend;
+import emulator.ui.bridge.BridgeFrontend;
+import emulator.ui.swt.SWTFrontend;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
+import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Screen;
@@ -22,8 +26,12 @@ import javax.microedition.midlet.MIDlet;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -31,18 +39,18 @@ import java.util.jar.Manifest;
 
 public class Emulator implements Runnable {
 	public static boolean debugBuild = true;
-	public static String version = "2.19.1";
+	public static String version = "2.19.2";
 	public static String revision = "";
-	public static final int numericVersion = 31;
+	public static final int numericVersion = 32;
 
-	static EmulatorImpl emulatorimpl;
+	private static IEmulatorFrontend emulatorimpl;
 	private static MIDlet midlet;
 	private static Canvas currentCanvas;
 	private static Screen currentScreen;
 	private static EventQueue eventQueue;
 	private static KeyRecords record;
 	public static Vector jarLibrarys;
-	public static Vector jarClasses;
+	public static Vector<String> jarClasses;
 	public static String midletJar;
 	public static String midletClassName;
 	public static String classPath;
@@ -65,14 +73,17 @@ public class Emulator implements Runnable {
 	public static String httpUserAgent;
 	private final static Thread backgroundThread;
 	private static IEmulatorPlatform platform;
-	public static boolean installed;
 
 	public static final String os = System.getProperty("os.name").toLowerCase();
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
+	public static final boolean macos = os.startsWith("darwin") || os.startsWith("mac os");
+	public static final boolean isPortable = checkIsPortable();
 	private static Class<?> midletClass;
 	private static boolean forked;
 	private static boolean updated;
+	private static boolean bridge;
+	public static boolean doja;
 
 	private static void initRichPresence() {
 		if (!Settings.rpc)
@@ -120,8 +131,8 @@ public class Emulator implements Runnable {
 		super();
 	}
 
-	public static IEmulator getEmulator() {
-		return Emulator.emulatorimpl;
+	public static IEmulatorFrontend getEmulator() {
+		return emulatorimpl;
 	}
 
 	public static KeyRecords getRobot() {
@@ -134,7 +145,7 @@ public class Emulator implements Runnable {
 
 	public static void setCanvas(final Canvas canvas) {
 		Emulator.currentCanvas = canvas;
-		Emulator.emulatorimpl.getEmulatorScreen().setCurrent(canvas);
+		Emulator.emulatorimpl.getScreen().setCurrent(canvas);
 	}
 
 	public static Screen getScreen() {
@@ -143,7 +154,7 @@ public class Emulator implements Runnable {
 
 	public static void setScreen(final Screen screen) {
 		Emulator.currentScreen = screen;
-		Emulator.emulatorimpl.getEmulatorScreen().setCurrent(screen);
+		Emulator.emulatorimpl.getScreen().setCurrent(screen);
 	}
 
 	public static MIDlet getMIDlet() {
@@ -172,29 +183,101 @@ public class Emulator implements Runnable {
 		MMFPlayer.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
-			method280();
+			generateJad();
 			return;
 		}
 		saveTargetDevice();
 	}
 
-	private static void method280() {
+	public static void openFileExternally(final String fileName) {
+		try {
+			if (win) {
+				// I intentionally use this only for windows.
+				Desktop.getDesktop().open(new File(fileName));
+				return;
+			}
+			if (macos) {
+				Runtime.getRuntime().exec("open \"" + fileName + "\"");
+				return;
+			}
+			if (linux) {
+				// I have no idea how to open files if there is no XDG.
+				// see https://github.com/ppy/osu/discussions/24499#discussioncomment-6698365 for fun.
+				if (Files.isExecutable(Paths.get("/usr/bin/xdg-open")))
+					Runtime.getRuntime().exec("/usr/bin/xdg-open \"" + fileName + "\"");
+				else if (Files.isExecutable(Paths.get("/usr/bin/gedit")))
+					// let's try gedit? it seems like the most well-known one.
+					Runtime.getRuntime().exec("/usr/bin/gedit \"" + fileName + "\"");
+				else
+					getEmulator().getScreen().showMessage("Non XDG compliant systems are not supported.");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		getEmulator().getScreen().showMessage("Failed to open file.");
+	}
+
+	public static void openUrlExternally(final String url) throws ConnectionNotFoundException {
+		if (linux) {
+			if (Files.isExecutable(Paths.get("/usr/bin/xdg-open"))) {
+				try {
+					Runtime.getRuntime().exec(new String[]{"/usr/bin/xdg-open", url});
+					return;
+				} catch (IOException ignored) {
+				}
+			}
+		}
+		if (macos) {
+			try {
+				Runtime.getRuntime().exec("open \"" + url + "\"");
+				return;
+			} catch (IOException ignored) {
+			}
+		}
+		try {
+			if (Desktop.isDesktopSupported()) {
+				Desktop.getDesktop().browse(new URI(url));
+				return;
+			}
+		} catch (Exception ignored) {
+		}
+
+		if (win) {
+			try {
+				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+				return;
+			} catch (IOException ignored) {
+			}
+		}
+		throw new ConnectionNotFoundException("not supported");
+	}
+
+	public static void openUrlExternallySilent(String url) {
+		try {
+			openUrlExternally(url);
+		} catch (ConnectionNotFoundException e) {
+			getEmulator().getScreen().showMessage("Failed to open URL.");
+		}
+	}
+
+	private static void generateJad() {
 		if (Emulator.midletJar == null) {
 			return;
 		}
 		try {
 			final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad"), "UTF-8");
-			final Enumeration<Object> keys = (Emulator.emulatorimpl.midletProps).keys();
+			final Enumeration<Object> keys = (Emulator.emulatorimpl.getAppProperties()).keys();
 			while (keys.hasMoreElements()) {
 				final String s;
 				if (!(s = (String) keys.nextElement()).equalsIgnoreCase("KEmu-Platform")) {
-					outputStreamWriter.write(s + ": " + Emulator.emulatorimpl.midletProps.getProperty(s) + "\r\n");
+					outputStreamWriter.write(s + ": " + Emulator.emulatorimpl.getAppProperties().getProperty(s) + "\r\n");
 				}
 			}
-			if (Emulator.emulatorimpl.midletProps.getProperty("MIDlet-Jar-URL") == null) {
+			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-URL") == null) {
 				outputStreamWriter.write("MIDlet-Jar-URL: " + new File(Emulator.midletJar).getName() + "\r\n");
 			}
-			if (Emulator.emulatorimpl.midletProps.getProperty("MIDlet-Jar-Size") == null) {
+			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-Size") == null) {
 				outputStreamWriter.write("MIDlet-Jar-Size: " + new File(Emulator.midletJar).length() + "\r\n");
 			}
 			outputStreamWriter.write("KEmu-Platform: " + Emulator.deviceName + "\r\n");
@@ -203,10 +286,6 @@ public class Emulator implements Runnable {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	public static Properties getMidletProperties() {
-		return Emulator.emulatorimpl.midletProps;
 	}
 
 	private static void saveTargetDevice() {
@@ -279,7 +358,7 @@ public class Emulator implements Runnable {
 
 	private static void loadTargetDevice() {
 		final String property;
-		if ((property = Emulator.emulatorimpl.midletProps.getProperty("KEmu-Platform")) != null) {
+		if ((property = Emulator.emulatorimpl.getAppProperties().getProperty("KEmu-Platform")) != null) {
 			tryToSetDevice(property);
 			return;
 		}
@@ -332,12 +411,13 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getTitle(String s) {
+		if (Settings.customTitle != null) return Settings.customTitle;
 		StringBuilder sb = new StringBuilder();
 		sb.append(platform.getTitleName()).append(' ').append(version);
 		if (s != null) {
 			sb.append(" - ").append(s);
-		} else if (midletJar != null && Emulator.emulatorimpl.midletProps != null) {
-			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty("MIDlet-Name"));
+		} else if (midletJar != null && Emulator.emulatorimpl.getAppProperties() != null) {
+			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty(Emulator.doja ? "AppName" : "MIDlet-Name"));
 		}
 		if (Settings.uei) sb.append(" (UEI)");
 		return sb.toString();
@@ -369,19 +449,13 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getJadPath() {
-		File file = null;
-		Label_0068:
-		{
-			File file2;
-			if (Emulator.jadPath != null) {
-				file2 = new File(Emulator.jadPath);
-			} else {
-				if (Emulator.midletJar == null) {
-					break Label_0068;
-				}
-				file2 = new File(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad");
-			}
-			file = file2;
+		File file;
+		if (Emulator.jadPath != null) {
+			file = new File(Emulator.jadPath);
+		} else if (Emulator.midletJar != null) {
+			file = new File(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad");
+		} else {
+			return null;
 		}
 		if (file.exists()) {
 			return file.getAbsolutePath();
@@ -393,21 +467,32 @@ public class Emulator implements Runnable {
 		try {
 			if (Emulator.midletClassName == null) {
 				Properties props = null;
-				File file2;
 				File file;
 				if (Emulator.jadPath != null) {
-					file = (file2 = new File(Emulator.jadPath));
+					file = new File(Emulator.jadPath);
 				} else {
 					final StringBuffer sb = new StringBuffer();
-					file = (file2 = new File(sb.append(Emulator.midletJar, 0, Emulator.midletJar.length() - 3).append("jad").toString()));
+					file = new File(sb.append(Emulator.midletJar, 0, Emulator.midletJar.length() - 3).append("jad").toString());
+					if (!file.exists()) {
+						sb.setCharAt(sb.length() - 1, 'm');
+						file = new File(sb.toString());
+					}
 				}
-				final File file3 = file2;
 				if (file.exists()) {
-					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file3), "UTF-8"));
+					doja = file.getName().endsWith(".jam");
+					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file), doja ? "Shift_JIS" : "UTF-8"));
 					final Enumeration<Object> keys = props.keys();
 					while (keys.hasMoreElements()) {
 						final String s = (String) keys.nextElement();
 						props.put(s, props.getProperty(s));
+					}
+				}
+				if (doja) {
+					Emulator.emulatorimpl.getLogStream().println("Running DoJa");
+					System.out.println(props);
+					if (Emulator.midletJar == null) {
+						String s = file.getName();
+						Emulator.midletJar = s.substring(0, s.length() - 1) + 'r';
 					}
 				}
 				Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
@@ -421,14 +506,14 @@ public class Emulator implements Runnable {
 						Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
 					}
 				}
-				if (props == null || !props.containsKey("MIDlet-1")) {
+				if (props == null || !props.containsKey(doja ? "AppClass" : "MIDlet-1")) {
 					try {
 						final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
 						props = new Properties();
 						for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
 							props.put(entry.getKey().toString(), entry.getValue());
 						}
-						if (!props.containsKey("MIDlet-1")) throw new Exception();
+						if (!props.containsKey(doja ? "AppClass" : "MIDlet-1")) throw new Exception();
 					} catch (Exception ex2) {
 						final InputStream inputStream;
 						(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
@@ -441,7 +526,7 @@ public class Emulator implements Runnable {
 						}
 					}
 				}
-				Emulator.emulatorimpl.midletProps = props;
+				Emulator.emulatorimpl.setAppProperties(props);
 				if (props.containsKey("MIDlet-2") && props.containsKey("MIDlet-1")) {
 					// find all midlets and show choice window
 					Vector<String> midletKeys = new Vector<String>();
@@ -453,14 +538,15 @@ public class Emulator implements Runnable {
 							try {
 								Integer.parseInt(num);
 								midletKeys.add(s);
-							} catch (Exception ignored) {}
+							} catch (Exception ignored) {
+							}
 						}
 					}
 					if (midletKeys.size() != 0) {
 						// must have to load device before screen is initialized
 						loadTargetDevice();
 
-						int n = emulatorimpl.getEmulatorScreen().showMidletChoice(midletKeys);
+						int n = emulatorimpl.getScreen().showMidletChoice(midletKeys);
 						if (n == -1) {
 							CustomMethod.close();
 							System.exit(0);
@@ -471,9 +557,13 @@ public class Emulator implements Runnable {
 						return true;
 					}
 				}
-				Emulator.midletClassName = props.getProperty("MIDlet-1");
-				if (Emulator.midletClassName != null) {
-					Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
+				if (doja) {
+					Emulator.midletClassName = props.getProperty("AppClass");
+				} else {
+					Emulator.midletClassName = props.getProperty("MIDlet-1");
+					if (Emulator.midletClassName != null) {
+						Emulator.midletClassName = Emulator.midletClassName.substring(Emulator.midletClassName.lastIndexOf(",") + 1).trim();
+					}
 				}
 			} else {
 				if (Emulator.classPath == null) {
@@ -482,7 +572,7 @@ public class Emulator implements Runnable {
 				final String[] split = Emulator.classPath.split(";");
 				for (int i = 0; i < split.length; ++i) {
 					Emulator.emulatorimpl.getLogStream().println("Get classes from " + split[i]);
-					method281(new File(split[i]), null);
+					loadClassesFrom(new File(split[i]), null);
 				}
 				Properties aProperties1369 = null;
 				final File file4;
@@ -497,12 +587,12 @@ public class Emulator implements Runnable {
 				if (aProperties1369 == null) {
 					aProperties1369 = new Properties();
 				}
-				Emulator.emulatorimpl.midletProps = aProperties1369;
+				Emulator.emulatorimpl.setAppProperties(aProperties1369);
 			}
 		} catch (Exception ex) {
 			if (ex.toString().equalsIgnoreCase("java.io.IOException: Negative seek offset")) {
 				ex.printStackTrace();
-				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file is not JAR or ZIP archive."), CustomMethod.getStackTrace(ex));
+				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_ZIP_ERROR", "Input file is not JAR or ZIP archive."), CustomMethod.getStackTrace(ex));
 				return false;
 			}
 			throw ex;
@@ -511,13 +601,13 @@ public class Emulator implements Runnable {
 		return true;
 	}
 
-	private static void method281(final File file, String s) {
+	private static void loadClassesFrom(final File file, String s) {
 		s = ((s != null) ? (s + ".") : "");
 		final File[] listFiles = file.listFiles();
 		for (int i = 0; i < listFiles.length; ++i) {
 			final String string = s + listFiles[i].getName();
 			if (listFiles[i].isDirectory()) {
-				method281(listFiles[i], string);
+				loadClassesFrom(listFiles[i], string);
 			} else if (string.endsWith(".class")) {
 				Emulator.jarClasses.add(string.substring(0, string.length() - 6));
 				Emulator.emulatorimpl.getLogStream().println("Get class " + string.substring(0, string.length() - 6));
@@ -662,7 +752,7 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 
-		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null) {
+		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
 			try {
 				Webcam w = Webcam.getDefault();
 				if (w != null) {
@@ -673,24 +763,14 @@ public class Emulator implements Runnable {
 					Dimension d = w.getViewSize();
 					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 		}
 
 		try {
-			String midlet = Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-			String midletVendor = Emulator.emulatorimpl.getAppProperty("MIDlet-Vendor");
-			if (midlet != null) {
-				// TODO this is stupid
-				if (midlet.equalsIgnoreCase("bounce tales")) {
-					Settings.fpsGame = 1;
-				} else if (midlet.equalsIgnoreCase("micro counter strike")) {
-					Settings.fpsGame = 2;
-				} else if (midlet.equalsIgnoreCase("quantum") || (midletVendor != null && midletVendor.toLowerCase().contains("ae-mods"))) {
-					Settings.fpsGame = 3;
-				}
-			}
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	private static String getHWID() {
@@ -731,10 +811,11 @@ public class Emulator implements Runnable {
 					break;
 				}
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		String arch = System.getProperty("os.arch");
-		if (!platform.isX64() && !arch.contains("86")) {
-			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try x64 version instead.");
+		if (!platform.isX64() && (!arch.contains("86") || !win)) {
+			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try multi-platform version instead.");
 			System.exit(0);
 			return;
 		}
@@ -751,13 +832,16 @@ public class Emulator implements Runnable {
 			Emulator.commandLineArguments = commandLineArguments;
 			UILocale.initLocale();
 			parseLaunchArgs(commandLineArguments); //
-			Emulator.emulatorimpl = new EmulatorImpl();
+			if (bridge)
+				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
+			else
+				Emulator.emulatorimpl = new SWTFrontend();
 			parseLaunchArgs(commandLineArguments);
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
 			// Restart with additional arguments required for specific os or java version
-			if (!(forked || Settings.uei) && (os.startsWith("darwin") || os.startsWith("mac os") || isJava9())) {
+			if (!(forked || Settings.uei) && (macos || isJava9())) {
 				loadGame(null, false);
 				return;
 			}
@@ -774,13 +858,13 @@ public class Emulator implements Runnable {
 			initRichPresence();
 
 			if (Settings.autoUpdate == 0) {
-				Settings.autoUpdate = updated ? 2 : Emulator.emulatorimpl.getEmulatorScreen().showUpdateDialog(0);
+				Settings.autoUpdate = updated ? 2 : Emulator.emulatorimpl.getScreen().showUpdateDialog(0);
 			}
 			backgroundThread.start();
 
 			if (Emulator.midletClassName == null && Emulator.midletJar == null) {
-				Emulator.emulatorimpl.getEmulatorScreen().start(false);
-				EmulatorImpl.dispose();
+				Emulator.emulatorimpl.getScreen().runEmpty();
+				emulatorimpl.dispose();
 				System.exit(0);
 				return;
 			}
@@ -788,63 +872,70 @@ public class Emulator implements Runnable {
 			getLibraries();
 			try {
 				if (!getJarClasses()) {
-					Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
+					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
 					System.exit(1);
 					return;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."), CustomMethod.getStackTrace(e));
+				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."), CustomMethod.getStackTrace(e));
 				System.exit(1);
 				return;
 			}
 			InputStream inputStream = null;
-			final String appProperty;
-			if ((appProperty = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
-				iconPath = appProperty;
-				inputStream = emulator.custom.CustomJarResources.getResourceAsStream(appProperty);
-			} else {
-				final String appProperty2;
-				if ((appProperty2 = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
-					try {
-						String s = appProperty2.split(",")[1].trim();
-						iconPath = s;
-						inputStream = emulator.custom.CustomJarResources.getResourceAsStream(s);
-					} catch (Exception ex3) {
-						ex3.printStackTrace();
+			try {
+				String iconPath;
+				if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
+					Emulator.iconPath = iconPath;
+					inputStream = ResourceManager.getResourceAsStream(iconPath);
+				} else if ((iconPath = Emulator.emulatorimpl.getAppProperty("AppIcon")) != null) {
+					Emulator.iconPath = iconPath = iconPath.split(",")[0].trim();
+					inputStream = ResourceManager.getResourceAsStream(iconPath);
+				} else {
+					if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
+						Emulator.iconPath = iconPath = iconPath.split(",")[1].trim();
+						inputStream = ResourceManager.getResourceAsStream(iconPath);
 					}
 				}
+			} catch (Exception ex3) {
+				ex3.printStackTrace();
 			}
 			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
 				Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
 				Emulator.rpcDetails = Settings.uei ? "UEI" : new File(midletJar).getName();
 				updatePresence();
 			}
-			Emulator.emulatorimpl.getEmulatorScreen().setWindowIcon(inputStream);
+			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
 			setProperties();
 			if (Emulator.midletClassName == null) {
-				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
 				System.exit(1);
 				return;
 			}
-			getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
-			try {
-				midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
-			} catch (Throwable e) {
-				e.printStackTrace();
-				Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
-				System.exit(1);
-				return;
+			if (doja) {
+				Emulator.eventQueue = new EventQueue();
+				midlet = new IApplicationMIDlet(Emulator.midletClassName.trim());
+			} else {
+				getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
+				try {
+					midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
+				} catch (Throwable e) {
+					e.printStackTrace();
+					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+					System.exit(1);
+					return;
+				}
+				Emulator.eventQueue = new EventQueue();
 			}
-			Emulator.eventQueue = new EventQueue();
 			new Thread(new Emulator()).start();
-			Emulator.emulatorimpl.getEmulatorScreen().start(true);
+			Emulator.emulatorimpl.getScreen().runWithMidlet();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		try {
-			EmulatorImpl.dispose();
-		} catch (Throwable ignored) {}
+			emulatorimpl.dispose();
+		} catch (Throwable ignored) {
+		}
 		System.exit(0);
 	}
 
@@ -855,7 +946,7 @@ public class Emulator implements Runnable {
 			String[] a = deviceName.split(";");
 			c = new String[a.length][2];
 			int idx = 0;
-			for (String s: a) {
+			for (String s : a) {
 				int i = s.indexOf(':');
 				if (i == -1) {
 					deviceName = s;
@@ -871,7 +962,7 @@ public class Emulator implements Runnable {
 		}
 		Emulator.emulatorimpl.getProperty().setCustomProperties();
 		if (c != null) {
-			for (String[] p: c) {
+			for (String[] p : c) {
 				if (p == null || p[0] == null) continue;
 				Devices.setProperty(p[0], p[1]);
 			}
@@ -886,7 +977,7 @@ public class Emulator implements Runnable {
 		if (array.length < 1) {
 			return false;
 		}
-		if (array.length == 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad"))) {
+		if (array.length == 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad")) || array[0].endsWith(".jam")) {
 			String path = array[0];
 			if (path.endsWith(".jar")) {
 				try {
@@ -904,17 +995,16 @@ public class Emulator implements Runnable {
 			String key = array[i].trim();
 			if (key.startsWith("-")) {
 				key = key.substring(1).toLowerCase();
-			} else if (i == array.length - 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad"))) {
-				String path = array[0];
-				if (path.endsWith(".jar")) {
+			} else if (key.endsWith(".jar") || key.endsWith(".jad") || key.endsWith(".jam")) {
+				if (key.endsWith(".jar")) {
 					try {
-						Emulator.midletJar = new File(path).getCanonicalPath();
+						Emulator.midletJar = new File(key).getCanonicalPath();
 					} catch (Exception e) {
-						Emulator.midletJar = path;
+						Emulator.midletJar = key;
 					}
 				} else {
-					Emulator.jadPath = path;
-					Emulator.midletJar = getMidletJarUrl(path);
+					Emulator.jadPath = key;
+					Emulator.midletJar = getMidletJarUrl(key);
 				}
 			}
 			String value = null;
@@ -937,14 +1027,14 @@ public class Emulator implements Runnable {
 				Settings.micro3d = 0;
 			} else if (key.equalsIgnoreCase("log")) {
 				Settings.showLogFrame = true;
-			} else if (key.equalsIgnoreCase("installed")) {
-				installed = true;
 			} else if (key.equalsIgnoreCase("uei")) {
 				Settings.uei = true;
 			} else if (key.equalsIgnoreCase("s")) {
 				forked = true;
 			} else if (key.equalsIgnoreCase("updated")) {
 				updated = true;
+			} else if (key.equals("bridge")) {
+				bridge = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
@@ -981,6 +1071,17 @@ public class Emulator implements Runnable {
 		return true;
 	}
 
+	public static String getProcessOutput(String commandline) throws IOException {
+		Process regRequest = Runtime.getRuntime().exec(commandline);
+		StringBuilder sw = new StringBuilder();
+		try (InputStream is = regRequest.getInputStream()) {
+			int c;
+			while ((c = is.read()) != -1)
+				sw.append((char) c);
+		}
+		return sw.toString();
+	}
+
 	public static String getAbsoluteFile() {
 		String s = System.getProperty("user.dir");
 		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
@@ -1010,25 +1111,99 @@ public class Emulator implements Runnable {
 		return s;
 	}
 
+	private static boolean checkIsPortable() {
+		String path = getAbsoluteFile();
+		// if kemu jar is read-only, it's probably somewhere in system folders.
+		if (Files.exists(Paths.get(path)) && !Files.isWritable(Paths.get(path)))
+			return false;
+
+		// we may live in system folders but are writable (container, misconfiguration, etc.)
+		if (linux) {
+			// we installed from package
+			if (path.startsWith("/opt/") || path.startsWith("/usr/") || path.startsWith("/bin/"))
+				return false;
+			// we live in ~.local/bin
+			if (path.contains("/home/") && path.contains("/.local/"))
+				return false;
+			//TODO flatpack/snap?
+
+			return true;
+		}
+		if (win) {
+			// installer will write to registry path to installed jar. Let's check it.
+			try {
+				String output = getProcessOutput("reg query \"HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator\" /v JarInstalledPath");
+				int i = output.indexOf("REG_SZ");
+				if (i != -1) {
+					String pathFromReg = output.substring(i + 6).trim();
+					if (Files.isSameFile(Paths.get(pathFromReg), Paths.get(path)))
+						return false; // we are running "installed" instance
+				}
+			} catch (IOException e) {
+				// ignore
+			}
+
+			// installed into appdata
+			if (path.contains("\\Users\\") && path.contains("\\AppData\\Local\\"))
+				return false;
+
+			// all other cases will be handled by writeablility check above.
+			return true;
+		}
+
+		// non-".app" program management on macos is messy so doing nothing
+		return true;
+	}
+
 	public static String getUserPath() {
 		installed:
 		{
-			if (installed) {
+			if (!isPortable) {
 				String s;
 				if (linux) {
-					s = "~/local/share/KEmulator";
-				} else {
+					s = System.getenv("HOME") + "/.local/share/KEmulator/";
+				} else if (win) {
 					s = System.getenv("APPDATA");
 					if (s == null)
 						break installed;
 					s += "\\KEmulator";
+				} else {
+					break installed;
 				}
-				File f = new File(s);
-				if ((f.exists() && f.isDirectory()) || f.mkdir())
+				Path p = Paths.get(s);
+				if (Files.exists(p) && Files.isDirectory(p))
 					return s;
+
+				try {
+					Files.createDirectories(p);
+				} catch (IOException e) {
+					break installed;
+				}
+
+				return s;
 			}
 		}
 		return getAbsolutePath();
+	}
+
+	/**
+	 * Attempts to find JDK near JRE KEmulator is running on.
+	 *
+	 * @return Null on failure, JDK home on success.
+	 */
+	public static String getJdkHome() {
+		String realHome = System.getProperty("java.home");
+		if (Files.exists(Paths.get(realHome, "bin", win ? "javac.exe" : "javac"))) {
+			// we run with JDK
+			return realHome;
+		}
+		String parent = Paths.get(realHome).getParent().toString();
+		if (Files.exists(Paths.get(parent, "bin", win ? "javac.exe" : "javac"))) {
+			// we run with JRE in JDK
+			return realHome;
+		}
+		// standalone JRE
+		return null;
 	}
 
 	public static void loadGame(String s, boolean b) {
@@ -1060,7 +1235,7 @@ public class Emulator implements Runnable {
 			cmd.add("-XstartOnFirstThread");
 		}
 
-		
+
 		if (debugBuild) {
 			File f = new File(getAbsolutePath() + "/../eclipse/KEmulator_base/agent.jar");
 			if (f.exists()) {
@@ -1095,7 +1270,7 @@ public class Emulator implements Runnable {
 					continue;
 				cmd.add(a);
 			}
-		} else if (s.endsWith(".jad")) {
+		} else if (s.endsWith(".jad") || s.endsWith(".jam")) {
 			cmd.add("-jad");
 			cmd.add(s);
 			cmd.add("-jar");
@@ -1113,14 +1288,16 @@ public class Emulator implements Runnable {
 		cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
 		cmd.add(mascotEngine == 0 ? "-mascotdll" : "-mascotgl");
 
-		if (installed) cmd.add("-installed");
-
 		cmd.add("-s");
 
 		getEmulator().disposeSubWindows();
 		notifyDestroyed();
 		try {
-			new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO().start();
+			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
+			// something inside SWT libs setting this to X11 on dual-server systems.
+			// GTK is clever enough to decide itself, so clearing it
+			newKem.environment().remove("GDK_BACKEND");
+			newKem.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -1132,11 +1309,15 @@ public class Emulator implements Runnable {
 		try {
 			File file = new File(jadPath);
 			if (file.exists()) {
+				if (jadPath.endsWith(".jam")) {
+					return jadPath.substring(0, jadPath.length() - 1) + 'r';
+				}
 				Properties properties = new Properties();
 				properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 				return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		return null;
 	}
 
@@ -1153,11 +1334,9 @@ public class Emulator implements Runnable {
 			public void run() {
 				Manager.checkLibVlcSupport();
 				if (!updated && !Settings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
-					EmulatorImpl.asyncExec(new Runnable() {
-						public void run() {
-							Emulator.emulatorimpl.getEmulatorScreen().showUpdateDialog(1);
-						}
-					});
+					if (emulatorimpl instanceof SWTFrontend) {
+						SWTFrontend.getDisplay().asyncExec(() -> getEmulator().getScreen().showUpdateDialog(1));
+					}
 				}
 			}
 		});
@@ -1183,7 +1362,7 @@ public class Emulator implements Runnable {
 	public static IGraphics3D getGraphics3D() {
 		return platform.getGraphics3D();
 	}
-	
+
 	public static int getJavaVersionMajor() {
 		try {
 			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
@@ -1209,20 +1388,21 @@ public class Emulator implements Runnable {
 	}
 
 	public void run() {
-		try {
-			midletClass.newInstance();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			Emulator.eventQueue.stop();
-			EmulatorImpl.syncExec(new Runnable() {
-				public void run() {
-					Emulator.emulatorimpl.getEmulatorScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
-				}
-			});
-			return;
+		if (!doja) {
+			try {
+				midletClass.newInstance();
+			} catch (Throwable e) {
+				e.printStackTrace();
+				eventQueue.stop();
+				emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+				return;
+			}
 		}
-		Emulator.emulatorimpl.getClassWatcher().fill();
-		Emulator.emulatorimpl.getProfiler().fill();
+		if (Emulator.getEmulator() instanceof SWTFrontend) {
+			SWTFrontend swt = (SWTFrontend) Emulator.getEmulator();
+			swt.getClassWatcher().fillClassList();
+			swt.getProfiler().fillClassList();
+		}
 		Emulator.eventQueue.queue(EventQueue.EVENT_START);
 	}
 }

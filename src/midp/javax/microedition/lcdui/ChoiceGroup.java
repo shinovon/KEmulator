@@ -2,7 +2,10 @@ package javax.microedition.lcdui;
 
 import emulator.Emulator;
 import emulator.lcdui.BoundsUtils;
-import emulator.lcdui.c;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
+import emulator.ui.CommandsMenuPosition;
+import emulator.ui.TargetedCommand;
 
 import java.util.Vector;
 
@@ -49,7 +52,7 @@ public class ChoiceGroup
 			this.items.add(new a(strs[j], imgs == null ? null : imgs[j], null, this));
 			++j;
 		}
-		if (this.items.size() > 0) {
+		if (choiceType != MULTIPLE && this.items.size() > 0) {
 			((a) this.items.get(0)).sel = true;
 		}
 	}
@@ -230,23 +233,33 @@ public class ChoiceGroup
 			return;
 		}
 		if (this.choiceType == POPUP) {
-			((Form) screen)._showMenu(this, 4, popupY);
+			int[] l = ((Form) screen).getLocationOnScreen(this);
+			final int y = popupY < 0 ? popupY : l[1] + popupY;
+			Emulator.getEmulator().getScreen().showCommandsList(buildPopupList(), CommandsMenuPosition.Custom, l[0] + 4, y);
 		}
+	}
+
+	private Vector<TargetedCommand> buildPopupList() {
+		Vector<TargetedCommand> cmds = new Vector<>();
+		for (int i = 0; i < this.items.size(); i++) {
+			cmds.add(new TargetedCommand(this, i, this.isSelected(i)));
+		}
+		return cmds;
 	}
 
 	void paint(Graphics g, int x, int y, int w, int h) {
 		if (!this.aBoolean541) {
 			super.paint(g, x, y, w, h);
 		} else {
-			g.setColor(-16777216);
+			g.setColor(LCDUIUtils.foregroundColor);
 		}
 		int n = y;
 		if (this.labelArr != null && this.labelArr.length > 0) {
-			g.setFont(Item.font);
+			g.setFont(labelFont);
 			int i = 0;
 			while (i < this.labelArr.length) {
 				g.drawString(this.labelArr[i], x + 4, n + 2, 0);
-				n += Item.font.getHeight() + 4;
+				n += labelFont.getHeight() + 4;
 				++i;
 			}
 		}
@@ -268,7 +281,8 @@ public class ChoiceGroup
 				case POPUP: {
 					try {
 						((a) this.items.get(this.currentSelect)).method211(g, this.focused, y);
-					} catch (Exception ignored) {}
+					} catch (Exception ignored) {
+					}
 				}
 			}
 		}
@@ -279,8 +293,8 @@ public class ChoiceGroup
 		int n = 0;
 		if (this.label != null) {
 			int n2 = this.getPreferredWidth() - 8;
-			this.labelArr = c.textArr(this.label, Item.font, n2, n2);
-			n = (Item.font.getHeight() + 4) * this.labelArr.length;
+			this.labelArr = TextUtils.textArr(this.label, labelFont, n2, n2);
+			n = (labelFont.getHeight() + 4) * this.labelArr.length;
 		} else {
 			this.labelArr = null;
 		}

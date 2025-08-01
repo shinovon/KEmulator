@@ -1,6 +1,11 @@
 package javax.microedition.lcdui;
 
+import emulator.Emulator;
+import emulator.ui.CommandsMenuPosition;
+import emulator.ui.TargetedCommand;
+
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class Form extends Screen {
 	ItemStateListener itemStateListener;
@@ -37,7 +42,7 @@ public class Form extends Screen {
 	}
 
 	public int append(final Item item) {
-		synchronized(items) {
+		synchronized (items) {
 			if (item == null) {
 				throw new NullPointerException();
 			}
@@ -66,7 +71,7 @@ public class Form extends Screen {
 		if (item.screen != null) {
 			throw new IllegalStateException();
 		}
-		synchronized(items) {
+		synchronized (items) {
 			super.items.insertElementAt(item, n);
 			item.screen = this;
 		}
@@ -85,7 +90,7 @@ public class Form extends Screen {
 			item.screen = null;
 			super.items.remove(n);
 		}
-		queueLayout(n);
+		queueLayout(n - 1);
 	}
 
 	public void deleteAll() {
@@ -301,7 +306,7 @@ public class Form extends Screen {
 			if (row.y + row.height < y + scroll) continue;
 			if (height < row.y - scroll) return null;
 			int ry = y + scroll - row.y;
-			for (Row.RowItem o: row.items) {
+			for (Row.RowItem o : row.items) {
 				if (o.x <= x && o.x + o.width >= x && o.y <= ry && o.y + o.height >= ry) {
 					if (transformed != null) {
 						transformed[0] = x - o.x;
@@ -321,7 +326,8 @@ public class Form extends Screen {
 		}
 		try {
 			currentIndexInRow = getFirstRow(item).indexOf(item);
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		scrollCurrentItem = item;
 		focusedItem = item;
 		if (item != null) {
@@ -357,11 +363,12 @@ public class Form extends Screen {
 		try {
 			for (int i = (prevRow == null ? rows.indexOf(getFirstVisibleRow()) : rows.indexOf(prevRow) + dir); i < rows.size() && i >= 0; i += dir) {
 				Row row = rows.get(i);
-				for (Row.RowItem o: row.items) {
+				for (Row.RowItem o : row.items) {
 					if (o.item.isFocusable()) return row;
 				}
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		return null;
 	}
 
@@ -371,7 +378,8 @@ public class Form extends Screen {
 				Item item = row.items.get(i).item;
 				if (item.isFocusable()) return i;
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		return -1;
 	}
 
@@ -379,13 +387,14 @@ public class Form extends Screen {
 		try {
 			for (int i = (getFirstRowIdx(prevItem) + dir); i < rows.size() && i >= 0; i += dir) {
 				Row row = rows.get(i);
-				for (Row.RowItem o: row.items) {
+				for (Row.RowItem o : row.items) {
 					if (o.item != prevItem && o.item.isFocusable()) {
 						return o.item;
 					}
 				}
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		return null;
 	}
 
@@ -405,7 +414,7 @@ public class Form extends Screen {
 				w = bounds[W],
 				h = bounds[H],
 				sy = y;
-		g.setClip(0, sy, w, sy+h);
+		g.setClip(0, sy, w, sy + h);
 
 		if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
 			Item item = getFirstVisibleAndFocusableItem();
@@ -418,12 +427,14 @@ public class Form extends Screen {
 		scroll = Math.max(0, Math.min(scroll, layoutHeight - h + bounds[Y]));
 
 		y -= scroll;
-		for (Row row : rows) {
-			int rh = row.getHeight();
-			if (y + rh > 0 && h + sy > y) {
-				row.paint(g, y, w);
-			} else row.hidden();
-			y += rh;
+		synchronized (rows) {
+			for (Row row : rows) {
+				int rh = row.getHeight();
+				if (y + rh > 0 && h + sy > y) {
+					row.paint(g, y, w);
+				} else row.hidden();
+				y += rh;
+			}
 		}
 		g.setClip(0, 0, this.w, this.h);
 	}
@@ -462,7 +473,8 @@ public class Form extends Screen {
 				Row row = rows.get(i);
 				if (item == null || row.contains(item)) return row;
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 		return null;
 	}
 
@@ -500,10 +512,18 @@ public class Form extends Screen {
 		scrollCurrentItem = item;
 		try {
 			scroll = getFirstRow(item).y;
-		} catch (Exception ignored) {}
+		} catch (Exception e) {
+			queueLayout(item);
+			doLayout(0);
+			try {
+				scroll = getFirstRow(item).y;
+			} catch (Exception ignored) {
+			}
+		}
 	}
 
 	void queueLayout(int i) {
+		if (i < 0) i = 0;
 		layoutStart = Math.min(layoutStart, i);
 		layout = true;
 		repaintScreen();
@@ -524,6 +544,16 @@ public class Form extends Screen {
 				return;
 			}
 			int width = bounds[W];
+			int prevScroll = this.scroll;
+			int prevScrollItemY = 0;
+			Item scrollItem = this.scrollCurrentItem;
+			if (scrollItem != null) {
+				try {
+					prevScrollItemY = getFirstRow(scrollItem).y;
+				} catch (Exception ignored) {
+				}
+			}
+
 			Row row = null;
 			synchronized (items) {
 				while (row == null && i > 0) {
@@ -574,7 +604,7 @@ public class Form extends Screen {
 					row = newRow(row);
 				}
 				String text = null;
-				if(item instanceof StringItem
+				if (item instanceof StringItem
 						&& (((text = ((StringItem) item).getText()) != null
 						&& !text.trim().isEmpty() && text.startsWith("\n"))
 						|| ((StringItem) item).getAppearanceMode() != Item.BUTTON && item.hasLabel())) {
@@ -597,7 +627,7 @@ public class Form extends Screen {
 				} else {
 					row.add(item, width);
 				}
-				if((text != null && text.endsWith("\n"))
+				if ((text != null && text.endsWith("\n") && !item._hasLayout(Item.LAYOUT_NEWLINE_AFTER))
 						|| item._hasLayout(Item.LAYOUT_NEWLINE_AFTER)
 						|| item instanceof ChoiceGroup
 						|| item instanceof TextField
@@ -607,6 +637,14 @@ public class Form extends Screen {
 			}
 			if (row != null && !row.items.isEmpty()) {
 				layoutHeight += row.getHeight();
+			}
+
+			if (prevScrollItemY != 0) {
+				int s = prevScroll - prevScrollItemY;
+				try {
+					scroll = s + getFirstRow(scrollItem).y;
+				} catch (Exception ignored) {
+				}
 			}
 		}
 	}
@@ -619,13 +657,16 @@ public class Form extends Screen {
 		return row;
 	}
 
-	public void _showMenu(Item item, int x, int y) {
-		if (item == null) {
-			hideSwtMenu();
-			return;
+	public boolean _tryShowMenuAt(int x, int y) {
+		Item item = _getItemAt(x, y, null);
+		if (item != null && !item.commands.isEmpty()) {
+			Vector<TargetedCommand> commands = new Vector<>();
+			buildItemCommands(commands, item);
+//			buildScreenCommands(commands);
+			Emulator.getEmulator().getScreen().showCommandsList(commands, CommandsMenuPosition.Cursor, 0,0);
+			return true;
 		}
-		int[] l = getLocationOnScreen(item);
-		showSwtMenu(true, x < 0 ? x : l[0] + x, y < 0 ? y : l[1] + y);
+		return false;
 	}
 
 	int[] getLocationOnScreen(Item item) {
@@ -635,8 +676,9 @@ public class Form extends Screen {
 			Row.RowItem o = row.items.get(row.indexOf(item));
 			x = o.x;
 			y = row.y + bounds[Y] + o.y - scroll;
-		} catch (Exception ignored) {}
-		return new int[] {x, y};
+		} catch (Exception ignored) {
+		}
+		return new int[]{x, y};
 	}
 
 	public void _invokeSizeChanged(int w, int h) {

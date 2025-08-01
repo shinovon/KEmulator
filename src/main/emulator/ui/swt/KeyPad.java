@@ -185,13 +185,13 @@ public final class KeyPad implements ControlListener, DisposeListener {
 
 	private static void method832(final int n) {
 		try {
-			((EmulatorImpl) Emulator.getEmulator()).getEmulatorScreen().handleKeyPress(Integer.parseInt(KeyMapping.deviceKeycodes[n]));
+			((EmulatorScreen) Emulator.getEmulator().getScreen()).handleKeyPress(Integer.parseInt(KeyMapping.deviceKeycodes[n]));
 		} catch (Exception ignored) {}
 	}
 
 	private static void method839(final int n) {
 		try {
-			((EmulatorImpl) Emulator.getEmulator()).getEmulatorScreen().handleKeyRelease(Integer.parseInt(KeyMapping.deviceKeycodes[n]));
+			((EmulatorScreen) Emulator.getEmulator().getScreen()).handleKeyRelease(Integer.parseInt(KeyMapping.deviceKeycodes[n]));
 		} catch (Exception ignored) {}
 	}
 

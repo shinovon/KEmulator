@@ -2,7 +2,7 @@ package javax.microedition.lcdui;
 
 import emulator.Emulator;
 import emulator.KeyMapping;
-import emulator.lcdui.c;
+import emulator.lcdui.TextUtils;
 
 public abstract class CustomItem extends Item {
 	protected static final int TRAVERSE_HORIZONTAL = 1;
@@ -176,10 +176,10 @@ public abstract class CustomItem extends Item {
 			this.paint(this.g, contentWidth, contentHeight);
 		}
 		if (super.labelArr != null && super.labelArr.length > 0) {
-			graphics.setFont(Item.font);
+			graphics.setFont(labelFont);
 			for (int i = 0; i < super.labelArr.length; ++i) {
 				graphics.drawString(super.labelArr[i], x + 4, n2 + 2, 0);
-				n2 += Item.font.getHeight() + 4;
+				n2 += labelFont.getHeight() + 4;
 			}
 		}
 		graphics.drawRegion(img, 0, 0,
@@ -193,8 +193,8 @@ public abstract class CustomItem extends Item {
 		int n = 0;
 		int w = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
 		if (hasLabel()) {
-			super.labelArr = c.textArr(super.label, Item.font, w, w);
-			n = (Item.font.getHeight() + 4) * super.labelArr.length;
+			super.labelArr = TextUtils.textArr(super.label, labelFont, w, w);
+			n = (labelFont.getHeight() + 4) * super.labelArr.length;
 		} else {
 			super.labelArr = null;
 		}

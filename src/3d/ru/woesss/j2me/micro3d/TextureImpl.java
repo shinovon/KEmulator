@@ -17,7 +17,7 @@
 package ru.woesss.j2me.micro3d;
 
 import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import javax.microedition.lcdui.Image;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public final class TextureImpl {
 		if (name == null) {
 			throw new NullPointerException();
 		}
-		byte[] b = CustomJarResources.getBytes(name);
+		byte[] b = ResourceManager.getBytes(name);
 		if (b == null) {
 			throw new IOException();
 		}

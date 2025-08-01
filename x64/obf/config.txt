@@ -113,7 +113,7 @@
 -keep class emulator.debug.Profiler3D { *; }
 -keep class emulator.custom.subclass.* { *; }
 -keep class emulator.custom.CustomMethod { public *; }
--keep class emulator.custom.CustomJarResources { public protected *; }
+-keep class emulator.custom.ResourceManager { public protected *; }
 
 -keep class emulator.i { *; }
 

@@ -1,5 +1,8 @@
 package emulator.graphics2D;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 public interface IImage {
 	IGraphics2D createGraphics();
 
@@ -10,6 +13,8 @@ public interface IImage {
 	int getHeight();
 
 	int[] getData();
+
+	boolean directAccess();
 
 	void setData(final int[] p0);
 
@@ -23,13 +28,15 @@ public interface IImage {
 
 	void saveToFile(final String p0);
 
+	void write(OutputStream out, String format) throws IOException;
+
 	void copyToClipBoard();
 
-	void cloneImage(final IImage img);
+	void cloneImage(final IImage sourceImg);
 
-	void cloneImage(final IImage img, int x, int y, int w, int h);
+	void cloneImage(final IImage sourceImg, int x, int y, int w, int h);
 
-	void copyImage(final IGraphics2D g, int sx, int sy, int w, int h, int tx, int ty);
+	void copyImage(final IGraphics2D destGraphics, int sx, int sy, int w, int h, int tx, int ty);
 
 	int size();
 

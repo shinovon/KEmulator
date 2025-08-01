@@ -76,6 +76,14 @@ public class DeviceControl {
 	}
 
 	public boolean setDeviceActive(int device, boolean active) {
+		if (device == VIBRATION) {
+			if (active) {
+				Emulator.getEmulator().getScreen().startVibra(3000);
+			} else {
+				Emulator.getEmulator().getScreen().stopVibra();
+			}
+			return true;
+		}
 		return true;
 	}
 

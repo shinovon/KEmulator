@@ -25,6 +25,22 @@ public final class LCDUIUtils {
 		return Emulator.getCurrentDisplay().equals(param);
 	}
 
+	public static void setCurrent(Display paramDisplay, Displayable paramDisplayable) {
+		if ((paramDisplay == null) || (paramDisplayable != null)) {
+			throw new NullPointerException();
+		}
+		paramDisplay.setCurrent(paramDisplayable);
+	}
+
+
+	public static void setCurrentNoWaitForForeground(Display paramDisplay, Displayable paramDisplayable) {
+		if ((paramDisplay == null) || (paramDisplayable != null)) {
+			throw new NullPointerException();
+		}
+		paramDisplay.setCurrent(paramDisplayable);
+	}
+
+
 	public static void setCurrent(Display paramDisplay, Displayable paramDisplayable, String paramString) {
 		if ((paramDisplay == null) || ((paramDisplayable != null) && (paramString == null))) {
 			throw new NullPointerException();

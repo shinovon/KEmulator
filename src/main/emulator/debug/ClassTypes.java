@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 
 public final class ClassTypes {
 
-	public static String method869(Class c) {
+	public static String getReadableClassName(Class c) {
 		return !c.isArray() ? c.getName() : method870(c.getName());
 	}
 
@@ -26,23 +26,6 @@ public final class ClassTypes {
 					break;
 				case 'D':
 					s = "double";
-					break;
-				case 'E':
-				case 'G':
-				case 'H':
-				case 'K':
-				case 'M':
-				case 'N':
-				case 'O':
-				case 'P':
-				case 'Q':
-				case 'R':
-				case 'T':
-				case 'U':
-				case 'W':
-				case 'X':
-				case 'Y':
-				default:
 					break;
 				case 'F':
 					s = "float";
@@ -64,6 +47,8 @@ public final class ClassTypes {
 					break;
 				case 'Z':
 					s = "boolean";
+				default:
+					break;
 			}
 
 			StringBuilder sBuilder = new StringBuilder(s);
@@ -76,7 +61,7 @@ public final class ClassTypes {
 		return s;
 	}
 
-	public static boolean method871(final Class clazz) {
+	public static boolean isObject(final Class clazz) {
 		return clazz != Integer.TYPE &&
 				clazz != Boolean.TYPE &&
 				clazz != Byte.TYPE &&
@@ -89,41 +74,57 @@ public final class ClassTypes {
 				&& !clazz.isArray();
 	}
 
-	public static String method872(Object obj, int var1, boolean var2) {
+	public static String getArrayValue(Object obj, int index, boolean hex) {
 		if (obj == null || !obj.getClass().isArray())
 			return "null";
 		Class cls = obj.getClass().getComponentType();
-		Object e = Array.get(obj, var1);
-		return (e == null ? "null" : (cls == Integer.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getInt(obj, var1)) : String.valueOf(Array.getInt(obj, var1))) : (cls == Boolean.TYPE ? String.valueOf(Array.getBoolean(obj, var1)) : (cls == Byte.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getByte(obj, var1)) : String.valueOf(Array.getByte(obj, var1))) : (cls == Short.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getShort(obj, var1)) : String.valueOf(Array.getShort(obj, var1))) : (cls == Long.TYPE ? (var2 ? "0x" + Long.toHexString(Array.getLong(obj, var1)) : String.valueOf(Array.getLong(obj, var1))) : (cls == Float.TYPE ? String.valueOf(Array.getFloat(obj, var1)) : (cls == Double.TYPE ? String.valueOf(Array.getDouble(obj, var1)) : (cls == Character.TYPE ? String.valueOf(Array.getChar(obj, var1)) : (cls == String.class ? String.valueOf(e) : (!cls.isArray() ? e.toString() : "[" + Array.getLength(e) + "]")))))))))));
+		Object e = Array.get(obj, index);
+		return (e == null ? "null" : (cls == Integer.TYPE ? (hex ? "0x" + Integer.toHexString(Array.getInt(obj, index)) : String.valueOf(Array.getInt(obj, index))) : (cls == Boolean.TYPE ? String.valueOf(Array.getBoolean(obj, index)) : (cls == Byte.TYPE ? (hex ? "0x" + Integer.toHexString(Array.getByte(obj, index)) : String.valueOf(Array.getByte(obj, index))) : (cls == Short.TYPE ? (hex ? "0x" + Integer.toHexString(Array.getShort(obj, index)) : String.valueOf(Array.getShort(obj, index))) : (cls == Long.TYPE ? (hex ? "0x" + Long.toHexString(Array.getLong(obj, index)) : String.valueOf(Array.getLong(obj, index))) : (cls == Float.TYPE ? String.valueOf(Array.getFloat(obj, index)) : (cls == Double.TYPE ? String.valueOf(Array.getDouble(obj, index)) : (cls == Character.TYPE ? String.valueOf(Array.getChar(obj, index)) : (cls == String.class ? String.valueOf(e) : (!cls.isArray() ? e.toString() : "[" + Array.getLength(e) + "]")))))))))));
 	}
 
-	public static void method873(Object var0, int var1, String var2) {
-		if (var0 != null && var0.getClass().isArray()) {
-			if (Array.get(var0, var1) != null) {
+	public static void setArrayValue(Object obj, int index, String value) {
+		if (obj != null && obj.getClass().isArray()) {
+			if (Array.get(obj, index) != null) {
 				int var4;
-				if ((var4 = var2.startsWith("0x") ? 16 : 10) == 16) {
-					var2 = var2.substring(2);
+				if ((var4 = value.startsWith("0x") ? 16 : 10) == 16) {
+					value = value.substring(2);
 				}
 
 				Class cls;
-				if ((cls = var0.getClass().getComponentType()) == Long.TYPE) {
-					Array.setLong(var0, var1, Long.parseLong(var2, var4));
-				} else if (cls == Integer.TYPE) {
-					Array.setInt(var0, var1, Integer.parseInt(var2, var4));
-				} else if (cls == Short.TYPE) {
-					Array.setShort(var0, var1, (short) Integer.parseInt(var2, var4));
-				} else if (cls == Byte.TYPE) {
-					Array.setByte(var0, var1, (byte) Integer.parseInt(var2, var4));
-				} else if (cls == Boolean.TYPE) {
-					Array.setBoolean(var0, var1, Boolean.valueOf(var2).booleanValue());
-				} else if (cls == Float.TYPE) {
-					Array.setFloat(var0, var1, Float.parseFloat(var2));
-				} else if (cls == Double.TYPE) {
-					Array.setDouble(var0, var1, Double.parseDouble(var2));
-				} else if (cls == Character.TYPE) {
-					Array.setChar(var0, var1, var2.charAt(0));
-				} else if (cls == String.class) {
-					Array.set(var0, var1, var2);
+				try {
+					if ((cls = obj.getClass().getComponentType()) == Long.TYPE) {
+						Array.setLong(obj, index, Long.parseLong(value, var4));
+					} else if (cls == Integer.TYPE) {
+						if (var4 == 16)
+							Array.setInt(obj, index, Integer.parseUnsignedInt(value, var4));
+						else if (var4 == 10)
+							Array.setInt(obj, index, Integer.parseInt(value, var4));
+					} else if (cls == Short.TYPE) {
+						Array.setShort(obj, index, (short) Integer.parseInt(value, var4));
+					} else if (cls == Byte.TYPE) {
+						Array.setByte(obj, index, (byte) Integer.parseInt(value, var4));
+					} else if (cls == Boolean.TYPE) {
+						String lowerCase = value.toLowerCase();
+						boolean b = "true".indexOf(lowerCase) == 0;
+						if (!b) {
+							try {
+								b = Integer.parseInt(value, var4) != 0;
+							} catch (java.lang.NumberFormatException e) {
+								b = false;
+							}
+						}
+						Array.setBoolean(obj, index, b);
+					} else if (cls == Float.TYPE) {
+						Array.setFloat(obj, index, Float.parseFloat(value));
+					} else if (cls == Double.TYPE) {
+						Array.setDouble(obj, index, Double.parseDouble(value));
+					} else if (cls == Character.TYPE) {
+						Array.setChar(obj, index, value.charAt(0));
+					} else if (cls == String.class) {
+						Array.set(obj, index, value);
+					}
+				} catch (java.lang.NumberFormatException e) {
+					Emulator.getEmulator().getLogStream().println(e.toString());
 				}
 			}
 		}
@@ -137,42 +138,71 @@ public final class ClassTypes {
 		}
 	}
 
-	public static void setFieldValue(Object var0, Field var1, String var2) {
+	public static void setFieldValue(Object obj, Field field, String s) {
 		try {
-			int var3;
-			if ((var3 = var2.startsWith("0x") ? 16 : 10) == 16) {
-				var2 = var2.substring(2);
+			int radix;
+			String n = s;
+			if ((radix = s.startsWith("0x") ? 16 : s.startsWith("0b") ? 2 : 10) != 10) {
+				n = s.substring(2);
 			}
 
-			if (var1.getType() == Long.TYPE) {
-				var1.setLong(var0, Long.parseLong(var2, var3));
-			} else if (var1.getType() == Integer.TYPE) {
-				var1.setInt(var0, Integer.parseInt(var2, var3));
-			} else if (var1.getType() == Short.TYPE) {
-				var1.setShort(var0, (short) Integer.parseInt(var2, var3));
-			} else if (var1.getType() == Byte.TYPE) {
-				var1.setByte(var0, (byte) Integer.parseInt(var2, var3));
-			} else if (var1.getType() == Boolean.TYPE) {
-				var1.setBoolean(var0, Boolean.valueOf(var2).booleanValue());
-			} else if (var1.getType() == Float.TYPE) {
-				var1.setFloat(var0, Float.parseFloat(var2));
-			} else if (var1.getType() == Double.TYPE) {
-				var1.setDouble(var0, Double.parseDouble(var2));
-			} else {
-				if (var1.getType() != Character.TYPE) {
-					if (var1.getType() == String.class) {
-						var1.set(var0, var2);
+			if (field.getType() == Long.TYPE) {
+				field.setLong(obj, Long.parseLong(n, radix));
+			} else if (field.getType() == Integer.TYPE) {
+				if (radix == 16 || radix == 2)
+					field.setInt(obj, Integer.parseUnsignedInt(n, radix));
+				else if (radix == 10)
+					field.setInt(obj, Integer.parseInt(n, radix));
+			} else if (field.getType() == Short.TYPE) {
+				field.setShort(obj, (short) Integer.parseInt(n, radix));
+			} else if (field.getType() == Byte.TYPE) {
+				field.setByte(obj, (byte) Integer.parseInt(n, radix));
+			} else if (field.getType() == Boolean.TYPE) {
+				boolean b = "true".indexOf(s.toLowerCase()) == 0;
+				if (!b) {
+					try {
+						b = Integer.parseInt(n, radix) != 0;
+					} catch (java.lang.NumberFormatException e) {
+						b = false;
 					}
-
-					return;
 				}
-
-				var1.setChar(var0, var2.charAt(0));
+				field.setBoolean(obj, b);
+			} else if (field.getType() == Float.TYPE) {
+				field.setFloat(obj, Float.parseFloat(s));
+			} else if (field.getType() == Double.TYPE) {
+				field.setDouble(obj, Double.parseDouble(s));
+			} else if (field.getType() == Character.TYPE) {
+				field.setChar(obj, s.charAt(0));
+			} else if (field.getType() == String.class) {
+				field.set(obj, s);
 			}
 		} catch (Exception var4) {
 			Emulator.getEmulator().getLogStream().println(var4.toString());
 		}
+	}
 
+	// must be synced with method above!
+	public static boolean canSetFieldValue(Field var1) {
+		if (var1.getType() == Long.TYPE) {
+			return true;
+		} else if (var1.getType() == Integer.TYPE) {
+			return true;
+		} else if (var1.getType() == Short.TYPE) {
+			return true;
+		} else if (var1.getType() == Byte.TYPE) {
+			return true;
+		} else if (var1.getType() == Boolean.TYPE) {
+			return true;
+		} else if (var1.getType() == Float.TYPE) {
+			return true;
+		} else if (var1.getType() == Double.TYPE) {
+			return true;
+		} else if (var1.getType() == Character.TYPE) {
+			return true;
+		} else if (var1.getType() == String.class) {
+			return true;
+		}
+		return false;
 	}
 
 	public static Object getFieldValue(Object var0, Field var1) {
@@ -190,7 +220,7 @@ public final class ClassTypes {
 		Object e = Array.get(obj, var1);
 		return (e == null ? "null" : (cls == Integer.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getInt(obj, var1)) : String.valueOf(Array.getInt(obj, var1))) : (cls == Boolean.TYPE ? String.valueOf(Array.getBoolean(obj, var1)) : (cls == Byte.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getByte(obj, var1)) : String.valueOf(Array.getByte(obj, var1))) : (cls == Short.TYPE ? (var2 ? "0x" + Integer.toHexString(Array.getShort(obj, var1)) : String.valueOf(Array.getShort(obj, var1))) : (cls == Long.TYPE ? (var2 ? "0x" + Long.toHexString(Array.getLong(obj, var1)) : String.valueOf(Array.getLong(obj, var1))) : (cls == Float.TYPE ? String.valueOf(Array.getFloat(obj, var1)) : (cls == Double.TYPE ? String.valueOf(Array.getDouble(obj, var1)) : (cls == Character.TYPE ? String.valueOf(Array.getChar(obj, var1)) : (cls == String.class ? String.valueOf(e) :
 				(!cls.isArray() ? e.toString() :
-						ClassTypes.method869(e.getClass()).replaceFirst("\\[\\]", "[" + Array.getLength(e) + "]")
+						ClassTypes.getReadableClassName(e.getClass()).replaceFirst("\\[\\]", "[" + Array.getLength(e) + "]")
 				)))))))))));
 	}
 }

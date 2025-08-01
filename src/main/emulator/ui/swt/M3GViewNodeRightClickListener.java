@@ -18,7 +18,7 @@ final class M3GViewNodeRightClickListener extends MouseAdapter {
 			try {
 				final Node node;
 				if (M3GViewUI.method501(this.aClass90_802).getSelection() != null && (node = (Node) M3GViewUI.method501(this.aClass90_802).getSelection()[0].getData()) != null) {
-					new Watcher(node).method311(M3GViewUI.method499(aClass90_802));
+					new Watcher(node).open(M3GViewUI.method499(aClass90_802));
 				}
 			} catch (Exception ignored) {
 			}

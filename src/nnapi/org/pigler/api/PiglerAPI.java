@@ -3,7 +3,6 @@ package org.pigler.api;
 import com.nokia.mid.ui.SoftNotificationImpl;
 import emulator.Emulator;
 import emulator.graphics2D.awt.ImageAWT;
-import emulator.ui.swt.EmulatorImpl;
 import emulator.ui.swt.EmulatorScreen;
 import org.eclipse.swt.widgets.Shell;
 
@@ -135,22 +134,25 @@ public class PiglerAPI {
         throw new PiglerException("showGlobalPopup not supported");
     }
 
-    public void _callback(int i) {
-        tapped = true;
-        if(launch)
-            try {
-                EmulatorImpl.asyncExec(() -> {
-                    try {
-                        Shell shell = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell();
-                        shell.setMinimized(false);
-                        shell.setActive();
-                    } catch (Exception ignored) {
-                    }
-                });
-            } catch (Exception ignored) {}
-        if(!created) return;
-        created = false;
-        if(listener != null)
-            listener.handleNotificationTap(2100);
-    }
+	public void _callback(int i) {
+		tapped = true;
+		if (launch)
+			try {
+				if (Emulator.getEmulator().getScreen() instanceof EmulatorScreen) {
+					Shell shell = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell();
+					shell.getDisplay().asyncExec(() -> {
+						try {
+							shell.setMinimized(false);
+							shell.setActive();
+						} catch (Exception ignored) {
+						}
+					});
+				}
+			} catch (Exception ignored) {
+			}
+		if (!created) return;
+		created = false;
+		if (listener != null)
+			listener.handleNotificationTap(2100);
+	}
 }

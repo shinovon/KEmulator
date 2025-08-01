@@ -42,12 +42,14 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			}
 			desc = desc.replaceAll(s4, s5);
 		}
-		if ("paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc) && Settings.patchSynchronizedPaint) {
+		if (Settings.patchSynchronizedPaint &&
+				"paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc)) {
 			if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
 				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
 				Emulator.getEmulator().getLogStream().println("Patched paint method: " + className);
 			}
-		} else if ("playerUpdate".equals(name) && "(Ljavax/microedition/media/Player;Ljava/lang/String;Ljava/lang/Object;)V".equals(desc)) {
+		} else if (Settings.patchSynchronizedPlayerUpdate &&
+				"playerUpdate".equals(name) && "(Ljavax/microedition/media/Player;Ljava/lang/String;Ljava/lang/Object;)V".equals(desc)) {
 			if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
 				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
 				Emulator.getEmulator().getLogStream().println("Patched playerUpdate method: " + className);

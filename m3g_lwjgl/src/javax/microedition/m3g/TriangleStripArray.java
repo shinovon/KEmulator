@@ -94,9 +94,7 @@ public class TriangleStripArray extends IndexBuffer {
 			}
 
 			int[] resIndexStrip = new int[stripLengths[index]];
-			if (this.stripLengths != null) {
-				System.arraycopy(super.indices, sumStripLengths, resIndexStrip, 0, stripLengths[index]);
-			}
+			System.arraycopy(super.indices, sumStripLengths, resIndexStrip, 0, stripLengths[index]);
 
 			return resIndexStrip;
 		} else {
@@ -127,6 +125,34 @@ public class TriangleStripArray extends IndexBuffer {
 		}
 
 		return false;
+	}
+
+	public void getIndices(int[] indices) {
+		int stripCount = stripLengths.length;
+		int k = 0, m = 0;
+
+		for (int i = 0; i < stripCount; i++) {
+			for (int j = 0; j < stripLengths[i] - 2; j++) {
+				if ((j & 1) == 0) {
+					indices[k++] = super.indices[m + 0];
+					indices[k++] = super.indices[m + 1];
+				} else {
+					indices[k++] = super.indices[m + 1];
+					indices[k++] = super.indices[m + 0];
+				}
+				indices[k++] = super.indices[m + 2];
+				m++;
+			}
+			m += 2;
+		}
+	}
+
+	public int getIndexCount() {
+		int count = 0, stripCount = stripLengths.length;
+		for (int i = 0; i < stripCount; i++) {
+			count += stripLengths[i] - 2;
+		}
+		return count * 3;
 	}
 
 	private void copyToNative() {

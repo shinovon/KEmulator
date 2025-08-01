@@ -100,7 +100,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		this.camera = new Camera();
 		this.cameraTransform = new Transform();
 		this.quaternion = new Quaternion();
-		this.memory = new Memory();
+		this.memory = Memory.getInstance();
 		this.m3gview = M3GView3D.getViewInstance();
 	}
 
@@ -154,8 +154,10 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
 	public final void method226() {
 		this.method543();
-		final Display current = Display.getCurrent();
-		this.shell.setLocation(current.getClientArea().width - this.shell.getSize().x >> 1, current.getClientArea().height - this.shell.getSize().y >> 1);
+		Display display = Display.getCurrent();
+		Rectangle clientArea = shell.getMonitor().getClientArea();
+		Point size = shell.getSize();
+		this.shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.setDefaultPreferences();
@@ -163,8 +165,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		new Thread(new Refresher(this)).start();
 		new Thread(new Flusher(this)).start();
 		while (!this.shell.isDisposed()) {
-			if (!current.readAndDispatch()) {
-				current.sleep();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 	}
@@ -184,7 +186,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	}
 
 	private void addM3GObjects() {
-		this.memory.method846();
+		this.memory.updateEverything();
 		this.aTree896.removeAll();
 
 		for (int i = 0; i < this.memory.m3gObjects.size(); ++i) {
@@ -831,7 +833,8 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				}
 				try {
 					Thread.sleep(10L);
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 			}
 		}
 
@@ -841,27 +844,25 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	}
 
 	final static class Refresher implements Runnable {
-		final M3GViewUI aClass90_830;
+		final M3GViewUI ui;
 
-		private Refresher(final M3GViewUI aClass90_830) {
+		private Refresher(final M3GViewUI ui) {
 			super();
-			this.aClass90_830 = aClass90_830;
+			this.ui = ui;
 		}
 
 		public final void run() {
-			while (aClass90_830.canvas != null) {
-				if (aClass90_830.canvas.isDisposed()) {
+			while (ui.canvas != null) {
+				if (ui.canvas.isDisposed()) {
 					return;
 				}
-				EmulatorImpl.syncExec(new Class10(this));
+				ui.canvas.getDisplay().syncExec(new Class10(this));
 				try {
 					Thread.sleep(10L);
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 			}
 		}
 
-		Refresher(final M3GViewUI class90, final M3GViewLightSceneListener class91) {
-			this(class90);
-		}
 	}
 }

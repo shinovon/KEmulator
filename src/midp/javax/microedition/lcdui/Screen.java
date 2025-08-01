@@ -1,17 +1,17 @@
 package javax.microedition.lcdui;
 
 import emulator.KeyMapping;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MenuItem;
+import emulator.lcdui.LCDUIUtils;
+import emulator.lcdui.TextUtils;
 
 import java.util.Vector;
 
 public abstract class Screen extends Displayable {
-	static final Font font;
-	static final int fontHeight;
-	static final int fontHeight4;
+	static final Font font = Font.getDefaultFont();
+	static final int fontHeight = font.getHeight();
+	static final int fontHeight4 = fontHeight + 4;
 	final Vector items;
-//	private long lastPressTime;
+	//	private long lastPressTime;
 	int scroll;
 
 	Screen() {
@@ -25,7 +25,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void _invokeKeyPressed(final int n) {
-		if (swtContent != null) return;
+		if (_isSWT()) return;
 //		final long currentTimeMillis;
 //		if ((currentTimeMillis = System.currentTimeMillis()) - this.lastPressTime < 100L) {
 //			return;
@@ -58,7 +58,7 @@ public abstract class Screen extends Displayable {
 	}
 
 	public void _invokeKeyRepeated(final int n) {
-		if (swtContent != null) return;
+		if (_isSWT()) return;
 		if (n == KeyMapping.getArrowKeyFromDevice(Canvas.UP)) {
 			_keyScroll(Canvas.UP, true);
 			return;
@@ -98,7 +98,6 @@ public abstract class Screen extends Displayable {
 	}
 
 	public boolean _invokePointerPressed(final int x, final int y) {
-		if (swtContent != null) return false;
 		return false;
 	}
 
@@ -111,14 +110,14 @@ public abstract class Screen extends Displayable {
 	protected abstract void _paint(final Graphics p0);
 
 	public void _invokePaint(final Graphics graphics) {
-		if (swtContent != null) return;
+		if (_isSWT()) return;
 		Displayable._resetXRayGraphics();
 		final int color = graphics.getColor();
 		final int strokeStyle = graphics.getStrokeStyle();
 		final Font font = graphics.getFont();
 		graphics.setFont(Screen.font);
 		graphics.setStrokeStyle(0);
-		emulator.lcdui.a.method177(graphics, 0, 0, super.w, super.h, false);
+		LCDUIUtils.drawDisplayableBackground(graphics, 0, 0, super.w, super.h, false);
 		this._drawTitleBar(graphics);
 		this._paint(graphics);
 		this._drawScrollBar(graphics);
@@ -130,21 +129,24 @@ public abstract class Screen extends Displayable {
 	}
 
 	protected void _drawTitleBar(final Graphics graphics) {
-		if (swtContent != null) return;
-		String title = super.title;
-		if (title == null)
-			title = "";
+		if (_isSWT()) return;
+		String title = super.title == null ? "" : super.title.trim();
 		final int n;
 		final String value = String.valueOf(n = ((focusedItem != null) ? (this.items.indexOf(focusedItem) + 1) : this.items.size()));
 		final int n2 = (Screen.fontHeight4 >> 1) - 1;
-		final int stringWidth = Screen.font.stringWidth(title);
 		final int stringWidth2 = Screen.font.stringWidth(value);
+		int w = super.w - stringWidth2 - 16 - Screen.font.stringWidth("...");
+		if (w > 16) {
+			String[] s = TextUtils.textArr(title, Screen.font, w, w);
+			title = s.length == 0 ? "" : (s.length != 1 ? s[0] + "..." : s[0]);
+		}
+		final int stringWidth = Screen.font.stringWidth(title);
 		final int n3 = (super.w - stringWidth >> 1) + 2;
 		final int n4 = super.w - stringWidth2 - 2;
 		graphics.setColor(8617456);
 		graphics.fillRect(2, n2, (super.w - stringWidth >> 1) - 2, 2);
 		graphics.fillRect(n3 + stringWidth + 2, n2, n4 - n3 - stringWidth - 4, 2);
-		graphics.setColor(-16777216);
+		graphics.setColor(LCDUIUtils.foregroundColor);
 		graphics.setFont(Screen.font);
 		graphics.drawString(title, n3, 1, 0);
 		graphics.drawString(value, n4, 1, 0);
@@ -153,45 +155,32 @@ public abstract class Screen extends Displayable {
 	protected void sizeChanged(final int w, final int h) {
 	}
 
-	protected void _drawScrollBar(final Graphics graphics) {
-		emulator.lcdui.a.method179(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
+	void _invokeSizeChanged(int w, int h, boolean b) {
+		super._invokeSizeChanged(w, h, b);
 	}
 
-	void swtUpdateMenuCommands(boolean item) {
-		if (focusedItem == null || !item) {
-			super.swtUpdateMenuCommands(false);
-			return;
-		}
-		for (MenuItem mi: swtMenu.getItems()) {
-			mi.dispose();
-		}
-		if (focusedItem instanceof ChoiceGroup && ((ChoiceGroup) focusedItem).choiceType == Choice.POPUP) {
-			for (int i = 0; i < ((ChoiceGroup) focusedItem).items.size(); i++) {
-				String s = ((ChoiceGroup) focusedItem).getString(i);
-				MenuItem mi = new MenuItem(swtMenu, SWT.RADIO);
-				mi.addSelectionListener(swtMenuSelectionListener);
-				mi.setData(focusedItem);
-				if (((ChoiceGroup) focusedItem).isSelected(i)) mi.setSelection(true);
-				mi.setText(s);
-			}
-		} else {
-			for (int i = 0; i < focusedItem.commands.size(); i++) {
-				Command c = (Command) focusedItem.commands.get(i);
-				MenuItem mi = new MenuItem(swtMenu, SWT.PUSH);
-				mi.addSelectionListener(swtMenuSelectionListener);
-				mi.setData(new Object[] {c, focusedItem});
-				mi.setText(c.getLongLabel());
-			}
-		}
+	protected void _drawScrollBar(final Graphics graphics) {
+		LCDUIUtils.drawScrollbar(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
 	}
 
 	public int _repaintInterval() {
 		return -1;
 	}
 
-	static {
-		font = Font.getDefaultFont();
-		fontHeight = Screen.font.getHeight();
-		fontHeight4 = Screen.fontHeight + 4;
+	public boolean _isSWT() {
+		return false;
+	}
+
+	public void _swtShown() {
+	}
+
+	public void _swtHidden() {
+	}
+
+	public void _swtUpdateSizes() {
+	}
+
+	public Object _getSwtContent() {
+		return null;
 	}
 }

@@ -164,51 +164,6 @@ public final class KeyMapping {
 		method606();
 	}
 
-	public static int fpsKey(int n) {
-		if (Settings.fpsGame == 2) {
-			//up
-			if (n == 'w') return getArrowKeyFromDevice(Canvas.UP);
-			//down
-			if (n == 's') return getArrowKeyFromDevice(Canvas.DOWN);
-
-			//num1
-			if (n == 'a') return 49;
-			//num3
-			if (n == 'd') return 51;
-			//num7
-			if (n == 'q') return 55;
-			//num9
-			if (n == 'e') return 57;
-			//num0
-			if (n == 'c') return 48;
-			//star
-			if (n == 'x') return 42;
-			//hash
-			if (n == 'z') return 35;
-		} else if (Settings.fpsGame == 3) {
-			//up
-			if (n == 'w') return getArrowKeyFromDevice(Canvas.UP);
-			//down
-			if (n == 's') return getArrowKeyFromDevice(Canvas.DOWN);
-
-			//num1
-			//if(n == 'a') return 49;
-			//num3
-			//if(n == 'd') return 51;
-			//num7
-			if (n == 'a' || n == 3) return 55;
-			//num9
-			if (n == 'd' || n == 4) return 57;
-			//num0
-			if (n == 'c') return 48;
-			//star
-			if (n == 'x') return 42;
-			//hash
-			if (n == 'z') return 35;
-		}
-		return 0;
-	}
-
 	public static String replaceKey(int n) {
 		if (n == 80) {
 			n = 13;
@@ -220,10 +175,6 @@ public final class KeyMapping {
 		final Object value;
 		if ((value = KeyMapping.deviceKeyToStr.get(String.valueOf(n))) != null) {
 			return (String) KeyMapping.strToPCKey.get(value);
-		}
-		if (Settings.fpsMode) {
-			int g = fpsKey(n);
-			if (g != 0) return String.valueOf(g);
 		}
 		final String method594;
 		if ((method594 = keyToString(String.valueOf(n))) == null) {

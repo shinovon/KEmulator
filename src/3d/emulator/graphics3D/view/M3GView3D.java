@@ -12,7 +12,7 @@ import emulator.graphics3D.m3g.LightsCache;
 import emulator.graphics3D.m3g.MeshMorph;
 import emulator.graphics3D.m3g.RenderObject;
 import emulator.graphics3D.m3g.RenderPipe;
-import emulator.ui.swt.EmulatorImpl;
+import emulator.ui.swt.SWTFrontend;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
@@ -42,8 +42,6 @@ public final class M3GView3D implements PaintListener, Runnable {
 	private int viewportHeight;
 	private float depthRangeNear;
 	private float depthRangeFar;
-	private static long canvasHandle;
-	private static long wglHandle;
 	private static Camera camera;
 	private static Transform cameraTransform = new Transform();
 	private static Vector lights = new Vector();
@@ -419,7 +417,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			glfwMakeContextCurrent(window);
 			getCapabilities();
 
-			EmulatorImpl.syncExec(this);
+			SWTFrontend.getDisplay().syncExec(this);
 		}
 		hints();
 
@@ -483,7 +481,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				var10 -= var8;
 			}
 		}
-		EmulatorImpl.syncExec(this);
+		SWTFrontend.getDisplay().syncExec(this);
 	}
 
 	public void run() {
@@ -794,6 +792,11 @@ public final class M3GView3D implements PaintListener, Runnable {
 				}
 
 				GL11.glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blendMode);
+
+				float[] blendColor = new float[4];
+				G3DUtils.fillFloatColor(blendColor, texture2D.getBlendColor());
+				blendColor[3] = 1.0F;
+				GL11.glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, memoryBuffers.getFloatBuffer(blendColor));
 
 				short texFormat = GL_RGB;
 				switch (image2D.getFormat()) {

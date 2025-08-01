@@ -2,7 +2,7 @@ package javax.microedition.media;
 
 import emulator.Emulator;
 import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.media.EmulatorMIDI;
 import emulator.media.tone.ToneControlImpl;
 import javazoom.jl.decoder.Header;
@@ -45,6 +45,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private long mediaTime;
 	private final Object playLock = new Object();
 	private Sequencer midiSequencer;
+	private Synthesizer midiSynthesizer;
 	private boolean stopped;
 	private InputStream inputStream;
 	private boolean realized;
@@ -101,7 +102,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		controls = new Control[]{toneControl, volumeControl};
 		try {
 			final byte[] b;
-			if ((b = emulator.media.amr.a.method476(CustomJarResources.getBytes(inputStream))) == null) {
+			if ((b = emulator.media.amr.a.method476(ResourceManager.getBytes(inputStream))) == null) {
 				throw new MediaException("Cannot parse AMR data");
 			}
 			if (Settings.enableMediaDump) data = b;
@@ -126,7 +127,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		WavCache key = null;
 		try {
 			if (inputStream instanceof ByteArrayInputStream || Settings.enableMediaDump) {
-				data = CustomJarResources.getBytes(inputStream);
+				data = ResourceManager.getBytes(inputStream);
 				if (Settings.wavCache) {
 					key = new WavCache(data);
 					synchronized (wavCache) {
@@ -182,7 +183,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 
 	private void midi(final InputStream inputStream) throws IOException {
 		try {
-			byte[] data = CustomJarResources.getBytes(inputStream);
+			byte[] data = ResourceManager.getBytes(inputStream);
 			if (Settings.enableMediaDump) this.data = data;
 			sequence = MidiSystem.getSequence(this.inputStream = new ByteArrayInputStream(data));
 		} catch (Exception e) {
@@ -234,12 +235,16 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence instanceof javazoom.jl.player.Player) {
 			((javazoom.jl.player.Player) sequence).close();
 		} else if (sequence instanceof Sequence) {
+			if (midiSynthesizer != null) {
+				midiSynthesizer.close();
+				midiSynthesizer = null;
+			}
 			if (midiSequencer != null) {
 				midiSequencer.close();
 				midiSequencer = null;
 			}
 			if (Settings.oneMidiAtTime) {
-				EmulatorMIDI.close();
+				EmulatorMIDI.close(false);
 			}
 		}
 //		else if (sequence instanceof Clip) {
@@ -464,7 +469,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					try {
 						InputStream i = inputStream;
 						if (i instanceof ByteArrayInputStream || Settings.enableMediaDump) {
-							data = CustomJarResources.getBytes(i);
+							data = ResourceManager.getBytes(i);
 							i = this.inputStream = new ByteArrayInputStream(data);
 						}
 						sequence = new javazoom.jl.player.Player(i, false);
@@ -577,7 +582,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 							} catch (Exception ignored) {}
 //                        throw new MediaException("MIDI is currently playing");
 						}
-						EmulatorMIDI.close();
+						EmulatorMIDI.close(false);
 					}
 					if (midiSequencer != null) {
 						midiSequencer.close();
@@ -836,10 +841,16 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 
 	private void initMidiSequencer() throws MidiUnavailableException {
 		if (midiSequencer != null) return;
-		midiSequencer = MidiSystem.getSequencer();
-		EmulatorMIDI.setupSequencer(midiSequencer);
-		midiSequencer.addMetaEventListener(this);
+		midiSequencer = MidiSystem.getSequencer(false);
+		if (EmulatorMIDI.useExternalReceiver()) {
+			EmulatorMIDI.setupSequencer(midiSequencer);
+		} else {
+			midiSynthesizer = MidiSystem.getSynthesizer();
+			midiSynthesizer.open();
+			midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
+		}
 		midiSequencer.open();
+		midiSequencer.addMetaEventListener(this);
 	}
 
 	public void meta(MetaMessage meta) {
@@ -852,6 +863,18 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		CRC32 crc = new CRC32();
 		crc.update(b);
 		return crc.getValue();
+	}
+
+	public String getReadableImplementationType() {
+		if(sequence == null)
+			return "Empty player";
+		if(sequence instanceof Sequence)
+			return "JVM MIDI";
+		if(sequence instanceof Clip)
+			return "JVM clip";
+		if(sequence instanceof javazoom.jl.player.Player)
+			return "javazoom";
+		return "MMAPI/unknown";
 	}
 
 	static class WavCache implements LineListener {

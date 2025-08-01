@@ -1,20 +1,15 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
-import emulator.debug.Memory;
-import emulator.debug.MemoryViewImage;
-import emulator.graphics2D.awt.ImageAWT;
+import emulator.debug.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -23,1047 +18,717 @@ import org.eclipse.swt.widgets.*;
 import javax.microedition.lcdui.Image;
 import java.util.*;
 
-public final class MemoryView implements DisposeListener {
+public final class MemoryView implements DisposeListener, ControlListener {
 	private Shell shell;
-	private Button aButton1081;
-	private Button aButton1104;
-	private CLabel aCLabel1082;
-	private Text aText1087;
-	private CLabel aCLabel1105;
-	private CLabel aCLabel1114;
-	private CLabel bytecodeSizeLbl;
-	private CLabel objectsSizeLbl;
-	private CLabel aCLabel1128;
-	private CLabel totalmemLbl;
-	private CLabel aCLabel1136;
-	private CLabel aCLabel1140;
-	private Display display;
-	private Memory memoryMgr;
+	public final Memory memoryMgr = Memory.getInstance();
 	private boolean visible;
-	private TabFolder aTabFolder1097;
-	private Composite aComposite1098;
-	private Composite audioControlComp;
-	private CLabel aCLabel1143;
-	private Combo imageScaleCombo;
-	private CLabel aCLabel1146;
-	private Combo aCombo1107;
-	private Button aButton1115;
-	private Button aButton1121;
-	private Button aButton1125;
-	private Button aButton1129;
-	private Button aButton1133;
-	private Button aButton1137;
-	private Button aButton1141;
-	private Canvas aCanvas1095;
-	private SashForm aSashForm1083;
-	private Composite aComposite1116;
-	private SashForm aSashForm1103;
-	private Table table;
+	private Composite imagesPanel;
+	private ImageViewControls imageControls;
+	private MemoryViewControls memoryControls;
+	private Canvas imagesCanvas;
+	private SashForm horizontalSeparator;
+	private Composite memoryPanel;
 	private Table classTable;
-	private CLabel aCLabel1149;
-	private CLabel aCLabel1152;
-	private double imageScaling;
-	private int anInt1109;
-	private boolean aBoolean1111;
-	private Menu aMenu1084;
-	private Menu aMenu1113;
-	private int anInt1117;
-	private int bytecodeSize;
-	private int objectsSize;
-	private int anInt1130;
-	private static Object anObject1086;
-	private static Vector aVector1099;
-	private static ArrayList anArrayList1090;
-	private int anInt1134;
-	private boolean aBoolean1118;
-	private int anInt1138;
-	private int anInt1142;
-	private int anInt1144;
-	private int anInt1147;
-	private boolean aBoolean1123;
-	private boolean aBoolean1127;
-	private boolean aBoolean1131;
-	private boolean aBoolean1135;
-	private boolean imgSelected;
-	private int anInt1150;
-	private Hashtable aHashtable1091;
-	private Image anImage1088;
-	private ArrayList anArrayList1110;
-	private Vector classRefsVector;
-	private AutoUpdate aClass88_1100;
-	private Thread autoUpdateThread;
-	private Button startAudioBtn;
-	private Button stopAudioBtn;
-	private CLabel aCLabel1153;
-	private Scale aScale1089;
-	private CLabel aCLabel1154;
-	private Table soundsTable;
-	private CLabel aCLabel1155;
-	private ProgressBar aProgressBar1092;
-	private Button pauseAudioBtn;
-	private CLabel jvmmem1Label;
-	private CLabel jvmmemLabel;
+	private Table objectsTable;
+	private double imageScaling = 1d;
+	private int imagesSortingMethod;
+	private boolean sortImagesByAscending;
+	private static final Object updateLock = new Object();
+	static final Vector<Image> allImages = new Vector();
+	static final ArrayList<ImageViewItem> imagesToShow = new ArrayList<>();
+	int imagesCanvasScroll;
+	private boolean imagesDrawn = true;
+	private boolean imagesNeverDrawn = true;
+	private boolean showReleasedImages = false;
+	private boolean show2dImages = true;
+	private boolean show3dImages = true;
+	private boolean darkenUnused = false;
+	private boolean displayPkgNames = true;
+
+	private boolean drawImagesInfo = false;
+	private Object selectedObject;
+	private ArrayList<String> classesList = new ArrayList<>();
+	private AutoUpdate autoUpdater;
 	private int sortColumn = -1;
-	private Button exportAudioBtn;
 
-	public MemoryView() {
-		super();
-		this.shell = null;
-		this.aButton1081 = null;
-		this.aButton1104 = null;
-		this.aCLabel1082 = null;
-		this.aText1087 = null;
-		this.aCLabel1105 = null;
-		this.aCLabel1114 = null;
-		this.bytecodeSizeLbl = null;
-		this.objectsSizeLbl = null;
-		this.aCLabel1128 = null;
-		this.totalmemLbl = null;
-		this.aCLabel1136 = null;
-		this.aCLabel1140 = null;
-		this.aTabFolder1097 = null;
-		this.aComposite1098 = null;
-		this.audioControlComp = null;
-		this.aCLabel1143 = null;
-		this.imageScaleCombo = null;
-		this.aCLabel1146 = null;
-		this.aCombo1107 = null;
-		this.aButton1115 = null;
-		this.aButton1121 = null;
-		this.aButton1125 = null;
-		this.aButton1129 = null;
-		this.aButton1133 = null;
-		this.aButton1137 = null;
-		this.aButton1141 = null;
-		this.aCanvas1095 = null;
-		this.aSashForm1083 = null;
-		this.aComposite1116 = null;
-		this.aSashForm1103 = null;
-		this.table = null;
-		this.classTable = null;
-		this.aCLabel1149 = null;
-		this.aCLabel1152 = null;
-		this.aBoolean1123 = true;
-		this.aBoolean1127 = true;
-		this.aHashtable1091 = new Hashtable();
-		this.startAudioBtn = null;
-		this.stopAudioBtn = null;
-		this.aCLabel1153 = null;
-		this.aScale1089 = null;
-		this.aCLabel1154 = null;
-		this.soundsTable = null;
-		this.aCLabel1155 = null;
-		this.aProgressBar1092 = null;
-		this.pauseAudioBtn = null;
-		this.display = EmulatorImpl.getDisplay();
-		this.memoryMgr = new Memory();
-		this.classRefsVector = new Vector();
-		this.anArrayList1110 = new ArrayList();
-	}
+	public static final String SHELL_TYPE = "MEMORY_VIEW";
+	private Group objectPaths;
+	private Composite objectPathsContainer;
 
-	public final void open() {
-		this.method665();
-		this.shell.setLocation(this.display.getClientArea().width - this.shell.getSize().x >> 1, this.display.getClientArea().height - this.shell.getSize().y >> 1);
-		this.shell.open();
-		this.shell.addDisposeListener(this);
-		this.method692();
-		this.visible = true;
-		while (!this.shell.isDisposed()) {
-			if (!this.display.readAndDispatch()) {
-				this.display.sleep();
+	public void open() {
+		createShell();
+		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
+		shell.setLocation(
+				clientArea.x + (int) (clientArea.height * 0.025), //- this.shell.getSize().x >> 3,
+				clientArea.y + (int) (clientArea.height * 0.025)// - this.shell.getSize().y >> 2
+		);
+		shell.open();
+		shell.addDisposeListener(this);
+		updateEverything();
+		visible = true;
+		Display display = shell.getDisplay();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 		Settings.showMemViewFrame = false;
-		if (this.autoUpdateThread != null && this.autoUpdateThread.isAlive()) {
-			this.autoUpdateThread.interrupt();
-		}
-		this.memoryMgr.aVector1463.clear();
+		if (autoUpdater != null)
+			autoUpdater.stopThread();
+		this.memoryMgr.releasedImages.clear();
 		this.visible = false;
 	}
 
-	public final void dispose() {
+	public void dispose() {
 		if (this.shell != null && !this.shell.isDisposed()) {
 			this.shell.dispose();
 		}
 		this.visible = false;
 	}
 
-	public final boolean isShown() {
+	public boolean isShown() {
 		return this.visible;
 	}
 
-	private void method665() {
-		final GridData gridData;
-		(gridData = new GridData()).horizontalAlignment = 4;
-		gridData.verticalAlignment = 2;
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.verticalAlignment = 2;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 4;
-		layoutData2.verticalAlignment = 2;
-		final GridData layoutData3;
-		(layoutData3 = new GridData()).horizontalAlignment = 4;
-		layoutData3.verticalAlignment = 2;
-		final GridData layoutData4;
-		(layoutData4 = new GridData()).horizontalSpan = 2;
-		layoutData4.verticalAlignment = 2;
-		layoutData4.grabExcessHorizontalSpace = false;
-		layoutData4.horizontalAlignment = 4;
-		final GridData gridData2;
-		(gridData2 = new GridData()).horizontalAlignment = 4;
-		gridData2.grabExcessHorizontalSpace = false;
-		gridData2.verticalAlignment = 2;
-		final GridData gridData3;
-		(gridData3 = new GridData()).horizontalAlignment = 4;
-		gridData3.grabExcessHorizontalSpace = false;
-		gridData3.verticalAlignment = 2;
-		final GridData gridData4;
-		(gridData4 = new GridData()).horizontalAlignment = 4;
-		gridData4.grabExcessHorizontalSpace = false;
-		gridData4.horizontalSpan = 3;
-		gridData4.verticalAlignment = 2;
-		final GridData layoutData5;
-		(layoutData5 = new GridData()).horizontalAlignment = 4;
-		layoutData5.grabExcessHorizontalSpace = false;
-		layoutData5.horizontalIndent = 0;
-		layoutData5.verticalAlignment = 2;
-		final GridData layoutData6;
-		(layoutData6 = new GridData()).verticalAlignment = 2;
-		layoutData6.verticalSpan = 1;
-		layoutData6.grabExcessHorizontalSpace = false;
-		layoutData6.horizontalAlignment = 4;
-		final GridData gridData7;
-		(gridData7 = new GridData()).horizontalAlignment = 4;
-		gridData7.grabExcessHorizontalSpace = false;
-		gridData7.verticalAlignment = 2;
-		final GridData gridData8;
-		(gridData8 = new GridData()).horizontalAlignment = 4;
-		gridData8.grabExcessHorizontalSpace = false;
-		gridData8.verticalAlignment = 2;
-		final GridData gridData9;
-		(gridData9 = new GridData()).verticalAlignment = 2;
-		gridData9.grabExcessHorizontalSpace = false;
-		gridData9.horizontalAlignment = 4;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 7;
-		(this.shell = new Shell(1264)).setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
+	private void createShell() {
+		final int shellStyle = SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN;
+		shell = new Shell(shellStyle);
+		shell.setText(UILocale.get("MEMORY_VIEW_TITLE", "MemoryView"));
 		this.shell.setImage(new org.eclipse.swt.graphics.Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.shell.setLayout(layout);
-		(this.shell).setSize(new Point(740, 466));
-		(this.aButton1081 = new Button(this.shell, 8388608)).setText(" " + UILocale.get("MEMORY_VIEW_UPDATE", "Update") + " ");
-		(this.aButton1081).setLayoutData(layoutData6);
-		this.aButton1081.addSelectionListener(new Class129(this));
-		(this.aButton1104 = new Button(this.shell, 32)).setText(UILocale.get("MEMORY_VIEW_AUTO_UPDATE", "AutoUpdate"));
-		(this.aButton1104).setLayoutData(layoutData4);
-		this.aButton1104.addSelectionListener(new Class70(this));
-		(this.aCLabel1105 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_BYTECODE_SIZE", "ByteCode Size:"));
-		(this.aCLabel1105).setLayoutData(layoutData);
-		(this.bytecodeSizeLbl = new CLabel(this.shell, 0)).setText("0              bytes");
-		(this.bytecodeSizeLbl).setLayoutData(gridData3);
-		(this.aCLabel1128 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_TOTALMEM_SIZE", "Total Memory Used:"));
-		(this.aCLabel1128).setLayoutData(gridData);
-		(this.totalmemLbl = new CLabel(this.shell, 0)).setText("0");
-		(this.totalmemLbl).setLayoutData(gridData2);
+		this.shell.setLayout(new GridLayout(1, true));
+		shell.setData("TYPE", SHELL_TYPE);
+		shell.setMinimumSize(320, 300);
 
+		Rectangle clientArea = ((EmulatorScreen) Emulator.getEmulator().getScreen()).getShell().getMonitor().getClientArea();
+		this.shell.setSize(
+				(int) (clientArea.width * 0.4),
+				(int) (clientArea.height * 0.95)
+		);
 
-		Button gcButton = new Button(shell, SWT.PUSH);
-		gcButton.setText("GC");
-		gcButton.setLayoutData(gridData9);
-		gcButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent selectionEvent) {
-				System.gc();
-			}
-		});
-		(this.aCLabel1082 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_INTERVAL", "Interval(milli sec):"));
-		(this.aCLabel1082).setLayoutData(layoutData3);
-		(this.aText1087 = new Text(this.shell, 2048)).setText("1000");
-		(this.aText1087).setLayoutData(layoutData5);
-		(this.aCLabel1114 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_OBJECT_SIZE", "Objects Size:"));
-		this.aCLabel1114.setLayoutData(layoutData2);
-		(this.objectsSizeLbl = new CLabel(this.shell, 0)).setText("0");
-		this.objectsSizeLbl.setLayoutData(gridData7);
-		(this.aCLabel1136 = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_MAX_OBJECT_SIZE", "Max Objects Size:"));
-		this.aCLabel1136.setLayoutData(gridData);
-		(this.aCLabel1140 = new CLabel(this.shell, 0)).setText("0");
-		this.aCLabel1140.setLayoutData(gridData2);
-		(this.jvmmem1Label = new CLabel(this.shell, 0)).setText(UILocale.get("MEMORY_VIEW_JVM_MEMORY", "Real usage:"));
-		(this.jvmmemLabel = new CLabel(this.shell, 0)).setText("0");
-		this.jvmmemLabel.setLayoutData(gridData8);
-		this.method687();
+		final GridData controlsLayout = new GridData();
+		controlsLayout.horizontalAlignment = 4;
+		controlsLayout.grabExcessHorizontalSpace = true;
+		controlsLayout.verticalAlignment = 4;
+		memoryControls = new MemoryViewControls(shell, this);
+		memoryControls.setLayoutData(controlsLayout);
+
+		this.createSeparator();
 	}
 
-	private void method672() {
-		this.aTabFolder1097 = new TabFolder(this.aSashForm1083, 0);
-		this.method677();
-		this.method681();
-		final TabItem tabItem;
-		(tabItem = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_IMAGES", "Images"));
-		tabItem.setControl(this.aComposite1098);
-		final TabItem tabItem2;
-		(tabItem2 = new TabItem(this.aTabFolder1097, 0)).setText(UILocale.get("MEMORY_VIEW_SOUNDS", "Sounds"));
-		tabItem2.setControl(this.audioControlComp);
-	}
-
-	private void method677() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalSpan = 2;
-		layoutData.verticalAlignment = 2;
+	private void createSeparator() {
+		final GridData layoutData = new GridData();
 		layoutData.horizontalAlignment = 4;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 7;
-		layout.marginHeight = 2;
-		layout.marginWidth = 0;
-		(this.aComposite1098 = new Composite(this.aTabFolder1097, 0)).setLayout(layout);
-		(this.aCLabel1143 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_ZOOM", "Zoom:"));
-		this.method684();
-		(this.aCLabel1146 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SORT", "Sort:"));
-		this.method685();
-		(this.aButton1121 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_IMAGES_DRAWN", "Images Drawn"));
-		this.aButton1121.setSelection(true);
-		this.aButton1121.addSelectionListener(new Class144(this));
-		(this.aButton1129 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_UNUSED_REGION", "Darken Unused Regions"));
-		this.aButton1129.addSelectionListener(new Class125(this));
-		(this.aButton1137 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_RESET_IMAGE", "Reset Image Usage"));
-		this.aButton1137.addSelectionListener(new Class123(this));
-		(this.aCLabel1149 = new CLabel(this.aComposite1098, 0)).setText(UILocale.get("MEMORY_VIEW_SIZE", "Size") + ":");
-		(this.aCLabel1152 = new CLabel(this.aComposite1098, 0)).setText("");
-		this.aCLabel1152.setLayoutData(layoutData);
-		(this.aButton1115 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_ASCEND", "Ascending"));
-		this.aButton1115.setEnabled(true);
-		this.aButton1115.setSelection(true);
-		this.aBoolean1111 = true;
-		this.aButton1115.addSelectionListener(new Class66(this));
-		(this.aButton1125 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_IMAGE_NEVER_DRAW", "Images Never Drawn"));
-		this.aButton1125.setSelection(true);
-		this.aButton1125.addSelectionListener(new Class69(this));
-		(this.aButton1133 = new Button(this.aComposite1098, 32)).setText(UILocale.get("MEMORY_VIEW_RELEASED_IMAGES", "Released Images"));
-		this.aButton1133.setEnabled(Settings.recordReleasedImg);
-		this.aButton1133.addSelectionListener(new Class68(this));
-		(this.aButton1141 = new Button(this.aComposite1098, 8388608)).setText(UILocale.get("MEMORY_VIEW_CLEAR_RELEASED_IMAGES", "Clear Released Images"));
-		this.aButton1141.setEnabled(Settings.recordReleasedImg);
-		this.aButton1141.addSelectionListener(new Class71(this));
-		this.method686();
-	}
-
-	private void method681() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalSpan = 8;
 		layoutData.verticalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
-		layoutData.horizontalAlignment = 4;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 9;
-		(this.audioControlComp = new Composite(this.aTabFolder1097, 0)).setLayout(layout);
-		(this.startAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_START", "Start"));
-		(this.pauseAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_PAUSE", "Pause"));
-		this.pauseAudioBtn.addSelectionListener(new Class28(this));
-		this.startAudioBtn.addSelectionListener(new Class7(this));
-		(this.stopAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_STOP", "Stop"));
-		this.stopAudioBtn.addSelectionListener(new Class27(this));
-		(this.aCLabel1153 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_VOLUME", "Volume:"));
-		(this.aCLabel1154 = new CLabel(this.audioControlComp, 0)).setText("0   ");
-		(this.aScale1089 = new Scale(this.audioControlComp, 0)).addSelectionListener(new Class21(this));
-		(this.aCLabel1155 = new CLabel(this.audioControlComp, 0)).setText(UILocale.get("MEMORY_VIEW_SOUND_PROGRESS", "Progress:"));
-		(this.aProgressBar1092 = new ProgressBar(this.audioControlComp, 65536)).setSelection(0);
+		layoutData.grabExcessHorizontalSpace = true;
 
-		(this.exportAudioBtn = new Button(this.audioControlComp, 8388608)).setText(UILocale.get("MEMORY_VIEW_SOUND_EXPORT", "Export"));
-		this.exportAudioBtn.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(final SelectionEvent selectionEvent) {
-				Object value;
-				if (soundsTable.getSelectionIndex() != -1 &&
-						soundsTable.getSelectionIndex() < memoryMgr.players.size() &&
-						(value = memoryMgr.players.get(soundsTable.getSelectionIndex())) != null) {
-					Memory.playerAct(value, 3);
-				}
-			}
-		});
-		final Color foreground = new Color(Display.getCurrent(), 217, 108, 0);
-		this.aProgressBar1092.setForeground(foreground);
-		foreground.dispose();
-		(this.soundsTable = new Table(this.audioControlComp, 67584)).setHeaderVisible(true);
-		this.soundsTable.setLayoutData(layoutData);
-		this.soundsTable.setLinesVisible(true);
-		this.soundsTable.addSelectionListener(new Class24(this));
+		horizontalSeparator = new SashForm(this.shell, 0);
+		horizontalSeparator.setOrientation(SWT.VERTICAL);
+		this.horizontalSeparator.setSashWidth(5);
+		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+		this.horizontalSeparator.setLayoutData(layoutData);
+
+		createMemoryView();
+		createImagesView();
+
+		horizontalSeparator.setWeights(new int[]{4, 6});
+	}
+
+	private void createMemoryView() {
+		SashForm memoryPanel = new SashForm(this.horizontalSeparator, 0);
+
+		classTable = new Table(memoryPanel, 67584);
+		classTable.setHeaderVisible(true);
+		classTable.setLinesVisible(true);
+		TableListener tl = new TableListener(this);
+		classTable.addSelectionListener(tl);
+		classTable.addMouseListener(tl);
 		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
-		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn2.setText(UILocale.get("MEMORY_VIEW_CONTENT_TYPE", "ContentType"));
-		final TableColumn tableColumn3;
-		(tableColumn3 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn3.setText(UILocale.get("MEMORY_VIEW_STATE", "State"));
-		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn4.setText(UILocale.get("MEMORY_VIEW_LOOP_COUNT", "LoopCount"));
-		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.soundsTable, 0)).setWidth(100);
-		tableColumn5.setText(UILocale.get("MEMORY_VIEW_DATA_SIZE", "DataSize"));
-	}
-
-	private void method684() {
-		this.imageScaleCombo = new Combo(this.aComposite1098, 8);
-		this.imageScaleCombo.add("50%");
-		this.imageScaleCombo.add("100%");
-		this.imageScaleCombo.add("200%");
-		this.imageScaleCombo.add("300%");
-		this.imageScaleCombo.add("400%");
-		this.imageScaleCombo.setText("100%");
-		this.imageScaling = 1;
-		this.imageScaleCombo.addModifyListener(new Class35(this));
-	}
-
-	private void method685() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 1;
-		layoutData.grabExcessHorizontalSpace = false;
-		layoutData.verticalAlignment = 2;
-		(this.aCombo1107 = new Combo(this.aComposite1098, 8)).setEnabled(true);
-		this.aCombo1107.setLayoutData(layoutData);
-		this.aCombo1107.add(UILocale.get("MEMORY_VIEW_SORT_REFERENCE", "Reference"));
-		this.aCombo1107.add(UILocale.get("MEMORY_VIEW_SORT_SIZE", "Size"));
-		this.aCombo1107.add(UILocale.get("MEMORY_VIEW_SORT_DRAW_COUNT", "Draw Count"));
-		this.aCombo1107.setText(UILocale.get("MEMORY_VIEW_SORT_REFERENCE", "Reference"));
-		this.anInt1109 = 0;
-		this.aCombo1107.addModifyListener(new Class22(this));
-	}
-
-	private void method686() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 7;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
-		((this.aCanvas1095 = new Canvas(this.aComposite1098, 537135616))).setLayout(null);
-		this.aCanvas1095.setLayoutData(layoutData);
-		this.aCanvas1095.addPaintListener(new Class26(this));
-		this.aCanvas1095.addMouseListener(new Class25(this));
-		this.aCanvas1095.getVerticalBar().addSelectionListener(new Class23(this));
-		this.aMenu1084 = new Menu(this.shell, 8);
-		final MenuItem menuItem;
-		(menuItem = new MenuItem(this.aMenu1084, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_AS", "Save As..."));
-		menuItem.addSelectionListener(new Class36(this));
-		this.aMenu1113 = new Menu(this.shell, 8);
-		final MenuItem menuItem2;
-		(menuItem2 = new MenuItem(this.aMenu1113, 8)).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Save All Images..."));
-		menuItem2.addSelectionListener(new Class33(this));
-	}
-
-	private void method687() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalSpan = 7;
-		layoutData.horizontalAlignment = 4;
-		layoutData.verticalAlignment = 4;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.grabExcessHorizontalSpace = true;
-		(this.aSashForm1083 = new SashForm(this.shell, 0)).setOrientation(512);
-		this.aSashForm1083.setLayoutData(layoutData);
-		this.method688();
-		this.method672();
-		this.aSashForm1083.setWeights(new int[]{4, 6});
-	}
-
-	private void method688() {
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 1;
-		this.aComposite1116 = new Composite(this.aSashForm1083, 0);
-		this.method689();
-		this.aComposite1116.setLayout(layout);
-	}
-
-	private void method689() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
-		(this.aSashForm1103 = new SashForm(this.aComposite1116, 0)).setLayoutData(layoutData);
-		(this.table = new Table(this.aSashForm1103, 67584)).setHeaderVisible(true);
-		this.table.setLinesVisible(true);
-		this.table.addSelectionListener(new Class34(this));
-		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.table, 0)).setWidth(100);
+		(tableColumn = new TableColumn(this.classTable, 0)).setWidth(170);
 		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
 		tableColumn.addSelectionListener(new Class31(this));
 		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.table, 0)).setWidth(100);
+		(tableColumn2 = new TableColumn(this.classTable, 0)).setWidth(70);
 		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
 		tableColumn2.addSelectionListener(new Class140(this));
 		final TableColumn tableColumn3;
-		(tableColumn3 = new TableColumn(this.table, 0)).setWidth(100);
+		(tableColumn3 = new TableColumn(this.classTable, 0)).setWidth(100);
 		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
 		tableColumn3.addSelectionListener(new Class17(this));
-		(this.classTable = new Table(this.aSashForm1103, 67584)).setHeaderVisible(true);
-		this.classTable.setLinesVisible(true);
-		this.classTable.addSelectionListener(new Class19(this));
-		this.classTable.addMouseListener(new Class13(this));
+
+		SashForm objectsPanel = new SashForm(memoryPanel, 0);
+		objectsPanel.setOrientation(SWT.VERTICAL);
+
+		objectsTable = new Table(objectsPanel, 67584);
+		objectsTable.setHeaderVisible(true);
+		this.objectsTable.setLinesVisible(true);
+		ObjectsTableListener otl = new ObjectsTableListener(this);
+		this.objectsTable.addSelectionListener(otl);
+		this.objectsTable.addMouseListener(otl);
 		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn4 = new TableColumn(this.objectsTable, 0)).setWidth(230);
 		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
 		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn5 = new TableColumn(this.objectsTable, 0)).setWidth(70);
 		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
 		final TableColumn tableColumn6;
-		(tableColumn6 = new TableColumn(this.classTable, 0)).setWidth(100);
+		(tableColumn6 = new TableColumn(this.objectsTable, 0)).setWidth(100);
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
+
+		// borders
+		objectPaths = new Group(objectsPanel, SWT.NONE);
+		objectPaths.setLayout(new GridLayout(1, false));
+		objectPaths.addControlListener(this);
+		// inner scroll
+		ScrolledComposite sc = new ScrolledComposite(objectPaths, SWT.V_SCROLL);
+		final GridData gd = new GridData();
+		gd.horizontalAlignment = 4;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = true;
+		gd.verticalAlignment = 4;
+		sc.setLayoutData(gd);
+		// scrolled content
+		objectPathsContainer = new Composite(sc, 0);
+		objectPathsContainer.setLayout(new GridLayout(1, false));
+		sc.setContent(objectPathsContainer);
+		clearObjectPaths();
+
+		objectsPanel.setWeights(new int[]{8, 2});
 	}
 
-	private void method690() {
-		if (this.aBoolean1118) {
-			return;
-		}
-		this.aBoolean1118 = true;
-		try {
-			this.memoryMgr.method846();
-			this.method694();
-			this.bytecodeSize = Memory.bytecodeSize();
-			this.objectsSize = this.memoryMgr.objectsSize();
-			this.anInt1130 = Math.max(this.anInt1130, this.objectsSize);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} catch (Error ex) {
-			ex.printStackTrace();
-		}
-		this.aBoolean1118 = false;
+	private void createImagesView() {
+		final GridLayout layout = new GridLayout(1, true);
+		layout.marginHeight = 2;
+		layout.marginWidth = 0;
+
+		this.imagesPanel = new Composite(this.horizontalSeparator, 0);
+		imagesPanel.setLayout(layout);
+
+		imageControls = new ImageViewControls(imagesPanel, this);
+		final GridData controlsLayout = new GridData();
+		controlsLayout.horizontalAlignment = 4;
+		controlsLayout.grabExcessHorizontalSpace = true;
+		controlsLayout.verticalAlignment = 4;
+		imageControls.setLayoutData(controlsLayout);
+
+		final GridData canvasLayout = new GridData();
+		canvasLayout.horizontalAlignment = 4;
+		canvasLayout.grabExcessHorizontalSpace = true;
+		canvasLayout.grabExcessVerticalSpace = true;
+		canvasLayout.verticalAlignment = 4;
+
+		imagesCanvas = new Canvas(this.imagesPanel, 537135616);
+		imagesCanvas.setLayout(null);
+		this.imagesCanvas.setLayoutData(canvasLayout);
+		ImagesCanvasListener listener = new ImagesCanvasListener(this, imagesCanvas);
+		this.imagesCanvas.addPaintListener(listener);
+		this.imagesCanvas.addMouseListener(listener);
+		this.imagesCanvas.getVerticalBar().addSelectionListener(listener);
+
+		Menu menuSave = new Menu(this.shell, 8);
+		final MenuItem menuItem = new MenuItem(menuSave, 8);
+		menuItem.setText(UILocale.get("MEMORY_VIEW_SAVE_ONE", "Export selected image"));
+		menuItem.addSelectionListener(new SaveImageListener(this));
+		final MenuItem menuItem2 = new MenuItem(menuSave, 8);
+		menuItem2.setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Export all images"));
+		menuItem2.addSelectionListener(new SaveAllImagesListener(this));
+
+		imagesCanvas.setMenu(menuSave);
 	}
 
-	private void method691() {
-		if (this.shell.isDisposed()) {
-			return;
-		}
-		try {
-			if (this.aTabFolder1097.getSelectionIndex() == 0) {
-				this.aCanvas1095.redraw();
-			} else {
-				this.method695();
-			}
-			this.method696();
-		} catch (Exception ignored) {
-		}
-		this.bytecodeSizeLbl.setText(this.bytecodeSize + " bytes");
-		this.objectsSizeLbl.setText(this.objectsSize + " bytes");
-		this.totalmemLbl.setText(this.bytecodeSize + this.objectsSize + " bytes");
-		this.aCLabel1140.setText(this.anInt1130 + " bytes");
-		long t = Runtime.getRuntime().totalMemory();
-		long f = Runtime.getRuntime().freeMemory();
-		this.jvmmemLabel.setText(((t - f) / 1024L) + "/" + (t / 1024L) + " kb");
-		sort();
-	}
-
-	private void method692() {
-		this.method690();
-		this.method691();
-
-	}
-
-	private void method693() {
-		synchronized (MemoryView.anObject1086) {
-			Collections.sort((java.util.List<Object>) MemoryView.anArrayList1090, new Class15(this));
-		}
-	}
-
-	private void method694() {
-		synchronized (MemoryView.anObject1086) {
-			final int size = this.memoryMgr.images.size();
-			final int n = this.memoryMgr.images.size() + (this.aBoolean1131 ? this.memoryMgr.aVector1463.size() : 0);
-			MemoryView.aVector1099.clear();
-			MemoryView.anArrayList1090.clear();
-			for (int i = 0; i < n; ++i) {
-				Image image;
-				try {
-					if (i < size) {
-						image = (Image) this.memoryMgr.images.get(i);
-					} else {
-						image = (Image) this.memoryMgr.aVector1463.get(i - size);
-					}
-				} catch (Exception ex) {
-					break;
-				}
-				MemoryView.aVector1099.add(image);
-				if (i < size && (image.getUsedCount() <= 0 || !this.aBoolean1123)) {
-					if (image.getUsedCount() != 0) {
-						continue;
-					}
-					if (!this.aBoolean1127) {
-						continue;
-					}
-				}
-				MemoryView.anArrayList1090.add(image);
-			}
-			this.anInt1134 = size;
-		}
-		this.method693();
-	}
-
-	private boolean method628(final int n, final int n2) {
-		final Enumeration<Rectangle> keys = this.aHashtable1091.keys();
-		while (keys.hasMoreElements()) {
-			final Rectangle rectangle;
-			if ((rectangle = keys.nextElement()).contains(n, n2)) {
-				this.anImage1088 = (Image) this.aHashtable1091.get(rectangle);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void method636(final GC gc) {
-		int n = 12 - this.anInt1147;
-		int n2 = 10;
-		int max = 0;
-		this.anInt1144 = 0;
-		final Color background = new Color(null, 151, 150, 147);
-		final Color color = new Color(null, 255, 0, 0);
-		final Color color2 = new Color(null, 0, 0, 0);
-		final Color color3 = new Color(null, 0, 255, 0);
-		final Color foreground = new Color(null, 0, 0, 255);
-		gc.setBackground(background);
-		gc.fillRectangle(0, 0, this.anInt1138, this.anInt1142);
-		this.anInt1117 = 0;
-		this.aHashtable1091.clear();
-		for (int size = MemoryView.anArrayList1090.size(), i = 0; i < size; ++i) {
-			Image image;
+	private void updateModel() {
+		synchronized (MemoryView.updateLock) {
 			try {
-				image = (Image) MemoryView.anArrayList1090.get(i);
-			} catch (Exception ex) {
-				break;
+				this.memoryMgr.updateEverything();
+				this.updateImagesList();
+			} catch (Throwable ex) {
+				ex.printStackTrace();
 			}
-			final int n3 = (int) (image.getWidth() * this.imageScaling);
-			final int n4 = (int) (image.getHeight() * this.imageScaling);
-			if (n2 + n3 + 30 > this.anInt1138) {
-				n2 = 10;
-				n += max + 12;
-				max = 0;
+		}
+	}
+
+	public void updateView() {
+		if (this.shell.isDisposed())
+			return;
+		try {
+			this.imagesCanvas.redraw();
+			this.updateClassesView();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		memoryControls.refreshStats();
+		resortClasses();
+	}
+
+	public void updateEverything() {
+		this.updateModel();
+		this.updateView();
+	}
+
+	public void resortImages() {
+		synchronized (MemoryView.updateLock) {
+			MemoryView.imagesToShow.sort(new ImagesComparator(this));
+		}
+	}
+
+	private void updateImagesList() {
+		synchronized (MemoryView.updateLock) {
+			MemoryView.allImages.clear();
+			MemoryView.imagesToShow.clear();
+			synchronized (this.memoryMgr) {
+				for (Image image : this.memoryMgr.images) {
+					allImages.add(image);
+					boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
+					if (!add)
+						continue;
+					ImageViewItem i = new ImageViewItem(image, false);
+					boolean add2 = (show2dImages && i.type == MemoryViewImageType.LCDUI) || (show3dImages && i.type != MemoryViewImageType.LCDUI);
+					if (add2)
+						MemoryView.imagesToShow.add(i);
+
+				}
 			}
-			Label_0547:
-			{
-				if (n + n4 <= 0) {
-					if (n <= this.anInt1142) {
-						break Label_0547;
-					}
+			if (showReleasedImages) {
+				for (Image image : this.memoryMgr.releasedImages) {
+					allImages.add(image);
+					MemoryView.imagesToShow.add(new ImageViewItem(image, true));
 				}
-				try {
-					if (Settings.g2d == 1) {
-						((ImageAWT) image.getImpl()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-						if (this.aBoolean1135) {
-							((ImageAWT) image.getUsedRegion()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
+			}
+		}
+		this.resortImages();
+	}
+
+	public void selectImageClicked(final int x, final int y) {
+		synchronized (MemoryView.updateLock) {
+			for (ImageViewItem image : imagesToShow) {
+				if (image.drawnRect == null)
+					continue;
+				if (image.drawnRect.contains(x, y)) {
+					selectedObject = image.source;
+					TableItem[] array = classTable.getSelection();
+					if (array == null || array.length < 1 || !selectedObject.getClass().getName().equals(array[0].getData())) {
+						// reselecting proper class
+						for (TableItem ti : classTable.getItems()) {
+							if (selectedObject.getClass().getName().equals(ti.getData())) {
+								classTable.setSelection(ti);
+								break;
+							}
 						}
-					} else if (Settings.g2d == 0) {
-						((emulator.graphics2D.swt.ImageSWT) image.getImpl()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-						if (this.aBoolean1135) {
-							((emulator.graphics2D.swt.ImageSWT) image.getUsedRegion()).copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), n2, n, n3, n4);
-						}
+						onClassTableItemSelection();
 					}
-				} catch (Exception ignored) {
+					syncObjectSelection();
+					imagesCanvas.redraw();
+					return;
 				}
-				if (image instanceof MemoryViewImage) {
-					gc.setForeground(foreground);
-					gc.drawString("Tex", n2 - 1, n + 1 - gc.getFontMetrics().getHeight(), true);
-				} else {
-					GC gc2;
-					Color foreground2;
-					if (this.imgSelected && this.anInt1150 >= 0 && this.anInt1150 < MemoryView.aVector1099.size() && MemoryView.aVector1099.get(this.anInt1150) == image) {
-						gc2 = gc;
-						foreground2 = color3;
+			}
+		}
+	}
+
+	/**
+	 * Sets selection in table to {@link #selectedObject}.
+	 */
+	private void syncObjectSelection() {
+		for (int i = 0; i < objectsTable.getItemCount(); i++) {
+			ObjInstance o = (ObjInstance) objectsTable.getItem(i).getData();
+			if (o.value == selectedObject) {
+				objectsTable.select(i);
+				onObjectTableItemSelection();
+				return;
+			}
+		}
+	}
+
+	public void paintImagesCanvas(final GC gc) {
+		final int fh = gc.getFontMetrics().getHeight();
+		int canvasW = imagesCanvas.getClientArea().width;
+		int canvasH = imagesCanvas.getClientArea().height;
+		int y = 10 - this.imagesCanvasScroll;
+		if (drawImagesInfo)
+			y += fh * 4;
+		int x = 10;
+		int max = 0;
+		final Color background = new Color(null, 151, 150, 147);
+		final Color regularColor = new Color(null, 0, 0, 0);
+
+		final Color releasedColor = new Color(null, 200, 0, 0);
+		final Color selectedColor = new Color(null, 0, 255, 0);
+		final Color texColor = new Color(null, 0, 0, 200);
+
+		gc.setBackground(background);
+		gc.fillRectangle(0, 0, canvasW, canvasH);
+		gc.setInterpolation(SWT.NONE);
+		int pixels2d = 0;
+		int pixels3d = 0;
+		int count2d = 0;
+		int count3d = 0;
+		synchronized (MemoryView.updateLock) {
+			final int size = MemoryView.imagesToShow.size();
+			for (int i = 0; i < size; ++i) {
+				ImageViewItem item = MemoryView.imagesToShow.get(i);
+				Image image = item.drawable;
+				final int imgW = (int) (image.getWidth() * this.imageScaling);
+				final int imgH = (int) (image.getHeight() * this.imageScaling);
+				if (x + imgW + 30 > canvasW) {
+					x = 10;
+					y += max + 10;
+					if (drawImagesInfo)
+						y += fh * 4;
+					max = 0;
+				}
+				if (y + imgH > 0 || y > canvasH) {
+					try {
+						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+						if (this.darkenUnused) {
+							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if (item.released) {
+						gc.setForeground(releasedColor);
+					} else if (item.source == selectedObject) {
+						gc.setForeground(selectedColor);
+					} else if (item.type == MemoryViewImageType.LCDUI) {
+						gc.setForeground(regularColor);
 					} else {
-						gc2 = gc;
-						foreground2 = ((i < this.anInt1134) ? color2 : color);
+						gc.setForeground(texColor);
 					}
-					gc2.setForeground(foreground2);
+
+					if (drawImagesInfo) {
+						gc.drawString(item.getCaption(), x - 1, y - fh * 4, true);
+						gc.drawString(item.type2, x - 1, y - fh * 3, true);
+						gc.drawString(image.getWidth() + "*" + image.getHeight(), x - 1, y - fh * 2, true);
+						if (item.released)
+							gc.drawString("Released", x - 1, y - fh, true);
+						else
+							gc.drawString("x" + image.getUsedCount(), x - 1, y - fh, true);
+					}
+					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
+					item.drawnRect = new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1);
+				} else {
+					item.drawnRect = null; // skipped, no valid used area.
 				}
-				gc.drawRectangle(n2 - 1, n - 1, n3 + 1, n4 + 1);
-				this.aHashtable1091.put(new Rectangle(n2 - 1, n - 1, n3 + 1, n4 + 1), image);
+				if (item.type == MemoryViewImageType.LCDUI) {
+					if (!item.released) {
+						pixels2d += image.getWidth() * image.getHeight();
+						count2d++;
+					}
+				} else {
+					pixels3d += image.getWidth() * image.getHeight();
+					count3d++;
+				}
+				int minImgW = drawImagesInfo ? 50 : 0;
+				x += Math.max(imgW, minImgW) + 10;
+				max = Math.max(max, imgH);
 			}
-			n2 += n3 + 10;
-			max = Math.max(max, n4);
-			this.anInt1117 += image.getWidth() * image.getHeight() * 2;
 		}
 		background.dispose();
-		color.dispose();
-		color2.dispose();
-		color3.dispose();
-		this.anInt1144 = n + max + this.anInt1147 + 10;
-		this.aCanvas1095.getVerticalBar().setMaximum(this.anInt1144);
-		this.aCanvas1095.getVerticalBar().setThumb(Math.min(this.anInt1144, this.aCanvas1095.getClientArea().height));
-		this.aCanvas1095.getVerticalBar().setIncrement(10);
-		this.aCLabel1152.setText(this.anInt1117 + " bytes");
+		releasedColor.dispose();
+		regularColor.dispose();
+		selectedColor.dispose();
+		int anInt1144 = y + max + this.imagesCanvasScroll + 10;
+		this.imagesCanvas.getVerticalBar().setMaximum(anInt1144);
+		this.imagesCanvas.getVerticalBar().setThumb(Math.min(anInt1144, this.imagesCanvas.getClientArea().height));
+		this.imagesCanvas.getVerticalBar().setIncrement(10);
+		imageControls.updateStats(pixels2d, pixels3d, count2d, count3d);
 	}
 
-	private void method695() {
-		if (this.memoryMgr.players.size() > this.soundsTable.getItemCount()) {
-			for (int i = this.memoryMgr.players.size() - this.soundsTable.getItemCount(); i > 0; --i) {
-				new TableItem(this.soundsTable, 0);
-			}
-		} else {
-			for (int j = this.memoryMgr.players.size(); j < this.soundsTable.getItemCount(); ++j) {
-				this.soundsTable.remove(j);
-			}
-		}
-		for (int k = 0; k < this.memoryMgr.players.size(); ++k) {
-			final Object value = this.memoryMgr.players.get(k);
-			final TableItem item;
-			(item = this.soundsTable.getItem(k)).setText(0, value.toString());
-			item.setText(1, Memory.playerType(value));
-			item.setText(2, Memory.playerStateStr(value));
-			item.setText(3, String.valueOf(Memory.loopCount(value)));
-			item.setText(4, String.valueOf(Memory.dataLen(value)));
-		}
-		final Object value2;
-		if (this.soundsTable.getSelectionIndex() != -1 && this.soundsTable.getSelectionIndex() < this.memoryMgr.players.size() && (value2 = this.memoryMgr.players.get(this.soundsTable.getSelectionIndex())) != null) {
-			this.aScale1089.setSelection(Memory.volume(value2));
-			this.aCLabel1154.setText(String.valueOf(this.aScale1089.getSelection()));
-			this.aProgressBar1092.setSelection(Memory.progress(value2));
-		}
-	}
-
-	private void changeSort(final int n) {
-		this.table.setSortColumn(this.table.getColumn(n));
-		int x = (this.table.getSortDirection() == 128) ? 1024 : 128;
-		this.table.setSortDirection(x);
+	void changeClassesSort(final int n) {
+		this.classTable.setSortColumn(this.classTable.getColumn(n));
+		int x = (this.classTable.getSortDirection() == 128) ? 1024 : 128;
+		this.classTable.setSortDirection(x);
 		sortColumn = n;
-		sort();
+		resortClasses();
 	}
 
-	private void sort() {
+	private void resortClasses() {
 		if (sortColumn == -1) return;
-		Collections.sort(this.anArrayList1110, new Class9(this, sortColumn));
-		for (int i = 0; i < this.anArrayList1110.size(); ++i) {
-			final Object value = this.anArrayList1110.get(i);
-			final TableItem item;
-			(item = this.table.getItem(i)).setText(0, (String) value);
-			item.setText(1, String.valueOf(this.memoryMgr.method866(value)));
-			item.setText(2, String.valueOf(this.memoryMgr.method867(value)));
-		}
+		classesList.sort(new ClassListComparator(this, sortColumn));
+		setClassTableContent();
 	}
 
-	private void method696() {
-		this.anArrayList1110 = Collections.list(this.memoryMgr.table.keys());
-		for (int i = 0; i < this.anArrayList1110.size(); ++i) {
-			if (this.memoryMgr.method867(this.anArrayList1110.get(i)) == 0) {
-				this.anArrayList1110.remove(i--);
+	private void updateClassesView() {
+		this.classesList = Collections.list(this.memoryMgr.classesTable.keys());
+		for (int i = 0; i < this.classesList.size(); ++i) {
+			if (this.memoryMgr.totalObjectsSize(this.classesList.get(i)) == 0) {
+				this.classesList.remove(i--);
 			}
 		}
-		Collections.sort((java.util.List<Comparable>) this.anArrayList1110);
-		if (this.anArrayList1110.size() > this.table.getItemCount()) {
-			for (int j = this.anArrayList1110.size() - this.table.getItemCount(); j > 0; --j) {
-				new TableItem(this.table, 0);
+		Collections.sort(this.classesList);
+		if (this.classesList.size() > this.classTable.getItemCount()) {
+			for (int j = this.classesList.size() - this.classTable.getItemCount(); j > 0; --j) {
+				new TableItem(this.classTable, 0);
 			}
 		} else {
-			while (this.table.getItemCount() > this.anArrayList1110.size()) {
-				this.table.remove(this.anArrayList1110.size());
+			while (this.classTable.getItemCount() > this.classesList.size()) {
+				this.classTable.remove(this.classesList.size());
 			}
 		}
-		for (int k = 0; k < this.anArrayList1110.size(); ++k) {
-			final Object value = this.anArrayList1110.get(k);
-			final TableItem item;
-			(item = this.table.getItem(k)).setText(0, (String) value);
-			item.setText(1, String.valueOf(this.memoryMgr.method866(value)));
-			item.setText(2, String.valueOf(this.memoryMgr.method867(value)));
-		}
-		//this.aTable1096.setSortColumn(this.aTable1096.getColumn(0));
-		//this.aTable1096.setSortDirection(128);
+		setClassTableContent();
 	}
 
-	private void method644(TableItem[] array) {
+	private void setClassTableContent() {
+		for (int i = 0; i < this.classesList.size(); ++i) {
+			final String value = this.classesList.get(i);
+			final TableItem item = this.classTable.getItem(i);
+			if (displayPkgNames)
+				item.setText(0, value);
+			else {
+				String[] split = value.split("\\.");
+				item.setText(0, split[split.length - 1]);
+			}
+			item.setText(1, String.valueOf(this.memoryMgr.instancesCount(value)));
+			item.setText(2, String.valueOf(this.memoryMgr.totalObjectsSize(value)));
+			item.setData(value);
+		}
+	}
+
+	void onClassTableItemSelection() {
+		TableItem[] array = classTable.getSelection();
 		if (array == null || array.length < 1) {
 			return;
 		}
-		classTable.removeAll();
-		classRefsVector.removeAllElements();
-		String text = array[0].getText(0);
-		Vector objs = this.memoryMgr.objs(text);
-		if (text.equalsIgnoreCase("javax.microedition.lcdui.Image")) {
-			imgSelected = true;
-			anInt1150 = -1;
-		} else {
-			imgSelected = false;
-		}
-		for (Object o : objs) {
-			TableItem ti = new TableItem(classTable, 0);
-			ti.setText(0, Memory.refs(o));
-			String s = String.valueOf(Memory.val(o));
+		objectsTable.removeAll();
+		String cls = (String) array[0].getData();
+		Vector<ObjInstance> objs = this.memoryMgr.objs(cls);
+		if (selectedObject != null && !selectedObject.getClass().getName().equals(cls))
+			selectedObject = null;
+		for (ObjInstance o : objs) {
+			TableItem ti = new TableItem(objectsTable, 0);
+			if (o.paths.isEmpty())
+				ti.setText(0, "Unknown reference");
+			else if (o.paths.size() == 1)
+				ti.setText(0, o.paths.get(0).toString(displayPkgNames));
+			else
+				ti.setText(0, o.paths.get(0).toString(displayPkgNames) + "; " + (o.paths.size() - 1) + " more");
+			String s = String.valueOf(o.value);
 			//XXX
 			if (s.length() > 128) {
 				s = s.substring(0, 127) + "...";
 			}
 			ti.setText(1, s);
-			ti.setText(2, String.valueOf(Memory.size(o)));
-			classRefsVector.add(Memory.val(o));
+			ti.setText(2, String.valueOf(o.size));
+			ti.setData(o);
 		}
+		clearObjectPaths();
 	}
 
-	private void method655(final TableItem[] array) {
-		if (array == null || array.length < 1) {
-			return;
-		}
-		final Object value;
-		if ((value = this.classRefsVector.get(this.classTable.getSelectionIndex())) != null && emulator.debug.ClassTypes.method871(value.getClass())) {
-			new Watcher(value).method311(this.shell);
-		}
-	}
-
-	public final void widgetDisposed(final DisposeEvent disposeEvent) {
+	public void widgetDisposed(final DisposeEvent disposeEvent) {
 		this.dispose();
 	}
 
-	static void method647(final MemoryView class110) {
-		class110.method692();
-	}
-
-	static Button method648(final MemoryView class110) {
-		return class110.aButton1104;
-	}
-
-	static Text method652(final MemoryView class110) {
-		return class110.aText1087;
-	}
-
-	static AutoUpdate method653(final MemoryView class110) {
-		return class110.aClass88_1100;
-	}
-
-	static AutoUpdate method633(final MemoryView class110, final AutoUpdate aClass88_1100) {
-		return class110.aClass88_1100 = aClass88_1100;
-	}
-
-	static Thread method635(final MemoryView class110, final Thread aThread1085) {
-		return class110.autoUpdateThread = aThread1085;
-	}
-
-	static Thread method626(final MemoryView class110) {
-		return class110.autoUpdateThread;
-	}
-
-	static boolean method627(final MemoryView class110, final boolean aBoolean1123) {
-		return class110.aBoolean1123 = aBoolean1123;
-	}
-
-	static Button method657(final MemoryView class110) {
-		return class110.aButton1121;
-	}
-
-	static boolean method659(final MemoryView class110, final boolean aBoolean1135) {
-		return class110.aBoolean1135 = aBoolean1135;
-	}
-
-	static Button method666(final MemoryView class110) {
-		return class110.aButton1129;
-	}
-
-	static Memory method629(final MemoryView class110) {
-		return class110.memoryMgr;
-	}
-
-	static boolean method667(final MemoryView class110, final boolean aBoolean1111) {
-		return class110.aBoolean1111 = aBoolean1111;
-	}
-
-	static Button method673(final MemoryView class110) {
-		return class110.aButton1115;
-	}
-
-	static void method661(final MemoryView class110) {
-		class110.method693();
-	}
-
-	static void method668(final MemoryView class110) {
-		class110.method691();
-	}
-
-	static boolean method674(final MemoryView class110, final boolean aBoolean1127) {
-		return class110.aBoolean1127 = aBoolean1127;
-	}
-
-	static Button method678(final MemoryView class110) {
-		return class110.aButton1125;
-	}
-
-	static boolean method679(final MemoryView class110, final boolean aBoolean1131) {
-		return class110.aBoolean1131 = aBoolean1131;
-	}
-
-	static Button method682(final MemoryView class110) {
-		return class110.aButton1133;
-	}
-
-	static Table method649(final MemoryView class110) {
-		return class110.soundsTable;
-	}
-
-	static Scale method630(final MemoryView class110) {
-		return class110.aScale1089;
-	}
-
-	static CLabel method624(final MemoryView class110) {
-		return class110.aCLabel1154;
-	}
-
-	static ProgressBar method646(final MemoryView class110) {
-		return class110.aProgressBar1092;
-	}
-
-	static double method651(final MemoryView class110, final double anInt1102) {
-		return class110.imageScaling = anInt1102;
-	}
-
-	static Combo method631(final MemoryView class110) {
-		return class110.imageScaleCombo;
-	}
-
-	static int method662(final MemoryView class110, final int anInt1109) {
-		return class110.anInt1109 = anInt1109;
-	}
-
-	static Combo method654(final MemoryView class110) {
-		return class110.aCombo1107;
-	}
-
-	static int method669(final MemoryView class110, final int anInt1138) {
-		return class110.anInt1138 = anInt1138;
-	}
-
-	static Canvas method642(final MemoryView class110) {
-		return class110.aCanvas1095;
-	}
-
-	static int method675(final MemoryView class110, final int anInt1142) {
-		return class110.anInt1142 = anInt1142;
-	}
-
-	static int method680(final MemoryView class110, final int anInt1147) {
-		return class110.anInt1147 = anInt1147;
-	}
-
-	static void method650(final MemoryView class110, final GC gc) {
-		class110.method636(gc);
-	}
-
-	static boolean method625(final MemoryView class110, final int n, final int n2) {
-		return class110.method628(n, n2);
-	}
-
-	static Menu method643(final MemoryView class110) {
-		return class110.aMenu1084;
-	}
-
-	static Menu method663(final MemoryView class110) {
-		return class110.aMenu1113;
-	}
-
-	static Shell method632(final MemoryView class110) {
-		return class110.shell;
-	}
-
-	static Image method640(final MemoryView class110) {
-		return class110.anImage1088;
-	}
-
-	static ArrayList method638() {
-		return MemoryView.anArrayList1090;
-	}
-
-	static Table method664(final MemoryView class110) {
-		return class110.table;
-	}
-
-	static void method641(final MemoryView class110, final TableItem[] array) {
-		class110.method644(array);
-	}
-
-	static void method623(final MemoryView class110, final int n) {
-		class110.changeSort(n);
-	}
-
-	static boolean method639(final MemoryView class110) {
-		return class110.imgSelected;
-	}
-
-	static int method683(final MemoryView class110, final int anInt1150) {
-		return class110.anInt1150 = anInt1150;
-	}
-
-	static Table method670(final MemoryView class110) {
-		return class110.classTable;
-	}
-
-	static void method658(final MemoryView class110, final TableItem[] array) {
-		class110.method655(array);
-	}
-
-	static int method645(final MemoryView class110) {
-		return class110.anInt1109;
-	}
-
-	static Vector method634() {
-		return MemoryView.aVector1099;
-	}
-
-	static boolean method660(final MemoryView class110) {
-		return class110.aBoolean1111;
-	}
-
-	static boolean method671(final MemoryView class110) {
-		return class110.aBoolean1118;
-	}
-
-	static void method676(final MemoryView class110) {
-		class110.method690();
-	}
-
-	static {
-		MemoryView.anObject1086 = new Object();
-		MemoryView.aVector1099 = new Vector();
-		MemoryView.anArrayList1090 = new ArrayList();
-	}
-
-	final class DoUpdate implements Runnable {
-		private final MemoryView aClass110_1210;
-
-		DoUpdate(final MemoryView aClass110_1210) {
-			super();
-			this.aClass110_1210 = aClass110_1210;
+	void setAutoUpdate(boolean enabled, int interval) {
+		if (autoUpdater != null) {
+			autoUpdater.stopThread();
+			autoUpdater = null;
 		}
-
-		public final void run() {
-			this.aClass110_1210.method691();
-		}
-
-		DoUpdate(final MemoryView class110, final Class129 class111) {
-			this(class110);
+		if (enabled) {
+			if (interval < 10)
+				throw new IllegalArgumentException("Too small update interval");
+			autoUpdater = new AutoUpdate(this, interval);
+			autoUpdater.start();
 		}
 	}
 
-	final class AutoUpdate implements Runnable {
-		boolean aBoolean885;
-		long aLong886;
-		long aLong888;
-		private final MemoryView aClass110_887;
+	public void setImagesDrawn(boolean b) {
+		imagesDrawn = b;
+		updateEverything();
+	}
 
-		AutoUpdate(final MemoryView aClass110_887, final long aLong888) {
-			super();
-			this.aClass110_887 = aClass110_887;
-			this.aLong888 = aLong888;
-			this.aBoolean885 = true;
-			MemoryView.method633(aClass110_887, this);
+	void setImagesNotDrawn(boolean b) {
+		imagesNeverDrawn = b;
+		updateEverything();
+	}
+
+	void setImagesAscend(boolean b) {
+		sortImagesByAscending = b;
+		resortImages();
+		updateView();
+	}
+
+	void setImagesSorting(int i) {
+		imagesSortingMethod = i;
+		resortImages();
+		updateView();
+	}
+
+	void setShowReleasedImages(boolean b) {
+		showReleasedImages = b;
+		updateEverything();
+	}
+
+	void setShow2dImages(boolean b) {
+		show2dImages = b;
+		updateEverything();
+	}
+
+	void setShow3dImages(boolean b) {
+		show3dImages = b;
+		updateEverything();
+	}
+
+	void setShowImagesInfo(boolean b) {
+		drawImagesInfo = b;
+		updateView();
+	}
+
+	void setDarkenUnused(boolean b) {
+		darkenUnused = b;
+		updateEverything();
+	}
+
+	void setImagesScaling(int i) {
+		double s = i;
+		if (s == 0) {
+			s = 0.5d;
+		}
+		imageScaling = s;
+		updateView();
+	}
+
+	void setPkgNamesDisplay(boolean b) {
+		displayPkgNames = b;
+		updateClassesView();
+		onClassTableItemSelection();
+		syncObjectSelection();
+		onObjectTableItemSelection();
+	}
+
+	Shell getShell() {
+		return shell;
+	}
+
+	Object getSelectedImage() {
+		return selectedObject;
+	}
+
+	Table getTheTable() {
+		return classTable;
+	}
+
+	void onObjectTableItemSelection() {
+		TableItem[] array = objectsTable.getSelection();
+		if (array == null || array.length < 1) {
+			clearObjectPaths();
+			return;
 		}
 
-		public final void run() {
-			this.aLong886 = System.currentTimeMillis();
-			while (this.aBoolean885 && !MemoryView.method632(this.aClass110_887).isDisposed()) {
-				try {
-					if (System.currentTimeMillis() - this.aLong886 > this.aLong888 && !MemoryView.method671(this.aClass110_887)) {
-						this.aClass110_887.method690();
-						EmulatorImpl.syncExec(this.aClass110_887.new DoUpdate(aClass110_887));
+		ObjInstance inst = (ObjInstance) array[0].getData();
+		displayObjectPaths(inst);
+		selectedObject = inst.value;
+		imagesCanvas.redraw();
+	}
 
-						this.aLong886 = System.currentTimeMillis();
+	private void clearObjectPaths() {
+		for (Control c : objectPathsContainer.getChildren())
+			c.dispose();
+		new Label(objectPathsContainer, 0).setText("No objects selected. Select an object to inspect it.");
+		objectPaths.setText("Paths to the object");
+		objectPaths.layout(true, true);
+		relayoutObjectSizes();
+	}
+
+	private void displayObjectPaths(ObjInstance inst) {
+		for (Control c : objectPathsContainer.getChildren())
+			c.dispose();
+		for (ReferencePath o : inst.paths) {
+			new ReferencePathDisplay(objectPathsContainer, o, displayPkgNames);
+		}
+		objectPaths.setText("Paths to the object (" + inst.paths.size() + ")");
+		objectPaths.layout(true, true);
+		relayoutObjectSizes();
+	}
+
+	private void relayoutObjectSizes() {
+		objectPathsContainer.setSize(objectPathsContainer.computeSize(objectPathsContainer.getParent().getSize().x, -1));
+	}
+
+	void openWatcherForSelected() {
+		TableItem[] array = objectsTable.getSelection();
+		if (array == null || array.length < 1) {
+			return;
+		}
+		final Object value = ((ObjInstance) array[0].getData()).value;
+		if (value != null && emulator.debug.ClassTypes.isObject(value.getClass())) {
+			new Watcher(value).open(shell);
+		}
+	}
+
+	void openWatcherForSelectedClass() {
+		TableItem[] array = classTable.getSelection();
+		if (array == null || array.length < 1) {
+			return;
+		}
+		try {
+			new Watcher(Memory.cls(array[0].getData().toString())).open(getShell());
+		} catch (Exception ignored) {
+			// arrays will throw
+		}
+	}
+
+	void exportSelectedImage() {
+		if (getSelectedImage() != null) {
+			for (ImageViewItem item : imagesToShow) {
+				if (item.source == getSelectedImage()) {
+					final FileDialog fileDialog;
+					(fileDialog = new FileDialog(getShell(), 8192)).setText(UILocale.get("MEMORY_VIEW_SAVE_TO_FILE", "Save to file"));
+					fileDialog.setFilterExtensions(new String[]{"*.png"});
+					final String open;
+					if ((open = fileDialog.open()) != null) {
+						item.drawable.getImpl().saveToFile(open);
 					}
-					Thread.sleep(1L);
-				} catch (InterruptedException ignored) {}
+					return;
+				}
 			}
-			MemoryView.method633(this.aClass110_887, this);
+		}
+		Emulator.getEmulator().getScreen().showMessage("No images selected. Click at one to select it.");
+	}
+
+	int getSortingMethod() {
+		return imagesSortingMethod;
+	}
+
+	boolean getSortByAscending() {
+		return sortImagesByAscending;
+	}
+
+	@Override
+	public void controlMoved(ControlEvent controlEvent) {
+
+	}
+
+	@Override
+	public void controlResized(ControlEvent controlEvent) {
+		relayoutObjectSizes();
+	}
+
+	public static final class AutoUpdate extends Thread {
+		boolean shouldRun;
+		long updateInterval;
+		private final MemoryView mv;
+
+		AutoUpdate(final MemoryView mv, final long updateInterval) {
+			super();
+			this.mv = mv;
+			this.updateInterval = updateInterval;
+			this.shouldRun = true;
+		}
+
+		public void run() {
+			while (this.shouldRun && !mv.getShell().isDisposed()) {
+				try {
+					mv.updateModel();
+					mv.getShell().getDisplay().syncExec(mv::updateView);
+					Thread.sleep(updateInterval);
+				} catch (InterruptedException ignored) {
+				}
+			}
+		}
+
+		public void stopThread() {
+			shouldRun = false;
+			if (isAlive())
+				interrupt();
 		}
 	}
 }
