@@ -225,8 +225,7 @@ public class ProjectGenerator {
 		Path midletCodePath;
 		if (midletName.indexOf('.') != -1) {
 			String[] splitted = ProjectConfigGenerator.splitByLastDot(midletName);
-			String[] packagesNames = splitted[0].split("\\.");
-			Path midletFolder = Paths.get(src.toString(), packagesNames);
+			Path midletFolder = Paths.get(src.toString(), splitted[0].replace('.', File.separatorChar));
 			Files.createDirectories(midletFolder);
 			midletCodePath = midletFolder.resolve(splitted[1] + ".java");
 			Files.write(midletCodePath, ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
