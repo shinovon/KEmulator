@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -173,11 +174,18 @@ public class ProjectGenerator {
 		Files.createDirectories(dir.resolve(".idea"));
 		Files.createDirectories(dir.resolve(".idea").resolve("artifacts"));
 		Files.createDirectories(dir.resolve(".idea").resolve("runConfigurations"));
-		Files.createDirectories(dir.resolve("src"));
-		Files.createDirectories(dir.resolve("res"));
-		Files.createDirectories(dir.resolve("bin"));
-		Files.createDirectories(dir.resolve("deployed"));
-		Files.createDirectories(dir.resolve("META-INF"));
+		createDirSilently(dir.resolve("src")); // some folders may be symlinks. This is a valid case (but NIO doesn't think so)
+		createDirSilently(dir.resolve("res"));
+		createDirSilently(dir.resolve("bin"));
+		createDirSilently(dir.resolve("deployed"));
+		createDirSilently(dir.resolve("META-INF"));
+	}
+
+	private static void createDirSilently(Path path) throws IOException {
+		try {
+			Files.createDirectories(path);
+		} catch (FileAlreadyExistsException ignored) {
+		}
 	}
 
 	private static String getMidletClassNameFromMF(Path dir) throws IOException {
