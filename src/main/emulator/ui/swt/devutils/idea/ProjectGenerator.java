@@ -29,7 +29,7 @@ public class ProjectGenerator {
 		// root
 		Files.write(dir.resolve(".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
 		ProjectConfigGenerator.generateIML(null, dir.resolve(projectName + ".iml"));
-		generateProGuardConfig(dir, projectName);
+		generateProGuardConfig(dir, projectName, new String[0]);
 
 		// code
 		Files.write(dir.resolve("META-INF").resolve("MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
@@ -103,7 +103,7 @@ public class ProjectGenerator {
 		String midletName = getMidletClassNameFromMF(dirp);
 
 		createDirectories(dirp);
-		generateProGuardConfig(dirp, projectName);
+		generateProGuardConfig(dirp, projectName, new String[0]);
 		if (imlFound)
 			generateRunConfigs(dirp, projectName, midletName);
 		else
@@ -132,8 +132,8 @@ public class ProjectGenerator {
 			gi.write(PROGUARD_LOCAL_CFG);
 			gi.newLine();
 		}
-		ProjectConfigGenerator.generateIML(dir.resolve(".classpath"), dir.resolve(projectName + ".iml"));
-		generateProGuardConfig(dir, projectName);
+		String[] libraries = ProjectConfigGenerator.generateIML(dir.resolve(".classpath"), dir.resolve(projectName + ".iml"));
+		generateProGuardConfig(dir, projectName, libraries);
 
 		// manifest
 		fixManifestWithVersion(appDescriptorPath);
@@ -237,8 +237,8 @@ public class ProjectGenerator {
 		return midletCodePath.toString();
 	}
 
-	private static void generateProGuardConfig(Path dir, String projName) throws IOException {
-		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName).getBytes(StandardCharsets.UTF_8));
+	private static void generateProGuardConfig(Path dir, String projName, String[] libs) throws IOException {
+		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, libs).getBytes(StandardCharsets.UTF_8));
 		if (!Files.exists(dir.resolve(PROGUARD_GLOBAL_CFG))) {
 			Files.write(dir.resolve(PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
 		}

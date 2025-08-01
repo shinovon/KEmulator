@@ -16,6 +16,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class ProjectConfigGenerator {
 
@@ -71,7 +72,7 @@ public class ProjectConfigGenerator {
 			"/dataSources/\n" +
 			"/dataSources.local.xml\n";
 
-	public static String buildLocalProguardConfig(String dir, String name) {
+	public static String buildLocalProguardConfig(String dir, String name, String[] libs) {
 		StringBuilder sb = new StringBuilder();
 		for (String l : JdkTablePatcher.DEV_TIME_JARS) {
 			sb.append("-libraryjars '");
@@ -81,6 +82,10 @@ public class ProjectConfigGenerator {
 		}
 		sb.append("-injars '").append(Paths.get(dir, "deployed", "raw", name + ".jar")).append("'");
 		sb.append(System.lineSeparator());
+		for (int i = 0; i < libs.length; i++) {
+			sb.append("-injars '").append(Paths.get(dir, libs[i])).append("'");
+			sb.append(System.lineSeparator());
+		}
 		sb.append("-outjars '").append(Paths.get(dir, "deployed", name + ".jar")).append("'");
 		sb.append(System.lineSeparator());
 		sb.append("-printseeds '").append(Paths.get(dir, "deployed", "pro_seeds.txt")).append("'");
@@ -235,9 +240,11 @@ public class ProjectConfigGenerator {
 				"</component>";
 	}
 
-	public static void generateIML(Path eclipseClasspath, Path imlFile) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+	public static String[] generateIML(Path eclipseClasspath, Path imlFile) throws ParserConfigurationException, IOException, SAXException, TransformerException {
 		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document doc = builder.newDocument();
+
+		ArrayList<String> libsList = new ArrayList<>();
 
 		Element module = doc.createElement("module");
 		module.setAttribute("type", "JAVA_MODULE");
@@ -256,14 +263,14 @@ public class ProjectConfigGenerator {
 		content.setAttribute("url", "file://$MODULE_DIR$");
 		component.appendChild(content);
 
-		Element orderEntry1 = doc.createElement("orderEntry");
-		orderEntry1.setAttribute("type", "inheritedJdk");
-		component.appendChild(orderEntry1);
+		Element jdkEntry = doc.createElement("orderEntry");
+		jdkEntry.setAttribute("type", "inheritedJdk");
+		component.appendChild(jdkEntry);
 
-		Element orderEntry2 = doc.createElement("orderEntry");
-		orderEntry2.setAttribute("type", "sourceFolder");
-		orderEntry2.setAttribute("forTests", "false");
-		component.appendChild(orderEntry2);
+		Element sourceEntry = doc.createElement("orderEntry");
+		sourceEntry.setAttribute("type", "sourceFolder");
+		sourceEntry.setAttribute("forTests", "false");
+		component.appendChild(sourceEntry);
 
 		if (eclipseClasspath == null) {
 			addSourceFolder(doc, content, "res");
@@ -274,11 +281,31 @@ public class ProjectConfigGenerator {
 			for (int i = 0; i < entries.getLength(); i++) {
 				Element entry = (Element) entries.item(i);
 				String kind = entry.getAttribute("kind");
-				if (!"src".equals(kind))
-					continue;
+				if ("src".equals(kind)) {
+					String path = entry.getAttribute("path");
+					addSourceFolder(doc, content, path);
+				} else if ("lib".equals(kind)) {
+					Element libEntry = doc.createElement("orderEntry");
+					libEntry.setAttribute("type", "module-library");
+					if ("true".equals(entry.getAttribute("exported")))
+						libEntry.setAttribute("exported", "");
+					component.appendChild(libEntry);
 
-				String path = entry.getAttribute("path");
-				addSourceFolder(doc, content, path);
+					Element libRoot = doc.createElement("library");
+					libEntry.appendChild(libRoot);
+
+					Element classes = doc.createElement("CLASSES");
+					libRoot.appendChild(classes);
+
+					Element jar = doc.createElement("root");
+					jar.setAttribute("url", "jar://$MODULE_DIR$/" + entry.getAttribute("path") + "!/");
+					classes.appendChild(jar);
+
+					libRoot.appendChild(doc.createElement("JAVADOC"));
+					libRoot.appendChild(doc.createElement("SOURCES"));
+
+					libsList.add(entry.getAttribute("path"));
+				}
 			}
 		}
 
@@ -296,6 +323,8 @@ public class ProjectConfigGenerator {
 		DOMSource source = new DOMSource(doc);
 		StreamResult result = new StreamResult(imlFile.toFile());
 		transformer.transform(source, result);
+
+		return libsList.toArray(new String[0]);
 	}
 
 	private static void addSourceFolder(Document doc, Element content, String path) {
