@@ -1,8 +1,13 @@
 package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
@@ -112,6 +117,9 @@ public class ProjectGenerator {
 				generateProGuardConfig(dirp, projectName, new String[0]);
 			}
 			generateRunConfigs(dirp, projectName, midletName);
+			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
+				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
+						"You can rerun IDE setup to bring your configuration to recommended one.");
 		} else {
 			System.out.println("No IML found! IDEA configs will not be created.");
 			generateProGuardConfig(dirp, projectName, new String[0]);
@@ -161,6 +169,8 @@ public class ProjectGenerator {
 		return dir.toString();
 	}
 
+	//#region impls
+
 	private static void fixManifestWithVersion(String mfPath) throws IOException {
 		List<String> manifest = Files.readAllLines(Paths.get(mfPath));
 		boolean hasVersion = false;
@@ -175,8 +185,6 @@ public class ProjectGenerator {
 			Files.write(Paths.get(mfPath), manifest);
 		}
 	}
-
-	//#region impls
 
 	private static void createDirectories(Path dir) throws IOException {
 		Files.createDirectories(dir.resolve(".idea"));
@@ -265,6 +273,21 @@ public class ProjectGenerator {
 		if (code != 0) {
 			throw new RuntimeException((Emulator.win ? "mklink" : "ln") + " returned non-zero code: " + code + ". " + SYMLINK_FAIL_MSG);
 		}
+	}
+
+	public static String getProjectJdkName(Path miscXml) {
+		try {
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(miscXml.toFile());
+			NodeList components = doc.getElementsByTagName("component");
+			for (int i = 0; i < components.getLength(); i++) {
+				Element component = (Element) components.item(i);
+				if ("ProjectRootManager".equals(component.getAttribute("name"))) {
+					return component.getAttribute("project-jdk-name");
+				}
+			}
+		} catch (Exception ignored) {
+		}
+		return null;
 	}
 
 	//#endregion
