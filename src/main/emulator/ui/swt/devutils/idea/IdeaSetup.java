@@ -532,11 +532,12 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			if (Files.exists(ppath.resolve("bin").resolve(Emulator.win ? "java.exe" : "java")) &&
 					Files.exists(ppath.resolve("bin").resolve(Emulator.win ? "javac.exe" : "javac"))) {
 				try {
-					if (Emulator.getProcessOutput(new String[]{ppath.resolve("bin").resolve(Emulator.win ? "java.exe" : "java").toAbsolutePath().toString(), "-version"}, true).contains("1.8.")) {
+					String javaVer = Emulator.getProcessOutput(new String[]{ppath.resolve("bin").resolve(Emulator.win ? "java.exe" : "java").toAbsolutePath().toString(), "-version"}, true);
+					if (javaVer.contains("1.8.")) {
 						jdkHome = path;
 						refreshContent();
 					} else {
-						errorMsg("JDK home", "Selected JDK says it's not 1.8.");
+						errorMsg("JDK home", "Selected JDK says it's not 1.8.\n\n" + javaVer);
 					}
 				} catch (IOException ex) {
 					// ignore
