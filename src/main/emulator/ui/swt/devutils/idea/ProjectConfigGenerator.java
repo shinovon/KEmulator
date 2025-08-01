@@ -337,7 +337,7 @@ public class ProjectConfigGenerator {
 		content.appendChild(sourceFolder);
 	}
 
-	public static String[] extractLibrariesListFromIML(Path imlPath) throws Exception {
+	public static String[] extractLibrariesListFromIML(Path imlPath) throws ParserConfigurationException, IOException, SAXException {
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(imlPath.toFile());
 
 		ArrayList<String> result = new ArrayList<>();

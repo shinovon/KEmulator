@@ -50,10 +50,10 @@ public class ProjectGenerator {
 
 	public static boolean fixCloned(String dir, Runnable onSymlinkFail) throws IOException, InterruptedException {
 		File folder = new File(dir);
-		boolean imlFound = false;
+		String imlPath = null;
 		for (File file : folder.listFiles()) {
 			if (file.getName().endsWith(".iml")) {
-				imlFound = true;
+				imlPath = file.getAbsolutePath();
 				break;
 			}
 		}
@@ -103,13 +103,21 @@ public class ProjectGenerator {
 		String midletName = getMidletClassNameFromMF(dirp);
 
 		createDirectories(dirp);
-		generateProGuardConfig(dirp, projectName, new String[0]);
-		if (imlFound)
-			generateRunConfigs(dirp, projectName, midletName);
-		else
-			System.out.println("No IML found! IDEA configs will not be created.");
 
-		return imlFound;
+		if (imlPath != null) {
+			try {
+				generateProGuardConfig(dirp, projectName, ProjectConfigGenerator.extractLibrariesListFromIML(Paths.get(imlPath)));
+			} catch (Exception e) {
+				System.out.println("Failed to parse IML!");
+				generateProGuardConfig(dirp, projectName, new String[0]);
+			}
+			generateRunConfigs(dirp, projectName, midletName);
+		} else {
+			System.out.println("No IML found! IDEA configs will not be created.");
+			generateProGuardConfig(dirp, projectName, new String[0]);
+		}
+
+		return imlPath != null;
 	}
 
 	public static String convertEclipse(String appDescriptorPath) throws IOException, InterruptedException, ParserConfigurationException, TransformerException, SAXException {
