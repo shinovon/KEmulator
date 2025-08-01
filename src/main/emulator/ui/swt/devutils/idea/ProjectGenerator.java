@@ -16,6 +16,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ProjectGenerator {
@@ -47,7 +49,7 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName);
 
 		// run configs
-		generateRunConfigs(dir, projectName, midletClassName);
+		generateRunConfigs(dir, projectName, new String[][]{new String[]{readableName, midletClassName}});
 
 		return midletCodePath;
 	}
@@ -105,7 +107,7 @@ public class ProjectGenerator {
 		}
 
 		String projectName = dirp.getFileName().toString();
-		String midletName = getMidletClassNameFromMF(dirp);
+		String[][] midletNames = getMidletClassNameFromMF(dirp);
 
 		createDirectories(dirp);
 
@@ -116,7 +118,7 @@ public class ProjectGenerator {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
 				generateProGuardConfig(dirp, projectName, new String[0]);
 			}
-			generateRunConfigs(dirp, projectName, midletName);
+			generateRunConfigs(dirp, projectName, midletNames);
 			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
 				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
 						"You can rerun IDE setup to bring your configuration to recommended one.");
@@ -155,7 +157,7 @@ public class ProjectGenerator {
 		fixManifestWithVersion(appDescriptorPath);
 		symlinkManifests(dir.toString());
 
-		String midletClassName = getMidletClassNameFromMF(dir);
+		String[][] midlets = getMidletClassNameFromMF(dir);
 
 		// ide config
 		generateMiscXmls(dir, projectName);
@@ -164,7 +166,7 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName);
 
 		// run configs
-		generateRunConfigs(dir, projectName, midletClassName);
+		generateRunConfigs(dir, projectName, midlets);
 
 		return dir.toString();
 	}
@@ -204,23 +206,32 @@ public class ProjectGenerator {
 		}
 	}
 
-	private static String getMidletClassNameFromMF(Path dir) throws IOException {
-		String midletName = null;
-		List<String> manifest = Files.readAllLines(dir.resolve("META-INF").resolve("MANIFEST.MF"), StandardCharsets.UTF_8);
-		for (String line : manifest) {
-			if (line.startsWith("MIDlet-1:")) {
-				String[] split = line.split(",");
-				midletName = split[split.length - 1].trim();
+	private static String[][] getMidletClassNameFromMF(Path dir) throws IOException {
+		ArrayList<String[]> names = new ArrayList<>();
+		List<String> lines = Files.readAllLines(dir.resolve("META-INF").resolve("MANIFEST.MF"), StandardCharsets.UTF_8);
+		HashMap<String, String> manifest = new HashMap<>();
+		for (String line : lines) {
+			String[] split = line.split(":", 2);
+			manifest.put(split[0], split[1]);
+		}
+		for (int i = 1; true; i++) {
+			if (!manifest.containsKey("MIDlet-" + i)) {
 				break;
 			}
+			String[] split = manifest.get("MIDlet-" + i).split(",");
+			names.add(new String[]{split[0].trim(), split[2].trim()});
 		}
-		if (midletName == null)
+		if (names.isEmpty())
 			throw new IllegalArgumentException("Broken manifest file");
-		return midletName;
+		return names.toArray(new String[0][0]);
 	}
 
-	private static void generateRunConfigs(Path dir, String projectName, String midletName) throws IOException {
-		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Run_with_KEmulator.xml"), ProjectConfigGenerator.buildKemRunConfig(projectName, midletName).getBytes(StandardCharsets.UTF_8));
+	private static void generateRunConfigs(Path dir, String projectName, String[][] midletNames) throws IOException {
+		for (int i = 0; i < midletNames.length; i++) {
+			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Run_with_KEmulator_" + (i + 1) + ".xml");
+			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i][0], midletNames[i][1]);
+			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
+		}
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 

@@ -56,7 +56,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		fixClonedBtn.addSelectionListener(this);
 
 		createNewProject = new Group(shell, SWT.NONE);
-		createNewProject.setText("Create new project");
+		createNewProject.setText("Create a new project");
 		createNewProject.setLayout(genGLo());
 		createNewProject.setLayoutData(genGd());
 
@@ -98,15 +98,13 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		creationStatus.setSize(400, SWT.DEFAULT);
 
 		Group convertEclipseProject = new Group(shell, SWT.NONE);
-		convertEclipseProject.setText("Convert Eclipse MTJ project");
+		convertEclipseProject.setText("Convert a project");
 		convertEclipseProject.setLayout(genGLo());
 		convertEclipseProject.setLayoutData(genGd());
 
 		chooseEclipse = new Button(convertEclipseProject, SWT.FLAT);
-		chooseEclipse.setText("Choose existing project");
+		chooseEclipse.setText("Eclipse MTJ -> IDEA");
 		chooseEclipse.addSelectionListener(this);
-
-		new Label(convertEclipseProject, SWT.NONE).setText("Run config will be created only for first MIDlet.");
 
 		Group maintenanceGroup = new Group(shell, SWT.NONE);
 		maintenanceGroup.setText("Maintenance");
