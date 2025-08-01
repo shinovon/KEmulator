@@ -43,11 +43,11 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private final Shell parent;
 	private Button chooseIdeaManuallyBtn;
 	private Button refreshInstalledListBtn;
-	private Button nnchanProguardBtn;
-	private Button githubProguardBtn;
+	private Link nnchanProguardBtn;
+	private Link githubProguardBtn;
 	private Button selectProguardBtn;
 	private Link ideaDownloadLink;
-	private Button jmeDocsBtn;
+	private Link jmeDocsBtn;
 	private Button selectJmeDocsBtn;
 	private Button manualConfigBtn;
 	private StyledText log;
@@ -185,14 +185,15 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			pgGroup.setText("Manual setup");
 			pgGroup.setLayout(genGLo());
 			pgGroup.setLayoutData(genGd());
-			nnchanProguardBtn = new Button(pgGroup, SWT.PUSH);
-			nnchanProguardBtn.setText("Download v6.2.2 from nnproject archive");
+			new Label(pgGroup, SWT.NONE).setText("1. Download it from one of the sources.");
+			nnchanProguardBtn = new Link(pgGroup, SWT.NONE);
+			nnchanProguardBtn.setText("<a>v6.2.2 from NNP archive</a> (recommended)");
 			nnchanProguardBtn.addSelectionListener(this);
-			githubProguardBtn = new Button(pgGroup, SWT.PUSH);
-			githubProguardBtn.setText("Download from project's github");
+			githubProguardBtn = new Link(pgGroup, SWT.NONE);
+			githubProguardBtn.setText("<a>Project's github</a>");
 			githubProguardBtn.addSelectionListener(this);
 
-			new Label(pgGroup, SWT.NONE).setText("Unpack the archive where you want and select main program file:");
+			new Label(pgGroup, SWT.NONE).setText("2. Unpack the archive where you want and select main program file:");
 			selectProguardBtn = new Button(pgGroup, SWT.PUSH);
 			selectProguardBtn.setText("Choose proguard JAR");
 			selectProguardBtn.addSelectionListener(this);
@@ -256,14 +257,11 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			jmeDocsGroup.setLayout(genGLo());
 			jmeDocsGroup.setLayoutData(genGd());
 
-			new Label(jmeDocsGroup, SWT.NONE).setText("Download them from one of the sources, or take from SDK.");
-			jmeDocsBtn = new Button(jmeDocsGroup, SWT.PUSH);
-			jmeDocsBtn.setText("Nikita36068's GitHub documentation repository");
+			new Label(jmeDocsGroup, SWT.NONE).setText("1. Download them from one of the sources, or take from SDK.");
+			jmeDocsBtn = new Link(jmeDocsGroup, SWT.NONE);
+			jmeDocsBtn.setText("<a>Nikita36068's repository</a>");
 			jmeDocsBtn.addSelectionListener(this);
-			Button b = new Button(jmeDocsGroup, SWT.PUSH);
-			b.setText("Archive at nnproject");
-			b.setEnabled(false);
-			new Label(jmeDocsGroup, SWT.NONE).setText("Select location where you placed them.");
+			new Label(jmeDocsGroup, SWT.NONE).setText("2. Select location where you placed them:");
 			selectJmeDocsBtn = new Button(jmeDocsGroup, SWT.PUSH);
 			selectJmeDocsBtn.setText("Choose documentation root");
 			selectJmeDocsBtn.addSelectionListener(this);
