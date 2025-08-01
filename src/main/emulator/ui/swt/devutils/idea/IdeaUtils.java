@@ -106,7 +106,6 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		chooseEclipse.setText("Choose existing project");
 		chooseEclipse.addSelectionListener(this);
 
-		new Label(convertEclipseProject, SWT.NONE).setText("This works only for projects with default configuration.");
 		new Label(convertEclipseProject, SWT.NONE).setText("Run config will be created only for first MIDlet.");
 
 		Group maintenanceGroup = new Group(shell, SWT.NONE);
