@@ -32,8 +32,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 
 	// state
 	private boolean didInstallation = false;
-	private String jdkTablePath = null;
-	private boolean alreadyPatched = false;
 	private boolean useOnlineDocs = false;
 	private String localDocsPath;
 	private String jdkHome;
@@ -50,8 +48,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private Button jmeDocsBtn;
 	private Button selectJmeDocsBtn;
 	private Button manualConfigBtn;
-	private Button skipPatchBtn;
-	private Button doPatchBtn;
 	private StyledText log;
 	private Button proguardAutoBtn;
 	private Button installDocsToUsr;
@@ -383,62 +379,36 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		jvmSetupGroup.setText("JVM setup");
 		jvmSetupGroup.setLayout(genGLo());
 		jvmSetupGroup.setLayoutData(genGd());
-		if (jdkTablePath == null) {
-			new Label(jvmSetupGroup, SWT.NONE).setText("CLDC/MIDP projects need specific JDK setup in IDEA.");
-			new Label(jvmSetupGroup, SWT.NONE).setText("This will be done automatically.");
-			try {
-				for (String path : getDefaultJdkSettingsFolder()) {
-					Button autoConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
-					autoConfigBtn.setText("Edit \"" + path + "\"");
-					autoConfigBtn.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent selectionEvent) {
-							try {
-								String table = Paths.get(path, "options", "jdk.table.xml").toString();
-								alreadyPatched = JdkTablePatcher.checkJdkTable(table);
-								jdkTablePath = table;
-								if (alreadyPatched)
-									refreshContent();
-								else
-									patchJdkTable();
-							} catch (Exception ex) {
-								errorMsg("Config location", "Failed to check config table. Logs may help you.\n\nException: " + ex);
-							}
-						}
-					});
-				}
-			} catch (Exception e) {
-				new Label(jvmSetupGroup, SWT.NONE).setText("Failed to automatically find config folder!");
+		new Label(jvmSetupGroup, SWT.NONE).setText("CLDC/MIDP projects need specific JDK setup in IDEA.");
+		new Label(jvmSetupGroup, SWT.NONE).setText("This will be done automatically.");
+		try {
+			for (String path : getDefaultJdkSettingsFolder()) {
+				Button autoConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
+				autoConfigBtn.setText("Edit \"" + path + "\"");
+				autoConfigBtn.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent selectionEvent) {
+						String table = Paths.get(path, "options", "jdk.table.xml").toString();
+						patchJdkTable(table);
+					}
+				});
 			}
-			new Label(jvmSetupGroup, SWT.NONE).setText("If you use non-standard setup:");
-			new Label(jvmSetupGroup, SWT.NONE).setText("1. Find config folder that your IDEA version uses.");
-			new Label(jvmSetupGroup, SWT.NONE).setText("2. Navigate to \"options\" subfolder and choose \"jdk.table.xml\" file.");
-
-			manualConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
-			manualConfigBtn.setText("Choose the file");
-			manualConfigBtn.addSelectionListener(this);
-
-			new Label(shell, SWT.NONE).setText("Note: this will write to config paths to:");
-			new Label(shell, SWT.NONE).setText("1. Running instance of KEmulator");
-			new Label(shell, SWT.NONE).setText("2. Selected JDK");
-			new Label(shell, SWT.NONE).setText("3. Selected javadocs");
-			new Label(shell, SWT.NONE).setText("You should not relocate them after the setup, or things will break.");
-		} else {
-			if (alreadyPatched) {
-				new Label(jvmSetupGroup, SWT.NONE).setText("Your JDK table looks like already set up.");
-				new Label(jvmSetupGroup, SWT.NONE).setText("If skipping, everything you choose on previous steps will be discarded.");
-
-				skipPatchBtn = new Button(jvmSetupGroup, SWT.PUSH);
-				skipPatchBtn.setText("Leave old configuration");
-				skipPatchBtn.addSelectionListener(this);
-
-				doPatchBtn = new Button(jvmSetupGroup, SWT.PUSH);
-				doPatchBtn.setText("Apply new configuration");
-				doPatchBtn.addSelectionListener(this);
-			} else {
-				throw new RuntimeException("Invalid state: not patched.");
-			}
+		} catch (Exception e) {
+			new Label(jvmSetupGroup, SWT.NONE).setText("Failed to automatically find config folder!");
 		}
+		new Label(jvmSetupGroup, SWT.NONE).setText("If you use non-standard setup:");
+		new Label(jvmSetupGroup, SWT.NONE).setText("1. Find config folder that your IDEA version uses.");
+		new Label(jvmSetupGroup, SWT.NONE).setText("2. Navigate to \"options\" subfolder and choose \"jdk.table.xml\" file.");
+
+		manualConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
+		manualConfigBtn.setText("Choose the file");
+		manualConfigBtn.addSelectionListener(this);
+
+		new Label(shell, SWT.NONE).setText("Note: this will write to config paths to:");
+		new Label(shell, SWT.NONE).setText("1. Running instance of KEmulator");
+		new Label(shell, SWT.NONE).setText("2. Selected JDK");
+		new Label(shell, SWT.NONE).setText("3. Selected javadocs");
+		new Label(shell, SWT.NONE).setText("You should not relocate them after the setup, or things will break.");
 
 		shell.layout(true, true);
 		return;
@@ -541,23 +511,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			fd.setFilterExtensions(new String[]{"jdk.table.xml"});
 			String path = fd.open();
 			if (path == null) return;
-			try {
-				alreadyPatched = JdkTablePatcher.checkJdkTable(path);
-				jdkTablePath = path;
-				if (alreadyPatched)
-					refreshContent();
-				else
-					patchJdkTable();
-			} catch (Exception ex) {
-				errorMsg("Config location", "Failed to check config table. Logs may help you.\nException: " + ex);
-			}
-		} else if (e.widget == skipPatchBtn) {
-			Settings.ideaJdkTablePatched = true;
-			shell.close();
-			shell.dispose();
-			IdeaUtils.open(parent);
-		} else if (e.widget == doPatchBtn) {
-			patchJdkTable();
+			patchJdkTable(path);
 		} else if (e.widget == selectJdkBtn) {
 			DirectoryDialog dd = new DirectoryDialog(shell, SWT.OPEN);
 			dd.setText("Choose JDK home folder");
@@ -591,11 +545,10 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		}
 	}
 
-	private void patchJdkTable() {
+	private void patchJdkTable(String jdkTablePath) {
 		Path lockFile = Paths.get(jdkTablePath).getParent().getParent().resolve(".lock");
 		if (Files.exists(lockFile)) {
 			errorMsg("Config location", "Your IntelliJ IDEA is running. Close it to continue.");
-			jdkTablePath = null;
 			refreshContent();
 			return;
 		}
@@ -606,7 +559,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			Settings.ideaJdkTablePatched = true;
 		} catch (Exception ex) {
 			errorMsg("Config patch", "Failed to modify config table. Logs may help you.\n\nException: " + ex);
-			jdkTablePath = null;
 			refreshContent();
 			return;
 		}

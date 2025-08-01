@@ -75,6 +75,16 @@ public class JdkTablePatcher {
 
 	//#region API
 
+	/**
+	 * Checks does the table contain relevant JDKs.
+	 *
+	 * @param tablePath Path to XML.
+	 * @return True if relevant JDKs found.
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws TransformerException
+	 */
 	public static boolean checkJdkTable(String tablePath) throws ParserConfigurationException, IOException, SAXException, TransformerException {
 		Element projectJdkTable = getProjectJdkTableElement(loadDocument(tablePath));
 		return jdkExists(projectJdkTable, CLDC_DEVTIME) && jdkExists(projectJdkTable, CLDC_RUNTIME);
