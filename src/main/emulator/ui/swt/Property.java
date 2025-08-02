@@ -678,10 +678,9 @@ public final class Property implements IProperty, SelectionListener {
 
 			// devutils
 			Settings.ideaPath = properties.getProperty("IdeaPath", null);
-			Settings.eclipsePath = properties.getProperty("EclipsePath", null);
 			Settings.proguardPath = properties.getProperty("ProguardPath", null);
-			Settings.j2meDocsPath = properties.getProperty("J2MEDocsPath", null);
 			Settings.ideaJdkTablePatched = Boolean.parseBoolean(properties.getProperty("IdeaJdkTablePatched", "false"));
+			Settings.lastIdeaRepoPath = properties.getProperty("LastIdeaProjectsRepo", "");
 
 			fileInputStream.close();
 		} catch (Exception ex) {
@@ -922,10 +921,9 @@ public final class Property implements IProperty, SelectionListener {
 
 			// devutils
 			if (Settings.ideaPath != null) properties.setProperty("IdeaPath", Settings.ideaPath);
-			if (Settings.eclipsePath != null) properties.setProperty("EclipsePath", Settings.eclipsePath);
 			if (Settings.proguardPath != null) properties.setProperty("ProguardPath", Settings.proguardPath);
-			if (Settings.j2meDocsPath != null) properties.setProperty("J2MEDocsPath", Settings.j2meDocsPath);
 			properties.setProperty("IdeaJdkTablePatched", String.valueOf(Settings.ideaJdkTablePatched));
+			properties.setProperty("LastIdeaProjectsRepo", Settings.lastIdeaRepoPath);
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
