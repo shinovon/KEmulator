@@ -31,6 +31,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	private final Button restartSetup;
 	private final Label creationStatus;
 	private final Group createNewProject;
+	private final Link docsLink;
 
 	IdeaUtils(Shell parent) {
 		if (!Settings.ideaJdkTablePatched)
@@ -97,14 +98,18 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		creationStatus.setText("Hover fields to see tooltips with details.");
 		creationStatus.setSize(400, SWT.DEFAULT);
 
-		Group convertEclipseProject = new Group(shell, SWT.NONE);
-		convertEclipseProject.setText("Convert a project");
-		convertEclipseProject.setLayout(genGLo());
-		convertEclipseProject.setLayoutData(genGd());
+		Group convertGroup = new Group(shell, SWT.NONE);
+		convertGroup.setText("Convert a project");
+		convertGroup.setLayout(genGLo());
+		convertGroup.setLayoutData(genGd());
 
-		chooseEclipse = new Button(convertEclipseProject, SWT.FLAT);
+		chooseEclipse = new Button(convertGroup, SWT.FLAT);
 		chooseEclipse.setText("Eclipse MTJ -> IDEA");
 		chooseEclipse.addSelectionListener(this);
+
+		docsLink = new Link(convertGroup, SWT.NONE);
+		docsLink.setText("See <a>documentation</a> to learn limitations and known issues.");
+		docsLink.addSelectionListener(this);
 
 		Group maintenanceGroup = new Group(shell, SWT.NONE);
 		maintenanceGroup.setText("Maintenance");
@@ -242,6 +247,8 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			shell.close();
 			shell.dispose();
 			open(parent);
+		} else if (e.widget == docsLink) {
+			Emulator.openUrlExternallySilent("https://github.com/shinovon/KEmulator/blob/main/IdeaSupport.md");
 		}
 	}
 
@@ -304,15 +311,6 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		try {
 			String dir = ProjectGenerator.convertEclipse(path);
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
-			MessageBox mb = new MessageBox(this.shell, SWT.ICON_INFORMATION | SWT.OK);
-			mb.setText("Project conversion");
-			mb.setMessage("Your project was converted and will open in IDEA in few seconds. There are some important notes:\n\n" +
-					"- You can still use Eclipse JDT/MTJ to work on the project.\n" +
-					"- IDEA provides bad support for global package classes. Get rid of them.\n" +
-					"- Artifact building will provide you non-pre-verified JAR, it's not ready to be run on real devices.\n" +
-					"- To get a JAR ready for deployment, use \"Package\" run configuration. The file will be \"./deployed/PROJECTNAME.jar\".\n" +
-					"- Pre-verification is done via ProGuard as part of optimization/obfuscation pass. Edit ProGuard config manually to skip it.");
-			mb.open();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			if (ex instanceof IllegalArgumentException)
