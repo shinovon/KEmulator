@@ -279,10 +279,18 @@ public class ProjectGenerator {
 			pb.command("/usr/bin/ln", "../Application Descriptor", "MANIFEST.MF");
 		}
 
-		pb.directory(new File(dir + "/META-INF"));
-		int code = pb.start().waitFor();
+		pb.directory(Paths.get(dir, "META-INF").toAbsolutePath().toFile());
+
+		Process ln = pb.start();
+		StringBuilder sw = new StringBuilder();
+		try (InputStream is = ln.getInputStream()) {
+			int c;
+			while ((c = is.read()) != -1)
+				sw.append((char) c);
+		}
+		int code = ln.waitFor();
 		if (code != 0) {
-			throw new RuntimeException((Emulator.win ? "mklink" : "ln") + " returned non-zero code: " + code + ". " + SYMLINK_FAIL_MSG);
+			throw new IllegalArgumentException((Emulator.win ? "mklink" : "ln") + " returned non-zero code: " + code + ".\n" + sw + "\n\n" + SYMLINK_FAIL_MSG);
 		}
 	}
 
