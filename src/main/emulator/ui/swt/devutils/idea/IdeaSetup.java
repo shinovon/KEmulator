@@ -36,7 +36,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private boolean didInstallation = false;
 	private boolean useOnlineDocs = false;
 	private String localDocsPath;
-	private String jdkHome;
+	private String jdkHome = null;
+	private String invalidJdkHome = null;
 
 	// view
 	private final Shell shell;
@@ -302,7 +303,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				new Label(shell, SWT.NONE).setText("KEmulator is launched with java " + System.getProperty("java.version") + ".");
 				new Label(shell, SWT.NONE).setText("Please install JDK 1.8 and select it.");
 				new Label(shell, SWT.NONE).setText("You can run KEmulator with it for auto setup.");
-			} else {
+			} else if (false) {
 				String _jdkHome = Emulator.getJdkHome();
 				if (_jdkHome == null) {
 					if (this instanceof IdeaSetupXdgLinux) {
@@ -379,6 +380,20 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			selectJdkBtn = new Button(manualJdkSetupGroup, SWT.PUSH);
 			selectJdkBtn.setText("Choose JDK home");
 			selectJdkBtn.addSelectionListener(this);
+
+			if (invalidJdkHome != null) {
+				Link ignoreVerMismatch = new Link(manualJdkSetupGroup, SWT.NONE);
+				ignoreVerMismatch.setText("<a>Ignore inappropriate version of last selected JDK and use it</a>");
+				ignoreVerMismatch.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent selectionEvent) {
+						jdkHome = invalidJdkHome;
+						invalidJdkHome = null;
+						refreshContent();
+					}
+				});
+				new Label(manualJdkSetupGroup, SWT.NONE).setText("This will cause issues, make sure to fix your config later.");
+			}
 
 			oracleJdk = new Link(shell, SWT.NONE);
 			oracleJdk.setText("<a>Download from Oracle</a>");
@@ -548,8 +563,11 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 						refreshContent();
 					} else {
 						errorMsg("JDK home", "Selected JDK says it's not 1.8.\n\n" + javaVer);
+						invalidJdkHome = path;
+						refreshContent();
 					}
-				} catch (IOException ignored) {
+				} catch (IOException ex) {
+					errorMsg("JDK home", "Failed to run java binary.");
 				}
 			} else {
 				errorMsg("JDK home", "Selected folder is not JDK home. Select a folder with \"bin\", \"jre\", \"lib\" subfolders.");
