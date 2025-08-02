@@ -283,7 +283,7 @@ public class ProjectGenerator {
 
 		Process ln = pb.start();
 		StringBuilder sw = new StringBuilder();
-		try (InputStream is = ln.getInputStream()) {
+		try (InputStream is = ln.getErrorStream()) {
 			int c;
 			while ((c = is.read()) != -1)
 				sw.append((char) c);
