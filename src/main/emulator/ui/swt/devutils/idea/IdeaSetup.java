@@ -57,6 +57,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private Button proguardAutoLocalBtn;
 	private Button useOnlineDocsBtn;
 	private Button selectJdkBtn;
+	private Link oracleJdk;
+	private Link pkgJdk;
 
 	public IdeaSetup(Shell parent) {
 		if (Settings.ideaJdkTablePatched)
@@ -378,6 +380,16 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			selectJdkBtn.setText("Choose JDK home");
 			selectJdkBtn.addSelectionListener(this);
 
+			oracleJdk = new Link(shell, SWT.NONE);
+			oracleJdk.setText("<a>Download from Oracle</a>");
+			oracleJdk.addSelectionListener(this);
+
+			if (this instanceof IdeaSetupXdgLinux) {
+				pkgJdk = new Link(shell, SWT.NONE);
+				pkgJdk.setText("<a>Search how to install a JDK from your repository</a>");
+				pkgJdk.addSelectionListener(this);
+			}
+
 			shell.layout(true, true);
 			return;
 		}
@@ -537,13 +549,20 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					} else {
 						errorMsg("JDK home", "Selected JDK says it's not 1.8.\n\n" + javaVer);
 					}
-				} catch (IOException ex) {
-					// ignore
+				} catch (IOException ignored) {
 				}
 			} else {
 				errorMsg("JDK home", "Selected folder is not JDK home. Select a folder with \"bin\", \"jre\", \"lib\" subfolders.");
 			}
-
+		} else if (e.widget == oracleJdk) {
+			Emulator.openUrlExternallySilent("https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html");
+		} else if (e.widget == pkgJdk) {
+			try {
+				String distroName = Emulator.getProcessOutput(new String[]{"/usr/bin/bash", "-c", "source /etc/os-release && echo $NAME"}, false).trim();
+				Emulator.openUrlExternallySilent("https://duckduckgo.com/?q=" + distroName.replace(" ", "+") + "+openjdk+1.8+package");
+			} catch (IOException ex) {
+				errorMsg("Failed to get distro name", ex.toString());
+			}
 		}
 	}
 
