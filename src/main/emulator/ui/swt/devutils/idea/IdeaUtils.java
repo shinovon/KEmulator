@@ -273,6 +273,8 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			String code = ProjectGenerator.create(location, repoName, className, appName);
 			Settings.lastIdeaRepoPath = location;
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, Paths.get(location, repoName).toString(), code});
+			shell.close();
+			shell.dispose();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			errorMsg("Project creation", "Failed to generate project: " + ex.getMessage());
@@ -296,6 +298,8 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			});
 			if (runIdea)
 				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+			shell.close();
+			shell.dispose();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			errorMsg("Project restore", "Failed to generate project: " + ex.getMessage() + "\nNote that this works only with projects created by KEmulator.");
@@ -311,6 +315,8 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		try {
 			String dir = ProjectGenerator.convertEclipse(path);
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+			shell.close();
+			shell.dispose();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			if (ex instanceof IllegalArgumentException)
