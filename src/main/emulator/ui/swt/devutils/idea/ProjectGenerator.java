@@ -274,7 +274,7 @@ public class ProjectGenerator {
 	private static void symlinkManifests(String dir) throws IOException, InterruptedException {
 		ProcessBuilder pb = new ProcessBuilder();
 		if (Emulator.win) {
-			pb.command("cmd.exe", "/C", "mklink MANIFEST.MF ..\\Application Descriptor");
+			pb.command("cmd.exe", "/C", "mklink MANIFEST.MF \"..\\Application Descriptor\"");
 		} else {
 			pb.command("/usr/bin/ln", "../Application Descriptor", "MANIFEST.MF");
 		}
@@ -283,7 +283,7 @@ public class ProjectGenerator {
 
 		Process ln = pb.start();
 		StringBuilder sw = new StringBuilder();
-		try (InputStream is = ln.getInputStream()) {
+		try (InputStream is = ln.getErrorStream()) {
 			int c;
 			while ((c = is.read()) != -1)
 				sw.append((char) c);
