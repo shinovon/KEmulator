@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class ProjectGenerator {
@@ -144,11 +145,17 @@ public class ProjectGenerator {
 
 		// root
 
+		HashSet<String> gitignore = new HashSet<>(Files.readAllLines(dir.resolve(".gitignore")));
+
 		try (BufferedWriter gi = new BufferedWriter(new FileWriter(dir.resolve(".gitignore").toString(), true))) {
-			gi.write(".idea/runConfigurations");
-			gi.newLine();
-			gi.write(PROGUARD_LOCAL_CFG);
-			gi.newLine();
+			if (!gitignore.contains(".idea") && !gitignore.contains(".idea/") && !gitignore.contains(".idea/*") && !gitignore.contains(".idea/runConfigurations")) {
+				gi.write(".idea/runConfigurations");
+				gi.newLine();
+			}
+			if (!gitignore.contains(PROGUARD_GLOBAL_CFG)) {
+				gi.write(PROGUARD_LOCAL_CFG);
+				gi.newLine();
+			}
 		}
 		String[] libraries = ProjectConfigGenerator.generateIML(dir.resolve(".classpath"), dir.resolve(projectName + ".iml"));
 		generateProGuardConfig(dir, projectName, libraries);
