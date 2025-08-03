@@ -55,7 +55,7 @@ public class ProjectGenerator {
 	}
 
 
-	public static boolean fixCloned(String dir, Runnable onSymlinkFail) throws IOException, InterruptedException {
+	public static boolean fixCloned(String dir) throws IOException, InterruptedException {
 		File folder = new File(dir);
 		String imlPath = null;
 		for (File file : folder.listFiles()) {

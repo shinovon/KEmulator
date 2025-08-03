@@ -293,9 +293,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		}
 		String dir = Paths.get(path).getParent().toString();
 		try {
-			boolean runIdea = ProjectGenerator.fixCloned(dir, () -> {
-				errorMsg("Failed to create symbolic link", ProjectGenerator.SYMLINK_FAIL_MSG + "\n\nSee log/stdout for error code.");
-			});
+			boolean runIdea = ProjectGenerator.fixCloned(dir);
 			if (runIdea)
 				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
 			shell.close();
@@ -336,7 +334,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		}
 		try {
 			System.out.println("Fixing project at " + path);
-			ProjectGenerator.fixCloned(path, () -> System.out.println("Failed to restore symlink. Your MANIFEST.MF and Application Descriptor are now independent files."));
+			ProjectGenerator.fixCloned(path);
 			System.out.println("OK");
 			System.exit(0);
 		} catch (Exception ex) {
