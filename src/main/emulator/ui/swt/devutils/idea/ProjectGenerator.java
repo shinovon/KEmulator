@@ -220,6 +220,7 @@ public class ProjectGenerator {
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
 	private static void generateBuildConfigs(Path dir, String projectName, boolean eclipseManifest) throws IOException {

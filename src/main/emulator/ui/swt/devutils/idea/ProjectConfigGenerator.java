@@ -226,6 +226,22 @@ public class ProjectConfigGenerator {
 				"</component>";
 	}
 
+	public static String buildRestoreRunConfig(String projectName) {
+		return "<component name=\"ProjectRunConfigurationManager\">\n" +
+				"  <configuration default=\"false\" name=\"Restore project\" type=\"Application\" factoryName=\"Application\">\n" +
+				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
+				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
+				"    <option name=\"MAIN_CLASS_NAME\" value=\"emulator.Emulator\" />\n" +
+				"    <module name=\"" + projectName + "\" />\n" +
+				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-restore $PROJECT_DIR$\" />\n" +
+				"    <option name=\"WORKING_DIRECTORY\" value=\"" + Emulator.getAbsolutePath() + "\" />\n" +
+				"    <method v=\"2\">\n" +
+				"      <option name=\"Make\" enabled=\"true\" />\n" +
+				"    </method>\n" +
+				"  </configuration>\n" +
+				"</component>";
+	}
+
 	public static String buildPackageRunConfig(String projectName) {
 		return "<component name=\"ProjectRunConfigurationManager\">\n" +
 				"  <configuration default=\"false\" name=\"Package\" type=\"JarApplication\">\n" +
@@ -235,6 +251,7 @@ public class ProjectConfigGenerator {
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <method v=\"2\">\n" +
+				"      <option name=\"RunConfigurationTask\" enabled=\"true\" run_configuration_name=\"Restore project\" run_configuration_type=\"Application\" />"+
 				"      <option name=\"BuildArtifacts\" enabled=\"true\">\n" +
 				"        <artifact name=\"" + projectName + "\" />\n" +
 				"      </option>\n" +
