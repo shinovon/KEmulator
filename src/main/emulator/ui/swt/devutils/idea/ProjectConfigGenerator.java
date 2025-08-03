@@ -188,7 +188,7 @@ public class ProjectConfigGenerator {
 		return sb.toString();
 	}
 
-	public static String buildArtifactConfig(String projectName) {
+	public static String buildArtifactConfig(String projectName, boolean eclipseManifest) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("<component name=\"ArtifactManager\">").append(System.lineSeparator());
@@ -196,7 +196,10 @@ public class ProjectConfigGenerator {
 		sb.append("    <output-path>$PROJECT_DIR$/deployed/raw</output-path>").append(System.lineSeparator());
 		sb.append("    <root id=\"archive\" name=\"").append(projectName).append(".jar\">").append(System.lineSeparator());
 		sb.append("      <element id=\"directory\" name=\"META-INF\">").append(System.lineSeparator());
-		sb.append("        <element id=\"file-copy\" path=\"$PROJECT_DIR$/META-INF/MANIFEST.MF\" />").append(System.lineSeparator());
+		if (eclipseManifest)
+			sb.append("        <element id=\"file-copy\" output-file-name=\"MANIFEST.MF\" path=\"$PROJECT_DIR$/Application Descriptor\" />").append(System.lineSeparator());
+		else
+			sb.append("        <element id=\"file-copy\" path=\"$PROJECT_DIR$/META-INF/MANIFEST.MF\" />").append(System.lineSeparator());
 		sb.append("      </element>").append(System.lineSeparator());
 		sb.append("      <element id=\"module-output\" name=\"").append(projectName).append("\" />").append(System.lineSeparator());
 		sb.append("    </root>").append(System.lineSeparator());

@@ -6,7 +6,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -47,7 +46,7 @@ public class ProjectGenerator {
 		generateMiscXmls(dir, projectName);
 
 		// jars
-		generateBuildConfigs(dir, projectName);
+		generateBuildConfigs(dir, projectName, false);
 
 		// run configs
 		generateRunConfigs(dir, projectName, new String[][]{new String[]{readableName, midletClassName}});
@@ -69,48 +68,32 @@ public class ProjectGenerator {
 		Path appDecrPath = dirp.resolve("Application Descriptor");
 		Path mfPath = dirp.resolve("META-INF").resolve("MANIFEST.MF");
 
+		createDirectories(dirp);
+
+		String[][] midletNames;
+
 		boolean isEclipse = Files.exists(appDecrPath);
-		if (!Files.exists(mfPath)) {
+
+		if (Files.exists(mfPath)) {
 			if (isEclipse) {
-				// this may happen if user unpacks dual eclipse/idea project, attempts to restore it but symlinking fails with KEm crashing.
-				// let's silently repair this.
-				try {
-					symlinkManifests(dir);
-				} catch (IOException e) {
-					System.out.println(e);
-					Files.copy(appDecrPath, mfPath);
-					onSymlinkFail.run();
-				}
+				System.out.println("Warning: both \"Application Descriptor\" and \"MANIFEST.MF\" exist. Run configurations will be updated based on \"Application Descriptor\".");
+				fixManifestWithVersion(mfPath);
+				fixManifestWithVersion(appDecrPath);
+				midletNames = getMidletsFromMF(appDecrPath);
+			} else {
+				fixManifestWithVersion(mfPath);
+				midletNames = getMidletsFromMF(mfPath);
 			}
-			throw new FileNotFoundException("MANIFEST.MF file is missing. Please repair your project structure by hand first.");
 		} else {
-			if (isEclipse && !Files.isSymbolicLink(mfPath)) {
-				List<String> ideaMf = Files.readAllLines(mfPath);
-				List<String> eclipseMf = Files.readAllLines(appDecrPath);
-				boolean match = ideaMf.equals(eclipseMf);
-				if (match) {
-					// manifests are equal so symlink them
-					try {
-						Files.delete(mfPath);
-						symlinkManifests(dir);
-					} catch (IOException e) {
-						System.out.println(e);
-						Files.copy(appDecrPath, mfPath);
-						onSymlinkFail.run();
-					}
-				} else {
-					throw new RuntimeException("Application Descriptor and MANIFEST.MF do not match. " +
-							"Please synchronize them by hand and run restore again. " +
-							"If you run into issues, copypaste correct version into Application Descriptor and delete MANIFEST.MF, " +
-							"it will be automatically restored.");
-				}
+			if (isEclipse) {
+				fixManifestWithVersion(appDecrPath);
+				midletNames = getMidletsFromMF(appDecrPath);
+			} else {
+				throw new IllegalArgumentException("Neither \"Application Descriptor\" nor \"MANIFEST.MF\" files found!");
 			}
 		}
 
 		String projectName = dirp.getFileName().toString();
-		String[][] midletNames = getMidletClassNameFromMF(dirp);
-
-		createDirectories(dirp);
 
 		if (imlPath != null) {
 			try {
@@ -124,7 +107,7 @@ public class ProjectGenerator {
 				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
 						"You can rerun IDE setup to bring your configuration to recommended one.");
 		} else {
-			System.out.println("No IML found! IDEA configs will not be created.");
+			System.out.println("No IML found! Run configuration will not be created.");
 			generateProGuardConfig(dirp, projectName, new String[0]);
 		}
 
@@ -136,9 +119,7 @@ public class ProjectGenerator {
 		String projectName = dir.getFileName().toString(); //folder name
 
 		if (Files.exists(dir.resolve("META-INF").resolve("MANIFEST.MF"))) {
-			throw new RuntimeException("META-INF/MANIFEST.MF already exists! " +
-					"Eclipse projects are supposed to work with \"Application Descriptor\" file. " +
-					"Synchronize their contents by hand and delete MANIFEST.MF file. It will be recreated soon.");
+			System.out.println("MANIFEST.MF found! It will be ignored, converted projects use \"Application Descriptor\".");
 		}
 
 		createDirectories(dir);
@@ -161,16 +142,15 @@ public class ProjectGenerator {
 		generateProGuardConfig(dir, projectName, libraries);
 
 		// manifest
-		fixManifestWithVersion(appDescriptorPath);
-		symlinkManifests(dir.toString());
+		fixManifestWithVersion(Paths.get(appDescriptorPath));
 
-		String[][] midlets = getMidletClassNameFromMF(dir);
+		String[][] midlets = getMidletsFromMF(dir.resolve("Application Descriptor"));
 
 		// ide config
 		generateMiscXmls(dir, projectName);
 
 		// jars
-		generateBuildConfigs(dir, projectName);
+		generateBuildConfigs(dir, projectName, true);
 
 		// run configs
 		generateRunConfigs(dir, projectName, midlets);
@@ -180,8 +160,8 @@ public class ProjectGenerator {
 
 	//#region impls
 
-	private static void fixManifestWithVersion(String mfPath) throws IOException {
-		List<String> manifest = Files.readAllLines(Paths.get(mfPath));
+	private static void fixManifestWithVersion(Path manifestPath) throws IOException {
+		List<String> manifest = Files.readAllLines(manifestPath);
 		boolean hasVersion = false;
 		for (String line : manifest) {
 			if (line.startsWith("Manifest-Version:")) {
@@ -191,7 +171,7 @@ public class ProjectGenerator {
 		}
 		if (!hasVersion) {
 			manifest.add(0, "Manifest-Version: 1.0");
-			Files.write(Paths.get(mfPath), manifest);
+			Files.write(manifestPath, manifest);
 		}
 	}
 
@@ -213,9 +193,9 @@ public class ProjectGenerator {
 		}
 	}
 
-	private static String[][] getMidletClassNameFromMF(Path dir) throws IOException {
+	private static String[][] getMidletsFromMF(Path manifestPath) throws IOException {
 		ArrayList<String[]> names = new ArrayList<>();
-		List<String> lines = Files.readAllLines(dir.resolve("META-INF").resolve("MANIFEST.MF"), StandardCharsets.UTF_8);
+		List<String> lines = Files.readAllLines(manifestPath, StandardCharsets.UTF_8);
 		HashMap<String, String> manifest = new HashMap<>();
 		for (String line : lines) {
 			String[] split = line.split(":", 2);
@@ -242,8 +222,9 @@ public class ProjectGenerator {
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void generateBuildConfigs(Path dir, String projectName) throws IOException {
-		Files.write(dir.resolve(".idea").resolve("artifacts").resolve(projectName + ".xml"), ProjectConfigGenerator.buildArtifactConfig(projectName).getBytes(StandardCharsets.UTF_8));
+	private static void generateBuildConfigs(Path dir, String projectName, boolean eclipseManifest) throws IOException {
+		Path path = dir.resolve(".idea").resolve("artifacts").resolve(projectName + ".xml");
+		Files.write(path, ProjectConfigGenerator.buildArtifactConfig(projectName, eclipseManifest).getBytes(StandardCharsets.UTF_8));
 	}
 
 	private static void generateMiscXmls(Path dir, String projectName) throws IOException {
@@ -275,29 +256,6 @@ public class ProjectGenerator {
 		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, libs).getBytes(StandardCharsets.UTF_8));
 		if (!Files.exists(dir.resolve(PROGUARD_GLOBAL_CFG))) {
 			Files.write(dir.resolve(PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
-		}
-	}
-
-	private static void symlinkManifests(String dir) throws IOException, InterruptedException {
-		ProcessBuilder pb = new ProcessBuilder();
-		if (Emulator.win) {
-			pb.command("cmd.exe", "/C", "mklink MANIFEST.MF \"..\\Application Descriptor\"");
-		} else {
-			pb.command("/usr/bin/ln", "../Application Descriptor", "MANIFEST.MF");
-		}
-
-		pb.directory(Paths.get(dir, "META-INF").toAbsolutePath().toFile());
-
-		Process ln = pb.start();
-		StringBuilder sw = new StringBuilder();
-		try (InputStream is = ln.getErrorStream()) {
-			int c;
-			while ((c = is.read()) != -1)
-				sw.append((char) c);
-		}
-		int code = ln.waitFor();
-		if (code != 0) {
-			throw new IllegalArgumentException((Emulator.win ? "mklink" : "ln") + " returned non-zero code: " + code + ".\n" + sw + "\n\n" + SYMLINK_FAIL_MSG);
 		}
 	}
 
