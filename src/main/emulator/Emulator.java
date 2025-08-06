@@ -776,7 +776,7 @@ public class Emulator implements Runnable {
 		}
 	}
 
-	public static void main(final String[] commandLineArguments) {
+	public static void main(final String[] args) {
 		try {
 			platform = ((IEmulatorPlatform) Class.forName("emulator.EmulatorPlatform").newInstance());
 		} catch (Exception e) {
@@ -813,14 +813,14 @@ public class Emulator implements Runnable {
 				return;
 			}
 			EmulatorMIDI.initDevices();
-			Emulator.commandLineArguments = commandLineArguments;
+			Emulator.commandLineArguments = args;
 			UILocale.initLocale();
-			parseLaunchArgs(commandLineArguments); //
+			parseLaunchArgs(args); //
 			if (bridge)
 				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
 			else
 				Emulator.emulatorimpl = new SWTFrontend();
-			parseLaunchArgs(commandLineArguments);
+			parseLaunchArgs(args);
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
