@@ -717,8 +717,6 @@ public class Emulator implements Runnable {
 		System.setProperty("microedition.media.version", "1.0");
 		System.setProperty("supports.mixing", "true");
 		System.setProperty("supports.audio.capture", "false");
-		System.setProperty("supports.video.capture", "false");
-		System.setProperty("supports.photo.capture", "false");
 		System.setProperty("supports.recording", "false");
 		System.setProperty("microedition.io.file.FileConnection.version", "1.0");
 		System.setProperty("microedition.pim.version", "1.0");

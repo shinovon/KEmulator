@@ -140,25 +140,31 @@ public class CustomMethod {
 					|| prop.equals("supports.mediacapabilities")
 					|| prop.equals("camera.orientations")
 					|| prop.equals("camera.resolutions"))) {
-				if (!Emulator.getPlatform().isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
-					try {
-						Webcam w = Webcam.getDefault();
-						if (w != null) {
-							System.setProperty("supports.video.capture", "true");
-							System.setProperty("supports.photo.capture", "true");
-							System.setProperty("supports.mediacapabilities", "camera");
-							System.setProperty("camera.orientations", "devcam0:inwards");
-							Dimension d = w.getViewSize();
-							System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
+				r: {
+					if (!Emulator.getPlatform().isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
+						try {
+							Webcam w = Webcam.getDefault();
+							if (w != null) {
+								System.setProperty("supports.video.capture", "true");
+								System.setProperty("supports.photo.capture", "true");
+								System.setProperty("supports.mediacapabilities", "camera");
+								System.setProperty("camera.orientations", "devcam0:inwards");
+								Dimension d = w.getViewSize();
+								System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
+								
+								res = System.getProperty(prop);
+								break r;
+							}
+						} catch (Throwable ignored) {
 						}
-					} catch (Throwable ignored) {
+					}
+					if (prop.equals("supports.video.capture") || prop.equals("supports.photo.capture")) {
+						res = "false";
 					}
 				}
-				res = System.getProperty(prop);
-			} else if (Settings.hideEmulation) {
-					if (prop.startsWith("os.") || prop.startsWith("java."))
-						res = null;
-				}
+			} else if (Settings.hideEmulation && (prop.startsWith("os.") || prop.startsWith("java.") || prop.startsWith("sun."))) {
+				res = null;
+			}
 			// Hide properties of disabled APIs
 			if(!Settings.protectedPackages.isEmpty()) {
 				if (CustomClassLoader.isProtected(prop, false) || CustomClassLoader.isProtected("javax." + prop, false)) {
