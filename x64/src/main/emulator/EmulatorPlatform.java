@@ -190,8 +190,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 					}
 					System.load(path + ".so");
 				} else if (osn.contains("mac")) {
-					// TODO
-					path += "amrdecoder";
+					path += "libamrdecoder";
 					if (osa.contains("aarch64")) {
 						path += "_arm64";
 					}
