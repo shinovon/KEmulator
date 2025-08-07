@@ -104,7 +104,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
         try {
             final byte[] b;
             // Use new AMR decoder
-            b = AMRDecoder.decode(ResourceManager.getBytes(inputStream));
+            b = AMRDecoder.decode(data = ResourceManager.getBytes(inputStream));
             if (b == null) {
                 throw new MediaException("Cannot parse AMR data");
             }
@@ -124,10 +124,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
             clip.addLineListener(this);
             clip.open(audioInputStream);
             sequence = clip;
-        } catch (Exception e) {
-            System.out.println("AMR realize error: " + e);
+        } catch (Throwable e) {
+			Emulator.getEmulator().getLogStream().println("AMR realize error: " + e);
             sequence = null;
-            throw new IOException("AMR realize error!", e);
+            throw new IOException("AMR realize error", e);
         }
     }
 

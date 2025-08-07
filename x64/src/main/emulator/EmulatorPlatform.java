@@ -39,6 +39,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		System.setProperty("jna.nosys", "true");
 		loadSWTLibrary();
 		loadLWJGLNatives();
+		loadAMR();
 	}
 
 	public boolean supportsMascotCapsule() {
@@ -156,6 +157,25 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 			addToClassPath("lwjgl-opengl-natives-" + arch + ".jar");
 			addToClassPath("lwjgl3-swt-" + arch + ".jar");
 		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void loadAMR() {
+		String osn = System.getProperty("os.name").toLowerCase();
+		String osa = System.getProperty("os.arch").toLowerCase();
+		String path = Emulator.getAbsolutePath() + File.separatorChar;
+		try {
+			if (osn.contains("win")) {
+				if (osa.contains("amd64") || osa.contains("x86_64")) {
+					System.load(path + "amrdecoder_64.dll");
+				} else {
+					System.load(path + "amrdecoder.dll");
+				}
+			} else {
+				// TODO linux & mac os support
+			}
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}

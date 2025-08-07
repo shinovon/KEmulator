@@ -41,6 +41,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	public void loadLibraries() {
+		loadAMR();
 	}
 
 	public boolean supportsMascotCapsule() {
@@ -92,6 +93,14 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 			if (!mascotLoaded) {
 				addToClassPath(Settings.micro3d == 0 ? "micro3d_dll.jar" : "micro3d_gl.jar");
 			}
+		}
+	}
+
+	private static void loadAMR() {
+		try {
+			System.load(Emulator.getAbsolutePath() + File.separatorChar + "amrdecoder.dll");
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 	}
 
