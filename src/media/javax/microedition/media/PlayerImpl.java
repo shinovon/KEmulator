@@ -469,7 +469,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		realized = true;
 		if (inputStream != null) {
 			try {
-				if ("audio/amr".equals(contentType)) {
+				if ("audio/amr".equals(contentType) || "audio/x-amr".equals(contentType)) {
 					amr(inputStream);
 				} else if ("audio/x-wav".equals(contentType) || "audio/wav".equals(contentType)) {
 					wav(inputStream);
