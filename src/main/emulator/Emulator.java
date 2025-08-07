@@ -12,7 +12,9 @@ import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
 import emulator.ui.bridge.BridgeFrontend;
+import emulator.ui.swt.Property;
 import emulator.ui.swt.SWTFrontend;
+import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -71,7 +73,7 @@ public class Emulator implements Runnable {
 
 	public static String httpUserAgent;
 	private final static Thread backgroundThread;
-	private static IEmulatorPlatform platform;
+	public static IEmulatorPlatform platform;
 
 	public static final String os = System.getProperty("os.name").toLowerCase();
 	public static final boolean win = os.startsWith("win");
@@ -1047,16 +1049,28 @@ public class Emulator implements Runnable {
 					getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
 				} else if (key.equalsIgnoreCase("key")) {
 					KeyMapping.keyArg(value);
+				} else if (key.equals("new-project")) {
+					new Property();
+					IdeaUtils.createProjectCLI(value);
+				} else if (key.equals("restore")) {
+					new Property();
+					IdeaUtils.restoreProjectCLI(value);
+				} else if (key.equals("convert")) {
+					new Property();
+					IdeaUtils.convertProjectCLI(value);
+				} else if (key.equals("edit")) {
+					new Property();
+					IdeaUtils.editProjectCLI(value);
 				}
 			}
 		}
 		return true;
 	}
 
-	public static String getProcessOutput(String commandline) throws IOException {
-		Process regRequest = Runtime.getRuntime().exec(commandline);
+	public static String getProcessOutput(String[] commandline, boolean errStream) throws IOException {
+		Process proc = Runtime.getRuntime().exec(commandline);
 		StringBuilder sw = new StringBuilder();
-		try (InputStream is = regRequest.getInputStream()) {
+		try (InputStream is = errStream ? proc.getErrorStream() : proc.getInputStream()) {
 			int c;
 			while ((c = is.read()) != -1)
 				sw.append((char) c);
@@ -1114,7 +1128,7 @@ public class Emulator implements Runnable {
 		if (win) {
 			// installer will write to registry path to installed jar. Let's check it.
 			try {
-				String output = getProcessOutput("reg query \"HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator\" /v JarInstalledPath");
+				String output = getProcessOutput(new String[]{"reg", "query", "HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator", "/v", "JarInstalledPath"}, false);
 				int i = output.indexOf("REG_SZ");
 				if (i != -1) {
 					String pathFromReg = output.substring(i + 6).trim();
@@ -1182,7 +1196,7 @@ public class Emulator implements Runnable {
 		String parent = Paths.get(realHome).getParent().toString();
 		if (Files.exists(Paths.get(parent, "bin", win ? "javac.exe" : "javac"))) {
 			// we run with JRE in JDK
-			return realHome;
+			return parent;
 		}
 		// standalone JRE
 		return null;
