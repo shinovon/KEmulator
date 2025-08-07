@@ -39,6 +39,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		System.setProperty("jna.nosys", "true");
 		loadSWTLibrary();
 		loadLWJGLNatives();
+		loadAMR();
 	}
 
 	public boolean supportsMascotCapsule() {
@@ -156,6 +157,47 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 			addToClassPath("lwjgl-opengl-natives-" + arch + ".jar");
 			addToClassPath("lwjgl3-swt-" + arch + ".jar");
 		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void loadAMR() {
+		String osn = System.getProperty("os.name").toLowerCase();
+		String osa = System.getProperty("os.arch").toLowerCase();
+		String path = Emulator.getAbsolutePath() + File.separatorChar;
+		try {
+			if (osn.contains("win")) {
+				if (osa.contains("amd64") || osa.contains("x86_64")) {
+					path += "amrdecoder_64.dll";
+				} else if (osa.contains("aarch64") || osa.contains("arm")) { // I don't know which one it returns exactly
+					path += "amrdecoder_arm64.dll";
+				} else {
+					path += "amrdecoder.dll";
+				}
+				System.load(path);
+			} else {
+				if (osn.contains("linux")) {
+					path += "libamrdecoder";
+					if (osa.contains("amd64") || osa.contains("x86_64")) {
+						path += "_64";
+					} else if (osa.contains("86")) {
+					} else if (osa.contains("aarch64") || osa.contains("armv8")) {
+						path = "_arm64";
+					} else if (osa.contains("arm")) {
+						path = "_arm32";
+					} else {
+						path += '_' + osa;
+					}
+					System.load(path + ".so");
+				} else if (osn.contains("mac")) {
+					path += "libamrdecoder";
+					if (osa.contains("aarch64")) {
+						path += "_arm64";
+					}
+					System.load(path + ".dylib");
+				}
+			}
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}
