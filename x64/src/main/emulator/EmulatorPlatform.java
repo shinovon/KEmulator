@@ -174,7 +174,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 				} else {
 					path += "amrdecoder.dll";
 				}
-				System.load(path + "amrdecoder.dll");
+				System.load(path);
 			} else {
 				if (osn.contains("linux")) {
 					path += "libamrdecoder";
