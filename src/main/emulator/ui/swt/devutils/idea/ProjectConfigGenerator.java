@@ -153,14 +153,19 @@ public class ProjectConfigGenerator {
 		sb.append("import javax.microedition.lcdui.Display;").append(System.lineSeparator());
 		sb.append("import javax.microedition.lcdui.Form;").append(System.lineSeparator());
 		sb.append("import javax.microedition.midlet.MIDlet;").append(System.lineSeparator());
+		sb.append(System.lineSeparator());
 		sb.append("public class ").append(clsName).append(" extends MIDlet {").append(System.lineSeparator());
 		sb.append("    protected void startApp() {").append(System.lineSeparator());
-		sb.append("        Form f = new Form(\"Test MIDlet\");").append(System.lineSeparator());
-		sb.append("        f.append(\"Hello world, I guess?\");").append(System.lineSeparator());
+		sb.append("        Form f = new Form(\"").append(clsName).append("\");").append(System.lineSeparator());
+		sb.append("        f.append(\"Your MIDlet seems to run.\");").append(System.lineSeparator());
 		sb.append("        Display.getDisplay(this).setCurrent(f);").append(System.lineSeparator());
 		sb.append("    }").append(System.lineSeparator());
-		sb.append("    protected void pauseApp() {}").append(System.lineSeparator());
-		sb.append("    protected void destroyApp(boolean b) {}").append(System.lineSeparator());
+		sb.append(System.lineSeparator());
+		sb.append("    protected void pauseApp() {").append(System.lineSeparator());
+		sb.append("    }").append(System.lineSeparator());
+		sb.append(System.lineSeparator());
+		sb.append("    protected void destroyApp(boolean unconditional) {").append(System.lineSeparator());
+		sb.append("    }").append(System.lineSeparator());
 		sb.append("}").append(System.lineSeparator());
 
 		return sb.toString();
