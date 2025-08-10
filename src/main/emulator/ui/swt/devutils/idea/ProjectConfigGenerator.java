@@ -47,8 +47,6 @@ public class ProjectConfigGenerator {
 			".settings\n" +
 			"bin/\n" +
 			"deployed/\n" +
-			"!**/src/main/**/bin/\n" +
-			"!**/src/test/**/bin/\n" +
 			"\n" +
 			"### NetBeans ###\n" +
 			"/nbproject/private/\n" +
