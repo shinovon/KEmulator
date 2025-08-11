@@ -15,10 +15,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class ProjectGenerator {
 
@@ -197,18 +194,15 @@ public class ProjectGenerator {
 	}
 
 	private static String[][] getMidletsFromMF(Path manifestPath) throws IOException {
+		Properties manifest = new Properties();
+		manifest.load(new InputStreamReader(new FileInputStream(manifestPath.toFile()), StandardCharsets.UTF_8));
+
 		ArrayList<String[]> names = new ArrayList<>();
-		List<String> lines = Files.readAllLines(manifestPath, StandardCharsets.UTF_8);
-		HashMap<String, String> manifest = new HashMap<>();
-		for (String line : lines) {
-			String[] split = line.split(":", 2);
-			manifest.put(split[0], split[1]);
-		}
 		for (int i = 1; true; i++) {
 			if (!manifest.containsKey("MIDlet-" + i)) {
 				break;
 			}
-			String[] split = manifest.get("MIDlet-" + i).split(",");
+			String[] split = ((String) manifest.get("MIDlet-" + i)).split(",");
 			names.add(new String[]{split[0].trim(), split[2].trim()});
 		}
 		if (names.isEmpty())
