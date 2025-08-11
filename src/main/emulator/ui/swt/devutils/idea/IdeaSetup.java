@@ -647,7 +647,14 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		if (!Emulator.isPortable)
 			throw new UnsupportedOperationException();
 
-		Path tempZip = Files.createTempFile("proguard", ".zip").toAbsolutePath();
+		Path tempZip;
+		if (this instanceof IdeaSetupWindows) {
+			Path appData = Paths.get(System.getenv("APPDATA")).toAbsolutePath();
+			Path tmp = appData.getParent().resolve("Local").resolve("Temp");
+			tempZip = Files.createTempFile(tmp, "proguard", ".zip").toAbsolutePath();
+		} else {
+			tempZip = Files.createTempFile("proguard", ".zip").toAbsolutePath();
+		}
 		try {
 			appendLog("Downloading manually, wait...\n");
 			try (InputStream in = new URL(PROGUARD_URL).openStream()) {
