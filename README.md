@@ -9,7 +9,7 @@ Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 ## Compatibility
 JRE:
 - Java 8 by Oracle
-- OpenJDK 9-21
+- OpenJDK 9-25
 
 System:
 - Windows XP - 11 (x86, x86_64)
