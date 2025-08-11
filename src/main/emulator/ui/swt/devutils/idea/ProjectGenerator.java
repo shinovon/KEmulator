@@ -126,7 +126,10 @@ public class ProjectGenerator {
 
 		// root
 
-		HashSet<String> gitignore = new HashSet<>(Files.readAllLines(dir.resolve(".gitignore")));
+		HashSet<String> gitignore = new HashSet<>();
+		if (Files.exists(dir.resolve(".gitignore"))) {
+			gitignore = new HashSet<>(Files.readAllLines(dir.resolve(".gitignore")));
+		}
 
 		try (BufferedWriter gi = new BufferedWriter(new FileWriter(dir.resolve(".gitignore").toString(), true))) {
 			if (!gitignore.contains(".idea") && !gitignore.contains(".idea/") && !gitignore.contains(".idea/*") && !gitignore.contains(".idea/runConfigurations")) {
