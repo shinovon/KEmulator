@@ -115,6 +115,20 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			return;
 		}
 
+		// proguard installation
+		if (Settings.proguardPath == null) {
+			// if proguard is already here, skip the setup.
+			if (Files.exists(proguardDefaultLocalPath) || (this instanceof IdeaSetupXdgLinux && Files.exists(Paths.get(PROGUARD_DEFAULT_PATH_UNIX)))) {
+				Settings.proguardPath = proguardDefaultLocalPath.toString();
+				refreshContent();
+				return;
+			}
+
+			makeProguardForm();
+			shell.layout(true, true);
+			return;
+		}
+
 		// IDEA installation
 		if (Settings.ideaPath == null) {
 			Group findGroup = new Group(shell, SWT.NONE);
@@ -169,62 +183,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				refreshInstalledListBtn.setText("I did it, refresh list of installed IDEs");
 				refreshInstalledListBtn.addSelectionListener(this);
 			}
-
-			shell.layout(true, true);
-			return;
-		}
-
-		// proguard installation
-		if (Settings.proguardPath == null) {
-			// if proguard is already here, skip the setup.
-			if (Files.exists(proguardDefaultLocalPath) || (this instanceof IdeaSetupXdgLinux && Files.exists(Paths.get(PROGUARD_DEFAULT_PATH_UNIX)))) {
-				Settings.proguardPath = proguardDefaultLocalPath.toString();
-				refreshContent();
-				return;
-			}
-
-			new Label(shell, SWT.NONE).setText("ProGuard is needed for packaging MIDlets into JARs.");
-			Group pgGroup = new Group(shell, SWT.NONE);
-			pgGroup.setText("Manual setup");
-			pgGroup.setLayout(genGLo());
-			pgGroup.setLayoutData(genGd());
-			new Label(pgGroup, SWT.NONE).setText("1. Download it from one of the sources.");
-			nnchanProguardBtn = new Link(pgGroup, SWT.NONE);
-			nnchanProguardBtn.setText("<a>v6.2.2 from NNP archive</a> (recommended)");
-			nnchanProguardBtn.addSelectionListener(this);
-			githubProguardBtn = new Link(pgGroup, SWT.NONE);
-			githubProguardBtn.setText("<a>Project's github</a>");
-			githubProguardBtn.addSelectionListener(this);
-
-			new Label(pgGroup, SWT.NONE).setText("2. Unpack the archive where you want and select main program file:");
-			selectProguardBtn = new Button(pgGroup, SWT.PUSH);
-			selectProguardBtn.setText("Choose proguard JAR");
-			selectProguardBtn.addSelectionListener(this);
-
-			Group autoGroup = new Group(shell, SWT.NONE);
-			autoGroup.setText("Auto setup");
-			autoGroup.setLayout(genGLo());
-			autoGroup.setLayoutData(genGd());
-
-			boolean autoSetupAvailable = false;
-
-			if (this instanceof IdeaSetupXdgLinux) {
-				proguardAutoBtn = new Button(autoGroup, SWT.PUSH);
-				proguardAutoBtn.setText("Install to /opt/");
-				proguardAutoBtn.addSelectionListener(this);
-				new Label(autoGroup, SWT.NONE).setText("Required tools: wget, rm, bash, unzip, install, pkexec.");
-				autoSetupAvailable = true;
-			}
-
-			if (Emulator.isPortable) {
-				proguardAutoLocalBtn = new Button(autoGroup, SWT.PUSH);
-				proguardAutoLocalBtn.setText("Install to KEmulator folder");
-				proguardAutoLocalBtn.addSelectionListener(this);
-				autoSetupAvailable = true;
-			}
-
-			if (!autoSetupAvailable)
-				new Label(autoGroup, SWT.NONE).setText("Not available in your configuration.");
 
 			shell.layout(true, true);
 			return;
@@ -448,6 +406,51 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		shell.layout(true, true);
 		return;
 
+	}
+
+	private void makeProguardForm() {
+		new Label(shell, SWT.NONE).setText("ProGuard is needed for packaging MIDlets into JARs.");
+		Group pgGroup = new Group(shell, SWT.NONE);
+		pgGroup.setText("Manual setup");
+		pgGroup.setLayout(genGLo());
+		pgGroup.setLayoutData(genGd());
+		new Label(pgGroup, SWT.NONE).setText("1. Download it from one of the sources.");
+		nnchanProguardBtn = new Link(pgGroup, SWT.NONE);
+		nnchanProguardBtn.setText("<a>v6.2.2 from NNP archive</a> (recommended)");
+		nnchanProguardBtn.addSelectionListener(this);
+		githubProguardBtn = new Link(pgGroup, SWT.NONE);
+		githubProguardBtn.setText("<a>Project's github</a>");
+		githubProguardBtn.addSelectionListener(this);
+
+		new Label(pgGroup, SWT.NONE).setText("2. Unpack the archive where you want and select main program file:");
+		selectProguardBtn = new Button(pgGroup, SWT.PUSH);
+		selectProguardBtn.setText("Choose proguard JAR");
+		selectProguardBtn.addSelectionListener(this);
+
+		Group autoGroup = new Group(shell, SWT.NONE);
+		autoGroup.setText("Auto setup");
+		autoGroup.setLayout(genGLo());
+		autoGroup.setLayoutData(genGd());
+
+		boolean autoSetupAvailable = false;
+
+		if (this instanceof IdeaSetupXdgLinux) {
+			proguardAutoBtn = new Button(autoGroup, SWT.PUSH);
+			proguardAutoBtn.setText("Install to /opt/");
+			proguardAutoBtn.addSelectionListener(this);
+			new Label(autoGroup, SWT.NONE).setText("Required tools: wget, rm, bash, unzip, install, pkexec.");
+			autoSetupAvailable = true;
+		}
+
+		if (Emulator.isPortable) {
+			proguardAutoLocalBtn = new Button(autoGroup, SWT.PUSH);
+			proguardAutoLocalBtn.setText("Install to KEmulator folder");
+			proguardAutoLocalBtn.addSelectionListener(this);
+			autoSetupAvailable = true;
+		}
+
+		if (!autoSetupAvailable)
+			new Label(autoGroup, SWT.NONE).setText("Not available in your configuration.");
 	}
 
 	private void makeLogWindow() {
