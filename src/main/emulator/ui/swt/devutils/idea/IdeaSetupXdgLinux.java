@@ -1,7 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
-import emulator.Settings;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.File;
@@ -29,15 +28,12 @@ public class IdeaSetupXdgLinux extends IdeaSetup {
 	}
 
 	@Override
-	protected List<String> getDefaultJdkSettingsFolder() throws IOException {
+	protected Path getJetBrainsDataRoot() {
 		String cfgFolder = System.getenv("XDG_CONFIG_HOME");
 		if (cfgFolder == null) {
 			cfgFolder = System.getenv("HOME") + "/.config";
 		}
-		cfgFolder += "/JetBrains/IntelliJIdea";
-		String[] version = getVersion(Settings.ideaPath).split(" ")[2].split("\\.");
-		cfgFolder += version[0] + "." + version[1];
-		return Collections.singletonList(cfgFolder);
+		return Paths.get(cfgFolder + "/JetBrains");
 	}
 
 	protected String autoInstallProguard() throws IOException, InterruptedException {

@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -21,6 +22,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class IdeaSetup implements DisposeListener, SelectionListener {
@@ -368,40 +372,82 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 
 		// JDK table patch
 
-		Group jvmSetupGroup = new Group(shell, SWT.NONE);
-		jvmSetupGroup.setText("JVM setup");
-		jvmSetupGroup.setLayout(genGLo());
-		jvmSetupGroup.setLayoutData(genGd());
-		new Label(jvmSetupGroup, SWT.NONE).setText("CLDC/MIDP projects need specific JDK setup in IDEA.");
-		new Label(jvmSetupGroup, SWT.NONE).setText("This will be done automatically.");
-		try {
-			for (String path : getDefaultJdkSettingsFolder()) {
-				Button autoConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
-				autoConfigBtn.setText("Edit \"" + path + "\"");
-				autoConfigBtn.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent selectionEvent) {
-						String table = Paths.get(path, "options", "jdk.table.xml").toString();
-						patchJdkTable(table);
-					}
-				});
-			}
-		} catch (Exception e) {
-			new Label(jvmSetupGroup, SWT.NONE).setText("Failed to automatically find config folder!");
-		}
-		new Label(jvmSetupGroup, SWT.NONE).setText("If you use non-standard setup:");
-		new Label(jvmSetupGroup, SWT.NONE).setText("1. Find config folder that your IDEA version uses.");
-		new Label(jvmSetupGroup, SWT.NONE).setText("2. Navigate to \"options\" subfolder and choose \"jdk.table.xml\" file.");
+		new Label(shell, SWT.NONE).setText("Select configuration folder that your IDEA uses:");
+		new Label(shell, SWT.NONE).setText(" ");
 
-		manualConfigBtn = new Button(jvmSetupGroup, SWT.PUSH);
-		manualConfigBtn.setText("Choose the file");
+		IdeaDataFolder defaultFolderTemp = null;
+		try {
+			List<IdeaDataFolder> folders = getIdeaDataFolders();
+			for (IdeaDataFolder folder : folders) {
+				if (folder.isDefault) {
+					defaultFolderTemp = folder;
+					break;
+				}
+			}
+
+			if (folders.isEmpty()) {
+				new Label(shell, SWT.NONE).setText("No config folders found!");
+			} else {
+
+				final IdeaDataFolder defaultFolder = defaultFolderTemp;
+
+				if (defaultFolder != null) {
+					Group defaultGroup = new Group(shell, SWT.NONE);
+					defaultGroup.setText("The most relevant");
+					defaultGroup.setLayout(genGLo());
+					defaultGroup.setLayoutData(genGd());
+
+					new Label(defaultGroup, SWT.NONE).setText("If you didn't touch IDEA's paths, this is yours.");
+
+					Button autoConfigBtn = new Button(defaultGroup, SWT.PUSH);
+					autoConfigBtn.setText("Choose \"" + defaultFolder.path.toAbsolutePath() + "\"");
+					autoConfigBtn.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent selectionEvent) {
+							String table = defaultFolder.path.resolve("options").resolve("jdk.table.xml").toString();
+							patchJdkTable(table);
+						}
+					});
+				}
+
+
+				if (folders.size() != ((defaultFolder == null) ? 0 : 1)) {
+					Group othersGroup = new Group(shell, SWT.NONE);
+					othersGroup.setText("Other folders");
+					othersGroup.setLayout(genGLo());
+					othersGroup.setLayoutData(genGd());
+					for (IdeaDataFolder folder : folders) {
+						if (folder.isDefault)
+							continue;
+						Link autoConfigBtn = new Link(othersGroup, SWT.PUSH);
+						autoConfigBtn.setText("<a>Choose</a> \"" + folder.path.toAbsolutePath() + "\"");
+						autoConfigBtn.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent selectionEvent) {
+								String table = folder.path.resolve("options").resolve("jdk.table.xml").toString();
+								patchJdkTable(table);
+							}
+						});
+					}
+				}
+			}
+
+		} catch (IOException e) {
+			new Label(shell, SWT.NONE).setText("Failed to automatically find config folder!");
+			errorMsg("Failed to automatically find config folder!", e.toString());
+		}
+
+		Group manualGroup = new Group(shell, SWT.NONE);
+		manualGroup.setText("Non-standard setup");
+		manualGroup.setLayout(genGLo());
+		manualGroup.setLayoutData(genGd());
+		new Label(manualGroup, SWT.NONE).setText("1. Find config folder that your IDEA version uses.");
+		new Label(manualGroup, SWT.NONE).setText("2. Navigate to \"options\" subfolder and choose \"jdk.table.xml\" file.");
+
+		manualConfigBtn = new Button(manualGroup, SWT.PUSH);
+		manualConfigBtn.setText("Choose arbitrary config XML");
 		manualConfigBtn.addSelectionListener(this);
 
-		new Label(shell, SWT.NONE).setText("Note: this will write to config paths to:");
-		new Label(shell, SWT.NONE).setText("1. Running instance of KEmulator");
-		new Label(shell, SWT.NONE).setText("2. Selected JDK");
-		new Label(shell, SWT.NONE).setText("3. Selected javadocs");
-		new Label(shell, SWT.NONE).setText("You should not relocate them after the setup, or things will break.");
 
 		shell.layout(true, true);
 		return;
@@ -604,7 +650,31 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		try {
 			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath, jdkHome);
 			String repairer = Paths.get(Settings.ideaPath).getParent().resolve(Emulator.win ? "repair.exe" : "repair").toAbsolutePath().toString();
-			Runtime.getRuntime().exec(new String[]{repairer, "caches", "--clear"}).waitFor();
+			try {
+				Runtime.getRuntime().exec(new String[]{repairer, "caches", "--clear"}).waitFor();
+			} catch (IOException ex) {
+				// there is no repair util.
+				String defaultFolderName = getDefaultIdeaDataFolderName();
+				if (defaultFolderName != null) {
+					// try to wipe cache manually
+					try {
+						if (Emulator.win) {
+							Path path = Paths.get(System.getenv("LOCALAPPDATA") + "\\JetBrains\\" + defaultFolderName);
+							if (Files.exists(path)) {
+								deleteRecursive(path.toFile());
+							}
+						}
+						if (Emulator.linux) {
+							Path path = Paths.get(System.getenv("HOME") + "/.cache/JetBrains/" + defaultFolderName);
+							if (Files.exists(path)) {
+								Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", path.toAbsolutePath().toString()}).waitFor();
+							}
+						}
+					} catch (Exception ex2) {
+
+					}
+				}
+			}
 			Settings.ideaJdkTablePatched = true;
 		} catch (Exception ex) {
 			errorMsg("Config patch", "Failed to modify config table. Logs may help you.\n\nException: " + ex);
@@ -640,7 +710,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 
 	protected abstract Set<String> getIdeaInstallationPath();
 
-	protected abstract List<String> getDefaultJdkSettingsFolder() throws IOException;
+	protected abstract Path getJetBrainsDataRoot();
 
 	protected abstract String autoInstallProguard() throws IOException, InterruptedException;
 
@@ -692,4 +762,54 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		mb.setMessage(text);
 		mb.open();
 	}
+
+	protected static String getDefaultIdeaDataFolderName() throws IOException {
+		Path infoPath = Paths.get(Settings.ideaPath).getParent().getParent().resolve("product-info.json");
+		String content = String.join("", Files.readAllLines(infoPath));
+
+		Pattern pattern = Pattern.compile("\"dataDirectoryName\"\\s*:\\s*\"([^\"]+)\"");
+		Matcher matcher = pattern.matcher(content);
+
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+
+		return null;
+	}
+
+	private void deleteRecursive(File f) {
+		if (f.isDirectory()) {
+			for (File c : f.listFiles())
+				deleteRecursive(c);
+		}
+		f.delete();
+	}
+
+	protected List<IdeaDataFolder> getIdeaDataFolders() throws IOException {
+		final String defaultName = getDefaultIdeaDataFolderName();
+
+		try (Stream<Path> list = Files.list(getJetBrainsDataRoot())) {
+			return list.filter(p -> {
+				String name = p.getFileName().toString();
+				if (name.toLowerCase().contains("idea"))
+					return true;
+				if (defaultName == null)
+					return false;
+				return name.equalsIgnoreCase(defaultName);
+			}).map(p -> new IdeaDataFolder(p, p.getFileName().toString().equalsIgnoreCase(defaultName))).collect(Collectors.toList());
+		}
+	}
+
+	protected static class IdeaDataFolder {
+		public final Path path;
+
+		public final boolean isDefault;
+
+		public IdeaDataFolder(Path path, boolean isDefault) {
+			this.path = path;
+			this.isDefault = isDefault;
+		}
+
+	}
+
 }
