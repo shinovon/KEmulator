@@ -643,9 +643,13 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private void patchJdkTable(String jdkTablePath) {
 		Path lockFile = Paths.get(jdkTablePath).getParent().getParent().resolve(".lock");
 		if (Files.exists(lockFile)) {
-			errorMsg("Config location", "Your IntelliJ IDEA is running. Close it to continue.");
-			refreshContent();
-			return;
+			final MessageBox mb = new MessageBox(this.shell, SWT.ICON_ERROR | SWT.RETRY | SWT.CANCEL);
+			mb.setText("Config location");
+			mb.setMessage("Your IntelliJ IDEA is running. Close it to continue, or else things will break. If you are absolutely sure that it is closed, choose \"Retry\" to continue.");
+			if (mb.open() == SWT.CANCEL) {
+				refreshContent();
+				return;
+			}
 		}
 		try {
 			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath, jdkHome);
