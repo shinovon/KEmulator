@@ -662,16 +662,20 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 							Path path = Paths.get(System.getenv("LOCALAPPDATA") + "\\JetBrains\\" + defaultFolderName);
 							if (Files.exists(path)) {
 								deleteRecursive(path.toFile());
+							} else {
+								throw new RuntimeException();
 							}
 						}
 						if (Emulator.linux) {
 							Path path = Paths.get(System.getenv("HOME") + "/.cache/JetBrains/" + defaultFolderName);
 							if (Files.exists(path)) {
 								Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", path.toAbsolutePath().toString()}).waitFor();
+							} else {
+								throw new RuntimeException();
 							}
 						}
-					} catch (Exception ex2) {
-
+					} catch (Exception ignored) {
+						errorMsg("Failed to clear caches", "If your IDE behaves wrong, try do that via \"File > Invalidate caches...\" menu there. Everything else is done successfully, you may get to work.");
 					}
 				}
 			}
