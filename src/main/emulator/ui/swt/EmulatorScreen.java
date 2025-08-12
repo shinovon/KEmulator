@@ -47,7 +47,6 @@ public final class EmulatorScreen implements
 	private static int threadCount;
 	private final int startWidth;
 	private final int startHeight;
-	private long lastPollTime;
 
 	private Shell shell;
 	private Canvas canvas;
@@ -191,6 +190,7 @@ public final class EmulatorScreen implements
 
 	private Menu commandsMenu;
 	private String leftSoftLabelText, rightSoftLabelText;
+	private Win32KeyboardPoller poller;
 
 	public EmulatorScreen(int n, int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -368,13 +368,14 @@ public final class EmulatorScreen implements
 
 		win = Emulator.win;
 		if (win) {
+			poller = new Win32KeyboardPoller(this);
 			new Thread("KEmulator keyboard poll thread") {
 				boolean b;
 
 				public void run() {
 					try {
 						if (b) {
-							pollKeyboard(canvas);
+							poller.pollKeyboard(canvas);
 							Controllers.poll();
 							return;
 						}
@@ -408,65 +409,6 @@ public final class EmulatorScreen implements
 	}
 
 	// KEYBOARD
-
-	private static volatile boolean[] lastKeyboardButtonStates = new boolean[256];
-	private static volatile boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
-	private static volatile long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];
-	private static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
-	private static Class win32OS;
-	private static Method win32OSGetKeyState;
-
-	public synchronized void pollKeyboard(Canvas canvas) {
-		if (!win || canvas == null || canvas.isDisposed()) return;
-		long now = System.currentTimeMillis();
-		Shell shell = canvas.getShell();
-		if (shell == this.shell) {
-			if (now - lastPollTime < 10) return;
-			lastPollTime = now;
-		}
-		final boolean active = canvas.getDisplay().getActiveShell() == shell &&
-				shell.isVisible() &&
-				canvas.isFocusControl();
-//		if (!active) return;
-		try {
-			if (win32OS == null)
-				win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
-			if (win32OSGetKeyState == null &&
-					(win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class)) == null) {
-				// TODO jna
-				win = false;
-				return;
-			}
-			for (int i = 0; i < keyboardButtonStates.length; i++) {
-				lastKeyboardButtonStates[i] = keyboardButtonStates[i];
-				short keyState = (Short) win32OSGetKeyState.invoke(null, i);
-				boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
-				if (!keyboardButtonStates[i]) {
-					if (pressed) {
-						keyboardButtonStates[i] = true;
-						keyboardButtonHoldTimes[i] = 0;
-						keyboardButtonDownTimes[i] = now;
-//                        onKeyDown(i);
-					}
-				} else if (!pressed) {
-					keyboardButtonStates[i] = false;
-					keyboardButtonHoldTimes[i] = 0;
-					onKeyUp(i, shell == this.shell);
-				}
-				if (lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
-					if (keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
-						keyboardButtonHoldTimes[i] = now;
-					}
-					if (now - keyboardButtonHoldTimes[i] >= 40) {
-						keyboardButtonHoldTimes[i] = now;
-//                        onKeyHeld(i);
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public void setSize(int x, int y) {
 		if (this.pauseState == 1) {
@@ -1986,7 +1928,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.pollKeyboardOnRepaint) {
-			pollKeyboard(canvas);
+			poller.pollKeyboard(canvas);
 			Controllers.poll();
 		}
 		if (swtContent == null) {
@@ -2171,9 +2113,8 @@ public final class EmulatorScreen implements
 		Emulator.getEventQueue().keyRelease(n);
 	}
 
-	private void onKeyUp(int n, boolean screen) {
-		n = key(n);
-		if (!screen) {
+	void onKeyUp(int n, Shell shell) {
+		if (shell != this.shell) {
 			((SWTFrontend) Emulator.getEmulator()).getM3GView().keyReleased(n);
 			return;
 		}
@@ -2203,72 +2144,6 @@ public final class EmulatorScreen implements
 
 	private String mapKey(int n) {
 		return KeyMapping.replaceKey(n);
-	}
-
-	private int key(int n) {
-		if (n <= 7) return -1;
-		if (n >= 14 && n <= 31) return -1;
-		if (n >= 91 && n <= 95) return -1;
-		if (n >= 41 && n <= 47) return -1;
-		if (n >= 124 && n <= 186) return -1;
-		if (n > 190) return -1;
-		if (n >= 'A' && n <= 'Z') n -= 'A' - 'a';
-		else if (n >= 96 && n <= 105) n = n - 96 + '0';
-		else if (n >= 112 && n <= 123) n = n - 112 + 10;
-		else switch (n) {
-				case 33:
-					n = 5;
-					break;
-				case 34:
-					n = 6;
-					break;
-				case 35:
-					n = 8;
-					break;
-				case 36:
-					n = 7;
-					break;
-				case 37:
-					n = 3;
-					break;
-				case 38:
-					n = 1;
-					break;
-				case 39:
-					n = 4;
-					break;
-				case 40:
-					n = 2;
-					break;
-				case 106:
-					n = '*';
-					break;
-				case 107:
-					n = '+';
-					break;
-				case 109:
-					n = '-';
-					break;
-				case 110:
-					n = '.';
-					break;
-				case 111:
-					n = '/';
-					break;
-				case 187:
-					n = '=';
-					break;
-				case 188:
-					n = ',';
-					break;
-				case 189:
-					n = '-';
-					break;
-				case 190:
-					n = '.';
-					break;
-			}
-		return n;
 	}
 
 	public void mouseDoubleClick(final MouseEvent mouseEvent) {
