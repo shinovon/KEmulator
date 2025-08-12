@@ -2,6 +2,7 @@ package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.ui.swt.devutils.ClasspathEntry;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -14,6 +15,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -254,7 +256,7 @@ public class ProjectConfigGenerator {
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <method v=\"2\">\n" +
-				"      <option name=\"RunConfigurationTask\" enabled=\"true\" run_configuration_name=\"Restore project\" run_configuration_type=\"Application\" />"+
+				"      <option name=\"RunConfigurationTask\" enabled=\"true\" run_configuration_name=\"Restore project\" run_configuration_type=\"Application\" />" +
 				"      <option name=\"BuildArtifacts\" enabled=\"true\">\n" +
 				"        <artifact name=\"" + projectName + "\" />\n" +
 				"      </option>\n" +
@@ -296,38 +298,33 @@ public class ProjectConfigGenerator {
 		component.appendChild(sourceEntry);
 
 		if (eclipseClasspath == null) {
-			addSourceFolder(doc, content, "res");
-			addSourceFolder(doc, content, "src");
+			addSourceFolder(doc, content, "src", false);
+			addSourceFolder(doc, content, "res", true);
 		} else {
-			Document inputDoc = builder.parse(eclipseClasspath.toFile());
-			NodeList entries = inputDoc.getElementsByTagName("classpathentry");
-			for (int i = 0; i < entries.getLength(); i++) {
-				Element entry = (Element) entries.item(i);
-				String kind = entry.getAttribute("kind");
-				if ("src".equals(kind)) {
-					String path = entry.getAttribute("path");
-					addSourceFolder(doc, content, path);
-				} else if ("lib".equals(kind)) {
-					Element libEntry = doc.createElement("orderEntry");
-					libEntry.setAttribute("type", "module-library");
-					if ("true".equals(entry.getAttribute("exported")))
-						libEntry.setAttribute("exported", "");
-					component.appendChild(libEntry);
-
-					Element libRoot = doc.createElement("library");
-					libEntry.appendChild(libRoot);
-
-					Element classes = doc.createElement("CLASSES");
-					libRoot.appendChild(classes);
-
-					Element jar = doc.createElement("root");
-					jar.setAttribute("url", "jar://$MODULE_DIR$/" + entry.getAttribute("path") + "!/");
-					classes.appendChild(jar);
-
-					libRoot.appendChild(doc.createElement("JAVADOC"));
-					libRoot.appendChild(doc.createElement("SOURCES"));
-
-					libsList.add(entry.getAttribute("path"));
+			ClasspathEntry[] existing;
+			if (Files.exists(eclipseClasspath)) {
+				existing = ClasspathEntry.readFromEclipse(eclipseClasspath);
+			} else {
+				existing = ClasspathEntry.readFromConfigless(eclipseClasspath.getParent());
+				System.out.println("Warning! Classpath file is missing. Default paths were guessed.");
+			}
+			for (ClasspathEntry entry : existing) {
+				switch (entry.type) {
+					case Source:
+					case LibrarySource:
+						addSourceFolder(doc, content, entry.localPath, false);
+						break;
+					case Resource:
+						addSourceFolder(doc, content, entry.localPath, true);
+						break;
+					case HeaderLibrary:
+						addLibrary(doc, component, entry.localPath, false);
+						libsList.add(entry.localPath);
+						break;
+					case ExportedLibrary:
+						addLibrary(doc, component, entry.localPath, true);
+						libsList.add(entry.localPath);
+						break;
 				}
 			}
 		}
@@ -350,14 +347,35 @@ public class ProjectConfigGenerator {
 		return libsList.toArray(new String[0]);
 	}
 
-	private static void addSourceFolder(Document doc, Element content, String path) {
+	private static void addSourceFolder(Document doc, Element content, String path, boolean isRes) {
 		Element sourceFolder = doc.createElement("sourceFolder");
 		sourceFolder.setAttribute("url", "file://$MODULE_DIR$/" + path);
-		if (path.endsWith("res"))
+		if (isRes)
 			sourceFolder.setAttribute("type", "java-resource");
 		else
 			sourceFolder.setAttribute("isTestSource", "false");
 		content.appendChild(sourceFolder);
+	}
+
+	private static void addLibrary(Document doc, Element component, String path, boolean exported) {
+		Element libEntry = doc.createElement("orderEntry");
+		libEntry.setAttribute("type", "module-library");
+		if (exported)
+			libEntry.setAttribute("exported", "");
+		component.appendChild(libEntry);
+
+		Element libRoot = doc.createElement("library");
+		libEntry.appendChild(libRoot);
+
+		Element classes = doc.createElement("CLASSES");
+		libRoot.appendChild(classes);
+
+		Element jar = doc.createElement("root");
+		jar.setAttribute("url", "jar://$MODULE_DIR$/" + path + "!/");
+		classes.appendChild(jar);
+
+		libRoot.appendChild(doc.createElement("JAVADOC"));
+		libRoot.appendChild(doc.createElement("SOURCES"));
 	}
 
 	public static String[] extractLibrariesListFromIML(Path imlPath) throws ParserConfigurationException, IOException, SAXException {
