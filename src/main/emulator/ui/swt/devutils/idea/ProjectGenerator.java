@@ -1,6 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
-import emulator.Emulator;
+import emulator.ui.swt.devutils.DevtimeMIDlet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -46,7 +46,7 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName, false);
 
 		// run configs
-		generateRunConfigs(dir, projectName, new String[][]{new String[]{readableName, midletClassName}});
+		generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)});
 
 		return midletCodePath;
 	}
@@ -67,7 +67,7 @@ public class ProjectGenerator {
 
 		createDirectories(dirp);
 
-		String[][] midletNames;
+		DevtimeMIDlet[] midletNames;
 
 		boolean isEclipse = Files.exists(appDecrPath);
 
@@ -76,15 +76,15 @@ public class ProjectGenerator {
 				System.out.println("Warning: both \"Application Descriptor\" and \"MANIFEST.MF\" exist. Run configurations will be updated based on \"Application Descriptor\".");
 				fixManifestWithVersion(mfPath);
 				fixManifestWithVersion(appDecrPath);
-				midletNames = getMidletsFromMF(appDecrPath);
+				midletNames = DevtimeMIDlet.readMidletsList(appDecrPath);
 			} else {
 				fixManifestWithVersion(mfPath);
-				midletNames = getMidletsFromMF(mfPath);
+				midletNames = DevtimeMIDlet.readMidletsList(mfPath);
 			}
 		} else {
 			if (isEclipse) {
 				fixManifestWithVersion(appDecrPath);
-				midletNames = getMidletsFromMF(appDecrPath);
+				midletNames = DevtimeMIDlet.readMidletsList(appDecrPath);
 			} else {
 				throw new IllegalArgumentException("Neither \"Application Descriptor\" nor \"MANIFEST.MF\" files found!");
 			}
@@ -144,7 +144,7 @@ public class ProjectGenerator {
 		// manifest
 		fixManifestWithVersion(Paths.get(appDescriptorPath));
 
-		String[][] midlets = getMidletsFromMF(dir.resolve("Application Descriptor"));
+		DevtimeMIDlet[] midlets = DevtimeMIDlet.readMidletsList(dir.resolve("Application Descriptor"));
 
 		// ide config
 		generateMiscXmls(dir, projectName);
@@ -193,27 +193,10 @@ public class ProjectGenerator {
 		}
 	}
 
-	private static String[][] getMidletsFromMF(Path manifestPath) throws IOException {
-		Properties manifest = new Properties();
-		manifest.load(new InputStreamReader(new FileInputStream(manifestPath.toFile()), StandardCharsets.UTF_8));
-
-		ArrayList<String[]> names = new ArrayList<>();
-		for (int i = 1; true; i++) {
-			if (!manifest.containsKey("MIDlet-" + i)) {
-				break;
-			}
-			String[] split = ((String) manifest.get("MIDlet-" + i)).split(",");
-			names.add(new String[]{split[0].trim(), split[2].trim()});
-		}
-		if (names.isEmpty())
-			throw new IllegalArgumentException("Broken manifest file");
-		return names.toArray(new String[0][0]);
-	}
-
-	private static void generateRunConfigs(Path dir, String projectName, String[][] midletNames) throws IOException {
+	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames) throws IOException {
 		for (int i = 0; i < midletNames.length; i++) {
 			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Run_with_KEmulator_" + (i + 1) + ".xml");
-			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i][0], midletNames[i][1]);
+			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className);
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
