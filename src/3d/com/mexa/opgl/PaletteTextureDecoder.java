@@ -79,19 +79,29 @@ public class PaletteTextureDecoder {
                     int r = (colorShort >> 11) & 0x1F;
                     int g = (colorShort >> 5) & 0x3F;
                     int b = colorShort & 0x1F;
-                    color = 0xFF000000 | ((r << 19) | (g << 10) | (b << 3));
+                    r = (r << 3) | (r >> 2);
+                    g = (g << 2) | (g >> 4);
+                    b = (b << 3) | (b >> 2);
+                    color = 0xFF000000 | (r << 16) | (g << 8) | b;
                 } else if (format == OpglGraphics.GL_PALETTE4_RGBA4_OES || format == OpglGraphics.GL_PALETTE8_RGBA4_OES) {
                     int r = (colorShort >> 12) & 0xF;
                     int g = (colorShort >> 8) & 0xF;
                     int b = (colorShort >> 4) & 0xF;
                     int a = colorShort & 0xF;
-                    color = ((a << 4) << 24) | ((r << 4) << 16) | ((g << 4) << 8) | (b << 4);
+                    r = (r << 4) | r;
+                    g = (g << 4) | g;
+                    b = (b << 4) | b;
+                    a = (a << 4) | a;
+                    color = (a << 24) | (r << 16) | (g << 8) | b;
                 } else if (format == OpglGraphics.GL_PALETTE4_RGB5_A1_OES || format == OpglGraphics.GL_PALETTE8_RGB5_A1_OES) {
                     int r = (colorShort >> 11) & 0x1F;
                     int g = (colorShort >> 6) & 0x1F;
                     int b = (colorShort >> 1) & 0x1F;
                     int a = (colorShort & 1) * 0xFF;
-                    color = (a << 24) | (r << 19) | (g << 11) | (b << 3);
+                    r = (r << 3) | (r >> 2);
+                    g = (g << 3) | (g >> 2);
+                    b = (b << 3) | (b >> 2);
+                    color = (a << 24) | (r << 16) | (g << 8) | b;
                 }
             } else if (bytesPerColor == 3) {
                 int r = paletteBuffer.get() & 0xFF;
@@ -131,12 +141,20 @@ public class PaletteTextureDecoder {
                     byte b = indexBuffer.get(indexBuffer.position() - 1);
                     index = b & 0x0F;
                 }
-                rgbaBuffer.putInt(palette[index]);
+                int color = palette[index];
+                rgbaBuffer.put((byte) ((color >> 16) & 0xFF));
+                rgbaBuffer.put((byte) ((color >> 8) & 0xFF));
+                rgbaBuffer.put((byte) (color & 0xFF));
+                rgbaBuffer.put((byte) ((color >> 24) & 0xFF));
             }
         } else {
             for (int i = 0; i < indexCount; i++) {
                 int index = indexBuffer.get() & 0xFF;
-                rgbaBuffer.putInt(palette[index]);
+                int color = palette[index];
+                rgbaBuffer.put((byte) ((color >> 16) & 0xFF));
+                rgbaBuffer.put((byte) ((color >> 8) & 0xFF));
+                rgbaBuffer.put((byte) (color & 0xFF));
+                rgbaBuffer.put((byte) ((color >> 24) & 0xFF));
             }
         }
 
