@@ -1,7 +1,7 @@
 package com.nokia.mid.sound;
 
 import emulator.Settings;
-import emulator.media.b;
+import emulator.media.RingtoneParser;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.MidiToneConstants;
 import emulator.media.tone.ToneManager;
@@ -94,7 +94,7 @@ public class Sound {
 		if (paramInt == 1) {
 			// TODO fix memory leaks
 			if (Settings.enableOTT) {
-				paramArrayOfByte = new b(paramArrayOfByte).method726();
+				paramArrayOfByte = new RingtoneParser(paramArrayOfByte).method726();
 			} else {
 				m_player = new MIDITonePlayer();
 				state = 3;

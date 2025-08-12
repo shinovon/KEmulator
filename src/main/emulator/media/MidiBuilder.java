@@ -1,6 +1,6 @@
 package emulator.media;
 
-public final class a {
+public final class MidiBuilder {
 	public int anInt1275;
 	public int anInt1277;
 	public int anInt1278;
@@ -12,10 +12,10 @@ public final class a {
 	static int anInt1284;
 	byte[] aByteArray1276;
 
-	public a() {
+	public MidiBuilder() {
 		super();
 		this.aByteArray1276 = new byte[100];
-		a.anInt1284 = 0;
+		MidiBuilder.anInt1284 = 0;
 	}
 
 	public final byte[] method730() {
@@ -23,14 +23,14 @@ public final class a {
 	}
 
 	private void method731(final int n, final int n2) {
-		if (a.anInt1284 + n2 >= this.aByteArray1276.length) {
+		if (MidiBuilder.anInt1284 + n2 >= this.aByteArray1276.length) {
 			final int n3 = (n2 > 100) ? n2 : 100;
 			final byte[] array = new byte[this.aByteArray1276.length];
 			System.arraycopy(this.aByteArray1276, 0, array, 0, this.aByteArray1276.length);
 			System.arraycopy(array, 0, this.aByteArray1276 = new byte[array.length + n3], 0, array.length);
 		}
 		for (int i = n2 - 1; i >= 0; --i) {
-			this.aByteArray1276[a.anInt1284++] = (byte) (n >> (i << 3) & 0xFF);
+			this.aByteArray1276[MidiBuilder.anInt1284++] = (byte) (n >> (i << 3) & 0xFF);
 		}
 	}
 
@@ -82,7 +82,7 @@ public final class a {
 			if (n4 < 0) {
 				break;
 			}
-			a a;
+			MidiBuilder a;
 			int n7;
 			if (n6 != 0) {
 				a = this;
@@ -100,11 +100,11 @@ public final class a {
 		this.method731(1297377380, 4);
 		this.method731(6, 4);
 		this.method731(1, 2);
-		this.anInt1283 = a.anInt1284;
+		this.anInt1283 = MidiBuilder.anInt1284;
 		this.method731(1, 2);
 		this.method731(240, 2);
 		this.method731(1297379947, 4);
-		this.anInt1282 = a.anInt1284;
+		this.anInt1282 = MidiBuilder.anInt1284;
 		this.method731(0, 4);
 		this.method735(0);
 		this.method731(192, 1);
@@ -135,7 +135,7 @@ public final class a {
 		}
 		this.method735(0);
 		this.method731(144, 1);
-		a a;
+		MidiBuilder a;
 		int n5;
 		if (this.anInt1275 == 0) {
 			a = this;
@@ -148,7 +148,7 @@ public final class a {
 		this.method731(255, 1);
 		this.method735(n);
 		this.method731(128, 1);
-		a a2;
+		MidiBuilder a2;
 		int n6;
 		if (this.anInt1275 == 0) {
 			this.method731(0, 1);
@@ -183,11 +183,11 @@ public final class a {
 		this.method731(255, 1);
 		this.method731(47, 1);
 		this.method731(0, 1);
-		final int anInt1284 = a.anInt1284;
-		a.anInt1284 = this.anInt1282;
+		final int anInt1284 = MidiBuilder.anInt1284;
+		MidiBuilder.anInt1284 = this.anInt1282;
 		this.method731(anInt1284 - this.anInt1282 - 4, 4);
-		this.method732(a.anInt1284 = anInt1284);
-		this.method734(this.anInt1282 - 4, a.anInt1284, 10);
+		this.method732(MidiBuilder.anInt1284 = anInt1284);
+		this.method734(this.anInt1282 - 4, MidiBuilder.anInt1284, 10);
 	}
 
 	private void method734(final int n, final int n2, final int n3) {
@@ -198,9 +198,9 @@ public final class a {
 			System.arraycopy(this.aByteArray1276, n, this.aByteArray1276, n5, n4);
 			n5 = this.aByteArray1276.length;
 		}
-		final int anInt1284 = a.anInt1284;
-		a.anInt1284 = this.anInt1283;
+		final int anInt1284 = MidiBuilder.anInt1284;
+		MidiBuilder.anInt1284 = this.anInt1283;
 		this.method731(n3 + 1, 2);
-		a.anInt1284 = anInt1284;
+		MidiBuilder.anInt1284 = anInt1284;
 	}
 }
