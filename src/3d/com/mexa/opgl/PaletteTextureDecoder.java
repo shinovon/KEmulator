@@ -3,64 +3,40 @@ package com.mexa.opgl;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class PaletteTextureDecoder {
+class PaletteTextureDecoder {
 
     public static ByteBuffer decode(int format, ByteBuffer data, int width, int height) {
         int paletteSize;
         int bytesPerColor;
-        boolean hasAlpha;
-        int paletteOffset;
 
         switch (format) {
             case OpglGraphics.GL_PALETTE4_RGB8_OES:
                 paletteSize = 16;
                 bytesPerColor = 3;
-                hasAlpha = false;
                 break;
             case OpglGraphics.GL_PALETTE4_RGBA8_OES:
                 paletteSize = 16;
                 bytesPerColor = 4;
-                hasAlpha = true;
                 break;
             case OpglGraphics.GL_PALETTE4_R5_G6_B5_OES:
-                paletteSize = 16;
-                bytesPerColor = 2;
-                hasAlpha = false;
-                break;
             case OpglGraphics.GL_PALETTE4_RGBA4_OES:
-                paletteSize = 16;
-                bytesPerColor = 2;
-                hasAlpha = true;
-                break;
             case OpglGraphics.GL_PALETTE4_RGB5_A1_OES:
                 paletteSize = 16;
                 bytesPerColor = 2;
-                hasAlpha = true;
                 break;
             case OpglGraphics.GL_PALETTE8_RGB8_OES:
                 paletteSize = 256;
                 bytesPerColor = 3;
-                hasAlpha = false;
                 break;
             case OpglGraphics.GL_PALETTE8_RGBA8_OES:
                 paletteSize = 256;
                 bytesPerColor = 4;
-                hasAlpha = true;
                 break;
             case OpglGraphics.GL_PALETTE8_R5_G6_B5_OES:
-                paletteSize = 256;
-                bytesPerColor = 2;
-                hasAlpha = false;
-                break;
             case OpglGraphics.GL_PALETTE8_RGBA4_OES:
-                paletteSize = 256;
-                bytesPerColor = 2;
-                hasAlpha = true;
-                break;
             case OpglGraphics.GL_PALETTE8_RGB5_A1_OES:
                 paletteSize = 256;
                 bytesPerColor = 2;
-                hasAlpha = true;
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported palette format: 0x" + Integer.toHexString(format));
