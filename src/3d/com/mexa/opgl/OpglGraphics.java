@@ -589,23 +589,7 @@ public class OpglGraphics {
 	public void glColorPointer(int size, int type, int stride, int offset) {
 		gl.glColorPointer(size, type, stride, offset);
 	}
-    private boolean isPaletteFormat(int format) {
-        switch (format) {
-            case GL_PALETTE4_RGB8_OES:
-            case GL_PALETTE4_RGBA8_OES:
-            case GL_PALETTE4_R5_G6_B5_OES:
-            case GL_PALETTE4_RGBA4_OES:
-            case GL_PALETTE4_RGB5_A1_OES:
-            case GL_PALETTE8_RGB8_OES:
-            case GL_PALETTE8_RGBA8_OES:
-            case GL_PALETTE8_R5_G6_B5_OES:
-            case GL_PALETTE8_RGBA4_OES:
-            case GL_PALETTE8_RGB5_A1_OES:
-                return true;
-            default:
-                return false;
-        }
-    }
+
     public void glCompressedTexImage2D(int target,
                                        int level,
                                        int internalformat,
@@ -613,21 +597,7 @@ public class OpglGraphics {
                                        int height,
                                        int border,
                                        ByteBuffer data) {
-        if (isPaletteFormat(internalformat)) {
-            // Преобразуем наш ByteBuffer в java.nio.ByteBuffer
-            java.nio.ByteBuffer nioData = (java.nio.ByteBuffer) data.getNioBuffer();
-            // Декодируем палитровую текстуру в RGBA
-            java.nio.ByteBuffer rgbaBuffer = PaletteTextureDecoder.decode(internalformat, nioData, width, height);
-            // Создаем обертку Buffer для декодированных данных
-            Buffer wrapped = new Buffer(rgbaBuffer) {};
-            // Устанавливаем корректные границы данных
-            wrapped.setBounds(0, rgbaBuffer.remaining());
-            // Загружаем как несжатую текстуру RGBA
-            glTexImage2D(target, level, GL_RGBA, width, height, border, GL_RGBA, GL_UNSIGNED_BYTE, wrapped);
-        } else {
-            // Для несжатых форматов используем стандартный метод
-            gl.glCompressedTexImage2D(target, level, internalformat, width, height, border, data.length(), data.getNioBuffer());
-        }
+		gl.glCompressedTexImage2D(target, level, internalformat, width, height, border, data.length(), data.getNioBuffer());
     }
 
 	public void glCompressedTexSubImage2D(int target,

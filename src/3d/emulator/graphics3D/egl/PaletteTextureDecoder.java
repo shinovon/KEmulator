@@ -1,7 +1,9 @@
-package com.mexa.opgl;
+package emulator.graphics3D.egl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import static javax.microedition.khronos.opengles.GL10.*;
 
 class PaletteTextureDecoder {
 
@@ -10,31 +12,31 @@ class PaletteTextureDecoder {
         int bytesPerColor;
 
         switch (format) {
-            case OpglGraphics.GL_PALETTE4_RGB8_OES:
+            case GL_PALETTE4_RGB8_OES:
                 paletteSize = 16;
                 bytesPerColor = 3;
                 break;
-            case OpglGraphics.GL_PALETTE4_RGBA8_OES:
+            case GL_PALETTE4_RGBA8_OES:
                 paletteSize = 16;
                 bytesPerColor = 4;
                 break;
-            case OpglGraphics.GL_PALETTE4_R5_G6_B5_OES:
-            case OpglGraphics.GL_PALETTE4_RGBA4_OES:
-            case OpglGraphics.GL_PALETTE4_RGB5_A1_OES:
+            case GL_PALETTE4_R5_G6_B5_OES:
+            case GL_PALETTE4_RGBA4_OES:
+            case GL_PALETTE4_RGB5_A1_OES:
                 paletteSize = 16;
                 bytesPerColor = 2;
                 break;
-            case OpglGraphics.GL_PALETTE8_RGB8_OES:
+            case GL_PALETTE8_RGB8_OES:
                 paletteSize = 256;
                 bytesPerColor = 3;
                 break;
-            case OpglGraphics.GL_PALETTE8_RGBA8_OES:
+            case GL_PALETTE8_RGBA8_OES:
                 paletteSize = 256;
                 bytesPerColor = 4;
                 break;
-            case OpglGraphics.GL_PALETTE8_R5_G6_B5_OES:
-            case OpglGraphics.GL_PALETTE8_RGBA4_OES:
-            case OpglGraphics.GL_PALETTE8_RGB5_A1_OES:
+            case GL_PALETTE8_R5_G6_B5_OES:
+            case GL_PALETTE8_RGBA4_OES:
+            case GL_PALETTE8_RGB5_A1_OES:
                 paletteSize = 256;
                 bytesPerColor = 2;
                 break;
@@ -51,7 +53,7 @@ class PaletteTextureDecoder {
             int color = 0;
             if (bytesPerColor == 2) {
                 short colorShort = paletteBuffer.getShort();
-                if (format == OpglGraphics.GL_PALETTE4_R5_G6_B5_OES || format == OpglGraphics.GL_PALETTE8_R5_G6_B5_OES) {
+                if (format == GL_PALETTE4_R5_G6_B5_OES || format == GL_PALETTE8_R5_G6_B5_OES) {
                     int r = (colorShort >> 11) & 0x1F;
                     int g = (colorShort >> 5) & 0x3F;
                     int b = colorShort & 0x1F;
@@ -59,7 +61,7 @@ class PaletteTextureDecoder {
                     g = (g << 2) | (g >> 4);
                     b = (b << 3) | (b >> 2);
                     color = 0xFF000000 | (r << 16) | (g << 8) | b;
-                } else if (format == OpglGraphics.GL_PALETTE4_RGBA4_OES || format == OpglGraphics.GL_PALETTE8_RGBA4_OES) {
+                } else if (format == GL_PALETTE4_RGBA4_OES || format == GL_PALETTE8_RGBA4_OES) {
                     int r = (colorShort >> 12) & 0xF;
                     int g = (colorShort >> 8) & 0xF;
                     int b = (colorShort >> 4) & 0xF;
@@ -69,7 +71,7 @@ class PaletteTextureDecoder {
                     b = (b << 4) | b;
                     a = (a << 4) | a;
                     color = (a << 24) | (r << 16) | (g << 8) | b;
-                } else if (format == OpglGraphics.GL_PALETTE4_RGB5_A1_OES || format == OpglGraphics.GL_PALETTE8_RGB5_A1_OES) {
+                } else if (format == GL_PALETTE4_RGB5_A1_OES || format == GL_PALETTE8_RGB5_A1_OES) {
                     int r = (colorShort >> 11) & 0x1F;
                     int g = (colorShort >> 6) & 0x1F;
                     int b = (colorShort >> 1) & 0x1F;
