@@ -40,12 +40,21 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	private final float[][] paletteMatrices = new float[32][16];
 	private int currentPaletteMatrix = 0;
 
+	// Captured vertex pointer state for software skinning
 	protected int vertexSize;
 	protected int vertexType;
 	protected int vertexStride;
 	protected int vertexOffset;
 	protected boolean vertexIsOffset;
 	protected FloatBuffer vertexBuffer;
+
+	// Captured normal pointer state for software skinning
+	protected boolean normalArrayEnabled = false;
+	protected int normalType;
+	protected int normalStride;
+	protected Buffer normalBuffer;
+	protected boolean normalIsOffset;
+	protected int normalOffset;
 
 	public final synchronized boolean glIsBuffer(final int n) {
 		EGL10Impl.g3d.sync(() -> temp = GL15.glIsBuffer(n));
@@ -138,8 +147,21 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		EGL10Impl.g3d.sync(() -> GL11.glColorPointer(n, n2, n3, (long) n4));
 	}
 
-	public final synchronized void glNormalPointer(final int n, final int n2, final int n3) {
-		EGL10Impl.g3d.sync(() -> GL11.glNormalPointer(n, n2, (long) n3));
+	public final synchronized void glNormalPointer(final int type, final int stride, final Buffer pointer) {
+		this.normalType = type;
+		this.normalStride = stride;
+		this.normalBuffer = pointer;
+		this.normalIsOffset = false;
+		EGL10Impl.g3d.async(() -> GL11.glNormalPointer(type, stride, MemoryUtil.memAddress(pointer)));
+	}
+
+	public final synchronized void glNormalPointer(final int type, final int stride, final int offset) {
+		this.normalType = type;
+		this.normalStride = stride;
+		this.normalOffset = offset;
+		this.normalIsOffset = true;
+		this.normalBuffer = null; // VBO-backed
+		EGL10Impl.g3d.async(() -> GL11.glNormalPointer(type, stride, offset));
 	}
 
 	public final synchronized void glTexCoordPointer(final int n, final int n2, final int n3, final int n4) {
@@ -512,6 +534,8 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		// copy current modelview matrix into the current palette matrix (software emulation)
 		final FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 		EGL10Impl.g3d.sync(() -> GL11.glGetFloatv(GL11.GL_MODELVIEW_MATRIX, fb));
+
+		fb.position(0);
 		fb.get(paletteMatrices[currentPaletteMatrix]);
 	}
 
@@ -894,77 +918,134 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		}
 	}
 
+	// Multiply 3x3 matrix (from upper-left of 4x4) by vec3
+	private static void mulMat3Vec3(final float[] m, final float[] v, final float[] out) {
+		out[0] = m[0] * v[0] + m[4] * v[1] + m[8] * v[2];
+		out[1] = m[1] * v[0] + m[5] * v[1] + m[9] * v[2];
+		out[2] = m[2] * v[0] + m[6] * v[1] + m[10] * v[2];
+	}
+
+	// Normalize a vec3
+	private static void normalizeVec3(final float[] v) {
+		float len = (float) Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+		if (len != 0.0f) {
+			v[0] /= len;
+			v[1] /= len;
+			v[2] /= len;
+		}
+	}
+
 	// Perform a software skinning pass when possible before delegating to GL draw calls
 	private boolean trySoftwareSkinAndDrawArrays(final int mode, final int first, final int count) {
 		if (!this.oesMatrixPaletteEnabled || !this.oesMatrixIndexArrayEnabled || !this.oesWeightArrayEnabled) return false;
-		if (this.vertexBuffer == null) return false; // only support client-side float vertex arrays
-		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset) {
-			return false; // VBO-backed arrays not supported in this software path
+		if (this.vertexBuffer == null) return false;
+		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset || (normalArrayEnabled && normalIsOffset)) {
+			return false; // VBOs not supported in this path
 		}
 
-		// Check for supported buffer types
-		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT) return false;
+		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT || (normalArrayEnabled && this.normalType != GL11.GL_FLOAT)) return false;
 		if (this.oesMatrixIndexType != GL11.GL_UNSIGNED_BYTE && this.oesMatrixIndexType != GL11.GL_UNSIGNED_SHORT) return false;
 
 		final int vSize = this.vertexSize;
-		final FloatBuffer srcV = (FloatBuffer) this.vertexBuffer;
+		final FloatBuffer srcV = this.vertexBuffer;
+		final FloatBuffer skinnedVerts = BufferUtils.createFloatBuffer(count * vSize);
 
-		final FloatBuffer skinned = BufferUtils.createFloatBuffer(count * vSize);
+		// Handle normals
+		final FloatBuffer srcN = normalArrayEnabled ? (FloatBuffer) this.normalBuffer : null;
+		final FloatBuffer skinnedNormals = normalArrayEnabled ? BufferUtils.createFloatBuffer(count * 3) : null;
+		final float[] origN = normalArrayEnabled ? new float[3] : null;
+		final float[] tmpN = normalArrayEnabled ? new float[3] : null;
+		final float[] accumN = normalArrayEnabled ? new float[3] : null;
+
 
 		final int[] indices = new int[this.oesMatrixIndexSize];
 		final float[] weights = new float[this.oesWeightSize];
-		final float[] orig = {0, 0, 0, 1};
-		final float[] tmp = new float[4];
-		final float[] accum = new float[4];
+		final float[] origV = new float[4];
+		final float[] tmpV = new float[4];
+		final float[] accumV = new float[4];
 
 		for (int vi = 0; vi < count; vi++) {
 			final int vertIndex = first + vi;
 
-			// Clear accumulator for the new vertex
-			accum[0] = 0f; accum[1] = 0f; accum[2] = 0f; accum[3] = 0f;
+			accumV[0] = 0f; accumV[1] = 0f; accumV[2] = 0f; accumV[3] = 0f;
+			origV[0] = 0f; origV[1] = 0f; origV[2] = 0f; origV[3] = 1f;
 
 			// Read original vertex position
 			final int floatsPerVertex = (this.vertexStride == 0) ? vSize : (this.vertexStride / 4);
-			final int srcPos = vertIndex * floatsPerVertex;
-			for (int a = 0; a < vSize; a++) {
-				orig[a] = srcV.get(srcPos + a);
-			}
-			orig[3] = (vSize < 4) ? 1.0f : orig[3]; // Ensure w is 1 if not provided
+			final int vPos = vertIndex * floatsPerVertex;
+			for (int a = 0; a < vSize; a++) origV[a] = srcV.get(vPos + a);
 
-			// Read indices and weights for this vertex
+			// Read original normal if enabled
+			if (normalArrayEnabled) {
+				accumN[0] = 0f; accumN[1] = 0f; accumN[2] = 0f;
+				final int floatsPerNormal = (this.normalStride == 0) ? 3 : (this.normalStride / 4);
+				final int nPos = vertIndex * floatsPerNormal;
+				for (int a = 0; a < 3; a++) origN[a] = srcN.get(nPos + a);
+			}
+
 			readIndices(this.oesMatrixIndexBuffer, vertIndex, this.oesMatrixIndexSize, this.oesMatrixIndexStride, this.oesMatrixIndexType, indices);
 			readWeights(this.oesWeightBuffer, vertIndex, this.oesWeightSize, this.oesWeightStride, this.oesWeightType, weights);
 
-			// Apply palette matrices
 			for (int k = 0; k < this.oesWeightSize; k++) {
 				final int mi = indices[k];
-				if (mi < 0 || mi >= paletteMatrices.length) continue; // Safety check
-
-				mulMat4Vec4(paletteMatrices[mi], orig, tmp);
-
+				if (mi < 0 || mi >= paletteMatrices.length) continue;
+				final float[] matrix = paletteMatrices[mi];
 				final float w = weights[k];
-				accum[0] += tmp[0] * w;
-				accum[1] += tmp[1] * w;
-				accum[2] += tmp[2] * w;
-				accum[3] += tmp[3] * w;
+
+				// Accumulate vertex position
+				mulMat4Vec4(matrix, origV, tmpV);
+				accumV[0] += tmpV[0] * w;
+				accumV[1] += tmpV[1] * w;
+				accumV[2] += tmpV[2] * w;
+				accumV[3] += tmpV[3] * w;
+
+				// Accumulate normal
+				if (normalArrayEnabled) {
+					mulMat3Vec3(matrix, origN, tmpN);
+					accumN[0] += tmpN[0] * w;
+					accumN[1] += tmpN[1] * w;
+					accumN[2] += tmpN[2] * w;
+				}
 			}
 
-			// Write skinned vertex to the new buffer
-			for (int a = 0; a < vSize; a++) {
-				skinned.put(accum[a]);
+			// Write skinned vertex
+			for (int a = 0; a < vSize; a++) skinnedVerts.put(accumV[a]);
+
+			// Write skinned normal
+			if (normalArrayEnabled) {
+				normalizeVec3(accumN);
+				skinnedNormals.put(accumN);
 			}
 		}
-		skinned.position(0);
+		skinnedVerts.position(0);
+		if (skinnedNormals != null) skinnedNormals.position(0);
 
-		// Replace vertex pointer, draw, and then restore
 		EGL10Impl.g3d.sync(() -> {
-			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinned);
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPushMatrix();
+			GL11.glLoadIdentity();
+
+			// Texture matrix manipulation is generally not needed if normals are correct
+			// It could be added back if specific effects require it, but this is the safer default.
+
+			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinnedVerts);
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(GL11.GL_FLOAT, 0, skinnedNormals);
+			}
+
 			GL11.glDrawArrays(mode, 0, count);
-			// Restore original pointer
+
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPopMatrix();
+
+			// Restore original pointers
 			if (this.vertexIsOffset) {
 				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexOffset);
-			} else {
-				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, (FloatBuffer)this.vertexBuffer);
+			} else if (this.vertexBuffer != null) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexBuffer);
+			}
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(this.normalType, this.normalStride, MemoryUtil.memAddress(this.normalBuffer));
 			}
 		});
 
@@ -972,86 +1053,140 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	}
 
 	private boolean trySoftwareSkinAndDrawElements(final int mode, final int count, final int type, final Buffer indicesBuffer) {
+		// 1. Check if software skinning should be applied
 		if (!this.oesMatrixPaletteEnabled || !this.oesMatrixIndexArrayEnabled || !this.oesWeightArrayEnabled) return false;
-		if (this.vertexBuffer == null) return false; // only support client-side float vertex arrays
-		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset) {
-			return false; // VBO-backed arrays not supported in this software path
+		if (this.vertexBuffer == null) return false; // Must have client-side vertices
+		// VBOs are not supported in this software path
+		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset || (normalArrayEnabled && normalIsOffset)) {
+			return false;
 		}
 
-		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT) return false;
+		// 2. Check if the buffer data types are compatible with the software implementation
+		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT || (normalArrayEnabled && this.normalType != GL11.GL_FLOAT)) return false;
 		if (this.oesMatrixIndexType != GL11.GL_UNSIGNED_BYTE && this.oesMatrixIndexType != GL11.GL_UNSIGNED_SHORT) return false;
+		if (type != GL11.GL_UNSIGNED_BYTE && type != GL11.GL_UNSIGNED_SHORT) return false; // Unsupported element index type
 
-		// We will create a new, non-indexed vertex buffer by "unrolling" the elements
-		final FloatBuffer skinned = BufferUtils.createFloatBuffer(count * this.vertexSize);
+		// 3. Prepare output buffers for the "unrolled" and skinned vertex data
+		final int vSize = this.vertexSize;
 		final FloatBuffer srcV = (FloatBuffer) this.vertexBuffer;
+		final FloatBuffer skinnedVerts = BufferUtils.createFloatBuffer(count * vSize);
 
+		// Handle normals if they are enabled
+		final FloatBuffer srcN = normalArrayEnabled ? (FloatBuffer) this.normalBuffer : null;
+		final FloatBuffer skinnedNormals = normalArrayEnabled ? BufferUtils.createFloatBuffer(count * 3) : null;
+		final float[] origN = normalArrayEnabled ? new float[3] : null;
+		final float[] tmpN = normalArrayEnabled ? new float[3] : null;
+		final float[] accumN = normalArrayEnabled ? new float[3] : null;
+
+		// Prepare temporary arrays for calculations
 		final int[] indices = new int[this.oesMatrixIndexSize];
 		final float[] weights = new float[this.oesWeightSize];
-		final float[] orig = {0, 0, 0, 1};
-		final float[] tmp = new float[4];
-		final float[] accum = new float[4];
+		final float[] origV = new float[4];
+		final float[] tmpV = new float[4];
+		final float[] accumV = new float[4];
 
 		indicesBuffer.position(0);
 
+		// 4. Main loop to process each element
 		for (int ei = 0; ei < count; ei++) {
+			// Read the actual vertex index from the element buffer
 			int vertexIndex;
 			if (type == GL11.GL_UNSIGNED_SHORT) {
 				vertexIndex = ((ShortBuffer)indicesBuffer).get(ei) & 0xFFFF;
-			} else if (type == GL11.GL_UNSIGNED_BYTE) {
+			} else { // GL_UNSIGNED_BYTE
 				vertexIndex = ((ByteBuffer)indicesBuffer).get(ei) & 0xFF;
-			} else {
-				return false; // Unsupported index type
 			}
 
-			// Clear accumulator for the new vertex
-			accum[0] = 0f; accum[1] = 0f; accum[2] = 0f; accum[3] = 0f;
+			// Reset accumulators for the new vertex
+			accumV[0] = 0f; accumV[1] = 0f; accumV[2] = 0f; accumV[3] = 0f;
+			origV[0] = 0f; origV[1] = 0f; origV[2] = 0f; origV[3] = 1f;
 
-			// Read original vertex
-			final int floatsPerVertex = (this.vertexStride == 0) ? this.vertexSize : (this.vertexStride / 4);
-			final int srcPos = vertexIndex * floatsPerVertex;
-			for (int a = 0; a < this.vertexSize; a++) {
-				orig[a] = srcV.get(srcPos + a);
+			// Read original vertex position
+			final int floatsPerVertex = (this.vertexStride == 0) ? vSize : (this.vertexStride / 4);
+			final int vPos = vertexIndex * floatsPerVertex;
+			for (int a = 0; a < vSize; a++) origV[a] = srcV.get(vPos + a);
+
+			// Read original normal if enabled
+			if (normalArrayEnabled) {
+				accumN[0] = 0f; accumN[1] = 0f; accumN[2] = 0f;
+				final int floatsPerNormal = (this.normalStride == 0) ? 3 : (this.normalStride / 4);
+				final int nPos = vertexIndex * floatsPerNormal;
+				for (int a = 0; a < 3; a++) origN[a] = srcN.get(nPos + a);
 			}
-			orig[3] = (this.vertexSize < 4) ? 1.0f : orig[3];
 
 			// Read skinning data for this vertex
 			readIndices(this.oesMatrixIndexBuffer, vertexIndex, this.oesMatrixIndexSize, this.oesMatrixIndexStride, this.oesMatrixIndexType, indices);
 			readWeights(this.oesWeightBuffer, vertexIndex, this.oesWeightSize, this.oesWeightStride, this.oesWeightType, weights);
 
-			// Apply palette matrices
+			// 5. Apply palette matrices
 			for (int k = 0; k < this.oesWeightSize; k++) {
 				final int mi = indices[k];
 				if (mi < 0 || mi >= paletteMatrices.length) continue;
-
-				mulMat4Vec4(paletteMatrices[mi], orig, tmp);
-
+				final float[] matrix = paletteMatrices[mi];
 				final float w = weights[k];
-				accum[0] += tmp[0] * w;
-				accum[1] += tmp[1] * w;
-				accum[2] += tmp[2] * w;
-				accum[3] += tmp[3] * w;
+
+				// Accumulate vertex position
+				mulMat4Vec4(matrix, origV, tmpV);
+				accumV[0] += tmpV[0] * w;
+				accumV[1] += tmpV[1] * w;
+				accumV[2] += tmpV[2] * w;
+				accumV[3] += tmpV[3] * w;
+
+				// Accumulate normal (transformed by 3x3 rotation part of matrix)
+				if (normalArrayEnabled) {
+					mulMat3Vec3(matrix, origN, tmpN);
+					accumN[0] += tmpN[0] * w;
+					accumN[1] += tmpN[1] * w;
+					accumN[2] += tmpN[2] * w;
+				}
 			}
 
-			// Write the final skinned vertex
-			for (int a = 0; a < this.vertexSize; a++) {
-				skinned.put(accum[a]);
+			// 6. Write the final skinned data to the output buffers
+			for (int a = 0; a < vSize; a++) skinnedVerts.put(accumV[a]);
+
+			if (normalArrayEnabled) {
+				normalizeVec3(accumN);
+				skinnedNormals.put(accumN);
 			}
 		}
-		skinned.position(0);
 
+		skinnedVerts.position(0);
+		if (skinnedNormals != null) skinnedNormals.position(0);
+
+		// 7. Perform the OpenGL draw call with the skinned data
 		EGL10Impl.g3d.sync(() -> {
-			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinned);
-			// Draw as non-indexed arrays since we've "unrolled" the vertices
+			// Save the current MODELVIEW matrix state
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPushMatrix();
+
+			// Set MODELVIEW to identity to prevent double-transforming our skinned data
+			GL11.glLoadIdentity();
+
+			// Set the vertex and normal pointers to our new software-skinned buffers
+			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinnedVerts);
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(GL11.GL_FLOAT, 0, skinnedNormals);
+			}
+
+			// Draw using glDrawArrays since we have unrolled the indexed data
 			GL11.glDrawArrays(mode, 0, count);
-			// Restore original pointer
+
+			// Restore the previous MODELVIEW matrix
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPopMatrix();
+
+			// Restore the original vertex and normal pointers to leave GL state clean
 			if (this.vertexIsOffset) {
 				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexOffset);
 			} else if (this.vertexBuffer != null) {
-				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, (FloatBuffer)this.vertexBuffer);
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexBuffer);
+			}
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(this.normalType, this.normalStride, MemoryUtil.memAddress(this.normalBuffer));
 			}
 		});
 
-		return true;
+		return true; // Indicate that the draw call was handled
 	}
 
 	// Intercept draw calls to handle software skinning
@@ -1077,6 +1212,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	public synchronized void glDisable(final int n) {
 		if (n == OES_MATRIX_PALETTE) {
 			this.oesMatrixPaletteEnabled = false;
+			return;
 		} else if (n == 2896) { // GL_LIGHTING
 			GL10Impl.aBoolean1355 = true;
 		} else if (n == 2912) { // GL_FOG
@@ -1088,17 +1224,24 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	public synchronized void glDisableClientState(final int n) {
 		if (n == OES_MATRIX_INDEX_ARRAY) {
 			this.oesMatrixIndexArrayEnabled = false;
-		} else if (n == OES_WEIGHT_ARRAY) {
-			this.oesWeightArrayEnabled = false;
-		} else {
-			EGL10Impl.g3d.async(() -> GL11.glDisableClientState(n));
+			return;
 		}
+		if (n == OES_WEIGHT_ARRAY) {
+			this.oesWeightArrayEnabled = false;
+			return;
+		}
+		if (n == GL11.GL_NORMAL_ARRAY) {
+			this.normalArrayEnabled = false;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glDisableClientState(n));
 	}
 
 	public synchronized void glEnable(final int n) {
 		if (n == OES_MATRIX_PALETTE) {
 			this.oesMatrixPaletteEnabled = true;
-		} else if (n == 2896) { // GL_LIGHTING
+			return;
+		}
+		if (n == 2896) { // GL_LIGHTING
 			GL10Impl.aBoolean1355 = true;
 		} else if (n == 2912) { // GL_FOG
 			GL10Impl.aBoolean1358 = true;
@@ -1109,11 +1252,16 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 	public synchronized void glEnableClientState(final int n) {
 		if (n == OES_MATRIX_INDEX_ARRAY) {
 			this.oesMatrixIndexArrayEnabled = true;
-		} else if (n == OES_WEIGHT_ARRAY) {
-			this.oesWeightArrayEnabled = true;
-		} else {
-			EGL10Impl.g3d.async(() -> GL11.glEnableClientState(n));
+			return;
 		}
+		if (n == OES_WEIGHT_ARRAY) {
+			this.oesWeightArrayEnabled = true;
+			return;
+		}
+		if (n == GL11.GL_NORMAL_ARRAY) {
+			this.normalArrayEnabled = true;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glEnableClientState(n));
 	}
 
 	public GL11Impl(final EGLContext eglContext) {
