@@ -272,31 +272,33 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					refreshContent();
 					return;
 				}
-				if (this instanceof IdeaSetupXdgLinux) {
-					if (Files.exists(Paths.get(DEB_DEFAULT_JDK + "/bin/java"))) {
-						try {
-							if (Emulator.getProcessOutput(new String[]{DEB_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
-								jdkHome = DEB_DEFAULT_JDK;
-								refreshContent();
-								return;
-							}
-						} catch (IOException ignored) {
-						}
-					}
-					if (Files.exists(Paths.get(RPM_DEFAULT_JDK + "/bin/java"))) {
-						try {
-							if (Emulator.getProcessOutput(new String[]{RPM_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
-								jdkHome = RPM_DEFAULT_JDK;
-								refreshContent();
-								return;
-							}
-						} catch (IOException ignored) {
-						}
-					}
-				}
 				new Label(shell, SWT.NONE).setText("KEmulator is launched with JRE without JDK.");
 				new Label(shell, SWT.NONE).setText("Please install JDK 1.8 and select it.");
 				new Label(shell, SWT.NONE).setText("You can run KEmulator with it for auto setup.");
+			}
+
+			// in linux it's expected at /usr/lib/jvm, if it's not there we can't do much.
+			if (this instanceof IdeaSetupXdgLinux) {
+				if (Files.exists(Paths.get(DEB_DEFAULT_JDK + "/bin/java"))) {
+					try {
+						if (Emulator.getProcessOutput(new String[]{DEB_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
+							jdkHome = DEB_DEFAULT_JDK;
+							refreshContent();
+							return;
+						}
+					} catch (IOException ignored) {
+					}
+				}
+				if (Files.exists(Paths.get(RPM_DEFAULT_JDK + "/bin/java"))) {
+					try {
+						if (Emulator.getProcessOutput(new String[]{RPM_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
+							jdkHome = RPM_DEFAULT_JDK;
+							refreshContent();
+							return;
+						}
+					} catch (IOException ignored) {
+					}
+				}
 			}
 
 			if (this instanceof IdeaSetupWindows) {
@@ -331,7 +333,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				if (!found) {
 					new Label(jdkSetupGroup, SWT.NONE).setText("Nothing found.");
 				}
-			} // in linux it's expected at /usr/lib/jvm, if it's not there we can't do much.
+			}
+
 
 			Group manualJdkSetupGroup = new Group(shell, SWT.NONE);
 			manualJdkSetupGroup.setText("Manual selection");
