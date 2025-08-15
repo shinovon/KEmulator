@@ -37,6 +37,9 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			} else if (desc.contains("com/bmc/media/")) {
 				s4 = "com/bmc/media/";
 				s5 = "com/sprintpcs/media/";
+			} else if (desc.contains("com/docomostar/")) {
+				s4 = "com/docomostar/";
+				s5 = "com/nttdocomo/";
 			} else {
 				break Label_0037;
 			}
@@ -98,6 +101,10 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			super.visit(n, n2, s, s2, s3.replace("com/bmc/media/", "com/sprintpcs/media/"), array);
 			return;
 		}
+		if (s3.startsWith("com/docomostar/")) {
+			super.visit(n, n2, s, s2, s3.replace("com/docomostar/", "com/nttdocomo/"), array);
+			return;
+		}
 		if (CustomClassLoader.isProtected(s3.replace('/', '.'), false)) {
 			s3 = "__".concat(s3);
 		}
@@ -115,6 +122,8 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			s2 = s2.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
 		} else if (s2.contains("com/bmc/media/")) {
 			s2 = s2.replace("com/bmc/media/", "com/sprintpcs/media/");
+		} else if (s2.contains("com/docomostar/")) {
+			s2 = s2.replace("com/docomostar/", "com/nttdocomo/");
 		}
 		return super.visitField(n, s, s2, s3, o);
 	}

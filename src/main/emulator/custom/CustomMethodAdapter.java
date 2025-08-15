@@ -113,6 +113,10 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(acc, cls.replace("com/bmc/media/", "com/sprintpcs/media/"), name, sign.replace("com/bmc/media/", "com/sprintpcs/media/"));
 					return;
 				}
+				if (cls.startsWith("com/docomostar/") || sign.contains("com/docomostar/")) {
+					super.visitMethodInsn(acc, cls.replace("com/docomostar/", "com/nttdocomo/"), name, sign.replace("com/docomostar/", "com/nttdocomo/"));
+					return;
+				}
 				if (cls.equals("com/immersion/VibeTonz") && acc == Opcodes.INVOKESTATIC) {
 					super.visitMethodInsn(acc, cls.concat("Static"), name, sign);
 					return;
@@ -164,6 +168,9 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				} else if (sign.contains("com/bmc/media/")) {
 					s5 = "com/bmc/media/";
 					s6 = "com/sprintpcs/media/";
+				} else if (sign.contains("com/docomostar/")) {
+					s5 = "com/docomostar/";
+					s6 = "com/nttdocomo/";
 				} else {
 					break Label_0576;
 				}
@@ -188,6 +195,8 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			s3 = s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
 		} else if (s3.contains("com/bmc/media/")) {
 			s3 = s3.replace("com/bmc/media/", "com/sprintpcs/media/");
+		} else if (s3.contains("com/docomostar/")) {
+			s3 = s3.replace("com/docomostar/", "com/nttdocomo/");
 		}
 		super.visitFieldInsn(n, s, s2, s3);
 	}
