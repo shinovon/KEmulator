@@ -302,6 +302,25 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			}
 
 			if (this instanceof IdeaSetupWindows) {
+				Path jdkLocs = Emulator.isX64() ? Paths.get("C:\\Program Files\\Java") : Paths.get("C:\\Program Files (x86)\\Java");
+				for (File f : jdkLocs.toFile().listFiles()) {
+					String path = f.getAbsolutePath();
+					if (!path.toLowerCase().contains("jdk"))
+						continue;
+					if (Files.exists(Paths.get(path + "\\bin\\java.exe"))) {
+						try {
+							if (Emulator.getProcessOutput(new String[]{path + "\\bin\\java.exe", "-version"}, true).contains("1.8.")) {
+								jdkHome = path;
+								refreshContent();
+								return;
+							}
+						} catch (IOException ignored) {
+						}
+					}
+				}
+			}
+
+			if (this instanceof IdeaSetupWindows) {
 				Group jdkSetupGroup = new Group(shell, SWT.NONE);
 				jdkSetupGroup.setText("JDKs from PATH");
 				jdkSetupGroup.setLayout(genGLo());
