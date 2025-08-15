@@ -20,6 +20,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 
 
 	public final void visitMethodInsn(final int acc, final String cls, String name, String sign) {
+//		System.out.println("visitMethod " + cls + " " + name + " " + sign);
 		Label_0576:
 		{
 			if (cls.equals("java/lang/System")) {
@@ -92,7 +93,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			} else {
 				if (cls.equals("java/util/Timer")) {
 					if (sign.contains("java/util/TimerTask")) {
-						sign = sign.replaceAll("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
+						sign = sign.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
 					}
 					super.visitMethodInsn(acc, "emulator/custom/subclass/Timer", name, sign);
 					return;
@@ -174,7 +175,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				} else {
 					break Label_0576;
 				}
-				sign = sign.replaceAll(s5, s6);
+				sign = sign.replace(s5, s6);
 			}
 		}
 		if (CustomClassAdapter.hasRenamedMethods && CustomClassAdapter.renamedClasses.contains(cls) && "()V".equals(sign) &&
@@ -184,11 +185,14 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 		super.visitMethodInsn(acc, cls, name, sign);
 	}
 
-	public final void visitFieldInsn(final int n, final String s, final String s2, String s3) {
-		if (s3.equals("Ljava/util/TimerTask;")) {
-			s3 = "Lemulator/custom/subclass/SubTimerTask;";
-		} else if (s3.equals("Ljava/util/Timer;")) {
-			s3 = "Lemulator/custom/subclass/Timer;";
+	public final void visitFieldInsn(final int n, String s, final String s2, String s3) {
+		if (s.contains("com/docomostar/")) {
+			s = s.replace("com/docomostar/", "com/nttdocomo/");
+		}
+		if (s3.contains("java/util/TimerTask")) {
+			s3 = s3.replace("java/util/TimerTask", "Lemulator/custom/subclass/SubTimerTask");
+		} else if (s3.contains("java/util/Timer")) {
+			s3 = s3.replace("java/util/Timer", "emulator/custom/subclass/Timer");
 		} else if (s3.contains("com/gcjsp/v10/")) {
 			s3 = s3.replace("com/gcjsp/v10/", "com/vodafone/v10/");
 		} else if (s3.contains("tw/com/fareastone/v10/")) {
@@ -242,8 +246,13 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitMultiANewArrayInsn(final String s, final int n) {
+//		System.out.println("visitMulti " + s);
 		if (Settings.enableNewTrack) {
 			this.method708("new " + emulator.debug.ClassTypes.method870(s));
+		}
+		if (s.contains("com/docomostar/")) {
+			super.visitMultiANewArrayInsn(s.replace("com/docomostar/", "com/nttdocomo/"), n);
+			return;
 		}
 		super.visitMultiANewArrayInsn(s, n);
 	}
@@ -275,20 +284,28 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				f.method708(sb.append(s2).toString());
 			}
 		}
-		if (s.equals("java/util/Timer")) {
-			super.visitTypeInsn(n, "emulator/custom/subclass/Timer");
+		if (s.contains("java/util/TimerTask")) {
+			super.visitTypeInsn(n, s.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask"));
 			return;
 		}
-		if (s.startsWith("com/gcjsp/v10/")) {
+		if (s.contains("java/util/Timer")) {
+			super.visitTypeInsn(n, s.replace("java/util/Timer", "emulator/custom/subclass/Timer"));
+			return;
+		}
+		if (s.contains("com/gcjsp/v10/")) {
 			super.visitTypeInsn(n, s.replace("com/gcjsp/v10/", "com/vodafone/v10/"));
 			return;
 		}
-		if (s.startsWith("tw/com/fareastone/v10/")) {
+		if (s.contains("tw/com/fareastone/v10/")) {
 			super.visitTypeInsn(n, s.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"));
 			return;
 		}
-		if (s.startsWith("com/bmc/media/")) {
+		if (s.contains("com/bmc/media/")) {
 			super.visitTypeInsn(n, s.replace("com/bmc/media/", "com/sprintpcs/media/"));
+			return;
+		}
+		if (s.contains("com/docomostar/")) {
+			super.visitTypeInsn(n, s.replace("com/docomostar/", "com/nttdocomo/"));
 			return;
 		}
 		super.visitTypeInsn(n, s);
@@ -355,6 +372,13 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			}
 		}
 		super.visitIntInsn(n, n2);
+	}
+
+	public void visitTryCatchBlock(Label var1, Label var2, Label var3, String var4) {
+		if (var4 != null && var4.startsWith("com/docomostar/")) {
+			var4 = var4.replace("com/docomostar/", "com/nttdocomo/");
+		}
+		super.visitTryCatchBlock(var1, var2, var3, var4);
 	}
 
 	public final void visitCode() {
