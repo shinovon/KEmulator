@@ -180,12 +180,18 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				ideaDownloadLink = new Link(installGroup, SWT.NONE);
 				ideaDownloadLink.setText("1. Go to <a>download page</a>, grab a release and install it.");
 				ideaDownloadLink.addSelectionListener(this);
-				new Label(installGroup, SWT.NONE).setText("2. Launch installed IDE, activate a license and create desktop shortcut.");
+				if (this instanceof IdeaSetupXdgLinux)
+					new Label(installGroup, SWT.NONE).setText("2. Launch installed IDE.");
+				else
+					new Label(installGroup, SWT.NONE).setText("2. Launch installed IDE and create desktop shortcut.");
 				new Label(installGroup, SWT.NONE).setText("3. Do NOT touch any settings related to JDKs. Close IDE and return here.");
-
-				refreshInstalledListBtn = new Button(installGroup, SWT.PUSH);
-				refreshInstalledListBtn.setText("I did it, refresh list of installed IDEs");
-				refreshInstalledListBtn.addSelectionListener(this);
+				if (this instanceof IdeaSetupXdgLinux) {
+					refreshInstalledListBtn = new Button(installGroup, SWT.PUSH);
+					refreshInstalledListBtn.setText("I did it, refresh list of installed IDEs");
+					refreshInstalledListBtn.addSelectionListener(this);
+				} else {
+					new Label(installGroup, SWT.NONE).setText("4. Select Intellij binary via button above.");
+				}
 			}
 
 			shell.layout(true, true);
