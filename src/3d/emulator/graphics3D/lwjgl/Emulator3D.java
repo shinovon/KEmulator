@@ -215,7 +215,7 @@ public final class Emulator3D implements IGraphics3D {
 		if (capabilities == null) {
 			capabilities = GL.createCapabilities();
 //			GLConfiguration.OES_draw_texture = false;
-			GLConfiguration.OES_matrix_pallete = capabilities.GL_ARB_matrix_palette;
+//			GLConfiguration.OES_matrix_pallete = capabilities.GL_ARB_matrix_palette;
 //			GLConfiguration.OES_texture_cube_map = capabilities.GL_ARB_texture_cube_map;
 			GLConfiguration.OES_blend_subtract = capabilities.OpenGL14 /*|| capabilities.GL_EXT_blend_subtract*/;
 			GLConfiguration.OES_blend_func_separate = capabilities.OpenGL14 /*|| capabilities.GL_EXT_blend_func_separate*/;

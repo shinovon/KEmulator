@@ -13,6 +13,40 @@ import java.nio.*;
  * GL11
  */
 public final class GL11Impl extends GL10Impl implements javax.microedition.khronos.opengles.GL11, GL11Ext, GL11ExtensionPack {
+	// Software implementation of OES_matrix_palette
+	private static final int OES_MATRIX_PALETTE = 34880; // GL_MATRIX_PALETTE_OES
+	private static final int OES_MATRIX_INDEX_ARRAY = 34884; // GL_MATRIX_INDEX_ARRAY_OES
+	private static final int OES_WEIGHT_ARRAY = 34477; // GL_WEIGHT_ARRAY_OES
+
+	private boolean oesMatrixPaletteEnabled = false;
+	private boolean oesMatrixIndexArrayEnabled = false;
+	private boolean oesWeightArrayEnabled = false;
+
+	private Buffer oesMatrixIndexBuffer = null;
+	private int oesMatrixIndexSize = 0;
+	private int oesMatrixIndexType = 0;
+	private int oesMatrixIndexStride = 0;
+	private int oesMatrixIndexOffset = 0;
+	private boolean oesMatrixIndexIsOffset = false;
+
+	private Buffer oesWeightBuffer = null;
+	private int oesWeightSize = 0;
+	private int oesWeightType = 0;
+	private int oesWeightStride = 0;
+	private int oesWeightOffset = 0;
+	private boolean oesWeightIsOffset = false;
+
+	// Simple palette storage (software): default to 32 palette matrices, each 16 floats (4x4)
+	private final float[][] paletteMatrices = new float[32][16];
+	private int currentPaletteMatrix = 0;
+
+	protected int vertexSize;
+	protected int vertexType;
+	protected int vertexStride;
+	protected int vertexOffset;
+	protected boolean vertexIsOffset;
+	protected FloatBuffer vertexBuffer;
+
 	public final synchronized boolean glIsBuffer(final int n) {
 		EGL10Impl.g3d.sync(() -> temp = GL15.glIsBuffer(n));
 		return (boolean) temp;
@@ -112,12 +146,31 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		EGL10Impl.g3d.sync(() -> GL11.glTexCoordPointer(n, n2, n3, (long) n4));
 	}
 
-	public final synchronized void glVertexPointer(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.sync(() -> GL11.glVertexPointer(n, n2, n3, (long) n4));
+	// Override glVertexPointer to capture client-side vertex array state for software skinning
+	public synchronized void glVertexPointer(final int size, final int type, final int stride, final Buffer pointer) {
+		// store only client-side float arrays for now
+		this.vertexSize = size;
+		this.vertexType = type;
+		this.vertexStride = stride;
+		this.vertexIsOffset = false;
+		if (pointer instanceof FloatBuffer) {
+			this.vertexBuffer = ((FloatBuffer) pointer);
+		} else {
+			// unsupported client-side type for skinning; null out so we fall back to GL
+			this.vertexBuffer = null;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glVertexPointer(size, type, stride, MemoryUtil.memAddress(pointer)));
 	}
 
-	public final synchronized void glDrawElements(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.sync(() -> GL11.glDrawElements(n, n2, n3, (long) n4));
+	public synchronized void glVertexPointer(final int size, final int type, final int stride, final int pointerOffset) {
+		// VBO-backed vertex pointer; we mark as offset (unsupported for software path unless we read back)
+		this.vertexSize = size;
+		this.vertexType = type;
+		this.vertexStride = stride;
+		this.vertexOffset = pointerOffset;
+		this.vertexIsOffset = true;
+		this.vertexBuffer = null;
+		EGL10Impl.g3d.async(() -> GL11.glVertexPointer(size, type, stride, pointerOffset));
 	}
 
 	public final synchronized void glClipPlanef(final int n, final float[] array, final int n2) {
@@ -446,42 +499,70 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glCurrentPaletteMatrixARB(n));
+		// set current palette matrix index (software emulation)
+		if (n >= 0 && n < paletteMatrices.length) {
+			this.currentPaletteMatrix = n;
+		}
 	}
 
 	public final synchronized void glLoadPaletteFromModelViewMatrixOES() {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
+		// copy current modelview matrix into the current palette matrix (software emulation)
+		final FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+		EGL10Impl.g3d.sync(() -> GL11.glGetFloatv(GL11.GL_MODELVIEW_MATRIX, fb));
+		fb.get(paletteMatrices[currentPaletteMatrix]);
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glMatrixIndexPointerARB(n, n2, n3, MemoryUtil.memAddress(buffer)));
+		// store client-side matrix index pointer for software emulation
+		this.oesMatrixIndexBuffer = buffer;
+		this.oesMatrixIndexSize = n;
+		this.oesMatrixIndexType = n2;
+		this.oesMatrixIndexStride = n3;
+		this.oesMatrixIndexIsOffset = false;
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final int n4) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glMatrixIndexPointerARB(n, n2, n3, (long) n4));
+		// store VBO offset-based index pointer (we keep offset for later use if needed)
+		this.oesMatrixIndexBuffer = null;
+		this.oesMatrixIndexSize = n;
+		this.oesMatrixIndexType = n2;
+		this.oesMatrixIndexStride = n3;
+		this.oesMatrixIndexOffset = n4;
+		this.oesMatrixIndexIsOffset = true;
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBVertexBlend.glWeightPointerARB(n, n2, n3, MemoryUtil.memAddress(buffer)));
+		this.oesWeightBuffer = buffer;
+		this.oesWeightSize = n;
+		this.oesWeightType = n2;
+		this.oesWeightStride = n3;
+		this.oesWeightIsOffset = false;
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final int n4) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBVertexBlend.glWeightPointerARB(n, n2, n3, (long) n4));
+		this.oesWeightBuffer = null;
+		this.oesWeightSize = n;
+		this.oesWeightType = n2;
+		this.oesWeightStride = n3;
+		this.oesWeightOffset = n4;
+		this.oesWeightIsOffset = true;
 	}
+
 
 	private static void checkTextureCubeMapExt() {
 		if (!GLConfiguration.OES_texture_cube_map) {
@@ -769,6 +850,270 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glPointSizePointerOES(final int n, final int n2, final int n3) {
 		System.out.println("OES is not implemented.");
+	}
+
+	// Helper: read matrix indices (unsigned byte or unsigned short) from index buffer
+	private static void readIndices(final Buffer buf, final int vertexIndex, final int indexSize, final int strideBytes, final int type, final int[] out) {
+		if (buf == null) return;
+
+		if (type == GL11.GL_UNSIGNED_BYTE) {
+			ByteBuffer bb = (ByteBuffer) buf;
+			final int stride = (strideBytes == 0) ? indexSize : strideBytes;
+			final int pos = vertexIndex * stride;
+			for (int i = 0; i < indexSize; i++) {
+				out[i] = bb.get(pos + i) & 0xFF;
+			}
+		} else if (type == GL11.GL_UNSIGNED_SHORT) {
+			ShortBuffer sb = (ShortBuffer) buf;
+			final int strideElems = (strideBytes == 0) ? indexSize : (strideBytes / 2);
+			final int pos = vertexIndex * strideElems;
+			for (int i = 0; i < indexSize; i++) {
+				out[i] = sb.get(pos + i) & 0xFFFF;
+			}
+		}
+	}
+
+	// Helper: read weights (floats) from weight buffer
+	private static void readWeights(final Buffer buf, final int vertexIndex, final int weightSize, final int strideBytes, final int type, final float[] out) {
+		if (buf == null) return;
+
+		if (type == GL11.GL_FLOAT) {
+			FloatBuffer fb = (FloatBuffer) buf;
+			final int strideElems = (strideBytes == 0) ? weightSize : (strideBytes / 4);
+			final int pos = vertexIndex * strideElems;
+			for (int i = 0; i < weightSize; i++) {
+				out[i] = fb.get(pos + i);
+			}
+		}
+	}
+
+	// Multiply 4x4 matrix (array of 16 floats in column-major order) by vec4
+	private static void mulMat4Vec4(final float[] m, final float[] v, final float[] out) {
+		for (int row = 0; row < 4; row++) {
+			out[row] = m[row] * v[0] + m[4 + row] * v[1] + m[8 + row] * v[2] + m[12 + row] * v[3];
+		}
+	}
+
+	// Perform a software skinning pass when possible before delegating to GL draw calls
+	private boolean trySoftwareSkinAndDrawArrays(final int mode, final int first, final int count) {
+		if (!this.oesMatrixPaletteEnabled || !this.oesMatrixIndexArrayEnabled || !this.oesWeightArrayEnabled) return false;
+		if (this.vertexBuffer == null) return false; // only support client-side float vertex arrays
+		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset) {
+			return false; // VBO-backed arrays not supported in this software path
+		}
+
+		// Check for supported buffer types
+		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT) return false;
+		if (this.oesMatrixIndexType != GL11.GL_UNSIGNED_BYTE && this.oesMatrixIndexType != GL11.GL_UNSIGNED_SHORT) return false;
+
+		final int vSize = this.vertexSize;
+		final FloatBuffer srcV = (FloatBuffer) this.vertexBuffer;
+
+		final FloatBuffer skinned = BufferUtils.createFloatBuffer(count * vSize);
+
+		final int[] indices = new int[this.oesMatrixIndexSize];
+		final float[] weights = new float[this.oesWeightSize];
+		final float[] orig = {0, 0, 0, 1};
+		final float[] tmp = new float[4];
+		final float[] accum = new float[4];
+
+		for (int vi = 0; vi < count; vi++) {
+			final int vertIndex = first + vi;
+
+			// Clear accumulator for the new vertex
+			accum[0] = 0f; accum[1] = 0f; accum[2] = 0f; accum[3] = 0f;
+
+			// Read original vertex position
+			final int floatsPerVertex = (this.vertexStride == 0) ? vSize : (this.vertexStride / 4);
+			final int srcPos = vertIndex * floatsPerVertex;
+			for (int a = 0; a < vSize; a++) {
+				orig[a] = srcV.get(srcPos + a);
+			}
+			orig[3] = (vSize < 4) ? 1.0f : orig[3]; // Ensure w is 1 if not provided
+
+			// Read indices and weights for this vertex
+			readIndices(this.oesMatrixIndexBuffer, vertIndex, this.oesMatrixIndexSize, this.oesMatrixIndexStride, this.oesMatrixIndexType, indices);
+			readWeights(this.oesWeightBuffer, vertIndex, this.oesWeightSize, this.oesWeightStride, this.oesWeightType, weights);
+
+			// Apply palette matrices
+			for (int k = 0; k < this.oesWeightSize; k++) {
+				final int mi = indices[k];
+				if (mi < 0 || mi >= paletteMatrices.length) continue; // Safety check
+
+				mulMat4Vec4(paletteMatrices[mi], orig, tmp);
+
+				final float w = weights[k];
+				accum[0] += tmp[0] * w;
+				accum[1] += tmp[1] * w;
+				accum[2] += tmp[2] * w;
+				accum[3] += tmp[3] * w;
+			}
+
+			// Write skinned vertex to the new buffer
+			for (int a = 0; a < vSize; a++) {
+				skinned.put(accum[a]);
+			}
+		}
+		skinned.position(0);
+
+		// Replace vertex pointer, draw, and then restore
+		EGL10Impl.g3d.sync(() -> {
+			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinned);
+			GL11.glDrawArrays(mode, 0, count);
+			// Restore original pointer
+			if (this.vertexIsOffset) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexOffset);
+			} else {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, (FloatBuffer)this.vertexBuffer);
+			}
+		});
+
+		return true;
+	}
+
+	private boolean trySoftwareSkinAndDrawElements(final int mode, final int count, final int type, final Buffer indicesBuffer) {
+		if (!this.oesMatrixPaletteEnabled || !this.oesMatrixIndexArrayEnabled || !this.oesWeightArrayEnabled) return false;
+		if (this.vertexBuffer == null) return false; // only support client-side float vertex arrays
+		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset) {
+			return false; // VBO-backed arrays not supported in this software path
+		}
+
+		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT) return false;
+		if (this.oesMatrixIndexType != GL11.GL_UNSIGNED_BYTE && this.oesMatrixIndexType != GL11.GL_UNSIGNED_SHORT) return false;
+
+		// We will create a new, non-indexed vertex buffer by "unrolling" the elements
+		final FloatBuffer skinned = BufferUtils.createFloatBuffer(count * this.vertexSize);
+		final FloatBuffer srcV = (FloatBuffer) this.vertexBuffer;
+
+		final int[] indices = new int[this.oesMatrixIndexSize];
+		final float[] weights = new float[this.oesWeightSize];
+		final float[] orig = {0, 0, 0, 1};
+		final float[] tmp = new float[4];
+		final float[] accum = new float[4];
+
+		indicesBuffer.position(0);
+
+		for (int ei = 0; ei < count; ei++) {
+			int vertexIndex;
+			if (type == GL11.GL_UNSIGNED_SHORT) {
+				vertexIndex = ((ShortBuffer)indicesBuffer).get(ei) & 0xFFFF;
+			} else if (type == GL11.GL_UNSIGNED_BYTE) {
+				vertexIndex = ((ByteBuffer)indicesBuffer).get(ei) & 0xFF;
+			} else {
+				return false; // Unsupported index type
+			}
+
+			// Clear accumulator for the new vertex
+			accum[0] = 0f; accum[1] = 0f; accum[2] = 0f; accum[3] = 0f;
+
+			// Read original vertex
+			final int floatsPerVertex = (this.vertexStride == 0) ? this.vertexSize : (this.vertexStride / 4);
+			final int srcPos = vertexIndex * floatsPerVertex;
+			for (int a = 0; a < this.vertexSize; a++) {
+				orig[a] = srcV.get(srcPos + a);
+			}
+			orig[3] = (this.vertexSize < 4) ? 1.0f : orig[3];
+
+			// Read skinning data for this vertex
+			readIndices(this.oesMatrixIndexBuffer, vertexIndex, this.oesMatrixIndexSize, this.oesMatrixIndexStride, this.oesMatrixIndexType, indices);
+			readWeights(this.oesWeightBuffer, vertexIndex, this.oesWeightSize, this.oesWeightStride, this.oesWeightType, weights);
+
+			// Apply palette matrices
+			for (int k = 0; k < this.oesWeightSize; k++) {
+				final int mi = indices[k];
+				if (mi < 0 || mi >= paletteMatrices.length) continue;
+
+				mulMat4Vec4(paletteMatrices[mi], orig, tmp);
+
+				final float w = weights[k];
+				accum[0] += tmp[0] * w;
+				accum[1] += tmp[1] * w;
+				accum[2] += tmp[2] * w;
+				accum[3] += tmp[3] * w;
+			}
+
+			// Write the final skinned vertex
+			for (int a = 0; a < this.vertexSize; a++) {
+				skinned.put(accum[a]);
+			}
+		}
+		skinned.position(0);
+
+		EGL10Impl.g3d.sync(() -> {
+			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinned);
+			// Draw as non-indexed arrays since we've "unrolled" the vertices
+			GL11.glDrawArrays(mode, 0, count);
+			// Restore original pointer
+			if (this.vertexIsOffset) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexOffset);
+			} else if (this.vertexBuffer != null) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, (FloatBuffer)this.vertexBuffer);
+			}
+		});
+
+		return true;
+	}
+
+	// Intercept draw calls to handle software skinning
+	public synchronized void glDrawArrays(final int mode, final int first, final int count) {
+		if (!trySoftwareSkinAndDrawArrays(mode, first, count)) {
+			// Fallback to normal GL draw if not handled by software skinning
+			EGL10Impl.g3d.async(() -> GL11.glDrawArrays(mode, first, count));
+		}
+	}
+
+	public synchronized void glDrawElements(final int mode, final int count, final int type, final Buffer indices) {
+		if (!trySoftwareSkinAndDrawElements(mode, count, type, indices)) {
+			// Fallback to normal GL draw
+			EGL10Impl.g3d.async(() -> GL11.glDrawElements(mode, count, type, MemoryUtil.memAddress(indices)));
+		}
+	}
+
+	public synchronized void glDrawElements(final int mode, final int count, final int type, final int indicesOffset) {
+		// Offset-based elements (VBO index buffer) not supported by the software path
+		EGL10Impl.g3d.async(() -> GL11.glDrawElements(mode, count, type, indicesOffset));
+	}
+
+	public synchronized void glDisable(final int n) {
+		if (n == OES_MATRIX_PALETTE) {
+			this.oesMatrixPaletteEnabled = false;
+		} else if (n == 2896) { // GL_LIGHTING
+			GL10Impl.aBoolean1355 = true;
+		} else if (n == 2912) { // GL_FOG
+			GL10Impl.aBoolean1358 = true;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glDisable(n));
+	}
+
+	public synchronized void glDisableClientState(final int n) {
+		if (n == OES_MATRIX_INDEX_ARRAY) {
+			this.oesMatrixIndexArrayEnabled = false;
+		} else if (n == OES_WEIGHT_ARRAY) {
+			this.oesWeightArrayEnabled = false;
+		} else {
+			EGL10Impl.g3d.async(() -> GL11.glDisableClientState(n));
+		}
+	}
+
+	public synchronized void glEnable(final int n) {
+		if (n == OES_MATRIX_PALETTE) {
+			this.oesMatrixPaletteEnabled = true;
+		} else if (n == 2896) { // GL_LIGHTING
+			GL10Impl.aBoolean1355 = true;
+		} else if (n == 2912) { // GL_FOG
+			GL10Impl.aBoolean1358 = true;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glEnable(n));
+	}
+
+	public synchronized void glEnableClientState(final int n) {
+		if (n == OES_MATRIX_INDEX_ARRAY) {
+			this.oesMatrixIndexArrayEnabled = true;
+		} else if (n == OES_WEIGHT_ARRAY) {
+			this.oesWeightArrayEnabled = true;
+		} else {
+			EGL10Impl.g3d.async(() -> GL11.glEnableClientState(n));
+		}
 	}
 
 	public GL11Impl(final EGLContext eglContext) {
