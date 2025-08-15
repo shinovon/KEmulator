@@ -279,25 +279,15 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 
 			// in linux it's expected at /usr/lib/jvm, if it's not there we can't do much.
 			if (this instanceof IdeaSetupXdgLinux) {
-				if (Files.exists(Paths.get(DEB_DEFAULT_JDK + "/bin/java"))) {
-					try {
-						if (Emulator.getProcessOutput(new String[]{DEB_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
-							jdkHome = DEB_DEFAULT_JDK;
-							refreshContent();
-							return;
-						}
-					} catch (IOException ignored) {
-					}
+				if (is8(DEB_DEFAULT_JDK)) {
+					jdkHome = DEB_DEFAULT_JDK;
+					refreshContent();
+					return;
 				}
-				if (Files.exists(Paths.get(RPM_DEFAULT_JDK + "/bin/java"))) {
-					try {
-						if (Emulator.getProcessOutput(new String[]{RPM_DEFAULT_JDK + "/bin/java", "-version"}, true).contains("1.8.")) {
-							jdkHome = RPM_DEFAULT_JDK;
-							refreshContent();
-							return;
-						}
-					} catch (IOException ignored) {
-					}
+				if (is8(RPM_DEFAULT_JDK)) {
+					jdkHome = RPM_DEFAULT_JDK;
+					refreshContent();
+					return;
 				}
 			}
 
@@ -307,15 +297,10 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					String path = f.getAbsolutePath();
 					if (!path.toLowerCase().contains("jdk"))
 						continue;
-					if (Files.exists(Paths.get(path + "\\bin\\java.exe"))) {
-						try {
-							if (Emulator.getProcessOutput(new String[]{path + "\\bin\\java.exe", "-version"}, true).contains("1.8.")) {
-								jdkHome = path;
-								refreshContent();
-								return;
-							}
-						} catch (IOException ignored) {
-						}
+					if (is8(path)) {
+						jdkHome = path;
+						refreshContent();
+						return;
 					}
 				}
 			}
@@ -353,7 +338,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					new Label(jdkSetupGroup, SWT.NONE).setText("Nothing found.");
 				}
 			}
-
 
 			Group manualJdkSetupGroup = new Group(shell, SWT.NONE);
 			manualJdkSetupGroup.setText("Manual selection");
@@ -805,6 +789,18 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		}
 
 		return null;
+	}
+
+	protected static boolean is8(String jdkHome) {
+		Path bin = Paths.get(jdkHome).resolve("bin").resolve(Emulator.win ? "java.exe" : "java").toAbsolutePath();
+		if (!Files.exists(bin))
+			return false;
+		try {
+			return Emulator.getProcessOutput(new String[]{bin.toString(), "-version"}, true).contains("1.8.");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	private void deleteRecursive(File f) {
