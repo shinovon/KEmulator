@@ -764,7 +764,11 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				Files.copy(entryStream, proguardDefaultLocalPath, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} finally {
-			Files.deleteIfExists(tempZip);
+			try {
+				Files.deleteIfExists(tempZip);
+			} catch (IOException ignored) {
+				// winapi moment
+			}
 		}
 	}
 
