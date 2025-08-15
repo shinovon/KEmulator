@@ -18,7 +18,7 @@ package com.mexa.opgl;
 
 import org.lwjgl.BufferUtils;
 
-public class FloatBuffer extends Buffer {
+public class FloatBuffer extends Buffer implements com.nttdocomo.ui.ogl.FloatBuffer {
 
 	private FloatBuffer(int size) {
 		super(BufferUtils.createFloatBuffer(size));
@@ -38,11 +38,19 @@ public class FloatBuffer extends Buffer {
 		return new FloatBuffer(buffer);
 	}
 
+	public float[] get(int paramInt, float[] paramArrayOfFloat) {
+		return get(paramInt, paramArrayOfFloat, 0, paramArrayOfFloat.length);
+	}
+
 	public float[] get(int srcIndex, float[] buf, int dstIndex, int length) {
 		java.nio.FloatBuffer nio = (java.nio.FloatBuffer) super.buffer;
 		nio.position(srcIndex);
 		nio.get(buf, dstIndex, length);
 		return buf;
+	}
+
+	public void put(int paramInt, float[] paramArrayOfFloat) {
+		put(paramInt, paramArrayOfFloat, 0, paramArrayOfFloat.length);
 	}
 
 	public void put(int dstIndex, float[] buf, int srcIndex, int length) {

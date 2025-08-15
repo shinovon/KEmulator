@@ -18,7 +18,7 @@ package com.mexa.opgl;
 
 import org.lwjgl.BufferUtils;
 
-public class ShortBuffer extends Buffer {
+public class ShortBuffer extends Buffer implements com.nttdocomo.ui.ogl.ShortBuffer {
 
 	private ShortBuffer(int size) {
 		super(BufferUtils.createShortBuffer(size));
@@ -38,11 +38,19 @@ public class ShortBuffer extends Buffer {
 		return new ShortBuffer(buffer);
 	}
 
+	public short[] get(int paramInt, short[] paramArrayOfShort) {
+		return get(paramInt, paramArrayOfShort, 0, paramArrayOfShort.length);
+	}
+
 	public short[] get(int srcIndex, short[] buf, int dstIndex, int length) {
 		java.nio.ShortBuffer nio = (java.nio.ShortBuffer) super.buffer;
 		nio.position(srcIndex);
 		nio.get(buf, dstIndex, length);
 		return buf;
+	}
+
+	public void put(int paramInt, short[] paramArrayOfShort) {
+		put(paramInt, paramArrayOfShort, 0, paramArrayOfShort.length);
 	}
 
 	public void put(int dstIndex, short[] buf, int srcIndex, int length) {
