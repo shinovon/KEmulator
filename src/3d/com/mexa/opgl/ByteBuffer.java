@@ -58,4 +58,16 @@ public class ByteBuffer extends Buffer implements com.nttdocomo.ui.ogl.ByteBuffe
 		nio.position(dstIndex);
 		nio.put(buf, srcIndex, length);
 	}
+
+	public ShortBuffer asShortBuffer() {
+		return new ShortBuffer(this);
+	}
+
+	public IntBuffer asIntBuffer() {
+		return new IntBuffer(this);
+	}
+
+	public FloatBuffer asFloatBuffer() {
+		return new FloatBuffer(this);
+	}
 }

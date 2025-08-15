@@ -30,6 +30,10 @@ public class ShortBuffer extends Buffer implements com.nttdocomo.ui.ogl.ShortBuf
 		nio.put((java.nio.ShortBuffer) buffer.getNioBuffer());
 	}
 
+	ShortBuffer(ByteBuffer b) {
+		super(((java.nio.ByteBuffer) b.getNioBuffer()).asShortBuffer());
+	}
+
 	public static ShortBuffer allocateDirect(int size) {
 		return new ShortBuffer(size);
 	}

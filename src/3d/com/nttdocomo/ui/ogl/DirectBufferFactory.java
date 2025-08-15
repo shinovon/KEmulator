@@ -11,7 +11,7 @@ public final class DirectBufferFactory {
     }
 
     public ByteBuffer allocateByteBuffer(int paramInt) {
-        return null;
+        return com.mexa.opgl.ByteBuffer.allocateDirect(paramInt);
     }
 
     public ByteBuffer allocateByteBuffer(byte[] paramArrayOfByte) {
@@ -19,42 +19,48 @@ public final class DirectBufferFactory {
     }
 
     public ByteBuffer allocateByteBuffer(ByteBuffer paramByteBuffer) {
-        return null;
+        return com.mexa.opgl.ByteBuffer.allocateDirect((com.mexa.opgl.ByteBuffer) paramByteBuffer);
     }
 
     public ShortBuffer allocateShortBuffer(int paramInt) {
-        return null;
+        return com.mexa.opgl.ShortBuffer.allocateDirect(paramInt);
     }
 
     public ShortBuffer allocateShortBuffer(byte[] paramArrayOfByte) {
-        return null;
+        com.mexa.opgl.ByteBuffer b = com.mexa.opgl.ByteBuffer.allocateDirect(paramArrayOfByte.length);
+        b.put(0, paramArrayOfByte);
+        return b.asShortBuffer();
     }
 
     public ShortBuffer allocateShortBuffer(ShortBuffer paramShortBuffer) {
-        return null;
+        return com.mexa.opgl.ShortBuffer.allocateDirect((com.mexa.opgl.ShortBuffer) paramShortBuffer);
     }
 
     public IntBuffer allocateIntBuffer(int paramInt) {
-        return null;
+        return com.mexa.opgl.IntBuffer.allocateDirect(paramInt);
     }
 
     public IntBuffer allocateIntBuffer(byte[] paramArrayOfByte) {
-        return null;
+        com.mexa.opgl.ByteBuffer b = com.mexa.opgl.ByteBuffer.allocateDirect(paramArrayOfByte.length);
+        b.put(0, paramArrayOfByte);
+        return b.asIntBuffer();
     }
 
     public IntBuffer allocateIntBuffer(IntBuffer paramIntBuffer) {
-        return null;
+        return com.mexa.opgl.IntBuffer.allocateDirect((com.mexa.opgl.IntBuffer) paramIntBuffer);
     }
 
     public FloatBuffer allocateFloatBuffer(int paramInt) {
-        return null;
+        return com.mexa.opgl.FloatBuffer.allocateDirect(paramInt);
     }
 
     public FloatBuffer allocateFloatBuffer(byte[] paramArrayOfByte) {
-        return null;
+        com.mexa.opgl.ByteBuffer b = com.mexa.opgl.ByteBuffer.allocateDirect(paramArrayOfByte.length);
+        b.put(0, paramArrayOfByte);
+        return b.asFloatBuffer();
     }
 
     public FloatBuffer allocateFloatBuffer(FloatBuffer paramFloatBuffer) {
-        return null;
+        return com.mexa.opgl.FloatBuffer.allocateDirect((com.mexa.opgl.FloatBuffer) paramFloatBuffer);
     }
 }

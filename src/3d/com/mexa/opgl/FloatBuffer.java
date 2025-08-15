@@ -30,6 +30,10 @@ public class FloatBuffer extends Buffer implements com.nttdocomo.ui.ogl.FloatBuf
 		nio.put((java.nio.FloatBuffer) buffer.getNioBuffer());
 	}
 
+	FloatBuffer(ByteBuffer b) {
+		super(((java.nio.ByteBuffer) b.getNioBuffer()).asShortBuffer());
+	}
+
 	public static FloatBuffer allocateDirect(int size) {
 		return new FloatBuffer(size);
 	}

@@ -30,6 +30,10 @@ public class IntBuffer extends Buffer implements com.nttdocomo.ui.ogl.IntBuffer 
 		nio.put((java.nio.IntBuffer) buffer.getNioBuffer());
 	}
 
+	IntBuffer(ByteBuffer b) {
+		super(((java.nio.ByteBuffer) b.getNioBuffer()).asShortBuffer());
+	}
+
 	public static IntBuffer allocateDirect(int size) {
 		return new IntBuffer(size);
 	}
