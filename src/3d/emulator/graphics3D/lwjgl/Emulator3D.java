@@ -1389,25 +1389,27 @@ public final class Emulator3D implements IGraphics3D {
 				}
 			}
 
-			try {
-				GLCanvasUtil.makeCurrent(glCanvas);
-				getCapabilities();
+			if (glCanvas != null) {
+				try {
+					GLCanvasUtil.makeCurrent(glCanvas);
+					getCapabilities();
 
-				glCanvas.getDisplay().syncExec(() -> glCanvas.addControlListener(new ControlListener() {
-					public void controlMoved(ControlEvent controlEvent) {
-					}
+					glCanvas.getDisplay().syncExec(() -> glCanvas.addControlListener(new ControlListener() {
+						public void controlMoved(ControlEvent controlEvent) {
+						}
 
-					public void controlResized(ControlEvent controlEvent) {
-						if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
-						glCanvas.setSize(targetWidth, targetHeight);
-						glCanvas.setVisible(false);
+						public void controlResized(ControlEvent controlEvent) {
+							if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
+							glCanvas.setSize(targetWidth, targetHeight);
+							glCanvas.setVisible(false);
+						}
+					}));
+				} catch (Exception e) {
+					e.printStackTrace();
+					if (glCanvas != null) {
+						disposeGlCanvas();
+						glCanvas = null;
 					}
-				}));
-			} catch (Exception e) {
-				e.printStackTrace();
-				if (glCanvas != null) {
-					disposeGlCanvas();
-					glCanvas = null;
 				}
 			}
 			if (glCanvas == null) {
