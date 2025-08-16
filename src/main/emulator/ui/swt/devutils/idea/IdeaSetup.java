@@ -788,7 +788,11 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	}
 
 	protected static String getDefaultIdeaDataFolderName() throws IOException {
-		Path infoPath = Paths.get(Settings.ideaPath).getParent().getParent().resolve("product-info.json");
+		Path infoPath;
+		if (Settings.ideaPath.equals("/usr/bin/idea"))
+			infoPath = Paths.get("/usr/share/idea/product-info.json");
+		else
+			infoPath = Paths.get(Settings.ideaPath).getParent().getParent().resolve("product-info.json");
 		String content = String.join("", Files.readAllLines(infoPath));
 
 		Pattern pattern = Pattern.compile("\"dataDirectoryName\"\\s*:\\s*\"([^\"]+)\"");
