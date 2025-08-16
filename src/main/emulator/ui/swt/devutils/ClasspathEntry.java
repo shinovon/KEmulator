@@ -52,6 +52,61 @@ public class ClasspathEntry {
 		return list.toArray(new ClasspathEntry[0]);
 	}
 
+	public static ClasspathEntry[] readFromIml(Path imlPath) throws ParserConfigurationException, IOException, SAXException {
+		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(imlPath.toFile());
+		ArrayList<ClasspathEntry> list = new ArrayList<>();
+
+		NodeList orderEntries = doc.getElementsByTagName("orderEntry");
+		for (int i = 0; i < orderEntries.getLength(); i++) {
+			Element orderEntry = (Element) orderEntries.item(i);
+
+			if ("module-library".equals(orderEntry.getAttribute("type"))) {
+				ClasspathEntryType entryType;
+				if (orderEntry.hasAttribute("exported") && orderEntry.getAttribute("exported").isEmpty()) {
+					entryType = ClasspathEntryType.ExportedLibrary;
+				} else {
+					entryType = ClasspathEntryType.HeaderLibrary;
+				}
+
+				Element library = (Element) orderEntry.getElementsByTagName("library").item(0);
+				Element classes = (Element) library.getElementsByTagName("CLASSES").item(0);
+				NodeList roots = classes.getElementsByTagName("root");
+
+				for (int i1 = 0; i1 < roots.getLength(); i1++) {
+					Element root = (Element) roots.item(i1);
+					String url = root.getAttribute("url");
+
+					if (url.startsWith("jar://$MODULE_DIR$/")) {
+						String path;
+						path = url.substring("jar://$MODULE_DIR$/".length(), url.length() - 2);
+						list.add(new ClasspathEntry(path, entryType));
+					} else {
+						throw new IllegalArgumentException("Global library imports are not supported yet.");
+					}
+				}
+
+			}
+		}
+
+		NodeList sourceEntries = doc.getElementsByTagName("sourceFolder");
+		for (int i = 0; i < sourceEntries.getLength(); i++) {
+			Element sourceFolder = (Element) sourceEntries.item(i);
+			String url = sourceFolder.getAttribute("url");
+			if (!url.startsWith("file://$MODULE_DIR$/"))
+				throw new IllegalArgumentException("Global paths at module sources are not supported yet.");
+			url = url.substring("jar://$MODULE_DIR$/".length());
+			if (sourceFolder.getAttribute("type").equals("java-resource")) {
+				list.add(new ClasspathEntry(url, ClasspathEntryType.Resource));
+			} else if (url.startsWith("lib")) {
+				list.add(new ClasspathEntry(url, ClasspathEntryType.LibrarySource));
+			} else {
+				list.add(new ClasspathEntry(url, ClasspathEntryType.Source));
+			}
+		}
+
+		return list.toArray(new ClasspathEntry[0]);
+	}
+
 	// TODO: idea
 
 	// TODO: netbeans

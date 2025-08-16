@@ -378,38 +378,6 @@ public class ProjectConfigGenerator {
 		libRoot.appendChild(doc.createElement("SOURCES"));
 	}
 
-	public static String[] extractLibrariesListFromIML(Path imlPath) throws ParserConfigurationException, IOException, SAXException {
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(imlPath.toFile());
-
-		ArrayList<String> result = new ArrayList<>();
-		NodeList orderEntries = doc.getElementsByTagName("orderEntry");
-
-		for (int i = 0; i < orderEntries.getLength(); i++) {
-			Element orderEntry = (Element) orderEntries.item(i);
-			String type = orderEntry.getAttribute("type");
-			String exported = orderEntry.getAttribute("exported");
-
-			if ("module-library".equals(type) && "".equals(exported)) {
-				Element library = (Element) orderEntry.getElementsByTagName("library").item(0);
-				Element classes = (Element) library.getElementsByTagName("CLASSES").item(0);
-				NodeList roots = classes.getElementsByTagName("root");
-
-				for (int i1 = 0; i1 < roots.getLength(); i1++) {
-					Element root = (Element) roots.item(i1);
-					String url = root.getAttribute("url");
-
-					String path;
-					if (url.startsWith("jar://$MODULE_DIR$/"))
-						path = url.substring("jar://$MODULE_DIR$/".length(), url.length() - 2);
-					else
-						path = url.substring(0, url.length() - 2);
-					result.add(path);
-				}
-			}
-		}
-		return result.toArray(new String[0]);
-	}
-
 	public static String[] splitByLastDot(String input) {
 		int lastDotIndex = input.lastIndexOf('.');
 		if (lastDotIndex == -1) {

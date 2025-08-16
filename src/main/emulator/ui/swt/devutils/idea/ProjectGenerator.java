@@ -1,5 +1,7 @@
 package emulator.ui.swt.devutils.idea;
 
+import emulator.ui.swt.devutils.ClasspathEntry;
+import emulator.ui.swt.devutils.ClasspathEntryType;
 import emulator.ui.swt.devutils.DevtimeMIDlet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -95,7 +97,14 @@ public class ProjectGenerator {
 
 		if (imlPath != null) {
 			try {
-				generateProGuardConfig(dirp, projectName, ProjectConfigGenerator.extractLibrariesListFromIML(Paths.get(imlPath)));
+				ClasspathEntry[] classpath = ClasspathEntry.readFromIml(Paths.get(imlPath));
+				ArrayList<String> exportedLibs = new ArrayList<>();
+				for (ClasspathEntry entry : classpath) {
+					if(entry.type == ClasspathEntryType.ExportedLibrary){
+						exportedLibs.add(entry.localPath);
+					}
+				}
+				generateProGuardConfig(dirp, projectName, exportedLibs.toArray(new String[0]));
 			} catch (Exception e) {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
 				generateProGuardConfig(dirp, projectName, new String[0]);
