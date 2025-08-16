@@ -398,7 +398,11 @@ public class ProjectConfigGenerator {
 					Element root = (Element) roots.item(i1);
 					String url = root.getAttribute("url");
 
-					String path = url.substring("jar://$MODULE_DIR$/".length(), url.length() - 2);
+					String path;
+					if (url.startsWith("jar://$MODULE_DIR$/"))
+						path = url.substring("jar://$MODULE_DIR$/".length(), url.length() - 2);
+					else
+						path = url.substring(0, url.length() - 2);
 					result.add(path);
 				}
 			}
