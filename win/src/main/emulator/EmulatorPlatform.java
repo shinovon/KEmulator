@@ -70,7 +70,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 				} catch (Throwable e) {
 					m3gLoaded = true;
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 			if (!m3gLoaded) {
 				addToClassPath(Settings.g3d == 0 ? "m3g_swerve.jar" : "m3g_lwjgl.jar");
 			}
@@ -89,11 +90,20 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 				} catch (Throwable e) {
 					mascotLoaded = true;
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 			if (!mascotLoaded) {
 				addToClassPath(Settings.micro3d == 0 ? "micro3d_dll.jar" : "micro3d_gl.jar");
 			}
 		}
+	}
+
+	public String getSwtLibraryName() {
+		return "swt-win-x86.jar";
+	}
+
+	public String[] getLwjglLibraryNames(){
+		return new String[0];
 	}
 
 	private static void loadAMR() {

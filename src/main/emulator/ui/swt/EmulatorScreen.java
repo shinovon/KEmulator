@@ -12,6 +12,7 @@ import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
+import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StackLayout;
@@ -129,6 +130,7 @@ public final class EmulatorScreen implements
 	MenuItem mediaViewMenuItem;
 	MenuItem smsConsoleMenuItem;
 	MenuItem sensorMenuItem;
+	MenuItem devUtilsMenuItem;
 	MenuItem networkKillswitchMenuItem;
 	private MenuItem canvasKeyboardMenuItem;
 	private MenuItem changeResMenuItem;
@@ -912,7 +914,9 @@ public final class EmulatorScreen implements
 		this.smsConsoleMenuItem.addSelectionListener(this);
 		(this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
 		this.sensorMenuItem.addSelectionListener(this);
-
+		devUtilsMenuItem = new MenuItem(this.menuView, 8);
+		devUtilsMenuItem.setText("IntelliJ IDEA support");
+		devUtilsMenuItem.addSelectionListener(this);
 		(this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
 		this.logMenuItem.addSelectionListener(this);
 
@@ -1268,6 +1272,8 @@ public final class EmulatorScreen implements
 		} else if (parent == this.menuMidlet) {
 			boolean equals = false;
 			if (menuItem == this.exitMenuItem) {
+				shell.close();
+				Thread.yield();
 				this.shell.dispose();
 				return;
 			}
@@ -1543,6 +1549,10 @@ public final class EmulatorScreen implements
 				}
 				return;
 			}
+			if (menuItem == devUtilsMenuItem) {
+				IdeaUtils.open(shell);
+				return;
+			}
 			if (menuItem == this.smsConsoleMenuItem) {
 				if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
 					((MessageConsole) Emulator.getEmulator().getMessage()).dispose();
@@ -1672,7 +1682,7 @@ public final class EmulatorScreen implements
 	private void updatePauseState() {
 		this.suspendMenuItem.setEnabled(this.pauseState == 1);
 		this.resumeMenuItem.setEnabled(this.pauseState == 2);
-		this.restartMenuItem.setEnabled(this.pauseState != 0);
+		this.restartMenuItem.setEnabled(this.pauseState != 0 && !Settings.uei);
 		this.xrayViewMenuItem.setSelection(Settings.xrayView);
 		this.forcePaintMenuItem.setEnabled(this.pauseState != 0);
 		this.pausestepMenuItem.setEnabled(this.pauseState != 0);
@@ -1760,7 +1770,7 @@ public final class EmulatorScreen implements
 			public void controlResized(ControlEvent controlEvent) {
 				caret.a(paintTransform, rotation);
 				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen
-						&& ((Screen)lastDisplayable)._isSWT()) {
+						&& ((Screen) lastDisplayable)._isSWT()) {
 					((Screen) lastDisplayable)._swtUpdateSizes();
 				}
 			}

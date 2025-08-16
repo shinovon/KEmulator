@@ -65,7 +65,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 				} catch (Throwable e) {
 					m3gLoaded = true;
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 			if (!m3gLoaded) {
 				// TODO
 				addToClassPath("m3g_lwjgl.jar");
@@ -82,19 +83,69 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 				} catch (Throwable e) {
 					mascotLoaded = true;
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 			if (!mascotLoaded) {
 				addToClassPath("micro3d_gl.jar");
 			}
 		}
 	}
 
-	private static void loadSWTLibrary() {
+	private void loadSWTLibrary() {
 		if (new File(Emulator.getAbsolutePath() + File.separatorChar + "swt-custom.jar").exists()) {
 			addToClassPath("swt-custom.jar");
 			return;
 		}
 
+		String swtLibName = getSwtLibraryName();
+
+		try {
+			addToClassPath(swtLibName);
+		} catch (RuntimeException e) {
+			// Check if SWT is already loaded
+			try {
+				Class.forName("org.eclipse.swt.SWT");
+			} catch (ClassNotFoundException e2) {
+				throw e;
+			}
+		}
+	}
+
+	private void loadLWJGLNatives() {
+		try {
+			for (String lib : getLwjglLibraryNames()) {
+				addToClassPath(lib);
+			}
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String[] getLwjglLibraryNames() {
+		String osn = System.getProperty("os.name").toLowerCase();
+		String osa = System.getProperty("os.arch").toLowerCase();
+		String os =
+				osn.contains("win") ? "windows" :
+						osn.contains("mac") ? "macos" :
+								osn.contains("linux") || osn.contains("nix") ? "linux" :
+										null;
+		if (os == null) {
+			return new String[0];
+		}
+		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64") && !osa.contains("arm")) {
+			return new String[0];
+		}
+		String arch = os + ((osa.contains("amd64") || osa.contains("x84_64")) ? "" : osa.contains("86") ? "-x86" : osa.contains("aarch64") ? "-arm64" : osa.contains("arm") ? "-arm32" : "");
+
+		String[] l = new String[4];
+		l[0] = "lwjgl-natives-" + arch + ".jar";
+		l[1] = "lwjgl-glfw-natives-" + arch + ".jar";
+		l[2] = "lwjgl-opengl-natives-" + arch + ".jar";
+		l[3] = "lwjgl3-swt-" + arch + ".jar";
+		return l;
+	}
+
+	public String getSwtLibraryName() {
 		String osn = System.getProperty("os.name").toLowerCase();
 		String osa = System.getProperty("os.arch").toLowerCase();
 
@@ -123,42 +174,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		} else {
 			throw new RuntimeException("Unsupported arch: " + osa);
 		}
-
-		try {
-			addToClassPath("swt-" + os + "-" + arch + ".jar");
-		} catch (RuntimeException e) {
-			// Check if SWT is already loaded
-			try {
-				Class.forName("org.eclipse.swt.SWT");
-			} catch (ClassNotFoundException e2) {
-				throw e;
-			}
-		}
-	}
-
-	private static void loadLWJGLNatives() {
-		String osn = System.getProperty("os.name").toLowerCase();
-		String osa = System.getProperty("os.arch").toLowerCase();
-		String os =
-				osn.contains("win") ? "windows" :
-						osn.contains("mac") ? "macos" :
-								osn.contains("linux") || osn.contains("nix") ? "linux" :
-										null;
-		if (os == null) {
-			return;
-		}
-		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64") && !osa.contains("arm")) {
-			return;
-		}
-		String arch = os + ((osa.contains("amd64") || osa.contains("x84_64")) ? "" : osa.contains("86") ? "-x86" : osa.contains("aarch64") ? "-arm64" : osa.contains("arm") ? "-arm32" : "");
-		try {
-			addToClassPath("lwjgl-natives-" + arch + ".jar");
-			addToClassPath("lwjgl-glfw-natives-" + arch + ".jar");
-			addToClassPath("lwjgl-opengl-natives-" + arch + ".jar");
-			addToClassPath("lwjgl3-swt-" + arch + ".jar");
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-		}
+		return "swt-" + os + "-" + arch + ".jar";
 	}
 
 	private static void loadAMR() {
