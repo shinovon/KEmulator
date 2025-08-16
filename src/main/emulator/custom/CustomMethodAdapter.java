@@ -190,7 +190,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			s = s.replace("com/docomostar/", "com/nttdocomo/");
 		}
 		if (s3.contains("java/util/TimerTask")) {
-			s3 = s3.replace("java/util/TimerTask", "Lemulator/custom/subclass/SubTimerTask");
+			s3 = s3.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
 		} else if (s3.contains("java/util/Timer")) {
 			s3 = s3.replace("java/util/Timer", "emulator/custom/subclass/Timer");
 		} else if (s3.contains("com/gcjsp/v10/")) {
