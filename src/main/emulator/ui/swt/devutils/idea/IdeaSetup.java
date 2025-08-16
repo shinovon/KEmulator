@@ -33,6 +33,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	public static final String PROGUARD_URL = "https://nnproject.cc/dl/d/proguard.zip";
 	public static final String JAVADOCS_URL = "https://github.com/nikita36078/J2ME_Docs/archive/refs/heads/master.zip";
 	public static final String PROGUARD_DEFAULT_PATH_UNIX = "/opt/proguard6.2.2/proguard.jar";
+	public static final String PROGUARD_AUR_PATH_UNIX = "/usr/share/proguard/proguard.jar";
 	public static final String DEB_DEFAULT_JDK = "/usr/lib/jvm/java-8-openjdk";
 	public static final String RPM_DEFAULT_JDK = "/usr/lib/jvm/java-1.8-openjdk";
 
@@ -126,12 +127,18 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				Settings.proguardPath = proguardDefaultLocalPath.toString();
 				refreshContent();
 				return;
-			} else if (this instanceof IdeaSetupXdgLinux)
+			} else if (this instanceof IdeaSetupXdgLinux) {
 				if (Files.exists(Paths.get(PROGUARD_DEFAULT_PATH_UNIX))) {
 					Settings.proguardPath = PROGUARD_DEFAULT_PATH_UNIX;
 					refreshContent();
 					return;
 				}
+				if (Files.exists(Paths.get(PROGUARD_AUR_PATH_UNIX))) {
+					Settings.proguardPath = PROGUARD_AUR_PATH_UNIX;
+					refreshContent();
+					return;
+				}
+			}
 
 			makeProguardForm();
 			shell.layout(true, true);
