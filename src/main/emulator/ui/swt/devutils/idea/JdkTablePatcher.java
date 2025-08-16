@@ -69,7 +69,7 @@ public class JdkTablePatcher {
 		Vector<String> libs = new Vector<>();
 		libs.add("KEmulator.jar");
 		libs.addAll(Arrays.asList(Emulator.platform.getLwjglLibraryNames()));
-		libs.add(Emulator.platform.getSwtLibraryName());
+		if (Emulator.platform.isX64()) libs.add(Emulator.platform.getSwtLibraryName());
 		return libs;
 	}
 
