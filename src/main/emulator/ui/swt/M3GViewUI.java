@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.UILocale;
 import emulator.debug.Memory;
 import emulator.graphics3D.Quaternion;
@@ -10,6 +11,7 @@ import emulator.graphics3D.view.M3GView3D;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -27,6 +29,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	private Menu menu;
 	private Composite aComposite907;
 	private Tree aTree896;
+	Win32KeyboardPoller poller;
 	Canvas canvas;
 	private Memory memory;
 	private M3GView3D m3gview;
@@ -462,6 +465,9 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 			if (canvas != null) canvas.dispose();
 			canvas = new Canvas(this.aComposite907, 264192);
 		}
+		if (Emulator.win) {
+			poller = new Win32KeyboardPoller((EmulatorScreen) Emulator.getEmulator().getScreen());
+		}
 
 		canvas.setLayoutData(layoutData);
 		this.canvas.addMouseMoveListener(this);
@@ -845,6 +851,32 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
 	final static class Refresher implements Runnable {
 		final M3GViewUI ui;
+		private Runnable r = new Runnable() {
+			public final void run() {
+				try {
+					if (ui.poller != null && ui.canvas != null) {
+						ui.poller.pollKeyboard(ui.canvas);
+					}
+					if (M3GViewUI.method232(ui)) {
+						if (!M3GViewUI.method242(ui)) {
+							M3GViewUI.method511(ui);
+							ui.aBoolean909 = true;
+							return;
+						}
+					} else {
+						final Rectangle clientArea = ui.canvas.getClientArea();
+						final GC gc;
+						(gc = new GC(ui.canvas)).setBackground(Display.getCurrent().getSystemColor(2));
+						gc.fillRectangle(clientArea);
+						gc.setForeground(Display.getCurrent().getSystemColor(3));
+						gc.drawString("M3GView init .....", clientArea.width >> 2, clientArea.height >> 2, true);
+						gc.dispose();
+					}
+
+				} catch (Exception ignored) {}
+
+			}
+		};
 
 		private Refresher(final M3GViewUI ui) {
 			super();
@@ -856,7 +888,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				if (ui.canvas.isDisposed()) {
 					return;
 				}
-				ui.canvas.getDisplay().syncExec(new Class10(this));
+				ui.canvas.getDisplay().syncExec(r);
 				try {
 					Thread.sleep(10L);
 				} catch (Exception ignored) {

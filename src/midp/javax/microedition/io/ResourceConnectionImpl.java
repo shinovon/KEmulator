@@ -25,7 +25,12 @@ final class ResourceConnectionImpl implements InputConnection {
 	}
 
 	public final InputStream openInputStream() throws IOException {
-		return "!blank".equals(url) ? new ByteArrayInputStream(new byte[0]) : ResourceManager.getResourceAsStream(url);
+		if ("!blank".equals(url))
+			return new ByteArrayInputStream(new byte[0]);
+		InputStream i = ResourceManager.getResourceAsStream(url);
+		if (i == null)
+			throw new ConnectionNotFoundException(url);
+		return i;
 	}
 
 	public final void close() {

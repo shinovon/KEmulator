@@ -9,7 +9,7 @@ Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 ## Compatibility
 JRE:
 - Java 8 by Oracle
-- OpenJDK 9-21
+- OpenJDK 9-25
 
 System:
 - Windows XP - 11 (x86, x86_64)
@@ -51,6 +51,7 @@ System:
 - [BrigJ](https://github.com/nativelibs4java/BridJ) 0.7.0
 - [lwjgl3-swt](https://github.com/LWJGLX/lwjgl3-swt)
 - org.apache.tools.zip
+- [opencore-amr](https://sourceforge.net/projects/opencore-amr) 0.1.6
 
 ### Source code
 - [J2ME-Loader](https://github.com/nikita36078/J2ME-Loader) Apache-2.0 license

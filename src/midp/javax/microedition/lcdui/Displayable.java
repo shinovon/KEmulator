@@ -65,7 +65,8 @@ public class Displayable {
 	}
 
 	public boolean isShown() {
-		return Display.current == this;
+		return Display.current == this &&
+				(!Settings.hideDisplayableOnMinimize || Emulator.getEmulator().getScreen().isShown());
 	}
 
 	protected void defocus() {

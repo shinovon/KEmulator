@@ -3,7 +3,6 @@ package emulator;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import com.github.sarxos.webcam.Webcam;
 import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
@@ -720,8 +719,6 @@ public class Emulator implements Runnable {
 		System.setProperty("microedition.media.version", "1.0");
 		System.setProperty("supports.mixing", "true");
 		System.setProperty("supports.audio.capture", "false");
-		System.setProperty("supports.video.capture", "false");
-		System.setProperty("supports.photo.capture", "false");
 		System.setProperty("supports.recording", "false");
 		System.setProperty("microedition.io.file.FileConnection.version", "1.0");
 		System.setProperty("microedition.pim.version", "1.0");
@@ -754,21 +751,6 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 
-		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
-			try {
-				Webcam w = Webcam.getDefault();
-				if (w != null) {
-					System.setProperty("supports.video.capture", "true");
-					System.setProperty("supports.photo.capture", "true");
-					System.setProperty("supports.mediacapabilities", "camera");
-					System.setProperty("camera.orientations", "devcam0:inwards");
-					Dimension d = w.getViewSize();
-					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
-				}
-			} catch (Throwable ignored) {
-			}
-		}
-
 		try {
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 		} catch (Exception ignored) {
@@ -794,7 +776,7 @@ public class Emulator implements Runnable {
 		}
 	}
 
-	public static void main(final String[] commandLineArguments) {
+	public static void main(final String[] args) {
 		try {
 			platform = ((IEmulatorPlatform) Class.forName("emulator.EmulatorPlatform").newInstance());
 		} catch (Exception e) {
@@ -831,14 +813,14 @@ public class Emulator implements Runnable {
 				return;
 			}
 			EmulatorMIDI.initDevices();
-			Emulator.commandLineArguments = commandLineArguments;
+			Emulator.commandLineArguments = args;
 			UILocale.initLocale();
-			parseLaunchArgs(commandLineArguments); //
+			parseLaunchArgs(args); //
 			if (bridge)
 				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
 			else
 				Emulator.emulatorimpl = new SWTFrontend();
-			parseLaunchArgs(commandLineArguments);
+			parseLaunchArgs(args);
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 

@@ -197,8 +197,13 @@ public class KEmulatorUpdater implements Runnable {
 						download(UPDATE_URL
 								+ branch + "/" + type + "/micro3d_dll.jar",
 								kemulatorDir.resolve("micro3d_dll.jar"));
+
+						state("Downloading amrdecoder.dll");
+						download(UPDATE_URL
+										+ branch + "/" + type + "/amrdecoder.dll",
+								kemulatorDir.resolve("amrdecoder.dll"));
 					} catch (IOException e) {
-						fail("Failed to download KEmulator.jar", e);
+						fail("Failed to download libraries", e);
 						return;
 					}
 				} else {

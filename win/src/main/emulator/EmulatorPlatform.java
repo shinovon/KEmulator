@@ -41,6 +41,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	public void loadLibraries() {
+		loadAMR();
 	}
 
 	public boolean supportsMascotCapsule() {
@@ -103,6 +104,14 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
 	public String[] getLwjglLibraryNames(){
 		return new String[0];
+	}
+
+	private static void loadAMR() {
+		try {
+			System.load(Emulator.getAbsolutePath() + File.separatorChar + "amrdecoder.dll");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void addToClassPath(String s) {

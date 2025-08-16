@@ -7,6 +7,7 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,25 +23,20 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 		{
 			String s4;
 			String s5;
-			if (desc.contains("java/util/TimerTask")) {
-				s4 = "java/util/TimerTask";
+			if (desc.contains(s4 = "java/util/TimerTask")) {
 				s5 = "emulator/custom/subclass/SubTimerTask";
-			} else if (desc.contains("java/util/Timer")) {
-				s4 = "java/util/Timer";
+			} else if (desc.contains(s4 = "java/util/Timer")) {
 				s5 = "emulator/custom/subclass/Timer";
-			} else if (desc.contains("com/gcjsp/v10/")) {
-				s4 = "com/gcjsp/v10/";
+			} else if (desc.contains(s4 = "com/gcjsp/v10/") || desc.contains(s4 = "tw/com/fareastone/v10/")) {
 				s5 = "com/vodafone/v10/";
-			} else if (desc.contains("tw/com/fareastone/v10/")) {
-				s4 = "tw/com/fareastone/v10/";
-				s5 = "com/vodafone/v10/";
-			} else if (desc.contains("com/bmc/media/")) {
-				s4 = "com/bmc/media/";
+			} else if (desc.contains(s4 = "com/bmc/media/")) {
 				s5 = "com/sprintpcs/media/";
+			} else if (desc.contains(s4 = "com/docomostar/")) {
+				s5 = "com/nttdocomo/";
 			} else {
 				break Label_0037;
 			}
-			desc = desc.replaceAll(s4, s5);
+			desc = desc.replace(s4, s5);
 		}
 		if (Settings.patchSynchronizedPaint &&
 				"paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc)) {
@@ -78,24 +74,47 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 
 	public final void visit(final int n, final int n2, final String s, final String s2, String s3, final String[] array) {
 		parentClassName = s3;
+//		System.out.println("visit " + s + " " + s2 + " " + s3 + " " + Arrays.toString(array));
+		for (int i = 0; i < array.length; ++i) {
+			if (array[i].startsWith("com/gcjsp/v10/")) {
+				array[i] = array[i].replace("com/gcjsp/v10/", "com/vodafone/v10/");
+				continue;
+			}
+			if (array[i].startsWith("com/fareastone/v10/")) {
+				array[i] = array[i].replace("com/fareastone/v10/", "com/vodafone/v10/");
+				continue;
+			}
+			if (array[i].startsWith("com/bmc/media/")) {
+				array[i] = array[i].replace("com/bmc/media/", "com/sprintpcs/media/");
+				continue;
+			}
+			if (array[i].startsWith("com/docomostar/")) {
+				array[i] = array[i].replace("com/docomostar/", "com/nttdocomo/");
+				continue;
+			}
+		}
 		if (s3.equals("java/util/TimerTask")) {
-			super.visit(n, n2, s, s2, "emulator/custom/subclass/SubTimerTask", array);
+			visit(n, n2, s, s2, "emulator/custom/subclass/SubTimerTask", array);
 			return;
 		}
 		if (s3.equals("java/util/Timer")) {
-			super.visit(n, n2, s, s2, "emulator/custom/subclass/Timer", array);
+			visit(n, n2, s, s2, "emulator/custom/subclass/Timer", array);
 			return;
 		}
 		if (s3.startsWith("com/gcjsp/v10/")) {
-			super.visit(n, n2, s, s2, s3.replace("com/gcjsp/v10/", "com/vodafone/v10/"), array);
+			visit(n, n2, s, s2, s3.replace("com/gcjsp/v10/", "com/vodafone/v10/"), array);
 			return;
 		}
 		if (s3.startsWith("tw/com/fareastone/v10/")) {
-			super.visit(n, n2, s, s2, s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"), array);
+			visit(n, n2, s, s2, s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"), array);
 			return;
 		}
 		if (s3.startsWith("com/bmc/media/")) {
-			super.visit(n, n2, s, s2, s3.replace("com/bmc/media/", "com/sprintpcs/media/"), array);
+			visit(n, n2, s, s2, s3.replace("com/bmc/media/", "com/sprintpcs/media/"), array);
+			return;
+		}
+		if (s3.startsWith("com/docomostar/")) {
+			visit(n, n2, s, s2, s3.replace("com/docomostar/", "com/nttdocomo/"), array);
 			return;
 		}
 		if (CustomClassLoader.isProtected(s3.replace('/', '.'), false)) {
@@ -105,16 +124,18 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 	}
 
 	public final FieldVisitor visitField(final int n, final String s, String s2, final String s3, final Object o) {
-		if (s2.equals("Ljava/util/TimerTask;")) {
-			s2 = "Lemulator/custom/subclass/SubTimerTask;";
-		} else if (s2.equals("Ljava/util/Timer;")) {
-			s2 = "Lemulator/custom/subclass/Timer;";
+		if (s2.contains("java/util/TimerTask")) {
+			s2 = s2.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
+		} else if (s2.contains("java/util/Timer")) {
+			s2 = s2.replace("java/util/Timer", "emulator/custom/subclass/Timer");
 		} else if (s2.contains("com/gcjsp/v10/")) {
 			s2 = s2.replace("com/gcjsp/v10/", "com/vodafone/v10/");
 		} else if (s2.contains("tw/com/fareastone/v10/")) {
 			s2 = s2.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
 		} else if (s2.contains("com/bmc/media/")) {
 			s2 = s2.replace("com/bmc/media/", "com/sprintpcs/media/");
+		} else if (s2.contains("com/docomostar/")) {
+			s2 = s2.replace("com/docomostar/", "com/nttdocomo/");
 		}
 		return super.visitField(n, s, s2, s3, o);
 	}

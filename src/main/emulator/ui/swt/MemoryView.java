@@ -661,7 +661,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		}
 		try {
 			new Watcher(Memory.cls(array[0].getData().toString())).open(getShell());
-		} catch (Exception ignored) {
+		} catch (Throwable ignored) {
 			// arrays will throw
 		}
 	}

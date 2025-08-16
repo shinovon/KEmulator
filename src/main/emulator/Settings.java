@@ -168,4 +168,6 @@ public final class Settings {
 	public static boolean ignoreSleep;
 	public static boolean applySpeedToSleep;
 	public static boolean altLessSpeedShortcuts;
+	public static boolean hideEmulation;
+	public static boolean hideDisplayableOnMinimize;
 }
