@@ -123,10 +123,12 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	}
 
 	public static void open(Shell p) {
-		if (Settings.ideaJdkTablePatched) {
+		if (Settings.ideaJdkTablePatched && Settings.ideaPath != null && Settings.proguardPath != null && Files.exists(Paths.get(Settings.ideaPath)) && Files.exists(Paths.get(Settings.proguardPath))) {
 			// ready for work
 			new IdeaUtils(p).shell.open();
 		} else {
+			Settings.proguardPath = null;
+			Settings.ideaPath = null;
 			if (Emulator.linux)
 				new IdeaSetupXdgLinux(p).open();
 			else
@@ -326,11 +328,23 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 
 	//#region CLI implementation
 
-	public static void restoreProjectCLI(String path) {
+	private static void checkConfigured() {
 		if (!Settings.ideaJdkTablePatched) {
 			System.out.println("IDE support is not configured, please run setup first.");
 			System.exit(2);
 		}
+		if (!Files.exists(Paths.get(Settings.ideaPath))) {
+			System.out.println("IDE binary is gone. Please run setup again.");
+			System.exit(2);
+		}
+		if (!Files.exists(Paths.get(Settings.proguardPath))) {
+			System.out.println("Proguard is gone. Please run setup again.");
+			System.exit(2);
+		}
+	}
+
+	public static void restoreProjectCLI(String path) {
+		checkConfigured();
 		try {
 			System.out.println("Fixing project at " + path);
 			ProjectGenerator.restore(path);
@@ -344,11 +358,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	}
 
 	public static void createProjectCLI(String path) {
-		if (!Settings.ideaJdkTablePatched) {
-			System.out.println("IDE support is not configured, please run setup first.");
-			System.exit(2);
-		}
-
+		checkConfigured();
 		try {
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -386,6 +396,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	}
 
 	public static void convertProjectCLI(String path) {
+		checkConfigured();
 		try {
 			ProjectGenerator.convertEclipse(Paths.get(path).resolve("Application Descriptor").toAbsolutePath().toString());
 			System.out.println("OK");
@@ -398,6 +409,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	}
 
 	public static void editProjectCLI(String path) {
+		checkConfigured();
 		try {
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, path});
 			System.out.println("OK");
