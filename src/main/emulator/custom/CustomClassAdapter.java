@@ -125,7 +125,7 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 
 	public final FieldVisitor visitField(final int n, final String s, String s2, final String s3, final Object o) {
 		if (s2.contains("java/util/TimerTask")) {
-			s2 = s2.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask;");
+			s2 = s2.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
 		} else if (s2.contains("java/util/Timer")) {
 			s2 = s2.replace("java/util/Timer", "emulator/custom/subclass/Timer");
 		} else if (s2.contains("com/gcjsp/v10/")) {
