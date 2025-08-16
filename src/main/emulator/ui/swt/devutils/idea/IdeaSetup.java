@@ -122,11 +122,16 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		// proguard installation
 		if (Settings.proguardPath == null) {
 			// if proguard is already here, skip the setup.
-			if (Files.exists(proguardDefaultLocalPath) || (this instanceof IdeaSetupXdgLinux && Files.exists(Paths.get(PROGUARD_DEFAULT_PATH_UNIX)))) {
+			if (Files.exists(proguardDefaultLocalPath)) {
 				Settings.proguardPath = proguardDefaultLocalPath.toString();
 				refreshContent();
 				return;
-			}
+			} else if (this instanceof IdeaSetupXdgLinux)
+				if (Files.exists(Paths.get(PROGUARD_DEFAULT_PATH_UNIX))) {
+					Settings.proguardPath = PROGUARD_DEFAULT_PATH_UNIX;
+					refreshContent();
+					return;
+				}
 
 			makeProguardForm();
 			shell.layout(true, true);
