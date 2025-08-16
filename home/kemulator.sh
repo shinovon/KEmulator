@@ -14,7 +14,11 @@ JAVA_VER=$($JAVA -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' 
 
 # absolute paths to this starter
 # this works even if runned as `bash starter.sh`
-SELF=$(realpath "$0")
+if command -v realpath >/dev/null 2>&1; then
+  SELF=$(realpath "$0")
+else
+  SELF="$0"
+fi
 SELF_DIR=$(dirname "$SELF")
 
 # path to kem
@@ -33,33 +37,33 @@ if [[ "$OSTYPE" == "darwin"* ]]
 then
 	ARGS="$ARGS -XstartOnFirstThread"
 fi
-if [ $JAVA_VER -ge 90 ]
+if [ "$JAVA_VER" -ge 90 ]
 then
 	ARGS="$ARGS --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.lang.ref=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --enable-native-access=ALL-UNNAMED"
 fi
 
 if [ -z "$1" ]; then
     # run without arguments
-	cd $KEM_DIR
+	cd "$KEM_DIR" || exit
 	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" -s
 	exit $?
 elif [[ "$1" == "-new-project" || "$1" == "-restore" || "$1" == "-convert" || "$1" == "-edit" ]]; then
     # utils for IntelliJ IDEA
 	CALL_PWD="$PWD"
-	cd $KEM_DIR
+	cd "$KEM_DIR" || exit
 	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" "$1" "$CALL_PWD" -s
 	exit $?
 elif [[ "$1" == -* ]]; then
 	# direct configuration (jad, classpath, etc)
 	echo "When using direct emulator configuration, please pass absolute paths!"
 	#TODO invent something to resolve jads/cp paths
-	cd $KEM_DIR
+	cd "$KEM_DIR" || exit
 	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" -s "$@"
 	exit $?
 else
     # JAR file for launch
 	USER_JAR=$(realpath "$1")
-	cd $KEM_DIR
+	cd "$KEM_DIR" || exit
 	shift
 	"$JAVA" $ARGS "-Djava.library.path=$KEM_DIR" "-javaagent:$KEM_JAR" -jar "$KEM_JAR" -jar "$USER_JAR" -s "$@"
 	exit $?
