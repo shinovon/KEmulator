@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class IdeaUtils implements SelectionListener, ModifyListener {
@@ -293,7 +292,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		}
 		String dir = Paths.get(path).getParent().toString();
 		try {
-			boolean runIdea = ProjectGenerator.fixCloned(dir);
+			boolean runIdea = ProjectGenerator.restore(dir);
 			if (runIdea)
 				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
 			shell.close();
@@ -334,7 +333,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		}
 		try {
 			System.out.println("Fixing project at " + path);
-			ProjectGenerator.fixCloned(path);
+			ProjectGenerator.restore(path);
 			System.out.println("OK");
 			System.exit(0);
 		} catch (Exception ex) {

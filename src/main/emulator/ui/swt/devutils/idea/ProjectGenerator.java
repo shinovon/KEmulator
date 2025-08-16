@@ -52,13 +52,14 @@ public class ProjectGenerator {
 	}
 
 
-	public static boolean fixCloned(String dir) throws IOException, InterruptedException {
+	public static boolean restore(String dir) throws IOException, InterruptedException {
 		File folder = new File(dir);
 		String imlPath = null;
 		for (File file : folder.listFiles()) {
 			if (file.getName().endsWith(".iml")) {
+				if (imlPath != null)
+					throw new IllegalArgumentException("KEmulator-based IDEA projects are expected to have single IML file, two found.");
 				imlPath = file.getAbsolutePath();
-				break;
 			}
 		}
 		Path dirp = Paths.get(dir);
