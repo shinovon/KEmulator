@@ -123,12 +123,15 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	}
 
 	public static void open(Shell p) {
-		if (Settings.ideaJdkTablePatched && Settings.ideaPath != null && Settings.proguardPath != null && Files.exists(Paths.get(Settings.ideaPath)) && Files.exists(Paths.get(Settings.proguardPath))) {
+		if (Settings.ideaPath != null && !Files.exists(Paths.get(Settings.ideaPath)))
+			Settings.ideaPath = null;
+		if (Settings.proguardPath != null && !Files.exists(Paths.get(Settings.proguardPath)))
+			Settings.proguardPath = null;
+		if (Settings.ideaJdkTablePatched && Settings.ideaPath != null && Settings.proguardPath != null) {
 			// ready for work
 			new IdeaUtils(p).shell.open();
 		} else {
-			Settings.proguardPath = null;
-			Settings.ideaPath = null;
+			Settings.ideaJdkTablePatched = false;
 			if (Emulator.linux)
 				new IdeaSetupXdgLinux(p).open();
 			else
@@ -344,7 +347,6 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	}
 
 	public static void restoreProjectCLI(String path) {
-		checkConfigured();
 		try {
 			System.out.println("Fixing project at " + path);
 			ProjectGenerator.restore(path);
