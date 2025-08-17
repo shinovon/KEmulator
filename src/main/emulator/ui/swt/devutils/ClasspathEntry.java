@@ -24,6 +24,23 @@ public class ClasspathEntry {
 		this.type = type;
 	}
 
+	public static ClasspathEntry[] readAnything(Path projectDir) throws ParserConfigurationException, IOException, SAXException {
+		Path eclipse = projectDir.resolve(".classpath");
+		if (Files.exists(eclipse)) {
+			System.out.println("Found eclipse classpath, parsing...");
+			return readFromEclipse(eclipse);
+		}
+		Path iml = findImlAt(projectDir);
+		if (iml != null) {
+			System.out.println("Found IDEA module, parsing...");
+			return readFromIml(iml);
+		}
+		//TODO netbeans
+
+		System.out.println("Found no configurations, thinking up project structure from files...");
+		return readFromConfigless(projectDir);
+	}
+
 	public static ClasspathEntry[] readFromEclipse(Path eclipseClasspath) throws ParserConfigurationException, IOException, SAXException {
 		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		ArrayList<ClasspathEntry> list = new ArrayList<>();
@@ -107,8 +124,6 @@ public class ClasspathEntry {
 
 		return list.toArray(new ClasspathEntry[0]);
 	}
-
-	// TODO: idea
 
 	// TODO: netbeans
 
