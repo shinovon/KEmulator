@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class ClasspathEntry {
@@ -131,5 +132,24 @@ public class ClasspathEntry {
 		}
 
 		return list.toArray(new ClasspathEntry[0]);
+	}
+
+	/**
+	 * Looks for IDEA module files. Returns null if none found. Throws if there are 2 or more modules.
+	 *
+	 * @param projectDir Path to project's root.
+	 * @return Path to found IML or null.
+	 */
+	public static Path findImlAt(Path projectDir) {
+		Path imlPath = null;
+		for (File file : projectDir.toFile().listFiles()) {
+			if (file.getName().endsWith(".iml")) {
+				if (imlPath != null)
+					throw new IllegalArgumentException("KEmulator-based IDEA projects are expected to have single IML file, two found.");
+				imlPath = Paths.get(file.getAbsolutePath());
+			}
+		}
+
+		return imlPath;
 	}
 }

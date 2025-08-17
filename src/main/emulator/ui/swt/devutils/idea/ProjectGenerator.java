@@ -54,19 +54,11 @@ public class ProjectGenerator {
 	}
 
 
-	public static boolean restore(String dir) throws IOException, InterruptedException {
-		File folder = new File(dir);
-		String imlPath = null;
-		for (File file : folder.listFiles()) {
-			if (file.getName().endsWith(".iml")) {
-				if (imlPath != null)
-					throw new IllegalArgumentException("KEmulator-based IDEA projects are expected to have single IML file, two found.");
-				imlPath = file.getAbsolutePath();
-			}
-		}
+	public static boolean restore(String dir) throws IOException {
 		Path dirp = Paths.get(dir);
 		Path appDecrPath = dirp.resolve("Application Descriptor");
 		Path mfPath = dirp.resolve("META-INF").resolve("MANIFEST.MF");
+		Path imlPath = ClasspathEntry.findImlAt(dirp);
 
 		createDirectories(dirp);
 
@@ -97,7 +89,7 @@ public class ProjectGenerator {
 
 		if (imlPath != null) {
 			try {
-				ClasspathEntry[] classpath = ClasspathEntry.readFromIml(Paths.get(imlPath));
+				ClasspathEntry[] classpath = ClasspathEntry.readFromIml(imlPath);
 				ArrayList<String> exportedLibs = new ArrayList<>();
 				for (ClasspathEntry entry : classpath) {
 					if(entry.type == ClasspathEntryType.ExportedLibrary){
