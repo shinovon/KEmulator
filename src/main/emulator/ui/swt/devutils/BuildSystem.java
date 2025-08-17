@@ -6,6 +6,7 @@ import emulator.ui.swt.devutils.idea.ProjectGenerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -114,6 +115,7 @@ public class BuildSystem {
 				);
 			} catch (IOException ex) {
 				System.out.println("Failed to list files in " + folder);
+				System.out.println(ex);
 				System.exit(1);
 			}
 			return folder.toString();
@@ -136,18 +138,18 @@ public class BuildSystem {
 		javacArgs.add("-sourcepath");
 		javacArgs.add(builtSourcepath);
 		javacArgs.addAll(sourceFiles);
-		run("javac", new ProcessBuilder(javacArgs));
+		run("javac", new ProcessBuilder(javacArgs), false);
 
 		// packing classes
 
-		run("jar", new ProcessBuilder(jar, "cmf", manifestName, workingJarName, "-C", "bin", "."));
+		run("jar", new ProcessBuilder(jar, "cmf", manifestName, workingJarName, "-C", "bin", "."), true);
 
 		// packing resources
 
 		for (ClasspathEntry entry : classpath) {
 			if (entry.type != Resource)
 				continue;
-			run("jar", new ProcessBuilder(jar, "uf", workingJarName, "-C", entry.localPath, "."));
+			run("jar", new ProcessBuilder(jar, "uf", workingJarName, "-C", entry.localPath, "."), true);
 		}
 
 		// proguard merge & preverify & obfuscation
@@ -172,17 +174,32 @@ public class BuildSystem {
 		} else if (Files.exists(projectRoot.resolve("proguard.cfg"))) {
 			proguardArgs.add("@proguard.cfg");
 		}
-		run("proguard", new ProcessBuilder(proguardArgs));
+		run("proguard", new ProcessBuilder(proguardArgs), true);
 
-		System.out.println("OK");
+		System.out.println("Build OK");
 		System.exit(0);
 	}
 
-	private void run(String name, ProcessBuilder proc) {
+	private void run(String name, ProcessBuilder pb, boolean bufferOutput) {
 		try {
-			int code = proc.directory(projectRoot.toFile()).inheritIO().start().waitFor();
+			StringBuilder sw = new StringBuilder();
+			if (!bufferOutput)
+				pb.inheritIO();
+			Process proc = pb.directory(projectRoot.toFile()).start();
+			if (bufferOutput) {
+				try (InputStream is = proc.getInputStream()) {
+					int c;
+					while ((c = is.read()) != -1)
+						sw.append((char) c);
+				}
+			}
+			int code = proc.waitFor();
 			if (code != 0) {
 				System.out.println(name + " exited with code " + code);
+				if (bufferOutput) {
+					System.out.println("Log:");
+					System.out.println(sw);
+				}
 				System.exit(1);
 			}
 		} catch (InterruptedException e) {
