@@ -235,7 +235,7 @@ public class ProjectGenerator {
 		return midletCodePath.toString();
 	}
 
-	private static void generateProGuardConfig(Path dir, String projName, String[] libs) throws IOException {
+	public static void generateProGuardConfig(Path dir, String projName, String[] libs) throws IOException {
 		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, libs).getBytes(StandardCharsets.UTF_8));
 		if (!Files.exists(dir.resolve(PROGUARD_GLOBAL_CFG))) {
 			Files.write(dir.resolve(PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));

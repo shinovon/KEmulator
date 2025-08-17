@@ -63,7 +63,7 @@ if [ -z "$1" ]; then
 	cd "$KEM_DIR" || exit
 	"$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" -s
 	exit $?
-elif [[ "$1" == "-new-project" || "$1" == "-restore" || "$1" == "-convert" || "$1" == "-edit" ]]; then
+elif [[ "$1" == "-new-project" || "$1" == "-restore" || "$1" == "-convert" || "$1" == "-edit" || "$1" == "-build" || "$1" == "-publish" ]]; then
     # utils for IntelliJ IDEA
 	CALL_PWD="$PWD"
 	cd "$KEM_DIR" || exit

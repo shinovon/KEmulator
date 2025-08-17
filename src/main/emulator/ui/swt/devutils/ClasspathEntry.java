@@ -24,6 +24,14 @@ public class ClasspathEntry {
 		this.type = type;
 	}
 
+	public boolean isSourceCode() {
+		return type == ClasspathEntryType.Source || type == ClasspathEntryType.LibrarySource;
+	}
+
+	public boolean isJar() {
+		return type == ClasspathEntryType.HeaderLibrary || type == ClasspathEntryType.ExportedLibrary;
+	}
+
 	public static ClasspathEntry[] readAnything(Path projectDir) throws ParserConfigurationException, IOException, SAXException {
 		Path eclipse = projectDir.resolve(".classpath");
 		if (Files.exists(eclipse)) {

@@ -14,6 +14,7 @@ import emulator.ui.IEmulatorFrontend;
 import emulator.ui.bridge.BridgeFrontend;
 import emulator.ui.swt.Property;
 import emulator.ui.swt.SWTFrontend;
+import emulator.ui.swt.devutils.BuildSystem;
 import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -1061,6 +1062,12 @@ public class Emulator implements Runnable {
 				} else if (key.equals("edit")) {
 					new Property();
 					IdeaUtils.editProjectCLI(value);
+				} else if (key.equals("build")) {
+					new Property();
+					new BuildSystem(Paths.get(value).toAbsolutePath(), false).build();
+				} else if (key.equals("publish")) {
+					new Property();
+					new BuildSystem(Paths.get(value).toAbsolutePath(), true).build();
 				}
 			}
 		}
