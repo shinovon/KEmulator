@@ -68,10 +68,10 @@ public class BuildSystem {
 
 		workingJarName = "." + File.separator + "deployed" + File.separator + "raw" + File.separator + projectRoot.getFileName().toString() + ".jar";
 
-		if (Settings.proguardPath != null)
+		if (Settings.proguardPath != null) {
 			proguardJar = Settings.proguardPath;
-		else if (Files.exists(Paths.get(Emulator.getAbsolutePath(), "proguard.jar"))) {
-			proguardJar = Paths.get(Emulator.getAbsolutePath(), "proguard.jar").toString();
+		} else if (Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("proguard.jar"))) {
+			proguardJar = Paths.get(Emulator.getAbsolutePath()).resolve("proguard.jar").toString();
 		} else {
 			System.out.println("Proguard jar is not in settings nor in local folder. Run Intellij IDEA setup and complete first step.");
 			proguardJar = null;
