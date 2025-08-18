@@ -2055,7 +2055,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void keyReleased(final KeyEvent keyEvent) {
-		if (!Settings.canvasKeyboard && win) {
+		if (!Settings.canvasKeyboard && poller != null) {
 			return;
 		}
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
