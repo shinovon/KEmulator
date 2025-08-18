@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import com.sun.jna.platform.win32.User32;
 import emulator.Emulator;
 import emulator.ReflectUtil;
 import org.eclipse.swt.widgets.Canvas;
@@ -13,6 +14,14 @@ public class Win32KeyboardPoller {
 
 	public Win32KeyboardPoller(EmulatorScreen screen) {
 		this.screen = screen;
+		try {
+			if (win32OS == null) {
+				win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
+			}
+			if (win32OSGetKeyState == null) {
+				win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class);
+			}
+		} catch (Throwable ignored) {}
 	}
 
 	private long lastPollTime;
@@ -36,17 +45,15 @@ public class Win32KeyboardPoller {
 				canvas.isFocusControl();
 //		if (!active) return;
 		try {
-			if (win32OS == null)
-				win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
-			if (win32OSGetKeyState == null &&
-					(win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class)) == null) {
-				// TODO jna
-				win = false;
-				return;
-			}
+
 			for (int i = 0; i < keyboardButtonStates.length; i++) {
 				lastKeyboardButtonStates[i] = keyboardButtonStates[i];
-				short keyState = (Short) win32OSGetKeyState.invoke(null, i);
+				short keyState;
+				if (win32OSGetKeyState != null) {
+					keyState = (Short) win32OSGetKeyState.invoke(null, i);
+				} else {
+					keyState = User32.INSTANCE.GetAsyncKeyState(i);
+				}
 				boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
 				if (!keyboardButtonStates[i]) {
 					if (pressed) {
