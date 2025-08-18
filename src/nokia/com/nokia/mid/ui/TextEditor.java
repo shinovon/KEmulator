@@ -97,6 +97,11 @@ public class TextEditor extends CanvasItem {
 		repaint();
 	}
 
+	public void setSize(int x, int y, int width, int height) {
+		setPosition(x, y);
+		setSize(width, height);
+	}
+
 	public void setVisible(boolean visible) {
 		checkParent();
 		if (visible == iVisible) return;
@@ -277,6 +282,8 @@ public class TextEditor extends CanvasItem {
 		return iWidth;
 	}
 
+	public void setIndicatorVisibility(boolean b) {}
+
 	TextEditor() {}
 
 	TextEditor(String text,
@@ -291,7 +298,7 @@ public class TextEditor extends CanvasItem {
 			throw new IllegalArgumentException(ERROR_GIVEN_ARGUMENTS_NOT_VALID);
 		}
 		iWidth = width;
-		setContent(text);
+		setContent(text == null ? "" : text);
 		if (rows) {
 			setMultiline(height != 1);
 			iRows = height;

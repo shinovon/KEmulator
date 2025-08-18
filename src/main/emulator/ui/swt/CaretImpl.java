@@ -6,6 +6,7 @@ import emulator.Settings;
 import emulator.ui.ICaret;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Caret;
@@ -177,6 +178,16 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 					swtText = text;
 				}
 
+				if (item instanceof TextEditor) {
+					int c = ((TextEditor) item).getForegroundColor();
+					if (c != 0) {
+						text.setForeground(new Color(null, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, 0xFF));
+					}
+					c = ((TextEditor) item).getBackgroundColor();
+					if (c != 0) {
+						text.setBackground(new Color(null, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, 0xFF));
+					}
+				}
 				text.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
 				text.setVisible(true);
 				text.setFocus();
