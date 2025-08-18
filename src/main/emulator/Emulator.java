@@ -1083,9 +1083,22 @@ public class Emulator implements Runnable {
 		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
 			return s + File.separatorChar + "KEmulator.jar";
 		}
-		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
-		if (s.endsWith("bin/"))
-			s = s.substring(0, s.length() - 4);
+		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+		if (win) s = s.substring(1);
+		if (debugBuild && s.endsWith("/")) {
+			if (s.endsWith("bin/production/KEmulator_base/")) {
+				// IDEA project
+				s = s.substring(0, s.length() - "bin/production/KEmulator_base/".length()) + "home";
+			} else if (s.endsWith("bin/")) {
+				// Eclipse project
+				s = s.substring(0, s.length() - 4);
+			}
+			if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+				s = s + File.separatorChar + "KEmulator.jar";
+			} else {
+				throw new RuntimeException("Could not find home directory");
+			}
+		}
 		try {
 			return URLDecoder.decode(s, "UTF-8");
 		} catch (Exception ex) {
