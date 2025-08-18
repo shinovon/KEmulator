@@ -377,7 +377,7 @@ public final class EmulatorScreen implements
 				public void run() {
 					try {
 						if (b) {
-							poller.pollKeyboard(canvas);
+							if (poller != null) poller.pollKeyboard(canvas);
 							Controllers.poll();
 							return;
 						}
@@ -1938,7 +1938,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.pollKeyboardOnRepaint) {
-			poller.pollKeyboard(canvas);
+			if (poller != null) poller.pollKeyboard(canvas);
 			Controllers.poll();
 		}
 		if (swtContent == null) {
