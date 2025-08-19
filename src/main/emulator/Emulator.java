@@ -778,6 +778,10 @@ public class Emulator implements Runnable {
 	}
 
 	public static void main(final String[] args) {
+		if (args.length >= 1 && "-build".equals(args[0])) {
+			new Property();
+			new BuildSystem(args).build(); // will System.exit()
+		}
 		try {
 			platform = ((IEmulatorPlatform) Class.forName("emulator.EmulatorPlatform").newInstance());
 		} catch (Exception e) {
@@ -982,11 +986,6 @@ public class Emulator implements Runnable {
 				Emulator.midletJar = getMidletJarUrl(path);
 			}
 			return true;
-		}
-
-		if (array[0].equals("-build")) {
-			new Property();
-			new BuildSystem(array).build(); // will System.exit()
 		}
 
 		for (int i = 0; i < array.length; ++i) {
