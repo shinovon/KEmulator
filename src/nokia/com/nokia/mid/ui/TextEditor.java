@@ -357,6 +357,12 @@ public class TextEditor extends CanvasItem {
 		}
 	}
 
+	public void _inputAction(int a) {
+		if (iListener != null) {
+			iListener.inputAction(this, a);
+		}
+	}
+
 	private void layout() {
 		int availableWidth = getWidth() - 8;
 		Font font = getFont();
