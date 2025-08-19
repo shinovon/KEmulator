@@ -377,7 +377,7 @@ public final class EmulatorScreen implements
 				public void run() {
 					try {
 						if (b) {
-							poller.pollKeyboard(canvas);
+							if (poller != null) poller.pollKeyboard(canvas);
 							Controllers.poll();
 							return;
 						}
@@ -1938,7 +1938,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.pollKeyboardOnRepaint) {
-			poller.pollKeyboard(canvas);
+			if (poller != null) poller.pollKeyboard(canvas);
 			Controllers.poll();
 		}
 		if (swtContent == null) {
@@ -2055,7 +2055,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void keyReleased(final KeyEvent keyEvent) {
-		if (!Settings.canvasKeyboard && win) {
+		if (!Settings.canvasKeyboard && poller != null) {
 			return;
 		}
 		int n = keyEvent.keyCode & 0xFEFFFFFF;

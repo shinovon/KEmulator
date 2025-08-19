@@ -805,18 +805,30 @@ public class Emulator implements Runnable {
 			return;
 		}
 		try {
+			Exception librariesException = null;
 			try {
 				platform.loadLibraries();
 			} catch (Exception e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + e.getMessage());
-				System.exit(0);
-				return;
+				librariesException = e;
 			}
 			EmulatorMIDI.initDevices();
 			Emulator.commandLineArguments = args;
 			UILocale.initLocale();
-			parseLaunchArgs(args); //
+			try {
+				parseLaunchArgs(args);
+			} catch (Throwable ignored) {}
+
+			// Restart with additional arguments required for specific os or java version
+			if (!(forked || Settings.uei) && (librariesException != null || macos || isJava9())) {
+				loadGame(null, false);
+				return;
+			} else if (librariesException != null) {
+				librariesException.printStackTrace();
+				JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + librariesException.getMessage());
+				System.exit(0);
+				return;
+			}
+			
 			if (bridge)
 				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
 			else
@@ -824,12 +836,6 @@ public class Emulator implements Runnable {
 			parseLaunchArgs(args);
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
-
-			// Restart with additional arguments required for specific os or java version
-			if (!(forked || Settings.uei) && (macos || isJava9())) {
-				loadGame(null, false);
-				return;
-			}
 
 			platform.load3D();
 			Controllers.refresh(true);
@@ -1090,9 +1096,26 @@ public class Emulator implements Runnable {
 		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
 			return s + File.separatorChar + "KEmulator.jar";
 		}
-		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
-		if (s.endsWith("bin/"))
-			s = s.substring(0, s.length() - 4);
+		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+		if (win) s = s.substring(1);
+		if (debugBuild && s.endsWith("/")) {
+			if (s.endsWith("bin/production/KEmulator_base/")) {
+				// IDEA project
+				s = s.substring(0, s.length() - "bin/production/KEmulator_base/".length()) + "home";
+			} else if (s.endsWith("eclipse/KEmulator_base/bin/")) {
+				// Eclipse project
+				s = s.substring(0, s.length() - "eclipse/KEmulator_base/bin/".length()) + "home";
+			}
+//			else if (s.endsWith("bin/")) {
+//				s = s.substring(0, s.length() - 4);
+//			}
+			if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+				s = s + File.separatorChar + "KEmulator.jar";
+			} else {
+				System.out.println("Running from " + s);
+				throw new RuntimeException("Could not find home directory");
+			}
+		}
 		try {
 			return URLDecoder.decode(s, "UTF-8");
 		} catch (Exception ex) {
@@ -1215,7 +1238,11 @@ public class Emulator implements Runnable {
 
 	public static void loadGame(final String s, final int engine2d, final int engine3d, int mascotEngine, final boolean b) {
 		ArrayList<String> cmd = new ArrayList<String>();
-		getEmulator().getLogStream().println(s == null ? "Restarting" : ("loadGame: " + s));
+		if (emulatorimpl != null ) {
+			getEmulator().getLogStream().println(s == null ? "Restarting" : ("loadGame: " + s));
+		} else {
+			System.out.println(s == null ? "Restarting" : ("loadGame: " + s));
+		}
 		String javahome = System.getProperty("java.home");
 		cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
 		cmd.add("-cp");
@@ -1293,8 +1320,10 @@ public class Emulator implements Runnable {
 
 		cmd.add("-s");
 
-		getEmulator().disposeSubWindows();
-		notifyDestroyed();
+		try {
+			getEmulator().disposeSubWindows();
+			notifyDestroyed();
+		} catch (NullPointerException ignored) {}
 		try {
 			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
 			// something inside SWT libs setting this to X11 on dual-server systems.
