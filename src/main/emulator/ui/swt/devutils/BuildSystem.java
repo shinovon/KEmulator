@@ -81,7 +81,10 @@ public class BuildSystem {
 		} else if (Files.exists(this.projectRoot.resolve("META-INF/MANIFEST.MF"))) {
 			System.out.println("Found standard manifest, using...");
 			manifestName = "META-INF/MANIFEST.MF";
-		} else {
+		} else if (Files.exists(this.projectRoot.resolve("MANIFEST.MF"))) {
+			System.out.println("Found dangling manifest, using...");
+			manifestName = "MANIFEST.MF";
+		}  else {
 			System.out.println("No manifests found!");
 			System.exit(1);
 			manifestName = null;
