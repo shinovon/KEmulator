@@ -73,6 +73,8 @@ public class BuildSystem {
 		java = Paths.get(jdkHome, "bin", Emulator.win ? "java.exe" : "java").toString();
 		jar = Paths.get(jdkHome, "bin", Emulator.win ? "jar.exe" : "jar").toString();
 
+		System.out.println("Building project at " + projectRoot);
+
 		if (Files.exists(this.projectRoot.resolve("Application Descriptor"))) {
 			System.out.println("Found eclipse manifest, using...");
 			manifestName = "Application Descriptor";
@@ -130,6 +132,7 @@ public class BuildSystem {
 
 		// javac
 		{
+			System.out.println("Collecting sources...");
 			ArrayList<String> javacArgs = new ArrayList<>();
 			ArrayList<String> sourceFiles = new ArrayList<>();
 
@@ -165,32 +168,44 @@ public class BuildSystem {
 			javacArgs.add("-sourcepath");
 			javacArgs.add(builtSourcepath);
 			javacArgs.addAll(sourceFiles);
+			System.out.println("Running javac...");
 			run("javac", new ProcessBuilder(javacArgs), false);
 		}
 		// packing classes
 
+		System.out.println("Packing classes");
 		run("jar", new ProcessBuilder(jar, "cmf", manifestName, workingJarName, "-C", "bin", "."), true);
 
 		// packing resources
 
 		for (ClasspathEntry entry : classpath) {
 			if (entry.type == Resource) {
+				System.out.println("Packing resources from " + entry.localPath);
 				run("jar", new ProcessBuilder(jar, "uf", workingJarName, "-C", entry.localPath, "."), true);
 			} else if (entry.isSourceCode() && anyres) {
+				System.out.println("Packing resources from " + entry.localPath);
 				ArrayList<String> jarArgs = new ArrayList<>();
 				jarArgs.add(jar);
 				jarArgs.add("uf");
 				jarArgs.add(workingJarName);
+
 				try (Stream<Path> walk = Files.walk(projectRoot.resolve(entry.localPath))) {
 					walk.filter(x1 -> !Files.isDirectory(x1) && !x1.getFileName().toString().endsWith(".java")).forEach(
-							x1 -> jarArgs.add(x1.toAbsolutePath().toString())
+							x1 -> {
+								Path folder = projectRoot.resolve(entry.localPath);
+								String localPath = folder.relativize(x1).toString();
+								jarArgs.add("-C");
+								jarArgs.add("." + File.separator + entry.localPath);
+								jarArgs.add(localPath);
+							}
 					);
 				} catch (IOException ex) {
 					System.out.println("Failed to list files in " + entry.localPath);
 					System.out.println(ex);
 					System.exit(1);
 				}
-				run("jar", new ProcessBuilder(jarArgs), true);
+				if (jarArgs.size() > 3) // if 3, no files were appended.
+					run("jar", new ProcessBuilder(jarArgs), true);
 			}
 		}
 
@@ -230,6 +245,12 @@ public class BuildSystem {
 		}
 
 		System.out.println("Build OK");
+
+		if (runAfter) {
+			System.out.println("Running built JAR...");
+			Emulator.main(new String[]{"-jar", projectRoot.resolve("deployed").resolve(projectName + ".jar").toString()});
+		}
+
 		System.exit(0);
 	}
 
@@ -241,6 +262,12 @@ public class BuildSystem {
 			Process proc = pb.directory(projectRoot.toFile()).start();
 			if (bufferOutput) {
 				try (InputStream is = proc.getInputStream()) {
+					int c;
+					while ((c = is.read()) != -1)
+						sw.append((char) c);
+				}
+				sw.append(System.lineSeparator());
+				try (InputStream is = proc.getErrorStream()) {
 					int c;
 					while ((c = is.read()) != -1)
 						sw.append((char) c);
