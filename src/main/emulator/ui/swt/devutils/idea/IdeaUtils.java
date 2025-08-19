@@ -344,7 +344,6 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 	}
 
 	public static void restoreProjectCLI(String path) {
-		checkConfigured();
 		try {
 			System.out.println("Fixing project at " + path);
 			ProjectGenerator.restore(path);
