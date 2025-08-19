@@ -42,7 +42,7 @@ ARGS=(
 )
 if [[ "$OSTYPE" == "darwin"* ]]
 then
-	 ARGS+=(
+  ARGS+=(
     "-XstartOnFirstThread"
   )
 fi
@@ -59,16 +59,18 @@ then
 fi
 
 if [ -z "$1" ]; then
-    # run without arguments
-	cd "$KEM_DIR" || exit
-	"$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" -s
-	exit $?
-elif [[ "$1" == "-new-project" || "$1" == "-restore" || "$1" == "-convert" || "$1" == "-edit" || "$1" == "-build" || "$1" == "-publish" ]]; then
-    # utils for IntelliJ IDEA
-	CALL_PWD="$PWD"
-	cd "$KEM_DIR" || exit
-	"$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" "$1" "$CALL_PWD" -s
-	exit $?
+  # run without arguments
+  cd "$KEM_DIR" || exit
+  "$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" -s
+  exit $?
+elif [[ "$1" == "-new-project" || "$1" == "-restore" || "$1" == "-convert" || "$1" == "-edit" || "$1" == "-build" ]]; then
+  # utils for IntelliJ IDEA
+  CALL_PWD="$PWD"
+  CMD="$1"
+  shift
+  cd "$KEM_DIR" || exit
+  "$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" "$CMD" "$CALL_PWD" "$@"
+  exit $?
 elif [[ "$1" == -* ]]; then
 	# direct configuration (jad, classpath, etc)
 	echo "When using direct emulator configuration, please pass absolute paths!"
@@ -77,7 +79,7 @@ elif [[ "$1" == -* ]]; then
 	"$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" -s "$@"
 	exit $?
 else
-    # JAR file for launch
+  # JAR file for launch
 	USER_JAR=$(realpath "$1")
 	cd "$KEM_DIR" || exit
 	shift
