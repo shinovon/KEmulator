@@ -138,7 +138,8 @@ public class ClasspathEntry {
 	public static ClasspathEntry[] readFromConfigless(Path projectRoot) {
 		ArrayList<ClasspathEntry> list = new ArrayList<>();
 		list.add(new ClasspathEntry("src", ClasspathEntryType.Source));
-		list.add(new ClasspathEntry("res", ClasspathEntryType.Resource));
+		if (Files.exists(projectRoot.resolve("res")))
+			list.add(new ClasspathEntry("res", ClasspathEntryType.Resource));
 
 		Path libs = projectRoot.resolve("lib");
 		if (Files.exists(libs) && Files.isDirectory(libs)) {
