@@ -72,7 +72,7 @@ public class ProjectConfigGenerator {
 			"/dataSources/\n" +
 			"/dataSources.local.xml\n";
 
-	public static String buildLocalProguardConfig(String dir, String name, String[] libs) {
+	public static String buildLocalProguardConfig(String dir, String inJarName, String outJarName, String[] libs) {
 		StringBuilder sb = new StringBuilder();
 		for (String l : JdkTablePatcher.DEV_TIME_JARS) {
 			sb.append("-libraryjars '");
@@ -80,17 +80,17 @@ public class ProjectConfigGenerator {
 			sb.append("'");
 			sb.append(System.lineSeparator());
 		}
-		sb.append("-injars '").append(Paths.get(dir, "deployed", "raw", name + ".jar")).append("'");
+		sb.append("-injars '").append(Paths.get(dir, "deployed", "raw", inJarName + ".jar")).append("'");
 		sb.append(System.lineSeparator());
 		for (int i = 0; i < libs.length; i++) {
 			sb.append("-injars '").append(Paths.get(dir, libs[i])).append("'");
 			sb.append(System.lineSeparator());
 		}
-		sb.append("-outjars '").append(Paths.get(dir, "deployed", name + ".jar")).append("'");
+		sb.append("-outjars '").append(Paths.get(dir, "deployed", outJarName + ".jar")).append("'");
 		sb.append(System.lineSeparator());
-		sb.append("-printseeds '").append(Paths.get(dir, "deployed", "pro_seeds.txt")).append("'");
+		sb.append("-printseeds '").append(Paths.get(dir, "deployed", outJarName + "_pro_seeds.txt")).append("'");
 		sb.append(System.lineSeparator());
-		sb.append("-printmapping '").append(Paths.get(dir, "deployed", "pro_map.txt")).append("'");
+		sb.append("-printmapping '").append(Paths.get(dir, "deployed", outJarName + "_pro_map.txt")).append("'");
 		sb.append(System.lineSeparator());
 		sb.append("-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.3 -optimizations !library/*,!code/simplification/object");
 		sb.append(System.lineSeparator());

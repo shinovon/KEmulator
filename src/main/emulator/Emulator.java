@@ -816,7 +816,8 @@ public class Emulator implements Runnable {
 			UILocale.initLocale();
 			try {
 				parseLaunchArgs(args);
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 
 			// Restart with additional arguments required for specific os or java version
 			if (!(forked || Settings.uei) && (librariesException != null || macos || isJava9())) {
@@ -828,7 +829,7 @@ public class Emulator implements Runnable {
 				System.exit(0);
 				return;
 			}
-			
+
 			if (bridge)
 				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
 			else
@@ -982,6 +983,12 @@ public class Emulator implements Runnable {
 			}
 			return true;
 		}
+
+		if (array[0].equals("-build")) {
+			new Property();
+			new BuildSystem(array).build(); // will System.exit()
+		}
+
 		for (int i = 0; i < array.length; ++i) {
 			String key = array[i].trim();
 			if (key.startsWith("-")) {
@@ -1068,12 +1075,6 @@ public class Emulator implements Runnable {
 				} else if (key.equals("edit")) {
 					new Property();
 					IdeaUtils.editProjectCLI(value);
-				} else if (key.equals("build")) {
-					new Property();
-					new BuildSystem(Paths.get(value).toAbsolutePath(), false).build();
-				} else if (key.equals("publish")) {
-					new Property();
-					new BuildSystem(Paths.get(value).toAbsolutePath(), true).build();
 				}
 			}
 		}
@@ -1238,7 +1239,7 @@ public class Emulator implements Runnable {
 
 	public static void loadGame(final String s, final int engine2d, final int engine3d, int mascotEngine, final boolean b) {
 		ArrayList<String> cmd = new ArrayList<String>();
-		if (emulatorimpl != null ) {
+		if (emulatorimpl != null) {
 			getEmulator().getLogStream().println(s == null ? "Restarting" : ("loadGame: " + s));
 		} else {
 			System.out.println(s == null ? "Restarting" : ("loadGame: " + s));
@@ -1323,7 +1324,8 @@ public class Emulator implements Runnable {
 		try {
 			getEmulator().disposeSubWindows();
 			notifyDestroyed();
-		} catch (NullPointerException ignored) {}
+		} catch (NullPointerException ignored) {
+		}
 		try {
 			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
 			// something inside SWT libs setting this to X11 on dual-server systems.

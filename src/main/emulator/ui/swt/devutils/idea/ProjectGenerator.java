@@ -236,7 +236,8 @@ public class ProjectGenerator {
 	}
 
 	public static void generateProGuardConfig(Path dir, String projName, String[] libs) throws IOException {
-		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, libs).getBytes(StandardCharsets.UTF_8));
+		String localConfig = ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, projName, libs);
+		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), localConfig.getBytes(StandardCharsets.UTF_8));
 		if (!Files.exists(dir.resolve(PROGUARD_GLOBAL_CFG))) {
 			Files.write(dir.resolve(PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
 		}
