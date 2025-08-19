@@ -59,6 +59,7 @@ public class Alert extends Screen {
 
 	protected void _shown() {
 		super._shown();
+		repaintScreen();
 		timeShown = System.currentTimeMillis();
 	}
 

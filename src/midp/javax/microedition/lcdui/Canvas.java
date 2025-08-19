@@ -495,4 +495,14 @@ public abstract class Canvas extends Displayable {
 		}
 		return null;
 	}
+
+	protected void defocus() {
+		super.defocus();
+		if (nokiaCanvasItems.isEmpty()) return;
+		for (CanvasItem i : nokiaCanvasItems) {
+			if (!i.isVisible()) continue;
+			if (i instanceof TextEditor)
+				((TextEditor) i).setFocus(false);
+		}
+	}
 }
