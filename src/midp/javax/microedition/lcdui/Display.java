@@ -165,6 +165,7 @@ public class Display {
 		Display.current = alert;
 		alert.lastDisplayed = ret;
 		Emulator.setScreen(alert);
+		alert._shown();
 		Emulator.getEventQueue().queue(EventQueue.EVENT_SCREEN);
 		alert.updateCommands();
 	}

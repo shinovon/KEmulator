@@ -467,6 +467,12 @@ public final class EventQueue implements Runnable {
 		queue(EVENT_CALL);
 	}
 
+	public void waitRepaint() throws InterruptedException {
+		while (repaintPending) {
+			Thread.sleep(1);
+		}
+	}
+
 	private void internalRepaint(int x, int y, int w, int h) {
 		repaintPending = false;
 		try {
