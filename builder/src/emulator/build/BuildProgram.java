@@ -1,10 +1,16 @@
 package emulator.build;
 
+import emulator.Emulator;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Properties;
 
 public class BuildProgram {
 
@@ -27,7 +33,18 @@ public class BuildProgram {
 
 		HashSet<String> opts = new HashSet<>(Arrays.asList(Arrays.copyOfRange(args, 1, args.length)));
 
-		new BuildSystem(path, opts).build();
+		Properties kemProps = null;
+		try {
+			if (new File(Emulator.getUserPath() + File.separator + "property.txt").exists()) {
+				final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + File.separator + "property.txt");
+				final Properties temp = new Properties();
+				temp.load(fileInputStream);
+				kemProps = temp;
+			}
+		} catch (IOException ignored) {
+		}
+
+		new BuildSystem(path, opts, kemProps).build();
 	}
 
 	private static void printHelp() {

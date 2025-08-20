@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import static emulator.ui.swt.devutils.ClasspathEntryType.*;
@@ -36,7 +37,7 @@ public class BuildSystem {
 	private final boolean anyres;
 	private final boolean runAfter;
 
-	public BuildSystem(Path projectRoot, HashSet<String> args) {
+	public BuildSystem(Path projectRoot, HashSet<String> args, Properties kemProps) {
 		this.projectRoot = projectRoot;
 		obfuscate = args.contains("-obf");
 		anyres = args.contains("-anyres");
@@ -85,8 +86,8 @@ public class BuildSystem {
 		projectName = projectRoot.getFileName().toString();
 		workingJarName = "." + File.separator + "deployed" + File.separator + "raw" + File.separator + projectName + ".jar";
 
-		if (Settings.proguardPath != null) {
-			proguardJar = Settings.proguardPath;
+		if (kemProps != null && kemProps.getProperty("ProguardPath", null) != null) {
+			proguardJar = kemProps.getProperty("ProguardPath");
 		} else if (Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("proguard.jar"))) {
 			proguardJar = Paths.get(Emulator.getAbsolutePath()).resolve("proguard.jar").toString();
 		} else {
