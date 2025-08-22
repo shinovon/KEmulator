@@ -1693,6 +1693,8 @@ public final class EmulatorScreen implements
 		this.memoryViewMenuItem.setEnabled(this.pauseState != 0);
 		this.methodsMenuItem.setEnabled(this.pauseState != 0);
 		m3gViewMenuItem.setEnabled(Settings.g3d == 1 && pauseState != 0);
+		fullscreenMenuItem.setEnabled(pauseState != 0);
+		mediaViewMenuItem.setEnabled(pauseState != 0);
 		this.updateStatus();
 	}
 
@@ -2042,7 +2044,7 @@ public final class EmulatorScreen implements
 			this.zoomIn();
 			return;
 		}
-		if (keyEvent.keyCode == SWT.F11) {
+		if (keyEvent.keyCode == SWT.F11 && pauseState != 0) {
 			fullscreenMenuItem.setSelection(fullscreen = !fullscreen);
 			changeFullscreen();
 			return;
