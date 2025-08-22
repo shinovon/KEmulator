@@ -1,9 +1,9 @@
 package emulator.build;
 
 import emulator.Emulator;
-import emulator.Settings;
 import emulator.ui.swt.devutils.ClasspathEntry;
 import emulator.ui.swt.devutils.idea.ProjectConfigGenerator;
+import emulator.ui.swt.devutils.idea.ProjectGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static emulator.ui.swt.devutils.ClasspathEntryType.*;
@@ -26,11 +23,12 @@ public class BuildSystem {
 	private final String javac;
 	private final String java;
 	private final String jar;
-	private final String manifestName;
+	private Path manifestPath;
 	private final String workingJarName;
 	private final String projectName;
 	private ClasspathEntry[] classpath;
 	private final String proguardJar;
+	private boolean deleteManifest = false;
 
 	// options
 	private final boolean obfuscate;
@@ -60,19 +58,29 @@ public class BuildSystem {
 
 		System.out.println("Building project at " + projectRoot);
 
-		if (Files.exists(this.projectRoot.resolve("Application Descriptor"))) {
+		if (Files.exists(projectRoot.resolve("Application Descriptor"))) {
 			System.out.println("Found eclipse manifest, using...");
-			manifestName = "Application Descriptor";
-		} else if (Files.exists(this.projectRoot.resolve("META-INF/MANIFEST.MF"))) {
+			manifestPath = projectRoot.resolve("Application Descriptor");
+		} else if (Files.exists(projectRoot.resolve("META-INF/MANIFEST.MF"))) {
 			System.out.println("Found standard manifest, using...");
-			manifestName = "META-INF/MANIFEST.MF";
-		} else if (Files.exists(this.projectRoot.resolve("MANIFEST.MF"))) {
+			manifestPath = projectRoot.resolve("META-INF/MANIFEST.MF");
+		} else if (Files.exists(projectRoot.resolve("MANIFEST.MF"))) {
 			System.out.println("Found dangling manifest, using...");
-			manifestName = "MANIFEST.MF";
+			manifestPath = projectRoot.resolve("MANIFEST.MF");
+		} else if (Files.exists(projectRoot.resolve("nbproject/project.properties"))) {
+			try {
+				String manifest = ProjectGenerator.readManifestFromNetbeans(projectRoot.resolve("nbproject/project.properties"));
+				manifestPath = Paths.get(Emulator.getUserPath()).resolve("NB_GENERATED_MANIFEST_" + System.currentTimeMillis() + ".MF");
+				deleteManifest = true;
+				System.out.println("Found NetBeans configuration. Manifest will be generated based on it.");
+				Files.write(manifestPath, manifest.getBytes(StandardCharsets.UTF_8));
+			} catch (IOException e) {
+				System.out.println("Failed to read NetBeans configuration. Exception: " + e);
+				System.exit(1);
+			}
 		} else {
 			System.out.println("No manifests found!");
 			System.exit(1);
-			manifestName = null;
 		}
 
 		try {
@@ -162,7 +170,7 @@ public class BuildSystem {
 		// packing classes
 
 		System.out.println("Packing classes");
-		run("jar", new ProcessBuilder(jar, "cmf", manifestName, workingJarName, "-C", "bin", "."), true);
+		run("jar", new ProcessBuilder(jar, "cmf", manifestPath.toAbsolutePath().toString(), workingJarName, "-C", "bin", "."), true);
 
 		// packing resources
 
@@ -227,6 +235,8 @@ public class BuildSystem {
 		// cleanup
 
 		try {
+			if(deleteManifest)
+				Files.deleteIfExists(manifestPath);
 			Files.deleteIfExists(projectRoot.resolve("deployed").resolve("raw").resolve("build.cfg"));
 			Files.deleteIfExists(rawJar);
 		} catch (IOException ignored) {
