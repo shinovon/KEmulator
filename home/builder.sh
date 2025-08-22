@@ -43,7 +43,7 @@ then
   exit 1
 fi
 
-if [[ "$1" == "--help" ]]; then
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
   cd "$KEM_DIR" || exit
   "$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" --help
   exit 0
