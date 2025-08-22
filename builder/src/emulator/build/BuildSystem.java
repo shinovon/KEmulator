@@ -148,7 +148,7 @@ public class BuildSystem {
 			} else {
 				sourceClasspathStream = sourceClasspathStream.peek(x -> {
 					if (!Files.exists(x)) {
-						System.out.println("Source folder " + x + "does not exist. Pass " + SKIPMISS + " to ignore this.");
+						System.out.println("Source folder " + x + " does not exist. Pass " + SKIPMISS + " to ignore this.");
 						System.exit(1);
 					}
 				});
@@ -208,7 +208,7 @@ public class BuildSystem {
 				if (!Files.exists(projectRoot.resolve(entry.localPath))) {
 					if (skipMissing)
 						continue;
-					System.out.println("Resource folder " + projectRoot.resolve(entry.localPath) + "does not exist. Pass " + SKIPMISS + " to ignore this.");
+					System.out.println("Resource folder " + projectRoot.resolve(entry.localPath) + " does not exist. Pass " + SKIPMISS + " to ignore this.");
 					System.exit(1);
 				}
 				System.out.println("Packing resources from " + entry.localPath);
