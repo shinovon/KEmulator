@@ -20,7 +20,7 @@ public class BuildProgram {
 			System.out.println("Pass \"--help\" as single argument to see options.");
 			System.exit(1);
 		}
-		if ("--help".equals(args[0])) {
+		if ("--help".equals(args[0]) || "-h".equals(args[0])) {
 			printHelp();
 			System.exit(0);
 		}
@@ -31,7 +31,33 @@ public class BuildProgram {
 			System.exit(1);
 		}
 
-		HashSet<String> opts = new HashSet<>(Arrays.asList(Arrays.copyOfRange(args, 1, args.length)));
+		HashSet<String> opts = new HashSet<>();
+		for (int i = 1; i < args.length; i++) {
+			if (args[i].startsWith("--")) {
+				opts.add(args[i]);
+			} else if (args[i].startsWith("-")) {
+				char[] list = args[i].toCharArray();
+				for (int j = 1; j < list.length; j++) {
+					switch (list[j]) {
+						case 'r':
+							opts.add("--run");
+							break;
+						case 'a':
+							opts.add("--anyres");
+							break;
+						case 'o':
+							opts.add("--obf");
+							break;
+						default:
+							System.out.println("Unknown option: " + args[i]);
+							System.exit(1);
+					}
+				}
+			} else {
+				System.out.println("Unknown option: " + args[i]);
+				System.exit(1);
+			}
+		}
 
 		Properties kemProps = null;
 		try {
@@ -56,11 +82,11 @@ public class BuildProgram {
 		System.out.println();
 		System.out.println("Options:");
 		System.out.println();
-		System.out.println("    --help      Print this help message. Must be passed instead of project path.");
-		System.out.println("    --run       Run the project after compilation.");
-		System.out.println("    --anyres    When passed: include all files except *.java from all source folders as resources in final JAR. " +
+		System.out.println("    -h, --help        Print this help message. Must be passed instead of project path.");
+		System.out.println("    -r, --run         Run the project after compilation.");
+		System.out.println("    -a, --anyres      When passed: include all files except *.java from all source folders as resources in final JAR. " +
 				"When not passed: include folders from IML marked as \"resources\" and folders from eclipse named exactly as \"res\" as is, compile everything else.");
-		System.out.println("    --obf       When passed: include \"proguard.cfg\" as proguard config. When not passed: disable optimization, shrinking and obfuscation.");
+		System.out.println("    -o, --obf         When passed: include \"proguard.cfg\" as proguard config. When not passed: disable optimization, shrinking and obfuscation.");
 		System.out.println();
 		System.out.println("Principle of operation:");
 		System.out.println();

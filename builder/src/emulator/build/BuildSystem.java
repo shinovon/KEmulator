@@ -37,9 +37,9 @@ public class BuildSystem {
 
 	public BuildSystem(Path projectRoot, HashSet<String> args, Properties kemProps) {
 		this.projectRoot = projectRoot;
-		obfuscate = args.contains("-obf");
-		anyres = args.contains("-anyres");
-		runAfter = args.contains("-run");
+		obfuscate = args.contains("--obf");
+		anyres = args.contains("--anyres");
+		runAfter = args.contains("--run");
 
 		if (Emulator.isJava9()) {
 			System.out.println("Must be run with JDK 1.8.");
