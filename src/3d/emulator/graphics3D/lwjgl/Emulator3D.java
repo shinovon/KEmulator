@@ -1361,6 +1361,10 @@ public final class Emulator3D implements IGraphics3D {
 
 	private void bindM3GThread(int w, int h, boolean forceWindow) throws Exception {
 		if (!initialized) {
+			if (Emulator.termux) {
+				System.setProperty("org.lwjgl.librarypath", "/data/data/com.termux/files/usr/lib:" + Emulator.getAbsolutePath());
+			}
+
 			if (glCanvas != null) {
 				disposeGlCanvas();
 			}
