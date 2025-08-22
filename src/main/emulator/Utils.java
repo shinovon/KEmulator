@@ -68,8 +68,11 @@ public class Utils {
 						case 't':
 							ch = '\t';
 							break;
+						case ':':
+							ch = ':';
+							break;
 						default:
-							throw new IllegalArgumentException();
+							throw new IllegalArgumentException(input);
 					}
 				}
 
