@@ -155,7 +155,15 @@ public class BuildSystem {
 			}
 			String builtClasspath = String.join(File.pathSeparator, sourceClasspathStream.map(Path::toString).toArray(String[]::new));
 			String builtSourcepath = String.join(File.pathSeparator, Arrays.stream(classpath).filter(ClasspathEntry::isSourceCode).map(e -> {
-				Path folder = projectRoot.resolve(e.localPath);
+				Path folder = projectRoot.resolve(e.localPath).normalize();
+				if(Files.isSymbolicLink(folder)) {
+					try {
+						folder = folder.getParent().resolve(Files.readSymbolicLink(folder)).normalize();
+					} catch (IOException ex) {
+						System.out.println("Failed to read symbolic link: " + ex);
+						System.exit(1);
+					}
+				}
 				try (Stream<Path> walk = Files.walk(folder)) {
 					walk.filter(x1 -> !Files.isDirectory(x1) && x1.getFileName().toString().endsWith(".java")).forEach(
 							x1 -> sourceFiles.add(x1.toAbsolutePath().toString())
@@ -213,10 +221,19 @@ public class BuildSystem {
 				jarArgs.add("uf");
 				jarArgs.add(workingJarName);
 
-				try (Stream<Path> walk = Files.walk(projectRoot.resolve(entry.localPath))) {
+				Path folderT = projectRoot.resolve(entry.localPath);
+				if(Files.isSymbolicLink(folderT)) {
+					try {
+						folderT = folderT.getParent().resolve(Files.readSymbolicLink(folderT)).normalize();
+					} catch (IOException ex) {
+						System.out.println("Failed to read symbolic link: " + ex);
+						System.exit(1);
+					}
+				}
+				final Path folder = folderT;
+				try (Stream<Path> walk = Files.walk(folder)) {
 					walk.filter(x1 -> !Files.isDirectory(x1) && !x1.getFileName().toString().endsWith(".java")).forEach(
 							x1 -> {
-								Path folder = projectRoot.resolve(entry.localPath);
 								String localPath = folder.relativize(x1).toString();
 								jarArgs.add("-C");
 								jarArgs.add("." + File.separator + entry.localPath);
