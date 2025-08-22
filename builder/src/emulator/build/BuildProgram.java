@@ -40,16 +40,16 @@ public class BuildProgram {
 				for (int j = 1; j < list.length; j++) {
 					switch (list[j]) {
 						case 'r':
-							opts.add("--run");
+							opts.add(BuildSystem.RUN);
 							break;
 						case 'a':
-							opts.add("--anyres");
+							opts.add(BuildSystem.ANYRES);
 							break;
 						case 'o':
-							opts.add("--obf");
+							opts.add(BuildSystem.OBF);
 							break;
 						case 's':
-							opts.add("--skipmiss");
+							opts.add(BuildSystem.SKIPMISS);
 							break;
 						default:
 							System.out.println("Unknown option: " + args[i]);
@@ -86,11 +86,11 @@ public class BuildProgram {
 		System.out.println("Options:");
 		System.out.println();
 		System.out.println("    -h, --help        Print this help message. Must be passed instead of project path.");
-		System.out.println("    -r, --run         Run the project after compilation.");
-		System.out.println("    -a, --anyres      When passed: include all files except *.java from all source folders as resources in final JAR. " +
+		System.out.println("    -r, " + BuildSystem.RUN + "         Run the project after compilation.");
+		System.out.println("    -a, " + BuildSystem.ANYRES + "      When passed: include all files except *.java from all source folders as resources in final JAR. " +
 				"When not passed: include folders from IML marked as \"resources\" and folders from eclipse named exactly as \"res\" as is, compile everything else.");
-		System.out.println("    -o, --obf         When passed: include \"proguard.cfg\" as proguard config. When not passed: disable optimization, shrinking and obfuscation.");
-		System.out.println("    -s, --skipmiss    When passed: non-existing source and resource paths will be skipped. Library paths are not affected.");
+		System.out.println("    -o, " + BuildSystem.OBF + "         When passed: include \"proguard.cfg\" as proguard config. When not passed: disable optimization, shrinking and obfuscation.");
+		System.out.println("    -s, " + BuildSystem.SKIPMISS + "    When passed: non-existing source and resource paths will be skipped. Library paths are not affected.");
 		System.out.println();
 		System.out.println("Principle of operation:");
 		System.out.println();
