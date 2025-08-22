@@ -25,7 +25,7 @@ public class BuildProgram {
 			System.exit(0);
 		}
 
-		Path path = Paths.get(args[0]).toAbsolutePath();
+		Path path = Paths.get(args[0]).toAbsolutePath().normalize();
 		if (!Files.exists(path)) {
 			System.out.println("Project directory does not exist: " + path);
 			System.exit(1);
