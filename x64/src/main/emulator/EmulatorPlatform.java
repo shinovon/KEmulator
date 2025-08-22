@@ -126,10 +126,10 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		String osa = System.getProperty("os.arch").toLowerCase();
 		String os =
 				osn.contains("win") ? "windows" :
-						osn.contains("mac") ? "macos" :
-								Emulator.termux ? "termux" :
-								osn.contains("linux") || osn.contains("nix") ? "linux" :
-										null;
+				osn.contains("mac") ? "macos" :
+//				Emulator.termux ? "termux" :
+				osn.contains("linux") || osn.contains("nix") ? "linux" :
+					null;
 		if (os == null) {
 			return new String[0];
 		}
