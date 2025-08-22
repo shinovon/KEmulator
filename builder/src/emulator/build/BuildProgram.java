@@ -48,6 +48,9 @@ public class BuildProgram {
 						case 'o':
 							opts.add("--obf");
 							break;
+						case 's':
+							opts.add("--skipmiss");
+							break;
 						default:
 							System.out.println("Unknown option: " + args[i]);
 							System.exit(1);
@@ -87,6 +90,7 @@ public class BuildProgram {
 		System.out.println("    -a, --anyres      When passed: include all files except *.java from all source folders as resources in final JAR. " +
 				"When not passed: include folders from IML marked as \"resources\" and folders from eclipse named exactly as \"res\" as is, compile everything else.");
 		System.out.println("    -o, --obf         When passed: include \"proguard.cfg\" as proguard config. When not passed: disable optimization, shrinking and obfuscation.");
+		System.out.println("    -s, --skipmiss    When passed: non-existing source and resource paths will be skipped. Library paths are not affected.");
 		System.out.println();
 		System.out.println("Principle of operation:");
 		System.out.println();

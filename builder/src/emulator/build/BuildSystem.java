@@ -34,12 +34,20 @@ public class BuildSystem {
 	private final boolean obfuscate;
 	private final boolean anyres;
 	private final boolean runAfter;
+	private final boolean skipMissing;
+
+	// option keys
+	public static final String OBF = "--obf";
+	public static final String ANYRES = "--anyres";
+	public static final String RUN = "--run";
+	public static final String SKIPMISS = "--skipmiss";
 
 	public BuildSystem(Path projectRoot, HashSet<String> args, Properties kemProps) {
 		this.projectRoot = projectRoot;
-		obfuscate = args.contains("--obf");
-		anyres = args.contains("--anyres");
-		runAfter = args.contains("--run");
+		obfuscate = args.contains(OBF);
+		anyres = args.contains(ANYRES);
+		runAfter = args.contains(RUN);
+		skipMissing = args.contains(SKIPMISS);
 
 		if (Emulator.isJava9()) {
 			System.out.println("Must be run with JDK 1.8.");
@@ -132,7 +140,20 @@ public class BuildSystem {
 			ArrayList<String> javacArgs = new ArrayList<>();
 			ArrayList<String> sourceFiles = new ArrayList<>();
 
-			String builtClasspath = String.join(File.pathSeparator, Arrays.stream(classpath).filter(ClasspathEntry::isJar).map(x -> projectRoot.resolve(x.localPath).toString()).toArray(String[]::new));
+			Stream<Path> sourceClasspathStream = Arrays.stream(classpath)
+					.filter(ClasspathEntry::isJar)
+					.map(x -> projectRoot.resolve(x.localPath));
+			if (skipMissing) {
+				sourceClasspathStream = sourceClasspathStream.filter(Files::exists);
+			} else {
+				sourceClasspathStream = sourceClasspathStream.peek(x -> {
+					if (!Files.exists(x)) {
+						System.out.println("Source folder " + x + "does not exist. Pass " + SKIPMISS + " to ignore this.");
+						System.exit(1);
+					}
+				});
+			}
+			String builtClasspath = String.join(File.pathSeparator, sourceClasspathStream.map(Path::toString).toArray(String[]::new));
 			String builtSourcepath = String.join(File.pathSeparator, Arrays.stream(classpath).filter(ClasspathEntry::isSourceCode).map(e -> {
 				Path folder = projectRoot.resolve(e.localPath);
 				try (Stream<Path> walk = Files.walk(folder)) {
@@ -176,9 +197,16 @@ public class BuildSystem {
 
 		for (ClasspathEntry entry : classpath) {
 			if (entry.type == Resource) {
+				if (!Files.exists(projectRoot.resolve(entry.localPath))) {
+					if (skipMissing)
+						continue;
+					System.out.println("Resource folder " + projectRoot.resolve(entry.localPath) + "does not exist. Pass " + SKIPMISS + " to ignore this.");
+					System.exit(1);
+				}
 				System.out.println("Packing resources from " + entry.localPath);
 				run("jar", new ProcessBuilder(jar, "uf", workingJarName, "-C", entry.localPath, "."), true);
 			} else if (entry.isSourceCode() && anyres) {
+				// non-existence is handled at "source" step.
 				System.out.println("Packing resources from " + entry.localPath);
 				ArrayList<String> jarArgs = new ArrayList<>();
 				jarArgs.add(jar);
@@ -235,7 +263,7 @@ public class BuildSystem {
 		// cleanup
 
 		try {
-			if(deleteManifest)
+			if (deleteManifest)
 				Files.deleteIfExists(manifestPath);
 			Files.deleteIfExists(projectRoot.resolve("deployed").resolve("raw").resolve("build.cfg"));
 			Files.deleteIfExists(rawJar);
