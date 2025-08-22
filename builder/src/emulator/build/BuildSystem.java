@@ -148,7 +148,7 @@ public class BuildSystem {
 			} else {
 				sourceClasspathStream = sourceClasspathStream.peek(x -> {
 					if (!Files.exists(x)) {
-						System.out.println("Source folder " + x + " does not exist. Pass " + SKIPMISS + " to ignore this.");
+						System.out.println("Library " + x + " does not exist. Pass " + SKIPMISS + " to ignore this.");
 						System.exit(1);
 					}
 				});
@@ -156,7 +156,11 @@ public class BuildSystem {
 			String builtClasspath = String.join(File.pathSeparator, sourceClasspathStream.map(Path::toString).toArray(String[]::new));
 			String builtSourcepath = String.join(File.pathSeparator, Arrays.stream(classpath).filter(ClasspathEntry::isSourceCode).map(e -> {
 				Path folder = projectRoot.resolve(e.localPath).normalize();
-				if(Files.isSymbolicLink(folder)) {
+				if (!Files.exists(folder)) {
+					System.out.println("Source folder " + folder + " does not exist. Pass " + SKIPMISS + " to ignore this.");
+					System.exit(1);
+				}
+				if (Files.isSymbolicLink(folder)) {
 					try {
 						folder = folder.getParent().resolve(Files.readSymbolicLink(folder)).normalize();
 					} catch (IOException ex) {
@@ -222,7 +226,7 @@ public class BuildSystem {
 				jarArgs.add(workingJarName);
 
 				Path folderT = projectRoot.resolve(entry.localPath);
-				if(Files.isSymbolicLink(folderT)) {
+				if (Files.isSymbolicLink(folderT)) {
 					try {
 						folderT = folderT.getParent().resolve(Files.readSymbolicLink(folderT)).normalize();
 					} catch (IOException ex) {
@@ -253,7 +257,18 @@ public class BuildSystem {
 		// proguard merge & preverify & obfuscation
 
 		try {
-			String[] libs = Arrays.stream(classpath).filter(x -> x.type == ExportedLibrary).map(x -> x.localPath).toArray(String[]::new);
+			Stream<String> exportedLibsStream = Arrays.stream(classpath).filter(x -> x.type == ExportedLibrary).map(x -> x.localPath);
+			if (skipMissing) {
+				exportedLibsStream = exportedLibsStream.filter(x -> Files.exists(projectRoot.resolve(x)));
+			} else {
+				exportedLibsStream = exportedLibsStream.peek(x -> {
+					if (!Files.exists(projectRoot.resolve(x))) {
+						System.out.println("Library " + x + " does not exist. Pass " + SKIPMISS + " to ignore this.");
+						System.exit(1);
+					}
+				});
+			}
+			String[] libs = exportedLibsStream.toArray(String[]::new);
 			String localConfig = ProjectConfigGenerator.buildLocalProguardConfig(projectRoot.toString(), projectName, libs);
 			if (!obfuscate) {
 				localConfig += "-dontoptimize -dontshrink -dontobfuscate" + System.lineSeparator() +

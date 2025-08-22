@@ -90,7 +90,7 @@ public class BuildProgram {
 		System.out.println("    -a, " + BuildSystem.ANYRES + "      When passed: include all files except *.java from all source folders as resources in final JAR. " +
 				"When not passed: include folders from IML marked as \"resources\" and folders from eclipse named exactly as \"res\" as is, compile everything else.");
 		System.out.println("    -o, " + BuildSystem.OBF + "         When passed: include \"proguard.cfg\" as proguard config. When not passed: disable optimization, shrinking and obfuscation.");
-		System.out.println("    -s, " + BuildSystem.SKIPMISS + "    When passed: non-existing source and resource paths will be skipped. Library paths are not affected.");
+		System.out.println("    -s, " + BuildSystem.SKIPMISS + "    When passed: non-existing source and resource paths will be skipped.");
 		System.out.println();
 		System.out.println("Principle of operation:");
 		System.out.println();
