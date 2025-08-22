@@ -44,7 +44,7 @@ public class BuildSystem {
 		runAfter = args.contains("-run");
 
 		if (Emulator.isJava9()) {
-			System.out.println("Must be run with JDK 1.8 or lower.");
+			System.out.println("Must be run with JDK 1.8.");
 			System.exit(1);
 		}
 

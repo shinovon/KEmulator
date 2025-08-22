@@ -39,7 +39,7 @@ ARGS=(
 )
 if [ "$JAVA_VER" -ge 90 ]
 then
-  echo "JDK 1.8 or lower is required! Exiting."
+  echo "JDK 1.8 is required! Exiting."
   exit 1
 fi
 
