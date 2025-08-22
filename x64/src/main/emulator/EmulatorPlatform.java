@@ -201,9 +201,9 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 						path += "_64";
 					} else if (osa.contains("86")) {
 					} else if (osa.contains("aarch64") || osa.contains("armv8")) {
-						path = "_arm64";
+						path += "_arm64";
 					} else if (osa.contains("arm")) {
-						path = "_arm32";
+						path += "_arm32";
 					} else {
 						path += '_' + osa;
 					}
