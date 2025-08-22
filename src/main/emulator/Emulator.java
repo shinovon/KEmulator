@@ -75,10 +75,11 @@ public class Emulator implements Runnable {
 	private final static Thread backgroundThread;
 	public static IEmulatorPlatform platform;
 
-	public static final String os = System.getProperty("os.name").toLowerCase();
+	public static final String os = String.valueOf(System.getProperty("os.name")).toLowerCase();
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
 	public static final boolean macos = os.startsWith("darwin") || os.startsWith("mac os");
+	public static final boolean termux = String.valueOf(System.getProperty("java.vm.vendor")).toLowerCase().contains("termux");
 	public static final boolean isPortable = checkIsPortable();
 	private static Class<?> midletClass;
 	private static boolean forked;

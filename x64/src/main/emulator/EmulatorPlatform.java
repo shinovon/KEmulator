@@ -127,6 +127,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		String os =
 				osn.contains("win") ? "windows" :
 						osn.contains("mac") ? "macos" :
+								Emulator.termux ? "termux" :
 								osn.contains("linux") || osn.contains("nix") ? "linux" :
 										null;
 		if (os == null) {
@@ -154,6 +155,8 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 			os = "win32";
 		} else if (osn.contains("mac")) {
 			os = "macosx";
+		} else if (Emulator.termux) {
+			os = "gtk-termux";
 		} else if (osn.contains("linux") || osn.contains("nix")) {
 			os = "gtk-linux";
 		} else {
