@@ -37,6 +37,9 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
 	public void loadLibraries() {
 		System.setProperty("jna.nosys", "true");
+		if (Emulator.termux) {
+			System.setProperty("org.lwjgl.librarypath", "/data/data/com.termux/files/usr/lib:" + Emulator.getAbsolutePath());
+		}
 		loadSWTLibrary();
 		loadLWJGLNatives();
 		loadAMR();
