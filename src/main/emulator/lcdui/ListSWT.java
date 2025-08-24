@@ -410,15 +410,18 @@ public class ListSWT extends SWTScreen implements IListImpl {
 		else
 		{
 			int size = choiceImpl.size();
+
 			for(int i = 0; i < size; i++)
 			{
 				if(choiceImpl.isSelected(i))
 				{
 					swtTable.select(i);
+					swtTable.getItem(i).setChecked(true);
 				}
 				else
 				{
 					swtTable.deselect(i);
+					swtTable.getItem(i).setChecked(false);
 				}
 			}
 		}
@@ -493,7 +496,11 @@ public class ListSWT extends SWTScreen implements IListImpl {
 				int index = ((Table) se.widget).indexOf((TableItem) se.item);
 				if(index >= 0)
 				{
-					choiceImpl.setSelected(index, !isSelected(index));
+					if (type == Choice.MULTIPLE) {
+						choiceImpl.setSelected(index, ((TableItem) se.item).getChecked());
+					} else {
+						choiceImpl.setSelected(index, !isSelected(index));
+					}
 				}
 			}
 		}
