@@ -10,7 +10,6 @@ fi
 if [ -x "/usr/lib/jvm/java-1.8-openjdk/bin/java" ]; then
     JAVA="/usr/lib/jvm/java-1.8-openjdk/bin/java"
 fi
-JAVA_VER=$($JAVA -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{sub("^$", "0", $2); print $1$2}')
 
 # absolute paths to this starter
 # this works even if runned as `bash starter.sh`
@@ -28,28 +27,8 @@ if [[ "$SELF_DIR" =~ ^/(bin|sbin|usr)(/|$) ]]; then
 else
 	KEM_DIR="$SELF_DIR"
 fi
-KEM_JAR="$KEM_DIR/builder.jar"
-
-# Hotspot configuration
-ARGS=(
-  "-Xmx512M"
-  "-Djna.nosys=true"
-  "-Djava.library.path=$KEM_DIR"
-  "-Dfile.encoding=UTF-8"
-)
-if [ "$JAVA_VER" -ge 90 ]
-then
-  echo "JDK 1.8 is required! Exiting."
-  exit 1
-fi
-
-if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-  cd "$KEM_DIR" || exit
-  "$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" --help
-  exit 0
-fi
 
 CALL_PWD="$PWD"
 cd "$KEM_DIR" || exit
-"$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" "$CALL_PWD" "$@"
+"$JAVA" "-Xmx512M" "-Dfile.encoding=UTF-8" "-Djava.library.path=$KEM_DIR" -jar "$KEM_DIR/builder.jar" "$CALL_PWD" "$@"
 exit $?

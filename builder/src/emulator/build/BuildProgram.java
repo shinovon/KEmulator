@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -25,15 +24,12 @@ public class BuildProgram {
 			System.exit(0);
 		}
 
-		Path path = Paths.get(args[0]).toAbsolutePath().normalize();
-		if (!Files.exists(path)) {
-			System.out.println("Project directory does not exist: " + path);
-			System.exit(1);
-		}
-
 		HashSet<String> opts = new HashSet<>();
 		for (int i = 1; i < args.length; i++) {
-			if (args[i].startsWith("--")) {
+			if ("--help".equals(args[i])) {
+				printHelp();
+				System.exit(0);
+			} else if (args[i].startsWith("--")) {
 				opts.add(args[i]);
 			} else if (args[i].startsWith("-")) {
 				char[] list = args[i].toCharArray();
@@ -51,6 +47,9 @@ public class BuildProgram {
 						case 's':
 							opts.add(BuildSystem.SKIPMISS);
 							break;
+						case 'h':
+							printHelp();
+							System.exit(0);
 						default:
 							System.out.println("Unknown option: " + args[i]);
 							System.exit(1);
@@ -60,6 +59,12 @@ public class BuildProgram {
 				System.out.println("Unknown option: " + args[i]);
 				System.exit(1);
 			}
+		}
+
+		Path path = Paths.get(args[0]).toAbsolutePath().normalize();
+		if (!Files.exists(path)) {
+			System.out.println("Project directory does not exist: " + path);
+			System.exit(1);
 		}
 
 		Properties kemProps = null;
