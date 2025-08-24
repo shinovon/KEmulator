@@ -499,7 +499,7 @@ public class ListSWT extends SWTScreen implements IListImpl {
 					if (type == Choice.MULTIPLE) {
 						choiceImpl.setSelected(index, ((TableItem) se.item).getChecked());
 					} else {
-						choiceImpl.setSelected(index, !isSelected(index));
+						choiceImpl.setSelected(index, true);
 					}
 				}
 			}
