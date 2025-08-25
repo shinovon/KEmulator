@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/KEmulator_res.iml" filepath="$PROJECT_DIR$/KEmulator_res.iml" />
       <module fileurl="file://$PROJECT_DIR$/win/KEmulator_win.iml" filepath="$PROJECT_DIR$/win/KEmulator_win.iml" />
       <module fileurl="file://$PROJECT_DIR$/x64/KEmulator_x64.iml" filepath="$PROJECT_DIR$/x64/KEmulator_x64.iml" />
+      <module fileurl="file://$PROJECT_DIR$/builder/builder.iml" filepath="$PROJECT_DIR$/builder/builder.iml" />
       <module fileurl="file://$PROJECT_DIR$/lwjgl3-swt-platform/lwjgl3-swt-platform.iml" filepath="$PROJECT_DIR$/lwjgl3-swt-platform/lwjgl3-swt-platform.iml" />
       <module fileurl="file://$PROJECT_DIR$/m3g_lwjgl/m3g_lwjgl.iml" filepath="$PROJECT_DIR$/m3g_lwjgl/m3g_lwjgl.iml" />
       <module fileurl="file://$PROJECT_DIR$/m3g_stub/m3g_stub.iml" filepath="$PROJECT_DIR$/m3g_stub/m3g_stub.iml" />
