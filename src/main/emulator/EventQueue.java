@@ -468,6 +468,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void waitRepaint() throws InterruptedException {
+		if (Thread.currentThread() == eventThread) return;
 		while (repaintPending) {
 			Thread.sleep(1);
 		}
