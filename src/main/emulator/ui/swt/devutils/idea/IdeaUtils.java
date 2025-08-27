@@ -127,6 +127,9 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			Settings.ideaPath = null;
 		if (Settings.proguardPath != null && !Files.exists(Paths.get(Settings.proguardPath)))
 			Settings.proguardPath = null;
+		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei").resolve("cldc11.jar")) || !Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei").resolve("midp21.jar"))) {
+			Settings.ideaJdkTablePatched = false; // reset only patch status
+		}
 		if (Settings.ideaJdkTablePatched && Settings.ideaPath != null && Settings.proguardPath != null) {
 			// ready for work
 			new IdeaUtils(p).shell.open();
@@ -342,6 +345,10 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		}
 		if (!Files.exists(Paths.get(Settings.proguardPath))) {
 			System.out.println("Proguard is gone. Please run setup again.");
+			System.exit(2);
+		}
+		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei").resolve("cldc11.jar")) || !Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei").resolve("midp21.jar"))) {
+			System.out.println("UEI libs are gone. Please run setup again.");
 			System.exit(2);
 		}
 	}
