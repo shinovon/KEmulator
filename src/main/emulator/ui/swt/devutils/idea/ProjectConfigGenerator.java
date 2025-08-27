@@ -76,7 +76,7 @@ public class ProjectConfigGenerator {
 		StringBuilder sb = new StringBuilder();
 		for (String l : JdkTablePatcher.getDevTimeJars()) {
 			sb.append("-libraryjars '");
-			sb.append(Paths.get(Emulator.getAbsolutePath(), "uei", l));
+			sb.append(l);
 			sb.append("'");
 			sb.append(System.lineSeparator());
 		}
