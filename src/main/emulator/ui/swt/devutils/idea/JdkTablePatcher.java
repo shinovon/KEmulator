@@ -26,30 +26,7 @@ import java.util.stream.Stream;
 
 
 public class JdkTablePatcher {
-	public static final String[] DEV_TIME_JARS = new String[]{
-			"cldc11.jar",
-			"filemanagerapi.jar",
-			"javapiglerapi.jar",
-			"jsr75_file.jar",
-			"jsr75_pim.jar",
-			"jsr82.jar",
-			"jsr120.jar",
-			"jsr135.jar",
-			"jsr177_crypto.jar",
-			"jsr179.jar",
-			"jsr184.jar",
-			"jsr211.jar",
-			"jsr226.jar",
-			"jsr234.jar",
-			"jsr256.jar",
-			"mascotv3.jar",
-			"midp21.jar",
-			"nokiaui.jar",
-			"notificationapi.jar",
-			"rpcapi.jar",
-			"samsungapi.jar",
-			"siemensio.jar",
-	};
+
 	public static final String[] NIKITA_DOCS = new String[]{
 			"https://nikita36078.github.io/J2ME_Docs/docs/cldc-1.1",
 			"https://nikita36078.github.io/J2ME_Docs/docs/midp-2.0",
@@ -310,11 +287,23 @@ public class JdkTablePatcher {
 		return root;
 	}
 
+	public static ArrayList<String> getDevTimeJars() {
+		Path uei = Paths.get(Emulator.getAbsolutePath()).resolve("uei");
+		ArrayList<String> paths = new ArrayList<>();
+		for (File c : uei.toFile().listFiles()) {
+			if (!c.getName().endsWith(".jar"))
+				continue;
+			if (c.getName().equalsIgnoreCase("emulator.jar"))
+				continue;
+			paths.add(c.getAbsolutePath().toString());
+		}
+		return paths;
+	}
+
 	private static List<String> getDevTimeClassPaths() {
-		String kemnnPath = Emulator.getAbsolutePath();
 		List<String> paths = new ArrayList<>();
-		for (String jar : DEV_TIME_JARS) {
-			paths.add("jar://" + Paths.get(kemnnPath, "uei", jar).toString().replace("\\", "/") + "!/");
+		for (String p : getDevTimeJars()) {
+			paths.add("jar://" + p.replace("\\", "/") + "!/");
 		}
 		return paths;
 	}

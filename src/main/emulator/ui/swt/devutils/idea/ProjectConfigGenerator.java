@@ -74,7 +74,7 @@ public class ProjectConfigGenerator {
 
 	public static String buildLocalProguardConfig(String dir, String name, String[] libs) {
 		StringBuilder sb = new StringBuilder();
-		for (String l : JdkTablePatcher.DEV_TIME_JARS) {
+		for (String l : JdkTablePatcher.getDevTimeJars()) {
 			sb.append("-libraryjars '");
 			sb.append(Paths.get(Emulator.getAbsolutePath(), "uei", l));
 			sb.append("'");
