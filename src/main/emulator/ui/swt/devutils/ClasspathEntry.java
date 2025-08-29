@@ -142,8 +142,9 @@ public class ClasspathEntry {
 			list.add(new ClasspathEntry("res", ClasspathEntryType.Resource));
 
 		Path libs = projectRoot.resolve("lib");
-		if (Files.exists(libs) && Files.isDirectory(libs)) {
-			for (File c : libs.toFile().listFiles()) {
+		File[] files = libs.toFile().listFiles();
+		if (files != null) {
+			for (File c : files) {
 				if (c.isFile() && c.getName().endsWith(".jar"))
 					list.add(new ClasspathEntry("lib/" + c.getName(), ClasspathEntryType.ExportedLibrary));
 				if (c.isDirectory()) {
