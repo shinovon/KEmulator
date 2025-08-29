@@ -24,7 +24,7 @@ public class StringItem extends Item {
 		if (mode < 0 || mode > 2) {
 			throw new IllegalArgumentException();
 		}
-		setText(s);
+		setText(text);
 		this.mode = mode;
 		this.font = null;
 	}
