@@ -463,7 +463,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	}
 
 	private void updateClassesView() {
-		this.classesList = Collections.list(this.memoryMgr.classesTable.keys());
+		this.classesList = new ArrayList<>(memoryMgr.classesTable.keySet());
 		for (int i = 0; i < this.classesList.size(); ++i) {
 			if (this.memoryMgr.totalObjectsSize(this.classesList.get(i)) == 0) {
 				this.classesList.remove(i--);

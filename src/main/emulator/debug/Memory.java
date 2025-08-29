@@ -19,7 +19,7 @@ import java.util.*;
 
 public final class Memory {
 
-	public Hashtable<String, ClassInfo> classesTable = new Hashtable<>();
+	public HashMap<String, ClassInfo> classesTable = new HashMap<>();
 	public HashSet<IdentityWrapper> instances;
 	public ArrayList<Image> images = new ArrayList<>();
 	public ArrayList<Image> releasedImages = new ArrayList<>();
@@ -252,7 +252,7 @@ public final class Memory {
 			}
 			try {
 				if (o instanceof Object3D) {
-					iterateFields(clazz, o, path);
+					iterateFields(clazz, classInfo.cachedFields, o, path);
 					return;
 				}
 			} catch (NoClassDefFoundError e) {
@@ -261,18 +261,13 @@ public final class Memory {
 		}
 
 		if (Emulator.jarClasses.contains(clazz.getName()) || vector || checkClasses.contains(clazz.getName()) || InputStream.class.isAssignableFrom(clazz)) {
-			iterateFields(clazz, o, path);
+			iterateFields(clazz, classInfo.cachedFields, o, path);
 		}
 	}
 
-	private void iterateFields(Class clazz, Object o, ReferencePath path) {
-		final Field[] fields = fields(clazz); //TODO remove
+	private void iterateFields(Class clazz, Field[] fields, Object o, ReferencePath path) {
 		for (Field f : fields) {
-			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive())
-				continue; // const field
-
 			final String fieldName = f.getName();
-			f.setAccessible(true);
 
 			final Object value = ClassTypes.getFieldValue(o, f);
 			final ReferencePath newPath;
@@ -348,7 +343,13 @@ public final class Memory {
 	public static Field[] fields(final Class clazz) {
 		final ArrayList<Field> vector = new ArrayList<>();
 		addFieldsWithSupers(clazz, vector);
-		final Field[] array = new Field[vector.size()];
+		for (int i = vector.size() - 1; i >= 0; i--) {
+			Field f = vector.get(i);
+			f.setAccessible(true);
+			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive())
+				vector.remove(i);
+		}
+		Field[] array = new Field[vector.size()];
 		return vector.toArray(array);
 	}
 
@@ -396,9 +397,8 @@ public final class Memory {
 
 	public int objectsSize() {
 		int n = 0;
-		final Enumeration<ClassInfo> elements = this.classesTable.elements();
-		while (elements.hasMoreElements()) {
-			n += elements.nextElement().size();
+		for (ClassInfo ci : this.classesTable.values()) {
+			n += ci.size();
 		}
 		return n;
 	}
