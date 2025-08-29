@@ -125,10 +125,10 @@
 -keep class emulator.graphics3D.IGraphics3D { *; }
 
 # Build system
--keep emulator.ui.swt.devutils.ClasspathEntry { *; }
--keep emulator.ui.swt.devutils.ClasspathEntryType { *; }
--keep emulator.ui.swt.devutils.idea.ProjectConfigGenerator  { *; }
--keep emulator.ui.swt.devutils.idea.ProjectGenerator { *; }
+-keep class emulator.ui.swt.devutils.ClasspathEntry { *; }
+-keep class emulator.ui.swt.devutils.ClasspathEntryType { *; }
+-keep class emulator.ui.swt.devutils.idea.ProjectConfigGenerator  { *; }
+-keep class emulator.ui.swt.devutils.idea.ProjectGenerator { *; }
 
 # Keep - Applications. Keep all application classes, along with their 'main' methods.
 -keepclasseswithmembers public class * {
