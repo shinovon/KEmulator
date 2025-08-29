@@ -494,14 +494,29 @@ public final class Memory {
 		} else if (clazz == ((Memory._C != null) ? Memory._C : (Memory._C = cls("[C")))) {
 			n = 16 + 1 * Array.getLength(o);
 		} else {
-			for (int i = Array.getLength(o) - 1; i >= 0; --i) {
-				final Object value;
-				if ((value = Array.get(o, i)) != null && !ClassTypes.isObject(clazz.getComponentType())) {
-					n += this.size(value.getClass(), fields, value);
-				} else if (value != null && value.getClass().isArray()) {
-					n += 16;
-				} else {
-					n += 4;
+			boolean isArrayOfObjs = ClassTypes.isObject(clazz.getComponentType());
+			if (o instanceof Object[]) {
+				Object[] oo = (Object[]) o;
+				for (int i = oo.length - 1; i >= 0; --i) {
+					final Object value = oo[i];
+					if (value != null && !isArrayOfObjs) {
+						n += this.size(value.getClass(), fields, value);
+					} else if (value != null && value.getClass().isArray()) {
+						n += 16;
+					} else {
+						n += 4;
+					}
+				}
+			} else {
+				for (int i = Array.getLength(o) - 1; i >= 0; --i) {
+					final Object value;
+					if ((value = Array.get(o, i)) != null && !isArrayOfObjs) {
+						n += this.size(value.getClass(), fields, value);
+					} else if (value != null && value.getClass().isArray()) {
+						n += 16;
+					} else {
+						n += 4;
+					}
 				}
 			}
 		}
