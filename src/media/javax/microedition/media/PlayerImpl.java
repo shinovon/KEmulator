@@ -99,37 +99,37 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		this.inputStream = inputStream;
 	}
 
-    private void amr(final InputStream inputStream) throws IOException {
-        controls = new Control[]{toneControl, volumeControl};
-        try {
-            final byte[] b;
-            // Use new AMR decoder
-            b = AMRDecoder.decode(data = ResourceManager.getBytes(inputStream));
-            if (b == null) {
-                throw new MediaException("Cannot parse AMR data");
-            }
-            if (Settings.enableMediaDump) data = b;
-            InputStream i = this.inputStream = new ByteArrayInputStream(b);
-            final AudioFormat audioFormat = new AudioFormat(
-                    AudioFormat.Encoding.PCM_SIGNED,
-                    8000.0f,
-                    16,
-                    1,
-                    2,
-                    8000.0f,
-                    false
-            );
-            final AudioInputStream audioInputStream = new AudioInputStream(i, audioFormat, -1L);
-            final Clip clip = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioFormat));
-            clip.addLineListener(this);
-            clip.open(audioInputStream);
-            sequence = clip;
-        } catch (Throwable e) {
+	private void amr(final InputStream inputStream) throws IOException {
+		controls = new Control[]{toneControl, volumeControl};
+		try {
+			final byte[] b;
+			// Use new AMR decoder
+			b = AMRDecoder.decode(data = ResourceManager.getBytes(inputStream));
+			if (b == null) {
+				throw new MediaException("Cannot parse AMR data");
+			}
+			if (Settings.enableMediaDump) data = b;
+			InputStream i = this.inputStream = new ByteArrayInputStream(b);
+			final AudioFormat audioFormat = new AudioFormat(
+					AudioFormat.Encoding.PCM_SIGNED,
+					8000.0f,
+					16,
+					1,
+					2,
+					8000.0f,
+					false
+			);
+			final AudioInputStream audioInputStream = new AudioInputStream(i, audioFormat, -1L);
+			final Clip clip = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioFormat));
+			clip.addLineListener(this);
+			clip.open(audioInputStream);
+			sequence = clip;
+		} catch (Throwable e) {
 			Emulator.getEmulator().getLogStream().println("AMR realize error: " + e);
-            sequence = null;
-            throw new IOException("AMR realize error", e);
-        }
-    }
+			sequence = null;
+			//throw new IOException("AMR realize error", e);
+		}
+	}
 
 	private void wav(InputStream inputStream) throws IOException {
 		controls = new Control[]{toneControl, volumeControl};
