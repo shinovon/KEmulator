@@ -3,7 +3,6 @@ package emulator;
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import com.github.sarxos.webcam.Webcam;
 import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
@@ -13,7 +12,9 @@ import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
 import emulator.ui.bridge.BridgeFrontend;
+import emulator.ui.swt.Property;
 import emulator.ui.swt.SWTFrontend;
+import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -39,9 +40,9 @@ import java.util.jar.Manifest;
 
 public class Emulator implements Runnable {
 	public static boolean debugBuild = true;
-	public static String version = "2.19.2";
+	public static String version = "2.20";
 	public static String revision = "";
-	public static final int numericVersion = 32;
+	public static final int numericVersion = 33;
 
 	private static IEmulatorFrontend emulatorimpl;
 	private static MIDlet midlet;
@@ -72,12 +73,13 @@ public class Emulator implements Runnable {
 
 	public static String httpUserAgent;
 	private final static Thread backgroundThread;
-	private static IEmulatorPlatform platform;
+	public static IEmulatorPlatform platform;
 
-	public static final String os = System.getProperty("os.name").toLowerCase();
+	public static final String os = String.valueOf(System.getProperty("os.name")).toLowerCase();
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
 	public static final boolean macos = os.startsWith("darwin") || os.startsWith("mac os");
+	public static final boolean termux = String.valueOf(System.getProperty("java.vm.vendor")).toLowerCase().contains("termux");
 	public static final boolean isPortable = checkIsPortable();
 	private static Class<?> midletClass;
 	private static boolean forked;
@@ -718,8 +720,6 @@ public class Emulator implements Runnable {
 		System.setProperty("microedition.media.version", "1.0");
 		System.setProperty("supports.mixing", "true");
 		System.setProperty("supports.audio.capture", "false");
-		System.setProperty("supports.video.capture", "false");
-		System.setProperty("supports.photo.capture", "false");
 		System.setProperty("supports.recording", "false");
 		System.setProperty("microedition.io.file.FileConnection.version", "1.0");
 		System.setProperty("microedition.pim.version", "1.0");
@@ -752,21 +752,6 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 
-		if (!platform.isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
-			try {
-				Webcam w = Webcam.getDefault();
-				if (w != null) {
-					System.setProperty("supports.video.capture", "true");
-					System.setProperty("supports.photo.capture", "true");
-					System.setProperty("supports.mediacapabilities", "camera");
-					System.setProperty("camera.orientations", "devcam0:inwards");
-					Dimension d = w.getViewSize();
-					System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
-				}
-			} catch (Throwable ignored) {
-			}
-		}
-
 		try {
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 		} catch (Exception ignored) {
@@ -792,7 +777,7 @@ public class Emulator implements Runnable {
 		}
 	}
 
-	public static void main(final String[] commandLineArguments) {
+	public static void main(final String[] args) {
 		try {
 			platform = ((IEmulatorPlatform) Class.forName("emulator.EmulatorPlatform").newInstance());
 		} catch (Exception e) {
@@ -820,31 +805,37 @@ public class Emulator implements Runnable {
 			return;
 		}
 		try {
+			Exception librariesException = null;
 			try {
 				platform.loadLibraries();
 			} catch (Exception e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + e.getMessage());
+				librariesException = e;
+			}
+			EmulatorMIDI.initDevices();
+			Emulator.commandLineArguments = args;
+			UILocale.initLocale();
+			try {
+				parseLaunchArgs(args);
+			} catch (Throwable ignored) {}
+
+			// Restart with additional arguments required for specific os or java version
+			if (!(forked || Settings.uei) && (librariesException != null || macos || isJava9())) {
+				loadGame(null, false);
+				return;
+			} else if (librariesException != null) {
+				librariesException.printStackTrace();
+				JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + librariesException.getMessage());
 				System.exit(0);
 				return;
 			}
-			EmulatorMIDI.initDevices();
-			Emulator.commandLineArguments = commandLineArguments;
-			UILocale.initLocale();
-			parseLaunchArgs(commandLineArguments); //
+			
 			if (bridge)
 				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
 			else
 				Emulator.emulatorimpl = new SWTFrontend();
-			parseLaunchArgs(commandLineArguments);
+			parseLaunchArgs(args);
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
-
-			// Restart with additional arguments required for specific os or java version
-			if (!(forked || Settings.uei) && (macos || isJava9())) {
-				loadGame(null, false);
-				return;
-			}
 
 			platform.load3D();
 			Controllers.refresh(true);
@@ -1065,16 +1056,28 @@ public class Emulator implements Runnable {
 					getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
 				} else if (key.equalsIgnoreCase("key")) {
 					KeyMapping.keyArg(value);
+				} else if (key.equals("new-project")) {
+					new Property();
+					IdeaUtils.createProjectCLI(value);
+				} else if (key.equals("restore")) {
+					new Property();
+					IdeaUtils.restoreProjectCLI(value);
+				} else if (key.equals("convert")) {
+					new Property();
+					IdeaUtils.convertProjectCLI(value);
+				} else if (key.equals("edit")) {
+					new Property();
+					IdeaUtils.editProjectCLI(value);
 				}
 			}
 		}
 		return true;
 	}
 
-	public static String getProcessOutput(String commandline) throws IOException {
-		Process regRequest = Runtime.getRuntime().exec(commandline);
+	public static String getProcessOutput(String[] commandline, boolean errStream) throws IOException {
+		Process proc = Runtime.getRuntime().exec(commandline);
 		StringBuilder sw = new StringBuilder();
-		try (InputStream is = regRequest.getInputStream()) {
+		try (InputStream is = errStream ? proc.getErrorStream() : proc.getInputStream()) {
 			int c;
 			while ((c = is.read()) != -1)
 				sw.append((char) c);
@@ -1087,9 +1090,26 @@ public class Emulator implements Runnable {
 		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
 			return s + File.separatorChar + "KEmulator.jar";
 		}
-		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile().substring(1);
-		if (s.endsWith("bin/"))
-			s = s.substring(0, s.length() - 4);
+		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+		if (win) s = s.substring(1);
+		if (debugBuild && s.endsWith("/")) {
+			if (s.endsWith("bin/production/KEmulator_base/")) {
+				// IDEA project
+				s = s.substring(0, s.length() - "bin/production/KEmulator_base/".length()) + "home";
+			} else if (s.endsWith("eclipse/KEmulator_base/bin/")) {
+				// Eclipse project
+				s = s.substring(0, s.length() - "eclipse/KEmulator_base/bin/".length()) + "home";
+			}
+//			else if (s.endsWith("bin/")) {
+//				s = s.substring(0, s.length() - 4);
+//			}
+			if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+				s = s + File.separatorChar + "KEmulator.jar";
+			} else {
+				System.out.println("Running from " + s);
+				throw new RuntimeException("Could not find home directory");
+			}
+		}
 		try {
 			return URLDecoder.decode(s, "UTF-8");
 		} catch (Exception ex) {
@@ -1132,7 +1152,7 @@ public class Emulator implements Runnable {
 		if (win) {
 			// installer will write to registry path to installed jar. Let's check it.
 			try {
-				String output = getProcessOutput("reg query \"HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator\" /v JarInstalledPath");
+				String output = getProcessOutput(new String[]{"reg", "query", "HKEY_LOCAL_MACHINE\\Software\\nnproject\\KEmulator", "/v", "JarInstalledPath"}, false);
 				int i = output.indexOf("REG_SZ");
 				if (i != -1) {
 					String pathFromReg = output.substring(i + 6).trim();
@@ -1200,7 +1220,7 @@ public class Emulator implements Runnable {
 		String parent = Paths.get(realHome).getParent().toString();
 		if (Files.exists(Paths.get(parent, "bin", win ? "javac.exe" : "javac"))) {
 			// we run with JRE in JDK
-			return realHome;
+			return parent;
 		}
 		// standalone JRE
 		return null;
@@ -1212,7 +1232,11 @@ public class Emulator implements Runnable {
 
 	public static void loadGame(final String s, final int engine2d, final int engine3d, int mascotEngine, final boolean b) {
 		ArrayList<String> cmd = new ArrayList<String>();
-		getEmulator().getLogStream().println(s == null ? "Restarting" : ("loadGame: " + s));
+		if (emulatorimpl != null ) {
+			getEmulator().getLogStream().println(s == null ? "Restarting" : ("loadGame: " + s));
+		} else {
+			System.out.println(s == null ? "Restarting" : ("loadGame: " + s));
+		}
 		String javahome = System.getProperty("java.home");
 		cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!win ? "/bin/java" : "/bin/java.exe")));
 		cmd.add("-cp");
@@ -1290,8 +1314,10 @@ public class Emulator implements Runnable {
 
 		cmd.add("-s");
 
-		getEmulator().disposeSubWindows();
-		notifyDestroyed();
+		try {
+			getEmulator().disposeSubWindows();
+			notifyDestroyed();
+		} catch (NullPointerException ignored) {}
 		try {
 			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
 			// something inside SWT libs setting this to X11 on dual-server systems.

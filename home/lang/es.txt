@@ -170,23 +170,22 @@ MEMORY_VIEW_SOUNDS=Sonidos
 
 MEMORY_VIEW_ZOOM=Zoom:
 MEMORY_VIEW_SORT=Ordenar:
-MEMORY_VIEW_SIZE=Tamaño:
+MEMORY_VIEW_SIZE=Tamaño
 MEMORY_VIEW_ASCEND=Ascendente
-MEMORY_VIEW_IMAGES_DRAWN=Imágenes dibujadas
+MEMORY_VIEW_IMAGES_DRAWN=Utilizadas
 MEMORY_VIEW_UNUSED_REGION=Oscurecer regiones no utilizadas
-MEMORY_VIEW_RESET_IMAGE=Restablecer uso de imágenes
-MEMORY_VIEW_IMAGE_NEVER_DRAW=Imágenes nunca dibujadas
-MEMORY_VIEW_RELEASED_IMAGES=Imágenes liberadas
+MEMORY_VIEW_RESET_IMAGE=Restablecer uso
+MEMORY_VIEW_IMAGE_NEVER_DRAW=Sin utilizar
+MEMORY_VIEW_RELEASED_IMAGES=Liberadas
 MEMORY_VIEW_CLEAR_RELEASED_IMAGES=Limpiar imágenes liberadas
 
 MEMORY_VIEW_SORT_REFERENCE=Referencia
 MEMORY_VIEW_SORT_SIZE=Tamaño
 MEMORY_VIEW_SORT_DRAW_COUNT=Veces dibujado
 
-MEMORY_VIEW_SAVE_AS=Guardar como...
+MEMORY_VIEW_SAVE_ONE=Exportar imagen seleccionada
 MEMORY_VIEW_SAVE_TO_FILE=Guardar en archivo
-MEMORY_VIEW_SAVE_ALL=Guardar todas las imágenes...
-MEMORY_VIEW_SAVE_ALL_IMAGES=Guardar todas las imágenes
+MEMORY_VIEW_SAVE_ALL=Exportar todas las imágenes
 MEMORY_VIEW_CHOOSE_DIRECTORY=Elegir un directorio
 
 MEMORY_VIEW_SOUND_START=Iniciar

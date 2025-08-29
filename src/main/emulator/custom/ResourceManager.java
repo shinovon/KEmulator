@@ -7,6 +7,7 @@ import org.apache.tools.zip.ZipFile;
 import javax.microedition.io.Connector;
 import javax.microedition.io.InputConnection;
 import java.io.*;
+import java.util.Enumeration;
 
 public final class ResourceManager {
 	public ResourceManager() {
@@ -20,15 +21,30 @@ public final class ResourceManager {
 				while (name.length() > 0 && name.startsWith("/")) {
 					name = name.substring(1);
 				}
-				final ZipFile zipFile;
-				final ZipEntry entry;
-				if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(name)) == null) {
-					Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (null)");
-					throw new IOException();
+				final ZipFile zipFile = new ZipFile(Emulator.midletJar);
+				try {
+					ZipEntry entry;
+					if ((entry = zipFile.getEntry(name)) == null) {
+						// try again by searching entry ignoring case
+						Enumeration entries = zipFile.getEntries();
+						fail:
+						{
+							do {
+								entry = (ZipEntry) entries.nextElement();
+								if (entry.getName().equalsIgnoreCase(name)) {
+									break fail;
+								}
+							} while (entries.hasMoreElements());
+							Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (null)");
+							throw new IOException();
+						}
+					}
+					data = new byte[(int) entry.getSize()];
+					Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + data.length + ")");
+					new DataInputStream(zipFile.getInputStream(entry)).readFully(data);
+				} finally {
+					zipFile.close();
 				}
-				data = new byte[(int) entry.getSize()];
-				Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + data.length + ")");
-				new DataInputStream(zipFile.getInputStream(entry)).readFully(data);
 			} else {
 				final File fileFromClassPath;
 				if ((fileFromClassPath = Emulator.getFileFromClassPath(s)) == null || !fileFromClassPath.exists()) {

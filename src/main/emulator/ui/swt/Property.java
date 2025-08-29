@@ -548,7 +548,7 @@ public final class Property implements IProperty, SelectionListener {
 			// platform
 			Settings.synchronizeKeyEvents = Boolean.parseBoolean(properties.getProperty("SynchronizeKeyEvents", "false"));
 			Settings.motorolaSoftKeyFix = Boolean.parseBoolean(properties.getProperty("MotorolaSoftKeyFix", "false"));
-			Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
+//			Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
 			Settings.patchSynchronizedPlayerUpdate = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPlayerUpdate", "true"));
 			Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
@@ -678,10 +678,9 @@ public final class Property implements IProperty, SelectionListener {
 
 			// devutils
 			Settings.ideaPath = properties.getProperty("IdeaPath", null);
-			Settings.eclipsePath = properties.getProperty("EclipsePath", null);
 			Settings.proguardPath = properties.getProperty("ProguardPath", null);
-			Settings.j2meDocsPath = properties.getProperty("J2MEDocsPath", null);
 			Settings.ideaJdkTablePatched = Boolean.parseBoolean(properties.getProperty("IdeaJdkTablePatched", "false"));
+			Settings.lastIdeaRepoPath = properties.getProperty("LastIdeaProjectsRepo", "");
 
 			fileInputStream.close();
 		} catch (Exception ex) {
@@ -791,7 +790,7 @@ public final class Property implements IProperty, SelectionListener {
 			// platform
 			properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
 			properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
-			properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
+//			properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
 			properties.setProperty("PatchSynchronizedPlayerUpdater", String.valueOf(Settings.patchSynchronizedPlayerUpdate));
 			properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
@@ -922,10 +921,9 @@ public final class Property implements IProperty, SelectionListener {
 
 			// devutils
 			if (Settings.ideaPath != null) properties.setProperty("IdeaPath", Settings.ideaPath);
-			if (Settings.eclipsePath != null) properties.setProperty("EclipsePath", Settings.eclipsePath);
 			if (Settings.proguardPath != null) properties.setProperty("ProguardPath", Settings.proguardPath);
-			if (Settings.j2meDocsPath != null) properties.setProperty("J2MEDocsPath", Settings.j2meDocsPath);
 			properties.setProperty("IdeaJdkTablePatched", String.valueOf(Settings.ideaJdkTablePatched));
+			properties.setProperty("LastIdeaProjectsRepo", Settings.lastIdeaRepoPath);
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();

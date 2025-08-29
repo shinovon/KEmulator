@@ -37,6 +37,7 @@ import java.awt.image.ImageObserver;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
+
 /** @noinspection unused*/
 public class OpglGraphics {
 	public static final int GL_ACTIVE_TEXTURE = 34016;
@@ -589,15 +590,15 @@ public class OpglGraphics {
 		gl.glColorPointer(size, type, stride, offset);
 	}
 
-	public void glCompressedTexImage2D(int target,
-									   int level,
-									   int internalformat,
-									   int width,
-									   int height,
-									   int border,
-									   ByteBuffer data) {
+    public void glCompressedTexImage2D(int target,
+                                       int level,
+                                       int internalformat,
+                                       int width,
+                                       int height,
+                                       int border,
+                                       ByteBuffer data) {
 		gl.glCompressedTexImage2D(target, level, internalformat, width, height, border, data.length(), data.getNioBuffer());
-	}
+    }
 
 	public void glCompressedTexSubImage2D(int target,
 										  int level,

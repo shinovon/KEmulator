@@ -1,11 +1,13 @@
 package emulator.ui.swt;
 
 import com.nokia.mid.ui.TextEditor;
+import com.nokia.mid.ui.TextEditorListener;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.ui.ICaret;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Caret;
@@ -177,6 +179,16 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 					swtText = text;
 				}
 
+				if (item instanceof TextEditor) {
+					int c = ((TextEditor) item).getForegroundColor();
+					if (c != 0) {
+						text.setForeground(new Color(null, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, 0xFF));
+					}
+					c = ((TextEditor) item).getBackgroundColor();
+					if (c != 0) {
+						text.setBackground(new Color(null, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, 0xFF));
+					}
+				}
 				text.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
 				text.setVisible(true);
 				text.setFocus();
@@ -266,7 +278,18 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 				break;
 			case SWT.TRAVERSE_ARROW_PREVIOUS:
 			case SWT.TRAVERSE_ARROW_NEXT:
-				if (item instanceof TextEditor) break;
+				if (item instanceof TextEditor) {
+					if (length == 0
+							|| (key == SWT.ARROW_UP && line == 0)
+							|| (key == SWT.ARROW_DOWN && !text.contains("\n"))) {
+						if (key == SWT.ARROW_UP) {
+							((TextEditor) item)._inputAction(TextEditorListener.ACTION_TRAVERSE_PREVIOUS);
+						} else if (key == SWT.ARROW_DOWN) {
+							((TextEditor) item)._inputAction(TextEditorListener.ACTION_TRAVERSE_NEXT);
+						}
+					}
+					break;
+				}
 				if (length == 0) {
 					defocusItem(item);
 					break;

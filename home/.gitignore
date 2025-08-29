@@ -8,6 +8,7 @@ track.txt
 classwatcher.txt
 midlets.txt
 updater.jar
+builder.jar
 
 !.package
 !KEmulator*.bat

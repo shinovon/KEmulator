@@ -62,7 +62,7 @@ public class Manager {
 			requireLibVlc();
 			return new VLCPlayerImpl(inputStream, s);
 		}
-//		if ("audio/amr".equals(s) && isLibVlcSupported() && Emulator.isX64()) {
+//		if ("audio/amr-wb".equals(s) && isLibVlcSupported()) {
 //			return new VLCPlayerImpl(inputStream, s);
 //		}
 		// buffer
@@ -138,7 +138,7 @@ public class Manager {
 			if (contentType.startsWith("audio/") && isAudioContentTypeSupportedForDataSource(contentType)) {
 				if (locator != null) {
 					// rtsp
-					if (locator.startsWith("rtps://") || locator.startsWith("rtp://")) {
+					if (locator.startsWith("rtsp://") || locator.startsWith("rtp://")) {
 						requireLibVlc();
 						return new VLCPlayerImpl(locator, contentType);
 					}

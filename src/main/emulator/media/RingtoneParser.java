@@ -2,17 +2,17 @@ package emulator.media;
 
 import emulator.Emulator;
 
-public final class b {
-	a ana1225;
+public final class RingtoneParser {
+	MidiBuilder ana1225;
 	int anInt1226;
 	byte[] aByteArray1227;
 	static int anInt1229;
 	static int anInt1230;
 	static final int[] anIntArray1228;
 
-	public b(final byte[] array) {
+	public RingtoneParser(final byte[] array) {
 		super();
-		this.ana1225 = new a();
+		this.ana1225 = new MidiBuilder();
 		this.anInt1226 = array.length;
 		System.arraycopy(array, 0, this.aByteArray1227 = new byte[this.anInt1226 + 10], 0, this.anInt1226);
 		this.method729(this.aByteArray1227);
@@ -23,22 +23,22 @@ public final class b {
 	}
 
 	private static int method727(final byte[] array, final int n) {
-		final int n2 = ((array[b.anInt1229] & 0xFF) << 8) + (array[b.anInt1229 + 1] & 0xFF) >> 16 - (n + b.anInt1230) & (1 << n) - 1;
-		b.anInt1230 += n;
-		if (b.anInt1230 > 7) {
-			b.anInt1230 -= 8;
-			++b.anInt1229;
+		final int n2 = ((array[RingtoneParser.anInt1229] & 0xFF) << 8) + (array[RingtoneParser.anInt1229 + 1] & 0xFF) >> 16 - (n + RingtoneParser.anInt1230) & (1 << n) - 1;
+		RingtoneParser.anInt1230 += n;
+		if (RingtoneParser.anInt1230 > 7) {
+			RingtoneParser.anInt1230 -= 8;
+			++RingtoneParser.anInt1229;
 		}
 		return n2;
 	}
 
 	private static int method728(final int n) {
-		return b.anIntArray1228[n];
+		return RingtoneParser.anIntArray1228[n];
 	}
 
 	private void method729(final byte[] array) {
-		b.anInt1229 = 0;
-		b.anInt1230 = 0;
+		RingtoneParser.anInt1229 = 0;
+		RingtoneParser.anInt1230 = 0;
 		int n = 0;
 		method727(array, 8);
 		method727(array, 8);
@@ -52,14 +52,14 @@ public final class b {
 			method727(array, 8);
 		}
 		int method729 = method727(array, 8);
-		while (b.anInt1229 < this.anInt1226) {
+		while (RingtoneParser.anInt1229 < this.anInt1226) {
 			if (method729 == 0) {
 				break;
 			}
 			method727(array, 3);
 			method727(array, 2);
 			method727(array, 4);
-			for (int method730 = method727(array, 8), n2 = 0; n2 < method730 && b.anInt1229 < this.anInt1226; ++n2) {
+			for (int method730 = method727(array, 8), n2 = 0; n2 < method730 && RingtoneParser.anInt1229 < this.anInt1226; ++n2) {
 				switch (method727(array, 3)) {
 					case 0: {
 						method727(array, 2);
@@ -79,7 +79,7 @@ public final class b {
 					case 2: {
 						this.ana1225.anInt1279 = method727(array, 2);
 						if (this.ana1225.anInt1279 > 0) {
-							final a ana1225 = this.ana1225;
+							final MidiBuilder ana1225 = this.ana1225;
 							--ana1225.anInt1279;
 							break;
 						}
@@ -103,7 +103,7 @@ public final class b {
 					}
 				}
 			}
-			if (b.anInt1229 >= this.anInt1226) {
+			if (RingtoneParser.anInt1229 >= this.anInt1226) {
 				break;
 			}
 			--method729;

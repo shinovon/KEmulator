@@ -13,7 +13,7 @@ varying float vIsReflect;
 varying float vAmbIntensity;
 
 void main() {
-    vec4 color = texture2D(uTextureUnit, vTexture);
+    vec4 color = texture2D(uTextureUnit, vTexture + vec2(1.0, -1.0) / 65536.0);
     if (vIsTransparency > 0.5 && color.a < 0.5) {
         discard;
     }

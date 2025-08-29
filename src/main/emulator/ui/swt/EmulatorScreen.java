@@ -12,6 +12,7 @@ import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
+import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StackLayout;
@@ -42,12 +43,11 @@ public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,
 		ControlListener, KeyListener, MouseListener,
 		MouseMoveListener, SelectionListener, MouseWheelListener,
-		MouseTrackListener, TouchListener {
+		MouseTrackListener, TouchListener, Listener {
 	private static Display display;
 	private static int threadCount;
 	private final int startWidth;
 	private final int startHeight;
-	private long lastPollTime;
 
 	private Shell shell;
 	private Canvas canvas;
@@ -130,6 +130,7 @@ public final class EmulatorScreen implements
 	MenuItem mediaViewMenuItem;
 	MenuItem smsConsoleMenuItem;
 	MenuItem sensorMenuItem;
+	MenuItem devUtilsMenuItem;
 	MenuItem networkKillswitchMenuItem;
 	private MenuItem canvasKeyboardMenuItem;
 	private MenuItem changeResMenuItem;
@@ -191,6 +192,7 @@ public final class EmulatorScreen implements
 
 	private Menu commandsMenu;
 	private String leftSoftLabelText, rightSoftLabelText;
+	private Win32KeyboardPoller poller;
 
 	public EmulatorScreen(int n, int n2) {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
@@ -368,13 +370,14 @@ public final class EmulatorScreen implements
 
 		win = Emulator.win;
 		if (win) {
+			poller = new Win32KeyboardPoller(this);
 			new Thread("KEmulator keyboard poll thread") {
 				boolean b;
 
 				public void run() {
 					try {
 						if (b) {
-							pollKeyboard(canvas);
+							if (poller != null) poller.pollKeyboard(canvas);
 							Controllers.poll();
 							return;
 						}
@@ -408,65 +411,6 @@ public final class EmulatorScreen implements
 	}
 
 	// KEYBOARD
-
-	private static volatile boolean[] lastKeyboardButtonStates = new boolean[256];
-	private static volatile boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
-	private static volatile long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];
-	private static volatile long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
-	private static Class win32OS;
-	private static Method win32OSGetKeyState;
-
-	public synchronized void pollKeyboard(Canvas canvas) {
-		if (!win || canvas == null || canvas.isDisposed()) return;
-		long now = System.currentTimeMillis();
-		Shell shell = canvas.getShell();
-		if (shell == this.shell) {
-			if (now - lastPollTime < 10) return;
-			lastPollTime = now;
-		}
-		final boolean active = canvas.getDisplay().getActiveShell() == shell &&
-				shell.isVisible() &&
-				canvas.isFocusControl();
-//		if (!active) return;
-		try {
-			if (win32OS == null)
-				win32OS = Class.forName("org.eclipse.swt.internal.win32.OS");
-			if (win32OSGetKeyState == null &&
-					(win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class)) == null) {
-				// TODO jna
-				win = false;
-				return;
-			}
-			for (int i = 0; i < keyboardButtonStates.length; i++) {
-				lastKeyboardButtonStates[i] = keyboardButtonStates[i];
-				short keyState = (Short) win32OSGetKeyState.invoke(null, i);
-				boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
-				if (!keyboardButtonStates[i]) {
-					if (pressed) {
-						keyboardButtonStates[i] = true;
-						keyboardButtonHoldTimes[i] = 0;
-						keyboardButtonDownTimes[i] = now;
-//                        onKeyDown(i);
-					}
-				} else if (!pressed) {
-					keyboardButtonStates[i] = false;
-					keyboardButtonHoldTimes[i] = 0;
-					onKeyUp(i, shell == this.shell);
-				}
-				if (lastKeyboardButtonStates[i] && pressed && now - keyboardButtonDownTimes[i] >= 460) {
-					if (keyboardButtonHoldTimes[i] == 0 || keyboardButtonDownTimes[i] > keyboardButtonHoldTimes[i]) {
-						keyboardButtonHoldTimes[i] = now;
-					}
-					if (now - keyboardButtonHoldTimes[i] >= 40) {
-						keyboardButtonHoldTimes[i] = now;
-//                        onKeyHeld(i);
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public void setSize(int x, int y) {
 		if (this.pauseState == 1) {
@@ -970,7 +914,9 @@ public final class EmulatorScreen implements
 		this.smsConsoleMenuItem.addSelectionListener(this);
 		(this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
 		this.sensorMenuItem.addSelectionListener(this);
-
+		devUtilsMenuItem = new MenuItem(this.menuView, 8);
+		devUtilsMenuItem.setText("IntelliJ IDEA support");
+		devUtilsMenuItem.addSelectionListener(this);
 		(this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
 		this.logMenuItem.addSelectionListener(this);
 
@@ -1326,6 +1272,8 @@ public final class EmulatorScreen implements
 		} else if (parent == this.menuMidlet) {
 			boolean equals = false;
 			if (menuItem == this.exitMenuItem) {
+				shell.close();
+				Thread.yield();
 				this.shell.dispose();
 				return;
 			}
@@ -1601,6 +1549,10 @@ public final class EmulatorScreen implements
 				}
 				return;
 			}
+			if (menuItem == devUtilsMenuItem) {
+				IdeaUtils.open(shell);
+				return;
+			}
 			if (menuItem == this.smsConsoleMenuItem) {
 				if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
 					((MessageConsole) Emulator.getEmulator().getMessage()).dispose();
@@ -1730,7 +1682,7 @@ public final class EmulatorScreen implements
 	private void updatePauseState() {
 		this.suspendMenuItem.setEnabled(this.pauseState == 1);
 		this.resumeMenuItem.setEnabled(this.pauseState == 2);
-		this.restartMenuItem.setEnabled(this.pauseState != 0);
+		this.restartMenuItem.setEnabled(this.pauseState != 0 && !Settings.uei);
 		this.xrayViewMenuItem.setSelection(Settings.xrayView);
 		this.forcePaintMenuItem.setEnabled(this.pauseState != 0);
 		this.pausestepMenuItem.setEnabled(this.pauseState != 0);
@@ -1741,6 +1693,8 @@ public final class EmulatorScreen implements
 		this.memoryViewMenuItem.setEnabled(this.pauseState != 0);
 		this.methodsMenuItem.setEnabled(this.pauseState != 0);
 		m3gViewMenuItem.setEnabled(Settings.g3d == 1 && pauseState != 0);
+		fullscreenMenuItem.setEnabled(pauseState != 0);
+		mediaViewMenuItem.setEnabled(pauseState != 0);
 		this.updateStatus();
 	}
 
@@ -1807,6 +1761,7 @@ public final class EmulatorScreen implements
 		this.canvas.addMouseMoveListener(this);
 		this.canvas.getShell().addMouseTrackListener(this);
 		this.canvas.addPaintListener(this);
+		canvas.addListener(SWT.MouseHorizontalWheel, this);
 		canvas.addControlListener(new ControlListener() {
 			@Override
 			public void controlMoved(ControlEvent controlEvent) {
@@ -1817,7 +1772,7 @@ public final class EmulatorScreen implements
 			public void controlResized(ControlEvent controlEvent) {
 				caret.a(paintTransform, rotation);
 				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen
-						&& ((Screen)lastDisplayable)._isSWT()) {
+						&& ((Screen) lastDisplayable)._isSWT()) {
 					((Screen) lastDisplayable)._swtUpdateSizes();
 				}
 			}
@@ -1985,7 +1940,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.pollKeyboardOnRepaint) {
-			pollKeyboard(canvas);
+			if (poller != null) poller.pollKeyboard(canvas);
 			Controllers.poll();
 		}
 		if (swtContent == null) {
@@ -2089,7 +2044,7 @@ public final class EmulatorScreen implements
 			this.zoomIn();
 			return;
 		}
-		if (keyEvent.keyCode == SWT.F11) {
+		if (keyEvent.keyCode == SWT.F11 && pauseState != 0) {
 			fullscreenMenuItem.setSelection(fullscreen = !fullscreen);
 			changeFullscreen();
 			return;
@@ -2102,7 +2057,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void keyReleased(final KeyEvent keyEvent) {
-		if (!Settings.canvasKeyboard && win) {
+		if (!Settings.canvasKeyboard && poller != null) {
 			return;
 		}
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
@@ -2170,9 +2125,8 @@ public final class EmulatorScreen implements
 		Emulator.getEventQueue().keyRelease(n);
 	}
 
-	private void onKeyUp(int n, boolean screen) {
-		n = key(n);
-		if (!screen) {
+	void onKeyUp(int n, Shell shell) {
+		if (shell != this.shell) {
 			((SWTFrontend) Emulator.getEmulator()).getM3GView().keyReleased(n);
 			return;
 		}
@@ -2202,72 +2156,6 @@ public final class EmulatorScreen implements
 
 	private String mapKey(int n) {
 		return KeyMapping.replaceKey(n);
-	}
-
-	private int key(int n) {
-		if (n <= 7) return -1;
-		if (n >= 14 && n <= 31) return -1;
-		if (n >= 91 && n <= 95) return -1;
-		if (n >= 41 && n <= 47) return -1;
-		if (n >= 124 && n <= 186) return -1;
-		if (n > 190) return -1;
-		if (n >= 'A' && n <= 'Z') n -= 'A' - 'a';
-		else if (n >= 96 && n <= 105) n = n - 96 + '0';
-		else if (n >= 112 && n <= 123) n = n - 112 + 10;
-		else switch (n) {
-				case 33:
-					n = 5;
-					break;
-				case 34:
-					n = 6;
-					break;
-				case 35:
-					n = 8;
-					break;
-				case 36:
-					n = 7;
-					break;
-				case 37:
-					n = 3;
-					break;
-				case 38:
-					n = 1;
-					break;
-				case 39:
-					n = 4;
-					break;
-				case 40:
-					n = 2;
-					break;
-				case 106:
-					n = '*';
-					break;
-				case 107:
-					n = '+';
-					break;
-				case 109:
-					n = '-';
-					break;
-				case 110:
-					n = '.';
-					break;
-				case 111:
-					n = '/';
-					break;
-				case 187:
-					n = '=';
-					break;
-				case 188:
-					n = ',';
-					break;
-				case 189:
-					n = '-';
-					break;
-				case 190:
-					n = '.';
-					break;
-			}
-		return n;
 	}
 
 	public void mouseDoubleClick(final MouseEvent mouseEvent) {
@@ -2612,6 +2500,12 @@ public final class EmulatorScreen implements
 			display.asyncExec(new WindowOpen(this, 0));
 	}
 
+	public boolean isShown() {
+		boolean[] r = new boolean[1];
+		display.syncExec(() -> r[0] = shell.isVisible() && !shell.getMinimized());
+		return r[0];
+	}
+
 	public int showMidletChoice(Vector<String> midletKeys) {
 		dialogSelection = -1;
 
@@ -2848,6 +2742,27 @@ public final class EmulatorScreen implements
 				Emulator.getEventQueue().keyRelease(k);
 			}
 		} catch (Exception ignored) {
+		}
+	}
+
+	public void handleEvent(Event event) {
+		if (event.type == SWT.MouseHorizontalWheel) {
+			if (this.pauseState == 0 || Settings.playingRecordedKeys) {
+				return;
+			}
+			try {
+				int k = 0;
+				if (event.count < 0) {
+					k = Integer.parseInt(mapKey(3));
+				} else if (event.count > 0) {
+					k = Integer.parseInt(mapKey(4));
+				}
+				if (k != 0) {
+					Emulator.getEventQueue().keyPress(k);
+					Emulator.getEventQueue().keyRelease(k);
+				}
+			} catch (Exception ignored) {
+			}
 		}
 	}
 }

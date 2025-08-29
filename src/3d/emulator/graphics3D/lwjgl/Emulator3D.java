@@ -215,7 +215,7 @@ public final class Emulator3D implements IGraphics3D {
 		if (capabilities == null) {
 			capabilities = GL.createCapabilities();
 //			GLConfiguration.OES_draw_texture = false;
-			GLConfiguration.OES_matrix_pallete = capabilities.GL_ARB_matrix_palette;
+//			GLConfiguration.OES_matrix_pallete = capabilities.GL_ARB_matrix_palette;
 //			GLConfiguration.OES_texture_cube_map = capabilities.GL_ARB_texture_cube_map;
 			GLConfiguration.OES_blend_subtract = capabilities.OpenGL14 /*|| capabilities.GL_EXT_blend_subtract*/;
 			GLConfiguration.OES_blend_func_separate = capabilities.OpenGL14 /*|| capabilities.GL_EXT_blend_func_separate*/;
@@ -1369,7 +1369,7 @@ public final class Emulator3D implements IGraphics3D {
 				window = 0;
 			}
 			if (exiting) return;
-			int mode = Settings.m3gContextMode == 0 && Emulator.win ? 2 : Settings.m3gContextMode;
+			int mode = Settings.m3gContextMode == 0 && (Emulator.win || Emulator.termux) ? 2 : Settings.m3gContextMode;
 			if (!forceWindow && Settings.m3gContextMode != 3 && Emulator.getEmulator() instanceof SWTFrontend) {
 				try {
 					SWTFrontend.syncExec(() -> {
@@ -1389,25 +1389,27 @@ public final class Emulator3D implements IGraphics3D {
 				}
 			}
 
-			try {
-				GLCanvasUtil.makeCurrent(glCanvas);
-				getCapabilities();
+			if (glCanvas != null) {
+				try {
+					GLCanvasUtil.makeCurrent(glCanvas);
+					getCapabilities();
 
-				glCanvas.getDisplay().syncExec(() -> glCanvas.addControlListener(new ControlListener() {
-					public void controlMoved(ControlEvent controlEvent) {
-					}
+					glCanvas.getDisplay().syncExec(() -> glCanvas.addControlListener(new ControlListener() {
+						public void controlMoved(ControlEvent controlEvent) {
+						}
 
-					public void controlResized(ControlEvent controlEvent) {
-						if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
-						glCanvas.setSize(targetWidth, targetHeight);
-						glCanvas.setVisible(false);
+						public void controlResized(ControlEvent controlEvent) {
+							if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
+							glCanvas.setSize(targetWidth, targetHeight);
+							glCanvas.setVisible(false);
+						}
+					}));
+				} catch (Exception e) {
+					e.printStackTrace();
+					if (glCanvas != null) {
+						disposeGlCanvas();
+						glCanvas = null;
 					}
-				}));
-			} catch (Exception e) {
-				e.printStackTrace();
-				if (glCanvas != null) {
-					disposeGlCanvas();
-					glCanvas = null;
 				}
 			}
 			if (glCanvas == null) {

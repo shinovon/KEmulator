@@ -124,6 +124,11 @@
 -keep class emulator.graphics3D.** { public protected *; }
 -keep class emulator.graphics3D.IGraphics3D { *; }
 
+# Build system
+-keep class emulator.ui.swt.devutils.ClasspathEntry { *; }
+-keep class emulator.ui.swt.devutils.ClasspathEntryType { *; }
+-keep class emulator.ui.swt.devutils.idea.ProjectConfigGenerator  { *; }
+-keep class emulator.ui.swt.devutils.idea.ProjectGenerator { *; }
 
 # Keep - Applications. Keep all application classes, along with their 'main' methods.
 -keepclasseswithmembers public class * {

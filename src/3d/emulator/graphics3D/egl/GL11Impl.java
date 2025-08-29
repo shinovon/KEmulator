@@ -13,6 +13,45 @@ import java.nio.*;
  * GL11
  */
 public final class GL11Impl extends GL10Impl implements javax.microedition.khronos.opengles.GL11, GL11Ext, GL11ExtensionPack {
+	private static final int OES_MATRIX_PALETTE = 34880;
+	private static final int OES_MATRIX_INDEX_ARRAY = 34884;
+	private static final int OES_WEIGHT_ARRAY = 34477;
+
+	private boolean oesMatrixPaletteEnabled = false;
+	private boolean oesMatrixIndexArrayEnabled = false;
+	private boolean oesWeightArrayEnabled = false;
+
+	private Buffer oesMatrixIndexBuffer = null;
+	private int oesMatrixIndexSize;
+	private int oesMatrixIndexType;
+	private int oesMatrixIndexStride;
+	private int oesMatrixIndexOffset;
+	private boolean oesMatrixIndexIsOffset = false;
+
+	private Buffer oesWeightBuffer;
+	private int oesWeightSize;
+	private int oesWeightType;
+	private int oesWeightStride;
+	private int oesWeightOffset;
+	private boolean oesWeightIsOffset;
+
+	private final float[][] paletteMatrices = new float[32][16];
+	private int currentPaletteMatrix = 0;
+
+	protected int vertexSize;
+	protected int vertexType;
+	protected int vertexStride;
+	protected int vertexOffset;
+	protected boolean vertexIsOffset;
+	protected FloatBuffer vertexBuffer;
+
+	protected boolean normalArrayEnabled;
+	protected int normalType;
+	protected int normalStride;
+	protected Buffer normalBuffer;
+	protected boolean normalIsOffset;
+	protected int normalOffset;
+
 	public final synchronized boolean glIsBuffer(final int n) {
 		EGL10Impl.g3d.sync(() -> temp = GL15.glIsBuffer(n));
 		return (boolean) temp;
@@ -104,20 +143,52 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		EGL10Impl.g3d.sync(() -> GL11.glColorPointer(n, n2, n3, (long) n4));
 	}
 
-	public final synchronized void glNormalPointer(final int n, final int n2, final int n3) {
-		EGL10Impl.g3d.sync(() -> GL11.glNormalPointer(n, n2, (long) n3));
+	public final synchronized void glNormalPointer(final int type, final int stride, final Buffer pointer) {
+		this.normalType = type;
+		this.normalStride = stride;
+		this.normalBuffer = pointer;
+		this.normalIsOffset = false;
+		EGL10Impl.g3d.async(() -> GL11.glNormalPointer(type, stride, MemoryUtil.memAddress(pointer)));
+	}
+
+	public final synchronized void glNormalPointer(final int type, final int stride, final int offset) {
+		this.normalType = type;
+		this.normalStride = stride;
+		this.normalOffset = offset;
+		this.normalIsOffset = true;
+		this.normalBuffer = null; // VBO-backed
+		EGL10Impl.g3d.async(() -> GL11.glNormalPointer(type, stride, offset));
 	}
 
 	public final synchronized void glTexCoordPointer(final int n, final int n2, final int n3, final int n4) {
 		EGL10Impl.g3d.sync(() -> GL11.glTexCoordPointer(n, n2, n3, (long) n4));
 	}
 
-	public final synchronized void glVertexPointer(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.sync(() -> GL11.glVertexPointer(n, n2, n3, (long) n4));
+	// Override glVertexPointer to capture client-side vertex array state for software skinning
+	public synchronized void glVertexPointer(final int size, final int type, final int stride, final Buffer pointer) {
+		// store only client-side float arrays for now
+		this.vertexSize = size;
+		this.vertexType = type;
+		this.vertexStride = stride;
+		this.vertexIsOffset = false;
+		if (pointer instanceof FloatBuffer) {
+			this.vertexBuffer = ((FloatBuffer) pointer);
+		} else {
+			// unsupported client-side type for skinning; null out so we fall back to GL
+			this.vertexBuffer = null;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glVertexPointer(size, type, stride, MemoryUtil.memAddress(pointer)));
 	}
 
-	public final synchronized void glDrawElements(final int n, final int n2, final int n3, final int n4) {
-		EGL10Impl.g3d.sync(() -> GL11.glDrawElements(n, n2, n3, (long) n4));
+	public synchronized void glVertexPointer(final int size, final int type, final int stride, final int pointerOffset) {
+		// VBO-backed vertex pointer; we mark as offset (unsupported for software path unless we read back)
+		this.vertexSize = size;
+		this.vertexType = type;
+		this.vertexStride = stride;
+		this.vertexOffset = pointerOffset;
+		this.vertexIsOffset = true;
+		this.vertexBuffer = null;
+		EGL10Impl.g3d.async(() -> GL11.glVertexPointer(size, type, stride, pointerOffset));
 	}
 
 	public final synchronized void glClipPlanef(final int n, final float[] array, final int n2) {
@@ -446,42 +517,68 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glCurrentPaletteMatrixARB(n));
+		if (n >= 0 && n < paletteMatrices.length) {
+			this.currentPaletteMatrix = n;
+		}
 	}
 
 	public final synchronized void glLoadPaletteFromModelViewMatrixOES() {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
+		final FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+		EGL10Impl.g3d.sync(() -> GL11.glGetFloatv(GL11.GL_MODELVIEW_MATRIX, fb));
+
+		fb.position(0);
+		fb.get(paletteMatrices[currentPaletteMatrix]);
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glMatrixIndexPointerARB(n, n2, n3, MemoryUtil.memAddress(buffer)));
+		this.oesMatrixIndexBuffer = buffer;
+		this.oesMatrixIndexSize = n;
+		this.oesMatrixIndexType = n2;
+		this.oesMatrixIndexStride = n3;
+		this.oesMatrixIndexIsOffset = false;
 	}
 
 	public final synchronized void glMatrixIndexPointerOES(final int n, final int n2, final int n3, final int n4) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBMatrixPalette.glMatrixIndexPointerARB(n, n2, n3, (long) n4));
+		this.oesMatrixIndexBuffer = null;
+		this.oesMatrixIndexSize = n;
+		this.oesMatrixIndexType = n2;
+		this.oesMatrixIndexStride = n3;
+		this.oesMatrixIndexOffset = n4;
+		this.oesMatrixIndexIsOffset = true;
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final Buffer buffer) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBVertexBlend.glWeightPointerARB(n, n2, n3, MemoryUtil.memAddress(buffer)));
+		this.oesWeightBuffer = buffer;
+		this.oesWeightSize = n;
+		this.oesWeightType = n2;
+		this.oesWeightStride = n3;
+		this.oesWeightIsOffset = false;
 	}
 
 	public final synchronized void glWeightPointerOES(final int n, final int n2, final int n3, final int n4) {
 		if (!GLConfiguration.OES_matrix_pallete) {
 			throw new UnsupportedOperationException("OES_matrix_palette extension not available");
 		}
-		EGL10Impl.g3d.sync(() -> ARBVertexBlend.glWeightPointerARB(n, n2, n3, (long) n4));
+		this.oesWeightBuffer = null;
+		this.oesWeightSize = n;
+		this.oesWeightType = n2;
+		this.oesWeightStride = n3;
+		this.oesWeightOffset = n4;
+		this.oesWeightIsOffset = true;
 	}
+
 
 	private static void checkTextureCubeMapExt() {
 		if (!GLConfiguration.OES_texture_cube_map) {
@@ -769,6 +866,361 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public final synchronized void glPointSizePointerOES(final int n, final int n2, final int n3) {
 		System.out.println("OES is not implemented.");
+	}
+
+	private static void readIndices(final Buffer buf, final int vertexIndex, final int indexSize, final int strideBytes, final int type, final int[] out) {
+		if (buf == null) return;
+
+		if (type == GL11.GL_UNSIGNED_BYTE) {
+			ByteBuffer bb = (ByteBuffer) buf;
+			final int stride = (strideBytes == 0) ? indexSize : strideBytes;
+			final int pos = vertexIndex * stride;
+			for (int i = 0; i < indexSize; i++) {
+				out[i] = bb.get(pos + i) & 0xFF;
+			}
+		} else if (type == GL11.GL_UNSIGNED_SHORT) {
+			ShortBuffer sb = (ShortBuffer) buf;
+			final int strideElems = (strideBytes == 0) ? indexSize : (strideBytes / 2);
+			final int pos = vertexIndex * strideElems;
+			for (int i = 0; i < indexSize; i++) {
+				out[i] = sb.get(pos + i) & 0xFFFF;
+			}
+		}
+	}
+
+	private static void readWeights(final Buffer buf, final int vertexIndex, final int weightSize, final int strideBytes, final int type, final float[] out) {
+		if (buf == null) return;
+
+		if (type == GL11.GL_FLOAT) {
+			FloatBuffer fb = (FloatBuffer) buf;
+			final int strideElems = (strideBytes == 0) ? weightSize : (strideBytes / 4);
+			final int pos = vertexIndex * strideElems;
+			for (int i = 0; i < weightSize; i++) {
+				out[i] = fb.get(pos + i);
+			}
+		}
+	}
+
+	private static void mulMat4Vec4(final float[] m, final float[] v, final float[] out) {
+		for (int row = 0; row < 4; row++) {
+			out[row] = m[row] * v[0] + m[4 + row] * v[1] + m[8 + row] * v[2] + m[12 + row] * v[3];
+		}
+	}
+
+	private static void mulMat3Vec3(final float[] m, final float[] v, final float[] out) {
+		out[0] = m[0] * v[0] + m[4] * v[1] + m[8] * v[2];
+		out[1] = m[1] * v[0] + m[5] * v[1] + m[9] * v[2];
+		out[2] = m[2] * v[0] + m[6] * v[1] + m[10] * v[2];
+	}
+
+	private static void normalizeVec3(final float[] v) {
+		float len = (float) Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+		if (len != 0.0f) {
+			v[0] /= len;
+			v[1] /= len;
+			v[2] /= len;
+		}
+	}
+
+	private boolean trySoftwareSkinAndDrawArrays(final int mode, final int first, final int count) {
+		if (!this.oesMatrixPaletteEnabled || !this.oesMatrixIndexArrayEnabled || !this.oesWeightArrayEnabled) return false;
+		if (this.vertexBuffer == null) return false;
+		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset || (normalArrayEnabled && normalIsOffset)) {
+			return false;
+		}
+
+		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT || (normalArrayEnabled && this.normalType != GL11.GL_FLOAT)) return false;
+		if (this.oesMatrixIndexType != GL11.GL_UNSIGNED_BYTE && this.oesMatrixIndexType != GL11.GL_UNSIGNED_SHORT) return false;
+
+		final int vSize = this.vertexSize;
+		final FloatBuffer srcV = this.vertexBuffer;
+		final FloatBuffer skinnedVerts = BufferUtils.createFloatBuffer(count * vSize);
+
+		// Handle normals
+		final FloatBuffer srcN = normalArrayEnabled ? (FloatBuffer) this.normalBuffer : null;
+		final FloatBuffer skinnedNormals = normalArrayEnabled ? BufferUtils.createFloatBuffer(count * 3) : null;
+		final float[] origN = normalArrayEnabled ? new float[3] : null;
+		final float[] tmpN = normalArrayEnabled ? new float[3] : null;
+		final float[] accumN = normalArrayEnabled ? new float[3] : null;
+
+
+		final int[] indices = new int[this.oesMatrixIndexSize];
+		final float[] weights = new float[this.oesWeightSize];
+		final float[] origV = new float[4];
+		final float[] tmpV = new float[4];
+		final float[] accumV = new float[4];
+
+		for (int vi = 0; vi < count; vi++) {
+			final int vertIndex = first + vi;
+
+			accumV[0] = 0f; accumV[1] = 0f; accumV[2] = 0f; accumV[3] = 0f;
+			origV[0] = 0f; origV[1] = 0f; origV[2] = 0f; origV[3] = 1f;
+
+			// Read original vertex position
+			final int floatsPerVertex = (this.vertexStride == 0) ? vSize : (this.vertexStride / 4);
+			final int vPos = vertIndex * floatsPerVertex;
+			for (int a = 0; a < vSize; a++) origV[a] = srcV.get(vPos + a);
+
+			// Read original normal if enabled
+			if (normalArrayEnabled) {
+				accumN[0] = 0f; accumN[1] = 0f; accumN[2] = 0f;
+				final int floatsPerNormal = (this.normalStride == 0) ? 3 : (this.normalStride / 4);
+				final int nPos = vertIndex * floatsPerNormal;
+				for (int a = 0; a < 3; a++) origN[a] = srcN.get(nPos + a);
+			}
+
+			readIndices(this.oesMatrixIndexBuffer, vertIndex, this.oesMatrixIndexSize, this.oesMatrixIndexStride, this.oesMatrixIndexType, indices);
+			readWeights(this.oesWeightBuffer, vertIndex, this.oesWeightSize, this.oesWeightStride, this.oesWeightType, weights);
+
+			for (int k = 0; k < this.oesWeightSize; k++) {
+				final int mi = indices[k];
+				if (mi < 0 || mi >= paletteMatrices.length) continue;
+				final float[] matrix = paletteMatrices[mi];
+				final float w = weights[k];
+
+				// Accumulate vertex position
+				mulMat4Vec4(matrix, origV, tmpV);
+				accumV[0] += tmpV[0] * w;
+				accumV[1] += tmpV[1] * w;
+				accumV[2] += tmpV[2] * w;
+				accumV[3] += tmpV[3] * w;
+
+				// Accumulate normal
+				if (normalArrayEnabled) {
+					mulMat3Vec3(matrix, origN, tmpN);
+					accumN[0] += tmpN[0] * w;
+					accumN[1] += tmpN[1] * w;
+					accumN[2] += tmpN[2] * w;
+				}
+			}
+
+			// Write skinned vertex
+			for (int a = 0; a < vSize; a++) skinnedVerts.put(accumV[a]);
+
+			// Write skinned normal
+			if (normalArrayEnabled) {
+				normalizeVec3(accumN);
+				skinnedNormals.put(accumN);
+			}
+		}
+		skinnedVerts.position(0);
+		if (skinnedNormals != null) skinnedNormals.position(0);
+
+		EGL10Impl.g3d.sync(() -> {
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPushMatrix();
+			GL11.glLoadIdentity();
+
+			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinnedVerts);
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(GL11.GL_FLOAT, 0, skinnedNormals);
+			}
+
+			GL11.glDrawArrays(mode, 0, count);
+
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPopMatrix();
+
+			// Restore original pointers
+			if (this.vertexIsOffset) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexOffset);
+			} else if (this.vertexBuffer != null) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexBuffer);
+			}
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(this.normalType, this.normalStride, MemoryUtil.memAddress(this.normalBuffer));
+			}
+		});
+
+		return true;
+	}
+
+	private boolean trySoftwareSkinAndDrawElements(final int mode, final int count, final int type, final Buffer indicesBuffer) {
+		if (!this.oesMatrixPaletteEnabled || !this.oesMatrixIndexArrayEnabled || !this.oesWeightArrayEnabled) return false;
+		if (this.vertexBuffer == null) return false;
+		if (this.oesMatrixIndexIsOffset || this.oesWeightIsOffset || this.vertexIsOffset || (normalArrayEnabled && normalIsOffset)) {
+			return false;
+		}
+
+		if (this.vertexType != GL11.GL_FLOAT || this.oesWeightType != GL11.GL_FLOAT || (normalArrayEnabled && this.normalType != GL11.GL_FLOAT)) return false;
+		if (this.oesMatrixIndexType != GL11.GL_UNSIGNED_BYTE && this.oesMatrixIndexType != GL11.GL_UNSIGNED_SHORT) return false;
+		if (type != GL11.GL_UNSIGNED_BYTE && type != GL11.GL_UNSIGNED_SHORT) return false;
+
+		final int vSize = this.vertexSize;
+		final FloatBuffer srcV = (FloatBuffer) this.vertexBuffer;
+		final FloatBuffer skinnedVerts = BufferUtils.createFloatBuffer(count * vSize);
+
+		final FloatBuffer srcN = normalArrayEnabled ? (FloatBuffer) this.normalBuffer : null;
+		final FloatBuffer skinnedNormals = normalArrayEnabled ? BufferUtils.createFloatBuffer(count * 3) : null;
+		final float[] origN = normalArrayEnabled ? new float[3] : null;
+		final float[] tmpN = normalArrayEnabled ? new float[3] : null;
+		final float[] accumN = normalArrayEnabled ? new float[3] : null;
+
+		final int[] indices = new int[this.oesMatrixIndexSize];
+		final float[] weights = new float[this.oesWeightSize];
+		final float[] origV = new float[4];
+		final float[] tmpV = new float[4];
+		final float[] accumV = new float[4];
+
+		indicesBuffer.position(0);
+
+		for (int ei = 0; ei < count; ei++) {
+			int vertexIndex;
+			if (type == GL11.GL_UNSIGNED_SHORT) {
+				vertexIndex = ((ShortBuffer)indicesBuffer).get(ei) & 0xFFFF;
+			} else { // GL_UNSIGNED_BYTE
+				vertexIndex = ((ByteBuffer)indicesBuffer).get(ei) & 0xFF;
+			}
+
+			accumV[0] = 0f; accumV[1] = 0f; accumV[2] = 0f; accumV[3] = 0f;
+			origV[0] = 0f; origV[1] = 0f; origV[2] = 0f; origV[3] = 1f;
+
+			final int floatsPerVertex = (this.vertexStride == 0) ? vSize : (this.vertexStride / 4);
+			final int vPos = vertexIndex * floatsPerVertex;
+			for (int a = 0; a < vSize; a++) origV[a] = srcV.get(vPos + a);
+
+			if (normalArrayEnabled) {
+				accumN[0] = 0f; accumN[1] = 0f; accumN[2] = 0f;
+				final int floatsPerNormal = (this.normalStride == 0) ? 3 : (this.normalStride / 4);
+				final int nPos = vertexIndex * floatsPerNormal;
+				for (int a = 0; a < 3; a++) origN[a] = srcN.get(nPos + a);
+			}
+
+			readIndices(this.oesMatrixIndexBuffer, vertexIndex, this.oesMatrixIndexSize, this.oesMatrixIndexStride, this.oesMatrixIndexType, indices);
+			readWeights(this.oesWeightBuffer, vertexIndex, this.oesWeightSize, this.oesWeightStride, this.oesWeightType, weights);
+
+			for (int k = 0; k < this.oesWeightSize; k++) {
+				final int mi = indices[k];
+				if (mi < 0 || mi >= paletteMatrices.length) continue;
+				final float[] matrix = paletteMatrices[mi];
+				final float w = weights[k];
+
+				// Accumulate vertex position
+				mulMat4Vec4(matrix, origV, tmpV);
+				accumV[0] += tmpV[0] * w;
+				accumV[1] += tmpV[1] * w;
+				accumV[2] += tmpV[2] * w;
+				accumV[3] += tmpV[3] * w;
+
+				// Accumulate normal (transformed by 3x3 rotation part of matrix)
+				if (normalArrayEnabled) {
+					mulMat3Vec3(matrix, origN, tmpN);
+					accumN[0] += tmpN[0] * w;
+					accumN[1] += tmpN[1] * w;
+					accumN[2] += tmpN[2] * w;
+				}
+			}
+
+			for (int a = 0; a < vSize; a++) skinnedVerts.put(accumV[a]);
+
+			if (normalArrayEnabled) {
+				normalizeVec3(accumN);
+				skinnedNormals.put(accumN);
+			}
+		}
+
+		skinnedVerts.position(0);
+		if (skinnedNormals != null) skinnedNormals.position(0);
+
+		EGL10Impl.g3d.sync(() -> {
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPushMatrix();
+
+			GL11.glLoadIdentity();
+
+			GL11.glVertexPointer(this.vertexSize, GL11.GL_FLOAT, 0, skinnedVerts);
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(GL11.GL_FLOAT, 0, skinnedNormals);
+			}
+
+			GL11.glDrawArrays(mode, 0, count);
+
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glPopMatrix();
+
+			if (this.vertexIsOffset) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexOffset);
+			} else if (this.vertexBuffer != null) {
+				GL11.glVertexPointer(this.vertexSize, this.vertexType, this.vertexStride, this.vertexBuffer);
+			}
+			if (normalArrayEnabled) {
+				GL11.glNormalPointer(this.normalType, this.normalStride, MemoryUtil.memAddress(this.normalBuffer));
+			}
+		});
+
+		return true;
+	}
+
+	public synchronized void glDrawArrays(final int mode, final int first, final int count) {
+		if (!trySoftwareSkinAndDrawArrays(mode, first, count)) {
+			EGL10Impl.g3d.async(() -> GL11.glDrawArrays(mode, first, count));
+		}
+	}
+
+	public synchronized void glDrawElements(final int mode, final int count, final int type, final Buffer indices) {
+		if (!trySoftwareSkinAndDrawElements(mode, count, type, indices)) {
+			EGL10Impl.g3d.async(() -> GL11.glDrawElements(mode, count, type, MemoryUtil.memAddress(indices)));
+		}
+	}
+
+	public synchronized void glDrawElements(final int mode, final int count, final int type, final int indicesOffset) {
+		EGL10Impl.g3d.async(() -> GL11.glDrawElements(mode, count, type, indicesOffset));
+	}
+
+	public synchronized void glDisable(final int n) {
+		if (n == OES_MATRIX_PALETTE) {
+			this.oesMatrixPaletteEnabled = false;
+			return;
+		}
+		if (n == 2896) { // GL_LIGHTING
+			GL10Impl.aBoolean1355 = true;
+		} else if (n == 2912) { // GL_FOG
+			GL10Impl.aBoolean1358 = true;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glDisable(n));
+	}
+
+	public synchronized void glDisableClientState(final int n) {
+		if (n == OES_MATRIX_INDEX_ARRAY) {
+			this.oesMatrixIndexArrayEnabled = false;
+			return;
+		}
+		if (n == OES_WEIGHT_ARRAY) {
+			this.oesWeightArrayEnabled = false;
+			return;
+		}
+		if (n == GL11.GL_NORMAL_ARRAY) {
+			this.normalArrayEnabled = false;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glDisableClientState(n));
+	}
+
+	public synchronized void glEnable(final int n) {
+		if (n == OES_MATRIX_PALETTE) {
+			this.oesMatrixPaletteEnabled = true;
+			return;
+		}
+		if (n == 2896) { // GL_LIGHTING
+			GL10Impl.aBoolean1355 = true;
+		} else if (n == 2912) { // GL_FOG
+			GL10Impl.aBoolean1358 = true;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glEnable(n));
+	}
+
+	public synchronized void glEnableClientState(final int n) {
+		if (n == OES_MATRIX_INDEX_ARRAY) {
+			this.oesMatrixIndexArrayEnabled = true;
+			return;
+		}
+		if (n == OES_WEIGHT_ARRAY) {
+			this.oesWeightArrayEnabled = true;
+			return;
+		}
+		if (n == GL11.GL_NORMAL_ARRAY) {
+			this.normalArrayEnabled = true;
+		}
+		EGL10Impl.g3d.async(() -> GL11.glEnableClientState(n));
 	}
 
 	public GL11Impl(final EGLContext eglContext) {

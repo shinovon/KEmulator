@@ -68,7 +68,9 @@ public final class EventQueue implements Runnable {
 							alive = false;
 						} else if ((System.currentTimeMillis() - time) > 5000) {
 							time = System.currentTimeMillis();
-							Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
+							if (!Settings.uei) {
+								Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
+							}
 						}
 						Displayable._fpsLimiter(false);
 						sleep(1000);
@@ -463,6 +465,13 @@ public final class EventQueue implements Runnable {
 			eventArguments.add(run);
 		}
 		queue(EVENT_CALL);
+	}
+
+	public void waitRepaint() throws InterruptedException {
+		if (Thread.currentThread() == eventThread) return;
+		while (repaintPending) {
+			Thread.sleep(1);
+		}
 	}
 
 	private void internalRepaint(int x, int y, int w, int h) {

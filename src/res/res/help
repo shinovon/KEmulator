@@ -43,6 +43,29 @@ log.txt      log file
 
 ==================
 $[Changelog]
+$v2.20 [2025.08.24]
+DoJa initial support
+Reworked Memory View
+Moved sounds to Media View
+New amr decoder
+Font.FACE_MONOSPACE support
+Fixed TriangleStrippArray.getIndices()
+Fixed Graphics3d.addLight()
+Fixed blend color not appearing in M3G View
+Added OES_matrix_pallete emulation in JSR-239
+Added compressed texture formats conversion in JSR-239
+Fixed Canvas.hideNotify not calling when switching screens
+Fixed pointer events lag
+Fixed random softlock related to CaretImpl
+Fixed softkeys handling in TextBox
+Fixed controller events when game is not loaded
+Improved Graphics.drawRGB performance
+Fixed resource: connection not throwing IOException on missing files
+Fixed mouse wheel scroll to key mapping
+Fixed resource loading with mixed case names
+Fixed nnx64 starter scripts
+Fixed lcdui.List selection in MULTIPLE mode
+
 $v2.19.2 [2025.04.24]
 StringItem layout improvements
 Fixed FileConnection filter

@@ -59,6 +59,12 @@ public class Alert extends Screen {
 
 	protected void _shown() {
 		super._shown();
+		try {
+			Emulator.getEventQueue().waitRepaint();
+			repaintScreen();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		timeShown = System.currentTimeMillis();
 	}
 
