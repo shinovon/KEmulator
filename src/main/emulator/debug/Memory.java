@@ -451,10 +451,11 @@ public final class Memory {
 
 		res += 12;
 
-		if (cls == String.class) {
-			res += 2 + ((String) o).length();
-			return res;
-		}
+		// TODO investigate
+//		if (cls == String.class) {
+//			res += 2 + ((String) o).length();
+//			return res;
+//		}
 
 		if (cls == Image.class) {
 			final Image image = (Image) o;
@@ -491,7 +492,7 @@ public final class Memory {
 		} else if (clazz == ((Memory._F != null) ? Memory._F : (Memory._F = cls("[F")))) {
 			n = 16 + 4 * Array.getLength(o);
 		} else if (clazz == ((Memory._C != null) ? Memory._C : (Memory._C = cls("[C")))) {
-			n = 16 + 1 * Array.getLength(o);
+			n = 16 + 2 * Array.getLength(o);
 		} else {
 			boolean isArrayOfObjs = ClassTypes.isObject(clazz.getComponentType());
 			if (o instanceof Object[]) {
