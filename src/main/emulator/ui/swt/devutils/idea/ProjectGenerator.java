@@ -1,5 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
+import emulator.Utils;
 import emulator.ui.swt.devutils.ClasspathEntry;
 import emulator.ui.swt.devutils.ClasspathEntryType;
 import emulator.ui.swt.devutils.DevtimeMIDlet;
@@ -92,7 +93,7 @@ public class ProjectGenerator {
 				ClasspathEntry[] classpath = ClasspathEntry.readFromIml(imlPath);
 				ArrayList<String> exportedLibs = new ArrayList<>();
 				for (ClasspathEntry entry : classpath) {
-					if(entry.type == ClasspathEntryType.ExportedLibrary){
+					if (entry.type == ClasspathEntryType.ExportedLibrary) {
 						exportedLibs.add(entry.localPath);
 					}
 				}
@@ -255,6 +256,19 @@ public class ProjectGenerator {
 		} catch (Exception ignored) {
 		}
 		return null;
+	}
+
+	public static String readManifestFromNetbeans(Path projPropsPath) throws IOException {
+		List<String> lines = Files.readAllLines(projPropsPath);
+		Hashtable<String, String> manifestProps = new Hashtable<>();
+		for (String line : lines) {
+			if (!line.startsWith("manifest.")) {
+				continue;
+			}
+			String[] split = line.split("=", 2);
+			manifestProps.put(split[0].substring("manifest.".length()), Utils.translateEscapes(split[1]));
+		}
+		return "Manifest-Version: 1.0\n" + manifestProps.get("midlets") + manifestProps.get("apipermissions") + manifestProps.get("others") + manifestProps.get("manifest");
 	}
 
 	//#endregion
