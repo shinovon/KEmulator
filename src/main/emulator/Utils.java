@@ -12,7 +12,7 @@ public class Utils {
 			int from = 0;
 			int to = 0;
 
-			while(from < length) {
+			while (from < length) {
 				char ch = chars[from++];
 				if (ch == '\\') {
 					ch = from < length ? chars[from++] : 0;
@@ -39,7 +39,7 @@ public class Utils {
 							int limit = Integer.min(from + (ch <= '3' ? 2 : 1), length);
 
 							int code;
-							for(code = ch - 48; from < limit; code = code << 3 | ch - 48) {
+							for (code = ch - 48; from < limit; code = code << 3 | ch - 48) {
 								ch = chars[from];
 								if (ch < '0' || '7' < ch) {
 									break;
@@ -48,7 +48,7 @@ public class Utils {
 								++from;
 							}
 
-							ch = (char)code;
+							ch = (char) code;
 							break;
 						case 'b':
 							ch = '\b';
@@ -81,5 +81,29 @@ public class Utils {
 
 			return new String(chars, 0, to);
 		}
+	}
+
+	public static boolean isPathAbsolute(String path) {
+		// posix
+		if (path.isEmpty())
+			return false;
+		if (path.charAt(0) == '/')
+			return true;
+		// win nt: UNC
+		if (path.length() <= 2)
+			return false;
+		if (path.charAt(0) == '\\' && path.charAt(1) == '\\')
+			return true;
+		// win nt: local drive
+		if (path.length() <= 3)
+			return false;
+		if (path.charAt(1) == ':') {
+			if (path.charAt(2) == '/' || path.charAt(2) == '\\') {
+				char letter = Character.toUpperCase(path.charAt(0));
+				return letter >= 'A' && letter <= 'Z';
+			}
+		}
+
+		return false;
 	}
 }
