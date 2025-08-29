@@ -34,7 +34,7 @@ public class StringItem extends Item {
 	}
 
 	public void setText(final String aString25) {
-		this.text = text == null ? "" : aString25;
+		this.text = aString25 == null ? "" : aString25;
 		layoutForm();
 	}
 
