@@ -24,7 +24,7 @@ public class StringItem extends Item {
 		if (mode < 0 || mode > 2) {
 			throw new IllegalArgumentException();
 		}
-		this.text = text;
+		setText(s);
 		this.mode = mode;
 		this.font = null;
 	}
@@ -34,7 +34,7 @@ public class StringItem extends Item {
 	}
 
 	public void setText(final String aString25) {
-		this.text = aString25;
+		this.text = text == null ? "" : aString25;
 		layoutForm();
 	}
 
@@ -153,6 +153,7 @@ public class StringItem extends Item {
 			labelArr = null;
 		}
 		String s = text;
+		if (s == null) s = "";
 		if (s.startsWith("\n")) s = s.substring(1);
 		if (s.endsWith("\n") && !_hasLayout(Item.LAYOUT_NEWLINE_AFTER)) {
 			s = s.substring(0, s.length() - 1);
