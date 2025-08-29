@@ -1,5 +1,6 @@
 package emulator.debug;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -16,7 +17,7 @@ public class ReferencePath {
 	 */
 	public final boolean isRootStatic;
 
-	private final Vector<ReferencePathEntry> path = new Vector<>();
+	private final ArrayList<ReferencePathEntry> path = new ArrayList<>();
 
 	public ReferencePath(String root, boolean isRootStatic) {
 		this.root = root;
