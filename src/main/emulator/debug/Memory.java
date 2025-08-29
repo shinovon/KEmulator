@@ -163,16 +163,17 @@ public final class Memory {
 		if (o != null) {
 			IdentityWrapper ow = new IdentityWrapper(o);
 			if (instances.contains(ow)) {
-				for (ObjInstance obj : classInfo.objs) {
-					if (obj.value == o) {
-						obj.paths.add(path);
-					}
+				ObjInstance foundInst = classInfo.objsMap.get(o);
+				if (foundInst != null) {
+					foundInst.paths.add(path);
 				}
 				return;
 			}
 
 			++classInfo.instancesCount;
-			classInfo.objs.add(new ObjInstance(this, classInfo, path, o));
+			ObjInstance inst = new ObjInstance(this, classInfo, path, o);
+			classInfo.objs.add(inst);
+			classInfo.objsMap.put(o, inst);
 			instances.add(ow);
 			try {
 				if (o instanceof Image) {
