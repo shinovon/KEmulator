@@ -501,7 +501,8 @@ public final class Memory {
 				for (int i = oo.length - 1; i >= 0; --i) {
 					final Object value = oo[i];
 					if (value != null && !isArrayOfObjs) {
-						n += this.size(value.getClass(), fields, value);
+						Class cls = value.getClass();
+						n += this.size(cls, fields(cls), value);
 					} else if (value != null && value.getClass().isArray()) {
 						n += 16;
 					} else {
@@ -512,7 +513,8 @@ public final class Memory {
 				for (int i = Array.getLength(o) - 1; i >= 0; --i) {
 					final Object value;
 					if ((value = Array.get(o, i)) != null && !isArrayOfObjs) {
-						n += this.size(value.getClass(), fields, value);
+						Class cls = value.getClass();
+						n += this.size(cls, fields(cls), value);
 					} else if (value != null && value.getClass().isArray()) {
 						n += 16;
 					} else {
