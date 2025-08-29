@@ -3,9 +3,9 @@ package emulator.ui.swt.devutils.idea;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.ui.swt.devutils.ClasspathEntry;
+import emulator.ui.swt.devutils.ClasspathEntryType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -72,7 +72,7 @@ public class ProjectConfigGenerator {
 			"/dataSources/\n" +
 			"/dataSources.local.xml\n";
 
-	public static String buildLocalProguardConfig(String dir, String name, String[] libs) {
+	public static String buildLocalProguardConfig(String dir, String name, ClasspathEntry[] classpath) {
 		StringBuilder sb = new StringBuilder();
 		for (String l : JdkTablePatcher.getDevTimeJars()) {
 			sb.append("-libraryjars '");
@@ -80,10 +80,29 @@ public class ProjectConfigGenerator {
 			sb.append("'");
 			sb.append(System.lineSeparator());
 		}
+		for (ClasspathEntry c : classpath) {
+			if (c.type != ClasspathEntryType.HeaderLibrary)
+				continue;
+			sb.append("-libraryjars '");
+			if (c.isLocalPath)
+				sb.append(Paths.get(dir).resolve(c.path));
+			else
+				sb.append(c.path);
+			sb.append("'");
+			sb.append(System.lineSeparator());
+		}
+
 		sb.append("-injars '").append(Paths.get(dir, "deployed", "raw", name + ".jar")).append("'");
 		sb.append(System.lineSeparator());
-		for (int i = 0; i < libs.length; i++) {
-			sb.append("-injars '").append(Paths.get(dir, libs[i])).append("'");
+		for (ClasspathEntry c : classpath) {
+			if (c.type != ClasspathEntryType.ExportedLibrary)
+				continue;
+			sb.append("-injars '");
+			if (c.isLocalPath)
+				sb.append(Paths.get(dir).resolve(c.path));
+			else
+				sb.append(c.path);
+			sb.append("'");
 			sb.append(System.lineSeparator());
 		}
 		sb.append("-outjars '").append(Paths.get(dir, "deployed", name + ".jar")).append("'");
@@ -265,11 +284,9 @@ public class ProjectConfigGenerator {
 				"</component>";
 	}
 
-	public static String[] generateIML(Path eclipseClasspath, Path imlFile) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+	public static ClasspathEntry[] generateIML(Path eclipseClasspath, Path imlFile) throws ParserConfigurationException, IOException, SAXException, TransformerException {
 		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document doc = builder.newDocument();
-
-		ArrayList<String> libsList = new ArrayList<>();
 
 		Element module = doc.createElement("module");
 		module.setAttribute("type", "JAVA_MODULE");
@@ -297,11 +314,12 @@ public class ProjectConfigGenerator {
 		sourceEntry.setAttribute("forTests", "false");
 		component.appendChild(sourceEntry);
 
+		ClasspathEntry[] existing;
 		if (eclipseClasspath == null) {
 			addSourceFolder(doc, content, "src", false);
 			addSourceFolder(doc, content, "res", true);
+			existing = new ClasspathEntry[0];
 		} else {
-			ClasspathEntry[] existing;
 			if (Files.exists(eclipseClasspath)) {
 				existing = ClasspathEntry.readFromEclipse(eclipseClasspath);
 			} else {
@@ -309,21 +327,21 @@ public class ProjectConfigGenerator {
 				System.out.println("Warning! Classpath file is missing. Default paths were guessed.");
 			}
 			for (ClasspathEntry entry : existing) {
+				if (!entry.isLocalPath)
+					throw new IllegalArgumentException("Non-local paths in classpath are not supported yet. Please restructure your project to not rely on them.");
 				switch (entry.type) {
 					case Source:
 					case LibrarySource:
-						addSourceFolder(doc, content, entry.localPath, false);
+						addSourceFolder(doc, content, entry.path, false);
 						break;
 					case Resource:
-						addSourceFolder(doc, content, entry.localPath, true);
+						addSourceFolder(doc, content, entry.path, true);
 						break;
 					case HeaderLibrary:
-						addLibrary(doc, component, entry.localPath, false);
-						libsList.add(entry.localPath);
+						addLibrary(doc, component, entry.path, false);
 						break;
 					case ExportedLibrary:
-						addLibrary(doc, component, entry.localPath, true);
-						libsList.add(entry.localPath);
+						addLibrary(doc, component, entry.path, true);
 						break;
 				}
 			}
@@ -344,7 +362,7 @@ public class ProjectConfigGenerator {
 		StreamResult result = new StreamResult(imlFile.toFile());
 		transformer.transform(source, result);
 
-		return libsList.toArray(new String[0]);
+		return existing;
 	}
 
 	private static void addSourceFolder(Document doc, Element content, String path, boolean isRes) {

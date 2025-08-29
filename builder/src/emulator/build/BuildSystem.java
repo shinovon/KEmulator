@@ -142,7 +142,7 @@ public class BuildSystem {
 
 			Stream<Path> sourceClasspathStream = Arrays.stream(classpath)
 					.filter(ClasspathEntry::isJar)
-					.map(x -> projectRoot.resolve(x.localPath));
+					.map(x -> x.getAbsolutePath(projectRoot));
 			if (skipMissing) {
 				sourceClasspathStream = sourceClasspathStream.filter(Files::exists);
 			} else {
@@ -155,7 +155,7 @@ public class BuildSystem {
 			}
 			String builtClasspath = String.join(File.pathSeparator, sourceClasspathStream.map(Path::toString).toArray(String[]::new));
 			String builtSourcepath = String.join(File.pathSeparator, Arrays.stream(classpath).filter(ClasspathEntry::isSourceCode).map(e -> {
-				Path folder = projectRoot.resolve(e.localPath).normalize();
+				Path folder = e.getAbsolutePath(projectRoot);
 				if (!Files.exists(folder)) {
 					System.out.println("Source folder " + folder + " does not exist. Pass " + SKIPMISS + " to ignore this.");
 					System.exit(1);
@@ -209,23 +209,24 @@ public class BuildSystem {
 
 		for (ClasspathEntry entry : classpath) {
 			if (entry.type == Resource) {
-				if (!Files.exists(projectRoot.resolve(entry.localPath))) {
+				Path abs = entry.getAbsolutePath(projectRoot);
+				if (!Files.exists(abs)) {
 					if (skipMissing)
 						continue;
-					System.out.println("Resource folder " + projectRoot.resolve(entry.localPath) + " does not exist. Pass " + SKIPMISS + " to ignore this.");
+					System.out.println("Resource folder " + abs + " does not exist. Pass " + SKIPMISS + " to ignore this.");
 					System.exit(1);
 				}
-				System.out.println("Packing resources from " + entry.localPath);
-				run("jar", new ProcessBuilder(jar, "uf", workingJarName, "-C", entry.localPath, "."), true);
+				System.out.println("Packing resources from " + abs);
+				run("jar", new ProcessBuilder(jar, "uf", workingJarName, "-C", abs.toString(), "."), true);
 			} else if (entry.isSourceCode() && anyres) {
 				// non-existence is handled at "source" step.
-				System.out.println("Packing resources from " + entry.localPath);
+				Path folderT = entry.getAbsolutePath(projectRoot);
+				System.out.println("Packing resources from " + folderT);
 				ArrayList<String> jarArgs = new ArrayList<>();
 				jarArgs.add(jar);
 				jarArgs.add("uf");
 				jarArgs.add(workingJarName);
 
-				Path folderT = projectRoot.resolve(entry.localPath);
 				if (Files.isSymbolicLink(folderT)) {
 					try {
 						folderT = folderT.getParent().resolve(Files.readSymbolicLink(folderT)).normalize();
@@ -240,12 +241,15 @@ public class BuildSystem {
 							x1 -> {
 								String localPath = folder.relativize(x1).toString();
 								jarArgs.add("-C");
-								jarArgs.add("." + File.separator + entry.localPath);
+								if (entry.isLocalPath)
+									jarArgs.add("." + File.separator + entry.path);
+								else
+									jarArgs.add(entry.getAbsolutePath(projectRoot).toString());
 								jarArgs.add(localPath);
 							}
 					);
 				} catch (IOException ex) {
-					System.out.println("Failed to list files in " + entry.localPath);
+					System.out.println("Failed to list files in " + entry.path);
 					System.out.println(ex);
 					System.exit(1);
 				}
@@ -257,19 +261,7 @@ public class BuildSystem {
 		// proguard merge & preverify & obfuscation
 
 		try {
-			Stream<String> exportedLibsStream = Arrays.stream(classpath).filter(x -> x.type == ExportedLibrary).map(x -> x.localPath);
-			if (skipMissing) {
-				exportedLibsStream = exportedLibsStream.filter(x -> Files.exists(projectRoot.resolve(x)));
-			} else {
-				exportedLibsStream = exportedLibsStream.peek(x -> {
-					if (!Files.exists(projectRoot.resolve(x))) {
-						System.out.println("Library " + x + " does not exist. Pass " + SKIPMISS + " to ignore this.");
-						System.exit(1);
-					}
-				});
-			}
-			String[] libs = exportedLibsStream.toArray(String[]::new);
-			String localConfig = ProjectConfigGenerator.buildLocalProguardConfig(projectRoot.toString(), projectName, libs);
+			String localConfig = ProjectConfigGenerator.buildLocalProguardConfig(projectRoot.toString(), projectName, classpath);
 			if (!obfuscate) {
 				localConfig += "-dontoptimize -dontshrink -dontobfuscate" + System.lineSeparator() +
 						"-keep class *" + System.lineSeparator();

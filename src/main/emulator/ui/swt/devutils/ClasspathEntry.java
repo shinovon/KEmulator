@@ -1,5 +1,6 @@
 package emulator.ui.swt.devutils;
 
+import emulator.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -16,12 +17,20 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class ClasspathEntry {
-	public final String localPath;
+	public final String path;
 	public final ClasspathEntryType type;
+	public final boolean isLocalPath;
 
-	public ClasspathEntry(String localPath, ClasspathEntryType type) {
-		this.localPath = localPath;
+	public ClasspathEntry(String path, ClasspathEntryType type, boolean localPath) {
+		this.path = path;
 		this.type = type;
+		this.isLocalPath = localPath;
+	}
+
+	public ClasspathEntry(String path, ClasspathEntryType type) {
+		this.path = path;
+		this.type = type;
+		this.isLocalPath = !Utils.isPathAbsolute(path);
 	}
 
 	public boolean isSourceCode() {
@@ -30,6 +39,12 @@ public class ClasspathEntry {
 
 	public boolean isJar() {
 		return type == ClasspathEntryType.HeaderLibrary || type == ClasspathEntryType.ExportedLibrary;
+	}
+
+	public Path getAbsolutePath(Path projectRoot) {
+		if (isLocalPath)
+			return projectRoot.resolve(path).normalize();
+		return Paths.get(path);
 	}
 
 	public static ClasspathEntry[] readAnything(Path projectDir) throws ParserConfigurationException, IOException, SAXException {
@@ -103,11 +118,13 @@ public class ClasspathEntry {
 					String url = root.getAttribute("url");
 
 					if (url.startsWith("jar://$MODULE_DIR$/")) {
-						String path;
-						path = url.substring("jar://$MODULE_DIR$/".length(), url.length() - 2);
-						list.add(new ClasspathEntry(path, entryType));
+						String path = url.substring("jar://$MODULE_DIR$/".length(), url.length() - 2);
+						list.add(new ClasspathEntry(path, entryType, true));
+					} else if (url.startsWith("jar://")) {
+						String path = url.substring("jar://".length(), url.length() - 2);
+						list.add(new ClasspathEntry(path, entryType, false));
 					} else {
-						throw new IllegalArgumentException("Global library imports are not supported yet.");
+						throw new RuntimeException("Unknown library entry: " + url);
 					}
 				}
 
@@ -118,9 +135,13 @@ public class ClasspathEntry {
 		for (int i = 0; i < sourceEntries.getLength(); i++) {
 			Element sourceFolder = (Element) sourceEntries.item(i);
 			String url = sourceFolder.getAttribute("url");
-			if (!url.startsWith("file://$MODULE_DIR$/"))
-				throw new IllegalArgumentException("Global paths at module sources are not supported yet.");
-			url = url.substring("jar://$MODULE_DIR$/".length());
+			if (url.startsWith("file://$MODULE_DIR$/")) {
+				url = url.substring("file://$MODULE_DIR$/".length());
+			} else if (url.startsWith("file://")) {
+				url = url.substring("file://".length());
+			} else {
+				throw new IllegalArgumentException("Unknown source folder entry: " + url);
+			}
 			if (sourceFolder.getAttribute("type").equals("java-resource")) {
 				list.add(new ClasspathEntry(url, ClasspathEntryType.Resource));
 			} else if (url.startsWith("lib")) {
@@ -137,21 +158,21 @@ public class ClasspathEntry {
 
 	public static ClasspathEntry[] readFromConfigless(Path projectRoot) {
 		ArrayList<ClasspathEntry> list = new ArrayList<>();
-		list.add(new ClasspathEntry("src", ClasspathEntryType.Source));
+		list.add(new ClasspathEntry("src", ClasspathEntryType.Source, true));
 		if (Files.exists(projectRoot.resolve("res")))
-			list.add(new ClasspathEntry("res", ClasspathEntryType.Resource));
+			list.add(new ClasspathEntry("res", ClasspathEntryType.Resource, true));
 
 		Path libs = projectRoot.resolve("lib");
 		File[] files = libs.toFile().listFiles();
 		if (files != null) {
 			for (File c : files) {
 				if (c.isFile() && c.getName().endsWith(".jar"))
-					list.add(new ClasspathEntry("lib/" + c.getName(), ClasspathEntryType.ExportedLibrary));
+					list.add(new ClasspathEntry("lib/" + c.getName(), ClasspathEntryType.ExportedLibrary, true));
 				if (c.isDirectory()) {
 					if (Files.exists(projectRoot.resolve("lib").resolve(c.getName()).resolve("src")))
-						list.add(new ClasspathEntry("lib/" + c.getName() + "/src", ClasspathEntryType.LibrarySource));
+						list.add(new ClasspathEntry("lib/" + c.getName() + "/src", ClasspathEntryType.LibrarySource, true));
 					if (Files.exists(projectRoot.resolve("lib").resolve(c.getName()).resolve("res")))
-						list.add(new ClasspathEntry("lib/" + c.getName() + "/res", ClasspathEntryType.Resource));
+						list.add(new ClasspathEntry("lib/" + c.getName() + "/res", ClasspathEntryType.Resource, true));
 				}
 			}
 		}

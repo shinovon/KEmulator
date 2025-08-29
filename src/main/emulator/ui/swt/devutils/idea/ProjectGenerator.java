@@ -36,7 +36,7 @@ public class ProjectGenerator {
 		// root
 		Files.write(dir.resolve(".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
 		ProjectConfigGenerator.generateIML(null, dir.resolve(projectName + ".iml"));
-		generateProGuardConfig(dir, projectName, new String[0]);
+		generateProGuardConfig(dir, projectName, new ClasspathEntry[0]);
 
 		// code
 		Files.write(dir.resolve("META-INF").resolve("MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
@@ -91,16 +91,10 @@ public class ProjectGenerator {
 		if (imlPath != null) {
 			try {
 				ClasspathEntry[] classpath = ClasspathEntry.readFromIml(imlPath);
-				ArrayList<String> exportedLibs = new ArrayList<>();
-				for (ClasspathEntry entry : classpath) {
-					if (entry.type == ClasspathEntryType.ExportedLibrary) {
-						exportedLibs.add(entry.localPath);
-					}
-				}
-				generateProGuardConfig(dirp, projectName, exportedLibs.toArray(new String[0]));
+				generateProGuardConfig(dirp, projectName, classpath);
 			} catch (Exception e) {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
-				generateProGuardConfig(dirp, projectName, new String[0]);
+				generateProGuardConfig(dirp, projectName, new ClasspathEntry[0]);
 			}
 			generateRunConfigs(dirp, projectName, midletNames);
 			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
@@ -108,7 +102,7 @@ public class ProjectGenerator {
 						"You can rerun IDE setup to bring your configuration to recommended one.");
 		} else {
 			System.out.println("No IML found! Run configuration will not be created.");
-			generateProGuardConfig(dirp, projectName, new String[0]);
+			generateProGuardConfig(dirp, projectName, new ClasspathEntry[0]);
 		}
 
 		return imlPath != null;
@@ -141,8 +135,8 @@ public class ProjectGenerator {
 				gi.newLine();
 			}
 		}
-		String[] libraries = ProjectConfigGenerator.generateIML(dir.resolve(".classpath"), dir.resolve(projectName + ".iml"));
-		generateProGuardConfig(dir, projectName, libraries);
+		ClasspathEntry[] cp = ProjectConfigGenerator.generateIML(dir.resolve(".classpath"), dir.resolve(projectName + ".iml"));
+		generateProGuardConfig(dir, projectName, cp);
 
 		// manifest
 		fixManifestWithVersion(Paths.get(appDescriptorPath));
@@ -236,8 +230,8 @@ public class ProjectGenerator {
 		return midletCodePath.toString();
 	}
 
-	private static void generateProGuardConfig(Path dir, String projName, String[] libs) throws IOException {
-		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, libs).getBytes(StandardCharsets.UTF_8));
+	private static void generateProGuardConfig(Path dir, String projName, ClasspathEntry[] classpath) throws IOException {
+		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, classpath).getBytes(StandardCharsets.UTF_8));
 		if (!Files.exists(dir.resolve(PROGUARD_GLOBAL_CFG))) {
 			Files.write(dir.resolve(PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
 		}
