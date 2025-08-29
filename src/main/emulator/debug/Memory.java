@@ -21,8 +21,8 @@ public final class Memory {
 
 	public Hashtable<String, ClassInfo> classesTable = new Hashtable<>();
 	public Vector instances;
-	public Vector<Image> images = new Vector<>();
-	public Vector<Image> releasedImages = new Vector<>();
+	public ArrayList<Image> images = new ArrayList<>();
+	public ArrayList<Image> releasedImages = new ArrayList<>();
 	public Vector players = new Vector();
 	public Vector m3gObjects = new Vector();
 	private final Vector<String> checkClasses = new Vector<>();
@@ -78,7 +78,7 @@ public final class Memory {
 		if (Settings.recordReleasedImg) {
 			for (Image image : images) {
 				if (!releasedImages.contains(image)) {
-					releasedImages.addElement(image);
+					releasedImages.add(image);
 				}
 			}
 		}
@@ -192,7 +192,7 @@ public final class Memory {
 				if (o instanceof Image) {
 					this.images.add((Image) o);
 					if (Settings.recordReleasedImg && this.releasedImages.contains(o)) {
-						this.releasedImages.removeElement(o); // this image is still alive
+						this.releasedImages.remove(o); // this image is still alive
 					}
 				} else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
 					if (!players.contains(o))

@@ -2,53 +2,59 @@ package emulator.ui.swt;
 
 import javax.microedition.lcdui.Image;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 
-final class ImagesComparator implements Comparator<ImageViewItem> {
+final class ImagesComparatorByUsage implements Comparator<ImageViewItem> {
 	private final MemoryView mv;
 
-	ImagesComparator(final MemoryView mv) {
+	ImagesComparatorByUsage(final MemoryView mv) {
 		super();
 		this.mv = mv;
 	}
 
-	public final int compare(final ImageViewItem i1, final ImageViewItem i2) {
+	public int compare(final ImageViewItem i1, final ImageViewItem i2) {
 		Image o1 = i1.drawable;
 		Image o2 = i2.drawable;
-		int n = 0;
-		Label_0142:
-		{
-			int usedCount = 0;
-			int usedCount2 = 0;
-			switch (mv.getSortingMethod()) {
-				case 0: {
-					for (int i = 0; i < MemoryView.allImages.size(); ++i) {
-						if (o1 == MemoryView.allImages.get(i)) {
-							n = 1;
-							break;
-						}
-						if (o2 == MemoryView.allImages.get(i)) {
-							n = -1;
-							break;
-						}
-					}
-					break Label_0142;
-				}
-				case 1: {
-					usedCount = o1.getWidth() * o1.getHeight();
-					usedCount2 = o2.getWidth() * o2.getHeight();
-					break;
-				}
-				case 2: {
-					usedCount = o1.getUsedCount();
-					usedCount2 = o2.getUsedCount();
-					break;
-				}
-			}
-			n = usedCount - usedCount2;
+		int n = o1.getUsedCount() - o2.getUsedCount();
+		return mv.getSortByAscending() ? n : -n;
+	}
+}
+
+final class ImagesComparatorBySize implements Comparator<ImageViewItem> {
+	private final MemoryView mv;
+
+	ImagesComparatorBySize(final MemoryView mv) {
+		super();
+		this.mv = mv;
+	}
+
+	public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+		Image o1 = i1.drawable;
+		Image o2 = i2.drawable;
+		int size1 = o1.getWidth() * o1.getHeight();
+		int size2 = o2.getWidth() * o2.getHeight();
+		int n = size1 - size2;
+		return mv.getSortByAscending() ? n : -n;
+	}
+}
+
+final class ImagesComparatorByOrder implements Comparator<ImageViewItem> {
+	private final MemoryView mv;
+	private final IdentityHashMap<Image, Integer> positions;
+
+	ImagesComparatorByOrder(final MemoryView mv) {
+		super();
+		this.mv = mv;
+		positions = new IdentityHashMap<>(MemoryView.allImages.size());
+		for (int i = 0; i < MemoryView.allImages.size(); i++) {
+			positions.put(MemoryView.allImages.get(i), i);
 		}
-		if (mv.getSortByAscending()) {
-			return n;
-		}
-		return -n;
+	}
+
+	public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+		int index1 = positions.get(i1.drawable);
+		int index2 = positions.get(i2.drawable);
+		int n = index2 - index1;
+		return mv.getSortByAscending() ? n : -n;
 	}
 }

@@ -34,7 +34,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private int imagesSortingMethod;
 	private boolean sortImagesByAscending;
 	private static final Object updateLock = new Object();
-	static final Vector<Image> allImages = new Vector();
+	static final ArrayList<Image> allImages = new ArrayList<>();
 	static final ArrayList<ImageViewItem> imagesToShow = new ArrayList<>();
 	int imagesCanvasScroll;
 	private boolean imagesDrawn = true;
@@ -267,16 +267,31 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	public void resortImages() {
 		synchronized (MemoryView.updateLock) {
-			MemoryView.imagesToShow.sort(new ImagesComparator(this));
+			Comparator<ImageViewItem> comp;
+			switch (getSortingMethod()) {
+				case 0:
+					comp = new ImagesComparatorByOrder(this);
+					break;
+				case 1:
+					comp = new ImagesComparatorBySize(this);
+					break;
+				case 2:
+					comp = new ImagesComparatorByUsage(this);
+					break;
+				default:
+					throw new IllegalArgumentException("Unsupported sort method");
+			}
+			MemoryView.imagesToShow.sort(comp);
 		}
 	}
 
 	private void updateImagesList() {
 		synchronized (MemoryView.updateLock) {
 			MemoryView.allImages.clear();
+			allImages.ensureCapacity(memoryMgr.images.size());
 			MemoryView.imagesToShow.clear();
-			synchronized (this.memoryMgr) {
-				for (Image image : this.memoryMgr.images) {
+			synchronized (memoryMgr) {
+				for (Image image : memoryMgr.images) {
 					allImages.add(image);
 					boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
 					if (!add)
