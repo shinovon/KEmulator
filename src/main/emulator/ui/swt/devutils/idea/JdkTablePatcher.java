@@ -291,16 +291,20 @@ public class JdkTablePatcher {
 	 * Gets list of all available UEI libs as absolute paths.
 	 */
 	public static ArrayList<String> getDevTimeJars() {
-		Path uei = Paths.get(Emulator.getAbsolutePath()).resolve("uei");
-		ArrayList<String> paths = new ArrayList<>();
-		for (File c : uei.toFile().listFiles()) {
-			if (!c.getName().endsWith(".jar"))
-				continue;
-			if (c.getName().equalsIgnoreCase("emulator.jar"))
-				continue;
-			paths.add(c.getAbsolutePath().toString());
+		try {
+			Path uei = Paths.get(Emulator.getAbsolutePath()).resolve("uei");
+			ArrayList<String> paths = new ArrayList<>();
+			for (File c : uei.toFile().listFiles()) {
+				if (!c.getName().endsWith(".jar"))
+					continue;
+				if (c.getName().equalsIgnoreCase("emulator.jar"))
+					continue;
+				paths.add(c.getAbsolutePath().toString());
+			}
+			return paths;
+		} catch (RuntimeException ex) {
+			return new ArrayList<>();
 		}
-		return paths;
 	}
 
 	private static List<String> getDevTimeClassPaths() {

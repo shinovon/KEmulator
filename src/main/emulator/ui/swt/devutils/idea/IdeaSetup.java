@@ -113,9 +113,16 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			return;
 		}
 
-		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei").resolve("cldc11.jar")) || !Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei").resolve("midp21.jar"))) {
+		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei"))) {
 			new Label(shell, SWT.NONE).setText("UEI directory is missing in your KEmulator setup.");
-			new Label(shell, SWT.NONE).setText("It contains libraries for your IDE. Find a proper KEmulator package.");
+			new Label(shell, SWT.NONE).setText("It contains libraries for your IDE.");
+			new Label(shell, SWT.NONE).setText("Find a KEmulator distribution package with them.");
+			shell.layout(true, true);
+			return;
+		}
+		if (JdkTablePatcher.getDevTimeJars().isEmpty()) {
+			new Label(shell, SWT.NONE).setText("No UEI libraries found.");
+			new Label(shell, SWT.NONE).setText("Find a KEmulator distribution package with them.");
 			shell.layout(true, true);
 			return;
 		}
