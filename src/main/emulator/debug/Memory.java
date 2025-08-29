@@ -478,22 +478,22 @@ public final class Memory {
 	private int arraySize(final Class clazz, final Field[] fields, final Object o) {
 		int n = 0;
 		n += 16;
-		if (clazz == ((Memory._J != null) ? Memory._J : (Memory._J = cls("[J")))) {
-			n = 16 + 8 * Array.getLength(o);
-		} else if (clazz == ((Memory._I != null) ? Memory._I : (Memory._I = cls("[I")))) {
-			n = 16 + 4 * Array.getLength(o);
-		} else if (clazz == ((Memory._S != null) ? Memory._S : (Memory._S = cls("[S")))) {
-			n = 16 + 2 * Array.getLength(o);
-		} else if (clazz == ((Memory._B != null) ? Memory._B : (Memory._B = cls("[B")))) {
-			n = 16 + 1 * Array.getLength(o);
-		} else if (clazz == ((Memory._Z != null) ? Memory._Z : (Memory._Z = cls("[Z")))) {
-			n = 16 + 4 * Array.getLength(o);
-		} else if (clazz == ((Memory._D != null) ? Memory._D : (Memory._D = cls("[D")))) {
-			n = 16 + 8 * Array.getLength(o);
-		} else if (clazz == ((Memory._F != null) ? Memory._F : (Memory._F = cls("[F")))) {
-			n = 16 + 4 * Array.getLength(o);
-		} else if (clazz == ((Memory._C != null) ? Memory._C : (Memory._C = cls("[C")))) {
-			n = 16 + 2 * Array.getLength(o);
+		if (o instanceof long[]) {
+			n = 16 + 8 * ((long[]) o).length;
+		} else if (o instanceof int[]) {
+			n = 16 + 4 * ((int[]) o).length;
+		} else if (o instanceof short[]) {
+			n = 16 + 2 * ((short[]) o).length;
+		} else if (o instanceof byte[]) {
+			n = 16 + ((byte[]) o).length;
+		} else if (o instanceof boolean[]) {
+			n = 16 + 4 * ((boolean[]) o).length;
+		} else if (o instanceof double[]) {
+			n = 16 + 8 * ((double[]) o).length;
+		} else if (o instanceof float[]) {
+			n = 16 + 4 * ((float[]) o).length;
+		} else if (o instanceof char[]) {
+			n = 16 + 2 * ((char[]) o).length;
 		} else {
 			boolean isArrayOfObjs = ClassTypes.isObject(clazz.getComponentType());
 			if (o instanceof Object[]) {
