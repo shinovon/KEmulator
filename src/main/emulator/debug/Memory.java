@@ -165,8 +165,7 @@ public final class Memory {
 			if (instances.contains(ow)) {
 				for (ObjInstance obj : classInfo.objs) {
 					if (obj.value == o) {
-						if (!obj.paths.contains(path))
-							obj.paths.add(path);
+						obj.paths.add(path);
 					}
 				}
 				return;
@@ -419,7 +418,7 @@ public final class Memory {
 		return 0;
 	}
 
-	public final Vector<ObjInstance> objs(final String o) {
+	public final ArrayList<ObjInstance> objs(final String o) {
 		return this.classesTable.get(o).objs;
 	}
 

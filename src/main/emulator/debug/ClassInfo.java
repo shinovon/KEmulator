@@ -1,13 +1,14 @@
 package emulator.debug;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public final class ClassInfo implements Comparable<ClassInfo> {
 	final String name;
 	int instancesCount;
 	final int staticsSize;
-	public final Vector<ObjInstance> objs;
+	public final ArrayList<ObjInstance> objs;
 	public final Field[] cachedFields;
 
 	public int size() {
@@ -25,7 +26,7 @@ public final class ClassInfo implements Comparable<ClassInfo> {
 	ClassInfo(final Memory m, final Class cls) {
 		super();
 		cachedFields = Memory.fields(cls);
-		this.objs = new Vector();
+		this.objs = new ArrayList<>();
 		this.instancesCount = 0;
 		staticsSize = m.size(cls, cachedFields, null);
 		name = cls.getName();

@@ -505,7 +505,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		}
 		objectsTable.removeAll();
 		String cls = (String) array[0].getData();
-		Vector<ObjInstance> objs = this.memoryMgr.objs(cls);
+		ArrayList<ObjInstance> objs = this.memoryMgr.objs(cls);
 		if (selectedObject != null && !selectedObject.getClass().getName().equals(cls))
 			selectedObject = null;
 		for (ObjInstance o : objs) {
@@ -513,9 +513,9 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			if (o.paths.isEmpty())
 				ti.setText(0, "Unknown reference");
 			else if (o.paths.size() == 1)
-				ti.setText(0, o.paths.get(0).toString(displayPkgNames));
+				ti.setText(0, o.paths.iterator().next().toString(displayPkgNames));
 			else
-				ti.setText(0, o.paths.get(0).toString(displayPkgNames) + "; " + (o.paths.size() - 1) + " more");
+				ti.setText(0, o.paths.iterator().next().toString(displayPkgNames) + "; " + (o.paths.size() - 1) + " more");
 			String s = String.valueOf(o.value);
 			//XXX
 			if (s.length() > 128) {
