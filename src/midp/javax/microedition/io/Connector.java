@@ -90,6 +90,9 @@ public class Connector {
 			try {
 				openPrim = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + protocol + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(':') + 1), n, b);
 			} catch (Exception ex) {
+				if (ex instanceof IOException) {
+					throw (IOException) ex;
+				}
 				throw new ConnectionNotFoundException("unknown protocol: " + s, ex);
 			}
 			return openPrim;
