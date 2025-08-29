@@ -173,7 +173,7 @@ public final class Memory {
 			}
 
 			++classInfo.instancesCount;
-			classInfo.objs.add(new ObjInstance(this, path, o));
+			classInfo.objs.add(new ObjInstance(this, classInfo, path, o));
 			instances.add(ow);
 			try {
 				if (o instanceof Image) {
@@ -266,7 +266,7 @@ public final class Memory {
 	}
 
 	private void iterateFields(Class clazz, Object o, ReferencePath path) {
-		final Field[] fields = fields(clazz);
+		final Field[] fields = fields(clazz); //TODO remove
 		for (Field f : fields) {
 			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive())
 				continue; // const field
@@ -345,7 +345,7 @@ public final class Memory {
 		}
 	}
 
-	private static Field[] fields(final Class clazz) {
+	public static Field[] fields(final Class clazz) {
 		final ArrayList<Field> vector = new ArrayList<>();
 		addFieldsWithSupers(clazz, vector);
 		final Field[] array = new Field[vector.size()];
@@ -423,9 +423,7 @@ public final class Memory {
 		return this.classesTable.get(o).objs;
 	}
 
-
-	public final int size(final Class cls, final Object o) {
-		final Field[] fields = fields(cls);
+	public final int size(final Class cls, Field[] fields, final Object o) {
 		int res = 0;
 
 		// fields
@@ -449,7 +447,7 @@ public final class Memory {
 			return res;
 
 		if (cls.isArray()) {
-			return res + this.arraySize(cls, o);
+			return res + this.arraySize(cls, fields, o);
 		}
 
 		res += 12;
@@ -476,7 +474,7 @@ public final class Memory {
 		return res;
 	}
 
-	private int arraySize(final Class clazz, final Object o) {
+	private int arraySize(final Class clazz, final Field[] fields, final Object o) {
 		int n = 0;
 		n += 16;
 		if (clazz == ((Memory._J != null) ? Memory._J : (Memory._J = cls("[J")))) {
@@ -499,7 +497,7 @@ public final class Memory {
 			for (int i = Array.getLength(o) - 1; i >= 0; --i) {
 				final Object value;
 				if ((value = Array.get(o, i)) != null && !ClassTypes.isObject(clazz.getComponentType())) {
-					n += this.size(value.getClass(), value);
+					n += this.size(value.getClass(), fields, value);
 				} else if (value != null && value.getClass().isArray()) {
 					n += 16;
 				} else {

@@ -1,5 +1,6 @@
 package emulator.debug;
 
+import java.lang.reflect.Field;
 import java.util.Vector;
 
 public final class ClassInfo implements Comparable<ClassInfo> {
@@ -7,6 +8,7 @@ public final class ClassInfo implements Comparable<ClassInfo> {
 	int instancesCount;
 	final int staticsSize;
 	public final Vector<ObjInstance> objs;
+	public final Field[] cachedFields;
 
 	public int size() {
 		int total = this.staticsSize;
@@ -22,9 +24,10 @@ public final class ClassInfo implements Comparable<ClassInfo> {
 
 	ClassInfo(final Memory m, final Class cls) {
 		super();
+		cachedFields = Memory.fields(cls);
 		this.objs = new Vector();
 		this.instancesCount = 0;
-		this.staticsSize = m.size(cls, null);
-		this.name = cls.getName();
+		staticsSize = m.size(cls, cachedFields, null);
+		name = cls.getName();
 	}
 }
