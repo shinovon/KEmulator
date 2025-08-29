@@ -20,7 +20,7 @@ import java.util.*;
 public final class Memory {
 
 	public Hashtable<String, ClassInfo> classesTable = new Hashtable<>();
-	public Vector instances;
+	public HashSet<IdentityWrapper> instances;
 	public ArrayList<Image> images = new ArrayList<>();
 	public ArrayList<Image> releasedImages = new ArrayList<>();
 	public Vector players = new Vector();
@@ -50,20 +50,7 @@ public final class Memory {
 
 	private Memory() {
 		super();
-		this.instances = new Vector() {
-			public synchronized int indexOf(Object o, int index) {
-				if (o == null) {
-					for (int i = index; i < elementCount; i++)
-						if (elementData[i] == null)
-							return i;
-				} else {
-					for (int i = index; i < elementCount; i++)
-						if (o == elementData[i])
-							return i;
-				}
-				return -1;
-			}
-		};
+		this.instances = new HashSet<>();
 		checkClasses.add("javax.microedition.lcdui.ImageItem");
 		checkClasses.add("javax.microedition.lcdui.CustomItem");
 		checkClasses.add("javax.microedition.lcdui.List");
@@ -174,8 +161,8 @@ public final class Memory {
 		}
 
 		if (o != null) {
-
-			if (this.instances.contains(o)) {
+			IdentityWrapper ow = new IdentityWrapper(o);
+			if (instances.contains(ow)) {
 				for (ObjInstance obj : classInfo.objs) {
 					if (obj.value == o) {
 						if (!obj.paths.contains(path))
@@ -187,7 +174,7 @@ public final class Memory {
 
 			++classInfo.instancesCount;
 			classInfo.objs.add(new ObjInstance(this, path, o));
-			instances.add(o);
+			instances.add(ow);
 			try {
 				if (o instanceof Image) {
 					this.images.add((Image) o);
@@ -342,8 +329,9 @@ public final class Memory {
 		} else if (obj instanceof Image2D) {
 			Image2D img2d = (Image2D) obj;
 			//use only after all objects are added to instances list!
-			if (this.instances.contains(img2d)) return;
-			this.instances.add(img2d);
+			IdentityWrapper iw = new IdentityWrapper(img2d);
+			if (this.instances.contains(iw)) return;
+			this.instances.add(iw);
 
 			IImage img = MemoryViewImage.createFromM3GImage(img2d);
 			if (img != null) {
@@ -358,13 +346,13 @@ public final class Memory {
 	}
 
 	private static Field[] fields(final Class clazz) {
-		final Vector<Field> vector = new Vector<>();
+		final ArrayList<Field> vector = new ArrayList<>();
 		addFieldsWithSupers(clazz, vector);
 		final Field[] array = new Field[vector.size()];
 		return vector.toArray(array);
 	}
 
-	private static void addFieldsWithSupers(final Class clazz, final Vector<Field> vector) {
+	private static void addFieldsWithSupers(final Class clazz, final ArrayList<Field> vector) {
 		try {
 			if (clazz.getSuperclass() != null) {
 				addFieldsWithSupers(clazz.getSuperclass(), vector);
