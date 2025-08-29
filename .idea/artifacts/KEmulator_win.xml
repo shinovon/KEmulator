@@ -15,7 +15,7 @@
     </properties>
     <root id="archive" name="KEmulator.jar">
       <element id="module-output" name="KEmulator_win" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/bluecove-2.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/bluecove-2.1.1-SNAPSHOT.jar" path-in-jar="/" />
       <element id="module-output" name="KEmulator_base" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jinput.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jutils.jar" path-in-jar="/" />
