@@ -352,6 +352,8 @@ public final class EmulatorScreen implements
 		if (midletLoaded) {
 			String s = Emulator.getEmulator().getAppProperty("Nokia-UI-Enhancement");
 			midletSupportsMultitouch = s != null && s.contains("EnableMultiPointTouchEvents");
+		} else {
+			fullscreen = false;
 		}
 
 		shell.open();
