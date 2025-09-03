@@ -75,7 +75,7 @@ public class Updater {
 			String path = Emulator.getAbsolutePath();
 			if (Files.exists(Paths.get(path)) && !Files.isWritable(Paths.get(path))) {
 				// emulator is in system folder or on read-only disk.
-				if (Emulator.linux && Files.exists(Paths.get("/usr/bin/pacman"))) {
+				if (Utils.linux && Files.exists(Paths.get("/usr/bin/pacman"))) {
 					Emulator.getEmulator().getScreen().showMessage("You are running system-wide installation. Use your package manager (i.e. \"yay -S kemulatornnmod-bin\").");
 				} else {
 					Emulator.getEmulator().getScreen().showMessage("KEmulator is installed in read-only location. Use external software management tools or restart KEmulator with admin/root permissions.");
@@ -92,7 +92,7 @@ public class Updater {
 
 		ArrayList<String> cmd = new ArrayList<String>();
 		String javaHome = System.getProperty("java.home");
-		cmd.add(javaHome == null || javaHome.length() == 0 ? "java" : (javaHome + (!Emulator.win ? "/bin/java" : "/bin/java.exe")));
+		cmd.add(javaHome == null || javaHome.length() == 0 ? "java" : (javaHome + (!Utils.win ? "/bin/java" : "/bin/java.exe")));
 		cmd.add("-cp");
 		cmd.add(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar");
 

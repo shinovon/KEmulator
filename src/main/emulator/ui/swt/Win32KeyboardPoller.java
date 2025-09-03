@@ -3,6 +3,7 @@ package emulator.ui.swt;
 import com.sun.jna.platform.win32.User32;
 import emulator.Emulator;
 import emulator.ReflectUtil;
+import emulator.Utils;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Shell;
 
@@ -25,7 +26,7 @@ public class Win32KeyboardPoller {
 	}
 
 	private long lastPollTime;
-	boolean win = Emulator.win;
+	boolean win = Utils.win;
 	private final boolean[] lastKeyboardButtonStates = new boolean[256];
 	private final boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
 	private final long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];

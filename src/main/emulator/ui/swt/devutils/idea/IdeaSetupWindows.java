@@ -1,6 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
-import emulator.Emulator;
+import emulator.Utils;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.IOException;
@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class IdeaSetupWindows extends IdeaSetup {
@@ -70,7 +69,7 @@ public class IdeaSetupWindows extends IdeaSetup {
 						"    } catch {} " +
 						"}";
 
-				String output = Emulator.getProcessOutput(new String[]{"powershell", "-Command", powershellCommand}, false);
+				String output = Utils.getProcessOutput(new String[]{"powershell", "-Command", powershellCommand}, false);
 
 				for (String i : output.split("[\\r\\n]+")) {
 					i = i.trim();

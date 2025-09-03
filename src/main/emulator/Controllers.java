@@ -188,7 +188,7 @@ public class Controllers {
 	}
 
 	private static ControllerEnvironment getDefaultEnvironment() throws Exception {
-		if (Emulator.isJava9()) {
+		if (Utils.isJava9()) {
 			return ControllerEnvironment.getDefaultEnvironment();
 		}
 		Constructor<ControllerEnvironment> constructor = (Constructor<ControllerEnvironment>)

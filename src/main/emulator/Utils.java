@@ -1,6 +1,18 @@
 package emulator;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+
 public class Utils {
+
+	public static final String os = String.valueOf(System.getProperty("os.name")).toLowerCase();
+	public static final boolean win = os.startsWith("win");
+	public static final boolean linux = os.contains("linux") || os.contains("nix");
+	public static final boolean macos = os.contains("mac");
+	public static final boolean termux = String.valueOf(System.getProperty("java.vm.vendor")).toLowerCase().contains("termux");
 
 	// copied from JDK 24
 	public static String translateEscapes(String input) {
@@ -105,5 +117,80 @@ public class Utils {
 		}
 
 		return false;
+	}
+
+
+	public static int getJavaVersionMajor() {
+		try {
+			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
+		} catch (Throwable e) {
+			return 0;
+		}
+	}
+
+	public static boolean isJava9() {
+		try {
+			return getJavaVersionMajor() >= 9;
+		} catch (Throwable e) {
+			return false;
+		}
+	}
+
+	public static boolean isJava17() {
+		try {
+			return getJavaVersionMajor() >= 17;
+		} catch (Throwable e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Attempts to find JDK near JRE KEmulator is running on.
+	 *
+	 * @return Null on failure, JDK home on success.
+	 */
+	public static String getJdkHome() {
+		String realHome = System.getProperty("java.home");
+		if (Files.exists(Paths.get(realHome, "bin", win ? "javac.exe" : "javac"))) {
+			// we run with JDK
+			return realHome;
+		}
+		String parent = Paths.get(realHome).getParent().toString();
+		if (Files.exists(Paths.get(parent, "bin", win ? "javac.exe" : "javac"))) {
+			// we run with JRE in JDK
+			return parent;
+		}
+		// standalone JRE
+		return null;
+	}
+
+	public static String getProcessOutput(String[] commandline, boolean errStream) throws IOException {
+		Process proc = Runtime.getRuntime().exec(commandline);
+		StringBuilder sw = new StringBuilder();
+		try (InputStream is = errStream ? proc.getErrorStream() : proc.getInputStream()) {
+			int c;
+			while ((c = is.read()) != -1)
+				sw.append((char) c);
+		}
+		return sw.toString();
+	}
+
+	static String getHWID() {
+		try {
+			String s = System.getenv("COMPUTERNAME") + System.getProperty("user.name") + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_LEVEL");
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(s.getBytes());
+			StringBuffer sb = new StringBuffer();
+			byte[] b = md.digest();
+			for (byte aByteData : b) {
+				String hex = Integer.toHexString(0xff & aByteData);
+				if (hex.length() == 1) sb.append('0');
+				sb.append(hex);
+			}
+
+			return sb.toString();
+		} catch (Exception e) {
+			return "null";
+		}
 	}
 }

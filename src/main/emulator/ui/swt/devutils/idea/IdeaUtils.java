@@ -2,6 +2,7 @@ package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.Utils;
 import emulator.ui.swt.devutils.JavaTypeValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -81,7 +82,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		reposPath = new Text(createNewProject, 2048);
 		reposPath.setText(Settings.lastIdeaRepoPath);
 		reposPath.setMessage("Project location");
-		reposPath.setToolTipText("Location of folder where the project's folder will be created.\n\nExample: \"" + (Emulator.linux ? "/mnt/projects/" : "D:\\projects\\") + "\"");
+		reposPath.setToolTipText("Location of folder where the project's folder will be created.\n\nExample: \"" + (Utils.linux ? "/mnt/projects/" : "D:\\projects\\") + "\"");
 		reposPath.setLayoutData(new RowData(400, SWT.DEFAULT));
 		reposPath.addModifyListener(this);
 
@@ -138,7 +139,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			new IdeaUtils(p).shell.open();
 		} else {
 			Settings.ideaJdkTablePatched = false;
-			if (Emulator.linux)
+			if (Utils.linux)
 				new IdeaSetupXdgLinux(p).open();
 			else
 				new IdeaSetupWindows(p).open();

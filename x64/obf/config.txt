@@ -101,6 +101,7 @@
 -keep class emulator.Emulator { public static *; }
 -keep class emulator.Settings { public static *; }
 -keep class emulator.Agent { public static *; }
+-keep class emulator.Utils { public static *; }
 
 # 2D
 -keep public class emulator.graphics2D.awt.* { public protected *; }

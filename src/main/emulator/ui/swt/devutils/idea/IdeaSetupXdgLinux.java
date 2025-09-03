@@ -1,6 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
-import emulator.Emulator;
+import emulator.Utils;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.File;
@@ -217,7 +217,7 @@ public class IdeaSetupXdgLinux extends IdeaSetup {
 	}
 
 	protected static String getVersion(String path) throws IOException {
-		String[] output = Emulator.getProcessOutput(new String[]{path, "--version"}, false).split(System.lineSeparator());
+		String[] output = Utils.getProcessOutput(new String[]{path, "--version"}, false).split(System.lineSeparator());
 		String ver = null;
 		for (String line : output) {
 			if (line.startsWith("IntelliJ")) {

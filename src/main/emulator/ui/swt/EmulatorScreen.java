@@ -368,7 +368,7 @@ public final class EmulatorScreen implements
 //			shell.setFullScreen(true);
 		}
 
-		win = Emulator.win;
+		win = Utils.win;
 		if (win) {
 			poller = new Win32KeyboardPoller(this);
 			new Thread("KEmulator keyboard poll thread") {

@@ -2,6 +2,7 @@ package emulator.graphics3D.lwjgl;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.Utils;
 import emulator.debug.Profiler3D;
 import emulator.graphics2D.awt.Graphics2DAWT;
 import emulator.graphics2D.swt.Graphics2DSWT;
@@ -1369,7 +1370,7 @@ public final class Emulator3D implements IGraphics3D {
 				window = 0;
 			}
 			if (exiting) return;
-			int mode = Settings.m3gContextMode == 0 && (Emulator.win || Emulator.termux) ? 2 : Settings.m3gContextMode;
+			int mode = Settings.m3gContextMode == 0 && (Utils.win || Utils.termux) ? 2 : Settings.m3gContextMode;
 			if (!forceWindow && Settings.m3gContextMode != 3 && Emulator.getEmulator() instanceof SWTFrontend) {
 				try {
 					SWTFrontend.syncExec(() -> {

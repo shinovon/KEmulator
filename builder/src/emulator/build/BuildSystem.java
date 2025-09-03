@@ -1,6 +1,7 @@
 package emulator.build;
 
 import emulator.Emulator;
+import emulator.Utils;
 import emulator.ui.swt.devutils.ClasspathEntry;
 import emulator.ui.swt.devutils.idea.ProjectConfigGenerator;
 import emulator.ui.swt.devutils.idea.ProjectGenerator;
@@ -49,20 +50,20 @@ public class BuildSystem {
 		runAfter = args.contains(RUN);
 		skipMissing = args.contains(SKIPMISS);
 
-		if (Emulator.isJava9()) {
+		if (Utils.isJava9()) {
 			System.out.println("Must be run with JDK 1.8.");
 			System.exit(1);
 		}
 
-		String jdkHome = Emulator.getJdkHome();
+		String jdkHome = Utils.getJdkHome();
 		if (jdkHome == null) {
 			System.out.println("Must be run with JDK 1.8, not with JRE.");
 			System.exit(1);
 		}
 
-		javac = Paths.get(jdkHome, "bin", Emulator.win ? "javac.exe" : "javac").toString();
-		java = Paths.get(jdkHome, "bin", Emulator.win ? "java.exe" : "java").toString();
-		jar = Paths.get(jdkHome, "bin", Emulator.win ? "jar.exe" : "jar").toString();
+		javac = Paths.get(jdkHome, "bin", Utils.win ? "javac.exe" : "javac").toString();
+		java = Paths.get(jdkHome, "bin", Utils.win ? "java.exe" : "java").toString();
+		jar = Paths.get(jdkHome, "bin", Utils.win ? "jar.exe" : "jar").toString();
 
 		System.out.println("Building project at " + projectRoot);
 
@@ -122,7 +123,7 @@ public class BuildSystem {
 			Files.createDirectories(projectRoot.resolve("bin"));
 			Files.createDirectories(projectRoot.resolve("deployed").resolve("raw"));
 			for (File f : projectRoot.resolve("bin").toFile().listFiles()) {
-				String[] args = Emulator.win ? new String[]{"rd", "/s", "/q", f.getAbsolutePath()} : new String[]{"rm", "-rf", f.getAbsolutePath()};
+				String[] args = Utils.win ? new String[]{"rd", "/s", "/q", f.getAbsolutePath()} : new String[]{"rm", "-rf", f.getAbsolutePath()};
 				Runtime.getRuntime().exec(args).waitFor();
 			}
 			Files.deleteIfExists(rawJar);
@@ -298,7 +299,7 @@ public class BuildSystem {
 
 		if (runAfter) {
 			System.out.println("Running built JAR...");
-			run("kemulator", new ProcessBuilder(java, "-jar", Emulator.getAbsolutePath() + File.separator + "KEmulator.jar", "-jar", projectRoot.resolve("deployed").resolve(projectName + ".jar").toString()), false);
+			run("kemulator", new ProcessBuilder(java, "-jar", Emulator.getAbsolutePath() + File.separator + "KUtils.jar", "-jar", projectRoot.resolve("deployed").resolve(projectName + ".jar").toString()), false);
 		}
 
 		System.exit(0);

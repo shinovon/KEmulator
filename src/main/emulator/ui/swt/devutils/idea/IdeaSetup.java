@@ -2,6 +2,7 @@ package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.Utils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.eclipse.swt.SWT;
@@ -107,7 +108,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		if (Settings.ideaJdkTablePatched) // this is an invalid state! successful patching must close the window.
 			throw new RuntimeException("Attempt to run setup when not needed.");
 
-		if (Emulator.macos) {
+		if (Utils.macos) {
 			new Label(shell, SWT.NONE).setText("Mac OS is not supported yet. Reach us to become a tester!");
 			shell.layout(true, true);
 			return;
@@ -286,12 +287,12 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 
 		// JDK 1.8 for use in IDE
 		if (jdkHome == null) {
-			if (Emulator.isJava9()) {
+			if (Utils.isJava9()) {
 				new Label(shell, SWT.NONE).setText("KEmulator is launched with java " + System.getProperty("java.version") + ".");
 				new Label(shell, SWT.NONE).setText("Please install JDK 1.8 and select it.");
 				new Label(shell, SWT.NONE).setText("You can run KEmulator with it for auto setup.");
 			} else {
-				String _jdkHome = Emulator.getJdkHome();
+				String _jdkHome = Utils.getJdkHome();
 				if (_jdkHome != null) {
 					jdkHome = _jdkHome;
 					refreshContent();
@@ -342,7 +343,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					Path ppath = Paths.get(path);
 					if (Files.exists(ppath.resolve("java.exe")) && Files.exists(ppath.resolve("javac.exe"))) {
 						try {
-							if (Emulator.getProcessOutput(new String[]{ppath.resolve("java.exe").toAbsolutePath().toString(), "-version"}, true).contains("1.8.")) {
+							if (Utils.getProcessOutput(new String[]{ppath.resolve("java.exe").toAbsolutePath().toString(), "-version"}, true).contains("1.8.")) {
 								found = true;
 								Button b = new Button(jdkSetupGroup, SWT.FLAT);
 								b.setText(path);
@@ -633,10 +634,10 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			String path = dd.open();
 			if (path == null) return;
 			Path ppath = Paths.get(path);
-			if (Files.exists(ppath.resolve("bin").resolve(Emulator.win ? "java.exe" : "java")) &&
-					Files.exists(ppath.resolve("bin").resolve(Emulator.win ? "javac.exe" : "javac"))) {
+			if (Files.exists(ppath.resolve("bin").resolve(Utils.win ? "java.exe" : "java")) &&
+					Files.exists(ppath.resolve("bin").resolve(Utils.win ? "javac.exe" : "javac"))) {
 				try {
-					String javaVer = Emulator.getProcessOutput(new String[]{ppath.resolve("bin").resolve(Emulator.win ? "java.exe" : "java").toAbsolutePath().toString(), "-version"}, true);
+					String javaVer = Utils.getProcessOutput(new String[]{ppath.resolve("bin").resolve(Utils.win ? "java.exe" : "java").toAbsolutePath().toString(), "-version"}, true);
 					if (javaVer.contains("1.8.")) {
 						jdkHome = path;
 						refreshContent();
@@ -655,7 +656,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			Emulator.openUrlExternallySilent("https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html");
 		} else if (e.widget == pkgJdk) {
 			try {
-				String distroName = Emulator.getProcessOutput(new String[]{"/usr/bin/bash", "-c", "source /etc/os-release && echo $NAME"}, false).trim();
+				String distroName = Utils.getProcessOutput(new String[]{"/usr/bin/bash", "-c", "source /etc/os-release && echo $NAME"}, false).trim();
 				Emulator.openUrlExternallySilent("https://duckduckgo.com/?q=" + distroName.replace(" ", "+") + "+openjdk+1.8+package");
 			} catch (IOException ex) {
 				errorMsg("Failed to get distro name", ex.toString());
@@ -684,7 +685,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		}
 		try {
 			JdkTablePatcher.updateJdkTable(jdkTablePath, useOnlineDocs ? null : localDocsPath, jdkHome);
-			String repairer = Paths.get(Settings.ideaPath).getParent().resolve(Emulator.win ? "repair.exe" : "repair").toAbsolutePath().toString();
+			String repairer = Paths.get(Settings.ideaPath).getParent().resolve(Utils.win ? "repair.exe" : "repair").toAbsolutePath().toString();
 			try {
 				Runtime.getRuntime().exec(new String[]{repairer, "caches", "--clear"}).waitFor();
 			} catch (IOException ex) {
@@ -693,7 +694,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				if (defaultFolderName != null) {
 					// try to wipe cache manually
 					try {
-						if (Emulator.win) {
+						if (Utils.win) {
 							Path path = Paths.get(System.getenv("LOCALAPPDATA") + "\\JetBrains\\" + defaultFolderName);
 							if (Files.exists(path)) {
 								deleteRecursive(path.toFile());
@@ -701,7 +702,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 								throw new RuntimeException();
 							}
 						}
-						if (Emulator.linux) {
+						if (Utils.linux) {
 							Path path = Paths.get(System.getenv("HOME") + "/.cache/JetBrains/" + defaultFolderName);
 							if (Files.exists(path)) {
 								Runtime.getRuntime().exec(new String[]{"/usr/bin/rm", "-rf", path.toAbsolutePath().toString()}).waitFor();
@@ -729,9 +730,9 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	private void chooseIdeaLauncherManually() {
 		FileDialog fd = new FileDialog(shell, SWT.OPEN);
 		fd.setText("Choose IDEA binary (\"idea\", \"idea.exe\" or \"idea.sh\")");
-		if (Emulator.win)
+		if (Utils.win)
 			fd.setFilterExtensions(new String[]{"idea*.exe", "idea*.bat"});
-		else if (Emulator.linux)
+		else if (Utils.linux)
 			fd.setFilterExtensions(new String[]{"idea", "idea*.sh"});
 		String path = fd.open();
 		if (path == null) return;
@@ -825,11 +826,11 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 	}
 
 	protected static boolean is8(String jdkHome) {
-		Path bin = Paths.get(jdkHome).resolve("bin").resolve(Emulator.win ? "java.exe" : "java").toAbsolutePath();
+		Path bin = Paths.get(jdkHome).resolve("bin").resolve(Utils.win ? "java.exe" : "java").toAbsolutePath();
 		if (!Files.exists(bin))
 			return false;
 		try {
-			return Emulator.getProcessOutput(new String[]{bin.toString(), "-version"}, true).contains("1.8.");
+			return Utils.getProcessOutput(new String[]{bin.toString(), "-version"}, true).contains("1.8.");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

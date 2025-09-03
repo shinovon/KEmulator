@@ -2,6 +2,7 @@ package emulator.ui.swt;
 
 import emulator.Emulator;
 import emulator.UILocale;
+import emulator.Utils;
 import emulator.debug.Memory;
 import emulator.graphics3D.Quaternion;
 import emulator.graphics3D.Transform3D;
@@ -465,7 +466,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 			if (canvas != null) canvas.dispose();
 			canvas = new Canvas(this.aComposite907, 264192);
 		}
-		if (Emulator.win) {
+		if (Utils.win) {
 			poller = new Win32KeyboardPoller((EmulatorScreen) Emulator.getEmulator().getScreen());
 		}
 

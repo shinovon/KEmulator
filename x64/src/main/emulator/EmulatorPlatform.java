@@ -37,7 +37,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 
 	public void loadLibraries() {
 		System.setProperty("jna.nosys", "true");
-		if (Emulator.termux) {
+		if (Utils.termux) {
 			System.setProperty("org.lwjgl.librarypath", "/data/data/com.termux/files/usr/lib:" + Emulator.getAbsolutePath());
 		}
 		loadSWTLibrary();
@@ -130,7 +130,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		String os =
 				osn.contains("win") ? "windows" :
 				osn.contains("mac") ? "macos" :
-				Emulator.termux ? "android" :
+				Utils.termux ? "android" :
 				osn.contains("linux") || osn.contains("nix") ? "linux" :
 				null;
 		if (os == null) {
@@ -158,7 +158,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 			os = "win32";
 		} else if (osn.contains("mac")) {
 			os = "macosx";
-		} else if (Emulator.termux) {
+		} else if (Utils.termux) {
 			os = "gtk-android";
 		} else if (osn.contains("linux") || osn.contains("nix")) {
 			os = "gtk-linux";
