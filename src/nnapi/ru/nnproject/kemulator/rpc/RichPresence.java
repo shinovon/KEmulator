@@ -10,30 +10,30 @@ public class RichPresence {
 	}
 
 	public static void setState(String state) {
-		Emulator.rpcState = state;
+		emulator.ui.RichPresence.rpcState = state;
 	}
 
 	public static void setDetails(String details) {
-		Emulator.rpcDetails = details;
+		emulator.ui.RichPresence.rpcDetails = details;
 	}
 
 	public static void setStartTimestamp(long timestamp) {
-		Emulator.rpcStartTimestamp = timestamp / 1000L;
+		emulator.ui.RichPresence.rpcStartTimestamp = timestamp / 1000L;
 	}
 
 	public static void setEndTimestamp(long timestamp) {
-		Emulator.rpcEndTimestamp = timestamp / 1000L;
+		emulator.ui.RichPresence.rpcEndTimestamp = timestamp / 1000L;
 	}
 
 	public static void setPartySize(int partySize) {
-		Emulator.rpcPartySize = partySize;
+		emulator.ui.RichPresence.rpcPartySize = partySize;
 	}
 
 	public static void setPartyMax(int partyMax) {
-		Emulator.rpcPartyMax = partyMax;
+		emulator.ui.RichPresence.rpcPartyMax = partyMax;
 	}
 
 	public static void updatePresence() {
-		Emulator.updatePresence();
+		emulator.ui.RichPresence.updatePresence();
 	}
 }

@@ -11,6 +11,7 @@ import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
+import emulator.ui.RichPresence;
 import emulator.ui.bridge.BridgeFrontend;
 import emulator.ui.swt.Property;
 import emulator.ui.swt.SWTFrontend;
@@ -62,15 +63,6 @@ public class Emulator implements Runnable {
 	public static emulator.custom.CustomClassLoader customClassLoader;
 	public static String iconPath;
 
-	protected static Object rpc;
-	private static Thread rpcCallbackThread;
-	public static long rpcStartTimestamp;
-	public static long rpcEndTimestamp;
-	public static String rpcState;
-	public static String rpcDetails;
-	public static int rpcPartySize;
-	public static int rpcPartyMax;
-
 	public static String httpUserAgent;
 	private final static Thread backgroundThread;
 	public static IEmulatorPlatform platform;
@@ -80,48 +72,6 @@ public class Emulator implements Runnable {
 	private static boolean updated;
 	private static boolean bridge;
 	public static boolean doja;
-
-	private static void initRichPresence() {
-		if (!Settings.rpc)
-			return;
-		final DiscordRPC rpc = (DiscordRPC) (Emulator.rpc = DiscordRPC.INSTANCE);
-		DiscordEventHandlers handlers = new DiscordEventHandlers();
-//        handlers.ready = new DiscordEventHandlers.OnReady() {
-//            public void accept(DiscordUser user) {}
-//        };
-		rpc.Discord_Initialize("823522436444192818", handlers, true, "");
-		DiscordRichPresence presence = new DiscordRichPresence();
-		presence.startTimestamp = rpcStartTimestamp = System.currentTimeMillis() / 1000;
-		presence.state = "No MIDlet loaded";
-		rpc.Discord_UpdatePresence(presence);
-		rpcCallbackThread = new Thread("KEmulator RPC-Callback-Handler") {
-			public void run() {
-				while (true) {
-					rpc.Discord_RunCallbacks();
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						break;
-					}
-				}
-			}
-		};
-		rpcCallbackThread.start();
-	}
-
-	public static void updatePresence() {
-		if (rpc == null)
-			return;
-		DiscordRPC rpc = (DiscordRPC) Emulator.rpc;
-		DiscordRichPresence presence = new DiscordRichPresence();
-		presence.state = rpcState;
-		presence.details = rpcDetails;
-		presence.startTimestamp = rpcStartTimestamp;
-		presence.endTimestamp = rpcEndTimestamp;
-		presence.partySize = rpcPartySize;
-		presence.partyMax = rpcPartyMax;
-		rpc.Discord_UpdatePresence(presence);
-	}
 
 	private Emulator() {
 		super();
@@ -174,8 +124,7 @@ public class Emulator implements Runnable {
 	}
 
 	public static void notifyDestroyed() {
-		if (rpcCallbackThread != null)
-			rpcCallbackThread.interrupt();
+		RichPresence.close();
 		MMFPlayer.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
@@ -821,7 +770,7 @@ public class Emulator implements Runnable {
 			Devices.load(Emulator.deviceFile);
 			tryToSetDevice(Emulator.deviceName);
 			setupMRUList();
-			initRichPresence();
+			RichPresence.initRichPresence();
 
 			if (Settings.autoUpdate == 0) {
 				Settings.autoUpdate = updated ? 2 : Emulator.emulatorimpl.getScreen().showUpdateDialog(0);
@@ -867,9 +816,9 @@ public class Emulator implements Runnable {
 				ex3.printStackTrace();
 			}
 			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
-				Emulator.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-				Emulator.rpcDetails = Settings.uei ? "UEI" : new File(midletJar).getName();
-				updatePresence();
+				RichPresence.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+				RichPresence.rpcDetails = Settings.uei ? "UEI" : new File(midletJar).getName();
+				RichPresence.updatePresence();
 			}
 			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
 			setProperties();
