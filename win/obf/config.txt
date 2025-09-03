@@ -70,6 +70,7 @@
 -keep public class com.pantech.** { public protected *; }
 -keep public class com.mot.** { public protected *; }
 -keep public class mmpp.** { public protected *; }
+-keep public class com.nttdocomo.** { public protected *; }
 
 # LIBRARIES
 -keep public class club.minnced.discord.rpc.** { public protected *; }
