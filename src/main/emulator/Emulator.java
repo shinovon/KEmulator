@@ -1175,6 +1175,10 @@ public class Emulator implements Runnable {
 			cmd.add("java.base/java.io=ALL-UNNAMED");
 			cmd.add("--add-opens");
 			cmd.add("java.base/java.util=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/sun.misc=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.base/com.sun.media.sound=ALL-UNNAMED");
 			if (Utils.isJava17())
 				cmd.add("--enable-native-access=ALL-UNNAMED");
 		}
