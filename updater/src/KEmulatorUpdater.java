@@ -320,6 +320,8 @@ public class KEmulatorUpdater implements Runnable {
 			cmd.add("jdk.unsupported/sun.misc=ALL-UNNAMED");
 			cmd.add("--add-opens");
 			cmd.add("java.desktop/com.sun.media.sound=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.desktop/javax.sound.midi=ALL-UNNAMED");
 			if (getJavaVersionMajor() >= 17)
 				cmd.add("--enable-native-access=ALL-UNNAMED");
 		}

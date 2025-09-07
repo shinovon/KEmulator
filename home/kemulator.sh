@@ -56,6 +56,7 @@ then
     "--add-opens" "java.base/java.util=ALL-UNNAMED"
     "--add-opens" "jdk.unsupported/sun.misc=ALL-UNNAMED"
     "--add-opens" "java.desktop/com.sun.media.sound=ALL-UNNAMED"
+    "--add-opens" "java.desktop/javax.sound.midi=ALL-UNNAMED"
     "--enable-native-access=ALL-UNNAMED"
   )
 fi
