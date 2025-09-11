@@ -139,7 +139,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		if (!osa.contains("amd64") && !osa.contains("86") && !osa.contains("aarch64") && !osa.contains("arm")) {
 			return new String[0];
 		}
-		String arch = os + ((osa.contains("amd64") || osa.contains("x84_64")) ? "" : osa.contains("86") ? "-x86" : osa.contains("aarch64") ? "-arm64" : osa.contains("arm") ? "-arm32" : "");
+		String arch = os + ((osa.contains("amd64") || osa.contains("x86_64")) ? "" : osa.contains("86") ? "-x86" : osa.contains("aarch64") ? "-arm64" : osa.contains("arm") ? "-arm32" : "");
 
 		String[] l = new String[4];
 		l[0] = "lwjgl-natives-" + arch + ".jar";
