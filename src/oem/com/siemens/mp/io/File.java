@@ -182,12 +182,16 @@ public class File {
 	}
 
 	private static java.io.File getFile(String fileName) {
+		String r = Emulator.getUserPath() + "/file/root/";
+		try {
+			new java.io.File(r).mkdirs();
+		} catch (Exception ignored) {}
 		int colon = fileName.indexOf(':');
 		if (colon == -1) {
-			return new java.io.File(Emulator.getUserPath() + "/file/root/", fileName);
+			return new java.io.File(r, fileName);
 		} else {
 			fileName = fileName.substring(colon + 2);
-			return new java.io.File(Emulator.getUserPath() + "/file/root/", fileName);
+			return new java.io.File(r, fileName);
 		}
 	}
 }
