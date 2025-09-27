@@ -602,7 +602,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				localDocsPath = path;
 				Settings.ideaJdkTablePatched = false;
 				refreshContent();
-			} catch (IOException ex) {
+			} catch (IOException | RuntimeException ex) {
 				errorMsg("Documentation location", "Failed to find documentation file for \"MIDlet\" class. You are expected to choose \"docs\" folder, it contains subfolders for each jsr/api.");
 			}
 		} else if (e.widget == installDocsToUsr) {
