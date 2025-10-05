@@ -50,8 +50,8 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		fixupIdeaClonedProject.setLayout(genGLo());
 		fixupIdeaClonedProject.setLayoutData(genGd());
 
-		new Label(fixupIdeaClonedProject, SWT.NONE).setText("Project configuration keeps absolute paths specific to each machine.");
-		new Label(fixupIdeaClonedProject, SWT.NONE).setText("Affected files are gitignored by default. This button will create them.");
+		new Label(fixupIdeaClonedProject, SWT.NONE).setText("Some files are gitignored by default because they contain absolute paths.");
+		new Label(fixupIdeaClonedProject, SWT.NONE).setText("They should be recreated if you downloaded someone's project.");
 		fixClonedBtn = new Button(fixupIdeaClonedProject, SWT.FLAT);
 		fixClonedBtn.setText("Choose a project");
 		fixClonedBtn.addSelectionListener(this);
