@@ -833,7 +833,8 @@ public class Emulator implements Runnable {
 			} else {
 				getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
 				try {
-					midletClass = Class.forName(Emulator.midletClassName = Emulator.midletClassName.replace('/', '.'), true, Emulator.customClassLoader);
+					midletClassName = midletClassName.replace('/', '.');
+					midletClass = Class.forName(midletClassName, true, customClassLoader);
 				} catch (Throwable e) {
 					e.printStackTrace();
 					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
