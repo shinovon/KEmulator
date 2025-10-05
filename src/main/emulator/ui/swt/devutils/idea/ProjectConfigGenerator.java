@@ -18,8 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
+/**
+ * Generates various configuration files for projects.
+ */
 public class ProjectConfigGenerator {
 
 	public static final String encodingFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -74,6 +76,10 @@ public class ProjectConfigGenerator {
 
 	public static String buildLocalProguardConfig(String dir, String name, ClasspathEntry[] classpath) {
 		StringBuilder sb = new StringBuilder();
+		sb.append("# This config file is gitignored and reset on each deploy.");
+		sb.append(System.lineSeparator());
+		sb.append("# Actual configuration should live in another file, \"proguard.cfg\" by default.");
+		sb.append(System.lineSeparator());
 		for (String l : JdkTablePatcher.getDevTimeJars()) {
 			sb.append("-libraryjars '");
 			sb.append(l);

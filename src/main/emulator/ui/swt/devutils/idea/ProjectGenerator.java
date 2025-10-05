@@ -20,13 +20,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * Uses {@link ProjectConfigGenerator} to create project structure on disk.
+ */
 public class ProjectGenerator {
 
 	public static final String PROGUARD_LOCAL_CFG = "proguard-local.cfg";
 	public static final String PROGUARD_GLOBAL_CFG = "proguard.cfg";
-	public static final String SYMLINK_FAIL_MSG = "Please do something so symlinks begin to work at your project location. " +
-			"This may include tweaking your FS/mount options, moving the project to another FS, enabling Windows Developer Mode, running from admin/sudo, etc. " +
-			"Also check git settings for related options.";
 
 	public static String create(String location, String projectName, String midletClassName, String readableName) throws IOException, ParserConfigurationException, TransformerException, SAXException {
 		Path dir = Paths.get(location, projectName).toAbsolutePath();
