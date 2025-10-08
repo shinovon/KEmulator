@@ -77,7 +77,14 @@ public final class CustomClassLoader extends ClassLoader {
 				Settings.asmSkipDebug = true;
 				bytes = load(s);
 			}
-			defineClass = this.defineClass(s, bytes, 0, bytes.length);
+			try {
+				defineClass = this.defineClass(s, bytes, 0, bytes.length);
+			} catch (ClassFormatError e) {
+				if (Settings.asmSkipDebug) throw e;
+				Settings.asmSkipDebug = true;
+				bytes = load(s);
+				defineClass = this.defineClass(s, bytes, 0, bytes.length);
+			}
 		} catch (ClassNotFoundException e) {
 			return super.findClass(s);
 		} catch (Exception e) {
