@@ -181,12 +181,18 @@ public final class Memory {
 					if (Settings.recordReleasedImg && this.releasedImages.contains(o)) {
 						this.releasedImages.remove(o); // this image is still alive
 					}
-				} else if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
+					return;
+				}
+				if (o instanceof Sound || o instanceof AudioClip || o instanceof Player) {
 					if (!players.contains(o))
 						players.add(o);
-				} else if (o instanceof Node) {
+					return;
+				}
+				if (o instanceof Node) {
 					this.m3gObjects.add(o);
-				} else if (o instanceof Image2D) {
+					return;
+				}
+				if (o instanceof Image2D) {
 					IImage img = MemoryViewImage.createFromM3GImage((Image2D) o);
 					if (img != null) {
 						MemoryViewImage mvi = new MemoryViewImage(img, MemoryViewImageType.M3G, o);
@@ -196,7 +202,9 @@ public final class Memory {
 							this.releasedImages.remove(i); // this image is still alive
 						}
 					}
-				} else if (o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
+					return;
+				}
+				if (o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
 					IImage img = MemoryViewImage.createFromMicro3DTexture(o);
 					if (img != null) {
 						MemoryViewImage mvi = new MemoryViewImage(img, MemoryViewImageType.Micro3D, o);
@@ -206,6 +214,11 @@ public final class Memory {
 							this.releasedImages.remove(i); // this image is still alive
 						}
 					}
+					return;
+				}
+				if (o instanceof Object3D) {
+					iterateFields(clazz, classInfo.cachedFields, o, path);
+					return;
 				}
 			} catch (NoClassDefFoundError e) {
 				e.printStackTrace();
@@ -252,14 +265,6 @@ public final class Memory {
 			}
 			if (o instanceof String) {
 				return;
-			}
-			try {
-				if (o instanceof Object3D) {
-					iterateFields(clazz, classInfo.cachedFields, o, path);
-					return;
-				}
-			} catch (NoClassDefFoundError e) {
-				e.printStackTrace();
 			}
 		}
 
