@@ -122,7 +122,7 @@ public final class CustomClassLoader extends ClassLoader {
 	}
 
 	public static boolean isProtected(String s, boolean stack) {
-		if (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty())
+		if (!Settings.hideEmulation && (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty()))
 			return false;
 
 		if (s.startsWith("__")) return true;
@@ -142,8 +142,11 @@ public final class CustomClassLoader extends ClassLoader {
 
 		if (Settings.hideEmulation
 				&& (s.startsWith("java.applet") || s.startsWith("java.awt") || s.startsWith("java.swing")
-				|| s.startsWith("org.eclipse.swt") || s.startsWith("ru.nnproject")))
+				|| s.startsWith("org.eclipse.swt") || s.startsWith("ru.nnproject") || s.startsWith("java.lang.CharSequence")
+				|| s.startsWith("java.util.Collection") || s.startsWith("java.util.ArrayList") || s.startsWith("java.lang.ClassLoader")
+				|| s.startsWith("java.util.Map"))) {
 			return true;
+		}
 
 		int idx = -1;
 		while ((idx = s.indexOf('.', idx + 1)) != -1) {

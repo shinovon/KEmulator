@@ -152,6 +152,14 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 						}
 					}
 				}
+				if (Settings.hideEmulation) {
+					if (cls.equals("java/lang/Runtime")) {
+						if (name.equals("totalMemory") || name.equals("freeMemory")) {
+							super.visitMethodInsn(184, "emulator/custom/CustomMethod", name, "(Ljava/lang/Object;)J");
+							return;
+						}
+					}
+				}
 				String s5;
 				String s6;
 				if (sign.contains("java/util/TimerTask")) {

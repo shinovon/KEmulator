@@ -318,10 +318,19 @@ public class CustomMethod {
 	}
 
 	public static Class forName(String s) throws ClassNotFoundException {
-		if (Settings.hideEmulation && s.startsWith("emulator.custom.")) {
+		if ((Settings.hideEmulation && s.startsWith("emulator.custom.")) || CustomClassLoader.isProtected(s, false)) {
 			throw new ClassNotFoundException(s);
 		}
-		return Class.forName(s);
+
+		return Class.forName(s, true, Emulator.getCustomClassLoader());
+	}
+
+	public static long totalMemory(Object runtime) {
+		return 2 * 1024 * 1024L;
+	}
+
+	public static long freeMemory(Object runtime) {
+		return Math.max(((Runtime) runtime).freeMemory(), 1024 * 1024L + (System.currentTimeMillis() % 1024));
 	}
 
 	static {
