@@ -301,6 +301,10 @@ public final class ImageSWT implements IImage {
 		// TODO
 	}
 
+	@Override
+	public void switchMutability(boolean mutable) {
+	}
+
 	private int method300(int x, int y, ImageData imgdata) {
 		final RGB rgb = imgdata.palette.getRGB(imgdata.getPixel(x, y));
 		return ((imgdata.getAlpha(x, y) & 0xFF) << 24) + ((rgb.red & 0xFF) << 16) + ((rgb.green & 0xFF) << 8) + (rgb.blue & 0xFF);

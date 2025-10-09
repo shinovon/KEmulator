@@ -64,13 +64,21 @@ public final class c {
 			final PaletteData paletteData = new PaletteData(directColorModel.getRedMask(), directColorModel.getGreenMask(), directColorModel.getBlueMask());
 			final ImageData imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), directColorModel.getPixelSize(), paletteData);
 			final WritableRaster raster = bufferedImage.getRaster();
-			final int[] array = new int[4];
+			int imgW = imageData.width;
+			final int[] awtPixels = new int[4 * imgW];
+			final int[] swtPixels = new int[imgW];
+
 			for (int i = 0; i < imageData.height; ++i) {
-				for (int j = 0; j < imageData.width; ++j) {
-					raster.getPixel(j, i, array);
-					imageData.setPixel(j, i, paletteData.getPixel(new RGB(array[0], array[1], array[2])));
-					if (directColorModel.hasAlpha()) {
-						imageData.setAlpha(j, i, array[3]);
+				raster.getPixels(0, i, imgW, 1, awtPixels);
+
+				for (int j = 0; j < imgW; ++j) {
+					RGB rgb = new RGB(awtPixels[j * 4 + 0], awtPixels[j * 4 + 1], awtPixels[j * 4 + 2]);
+					swtPixels[j] = paletteData.getPixel(rgb);
+				}
+				imageData.setPixels(0, i, imgW, swtPixels, 0);
+				if (directColorModel.hasAlpha()) {
+					for (int j = 0; j < imgW; ++j) {
+						imageData.setAlpha(j, i, awtPixels[j * 4 + 3]);
 					}
 				}
 			}
