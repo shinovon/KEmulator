@@ -250,6 +250,9 @@ public final class Memory {
 				}
 				return;
 			}
+			if (o instanceof String) {
+				return;
+			}
 			try {
 				if (o instanceof Object3D) {
 					iterateFields(clazz, classInfo.cachedFields, o, path);
@@ -454,7 +457,7 @@ public final class Memory {
 
 		// TODO investigate
 		if (cls == String.class) {
-			res += 2 + ((String) o).length();
+			res += 2 * ((String) o).length();
 			return res;
 		}
 
