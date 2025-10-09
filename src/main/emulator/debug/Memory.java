@@ -453,10 +453,10 @@ public final class Memory {
 		res += 12;
 
 		// TODO investigate
-//		if (cls == String.class) {
-//			res += 2 + ((String) o).length();
-//			return res;
-//		}
+		if (cls == String.class) {
+			res += 2 + ((String) o).length();
+			return res;
+		}
 
 		if (cls == Image.class) {
 			final Image image = (Image) o;
