@@ -128,34 +128,35 @@ public final class CopyUtils {
 			lastImg = bufferedImage;
 		}
 		ImageData data = CopyUtils.imageData;
-		int[] buf = CopyUtils.buffer;
-		int n = data.data.length - 1;
+		int[] source = CopyUtils.buffer;
+		byte[] target = data.data;
+		int n = target.length - 1;
 		switch (bufferedImage.getType()) {
 			case BufferedImage.TYPE_INT_BGR:
-				for (int i = buf.length - 1; i >= 0; --i) {
-					data.data[n--] = (byte) (0xFF);
-					data.data[n--] = (byte) (buf[i] & 0xFF);
-					data.data[n--] = (byte) (buf[i] >> 8 & 0xFF);
-					data.data[n--] = (byte) (buf[i] >> 16 & 0xFF);
+				for (int i = source.length - 1; i >= 0; --i) {
+					target[n--] = (byte) (0xFF);
+					target[n--] = (byte) (source[i] & 0xFF);
+					target[n--] = (byte) (source[i] >> 8 & 0xFF);
+					target[n--] = (byte) (source[i] >> 16 & 0xFF);
 				}
 				break;
 			case BufferedImage.TYPE_INT_RGB:
-				for (int i = buf.length - 1; i >= 0; --i) {
-					data.data[n--] = (byte) (0xFF);
-					data.data[n--] = (byte) (buf[i] >> 16 & 0xFF);
-					data.data[n--] = (byte) (buf[i] >> 8 & 0xFF);
-					data.data[n--] = (byte) (buf[i] & 0xFF);
+				for (int i = source.length - 1; i >= 0; --i) {
+					target[n--] = (byte) (0xFF);
+					target[n--] = (byte) (source[i] >> 16 & 0xFF);
+					target[n--] = (byte) (source[i] >> 8 & 0xFF);
+					target[n--] = (byte) (source[i] & 0xFF);
 				}
 				break;
 			case BufferedImage.TYPE_INT_ARGB:
-				data.alphaData = new byte[buf.length];
-				for (int i = buf.length - 1; i >= 0; --i) {
-					byte alpha = (byte) (buf[i] >> 24 & 0xFF);
-					data.data[n--] = alpha;
+				data.alphaData = new byte[source.length];
+				for (int i = source.length - 1; i >= 0; --i) {
+					byte alpha = (byte) (source[i] >> 24 & 0xFF);
+					target[n--] = alpha;
 					data.alphaData[i] = alpha;
-					data.data[n--] = (byte) (buf[i] >> 16 & 0xFF);
-					data.data[n--] = (byte) (buf[i] >> 8 & 0xFF);
-					data.data[n--] = (byte) (buf[i] & 0xFF);
+					target[n--] = (byte) (source[i] >> 16 & 0xFF);
+					target[n--] = (byte) (source[i] >> 8 & 0xFF);
+					target[n--] = (byte) (source[i] & 0xFF);
 				}
 				break;
 		}
