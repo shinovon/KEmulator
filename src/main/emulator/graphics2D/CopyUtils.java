@@ -107,8 +107,10 @@ public final class CopyUtils {
 	}
 
 	public static ImageData toSwt(final BufferedImage bufferedImage) {
-		if (bufferedImage.getType() == BufferedImage.TYPE_INT_RGB) {
-			return toSwtARGB(bufferedImage);
+		if (bufferedImage.getType() == BufferedImage.TYPE_INT_RGB ||
+				bufferedImage.getType() == BufferedImage.TYPE_INT_ARGB ||
+				bufferedImage.getType() == BufferedImage.TYPE_INT_BGR) {
+			return toSwtAsIs(bufferedImage);
 		}
 		if (bufferedImage.getColorModel() instanceof DirectColorModel) {
 			return toSwtDCM(bufferedImage);
@@ -119,7 +121,7 @@ public final class CopyUtils {
 		return null;
 	}
 
-	private static ImageData toSwtARGB(final BufferedImage bufferedImage) {
+	private static ImageData toSwtAsIs(final BufferedImage bufferedImage) {
 		if (buffer == null || bufferedImage != lastImg) {
 			imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, CopyUtils.palleteData);
 			buffer = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
@@ -128,11 +130,34 @@ public final class CopyUtils {
 		ImageData data = CopyUtils.imageData;
 		int[] buf = CopyUtils.buffer;
 		int n = data.data.length - 1;
-		for (int i = buf.length - 1; i >= 0; --i) {
-			data.data[n--] = (byte) (buf[i] >> 24 & 0xFF);
-			data.data[n--] = (byte) (buf[i] >> 16 & 0xFF);
-			data.data[n--] = (byte) (buf[i] >> 8 & 0xFF);
-			data.data[n--] = (byte) (buf[i] & 0xFF);
+		switch (bufferedImage.getType()) {
+			case BufferedImage.TYPE_INT_BGR:
+				for (int i = buf.length - 1; i >= 0; --i) {
+					data.data[n--] = (byte) (0xFF);
+					data.data[n--] = (byte) (buf[i] & 0xFF);
+					data.data[n--] = (byte) (buf[i] >> 8 & 0xFF);
+					data.data[n--] = (byte) (buf[i] >> 16 & 0xFF);
+				}
+				break;
+			case BufferedImage.TYPE_INT_RGB:
+				for (int i = buf.length - 1; i >= 0; --i) {
+					data.data[n--] = (byte) (0xFF);
+					data.data[n--] = (byte) (buf[i] >> 16 & 0xFF);
+					data.data[n--] = (byte) (buf[i] >> 8 & 0xFF);
+					data.data[n--] = (byte) (buf[i] & 0xFF);
+				}
+				break;
+			case BufferedImage.TYPE_INT_ARGB:
+				data.alphaData = new byte[buf.length];
+				for (int i = buf.length - 1; i >= 0; --i) {
+					byte alpha = (byte) (buf[i] >> 24 & 0xFF);
+					data.data[n--] = alpha;
+					data.alphaData[i] = alpha;
+					data.data[n--] = (byte) (buf[i] >> 16 & 0xFF);
+					data.data[n--] = (byte) (buf[i] >> 8 & 0xFF);
+					data.data[n--] = (byte) (buf[i] & 0xFF);
+				}
+				break;
 		}
 		return data;
 	}
