@@ -392,7 +392,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				}
 				if (y + imgH > 0 || y > canvasH) {
 					try {
-						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+						if (item.cache != null)
+							gc.drawImage(item.cache, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+						else
+							image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						if (this.darkenUnused) {
 							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						}

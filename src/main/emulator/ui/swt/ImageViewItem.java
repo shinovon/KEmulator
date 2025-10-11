@@ -2,6 +2,8 @@ package emulator.ui.swt;
 
 import emulator.debug.MemoryViewImage;
 import emulator.debug.MemoryViewImageType;
+import emulator.graphics2D.CopyUtils;
+import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.graphics.Rectangle;
 
 import javax.microedition.lcdui.Image;
@@ -16,6 +18,8 @@ public class ImageViewItem {
 	public final MemoryViewImageType type;
 	public final boolean released;
 	public final String type2;
+	public final boolean mutable;
+	public final org.eclipse.swt.graphics.Image cache;
 	/**
 	 * Rect where image was drawn. May be null if image was not drawn.
 	 */
@@ -33,10 +37,22 @@ public class ImageViewItem {
 			} else {
 				type2 = ""; //TODO i'm not familiar with micro3d
 			}
+			mutable = true;
+			cache = null;
 		} else {
 			source = image;
 			type = MemoryViewImageType.LCDUI;
-			type2 = image.isMutable() ? "Mutable" : "Immutable";
+			mutable = image.isMutable();
+			if (mutable) {
+				type2 = "Mutable";
+				cache = null;
+			} else {
+				type2 = "Immutable";
+				if (image.getImpl() instanceof ImageAWT)
+					cache = new org.eclipse.swt.graphics.Image(null, CopyUtils.toSwt(((ImageAWT) image.getImpl()).getBufferedImage()));
+				else
+					cache = null;
+			}
 		}
 	}
 
