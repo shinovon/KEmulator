@@ -32,9 +32,9 @@ public interface IImage {
 
 	void copyToClipBoard();
 
-	void cloneImage(final IImage sourceImg);
+	void cloneImage(final IImage target);
 
-	void cloneImage(final IImage sourceImg, int x, int y, int w, int h);
+	void cloneImage(final IImage target, int x, int y, int w, int h);
 
 	void copyImage(final IGraphics2D destGraphics, int sx, int sy, int w, int h, int tx, int ty);
 

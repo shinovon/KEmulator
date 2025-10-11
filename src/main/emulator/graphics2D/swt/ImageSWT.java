@@ -337,13 +337,13 @@ public final class ImageSWT implements IImage {
 		CopyUtils.setClipboard(CopyUtils.toAwtForCapture(this.imgdata));
 	}
 
-	public final void cloneImage(final IImage sourceImg) {
-		sourceImg.setData(this.getData());
+	public final void cloneImage(final IImage target) {
+		target.setData(this.getData());
 	}
 
-	public void cloneImage(IImage sourceImg, int x, int y, int w, int h) {
+	public void cloneImage(IImage target, int x, int y, int w, int h) {
 		// TODO
-		sourceImg.setData(this.getData());
+		target.setData(this.getData());
 	}
 
 	public void copyImage(IGraphics2D destGraphics, int sx, int sy, int w, int h, int tx, int ty) {

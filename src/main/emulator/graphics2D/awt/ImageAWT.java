@@ -185,17 +185,17 @@ public final class ImageAWT implements IImage {
 		CopyUtils.setClipboard(img);
 	}
 
-	public final void cloneImage(final IImage sourceImg) {
-		System.arraycopy(getInternalData(), 0, ((ImageAWT) sourceImg).getInternalData(), 0, data.length);
+	public final void cloneImage(final IImage target) {
+		System.arraycopy(getInternalData(), 0, ((ImageAWT) target).getInternalData(), 0, data.length);
 	}
 
-	public void cloneImage(IImage sourceImg, int x, int y, int w, int h) {
-		Graphics2D g = ((ImageAWT) sourceImg).g2d;
+	public void cloneImage(IImage target, int x, int y, int w, int h) {
+		Graphics2D g = ((ImageAWT) target).g2d;
 		if (g == null) {
-			if (((ImageAWT) sourceImg).graphics != null) {
-				g = ((ImageAWT) sourceImg).graphics.g;
+			if (((ImageAWT) target).graphics != null) {
+				g = ((ImageAWT) target).graphics.g;
 			} else {
-				g = ((ImageAWT) sourceImg).g2d = img.createGraphics();
+				g = ((ImageAWT) target).g2d = img.createGraphics();
 			}
 		}
 		g.drawImage(img, x, y, x + w, y + h, x, y, x + w, y + h, null);
