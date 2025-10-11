@@ -7,14 +7,17 @@ import org.eclipse.swt.graphics.RGB;
 import java.awt.*;
 import java.awt.image.*;
 
-public final class c {
-	private static final PaletteData palleteData;
+/**
+ * Methods to transfer images between SWT and AWT.
+ */
+public final class CopyUtils {
+	private static final PaletteData palleteData = new PaletteData(65280, 16711680, -16777216);
+
 	private static int[] buffer;
 	private static BufferedImage lastImg;
 	private static ImageData imageData;
 
-	public c() {
-		super();
+	private CopyUtils() {
 	}
 
 	public static BufferedImage toAwtForCapture(final ImageData imageData) {
@@ -56,60 +59,6 @@ public final class c {
 			}
 		}
 		return bufferedImage2;
-	}
-
-	private static ImageData _awtToSwt(final BufferedImage bufferedImage) {
-		if (bufferedImage.getColorModel() instanceof DirectColorModel) {
-			final DirectColorModel directColorModel = (DirectColorModel) bufferedImage.getColorModel();
-			final PaletteData paletteData = new PaletteData(directColorModel.getRedMask(), directColorModel.getGreenMask(), directColorModel.getBlueMask());
-			final ImageData imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), directColorModel.getPixelSize(), paletteData);
-			final WritableRaster raster = bufferedImage.getRaster();
-			int imgW = imageData.width;
-			final int[] awtPixels = new int[4 * imgW];
-			final int[] swtPixels = new int[imgW];
-
-			for (int i = 0; i < imageData.height; ++i) {
-				raster.getPixels(0, i, imgW, 1, awtPixels);
-
-				for (int j = 0; j < imgW; ++j) {
-					RGB rgb = new RGB(awtPixels[j * 4 + 0], awtPixels[j * 4 + 1], awtPixels[j * 4 + 2]);
-					swtPixels[j] = paletteData.getPixel(rgb);
-				}
-				imageData.setPixels(0, i, imgW, swtPixels, 0);
-				if (directColorModel.hasAlpha()) {
-					for (int j = 0; j < imgW; ++j) {
-						imageData.setAlpha(j, i, awtPixels[j * 4 + 3]);
-					}
-				}
-			}
-			return imageData;
-		}
-		if (bufferedImage.getColorModel() instanceof IndexColorModel) {
-			final IndexColorModel indexColorModel;
-			final int mapSize;
-			final byte[] array2 = new byte[mapSize = (indexColorModel = (IndexColorModel) bufferedImage.getColorModel()).getMapSize()];
-			final byte[] array3 = new byte[mapSize];
-			final byte[] array4 = new byte[mapSize];
-			indexColorModel.getReds(array2);
-			indexColorModel.getGreens(array3);
-			indexColorModel.getBlues(array4);
-			final RGB[] array5 = new RGB[mapSize];
-			for (int k = 0; k < array5.length; ++k) {
-				array5[k] = new RGB(array2[k] & 0xFF, array3[k] & 0xFF, array4[k] & 0xFF);
-			}
-			final ImageData imageData2;
-			(imageData2 = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), indexColorModel.getPixelSize(), new PaletteData(array5))).transparentPixel = indexColorModel.getTransparentPixel();
-			final WritableRaster raster2 = bufferedImage.getRaster();
-			final int[] array6 = {0};
-			for (int l = 0; l < imageData2.height; ++l) {
-				for (int n = 0; n < imageData2.width; ++n) {
-					raster2.getPixel(n, l, array6);
-					imageData2.setPixel(n, l, array6[0]);
-				}
-			}
-			return imageData2;
-		}
-		return null;
 	}
 
 	public static BufferedImage toAwt(final ImageData imageData) {
@@ -158,16 +107,26 @@ public final class c {
 	}
 
 	public static ImageData toSwt(final BufferedImage bufferedImage) {
-		if (bufferedImage.getType() != 1) {
-			return _awtToSwt(bufferedImage);
+		if (bufferedImage.getType() == BufferedImage.TYPE_INT_RGB) {
+			return toSwtARGB(bufferedImage);
 		}
+		if (bufferedImage.getColorModel() instanceof DirectColorModel) {
+			return toSwtDCM(bufferedImage);
+		}
+		if (bufferedImage.getColorModel() instanceof IndexColorModel) {
+			return toSwtICM(bufferedImage);
+		}
+		return null;
+	}
+
+	private static ImageData toSwtARGB(final BufferedImage bufferedImage) {
 		if (buffer == null || bufferedImage != lastImg) {
-			imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, c.palleteData);
+			imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), 32, CopyUtils.palleteData);
 			buffer = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
 			lastImg = bufferedImage;
 		}
-		ImageData data = c.imageData;
-		int[] buf = c.buffer;
+		ImageData data = CopyUtils.imageData;
+		int[] buf = CopyUtils.buffer;
 		int n = data.data.length - 1;
 		for (int i = buf.length - 1; i >= 0; --i) {
 			data.data[n--] = (byte) (buf[i] >> 24 & 0xFF);
@@ -178,11 +137,59 @@ public final class c {
 		return data;
 	}
 
-	public static void setClipboard(final BufferedImage bufferedImage) {
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new a(bufferedImage), null);
+	private static ImageData toSwtDCM(BufferedImage bufferedImage) {
+		final DirectColorModel directColorModel = (DirectColorModel) bufferedImage.getColorModel();
+		final PaletteData paletteData = new PaletteData(directColorModel.getRedMask(), directColorModel.getGreenMask(), directColorModel.getBlueMask());
+		final ImageData imageData = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), directColorModel.getPixelSize(), paletteData);
+		final WritableRaster raster = bufferedImage.getRaster();
+		int imgW = imageData.width;
+		final int[] awtPixels = new int[4 * imgW];
+		final int[] swtPixels = new int[imgW];
+
+		for (int i = 0; i < imageData.height; ++i) {
+			raster.getPixels(0, i, imgW, 1, awtPixels);
+
+			for (int j = 0; j < imgW; ++j) {
+				RGB rgb = new RGB(awtPixels[j * 4 + 0], awtPixels[j * 4 + 1], awtPixels[j * 4 + 2]);
+				swtPixels[j] = paletteData.getPixel(rgb);
+			}
+			imageData.setPixels(0, i, imgW, swtPixels, 0);
+			if (directColorModel.hasAlpha()) {
+				for (int j = 0; j < imgW; ++j) {
+					imageData.setAlpha(j, i, awtPixels[j * 4 + 3]);
+				}
+			}
+		}
+		return imageData;
 	}
 
-	static {
-		palleteData = new PaletteData(65280, 16711680, -16777216);
+	private static ImageData toSwtICM(BufferedImage bufferedImage) {
+		final IndexColorModel indexColorModel;
+		final int mapSize;
+		final byte[] array2 = new byte[mapSize = (indexColorModel = (IndexColorModel) bufferedImage.getColorModel()).getMapSize()];
+		final byte[] array3 = new byte[mapSize];
+		final byte[] array4 = new byte[mapSize];
+		indexColorModel.getReds(array2);
+		indexColorModel.getGreens(array3);
+		indexColorModel.getBlues(array4);
+		final RGB[] array5 = new RGB[mapSize];
+		for (int k = 0; k < array5.length; ++k) {
+			array5[k] = new RGB(array2[k] & 0xFF, array3[k] & 0xFF, array4[k] & 0xFF);
+		}
+		final ImageData imageData2;
+		(imageData2 = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), indexColorModel.getPixelSize(), new PaletteData(array5))).transparentPixel = indexColorModel.getTransparentPixel();
+		final WritableRaster raster2 = bufferedImage.getRaster();
+		final int[] array6 = {0};
+		for (int l = 0; l < imageData2.height; ++l) {
+			for (int n = 0; n < imageData2.width; ++n) {
+				raster2.getPixel(n, l, array6);
+				imageData2.setPixel(n, l, array6[0]);
+			}
+		}
+		return imageData2;
+	}
+
+	public static void setClipboard(final BufferedImage bufferedImage) {
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new a(bufferedImage), null);
 	}
 }

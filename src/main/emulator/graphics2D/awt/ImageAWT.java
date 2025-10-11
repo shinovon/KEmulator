@@ -1,5 +1,6 @@
 package emulator.graphics2D.awt;
 
+import emulator.graphics2D.CopyUtils;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import org.eclipse.swt.SWTException;
@@ -29,7 +30,7 @@ public final class ImageAWT implements IImage {
 	public ImageAWT(final byte[] array) throws IOException {
 		super();
 		try {
-			img = emulator.graphics2D.c.toAwt(new ImageData(new ByteArrayInputStream(array)));
+			img = CopyUtils.toAwt(new ImageData(new ByteArrayInputStream(array)));
 		} catch (SWTException e) {
 			if (!("Invalid image".equals(e.getMessage())
 					|| "Unsupported or unrecognized format".equals(e.getMessage())))
@@ -58,7 +59,7 @@ public final class ImageAWT implements IImage {
 
 	public final void copyToScreen(Object g, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
 		GC gc = (GC) g;
-		final Image image = new Image(null, emulator.graphics2D.c.toSwt(img));
+		final Image image = new Image(null, CopyUtils.toSwt(img));
 		gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
 		image.dispose();
 	}
@@ -73,7 +74,7 @@ public final class ImageAWT implements IImage {
 
 	public final void copyToScreen(Object g) {
 		GC gc = (GC) g;
-		final Image image = new Image(null, emulator.graphics2D.c.toSwt(img));
+		final Image image = new Image(null, CopyUtils.toSwt(img));
 		gc.drawImage(image, 0, 0);
 		image.dispose();
 	}
@@ -181,7 +182,7 @@ public final class ImageAWT implements IImage {
 	}
 
 	public final void copyToClipBoard() {
-		emulator.graphics2D.c.setClipboard(img);
+		CopyUtils.setClipboard(img);
 	}
 
 	public final void cloneImage(final IImage sourceImg) {

@@ -1,5 +1,6 @@
 package emulator.graphics2D.swt;
 
+import emulator.graphics2D.CopyUtils;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import org.eclipse.swt.graphics.*;
@@ -315,7 +316,7 @@ public final class ImageSWT implements IImage {
 			}
 		}
 		try {
-			ImageIO.write(emulator.graphics2D.c.toAwtForCapture(this.imgdata), "png", new File(s));
+			ImageIO.write(CopyUtils.toAwtForCapture(this.imgdata), "png", new File(s));
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 		}
@@ -326,14 +327,14 @@ public final class ImageSWT implements IImage {
 		if (this.mutable) {
 			this.imgdata = this.img.getImageData();
 		}
-		ImageIO.write(emulator.graphics2D.c.toAwtForCapture(this.imgdata), format, out);
+		ImageIO.write(CopyUtils.toAwtForCapture(this.imgdata), format, out);
 	}
 
 	public final void copyToClipBoard() {
 		if (this.mutable) {
 			this.imgdata = this.img.getImageData();
 		}
-		emulator.graphics2D.c.setClipboard(emulator.graphics2D.c.toAwtForCapture(this.imgdata));
+		CopyUtils.setClipboard(CopyUtils.toAwtForCapture(this.imgdata));
 	}
 
 	public final void cloneImage(final IImage sourceImg) {
