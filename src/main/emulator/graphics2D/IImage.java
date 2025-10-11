@@ -51,10 +51,4 @@ public interface IImage {
 	void fill(int color);
 
 	void getRGB(int[] data, int off, int scan, int x, int y, int w, int h);
-
-	/**
-	 * Allows some copy optimizations to be applied.
-	 * Image is mutable dy default.
-	 */
-	void switchMutability(boolean mutable);
 }

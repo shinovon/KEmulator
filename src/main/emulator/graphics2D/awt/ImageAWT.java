@@ -26,9 +26,6 @@ public final class ImageAWT implements IImage {
 	private int[] data;
 	private boolean directAccess;
 
-	private Object swtCache;
-	private boolean allowSwtCache = false;
-
 	public ImageAWT(final byte[] array) throws IOException {
 		super();
 		try {
@@ -59,30 +56,11 @@ public final class ImageAWT implements IImage {
 		return img;
 	}
 
-	public synchronized void switchMutability(boolean mutable) {
-		allowSwtCache = !mutable;
-		if (mutable) {
-			Image i = (Image) swtCache;
-			swtCache = null;
-			if (i != null)
-				i.dispose();
-		}
-	}
-
-	public final synchronized void copyToScreen(Object g, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
+	public final void copyToScreen(Object g, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
 		GC gc = (GC) g;
-		if (allowSwtCache) {
-			Image image = (Image) swtCache;
-			if (image == null) {
-				image = new Image(null, emulator.graphics2D.c.toSwt(img));
-				swtCache = image;
-			}
-			gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
-		} else {
-			Image image = new Image(null, emulator.graphics2D.c.toSwt(img));
-			gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
-			image.dispose();
-		}
+		final Image image = new Image(null, emulator.graphics2D.c.toSwt(img));
+		gc.drawImage(image, n, n2, n3, n4, n5, n6, n7, n8);
+		image.dispose();
 	}
 
 	public boolean isTransparent() {

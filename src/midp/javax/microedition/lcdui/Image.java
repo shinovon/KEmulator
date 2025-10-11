@@ -65,7 +65,7 @@ public class Image {
 		if (this.xrayBuffer == null && Settings.xrayView) {
 			this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
 		}
-		imageImpl.switchMutability(true);
+
 		return new Graphics(this.imageImpl, xrayBuffer);
 	}
 
@@ -83,9 +83,7 @@ public class Image {
 
 	private static Image decode(final byte[] array) throws IllegalArgumentException {
 		try {
-			Image img = new Image(Emulator.getEmulator().newImage(array));
-			img.imageImpl.switchMutability(false);
-			return img;
+			return new Image(Emulator.getEmulator().newImage(array));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			Emulator.getEmulator().getLogStream().println("*** createImage error!! check it ***");
@@ -114,8 +112,7 @@ public class Image {
 	public static Image createImage(final int n, final int n2) {
 		if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
 		final Image image;
-		image = new Image(Emulator.getEmulator().newImage(n, n2, false));
-		image.mutable = true;
+		(image = new Image(Emulator.getEmulator().newImage(n, n2, false))).mutable = true;
 		if (Settings.xrayView)
 			image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
 		return image;
@@ -143,7 +140,6 @@ public class Image {
 		if (Settings.xrayView)
 			image2.xrayBuffer = Emulator.getEmulator().newImage(n6, n7, true, 0);
 		image2.getGraphics().drawRegion(image, n, n2, n3, n4, n5, 0, 0, 20);
-		image2.imageImpl.switchMutability(false);
 		image2.mutable = false;
 		return image2;
 	}
@@ -166,7 +162,6 @@ public class Image {
 	public static Image createRGBImage(final int[] array, final int n, final int n2, final boolean b) {
 		final Image image;
 		GraphicsUtils.setImageData((image = new Image(Emulator.getEmulator().newImage(n, n2, b))).imageImpl, array, b, 0, n, n, n2);
-		image.imageImpl.switchMutability(false);
 		return image;
 	}
 
