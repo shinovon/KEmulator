@@ -18,8 +18,8 @@ public class ImageViewItem {
 	public final MemoryViewImageType type;
 	public final boolean released;
 	public final String type2;
-	public final boolean mutable;
-	public final org.eclipse.swt.graphics.Image cache;
+	public final boolean allowCache;
+	public org.eclipse.swt.graphics.Image cache;
 	/**
 	 * Rect where image was drawn. May be null if image was not drawn.
 	 */
@@ -37,23 +37,23 @@ public class ImageViewItem {
 			} else {
 				type2 = ""; //TODO i'm not familiar with micro3d
 			}
-			mutable = true;
+			allowCache = false;
 			cache = null;
 		} else {
 			source = image;
 			type = MemoryViewImageType.LCDUI;
-			mutable = image.isMutable();
-			if (mutable) {
-				type2 = "Mutable";
-				cache = null;
-			} else {
-				type2 = "Immutable";
-				if (image.getImpl() instanceof ImageAWT)
-					cache = new org.eclipse.swt.graphics.Image(null, CopyUtils.toSwt(((ImageAWT) image.getImpl()).getBufferedImage()));
-				else
-					cache = null;
-			}
+			type2 = image.isMutable() ? "Mutable" : "Immutable";
+			allowCache = !image.isMutable();
 		}
+	}
+
+	public boolean ensureCache() {
+		if (allowCache) {
+			if (cache == null)
+				cache = new org.eclipse.swt.graphics.Image(null, CopyUtils.toSwt(((ImageAWT) drawable.getImpl()).getBufferedImage()));
+			return true;
+		}
+		return false;
 	}
 
 	public String getCaption() {
