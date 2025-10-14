@@ -10,7 +10,7 @@
 -printmapping '.\mapping.txt'
 -overloadaggressively
 #-keeppackagenames **
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,Exceptions
 #-keepparameternames
 -dontnote
 -dontwarn
