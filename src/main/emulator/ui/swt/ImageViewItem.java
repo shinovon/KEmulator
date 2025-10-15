@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Settings;
 import emulator.debug.MemoryViewImage;
 import emulator.debug.MemoryViewImageType;
 import emulator.graphics2D.CopyUtils;
@@ -42,8 +43,8 @@ public class ImageViewItem {
 		} else {
 			source = image;
 			type = MemoryViewImageType.LCDUI;
-			type2 = image.isMutable() ? "Mutable" : "Immutable";
-			allowCache = !image.isMutable();
+			type2 = image.isMutable() ? "Mut." : "Immut.";
+			allowCache = !image.isMutable() && Settings.g2d == 1;
 		}
 	}
 
