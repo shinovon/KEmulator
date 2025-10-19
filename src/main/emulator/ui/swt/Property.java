@@ -1143,9 +1143,16 @@ public final class Property implements IProperty, SelectionListener {
 		Collections.sort(list);
 		String s = (String) list.get(0);
 		for (int i = 0; i < list.size(); ++i) {
-			this.aCombo675.add((String) list.get(i));
-			if (Settings.fileEncoding.equalsIgnoreCase((String) list.get(i))) {
-				s = (String) list.get(i);
+			String e = (String) list.get(i);
+			if (!e.equalsIgnoreCase("ISO-8859-1")
+					&& !e.equalsIgnoreCase("UTF-8")
+					&& !e.equalsIgnoreCase("Shift_JIS")
+					&& !e.equalsIgnoreCase("EUC-KR")) {
+				continue;
+			}
+			this.aCombo675.add(e);
+			if (Settings.fileEncoding.equalsIgnoreCase(e)) {
+				s = e;
 			}
 		}
 		Settings.fileEncoding = s;
