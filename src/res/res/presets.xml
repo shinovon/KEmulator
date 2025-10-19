@@ -74,14 +74,12 @@
     <preset name="96x64 (Motorola - fullscreen)" layout="Motorola">
         <define name="SCREEN_WIDTH" value="96"/>
         <define name="SCREEN_HEIGHT" value="64"/>
-        <define name="Platform" value=""/>
     </preset>
 
     <!-- Nokia 3410 -->
     <preset name="96x65 (Nokia - full screen)" layout="Nokia">
         <define name="SCREEN_WIDTH" value="96"/>
         <define name="SCREEN_HEIGHT" value="65"/>
-        <define name="Platform" value="Nokia3410/1.0"/>
     </preset>
 
     <!-- Siemens M50 -->

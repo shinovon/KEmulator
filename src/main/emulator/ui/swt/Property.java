@@ -1134,7 +1134,7 @@ public final class Property implements IProperty, SelectionListener {
 	private void setupEncodingField() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 1;
+//		layoutData.horizontalSpan = 1;
 //		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
 		(this.aCombo675 = new Combo(this.customComp, 8)).setLayoutData(layoutData);
@@ -1363,9 +1363,13 @@ public final class Property implements IProperty, SelectionListener {
 		final GridData layoutData5 = new GridData();
 		layoutData5.horizontalAlignment = 4;
 		layoutData5.verticalAlignment = 2;
+		final GridData layoutData8 = new GridData();
+		layoutData8.horizontalAlignment = 4;
+		layoutData8.verticalAlignment = 2;
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 4;
 		layout.marginWidth = 5;
+		layout.makeColumnsEqualWidth = false;
 		this.customComp.setLayout(layout);
 		customComp.setFont(f);
 		CLabel aCLabel658;
@@ -1383,7 +1387,6 @@ public final class Property implements IProperty, SelectionListener {
 
 		final GridData layoutData6 = new GridData();
 		layoutData6.horizontalAlignment = 4;
-		layoutData6.horizontalSpan = 1;
 		layoutData6.grabExcessHorizontalSpace = true;
 		layoutData6.verticalAlignment = 2;
 		localeText = new Text(this.customComp, 2048);
@@ -1393,7 +1396,7 @@ public final class Property implements IProperty, SelectionListener {
 
 		CLabel labelPlatform = new CLabel(this.customComp, 0);
 		labelPlatform.setText("MIDP Platform:");
-		labelPlatform.setLayoutData(layoutData5);
+		labelPlatform.setLayoutData(layoutData8);
 
 		final GridData layoutData7 = new GridData();
 		layoutData7.horizontalAlignment = 4;
