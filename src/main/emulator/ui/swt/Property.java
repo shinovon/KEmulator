@@ -123,21 +123,15 @@ public final class Property implements IProperty, SelectionListener {
 
 	private static Display display;
 	private Shell setsShell;
-	private Combo aCombo657;
-	private CLabel aCLabel658;
-	private CLabel aCLabel673;
+	private Combo deviceCombo;
 	private Combo aCombo675;
-	private CLabel aCLabel683;
 	private Group aGroup660;
 	private Text aText662;
 	private Button aButton666;
 	private CLabel aCLabel694;
 	private Text screenWidthText;
-	private CLabel aCLabel701;
 	private Text screenHeightText;
-	private CLabel aCLabel707;
 	private Text aText695;
-	private CLabel aCLabel712;
 	private Text aText702;
 	private CLabel aCLabel717;
 	private Text aText708;
@@ -152,8 +146,8 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite aComposite667;
 	private Button aButton676;
 	private Button aButton685;
-	private Scale aScale669;
-	private CLabel aCLabel738;
+	private Scale fpsScale;
+	private CLabel fpsLabel;
 	private CTabFolder tabFolder;
 	private Composite customComp;
 	private Composite keyMapBindsComp;
@@ -275,8 +269,8 @@ public final class Property implements IProperty, SelectionListener {
 	private Group mediaGroup;
 	private Text vlcDirText;
 	private Font f;
-	private CLabel labelLocale;
 	private Text localeText;
+	private Text platformText;
 	private Button keymapClearBtn;
 
 	private Combo languageCombo;
@@ -481,7 +475,7 @@ public final class Property implements IProperty, SelectionListener {
 			final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + "/property.txt");
 			final Properties properties = new Properties();
 			properties.load(fileInputStream);
-			final String property = properties.getProperty("Device", "SonyEricssonK800");
+			final String property = properties.getProperty("DevicePreset", "SonyEricssonK800");
 			this.device = property;
 			Emulator.deviceName = property;
 			this.defaultFont = properties.getProperty("DefaultFont", "Tahoma");
@@ -580,6 +574,7 @@ public final class Property implements IProperty, SelectionListener {
 
             Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
 			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
+			Settings.microeditionPlatform = properties.getProperty("MicroeditionPlatform", "Nokia6700c-1/13.10");
 
 			// emulator
 			Settings.rightClickMenu = Boolean.parseBoolean(properties.getProperty("RightClickMenu", "false"));
@@ -730,7 +725,7 @@ public final class Property implements IProperty, SelectionListener {
 			final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getUserPath() + "/property.txt");
 			final Properties properties = new SortProperties();
 
-			properties.setProperty("Device", this.device);
+			properties.setProperty("DevicePreset", this.device);
 			properties.setProperty("DefaultFont", this.defaultFont);
 			properties.setProperty("RMSFolder", this.rmsFolder);
 			properties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
@@ -933,7 +928,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void apply() {
-		final String trim = this.aCombo657.getText().trim();
+		final String trim = this.deviceCombo.getText().trim();
 		this.device = trim;
 		Emulator.deviceName = trim;
 		Devices.curPlatform = Devices.getPlatform(Emulator.deviceName);
@@ -1014,6 +1009,7 @@ public final class Property implements IProperty, SelectionListener {
 //        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
 		Settings.locale = localeText.getText().trim();
+		Settings.microeditionPlatform = platformText.getText().trim();
 
 		//set UILanguage
 		Settings.uiLanguage = languageCombo.getText().trim();
@@ -1101,24 +1097,26 @@ public final class Property implements IProperty, SelectionListener {
 		this.method390();
 	}
 
-	private void method373() {
+	private void setupDeviceCombo() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 2;
+		layoutData.horizontalSpan = 3;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = false;
 		layoutData.verticalSpan = 1;
 		layoutData.verticalAlignment = 2;
-		(this.aCombo657 = new Combo(this.customComp, 12)).setLayoutData(layoutData);
-		final Enumeration method620 = Devices.method620();
-		while (method620.hasMoreElements()) {
-			final String text = (String) method620.nextElement();
-			this.aCombo657.add(text);
-			if (this.device.equalsIgnoreCase(text)) {
-				this.aCombo657.setText(text);
-			}
-		}
-		this.aCombo657.addModifyListener(new Class117(this));
+		(this.deviceCombo = new Combo(this.customComp, 12)).setLayoutData(layoutData);
+//		final Enumeration method620 = Devices.method620();
+//		while (method620.hasMoreElements()) {
+//			final String text = (String) method620.nextElement();
+//			this.aCombo657.add(text);
+//			if (this.device.equalsIgnoreCase(text)) {
+//				this.aCombo657.setText(text);
+//			}
+//		}
+		deviceCombo.add("240x320 placeholder");
+		deviceCombo.setText("240x320 placeholder");
+//		this.aCombo657.addModifyListener(new Class117(this));
 	}
 
 	private void genLanguageList() {
@@ -1187,11 +1185,11 @@ public final class Property implements IProperty, SelectionListener {
 		updateBranchCombo.setText(Settings.updateBranch);
 	}
 
-	private void method379() {
+	private void setupEncodingField() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 2;
-		layoutData.grabExcessHorizontalSpace = true;
+		layoutData.horizontalSpan = 1;
+//		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
 		(this.aCombo675 = new Combo(this.customComp, 8)).setLayoutData(layoutData);
 		final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
@@ -1208,7 +1206,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.aCombo675.setText(s);
 	}
 
-	private void method384() {
+	private void setupCustomProperties() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
@@ -1259,7 +1257,7 @@ public final class Property implements IProperty, SelectionListener {
 		layout.horizontalSpacing = 5;
 		final GridData layoutData12;
 		(layoutData12 = new GridData()).horizontalAlignment = 4;
-		layoutData12.horizontalSpan = 3;
+		layoutData12.horizontalSpan = 4;
 		layoutData12.grabExcessHorizontalSpace = true;
 		layoutData12.grabExcessVerticalSpace = true;
 		//layoutData12.heightHint = 140;
@@ -1270,12 +1268,15 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aCLabel694 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_SCREEN_WIDTH", "Screen Width:"));
 		this.aCLabel694.setLayoutData(layoutData9);
 		(this.screenWidthText = new Text(this.aGroup660, 2048)).setLayoutData(layoutData11);
-		(this.aCLabel701 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_SCREEN_HEIGHT", "Screen Height:"));
-		this.aCLabel701.setLayoutData(layoutData8);
+		CLabel aCLabel701;
+		(aCLabel701 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_SCREEN_HEIGHT", "Screen Height:"));
+		aCLabel701.setLayoutData(layoutData8);
 		(this.screenHeightText = new Text(this.aGroup660, 2048)).setLayoutData(layoutData10);
-		(this.aCLabel707 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_LSK", "Left Soft Key:"));
+		CLabel aCLabel707;
+		(aCLabel707 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_LSK", "Left Soft Key:"));
 		(this.aText695 = new Text(this.aGroup660, 2048)).setLayoutData(layoutData7);
-		(this.aCLabel712 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_RSK", "Right Soft Key:"));
+		CLabel aCLabel712;
+		(aCLabel712 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_RSK", "Right Soft Key:"));
 		(this.aText702 = new Text(this.aGroup660, 2048)).setLayoutData(layoutData6);
 		(this.aCLabel717 = new CLabel(this.aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_MIDDLE", "Fire/Middle:"));
 		(this.aText708 = new Text(this.aGroup660, 2048)).setLayoutData(layoutData5);
@@ -1389,57 +1390,75 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void setupCustomComp() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
+		final GridData layoutData = new GridData();
+		layoutData.horizontalAlignment = 4;
 		layoutData.verticalAlignment = 4;
 		this.customComp = new Composite(this.tabFolder, 0);
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 4;
+		final GridData layoutData2 = new GridData();
+		layoutData2.horizontalAlignment = 4;
 		layoutData2.horizontalSpan = 2;
 		layoutData2.grabExcessHorizontalSpace = true;
 		layoutData2.verticalAlignment = 2;
-		final GridData layoutData3;
-		(layoutData3 = new GridData()).horizontalAlignment = 4;
+		final GridData layoutData3 = new GridData();
+		layoutData3.horizontalAlignment = 4;
 		layoutData3.verticalAlignment = 2;
-		final GridData layoutData4;
-		(layoutData4 = new GridData()).horizontalAlignment = 4;
+		final GridData layoutData4 = new GridData();
+		layoutData4.horizontalAlignment = 4;
 		layoutData4.verticalAlignment = 2;
-		final GridData layoutData5;
-		(layoutData5 = new GridData()).horizontalAlignment = 4;
+		final GridData layoutData5 = new GridData();
+		layoutData5.horizontalAlignment = 4;
 		layoutData5.verticalAlignment = 2;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 3;
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 4;
 		layout.marginWidth = 5;
 		this.customComp.setLayout(layout);
 		customComp.setFont(f);
-		(this.aCLabel658 = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_DEVICE", "Device Select:"));
-		this.aCLabel658.setLayoutData(layoutData3);
-		this.method373();
-		(this.aCLabel673 = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_ENCODING", "Default Encoding:"));
-		this.aCLabel673.setLayoutData(layoutData4);
-		this.method379();
-		(this.labelLocale = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_LOCALE", "MIDP Locale:"));
-		this.labelLocale.setLayoutData(layoutData5);
+		CLabel aCLabel658;
+		(aCLabel658 = new CLabel(this.customComp, 0)).setText("Device preset:");
+		aCLabel658.setLayoutData(layoutData3);
+		this.setupDeviceCombo();
+		CLabel aCLabel673;
+		(aCLabel673 = new CLabel(this.customComp, 0)).setText("Default encoding:");
+		aCLabel673.setLayoutData(layoutData4);
+		this.setupEncodingField();
 
-		final GridData layoutData333;
-		(layoutData333 = new GridData()).horizontalAlignment = 4;
-		layoutData333.horizontalSpan = 2;
-		layoutData333.grabExcessHorizontalSpace = true;
-		layoutData333.verticalAlignment = 2;
+		CLabel labelLocale = new CLabel(this.customComp, 0);
+		labelLocale.setText("MIDP Locale:");
+		labelLocale.setLayoutData(layoutData5);
+
+		final GridData layoutData6 = new GridData();
+		layoutData6.horizontalAlignment = 4;
+		layoutData6.horizontalSpan = 1;
+		layoutData6.grabExcessHorizontalSpace = true;
+		layoutData6.verticalAlignment = 2;
 		localeText = new Text(this.customComp, 2048);
-		localeText.setLayoutData(layoutData333);
+		localeText.setLayoutData(layoutData6);
 		localeText.setText(Settings.locale);
 
-		this.method384();
-		(this.aCLabel738 = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
-		this.aCLabel738.setLayoutData(layoutData);
-		(this.aScale669 = new Scale(this.customComp, 256)).setIncrement(1);
-		this.aScale669.setMaximum(121);
-		this.aScale669.setPageIncrement(5);
-		this.aScale669.setSelection(Settings.frameRate);
-		this.aScale669.setMinimum(1);
-		this.aScale669.setLayoutData(layoutData2);
-		this.aScale669.addSelectionListener(new Class109(this));
+
+		CLabel labelPlatform = new CLabel(this.customComp, 0);
+		labelPlatform.setText("MIDP Platform:");
+		labelPlatform.setLayoutData(layoutData5);
+
+		final GridData layoutData7 = new GridData();
+		layoutData7.horizontalAlignment = 4;
+		layoutData7.horizontalSpan = 3;
+		layoutData7.grabExcessHorizontalSpace = true;
+		layoutData7.verticalAlignment = 2;
+		platformText = new Text(this.customComp, 2048);
+		platformText.setLayoutData(layoutData7);
+		platformText.setText(Settings.microeditionPlatform);
+
+		this.setupCustomProperties();
+		(this.fpsLabel = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
+		this.fpsLabel.setLayoutData(layoutData);
+		(this.fpsScale = new Scale(this.customComp, 256)).setIncrement(1);
+		this.fpsScale.setMaximum(121);
+		this.fpsScale.setPageIncrement(5);
+		this.fpsScale.setSelection(Settings.frameRate);
+		this.fpsScale.setMinimum(1);
+		this.fpsScale.setLayoutData(layoutData2);
+		this.fpsScale.addSelectionListener(new Class109(this));
 	}
 
 	private void setupKeyMapComp() {
@@ -2619,8 +2638,9 @@ public final class Property implements IProperty, SelectionListener {
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 3;
 		(this.recordsComp = new Composite(this.tabFolder, 0)).setLayout(layout);
-		(this.aCLabel683 = new CLabel(this.recordsComp, 0)).setText(UILocale.get("OPTION_RECORDS_RMS_FOLDER", "RMS Folder:"));
-		this.aCLabel683.setLayoutData(layoutData5);
+		CLabel aCLabel683;
+		(aCLabel683 = new CLabel(this.recordsComp, 0)).setText(UILocale.get("OPTION_RECORDS_RMS_FOLDER", "RMS Folder:"));
+		aCLabel683.setLayoutData(layoutData5);
 		(this.aText662 = new Text(this.recordsComp, 2048)).setEditable(true);
 		this.aText662.setEnabled(true);
 		this.aText662.setLayoutData(layoutData4);
@@ -2952,7 +2972,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	static Combo method361(final Property class38) {
-		return class38.aCombo657;
+		return class38.deviceCombo;
 	}
 
 	static void method362(final Property class38) {
@@ -2968,11 +2988,11 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	static Scale method370(final Property class38) {
-		return class38.aScale669;
+		return class38.fpsScale;
 	}
 
 	static CLabel method363(final Property class38) {
-		return class38.aCLabel738;
+		return class38.fpsLabel;
 	}
 
 	static Combo method376(final Property class38) {

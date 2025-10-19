@@ -632,32 +632,10 @@ public class Emulator implements Runnable {
 			System.setProperty("microedition.locale", Settings.locale);
 		}
 		if (System.getProperty("microedition.platform") == null) {
-			String plat = Emulator.deviceName;
-			DevicePlatform c = Devices.getPlatform(Emulator.deviceName);
-			if (c.exists("OVERRIDE_NAME")) {
-				plat = c.getString("OVERRIDE_NAME");
-			}
-			if (c.exists("R")) {
-				plat += "-" + c.getString("R");
-			}
+			String plat = Settings.microeditionPlatform;
 
 			Emulator.httpUserAgent = plat + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ")";
 
-			if (!c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
-				plat += "/" + c.getString("PLATFORM_VERSION");
-			}
-			if (c.exists("CUSTOM_UA")) {
-				Emulator.httpUserAgent = c.getString("CUSTOM_UA");
-			}
-			if (c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
-				plat += "/" + c.getString("PLATFORM_VERSION2");
-			}
-//                if (c.exists("SW_PLATFORM")) {
-//                    plat += "sw_platform=" + c.getString("SW_PLATFORM");
-//                }
-//                if (c.exists("SW_PLATFORM_VERSION")) {
-//                    plat += ";sw_platform_version=" + c.getString("SW_PLATFORM_VERSION");
-//                }
 			System.setProperty("microedition.platform", plat);
 		}
 		System.setProperty("microedition.media.version", "1.0");
@@ -1255,7 +1233,7 @@ public class Emulator implements Runnable {
 		Emulator.jarLibrarys = new Vector();
 		Emulator.jarClasses = new Vector();
 		Emulator.deviceName = "SonyEricssonK800";
-		Emulator.deviceFile = "/res/plat";
+		Emulator.deviceFile = "/res/presets.xml";
 		backgroundThread = new Thread(new Runnable() {
 			public void run() {
 				Manager.checkLibVlcSupport();
