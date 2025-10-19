@@ -59,9 +59,9 @@ public class Image {
 	}
 
 	public Graphics getGraphics() {
-		if (!this.mutable && !Devices.curPlatform.hasNokiaUI()) {
-			throw new IllegalStateException("the image is immutable.");
-		}
+//		if (!this.mutable) {
+//			throw new IllegalStateException("the image is immutable.");
+//		}
 		if (this.xrayBuffer == null && Settings.xrayView) {
 			this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
 		}

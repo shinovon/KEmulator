@@ -1,8 +1,5 @@
 package emulator;
 
-import club.minnced.discord.rpc.DiscordEventHandlers;
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
 import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
@@ -34,7 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -851,8 +847,8 @@ public class Emulator implements Runnable {
 			}
 		}
 		Emulator.deviceName = deviceName;
-		if (!Devices.setPlatform(Emulator.deviceName)) {
-			Devices.setPlatform(Emulator.deviceName = "SonyEricssonK800");
+		if (!Devices.setPreset(Emulator.deviceName)) {
+			Devices.setPreset(Emulator.deviceName = Devices.getDefaultPreset());
 		}
 		Emulator.emulatorimpl.getProperty().setCustomProperties();
 		if (c != null) {

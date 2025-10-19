@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <presets>
+    <default value="240x320 (COMMON - full screen)"/>
+
     <layout name="Nokia">
         <define name="KEY_UP" 	    value="-1"/>
         <define name="KEY_DOWN" 	value="-2"/>
@@ -54,11 +56,11 @@
         <define name="KEY_S1" 	    value="-202"/>
         <define name="KEY_S2" 	    value="-203"/>
     </layout>
-    <define name="Sagem" parent="Nokia">
+    <layout name="Sagem" parent="Nokia">
         <define name="KEY_S1" 	    value="-7"/>
         <define name="KEY_S2" 	    value="-6"/>
-    </define>
-    <define name="Sharp">
+    </layout>
+    <layout name="Sharp">
         <define name="KEY_UP" value="-1"/>
         <define name="KEY_DOWN" value="-6"/>
         <define name="KEY_LEFT" value="-2"/>
@@ -66,7 +68,7 @@
         <define name="KEY_FIRE" value="-20"/>
         <define name="KEY_S1" value="-21"/>
         <define name="KEY_S2" value="-22"/>
-    </define>
+    </layout>
 
     <!-- Motorola V60i -->
     <preset name="96x64 (Motorola - fullscreen)" layout="Motorola">
@@ -106,7 +108,7 @@
         <define name="SCREEN_HEIGHT" value="110"/>
     </preset>
 
-    <!-- -->
+    <!-- Samsung SGH-X460 -->
     <preset name="128x112 (Samsung - with status bar and commands)" layout="Samsung">
         <define name="SCREEN_WIDTH" value="128"/>
         <define name="SCREEN_HEIGHT" value="112"/>
@@ -148,172 +150,245 @@
         <define name="SCREEN_HEIGHT" value="148"/>
     </preset>
 
-    <!-- -->
+    <!-- Motorola L6 -->
     <preset name="128x149 (Motorola - with status bar)" layout="Motorola">
         <define name="SCREEN_WIDTH" value="128"/>
         <define name="SCREEN_HEIGHT" value="149"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Sony Ericsson K500i -->
+    <preset name="128x160 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="128"/>
+        <define name="SCREEN_HEIGHT" value="160"/>
+    </preset>
+
+    <!-- Siemens CX75 -->
+    <preset name="132x176 (Siemens - full screen)" layout="Siemens">
+        <define name="SCREEN_WIDTH" value="132"/>
+        <define name="SCREEN_HEIGHT" value="176"/>
+    </preset>
+
+    <!-- Sony Ericsson K700i -->
+    <preset name="176x176 (Sony Ericsson - with status bar and commands)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="176"/>
+    </preset>
+
+    <!-- Motorola E398 -->
+    <preset name="176x182 (Motorola - with status bar and commands)" layout="Motorola">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="182"/>
+    </preset>
+
+    <!-- Motorola V600 -->
+    <preset name="176x182 (Motorola Triplets - with status bar and commands)" layout="Motorola_Triplets">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="182"/>
+    </preset>
+
+    <!-- Motorola E398 -->
+    <preset name="176x204 (Motorola - with status bar)" layout="Motorola">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+    </preset>
+
+    <!-- Motorola V600 -->
+    <preset name="176x204 (Motorola Triplets - with status bar)" layout="Motorola_Triplets">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="204"/>
+    </preset>
+
+    <!-- Samsung SGH-ZV10 -->
+    <preset name="176x205 (Samsung - with status bar)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="205"/>
     </preset>
 
     <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <preset name="176x206 (LG - with status bar)" layout="LG">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="206"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia N70 -->
+    <preset name="176x208 (Nokia - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="208"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Sony Ericsson W810i -->
+    <preset name="176x220 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="176"/>
+        <define name="SCREEN_HEIGHT" value="220"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Samsung SGH-X820 -->
+    <preset name="220x176 (Samsung - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="220"/>
+        <define name="SCREEN_HEIGHT" value="176"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!--Sony Ericsson P990i -->
+    <preset name="208x173 (Sony Ericsson - with keypad)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="208"/>
+        <define name="SCREEN_HEIGHT" value="173"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia 6230i -->
+    <preset name="208x208 (Nokia - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="208"/>
+        <define name="SCREEN_HEIGHT" value="208"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia N97 -->
+    <preset name="180x320 (half of 360x640 - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="180"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia N97 -->
+    <preset name="320x180 (half of 640x360 - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="320"/>
+        <define name="SCREEN_HEIGHT" value="180"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Panasonic P902i -->
+    <preset name="240x240 (Sharp/DoCoMo - with status bar and commands)" layout="Sharp">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="240"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Motorola E1000 -->
+    <preset name="240x266 (Motorola - with status bar and commands)" layout="Motorola">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="266"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Samsung SGH-F400 -->
+    <preset name="240x297 (Samsung - with status bar)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="297"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- LG KU990 -->
+    <preset name="240x298 (LG - with keypad)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="298"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Motorola E1000 -->
+    <preset name="240x299 (Motorola - with status bar)" layout="Motorola">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="299"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- LG KF550 -->
+    <preset name="240x304 (LG - with status bar)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="304"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!--  -->
+    <preset name="320x224 (LG - with status bar)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="320"/>
+        <define name="SCREEN_HEIGHT" value="224"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Sony Ericsson K800i -->
+    <preset name="240x320 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
+        <define name="Platform" value="SonyEricssonK800i"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Motorola RAZR2 V8 -->
+    <preset name="240x320 (Motorola Motomagx - full screen)" layout="MotorolaV8">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia E72 -->
+    <preset name="320x240 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="320"/>
+        <define name="SCREEN_HEIGHT" value="240"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Motorola EM30 -->
+    <preset name="320x240 (Motorola Motomagx - full screen)" layout="MotorolaV8">
+        <define name="SCREEN_WIDTH" value="320"/>
+        <define name="SCREEN_HEIGHT" value="240"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia Asha 311 -->
+    <preset name="240x400 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="400"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia Asha 311 -->
+    <preset name="400x240 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="400"/>
+        <define name="SCREEN_HEIGHT" value="240"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!--  -->
+    <preset name="400x240 (SoftBank - full screen)" layout="Motorola">
+        <define name="SCREEN_WIDTH" value="400"/>
+        <define name="SCREEN_HEIGHT" value="240"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Sony Ericsson Aino -->
+    <preset name="240x432 (Sony Ericsson - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="432"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- LG KF700 -->
+    <preset name="240x480 (LG - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="240"/>
+        <define name="SCREEN_HEIGHT" value="480"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia N80 -->
+    <preset name="352x416 (Nokia - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="352"/>
+        <define name="SCREEN_HEIGHT" value="416"/>
     </preset>
 
-    <!-- -->
-    <preset name="" layout="">
-        <define name="SCREEN_WIDTH" value=""/>
-        <define name="SCREEN_HEIGHT" value=""/>
+    <!-- Nokia N97 -->
+    <preset name="360x640 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="360"/>
+        <define name="SCREEN_HEIGHT" value="640"/>
+    </preset>
+
+    <!-- Nokia N97 -->
+    <preset name="640x360 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="640"/>
+        <define name="SCREEN_HEIGHT" value="360"/>
+    </preset>
+
+    <!-- Sony Ericsson Xperia X1 -->
+    <preset name="480x800 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="480"/>
+        <define name="SCREEN_HEIGHT" value="800"/>
+    </preset>
+
+    <!-- Sony Ericsson Xperia X1 -->
+    <preset name="800x480 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="800"/>
+        <define name="SCREEN_HEIGHT" value="480"/>
+    </preset>
+
+    <!--  -->
+    <preset name="480x800 (Sharp/DoCoMo - full screen)" layout="Sharp">
+        <define name="SCREEN_WIDTH" value="480"/>
+        <define name="SCREEN_HEIGHT" value="800"/>
+    </preset>
+
+    <!--  -->
+    <preset name="800x480 (Sharp/DoCoMo - full screen)" layout="Sharp">
+        <define name="SCREEN_WIDTH" value="800"/>
+        <define name="SCREEN_HEIGHT" value="480"/>
     </preset>
 
 </presets>
