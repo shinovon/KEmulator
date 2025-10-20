@@ -10,7 +10,7 @@ public class MMFPlayer {
 		super();
 	}
 
-	public static boolean a() {
+	public static boolean initialize() {
 		if (MMFPlayer.initialized) {
 			return true;
 		}
