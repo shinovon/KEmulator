@@ -94,7 +94,7 @@ public class Sound {
 		if (paramInt == 1) {
 			// TODO fix memory leaks
 			if (Settings.enableOTT) {
-				paramArrayOfByte = new RingtoneParser(paramArrayOfByte).method726();
+				paramArrayOfByte = new RingtoneParser(paramArrayOfByte).getMIDIData();
 			} else {
 				m_player = new MIDITonePlayer();
 				state = 3;

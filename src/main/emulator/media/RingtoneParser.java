@@ -3,115 +3,115 @@ package emulator.media;
 import emulator.Emulator;
 
 public final class RingtoneParser {
-	MidiBuilder ana1225;
-	int anInt1226;
-	byte[] aByteArray1227;
-	static int anInt1229;
-	static int anInt1230;
-	static final int[] anIntArray1228;
+	MidiBuilder midiBuilder;
+	int dataLength;
+	byte[] dataBuffer;
+	static int bitIndex;
+	static int bitOffset;
+	static final int[] noteDurations;
 
 	public RingtoneParser(final byte[] array) {
 		super();
-		this.ana1225 = new MidiBuilder();
-		this.anInt1226 = array.length;
-		System.arraycopy(array, 0, this.aByteArray1227 = new byte[this.anInt1226 + 10], 0, this.anInt1226);
-		this.method729(this.aByteArray1227);
+		this.midiBuilder = new MidiBuilder();
+		this.dataLength = array.length;
+		System.arraycopy(array, 0, this.dataBuffer = new byte[this.dataLength + 10], 0, this.dataLength);
+		this.parse(this.dataBuffer);
 	}
 
-	public final byte[] method726() {
-		return this.ana1225.method730();
+	public final byte[] getMIDIData() {
+		return this.midiBuilder.getMIDIData();
 	}
 
-	private static int method727(final byte[] array, final int n) {
-		final int n2 = ((array[RingtoneParser.anInt1229] & 0xFF) << 8) + (array[RingtoneParser.anInt1229 + 1] & 0xFF) >> 16 - (n + RingtoneParser.anInt1230) & (1 << n) - 1;
-		RingtoneParser.anInt1230 += n;
-		if (RingtoneParser.anInt1230 > 7) {
-			RingtoneParser.anInt1230 -= 8;
-			++RingtoneParser.anInt1229;
+	private static int readbits(final byte[] array, final int n) {
+		final int n2 = ((array[RingtoneParser.bitIndex] & 0xFF) << 8) + (array[RingtoneParser.bitIndex + 1] & 0xFF) >> 16 - (n + RingtoneParser.bitOffset) & (1 << n) - 1;
+		RingtoneParser.bitOffset += n;
+		if (RingtoneParser.bitOffset > 7) {
+			RingtoneParser.bitOffset -= 8;
+			++RingtoneParser.bitIndex;
 		}
 		return n2;
 	}
 
-	private static int method728(final int n) {
-		return RingtoneParser.anIntArray1228[n];
+	private static int getTempoValue(final int n) {
+		return RingtoneParser.noteDurations[n];
 	}
 
-	private void method729(final byte[] array) {
-		RingtoneParser.anInt1229 = 0;
-		RingtoneParser.anInt1230 = 0;
+	private void parse(final byte[] array) {
+		RingtoneParser.bitIndex = 0;
+		RingtoneParser.bitOffset = 0;
 		int n = 0;
-		method727(array, 8);
-		method727(array, 8);
-		method727(array, 7);
+		readbits(array, 8);
+		readbits(array, 8);
+		readbits(array, 7);
 		final int method727;
-		if ((method727 = method727(array, 3)) != 1 && method727 != 2) {
+		if ((method727 = readbits(array, 3)) != 1 && method727 != 2) {
 			Emulator.getEmulator().getLogStream().println("Unsupported ringtone type");
 			return;
 		}
-		for (int method728 = method727(array, 4), i = 0; i < method728; ++i) {
-			method727(array, 8);
+		for (int method728 = readbits(array, 4), i = 0; i < method728; ++i) {
+			readbits(array, 8);
 		}
-		int method729 = method727(array, 8);
-		while (RingtoneParser.anInt1229 < this.anInt1226) {
+		int method729 = readbits(array, 8);
+		while (RingtoneParser.bitIndex < this.dataLength) {
 			if (method729 == 0) {
 				break;
 			}
-			method727(array, 3);
-			method727(array, 2);
-			method727(array, 4);
-			for (int method730 = method727(array, 8), n2 = 0; n2 < method730 && RingtoneParser.anInt1229 < this.anInt1226; ++n2) {
-				switch (method727(array, 3)) {
+			readbits(array, 3);
+			readbits(array, 2);
+			readbits(array, 4);
+			for (int method730 = readbits(array, 8), n2 = 0; n2 < method730 && RingtoneParser.bitIndex < this.dataLength; ++n2) {
+				switch (readbits(array, 3)) {
 					case 0: {
-						method727(array, 2);
+						readbits(array, 2);
 						break;
 					}
 					case 1: {
 						if (n == 0) {
-							this.ana1225.method733();
+							this.midiBuilder.initTrack();
 							n = 1;
 						}
-						this.ana1225.anInt1275 = method727(array, 4);
-						this.ana1225.anInt1277 = method727(array, 3);
-						this.ana1225.anInt1278 = method727(array, 2);
-						this.ana1225.method736();
+						this.midiBuilder.note = readbits(array, 4);
+						this.midiBuilder.durationType = readbits(array, 3);
+						this.midiBuilder.noteType = readbits(array, 2);
+						this.midiBuilder.addNote();
 						break;
 					}
 					case 2: {
-						this.ana1225.anInt1279 = method727(array, 2);
-						if (this.ana1225.anInt1279 > 0) {
-							final MidiBuilder ana1225 = this.ana1225;
-							--ana1225.anInt1279;
+						this.midiBuilder.octave = readbits(array, 2);
+						if (this.midiBuilder.octave > 0) {
+							final MidiBuilder ana1225 = this.midiBuilder;
+							--ana1225.octave;
 							break;
 						}
 						break;
 					}
 					case 3: {
-						method727(array, 2);
+						readbits(array, 2);
 						break;
 					}
 					case 4: {
-						this.ana1225.anInt1280 = method728(method727(array, 5));
+						this.midiBuilder.tempo = getTempoValue(readbits(array, 5));
 						if (n == 1) {
-							this.ana1225.method737();
+							this.midiBuilder.setTempo();
 							break;
 						}
 						break;
 					}
 					case 5: {
-						this.ana1225.anInt1281 = method727(array, 4);
+						this.midiBuilder.volume = readbits(array, 4);
 						break;
 					}
 				}
 			}
-			if (RingtoneParser.anInt1229 >= this.anInt1226) {
+			if (RingtoneParser.bitIndex >= this.dataLength) {
 				break;
 			}
 			--method729;
 		}
-		this.ana1225.method738();
+		this.midiBuilder.finishTrack();
 	}
 
 	static {
-		anIntArray1228 = new int[]{25, 28, 31, 35, 40, 45, 50, 56, 63, 70, 80, 90, 100, 112, 125, 140, 160, 180, 200, 225, 250, 285, 320, 355, 400, 450, 500, 565, 635, 715, 800, 900};
+		noteDurations = new int[]{25, 28, 31, 35, 40, 45, 50, 56, 63, 70, 80, 90, 100, 112, 125, 140, 160, 180, 200, 225, 250, 285, 320, 355, 400, 450, 500, 565, 635, 715, 800, 900};
 	}
 }

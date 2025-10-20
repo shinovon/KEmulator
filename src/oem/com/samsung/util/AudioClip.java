@@ -55,7 +55,7 @@ public class AudioClip {
 		}
 		this.type = type;
 		if (type == TYPE_MMF) {
-			this.mmfInit = MMFPlayer.a();
+			this.mmfInit = MMFPlayer.initialize();
 			this.data = b;
 			this.dataLen = b.length;
 			this.status = STATUS_STOP;
