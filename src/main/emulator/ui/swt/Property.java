@@ -1358,7 +1358,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.customComp = new Composite(this.tabFolder, 0);
 		final GridData layoutData2 = new GridData();
 		layoutData2.horizontalAlignment = 4;
-		layoutData2.horizontalSpan = 2;
+		layoutData2.horizontalSpan = 3;
 		layoutData2.grabExcessHorizontalSpace = true;
 		layoutData2.verticalAlignment = 2;
 		final GridData layoutData3 = new GridData();
