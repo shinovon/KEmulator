@@ -31,8 +31,7 @@ public final class MidiBuilder {
         writeInt(1, 2);           // Format type 1
         trackCountOffset = currentOffset;
         writeInt(1, 2);           // Placeholder for track count
-        writeInt(0, 2);           // Time division placeholder
-
+        writeInt(240, 2); // Time division
         writeInt(0x4D54726B, 4);  // "MTrk"
         trackLengthOffset = currentOffset;
         writeInt(0, 4);           // Placeholder for track length
@@ -89,12 +88,14 @@ public final class MidiBuilder {
     // ================== Private Helpers ==================
 
     private int calculateNoteDuration(int baseDuration) {
-        if (noteType == 1) {          // Normal
-            return baseDuration + baseDuration / 2;
-        } else if (noteType == 2) {   // Dotted
-            return baseDuration + baseDuration / 2;
+        switch (noteType) {
+            case 1: // Normal note
+                return baseDuration + baseDuration / 2;
+            case 2: // Dotted note
+                return baseDuration + baseDuration / 2 + baseDuration / 4;
+            default:
+                return baseDuration;
         }
-        return baseDuration;
     }
 
     private void writeInt(int value, int bytes) {
