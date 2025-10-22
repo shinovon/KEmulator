@@ -94,7 +94,7 @@ public class Sound {
 		}
 		if (paramInt == 1) {
 			// TODO fix memory leaks
-			switch (Settings.ottConverter) {
+			switch (Settings.ottDecoder) {
 			case 1:
 				try {
 					data = new RingtoneParser(data).getMIDIData();
@@ -105,10 +105,10 @@ public class Sound {
 			case 2:
 				try {
 					data = NokiaOTTDecoder.convertToMidi(data);
+					break;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				break;
 			default:
 				m_player = new MIDITonePlayer();
 				state = 3;
