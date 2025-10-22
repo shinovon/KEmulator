@@ -250,7 +250,6 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite propsComp;
 	private Text propsText;
 	private Button mediaDumpCheck;
-	private Button ottCheck;
 	private ScrolledComposite securityComp;
 	private Button mascotNo2DMixingCheck;
 	private Composite mascotComp;
@@ -260,12 +259,14 @@ public final class Property implements IProperty, SelectionListener {
 	private Button securityCheck;
 	private Composite securityContent;
 	private Tree rmsTree;
+//	private Button forceServicePaintCheck;
 	private Button pointerEventsCheck;
 	private Button fpsLimitJlCheck;
 	private Button autoUpdatesBtn;
 	private Button m3gFlushImmediately;
 	private Button asyncFlushCheck;
 	private Button m3gThreadCheck;
+	private Combo ottCombo;
 //    private Button pollOnRepaintBtn;
 
 	public Property() {
@@ -609,7 +610,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "true"));
 			Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
 			Settings.enableMediaDump = Boolean.parseBoolean(properties.getProperty("EnableMediaDump", "false"));
-			Settings.enableOTT = Boolean.parseBoolean(properties.getProperty("EnableOTT", "true"));
+			Settings.ottDecoder = Integer.parseInt(properties.getProperty("OTTConverter", "2"));
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -849,7 +850,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("MIDIReopenDevice", String.valueOf(Settings.reopenMidiDevice));
 			properties.setProperty("MIDIGlobalSequencer", String.valueOf(Settings.oneMidiAtTime));
 			properties.setProperty("EnableMediaDump", String.valueOf(Settings.enableMediaDump));
-			properties.setProperty("EnableOTT", String.valueOf(Settings.enableOTT));
+			properties.setProperty("OTTConverter", String.valueOf(Settings.ottDecoder));
 
 			// jvm
 			properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
@@ -1009,7 +1010,7 @@ public final class Property implements IProperty, SelectionListener {
 		}
 
 		Settings.enableMediaDump = mediaDumpCheck.getSelection();
-		Settings.enableOTT = ottCheck.getSelection();
+		Settings.ottDecoder = ottCombo.getSelectionIndex();
 		Settings.enableSecurity = securityCheck.getSelection();
 
 		Settings.autoUpdate = autoUpdatesBtn.getSelection() ? 2 : 1;
@@ -1076,7 +1077,6 @@ public final class Property implements IProperty, SelectionListener {
 		langLayout.marginWidth = 0;
 		langLayout.marginHeight = 0;
 
-		//	private Button forceServicePaintCheck;
 		Composite langComposite = new Composite(sysChecksGroup, SWT.NONE);
 		langComposite.setLayout(langLayout);
 		langComposite.setLayoutData(compLayoutData);
@@ -2125,7 +2125,7 @@ public final class Property implements IProperty, SelectionListener {
 		mediaGroup.setLayoutData(fill);
 
 		new Label(mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") +
-				(System.getProperty("os.arch").contains("64") ? " (64-bit only)" : " (32-bit only)") + ":");
+				(System.getProperty("os.arch").contains("64") ? " (64-bit)" : " (32-bit)") + ":");
 		vlcDirText = new Text(mediaGroup, SWT.BORDER);
 		vlcDirText.setEditable(true);
 		vlcDirText.setEnabled(true);
@@ -2147,15 +2147,51 @@ public final class Property implements IProperty, SelectionListener {
 		mediaDumpCheck.setLayoutData(fillHor);
 		mediaDumpCheck.setSelection(Settings.enableMediaDump);
 
-		ottCheck = new Button(mediaGroup, SWT.CHECK);
-		ottCheck.setText(UILocale.get("OPTION_MEDIA_OTT", "Nokia Tone playback (unstable)"));
-		ottCheck.setLayoutData(fillHor);
-		ottCheck.setSelection(Settings.enableOTT);
+		setupOttChoice(mediaGroup);
 
 //        reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
 //        reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));
 //        reopenMidiCheck.setLayoutData(fillHor);
 //        reopenMidiCheck.setSelection(Settings.reopenMidiDevice);
+	}
+
+	private void setupOttChoice(Group mediaGroup) {
+		final GridData compLayoutData = new GridData();
+		compLayoutData.horizontalAlignment = GridData.FILL;
+		compLayoutData.verticalAlignment = GridData.FILL;
+		compLayoutData.grabExcessHorizontalSpace = true;
+
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+
+		Composite comp = new Composite(mediaGroup, SWT.NONE);
+		comp.setLayout(layout);
+		comp.setLayoutData(compLayoutData);
+
+		final GridData labelLayoutData = new GridData();
+		labelLayoutData.horizontalAlignment = GridData.FILL;
+		labelLayoutData.verticalAlignment = GridData.CENTER;
+
+		CLabel label = new CLabel(comp, SWT.NONE);
+		label.setText("OTT Decoder:");
+		label.setLayoutData(labelLayoutData);
+
+		final GridData comboLayoutData = new GridData();
+		comboLayoutData.horizontalAlignment = GridData.FILL;
+		comboLayoutData.grabExcessHorizontalSpace = true;
+
+		ottCombo = new Combo(comp, 12);
+		ottCombo.setLayoutData(comboLayoutData);
+		ottCombo.setFont(f);
+		String[] items = new String[] {
+				"Disabled",
+				"KEmulator",
+				"FreeJ2ME-Plus",
+		};
+		ottCombo.setItems(items);
+		ottCombo.setText(items[Settings.ottDecoder]);
 	}
 
 	private void setupM3GComp() {

@@ -1,0 +1,40 @@
+$KEmulator nnmod
+By shinovon, Feodor0090 aka sym_ansel
+
+$KEmulator
+Author: Wu.Liang (c) 2006, 2008
+
+$Contributors
+rmn20: M3G OpenGL engine improvements
+BaalNetbek: MemoryView improvements, Deobfuscation
+klaxons1: AMR decoder, Deobfuscation
+
+$Testing
+Afabych, TwoSpacesSG
+
+$SoftBank MEXA, MascotCapsule OpenGL Implementation
+From JL-Mod, by woesss
+
+$Nokia M3D(O) Implementation
+From FreeJ2ME, by recompileorg
+
+$Nokia OTT Implementation
+From FreeJ2ME-Plus, by AShiningRay
+
+==================
+$[Libs]
+swt 4.20 / 4.7 (32-bit)
+asm 5.2
+lwjgl 3.3.6
+java-discord-rpc 2.0.1
+jinput
+jna 5.2.0
+webcam-capture 0.3.12
+slf4j-api 1.7.2
+bridj 0.7.0
+vlcj 4.7.1
+
+$[Bug Report]
+GitHub: https://github.com/shinovon/KEmulator/issues
+Telegram: @nnmidletschat / @shinovon
+Discord: https://discord.gg/ETvTpMehXV
