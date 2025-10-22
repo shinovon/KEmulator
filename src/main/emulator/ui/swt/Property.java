@@ -668,7 +668,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.reopenMidiDevice = Boolean.parseBoolean(properties.getProperty("MIDIReopenDevice", "true"));
 			Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
 			Settings.enableMediaDump = Boolean.parseBoolean(properties.getProperty("EnableMediaDump", "false"));
-			Settings.enableOTT = Boolean.parseBoolean(properties.getProperty("EnableOTT", "true"));
+			Settings.ottConverter = Integer.parseInt(properties.getProperty("OTTConverter", "2"));
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -908,7 +908,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("MIDIReopenDevice", String.valueOf(Settings.reopenMidiDevice));
 			properties.setProperty("MIDIGlobalSequencer", String.valueOf(Settings.oneMidiAtTime));
 			properties.setProperty("EnableMediaDump", String.valueOf(Settings.enableMediaDump));
-			properties.setProperty("EnableOTT", String.valueOf(Settings.enableOTT));
+			properties.setProperty("OTTConverter", String.valueOf(Settings.ottConverter));
 
 			// jvm
 			properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
@@ -1066,7 +1066,7 @@ public final class Property implements IProperty, SelectionListener {
 		}
 
 		Settings.enableMediaDump = mediaDumpCheck.getSelection();
-		Settings.enableOTT = ottCheck.getSelection();
+		Settings.ottConverter = ottCheck.getSelection() ? 2 : 0;
 		Settings.enableSecurity = securityCheck.getSelection();
 
 		Settings.autoUpdate = autoUpdatesBtn.getSelection() ? 2 : 1;
@@ -2140,10 +2140,11 @@ public final class Property implements IProperty, SelectionListener {
 		mediaDumpCheck.setLayoutData(fillHor);
 		mediaDumpCheck.setSelection(Settings.enableMediaDump);
 
+		// TODO
 		ottCheck = new Button(mediaGroup, SWT.CHECK);
 		ottCheck.setText(UILocale.get("OPTION_MEDIA_OTT", "Nokia Tone playback (unstable)"));
 		ottCheck.setLayoutData(fillHor);
-		ottCheck.setSelection(Settings.enableOTT);
+		ottCheck.setSelection(Settings.ottConverter == 2);
 
 //        reopenMidiCheck = new Button(mediaGroup, SWT.CHECK);
 //        reopenMidiCheck.setText(UILocale.get("OPTION_MEDIA_REOPEN_MIDI", "Reopen MIDI device every time"));

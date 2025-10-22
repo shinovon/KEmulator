@@ -105,7 +105,7 @@ public final class Settings {
 	public static boolean startAppOnResume = true;
 	public static int micro3d = 1; // 0 - dll, 1 - gl
 
-	public static boolean enableOTT = true;
+	public static int ottConverter = 2; // 0 - disabled, 1 - kemulator, 2 - freej2me
 
 	// mascot
 	public static boolean mascotNo2DMixing;
