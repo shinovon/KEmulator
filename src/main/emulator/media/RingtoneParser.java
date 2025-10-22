@@ -3,115 +3,122 @@ package emulator.media;
 import emulator.Emulator;
 
 public final class RingtoneParser {
-	MidiBuilder midiBuilder;
-	int dataLength;
-	byte[] dataBuffer;
-	static int bitIndex;
-	static int bitOffset;
-	static final int[] noteDurations;
 
-	public RingtoneParser(final byte[] array) {
-		super();
-		this.midiBuilder = new MidiBuilder();
-		this.dataLength = array.length;
-		System.arraycopy(array, 0, this.dataBuffer = new byte[this.dataLength + 10], 0, this.dataLength);
-		this.parse(this.dataBuffer);
-	}
+    private MidiBuilder midiBuilder;
+    private int dataLength;
+    private byte[] dataBuffer;
 
-	public final byte[] getMIDIData() {
-		return this.midiBuilder.getMIDIData();
-	}
+    private static int bitIndex;
+    private static int bitOffset;
 
-	private static int readbits(final byte[] array, final int n) {
-		final int n2 = ((array[RingtoneParser.bitIndex] & 0xFF) << 8) + (array[RingtoneParser.bitIndex + 1] & 0xFF) >> 16 - (n + RingtoneParser.bitOffset) & (1 << n) - 1;
-		RingtoneParser.bitOffset += n;
-		if (RingtoneParser.bitOffset > 7) {
-			RingtoneParser.bitOffset -= 8;
-			++RingtoneParser.bitIndex;
-		}
-		return n2;
-	}
+    private static final int[] noteDurations = {
+            25, 28, 31, 35, 40, 45, 50, 56, 63, 70, 80, 90, 100, 112, 125, 140,
+            160, 180, 200, 225, 250, 285, 320, 355, 400, 450, 500, 565, 635, 715,
+            800, 900
+    };
 
-	private static int getTempoValue(final int n) {
-		return RingtoneParser.noteDurations[n];
-	}
+    public RingtoneParser(final byte[] inputData) {
+        this.midiBuilder = new MidiBuilder();
+        this.dataLength = inputData.length;
+        this.dataBuffer = new byte[dataLength + 10];
+        System.arraycopy(inputData, 0, dataBuffer, 0, dataLength);
+        parse(dataBuffer);
+    }
 
-	private void parse(final byte[] array) {
-		RingtoneParser.bitIndex = 0;
-		RingtoneParser.bitOffset = 0;
-		int n = 0;
-		readbits(array, 8);
-		readbits(array, 8);
-		readbits(array, 7);
-		final int method727;
-		if ((method727 = readbits(array, 3)) != 1 && method727 != 2) {
-			Emulator.getEmulator().getLogStream().println("Unsupported ringtone type");
-			return;
-		}
-		for (int method728 = readbits(array, 4), i = 0; i < method728; ++i) {
-			readbits(array, 8);
-		}
-		int method729 = readbits(array, 8);
-		while (RingtoneParser.bitIndex < this.dataLength) {
-			if (method729 == 0) {
-				break;
-			}
-			readbits(array, 3);
-			readbits(array, 2);
-			readbits(array, 4);
-			for (int method730 = readbits(array, 8), n2 = 0; n2 < method730 && RingtoneParser.bitIndex < this.dataLength; ++n2) {
-				switch (readbits(array, 3)) {
-					case 0: {
-						readbits(array, 2);
-						break;
-					}
-					case 1: {
-						if (n == 0) {
-							this.midiBuilder.initTrack();
-							n = 1;
-						}
-						this.midiBuilder.note = readbits(array, 4);
-						this.midiBuilder.durationType = readbits(array, 3);
-						this.midiBuilder.noteType = readbits(array, 2);
-						this.midiBuilder.addNote();
-						break;
-					}
-					case 2: {
-						this.midiBuilder.octave = readbits(array, 2);
-						if (this.midiBuilder.octave > 0) {
-							final MidiBuilder ana1225 = this.midiBuilder;
-							--ana1225.octave;
-							break;
-						}
-						break;
-					}
-					case 3: {
-						readbits(array, 2);
-						break;
-					}
-					case 4: {
-						this.midiBuilder.tempo = getTempoValue(readbits(array, 5));
-						if (n == 1) {
-							this.midiBuilder.setTempo();
-							break;
-						}
-						break;
-					}
-					case 5: {
-						this.midiBuilder.volume = readbits(array, 4);
-						break;
-					}
-				}
-			}
-			if (RingtoneParser.bitIndex >= this.dataLength) {
-				break;
-			}
-			--method729;
-		}
-		this.midiBuilder.finishTrack();
-	}
+    public byte[] getMIDIData() {
+        return midiBuilder.getMIDIData();
+    }
 
-	static {
-		noteDurations = new int[]{25, 28, 31, 35, 40, 45, 50, 56, 63, 70, 80, 90, 100, 112, 125, 140, 160, 180, 200, 225, 250, 285, 320, 355, 400, 450, 500, 565, 635, 715, 800, 900};
-	}
+    // ================== Parsing helpers ==================
+
+    private static int readBits(final byte[] array, final int n) {
+        int value = (((array[bitIndex] & 0xFF) << 8) | (array[bitIndex + 1] & 0xFF)) >> (16 - (n + bitOffset)) & ((1 << n) - 1);
+        bitOffset += n;
+        if (bitOffset > 7) {
+            bitOffset -= 8;
+            bitIndex++;
+        }
+        return value;
+    }
+
+    private static int getTempoValue(final int index) {
+        return noteDurations[index];
+    }
+
+    // ================== Core parsing ==================
+
+    private void parse(final byte[] array) {
+        bitIndex = 0;
+        bitOffset = 0;
+
+        int trackInitialized = 0;
+
+        // Skip header bytes
+        readBits(array, 8);
+        readBits(array, 8);
+        readBits(array, 7);
+
+        int ringtoneType = readBits(array, 3);
+        if (ringtoneType != 1 && ringtoneType != 2) {
+            Emulator.getEmulator().getLogStream().println("Unsupported ringtone type");
+            return;
+        }
+
+        // Skip initial bytes
+        int initialCount = readBits(array, 4);
+        for (int i = 0; i < initialCount; i++) {
+            readBits(array, 8);
+        }
+
+        int loopCounter = readBits(array, 8);
+
+        while (bitIndex < dataLength && loopCounter > 0) {
+
+            readBits(array, 3); // unused
+            readBits(array, 2); // unused
+            readBits(array, 4); // unused
+
+            int notesCount = readBits(array, 8);
+            for (int i = 0; i < notesCount && bitIndex < dataLength; i++) {
+                int command = readBits(array, 3);
+                switch (command) {
+                    case 0:
+                        readBits(array, 2); // unused
+                        break;
+                    case 1:
+                        if (trackInitialized == 0) {
+                            midiBuilder.initTrack();
+                            trackInitialized = 1;
+                        }
+                        midiBuilder.note = readBits(array, 4);
+                        midiBuilder.durationType = readBits(array, 3);
+                        midiBuilder.noteType = readBits(array, 2);
+                        midiBuilder.addNote();
+                        break;
+                    case 2:
+                        midiBuilder.octave = readBits(array, 2);
+                        if (midiBuilder.octave > 0) {
+                            midiBuilder.octave--;
+                        }
+                        break;
+                    case 3:
+                        readBits(array, 2); // unused
+                        break;
+                    case 4:
+                        midiBuilder.tempo = getTempoValue(readBits(array, 5));
+                        if (trackInitialized == 1) {
+                            midiBuilder.setTempo();
+                        }
+                        break;
+                    case 5:
+                        midiBuilder.volume = readBits(array, 4);
+                        break;
+                }
+            }
+
+            loopCounter--;
+        }
+
+        midiBuilder.finishTrack();
+    }
 }
