@@ -2,7 +2,7 @@ package emulator.ui.swt;
 
 import emulator.Emulator;
 import emulator.graphics2D.swt.ImageSWT;
-import emulator.ui.effect.a;
+import emulator.ui.effect.WaterEffect;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -31,7 +31,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	private StyledText aStyledText808;
 	private Button aButton809;
 	private Canvas aCanvas810;
-	private a ana811;
+	private WaterEffect ana811;
 	private ImageSWT ad812;
 	private ImageSWT ad817;
 	private Timer aTimer813;
@@ -177,8 +177,8 @@ public final class About implements MouseListener, MouseMoveListener {
 			this.ad817 = new ImageSWT(this.ad812.getWidth(), this.ad812.getHeight(), false, 6393563);
 			this.anIntArray815 = this.ad812.getData();
 			this.anIntArray818 = this.ad817.getData();
-			(this.ana811 = new a()).method135(this.ad812.getWidth(), this.ad812.getHeight());
-			this.ana811.method137(this.ad812.getWidth() >> 1, this.ad812.getHeight() >> 1, 10, 500, this.ana811.anInt324);
+			(this.ana811 = new WaterEffect()).initialize(this.ad812.getWidth(), this.ad812.getHeight());
+			this.ana811.addDrop(this.ad812.getWidth() >> 1, this.ad812.getHeight() >> 1, 10, 500, this.ana811.currentBufferIndex);
 			(this.aTimer813 = new Timer()).schedule(new WaterTask(this), 0L, 30L);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -189,21 +189,21 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	public final void mouseDown(final MouseEvent mouseEvent) {
-		this.ana811.method137(mouseEvent.x, mouseEvent.y, 5, 500, this.ana811.anInt324);
+		this.ana811.addDrop(mouseEvent.x, mouseEvent.y, 5, 500, this.ana811.currentBufferIndex);
 	}
 
 	public final void mouseUp(final MouseEvent mouseEvent) {
 	}
 
 	public final void mouseMove(final MouseEvent mouseEvent) {
-		this.ana811.method137(mouseEvent.x, mouseEvent.y, 5, 50, this.ana811.anInt324);
+		this.ana811.addDrop(mouseEvent.x, mouseEvent.y, 5, 50, this.ana811.currentBufferIndex);
 	}
 
 	static Shell method456(final About class54) {
 		return class54.aShell806;
 	}
 
-	static a method457(final About class54) {
+	static WaterEffect method457(final About class54) {
 		return class54.ana811;
 	}
 
@@ -215,7 +215,7 @@ public final class About implements MouseListener, MouseMoveListener {
 		return class54.aTimer813;
 	}
 
-	static a method460(final About class54, final a ana811) {
+	static WaterEffect method460(final About class54, final WaterEffect ana811) {
 		return class54.ana811 = ana811;
 	}
 
@@ -232,7 +232,7 @@ public final class About implements MouseListener, MouseMoveListener {
 		}
 
 		public final void run() {
-			About.method457(this.aClass54_775).method136(this.aClass54_775.anIntArray815, this.aClass54_775.anIntArray818);
+			About.method457(this.aClass54_775).processFrame(this.aClass54_775.anIntArray815, this.aClass54_775.anIntArray818);
 			//TODO DEOBFUSCATE ALL THIS MESS
 			SWTFrontend.getDisplay().syncExec(new Water(this, aClass54_775.ana811));
 		}

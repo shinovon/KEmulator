@@ -1,12 +1,12 @@
 package emulator.ui.swt;
 
-import emulator.ui.effect.a;
+import emulator.ui.effect.WaterEffect;
 
 final class Water implements Runnable {
 	private final About.WaterTask aClass39_939;
-	private a ana;
+	private WaterEffect ana;
 
-	Water(final About.WaterTask aClass39_939, a ana811) {
+	Water(final About.WaterTask aClass39_939, WaterEffect ana811) {
 		super();
 		this.aClass39_939 = aClass39_939;
 		this.ana = ana811;
