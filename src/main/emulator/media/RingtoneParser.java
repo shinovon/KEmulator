@@ -97,15 +97,16 @@ public final class RingtoneParser {
                         break;
                     case 2:
                         midiBuilder.octave = readBits(array, 2);
-                        if (midiBuilder.octave > 0) {
-                            midiBuilder.octave--;
-                        }
+//                        if (midiBuilder.octave > 0) {
+//                            midiBuilder.octave--;
+//                        }
                         break;
                     case 3:
                         readBits(array, 2); // unused
                         break;
                     case 4:
                         midiBuilder.tempo = getTempoValue(readBits(array, 5));
+                        midiBuilder.tempo *= 4;
                         if (trackInitialized == 1) {
                             midiBuilder.setTempo();
                         }
