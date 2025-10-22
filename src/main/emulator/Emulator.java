@@ -377,7 +377,7 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getAboutString() {
-		return "KEmulator nnmod\n" + version + "\n\n\t" + UILocale.get("ABOUT_INFO_EMULATOR", "Mobile Game Emulator");
+		return "KEmulator nnmod\n" + version;
 	}
 
 	public static void getLibraries() {

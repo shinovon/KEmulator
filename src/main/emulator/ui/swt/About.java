@@ -3,9 +3,8 @@ package emulator.ui.swt;
 import emulator.Emulator;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.ui.effect.WaterEffect;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.*;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -23,13 +22,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public final class About implements MouseListener, MouseMoveListener {
-	private Shell aShell806;
-	private CLabel aCLabel805;
-	private Link aLink807;
+	private Shell aboutShell;
+	private CLabel aboutText;
 	private Link aLink816;
-	private Link aLink820;
-	private StyledText aStyledText808;
-	private Button aButton809;
+	private Button okBtn;
 	private Canvas aCanvas810;
 	private WaterEffect ana811;
 	private ImageSWT ad812;
@@ -38,51 +34,27 @@ public final class About implements MouseListener, MouseMoveListener {
 	GC aGC814;
 	int[] anIntArray815;
 	int[] anIntArray818;
-	private Button aButton819;
 
 	public About() {
 		super();
-		this.aShell806 = null;
-		this.aCLabel805 = null;
-		this.aLink807 = null;
+		this.aboutShell = null;
+		this.aboutText = null;
 		this.aLink816 = null;
-		this.aLink820 = null;
-		this.aStyledText808 = null;
-		this.aButton809 = null;
+		this.okBtn = null;
 		this.aCanvas810 = null;
-		this.aButton819 = null;
 	}
 
 	private void method462(final Shell shell) {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalIndent = 2;
-		layoutData.horizontalSpan = 2;
-		layoutData.horizontalAlignment = 4;
-		layoutData.verticalAlignment = 2;
-		layoutData.grabExcessHorizontalSpace = true;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).heightHint = 20;
-		layoutData2.widthHint = 90;
 		final GridData gridData;
 		(gridData = new GridData()).horizontalAlignment = 4;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalAlignment = 2;
-		final GridData layoutData3;
-		(layoutData3 = new GridData()).horizontalAlignment = 3;
-		layoutData3.grabExcessHorizontalSpace = false;
-		layoutData3.verticalAlignment = 2;
-		final GridData layoutData4;
-		(layoutData4 = new GridData()).horizontalAlignment = 4;
-		layoutData4.grabExcessHorizontalSpace = true;
-		layoutData4.grabExcessVerticalSpace = true;
-		layoutData4.horizontalSpan = 2;
-		layoutData4.verticalAlignment = 4;
 		final GridData layoutData5;
 		(layoutData5 = new GridData()).horizontalAlignment = 4;
 		layoutData5.grabExcessHorizontalSpace = true;
 		layoutData5.grabExcessVerticalSpace = false;
 		layoutData5.verticalAlignment = 4;
-		layoutData5.verticalSpan = 3;
+		layoutData5.verticalSpan = 1;
 		final GridData gridData2;
 		(gridData2 = new GridData()).horizontalIndent = 5;
 		gridData2.horizontalAlignment = 4;
@@ -92,53 +64,143 @@ public final class About implements MouseListener, MouseMoveListener {
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 2;
 		layout.horizontalSpacing = 0;
-		(this.aShell806 = new Shell(shell, 67680)).setText(emulator.UILocale.get("ABOUT_FRAME_TITLE", "About & Help"));
-		this.aShell806.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.aShell806.setLayout(layout);
-		this.aShell806.setSize(new Point(360, 400));
-		(this.aCLabel805 = new CLabel(this.aShell806, 0)).setLayoutData(layoutData5);
-		aCLabel805.setFont(EmulatorScreen.f);
-		this.aCLabel805.setText(Emulator.getAboutString());
-		this.method463();
-		(this.aLink816 = new Link(this.aShell806, 0)).setText("<a>" + "nnmod web page" + "</a>");
+
+		(this.aboutShell = new Shell(shell, 67680)).setText("About KEmulator");
+		this.aboutShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+		this.aboutShell.setLayout(layout);
+
+		this.addIcon();
+
+		(this.aboutText = new CLabel(this.aboutShell, 0)).setLayoutData(layoutData5);
+		aboutText.setFont(EmulatorScreen.f);
+		this.aboutText.setText(Emulator.getAboutString());
+
+		(this.aLink816 = new Link(this.aboutShell, 0)).setText("<a>nnproject.cc/kem</a>");
 		this.aLink816.setLayoutData(gridData2);
-		//((Control)this.aLink816).setEnabled(false);
 		this.aLink816.addSelectionListener(new Class158(this));
-		(this.aLink820 = new Link(this.aShell806, 0)).setText("<a>" + "Chat, news (en)" + "</a>");
-		this.aLink820.setLayoutData(gridData2);
-		//   ((Control)this.aLink820).setEnabled(false);
-		this.aLink820.addSelectionListener(new Class157(this));
-		(this.aLink807 = new Link(this.aShell806, 0)).setText("Mod by shinovon\n3D engine contributions by rmn20\nSoftBank MEXA, MascotCapsule impl by woesss\n" + emulator.UILocale.get("ABOUT_AUTHOR", "Author") + ": <a>Wu.Liang</a>  (c) 2006,2008");
-		this.aLink807.setLayoutData(layoutData);
-		this.aLink807.addSelectionListener(new Class156(this));
-		(this.aStyledText808 = new StyledText(this.aShell806, 2562)).setLayoutData(layoutData4);
-		this.aStyledText808.setFocus();
-		this.aStyledText808.setEditable(false);
-		this.aStyledText808.setIndent(5);
-		aStyledText808.setFont(EmulatorScreen.f);
-		(this.aButton819 = new Button(this.aShell806, 8388608)).setText(emulator.UILocale.get("ABOUT_ONLINE_MANUAL", "Online Manual"));
-		this.aButton819.setLayoutData(layoutData2);
-		this.aButton819.setEnabled(false);
-		this.aButton819.addSelectionListener(new Class162(this));
-		(this.aButton809 = new Button(this.aShell806, 8388616)).setText(emulator.UILocale.get("DIALOG_OK", "OK"));
-		this.aButton809.setLayoutData(layoutData3);
-		layoutData3.heightHint = 20;
-		layoutData3.widthHint = 70;
-		this.aButton809.addSelectionListener(new Class163(this));
-		this.method453();
+
+		{
+			final GridData layoutData3;
+			(layoutData3 = new GridData()).horizontalAlignment = 3;
+			layoutData3.grabExcessHorizontalSpace = false;
+			layoutData3.verticalAlignment = GridData.END;
+
+			(this.okBtn = new Button(this.aboutShell, 8388616)).setText(emulator.UILocale.get("DIALOG_OK", "OK"));
+			this.okBtn.setLayoutData(layoutData3);
+//			layoutData3.heightHint = 20;
+			layoutData3.widthHint = 100;
+			this.okBtn.addSelectionListener(new Class163(this));
+		}
+
+
+		final GridData layoutData2 = new GridData();
+		layoutData2.horizontalSpan = 2;
+		layoutData2.horizontalAlignment = 4;
+		layoutData2.grabExcessHorizontalSpace = true;
+		layoutData2.grabExcessVerticalSpace = true;
+		layoutData2.verticalAlignment = 4;
+
+		TabFolder tabFolder = new TabFolder(aboutShell, SWT.TOP);
+		{
+			final GridData layoutData = new GridData();
+			layoutData.horizontalIndent = 2;
+			layoutData.horizontalSpan = 2;
+			layoutData.horizontalAlignment = 4;
+			layoutData.verticalAlignment = 4;
+			layoutData.grabExcessHorizontalSpace = true;
+			layoutData.grabExcessVerticalSpace = true;
+			tabFolder.setLayoutData(layoutData);
+		}
+
+		Composite helpComposite = new Composite(tabFolder, SWT.NONE);
+		StyledText helpText = new StyledText(helpComposite, 2562);
+		{
+			GridLayout gridLayout = new GridLayout();
+			helpComposite.setLayout(gridLayout);
+
+			final GridData layoutData4 = new GridData();
+			layoutData4.horizontalAlignment = 4;
+			layoutData4.grabExcessHorizontalSpace = true;
+			layoutData4.grabExcessVerticalSpace = true;
+			layoutData4.horizontalSpan = 2;
+			layoutData4.verticalAlignment = 4;
+
+			helpText.setLayoutData(layoutData4);
+			helpText.setEditable(false);
+			helpText.setIndent(5);
+			helpText.setFont(EmulatorScreen.f);
+		}
+
+		TabItem logTab = new TabItem(tabFolder, SWT.NONE);
+		logTab.setText("Changelog");
+		logTab.setControl(helpComposite);
+
+		Composite apisComposite = new Composite(tabFolder, SWT.NONE);
+		StyledText apisText = new StyledText(apisComposite, 2562);
+		{
+			GridLayout gridLayout = new GridLayout();
+			apisComposite.setLayout(gridLayout);
+
+			final GridData layoutData4 = new GridData();
+			layoutData4.horizontalAlignment = 4;
+			layoutData4.grabExcessHorizontalSpace = true;
+			layoutData4.grabExcessVerticalSpace = true;
+			layoutData4.horizontalSpan = 2;
+			layoutData4.verticalAlignment = 4;
+
+			apisText.setLayoutData(layoutData4);
+			apisText.setEditable(false);
+			apisText.setIndent(5);
+			apisText.setFont(EmulatorScreen.f);
+		}
+
+		TabItem apisTab = new TabItem(tabFolder, SWT.NONE);
+		apisTab.setText("Supported APIs");
+		apisTab.setControl(apisComposite);
+
+		Composite creditsComposite = new Composite(tabFolder, SWT.NONE);
+		StyledText creditsText = new StyledText(creditsComposite, 2562);
+		{
+			GridLayout gridLayout = new GridLayout();
+			creditsComposite.setLayout(gridLayout);
+
+			final GridData layoutData4 = new GridData();
+			layoutData4.horizontalAlignment = 4;
+			layoutData4.grabExcessHorizontalSpace = true;
+			layoutData4.grabExcessVerticalSpace = true;
+			layoutData4.horizontalSpan = 2;
+			layoutData4.verticalAlignment = 4;
+
+			creditsText.setLayoutData(layoutData4);
+			creditsText.setEditable(false);
+			creditsText.setIndent(5);
+			creditsText.setFont(EmulatorScreen.f);
+		}
+
+		TabItem creditsTab = new TabItem(tabFolder, SWT.NONE);
+		creditsTab.setText("Credits");
+		creditsTab.setControl(creditsComposite);
+
+		aboutShell.pack();
+		aboutShell.setSize(new Point(400, 600));
+
+		this.setText(helpText, "/res/help");
+		this.setText(apisText, "/res/apis");
+		this.setText(creditsText, "/res/credits");
 	}
 
-	private void method453() {
+	private void setText(StyledText styledText, String res) {
+		styledText.setText("");
 		try {
-			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/res/help")));
+			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(res)));
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
-				final int charCount = this.aStyledText808.getCharCount();
+				final int charCount = styledText.getCharCount();
 				if (line.startsWith("$")) {
-					this.aStyledText808.append(line.substring(1) + "\n");
-					this.aStyledText808.setStyleRange(new StyleRange(charCount, line.length(), Display.getCurrent().getSystemColor(9), null));
+					styledText.append(line.substring(1) + "\n");
+					styledText.setStyleRange(new StyleRange(charCount, line.length(), Display.getCurrent().getSystemColor(9), null));
 				} else {
-					this.aStyledText808.append(line + "\n");
+					styledText.append(line + "\n");
 				}
 			}
 			bufferedReader.close();
@@ -149,22 +211,23 @@ public final class About implements MouseListener, MouseMoveListener {
 	public final void method454(final Shell shell) {
 		this.method462(shell);
 		final Display display = shell.getDisplay();
-		this.aShell806.setLocation(shell.getLocation().x + (shell.getSize().x - this.aShell806.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aShell806.getSize().y >> 1));
-		this.aShell806.open();
-		while (!this.aShell806.isDisposed()) {
+		this.aboutShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.aboutShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aboutShell.getSize().y >> 1));
+		this.aboutShell.open();
+		while (!this.aboutShell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
 	}
 
-	private void method463() {
+	private void addIcon() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.verticalAlignment = 4;
+		layoutData.verticalSpan = 3;
 		layoutData.heightHint = 146;
 		layoutData.widthHint = 156;
-		(this.aCanvas810 = new Canvas(this.aShell806, 537133056)).setLayoutData(layoutData);
+		(this.aCanvas810 = new Canvas(this.aboutShell, 537133056)).setLayoutData(layoutData);
 		this.aCanvas810.addMouseListener(this);
 		this.aCanvas810.addMouseMoveListener(this);
 		this.aGC814 = new GC(this.aCanvas810);
@@ -200,7 +263,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	static Shell method456(final About class54) {
-		return class54.aShell806;
+		return class54.aboutShell;
 	}
 
 	static WaterEffect method457(final About class54) {
@@ -247,7 +310,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	public void finalize() {
-		aShell806.getDisplay().asyncExec(() -> {
+		aboutShell.getDisplay().asyncExec(() -> {
 			try {
 				if (!aGC814.isDisposed()) aGC814.dispose();
 			} catch (Exception ignored) {
