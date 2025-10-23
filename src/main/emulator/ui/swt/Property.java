@@ -2167,7 +2167,7 @@ public final class Property implements IProperty, SelectionListener {
 		labelLayoutData.verticalAlignment = GridData.CENTER;
 
 		CLabel label = new CLabel(comp, SWT.NONE);
-		label.setText("OTT Decoder:");
+		label.setText("Nokia Tone Decoder:");
 		label.setLayoutData(labelLayoutData);
 
 		final GridData comboLayoutData = new GridData();
