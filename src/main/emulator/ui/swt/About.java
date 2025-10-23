@@ -24,27 +24,27 @@ import java.util.TimerTask;
 public final class About implements MouseListener, MouseMoveListener {
 	private Shell aboutShell;
 	private CLabel aboutText;
-	private Link aLink816;
+	private Link websiteLink;
 	private Button okBtn;
-	private Canvas aCanvas810;
+	private Canvas waterCanvas;
 	private WaterEffect ana811;
-	private ImageSWT ad812;
-	private ImageSWT ad817;
-	private Timer aTimer813;
-	GC aGC814;
-	int[] anIntArray815;
-	int[] anIntArray818;
+	private ImageSWT logoImage;
+	private ImageSWT waterImage;
+	private Timer animationTimer;
+	GC canvasGC;
+	int[] logoImageData;
+	int[] waterImageData;
 
 	public About() {
 		super();
 		this.aboutShell = null;
 		this.aboutText = null;
-		this.aLink816 = null;
+		this.websiteLink = null;
 		this.okBtn = null;
-		this.aCanvas810 = null;
+		this.waterCanvas = null;
 	}
 
-	private void method462(final Shell shell) {
+	private void createAboutShell(final Shell shell) {
 		final GridData gridData;
 		(gridData = new GridData()).horizontalAlignment = 4;
 		gridData.grabExcessHorizontalSpace = true;
@@ -75,9 +75,9 @@ public final class About implements MouseListener, MouseMoveListener {
 		aboutText.setFont(EmulatorScreen.f);
 		this.aboutText.setText(Emulator.getAboutString());
 
-		(this.aLink816 = new Link(this.aboutShell, 0)).setText("<a>nnproject.cc/kem</a>");
-		this.aLink816.setLayoutData(gridData2);
-		this.aLink816.addSelectionListener(new Class158(this));
+		(this.websiteLink = new Link(this.aboutShell, 0)).setText("<a>nnproject.cc/kem</a>");
+		this.websiteLink.setLayoutData(gridData2);
+		this.websiteLink.addSelectionListener(new Class158(this));
 
 		{
 			final GridData layoutData3;
@@ -209,7 +209,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	public final void method454(final Shell shell) {
-		this.method462(shell);
+		this.createAboutShell(shell);
 		final Display display = shell.getDisplay();
 		this.aboutShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.aboutShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aboutShell.getSize().y >> 1));
 		this.aboutShell.open();
@@ -227,22 +227,22 @@ public final class About implements MouseListener, MouseMoveListener {
 		layoutData.verticalSpan = 3;
 		layoutData.heightHint = 146;
 		layoutData.widthHint = 156;
-		(this.aCanvas810 = new Canvas(this.aboutShell, 537133056)).setLayoutData(layoutData);
-		this.aCanvas810.addMouseListener(this);
-		this.aCanvas810.addMouseMoveListener(this);
-		this.aGC814 = new GC(this.aCanvas810);
+		(this.waterCanvas = new Canvas(this.aboutShell, 537133056)).setLayoutData(layoutData);
+		this.waterCanvas.addMouseListener(this);
+		this.waterCanvas.addMouseMoveListener(this);
+		this.canvasGC = new GC(this.waterCanvas);
 		this.method455(Emulator.class.getResourceAsStream("/res/sign"));
 	}
 
 	private void method455(final InputStream inputStream) {
 		try {
-			this.ad812 = new ImageSWT(inputStream);
-			this.ad817 = new ImageSWT(this.ad812.getWidth(), this.ad812.getHeight(), false, 6393563);
-			this.anIntArray815 = this.ad812.getData();
-			this.anIntArray818 = this.ad817.getData();
-			(this.ana811 = new WaterEffect()).initialize(this.ad812.getWidth(), this.ad812.getHeight());
-			this.ana811.addDrop(this.ad812.getWidth() >> 1, this.ad812.getHeight() >> 1, 10, 500, this.ana811.currentBufferIndex);
-			(this.aTimer813 = new Timer()).schedule(new WaterTask(this), 0L, 30L);
+			this.logoImage = new ImageSWT(inputStream);
+			this.waterImage = new ImageSWT(this.logoImage.getWidth(), this.logoImage.getHeight(), false, 6393563);
+			this.logoImageData = this.logoImage.getData();
+			this.waterImageData = this.waterImage.getData();
+			(this.ana811 = new WaterEffect()).initialize(this.logoImage.getWidth(), this.logoImage.getHeight());
+			this.ana811.addDrop(this.logoImage.getWidth() >> 1, this.logoImage.getHeight() >> 1, 10, 500, this.ana811.currentBufferIndex);
+			(this.animationTimer = new Timer()).schedule(new WaterTask(this), 0L, 30L);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -271,11 +271,11 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	static Canvas method458(final About class54) {
-		return class54.aCanvas810;
+		return class54.waterCanvas;
 	}
 
 	static Timer method459(final About class54) {
-		return class54.aTimer813;
+		return class54.animationTimer;
 	}
 
 	static WaterEffect method460(final About class54, final WaterEffect ana811) {
@@ -283,21 +283,21 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	static ImageSWT method461(final About class54) {
-		return class54.ad817;
+		return class54.waterImage;
 	}
 
 	final static class WaterTask extends TimerTask {
-		private final About aClass54_775;
+		private final About waterTask;
 
-		private WaterTask(final About aClass54_775) {
+		private WaterTask(final About waterTask) {
 			super();
-			this.aClass54_775 = aClass54_775;
+			this.waterTask = waterTask;
 		}
 
 		public final void run() {
-			About.method457(this.aClass54_775).processFrame(this.aClass54_775.anIntArray815, this.aClass54_775.anIntArray818);
-			//TODO DEOBFUSCATE ALL THIS MESS
-			SWTFrontend.getDisplay().syncExec(new Water(this, aClass54_775.ana811));
+			About.method457(this.waterTask).processFrame(this.waterTask.logoImageData, this.waterTask.waterImageData);
+			//TODO DEOBFUSCATE ALL THIS MESS | 24.10.2025 in progress -klaxons1
+			SWTFrontend.getDisplay().syncExec(new Water(this, waterTask.ana811));
 		}
 
 		WaterTask(final About class54, final Class158 class55) {
@@ -305,14 +305,14 @@ public final class About implements MouseListener, MouseMoveListener {
 		}
 
 		static About method433(final WaterTask waterTask) {
-			return waterTask.aClass54_775;
+			return waterTask.waterTask;
 		}
 	}
 
 	public void finalize() {
 		aboutShell.getDisplay().asyncExec(() -> {
 			try {
-				if (!aGC814.isDisposed()) aGC814.dispose();
+				if (!canvasGC.isDisposed()) canvasGC.dispose();
 			} catch (Exception ignored) {
 			}
 		});
