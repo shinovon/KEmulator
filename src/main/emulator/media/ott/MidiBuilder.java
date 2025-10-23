@@ -1,4 +1,4 @@
-package emulator.media;
+package emulator.media.ott;
 
 public final class MidiBuilder {
 

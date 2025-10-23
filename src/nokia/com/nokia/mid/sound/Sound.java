@@ -1,8 +1,8 @@
 package com.nokia.mid.sound;
 
 import emulator.Settings;
-import emulator.media.NokiaOTTDecoder;
-import emulator.media.RingtoneParser;
+import emulator.media.ott.NokiaOTTDecoder;
+import emulator.media.ott.RingtoneParser;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.MidiToneConstants;
 import emulator.media.tone.ToneManager;

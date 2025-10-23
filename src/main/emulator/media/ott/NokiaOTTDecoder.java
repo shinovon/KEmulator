@@ -14,7 +14,7 @@
 	You should have received a copy of the GNU General Public License
 	along with FreeJ2ME.  If not, see http://www.gnu.org/licenses/
 */
-package emulator.media;
+package emulator.media.ott;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
