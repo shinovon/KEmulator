@@ -1,3 +1,11 @@
+$v2.20.1 [2025.10.25]
+Fixed Media View with Java 9+
+Fixed LWJGL loading on Intel Mac
+Fix Siemens File API
+Optimized image rendering in MemoryView
+Added Nokia OTT decoder from FreeJ2ME-Plus
+Updated About window
+
 $v2.20 [2025.08.24]
 DoJa initial support
 Reworked Memory View
