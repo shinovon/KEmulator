@@ -55,6 +55,7 @@ public final class Settings {
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
 	public static String locale = "en-US";
+	public static String microeditionPlatform = "Nokia6700c-1/13.10";
 
 
 	public static boolean jdwpDebug;

@@ -1,8 +1,5 @@
 package emulator;
 
-import club.minnced.discord.rpc.DiscordEventHandlers;
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
 import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
@@ -34,7 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -632,32 +628,10 @@ public class Emulator implements Runnable {
 			System.setProperty("microedition.locale", Settings.locale);
 		}
 		if (System.getProperty("microedition.platform") == null) {
-			String plat = Emulator.deviceName;
-			DevicePlatform c = Devices.getPlatform(Emulator.deviceName);
-			if (c.exists("OVERRIDE_NAME")) {
-				plat = c.getString("OVERRIDE_NAME");
-			}
-			if (c.exists("R")) {
-				plat += "-" + c.getString("R");
-			}
+			String plat = Settings.microeditionPlatform;
 
 			Emulator.httpUserAgent = plat + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ")";
 
-			if (!c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
-				plat += "/" + c.getString("PLATFORM_VERSION");
-			}
-			if (c.exists("CUSTOM_UA")) {
-				Emulator.httpUserAgent = c.getString("CUSTOM_UA");
-			}
-			if (c.exists("PLATFORM_VERSION2") && c.exists("PLATFORM_VERSION")) {
-				plat += "/" + c.getString("PLATFORM_VERSION2");
-			}
-//                if (c.exists("SW_PLATFORM")) {
-//                    plat += "sw_platform=" + c.getString("SW_PLATFORM");
-//                }
-//                if (c.exists("SW_PLATFORM_VERSION")) {
-//                    plat += ";sw_platform_version=" + c.getString("SW_PLATFORM_VERSION");
-//                }
 			System.setProperty("microedition.platform", plat);
 		}
 		System.setProperty("microedition.media.version", "1.0");
@@ -873,8 +847,8 @@ public class Emulator implements Runnable {
 			}
 		}
 		Emulator.deviceName = deviceName;
-		if (!Devices.setPlatform(Emulator.deviceName)) {
-			Devices.setPlatform(Emulator.deviceName = "SonyEricssonK800");
+		if (!Devices.setPreset(Emulator.deviceName)) {
+			Devices.setPreset(Emulator.deviceName = Devices.getDefaultPreset());
 		}
 		Emulator.emulatorimpl.getProperty().setCustomProperties();
 		if (c != null) {
@@ -1255,7 +1229,7 @@ public class Emulator implements Runnable {
 		Emulator.jarLibrarys = new Vector();
 		Emulator.jarClasses = new Vector();
 		Emulator.deviceName = "SonyEricssonK800";
-		Emulator.deviceFile = "/res/plat";
+		Emulator.deviceFile = "/res/presets.xml";
 		backgroundThread = new Thread(new Runnable() {
 			public void run() {
 				Manager.checkLibVlcSupport();
