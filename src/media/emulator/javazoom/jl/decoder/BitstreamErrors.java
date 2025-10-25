@@ -19,7 +19,7 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.decoder;
+package emulator.javazoom.jl.decoder;
 
 /**
  * This interface describes all error codes that can be thrown 

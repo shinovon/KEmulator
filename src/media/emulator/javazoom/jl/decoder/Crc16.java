@@ -22,7 +22,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
-package javazoom.jl.decoder;
+package emulator.javazoom.jl.decoder;
 
 /**
  * 16-Bit CRC checksum

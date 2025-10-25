@@ -18,9 +18,9 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.player;
+package emulator.javazoom.jl.player;
 
-import javazoom.jl.decoder.JavaLayerException;
+import emulator.javazoom.jl.decoder.JavaLayerException;
 
 import java.util.Enumeration;
 import java.util.Hashtable;

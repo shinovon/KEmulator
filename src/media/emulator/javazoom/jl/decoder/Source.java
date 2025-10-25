@@ -17,7 +17,7 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.decoder;
+package emulator.javazoom.jl.decoder;
 
 import java.io.IOException;
 

@@ -19,7 +19,7 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.decoder;
+package emulator.javazoom.jl.decoder;
 
 /**
  * Implementations of FrameDecoder are responsible for decoding

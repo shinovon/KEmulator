@@ -18,7 +18,7 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.decoder;
+package emulator.javazoom.jl.decoder;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -193,7 +193,7 @@ public class JavaLayerUtils
 		else
 		{*/
 			Class cls = JavaLayerUtils.class;
-			is = cls.getResourceAsStream("/javazoom/jl/decoder/" +name);
+			is = cls.getResourceAsStream("/emulator/javazoom/jl/decoder/" +name);
 		//}
 		
 		return is;		

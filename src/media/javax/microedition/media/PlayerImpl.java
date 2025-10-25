@@ -6,8 +6,8 @@ import emulator.custom.ResourceManager;
 import emulator.media.EmulatorMIDI;
 import emulator.media.amr.AMRDecoder;
 import emulator.media.tone.ToneControlImpl;
-import javazoom.jl.decoder.Header;
-import javazoom.jl.decoder.JavaLayerException;
+import emulator.javazoom.jl.decoder.Header;
+import emulator.javazoom.jl.decoder.JavaLayerException;
 
 import javax.microedition.io.Connector;
 import javax.microedition.media.control.MIDIControlImpl;
@@ -242,8 +242,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				stop();
 			} catch (Exception ignored) {}
 		}
-		if (sequence instanceof javazoom.jl.player.Player) {
-			((javazoom.jl.player.Player) sequence).close();
+		if (sequence instanceof emulator.javazoom.jl.player.Player) {
+			((emulator.javazoom.jl.player.Player) sequence).close();
 		} else if (sequence instanceof Sequence) {
 			if (midiSynthesizer != null) {
 				midiSynthesizer.close();
@@ -327,9 +327,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			final Clip clip;
 			res = (clip = (Clip) sequence).getBufferSize()
 					/ (clip.getFormat().getFrameSize() * clip.getFormat().getFrameRate());
-		} else if (sequence instanceof javazoom.jl.player.Player) {
+		} else if (sequence instanceof emulator.javazoom.jl.player.Player) {
 			try {
-				res = ((double) (dataLen * 8) / ((javazoom.jl.player.Player) sequence).getBitrate());
+				res = ((double) (dataLen * 8) / ((emulator.javazoom.jl.player.Player) sequence).getBitrate());
 			} catch (ArithmeticException e) {
 				return -1;
 			}
@@ -351,8 +351,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			} catch (Exception ignored) {}
 			return mediaTime;
 		}
-		if (sequence instanceof javazoom.jl.player.Player) {
-			return mediaTime = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
+		if (sequence instanceof emulator.javazoom.jl.player.Player) {
+			return mediaTime = ((emulator.javazoom.jl.player.Player) sequence).getPosition() * 1000L;
 		}
 		return TIME_UNKNOWN;
 	}
@@ -380,18 +380,18 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			} catch (Exception e) {
 				throw new MediaException(e);
 			}
-		} else if (sequence instanceof javazoom.jl.player.Player) {
+		} else if (sequence instanceof emulator.javazoom.jl.player.Player) {
 			long l = getMediaTime();
 //			if (true) return l; // TODO
-			if (t == 0 && l == 0 || !((javazoom.jl.player.Player) sequence).isBuffered)
+			if (t == 0 && l == 0 || !((emulator.javazoom.jl.player.Player) sequence).isBuffered)
 				return 0;
 			if (t < l) {
 				try {
 					stop();
-					Header old = ((javazoom.jl.player.Player) sequence).bitstream().header;
-					((javazoom.jl.player.Player) sequence).reset();
-					((javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
-					ms = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
+					Header old = ((emulator.javazoom.jl.player.Player) sequence).bitstream().header;
+					((emulator.javazoom.jl.player.Player) sequence).reset();
+					((emulator.javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
+					ms = ((emulator.javazoom.jl.player.Player) sequence).getPosition() * 1000L;
 					start();
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
@@ -399,10 +399,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			} else {
 				try {
 					stop();
-					Header old = ((javazoom.jl.player.Player) sequence).bitstream().header;
-					((javazoom.jl.player.Player) sequence).reset();
-					((javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
-					ms = ((javazoom.jl.player.Player) sequence).getPosition() * 1000L;
+					Header old = ((emulator.javazoom.jl.player.Player) sequence).bitstream().header;
+					((emulator.javazoom.jl.player.Player) sequence).reset();
+					((emulator.javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
+					ms = ((emulator.javazoom.jl.player.Player) sequence).getPosition() * 1000L;
 					start();
 				} catch (JavaLayerException e) {
 					throw new MediaException(e);
@@ -482,7 +482,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 							data = ResourceManager.getBytes(i);
 							i = this.inputStream = new ByteArrayInputStream(data);
 						}
-						sequence = new javazoom.jl.player.Player(i, false);
+						sequence = new emulator.javazoom.jl.player.Player(i, false);
 					} catch (JavaLayerException e) {
 						e.printStackTrace();
 						throw new IOException(e);
@@ -533,7 +533,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			if (mp3 || contentType.equalsIgnoreCase("audio/mpeg") || contentType.equalsIgnoreCase("audio/mp3")) {
 				dataLen = (int) stream.getContentLength();
 				try {
-					sequence = new javazoom.jl.player.Player(new InputStream() {
+					sequence = new emulator.javazoom.jl.player.Player(new InputStream() {
 
 						public int read() throws IOException {
 							byte[] b = new byte[1];
@@ -623,8 +623,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			throw new IllegalStateException();
 		}
 		if (sequence == null) return;
-		if (sequence instanceof javazoom.jl.player.Player) {
-			((javazoom.jl.player.Player) sequence).stop();
+		if (sequence instanceof emulator.javazoom.jl.player.Player) {
+			((emulator.javazoom.jl.player.Player) sequence).stop();
 			return;
 		}
 		stopped = true;
@@ -724,18 +724,18 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					synchronized (clip) {
 						clip.stop();
 					}
-				} else if (sequence instanceof javazoom.jl.player.Player) {
+				} else if (sequence instanceof emulator.javazoom.jl.player.Player) {
 					if (b) {
 						notifyListeners(PlayerListener.STARTED, getMediaTime());
 						b = false;
 					}
 					try {
-						complete = ((javazoom.jl.player.Player) sequence).play(Integer.MAX_VALUE);
+						complete = ((emulator.javazoom.jl.player.Player) sequence).play(Integer.MAX_VALUE);
 					} catch (JavaLayerException e) {
 						e.printStackTrace();
 						notifyListeners(PlayerListener.ERROR, e.toString());
 					}
-					if (complete || (sequence != null && ((javazoom.jl.player.Player) sequence).isComplete())) {
+					if (complete || (sequence != null && ((emulator.javazoom.jl.player.Player) sequence).isComplete())) {
 						complete = true;
 						if (dataSource != null) {
 							//dataSource.stop();
@@ -790,8 +790,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			// TODO midi volume
 			return;
 		}
-		if (sequence instanceof javazoom.jl.player.Player) {
-			((javazoom.jl.player.Player) sequence).setLevel(n);
+		if (sequence instanceof emulator.javazoom.jl.player.Player) {
+			((emulator.javazoom.jl.player.Player) sequence).setLevel(n);
 		}
 	}
 
@@ -820,7 +820,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			ext = "mid";
 		} else /*if (sequence instanceof Clip) {
 			ext = "wav";
-		} else */if (sequence instanceof javazoom.jl.player.Player) {
+		} else */if (sequence instanceof emulator.javazoom.jl.player.Player) {
 			ext = "mp3";
 		} else if (contentType != null) {
 			if (contentType.equalsIgnoreCase("audio/wav") ||
@@ -882,7 +882,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			return "JVM MIDI";
 		if(sequence instanceof Clip)
 			return "JVM clip";
-		if(sequence instanceof javazoom.jl.player.Player)
+		if(sequence instanceof emulator.javazoom.jl.player.Player)
 			return "javazoom";
 		return "MMAPI/unknown";
 	}

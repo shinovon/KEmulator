@@ -107,7 +107,7 @@
 -keep public class emulator.graphics2D.awt.* { public protected *; }
 -keep class emulator.graphics2D.IImage { *; }
 
--keep class javazoom.jl.player.JavaSoundAudioDevice
+-keep class emulator.javazoom.jl.JavaSoundAudioDevice
 
 # Debug & custom
 -keep class emulator.debug.Memory { public static *; }

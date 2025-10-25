@@ -32,7 +32,7 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.decoder;
+package emulator.javazoom.jl.decoder;
 
 /**
  * Class Implementing Layer 3 Decoder.

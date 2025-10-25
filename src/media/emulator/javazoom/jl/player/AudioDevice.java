@@ -18,10 +18,10 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.player;
+package emulator.javazoom.jl.player;
 
-import javazoom.jl.decoder.Decoder;
-import javazoom.jl.decoder.JavaLayerException;
+import emulator.javazoom.jl.decoder.Decoder;
+import emulator.javazoom.jl.decoder.JavaLayerException;
 
 /**
  * The <code>AudioDevice</code> interface provides an abstraction for

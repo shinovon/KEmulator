@@ -18,9 +18,9 @@
  *----------------------------------------------------------------------
  */
 
-package javazoom.jl.player;
+package emulator.javazoom.jl.player;
 
-import javazoom.jl.decoder.*;
+import emulator.javazoom.jl.decoder.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +48,7 @@ public class Player
 	 * The MPEG audio bitstream.
 	 */
 	// javac blank final bug.
-	/*final*/ private Bitstream		bitstream;
+	/*final*/ private Bitstream bitstream;
 
 	/**
 	 * The MPEG audio decoder.
