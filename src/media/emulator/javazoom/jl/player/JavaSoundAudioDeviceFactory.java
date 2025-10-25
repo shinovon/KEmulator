@@ -32,7 +32,7 @@ public class JavaSoundAudioDeviceFactory extends AudioDeviceFactory
 {
 	private boolean tested = false;
 
-	static private final String DEVICE_CLASS_NAME = "javazoom.jl.player.JavaSoundAudioDevice";
+	static private final String DEVICE_CLASS_NAME = "emulator.javazoom.jl.player.JavaSoundAudioDevice";
 	
 	public synchronized AudioDevice createAudioDevice()
 		throws JavaLayerException
