@@ -27,7 +27,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	private Link websiteLink;
 	private Button okBtn;
 	private Canvas waterCanvas;
-	private WaterEffect ana811;
+	private WaterEffect waterEffect;
 	private ImageSWT logoImage;
 	private ImageSWT waterImage;
 	private Timer animationTimer;
@@ -240,8 +240,8 @@ public final class About implements MouseListener, MouseMoveListener {
 			this.waterImage = new ImageSWT(this.logoImage.getWidth(), this.logoImage.getHeight(), false, 6393563);
 			this.logoImageData = this.logoImage.getData();
 			this.waterImageData = this.waterImage.getData();
-			(this.ana811 = new WaterEffect()).initialize(this.logoImage.getWidth(), this.logoImage.getHeight());
-			this.ana811.addDrop(this.logoImage.getWidth() >> 1, this.logoImage.getHeight() >> 1, 10, 500, this.ana811.currentBufferIndex);
+			(this.waterEffect = new WaterEffect()).initialize(this.logoImage.getWidth(), this.logoImage.getHeight());
+			this.waterEffect.addDrop(this.logoImage.getWidth() >> 1, this.logoImage.getHeight() >> 1, 10, 500, this.waterEffect.currentBufferIndex);
 			(this.animationTimer = new Timer()).schedule(new WaterTask(this), 0L, 30L);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -252,14 +252,14 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	public final void mouseDown(final MouseEvent mouseEvent) {
-		this.ana811.addDrop(mouseEvent.x, mouseEvent.y, 5, 500, this.ana811.currentBufferIndex);
+		this.waterEffect.addDrop(mouseEvent.x, mouseEvent.y, 5, 500, this.waterEffect.currentBufferIndex);
 	}
 
 	public final void mouseUp(final MouseEvent mouseEvent) {
 	}
 
 	public final void mouseMove(final MouseEvent mouseEvent) {
-		this.ana811.addDrop(mouseEvent.x, mouseEvent.y, 5, 50, this.ana811.currentBufferIndex);
+		this.waterEffect.addDrop(mouseEvent.x, mouseEvent.y, 5, 50, this.waterEffect.currentBufferIndex);
 	}
 
 	static Shell method456(final About class54) {
@@ -267,7 +267,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	static WaterEffect method457(final About class54) {
-		return class54.ana811;
+		return class54.waterEffect;
 	}
 
 	static Canvas method458(final About class54) {
@@ -279,7 +279,7 @@ public final class About implements MouseListener, MouseMoveListener {
 	}
 
 	static WaterEffect method460(final About class54, final WaterEffect ana811) {
-		return class54.ana811 = ana811;
+		return class54.waterEffect = ana811;
 	}
 
 	static ImageSWT method461(final About class54) {
@@ -297,7 +297,7 @@ public final class About implements MouseListener, MouseMoveListener {
 		public final void run() {
 			About.method457(this.waterTask).processFrame(this.waterTask.logoImageData, this.waterTask.waterImageData);
 			//TODO DEOBFUSCATE ALL THIS MESS | 24.10.2025 in progress -klaxons1
-			SWTFrontend.getDisplay().syncExec(new Water(this, waterTask.ana811));
+			SWTFrontend.getDisplay().syncExec(new Water(this, waterTask.waterEffect));
 		}
 
 		WaterTask(final About class54, final Class158 class55) {
