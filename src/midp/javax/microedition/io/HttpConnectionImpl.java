@@ -35,6 +35,7 @@ public final class HttpConnectionImpl implements HttpConnection {
 		this.url = url;
 		Emulator.getEmulator().getLogStream().println("Connect to: " + url);
 		this.connection = (HttpURLConnection) new URL(url).openConnection();
+		connection.setInstanceFollowRedirects(false);
 		connection.setDoInput(true);
 		connection.setDoOutput(true);
 	}
