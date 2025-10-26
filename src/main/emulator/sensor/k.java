@@ -169,60 +169,60 @@ public final class k implements Channel, ChannelInfo, Runnable {
 		}
 	}
 
-	final synchronized void setSensor(final SensorImpl aj494) {
-		this.sensor = aj494;
+	final synchronized void setSensor(final SensorImpl sensor) {
+		this.sensor = sensor;
 	}
 
-	final void startDataCollection(final ChannelDataListener aChannelDataListener496, final int anInt503, final long n, final boolean aBoolean497, final boolean aBoolean498, final boolean aBoolean499, final boolean aBoolean500) {
+	final void startDataCollection(final ChannelDataListener dataListener, final int bufferSize, final long bufferingPeriod, final boolean isTimestampIncluded, final boolean isUncertaintyIncluded, final boolean isValidityIncluded, final boolean isRepeat) {
 		this.stopThread();
 		this.isStopped = false;
-		this.dataListener = aChannelDataListener496;
-		this.bufferSize = anInt503;
-		this.isTimestampIncluded = aBoolean497;
-		this.isUncertaintyIncluded = aBoolean498;
-		this.isValidityIncluded = aBoolean499;
-		this.isRepeat = aBoolean500;
+		this.dataListener = dataListener;
+		this.bufferSize = bufferSize;
+		this.isTimestampIncluded = isTimestampIncluded;
+		this.isUncertaintyIncluded = isUncertaintyIncluded;
+		this.isValidityIncluded = isValidityIncluded;
+		this.isRepeat = isRepeat;
 		(this.dataThread = new Thread(this)).start();
 	}
 
 	public final void run() {
 		do {
-			final SensorDataImpl l = new SensorDataImpl(this, this.bufferSize, this.getDataType(), this.isTimestampIncluded, this.isUncertaintyIncluded, this.isValidityIncluded);
-			int n = 0;
-			while (!this.isStopped && n < this.bufferSize) {
-				final Object[] array = {null};
-				this.sensor.method240(this.channelNumber, array, this.getDataType());
-				if (this.lastValue != null && this.lastValue.equals(array[0])) {
+			final SensorDataImpl sensorData = new SensorDataImpl(this, this.bufferSize, this.getDataType(), this.isTimestampIncluded, this.isUncertaintyIncluded, this.isValidityIncluded);
+			int dataCount = 0;
+			while (!this.isStopped && dataCount < this.bufferSize) {
+				final Object[] dataArray = {null};
+				this.sensor.method240(this.channelNumber, dataArray, this.getDataType());
+				if (this.lastValue != null && this.lastValue.equals(dataArray[0])) {
 					continue;
 				}
-				this.lastValue = array[0];
-				final int n2 = n;
-				if ((n += array.length) > this.bufferSize) {
-					l.setBufferSize(n);
+				this.lastValue = dataArray[0];
+				final int startIndex = dataCount;
+				if ((dataCount += dataArray.length) > this.bufferSize) {
+					sensorData.setBufferSize(dataCount);
 				}
-				for (int i = 0; i < array.length; ++i) {
-					l.setData(n2 + i, array[i]);
+				for (int i = 0; i < dataArray.length; ++i) {
+					sensorData.setData(startIndex + i, dataArray[i]);
 					if (this.isTimestampIncluded) {
-						l.setTimestamp(n2 + i, Calendar.getInstance().getTime().getTime());
+						sensorData.setTimestamp(startIndex + i, Calendar.getInstance().getTime().getTime());
 					}
 					if (this.isUncertaintyIncluded) {
-						l.setUncertainty(n2 + i, 0.0f);
+						sensorData.setUncertainty(startIndex + i, 0.0f);
 					}
 					if (this.isValidityIncluded) {
-						l.setValidities(n2 + i, true);
+						sensorData.setValidities(startIndex + i, true);
 					}
 				}
 			}
 			if (this.isStopped) {
 				return;
 			}
-			if (n < 0) {
-				n = 0;
+			if (dataCount < 0) {
+				dataCount = 0;
 			}
-			if (n < this.bufferSize) {
-				l.setBufferSize(n);
+			if (dataCount < this.bufferSize) {
+				sensorData.setBufferSize(dataCount);
 			}
-			this.dataListener.channelDataReceived(this.channelNumber, l);
+			this.dataListener.channelDataReceived(this.channelNumber, sensorData);
 		} while (this.isRepeat && !this.isStopped);
 	}
 
