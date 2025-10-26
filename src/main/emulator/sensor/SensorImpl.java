@@ -42,7 +42,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
 		this.ana449 = ana449;
 		if (akArray453 != null && akArray453.length > 0) {
 			for (int i = 0; i < akArray453.length; ++i) {
-				akArray453[i].method275(this);
+				akArray453[i].setSensor(this);
 			}
 		}
 		this.state = 4;
@@ -188,7 +188,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
 		this.anInt457 = 0;
 		this.alArray450 = new SensorDataImpl[this.channelInfos.length];
 		for (int i = 0; i < this.channelInfos.length; ++i) {
-			this.channelInfos[i].method276(this, anInt448, n, b, b2, b3, false);
+			this.channelInfos[i].startDataCollection(this, anInt448, n, b, b2, b3, false);
 		}
 		this.aBoolean458 = false;
 		while (!this.aBoolean458) {
@@ -293,7 +293,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
 		this.anInt460 = 0;
 		this.alArray450 = new SensorDataImpl[this.channelInfos.length];
 		for (int i = 0; i < this.channelInfos.length; ++i) {
-			this.channelInfos[i].method276(this, anInt448, n, b, b2, b3, true);
+			this.channelInfos[i].startDataCollection(this, anInt448, n, b, b2, b3, true);
 		}
 	}
 

@@ -3,65 +3,66 @@ package emulator.sensor;
 import javax.microedition.sensor.*;
 import java.util.Calendar;
 import java.util.Vector;
-
+//k class must be some reimplementation of ChannelImpl.java
+//https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ChannelImpl.java#L84
 public final class k implements Channel, ChannelInfo, Runnable {
-	private MeasurementRange[] aMeasurementRangeArray489;
-	private String aString490;
-	private int anInt488;
-	private int anInt499;
-	private int anInt501;
-	private Unit anUnit491;
-	private float aFloat492;
-	private Vector aVector493;
-	private SensorImpl aj494;
-	private Thread aThread495;
-	private ChannelDataListener aChannelDataListener496;
-	private int anInt503;
-	private boolean aBoolean497;
-	private boolean aBoolean500;
-	private boolean aBoolean502;
-	private volatile boolean aBoolean504;
-	private boolean aBoolean505;
-	private Object anObject498;
+	private MeasurementRange[] ranges;
+	private String name;
+	private int channelNumber;
+	private int dataType;
+	private int scale;
+	private Unit unit;
+	private float accuracy;
+	private Vector conditions;
+	private SensorImpl sensor;
+	private Thread dataThread;
+	private ChannelDataListener dataListener;
+	private int bufferSize;
+	private boolean isTimestampIncluded;
+	private boolean isUncertaintyIncluded;
+	private boolean isValidityIncluded;
+	private volatile boolean isStopped;
+	private boolean isRepeat;
+	private Object lastValue;
 
-	public k(final int n, final int anInt488, final String aString490, final int anInt489, final float aFloat492, final int anInt490, final Unit anUnit491, final MeasurementRange[] aMeasurementRangeArray489) {
+	public k(final int n, final int channelNumber, final String name, final int dataType, final float accuracy, final int scale, final Unit unit, final MeasurementRange[] ranges) {
 		super();
-		this.aVector493 = new Vector();
-		this.anObject498 = null;
-		this.aString490 = aString490;
-		this.anInt488 = anInt488;
-		this.anInt499 = anInt489;
-		this.aFloat492 = aFloat492;
-		this.anInt501 = anInt490;
-		this.anUnit491 = anUnit491;
-		this.aMeasurementRangeArray489 = aMeasurementRangeArray489;
+		this.conditions = new Vector();
+		this.lastValue = null;
+		this.name = name;
+		this.channelNumber = channelNumber;
+		this.dataType = dataType;
+		this.accuracy = accuracy;
+		this.scale = scale;
+		this.unit = unit;
+		this.ranges = ranges;
 	}
 
-	final synchronized Condition[] method274() {
+	final synchronized Condition[] getAllConditions() {
 		Condition[] array = null;
-		if (this.aVector493.size() > 0) {
-			array = new Condition[this.aVector493.size()];
+		if (this.conditions.size() > 0) {
+			array = new Condition[this.conditions.size()];
 			for (int i = 0; i < array.length; ++i) {
-				array[i] = ((e) this.aVector493.elementAt(i)).method265();
+				array[i] = ((e) this.conditions.elementAt(i)).method265();
 			}
 		}
 		return array;
 	}
 
 	public final float getAccuracy() {
-		return this.aFloat492;
+		return this.accuracy;
 	}
 
 	public final int getDataType() {
-		return this.anInt499;
+		return this.dataType;
 	}
 
 	public final MeasurementRange[] getMeasurementRanges() {
 		MeasurementRange[] array = new MeasurementRange[0];
-		if (this.anInt499 != 4 && this.aMeasurementRangeArray489 != null && this.aMeasurementRangeArray489.length > 0) {
-			array = new MeasurementRange[this.aMeasurementRangeArray489.length];
-			for (int i = 0; i < this.aMeasurementRangeArray489.length; ++i) {
-				final MeasurementRange measurementRange = this.aMeasurementRangeArray489[i];
+		if (this.dataType != 4 && this.ranges != null && this.ranges.length > 0) {
+			array = new MeasurementRange[this.ranges.length];
+			for (int i = 0; i < this.ranges.length; ++i) {
+				final MeasurementRange measurementRange = this.ranges[i];
 				array[i] = new MeasurementRange(measurementRange.getSmallestValue(), measurementRange.getLargestValue(), measurementRange.getResolution());
 			}
 		}
@@ -69,39 +70,39 @@ public final class k implements Channel, ChannelInfo, Runnable {
 	}
 
 	public final String getName() {
-		return this.aString490;
+		return this.name;
 	}
 
 	public final int getScale() {
-		return this.anInt501;
+		return this.scale;
 	}
 
 	public final Unit getUnit() {
-		return this.anUnit491;
+		return this.unit;
 	}
 
 	public final synchronized void addCondition(final ConditionListener conditionListener, final Condition condition) {
 		if (conditionListener == null) {
 			throw new NullPointerException();
 		}
-		if (this.aj494.getState() == 4) {
+		if (this.sensor.getState() == 4) {
 			throw new IllegalStateException();
 		}
 		if (condition == null) {
 			throw new NullPointerException();
 		}
 		final boolean b;
-		if (((b = (condition instanceof ObjectCondition)) && this.anInt499 != 4) || (!b && this.anInt499 == 4)) {
+		if (((b = (condition instanceof ObjectCondition)) && this.dataType != 4) || (!b && this.dataType == 4)) {
 			throw new IllegalArgumentException();
 		}
-		final int size = this.aVector493.size();
+		final int size = this.conditions.size();
 		final e e = new e(conditionListener, condition);
 		for (int i = 0; i < size; ++i) {
-			if (((e) this.aVector493.elementAt(i)).method266(e)) {
+			if (((e) this.conditions.elementAt(i)).method266(e)) {
 				return;
 			}
 		}
-		this.aVector493.addElement(e);
+		this.conditions.addElement(e);
 	}
 
 	public final ChannelInfo getChannelInfo() {
@@ -112,11 +113,11 @@ public final class k implements Channel, ChannelInfo, Runnable {
 		if (conditionListener == null) {
 			throw new NullPointerException();
 		}
-		final int size = this.aVector493.size();
+		final int size = this.conditions.size();
 		final Vector vector = new Vector<Condition>(size);
 		for (int i = 0; i < size; ++i) {
 			final e e;
-			if ((e = (emulator.sensor.e) this.aVector493.elementAt(i)).method267(conditionListener)) {
+			if ((e = (emulator.sensor.e) this.conditions.elementAt(i)).method267(conditionListener)) {
 				vector.addElement(e.method265());
 			}
 		}
@@ -132,22 +133,22 @@ public final class k implements Channel, ChannelInfo, Runnable {
 	}
 
 	public final synchronized void removeAllConditions() {
-		if (this.aj494.getState() == 4) {
+		if (this.sensor.getState() == 4) {
 			throw new IllegalStateException();
 		}
-		this.aVector493.removeAllElements();
+		this.conditions.removeAllElements();
 	}
 
 	public final synchronized void removeCondition(final ConditionListener conditionListener, final Condition condition) {
 		if (conditionListener == null || condition == null) {
 			throw new NullPointerException();
 		}
-		if (this.aj494.getState() == 4) {
+		if (this.sensor.getState() == 4) {
 			throw new IllegalStateException();
 		}
-		for (int size = this.aVector493.size(), i = 0; i < size; ++i) {
-			if (((e) this.aVector493.elementAt(i)).method268(conditionListener, condition)) {
-				this.aVector493.removeElementAt(i);
+		for (int size = this.conditions.size(), i = 0; i < size; ++i) {
+			if (((e) this.conditions.elementAt(i)).method268(conditionListener, condition)) {
+				this.conditions.removeElementAt(i);
 				return;
 			}
 		}
@@ -157,79 +158,79 @@ public final class k implements Channel, ChannelInfo, Runnable {
 		if (conditionListener == null) {
 			throw new NullPointerException();
 		}
-		if (this.aj494.getState() == 4) {
+		if (this.sensor.getState() == 4) {
 			throw new IllegalStateException();
 		}
-		for (int i = 0; i < this.aVector493.size(); ++i) {
-			if (((e) this.aVector493.elementAt(i)).method267(conditionListener)) {
-				this.aVector493.removeElementAt(i);
+		for (int i = 0; i < this.conditions.size(); ++i) {
+			if (((e) this.conditions.elementAt(i)).method267(conditionListener)) {
+				this.conditions.removeElementAt(i);
 				--i;
 			}
 		}
 	}
 
-	final synchronized void method275(final SensorImpl aj494) {
-		this.aj494 = aj494;
+	final synchronized void setSensor(final SensorImpl aj494) {
+		this.sensor = aj494;
 	}
 
-	final void method276(final ChannelDataListener aChannelDataListener496, final int anInt503, final long n, final boolean aBoolean497, final boolean aBoolean498, final boolean aBoolean499, final boolean aBoolean500) {
-		this.method278();
-		this.aBoolean504 = false;
-		this.aChannelDataListener496 = aChannelDataListener496;
-		this.anInt503 = anInt503;
-		this.aBoolean497 = aBoolean497;
-		this.aBoolean500 = aBoolean498;
-		this.aBoolean502 = aBoolean499;
-		this.aBoolean505 = aBoolean500;
-		(this.aThread495 = new Thread(this)).start();
+	final void startDataCollection(final ChannelDataListener aChannelDataListener496, final int anInt503, final long n, final boolean aBoolean497, final boolean aBoolean498, final boolean aBoolean499, final boolean aBoolean500) {
+		this.stopThread();
+		this.isStopped = false;
+		this.dataListener = aChannelDataListener496;
+		this.bufferSize = anInt503;
+		this.isTimestampIncluded = aBoolean497;
+		this.isUncertaintyIncluded = aBoolean498;
+		this.isValidityIncluded = aBoolean499;
+		this.isRepeat = aBoolean500;
+		(this.dataThread = new Thread(this)).start();
 	}
 
 	public final void run() {
 		do {
-			final SensorDataImpl l = new SensorDataImpl(this, this.anInt503, this.getDataType(), this.aBoolean497, this.aBoolean500, this.aBoolean502);
+			final SensorDataImpl l = new SensorDataImpl(this, this.bufferSize, this.getDataType(), this.isTimestampIncluded, this.isUncertaintyIncluded, this.isValidityIncluded);
 			int n = 0;
-			while (!this.aBoolean504 && n < this.anInt503) {
+			while (!this.isStopped && n < this.bufferSize) {
 				final Object[] array = {null};
-				this.aj494.method240(this.anInt488, array, this.getDataType());
-				if (this.anObject498 != null && this.anObject498.equals(array[0])) {
+				this.sensor.method240(this.channelNumber, array, this.getDataType());
+				if (this.lastValue != null && this.lastValue.equals(array[0])) {
 					continue;
 				}
-				this.anObject498 = array[0];
+				this.lastValue = array[0];
 				final int n2 = n;
-				if ((n += array.length) > this.anInt503) {
+				if ((n += array.length) > this.bufferSize) {
 					l.setBufferSize(n);
 				}
 				for (int i = 0; i < array.length; ++i) {
 					l.setData(n2 + i, array[i]);
-					if (this.aBoolean497) {
+					if (this.isTimestampIncluded) {
 						l.setTimestamp(n2 + i, Calendar.getInstance().getTime().getTime());
 					}
-					if (this.aBoolean500) {
+					if (this.isUncertaintyIncluded) {
 						l.setUncertainty(n2 + i, 0.0f);
 					}
-					if (this.aBoolean502) {
+					if (this.isValidityIncluded) {
 						l.setValidities(n2 + i, true);
 					}
 				}
 			}
-			if (this.aBoolean504) {
+			if (this.isStopped) {
 				return;
 			}
 			if (n < 0) {
 				n = 0;
 			}
-			if (n < this.anInt503) {
+			if (n < this.bufferSize) {
 				l.setBufferSize(n);
 			}
-			this.aChannelDataListener496.channelDataReceived(this.anInt488, l);
-		} while (this.aBoolean505 && !this.aBoolean504);
+			this.dataListener.channelDataReceived(this.channelNumber, l);
+		} while (this.isRepeat && !this.isStopped);
 	}
 
-	private void method278() {
-		this.aBoolean504 = true;
+	private void stopThread() {
+		this.isStopped = true;
 		try {
-			if (this.aThread495.isAlive()) {
-				this.aThread495.join();
+			if (this.dataThread.isAlive()) {
+				this.dataThread.join();
 			}
 		} catch (Exception ex) {
 			Thread.currentThread().interrupt();
@@ -237,6 +238,6 @@ public final class k implements Channel, ChannelInfo, Runnable {
 	}
 
 	final void method277() {
-		this.method278();
+		this.stopThread();
 	}
 }

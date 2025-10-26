@@ -15,7 +15,7 @@ public final class b {
 		final StringBuffer sb;
 		(sb = new StringBuffer("channel=")).append(k.getName());
 		final Condition[] method274;
-		if ((method274 = k.method274()) != null && method274.length > 0) {
+		if ((method274 = k.getAllConditions()) != null && method274.length > 0) {
 			final Vector vector = new Vector<Condition>(method274.length);
 			for (int i = 0; i < method274.length; ++i) {
 				if (!(method274[i] instanceof ObjectCondition)) {
