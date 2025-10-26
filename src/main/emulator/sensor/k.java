@@ -43,7 +43,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 		if (this.conditions.size() > 0) {
 			array = new Condition[this.conditions.size()];
 			for (int i = 0; i < array.length; ++i) {
-				array[i] = ((e) this.conditions.elementAt(i)).method265();
+				array[i] = ((e) this.conditions.elementAt(i)).getCondition();
 			}
 		}
 		return array;
@@ -117,8 +117,8 @@ public final class k implements Channel, ChannelInfo, Runnable {
 		final Vector vector = new Vector<Condition>(size);
 		for (int i = 0; i < size; ++i) {
 			final e e;
-			if ((e = (emulator.sensor.e) this.conditions.elementAt(i)).method267(conditionListener)) {
-				vector.addElement(e.method265());
+			if ((e = (emulator.sensor.e) this.conditions.elementAt(i)).matches(conditionListener)) {
+				vector.addElement(e.getCondition());
 			}
 		}
 		final Condition[] array = new Condition[vector.size()];
@@ -147,7 +147,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 			throw new IllegalStateException();
 		}
 		for (int size = this.conditions.size(), i = 0; i < size; ++i) {
-			if (((e) this.conditions.elementAt(i)).method268(conditionListener, condition)) {
+			if (((e) this.conditions.elementAt(i)).matches(conditionListener, condition)) {
 				this.conditions.removeElementAt(i);
 				return;
 			}
@@ -162,7 +162,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 			throw new IllegalStateException();
 		}
 		for (int i = 0; i < this.conditions.size(); ++i) {
-			if (((e) this.conditions.elementAt(i)).method267(conditionListener)) {
+			if (((e) this.conditions.elementAt(i)).matches(conditionListener)) {
 				this.conditions.removeElementAt(i);
 				--i;
 			}
@@ -237,7 +237,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 		}
 	}
 
-	final void method277() {
+	final void stopGetData() {
 		this.stopThread();
 	}
 }

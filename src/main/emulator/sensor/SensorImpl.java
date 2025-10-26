@@ -256,7 +256,7 @@ public final class SensorImpl implements SensorInfo, SensorConnection, ChannelDa
 			final boolean aBoolean313 = this.aBoolean313;
 			this.aBoolean313 = true;
 			for (int i = 0; i < this.channelInfos.length; ++i) {
-				this.channelInfos[i].method277();
+				this.channelInfos[i].stopGetData();
 			}
 			synchronized (this) {
 				this.aDataListener451 = null;

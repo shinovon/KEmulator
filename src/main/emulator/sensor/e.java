@@ -2,30 +2,31 @@ package emulator.sensor;
 
 import javax.microedition.sensor.Condition;
 import javax.microedition.sensor.ConditionListener;
-
+//ConditionListenerPair from
+//https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ChannelImpl.java#L84
 final class e {
-	private ConditionListener aConditionListener476;
-	private Condition aCondition477;
+	private ConditionListener listener;
+	private Condition condition;
 
-	public e(final ConditionListener aConditionListener476, final Condition aCondition477) {
+	public e(final ConditionListener listener, final Condition condition) {
 		super();
-		this.aConditionListener476 = aConditionListener476;
-		this.aCondition477 = aCondition477;
+		this.listener = listener;
+		this.condition = condition;
 	}
 
-	public final Condition method265() {
-		return this.aCondition477;
+	public final Condition getCondition() {
+		return this.condition;
 	}
-
+    //method266 = equals; but I'm scared of renaming
 	public final boolean method266(final e e) {
-		return this.aConditionListener476 == e.aConditionListener476 && this.aCondition477 == e.aCondition477;
+		return this.listener == e.listener && this.condition == e.condition;
 	}
 
-	public final boolean method267(final ConditionListener conditionListener) {
-		return this.aConditionListener476 == conditionListener;
+	public final boolean matches(final ConditionListener conditionListener) {
+		return this.listener == conditionListener;
 	}
 
-	public final boolean method268(final ConditionListener conditionListener, final Condition condition) {
-		return this.aConditionListener476 == conditionListener && this.aCondition477 == condition;
+	public final boolean matches(final ConditionListener conditionListener, final Condition condition) {
+		return this.listener == conditionListener && this.condition == condition;
 	}
 }
