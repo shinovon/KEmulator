@@ -129,7 +129,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 	}
 
 	public final String getChannelUrl() {
-		return b.method222(this);
+		return b.createUrl(this);
 	}
 
 	public final synchronized void removeAllConditions() {

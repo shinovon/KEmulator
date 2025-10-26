@@ -1,7 +1,7 @@
 package emulator.sensor;
 
-public final class i {
-	public i() {
+public final class ConditionHelpers {
+	public ConditionHelpers() {
 		super();
 	}
 
@@ -33,7 +33,7 @@ public final class i {
 		return s.equals("le") && (method242("eq", n, n2) || method242("lt", n, n2));
 	}
 
-	public static double method243(final double n, final int n2) {
+	public static double resolve(final double n, final int n2) {
 		double n3 = 1.0;
 		for (int i = 0; i < Math.abs(n2); ++i) {
 			n3 *= 10.0;

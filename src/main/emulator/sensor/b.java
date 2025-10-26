@@ -5,13 +5,13 @@ import javax.microedition.sensor.LimitCondition;
 import javax.microedition.sensor.ObjectCondition;
 import javax.microedition.sensor.RangeCondition;
 import java.util.Vector;
-
+// https://github.com/hbao/phonemefeaturedevices/blob/78b194c67b3b21a9ec6a847972e6bf5dbafdde04/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ChannelUrl.java
 public final class b {
 	public b() {
 		super();
 	}
 
-	public static String method222(final k k) {
+	public static String createUrl(final k k) {
 		final StringBuffer sb;
 		(sb = new StringBuffer("channel=")).append(k.getName());
 		final Condition[] method274;
@@ -38,18 +38,18 @@ public final class b {
 				if ((condition = (Condition) vector.elementAt(l)) instanceof LimitCondition) {
 					final LimitCondition limitCondition = (LimitCondition) condition;
 					sb.append("limit=");
-					sb.append(Double.toString(i.method243(limitCondition.getLimit(), scale)));
+					sb.append(Double.toString(ConditionHelpers.resolve(limitCondition.getLimit(), scale)));
 					sb.append('&');
 					sb.append("op=");
 					sb.append(limitCondition.getOperator());
 				} else {
 					final RangeCondition rangeCondition = (RangeCondition) condition;
 					sb.append("lowerLimit=");
-					sb.append(Double.toString(i.method243(rangeCondition.getLowerLimit(), scale)));
+					sb.append(Double.toString(ConditionHelpers.resolve(rangeCondition.getLowerLimit(), scale)));
 					sb.append("&lowerOp=");
 					sb.append(rangeCondition.getLowerOp());
 					sb.append("&upperLimit=");
-					sb.append(Double.toString(i.method243(rangeCondition.getUpperLimit(), scale)));
+					sb.append(Double.toString(ConditionHelpers.resolve(rangeCondition.getUpperLimit(), scale)));
 					sb.append("&upperOp=");
 					sb.append(rangeCondition.getUpperOp());
 				}

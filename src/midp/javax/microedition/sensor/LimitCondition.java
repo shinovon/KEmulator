@@ -1,6 +1,6 @@
 package javax.microedition.sensor;
 
-import emulator.sensor.i;
+import emulator.sensor.ConditionHelpers;
 
 public class LimitCondition implements Condition {
 	private final double aDouble378;
@@ -11,7 +11,7 @@ public class LimitCondition implements Condition {
 		if (aString379 == null) {
 			throw new NullPointerException();
 		}
-		if (!i.method241(aString379)) {
+		if (!ConditionHelpers.method241(aString379)) {
 			throw new IllegalArgumentException();
 		}
 		this.aDouble378 = aDouble378;
@@ -27,7 +27,7 @@ public class LimitCondition implements Condition {
 	}
 
 	public boolean isMet(final double n) {
-		return i.method242(this.aString379, this.aDouble378, n);
+		return ConditionHelpers.method242(this.aString379, this.aDouble378, n);
 	}
 
 	public boolean isMet(final Object o) {

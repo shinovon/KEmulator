@@ -1,6 +1,6 @@
 package javax.microedition.sensor;
 
-import emulator.sensor.i;
+import emulator.sensor.ConditionHelpers;
 
 public class RangeCondition implements Condition {
 	private final double aDouble378;
@@ -10,7 +10,7 @@ public class RangeCondition implements Condition {
 
 	public RangeCondition(final double aDouble378, final String aString379, final double aDouble379, final String aString380) {
 		super();
-		if (!i.method244(aString379) || !i.method245(aString380)) {
+		if (!ConditionHelpers.method244(aString379) || !ConditionHelpers.method245(aString380)) {
 			throw new IllegalArgumentException();
 		}
 		if (aDouble378 > aDouble379) {
@@ -42,7 +42,7 @@ public class RangeCondition implements Condition {
 	}
 
 	public boolean isMet(final double n) {
-		return i.method242(this.aString379, this.aDouble378, n) && i.method242(this.aString381, this.aDouble380, n);
+		return ConditionHelpers.method242(this.aString379, this.aDouble378, n) && ConditionHelpers.method242(this.aString381, this.aDouble380, n);
 	}
 
 	public boolean isMet(final Object o) {
