@@ -20,7 +20,7 @@ public class SensorManager {
 	}
 
 	public static void addSensorListener(final SensorListener sensorListener, final String s) {
-		SensorMan.assSensorListener(sensorListener, s);
+		SensorMan.addSensorListener(sensorListener, s);
 	}
 
 	public static void removeSensorListener(final SensorListener sensorListener) {

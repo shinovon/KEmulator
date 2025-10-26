@@ -5,15 +5,16 @@ import javax.microedition.sensor.SensorInfo;
 import javax.microedition.sensor.SensorListener;
 import javax.microedition.sensor.Unit;
 import java.util.Vector;
-
+//taken from
+//https://github.com/hbao/phonemefeaturedevices/blob/78b194c67b3b21a9ec6a847972e6bf5dbafdde04/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/SensorRegistry.java
 public final class SensorMan {
-	private static final SensorImpl[] ajArray447;
+	private static final SensorImpl[] sensorsCache;
 
 	public SensorMan() {
 		super();
 	}
 
-	private static SensorImpl[] method227() {
+	private static SensorImpl[] createSensors() {
 		final SensorImpl[] array = new SensorImpl[2];
 		final String[] array2 = {"axis_x", "axis_y", "axis_z"};
 		final k[] array3 = new k[3];
@@ -45,12 +46,12 @@ public final class SensorMan {
 			throw new IllegalArgumentException("Illegal contextType");
 		}
 		if (s == null && contextType == null) {
-			return method236();
+			return getAllSensors();
 		}
-		final Vector vector = new Vector<SensorImpl>(SensorMan.ajArray447.length);
-		for (int i = 0; i < SensorMan.ajArray447.length; ++i) {
+		final Vector vector = new Vector<SensorImpl>(SensorMan.sensorsCache.length);
+		for (int i = 0; i < SensorMan.sensorsCache.length; ++i) {
 			final SensorImpl j;
-			if ((j = SensorMan.ajArray447[i]).method237(s, contextType)) {
+			if ((j = SensorMan.sensorsCache[i]).method237(s, contextType)) {
 				vector.addElement(j);
 			}
 		}
@@ -63,14 +64,14 @@ public final class SensorMan {
 		if (url == null) {
 			throw new NullPointerException("url is null");
 		}
-		return method230(SensorUtil.method250(url));
+		return findSensors(SensorUtil.method250(url));
 	}
 
-	private static SensorImpl[] method230(final SensorUtil d) {
-		final Vector vector = new Vector<SensorImpl>(SensorMan.ajArray447.length);
-		for (int i = 0; i < SensorMan.ajArray447.length; ++i) {
+	private static SensorImpl[] findSensors(final SensorUtil d) {
+		final Vector vector = new Vector<SensorImpl>(SensorMan.sensorsCache.length);
+		for (int i = 0; i < SensorMan.sensorsCache.length; ++i) {
 			final SensorImpl j;
-			if ((j = SensorMan.ajArray447[i]).method238(d)) {
+			if ((j = SensorMan.sensorsCache[i]).method238(d)) {
 				vector.addElement(j);
 			}
 		}
@@ -79,32 +80,32 @@ public final class SensorMan {
 		return array;
 	}
 
-	private static SensorImpl[] method236() {
-		final SensorImpl[] array = new SensorImpl[SensorMan.ajArray447.length];
-		for (int i = 0; i < SensorMan.ajArray447.length; ++i) {
-			array[i] = SensorMan.ajArray447[i];
+	private static SensorImpl[] getAllSensors() {
+		final SensorImpl[] array = new SensorImpl[SensorMan.sensorsCache.length];
+		for (int i = 0; i < SensorMan.sensorsCache.length; ++i) {
+			array[i] = SensorMan.sensorsCache[i];
 		}
 		return array;
 	}
 
-	static SensorImpl method231(final int n) {
+	static SensorImpl getSensors(final int n) {
 		SensorImpl j = null;
-		if (0 <= n && n < SensorMan.ajArray447.length) {
-			j = SensorMan.ajArray447[n];
+		if (0 <= n && n < SensorMan.sensorsCache.length) {
+			j = SensorMan.sensorsCache[n];
 		}
 		return j;
 	}
 
-	public static void assSensorListener(final SensorListener listener, final String quantity) {
+	public static void addSensorListener(final SensorListener listener, final String quantity) {
 		if (listener == null) {
 			throw new NullPointerException("Listener is null");
 		}
 		if (quantity == null) {
 			throw new NullPointerException("Quantity is null");
 		}
-		for (int i = 0; i < SensorMan.ajArray447.length; ++i) {
-			if (SensorMan.ajArray447[i].getQuantity().equals(quantity)) {
-				addSensorListener(listener, SensorMan.ajArray447[i]);
+		for (int i = 0; i < SensorMan.sensorsCache.length; ++i) {
+			if (SensorMan.sensorsCache[i].getQuantity().equals(quantity)) {
+				addSensorListener(listener, SensorMan.sensorsCache[i]);
 			}
 		}
 	}
@@ -116,7 +117,7 @@ public final class SensorMan {
 		if (info == null) {
 			throw new NullPointerException("Info is null");
 		}
-		if (!method235(info)) {
+		if (!containsSensorInfo(info)) {
 			throw new IllegalArgumentException("Invalid SensorInfo");
 		}
 	}
@@ -127,9 +128,9 @@ public final class SensorMan {
 		}
 	}
 
-	private static boolean method235(final SensorInfo info) {
-		for (int i = 0; i < SensorMan.ajArray447.length; ++i) {
-			if (SensorMan.ajArray447[i] == info) {
+	private static boolean containsSensorInfo(final SensorInfo info) {
+		for (int i = 0; i < SensorMan.sensorsCache.length; ++i) {
+			if (SensorMan.sensorsCache[i] == info) {
 				return true;
 			}
 		}
@@ -137,6 +138,6 @@ public final class SensorMan {
 	}
 
 	static {
-		ajArray447 = method227();
+		sensorsCache = createSensors();
 	}
 }
