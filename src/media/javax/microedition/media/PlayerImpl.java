@@ -734,6 +734,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					} catch (JavaLayerException e) {
 						e.printStackTrace();
 						notifyListeners(PlayerListener.ERROR, e.toString());
+						complete = true;
+						loopCount = 0;
 					}
 					if (complete || (sequence != null && ((emulator.javazoom.jl.player.Player) sequence).isComplete())) {
 						complete = true;

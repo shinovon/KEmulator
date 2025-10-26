@@ -110,7 +110,7 @@ public class Player
 			stream = dataStream = new InputStream() {
 				public int read() throws IOException {
 					if (dataIndex == data.length) return -1;
-					return data[dataIndex++];
+					return data[dataIndex++] & 0xFF;
 				}
 
 				public int read(byte[] b, int i, int len) throws IOException {
