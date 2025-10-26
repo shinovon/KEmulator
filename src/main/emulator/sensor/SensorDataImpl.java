@@ -4,168 +4,168 @@ import javax.microedition.sensor.ChannelInfo;
 import javax.microedition.sensor.Data;
 
 public final class SensorDataImpl implements Data {
-	private ChannelInfo aChannelInfo478;
-	private boolean aBoolean479;
-	private long[] aLongArray480;
-	private boolean aBoolean485;
-	private float[] aFloatArray481;
-	private boolean aBoolean487;
-	private boolean[] aBooleanArray482;
-	private int anInt483;
-	private int anInt486;
-	private Object[] anObjectArray484;
+	private ChannelInfo channelInfo;
+	private boolean isTimestampIncluded;
+	private long[] timeStamps;
+	private boolean isUncertaintyIncluded;
+	private float[] uncertainties;
+	private boolean isValiditesIncluded;
+	private boolean[] validities;
+	private int dataType;
+	private int bufferSize;
+	private Object[] objectValues;
 
-	SensorDataImpl(final ChannelInfo aChannelInfo478, final int anInt486, final int anInt487, final boolean aBoolean479, final boolean aBoolean480, final boolean aBoolean481) {
+	SensorDataImpl(final ChannelInfo channelInfo, final int bufferSize, final int dataType, final boolean isTimestampIncluded, final boolean isUncertaintyIncluded, final boolean isValidityIncluded) {
 		super();
-		this.aChannelInfo478 = aChannelInfo478;
-		this.aBoolean479 = aBoolean479;
-		if (aBoolean479) {
-			this.aLongArray480 = new long[anInt486];
+		this.channelInfo = channelInfo;
+		this.isTimestampIncluded = isTimestampIncluded;
+		if (isTimestampIncluded) {
+			this.timeStamps = new long[bufferSize];
 		}
-		this.aBoolean485 = aBoolean480;
-		if (aBoolean480) {
-			this.aFloatArray481 = new float[anInt486];
+		this.isUncertaintyIncluded = isUncertaintyIncluded;
+		if (isUncertaintyIncluded) {
+			this.uncertainties = new float[bufferSize];
 		}
-		this.aBoolean487 = aBoolean481;
-		if (aBoolean481) {
-			this.aBooleanArray482 = new boolean[anInt486];
+		this.isValiditesIncluded = isValidityIncluded;
+		if (isValidityIncluded) {
+			this.validities = new boolean[bufferSize];
 		}
-		this.anInt483 = anInt487;
-		this.anObjectArray484 = new Object[anInt486];
-		this.anInt486 = anInt486;
+		this.dataType = dataType;
+		this.objectValues = new Object[bufferSize];
+		this.bufferSize = bufferSize;
 	}
 
 	public final ChannelInfo getChannelInfo() {
-		return this.aChannelInfo478;
+		return this.channelInfo;
 	}
 
 	public final double[] getDoubleValues() {
-		if (this.anInt483 != 1) {
+		if (this.dataType != 1) {
 			throw new IllegalStateException("Data type is not double");
 		}
-		double[] array = new double[0];
-		if (this.anObjectArray484 != null && this.anInt486 > 0) {
-			array = new double[this.anInt486];
-			for (int i = 0; i < this.anInt486; ++i) {
-				final Object o;
-				if ((o = this.anObjectArray484[i]) instanceof Double) {
-					array[i] = (Double) o;
+		double[] retValues = new double[0];
+		if (this.objectValues != null && this.bufferSize > 0) {
+			retValues = new double[this.bufferSize];
+			for (int i = 0; i < this.bufferSize; ++i) {
+				final Object tmp;
+				if ((tmp = this.objectValues[i]) instanceof Double) {
+					retValues[i] = (Double) tmp;
 				} else {
-					array[i] = 0.0;
-					if (this.aBoolean487 && this.aBooleanArray482[i]) {
-						this.aBooleanArray482[i] = false;
+					retValues[i] = 0.0;
+					if (this.isValiditesIncluded && this.validities[i]) {
+						this.validities[i] = false;
 					}
 				}
 			}
 		}
-		return array;
+		return retValues;
 	}
 
 	public final int[] getIntValues() {
-		if (this.anInt483 != 2) {
+		if (this.dataType != 2) {
 			throw new IllegalStateException("Data type is not int");
 		}
-		int[] array = new int[0];
-		if (this.anObjectArray484 != null && this.anInt486 > 0) {
-			array = new int[this.anInt486];
-			for (int i = 0; i < this.anInt486; ++i) {
-				final Object o;
-				if ((o = this.anObjectArray484[i]) instanceof Integer) {
-					array[i] = (Integer) o;
+		int[] retValues = new int[0];
+		if (this.objectValues != null && this.bufferSize > 0) {
+			retValues = new int[this.bufferSize];
+			for (int i = 0; i < this.bufferSize; ++i) {
+				final Object tmp;
+				if ((tmp = this.objectValues[i]) instanceof Integer) {
+					retValues[i] = (Integer) tmp;
 				} else {
-					array[i] = 0;
-					if (this.aBoolean487 && this.aBooleanArray482[i]) {
-						this.aBooleanArray482[i] = false;
+					retValues[i] = 0;
+					if (this.isValiditesIncluded && this.validities[i]) {
+						this.validities[i] = false;
 					}
 				}
 			}
 		}
-		return array;
+		return retValues;
 	}
 
 	public final Object[] getObjectValues() {
-		if (this.anInt483 != 4) {
+		if (this.dataType != 4) {
 			throw new IllegalStateException("Data type is not Object");
 		}
-		Object[] anObjectArray484 = new Object[0];
-		if (this.anObjectArray484 != null) {
-			if (this.anInt486 == this.anObjectArray484.length) {
-				anObjectArray484 = this.anObjectArray484;
-			} else if (this.anInt486 > 0) {
-				anObjectArray484 = new Object[this.anInt486];
-				System.arraycopy(this.anObjectArray484, 0, anObjectArray484, 0, this.anInt486);
+		Object[] retValues = new Object[0];
+		if (this.objectValues != null) {
+			if (this.bufferSize == this.objectValues.length) {
+				retValues = this.objectValues;
+			} else if (this.bufferSize > 0) {
+				retValues = new Object[this.bufferSize];
+				System.arraycopy(this.objectValues, 0, retValues, 0, this.bufferSize);
 			}
 		}
-		return anObjectArray484;
+		return retValues;
 	}
 
-	public final long getTimestamp(final int n) {
-		if (!this.aBoolean479) {
+	public final long getTimestamp(final int index) {
+		if (!this.isTimestampIncluded) {
 			throw new IllegalStateException("Timestamp wasn't requested");
 		}
-		return this.aLongArray480[n];
+		return this.timeStamps[index];
 	}
 
-	public final float getUncertainty(final int n) {
-		if (!this.aBoolean485) {
+	public final float getUncertainty(final int index) {
+		if (!this.isUncertaintyIncluded) {
 			throw new IllegalStateException("Uncertainty wasn't requested");
 		}
-		return this.aFloatArray481[n];
+		return this.uncertainties[index];
 	}
 
-	public final boolean isValid(final int n) {
-		if (!this.aBoolean487) {
+	public final boolean isValid(final int index) {
+		if (!this.isValiditesIncluded) {
 			throw new IllegalStateException("Validity wasn't requested");
 		}
-		return this.aBooleanArray482[n];
+		return this.validities[index];
 	}
 
-	final void method269(final int anInt486) {
-		if (this.anInt486 < anInt486) {
-			long[] aLongArray480 = null;
-			float[] aFloatArray481 = null;
-			boolean[] aBooleanArray482 = null;
-			if (this.aLongArray480 != null) {
-				aLongArray480 = new long[anInt486];
-				System.arraycopy(this.aLongArray480, 0, aLongArray480, 0, this.aLongArray480.length);
+	final void setBufferSize(final int bufferSize) {
+		if (this.bufferSize < bufferSize) {
+			long[] tmpTimeStamps = null;
+			float[] tmpUncertainties = null;
+			boolean[] tmpValidities = null;
+			if (this.timeStamps != null) {
+				tmpTimeStamps = new long[bufferSize];
+				System.arraycopy(this.timeStamps, 0, tmpTimeStamps, 0, this.timeStamps.length);
 			}
-			if (this.aFloatArray481 != null) {
-				aFloatArray481 = new float[anInt486];
-				System.arraycopy(this.aFloatArray481, 0, aFloatArray481, 0, this.aFloatArray481.length);
+			if (this.uncertainties != null) {
+				tmpUncertainties = new float[bufferSize];
+				System.arraycopy(this.uncertainties, 0, tmpUncertainties, 0, this.uncertainties.length);
 			}
-			if (this.aBooleanArray482 != null) {
-				aBooleanArray482 = new boolean[anInt486];
-				System.arraycopy(this.aBooleanArray482, 0, aBooleanArray482, 0, this.aBooleanArray482.length);
+			if (this.validities != null) {
+				tmpValidities = new boolean[bufferSize];
+				System.arraycopy(this.validities, 0, tmpValidities, 0, this.validities.length);
 			}
-			final Object[] anObjectArray484 = new Object[anInt486];
-			System.arraycopy(this.anObjectArray484, 0, anObjectArray484, 0, this.anObjectArray484.length);
-			this.aLongArray480 = aLongArray480;
-			this.aFloatArray481 = aFloatArray481;
-			this.aBooleanArray482 = aBooleanArray482;
-			this.anObjectArray484 = anObjectArray484;
+			final Object[] tmpObjectValues = new Object[bufferSize];
+			System.arraycopy(this.objectValues, 0, tmpObjectValues, 0, this.objectValues.length);
+			this.timeStamps = tmpTimeStamps;
+			this.uncertainties = tmpUncertainties;
+			this.validities = tmpValidities;
+			this.objectValues = tmpObjectValues;
 		}
-		this.anInt486 = anInt486;
+		this.bufferSize = bufferSize;
 	}
 
-	final void method270(final int n, final Object o) {
-		this.anObjectArray484[n] = o;
+	final void setData(final int index, final Object item) {
+		this.objectValues[index] = item;
 	}
 
-	final void method271(final int n, final long n2) {
-		if (this.aBoolean479) {
-			this.aLongArray480[n] = n2;
-		}
-	}
-
-	final void method272(final int n, final float n2) {
-		if (this.aBoolean485) {
-			this.aFloatArray481[n] = n2;
+	final void setTimestamp(final int index, final long timestamp) {
+		if (this.isTimestampIncluded) {
+			this.timeStamps[index] = timestamp;
 		}
 	}
 
-	final void method273(final int n, final boolean b) {
-		if (this.aBoolean487) {
-			this.aBooleanArray482[n] = b;
+	final void setUncertainty(final int index, final float uncertainty) {
+		if (this.isUncertaintyIncluded) {
+			this.uncertainties[index] = uncertainty;
+		}
+	}
+
+	final void setValidities(final int index, final boolean validity) {
+		if (this.isValiditesIncluded) {
+			this.validities[index] = validity;
 		}
 	}
 }

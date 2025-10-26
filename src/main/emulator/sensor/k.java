@@ -197,18 +197,18 @@ public final class k implements Channel, ChannelInfo, Runnable {
 				this.anObject498 = array[0];
 				final int n2 = n;
 				if ((n += array.length) > this.anInt503) {
-					l.method269(n);
+					l.setBufferSize(n);
 				}
 				for (int i = 0; i < array.length; ++i) {
-					l.method270(n2 + i, array[i]);
+					l.setData(n2 + i, array[i]);
 					if (this.aBoolean497) {
-						l.method271(n2 + i, Calendar.getInstance().getTime().getTime());
+						l.setTimestamp(n2 + i, Calendar.getInstance().getTime().getTime());
 					}
 					if (this.aBoolean500) {
-						l.method272(n2 + i, 0.0f);
+						l.setUncertainty(n2 + i, 0.0f);
 					}
 					if (this.aBoolean502) {
-						l.method273(n2 + i, true);
+						l.setValidities(n2 + i, true);
 					}
 				}
 			}
@@ -219,7 +219,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 				n = 0;
 			}
 			if (n < this.anInt503) {
-				l.method269(n);
+				l.setBufferSize(n);
 			}
 			this.aChannelDataListener496.channelDataReceived(this.anInt488, l);
 		} while (this.aBoolean505 && !this.aBoolean504);
