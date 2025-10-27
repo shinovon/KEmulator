@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Vector;
 //k class must be some reimplementation of ChannelImpl.java
 //https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ChannelImpl.java#L84
-public final class k implements Channel, ChannelInfo, Runnable {
+public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 	private MeasurementRange[] ranges;
 	private String name;
 	private int channelNumber;
@@ -14,7 +14,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 	private Unit unit;
 	private float accuracy;
 	private Vector conditions;
-	private SensorImpl sensor;
+	private Sensor sensor;
 	private Thread dataThread;
 	private ChannelDataListener dataListener;
 	private int bufferSize;
@@ -25,7 +25,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 	private boolean isRepeat;
 	private Object lastValue;
 
-	public k(final int n, final int channelNumber, final String name, final int dataType, final float accuracy, final int scale, final Unit unit, final MeasurementRange[] ranges) {
+	public ChannelImpl(final int n, final int channelNumber, final String name, final int dataType, final float accuracy, final int scale, final Unit unit, final MeasurementRange[] ranges) {
 		super();
 		this.conditions = new Vector();
 		this.lastValue = null;
@@ -129,7 +129,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 	}
 
 	public final String getChannelUrl() {
-		return b.createUrl(this);
+		return ChannelUrl.createUrl(this);
 	}
 
 	public final synchronized void removeAllConditions() {
@@ -169,7 +169,7 @@ public final class k implements Channel, ChannelInfo, Runnable {
 		}
 	}
 
-	final synchronized void setSensor(final SensorImpl sensor) {
+	final synchronized void setSensor(final Sensor sensor) {
 		this.sensor = sensor;
 	}
 

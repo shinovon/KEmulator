@@ -5,7 +5,7 @@ import com.sun.cdc.io.ConnectionBaseInterface;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
-import emulator.sensor.SensorImpl;
+import emulator.sensor.Sensor;
 
 import javax.microedition.io.file.FileConnectionImpl;
 import javax.microedition.sensor.SensorConnection;
@@ -52,7 +52,7 @@ public class Connector {
 		if (s.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
 			final SensorInfo[] sensors;
 			if ((sensors = SensorManager.findSensors(s)).length > 0) {
-				((SensorImpl) sensors[0]).method239();
+				((Sensor) sensors[0]).open();
 				return (SensorConnection) sensors[0];
 			}
 			return null;

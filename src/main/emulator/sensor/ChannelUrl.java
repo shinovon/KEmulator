@@ -6,16 +6,16 @@ import javax.microedition.sensor.ObjectCondition;
 import javax.microedition.sensor.RangeCondition;
 import java.util.Vector;
 // https://github.com/hbao/phonemefeaturedevices/blob/78b194c67b3b21a9ec6a847972e6bf5dbafdde04/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ChannelUrl.java
-public final class b {
-	public b() {
+public final class ChannelUrl {
+	public ChannelUrl() {
 		super();
 	}
 
-	public static String createUrl(final k k) {
+	public static String createUrl(final ChannelImpl ChannelImpl) {
 		final StringBuffer sb;
-		(sb = new StringBuffer("channel=")).append(k.getName());
+		(sb = new StringBuffer("channel=")).append(ChannelImpl.getName());
 		final Condition[] method274;
-		if ((method274 = k.getAllConditions()) != null && method274.length > 0) {
+		if ((method274 = ChannelImpl.getAllConditions()) != null && method274.length > 0) {
 			final Vector vector = new Vector<Condition>(method274.length);
 			for (int i = 0; i < method274.length; ++i) {
 				if (!(method274[i] instanceof ObjectCondition)) {
@@ -31,7 +31,7 @@ public final class b {
 					}
 				}
 			}
-			final int scale = k.getScale();
+			final int scale = ChannelImpl.getScale();
 			for (int size2 = vector.size(), l = 0; l < size2; ++l) {
 				sb.append('&');
 				final Condition condition;

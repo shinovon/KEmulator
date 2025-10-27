@@ -24,12 +24,12 @@ public final class c extends a implements Runnable {
 
 	private void method257(final float[] array) {
 		if (this.af468.aBoolean472) {
-			this.af468.method262(SensorMan.getSensors(super.anInt445).getDescription(), array);
+			this.af468.method262(SensorRegistry.getSensor(super.anInt445).getDescription(), array);
 		}
 	}
 
 	public final boolean start() {
-		final String description = SensorMan.getSensors(super.anInt445).getDescription();
+		final String description = SensorRegistry.getSensor(super.anInt445).getDescription();
 		this.af468.method260();
 		this.af468.method264(description);
 		this.method258();
@@ -37,7 +37,7 @@ public final class c extends a implements Runnable {
 	}
 
 	public final boolean method225() {
-		this.af468.method261(SensorMan.getSensors(super.anInt445).getDescription());
+		this.af468.method261(SensorRegistry.getSensor(super.anInt445).getDescription());
 		this.af468.method263();
 		this.method259();
 		return true;

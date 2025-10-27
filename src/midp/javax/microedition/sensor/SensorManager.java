@@ -1,6 +1,6 @@
 package javax.microedition.sensor;
 
-import emulator.sensor.SensorMan;
+import emulator.sensor.SensorRegistry;
 
 public class SensorManager {
 	public SensorManager() {
@@ -8,22 +8,22 @@ public class SensorManager {
 	}
 
 	public static SensorInfo[] findSensors(final String s, final String s2) {
-		return SensorMan.findSensors(s, s2);
+		return SensorRegistry.findSensors(s, s2);
 	}
 
 	public static SensorInfo[] findSensors(final String s) {
-		return SensorMan.findSensors(s);
+		return SensorRegistry.findSensors(s);
 	}
 
 	public static void addSensorListener(final SensorListener sensorListener, final SensorInfo sensorInfo) {
-		SensorMan.addSensorListener(sensorListener, sensorInfo);
+		SensorRegistry.addSensorListener(sensorListener, sensorInfo);
 	}
 
 	public static void addSensorListener(final SensorListener sensorListener, final String s) {
-		SensorMan.addSensorListener(sensorListener, s);
+		SensorRegistry.addSensorListener(sensorListener, s);
 	}
 
 	public static void removeSensorListener(final SensorListener sensorListener) {
-		SensorMan.removeSensorListener(sensorListener);
+		SensorRegistry.removeSensorListener(sensorListener);
 	}
 }
