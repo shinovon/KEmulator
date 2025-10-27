@@ -1,14 +1,14 @@
 package emulator.sensor;
 
 public final class c extends a implements Runnable {
-	private f af468;
+	private SensorSimulatorClient af468;
 	private Thread aThread469;
 	private boolean aBoolean470;
 	final float[] aFloatArray471;
 
 	public c(final int n) {
 		super(n, 0, 0);
-		this.af468 = new f();
+		this.af468 = new SensorSimulatorClient();
 		this.aThread469 = null;
 		this.aBoolean470 = false;
 		this.aFloatArray471 = new float[3];
@@ -23,22 +23,22 @@ public final class c extends a implements Runnable {
 	}
 
 	private void method257(final float[] array) {
-		if (this.af468.aBoolean472) {
-			this.af468.method262(SensorRegistry.getSensor(super.anInt445).getDescription(), array);
+		if (this.af468.connected) {
+			this.af468.readSensor(SensorRegistry.getSensor(super.anInt445).getDescription(), array);
 		}
 	}
 
 	public final boolean start() {
 		final String description = SensorRegistry.getSensor(super.anInt445).getDescription();
-		this.af468.method260();
-		this.af468.method264(description);
+		this.af468.connect();
+		this.af468.enableSensor(description);
 		this.method258();
 		return true;
 	}
 
 	public final boolean method225() {
-		this.af468.method261(SensorRegistry.getSensor(super.anInt445).getDescription());
-		this.af468.method263();
+		this.af468.disableSensor(SensorRegistry.getSensor(super.anInt445).getDescription());
+		this.af468.disconnect();
 		this.method259();
 		return true;
 	}

@@ -10,7 +10,7 @@ public class RangeCondition implements Condition {
 
 	public RangeCondition(final double aDouble378, final String aString379, final double aDouble379, final String aString380) {
 		super();
-		if (!ConditionHelpers.method244(aString379) || !ConditionHelpers.method245(aString380)) {
+		if (!ConditionHelpers.checkLowerOperator(aString379) || !ConditionHelpers.checkUpperOperator(aString380)) {
 			throw new IllegalArgumentException();
 		}
 		if (aDouble378 > aDouble379) {
@@ -42,7 +42,7 @@ public class RangeCondition implements Condition {
 	}
 
 	public boolean isMet(final double n) {
-		return ConditionHelpers.method242(this.aString379, this.aDouble378, n) && ConditionHelpers.method242(this.aString381, this.aDouble380, n);
+		return ConditionHelpers.checkValue(this.aString379, this.aDouble378, n) && ConditionHelpers.checkValue(this.aString381, this.aDouble380, n);
 	}
 
 	public boolean isMet(final Object o) {

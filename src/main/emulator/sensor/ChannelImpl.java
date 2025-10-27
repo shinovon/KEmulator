@@ -43,7 +43,7 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 		if (this.conditions.size() > 0) {
 			array = new Condition[this.conditions.size()];
 			for (int i = 0; i < array.length; ++i) {
-				array[i] = ((e) this.conditions.elementAt(i)).getCondition();
+				array[i] = ((ConditionListener) this.conditions.elementAt(i)).getCondition();
 			}
 		}
 		return array;
@@ -81,7 +81,7 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 		return this.unit;
 	}
 
-	public final synchronized void addCondition(final ConditionListener conditionListener, final Condition condition) {
+	public final synchronized void addCondition(final javax.microedition.sensor.ConditionListener conditionListener, final Condition condition) {
 		if (conditionListener == null) {
 			throw new NullPointerException();
 		}
@@ -96,29 +96,29 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 			throw new IllegalArgumentException();
 		}
 		final int size = this.conditions.size();
-		final e e = new e(conditionListener, condition);
+		final ConditionListener ConditionListener = new ConditionListener(conditionListener, condition);
 		for (int i = 0; i < size; ++i) {
-			if (((e) this.conditions.elementAt(i)).method266(e)) {
+			if (((ConditionListener) this.conditions.elementAt(i)).method266(ConditionListener)) {
 				return;
 			}
 		}
-		this.conditions.addElement(e);
+		this.conditions.addElement(ConditionListener);
 	}
 
 	public final ChannelInfo getChannelInfo() {
 		return this;
 	}
 
-	public final synchronized Condition[] getConditions(final ConditionListener conditionListener) {
+	public final synchronized Condition[] getConditions(final javax.microedition.sensor.ConditionListener conditionListener) {
 		if (conditionListener == null) {
 			throw new NullPointerException();
 		}
 		final int size = this.conditions.size();
 		final Vector vector = new Vector<Condition>(size);
 		for (int i = 0; i < size; ++i) {
-			final e e;
-			if ((e = (emulator.sensor.e) this.conditions.elementAt(i)).matches(conditionListener)) {
-				vector.addElement(e.getCondition());
+			final ConditionListener ConditionListener;
+			if ((ConditionListener = (ConditionListener) this.conditions.elementAt(i)).matches(conditionListener)) {
+				vector.addElement(ConditionListener.getCondition());
 			}
 		}
 		final Condition[] array = new Condition[vector.size()];
@@ -139,7 +139,7 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 		this.conditions.removeAllElements();
 	}
 
-	public final synchronized void removeCondition(final ConditionListener conditionListener, final Condition condition) {
+	public final synchronized void removeCondition(final javax.microedition.sensor.ConditionListener conditionListener, final Condition condition) {
 		if (conditionListener == null || condition == null) {
 			throw new NullPointerException();
 		}
@@ -147,14 +147,14 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 			throw new IllegalStateException();
 		}
 		for (int size = this.conditions.size(), i = 0; i < size; ++i) {
-			if (((e) this.conditions.elementAt(i)).matches(conditionListener, condition)) {
+			if (((ConditionListener) this.conditions.elementAt(i)).matches(conditionListener, condition)) {
 				this.conditions.removeElementAt(i);
 				return;
 			}
 		}
 	}
 
-	public final synchronized void removeConditionListener(final ConditionListener conditionListener) {
+	public final synchronized void removeConditionListener(final javax.microedition.sensor.ConditionListener conditionListener) {
 		if (conditionListener == null) {
 			throw new NullPointerException();
 		}
@@ -162,7 +162,7 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 			throw new IllegalStateException();
 		}
 		for (int i = 0; i < this.conditions.size(); ++i) {
-			if (((e) this.conditions.elementAt(i)).matches(conditionListener)) {
+			if (((ConditionListener) this.conditions.elementAt(i)).matches(conditionListener)) {
 				this.conditions.removeElementAt(i);
 				--i;
 			}
@@ -187,7 +187,7 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 
 	public final void run() {
 		do {
-			final SensorDataImpl sensorData = new SensorDataImpl(this, this.bufferSize, this.getDataType(), this.isTimestampIncluded, this.isUncertaintyIncluded, this.isValidityIncluded);
+			final DataImpl sensorData = new DataImpl(this, this.bufferSize, this.getDataType(), this.isTimestampIncluded, this.isUncertaintyIncluded, this.isValidityIncluded);
 			int dataCount = 0;
 			while (!this.isStopped && dataCount < this.bufferSize) {
 				final Object[] dataArray = {null};

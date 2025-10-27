@@ -2,8 +2,8 @@ package emulator.sensor;
 
 import javax.microedition.sensor.ChannelInfo;
 import javax.microedition.sensor.Data;
-
-public final class SensorDataImpl implements Data {
+//https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/DataImpl.java
+public final class DataImpl implements Data {
 	private ChannelInfo channelInfo;
 	private boolean isTimestampIncluded;
 	private long[] timeStamps;
@@ -15,7 +15,7 @@ public final class SensorDataImpl implements Data {
 	private int bufferSize;
 	private Object[] objectValues;
 
-	SensorDataImpl(final ChannelInfo channelInfo, final int bufferSize, final int dataType, final boolean isTimestampIncluded, final boolean isUncertaintyIncluded, final boolean isValidityIncluded) {
+	DataImpl(final ChannelInfo channelInfo, final int bufferSize, final int dataType, final boolean isTimestampIncluded, final boolean isUncertaintyIncluded, final boolean isValidityIncluded) {
 		super();
 		this.channelInfo = channelInfo;
 		this.isTimestampIncluded = isTimestampIncluded;

@@ -12,7 +12,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     private String quantity;
     private a sensorDevice;
     private int channelCount;
-    private SensorDataImpl[] retData;
+    private DataImpl[] retData;
     private DataListener listener;
     private int channelStatus;
     private int channelNumber;
@@ -186,7 +186,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         this.listener = null;
         this.channelCount = 0;
         this.channelStatus = 0;
-        this.retData = new SensorDataImpl[this.channels.length];
+        this.retData = new DataImpl[this.channels.length];
         for (int i = 0; i < this.channels.length; ++i) {
             this.channels[i].startDataCollection(this, anInt448, n, b, b2, b3, false);
         }
@@ -204,7 +204,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         return this.retData;
     }
 
-    public final void channelDataReceived(final int n, final SensorDataImpl l) {
+    public final void channelDataReceived(final int n, final DataImpl l) {
         if (!this.aBoolean313) {
             this.retData[n] = l;
             Object aDataListener451 = this;
@@ -291,7 +291,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         this.channelCount = 0;
         this.channelStatus = 0;
         this.listeningProcessCounter = 0;
-        this.retData = new SensorDataImpl[this.channels.length];
+        this.retData = new DataImpl[this.channels.length];
         for (int i = 0; i < this.channels.length; ++i) {
             this.channels[i].startDataCollection(this, anInt448, n, b, b2, b3, true);
         }
