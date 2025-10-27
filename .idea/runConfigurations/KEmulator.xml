@@ -1,7 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="KEmulator" type="Application" factoryName="Application">
-    <option name="ALTERNATIVE_JRE_PATH" value="V:/jbed/kemnnmod (5)/kemnnmod/jre" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="emulator.Emulator" />
     <module name="KEmulator_win" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/home" />
