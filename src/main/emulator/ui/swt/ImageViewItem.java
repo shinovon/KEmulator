@@ -62,4 +62,14 @@ public class ImageViewItem {
 	}
 
 	private final static String[] m3gTypes = new String[]{"A", "L", "LA", "RGB", "RGBA"};
+
+
+	public final void finalize() {
+		SWTFrontend.syncExec(() -> {
+			if (cache != null && !cache.isDisposed()) {
+				cache.dispose();
+			}
+		});
+	}
+
 }
