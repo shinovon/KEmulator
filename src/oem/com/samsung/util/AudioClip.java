@@ -1,7 +1,7 @@
 package com.samsung.util;
 
 import emulator.custom.ResourceManager;
-import emulator.media.MMFPlayer;
+import emulator.media.mmf.MMFPlayer;
 
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;

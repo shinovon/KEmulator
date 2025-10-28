@@ -6,7 +6,7 @@ import emulator.custom.CustomMethod;
 import emulator.custom.ResourceManager;
 import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
-import emulator.media.MMFPlayer;
+import emulator.media.mmf.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
 import emulator.ui.RichPresence;
 import emulator.ui.bridge.BridgeFrontend;
