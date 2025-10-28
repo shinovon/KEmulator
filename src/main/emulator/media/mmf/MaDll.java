@@ -46,8 +46,7 @@ public class MaDll {
 
 	private int EmuBuf;
 	private int EmuP;
-	private int instanceId;
-	private int currentSound;
+	private int instanceId = -1;
 
 	public MaDll(String dllPath, int mode) {
 		this.library = Native.load(dllPath, Ma5.class);
@@ -158,18 +157,41 @@ public class MaDll {
 	}
 
 	public void stop(int sound) {
-
+		int r;
+		if ((r = ((Ma5) library).MaSound_Stop(instanceId, sound, 0)) != 0) {
+			throw new RuntimeException("MaSound_Stop: " + r);
+		}
 	}
 
 	public void pause(int sound) {
+		int r;
+		if ((r = ((Ma5) library).MaSound_Pause(instanceId, sound, 0)) != 0) {
+			throw new RuntimeException("MaSound_Pause: " + r);
+		}
 	}
 
 	public void resume(int sound) {
+		int r;
+		if ((r = ((Ma5) library).MaSound_Restart(instanceId, sound, 0)) != 0) {
+			throw new RuntimeException("MaSound_Pause: " + r);
+		}
 	}
 
+	public void close(int sound) {
+		((Ma5) library).MaSound_Stop(instanceId, sound, 0);
+		((Ma5) library).MaSound_Close(instanceId, sound, 0);
+		((Ma5) library).MaSound_Unload(instanceId, sound, 0);
+	}
 
 	public void destroy() {
+		((Ma5) library).MaSound_Delete(instanceId);
+		((Ma5) library).MaSound_Terminate();
+		((Ma5) library).MaSound_EmuTerminate();
 
+		if (EmuBuf != 0) {
+			Native.free(EmuBuf);
+			EmuBuf = 0;
+		}
 	}
 
 }

@@ -50,7 +50,7 @@ public class MMFPlayer {
 	}
 
 	public static boolean isPlaying() {
-
+		return false;
 	}
 
 	public static void stop() {
