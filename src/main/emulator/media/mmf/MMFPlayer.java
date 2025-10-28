@@ -19,6 +19,7 @@ public class MMFPlayer {
 			return false;
 		}
 		try {
+//			maDll = new MaDll(Emulator.getAbsolutePath() + "/ma3smwemu.dll", MaDll.MODE_MA3);
 			maDll = new MaDll(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll", MaDll.MODE_MA5);
 			maDll.init();
 			return MMFPlayer.initialized = true;
