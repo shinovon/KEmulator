@@ -4,6 +4,8 @@ import emulator.Emulator;
 
 public class MMFPlayer {
 	static boolean initialized;
+	static MaDll maDll;
+	static int currentSound = -1;
 
 	public MMFPlayer() {
 		super();
@@ -17,10 +19,11 @@ public class MMFPlayer {
 			return false;
 		}
 		try {
-			initMMFLibrary(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll");
+			maDll = new MaDll(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll", MaDll.MODE_MA5);
+			maDll.init();
 			return MMFPlayer.initialized = true;
-		} catch (Throwable ignored) {
-			ignored.printStackTrace();
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 		return MMFPlayer.initialized = false;
 	}
@@ -33,19 +36,25 @@ public class MMFPlayer {
 		}
 	}
 
-	public static void initMMFLibrary(final String dll) {
-
-	}
-
 	public static void initPlayer(final byte[] data) {
+		if (currentSound != -1) {
+			maDll.close(currentSound);
+		}
 
+		currentSound = maDll.load(data);
 	}
 
 	public static void play(final int p0, final int p1) {
-
+		maDll.setVolume(currentSound, (p1 * 100) / 5);
+		maDll.start(currentSound, p0);
 	}
 
 	public static void destroy() {
+		if (maDll == null) return;
+
+		if (currentSound != -1) maDll.stop(currentSound);
+		currentSound = -1;
+		maDll.destroy();
 
 	}
 
@@ -54,14 +63,14 @@ public class MMFPlayer {
 	}
 
 	public static void stop() {
-
+		maDll.stop(currentSound);
 	}
 
 	public static void pause() {
-
+		maDll.pause(currentSound);
 	}
 
 	public static void resume() {
-
+		maDll.resume(currentSound);
 	}
 }
