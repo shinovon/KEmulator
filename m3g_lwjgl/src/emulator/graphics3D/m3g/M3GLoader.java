@@ -463,7 +463,7 @@ public final class M3GLoader {
 	private Background readBackground(InputStream var1) throws IOException {
 		Background var2 = new Background();
 		this.readObject3DData(var2, var1);
-		var2.setColor(readARGB(var1));
+		var2.setColor(readRGBA(var1));
 		Image2D var3 = (Image2D) this.readReference(var1);
 		var2.setImage(var3);
 		var2.setImageMode(readByte(var1), readByte(var1));
@@ -635,7 +635,7 @@ public final class M3GLoader {
 		Material var2 = new Material();
 		this.readObject3DData(var2, var1);
 		var2.setColor(1024, readRGB(var1)); //AMBIENT
-		var2.setColor(2048, readARGB(var1)); //DIFFUSE
+		var2.setColor(2048, readRGBA(var1)); //DIFFUSE
 		var2.setColor(4096, readRGB(var1)); //EMISSIVE
 		var2.setColor(8192, readRGB(var1)); //SPECULAR
 		var2.setShininess(readFloat32LE(var1));
@@ -888,7 +888,7 @@ public final class M3GLoader {
 	private VertexBuffer readVertexBuffer(InputStream var1) throws IOException {
 		VertexBuffer var2 = new VertexBuffer();
 		this.readObject3DData(var2, var1);
-		var2.setDefaultColor(readARGB(var1));
+		var2.setDefaultColor(readRGBA(var1));
 		VertexArray var3 = (VertexArray) this.readReference(var1);
 		float[] var4 = new float[3];
 
@@ -994,7 +994,7 @@ public final class M3GLoader {
 		}
 	}
 
-	private static int readARGB(InputStream var0) throws IOException {
+	private static int readRGBA(InputStream var0) throws IOException {
 		return (var0.read() << 16) + (var0.read() << 8) + var0.read() + (var0.read() << 24);
 	}
 
