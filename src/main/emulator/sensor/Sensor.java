@@ -148,22 +148,15 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     }
     //method240 is unknown
     protected final void method240(final int n, final Object[] array, final int n2) {
-        Object[] array2;
-        int n3;
-        Number n4;
         if (n2 == 1) {
-            array2 = array;
-            n3 = 0;
-            n4 = new Double(this.sensorDevice.method223(n));
+            array[0] = new Double(this.sensorDevice.method223(n));
         } else {
             if (n2 != 2) {
                 return;
             }
-            array2 = array;
-            n3 = 0;
-            n4 = new Integer((int) this.sensorDevice.method223(n));
+            // constant from Loco Roco
+            array[0] = new Integer((int) (sensorDevice.method223(n) / (0.7853982F / 1000)));
         }
-        array2[n3] = n4;
     }
 
     public final Data[] getData(final int n) throws IOException {
