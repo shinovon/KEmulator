@@ -21,24 +21,24 @@ public final class M3GLoader {
 	// «JSR184»
 	static final byte[] M3G_MAGIC_NUMBER = new byte[]{-85, 74, 83, 82, 49, 56, 52, -69, 13, 10, 26, 10};
 	static final byte[] PNG_MAGIC_NUMBER = new byte[]{-119, 80, 78, 71, 13, 10, 26, 10};
-	private static final Boolean aBoolean1081 = new Boolean(false);
-	private static final Boolean aBoolean1087 = new Boolean(true);
-	private Vector aVector1082 = new Vector();
-	private Vector aVector1088 = new Vector();
-	private Vector aVector1091 = new Vector();
-	private Vector aVector1092 = null;
-	private String filePath;
-	private String aString1089;
-	private int currentSection;
-	private boolean aBoolean1085;
-	private boolean aBoolean1090;
+	private static final Boolean NOT_REFERENCED = new Boolean(false);
+	private static final Boolean REFERENCED = new Boolean(true);
+	private Vector iLoadedObjects = new Vector();
+	private Vector iLoadedObjectsRef = new Vector();
+	private Vector iFileHistory = new Vector();
+	private Vector iAnimTracks = null;
+	private String iResourceName;
+	private String iParentResourceName;
+	private int iCurrentSection;
+	private boolean iContainedExternalLinks;
+	private boolean iExternalLinks;
 
 	public static Object3D[] load(String var0) throws IOException {
 		if (var0 == null) {
 			throw new NullPointerException();
 		} else {
 			try {
-				return (new M3GLoader()).method746(var0);
+				return (new M3GLoader()).loadFromString(var0);
 			} catch (SecurityException var2) {
 				throw var2;
 			} catch (IOException var3) {
@@ -54,7 +54,7 @@ public final class M3GLoader {
 			throw new NullPointerException();
 		} else {
 			try {
-				return (new M3GLoader()).method747(var0, var1);
+				return (new M3GLoader()).loadFromByteArray(var0, var1);
 			} catch (SecurityException var3) {
 				throw var3;
 			} catch (IOException var4) {
@@ -69,70 +69,70 @@ public final class M3GLoader {
 	}
 
 	private M3GLoader(Vector var1, String var2) {
-		this.aString1089 = var2;
-		this.aVector1091 = var1;
+		this.iParentResourceName = var2;
+		this.iFileHistory = var1;
 	}
 
-	private Object3D[] method746(String var1) throws IOException {
+	private Object3D[] loadFromString(String var1) throws IOException {
 		if (var1 == null) {
 			throw new NullPointerException();
-		} else if (this.method715(var1)) {
+		} else if (this.inFileHistory(var1)) {
 			throw new IOException("Reference loop detected.");
 		} else {
-			this.filePath = var1;
-			this.aVector1091.addElement(var1);
+			this.iResourceName = var1;
+			this.iFileHistory.addElement(var1);
 			PeekInputStream var2;
-			int var3 = getFileType(var2 = new PeekInputStream(this.method752(var1), 12));
+			int var3 = getFileType(var2 = new PeekInputStream(this.getInputStream(var1), 12));
 			var2.rewind();
-			Object3D[] var4 = this.method696(var2, var3);
-			this.aVector1091.removeElement(var1);
+			Object3D[] var4 = this.loadStream(var2, var3);
+			this.iFileHistory.removeElement(var1);
 			return var4;
 		}
 	}
 
-	private Object3D[] method747(byte[] var1, int var2) throws IOException {
+	private Object3D[] loadFromByteArray(byte[] var1, int var2) throws IOException {
 		if (var1 == null) {
 			throw new NullPointerException("Resource byte array is null.");
 		} else {
 			int var3 = getInnerFileType(var1, var2);
 			ByteArrayInputStream var4 = new ByteArrayInputStream(var1, var2, var1.length - var2);
-			return this.method696(var4, var3);
+			return this.loadStream(var4, var3);
 		}
 	}
 
-	private Object3D[] method696(InputStream var1, int var2) throws IOException {
+	private Object3D[] loadStream(InputStream var1, int var2) throws IOException {
 		if (var2 == 1) {
-			return this.method748(var1);
+			return this.loadM3G(var1);
 		} else if (var2 == 2) {
-			return method707(var1);
+			return loadPNG(var1);
 		} else {
 			throw new IOException("File not recognized.");
 		}
 	}
 
-	private static Object3D[] method707(InputStream var0) throws IOException {
+	private static Object3D[] loadPNG(InputStream var0) throws IOException {
 		return new Object3D[]{new Image2D(100, Image.createImage(var0))};
 	}
 
-	private Object3D[] method748(InputStream paramInputStream)
+	private Object3D[] loadM3G(InputStream paramInputStream)
 			throws IOException {
 		paramInputStream.skip(M3G_MAGIC_NUMBER.length);
-		while (method718(paramInputStream)) {
-			this.currentSection += 1;
+		while (loadSection(paramInputStream)) {
+			this.iCurrentSection += 1;
 		}
-		return method743();
+		return getUnreferencedObjects();
 	}
 
-	private boolean method718(InputStream var1) throws IOException {
-		if (this.currentSection > 1 && this.aBoolean1090 && !this.aBoolean1085) {
-			throw new IOException("No external sections (" + this.filePath + ").");
+	private boolean loadSection(InputStream var1) throws IOException {
+		if (this.iCurrentSection > 1 && this.iExternalLinks && !this.iContainedExternalLinks) {
+			throw new IOException("No external sections (" + this.iResourceName + ").");
 		} else {
 			AdlerInputStream ais;
 			int compression;
 			if ((compression = readByte(ais = new AdlerInputStream(var1))) == -1) {
 				return false;
-			} else if (this.currentSection == 0 && compression != 0) {
-				throw new IOException("Compressed header (" + this.filePath + ").");
+			} else if (this.iCurrentSection == 0 && compression != 0) {
+				throw new IOException("Compressed header (" + this.iResourceName + ").");
 			} else {
 				long var5 = readUInt32LE(ais);
 				long var7 = readUInt32LE(ais);
@@ -159,7 +159,7 @@ public final class M3GLoader {
 				((CountedInputStream) var9).resetCounter();
 
 				while ((long) ((CountedInputStream) var9).getCounter() < var7) {
-					this.method722(this.method719((CountedInputStream) var9));
+					this.addLoaded(this.method719((CountedInputStream) var9));
 				}
 
 				if ((long) ((CountedInputStream) var9).getCounter() != var7) {
@@ -169,7 +169,7 @@ public final class M3GLoader {
 					long var12 = ais.getChecksum();
 					long var14 = readUInt32LE(ais);
 					if (var12 != var14) {
-						throw new IOException("Checksum is wrong (" + this.filePath + ").");
+						throw new IOException("Checksum is wrong (" + this.iResourceName + ").");
 					} else {
 						return true;
 					}
@@ -185,11 +185,11 @@ public final class M3GLoader {
 		Object object = null;
 		switch (var2) {
 			case 0:
-				if (this.currentSection != 0) {
-					throw new IOException("Header in wrong section (" + this.filePath + ").");
+				if (this.iCurrentSection != 0) {
+					throw new IOException("Header in wrong section (" + this.iResourceName + ").");
 				}
 
-				this.method744(var1);
+				this.readHeader(var1);
 				break;
 			case 1:
 				object = this.readAnimationController(var1);
@@ -258,55 +258,55 @@ public final class M3GLoader {
 				object = this.readWorld(var1);
 				break;
 			case 255:
-				if (this.currentSection != 1) {
-					throw new IOException("External reference in wrong section (" + this.filePath + ").");
+				if (this.iCurrentSection != 1) {
+					throw new IOException("External reference in wrong section (" + this.iResourceName + ").");
 				}
 
-				if (!this.aBoolean1090) {
-					throw new IOException("External links in self contained file (" + this.filePath + ").");
+				if (!this.iExternalLinks) {
+					throw new IOException("External links in self contained file (" + this.iResourceName + ").");
 				}
 
-				String var8 = method710(var1);
-				this.aBoolean1085 = true;
-				object = (new M3GLoader(this.aVector1091, this.filePath)).method746(var8)[0];
+				String var8 = readString(var1);
+				this.iContainedExternalLinks = true;
+				object = (new M3GLoader(this.iFileHistory, this.iResourceName)).loadFromString(var8)[0];
 				break;
 			default:
-				throw new IOException("Unrecognized object type " + var2 + " (" + this.filePath + ").");
+				throw new IOException("Unrecognized object type " + var2 + " (" + this.iResourceName + ").");
 		}
 
 		if (var5 != (long) var1.getCounter()) {
-			throw new IOException("Object length mismatch (" + this.filePath + ").");
+			throw new IOException("Object length mismatch (" + this.iResourceName + ").");
 		} else {
-			this.method749((Object3D) object);
+			this.addAnimTracks((Object3D) object);
 			return (Object3D) object;
 		}
 	}
 
-	private void method722(Object3D var1) {
+	private void addLoaded(Object3D var1) {
 		if (var1 != null) {
-			this.aVector1082.addElement(var1);
-			this.aVector1088.addElement(aBoolean1081);
+			this.iLoadedObjects.addElement(var1);
+			this.iLoadedObjectsRef.addElement(NOT_REFERENCED);
 		}
 
 	}
 
-	private Object3D method726(int var1) {
+	private Object3D getLoaded(int var1) {
 		if (var1 == 0) {
 			return null;
-		} else if (var1 >= 2 && var1 - 2 < this.aVector1082.size()) {
-			this.aVector1088.setElementAt(aBoolean1087, var1 - 2);
-			return (Object3D) this.aVector1082.elementAt(var1 - 2);
+		} else if (var1 >= 2 && var1 - 2 < this.iLoadedObjects.size()) {
+			this.iLoadedObjectsRef.setElementAt(REFERENCED, var1 - 2);
+			return (Object3D) this.iLoadedObjects.elementAt(var1 - 2);
 		} else {
-			throw new IllegalArgumentException("Invalid reference index (" + this.filePath + ").");
+			throw new IllegalArgumentException("Invalid reference index (" + this.iResourceName + ").");
 		}
 	}
 
-	private Object3D[] method743() {
+	private Object3D[] getUnreferencedObjects() {
 		Vector var1 = new Vector();
 
-		for (int var2 = 0; var2 < this.aVector1082.size(); ++var2) {
-			if (this.aVector1088.elementAt(var2) == aBoolean1081) {
-				var1.addElement(this.aVector1082.elementAt(var2));
+		for (int var2 = 0; var2 < this.iLoadedObjects.size(); ++var2) {
+			if (this.iLoadedObjectsRef.elementAt(var2) == NOT_REFERENCED) {
+				var1.addElement(this.iLoadedObjects.elementAt(var2));
 			}
 		}
 
@@ -319,31 +319,31 @@ public final class M3GLoader {
 		return var4;
 	}
 
-	private void method744(InputStream paramInputStream)
+	private void readHeader(InputStream paramInputStream)
 			throws IOException {
 		byte[] arrayOfByte = new byte[2];
 		paramInputStream.read(arrayOfByte);
-		this.aBoolean1090 = readBit(paramInputStream);
+		this.iExternalLinks = readBit(paramInputStream);
 		readUInt32LE(paramInputStream);
 		readUInt32LE(paramInputStream);
 		if ((arrayOfByte[0] != 1) || (arrayOfByte[1] != 0)) {
-			throw new IOException("Invalid file version (" + this.filePath + ").");
+			throw new IOException("Invalid file version (" + this.iResourceName + ").");
 		}
-		method710(paramInputStream);
+		readString(paramInputStream);
 	}
 
-	private void method736(Object3D var1, InputStream var2) throws IOException {
+	private void readObject3DData(Object3D var1, InputStream var2) throws IOException {
 		var1.setUserID( (int)readUInt32LE(var2) );
 		long var3 = readUInt32LE(var2);
-		this.aVector1092 = new Vector();
+		this.iAnimTracks = new Vector();
 
 		while (var3-- > 0L) {
 			AnimationTrack var5;
-			if ((var5 = (AnimationTrack) this.method728(var2)) == null) {
+			if ((var5 = (AnimationTrack) this.readReference(var2)) == null) {
 				throw new NullPointerException();
 			}
 
-			this.aVector1092.addElement(var5);
+			this.iAnimTracks.addElement(var5);
 		}
 
 		long var6 = readUInt32LE(var2);
@@ -361,8 +361,8 @@ public final class M3GLoader {
 		}
 	}
 
-	private void method737(Transformable var1, InputStream var2) throws IOException {
-		this.method736(var1, var2);
+	private void readTransformableData(Transformable var1, InputStream var2) throws IOException {
+		this.readObject3DData(var1, var2);
 		if (readBit(var2)) {
 			var1.setTranslation(readFloat32LE(var2), readFloat32LE(var2), readFloat32LE(var2));
 			var1.setScale(readFloat32LE(var2), readFloat32LE(var2), readFloat32LE(var2));
@@ -370,13 +370,13 @@ public final class M3GLoader {
 		}
 
 		if (readBit(var2)) {
-			var1.setTransform(method732(var2));
+			var1.setTransform(readTransform(var2));
 		}
 
 	}
 
-	private void method745(Node var1, InputStream var2) throws IOException {
-		this.method737(var1, var2);
+	private void readNodeData(Node var1, InputStream var2) throws IOException {
+		this.readTransformableData(var1, var2);
 		var1.setRenderingEnable(readBit(var2));
 		var1.setPickingEnable(readBit(var2));
 		var1.setAlphaFactor((float) readByte(var2) / 255.0F);
@@ -386,35 +386,35 @@ public final class M3GLoader {
 			int var4 = readByte(var2);
 			int var5 = (int) readUInt32LE(var2);
 			int var6 = (int) readUInt32LE(var2);
-			var1.setAlignment((Node) this.method726(var5), var3, (Node) this.method726(var6), var4);
+			var1.setAlignment((Node) this.getLoaded(var5), var3, (Node) this.getLoaded(var6), var4);
 		}
 
 	}
 
-	private void method716(Group var1, InputStream var2) throws IOException {
-		this.method745(var1, var2);
+	private void readGroupData(Group var1, InputStream var2) throws IOException {
+		this.readNodeData(var1, var2);
 		int var3 = (int) readUInt32LE(var2);
 
 		while (var3-- > 0) {
-			var1.addChild((Node) this.method728(var2));
+			var1.addChild((Node) this.readReference(var2));
 		}
 
 	}
 
-	private void method749(Object3D var1) {
-		if (this.aVector1092 != null && var1 != null) {
-			for (int var2 = 0; var2 < this.aVector1092.size(); ++var2) {
-				var1.addAnimationTrack((AnimationTrack) this.aVector1092.elementAt(var2));
+	private void addAnimTracks(Object3D var1) {
+		if (this.iAnimTracks != null && var1 != null) {
+			for (int var2 = 0; var2 < this.iAnimTracks.size(); ++var2) {
+				var1.addAnimationTrack((AnimationTrack) this.iAnimTracks.elementAt(var2));
 			}
 
-			this.aVector1092 = null;
+			this.iAnimTracks = null;
 		}
 
 	}
 
 	private AnimationController readAnimationController(InputStream var1) throws IOException {
 		AnimationController var2 = new AnimationController();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		float var3 = readFloat32LE(var1);
 		float var4 = readFloat32LE(var1);
 		var2.setActiveInterval(readInt32LE(var1), readInt32LE(var1));
@@ -428,9 +428,9 @@ public final class M3GLoader {
 
 	private AnimationTrack readAnimationTrack(InputStream var1) throws IOException {
 		AnimationController var2 = new AnimationController();
-		this.method736(var2, var1);
-		KeyframeSequence var3 = (KeyframeSequence) this.method728(var1);
-		AnimationController var4 = (AnimationController) this.method728(var1);
+		this.readObject3DData(var2, var1);
+		KeyframeSequence var3 = (KeyframeSequence) this.readReference(var1);
+		AnimationController var4 = (AnimationController) this.readReference(var1);
 		int var5 = (int) readUInt32LE(var1);
 		AnimationTrack var6 = new AnimationTrack(var3, var5);
 		copyObject3D(var2, var6);
@@ -440,17 +440,17 @@ public final class M3GLoader {
 
 	private Appearance readAppearance(InputStream var1) throws IOException {
 		Appearance var2 = new Appearance();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var2.setLayer(readByte(var1));
-		var2.setCompositingMode((CompositingMode) this.method728(var1));
-		var2.setFog((Fog) this.method728(var1));
-		var2.setPolygonMode((PolygonMode) this.method728(var1));
-		var2.setMaterial((Material) this.method728(var1));
+		var2.setCompositingMode((CompositingMode) this.readReference(var1));
+		var2.setFog((Fog) this.readReference(var1));
+		var2.setPolygonMode((PolygonMode) this.readReference(var1));
+		var2.setMaterial((Material) this.readReference(var1));
 		int var3 = (int) readUInt32LE(var1);
 
 		for (int var4 = 0; var4 < var3; ++var4) {
 			Texture2D var5;
-			if ((var5 = (Texture2D) this.method728(var1)) == null) {
+			if ((var5 = (Texture2D) this.readReference(var1)) == null) {
 				throw new IOException("Null texture reference");
 			}
 
@@ -462,9 +462,9 @@ public final class M3GLoader {
 
 	private Background readBackground(InputStream var1) throws IOException {
 		Background var2 = new Background();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var2.setColor(readARGB(var1));
-		Image2D var3 = (Image2D) this.method728(var1);
+		Image2D var3 = (Image2D) this.readReference(var1);
 		var2.setImage(var3);
 		var2.setImageMode(readByte(var1), readByte(var1));
 		var2.setCrop(readInt32LE(var1), readInt32LE(var1), readInt32LE(var1), readInt32LE(var1));
@@ -475,15 +475,15 @@ public final class M3GLoader {
 
 	private Camera readCamera(InputStream var1) throws IOException {
 		Camera var2 = new Camera();
-		this.method745(var2, var1);
+		this.readNodeData(var2, var1);
 		int var3;
 		if ((var3 = readByte(var1)) == 48) {
-			var2.setGeneric(method732(var1));
+			var2.setGeneric(readTransform(var1));
 		} else if (var3 == 50) {
 			var2.setPerspective(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
 		} else {
 			if (var3 != 49) {
-				throw new IOException("Projection type not recognized: " + var3 + "(" + this.filePath + ").");
+				throw new IOException("Projection type not recognized: " + var3 + "(" + this.iResourceName + ").");
 			}
 
 			var2.setParallel(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
@@ -494,7 +494,7 @@ public final class M3GLoader {
 
 	private CompositingMode readCompositingMode(InputStream var1) throws IOException {
 		CompositingMode var2 = new CompositingMode();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var2.setDepthTestEnable(readBit(var1));
 		var2.setDepthWriteEnable(readBit(var1));
 		var2.setColorWriteEnable(readBit(var1));
@@ -507,7 +507,7 @@ public final class M3GLoader {
 
 	private Fog readFog(InputStream var1) throws IOException {
 		Fog var2 = new Fog();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var2.setColor(readRGB(var1));
 		var2.setMode(readByte(var1));
 		if (var2.getMode() == 80) {
@@ -521,13 +521,13 @@ public final class M3GLoader {
 
 	private Group readGroup(InputStream var1) throws IOException {
 		Group var2 = new Group();
-		this.method716(var2, var1);
+		this.readGroupData(var2, var1);
 		return var2;
 	}
 
 	private Image2D readImage2D(InputStream var1) throws IOException {
 		AnimationController var2 = new AnimationController();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		int var3 = readByte(var1);
 		boolean var4 = readBit(var1);
 		int var5 = (int) readUInt32LE(var1);
@@ -554,7 +554,7 @@ public final class M3GLoader {
 
 	private KeyframeSequence readKeyframeSequence(InputStream var1) throws IOException {
 		AnimationController var2 = new AnimationController();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		int var3 = readByte(var1);
 		int var4 = readByte(var1);
 		int var5 = readByte(var1);
@@ -582,7 +582,7 @@ public final class M3GLoader {
 			}
 		} else {
 			if (var5 != 1 && var5 != 2) {
-				throw new IOException("Encoding not recognized: " + var5 + "(" + this.filePath + ").");
+				throw new IOException("Encoding not recognized: " + var5 + "(" + this.iResourceName + ").");
 			}
 
 			float[] var19 = new float[var9];
@@ -621,7 +621,7 @@ public final class M3GLoader {
 
 	private Light readLight(InputStream var1) throws IOException {
 		Light var2 = new Light();
-		this.method745(var2, var1);
+		this.readNodeData(var2, var1);
 		var2.setAttenuation(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
 		var2.setColor(readRGB(var1));
 		var2.setMode(readByte(var1));
@@ -633,7 +633,7 @@ public final class M3GLoader {
 
 	private Material readMaterial(InputStream var1) throws IOException {
 		Material var2 = new Material();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var2.setColor(1024, readRGB(var1)); //AMBIENT
 		var2.setColor(2048, readARGB(var1)); //DIFFUSE
 		var2.setColor(4096, readRGB(var1)); //EMISSIVE
@@ -645,15 +645,15 @@ public final class M3GLoader {
 
 	private Mesh readMesh(InputStream var1) throws IOException {
 		Group var2 = new Group();
-		this.method745(var2, var1);
-		VertexBuffer var3 = (VertexBuffer) this.method728(var1);
+		this.readNodeData(var2, var1);
+		VertexBuffer var3 = (VertexBuffer) this.readReference(var1);
 		int var4;
 		IndexBuffer[] var5 = new IndexBuffer[var4 = (int) readUInt32LE(var1)];
 		Appearance[] var6 = new Appearance[var4];
 
 		for (int var7 = 0; var7 < var4; ++var7) {
-			var5[var7] = (IndexBuffer) this.method728(var1);
-			var6[var7] = (Appearance) this.method728(var1);
+			var5[var7] = (IndexBuffer) this.readReference(var1);
+			var6[var7] = (Appearance) this.readReference(var1);
 		}
 
 		Mesh var8 = new Mesh(var3, var5, var6);
@@ -669,7 +669,7 @@ public final class M3GLoader {
 
 		int var6;
 		for (var6 = 0; var6 < var3; ++var6) {
-			var4[var6] = (VertexBuffer) this.method728(var1);
+			var4[var6] = (VertexBuffer) this.readReference(var1);
 			var5[var6] = readFloat32LE(var1);
 		}
 
@@ -689,7 +689,7 @@ public final class M3GLoader {
 
 	private PolygonMode readPolygonMode(InputStream var1) throws IOException {
 		PolygonMode var2 = new PolygonMode();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var2.setCulling(readByte(var1));
 		var2.setShading(readByte(var1));
 		var2.setWinding(readByte(var1));
@@ -701,7 +701,7 @@ public final class M3GLoader {
 
 	private SkinnedMesh readSkinnedMesh(InputStream var1) throws IOException {
 		Mesh var2 = this.readMesh(var1);
-		Group var3 = (Group) this.method728(var1);
+		Group var3 = (Group) this.readReference(var1);
 		int var4;
 		IndexBuffer[] var5 = new IndexBuffer[var4 = var2.getSubmeshCount()];
 		Appearance[] var6 = new Appearance[var4];
@@ -716,7 +716,7 @@ public final class M3GLoader {
 		int var8 = (int) readUInt32LE(var1);
 
 		while (var8-- > 0) {
-			Node var9 = (Node) this.method728(var1);
+			Node var9 = (Node) this.readReference(var1);
 			int var10 = (int) readUInt32LE(var1);
 			int var11 = (int) readUInt32LE(var1);
 			int var12 = readInt32LE(var1);
@@ -728,9 +728,9 @@ public final class M3GLoader {
 
 	private Sprite3D readSprite(InputStream var1) throws IOException {
 		Group var2 = new Group();
-		this.method745(var2, var1);
-		Image2D var3 = (Image2D) this.method728(var1);
-		Appearance var4 = (Appearance) this.method728(var1);
+		this.readNodeData(var2, var1);
+		Image2D var3 = (Image2D) this.readReference(var1);
+		Appearance var4 = (Appearance) this.readReference(var1);
 		boolean var5 = readBit(var1);
 		Sprite3D var6 = new Sprite3D(var5, var3, var4);
 		copyNode(var2, var6);
@@ -740,8 +740,8 @@ public final class M3GLoader {
 
 	private Texture2D readTexture2D(InputStream var1) throws IOException {
 		Group var2 = new Group();
-		this.method737(var2, var1);
-		Texture2D var3 = new Texture2D((Image2D) this.method728(var1));
+		this.readTransformableData(var2, var1);
+		Texture2D var3 = new Texture2D((Image2D) this.readReference(var1));
 		copyTransformable(var2, var3);
 		var3.setBlendColor(readRGB(var1));
 		var3.setBlending(readByte(var1));
@@ -756,7 +756,7 @@ public final class M3GLoader {
 		int var4;
 		int[] var5;
 		var2 = new AnimationController();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var3 = readByte(var1);
 		var4 = 0;
 		var5 = null;
@@ -809,7 +809,7 @@ public final class M3GLoader {
 					++var6;
 				}
 			default:
-				throw new IllegalArgumentException("Invalid TriangleStripArray encoding (" + this.filePath + ").");
+				throw new IllegalArgumentException("Invalid TriangleStripArray encoding (" + this.iResourceName + ").");
 		}
 
 		int[] var9 = new int[(int) readUInt32LE(var1)];
@@ -826,13 +826,13 @@ public final class M3GLoader {
 
 	private VertexArray readVertexArray(InputStream var1) throws IOException {
 		AnimationController var2 = new AnimationController();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		int var3 = readByte(var1);
 		int var4 = readByte(var1);
 		int var5 = readByte(var1);
 		int var6 = readInt16LE(var1);
 		if (var5 != 0 && var5 != 1) {
-			throw new IllegalArgumentException("Invalid VertexArray encoding (" + this.filePath + ").");
+			throw new IllegalArgumentException("Invalid VertexArray encoding (" + this.iResourceName + ").");
 		} else {
 			VertexArray var7 = new VertexArray(var6, var4, var3);
 			int[] var8 = new int[var4];
@@ -887,9 +887,9 @@ public final class M3GLoader {
 
 	private VertexBuffer readVertexBuffer(InputStream var1) throws IOException {
 		VertexBuffer var2 = new VertexBuffer();
-		this.method736(var2, var1);
+		this.readObject3DData(var2, var1);
 		var2.setDefaultColor(readARGB(var1));
-		VertexArray var3 = (VertexArray) this.method728(var1);
+		VertexArray var3 = (VertexArray) this.readReference(var1);
 		float[] var4 = new float[3];
 
 		for (int var5 = 0; var5 < 3; ++var5) {
@@ -902,12 +902,12 @@ public final class M3GLoader {
 		}
 
 		VertexArray var6;
-		if ((var6 = (VertexArray) this.method728(var1)) != null) {
+		if ((var6 = (VertexArray) this.readReference(var1)) != null) {
 			var2.setNormals(var6);
 		}
 
 		VertexArray var7;
-		if ((var7 = (VertexArray) this.method728(var1)) != null) {
+		if ((var7 = (VertexArray) this.readReference(var1)) != null) {
 			var2.setColors(var7);
 		}
 
@@ -915,7 +915,7 @@ public final class M3GLoader {
 
 		for (int var9 = 0; var9 < var8; ++var9) {
 			VertexArray var10;
-			if ((var10 = (VertexArray) this.method728(var1)) == null) {
+			if ((var10 = (VertexArray) this.readReference(var1)) == null) {
 				throw new IOException("Null texture vertex array");
 			}
 
@@ -932,21 +932,21 @@ public final class M3GLoader {
 
 	private World readWorld(InputStream var1) throws IOException {
 		World var2 = new World();
-		this.method716(var2, var1);
+		this.readGroupData(var2, var1);
 		Camera var3;
-		if ((var3 = (Camera) this.method728(var1)) != null) {
+		if ((var3 = (Camera) this.readReference(var1)) != null) {
 			var2.setActiveCamera(var3);
 		}
 
-		var2.setBackground((Background) this.method728(var1));
+		var2.setBackground((Background) this.readReference(var1));
 		return var2;
 	}
 
-	private Object3D method728(InputStream var1) throws IOException {
-		return this.method726((int) readUInt32LE(var1));
+	private Object3D readReference(InputStream var1) throws IOException {
+		return this.getLoaded((int) readUInt32LE(var1));
 	}
 
-	private static final Transform method732(InputStream var0) throws IOException {
+	private static final Transform readTransform(InputStream var0) throws IOException {
 		Transform var1 = new Transform();
 		float[] var2 = new float[16];
 
@@ -1002,7 +1002,7 @@ public final class M3GLoader {
 		return (var0.read() << 16) + (var0.read() << 8) + var0.read();
 	}
 
-	private static String method710(InputStream var0) throws IOException {
+	private static String readString(InputStream var0) throws IOException {
 		StringBuffer var1 = new StringBuffer();
 
 		int var2;
@@ -1069,9 +1069,9 @@ public final class M3GLoader {
 		return getInnerFileType(var1, 0);
 	}
 
-	private boolean method715(String var1) {
-		for (int var2 = 0; var2 < this.aVector1091.size(); ++var2) {
-			if (((String) this.aVector1091.elementAt(var2)).equals(var1)) {
+	private boolean inFileHistory(String var1) {
+		for (int var2 = 0; var2 < this.iFileHistory.size(); ++var2) {
+			if (((String) this.iFileHistory.elementAt(var2)).equals(var1)) {
 				return true;
 			}
 		}
@@ -1079,7 +1079,7 @@ public final class M3GLoader {
 		return false;
 	}
 
-	private static InputStream method709(String var0) throws IOException {
+	private static InputStream getHttpInputStream(String var0) throws IOException {
 		InputConnection var1;
 		HttpConnection var2;
 		String var3;
@@ -1090,16 +1090,16 @@ public final class M3GLoader {
 		}
 	}
 
-	private InputStream method752(String var1) throws IOException {
+	private InputStream getInputStream(String var1) throws IOException {
 		if (var1.indexOf(58) != -1) {
-			return method709(var1);
+			return getHttpInputStream(var1);
 		} else if (var1.charAt(0) == 47) {
 			return ResourceManager.getResourceAsStream(var1);
-		} else if (this.aString1089 == null) {
+		} else if (this.iParentResourceName == null) {
 			throw new IOException("Relative URI.");
 		} else {
 			String var2;
-			return (var2 = this.aString1089.substring(0, this.aString1089.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? ResourceManager.getResourceAsStream(var2) : method709(var2);
+			return (var2 = this.iParentResourceName.substring(0, this.iParentResourceName.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? ResourceManager.getResourceAsStream(var2) : getHttpInputStream(var2);
 		}
 	}
 
