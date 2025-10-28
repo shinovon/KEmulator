@@ -406,7 +406,7 @@ public class Emulator implements Runnable {
 
 	public static boolean getJarClasses() throws Exception {
 		try {
-			if (Emulator.midletClassName == null) {
+			if (Emulator.midletClassName == null || Emulator.midletJar != null) {
 				Properties props = null;
 				File file;
 				if (Emulator.jadPath != null) {
@@ -466,6 +466,9 @@ public class Emulator implements Runnable {
 							props.put(s2, props.getProperty(s2));
 						}
 					}
+				}
+				if (Emulator.midletClassName != null) {
+					return true;
 				}
 				Emulator.emulatorimpl.setAppProperties(props);
 				if (props.containsKey("MIDlet-2") && props.containsKey("MIDlet-1")) {
