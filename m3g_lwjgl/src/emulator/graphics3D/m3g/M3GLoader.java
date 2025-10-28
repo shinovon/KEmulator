@@ -159,7 +159,7 @@ public final class M3GLoader {
 				((CountedInputStream) var9).resetCounter();
 
 				while ((long) ((CountedInputStream) var9).getCounter() < var7) {
-					this.addLoaded(this.method719((CountedInputStream) var9));
+					this.addLoaded(this.loadObject((CountedInputStream) var9));
 				}
 
 				if ((long) ((CountedInputStream) var9).getCounter() != var7) {
@@ -178,7 +178,7 @@ public final class M3GLoader {
 		}
 	}
 
-	private Object3D method719(CountedInputStream var1) throws IOException {
+	private Object3D loadObject(CountedInputStream var1) throws IOException {
 		int var2 = readByte(var1);
 		long var3 = readUInt32LE(var1);
 		long var5 = (long) var1.getCounter() + var3;
