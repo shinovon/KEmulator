@@ -1,18 +1,18 @@
 package javax.microedition.sensor;
 
 public class ObjectCondition implements Condition {
-	private final Object anObject3;
+	private final Object limit;
 
-	public ObjectCondition(final Object anObject3) {
+	public ObjectCondition(final Object limit) {
 		super();
-		if (anObject3 == null) {
+		if (limit == null) {
 			throw new NullPointerException();
 		}
-		this.anObject3 = anObject3;
+		this.limit = limit;
 	}
 
 	public final Object getLimit() {
-		return this.anObject3;
+		return this.limit;
 	}
 
 	public boolean isMet(final double n) {
@@ -20,6 +20,6 @@ public class ObjectCondition implements Condition {
 	}
 
 	public boolean isMet(final Object o) {
-		return this.anObject3.equals(o);
+		return this.limit.equals(o);
 	}
 }
