@@ -32,7 +32,7 @@ public class Texture2D extends Transformable {
 		this.blendColor = 0;
 	}
 
-	private static boolean method14(int var0) {
+	private static boolean checkDimension(int var0) {
 		return (var0 & var0 - 1) == 0;
 	}
 
@@ -42,7 +42,7 @@ public class Texture2D extends Transformable {
 		} else {
 			int var2 = var1.getWidth();
 			int var3 = var1.getHeight();
-			if (method14(var2) && method14(var3)) {
+			if (checkDimension(var2) && checkDimension(var3)) {
 				if (var2 <= Emulator3D.MaxTextureDimension && var3 <= Emulator3D.MaxTextureDimension) {
 					this.removeReference(this.image);
 					this.image = var1;
