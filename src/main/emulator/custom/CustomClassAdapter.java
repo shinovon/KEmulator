@@ -73,7 +73,7 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 	}
 
 	public final void visit(final int n, final int n2, final String s, final String s2, String s3, final String[] array) {
-		if (n >= Opcodes.V1_5 && n != Opcodes.V1_1) {
+		if ((n & 0xFFFF) >= Opcodes.V1_5) {
 			throw new Error("Invalid class version: " + n);
 		}
 		parentClassName = s3;
