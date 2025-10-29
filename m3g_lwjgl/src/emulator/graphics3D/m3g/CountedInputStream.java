@@ -4,32 +4,32 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class CountedInputStream extends InputStream {
-	private InputStream iStream;
-	private int iCounter;
+	private InputStream stream;
+	private int counter;
 
 	public int read() throws IOException {
-		++this.iCounter;
-		return this.iStream.read();
+		++this.counter;
+		return this.stream.read();
 	}
 
 	public final void resetCounter() {
-		this.iCounter = 0;
+		this.counter = 0;
 	}
 
 	public final int getCounter() {
-		return this.iCounter;
+		return this.counter;
 	}
 
 	public int available() throws IOException {
-		return this.iStream.available();
+		return this.stream.available();
 	}
 
 	public void close() throws IOException {
-		this.iStream.close();
+		this.stream.close();
 	}
 
 	public CountedInputStream(InputStream var1) {
-		this.iStream = var1;
+		this.stream = var1;
 		this.resetCounter();
 	}
 }

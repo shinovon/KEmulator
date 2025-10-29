@@ -23,15 +23,15 @@ public final class M3GLoader {
 	static final byte[] PNG_MAGIC_NUMBER = new byte[]{-119, 80, 78, 71, 13, 10, 26, 10};
 	private static final Boolean NOT_REFERENCED = new Boolean(false);
 	private static final Boolean REFERENCED = new Boolean(true);
-	private Vector iLoadedObjects = new Vector();
-	private Vector iLoadedObjectsRef = new Vector();
-	private Vector iFileHistory = new Vector();
-	private Vector iAnimTracks = null;
-	private String iResourceName;
-	private String iParentResourceName;
-	private int iCurrentSection;
-	private boolean iContainedExternalLinks;
-	private boolean iExternalLinks;
+	private Vector loadedObjects = new Vector();
+	private Vector loadedObjectsRef = new Vector();
+	private Vector fileHistory = new Vector();
+	private Vector animTracks = null;
+	private String resourceName;
+	private String parentResourceName;
+	private int currentSection;
+	private boolean containedExternalLinks;
+	private boolean externalLinks;
 
 	public static Object3D[] load(String var0) throws IOException {
 		if (var0 == null) {
@@ -69,8 +69,8 @@ public final class M3GLoader {
 	}
 
 	private M3GLoader(Vector var1, String var2) {
-		this.iParentResourceName = var2;
-		this.iFileHistory = var1;
+		this.parentResourceName = var2;
+		this.fileHistory = var1;
 	}
 
 	private Object3D[] loadFromString(String var1) throws IOException {
@@ -79,13 +79,13 @@ public final class M3GLoader {
 		} else if (this.inFileHistory(var1)) {
 			throw new IOException("Reference loop detected.");
 		} else {
-			this.iResourceName = var1;
-			this.iFileHistory.addElement(var1);
+			this.resourceName = var1;
+			this.fileHistory.addElement(var1);
 			PeekInputStream var2;
 			int var3 = getFileType(var2 = new PeekInputStream(this.getInputStream(var1), 12));
 			var2.rewind();
 			Object3D[] var4 = this.loadStream(var2, var3);
-			this.iFileHistory.removeElement(var1);
+			this.fileHistory.removeElement(var1);
 			return var4;
 		}
 	}
@@ -118,21 +118,21 @@ public final class M3GLoader {
 			throws IOException {
 		paramInputStream.skip(M3G_MAGIC_NUMBER.length);
 		while (loadSection(paramInputStream)) {
-			this.iCurrentSection += 1;
+			this.currentSection += 1;
 		}
 		return getUnreferencedObjects();
 	}
 
 	private boolean loadSection(InputStream var1) throws IOException {
-		if (this.iCurrentSection > 1 && this.iExternalLinks && !this.iContainedExternalLinks) {
-			throw new IOException("No external sections (" + this.iResourceName + ").");
+		if (this.currentSection > 1 && this.externalLinks && !this.containedExternalLinks) {
+			throw new IOException("No external sections (" + this.resourceName + ").");
 		} else {
 			AdlerInputStream ais;
 			int compression;
 			if ((compression = readByte(ais = new AdlerInputStream(var1))) == -1) {
 				return false;
-			} else if (this.iCurrentSection == 0 && compression != 0) {
-				throw new IOException("Compressed header (" + this.iResourceName + ").");
+			} else if (this.currentSection == 0 && compression != 0) {
+				throw new IOException("Compressed header (" + this.resourceName + ").");
 			} else {
 				long var5 = readUInt32LE(ais);
 				long var7 = readUInt32LE(ais);
@@ -169,7 +169,7 @@ public final class M3GLoader {
 					long var12 = ais.getChecksum();
 					long var14 = readUInt32LE(ais);
 					if (var12 != var14) {
-						throw new IOException("Checksum is wrong (" + this.iResourceName + ").");
+						throw new IOException("Checksum is wrong (" + this.resourceName + ").");
 					} else {
 						return true;
 					}
@@ -185,8 +185,8 @@ public final class M3GLoader {
 		Object object = null;
 		switch (var2) {
 			case 0:
-				if (this.iCurrentSection != 0) {
-					throw new IOException("Header in wrong section (" + this.iResourceName + ").");
+				if (this.currentSection != 0) {
+					throw new IOException("Header in wrong section (" + this.resourceName + ").");
 				}
 
 				this.readHeader(var1);
@@ -258,24 +258,24 @@ public final class M3GLoader {
 				object = this.readWorld(var1);
 				break;
 			case 255:
-				if (this.iCurrentSection != 1) {
-					throw new IOException("External reference in wrong section (" + this.iResourceName + ").");
+				if (this.currentSection != 1) {
+					throw new IOException("External reference in wrong section (" + this.resourceName + ").");
 				}
 
-				if (!this.iExternalLinks) {
-					throw new IOException("External links in self contained file (" + this.iResourceName + ").");
+				if (!this.externalLinks) {
+					throw new IOException("External links in self contained file (" + this.resourceName + ").");
 				}
 
 				String var8 = readString(var1);
-				this.iContainedExternalLinks = true;
-				object = (new M3GLoader(this.iFileHistory, this.iResourceName)).loadFromString(var8)[0];
+				this.containedExternalLinks = true;
+				object = (new M3GLoader(this.fileHistory, this.resourceName)).loadFromString(var8)[0];
 				break;
 			default:
-				throw new IOException("Unrecognized object type " + var2 + " (" + this.iResourceName + ").");
+				throw new IOException("Unrecognized object type " + var2 + " (" + this.resourceName + ").");
 		}
 
 		if (var5 != (long) var1.getCounter()) {
-			throw new IOException("Object length mismatch (" + this.iResourceName + ").");
+			throw new IOException("Object length mismatch (" + this.resourceName + ").");
 		} else {
 			this.addAnimTracks((Object3D) object);
 			return (Object3D) object;
@@ -284,8 +284,8 @@ public final class M3GLoader {
 
 	private void addLoaded(Object3D var1) {
 		if (var1 != null) {
-			this.iLoadedObjects.addElement(var1);
-			this.iLoadedObjectsRef.addElement(NOT_REFERENCED);
+			this.loadedObjects.addElement(var1);
+			this.loadedObjectsRef.addElement(NOT_REFERENCED);
 		}
 
 	}
@@ -293,20 +293,20 @@ public final class M3GLoader {
 	private Object3D getLoaded(int var1) {
 		if (var1 == 0) {
 			return null;
-		} else if (var1 >= 2 && var1 - 2 < this.iLoadedObjects.size()) {
-			this.iLoadedObjectsRef.setElementAt(REFERENCED, var1 - 2);
-			return (Object3D) this.iLoadedObjects.elementAt(var1 - 2);
+		} else if (var1 >= 2 && var1 - 2 < this.loadedObjects.size()) {
+			this.loadedObjectsRef.setElementAt(REFERENCED, var1 - 2);
+			return (Object3D) this.loadedObjects.elementAt(var1 - 2);
 		} else {
-			throw new IllegalArgumentException("Invalid reference index (" + this.iResourceName + ").");
+			throw new IllegalArgumentException("Invalid reference index (" + this.resourceName + ").");
 		}
 	}
 
 	private Object3D[] getUnreferencedObjects() {
 		Vector var1 = new Vector();
 
-		for (int var2 = 0; var2 < this.iLoadedObjects.size(); ++var2) {
-			if (this.iLoadedObjectsRef.elementAt(var2) == NOT_REFERENCED) {
-				var1.addElement(this.iLoadedObjects.elementAt(var2));
+		for (int var2 = 0; var2 < this.loadedObjects.size(); ++var2) {
+			if (this.loadedObjectsRef.elementAt(var2) == NOT_REFERENCED) {
+				var1.addElement(this.loadedObjects.elementAt(var2));
 			}
 		}
 
@@ -323,11 +323,11 @@ public final class M3GLoader {
 			throws IOException {
 		byte[] arrayOfByte = new byte[2];
 		paramInputStream.read(arrayOfByte);
-		this.iExternalLinks = readBit(paramInputStream);
+		this.externalLinks = readBit(paramInputStream);
 		readUInt32LE(paramInputStream);
 		readUInt32LE(paramInputStream);
 		if ((arrayOfByte[0] != 1) || (arrayOfByte[1] != 0)) {
-			throw new IOException("Invalid file version (" + this.iResourceName + ").");
+			throw new IOException("Invalid file version (" + this.resourceName + ").");
 		}
 		readString(paramInputStream);
 	}
@@ -335,7 +335,7 @@ public final class M3GLoader {
 	private void readObject3DData(Object3D var1, InputStream var2) throws IOException {
 		var1.setUserID( (int)readUInt32LE(var2) );
 		long var3 = readUInt32LE(var2);
-		this.iAnimTracks = new Vector();
+		this.animTracks = new Vector();
 
 		while (var3-- > 0L) {
 			AnimationTrack var5;
@@ -343,7 +343,7 @@ public final class M3GLoader {
 				throw new NullPointerException();
 			}
 
-			this.iAnimTracks.addElement(var5);
+			this.animTracks.addElement(var5);
 		}
 
 		long var6 = readUInt32LE(var2);
@@ -402,12 +402,12 @@ public final class M3GLoader {
 	}
 
 	private void addAnimTracks(Object3D var1) {
-		if (this.iAnimTracks != null && var1 != null) {
-			for (int var2 = 0; var2 < this.iAnimTracks.size(); ++var2) {
-				var1.addAnimationTrack((AnimationTrack) this.iAnimTracks.elementAt(var2));
+		if (this.animTracks != null && var1 != null) {
+			for (int var2 = 0; var2 < this.animTracks.size(); ++var2) {
+				var1.addAnimationTrack((AnimationTrack) this.animTracks.elementAt(var2));
 			}
 
-			this.iAnimTracks = null;
+			this.animTracks = null;
 		}
 
 	}
@@ -483,7 +483,7 @@ public final class M3GLoader {
 			var2.setPerspective(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
 		} else {
 			if (var3 != 49) {
-				throw new IOException("Projection type not recognized: " + var3 + "(" + this.iResourceName + ").");
+				throw new IOException("Projection type not recognized: " + var3 + "(" + this.resourceName + ").");
 			}
 
 			var2.setParallel(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
@@ -582,7 +582,7 @@ public final class M3GLoader {
 			}
 		} else {
 			if (var5 != 1 && var5 != 2) {
-				throw new IOException("Encoding not recognized: " + var5 + "(" + this.iResourceName + ").");
+				throw new IOException("Encoding not recognized: " + var5 + "(" + this.resourceName + ").");
 			}
 
 			float[] var19 = new float[var9];
@@ -809,7 +809,7 @@ public final class M3GLoader {
 					++var6;
 				}
 			default:
-				throw new IllegalArgumentException("Invalid TriangleStripArray encoding (" + this.iResourceName + ").");
+				throw new IllegalArgumentException("Invalid TriangleStripArray encoding (" + this.resourceName + ").");
 		}
 
 		int[] var9 = new int[(int) readUInt32LE(var1)];
@@ -832,7 +832,7 @@ public final class M3GLoader {
 		int var5 = readByte(var1);
 		int var6 = readInt16LE(var1);
 		if (var5 != 0 && var5 != 1) {
-			throw new IllegalArgumentException("Invalid VertexArray encoding (" + this.iResourceName + ").");
+			throw new IllegalArgumentException("Invalid VertexArray encoding (" + this.resourceName + ").");
 		} else {
 			VertexArray var7 = new VertexArray(var6, var4, var3);
 			int[] var8 = new int[var4];
@@ -1070,8 +1070,8 @@ public final class M3GLoader {
 	}
 
 	private boolean inFileHistory(String var1) {
-		for (int var2 = 0; var2 < this.iFileHistory.size(); ++var2) {
-			if (((String) this.iFileHistory.elementAt(var2)).equals(var1)) {
+		for (int var2 = 0; var2 < this.fileHistory.size(); ++var2) {
+			if (((String) this.fileHistory.elementAt(var2)).equals(var1)) {
 				return true;
 			}
 		}
@@ -1095,11 +1095,11 @@ public final class M3GLoader {
 			return getHttpInputStream(var1);
 		} else if (var1.charAt(0) == 47) {
 			return ResourceManager.getResourceAsStream(var1);
-		} else if (this.iParentResourceName == null) {
+		} else if (this.parentResourceName == null) {
 			throw new IOException("Relative URI.");
 		} else {
 			String var2;
-			return (var2 = this.iParentResourceName.substring(0, this.iParentResourceName.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? ResourceManager.getResourceAsStream(var2) : getHttpInputStream(var2);
+			return (var2 = this.parentResourceName.substring(0, this.parentResourceName.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? ResourceManager.getResourceAsStream(var2) : getHttpInputStream(var2);
 		}
 	}
 
