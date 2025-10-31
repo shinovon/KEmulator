@@ -225,12 +225,20 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 	}
 
-	protected void notifyListeners(final String s, final Object o) {
+	protected void notifyListeners(final String event, final Object data, boolean thread) {
 		if (listeners == null)
 			return;
+		if (thread) {
+			new Thread(() -> _notifyListeners(event, data)).start();
+		} else {
+			_notifyListeners(event, data);
+		}
+	}
+
+	private void _notifyListeners(String event, Object data) {
 		final Enumeration<PlayerListener> elements = listeners.elements();
 		while (elements.hasMoreElements()) {
-			elements.nextElement().playerUpdate(this, s.intern(), o);
+			elements.nextElement().playerUpdate(PlayerImpl.this, event.intern(), data);
 		}
 	}
 
@@ -273,7 +281,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 		sequence = null;
 		state = CLOSED;
-		notifyListeners(PlayerListener.CLOSED, null);
+		notifyListeners(PlayerListener.CLOSED, null, true);
 	}
 
 	public void deallocate() throws IllegalStateException {
@@ -608,8 +616,11 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				stopped = false;
 				(playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
 			} else {
-				notifyListeners(PlayerListener.STARTED, 0);
-				notifyListeners(PlayerListener.END_OF_MEDIA, 0);
+				try {
+					notifyListeners(PlayerListener.STARTED, 0, true);
+					Thread.sleep(50);
+					notifyListeners(PlayerListener.END_OF_MEDIA, 0, true);
+				} catch (Exception ignored) {}
 				return;
 			}
 			setLevel(level);
@@ -689,7 +700,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						sequencer.start();
 					}
 					if (b) {
-						notifyListeners(PlayerListener.STARTED, mediaTime = globalMidi ? EmulatorMIDI.getMicrosecondPosition() : midiSequencer.getMicrosecondPosition());
+						notifyListeners(PlayerListener.STARTED,
+								mediaTime = globalMidi ? EmulatorMIDI.getMicrosecondPosition() : midiSequencer.getMicrosecondPosition(),
+								false);
 						b = false;
 					}
 					midiPlaying = true;
@@ -713,7 +726,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						clip.start();
 					}
 					if (b) {
-						notifyListeners(PlayerListener.STARTED, getMediaTime());
+						notifyListeners(PlayerListener.STARTED, getMediaTime(), false);
 						b = false;
 					}
 					synchronized (playLock) {
@@ -725,14 +738,14 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					}
 				} else if (sequence instanceof emulator.javazoom.jl.player.Player) {
 					if (b) {
-						notifyListeners(PlayerListener.STARTED, getMediaTime());
+						notifyListeners(PlayerListener.STARTED, getMediaTime(), false);
 						b = false;
 					}
 					try {
 						complete = ((emulator.javazoom.jl.player.Player) sequence).play(Integer.MAX_VALUE);
 					} catch (JavaLayerException e) {
 						e.printStackTrace();
-						notifyListeners(PlayerListener.ERROR, e.toString());
+						notifyListeners(PlayerListener.ERROR, e.toString(), false);
 						complete = true;
 						loopCount = 0;
 					}
@@ -757,7 +770,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 			playerThread = null;
 			state = PREFETCHED;
-			notifyListeners(complete ? PlayerListener.END_OF_MEDIA : PlayerListener.STOPPED, getMediaTime());
+			notifyListeners(complete ? PlayerListener.END_OF_MEDIA : PlayerListener.STOPPED, getMediaTime(), false);
 		} catch (Exception e) {
 			System.err.println("Exception in player thread!");
 			e.printStackTrace();
@@ -774,7 +787,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	public void setLevel(int n) {
 		if (n > 100) n = 100;
 		if (n < 0) n = 0;
-		if (level != n) notifyListeners(PlayerListener.VOLUME_CHANGED, n);
+		if (level != n) notifyListeners(PlayerListener.VOLUME_CHANGED, n, true);
 		level = n;
 		if (sequence == null) return;
 		final double n2 = n / 100.0;

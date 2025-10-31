@@ -44,12 +44,6 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
 				Emulator.getEmulator().getLogStream().println("Patched paint method: " + className);
 			}
-		} else if (Settings.patchSynchronizedPlayerUpdate &&
-				"playerUpdate".equals(name) && "(Ljavax/microedition/media/Player;Ljava/lang/String;Ljava/lang/Object;)V".equals(desc)) {
-			if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
-				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
-				Emulator.getEmulator().getLogStream().println("Patched playerUpdate method: " + className);
-			}
 		} else if ("()V".equals(desc)
 				&& (("java/lang/Thread".equals(parentClassName) &&
 					("stop".equals(name) || "resume".equals(name) || "suspend".equals(name)))

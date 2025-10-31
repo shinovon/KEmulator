@@ -71,7 +71,6 @@ public final class Settings {
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
 	public static ResizeMethod resizeMode = ResizeMethod.Fit;
 	public static boolean patchSynchronizedPaint = false;
-	public static boolean patchSynchronizedPlayerUpdate = true;
 
 	//m3g
 	public static boolean m3gIgnoreOverwrite;
