@@ -50,8 +50,10 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
 				Emulator.getEmulator().getLogStream().println("Patched playerUpdate method: " + className);
 			}
-		} else if ("()V".equals(desc) && "java/lang/Thread".equals(parentClassName) &&
-				("stop".equals(name) || "resume".equals(name) || "suspend".equals(name))) {
+		} else if ("()V".equals(desc)
+				&& (("java/lang/Thread".equals(parentClassName) &&
+					("stop".equals(name) || "resume".equals(name) || "suspend".equals(name)))
+					|| "finalize".equals(name))) {
 			Emulator.getEmulator().getLogStream().println("Patched illegal Thread method name: " + className);
 			hasRenamedMethods = true;
 			renamedClasses.add(className.replace('.', '/'));

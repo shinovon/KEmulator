@@ -195,7 +195,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			}
 		}
 		if (CustomClassAdapter.hasRenamedMethods && CustomClassAdapter.renamedClasses.contains(cls) && "()V".equals(sign) &&
-				(name.equals("stop") || name.equals("resume") || name.equals("suspend"))) {
+				(name.equals("stop") || name.equals("resume") || name.equals("suspend") || name.equals("finalize"))) {
 			name = name + "_";
 		}
 		super.visitMethodInsn(acc, cls, name, sign);
