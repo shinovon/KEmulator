@@ -108,7 +108,6 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			if (b == null) {
 				throw new MediaException("Cannot parse AMR data");
 			}
-			if (Settings.enableMediaDump) data = b;
 			InputStream i = this.inputStream = new ByteArrayInputStream(b);
 			final AudioFormat audioFormat = new AudioFormat(
 					AudioFormat.Encoding.PCM_SIGNED,
