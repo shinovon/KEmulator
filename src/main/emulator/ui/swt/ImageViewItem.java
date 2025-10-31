@@ -49,11 +49,11 @@ public class ImageViewItem {
 	}
 
 	public boolean ensureCache() {
-		if (allowCache) {
-			if (cache == null)
-				cache = new org.eclipse.swt.graphics.Image(null, CopyUtils.toSwt(((ImageAWT) drawable.getImpl()).getBufferedImage()));
-			return true;
-		}
+//		if (allowCache) {
+//			if (cache == null)
+//				cache = new org.eclipse.swt.graphics.Image(null, CopyUtils.toSwt(((ImageAWT) drawable.getImpl()).getBufferedImage()));
+//			return true;
+//		}
 		return false;
 	}
 
