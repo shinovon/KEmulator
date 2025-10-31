@@ -15,7 +15,12 @@ public class EmulatorMIDI {
 	private static Receiver receiver;
 
 	public static boolean useExternalReceiver() {
-		return Settings.searchVms && receiver != null && synthesizer == null;
+		try {
+			EmulatorMIDI.initDevice();
+			return Settings.searchVms && receiver != null && synthesizer == null;
+		} catch (MidiUnavailableException e) {
+			return false;
+		}
 	}
 
 	public static void initDevices() {
