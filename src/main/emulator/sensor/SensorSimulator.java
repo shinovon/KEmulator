@@ -24,12 +24,12 @@ public final class SensorSimulator extends SensorDevice implements Runnable {
 
 	private void updateSensorValues(final float[] array) {
 		if (this.simulatorClient.connected) {
-			this.simulatorClient.readSensor(SensorRegistry.getSensor(super.anInt445).getDescription(), array);
+			this.simulatorClient.readSensor(SensorRegistry.getSensor(super.sensorId).getDescription(), array);
 		}
 	}
 
 	public final boolean start() {
-		final String description = SensorRegistry.getSensor(super.anInt445).getDescription();
+		final String description = SensorRegistry.getSensor(super.sensorId).getDescription();
 		this.simulatorClient.connect();
 		this.simulatorClient.enableSensor(description);
 		this.startPolling();
@@ -37,7 +37,7 @@ public final class SensorSimulator extends SensorDevice implements Runnable {
 	}
 
 	public final boolean shutdownSensor() {
-		this.simulatorClient.disableSensor(SensorRegistry.getSensor(super.anInt445).getDescription());
+		this.simulatorClient.disableSensor(SensorRegistry.getSensor(super.sensorId).getDescription());
 		this.simulatorClient.disconnect();
 		this.stopPolling();
 		return true;

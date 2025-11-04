@@ -146,8 +146,8 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         }
         throw new IllegalArgumentException("This channel is not from this sensor");
     }
-    //method240 is unknown
-    protected final void method240(final int n, final Object[] array, final int n2) {
+    //method240 is unknown | 05.11.2025 and now is known
+    protected final void populateChannelObjectValues(final int n, final Object[] array, final int n2) {
         if (n2 == 1) {
             array[0] = new Double(this.sensorDevice.getNormalizedAngle(n));
         } else {

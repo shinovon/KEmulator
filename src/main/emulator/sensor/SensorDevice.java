@@ -1,11 +1,11 @@
 package emulator.sensor;
 
 public abstract class SensorDevice {
-	protected int anInt445;
+	protected int sensorId;
 
-	public SensorDevice(final int anInt445, final int n, final int n2) {
+	public SensorDevice(final int sensorId, final int n, final int n2) {
 		super();
-		this.anInt445 = anInt445;
+		this.sensorId = sensorId;
 	}
 
 	public abstract float getNormalizedAngle(final int p0);
