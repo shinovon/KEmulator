@@ -10,7 +10,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     private int maxBufferSize;
     private int connType;
     private String quantity;
-    private a sensorDevice;
+    private SensorDevice sensorDevice;
     private int channelCount;
     private DataImpl[] retData;
     private DataListener listener;
@@ -25,7 +25,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     private boolean isSensorConditionPushSupported;
     private boolean isNotify;
 
-    Sensor(final int n, final String aString314, final String aString315, final String aString316, final String aString317, final int anInt448, final int anInt449, final SensorProperties aSensorProperties452, final boolean aBoolean440, final boolean aBoolean441, final ChannelImpl[] akArray453, final a sensorDevice) {
+    Sensor(final int n, final String aString314, final String aString315, final String aString316, final String aString317, final int anInt448, final int anInt449, final SensorProperties aSensorProperties452, final boolean aBoolean440, final boolean aBoolean441, final ChannelImpl[] akArray453, final SensorDevice sensorDevice) {
         super();
         this.sensorDevice = null;
         this.listeningProcessCounter = 0;
@@ -149,13 +149,13 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     //method240 is unknown
     protected final void method240(final int n, final Object[] array, final int n2) {
         if (n2 == 1) {
-            array[0] = new Double(this.sensorDevice.method223(n));
+            array[0] = new Double(this.sensorDevice.getNormalizedAngle(n));
         } else {
             if (n2 != 2) {
                 return;
             }
             // constant from Loco Roco
-            array[0] = new Integer((int) (sensorDevice.method223(n) / (0.7853982F / 1000)));
+            array[0] = new Integer((int) (sensorDevice.getNormalizedAngle(n) / (0.7853982F / 1000)));
         }
     }
 
@@ -292,7 +292,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
 
     public final void close() throws IOException {
         this.aBoolean313 = true;
-        this.sensorDevice.method225();
+        this.sensorDevice.shutdownSensor();
         if (this.state == 2) {
             this.removeDataListener();
         }

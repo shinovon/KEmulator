@@ -27,7 +27,7 @@ public final class SensorRegistry {
 		}
 		final h h;
 		(h = new h()).setProperty("location", "acceleration");
-		final a method279 = m.method279(0);
+		final SensorDevice method279 = SensorFactory.createSensorProvider(0);
 		array[0] = new Sensor(0, "orientation", "acceleration", "device", "ACCM01", 256, 1, h, false, true, array3, method279);
 		final ChannelImpl[] array5 = new ChannelImpl[3];
 		for (int k = 0; k < 3; ++k) {
