@@ -10,7 +10,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     private int maxBufferSize;
     private int connType;
     private String quantity;
-    private a sensorDevice;
+    private SensorDevice sensorDevice;
     private int channelCount;
     private DataImpl[] retData;
     private DataListener listener;
@@ -25,24 +25,24 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     private boolean isSensorConditionPushSupported;
     private boolean isNotify;
 
-    Sensor(final int n, final String aString314, final String aString315, final String aString316, final String aString317, final int anInt448, final int anInt449, final SensorProperties aSensorProperties452, final boolean aBoolean440, final boolean aBoolean441, final ChannelImpl[] akArray453, final a sensorDevice) {
+    Sensor(final int n, final String description, final String quantity, final String contextType, final String model, final int maxBufferSize, final int connType, final SensorProperties props, final boolean isSensorAvailabilityPushSupported, final boolean isSensorConditionPushSupported, final ChannelImpl[] channels, final SensorDevice sensorDevice) {
         super();
         this.sensorDevice = null;
         this.listeningProcessCounter = 0;
-        this.description = aString314;
-        this.quantity = aString315;
-        this.contextType = aString316;
-        this.model = aString317;
-        this.maxBufferSize = anInt448;
-        this.connType = anInt449;
-        this.props = aSensorProperties452;
-        this.channels = akArray453;
-        this.isSensorAvailabilityPushSupported = aBoolean440;
-        this.isSensorConditionPushSupported = aBoolean441;
+        this.description = description;
+        this.quantity = quantity;
+        this.contextType = contextType;
+        this.model = model;
+        this.maxBufferSize = maxBufferSize;
+        this.connType = connType;
+        this.props = props;
+        this.channels = channels;
+        this.isSensorAvailabilityPushSupported = isSensorAvailabilityPushSupported;
+        this.isSensorConditionPushSupported = isSensorConditionPushSupported;
         this.sensorDevice = sensorDevice;
-        if (akArray453 != null && akArray453.length > 0) {
-            for (int i = 0; i < akArray453.length; ++i) {
-                akArray453[i].setSensor(this);
+        if (channels != null && channels.length > 0) {
+            for (int i = 0; i < channels.length; ++i) {
+                channels[i].setSensor(this);
             }
         }
         this.state = 4;
@@ -146,16 +146,16 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         }
         throw new IllegalArgumentException("This channel is not from this sensor");
     }
-    //method240 is unknown
-    protected final void method240(final int n, final Object[] array, final int n2) {
+    //method240 is unknown | 05.11.2025 and now is known
+    protected final void populateChannelObjectValues(final int n, final Object[] array, final int n2) {
         if (n2 == 1) {
-            array[0] = new Double(this.sensorDevice.method223(n));
+            array[0] = new Double(this.sensorDevice.getNormalizedAngle(n));
         } else {
             if (n2 != 2) {
                 return;
             }
             // constant from Loco Roco
-            array[0] = new Integer((int) (sensorDevice.method223(n) / (0.7853982F / 1000)));
+            array[0] = new Integer((int) (sensorDevice.getNormalizedAngle(n) / (0.7853982F / 1000)));
         }
     }
 
@@ -292,7 +292,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
 
     public final void close() throws IOException {
         this.aBoolean313 = true;
-        this.sensorDevice.method225();
+        this.sensorDevice.shutdownSensor();
         if (this.state == 2) {
             this.removeDataListener();
         }

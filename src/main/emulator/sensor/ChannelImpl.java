@@ -191,7 +191,7 @@ public final class ChannelImpl implements Channel, ChannelInfo, Runnable {
 			int dataCount = 0;
 			while (!this.isStopped && dataCount < this.bufferSize) {
 				final Object[] dataArray = {null};
-				this.sensor.method240(this.channelNumber, dataArray, this.getDataType());
+				this.sensor.populateChannelObjectValues(this.channelNumber, dataArray, this.getDataType());
 				if (this.lastValue != null && this.lastValue.equals(dataArray[0])) {
 					continue;
 				}
