@@ -35,7 +35,7 @@ public final class Methods implements Runnable, DisposeListener {
 	private Display display;
 	private boolean visible;
 	private static NumberFormat numberFormat;
-	private int anInt786;
+	private int sortColumnIndex;
 	private ArrayList methodDataList;
 
 	public Methods() {
@@ -56,7 +56,7 @@ public final class Methods implements Runnable, DisposeListener {
 		this.methodDataList = new ArrayList();
 	}
 
-	private void method448() {
+	private void refreshMethodData() {
 		this.methodDataList.clear();
 		this.methodDataList.addAll(h.methodProfiles.values());
 		final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
@@ -75,10 +75,10 @@ public final class Methods implements Runnable, DisposeListener {
 			tableItem.setText(8, Methods.numberFormat.format(data.timePercentage));
 		}
 		this.run();
-		this.method435(0);
+		this.sortMethodTable(0);
 	}
 
-	private void method435(final int n) {
+	private void sortMethodTable(final int n) {
 		this.methodsTable.setSortColumn(this.methodsTable.getColumn(n));
 		this.methodsTable.setSortDirection((this.methodsTable.getSortDirection() == 128) ? 1024 : 128);
 		Collections.sort((List<Object>) this.methodDataList, new MethodTableComparator(this, n));
@@ -128,7 +128,7 @@ public final class Methods implements Runnable, DisposeListener {
 		}
 	}
 
-	public final void method436() {
+	public final void showWindow() {
 		if (h.methodProfiles == null) {
 			h.methodProfiles = new Hashtable();
 			h.method591();
@@ -141,7 +141,7 @@ public final class Methods implements Runnable, DisposeListener {
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.visible = true;
-		this.method448();
+		this.refreshMethodData();
 		while (!this.shell.isDisposed()) {
 			if (!this.display.readAndDispatch()) {
 				this.display.sleep();
@@ -241,7 +241,7 @@ public final class Methods implements Runnable, DisposeListener {
 		tableColumn9.addSelectionListener(new Class74(this));
 	}
 
-	private void method439(final TableItem[] array) {
+	private void displayMethodDetails(final TableItem[] array) {
 		if (array == null || array.length < 1) {
 			return;
 		}
@@ -293,11 +293,11 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	static void method443(final Methods class46, final TableItem[] array) {
-		class46.method439(array);
+		class46.displayMethodDetails(array);
 	}
 
 	static void method444(final Methods class46, final int n) {
-		class46.method435(n);
+		class46.sortMethodTable(n);
 	}
 
 	static Text method434(final Methods class46) {
@@ -305,11 +305,11 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	static int method445(final Methods class46, final int anInt786) {
-		return class46.anInt786 = anInt786;
+		return class46.sortColumnIndex = anInt786;
 	}
 
 	static int method437(final Methods class46) {
-		return class46.anInt786;
+		return class46.sortColumnIndex;
 	}
 
 	static StyledText method440(final Methods class46) {
@@ -317,6 +317,6 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	static int method447(final Methods class46) {
-		return class46.anInt786++;
+		return class46.sortColumnIndex++;
 	}
 }

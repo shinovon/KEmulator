@@ -1598,7 +1598,7 @@ public final class EmulatorScreen implements
 					((SWTFrontend) Emulator.getEmulator()).getMethods().dispose();
 					return;
 				}
-				((SWTFrontend) Emulator.getEmulator()).getMethods().method436();
+				((SWTFrontend) Emulator.getEmulator()).getMethods().showWindow();
 				return;
 			}
 			if (menuItem == this.memoryViewMenuItem) {
