@@ -4,11 +4,11 @@ import emulator.custom.h;
 
 import java.util.Comparator;
 
-final class Class169 implements Comparator {
+final class MethodTableComparator implements Comparator {
 	private final int anInt1438;
 	private final Methods aClass46_1439;
 
-	Class169(final Methods aClass46_1439, final int anInt1438) {
+	MethodTableComparator(final Methods aClass46_1439, final int anInt1438) {
 		super();
 		this.aClass46_1439 = aClass46_1439;
 		this.anInt1438 = anInt1438;
@@ -23,19 +23,19 @@ final class Class169 implements Comparator {
 			int n2 = 0;
 			switch (this.anInt1438) {
 				case 0: {
-					n2 = methodInfo.aString1172.compareTo(methodInfo2.aString1172);
+					n2 = methodInfo.className.compareTo(methodInfo2.className);
 					break;
 				}
 				case 1: {
-					n2 = methodInfo.aString1177.compareTo(methodInfo2.aString1177);
+					n2 = methodInfo.methodName.compareTo(methodInfo2.methodName);
 					break;
 				}
 				case 2: {
-					n2 = methodInfo.aString1181.compareTo(methodInfo2.aString1181);
+					n2 = methodInfo.methodSignature.compareTo(methodInfo2.methodSignature);
 					break;
 				}
 				case 3: {
-					n2 = methodInfo.anInt1173 - methodInfo2.anInt1173;
+					n2 = methodInfo.codeSize - methodInfo2.codeSize;
 					break;
 				}
 				case 4: {
@@ -43,19 +43,19 @@ final class Class169 implements Comparator {
 					break;
 				}
 				case 5: {
-					n2 = methodInfo.anInt1182 - methodInfo2.anInt1182;
+					n2 = methodInfo.callCount - methodInfo2.callCount;
 					break;
 				}
 				case 6: {
-					n = ((methodInfo.aLong1179 - methodInfo2.aLong1179 == 0L) ? 0 : ((methodInfo.aLong1179 - methodInfo2.aLong1179 > 0L) ? 1 : -1));
+					n = ((methodInfo.totalExecutionTime - methodInfo2.totalExecutionTime == 0L) ? 0 : ((methodInfo.totalExecutionTime - methodInfo2.totalExecutionTime > 0L) ? 1 : -1));
 					break Label_0290;
 				}
 				case 7: {
-					n = ((methodInfo.aFloat1175 - methodInfo2.aFloat1175 == 0.0f) ? 0 : ((methodInfo.aFloat1175 - methodInfo2.aFloat1175 > 0.0f) ? 1 : -1));
+					n = ((methodInfo.averageExecutionTime - methodInfo2.averageExecutionTime == 0.0f) ? 0 : ((methodInfo.averageExecutionTime - methodInfo2.averageExecutionTime > 0.0f) ? 1 : -1));
 					break Label_0290;
 				}
 				case 8: {
-					n2 = ((methodInfo.aFloat1180 - methodInfo2.aFloat1180 == 0.0f) ? 0 : ((methodInfo.aFloat1180 - methodInfo2.aFloat1180 > 0.0f) ? 1 : -1));
+					n2 = ((methodInfo.timePercentage - methodInfo2.timePercentage == 0.0f) ? 0 : ((methodInfo.timePercentage - methodInfo2.timePercentage > 0.0f) ? 1 : -1));
 					break;
 				}
 			}
