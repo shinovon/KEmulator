@@ -188,4 +188,37 @@ public class SkinnedMesh extends Mesh {
 	public int[] getVerticesWeights() {
 		return vtxWeights;
 	}
+
+	public void getBoneTransform(Node bone, Transform transform) {
+		if (bone == null) {
+			throw new NullPointerException("bone");
+		}
+		if (transform == null) {
+			throw new NullPointerException("transform");
+		}
+		for (int i = 0; i < boneTransList.size(); i++) {
+			BoneTransform boneTrans = boneTransList.elementAt(i);
+
+			if (boneTrans.bone == bone) {
+				transform.set(boneTrans.toBoneTrans);
+				return;
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+
+	public int getBoneVertices(Node bone, int[] indices, float[] weights) {
+		if (bone == null) {
+			throw new NullPointerException("bone");
+		}
+		for (int i = 0; i < boneTransList.size(); i++) {
+			BoneTransform boneTrans = boneTransList.elementAt(i);
+
+			if (boneTrans.bone == bone) {
+				// TODO
+				return 0;
+			}
+		}
+		throw new IllegalArgumentException();
+	}
 }

@@ -389,31 +389,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 		} else if (sequence instanceof emulator.javazoom.jl.player.Player) {
 			long l = getMediaTime();
-//			if (true) return l; // TODO
 			if (t == 0 && l == 0 || !((emulator.javazoom.jl.player.Player) sequence).isBuffered)
 				return 0;
-			if (t < l) {
-				try {
-					stop();
-					Header old = ((emulator.javazoom.jl.player.Player) sequence).bitstream().header;
-					((emulator.javazoom.jl.player.Player) sequence).reset();
-					((emulator.javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
-					ms = ((emulator.javazoom.jl.player.Player) sequence).getPosition() * 1000L;
-					start();
-				} catch (JavaLayerException e) {
-					throw new MediaException(e);
-				}
-			} else {
-				try {
-					stop();
-					Header old = ((emulator.javazoom.jl.player.Player) sequence).bitstream().header;
-					((emulator.javazoom.jl.player.Player) sequence).reset();
-					((emulator.javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
-					ms = ((emulator.javazoom.jl.player.Player) sequence).getPosition() * 1000L;
-					start();
-				} catch (JavaLayerException e) {
-					throw new MediaException(e);
-				}
+			try {
+				stop();
+				Header old = ((emulator.javazoom.jl.player.Player) sequence).bitstream().header;
+				((emulator.javazoom.jl.player.Player) sequence).reset();
+				((emulator.javazoom.jl.player.Player) sequence).skip((int) (t / 1000L), old);
+				ms = ((emulator.javazoom.jl.player.Player) sequence).getPosition() * 1000L;
+				start();
+			} catch (JavaLayerException e) {
+				throw new MediaException(e);
 			}
 		}
 		return mediaTime = ms;
