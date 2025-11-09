@@ -135,15 +135,22 @@ public class SkinnedMesh extends Mesh {
 			boneTransId = boneTransList.size() - 1;
 		}
 
+		int transPerVtx = Emulator3D.MaxTransformsPerVertex;
+
 		for (int i = firstVertex; i < firstVertex + numVertices; i++) {
-			//find bone slot with minimal weight
+			//find slot with minimal weight or with the same bone id
 			int minWeight = Integer.MAX_VALUE;
 			int selSlot = -1;
 
-			for (int slot = 0; slot < Emulator3D.MaxTransformsPerVertex; slot++) {
-				int slotWeight = vtxWeights[i * Emulator3D.MaxTransformsPerVertex + slot];
+			for (int slot = 0; slot < transPerVtx; slot++) {
+				int slotWeight = vtxWeights[i * transPerVtx + slot];
 
-				if (slotWeight < minWeight) {
+				if (vtxBones[i * transPerVtx + slot] == boneTransId + 1) {
+					selSlot = slot;
+					break;
+				}
+
+				if (slotWeight <= minWeight) {
 					minWeight = slotWeight;
 					selSlot = slot;
 
@@ -151,12 +158,17 @@ public class SkinnedMesh extends Mesh {
 				}
 			}
 
-			//selected slot weight should be less than current bone weight
-			if (minWeight > weight) selSlot = -1;
+			//add transform
+			if (vtxBones[i * transPerVtx + selSlot] == boneTransId + 1) {
+				vtxWeights[i * transPerVtx + selSlot] += weight;
+			} else {
+				//selected slot weight should be less than current bone weight
+				if (minWeight > weight) selSlot = -1;
 
-			if (selSlot != -1) {
-				vtxBones[i * Emulator3D.MaxTransformsPerVertex + selSlot] = boneTransId + 1;
-				vtxWeights[i * Emulator3D.MaxTransformsPerVertex + selSlot] = weight;
+				if (selSlot != -1) {
+					vtxBones[i * transPerVtx + selSlot] = boneTransId + 1;
+					vtxWeights[i * transPerVtx + selSlot] = weight;
+				}
 			}
 		}
 
