@@ -196,6 +196,9 @@ public class SkinnedMesh extends Mesh {
 		if (transform == null) {
 			throw new NullPointerException("transform");
 		}
+		if (bone != skeleton && !bone.isDescendantOf(skeleton)) {
+			throw new IllegalArgumentException();
+		}
 		for (int i = 0; i < boneTransList.size(); i++) {
 			BoneTransform boneTrans = boneTransList.elementAt(i);
 
@@ -204,21 +207,46 @@ public class SkinnedMesh extends Mesh {
 				return;
 			}
 		}
-		throw new IllegalArgumentException();
 	}
 
 	public int getBoneVertices(Node bone, int[] indices, float[] weights) {
 		if (bone == null) {
 			throw new NullPointerException("bone");
 		}
-		for (int i = 0; i < boneTransList.size(); i++) {
-			BoneTransform boneTrans = boneTransList.elementAt(i);
-
-			if (boneTrans.bone == bone) {
-				// TODO
-				return 0;
+		if (bone != skeleton && !bone.isDescendantOf(skeleton)) {
+			throw new IllegalArgumentException();
+		}
+		int numVertices = vertices.getVertexCount();
+		int boneCount = boneTransList.size();
+		int boneIndex;
+		for (boneIndex = 0; boneIndex < boneCount; boneIndex++) {
+			if (boneTransList.elementAt(boneIndex).bone == bone) {
+				break;
 			}
 		}
-		throw new IllegalArgumentException();
+
+		int count = 0;
+		if (boneIndex < boneCount) {
+			final int bonesPerVertex = Emulator3D.MaxTransformsPerVertex;
+			for (int i = 0; i < numVertices; i++) {
+				for (int j = 0; j < indices.length; j++) {
+					if (vtxBones[j * bonesPerVertex + i] == boneIndex && vtxWeights[j * bonesPerVertex + i] > 0) {
+						int k, sum = 0;
+						for (k = 0; k < bonesPerVertex; ++k) {
+							sum += vtxWeights[k * bonesPerVertex + i];
+						}
+						indices[count] = i;
+						if (sum != 0) {
+							weights[count] = ((float) vtxWeights[j * bonesPerVertex + i]) / sum;
+						}
+						else {
+							weights[count] = 0;
+						}
+						++count;
+					}
+				}
+			}
+		}
+		return count;
 	}
 }
