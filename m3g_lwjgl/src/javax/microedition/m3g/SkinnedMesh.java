@@ -229,17 +229,16 @@ public class SkinnedMesh extends Mesh {
 		if (boneIndex < boneCount) {
 			final int bonesPerVertex = Emulator3D.MaxTransformsPerVertex;
 			for (int i = 0; i < numVertices; i++) {
-				for (int j = 0; j < indices.length; j++) {
+				for (int j = 0; j < bonesPerVertex; j++) {
 					if (vtxBones[j * bonesPerVertex + i] == boneIndex && vtxWeights[j * bonesPerVertex + i] > 0) {
-						int k, sum = 0;
-						for (k = 0; k < bonesPerVertex; ++k) {
+						int sum = 0;
+						for (int k = 0; k < bonesPerVertex; ++k) {
 							sum += vtxWeights[k * bonesPerVertex + i];
 						}
 						indices[count] = i;
 						if (sum != 0) {
 							weights[count] = ((float) vtxWeights[j * bonesPerVertex + i]) / sum;
-						}
-						else {
+						} else {
 							weights[count] = 0;
 						}
 						++count;
