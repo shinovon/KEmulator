@@ -12,10 +12,10 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 
-final class Class164 extends SelectionAdapter {
+final class ExportBytecodeListener extends SelectionAdapter {
 	private final Methods aClass46_1432;
 
-	Class164(final Methods aClass46_1432) {
+	ExportBytecodeListener(final Methods aClass46_1432) {
 		super();
 		this.aClass46_1432 = aClass46_1432;
 	}
@@ -30,7 +30,7 @@ final class Class164 extends SelectionAdapter {
 		if ((open = fileDialog.open()) != null) {
 			try {
 				final PrintWriter printWriter = new PrintWriter(new FileOutputStream(open));
-				final Enumeration<h.MethodInfo> elements = h.aHashtable1061.elements();
+				final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
 				while (elements.hasMoreElements()) {
 					printWriter.write(elements.nextElement().method705(true, true));
 				}

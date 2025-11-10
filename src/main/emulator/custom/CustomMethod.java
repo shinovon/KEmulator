@@ -245,14 +245,14 @@ public class CustomMethod {
 	}
 
 	public static void beginMethod(final String s) {
-		if (h.aHashtable1061 == null) {
-			h.aHashtable1061 = new Hashtable();
+		if (h.methodProfiles == null) {
+			h.methodProfiles = new Hashtable();
 			h.method591();
 		}
 		final h.MethodInfo methodInfo;
-		if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
+		if ((methodInfo = (MethodInfo) h.methodProfiles.get(s)) != null) {
 			final int method16 = method16();
-			++methodInfo.anInt1182;
+			++methodInfo.callCount;
 			trackStr = "";
 			for (int i = 0; i < method16; ++i) {
 				trackStr += ("  ");
@@ -265,10 +265,10 @@ public class CustomMethod {
 
 	public static void endMethod(final String s) {
 		final h.MethodInfo methodInfo;
-		if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
-			if (methodInfo.anInt1182 > 0) {
-				methodInfo.aLong1179 += System.currentTimeMillis() - methodInfo.aLong1174;
-				methodInfo.aFloat1175 = (float) methodInfo.aLong1179 / methodInfo.anInt1182;
+		if ((methodInfo = (MethodInfo) h.methodProfiles.get(s)) != null) {
+			if (methodInfo.callCount > 0) {
+				methodInfo.totalExecutionTime += System.currentTimeMillis() - methodInfo.aLong1174;
+				methodInfo.averageExecutionTime = (float) methodInfo.totalExecutionTime / methodInfo.callCount;
 			}
 			method17();
 		}

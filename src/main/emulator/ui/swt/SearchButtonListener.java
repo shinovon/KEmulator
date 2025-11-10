@@ -3,10 +3,10 @@ package emulator.ui.swt;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-final class Class79 extends SelectionAdapter {
+final class SearchButtonListener extends SelectionAdapter {
 	private final Methods aClass46_863;
 
-	Class79(final Methods aClass46_863) {
+	SearchButtonListener(final Methods aClass46_863) {
 		super();
 		this.aClass46_863 = aClass46_863;
 	}
