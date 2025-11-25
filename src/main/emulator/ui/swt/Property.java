@@ -765,6 +765,7 @@ public final class Property implements IProperty, SelectionListener {
 
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
+			properties.setProperty("MicroeditionPlatform", Settings.microeditionPlatform);
 
 			// emulator
 			properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
