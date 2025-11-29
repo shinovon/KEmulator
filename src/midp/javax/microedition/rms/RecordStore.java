@@ -59,7 +59,7 @@ public class RecordStore {
 			}
 			boolean convert = false;
 			File file = new File(rootPath + "idx");
-			String oldPath = Emulator.getEmulator().getProperty().getOldRmsPath() + "." + aName + "/" + aName;
+			String oldPath = Emulator.getEmulator().getProperty().getOldRmsPath() + "." + aName + File.separatorChar + aName;
 			if (!file.exists()) {
 				if (aHomeSuite) {
 					// fallback
@@ -190,7 +190,7 @@ public class RecordStore {
 	public static RecordStore openRecordStore(String name, boolean createIfNecessary, int authmode, boolean writable) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("openRecordStore " + name);
-		String rootPath = homeRootPath + encodeBase64(name) + "/";
+		String rootPath = homeRootPath + encodeBase64(name) + File.separatorChar;
 		RecordStore rs = findRecordStore(rootPath);
 		if (rs != null) {
 			rs.openCount++;
@@ -200,7 +200,7 @@ public class RecordStore {
 		File file = new File(rootPath);
 		boolean exists = file.exists() && file.isDirectory() && (file = new File(rootPath + "idx")).exists();
 		if (!exists) {
-			String oldPath = Emulator.getEmulator().getProperty().getOldRmsPath() + "." + name + "/" + name + ".idx";
+			String oldPath = Emulator.getEmulator().getProperty().getOldRmsPath() + "." + name + File.separatorChar + name + ".idx";
 			file = new File(oldPath);
 			exists = file.exists();
 		}
@@ -218,7 +218,7 @@ public class RecordStore {
 	public static RecordStore openRecordStore(String name, String vendorName, String suiteName) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("openRecordStore " + name + " " + vendorName + " " + suiteName);
-		String rootPath = getRootPath(name, vendorName, suiteName) + encodeBase64(name) + "/";
+		String rootPath = getRootPath(name, vendorName, suiteName) + encodeBase64(name) + File.separatorChar;
 		RecordStore rs = findRecordStore(rootPath);
 		if (rs != null) {
 			rs.openCount++;
@@ -235,7 +235,7 @@ public class RecordStore {
 	public static void deleteRecordStore(String name) throws RecordStoreException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("deleteRecordStore " + name);
-		String rootPath = homeRootPath + encodeBase64(name) + "/";
+		String rootPath = homeRootPath + encodeBase64(name) + File.separatorChar;
 		if (findRecordStore(rootPath) != null) {
 			logln("tried to delete active store");
 			throw new RecordStoreException("Cannot delete currently opened record store: " + name);
@@ -266,7 +266,7 @@ public class RecordStore {
 			ArrayList<String> tmp = new ArrayList<String>();
 			if (list != null) {
 				for (String s : list) {
-					if (!new File(file.getAbsolutePath() + "/" + s + "/idx").exists())
+					if (!new File(file.getAbsolutePath() + File.separatorChar + s + File.separatorChar + "idx").exists())
 						continue;
 					tmp.add(decodeBase64(s));
 				}
@@ -506,7 +506,7 @@ public class RecordStore {
 	}
 
 	private static String getRootPath(String name, String vendorName, String suiteName) throws RecordStoreNotFoundException {
-		String s = rmsRootDir + encodeBase64(vendorName + "_" + suiteName) + "/";
+		String s = rmsRootDir + encodeBase64(vendorName + "_" + suiteName) + File.separatorChar;
 		File file = new File(s);
 		if (!file.exists() || !file.isDirectory()) {
 			file.mkdir();
