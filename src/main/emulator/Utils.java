@@ -12,7 +12,8 @@ public class Utils {
 	public static final boolean win = os.startsWith("win");
 	public static final boolean linux = os.contains("linux") || os.contains("nix");
 	public static final boolean macos = os.contains("mac");
-	public static final boolean termux = String.valueOf(System.getProperty("java.vm.vendor")).toLowerCase().contains("termux");
+	public static final boolean termux = String.valueOf(System.getProperty("java.vm.vendor")).toLowerCase().contains("termux")
+			|| String.valueOf(System.getProperty("user.dir")).toLowerCase().startsWith("/data/data/com.termux/");
 
 	// copied from JDK 24
 	public static String translateEscapes(String input) {
