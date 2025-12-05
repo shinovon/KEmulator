@@ -23,6 +23,7 @@ public final class Settings {
 	public static boolean infoColorHex;
 	public static boolean recordReleasedImg;
 	public static boolean xrayView;
+	public static boolean xrayBuffer;
 	public static boolean xrayOverlapScreen;
 	public static boolean xrayShowClipBorder;
 	public static int speedModifier = 1;

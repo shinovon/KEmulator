@@ -39,7 +39,7 @@ public class Image {
 	}
 
 	protected IImage getXRayBuffer() {
-		if (this.xrayBuffer == null && Settings.xrayView) {
+		if (this.xrayBuffer == null && (Settings.xrayView || Settings.xrayBuffer)) {
 			this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
 		}
 		return this.xrayBuffer;
@@ -62,7 +62,7 @@ public class Image {
 //		if (!this.mutable) {
 //			throw new IllegalStateException("the image is immutable.");
 //		}
-		if (this.xrayBuffer == null && Settings.xrayView) {
+		if (this.xrayBuffer == null && (Settings.xrayView || Settings.xrayBuffer)) {
 			this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
 		}
 
@@ -113,7 +113,7 @@ public class Image {
 		if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
 		final Image image;
 		(image = new Image(Emulator.getEmulator().newImage(n, n2, false))).mutable = true;
-		if (Settings.xrayView)
+		if (Settings.xrayView || Settings.xrayBuffer)
 			image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
 		return image;
 	}
@@ -122,7 +122,7 @@ public class Image {
 		if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
 		final Image image;
 		(image = new Image(Emulator.getEmulator().newImage(n, n2, true, color))).mutable = true;
-		if (Settings.xrayView)
+		if (Settings.xrayView || Settings.xrayBuffer)
 			image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true, color);
 		return image;
 	}
@@ -137,7 +137,7 @@ public class Image {
 		final int n7 = b ? n4 : n3;
 		final Image image2;
 		(image2 = new Image(Emulator.getEmulator().newImage(n6, n7, true, 0))).mutable = true;
-		if (Settings.xrayView)
+		if (Settings.xrayView || Settings.xrayBuffer)
 			image2.xrayBuffer = Emulator.getEmulator().newImage(n6, n7, true, 0);
 		image2.getGraphics().drawRegion(image, n, n2, n3, n4, n5, 0, 0, 20);
 		image2.mutable = false;

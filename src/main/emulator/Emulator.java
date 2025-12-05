@@ -928,6 +928,9 @@ public class Emulator implements Runnable {
 				updated = true;
 			} else if (key.equals("bridge")) {
 				bridge = true;
+			} else if (key.equals("xray")) {
+				Settings.xrayView = true;
+				Settings.xrayBuffer = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
