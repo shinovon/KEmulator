@@ -495,7 +495,7 @@ public final class Memory {
 		} else if (o instanceof byte[]) {
 			n = 16 + ((byte[]) o).length;
 		} else if (o instanceof boolean[]) {
-			n = 16 + 4 * ((boolean[]) o).length;
+			n = 16 + ((boolean[]) o).length;
 		} else if (o instanceof double[]) {
 			n = 16 + 8 * ((double[]) o).length;
 		} else if (o instanceof float[]) {
