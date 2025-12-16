@@ -1,10 +1,15 @@
-$v2.20.1 [2025.10.25]
+$v2.20.1 [2025.12.16]
 Fixed Media View with Java 9+
 Fixed LWJGL loading on Intel Mac
 Fix Siemens File API
 Optimized image rendering in MemoryView
 Added Nokia OTT decoder from FreeJ2ME-Plus
 Updated About window
+Reimplemented mmfplayer.dll with JNA
+Fixed AMR dumping
+Stub com.nokia.mid.ui.gestures
+Implemented missing SkinnedMesh functions from M3G 1.1
+Fix M3G on macOS Big Sur and later
 
 $v2.20 [2025.08.24]
 DoJa initial support
