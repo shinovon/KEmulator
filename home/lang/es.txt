@@ -346,7 +346,7 @@ OPTION_NETWORK_PROXY_EMPTY=¡Host de proxy vacío!
 OPTION_NETWORK_PROXY_UNIMP=¡La prueba de proxy está subimplementada!
 
 OPTION_MEDIA_VLC_DIR=Ruta de VLC
-OPTION_MEDIA_VMS=Buscar VirtualMIDISynth como dispositivo MIDI
+OPTION_MEDIA_VMS=Buscar VirtualMIDISynth/FluidSynth como dispositivo MIDI
 OPTION_MEDIA_GLOBAL_MIDI=Permitir solo una reproducción MIDI a la vez (reduce el retardo)
 OPTION_MEDIA_REOPEN_MIDI=Reabrir siempre el dispositivo MIDI
 OPTION_MEDIA_DUMP=Habilitar la exportación de medios (mayor uso de memoria)

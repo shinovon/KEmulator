@@ -36,7 +36,10 @@ public class EmulatorMIDI {
 	public static void initDevice(boolean noVms) throws MidiUnavailableException {
 		if (receiver == null && Settings.searchVms && !noVms) {
 			for (MidiDevice.Info info : deviceInfo) {
-				if (info.getName().toLowerCase().contains("virtualmidisynth")) {
+				String deviceName = info.getName()
+					.toLowerCase()
+					.replaceAll("\\s+", "");
+				if (deviceName.contains("virtualmidisynth") || deviceName.contains("fluidsynth")) {
 					device = MidiSystem.getMidiDevice(info);
 					device.open();
 					receiver = device.getReceiver();

@@ -2132,7 +2132,7 @@ public final class Property implements IProperty, SelectionListener {
 		vlcDirText.setText(Settings.vlcDir);
 
 		vmsCheck = new Button(mediaGroup, SWT.CHECK);
-		vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMIDISynth as MIDI device"));
+		vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMIDISynth/FluidSynth as MIDI device"));
 		vmsCheck.setLayoutData(fillHor);
 		vmsCheck.setSelection(Settings.searchVms);
 
