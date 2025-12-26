@@ -33,7 +33,7 @@ public class Image2D extends Object3D {
 			this.height = var3.getHeight();
 			this.mutable = false;
 			this.type = var1;
-			this.imageData = convert(var1, var3.getImpl().getData(), var3.isMutable());
+			this.imageData = convert(var1, var3._getImpl().getData(), var3.isMutable());
 //			allocateBuffer(imageData.length);
 		} else {
 			throw new IllegalArgumentException();

@@ -12,7 +12,7 @@ public class TextBox extends Screen {
 		impl = new TextBoxSWT(this, title, text, maxSize, constraints);
 	}
 
-	protected void focusCaret() {
+	void focusCaret() {
 		impl.focusCaret();
 	}
 
@@ -180,15 +180,15 @@ public class TextBox extends Screen {
 		impl.setInitialInputMode(inputMode);
 	}
 
-	protected void _paint(final Graphics graphics) {
+	void _paint(final Graphics graphics) {
 		impl.paint(graphics);
 	}
 
-	protected void layout() {
+	void _layout() {
 		impl.layout();
 	}
 
-	protected void defocus() {
+	void _defocus() {
 		impl.defocus();
 	}
 

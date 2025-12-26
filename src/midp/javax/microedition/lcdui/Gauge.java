@@ -145,8 +145,8 @@ public class Gauge extends Item {
 		}
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		final Font font = Item.font;
 		if (!interactive) {
 			int n2 = font.getHeight() + 4;

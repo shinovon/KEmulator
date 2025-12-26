@@ -293,7 +293,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			synchronized (memoryMgr) {
 				for (Image image : memoryMgr.images) {
 					allImages.add(image);
-					boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
+					boolean add = (imagesDrawn && image._getUsedCount() > 0) || (imagesNeverDrawn && image._getUsedCount() == 0);
 					if (!add)
 						continue;
 					ImageViewItem i = new ImageViewItem(image, false);
@@ -395,9 +395,9 @@ public final class MemoryView implements DisposeListener, ControlListener {
 						if (item.ensureCache())
 							gc.drawImage(item.cache, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						else
-							image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+							image._getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						if (this.darkenUnused) {
-							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+							image._getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -419,7 +419,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 						if (item.released)
 							gc.drawString("Released", x - 1, y - fh, true);
 						else
-							gc.drawString("x" + image.getUsedCount(), x - 1, y - fh, true);
+							gc.drawString("x" + image._getUsedCount(), x - 1, y - fh, true);
 					}
 					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
 					item.drawnRect = new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1);
@@ -693,7 +693,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					fileDialog.setFilterExtensions(new String[]{"*.png"});
 					final String open;
 					if ((open = fileDialog.open()) != null) {
-						item.drawable.getImpl().saveToFile(open);
+						item.drawable._getImpl().saveToFile(open);
 					}
 					return;
 				}

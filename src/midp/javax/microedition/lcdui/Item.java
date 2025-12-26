@@ -121,7 +121,7 @@ public abstract class Item {
 		}
 	}
 
-	protected void _itemApplyCommand() {
+	void _itemApplyCommand() {
 		if (this.itemCommandListener != null && this.defaultCommand != null) {
 			Emulator.getEventQueue().commandAction(defaultCommand, this);
 		}
@@ -174,14 +174,14 @@ public abstract class Item {
 		Emulator.getEventQueue().itemStateChanged(this);
 	}
 
-	void focus() {
+	void _focus() {
 		this.focused = true;
 		if (this.screen != null) {
 			this.screen.setItemCommands(this);
 		}
 	}
 
-	void defocus() {
+	void _defocus() {
 		focused = false;
 		if (screen != null) {
 			screen.removeItemCommands(this);
@@ -199,17 +199,17 @@ public abstract class Item {
 		}
 	}
 
-	void layout(Row row) {
+	void _layout(Row row) {
 		bounds[X] = 0;
 		bounds[Y] = 0;
 		bounds[W] = screen.bounds[W];
 		bounds[H] = Screen.fontHeight4;
 	}
 
-	protected void pointerPressed(int n, int n2) {
+	void pointerPressed(int n, int n2) {
 	}
 
-	public boolean _hasLayout(int l) {
+	boolean _hasLayout(int l) {
 		return (layout & l) == l;
 	}
 

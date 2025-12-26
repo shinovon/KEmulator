@@ -52,7 +52,7 @@ public class Display {
 			return;
 		}
 		if (Display.current != null) {
-			Display.current.defocus();
+			Display.current._defocus();
 			Emulator.getEventQueue().notifyHidden(Display.current);
 		}
 		Emulator.getEmulator().getScreen().getCaret().displayableChanged();
@@ -160,7 +160,7 @@ public class Display {
 			throw new IllegalArgumentException();
 		}
 		if (Display.current != null) {
-			Display.current.defocus();
+			Display.current._defocus();
 		}
 		Display.current = alert;
 		alert.lastDisplayed = ret;

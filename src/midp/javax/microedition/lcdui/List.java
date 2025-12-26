@@ -219,15 +219,15 @@ public class List extends Screen implements Choice {
 		return impl.size();
 	}
 
-	protected void _drawScrollBar(final Graphics graphics) {
+	void _drawScrollBar(final Graphics graphics) {
 		impl.drawScrollBar(graphics);
 	}
 
-	protected void _paint(Graphics graphics) {
+	void _paint(Graphics graphics) {
 		impl.paint(graphics);
 	}
 
-	protected void layout() {
+	void _layout() {
 		impl.layout();
 	}
 

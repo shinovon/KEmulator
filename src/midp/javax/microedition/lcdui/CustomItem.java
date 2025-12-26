@@ -188,8 +188,8 @@ public abstract class CustomItem extends Item {
 				n, n2, 0);
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		int n = 0;
 		int w = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
 		if (hasLabel()) {

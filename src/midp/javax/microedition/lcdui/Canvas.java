@@ -496,8 +496,8 @@ public abstract class Canvas extends Displayable {
 		return null;
 	}
 
-	protected void defocus() {
-		super.defocus();
+	void _defocus() {
+		super._defocus();
 		if (nokiaCanvasItems.isEmpty()) return;
 		for (CanvasItem i : nokiaCanvasItems) {
 			if (!i.isVisible()) continue;

@@ -216,7 +216,7 @@ public class ChoiceGroup
 		return this.items.size();
 	}
 
-	protected void _itemApplyCommand() {
+	void _itemApplyCommand() {
 		super._itemApplyCommand();
 		if (this.aBoolean541 && this.aCommand540 != null) {
 			if (screen.cmdListener != null)
@@ -288,8 +288,8 @@ public class ChoiceGroup
 		}
 	}
 
-	synchronized void layout(Row row) {
-		super.layout(row);
+	synchronized void _layout(Row row) {
+		super._layout(row);
 		int n = 0;
 		if (this.label != null) {
 			int n2 = this.getPreferredWidth() - 8;
@@ -364,7 +364,7 @@ public class ChoiceGroup
 		return false;
 	}
 
-	protected void pointerPressed(int x, int y) {
+	void pointerPressed(int x, int y) {
 		int[] array = new int[4];
 		int i = 0;
 		while (i < this.items.size()) {
@@ -389,8 +389,8 @@ public class ChoiceGroup
 		return items.size() > 0;
 	}
 
-	protected void defocus() {
-		super.defocus();
+	void _defocus() {
+		super._defocus();
 		if (choiceType != POPUP) return;
 		layoutForm();
 	}

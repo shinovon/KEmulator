@@ -172,9 +172,9 @@ public class SWTScreen {
 		// TODO
 		if (img == null) return null;
 		if (Settings.g2d == 0) {
-			return (org.eclipse.swt.graphics.Image) img.getImpl().getNative();
+			return (org.eclipse.swt.graphics.Image) img._getImpl().getNative();
 		}
-		BufferedImage b = (BufferedImage) img.getImpl().getNative();
+		BufferedImage b = (BufferedImage) img._getImpl().getNative();
 		return new org.eclipse.swt.graphics.Image(SWTFrontend.getDisplay(), CopyUtils.toSwt(b));
 	}
 }

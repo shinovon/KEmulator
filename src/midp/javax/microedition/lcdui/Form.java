@@ -137,7 +137,7 @@ public class Form extends Screen {
 		this.itemStateListener = anItemStateListener858;
 	}
 
-	protected synchronized void _keyScroll(int key, boolean repeat) {
+	synchronized void _keyScroll(int key, boolean repeat) {
 		if (rows.size() == 0) {
 			return;
 		}
@@ -322,7 +322,7 @@ public class Form extends Screen {
 	private void focusItem(Item item) {
 		if (focusedItem == item) return;
 		if (focusedItem != null) {
-			focusedItem.defocus();
+			focusedItem._defocus();
 		}
 		try {
 			currentIndexInRow = getFirstRow(item).indexOf(item);
@@ -331,7 +331,7 @@ public class Form extends Screen {
 		scrollCurrentItem = item;
 		focusedItem = item;
 		if (item != null) {
-			item.focus();
+			item._focus();
 		}
 	}
 
@@ -402,7 +402,7 @@ public class Form extends Screen {
 		return super.items.size();
 	}
 
-	protected void _paint(final Graphics g) {
+	void _paint(final Graphics g) {
 		if (rows.size() == 0) {
 			doLayout(0);
 		} else if (layout) {
@@ -610,11 +610,11 @@ public class Form extends Screen {
 						|| ((StringItem) item).getAppearanceMode() != Item.BUTTON && item.hasLabel())) {
 					row = newRow(row);
 				}
-				item.layout(row);
+				item._layout(row);
 				// has to be checked after item size calculated
 				if (!row.canAdd(item, width)) {
 					row = newRow(row);
-					item.layout(row);
+					item._layout(row);
 				}
 				if (item instanceof StringItem
 						&& ((StringItem) item).getAppearanceMode() != Item.BUTTON && !item.isSizeLocked() && !item.hasLabel()) {

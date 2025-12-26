@@ -41,7 +41,7 @@ final class a
 
 	public final void drawImage(Image paramImage, int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
 		IImage localIImage;
-		int i = (localIImage = paramImage.getImpl()).getWidth();
+		int i = (localIImage = paramImage._getImpl()).getWidth();
 		int j = localIImage.getHeight();
 		int k = a(paramInt4);
 		this.gc.drawRegion(paramImage, 0, 0, i, j, k, paramInt1, paramInt2, paramInt3);

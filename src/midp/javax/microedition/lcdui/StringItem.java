@@ -127,8 +127,8 @@ public class StringItem extends Item {
 		}
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		final Font font = (this.font != null) ? this.font : Screen.font;
 		int maxWidth = screen.bounds[W] - 8;
 		int preferredWidth = this.preferredWidth != -1 ? super.getPreferredWidth() : maxWidth;

@@ -66,7 +66,7 @@ public abstract class SpriteCanvas extends Canvas {
 	}
 
 	public void copyArea(int sx, int sy, int fw, int fh, int tx, int ty) {
-		_virtualImage.getImpl().copyImage(frameGraphics.getImpl(), sx, sy, fw, fh, tx, ty);
+		_virtualImage._getImpl().copyImage(frameGraphics.getImpl(), sx, sy, fw, fh, tx, ty);
 		_skipCopy = true;
 	}
 

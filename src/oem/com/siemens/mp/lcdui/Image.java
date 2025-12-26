@@ -17,11 +17,9 @@
 package com.siemens.mp.lcdui;
 
 import emulator.Emulator;
-import emulator.Settings;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -58,19 +56,19 @@ public class Image extends com.siemens.mp.ui.Image {
 	}
 
 	public static int getPixelColor(javax.microedition.lcdui.Image image, int x, int y) {
-		return image.getImpl().getRGB(x, y);
+		return image._getImpl().getRGB(x, y);
 	}
 
 	public static void setPixelColor(
 			javax.microedition.lcdui.Image image, int x, int y, int color) throws IllegalArgumentException {
-		image.getImpl().setRGB(x, y, color);
+		image._getImpl().setRGB(x, y, color);
 	}
 
 	public static void writeImageToFile(javax.microedition.lcdui.Image img, String file)
 			throws IOException {
 		FileConnection f = (FileConnection) Connector.open("file://" + file);
 		try (OutputStream out = f.openOutputStream()) {
-			img.getImpl().write(out, "png");
+			img._getImpl().write(out, "png");
 		} finally {
 			f.close();
 		}
@@ -79,7 +77,7 @@ public class Image extends com.siemens.mp.ui.Image {
 	public static void writeBmpToFile(javax.microedition.lcdui.Image image, String filename) throws IOException {
 		FileConnection f = (FileConnection) Connector.open("file://" + filename);
 		try (OutputStream out = f.openOutputStream()) {
-			image.getImpl().write(out, "bmp");
+			image._getImpl().write(out, "bmp");
 		} finally {
 			f.close();
 		}

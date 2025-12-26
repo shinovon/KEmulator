@@ -39,7 +39,7 @@ public class ExtendedImage extends com.siemens.mp.misc.NativeMem {
 			throw new IllegalArgumentException("ExtendedImage: width is not divisible by 8");
 		}
 		this.image = image;
-		hasAlpha = image.getImpl().isTransparent();
+		hasAlpha = image._getImpl().isTransparent();
 	}
 
 	public void blitToScreen(int x, int y) {
@@ -52,7 +52,7 @@ public class ExtendedImage extends com.siemens.mp.misc.NativeMem {
 	}
 
 	public void clear(byte color) {
-		image.getImpl().fill(color == 0 ? 0xFFFFFFFF : 0xFF000000);
+		image._getImpl().fill(color == 0 ? 0xFFFFFFFF : 0xFF000000);
 	}
 
 	public Image getImage() {
@@ -60,7 +60,7 @@ public class ExtendedImage extends com.siemens.mp.misc.NativeMem {
 	}
 
 	public int getPixel(int x, int y) {
-		final int pixel = image.getImpl().getRGB(x, y);
+		final int pixel = image._getImpl().getRGB(x, y);
 		if (hasAlpha) {
 			if ((pixel & 0xFF000000) != 0xFF000000) return 0;
 			return ((pixel & 0xFFFFFF) == 0xFFFFFF) ? 1 : 2;
@@ -101,13 +101,13 @@ public class ExtendedImage extends com.siemens.mp.misc.NativeMem {
 
 	public void setPixel(int x, int y, byte color) {
 		if (!hasAlpha) {
-			image.getImpl().setRGB(x, y, color == 1 ? 0 : -1);
+			image._getImpl().setRGB(x, y, color == 1 ? 0 : -1);
 			return;
 		}
 		if (color == 0) {
-			image.getImpl().setRGB(x, y, 0);
+			image._getImpl().setRGB(x, y, 0);
 		} else {
-			image.getImpl().setRGB(x, y, color == 1 ? -1 : 0);
+			image._getImpl().setRGB(x, y, color == 1 ? -1 : 0);
 		}
 	}
 
@@ -149,6 +149,6 @@ public class ExtendedImage extends com.siemens.mp.misc.NativeMem {
 				}
 			}
 		}
-		((ImageAWT) image.getImpl()).getBufferedImage().setRGB(x, y, width, height, colors, 0, width);
+		((ImageAWT) image._getImpl()).getBufferedImage().setRGB(x, y, width, height, colors, 0, width);
 	}
 }

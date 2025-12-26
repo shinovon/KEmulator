@@ -169,7 +169,7 @@ public class Graphics
 				n2 = n5 - height;
 			}
 
-			impl.drawImage(image.getImpl(), n, n2);
+			impl.drawImage(image._getImpl(), n, n2);
 			updateDebugData(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
 			++image.usedCount;
 			++Profiler.drawImageCallCount;
@@ -217,7 +217,7 @@ public class Graphics
 		if (sx < 0 || sx + w > image.getWidth() || sy < 0 || sy + h > image.getHeight()) {
 			throw new IllegalArgumentException("region exceeds the bounds of the source image");
 		}
-		if (image.getImpl() == this.image) {
+		if (image._getImpl() == this.image) {
 			throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
 		}
 		if (!method294(a, 64)) {
@@ -227,7 +227,7 @@ public class Graphics
 			final ITransform transform2 = this.impl.getTransform();
 			final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
 			this.impl.transform(transform);
-			this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, w, h);
+			this.impl.drawImage(image._getImpl(), sx, sy, w, h, 0, 0, w, h);
 			this.impl.setTransform(transform2);
 			if (xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
@@ -250,7 +250,7 @@ public class Graphics
 		if (sx < 0 || sx + w > image.getWidth() || sy < 0 || sy + h > image.getHeight()) {
 			throw new IllegalArgumentException("region exceeds the bounds of the source image");
 		}
-		if (image.getImpl() == this.image) {
+		if (image._getImpl() == this.image) {
 			throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
 		}
 		if (!method294(a, 64)) {
@@ -260,7 +260,7 @@ public class Graphics
 			final ITransform transform2 = this.impl.getTransform();
 			final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
 			this.impl.transform(transform);
-			this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, dw, dh);
+			this.impl.drawImage(image._getImpl(), sx, sy, w, h, 0, 0, dw, dh);
 			this.impl.setTransform(transform2);
 			if (xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
@@ -398,15 +398,15 @@ public class Graphics
 		final int n8 = clipY2 - clipY;
 		final int n9 = clipX - (n3 - n);
 		final int n10 = clipY - (n4 - n2);
-		image.getUsedRegion().setAlpha(n9, n10, n7, n8, 0);
+		image._getUsedRegion().setAlpha(n9, n10, n7, n8, 0);
 		if (!Settings.xrayView || xrayGraphics == null) {
 			return;
 		}
 		if (Settings.xrayOverlapScreen) {
-			this.xrayGraphics.drawImage(image.getImpl(), n, n2, n5, n6, n3, n4, n5, n6);
+			this.xrayGraphics.drawImage(image._getImpl(), n, n2, n5, n6, n3, n4, n5, n6);
 		}
-		if (image.isMutable() && image.getXRayBuffer() != null) {
-			this.xrayGraphics.drawImage(image.getXRayBuffer(), n3, n4);
+		if (image.isMutable() && image._getXRayBuffer() != null) {
+			this.xrayGraphics.drawImage(image._getXRayBuffer(), n3, n4);
 		}
 		this.xrayFillRect(n3, n4, n5, n6, 16777215);
 		if (Settings.xrayShowClipBorder) {
@@ -463,7 +463,7 @@ public class Graphics
 		}
 	}
 
-	protected static void resetXRayCache() {
+	static void resetXRayCache() {
 		for (int i = Graphics.xrayCache.size() - 1; i >= 0; --i) {
 			final IImage image;
 			final IGraphics2D graphics;

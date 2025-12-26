@@ -486,7 +486,7 @@ public final class EventQueue implements Runnable {
 			IScreen scr = Emulator.getEmulator().getScreen();
 			IImage backBufferImage, xRayScreenImage;
 			if (canvas instanceof SpriteCanvas) {
-				backBufferImage = SpriteCanvas._virtualImage.getImpl();
+				backBufferImage = SpriteCanvas._virtualImage._getImpl();
 				xRayScreenImage = null;
 			} else {
 				backBufferImage = scr.getBackBufferImage();

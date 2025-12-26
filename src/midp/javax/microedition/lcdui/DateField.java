@@ -55,16 +55,16 @@ public class DateField extends Item {
 		repaintForm();
 	}
 
-	void focus() {
-		super.focus();
+	void _focus() {
+		super._focus();
 		Emulator.getEmulator().getScreen().getCaret().focusItem(this, caretX, caretY);
 		updateFocus = true;
 	}
 
-	void defocus() {
+	void _defocus() {
 		if (focused || !updateFocus) Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 		if (focused) _input('\0');
-		super.defocus();
+		super._defocus();
 		updateFocus = true;
 	}
 
@@ -203,8 +203,8 @@ public class DateField extends Item {
 		}
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		int n = 4;
 		final int availableWidth = row.getAvailableWidth(screen.bounds[W]) - 8;
 		if (hasLabel()) {

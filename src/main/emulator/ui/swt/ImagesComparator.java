@@ -15,7 +15,7 @@ final class ImagesComparatorByUsage implements Comparator<ImageViewItem> {
 	public int compare(final ImageViewItem i1, final ImageViewItem i2) {
 		Image o1 = i1.drawable;
 		Image o2 = i2.drawable;
-		int n = o1.getUsedCount() - o2.getUsedCount();
+		int n = o1._getUsedCount() - o2._getUsedCount();
 		return mv.getSortByAscending() ? n : -n;
 	}
 }

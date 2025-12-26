@@ -468,7 +468,7 @@ public final class Memory {
 
 		if (cls == Image.class) {
 			final Image image = (Image) o;
-			res += image.size();
+			res += image._size();
 		} else {
 			try {
 				if (cls == Image2D.class) {

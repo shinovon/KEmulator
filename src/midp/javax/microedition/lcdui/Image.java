@@ -1,6 +1,5 @@
 package javax.microedition.lcdui;
 
-import emulator.Devices;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.custom.ResourceManager;
@@ -24,37 +23,37 @@ public class Image {
 		super();
 		this.imageImpl = img;
 		this.usedRegion = Emulator.getEmulator().newImage(this.imageImpl.getWidth(), this.imageImpl.getHeight(), true);
-		this.resetUsedRegion();
+		this._resetUsedRegion();
 		Profiler.totalImagePixelCount += this.getWidth() * this.getHeight();
 		++Profiler.totalImageInstances;
 	}
 
-	public void finalize() {
+	protected void finalize() {
 		Profiler.totalImagePixelCount -= this.getWidth() * this.getHeight();
 		--Profiler.totalImageInstances;
 	}
 
-	public IImage getImpl() {
+	public IImage _getImpl() {
 		return this.imageImpl;
 	}
 
-	protected IImage getXRayBuffer() {
+	IImage _getXRayBuffer() {
 		if (this.xrayBuffer == null && (Settings.xrayView || Settings.xrayBuffer)) {
 			this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
 		}
 		return this.xrayBuffer;
 	}
 
-	public IImage getUsedRegion() {
+	public IImage _getUsedRegion() {
 		return this.usedRegion;
 	}
 
-	public void resetUsedRegion() {
+	public void _resetUsedRegion() {
 		this.usedRegion.setAlpha(0, 0, this.getWidth(), this.getHeight(), 128);
 		this.usedCount = 0;
 	}
 
-	public int getUsedCount() {
+	public int _getUsedCount() {
 		return this.usedCount;
 	}
 
@@ -198,7 +197,7 @@ public class Image {
 		disposed = true;
 	}
 
-	public int size() {
+	public int _size() {
 		if (disposed) return 5;
 		int i = 5 + imageImpl.size();
 		if (xrayBuffer != null) i += xrayBuffer.size();

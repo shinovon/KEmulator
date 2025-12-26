@@ -40,7 +40,7 @@ public class ImageEncoder {
 	public byte[] encodeOffscreen(Image src, int x, int y, int width, int height) throws IOException {
 		Image resultImage = Image.createImage(src, x, y, width, height, 0);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		resultImage.getImpl().write(stream, format == FORMAT_PNG ? "png" : "jpeg");
+		resultImage._getImpl().write(stream, format == FORMAT_PNG ? "png" : "jpeg");
 		byte[] byteArray = stream.toByteArray();
 		stream.close();
 		return byteArray;

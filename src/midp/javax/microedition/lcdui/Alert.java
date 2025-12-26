@@ -57,7 +57,7 @@ public class Alert extends Screen {
 		this.timeout = n;
 	}
 
-	protected void _shown() {
+	void _shown() {
 		super._shown();
 		try {
 			Emulator.getEventQueue().waitRepaint();
@@ -96,11 +96,11 @@ public class Alert extends Screen {
 	public void setType(final AlertType alertType) {
 	}
 
-	protected void close() {
+	void close() {
 		Emulator.getCurrentDisplay().setCurrent(lastDisplayed);
 	}
 
-	protected void _paint(Graphics g) {
+	void _paint(Graphics g) {
 		final int n = super.bounds[W] - 8;
 		this.textArr = TextUtils.textArr(this.string, Screen.font, n, n);
 		g.setColor(LCDUIUtils.foregroundColor);
@@ -129,7 +129,7 @@ public class Alert extends Screen {
 		return gauge != null || timeout >= 0 || ticker != null ? 500 : -1;
 	}
 
-	protected void _keyScroll(int key, boolean repeat) {
+	void _keyScroll(int key, boolean repeat) {
 		if (key == Canvas.UP) {
 			scroll = Math.max(0, scroll - Screen.fontHeight4);
 			repaintScreen();
