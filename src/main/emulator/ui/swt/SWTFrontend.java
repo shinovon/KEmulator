@@ -52,6 +52,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		this.classWatcher = Watcher.createForStatics();
 		this.profiler = Watcher.createForProfiler();
 		this.methods = new Methods();
+		Display.setAppName("KEmulator");
 	}
 
 	public void dispose() {
