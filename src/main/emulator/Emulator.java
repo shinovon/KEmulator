@@ -636,6 +636,7 @@ public class Emulator implements Runnable {
 			Emulator.httpUserAgent = plat + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ")";
 
 			System.setProperty("microedition.platform", plat);
+			System.setProperty("device.model", plat);
 		}
 		System.setProperty("microedition.media.version", "1.0");
 		System.setProperty("supports.mixing", "true");
@@ -671,6 +672,7 @@ public class Emulator implements Runnable {
 		System.setProperty("org.pigler.api.version", "1.4-kemulator");
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
+		System.setProperty("ru.nnproject.symbiangl", "0.2-kemulator");
 
 		try {
 			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
