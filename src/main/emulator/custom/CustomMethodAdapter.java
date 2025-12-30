@@ -160,6 +160,12 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 						}
 					}
 				}
+				if (cls.equals("java/nio/ByteBuffer") && name.equals("allocateDirect") && sign.equals("(I)Ljava/nio/ByteBuffer;")) {
+					super.visitMethodInsn(acc, cls, name, sign);
+					super.visitMethodInsn(Opcodes.INVOKESTATIC, "java/nio/ByteOrder", "nativeOrder", "()Ljava/nio/ByteOrder;");
+					super.visitMethodInsn(Opcodes.INVOKEVIRTUAL, cls, "order", "(Ljava/nio/ByteOrder;)Ljava/nio/ByteBuffer;");
+					return;
+				}
 				if (Settings.hideEmulation) {
 					if (cls.equals("java/lang/Runtime")) {
 						if (name.equals("totalMemory") || name.equals("freeMemory")) {

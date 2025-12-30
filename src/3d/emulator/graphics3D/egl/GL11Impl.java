@@ -148,7 +148,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		this.normalStride = stride;
 		this.normalBuffer = pointer;
 		this.normalIsOffset = false;
-		EGL10Impl.g3d.async(() -> GL11.glNormalPointer(type, stride, MemoryUtil.memAddress(pointer)));
+		EGL10Impl.g3d.sync(() -> GL11.glNormalPointer(type, stride, MemoryUtil.memAddress(pointer)));
 	}
 
 	public final synchronized void glNormalPointer(final int type, final int stride, final int offset) {
@@ -157,7 +157,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		this.normalOffset = offset;
 		this.normalIsOffset = true;
 		this.normalBuffer = null; // VBO-backed
-		EGL10Impl.g3d.async(() -> GL11.glNormalPointer(type, stride, offset));
+		EGL10Impl.g3d.sync(() -> GL11.glNormalPointer(type, stride, offset));
 	}
 
 	public final synchronized void glTexCoordPointer(final int n, final int n2, final int n3, final int n4) {
@@ -177,7 +177,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 			// unsupported client-side type for skinning; null out so we fall back to GL
 			this.vertexBuffer = null;
 		}
-		EGL10Impl.g3d.async(() -> GL11.glVertexPointer(size, type, stride, MemoryUtil.memAddress(pointer)));
+		EGL10Impl.g3d.sync(() -> GL11.glVertexPointer(size, type, stride, MemoryUtil.memAddress(pointer)));
 	}
 
 	public synchronized void glVertexPointer(final int size, final int type, final int stride, final int pointerOffset) {
@@ -188,7 +188,7 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 		this.vertexOffset = pointerOffset;
 		this.vertexIsOffset = true;
 		this.vertexBuffer = null;
-		EGL10Impl.g3d.async(() -> GL11.glVertexPointer(size, type, stride, pointerOffset));
+		EGL10Impl.g3d.sync(() -> GL11.glVertexPointer(size, type, stride, pointerOffset));
 	}
 
 	public final synchronized void glClipPlanef(final int n, final float[] array, final int n2) {
@@ -1153,13 +1153,13 @@ public final class GL11Impl extends GL10Impl implements javax.microedition.khron
 
 	public synchronized void glDrawArrays(final int mode, final int first, final int count) {
 		if (!trySoftwareSkinAndDrawArrays(mode, first, count)) {
-			EGL10Impl.g3d.async(() -> GL11.glDrawArrays(mode, first, count));
+			EGL10Impl.g3d.sync(() -> GL11.glDrawArrays(mode, first, count));
 		}
 	}
 
 	public synchronized void glDrawElements(final int mode, final int count, final int type, final Buffer indices) {
 		if (!trySoftwareSkinAndDrawElements(mode, count, type, indices)) {
-			EGL10Impl.g3d.async(() -> GL11.glDrawElements(mode, count, type, MemoryUtil.memAddress(indices)));
+			EGL10Impl.g3d.sync(() -> GL11.glDrawElements(mode, count, type, MemoryUtil.memAddress(indices)));
 		}
 	}
 
