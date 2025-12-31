@@ -96,7 +96,28 @@ public class ProjectGenerator {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
 				generateProGuardConfig(dirp, projectName, new ClasspathEntry[0]);
 			}
-			generateRunConfigs(dirp, projectName, midletNames);
+
+			// regenerate run configurations only if something is missing
+			boolean generate = false;
+
+			Path runConfigsPath = dirp.resolve(".idea").resolve("runConfigurations");
+			if (!Files.exists(runConfigsPath)
+					|| !Files.exists(runConfigsPath.resolve("Package.xml"))
+					|| !Files.exists(runConfigsPath.resolve("Restore_project.xml"))) {
+				generate = true;
+			}
+			for (int i = 1; i <= midletNames.length; ++i) {
+				if (!Files.exists(runConfigsPath.resolve("Run_with_KEmulator_" + i + ".xml"))) {
+					generate = true;
+					break;
+				}
+			}
+
+			if (generate) {
+				generateRunConfigs(dirp, projectName, midletNames);
+			} else {
+				System.out.println("Skipping run configurations generation");
+			}
 			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
 				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
 						"You can rerun IDE setup to bring your configuration to recommended one.");
