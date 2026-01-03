@@ -348,7 +348,7 @@ OPTION_NETWORK_PROXY_EMPTY=Empty proxy host!
 OPTION_NETWORK_PROXY_UNIMP=Proxy test is underimplemented!
 
 OPTION_MEDIA_VLC_DIR=VLC Path
-OPTION_MEDIA_VMS=Search for VirtualMIDISynth as MIDI device
+OPTION_MEDIA_VMS=Search for VirtualMIDISynth/FluidSynth as MIDI device
 OPTION_MEDIA_GLOBAL_MIDI=Allow only one MIDI playback at time (reduces lag)
 OPTION_MEDIA_REOPEN_MIDI=Reopen MIDI device every time
 OPTION_MEDIA_DUMP=Enable media exporting (higher memory usage)
