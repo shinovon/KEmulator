@@ -964,7 +964,11 @@ public final class Property implements IProperty, SelectionListener {
 			Emulator.getEmulator().updateLanguage();
 		}
 
-		Settings.updateBranch = updateBranchCombo.getText().trim();
+		String updateBranch = updateBranchCombo.getText().trim();
+		if (!updateBranch.equals(Settings.updateBranch)) {
+			Settings.updateBranch = updateBranch;
+			Updater.state = Updater.STATE_INITIAL;
+		}
 
 		Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
 		Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
