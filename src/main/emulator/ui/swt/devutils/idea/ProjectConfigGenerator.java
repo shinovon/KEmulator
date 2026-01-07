@@ -239,14 +239,15 @@ public class ProjectConfigGenerator {
 		return sb.toString();
 	}
 
-	public static String buildKemRunConfig(String projectName, String midletName, String className) {
+	public static String buildKemRunConfig(String projectName, String midletName, String className, boolean eclipseManifest) {
+		String manifestPath = eclipseManifest ? "Application Descriptor" : "META-INF/MANIFEST.MF";
 		return "<component name=\"ProjectRunConfigurationManager\">\n" +
 				"  <configuration default=\"false\" name=\"Run &quot;" + midletName.replace("&", "&amp;").replace("\"", "&quot;") + "&quot; with KEmulator\" type=\"Application\" factoryName=\"Application\">\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"MAIN_CLASS_NAME\" value=\"emulator.Emulator\" />\n" +
 				"    <module name=\"" + projectName + "\" />\n" +
-				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-cp $PROJECT_DIR$/bin/production/" + projectName + " -midlet " + className + " -jad $PROJECT_DIR$/META-INF/MANIFEST.MF -uei\" />\n" +
+				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-cp $PROJECT_DIR$/bin/production/" + projectName + " -midlet " + className + " -jad \\\"$PROJECT_DIR$/" + manifestPath + "\\\" -uei\" />\n" +
 				"    <option name=\"VM_PARAMETERS\" value=\"-XX:+IgnoreUnrecognizedVMOptions -Djna.nosys=true -Dfile.encoding=UTF-8 -XstartOnFirstThread\" />" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"" + Emulator.getAbsolutePath() + "\" />\n" +
 				"    <method v=\"2\">\n" +

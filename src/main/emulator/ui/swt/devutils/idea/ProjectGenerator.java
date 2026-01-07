@@ -49,7 +49,7 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName, false);
 
 		// run configs
-		generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)});
+		generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)}, false);
 
 		return midletCodePath;
 	}
@@ -114,7 +114,7 @@ public class ProjectGenerator {
 			}
 
 			if (generate) {
-				generateRunConfigs(dirp, projectName, midletNames);
+				generateRunConfigs(dirp, projectName, midletNames, isEclipse);
 			} else {
 				System.out.println("Skipping run configurations generation");
 			}
@@ -171,7 +171,7 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName, true);
 
 		// run configs
-		generateRunConfigs(dir, projectName, midlets);
+		generateRunConfigs(dir, projectName, midlets, true);
 
 		return dir.toString();
 	}
@@ -211,10 +211,10 @@ public class ProjectGenerator {
 		}
 	}
 
-	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames) throws IOException {
+	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, boolean eclipseManifest) throws IOException {
 		for (int i = 0; i < midletNames.length; i++) {
 			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Run_with_KEmulator_" + (i + 1) + ".xml");
-			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className);
+			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
