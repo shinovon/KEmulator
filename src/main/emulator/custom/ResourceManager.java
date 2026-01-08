@@ -21,7 +21,19 @@ public final class ResourceManager {
 				while (name.length() > 0 && name.startsWith("/")) {
 					name = name.substring(1);
 				}
-				final ZipFile zipFile = new ZipFile(Emulator.midletJar);
+				ZipFile zipFile;
+				for (int i = 0; ; ++i) {
+					try {
+						zipFile = new ZipFile(Emulator.midletJar);
+						break;
+					} catch (FileNotFoundException e) {
+						if (i < 5 && e.toString().contains("Bad file descriptor")) {
+							Thread.sleep(5);
+							continue;
+						}
+						throw e;
+					}
+				}
 				try {
 					ZipEntry entry;
 					if ((entry = zipFile.getEntry(name)) == null) {
@@ -53,7 +65,9 @@ public final class ResourceManager {
 				}
 				data = new byte[(int) fileFromClassPath.length()];
 				Emulator.getEmulator().getLogStream().println("Custom.path.getResourceStream: " + s + " (" + fileFromClassPath.length() + ")");
-				new DataInputStream(new FileInputStream(fileFromClassPath)).readFully(data);
+				try (DataInputStream in = new DataInputStream(new FileInputStream(fileFromClassPath))) {
+					in.readFully(data);
+				}
 			}
 		} catch (Exception ex) {
 			return Emulator.class.getResourceAsStream(s);
