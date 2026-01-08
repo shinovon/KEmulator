@@ -1,5 +1,6 @@
 package emulator.ui.swt.devutils.idea;
 
+import emulator.Emulator;
 import emulator.Utils;
 import emulator.ui.swt.devutils.ClasspathEntry;
 import emulator.ui.swt.devutils.ClasspathEntryType;
@@ -107,7 +108,12 @@ public class ProjectGenerator {
 				generate = true;
 			}
 			for (int i = 1; i <= midletNames.length; ++i) {
-				if (!Files.exists(runConfigsPath.resolve("Run_with_KEmulator_" + i + ".xml"))) {
+				Path runPath = runConfigsPath.resolve("Run_with_KEmulator_" + i + ".xml");
+				if (!Files.exists(runPath)) {
+					generate = true;
+					break;
+				}
+				if (!checkRunConfiguration(runPath, midletNames[i - 1])) {
 					generate = true;
 					break;
 				}
@@ -284,6 +290,38 @@ public class ProjectGenerator {
 			manifestProps.put(split[0].substring("manifest.".length()), Utils.translateEscapes(split[1]));
 		}
 		return "Manifest-Version: 1.0\n" + manifestProps.get("midlets") + manifestProps.get("apipermissions") + manifestProps.get("others") + manifestProps.get("manifest");
+	}
+
+	private static boolean checkRunConfiguration(Path runPath, DevtimeMIDlet midletName) throws IOException {
+		List<String> manifest = Files.readAllLines(runPath);
+		boolean hasName = false;
+		boolean hasParams = false;
+		boolean hasWorkingDir = false;
+		// NOTE: synchronize with ProjectConfigGenerator.buildKemRunConfig !
+		for (String line : manifest) {
+			if (line.startsWith("  <configuration default=\"false\" name=\"Run &quot;")) {
+				if (!line.contains("quot;" + midletName.readableName + "&quot;")) {
+					return false;
+				}
+				hasName = true;
+				continue;
+			}
+			if (line.startsWith("    <option name=\"PROGRAM_PARAMETERS\" value=\"")) {
+				if (!line.contains("-midlet " + midletName.className)) {
+					return false;
+				}
+				hasParams = true;
+				continue;
+			}
+			if (line.startsWith("    <option name=\"WORKING_DIRECTORY\" value=\"")) {
+				if (!line.contains("\"" + Emulator.getAbsolutePath() + "\"")) {
+					return false;
+				}
+				hasWorkingDir = true;
+				continue;
+			}
+		}
+		return hasName && hasParams && hasWorkingDir;
 	}
 
 	//#endregion
