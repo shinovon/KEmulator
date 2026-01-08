@@ -1,5 +1,5 @@
 $KEmulator nnmod
-By shinovon, Feodor0090 aka sym_ansel, 2020-2025
+By shinovon, Feodor0090 (aka sym_ansel), 2020-2026
 
 $KEmulator
 Author: Wu.Liang (c) 2006, 2008
@@ -22,7 +22,7 @@ $Nokia OTT Implementation
 From FreeJ2ME-Plus, by AShiningRay
 
 ==================
-$[Libs]
+$[Libraries]
 swt 4.20 / 4.7 (32-bit)
 asm 5.2
 lwjgl 3.3.6
