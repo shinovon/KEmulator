@@ -117,7 +117,7 @@ public class ProjectConfigGenerator {
 		sb.append(System.lineSeparator());
 		sb.append("-printmapping '").append(Paths.get(dir, "deployed", "pro_map.txt")).append("'");
 		sb.append(System.lineSeparator());
-		sb.append("-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.3 -optimizations !library/*,!code/simplification/object");
+		sb.append("-dontusemixedcaseclassnames -dontnote -defaultpackage '' -microedition -target 1.2 -optimizations !library/*,!code/simplification/object");
 		sb.append(System.lineSeparator());
 		sb.append("-keep public class * extends javax.microedition.midlet.MIDlet");
 		sb.append(System.lineSeparator());
