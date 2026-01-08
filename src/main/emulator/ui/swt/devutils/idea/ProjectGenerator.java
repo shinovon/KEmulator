@@ -299,21 +299,22 @@ public class ProjectGenerator {
 		boolean hasWorkingDir = false;
 		// NOTE: synchronize with ProjectConfigGenerator.buildKemRunConfig !
 		for (String line : manifest) {
-			if (line.startsWith("  <configuration default=\"false\" name=\"Run &quot;")) {
-				if (!line.contains("quot;" + midletName.readableName + "&quot;")) {
+			String trimmed = line.trim();
+			if (trimmed.startsWith("<configuration default=\"false\" name=\"Run &quot;")) {
+				if (!line.contains("&quot;" + midletName.readableName + "&quot;")) {
 					return false;
 				}
 				hasName = true;
 				continue;
 			}
-			if (line.startsWith("    <option name=\"PROGRAM_PARAMETERS\" value=\"")) {
+			if (trimmed.startsWith("<option name=\"PROGRAM_PARAMETERS\" value=\"")) {
 				if (!line.contains("-midlet " + midletName.className)) {
 					return false;
 				}
 				hasParams = true;
 				continue;
 			}
-			if (line.startsWith("    <option name=\"WORKING_DIRECTORY\" value=\"")) {
+			if (trimmed.startsWith("<option name=\"WORKING_DIRECTORY\" value=\"")) {
 				if (!line.contains("\"" + Emulator.getAbsolutePath() + "\"")) {
 					return false;
 				}
