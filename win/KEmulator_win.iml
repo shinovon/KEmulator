@@ -10,5 +10,7 @@
     <orderEntry type="module" module-name="m3g_lwjgl" />
     <orderEntry type="module" module-name="micro3d_gl" />
     <orderEntry type="module" module-name="KEmulator_base" exported="" />
+    <orderEntry type="library" exported="" name="lwjgl-native" level="project" />
+    <orderEntry type="library" exported="" name="swt" level="project" />
   </component>
 </module>

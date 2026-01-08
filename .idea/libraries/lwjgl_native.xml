@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="lwjgl-native">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/home/lwjgl-glfw-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl-opengl-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/home/lwjgl3-swt-windows-x86.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
