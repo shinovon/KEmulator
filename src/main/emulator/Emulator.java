@@ -1244,7 +1244,6 @@ public class Emulator implements Runnable {
 		Emulator.deviceFile = "/res/presets.xml";
 		backgroundThread = new Thread(new Runnable() {
 			public void run() {
-				Manager.checkLibVlcSupport();
 				if (!updated && !Settings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
 					if (emulatorimpl instanceof SWTFrontend) {
 						SWTFrontend.getDisplay().asyncExec(() -> getEmulator().getScreen().showUpdateDialog(1));

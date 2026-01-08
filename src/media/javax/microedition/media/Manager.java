@@ -47,7 +47,7 @@ public class Manager {
 	private static Vector<String> kemVideo;
 	private static Vector<String> vlcAudio;
 	private static Vector<String> vlcVideo;
-	private static int libVlcState;
+	private static int libVlcState = -2;
 
 	public Manager() {
 		super();
@@ -153,7 +153,7 @@ public class Manager {
 					player = new PlayerImpl(contentType, src);
 				}
 				// Videos
-			} else if (contentType.startsWith("video/") || Manager.isLibVlcSupported()) {
+			} else if (contentType.startsWith("video/") || Settings.enableVlc && (Manager._isLibVlcSupported())) {
 				requireLibVlc();
 				if (locator != null) {
 					// located
@@ -199,8 +199,11 @@ public class Manager {
 	}
 
 	private static void requireLibVlc() throws MediaException {
-		if (!isLibVlcSupported()) {
-			throw new MediaException("LibVlc required!");
+		if (!Settings.enableVlc) {
+			throw new MediaException("LibVlc feature is disabled");
+		}
+		if (!_isLibVlcSupported()) {
+			throw new MediaException("LibVlc is required for this feature");
 		}
 	}
 
@@ -283,7 +286,7 @@ public class Manager {
 		Vector<String> fullList = new Vector<String>();
 		fullList.addAll(kemAudio);
 		fullList.addAll(kemVideo);
-		boolean vlc = isLibVlcSupported();
+		boolean vlc = Settings.enableVlc && _isLibVlcSupported();
 		if (vlc) {
 			fullList.addAll(vlcAudio);
 			fullList.addAll(vlcVideo);
@@ -326,21 +329,22 @@ public class Manager {
 	private static String getContentTypeHttp(String locator) throws IOException {
 		// позаимствованно из симбиана
 		HttpConnection hc = (HttpConnection) Connector.open(locator);
-		hc.setRequestMethod("HEAD");
-		if (hc.getResponseCode() == 405) {
+		try {
+			hc.setRequestMethod("HEAD");
+			if (hc.getResponseCode() == 405) {
+				hc.close();
+				hc = null;
+				hc = (HttpConnection) Connector.open(locator);
+				hc.setRequestMethod("GET");
+			}
+			int rc = hc.getResponseCode();
+			if (rc != 200) {
+				throw new IOException("HTTP response code: " + rc);
+			}
+			return hc.getHeaderField("Content-Type");
+		} finally {
 			hc.close();
-			hc = null;
-			hc = (HttpConnection) Connector.open(locator);
-			hc.setRequestMethod("GET");
 		}
-		int rc = hc.getResponseCode();
-		if (rc != 200) {
-			throw new IOException("HTTP response code: " + rc);
-		}
-		String cntype = hc.getHeaderField("Content-Type");
-		hc.close();
-		hc = null;
-		return cntype;
 	}
 
 	public static String[] getSupportedProtocols(final String type) {
@@ -355,13 +359,13 @@ public class Manager {
 		vlc.add("rtsp");
 		vlc.add("rtp");
 		Vector<String> fullList = new Vector<String>(kem);
-		if (isLibVlcSupported()) {
+		if (Settings.enableVlc && _isLibVlcSupported()) {
 			fullList.addAll(vlc);
 		}
 		return fullList.toArray(new String[0]);
 	}
 
-	public static String getContentTypeFromURL(String url) throws IOException {
+	private static String getContentTypeFromURL(String url) throws IOException {
 		// remove query
 		if (url.contains("?")) {
 			url = url.substring(0, url.indexOf("?"));
@@ -441,7 +445,14 @@ public class Manager {
 		return null;
 	}
 
-	public static boolean isLibVlcSupported() {
+	public static synchronized boolean _isLibVlcSupported() {
+		if (!Settings.enableVlc) {
+			return false;
+		}
+		if (libVlcState == -2) {
+			libVlcState = 0;
+			new Thread(Manager::checkLibVlcSupport).start();
+		}
 		try {
 			while (libVlcState == 0) {
 				Thread.sleep(5);
@@ -450,7 +461,7 @@ public class Manager {
 		return libVlcState == 1;
 	}
 
-	public static void checkLibVlcSupport() {
+	static void checkLibVlcSupport() {
 		/*
 		if(Settings.vlcDir == null) {
 			try {

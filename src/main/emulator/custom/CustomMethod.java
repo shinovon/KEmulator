@@ -116,7 +116,7 @@ public class CustomMethod {
 				} else {
 					try {
 						if (prop.equals("kemulator.libvlc.supported")) {
-							res = String.valueOf(Manager.isLibVlcSupported());
+							res = String.valueOf(Manager._isLibVlcSupported());
 						} else if (prop.equals("kemulator.threadtrace")) {
 							b = false;
 							res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");

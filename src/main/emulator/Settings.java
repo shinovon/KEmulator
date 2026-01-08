@@ -171,4 +171,6 @@ public final class Settings {
 	public static boolean altLessSpeedShortcuts;
 	public static boolean hideEmulation;
 	public static boolean hideDisplayableOnMinimize;
+
+	public static boolean enableVlc = true;
 }

@@ -133,13 +133,13 @@ public final class MediaUtils {
 		if (o instanceof AudioClip) {
 			return ((AudioClip) o).dataLen;
 		}
+		if (o instanceof PlayerImpl) {
+			return ((PlayerImpl) o).dataLen;
+		}
 		if (o instanceof VLCPlayerImpl) {
 			return ((VLCPlayerImpl) o).dataLen;
 		}
-		if (!(o instanceof PlayerImpl)) {
-			return 0;
-		}
-		return ((PlayerImpl) o).dataLen;
+		return 0;
 	}
 
 	public static int getPlayerVolume(final Object o) {
@@ -151,11 +151,11 @@ public final class MediaUtils {
 				return ((AudioClip) o).volume * 20;
 			}
 
-			if (o instanceof VLCPlayerImpl) {
-				return ((VolumeControlImpl) ((VLCPlayerImpl) o).getControl("VolumeControl")).getLevel();
-			}
 			if (o instanceof PlayerImpl) {
 				return ((VolumeControlImpl) ((PlayerImpl) o).getControl("VolumeControl")).getLevel();
+			}
+			if (o instanceof VLCPlayerImpl) {
+				return ((VolumeControlImpl) ((VLCPlayerImpl) o).getControl("VolumeControl")).getLevel();
 			}
 			return 0;
 		} catch (Exception ex) {
@@ -168,15 +168,14 @@ public final class MediaUtils {
 			if (o instanceof Sound) {
 				((Sound) o).setGain(n);
 			} else if (!(o instanceof AudioClip)) {
-
+				if (o instanceof PlayerImpl) {
+					((VolumeControlImpl) ((PlayerImpl) o).getControl("VolumeControl")).setLevel(n);
+					return;
+				}
 				if (o instanceof VLCPlayerImpl) {
 					((VolumeControlImpl) ((VLCPlayerImpl) o).getControl("VolumeControl")).setLevel(n);
 					return;
 				}
-				if (!(o instanceof PlayerImpl)) {
-					return;
-				}
-				((VolumeControlImpl) ((PlayerImpl) o).getControl("VolumeControl")).setLevel(n);
 			}
 		} catch (Exception ignored) {
 		}
@@ -254,6 +253,43 @@ public final class MediaUtils {
 			}
 			return;
 		}
+		if (o instanceof PlayerImpl) {
+			final PlayerImpl playerImpl = (PlayerImpl) o;
+			try {
+				switch (n) {
+					case resume: {
+						playerImpl.start();
+						break;
+					}
+					case pause: {
+						final long mediaTime2 = playerImpl.getMediaTime();
+						playerImpl.stop();
+						playerImpl.setMediaTime(mediaTime2);
+						break;
+					}
+					case stop: {
+						playerImpl.stop();
+						break;
+					}
+					case export: {
+						try {
+							byte[] b = playerImpl.getData();
+							String s = "audio" + playerImpl.getExportName();
+							if (b != null) {
+								exportAudio(b, s);
+								Emulator.getEmulator().getScreen().showMessage("Saved: " + s);
+							} else {
+								Emulator.getEmulator().getScreen().showMessage("Export failed: unsupported stream type");
+							}
+						} catch (Exception e) {
+							Emulator.getEmulator().getScreen().showMessage("Export failed: " + e);
+						}
+					}
+				}
+			} catch (Exception ignored) {
+			}
+			return;
+		}
 		if (o instanceof VLCPlayerImpl) {
 			final VLCPlayerImpl v = (VLCPlayerImpl) o;
 			try {
@@ -280,43 +316,6 @@ public final class MediaUtils {
 				ex2.printStackTrace();
 			}
 			return;
-		}
-		if (!(o instanceof PlayerImpl)) {
-			return;
-		}
-		final PlayerImpl playerImpl = (PlayerImpl) o;
-		try {
-			switch (n) {
-				case resume: {
-					playerImpl.start();
-					break;
-				}
-				case pause: {
-					final long mediaTime2 = playerImpl.getMediaTime();
-					playerImpl.stop();
-					playerImpl.setMediaTime(mediaTime2);
-					break;
-				}
-				case stop: {
-					playerImpl.stop();
-					break;
-				}
-				case export: {
-					try {
-						byte[] b = playerImpl.getData();
-						String s = "audio" + playerImpl.getExportName();
-						if (b != null) {
-							exportAudio(b, s);
-							Emulator.getEmulator().getScreen().showMessage("Saved: " + s);
-						} else {
-							Emulator.getEmulator().getScreen().showMessage("Export failed: unsupported stream type");
-						}
-					} catch (Exception e) {
-						Emulator.getEmulator().getScreen().showMessage("Export failed: " + e);
-					}
-				}
-			}
-		} catch (Exception ignored) {
 		}
 	}
 
