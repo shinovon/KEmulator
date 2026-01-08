@@ -96,29 +96,34 @@ public final class CustomClassLoader extends ClassLoader {
 
 	private byte[] load(String s) throws Exception {
 		InputStream inputStream;
-		if (Emulator.midletJar == null) {
-			final File fileFromClassPath;
-			if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
-				throw new ClassNotFoundException();
-			}
-			inputStream = new FileInputStream(fileFromClassPath);
-		} else {
-			final ZipFile zipFile;
-			final ZipEntry entry;
-			if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(s.replace('.', '/') + ".class")) == null) {
-				throw new ClassNotFoundException();
-			}
-			inputStream = zipFile.getInputStream(entry);
-		}
-
-		final ClassReader classReader = new ClassReader(inputStream);
-		final ClassWriter classWriter = new ClassWriter(0);
+		ZipFile zipFile = null;
 		try {
-			classReader.accept(new CustomClassAdapter(classWriter, s), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+			if (Emulator.midletJar == null) {
+				final File fileFromClassPath;
+				if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
+					throw new ClassNotFoundException();
+				}
+				inputStream = new FileInputStream(fileFromClassPath);
+			} else {
+				zipFile = new ZipFile(Emulator.midletJar);
+				final ZipEntry entry = zipFile.getEntry(s.replace('.', '/') + ".class");
+				if (entry == null) {
+					throw new ClassNotFoundException();
+				}
+				inputStream = zipFile.getInputStream(entry);
+			}
+
+			final ClassReader classReader = new ClassReader(inputStream);
+			final ClassWriter classWriter = new ClassWriter(0);
+			try {
+				classReader.accept(new CustomClassAdapter(classWriter, s), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+			} finally {
+				inputStream.close();
+			}
+			return classWriter.toByteArray();
 		} finally {
-			inputStream.close();
+			if (zipFile != null) zipFile.close();
 		}
-		return classWriter.toByteArray();
 	}
 
 	public static boolean isProtected(String s, boolean stack) {

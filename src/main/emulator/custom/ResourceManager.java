@@ -28,7 +28,7 @@ public final class ResourceManager {
 						break;
 					} catch (FileNotFoundException e) {
 						if (i < 5 && e.toString().contains("Bad file descriptor")) {
-							Thread.sleep(5);
+							Thread.sleep(10);
 							continue;
 						}
 						throw e;

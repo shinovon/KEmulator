@@ -437,35 +437,39 @@ public class Emulator implements Runnable {
 					}
 				}
 				Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
-				final ZipFile zipFile;
-				final Enumeration entries = (zipFile = new ZipFile(Emulator.midletJar)).getEntries();
-				while (entries.hasMoreElements()) {
-					final ZipEntry zipEntry;
-					if ((zipEntry = (ZipEntry) entries.nextElement()).getName().endsWith(".class")) {
-						final String replace = zipEntry.getName().substring(0, zipEntry.getName().length() - 6).replace('/', '.');
-						Emulator.jarClasses.add(replace);
-						Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
-					}
-				}
-				if (props == null || !props.containsKey(doja ? "AppClass" : "MIDlet-1")) {
-					try {
-						final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
-						props = new Properties();
-						for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
-							props.put(entry.getKey().toString(), entry.getValue());
-						}
-						if (!props.containsKey(doja ? "AppClass" : "MIDlet-1")) throw new Exception();
-					} catch (Exception ex2) {
-						final InputStream inputStream;
-						(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
-						(props = new Properties()).load(new InputStreamReader(inputStream, "UTF-8"));
-						inputStream.close();
-						final Enumeration<Object> keys2 = props.keys();
-						while (keys2.hasMoreElements()) {
-							final String s2 = (String) keys2.nextElement();
-							props.put(s2, props.getProperty(s2));
+				final ZipFile zipFile = new ZipFile(Emulator.midletJar);
+				try {
+					final Enumeration entries = zipFile.getEntries();
+					while (entries.hasMoreElements()) {
+						final ZipEntry zipEntry;
+						if ((zipEntry = (ZipEntry) entries.nextElement()).getName().endsWith(".class")) {
+							final String replace = zipEntry.getName().substring(0, zipEntry.getName().length() - 6).replace('/', '.');
+							Emulator.jarClasses.add(replace);
+							Emulator.emulatorimpl.getLogStream().println("Get class " + replace);
 						}
 					}
+					if (props == null || !props.containsKey(doja ? "AppClass" : "MIDlet-1")) {
+						try {
+							final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
+							props = new Properties();
+							for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
+								props.put(entry.getKey().toString(), entry.getValue());
+							}
+							if (!props.containsKey(doja ? "AppClass" : "MIDlet-1")) throw new Exception();
+						} catch (Exception ex2) {
+							final InputStream inputStream;
+							(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
+							(props = new Properties()).load(new InputStreamReader(inputStream, "UTF-8"));
+							inputStream.close();
+							final Enumeration<Object> keys2 = props.keys();
+							while (keys2.hasMoreElements()) {
+								final String s2 = (String) keys2.nextElement();
+								props.put(s2, props.getProperty(s2));
+							}
+						}
+					}
+				} finally {
+					zipFile.close();
 				}
 				if (Emulator.midletClassName != null) {
 					return true;
