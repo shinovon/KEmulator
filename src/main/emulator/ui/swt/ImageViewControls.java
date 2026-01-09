@@ -3,10 +3,7 @@ package emulator.ui.swt;
 import emulator.Settings;
 import emulator.UILocale;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
@@ -74,7 +71,15 @@ public class ImageViewControls extends Composite implements SelectionListener, M
 
 			Button clearUsageBtn = new Button(displays, 8388608);
 			clearUsageBtn.setText(UILocale.get("MEMORY_VIEW_RESET_IMAGE", "Reset usage"));
-			clearUsageBtn.addSelectionListener(new ResetUsageListener(mv));
+			clearUsageBtn.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent selectionEvent) {
+					for (int i = 0; i < mv.memoryMgr.images.size(); ++i) {
+						mv.memoryMgr.images.get(i)._resetUsedRegion();
+					}
+					mv.updateEverything();
+				}
+			});
 			clearUsageBtn.setLayoutData(new RowData(SWT.DEFAULT, 20));
 		}
 

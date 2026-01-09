@@ -17,6 +17,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
@@ -2477,7 +2479,25 @@ public final class EmulatorScreen implements
 	private void method589() {
 		final DropTarget dropTarget;
 		(dropTarget = new DropTarget(this.canvas, 19)).setTransfer(FileTransfer.getInstance());
-		dropTarget.addDropListener(new Class29(this));
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			public final void dragEnter(final DropTargetEvent dropTargetEvent) {
+				if (dropTargetEvent.detail == 16) {
+					dropTargetEvent.detail = (((dropTargetEvent.operations & 0x1) != 0x0) ? 1 : 0);
+				}
+			}
+
+			public final void dragOver(final DropTargetEvent dropTargetEvent) {
+				dropTargetEvent.feedback = 9;
+			}
+
+			public final void drop(final DropTargetEvent dropTargetEvent) {
+				final String[] array;
+				if (FileTransfer.getInstance().isSupportedType(dropTargetEvent.currentDataType) && (array = (String[]) dropTargetEvent.data).length > 0 &&
+						(array[0].toLowerCase().endsWith(".jar") || array[0].toLowerCase().endsWith(".jad") || array[0].toLowerCase().endsWith(".jam"))) {
+					Emulator.loadGame(array[0], false);
+				}
+			}
+		});
 	}
 
 	public ICaret getCaret() {

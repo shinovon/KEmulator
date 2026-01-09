@@ -197,7 +197,19 @@ public final class Methods implements Runnable, DisposeListener {
 		layout.marginWidth = 3;
 		(this.tablePanel = new Composite(this.mainSashForm, 0)).setLayout(layout);
 		(this.resetCallsBtn = new Button(this.tablePanel, 8388608)).setText(UILocale.get("METHOD_FRAME_RESET_CALLS", "Reset Calls"));
-		this.resetCallsBtn.addSelectionListener(new ResetCallsListener(this));
+		this.resetCallsBtn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
+				while (elements.hasMoreElements()) {
+					final h.MethodInfo methodInfo;
+					(methodInfo = elements.nextElement()).callCount = 0;
+					methodInfo.totalExecutionTime = 0L;
+					methodInfo.averageExecutionTime = 0.0f;
+					methodInfo.timePercentage = 0.0f;
+				}
+			}
+		});
 		(this.exportBytecodeBtn = new Button(this.tablePanel, 8388608)).setText(UILocale.get("METHOD_FRAME_EXPORT_BYTECODE", "Export ByteCode"));
 		this.exportBytecodeBtn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent selectionEvent) {
