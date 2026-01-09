@@ -1120,6 +1120,7 @@ public class Emulator implements Runnable {
 		String javahome = System.getProperty("java.home");
 		cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!Utils.win ? "/bin/java" : "/bin/java.exe")));
 		cmd.add("-cp");
+		// TODO clean duplicate entries
 		cmd.add(System.getProperty("java.class.path"));
 		cmd.add("-Xmx" + Settings.xmx + "M");
 
@@ -1176,7 +1177,9 @@ public class Emulator implements Runnable {
 		if (s == null) {
 			for (String a : Emulator.commandLineArguments) {
 				if (a.equals("-swt") || a.equals("-awt")
-						|| a.equals("-swerve") || a.equals("-lwj"))
+						|| a.equals("-swerve") || a.equals("-lwj")
+						|| a.equals("-mascotdll") || a.equals("-mascotgl")
+						|| a.equals("-s"))
 					continue;
 				cmd.add(a);
 			}
