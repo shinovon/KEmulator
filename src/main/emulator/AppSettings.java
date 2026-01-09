@@ -1,5 +1,6 @@
 package emulator;
 
+import emulator.ui.IEmulatorFrontend;
 import emulator.ui.IProperty;
 import emulator.ui.swt.Property;
 
@@ -156,37 +157,73 @@ public class AppSettings {
 	public static int load() {
 		Map<String, String> properties = appProperties = new HashMap<>();
 
-		try {
-			String s = Emulator.getEmulator().getAppProperty("MIDxlet-ScreenSize");
-			if (s == null) {
-				s = Emulator.getEmulator().getAppProperty("SEMC-Screen-Size");
-			}
-			if (s == null) {
-				s = Emulator.getEmulator().getAppProperty("Nokia-MIDlet-Original-Display-Size");
-			}
-			if (s != null) {
-				s = s.trim();
-				char sep = ',';
-				if (s.indexOf(sep) == -1) {
-					sep = 'x';
+		detectScreen: {
+			IEmulatorFrontend emulator = Emulator.getEmulator();
+			try {
+				String s = emulator.getAppProperty("MIDxlet-ScreenSize");
+				if (s == null) {
+					s = emulator.getAppProperty("SEMC-Screen-Size");
 				}
-				if (s.indexOf(sep) != -1) {
-					int w = Integer.parseInt(s.substring(0, s.indexOf(sep)).trim());
-					int h = Integer.parseInt(s.substring(s.indexOf(sep) + 1).trim());
+				if (s == null) {
+					s = emulator.getAppProperty("Nokia-MIDlet-Original-Display-Size");
+				}
+				if (s != null) {
+					s = s.trim();
+					char sep = ',';
+					if (s.indexOf(sep) == -1) {
+						sep = 'x';
+					}
+					if (s.indexOf(sep) != -1) {
+						int w = Integer.parseInt(s.substring(0, s.indexOf(sep)).trim());
+						int h = Integer.parseInt(s.substring(s.indexOf(sep) + 1).trim());
 
-					if (w > 0 && h > 0) {
-						if ("Y".equals(Emulator.getEmulator().getAppProperty("MIDxlet-WideScreen"))) {
-							screenWidth = h;
-							screenHeight = w;
-						} else {
-							screenWidth = w;
-							screenHeight = h;
+						if (w > 0 && h > 0) {
+							if ("Y".equals(emulator.getAppProperty("MIDxlet-WideScreen"))) {
+								screenWidth = h;
+								screenHeight = w;
+							} else {
+								screenWidth = w;
+								screenHeight = h;
+							}
+							break detectScreen;
 						}
 					}
 				}
+			} catch (Exception ignored) {}
+
+			String jar = Emulator.midletJar;
+			if (jar != null) {
+				jar = new File(jar).getName();
+				if (jar.contains("128x128")) {
+					screenWidth = 128;
+					screenHeight = 128;
+				} else if (jar.contains("130x130")) {
+					screenWidth = 130;
+					screenHeight = 130;
+				} else if (jar.contains("176x208")) {
+					screenWidth = 176;
+					screenHeight = 208;
+				} else if (jar.contains("176x220")) {
+					screenWidth = 176;
+					screenHeight = 220;
+				} else if (jar.contains("240x320")) {
+					screenWidth = 240;
+					screenHeight = 320;
+				} else if (jar.contains("320x240")) {
+					screenWidth = 320;
+					screenHeight = 240;
+				} else if (jar.contains("240x400")) {
+					screenWidth = 240;
+					screenHeight = 400;
+				} else if (jar.contains("360x640")) {
+					screenWidth = 360;
+					screenHeight = 640;
+				} else if (jar.contains("640x360")) {
+					screenWidth = 640;
+					screenHeight = 360;
+				}
 			}
-			System.out.println(screenWidth + "x" + screenHeight);
-		} catch (Exception ignored) {}
+		}
 
 		if (Emulator.doja) {
 			fileEncoding = "Shift_JIS";
