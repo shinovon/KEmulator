@@ -38,7 +38,7 @@
         <define name="KEY_S1" 	    value="-21"/>
         <define name="KEY_S2" 	    value="-22"/>
     </layout>
-    <define name="Siemens">
+    <layout name="Siemens">
         <define name="KEY_UP" 	    value="-59"/>
         <define name="KEY_DOWN" 	value="-60"/>
         <define name="KEY_LEFT" 	value="-61"/>
@@ -46,7 +46,7 @@
         <define name="KEY_FIRE" 	value="-26"/>
         <define name="KEY_S1" 	    value="-1"/>
         <define name="KEY_S2" 	    value="-4"/>
-    </define>
+    </layout>
     <layout name="LG">
         <define name="KEY_UP" 	    value="-1"/>
         <define name="KEY_DOWN" 	value="-2"/>
