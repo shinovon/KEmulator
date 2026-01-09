@@ -21,24 +21,6 @@ final class ExportBytecodeListener extends SelectionAdapter {
 	}
 
 	public final void widgetSelected(final SelectionEvent selectionEvent) {
-		Emulator.getEmulator().getScreen();
-		EmulatorScreen.pauseStep();
-		final FileDialog fileDialog;
-		(fileDialog = new FileDialog(Methods.method442(this.aClass46_1432), 8192)).setText(UILocale.get("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
-		fileDialog.setFileName("bytecode.txt");
-		final String open;
-		if ((open = fileDialog.open()) != null) {
-			try {
-				final PrintWriter printWriter = new PrintWriter(new FileOutputStream(open));
-				final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
-				while (elements.hasMoreElements()) {
-					printWriter.write(elements.nextElement().method705(true, true));
-				}
-				printWriter.close();
-			} catch (FileNotFoundException ex) {
-				ex.printStackTrace();
-			}
-		}
-		((EmulatorScreen) Emulator.getEmulator().getScreen()).resumeStep();
+
 	}
 }

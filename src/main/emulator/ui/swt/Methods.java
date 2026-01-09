@@ -1,15 +1,13 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
 import emulator.custom.h;
 import emulator.custom.h.MethodInfo;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -17,6 +15,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.*;
@@ -198,13 +199,41 @@ public final class Methods implements Runnable, DisposeListener {
 		(this.resetCallsBtn = new Button(this.tablePanel, 8388608)).setText(UILocale.get("METHOD_FRAME_RESET_CALLS", "Reset Calls"));
 		this.resetCallsBtn.addSelectionListener(new ResetCallsListener(this));
 		(this.exportBytecodeBtn = new Button(this.tablePanel, 8388608)).setText(UILocale.get("METHOD_FRAME_EXPORT_BYTECODE", "Export ByteCode"));
-		this.exportBytecodeBtn.addSelectionListener(new ExportBytecodeListener(this));
+		this.exportBytecodeBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				Emulator.getEmulator().getScreen();
+				EmulatorScreen.pauseStep();
+				final FileDialog fileDialog;
+				(fileDialog = new FileDialog(shell, 8192)).setText(UILocale.get("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
+				fileDialog.setFileName("bytecode.txt");
+				final String open;
+				if ((open = fileDialog.open()) != null) {
+					try {
+						final PrintWriter printWriter = new PrintWriter(new FileOutputStream(open));
+						final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
+						while (elements.hasMoreElements()) {
+							printWriter.write(elements.nextElement().method705(true, true));
+						}
+						printWriter.close();
+					} catch (FileNotFoundException ex) {
+						ex.printStackTrace();
+					}
+				}
+				((EmulatorScreen) Emulator.getEmulator().getScreen()).resumeStep();
+			}
+		});
 		if (!Settings.enableMethodTrack)
 			new Label(this.tablePanel, 8388608).setText("To track calls, enable it in System settings");
 		(this.methodsTable = new Table(this.tablePanel, 67584)).setHeaderVisible(true);
 		this.methodsTable.setLayoutData(layoutData);
 		this.methodsTable.setLinesVisible(true);
-		this.methodsTable.addSelectionListener(new TableSelectionListener(this));
+		this.methodsTable.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				try {
+					displayMethodDetails(methodsTable.getSelection());
+				} catch (Exception ignored) {}
+			}
+		});
 		final TableColumn tableColumn;
 		(tableColumn = new TableColumn(this.methodsTable, 0)).setWidth(100);
 		tableColumn.setText("Class");
@@ -264,11 +293,19 @@ public final class Methods implements Runnable, DisposeListener {
 		final TableColumn tableColumn8;
 		(tableColumn8 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn8.setText("Average Time(ms)");
-		tableColumn8.addSelectionListener(new Class75(this));
+		tableColumn8.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				sortMethodTable(7);
+			}
+		});
 		final TableColumn tableColumn9;
 		(tableColumn9 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn9.setText("% Time");
-		tableColumn9.addSelectionListener(new Class74(this));
+		tableColumn9.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				sortMethodTable(8);
+			}
+		});
 	}
 
 	private void displayMethodDetails(final TableItem[] array) {
@@ -298,13 +335,36 @@ public final class Methods implements Runnable, DisposeListener {
 		layout.marginWidth = 3;
 		(this.detailsPanel = new Composite(this.mainSashForm, 0)).setLayout(layout);
 		(this.showLineNumbersBtn = new Button(this.detailsPanel, 32)).setText("Show Line Numbers");
-		this.showLineNumbersBtn.addSelectionListener(new Class77(this));
+		this.showLineNumbersBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				displayMethodDetails(methodsTable.getSelection());
+			}
+		});
 		(this.showFramesBtn = new Button(this.detailsPanel, 32)).setText("Show Frames    ");
-		this.showFramesBtn.addSelectionListener(new Class76(this));
+		this.showFramesBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				displayMethodDetails(methodsTable.getSelection());
+			}
+		});
 		(this.searchText = new Text(this.detailsPanel, 2048)).setLayoutData(layoutData);
 		(this.searchBtn = new Button(this.detailsPanel, 8388608)).setText(UILocale.get("METHOD_FRAME_SEARCH", "Search"));
-		this.searchBtn.addSelectionListener(new SearchButtonListener(this));
-		this.searchBtn.addFocusListener(new Class78(this));
+		this.searchBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				final String text;
+				if ((text = searchText.getText()).trim().length() > 0) {
+					sortColumnIndex = codeViewer.getText().indexOf(text, sortColumnIndex);
+					if (sortColumnIndex != -1) {
+						codeViewer.setSelection(sortColumnIndex, sortColumnIndex + text.length());
+					}
+					sortColumnIndex++;
+				}
+			}
+		});
+		this.searchBtn.addFocusListener(new FocusAdapter() {
+			public void focusLost(FocusEvent focusEvent) {
+				sortColumnIndex = 0;
+			}
+		});
 		(this.codeViewer = new StyledText(this.detailsPanel, 2562)).setLayoutData(layoutData2);
 		this.codeViewer.setEditable(false);
 		this.codeViewer.setIndent(3);
@@ -324,29 +384,5 @@ public final class Methods implements Runnable, DisposeListener {
 
 	static void method443(final Methods class46, final TableItem[] array) {
 		class46.displayMethodDetails(array);
-	}
-
-	static void method444(final Methods class46, final int n) {
-		class46.sortMethodTable(n);
-	}
-
-	static Text method434(final Methods class46) {
-		return class46.searchText;
-	}
-
-	static int method445(final Methods class46, final int anInt786) {
-		return class46.sortColumnIndex = anInt786;
-	}
-
-	static int method437(final Methods class46) {
-		return class46.sortColumnIndex;
-	}
-
-	static StyledText method440(final Methods class46) {
-		return class46.codeViewer;
-	}
-
-	static int method447(final Methods class46) {
-		return class46.sortColumnIndex++;
 	}
 }

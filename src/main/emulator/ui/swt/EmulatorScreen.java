@@ -1099,7 +1099,13 @@ public final class EmulatorScreen implements
 			final MenuItem menuItem6 = new MenuItem(aMenu1018, 8);
 			menuItem6.setText("&" + n + " " + f + " " + (s.length() > 10 ? ('[' + s.substring(0, 10) + "...]") : ('[' + s + ']')));
 			menuItem6.setAccelerator(SWT.MOD1 + 49 + n - 1);
-			menuItem6.addSelectionListener(new Class45(this, n));
+			int finalN = n;
+			menuItem6.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent selectionEvent) {
+					Settings.recordedKeysFile = null;
+					Emulator.loadGame(Settings.recentJars[finalN], false);
+				}
+			});
 		}
 		menuItem5.setMenu(aMenu1018);
 		new MenuItem(this.menuMidlet, 2);

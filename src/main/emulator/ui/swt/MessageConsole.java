@@ -4,10 +4,7 @@ import emulator.Emulator;
 import emulator.UILocale;
 import emulator.ui.IMessage;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -87,7 +84,15 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 		}
 		Emulator.getEmulator().getLogStream().println(MessageConsole.aString871);
 		try {
-			shell.getDisplay().syncExec(new Textout(this));
+			shell.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					if (aStyledText877 == null || aStyledText877.isDisposed()) {
+						return;
+					}
+					aStyledText877.append(MessageConsole.aString871);
+					aStyledText877.setTopIndex(aStyledText877.getLineCount());
+				}
+			});
 		} catch (Exception ignored) {}
 	}
 
@@ -160,10 +165,22 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 		(this.aStyledText874 = new StyledText(this.aGroup872, 2624)).setLayoutData(layoutData2);
 		(this.aButton878 = new Button(this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_CLEAR", "Clear"));
 		this.aButton878.setLayoutData(gridData);
-		this.aButton878.addSelectionListener(new Class84(this));
+		this.aButton878.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				aStyledText874.setText("");
+			}
+		});
 		(this.aButton880 = new Button(this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_SEND", "Send"));
 		this.aButton880.setLayoutData(gridData);
-		this.aButton880.addSelectionListener(new Class87(this));
+		this.aButton880.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				final String text;
+				if ((text = aStyledText874.getText()) != null && text.length() > 0) {
+					aVector870.addElement(text);
+				}
+			}
+		});
 	}
 
 	private void method491() {
@@ -177,7 +194,11 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 		this.aGroup876.setLayoutData(gridData);
 		(this.aButton873 = new Button(this.aGroup876, 32)).setText(UILocale.get("SMS_CONSOLE_BLOCK", "Block the received message"));
 		this.aButton873.setSelection(this.aBoolean869);
-		this.aButton873.addSelectionListener(new Class86(this));
+		this.aButton873.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				aBoolean869 = aButton873.getSelection();
+			}
+		});
 		(this.aStyledText877 = new StyledText(this.aGroup876, 2624)).setLayoutData(gridData);
 	}
 
@@ -204,46 +225,5 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
 		this.dispose();
-	}
-
-	static StyledText method483(final MessageConsole class83) {
-		return class83.aStyledText877;
-	}
-
-	static StyledText method489(final MessageConsole class83) {
-		return class83.aStyledText874;
-	}
-
-	static Vector method484(final MessageConsole class83) {
-		return class83.aVector870;
-	}
-
-	static boolean method485(final MessageConsole class83, final boolean aBoolean869) {
-		return class83.aBoolean869 = aBoolean869;
-	}
-
-	static Button method486(final MessageConsole class83) {
-		return class83.aButton873;
-	}
-
-	private final class Textout implements Runnable {
-		private final MessageConsole aClass83_867;
-
-		private Textout(final MessageConsole aClass83_867) {
-			super();
-			this.aClass83_867 = aClass83_867;
-		}
-
-		public final void run() {
-			if (MessageConsole.method483(this.aClass83_867) == null || MessageConsole.method483(this.aClass83_867).isDisposed()) {
-				return;
-			}
-			MessageConsole.method483(this.aClass83_867).append(MessageConsole.aString871);
-			MessageConsole.method483(this.aClass83_867).setTopIndex(MessageConsole.method483(this.aClass83_867).getLineCount());
-		}
-
-		Textout(final MessageConsole class83, final Class84 class84) {
-			this(class83);
-		}
 	}
 }

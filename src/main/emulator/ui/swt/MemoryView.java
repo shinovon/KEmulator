@@ -146,15 +146,28 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		final TableColumn tableColumn;
 		(tableColumn = new TableColumn(this.classTable, 0)).setWidth(170);
 		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
-		tableColumn.addSelectionListener(new Class31(this));
+		tableColumn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeClassesSort(0);
+			}
+		});
 		final TableColumn tableColumn2;
 		(tableColumn2 = new TableColumn(this.classTable, 0)).setWidth(70);
 		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
-		tableColumn2.addSelectionListener(new Class140(this));
+		tableColumn2.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeClassesSort(1);
+			}
+		});
 		final TableColumn tableColumn3;
 		(tableColumn3 = new TableColumn(this.classTable, 0)).setWidth(100);
 		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
-		tableColumn3.addSelectionListener(new Class17(this));
+		tableColumn3.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeClassesSort(2);
+			}
+		});
 
 		SashForm objectsPanel = new SashForm(memoryPanel, 0);
 		objectsPanel.setOrientation(SWT.VERTICAL);

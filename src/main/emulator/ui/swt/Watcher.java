@@ -75,7 +75,41 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	public void fillClassList() {
-		new Thread(new ClassListFiller(this)).start();
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					switch (type) {
+						case Static: {
+							for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
+								final String s = Emulator.jarClasses.get(i);
+								try {
+									final Instance c;
+									if ((c = new Instance(s, s.equals(Emulator.getMIDlet().getClass().getName()) ? Emulator.getMIDlet() : null)).updateFields(null)) {
+										String s2 = c.toString();
+										if (c.getCls().getSuperclass() != null) {
+											s2 = s2 + "@" + c.getCls().getSuperclass().getName();
+										}
+										((Map) selectableClasses).put(s2, c);
+									}
+								} catch (Throwable e) {
+									e.printStackTrace();
+								}
+							}
+							break;
+						}
+						case Profiler: {
+							final Instance c2 = new Instance("emulator.debug.Profiler", null);
+							c2.updateFields(null);
+							((Map) selectableClasses).put(emulator.UILocale.get("WATCHES_FRAME_PROFILER", "Profiler monitor"), c2);
+
+							final Instance c3 = new Instance("emulator.debug.Profiler3D", null);
+							((Map) selectableClasses).put(emulator.UILocale.get("WATCHES_FRAME_PROFILER_3D", "3D profiler monitor"), c3);
+							break;
+						}
+					}
+				} catch (Error ignored) {}
+			}
+		}).start();
 	}
 
 	public Instance getWatched() {

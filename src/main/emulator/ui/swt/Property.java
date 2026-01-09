@@ -5,7 +5,9 @@ import emulator.graphics2D.IFont;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.FontAWT;
+import emulator.graphics2D.awt.ImageAWT;
 import emulator.graphics2D.swt.FontSWT;
+import emulator.graphics2D.swt.ImageSWT;
 import emulator.ui.IProperty;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -1065,7 +1067,16 @@ public final class Property implements IProperty, SelectionListener {
 				this.deviceCombo.setText(text);
 			}
 		}
-		this.deviceCombo.addModifyListener(new Class117(this));
+		this.deviceCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent modifyEvent) {
+				final DevicePlatform ane1073 = Devices.curPlatform;
+				Devices.curPlatform = Devices.getPlatform(deviceCombo.getText().trim());
+				updateCustomProperties();
+				method387();
+				Devices.curPlatform = ane1073;
+				updateCustomProperties();
+			}
+		});
 	}
 
 	private void genLanguageList() {
@@ -1280,11 +1291,21 @@ public final class Property implements IProperty, SelectionListener {
 		(aButton676 = new Button(aComposite667, 8388616)).setBounds(new Rectangle(62 + x, 1, 68, 19));
 		aButton676.setSelection(false);
 		aButton676.setText(UILocale.get("DIALOG_OK", "OK"));
-		aButton676.addSelectionListener(new Class113(this));
+		aButton676.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				apply();
+				saveProperties();
+				setsShell.dispose();
+			}
+		});
 		Button aButton685;
 		(aButton685 = new Button(aComposite667, 8388616)).setBounds(new Rectangle(197 + x, 0, 66, 21));
 		aButton685.setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
-		aButton685.addSelectionListener(new Class111(this));
+		aButton685.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				setsShell.dispose();
+			}
+		});
 	}
 
 	private void method393() {
@@ -1426,7 +1447,12 @@ public final class Property implements IProperty, SelectionListener {
 		this.fpsScale.setSelection(Settings.frameRate);
 		this.fpsScale.setMinimum(1);
 		this.fpsScale.setLayoutData(layoutData2);
-		this.fpsScale.addSelectionListener(new Class109(this));
+		this.fpsScale.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				Settings.frameRate = fpsScale.getSelection();
+				fpsLabel.setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
+			}
+		});
 	}
 
 	private void setupKeyMapComp() {
@@ -1769,14 +1795,24 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.horizontalAlignment = 4;
 		(this.controllerCombo = new Combo(this.keyMapControllerComp, 8)).setLayoutData(layoutData);
-		this.controllerCombo.addModifyListener(new Class185(this));
+		this.controllerCombo.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent modifyEvent) {
+				method406();
+			}
+		});
 		final GridData layoutData2;
 		(layoutData2 = new GridData()).horizontalAlignment = 2;
 		layoutData2.verticalAlignment = 2;
 		Button keymapRefreshBtn;
 		(keymapRefreshBtn = new Button(this.keyMapControllerComp, 8388616)).setText(UILocale.get("OPTION_KEYMAP_REFRESH", "Refresh"));
 		keymapRefreshBtn.setLayoutData(layoutData2);
-		keymapRefreshBtn.addSelectionListener(new Class184(this));
+		keymapRefreshBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				Controllers.refresh(true);
+				method402();
+			}
+		});
 		Button keymapClearBtn;
 		(keymapClearBtn = new Button(this.keyMapControllerComp, 8388616)).setText(UILocale.get("OPTION_KEYMAP_CLEAR", "Clear"));
 		GridData layoutData3 = new GridData();
@@ -2479,25 +2515,44 @@ public final class Property implements IProperty, SelectionListener {
 		aCLabel640.setLayoutData(layoutData3);
 		(this.aSpinner670 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
 		this.aSpinner670.setSelection(this.fontLargeSize);
-		this.aSpinner670.addModifyListener(new Class186(this));
+		this.aSpinner670.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent modifyEvent) {
+				method360(1);
+			}
+		});
 		this.method420();
 		CLabel aCLabel642;
 		(aCLabel642 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
 		(this.aSpinner679 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
 		this.aSpinner679.setSelection(this.fontMediumSize);
-		this.aSpinner679.addModifyListener(new Class187(this));
+		this.aSpinner679.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent modifyEvent) {
+				method360(2);
+			}
+		});
 		this.method422();
 		CLabel aCLabel644;
 		(aCLabel644 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
 		(this.aSpinner690 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
 		this.aSpinner690.setSelection(this.fontSmallSize);
-		this.aSpinner690.addModifyListener(new Class188(this));
+		this.aSpinner690.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent modifyEvent) {
+				method360(4);
+			}
+		});
 		this.method424();
 		CLabel aCLabel645;
 		(aCLabel645 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
 		(this.aText633 = new Text(this.sysFontComp, 2048)).setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
 		this.aText633.setLayoutData(layoutData);
-		this.aText633.addModifyListener(new Class192(this));
+		this.aText633.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent modifyEvent) {
+				method360(7);
+			}
+		});
 
 
 		final GridData layoutData4;
@@ -2514,7 +2569,11 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.horizontalAlignment = 4;
 		(this.aCombo689 = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
-		this.aCombo689.addModifyListener(new Class191(this));
+		this.aCombo689.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent modifyEvent) {
+				method360(7);
+			}
+		});
 		final FontData[] fontList = Property.display.getFontList(null, true);
 		final ArrayList<Comparable> list = new ArrayList<Comparable>();
 		list.add("Nokia");
@@ -2548,7 +2607,20 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
 		(this.aCanvas663 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
-		this.aCanvas663.addPaintListener(new Class190(this));
+		this.aCanvas663.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent paintEvent) {
+				if (anIImage671 == null) {
+					method360(1);
+				}
+				if (Settings.g2d == 0) {
+					((ImageSWT) anIImage671).method12(paintEvent.gc, 0, 0);
+					return;
+				}
+				if (Settings.g2d == 1) {
+					((ImageAWT) anIImage671).copyToScreen(paintEvent.gc);
+				}
+			}
+		});
 	}
 
 	private void method422() {
@@ -2557,7 +2629,14 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
 		(this.aCanvas680 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
-		this.aCanvas680.addPaintListener(new Class196(this));
+		this.aCanvas680.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent paintEvent) {
+				if (anIImage674 == null) {
+					method360(2);
+				}
+				anIImage674.copyToScreen(paintEvent.gc);
+			}
+		});
 	}
 
 	private void method424() {
@@ -2566,7 +2645,20 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
 		(this.aCanvas691 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
-		this.aCanvas691.addPaintListener(new Class195(this));
+		this.aCanvas691.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent paintEvent) {
+				if (anIImage693 == null) {
+					method360(4);
+				}
+				if (Settings.g2d == 0) {
+					((ImageSWT) anIImage693).copyToScreen(paintEvent.gc);
+					return;
+				}
+				if (Settings.g2d == 1) {
+					((ImageAWT) anIImage693).copyToScreen(paintEvent.gc);
+				}
+			}
+		});
 	}
 
 	private void method360(final int n) {
@@ -2679,7 +2771,22 @@ public final class Property implements IProperty, SelectionListener {
 		this.aText662.setText(this.rmsFolder);
 		Button aButton666;
 		(aButton666 = new Button(this.recordsComp, 8388616)).setText("...");
-		aButton666.addSelectionListener(new Class101(this));
+		aButton666.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				Emulator.getEmulator().getScreen();
+				EmulatorScreen.pauseStep();
+				final DirectoryDialog directoryDialog;
+				(directoryDialog = new DirectoryDialog(setsShell)).setText(UILocale.get("OPTION_RECORDS_OPEN_DIRECTORY", "Select a directory for rms"));
+				directoryDialog.setMessage(UILocale.get("OPTION_RECORDS_CHOOSE_DIR", "Choose a directory"));
+				directoryDialog.setFilterPath(System.getProperty("user.dir"));
+				final String open;
+				if ((open = directoryDialog.open()) != null) {
+					aText662.setText(open);
+					method428();
+				}
+				((EmulatorScreen) Emulator.getEmulator().getScreen()).resumeStep();
+			}
+		});
 
 		Button clearRecordsBtn;
 		if (Emulator.midletClassName != null) {
@@ -2691,10 +2798,30 @@ public final class Property implements IProperty, SelectionListener {
 			this.aTable665.setLinesVisible(true);
 			Button aButton761;
 			(aButton761 = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_SELECT_ALL", "Select All"));
-			aButton761.addSelectionListener(new Class194(this));
+			aButton761.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent selectionEvent) {
+					for (int i = 0; i < aTable665.getItemCount(); ++i) {
+						aTable665.getItem(i).setChecked(true);
+					}
+				}
+			});
 			(clearRecordsBtn = new Button(this.recordsComp, 8388608)).setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
 			clearRecordsBtn.setLayoutData(layoutData);
-			clearRecordsBtn.addSelectionListener(new Class103(this));
+			clearRecordsBtn.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent selectionEvent) {
+					// TODO: rms delete
+					final String string = method374() + ".";
+					for (int i = 0; i < aTable665.getItemCount(); ++i) {
+						final File file;
+						if (aTable665.getItem(i).getChecked()) {
+							try {
+								RecordStore.deleteRecordStore(aTable665.getItem(i).getText().trim());
+							} catch (Exception ignored) {}
+						}
+					}
+					method428();
+				}
+			});
 			new TableColumn(this.aTable665, 0).setWidth(200);
 			this.method428();
 		} else {
