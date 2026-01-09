@@ -27,6 +27,17 @@ public class AppSettings {
 	public static boolean xrayBuffer;
 
 	public static String devicePreset;
+	
+	public static int screenWidth;
+	public static int screenHeight;
+	
+	public static int leftSoftKey;
+	public static int rightSoftKey;
+	public static int fireKey;
+	public static int upKey;
+	public static int downKey;
+	public static int leftKey;
+	public static int rightKey;
 
 	// font
 	public static int fontSmallSize;
@@ -44,6 +55,7 @@ public class AppSettings {
 
 	public static boolean ignoreFullScreen;
 	public static boolean asyncFlush;
+	public static boolean startAppOnResume;
 
 	// tweaks
 	public static boolean j2lStyleFpsLimit;
@@ -80,9 +92,20 @@ public class AppSettings {
 	public static void init() {
 		// copy values from Settings
 
-		IProperty p = Emulator.getEmulator().getProperty();
+		Property p = (Property) Emulator.getEmulator().getProperty();
 
 		devicePreset = Emulator.deviceName;
+		
+		screenWidth = Integer.parseInt(p.getScreenWidth());
+		screenHeight = Integer.parseInt(p.getScreenHeight());
+		
+		leftSoftKey = Integer.parseInt(p.getLsoft());
+		rightSoftKey = Integer.parseInt(p.getRsoft());
+		fireKey = Integer.parseInt(p.getFire());
+		upKey = Integer.parseInt(p.getUp());
+		downKey = Integer.parseInt(p.getDown());
+		leftKey = Integer.parseInt(p.getLeft());
+		rightKey = Integer.parseInt(p.getRight());
 
 		fontSmallSize = p.getFontSmallSize();
 		fontMediumSize = p.getFontMediumSize();
@@ -99,6 +122,7 @@ public class AppSettings {
 
 		ignoreFullScreen = Settings.ignoreFullScreen;
 		asyncFlush = Settings.asyncFlush;
+		startAppOnResume = Settings.startAppOnResume;
 
 		j2lStyleFpsLimit = Settings.j2lStyleFpsLimit;
 		motorolaSoftKeyFix = Settings.motorolaSoftKeyFix;
@@ -125,7 +149,51 @@ public class AppSettings {
 		mascotBackgroundFilter = Settings.mascotBackgroundFilter;
 	}
 
+	public static void clear() {
+		appProperties.clear();
+	}
+
 	public static int load() {
+		Map<String, String> properties = appProperties = new HashMap<>();
+
+		try {
+			String s = Emulator.getEmulator().getAppProperty("MIDxlet-ScreenSize");
+			if (s == null) {
+				s = Emulator.getEmulator().getAppProperty("SEMC-Screen-Size");
+			}
+			if (s == null) {
+				s = Emulator.getEmulator().getAppProperty("Nokia-MIDlet-Original-Display-Size");
+			}
+			if (s != null) {
+				s = s.trim();
+				char sep = ',';
+				if (s.indexOf(sep) == -1) {
+					sep = 'x';
+				}
+				if (s.indexOf(sep) != -1) {
+					int w = Integer.parseInt(s.substring(0, s.indexOf(sep)).trim());
+					int h = Integer.parseInt(s.substring(s.indexOf(sep) + 1).trim());
+
+					if (w > 0 && h > 0) {
+						if ("Y".equals(Emulator.getEmulator().getAppProperty("MIDxlet-WideScreen"))) {
+							screenWidth = h;
+							screenHeight = w;
+						} else {
+							screenWidth = w;
+							screenHeight = h;
+						}
+					}
+				}
+			}
+			System.out.println(screenWidth + "x" + screenHeight);
+		} catch (Exception ignored) {}
+
+		if (Emulator.doja) {
+			fileEncoding = "Shift_JIS";
+		} else if (AppSettings.softbankApi) {
+			devicePreset = "400x240 (SoftBank - full screen)";
+		}
+		
 		String s;
 		if (AppSettings.uei) {
 			s = "UEI";
@@ -139,14 +207,41 @@ public class AppSettings {
 		}
 		jarSha1 = s;
 
-		Map<String, String> properties = appProperties = new HashMap<>();
-
 		if (!load(false)) {
 			return 0;
 		}
 
 		if (properties.containsKey("DevicePreset")) {
 			devicePreset = properties.get("DevicePreset");
+		}
+		
+		if (properties.containsKey("ScreenWidth")) {
+			screenWidth = Integer.parseInt(properties.get("ScreenWidth"));
+		}
+		if (properties.containsKey("ScreenHeight")) {
+			screenHeight = Integer.parseInt(properties.get("ScreenHeight"));
+		}
+		
+		if (properties.containsKey("KeyLeftSoft")) {
+			leftSoftKey = Integer.parseInt(properties.get("KeyLeftSoft"));
+		}
+		if (properties.containsKey("KeyRightSoft")) {
+			rightSoftKey = Integer.parseInt(properties.get("KeyRightSoft"));
+		}
+		if (properties.containsKey("KeyFire")) {
+			fireKey = Integer.parseInt(properties.get("KeyFire"));
+		}
+		if (properties.containsKey("KeyUp")) {
+			upKey = Integer.parseInt(properties.get("KeyUp"));
+		}
+		if (properties.containsKey("KeyDown")) {
+			downKey = Integer.parseInt(properties.get("KeyDown"));
+		}
+		if (properties.containsKey("KeyLeft")) {
+			leftKey = Integer.parseInt(properties.get("KeyLeft"));
+		}
+		if (properties.containsKey("KeyFire")) {
+			rightKey = Integer.parseInt(properties.get("KeyRight"));
 		}
 
 		if (properties.containsKey("MIDPLocale")) {
@@ -175,6 +270,9 @@ public class AppSettings {
 		}
 		if (properties.containsKey("AsyncFlush")) {
 			asyncFlush = Boolean.parseBoolean(properties.get("AsyncFlush"));
+		}
+		if (properties.containsKey("StartAppOnResume")) {
+			startAppOnResume = Boolean.parseBoolean(properties.get("StartAppOnResume"));
 		}
 
 		if (properties.containsKey("FPSLimitJLStyle")) {
@@ -206,7 +304,20 @@ public class AppSettings {
 			applySpeedToSleep = Boolean.parseBoolean(properties.get("ApplySpeedToSleep"));
 		}
 
-		return 1;
+		return 0;
+//		return 1;
+	}
+	
+	public static void set(String key, String value) {
+		appProperties.put(key, value);
+	}
+	
+	public static void set(String key, boolean value) {
+		appProperties.put(key, Boolean.toString(value));
+	}
+	
+	public static void set(String key, int value) {
+		appProperties.put(key, Integer.toString(value));
 	}
 
 	public static void save() {
@@ -248,7 +359,6 @@ public class AppSettings {
 								writer.write(value);
 								writer.newLine();
 							}
-							writer.newLine();
 						}
 						continue;
 					}
@@ -257,6 +367,8 @@ public class AppSettings {
 
 					if (line.startsWith("[")) {
 						if (save) {
+							writer.write(line);
+							writer.newLine();
 							for (;;) {
 								line = reader.readLine();
 								if (line == null) break;
@@ -274,7 +386,6 @@ public class AppSettings {
 					}
 
 					String key = line.substring(0, sepIdx);
-
 					String value = line.substring(sepIdx + 1);
 
 					appProperties.put(key, value);
@@ -301,7 +412,6 @@ public class AppSettings {
 						writer.write(value);
 						writer.newLine();
 					}
-					writer.newLine();
 				}
 				return true;
 			} catch (Exception e) {

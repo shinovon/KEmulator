@@ -4,8 +4,9 @@ import com.sun.jna.Library;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import sun.nio.ch.DirectBuffer;
 
+import java.lang.reflect.Method;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -161,7 +162,7 @@ public class MaDll {
 		IntBuffer volumeBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		volumeBuf.put(volume);
 		int r;
-		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 0, (int) ((DirectBuffer) volumeBuf).address(), 0)) != 0) {
+		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 0, (int) getAddress(volumeBuf), 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
@@ -170,16 +171,16 @@ public class MaDll {
 		IntBuffer pitchBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		pitchBuf.put(pitch);
 		int r;
-		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 2, (int) ((DirectBuffer) pitchBuf).address(), 0)) != 0) {
+		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 2, (int) getAddress(pitchBuf), 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
 
 	public void setTempo(int sound, int tempo) {
-		IntBuffer tempoBuf  = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
+		IntBuffer tempoBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		tempoBuf.put(tempo);
 		int r;
-		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 1, (int) ((DirectBuffer) tempoBuf).address(), 0)) != 0) {
+		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 1, (int) getAddress(tempoBuf), 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
@@ -236,6 +237,16 @@ public class MaDll {
 		if (EmuBuf != 0) {
 			Native.free(EmuBuf);
 			EmuBuf = 0;
+		}
+	}
+	
+	private static long getAddress(Buffer buf) {
+		try {
+			Class cls = Class.forName("sun.nio.ch.DirectBuffer");
+			Method m = cls.getMethod("address");
+			return (Long) m.invoke(buf);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 

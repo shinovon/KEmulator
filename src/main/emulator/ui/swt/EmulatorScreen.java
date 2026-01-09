@@ -48,8 +48,8 @@ public final class EmulatorScreen implements
 		MouseTrackListener, TouchListener, Listener {
 	private static Display display;
 	private static int threadCount;
-	private final int startWidth;
-	private final int startHeight;
+	private int startWidth;
+	private int startHeight;
 
 	private Shell shell;
 	private Canvas canvas;
@@ -195,18 +195,21 @@ public final class EmulatorScreen implements
 	private String leftSoftLabelText, rightSoftLabelText;
 	private Win32KeyboardPoller poller;
 
-	public EmulatorScreen(int n, int n2) {
+	public EmulatorScreen() {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		display = SWTFrontend.getDisplay();
 		this.initShell();
+	}
+
+	public void initScreen(int w, int h) {
 		try {
-			this.initScreenBuffer(n, n2);
+			this.initScreenBuffer(w, h);
 		} catch (Throwable e) {
-			Emulator.getEmulator().getLogStream().println("Failed to initialize screen buffer with size " + n + "x" + n2 + ", falling back to 240x320.");
+			Emulator.getEmulator().getLogStream().println("Failed to initialize screen buffer with size " + w + "x" + h + ", falling back to 240x320.");
 			e.printStackTrace();
-			this.initScreenBuffer(n = 240, n2 = 320);
+			this.initScreenBuffer(w = 240, h = 320);
 		}
-		startWidth = n; startHeight = n2;
+		startWidth = w; startHeight = h;
 		this.updatePauseState();
 	}
 
@@ -2559,7 +2562,11 @@ public final class EmulatorScreen implements
 	public int showMidletChoice(Vector<String> midletKeys) {
 		dialogSelection = -1;
 
+
 		Shell shell = new Shell(SWTFrontend.getDisplay(), SWT.DIALOG_TRIM);
+		try {
+			setWindowOnTop(ReflectUtil.getHandle(shell), true);
+		} catch (Throwable ignored) {}
 		shell.setSize(300, 400);
 		shell.setText(UILocale.get("START_MIDLET_CHOICE_TITLE", "Choose MIDlet to run"));
 		shell.setLayout(new GridLayout(1, false));
@@ -2588,8 +2595,7 @@ public final class EmulatorScreen implements
 			t.setText(0, p[0].trim());
 			try {
 				t.setImage(0, new Image(SWTFrontend.getDisplay(), ResourceManager.getResourceAsStream(p[1].trim())));
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		}
 
 		Rectangle clientArea = this.shell.getMonitor().getClientArea();
@@ -2610,8 +2616,7 @@ public final class EmulatorScreen implements
 
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(shell), true);
-		} catch (Throwable ignored) {
-		}
+		} catch (Throwable ignored) {}
 		MessageBox messageBox = new MessageBox(this.shell, SWT.YES | SWT.NO | SWT.CLOSE);
 		messageBox.setText(UILocale.get("UPDATE_TITLE", "KEmulator Update"));
 		switch (type) {
@@ -2630,8 +2635,7 @@ public final class EmulatorScreen implements
 		}
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
-		} catch (Throwable ignored) {
-		}
+		} catch (Throwable ignored) {}
 
 		return dialogSelection;
 	}

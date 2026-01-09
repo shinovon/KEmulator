@@ -1,8 +1,7 @@
 package emulator.ui.swt;
 
-import emulator.Devices;
-import emulator.Emulator;
-import emulator.Settings;
+import emulator.*;
+import emulator.custom.ResourceManager;
 import emulator.graphics2D.IFont;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.FontAWT;
@@ -11,7 +10,16 @@ import emulator.graphics2D.swt.FontSWT;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.graphics3D.IGraphics3D;
 import emulator.ui.*;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
 
 import javax.microedition.lcdui.Font;
 import java.io.IOException;
@@ -39,6 +47,8 @@ public final class SWTFrontend implements IEmulatorFrontend {
 	private AppSettingsUI appSettingsUI;
 	public Properties midletProps;
 	private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
+
+	protected int dialogSelection;
 
 	public SWTFrontend() {
 		super();
@@ -155,7 +165,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 
 	public final IScreen getScreen() {
 		if (screen == null) {
-			screen = new EmulatorScreen(Devices.getPropertyInt("SCREEN_WIDTH"), Devices.getPropertyInt("SCREEN_HEIGHT"));
+			screen = new EmulatorScreen();
 		}
 		return screen;
 	}

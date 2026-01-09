@@ -375,7 +375,7 @@ public class Emulator implements Runnable {
 	public static boolean getJarClasses() throws Exception {
 		try {
 			if (Emulator.midletClassName == null || Emulator.midletJar != null) {
-				Properties props = null;
+				Properties props = new Properties();
 				File file;
 				if (Emulator.jadPath != null) {
 					file = new File(Emulator.jadPath);
@@ -389,7 +389,7 @@ public class Emulator implements Runnable {
 				}
 				if (file.exists()) {
 					doja = file.getName().endsWith(".jam");
-					(props = new Properties()).load(new InputStreamReader(new FileInputStream(file), doja ? "Shift_JIS" : "UTF-8"));
+					props.load(new InputStreamReader(new FileInputStream(file), doja ? "Shift_JIS" : "UTF-8"));
 					final Enumeration<Object> keys = props.keys();
 					while (keys.hasMoreElements()) {
 						final String s = (String) keys.nextElement();
@@ -419,7 +419,6 @@ public class Emulator implements Runnable {
 					if (props == null || !props.containsKey(doja ? "AppClass" : "MIDlet-1")) {
 						try {
 							final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
-							props = new Properties();
 							for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
 								props.put(entry.getKey().toString(), entry.getValue());
 							}
@@ -427,7 +426,7 @@ public class Emulator implements Runnable {
 						} catch (Exception ex2) {
 							final InputStream inputStream;
 							(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
-							(props = new Properties()).load(new InputStreamReader(inputStream, "UTF-8"));
+							props.load(new InputStreamReader(inputStream, "UTF-8"));
 							inputStream.close();
 							final Enumeration<Object> keys2 = props.keys();
 							while (keys2.hasMoreElements()) {
@@ -645,11 +644,6 @@ public class Emulator implements Runnable {
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("kemulator.rpc.version", "1.0");
 		System.setProperty("ru.nnproject.symbiangl", "0.2-kemulator");
-
-		try {
-			AppSettings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
-		} catch (Exception ignored) {
-		}
 	}
 
 	public static void main(final String[] args) {
@@ -732,6 +726,7 @@ public class Emulator implements Runnable {
 			backgroundThread.start();
 
 			if (Emulator.midletClassName == null && Emulator.midletJar == null) {
+				Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
 				Emulator.emulatorimpl.getScreen().runEmpty();
 				emulatorimpl.dispose();
 				System.exit(0);
@@ -769,11 +764,16 @@ public class Emulator implements Runnable {
 			} catch (Exception ex3) {
 				ex3.printStackTrace();
 			}
-			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
+
+			try {
+				AppSettings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
+			} catch (Exception ignored) {}
+
 			if (AppSettings.load() == 0) {
-				System.out.println("open app settings");
 				Emulator.emulatorimpl.openAppSettings();
 			}
+			Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
+			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
 			setProperties();
 			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
 				RichPresence.rpcState = (AppSettings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
@@ -1170,7 +1170,7 @@ public class Emulator implements Runnable {
 					continue;
 				cmd.add(a);
 			}
-		} else if (s.endsWith(".jad") || s.endsWith(".jam")) {
+		} else if (s.toLowerCase().endsWith(".jad") || s.toLowerCase().endsWith(".jam")) {
 			cmd.add("-jad");
 			cmd.add(s);
 			cmd.add("-jar");
@@ -1211,8 +1211,8 @@ public class Emulator implements Runnable {
 		try {
 			File file = new File(jadPath);
 			if (file.exists()) {
-				if (jadPath.endsWith(".jam")) {
-					return jadPath.substring(0, jadPath.length() - 1) + 'r';
+				if (jadPath.toLowerCase().endsWith(".jam")) {
+					return jadPath.substring(0, jadPath.length() - 3) + "jar";
 				}
 				Properties properties = new Properties();
 				properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));

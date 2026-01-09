@@ -57,23 +57,23 @@ public final class KeyMapping {
 		int n2 = 0;
 		switch (n) {
 			case 1: {
-				n2 = ((Devices.getPropertyInt("KEY_UP") != 0) ? Devices.getPropertyInt("KEY_UP") : Canvas.UP);
+				n2 = ((AppSettings.upKey != 0) ? AppSettings.upKey : Canvas.UP);
 				break;
 			}
 			case 6: {
-				n2 = ((Devices.getPropertyInt("KEY_DOWN") != 0) ? Devices.getPropertyInt("KEY_DOWN") : Canvas.DOWN);
+				n2 = ((AppSettings.downKey != 0) ? AppSettings.downKey : Canvas.DOWN);
 				break;
 			}
 			case 2: {
-				n2 = ((Devices.getPropertyInt("KEY_LEFT") != 0) ? Devices.getPropertyInt("KEY_LEFT") : Canvas.LEFT);
+				n2 = ((AppSettings.leftKey != 0) ? AppSettings.leftKey : Canvas.LEFT);
 				break;
 			}
 			case 5: {
-				n2 = ((Devices.getPropertyInt("KEY_RIGHT") != 0) ? Devices.getPropertyInt("KEY_RIGHT") : Canvas.RIGHT);
+				n2 = ((AppSettings.rightKey != 0) ? AppSettings.rightKey : Canvas.RIGHT);
 				break;
 			}
 			case 8: {
-				n2 = ((Devices.getPropertyInt("KEY_FIRE") != 0) ? Devices.getPropertyInt("KEY_FIRE") : Canvas.FIRE);
+				n2 = ((AppSettings.fireKey != 0) ? AppSettings.fireKey : Canvas.FIRE);
 				break;
 			}
 		}
@@ -86,8 +86,8 @@ public final class KeyMapping {
 		final int left = getArrowKeyFromDevice(Canvas.LEFT);
 		final int down = getArrowKeyFromDevice(Canvas.DOWN);
 		final int right = getArrowKeyFromDevice(Canvas.RIGHT);
-		final int s1 = (Devices.getPropertyInt("KEY_S1") != 0) ? Devices.getPropertyInt("KEY_S1") : 21;
-		final int s2 = (Devices.getPropertyInt("KEY_S2") != 0) ? Devices.getPropertyInt("KEY_S2") : 22;
+		final int s1 = (AppSettings.leftSoftKey != 0) ? AppSettings.leftSoftKey : 21;
+		final int s2 = (AppSettings.rightSoftKey != 0) ? AppSettings.rightSoftKey : 22;
 		KeyMapping.strToPCKey.clear();
 		KeyMapping.strToPCKey.put("NUM_0", "48");
 		KeyMapping.strToPCKey.put("NUM_1", "49");

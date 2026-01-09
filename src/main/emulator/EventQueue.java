@@ -87,39 +87,39 @@ public final class EventQueue implements Runnable {
 
 	public void keyPress(int n) {
 		if (n == 10000) return;
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {0, n, 0, -1});
 		} else input.queue(0, n, 0, -1);
 	}
 
 	public void keyRelease(int n) {
 		if (n == 10000) return;
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {1, n, 0, -1});
 		} else input.queue(1, n, 0, -1);
 	}
 
 	public void keyRepeat(int n) {
 		if (n == 10000) return;
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {2, n, 0, -1});
 		} else input.queue(2, n, 0, -1);
 	}
 
 	public void mouseDown(int x, int y, int pointer) {
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {0, x, y, pointer});
 		} else input.queue(0, x, y, pointer);
 	}
 
 	public void mouseUp(int x, int y, int pointer) {
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {1, x, y, pointer});
 		} else input.queue(1, x, y, pointer);
 	}
 
 	public void mouseDrag(int x, int y, int pointer) {
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {2, x, y, pointer});
 		} else input.queue(2, x, y, pointer);
 	}
@@ -182,7 +182,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
-		if (Settings.j2lStyleFpsLimit)
+		if (AppSettings.j2lStyleFpsLimit)
 			Displayable._fpsLimiter(true);
 
 		synchronized (repaintLock) {
@@ -262,7 +262,7 @@ public final class EventQueue implements Runnable {
 			repaintX = repaintY = repaintW = repaintH = -1;
 			internalRepaint(x, y, w, h);
 		}
-		if (!Settings.j2lStyleFpsLimit)
+		if (!AppSettings.j2lStyleFpsLimit)
 			Displayable._fpsLimiter(true);
 	}
 
@@ -290,7 +290,7 @@ public final class EventQueue implements Runnable {
 								repaintX = repaintY = repaintW = repaintH = -1;
 								internalRepaint(x, y, w, h);
 							}
-							if (!Settings.j2lStyleFpsLimit)
+							if (!AppSettings.j2lStyleFpsLimit)
 								Displayable._fpsLimiter(true);
 							break;
 						}
@@ -306,7 +306,7 @@ public final class EventQueue implements Runnable {
 							final IImage backBufferImage3 = scr.getBackBufferImage();
 							final IImage xRayScreenImage3 = scr.getXRayScreenImage();
 							((Screen) d)._invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
-							if (Settings.asyncFlush) {
+							if (AppSettings.asyncFlush) {
 								try {
 									(AppSettings.xrayView ? xRayScreenImage3 : backBufferImage3)
 											.cloneImage(scr.getScreenImg());
@@ -509,7 +509,7 @@ public final class EventQueue implements Runnable {
 				}
 				return;
 			}
-			if (Settings.asyncFlush) {
+			if (AppSettings.asyncFlush) {
 				(AppSettings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
 			}
@@ -620,7 +620,7 @@ public final class EventQueue implements Runnable {
 					while (count > 0) {
 						try {
 							int[] o = (int[]) elements[0];
-							if (Settings.synchronizeKeyEvents) {
+							if (AppSettings.synchronizeKeyEvents) {
 								synchronized (callbackLock) {
 									processInputEvent(o);
 								}

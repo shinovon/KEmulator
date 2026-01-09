@@ -40,6 +40,11 @@ final class BridgeOutput implements IScreen {
 	}
 
 	@Override
+	public void initScreen(int w, int h) {
+
+	}
+
+	@Override
 	public IImage getScreenImg() {
 		synchronized (lock) {
 			return screenImageAwt;

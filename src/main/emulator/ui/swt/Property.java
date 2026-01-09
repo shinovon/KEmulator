@@ -126,7 +126,7 @@ public final class Property implements IProperty, SelectionListener {
 	private static Display display;
 	private Shell setsShell;
 	private Combo deviceCombo;
-	private Combo aCombo675;
+	private Combo encodingCombo;
 	private Text aText662;
 	private Text screenWidthText;
 	private Text screenHeightText;
@@ -390,30 +390,30 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	public void setCustomProperties() {
-		if (this.device.equalsIgnoreCase(Emulator.deviceName)) {
-			Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
-			Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
-			Devices.setProperty("KEY_S1", this.lsoft);
-			Devices.setProperty("KEY_S2", this.rsoft);
-			Devices.setProperty("KEY_FIRE", this.fire);
-			Devices.setProperty("KEY_UP", this.up);
-			Devices.setProperty("KEY_DOWN", this.down);
-			Devices.setProperty("KEY_LEFT", this.left);
-			Devices.setProperty("KEY_RIGHT", this.right);
-			Devices.writeProperties();
-		}
+//		if (this.device.equalsIgnoreCase(Emulator.deviceName)) {
+//			Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
+//			Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
+//			Devices.setProperty("KEY_S1", this.lsoft);
+//			Devices.setProperty("KEY_S2", this.rsoft);
+//			Devices.setProperty("KEY_FIRE", this.fire);
+//			Devices.setProperty("KEY_UP", this.up);
+//			Devices.setProperty("KEY_DOWN", this.down);
+//			Devices.setProperty("KEY_LEFT", this.left);
+//			Devices.setProperty("KEY_RIGHT", this.right);
+//			Devices.writeProperties();
+//		}
 	}
 
 	public void updateCustomProperties() {
-		this.screenWidth = Devices.getProperty("SCREEN_WIDTH");
-		this.screenHeight = Devices.getProperty("SCREEN_HEIGHT");
-		this.lsoft = Devices.getProperty("KEY_S1");
-		this.rsoft = Devices.getProperty("KEY_S2");
-		this.fire = Devices.getProperty("KEY_FIRE");
-		this.up = Devices.getProperty("KEY_UP");
-		this.down = Devices.getProperty("KEY_DOWN");
-		this.left = Devices.getProperty("KEY_LEFT");
-		this.right = Devices.getProperty("KEY_RIGHT");
+//		this.screenWidth = Devices.getProperty("SCREEN_WIDTH");
+//		this.screenHeight = Devices.getProperty("SCREEN_HEIGHT");
+//		this.lsoft = Devices.getProperty("KEY_S1");
+//		this.rsoft = Devices.getProperty("KEY_S2");
+//		this.fire = Devices.getProperty("KEY_FIRE");
+//		this.up = Devices.getProperty("KEY_UP");
+//		this.down = Devices.getProperty("KEY_DOWN");
+//		this.left = Devices.getProperty("KEY_LEFT");
+//		this.right = Devices.getProperty("KEY_RIGHT");
 	}
 
 	public void loadProperties() {
@@ -885,7 +885,7 @@ public final class Property implements IProperty, SelectionListener {
 		Devices.curPlatform = Devices.getPlatform(Emulator.deviceName);
 		this.defaultFont = this.aCombo689.getText().trim();
 		this.rmsFolder = this.aText662.getText().trim();
-		Settings.fileEncoding = this.aCombo675.getText().trim();
+		Settings.fileEncoding = this.encodingCombo.getText().trim();
 		this.fontSmallSize = this.aSpinner690.getSelection();
 		this.fontMediumSize = this.aSpinner679.getSelection();
 		this.fontLargeSize = this.aSpinner670.getSelection();
@@ -917,16 +917,16 @@ public final class Property implements IProperty, SelectionListener {
 		KeyMapping.mapDeviceKey(8, KeyMapping.method601(Property.aStringArray661[8]));
 		KeyMapping.mapDeviceKey(9, KeyMapping.method601(Property.aStringArray661[9]));
 		KeyMapping.mapDeviceKey(0, KeyMapping.method601(Property.aStringArray661[0]));
-		Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
-		Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
-		Devices.setProperty("KEY_S1", this.lsoft);
-		Devices.setProperty("KEY_S2", this.rsoft);
-		Devices.setProperty("KEY_FIRE", this.fire);
-		Devices.setProperty("KEY_UP", this.up);
-		Devices.setProperty("KEY_DOWN", this.down);
-		Devices.setProperty("KEY_LEFT", this.left);
-		Devices.setProperty("KEY_RIGHT", this.right);
-		Devices.writeProperties();
+//		Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
+//		Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
+//		Devices.setProperty("KEY_S1", this.lsoft);
+//		Devices.setProperty("KEY_S2", this.rsoft);
+//		Devices.setProperty("KEY_FIRE", this.fire);
+//		Devices.setProperty("KEY_UP", this.up);
+//		Devices.setProperty("KEY_DOWN", this.down);
+//		Devices.setProperty("KEY_LEFT", this.left);
+//		Devices.setProperty("KEY_RIGHT", this.right);
+//		Devices.writeProperties();
 		KeyMapping.init();
 		if (Settings.enableKeyCache != this.aButton696.getSelection()) {
 			KeyMapping.keyCacheStack.clear();
@@ -1074,7 +1074,16 @@ public final class Property implements IProperty, SelectionListener {
 			public void modifyText(ModifyEvent modifyEvent) {
 				final DevicePlatform ane1073 = Devices.curPlatform;
 				Devices.curPlatform = Devices.getPlatform(deviceCombo.getText().trim());
-				updateCustomProperties();
+//				updateCustomProperties();
+				screenWidth = Devices.getProperty("SCREEN_WIDTH");
+				screenHeight = Devices.getProperty("SCREEN_HEIGHT");
+				lsoft = Devices.getProperty("KEY_S1");
+				rsoft = Devices.getProperty("KEY_S2");
+				fire = Devices.getProperty("KEY_FIRE");
+				up = Devices.getProperty("KEY_UP");
+				down = Devices.getProperty("KEY_DOWN");
+				left = Devices.getProperty("KEY_LEFT");
+				right = Devices.getProperty("KEY_RIGHT");
 				method387();
 				Devices.curPlatform = ane1073;
 				updateCustomProperties();
@@ -1154,7 +1163,7 @@ public final class Property implements IProperty, SelectionListener {
 //		layoutData.horizontalSpan = 1;
 //		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCombo675 = new Combo(this.customComp, 8)).setLayoutData(layoutData);
+		(this.encodingCombo = new Combo(this.customComp, 8)).setLayoutData(layoutData);
 		final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
 		final ArrayList<Comparable> list = new ArrayList(availableCharsets.keySet());
 		Collections.sort(list);
@@ -1167,13 +1176,13 @@ public final class Property implements IProperty, SelectionListener {
 					&& !e.equalsIgnoreCase("EUC-KR")) {
 				continue;
 			}
-			this.aCombo675.add(e);
+			this.encodingCombo.add(e);
 			if (Settings.fileEncoding.equalsIgnoreCase(e)) {
 				s = e;
 			}
 		}
 		Settings.fileEncoding = s;
-		this.aCombo675.setText(s);
+		this.encodingCombo.setText(s);
 	}
 
 	private void setupCustomProperties() {
@@ -3146,6 +3155,42 @@ public final class Property implements IProperty, SelectionListener {
 			System.setProperty("socksProxyPort", Settings.proxyPort);
 		}
 		Authenticator.setDefault(new MyAuthenticator(this, Settings.proxyUser, Settings.proxyPass));
+	}
+	
+	public String getScreenWidth() {
+		return screenWidth;
+	}
+	
+	public String getScreenHeight() {
+		return screenHeight;
+	}
+
+	public String getLsoft() {
+		return lsoft;
+	}
+
+	public String getRsoft() {
+		return rsoft;
+	}
+
+	public String getFire() {
+		return fire;
+	}
+
+	public String getUp() {
+		return up;
+	}
+
+	public String getDown() {
+		return down;
+	}
+
+	public String getLeft() {
+		return left;
+	}
+
+	public String getRight() {
+		return right;
 	}
 
 	static Combo method361(final Property class38) {

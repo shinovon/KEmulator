@@ -72,4 +72,6 @@ public interface IScreen {
 	void appStarted(boolean first);
 
 	boolean isShown();
+
+	void initScreen(int w, int h);
 }
