@@ -1061,10 +1061,11 @@ public final class EmulatorScreen implements
 		this.enableAutoplayMenuItem.setSelection(Settings.playingRecordedKeys);
 		this.enableAutoplayMenuItem.setEnabled(Settings.playingRecordedKeys);
 		new MenuItem(this.menuTool, 2);
-		(this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tAlt+C");
+		(this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tAlt+S");
+		this.captureToFileMenuItem.setAccelerator(SWT.ALT | 'S');
 		this.captureToFileMenuItem.addSelectionListener(this);
-		(this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+S");
-		this.captureToClipboardMenuItem.setAccelerator(SWT.ALT | 'S');
+		(this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+C");
+		this.captureToClipboardMenuItem.setAccelerator(SWT.ALT | 'C');
 		this.captureToClipboardMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuTool, 2);
 		(this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tCtrl+F3");
@@ -1187,7 +1188,7 @@ public final class EmulatorScreen implements
 
 
 	void toggleMenuAccelerators(final boolean b) {
-		this.captureToFileMenuItem.setAccelerator(b ? SWT.ALT | 67 : 0);
+
 	}
 
 	public static void pause() {
