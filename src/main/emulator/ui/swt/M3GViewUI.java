@@ -339,9 +339,15 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		(menuItem3 = new MenuItem(this.menu, 64)).setText(UILocale.get("M3G_VIEW_LIGHT", "Light"));
 		this.lightMenu = new Menu(menuItem3);
 		(this.sceneLightItem = new MenuItem(this.lightMenu, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
-		this.sceneLightItem.addSelectionListener(new M3GViewLightSceneListener(this));
+//		this.sceneLightItem.addSelectionListener(new SelectionAdapter() {
+//			public void widgetSelected(SelectionEvent selectionEvent) {
+//			}
+//		});
 		(this.viewLightItem = new MenuItem(this.lightMenu, 16)).setText(UILocale.get("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
-		this.viewLightItem.addSelectionListener(new M3GViewLightViewListener(this));
+//		this.viewLightItem.addSelectionListener(new SelectionAdapter() {
+//			public void widgetSelected(SelectionEvent selectionEvent) {
+//			}
+//		});
         /*new MenuItem(this.lightMenu, 2);
         (this.lightSettingsItem = new MenuItem(this.lightMenu, 8)).setText(UILocale.get("M3G_VIEW_LIGHT_SETTING", "Light Setting"));*/
 		menuItem3.setMenu(this.lightMenu);
@@ -384,16 +390,33 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		new MenuItem(this.cameraMenu, 2);
 		(this.aMenuItem935 = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_RESET", "Reset Camera") + "\tR");
 		this.aMenuItem935.setAccelerator(82);
-		this.aMenuItem935.addSelectionListener(new M3GViewCameraResetListener(this));
+		this.aMenuItem935.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				method524();
+			}
+		});
 		menuItem2.setMenu(this.cameraMenu);
 		this.displayMenu = new Menu(menuItem);
 		(this.axisItem = new MenuItem(this.displayMenu, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_COORDINATE", "Coordinate Axis"));
-		this.axisItem.addSelectionListener(new M3GViewDisplayAxisListener(this));
+		this.axisItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				showAxis = axisItem.getSelection();
+			}
+		});
 		(this.gridItem = new MenuItem(this.displayMenu, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_GRID", "Show Grid"));
-		this.gridItem.addSelectionListener(new M3GViewDisplayGridListener(this));
+		this.gridItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				showGrid = gridItem.getSelection();
+			}
+		});
 		(this.xrayItem = new MenuItem(this.displayMenu, 32)).setText(UILocale.get("M3G_VIEW_DISPLAY_SHOW_XRAY", "Show Xray") + "\tX");
 		this.xrayItem.setAccelerator(88);
-		this.xrayItem.addSelectionListener(new M3GViewXrayListener(this));
+		this.xrayItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				setXray(xrayItem.getSelection());
+			}
+		});
 
 		renderInvisibleItem = new MenuItem(this.displayMenu, 32);
 		renderInvisibleItem.setText(UILocale.get("M3G_VIEW_DISPLAY_RENDER_INVISIBLE", "Render invisible nodes") + "\tV");
@@ -407,11 +430,22 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		new MenuItem(this.displayMenu, 2);
 		(this.aMenuItem921 = new MenuItem(this.displayMenu, 8)).setText(UILocale.get("M3G_VIEW_DISPLAY_UPDATE_WORLD", "Update World") + "\tF5");
 		this.aMenuItem921.setAccelerator(16777230);
-		this.aMenuItem921.addSelectionListener(new M3GViewUpdateWorldListener(this));
+		this.aMenuItem921.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				addM3GObjects();
+			}
+		});
 		menuItem.setMenu(this.displayMenu);
 		menuItem.setText(UILocale.get("M3G_VIEW_DISPLAY", "Display"));
 		this.shell.setMenuBar(this.menu);
-		this.shell.addShellListener(new M3GViewCloseListener(this));
+		this.shell.addShellListener(new ShellAdapter() {
+			@Override
+			public void shellClosed(ShellEvent shellEvent) {
+				shellEvent.doit = false;
+				close();
+			}
+		});
 	}
 
 	private void method545() {
@@ -440,8 +474,48 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		(this.aTree896 = new Tree(this.aComposite891, 2048)).setHeaderVisible(false);
 		this.aTree896.setLayoutData(layoutData);
 		this.aTree896.setLinesVisible(false);
-		this.aTree896.addListener(17, new M3GViewGroupClickListener(this));
-		this.aTree896.addMouseListener(new M3GViewNodeRightClickListener(this));
+		this.aTree896.addListener(17, new Listener() {
+			public void handleEvent(Event event) {
+				final TreeItem groupWidget = (TreeItem) event.item;
+				final TreeItem[] items = groupWidget.getItems();
+
+				if (items.length != 1) return;
+				if (items[0].getData() != null) return;
+
+				items[0].dispose();
+
+				if (groupWidget.getData() instanceof Group) {
+					final Group group = (Group) groupWidget.getData();
+
+					for (int i = 0; i < group.getChildCount(); ++i) {
+						final Node child = group.getChild(i);
+						final String name = child.getClass().getName();
+						final TreeItem childWidget = new TreeItem(groupWidget, 0);
+
+						childWidget.setText(name.substring(name.lastIndexOf(".") + 1) + "_" + child.getUserID());
+						if (!child.isRenderingEnabled())
+							childWidget.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+						childWidget.setData(child);
+						if (child instanceof Group) {
+							new TreeItem((TreeItem) childWidget, 0);
+						}
+					}
+				}
+			}
+		});
+		this.aTree896.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent mouseEvent) {
+				if (mouseEvent.button == 3) {
+					try {
+						final Node node;
+						if (aTree896.getSelection() != null && (node = (Node) aTree896.getSelection()[0].getData()) != null) {
+							new Watcher(node).open(shell);
+						}
+					} catch (Exception ignored) {}
+				}
+			}
+		});
 	}
 
 	private void method547() {
@@ -906,10 +980,6 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				} catch (Exception ignored) {
 				}
 			}
-		}
-
-		Flusher(final M3GViewUI class90, final M3GViewLightSceneListener class91) {
-			this(class90);
 		}
 	}
 

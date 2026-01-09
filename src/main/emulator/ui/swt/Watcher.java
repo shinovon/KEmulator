@@ -554,7 +554,17 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		tree.setLayoutData(treeLayout);
 		if (this.type != WatcherType.Profiler) {
 			tree.setToolTipText("Right click: open watcher\nDouble click: edit value");
-			tree.addMouseListener(new WatcherTreeMouseHandler(this));
+			tree.addMouseListener(new MouseAdapter() {
+				public void mouseDown(final MouseEvent mouseEvent) {
+					if (mouseEvent.button == 3) {
+						openWatcherForSelected();
+					}
+				}
+
+				public void mouseDoubleClick(final MouseEvent mouseEvent) {
+					startFieldEditingForSelected();
+				}
+			});
 		}
 		tree.addTreeListener(this);
 

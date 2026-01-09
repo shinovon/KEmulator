@@ -241,10 +241,32 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		Menu menuSave = new Menu(this.shell, 8);
 		final MenuItem menuItem = new MenuItem(menuSave, 8);
 		menuItem.setText(UILocale.get("MEMORY_VIEW_SAVE_ONE", "Export selected image"));
-		menuItem.addSelectionListener(new SaveImageListener(this));
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				exportSelectedImage();
+			}
+		});
 		final MenuItem menuItem2 = new MenuItem(menuSave, 8);
 		menuItem2.setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Export all images"));
-		menuItem2.addSelectionListener(new SaveAllImagesListener(this));
+		menuItem2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				final DirectoryDialog directoryDialog;
+				(directoryDialog = new DirectoryDialog(getShell())).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Export all images"));
+				directoryDialog.setMessage(UILocale.get("MEMORY_VIEW_CHOOSE_DIRECTORY", "Choose a directory"));
+				directoryDialog.setFilterPath(System.getProperty("user.dir"));
+				final String open;
+				if ((open = directoryDialog.open()) != null) {
+					for (int i = 0; i < MemoryView.imagesToShow.size(); ++i) {
+						try {
+							MemoryView.imagesToShow.get(i).drawable._getImpl().saveToFile(open + "/" + i + ".png");
+						} catch (Exception ignored) {
+						}
+					}
+				}
+			}
+		});
 
 		imagesCanvas.setMenu(menuSave);
 	}
