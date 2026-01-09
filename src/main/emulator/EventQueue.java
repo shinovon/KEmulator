@@ -63,12 +63,12 @@ public final class EventQueue implements Runnable {
 				long time = System.currentTimeMillis();
 				try {
 					while (running) {
-						if (alive || paused || Settings.steps >= 0) {
+						if (alive || paused || AppSettings.steps >= 0) {
 							time = System.currentTimeMillis();
 							alive = false;
 						} else if ((System.currentTimeMillis() - time) > 5000) {
 							time = System.currentTimeMillis();
-							if (!Settings.uei) {
+							if (!AppSettings.uei) {
 								Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
 							}
 						}
@@ -230,11 +230,11 @@ public final class EventQueue implements Runnable {
 	public void gameGraphicsFlush() {
 		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
-			if (Settings.asyncFlush) {
+			if (AppSettings.asyncFlush) {
 				final IImage screenImage = scr.getScreenImg();
 				final IImage backBufferImage2 = scr.getBackBufferImage();
 				final IImage xRayScreenImage2 = scr.getXRayScreenImage();
-				(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+				(AppSettings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
 			}
 			scr.repaint();
 		}
@@ -243,11 +243,11 @@ public final class EventQueue implements Runnable {
 	public void gameGraphicsFlush(int x, int y, int w, int h) {
 		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
-			if (Settings.asyncFlush) {
+			if (AppSettings.asyncFlush) {
 				final IImage screenImage = scr.getScreenImg();
 				final IImage backBufferImage2 = scr.getBackBufferImage();
 				final IImage xRayScreenImage2 = scr.getXRayScreenImage();
-				(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage, x, y, w, h);
+				(AppSettings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage, x, y, w, h);
 			}
 			scr.repaint();
 		}
@@ -308,7 +308,7 @@ public final class EventQueue implements Runnable {
 							((Screen) d)._invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
 							if (Settings.asyncFlush) {
 								try {
-									(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
+									(AppSettings.xrayView ? xRayScreenImage3 : backBufferImage3)
 											.cloneImage(scr.getScreenImg());
 								} catch (Exception ignored) {}
 							}
@@ -482,7 +482,7 @@ public final class EventQueue implements Runnable {
 					|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 				return;
 			}
-			if (Settings.xrayView) Displayable._resetXRayGraphics();
+			if (AppSettings.xrayView) Displayable._resetXRayGraphics();
 			IScreen scr = Emulator.getEmulator().getScreen();
 			IImage backBufferImage, xRayScreenImage;
 			if (canvas instanceof SpriteCanvas) {
@@ -510,7 +510,7 @@ public final class EventQueue implements Runnable {
 				return;
 			}
 			if (Settings.asyncFlush) {
-				(Settings.xrayView ? xRayScreenImage : backBufferImage)
+				(AppSettings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
 			}
 			scr.repaint();

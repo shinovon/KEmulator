@@ -16,17 +16,13 @@ public final class Settings {
 	public static boolean rightClickMenu;
 	public static float canvasScale;
 	public static int frameRate = 60;
-	public static int steps = -1;
 	public static long aLong1235;
 	public static String fileEncoding;
 	public static String[] recentJars = new String[5];
 	public static boolean infoColorHex;
 	public static boolean recordReleasedImg;
-	public static boolean xrayView;
-	public static boolean xrayBuffer;
 	public static boolean xrayOverlapScreen;
 	public static boolean xrayShowClipBorder;
-	public static int speedModifier = 1;
 	public static boolean autoGenJad;
 	public static boolean enableMethodTrack;
 	public static boolean enableNewTrack;
@@ -46,7 +42,6 @@ public final class Settings {
 	public static boolean showLogFrame;
 	public static boolean showInfoFrame;
 	public static boolean showMemViewFrame;
-	public static boolean blackberryApi = false;
 
 	// nnmod
 
@@ -65,13 +60,11 @@ public final class Settings {
 	public static boolean pollKeyboardOnRepaint = true;
 	public static String uiLanguage = "en";
 	public static boolean rpc;
-	public static boolean uei;
 	public static boolean fpsCounter = true;
 	public static boolean synchronizeKeyEvents = true;
 	public static boolean motorolaSoftKeyFix = false;
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
 	public static ResizeMethod resizeMode = ResizeMethod.Fit;
-	public static boolean patchSynchronizedPaint = false;
 
 	//m3g
 	public static boolean m3gIgnoreOverwrite;
@@ -100,7 +93,6 @@ public final class Settings {
 	public static boolean searchVms;
 
 	public static int xmx = 512;
-	public static boolean asmSkipDebug;
 	public static boolean oneMidiAtTime;
 	public static boolean ignoreRegionRepaint;
 	public static boolean startAppOnResume = true;
@@ -131,9 +123,6 @@ public final class Settings {
 	public static String updateBranch = "stable";
 	public static int autoUpdate = 0; // 0 - not asked, 1 - manual, 2 - automatic
 	public static boolean asyncFlush = true;
-
-	public static boolean softbankApi = false;
-    public static String customTitle;
 
 	public static boolean disableCamera;
 

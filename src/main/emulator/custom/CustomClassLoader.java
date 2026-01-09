@@ -1,5 +1,6 @@
 package emulator.custom;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import org.apache.tools.zip.ZipEntry;
@@ -55,7 +56,7 @@ public final class CustomClassLoader extends ClassLoader {
 				if ((entry = (zipFile = new ZipFile((String) Emulator.jarLibrarys.get(i))).getEntry(s.replace('.', '/') + ".class")) != null) {
 					final ClassReader classReader = new ClassReader(zipFile.getInputStream(entry));
 					final ClassWriter classWriter = new ClassWriter(0);
-					classReader.accept(new ClassVisitor(Opcodes.ASM4, classWriter) {}, Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+					classReader.accept(new ClassVisitor(Opcodes.ASM4, classWriter) {}, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
 					final byte[] byteArray = classWriter.toByteArray();
 					defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
 				}
@@ -73,15 +74,15 @@ public final class CustomClassLoader extends ClassLoader {
 			try {
 				bytes = load(s);
 			} catch (ArrayIndexOutOfBoundsException e) {
-				if (Settings.asmSkipDebug) throw e;
-				Settings.asmSkipDebug = true;
+				if (AppSettings.asmSkipDebug) throw e;
+				AppSettings.asmSkipDebug = true;
 				bytes = load(s);
 			}
 			try {
 				defineClass = this.defineClass(s, bytes, 0, bytes.length);
 			} catch (ClassFormatError e) {
-				if (Settings.asmSkipDebug) throw e;
-				Settings.asmSkipDebug = true;
+				if (AppSettings.asmSkipDebug) throw e;
+				AppSettings.asmSkipDebug = true;
 				bytes = load(s);
 				defineClass = this.defineClass(s, bytes, 0, bytes.length);
 			}
@@ -116,7 +117,7 @@ public final class CustomClassLoader extends ClassLoader {
 			final ClassReader classReader = new ClassReader(inputStream);
 			final ClassWriter classWriter = new ClassWriter(0);
 			try {
-				classReader.accept(new CustomClassAdapter(classWriter, s), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+				classReader.accept(new CustomClassAdapter(classWriter, s), AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
 			} finally {
 				inputStream.close();
 			}

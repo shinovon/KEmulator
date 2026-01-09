@@ -6,7 +6,7 @@ log.txt
 property.txt
 track.txt
 classwatcher.txt
-midlets.txt
+midlets.*
 updater.jar
 builder.jar
 

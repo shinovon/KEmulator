@@ -1,5 +1,6 @@
 package javax.microedition.lcdui;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.graphics2D.IFont;
 
@@ -33,16 +34,16 @@ public class Font {
 		int mappedSize = 0;
 		switch (size) {
 			case SIZE_MEDIUM: {
-				mappedSize = Emulator.getEmulator().getProperty().getFontMediumSize();
+				mappedSize = AppSettings.fontMediumSize;
 				break;
 			}
 			case SIZE_LARGE: {
-				mappedSize = Emulator.getEmulator().getProperty().getFontLargeSize();
+				mappedSize = AppSettings.fontLargeSize;
 				break;
 			}
 			case SIZE_SMALL:
 			default: {
-				mappedSize = Emulator.getEmulator().getProperty().getFontSmallSize();
+				mappedSize = AppSettings.fontSmallSize;
 				break;
 			}
 		}

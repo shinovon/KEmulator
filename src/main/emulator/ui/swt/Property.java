@@ -186,6 +186,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Text aText633;
 	private String device;
 	private String defaultFont;
+	private String monospaceFont;
 	private String rmsFolder;
 	private String screenWidth;
 	private String screenHeight;
@@ -313,8 +314,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	public String getMonospaceFontName() {
-		// TODO
-		return "Consolas";
+		return monospaceFont;
 	}
 
 	public int getFontSmallSize() {
@@ -428,6 +428,7 @@ public final class Property implements IProperty, SelectionListener {
 			this.device = property;
 			Emulator.deviceName = property;
 			this.defaultFont = properties.getProperty("DefaultFont", "Tahoma");
+			this.monospaceFont = properties.getProperty("MonospacedFont", "Consolas");
 			this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
 			this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
 			this.fontMediumSize = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
@@ -522,7 +523,7 @@ public final class Property implements IProperty, SelectionListener {
 
             Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
 			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
-			Settings.microeditionPlatform = properties.getProperty("MicroeditionPlatform", "Nokia6700c-1/13.10");
+			Settings.microeditionPlatform = properties.getProperty("MIDPPlatform", "Nokia6700c-1/13.10");
 
 			// emulator
 			Settings.rightClickMenu = Boolean.parseBoolean(properties.getProperty("RightClickMenu", "false"));
@@ -633,6 +634,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 			this.device = "SonyEricssonK800";
 			this.defaultFont = "Tahoma";
+			this.monospaceFont = "Consolas";
 			this.rmsFolder = "/rms";
 			this.screenWidth = "240";
 			this.screenHeight = "320";
@@ -675,6 +677,7 @@ public final class Property implements IProperty, SelectionListener {
 
 			properties.setProperty("DevicePreset", this.device);
 			properties.setProperty("DefaultFont", this.defaultFont);
+			properties.setProperty("MonospacedFont", this.monospaceFont);
 			properties.setProperty("RMSFolder", this.rmsFolder);
 			properties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
 			properties.setProperty("FontMediumSize", String.valueOf(this.fontMediumSize));
@@ -767,7 +770,7 @@ public final class Property implements IProperty, SelectionListener {
 
 			properties.setProperty("FileEncoding", Settings.fileEncoding);
 			properties.setProperty("MIDPLocale", Settings.locale);
-			properties.setProperty("MicroeditionPlatform", Settings.microeditionPlatform);
+			properties.setProperty("MIDPPlatform", Settings.microeditionPlatform);
 
 			// emulator
 			properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));

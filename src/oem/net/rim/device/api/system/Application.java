@@ -1,5 +1,6 @@
 package net.rim.device.api.system;
 
+import emulator.AppSettings;
 import net.rim.device.api.ui.UiApplication;
 
 public class Application {
@@ -15,7 +16,7 @@ public class Application {
 		if (instance == null) {
 			instance = new UiApplication();
 		}
-		emulator.Settings.blackberryApi = true;
+		AppSettings.blackberryApi = true;
 		return instance;
 	}
 

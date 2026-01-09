@@ -4,6 +4,7 @@ import com.jblend.graphics.j3d.Effect3D;
 import com.jblend.graphics.j3d.Figure;
 import com.jblend.graphics.j3d.FigureLayout;
 import com.jblend.graphics.j3d.Texture;
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler;
@@ -76,7 +77,7 @@ public class Graphics
 	}
 
 	public IGraphics2D getImpl() {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			return this.xrayGraphics;
 		}
 		return this.impl;
@@ -189,7 +190,7 @@ public class Graphics
 			this.impl.transform(transform);
 			this.impl.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
 			this.impl.setTransform(transform2);
-			if (n5 >= 0 && Settings.xrayView && xrayGraphics != null) {
+			if (n5 >= 0 && AppSettings.xrayView && xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
 				if (Settings.xrayOverlapScreen) {
 					this.xrayGraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
@@ -399,7 +400,7 @@ public class Graphics
 		final int n9 = clipX - (n3 - n);
 		final int n10 = clipY - (n4 - n2);
 		image._getUsedRegion().setAlpha(n9, n10, n7, n8, 0);
-		if (!Settings.xrayView || xrayGraphics == null) {
+		if (!AppSettings.xrayView || xrayGraphics == null) {
 			return;
 		}
 		if (Settings.xrayOverlapScreen) {
@@ -418,7 +419,7 @@ public class Graphics
 	}
 
 	private void xrayFillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.fillArc(n, n2, n3, n4, n5, n6);
 			this.xrayUpdate();
@@ -426,7 +427,7 @@ public class Graphics
 	}
 
 	private void xrayDrawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.drawArc(n, n2, n3, n4, n5, n6);
 			this.xrayUpdate();
@@ -434,7 +435,7 @@ public class Graphics
 	}
 
 	private void xrayFillRect(final int n, final int n2, final int n3, final int n4, final int n5) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(n5, false);
 			this.xrayGraphics.fillRect(n, n2, n3, n4);
 			this.xrayUpdate();
@@ -442,7 +443,7 @@ public class Graphics
 	}
 
 	private void xrayDrawRect(final int n, final int n2, final int n3, final int n4) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.drawRect(n, n2, n3, n4);
 			this.xrayUpdate();
@@ -450,7 +451,7 @@ public class Graphics
 	}
 
 	private void xrayDrawLine(final int n, final int n2, final int n3, final int n4) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.drawLine(n, n2, n3, n4);
 			this.xrayUpdate();

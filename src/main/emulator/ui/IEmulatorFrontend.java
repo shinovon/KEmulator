@@ -50,4 +50,6 @@ public interface IEmulatorFrontend {
 	void updateLanguage();
 
 	void dispose();
+
+	void openAppSettings();
 }

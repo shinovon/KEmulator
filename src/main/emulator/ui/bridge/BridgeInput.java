@@ -1,7 +1,7 @@
 package emulator.ui.bridge;
 
+import emulator.AppSettings;
 import emulator.Emulator;
-import emulator.Settings;
 import emulator.ui.TargetedCommand;
 
 import java.io.IOException;
@@ -108,7 +108,7 @@ class BridgeInput implements Runnable {
 				throw new RuntimeException("Not implemented");
 			}
 			case "X": {
-				Settings.xrayView = parseBool(data[1]);
+				AppSettings.xrayView = parseBool(data[1]);
 				break;
 			}
 			default:

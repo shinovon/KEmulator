@@ -780,10 +780,10 @@ public final class EmulatorScreen implements
 			var9.append(" FPS");
 			var9.append(var8);
 		}
-		if (Settings.speedModifier > 0) {
+		if (AppSettings.speedModifier > 0) {
 			var9.append("x");
 		}
-		var9.append(Settings.speedModifier);
+		var9.append(AppSettings.speedModifier);
 		this.statusLabel.setText(var9.toString());
 	}
 
@@ -1200,15 +1200,15 @@ public final class EmulatorScreen implements
 	}
 
 	public static void pause() {
-		Settings.steps = 0;
+		AppSettings.steps = 0;
 	}
 
 	static void pauseStep() {
-		Settings.steps = 1;
+		AppSettings.steps = 1;
 	}
 
 	public void resumeStep() {
-		Settings.steps = -1;
+		AppSettings.steps = -1;
 		if (this.screenImg != null && !this.screenImg.isDisposed()) {
 			this.screenImg.dispose();
 		}
@@ -1266,26 +1266,26 @@ public final class EmulatorScreen implements
 					return;
 				}
 				if (menuItem == this.resetSpeedMenuItem){
-					Settings.speedModifier = 1;
+					AppSettings.speedModifier = 1;
 					this.updateStatus();
 				} else if (menuItem == this.speedUpMenuItem) {
-					if (Settings.speedModifier == -1) {
-						Settings.speedModifier = 1;
+					if (AppSettings.speedModifier == -1) {
+						AppSettings.speedModifier = 1;
 						this.updateStatus();
 						return;
 					}
-					if (Settings.speedModifier < 100) {
-						++Settings.speedModifier;
+					if (AppSettings.speedModifier < 100) {
+						++AppSettings.speedModifier;
 						this.updateStatus();
 					}
 				} else if (menuItem == this.slowDownMenuItem) {
-					if (Settings.speedModifier == 1) {
-						Settings.speedModifier = -1;
+					if (AppSettings.speedModifier == 1) {
+						AppSettings.speedModifier = -1;
 						this.updateStatus();
 						return;
 					}
-					if (Settings.speedModifier > -100) {
-						--Settings.speedModifier;
+					if (AppSettings.speedModifier > -100) {
+						--AppSettings.speedModifier;
 						this.updateStatus();
 					}
 				} else {
@@ -1369,7 +1369,7 @@ public final class EmulatorScreen implements
 				this.pauseState = 1;
 				Emulator.getEventQueue().queue(EventQueue.EVENT_RESUME);
 				this.screenImg.dispose();
-				if (Settings.steps == 0) {
+				if (AppSettings.steps == 0) {
 					this.pauseScreen();
 					this.canvas.redraw();
 				} else {
@@ -1545,13 +1545,13 @@ public final class EmulatorScreen implements
 			}
 			if (menuItem == this.forcePaintMenuItem) {
 				if (Settings.g2d == 0) {
-					if (Settings.xrayView) {
+					if (AppSettings.xrayView) {
 						this.xrayScreenImageSwt.cloneImage(this.screenCopySwt);
 					} else {
 						this.backBufferImageSwt.cloneImage(this.screenCopySwt);
 					}
 				} else if (Settings.g2d == 1) {
-					(Settings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenCopyAwt);
+					(AppSettings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenCopyAwt);
 				}
 				this.canvas.redraw();
 				return;
@@ -1603,7 +1603,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.xrayViewMenuItem) {
-				Settings.xrayView = this.xrayViewMenuItem.getSelection();
+				AppSettings.xrayView = this.xrayViewMenuItem.getSelection();
 				return;
 			}
 			if (menuItem == this.watchesMenuItem) {
@@ -1711,11 +1711,11 @@ public final class EmulatorScreen implements
 	private void updatePauseState() {
 		this.suspendMenuItem.setEnabled(this.pauseState == 1);
 		this.resumeMenuItem.setEnabled(this.pauseState == 2);
-		this.restartMenuItem.setEnabled(this.pauseState != 0 && !Settings.uei);
-		this.xrayViewMenuItem.setSelection(Settings.xrayView);
+		this.restartMenuItem.setEnabled(this.pauseState != 0 && !AppSettings.uei);
+		this.xrayViewMenuItem.setSelection(AppSettings.xrayView);
 		this.forcePaintMenuItem.setEnabled(this.pauseState != 0);
 		this.pausestepMenuItem.setEnabled(this.pauseState != 0);
-		this.playResumeMenuItem.setEnabled(Settings.steps >= 0 && this.pauseState != 0);
+		this.playResumeMenuItem.setEnabled(AppSettings.steps >= 0 && this.pauseState != 0);
 		this.openJadMenuItem.setEnabled(this.pauseState != 0);
 		this.watchesMenuItem.setEnabled(this.pauseState != 0);
 		this.profilerMenuItem.setEnabled(this.pauseState != 0);
@@ -2109,8 +2109,8 @@ public final class EmulatorScreen implements
 		if (pressedKeys.contains(n)) {
 			if (Emulator.getCurrentDisplay().getCurrent() instanceof Screen) {
 				Emulator.getEventQueue().keyRepeat(n);
-			} else if (Settings.enableKeyRepeat) {
-				if (Settings.keyPressOnRepeat) {
+			} else if (AppSettings.enableKeyRepeat) {
+				if (AppSettings.keyPressOnRepeat) {
 					Emulator.getEventQueue().keyPress(n);
 				} else {
 					Emulator.getEventQueue().keyRepeat(n);

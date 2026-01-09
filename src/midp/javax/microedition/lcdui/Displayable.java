@@ -187,7 +187,7 @@ public class Displayable {
 		if (cmdListener == null && this instanceof Canvas) {
 			return false;
 		}
-		boolean fix = Settings.motorolaSoftKeyFix || Settings.softbankApi;
+		boolean fix = Settings.motorolaSoftKeyFix || AppSettings.softbankApi;
 		if (KeyMapping.isLeftSoft(n)) {
 			if (hasMenuOnLeft()) {
 				if (b) {
@@ -332,9 +332,9 @@ public class Displayable {
 	}
 
 	public static synchronized void _fpsLimiter(boolean b) {
-		if (b && (Settings.speedModifier == 1 || (Settings.patchSleep && Settings.applySpeedToSleep)) && Settings.frameRate <= 120) {
+		if (b && (AppSettings.speedModifier == 1 || (AppSettings.patchSleep && AppSettings.applySpeedToSleep)) && AppSettings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
-			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
+			long var2 = (long) ((MILLI_TO_NANO * 1000) / AppSettings.frameRate);
 
 			long delta = var2 - elapsed;
 			if (delta > 0) {
@@ -356,11 +356,11 @@ public class Displayable {
 	}
 
 	public static void _checkForSteps(Object lock) {
-		if (Settings.steps >= 0) {
-			if (Settings.steps == 0) {
+		if (AppSettings.steps >= 0) {
+			if (AppSettings.steps == 0) {
 				final long currentTimeMillis = System.currentTimeMillis();
 				try {
-					while (Settings.steps == 0) {
+					while (AppSettings.steps == 0) {
 						if (lock == null) Thread.sleep(50);
 						else synchronized (lock) {
 							lock.wait(50L);
@@ -370,7 +370,7 @@ public class Displayable {
 				}
 				Settings.aLong1235 += System.currentTimeMillis() - currentTimeMillis;
 			}
-			--Settings.steps;
+			--AppSettings.steps;
 		}
 	}
 

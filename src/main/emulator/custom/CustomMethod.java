@@ -1,6 +1,7 @@
 package emulator.custom;
 
 import com.github.sarxos.webcam.Webcam;
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
@@ -30,13 +31,13 @@ public class CustomMethod {
 
 	public static void gc() {
 		++Profiler.gcCallCount;
-		if (!Settings.ignoreGc) {
+		if (!AppSettings.ignoreGc) {
 			System.gc();
 		}
 	}
 
 	public static void yield() throws InterruptedException {
-		if (Settings.patchYield) {
+		if (AppSettings.patchYield) {
 			Thread.sleep(1L);
 		} else {
 			Thread.yield();
@@ -44,12 +45,12 @@ public class CustomMethod {
 	}
 
 	public static void sleep(long t) throws InterruptedException {
-		if (Settings.ignoreSleep) return;
-		if (Settings.applySpeedToSleep && Settings.speedModifier != 1 && t > 1) {
-			if (Settings.speedModifier < 0) {
-				t = t * ((100L - Settings.speedModifier * 1024L) / 100L);
+		if (AppSettings.ignoreSleep) return;
+		if (AppSettings.applySpeedToSleep && AppSettings.speedModifier != 1 && t > 1) {
+			if (AppSettings.speedModifier < 0) {
+				t = t * ((100L - AppSettings.speedModifier * 1024L) / 100L);
 			} else {
-				t = t / Settings.speedModifier;
+				t = t / AppSettings.speedModifier;
 			}
 		}
 		Thread.sleep(t);
@@ -59,7 +60,17 @@ public class CustomMethod {
 	public static String getProperty(final String prop) {
 		String res = System.getProperty(prop);
 		boolean b = true;
-		if (Settings.systemProperties != null && Settings.systemProperties.containsKey(prop)) {
+		if (AppSettings.systemProperties.containsKey(prop)) {
+			res = AppSettings.systemProperties.get(prop);
+			if (res.startsWith(":")) {
+				res = res.substring(1);
+				if (res.equals("null")) {
+					res = null;
+				} else {
+					res = System.getProperty(res);
+				}
+			}
+		} else if (Settings.systemProperties.containsKey(prop)) {
 			res = Settings.systemProperties.get(prop);
 			if (res.startsWith(":")) {
 				res = res.substring(1);
@@ -103,9 +114,9 @@ public class CustomMethod {
 					res = Emulator.getEventQueue().getPointerNumber();
 				} catch (Exception ignored) {}
 			} else if (prop.equals("microedition.locale")) {
-				res = Settings.locale;
+				res = AppSettings.locale;
 			} else if (prop.equals("microedition.encoding")) {
-				res = Settings.fileEncoding;
+				res = AppSettings.fileEncoding;
 			} else if (prop.equals("Platform")) {
 				res = "";
 			} else if (prop.equals("fileconn.dir.roots.names")) {
@@ -126,7 +137,7 @@ public class CustomMethod {
 							if ((res = prop.substring(prop.indexOf('=') + 1)).equals("null")) {
 								res = null;
 							}
-							Settings.customTitle = res;
+							AppSettings.customTitle = res;
 
 							Emulator.getEmulator().getScreen().updateTitle();
 							res = "true";
@@ -191,7 +202,7 @@ public class CustomMethod {
 		++Profiler.currentTimeMillisCallCount;
 		final long currentTimeMillis = System.currentTimeMillis();
 		final long n2;
-		final long n = ((n2 = Settings.speedModifier) < 0L) ? ((100L + n2 << 10) / 100L) : (n2 << 10);
+		final long n = ((n2 = AppSettings.speedModifier) < 0L) ? ((100L + n2 << 10) / 100L) : (n2 << 10);
 		if (Settings.aLong1235 > 0L) {
 			CustomMethod.aLong13 += n * (currentTimeMillis - CustomMethod.aLong17 - Settings.aLong1235) >> 10;
 			CustomMethod.aLong17 = currentTimeMillis;

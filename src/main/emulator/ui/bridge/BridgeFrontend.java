@@ -1,6 +1,5 @@
 package emulator.ui.bridge;
 
-import emulator.Emulator;
 import emulator.graphics2D.IFont;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.FontAWT;
@@ -254,5 +253,8 @@ public class BridgeFrontend implements IEmulatorFrontend {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void openAppSettings() {
 	}
 }

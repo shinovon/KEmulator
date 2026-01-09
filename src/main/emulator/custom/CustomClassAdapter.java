@@ -38,13 +38,14 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 			}
 			desc = desc.replace(s4, s5);
 		}
-		if (Settings.patchSynchronizedPaint &&
-				"paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc)) {
-			if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
-				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
-				Emulator.getEmulator().getLogStream().println("Patched paint method: " + className);
-			}
-		} else if ("()V".equals(desc)
+//		if (Settings.patchSynchronizedPaint &&
+//				"paint".equals(name) && "(Ljavax/microedition/lcdui/Graphics;)V".equals(desc)) {
+//			if ((acc & Opcodes.ACC_SYNCHRONIZED) != 0) {
+//				acc = acc & (~Opcodes.ACC_SYNCHRONIZED);
+//				Emulator.getEmulator().getLogStream().println("Patched paint method: " + className);
+//			}
+//		} else
+		if ("()V".equals(desc)
 				&& (("java/lang/Thread".equals(parentClassName) &&
 					("stop".equals(name) || "resume".equals(name) || "suspend".equals(name)))
 					|| "finalize".equals(name))) {

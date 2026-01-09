@@ -22,7 +22,6 @@ import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Screen;
-import javax.microedition.media.Manager;
 import javax.microedition.midlet.MIDlet;
 import javax.swing.*;
 import java.awt.*;
@@ -237,6 +236,7 @@ public class Emulator implements Runnable {
 		if (Emulator.midletJar == null) {
 			return;
 		}
+		AppSettings.save();
 		if (Settings.writeKemCfg) {
 			String propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + File.separatorChar + "kemulator.cfg";
 			try {
@@ -262,42 +262,6 @@ public class Emulator implements Runnable {
 				e.printStackTrace();
 			}
 			return;
-		}
-		final String propsPath = getUserPath() + File.separatorChar + "midlets.txt";
-		try {
-			String key = new File(Emulator.midletJar).getCanonicalPath();
-			final Properties properties = new Properties();
-			if (new File(propsPath).exists()) {
-				FileInputStream in = new FileInputStream(propsPath);
-				try {
-					properties.load(in);
-				} finally {
-					in.close();
-				}
-			}
-			StringBuilder s = new StringBuilder("!");
-
-			s.append(Emulator.deviceName).append(';')
-					.append("SCREEN_WIDTH:").append(Devices.getProperty("SCREEN_WIDTH")).append(';')
-					.append("SCREEN_HEIGHT:").append(Devices.getProperty("SCREEN_HEIGHT")).append(';')
-					.append("KEY_S1:").append(Devices.getProperty("KEY_S1")).append(';')
-					.append("KEY_S2:").append(Devices.getProperty("KEY_S2")).append(';')
-					.append("KEY_FIRE:").append(Devices.getProperty("KEY_FIRE")).append(';')
-					.append("KEY_UP:").append(Devices.getProperty("KEY_UP")).append(';')
-					.append("KEY_DOWN:").append(Devices.getProperty("KEY_DOWN")).append(';')
-					.append("KEY_LEFT:").append(Devices.getProperty("KEY_LEFT")).append(';')
-					.append("KEY_RIGHT:").append(Devices.getProperty("KEY_RIGHT"))
-			;
-
-			properties.setProperty(key, s.toString());
-			FileOutputStream out = new FileOutputStream(propsPath);
-			try {
-				properties.store(out, "KEmulator MIDlets database");
-			} finally {
-				out.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -356,7 +320,7 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getTitle(String s) {
-		if (Settings.customTitle != null) return Settings.customTitle;
+		if (AppSettings.customTitle != null) return AppSettings.customTitle;
 		StringBuilder sb = new StringBuilder();
 		sb.append(platform.getTitleName()).append(' ').append(version);
 		if (s != null) {
@@ -364,7 +328,7 @@ public class Emulator implements Runnable {
 		} else if (midletJar != null && Emulator.emulatorimpl.getAppProperties() != null) {
 			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty(Emulator.doja ? "AppName" : "MIDlet-Name"));
 		}
-		if (Settings.uei) sb.append(" (UEI)");
+		if (AppSettings.uei) sb.append(" (UEI)");
 		return sb.toString();
 	}
 
@@ -683,7 +647,7 @@ public class Emulator implements Runnable {
 		System.setProperty("ru.nnproject.symbiangl", "0.2-kemulator");
 
 		try {
-			Settings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
+			AppSettings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 		} catch (Exception ignored) {
 		}
 	}
@@ -730,7 +694,7 @@ public class Emulator implements Runnable {
 			} catch (Throwable ignored) {}
 
 			// Restart with additional arguments required for specific os or java version
-			if (!(forked || Settings.uei) && (librariesException != null || Utils.macos || Utils.isJava9())) {
+			if (!(forked || AppSettings.uei) && (librariesException != null || Utils.macos || Utils.isJava9())) {
 				loadGame(null, false);
 				return;
 			} else if (librariesException != null) {
@@ -748,6 +712,8 @@ public class Emulator implements Runnable {
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
+			AppSettings.init();
+
 			platform.load3D();
 			Controllers.refresh(true);
 			Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on "
@@ -756,6 +722,7 @@ public class Emulator implements Runnable {
 					+ System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
 			Devices.load(Emulator.deviceFile);
 			tryToSetDevice(Emulator.deviceName);
+
 			setupMRUList();
 			RichPresence.initRichPresence();
 
@@ -802,13 +769,17 @@ public class Emulator implements Runnable {
 			} catch (Exception ex3) {
 				ex3.printStackTrace();
 			}
+			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
+			if (AppSettings.load() == 0) {
+				System.out.println("open app settings");
+				Emulator.emulatorimpl.openAppSettings();
+			}
+			setProperties();
 			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
-				RichPresence.rpcState = (Settings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-				RichPresence.rpcDetails = Settings.uei ? "UEI" : new File(midletJar).getName();
+				RichPresence.rpcState = (AppSettings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
+				RichPresence.rpcDetails = AppSettings.uei ? "UEI" : new File(midletJar).getName();
 				RichPresence.updatePresence();
 			}
-			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
-			setProperties();
 			if (Emulator.midletClassName == null) {
 				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
 				System.exit(1);
@@ -937,7 +908,7 @@ public class Emulator implements Runnable {
 			} else if (key.equalsIgnoreCase("log")) {
 				Settings.showLogFrame = true;
 			} else if (key.equalsIgnoreCase("uei")) {
-				Settings.uei = true;
+				AppSettings.uei = true;
 			} else if (key.equalsIgnoreCase("s")) {
 				forked = true;
 			} else if (key.equalsIgnoreCase("updated")) {
@@ -945,8 +916,8 @@ public class Emulator implements Runnable {
 			} else if (key.equals("bridge")) {
 				bridge = true;
 			} else if (key.equals("xray")) {
-				Settings.xrayView = true;
-				Settings.xrayBuffer = true;
+				AppSettings.xrayView = true;
+				AppSettings.xrayBuffer = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
@@ -1263,7 +1234,7 @@ public class Emulator implements Runnable {
 		Emulator.deviceFile = "/res/presets.xml";
 		backgroundThread = new Thread(new Runnable() {
 			public void run() {
-				if (!updated && !Settings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
+				if (!updated && !AppSettings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {
 					if (emulatorimpl instanceof SWTFrontend) {
 						SWTFrontend.getDisplay().asyncExec(() -> getEmulator().getScreen().showUpdateDialog(1));
 					}

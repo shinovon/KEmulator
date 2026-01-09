@@ -1,7 +1,7 @@
 package emulator.custom;
 
+import emulator.AppSettings;
 import emulator.Emulator;
-import emulator.Settings;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.objectweb.asm.*;
@@ -32,7 +32,7 @@ public final class h {
 				final InputStream method592 = method592((String) Emulator.jarClasses.get(i));
 				final ClassReader classReader = new ClassReader(method592);
 				final ClassNode classNode = new ClassNode();
-				classReader.accept((ClassVisitor) classNode, Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+				classReader.accept((ClassVisitor) classNode, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
 				method592.close();
 				for (Object o : classNode.methods) {
 					final MethodInfo methodInfo = new MethodInfo(classNode, (MethodNode) o);
@@ -41,7 +41,7 @@ public final class h {
 			}
 			for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
 				final InputStream method593 = method592((String) Emulator.jarClasses.get(j));
-				new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+				new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
 				method593.close();
 			}
 		} catch (Exception e) {

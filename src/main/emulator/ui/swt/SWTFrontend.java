@@ -36,6 +36,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 	private InfosBox infos;
 	private M3GViewUI m3gView;
 	private MessageConsole sms;
+	private AppSettingsUI appSettingsUI;
 	public Properties midletProps;
 	private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
 
@@ -52,6 +53,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		this.classWatcher = Watcher.createForStatics();
 		this.profiler = Watcher.createForProfiler();
 		this.methods = new Methods();
+		this.appSettingsUI = new AppSettingsUI();
 		Display.setAppName("KEmulator");
 	}
 
@@ -273,5 +275,9 @@ public final class SWTFrontend implements IEmulatorFrontend {
 	 */
 	public void updateLanguage() {
 		((EmulatorScreen) getScreen()).updateLanguage();
+	}
+
+	public void openAppSettings() {
+		appSettingsUI.open(Display.getCurrent());
 	}
 }

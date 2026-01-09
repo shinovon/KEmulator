@@ -3,6 +3,7 @@ package javax.microedition.lcdui;
 import com.nokia.mid.ui.CanvasGraphicsItem;
 import com.nokia.mid.ui.CanvasItem;
 import com.nokia.mid.ui.TextEditor;
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.KeyMapping;
 import emulator.Settings;
@@ -46,7 +47,7 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public void _invokePaint(IImage buffer, IImage xray) {
-		if (!Settings.xrayView) xray = null;
+		if (!AppSettings.xrayView) xray = null;
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
 		}
@@ -57,7 +58,7 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public void _invokePaint(IImage buffer, IImage xray, int x, int y, int w, int h) {
-		if (!Settings.xrayView) xray = null;
+		if (!AppSettings.xrayView) xray = null;
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
 		}
@@ -181,7 +182,7 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public void setFullScreenMode(final boolean b) {
-		if (!Settings.ignoreFullScreen) {
+		if (!AppSettings.ignoreFullScreen) {
 			if (b == fullScreen) return;
 			fullScreen = b;
 			updateSize(true);
@@ -407,15 +408,15 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public boolean hasPointerEvents() {
-		return Settings.hasPointerEvents;
+		return AppSettings.hasPointerEvents;
 	}
 
 	public boolean hasPointerMotionEvents() {
-		return Settings.hasPointerEvents;
+		return AppSettings.hasPointerEvents;
 	}
 
 	public boolean hasRepeatEvents() {
-		return Settings.enableKeyRepeat;
+		return AppSettings.enableKeyRepeat;
 	}
 
 	public boolean isDoubleBuffered() {
