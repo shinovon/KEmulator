@@ -472,10 +472,73 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
 		canvas.setLayoutData(layoutData);
 		this.canvas.addMouseMoveListener(this);
-		this.canvas.addMouseListener(new Class56(this));
+		this.canvas.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				Label_0205:
+				{
+					if (e.button == 3) {
+                /*M3GViewUI.nextCameraMode(this.aClass90_822);
+                MenuItem menuItem = null;
+                Label_0166:
+                {
+                    switch (M3GViewUI.getCameraMode(this.aClass90_822)) {
+                        case 0: {
+                            M3GViewUI.method534(this.aClass90_822).setSelection(false);
+                            menuItem = M3GViewUI.method539(this.aClass90_822);
+                            break Label_0166;
+                        }
+                        case 1: {
+                            M3GViewUI.method539(this.aClass90_822).setSelection(false);
+                            menuItem = M3GViewUI.method541(this.aClass90_822);
+                            break Label_0166;
+                        }
+                        case 2: {
+                            M3GViewUI.method541(this.aClass90_822).setSelection(false);
+                            if (M3GViewUI.method500(this.aClass90_822) == 0) {
+                                menuItem = M3GViewUI.method505(this.aClass90_822);
+                                break Label_0166;
+                            }
+                            M3GViewUI.nextCameraMode(this.aClass90_822);
+                            break;
+                        }
+                        case 3: {
+                            M3GViewUI.method505(this.aClass90_822).setSelection(false);
+                            break;
+                        }
+                        default: {
+                            break Label_0205;
+                        }
+                    }
+                    menuItem = M3GViewUI.method534(this.aClass90_822);
+                }
+                menuItem.setSelection(true);*/
+					} else if (e.button == 1) {
+						anInt917 = e.x;
+						anInt922 = e.y;
+					}
+				}
+				canvas.forceFocus();
+			}
+		});
 		canvas.addKeyListener(this);
-		this.canvas.addControlListener(new Class57(this));
-		this.canvas.addListener(12, new Class58(this));
+		this.canvas.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				if (shell.getVisible()) {
+					setupCamera();
+				}
+			}
+		});
+		this.canvas.addListener(12, new Listener() {
+			public void handleEvent(Event event) {
+				switch (event.type) {
+				case 12: {
+					aBoolean905 = false;
+					M3GView3D.releaseContext();
+					break;
+				}
+				}
+			}
+		});
 		canvas.addMouseWheelListener(this);
 	}
 

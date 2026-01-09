@@ -2944,7 +2944,11 @@ public final class Property implements IProperty, SelectionListener {
 		this.aText643.setText(Settings.proxyDomain);
 		(this.aButton764 = new Button(this.networkProxyGroup, 8388608)).setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
 		this.aButton764.setLayoutData(layoutData);
-		this.aButton764.addSelectionListener(new Class97(this));
+		this.aButton764.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				method352();
+			}
+		});
 		this.proxyTypeCombo.addModifyListener(new Class65(this));
 		this.proxyTypeCombo.select(Settings.proxyType);
 

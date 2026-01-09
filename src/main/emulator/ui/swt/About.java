@@ -5,14 +5,13 @@ import emulator.graphics2D.swt.ImageSWT;
 import emulator.ui.effect.WaterEffect;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.*;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.*;
 
 import java.io.BufferedReader;
@@ -21,7 +20,7 @@ import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public final class About implements MouseListener, MouseMoveListener {
+public final class About implements MouseListener, MouseMoveListener, PaintListener {
 	private Shell aboutShell;
 	private CLabel aboutText;
 	private Link websiteLink;
@@ -31,7 +30,6 @@ public final class About implements MouseListener, MouseMoveListener {
 	private ImageSWT logoImage;
 	private ImageSWT waterImage;
 	private Timer animationTimer;
-	GC canvasGC;
 	int[] logoImageData;
 	int[] waterImageData;
 
@@ -68,6 +66,13 @@ public final class About implements MouseListener, MouseMoveListener {
 		(this.aboutShell = new Shell(shell, 67680)).setText("About KEmulator");
 		this.aboutShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.aboutShell.setLayout(layout);
+		aboutShell.addShellListener(new ShellAdapter() {
+			public void shellClosed(ShellEvent e) {
+				aboutShell.dispose();
+				waterImage.finalize();
+				logoImage.finalize();
+			}
+		});
 
 		this.addIcon();
 
@@ -77,7 +82,11 @@ public final class About implements MouseListener, MouseMoveListener {
 
 		(this.websiteLink = new Link(this.aboutShell, 0)).setText("<a>nnproject.cc/kem</a>");
 		this.websiteLink.setLayoutData(gridData2);
-		this.websiteLink.addSelectionListener(new Class158(this));
+		this.websiteLink.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Program.launch("https://nnproject.cc/kem");
+			}
+		});
 
 		{
 			final GridData layoutData3;
@@ -89,7 +98,11 @@ public final class About implements MouseListener, MouseMoveListener {
 			this.okBtn.setLayoutData(layoutData3);
 //			layoutData3.heightHint = 20;
 			layoutData3.widthHint = 100;
-			this.okBtn.addSelectionListener(new Class163(this));
+			this.okBtn.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					aboutShell.dispose();
+				}
+			});
 		}
 
 
@@ -230,7 +243,7 @@ public final class About implements MouseListener, MouseMoveListener {
 		(this.waterCanvas = new Canvas(this.aboutShell, 537133056)).setLayoutData(layoutData);
 		this.waterCanvas.addMouseListener(this);
 		this.waterCanvas.addMouseMoveListener(this);
-		this.canvasGC = new GC(this.waterCanvas);
+		waterCanvas.addPaintListener(this);
 		this.method455(Emulator.class.getResourceAsStream("/res/sign"));
 	}
 
@@ -242,7 +255,21 @@ public final class About implements MouseListener, MouseMoveListener {
 			this.waterImageData = this.waterImage.getData();
 			(this.waterEffect = new WaterEffect()).initialize(this.logoImage.getWidth(), this.logoImage.getHeight());
 			this.waterEffect.addDrop(this.logoImage.getWidth() >> 1, this.logoImage.getHeight() >> 1, 10, 500, this.waterEffect.currentBufferIndex);
-			(this.animationTimer = new Timer()).schedule(new WaterTask(this), 0L, 30L);
+			(this.animationTimer = new Timer()).schedule(new TimerTask() {
+				public void run() {
+					waterEffect.processFrame(logoImageData, waterImageData);
+					SWTFrontend.getDisplay().syncExec(new Runnable() {
+						public void run() {
+							if (waterCanvas.isDisposed()) {
+								animationTimer.cancel();
+								return;
+							}
+							waterImage.setData(waterImageData);
+							waterCanvas.redraw();
+						}
+					});
+				}
+			}, 0L, 30L);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -262,59 +289,7 @@ public final class About implements MouseListener, MouseMoveListener {
 		this.waterEffect.addDrop(mouseEvent.x, mouseEvent.y, 5, 50, this.waterEffect.currentBufferIndex);
 	}
 
-	static Shell method456(final About class54) {
-		return class54.aboutShell;
-	}
-
-	static WaterEffect method457(final About class54) {
-		return class54.waterEffect;
-	}
-
-	static Canvas method458(final About class54) {
-		return class54.waterCanvas;
-	}
-
-	static Timer method459(final About class54) {
-		return class54.animationTimer;
-	}
-
-	static WaterEffect method460(final About class54, final WaterEffect ana811) {
-		return class54.waterEffect = ana811;
-	}
-
-	static ImageSWT method461(final About class54) {
-		return class54.waterImage;
-	}
-
-	final static class WaterTask extends TimerTask {
-		private final About waterTask;
-
-		private WaterTask(final About waterTask) {
-			super();
-			this.waterTask = waterTask;
-		}
-
-		public final void run() {
-			About.method457(this.waterTask).processFrame(this.waterTask.logoImageData, this.waterTask.waterImageData);
-			//TODO DEOBFUSCATE ALL THIS MESS | 24.10.2025 in progress -klaxons1
-			SWTFrontend.getDisplay().syncExec(new Water(this, waterTask.waterEffect));
-		}
-
-		WaterTask(final About class54, final Class158 class55) {
-			this(class54);
-		}
-
-		static About method433(final WaterTask waterTask) {
-			return waterTask.waterTask;
-		}
-	}
-
-	public void finalize() {
-		aboutShell.getDisplay().asyncExec(() -> {
-			try {
-				if (!canvasGC.isDisposed()) canvasGC.dispose();
-			} catch (Exception ignored) {
-			}
-		});
+	public void paintControl(PaintEvent e) {
+		waterImage.method12(e.gc, 0, 0);
 	}
 }

@@ -149,7 +149,6 @@ public final class EmulatorScreen implements
 	private boolean infosEnabled;
 	private String aString1008;
 	private CaretImpl caret;
-	private boolean[] keysState;
 	private int mouseXPress;
 	private int mouseXRelease;
 	private int mouseYPress;
@@ -811,14 +810,34 @@ public final class EmulatorScreen implements
 		}
 		initCanvas();
 		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
-		this.leftSoftLabel.addMouseListener(new Class43(this));
+		this.leftSoftLabel.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (pauseState == 0 || Emulator.getCurrentDisplay().getCurrent() == null) {
+					return;
+				}
+				new Thread(() -> Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(KeyMapping.soft1(), true)).start();
+			}
+		});
 		(this.statusLabel = new CLabel(this.shell, 16777216)).setText("");
 		(this.rightSoftLabel = new CLabel(this.shell, 131072)).setText("\t");
-		this.rightSoftLabel.addMouseListener(new Class50(this));
+		this.rightSoftLabel.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (pauseState == 0 || Emulator.getCurrentDisplay().getCurrent() == null) {
+					return;
+				}
+				new Thread(() -> Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(KeyMapping.soft2(), true)).start();
+			}
+		});
 		initMenu();
 		setFullscreen(fullscreen);
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.shell.addShellListener(new Class53(this));
+		this.shell.addShellListener(new ShellAdapter() {
+			public void shellDeactivated(ShellEvent e) {
+				for (Integer n : pressedKeys) {
+					handleKeyReleaseMapped(n.toString());
+				}
+			}
+		});
 	}
 
 	private void setFullscreen(boolean fullscreen) {
@@ -1801,7 +1820,6 @@ public final class EmulatorScreen implements
 
 		stackLayout = new StackLayout();
 		canvas.setLayout(stackLayout);
-		this.keysState = new boolean[256];
 		this.method589();
 		this.caret = new CaretImpl(this.canvas);
 		shell.layout();
@@ -2069,12 +2087,16 @@ public final class EmulatorScreen implements
 
 
 	void handleKeyPress(int n) {
-		if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
+		if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= 256) && !Settings.canvasKeyboard)) {
 			return;
 		}
-		String r = mapKey(n);
+		handleKeyPressMapped(mapKey(n));
+	}
+
+	void handleKeyPressMapped(String r) {
 		if (r == null) return;
-		n = Integer.parseInt(r);
+		int n = Integer.parseInt(r);
+
 		if (pressedKeys.contains(n)) {
 			if (Emulator.getCurrentDisplay().getCurrent() instanceof Screen) {
 				Emulator.getEventQueue().keyRepeat(n);
@@ -2103,12 +2125,16 @@ public final class EmulatorScreen implements
 	}
 
 	void handleKeyRelease(int n) {
-		if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= this.keysState.length) && !Settings.canvasKeyboard)) {
+		if (this.pauseState == 0 || Settings.playingRecordedKeys || ((n < 0 || n >= 256) && !Settings.canvasKeyboard)) {
 			return;
 		}
-		String r = mapKey(n);
+		handleKeyReleaseMapped(mapKey(n));
+	}
+
+	void handleKeyReleaseMapped(String r) {
 		if (r == null) return;
-		n = Integer.parseInt(r);
+		int n = Integer.parseInt(r);
+
 		synchronized (pressedKeys) {
 			if (win && !pressedKeys.contains(n)) {
 				return;
@@ -2466,10 +2492,6 @@ public final class EmulatorScreen implements
 
 	static int method566(final EmulatorScreen class93) {
 		return class93.pauseState;
-	}
-
-	static boolean[] method556(final EmulatorScreen class93) {
-		return class93.keysState;
 	}
 
 	static long method559(final EmulatorScreen class93, final long aLong1017) {

@@ -13,12 +13,6 @@ final class Water implements Runnable {
 	}
 
 	public final void run() {
-		if (About.method458(About.WaterTask.method433(this.waterTask)).isDisposed()) {
-			About.method459(About.WaterTask.method433(this.waterTask)).cancel();
-			About.method460(About.WaterTask.method433(this.waterTask), waterEffect);
-			return;
-		}
-		About.method461(About.WaterTask.method433(this.waterTask)).setData(About.WaterTask.method433(this.waterTask).waterImageData);
-		About.method461(About.WaterTask.method433(this.waterTask)).method12(About.WaterTask.method433(this.waterTask).canvasGC, 0, 0);
+
 	}
 }

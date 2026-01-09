@@ -8,6 +8,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -206,31 +208,59 @@ public final class Methods implements Runnable, DisposeListener {
 		final TableColumn tableColumn;
 		(tableColumn = new TableColumn(this.methodsTable, 0)).setWidth(100);
 		tableColumn.setText("Class");
-		tableColumn.addSelectionListener(new Class166(this));
+		tableColumn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(0);
+			}
+		});
 		final TableColumn tableColumn2;
 		(tableColumn2 = new TableColumn(this.methodsTable, 0)).setWidth(100);
 		tableColumn2.setText("Name");
-		tableColumn2.addSelectionListener(new Class167(this));
+		tableColumn2.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(1);
+			}
+		});
 		final TableColumn tableColumn3;
 		(tableColumn3 = new TableColumn(this.methodsTable, 0)).setWidth(200);
 		tableColumn3.setText("Description");
-		tableColumn3.addSelectionListener(new Class160(this));
+		tableColumn3.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(2);
+			}
+		});
 		final TableColumn tableColumn4;
 		(tableColumn4 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn4.setText("Code Size");
-		tableColumn4.addSelectionListener(new Class99(this));
+		tableColumn4.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(3);
+			}
+		});
 		final TableColumn tableColumn5;
 		(tableColumn5 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn5.setText("References");
-		tableColumn5.addSelectionListener(new Class95(this));
+		tableColumn5.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(4);
+			}
+		});
 		final TableColumn tableColumn6;
 		(tableColumn6 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn6.setText("Calls");
-		tableColumn6.addSelectionListener(new Class73(this));
+		tableColumn6.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(5);
+			}
+		});
 		final TableColumn tableColumn7;
 		(tableColumn7 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn7.setText("Total Time(ms)");
-		tableColumn7.addSelectionListener(new Class72(this));
+		tableColumn7.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(6);
+			}
+		});
 		final TableColumn tableColumn8;
 		(tableColumn8 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn8.setText("Average Time(ms)");
