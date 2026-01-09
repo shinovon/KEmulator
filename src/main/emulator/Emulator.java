@@ -10,7 +10,9 @@ import emulator.media.mmf.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
 import emulator.ui.RichPresence;
 import emulator.ui.bridge.BridgeFrontend;
+import emulator.ui.swt.EmulatorScreen;
 import emulator.ui.swt.Property;
+import emulator.ui.swt.ResizeMethod;
 import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.devutils.idea.IdeaUtils;
 import org.apache.tools.zip.ZipEntry;
@@ -953,10 +955,6 @@ public class Emulator implements Runnable {
 				} else if (key.equalsIgnoreCase("rec")) {
 					Settings.recordedKeysFile = value;
 					Settings.playingRecordedKeys = new File(value).exists();
-				} else if (key.equalsIgnoreCase("device")) {
-					Emulator.deviceName = value;
-				} else if (key.equalsIgnoreCase("devicefile")) {
-					Emulator.deviceFile = value;
 				} else if (key.equalsIgnoreCase("fontname")) {
 					getEmulator().getProperty().setDefaultFontName(value);
 				} else if (key.equalsIgnoreCase("fontsmall")) {
@@ -965,6 +963,13 @@ public class Emulator implements Runnable {
 					getEmulator().getProperty().getFontMediumSize(Integer.parseInt(value));
 				} else if (key.equalsIgnoreCase("fontlarge")) {
 					getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
+				} else if (key.equalsIgnoreCase("screen")) {
+					String[] size = value.split("x");
+					Devices.setProperty("SCREEN_WIDTH", size[0]);
+					Devices.setProperty("SCREEN_HEIGHT", size[1]);
+					EmulatorScreen.sizeW = -1;
+					EmulatorScreen.sizeH = -1;
+					Settings.resizeMode = ResizeMethod.Fit;
 				} else if (key.equalsIgnoreCase("key")) {
 					KeyMapping.keyArg(value);
 				} else if (key.equals("new-project")) {

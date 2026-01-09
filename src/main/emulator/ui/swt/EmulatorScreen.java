@@ -573,6 +573,7 @@ public final class EmulatorScreen implements
 					updateCanvasRect(true, false, false);
 					return;
 				}
+				windowResizedByUser = true;
 				break;
 			}
 			default:
