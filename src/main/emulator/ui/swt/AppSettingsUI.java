@@ -59,6 +59,25 @@ public class AppSettingsUI {
 	private Spinner largeSizeSpinner;
 	private Spinner mediumSizeSpinner;
 	private Spinner smallSizeSpinner;
+	private Button keyRepeatsCheck;
+	private Button pointerEventsCheck;
+	private Button ignoreFullScreenCheck;
+	private Button j2lStyleFpsLimitCheck;
+	private Button motorolaSoftKeyFixCheck;
+	private Button synchronizeKeyEventsCheck;
+	private Button keyPressOnRepeatCheck;
+	private Button asyncFlushCheck;
+	private Combo m3gAACombo;
+	private Combo m3gTexFilterCombo;
+	private Combo m3gMipmapCombo;
+	private Button mascotNo2DMixingCheck;
+	private Button mascotIgnoreBgCheck;
+	private Button mascotTextureFilterCheck;
+	private Button mascotBackgroundFilterCheck;
+	private Button m3gFlushImmediately;
+	private Button m3gIgnoreOverwriteCheck;
+	private Button m3gForcePersCorrectCheck;
+	private Button m3gDisableLightClampCheck;
 
 	public AppSettingsUI() {
 	}
@@ -274,9 +293,9 @@ public class AppSettingsUI {
 		btnNewButton_2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				String tmp = leftSoftText.getText();
-				leftSoftText.setText(rightSoftText.getText());
-				rightSoftText.setText(tmp);
+				String tmp = screenWidthText.getText();
+				screenWidthText.setText(screenHeightText.getText());
+				screenHeightText.setText(tmp);
 			}
 		});
 		btnNewButton_2.setText("Swap");
@@ -410,44 +429,43 @@ public class AppSettingsUI {
 		grpCanvasCapabilities.setLayout(new GridLayout(1, false));
 		grpCanvasCapabilities.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		Button btnCheckButton_4 = new Button(grpCanvasCapabilities, SWT.CHECK);
-		btnCheckButton_4.setText("Key repeats support");
+		keyRepeatsCheck = new Button(grpCanvasCapabilities, SWT.CHECK);
+		keyRepeatsCheck.setText("Key repeats support");
+		keyRepeatsCheck.setSelection(AppSettings.enableKeyRepeat);
 
-		Button btnCheckButton_5 = new Button(grpCanvasCapabilities, SWT.CHECK);
-		btnCheckButton_5.setText("Pointer events support");
+		pointerEventsCheck = new Button(grpCanvasCapabilities, SWT.CHECK);
+		pointerEventsCheck.setText("Pointer events support");
+		pointerEventsCheck.setSelection(AppSettings.hasPointerEvents);
 
 		Group grpTweaks = new Group(composite_9, SWT.NONE);
 		grpTweaks.setText("Tweaks");
 		grpTweaks.setLayout(new GridLayout(1, false));
 		grpTweaks.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		Button btnCheckButton_10 = new Button(grpTweaks, SWT.CHECK);
-		btnCheckButton_10.setText("Ignore Canvas.setFullScreenMode");
+		ignoreFullScreenCheck = new Button(grpTweaks, SWT.CHECK);
+		ignoreFullScreenCheck.setText("Ignore Canvas.setFullScreenMode");
+		ignoreFullScreenCheck.setSelection(AppSettings.ignoreFullScreen);
 
-		Button btnCheckButton_11 = new Button(grpTweaks, SWT.CHECK);
-		btnCheckButton_11.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-			}
-		});
-		btnCheckButton_11.setText("J2ME Loader style FPS limiter");
+		j2lStyleFpsLimitCheck = new Button(grpTweaks, SWT.CHECK);
+		j2lStyleFpsLimitCheck.setText("J2ME Loader style FPS limiter");
+		j2lStyleFpsLimitCheck.setSelection(AppSettings.j2lStyleFpsLimit);
 
-		Button btnCheckButton_6 = new Button(grpTweaks, SWT.CHECK);
-		btnCheckButton_6.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-			}
-		});
-		btnCheckButton_6.setText("Send key events with commandAction");
+		motorolaSoftKeyFixCheck = new Button(grpTweaks, SWT.CHECK);
+		motorolaSoftKeyFixCheck.setText("Send key events with commandAction");
+		motorolaSoftKeyFixCheck.setSelection(AppSettings.motorolaSoftKeyFix);
 
-		Button btnCheckButton_7 = new Button(grpTweaks, SWT.CHECK);
-		btnCheckButton_7.setText("Send keyPressed on repeats");
+		keyPressOnRepeatCheck = new Button(grpTweaks, SWT.CHECK);
+		keyPressOnRepeatCheck.setText("Send keyPressed on repeats");
+		keyPressOnRepeatCheck.setSelection(AppSettings.keyPressOnRepeat);
 
-		Button btnCheckButton_9 = new Button(grpTweaks, SWT.CHECK);
-		btnCheckButton_9.setText("Synchronize key events");
+		synchronizeKeyEventsCheck = new Button(grpTweaks, SWT.CHECK);
+		synchronizeKeyEventsCheck.setText("Synchronize key events");
+		synchronizeKeyEventsCheck.setSelection(AppSettings.synchronizeKeyEvents);
 
-		Button btnCheckButton_8 = new Button(grpTweaks, SWT.CHECK);
-		btnCheckButton_8.setText("Asynchronous canvas flush");
+		asyncFlushCheck = new Button(grpTweaks, SWT.CHECK);
+		asyncFlushCheck.setText("Asynchronous canvas flush");
+		asyncFlushCheck.setSelection(AppSettings.asyncFlush);
+
 		scrolledComposite_2.setContent(composite_9);
 		scrolledComposite_2.setMinSize(composite_9.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
@@ -470,62 +488,83 @@ public class AppSettingsUI {
 		grpMgLwjgl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		grpMgLwjgl.setText("M3G LWJGL");
 
-		Button btnCheckButton = new Button(grpMgLwjgl, SWT.CHECK);
-		btnCheckButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		btnCheckButton.setText("Ignore OVERWRITE hint");
+		m3gIgnoreOverwriteCheck = new Button(grpMgLwjgl, SWT.CHECK);
+		m3gIgnoreOverwriteCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gIgnoreOverwriteCheck.setText("Ignore OVERWRITE hint");
+		m3gIgnoreOverwriteCheck.setSelection(AppSettings.m3gIgnoreOverwrite);
 
-		Button btnCheckButton_1 = new Button(grpMgLwjgl, SWT.CHECK);
-		btnCheckButton_1.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		btnCheckButton_1.setText("Force perspective correction");
+		m3gForcePersCorrectCheck = new Button(grpMgLwjgl, SWT.CHECK);
+		m3gForcePersCorrectCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gForcePersCorrectCheck.setText("Force perspective correction");
+		m3gForcePersCorrectCheck.setSelection(AppSettings.m3gForcePerspectiveCorrection);
 
-		Button btnCheckButton_2 = new Button(grpMgLwjgl, SWT.CHECK);
-		btnCheckButton_2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		btnCheckButton_2.setText("Disable light clamping");
+		m3gDisableLightClampCheck = new Button(grpMgLwjgl, SWT.CHECK);
+		m3gDisableLightClampCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gDisableLightClampCheck.setText("Disable light clamping");
+		m3gDisableLightClampCheck.setSelection(AppSettings.m3gDisableLightClamp);
 
-		Button btnCheckButton_3 = new Button(grpMgLwjgl, SWT.CHECK);
-		btnCheckButton_3.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		btnCheckButton_3.setText("Flush contents immediately (slow!)");
+		m3gFlushImmediately = new Button(grpMgLwjgl, SWT.CHECK);
+		m3gFlushImmediately.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gFlushImmediately.setText("Flush contents immediately (slow!)");
+		m3gFlushImmediately.setSelection(AppSettings.m3gFlushImmediately);
 
 		Label lblNewLabel_17 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_17.setText("Anti-aliasing:");
 
-		Combo combo_2 = new Combo(grpMgLwjgl, SWT.NONE);
-		combo_2.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		m3gAACombo = new Combo(grpMgLwjgl, SWT.NONE);
+		m3gAACombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		m3gAACombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
+		m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_OFF", "Force off"));
+		m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_ON", "Force on"));
+		m3gAACombo.setText(m3gAACombo.getItem(AppSettings.m3gAA));
 
 		Label lblNewLabel_18 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_18.setText("Texture filter:");
 
-		Combo combo_3 = new Combo(grpMgLwjgl, SWT.NONE);
-		combo_3.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		m3gTexFilterCombo = new Combo(grpMgLwjgl, SWT.NONE);
+		m3gTexFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
+		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_NEAREST", "Force nearest"));
+		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_LINEAR", "Force linear"));
+		m3gTexFilterCombo.setText(m3gTexFilterCombo.getItem(AppSettings.m3gTexFilter));
 
 		Label lblNewLabel_19 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_19.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_19.setText("Mipmapping:");
 
-		Combo combo_4 = new Combo(grpMgLwjgl, SWT.NONE);
-		combo_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		m3gMipmapCombo = new Combo(grpMgLwjgl, SWT.NONE);
+		m3gMipmapCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_OFF", "Force off"));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_BILINEAR", "Force bilinear"));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_TRILINEAR", "Force trilinear"));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_2X", "Force anisotropic 2x"));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_4X", "Force anisotropic 4x"));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_8X", "Force anisotropic 8x"));
+		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_16X", "Force anisotropic 16x"));
+		m3gMipmapCombo.setText(m3gMipmapCombo.getItem(AppSettings.m3gMipmapping));
 
 		Group grpMascotcapsuleLwjgl = new Group(composite_8, SWT.NONE);
 		grpMascotcapsuleLwjgl.setLayout(new GridLayout(1, false));
 		grpMascotcapsuleLwjgl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		grpMascotcapsuleLwjgl.setText("MascotCapsule LWJGL");
 
-		Button btnCheckButton_12 = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
-		btnCheckButton_12.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-			}
-		});
-		btnCheckButton_12.setText("No 2D mixing");
+		mascotNo2DMixingCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotNo2DMixingCheck.setText("No 2D mixing");
+		mascotNo2DMixingCheck.setSelection(AppSettings.mascotNo2DMixing);
 
-		Button btnIgnoreBackground = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
-		btnIgnoreBackground.setText("Ignore background");
+		mascotIgnoreBgCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotIgnoreBgCheck.setText("Ignore background");
+		mascotIgnoreBgCheck.setSelection(AppSettings.mascotIgnoreBackground);
 
-		Button btnCheckButton_13 = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
-		btnCheckButton_13.setText("Texture filter");
+		mascotTextureFilterCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotTextureFilterCheck.setText("Texture filter");
+		mascotTextureFilterCheck.setSelection(AppSettings.mascotTextureFilter);
 
-		Button btnBackgroundFilter = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
-		btnBackgroundFilter.setText("Background filter");
+		mascotBackgroundFilterCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotBackgroundFilterCheck.setText("Background filter");
+		mascotBackgroundFilterCheck.setSelection(AppSettings.mascotBackgroundFilter);
+
 		scrolledComposite_1.setContent(composite_8);
 		scrolledComposite_1.setMinSize(composite_8.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
@@ -533,7 +572,11 @@ public class AppSettingsUI {
 		tbtmProperties.setText("Properties");
 
 		systemPropertiesText = new Text(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-		systemPropertiesText.setText("TODO");
+		StringBuilder s = new StringBuilder();
+		for (String k: AppSettings.systemProperties.keySet()) {
+			s.append(k).append(": ").append(AppSettings.systemProperties.get(k)).append('\n');
+		}
+		systemPropertiesText.setText(s.toString());
 		tbtmProperties.setControl(systemPropertiesText);
 
 		Composite composite_3 = new Composite(shell, SWT.NONE);
@@ -571,129 +614,291 @@ public class AppSettingsUI {
 	}
 	
 	private void apply() {
-		// encoding
-		String encoding = encodingCombo.getText().trim();
-		if (!encoding.equals(AppSettings.fileEncoding)) {
-			AppSettings.fileEncoding = encoding;
-			AppSettings.set("FileEncoding", encoding);
-		}
+		// general tab
+		{
+			// encoding
+			String encoding = encodingCombo.getText().trim();
+			if (!encoding.equals(AppSettings.fileEncoding)) {
+				AppSettings.fileEncoding = encoding;
+				AppSettings.set("FileEncoding", encoding);
+			}
 
-		// device
-		String device = deviceCombo.getText().trim();
-		if (!device.equals(AppSettings.devicePreset)) {
-			AppSettings.devicePreset = device;
-			AppSettings.set("DevicePreset", device);
-			// TODO
-		}
+			// device
+			String device = deviceCombo.getText().trim();
+			if (!device.equals(AppSettings.devicePreset)) {
+				AppSettings.devicePreset = device;
+				AppSettings.set("DevicePreset", device);
+				// TODO
+			}
 
-		// platform
-		String platform = platformText.getText().trim();
-		if (!platform.equals(AppSettings.microeditionPlatform)) {
-			AppSettings.microeditionPlatform = platform;
-			AppSettings.set("MIDPPlatform", platform);
-		}
+			// platform
+			String platform = platformText.getText().trim();
+			if (!platform.equals(AppSettings.microeditionPlatform)) {
+				AppSettings.microeditionPlatform = platform;
+				AppSettings.set("MIDPPlatform", platform);
+			}
 
-		// locale
-		String locale = localeText.getText().trim();
-		if (!locale.equals(AppSettings.locale)) {
-			AppSettings.locale = locale;
-			AppSettings.set("MIDPLocale", locale);
+			// locale
+			String locale = localeText.getText().trim();
+			if (!locale.equals(AppSettings.locale)) {
+				AppSettings.locale = locale;
+				AppSettings.set("MIDPLocale", locale);
+			}
 		}
 
 		// screen size
-		
-		int width = 0;
-		try {
-			width = Integer.parseInt(screenWidthText.getText().trim());
-		} catch (Exception ignored) {}
-		if (width > 0 && width != AppSettings.screenWidth) {
-			AppSettings.screenWidth = width;
-			AppSettings.set("ScreenWidth", width);
-		}
-		
-		int height = 0;
-		try {
-			height = Integer.parseInt(screenHeightText.getText().trim());
-		} catch (Exception ignored) {}
-		if (height > 0 && height != AppSettings.screenHeight) {
-			AppSettings.screenHeight = height;
-			AppSettings.set("ScreenHeight", height);
+		{
+			int width = 0;
+			try {
+				width = Integer.parseInt(screenWidthText.getText().trim());
+			} catch (Exception ignored) {}
+			if (width > 0 && width != AppSettings.screenWidth) {
+				AppSettings.screenWidth = width;
+				AppSettings.set("ScreenWidth", width);
+			}
+
+			int height = 0;
+			try {
+				height = Integer.parseInt(screenHeightText.getText().trim());
+			} catch (Exception ignored) {}
+			if (height > 0 && height != AppSettings.screenHeight) {
+				AppSettings.screenHeight = height;
+				AppSettings.set("ScreenHeight", height);
+			}
 		}
 
 		// key codes
+		{
+			int leftSoft = 0;
+			try {
+				leftSoft = Integer.parseInt(leftSoftText.getText().trim());
+			} catch (Exception ignored) {}
+			if (leftSoft != 0 && leftSoft != AppSettings.leftSoftKey) {
+				AppSettings.leftSoftKey = leftSoft;
+				AppSettings.set("KeyLeftSoft", leftSoft);
+			}
 
-		int leftSoft = 0;
-		try {
-			leftSoft = Integer.parseInt(leftSoftText.getText().trim());
-		} catch (Exception ignored) {}
-		if (leftSoft != 0 && leftSoft != AppSettings.leftSoftKey) {
-			AppSettings.leftSoftKey = leftSoft;
-			AppSettings.set("KeyLeftSoft", leftSoft);
-		}
+			int rightSoft = 0;
+			try {
+				rightSoft = Integer.parseInt(rightSoftText.getText().trim());
+			} catch (Exception ignored) {}
+			if (rightSoft != 0 && rightSoft != AppSettings.rightSoftKey) {
+				AppSettings.rightSoftKey = rightSoft;
+				AppSettings.set("KeyRightSoft", rightSoft);
+			}
 
-		int rightSoft = 0;
-		try {
-			rightSoft = Integer.parseInt(rightSoftText.getText().trim());
-		} catch (Exception ignored) {}
-		if (rightSoft != 0 && rightSoft != AppSettings.rightSoftKey) {
-			AppSettings.rightSoftKey = rightSoft;
-			AppSettings.set("KeyRightSoft", rightSoft);
-		}
+			int up = 0;
+			try {
+				up = Integer.parseInt(upText.getText().trim());
+			} catch (Exception ignored) {}
+			if (up != 0 && up != AppSettings.upKey) {
+				AppSettings.upKey = up;
+				AppSettings.set("KeyUp", up);
+			}
 
-		int up = 0;
-		try {
-			up = Integer.parseInt(upText.getText().trim());
-		} catch (Exception ignored) {}
-		if (up != 0 && up != AppSettings.upKey) {
-			AppSettings.upKey = up;
-			AppSettings.set("KeyUp", up);
-		}
+			int down = 0;
+			try {
+				down = Integer.parseInt(downText.getText().trim());
+			} catch (Exception ignored) {}
+			if (down != 0 && down != AppSettings.downKey) {
+				AppSettings.downKey = down;
+				AppSettings.set("KeyDown", down);
+			}
 
-		int down = 0;
-		try {
-			down = Integer.parseInt(downText.getText().trim());
-		}  catch (Exception ignored) {}
-		if (down != 0 && down != AppSettings.downKey) {
-			AppSettings.downKey = down;
-			AppSettings.set("KeyDown", down);
-		}
+			int left = 0;
+			try {
+				left = Integer.parseInt(leftText.getText().trim());
+			} catch (Exception ignored) {}
+			if (left != 0 && left != AppSettings.leftKey) {
+				AppSettings.leftKey = left;
+				AppSettings.set("KeyLeft", left);
+			}
 
-		int left = 0;
-		try {
-			left = Integer.parseInt(leftText.getText().trim());
-		} catch (Exception ignored) {}
-		if (left != 0 && left != AppSettings.leftKey) {
-			AppSettings.leftKey = left;
-			AppSettings.set("KeyLeft", left);
-		}
-
-		int right = 0;
-		try {
-			right = Integer.parseInt(rightText.getText().trim());
-		} catch (Exception ignored) {}
-		if (right != 0 && right != AppSettings.rightKey) {
-			AppSettings.rightKey = right;
-			AppSettings.set("KeyRight", right);
+			int right = 0;
+			try {
+				right = Integer.parseInt(rightText.getText().trim());
+			} catch (Exception ignored) {}
+			if (right != 0 && right != AppSettings.rightKey) {
+				AppSettings.rightKey = right;
+				AppSettings.set("KeyRight", right);
+			}
 		}
 
 		// font
+		{
+			int large = largeSizeSpinner.getSelection();
+			if (large > 0 && large != AppSettings.fontLargeSize) {
+				AppSettings.fontLargeSize = large;
+				AppSettings.set("FontLargeSize", large);
+			}
 
-		int large = largeSizeSpinner.getSelection();
-		if (large > 0 && large != AppSettings.fontLargeSize) {
-			AppSettings.fontLargeSize = large;
-			AppSettings.set("FontLargeSize", large);
+			int medium = mediumSizeSpinner.getSelection();
+			if (medium > 0 && medium != AppSettings.fontMediumSize) {
+				AppSettings.fontMediumSize = medium;
+				AppSettings.set("FontMediumSize", medium);
+			}
+
+			int small = smallSizeSpinner.getSelection();
+			if (small > 0 && small != AppSettings.fontSmallSize) {
+				AppSettings.fontSmallSize = small;
+				AppSettings.set("FontSmallSize", small);
+			}
 		}
 
-		int medium = mediumSizeSpinner.getSelection();
-		if (medium > 0 && medium != AppSettings.fontMediumSize) {
-			AppSettings.fontMediumSize = medium;
-			AppSettings.set("FontMediumSize", medium);
+		// tweaks tab
+		
+		boolean b;
+
+		// capabilities
+		{
+			b = keyRepeatsCheck.getSelection();
+			if (b != AppSettings.enableKeyRepeat) {
+				AppSettings.enableKeyRepeat = b;
+				AppSettings.set("EnableKeyRepeat", b);
+			}
+
+			b = pointerEventsCheck.getSelection();
+			if (b != AppSettings.hasPointerEvents) {
+				AppSettings.hasPointerEvents = b;
+				AppSettings.set("HasPointerEvents", b);
+			}
 		}
 
-		int small = smallSizeSpinner.getSelection();
-		if (small > 0 && small != AppSettings.fontSmallSize) {
-			AppSettings.fontSmallSize = small;
-			AppSettings.set("FontSmallSize", small);
+		// tweaks
+		{
+			b = ignoreFullScreenCheck.getSelection();
+			if (b != AppSettings.ignoreFullScreen) {
+				AppSettings.ignoreFullScreen = b;
+				AppSettings.set("IgnoreFullScreenMode", b);
+			}
+
+			b = j2lStyleFpsLimitCheck.getSelection();
+			if (b != AppSettings.j2lStyleFpsLimit) {
+				AppSettings.j2lStyleFpsLimit = b;
+				AppSettings.set("FPSLimitJLStyle", b);
+			}
+
+			b = motorolaSoftKeyFixCheck.getSelection();
+			if (b != AppSettings.motorolaSoftKeyFix) {
+				AppSettings.motorolaSoftKeyFix = b;
+				AppSettings.set("MotorolaSoftKeyFix", b);
+			}
+
+			b = keyPressOnRepeatCheck.getSelection();
+			if (b != AppSettings.keyPressOnRepeat) {
+				AppSettings.keyPressOnRepeat = b;
+				AppSettings.set("KeyPressOnRepeat", b);
+			}
+
+			b = synchronizeKeyEventsCheck.getSelection();
+			if (b != AppSettings.synchronizeKeyEvents) {
+				AppSettings.synchronizeKeyEvents = b;
+				AppSettings.set("SynchronizeKeyEvents", b);
+			}
+
+			b = asyncFlushCheck.getSelection();
+			if (b != AppSettings.asyncFlush) {
+				AppSettings.asyncFlush = b;
+				AppSettings.set("AsyncFlush", b);
+			}
+		}
+
+		// 3d tab
+
+		// m3g
+		{
+			b = m3gIgnoreOverwriteCheck.getSelection();
+			if (b != AppSettings.m3gIgnoreOverwrite) {
+				AppSettings.m3gIgnoreOverwrite = b;
+				AppSettings.set("M3GIgnoreOverwrite", b);
+			}
+
+			b = m3gForcePersCorrectCheck.getSelection();
+			if (b != AppSettings.m3gForcePerspectiveCorrection) {
+				AppSettings.m3gForcePerspectiveCorrection = b;
+				AppSettings.set("M3GForcePerspectiveCorrection", b);
+			}
+
+			b = m3gDisableLightClampCheck.getSelection();
+			if (b != AppSettings.m3gDisableLightClamp) {
+				AppSettings.m3gDisableLightClamp = b;
+				AppSettings.set("M3GDisableLightClamp", b);
+			}
+		}
+		{
+			int i;
+
+			i = m3gAACombo.getSelectionIndex();
+			if (i != -1 && i != AppSettings.m3gAA) {
+				AppSettings.m3gAA = i;
+				AppSettings.set("M3GAA", AppSettings.m3gAA);
+			}
+
+			i = m3gTexFilterCombo.getSelectionIndex();
+			if (i != -1 && i != AppSettings.m3gTexFilter) {
+				AppSettings.m3gTexFilter = i;
+				AppSettings.set("M3GTexFilter", AppSettings.m3gTexFilter);
+			}
+
+			i = m3gMipmapCombo.getSelectionIndex();
+			if (i != -1 && i != AppSettings.m3gMipmapping) {
+				AppSettings.m3gMipmapping = i;
+				AppSettings.set("M3GMipmapping", AppSettings.m3gMipmapping);
+			}
+		}
+
+		// mascot
+		{
+			b = mascotNo2DMixingCheck.getSelection();
+			if (b != AppSettings.mascotNo2DMixing) {
+				AppSettings.mascotNo2DMixing = b;
+				AppSettings.set("MascotNo2DMixing", b);
+			}
+
+			b = mascotIgnoreBgCheck.getSelection();
+			if (b != AppSettings.mascotIgnoreBackground) {
+				AppSettings.mascotIgnoreBackground = b;
+				AppSettings.set("MascotIgnoreBackground", b);
+			}
+
+			b = mascotTextureFilterCheck.getSelection();
+			if (b != AppSettings.mascotTextureFilter) {
+				AppSettings.mascotTextureFilter = b;
+				AppSettings.set("MascotTextureFilter", b);
+			}
+
+			b = mascotBackgroundFilterCheck.getSelection();
+			if (b != AppSettings.mascotBackgroundFilter) {
+				AppSettings.mascotBackgroundFilter = b;
+				AppSettings.set("MascotBackgroundFilter", b);
+			}
+		}
+
+		// system properties
+
+		{
+			String sysProps = systemPropertiesText.getText();
+			AppSettings.systemProperties.clear();
+			if (!sysProps.isEmpty()) {
+				String[] a = sysProps.split("\n");
+				for (String s : a) {
+					if ((s = s.trim()).isEmpty()) continue;
+					int i = s.indexOf(':');
+					if (i == -1) continue;
+					String k = s.substring(0, i).trim();
+					String v = s.substring(i + 1).trim();
+					AppSettings.systemProperties.put(k, v);
+				}
+
+				StringBuilder sb = new StringBuilder();
+				if (!AppSettings.systemProperties.isEmpty()) {
+					for (String k : AppSettings.systemProperties.keySet()) {
+						sb.append(k).append(':').append(AppSettings.systemProperties.get(k)).append('\n');
+					}
+					sb.setLength(sb.length() - 1);
+					AppSettings.set("SystemProperties", sb.toString());
+				}
+			}
 		}
 	}
 }

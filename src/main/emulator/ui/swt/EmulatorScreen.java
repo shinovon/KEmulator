@@ -1730,6 +1730,7 @@ public final class EmulatorScreen implements
 		this.pausestepMenuItem.setEnabled(this.pauseState != 0);
 		this.playResumeMenuItem.setEnabled(AppSettings.steps >= 0 && this.pauseState != 0);
 		this.openJadMenuItem.setEnabled(this.pauseState != 0);
+		appSettingsMenuItem.setEnabled(pauseState != 0);
 		this.watchesMenuItem.setEnabled(this.pauseState != 0);
 		this.profilerMenuItem.setEnabled(this.pauseState != 0);
 		this.memoryViewMenuItem.setEnabled(this.pauseState != 0);

@@ -157,9 +157,9 @@ public class AppSettings {
 	public static int load() {
 		Map<String, String> properties = appProperties = new HashMap<>();
 
+		IEmulatorFrontend emulator = Emulator.getEmulator();
 		boolean screenDetected = true;
 		detectScreen: {
-			IEmulatorFrontend emulator = Emulator.getEmulator();
 			try {
 				String s = emulator.getAppProperty("MIDxlet-ScreenSize");
 				if (s == null) {
@@ -249,8 +249,8 @@ public class AppSettings {
 			screenDetected = false;
 		}
 		if (screenDetected) {
-			properties.put("ScreenWidth", String.valueOf(screenWidth));
-			properties.put("ScreenHeight", String.valueOf(screenHeight));
+			set("ScreenWidth", screenWidth);
+			set("ScreenHeight", screenHeight);
 		}
 
 		if (Emulator.doja) {
@@ -259,6 +259,25 @@ public class AppSettings {
 			// TODO
 			devicePreset = "400x240 (SoftBank - full screen)";
 		}
+
+		String midletName = emulator.getAppProperty("MIDlet-Name");
+		if (midletName != null) {
+			if (midletName.contains("Angry Birds")) {
+				m3gFlushImmediately = true;
+				set("M3GFlushImmediately", true);
+			} else if (midletName.contains("勇闯恶魔城-Konami正版")) {
+				j2lStyleFpsLimit = true;
+				set("FPSLimitJLStyle", true);
+			}
+		}
+
+//		if (Emulator.jadPath != null) {
+//			set("JadPath", Emulator.jadPath);
+//		}
+//
+//		if (Emulator.midletJar != null) {
+//			set("JarPath", Emulator.midletJar);
+//		}
 		
 		String s;
 		if (AppSettings.uei) {
@@ -308,6 +327,18 @@ public class AppSettings {
 		}
 		if (properties.containsKey("KeyFire")) {
 			rightKey = Integer.parseInt(properties.get("KeyRight"));
+		}
+
+		if (properties.containsKey("FontSmallSize")) {
+			fontSmallSize = Integer.parseInt(properties.get("FontSmallSize"));
+		}
+
+		if (properties.containsKey("FontMediumSize")) {
+			fontMediumSize = Integer.parseInt(properties.get("FontMediumSize"));
+		}
+
+		if (properties.containsKey("FontLargeSize")) {
+			fontLargeSize = Integer.parseInt(properties.get("FontLargeSize"));
 		}
 
 		if (properties.containsKey("MIDPLocale")) {
@@ -368,6 +399,62 @@ public class AppSettings {
 		}
 		if (properties.containsKey("ApplySpeedToSleep")) {
 			applySpeedToSleep = Boolean.parseBoolean(properties.get("ApplySpeedToSleep"));
+		}
+
+		if (properties.containsKey("M3GIgnoreOverwrite")) {
+			m3gIgnoreOverwrite = Boolean.parseBoolean(properties.get("M3GIgnoreOverwrite"));
+		}
+
+		if (properties.containsKey("M3GForcePerspectiveCorrection")) {
+			m3gForcePerspectiveCorrection = Boolean.parseBoolean(properties.get("M3GForcePerspectiveCorrection"));
+		}
+
+		if (properties.containsKey("M3GDisableLightClamp")) {
+			m3gDisableLightClamp = Boolean.parseBoolean(properties.get("M3GDisableLightClamp"));
+		}
+
+		if (properties.containsKey("M3GFlushImmediately")) {
+			m3gFlushImmediately = Boolean.parseBoolean(properties.get("M3GFlushImmediately"));
+		}
+
+		if (properties.containsKey("M3GAA")) {
+			m3gAA = Integer.parseInt(properties.get("M3GAA"));
+		}
+
+		if (properties.containsKey("M3GTexFilter")) {
+			m3gTexFilter = Integer.parseInt(properties.get("M3GTexFilter"));
+		}
+
+		if (properties.containsKey("M3GMipmapping")) {
+			m3gMipmapping = Integer.parseInt(properties.get("M3GMipmapping"));
+		}
+
+		if (properties.containsKey("MascotNo2DMixing")) {
+			mascotNo2DMixing = Boolean.parseBoolean(properties.get("MascotNo2DMixing"));
+		}
+
+		if (properties.containsKey("MascotIgnoreBackground")) {
+			mascotIgnoreBackground = Boolean.parseBoolean(properties.get("MascotIgnoreBackground"));
+		}
+
+		if (properties.containsKey("MascotTextureFilter")) {
+			mascotTextureFilter = Boolean.parseBoolean(properties.get("MascotTextureFilter"));
+		}
+
+		if (properties.containsKey("MascotBackgroundFilter")) {
+			mascotBackgroundFilter = Boolean.parseBoolean(properties.get("MascotBackgroundFilter"));
+		}
+
+		if (properties.containsKey("SystemProperties")) {
+			String[] sysProps = properties.get("SystemProperties").split("\n");
+			for (String l : sysProps) {
+				if ((l = l.trim()).isEmpty()) continue;
+				int i = l.indexOf(':');
+				if (i == -1) continue;
+				String k = l.substring(0, i).trim();
+				String v = l.substring(i + 1).trim();
+				AppSettings.systemProperties.put(k, v);
+			}
 		}
 
 		return 1;
@@ -434,6 +521,7 @@ public class AppSettings {
 
 					if (line.startsWith("[")) {
 						if (save) {
+							writer.newLine();
 							writer.write(line);
 							writer.newLine();
 							for (;;) {
