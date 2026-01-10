@@ -14,6 +14,8 @@ import emulator.graphics2D.swt.ImageSWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.layout.FillLayout;
@@ -45,7 +47,7 @@ public class AppSettingsUI {
 	private Text leftText;
 	private Text rightText;
 	private Text downText;
-	private Text text_11;
+	private Text systemPropertiesText;
 	private Combo encodingCombo;
 	private Combo deviceCombo;
 	private Scale fpsScale;
@@ -53,14 +55,26 @@ public class AppSettingsUI {
 	private ImageSWT iconImage;
 
 	private int action;
+	private boolean start;
+	private Spinner largeSizeSpinner;
+	private Spinner mediumSizeSpinner;
+	private Spinner smallSizeSpinner;
 
 	public AppSettingsUI() {
 	}
 
-	public void open(Display display) {
+	public void open(Display display, Shell parent, boolean start) {
+		this.start = start;
 		action = 0;
 		if (shell == null || shell.isDisposed()) {
 			createContents(display);
+		}
+		if (parent != null) {
+			shell.setLocation(parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x >> 1), parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y >> 1));
+		} else {
+			Rectangle clientArea = this.shell.getMonitor().getClientArea();
+			Point size = shell.getSize();
+			shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		}
 		shell.open();
 		shell.layout();
@@ -79,7 +93,7 @@ public class AppSettingsUI {
 		shell.setLayout(new GridLayout(1, false));
 		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(ShellEvent e) {
-				if (action == 0) {
+				if (action == 0 && start) {
 					CustomMethod.close();
 					System.exit(0);
 				}
@@ -267,7 +281,7 @@ public class AppSettingsUI {
 		btnNewButton_2.setText("Swap");
 
 		fpsLabel = new Label(grpDevice, SWT.NONE);
-		fpsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		fpsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		fpsLabel.setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((AppSettings.frameRate > 120) ? "\u221e" : String.valueOf(AppSettings.frameRate)));
 
 		fpsScale = new Scale(grpDevice, SWT.NONE);
@@ -348,6 +362,8 @@ public class AppSettingsUI {
 		rightText = new Text(grpKeyMapping, SWT.BORDER);
 		rightText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		rightText.setText(Integer.toString(AppSettings.rightKey));
+		new Label(grpKeyMapping, SWT.NONE);
+		new Label(grpKeyMapping, SWT.NONE);
 
 		CTabItem tbtmFont = new CTabItem(tabFolder, SWT.NONE);
 		tbtmFont.setText("Font");
@@ -359,17 +375,20 @@ public class AppSettingsUI {
 		Label lblNewLabel_5 = new Label(grpFont, SWT.NONE);
 		lblNewLabel_5.setText("Large size:");
 
-		Spinner spinner = new Spinner(grpFont, SWT.BORDER);
+		largeSizeSpinner = new Spinner(grpFont, SWT.BORDER);
+		largeSizeSpinner.setSelection(AppSettings.fontLargeSize);
 
 		Label lblNewLabel_5_1 = new Label(grpFont, SWT.NONE);
 		lblNewLabel_5_1.setText("Medium size:");
 
-		Spinner spinner_1 = new Spinner(grpFont, SWT.BORDER);
+		mediumSizeSpinner = new Spinner(grpFont, SWT.BORDER);
+		mediumSizeSpinner.setSelection(AppSettings.fontMediumSize);
 
 		Label lblNewLabel_5_1_1 = new Label(grpFont, SWT.NONE);
 		lblNewLabel_5_1_1.setText("Small size:");
 
-		Spinner spinner_1_1 = new Spinner(grpFont, SWT.BORDER);
+		smallSizeSpinner = new Spinner(grpFont, SWT.BORDER);
+		smallSizeSpinner.setSelection(AppSettings.fontSmallSize);
 
 		CTabItem tbtmTweaks = new CTabItem(tabFolder, SWT.NONE);
 		tbtmTweaks.setText("Tweaks");
@@ -512,8 +531,9 @@ public class AppSettingsUI {
 		CTabItem tbtmProperties = new CTabItem(tabFolder, SWT.NONE);
 		tbtmProperties.setText("Properties");
 
-		text_11 = new Text(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-		tbtmProperties.setControl(text_11);
+		systemPropertiesText = new Text(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+		systemPropertiesText.setText("TODO");
+		tbtmProperties.setControl(systemPropertiesText);
 
 		Composite composite_3 = new Composite(shell, SWT.NONE);
 		composite_3.setLayout(new GridLayout(2, false));
@@ -653,6 +673,26 @@ public class AppSettingsUI {
 		if (right != 0 && right != AppSettings.rightKey) {
 			AppSettings.rightKey = right;
 			AppSettings.set("KeyRight", right);
+		}
+
+		// font
+
+		int large = largeSizeSpinner.getSelection();
+		if (large > 0 && large != AppSettings.fontLargeSize) {
+			AppSettings.fontLargeSize = large;
+			AppSettings.set("FontLargeSize", large);
+		}
+
+		int medium = mediumSizeSpinner.getSelection();
+		if (medium > 0 && medium != AppSettings.fontMediumSize) {
+			AppSettings.fontMediumSize = medium;
+			AppSettings.set("FontMediumSize", medium);
+		}
+
+		int small = smallSizeSpinner.getSelection();
+		if (small > 0 && small != AppSettings.fontSmallSize) {
+			AppSettings.fontSmallSize = small;
+			AppSettings.set("FontSmallSize", small);
 		}
 	}
 }

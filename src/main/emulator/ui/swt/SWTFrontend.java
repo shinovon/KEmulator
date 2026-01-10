@@ -287,7 +287,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		((EmulatorScreen) getScreen()).updateLanguage();
 	}
 
-	public void openAppSettings() {
-		appSettingsUI.open(Display.getCurrent());
+	public void openAppSettings(boolean start) {
+		appSettingsUI.open(Display.getCurrent(), start ? null : screen.getShell(), start);
 	}
 }

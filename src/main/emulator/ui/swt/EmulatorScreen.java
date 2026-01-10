@@ -134,6 +134,7 @@ public final class EmulatorScreen implements
 	MenuItem sensorMenuItem;
 	MenuItem devUtilsMenuItem;
 	MenuItem networkKillswitchMenuItem;
+	MenuItem appSettingsMenuItem;
 	private MenuItem canvasKeyboardMenuItem;
 	private MenuItem changeResMenuItem;
 	private Menu menuResize;
@@ -946,7 +947,7 @@ public final class EmulatorScreen implements
 		this.logMenuItem.addSelectionListener(this);
 
 		new MenuItem(this.menuView, 2);
-		(this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_OPTIONS", "Options..."));
+		(this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText("KEmulator Settings...");
 		this.optionsMenuItem.addSelectionListener(this);
 		(this.helpMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
 		this.helpMenuItem.addSelectionListener(this);
@@ -1069,7 +1070,7 @@ public final class EmulatorScreen implements
 		(this.captureToFileMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_FILE", "Capture to File") + "\tAlt+S");
 		this.captureToFileMenuItem.setAccelerator(SWT.ALT | 'S');
 		this.captureToFileMenuItem.addSelectionListener(this);
-		(this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to ClipBoard") + "\tAlt+C");
+		(this.captureToClipboardMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_CAPTURE_CLIP", "Capture to Clipboard") + "\tAlt+C");
 		this.captureToClipboardMenuItem.setAccelerator(SWT.ALT | 'C');
 		this.captureToClipboardMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuTool, 2);
@@ -1116,6 +1117,11 @@ public final class EmulatorScreen implements
 		new MenuItem(this.menuMidlet, 2);
 		(this.openJadMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_JAD", "Open JAD with Notepad") + "\tCtrl+D");
 		this.openJadMenuItem.addSelectionListener(this);
+
+		this.appSettingsMenuItem = new MenuItem(this.menuMidlet, 8);
+		this.appSettingsMenuItem.setText("Application Settings...");
+		this.appSettingsMenuItem.addSelectionListener(this);
+
 		new MenuItem(this.menuMidlet, 2);
 		final MenuItem menuItem7;
 		(menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_2D_ENGINE", "2D Engine"));
@@ -1405,6 +1411,10 @@ public final class EmulatorScreen implements
 				} catch (Exception ignored) {
 				}
 				this.updatePauseState();
+				return;
+			}
+			if (menuItem == this.appSettingsMenuItem) {
+				Emulator.getEmulator().openAppSettings(false);
 				return;
 			}
 		}

@@ -51,5 +51,5 @@ public interface IEmulatorFrontend {
 
 	void dispose();
 
-	void openAppSettings();
+	void openAppSettings(boolean start);
 }

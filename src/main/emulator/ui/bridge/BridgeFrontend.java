@@ -256,6 +256,6 @@ public class BridgeFrontend implements IEmulatorFrontend {
 	}
 
 	@Override
-	public void openAppSettings() {
+	public void openAppSettings(boolean start) {
 	}
 }

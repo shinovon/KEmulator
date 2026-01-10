@@ -370,8 +370,7 @@ public class AppSettings {
 			applySpeedToSleep = Boolean.parseBoolean(properties.get("ApplySpeedToSleep"));
 		}
 
-		return 0;
-//		return 1;
+		return 1;
 	}
 	
 	public static void set(String key, String value) {
@@ -395,6 +394,7 @@ public class AppSettings {
 		Path midletsPath = getMidletsPath();
 		String jarSection = "[" + jarSha1 + "]";
 		boolean found = false;
+		boolean notEmpty = false;
 
 		if (!save && Files.notExists(midletsPath)) return false;
 
@@ -410,6 +410,7 @@ public class AppSettings {
 				for (;;) {
 					line = reader.readLine();
 					if (line == null) break;
+					notEmpty = true;
 
 					if (save && !found) {
 						writer.write(line);
@@ -465,6 +466,7 @@ public class AppSettings {
 		if (!found && save) {
 			try {
 				try (BufferedWriter writer = Files.newBufferedWriter(midletsPath, StandardCharsets.UTF_8, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+					if (notEmpty) writer.newLine();
 					writer.write(jarSection);
 					writer.newLine();
 					for (String key : appProperties.keySet()) {

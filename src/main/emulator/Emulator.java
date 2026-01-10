@@ -770,7 +770,7 @@ public class Emulator implements Runnable {
 			} catch (Exception ignored) {}
 
 			if (AppSettings.load() == 0) {
-				Emulator.emulatorimpl.openAppSettings();
+				Emulator.emulatorimpl.openAppSettings(true);
 			}
 			Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
 			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);

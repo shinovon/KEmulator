@@ -1355,7 +1355,7 @@ public final class Property implements IProperty, SelectionListener {
 		setupMascotComp();
 		setupSecurityComp();
 		final CTabItem deviceTab;
-		(deviceTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_CUSTOM", "General"));
+		(deviceTab = new CTabItem(this.tabFolder, 0)).setText("Default");
 		deviceTab.setControl(this.customComp);
 		final CTabItem keymapTab;
 		(keymapTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
