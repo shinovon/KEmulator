@@ -271,6 +271,8 @@ public final class Property implements IProperty, SelectionListener {
 	private Button m3gThreadCheck;
 	private Combo ottCombo;
 //    private Button pollOnRepaintBtn;
+	private Text soundfontPathText;
+	private Button vlcCheck;
 
 	public Property() {
 		super();
@@ -613,6 +615,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.oneMidiAtTime = Boolean.parseBoolean(properties.getProperty("MIDIGlobalSequencer", "false"));
 			Settings.enableMediaDump = Boolean.parseBoolean(properties.getProperty("EnableMediaDump", "false"));
 			Settings.ottDecoder = Integer.parseInt(properties.getProperty("OTTConverter", "2"));
+			Settings.enableVlc = Boolean.parseBoolean(properties.getProperty("EnableVlc", "true"));
+			Settings.soundfontPath = properties.getProperty("SoundfontPath", "");
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -855,6 +859,8 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("MIDIGlobalSequencer", String.valueOf(Settings.oneMidiAtTime));
 			properties.setProperty("EnableMediaDump", String.valueOf(Settings.enableMediaDump));
 			properties.setProperty("OTTConverter", String.valueOf(Settings.ottDecoder));
+			properties.setProperty("EnableVlc", String.valueOf(Settings.enableVlc));
+			properties.setProperty("SoundfontPath", Settings.soundfontPath);
 
 			// jvm
 			properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));
@@ -959,6 +965,7 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.textAntiAliasing = antiAliasTextBtn.getSelection();
 //        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
+		Settings.soundfontPath = soundfontPathText.getText().trim();
 		Settings.locale = localeText.getText().trim();
 		Settings.microeditionPlatform = platformText.getText().trim();
 
@@ -1019,6 +1026,7 @@ public final class Property implements IProperty, SelectionListener {
 
 		Settings.enableMediaDump = mediaDumpCheck.getSelection();
 		Settings.ottDecoder = ottCombo.getSelectionIndex();
+		Settings.enableVlc = vlcCheck.getSelection();
 		Settings.enableSecurity = securityCheck.getSelection();
 
 		Settings.autoUpdate = autoUpdatesBtn.getSelection() ? 2 : 1;
@@ -2170,18 +2178,25 @@ public final class Property implements IProperty, SelectionListener {
 		fillHor2.horizontalAlignment = GridData.FILL;
 		fillHor2.grabExcessHorizontalSpace = true;
 
+		final GridData fillHor3 = new GridData();
+		fillHor3.horizontalAlignment = GridData.FILL;
+		fillHor3.grabExcessHorizontalSpace = true;
+
+		final GridData fillHor4 = new GridData();
+		fillHor4.horizontalAlignment = GridData.FILL;
+		fillHor4.grabExcessHorizontalSpace = true;
+
 		Group mediaGroup = new Group(this.mediaComp, 0);
 		mediaGroup.setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
 		mediaGroup.setLayout(new GridLayout());
 		mediaGroup.setLayoutData(fill);
 
-		new Label(mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") +
-				(System.getProperty("os.arch").contains("64") ? " (64-bit)" : " (32-bit)") + ":");
-		vlcDirText = new Text(mediaGroup, SWT.BORDER);
-		vlcDirText.setEditable(true);
-		vlcDirText.setEnabled(true);
-		vlcDirText.setLayoutData(fillHor2);
-		vlcDirText.setText(Settings.vlcDir);
+		new Label(mediaGroup, 32).setText("MIDI Soundfont Path:");
+		soundfontPathText = new Text(mediaGroup, SWT.BORDER);
+		soundfontPathText.setEditable(true);
+		soundfontPathText.setEnabled(true);
+		soundfontPathText.setLayoutData(fillHor3);
+		soundfontPathText.setText(Settings.soundfontPath);
 
 		vmsCheck = new Button(mediaGroup, SWT.CHECK);
 		vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMIDISynth as MIDI device"));
@@ -2192,6 +2207,19 @@ public final class Property implements IProperty, SelectionListener {
 		globalMidiCheck.setText(UILocale.get("OPTION_MEDIA_GLOBAL_MIDI", "Allow only one MIDI playback at time (reduces lag)"));
 		globalMidiCheck.setLayoutData(fillHor);
 		globalMidiCheck.setSelection(Settings.oneMidiAtTime);
+
+		vlcCheck = new Button(mediaGroup, SWT.CHECK);
+		vlcCheck.setText("Enable VLC Player");
+		vlcCheck.setLayoutData(fillHor4);
+		vlcCheck.setSelection(Settings.enableVlc);
+
+		new Label(mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") +
+				(System.getProperty("os.arch").contains("64") ? " (64-bit)" : " (32-bit)") + ":");
+		vlcDirText = new Text(mediaGroup, SWT.BORDER);
+		vlcDirText.setEditable(true);
+		vlcDirText.setEnabled(true);
+		vlcDirText.setLayoutData(fillHor2);
+		vlcDirText.setText(Settings.vlcDir);
 
 		mediaDumpCheck = new Button(mediaGroup, SWT.CHECK);
 		mediaDumpCheck.setText(UILocale.get("OPTION_MEDIA_DUMP", "Enable media exporting (higher memory usage)"));
