@@ -70,7 +70,7 @@ public class Emulator implements Runnable {
 	private static boolean bridge;
 	public static boolean doja;
 
-	private static String startWidth, startHeight;
+	private static int startWidth, startHeight;
 
 	private Emulator() {
 		super();
@@ -837,17 +837,11 @@ public class Emulator implements Runnable {
 			Devices.setPreset(Emulator.deviceName = Devices.getDefaultPreset());
 		}
 		Emulator.emulatorimpl.getProperty().setCustomProperties();
-		if (c != null) {
-			for (String[] p : c) {
-				if (p == null || p[0] == null) continue;
-				if (startWidth != null && p[0].equals("SCREEN_WIDTH")) {
-					p[1] = startWidth;
-				}
-				if (startHeight != null && p[0].equals("SCREEN_HEIGHT")) {
-					p[1] = startHeight;
-				}
-				Devices.setProperty(p[0], p[1]);
-			}
+		if (startWidth != 0) {
+			AppSettings.screenWidth = startWidth;
+		}
+		if (startHeight != 0) {
+			AppSettings.screenHeight = startHeight;
 		}
 		Devices.writeProperties();
 		Emulator.emulatorimpl.getProperty().updateCustomProperties();
@@ -947,8 +941,8 @@ public class Emulator implements Runnable {
 				} else if (key.equalsIgnoreCase("screen")) {
 					String[] size = value.split("x");
 					if (size.length == 2 && Integer.parseInt(size[0]) > 0 && Integer.parseInt(size[1]) > 0) {
-						startWidth = size[0];
-						startHeight = size[1];
+						startWidth = Integer.parseInt(size[0]);
+						startHeight = Integer.parseInt(size[1]);
 						Devices.writeProperties();
 						EmulatorScreen.sizeW = -1;
 						EmulatorScreen.sizeH = -1;
