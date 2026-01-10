@@ -16,6 +16,7 @@
 
 package com.mexa.opgl;
 
+import emulator.AppSettings;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.Graphics2DAWT;
@@ -424,7 +425,7 @@ public class OpglGraphics {
 	private static ImageData swtImageBuffer;
 
 	private OpglGraphics() {
-		Settings.m3gThread = true;
+		AppSettings.m3gThread = true;
 		egl = (EGL10) EGLContext.getEGL();
 		eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
 		egl.eglInitialize(eglDisplay, null);

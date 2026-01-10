@@ -17,6 +17,7 @@
 package ru.woesss.j2me.micro3d;
 
 import com.mascotcapsule.micro3d.v3.Graphics3D;
+import emulator.AppSettings;
 import emulator.Settings;
 import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
@@ -64,8 +65,8 @@ public class Render {
 	private boolean backCopied;
 	private final LinkedList<RenderNode> stack = new LinkedList<RenderNode>();
 	private int flushStep;
-	private final boolean postCopy2D = !Settings.mascotNo2DMixing;
-	private final boolean preCopy2D = !Settings.mascotIgnoreBackground;
+	private final boolean postCopy2D = !AppSettings.mascotNo2DMixing;
+	private final boolean preCopy2D = !AppSettings.mascotIgnoreBackground;
 	private IntBuffer bufHandles;
 	private int clearColor;
 	private TextureImpl targetTexture;
@@ -148,7 +149,7 @@ public class Render {
 			}
 			glClear(GL_DEPTH_BUFFER_BIT);
 
-			boolean aa = Settings.m3gAA == Settings.AA_ON;
+			boolean aa = AppSettings.m3gAA == AppSettings.AA_ON;
 
 			if (aa) {
 				GL11.glEnable(GL_POINT_SMOOTH);
@@ -247,7 +248,7 @@ public class Render {
 			glGenTextures(/*1, */bgTextureId);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, bgTextureId.get(0));
-			boolean filter = Settings.mascotBackgroundFilter;
+			boolean filter = AppSettings.mascotBackgroundFilter;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

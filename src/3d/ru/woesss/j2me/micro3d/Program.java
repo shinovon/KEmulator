@@ -17,6 +17,7 @@
 package ru.woesss.j2me.micro3d;
 
 import com.mascotcapsule.micro3d.v3.Graphics3D;
+import emulator.AppSettings;
 import emulator.Settings;
 import emulator.custom.ResourceManager;
 
@@ -255,7 +256,7 @@ abstract class Program {
 
 		@Override
 		protected int loadShader(int type, String shaderCode) {
-			if (Settings.mascotTextureFilter) {
+			if (AppSettings.mascotTextureFilter) {
 				shaderCode = "#define FILTER\n" + shaderCode;
 			}
 			return super.loadShader(type, shaderCode);
@@ -332,7 +333,7 @@ abstract class Program {
 
 		@Override
 		protected int loadShader(int type, String shaderCode) {
-			if (Settings.mascotTextureFilter) {
+			if (AppSettings.mascotTextureFilter) {
 				shaderCode = "#define FILTER\n" + shaderCode;
 			}
 			return super.loadShader(type, shaderCode);

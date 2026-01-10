@@ -1,5 +1,6 @@
 package emulator.custom;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import org.objectweb.asm.Label;
@@ -68,7 +69,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "yield", sign);
 					return;
 				}
-				if ((Settings.patchSleep || Settings.ignoreSleep) && name.equals("sleep")) {
+				if ((AppSettings.patchSleep || AppSettings.ignoreSleep) && name.equals("sleep")) {
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "sleep", sign);
 					return;
 				}
@@ -84,13 +85,13 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			} else if (cls.equals("java/lang/String")) {
 				if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
 					this.method707(1);
-					super.visitLdcInsn(Settings.fileEncoding);
+					super.visitLdcInsn(AppSettings.fileEncoding);
 					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
 				}
 				if (name.equals("getBytes") && sign.startsWith("()")) {
 					this.method707(1);
-					super.visitLdcInsn(Settings.fileEncoding);
+					super.visitLdcInsn(AppSettings.fileEncoding);
 					super.visitMethodInsn(acc, cls, name, "(Ljava/lang/String;)[B");
 					return;
 				}

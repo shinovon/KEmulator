@@ -1,20 +1,17 @@
 package emulator;
 
 import emulator.ui.IEmulatorFrontend;
-import emulator.ui.IProperty;
 import emulator.ui.swt.Property;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class AppSettings {
 
-	public static String jarSha1;
+	public static String jarHash;
 
 	public static boolean softbankApi;
 	public static boolean blackberryApi = false;
@@ -76,9 +73,20 @@ public class AppSettings {
 	public static boolean m3gForcePerspectiveCorrection;
 	public static boolean m3gDisableLightClamp;
 	public static boolean m3gFlushImmediately;
+	public static boolean m3gThread;
+
 	public static int m3gAA;
 	public static int m3gTexFilter;
 	public static int m3gMipmapping;
+
+	public static final int APP_CONTROLLED = 0;
+
+	public static final int AA_OFF = 1, AA_ON = 2;
+
+	public static final int TEX_FILTER_NEAREST = 1, TEX_FILTER_LINEAR = 2;
+
+	public static final int MIP_OFF = 1, MIP_LINEAR = 2, MIP_TRILINEAR = 3,
+			MIP_ANISO_2 = 4, MIP_ANISO_4 = 5, MIP_ANISO_8 = 6, MIP_ANISO_16 = 7;
 
 	// mascot
 	public static boolean mascotNo2DMixing;
@@ -88,74 +96,74 @@ public class AppSettings {
 
 	public static final Map<String, String> systemProperties = new HashMap<String, String>();
 
-	private static Map<String, String> appProperties;
+	private static final Map<String, String> appProperties = new HashMap<>();
 
 	public static void init() {
-		// copy values from Settings
-
 		Property p = (Property) Emulator.getEmulator().getProperty();
 
-		devicePreset = Emulator.deviceName;
+		devicePreset = Devices.getDefaultPreset();
 
-		screenWidth = Integer.parseInt(p.getScreenWidth());
-		screenHeight = Integer.parseInt(p.getScreenHeight());
-		
-		leftSoftKey = Integer.parseInt(p.getLsoft());
-		rightSoftKey = Integer.parseInt(p.getRsoft());
-		fireKey = Integer.parseInt(p.getFire());
-		upKey = Integer.parseInt(p.getUp());
-		downKey = Integer.parseInt(p.getDown());
-		leftKey = Integer.parseInt(p.getLeft());
-		rightKey = Integer.parseInt(p.getRight());
+		screenWidth = 240;
+		screenHeight = 320;
 
-		fontSmallSize = p.getFontSmallSize();
-		fontMediumSize = p.getFontMediumSize();
-		fontLargeSize = p.getFontLargeSize();
+		leftSoftKey = -6;
+		rightSoftKey = -7;
+		fireKey = -5;
+		upKey = -1;
+		downKey = -2;
+		leftKey = -3;
+		rightKey = -4;
 
-		locale = Settings.locale;
-		fileEncoding = Settings.fileEncoding;
-		microeditionPlatform = Settings.microeditionPlatform;
+		fontSmallSize = 12; // p.getFontSmallSize();
+		fontMediumSize = 14; // p.getFontMediumSize();
+		fontLargeSize = 16; // p.getFontLargeSize();
 
-		frameRate = Settings.frameRate;
+		locale = "en-US";
+		fileEncoding = "ISO-8859-1";
+		microeditionPlatform = "Nokia6700c-1/13.10";
 
-		enableKeyRepeat = Settings.enableKeyRepeat;
-		hasPointerEvents = Settings.hasPointerEvents;
+		frameRate = 30;
 
-		ignoreFullScreen = Settings.ignoreFullScreen;
-		asyncFlush = Settings.asyncFlush;
-		startAppOnResume = Settings.startAppOnResume;
+		enableKeyRepeat = false;
+		hasPointerEvents = true;
 
-		j2lStyleFpsLimit = Settings.j2lStyleFpsLimit;
-		motorolaSoftKeyFix = Settings.motorolaSoftKeyFix;
-		keyPressOnRepeat = Settings.keyPressOnRepeat;
-		synchronizeKeyEvents = Settings.synchronizeKeyEvents;
+		ignoreFullScreen = false;
+		asyncFlush = true;
+		startAppOnResume = true;
 
-		patchYield = Settings.patchYield;
-		ignoreGc = Settings.ignoreGc;
-		patchSleep = Settings.patchSleep;
-		ignoreSleep = Settings.ignoreSleep;
-		applySpeedToSleep = Settings.applySpeedToSleep;
+		j2lStyleFpsLimit = false;
+		motorolaSoftKeyFix = false;
+		keyPressOnRepeat = false;
+		synchronizeKeyEvents = false;
 
-		m3gIgnoreOverwrite = Settings.m3gIgnoreOverwrite;
-		m3gForcePerspectiveCorrection = Settings.m3gForcePerspectiveCorrection;
-		m3gDisableLightClamp = Settings.m3gDisableLightClamp;
-		m3gFlushImmediately = Settings.m3gFlushImmediately;
-		m3gAA = Settings.m3gAA;
-		m3gTexFilter = Settings.m3gTexFilter;
-		m3gMipmapping = Settings.m3gMipmapping;
+		patchYield = false;
+		ignoreGc = true;
+		patchSleep = false;
+		ignoreSleep = false;
+		applySpeedToSleep = false;
 
-		mascotNo2DMixing = Settings.mascotNo2DMixing;
-		mascotIgnoreBackground = Settings.mascotIgnoreBackground;
-		mascotTextureFilter = Settings.mascotTextureFilter;
-		mascotBackgroundFilter = Settings.mascotBackgroundFilter;
+		m3gIgnoreOverwrite = false;
+		m3gForcePerspectiveCorrection = false;
+		m3gDisableLightClamp = false;
+		m3gFlushImmediately = false;
+		m3gThread = true;
+
+		m3gAA = APP_CONTROLLED;
+		m3gTexFilter = APP_CONTROLLED;
+		m3gMipmapping = APP_CONTROLLED;
+
+		mascotNo2DMixing = false;
+		mascotIgnoreBackground = false;
+		mascotTextureFilter = false;
+		mascotBackgroundFilter = false;
 	}
 
 	public static void clear() {
 		appProperties.clear();
 	}
 
-	public static int load() {
-		Map<String, String> properties = appProperties = new HashMap<>();
+	public static int load(boolean reset) {
+		Map<String, String> properties = appProperties;
 
 		IEmulatorFrontend emulator = Emulator.getEmulator();
 		boolean screenDetected = true;
@@ -263,6 +271,7 @@ public class AppSettings {
 		} else if (AppSettings.softbankApi) {
 			// TODO
 			devicePreset = "400x240 (SoftBank - full screen)";
+			m3gThread = true;
 		}
 
 		String midletName = emulator.getAppProperty("MIDlet-Name");
@@ -288,16 +297,18 @@ public class AppSettings {
 		if (AppSettings.uei) {
 			s = "UEI";
 		} else if (Emulator.midletJar == null) {
-			return -1;
+			s = "Classpath";
 		} else {
-			s = getJarSHA1(Emulator.midletJar);
+			s = getJarHash(Emulator.midletJar);
 		}
 		if (s == null) {
 			return -1;
 		}
-		jarSha1 = s;
+		jarHash = s;
 
-		if (!load(false)) {
+		if (reset) return 0;
+
+		if (!loadINI(false)) {
 			return uei || !Settings.showAppSettingsOnStart ? 1 : 0;
 		}
 
@@ -427,6 +438,10 @@ public class AppSettings {
 			m3gFlushImmediately = Boolean.parseBoolean(properties.get("M3GFlushImmediately"));
 		}
 
+		if (properties.containsKey("M3GThread")) {
+			m3gThread = Boolean.parseBoolean(properties.get("M3GThread"));
+		}
+
 		if (properties.containsKey("M3GAA")) {
 			m3gAA = Integer.parseInt(properties.get("M3GAA"));
 		}
@@ -483,13 +498,68 @@ public class AppSettings {
 	}
 
 	public static void save() {
-		if (jarSha1 == null) return;
-		load(true);
+		if (jarHash == null) return;
+
+		AppSettings.set("FileEncoding", fileEncoding);
+		AppSettings.set("DevicePreset", devicePreset);
+		AppSettings.set("MIDPPlatform", microeditionPlatform);
+		AppSettings.set("MIDPLocale", locale);
+
+		AppSettings.set("ScreenWidth", screenWidth);
+		AppSettings.set("ScreenHeight", screenHeight);
+
+		AppSettings.set("KeyLeftSoft", leftSoftKey);
+		AppSettings.set("KeyRightSoft", rightSoftKey);
+		AppSettings.set("KeyUp", upKey);
+		AppSettings.set("KeyDown", downKey);
+		AppSettings.set("KeyLeft", leftKey);
+		AppSettings.set("KeyRight", rightKey);
+
+		AppSettings.set("FontLargeSize", fontLargeSize);
+		AppSettings.set("FontMediumSize", fontMediumSize);
+		AppSettings.set("FontSmallSize", fontSmallSize);
+
+		AppSettings.set("EnableKeyRepeat", enableKeyRepeat);
+		AppSettings.set("HasPointerEvents", hasPointerEvents);
+
+		AppSettings.set("IgnoreFullScreenMode", ignoreFullScreen);
+		AppSettings.set("FPSLimitJLStyle", j2lStyleFpsLimit);
+		AppSettings.set("MotorolaSoftKeyFix", motorolaSoftKeyFix);
+		AppSettings.set("KeyPressOnRepeat", keyPressOnRepeat);
+		AppSettings.set("SynchronizeKeyEvents", synchronizeKeyEvents);
+		AppSettings.set("AsyncFlush", asyncFlush);
+		AppSettings.set("StartAppOnResume", startAppOnResume);
+
+		AppSettings.set("M3GIgnoreOverwrite", m3gIgnoreOverwrite);
+		AppSettings.set("M3GForcePerspectiveCorrection", m3gForcePerspectiveCorrection);
+		AppSettings.set("M3GDisableLightClamp", m3gDisableLightClamp);
+		AppSettings.set("M3GFlushImmediately", m3gFlushImmediately);
+		AppSettings.set("M3GThread", m3gThread);
+
+		AppSettings.set("M3GAA", AppSettings.m3gAA);
+		AppSettings.set("M3GTexFilter", AppSettings.m3gTexFilter);
+		AppSettings.set("M3GMipmapping", AppSettings.m3gMipmapping);
+
+		AppSettings.set("MascotNo2DMixing", mascotNo2DMixing);
+		AppSettings.set("MascotIgnoreBackground", mascotIgnoreBackground);
+		AppSettings.set("MascotTextureFilter", mascotTextureFilter);
+		AppSettings.set("MascotBackgroundFilter", mascotBackgroundFilter);
+
+		StringBuilder sb = new StringBuilder();
+		if (!AppSettings.systemProperties.isEmpty()) {
+			for (String k : AppSettings.systemProperties.keySet()) {
+				sb.append(k).append(':').append(AppSettings.systemProperties.get(k)).append('\n');
+			}
+			sb.setLength(sb.length() - 1);
+			AppSettings.set("SystemProperties", sb.toString());
+		}
+
+		loadINI(true);
 	}
 
-	private static boolean load(boolean save) {
+	private static boolean loadINI(boolean save) {
 		Path midletsPath = getMidletsPath();
-		String jarSection = "[" + jarSha1 + "]";
+		String jarSection = "[" + jarHash + "]";
 		boolean found = false;
 		boolean notEmpty = false;
 
@@ -517,7 +587,9 @@ public class AppSettings {
 					if (line.equals(jarSection)) {
 						found = true;
 						if (save) {
-							for (String key : appProperties.keySet()) {
+							List<String> list = new ArrayList<>(appProperties.keySet());
+							Collections.sort(list);
+							for (String key : list) {
 								writer.write(key);
 								writer.write('=');
 								writer.write(escape(appProperties.get(key)));
@@ -569,7 +641,9 @@ public class AppSettings {
 					if (notEmpty) writer.newLine();
 					writer.write(jarSection);
 					writer.newLine();
-					for (String key : appProperties.keySet()) {
+					List<String> list = new ArrayList<>(appProperties.keySet());
+					Collections.sort(list);
+					for (String key : list) {
 						writer.write(key);
 						writer.write('=');
 						writer.write(escape(appProperties.get(key)));
@@ -623,9 +697,9 @@ public class AppSettings {
 		return Paths.get(Emulator.getUserPath(), "midlets.ini");
 	}
 
-	private static String getJarSHA1(String file) {
+	private static String getJarHash(String file) {
 		try {
-			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
 
 			try (InputStream input = new FileInputStream(file)) {
 				byte[] buffer = new byte[8192];

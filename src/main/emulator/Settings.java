@@ -9,15 +9,11 @@ public final class Settings {
 	public static final int G2D_SWT = 0, G2D_AWT = 1;
 	public static int g2d = G2D_AWT; // swt - 0, awt - 1
 	public static boolean enableVibration;
-	public static boolean enableKeyRepeat;
-	public static boolean ignoreFullScreen;
 	public static boolean alwaysOnTop;
 	public static boolean enableKeyCache;
 	public static boolean rightClickMenu;
 	public static float canvasScale;
-	public static int frameRate = 60;
 	public static long aLong1235;
-	public static String fileEncoding;
 	public static String[] recentJars = new String[5];
 	public static boolean infoColorHex;
 	public static boolean recordReleasedImg;
@@ -50,8 +46,6 @@ public final class Settings {
 	public static boolean textAntiAliasing = true;
 	public static boolean playerBufferAll = false;
 	public static String vlcDir = "";
-	public static String locale = "en-US";
-	public static String microeditionPlatform = "Nokia6700c-1/13.10";
 
 
 	public static boolean jdwpDebug;
@@ -61,30 +55,10 @@ public final class Settings {
 	public static String uiLanguage = "en";
 	public static boolean rpc;
 	public static boolean fpsCounter = true;
-	public static boolean synchronizeKeyEvents = true;
-	public static boolean motorolaSoftKeyFix = false;
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
 	public static ResizeMethod resizeMode = ResizeMethod.Fit;
 
 	//m3g
-	public static boolean m3gIgnoreOverwrite;
-	public static boolean m3gForcePerspectiveCorrection;
-	public static boolean m3gDisableLightClamp;
-	public static boolean m3gFlushImmediately;
-	public static boolean m3gThread = true;
-
-	public static final int APP_CONTROLLED = 0;
-
-	public static final int AA_OFF = 1, AA_ON = 2;
-	public static int m3gAA;
-
-	public static final int TEX_FILTER_NEAREST = 1, TEX_FILTER_LINEAR = 2;
-	public static int m3gTexFilter;
-
-	public static final int MIP_OFF = 1, MIP_LINEAR = 2, MIP_TRILINEAR = 3,
-			MIP_ANISO_2 = 4, MIP_ANISO_4 = 5, MIP_ANISO_8 = 6, MIP_ANISO_16 = 7;
-	public static int m3gMipmapping;
-
 	public static int m3gContextMode; // 0 - auto, 1 - glcanvas, 2 - lwjglx canvas, 3 - glfw window
 
 	public static boolean reopenMidiDevice = true;
@@ -93,18 +67,11 @@ public final class Settings {
 	public static int xmx = 512;
 	public static boolean oneMidiAtTime;
 	public static boolean ignoreRegionRepaint;
-	public static boolean startAppOnResume = true;
 	public static int micro3d = 1; // 0 - dll, 1 - gl
 
 	public static int ottDecoder = 2; // 0 - disabled, 1 - kemulator, 2 - freej2me
 
-	// mascot
-	public static boolean mascotNo2DMixing;
-	public static boolean mascotIgnoreBackground;
-	public static boolean mascotTextureFilter;
-	public static boolean mascotBackgroundFilter;
 
-	public static boolean keyPressOnRepeat;
 	public static boolean bypassVserv = true;
 	public static boolean enableMediaDump;
 
@@ -114,13 +81,10 @@ public final class Settings {
 	public static boolean enableSecurity = true;
 	public static boolean ignoreServiceRepaints;
 	public static boolean dontRepaintOnSetCurrent;
-	public static boolean hasPointerEvents = true;
 	public static boolean wavCache = true;
 	public static boolean queueSleep = true;
-	public static boolean j2lStyleFpsLimit;
 	public static String updateBranch = "stable";
 	public static int autoUpdate = 0; // 0 - not asked, 1 - manual, 2 - automatic
-	public static boolean asyncFlush = true;
 
 	public static boolean disableCamera;
 
@@ -150,10 +114,6 @@ public final class Settings {
 	public static String lastIdeaRepoPath = ""; // where last project was created
 
   // hacks
-	public static boolean patchYield;
-	public static boolean ignoreGc = true;
-	public static boolean patchSleep;
-	public static boolean ignoreSleep;
 	public static boolean applySpeedToSleep;
 	public static boolean altLessSpeedShortcuts;
 	public static boolean hideEmulation;

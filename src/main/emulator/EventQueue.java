@@ -358,7 +358,7 @@ public final class EventQueue implements Runnable {
 							if (!(d instanceof Canvas)) break;
 							((Canvas) d)._invokeHideNotify();
 							this.paused = true;
-							if (Settings.startAppOnResume) {
+							if (AppSettings.startAppOnResume) {
 								try {
 									Emulator.getMIDlet().invokePauseApp();
 								} catch (Exception e) {
@@ -369,7 +369,7 @@ public final class EventQueue implements Runnable {
 						}
 						case EVENT_RESUME: {
 							Displayable d = getCurrent();
-							if (Settings.startAppOnResume) {
+							if (AppSettings.startAppOnResume) {
 								try {
 									Thread t = new Thread(new InvokeStartAppRunnable(false));
 									t.setPriority(5);

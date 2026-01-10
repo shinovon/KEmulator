@@ -28,7 +28,6 @@ import javax.microedition.rms.RecordStore;
 import java.io.*;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.*;
 
@@ -126,22 +125,8 @@ public final class Property implements IProperty, SelectionListener {
 
 	private static Display display;
 	private Shell setsShell;
-	private Combo deviceCombo;
-	private Combo encodingCombo;
 	private Text aText662;
-	private Text screenWidthText;
-	private Text screenHeightText;
-	private Text aText695;
-	private Text aText702;
-	private Text aText708;
-	private Text aText713;
-	private Text aText718;
-	private Text aText723;
-	private Text aText727;
-	private Scale fpsScale;
-	private CLabel fpsLabel;
 	private CTabFolder tabFolder;
-	private Composite customComp;
 	private Text aText731;
 	private Text aText735;
 	private Text aText739;
@@ -167,17 +152,15 @@ public final class Property implements IProperty, SelectionListener {
 	private Button aButton714;
 	private Button aButton719;
 	private Composite systemComp;
-	private Composite coreApiComp;
 	private Group sysChecksGroup;
 	private Button vibrationCheck;
-	private Button keyRepeatCheck;
-	private Button canvasFullscreenCheck;
 	private Button noNetworkBtn;
 	private Button aButton746;
 	private Button aButton749;
 	private Button aButton752;
 	private Composite sysFontComp;
-	private Combo aCombo689;
+	private Combo defaultFontCombo;
+	private Combo monoFontCombo;
 	private Spinner aSpinner670;
 	private Canvas aCanvas663;
 	private Spinner aSpinner679;
@@ -189,15 +172,6 @@ public final class Property implements IProperty, SelectionListener {
 	private String defaultFont;
 	private String monospaceFont;
 	private String rmsFolder;
-	private String screenWidth;
-	private String screenHeight;
-	private String lsoft;
-	private String rsoft;
-	private String fire;
-	private String up;
-	private String down;
-	private String left;
-	private String right;
 	private int fontSmallSize;
 	private int fontMediumSize;
 	private int fontLargeSize;
@@ -217,37 +191,21 @@ public final class Property implements IProperty, SelectionListener {
 	private Text aText641;
 	private Text aText643;
 	private Button aButton764;
-	//private Spinner inactiveTimerSpinner;
 	private Button rpcBtn;
 	private Button antiAliasBtn;
 	private Composite mediaComp;
 	private Text vlcDirText;
 	private Font f;
-	private Text localeText;
-	private Text platformText;
 
 	private Combo languageCombo;
 	private Combo updateBranchCombo;
 
 	private Composite keyMapControllerComp;
 	private Composite keyMapTabComp;
-	private Button softkeyMotFixCheck;
-	private Button synchronizeKeyEventsCheck;
 
-	private Composite m3gComp;
-	private Button m3gIgnoreOverwriteCheck;
-	private Button m3gForcePersCorrect;
-	private Button m3gDisableLightClamp;
-	private Combo m3gAACombo;
-	private Combo m3gTexFilterCombo;
-	private Combo m3gMipmapCombo;
 	private Button vmsCheck;
-	//    private Button reopenMidiCheck;
 	private Button globalMidiCheck;
-//	private Button ignoreRegionRepaintCheck;
 	private Button fpsCounterCheck;
-//	private Button serialCallsCheck;
-	private Button keyPressOnRepeatCheck;
 	private Button antiAliasTextBtn;
 	private Composite disableApiComp;
 	private Table disableApiTable;
@@ -255,23 +213,11 @@ public final class Property implements IProperty, SelectionListener {
 	private Text propsText;
 	private Button mediaDumpCheck;
 	private ScrolledComposite securityComp;
-	private Button mascotNo2DMixingCheck;
-	private Composite mascotComp;
-	private Button mascotIgnoreBgCheck;
-	private Button mascotTextureFilterCheck;
-	private Button mascotBackgroundFilterCheck;
 	private Button securityCheck;
 	private Composite securityContent;
 	private Tree rmsTree;
-//	private Button forceServicePaintCheck;
-	private Button pointerEventsCheck;
-	private Button fpsLimitJlCheck;
 	private Button autoUpdatesBtn;
-	private Button m3gFlushImmediately;
-	private Button asyncFlushCheck;
-	private Button m3gThreadCheck;
 	private Combo ottCombo;
-//    private Button pollOnRepaintBtn;
 	private Text soundfontPathText;
 	private Button vlcCheck;
 
@@ -320,36 +266,8 @@ public final class Property implements IProperty, SelectionListener {
 		return monospaceFont;
 	}
 
-	public int getFontSmallSize() {
-		return this.fontSmallSize;
-	}
-
-	public int getFontMediumSize() {
-		return this.fontMediumSize;
-	}
-
-	public int getFontLargeSize() {
-		return this.fontLargeSize;
-	}
-
 	public void setDefaultFontName(final String aString682) {
 		this.defaultFont = aString682;
-	}
-
-	public void setFontSmallSize(final int anInt664) {
-		this.fontSmallSize = anInt664;
-	}
-
-	public void getFontMediumSize(final int anInt681) {
-		this.fontMediumSize = anInt681;
-	}
-
-	public void getFontLargeSize(final int anInt687) {
-		this.fontLargeSize = anInt687;
-	}
-
-	private String method355() {
-		return String.format("%s_%sx%s", this.device, this.screenWidth, this.screenHeight);
 	}
 
 	public String getRmsFolderPath() {
@@ -389,34 +307,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	public String getOldRmsPath() {
-		return getRmsFolderPath() + method355() + File.separator;
-	}
-
-	public void setCustomProperties() {
-//		if (this.device.equalsIgnoreCase(Emulator.deviceName)) {
-//			Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
-//			Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
-//			Devices.setProperty("KEY_S1", this.lsoft);
-//			Devices.setProperty("KEY_S2", this.rsoft);
-//			Devices.setProperty("KEY_FIRE", this.fire);
-//			Devices.setProperty("KEY_UP", this.up);
-//			Devices.setProperty("KEY_DOWN", this.down);
-//			Devices.setProperty("KEY_LEFT", this.left);
-//			Devices.setProperty("KEY_RIGHT", this.right);
-//			Devices.writeProperties();
-//		}
-	}
-
-	public void updateCustomProperties() {
-//		this.screenWidth = Devices.getProperty("SCREEN_WIDTH");
-//		this.screenHeight = Devices.getProperty("SCREEN_HEIGHT");
-//		this.lsoft = Devices.getProperty("KEY_S1");
-//		this.rsoft = Devices.getProperty("KEY_S2");
-//		this.fire = Devices.getProperty("KEY_FIRE");
-//		this.up = Devices.getProperty("KEY_UP");
-//		this.down = Devices.getProperty("KEY_DOWN");
-//		this.left = Devices.getProperty("KEY_LEFT");
-//		this.right = Devices.getProperty("KEY_RIGHT");
+		return getRmsFolderPath() + "legacy" + File.separator;
 	}
 
 	public void loadProperties() {
@@ -436,21 +327,9 @@ public final class Property implements IProperty, SelectionListener {
 			this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
 			this.fontMediumSize = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
 			this.fontLargeSize = Integer.parseInt(properties.getProperty("FontLargeSize", String.valueOf(16)));
-			this.screenWidth = properties.getProperty("SCREEN_WIDTH", "240");
-			this.screenHeight = properties.getProperty("SCREEN_HEIGHT", "320");
-			this.lsoft = properties.getProperty("KEY_LSOFT", "-6");
-			this.rsoft = properties.getProperty("KEY_RSOFT", "-7");
-			this.fire = properties.getProperty("KEY_FIRE", "-5");
-			this.up = properties.getProperty("KEY_UP", "-1");
-			this.down = properties.getProperty("KEY_DOWN", "-2");
-			this.left = properties.getProperty("KEY_LEFT", "-3");
-			this.right = properties.getProperty("KEY_RIGHT", "-4");
 			Settings.g2d = (properties.getProperty("2D_Graphics_Engine", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
 			Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("SWERVE") ? 0 : 1);
 			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("DLL") ? 0 : 1);
-
-			Settings.frameRate = Integer.parseInt(properties.getProperty("FrameRate", String.valueOf(30)));
-			Settings.asyncFlush = Boolean.parseBoolean(properties.getProperty("AsyncFlush", "true"));
 
 			// keyboard mappings
 			KeyMapping.mapDeviceKey(0, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_0")));
@@ -488,26 +367,14 @@ public final class Property implements IProperty, SelectionListener {
 
 			// api
 			Settings.enableVibration = Boolean.parseBoolean(properties.getProperty("EnableVibration", "false"));
-			Settings.enableKeyRepeat = Boolean.parseBoolean(properties.getProperty("EnableKeyRepeat", "false"));
-			Settings.ignoreFullScreen = Boolean.parseBoolean(properties.getProperty("IgnoreFullScreenMode", "false"));
 			Settings.networkNotAvailable = Boolean.parseBoolean(properties.getProperty("NetworkNotAvailable", "false"));
 
 			// platform
-			Settings.synchronizeKeyEvents = Boolean.parseBoolean(properties.getProperty("SynchronizeKeyEvents", "false"));
-			Settings.motorolaSoftKeyFix = Boolean.parseBoolean(properties.getProperty("MotorolaSoftKeyFix", "false"));
-//			Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
 			Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
-			Settings.startAppOnResume = Boolean.parseBoolean(properties.getProperty("StartAppOnResume", "true"));
-			Settings.keyPressOnRepeat = Boolean.parseBoolean(properties.getProperty("KeyPressOnRepeat", "false"));
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
-			Settings.hasPointerEvents = Boolean.parseBoolean(properties.getProperty("HasPointerEvents", "true"));
-			Settings.j2lStyleFpsLimit = Boolean.parseBoolean(properties.getProperty("FPSLimitJLStyle", "false"));
 			Settings.queueSleep = Boolean.parseBoolean(properties.getProperty("EventQueueSleep", "true"));
-			Settings.patchYield = Boolean.parseBoolean(properties.getProperty("PatchYield", "false"));
-			Settings.ignoreGc = Boolean.parseBoolean(properties.getProperty("IgnoreGC", "true"));
-			Settings.ignoreSleep = Boolean.parseBoolean(properties.getProperty("IgnoreThreadSleep", "false"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -523,10 +390,6 @@ public final class Property implements IProperty, SelectionListener {
                 String v = s.substring(i + 1).trim();
                 Settings.systemProperties.put(k, v);
             }
-
-            Settings.fileEncoding = properties.getProperty("FileEncoding", "ISO-8859-1");
-			Settings.locale = properties.getProperty("MIDPLocale", "en-US");
-			Settings.microeditionPlatform = properties.getProperty("MIDPPlatform", "Nokia6700c-1/13.10");
 
 			// emulator
 			Settings.rightClickMenu = Boolean.parseBoolean(properties.getProperty("RightClickMenu", "false"));
@@ -592,22 +455,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.alwaysOnTop = Boolean.parseBoolean(properties.getProperty("AlwaysOnTop", "false"));
 
 			// m3g
-			Settings.m3gIgnoreOverwrite = Boolean.parseBoolean(properties.getProperty("M3GIgnoreOverwrite", "false"));
-			Settings.m3gForcePerspectiveCorrection = Boolean.parseBoolean(properties.getProperty("M3GForcePerspectiveCorrection", "false"));
-			Settings.m3gDisableLightClamp = Boolean.parseBoolean(properties.getProperty("M3GDisableLightClamp", "false"));
-			Settings.m3gFlushImmediately = Boolean.parseBoolean(properties.getProperty("M3GFlushImmediately", "false"));
-			Settings.m3gThread = Boolean.parseBoolean(properties.getProperty("M3GThread", "true"));
-
-			Settings.m3gAA = Integer.parseInt(properties.getProperty("M3GAA", "0"));
-			Settings.m3gTexFilter = Integer.parseInt(properties.getProperty("M3GTexFilter", "0"));
-			Settings.m3gMipmapping = Integer.parseInt(properties.getProperty("M3GMipmapping", "0"));
 			Settings.m3gContextMode = Integer.parseInt(properties.getProperty("M3GContextMode", "0"));
-
-			// mascot
-			Settings.mascotNo2DMixing = Boolean.parseBoolean(properties.getProperty("MascotNo2DMixing", "false"));
-			Settings.mascotIgnoreBackground = Boolean.parseBoolean(properties.getProperty("MascotIgnoreBackground", "false"));
-			Settings.mascotTextureFilter = Boolean.parseBoolean(properties.getProperty("MascotTextureFilter", "false"));
-			Settings.mascotBackgroundFilter = Boolean.parseBoolean(properties.getProperty("MascotBackgroundFilter", "false"));
 
 			// media
 			Settings.vlcDir = properties.getProperty("VlcDir", "");
@@ -641,18 +489,8 @@ public final class Property implements IProperty, SelectionListener {
 			this.defaultFont = "Tahoma";
 			this.monospaceFont = "Consolas";
 			this.rmsFolder = "/rms";
-			this.screenWidth = "240";
-			this.screenHeight = "320";
-			this.lsoft = "-6";
-			this.rsoft = "-7";
-			this.fire = "-5";
-			this.up = "-1";
-			this.down = "-2";
-			this.left = "-3";
-			this.right = "-4";
 			EmulatorScreen.locX = Integer.MIN_VALUE;
 			EmulatorScreen.locY = Integer.MIN_VALUE;
-			Settings.fileEncoding = "ISO-8859-1";
 			Settings.autoGenJad = false;
 			Settings.enableNewTrack = false;
 			Settings.enableMethodTrack = false;
@@ -687,21 +525,9 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("FontSmallSize", String.valueOf(this.fontSmallSize));
 			properties.setProperty("FontMediumSize", String.valueOf(this.fontMediumSize));
 			properties.setProperty("FontLargeSize", String.valueOf(this.fontLargeSize));
-			properties.setProperty("SCREEN_WIDTH", this.screenWidth);
-			properties.setProperty("SCREEN_HEIGHT", this.screenHeight);
-			properties.setProperty("KEY_LSOFT", this.lsoft);
-			properties.setProperty("KEY_RSOFT", this.rsoft);
-			properties.setProperty("KEY_FIRE", this.fire);
-			properties.setProperty("KEY_UP", this.up);
-			properties.setProperty("KEY_DOWN", this.down);
-			properties.setProperty("KEY_LEFT", this.left);
-			properties.setProperty("KEY_RIGHT", this.right);
 			properties.setProperty("2D_Graphics_Engine", (Settings.g2d == 0) ? "SWT" : "AWT");
 			properties.setProperty("3D_Graphics_Engine", (Settings.g3d == 0) ? "SWERVE" : "LWJ");
 			properties.setProperty("Micro3D_Engine", (Settings.micro3d == 0) ? "DLL" : "GL");
-
-			properties.setProperty("FrameRate", String.valueOf(Settings.frameRate));
-			properties.setProperty("AsyncFlush", String.valueOf(Settings.asyncFlush));
 
 			// keyboard mappings
 			properties.setProperty("MAP_KEY_NUM_0", KeyMapping.get(0));
@@ -734,26 +560,14 @@ public final class Property implements IProperty, SelectionListener {
 
 			// api
 			properties.setProperty("EnableVibration", String.valueOf(Settings.enableVibration));
-			properties.setProperty("EnableKeyRepeat", String.valueOf(Settings.enableKeyRepeat));
-			properties.setProperty("IgnoreFullScreenMode", String.valueOf(Settings.ignoreFullScreen));
 			properties.setProperty("NetworkNotAvailable", String.valueOf(Settings.networkNotAvailable));
 
 			// platform
-			properties.setProperty("SynchronizeKeyEvents", String.valueOf(Settings.synchronizeKeyEvents));
-			properties.setProperty("MotorolaSoftKeyFix", String.valueOf(Settings.motorolaSoftKeyFix));
-//			properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
 			properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
-			properties.setProperty("StartAppOnResume", String.valueOf(Settings.startAppOnResume));
-			properties.setProperty("KeyPressOnRepeat", String.valueOf(Settings.keyPressOnRepeat));
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
-			properties.setProperty("HasPointerEvents", String.valueOf(Settings.hasPointerEvents));
-			properties.setProperty("FPSLimitJLStyle", String.valueOf(Settings.j2lStyleFpsLimit));
 			properties.setProperty("EventQueueSleep", String.valueOf(Settings.queueSleep));
-			properties.setProperty("PatchYield", String.valueOf(Settings.patchYield));
-			properties.setProperty("IgnoreGC", String.valueOf(Settings.ignoreGc));
-			properties.setProperty("IgnoreThreadSleep", String.valueOf(Settings.ignoreSleep));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -772,10 +586,6 @@ public final class Property implements IProperty, SelectionListener {
 				builder.setLength(builder.length() - 1);
 			}
 			properties.setProperty("SystemProperties", builder.toString());
-
-			properties.setProperty("FileEncoding", Settings.fileEncoding);
-			properties.setProperty("MIDPLocale", Settings.locale);
-			properties.setProperty("MIDPPlatform", Settings.microeditionPlatform);
 
 			// emulator
 			properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
@@ -836,22 +646,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
 
 			// m3g
-			properties.setProperty("M3GIgnoreOverwrite", String.valueOf(Settings.m3gIgnoreOverwrite));
-			properties.setProperty("M3GForcePerspectiveCorrection", String.valueOf(Settings.m3gForcePerspectiveCorrection));
-			properties.setProperty("M3GDisableLightClamp", String.valueOf(Settings.m3gDisableLightClamp));
-			properties.setProperty("M3GFlushImmediately", String.valueOf(Settings.m3gFlushImmediately));
-			properties.setProperty("M3GThread", String.valueOf(Settings.m3gThread));
-
-			properties.setProperty("M3GAA", String.valueOf(Settings.m3gAA));
-			properties.setProperty("M3GTexFilter", String.valueOf(Settings.m3gTexFilter));
-			properties.setProperty("M3GMipmapping", String.valueOf(Settings.m3gMipmapping));
 			properties.setProperty("M3GContextMode", String.valueOf(Settings.m3gContextMode));
-
-			// mascot
-			properties.setProperty("MascotNo2DMixing", String.valueOf(Settings.mascotNo2DMixing));
-			properties.setProperty("MascotIgnoreBackground", String.valueOf(Settings.mascotIgnoreBackground));
-			properties.setProperty("MascotTextureFilter", String.valueOf(Settings.mascotTextureFilter));
-			properties.setProperty("MascotBackgroundFilter", String.valueOf(Settings.mascotBackgroundFilter));
 
 			// media
 			properties.setProperty("VlcDir", Settings.vlcDir);
@@ -886,25 +681,11 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void apply() {
-		final String trim = this.deviceCombo.getText().trim();
-		this.device = trim;
-		Emulator.deviceName = trim;
-		Devices.curPlatform = Devices.getPlatform(Emulator.deviceName);
-		this.defaultFont = this.aCombo689.getText().trim();
+		this.defaultFont = this.defaultFontCombo.getText().trim();
 		this.rmsFolder = this.aText662.getText().trim();
-		Settings.fileEncoding = this.encodingCombo.getText().trim();
 		this.fontSmallSize = this.aSpinner690.getSelection();
 		this.fontMediumSize = this.aSpinner679.getSelection();
 		this.fontLargeSize = this.aSpinner670.getSelection();
-		this.screenWidth = this.screenWidthText.getText().trim();
-		this.screenHeight = this.screenHeightText.getText().trim();
-		this.lsoft = this.aText695.getText().trim();
-		this.rsoft = this.aText702.getText().trim();
-		this.fire = this.aText708.getText().trim();
-		this.up = this.aText713.getText().trim();
-		this.down = this.aText718.getText().trim();
-		this.left = this.aText723.getText().trim();
-		this.right = this.aText727.getText().trim();
 		KeyMapping.mapDeviceKey(17, KeyMapping.method601(Property.aStringArray661[17]));
 		KeyMapping.mapDeviceKey(18, KeyMapping.method601(Property.aStringArray661[18]));
 		KeyMapping.mapDeviceKey(14, KeyMapping.method601(Property.aStringArray661[14]));
@@ -924,16 +705,6 @@ public final class Property implements IProperty, SelectionListener {
 		KeyMapping.mapDeviceKey(8, KeyMapping.method601(Property.aStringArray661[8]));
 		KeyMapping.mapDeviceKey(9, KeyMapping.method601(Property.aStringArray661[9]));
 		KeyMapping.mapDeviceKey(0, KeyMapping.method601(Property.aStringArray661[0]));
-//		Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
-//		Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
-//		Devices.setProperty("KEY_S1", this.lsoft);
-//		Devices.setProperty("KEY_S2", this.rsoft);
-//		Devices.setProperty("KEY_FIRE", this.fire);
-//		Devices.setProperty("KEY_UP", this.up);
-//		Devices.setProperty("KEY_DOWN", this.down);
-//		Devices.setProperty("KEY_LEFT", this.left);
-//		Devices.setProperty("KEY_RIGHT", this.right);
-//		Devices.writeProperties();
 		KeyMapping.init();
 		if (Settings.enableKeyCache != this.aButton696.getSelection()) {
 			KeyMapping.keyCacheStack.clear();
@@ -942,11 +713,7 @@ public final class Property implements IProperty, SelectionListener {
 		if (Settings.enableVibration != this.vibrationCheck.getSelection() && !(Settings.enableVibration = this.vibrationCheck.getSelection())) {
 			Emulator.getEmulator().getScreen().stopVibra();
 		}
-		Settings.enableKeyRepeat = this.keyRepeatCheck.getSelection();
-		Settings.ignoreFullScreen = this.canvasFullscreenCheck.getSelection();
 		Settings.networkNotAvailable = this.noNetworkBtn.getSelection();
-		Settings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
-		Settings.motorolaSoftKeyFix = softkeyMotFixCheck.getSelection();
 		Settings.xrayOverlapScreen = this.aButton746.getSelection();
 		Settings.xrayShowClipBorder = this.aButton749.getSelection();
 		Settings.infoColorHex = this.aButton752.getSelection();
@@ -960,15 +727,11 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.proxyUser = this.aText639.getText().trim();
 		Settings.proxyPass = this.aText641.getText();
 		Settings.proxyDomain = this.aText643.getText().trim();
-		//Emulator.inactivityTimer = this.inactiveTimerSpinner.getSelection();
 		Settings.rpc = this.rpcBtn.getSelection();
 		Settings.awtAntiAliasing = antiAliasBtn.getSelection();
 		Settings.textAntiAliasing = antiAliasTextBtn.getSelection();
-//        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
 		Settings.soundfontPath = soundfontPathText.getText().trim();
-		Settings.locale = localeText.getText().trim();
-		Settings.microeditionPlatform = platformText.getText().trim();
 
 		//set UILanguage
 		Settings.uiLanguage = languageCombo.getText().trim();
@@ -983,33 +746,10 @@ public final class Property implements IProperty, SelectionListener {
 			Updater.state = Updater.STATE_INITIAL;
 		}
 
-		Settings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
-		Settings.m3gForcePerspectiveCorrection = m3gForcePersCorrect.getSelection();
-		Settings.m3gDisableLightClamp = m3gDisableLightClamp.getSelection();
-		Settings.m3gFlushImmediately = m3gFlushImmediately.getSelection();
-		Settings.m3gThread = m3gThreadCheck.getSelection();
-
-		Settings.m3gAA = m3gAACombo.getSelectionIndex();
-		Settings.m3gTexFilter = m3gTexFilterCombo.getSelectionIndex();
-		Settings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
-
-		Settings.mascotIgnoreBackground = mascotIgnoreBgCheck.getSelection();
-		Settings.mascotTextureFilter = mascotTextureFilterCheck.getSelection();
-		Settings.mascotBackgroundFilter = mascotBackgroundFilterCheck.getSelection();
-		Settings.mascotNo2DMixing = mascotNo2DMixingCheck.getSelection();
-
 		Settings.searchVms = vmsCheck.getSelection();
-//        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 		Settings.oneMidiAtTime = globalMidiCheck.getSelection();
-//		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
-//		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
-		Settings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
-//		Settings.forcePaintOnServiceRepaints = forceServicePaintCheck.getSelection();
-		Settings.hasPointerEvents = pointerEventsCheck.getSelection();
-		Settings.j2lStyleFpsLimit = fpsLimitJlCheck.getSelection();
-		Settings.asyncFlush = asyncFlushCheck.getSelection();
 
 		String sysProps = propsText.getText();
 		Settings.systemProperties.clear();
@@ -1031,10 +771,6 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.enableSecurity = securityCheck.getSelection();
 
 		Settings.autoUpdate = autoUpdatesBtn.getSelection() ? 2 : 1;
-
-//		try {
-//			Emulator.getEmulator().getScreen().setSize(Integer.parseInt(screenWidthText.getText()), Integer.parseInt(screenHeightText.getText()));
-//		} catch (Exception ignored) {}
 
 		this.updateProxy();
 	}
@@ -1060,44 +796,6 @@ public final class Property implements IProperty, SelectionListener {
 		this.setsShell.setLayout(layout);
 		this.method393();
 		this.method390();
-	}
-
-	private void setupDeviceCombo() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.horizontalSpan = 3;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = false;
-		layoutData.verticalSpan = 1;
-		layoutData.verticalAlignment = 2;
-		(this.deviceCombo = new Combo(this.customComp, 12)).setLayoutData(layoutData);
-		final Enumeration method620 = Devices.method620();
-		while (method620.hasMoreElements()) {
-			final String text = (String) method620.nextElement();
-			this.deviceCombo.add(text);
-			if (this.device.equalsIgnoreCase(text)) {
-				this.deviceCombo.setText(text);
-			}
-		}
-		this.deviceCombo.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent modifyEvent) {
-				final DevicePlatform ane1073 = Devices.curPlatform;
-				Devices.curPlatform = Devices.getPlatform(deviceCombo.getText().trim());
-//				updateCustomProperties();
-				screenWidth = Devices.getProperty("SCREEN_WIDTH");
-				screenHeight = Devices.getProperty("SCREEN_HEIGHT");
-				lsoft = Devices.getProperty("KEY_S1");
-				rsoft = Devices.getProperty("KEY_S2");
-				fire = Devices.getProperty("KEY_FIRE");
-				up = Devices.getProperty("KEY_UP");
-				down = Devices.getProperty("KEY_DOWN");
-				left = Devices.getProperty("KEY_LEFT");
-				right = Devices.getProperty("KEY_RIGHT");
-				method387();
-				Devices.curPlatform = ane1073;
-				updateCustomProperties();
-			}
-		});
 	}
 
 	private void genLanguageList() {
@@ -1166,139 +864,6 @@ public final class Property implements IProperty, SelectionListener {
 		updateBranchCombo.setText(Settings.updateBranch);
 	}
 
-	private void setupEncodingField() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-//		layoutData.horizontalSpan = 1;
-//		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		(this.encodingCombo = new Combo(this.customComp, 8)).setLayoutData(layoutData);
-		final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
-		final ArrayList<Comparable> list = new ArrayList(availableCharsets.keySet());
-		Collections.sort(list);
-		String s = (String) list.get(0);
-		for (int i = 0; i < list.size(); ++i) {
-			String e = (String) list.get(i);
-			if (!e.equalsIgnoreCase("ISO-8859-1")
-					&& !e.equalsIgnoreCase("UTF-8")
-					&& !e.equalsIgnoreCase("Shift_JIS")
-					&& !e.equalsIgnoreCase("EUC-KR")) {
-				continue;
-			}
-			this.encodingCombo.add(e);
-			if (Settings.fileEncoding.equalsIgnoreCase(e)) {
-				s = e;
-			}
-		}
-		Settings.fileEncoding = s;
-		this.encodingCombo.setText(s);
-	}
-
-	private void setupCustomProperties() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 4;
-		layoutData2.grabExcessHorizontalSpace = true;
-		layoutData2.verticalAlignment = 2;
-		final GridData layoutData3;
-		(layoutData3 = new GridData()).horizontalAlignment = 4;
-		layoutData3.grabExcessHorizontalSpace = true;
-		layoutData3.verticalAlignment = 2;
-		final GridData layoutData4;
-		(layoutData4 = new GridData()).horizontalAlignment = 4;
-		layoutData4.grabExcessHorizontalSpace = true;
-		layoutData4.verticalAlignment = 2;
-		final GridData layoutData5;
-		(layoutData5 = new GridData()).horizontalAlignment = 4;
-		layoutData5.grabExcessHorizontalSpace = true;
-		layoutData5.verticalAlignment = 2;
-		final GridData layoutData6;
-		(layoutData6 = new GridData()).horizontalAlignment = 4;
-		layoutData6.grabExcessHorizontalSpace = true;
-		layoutData6.verticalAlignment = 2;
-		final GridData layoutData7;
-		(layoutData7 = new GridData()).horizontalAlignment = 4;
-		layoutData7.grabExcessHorizontalSpace = true;
-		layoutData7.verticalAlignment = 2;
-		final GridData layoutData8;
-		(layoutData8 = new GridData()).horizontalAlignment = 1;
-		layoutData8.verticalAlignment = 2;
-		final GridData layoutData9;
-		(layoutData9 = new GridData()).horizontalAlignment = 1;
-		layoutData9.grabExcessHorizontalSpace = false;
-		layoutData9.verticalAlignment = 2;
-		final GridData layoutData10;
-		(layoutData10 = new GridData()).horizontalAlignment = 4;
-		layoutData10.grabExcessHorizontalSpace = true;
-		layoutData10.verticalAlignment = 2;
-		final GridData layoutData11;
-		(layoutData11 = new GridData()).horizontalAlignment = 4;
-		layoutData11.grabExcessHorizontalSpace = true;
-		layoutData11.verticalAlignment = 2;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 4;
-		layout.makeColumnsEqualWidth = false;
-		layout.marginHeight = 10;
-		layout.horizontalSpacing = 5;
-		final GridData layoutData12;
-		(layoutData12 = new GridData()).horizontalAlignment = 4;
-		layoutData12.horizontalSpan = 4;
-		layoutData12.grabExcessHorizontalSpace = true;
-		layoutData12.grabExcessVerticalSpace = true;
-		//layoutData12.heightHint = 140;
-		layoutData12.verticalAlignment = 4;
-		Group aGroup660;
-		(aGroup660 = new Group(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_PROPERTIES", "Custom Properties"));
-		aGroup660.setLayout(layout);
-		aGroup660.setLayoutData(layoutData12);
-		CLabel aCLabel694;
-		(aCLabel694 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_SCREEN_WIDTH", "Screen Width:"));
-		aCLabel694.setLayoutData(layoutData9);
-		(this.screenWidthText = new Text(aGroup660, 2048)).setLayoutData(layoutData11);
-		CLabel aCLabel701;
-		(aCLabel701 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_SCREEN_HEIGHT", "Screen Height:"));
-		aCLabel701.setLayoutData(layoutData8);
-		(this.screenHeightText = new Text(aGroup660, 2048)).setLayoutData(layoutData10);
-		CLabel aCLabel707;
-		(aCLabel707 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_LSK", "Left Soft Key:"));
-		(this.aText695 = new Text(aGroup660, 2048)).setLayoutData(layoutData7);
-		CLabel aCLabel712;
-		(aCLabel712 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_RSK", "Right Soft Key:"));
-		(this.aText702 = new Text(aGroup660, 2048)).setLayoutData(layoutData6);
-		CLabel aCLabel717;
-		(aCLabel717 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_MIDDLE", "Fire/Middle:"));
-		(this.aText708 = new Text(aGroup660, 2048)).setLayoutData(layoutData5);
-		CLabel aCLabel722 = new CLabel(aGroup660, 0);
-		aCLabel722 = new CLabel(aGroup660, 0);
-		(aCLabel722 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_UP", "Up:"));
-		(this.aText713 = new Text(aGroup660, 2048)).setLayoutData(layoutData4);
-		CLabel aCLabel726;
-		(aCLabel726 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_DOWN", "Down:"));
-		(this.aText718 = new Text(aGroup660, 2048)).setLayoutData(layoutData3);
-		CLabel aCLabel730;
-		(aCLabel730 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_LEFT", "Left:"));
-		(this.aText723 = new Text(aGroup660, 2048)).setLayoutData(layoutData2);
-		CLabel aCLabel734;
-		(aCLabel734 = new CLabel(aGroup660, 0)).setText(UILocale.get("OPTION_CUSTOM_KEY_RIGHT", "Right:"));
-		(this.aText727 = new Text(aGroup660, 2048)).setLayoutData(layoutData);
-		this.method387();
-	}
-
-	private void method387() {
-		this.screenWidthText.setText(this.screenWidth);
-		this.screenHeightText.setText(this.screenHeight);
-		this.aText695.setText(this.lsoft);
-		this.aText702.setText(this.rsoft);
-		this.aText708.setText(this.fire);
-		this.aText713.setText(this.up);
-		this.aText718.setText(this.down);
-		this.aText723.setText(this.left);
-		this.aText727.setText(this.right);
-	}
-
 	private void method390() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
@@ -1342,22 +907,15 @@ public final class Property implements IProperty, SelectionListener {
 		this.tabFolder.setUnselectedCloseVisible(false);
 		this.tabFolder.setUnselectedImageVisible(false);
 		this.tabFolder.setLayoutData(layoutData);
-		this.setupCustomComp();
 		this.setupKeyMapComp();
 		this.setupSystemComp();
-		this.setupCoreApiComp();
 		setupDisableApiComp();
 		setupPropsComp();
 		this.setupSysFontComp();
 		this.setupRecordsComp();
 		this.setupNetworkComp();
 		this.setupMediaComp();
-		this.setupM3GComp();
-		setupMascotComp();
 		setupSecurityComp();
-		final CTabItem deviceTab;
-		(deviceTab = new CTabItem(this.tabFolder, 0)).setText("Default");
-		deviceTab.setControl(this.customComp);
 		final CTabItem keymapTab;
 		(keymapTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
 		keymapTab.setControl(this.keyMapTabComp);
@@ -1367,9 +925,6 @@ public final class Property implements IProperty, SelectionListener {
 		final CTabItem systemTab;
 		(systemTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM", "System"));
 		systemTab.setControl(this.systemComp);
-		final CTabItem coreApiTab;
-		(coreApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_COREAPI", "CoreAPI"));
-		coreApiTab.setControl(this.coreApiComp);
 		final CTabItem disableApiTab;
 		(disableApiTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_DISABLE_API", "Disable APIs"));
 		disableApiTab.setControl(this.disableApiComp);
@@ -1382,98 +937,12 @@ public final class Property implements IProperty, SelectionListener {
 		final CTabItem mediaTab;
 		(mediaTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
 		mediaTab.setControl(this.mediaComp);
-		final CTabItem m3gTab;
-		(m3gTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_M3G", "M3G"));
-		m3gTab.setControl(this.m3gComp);
-		final CTabItem mascotTab;
-		(mascotTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_MASCOT", "MascotCapsule"));
-		mascotTab.setControl(this.mascotComp);
 		final CTabItem securityTab;
 		(securityTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SECURITY", "Security"));
 		securityTab.setControl(this.securityComp);
 		final CTabItem propsTab;
 		(propsTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
 		propsTab.setControl(this.propsComp);
-	}
-
-	private void setupCustomComp() {
-		final GridData layoutData = new GridData();
-		layoutData.horizontalAlignment = 4;
-		layoutData.verticalAlignment = 4;
-		this.customComp = new Composite(this.tabFolder, 0);
-		final GridData layoutData2 = new GridData();
-		layoutData2.horizontalAlignment = 4;
-		layoutData2.horizontalSpan = 3;
-		layoutData2.grabExcessHorizontalSpace = true;
-		layoutData2.verticalAlignment = 2;
-		final GridData layoutData3 = new GridData();
-		layoutData3.horizontalAlignment = 4;
-		layoutData3.verticalAlignment = 2;
-		final GridData layoutData4 = new GridData();
-		layoutData4.horizontalAlignment = 4;
-		layoutData4.verticalAlignment = 2;
-		final GridData layoutData5 = new GridData();
-		layoutData5.horizontalAlignment = 4;
-		layoutData5.verticalAlignment = 2;
-		final GridData layoutData8 = new GridData();
-		layoutData8.horizontalAlignment = 4;
-		layoutData8.verticalAlignment = 2;
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = 4;
-		layout.marginWidth = 5;
-		layout.makeColumnsEqualWidth = false;
-		this.customComp.setLayout(layout);
-		customComp.setFont(f);
-		CLabel aCLabel658;
-		(aCLabel658 = new CLabel(this.customComp, 0)).setText("Device preset:");
-		aCLabel658.setLayoutData(layoutData3);
-		this.setupDeviceCombo();
-		CLabel aCLabel673;
-		(aCLabel673 = new CLabel(this.customComp, 0)).setText("Default encoding:");
-		aCLabel673.setLayoutData(layoutData4);
-		this.setupEncodingField();
-
-		CLabel labelLocale = new CLabel(this.customComp, 0);
-		labelLocale.setText("MIDP Locale:");
-		labelLocale.setLayoutData(layoutData5);
-
-		final GridData layoutData6 = new GridData();
-		layoutData6.horizontalAlignment = 4;
-		layoutData6.grabExcessHorizontalSpace = true;
-		layoutData6.verticalAlignment = 2;
-		localeText = new Text(this.customComp, 2048);
-		localeText.setLayoutData(layoutData6);
-		localeText.setText(Settings.locale);
-
-
-		CLabel labelPlatform = new CLabel(this.customComp, 0);
-		labelPlatform.setText("MIDP Platform:");
-		labelPlatform.setLayoutData(layoutData8);
-
-		final GridData layoutData7 = new GridData();
-		layoutData7.horizontalAlignment = 4;
-		layoutData7.horizontalSpan = 3;
-		layoutData7.grabExcessHorizontalSpace = true;
-		layoutData7.verticalAlignment = 2;
-		platformText = new Text(this.customComp, 2048);
-		platformText.setLayoutData(layoutData7);
-		platformText.setText(Settings.microeditionPlatform);
-
-		this.setupCustomProperties();
-		(this.fpsLabel = new CLabel(this.customComp, 0)).setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
-		this.fpsLabel.setLayoutData(layoutData);
-		(this.fpsScale = new Scale(this.customComp, 256)).setIncrement(1);
-		this.fpsScale.setMaximum(121);
-		this.fpsScale.setPageIncrement(5);
-		this.fpsScale.setSelection(Settings.frameRate);
-		this.fpsScale.setMinimum(1);
-		this.fpsScale.setLayoutData(layoutData2);
-		this.fpsScale.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent selectionEvent) {
-				Settings.frameRate = fpsScale.getSelection();
-				fpsLabel.setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((Settings.frameRate > 120) ? "\u221e" : String.valueOf(Settings.frameRate)));
-			}
-		});
 	}
 
 	private void setupKeyMapComp() {
@@ -2030,88 +1499,6 @@ public final class Property implements IProperty, SelectionListener {
 		this.initSystemComp();
 	}
 
-	private void setupCoreApiComp() {
-		(this.coreApiComp = new Composite(this.tabFolder, 0)).setLayout(new GridLayout());
-
-		final GridData gridData;
-		(gridData = new GridData()).grabExcessHorizontalSpace = true;
-		gridData.verticalAlignment = 2;
-		gridData.horizontalAlignment = 4;
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
-		Group coreApiGroup;
-		(coreApiGroup = new Group(this.coreApiComp, 0)).setLayout(new GridLayout());
-		coreApiGroup.setLayoutData(layoutData);
-		(this.vibrationCheck = new Button(coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
-		this.vibrationCheck.setLayoutData(gridData);
-		this.vibrationCheck.setSelection(Settings.enableVibration);
-		// автор подсказок - twospaces TODO: localize
-		vibrationCheck.setToolTipText("Shakes the window during vibration");
-
-		(this.keyRepeatCheck = new Button(coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_KEY_REPEAT", "Enable Canvas.keyRepeated(int)."));
-		this.keyRepeatCheck.setLayoutData(gridData);
-		this.keyRepeatCheck.setSelection(Settings.enableKeyRepeat);
-		keyRepeatCheck.setToolTipText("Enables key repeats");
-
-		(this.canvasFullscreenCheck = new Button(coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_FULLSCREEN", "Ignore Canvas.setFullScreenMode(boolean)."));
-		this.canvasFullscreenCheck.setLayoutData(gridData);
-		this.canvasFullscreenCheck.setSelection(Settings.ignoreFullScreen);
-		canvasFullscreenCheck.setToolTipText("Forces full screen mode");
-
-		(this.synchronizeKeyEventsCheck = new Button(coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SYNC_KEYEVENTS", "Synchronize key events"));
-		this.synchronizeKeyEventsCheck.setLayoutData(gridData);
-		this.synchronizeKeyEventsCheck.setSelection(Settings.synchronizeKeyEvents);
-		synchronizeKeyEventsCheck.setToolTipText("Compatibility option");
-
-		(this.softkeyMotFixCheck = new Button(coreApiGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_SOFTKEY_FIX", "Send keyPressed with commandAction"));
-		this.softkeyMotFixCheck.setLayoutData(gridData);
-		this.softkeyMotFixCheck.setSelection(Settings.motorolaSoftKeyFix);
-		softkeyMotFixCheck.setToolTipText("Compatibility tweak for certain Motorola Triplets games");
-
-//		ignoreRegionRepaintCheck = new Button(coreApiGroup, SWT.CHECK);
-//		ignoreRegionRepaintCheck.setText(UILocale.get("OPTION_COREAPI_IGNORE_REGION_REPAINT", "Always repaint screen fully"));
-//		ignoreRegionRepaintCheck.setLayoutData(gridData);
-//		ignoreRegionRepaintCheck.setSelection(Settings.ignoreRegionRepaint);
-//		ignoreRegionRepaintCheck.setToolTipText("Compatibility tweak for Opera Mini (breaks Fantasy Zone: Part 1)");
-
-//		serialCallsCheck = new Button(coreApiGroup, SWT.CHECK);
-//		serialCallsCheck.setText(UILocale.get("OPTION_COREAPI_SERIAL_CALLS", "Process serial calls out of queue"));
-//		serialCallsCheck.setLayoutData(gridData);
-//		serialCallsCheck.setSelection(Settings.processSerialCallsOutOfQueue);
-
-		keyPressOnRepeatCheck = new Button(coreApiGroup, SWT.CHECK);
-		keyPressOnRepeatCheck.setText(UILocale.get("OPTION_COREAPI_KEYPRESS_ON_REPEAT", "Send keyPressed on repeats"));
-		keyPressOnRepeatCheck.setLayoutData(gridData);
-		keyPressOnRepeatCheck.setSelection(Settings.keyPressOnRepeat);
-		keyPressOnRepeatCheck.setToolTipText("Compatibility tweak for The Elder Scrolls: Oblivion");
-
-//		forceServicePaintCheck = new Button(coreApiGroup, SWT.CHECK);
-//		forceServicePaintCheck.setText(UILocale.get("OPTION_COREAPI_FORCE_SERVICE_REPAINTS", "Force paint on serviceRepaints()"));
-//		forceServicePaintCheck.setLayoutData(gridData);
-//		forceServicePaintCheck.setSelection(Settings.forcePaintOnServiceRepaints);
-//		forceServicePaintCheck.setToolTipText("Compatibility tweak for games by SEGA China (breaks other games)");
-
-		pointerEventsCheck = new Button(coreApiGroup, SWT.CHECK);
-		pointerEventsCheck.setText(UILocale.get("OPTION_COREAPI_POINTER_EVENTS", "Canvas.hasPointerEvents() return value"));
-		pointerEventsCheck.setLayoutData(gridData);
-		pointerEventsCheck.setSelection(Settings.hasPointerEvents);
-
-		fpsLimitJlCheck = new Button(coreApiGroup, SWT.CHECK);
-		fpsLimitJlCheck.setText(UILocale.get("OPTION_COREAPI_FPS_LIMIT_JL", "J2ME-Loader style FPS limit"));
-		fpsLimitJlCheck.setLayoutData(gridData);
-		fpsLimitJlCheck.setSelection(Settings.j2lStyleFpsLimit);
-		fpsLimitJlCheck.setToolTipText("Compatibility tweak for chinese version of Castlevania");
-
-		asyncFlushCheck = new Button(coreApiGroup, SWT.CHECK);
-		asyncFlushCheck.setText(UILocale.get("OPTION_COREAPI_ASYNC_FLUSH", "Async flush"));
-		asyncFlushCheck.setLayoutData(gridData);
-		asyncFlushCheck.setSelection(Settings.asyncFlush);
-		asyncFlushCheck.setToolTipText("If disabled, window refresh delay is passed to app. Restart after changing this property.");
-	}
-
 	private void setupDisableApiComp() {
 		(disableApiComp = new Composite(tabFolder, 0)).setLayout(new GridLayout());
 
@@ -2276,158 +1663,6 @@ public final class Property implements IProperty, SelectionListener {
 		ottCombo.setItems(items);
 		ottCombo.setText(items[Settings.ottDecoder]);
 	}
-
-	private void setupM3GComp() {
-		this.m3gComp = new Composite(this.tabFolder, 0);
-		m3gComp.setLayout(new GridLayout());
-		this.initM3GComp();
-	}
-
-	private void initM3GComp() {
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		layout.marginWidth = 5;
-		/*m3gComp.setLayout(layout);*/
-
-		final GridData groupData = new GridData();
-		groupData.horizontalAlignment = 4;
-		groupData.grabExcessHorizontalSpace = true;
-		groupData.grabExcessVerticalSpace = true;
-		groupData.verticalAlignment = 1;
-
-		Group lwjglGroup = new Group(m3gComp, 0);
-		lwjglGroup.setText(UILocale.get("OPTION_M3G_LWJGL_SETTINGS", "LWJGL Settings"));
-		lwjglGroup.setLayout(layout);
-		lwjglGroup.setLayoutData(groupData);
-
-		final GridData labelGridData = new GridData();
-		labelGridData.horizontalAlignment = SWT.FILL;
-		labelGridData.grabExcessHorizontalSpace = true;
-		labelGridData.horizontalSpan = 2;
-
-		m3gIgnoreOverwriteCheck = new Button(lwjglGroup, SWT.CHECK);
-		m3gIgnoreOverwriteCheck.setText(UILocale.get("OPTION_M3G_IGNORE_OVERWRITE", "Ignore M3G overwrite hint"));
-		m3gIgnoreOverwriteCheck.setLayoutData(labelGridData);
-		m3gIgnoreOverwriteCheck.setSelection(Settings.m3gIgnoreOverwrite);
-
-		m3gForcePersCorrect = new Button(lwjglGroup, SWT.CHECK);
-		m3gForcePersCorrect.setText(UILocale.get("OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION", "Force perspective correction"));
-		m3gForcePersCorrect.setLayoutData(labelGridData);
-		m3gForcePersCorrect.setSelection(Settings.m3gForcePerspectiveCorrection);
-
-		m3gDisableLightClamp = new Button(lwjglGroup, SWT.CHECK);
-		m3gDisableLightClamp.setText(UILocale.get("OPTION_M3G_DISABLE_LIGHT_CLAMPING", "Disable light clamping"));
-		m3gDisableLightClamp.setLayoutData(labelGridData);
-		m3gDisableLightClamp.setSelection(Settings.m3gDisableLightClamp);
-
-		m3gFlushImmediately = new Button(lwjglGroup, SWT.CHECK);
-		m3gFlushImmediately.setText(UILocale.get("OPTION_M3G_FLUSH_IMMEDIATELY", "Flush contents immediately (slow!)"));
-		m3gFlushImmediately.setLayoutData(labelGridData);
-		m3gFlushImmediately.setSelection(Settings.m3gFlushImmediately);
-		m3gFlushImmediately.setToolTipText("Fixes background in Angry Birds Seasons");
-
-		m3gThreadCheck = new Button(lwjglGroup, SWT.CHECK);
-		m3gThreadCheck.setText(UILocale.get("OPTION_M3G_THREAD", "Single threaded M3G"));
-		m3gThreadCheck.setLayoutData(labelGridData);
-		m3gThreadCheck.setSelection(Settings.m3gThread);
-		m3gThreadCheck.setToolTipText("Fixes some games, but less performance. Restart after changing this property.");
-
-		final GridData dataFillLabel = new GridData();
-		dataFillLabel.horizontalAlignment = SWT.FILL;
-
-		final GridData dataFillLabel2 = new GridData();
-		dataFillLabel2.horizontalAlignment = SWT.FILL;
-
-		final GridData dataFillLabel3 = new GridData();
-		dataFillLabel3.horizontalAlignment = SWT.FILL;
-
-		final GridData listGridData = new GridData();
-		listGridData.horizontalAlignment = SWT.FILL;
-		listGridData.grabExcessHorizontalSpace = true;
-
-		CLabel tmpLabel = new CLabel(lwjglGroup, 0);
-		tmpLabel.setText(UILocale.get("OPTION_M3G_AA", "Anti-aliasing:"));
-		tmpLabel.setLayoutData(dataFillLabel);
-
-		m3gAACombo = new Combo(lwjglGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
-		m3gAACombo.setLayoutData(listGridData);
-		m3gAACombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
-		m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_OFF", "Force off"));
-		m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_ON", "Force on"));
-		m3gAACombo.setText(m3gAACombo.getItem(Settings.m3gAA));
-
-		tmpLabel = new CLabel(lwjglGroup, 0);
-		tmpLabel.setText(UILocale.get("OPTION_M3G_TEXTURE_FILTER", "Texture filter:"));
-		tmpLabel.setLayoutData(dataFillLabel2);
-
-		m3gTexFilterCombo = new Combo(lwjglGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
-		m3gTexFilterCombo.setLayoutData(listGridData);
-		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
-		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_NEAREST", "Force nearest"));
-		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_LINEAR", "Force linear"));
-		m3gTexFilterCombo.setText(m3gTexFilterCombo.getItem(Settings.m3gTexFilter));
-
-		tmpLabel = new CLabel(lwjglGroup, 0);
-		tmpLabel.setText(UILocale.get("OPTION_M3G_MIPMAPPING", "Mipmapping:"));
-		tmpLabel.setLayoutData(dataFillLabel3);
-
-		m3gMipmapCombo = new Combo(lwjglGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
-		m3gMipmapCombo.setLayoutData(listGridData);
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_OFF", "Force off"));
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_BILINEAR", "Force bilinear"));
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_TRILINEAR", "Force trilinear"));
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_2X", "Force anisotropic 2x"));
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_4X", "Force anisotropic 4x"));
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_8X", "Force anisotropic 8x"));
-		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_16X", "Force anisotropic 16x"));
-		m3gMipmapCombo.setText(m3gMipmapCombo.getItem(Settings.m3gMipmapping));
-	}
-
-	private void setupMascotComp() {
-		mascotComp = new Composite(this.tabFolder, 0);
-		mascotComp.setLayout(new GridLayout());
-
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		layout.marginWidth = 5;
-
-		final GridData groupData = new GridData();
-		groupData.horizontalAlignment = 4;
-		groupData.grabExcessHorizontalSpace = true;
-		groupData.grabExcessVerticalSpace = true;
-		groupData.verticalAlignment = 1;
-
-		Group lwjglGroup = new Group(mascotComp, 0);
-		lwjglGroup.setText(UILocale.get("OPTION_M3G_LWJGL_SETTINGS", "LWJGL Settings"));
-		lwjglGroup.setLayout(layout);
-		lwjglGroup.setLayoutData(groupData);
-
-		final GridData labelGridData = new GridData();
-		labelGridData.horizontalAlignment = SWT.FILL;
-		labelGridData.grabExcessHorizontalSpace = true;
-		labelGridData.horizontalSpan = 2;
-
-		mascotNo2DMixingCheck = new Button(lwjglGroup, SWT.CHECK);
-		mascotNo2DMixingCheck.setText(UILocale.get("OPTION_MASCOT_NO_2D_MIXING", "No 2D mixing"));
-		mascotNo2DMixingCheck.setLayoutData(labelGridData);
-		mascotNo2DMixingCheck.setSelection(Settings.mascotNo2DMixing);
-
-		mascotIgnoreBgCheck = new Button(lwjglGroup, SWT.CHECK);
-		mascotIgnoreBgCheck.setText(UILocale.get("OPTION_MASCOT_IGNORE_BACKGROUND", "Ignore background"));
-		mascotIgnoreBgCheck.setLayoutData(labelGridData);
-		mascotIgnoreBgCheck.setSelection(Settings.mascotIgnoreBackground);
-
-		mascotTextureFilterCheck = new Button(lwjglGroup, SWT.CHECK);
-		mascotTextureFilterCheck.setText(UILocale.get("OPTION_MASCOT_TEXTURE_FILTER", "Texture filter"));
-		mascotTextureFilterCheck.setLayoutData(labelGridData);
-		mascotTextureFilterCheck.setSelection(Settings.mascotTextureFilter);
-
-		mascotBackgroundFilterCheck = new Button(lwjglGroup, SWT.CHECK);
-		mascotBackgroundFilterCheck.setText(UILocale.get("OPTION_MASCOT_BACKGROUND_FILTER", "Background filter"));
-		mascotBackgroundFilterCheck.setLayoutData(labelGridData);
-		mascotBackgroundFilterCheck.setSelection(Settings.mascotBackgroundFilter);
-	}
 	
 	private void setupSecurityComp() {
 		securityComp = new ScrolledComposite(tabFolder, SWT.V_SCROLL);
@@ -2519,19 +1754,27 @@ public final class Property implements IProperty, SelectionListener {
 		this.aButton714.setSelection(Settings.enableNewTrack);
 		(this.aButton719 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Track method calls."));
 		this.aButton719.setSelection(Settings.enableMethodTrack);
-		//new Label(this.aGroup688, 32).setText(UILocale.uiText("OPTION_SYSTEM_INACTIVITY_TIMER", "Inactivity timer (Set 0 to disable)"));
-		//this.inactiveTimerSpinner = new Spinner(this.aGroup688, 32);
-		//inactiveTimerSpinner.setValues(0, 0, Integer.MAX_VALUE, 0, 1, 10);
-		//inactiveTimerSpinner.setSelection(Emulator.inactivityTimer);
 		(this.rpcBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_DISCORD_RICHPRESENCE", "Discord Rich Presence"));
 		this.rpcBtn.setSelection(Settings.rpc);
 		(this.antiAliasBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
-//        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
-//        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
 		fpsCounterCheck = new Button(sysChecksGroup, SWT.CHECK);
 		fpsCounterCheck.setText(UILocale.get("OPTION_SYSTEM_FPS_COUNT", "FPS Counter"));
 		fpsCounterCheck.setSelection(Settings.fpsCounter);
+
+		final GridData gridData;
+		(gridData = new GridData()).grabExcessHorizontalSpace = true;
+		gridData.verticalAlignment = 2;
+		gridData.horizontalAlignment = 4;
+		final GridData layoutData2;
+		(layoutData2 = new GridData()).horizontalAlignment = 4;
+		layoutData2.grabExcessHorizontalSpace = true;
+		layoutData2.grabExcessVerticalSpace = true;
+		layoutData2.verticalAlignment = 4;
+		(this.vibrationCheck = new Button(sysChecksGroup, SWT.CHECK)).setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
+		this.vibrationCheck.setLayoutData(gridData);
+		this.vibrationCheck.setSelection(Settings.enableVibration);
+		vibrationCheck.setToolTipText("Shakes the window during vibration");
 	}
 
 	private void setupSysFontComp() {
@@ -2553,11 +1796,26 @@ public final class Property implements IProperty, SelectionListener {
 		CLabel aCLabel638;
 		(aCLabel638 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_DEFAULT_FONT", "Default Font:"));
 		aCLabel638.setLayoutData(layoutData2);
-		this.method418();
+		this.setupDefaultFontChoice();
+
+		CLabel aCLabel;
+		(aCLabel = new CLabel(this.sysFontComp, 0)).setText("Monospace Font:");
+		aCLabel.setLayoutData(layoutData2);
+		this.setupMonoFontChoice();
+
+		Group fontPreviewGroup = new Group(this.sysFontComp, SWT.NONE);
+		fontPreviewGroup.setLayout(new GridLayout(3, false));
+		fontPreviewGroup.setText("Preview");
+		GridData gd = new GridData();
+		gd.horizontalSpan = 3;
+		gd.horizontalAlignment = GridData.FILL;
+		gd.verticalAlignment = GridData.FILL;
+		fontPreviewGroup.setLayoutData(gd);
+
 		CLabel aCLabel640;
-		(aCLabel640 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_LARGE_SIZE", "Large Size:"));
+		(aCLabel640 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_LARGE_SIZE", "Large Size:"));
 		aCLabel640.setLayoutData(layoutData3);
-		(this.aSpinner670 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
+		(this.aSpinner670 = new Spinner(fontPreviewGroup, 2048)).setMinimum(1);
 		this.aSpinner670.setSelection(this.fontLargeSize);
 		this.aSpinner670.addModifyListener(new ModifyListener() {
 			@Override
@@ -2565,10 +1823,10 @@ public final class Property implements IProperty, SelectionListener {
 				method360(1);
 			}
 		});
-		this.method420();
+		this.method420(fontPreviewGroup);
 		CLabel aCLabel642;
-		(aCLabel642 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
-		(this.aSpinner679 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
+		(aCLabel642 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
+		(this.aSpinner679 = new Spinner(fontPreviewGroup, 2048)).setMinimum(1);
 		this.aSpinner679.setSelection(this.fontMediumSize);
 		this.aSpinner679.addModifyListener(new ModifyListener() {
 			@Override
@@ -2576,10 +1834,10 @@ public final class Property implements IProperty, SelectionListener {
 				method360(2);
 			}
 		});
-		this.method422();
+		this.method422(fontPreviewGroup);
 		CLabel aCLabel644;
-		(aCLabel644 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
-		(this.aSpinner690 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
+		(aCLabel644 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
+		(this.aSpinner690 = new Spinner(fontPreviewGroup, 2048)).setMinimum(1);
 		this.aSpinner690.setSelection(this.fontSmallSize);
 		this.aSpinner690.addModifyListener(new ModifyListener() {
 			@Override
@@ -2587,10 +1845,10 @@ public final class Property implements IProperty, SelectionListener {
 				method360(4);
 			}
 		});
-		this.method424();
+		this.method424(fontPreviewGroup);
 		CLabel aCLabel645;
-		(aCLabel645 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
-		(this.aText633 = new Text(this.sysFontComp, 2048)).setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
+		(aCLabel645 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
+		(this.aText633 = new Text(fontPreviewGroup, 2048)).setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
 		this.aText633.setLayoutData(layoutData);
 		this.aText633.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
@@ -2606,14 +1864,14 @@ public final class Property implements IProperty, SelectionListener {
 		antiAliasTextBtn.setLayoutData(layoutData4);
 	}
 
-	private void method418() {
+	private void setupDefaultFontChoice() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 2;
 		layoutData.verticalAlignment = 2;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.horizontalAlignment = 4;
-		(this.aCombo689 = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
-		this.aCombo689.addModifyListener(new ModifyListener() {
+		(this.defaultFontCombo = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
+		this.defaultFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
 				method360(7);
 			}
@@ -2636,21 +1894,58 @@ public final class Property implements IProperty, SelectionListener {
 		Collections.sort(list);
 		String aString682 = (String) list.get(0);
 		for (Comparable comparable : list) {
-			this.aCombo689.add((String) comparable);
+			this.defaultFontCombo.add((String) comparable);
 			if (this.defaultFont.equalsIgnoreCase((String) comparable)) {
 				aString682 = (String) comparable;
 			}
 		}
 		this.defaultFont = aString682;
-		this.aCombo689.setText(this.defaultFont);
+		this.defaultFontCombo.setText(this.defaultFont);
 	}
 
-	private void method420() {
+	private void setupMonoFontChoice() {
+		final GridData layoutData;
+		(layoutData = new GridData()).horizontalSpan = 2;
+		layoutData.verticalAlignment = 2;
+		layoutData.grabExcessHorizontalSpace = true;
+		layoutData.horizontalAlignment = 4;
+		(this.monoFontCombo = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
+		this.monoFontCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent modifyEvent) {
+				method360(7);
+			}
+		});
+		final FontData[] fontList = Property.display.getFontList(null, true);
+		final ArrayList<Comparable> list = new ArrayList<Comparable>();
+		for (FontData fontData : fontList) {
+			if (!list.contains(fontData.getName()) && !fontData.getName().startsWith("@")) {
+				list.add(fontData.getName());
+			}
+		}
+		final FontData[] fontList2 = Property.display.getFontList(null, false);
+		for (FontData fontData : fontList2) {
+			if (!list.contains(fontData.getName()) && !fontData.getName().startsWith("@")) {
+				list.add(fontData.getName());
+			}
+		}
+		Collections.sort(list);
+		String aString682 = (String) list.get(0);
+		for (Comparable comparable : list) {
+			this.monoFontCombo.add((String) comparable);
+			if (this.monospaceFont.equalsIgnoreCase((String) comparable)) {
+				aString682 = (String) comparable;
+			}
+		}
+		this.monospaceFont = aString682;
+		this.monoFontCombo.setText(this.monospaceFont);
+	}
+
+	private void method420(Composite parent) {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCanvas663 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
+		(this.aCanvas663 = new Canvas(parent, 264192)).setLayoutData(layoutData);
 		this.aCanvas663.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage671 == null) {
@@ -2667,12 +1962,12 @@ public final class Property implements IProperty, SelectionListener {
 		});
 	}
 
-	private void method422() {
+	private void method422(Composite parent) {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCanvas680 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
+		(this.aCanvas680 = new Canvas(parent, 264192)).setLayoutData(layoutData);
 		this.aCanvas680.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage674 == null) {
@@ -2683,12 +1978,12 @@ public final class Property implements IProperty, SelectionListener {
 		});
 	}
 
-	private void method424() {
+	private void method424(Composite parent) {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCanvas691 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
+		(this.aCanvas691 = new Canvas(parent, 264192)).setLayoutData(layoutData);
 		this.aCanvas691.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage693 == null) {
@@ -2715,12 +2010,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font2;
 				if (Settings.g2d == 0) {
-					font2 = new FontSWT(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0);
+					font2 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner670.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0080;
 					}
-					font2 = new FontAWT(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0, false);
+					font2 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner670.getSelection(), 0, false);
 				}
 				font = font2;
 			}
@@ -2738,12 +2033,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font3;
 				if (Settings.g2d == 0) {
-					font3 = new FontSWT(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0);
+					font3 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner679.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0242;
 					}
-					font3 = new FontAWT(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0, false);
+					font3 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner679.getSelection(), 0, false);
 				}
 				font = font3;
 			}
@@ -2761,12 +2056,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font4;
 				if (Settings.g2d == 0) {
-					font4 = new FontSWT(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0);
+					font4 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner690.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0404;
 					}
-					font4 = new FontAWT(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0, false);
+					font4 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner690.getSelection(), 0, false);
 				}
 				font = font4;
 			}
@@ -2980,11 +2275,6 @@ public final class Property implements IProperty, SelectionListener {
 		if (!(file = new File(s)).exists() || !file.isDirectory()) {
 			file.mkdirs();
 		}
-//		final String string = s + "/" + this.method355();
-//		final File file2;
-//		if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
-//			file2.mkdirs();
-//		}
 		return s + "/";
 	}
 
@@ -3014,28 +2304,6 @@ public final class Property implements IProperty, SelectionListener {
 			ti.setText(0, s);
 			ti.setChecked(false);
 		}
-        /*
-        final File file;
-        if (!(file = new File(this.method374())).exists() || !file.isDirectory()) {
-            return;
-        }
-        final File[] listFiles;
-        if ((listFiles = file.listFiles(new Class105(this))).length > this.aTable665.getItemCount()) {
-            for (int i = listFiles.length - this.aTable665.getItemCount(); i > 0; --i) {
-                new TableItem(this.aTable665, 0);
-            }
-        }
-        else {
-            while (this.aTable665.getItemCount() > listFiles.length) {
-                this.aTable665.remove(listFiles.length);
-            }
-        }
-        for (int j = 0; j < listFiles.length; ++j) {
-            final TableItem item;
-            (item = this.aTable665.getItem(j)).setText(0, listFiles[j].getName().substring(1));
-            item.setChecked(false);
-        }
-         */
 	}
 
 	private void setupNetworkComp() {
@@ -3188,66 +2456,6 @@ public final class Property implements IProperty, SelectionListener {
 		}
 		Authenticator.setDefault(new MyAuthenticator(this, Settings.proxyUser, Settings.proxyPass));
 	}
-	
-	public String getScreenWidth() {
-		return screenWidth;
-	}
-	
-	public String getScreenHeight() {
-		return screenHeight;
-	}
-
-	public String getLsoft() {
-		return lsoft;
-	}
-
-	public String getRsoft() {
-		return rsoft;
-	}
-
-	public String getFire() {
-		return fire;
-	}
-
-	public String getUp() {
-		return up;
-	}
-
-	public String getDown() {
-		return down;
-	}
-
-	public String getLeft() {
-		return left;
-	}
-
-	public String getRight() {
-		return right;
-	}
-
-	static Combo method361(final Property class38) {
-		return class38.deviceCombo;
-	}
-
-	static void method362(final Property class38) {
-		class38.method387();
-	}
-
-	static void method375(final Property class38) {
-		class38.apply();
-	}
-
-	static Shell method364(final Property class38) {
-		return class38.setsShell;
-	}
-
-	static Scale method370(final Property class38) {
-		return class38.fpsScale;
-	}
-
-	static CLabel method363(final Property class38) {
-		return class38.fpsLabel;
-	}
 
 	static Combo method376(final Property class38) {
 		return class38.controllerCombo;
@@ -3331,50 +2539,6 @@ public final class Property implements IProperty, SelectionListener {
 
 	static Text method419(final Property class38) {
 		return class38.aText751;
-	}
-
-	static void method381(final Property class38) {
-		class38.method406();
-	}
-
-	static void method386(final Property class38) {
-		class38.method402();
-	}
-
-	static void method369(final Property class38, final int n) {
-		class38.method360(n);
-	}
-
-	static IImage method356(final Property class38) {
-		return class38.anIImage671;
-	}
-
-	static IImage method378(final Property class38) {
-		return class38.anIImage674;
-	}
-
-	static IImage method382(final Property class38) {
-		return class38.anIImage693;
-	}
-
-	static Table method367(final Property class38) {
-		return class38.aTable665;
-	}
-
-	static String method368(final Property class38) {
-		return class38.method374();
-	}
-
-	static void method389(final Property class38) {
-		class38.method428();
-	}
-
-	static Text method421(final Property class38) {
-		return class38.aText662;
-	}
-
-	static void method392(final Property class38) {
-		class38.method352();
 	}
 
 	static Combo method383(final Property class38) {
