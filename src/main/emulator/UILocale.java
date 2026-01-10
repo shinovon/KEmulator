@@ -13,12 +13,12 @@ public final class UILocale {
 
 	public static void initLocale() {
 		try {
-			final FileInputStream fileInputStream = new FileInputStream(Emulator.getAbsolutePath() + "/lang/" + Settings.uiLanguage + ".txt");
+			final FileInputStream fileInputStream = new FileInputStream(String.format("%s/lang/%s.txt", Emulator.getAbsolutePath(), Settings.uiLanguage));
 			UILocale.bundle = new PropertyResourceBundle(new InputStreamReader(fileInputStream, "UTF-8"));
 			fileInputStream.close();
 		} catch (Exception e) {
 			try {
-				final FileInputStream fileInputStream = new FileInputStream(Emulator.getAbsolutePath() + "/lang/en.txt");
+				final FileInputStream fileInputStream = new FileInputStream(String.format("%s/lang/en.txt", Emulator.getAbsolutePath()));
 				UILocale.bundle = new PropertyResourceBundle(new InputStreamReader(fileInputStream, "UTF-8"));
 				fileInputStream.close();
 			} catch (Exception e2) {

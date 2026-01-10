@@ -142,17 +142,17 @@ public class Emulator implements Runnable {
 				return;
 			}
 			if (Utils.macos) {
-				Runtime.getRuntime().exec("open \"" + fileName + "\"");
+				Runtime.getRuntime().exec(String.format("open \"%s\"", fileName));
 				return;
 			}
 			if (Utils.linux) {
 				// I have no idea how to open files if there is no XDG.
 				// see https://github.com/ppy/osu/discussions/24499#discussioncomment-6698365 for fun.
 				if (Files.isExecutable(Paths.get("/usr/bin/xdg-open")))
-					Runtime.getRuntime().exec("/usr/bin/xdg-open \"" + fileName + "\"");
+					Runtime.getRuntime().exec(String.format("/usr/bin/xdg-open \"%s\"", fileName));
 				else if (Files.isExecutable(Paths.get("/usr/bin/gedit")))
 					// let's try gedit? it seems like the most well-known one.
-					Runtime.getRuntime().exec("/usr/bin/gedit \"" + fileName + "\"");
+					Runtime.getRuntime().exec(String.format("/usr/bin/gedit \"%s\"", fileName));
 				else
 					getEmulator().getScreen().showMessage("Non XDG compliant systems are not supported.");
 			}
@@ -175,7 +175,7 @@ public class Emulator implements Runnable {
 		}
 		if (Utils.macos) {
 			try {
-				Runtime.getRuntime().exec("open \"" + url + "\"");
+				Runtime.getRuntime().exec(String.format("open \"%s\"", url));
 				return;
 			} catch (IOException ignored) {
 			}
@@ -216,16 +216,16 @@ public class Emulator implements Runnable {
 			while (keys.hasMoreElements()) {
 				final String s;
 				if (!(s = (String) keys.nextElement()).equalsIgnoreCase("KEmu-Platform")) {
-					outputStreamWriter.write(s + ": " + Emulator.emulatorimpl.getAppProperties().getProperty(s) + "\r\n");
+					outputStreamWriter.write(String.format("%s: %s\r\n", s, Emulator.emulatorimpl.getAppProperties().getProperty(s)));
 				}
 			}
 			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-URL") == null) {
-				outputStreamWriter.write("MIDlet-Jar-URL: " + new File(Emulator.midletJar).getName() + "\r\n");
+				outputStreamWriter.write(String.format("MIDlet-Jar-URL: %s\r\n", new File(Emulator.midletJar).getName()));
 			}
 			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-Size") == null) {
-				outputStreamWriter.write("MIDlet-Jar-Size: " + new File(Emulator.midletJar).length() + "\r\n");
+				outputStreamWriter.write(String.format("MIDlet-Jar-Size: %s\r\n", new File(Emulator.midletJar).length()));
 			}
-			outputStreamWriter.write("KEmu-Platform: " + Emulator.deviceName + "\r\n");
+			outputStreamWriter.write(String.format("KEmu-Platform: %s\r\n", Emulator.deviceName));
 			outputStreamWriter.flush();
 			outputStreamWriter.close();
 		} catch (Exception ex) {
@@ -238,7 +238,7 @@ public class Emulator implements Runnable {
 			return;
 		}
 		if (Settings.writeKemCfg) {
-			String propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + File.separatorChar + "kemulator.cfg";
+			String propsPath = String.format("%s%c%s", new File(Emulator.midletJar).getParentFile().getAbsolutePath(), File.separatorChar, "kemulator.cfg");
 			try {
 				String key = new File(Emulator.midletJar).getName();
 				key = key.substring(0, key.lastIndexOf("."));
@@ -263,7 +263,7 @@ public class Emulator implements Runnable {
 			}
 			return;
 		}
-		final String propsPath = getUserPath() + File.separatorChar + "midlets.txt";
+		final String propsPath = String.format("%s%c%s", getUserPath(), File.separatorChar, "midlets.txt");
 		try {
 			String key = new File(Emulator.midletJar).getCanonicalPath();
 			final Properties properties = new Properties();
@@ -310,7 +310,7 @@ public class Emulator implements Runnable {
 		if (Emulator.midletJar == null) {
 			return;
 		}
-		String propsPath = getUserPath() + File.separatorChar + "midlets.txt";
+		String propsPath = String.format("%s%c%s", getUserPath(), File.separatorChar, "midlets.txt");
 		if (new File(propsPath).exists()) {
 			try {
 				String key = new File(Emulator.midletJar).getCanonicalPath();
@@ -331,7 +331,7 @@ public class Emulator implements Runnable {
 			}
 		}
 
-		propsPath = new File(Emulator.midletJar).getParentFile().getAbsolutePath() + File.separatorChar + "kemulator.cfg";
+		propsPath = String.format("%s%c%s", new File(Emulator.midletJar).getParentFile().getAbsolutePath(), File.separatorChar, "kemulator.cfg");
 
 		String key = new File(Emulator.midletJar).getName();
 		key = key.substring(0, key.lastIndexOf("."));
@@ -369,7 +369,7 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getCmdVersionString() {
-		return platform.getName() + " " + version;
+		return String.format("%s %s", platform.getName(), version);
 	}
 
 	public static String getInfoString() {
@@ -377,12 +377,12 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getAboutString() {
-		return "KEmulator nnmod\n" + version;
+		return String.format("KEmulator nnmod%n%s", version);
 	}
 
 	public static void getLibraries() {
 		final File file;
-		if ((file = new File(getAbsolutePath() + File.separatorChar + "libs")).exists() && file.isDirectory()) {
+		if ((file = new File(String.format("%s%c%s", getAbsolutePath(), File.separatorChar, "libs"))).exists() && file.isDirectory()) {
 			final File[] listFiles = file.listFiles();
 			for (int i = 0; i < listFiles.length; ++i) {
 				final String absolutePath;
@@ -574,7 +574,7 @@ public class Emulator implements Runnable {
 		final String[] split = Emulator.classPath.split(";");
 		for (int i = 0; i < split.length; ++i) {
 			final File file;
-			if ((file = new File(split[i] + File.separatorChar + s)).exists()) {
+			if ((file = new File(String.format("%s%c%s", split[i], File.separatorChar, s))).exists()) {
 				return file;
 			}
 		}
@@ -641,7 +641,7 @@ public class Emulator implements Runnable {
 		if (System.getProperty("microedition.platform") == null) {
 			String plat = Settings.microeditionPlatform;
 
-			Emulator.httpUserAgent = plat + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ")";
+			Emulator.httpUserAgent = String.format("%s (Java/%s; KEmulator/%s)", plat, System.getProperty("java.version"), version);
 
 			System.setProperty("microedition.platform", plat);
 			System.setProperty("device.model", plat);
@@ -711,7 +711,7 @@ public class Emulator implements Runnable {
 		}
 		String arch = System.getProperty("os.arch");
 		if (!platform.isX64() && (!arch.contains("86") || !Utils.win)) {
-			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try multi-platform version instead.");
+			JOptionPane.showMessageDialog(new JPanel(), String.format("Can't run this version of KEmulator nnmod on this architecture (%s). Try multi-platform version instead.", arch));
 			System.exit(0);
 			return;
 		}
@@ -750,10 +750,9 @@ public class Emulator implements Runnable {
 
 			platform.load3D();
 			Controllers.refresh(true);
-			Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on "
-					+ System.getProperty("os.name") + ' ' + System.getProperty("os.arch")
-					+ " (" + System.getProperty("os.version") + "), Java: "
-					+ System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
+			Emulator.emulatorimpl.getLogStream().stdout(String.format("%s Running on %s %s (%s), Java: %s (%s)",
+					getCmdVersionString(), System.getProperty("os.name"), System.getProperty("os.arch"),
+					System.getProperty("os.version"), System.getProperty("java.version"), System.getProperty("java.vendor")));
 			Devices.load(Emulator.deviceFile);
 			tryToSetDevice(Emulator.deviceName);
 			setupMRUList();
@@ -774,13 +773,13 @@ public class Emulator implements Runnable {
 			getLibraries();
 			try {
 				if (!getJarClasses()) {
-					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
+					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Please check the input jar or classpath."));
 					System.exit(1);
 					return;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."), CustomMethod.getStackTrace(e));
+				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Please check the input jar or classpath."), CustomMethod.getStackTrace(e));
 				System.exit(1);
 				return;
 			}
@@ -810,7 +809,7 @@ public class Emulator implements Runnable {
 			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
 			setProperties();
 			if (Emulator.midletClassName == null) {
-				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Please check jad or use -midlet param."));
 				System.exit(1);
 				return;
 			}
@@ -824,7 +823,7 @@ public class Emulator implements Runnable {
 					midletClass = Class.forName(midletClassName, true, customClassLoader);
 				} catch (Throwable e) {
 					e.printStackTrace();
-					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+					Emulator.emulatorimpl.getScreen().showMessage(String.format("%s %s", UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:"), Emulator.midletClassName), CustomMethod.getStackTrace(e));
 					System.exit(1);
 					return;
 				}
@@ -1019,8 +1018,8 @@ public class Emulator implements Runnable {
 //			else if (s.endsWith("bin/")) {
 //				s = s.substring(0, s.length() - 4);
 //			}
-			if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
-				s = s + File.separatorChar + "KEmulator.jar";
+			if (new File(String.format("%s%c%s", s, File.separatorChar, "KEmulator.jar")).exists() || new File(String.format("%s%c%s", s, File.separatorChar, "sensorsimulator.jar")).exists()) {
+				s = String.format("%s%c%s", s, File.separatorChar, "KEmulator.jar");
 			} else {
 				System.out.println("Running from " + s);
 				throw new RuntimeException("Could not find home directory");
@@ -1035,7 +1034,7 @@ public class Emulator implements Runnable {
 
 	public static String getAbsolutePath() {
 		String s = System.getProperty("user.dir");
-		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+		if (new File(String.format("%s%c%s", s, File.separatorChar, "KEmulator.jar")).exists() || new File(String.format("%s%c%s", s, File.separatorChar, "sensorsimulator.jar")).exists()) {
 			return s;
 		}
 		File file = new File(getAbsoluteFile()).getParentFile();
@@ -1138,11 +1137,11 @@ public class Emulator implements Runnable {
 		cmd.add("-cp");
 		// TODO clean duplicate entries
 		cmd.add(System.getProperty("java.class.path"));
-		cmd.add("-Xmx" + Settings.xmx + "M");
+		cmd.add(String.format("-Xmx%dM", Settings.xmx));
 
 		// start with debug server
 		if (Settings.jdwpDebug) {
-			cmd.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + Settings.debugPort);
+			cmd.add(String.format("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%d", Settings.debugPort));
 		}
 
 		// linux fixes
@@ -1245,7 +1244,7 @@ public class Emulator implements Runnable {
 				}
 				Properties properties = new Properties();
 				properties.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-				return file.getParent() + File.separator + properties.getProperty("MIDlet-Jar-URL");
+				return String.format("%s%c%s", file.getParent(), File.separator, properties.getProperty("MIDlet-Jar-URL"));
 			}
 		} catch (Exception ignored) {
 		}
@@ -1300,7 +1299,7 @@ public class Emulator implements Runnable {
 			} catch (Throwable e) {
 				e.printStackTrace();
 				eventQueue.stop();
-				emulatorimpl.getScreen().showMessageThreadSafe(UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:") + " " + Emulator.midletClassName, CustomMethod.getStackTrace(e));
+				emulatorimpl.getScreen().showMessageThreadSafe(String.format("%s %s", UILocale.get("FAIL_LAUNCH_MIDLET", "Fail to launch the MIDlet class:"), Emulator.midletClassName), CustomMethod.getStackTrace(e));
 				return;
 			}
 		}

@@ -22,13 +22,19 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+import org.w3c.dom.Text;
+import org.w3c.dom.events.Event;
 
 import javax.microedition.rms.RecordStore;
+import javax.swing.GroupLayout.Group;
+import javax.swing.table.TableColumn;
+
 import java.io.*;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.net.http.WebSocket.Listener;
 import java.nio.charset.Charset;
-import java.util.List;
+import java.security.Permission;
 import java.util.*;
 
 public final class Property implements IProperty, SelectionListener {
@@ -348,7 +354,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private String method355() {
-		return this.device + "_" + this.screenWidth + "x" + this.screenHeight;
+		return String.format("%s_%sx%s", this.device, this.screenWidth, this.screenHeight);
 	}
 
 	public String getRmsFolderPath() {
@@ -2201,8 +2207,11 @@ public final class Property implements IProperty, SelectionListener {
 		vlcCheck.setLayoutData(fillHor4);
 		vlcCheck.setSelection(Settings.enableVlc);
 
-		new Label(mediaGroup, 32).setText(UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path") +
-				(System.getProperty("os.arch").contains("64") ? " (64-bit)" : " (32-bit)") + ":");
+		new Label(mediaGroup, 32).setText(String.format(
+			"%s (%s):",
+			UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path"),
+			System.getProperty("os.arch").contains("64") ? "64-bit" : "32-bit"
+		));
 		vlcDirText = new Text(mediaGroup, SWT.BORDER);
 		vlcDirText.setEditable(true);
 		vlcDirText.setEnabled(true);
