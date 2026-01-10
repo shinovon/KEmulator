@@ -94,7 +94,7 @@ public class AppSettings {
 	public static boolean mascotTextureFilter;
 	public static boolean mascotBackgroundFilter;
 
-	public static final Map<String, String> systemProperties = new HashMap<String, String>();
+	public static final Map<String, String> systemProperties = new HashMap<>();
 
 	private static final Map<String, String> appProperties = new HashMap<>();
 
@@ -164,7 +164,6 @@ public class AppSettings {
 		Map<String, String> properties = appProperties;
 
 		IEmulatorFrontend emulator = Emulator.getEmulator();
-		boolean screenDetected = true;
 		detectScreen: {
 			if (Emulator.startWidth != 0) {
 				screenWidth = Emulator.startWidth;
@@ -257,11 +256,6 @@ public class AppSettings {
 					break detectScreen;
 				}
 			}
-			screenDetected = false;
-		}
-		if (screenDetected) {
-			set("ScreenWidth", screenWidth);
-			set("ScreenHeight", screenHeight);
 		}
 
 		if (Emulator.doja) {
@@ -276,10 +270,8 @@ public class AppSettings {
 		if (midletName != null) {
 			if (midletName.contains("Angry Birds")) {
 				m3gFlushImmediately = true;
-				set("M3GFlushImmediately", true);
 			} else if (midletName.contains("勇闯恶魔城-Konami正版")) {
 				j2lStyleFpsLimit = true;
-				set("FPSLimitJLStyle", true);
 			}
 		}
 
@@ -322,9 +314,6 @@ public class AppSettings {
 			if (properties.containsKey("ScreenHeight")) {
 				screenHeight = Integer.parseInt(properties.get("ScreenHeight"));
 			}
-		} else {
-			set("ScreenWidth", screenWidth);
-			set("ScreenHeight", screenHeight);
 		}
 		
 		if (properties.containsKey("KeyLeftSoft")) {
@@ -596,7 +585,9 @@ public class AppSettings {
 						}
 						if (found) {
 							if (save) {
-								writer.write(exactSection);
+//								writer.write(exactSection);
+								// TODO replace section?
+								writer.write(line);
 								writer.newLine();
 								List<String> list = new ArrayList<>(appProperties.keySet());
 								Collections.sort(list);

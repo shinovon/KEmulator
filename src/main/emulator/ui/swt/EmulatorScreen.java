@@ -1906,7 +1906,7 @@ public final class EmulatorScreen implements
 			String s = Emulator.getInfoString();
 			gc.drawText(s, Math.max(4, (size.width - gc.stringExtent(s).x) >> 1), (size.height - gc.stringExtent(s).y * 2) >> 1, true);
 
-			s = "Drop a .jar file here";
+			s = "Drop a J2ME application here";
 			gc.drawText(s, Math.max(4, (size.width - gc.stringExtent(s).x) >> 1), (size.height + gc.stringExtent(s).y) >> 1, true);
 			return;
 		}
