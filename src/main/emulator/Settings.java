@@ -173,4 +173,5 @@ public final class Settings {
 	public static boolean hideDisplayableOnMinimize;
 
 	public static boolean enableVlc = true;
+	public static String soundfontPath = "";
 }

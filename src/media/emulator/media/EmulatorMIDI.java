@@ -5,6 +5,7 @@ import emulator.Settings;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.sound.midi.*;
+import java.io.File;
 
 public class EmulatorMIDI {
 	public static Player currentPlayer;
@@ -13,6 +14,26 @@ public class EmulatorMIDI {
 	private static Synthesizer synthesizer;
 	private static MidiDevice device;
 	private static Receiver receiver;
+	public static Soundbank soundbank;
+
+	public static boolean useCustomSoundfont() {
+		Thread.dumpStack();
+		if (Settings.soundfontPath == null || Settings.soundfontPath.isEmpty()) {
+			return false;
+		}
+		File file = new File(Settings.soundfontPath);
+		if (!file.exists()) {
+			return false;
+		}
+		if (soundbank == null) {
+			try {
+				soundbank = MidiSystem.getSoundbank(file);
+			} catch (Exception e) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public static boolean useExternalReceiver() {
 		try {
@@ -47,6 +68,9 @@ public class EmulatorMIDI {
 		if (receiver == null) {
 			synthesizer = MidiSystem.getSynthesizer();
 			synthesizer.open();
+			if (useCustomSoundfont()) {
+				synthesizer.loadAllInstruments(soundbank);
+			}
 			receiver = synthesizer.getReceiver();
 		}
 		if (sequencer == null) {
