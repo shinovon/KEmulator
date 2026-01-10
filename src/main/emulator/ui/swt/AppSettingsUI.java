@@ -120,7 +120,7 @@ public class AppSettingsUI {
 		});
 
 		shell.setText("Application Settings");
-		shell.setSize(400, 420);
+		shell.setSize(460, 420);
 		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 
 		Composite scrolledComposite = new Composite(shell, SWT.NONE);
@@ -237,7 +237,7 @@ public class AppSettingsUI {
 		lblNewLabel_8.setText("Encoding:");
 
 		encodingCombo = new Combo(grpDevice, SWT.NONE);
-		encodingCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		encodingCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		{
 			final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
 			final ArrayList<Comparable> list = new ArrayList(availableCharsets.keySet());
@@ -275,6 +275,7 @@ public class AppSettingsUI {
 		Composite composite_4 = new Composite(grpDevice, SWT.NONE);
 		composite_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		GridLayout gl_composite_4 = new GridLayout(3, false);
+		gl_composite_4.verticalSpacing = 0;
 		gl_composite_4.marginWidth = 0;
 		gl_composite_4.marginHeight = 0;
 		composite_4.setLayout(gl_composite_4);
