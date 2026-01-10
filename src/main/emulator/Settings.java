@@ -163,4 +163,5 @@ public final class Settings {
 
 	public static boolean enableVlc = true;
 	public static String soundfontPath = "";
+	public static boolean showAppSettingsOnStart = true;
 }

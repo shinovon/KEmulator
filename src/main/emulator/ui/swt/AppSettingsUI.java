@@ -119,7 +119,7 @@ public class AppSettingsUI {
 			}
 		});
 
-		shell.setText("Setup");
+		shell.setText("Application Settings");
 		shell.setSize(389, 427);
 		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 
@@ -204,16 +204,7 @@ public class AppSettingsUI {
 		deviceCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				DevicePlatform p = Devices.getPlatform(deviceCombo.getText().trim());
-				screenWidthText.setText(p.getString("SCREEN_WIDTH"));
-				screenHeightText.setText(p.getString("SCREEN_HEIGHT"));
-				leftSoftText.setText(p.getString("KEY_S1"));
-				rightSoftText.setText(p.getString("KEY_S2"));
-				fireText.setText(p.getString("KEY_FIRE"));
-				upText.setText(p.getString("KEY_UP"));
-				downText.setText(p.getString("KEY_DOWN"));
-				leftText.setText(p.getString("KEY_LEFT"));
-				rightText.setText(p.getString("KEY_RIGHT"));
+				applyPreset(deviceCombo.getText().trim());
 			}
 		});
 		deviceCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
@@ -349,14 +340,8 @@ public class AppSettingsUI {
 		fireText = new Text(grpKeyMapping, SWT.BORDER);
 		fireText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		fireText.setText(Integer.toString(AppSettings.fireKey));
-
-		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_13.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_13.setText("Up:");
-
-		upText = new Text(grpKeyMapping, SWT.BORDER);
-		upText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		upText.setText(Integer.toString(AppSettings.upKey));
+		new Label(grpKeyMapping, SWT.NONE);
+		new Label(grpKeyMapping, SWT.NONE);
 
 		Label lblNewLabel_15 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_15.setAlignment(SWT.RIGHT);
@@ -366,14 +351,14 @@ public class AppSettingsUI {
 		downText = new Text(grpKeyMapping, SWT.BORDER);
 		downText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		downText.setText(Integer.toString(AppSettings.downKey));
+		
+		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
+		lblNewLabel_13.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_13.setText("Up:");
 
-		Label lblNewLabel_14 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_14.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_14.setText("Left:");
-
-		leftText = new Text(grpKeyMapping, SWT.BORDER);
-		leftText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		leftText.setText(Integer.toString(AppSettings.leftKey));
+		upText = new Text(grpKeyMapping, SWT.BORDER);
+		upText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		upText.setText(Integer.toString(AppSettings.upKey));
 
 		Label lblNewLabel_16 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_16.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -382,8 +367,14 @@ public class AppSettingsUI {
 		rightText = new Text(grpKeyMapping, SWT.BORDER);
 		rightText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		rightText.setText(Integer.toString(AppSettings.rightKey));
-		new Label(grpKeyMapping, SWT.NONE);
-		new Label(grpKeyMapping, SWT.NONE);
+		
+		Label lblNewLabel_14 = new Label(grpKeyMapping, SWT.NONE);
+		lblNewLabel_14.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_14.setText("Left:");
+
+		leftText = new Text(grpKeyMapping, SWT.BORDER);
+		leftText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		leftText.setText(Integer.toString(AppSettings.leftKey));
 
 		CTabItem tbtmFont = new CTabItem(tabFolder, SWT.NONE);
 		tbtmFont.setText("Font");
@@ -612,7 +603,20 @@ public class AppSettingsUI {
 		scrolledComposite_1.setMinHeight(composite_8.computeSize(-1, -1).y);
 		scrolledComposite_2.setMinHeight(composite_9.computeSize(-1, -1).y);
 	}
-	
+
+	private void applyPreset(String s) {
+		DevicePlatform p = Devices.getPlatform(s);
+		screenWidthText.setText(p.getString("SCREEN_WIDTH"));
+		screenHeightText.setText(p.getString("SCREEN_HEIGHT"));
+		leftSoftText.setText(p.getString("KEY_S1"));
+		rightSoftText.setText(p.getString("KEY_S2"));
+		fireText.setText(p.getString("KEY_FIRE"));
+		upText.setText(p.getString("KEY_UP"));
+		downText.setText(p.getString("KEY_DOWN"));
+		leftText.setText(p.getString("KEY_LEFT"));
+		rightText.setText(p.getString("KEY_RIGHT"));
+	}
+
 	private void apply() {
 		// general tab
 		{
@@ -875,7 +879,6 @@ public class AppSettingsUI {
 		}
 
 		// system properties
-
 		{
 			String sysProps = systemPropertiesText.getText();
 			AppSettings.systemProperties.clear();
