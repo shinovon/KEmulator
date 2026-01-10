@@ -86,7 +86,7 @@ public class AppSettingsUI {
 		this.start = start;
 		action = 0;
 		if (shell == null || shell.isDisposed()) {
-			createContents(display);
+			createContents(parent);
 		}
 		if (parent != null) {
 			shell.setLocation(parent.getLocation().x + (parent.getSize().x - this.shell.getSize().x >> 1), parent.getLocation().y + (parent.getSize().y - this.shell.getSize().y >> 1));
@@ -107,8 +107,8 @@ public class AppSettingsUI {
 	/**
 	 * @wbp.parser.entryPoint
 	 */
-	protected void createContents(Display display) {
-		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.RESIZE);
+	protected void createContents(Shell parent) {
+		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE);
 		shell.setLayout(new GridLayout(1, false));
 		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(ShellEvent e) {
@@ -650,14 +650,12 @@ public class AppSettingsUI {
 			String encoding = encodingCombo.getText().trim();
 			if (!encoding.equals(AppSettings.fileEncoding)) {
 				AppSettings.fileEncoding = encoding;
-				AppSettings.set("FileEncoding", encoding);
 			}
 
 			// device
 			String device = deviceCombo.getText().trim();
 			if (!device.equals(AppSettings.devicePreset)) {
 				AppSettings.devicePreset = device;
-				AppSettings.set("DevicePreset", device);
 				// TODO
 			}
 
@@ -665,14 +663,12 @@ public class AppSettingsUI {
 			String platform = platformText.getText().trim();
 			if (!platform.equals(AppSettings.microeditionPlatform)) {
 				AppSettings.microeditionPlatform = platform;
-				AppSettings.set("MIDPPlatform", platform);
 			}
 
 			// locale
 			String locale = localeText.getText().trim();
 			if (!locale.equals(AppSettings.locale)) {
 				AppSettings.locale = locale;
-				AppSettings.set("MIDPLocale", locale);
 			}
 		}
 
@@ -684,7 +680,6 @@ public class AppSettingsUI {
 			} catch (Exception ignored) {}
 			if (width > 0 && width != AppSettings.screenWidth) {
 				AppSettings.screenWidth = width;
-				AppSettings.set("ScreenWidth", width);
 			}
 
 			int height = 0;
@@ -693,7 +688,6 @@ public class AppSettingsUI {
 			} catch (Exception ignored) {}
 			if (height > 0 && height != AppSettings.screenHeight) {
 				AppSettings.screenHeight = height;
-				AppSettings.set("ScreenHeight", height);
 			}
 		}
 
@@ -703,205 +697,97 @@ public class AppSettingsUI {
 			try {
 				leftSoft = Integer.parseInt(leftSoftText.getText().trim());
 			} catch (Exception ignored) {}
-			if (leftSoft != 0 && leftSoft != AppSettings.leftSoftKey) {
+			if (leftSoft != 0) {
 				AppSettings.leftSoftKey = leftSoft;
-				AppSettings.set("KeyLeftSoft", leftSoft);
 			}
 
 			int rightSoft = 0;
 			try {
 				rightSoft = Integer.parseInt(rightSoftText.getText().trim());
 			} catch (Exception ignored) {}
-			if (rightSoft != 0 && rightSoft != AppSettings.rightSoftKey) {
+			if (rightSoft != 0) {
 				AppSettings.rightSoftKey = rightSoft;
-				AppSettings.set("KeyRightSoft", rightSoft);
 			}
 
 			int up = 0;
 			try {
 				up = Integer.parseInt(upText.getText().trim());
 			} catch (Exception ignored) {}
-			if (up != 0 && up != AppSettings.upKey) {
+			if (up != 0) {
 				AppSettings.upKey = up;
-				AppSettings.set("KeyUp", up);
 			}
 
 			int down = 0;
 			try {
 				down = Integer.parseInt(downText.getText().trim());
 			} catch (Exception ignored) {}
-			if (down != 0 && down != AppSettings.downKey) {
+			if (down != 0) {
 				AppSettings.downKey = down;
-				AppSettings.set("KeyDown", down);
 			}
 
 			int left = 0;
 			try {
 				left = Integer.parseInt(leftText.getText().trim());
 			} catch (Exception ignored) {}
-			if (left != 0 && left != AppSettings.leftKey) {
+			if (left != 0) {
 				AppSettings.leftKey = left;
-				AppSettings.set("KeyLeft", left);
 			}
 
 			int right = 0;
 			try {
 				right = Integer.parseInt(rightText.getText().trim());
 			} catch (Exception ignored) {}
-			if (right != 0 && right != AppSettings.rightKey) {
+			if (right != 0) {
 				AppSettings.rightKey = right;
-				AppSettings.set("KeyRight", right);
 			}
 		}
 
 		// font
 		{
-			int large = largeSizeSpinner.getSelection();
-			if (large > 0 && large != AppSettings.fontLargeSize) {
-				AppSettings.fontLargeSize = large;
-				AppSettings.set("FontLargeSize", large);
-			}
-
-			int medium = mediumSizeSpinner.getSelection();
-			if (medium > 0 && medium != AppSettings.fontMediumSize) {
-				AppSettings.fontMediumSize = medium;
-				AppSettings.set("FontMediumSize", medium);
-			}
-
-			int small = smallSizeSpinner.getSelection();
-			if (small > 0 && small != AppSettings.fontSmallSize) {
-				AppSettings.fontSmallSize = small;
-				AppSettings.set("FontSmallSize", small);
-			}
+			AppSettings.fontLargeSize = largeSizeSpinner.getSelection();
+			AppSettings.fontMediumSize = mediumSizeSpinner.getSelection();
+			AppSettings.fontSmallSize = smallSizeSpinner.getSelection();
 		}
 
 		// tweaks tab
-		
-		boolean b;
 
 		// capabilities
 		{
-			b = keyRepeatsCheck.getSelection();
-			if (b != AppSettings.enableKeyRepeat) {
-				AppSettings.enableKeyRepeat = b;
-				AppSettings.set("EnableKeyRepeat", b);
-			}
-
-			b = pointerEventsCheck.getSelection();
-			if (b != AppSettings.hasPointerEvents) {
-				AppSettings.hasPointerEvents = b;
-				AppSettings.set("HasPointerEvents", b);
-			}
+			AppSettings.enableKeyRepeat = keyRepeatsCheck.getSelection();
+			AppSettings.hasPointerEvents = pointerEventsCheck.getSelection();
 		}
 
 		// tweaks
 		{
-			b = ignoreFullScreenCheck.getSelection();
-			if (b != AppSettings.ignoreFullScreen) {
-				AppSettings.ignoreFullScreen = b;
-				AppSettings.set("IgnoreFullScreenMode", b);
-			}
-
-			b = j2lStyleFpsLimitCheck.getSelection();
-			if (b != AppSettings.j2lStyleFpsLimit) {
-				AppSettings.j2lStyleFpsLimit = b;
-				AppSettings.set("FPSLimitJLStyle", b);
-			}
-
-			b = motorolaSoftKeyFixCheck.getSelection();
-			if (b != AppSettings.motorolaSoftKeyFix) {
-				AppSettings.motorolaSoftKeyFix = b;
-				AppSettings.set("MotorolaSoftKeyFix", b);
-			}
-
-			b = keyPressOnRepeatCheck.getSelection();
-			if (b != AppSettings.keyPressOnRepeat) {
-				AppSettings.keyPressOnRepeat = b;
-				AppSettings.set("KeyPressOnRepeat", b);
-			}
-
-			b = synchronizeKeyEventsCheck.getSelection();
-			if (b != AppSettings.synchronizeKeyEvents) {
-				AppSettings.synchronizeKeyEvents = b;
-				AppSettings.set("SynchronizeKeyEvents", b);
-			}
-
-			b = asyncFlushCheck.getSelection();
-			if (b != AppSettings.asyncFlush) {
-				AppSettings.asyncFlush = b;
-				AppSettings.set("AsyncFlush", b);
-			}
+			AppSettings.ignoreFullScreen = ignoreFullScreenCheck.getSelection();
+			AppSettings.j2lStyleFpsLimit = j2lStyleFpsLimitCheck.getSelection();
+			AppSettings.motorolaSoftKeyFix = motorolaSoftKeyFixCheck.getSelection();
+			AppSettings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
+			AppSettings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
+			AppSettings.asyncFlush = asyncFlushCheck.getSelection();
 		}
 
 		// 3d tab
 
 		// m3g
 		{
-			b = m3gIgnoreOverwriteCheck.getSelection();
-			if (b != AppSettings.m3gIgnoreOverwrite) {
-				AppSettings.m3gIgnoreOverwrite = b;
-				AppSettings.set("M3GIgnoreOverwrite", b);
-			}
-
-			b = m3gForcePersCorrectCheck.getSelection();
-			if (b != AppSettings.m3gForcePerspectiveCorrection) {
-				AppSettings.m3gForcePerspectiveCorrection = b;
-				AppSettings.set("M3GForcePerspectiveCorrection", b);
-			}
-
-			b = m3gDisableLightClampCheck.getSelection();
-			if (b != AppSettings.m3gDisableLightClamp) {
-				AppSettings.m3gDisableLightClamp = b;
-				AppSettings.set("M3GDisableLightClamp", b);
-			}
+			AppSettings.m3gIgnoreOverwrite = m3gIgnoreOverwriteCheck.getSelection();
+			AppSettings.m3gForcePerspectiveCorrection = m3gForcePersCorrectCheck.getSelection();
+			AppSettings.m3gDisableLightClamp = m3gDisableLightClampCheck.getSelection();
+			AppSettings.m3gFlushImmediately = m3gFlushImmediately.getSelection();
 		}
 		{
-			int i;
-
-			i = m3gAACombo.getSelectionIndex();
-			if (i != -1 && i != AppSettings.m3gAA) {
-				AppSettings.m3gAA = i;
-				AppSettings.set("M3GAA", AppSettings.m3gAA);
-			}
-
-			i = m3gTexFilterCombo.getSelectionIndex();
-			if (i != -1 && i != AppSettings.m3gTexFilter) {
-				AppSettings.m3gTexFilter = i;
-				AppSettings.set("M3GTexFilter", AppSettings.m3gTexFilter);
-			}
-
-			i = m3gMipmapCombo.getSelectionIndex();
-			if (i != -1 && i != AppSettings.m3gMipmapping) {
-				AppSettings.m3gMipmapping = i;
-				AppSettings.set("M3GMipmapping", AppSettings.m3gMipmapping);
-			}
+			AppSettings.m3gAA = m3gAACombo.getSelectionIndex();
+			AppSettings.m3gTexFilter = m3gTexFilterCombo.getSelectionIndex();
+			AppSettings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
 		}
 
 		// mascot
 		{
-			b = mascotNo2DMixingCheck.getSelection();
-			if (b != AppSettings.mascotNo2DMixing) {
-				AppSettings.mascotNo2DMixing = b;
-				AppSettings.set("MascotNo2DMixing", b);
-			}
-
-			b = mascotIgnoreBgCheck.getSelection();
-			if (b != AppSettings.mascotIgnoreBackground) {
-				AppSettings.mascotIgnoreBackground = b;
-				AppSettings.set("MascotIgnoreBackground", b);
-			}
-
-			b = mascotTextureFilterCheck.getSelection();
-			if (b != AppSettings.mascotTextureFilter) {
-				AppSettings.mascotTextureFilter = b;
-				AppSettings.set("MascotTextureFilter", b);
-			}
-
-			b = mascotBackgroundFilterCheck.getSelection();
-			if (b != AppSettings.mascotBackgroundFilter) {
-				AppSettings.mascotBackgroundFilter = b;
-				AppSettings.set("MascotBackgroundFilter", b);
-			}
+			AppSettings.mascotNo2DMixing = mascotNo2DMixingCheck.getSelection();
+			AppSettings.mascotIgnoreBackground = mascotIgnoreBgCheck.getSelection();
+			AppSettings.mascotTextureFilter = mascotTextureFilterCheck.getSelection();
+			AppSettings.mascotBackgroundFilter = mascotBackgroundFilterCheck.getSelection();
 		}
 
 		// system properties
@@ -917,15 +803,6 @@ public class AppSettingsUI {
 					String k = s.substring(0, i).trim();
 					String v = s.substring(i + 1).trim();
 					AppSettings.systemProperties.put(k, v);
-				}
-
-				StringBuilder sb = new StringBuilder();
-				if (!AppSettings.systemProperties.isEmpty()) {
-					for (String k : AppSettings.systemProperties.keySet()) {
-						sb.append(k).append(':').append(AppSettings.systemProperties.get(k)).append('\n');
-					}
-					sb.setLength(sb.length() - 1);
-					AppSettings.set("SystemProperties", sb.toString());
 				}
 			}
 		}

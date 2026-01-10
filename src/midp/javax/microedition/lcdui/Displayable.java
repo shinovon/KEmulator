@@ -187,7 +187,7 @@ public class Displayable {
 		if (cmdListener == null && this instanceof Canvas) {
 			return false;
 		}
-		boolean fix = Settings.motorolaSoftKeyFix || AppSettings.softbankApi;
+		boolean fix = AppSettings.motorolaSoftKeyFix || AppSettings.softbankApi;
 		if (KeyMapping.isLeftSoft(n)) {
 			if (hasMenuOnLeft()) {
 				if (b) {

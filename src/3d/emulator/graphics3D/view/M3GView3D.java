@@ -1,5 +1,6 @@
 package emulator.graphics3D.view;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.graphics3D.G3DUtils;
@@ -595,7 +596,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 		GL11.glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, pm.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
 
 		boolean persCorrect = pm.isPerspectiveCorrectionEnabled();
-		if (Settings.m3gForcePerspectiveCorrection) persCorrect = true;
+		if (AppSettings.m3gForcePerspectiveCorrection) persCorrect = true;
 
 		GL11.glHint(GL_PERSPECTIVE_CORRECTION_HINT, persCorrect ? GL_NICEST : GL_FASTEST);
 	}
@@ -835,23 +836,23 @@ public final class M3GView3D implements PaintListener, Runnable {
 				int levelFilter = texture2D.getLevelFilter();
 				int imageFilter = texture2D.getImageFilter();
 
-				if (useGL11() || Settings.m3gMipmapping == Settings.MIP_OFF || true) {
+				if (useGL11() || AppSettings.m3gMipmapping == AppSettings.MIP_OFF || true) {
 					levelFilter = Texture2D.FILTER_BASE_LEVEL;
 					if (!useGL11()) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
-				} else if (Settings.m3gMipmapping == Settings.MIP_LINEAR) {
+				} else if (AppSettings.m3gMipmapping == AppSettings.MIP_LINEAR) {
 					levelFilter = Texture2D.FILTER_NEAREST;
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
-				} else if (Settings.m3gMipmapping == Settings.MIP_TRILINEAR) {
+				} else if (AppSettings.m3gMipmapping == AppSettings.MIP_TRILINEAR) {
 					levelFilter = Texture2D.FILTER_LINEAR;
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
-				} else if (Settings.m3gMipmapping >= Settings.MIP_ANISO_2) {
+				} else if (AppSettings.m3gMipmapping >= AppSettings.MIP_ANISO_2) {
 					levelFilter = Texture2D.FILTER_LINEAR;
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2 << (Settings.m3gMipmapping - Settings.MIP_ANISO_2));
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2 << (AppSettings.m3gMipmapping - AppSettings.MIP_ANISO_2));
 				}
 
-				if (Settings.m3gTexFilter == Settings.TEX_FILTER_NEAREST) {
+				if (AppSettings.m3gTexFilter == AppSettings.TEX_FILTER_NEAREST) {
 					imageFilter = Texture2D.FILTER_NEAREST;
-				} else if (Settings.m3gTexFilter == Settings.TEX_FILTER_LINEAR) {
+				} else if (AppSettings.m3gTexFilter == AppSettings.TEX_FILTER_LINEAR) {
 					imageFilter = Texture2D.FILTER_LINEAR;
 				}
 
@@ -953,7 +954,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 		if (!useGL11() && capabilities.GL_ARB_color_buffer_float) {
 			ARBColorBufferFloat.glClampColorARB(
 					ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
-					Settings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE
+					AppSettings.m3gDisableLightClamp ? GL_FALSE : GL_TRUE
 			);
 		}
 

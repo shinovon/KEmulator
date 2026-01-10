@@ -680,7 +680,7 @@ public final class EmulatorScreen implements
 	}
 
 	public IImage getBackBufferImage() {
-		if (!Settings.asyncFlush) return getScreenImg();
+		if (!AppSettings.asyncFlush) return getScreenImg();
 		synchronized (this) {
 			if (Settings.g2d == 0) {
 				return this.backBufferImageSwt;
@@ -734,7 +734,7 @@ public final class EmulatorScreen implements
 				method580(Integer.parseInt(substring2));
 			}
 		}
-		if (Settings.asyncFlush) {
+		if (AppSettings.asyncFlush) {
 			if (paintPending) return;
 			paintPending = true;
 			display.asyncExec(this);

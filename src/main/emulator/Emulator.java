@@ -507,12 +507,12 @@ public class Emulator implements Runnable {
 		System.setProperty("microedition.profiles", "MIDP-2.0");
 		if (platform.supportsM3G())
 			System.setProperty("microedition.m3g.version", "1.1");
-		System.setProperty("microedition.encoding", Settings.fileEncoding);
+		System.setProperty("microedition.encoding", AppSettings.fileEncoding);
 		if (System.getProperty("microedition.locale") == null) {
-			System.setProperty("microedition.locale", Settings.locale);
+			System.setProperty("microedition.locale", AppSettings.locale);
 		}
 		if (System.getProperty("microedition.platform") == null) {
-			String plat = Settings.microeditionPlatform;
+			String plat = AppSettings.microeditionPlatform;
 
 			Emulator.httpUserAgent = plat + " (Java/" + System.getProperty("java.version") + "; KEmulator/" + version + ")";
 
@@ -616,7 +616,6 @@ public class Emulator implements Runnable {
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
-			AppSettings.init();
 
 			platform.load3D();
 			Controllers.refresh(true);
@@ -625,6 +624,7 @@ public class Emulator implements Runnable {
 					+ " (" + System.getProperty("os.version") + "), Java: "
 					+ System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
 			Devices.load(Emulator.deviceFile);
+			AppSettings.init();
 			tryToSetDevice(Emulator.deviceName);
 
 			setupMRUList();

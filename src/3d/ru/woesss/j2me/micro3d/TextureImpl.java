@@ -16,6 +16,7 @@
 
 package ru.woesss.j2me.micro3d;
 
+import emulator.AppSettings;
 import emulator.Settings;
 import emulator.custom.ResourceManager;
 
@@ -151,7 +152,7 @@ public final class TextureImpl {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, mTexId);
 
-		boolean filter = Settings.mascotTextureFilter;
+		boolean filter = AppSettings.mascotTextureFilter;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

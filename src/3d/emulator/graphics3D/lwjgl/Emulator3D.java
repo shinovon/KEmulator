@@ -384,8 +384,8 @@ public final class Emulator3D implements IGraphics3D {
 	private void setHintsInternal() {
 		boolean aa = (hints & Graphics3D.ANTIALIAS) != 0;
 
-		if (AppSettings.m3gAA == Settings.AA_OFF) aa = false;
-		else if (AppSettings.m3gAA == Settings.AA_ON) aa = true;
+		if (AppSettings.m3gAA == AppSettings.AA_OFF) aa = false;
+		else if (AppSettings.m3gAA == AppSettings.AA_ON) aa = true;
 
 		if (aa) {
 			GL11.glEnable(GL_POINT_SMOOTH);
@@ -980,23 +980,23 @@ public final class Emulator3D implements IGraphics3D {
 				int levelFilter = texture2D.getLevelFilter();
 				int imageFilter = texture2D.getImageFilter();
 
-				if (useGL11() || AppSettings.m3gMipmapping == Settings.MIP_OFF) {
+				if (useGL11() || AppSettings.m3gMipmapping == AppSettings.MIP_OFF) {
 					levelFilter = Texture2D.FILTER_BASE_LEVEL;
 					if (!useGL11()) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
-				} else if (AppSettings.m3gMipmapping == Settings.MIP_LINEAR) {
+				} else if (AppSettings.m3gMipmapping == AppSettings.MIP_LINEAR) {
 					levelFilter = Texture2D.FILTER_NEAREST;
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
-				} else if (AppSettings.m3gMipmapping == Settings.MIP_TRILINEAR) {
+				} else if (AppSettings.m3gMipmapping == AppSettings.MIP_TRILINEAR) {
 					levelFilter = Texture2D.FILTER_LINEAR;
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
-				} else if (AppSettings.m3gMipmapping >= Settings.MIP_ANISO_2) {
+				} else if (AppSettings.m3gMipmapping >= AppSettings.MIP_ANISO_2) {
 					levelFilter = Texture2D.FILTER_LINEAR;
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2 << (AppSettings.m3gMipmapping - Settings.MIP_ANISO_2));
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2 << (AppSettings.m3gMipmapping - AppSettings.MIP_ANISO_2));
 				}
 
-				if (AppSettings.m3gTexFilter == Settings.TEX_FILTER_NEAREST) {
+				if (AppSettings.m3gTexFilter == AppSettings.TEX_FILTER_NEAREST) {
 					imageFilter = Texture2D.FILTER_NEAREST;
-				} else if (AppSettings.m3gTexFilter == Settings.TEX_FILTER_LINEAR) {
+				} else if (AppSettings.m3gTexFilter == AppSettings.TEX_FILTER_LINEAR) {
 					imageFilter = Texture2D.FILTER_LINEAR;
 				}
 
