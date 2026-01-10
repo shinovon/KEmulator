@@ -22,19 +22,14 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.w3c.dom.Text;
-import org.w3c.dom.events.Event;
 
 import javax.microedition.rms.RecordStore;
-import javax.swing.GroupLayout.Group;
-import javax.swing.table.TableColumn;
 
 import java.io.*;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.net.http.WebSocket.Listener;
 import java.nio.charset.Charset;
-import java.security.Permission;
+import java.util.List;
 import java.util.*;
 
 public final class Property implements IProperty, SelectionListener {
