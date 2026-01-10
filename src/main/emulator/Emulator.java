@@ -70,7 +70,7 @@ public class Emulator implements Runnable {
 	private static boolean bridge;
 	public static boolean doja;
 
-	private static int startWidth, startHeight;
+	static int startWidth, startHeight;
 
 	private Emulator() {
 		super();
@@ -933,11 +933,11 @@ public class Emulator implements Runnable {
 				} else if (key.equalsIgnoreCase("fontname")) {
 					getEmulator().getProperty().setDefaultFontName(value);
 				} else if (key.equalsIgnoreCase("fontsmall")) {
-					getEmulator().getProperty().setFontSmallSize(Integer.parseInt(value));
+					AppSettings.fontSmallSize = Integer.parseInt(value);
 				} else if (key.equalsIgnoreCase("fontmedium")) {
-					getEmulator().getProperty().getFontMediumSize(Integer.parseInt(value));
+					AppSettings.fontMediumSize = Integer.parseInt(value);
 				} else if (key.equalsIgnoreCase("fontlarge")) {
-					getEmulator().getProperty().getFontLargeSize(Integer.parseInt(value));
+					AppSettings.fontLargeSize = Integer.parseInt(value);
 				} else if (key.equalsIgnoreCase("screen")) {
 					String[] size = value.split("x");
 					if (size.length == 2 && Integer.parseInt(size[0]) > 0 && Integer.parseInt(size[1]) > 0) {

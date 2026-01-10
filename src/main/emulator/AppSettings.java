@@ -96,7 +96,7 @@ public class AppSettings {
 		Property p = (Property) Emulator.getEmulator().getProperty();
 
 		devicePreset = Emulator.deviceName;
-		
+
 		screenWidth = Integer.parseInt(p.getScreenWidth());
 		screenHeight = Integer.parseInt(p.getScreenHeight());
 		
@@ -160,6 +160,11 @@ public class AppSettings {
 		IEmulatorFrontend emulator = Emulator.getEmulator();
 		boolean screenDetected = true;
 		detectScreen: {
+			if (Emulator.startWidth != 0) {
+				screenWidth = Emulator.startWidth;
+				screenHeight = Emulator.startHeight;
+				break detectScreen;
+			}
 			try {
 				String s = emulator.getAppProperty("MIDxlet-ScreenSize");
 				if (s == null) {
@@ -299,12 +304,17 @@ public class AppSettings {
 		if (properties.containsKey("DevicePreset")) {
 			devicePreset = properties.get("DevicePreset");
 		}
-		
-		if (properties.containsKey("ScreenWidth")) {
-			screenWidth = Integer.parseInt(properties.get("ScreenWidth"));
-		}
-		if (properties.containsKey("ScreenHeight")) {
-			screenHeight = Integer.parseInt(properties.get("ScreenHeight"));
+
+		if (Emulator.startWidth == 0) {
+			if (properties.containsKey("ScreenWidth")) {
+				screenWidth = Integer.parseInt(properties.get("ScreenWidth"));
+			}
+			if (properties.containsKey("ScreenHeight")) {
+				screenHeight = Integer.parseInt(properties.get("ScreenHeight"));
+			}
+		} else {
+			set("ScreenWidth", screenWidth);
+			set("ScreenHeight", screenHeight);
 		}
 		
 		if (properties.containsKey("KeyLeftSoft")) {
@@ -534,6 +544,8 @@ public class AppSettings {
 						}
 						break;
 					}
+
+					if (save) continue;
 
 					int sepIdx = line.indexOf('=');
 					if (sepIdx == -1) {
