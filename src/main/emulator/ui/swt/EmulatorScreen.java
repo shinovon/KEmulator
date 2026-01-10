@@ -1903,7 +1903,11 @@ public final class EmulatorScreen implements
 			gc.fillRectangle(0, 0, size.width, size.height);
 			gc.setForeground(display.getSystemColor(21));
 			gc.setFont(f);
-			gc.drawText(Emulator.getInfoString(), size.width >> 3, size.height >> 3, true);
+			String s = Emulator.getInfoString();
+			gc.drawText(s, Math.max(4, (size.width - gc.stringExtent(s).x) >> 1), (size.height - gc.stringExtent(s).y * 2) >> 1, true);
+
+			s = "Drop a .JAR file here";
+			gc.drawText(s, Math.max(4, (size.width - gc.stringExtent(s).x) >> 1), (size.height + gc.stringExtent(s).y) >> 1, true);
 			return;
 		}
 
