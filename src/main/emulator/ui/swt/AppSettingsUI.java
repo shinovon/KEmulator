@@ -136,7 +136,11 @@ public class AppSettingsUI {
 
 		Label lblNewLabel = new Label(composite_1, SWT.NONE);
 		lblNewLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
-		lblNewLabel.setText("Name: " + Emulator.getEmulator().getAppProperty("MIDlet-Name"));
+		String name = "Name: " + Emulator.getEmulator().getAppProperty("MIDlet-Name");
+		if (AppSettings.uei) {
+			name = name + " (UEI)";
+		}
+		lblNewLabel.setText(name);
 
 		Composite composite_2 = new Composite(composite_1, SWT.NONE);
 		GridLayout gl_composite_2 = new GridLayout(1, false);
