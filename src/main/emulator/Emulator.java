@@ -1127,6 +1127,8 @@ public class Emulator implements Runnable {
 			cmd.add("-XstartOnFirstThread");
 		}
 
+		cmd.add("-Dfile.encoding=UTF-8");
+		cmd.add("-Dsun.jnu.encoding=UTF-8");
 
 		if (debugBuild) {
 			File f = new File(getAbsolutePath() + "/../eclipse/KEmulator_base/agent.jar");
@@ -1166,7 +1168,7 @@ public class Emulator implements Runnable {
 				if (a.equals("-swt") || a.equals("-awt")
 						|| a.equals("-swerve") || a.equals("-lwj")
 						|| a.equals("-mascotdll") || a.equals("-mascotgl")
-						|| a.equals("-s"))
+						|| a.equals("-s") || a.equals("-updated"))
 					continue;
 				cmd.add(a);
 			}

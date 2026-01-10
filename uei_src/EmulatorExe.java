@@ -180,6 +180,7 @@ public class EmulatorExe {
 		if (!encodingSet) {
 			cmd.add("-Dfile.encoding=UTF-8");
 		}
+		cmd.add("-Dsun.jnu.encoding=UTF-8");
 
 		cmd.add("-javaagent:" + path + "/KEmulator.jar");
 
