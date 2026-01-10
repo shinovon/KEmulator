@@ -28,7 +28,6 @@ import javax.microedition.rms.RecordStore;
 import java.io.*;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.*;
 
@@ -163,7 +162,8 @@ public final class Property implements IProperty, SelectionListener {
 	private Button aButton749;
 	private Button aButton752;
 	private Composite sysFontComp;
-	private Combo aCombo689;
+	private Combo defaultFontCombo;
+	private Combo monoFontCombo;
 	private Spinner aSpinner670;
 	private Canvas aCanvas663;
 	private Spinner aSpinner679;
@@ -744,7 +744,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void apply() {
-		this.defaultFont = this.aCombo689.getText().trim();
+		this.defaultFont = this.defaultFontCombo.getText().trim();
 		this.rmsFolder = this.aText662.getText().trim();
 		this.fontSmallSize = this.aSpinner690.getSelection();
 		this.fontMediumSize = this.aSpinner679.getSelection();
@@ -1884,11 +1884,26 @@ public final class Property implements IProperty, SelectionListener {
 		CLabel aCLabel638;
 		(aCLabel638 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_DEFAULT_FONT", "Default Font:"));
 		aCLabel638.setLayoutData(layoutData2);
-		this.method418();
+		this.setupDefaultFontChoice();
+
+		CLabel aCLabel;
+		(aCLabel = new CLabel(this.sysFontComp, 0)).setText("Monospace Font:");
+		aCLabel.setLayoutData(layoutData2);
+		this.setupMonoFontChoice();
+
+		Group fontPreviewGroup = new Group(this.sysFontComp, SWT.NONE);
+		fontPreviewGroup.setLayout(new GridLayout(3, false));
+		fontPreviewGroup.setText("Preview");
+		GridData gd = new GridData();
+		gd.horizontalSpan = 3;
+		gd.horizontalAlignment = GridData.FILL;
+		gd.verticalAlignment = GridData.FILL;
+		fontPreviewGroup.setLayoutData(gd);
+
 		CLabel aCLabel640;
-		(aCLabel640 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_LARGE_SIZE", "Large Size:"));
+		(aCLabel640 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_LARGE_SIZE", "Large Size:"));
 		aCLabel640.setLayoutData(layoutData3);
-		(this.aSpinner670 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
+		(this.aSpinner670 = new Spinner(fontPreviewGroup, 2048)).setMinimum(1);
 		this.aSpinner670.setSelection(this.fontLargeSize);
 		this.aSpinner670.addModifyListener(new ModifyListener() {
 			@Override
@@ -1896,10 +1911,10 @@ public final class Property implements IProperty, SelectionListener {
 				method360(1);
 			}
 		});
-		this.method420();
+		this.method420(fontPreviewGroup);
 		CLabel aCLabel642;
-		(aCLabel642 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
-		(this.aSpinner679 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
+		(aCLabel642 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
+		(this.aSpinner679 = new Spinner(fontPreviewGroup, 2048)).setMinimum(1);
 		this.aSpinner679.setSelection(this.fontMediumSize);
 		this.aSpinner679.addModifyListener(new ModifyListener() {
 			@Override
@@ -1907,10 +1922,10 @@ public final class Property implements IProperty, SelectionListener {
 				method360(2);
 			}
 		});
-		this.method422();
+		this.method422(fontPreviewGroup);
 		CLabel aCLabel644;
-		(aCLabel644 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
-		(this.aSpinner690 = new Spinner(this.sysFontComp, 2048)).setMinimum(1);
+		(aCLabel644 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
+		(this.aSpinner690 = new Spinner(fontPreviewGroup, 2048)).setMinimum(1);
 		this.aSpinner690.setSelection(this.fontSmallSize);
 		this.aSpinner690.addModifyListener(new ModifyListener() {
 			@Override
@@ -1918,10 +1933,10 @@ public final class Property implements IProperty, SelectionListener {
 				method360(4);
 			}
 		});
-		this.method424();
+		this.method424(fontPreviewGroup);
 		CLabel aCLabel645;
-		(aCLabel645 = new CLabel(this.sysFontComp, 0)).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
-		(this.aText633 = new Text(this.sysFontComp, 2048)).setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
+		(aCLabel645 = new CLabel(fontPreviewGroup, 0)).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
+		(this.aText633 = new Text(fontPreviewGroup, 2048)).setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
 		this.aText633.setLayoutData(layoutData);
 		this.aText633.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
@@ -1937,14 +1952,14 @@ public final class Property implements IProperty, SelectionListener {
 		antiAliasTextBtn.setLayoutData(layoutData4);
 	}
 
-	private void method418() {
+	private void setupDefaultFontChoice() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 2;
 		layoutData.verticalAlignment = 2;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.horizontalAlignment = 4;
-		(this.aCombo689 = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
-		this.aCombo689.addModifyListener(new ModifyListener() {
+		(this.defaultFontCombo = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
+		this.defaultFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
 				method360(7);
 			}
@@ -1967,21 +1982,58 @@ public final class Property implements IProperty, SelectionListener {
 		Collections.sort(list);
 		String aString682 = (String) list.get(0);
 		for (Comparable comparable : list) {
-			this.aCombo689.add((String) comparable);
+			this.defaultFontCombo.add((String) comparable);
 			if (this.defaultFont.equalsIgnoreCase((String) comparable)) {
 				aString682 = (String) comparable;
 			}
 		}
 		this.defaultFont = aString682;
-		this.aCombo689.setText(this.defaultFont);
+		this.defaultFontCombo.setText(this.defaultFont);
 	}
 
-	private void method420() {
+	private void setupMonoFontChoice() {
+		final GridData layoutData;
+		(layoutData = new GridData()).horizontalSpan = 2;
+		layoutData.verticalAlignment = 2;
+		layoutData.grabExcessHorizontalSpace = true;
+		layoutData.horizontalAlignment = 4;
+		(this.monoFontCombo = new Combo(this.sysFontComp, 8)).setLayoutData(layoutData);
+		this.monoFontCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent modifyEvent) {
+				method360(7);
+			}
+		});
+		final FontData[] fontList = Property.display.getFontList(null, true);
+		final ArrayList<Comparable> list = new ArrayList<Comparable>();
+		for (FontData fontData : fontList) {
+			if (!list.contains(fontData.getName()) && !fontData.getName().startsWith("@")) {
+				list.add(fontData.getName());
+			}
+		}
+		final FontData[] fontList2 = Property.display.getFontList(null, false);
+		for (FontData fontData : fontList2) {
+			if (!list.contains(fontData.getName()) && !fontData.getName().startsWith("@")) {
+				list.add(fontData.getName());
+			}
+		}
+		Collections.sort(list);
+		String aString682 = (String) list.get(0);
+		for (Comparable comparable : list) {
+			this.monoFontCombo.add((String) comparable);
+			if (this.monospaceFont.equalsIgnoreCase((String) comparable)) {
+				aString682 = (String) comparable;
+			}
+		}
+		this.monospaceFont = aString682;
+		this.monoFontCombo.setText(this.monospaceFont);
+	}
+
+	private void method420(Composite parent) {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCanvas663 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
+		(this.aCanvas663 = new Canvas(parent, 264192)).setLayoutData(layoutData);
 		this.aCanvas663.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage671 == null) {
@@ -1998,12 +2050,12 @@ public final class Property implements IProperty, SelectionListener {
 		});
 	}
 
-	private void method422() {
+	private void method422(Composite parent) {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCanvas680 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
+		(this.aCanvas680 = new Canvas(parent, 264192)).setLayoutData(layoutData);
 		this.aCanvas680.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage674 == null) {
@@ -2014,12 +2066,12 @@ public final class Property implements IProperty, SelectionListener {
 		});
 	}
 
-	private void method424() {
+	private void method424(Composite parent) {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		(this.aCanvas691 = new Canvas(this.sysFontComp, 264192)).setLayoutData(layoutData);
+		(this.aCanvas691 = new Canvas(parent, 264192)).setLayoutData(layoutData);
 		this.aCanvas691.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage693 == null) {
@@ -2046,12 +2098,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font2;
 				if (Settings.g2d == 0) {
-					font2 = new FontSWT(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0);
+					font2 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner670.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0080;
 					}
-					font2 = new FontAWT(this.aCombo689.getText(), this.aSpinner670.getSelection(), 0, false);
+					font2 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner670.getSelection(), 0, false);
 				}
 				font = font2;
 			}
@@ -2069,12 +2121,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font3;
 				if (Settings.g2d == 0) {
-					font3 = new FontSWT(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0);
+					font3 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner679.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0242;
 					}
-					font3 = new FontAWT(this.aCombo689.getText(), this.aSpinner679.getSelection(), 0, false);
+					font3 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner679.getSelection(), 0, false);
 				}
 				font = font3;
 			}
@@ -2092,12 +2144,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font4;
 				if (Settings.g2d == 0) {
-					font4 = new FontSWT(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0);
+					font4 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner690.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0404;
 					}
-					font4 = new FontAWT(this.aCombo689.getText(), this.aSpinner690.getSelection(), 0, false);
+					font4 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner690.getSelection(), 0, false);
 				}
 				font = font4;
 			}

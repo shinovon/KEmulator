@@ -615,6 +615,7 @@ public class AppSettingsUI {
 			s.append(k).append(": ").append(AppSettings.systemProperties.get(k)).append('\n');
 		}
 		systemPropertiesText.setText(s.toString());
+		systemPropertiesText.setToolTipText("foo.bar: Example");
 		tbtmProperties.setControl(systemPropertiesText);
 
 		Composite composite_3 = new Composite(shell, SWT.NONE);
@@ -645,7 +646,7 @@ public class AppSettingsUI {
 			}
 		});
 		btnNewButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnNewButton.setText("Default");
+		btnNewButton.setText(start ? "Default" : "Reset");
 
 
 		scrolledComposite_1.setMinHeight(composite_8.computeSize(-1, -1).y);

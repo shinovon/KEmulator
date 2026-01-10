@@ -114,9 +114,9 @@ public class AppSettings {
 		leftKey = -3;
 		rightKey = -4;
 
-		fontSmallSize = p.getFontSmallSize();
-		fontMediumSize = p.getFontMediumSize();
-		fontLargeSize = p.getFontLargeSize();
+		fontSmallSize = 12; // p.getFontSmallSize();
+		fontMediumSize = 14; // p.getFontMediumSize();
+		fontLargeSize = 16; // p.getFontLargeSize();
 
 		locale = "en-US";
 		fileEncoding = "ISO-8859-1";
