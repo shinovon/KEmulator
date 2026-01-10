@@ -857,9 +857,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		} else {
 			midiSynthesizer = MidiSystem.getSynthesizer();
 			midiSynthesizer.open();
-			if (EmulatorMIDI.useCustomSoundfont()) {
-				midiSynthesizer.loadAllInstruments(EmulatorMIDI.soundbank);
-			}
+			midiSynthesizer.loadAllInstruments(EmulatorMIDI.useCustomSoundfont() ?
+					EmulatorMIDI.soundbank : midiSynthesizer.getDefaultSoundbank());
 			midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
 		}
 		midiSequencer.open();

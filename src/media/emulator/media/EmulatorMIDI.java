@@ -17,7 +17,6 @@ public class EmulatorMIDI {
 	public static Soundbank soundbank;
 
 	public static boolean useCustomSoundfont() {
-		Thread.dumpStack();
 		if (Settings.soundfontPath == null || Settings.soundfontPath.isEmpty()) {
 			return false;
 		}
@@ -68,9 +67,7 @@ public class EmulatorMIDI {
 		if (receiver == null) {
 			synthesizer = MidiSystem.getSynthesizer();
 			synthesizer.open();
-			if (useCustomSoundfont()) {
-				synthesizer.loadAllInstruments(soundbank);
-			}
+			synthesizer.loadAllInstruments(useCustomSoundfont() ? soundbank : synthesizer.getDefaultSoundbank());
 			receiver = synthesizer.getReceiver();
 		}
 		if (sequencer == null) {
