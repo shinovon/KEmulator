@@ -237,7 +237,7 @@ public class AppSettingsUI {
 		lblNewLabel_8.setText("Encoding:");
 
 		encodingCombo = new Combo(grpDevice, SWT.NONE);
-		encodingCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		encodingCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		{
 			final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
 			final ArrayList<Comparable> list = new ArrayList(availableCharsets.keySet());
