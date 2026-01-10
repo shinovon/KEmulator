@@ -7,8 +7,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class AppSettings {
 
@@ -96,7 +95,7 @@ public class AppSettings {
 
 	public static final Map<String, String> systemProperties = new HashMap<String, String>();
 
-	private static Map<String, String> appProperties;
+	private static Map<String, String> appProperties = new HashMap<>();
 
 	public static void init() {
 		// copy values from Settings
@@ -165,7 +164,7 @@ public class AppSettings {
 	}
 
 	public static int load() {
-		Map<String, String> properties = appProperties = new HashMap<>();
+		Map<String, String> properties = appProperties;
 
 		IEmulatorFrontend emulator = Emulator.getEmulator();
 		boolean screenDetected = true;
@@ -298,7 +297,7 @@ public class AppSettings {
 		if (AppSettings.uei) {
 			s = "UEI";
 		} else if (Emulator.midletJar == null) {
-			return -1;
+			s = "Classpath";
 		} else {
 			s = getJarHash(Emulator.midletJar);
 		}
@@ -580,7 +579,9 @@ public class AppSettings {
 					if (line.equals(jarSection)) {
 						found = true;
 						if (save) {
-							for (String key : appProperties.keySet()) {
+							List<String> list = new ArrayList<>(appProperties.keySet());
+							Collections.sort(list);
+							for (String key : list) {
 								writer.write(key);
 								writer.write('=');
 								writer.write(escape(appProperties.get(key)));
@@ -632,7 +633,9 @@ public class AppSettings {
 					if (notEmpty) writer.newLine();
 					writer.write(jarSection);
 					writer.newLine();
-					for (String key : appProperties.keySet()) {
+					List<String> list = new ArrayList<>(appProperties.keySet());
+					Collections.sort(list);
+					for (String key : list) {
 						writer.write(key);
 						writer.write('=');
 						writer.write(escape(appProperties.get(key)));
@@ -688,7 +691,7 @@ public class AppSettings {
 
 	private static String getJarHash(String file) {
 		try {
-			MessageDigest md = MessageDigest.getInstance("SHA256");
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
 
 			try (InputStream input = new FileInputStream(file)) {
 				byte[] buffer = new byte[8192];

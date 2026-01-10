@@ -217,9 +217,10 @@ public class AppSettingsUI {
 			final Enumeration method620 = Devices.method620();
 			while (method620.hasMoreElements()) {
 				final String text = (String) method620.nextElement();
-				this.deviceCombo.add(text);
+				deviceCombo.add(text);
 				if (AppSettings.devicePreset.equalsIgnoreCase(text)) {
-					this.deviceCombo.setText(text);
+					deviceCombo.setText(text);
+					deviceCombo.select(deviceCombo.getItemCount() - 1);
 				}
 			}
 		}
@@ -528,7 +529,7 @@ public class AppSettingsUI {
 		m3gAACombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
 		m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_OFF", "Force off"));
 		m3gAACombo.add(UILocale.get("OPTION_M3G_FORCE_ON", "Force on"));
-		m3gAACombo.setText(m3gAACombo.getItem(AppSettings.m3gAA));
+		m3gAACombo.select(AppSettings.m3gAA);
 
 		Label lblNewLabel_18 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_18.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -539,7 +540,7 @@ public class AppSettingsUI {
 		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_APP_CONTROLLED", "Application-controlled"));
 		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_NEAREST", "Force nearest"));
 		m3gTexFilterCombo.add(UILocale.get("OPTION_M3G_FORCE_LINEAR", "Force linear"));
-		m3gTexFilterCombo.setText(m3gTexFilterCombo.getItem(AppSettings.m3gTexFilter));
+		m3gTexFilterCombo.select(AppSettings.m3gTexFilter);
 
 		Label lblNewLabel_19 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_19.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -555,7 +556,7 @@ public class AppSettingsUI {
 		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_4X", "Force anisotropic 4x"));
 		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_8X", "Force anisotropic 8x"));
 		m3gMipmapCombo.add(UILocale.get("OPTION_M3G_FORCE_ANISO_16X", "Force anisotropic 16x"));
-		m3gMipmapCombo.setText(m3gMipmapCombo.getItem(AppSettings.m3gMipmapping));
+		m3gMipmapCombo.select(AppSettings.m3gMipmapping);
 
 		Group grpMascotcapsuleLwjgl = new Group(composite_8, SWT.NONE);
 		grpMascotcapsuleLwjgl.setLayout(new GridLayout(1, false));
@@ -777,9 +778,9 @@ public class AppSettingsUI {
 			AppSettings.m3gFlushImmediately = m3gFlushImmediately.getSelection();
 		}
 		{
-			AppSettings.m3gAA = m3gAACombo.getSelectionIndex();
-			AppSettings.m3gTexFilter = m3gTexFilterCombo.getSelectionIndex();
-			AppSettings.m3gMipmapping = m3gMipmapCombo.getSelectionIndex();
+			AppSettings.m3gAA = Math.max(0, m3gAACombo.getSelectionIndex());
+			AppSettings.m3gTexFilter = Math.max(0, m3gTexFilterCombo.getSelectionIndex());
+			AppSettings.m3gMipmapping = Math.max(0, m3gMipmapCombo.getSelectionIndex());
 		}
 
 		// mascot
