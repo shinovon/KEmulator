@@ -99,18 +99,17 @@ public class AppSettings {
 	private static final Map<String, String> appProperties = new HashMap<>();
 
 	public static void init() {
-		devicePreset = Devices.getDefaultPreset();
-
-		screenWidth = 240;
-		screenHeight = 320;
-
-		leftSoftKey = -6;
-		rightSoftKey = -7;
-		fireKey = -5;
-		upKey = -1;
-		downKey = -2;
-		leftKey = -3;
-		rightKey = -4;
+		applyPreset(devicePreset = Devices.getDefaultPreset(), true);
+//		screenWidth = 240;
+//		screenHeight = 320;
+//
+//		leftSoftKey = -6;
+//		rightSoftKey = -7;
+//		fireKey = -5;
+//		upKey = -1;
+//		downKey = -2;
+//		leftKey = -3;
+//		rightKey = -4;
 
 		fontSmallSize = 12; // p.getFontSmallSize();
 		fontMediumSize = 14; // p.getFontMediumSize();
@@ -164,6 +163,7 @@ public class AppSettings {
 		Map<String, String> properties = appProperties;
 
 		IEmulatorFrontend emulator = Emulator.getEmulator();
+		boolean screenDetected = true;
 		detectScreen: {
 			if (Emulator.startWidth != 0) {
 				screenWidth = Emulator.startWidth;
@@ -256,13 +256,16 @@ public class AppSettings {
 					break detectScreen;
 				}
 			}
+			screenDetected = false;
 		}
 
 		if (Emulator.doja) {
+			applyPreset(devicePreset = "120x160 (Sharp/DoCoMo - full screen)", !screenDetected);
 			fileEncoding = "Shift_JIS";
+			m3gThread = true;
 		} else if (AppSettings.softbankApi) {
 			// TODO
-			devicePreset = "400x240 (SoftBank - full screen)";
+			applyPreset(devicePreset = "400x240 (SoftBank - full screen)", !screenDetected);
 			m3gThread = true;
 		}
 
@@ -543,6 +546,21 @@ public class AppSettings {
 		}
 
 		loadIni(true);
+	}
+
+	public static void applyPreset(String s, boolean screen) {
+		DevicePlatform p = Devices.getPlatform(s);
+		if (screen) {
+			screenWidth = Integer.parseInt(p.getString("SCREEN_WIDTH"));
+			screenHeight = Integer.parseInt(p.getString("SCREEN_HEIGHT"));
+		}
+		leftSoftKey = Integer.parseInt(p.getString("KEY_S1"));
+		rightSoftKey = Integer.parseInt(p.getString("KEY_S2"));
+		fireKey = Integer.parseInt(p.getString("KEY_FIRE"));
+		upKey = Integer.parseInt(p.getString("KEY_UP"));
+		downKey = Integer.parseInt(p.getString("KEY_DOWN"));
+		leftKey = Integer.parseInt(p.getString("KEY_LEFT"));
+		rightKey = Integer.parseInt(p.getString("KEY_RIGHT"));
 	}
 
 	private static boolean loadIni(boolean save) {
