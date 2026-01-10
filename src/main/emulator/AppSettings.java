@@ -1,7 +1,6 @@
 package emulator;
 
 import emulator.ui.IEmulatorFrontend;
-import emulator.ui.swt.Property;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -308,7 +307,7 @@ public class AppSettings {
 
 		if (reset) return 0;
 
-		if (!loadINI(false)) {
+		if (!loadIni(false)) {
 			return uei || !Settings.showAppSettingsOnStart ? 1 : 0;
 		}
 
@@ -554,10 +553,10 @@ public class AppSettings {
 			AppSettings.set("SystemProperties", sb.toString());
 		}
 
-		loadINI(true);
+		loadIni(true);
 	}
 
-	private static boolean loadINI(boolean save) {
+	private static boolean loadIni(boolean save) {
 		Path midletsPath = getMidletsPath();
 		String exactSection = '[' + iniSection + ']';
 		boolean found = false;
@@ -574,6 +573,8 @@ public class AppSettings {
 			}
 			try (BufferedReader reader = Files.newBufferedReader(midletsPath, StandardCharsets.UTF_8)) {
 				String line;
+				String hashPrefix = "[" + jarHash + ":";
+				String pathSuffix = ":" + Emulator.midletJar + "]";
 				for (;;) {
 					line = reader.readLine();
 					if (line == null) break;
@@ -588,7 +589,7 @@ public class AppSettings {
 							if (uei || Emulator.midletJar == null) {
 								break match;
 							}
-							if (line.startsWith('[' + jarHash + ':') || line.endsWith(':' + Emulator.midletJar + ']')) {
+							if (line.startsWith(hashPrefix) || line.endsWith(pathSuffix)) {
 								found = true;
 								break match;
 							}
