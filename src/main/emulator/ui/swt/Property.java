@@ -548,7 +548,6 @@ public final class Property implements IProperty, SelectionListener {
 
 			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "false"));
 			Settings.uiLanguage = properties.getProperty("UILanguage", "en");
-			Settings.writeKemCfg = Boolean.parseBoolean(properties.getProperty("WriteKemulatorCfg", "false"));
 
 			for (int i = 0; i < 5; ++i) {
 				Settings.recentJars[i] = properties.getProperty("MRUList" + i, "");
@@ -799,7 +798,6 @@ public final class Property implements IProperty, SelectionListener {
 
 			properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
 			properties.setProperty("UILanguage", Settings.uiLanguage);
-			properties.setProperty("WriteKemulatorCfg", String.valueOf(Settings.writeKemCfg));
 
 			for (int i = 0; i < 5; ++i) {
 				properties.setProperty("MRUList" + i, Settings.recentJars[i]);

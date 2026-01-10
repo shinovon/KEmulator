@@ -87,8 +87,6 @@ public final class Settings {
 
 	public static int m3gContextMode; // 0 - auto, 1 - glcanvas, 2 - lwjglx canvas, 3 - glfw window
 
-	public static boolean writeKemCfg = false;
-
 	public static boolean reopenMidiDevice = true;
 	public static boolean searchVms;
 
