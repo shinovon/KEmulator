@@ -315,7 +315,7 @@ public final class Property implements IProperty, SelectionListener {
 				fileInputStream.close();
 				hasFile = true;
 			}
-			if (Utils.linux) {
+			if (!Utils.win) {
 				Font systemFont = Display.getDefault().getSystemFont();
 				String systemName = "DejaVu Sans";
 				if (systemFont != null && systemFont.getFontData().length > 0)
@@ -484,8 +484,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.proguardPath = properties.getProperty("ProguardPath", null);
 			Settings.ideaJdkTablePatched = Boolean.parseBoolean(properties.getProperty("IdeaJdkTablePatched", "false"));
 			Settings.lastIdeaRepoPath = properties.getProperty("LastIdeaProjectsRepo", "");
-
-			fileInputStream.close();
 		} catch (Exception ex) {
 			if (!(ex instanceof FileNotFoundException)) {
 				System.out.println("properties load failed");
