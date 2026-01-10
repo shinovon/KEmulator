@@ -54,7 +54,6 @@ public class Emulator implements Runnable {
 	public static String midletClassName;
 	public static String classPath;
 	public static String jadPath;
-	public static String deviceName;
 	public static String deviceFile;
 	public static String[] commandLineArguments;
 	public static emulator.custom.CustomClassLoader customClassLoader;
@@ -625,7 +624,6 @@ public class Emulator implements Runnable {
 					+ System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
 			Devices.load(Emulator.deviceFile);
 			AppSettings.init();
-			tryToSetDevice(Emulator.deviceName);
 
 			setupMRUList();
 			RichPresence.initRichPresence();
@@ -684,6 +682,7 @@ public class Emulator implements Runnable {
 			if (AppSettings.load(false) == 0) {
 				Emulator.emulatorimpl.openAppSettings(true);
 			}
+			tryToSetDevice();
 			Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
 			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
 			setProperties();
@@ -725,26 +724,10 @@ public class Emulator implements Runnable {
 		System.exit(0);
 	}
 
-	private static void tryToSetDevice(String deviceName) {
-		String[][] c = null;
-		if (deviceName.startsWith("!")) {
-			deviceName = deviceName.substring(1);
-			String[] a = deviceName.split(";");
-			c = new String[a.length][2];
-			int idx = 0;
-			for (String s : a) {
-				int i = s.indexOf(':');
-				if (i == -1) {
-					deviceName = s;
-					continue;
-				}
-				c[idx][0] = s.substring(0, i);
-				c[idx++][1] = s.substring(i + 1);
-			}
-		}
-		Emulator.deviceName = deviceName;
-		if (!Devices.setPreset(Emulator.deviceName)) {
-			Devices.setPreset(Emulator.deviceName = Devices.getDefaultPreset());
+	private static void tryToSetDevice() {
+		String deviceName = AppSettings.devicePreset;
+		if (!Devices.setPreset(deviceName)) {
+			Devices.setPreset(Devices.getDefaultPreset());
 		}
 		if (startWidth != 0) {
 			AppSettings.screenWidth = startWidth;
@@ -753,7 +736,6 @@ public class Emulator implements Runnable {
 			AppSettings.screenHeight = startHeight;
 		}
 		Devices.writeProperties();
-		Emulator.emulatorimpl.getProperty().resetDeviceName();
 		KeyMapping.init();
 	}
 
@@ -1136,7 +1118,6 @@ public class Emulator implements Runnable {
 		Emulator.customClassLoader = new CustomClassLoader(ClassLoader.getSystemClassLoader());
 		Emulator.jarLibrarys = new Vector();
 		Emulator.jarClasses = new Vector();
-		Emulator.deviceName = "SonyEricssonK800";
 		Emulator.deviceFile = "/res/presets.xml";
 		backgroundThread = new Thread(new Runnable() {
 			public void run() {

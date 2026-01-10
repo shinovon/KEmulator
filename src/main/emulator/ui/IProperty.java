@@ -7,8 +7,6 @@ public interface IProperty {
 
 	void setDefaultFontName(final String p0);
 
-	void resetDeviceName();
-
 	void saveProperties();
 
 	void loadProperties();

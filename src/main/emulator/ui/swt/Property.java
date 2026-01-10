@@ -168,7 +168,6 @@ public final class Property implements IProperty, SelectionListener {
 	private Spinner aSpinner690;
 	private Canvas aCanvas691;
 	private Text aText633;
-	private String device;
 	private String defaultFont;
 	private String monospaceFont;
 	private String rmsFolder;
@@ -254,10 +253,6 @@ public final class Property implements IProperty, SelectionListener {
 		this.anIImage693 = null;
 	}
 
-	public void resetDeviceName() {
-		this.device = Emulator.deviceName;
-	}
-
 	public String getDefaultFontName() {
 		return this.defaultFont;
 	}
@@ -318,9 +313,6 @@ public final class Property implements IProperty, SelectionListener {
 			final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + "/property.txt");
 			final Properties properties = new Properties();
 			properties.load(fileInputStream);
-			final String property = properties.getProperty("DevicePreset", "SonyEricssonK800");
-			this.device = property;
-			Emulator.deviceName = property;
 			this.defaultFont = properties.getProperty("DefaultFont", Utils.linux ? "DejaVu Sans" : "Tahoma");
 			this.monospaceFont = properties.getProperty("MonospacedFont", Utils.linux ? "DejaVu Sans Mono" : "Consolas");
 			this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
@@ -485,7 +477,6 @@ public final class Property implements IProperty, SelectionListener {
 				System.out.println("properties load failed");
 				ex.printStackTrace();
 			}
-			this.device = "SonyEricssonK800";
 			this.defaultFont = "Tahoma";
 			this.monospaceFont = "Consolas";
 			this.rmsFolder = "/rms";
@@ -518,7 +509,6 @@ public final class Property implements IProperty, SelectionListener {
 			final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getUserPath() + "/property.txt");
 			final Properties properties = new SortProperties();
 
-			properties.setProperty("DevicePreset", this.device);
 			properties.setProperty("DefaultFont", this.defaultFont);
 			properties.setProperty("MonospacedFont", this.monospaceFont);
 			properties.setProperty("RMSFolder", this.rmsFolder);

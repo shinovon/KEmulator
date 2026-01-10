@@ -653,6 +653,7 @@ public class AppSettingsUI {
 				AppSettings.init();
 				AppSettings.load(true);
 				AppSettings.clear();
+				KeyMapping.init();
 				shell.close();
 			}
 		});
@@ -843,5 +844,6 @@ public class AppSettingsUI {
 		}
 
 		AppSettings.save();
+		KeyMapping.init();
 	}
 }

@@ -1,5 +1,6 @@
 package javax.microedition.io;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 
@@ -102,7 +103,7 @@ public final class HttpConnectionImpl implements HttpConnection {
 							Emulator.httpUserAgent);
 				} else {
 					connection.setRequestProperty("User-Agent",
-							Emulator.deviceName + " (KEmulator/" + Emulator.version + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
+							AppSettings.microeditionPlatform + " (KEmulator/" + Emulator.version + "; Profile/MIDP-2.1 Configuration/CLDC-1.1)");
 				}
 			}
 		} catch (Exception ignored) {}
