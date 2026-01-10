@@ -202,6 +202,7 @@ public class AppSettingsUI {
 		grpDevice.setLayout(new GridLayout(4, false));
 
 		Label lblNewLabel_3 = new Label(grpDevice, SWT.NONE);
+		lblNewLabel_3.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_3.setText("Device preset:");
 
 		deviceCombo = new Combo(grpDevice, SWT.NONE);
@@ -224,6 +225,7 @@ public class AppSettingsUI {
 		}
 
 		Label lblNewLabel_7 = new Label(grpDevice, SWT.NONE);
+		lblNewLabel_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_7.setText("Platform:");
 
 		platformText = new Text(grpDevice, SWT.BORDER);
@@ -231,6 +233,7 @@ public class AppSettingsUI {
 		platformText.setText(AppSettings.microeditionPlatform);
 
 		Label lblNewLabel_8 = new Label(grpDevice, SWT.NONE);
+		lblNewLabel_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_8.setText("Encoding:");
 
 		encodingCombo = new Combo(grpDevice, SWT.NONE);
@@ -266,6 +269,7 @@ public class AppSettingsUI {
 		localeText.setText(AppSettings.locale);
 
 		Label lblNewLabel_4 = new Label(grpDevice, SWT.NONE);
+		lblNewLabel_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_4.setText("Screen size:");
 
 		Composite composite_4 = new Composite(grpDevice, SWT.NONE);
@@ -388,18 +392,21 @@ public class AppSettingsUI {
 		grpFont.setLayout(new GridLayout(2, false));
 
 		Label lblNewLabel_5 = new Label(grpFont, SWT.NONE);
+		lblNewLabel_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_5.setText("Large size:");
 
 		largeSizeSpinner = new Spinner(grpFont, SWT.BORDER);
 		largeSizeSpinner.setSelection(AppSettings.fontLargeSize);
 
 		Label lblNewLabel_5_1 = new Label(grpFont, SWT.NONE);
+		lblNewLabel_5_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_5_1.setText("Medium size:");
 
 		mediumSizeSpinner = new Spinner(grpFont, SWT.BORDER);
 		mediumSizeSpinner.setSelection(AppSettings.fontMediumSize);
 
 		Label lblNewLabel_5_1_1 = new Label(grpFont, SWT.NONE);
+		lblNewLabel_5_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_5_1_1.setText("Small size:");
 
 		smallSizeSpinner = new Spinner(grpFont, SWT.BORDER);
@@ -425,10 +432,12 @@ public class AppSettingsUI {
 		grpCanvasCapabilities.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		keyRepeatsCheck = new Button(grpCanvasCapabilities, SWT.CHECK);
+		keyRepeatsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		keyRepeatsCheck.setText("Key repeats support");
 		keyRepeatsCheck.setSelection(AppSettings.enableKeyRepeat);
 
 		pointerEventsCheck = new Button(grpCanvasCapabilities, SWT.CHECK);
+		pointerEventsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		pointerEventsCheck.setText("Pointer events support");
 		pointerEventsCheck.setSelection(AppSettings.hasPointerEvents);
 
@@ -438,26 +447,32 @@ public class AppSettingsUI {
 		grpTweaks.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		ignoreFullScreenCheck = new Button(grpTweaks, SWT.CHECK);
+		ignoreFullScreenCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		ignoreFullScreenCheck.setText("Ignore Canvas.setFullScreenMode");
 		ignoreFullScreenCheck.setSelection(AppSettings.ignoreFullScreen);
 
 		j2lStyleFpsLimitCheck = new Button(grpTweaks, SWT.CHECK);
+		j2lStyleFpsLimitCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		j2lStyleFpsLimitCheck.setText("J2ME Loader style FPS limiter");
 		j2lStyleFpsLimitCheck.setSelection(AppSettings.j2lStyleFpsLimit);
 
 		motorolaSoftKeyFixCheck = new Button(grpTweaks, SWT.CHECK);
+		motorolaSoftKeyFixCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		motorolaSoftKeyFixCheck.setText("Send key events with commandAction");
 		motorolaSoftKeyFixCheck.setSelection(AppSettings.motorolaSoftKeyFix);
 
 		keyPressOnRepeatCheck = new Button(grpTweaks, SWT.CHECK);
+		keyPressOnRepeatCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		keyPressOnRepeatCheck.setText("Send keyPressed on repeats");
 		keyPressOnRepeatCheck.setSelection(AppSettings.keyPressOnRepeat);
 
 		synchronizeKeyEventsCheck = new Button(grpTweaks, SWT.CHECK);
+		synchronizeKeyEventsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		synchronizeKeyEventsCheck.setText("Synchronize key events");
 		synchronizeKeyEventsCheck.setSelection(AppSettings.synchronizeKeyEvents);
 
 		asyncFlushCheck = new Button(grpTweaks, SWT.CHECK);
+		asyncFlushCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		asyncFlushCheck.setText("Asynchronous canvas flush");
 		asyncFlushCheck.setSelection(AppSettings.asyncFlush);
 
@@ -484,26 +499,27 @@ public class AppSettingsUI {
 		grpMgLwjgl.setText("M3G LWJGL");
 
 		m3gIgnoreOverwriteCheck = new Button(grpMgLwjgl, SWT.CHECK);
-		m3gIgnoreOverwriteCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gIgnoreOverwriteCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		m3gIgnoreOverwriteCheck.setText("Ignore OVERWRITE hint");
 		m3gIgnoreOverwriteCheck.setSelection(AppSettings.m3gIgnoreOverwrite);
 
 		m3gForcePersCorrectCheck = new Button(grpMgLwjgl, SWT.CHECK);
-		m3gForcePersCorrectCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gForcePersCorrectCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		m3gForcePersCorrectCheck.setText("Force perspective correction");
 		m3gForcePersCorrectCheck.setSelection(AppSettings.m3gForcePerspectiveCorrection);
 
 		m3gDisableLightClampCheck = new Button(grpMgLwjgl, SWT.CHECK);
-		m3gDisableLightClampCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gDisableLightClampCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		m3gDisableLightClampCheck.setText("Disable light clamping");
 		m3gDisableLightClampCheck.setSelection(AppSettings.m3gDisableLightClamp);
 
 		m3gFlushImmediately = new Button(grpMgLwjgl, SWT.CHECK);
-		m3gFlushImmediately.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		m3gFlushImmediately.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		m3gFlushImmediately.setText("Flush contents immediately (slow!)");
 		m3gFlushImmediately.setSelection(AppSettings.m3gFlushImmediately);
 
 		Label lblNewLabel_17 = new Label(grpMgLwjgl, SWT.NONE);
+		lblNewLabel_17.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_17.setText("Anti-aliasing:");
 
 		m3gAACombo = new Combo(grpMgLwjgl, SWT.NONE);
@@ -514,6 +530,7 @@ public class AppSettingsUI {
 		m3gAACombo.setText(m3gAACombo.getItem(AppSettings.m3gAA));
 
 		Label lblNewLabel_18 = new Label(grpMgLwjgl, SWT.NONE);
+		lblNewLabel_18.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_18.setText("Texture filter:");
 
 		m3gTexFilterCombo = new Combo(grpMgLwjgl, SWT.NONE);
@@ -524,7 +541,7 @@ public class AppSettingsUI {
 		m3gTexFilterCombo.setText(m3gTexFilterCombo.getItem(AppSettings.m3gTexFilter));
 
 		Label lblNewLabel_19 = new Label(grpMgLwjgl, SWT.NONE);
-		lblNewLabel_19.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_19.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_19.setText("Mipmapping:");
 
 		m3gMipmapCombo = new Combo(grpMgLwjgl, SWT.NONE);
@@ -545,18 +562,22 @@ public class AppSettingsUI {
 		grpMascotcapsuleLwjgl.setText("MascotCapsule LWJGL");
 
 		mascotNo2DMixingCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotNo2DMixingCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		mascotNo2DMixingCheck.setText("No 2D mixing");
 		mascotNo2DMixingCheck.setSelection(AppSettings.mascotNo2DMixing);
 
 		mascotIgnoreBgCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotIgnoreBgCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		mascotIgnoreBgCheck.setText("Ignore background");
 		mascotIgnoreBgCheck.setSelection(AppSettings.mascotIgnoreBackground);
 
 		mascotTextureFilterCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotTextureFilterCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		mascotTextureFilterCheck.setText("Texture filter");
 		mascotTextureFilterCheck.setSelection(AppSettings.mascotTextureFilter);
 
 		mascotBackgroundFilterCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
+		mascotBackgroundFilterCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		mascotBackgroundFilterCheck.setText("Background filter");
 		mascotBackgroundFilterCheck.setSelection(AppSettings.mascotBackgroundFilter);
 
