@@ -128,18 +128,19 @@ public class AppSettingsUI {
 
 		InputStream inputStream = null;
 		try {
-			String iconPath;
-			if ((iconPath = Emulator.getEmulator().getAppProperty("MIDlet-Icon")) != null) {
-				Emulator.iconPath = iconPath;
-				inputStream = ResourceManager.getResourceAsStream(iconPath);
-			} else if ((iconPath = Emulator.getEmulator().getAppProperty("AppIcon")) != null) {
-				Emulator.iconPath = iconPath = iconPath.split(",")[0].trim();
-				inputStream = ResourceManager.getResourceAsStream(iconPath);
-			} else {
-				if ((iconPath = Emulator.getEmulator().getAppProperty("MIDlet-1")) != null) {
-					Emulator.iconPath = iconPath = iconPath.split(",")[1].trim();
-					inputStream = ResourceManager.getResourceAsStream(iconPath);
+			String iconPath = Emulator.getEmulator().getAppProperty("MIDlet-Icon");
+			if (iconPath == null) {
+				if ((iconPath = Emulator.getEmulator().getAppProperty("AppIcon")) != null) {
+					iconPath = iconPath.split(",")[0].trim();
 				}
+			}
+			if (iconPath == null) {
+				if ((iconPath = Emulator.getEmulator().getAppProperty("MIDlet-1")) != null) {
+					iconPath = iconPath.split(",")[1].trim();
+				}
+			}
+			if (iconPath != null && !iconPath.trim().isEmpty()) {
+				inputStream = ResourceManager.getResourceAsStream(iconPath);
 			}
 			if (inputStream != null) {
 				iconImage = new ImageSWT(inputStream);

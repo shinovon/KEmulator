@@ -748,18 +748,20 @@ public class Emulator implements Runnable {
 			}
 			InputStream inputStream = null;
 			try {
-				String iconPath;
-				if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-Icon")) != null) {
+				String iconPath = getEmulator().getAppProperty("MIDlet-Icon");
+				if (iconPath == null) {
+					if ((iconPath = getEmulator().getAppProperty("AppIcon")) != null) {
+						iconPath = iconPath.split(",")[0].trim();
+					}
+				}
+				if (iconPath == null) {
+					if ((iconPath = getEmulator().getAppProperty("MIDlet-1")) != null) {
+						iconPath = iconPath.split(",")[1].trim();
+					}
+				}
+				if (iconPath != null && !iconPath.trim().isEmpty()) {
 					Emulator.iconPath = iconPath;
 					inputStream = ResourceManager.getResourceAsStream(iconPath);
-				} else if ((iconPath = Emulator.emulatorimpl.getAppProperty("AppIcon")) != null) {
-					Emulator.iconPath = iconPath = iconPath.split(",")[0].trim();
-					inputStream = ResourceManager.getResourceAsStream(iconPath);
-				} else {
-					if ((iconPath = Emulator.emulatorimpl.getAppProperty("MIDlet-1")) != null) {
-						Emulator.iconPath = iconPath = iconPath.split(",")[1].trim();
-						inputStream = ResourceManager.getResourceAsStream(iconPath);
-					}
 				}
 			} catch (Exception ex3) {
 				ex3.printStackTrace();
