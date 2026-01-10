@@ -321,8 +321,8 @@ public final class Property implements IProperty, SelectionListener {
 			final String property = properties.getProperty("DevicePreset", "SonyEricssonK800");
 			this.device = property;
 			Emulator.deviceName = property;
-			this.defaultFont = properties.getProperty("DefaultFont", "Tahoma");
-			this.monospaceFont = properties.getProperty("MonospacedFont", "Consolas");
+			this.defaultFont = properties.getProperty("DefaultFont", Utils.linux ? "DejaVu Sans" : "Tahoma");
+			this.monospaceFont = properties.getProperty("MonospacedFont", Utils.linux ? "DejaVu Sans Mono" : "Consolas");
 			this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
 			this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
 			this.fontMediumSize = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
