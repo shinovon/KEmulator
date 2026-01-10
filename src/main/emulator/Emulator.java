@@ -1173,7 +1173,7 @@ public class Emulator implements Runnable {
 	public void run() {
 		if (!doja) {
 			try {
-				midletClass.newInstance();
+				Emulator.setMIDlet((MIDlet) midletClass.newInstance());
 			} catch (Throwable e) {
 				e.printStackTrace();
 				eventQueue.stop();

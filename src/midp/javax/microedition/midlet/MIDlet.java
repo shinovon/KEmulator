@@ -16,9 +16,6 @@ public abstract class MIDlet {
 
 	public MIDlet() {
 		super();
-		if (Emulator.getMIDlet() == null) {
-			Emulator.setMIDlet(this);
-		}
 	}
 
 	public int checkPermission(final String s) {
