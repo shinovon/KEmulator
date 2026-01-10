@@ -152,11 +152,8 @@ public final class Property implements IProperty, SelectionListener {
 	private Button aButton714;
 	private Button aButton719;
 	private Composite systemComp;
-	private Composite coreApiComp;
 	private Group sysChecksGroup;
 	private Button vibrationCheck;
-	private Button keyRepeatCheck;
-	private Button canvasFullscreenCheck;
 	private Button noNetworkBtn;
 	private Button aButton746;
 	private Button aButton749;
@@ -194,7 +191,6 @@ public final class Property implements IProperty, SelectionListener {
 	private Text aText641;
 	private Text aText643;
 	private Button aButton764;
-	//private Spinner inactiveTimerSpinner;
 	private Button rpcBtn;
 	private Button antiAliasBtn;
 	private Composite mediaComp;
@@ -270,32 +266,8 @@ public final class Property implements IProperty, SelectionListener {
 		return monospaceFont;
 	}
 
-	public int getFontSmallSize() {
-		return this.fontSmallSize;
-	}
-
-	public int getFontMediumSize() {
-		return this.fontMediumSize;
-	}
-
-	public int getFontLargeSize() {
-		return this.fontLargeSize;
-	}
-
 	public void setDefaultFontName(final String aString682) {
 		this.defaultFont = aString682;
-	}
-
-	public void setFontSmallSize(final int anInt664) {
-		this.fontSmallSize = anInt664;
-	}
-
-	public void getFontMediumSize(final int anInt681) {
-		this.fontMediumSize = anInt681;
-	}
-
-	public void getFontLargeSize(final int anInt687) {
-		this.fontLargeSize = anInt687;
 	}
 
 	public String getRmsFolderPath() {
@@ -336,33 +308,6 @@ public final class Property implements IProperty, SelectionListener {
 
 	public String getOldRmsPath() {
 		return getRmsFolderPath() + "legacy" + File.separator;
-	}
-
-	public void setCustomProperties() {
-//		if (this.device.equalsIgnoreCase(Emulator.deviceName)) {
-//			Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
-//			Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
-//			Devices.setProperty("KEY_S1", this.lsoft);
-//			Devices.setProperty("KEY_S2", this.rsoft);
-//			Devices.setProperty("KEY_FIRE", this.fire);
-//			Devices.setProperty("KEY_UP", this.up);
-//			Devices.setProperty("KEY_DOWN", this.down);
-//			Devices.setProperty("KEY_LEFT", this.left);
-//			Devices.setProperty("KEY_RIGHT", this.right);
-//			Devices.writeProperties();
-//		}
-	}
-
-	public void updateCustomProperties() {
-//		this.screenWidth = Devices.getProperty("SCREEN_WIDTH");
-//		this.screenHeight = Devices.getProperty("SCREEN_HEIGHT");
-//		this.lsoft = Devices.getProperty("KEY_S1");
-//		this.rsoft = Devices.getProperty("KEY_S2");
-//		this.fire = Devices.getProperty("KEY_FIRE");
-//		this.up = Devices.getProperty("KEY_UP");
-//		this.down = Devices.getProperty("KEY_DOWN");
-//		this.left = Devices.getProperty("KEY_LEFT");
-//		this.right = Devices.getProperty("KEY_RIGHT");
 	}
 
 	public void loadProperties() {
@@ -425,15 +370,11 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.networkNotAvailable = Boolean.parseBoolean(properties.getProperty("NetworkNotAvailable", "false"));
 
 			// platform
-//			Settings.patchSynchronizedPaint = Boolean.parseBoolean(properties.getProperty("PatchSynchronizedPaint", "true"));
 			Settings.pollKeyboardOnRepaint = Boolean.parseBoolean(properties.getProperty("PollKeyboardOnRepaint", "true"));
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
 			Settings.queueSleep = Boolean.parseBoolean(properties.getProperty("EventQueueSleep", "true"));
-			Settings.patchYield = Boolean.parseBoolean(properties.getProperty("PatchYield", "false"));
-			Settings.ignoreGc = Boolean.parseBoolean(properties.getProperty("IgnoreGC", "true"));
-			Settings.ignoreSleep = Boolean.parseBoolean(properties.getProperty("IgnoreThreadSleep", "false"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -622,15 +563,11 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("NetworkNotAvailable", String.valueOf(Settings.networkNotAvailable));
 
 			// platform
-//			properties.setProperty("PatchSynchronizedPaint", String.valueOf(Settings.patchSynchronizedPaint));
 			properties.setProperty("PollKeyboardOnRepaint", String.valueOf(Settings.pollKeyboardOnRepaint));
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
 			properties.setProperty("EventQueueSleep", String.valueOf(Settings.queueSleep));
-			properties.setProperty("PatchYield", String.valueOf(Settings.patchYield));
-			properties.setProperty("IgnoreGC", String.valueOf(Settings.ignoreGc));
-			properties.setProperty("IgnoreThreadSleep", String.valueOf(Settings.ignoreSleep));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -768,16 +705,6 @@ public final class Property implements IProperty, SelectionListener {
 		KeyMapping.mapDeviceKey(8, KeyMapping.method601(Property.aStringArray661[8]));
 		KeyMapping.mapDeviceKey(9, KeyMapping.method601(Property.aStringArray661[9]));
 		KeyMapping.mapDeviceKey(0, KeyMapping.method601(Property.aStringArray661[0]));
-//		Devices.setProperty("SCREEN_WIDTH", this.screenWidth);
-//		Devices.setProperty("SCREEN_HEIGHT", this.screenHeight);
-//		Devices.setProperty("KEY_S1", this.lsoft);
-//		Devices.setProperty("KEY_S2", this.rsoft);
-//		Devices.setProperty("KEY_FIRE", this.fire);
-//		Devices.setProperty("KEY_UP", this.up);
-//		Devices.setProperty("KEY_DOWN", this.down);
-//		Devices.setProperty("KEY_LEFT", this.left);
-//		Devices.setProperty("KEY_RIGHT", this.right);
-//		Devices.writeProperties();
 		KeyMapping.init();
 		if (Settings.enableKeyCache != this.aButton696.getSelection()) {
 			KeyMapping.keyCacheStack.clear();
@@ -800,11 +727,9 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.proxyUser = this.aText639.getText().trim();
 		Settings.proxyPass = this.aText641.getText();
 		Settings.proxyDomain = this.aText643.getText().trim();
-		//Emulator.inactivityTimer = this.inactiveTimerSpinner.getSelection();
 		Settings.rpc = this.rpcBtn.getSelection();
 		Settings.awtAntiAliasing = antiAliasBtn.getSelection();
 		Settings.textAntiAliasing = antiAliasTextBtn.getSelection();
-//        Settings.pollKeyboardOnRepaint = this.pollOnRepaintBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
 		Settings.soundfontPath = soundfontPathText.getText().trim();
 
@@ -822,10 +747,7 @@ public final class Property implements IProperty, SelectionListener {
 		}
 
 		Settings.searchVms = vmsCheck.getSelection();
-//        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
 		Settings.oneMidiAtTime = globalMidiCheck.getSelection();
-//		Settings.ignoreRegionRepaint = ignoreRegionRepaintCheck.getSelection();
-//		Settings.processSerialCallsOutOfQueue = serialCallsCheck.getSelection();
 
 		Settings.fpsCounter = fpsCounterCheck.getSelection();
 
@@ -849,10 +771,6 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.enableSecurity = securityCheck.getSelection();
 
 		Settings.autoUpdate = autoUpdatesBtn.getSelection() ? 2 : 1;
-
-//		try {
-//			Emulator.getEmulator().getScreen().setSize(Integer.parseInt(screenWidthText.getText()), Integer.parseInt(screenHeightText.getText()));
-//		} catch (Exception ignored) {}
 
 		this.updateProxy();
 	}
@@ -1836,16 +1754,10 @@ public final class Property implements IProperty, SelectionListener {
 		this.aButton714.setSelection(Settings.enableNewTrack);
 		(this.aButton719 = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Track method calls."));
 		this.aButton719.setSelection(Settings.enableMethodTrack);
-		//new Label(this.aGroup688, 32).setText(UILocale.uiText("OPTION_SYSTEM_INACTIVITY_TIMER", "Inactivity timer (Set 0 to disable)"));
-		//this.inactiveTimerSpinner = new Spinner(this.aGroup688, 32);
-		//inactiveTimerSpinner.setValues(0, 0, Integer.MAX_VALUE, 0, 1, 10);
-		//inactiveTimerSpinner.setSelection(Emulator.inactivityTimer);
 		(this.rpcBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_DISCORD_RICHPRESENCE", "Discord Rich Presence"));
 		this.rpcBtn.setSelection(Settings.rpc);
 		(this.antiAliasBtn = new Button(this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
-//        (this.pollOnRepaintBtn = new Button((Composite)this.sysChecksGroup, 32)).setText(UILocale.get("OPTION_SYSTEM_POLL_ON_REPAINT", "Poll keyboard on repaint"));
-//        this.pollOnRepaintBtn.setSelection(Settings.pollKeyboardOnRepaint);
 		fpsCounterCheck = new Button(sysChecksGroup, SWT.CHECK);
 		fpsCounterCheck.setText(UILocale.get("OPTION_SYSTEM_FPS_COUNT", "FPS Counter"));
 		fpsCounterCheck.setSelection(Settings.fpsCounter);
@@ -2363,11 +2275,6 @@ public final class Property implements IProperty, SelectionListener {
 		if (!(file = new File(s)).exists() || !file.isDirectory()) {
 			file.mkdirs();
 		}
-//		final String string = s + "/" + this.method355();
-//		final File file2;
-//		if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
-//			file2.mkdirs();
-//		}
 		return s + "/";
 	}
 
@@ -2397,28 +2304,6 @@ public final class Property implements IProperty, SelectionListener {
 			ti.setText(0, s);
 			ti.setChecked(false);
 		}
-        /*
-        final File file;
-        if (!(file = new File(this.method374())).exists() || !file.isDirectory()) {
-            return;
-        }
-        final File[] listFiles;
-        if ((listFiles = file.listFiles(new Class105(this))).length > this.aTable665.getItemCount()) {
-            for (int i = listFiles.length - this.aTable665.getItemCount(); i > 0; --i) {
-                new TableItem(this.aTable665, 0);
-            }
-        }
-        else {
-            while (this.aTable665.getItemCount() > listFiles.length) {
-                this.aTable665.remove(listFiles.length);
-            }
-        }
-        for (int j = 0; j < listFiles.length; ++j) {
-            final TableItem item;
-            (item = this.aTable665.getItem(j)).setText(0, listFiles[j].getName().substring(1));
-            item.setChecked(false);
-        }
-         */
 	}
 
 	private void setupNetworkComp() {
@@ -2654,50 +2539,6 @@ public final class Property implements IProperty, SelectionListener {
 
 	static Text method419(final Property class38) {
 		return class38.aText751;
-	}
-
-	static void method381(final Property class38) {
-		class38.method406();
-	}
-
-	static void method386(final Property class38) {
-		class38.method402();
-	}
-
-	static void method369(final Property class38, final int n) {
-		class38.method360(n);
-	}
-
-	static IImage method356(final Property class38) {
-		return class38.anIImage671;
-	}
-
-	static IImage method378(final Property class38) {
-		return class38.anIImage674;
-	}
-
-	static IImage method382(final Property class38) {
-		return class38.anIImage693;
-	}
-
-	static Table method367(final Property class38) {
-		return class38.aTable665;
-	}
-
-	static String method368(final Property class38) {
-		return class38.method374();
-	}
-
-	static void method389(final Property class38) {
-		class38.method428();
-	}
-
-	static Text method421(final Property class38) {
-		return class38.aText662;
-	}
-
-	static void method392(final Property class38) {
-		class38.method352();
 	}
 
 	static Combo method383(final Property class38) {

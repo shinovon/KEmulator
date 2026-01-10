@@ -746,7 +746,6 @@ public class Emulator implements Runnable {
 		if (!Devices.setPreset(Emulator.deviceName)) {
 			Devices.setPreset(Emulator.deviceName = Devices.getDefaultPreset());
 		}
-		Emulator.emulatorimpl.getProperty().setCustomProperties();
 		if (startWidth != 0) {
 			AppSettings.screenWidth = startWidth;
 		}
@@ -754,7 +753,6 @@ public class Emulator implements Runnable {
 			AppSettings.screenHeight = startHeight;
 		}
 		Devices.writeProperties();
-		Emulator.emulatorimpl.getProperty().updateCustomProperties();
 		Emulator.emulatorimpl.getProperty().resetDeviceName();
 		KeyMapping.init();
 	}

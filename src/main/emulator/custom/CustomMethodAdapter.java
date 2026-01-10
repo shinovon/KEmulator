@@ -69,7 +69,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "yield", sign);
 					return;
 				}
-				if ((Settings.patchSleep || Settings.ignoreSleep) && name.equals("sleep")) {
+				if ((AppSettings.patchSleep || AppSettings.ignoreSleep) && name.equals("sleep")) {
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "sleep", sign);
 					return;
 				}

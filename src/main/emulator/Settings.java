@@ -114,10 +114,6 @@ public final class Settings {
 	public static String lastIdeaRepoPath = ""; // where last project was created
 
   // hacks
-	public static boolean patchYield;
-	public static boolean ignoreGc = true;
-	public static boolean patchSleep;
-	public static boolean ignoreSleep;
 	public static boolean applySpeedToSleep;
 	public static boolean altLessSpeedShortcuts;
 	public static boolean hideEmulation;

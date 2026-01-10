@@ -144,7 +144,7 @@ public class Font {
 	// MIDP 3.0
 
 	public static Font createFont(InputStream fontData) throws IOException {
-		int size = Emulator.getEmulator().getProperty().getFontMediumSize();
+		int size = AppSettings.fontMediumSize;
 		IFont font = Emulator.getEmulator().loadFont(fontData, size);
 		if (font == null) {
 			return getDefaultFont();
@@ -158,7 +158,7 @@ public class Font {
 			filteredStyle &= 0xFFFFFFFB;
 		}
 		if (pixelSize <= 0) {
-			pixelSize = Emulator.getEmulator().getProperty().getFontMediumSize();
+			pixelSize = AppSettings.fontMediumSize;
 		}
 		IFont font = Emulator.getEmulator().newFont(name, pixelSize, filteredStyle);
 		return new Font(FACE_SYSTEM, style, SIZE_MEDIUM, font);
@@ -175,7 +175,7 @@ public class Font {
 			filteredStyle &= 0xFFFFFFFB;
 		}
 		if (pixelSize <= 0) {
-			pixelSize = Emulator.getEmulator().getProperty().getFontMediumSize();
+			pixelSize = AppSettings.fontMediumSize;
 		}
 		IFont font = Emulator.getEmulator().newCustomFont(face, pixelSize, filteredStyle, false);
 		return new Font(face, style, size, font);
