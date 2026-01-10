@@ -2,17 +2,17 @@ $v2.21 [2026.01.20]
 New device presets
 Updated About window
 Application settings
-Improved JSR 239 OpenGL API
 Added Nokia OTT decoder from FreeJ2ME-Plus
+Improved JSR 239 OpenGL API
 Implemented missing SkinnedMesh functions from M3G 1.1
 Reimplemented mmfplayer.dll with JNA
 Stub com.nokia.mid.ui.gestures API
 Optimized image rendering in MemoryView
-Fix Media View on Java 9+
-Fix LWJGL libraries loading on Intel Mac
-Fix M3G on macOS 11 and later
-Fix Siemens File API
-Fix AMR dumping
+Fixed Media View on Java 9+
+Fixed LWJGL libraries loading on Intel Mac
+Fixed M3G on macOS 11 and later
+Fixed Siemens File API
+Fixed AMR dumping
 
 $v2.20 [2025.08.24]
 DoJa initial support

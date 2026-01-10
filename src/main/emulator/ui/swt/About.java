@@ -23,7 +23,6 @@ import java.util.TimerTask;
 public final class About implements MouseListener, MouseMoveListener, PaintListener {
 	private Shell aboutShell;
 	private CLabel aboutText;
-	private Link websiteLink;
 	private Button okBtn;
 	private Canvas waterCanvas;
 	private WaterEffect waterEffect;
@@ -37,7 +36,6 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		super();
 		this.aboutShell = null;
 		this.aboutText = null;
-		this.websiteLink = null;
 		this.okBtn = null;
 		this.waterCanvas = null;
 	}
@@ -59,6 +57,12 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		gridData2.grabExcessHorizontalSpace = false;
 		gridData2.grabExcessVerticalSpace = false;
 		gridData2.verticalAlignment = 4;
+		final GridData gridData3;
+		(gridData3 = new GridData()).horizontalIndent = 5;
+		gridData3.horizontalAlignment = 4;
+		gridData3.grabExcessHorizontalSpace = false;
+		gridData3.grabExcessVerticalSpace = false;
+		gridData3.verticalAlignment = 4;
 		final GridLayout layout;
 		(layout = new GridLayout()).numColumns = 2;
 		layout.horizontalSpacing = 0;
@@ -80,11 +84,21 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		aboutText.setFont(EmulatorScreen.f);
 		this.aboutText.setText(Emulator.getAboutString());
 
-		(this.websiteLink = new Link(this.aboutShell, 0)).setText("<a>nnproject.cc/kem</a>");
-		this.websiteLink.setLayoutData(gridData2);
-		this.websiteLink.addSelectionListener(new SelectionAdapter() {
+		Link websiteLink = new Link(this.aboutShell, 0);
+		websiteLink.setText("<a>nnproject.cc/kem</a>");
+		websiteLink.setLayoutData(gridData2);
+		websiteLink.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Program.launch("https://nnproject.cc/kem");
+			}
+		});
+
+		Link githubLink = new Link(this.aboutShell, 0);
+		githubLink.setText("<a>github.com/shinovon/KEmulator</a>");
+		githubLink.setLayoutData(gridData3);
+		githubLink.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Program.launch("https://github.com/shinovon/KEmulator");
 			}
 		});
 
@@ -237,7 +251,7 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.verticalAlignment = 4;
-		layoutData.verticalSpan = 3;
+		layoutData.verticalSpan = 4;
 		layoutData.heightHint = 146;
 		layoutData.widthHint = 156;
 		(this.waterCanvas = new Canvas(this.aboutShell, 537133056)).setLayoutData(layoutData);
