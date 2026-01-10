@@ -907,5 +907,7 @@ public class AppSettingsUI {
 				}
 			}
 		}
+
+		AppSettings.save();
 	}
 }
