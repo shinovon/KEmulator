@@ -11,6 +11,7 @@ import java.util.*;
 
 public class AppSettings {
 
+	public static String iniSection;
 	public static String jarHash;
 
 	public static boolean softbankApi;
@@ -99,8 +100,6 @@ public class AppSettings {
 	private static final Map<String, String> appProperties = new HashMap<>();
 
 	public static void init() {
-		Property p = (Property) Emulator.getEmulator().getProperty();
-
 		devicePreset = Devices.getDefaultPreset();
 
 		screenWidth = 240;
@@ -299,12 +298,13 @@ public class AppSettings {
 		} else if (Emulator.midletJar == null) {
 			s = "Classpath";
 		} else {
-			s = getJarHash(Emulator.midletJar);
+			jarHash = getJarHash(Emulator.midletJar);
+			s = jarHash + ':' + Emulator.midletJar;
 		}
 		if (s == null) {
 			return -1;
 		}
-		jarHash = s;
+		iniSection = s;
 
 		if (reset) return 0;
 
@@ -559,7 +559,7 @@ public class AppSettings {
 
 	private static boolean loadINI(boolean save) {
 		Path midletsPath = getMidletsPath();
-		String jarSection = "[" + jarHash + "]";
+		String exactSection = '[' + iniSection + ']';
 		boolean found = false;
 		boolean notEmpty = false;
 
@@ -579,24 +579,40 @@ public class AppSettings {
 					if (line == null) break;
 					notEmpty = true;
 
+					if (!line.isEmpty() && line.charAt(0) == '[' && !found) {
+						match: {
+							if (line.equals(exactSection)) {
+								found = true;
+								break match;
+							}
+							if (uei || Emulator.midletJar == null) {
+								break match;
+							}
+							if (line.startsWith('[' + jarHash + ':') || line.endsWith(':' + Emulator.midletJar + ']')) {
+								found = true;
+								break match;
+							}
+						}
+						if (found) {
+							if (save) {
+								writer.write(exactSection);
+								writer.newLine();
+								List<String> list = new ArrayList<>(appProperties.keySet());
+								Collections.sort(list);
+								for (String key : list) {
+									writer.write(key);
+									writer.write('=');
+									writer.write(escape(appProperties.get(key)));
+									writer.newLine();
+								}
+							}
+							continue;
+						}
+					}
+
 					if (save && !found) {
 						writer.write(line);
 						writer.newLine();
-					}
-
-					if (line.equals(jarSection)) {
-						found = true;
-						if (save) {
-							List<String> list = new ArrayList<>(appProperties.keySet());
-							Collections.sort(list);
-							for (String key : list) {
-								writer.write(key);
-								writer.write('=');
-								writer.write(escape(appProperties.get(key)));
-								writer.newLine();
-							}
-						}
-						continue;
 					}
 
 					if (!found) continue;
@@ -639,7 +655,7 @@ public class AppSettings {
 			try {
 				try (BufferedWriter writer = Files.newBufferedWriter(midletsPath, StandardCharsets.UTF_8, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
 					if (notEmpty) writer.newLine();
-					writer.write(jarSection);
+					writer.write(exactSection);
 					writer.newLine();
 					List<String> list = new ArrayList<>(appProperties.keySet());
 					Collections.sort(list);

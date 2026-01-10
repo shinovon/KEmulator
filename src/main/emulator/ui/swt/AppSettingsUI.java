@@ -13,6 +13,7 @@ import emulator.custom.ResourceManager;
 import emulator.graphics2D.swt.ImageSWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -176,7 +177,17 @@ public class AppSettingsUI {
 		canvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
 				if (iconImage != null) {
-					iconImage.copyToScreen(e.gc, 0, 0, iconImage.getWidth(), iconImage.getHeight(), 0, 0, e.width, e.height);
+					GC gc = e.gc;
+					int imageWidth = iconImage.getWidth();
+					int imageHeight = iconImage.getHeight();
+					int width = canvas.getSize().x;
+					int height = canvas.getSize().y;
+					if (width < imageWidth * 2 || height < imageHeight * 2) {
+						gc.setInterpolation(SWT.HIGH);
+					} else {
+						gc.setInterpolation(SWT.NONE);
+					}
+					iconImage.copyToScreen(gc, 0, 0, imageWidth, imageHeight, 0, 0, height, height);
 				}
 			}
 		});
