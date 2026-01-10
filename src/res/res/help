@@ -1,8 +1,9 @@
-$v2.21 [2026.01.20]
+$v2.21 [2026.01.10]
 New device presets
-Updated About window
 Application settings
+MIDI soundfont changing
 Added Nokia OTT decoder from FreeJ2ME-Plus
+Updated About window
 Improved JSR 239 OpenGL API
 Implemented missing SkinnedMesh functions from M3G 1.1
 Reimplemented mmfplayer.dll with JNA
