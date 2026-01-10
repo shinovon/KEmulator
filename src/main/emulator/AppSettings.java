@@ -298,7 +298,7 @@ public class AppSettings {
 		jarSha1 = s;
 
 		if (!load(false)) {
-			return 0;
+			return uei || !Settings.showAppSettingsOnStart ? 1 : 0;
 		}
 
 		if (properties.containsKey("DevicePreset")) {
