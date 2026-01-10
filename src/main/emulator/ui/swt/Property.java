@@ -307,14 +307,26 @@ public final class Property implements IProperty, SelectionListener {
 
 	public void loadProperties() {
 		try {
-			if (!new File(Emulator.getUserPath() + "/property.txt").exists()) {
-				throw new FileNotFoundException();
-			}
-			final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + "/property.txt");
 			final Properties properties = new Properties();
-			properties.load(fileInputStream);
-			this.defaultFont = properties.getProperty("DefaultFont", Utils.linux ? "DejaVu Sans" : "Tahoma");
-			this.monospaceFont = properties.getProperty("MonospacedFont", Utils.linux ? "DejaVu Sans Mono" : "Consolas");
+			boolean hasFile = false;
+			if (new File(Emulator.getUserPath() + "/property.txt").exists()) {
+				final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + "/property.txt");
+				properties.load(fileInputStream);
+				fileInputStream.close();
+				hasFile = true;
+			}
+			if (Utils.linux) {
+				Font systemFont = Display.getDefault().getSystemFont();
+				String systemName = "DejaVu Sans";
+				if (systemFont != null && systemFont.getFontData().length > 0)
+					systemName = systemFont.getFontData()[0].getName();
+				this.defaultFont = properties.getProperty("DefaultFont", systemName);
+				this.monospaceFont = properties.getProperty("MonospacedFont", "DejaVu Sans Mono");
+			} else {
+				this.defaultFont = properties.getProperty("DefaultFont", "Tahoma");
+				this.monospaceFont = properties.getProperty("MonospacedFont", "Consolas");
+
+			}
 			this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
 			this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
 			this.fontMediumSize = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
@@ -324,25 +336,27 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("DLL") ? 0 : 1);
 
 			// keyboard mappings
-			KeyMapping.mapDeviceKey(0, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_0")));
-			KeyMapping.mapDeviceKey(1, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_1")));
-			KeyMapping.mapDeviceKey(2, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_2")));
-			KeyMapping.mapDeviceKey(3, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_3")));
-			KeyMapping.mapDeviceKey(4, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_4")));
-			KeyMapping.mapDeviceKey(5, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_5")));
-			KeyMapping.mapDeviceKey(6, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_6")));
-			KeyMapping.mapDeviceKey(7, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_7")));
-			KeyMapping.mapDeviceKey(8, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_8")));
-			KeyMapping.mapDeviceKey(9, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_9")));
-			KeyMapping.mapDeviceKey(10, KeyMapping.method601(properties.getProperty("MAP_KEY_STAR")));
-			KeyMapping.mapDeviceKey(11, KeyMapping.method601(properties.getProperty("MAP_KEY_POUND")));
-			KeyMapping.mapDeviceKey(12, KeyMapping.method601(properties.getProperty("MAP_KEY_UP")));
-			KeyMapping.mapDeviceKey(13, KeyMapping.method601(properties.getProperty("MAP_KEY_DOWN")));
-			KeyMapping.mapDeviceKey(14, KeyMapping.method601(properties.getProperty("MAP_KEY_LEFT")));
-			KeyMapping.mapDeviceKey(15, KeyMapping.method601(properties.getProperty("MAP_KEY_RIGHT")));
-			KeyMapping.mapDeviceKey(16, KeyMapping.method601(properties.getProperty("MAP_KEY_MIDDLE")));
-			KeyMapping.mapDeviceKey(17, KeyMapping.method601(properties.getProperty("MAP_KEY_LSOFT")));
-			KeyMapping.mapDeviceKey(18, KeyMapping.method601(properties.getProperty("MAP_KEY_RSOFT")));
+			if (hasFile) {
+				KeyMapping.mapDeviceKey(0, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_0")));
+				KeyMapping.mapDeviceKey(1, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_1")));
+				KeyMapping.mapDeviceKey(2, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_2")));
+				KeyMapping.mapDeviceKey(3, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_3")));
+				KeyMapping.mapDeviceKey(4, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_4")));
+				KeyMapping.mapDeviceKey(5, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_5")));
+				KeyMapping.mapDeviceKey(6, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_6")));
+				KeyMapping.mapDeviceKey(7, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_7")));
+				KeyMapping.mapDeviceKey(8, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_8")));
+				KeyMapping.mapDeviceKey(9, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_9")));
+				KeyMapping.mapDeviceKey(10, KeyMapping.method601(properties.getProperty("MAP_KEY_STAR")));
+				KeyMapping.mapDeviceKey(11, KeyMapping.method601(properties.getProperty("MAP_KEY_POUND")));
+				KeyMapping.mapDeviceKey(12, KeyMapping.method601(properties.getProperty("MAP_KEY_UP")));
+				KeyMapping.mapDeviceKey(13, KeyMapping.method601(properties.getProperty("MAP_KEY_DOWN")));
+				KeyMapping.mapDeviceKey(14, KeyMapping.method601(properties.getProperty("MAP_KEY_LEFT")));
+				KeyMapping.mapDeviceKey(15, KeyMapping.method601(properties.getProperty("MAP_KEY_RIGHT")));
+				KeyMapping.mapDeviceKey(16, KeyMapping.method601(properties.getProperty("MAP_KEY_MIDDLE")));
+				KeyMapping.mapDeviceKey(17, KeyMapping.method601(properties.getProperty("MAP_KEY_LSOFT")));
+				KeyMapping.mapDeviceKey(18, KeyMapping.method601(properties.getProperty("MAP_KEY_RSOFT")));
+			}
 			Settings.enableKeyCache = Boolean.parseBoolean(properties.getProperty("EnableKeyCache", "false"));
 			Settings.canvasKeyboard = Boolean.parseBoolean(properties.getProperty("CanvasKeyboardMode", "true"));
 			Settings.recordKeys = Boolean.parseBoolean(properties.getProperty("RecordKeys", "false"));
