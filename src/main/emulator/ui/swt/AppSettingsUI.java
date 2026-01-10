@@ -300,7 +300,7 @@ public class AppSettingsUI {
 		btnNewButton_2.setText("Swap");
 
 		fpsLabel = new Label(grpDevice, SWT.NONE);
-		fpsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		fpsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		fpsLabel.setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((AppSettings.frameRate > 120) ? "\u221e" : String.valueOf(AppSettings.frameRate)));
 
 		fpsScale = new Scale(grpDevice, SWT.NONE);
@@ -311,7 +311,7 @@ public class AppSettingsUI {
 				fpsLabel.setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((AppSettings.frameRate > 120) ? "\u221e" : String.valueOf(AppSettings.frameRate)));
 			}
 		});
-		fpsScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
+		fpsScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		fpsScale.setIncrement(1);
 		fpsScale.setPageIncrement(5);
 		fpsScale.setMaximum(121);
