@@ -157,6 +157,7 @@ public class AppSettings {
 	public static int load() {
 		Map<String, String> properties = appProperties = new HashMap<>();
 
+		boolean screenDetected = true;
 		detectScreen: {
 			IEmulatorFrontend emulator = Emulator.getEmulator();
 			try {
@@ -197,37 +198,65 @@ public class AppSettings {
 				if (jar.contains("128x128")) {
 					screenWidth = 128;
 					screenHeight = 128;
-				} else if (jar.contains("130x130")) {
+					break detectScreen;
+				}
+				if (jar.contains("128x160")) {
+					screenWidth = 128;
+					screenHeight = 160;
+					break detectScreen;
+				}
+				if (jar.contains("130x130")) {
 					screenWidth = 130;
 					screenHeight = 130;
-				} else if (jar.contains("176x208")) {
+					break detectScreen;
+				}
+				if (jar.contains("176x208")) {
 					screenWidth = 176;
 					screenHeight = 208;
-				} else if (jar.contains("176x220")) {
+					break detectScreen;
+				}
+				if (jar.contains("176x220")) {
 					screenWidth = 176;
 					screenHeight = 220;
-				} else if (jar.contains("240x320")) {
+					break detectScreen;
+				}
+				if (jar.contains("240x320")) {
 					screenWidth = 240;
 					screenHeight = 320;
-				} else if (jar.contains("320x240")) {
+					break detectScreen;
+				}
+				if (jar.contains("320x240")) {
 					screenWidth = 320;
 					screenHeight = 240;
-				} else if (jar.contains("240x400")) {
+					break detectScreen;
+				}
+				if (jar.contains("240x400")) {
 					screenWidth = 240;
 					screenHeight = 400;
-				} else if (jar.contains("360x640")) {
+					break detectScreen;
+				}
+				if (jar.contains("360x640")) {
 					screenWidth = 360;
 					screenHeight = 640;
-				} else if (jar.contains("640x360")) {
+					break detectScreen;
+				}
+				if (jar.contains("640x360")) {
 					screenWidth = 640;
 					screenHeight = 360;
+					break detectScreen;
 				}
 			}
+			screenDetected = false;
+		}
+		if (screenDetected) {
+			properties.put("ScreenWidth", String.valueOf(screenWidth));
+			properties.put("ScreenHeight", String.valueOf(screenHeight));
 		}
 
 		if (Emulator.doja) {
 			fileEncoding = "Shift_JIS";
 		} else if (AppSettings.softbankApi) {
+			// TODO
 			devicePreset = "400x240 (SoftBank - full screen)";
 		}
 		
@@ -364,10 +393,11 @@ public class AppSettings {
 
 	private static boolean load(boolean save) {
 		Path midletsPath = getMidletsPath();
-
 		String jarSection = "[" + jarSha1 + "]";
-
 		boolean found = false;
+
+		if (!save && Files.notExists(midletsPath)) return false;
+
 		try {
 			BufferedWriter writer = null;
 			Path tempPath = null;
@@ -392,8 +422,7 @@ public class AppSettings {
 							for (String key : appProperties.keySet()) {
 								writer.write(key);
 								writer.write('=');
-								String value = appProperties.get(key);
-								writer.write(value);
+								writer.write(escape(appProperties.get(key)));
 								writer.newLine();
 							}
 						}
@@ -422,16 +451,12 @@ public class AppSettings {
 						continue;
 					}
 
-					String key = line.substring(0, sepIdx);
-					String value = line.substring(sepIdx + 1);
-
-					appProperties.put(key, value);
+					appProperties.put(line.substring(0, sepIdx), unescape(line.substring(sepIdx + 1)));
 				}
 			} finally {
 				if (writer != null) {
 					writer.close();
-					Files.deleteIfExists(midletsPath);
-					Files.move(tempPath, midletsPath);
+					Files.move(tempPath, midletsPath, StandardCopyOption.REPLACE_EXISTING);
 				}
 			}
 		} catch (Exception e) {
@@ -445,8 +470,7 @@ public class AppSettings {
 					for (String key : appProperties.keySet()) {
 						writer.write(key);
 						writer.write('=');
-						String value = appProperties.get(key);
-						writer.write(value);
+						writer.write(escape(appProperties.get(key)));
 						writer.newLine();
 					}
 				}
@@ -457,6 +481,44 @@ public class AppSettings {
 			return false;
 		}
 		return found;
+	}
+
+	private static String escape(String s) {
+		if (s == null) return "";
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			switch (c) {
+			case '\\':
+				sb.append("\\\\");
+				break;
+			case '\n':
+				sb.append("\\n");
+				break;
+			case '\r':
+				sb.append("\\r");
+				break;
+			case '\t':
+				sb.append("\\t");
+				break;
+			default:
+				sb.append(c);
+				break;
+			}
+		}
+		return sb.toString();
+	}
+
+	private static String unescape(String s) {
+		if (s == null) return "";
+		return s.replace("\\n", "\n")
+				.replace("\\r", "\r")
+				.replace("\\t", "\t")
+				.replace("\\\\", "\\");
+	}
+
+	private static Path getMidletsPath() {
+		return Paths.get(Emulator.getUserPath(), "midlets.ini");
 	}
 
 	private static String getJarSHA1(String file) {
@@ -475,9 +537,5 @@ public class AppSettings {
 		} catch (Exception e) {
 			return null;
 		}
-	}
-
-	private static Path getMidletsPath() {
-		return Paths.get(Emulator.getUserPath(), "midlets.ini");
 	}
 }

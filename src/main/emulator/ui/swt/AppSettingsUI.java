@@ -8,9 +8,12 @@ import java.util.Enumeration;
 import java.util.SortedMap;
 
 import emulator.*;
+import emulator.custom.CustomMethod;
 import emulator.custom.ResourceManager;
 import emulator.graphics2D.swt.ImageSWT;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.layout.FillLayout;
@@ -23,18 +26,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Canvas;
-
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.PaintEvent;
 
 public class AppSettingsUI {
 	private Text screenWidthText;
@@ -56,10 +52,13 @@ public class AppSettingsUI {
 	private Label fpsLabel;
 	private ImageSWT iconImage;
 
+	private int action;
+
 	public AppSettingsUI() {
 	}
 
 	public void open(Display display) {
+		action = 0;
 		if (shell == null || shell.isDisposed()) {
 			createContents(display);
 		}
@@ -78,9 +77,18 @@ public class AppSettingsUI {
 	protected void createContents(Display display) {
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.RESIZE);
 		shell.setLayout(new GridLayout(1, false));
+		shell.addShellListener(new ShellAdapter() {
+			public void shellClosed(ShellEvent e) {
+				if (action == 0) {
+					CustomMethod.close();
+					System.exit(0);
+				}
+			}
+		});
 
 		shell.setText("Setup");
 		shell.setSize(389, 427);
+		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 
 		Composite scrolledComposite = new Composite(shell, SWT.NONE);
 		scrolledComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -119,10 +127,10 @@ public class AppSettingsUI {
 					inputStream = ResourceManager.getResourceAsStream(iconPath);
 				}
 			}
+			if (inputStream != null) {
+				iconImage = new ImageSWT(inputStream);
+			}
 		} catch (Exception e) {}
-		if (inputStream != null) {
-			iconImage = new ImageSWT(inputStream);
-		}
 
 		Canvas canvas = new Canvas(composite_2, SWT.NONE);
 		canvas.addPaintListener(new PaintListener() {
@@ -515,6 +523,7 @@ public class AppSettingsUI {
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
+				action = 1;
 				apply();
 				shell.close();
 			}
@@ -526,6 +535,7 @@ public class AppSettingsUI {
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
+				action = 2;
 				AppSettings.init();
 				AppSettings.clear();
 				shell.close();
