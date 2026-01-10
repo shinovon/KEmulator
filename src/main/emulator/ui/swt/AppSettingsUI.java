@@ -199,7 +199,7 @@ public class AppSettingsUI {
 		composite_5.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		Composite grpDevice = new Composite(composite_5, SWT.NONE);
-		grpDevice.setLayout(new GridLayout(4, false));
+		grpDevice.setLayout(new GridLayout(2, false));
 
 		Label lblNewLabel_3 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_3.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -212,7 +212,7 @@ public class AppSettingsUI {
 				applyPreset(deviceCombo.getText().trim());
 			}
 		});
-		deviceCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		deviceCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		{
 			final Enumeration method620 = Devices.method620();
 			while (method620.hasMoreElements()) {
@@ -229,15 +229,22 @@ public class AppSettingsUI {
 		lblNewLabel_7.setText("Platform:");
 
 		platformText = new Text(grpDevice, SWT.BORDER);
-		platformText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		platformText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		platformText.setText(AppSettings.microeditionPlatform);
 
 		Label lblNewLabel_8 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_8.setText("Encoding:");
-
-		encodingCombo = new Combo(grpDevice, SWT.NONE);
-		encodingCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		
+		Composite composite_10 = new Composite(grpDevice, SWT.NONE);
+		GridLayout gl_composite_10 = new GridLayout(3, false);
+		gl_composite_10.marginWidth = 0;
+		gl_composite_10.marginHeight = 0;
+		composite_10.setLayout(gl_composite_10);
+		composite_10.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		
+		encodingCombo = new Combo(composite_10, SWT.NONE);
+		encodingCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		{
 			final SortedMap<String, Charset> availableCharsets = Charset.availableCharsets();
 			final ArrayList<Comparable> list = new ArrayList(availableCharsets.keySet());
@@ -259,12 +266,12 @@ public class AppSettingsUI {
 			AppSettings.fileEncoding = s;
 			encodingCombo.setText(s);
 		}
-
-		Label lblNewLabel_9 = new Label(grpDevice, SWT.NONE);
+				
+		Label lblNewLabel_9 = new Label(composite_10, SWT.NONE);
 		lblNewLabel_9.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_9.setText("Locale:");
-
-		localeText = new Text(grpDevice, SWT.BORDER);
+		
+		localeText = new Text(composite_10, SWT.BORDER);
 		localeText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		localeText.setText(AppSettings.locale);
 
@@ -273,7 +280,7 @@ public class AppSettingsUI {
 		lblNewLabel_4.setText("Screen size:");
 
 		Composite composite_4 = new Composite(grpDevice, SWT.NONE);
-		composite_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		composite_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		GridLayout gl_composite_4 = new GridLayout(3, false);
 		gl_composite_4.marginWidth = 0;
 		gl_composite_4.marginHeight = 0;
@@ -311,7 +318,7 @@ public class AppSettingsUI {
 				fpsLabel.setText(UILocale.get("OPTION_CUSTOM_MAX_FPS", "Max FPS:") + " " + ((AppSettings.frameRate > 120) ? "\u221e" : String.valueOf(AppSettings.frameRate)));
 			}
 		});
-		fpsScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		fpsScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		fpsScale.setIncrement(1);
 		fpsScale.setPageIncrement(5);
 		fpsScale.setMaximum(121);
