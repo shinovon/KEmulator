@@ -681,7 +681,7 @@ public class Emulator implements Runnable {
 				AppSettings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 			} catch (Exception ignored) {}
 
-			if (AppSettings.load() == 0) {
+			if (AppSettings.load(false) == 0) {
 				Emulator.emulatorimpl.openAppSettings(true);
 			}
 			Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);

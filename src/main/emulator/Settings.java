@@ -59,7 +59,6 @@ public final class Settings {
 	public static ResizeMethod resizeMode = ResizeMethod.Fit;
 
 	//m3g
-	public static boolean m3gThread = true;
 	public static int m3gContextMode; // 0 - auto, 1 - glcanvas, 2 - lwjglx canvas, 3 - glfw window
 
 	public static boolean reopenMidiDevice = true;

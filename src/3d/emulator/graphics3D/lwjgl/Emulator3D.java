@@ -168,7 +168,7 @@ public final class Emulator3D implements IGraphics3D {
 
 		start();
 
-		if (!threadBound || !Settings.m3gThread) {
+		if (!threadBound || !AppSettings.m3gThread) {
 			threadBound = true;
 			sync(() -> {
 				try {
@@ -252,7 +252,7 @@ public final class Emulator3D implements IGraphics3D {
 			});
 		}
 
-		if (!Settings.m3gThread) {
+		if (!AppSettings.m3gThread) {
 			releaseContext();
 		}
 
@@ -1329,7 +1329,7 @@ public final class Emulator3D implements IGraphics3D {
 
 	private void dispose() {
 		exiting = true;
-		if (initialized && Settings.m3gThread) {
+		if (initialized && AppSettings.m3gThread) {
 			sync(() -> {
 				releaseTextures();
 				releaseContext();
@@ -1454,7 +1454,7 @@ public final class Emulator3D implements IGraphics3D {
 	// m3g thread
 
 	public void sync(Runnable r) throws M3GException {
-		if (Thread.currentThread() == executorThread || !Settings.m3gThread) {
+		if (Thread.currentThread() == executorThread || !AppSettings.m3gThread) {
 			try {
 				r.run();
 			} catch (RuntimeException e) {
@@ -1479,7 +1479,7 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public void async(Runnable r) {
-		if (Thread.currentThread() == executorThread || !Settings.m3gThread) {
+		if (Thread.currentThread() == executorThread || !AppSettings.m3gThread) {
 			r.run();
 			return;
 		}

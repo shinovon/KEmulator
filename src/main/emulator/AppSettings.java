@@ -73,6 +73,7 @@ public class AppSettings {
 	public static boolean m3gForcePerspectiveCorrection;
 	public static boolean m3gDisableLightClamp;
 	public static boolean m3gFlushImmediately;
+	public static boolean m3gThread;
 
 	public static int m3gAA;
 	public static int m3gTexFilter;
@@ -95,17 +96,13 @@ public class AppSettings {
 
 	public static final Map<String, String> systemProperties = new HashMap<String, String>();
 
-	private static Map<String, String> appProperties = new HashMap<>();
+	private static final Map<String, String> appProperties = new HashMap<>();
 
 	public static void init() {
-		// copy values from Settings
-
 		Property p = (Property) Emulator.getEmulator().getProperty();
 
 		devicePreset = Devices.getDefaultPreset();
-		System.out.println(devicePreset);
 
-		// TODO
 		screenWidth = 240;
 		screenHeight = 320;
 
@@ -149,6 +146,8 @@ public class AppSettings {
 		m3gForcePerspectiveCorrection = false;
 		m3gDisableLightClamp = false;
 		m3gFlushImmediately = false;
+		m3gThread = true;
+
 		m3gAA = APP_CONTROLLED;
 		m3gTexFilter = APP_CONTROLLED;
 		m3gMipmapping = APP_CONTROLLED;
@@ -163,7 +162,7 @@ public class AppSettings {
 		appProperties.clear();
 	}
 
-	public static int load() {
+	public static int load(boolean reset) {
 		Map<String, String> properties = appProperties;
 
 		IEmulatorFrontend emulator = Emulator.getEmulator();
@@ -272,6 +271,7 @@ public class AppSettings {
 		} else if (AppSettings.softbankApi) {
 			// TODO
 			devicePreset = "400x240 (SoftBank - full screen)";
+			m3gThread = true;
 		}
 
 		String midletName = emulator.getAppProperty("MIDlet-Name");
@@ -306,7 +306,9 @@ public class AppSettings {
 		}
 		jarHash = s;
 
-		if (!load(false)) {
+		if (reset) return 0;
+
+		if (!loadINI(false)) {
 			return uei || !Settings.showAppSettingsOnStart ? 1 : 0;
 		}
 
@@ -436,6 +438,10 @@ public class AppSettings {
 			m3gFlushImmediately = Boolean.parseBoolean(properties.get("M3GFlushImmediately"));
 		}
 
+		if (properties.containsKey("M3GThread")) {
+			m3gThread = Boolean.parseBoolean(properties.get("M3GThread"));
+		}
+
 		if (properties.containsKey("M3GAA")) {
 			m3gAA = Integer.parseInt(properties.get("M3GAA"));
 		}
@@ -522,11 +528,13 @@ public class AppSettings {
 		AppSettings.set("KeyPressOnRepeat", keyPressOnRepeat);
 		AppSettings.set("SynchronizeKeyEvents", synchronizeKeyEvents);
 		AppSettings.set("AsyncFlush", asyncFlush);
+		AppSettings.set("StartAppOnResume", startAppOnResume);
 
 		AppSettings.set("M3GIgnoreOverwrite", m3gIgnoreOverwrite);
 		AppSettings.set("M3GForcePerspectiveCorrection", m3gForcePerspectiveCorrection);
 		AppSettings.set("M3GDisableLightClamp", m3gDisableLightClamp);
 		AppSettings.set("M3GFlushImmediately", m3gFlushImmediately);
+		AppSettings.set("M3GThread", m3gThread);
 
 		AppSettings.set("M3GAA", AppSettings.m3gAA);
 		AppSettings.set("M3GTexFilter", AppSettings.m3gTexFilter);
@@ -546,10 +554,10 @@ public class AppSettings {
 			AppSettings.set("SystemProperties", sb.toString());
 		}
 
-		load(true);
+		loadINI(true);
 	}
 
-	private static boolean load(boolean save) {
+	private static boolean loadINI(boolean save) {
 		Path midletsPath = getMidletsPath();
 		String jarSection = "[" + jarHash + "]";
 		boolean found = false;

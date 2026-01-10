@@ -78,6 +78,8 @@ public class AppSettingsUI {
 	private Button m3gIgnoreOverwriteCheck;
 	private Button m3gForcePersCorrectCheck;
 	private Button m3gDisableLightClampCheck;
+	private Button startAppOnResumeCheck;
+	private Button m3gThreadCheck;
 
 	public AppSettingsUI() {
 	}
@@ -168,7 +170,7 @@ public class AppSettingsUI {
 			if (inputStream != null) {
 				iconImage = new ImageSWT(inputStream);
 			}
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 
 		Canvas canvas = new Canvas(composite_2, SWT.NONE);
 		canvas.addPaintListener(new PaintListener() {
@@ -328,7 +330,7 @@ public class AppSettingsUI {
 		grpKeyMapping.setLayout(new GridLayout(4, false));
 
 		Label lblNewLabel_10 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_10.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_10.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_10.setText("Left soft key:");
 
 		leftSoftText = new Text(grpKeyMapping, SWT.BORDER);
@@ -336,7 +338,7 @@ public class AppSettingsUI {
 		leftSoftText.setText(Integer.toString(AppSettings.leftSoftKey));
 
 		Label lblNewLabel_11 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_11.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_11.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_11.setText("Right soft key:");
 
 		rightSoftText = new Text(grpKeyMapping, SWT.BORDER);
@@ -344,7 +346,7 @@ public class AppSettingsUI {
 		rightSoftText.setText(Integer.toString(AppSettings.rightSoftKey));
 
 		Label lblNewLabel_12 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_12.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_12.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_12.setText("Fire/Middle:");
 
 		fireText = new Text(grpKeyMapping, SWT.BORDER);
@@ -363,7 +365,7 @@ public class AppSettingsUI {
 		downText.setText(Integer.toString(AppSettings.downKey));
 		
 		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_13.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_13.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_13.setText("Up:");
 
 		upText = new Text(grpKeyMapping, SWT.BORDER);
@@ -371,7 +373,7 @@ public class AppSettingsUI {
 		upText.setText(Integer.toString(AppSettings.upKey));
 
 		Label lblNewLabel_16 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_16.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_16.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_16.setText("Right:");
 
 		rightText = new Text(grpKeyMapping, SWT.BORDER);
@@ -379,7 +381,7 @@ public class AppSettingsUI {
 		rightText.setText(Integer.toString(AppSettings.rightKey));
 		
 		Label lblNewLabel_14 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_14.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel_14.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_14.setText("Left:");
 
 		leftText = new Text(grpKeyMapping, SWT.BORDER);
@@ -451,32 +453,43 @@ public class AppSettingsUI {
 		ignoreFullScreenCheck = new Button(grpTweaks, SWT.CHECK);
 		ignoreFullScreenCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		ignoreFullScreenCheck.setText("Ignore Canvas.setFullScreenMode");
+		ignoreFullScreenCheck.setToolTipText("Forces full-screen mode");
 		ignoreFullScreenCheck.setSelection(AppSettings.ignoreFullScreen);
 
 		j2lStyleFpsLimitCheck = new Button(grpTweaks, SWT.CHECK);
 		j2lStyleFpsLimitCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		j2lStyleFpsLimitCheck.setText("J2ME Loader style FPS limiter");
+		j2lStyleFpsLimitCheck.setToolTipText("Compatibility tweak for chinese version of Castlevania");
 		j2lStyleFpsLimitCheck.setSelection(AppSettings.j2lStyleFpsLimit);
 
 		motorolaSoftKeyFixCheck = new Button(grpTweaks, SWT.CHECK);
 		motorolaSoftKeyFixCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		motorolaSoftKeyFixCheck.setText("Send key events with commandAction");
+		motorolaSoftKeyFixCheck.setToolTipText("Compatibility tweak for certain Motorola Triplets games");
 		motorolaSoftKeyFixCheck.setSelection(AppSettings.motorolaSoftKeyFix);
 
 		keyPressOnRepeatCheck = new Button(grpTweaks, SWT.CHECK);
 		keyPressOnRepeatCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		keyPressOnRepeatCheck.setText("Send keyPressed on repeats");
+		keyPressOnRepeatCheck.setToolTipText("Compatibility tweak for The Elder Scrolls: Oblivion");
 		keyPressOnRepeatCheck.setSelection(AppSettings.keyPressOnRepeat);
 
 		synchronizeKeyEventsCheck = new Button(grpTweaks, SWT.CHECK);
 		synchronizeKeyEventsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		synchronizeKeyEventsCheck.setText("Synchronize key events");
+		synchronizeKeyEventsCheck.setToolTipText("Compatibility option");
 		synchronizeKeyEventsCheck.setSelection(AppSettings.synchronizeKeyEvents);
 
 		asyncFlushCheck = new Button(grpTweaks, SWT.CHECK);
 		asyncFlushCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		asyncFlushCheck.setText("Asynchronous canvas flush");
+		asyncFlushCheck.setToolTipText("If disabled, window refresh delay is passed to app. Restart after changing this property.");
 		asyncFlushCheck.setSelection(AppSettings.asyncFlush);
+		
+		startAppOnResumeCheck = new Button(grpTweaks, SWT.CHECK);
+		startAppOnResumeCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		startAppOnResumeCheck.setText("Send startApp on resume");
+		startAppOnResumeCheck.setSelection(AppSettings.startAppOnResume);
 
 		scrolledComposite_2.setContent(composite_9);
 		scrolledComposite_2.setMinSize(composite_9.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -518,7 +531,14 @@ public class AppSettingsUI {
 		m3gFlushImmediately = new Button(grpMgLwjgl, SWT.CHECK);
 		m3gFlushImmediately.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		m3gFlushImmediately.setText("Flush contents immediately (slow!)");
+		m3gFlushImmediately.setToolTipText("Fixes background in Angry Birds Seasons");
 		m3gFlushImmediately.setSelection(AppSettings.m3gFlushImmediately);
+
+		m3gThreadCheck = new Button(grpMgLwjgl, SWT.CHECK);
+		m3gThreadCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		m3gThreadCheck.setText("Single threaded M3G");
+		m3gThreadCheck.setToolTipText("Fixes some games, but less performance. Restart after changing this property.");
+		m3gThreadCheck.setSelection(AppSettings.m3gThread);
 
 		Label lblNewLabel_17 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_17.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -619,6 +639,7 @@ public class AppSettingsUI {
 			public void widgetSelected(SelectionEvent arg0) {
 				action = 2;
 				AppSettings.init();
+				AppSettings.load(true);
 				AppSettings.clear();
 				shell.close();
 			}
@@ -766,6 +787,7 @@ public class AppSettingsUI {
 			AppSettings.keyPressOnRepeat = keyPressOnRepeatCheck.getSelection();
 			AppSettings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
 			AppSettings.asyncFlush = asyncFlushCheck.getSelection();
+			AppSettings.startAppOnResume = startAppOnResumeCheck.getSelection();
 		}
 
 		// 3d tab

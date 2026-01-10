@@ -207,7 +207,6 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite keyMapControllerComp;
 	private Composite keyMapTabComp;
 
-	private Composite m3gComp;
 	private Button vmsCheck;
 	private Button globalMidiCheck;
 	private Button fpsCounterCheck;
@@ -222,7 +221,6 @@ public final class Property implements IProperty, SelectionListener {
 	private Composite securityContent;
 	private Tree rmsTree;
 	private Button autoUpdatesBtn;
-	private Button m3gThreadCheck;
 	private Combo ottCombo;
 	private Text soundfontPathText;
 	private Button vlcCheck;
@@ -516,11 +514,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.alwaysOnTop = Boolean.parseBoolean(properties.getProperty("AlwaysOnTop", "false"));
 
 			// m3g
-			Settings.m3gThread = Boolean.parseBoolean(properties.getProperty("M3GThread", "true"));
-
 			Settings.m3gContextMode = Integer.parseInt(properties.getProperty("M3GContextMode", "0"));
-
-			// mascot
 
 			// media
 			Settings.vlcDir = properties.getProperty("VlcDir", "");
@@ -715,8 +709,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("AlwaysOnTop", String.valueOf(Settings.alwaysOnTop));
 
 			// m3g
-			properties.setProperty("M3GThread", String.valueOf(Settings.m3gThread));
-
 			properties.setProperty("M3GContextMode", String.valueOf(Settings.m3gContextMode));
 
 			// media
@@ -828,8 +820,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.updateBranch = updateBranch;
 			Updater.state = Updater.STATE_INITIAL;
 		}
-
-		Settings.m3gThread = m3gThreadCheck.getSelection();
 
 		Settings.searchVms = vmsCheck.getSelection();
 //        Settings.reopenMidiDevice = reopenMidiCheck.getSelection();
@@ -1007,7 +997,6 @@ public final class Property implements IProperty, SelectionListener {
 		this.setupRecordsComp();
 		this.setupNetworkComp();
 		this.setupMediaComp();
-		this.setupM3GComp();
 		setupSecurityComp();
 		final CTabItem keymapTab;
 		(keymapTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
@@ -1030,9 +1019,6 @@ public final class Property implements IProperty, SelectionListener {
 		final CTabItem mediaTab;
 		(mediaTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
 		mediaTab.setControl(this.mediaComp);
-		final CTabItem m3gTab;
-		(m3gTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_M3G", "M3G"));
-		m3gTab.setControl(this.m3gComp);
 		final CTabItem securityTab;
 		(securityTab = new CTabItem(this.tabFolder, 0)).setText(UILocale.get("OPTION_TAB_SECURITY", "Security"));
 		securityTab.setControl(this.securityComp);
@@ -1758,41 +1744,6 @@ public final class Property implements IProperty, SelectionListener {
 		};
 		ottCombo.setItems(items);
 		ottCombo.setText(items[Settings.ottDecoder]);
-	}
-
-	private void setupM3GComp() {
-		this.m3gComp = new Composite(this.tabFolder, 0);
-		m3gComp.setLayout(new GridLayout());
-		this.initM3GComp();
-	}
-
-	private void initM3GComp() {
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		layout.marginWidth = 5;
-		/*m3gComp.setLayout(layout);*/
-
-		final GridData groupData = new GridData();
-		groupData.horizontalAlignment = 4;
-		groupData.grabExcessHorizontalSpace = true;
-		groupData.grabExcessVerticalSpace = true;
-		groupData.verticalAlignment = 1;
-
-		Group lwjglGroup = new Group(m3gComp, 0);
-		lwjglGroup.setText(UILocale.get("OPTION_M3G_LWJGL_SETTINGS", "LWJGL Settings"));
-		lwjglGroup.setLayout(layout);
-		lwjglGroup.setLayoutData(groupData);
-
-		final GridData labelGridData = new GridData();
-		labelGridData.horizontalAlignment = SWT.FILL;
-		labelGridData.grabExcessHorizontalSpace = true;
-		labelGridData.horizontalSpan = 2;
-
-		m3gThreadCheck = new Button(lwjglGroup, SWT.CHECK);
-		m3gThreadCheck.setText(UILocale.get("OPTION_M3G_THREAD", "Single threaded M3G"));
-		m3gThreadCheck.setLayoutData(labelGridData);
-		m3gThreadCheck.setSelection(Settings.m3gThread);
-		m3gThreadCheck.setToolTipText("Fixes some games, but less performance. Restart after changing this property.");
 	}
 	
 	private void setupSecurityComp() {
