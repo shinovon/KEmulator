@@ -14,9 +14,9 @@ final class ResourceConnectionImpl implements InputConnection {
 	ResourceConnectionImpl(final String s) {
 		Emulator.getEmulator().getLogStream().println("Resource opened: " + s);
 		if (s.startsWith("resource://")) {
-			this.url = s.substring("resource://".length());
+			this.url = s.replace("\\", "/").substring("resource://".length());
 		} else {
-			this.url = s.substring("resource:".length());
+			this.url = s.replace("\\", "/").substring("resource:".length());
 		}
 	}
 

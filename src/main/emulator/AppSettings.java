@@ -291,6 +291,8 @@ public class AppSettings {
 		String s;
 		if (AppSettings.uei) {
 			s = "UEI";
+		} else if (!Settings.showAppSettingsOnStart) {
+			s = "All";
 		} else if (Emulator.midletJar == null) {
 			s = "Classpath";
 		} else {
