@@ -41,6 +41,7 @@ public final class Settings {
 	public static int interpolation;
 	public static boolean altLessSpeedShortcuts;
 	public static boolean showAppSettingsOnStart = true;
+	public static boolean globalSettings = false;
 	public static boolean fpsCounter = true;
 	public static ResizeMethod resizeMode = ResizeMethod.Fit;
 	public static boolean enableVibration;
