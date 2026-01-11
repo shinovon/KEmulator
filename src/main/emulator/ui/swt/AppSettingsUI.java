@@ -681,6 +681,15 @@ public class AppSettingsUI {
 		if (p.exists("ENCODING")) {
 			encodingCombo.setText(p.getString("ENCODING"));
 		}
+		if (p.exists("FONT_SMALL_SIZE")) {
+			smallSizeSpinner.setSelection(Integer.parseInt(p.getString("FONT_SMALL_SIZE")));
+		}
+		if (p.exists("FONT_MEDIUM_SIZE")) {
+			mediumSizeSpinner.setSelection(Integer.parseInt(p.getString("FONT_MEDIUM_SIZE")));
+		}
+		if (p.exists("FONT_LARGE_SIZE")) {
+			largeSizeSpinner.setSelection(Integer.parseInt(p.getString("FONT_LARGE_SIZE")));
+		}
 		leftSoftText.setText(p.getString("KEY_S1"));
 		rightSoftText.setText(p.getString("KEY_S2"));
 		fireText.setText(p.getString("KEY_FIRE"));
@@ -703,7 +712,6 @@ public class AppSettingsUI {
 			String device = deviceCombo.getText().trim();
 			if (!device.equals(AppSettings.devicePreset)) {
 				AppSettings.devicePreset = device;
-				// TODO
 			}
 
 			// platform

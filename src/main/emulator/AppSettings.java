@@ -101,17 +101,19 @@ public class AppSettings {
 	public static final Map<String, String> systemProperties = new HashMap<>();
 
 	public static void init() {
-		applyPreset(devicePreset = Devices.getDefaultPreset(), true);
-//		screenWidth = 240;
-//		screenHeight = 320;
-//
-//		leftSoftKey = -6;
-//		rightSoftKey = -7;
-//		fireKey = -5;
-//		upKey = -1;
-//		downKey = -2;
-//		leftKey = -3;
-//		rightKey = -4;
+		if (!applyPreset(devicePreset = Devices.getDefaultPreset(), true)) {
+			// fallback in case user deletes preset
+			screenWidth = 240;
+			screenHeight = 320;
+
+			leftSoftKey = -6;
+			rightSoftKey = -7;
+			fireKey = -5;
+			upKey = -1;
+			downKey = -2;
+			leftKey = -3;
+			rightKey = -4;
+		}
 
 		fontSmallSize = 12;
 		fontMediumSize = 14;
@@ -274,7 +276,7 @@ public class AppSettings {
 			if (screenDetected) {
 				applyPreset("Sharp", false);
 			} else {
-				applyPreset(devicePreset = "120x160 (Sharp/DoCoMo - full screen)", !screenDetected);
+				applyPreset(devicePreset = "120x160 (Sharp/DoCoMo - full screen)", true);
 			}
 			fileEncoding = "Shift_JIS";
 			m3gThread = true;
@@ -563,6 +565,9 @@ public class AppSettings {
 	}
 
 	public static boolean applyPreset(String s, boolean screen) {
+		if (s == null) {
+			return false;
+		}
 		DevicePlatform p = Devices.getPlatform(s);
 		if (p == null) {
 			return false;
