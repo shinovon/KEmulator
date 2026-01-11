@@ -813,6 +813,8 @@ public class Emulator implements Runnable {
 			} else if (key.equals("xray")) {
 				AppSettings.xrayView = true;
 				AppSettings.xrayBuffer = true;
+			} else if (key.equalsIgnoreCase("hide")) {
+				Settings.hideEmulation = true;
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
@@ -1071,7 +1073,8 @@ public class Emulator implements Runnable {
 				if (a.equals("-swt") || a.equals("-awt")
 						|| a.equals("-swerve") || a.equals("-lwj")
 						|| a.equals("-mascotdll") || a.equals("-mascotgl")
-						|| a.equals("-s") || a.equals("-updated"))
+						|| a.equals("-s") || a.equals("-updated")
+						|| a.equals("-uei"))
 					continue;
 				cmd.add(a);
 			}

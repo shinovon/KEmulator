@@ -1,6 +1,7 @@
 package emulator.custom;
 
 import emulator.Emulator;
+import emulator.Settings;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -70,6 +71,9 @@ public final class ResourceManager {
 				}
 			}
 		} catch (Exception ex) {
+			if (Settings.hideEmulation) {
+				return null;
+			}
 			return Emulator.class.getResourceAsStream(s);
 		}
 		return new ResourceStream(data, name);
