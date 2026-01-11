@@ -4,10 +4,11 @@ Application settings
 MIDI soundfont changing
 Added Nokia OTT decoder from FreeJ2ME-Plus
 Added Nokia-Platform check bypass
+Added monospaced font choice
 Updated About window
 Improved JSR 239 OpenGL API
 Implemented missing SkinnedMesh functions from M3G 1.1
-Reimplemented mmfplayer.dll with JNA
+Replaced mmfplayer.dll with JNA implementation
 Stub com.nokia.mid.ui.gestures API
 Optimized image rendering in MemoryView
 Updated sensorsimulator.jar to 1.1.1
@@ -16,6 +17,9 @@ Fixed LWJGL libraries loading on Intel Mac
 Fixed M3G on macOS 11 and later
 Fixed Siemens File API
 Fixed AMR dumping
+Fixed MMAPI events lock
+Fixed Canvas.hideNotify
+Fixed compatibility with JMUnit
 
 $v2.20 [2025.08.24]
 DoJa initial support
