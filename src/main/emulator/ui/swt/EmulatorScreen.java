@@ -839,11 +839,13 @@ public final class EmulatorScreen implements
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.addShellListener(new ShellAdapter() {
 			public void shellDeactivated(ShellEvent e) {
-				synchronized (pressedKeys) {
-					for (Integer n : pressedKeys) {
-						handleKeyReleaseMapped(n.toString());
+				try {
+					synchronized (pressedKeys) {
+						for (Integer n : pressedKeys) {
+							handleKeyReleaseMapped(n.toString());
+						}
 					}
-				}
+				} catch (Exception ignored) {}
 			}
 		});
 	}
