@@ -654,6 +654,11 @@ public class Emulator implements Runnable {
 				System.exit(1);
 				return;
 			}
+			if (Emulator.midletClassName == null) {
+				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
+				System.exit(1);
+				return;
+			}
 			InputStream inputStream = null;
 			try {
 				String iconPath = getEmulator().getAppProperty("MIDlet-Icon");
@@ -690,11 +695,6 @@ public class Emulator implements Runnable {
 				RichPresence.rpcState = (AppSettings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
 				RichPresence.rpcDetails = AppSettings.uei ? "UEI" : new File(midletJar).getName();
 				RichPresence.updatePresence();
-			}
-			if (Emulator.midletClassName == null) {
-				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
-				System.exit(1);
-				return;
 			}
 			if (doja) {
 				Emulator.eventQueue = new EventQueue();
@@ -1014,7 +1014,6 @@ public class Emulator implements Runnable {
 		}
 
 		cmd.add("-Dfile.encoding=UTF-8");
-		cmd.add("-Dsun.jnu.encoding=UTF-8");
 
 		if (debugBuild) {
 			File f = new File(getAbsolutePath() + "/../eclipse/KEmulator_base/agent.jar");

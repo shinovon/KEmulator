@@ -302,7 +302,6 @@ public class KEmulatorUpdater implements Runnable {
 		cmd.add("-Djava.library.path=" + kemulatorDir.toString());
 		
 		cmd.add("-Dfile.encoding=UTF-8");
-		cmd.add("-Dsun.jnu.encoding=UTF-8");
 		
 		cmd.add("-javaagent:" + kemulatorJar.toString());
 		
