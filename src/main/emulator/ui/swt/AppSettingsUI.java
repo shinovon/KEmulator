@@ -368,8 +368,18 @@ public class AppSettingsUI {
 		fireText = new Text(grpKeyMapping, SWT.BORDER);
 		fireText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		fireText.setText(Integer.toString(AppSettings.fireKey));
-		new Label(grpKeyMapping, SWT.NONE);
-		new Label(grpKeyMapping, SWT.NONE);
+		
+		Button btnNewButton_3 = new Button(grpKeyMapping, SWT.NONE);
+		btnNewButton_3.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String tmp = leftSoftText.getText();
+				leftSoftText.setText(rightSoftText.getText());
+				rightSoftText.setText(tmp);
+			}
+		});
+		btnNewButton_3.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		btnNewButton_3.setText("Swap softkeys");
 		
 		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_13.setText("Up:");
