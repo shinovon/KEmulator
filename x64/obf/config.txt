@@ -44,6 +44,8 @@
 
 -keep public class ru.nnproject.kemulator.** { *; }
 
+-keep public class ru.nnproject.symbiangl.** { *; }
+
 -keep class javax.microedition.m3g.** { *; }
 
 -keep class net.rim.device.api.** { *; }
@@ -100,6 +102,7 @@
 # EMULATOR CLASSES
 -keep class emulator.Emulator { public static *; }
 -keep class emulator.Settings { public static *; }
+-keep class emulator.AppSettings { public static *; }
 -keep class emulator.Agent { public static *; }
 -keep class emulator.Utils { public static *; }
 
