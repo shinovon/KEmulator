@@ -1155,163 +1155,205 @@ public final class Property implements IProperty, SelectionListener {
 
 		layout.numColumns = 4;
 		keyMapBindsComp.setLayout(layout);
+		
 		CLabel aCLabel646 = new CLabel(this.keyMapControllerComp, 0);
 		aCLabel646.setText(UILocale.get("OPTION_KEYMAP_CONTROLLER", "Controller:"));
 		aCLabel646.setLayoutData(layoutData);
+		
 		this.method400();
+		
 		CLabel aCLabel741 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel741).setText(UILocale.get("OPTION_KEYMAP_LSK", "LeftSoftKey:"));
 		aCLabel741.setLayoutData(layoutData38);
+		
 		(this.aText731 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText731.setLayoutData(layoutData20);
 		this.aText731.setText(KeyMapping.get(17));
 		this.aText731.addKeyListener(new Class135(aText731, 17));
 		aText731.addVerifyListener(verify);
+		
 		CLabel aCLabel744 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel744).setText(UILocale.get("OPTION_KEYMAP_RSK", "RightSoftKey:"));
 		aCLabel744.setLayoutData(layoutData37);
+		
 		(this.aText735 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText735.setLayoutData(layoutData2);
 		this.aText735.setText(KeyMapping.get(18));
 		this.aText735.addKeyListener(new Class135(aText735, 18));
 		aText735.addVerifyListener(verify);
+		
 		CLabel aCLabel762 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel762).setText(UILocale.get("OPTION_KEYMAP_NUM_1", "Num_1:"));
 		aCLabel762.setLayoutData(layoutData40);
+		
 		(this.aText754 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText754.setLayoutData(layoutData16);
 		this.aText754.setText(KeyMapping.get(1));
 		this.aText754.addKeyListener(new Class135(aText754, 1));
 		aText754.addVerifyListener(verify);
+		
 		CLabel aCLabel765 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel765).setText(UILocale.get("OPTION_KEYMAP_NUM_2", "Num_2:"));
 		aCLabel765.setLayoutData(layoutData32);
+		
 		(this.aText757 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText757.setLayoutData(layoutData5);
 		this.aText757.setText(KeyMapping.get(2));
 		this.aText757.addKeyListener(new Class135(aText757, 2));
 		aText757.addVerifyListener(verify);
+		
 		CLabel aCLabel767 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel767).setText(UILocale.get("OPTION_KEYMAP_NUM_3", "Num_3:"));
 		aCLabel767.setLayoutData(layoutData31);
+		
 		(this.aText760 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText760.setLayoutData(layoutData15);
 		this.aText760.setText(KeyMapping.get(3));
 		this.aText760.addKeyListener(new Class135(aText760, 3));
 		aText760.addVerifyListener(verify);
+		
 		CLabel aCLabel769 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel769).setText(UILocale.get("OPTION_KEYMAP_NUM_4", "Num_4:"));
 		aCLabel769.setLayoutData(layoutData27);
+		
 		(this.aText763 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText763.setLayoutData(layoutData6);
 		this.aText763.setText(KeyMapping.get(4));
 		this.aText763.addKeyListener(new Class135(aText763, 4));
 		aText763.addVerifyListener(verify);
+		
 		CLabel aCLabel771 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel771).setText(UILocale.get("OPTION_KEYMAP_NUM_5", "Num_5:"));
 		aCLabel771.setLayoutData(layoutData25);
+		
 		(this.aText766 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText766.setLayoutData(layoutData14);
 		this.aText766.setText(KeyMapping.get(5));
 		this.aText766.addKeyListener(new Class135(aText766, 5));
 		aText766.addVerifyListener(verify);
+		
 		CLabel aCLabel773 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel773).setText(UILocale.get("OPTION_KEYMAP_NUM_6", "Num_6:"));
 		aCLabel773.setLayoutData(layoutData26);
+		
 		(this.aText768 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText768.setLayoutData(layoutData7);
 		this.aText768.setText(KeyMapping.get(6));
 		this.aText768.addKeyListener(new Class135(aText768, 6));
 		aText768.addVerifyListener(verify);
+		
 		CLabel aCLabel626 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel626).setText(UILocale.get("OPTION_KEYMAP_NUM_7", "Num_7:"));
 		aCLabel626.setLayoutData(layoutData24);
+		
 		(this.aText770 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText770.setLayoutData(layoutData13);
 		this.aText770.setText(KeyMapping.get(7));
 		this.aText770.addKeyListener(new Class135(aText770, 7));
 		aText770.addVerifyListener(verify);
+		
 		CLabel aCLabel628 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel628).setText(UILocale.get("OPTION_KEYMAP_NUM_8", "Num_8:"));
 		aCLabel628.setLayoutData(layoutData23);
+		
 		(this.aText772 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText772.setLayoutData(layoutData8);
 		this.aText772.setText(KeyMapping.get(8));
 		this.aText772.addKeyListener(new Class135(aText772, 8));
 		aText772.addVerifyListener(verify);
+		
 		CLabel aCLabel630 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel630).setText(UILocale.get("OPTION_KEYMAP_NUM_9", "Num_9:"));
 		aCLabel630.setLayoutData(layoutData21);
+		
 		(this.aText774 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText774.setLayoutData(layoutData12);
 		this.aText774.setText(KeyMapping.get(9));
 		this.aText774.addKeyListener(new Class135(aText774, 9));
 		aText774.addVerifyListener(verify);
+		
 		CLabel aCLabel632 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel632).setText(UILocale.get("OPTION_KEYMAP_NUM_0", "Num_0:"));
 		aCLabel632.setLayoutData(layoutData22);
+		
 		this.aText627 = new Text(keyMapBindsComp, 2048);
 		aText627.setEditable(true);
 		this.aText627.setLayoutData(layoutData9);
 		this.aText627.setText(KeyMapping.get(0));
 		this.aText627.addKeyListener(new Class135(aText627, 0));
 		aText627.addVerifyListener(verify);
+		
 		CLabel aCLabel634 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel634).setText(UILocale.get("OPTION_KEYMAP_KEY_*", "Key *:"));
 		aCLabel634.setLayoutData(layoutData30);
+		
 		(this.aText629 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText629.setLayoutData(layoutData11);
 		this.aText629.setText(KeyMapping.get(10));
 		this.aText629.addKeyListener(new Class135(aText629, 10));
 		aText629.addVerifyListener(verify);
+		
 		CLabel aCLabel636 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel636).setText(UILocale.get("OPTION_KEYMAP_KEY_#", "Key #:"));
 		aCLabel636.setLayoutData(layoutData29);
+		
 		(this.aText631 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText631.setLayoutData(layoutData10);
 		this.aText631.setText(KeyMapping.get(11));
 		this.aText631.addKeyListener(new Class135(aText631, 11));
 		aText631.addVerifyListener(verify);
+		
 		CLabel aCLabel747 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel747).setText(UILocale.get("OPTION_KEYMAP_PAD_LEFT", "Pad_Left:"));
+		
 		(this.aText739 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText739.setLayoutData(layoutData19);
 		this.aText739.setText(KeyMapping.get(14));
 		this.aText739.addKeyListener(new Class135(aText739, 14));
 		aText739.addVerifyListener(verify);
+		
 		CLabel aCLabel750 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel750).setText(UILocale.get("OPTION_KEYMAP_PAD_RIGHT", "Pad_Right:"));
 		aCLabel750.setLayoutData(layoutData36);
+		
 		(this.aText742 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText742.setLayoutData(layoutData3);
 		this.aText742.setText(KeyMapping.get(15));
 		this.aText742.addKeyListener(new Class135(aText742, 15));
 		aText742.addVerifyListener(verify);
+		
 		CLabel aCLabel753 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel753).setText(UILocale.get("OPTION_KEYMAP_PAD_UP", "Pad_Up:"));
 		aCLabel753.setLayoutData(layoutData34);
+		
 		(this.aText745 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText745.setLayoutData(layoutData18);
 		this.aText745.setText(KeyMapping.get(12));
 		this.aText745.addKeyListener(new Class135(aText745, 12));
 		aText745.addVerifyListener(verify);
+		
 		CLabel aCLabel756 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel756).setText(UILocale.get("OPTION_KEYMAP_PAD_DOWN", "Pad_Down:"));
 		aCLabel756.setLayoutData(layoutData33);
+		
 		(this.aText748 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText748.setLayoutData(layoutData4);
 		this.aText748.setText(KeyMapping.get(13));
 		this.aText748.addKeyListener(new Class135(aText748, 13));
 		aText748.addVerifyListener(verify);
+		
 		CLabel aCLabel759 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel759).setText(UILocale.get("OPTION_KEYMAP_PAD_MIDDLE", "Pad_Middle:"));
 		aCLabel759.setLayoutData(layoutData39);
+		
 		(this.aText751 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText751.setLayoutData(layoutData17);
 		this.aText751.setText(KeyMapping.get(16));
 		this.aText751.addKeyListener(new Class135(aText751, 16));
 		aText751.addVerifyListener(verify);
-		(this.aButton696 = new Button(keyMapBindsComp, 32)).setText(UILocale.get("OPTION_KEYMAP_KEY_CACHE", "Enable Key Cache"));
+		
+		this.aButton696 = new Button(keyMapBindsComp, 32);
+		aButton696 .setText(UILocale.get("OPTION_KEYMAP_KEY_CACHE", "Enable Key Cache"));
 		this.aButton696.setLayoutData(layoutData28);
 		this.aButton696.setSelection(Settings.enableKeyCache);
 		this.method404();
