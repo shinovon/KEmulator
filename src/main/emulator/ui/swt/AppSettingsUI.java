@@ -81,6 +81,7 @@ public class AppSettingsUI {
 	private Button m3gDisableLightClampCheck;
 	private Button startAppOnResumeCheck;
 	private Button m3gThreadCheck;
+	private CTabFolder tabFolder;
 
 	public AppSettingsUI() {
 	}
@@ -100,6 +101,7 @@ public class AppSettingsUI {
 		}
 		shell.open();
 		shell.layout();
+		tabFolder.setSelection(0);
 		screenWidthText.setFocus();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -201,9 +203,11 @@ public class AppSettingsUI {
 		lblNewLabel_2.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 		lblNewLabel_2.setText("Version: " + Emulator.getEmulator().getAppProperty("MIDlet-Version"));
 
-		CTabFolder tabFolder = new CTabFolder(composite, SWT.BORDER | SWT.FLAT);
+		tabFolder = new CTabFolder(composite, SWT.BORDER | SWT.FLAT);
 		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
 		tabFolder.setSimple(true);
+		tabFolder.setUnselectedCloseVisible(false);
+		tabFolder.setUnselectedImageVisible(false);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		CTabItem tbtmGeneral = new CTabItem(tabFolder, SWT.NONE);
