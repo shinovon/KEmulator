@@ -908,7 +908,7 @@ public final class EmulatorScreen implements
 		this.xrayViewMenuItem.addSelectionListener(this);
 
 		if (!Emulator.isX64()) {
-			(this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
+			(this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top"));
 			this.alwaysOnTopMenuItem.addSelectionListener(this);
 			this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
 		}
@@ -1209,8 +1209,6 @@ public final class EmulatorScreen implements
 
 		this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
 		this.xrayViewMenuItem.setAccelerator(SWT.ALT | 88);
-		if (alwaysOnTopMenuItem != null)
-			this.alwaysOnTopMenuItem.setAccelerator(SWT.CONTROL | 79);
 		this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
 		this.rotate90MenuItem.setAccelerator(SWT.ALT | 89);
 		this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);

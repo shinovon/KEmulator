@@ -144,14 +144,21 @@ public final class CustomClassLoader extends ClassLoader {
 
 		if (Settings.protectedPackages.contains(s)
 				|| (Settings.hideEmulation && !s.startsWith("emulator.custom.")
-				&& (s.startsWith("kemnn.") || s.startsWith("emulator.")) && !Emulator.jarClasses.contains(s)))
+				&& (s.startsWith("kemnn.") || s.startsWith("emulator.")
+				|| s.startsWith("club.") || s.startsWith("com.github.")
+				|| s.startsWith("uk.co.caprica") || s.startsWith("ru.woesss.")
+				|| s.startsWith("org.slf4j.") || s.startsWith("org.pigler.")
+				|| s.startsWith("org.objectweb.") || s.startsWith("org.bridj")
+				|| s.startsWith("com.sun.jna.") || s.startsWith("org.lwjgl.")
+				|| s.startsWith("org.apache.tools.")|| s.startsWith("net.java.games.")
+				|| s.startsWith("ru.nnproject")) && !Emulator.jarClasses.contains(s)))
 			return true;
 
 		if (Settings.hideEmulation
 				&& (s.startsWith("java.applet") || s.startsWith("java.awt") || s.startsWith("java.swing")
-				|| s.startsWith("org.eclipse.swt") || s.startsWith("ru.nnproject") || s.startsWith("java.lang.CharSequence")
+				|| s.startsWith("org.eclipse.swt") || s.startsWith("java.lang.CharSequence")
 				|| s.startsWith("java.util.Collection") || s.startsWith("java.util.ArrayList") || s.startsWith("java.lang.ClassLoader")
-				|| s.startsWith("java.util.Map"))) {
+				|| s.startsWith("java.util.Map") || s.startsWith("sun.") || s.startsWith("jdk."))) {
 			return true;
 		}
 

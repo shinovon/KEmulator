@@ -119,6 +119,8 @@ public class CustomMethod {
 				res = AppSettings.fileEncoding;
 			} else if (prop.equals("Platform")) {
 				res = "";
+			} else if (prop.equals("device.model")) {
+				res = AppSettings.microeditionPlatform;
 			} else if (prop.equals("fileconn.dir.roots.names")) {
 				res = "Root";
 			} else if(prop.startsWith("kemulator")) {
@@ -173,7 +175,9 @@ public class CustomMethod {
 						res = "false";
 					}
 				}
-			} else if (Settings.hideEmulation && (prop.startsWith("os.") || prop.startsWith("java.") || prop.startsWith("sun."))) {
+			} else if (Settings.hideEmulation &&
+					(prop.startsWith("os.") || prop.startsWith("java.") || prop.startsWith("sun.")
+							|| prop.startsWith("org.pigler.") || prop.startsWith("ru.nnproject."))) {
 				res = null;
 			}
 			// Hide properties of disabled APIs
