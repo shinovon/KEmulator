@@ -13,6 +13,9 @@ public class AppSettings {
 	public static String iniSection;
 	public static String jarHash;
 
+	private static final Map<String, String> appProperties = new HashMap<>();
+
+	// runtime only
 	public static boolean softbankApi;
 	public static boolean blackberryApi = false;
 	public static String customTitle;
@@ -24,6 +27,7 @@ public class AppSettings {
 	public static boolean xrayView;
 	public static boolean xrayBuffer;
 
+	// device
 	public static String devicePreset;
 	
 	public static int screenWidth;
@@ -95,8 +99,6 @@ public class AppSettings {
 	public static boolean mascotBackgroundFilter;
 
 	public static final Map<String, String> systemProperties = new HashMap<>();
-
-	private static final Map<String, String> appProperties = new HashMap<>();
 
 	public static void init() {
 		applyPreset(devicePreset = Devices.getDefaultPreset(), true);
