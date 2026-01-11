@@ -966,7 +966,7 @@ public final class EmulatorScreen implements
 
 		new MenuItem(this.menuView, 2);
 
-		(this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText("Settings...");
+		(this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText("Global Settings...");
 		this.optionsMenuItem.addSelectionListener(this);
 
 		new MenuItem(this.menuView, 2);
