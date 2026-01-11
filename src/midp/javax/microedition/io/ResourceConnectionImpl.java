@@ -11,12 +11,13 @@ import java.io.InputStream;
 final class ResourceConnectionImpl implements InputConnection {
 	String url;
 
-	ResourceConnectionImpl(final String s) {
+	ResourceConnectionImpl(String s) {
 		Emulator.getEmulator().getLogStream().println("Resource opened: " + s);
+		s = s.trim().replace("\\", "/");
 		if (s.startsWith("resource://")) {
-			this.url = s.trim().replace("\\", "/").substring("resource://".length());
+			this.url = s.substring("resource://".length());
 		} else {
-			this.url = s.trim().replace("\\", "/").substring("resource:".length());
+			this.url = s.substring("resource:".length());
 		}
 	}
 
@@ -27,10 +28,31 @@ final class ResourceConnectionImpl implements InputConnection {
 	public final InputStream openInputStream() throws IOException {
 		if ("!blank".equals(url))
 			return new ByteArrayInputStream(new byte[0]);
-		InputStream i = ResourceManager.getResourceAsStream(url);
-		if (i == null)
+
+		final InputStream i = ResourceManager.getResourceAsStream(url);
+		if (i == null) {
 			throw new ConnectionNotFoundException(url);
-		return i;
+		}
+
+		if (Emulator.doja) {
+			return i;
+		}
+
+		return new InputStream() {
+			public int read() throws IOException {
+				int r = i.read();
+				return r == -1 ? 0 : r;
+			}
+
+			public int read(byte[] b, int off, int len) throws IOException {
+				int r = i.read(b, off, len);
+				return r == -1 ? 0 : r;
+			}
+
+			public void close() throws IOException {
+				i.close();
+			}
+		};
 	}
 
 	public final void close() {
