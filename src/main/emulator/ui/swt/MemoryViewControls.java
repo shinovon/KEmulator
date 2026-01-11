@@ -99,7 +99,7 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 		long t = Runtime.getRuntime().totalMemory();
 		long f = Runtime.getRuntime().freeMemory();
 		objectsSize.setText(objSize + "B / " + maxObjectsSize + "B");
-//		totalSize.setText(((objSize + Memory.getBytecodeSize()) / 1024) + "KiB");
+		totalSize.setText(((objSize + Memory.getBytecodeSize()) / 1024) + "KiB");
 		jvmSize.setText(((t - f) / 1048576) + "/" + (t / 1048576) + "MiB");
 		this.layout(true, true);
 	}

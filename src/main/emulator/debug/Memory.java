@@ -401,8 +401,7 @@ public final class Memory {
 					}
 				}
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		bytecodeSize = n;
 		return n;
 	}
