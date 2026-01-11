@@ -354,7 +354,7 @@ public final class Memory {
 		for (int i = vector.size() - 1; i >= 0; i--) {
 			Field f = vector.get(i);
 			f.setAccessible(true);
-			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive())
+			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive() && Modifier.isStatic(f.getModifiers()))
 				vector.remove(i);
 		}
 		Field[] array = new Field[vector.size()];
@@ -440,7 +440,7 @@ public final class Memory {
 		// fields
 		for (Field field : fields) {
 			final Class type = field.getType();
-			if ((Modifier.isFinal(field.getModifiers()) && type.isPrimitive()))
+			if ((Modifier.isFinal(field.getModifiers()) && type.isPrimitive() && Modifier.isStatic(field.getModifiers())))
 				continue; // constant primitive field
 
 			if (!Modifier.isStatic(field.getModifiers()) || o == null) {

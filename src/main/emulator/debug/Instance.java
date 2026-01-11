@@ -41,7 +41,9 @@ public final class Instance {
 			for (int i = 0; i < declaredFields.length; ++i) {
 				if (declaredFields[i] != null) {
 					if (s == null || method884(declaredFields[i].getName(), s)) {
-						if (!Modifier.isFinal(declaredFields[i].getModifiers()) || !declaredFields[i].getType().isPrimitive()) {
+						if (!Modifier.isFinal(declaredFields[i].getModifiers())
+								|| !declaredFields[i].getType().isPrimitive()
+								|| !Modifier.isStatic(declaredFields[i].getModifiers())) {
 							this.fields.add(declaredFields[i]);
 							declaredFields[i].setAccessible(true);
 						}
