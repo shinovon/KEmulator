@@ -2,6 +2,8 @@
 <presets>
     <default value="240x320 (COMMON - full screen)"/>
 
+    <!-- Based on TwoSpacesSG research -->
+
     <layout name="Nokia">
         <define name="KEY_UP" 	    value="-1"/>
         <define name="KEY_DOWN" 	value="-2"/>

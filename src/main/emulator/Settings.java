@@ -127,4 +127,6 @@ public final class Settings {
 	public static boolean ideaJdkTablePatched = false;
 	public static String lastIdeaRepoPath = ""; // where last project was created
 
+	public static String deviceFile = "/res/presets.xml";
+
 }

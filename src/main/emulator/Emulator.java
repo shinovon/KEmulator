@@ -54,7 +54,6 @@ public class Emulator implements Runnable {
 	public static String midletClassName;
 	public static String classPath;
 	public static String jadPath;
-	public static String deviceFile;
 	public static String[] commandLineArguments;
 	public static emulator.custom.CustomClassLoader customClassLoader;
 	public static String iconPath;
@@ -630,7 +629,7 @@ public class Emulator implements Runnable {
 					+ System.getProperty("os.name") + ' ' + System.getProperty("os.arch")
 					+ " (" + System.getProperty("os.version") + "), Java: "
 					+ System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
-			Devices.load(Emulator.deviceFile);
+			Devices.load(Settings.deviceFile);
 			AppSettings.init();
 
 			setupMRUList();
@@ -1137,7 +1136,6 @@ public class Emulator implements Runnable {
 		Emulator.customClassLoader = new CustomClassLoader(ClassLoader.getSystemClassLoader());
 		Emulator.jarLibrarys = new Vector();
 		Emulator.jarClasses = new Vector();
-		Emulator.deviceFile = "/res/presets.xml";
 		backgroundThread = new Thread(new Runnable() {
 			public void run() {
 				if (!updated && !AppSettings.uei && Settings.autoUpdate == 2 && Updater.checkUpdate() == Updater.STATE_UPDATE_AVAILABLE) {

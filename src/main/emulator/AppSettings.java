@@ -166,6 +166,10 @@ public class AppSettings {
 
 		IEmulatorFrontend emulator = Emulator.getEmulator();
 		boolean screenDetected = true;
+		String jar = Emulator.midletJar;
+		if (jar != null) {
+			jar = new File(jar).getName();
+		}
 		detectScreen: {
 			if (Emulator.startWidth != 0) {
 				screenWidth = Emulator.startWidth;
@@ -204,9 +208,7 @@ public class AppSettings {
 				}
 			} catch (Exception ignored) {}
 
-			String jar = Emulator.midletJar;
 			if (jar != null) {
-				jar = new File(jar).getName();
 				if (jar.contains("128x128")) {
 					screenWidth = 128;
 					screenHeight = 128;
@@ -218,8 +220,15 @@ public class AppSettings {
 					break detectScreen;
 				}
 				if (jar.contains("130x130")) {
+					applyPreset("Siemens", false);
 					screenWidth = 130;
 					screenHeight = 130;
+					break detectScreen;
+				}
+				if (jar.contains("132x176")) {
+					applyPreset("Siemens", false);
+					screenWidth = 132;
+					screenHeight = 176;
 					break detectScreen;
 				}
 				if (jar.contains("176x208")) {
@@ -262,12 +271,16 @@ public class AppSettings {
 		}
 
 		if (Emulator.doja) {
-			applyPreset(devicePreset = "120x160 (Sharp/DoCoMo - full screen)", !screenDetected);
+			if (screenDetected) {
+				applyPreset("Sharp", false);
+			} else {
+				applyPreset(devicePreset = "120x160 (Sharp/DoCoMo - full screen)", !screenDetected);
+			}
 			fileEncoding = "Shift_JIS";
 			m3gThread = true;
 		} else if (AppSettings.softbankApi) {
 			// TODO
-			applyPreset(devicePreset = "400x240 (SoftBank - full screen)", !screenDetected);
+			applyPreset("Motorola", false);
 			m3gThread = true;
 		}
 
@@ -298,9 +311,6 @@ public class AppSettings {
 		} else {
 			jarHash = getJarHash(Emulator.midletJar);
 			s = jarHash + ':' + Emulator.midletJar;
-		}
-		if (s == null) {
-			return -1;
 		}
 		iniSection = s;
 
@@ -552,11 +562,29 @@ public class AppSettings {
 		loadIni(true);
 	}
 
-	public static void applyPreset(String s, boolean screen) {
+	public static boolean applyPreset(String s, boolean screen) {
 		DevicePlatform p = Devices.getPlatform(s);
-		if (screen) {
+		if (p == null) {
+			return false;
+		}
+		if (screen && p.exists("SCREEN_WIDTH")) {
 			screenWidth = Integer.parseInt(p.getString("SCREEN_WIDTH"));
 			screenHeight = Integer.parseInt(p.getString("SCREEN_HEIGHT"));
+		}
+		if (p.exists("PLATFORM")) {
+			microeditionPlatform = p.getString("PLATFORM");
+		}
+		if (p.exists("ENCODING")) {
+			fileEncoding = p.getString("ENCODING");
+		}
+		if (p.exists("FONT_SMALL_SIZE")) {
+			fontSmallSize = Integer.parseInt(p.getString("FONT_SMALL_SIZE"));
+		}
+		if (p.exists("FONT_MEDIUM_SIZE")) {
+			fontMediumSize = Integer.parseInt(p.getString("FONT_MEDIUM_SIZE"));
+		}
+		if (p.exists("FONT_LARGE_SIZE")) {
+			fontLargeSize = Integer.parseInt(p.getString("FONT_LARGE_SIZE"));
 		}
 		leftSoftKey = Integer.parseInt(p.getString("KEY_S1"));
 		rightSoftKey = Integer.parseInt(p.getString("KEY_S2"));
@@ -565,6 +593,7 @@ public class AppSettings {
 		downKey = Integer.parseInt(p.getString("KEY_DOWN"));
 		leftKey = Integer.parseInt(p.getString("KEY_LEFT"));
 		rightKey = Integer.parseInt(p.getString("KEY_RIGHT"));
+		return true;
 	}
 
 	private static boolean loadIni(boolean save) {

@@ -492,6 +492,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.proguardPath = properties.getProperty("ProguardPath", null);
 			Settings.ideaJdkTablePatched = Boolean.parseBoolean(properties.getProperty("IdeaJdkTablePatched", "false"));
 			Settings.lastIdeaRepoPath = properties.getProperty("LastIdeaProjectsRepo", "");
+
+			Settings.deviceFile = properties.getProperty("PresetsPath", Settings.deviceFile);
 		} catch (Exception ex) {
 			if (!(ex instanceof FileNotFoundException)) {
 				System.out.println("properties load failed");
@@ -740,6 +742,8 @@ public final class Property implements IProperty, SelectionListener {
 			if (Settings.proguardPath != null) properties.setProperty("ProguardPath", Settings.proguardPath);
 			properties.setProperty("IdeaJdkTablePatched", String.valueOf(Settings.ideaJdkTablePatched));
 			properties.setProperty("LastIdeaProjectsRepo", Settings.lastIdeaRepoPath);
+
+			properties.setProperty("PresetsPath", Settings.deviceFile);
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
