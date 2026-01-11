@@ -370,6 +370,13 @@ public class AppSettingsUI {
 		fireText.setText(Integer.toString(AppSettings.fireKey));
 		new Label(grpKeyMapping, SWT.NONE);
 		new Label(grpKeyMapping, SWT.NONE);
+		
+		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
+		lblNewLabel_13.setText("Up:");
+
+		upText = new Text(grpKeyMapping, SWT.BORDER);
+		upText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		upText.setText(Integer.toString(AppSettings.upKey));
 
 		Label lblNewLabel_15 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_15.setAlignment(SWT.RIGHT);
@@ -379,12 +386,12 @@ public class AppSettingsUI {
 		downText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		downText.setText(Integer.toString(AppSettings.downKey));
 		
-		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_13.setText("Up:");
+		Label lblNewLabel_14 = new Label(grpKeyMapping, SWT.NONE);
+		lblNewLabel_14.setText("Left:");
 
-		upText = new Text(grpKeyMapping, SWT.BORDER);
-		upText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		upText.setText(Integer.toString(AppSettings.upKey));
+		leftText = new Text(grpKeyMapping, SWT.BORDER);
+		leftText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		leftText.setText(Integer.toString(AppSettings.leftKey));
 
 		Label lblNewLabel_16 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_16.setText("Right:");
@@ -392,13 +399,6 @@ public class AppSettingsUI {
 		rightText = new Text(grpKeyMapping, SWT.BORDER);
 		rightText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		rightText.setText(Integer.toString(AppSettings.rightKey));
-		
-		Label lblNewLabel_14 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_14.setText("Left:");
-
-		leftText = new Text(grpKeyMapping, SWT.BORDER);
-		leftText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		leftText.setText(Integer.toString(AppSettings.leftKey));
 
 		CTabItem tbtmFont = new CTabItem(tabFolder, SWT.NONE);
 		tbtmFont.setText("Font");
