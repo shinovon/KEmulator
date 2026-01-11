@@ -909,11 +909,11 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.horizontalSpan = 2;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		int x = (480 - 320) / 2;
 		Composite aComposite667 = new Composite(this.setsShell, 0);
+		aComposite667.setLayout(new GridLayout(2, true));
 		(aComposite667).setLayoutData(layoutData);
 		Button aButton676 = new Button(aComposite667, 8388616);
-		(aButton676).setBounds(new Rectangle(62 + x, 1, 68, 19));
+		aButton676.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		aButton676.setSelection(false);
 		aButton676.setText(UILocale.get("DIALOG_OK", "OK"));
 		aButton676.addSelectionListener(new SelectionAdapter() {
@@ -924,7 +924,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 		});
 		Button aButton685 = new Button(aComposite667, 8388616);
-		(aButton685).setBounds(new Rectangle(197 + x, 0, 66, 21));
+		aButton685.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		aButton685.setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
 		aButton685.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent selectionEvent) {
