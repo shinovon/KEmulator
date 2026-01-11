@@ -121,7 +121,7 @@ public class AppSettings {
 
 		frameRate = 30;
 
-		enableKeyRepeat = false;
+		enableKeyRepeat = true;
 		hasPointerEvents = true;
 
 		ignoreFullScreen = false;
@@ -143,7 +143,7 @@ public class AppSettings {
 		m3gForcePerspectiveCorrection = false;
 		m3gDisableLightClamp = false;
 		m3gFlushImmediately = false;
-		m3gThread = true;
+		m3gThread = false;
 
 		m3gAA = APP_CONTROLLED;
 		m3gTexFilter = APP_CONTROLLED;

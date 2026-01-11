@@ -49,9 +49,9 @@ public final class GraphicsUtils {
 	public static IImage setImageData(final int[] rgbData, final boolean processAlpha, int offset, final int scanlength, final int width, final int height) {
 		createBuffer(width, height);
 		int[] data = null;
-		if (Settings.g2d == Settings.G2D_SWT) {
+		if (Settings.g2d == 0) {
 			data = GraphicsUtils.bufferData;
-		} else if (Settings.g2d == Settings.G2D_AWT){
+		} else if (Settings.g2d == 1){
 			data = GraphicsUtils.bufferImage.getData();
 		}
 		int n5 = 0;

@@ -404,7 +404,6 @@ public final class Property implements IProperty, SelectionListener {
 			}
 
 			// emulator
-			Settings.rightClickMenu = Boolean.parseBoolean(properties.getProperty("RightClickMenu", "false"));
 			Settings.xrayOverlapScreen = Boolean.parseBoolean(properties.getProperty("XRayOverLapScreen", "false"));
 			Settings.xrayShowClipBorder = Boolean.parseBoolean(properties.getProperty("XRayShowClipBorder", "false"));
 			Settings.infoColorHex = Boolean.parseBoolean(properties.getProperty("InfoColorHex", "false"));
@@ -654,7 +653,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("SystemProperties", builder.toString());
 
 			// emulator
-			properties.setProperty("RightClickMenu", String.valueOf(Settings.rightClickMenu));
 			properties.setProperty("XRayOverLapScreen", String.valueOf(Settings.xrayOverlapScreen));
 			properties.setProperty("XRayShowClipBorder", String.valueOf(Settings.xrayShowClipBorder));
 			properties.setProperty("InfoColorHex", String.valueOf(Settings.infoColorHex));
@@ -1835,17 +1833,17 @@ public final class Property implements IProperty, SelectionListener {
 		fpsCounterCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		fpsCounterCheck.setText(UILocale.get("OPTION_SYSTEM_FPS_COUNT", "FPS Counter"));
 		fpsCounterCheck.setSelection(Settings.fpsCounter);
+
+		this.vibrationCheck = new Button(grpUi, SWT.CHECK);
+		vibrationCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		vibrationCheck.setText("Enable Vibration");
+		this.vibrationCheck.setSelection(Settings.enableVibration);
+		vibrationCheck.setToolTipText("Shakes the window during vibration");
 		
 		this.aButton752 = new Button(grpUi, 32);
 		aButton752.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		aButton752.setText(UILocale.get("OPTION_SYSTEM_INFO_COLOR", "Info View: Show color in (R,G,B)."));
+		aButton752.setText(UILocale.get("OPTION_SYSTEM_INFO_COLOR", "Info View: Show color in (R,G,B)"));
 		this.aButton752.setSelection(Settings.infoColorHex);
-		
-		this.vibrationCheck = new Button(grpUi, SWT.CHECK);
-		vibrationCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		vibrationCheck.setText(UILocale.get("OPTION_COREAPI_VIBRATION", "Enable Vibration APIs."));
-		this.vibrationCheck.setSelection(Settings.enableVibration);
-		vibrationCheck.setToolTipText("Shakes the window during vibration");
 		
 		grpDebug = new Group(systemComp, SWT.NONE);
 		grpDebug.setText("Debug");
@@ -1854,27 +1852,27 @@ public final class Property implements IProperty, SelectionListener {
 		
 		this.aButton746 = new Button(grpDebug, 32);
 		aButton746.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton746.setText(UILocale.get("OPTION_SYSTEM_XRAY_BG", "X-Ray View: OverLap images."));
+		aButton746.setText(UILocale.get("OPTION_SYSTEM_XRAY_BG", "X-Ray View: OverLap images"));
 		this.aButton746.setSelection(Settings.xrayOverlapScreen);
 		
 		this.aButton749 = new Button(grpDebug, 32);
 		aButton749.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton749.setText(UILocale.get("OPTION_SYSTEM_XRAY_CLIP", "X-Ray View: Show image clipping region."));
+		aButton749.setText(UILocale.get("OPTION_SYSTEM_XRAY_CLIP", "X-Ray View: Show image clipping region"));
 		this.aButton749.setSelection(Settings.xrayShowClipBorder);
 		
 		this.aButton703 = new Button(grpDebug, 32);
 		aButton703.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton703.setText(UILocale.get("OPTION_SYSTEM_RELEASED_IMG", "Memory View: Record released images."));
+		aButton703.setText(UILocale.get("OPTION_SYSTEM_RELEASED_IMG", "Memory View: Record released images"));
 		this.aButton703.setSelection(Settings.recordReleasedImg);
 		
 		this.aButton714 = new Button(grpDebug, 32);
 		aButton714.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton714.setText(UILocale.get("OPTION_SYSTEM_TRACK_NEW", "Track \"new/new[]...\" operations."));
+		aButton714.setText(UILocale.get("OPTION_SYSTEM_TRACK_NEW", "Track \"new/new[]...\" operations"));
 		this.aButton714.setSelection(Settings.enableNewTrack);
 		
 		this.aButton719 = new Button(grpDebug, 32);
 		aButton719.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton719.setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Track method calls."));
+		aButton719.setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Track method calls"));
 		this.aButton719.setSelection(Settings.enableMethodTrack);
 
 		grpMisc = new Group(systemComp, SWT.NONE);
