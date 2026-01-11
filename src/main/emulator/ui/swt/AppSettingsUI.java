@@ -347,7 +347,7 @@ public class AppSettingsUI {
 		grpKeyMapping.setLayout(new GridLayout(4, false));
 
 		Label lblNewLabel_10 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_10.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		lblNewLabel_10.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_10.setText("Left soft key:");
 
 		leftSoftText = new Text(grpKeyMapping, SWT.BORDER);
@@ -355,7 +355,7 @@ public class AppSettingsUI {
 		leftSoftText.setText(Integer.toString(AppSettings.leftSoftKey));
 
 		Label lblNewLabel_11 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_11.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		lblNewLabel_11.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_11.setText("Right soft key:");
 
 		rightSoftText = new Text(grpKeyMapping, SWT.BORDER);
@@ -363,7 +363,6 @@ public class AppSettingsUI {
 		rightSoftText.setText(Integer.toString(AppSettings.rightSoftKey));
 
 		Label lblNewLabel_12 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_12.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_12.setText("Fire/Middle:");
 
 		fireText = new Text(grpKeyMapping, SWT.BORDER);
@@ -374,7 +373,6 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_15 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_15.setAlignment(SWT.RIGHT);
-		lblNewLabel_15.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_15.setText("Down:");
 
 		downText = new Text(grpKeyMapping, SWT.BORDER);
@@ -382,7 +380,6 @@ public class AppSettingsUI {
 		downText.setText(Integer.toString(AppSettings.downKey));
 		
 		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_13.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_13.setText("Up:");
 
 		upText = new Text(grpKeyMapping, SWT.BORDER);
@@ -390,7 +387,6 @@ public class AppSettingsUI {
 		upText.setText(Integer.toString(AppSettings.upKey));
 
 		Label lblNewLabel_16 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_16.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_16.setText("Right:");
 
 		rightText = new Text(grpKeyMapping, SWT.BORDER);
@@ -398,7 +394,6 @@ public class AppSettingsUI {
 		rightText.setText(Integer.toString(AppSettings.rightKey));
 		
 		Label lblNewLabel_14 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_14.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel_14.setText("Left:");
 
 		leftText = new Text(grpKeyMapping, SWT.BORDER);
