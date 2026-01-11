@@ -309,23 +309,24 @@ public final class Property implements IProperty, SelectionListener {
 		try {
 			final Properties properties = new Properties();
 			boolean hasFile = false;
-			if (new File(Emulator.getUserPath() + "/property.txt").exists()) {
-				final FileInputStream fileInputStream = new FileInputStream(Emulator.getUserPath() + "/property.txt");
+			File file = new File(Emulator.getUserPath(), "property.txt");
+			if (file.exists()) {
+				final FileInputStream fileInputStream = new FileInputStream(file);
 				properties.load(fileInputStream);
 				fileInputStream.close();
 				hasFile = true;
 			}
-			if (!Utils.win) {
+			this.defaultFont = properties.getProperty("DefaultFont", null);
+			this.monospaceFont = properties.getProperty("MonospacedFont", null);
+			if (defaultFont == null) {
+				String systemName = pickFont(false);
 				Font systemFont = Display.getDefault().getSystemFont();
-				String systemName = "DejaVu Sans";
 				if (systemFont != null && systemFont.getFontData().length > 0)
 					systemName = systemFont.getFontData()[0].getName();
-				this.defaultFont = properties.getProperty("DefaultFont", systemName);
-				this.monospaceFont = properties.getProperty("MonospacedFont", "DejaVu Sans Mono");
-			} else {
-				this.defaultFont = properties.getProperty("DefaultFont", "Tahoma");
-				this.monospaceFont = properties.getProperty("MonospacedFont", "Consolas");
-
+				defaultFont = systemName;
+			}
+			if (monospaceFont == null) {
+				monospaceFont = pickFont(true);
 			}
 			this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
 			this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
@@ -336,7 +337,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("DLL") ? 0 : 1);
 
 			// keyboard mappings
-			if (hasFile) {
+			if (properties.containsKey("MAP_KEY_NUM_0")) {
 				KeyMapping.mapDeviceKey(0, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_0")));
 				KeyMapping.mapDeviceKey(1, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_1")));
 				KeyMapping.mapDeviceKey(2, KeyMapping.method601(properties.getProperty("MAP_KEY_NUM_2")));
@@ -516,6 +517,64 @@ public final class Property implements IProperty, SelectionListener {
 		}
 	}
 
+	private String pickFont(boolean monospace) {
+		String res = "Arial";
+		final ArrayList<String> list = new ArrayList<>();
+
+		final FontData[] fontList = Display.getCurrent().getFontList(null, true);
+		for (FontData fontData : fontList) {
+			String name = fontData.getName();
+			if (!list.contains(name) && !name.startsWith("@")) {
+				list.add(name);
+				if (monospace && name.endsWith(" Mono")) {
+					res = name;
+				}
+			}
+		}
+		final FontData[] fontList2 = Display.getCurrent().getFontList(null, false);
+		for (FontData fontData : fontList2) {
+			String name = fontData.getName();
+			if (!list.contains(name) && !name.startsWith("@")) {
+				list.add(name);
+				if (monospace && name.endsWith(" Mono")) {
+					res = name;
+				}
+			}
+		}
+
+		if (monospace) {
+			if (list.contains("Cascadia Mono")) {
+				res = "Cascadia Mono";
+			} else if (list.contains("DejaVu Sans Mono")) {
+				res = "DejaVu Sans Mono";
+			} else if (list.contains("Droid Sans Mono")) {
+				res = "Droid Sans Mono";
+			} else if (list.contains("Consolas")) {
+				res = "Consolas";
+			} else if (list.contains("Courier New")) {
+				res = "Courier New";
+			}
+		} else {
+			if (list.contains("Segoe UI")) {
+				res = "Segoe UI";
+			} else if (list.contains("Noto Sans")) {
+				res = "Noto Sans";
+			} else if (list.contains("DejaVu Sans")) {
+				res = "DejaVu Sans";
+			} else if (list.contains("Liberation Sans")) {
+				res = "Liberation Sans";
+			} else if (list.contains("Tahoma")) {
+				res = "Tahoma";
+			} else if (list.contains("Roboto")) {
+				res = "Roboto";
+			} else if (list.contains("Arial")) {
+				res = "Arial";
+			}
+		}
+
+		return res;
+	}
+
 	public void saveProperties() {
 		try {
 			final FileOutputStream fileOutputStream = new FileOutputStream(Emulator.getUserPath() + "/property.txt");
@@ -684,6 +743,7 @@ public final class Property implements IProperty, SelectionListener {
 
 	private void apply() {
 		this.defaultFont = this.defaultFontCombo.getText().trim();
+		this.monospaceFont = this.monoFontCombo.getText().trim();
 		this.rmsFolder = this.aText662.getText().trim();
 		this.fontSmallSize = this.aSpinner690.getSelection();
 		this.fontMediumSize = this.aSpinner679.getSelection();

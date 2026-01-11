@@ -592,15 +592,23 @@ public class Emulator implements Runnable {
 			EmulatorMIDI.initDevices();
 			Emulator.commandLineArguments = args;
 			UILocale.initLocale();
-			try {
-				parseLaunchArgs(args);
-			} catch (Throwable ignored) {}
+			for (String s : args) {
+				if ("-s".equals(s)) {
+					forked = true;
+					continue;
+				}
+				if ("-uei".equals(s)) {
+					AppSettings.uei = true;
+					continue;
+				}
+			}
 
 			// Restart with additional arguments required for specific os or java version
 			if (!(forked || AppSettings.uei) && (librariesException != null || Utils.macos || Utils.isJava9())) {
 				loadGame(null, false);
 				return;
-			} else if (librariesException != null) {
+			}
+			if (librariesException != null) {
 				librariesException.printStackTrace();
 				JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + librariesException.getMessage());
 				System.exit(0);
@@ -1049,7 +1057,16 @@ public class Emulator implements Runnable {
 
 		cmd.add("emulator.Emulator");
 		if (s == null) {
+			boolean ignoreNext = false;
 			for (String a : Emulator.commandLineArguments) {
+				if (ignoreNext) {
+					ignoreNext = false;
+					continue;
+				}
+				if (a.equals("-screen")) {
+					ignoreNext = true;
+					continue;
+				}
 				if (a.equals("-swt") || a.equals("-awt")
 						|| a.equals("-swerve") || a.equals("-lwj")
 						|| a.equals("-mascotdll") || a.equals("-mascotgl")

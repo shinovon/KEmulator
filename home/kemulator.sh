@@ -37,7 +37,6 @@ ARGS=(
   "-Djna.nosys=true"
   "-Djava.library.path=$KEM_DIR"
   "-Dfile.encoding=UTF-8"
-  "-Dsun.jnu.encoding=UTF-8"
   "-javaagent:$KEM_JAR"
   "-XX:+IgnoreUnrecognizedVMOptions"
 )
