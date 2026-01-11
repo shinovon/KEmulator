@@ -14,11 +14,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 
 /**
@@ -148,11 +147,25 @@ public class ProjectGenerator {
 		// root
 
 		HashSet<String> gitignore = new HashSet<>();
-		if (Files.exists(dir.resolve(".gitignore"))) {
-			gitignore = new HashSet<>(Files.readAllLines(dir.resolve(".gitignore")));
+		boolean needStartNl = false;
+		Path gitignorePath = dir.resolve(".gitignore");
+		if (Files.exists(gitignorePath)) {
+			List<String> lines = Files.readAllLines(gitignorePath);
+			gitignore = new HashSet<>(lines);
+			long size = Files.size(gitignorePath);
+			try (SeekableByteChannel channel = Files.newByteChannel(gitignorePath, StandardOpenOption.READ)) {
+				ByteBuffer buffer = ByteBuffer.allocate(1);
+				channel.position(size - 1);
+				channel.read(buffer);
+				buffer.flip();
+				byte lastByte = buffer.get();
+				needStartNl = !(lastByte == '\n' || lastByte == '\r');
+			}
 		}
 
-		try (BufferedWriter gi = new BufferedWriter(new FileWriter(dir.resolve(".gitignore").toString(), true))) {
+		try (BufferedWriter gi = new BufferedWriter(new FileWriter(gitignorePath.toString(), true))) {
+			if (needStartNl)
+				gi.newLine();
 			if (!gitignore.contains(".idea") && !gitignore.contains(".idea/") && !gitignore.contains(".idea/*") && !gitignore.contains(".idea/runConfigurations")) {
 				gi.write(".idea/runConfigurations");
 				gi.newLine();
