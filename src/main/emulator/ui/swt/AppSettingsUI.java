@@ -668,8 +668,19 @@ public class AppSettingsUI {
 
 	private void applyPreset(String s) {
 		DevicePlatform p = Devices.getPlatform(s);
-		screenWidthText.setText(p.getString("SCREEN_WIDTH"));
-		screenHeightText.setText(p.getString("SCREEN_HEIGHT"));
+		if (p == null) {
+			return;
+		}
+		if (p.exists("SCREEN_WIDTH")) {
+			screenWidthText.setText(p.getString("SCREEN_WIDTH"));
+			screenHeightText.setText(p.getString("SCREEN_HEIGHT"));
+		}
+		if (p.exists("PLATFORM")) {
+			platformText.setText(p.getString("PLATFORM"));
+		}
+		if (p.exists("ENCODING")) {
+			encodingCombo.setText(p.getString("ENCODING"));
+		}
 		leftSoftText.setText(p.getString("KEY_S1"));
 		rightSoftText.setText(p.getString("KEY_S2"));
 		fireText.setText(p.getString("KEY_FIRE"));

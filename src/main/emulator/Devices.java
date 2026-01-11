@@ -25,26 +25,31 @@ public final class Devices {
 	public static void load(final String s) {
 		try {
 			final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			InputStream resourceAsStream;
+			InputStream stream = null;
 			try {
-				resourceAsStream = Emulator.class.getResourceAsStream(s);
-			} catch (Exception ex) {
-				resourceAsStream = new FileInputStream(s);
+				stream = Emulator.class.getResourceAsStream(s);
+			} catch (Exception ignored) {}
+			if (stream == null) {
+				stream = new FileInputStream(s);
 			}
-			if (resourceAsStream == null) {
+			if (stream == null) {
 				throw new Exception("device file could not be found: " + s);
 			}
-			final Document parse = documentBuilder.parse(resourceAsStream);
-			defaultPreset = ((Element) parse.getElementsByTagName("default").item(0)).getAttribute("value");
-			for (int i = 0; i < Devices.aStringArray1077.length; ++i) {
-				final NodeList elementsByTagName = parse.getElementsByTagName(Devices.aStringArray1077[i]);
-				for (int j = 0; j < elementsByTagName.getLength(); ++j) {
-					final DevicePlatform e = new DevicePlatform((Element) elementsByTagName.item(j));
-					Devices.aHashtable1074.put(e.name.toLowerCase(), e);
-					if (i > 0) {
-						Devices.anArrayList1075.add(e.name);
+			try {
+				final Document parse = documentBuilder.parse(stream);
+				defaultPreset = ((Element) parse.getElementsByTagName("default").item(0)).getAttribute("value");
+				for (int i = 0; i < Devices.aStringArray1077.length; ++i) {
+					final NodeList elementsByTagName = parse.getElementsByTagName(Devices.aStringArray1077[i]);
+					for (int j = 0; j < elementsByTagName.getLength(); ++j) {
+						final DevicePlatform e = new DevicePlatform((Element) elementsByTagName.item(j));
+						Devices.aHashtable1074.put(e.name.toLowerCase(), e);
+						if (i > 0) {
+							Devices.anArrayList1075.add(e.name);
+						}
 					}
 				}
+			} finally {
+				stream.close();
 			}
 //			Collections.sort((List<Comparable>) Devices.anArrayList1075);
 		} catch (Exception ex2) {
