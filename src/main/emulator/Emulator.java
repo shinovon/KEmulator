@@ -616,7 +616,8 @@ public class Emulator implements Runnable {
 			}
 			
 			if (bridge)
-				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/", 240, 320);
+				Emulator.emulatorimpl = new BridgeFrontend("/tmp/kem/",
+						startWidth != 0 ? startWidth : 240, startHeight != 0 ? startHeight : 320);
 			else
 				Emulator.emulatorimpl = new SWTFrontend();
 			parseLaunchArgs(args);
