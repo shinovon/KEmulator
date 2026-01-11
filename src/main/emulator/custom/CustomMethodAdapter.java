@@ -39,13 +39,16 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				}
 				if (name.equals("exit")) {
 					if (sign.equals("(I)V")) {
-						try {
-							// bypass nokia platform check
-							if (methodName.equals("<clinit>") && Emulator.getEmulator().getAppProperty("Nokia-Platform") != null) {
-								super.visitInsn(Opcodes.POP);
-								return;
-							}
-						} catch (Throwable ignored) {}
+						if (Settings.bypassVserv) {
+							try {
+								// bypass nokia platform check
+								if (methodName.equals("<clinit>") && Emulator.getEmulator().getAppProperty("Nokia-Platform") != null) {
+									Emulator.getEmulator().getLogStream().println("Patched Nokia-Platform check: " + cls + '.' + name + sign);
+									super.visitInsn(Opcodes.POP);
+									return;
+								}
+							} catch (Throwable ignored) {}
+						}
 
 						super.visitMethodInsn(184, "emulator/custom/CustomMethod", "exit", sign);
 						return;
