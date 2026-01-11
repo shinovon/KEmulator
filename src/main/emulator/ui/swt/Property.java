@@ -223,6 +223,8 @@ public final class Property implements IProperty, SelectionListener {
 	private Group grpDebug;
 	private Group grpMisc;
 
+	private int lastChangedFont;
+
 	public Property() {
 		super();
 		this.loadProperties();
@@ -1963,6 +1965,8 @@ public final class Property implements IProperty, SelectionListener {
 		(aCLabel).setText("Monospace Font:");
 		aCLabel.setLayoutData(layoutData5);
 		this.setupMonoFontChoice();
+		
+		lastChangedFont = 0;
 
 		Group fontPreviewGroup = new Group(this.fontComp, SWT.NONE);
 		fontPreviewGroup.setLayout(new GridLayout(3, false));
@@ -2043,6 +2047,7 @@ public final class Property implements IProperty, SelectionListener {
 		defaultFontCombo.setLayoutData(layoutData);
 		this.defaultFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
+				lastChangedFont = 0;
 				method360(7);
 			}
 		});
@@ -2083,6 +2088,7 @@ public final class Property implements IProperty, SelectionListener {
 		monoFontCombo.setLayoutData(layoutData);
 		this.monoFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
+				lastChangedFont = 1;
 				method360(7);
 			}
 		});
@@ -2178,18 +2184,19 @@ public final class Property implements IProperty, SelectionListener {
 		if (!this.setsShell.isVisible()) {
 			return;
 		}
+		String fontName = lastChangedFont == 1 ? monoFontCombo.getText() : defaultFontCombo.getText();
 		IFont font = null;
 		if ((n & 0x1) != 0x0) {
 			Label_0080:
 			{
 				IFont font2;
 				if (Settings.g2d == 0) {
-					font2 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner670.getSelection(), 0);
+					font2 = new FontSWT(fontName, this.aSpinner670.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0080;
 					}
-					font2 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner670.getSelection(), 0, false);
+					font2 = new FontAWT(fontName, this.aSpinner670.getSelection(), 0, false);
 				}
 				font = font2;
 			}
@@ -2207,12 +2214,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font3;
 				if (Settings.g2d == 0) {
-					font3 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner679.getSelection(), 0);
+					font3 = new FontSWT(fontName, this.aSpinner679.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0242;
 					}
-					font3 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner679.getSelection(), 0, false);
+					font3 = new FontAWT(fontName, this.aSpinner679.getSelection(), 0, false);
 				}
 				font = font3;
 			}
@@ -2230,12 +2237,12 @@ public final class Property implements IProperty, SelectionListener {
 			{
 				IFont font4;
 				if (Settings.g2d == 0) {
-					font4 = new FontSWT(this.defaultFontCombo.getText(), this.aSpinner690.getSelection(), 0);
+					font4 = new FontSWT(fontName, this.aSpinner690.getSelection(), 0);
 				} else {
 					if (Settings.g2d != 1) {
 						break Label_0404;
 					}
-					font4 = new FontAWT(this.defaultFontCombo.getText(), this.aSpinner690.getSelection(), 0, false);
+					font4 = new FontAWT(fontName, this.aSpinner690.getSelection(), 0, false);
 				}
 				font = font4;
 			}
