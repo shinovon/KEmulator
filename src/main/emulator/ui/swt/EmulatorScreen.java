@@ -841,8 +841,9 @@ public final class EmulatorScreen implements
 			public void shellDeactivated(ShellEvent e) {
 				try {
 					synchronized (pressedKeys) {
-						for (Integer n : pressedKeys) {
-							handleKeyReleaseMapped(n.toString());
+						while (!pressedKeys.isEmpty()) {
+							handleKeyReleaseMapped(pressedKeys.get(0).toString());
+							pressedKeys.remove(0);
 						}
 					}
 				} catch (Exception ignored) {}
