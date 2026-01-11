@@ -257,7 +257,7 @@ public class Emulator implements Runnable {
 
 	public static void getLibraries() {
 		final File file;
-		if ((file = new File(getAbsolutePath() + File.separatorChar + "libs")).exists() && file.isDirectory()) {
+		if ((file = new File(getAbsolutePath(), "libs")).exists() && file.isDirectory()) {
 			final File[] listFiles = file.listFiles();
 			for (int i = 0; i < listFiles.length; ++i) {
 				final String absolutePath;
@@ -446,7 +446,7 @@ public class Emulator implements Runnable {
 		final String[] split = Emulator.classPath.split(";");
 		for (int i = 0; i < split.length; ++i) {
 			final File file;
-			if ((file = new File(split[i] + File.separatorChar + s)).exists()) {
+			if ((file = new File(split[i], s)).exists()) {
 				return file;
 			}
 		}
@@ -869,7 +869,7 @@ public class Emulator implements Runnable {
 
 	public static String getAbsoluteFile() {
 		String s = System.getProperty("user.dir");
-		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+		if (new File(s, "KEmulator.jar").exists() || new File(s, "sensorsimulator.jar").exists()) {
 			return s + File.separatorChar + "KEmulator.jar";
 		}
 		s = Emulator.class.getProtectionDomain().getCodeSource().getLocation().getFile();
@@ -885,7 +885,7 @@ public class Emulator implements Runnable {
 //			else if (s.endsWith("bin/")) {
 //				s = s.substring(0, s.length() - 4);
 //			}
-			if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+			if (new File(s, "KEmulator.jar").exists() || new File(s, "sensorsimulator.jar").exists()) {
 				s = s + File.separatorChar + "KEmulator.jar";
 			} else {
 				System.out.println("Running from " + s);
@@ -901,7 +901,7 @@ public class Emulator implements Runnable {
 
 	public static String getAbsolutePath() {
 		String s = System.getProperty("user.dir");
-		if (new File(s + File.separatorChar + "KEmulator.jar").exists() || new File(s + File.separatorChar + "sensorsimulator.jar").exists()) {
+		if (new File(s, "KEmulator.jar").exists() || new File(s, "sensorsimulator.jar").exists()) {
 			return s;
 		}
 		File file = new File(getAbsoluteFile()).getParentFile();
