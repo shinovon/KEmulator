@@ -2,6 +2,8 @@ package emulator.media.mmf;
 
 import emulator.Emulator;
 
+import java.io.File;
+
 public class MMFPlayer {
 	static boolean initialized;
 	static MaDll maDll;
@@ -19,8 +21,13 @@ public class MMFPlayer {
 			return false;
 		}
 		try {
-			maDll = new MaDll(Emulator.getAbsolutePath() + "/ma3smwemu.dll", MaDll.MODE_MA3);
-//			maDll = new MaDll(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll", MaDll.MODE_MA5);
+			if (new File(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll").exists()
+					&& new File(Emulator.getAbsolutePath() + "/M5_EmuHw.dll").exists()
+					&& new File(Emulator.getAbsolutePath() + "/SMAFMMS5EMU.dll").exists()) {
+				maDll = new MaDll(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll", MaDll.MODE_MA5);
+			} else {
+				maDll = new MaDll(Emulator.getAbsolutePath() + "/ma3smwemu.dll", MaDll.MODE_MA3);
+			}
 			maDll.init();
 			return MMFPlayer.initialized = true;
 		} catch (Throwable e) {

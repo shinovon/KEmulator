@@ -127,7 +127,6 @@ public class Emulator implements Runnable {
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
 			generateJad();
-			return;
 		}
 		AppSettings.save();
 	}
