@@ -40,34 +40,38 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		this.waterCanvas = null;
 	}
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	private void createAboutShell(final Shell shell) {
-		final GridData gridData;
-		(gridData = new GridData()).horizontalAlignment = 4;
+		final GridData gridData = new GridData();
+		(gridData).horizontalAlignment = 4;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalAlignment = 2;
-		final GridData layoutData5;
-		(layoutData5 = new GridData()).horizontalAlignment = 4;
+		final GridData layoutData5 = new GridData();
+		(layoutData5).horizontalAlignment = 4;
 		layoutData5.grabExcessHorizontalSpace = true;
 		layoutData5.grabExcessVerticalSpace = false;
 		layoutData5.verticalAlignment = 4;
 		layoutData5.verticalSpan = 1;
-		final GridData gridData2;
-		(gridData2 = new GridData()).horizontalIndent = 5;
+		final GridData gridData2 = new GridData();
+		(gridData2).horizontalIndent = 5;
 		gridData2.horizontalAlignment = 4;
 		gridData2.grabExcessHorizontalSpace = false;
 		gridData2.grabExcessVerticalSpace = false;
 		gridData2.verticalAlignment = 4;
-		final GridData gridData3;
-		(gridData3 = new GridData()).horizontalIndent = 5;
+		final GridData gridData3 = new GridData();
+		(gridData3).horizontalIndent = 5;
 		gridData3.horizontalAlignment = 4;
 		gridData3.grabExcessHorizontalSpace = false;
 		gridData3.grabExcessVerticalSpace = false;
 		gridData3.verticalAlignment = 4;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 2;
+		final GridLayout layout = new GridLayout();
+		(layout).numColumns = 2;
 		layout.horizontalSpacing = 0;
 
-		(this.aboutShell = new Shell(shell, 67680)).setText("About KEmulator");
+		this.aboutShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		aboutShell.setText("About KEmulator");
 		this.aboutShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.aboutShell.setLayout(layout);
 		aboutShell.addShellListener(new ShellAdapter() {
@@ -80,7 +84,8 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 
 		this.addIcon();
 
-		(this.aboutText = new CLabel(this.aboutShell, 0)).setLayoutData(layoutData5);
+		this.aboutText = new CLabel(this.aboutShell, 0);
+		aboutText.setLayoutData(layoutData5);
 		aboutText.setFont(EmulatorScreen.f);
 		this.aboutText.setText(Emulator.getAboutString());
 
@@ -103,12 +108,13 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		});
 
 		{
-			final GridData layoutData3;
-			(layoutData3 = new GridData()).horizontalAlignment = 3;
+			final GridData layoutData3 = new GridData();
+			(layoutData3).horizontalAlignment = 3;
 			layoutData3.grabExcessHorizontalSpace = false;
 			layoutData3.verticalAlignment = GridData.END;
 
-			(this.okBtn = new Button(this.aboutShell, 8388616)).setText(emulator.UILocale.get("DIALOG_OK", "OK"));
+			okBtn = new Button(this.aboutShell, 8388616);
+			okBtn.setText(emulator.UILocale.get("DIALOG_OK", "OK"));
 			this.okBtn.setLayoutData(layoutData3);
 //			layoutData3.heightHint = 20;
 			layoutData3.widthHint = 100;
@@ -248,13 +254,14 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 	}
 
 	private void addIcon() {
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
+		final GridData layoutData = new GridData();
+		(layoutData).horizontalAlignment = 4;
 		layoutData.verticalAlignment = 4;
 		layoutData.verticalSpan = 4;
 		layoutData.heightHint = 146;
 		layoutData.widthHint = 156;
-		(this.waterCanvas = new Canvas(this.aboutShell, 537133056)).setLayoutData(layoutData);
+		this.waterCanvas = new Canvas(this.aboutShell, 537133056);
+		waterCanvas.setLayoutData(layoutData);
 		this.waterCanvas.addMouseListener(this);
 		this.waterCanvas.addMouseMoveListener(this);
 		waterCanvas.addPaintListener(this);

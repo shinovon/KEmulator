@@ -100,6 +100,7 @@ public class AppSettingsUI {
 		}
 		shell.open();
 		shell.layout();
+		screenWidthText.setFocus();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -111,7 +112,7 @@ public class AppSettingsUI {
 	 * @wbp.parser.entryPoint
 	 */
 	protected void createContents(Shell parent) {
-		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE);
+		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setLayout(new GridLayout(1, false));
 		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(ShellEvent e) {
@@ -200,9 +201,10 @@ public class AppSettingsUI {
 		lblNewLabel_2.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 		lblNewLabel_2.setText("Version: " + Emulator.getEmulator().getAppProperty("MIDlet-Version"));
 
-		CTabFolder tabFolder = new CTabFolder(composite, SWT.BORDER);
+		CTabFolder tabFolder = new CTabFolder(composite, SWT.BORDER | SWT.FLAT);
+		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
+		tabFolder.setSimple(true);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 
 		CTabItem tbtmGeneral = new CTabItem(tabFolder, SWT.NONE);
 		tbtmGeneral.setText("General");

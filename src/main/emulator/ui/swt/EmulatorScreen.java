@@ -889,26 +889,32 @@ public final class EmulatorScreen implements
 			menu.dispose();
 		}
 		this.menu = new Menu(this.shell, SWT.BAR);
+
 		final MenuItem menuItemMidlet;
 		(menuItemMidlet = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_MIDLET", "Midlet"));
+
 		final MenuItem menuItemTool;
 		(menuItemTool = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_TOOL", "Tool"));
+
 		final MenuItem menuItemView;
 		(menuItemView = new MenuItem(this.menu, 64)).setText(UILocale.get("MENU_VIEW", "View"));
 
 		this.menuView = new Menu(menuItemView);
+
 		(this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
 		this.infosMenuItem.addSelectionListener(this);
+
 		(this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tAlt+X");
 		this.xrayViewMenuItem.addSelectionListener(this);
+
 		if (!Emulator.isX64()) {
 			(this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top") + "\tCtrl+O");
 			this.alwaysOnTopMenuItem.addSelectionListener(this);
 			this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
 		}
+
 		(this.rotateScreenMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_ROTATE", "Rotate Screen") + "\tCtrl+Y");
 		this.rotateScreenMenuItem.addSelectionListener(this);
-
 
 		this.rotate90MenuItem = new MenuItem(this.menuView, 8);
 		this.rotate90MenuItem.setText(UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees") + "\tAlt+Y");
@@ -921,43 +927,62 @@ public final class EmulatorScreen implements
 		} catch (Throwable ignored) {
 		}
 		new MenuItem(this.menuView, 2);
+
 		(this.keypadMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_KEYPAD", "Keypad"));
 		this.keypadMenuItem.addSelectionListener(this);
+
 		(this.watchesMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_WATCHES", "Watches"));
 		this.watchesMenuItem.addSelectionListener(this);
+
 		(this.profilerMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_PROFILER", "Profiler"));
 		this.profilerMenuItem.addSelectionListener(this);
+
 		(this.methodsMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_METHODS", "Methods"));
 		this.methodsMenuItem.addSelectionListener(this);
+
 		(this.memoryViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEMORY", "Memory View"));
+
 		(this.mediaViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_MEDIA", "Media View"));
+
 		(this.m3gViewMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_M3GVIEW", "M3G View"));
+
 		m3gViewMenuItem.setEnabled(Settings.g3d == 1);
 		this.m3gViewMenuItem.addSelectionListener(this);
 		this.memoryViewMenuItem.addSelectionListener(this);
 		this.mediaViewMenuItem.addSelectionListener(this);
+
 		(this.smsConsoleMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SMS", "SMS Console"));
 		this.smsConsoleMenuItem.addSelectionListener(this);
+
 		(this.sensorMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_SENSOR", "Sensor Simulator"));
 		this.sensorMenuItem.addSelectionListener(this);
+
 		devUtilsMenuItem = new MenuItem(this.menuView, 8);
 		devUtilsMenuItem.setText("IntelliJ IDEA support");
 		devUtilsMenuItem.addSelectionListener(this);
+
 		(this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
 		this.logMenuItem.addSelectionListener(this);
 
 		new MenuItem(this.menuView, 2);
-		(this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText("KEmulator Settings...");
+
+		(this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText("Settings...");
 		this.optionsMenuItem.addSelectionListener(this);
-		(this.helpMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
-		this.helpMenuItem.addSelectionListener(this);
+
+		new MenuItem(this.menuView, 2);
+
 		(this.updateMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_CHECK_UPDATE", "Check for Updates"));
 		this.updateMenuItem.addSelectionListener(this);
 
+		(this.helpMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_HELP", "About"));
+		this.helpMenuItem.addSelectionListener(this);
+
 		menuItemView.setMenu(this.menuView);
 		this.menuTool = new Menu(menuItemTool);
+
 		(this.zoomInMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMIN", "Zoom In") + "\tPad+");
 		this.zoomInMenuItem.addSelectionListener(this);
+
 		(this.zoomOutMenuItem = new MenuItem(this.menuTool, 8)).setText(UILocale.get("MENU_TOOL_ZOOMOUT", "Zoom Out") + "\tPad-");
 		this.zoomOutMenuItem.addSelectionListener(this);
 

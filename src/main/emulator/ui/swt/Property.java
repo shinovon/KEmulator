@@ -842,7 +842,7 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void method372(final Shell shell) {
-		this.setsShell = new Shell(shell, 67680);
+		this.setsShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		setsShell.setText(UILocale.get("OPTION_FRAME_TITLE", "Options & Properties"));
 		this.setsShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		// 1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI
@@ -937,11 +937,12 @@ public final class Property implements IProperty, SelectionListener {
 
 	private void method393() {
 		final GridData layoutData = new GridData();
+		layoutData.grabExcessVerticalSpace = true;
 		(layoutData).horizontalAlignment = 4;
 		layoutData.horizontalSpan = 2;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
-		this.tabFolder = new CTabFolder(this.setsShell, 8390656);
+		this.tabFolder = new CTabFolder(this.setsShell, SWT.BORDER | SWT.FLAT);
 		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
 		this.tabFolder.setSimple(true);
 		tabFolder.setFont(f);
