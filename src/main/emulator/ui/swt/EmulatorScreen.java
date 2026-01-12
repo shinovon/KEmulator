@@ -1122,8 +1122,9 @@ public final class EmulatorScreen implements
 		menuItemTool.setMenu(this.menuTool);
 
 		this.menuMidlet = new Menu(menuItemMidlet);
-		(this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar..."));
+		(this.loadJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_LOAD_JAR", "Load jar...") + "\tCtrl+O");
 		this.loadJarMenuItem.addSelectionListener(this);
+		loadJarMenuItem.setAccelerator(SWT.CONTROL | 'O');
 		(this.loadAutoPlayMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_LOAD_AUTO_PLAY", "Load auto-play record"));
 		this.loadAutoPlayMenuItem.addSelectionListener(this);
 		final MenuItem menuItem5;
