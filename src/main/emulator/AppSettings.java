@@ -128,7 +128,7 @@ public class AppSettings {
 		enableKeyRepeat = true;
 		hasPointerEvents = true;
 
-		ignoreFullScreen = false;
+		ignoreFullScreen = true;
 		asyncFlush = true;
 		startAppOnResume = true;
 

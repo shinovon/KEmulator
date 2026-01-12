@@ -8,6 +8,7 @@ import emulator.Emulator;
 import emulator.KeyMapping;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
+import emulator.lcdui.LCDUIUtils;
 import emulator.ui.IScreen;
 
 import java.util.ArrayList;
@@ -88,6 +89,17 @@ public abstract class Canvas extends Displayable {
 			if (i instanceof TextEditor) {
 				((TextEditor) i)._invokePaint(graphics);
 			}
+		}
+		if (!fullScreen) {
+			int w = getWidth();
+			int y = getActualHeight();
+			int h = Screen.fontHeight4;
+			graphics.setClip(0, 0, w, Emulator.getEmulator().getScreen().getHeight());
+			graphics.setColor(LCDUIUtils.backgroundColor);
+			graphics.fillRect(0, y, w, h);
+			graphics.setFont(Font.getFont(0, 0, Font.SIZE_SMALL));
+			graphics.setColor(LCDUIUtils.foregroundColor);
+			graphics.drawString("Fake soft bar", w >> 1, y + 2, Graphics.HCENTER | Graphics.TOP);
 		}
 	}
 
