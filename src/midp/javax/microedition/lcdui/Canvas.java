@@ -11,6 +11,8 @@ import emulator.graphics2D.IImage;
 import emulator.ui.IScreen;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public abstract class Canvas extends Displayable {
 	public static final int UP = 1;
@@ -72,9 +74,10 @@ public abstract class Canvas extends Displayable {
 	protected void _paintOverlay(Graphics graphics) {
 		super._paintTicker(graphics);
 		super._paintSoftMenu(graphics);
-		for (CanvasItem i: nokiaCanvasItems) {
+		ArrayList<CanvasItem> list = new ArrayList<>(nokiaCanvasItems);
+		list.sort(Comparator.comparingInt(CanvasItem::getZPosition));
+		for (CanvasItem i: list) {
 			if (!i.isVisible()) continue;
-			// TODO z-position
 			if (i instanceof CanvasGraphicsItem) {
 				graphics.setClip(i.getPositionX(), i.getPositionY(), i.getWidth(), i.getHeight());
 				graphics.translate(-i.getPositionX(), -i.getPositionY());
