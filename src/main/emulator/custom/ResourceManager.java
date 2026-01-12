@@ -76,6 +76,10 @@ public final class ResourceManager {
 			}
 			return Emulator.class.getResourceAsStream(s);
 		}
+
+		if (Settings.hideEmulation) {
+			return new ByteArrayInputStream(data);
+		}
 		return new ResourceStream(data, name);
 	}
 

@@ -102,7 +102,7 @@ public class AppSettings {
 
 	public static void init() {
 		if (!applyPreset(devicePreset = Devices.getDefaultPreset(), true)) {
-			// fallback in case user deletes preset
+			// fallback in case user deletes presets
 			screenWidth = 240;
 			screenHeight = 320;
 
@@ -590,6 +590,9 @@ public class AppSettings {
 		}
 		if (p.exists("FONT_LARGE_SIZE")) {
 			fontLargeSize = Integer.parseInt(p.getString("FONT_LARGE_SIZE"));
+		}
+		if (p.exists("FORCE_FULLSCREEN")) {
+			ignoreFullScreen = Boolean.parseBoolean(p.getString("FORCE_FULLSCREEN"));
 		}
 		leftSoftKey = Integer.parseInt(p.getString("KEY_S1"));
 		rightSoftKey = Integer.parseInt(p.getString("KEY_S2"));

@@ -700,6 +700,9 @@ public class AppSettingsUI {
 		if (p.exists("FONT_LARGE_SIZE")) {
 			largeSizeSpinner.setSelection(Integer.parseInt(p.getString("FONT_LARGE_SIZE")));
 		}
+		if (p.exists("FORCE_FULLSCREEN")) {
+			ignoreFullScreenCheck.setSelection(Boolean.parseBoolean(p.getString("FORCE_FULLSCREEN")));
+		}
 		leftSoftText.setText(p.getString("KEY_S1"));
 		rightSoftText.setText(p.getString("KEY_S2"));
 		fireText.setText(p.getString("KEY_FIRE"));

@@ -17,9 +17,12 @@
 package com.siemens.mp.lcdui;
 
 import emulator.Emulator;
+import emulator.graphics2D.awt.AWTImageUtils;
+import emulator.graphics2D.awt.ImageAWT;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -45,11 +48,9 @@ public class Image extends com.siemens.mp.ui.Image {
 				scaleToHeight = (int) (((double) img.getHeight() / img.getWidth()) * scaleToWidth);
 			}
 
-			javax.microedition.lcdui.Image newImage = javax.microedition.lcdui.Image.createImage(scaleToWidth, scaleToHeight);
-
-
-
-			return newImage;
+			return new javax.microedition.lcdui.Image(
+					new ImageAWT(AWTImageUtils.resize((BufferedImage) img._getImpl().getNative(),
+							scaleToWidth, scaleToHeight)));
 		}
 
 		return img;
@@ -87,5 +88,24 @@ public class Image extends com.siemens.mp.ui.Image {
 			javax.microedition.lcdui.Image img, int n1, int n2, int n3, int n4, int n5, int n6) {
 		// TODO
 		return img;
+	}
+
+	public static javax.microedition.lcdui.Image createTransparentImageFromMask(javax.microedition.lcdui.Image image, javax.microedition.lcdui.Image mask) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int[] imagePixels = new int[width * height];
+		int[] maskPixels = new int[width * height];
+
+		image.getRGB(imagePixels, 0, width, 0, 0, width, height);
+		mask.getRGB(maskPixels, 0, width, 0, 0, width, height);
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (maskPixels[y * width + x] == 0xFFFFFFFF) {
+					imagePixels[y * width + x] = 0;
+				}
+			}
+		}
+		return javax.microedition.lcdui.Image.createRGBImage(imagePixels, width, height, true);
 	}
 }

@@ -88,12 +88,14 @@
     <preset name="101x64 (Siemens - full screen)" layout="Siemens">
         <define name="SCREEN_WIDTH" value="101"/>
         <define name="SCREEN_HEIGHT" value="64"/>
+        <define name="FORCE_FULLSCREEN" value="true"/>
     </preset>
 
     <!-- Siemens SL45i -->
     <preset name="101x80 (Siemens - full screen)" layout="Siemens">
         <define name="SCREEN_WIDTH" value="101"/>
         <define name="SCREEN_HEIGHT" value="80"/>
+        <define name="FORCE_FULLSCREEN" value="true"/>
     </preset>
 
     <!-- Motorola C650 -->
