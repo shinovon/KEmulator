@@ -52,6 +52,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 
 	public SWTFrontend() {
 		super();
+		Display.setAppName("KEmulator");
 		display = new Display();
 		this.plugins = new Vector();
 		this.screenDepth = SWTFrontend.display.getDepth();
@@ -64,7 +65,6 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		this.profiler = Watcher.createForProfiler();
 		this.methods = new Methods();
 		this.appSettingsUI = new AppSettingsUI();
-		Display.setAppName("KEmulator");
 	}
 
 	public void dispose() {
