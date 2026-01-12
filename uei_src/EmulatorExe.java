@@ -259,13 +259,12 @@ public class EmulatorExe {
 					cmd.add(arg);
 					continue;
 				case "-rec":
-				case "-device":
-				case "-devicefile":
 				case "-fontname":
 				case "-fontsmall":
 				case "-fontmedium":
 				case "-fontlarge":
 				case "-key":
+				case "-screen":
 					cmd.add(arg);
 					cmd.add(args[i+=1]);
 					continue;
