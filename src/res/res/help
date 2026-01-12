@@ -1,4 +1,4 @@
-$v2.21 [2026.01.10]
+$v2.21 [2026.01.12]
 New device presets
 Application settings
 MIDI soundfont changing
@@ -12,6 +12,7 @@ Replaced mmfplayer.dll with JNA implementation
 Stub com.nokia.mid.ui.gestures API
 Optimized image rendering in MemoryView
 Updated sensorsimulator.jar to 1.1.1
+Improved siemens api
 Fixed Media View on Java 9+
 Fixed LWJGL libraries loading on Intel Mac
 Fixed M3G on macOS 11 and later
