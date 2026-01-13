@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.4";
+	private static final String VERSION = "0.5";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
 	
