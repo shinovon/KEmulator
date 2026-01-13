@@ -1602,21 +1602,13 @@ public final class EmulatorScreen implements
 				final File f;
 				if ((f = new File(Emulator.getAbsolutePath() + "/sensorsimulator.jar")).exists()) {
 					try {
-						if (Emulator.isX64()) {
-							String javahome = System.getProperty("java.home");
-							Runtime.getRuntime().exec(new String[]{
-									javahome == null || javahome.length() < 1 ? "java" : (javahome + "/bin/java"),
-									"-jar",
-									f.getAbsolutePath()
-							});
-						} else {
-							final String[] array;
-							(array = new String[2])[0] = "cmd.exe";
-							array[1] = "/c \" java -jar " + f.getAbsolutePath() + " \"";
-							Runtime.getRuntime().exec(array);
-						}
-					} catch (Exception ignored) {
-					}
+						String javahome = System.getProperty("java.home");
+						Runtime.getRuntime().exec(new String[]{
+								javahome == null || javahome.length() < 1 ? "java" : (javahome + "/bin/java"),
+								"-jar",
+								f.getAbsolutePath()
+						});
+					} catch (Exception ignored) {}
 				}
 				return;
 			}
