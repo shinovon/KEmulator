@@ -158,7 +158,11 @@ public final class CustomClassLoader extends ClassLoader {
 				&& (s.startsWith("java.applet") || s.startsWith("java.awt") || s.startsWith("java.swing")
 				|| s.startsWith("org.eclipse.swt") || s.startsWith("java.lang.CharSequence")
 				|| s.startsWith("java.util.Collection") || s.startsWith("java.util.ArrayList") || s.startsWith("java.lang.ClassLoader")
-				|| s.startsWith("java.util.Map") || s.startsWith("sun.") || s.startsWith("jdk."))) {
+				|| s.startsWith("java.util.Map") || s.startsWith("java.util.Base64") || s.startsWith("java.util.Objects")
+				|| s.startsWith("java.util.Deque") || s.startsWith("java.util.regex.") || s.startsWith("java.util.Terminator")
+				|| s.startsWith("java.lang.Enum") || s.startsWith("java.lang.SecurityManager") || s.startsWith("java.lang.Terminator")
+				|| s.startsWith("java.nio.DoubleBuffer") || s.startsWith("java.lang.Compiler") || s.startsWith("java.util.Observer")
+				|| s.startsWith("sun.") || s.startsWith("jdk."))) {
 			return true;
 		}
 
