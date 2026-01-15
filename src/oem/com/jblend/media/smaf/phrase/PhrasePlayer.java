@@ -1,70 +1,130 @@
-/*
- * Copyright 2023 Yury Kharchenko
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.jblend.media.smaf.phrase;
 
+import emulator.media.mmf.MMFPlayer;
+
 public class PhrasePlayer {
-	private static final PhrasePlayer phrasePlayer = new PhrasePlayer();
+    private static PhrasePlayer phrasePlayer;
 
-	protected int trackCount;
-	protected int audioTrackCount;
+    protected int trackCount;
+    protected int audioTrackCount;
 
-	public static PhrasePlayer getPlayer() {
-		return phrasePlayer;
-	}
+    PhraseTrack[] tracks;
+    AudioPhraseTrack[] audioTracks;
 
-	public void disposePlayer() {
-	}
+    PhrasePlayer() {
+        MMFPlayer.initialize();
+        MMFPlayer.getMaDll().phraseInitialize();
+        tracks = new PhraseTrack[MMFPlayer.getMaDll().getMaxTracks()];
+        audioTracks = new AudioPhraseTrack[16];
+    }
 
-	public PhraseTrack getTrack() {
-		return new PhraseTrack(trackCount++);
-	}
+    public static PhrasePlayer getPlayer() {
+        if (phrasePlayer == null) phrasePlayer = new PhrasePlayer();
+        return phrasePlayer;
+    }
 
-	public AudioPhraseTrack getAudioTrack() {
-		return new AudioPhraseTrack(audioTrackCount++);
-	}
+    public void disposePlayer() {
+        kill();
+        phrasePlayer = null;
+    }
 
-	public int getTrackCount() {
-		return 16;
-	}
+    public PhraseTrack getTrack() {
+        int id = -1;
+        for (int i = 0; i < tracks.length; ++i) {
+            if (tracks[i] == null) {
+                id = i;
+                break;
+            }
+        }
+        if (id == -1) {
+            throw new IllegalStateException();
+        }
+        PhraseTrack t = new PhraseTrack(id);
+        tracks[id] = t;
+        trackCount++;
+        return t;
+    }
 
-	public int getAudioTrackCount() {
-		return 16;
-	}
+    public AudioPhraseTrack getAudioTrack() {
+        int id = -1;
+        for (int i = 0; i < audioTracks.length; ++i) {
+            if (audioTracks[i] == null) {
+                id = i;
+                break;
+            }
+        }
+        if (id == -1) {
+            throw new IllegalStateException();
+        }
+        AudioPhraseTrack t = new AudioPhraseTrack(id);
+        audioTracks[id] = t;
+        audioTrackCount++;
+        return t;
+    }
 
-	public PhraseTrack getTrack(int track) {
-		return new PhraseTrack(track);
-	}
+    public int getTrackCount() {
+        return trackCount;
+    }
 
-	public AudioPhraseTrack getAudioTrack(int track) {
-		return new AudioPhraseTrack(track);
-	}
+    public int getAudioTrackCount() {
+        return audioTrackCount;
+    }
 
-	public void disposeTrack(PhraseTrack t) {
-	}
+    public PhraseTrack getTrack(int track) {
+        return tracks[track];
+    }
 
-	public void disposeAudioTrack(AudioPhraseTrack t) {
-	}
+    public AudioPhraseTrack getAudioTrack(int track) {
+        return audioTracks[track];
+    }
 
-	public void kill() {
-	}
+    public void disposeTrack(PhraseTrack t) {
+        int id = t.getID();
+        if (tracks[id] == t) {
+            t.removePhrase();
+            tracks[id] = null;
+        }
+    }
 
-	public void pause() {
-	}
+    public void disposeAudioTrack(AudioPhraseTrack t) {
+        int id = t.getID();
+        if (audioTracks[id] == t) {
+            t.removePhrase();
+            audioTracks[id] = null;
+        }
+    }
 
-	public void resume() {
-	}
+    public void kill() {
+        for (int i = 0; i < tracks.length; ++i) {
+            if (tracks[i] == null) continue;
+            tracks[i].removePhrase();
+        }
+        for (int i = 0; i < audioTracks.length; ++i) {
+            if (audioTracks[i] == null) continue;
+            audioTracks[i].removePhrase();
+        }
+        MMFPlayer.getMaDll().phraseKill();
+    }
+
+    public void pause() {
+        for (int i = 0; i < tracks.length; ++i) {
+            if (tracks[i] == null) continue;
+            tracks[i].pause();
+        }
+        for (int i = 0; i < audioTracks.length; ++i) {
+            if (audioTracks[i] == null) continue;
+            audioTracks[i].pause();
+        }
+    }
+
+    public void resume() {
+        for (int i = 0; i < tracks.length; ++i) {
+            if (tracks[i] == null) continue;
+            tracks[i].resume();
+        }
+        for (int i = 0; i < audioTracks.length; ++i) {
+            if (audioTracks[i] == null) continue;
+            audioTracks[i].resume();
+        }
+    }
 }

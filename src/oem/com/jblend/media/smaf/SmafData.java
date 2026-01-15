@@ -8,7 +8,7 @@ import java.io.IOException;
 public class SmafData extends MediaData {
 
 	public static final String type = "SMAF";
-	private byte[] data;
+	byte[] data;
 
 	public SmafData() {
 		data = null;
@@ -23,7 +23,7 @@ public class SmafData extends MediaData {
 	}
 
 	public String getMediaType() {
-		return null;
+		return type;
 	}
 
 	public void setData(byte[] data) {
@@ -31,14 +31,17 @@ public class SmafData extends MediaData {
 	}
 
 	public int getContentType() {
+		// TODO
 		return 0;
 	}
 
 	public int getTagStart(int tag) {
+		// TODO
 		return -1;
 	}
 
 	public int getTagEnd(int tag) {
+		// TODO
 		return -1;
 	}
 
@@ -48,9 +51,5 @@ public class SmafData extends MediaData {
 
 	public int getHeight() {
 		return 0;
-	}
-
-	byte[] _getData() {
-		return data;
 	}
 }

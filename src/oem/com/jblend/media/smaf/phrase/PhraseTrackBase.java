@@ -24,10 +24,13 @@ abstract class PhraseTrackBase {
 	public static final int DEFAULT_VOLUME = 100;
 	public static final int DEFAULT_PANPOT = 64;
 	private int state;
-	private boolean muted;
+	int volume = DEFAULT_VOLUME;
+	int panpot = DEFAULT_PANPOT;
+	boolean mute;
+	int id;
 
 	PhraseTrackBase(int id) {
-		state = READY;
+		this.id = id;
 	}
 
 	public void removePhrase() {
@@ -58,29 +61,31 @@ abstract class PhraseTrackBase {
 	}
 
 	public void setVolume(int value) {
+		this.volume = value;
 	}
 
 	public int getVolume() {
-		return 0;
+		return volume;
 	}
 
 	public void setPanpot(int value) {
+		this.panpot = value;
 	}
 
 	public int getPanpot() {
-		return 0;
+		return panpot;
 	}
 
 	public void mute(boolean mute) {
-		muted = mute;
+		this.mute = mute;
 	}
 
 	public boolean isMute() {
-		return muted;
+		return mute;
 	}
 
 	public int getID() {
-		return 0;
+		return id;
 	}
 
 	public void setEventListener(PhraseTrackListener l) {

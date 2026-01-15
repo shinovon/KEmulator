@@ -98,7 +98,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 			return;
 		}
 		try {
-			sound = MMFPlayer.getMaDll().load(data._getData());
+			sound = MMFPlayer.getMaDll().load(data.data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			error = true;

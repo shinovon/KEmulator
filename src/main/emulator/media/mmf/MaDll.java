@@ -1,9 +1,6 @@
 package emulator.media.mmf;
 
-import com.sun.jna.Library;
-import com.sun.jna.Memory;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
+import com.sun.jna.*;
 
 import java.lang.reflect.Method;
 import java.nio.Buffer;
@@ -11,17 +8,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("UnusedReturnValue")
 public class MaDll {
-	public static final int STATE_READY = 3;
-	public static final int STATE_PLAYING = 4;
-	public static final int STATE_PAUSED = 5;
 
 	public static final int MODE_MA3 = 1;
 	public static final int MODE_MA5 = 2;
 	public static final int MODE_MA7 = 3;
+
+	// region JNA interfaces
 
 	// common MaSound entries
 	private interface MaSound extends Library {
@@ -43,10 +40,27 @@ public class MaDll {
 		int MaSound_Delete(int p1);
 	}
 
+	public class PhraseInfo extends Structure {
+		public long makerID;
+		public int deviceID;
+		public int versionID;
+		public int maxVoice;
+		public int maxChannel;
+		public int supportSMAF;
+		public long latency;
+
+		@Override
+		protected List<String> getFieldOrder() {
+			return Arrays.asList("makerID", "deviceID", "versionID", "maxVoice", "maxCHannel", "supportSMAF", "latency");
+		}
+	}
+
 	// common Phrase entries for MA3 and MA5
 	private interface Phrase extends Library {
 		int Phrase_Initialize();
 		int Phrase_Terminate();
+		int Phrase_GetInfo(PhraseInfo info);
+		int Phrase_CheckData(Pointer data, long len);
 		int Phrase_SetData(int ch, Pointer data, long len, int check);
 		int Phrase_Seek(int ch, long pos);
 		int Phrase_Play(int ch, int loop);
@@ -54,14 +68,16 @@ public class MaDll {
 		int Phrase_Pause(int ch);
 		int Phrase_Restart(int ch);
 		int Phrase_Kill();
-		int Phrase_SetVolume(int ch, int vol);
+		void Phrase_SetVolume(int ch, int vol);
 		int Phrase_GetVolume(int ch);
-		int Phrase_SetPanpot(int ch, int vol);
+		void Phrase_SetPanpot(int ch, int vol);
 		int Phrase_GetPanpot(int ch);
 		int Phrase_GetStatus(int ch);
 		long Phrase_GetPosition(int ch);
 		long Phrase_GetLength(int ch);
 		int Phrase_RemoveData(int ch);
+		int Phrase_SetLink(int ch, long slave);
+		long Phrase_GetLink(int ch);
 	}
 
 	private interface MA3 extends MaSound, Phrase {
@@ -80,13 +96,10 @@ public class MaDll {
 		int MaSmw_Term();
 	}
 
+	// endregion JNA interfaces
+
 	private final int mode;
 	private final Library library;
-
-	private int EmuBuf;
-	private int instanceId = -1;
-
-	private final List<Integer> sounds = new ArrayList<Integer>();
 
 	public MaDll(String dllPath, int mode) {
 		if (mode == MODE_MA3) {
@@ -101,7 +114,16 @@ public class MaDll {
 		this.mode = mode;
 	}
 
-	// masound
+	// region Sound
+
+	private final List<Integer> sounds = new ArrayList<Integer>();
+
+	private int EmuBuf;
+	private int instanceId = -1;
+
+	public static final int STATE_READY = 3;
+	public static final int STATE_PLAYING = 4;
+	public static final int STATE_PAUSED = 5;
 
 	public synchronized void init() {
 		if (EmuBuf != 0) {
@@ -278,9 +300,112 @@ public class MaDll {
 		}
 	}
 
-	// phrase TODO
+	// endregion Sound
+
+	// region Phrase
+
+	// TODO
+
+	public synchronized void phraseInitialize() {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_Initialize();
+	}
+
+	public synchronized void phraseTerminate() {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_Terminate();
+	}
 
 
+	public synchronized void phrasePlay(int ch, int loops) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_Play(ch, loops);
+	}
+
+	public synchronized void phrasePause(int ch) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_Pause(ch);
+	}
+
+	public synchronized void phraseRestart(int ch) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_Restart(ch);
+	}
+
+	public synchronized void phraseStop(int ch) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_Stop(ch);
+	}
+
+	public synchronized void phraseSetData(int ch, byte[] data) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		Memory ptr = new Memory(data.length);
+		ptr.write(0, data, 0, data.length);
+
+		((Phrase) library).Phrase_SetData(ch, ptr, data.length, 0);
+	}
+
+	public synchronized void phraseRemoveData(int ch) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_RemoveData(ch);
+	}
+
+	public synchronized void phraseKill() {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_Kill();
+	}
+
+	public synchronized void phraseSetLink(int ch, long slave) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_SetLink(ch, slave);
+	}
+
+	public synchronized void phraseSetVolume(int ch, int volume) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_SetVolume(ch, volume);
+	}
+
+	public synchronized void phraseSetPanpot(int ch, int panpot) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		((Phrase) library).Phrase_SetPanpot(ch, panpot);
+	}
+
+	public synchronized int phraseGetStatus(int ch) {
+		if (mode == MODE_MA7) {
+			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+		}
+		return ((Phrase) library).Phrase_GetStatus(ch);
+	}
+
+	public synchronized int getMaxTracks() {
+		return 4;
+	}
+
+	// endregion Phrase
 
 	// utils
 	
