@@ -21,7 +21,8 @@ public class MaDll {
 	public static final int MODE_MA5 = 2;
 	public static final int MODE_MA7 = 3;
 
-	private interface MA extends Library {
+	// common MaSound entries
+	private interface MaSound extends Library {
 		int MaSound_Initialize(int p1, int p2, int p3);
 		int MaSound_DeviceControl(int p1, int p2, int p3, int p4);
 		int MaSound_Create(int p1);
@@ -40,17 +41,39 @@ public class MaDll {
 		int MaSound_Delete(int p1);
 	}
 
-	private interface MA3 extends MA {
+	// common Phrase entries for MA3 and MA5
+	private interface Phrase extends Library {
+		int Phrase_Initialize();
+		int Phrase_Terminate();
+		int Phrase_SetData(int ch, Pointer data, long len, int check);
+		int Phrase_Seek(int ch, long pos);
+		int Phrase_Play(int ch, int loop);
+		int Phrase_Stop(int ch);
+		int Phrase_Pause(int ch);
+		int Phrase_Restart(int ch);
+		int Phrase_Kill();
+		int Phrase_SetVolume(int ch, int vol);
+		int Phrase_GetVolume(int ch);
+		int Phrase_SetPanpot(int ch, int vol);
+		int Phrase_GetPanpot(int ch);
+		int Phrase_GetStatus(int ch);
+		long Phrase_GetPosition(int ch);
+		long Phrase_GetLength(int ch);
+		int Phrase_RemoveData(int ch);
+	}
+
+	private interface MA3 extends MaSound, Phrase {
 		int MaSound_Initialize();
 	}
 
-	private interface MA5 extends MA {
+	private interface MA5 extends MaSound, Phrase {
 		int MaSound_EmuInitialize(int p1, int p2, int p3);
 		int MaSound_Terminate();
 		int MaSound_EmuTerminate();
 	}
 
-	private interface MA7 extends MA {
+	// MA7 has its own Phrase entries TODO
+	private interface MA7 extends MaSound {
 		int MaSmw_Init();
 		int MaSmw_Term();
 	}
@@ -76,6 +99,8 @@ public class MaDll {
 		}
 		this.mode = mode;
 	}
+
+	// masound
 
 	public void init() {
 		if (EmuBuf != 0) {
@@ -119,7 +144,7 @@ public class MaDll {
 				throw new RuntimeException("MaSmw_Init: " + r);
 			}
 		}
-		if ((r = ((MA) library).MaSound_Create(1)) < 0) {
+		if ((r = ((MaSound) library).MaSound_Create(1)) < 0) {
 			throw new RuntimeException("MaSound_Create: " + r);
 		}
 		instanceId = r;
@@ -130,15 +155,15 @@ public class MaDll {
 		ptr.write(0, data, 0, data.length);
 
 		int r;
-		if ((r = ((MA) library).MaSound_Load(instanceId, ptr, data.length, 1, 0, 0)) < 1) {
+		if ((r = ((MaSound) library).MaSound_Load(instanceId, ptr, data.length, 1, 0, 0)) < 1) {
 			throw new RuntimeException("MaSound_Load: " + r);
 		}
 		int sound = r;
 
-		if ((r = ((MA) library).MaSound_Open(instanceId, sound, 0, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Open(instanceId, sound, 0, 0)) != 0) {
 			throw new RuntimeException("MaSound_Open: " + r);
 		}
-		if ((r = ((MA) library).MaSound_Standby(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Standby(instanceId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Standby: " + r);
 		}
 
@@ -154,7 +179,7 @@ public class MaDll {
 
 	public void seek(int sound, int pos) {
 		int r;
-		if ((r = ((MA) library).MaSound_Seek(instanceId, sound, 0, pos, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Seek(instanceId, sound, 0, pos, 0)) != 0) {
 			throw new RuntimeException("MaSound_Seek: " + r);
 		}
 	}
@@ -164,7 +189,7 @@ public class MaDll {
 		IntBuffer volumeBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		volumeBuf.put(volume);
 		int r;
-		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 0, (int) getAddress(volumeBuf), 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 0, (int) getAddress(volumeBuf), 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
@@ -173,7 +198,7 @@ public class MaDll {
 		IntBuffer pitchBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		pitchBuf.put(pitch);
 		int r;
-		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 2, (int) getAddress(pitchBuf), 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 2, (int) getAddress(pitchBuf), 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
@@ -182,56 +207,56 @@ public class MaDll {
 		IntBuffer tempoBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		tempoBuf.put(tempo);
 		int r;
-		if ((r = ((MA) library).MaSound_Control(instanceId, sound, 1, (int) getAddress(tempoBuf), 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 1, (int) getAddress(tempoBuf), 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
 
 	public void start(int sound, int loops) {
 		int r;
-		if ((r = ((MA) library).MaSound_Start(instanceId, sound, loops, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Start(instanceId, sound, loops, 0)) != 0) {
 			throw new RuntimeException("MaSound_Start: " + r);
 		}
 	}
 
 	public void stop(int sound) {
 		int r;
-		if ((r = ((MA) library).MaSound_Stop(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Stop(instanceId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Stop: " + r);
 		}
 	}
 
 	public void pause(int sound) {
 		int r;
-		if ((r = ((MA) library).MaSound_Pause(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Pause(instanceId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Pause: " + r);
 		}
 	}
 
 	public void resume(int sound) {
 		int r;
-		if ((r = ((MA) library).MaSound_Restart(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Restart(instanceId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Pause: " + r);
 		}
 	}
 
 	public int getStatus(int sound) {
-		return ((MA) library).MaSound_Control(instanceId, sound, 6, 0, 0);
+		return ((MaSound) library).MaSound_Control(instanceId, sound, 6, 0, 0);
 	}
 
 	public void close(int sound) {
-		((MA) library).MaSound_Stop(instanceId, sound, 0);
-		((MA) library).MaSound_Close(instanceId, sound, 0);
-		((MA) library).MaSound_Unload(instanceId, sound, 0);
+		((MaSound) library).MaSound_Stop(instanceId, sound, 0);
+		((MaSound) library).MaSound_Close(instanceId, sound, 0);
+		((MaSound) library).MaSound_Unload(instanceId, sound, 0);
 		sounds.remove((Integer) sound);
 	}
 
 	public void destroy() {
 		for (Integer sound : sounds) {
-			((MA) library).MaSound_Close(instanceId, sound, 0);
-			((MA) library).MaSound_Unload(instanceId, sound, 0);
+			((MaSound) library).MaSound_Close(instanceId, sound, 0);
+			((MaSound) library).MaSound_Unload(instanceId, sound, 0);
 		}
-		((MA) library).MaSound_Delete(instanceId);
+		((MaSound) library).MaSound_Delete(instanceId);
 
 		if (mode == MODE_MA5) {
 			((MA5) library).MaSound_Terminate();
@@ -245,6 +270,12 @@ public class MaDll {
 			EmuBuf = 0;
 		}
 	}
+
+	// phrase TODO
+
+
+
+	// utils
 	
 	private static long getAddress(Buffer buf) {
 		try {

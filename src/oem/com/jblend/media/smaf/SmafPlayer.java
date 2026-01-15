@@ -80,14 +80,19 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (state == PLAYING || state == PAUSED) {
 			throw new IllegalStateException();
 		}
+		if (!MMFPlayer.initialize()) {
+			return;
+		}
+		error = false;
 		if (sound != 0) {
 			MMFPlayer.getMaDll().close(sound);
 			sound = 0;
 		}
-		error = false;
 		this.data = data;
+		if (data == null) {
+			return;
+		}
 		try {
-			MMFPlayer.initialize();
 			sound = MMFPlayer.getMaDll().load(data._getData());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -97,21 +102,24 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 
 	public void play() {
 		if (getState() != READY) {
-			throw new IllegalStateException();
+//			throw new IllegalStateException();
+			return;
 		}
 		MMFPlayer.getMaDll().start(sound, 0);
 	}
 
 	public void play(boolean isRepeat) {
 		if (getState() != READY) {
-			throw new IllegalStateException();
+//			throw new IllegalStateException();
+			return;
 		}
 		MMFPlayer.getMaDll().start(sound, isRepeat ? 200 : 0);
 	}
 
 	public void play(int count) {
 		if (getState() != READY) {
-			throw new IllegalStateException();
+//			throw new IllegalStateException();
+			return;
 		}
 		MMFPlayer.getMaDll().start(sound, count);
 	}
@@ -119,7 +127,8 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	public void stop() {
 		int state = getState();
 		if (state != READY && state != PLAYING) {
-			throw new IllegalStateException();
+//			throw new IllegalStateException();
+			return;
 		}
 		MMFPlayer.getMaDll().stop(sound);
 	}
@@ -127,7 +136,8 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	public void pause() {
 		int state = getState();
 		if (state != READY && state != PLAYING) {
-			throw new IllegalStateException();
+//			throw new IllegalStateException();
+			return;
 		}
 		MMFPlayer.getMaDll().pause(sound);
 	}
@@ -135,7 +145,8 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	public void resume() {
 		int state = getState();
 		if (state != PAUSED) {
-			throw new IllegalStateException();
+//			throw new IllegalStateException();
+			return;
 		}
 		MMFPlayer.getMaDll().resume(sound);
 	}
