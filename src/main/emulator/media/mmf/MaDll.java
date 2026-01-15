@@ -1,6 +1,7 @@
 package emulator.media.mmf;
 
 import com.sun.jna.*;
+import emulator.Emulator;
 
 import java.lang.reflect.Method;
 import java.nio.Buffer;
@@ -90,10 +91,34 @@ public class MaDll {
 		int MaSound_EmuTerminate();
 	}
 
-	// MA7 has its own Phrase entries TODO
 	private interface MA7 extends MaSound {
 		int MaSmw_Init();
 		int MaSmw_Term();
+		int Mapi_EmuSetPath(String p1, int p2, String p3);
+
+		// TODO check these
+		int Mapi_Initialize();
+		int Mapi_Terminate();
+		int Mapi_Phrase_GetInfo(PhraseInfo info);
+		int Mapi_Phrase_CheckData(Pointer data, long len);
+		int Mapi_Phrase_SetData(int ch, Pointer data, long len, int check);
+		int Mapi_Phrase_Seek(int ch, long pos);
+		int Mapi_Phrase_Play(int ch, int loop);
+		int Mapi_Phrase_Stop(int ch);
+		int Mapi_Phrase_Pause(int ch);
+		int Mapi_Phrase_Restart(int ch);
+		int Mapi_Phrase_Kill();
+		void Mapi_Phrase_SetVolume(int ch, int vol);
+		int Mapi_Phrase_GetVolume(int ch);
+		void Mapi_Phrase_SetPanpot(int ch, int vol);
+		int Mapi_Phrase_GetPanpot(int ch);
+		int Mapi_Phrase_GetStatus(int ch);
+		long Mapi_Phrase_GetPosition(int ch);
+		long Mapi_Phrase_GetLength(int ch);
+		int Mapi_Phrase_RemoveData(int ch);
+		int Mapi_Phrase_SetLink(int ch, long slave);
+		long Mapi_Phrase_GetLink(int ch);
+		// TODO Mapi_Phrase_Audio
 	}
 
 	// endregion JNA interfaces
@@ -163,9 +188,21 @@ public class MaDll {
 				throw new RuntimeException("MaSound_DeviceControl: " + r);
 			}
 		} else if (mode == MODE_MA7) {
-			if ((r = ((MA7) library).MaSmw_Init()) != 0) {
-				throw new RuntimeException("MaSmw_Init: " + r);
-			}
+//			if ((r = ((MA7) library).Mapi_EmuSetPath(null, 0, Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll")) != 0) {
+//				throw new RuntimeException("Mapi_EmuSetPath: " + r);
+//			}
+//			if ((r = ((MA7) library).Mapi_EmuInitialize()) != 0) {
+//				throw new RuntimeException("Mapi_EmuInitialize: " + r);
+//			}
+//			if ((r = ((MA7) library).Mapi_Initialize()) != 0) {
+//				throw new RuntimeException("Mapi_Initialize: " + r);
+//			}
+//			if ((r = ((MA7) library).MaSmw_Init()) != 0) {
+//				throw new RuntimeException("MaSmw_Init: " + r);
+//			}
+//			if ((r = ((MA7) library).MaSound_Initialize(0, EmuBuf, 0)) != 0) {
+//				throw new RuntimeException("MaSound_Initialize: " + r);
+//			}
 		}
 		if ((r = ((MaSound) library).MaSound_Create(1)) < 0) {
 			throw new RuntimeException("MaSound_Create: " + r);
@@ -308,101 +345,146 @@ public class MaDll {
 
 	public synchronized void phraseInitialize() {
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			return;
 		}
 		((Phrase) library).Phrase_Initialize();
 	}
 
 	public synchronized void phraseTerminate() {
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			return;
 		}
 		((Phrase) library).Phrase_Terminate();
 	}
 
 
 	public synchronized void phrasePlay(int ch, int loops) {
-		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
-		}
 		int r;
+		if (mode == MODE_MA7) {
+			if ((r = ((MA7) library).Mapi_Phrase_Play(ch, loops)) != 0) {
+				throw new RuntimeException("Mapi_Phrase_Play: " + r);
+			}
+			return;
+		}
 		if ((r = ((Phrase) library).Phrase_Play(ch, loops)) != 0) {
 			throw new RuntimeException("Phrase_Play: " + r);
 		}
 	}
 
 	public synchronized void phrasePause(int ch) {
+		int r;
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			if ((r = ((MA7) library).Mapi_Phrase_Pause(ch)) != 0) {
+				throw new RuntimeException("Mapi_Phrase_Pause: " + r);
+			}
+			return;
 		}
-		((Phrase) library).Phrase_Pause(ch);
+		if ((r = ((Phrase) library).Phrase_Pause(ch)) != 0) {
+			throw new RuntimeException("Phrase_Pause: " + r);
+		}
 	}
 
 	public synchronized void phraseRestart(int ch) {
+		int r;
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			if ((r = ((MA7) library).Mapi_Phrase_Restart(ch)) != 0) {
+				throw new RuntimeException("Mapi_Phrase_Restart: " + r);
+			}
+			return;
 		}
-		((Phrase) library).Phrase_Restart(ch);
+		if ((r = ((Phrase) library).Phrase_Restart(ch)) != 0) {
+			throw new RuntimeException("Phrase_Restart: " + r);
+		}
 	}
 
 	public synchronized void phraseStop(int ch) {
+		int r;
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			if ((r = ((MA7) library).Mapi_Phrase_Stop(ch)) != 0) {
+				throw new RuntimeException("Mapi_Phrase_Stop: " + r);
+			}
+			return;
 		}
-		((Phrase) library).Phrase_Stop(ch);
+		if ((r = ((Phrase) library).Phrase_Stop(ch)) != 0) {
+			throw new RuntimeException("Phrase_Stop: " + r);
+		}
 	}
 
 	public synchronized void phraseSetData(int ch, byte[] data) {
-		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
-		}
+		int r;
 		Memory ptr = new Memory(data.length);
 		ptr.write(0, data, 0, data.length);
 
-		int r;
+		if (mode == MODE_MA7) {
+			if ((r = ((MA7) library).Mapi_Phrase_SetData(ch, ptr, data.length, 1)) != 0) {
+				throw new RuntimeException("Phrase_SetData: " + r);
+			}
+			return;
+		}
+
 		if ((r = ((Phrase) library).Phrase_SetData(ch, ptr, data.length, 1)) != 0) {
 			throw new RuntimeException("Phrase_SetData: " + r);
 		}
 	}
 
 	public synchronized void phraseRemoveData(int ch) {
+		int r;
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			if ((r = ((MA7) library).Mapi_Phrase_RemoveData(ch)) != 0) {
+				throw new RuntimeException("Mapi_Phrase_RemoveData: " + r);
+			}
+			return;
+		};
+		if ((r = ((Phrase) library).Phrase_RemoveData(ch)) != 0) {
+			throw new RuntimeException("Phrase_RemoveData: " + r);
 		}
-		((Phrase) library).Phrase_RemoveData(ch);
 	}
 
 	public synchronized void phraseKill() {
+		int r;
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			if ((r = ((MA7) library).Mapi_Phrase_Kill()) != 0) {
+				throw new RuntimeException("Mapi_Phrase_Kill: " + r);
+			}
+			return;
 		}
-		((Phrase) library).Phrase_Kill();
+		if ((r = ((Phrase) library).Phrase_Kill()) != 0) {
+			throw new RuntimeException("Phrase_Kill: " + r);
+		}
 	}
 
 	public synchronized void phraseSetLink(int ch, long slave) {
+		int r;
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			if ((r = ((MA7) library).Mapi_Phrase_SetLink(ch, slave)) != 0) {
+				throw new RuntimeException("Mapi_Phrase_SetLink: " + r);
+			}
+			return;
 		}
-		((Phrase) library).Phrase_SetLink(ch, slave);
+		if ((r = ((Phrase) library).Phrase_SetLink(ch, slave)) != 0) {
+			throw new RuntimeException("Phrase_SetLink: " + r);
+		}
 	}
 
 	public synchronized void phraseSetVolume(int ch, int volume) {
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			((MA7) library).Mapi_Phrase_SetVolume(ch, volume);
+			return;
 		}
 		((Phrase) library).Phrase_SetVolume(ch, volume);
 	}
 
 	public synchronized void phraseSetPanpot(int ch, int panpot) {
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			((MA7) library).Mapi_Phrase_SetPanpot(ch, panpot);
+			return;
 		}
 		((Phrase) library).Phrase_SetPanpot(ch, panpot);
 	}
 
 	public synchronized int phraseGetStatus(int ch) {
 		if (mode == MODE_MA7) {
-			throw new RuntimeException("Phrases with MA-7 are not yet supported");
+			return ((MA7) library).Mapi_Phrase_GetStatus(ch);
 		}
 		return ((Phrase) library).Phrase_GetStatus(ch);
 	}
