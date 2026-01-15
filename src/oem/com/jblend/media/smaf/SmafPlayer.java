@@ -15,7 +15,8 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	private int sound;
 	private boolean error;
 	private SmafData data;
-	private final List<MediaPlayerListener> listeners = new ArrayList<>();
+	private final List<MediaPlayerListener> mediaListeners = new ArrayList<>();
+	private final List<SmafPlayerListener> smafListeners = new ArrayList<>();
 
 	private int volume = 127;
 	private int transpose = 0;
@@ -240,11 +241,19 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	}
 
 	public void addMediaPlayerListener(MediaPlayerListener l) {
-		listeners.add(l);
+		mediaListeners.add(l);
+	}
+
+	public void addSmafPlayerListener(SmafPlayerListener l) {
+		smafListeners.add(l);
 	}
 
 	public void removeMediaPlayerListener(MediaPlayerListener l) {
-		listeners.remove(l);
+		mediaListeners.remove(l);
+	}
+
+	public void removeSmafPlayerListener(SmafPlayerListener l) {
+		smafListeners.remove(l);
 	}
 
 	protected void finalize() {
