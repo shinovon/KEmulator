@@ -1,39 +1,22 @@
-/*
- * Copyright 2020 Nikita Shakarun
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.vodafone.v10.sound;
 
-import javax.microedition.media.MediaException;
-import javax.microedition.media.Player;
+import emulator.media.mmf.MMFPlayer;
 
 public class SoundTrack {
 	public static final int NO_DATA = 0;
 	public static final int PAUSED = 3;
 	public static final int PLAYING = 2;
 	public static final int READY = 1;
-	private static final int MAX_VOLUME = 127;
 	private int id;
-	private Sound snd;
-	private Player player;
-	private int state;
-	private int loopCount;
-	private int volume = MAX_VOLUME;
+	private Sound phrase;
 	private SoundTrackListener listener;
-	private SoundTrack syncMaster;
-	
+	private SoundTrack master;
+	boolean stub;
+	boolean playing;
+	int volume;
+	int panpot;
+	boolean mute;
+
 	public SoundTrack() {
 	}
 
@@ -42,59 +25,91 @@ public class SoundTrack {
 	}
 
 	public Sound getSound() {
-		return snd;
+		return phrase;
 	}
 
-	public void setSound(Sound p) {
-		this.snd = p;
-		this.player = p.getPlayer();
-	}
-
-	public int getState() {
-		return state;
-	}
-
-	public void setVolume(int value) {
-		this.volume = value;
-		if (volume < 0) {
-			volume = 0;
+	public void setSound(Sound phrase) {
+		if (phrase != null) {
+			try {
+				MMFPlayer.getMaDll().phraseSetData(id, phrase.data);
+			} catch (Exception e) {
+				e.printStackTrace();
+				stub = true;
+			}
 		}
-		if (volume > MAX_VOLUME) {
-			volume = MAX_VOLUME;
-		}
-	}
-
-	public void stop() {
-		try {
-			player.stop();
-			state = READY;
-		} catch (MediaException e) {
-			e.printStackTrace();
-		}
+		this.phrase = phrase;
 	}
 
 	public void play() {
-
+		play(1);
 	}
 
-	public void play(int loop) {
-		try {
-			if (state != PLAYING) {
-				loopCount = loop;
-				if (loop == 0) {
-					loop = -1;
-				}
-				player.setLoopCount(loop);
-				player.start();
-				state = PLAYING;
-			}
-		} catch (MediaException e) {
-			e.printStackTrace();
+	public void play(int loops) {
+		if (phrase == null) {
+			return;
+		}
+		if (stub) {
+			playing = true;
+			return;
+		}
+		MMFPlayer.getMaDll().phrasePlay(id, loops);
+	}
+
+	public void stop() {
+		if (stub) {
+			playing = false;
+			return;
+		}
+		if (phrase == null) {
+			throw new IllegalStateException();
+		}
+		MMFPlayer.getMaDll().phraseStop(id);
+	}
+
+	public void pause() {
+		if (stub) {
+			playing = false;
+			return;
+		}
+		if (phrase == null || getState() != PLAYING) {
+			throw new IllegalStateException();
+		}
+		MMFPlayer.getMaDll().phrasePause(id);
+	}
+
+	public void resume() {
+		if (stub) {
+			playing = true;
+			return;
+		}
+		if (phrase == null || getState() != PAUSED) {
+			throw new IllegalStateException();
+		}
+		MMFPlayer.getMaDll().phraseRestart(id);
+	}
+
+	public void setVolume(int volume) {
+		if (volume < 0 || volume > 127) {
+			throw new IllegalArgumentException();
+		}
+		this.volume = volume;
+		if (stub) {
+			return;
+		}
+		if (phrase == null) {
+			throw new IllegalStateException();
+		}
+		if (!mute) {
+			MMFPlayer.getMaDll().phraseSetVolume(id, volume);
 		}
 	}
 
 	public void removeSound() {
-		this.snd = null;
+		if (stub) return;
+		if (phrase != null) {
+			MMFPlayer.getMaDll().phraseRemoveData(id);
+			phrase = null;
+		}
 	}
 
 	public void setEventListener(SoundTrackListener l) {
@@ -108,15 +123,42 @@ public class SoundTrack {
 	}
 
 	public SoundTrack getSyncMaster() {
-		return syncMaster;
+		return master;
 	}
 
 	public void setSubjectTo(SoundTrack master) {
-		syncMaster = master;
+		this.master = master;
+		if (phrase == null || stub) {
+			return;
+		}
+		MMFPlayer.getMaDll().phraseSetLink(id, 0);
+		if (master != null) {
+			MMFPlayer.getMaDll().phraseSetLink(id, 1L << master.id);
+		}
 	}
 
-	public void setPanpot(int value) {
+	public int getState() {
+		if (phrase == null) {
+			return NO_DATA;
+		}
+		if (stub && playing) {
+			return PLAYING;
+		}
+		return MMFPlayer.getMaDll().phraseGetStatus(id);
+	}
 
+	public void setPanpot(int panpot) {
+		if (panpot < 0 || panpot > 127) {
+			throw new IllegalArgumentException();
+		}
+		this.panpot = panpot;
+		if (stub) {
+			return;
+		}
+		if (phrase == null) {
+			throw new IllegalStateException();
+		}
+		MMFPlayer.getMaDll().phraseSetPanpot(id, panpot);
 	}
 
 	public int getVolume() {
@@ -124,14 +166,10 @@ public class SoundTrack {
 	}
 
 	public int getPanpot() {
-		return 64;
+		return panpot;
 	}
 
 	public int getID() {
 		return id;
-	}
-
-	public void resume() {
-		play(1);
 	}
 }

@@ -11,11 +11,21 @@ public class PhrasePlayer {
     PhraseTrack[] tracks;
     AudioPhraseTrack[] audioTracks;
 
+    boolean stub;
+
     PhrasePlayer() {
-        MMFPlayer.initialize();
-        MMFPlayer.getMaDll().phraseInitialize();
-        tracks = new PhraseTrack[trackCount = MMFPlayer.getMaDll().getMaxTracks()];
-        audioTracks = new AudioPhraseTrack[audioTrackCount = 16];
+        try {
+            MMFPlayer.initialize();
+            MMFPlayer.getMaDll().phraseInitialize();
+            tracks = new PhraseTrack[trackCount = MMFPlayer.getMaDll().getMaxTracks()];
+            audioTracks = new AudioPhraseTrack[audioTrackCount = 16];
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            tracks = new PhraseTrack[trackCount = 16];
+            audioTracks = new AudioPhraseTrack[audioTrackCount = 16];
+            stub = true;
+        }
     }
 
     public static PhrasePlayer getPlayer() {
@@ -93,14 +103,15 @@ public class PhrasePlayer {
     }
 
     public void kill() {
-        for (int i = 0; i < tracks.length; ++i) {
-            if (tracks[i] == null) continue;
-            tracks[i].removePhrase();
-        }
-        for (int i = 0; i < audioTracks.length; ++i) {
-            if (audioTracks[i] == null) continue;
-            audioTracks[i].removePhrase();
-        }
+//        for (int i = 0; i < tracks.length; ++i) {
+//            if (tracks[i] == null) continue;
+//            tracks[i].removePhrase();
+//        }
+//        for (int i = 0; i < audioTracks.length; ++i) {
+//            if (audioTracks[i] == null) continue;
+//            audioTracks[i].removePhrase();
+//        }
+        if (stub) return;
         MMFPlayer.getMaDll().phraseKill();
     }
 

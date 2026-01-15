@@ -3,6 +3,13 @@ package com.jblend.media.smaf.phrase;
 import emulator.media.mmf.MMFPlayer;
 
 public class PhraseTrack extends PhraseTrackBase {
+	public static final int NO_DATA = 1;
+	public static final int READY = 2;
+	public static final int PLAYING = 3;
+	public static final int PAUSED = 5;
+	public static final int DEFAULT_VOLUME = 100;
+	public static final int DEFAULT_PANPOT = 64;
+
 	private Phrase phrase;
 	private PhraseTrack master;
     boolean stub;
@@ -28,65 +35,57 @@ public class PhraseTrack extends PhraseTrackBase {
 	}
 
 	public void removePhrase() {
-		if (stub) return;
-		if (phrase != null) {
+		if (!stub && phrase != null) {
 			MMFPlayer.getMaDll().phraseRemoveData(id);
-			phrase = null;
 		}
+		phrase = null;
 	}
 
 	public void play() {
-        if (phrase == null) {
-            return;
-        }
-        if (stub) {
-			playing = true;
-            return;
-        }
-		MMFPlayer.getMaDll().phrasePlay(id, 1);
+        play(1);
 	}
 
 	public void play(int loops) {
-		if (phrase == null) {
-			return;
-		}
         if (stub) {
 			playing = true;
             return;
         }
+		if (phrase == null || getState() != READY) {
+			throw new IllegalStateException();
+		}
 		MMFPlayer.getMaDll().phrasePlay(id, loops);
 	}
 
 	public void stop() {
-        if (phrase == null) {
-            return;
-        }
         if (stub) {
 			playing = false;
             return;
         }
+		if (phrase == null) {
+			throw new IllegalStateException();
+		}
 		MMFPlayer.getMaDll().phraseStop(id);
 	}
 
 	public void pause() {
-        if (phrase == null) {
-            return;
-        }
         if (stub) {
 			playing = false;
             return;
         }
+		if (phrase == null || getState() != PLAYING) {
+			throw new IllegalStateException();
+		}
 		MMFPlayer.getMaDll().phrasePause(id);
 	}
 
 	public void resume() {
-        if (phrase == null) {
-            return;
-        }
         if (stub) {
 			playing = true;
             return;
         }
+		if (phrase == null || getState() != PAUSED) {
+			throw new IllegalStateException();
+		}
 		MMFPlayer.getMaDll().phraseRestart(id);
 	}
 
@@ -95,44 +94,58 @@ public class PhraseTrack extends PhraseTrackBase {
 	}
 
     public int getState() {
-        // TODO
         if (phrase == null) {
             return NO_DATA;
         }
-		if (playing) {
+		if (stub && playing) {
 			return PLAYING;
 		}
-        return READY;
+        return MMFPlayer.getMaDll().phraseGetStatus(id);
     }
 
 	public void setVolume(int volume) {
-		if (phrase == null || stub) {
-			return;
+		if (volume < 0 || volume > 127) {
+			throw new IllegalArgumentException();
 		}
 		this.volume = volume;
+		if (stub) {
+			return;
+		}
+		if (phrase == null) {
+			throw new IllegalStateException();
+		}
 		if (!mute) {
 			MMFPlayer.getMaDll().phraseSetVolume(id, volume);
 		}
 	}
 
 	public void setPanpot(int panpot) {
-		if (phrase == null || stub) {
-			return;
+		if (panpot < 0 || panpot > 127) {
+			throw new IllegalArgumentException();
 		}
 		this.panpot = panpot;
+		if (stub) {
+			return;
+		}
+		if (phrase == null) {
+			throw new IllegalStateException();
+		}
 		MMFPlayer.getMaDll().phraseSetPanpot(id, panpot);
 	}
 
 	public void mute(boolean mute) {
-		if (phrase == null || stub) {
+		this.mute = mute;
+		if (stub) {
 			return;
+		}
+		if (phrase == null) {
+			throw new IllegalStateException();
 		}
 		if (!mute) {
 			MMFPlayer.getMaDll().phraseSetVolume(id, volume);
 		} else {
 			MMFPlayer.getMaDll().phraseSetVolume(id, 0);
 		}
-		this.mute = mute;
 	}
 
 	public boolean isMute() {

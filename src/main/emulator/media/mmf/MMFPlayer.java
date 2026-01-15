@@ -22,10 +22,11 @@ public class MMFPlayer {
 		}
 		try {
 			if (new File(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll").exists()
-					&& new File(Emulator.getAbsolutePath() + "/M5_EmuHw.dll").exists()
-					&& new File(Emulator.getAbsolutePath() + "/SMAFMMS5EMU.dll").exists()) {
+					&& new File(Emulator.getAbsolutePath() + "/M5_EmuHw.dll").exists()) {
+				Emulator.getEmulator().getLogStream().println("Loading MA-5 emulator");
 				maDll = new MaDll(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll", MaDll.MODE_MA5);
 			} else {
+				Emulator.getEmulator().getLogStream().println("Loading MA-3 emulator");
 				maDll = new MaDll(Emulator.getAbsolutePath() + "/ma3smwemu.dll", MaDll.MODE_MA3);
 			}
 			maDll.init();

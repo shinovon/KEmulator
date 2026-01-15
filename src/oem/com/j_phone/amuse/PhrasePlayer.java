@@ -8,10 +8,19 @@ public class PhrasePlayer {
 	protected boolean[] useFlag;
 	protected static PhrasePlayer phrasePlayer;
 
+	boolean stub;
+
 	PhrasePlayer() {
-		MMFPlayer.initialize();
-		MMFPlayer.getMaDll().phraseInitialize();
-		tracks = new PhraseTrack[MMFPlayer.getMaDll().getMaxTracks()];
+		try {
+			MMFPlayer.initialize();
+			MMFPlayer.getMaDll().phraseInitialize();
+			tracks = new PhraseTrack[MMFPlayer.getMaDll().getMaxTracks()];
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			tracks = new PhraseTrack[4];
+			stub = true;
+		}
 	}
 
 	public static PhrasePlayer getPlayer() {
@@ -67,6 +76,7 @@ public class PhrasePlayer {
 //			if (tracks[i] == null) continue;
 //			tracks[i].removePhrase();
 //		}
+		if (stub) return;
 		MMFPlayer.getMaDll().phraseKill();
 	}
 

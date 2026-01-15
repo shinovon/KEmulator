@@ -1,64 +1,68 @@
-/*
- * Copyright 2020 Nikita Shakarun
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.vodafone.v10.sound;
 
+import emulator.media.mmf.MMFPlayer;
+
 public class SoundPlayer {
-	private SoundTrack[] tracks = new SoundTrack[16];
+
+	private static SoundPlayer soundPlayer;
+
+	SoundTrack[] tracks;
+
+	boolean stub;
+
+	SoundPlayer() {
+		try {
+			MMFPlayer.initialize();
+			MMFPlayer.getMaDll().phraseInitialize();
+			tracks = new SoundTrack[MMFPlayer.getMaDll().getMaxTracks()];
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			tracks = new SoundTrack[4];
+			stub = true;
+		}
+	}
 
 	public static SoundPlayer getPlayer() {
-		return new SoundPlayer();
+		if (soundPlayer == null) soundPlayer = new SoundPlayer();
+		return soundPlayer;
 	}
 
 	public SoundTrack getTrack() {
-		for (int i = 0; i < 16; i++) {
+		int id = -1;
+		for (int i = 0; i < tracks.length; ++i) {
 			if (tracks[i] == null) {
-				tracks[i] = new SoundTrack(i);
-				return tracks[i];
+				id = i;
+				break;
 			}
 		}
-		throw new IllegalStateException("no more tracks available!");
+		if (id == -1) {
+			throw new IllegalStateException();
+		}
+		SoundTrack t = new SoundTrack(id);
+		tracks[id] = t;
+		return t;
 	}
 
 	public SoundTrack getTrack(int i) {
-		if (tracks[i] == null) {
-			tracks[i] = new SoundTrack(i);
-		}
 		return tracks[i];
 	}
 
 	public int getTrackCount() {
-		int n = 0;
-		for (int i = 0; i < 16; i++) {
-			if (tracks[i] != null) {
-				n++;
-			}
-		}
-		return n;
+		return tracks.length;
 	}
 
 	public void kill() {
-		for (int i = 0; i < 16; i++) {
-			if (tracks[i] != null) {
-				tracks[i].stop();
-			}
+		for (int i = 0; i < tracks.length; ++i) {
+			if (tracks[i] == null) continue;
+			tracks[i].removeSound();
 		}
+		if (stub) return;
+		MMFPlayer.getMaDll().phraseKill();
 	}
 
 	public void disposePlayer() {
-
+		kill();
+		soundPlayer = null;
 	}
 }

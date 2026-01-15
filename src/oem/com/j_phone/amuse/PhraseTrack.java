@@ -92,8 +92,13 @@ public class PhraseTrack {
 	}
 
 	public boolean isPlaying() {
-		// TODO
-		return playing;
+		if (phrase == null) {
+			return false;
+		}
+		if (stub) {
+			return playing;
+		}
+		return MMFPlayer.getMaDll().phraseGetStatus(id) == 3;
 	}
 
 	public Phrase getPhrase() {
