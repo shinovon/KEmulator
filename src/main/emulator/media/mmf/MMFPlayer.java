@@ -67,7 +67,7 @@ public class MMFPlayer {
 	}
 
 	public static boolean isPlaying() {
-		return false;
+		return maDll.getStatus(currentSound) == 4;
 	}
 
 	public static void stop() {
@@ -78,7 +78,15 @@ public class MMFPlayer {
 		maDll.pause(currentSound);
 	}
 
+	public static int getStatus() {
+		return maDll.getStatus(currentSound);
+	}
+
 	public static void resume() {
 		maDll.resume(currentSound);
+	}
+
+	public static MaDll getMaDll() {
+		return maDll;
 	}
 }

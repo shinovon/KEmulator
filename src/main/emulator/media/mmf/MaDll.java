@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MaDll {
+	public static final int STATE_PLAYING = 4;
+	public static final int STATE_PAUSED = 5;
 
 	public static final int MODE_MA3 = 1;
 	public static final int MODE_MA5 = 2;
@@ -211,6 +213,10 @@ public class MaDll {
 		if ((r = ((MA) library).MaSound_Restart(instanceId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Pause: " + r);
 		}
+	}
+
+	public int getStatus(int sound) {
+		return ((MA) library).MaSound_Control(instanceId, sound, 6, 0, 0);
 	}
 
 	public void close(int sound) {
