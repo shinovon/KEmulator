@@ -10,22 +10,20 @@ public class PhraseTrack {
 	private int volume = DEFAULT_VOLUME;
 	private boolean mute;
 	private boolean stub;
+	private boolean playing;
 
 	PhraseTrack(int id) {
 		this.id = id;
 	}
 
 	public void setPhrase(Phrase phrase) {
-		if (this.phrase != null) {
-			this.phrase.references--;
-		}
 		if (phrase != null) {
 			try {
 				MMFPlayer.getMaDll().phraseSetData(id, phrase.data);
-			} catch (Exception ignored) {
+			} catch (Exception e) {
+				e.printStackTrace();
 				stub = true;
 			}
-			phrase.references++;
 		}
 		this.phrase = phrase;
 	}
@@ -34,41 +32,60 @@ public class PhraseTrack {
 		if (stub) return;
 		if (phrase != null) {
 			MMFPlayer.getMaDll().phraseRemoveData(id);
-			phrase.references--;
 			phrase = null;
 		}
 	}
 
 	public void play() {
-		if (phrase == null || stub) {
+		if (phrase == null) {
 			return;
 		}
-		MMFPlayer.getMaDll().phrasePlay(id, 0);
+		if (stub) {
+			playing = true;
+			return;
+		}
+		MMFPlayer.getMaDll().phrasePlay(id, 1);
 	}
 
 	public void play(int loops) {
-		if (phrase == null || stub) {
+		if (phrase == null) {
+			return;
+		}
+		if (stub) {
+			playing = true;
 			return;
 		}
 		MMFPlayer.getMaDll().phrasePlay(id, loops);
 	}
 
 	public void stop() {
-		if (phrase == null || stub) {
+		if (phrase == null) {
+			return;
+		}
+		if (stub) {
+			playing = false;
 			return;
 		}
 		MMFPlayer.getMaDll().phraseStop(id);
 	}
 
 	public void pause() {
-		if (phrase == null || stub) {
+		if (phrase == null) {
+			return;
+		}
+		if (stub) {
+			playing = false;
 			return;
 		}
 		MMFPlayer.getMaDll().phrasePause(id);
 	}
 
 	public void resume() {
-		if (phrase == null || stub) {
+		if (phrase == null) {
+			return;
+		}
+		if (stub) {
+			playing = true;
 			return;
 		}
 		MMFPlayer.getMaDll().phraseRestart(id);
@@ -76,7 +93,7 @@ public class PhraseTrack {
 
 	public boolean isPlaying() {
 		// TODO
-		return false;
+		return playing;
 	}
 
 	public Phrase getPhrase() {

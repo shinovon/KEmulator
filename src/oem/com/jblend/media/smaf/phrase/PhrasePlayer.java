@@ -14,8 +14,8 @@ public class PhrasePlayer {
     PhrasePlayer() {
         MMFPlayer.initialize();
         MMFPlayer.getMaDll().phraseInitialize();
-        tracks = new PhraseTrack[MMFPlayer.getMaDll().getMaxTracks()];
-        audioTracks = new AudioPhraseTrack[16];
+        tracks = new PhraseTrack[trackCount = MMFPlayer.getMaDll().getMaxTracks()];
+        audioTracks = new AudioPhraseTrack[audioTrackCount = 16];
     }
 
     public static PhrasePlayer getPlayer() {
@@ -41,7 +41,6 @@ public class PhrasePlayer {
         }
         PhraseTrack t = new PhraseTrack(id);
         tracks[id] = t;
-        trackCount++;
         return t;
     }
 
@@ -58,7 +57,6 @@ public class PhrasePlayer {
         }
         AudioPhraseTrack t = new AudioPhraseTrack(id);
         audioTracks[id] = t;
-        audioTrackCount++;
         return t;
     }
 

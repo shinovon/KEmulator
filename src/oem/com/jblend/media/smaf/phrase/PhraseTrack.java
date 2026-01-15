@@ -6,6 +6,7 @@ public class PhraseTrack extends PhraseTrackBase {
 	private Phrase phrase;
 	private PhraseTrack master;
     boolean stub;
+	boolean playing;
 
 	PhraseTrack(int id) {
 		super(id);
@@ -16,16 +17,12 @@ public class PhraseTrack extends PhraseTrackBase {
 	}
 
 	public void setPhrase(Phrase phrase) {
-		if (this.phrase != null) {
-			this.phrase.references--;
-		}
 		if (phrase != null) {
 			try {
 				MMFPlayer.getMaDll().phraseSetData(id, phrase.data);
 			} catch (Exception ignored) {
 				stub = true;
 			}
-			phrase.references++;
 		}
 		this.phrase = phrase;
 	}
@@ -34,7 +31,6 @@ public class PhraseTrack extends PhraseTrackBase {
 		if (stub) return;
 		if (phrase != null) {
 			MMFPlayer.getMaDll().phraseRemoveData(id);
-			phrase.references--;
 			phrase = null;
 		}
 	}
@@ -44,9 +40,10 @@ public class PhraseTrack extends PhraseTrackBase {
             return;
         }
         if (stub) {
+			playing = true;
             return;
         }
-		MMFPlayer.getMaDll().phrasePlay(id, 0);
+		MMFPlayer.getMaDll().phrasePlay(id, 1);
 	}
 
 	public void play(int loops) {
@@ -54,6 +51,7 @@ public class PhraseTrack extends PhraseTrackBase {
 			return;
 		}
         if (stub) {
+			playing = true;
             return;
         }
 		MMFPlayer.getMaDll().phrasePlay(id, loops);
@@ -64,6 +62,7 @@ public class PhraseTrack extends PhraseTrackBase {
             return;
         }
         if (stub) {
+			playing = false;
             return;
         }
 		MMFPlayer.getMaDll().phraseStop(id);
@@ -74,6 +73,7 @@ public class PhraseTrack extends PhraseTrackBase {
             return;
         }
         if (stub) {
+			playing = false;
             return;
         }
 		MMFPlayer.getMaDll().phrasePause(id);
@@ -84,6 +84,7 @@ public class PhraseTrack extends PhraseTrackBase {
             return;
         }
         if (stub) {
+			playing = true;
             return;
         }
 		MMFPlayer.getMaDll().phraseRestart(id);
@@ -98,6 +99,9 @@ public class PhraseTrack extends PhraseTrackBase {
         if (phrase == null) {
             return NO_DATA;
         }
+		if (playing) {
+			return PLAYING;
+		}
         return READY;
     }
 

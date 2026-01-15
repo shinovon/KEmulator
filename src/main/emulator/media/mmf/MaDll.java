@@ -325,7 +325,10 @@ public class MaDll {
 		if (mode == MODE_MA7) {
 			throw new RuntimeException("Phrases with MA-7 are not yet supported");
 		}
-		((Phrase) library).Phrase_Play(ch, loops);
+		int r;
+		if ((r = ((Phrase) library).Phrase_Play(ch, loops)) != 0) {
+			throw new RuntimeException("Phrase_Play: " + r);
+		}
 	}
 
 	public synchronized void phrasePause(int ch) {
@@ -356,7 +359,10 @@ public class MaDll {
 		Memory ptr = new Memory(data.length);
 		ptr.write(0, data, 0, data.length);
 
-		((Phrase) library).Phrase_SetData(ch, ptr, data.length, 0);
+		int r;
+		if ((r = ((Phrase) library).Phrase_SetData(ch, ptr, data.length, 1)) != 0) {
+			throw new RuntimeException("Phrase_SetData: " + r);
+		}
 	}
 
 	public synchronized void phraseRemoveData(int ch) {

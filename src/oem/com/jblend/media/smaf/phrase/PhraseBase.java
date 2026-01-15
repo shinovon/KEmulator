@@ -22,7 +22,6 @@ import java.io.IOException;
 
 abstract class PhraseBase {
 	byte[] data;
-	int references;
 	public PhraseBase(byte[] data) {
 		this.data = data;
 	}
@@ -36,6 +35,6 @@ abstract class PhraseBase {
 	}
 
 	public int getUseTracks() {
-		return references;
+		return 1;
 	}
 }

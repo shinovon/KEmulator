@@ -6,7 +6,6 @@ import java.io.IOException;
 
 public class Phrase {
 	final byte[] data;
-	int references;
 
 	public Phrase(String paramString)
 			throws IOException {
@@ -22,6 +21,6 @@ public class Phrase {
 	}
 
 	public int getUseTracks() {
-		return references;
+		return 1;
 	}
 }

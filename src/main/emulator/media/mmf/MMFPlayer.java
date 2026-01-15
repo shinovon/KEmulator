@@ -62,8 +62,8 @@ public class MMFPlayer {
 
 		if (currentSound != -1) maDll.stop(currentSound);
 		currentSound = -1;
+		maDll.phraseTerminate();
 		maDll.destroy();
-
 	}
 
 	public static boolean isPlaying() {
@@ -71,7 +71,9 @@ public class MMFPlayer {
 	}
 
 	public static void stop() {
-		maDll.stop(currentSound);
+		if (currentSound != -1) {
+			maDll.stop(currentSound);
+		}
 	}
 
 	public static void pause() {

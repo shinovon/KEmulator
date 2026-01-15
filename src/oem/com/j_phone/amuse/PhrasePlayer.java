@@ -37,7 +37,7 @@ public class PhrasePlayer {
 	}
 
 	public int getTrackCount() {
-		return trackCount;
+		return tracks.length;
 	}
 
 	public PhraseTrack getTrack(int id) {
@@ -45,11 +45,13 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrackPair() {
-		return null;
+		// TODO
+		return getTrack();
 	}
 
-	public PhraseTrack getTrackPair(int paramInt) {
-		return null;
+	public PhraseTrack getTrackPair(int id) {
+		// TODO
+		return getTrack(id);
 	}
 
 	public void disposeTrack(PhraseTrack t) {
@@ -61,10 +63,10 @@ public class PhrasePlayer {
 	}
 
 	public void kill() {
-		for (int i = 0; i < tracks.length; ++i) {
-			if (tracks[i] == null) continue;
-			tracks[i].removePhrase();
-		}
+//		for (int i = 0; i < tracks.length; ++i) {
+//			if (tracks[i] == null) continue;
+//			tracks[i].removePhrase();
+//		}
 		MMFPlayer.getMaDll().phraseKill();
 	}
 

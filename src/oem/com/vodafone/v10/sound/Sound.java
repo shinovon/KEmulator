@@ -68,6 +68,6 @@ public class Sound {
 	}
 
 	public int getUseTracks() {
-		return 0;
+		return 1;
 	}
 }
