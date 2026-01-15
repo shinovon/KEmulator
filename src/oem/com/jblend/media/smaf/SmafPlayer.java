@@ -15,7 +15,11 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	private int sound;
 	private boolean error;
 	private SmafData data;
-	private List<MediaPlayerListener> listeners = new ArrayList<>();
+	private final List<MediaPlayerListener> listeners = new ArrayList<>();
+
+	private int volume = 127;
+	private int transpose = 0;
+	private int speed = 100;
 
 	public SmafPlayer() {
 	}
@@ -155,7 +159,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (error) {
 			return ERROR;
 		}
-		if (data == null) {
+		if (data == null || sound == 0) {
 			return NO_DATA;
 		}
 		int status = MMFPlayer.getMaDll().getStatus(sound);
@@ -170,17 +174,17 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 
 	public int getSpeed() {
 		// TODO
-		return 0;
+		return speed;
 	}
 
 	public int getTranspose() {
 		// TODO
-		return 0;
+		return transpose;
 	}
 
 	public int getVolume() {
 		// TODO
-		return 0;
+		return volume;
 	}
 
 	public void seek(int time) {
@@ -205,7 +209,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (speed < 70 || speed > 130) {
 			throw new IllegalArgumentException();
 		}
-		MMFPlayer.getMaDll().setTempo(sound, speed);
+		MMFPlayer.getMaDll().setTempo(sound, this.speed = speed);
 	}
 
 	public void setTranspose(int shift) {
@@ -215,7 +219,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (shift < -12 || shift > 12) {
 			throw new IllegalArgumentException();
 		}
-		MMFPlayer.getMaDll().setPitch(sound, shift);
+		MMFPlayer.getMaDll().setPitch(sound, this.transpose = shift);
 	}
 
 	public void setVolume(int volume) {
@@ -225,7 +229,14 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (volume < 0 || volume > 127) {
 			throw new IllegalArgumentException();
 		}
-		MMFPlayer.getMaDll().setVolume(sound, volume);
+		MMFPlayer.getMaDll().setVolume(sound, this.volume = volume);
+	}
+
+	public int getCurrent() {
+		if (sound == 0) {
+			throw new IllegalStateException();
+		}
+		return MMFPlayer.getMaDll().getPosition(sound);
 	}
 
 	public void addMediaPlayerListener(MediaPlayerListener l) {

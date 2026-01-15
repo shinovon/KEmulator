@@ -13,7 +13,9 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("UnusedReturnValue")
 public class MaDll {
+	public static final int STATE_READY = 3;
 	public static final int STATE_PLAYING = 4;
 	public static final int STATE_PAUSED = 5;
 
@@ -78,14 +80,13 @@ public class MaDll {
 		int MaSmw_Term();
 	}
 
-	private int mode;
-	private Library library;
+	private final int mode;
+	private final Library library;
 
 	private int EmuBuf;
-	private int EmuP;
 	private int instanceId = -1;
 
-	private List<Integer> sounds = new ArrayList<Integer>();
+	private final List<Integer> sounds = new ArrayList<Integer>();
 
 	public MaDll(String dllPath, int mode) {
 		if (mode == MODE_MA3) {
@@ -102,7 +103,7 @@ public class MaDll {
 
 	// masound
 
-	public void init() {
+	public synchronized void init() {
 		if (EmuBuf != 0) {
 			Native.free(EmuBuf);
 			EmuBuf = 0;
@@ -114,11 +115,11 @@ public class MaDll {
 				throw new RuntimeException("MaSound_Initialize: " + r);
 			}
 		} else if (mode == MODE_MA5) {
-			EmuP = EmuBuf = (int) Native.malloc(1024);
-			while ((EmuP & 0xFF) != 0x81) {
-				EmuP++;
+			int emuP = EmuBuf = (int) Native.malloc(1024);
+			while ((emuP & 0xFF) != 0x81) {
+				emuP++;
 			}
-			if ((r = ((MA5) library).MaSound_EmuInitialize(48000, 2, EmuP)) != 0) {
+			if ((r = ((MA5) library).MaSound_EmuInitialize(48000, 2, emuP)) != 0) {
 				throw new RuntimeException("MaSound_EmuInitialize: " + r);
 			}
 			if ((r = ((MA5) library).MaSound_Initialize(0, EmuBuf, 0)) != 0) {
@@ -150,7 +151,7 @@ public class MaDll {
 		instanceId = r;
 	}
 
-	public int load(byte[] data) {
+	public synchronized int load(byte[] data) {
 		Memory ptr = new Memory(data.length);
 		ptr.write(0, data, 0, data.length);
 
@@ -177,15 +178,15 @@ public class MaDll {
 		return sound;
 	}
 
-	public void seek(int sound, int pos) {
+	public synchronized void seek(int sound, int pos) {
 		int r;
-		if ((r = ((MaSound) library).MaSound_Seek(instanceId, sound, 0, pos, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Seek(instanceId, sound, pos, 0, 0)) != 0) {
 			throw new RuntimeException("MaSound_Seek: " + r);
 		}
 	}
 
-	// 0-127
-	public void setVolume(int sound, int volume) {
+	// 0..127
+	public synchronized void setVolume(int sound, int volume) {
 		IntBuffer volumeBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		volumeBuf.put(volume);
 		int r;
@@ -194,7 +195,8 @@ public class MaDll {
 		}
 	}
 
-	public void setPitch(int sound, int pitch) {
+	// -12..+12
+	public synchronized void setPitch(int sound, int pitch) {
 		IntBuffer pitchBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		pitchBuf.put(pitch);
 		int r;
@@ -203,7 +205,8 @@ public class MaDll {
 		}
 	}
 
-	public void setTempo(int sound, int tempo) {
+	// 70..130
+	public synchronized void setTempo(int sound, int tempo) {
 		IntBuffer tempoBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
 		tempoBuf.put(tempo);
 		int r;
@@ -212,46 +215,50 @@ public class MaDll {
 		}
 	}
 
-	public void start(int sound, int loops) {
+	public synchronized void start(int sound, int loops) {
 		int r;
 		if ((r = ((MaSound) library).MaSound_Start(instanceId, sound, loops, 0)) != 0) {
 			throw new RuntimeException("MaSound_Start: " + r);
 		}
 	}
 
-	public void stop(int sound) {
+	public synchronized void stop(int sound) {
 		int r;
 		if ((r = ((MaSound) library).MaSound_Stop(instanceId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Stop: " + r);
 		}
 	}
 
-	public void pause(int sound) {
+	public synchronized void pause(int sound) {
 		int r;
 		if ((r = ((MaSound) library).MaSound_Pause(instanceId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Pause: " + r);
 		}
 	}
 
-	public void resume(int sound) {
+	public synchronized void resume(int sound) {
 		int r;
 		if ((r = ((MaSound) library).MaSound_Restart(instanceId, sound, 0)) != 0) {
-			throw new RuntimeException("MaSound_Pause: " + r);
+			throw new RuntimeException("MaSound_Restart: " + r);
 		}
 	}
 
-	public int getStatus(int sound) {
+	public synchronized int getStatus(int sound) {
 		return ((MaSound) library).MaSound_Control(instanceId, sound, 6, 0, 0);
 	}
 
-	public void close(int sound) {
+	public synchronized int getPosition(int sound) {
+		return ((MaSound) library).MaSound_Control(instanceId, sound, 4, 0, 0);
+	}
+
+	public synchronized void close(int sound) {
 		((MaSound) library).MaSound_Stop(instanceId, sound, 0);
 		((MaSound) library).MaSound_Close(instanceId, sound, 0);
 		((MaSound) library).MaSound_Unload(instanceId, sound, 0);
 		sounds.remove((Integer) sound);
 	}
 
-	public void destroy() {
+	public synchronized void destroy() {
 		for (Integer sound : sounds) {
 			((MaSound) library).MaSound_Close(instanceId, sound, 0);
 			((MaSound) library).MaSound_Unload(instanceId, sound, 0);
