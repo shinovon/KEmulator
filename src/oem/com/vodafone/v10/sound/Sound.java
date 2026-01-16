@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package com.vodafone.v10.sound;
 
 import emulator.custom.ResourceManager;

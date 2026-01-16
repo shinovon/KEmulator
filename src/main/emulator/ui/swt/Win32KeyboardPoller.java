@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025 Arman Jussupgaliyev
+*/
 package emulator.ui.swt;
 
 import com.sun.jna.platform.win32.User32;

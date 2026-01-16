@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025-2026 Arman Jussupgaliyev
+*/
 package com.jblend.media.smaf;
 
 import com.jblend.media.MediaData;

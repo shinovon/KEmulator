@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Roman Lahin
+*/
 package emulator.debug;
 
 import emulator.Emulator;

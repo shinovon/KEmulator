@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package com.jblend.media.smaf;
 
 import com.jblend.media.MediaData;
@@ -106,11 +109,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	}
 
 	public void play() {
-		if (getState() != READY) {
-//			throw new IllegalStateException();
-			return;
-		}
-		MMFPlayer.getMaDll().start(sound, 0);
+		play(1);
 	}
 
 	public void play(boolean isRepeat) {
@@ -118,7 +117,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 //			throw new IllegalStateException();
 			return;
 		}
-		MMFPlayer.getMaDll().start(sound, isRepeat ? 200 : 0);
+		MMFPlayer.getMaDll().start(sound, isRepeat ? 0 : 1);
 	}
 
 	public void play(int count) {

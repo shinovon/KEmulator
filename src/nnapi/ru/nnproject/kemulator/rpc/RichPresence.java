@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024-2025 Arman Jussupgaliyev
+*/
 package ru.nnproject.kemulator.rpc;
 
 import emulator.Emulator;

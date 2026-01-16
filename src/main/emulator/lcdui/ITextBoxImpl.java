@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025 Arman Jussupgaliyev
+*/
 package emulator.lcdui;
 
 public interface ITextBoxImpl extends IScreenImpl {

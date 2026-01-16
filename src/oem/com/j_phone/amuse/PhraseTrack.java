@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package com.j_phone.amuse;
 
 import emulator.media.mmf.MMFPlayer;

@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package emulator;
 
 import emulator.ui.IEmulatorFrontend;

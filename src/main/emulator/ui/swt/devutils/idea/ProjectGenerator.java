@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025-2026 Fyodor Ryzhov
+*/
 package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;

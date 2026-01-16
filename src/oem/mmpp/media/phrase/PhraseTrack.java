@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package mmpp.media.phrase;
 
 import emulator.media.mmf.MMFPlayer;

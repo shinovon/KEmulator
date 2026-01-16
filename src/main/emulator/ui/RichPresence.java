@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025 Arman Jussupgaliyev
+*/
 package emulator.ui;
 
 import club.minnced.discord.rpc.DiscordEventHandlers;

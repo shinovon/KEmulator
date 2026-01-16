@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024-2026 Arman Jussupgaliyev
+*/
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;

@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2021-2025 Arman Jussupgaliyev
+*/
 package emulator;
 
 import emulator.custom.ResourceManager;

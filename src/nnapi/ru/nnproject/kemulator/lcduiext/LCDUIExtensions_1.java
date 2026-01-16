@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025 Arman Jussupgaliyev
+*/
 package ru.nnproject.kemulator.lcduiext;
 
 import emulator.lcdui.LCDUIUtils;
