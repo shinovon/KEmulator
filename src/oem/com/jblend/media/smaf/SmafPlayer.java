@@ -113,11 +113,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	}
 
 	public void play(boolean isRepeat) {
-		if (getState() != READY) {
-//			throw new IllegalStateException();
-			return;
-		}
-		MMFPlayer.getMaDll().start(sound, isRepeat ? 0 : 1);
+		play(isRepeat ? 0 : 1);
 	}
 
 	public void play(int count) {
@@ -238,6 +234,8 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		}
 		return MMFPlayer.getMaDll().getPosition(sound);
 	}
+
+	// TODO events
 
 	public void addMediaPlayerListener(MediaPlayerListener l) {
 		mediaListeners.add(l);
