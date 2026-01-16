@@ -130,7 +130,6 @@ public class Emulator implements Runnable {
 			}
 		} catch (Throwable ignored) {}
 		RichPresence.close();
-		RichPresence.close();
 		MMFPlayer.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
