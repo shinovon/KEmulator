@@ -377,8 +377,8 @@ public final class Memory {
 		int n = 0;
 		try {
 			if (Emulator.midletJar != null) {
-				final ZipFile zipFile = new ZipFile(Emulator.midletJar);
-				try {
+				synchronized (Emulator.zipFileLock) {
+					ZipFile zipFile = Emulator.zipFile;
 					final Enumeration<String> elements = Emulator.jarClasses.elements();
 					while (elements.hasMoreElements()) {
 						final String s;
@@ -386,11 +386,8 @@ public final class Memory {
 							if (!cls(s = elements.nextElement()).isInterface()) {
 								n += (int) zipFile.getEntry(s.replace('.', '/') + ".class").getSize();
 							}
-						} catch (Throwable ignored) {
-						}
+						} catch (Throwable ignored) {}
 					}
-				} finally {
-					zipFile.close();
 				}
 			} else {
 				final Enumeration<String> elements2 = Emulator.jarClasses.elements();

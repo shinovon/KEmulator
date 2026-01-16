@@ -70,6 +70,9 @@ public class Emulator implements Runnable {
 
 	static int startWidth, startHeight;
 
+	public static ZipFile zipFile;
+	public static final Object zipFileLock = new Object();
+
 	private Emulator() {
 		super();
 	}
@@ -121,6 +124,12 @@ public class Emulator implements Runnable {
 	}
 
 	public static void notifyDestroyed() {
+		try {
+			synchronized (Emulator.zipFileLock) {
+				if (Emulator.zipFile != null) Emulator.zipFile.close();
+			}
+		} catch (Throwable ignored) {}
+		RichPresence.close();
 		RichPresence.close();
 		MMFPlayer.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
@@ -314,8 +323,8 @@ public class Emulator implements Runnable {
 					}
 				}
 				Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
-				final ZipFile zipFile = new ZipFile(Emulator.midletJar);
-				try {
+				synchronized (zipFileLock) {
+					zipFile = new ZipFile(Emulator.midletJar);
 					final Enumeration entries = zipFile.getEntries();
 					while (entries.hasMoreElements()) {
 						final ZipEntry zipEntry;
@@ -344,8 +353,6 @@ public class Emulator implements Runnable {
 							}
 						}
 					}
-				} finally {
-					zipFile.close();
 				}
 				if (Emulator.midletClassName != null) {
 					return true;
