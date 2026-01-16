@@ -29,18 +29,20 @@ public final class h {
 	public static void method591() {
 		try {
 			for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
-				final InputStream method592 = method592((String) Emulator.jarClasses.get(i));
-				final ClassReader classReader = new ClassReader(method592);
 				final ClassNode classNode = new ClassNode();
-				classReader.accept((ClassVisitor) classNode, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
-				method592.close();
+				synchronized (Emulator.zipFileLock) {
+					try (InputStream method592 = getClassStream((String) Emulator.jarClasses.get(i))) {
+						final ClassReader classReader = new ClassReader(method592);
+						classReader.accept((ClassVisitor) classNode, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+					}
+				}
 				for (Object o : classNode.methods) {
 					final MethodInfo methodInfo = new MethodInfo(classNode, (MethodNode) o);
 					h.methodProfiles.put(methodInfo.method704(), methodInfo);
 				}
 			}
 			for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
-				final InputStream method593 = method592((String) Emulator.jarClasses.get(j));
+				final InputStream method593 = getClassStream((String) Emulator.jarClasses.get(j));
 				new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
 				method593.close();
 			}
@@ -49,7 +51,7 @@ public final class h {
 		}
 	}
 
-	private static InputStream method592(final String s) throws IOException {
+	private static InputStream getClassStream(final String s) throws IOException {
 		if (Emulator.midletJar == null) {
 			final File fileFromClassPath;
 			if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
@@ -57,9 +59,9 @@ public final class h {
 			}
 			return new FileInputStream(fileFromClassPath);
 		} else {
-			final ZipFile zipFile;
-			final ZipEntry entry;
-			if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(s.replace('.', '/') + ".class")) == null) {
+			final ZipFile zipFile = Emulator.zipFile;
+			final ZipEntry entry = zipFile.getEntry(s.replace('.', '/') + ".class");
+			if (entry == null) {
 				return null;
 			}
 			return zipFile.getInputStream(entry);
