@@ -124,6 +124,12 @@ public class Emulator implements Runnable {
 	}
 
 	public static void notifyDestroyed() {
+		try {
+			synchronized (Emulator.zipFileLock) {
+				if (Emulator.zipFile != null) Emulator.zipFile.close();
+			}
+		} catch (Throwable ignored) {}
+		RichPresence.close();
 		RichPresence.close();
 		MMFPlayer.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
