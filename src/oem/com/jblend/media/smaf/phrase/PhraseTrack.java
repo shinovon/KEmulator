@@ -61,7 +61,7 @@ public class PhraseTrack extends PhraseTrackBase {
 			playing = false;
             return;
         }
-		if (phrase == null) {
+		if (phrase == null || getState() != PLAYING) {
 			throw new IllegalStateException();
 		}
 		MMFPlayer.getMaDll().phraseStop(id);

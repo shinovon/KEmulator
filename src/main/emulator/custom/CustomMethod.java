@@ -87,6 +87,8 @@ public class CustomMethod {
 				res = Settings.hideEmulation ? null : "KEmulator";
 			} else if (prop.equalsIgnoreCase("console.encoding")) {
 				res = System.getProperty("file.encoding");
+			} else if (prop.equalsIgnoreCase("file.encoding")) {
+				res = AppSettings.fileEncoding;
 			} else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
 				res = Settings.networkNotAvailable ? "unavailable" : "available";
 			} else if (prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {

@@ -88,14 +88,21 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			} else if (cls.equals("java/lang/String")) {
 				if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
 					this.method707(1);
-					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding()", "()Ljava/lang/String;");
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
 				}
 				if (name.equals("getBytes") && sign.startsWith("()")) {
 					this.method707(1);
-					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding()", "()Ljava/lang/String;");
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, "(Ljava/lang/String;)[B");
+					return;
+				}
+			} else if (cls.equals("java/io/InputStreamReader")) {
+				if (name.equals("<init>") && sign.equals("(Ljava/io/InputStream;)V")) {
+					this.method707(1);
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
+					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
 				}
 			} else if (cls.equals("java/util/Vector")) {
