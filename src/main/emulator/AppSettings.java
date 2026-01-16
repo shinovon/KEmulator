@@ -277,10 +277,13 @@ public class AppSettings {
 				applyPreset(devicePreset = "120x160 (Sharp/DoCoMo - full screen)", true);
 			}
 			fileEncoding = "Shift_JIS";
+			locale = "ja-JP";
 			m3gThread = true;
 		} else if (AppSettings.softbankApi) {
 			// TODO
 			applyPreset("Motorola", false);
+			fileEncoding = "Shift_JIS";
+			locale = "ja-JP";
 			m3gThread = true;
 		}
 
