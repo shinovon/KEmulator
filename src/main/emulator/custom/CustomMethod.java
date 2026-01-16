@@ -348,6 +348,10 @@ public class CustomMethod {
 		return Math.max(((Runtime) runtime).freeMemory(), 1024 * 1024L + (System.currentTimeMillis() % 1024));
 	}
 
+	public static String getEncoding() {
+		return AppSettings.fileEncoding;
+	}
+
 	static {
 		CustomMethod.aHashtable14 = new Hashtable();
 		try {

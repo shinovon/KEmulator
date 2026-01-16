@@ -68,7 +68,6 @@ public class AppSettings {
 	// patches
 	public static boolean patchYield;
 	public static boolean ignoreGc;
-	public static boolean patchSleep;
 	public static boolean ignoreSleep;
 	public static boolean applySpeedToSleep;
 
@@ -139,7 +138,6 @@ public class AppSettings {
 
 		patchYield = false;
 		ignoreGc = true;
-		patchSleep = false;
 		ignoreSleep = false;
 		applySpeedToSleep = false;
 
@@ -418,9 +416,6 @@ public class AppSettings {
 		}
 		if (properties.containsKey("IgnoreGC")) {
 			ignoreGc = Boolean.parseBoolean(properties.get("IgnoreGC"));
-		}
-		if (properties.containsKey("PatchSleep")) {
-			patchSleep = Boolean.parseBoolean(properties.get("PatchSleep"));
 		}
 		if (properties.containsKey("IgnoreSleep")) {
 			ignoreSleep = Boolean.parseBoolean(properties.get("IgnoreSleep"));

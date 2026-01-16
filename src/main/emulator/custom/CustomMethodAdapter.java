@@ -72,7 +72,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "yield", sign);
 					return;
 				}
-				if ((AppSettings.patchSleep || AppSettings.ignoreSleep) && name.equals("sleep")) {
+				if (name.equals("sleep")) {
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "sleep", sign);
 					return;
 				}
@@ -88,13 +88,13 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			} else if (cls.equals("java/lang/String")) {
 				if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
 					this.method707(1);
-					super.visitLdcInsn(AppSettings.fileEncoding);
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding()", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
 				}
 				if (name.equals("getBytes") && sign.startsWith("()")) {
 					this.method707(1);
-					super.visitLdcInsn(AppSettings.fileEncoding);
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding()", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, "(Ljava/lang/String;)[B");
 					return;
 				}
