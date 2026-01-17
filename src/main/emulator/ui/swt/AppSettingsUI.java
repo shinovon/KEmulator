@@ -228,14 +228,11 @@ public class AppSettingsUI {
 		lblNewLabel_3.setText("Device preset:");
 
 		deviceCombo = new Combo(grpDevice, SWT.NONE);
-		deviceCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				applyPreset(deviceCombo.getText().trim());
-			}
-		});
 		deviceCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		{
+			boolean set = false;
+			String defaultPreset = Devices.getDefaultPreset();
+			int defaultIdx = -1;
 			final Enumeration method620 = Devices.method620();
 			while (method620.hasMoreElements()) {
 				final String text = (String) method620.nextElement();
@@ -243,9 +240,21 @@ public class AppSettingsUI {
 				if (AppSettings.devicePreset.equalsIgnoreCase(text)) {
 					deviceCombo.setText(text);
 					deviceCombo.select(deviceCombo.getItemCount() - 1);
+					set = true;
+				} else if (defaultPreset != null && defaultPreset.equalsIgnoreCase(text)) {
+					defaultIdx = deviceCombo.getItemCount() - 1;
 				}
 			}
+			if (!set && defaultIdx != -1) {
+				deviceCombo.select(defaultIdx);
+			}
 		}
+		deviceCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				applyPreset(deviceCombo.getText().trim());
+			}
+		});
 
 		Label lblNewLabel_7 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
