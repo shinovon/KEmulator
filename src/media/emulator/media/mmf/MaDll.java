@@ -387,6 +387,15 @@ public class MaDll {
 		if (mode == MODE_MA7) {
 			return;
 		}
+		try {
+			while (!sounds.isEmpty()) {
+				int id = sounds.get(0);
+				if (getStatus(id) == STATE_PLAYING) {
+					throw new RuntimeException();
+				}
+				close(id);
+			}
+		} catch (Exception ignored) {}
 		int r;
 		if ((r = ((Phrase) library).Phrase_Initialize()) != 0) {
 			throw new RuntimeException("Phrase_Initialize: " + r);

@@ -118,8 +118,7 @@ public class RenderProxy {
 										FigureLayout layout, Effect3D effect,
 										int command, int numPrimitives, int[] vertexCoords,
 										int[] normals, int[] textureCoords, int[] colors) {
-		if (layout == null || effect == null || vertexCoords == null || normals == null
-				|| textureCoords == null || colors == null) {
+		if (layout == null || effect == null || vertexCoords == null) {
 			throw new NullPointerException();
 		}
 		if (command < 0 || numPrimitives <= 0 || numPrimitives >= 256) {
