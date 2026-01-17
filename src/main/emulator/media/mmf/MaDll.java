@@ -555,15 +555,27 @@ public class MaDll {
 	}
 
 	public synchronized long phraseGetPosition(int ch) {
+		if (mode == MODE_MA7) {
+			return ((MA7) library).Mapi_Phrase_GetPosition(ch);
+		}
 		return ((Phrase) library).Phrase_GetPosition(ch);
 	}
 
 	public synchronized long phraseGetLength(int ch) {
+		if (mode == MODE_MA7) {
+			return ((MA7) library).Mapi_Phrase_GetLength(ch);
+		}
 		return ((Phrase) library).Phrase_GetLength(ch);
 	}
 
 	public synchronized void phraseSeek(int ch, int pos) {
 		int r;
+		if (mode == MODE_MA7) {
+			if ((r = ((MA7) library).Mapi_Phrase_Seek(ch, pos)) != 0) {
+				throw new RuntimeException("Mapi_Phrase_Seek: " + r);
+			}
+			return;
+		}
 		if ((r = ((Phrase) library).Phrase_Seek(ch, pos)) != 0) {
 			throw new RuntimeException("Phrase_Seek: " + r);
 		}
