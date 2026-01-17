@@ -63,7 +63,6 @@ public class MMFPlayer {
 
 		if (currentSound != -1) maDll.stop(currentSound);
 		currentSound = -1;
-		maDll.phraseTerminate();
 		maDll.destroy();
 	}
 

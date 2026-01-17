@@ -3,28 +3,22 @@ Copyright (c) 2026 Arman Jussupgaliyev
 */
 package com.vodafone.v10.sound;
 
-import emulator.media.mmf.MMFPlayer;
+import emulator.media.mmf.IPhraseEventRedirect;
+import emulator.media.mmf.PhraseTrackImpl;
 
-public class SoundTrack {
+public class SoundTrack implements IPhraseEventRedirect {
 	public static final int NO_DATA = 0;
 	public static final int PAUSED = 3;
 	public static final int PLAYING = 2;
 	public static final int READY = 1;
-	private int id;
+
+	private final PhraseTrackImpl impl;
 	private Sound phrase;
-	private SoundTrackListener listener;
 	private SoundTrack master;
-	boolean stub;
-	boolean playing;
-	int volume;
-	int panpot;
-	boolean mute;
+	private SoundTrackListener listener;
 
-	public SoundTrack() {
-	}
-
-	SoundTrack(int id) {
-		this.id = id;
+	SoundTrack(PhraseTrackImpl impl) {
+		this.impl = impl;
 	}
 
 	public Sound getSound() {
@@ -32,94 +26,44 @@ public class SoundTrack {
 	}
 
 	public void setSound(Sound phrase) {
-		if (phrase != null) {
-			try {
-				MMFPlayer.getMaDll().phraseSetData(id, phrase.data);
-			} catch (Exception e) {
-				e.printStackTrace();
-				stub = true;
-			}
-		}
+		impl.setPhrase(phrase != null ? phrase.data : null);
 		this.phrase = phrase;
 	}
 
 	public void play() {
-		play(1);
+		impl.play(1);
 	}
 
 	public void play(int loops) {
-		if (phrase == null) {
-			return;
-		}
-		if (stub) {
-			playing = true;
-			return;
-		}
-		MMFPlayer.getMaDll().phrasePlay(id, loops);
+		impl.play(loops);
 	}
 
 	public void stop() {
-		if (stub) {
-			playing = false;
-			return;
-		}
-		if (phrase == null) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phraseStop(id);
+		impl.stop();
 	}
 
 	public void pause() {
-		if (stub) {
-			playing = false;
-			return;
-		}
-		if (phrase == null || getState() != PLAYING) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phrasePause(id);
+		impl.pause();
 	}
 
 	public void resume() {
-		if (stub) {
-			playing = true;
-			return;
-		}
-		if (phrase == null || getState() != PAUSED) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phraseRestart(id);
+		impl.resume();
 	}
 
 	public void setVolume(int volume) {
-		if (volume < 0 || volume > 127) {
-			throw new IllegalArgumentException();
-		}
-		this.volume = volume;
-		if (stub) {
-			return;
-		}
-		if (phrase == null) {
-			throw new IllegalStateException();
-		}
-		if (!mute) {
-			MMFPlayer.getMaDll().phraseSetVolume(id, volume);
-		}
+		impl.setVolume(volume);
 	}
 
 	public void removeSound() {
-		if (stub) return;
-		if (phrase != null) {
-			MMFPlayer.getMaDll().phraseRemoveData(id);
-			phrase = null;
-		}
+		impl.removePhrase();
+		phrase = null;
 	}
 
 	public void setEventListener(SoundTrackListener l) {
 		this.listener = l;
 	}
 
-	private void postEvent(int event) {
+	public void _redirectEvent(int event) {
 		if (listener != null) {
 			listener.eventOccurred(event);
 		}
@@ -131,48 +75,26 @@ public class SoundTrack {
 
 	public void setSubjectTo(SoundTrack master) {
 		this.master = master;
-		if (phrase == null || stub) {
-			return;
-		}
-		MMFPlayer.getMaDll().phraseSetLink(id, 0);
-		if (master != null) {
-			MMFPlayer.getMaDll().phraseSetLink(id, 1L << master.id);
-		}
+		impl.setSubjectTo(master.impl);
 	}
 
 	public int getState() {
-		if (phrase == null) {
-			return NO_DATA;
-		}
-		if (stub && playing) {
-			return PLAYING;
-		}
-		return MMFPlayer.getMaDll().phraseGetStatus(id);
+		return impl.getState();
 	}
 
 	public void setPanpot(int panpot) {
-		if (panpot < 0 || panpot > 127) {
-			throw new IllegalArgumentException();
-		}
-		this.panpot = panpot;
-		if (stub) {
-			return;
-		}
-		if (phrase == null) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phraseSetPanpot(id, panpot);
+		impl.setPanpot(panpot);
 	}
 
 	public int getVolume() {
-		return volume;
+		return impl.getVolume();
 	}
 
 	public int getPanpot() {
-		return panpot;
+		return impl.getPanpot();
 	}
 
 	public int getID() {
-		return id;
+		return impl.getID();
 	}
 }

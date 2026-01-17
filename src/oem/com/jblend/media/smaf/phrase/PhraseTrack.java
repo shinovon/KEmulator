@@ -1,8 +1,9 @@
 package com.jblend.media.smaf.phrase;
 
-import emulator.media.mmf.MMFPlayer;
+import emulator.media.mmf.IPhraseEventRedirect;
+import emulator.media.mmf.PhraseTrackImpl;
 
-public class PhraseTrack extends PhraseTrackBase {
+public class PhraseTrack extends PhraseTrackBase implements IPhraseEventRedirect {
 	public static final int NO_DATA = 1;
 	public static final int READY = 2;
 	public static final int PLAYING = 3;
@@ -10,13 +11,14 @@ public class PhraseTrack extends PhraseTrackBase {
 	public static final int DEFAULT_VOLUME = 100;
 	public static final int DEFAULT_PANPOT = 64;
 
+	private final PhraseTrackImpl impl;
 	private Phrase phrase;
 	private PhraseTrack master;
-    boolean stub;
-	boolean playing;
+	private PhraseTrackListener listener;
 
-	PhraseTrack(int id) {
-		super(id);
+	PhraseTrack(PhraseTrackImpl impl) {
+		super(impl.getID());
+		this.impl = impl;
 	}
 
 	public Phrase getPhrase() {
@@ -24,150 +26,80 @@ public class PhraseTrack extends PhraseTrackBase {
 	}
 
 	public void setPhrase(Phrase phrase) {
-		if (phrase != null) {
-			try {
-				MMFPlayer.getMaDll().phraseSetData(id, phrase.data);
-			} catch (Exception ignored) {
-				stub = true;
-			}
-		}
+		impl.setPhrase(phrase != null ? phrase.data : null);
 		this.phrase = phrase;
 	}
 
 	public void removePhrase() {
-		if (!stub && phrase != null) {
-			MMFPlayer.getMaDll().phraseRemoveData(id);
-		}
+		impl.removePhrase();
 		phrase = null;
 	}
 
 	public void play() {
-        play(1);
+		impl.play(1);
 	}
 
 	public void play(int loops) {
-        if (stub) {
-			playing = true;
-            return;
-        }
-		if (phrase == null || getState() != READY) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phrasePlay(id, loops);
+		impl.play(loops);
 	}
 
 	public void stop() {
-        if (stub) {
-			playing = false;
-            return;
-        }
-		if (phrase == null || getState() != PLAYING) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phraseStop(id);
+		impl.stop();
 	}
 
 	public void pause() {
-        if (stub) {
-			playing = false;
-            return;
-        }
-		if (phrase == null || getState() != PLAYING) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phrasePause(id);
+		impl.pause();
 	}
 
 	public void resume() {
-        if (stub) {
-			playing = true;
-            return;
-        }
-		if (phrase == null || getState() != PAUSED) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phraseRestart(id);
+		impl.resume();
 	}
 
 	public boolean isPlaying() {
-		return getState() == PLAYING;
+		return impl.isPlaying();
 	}
 
-    public int getState() {
-        if (phrase == null) {
-            return NO_DATA;
-        }
-		if (stub && playing) {
-			return PLAYING;
-		}
-        return MMFPlayer.getMaDll().phraseGetStatus(id);
-    }
+	public int getState() {
+		return impl.getState();
+	}
 
 	public void setVolume(int volume) {
-		if (volume < 0 || volume > 127) {
-			throw new IllegalArgumentException();
-		}
-		this.volume = volume;
-		if (stub) {
-			return;
-		}
-		if (phrase == null) {
-			throw new IllegalStateException();
-		}
-		if (!mute) {
-			MMFPlayer.getMaDll().phraseSetVolume(id, volume);
-		}
+		impl.setVolume(volume);
 	}
 
 	public void setPanpot(int panpot) {
-		if (panpot < 0 || panpot > 127) {
-			throw new IllegalArgumentException();
-		}
-		this.panpot = panpot;
-		if (stub) {
-			return;
-		}
-		if (phrase == null) {
-			throw new IllegalStateException();
-		}
-		MMFPlayer.getMaDll().phraseSetPanpot(id, panpot);
+		impl.setPanpot(panpot);
 	}
 
 	public void mute(boolean mute) {
-		this.mute = mute;
-		if (stub) {
-			return;
-		}
-		if (phrase == null) {
-			throw new IllegalStateException();
-		}
-		if (!mute) {
-			MMFPlayer.getMaDll().phraseSetVolume(id, volume);
-		} else {
-			MMFPlayer.getMaDll().phraseSetVolume(id, 0);
-		}
+		impl.mute(mute);
 	}
 
 	public boolean isMute() {
-		return mute;
+		return impl.isMute();
 	}
 
 	public int getID() {
-		return id;
+		return impl.getID();
 	}
 
 	public void setSubjectTo(PhraseTrack master) {
 		this.master = master;
-		if (phrase == null || stub) {
-			return;
-		}
-		MMFPlayer.getMaDll().phraseSetLink(id, 0);
-		if (master != null) {
-			MMFPlayer.getMaDll().phraseSetLink(id, 1L << master.id);
-		}
+		impl.setSubjectTo(master.impl);
 	}
 
 	public PhraseTrack getSyncMaster() {
 		return master;
 	}
+
+	public void setEventListener(PhraseTrackListener l) {
+		this.listener = l;
+	}
+
+	public void _redirectEvent(int event) {
+		if (listener != null) {
+			listener.eventOccurred(event);
+		}
+	}
+
 }

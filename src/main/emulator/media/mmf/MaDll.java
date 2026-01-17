@@ -11,9 +11,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("UnusedReturnValue")
 public class MaDll {
@@ -44,7 +42,7 @@ public class MaDll {
 		int MaSound_Delete(int p1);
 	}
 
-	public class PhraseInfo extends Structure {
+	public static class PhraseInfo extends Structure {
 		public long makerID;
 		public int deviceID;
 		public int versionID;
@@ -55,8 +53,27 @@ public class MaDll {
 
 		@Override
 		protected List<String> getFieldOrder() {
-			return Arrays.asList("makerID", "deviceID", "versionID", "maxVoice", "maxCHannel", "supportSMAF", "latency");
+			return Arrays.asList("makerID", "deviceID", "versionID", "maxVoice", "maxChannel", "supportSMAF", "latency");
 		}
+	}
+
+	public static class PhraseEvent extends Structure {
+		public int ch;
+		public int mode;
+
+		public PhraseEvent() {
+		}
+
+		@Override
+		protected List<String> getFieldOrder() {
+			return Arrays.asList("ch", "mode");
+		}
+
+		public static class ByValue extends PhraseEvent implements Structure.ByValue {}
+	}
+
+	private interface PhraseEventCallback extends Callback {
+		void invoke(PhraseEvent.ByValue event);
 	}
 
 	// common Phrase entries for MA3 and MA5
@@ -82,7 +99,9 @@ public class MaDll {
 		int Phrase_RemoveData(int ch);
 		int Phrase_SetLink(int ch, long slave);
 		long Phrase_GetLink(int ch);
+		int Phrase_SetEvHandler(Callback ev);
 	}
+
 
 	private interface MA3 extends MaSound, Phrase {
 		int MaSound_Initialize();
@@ -99,7 +118,6 @@ public class MaDll {
 		int MaSmw_Term();
 		int Mapi_EmuSetPath(String p1, int p2, String p3);
 
-		// TODO check these
 		int Mapi_Initialize();
 		int Mapi_Terminate();
 		int Mapi_Phrase_GetInfo(PhraseInfo info);
@@ -191,6 +209,7 @@ public class MaDll {
 				throw new RuntimeException("MaSound_DeviceControl: " + r);
 			}
 		} else if (mode == MODE_MA7) {
+			// TODO
 //			if ((r = ((MA7) library).Mapi_EmuSetPath(null, 0, Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll")) != 0) {
 //				throw new RuntimeException("Mapi_EmuSetPath: " + r);
 //			}
@@ -327,6 +346,11 @@ public class MaDll {
 		}
 		((MaSound) library).MaSound_Delete(instanceId);
 
+		if (phraseInitialized) {
+			phraseKill();
+			phraseTerminate();
+		}
+
 		if (mode == MODE_MA5) {
 			((MA5) library).MaSound_Terminate();
 			((MA5) library).MaSound_EmuTerminate();
@@ -344,20 +368,48 @@ public class MaDll {
 
 	// region Phrase
 
-	// TODO
+	private boolean phraseInitialized;
+	private PhrasePlayerImpl phrasePlayer;
+	private Map<Integer, Memory> phraseBuffers = new HashMap<>();
 
 	public synchronized void phraseInitialize() {
+		if (phraseInitialized) {
+			return;
+		}
 		if (mode == MODE_MA7) {
 			return;
 		}
-		((Phrase) library).Phrase_Initialize();
+		int r;
+		if ((r = ((Phrase) library).Phrase_Initialize()) != 0) {
+			throw new RuntimeException("Phrase_Initialize: " + r);
+		}
+		phraseInitialized = true;
+
+		if ((r = ((Phrase) library).Phrase_SetEvHandler(new PhraseEventCallback() {
+			public void invoke(PhraseEvent.ByValue event) {
+				System.out.println("event " + event.ch + " " + event.mode);
+				if (phrasePlayer == null) return;
+				phrasePlayer.eventCallback(event.ch, event.mode);
+			}
+		})) != 0) {
+			throw new RuntimeException("Phrase_SetEvHandler: " + r);
+		}
+		System.out.println(r);
+	}
+
+	public synchronized void phraseSetCallback(PhrasePlayerImpl player) {
+		this.phrasePlayer = player;
 	}
 
 	public synchronized void phraseTerminate() {
+		if (!phraseInitialized) {
+			return;
+		}
 		if (mode == MODE_MA7) {
 			return;
 		}
 		((Phrase) library).Phrase_Terminate();
+		phraseInitialized = false;
 	}
 
 
@@ -414,9 +466,16 @@ public class MaDll {
 	}
 
 	public synchronized void phraseSetData(int ch, byte[] data) {
+		if (phraseBuffers.containsKey(ch)) {
+			phraseBuffers.remove(ch);
+		}
+
 		int r;
 		Memory ptr = new Memory(data.length);
 		ptr.write(0, data, 0, data.length);
+
+		// keep buffer from deallocation
+		phraseBuffers.put(ch, ptr);
 
 		if (mode == MODE_MA7) {
 			if ((r = ((MA7) library).Mapi_Phrase_SetData(ch, ptr, data.length, 1)) != 0) {
@@ -440,6 +499,9 @@ public class MaDll {
 		};
 		if ((r = ((Phrase) library).Phrase_RemoveData(ch)) != 0) {
 			throw new RuntimeException("Phrase_RemoveData: " + r);
+		}
+		if (phraseBuffers.containsKey(ch)) {
+			phraseBuffers.remove(ch);
 		}
 	}
 
@@ -492,7 +554,23 @@ public class MaDll {
 		return ((Phrase) library).Phrase_GetStatus(ch);
 	}
 
+	public synchronized long phraseGetPosition(int ch) {
+		return ((Phrase) library).Phrase_GetPosition(ch);
+	}
+
+	public synchronized long phraseGetLength(int ch) {
+		return ((Phrase) library).Phrase_GetLength(ch);
+	}
+
+	public synchronized void phraseSeek(int ch, int pos) {
+		int r;
+		if ((r = ((Phrase) library).Phrase_Seek(ch, pos)) != 0) {
+			throw new RuntimeException("Phrase_Seek: " + r);
+		}
+	}
+
 	public synchronized int getMaxTracks() {
+		// TODO
 		return 4;
 	}
 

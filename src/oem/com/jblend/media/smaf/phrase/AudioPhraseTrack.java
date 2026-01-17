@@ -16,13 +16,15 @@
 
 package com.jblend.media.smaf.phrase;
 
+import emulator.media.mmf.AudioPhraseTrackImpl;
+
 public class AudioPhraseTrack extends PhraseTrackBase {
 	// TODO
 
 	private AudioPhrase phrase;
 
-	AudioPhraseTrack(int id) {
-		super(id);
+	AudioPhraseTrack(AudioPhraseTrackImpl impl) {
+		super(impl.getID());
 	}
 
 	public void setPhrase(AudioPhrase p) {

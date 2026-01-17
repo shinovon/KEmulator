@@ -3,29 +3,46 @@ Copyright (c) 2026 Arman Jussupgaliyev
 */
 package mmpp.media.phrase;
 
+import emulator.media.mmf.PhrasePlayerImpl;
+import emulator.media.mmf.PhraseTrackImpl;
+
 public class PhrasePlayer {
+	private static PhrasePlayer phrasePlayer;
+
+	private PhrasePlayerImpl impl;
+
+	PhraseTrack[] tracks;
+
+	PhrasePlayer() {
+		impl = PhrasePlayerImpl.open(false);
+		tracks = new PhraseTrack[impl.getTracksCount()];
+	}
 
 	public void closePlayer() {
-		// TODO
+		impl.close();
+		phrasePlayer = null;
 	}
 
 	public void closeTrack(PhraseTrack track) {
-		// TODO
+		int id = track.getNumber();
+		if (tracks[id] == track) {
+			impl.disposeTrack(id);
+			tracks[id] = null;
+		}
 	}
 
 	public static PhrasePlayer getPlayer() {
-		// TODO
-		return null;
+		if (phrasePlayer == null) phrasePlayer = new PhrasePlayer();
+		return phrasePlayer;
 	}
 
-	public static PhraseTrack getTrack() {
-		// TODO
-		return null;
+	public PhraseTrack getTrack() {
+		PhraseTrackImpl t = impl.createTrack();
+		return tracks[t.getID()] = new PhraseTrack(t);
 	}
 
-	public static int getTrackCount() {
-		// TODO
-		return 0;
+	public int getTrackCount() {
+		return tracks.length;
 	}
 
 	public static void handleEvent(int ch, int mode) {
@@ -33,15 +50,24 @@ public class PhrasePlayer {
 	}
 
 	public void kill() {
-		// TODO
+		impl.kill();
+		for (int i = 0; i < tracks.length; ++i) {
+			tracks[i] = null;
+		}
 	}
 
 	public void pause() {
-		// TODO
+		for (int i = 0; i < tracks.length; ++i) {
+			if (tracks[i] == null) continue;
+			tracks[i].pause();
+		}
 	}
 
 	public void resume() {
-		// TODO
+		for (int i = 0; i < tracks.length; ++i) {
+			if (tracks[i] == null) continue;
+			tracks[i].resume();
+		}
 	}
 
 }

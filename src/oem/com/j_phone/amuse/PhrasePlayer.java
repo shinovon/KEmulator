@@ -3,27 +3,21 @@ Copyright (c) 2026 Arman Jussupgaliyev
 */
 package com.j_phone.amuse;
 
-import emulator.media.mmf.MMFPlayer;
+import emulator.media.mmf.PhrasePlayerImpl;
+import emulator.media.mmf.PhraseTrackImpl;
 
 public class PhrasePlayer {
+	private static PhrasePlayer phrasePlayer;
+	private final PhrasePlayerImpl impl;
+
 	protected int trackCount;
 	protected PhraseTrack[] tracks;
 	protected boolean[] useFlag;
-	protected static PhrasePlayer phrasePlayer;
-
-	boolean stub;
 
 	PhrasePlayer() {
-		try {
-			MMFPlayer.initialize();
-			MMFPlayer.getMaDll().phraseInitialize();
-			tracks = new PhraseTrack[MMFPlayer.getMaDll().getMaxTracks()];
-		} catch (Exception e) {
-			e.printStackTrace();
-
-			tracks = new PhraseTrack[4];
-			stub = true;
-		}
+		impl = PhrasePlayerImpl.open(true);
+		tracks = new PhraseTrack[trackCount = impl.getTracksCount()];
+		useFlag = new boolean[trackCount];
 	}
 
 	public static PhrasePlayer getPlayer() {
@@ -32,24 +26,15 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrack() {
-		int id = -1;
-		for (int i = 0; i < tracks.length; ++i) {
-			if (tracks[i] == null) {
-				id = i;
-				break;
-			}
-		}
-		if (id == -1) {
-			throw new IllegalStateException();
-		}
-		PhraseTrack t = new PhraseTrack(id);
-		tracks[id] = t;
-		trackCount++;
+		PhraseTrackImpl impl = this.impl.createTrack();
+		useFlag[impl.getID()] = true;
+		PhraseTrack t = tracks[impl.getID()] = new PhraseTrack(impl);
+		impl.setEventListener(t);
 		return t;
 	}
 
 	public int getTrackCount() {
-		return tracks.length;
+		return trackCount;
 	}
 
 	public PhraseTrack getTrack(int id) {
@@ -69,31 +54,24 @@ public class PhrasePlayer {
 	public void disposeTrack(PhraseTrack t) {
 		int id = t.getID();
 		if (tracks[id] == t) {
-			t.removePhrase();
+			useFlag[id] = false;
+			impl.disposeTrack(id);
 			tracks[id] = null;
 		}
 	}
 
 	public void kill() {
-//		for (int i = 0; i < tracks.length; ++i) {
-//			if (tracks[i] == null) continue;
-//			tracks[i].removePhrase();
-//		}
-		if (stub) return;
-		MMFPlayer.getMaDll().phraseKill();
+		impl.kill();
+		for (int i = 0; i < tracks.length; ++i) {
+			tracks[i] = null;
+		}
 	}
 
 	public void pause() {
-		for (int i = 0; i < tracks.length; ++i) {
-			if (tracks[i] == null) continue;
-			tracks[i].pause();
-		}
+		impl.pause();
 	}
 
 	public void resume() {
-		for (int i = 0; i < tracks.length; ++i) {
-			if (tracks[i] == null) continue;
-			tracks[i].resume();
-		}
+		impl.resume();
 	}
 }

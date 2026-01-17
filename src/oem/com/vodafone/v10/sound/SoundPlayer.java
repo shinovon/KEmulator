@@ -3,27 +3,20 @@ Copyright (c) 2026 Arman Jussupgaliyev
 */
 package com.vodafone.v10.sound;
 
-import emulator.media.mmf.MMFPlayer;
+import emulator.media.mmf.PhrasePlayerImpl;
+import emulator.media.mmf.PhraseTrackImpl;
 
 public class SoundPlayer {
 
 	private static SoundPlayer soundPlayer;
 
-	SoundTrack[] tracks;
+	private PhrasePlayerImpl impl;
 
-	boolean stub;
+	private SoundTrack[] tracks;
 
 	SoundPlayer() {
-		try {
-			MMFPlayer.initialize();
-			MMFPlayer.getMaDll().phraseInitialize();
-			tracks = new SoundTrack[MMFPlayer.getMaDll().getMaxTracks()];
-		} catch (Exception e) {
-			e.printStackTrace();
-
-			tracks = new SoundTrack[4];
-			stub = true;
-		}
+		impl = PhrasePlayerImpl.open(true);
+		tracks = new SoundTrack[impl.getTracksCount()];
 	}
 
 	public static SoundPlayer getPlayer() {
@@ -32,18 +25,9 @@ public class SoundPlayer {
 	}
 
 	public SoundTrack getTrack() {
-		int id = -1;
-		for (int i = 0; i < tracks.length; ++i) {
-			if (tracks[i] == null) {
-				id = i;
-				break;
-			}
-		}
-		if (id == -1) {
-			throw new IllegalStateException();
-		}
-		SoundTrack t = new SoundTrack(id);
-		tracks[id] = t;
+		PhraseTrackImpl impl = this.impl.createTrack();
+		SoundTrack t = tracks[impl.getID()] = new SoundTrack(impl);
+		impl.setEventListener(t);
 		return t;
 	}
 
@@ -56,16 +40,27 @@ public class SoundPlayer {
 	}
 
 	public void kill() {
-		for (int i = 0; i < tracks.length; ++i) {
-			if (tracks[i] == null) continue;
-			tracks[i].removeSound();
+		impl.kill();
+	}
+
+	public void pause() {
+		impl.pause();
+	}
+
+	public void resume() {
+		impl.resume();
+	}
+
+	public void disposeTrack(SoundTrack t) {
+		int id = t.getID();
+		if (tracks[id] == t) {
+			impl.disposeTrack(id);
+			tracks[id] = null;
 		}
-		if (stub) return;
-		MMFPlayer.getMaDll().phraseKill();
 	}
 
 	public void disposePlayer() {
-		kill();
+		impl.close();
 		soundPlayer = null;
 	}
 }

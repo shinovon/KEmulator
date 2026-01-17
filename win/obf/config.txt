@@ -144,3 +144,10 @@
 -keepclasseswithmembers,includedescriptorclasses,allowshrinking class * {
     native <methods>;
 }
+
+# JNA
+
+-keep interface emulator.media.mmf.* { *; }
+-keep class * extends com.sun.jna.Library { *; }
+-keep class * extends com.sun.jna.Structure { *; }
+-keep class * extends com.sun.jna.Callback { *; }
