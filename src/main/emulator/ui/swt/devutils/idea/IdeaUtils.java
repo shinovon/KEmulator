@@ -383,16 +383,19 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
+			System.out.println();
 			System.out.println("\033[92mPlease enter project name.\033[0m");
 			System.out.println("Name of folder, JAR file, various configurations. Only ASCII letters, numbers, hyphen and underscore allowed.");
 			System.out.print("> ");
 			String name = br.readLine();
 
+			System.out.println();
 			System.out.println("\033[92mPlease enter MIDlet class name.\033[0m");
 			System.out.println("Full name of your MIDlet class. Must be valid java type name.");
 			System.out.print("> ");
 			String className = br.readLine();
 
+			System.out.println();
 			System.out.println("\033[92mPlease enter MIDlet name.\033[0m");
 			System.out.println("Name of your MIDlet, shown to user. Can contain any symbols except commas, just make sure your target device has enough fonts to display the name.");
 			System.out.print("> ");
@@ -406,7 +409,16 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 
 			ProjectGenerator.create(path, name, className, midletName);
 			Settings.lastIdeaRepoPath = path;
-			System.out.println("OK");
+
+			System.out.println();
+			System.out.println("\033[92mDone. Do you want to edit this new project?\033[0m (y/N)");
+
+			String editConfirm = br.readLine();
+
+			if (!editConfirm.isEmpty() && editConfirm.toLowerCase().charAt(0) == 'y') {
+				editProjectCLI(path + File.separator + name);
+			}
+
 			System.exit(0);
 		} catch (Exception ex) {
 			System.out.println("Failed!");
