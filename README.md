@@ -41,7 +41,7 @@ System:
 ### Libraries
 - [SWT](https://www.eclipse.org/swt/) 4.20 / 4.7
 - [LWJGL](https://github.com/LWJGL/lwjgl3) 3.3.6
-- [JNA](https://github.com/java-native-access/jna) 5.2.0
+- [JNA](https://github.com/java-native-access/jna) 5.7.0
 - [ASM](https://asm.ow2.io/) 5.2
 - [vlcj](https://github.com/caprica/vlcj) 4.7.3
 - [JInput](https://github.com/jinput/jinput) 2.0.5

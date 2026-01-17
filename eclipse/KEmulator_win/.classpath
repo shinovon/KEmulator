@@ -9,7 +9,7 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/KEmulator_base"/>
 	<classpathentry kind="lib" path="/KEmulator_base/lib/bridj-0.7.0-win32.jar"/>
 	<classpathentry kind="lib" path="/KEmulator_base/lib/java-discord-rpc-2.0.1-win32.jar"/>
-	<classpathentry kind="lib" path="/KEmulator_base/lib/jna-5.2.0-win32.jar"/>
+	<classpathentry kind="lib" path="/KEmulator_base/lib/jna-5.7.0-win32.jar"/>
 	<classpathentry kind="lib" path="/KEmulator_base/lib/webcam-capture-0.3.12-win32.jar"/>
 	<classpathentry kind="lib" path="/KEmulator_base/home/lwjgl3-swt-windows-x86.jar"/>
 	<classpathentry kind="lib" path="/KEmulator_base/home/lwjgl-glfw-natives-windows-x86.jar"/>
