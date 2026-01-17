@@ -147,7 +147,9 @@
 
 # JNA
 
--keep interface emulator.media.mmf.* { *; }
 -keep class * extends com.sun.jna.Library { *; }
 -keep class * extends com.sun.jna.Structure { *; }
 -keep class * extends com.sun.jna.Callback { *; }
+
+-keep interface emulator.media.mmf.* { *; }
+-keepclassmembers class emulator.media.mmf.MaDll { *** callback; }

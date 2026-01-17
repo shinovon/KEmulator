@@ -376,7 +376,8 @@ public class MaDll {
 
 	private boolean phraseInitialized;
 	private static PhrasePlayerImpl phrasePlayer;
-	private Map<Integer, Memory> phraseBuffers = new HashMap<>();
+	private final Map<Integer, Memory> phraseBuffers = new HashMap<>();
+	@SuppressWarnings("FieldCanBeLocal")
 	private PhraseEventCallback callback;
 
 	public synchronized void phraseInitialize() {
