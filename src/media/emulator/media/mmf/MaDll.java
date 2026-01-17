@@ -4,7 +4,6 @@ Copyright (c) 2025-2026 Arman Jussupgaliyev
 package emulator.media.mmf;
 
 import com.sun.jna.*;
-import emulator.Emulator;
 
 import java.lang.reflect.Method;
 import java.nio.Buffer;
