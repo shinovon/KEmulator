@@ -63,16 +63,23 @@ public class MaDll {
 		public PhraseEvent() {
 		}
 
+		public PhraseEvent(Pointer p) {
+			super(p);
+			read();
+		}
+
 		@Override
 		protected List<String> getFieldOrder() {
 			return Arrays.asList("ch", "mode");
 		}
-
-		public static class ByValue extends PhraseEvent implements Structure.ByValue {}
 	}
 
-	private interface PhraseEventCallback extends Callback {
-		void invoke(PhraseEvent.ByValue event);
+	private static class PhraseEventCallback implements Callback {
+		public void callback(Pointer p) {
+			PhraseEvent event = new PhraseEvent(p);
+			if (phrasePlayer == null) return;
+			phrasePlayer.eventCallback(event.ch, event.mode);
+		}
 	}
 
 	// common Phrase entries for MA3 and MA5
@@ -368,8 +375,9 @@ public class MaDll {
 	// region Phrase
 
 	private boolean phraseInitialized;
-	private PhrasePlayerImpl phrasePlayer;
+	private static PhrasePlayerImpl phrasePlayer;
 	private Map<Integer, Memory> phraseBuffers = new HashMap<>();
+	private PhraseEventCallback callback;
 
 	public synchronized void phraseInitialize() {
 		if (phraseInitialized) {
@@ -384,16 +392,9 @@ public class MaDll {
 		}
 		phraseInitialized = true;
 
-		if ((r = ((Phrase) library).Phrase_SetEvHandler(new PhraseEventCallback() {
-			public void invoke(PhraseEvent.ByValue event) {
-				System.out.println("event " + event.ch + " " + event.mode);
-				if (phrasePlayer == null) return;
-				phrasePlayer.eventCallback(event.ch, event.mode);
-			}
-		})) != 0) {
+		if ((r = ((Phrase) library).Phrase_SetEvHandler(callback = new PhraseEventCallback())) != 0) {
 			throw new RuntimeException("Phrase_SetEvHandler: " + r);
 		}
-		System.out.println(r);
 	}
 
 	public synchronized void phraseSetCallback(PhrasePlayerImpl player) {
