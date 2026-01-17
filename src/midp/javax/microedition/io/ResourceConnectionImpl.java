@@ -1,5 +1,6 @@
 package javax.microedition.io;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.custom.ResourceManager;
 
@@ -34,7 +35,7 @@ final class ResourceConnectionImpl implements InputConnection {
 			throw new ConnectionNotFoundException(url);
 		}
 
-		if (Emulator.doja) {
+		if (Emulator.doja || AppSettings.softbankApi) {
 			return i;
 		}
 
