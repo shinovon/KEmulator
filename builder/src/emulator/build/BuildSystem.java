@@ -302,7 +302,7 @@ public class BuildSystem {
 
 		if (runAfter) {
 			System.out.println("Running built JAR...");
-			run("kemulator", new ProcessBuilder(java, "-jar", Emulator.getAbsolutePath() + File.separator + "KUtils.jar", "-jar", projectRoot.resolve("deployed").resolve(projectName + ".jar").toString()), false);
+			run("kemulator", new ProcessBuilder(java, "-jar", Emulator.getAbsolutePath() + File.separator + "KEmulator.jar", "-jar", projectRoot.resolve("deployed").resolve(projectName + ".jar").toString()), false);
 		}
 
 		System.exit(0);
