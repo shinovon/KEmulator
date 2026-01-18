@@ -1025,9 +1025,12 @@ public class Emulator implements Runnable {
 		if ("false".equals(System.getProperty("sun.java3d.d3d"))) {
 			cmd.add("-Dsun.java3d.d3d=false");
 		}
+		if ("false".equals(System.getProperty("swt.autoScale"))) {
+			cmd.add("-Dswt.autoScale=false");
+		}
 
 		// mac cocoa fix
-		if (Utils.os.startsWith("darwin") || Utils.os.startsWith("mac os")) {
+		if (Utils.macos) {
 			cmd.add("-XstartOnFirstThread");
 		}
 
