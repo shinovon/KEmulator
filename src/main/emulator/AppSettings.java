@@ -308,7 +308,7 @@ public class AppSettings {
 //		}
 		
 		String s;
-		if (AppSettings.uei) {
+		if (uei) {
 			s = "UEI";
 		} else if (Settings.globalSettings) {
 			s = "All";
@@ -506,7 +506,7 @@ public class AppSettings {
 	}
 
 	public static void save() {
-		if (jarHash == null) return;
+		if (iniSection == null) return;
 
 		AppSettings.set("FileEncoding", fileEncoding);
 		AppSettings.set("DevicePreset", devicePreset);
