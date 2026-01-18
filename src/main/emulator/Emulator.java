@@ -123,14 +123,17 @@ public class Emulator implements Runnable {
 		return Emulator.customClassLoader;
 	}
 
-	public static void notifyDestroyed() {
+	public static void shutdownHook() {
 		try {
 			synchronized (Emulator.zipFileLock) {
 				if (Emulator.zipFile != null) Emulator.zipFile.close();
 			}
 		} catch (Throwable ignored) {}
-		RichPresence.close();
 		MMFPlayer.close();
+	}
+
+	public static void notifyDestroyed() {
+		RichPresence.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
 			generateJad();
@@ -628,7 +631,6 @@ public class Emulator implements Runnable {
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
-
 			platform.load3D();
 			Controllers.refresh(true);
 			Emulator.emulatorimpl.getLogStream().stdout(getCmdVersionString() + " Running on "
@@ -655,6 +657,7 @@ public class Emulator implements Runnable {
 			}
 			Emulator.record = new KeyRecords();
 			getLibraries();
+			Runtime.getRuntime().addShutdownHook(new Thread(Emulator::shutdownHook));
 			try {
 				if (!getJarClasses()) {
 					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
