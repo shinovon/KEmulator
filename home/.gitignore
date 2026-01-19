@@ -13,3 +13,15 @@ builder.jar
 !.package
 !KEmulator*.bat
 !kemulator.sh
+
+SMAF*.dll
+M5_*.dll
+M7_*.dll
+
+# IDA
+*.id0
+*.id1
+*.id2
+*.nam
+*.til
+*.idb

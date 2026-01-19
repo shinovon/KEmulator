@@ -21,7 +21,12 @@ public class MMFPlayer {
 			return false;
 		}
 		try {
-			if (new File(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll").exists()
+			if (new File(Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll").exists()
+					&& new File(Emulator.getAbsolutePath() + "/M7_EmuHw.dll").exists()
+					&& new File(Emulator.getAbsolutePath() + "/SMAFMMS7EMU.DLL").exists()) {
+				Emulator.getEmulator().getLogStream().println("Loading MA-7 emulator");
+				maDll = new MaDll(Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll", MaDll.MODE_MA7);
+			} else if (new File(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll").exists()
 					&& new File(Emulator.getAbsolutePath() + "/M5_EmuHw.dll").exists()) {
 				Emulator.getEmulator().getLogStream().println("Loading MA-5 emulator");
 				maDll = new MaDll(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll", MaDll.MODE_MA5);
@@ -61,8 +66,12 @@ public class MMFPlayer {
 	public static void destroy() {
 		if (maDll == null) return;
 
-		if (currentSound != -1) maDll.stop(currentSound);
-		currentSound = -1;
+		try {
+			if (currentSound != -1) {
+				maDll.close(currentSound);
+			}
+			currentSound = -1;
+		} catch (Exception ignored) {}
 		maDll.destroy();
 	}
 

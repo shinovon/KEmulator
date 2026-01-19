@@ -23,7 +23,7 @@ public class MaDll {
 
 	// common MaSound entries
 	private interface MaSound extends Library {
-		int MaSound_Initialize(int p1, int p2, int p3);
+		int MaSound_Initialize();
 		int MaSound_DeviceControl(int p1, int p2, int p3, int p4);
 		int MaSound_Create(int p1);
 		int MaSound_Load(int p1, Pointer p2, int p3, int p4, int p5, int p6);
@@ -110,10 +110,10 @@ public class MaDll {
 
 
 	private interface MA3 extends MaSound, Phrase {
-		int MaSound_Initialize();
 	}
 
 	private interface MA5 extends MaSound, Phrase {
+		int MaSound_Initialize(int p1, int p2, int p3);
 		int MaSound_EmuInitialize(int p1, int p2, int p3);
 		int MaSound_Terminate();
 		int MaSound_EmuTerminate();
@@ -122,14 +122,20 @@ public class MaDll {
 	private interface MA7 extends MaSound {
 		int MaSmw_Init();
 		int MaSmw_Term();
-		int Mapi_EmuSetPath(String p1, int p2, String p3);
-
+		int Mapi_EmuGetInfo(int p);
+		int Mapi_EmuInitialize(int p1, Pointer p2, Pointer p3, Pointer p4, Pointer p5, int p6);
 		int Mapi_Initialize();
+		int Mapi_DeviceControlEx(int p1, int p2, Pointer p3);
+		int Mapi_GetMode();
+		int Mapi_SetMode(int p);
 		int Mapi_Terminate();
+		int Mapi_EmuTerminate();
+
+
 		int Mapi_Phrase_GetInfo(PhraseInfo info);
-		int Mapi_Phrase_CheckData(Pointer data, long len);
-		int Mapi_Phrase_SetData(int ch, Pointer data, long len, int check);
-		int Mapi_Phrase_Seek(int ch, long pos);
+		int Mapi_Phrase_CheckData(Pointer data, int len);
+		int Mapi_Phrase_SetData(int ch, Pointer data, int len, int check);
+		int Mapi_Phrase_Seek(int ch, int pos);
 		int Mapi_Phrase_Play(int ch, int loop);
 		int Mapi_Phrase_Stop(int ch);
 		int Mapi_Phrase_Pause(int ch);
@@ -140,11 +146,12 @@ public class MaDll {
 		void Mapi_Phrase_SetPanpot(int ch, int vol);
 		int Mapi_Phrase_GetPanpot(int ch);
 		int Mapi_Phrase_GetStatus(int ch);
-		long Mapi_Phrase_GetPosition(int ch);
-		long Mapi_Phrase_GetLength(int ch);
+		int Mapi_Phrase_GetPosition(int ch);
+		int Mapi_Phrase_GetLength(int ch);
 		int Mapi_Phrase_RemoveData(int ch);
 		int Mapi_Phrase_SetLink(int ch, long slave);
 		long Mapi_Phrase_GetLink(int ch);
+		int Mapi_Phrase_SetEvHandler(Callback ev);
 		// TODO Mapi_Phrase_Audio
 	}
 
@@ -168,7 +175,7 @@ public class MaDll {
 
 	// region Sound
 
-	private final List<Integer> sounds = new ArrayList<Integer>();
+	private final Map<Integer, Memory> sounds = new HashMap<>();
 
 	private int EmuBuf;
 	private int instanceId = -1;
@@ -215,22 +222,77 @@ public class MaDll {
 				throw new RuntimeException("MaSound_DeviceControl: " + r);
 			}
 		} else if (mode == MODE_MA7) {
-			// TODO
-//			if ((r = ((MA7) library).Mapi_EmuSetPath(null, 0, Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll")) != 0) {
-//				throw new RuntimeException("Mapi_EmuSetPath: " + r);
-//			}
-//			if ((r = ((MA7) library).Mapi_EmuInitialize()) != 0) {
-//				throw new RuntimeException("Mapi_EmuInitialize: " + r);
-//			}
-//			if ((r = ((MA7) library).Mapi_Initialize()) != 0) {
-//				throw new RuntimeException("Mapi_Initialize: " + r);
-//			}
-//			if ((r = ((MA7) library).MaSmw_Init()) != 0) {
-//				throw new RuntimeException("MaSmw_Init: " + r);
-//			}
-//			if ((r = ((MA7) library).MaSound_Initialize(0, EmuBuf, 0)) != 0) {
-//				throw new RuntimeException("MaSound_Initialize: " + r);
-//			}
+			Memory config = new Memory(72);
+			config.clear();
+
+			config.setInt(0, 2);
+			config.setInt(4, 48000); // sample rate
+			config.setByte(8, (byte) 1);
+			config.setInt(12, 0);
+			config.setInt(16, 15);
+			config.setInt(20, 1);
+			config.setInt(24, 1);
+			config.setShort(28, (short) 120);
+			config.setShort(30, (short) 120);
+			config.setShort(32, (short) 120);
+			config.setShort(34, (short) 120);
+			config.setShort(36, (short) 240);
+			config.setShort(38, (short) 240);
+			config.setShort(40, (short) 240);
+			config.setShort(42, (short) 240);
+			config.setShort(44, (short) 12);
+			config.setShort(46, (short) 12);
+			config.setShort(48, (short) 12);
+			config.setShort(50, (short) 12);
+			config.setShort(52, (short) 16);
+			config.setShort(54, (short) 16);
+			config.setShort(56, (short) 24);
+			config.setShort(58, (short) 24);
+			config.setInt(60, 0);
+			config.setInt(64, 4096);
+			config.setByte(68, (byte) 1);
+
+//			((MA7) library).Mapi_EmuGetInfo(3);
+
+			r = ((MA7) library).Mapi_EmuInitialize(0, config, null, null, null, 0);
+			if (r != 0) {
+				throw new RuntimeException("Mapi_EmuInitialize: " + r);
+			}
+
+			r = ((MA7) library).Mapi_Initialize();
+			if (r != 0) {
+				throw new RuntimeException("Mapi_Initialize: " + r);
+			}
+
+			// unmute?
+			r = ((MA7) library).Mapi_DeviceControlEx(0x10000, 0, null);
+			if (r != 0) {
+				throw new RuntimeException("Mapi_DeviceControlEx: " + r);
+			}
+
+//			Memory p = new Memory(2);
+//			p.setByte(0, (byte) -10);
+//			p.setByte(1, (byte) -10);
+//			((MA7) library).Mapi_DeviceControlEx(65552, 0, p);
+//			((MA7) library).Mapi_DeviceControlEx(65552, 1, p);
+//			((MA7) library).Mapi_DeviceControlEx(65552, 2, p);
+
+			r = ((MA7) library).MaSmw_Init();
+			if (r != 0) {
+				throw new RuntimeException("MaSmw_Init: " + r);
+			}
+
+			// phrases don't work without this
+			r = ((MA7) library).Mapi_SetMode(2);
+			if (r != 0) {
+				throw new RuntimeException("Mapi_SetMode: " + r);
+			}
+
+			// regular initialization steps
+			r = ((MA7) library).MaSound_Initialize();
+			if (r != 0) {
+				throw new RuntimeException("MaSound_Initialize: " + r);
+			}
 		}
 		if ((r = ((MaSound) library).MaSound_Create(1)) < 0) {
 			throw new RuntimeException("MaSound_Create: " + r);
@@ -260,7 +322,7 @@ public class MaDll {
 		setTempo(sound, 100);
 		seek(sound, 0);
 
-		sounds.add(sound);
+		sounds.put(sound, ptr);
 
 		return sound;
 	}
@@ -346,7 +408,7 @@ public class MaDll {
 	}
 
 	public synchronized void destroy() {
-		for (Integer sound : sounds) {
+		for (Integer sound : sounds.keySet()) {
 			((MaSound) library).MaSound_Close(instanceId, sound, 0);
 			((MaSound) library).MaSound_Unload(instanceId, sound, 0);
 		}
@@ -362,6 +424,8 @@ public class MaDll {
 			((MA5) library).MaSound_EmuTerminate();
 		} else if (mode == MODE_MA7) {
 			((MA7) library).MaSmw_Term();
+			((MA7) library).Mapi_Terminate();
+			((MA7) library).Mapi_EmuTerminate();
 		}
 
 		if (EmuBuf != 0) {
@@ -384,20 +448,32 @@ public class MaDll {
 		if (phraseInitialized) {
 			return;
 		}
-		if (mode == MODE_MA7) {
-			return;
-		}
 		try {
-			while (!sounds.isEmpty()) {
-				int id = sounds.get(0);
-				if (getStatus(id) == STATE_PLAYING) {
-					throw new RuntimeException();
+			if (!sounds.isEmpty()) {
+				for (Integer id : sounds.keySet()) {
+					if (getStatus(id) == STATE_PLAYING) {
+						throw new RuntimeException();
+					}
+					close(id);
 				}
-				close(id);
 			}
 		} catch (Exception ignored) {}
+
 		int r;
-		if ((r = ((Phrase) library).Phrase_Initialize()) != 0) {
+		if (mode == MODE_MA7) {
+			r = ((MA7) library).Mapi_SetMode(2);
+			if (r != 0) {
+				throw new RuntimeException("Mapi_SetMode: " + r);
+			}
+			phraseInitialized = true;
+			if ((r = ((MA7) library).Mapi_Phrase_SetEvHandler(callback = new PhraseEventCallback())) != 0) {
+				throw new RuntimeException("Phrase_SetEvHandler: " + r);
+			}
+			return;
+		}
+
+		r = ((Phrase) library).Phrase_Initialize();
+		if (r != 0) {
 			throw new RuntimeException("Phrase_Initialize: " + r);
 		}
 		phraseInitialized = true;
@@ -408,7 +484,7 @@ public class MaDll {
 	}
 
 	public synchronized void phraseSetCallback(PhrasePlayerImpl player) {
-		this.phrasePlayer = player;
+		phrasePlayer = player;
 	}
 
 	public synchronized void phraseTerminate() {
@@ -476,9 +552,7 @@ public class MaDll {
 	}
 
 	public synchronized void phraseSetData(int ch, byte[] data) {
-		if (phraseBuffers.containsKey(ch)) {
-			phraseBuffers.remove(ch);
-		}
+		phraseBuffers.remove(ch);
 
 		int r;
 		Memory ptr = new Memory(data.length);
@@ -510,9 +584,7 @@ public class MaDll {
 		if ((r = ((Phrase) library).Phrase_RemoveData(ch)) != 0) {
 			throw new RuntimeException("Phrase_RemoveData: " + r);
 		}
-		if (phraseBuffers.containsKey(ch)) {
-			phraseBuffers.remove(ch);
-		}
+		phraseBuffers.remove(ch);
 	}
 
 	public synchronized void phraseKill() {
