@@ -27,7 +27,7 @@ public class MaDll {
 		int MaSound_DeviceControl(int p1, int p2, int p3, int p4);
 		int MaSound_Create(int p1);
 		int MaSound_Load(int p1, Pointer p2, int p3, int p4, int p5, int p6);
-		int MaSound_Control(int p1, int p2, int p3, int p4, int p5);
+		int MaSound_Control(int p1, int p2, int p3, Pointer p4, int p5);
 		int MaSound_Open(int p1, int p2, int p3, int p4);
 		int MaSound_Standby(int p1, int p2, int p3);
 		int MaSound_Start(int p1, int p2, int p3, int p4);
@@ -336,30 +336,30 @@ public class MaDll {
 
 	// 0..127
 	public synchronized void setVolume(int sound, int volume) {
-		IntBuffer volumeBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
-		volumeBuf.put(volume);
+		Memory p = new Memory(4);
+		p.setInt(0, volume);
 		int r;
-		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 0, (int) getAddress(volumeBuf), 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 0, p, 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
 
 	// -12..+12
 	public synchronized void setPitch(int sound, int pitch) {
-		IntBuffer pitchBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
-		pitchBuf.put(pitch);
+		Memory p = new Memory(4);
+		p.setInt(0, pitch);
 		int r;
-		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 2, (int) getAddress(pitchBuf), 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 2, p, 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
 
 	// 70..130
 	public synchronized void setTempo(int sound, int tempo) {
-		IntBuffer tempoBuf = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer();
-		tempoBuf.put(tempo);
+		Memory p = new Memory(4);
+		p.setInt(0, tempo);
 		int r;
-		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 1, (int) getAddress(tempoBuf), 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 1, p, 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
@@ -393,11 +393,11 @@ public class MaDll {
 	}
 
 	public synchronized int getStatus(int sound) {
-		return ((MaSound) library).MaSound_Control(instanceId, sound, 6, 0, 0);
+		return ((MaSound) library).MaSound_Control(instanceId, sound, 6, Pointer.NULL, 0);
 	}
 
 	public synchronized int getPosition(int sound) {
-		return ((MaSound) library).MaSound_Control(instanceId, sound, 4, 0, 0);
+		return ((MaSound) library).MaSound_Control(instanceId, sound, 4, Pointer.NULL, 0);
 	}
 
 	public synchronized void close(int sound) {
@@ -669,17 +669,5 @@ public class MaDll {
 	}
 
 	// endregion Phrase
-
-	// utils
-	
-	private static long getAddress(Buffer buf) {
-		try {
-			Class cls = Class.forName("sun.nio.ch.DirectBuffer");
-			Method m = cls.getMethod("address");
-			return (Long) m.invoke(buf);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 }
