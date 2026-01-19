@@ -22,8 +22,7 @@ public class MMFPlayer {
 		}
 		try {
 			if (new File(Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll").exists()
-					&& new File(Emulator.getAbsolutePath() + "/M7_EmuHw.dll").exists()
-					&& new File(Emulator.getAbsolutePath() + "/SMAFMMS7EMU.DLL").exists()) {
+					&& new File(Emulator.getAbsolutePath() + "/M7_EmuHw.dll").exists()) {
 				Emulator.getEmulator().getLogStream().println("Loading MA-7 emulator");
 				maDll = new MaDll(Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll", MaDll.MODE_MA7);
 			} else if (new File(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll").exists()

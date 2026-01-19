@@ -14,7 +14,6 @@ builder.jar
 !KEmulator*.bat
 !kemulator.sh
 
-SMAF*.dll
 M5_*.dll
 M7_*.dll
 
