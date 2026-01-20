@@ -5,11 +5,6 @@ package emulator.media.mmf;
 
 import com.sun.jna.*;
 
-import java.lang.reflect.Method;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.util.*;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -252,8 +247,6 @@ public class MaDll {
 			config.setInt(64, 4096);
 			config.setByte(68, (byte) 1);
 
-//			((MA7) library).Mapi_EmuGetInfo(3);
-
 			r = ((MA7) library).Mapi_EmuInitialize(0, config, null, null, null, 0);
 			if (r != 0) {
 				throw new RuntimeException("Mapi_EmuInitialize: " + r);
@@ -264,25 +257,13 @@ public class MaDll {
 				throw new RuntimeException("Mapi_Initialize: " + r);
 			}
 
-			// unmute?
+			// unmute
 			r = ((MA7) library).Mapi_DeviceControlEx(0x10000, 0, null);
 			if (r != 0) {
 				throw new RuntimeException("Mapi_DeviceControlEx: " + r);
 			}
 
-//			Memory p = new Memory(2);
-//			p.setByte(0, (byte) -10);
-//			p.setByte(1, (byte) -10);
-//			((MA7) library).Mapi_DeviceControlEx(65552, 0, p);
-//			((MA7) library).Mapi_DeviceControlEx(65552, 1, p);
-//			((MA7) library).Mapi_DeviceControlEx(65552, 2, p);
-
-			r = ((MA7) library).MaSmw_Init();
-			if (r != 0) {
-				throw new RuntimeException("MaSmw_Init: " + r);
-			}
-
-			// phrases don't work without this
+			// phrases only work in mode 2, it's in mode 1 by default
 			r = ((MA7) library).Mapi_SetMode(2);
 			if (r != 0) {
 				throw new RuntimeException("Mapi_SetMode: " + r);
@@ -409,6 +390,7 @@ public class MaDll {
 
 	public synchronized void destroy() {
 		for (Integer sound : sounds.keySet()) {
+			((MaSound) library).MaSound_Stop(instanceId, sound, 0);
 			((MaSound) library).MaSound_Close(instanceId, sound, 0);
 			((MaSound) library).MaSound_Unload(instanceId, sound, 0);
 		}

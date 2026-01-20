@@ -2,6 +2,7 @@ package com.samsung.util;
 
 import emulator.custom.ResourceManager;
 import emulator.media.mmf.MMFPlayer;
+import emulator.media.mmf.MaDll;
 
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
@@ -26,6 +27,7 @@ public class AudioClip {
 	public static final int STATUS_PLAY = 1;
 	public static final int STATUS_PAUSE = 2;
 	private int status;
+	private int mmfSound = -1;
 
 	public AudioClip(int n, byte[] b, int n2, int n3) {
 		byte[] t = new byte[n3];
@@ -34,12 +36,13 @@ public class AudioClip {
 	}
 
 	public AudioClip(int type, String s) throws IOException {
-		InputStream is = ResourceManager.getResourceAsStream(s);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] b = new byte[512];
-		while (is.available() > 0) {
-			int n2 = is.read(b);
-			baos.write(b, 0, n2);
+		try (InputStream is = ResourceManager.getResourceAsStream(s)) {
+			byte[] b = new byte[512];
+			while (is.available() > 0) {
+				int n2 = is.read(b);
+				baos.write(b, 0, n2);
+			}
 		}
 		byte[] t = new byte[baos.size()];
 		java.lang.System.arraycopy(baos.toByteArray(), 0, t, 0, t.length);
@@ -78,6 +81,16 @@ public class AudioClip {
 	}
 
 	public int getStatus() {
+		if (mmfSound != -1) {
+			int s = MMFPlayer.getMaDll().getStatus(mmfSound);
+			if (s == MaDll.STATE_PAUSED) {
+				return STATUS_PAUSE;
+			}
+			if (s == MaDll.STATE_PLAYING) {
+				return STATUS_PLAY;
+			}
+			return STATUS_STOP;
+		}
 		return this.status;
 	}
 
@@ -87,10 +100,14 @@ public class AudioClip {
 
 	public void pause() {
 		if (this.type == TYPE_MMF) {
-			if (this.mmfInit && MMFPlayer.isPlaying()) {
-				MMFPlayer.pause();
+			if (this.mmfInit) {
+				if (mmfSound != -1) {
+					if (MMFPlayer.getMaDll().getStatus(mmfSound) == MaDll.STATE_PLAYING) {
+						MMFPlayer.getMaDll().pause(mmfSound);
+					}
+					return;
+				}
 				this.status = STATUS_PAUSE;
-				return;
 			}
 		} else if (this.m_player != null) {
 			try {
@@ -117,11 +134,22 @@ public class AudioClip {
 			this.loopCount = l;
 			this.volume = v;
 			if (this.mmfInit) {
-				MMFPlayer.initPlayer(this.data);
-				MMFPlayer.play(l, v);
-				this.status = STATUS_PLAY;
+				try {
+					if (mmfSound == -1) {
+						mmfSound = MMFPlayer.getMaDll().load(data);
+					}
+					if (mmfSound != -1 && MMFPlayer.getMaDll().getStatus(mmfSound) == MaDll.STATE_READY) {
+						MMFPlayer.getMaDll().setVolume(mmfSound, (v * 100) / 5);
+						MMFPlayer.getMaDll().start(mmfSound, l);
+					}
+					return;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				status = STATUS_PLAY;
 				return;
 			}
+			this.status = STATUS_PLAY;
 		} else if (this.m_player != null) {
 			this.m_player.setLoopCount(l);
 			this.m_player.setLevel(v * 20);
@@ -136,10 +164,10 @@ public class AudioClip {
 	public void resume() {
 		if (this.type == TYPE_MMF) {
 			if (this.mmfInit) {
-				MMFPlayer.resume();
-				this.status = STATUS_PLAY;
+				MMFPlayer.getMaDll().resume(mmfSound);
 				return;
 			}
+			this.status = STATUS_PLAY;
 		} else if (this.m_player != null) {
 			try {
 				this.m_player.start();
@@ -151,8 +179,10 @@ public class AudioClip {
 
 	public void stop() {
 		if (this.type == TYPE_MMF) {
-			if (this.mmfInit && MMFPlayer.isPlaying()) {
-				MMFPlayer.stop();
+			if (this.mmfInit) {
+				if (MMFPlayer.getMaDll().getStatus(mmfSound) < MaDll.STATE_PLAYING) {
+					MMFPlayer.getMaDll().stop(mmfSound);
+				}
 				this.status = STATUS_STOP;
 				return;
 			}
@@ -171,6 +201,13 @@ public class AudioClip {
 				AudioClip.this.status = STATUS_STOP;
 			}
 		}
+	}
+
+	protected void finalize() {
+		if (mmfSound == -1) return;
+		try {
+			MMFPlayer.getMaDll().close(mmfSound);
+		} catch (Throwable ignored) {}
 	}
 
 	public byte[] getData() {
