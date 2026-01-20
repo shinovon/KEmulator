@@ -17,6 +17,7 @@ public final class NxGraphics {
 
 	public static NxGraphics getNxGraphics(Graphics g)
 			throws NullPointerException {
+		// TODO
 		return null;
 	}
 }

@@ -282,12 +282,14 @@ public class AppSettings {
 			fileEncoding = "Shift_JIS";
 			locale = "ja-JP";
 			m3gThread = true;
+			ignoreFullScreen = true;
 		} else if (AppSettings.softbankApi) {
 			// TODO
 			applyPreset("Motorola", false);
 			fileEncoding = "Shift_JIS";
 			locale = "ja-JP";
 			m3gThread = true;
+			ignoreFullScreen = true;
 		}
 
 		String midletName = emulator.getAppProperty("MIDlet-Name");

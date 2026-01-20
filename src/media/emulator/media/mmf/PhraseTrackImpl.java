@@ -14,17 +14,19 @@ public class PhraseTrackImpl {
 	public static final int DEFAULT_PANPOT = 64;
 
 	private final int id;
-	private boolean stub;
-	private byte[] phrase;
+	boolean stub;
+	byte[] phrase;
 	private PhraseTrackImpl master;
 	private boolean playing;
 	private int volume = DEFAULT_VOLUME;
 	private int panpot = DEFAULT_PANPOT;
 	private boolean mute;
 	private IPhraseEventRedirect listener;
+	private final PhrasePlayerImpl player;
 
-	PhraseTrackImpl(int id) {
+	PhraseTrackImpl(int id, PhrasePlayerImpl player) {
 		this.id = id;
+		this.player = player;
 	}
 
 	public void setEventListener(IPhraseEventRedirect listener) {
@@ -41,6 +43,7 @@ public class PhraseTrackImpl {
 		if (data != null) {
 			try {
 				MMFPlayer.getMaDll().phraseSetData(id, data);
+				stub = false;
 			} catch (Exception ignored) {
 				stub = true;
 			}
@@ -80,6 +83,9 @@ public class PhraseTrackImpl {
 		} else if (loops < 0) {
 			loops = 0;
 		}
+		if (master != null) {
+			return;
+		}
 		MMFPlayer.getMaDll().phrasePlay(id, loops);
 	}
 
@@ -93,6 +99,9 @@ public class PhraseTrackImpl {
 		}
 		int state = getState();
 		if (state != PLAYING && state != PAUSED) {
+			return;
+		}
+		if (master != null) {
 			return;
 		}
 		MMFPlayer.getMaDll().phraseStop(id);
@@ -109,6 +118,9 @@ public class PhraseTrackImpl {
 		if (getState() != PLAYING) {
 			return;
 		}
+		if (master != null) {
+			return;
+		}
 		MMFPlayer.getMaDll().phrasePause(id);
 	}
 
@@ -121,6 +133,9 @@ public class PhraseTrackImpl {
 			throw new IllegalStateException();
 		}
 		if (getState() != PAUSED) {
+			return;
+		}
+		if (master != null) {
 			return;
 		}
 		MMFPlayer.getMaDll().phraseRestart(id);
@@ -206,6 +221,9 @@ public class PhraseTrackImpl {
 		if (pos < 0) {
 			throw new IllegalArgumentException();
 		}
+		if (master != null) {
+			return;
+		}
 		MMFPlayer.getMaDll().phraseSeek(id, pos);
 	}
 
@@ -227,13 +245,7 @@ public class PhraseTrackImpl {
 
 	public void setSubjectTo(PhraseTrackImpl master) {
 		this.master = master;
-		if (phrase == null || stub) {
-			return;
-		}
-		MMFPlayer.getMaDll().phraseSetLink(id, 0);
-		if (master != null) {
-			MMFPlayer.getMaDll().phraseSetLink(id, 1L << master.id);
-		}
+		player.setLinks();
 	}
 
 	public PhraseTrackImpl getSyncMaster() {

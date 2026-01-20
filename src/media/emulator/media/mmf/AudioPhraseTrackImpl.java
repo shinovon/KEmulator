@@ -21,6 +21,7 @@ public class AudioPhraseTrackImpl {
 	private int panpot = DEFAULT_PANPOT;
 	private boolean mute;
 	private IPhraseEventRedirect listener;
+	int sound = -1;
 
 	AudioPhraseTrackImpl(int id) {
 		this.id = id;
@@ -37,9 +38,14 @@ public class AudioPhraseTrackImpl {
 	}
 
 	public void setPhrase(byte[] data) {
+		if (sound != -1) {
+			MMFPlayer.getMaDll().audioPhraseRemoveData(sound);
+			sound = -1;
+		}
 		if (data != null) {
 			try {
-				MMFPlayer.getMaDll().audioPhraseSetData(id, data);
+				sound = MMFPlayer.getMaDll().audioPhraseSetData(data, volume, panpot);
+				stub = false;
 			} catch (Exception ignored) {
 				stub = true;
 			}
@@ -48,9 +54,10 @@ public class AudioPhraseTrackImpl {
 	}
 
 	public void removePhrase() {
-		if (!stub && phrase != null) {
+		if (sound != -1) {
 			if (getState() != READY) stop();
-			MMFPlayer.getMaDll().audioPhraseRemoveData(id);
+			MMFPlayer.getMaDll().audioPhraseRemoveData(sound);
+			sound = -1;
 		}
 		phrase = null;
 	}
@@ -67,19 +74,19 @@ public class AudioPhraseTrackImpl {
 			return;
 		}
 		if (mute) {
-			MMFPlayer.getMaDll().audioPhraseSetVolume(id, 0);
+			MMFPlayer.getMaDll().audioPhraseSetVolume(sound, 0);
 		} else if (volume != DEFAULT_VOLUME) {
-			MMFPlayer.getMaDll().audioPhraseSetVolume(id, volume);
+			MMFPlayer.getMaDll().audioPhraseSetVolume(sound, volume);
 		}
 		if (panpot != DEFAULT_PANPOT) {
-			MMFPlayer.getMaDll().audioPhraseSetPanpot(id, panpot);
+			MMFPlayer.getMaDll().audioPhraseSetPanpot(sound, panpot);
 		}
 		if (loops > 255) {
 			loops = 255;
 		} else if (loops < 0) {
 			loops = 0;
 		}
-		MMFPlayer.getMaDll().audioPhrasePlay(id, loops);
+		MMFPlayer.getMaDll().audioPhrasePlay(sound, loops);
 	}
 
 	public void stop() {
@@ -94,7 +101,7 @@ public class AudioPhraseTrackImpl {
 		if (state != PLAYING && state != PAUSED) {
 			return;
 		}
-		MMFPlayer.getMaDll().audioPhraseStop(id);
+		MMFPlayer.getMaDll().audioPhraseStop(sound);
 	}
 
 	public void pause() {
@@ -108,7 +115,7 @@ public class AudioPhraseTrackImpl {
 		if (getState() != PLAYING) {
 			return;
 		}
-		MMFPlayer.getMaDll().audioPhrasePause(id);
+		MMFPlayer.getMaDll().audioPhrasePause(sound);
 	}
 
 	public void resume() {
@@ -122,7 +129,7 @@ public class AudioPhraseTrackImpl {
 		if (getState() != PAUSED) {
 			return;
 		}
-		MMFPlayer.getMaDll().audioPhraseRestart(id);
+		MMFPlayer.getMaDll().audioPhraseRestart(sound);
 	}
 
 	public boolean isPlaying() {
@@ -136,7 +143,14 @@ public class AudioPhraseTrackImpl {
 		if (stub && playing) {
 			return PLAYING;
 		}
-		return MMFPlayer.getMaDll().audioPhraseGetStatus(id);
+		int s = MMFPlayer.getMaDll().audioPhraseGetStatus(sound);
+		if (s == 3) {
+			return PLAYING;
+		}
+		if (s == 4) {
+			return PAUSED;
+		}
+		return READY;
 	}
 
 	public void setVolume(int volume) {
@@ -148,7 +162,7 @@ public class AudioPhraseTrackImpl {
 			return;
 		}
 		if (!mute) {
-			MMFPlayer.getMaDll().audioPhraseSetVolume(id, volume);
+			MMFPlayer.getMaDll().audioPhraseSetVolume(sound, volume);
 		}
 	}
 
@@ -160,7 +174,7 @@ public class AudioPhraseTrackImpl {
 		if (stub || phrase == null) {
 			return;
 		}
-		MMFPlayer.getMaDll().audioPhraseSetPanpot(id, panpot);
+		MMFPlayer.getMaDll().audioPhraseSetPanpot(sound, panpot);
 	}
 
 	public void mute(boolean mute) {
@@ -169,9 +183,9 @@ public class AudioPhraseTrackImpl {
 			return;
 		}
 		if (!mute) {
-			MMFPlayer.getMaDll().audioPhraseSetVolume(id, volume);
+			MMFPlayer.getMaDll().audioPhraseSetVolume(sound, volume);
 		} else {
-			MMFPlayer.getMaDll().audioPhraseSetVolume(id, 0);
+			MMFPlayer.getMaDll().audioPhraseSetVolume(sound, 0);
 		}
 	}
 

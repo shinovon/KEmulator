@@ -22,15 +22,15 @@ public class PhrasePlayerImpl {
 			MMFPlayer.getMaDll().phraseInitialize();
 			inst.tracks = new PhraseTrackImpl[MMFPlayer.getMaDll().getMaxTracks()];
 			if (audioTracks && MMFPlayer.getMaDll().supportsAudioTracks()) {
-				inst.tracks = new PhraseTrackImpl[MMFPlayer.getMaDll().getMaxAudioTracks()];
+				inst.audioTracks = new AudioPhraseTrackImpl[MMFPlayer.getMaDll().getMaxAudioTracks()];
 			} else {
-				inst.audioTracks = new AudioPhraseTrackImpl[16];
+				inst.audioTracks = new AudioPhraseTrackImpl[4];
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 
-			inst.tracks = new PhraseTrackImpl[16];
-			inst.audioTracks = new AudioPhraseTrackImpl[16];
+			inst.tracks = new PhraseTrackImpl[4];
+			inst.audioTracks = new AudioPhraseTrackImpl[4];
 			inst.stub = true;
 		}
 
@@ -48,7 +48,7 @@ public class PhrasePlayerImpl {
 		if (id == -1) {
 			throw new IllegalStateException();
 		}
-		PhraseTrackImpl t = new PhraseTrackImpl(id);
+		PhraseTrackImpl t = new PhraseTrackImpl(id, this);
 		tracks[id] = t;
 		return t;
 	}
@@ -161,14 +161,37 @@ public class PhrasePlayerImpl {
 		}
 	}
 
-	void audioEventCallback(int ch, int mode) {
+	void audioEventCallback(int id, int mode) {
+		// TODO
+		if (mode != 2) return;
+		int type = -1;
 		try {
-			AudioPhraseTrackImpl track = audioTracks[ch];
-			if (track == null) return;
+			for (AudioPhraseTrackImpl track : audioTracks) {
+				if (track.sound != id) continue;
 
-			track.redirectEvent(mode);
+				track.redirectEvent(type);
+				break;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	void setLinks() {
+		for (PhraseTrackImpl track : tracks) {
+			if (track == null || track.phrase == null || track.stub) {
+				continue;
+			}
+			int slave = 0;
+			for (int j = 0; j < tracks.length; j++) {
+				if (tracks[j] == null) continue;
+				if (tracks[j].getSyncMaster() == track) {
+					slave |= 1 << j;
+				}
+			}
+			try {
+				MMFPlayer.getMaDll().phraseSetLink(track.getID(), slave);
+			} catch (Exception ignored) {}
 		}
 	}
 }
