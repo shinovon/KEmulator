@@ -1,9 +1,8 @@
 package com.jblend.media.smaf.phrase;
 
-import emulator.media.mmf.IPhraseEventRedirect;
 import emulator.media.mmf.PhraseTrackImpl;
 
-public class PhraseTrack extends PhraseTrackBase implements IPhraseEventRedirect {
+public class PhraseTrack extends PhraseTrackBase {
 	public static final int NO_DATA = 1;
 	public static final int READY = 2;
 	public static final int PLAYING = 3;
@@ -14,7 +13,6 @@ public class PhraseTrack extends PhraseTrackBase implements IPhraseEventRedirect
 	private final PhraseTrackImpl impl;
 	private Phrase phrase;
 	private PhraseTrack master;
-	private PhraseTrackListener listener;
 
 	PhraseTrack(PhraseTrackImpl impl) {
 		super(impl.getID());
@@ -79,6 +77,14 @@ public class PhraseTrack extends PhraseTrackBase implements IPhraseEventRedirect
 		return impl.isMute();
 	}
 
+	public int getVolume() {
+		return impl.getVolume();
+	}
+
+	public int getPanpot() {
+		return impl.getPanpot();
+	}
+
 	public int getID() {
 		return impl.getID();
 	}
@@ -90,16 +96,6 @@ public class PhraseTrack extends PhraseTrackBase implements IPhraseEventRedirect
 
 	public PhraseTrack getSyncMaster() {
 		return master;
-	}
-
-	public void setEventListener(PhraseTrackListener l) {
-		this.listener = l;
-	}
-
-	public void _redirectEvent(int event) {
-		if (listener != null) {
-			listener.eventOccurred(event);
-		}
 	}
 
 }

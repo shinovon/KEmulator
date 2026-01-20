@@ -147,7 +147,16 @@ public class MaDll {
 		int Mapi_Phrase_SetLink(int ch, long slave);
 		long Mapi_Phrase_GetLink(int ch);
 		int Mapi_Phrase_SetEvHandler(Callback ev);
-		// TODO Mapi_Phrase_Audio
+
+		int Mapi_Phrase_AudioStop(int ch);
+		int Mapi_Phrase_AudioStart(int ch, short loops);
+		int Mapi_Phrase_AudioSeek(int ch, int pos, byte p);
+		int Mapi_Phrase_AudioStandby(int ch);
+		int Mapi_Phrase_AudioControl(int ch, int p1, Pointer p2);
+		int Mapi_Phrase_AudioOpen(int p1, int p2, Callback p3);
+		int Mapi_Phrase_AudioClose(int ch);
+		int Mapi_Phrase_AudioUnload(int ch);
+		int Mapi_Phrase_AudioLoad(Pointer data, int p1, byte p2);
 	}
 
 	// endregion JNA interfaces
@@ -651,5 +660,136 @@ public class MaDll {
 	}
 
 	// endregion Phrase
+
+	// region Audio phrase
+
+	private final Map<Integer, Memory> audioPhraseBuffers = new HashMap<>();
+
+	// TODO
+
+	public synchronized void audioPhrasePlay(int ch, int loops) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+		int r = ((MA7) library).Mapi_Phrase_AudioStart(ch, (short) loops);
+		if (r != 0) {
+			throw new RuntimeException("Mapi_Phrase_Audio: " + r);
+		}
+	}
+
+	public synchronized void audioPhrasePause(int ch) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+//		int r = ((MA7) library).Mapi_Phrase_AudioPause(ch);
+//		if (r != 0) {
+//			throw new RuntimeException("Mapi_Phrase_Audio: " + r);
+//		}
+	}
+
+	public synchronized void audioPhraseRestart(int ch) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+//		int r = ((MA7) library).Mapi_Phrase_AudioRestart(ch);
+//		if (r != 0) {
+//			throw new RuntimeException("Mapi_Phrase_Audio: " + r);
+//		}
+	}
+
+	public synchronized void audioPhraseStop(int ch) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+		int r = ((MA7) library).Mapi_Phrase_AudioStop(ch);
+		if (r != 0) {
+			throw new RuntimeException("Mapi_Phrase_Audio: " + r);
+		}
+	}
+
+	public synchronized void audioPhraseSetData(int ch, byte[] data) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+		throw new RuntimeException();
+
+//		audioPhraseBuffers.remove(ch);
+//
+//		Memory ptr = new Memory(data.length);
+//		ptr.write(0, data, 0, data.length);
+//
+//		int r;
+//		r = ((MA7) library).Mapi_Phrase_AudioOpen(1, 0, null);
+//		if (r != 0) {
+//			throw new RuntimeException("Mapi_Phrase_Audio: " + r);
+//		}
+//
+//		// keep buffer from deallocation
+//		audioPhraseBuffers.put(ch, ptr);
+//
+//		r = ((MA7) library).Mapi_Phrase_AudioLoad(ptr, data.length, (byte) 0);
+//		if (r != 0) {
+//			throw new RuntimeException("Mapi_Phrase_AudioLoad: " + r);
+//		}
+//
+//		r = ((MA7) library).Mapi_Phrase_AudioStandby(ch);
+//		if (r != 0) {
+//			throw new RuntimeException("Mapi_Phrase_AudioStandby: " + r);
+//		}
+	}
+
+	public synchronized void audioPhraseRemoveData(int ch) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+		int r;
+		r = ((MA7) library).Mapi_Phrase_AudioUnload(ch);
+//		if (r != 0) {
+//			throw new RuntimeException("Mapi_Phrase_AudioUnload: " + r);
+//		}
+		r = ((MA7) library).Mapi_Phrase_AudioClose(ch);
+//		if (r != 0) {
+//			throw new RuntimeException("Mapi_Phrase_AudioClose: " + r);
+//		}
+		audioPhraseBuffers.remove(ch);
+	}
+
+	public synchronized void audioPhraseSetVolume(int ch, int volume) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+	}
+
+	public synchronized void audioPhraseSetPanpot(int ch, int panpot) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+	}
+
+	public synchronized int audioPhraseGetStatus(int ch) {
+		if (mode != MODE_MA7) {
+			throw new RuntimeException("Not supported");
+		}
+
+		return 0;
+	}
+
+	public synchronized int getMaxAudioTracks() {
+		return 1;
+	}
+
+	public boolean supportsAudioTracks() {
+		return mode == MODE_MA7;
+	}
+
+	// endregion Audio phrase
 
 }

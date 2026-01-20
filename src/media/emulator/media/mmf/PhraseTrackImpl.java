@@ -126,7 +126,6 @@ public class PhraseTrackImpl {
 		MMFPlayer.getMaDll().phraseRestart(id);
 	}
 
-
 	public boolean isPlaying() {
 		return getState() == PLAYING;
 	}

@@ -16,78 +16,59 @@
 
 package com.jblend.media.smaf.phrase;
 
-abstract class PhraseTrackBase {
+import emulator.media.mmf.IPhraseEventRedirect;
+
+public abstract class PhraseTrackBase implements IPhraseEventRedirect {
 	public static final int NO_DATA = 1;
 	public static final int READY = 2;
 	public static final int PLAYING = 3;
 	public static final int PAUSED = 5;
 	public static final int DEFAULT_VOLUME = 100;
 	public static final int DEFAULT_PANPOT = 64;
-	private int state;
-	int volume = DEFAULT_VOLUME;
-	int panpot = DEFAULT_PANPOT;
-	boolean mute;
+	PhraseTrackListener listener;
 	int id;
 
 	PhraseTrackBase(int id) {
 		this.id = id;
 	}
 
-	public void removePhrase() {
+	public void setEventListener(PhraseTrackListener l) {
+		this.listener = l;
 	}
 
-	public void play() {
-		state = PLAYING;
+	public void _redirectEvent(int event) {
+		if (listener != null) {
+			listener.eventOccurred(event);
+		}
 	}
 
-	public void play(int loop) {
-		state = PLAYING;
-	}
+	public abstract void removePhrase();
 
-	public void stop() {
-		state = PAUSED;
-	}
+	public abstract void play();
 
-	public void pause() {
-		state = PAUSED;
-	}
+	public abstract void play(int loop);
 
-	public void resume() {
-		state = PLAYING;
-	}
+	public abstract void stop();
 
-	public int getState() {
-		return state;
-	}
+	public abstract void pause();
 
-	public void setVolume(int value) {
-		this.volume = value;
-	}
+	public abstract void resume();
 
-	public int getVolume() {
-		return volume;
-	}
+	public abstract int getState();
 
-	public void setPanpot(int value) {
-		this.panpot = value;
-	}
+	public abstract void setVolume(int value);
 
-	public int getPanpot() {
-		return panpot;
-	}
+	public abstract int getVolume();
 
-	public void mute(boolean mute) {
-		this.mute = mute;
-	}
+	public abstract void setPanpot(int value);
 
-	public boolean isMute() {
-		return mute;
-	}
+	public abstract int getPanpot();
+
+	public abstract void mute(boolean mute);
+
+	public abstract boolean isMute();
 
 	public int getID() {
 		return id;
-	}
-
-	public void setEventListener(PhraseTrackListener l) {
 	}
 }

@@ -21,15 +21,17 @@ public class PhrasePlayerImpl {
 			}
 			MMFPlayer.getMaDll().phraseInitialize();
 			inst.tracks = new PhraseTrackImpl[MMFPlayer.getMaDll().getMaxTracks()];
+			if (audioTracks && MMFPlayer.getMaDll().supportsAudioTracks()) {
+				inst.tracks = new PhraseTrackImpl[MMFPlayer.getMaDll().getMaxAudioTracks()];
+			} else {
+				inst.audioTracks = new AudioPhraseTrackImpl[16];
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 
 			inst.tracks = new PhraseTrackImpl[16];
-			inst.stub = true;
-		}
-
-		if (audioTracks) {
 			inst.audioTracks = new AudioPhraseTrackImpl[16];
+			inst.stub = true;
 		}
 
 		return inst;
@@ -107,12 +109,24 @@ public class PhrasePlayerImpl {
 			if (tracks[i] == null) continue;
 			tracks[i].pause();
 		}
+		if (audioTracks != null) {
+			for (int i = 0; i < audioTracks.length; ++i) {
+				if (audioTracks[i] == null) continue;
+				audioTracks[i].pause();
+			}
+		}
 	}
 
 	public void resume() {
 		for (int i = 0; i < tracks.length; ++i) {
 			if (tracks[i] == null) continue;
 			tracks[i].resume();
+		}
+		if (audioTracks != null) {
+			for (int i = 0; i < audioTracks.length; ++i) {
+				if (audioTracks[i] == null) continue;
+				audioTracks[i].resume();
+			}
 		}
 	}
 
@@ -139,6 +153,17 @@ public class PhrasePlayerImpl {
 	void eventCallback(int ch, int mode) {
 		try {
 			PhraseTrackImpl track = tracks[ch];
+			if (track == null) return;
+
+			track.redirectEvent(mode);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	void audioEventCallback(int ch, int mode) {
+		try {
+			AudioPhraseTrackImpl track = audioTracks[ch];
 			if (track == null) return;
 
 			track.redirectEvent(mode);
