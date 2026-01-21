@@ -6,7 +6,6 @@ package emulator.ui.swt.devutils.idea;
 import emulator.Emulator;
 import emulator.Utils;
 import emulator.ui.swt.devutils.ClasspathEntry;
-import emulator.ui.swt.devutils.ClasspathEntryType;
 import emulator.ui.swt.devutils.DevtimeMIDlet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 /**
@@ -339,6 +339,66 @@ public class ProjectGenerator {
 			}
 		}
 		return hasName && hasParams && hasWorkingDir;
+	}
+
+	private static void sortProjectFiles(Path root) throws IOException {
+		if (!Files.isDirectory(root))
+			throw new IllegalArgumentException("Project root is not a folder");
+		ArrayList<Path[]> moveMap = new ArrayList<>();
+
+		Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+				Path fileName = dir.getFileName();
+
+				if(fileName == null)
+					return FileVisitResult.CONTINUE;
+
+				if (fileName.toString().startsWith(".")) {
+					return FileVisitResult.SKIP_SUBTREE;
+				}
+
+				if ("META-INF".equals(fileName.toString()) && dir.getParent() != null && dir.getParent().equals(root)) {
+					return FileVisitResult.SKIP_SUBTREE;
+				}
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				if (!attrs.isRegularFile()) {
+					return FileVisitResult.CONTINUE;
+				}
+
+				String fileName = file.getFileName().toString();
+
+				if (fileName.startsWith(".")) {
+					return FileVisitResult.CONTINUE;
+				}
+
+				int dotIndex = fileName.lastIndexOf('.');
+				String extension = dotIndex == -1 || dotIndex == fileName.length() - 1 ? "" : fileName.substring(dotIndex);
+
+				Path targetRoot = ".java".equalsIgnoreCase(extension) ? root.resolve("src") : root.resolve("res");
+				Path target = targetRoot.resolve(root.relativize(file));
+
+				moveMap.add(new Path[]{file, target});
+
+				return FileVisitResult.CONTINUE;
+			}
+		});
+
+		Path srcDir = root.resolve("src");
+		Path resDir = root.resolve("res");
+		Files.createDirectories(srcDir);
+		Files.createDirectories(resDir);
+
+		for (Path[] move : moveMap) {
+			Path targetParent = move[1].getParent();
+			if (targetParent != null) {
+				Files.createDirectories(targetParent);
+			}
+			Files.move(move[0], move[1], StandardCopyOption.ATOMIC_MOVE);
+		}
 	}
 
 	//#endregion
