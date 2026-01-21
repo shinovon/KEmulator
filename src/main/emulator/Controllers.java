@@ -109,7 +109,7 @@ public class Controllers {
 			Controllers.binds[i][18] = "11";
 
 			// TODO remove
-			if (name.toLowerCase().contains("xbox")) {
+			if (name.toLowerCase().contains("xbox") || name.toLowerCase().contains("x-box")) {
 				Settings.controllerZMap = 5;
 				Settings.controllerRZMap = 5;
 			}
