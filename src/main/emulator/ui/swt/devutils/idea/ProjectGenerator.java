@@ -196,6 +196,20 @@ public class ProjectGenerator {
 		generateRunConfigs(dir, projectName, midlets, true);
 	}
 
+
+	public static void convertDecompiled(Path root) throws IOException, ParserConfigurationException, TransformerException, SAXException {
+		String projectName = root.getFileName().toString();
+		sortProjectFiles(root);
+		createDirectories(root);
+		Files.write(root.resolve(".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
+		ProjectConfigGenerator.generateIML(null, root.resolve(projectName + ".iml"));
+		generateProGuardConfig(root, projectName, new ClasspathEntry[0]);
+		generateMiscXmls(root, projectName);
+		generateBuildConfigs(root, projectName, false);
+		DevtimeMIDlet[] midlets = DevtimeMIDlet.readMidletsList(root.resolve("META-INF").resolve("MANIFEST.MF"));
+		generateRunConfigs(root, projectName, midlets, false);
+	}
+
 	//#region impls
 
 	private static void fixManifestWithVersion(Path manifestPath) throws IOException {
