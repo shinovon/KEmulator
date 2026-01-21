@@ -70,6 +70,7 @@ public class MaDll {
 	}
 
 	private static class PhraseEventCallback implements Callback {
+		@SuppressWarnings("unused")
 		public void callback(Pointer p) {
 			PhraseEvent event = new PhraseEvent(p);
 			if (phrasePlayer == null) return;
@@ -78,6 +79,7 @@ public class MaDll {
 	}
 
 	private static class AudioPhraseStateCallback implements Callback {
+		@SuppressWarnings("unused")
 		public void callback(int p1, int p2) {
 			try {
 				audioPhrases.get(p1).state = p2;
@@ -405,7 +407,7 @@ public class MaDll {
 		((MaSound) library).MaSound_Stop(instanceId, sound, 0);
 		((MaSound) library).MaSound_Close(instanceId, sound, 0);
 		((MaSound) library).MaSound_Unload(instanceId, sound, 0);
-		sounds.remove((Integer) sound);
+		sounds.remove(sound);
 	}
 
 	public synchronized void destroy() {
@@ -417,6 +419,7 @@ public class MaDll {
 		((MaSound) library).MaSound_Delete(instanceId);
 
 		if (phraseInitialized) {
+			// TODO api may still refer to deallocated tracks
 			phraseKill();
 			phraseTerminate();
 		}
@@ -444,7 +447,7 @@ public class MaDll {
 	private static PhrasePlayerImpl phrasePlayer;
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private final Map<Integer, Memory> phraseBuffers = new HashMap<>();
-	@SuppressWarnings("FieldCanBeLocal")
+	@SuppressWarnings("FieldCanBeLocal unused")
 	private PhraseEventCallback callback;
 
 	public synchronized void phraseInitialize() {
@@ -679,7 +682,7 @@ public class MaDll {
 		int state;
 	}
 
-	@SuppressWarnings("FieldCanBeLocal")
+	@SuppressWarnings("FieldCanBeLocal unused")
 	private AudioPhraseStateCallback audioPhraseCallback;
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private static final Map<Integer, AudioPhraseState> audioPhrases = new HashMap<>();
@@ -711,6 +714,7 @@ public class MaDll {
 	}
 
 	public synchronized void audioPhrasePause(int id) {
+		// TODO untested
 		if (mode != MODE_MA7) {
 			throw new RuntimeException("Not supported");
 		}
@@ -720,6 +724,7 @@ public class MaDll {
 	}
 
 	public synchronized void audioPhraseRestart(int id) {
+		// TODO untested
 		if (mode != MODE_MA7) {
 			throw new RuntimeException("Not supported");
 		}
@@ -732,6 +737,7 @@ public class MaDll {
 	}
 
 	public synchronized void audioPhraseStop(int id) {
+		// TODO untested
 		if (mode != MODE_MA7) {
 			throw new RuntimeException("Not supported");
 		}
@@ -792,7 +798,6 @@ public class MaDll {
 		Memory p = new Memory(4);
 		p.setInt(0, volume);
 		((MA7) library).Mapi_Phrase_AudioControl(id, 286326828, p);
-
 	}
 
 	public synchronized void audioPhraseSetPanpot(int id, int panpot) {

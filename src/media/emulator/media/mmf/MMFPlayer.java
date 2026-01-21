@@ -5,8 +5,8 @@ import emulator.Emulator;
 import java.io.File;
 
 public class MMFPlayer {
-	static boolean initialized;
-	static MaDll maDll;
+	private static boolean initialized;
+	private static MaDll maDll;
 
 	public static boolean initialize() {
 		if (MMFPlayer.initialized) {
@@ -16,17 +16,20 @@ public class MMFPlayer {
 			return false;
 		}
 		try {
-			if (new File(Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll").exists()
-					&& new File(Emulator.getAbsolutePath() + "/M7_EmuHw.dll").exists()) {
+			File f = new File(Emulator.getAbsolutePath(), "M7_EmuSmw7.dll");
+			if (f.exists()
+					&& new File(Emulator.getAbsolutePath(), "M7_EmuHw.dll").exists()) {
 				Emulator.getEmulator().getLogStream().println("Loading MA-7 emulator");
-				maDll = new MaDll(Emulator.getAbsolutePath() + "/M7_EmuSmw7.dll", MaDll.MODE_MA7);
-			} else if (new File(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll").exists()
-					&& new File(Emulator.getAbsolutePath() + "/M5_EmuHw.dll").exists()) {
+				maDll = new MaDll(f.getAbsolutePath(), MaDll.MODE_MA7);
+			} else if ((f = new File(Emulator.getAbsolutePath(), "M5_EmuSmw5.dll")).exists()
+					&& new File(Emulator.getAbsolutePath(), "M5_EmuHw.dll").exists()) {
 				Emulator.getEmulator().getLogStream().println("Loading MA-5 emulator");
-				maDll = new MaDll(Emulator.getAbsolutePath() + "/M5_EmuSmw5.dll", MaDll.MODE_MA5);
-			} else {
+				maDll = new MaDll(f.getAbsolutePath(), MaDll.MODE_MA5);
+			} else if ((f = new File(Emulator.getAbsolutePath(), "ma3smwemu.dll")).exists()) {
 				Emulator.getEmulator().getLogStream().println("Loading MA-3 emulator");
-				maDll = new MaDll(Emulator.getAbsolutePath() + "/ma3smwemu.dll", MaDll.MODE_MA3);
+				maDll = new MaDll(f.getAbsolutePath(), MaDll.MODE_MA3);
+			} else {
+				throw new Exception("No smw emulator found");
 			}
 			maDll.init();
 			return MMFPlayer.initialized = true;

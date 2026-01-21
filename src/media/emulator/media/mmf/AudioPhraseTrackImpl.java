@@ -44,7 +44,7 @@ public class AudioPhraseTrackImpl {
 		}
 		if (data != null) {
 			try {
-				sound = MMFPlayer.getMaDll().audioPhraseSetData(data, volume, panpot);
+				sound = MMFPlayer.getMaDll().audioPhraseSetData(data, mute ? 0 : volume, panpot);
 				stub = false;
 			} catch (Exception ignored) {
 				stub = true;

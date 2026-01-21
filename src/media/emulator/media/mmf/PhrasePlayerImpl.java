@@ -7,7 +7,8 @@ public class PhrasePlayerImpl {
 
 	PhraseTrackImpl[] tracks;
 	AudioPhraseTrackImpl[] audioTracks;
-	boolean stub;
+	private boolean stub;
+	private boolean supportsAudioTracks;
 
 	private PhrasePlayerImpl() {
 	}
@@ -23,6 +24,7 @@ public class PhrasePlayerImpl {
 			inst.tracks = new PhraseTrackImpl[MMFPlayer.getMaDll().getMaxTracks()];
 			if (audioTracks && MMFPlayer.getMaDll().supportsAudioTracks()) {
 				inst.audioTracks = new AudioPhraseTrackImpl[MMFPlayer.getMaDll().getMaxAudioTracks()];
+				inst.supportsAudioTracks = true;
 			} else {
 				inst.audioTracks = new AudioPhraseTrackImpl[4];
 			}
@@ -147,7 +149,7 @@ public class PhrasePlayerImpl {
 	}
 
 	public boolean audioTracksSupported() {
-		return false;
+		return supportsAudioTracks;
 	}
 
 	void eventCallback(int ch, int mode) {
