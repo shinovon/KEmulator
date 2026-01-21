@@ -250,7 +250,7 @@ public class ProjectConfigGenerator {
 	public static String buildKemRunConfig(String projectName, String midletName, String className, boolean eclipseManifest) {
 		String manifestPath = eclipseManifest ? "Application Descriptor" : "META-INF/MANIFEST.MF";
 		return "<component name=\"ProjectRunConfigurationManager\">\n" +
-				"  <configuration default=\"false\" name=\"Run &quot;" + midletName.replace("&", "&amp;").replace("\"", "&quot;") + "&quot; with KEmulator\" type=\"Application\" factoryName=\"Application\">\n" +
+				"  <configuration default=\"false\" name=\"Launch &quot;" + midletName.replace("&", "&amp;").replace("\"", "&quot;") + "&quot; with KEmulator\" type=\"Application\" factoryName=\"Application\">\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"MAIN_CLASS_NAME\" value=\"emulator.Emulator\" />\n" +

@@ -235,7 +235,7 @@ public class ProjectGenerator {
 
 	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, boolean eclipseManifest) throws IOException {
 		for (int i = 0; i < midletNames.length; i++) {
-			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Run_with_KEmulator_" + (i + 1) + ".xml");
+			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Launch_with_KEmulator_" + (i + 1) + ".xml");
 			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
