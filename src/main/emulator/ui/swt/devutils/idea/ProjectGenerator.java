@@ -137,7 +137,7 @@ public class ProjectGenerator {
 		return imlPath != null;
 	}
 
-	public static String convertEclipse(String appDescriptorPath) throws IOException, InterruptedException, ParserConfigurationException, TransformerException, SAXException {
+	public static void convertEclipse(String appDescriptorPath) throws IOException, InterruptedException, ParserConfigurationException, TransformerException, SAXException {
 		Path dir = Paths.get(appDescriptorPath).getParent().toAbsolutePath();
 		String projectName = dir.getFileName().toString(); //folder name
 
@@ -194,8 +194,6 @@ public class ProjectGenerator {
 
 		// run configs
 		generateRunConfigs(dir, projectName, midlets, true);
-
-		return dir.toString();
 	}
 
 	//#region impls

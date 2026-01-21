@@ -325,7 +325,8 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		String path = fd.open();
 		if (path == null) return;
 		try {
-			String dir = ProjectGenerator.convertEclipse(path);
+			ProjectGenerator.convertEclipse(path);
+			String dir = Paths.get(path).getParent().toAbsolutePath().toString();
 			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
 			shell.close();
 			shell.dispose();
