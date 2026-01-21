@@ -417,6 +417,8 @@ public class OpglGraphics {
 	private final EGLContext eglContext;
 	private final GL11 gl;
 	private Graphics graphics;
+	private int width;
+	private int height;
 	private EGLSurface eglWindowSurface;
 	private java.nio.ByteBuffer pixelBuffer;
 
@@ -462,20 +464,69 @@ public class OpglGraphics {
 		} else if (!(target instanceof Graphics)) {
 			throw new IllegalArgumentException();
 		}
-		if (eglWindowSurface != null) {
-			egl.eglDestroySurface(eglDisplay, eglWindowSurface);
+		graphics = (Graphics) target;
+		IImage bitmap = graphics.getImage();
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+
+		if (width != this.width || height != this.height || eglWindowSurface == null) {
+			this.width = width;
+			this.height = height;
+			if (Settings.g2d == 0) {
+				swtImageBuffer = new ImageData(width, height, 32, swtPalleteData);
+			} else {
+				awtImageBuffer = new BufferedImage(width, height, 4);
+			}
+			pixelBuffer = java.nio.ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
+
+			if (eglWindowSurface != null) {
+				releaseEglContext();
+				egl.eglDestroySurface(eglDisplay, eglWindowSurface);
+			}
+
+			int[] surface_attribs = {
+					EGL10.EGL_WIDTH, width,
+					EGL10.EGL_HEIGHT, height,
+					EGL10.EGL_LARGEST_PBUFFER, 1,
+					EGL10.EGL_NONE};
+			eglWindowSurface = egl.eglCreatePbufferSurface(eglDisplay, eglConfig, surface_attribs);
+
+			bindEglContext();
+			gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		}
-
-		eglWindowSurface = egl.eglCreateWindowSurface(eglDisplay, eglConfig, target, null);
-
-		bindEglContext();
-		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
 	public void release() {
-		if (graphics == null) return;
+		if (graphics == null || pixelBuffer == null || width <= 0 || height <= 0) {
+			return;
+		}
 		gl.glFinish();
-		egl.eglSwapBuffers(eglDisplay, eglWindowSurface);
+		gl.glReadPixels(0, 0, width, height, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, pixelBuffer.rewind());
+
+		if (Settings.g2d == 0) {
+			int var8 = swtImageBuffer.width << 2;
+			int var10 = swtImageBuffer.data.length - var8;
+
+			for (int var3 = swtImageBuffer.height; var3 > 0; --var3) {
+				pixelBuffer.get(swtImageBuffer.data, var10, var8);
+				var10 -= var8;
+			}
+			Image var12 = new Image((Device) null, swtImageBuffer);
+			((Graphics2DSWT) graphics.getImpl()).gc().drawImage(var12, 0, 0);
+			var12.dispose();
+		} else {
+			int[] var1 = ((DataBufferInt) awtImageBuffer.getRaster().getDataBuffer()).getData();
+			IntBuffer var2 = pixelBuffer.asIntBuffer();
+			int var3 = width;
+			int var4 = var1.length - var3;
+
+			for (int var5 = height; var5 > 0; --var5) {
+				var2.get(var1, var4, var3);
+				var4 -= var3;
+			}
+
+			((Graphics2DAWT) graphics.getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
+		}
 		releaseEglContext();
 		graphics = null;
 	}
