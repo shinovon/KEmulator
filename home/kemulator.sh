@@ -10,7 +10,6 @@ fi
 if [ -x "/usr/lib/jvm/java-1.8-openjdk/bin/java" ]; then
     JAVA="/usr/lib/jvm/java-1.8-openjdk/bin/java"
 fi
-JAVA_VER=$($JAVA -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{sub("^$", "0", $2); print $1$2}')
 
 # absolute paths to this starter
 # this works even if runned as `bash starter.sh`
@@ -27,8 +26,12 @@ if [[ "$SELF_DIR" =~ ^/(bin|sbin|usr)(/|$) ]]; then
 	KEM_DIR="/usr/share/kemulator"
 else
 	KEM_DIR="$SELF_DIR"
+  if [ -x "${KEM_DIR}/jre/bin/java" ]; then
+    JAVA="${KEM_DIR}/jre/bin/java"
+  fi
 fi
 KEM_JAR="$KEM_DIR/KEmulator.jar"
+JAVA_VER=$($JAVA -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{sub("^$", "0", $2); print $1$2}')
 
 # Hotspot configuration
 XMX="-Xmx512M"
