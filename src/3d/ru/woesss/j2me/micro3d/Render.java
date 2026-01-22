@@ -65,8 +65,6 @@ public class Render {
 	private boolean backCopied;
 	private final LinkedList<RenderNode> stack = new LinkedList<RenderNode>();
 	private int flushStep;
-	private final boolean postCopy2D = !AppSettings.mascotNo2DMixing;
-	private final boolean preCopy2D = !AppSettings.mascotIgnoreBackground;
 	private IntBuffer bufHandles;
 	private int clearColor;
 	private TextureImpl targetTexture;
@@ -259,6 +257,7 @@ public class Render {
 		}
 		IImage targetImage = targetGraphics.getImage();
 		int texFormat = targetImage.isTransparent() ? GL_RGBA : GL_RGB;
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		GL11.glTexImage2D(GL_TEXTURE_2D, 0,
 				texFormat, targetImage.getWidth(), targetImage.getHeight(), 0,
 				texFormat, GL_UNSIGNED_BYTE,
@@ -294,7 +293,7 @@ public class Render {
 		if (!preProcess) {
 			return;
 		}
-		if (postCopy2D) {
+		if (!AppSettings.mascotNo2DMixing) {
 			targetGraphics.setColor(0);
 			targetGraphics.fillRect(gClip.x, gClip.y, gClip.width, gClip.height);
 		}
@@ -567,7 +566,7 @@ public class Render {
 				glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
 				targetTexture = null;
 			} else if (targetGraphics != null) {
-				if (postCopy2D) {
+				if (!AppSettings.mascotNo2DMixing) {
 					copy2d(false);
 				}
 				swapBuffers();
@@ -585,7 +584,7 @@ public class Render {
 		}
 		g3d.sync(() -> {
 			try {
-				if (!backCopied && preCopy2D) {
+				if (!backCopied && !AppSettings.mascotIgnoreBackground) {
 					copy2d(true);
 				}
 				flushStep = 1;
@@ -1129,7 +1128,7 @@ public class Render {
 		Profiler3D.MC3D_drawFigureCallCount++;
 
 		g3d.sync(() -> {
-			if (!backCopied && preCopy2D) {
+			if (!backCopied && !AppSettings.mascotIgnoreBackground) {
 				copy2d(true);
 			}
 			try {
