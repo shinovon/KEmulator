@@ -96,7 +96,6 @@ public abstract class Canvas extends Displayable {
 			int y = getActualHeight();
 			int h = Screen.fontHeight4;
 			graphics.setClip(0, 0, w, Emulator.getEmulator().getScreen().getHeight());
-			System.out.println(h);
 			graphics.setColor(LCDUIUtils.backgroundColor);
 			graphics.fillRect(0, y, w, h);
 			graphics.setFont(Font.getFont(0, 0, Font.SIZE_SMALL));
