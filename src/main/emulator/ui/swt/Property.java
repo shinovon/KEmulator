@@ -1598,8 +1598,8 @@ public final class Property implements IProperty, SelectionListener {
 		this.systemComp = new Composite(this.systemScrollComp, 0);
 		systemComp.setLayout(new GridLayout());
 		this.initSystemComp();
-		systemScrollComp.setExpandHorizontal(true);
 		systemScrollComp.setContent(systemComp);
+		systemScrollComp.setExpandHorizontal(true);
 	}
 
 	private void setupDisableApiComp() {
@@ -2115,8 +2115,8 @@ public final class Property implements IProperty, SelectionListener {
 		antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
 		antiAliasTextBtn.setLayoutData(layoutData4);
 
-		fontScrollComp.setExpandHorizontal(true);
 		fontScrollComp.setContent(fontComp);
+		fontScrollComp.setExpandHorizontal(true);
 	}
 
 	private void setupDefaultFontChoice() {

@@ -291,7 +291,6 @@ public class AppSettings {
 			fileEncoding = "Shift_JIS";
 			locale = "ja-JP";
 			m3gThread = true;
-			ignoreFullScreen = true;
 			systemProperties.put("jscl.system.btswitchsetting", "false");
 		}
 

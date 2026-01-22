@@ -10,6 +10,7 @@ import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.lcdui.LCDUIUtils;
 import emulator.ui.IScreen;
+import emulator.ui.swt.AppSettingsUI;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,6 +96,7 @@ public abstract class Canvas extends Displayable {
 			int y = getActualHeight();
 			int h = Screen.fontHeight4;
 			graphics.setClip(0, 0, w, Emulator.getEmulator().getScreen().getHeight());
+			System.out.println(h);
 			graphics.setColor(LCDUIUtils.backgroundColor);
 			graphics.fillRect(0, y, w, h);
 			graphics.setFont(Font.getFont(0, 0, Font.SIZE_SMALL));
@@ -137,17 +139,24 @@ public abstract class Canvas extends Displayable {
 		}
 	}
 
-	int getActualHeight() {
-		int h = Emulator.getEmulator().getScreen().getHeight();
+	int getBorderHeight() {
+		int h = 0;
 		if (!fullScreen) {
-			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+			if (ticker != null) {
+				h += Screen.fontHeight4;
+			}
+			h += AppSettings.softbankApi ? 20 : Screen.fontHeight4;
 		}
 		return h;
 	}
 
+	int getActualHeight() {
+		return Emulator.getEmulator().getScreen().getHeight() - getBorderHeight();
+	}
+
 	public void _invokeSizeChanged(int w, int h) {
 		if (!fullScreen) {
-			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+			h -= getBorderHeight();
 		}
 		if (this.w != w || this.h != h || forceUpdateSize) {
 			this.w = bounds[W] = w;
