@@ -131,8 +131,7 @@ public final class MemoryViewImage extends Image {
 				IImage img = (IImage) texCls.getField("debugImage").get(tex);
 				return img;
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Throwable ignored) {}
 
 		return null;
 	}

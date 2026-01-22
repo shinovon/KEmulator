@@ -881,6 +881,7 @@ public class AppSettingsUI {
 			AppSettings.m3gForcePerspectiveCorrection = m3gForcePersCorrectCheck.getSelection();
 			AppSettings.m3gDisableLightClamp = m3gDisableLightClampCheck.getSelection();
 			AppSettings.m3gFlushImmediately = m3gFlushImmediately.getSelection();
+			AppSettings.m3gThread = m3gThreadCheck.getSelection();
 		}
 		{
 			AppSettings.m3gAA = Math.max(0, m3gAACombo.getSelectionIndex());

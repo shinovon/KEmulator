@@ -12,6 +12,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -98,6 +99,7 @@ public class KEmulatorUpdater implements Runnable {
 			Thread.sleep(1000);
 			
 			kemulatorJar = kemulatorDir.resolve("KEmulator.jar");
+			Path kemulatorJarTmp = kemulatorDir.resolve("KEmulator.jar.tmp");
 //			if (!(Files.exists(kemulatorJar))) {
 //				state("KEmulator.jar is missing");
 //				exitDelay(3000);
@@ -125,16 +127,15 @@ public class KEmulatorUpdater implements Runnable {
 					return;
 				}
 				
-				state("Deleting KEmulator.jar");
-				
-				try {
-					if (Files.exists(kemulatorJar)) {
-						Files.delete(kemulatorJar);
-					}
-				} catch (IOException e) {
-					fail("Failed to delete KEmulator.jar", e);
-					return;
-				}
+//				state("Deleting KEmulator.jar");
+//				try {
+//					if (Files.exists(kemulatorJar)) {
+//						Files.delete(kemulatorJar);
+//					}
+//				} catch (IOException e) {
+//					fail("Failed to delete KEmulator.jar", e);
+//					return;
+//				}
 				
 				if (!x64) {
 					state("Deleting 3d engines");
@@ -156,7 +157,8 @@ public class KEmulatorUpdater implements Runnable {
 					state("Downloading KEmulator.jar");
 					download(UPDATE_URL
 							+ branch + "/" + type
-							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), kemulatorJar);
+							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), kemulatorJarTmp);
+					Files.move(kemulatorJarTmp, kemulatorJar, StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e) {
 					fail("Failed to download KEmulator.jar", e);
 					return;
