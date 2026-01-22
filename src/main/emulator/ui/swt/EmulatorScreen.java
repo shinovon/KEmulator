@@ -2119,6 +2119,11 @@ public final class EmulatorScreen implements
 			this.zoomIn();
 			return;
 		}
+		if (fullscreen && keyEvent.keyCode == SWT.ESC) {
+			fullscreenMenuItem.setSelection(fullscreen = false);
+			changeFullscreen();
+			return;
+		}
 		if (keyEvent.keyCode == SWT.F11) {
 			fullscreenMenuItem.setSelection(fullscreen = !fullscreen);
 			changeFullscreen();
