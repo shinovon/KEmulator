@@ -213,7 +213,8 @@ public final class Memory {
 					}
 					return;
 				}
-				if (o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule()) {
+				if ((o.getClass().getName().equals("com.mascotcapsule.micro3d.v3.Texture") && Emulator.getPlatform().supportsMascotCapsule())
+						|| o.getClass().getName().equals("com.jblend.graphics.j3d.Texture")) {
 					IImage img = MemoryViewImage.createFromMicro3DTexture(o);
 					if (img != null) {
 						MemoryViewImage mvi = new MemoryViewImage(img, MemoryViewImageType.Micro3D, o);
