@@ -359,7 +359,7 @@ public class AppSettings {
 		if (properties.containsKey("KeyLeft")) {
 			leftKey = Integer.parseInt(properties.get("KeyLeft"));
 		}
-		if (properties.containsKey("KeyFire")) {
+		if (properties.containsKey("KeyRight")) {
 			rightKey = Integer.parseInt(properties.get("KeyRight"));
 		}
 
@@ -520,6 +520,7 @@ public class AppSettings {
 
 		AppSettings.set("KeyLeftSoft", leftSoftKey);
 		AppSettings.set("KeyRightSoft", rightSoftKey);
+		AppSettings.set("KeyFire", fireKey);
 		AppSettings.set("KeyUp", upKey);
 		AppSettings.set("KeyDown", downKey);
 		AppSettings.set("KeyLeft", leftKey);

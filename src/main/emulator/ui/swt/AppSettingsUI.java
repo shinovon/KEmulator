@@ -789,6 +789,14 @@ public class AppSettingsUI {
 				AppSettings.rightSoftKey = rightSoft;
 			}
 
+			int fire = 0;
+			try {
+				fire = Integer.parseInt(fireText.getText().trim());
+			} catch (Exception ignored) {}
+			if (fire != 0) {
+				AppSettings.fireKey = fire;
+			}
+
 			int up = 0;
 			try {
 				up = Integer.parseInt(upText.getText().trim());
