@@ -1246,7 +1246,7 @@ public class Render {
 		}
 		MathUtil.multiplyMM(MVP_TMP, node.projMatrix, node.viewMatrix);
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+		glDepthFunc(GL_LEQUAL);
 		glDepthMask(flushStep == 1);
 		glDisable(GL_CULL_FACE);
 		applyBlending(blend);
