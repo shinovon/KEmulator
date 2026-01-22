@@ -480,10 +480,14 @@ public class Manager {
 			if (Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
 				NativeDiscoveryStrategy win = new BaseNativeDiscoveryStrategy(new String[]{
 						"libvlc\\.dll",
-						"libvlccore\\.dll"
+						"libvlccore\\.dll",
+						"libvlc\\.so",
+						"libvlc\\.dylib"
 				}, new String[]{
 						"%s\\plugins",
-						"%s\\vlc\\plugins"
+						"%s\\vlc\\plugins",
+						"%s/plugins",
+						"%s/../plugins"
 				}) {
 
 					@Override
