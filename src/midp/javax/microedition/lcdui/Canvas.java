@@ -93,11 +93,12 @@ public abstract class Canvas extends Displayable {
 		}
 		if (!fullScreen) {
 			int w = getWidth();
-			int y = getActualHeight();
-			int h = Screen.fontHeight4;
-			graphics.setClip(0, 0, w, Emulator.getEmulator().getScreen().getHeight());
+			int sh = Emulator.getEmulator().getScreen().getHeight();
+			int bh = getBorderHeight();
+			int y = sh - bh;
+			graphics.setClip(0, 0, w, sh);
 			graphics.setColor(LCDUIUtils.backgroundColor);
-			graphics.fillRect(0, y, w, h);
+			graphics.fillRect(0, y, w, bh);
 			graphics.setFont(Font.getFont(0, 0, Font.SIZE_SMALL));
 			graphics.setColor(LCDUIUtils.foregroundColor);
 			graphics.drawString("Fake soft bar", w >> 1, y + 2, Graphics.HCENTER | Graphics.TOP);
