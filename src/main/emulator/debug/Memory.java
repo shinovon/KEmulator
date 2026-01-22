@@ -85,6 +85,12 @@ public final class Memory {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		try {
+			players.clear();
+			players.addAll(Image.images);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		// iterate global roots
 		for (final String s : Emulator.jarClasses) {
@@ -179,7 +185,7 @@ public final class Memory {
 			instances.add(ow);
 			try {
 				if (o instanceof Image) {
-					this.images.add((Image) o);
+					if (!images.contains(o)) this.images.add((Image) o);
 					if (Settings.recordReleasedImg && this.releasedImages.contains(o)) {
 						this.releasedImages.remove(o); // this image is still alive
 					}

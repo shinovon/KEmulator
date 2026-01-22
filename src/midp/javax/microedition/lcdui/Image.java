@@ -2,6 +2,7 @@ package javax.microedition.lcdui;
 
 import emulator.AppSettings;
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.custom.ResourceManager;
 import emulator.debug.Profiler;
 import emulator.graphics2D.GraphicsUtils;
@@ -10,8 +11,12 @@ import emulator.graphics2D.IImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 public class Image {
+	public static Set<Image> images = Collections.newSetFromMap(new WeakHashMap());
 	private boolean mutable;
 	private IImage imageImpl;
 	private IImage xrayBuffer;
@@ -82,7 +87,9 @@ public class Image {
 
 	private static Image decode(final byte[] array) throws IllegalArgumentException {
 		try {
-			return new Image(Emulator.getEmulator().newImage(array));
+			Image image = new Image(Emulator.getEmulator().newImage(array));
+			if (Settings.storeCreatedImages) images.add(image);
+			return image;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			Emulator.getEmulator().getLogStream().println("*** createImage error!! check it ***");
@@ -161,6 +168,7 @@ public class Image {
 	public static Image createRGBImage(final int[] array, final int n, final int n2, final boolean b) {
 		final Image image;
 		GraphicsUtils.setImageData((image = new Image(Emulator.getEmulator().newImage(n, n2, b))).imageImpl, array, b, 0, n, n, n2);
+		if (Settings.storeCreatedImages) images.add(image);
 		return image;
 	}
 
