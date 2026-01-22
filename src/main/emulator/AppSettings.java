@@ -290,6 +290,7 @@ public class AppSettings {
 			locale = "ja-JP";
 			m3gThread = true;
 			ignoreFullScreen = true;
+			systemProperties.put("jscl.system.btswitchsetting", "false");
 		}
 
 		String midletName = emulator.getAppProperty("MIDlet-Name");
@@ -481,6 +482,7 @@ public class AppSettings {
 		}
 
 		if (properties.containsKey("SystemProperties")) {
+			systemProperties.clear();
 			String[] sysProps = properties.get("SystemProperties").split("\n");
 			for (String l : sysProps) {
 				if ((l = l.trim()).isEmpty()) continue;
