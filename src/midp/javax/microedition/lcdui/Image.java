@@ -208,8 +208,8 @@ public class Image {
 	public int _size() {
 		if (disposed) return 5;
 		int i = 5 + imageImpl.size();
-		if (xrayBuffer != null) i += xrayBuffer.size();
-		if (usedRegion != null) i += usedRegion.size();
+//		if (xrayBuffer != null) i += xrayBuffer.size();
+//		if (usedRegion != null) i += usedRegion.size();
 		return i;
 	}
 }
