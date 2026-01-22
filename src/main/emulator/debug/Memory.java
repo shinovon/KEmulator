@@ -77,17 +77,18 @@ public final class Memory {
 		instances.clear();
 		images.clear();
 		m3gObjects.clear();
+		players.clear();
+		images.clear();
 
 		// players
 		try {
-			players.clear(); // here go mmapi ones. Others will be collected from heap later.
+			 // here go mmapi ones. Others will be collected from heap later.
 			players.addAll(PlayerImpl.players);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
-			players.clear();
-			players.addAll(Image.images);
+			images.addAll(Image.images);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
