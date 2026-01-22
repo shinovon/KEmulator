@@ -1,6 +1,8 @@
 # KEmulator nnmod
 Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 
+![screenshot](/screenshot.png)
+
 ## Links
 - [Webpage](https://nnproject.cc/kem)
 - [Discord server](https://discord.gg/ETvTpMehXV)
@@ -12,10 +14,11 @@ JRE:
 - OpenJDK 17-25
 
 System:
-- Windows XP - 11 (x86, x86_64)
+- Windows XP - 11 (x86, x86_64, arm64)
 - Linux GTK3, glibc 2.17+ (x86, x86_64, arm64, arm32)
 - Mac OS X 10.13 and higher (x86_64)
 - macOS 11 Big Sur (arm64)
+- Termux (arm64)
 
 ## Developing in IntelliJ IDEA
 ### Importing project
