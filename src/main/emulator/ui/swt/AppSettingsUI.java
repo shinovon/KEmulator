@@ -653,8 +653,21 @@ public class AppSettingsUI {
 		tbtmProperties.setControl(systemPropertiesText);
 
 		Composite composite_3 = new Composite(shell, SWT.NONE);
-		composite_3.setLayout(new GridLayout(2, false));
+		composite_3.setLayout(new GridLayout(3, false));
 		composite_3.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
+
+		Button btnNewButton_4 = new Button(composite_3, SWT.NONE);
+		btnNewButton_4.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				apply();
+				AppSettings.saveDefaults();
+			}
+		});
+		GridData gd1 = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
+//		gd1.widthHint = 100;
+		btnNewButton_4.setLayoutData(gd1);
+		btnNewButton_4.setText("Set as default");
 
 		Button btnNewButton_1 = new Button(composite_3, SWT.NONE);
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
@@ -665,7 +678,9 @@ public class AppSettingsUI {
 				shell.close();
 			}
 		});
-		btnNewButton_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		GridData gd2 = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+		gd2.widthHint = 100;
+		btnNewButton_1.setLayoutData(gd2);
 		btnNewButton_1.setText("Done");
 
 		Button btnNewButton = new Button(composite_3, SWT.NONE);
@@ -680,7 +695,9 @@ public class AppSettingsUI {
 				shell.close();
 			}
 		});
-		btnNewButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		GridData gd3 = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gd3.widthHint = 100;
+		btnNewButton.setLayoutData(gd3);
 		btnNewButton.setText(start ? "Default" : "Reset");
 
 
