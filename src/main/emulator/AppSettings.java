@@ -158,6 +158,8 @@ public class AppSettings {
 		mascotIgnoreBackground = false;
 		mascotTextureFilter = false;
 		mascotBackgroundFilter = false;
+
+		loadIni(false, "Default");
 	}
 
 	public static void clear() {
@@ -325,7 +327,7 @@ public class AppSettings {
 
 		if (reset) return 0;
 
-		if (!loadIni(false)) {
+		if (!loadIni(false, null)) {
 			return uei || !Settings.showAppSettingsOnStart ? 1 : 0;
 		}
 
@@ -567,7 +569,11 @@ public class AppSettings {
 			AppSettings.set("SystemProperties", sb.toString());
 		}
 
-		loadIni(true);
+		loadIni(true, null);
+	}
+
+	public static void saveDefaults() {
+		loadIni(true, "Default");
 	}
 
 	public static boolean applyPreset(String s, boolean screen) {
@@ -610,9 +616,10 @@ public class AppSettings {
 		return true;
 	}
 
-	private static boolean loadIni(boolean save) {
+	private static boolean loadIni(boolean save, String section) {
+		if (section == null) section = iniSection;
 		Path midletsPath = getMidletsPath();
-		String exactSection = '[' + iniSection + ']';
+		String exactSection = '[' + section + ']';
 		boolean found = false;
 		boolean notEmpty = false;
 
