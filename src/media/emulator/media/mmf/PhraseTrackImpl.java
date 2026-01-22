@@ -146,11 +146,14 @@ public class PhraseTrackImpl {
 	}
 
 	public int getState() {
+		if (stub) {
+			if (playing) {
+				return PLAYING;
+			}
+			return READY;
+		}
 		if (phrase == null) {
 			return NO_DATA;
-		}
-		if (stub && playing) {
-			return PLAYING;
 		}
 		return MMFPlayer.getMaDll().phraseGetStatus(id);
 	}

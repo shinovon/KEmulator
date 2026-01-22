@@ -257,7 +257,6 @@ public class Render {
 		}
 		IImage targetImage = targetGraphics.getImage();
 		int texFormat = targetImage.isTransparent() ? GL_RGBA : GL_RGB;
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		GL11.glTexImage2D(GL_TEXTURE_2D, 0,
 				texFormat, targetImage.getWidth(), targetImage.getHeight(), 0,
 				texFormat, GL_UNSIGNED_BYTE,
@@ -265,8 +264,14 @@ public class Render {
 		);
 		checkGlError("texImage2D");
 
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, bgTextureId.get(0));
+
 		final Program.Simple program = Program.simple;
 		program.use();
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		BG_VBO.rewind();
 		glVertexAttribPointer(program.aPosition, 2, GL_FLOAT, false, 4 * 4, BG_VBO);
