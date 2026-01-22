@@ -1,6 +1,9 @@
 package emulator.ui.swt;
 
+import com.sun.jna.Native;
+import com.sun.jna.NativeLibrary;
 import emulator.*;
+import emulator.custom.CustomMethod;
 import emulator.graphics2D.IFont;
 import emulator.graphics2D.IGraphics2D;
 import emulator.graphics2D.IImage;
@@ -28,6 +31,9 @@ import javax.microedition.rms.RecordStore;
 import java.io.*;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 
@@ -1661,6 +1667,7 @@ public final class Property implements IProperty, SelectionListener {
 		final GridData fillHor = new GridData();
 		fillHor.horizontalAlignment = GridData.FILL;
 		fillHor.grabExcessHorizontalSpace = true;
+		fillHor.horizontalSpan = 2;
 
 		final GridData fillHor2 = new GridData();
 		fillHor2.horizontalAlignment = GridData.FILL;
@@ -1673,26 +1680,51 @@ public final class Property implements IProperty, SelectionListener {
 		final GridData fillHor4 = new GridData();
 		fillHor4.horizontalAlignment = GridData.FILL;
 		fillHor4.grabExcessHorizontalSpace = true;
+		fillHor4.horizontalSpan = 2;
 
 		final GridData fillHor5 = new GridData();
 		fillHor5.horizontalAlignment = GridData.FILL;
 		fillHor5.grabExcessHorizontalSpace = true;
+		fillHor5.horizontalSpan = 2;
 
 		final GridData fillHor6 = new GridData();
 		fillHor6.horizontalAlignment = GridData.FILL;
 		fillHor6.grabExcessHorizontalSpace = true;
+		fillHor6.horizontalSpan = 2;
+
+		final GridData fillHor7 = new GridData();
+		fillHor7.horizontalAlignment = GridData.FILL;
+		fillHor7.grabExcessHorizontalSpace = true;
+		fillHor7.horizontalSpan = 2;
 
 		Group mediaGroup = new Group(this.mediaComp, 0);
 		mediaGroup.setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
-		mediaGroup.setLayout(new GridLayout());
+		mediaGroup.setLayout(new GridLayout(2, false));
 		mediaGroup.setLayoutData(fill);
 
-		new Label(mediaGroup, 32).setText("MIDI Soundfont Path:");
+		Label label = new Label(mediaGroup, 32);
+		label.setText("MIDI Soundfont Path:");
+		label.setLayoutData(fillHor7);
+
 		soundfontPathText = new Text(mediaGroup, SWT.BORDER);
 		soundfontPathText.setEditable(true);
 		soundfontPathText.setEnabled(true);
 		soundfontPathText.setLayoutData(fillHor3);
 		soundfontPathText.setText(Settings.soundfontPath);
+
+		Button sfPathBtn = new Button(mediaGroup, SWT.PUSH);
+		sfPathBtn.setText("...");
+		sfPathBtn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fileDialog = new FileDialog(setsShell, SWT.OPEN);
+				fileDialog.setFilterExtensions(new String[] { "*.sf2;*.dls", "*.*" });
+				String selection = fileDialog.open();
+				if (selection != null) {
+					soundfontPathText.setText(selection);
+				}
+			}
+		});
 
 		vmsCheck = new Button(mediaGroup, SWT.CHECK);
 		vmsCheck.setText(UILocale.get("OPTION_MEDIA_VMS", "Search for VirtualMIDISynth as MIDI device"));
@@ -1709,16 +1741,56 @@ public final class Property implements IProperty, SelectionListener {
 		vlcCheck.setLayoutData(fillHor4);
 		vlcCheck.setSelection(Settings.enableVlc);
 
-		new Label(mediaGroup, 32).setText(String.format(
+		label = new Label(mediaGroup, 32);
+		label.setText(String.format(
 			"%s (%s):",
 			UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path"),
 			System.getProperty("os.arch").contains("64") ? "64-bit" : "32-bit"
 		));
+		label.setLayoutData(fillHor7);
+
 		vlcDirText = new Text(mediaGroup, SWT.BORDER);
 		vlcDirText.setEditable(true);
 		vlcDirText.setEnabled(true);
 		vlcDirText.setLayoutData(fillHor2);
 		vlcDirText.setText(Settings.vlcDir);
+
+		Button vlcDirBtn = new Button(mediaGroup, SWT.PUSH);
+		vlcDirBtn.setText("...");
+		vlcDirBtn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fileDialog = new FileDialog(setsShell, SWT.OPEN);
+				fileDialog.setFilterExtensions(new String[] { "vlc;vlc.exe;libvlc.dll;libvlc.so;libvlc.dylib"});
+				String selection = fileDialog.open();
+				if (selection != null) {
+					Path vlcExe = Paths.get(selection);
+					Path vlcDir = vlcExe.getParent();
+					Path libvlc = vlcDir.resolve("libvlc.dll");
+					if (!Files.exists(libvlc)) {
+						libvlc = vlcDir.resolve("libvlc.so");
+					}
+					if (!Files.exists(libvlc)) {
+						libvlc = vlcDir.resolve("libvlc.dylib");
+					}
+					if (!Files.exists(libvlc)) {
+						Emulator.getEmulator().getScreen().showMessage("libvlc not found in selected path!");
+						return;
+					}
+					try {
+						NativeLibrary lib = NativeLibrary.getInstance(libvlc.toString());
+						lib.dispose();
+					} catch (Throwable ex) {
+						Emulator.getEmulator().getScreen().showMessage(
+								"Failed to load libvlc, check if it has same architecture as JVM!",
+								CustomMethod.getStackTrace(ex));
+						return;
+					}
+
+					vlcDirText.setText(vlcDir.toString());
+				}
+			}
+		});
 
 		mediaDumpCheck = new Button(mediaGroup, SWT.CHECK);
 		mediaDumpCheck.setText(UILocale.get("OPTION_MEDIA_DUMP", "Enable media exporting (higher memory usage)"));
@@ -2675,6 +2747,10 @@ public final class Property implements IProperty, SelectionListener {
 			System.setProperty("socksProxyPort", Settings.proxyPort);
 		}
 		Authenticator.setDefault(new MyAuthenticator(this, Settings.proxyUser, Settings.proxyPass));
+	}
+
+	Shell getShell() {
+		return setsShell;
 	}
 
 	static Combo method376(final Property class38) {

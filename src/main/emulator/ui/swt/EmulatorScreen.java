@@ -250,8 +250,12 @@ public final class EmulatorScreen implements
 	}
 
 	public void showMessage(final String message) {
+		Shell parentShell = ((Property) Emulator.getEmulator().getProperty()).getShell();
+		if (parentShell == null || parentShell.isDisposed() || !parentShell.isVisible()) {
+			parentShell = this.shell;
+		}
 		try {
-			setWindowOnTop(ReflectUtil.getHandle(shell), true);
+			setWindowOnTop(ReflectUtil.getHandle(parentShell), true);
 		} catch (Throwable ignored) {
 		}
 		final MessageBox messageBox;
@@ -261,12 +265,16 @@ public final class EmulatorScreen implements
 	}
 
 	public void showMessage(String title, String detail) {
+		Shell parentShell = ((Property) Emulator.getEmulator().getProperty()).getShell();
+		if (parentShell == null || parentShell.isDisposed() || !parentShell.isVisible()) {
+			parentShell = this.shell;
+		}
 		try {
-			setWindowOnTop(ReflectUtil.getHandle(shell), true);
+			setWindowOnTop(ReflectUtil.getHandle(parentShell), true);
 		} catch (Throwable ignored) {
 		}
 
-		Shell shell = new Shell(this.shell, SWT.DIALOG_TRIM | SWT.ON_TOP);
+		Shell shell = new Shell(parentShell, SWT.DIALOG_TRIM | SWT.ON_TOP);
 		shell.setSize(450, 300);
 		shell.setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
 		shell.setLayout(new GridLayout(1, false));
