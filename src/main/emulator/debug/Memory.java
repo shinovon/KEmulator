@@ -58,6 +58,8 @@ public final class Memory {
 		checkClasses.add("javax.microedition.lcdui.Display");
 		checkClasses.add("javax.microedition.lcdui.Form");
 		checkClasses.add("javax.microedition.lcdui.Graphics");
+		checkClasses.add("javax.microedition.lcdui.game.Sprite");
+		checkClasses.add("javax.microedition.lcdui.game.TiledLayer");
 	}
 
 	public synchronized void updateEverything() {
