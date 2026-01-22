@@ -1786,6 +1786,9 @@ public final class Property implements IProperty, SelectionListener {
 								CustomMethod.getStackTrace(ex));
 						return;
 					}
+					if (vlcDir.getFileName().toString().equalsIgnoreCase("lib")) {
+						vlcDir = vlcDir.getParent();
+					}
 
 					vlcDirText.setText(vlcDir.toString());
 				}
