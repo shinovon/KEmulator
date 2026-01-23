@@ -228,8 +228,10 @@ public final class Property implements IProperty, SelectionListener {
 	private Group grpUi;
 	private Group grpDebug;
 	private Group grpMisc;
+	private Button storeCreatedImagesBtn;
 
 	private int lastChangedFont;
+	private Button showAppSettingsBtn;
 
 	public Property() {
 		super();
@@ -425,6 +427,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.altLessSpeedShortcuts = Boolean.parseBoolean(properties.getProperty("AltLessSpeedShortcuts", "false"));
 			Settings.showAppSettingsOnStart = Boolean.parseBoolean(properties.getProperty("ShowAppSettingsOnStart", "true"));
 			Settings.globalSettings = Boolean.parseBoolean(properties.getProperty("GlobalSettings", "false"));
+			Settings.storeCreatedImages = Boolean.parseBoolean(properties.getProperty("StoreCreatedImages", "false"));
 
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
@@ -678,6 +681,7 @@ public final class Property implements IProperty, SelectionListener {
 				properties.setProperty("AltLessSpeedShortcuts",String.valueOf(Settings.altLessSpeedShortcuts));
 			properties.setProperty("ShowAppSettingsOnStart", String.valueOf(Settings.showAppSettingsOnStart));
 			properties.setProperty("GlobalSettings", String.valueOf(Settings.globalSettings));
+			properties.setProperty("StoreCreatedImages", String.valueOf(Settings.storeCreatedImages));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 			properties.setProperty("WavCache", String.valueOf(Settings.wavCache));
@@ -849,6 +853,9 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.enableSecurity = securityCheck.getSelection();
 
 		Settings.autoUpdate = autoUpdatesBtn.getSelection() ? 2 : 1;
+
+		Settings.storeCreatedImages = storeCreatedImagesBtn.getSelection();
+		Settings.showAppSettingsOnStart = showAppSettingsBtn.getSelection();
 
 		this.updateProxy();
 	}
@@ -1970,6 +1977,11 @@ public final class Property implements IProperty, SelectionListener {
 		aButton752.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		aButton752.setText(UILocale.get("OPTION_SYSTEM_INFO_COLOR", "Info View: Show color in (R,G,B)"));
 		this.aButton752.setSelection(Settings.infoColorHex);
+
+		showAppSettingsBtn = new Button(grpUi, 32);
+		showAppSettingsBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		showAppSettingsBtn.setText("Show application settings on first start");
+		showAppSettingsBtn.setSelection(Settings.showAppSettingsOnStart);
 		
 		grpDebug = new Group(systemComp, SWT.NONE);
 		grpDebug.setText("Debug");
@@ -1990,6 +2002,11 @@ public final class Property implements IProperty, SelectionListener {
 		aButton703.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		aButton703.setText(UILocale.get("OPTION_SYSTEM_RELEASED_IMG", "Memory View: Record released images"));
 		this.aButton703.setSelection(Settings.recordReleasedImg);
+
+		storeCreatedImagesBtn = new Button(grpDebug, 32);
+		storeCreatedImagesBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		storeCreatedImagesBtn.setText("Memory View: Record created images");
+		storeCreatedImagesBtn.setSelection(Settings.storeCreatedImages);
 		
 		this.aButton714 = new Button(grpDebug, 32);
 		aButton714.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
