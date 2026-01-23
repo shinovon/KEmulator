@@ -1179,7 +1179,7 @@ public class Render {
 				glDepthMask(true);
 				glClear(GL_DEPTH_BUFFER_BIT);
 			} finally {
-//				swapBuffers();
+				swapBuffers();
 			}
 		});
 	}

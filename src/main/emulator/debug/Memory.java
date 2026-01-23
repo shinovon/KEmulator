@@ -6,6 +6,7 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
 import org.apache.tools.zip.ZipFile;
+import sun.misc.Unsafe;
 
 import javax.microedition.lcdui.Image;
 import javax.microedition.m3g.*;
@@ -34,6 +35,7 @@ public final class Memory {
 	static Class _F;
 	static Class _D;
 	static Class _C;
+	private static Unsafe unsafe;
 
 	public static final Object m3gLock = new Object();
 
@@ -48,6 +50,26 @@ public final class Memory {
 		return inst;
 	}
 
+	private static Unsafe getUnsafeInstance() {
+		final Field[] declaredFields = Unsafe.class.getDeclaredFields();
+		for (final Field field : declaredFields) {
+			if (field.getType().equals(Unsafe.class)) {
+				final int modifiers = field.getModifiers();
+				if (Modifier.isStatic(modifiers)) {
+					if (Modifier.isFinal(modifiers)) {
+						try {
+							field.setAccessible(true);
+							return (Unsafe) field.get(null);
+						} catch (Exception ex) {
+							break;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	private Memory() {
 		super();
 		this.instances = new HashSet<>();
@@ -60,6 +82,10 @@ public final class Memory {
 		checkClasses.add("javax.microedition.lcdui.Graphics");
 		checkClasses.add("javax.microedition.lcdui.game.Sprite");
 		checkClasses.add("javax.microedition.lcdui.game.TiledLayer");
+
+		try {
+			unsafe = getUnsafeInstance();
+		} catch (Throwable ignored) {}
 	}
 
 	public synchronized void updateEverything() {
@@ -149,8 +175,12 @@ public final class Memory {
 		}
 	}
 
+	public boolean isNotInitialized(Class cls) {
+		return unsafe != null && unsafe.shouldBeInitialized(cls);
+	}
+
 	private void collectObjects(final Class clazz, final Object o, final ReferencePath path, boolean vector) {
-		if (clazz.isInterface())
+		if (clazz.isInterface() || isNotInitialized(clazz))
 			return;
 
 		String clazzName = clazz.getName();

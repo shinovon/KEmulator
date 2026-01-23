@@ -3,6 +3,7 @@ package emulator.ui.swt;
 import emulator.Emulator;
 import emulator.debug.ClassTypes;
 import emulator.debug.Instance;
+import emulator.debug.Memory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.*;
@@ -458,6 +459,10 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		final Instance c = getWatched();
 		int n = 0;
 		try {
+			if (Memory.getInstance().isNotInitialized(c.getCls())) {
+				this.updateInProgress = false;
+				return;
+			}
 			for (int i = 0; i < c.getFields().size(); ++i) {
 				final Field field = (Field) c.getFields().get(i);
 				if (this.disposed) {
