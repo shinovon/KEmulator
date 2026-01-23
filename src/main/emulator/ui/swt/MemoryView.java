@@ -50,6 +50,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
 	private int sortColumn = -1;
+	private int objectSortColumn = -1;
 
 	public static final String SHELL_TYPE = "MEMORY_VIEW";
 	private Group objectPaths;
@@ -181,12 +182,24 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		final TableColumn tableColumn4;
 		(tableColumn4 = new TableColumn(this.objectsTable, 0)).setWidth(230);
 		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
+		tableColumn4.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeObjectsSort(0);
+			}
+		});
 		final TableColumn tableColumn5;
 		(tableColumn5 = new TableColumn(this.objectsTable, 0)).setWidth(70);
 		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
 		final TableColumn tableColumn6;
 		(tableColumn6 = new TableColumn(this.objectsTable, 0)).setWidth(100);
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
+		tableColumn6.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeObjectsSort(2);
+			}
+		});
 
 		// borders
 		objectPaths = new Group(objectsPanel, SWT.NONE);
@@ -494,9 +507,43 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		resortClasses();
 	}
 
+	void changeObjectsSort(int n) {
+		objectsTable.setSortColumn(objectsTable.getColumn(n));
+		objectsTable.setSortDirection((objectsTable.getSortDirection() == 128) ? 1024 : 128);
+		objectSortColumn = n;
+
+		TableItem[] array = classTable.getSelection();
+		if (array == null || array.length < 1) {
+			return;
+		}
+
+		String cls = (String) array[0].getData();
+		if (selectedObject != null && !selectedObject.getClass().getName().equals(cls))
+			selectedObject = null;
+		objectsTable.removeAll();
+		addObjects(cls);
+		clearObjectPaths();
+	}
+
 	private void resortClasses() {
 		if (sortColumn == -1) return;
-		classesList.sort(new ClassListComparator(this, sortColumn));
+		classesList.sort((var1, var2) -> {
+			int r;
+			switch (sortColumn) {
+			case 0:
+				r = var1.compareTo(var2);
+				break;
+			case 1:
+				r = memoryMgr.instancesCount(var1) - memoryMgr.instancesCount(var2);
+				break;
+			case 2:
+				r = memoryMgr.totalObjectsSize(var1) - memoryMgr.totalObjectsSize(var2);
+				break;
+			default:
+				return 0;
+			}
+			return classTable.getSortDirection() == 128 ? r : -r;
+		});
 		setClassTableContent();
 	}
 
@@ -541,11 +588,33 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		if (array == null || array.length < 1) {
 			return;
 		}
+		// TODO sort
 		objectsTable.removeAll();
 		String cls = (String) array[0].getData();
-		ArrayList<ObjInstance> objs = this.memoryMgr.objs(cls);
 		if (selectedObject != null && !selectedObject.getClass().getName().equals(cls))
 			selectedObject = null;
+		addObjects(cls);
+		clearObjectPaths();
+	}
+
+	void addObjects(String cls) {
+		ArrayList<ObjInstance> objs = this.memoryMgr.objs(cls);
+		objs.sort((var1, var2) -> {
+			int r;
+			switch (objectSortColumn) {
+			case 0:
+				System.out.println("sort by references " + var1.paths.size() + " " + var2.paths.size());
+				r = var1.paths.size() - var2.paths.size();
+				break;
+			// TODO sort by values?
+			case 2:
+				r = var1.size - var2.size;
+				break;
+			default:
+				return 0;
+			}
+			return objectsTable.getSortDirection() == 128 ? r : -r;
+		});
 		for (ObjInstance o : objs) {
 			TableItem ti = new TableItem(objectsTable, 0);
 			if (o.paths.isEmpty())
@@ -563,7 +632,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			ti.setText(2, String.valueOf(o.size));
 			ti.setData(o);
 		}
-		clearObjectPaths();
 	}
 
 	public void widgetDisposed(final DisposeEvent disposeEvent) {
