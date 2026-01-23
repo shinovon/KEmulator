@@ -752,7 +752,7 @@ public class Render {
 					break;
 				case Graphics3D.COMMAND_TEXTURE_INDEX:
 					int tid = cmd & 0xFFFFFF;
-					if (tid <= 16) {
+					if (tid < 16) {
 						env.textureIdx = tid;
 					}
 					break;
