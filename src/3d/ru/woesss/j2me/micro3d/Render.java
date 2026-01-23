@@ -1488,13 +1488,13 @@ public class Render {
 				}
 				glDisable(GL_BLEND);
 				glDepthMask(true);
-				glClear(GL_DEPTH_BUFFER_BIT);
 				glFlush();
 				if (targetTexture != null) {
 					glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
 				} else if (targetGraphics != null) {
 					swapBuffers();
 				}
+				glClear(GL_DEPTH_BUFFER_BIT);
 			} finally {
 				stack.clear();
 			}
