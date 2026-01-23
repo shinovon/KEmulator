@@ -26,8 +26,6 @@ public class KEmulatorUpdater implements Runnable {
 	
 	private static KEmulatorUpdater inst;
 
-	private static JFrame frame;
-	private static JProgressBar progressBar;
 	private static JLabel label;
 
 //	private static StringBuilder log = new StringBuilder();
@@ -91,7 +89,9 @@ public class KEmulatorUpdater implements Runnable {
 			
 			// initialize ui
 			inst = new KEmulatorUpdater();
-			EventQueue.invokeAndWait(inst);
+			try {
+				EventQueue.invokeAndWait(inst);
+			} catch (Exception ignored) {}
 
 			state("KEmulator Updater v" + VERSION);
 			
@@ -254,12 +254,12 @@ public class KEmulatorUpdater implements Runnable {
 	 * @wbp.parser.entryPoint
 	 */
 	public void run() {
-		frame = new JFrame();
+		JFrame frame = new JFrame();
 		frame.setTitle("KEmulator Updater");
 		frame.setBounds(100, 100, 320, 100);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		
-		progressBar = new JProgressBar();
+
+		JProgressBar progressBar = new JProgressBar();
 		progressBar.setPreferredSize(new Dimension(-1, 20));
 		progressBar.setIndeterminate(true);
 		frame.getContentPane().add(progressBar, BorderLayout.SOUTH);
