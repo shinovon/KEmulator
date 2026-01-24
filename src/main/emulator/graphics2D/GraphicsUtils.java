@@ -111,13 +111,15 @@ public final class GraphicsUtils {
 	}
 
 	public static void getImageData(final IImage image, final short[] array, int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		for (int i = 0; i < n6; ++i) {
-			int n7 = n;
-			for (int j = 0; j < n5; ++j) {
-				final int rgb = image.getRGB(n3 + j, n4 + i);
-				array[n7++] = (short) ((rgb >> 24 & 0xF0) << 8 | (rgb >> 16 & 0xF0) << 4 | (rgb >> 8 & 0xF0) << 0 | (rgb & 0xF0) >> 4);
+		try {
+			for (int i = 0; i < n6; ++i) {
+				int n7 = n;
+				for (int j = 0; j < n5; ++j) {
+					final int rgb = image.getRGB(n3 + j, n4 + i);
+					array[n7++] = (short) ((rgb >> 24 & 0xF0) << 8 | (rgb >> 16 & 0xF0) << 4 | (rgb >> 8 & 0xF0) << 0 | (rgb & 0xF0) >> 4);
+				}
+				n += n2;
 			}
-			n += n2;
-		}
+		} catch (Exception ignored) {}
 	}
 }
