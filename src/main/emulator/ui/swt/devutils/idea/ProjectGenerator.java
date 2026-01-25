@@ -42,6 +42,7 @@ public class ProjectGenerator {
 		generateProGuardConfig(dir, projectName, new ClasspathEntry[0]);
 
 		// code
+		createDirSilently(dir.resolve("META-INF"));
 		Files.write(dir.resolve("META-INF").resolve("MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
 		String midletCodePath = generateDummyMidlet(dir, midletClassName);
 
@@ -235,7 +236,6 @@ public class ProjectGenerator {
 		createDirSilently(dir.resolve("res"));
 		createDirSilently(dir.resolve("bin"));
 		createDirSilently(dir.resolve("deployed"));
-		createDirSilently(dir.resolve("META-INF"));
 	}
 
 	private static void createDirSilently(Path path) throws IOException {
