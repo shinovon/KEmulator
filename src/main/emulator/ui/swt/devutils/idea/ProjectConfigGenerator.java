@@ -102,8 +102,6 @@ public class ProjectConfigGenerator {
 			sb.append("'");
 			sb.append(nl);
 		}
-		sb.append("-outjars '").append(Paths.get(dir, "deployed", name + ".jar")).append("'");
-		sb.append(nl);
 		sb.append("-printseeds '").append(Paths.get(dir, "deployed", "pro_seeds.txt")).append("'");
 		sb.append(nl);
 		sb.append("-printmapping '").append(Paths.get(dir, "deployed", "pro_map.txt")).append("'");
@@ -268,7 +266,7 @@ public class ProjectConfigGenerator {
 				"</component>";
 	}
 
-	public static String buildPackageRunConfig(String artifactName, ArrayList<String> inJars, boolean debugBuild) {
+	public static String buildPackageRunConfig(String artifactName, ArrayList<String> inJars, String outJar, boolean debugBuild) {
 		StringBuilder proguardCmdline = new StringBuilder();
 		// libraries/target config
 		proguardCmdline.append('@');
@@ -279,6 +277,9 @@ public class ProjectConfigGenerator {
 			proguardCmdline.append(jar);
 			proguardCmdline.append("&quot;");
 		}
+		proguardCmdline.append(" -outjars &quot;");
+		proguardCmdline.append(outJar);
+		proguardCmdline.append("&quot;");
 		// optimization/obfuscation
 		if (debugBuild)
 			proguardCmdline.append(" -dontoptimize -dontshrink -dontobfuscate -keep class *");
