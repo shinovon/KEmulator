@@ -240,7 +240,7 @@ public class ProjectConfigGenerator {
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"MAIN_CLASS_NAME\" value=\"emulator.Emulator\" />\n" +
 				"    <module name=\"" + projectName + "\" />\n" +
-				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-cp &quot;$PROJECT_DIR$/bin/production/" + projectName + "&quot; -midlet &quot;" + className + "&quot; -jad &quot;$PROJECT_DIR$/" + manifestPath + "&quot; -uei\" />\n" +
+				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-cp &quot;$PROJECT_DIR$/bin&quot; -midlet &quot;" + className + "&quot; -jad &quot;$PROJECT_DIR$/" + manifestPath + "&quot; -uei\" />\n" +
 				"    <option name=\"VM_PARAMETERS\" value=\"-XX:+IgnoreUnrecognizedVMOptions -Djna.nosys=true -Dfile.encoding=UTF-8 -XstartOnFirstThread\" />\n" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"" + Emulator.getAbsolutePath() + "\" />\n" +
 				"    <method v=\"2\">\n" +
@@ -317,6 +317,14 @@ public class ProjectConfigGenerator {
 		component.setAttribute("LANGUAGE_LEVEL", "JDK_1_3");
 		component.setAttribute("inherit-compiler-output", "true");
 		module.appendChild(component);
+
+		Element output = doc.createElement("output");
+		output.setAttribute("url", "file://$MODULE_DIR$/bin");
+		component.appendChild(output);
+
+		Element outputTest = doc.createElement("output-test");
+		outputTest.setAttribute("url", "file://$MODULE_DIR$/bin");
+		component.appendChild(outputTest);
 
 		component.appendChild(doc.createElement("exclude-output"));
 
