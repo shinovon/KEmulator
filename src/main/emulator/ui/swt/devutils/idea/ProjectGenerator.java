@@ -60,7 +60,7 @@ public class ProjectGenerator {
 	}
 
 
-	public static boolean restore(String dir) throws IOException, InterruptedException {
+	public static boolean restore(String dir) throws IOException, ParserConfigurationException, SAXException {
 		Path dirp = Paths.get(dir);
 		Path appDecrPath = dirp.resolve("Application Descriptor");
 		Path mfPath = dirp.resolve("META-INF").resolve("MANIFEST.MF");
