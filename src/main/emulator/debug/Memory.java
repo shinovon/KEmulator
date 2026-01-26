@@ -483,9 +483,9 @@ public final class Memory {
 			if (!Modifier.isStatic(field.getModifiers()) || o == null) {
 				if (Modifier.isStatic(field.getModifiers()) || o != null) {
 					if (type == Long.TYPE || type == Double.TYPE) {
-						res += 24;
+						res += 8;
 					} else {
-						res += 16;
+						res += 4;
 					}
 				}
 			}
