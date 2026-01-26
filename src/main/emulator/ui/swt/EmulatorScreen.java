@@ -377,8 +377,12 @@ public final class EmulatorScreen implements
 			shell.setMaximized(true);
 		if (fullscreen) {
 			Settings.resizeMode = ResizeMethod.Fit;
-			shell.setMaximized(true);
-//			shell.setFullScreen(true);
+			if (Utils.win) {
+				shell.setMaximized(true);
+			} else {
+				shell.setBounds(shell.getMonitor().getClientArea());
+				shell.setFullScreen(true);
+			}
 		}
 
 		win = Utils.win;
