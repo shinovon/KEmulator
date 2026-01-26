@@ -6,6 +6,7 @@ package emulator.ui.swt.devutils.idea;
 import emulator.Emulator;
 import emulator.Utils;
 import emulator.ui.swt.devutils.ClasspathEntry;
+import emulator.ui.swt.devutils.ClasspathEntryType;
 import emulator.ui.swt.devutils.DevtimeMIDlet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,7 +54,7 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName, false);
 
 		// run configs
-		generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)}, false);
+		generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)}, new ClasspathEntry[0], false);
 
 		return midletCodePath;
 	}
@@ -93,13 +94,14 @@ public class ProjectGenerator {
 		String projectName = dirp.getFileName().toString();
 
 		if (imlPath != null) {
+			ClasspathEntry[] classpath = new ClasspathEntry[0];
+
 			try {
-				ClasspathEntry[] classpath = ClasspathEntry.readFromIml(imlPath);
-				generateProGuardConfig(dirp, projectName, classpath);
+				classpath = ClasspathEntry.readFromIml(imlPath);
 			} catch (Exception e) {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
-				generateProGuardConfig(dirp, projectName, new ClasspathEntry[0]);
 			}
+			generateProGuardConfig(dirp, projectName, classpath);
 
 			// regenerate run configurations only if something is missing
 			boolean generate = false;
@@ -123,7 +125,7 @@ public class ProjectGenerator {
 			}
 
 			if (generate) {
-				generateRunConfigs(dirp, projectName, midletNames, isEclipse);
+				generateRunConfigs(dirp, projectName, midletNames, classpath, isEclipse);
 			} else {
 				System.out.println("Skipping run configurations generation");
 			}
@@ -194,7 +196,7 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName, true);
 
 		// run configs
-		generateRunConfigs(dir, projectName, midlets, true);
+		generateRunConfigs(dir, projectName, midlets, cp, true);
 	}
 
 
@@ -208,7 +210,7 @@ public class ProjectGenerator {
 		generateMiscXmls(root, projectName);
 		generateBuildConfigs(root, projectName, false);
 		DevtimeMIDlet[] midlets = DevtimeMIDlet.readMidletsList(root.resolve("META-INF").resolve("MANIFEST.MF"));
-		generateRunConfigs(root, projectName, midlets, false);
+		generateRunConfigs(root, projectName, midlets, new ClasspathEntry[0], false);
 	}
 
 	//#region impls
@@ -245,13 +247,23 @@ public class ProjectGenerator {
 		}
 	}
 
-	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, boolean eclipseManifest) throws IOException {
+	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, ClasspathEntry[] classpath, boolean eclipseManifest) throws IOException {
 		for (int i = 0; i < midletNames.length; i++) {
 			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Launch_with_KEmulator_" + (i + 1) + ".xml");
 			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
-		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
+		ArrayList<String> inJars = new ArrayList<>();
+		inJars.add(dir.resolve("deployed").resolve("raw").resolve(projectName + ".jar").toString());
+		for (ClasspathEntry c : classpath) {
+			if (c.type != ClasspathEntryType.ExportedLibrary)
+				continue;
+			if (c.isLocalPath)
+				inJars.add(dir.resolve(c.path).toString());
+			else
+				inJars.add(c.path);
+		}
+		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -362,7 +374,7 @@ public class ProjectGenerator {
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 				Path fileName = dir.getFileName();
 
-				if(fileName == null)
+				if (fileName == null)
 					return FileVisitResult.CONTINUE;
 
 				if (fileName.toString().startsWith(".")) {

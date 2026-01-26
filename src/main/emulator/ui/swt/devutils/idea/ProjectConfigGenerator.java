@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 /**
  * Generates various configuration files for projects.
@@ -94,20 +95,6 @@ public class ProjectConfigGenerator {
 			if (c.type != ClasspathEntryType.HeaderLibrary)
 				continue;
 			sb.append("-libraryjars '");
-			if (c.isLocalPath)
-				sb.append(Paths.get(dir).resolve(c.path));
-			else
-				sb.append(c.path);
-			sb.append("'");
-			sb.append(nl);
-		}
-
-		sb.append("-injars '").append(Paths.get(dir, "deployed", "raw", name + ".jar")).append("'");
-		sb.append(nl);
-		for (ClasspathEntry c : classpath) {
-			if (c.type != ClasspathEntryType.ExportedLibrary)
-				continue;
-			sb.append("-injars '");
 			if (c.isLocalPath)
 				sb.append(Paths.get(dir).resolve(c.path));
 			else
@@ -281,18 +268,34 @@ public class ProjectConfigGenerator {
 				"</component>";
 	}
 
-	public static String buildPackageRunConfig(String projectName) {
+	public static String buildPackageRunConfig(String artifactName, ArrayList<String> inJars, boolean debugBuild) {
+		StringBuilder proguardCmdline = new StringBuilder();
+		// libraries/target config
+		proguardCmdline.append('@');
+		proguardCmdline.append(ProjectGenerator.PROGUARD_LOCAL_CFG);
+		// inputs
+		for (String jar : inJars) {
+			proguardCmdline.append(" -injars &quot;");
+			proguardCmdline.append(jar);
+			proguardCmdline.append("&quot;");
+		}
+		// optimization/obfuscation
+		if (debugBuild)
+			proguardCmdline.append(" -dontoptimize -dontshrink -dontobfuscate -keep class *");
+		else {
+			proguardCmdline.append(" @");
+			proguardCmdline.append(ProjectGenerator.PROGUARD_GLOBAL_CFG);
+		}
 		return "<component name=\"ProjectRunConfigurationManager\">\n" +
-				"  <configuration default=\"false\" name=\"Package\" type=\"JarApplication\">\n" +
+				"  <configuration default=\"false\" name=\"Package &quot;" + artifactName + "&quot; (" + (debugBuild ? "development" : "release") + ")\" type=\"JarApplication\">\n" +
 				"    <option name=\"JAR_PATH\" value=\"" + Settings.proguardPath + "\" />\n" +
-				"    <option name=\"PROGRAM_PARAMETERS\" value=\"@" + ProjectGenerator.PROGUARD_LOCAL_CFG + " @" + ProjectGenerator.PROGUARD_GLOBAL_CFG + "\" />\n" +
+				"    <option name=\"PROGRAM_PARAMETERS\" value=\"" + proguardCmdline + "\" />\n" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <method v=\"2\">\n" +
-				"      <option name=\"RunConfigurationTask\" enabled=\"true\" run_configuration_name=\"Restore project\" run_configuration_type=\"Application\" />" +
 				"      <option name=\"BuildArtifacts\" enabled=\"true\">\n" +
-				"        <artifact name=\"" + projectName + "\" />\n" +
+				"        <artifact name=\"" + artifactName + "\" />\n" +
 				"      </option>\n" +
 				"    </method>\n" +
 				"  </configuration>\n" +
