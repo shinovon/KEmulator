@@ -265,7 +265,8 @@ public class ProjectGenerator {
 				else
 					inJars.add(c.path);
 			}
-			Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package_" + artifact.name + ".xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
+			Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package_" + artifact.name + "_dbg.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, true).getBytes(StandardCharsets.UTF_8));
+			Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package_" + artifact.name + "_rel.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
 		}
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
