@@ -274,7 +274,7 @@ public final class EmulatorScreen implements
 		} catch (Throwable ignored) {
 		}
 
-		Shell shell = new Shell(parentShell, SWT.DIALOG_TRIM | SWT.ON_TOP);
+		Shell shell = new Shell(parentShell, SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL);
 		shell.setSize(450, 300);
 		shell.setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
 		shell.setLayout(new GridLayout(1, false));
