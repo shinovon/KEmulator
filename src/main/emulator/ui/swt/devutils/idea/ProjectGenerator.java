@@ -250,8 +250,8 @@ public class ProjectGenerator {
 				else
 					inJars.add(c.path);
 			}
-			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_dbg.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, true).getBytes(StandardCharsets.UTF_8));
-			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_rel.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
+			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_dbg.xml"), ProjectConfigGenerator.buildPackageRunConfig(artifact.name, inJars, true).getBytes(StandardCharsets.UTF_8));
+			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_rel.xml"), ProjectConfigGenerator.buildPackageRunConfig(artifact.name, inJars, false).getBytes(StandardCharsets.UTF_8));
 		}
 		Files.write(runConfigs.resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
