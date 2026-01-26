@@ -247,23 +247,26 @@ public class ProjectGenerator {
 		}
 	}
 
-	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, ClasspathEntry[] classpath, boolean eclipseManifest) throws IOException {
+	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, ClasspathEntry[] classpath, boolean eclipseManifest) throws IOException, ParserConfigurationException, SAXException {
 		for (int i = 0; i < midletNames.length; i++) {
 			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Launch_with_KEmulator_" + (i + 1) + ".xml");
 			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
-		ArrayList<String> inJars = new ArrayList<>();
-		inJars.add(dir.resolve("deployed").resolve("raw").resolve(projectName + ".jar").toString());
-		for (ClasspathEntry c : classpath) {
-			if (c.type != ClasspathEntryType.ExportedLibrary)
-				continue;
-			if (c.isLocalPath)
-				inJars.add(dir.resolve(c.path).toString());
-			else
-				inJars.add(c.path);
+		Artifact[] artifacts = Artifact.extractJarArtifacts(dir);
+		for (Artifact artifact : artifacts) {
+			ArrayList<String> inJars = new ArrayList<>();
+			inJars.add(artifact.outputPath + File.separator + artifact.jarName);
+			for (ClasspathEntry c : classpath) {
+				if (c.type != ClasspathEntryType.ExportedLibrary)
+					continue;
+				if (c.isLocalPath)
+					inJars.add(dir.resolve(c.path).toString());
+				else
+					inJars.add(c.path);
+			}
+			Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package_" + artifact.name + ".xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
 		}
-		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
 		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 

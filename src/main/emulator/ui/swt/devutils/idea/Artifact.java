@@ -4,9 +4,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,10 +26,9 @@ public class Artifact {
 		this.jarName = jarName;
 	}
 
-	public static Artifact[] extractJarArtifacts(Path projectRoot) throws Exception {
+	public static Artifact[] extractJarArtifacts(Path projectRoot) throws ParserConfigurationException, IOException, SAXException {
 		ArrayList<Artifact> result = new ArrayList<>();
 
-		// Перебираем все XML-файлы в указанной папке
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(projectRoot.resolve(".idea").resolve("artifacts"), "*.xml")) {
 			for (Path xmlPath : stream) {
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
