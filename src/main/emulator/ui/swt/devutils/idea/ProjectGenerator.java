@@ -102,33 +102,7 @@ public class ProjectGenerator {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
 			}
 			generateProGuardConfig(dirp, projectName, classpath);
-
-			// regenerate run configurations only if something is missing
-			boolean generate = false;
-
-			Path runConfigsPath = dirp.resolve(".idea").resolve("runConfigurations");
-			if (!Files.exists(runConfigsPath)
-					|| !Files.exists(runConfigsPath.resolve("Package.xml"))
-					|| !Files.exists(runConfigsPath.resolve("Restore_project.xml"))) {
-				generate = true;
-			}
-			for (int i = 1; i <= midletNames.length; ++i) {
-				Path runPath = runConfigsPath.resolve("Run_with_KEmulator_" + i + ".xml");
-				if (!Files.exists(runPath)) {
-					generate = true;
-					break;
-				}
-				if (!checkRunConfiguration(runPath, midletNames[i - 1])) {
-					generate = true;
-					break;
-				}
-			}
-
-			if (generate) {
-				generateRunConfigs(dirp, projectName, midletNames, classpath, isEclipse);
-			} else {
-				System.out.println("Skipping run configurations generation");
-			}
+			generateRunConfigs(dirp, projectName, midletNames, classpath, isEclipse);
 			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
 				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
 						"You can rerun IDE setup to bring your configuration to recommended one.");
@@ -248,11 +222,22 @@ public class ProjectGenerator {
 	}
 
 	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, ClasspathEntry[] classpath, boolean eclipseManifest) throws IOException, ParserConfigurationException, SAXException {
+		Path runConfigs = dir.resolve(".idea").resolve("runConfigurations");
+		Files.createDirectories(runConfigs);
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(runConfigs, "kemauto_*.xml")) {
+			for (Path file : stream) {
+				try {
+					Files.delete(file);
+				} catch (IOException ignored) {
+				}
+			}
+		}
 		for (int i = 0; i < midletNames.length; i++) {
-			Path configPath = dir.resolve(".idea").resolve("runConfigurations").resolve("Launch_with_KEmulator_" + (i + 1) + ".xml");
+			Path configPath = runConfigs.resolve("kemauto_Launch_with_KEmulator_" + (i + 1) + ".xml");
 			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
+
 		Artifact[] artifacts = Artifact.extractJarArtifacts(dir);
 		for (Artifact artifact : artifacts) {
 			ArrayList<String> inJars = new ArrayList<>();
@@ -265,10 +250,10 @@ public class ProjectGenerator {
 				else
 					inJars.add(c.path);
 			}
-			Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package_" + artifact.name + "_dbg.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, true).getBytes(StandardCharsets.UTF_8));
-			Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Package_" + artifact.name + "_rel.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
+			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_dbg.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, true).getBytes(StandardCharsets.UTF_8));
+			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_rel.xml"), ProjectConfigGenerator.buildPackageRunConfig(projectName, inJars, false).getBytes(StandardCharsets.UTF_8));
 		}
-		Files.write(dir.resolve(".idea").resolve("runConfigurations").resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
+		Files.write(runConfigs.resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
 	}
 
 	private static void generateBuildConfigs(Path dir, String projectName, boolean eclipseManifest) throws IOException {
