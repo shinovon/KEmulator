@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 
-import static org.lwjgl.opengl.ARBES2Compatibility.glReleaseShaderCompiler;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.*;
@@ -66,7 +65,6 @@ abstract class Program {
 		color = new Color();
 		simple = new Simple();
 		sprite = new Sprite();
-		glReleaseShaderCompiler();
 	}
 
 	private int createProgram(String vertexShader, String fragmentShader) throws IOException {
