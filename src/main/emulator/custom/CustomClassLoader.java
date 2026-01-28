@@ -147,7 +147,8 @@ public final class CustomClassLoader extends ClassLoader {
 				|| s.startsWith("org.objectweb.") || s.startsWith("org.bridj")
 				|| s.startsWith("com.sun.jna.") || s.startsWith("org.lwjgl.")
 				|| s.startsWith("org.apache.tools.")|| s.startsWith("net.java.games.")
-				|| s.startsWith("ru.nnproject")) && !Emulator.jarClasses.contains(s)))
+				|| s.startsWith("ru.nnproject")
+				|| s.equals("javax.microedition.lcdui.a")) && !Emulator.jarClasses.contains(s)))
 			return true;
 
 		if (Settings.hideEmulation

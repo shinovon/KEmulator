@@ -3,10 +3,7 @@ package javax.microedition.lcdui;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
 
-/**
- * ChoiceGroupItem
- */
-final class a {
+final class ChoiceGroupItem {
 	boolean sel;
 	boolean aBoolean424;
 	String string;
@@ -16,7 +13,7 @@ final class a {
 	ChoiceGroup choice;
 	String[] str;
 
-	a(final String aString418, final Image anImage419, final Font aFont420, final ChoiceGroup aChoiceGroup422) {
+	ChoiceGroupItem(final String aString418, final Image anImage419, final Font aFont420, final ChoiceGroup aChoiceGroup422) {
 		super();
 		this.string = aString418;
 		this.image = anImage419;
