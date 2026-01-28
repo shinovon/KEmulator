@@ -104,7 +104,6 @@ public final class Settings {
 	public static boolean dontRepaintOnSetCurrent;
 	public static boolean bypassVserv = true;
 	public static boolean pollKeyboardOnRepaint = true;
-	public static boolean queueSleep = true;
 
 	public static boolean awtAntiAliasing;
 	public static boolean textAntiAliasing = true;

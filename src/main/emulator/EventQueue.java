@@ -52,12 +52,23 @@ public final class EventQueue implements Runnable {
 		inputs = new int[128][];
 		paused = false;
 		running = true;
+
 		eventThread = new Thread(this, "KEmulator-EventQueue");
 		eventThread.setPriority(3);
 		eventThread.start();
+
 		inputThread = new Thread(input, "KEmulator-InputQueue");
 		inputThread.setPriority(3);
 		inputThread.start();
+
+		Thread daemonThread = new Thread(() -> {
+			try {
+				Thread.sleep(Integer.MAX_VALUE);
+			} catch (Exception ignored) {}
+		});
+		daemonThread.setDaemon(true);
+		daemonThread.start();
+
 		Thread crashThread = new Thread() {
 			public void run() {
 				long time = System.currentTimeMillis();
@@ -334,7 +345,7 @@ public final class EventQueue implements Runnable {
 						}
 						case EVENT_START: {
 							if (Emulator.getMIDlet() == null) break;
-							Thread t = new Thread(new InvokeStartAppRunnable(true));
+							Thread t = new Thread(new InvokeStartAppRunnable(true), "KEmulator-StartApp");
 							t.setPriority(5);
 							t.start();
 							break;
@@ -342,7 +353,7 @@ public final class EventQueue implements Runnable {
 						case EVENT_EXIT: {
 							this.stop();
 							if (Emulator.getMIDlet() == null) break;
-							Thread t = new Thread(new InvokeDestroyAppRunnable(this));
+							Thread t = new Thread(new InvokeDestroyAppRunnable(this), "KEmulator-DestroyApp");
 							t.setPriority(5);
 							t.start();
 							break;
@@ -437,7 +448,7 @@ public final class EventQueue implements Runnable {
 							break;
 						}
 					}
-					if (Settings.queueSleep) Thread.sleep(1);
+					Thread.yield();
 				} catch (Throwable e) {
 					System.err.println("Exception in Event Thread!");
 					System.err.println("Event: " + event);

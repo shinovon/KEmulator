@@ -331,17 +331,16 @@ public class Displayable {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
 	}
 
-	public static synchronized void _fpsLimiter(boolean b) {
+	public static void _fpsLimiter(boolean b) {
 		if (b && (AppSettings.speedModifier == 1 || AppSettings.applySpeedToSleep) && AppSettings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
-			long var2 = (long) ((MILLI_TO_NANO * 1000) / AppSettings.frameRate);
+			long var2 = (MILLI_TO_NANO * 1000L) / AppSettings.frameRate;
 
 			long delta = var2 - elapsed;
 			if (delta > 0) {
 				try {
 					Thread.sleep(delta / MILLI_TO_NANO/*, (int) (delta % MILLI_TO_NANO)*/);
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 			}
 		}
 		lastFrameTime = System.nanoTime();
@@ -349,7 +348,7 @@ public class Displayable {
 		if (b) ++framesCount;
 		long l = lastFrameTime - lastFpsUpdateTime;
 		if (l >= 2000L * MILLI_TO_NANO) {
-			Profiler.FPS = (int) (((framesCount * 1000L + 500) * MILLI_TO_NANO) / l);
+			Profiler.FPS = (int) ((framesCount * 1000L * MILLI_TO_NANO) / l);
 			lastFpsUpdateTime = lastFrameTime;
 			framesCount = 0;
 		}
