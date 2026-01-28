@@ -664,10 +664,27 @@ public class AppSettingsUI {
 				AppSettings.saveDefaults();
 			}
 		});
-		GridData gd1 = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
-//		gd1.widthHint = 100;
+		GridData gd1 = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
+		gd1.widthHint = 100;
 		btnNewButton_4.setLayoutData(gd1);
-		btnNewButton_4.setText("Set as default");
+		btnNewButton_4.setText("Save as default");
+
+		Button btnNewButton = new Button(composite_3, SWT.NONE);
+		btnNewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				action = 2;
+				AppSettings.init();
+				AppSettings.load(true);
+				AppSettings.clear();
+				KeyMapping.init();
+				shell.close();
+			}
+		});
+		GridData gd3 = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd3.widthHint = 100;
+		btnNewButton.setLayoutData(gd3);
+		btnNewButton.setText("Reset");
 
 		Button btnNewButton_1 = new Button(composite_3, SWT.NONE);
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
@@ -682,23 +699,6 @@ public class AppSettingsUI {
 		gd2.widthHint = 100;
 		btnNewButton_1.setLayoutData(gd2);
 		btnNewButton_1.setText("Done");
-
-		Button btnNewButton = new Button(composite_3, SWT.NONE);
-		btnNewButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				action = 2;
-				AppSettings.init();
-				AppSettings.load(true);
-				AppSettings.clear();
-				KeyMapping.init();
-				shell.close();
-			}
-		});
-		GridData gd3 = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-		gd3.widthHint = 100;
-		btnNewButton.setLayoutData(gd3);
-		btnNewButton.setText(start ? "Default" : "Reset");
 
 
 		scrolledComposite_1.setMinHeight(composite_8.computeSize(-1, -1).y);
