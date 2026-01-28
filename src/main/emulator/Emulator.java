@@ -123,6 +123,7 @@ public class Emulator implements Runnable {
 		return Emulator.customClassLoader;
 	}
 
+	// not to be called manually
 	public static void shutdownHook() {
 		try {
 			synchronized (Emulator.zipFileLock) {

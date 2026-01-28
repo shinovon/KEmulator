@@ -492,8 +492,8 @@ public class Manager {
 
 					@Override
 					public boolean supported() {
-						// kemulator is windows only
-						return Emulator.isX64() ? RuntimeUtil.isWindows() : true;
+						// TODO
+						return !Emulator.isX64() || RuntimeUtil.isWindows();
 					}
 
 					@Override

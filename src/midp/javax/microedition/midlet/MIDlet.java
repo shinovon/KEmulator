@@ -3,13 +3,15 @@ package javax.microedition.midlet;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
+import emulator.Utils;
 import emulator.custom.CustomMethod;
 
 import javax.microedition.io.ConnectionNotFoundException;
-import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public abstract class MIDlet {
 	private boolean destroyed;
@@ -33,7 +35,7 @@ public abstract class MIDlet {
 		destroyed = true;
 		Emulator.getEmulator().getLogStream().println("Destroy stack trace:");
 		for (StackTraceElement e : new Exception().getStackTrace()) {
-			Emulator.getEmulator().getLogStream().println("\tat " + e.toString());
+			Emulator.getEmulator().getLogStream().println(e.toString());
 		}
 		Emulator.notifyDestroyed();
 		Emulator.getEmulator().getLogStream().println("Exiting Emulator");
@@ -49,6 +51,13 @@ public abstract class MIDlet {
 			Emulator.getEmulator().getLogStream().println("MIDlet.platformRequest: " + url);
 			if (url.startsWith("vlc.exe \"")) {
 				url = "vlc:" + url.substring(9, url.length() - 1);
+			}
+			String protocol = url.substring(0, url.indexOf(':') - 1);
+			if (!"http".equals(protocol) && !"https".equals(protocol) && !"file".equals(protocol)
+					&& !"tel".equals(protocol) && !"mailto".equals(protocol)) {
+				if (Settings.hideEmulation || !"vlc".equals(protocol)) {
+					throw new ConnectionNotFoundException("Unsupported protocol");
+				}
 			}
 			if (!Permission.requestURLAccess(url)) {
 				throw new SecurityException();
@@ -73,9 +82,9 @@ public abstract class MIDlet {
 					Runtime.getRuntime().exec(new File(Settings.vlcDir).getCanonicalPath() + "/vlc \"" + url + "\"");
 					return false;
 				}
-				String vlcdir = "C:/Program Files/VideoLAN/VLC/vlc.exe";
-				if (!Emulator.isX64() && new File(vlcdir).exists()) {
-					Runtime.getRuntime().exec(vlcdir + " \"" + url + "\"");
+				Path vlc = Paths.get("C:/Program Files/VideoLAN/VLC/vlc.exe");
+				if (Utils.win && Files.isExecutable(vlc)) {
+					Runtime.getRuntime().exec(vlc + " \"" + url + "\"");
 					return false;
 				}
 				throw new ConnectionNotFoundException("vlc dir not set");
