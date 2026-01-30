@@ -102,7 +102,7 @@ public class ProjectGenerator {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
 			}
 			generateProGuardConfig(dirp, projectName, classpath);
-			generateRunConfigs(dirp, imlPath.getFileName().toString(), midletNames, classpath, isEclipse);
+			generateRunConfigs(dirp, imlPath.getFileName().toString().replace(".iml", ""), midletNames, classpath, isEclipse);
 			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
 				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
 						"You can rerun IDE setup to bring your configuration to recommended one.");
