@@ -102,7 +102,7 @@ public class ProjectGenerator {
 				System.out.println("Failed to parse IML! No libraries will be exported.");
 			}
 			generateProGuardConfig(dirp, projectName, classpath);
-			generateRunConfigs(dirp, projectName, midletNames, classpath, isEclipse);
+			generateRunConfigs(dirp, imlPath.getFileName().toString(), midletNames, classpath, isEclipse);
 			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
 				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
 						"You can rerun IDE setup to bring your configuration to recommended one.");
@@ -221,7 +221,7 @@ public class ProjectGenerator {
 		}
 	}
 
-	private static void generateRunConfigs(Path dir, String projectName, DevtimeMIDlet[] midletNames, ClasspathEntry[] classpath, boolean eclipseManifest) throws IOException, ParserConfigurationException, SAXException {
+	private static void generateRunConfigs(Path dir, String moduleName, DevtimeMIDlet[] midletNames, ClasspathEntry[] classpath, boolean eclipseManifest) throws IOException, ParserConfigurationException, SAXException {
 		Path runConfigs = dir.resolve(".idea").resolve("runConfigurations");
 		Files.createDirectories(runConfigs);
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(runConfigs, "kemauto_*.xml")) {
@@ -234,7 +234,7 @@ public class ProjectGenerator {
 		}
 		for (int i = 0; i < midletNames.length; i++) {
 			Path configPath = runConfigs.resolve("kemauto_Launch_with_KEmulator_" + (i + 1) + ".xml");
-			String configText = ProjectConfigGenerator.buildKemRunConfig(projectName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
+			String configText = ProjectConfigGenerator.buildKemRunConfig(moduleName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
 			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
 		}
 
@@ -254,7 +254,7 @@ public class ProjectGenerator {
 			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_dbg.xml"), ProjectConfigGenerator.buildPackageRunConfig(artifact.name, inJars, outJarName, true).getBytes(StandardCharsets.UTF_8));
 			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_rel.xml"), ProjectConfigGenerator.buildPackageRunConfig(artifact.name, inJars, outJarName, false).getBytes(StandardCharsets.UTF_8));
 		}
-		Files.write(runConfigs.resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(projectName).getBytes(StandardCharsets.UTF_8));
+		Files.write(runConfigs.resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(moduleName).getBytes(StandardCharsets.UTF_8));
 	}
 
 	private static void generateBuildConfigs(Path dir, String projectName, boolean eclipseManifest) throws IOException {

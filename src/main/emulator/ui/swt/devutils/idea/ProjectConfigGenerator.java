@@ -232,14 +232,14 @@ public class ProjectConfigGenerator {
 		return sb.toString();
 	}
 
-	public static String buildKemRunConfig(String projectName, String midletName, String className, boolean eclipseManifest) {
+	public static String buildKemRunConfig(String moduleName, String midletName, String className, boolean eclipseManifest) {
 		String manifestPath = eclipseManifest ? "Application Descriptor" : "META-INF/MANIFEST.MF";
 		return "<component name=\"ProjectRunConfigurationManager\">\n" +
 				"  <configuration default=\"false\" name=\"Launch &quot;" + midletName.replace("&", "&amp;").replace("\"", "&quot;") + "&quot; with KEmulator\" type=\"Application\" factoryName=\"Application\">\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"MAIN_CLASS_NAME\" value=\"emulator.Emulator\" />\n" +
-				"    <module name=\"" + projectName + "\" />\n" +
+				"    <module name=\"" + moduleName + "\" />\n" +
 				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-cp &quot;$PROJECT_DIR$/bin&quot; -midlet &quot;" + className + "&quot; -jad &quot;$PROJECT_DIR$/" + manifestPath + "&quot; -uei\" />\n" +
 				"    <option name=\"VM_PARAMETERS\" value=\"-XX:+IgnoreUnrecognizedVMOptions -Djna.nosys=true -Dfile.encoding=UTF-8 -XstartOnFirstThread\" />\n" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"" + Emulator.getAbsolutePath() + "\" />\n" +
@@ -250,13 +250,13 @@ public class ProjectConfigGenerator {
 				"</component>";
 	}
 
-	public static String buildRestoreRunConfig(String projectName) {
+	public static String buildRestoreRunConfig(String moduleName) {
 		return "<component name=\"ProjectRunConfigurationManager\">\n" +
 				"  <configuration default=\"false\" name=\"Restore project\" type=\"Application\" factoryName=\"Application\">\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8 CLDC Runtime\" />\n" +
 				"    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n" +
 				"    <option name=\"MAIN_CLASS_NAME\" value=\"emulator.Emulator\" />\n" +
-				"    <module name=\"" + projectName + "\" />\n" +
+				"    <module name=\"" + moduleName + "\" />\n" +
 				"    <option name=\"PROGRAM_PARAMETERS\" value=\"-restore &quot;$PROJECT_DIR$&quot;\" />\n" +
 				"    <option name=\"WORKING_DIRECTORY\" value=\"" + Emulator.getAbsolutePath() + "\" />\n" +
 				"    <method v=\"2\">\n" +

@@ -109,8 +109,10 @@ public final class Emulator3D implements IGraphics3D {
 		properties.put("maxSpriteCropDimension", new Integer(MaxSpriteCropDimension));
 		properties.put("maxTransformsPerVertex", new Integer(MaxTransformsPerVertex));
 		properties.put("numTextureUnits", new Integer(NumTextureUnits));
-		properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
-		properties.put("version", "nnmod " + Emulator.version + (Emulator.revision.length() > 0 ? " (git: " + Emulator.revision + ")" : ""));
+		if (!Settings.hideEmulation) {
+			properties.put("coreID", "@KEmulator LWJ-OpenGL-M3G @liang.wu");
+			properties.put("version", "nnmod " + Emulator.version + (Emulator.revision.length() != 0 ? " (git: " + Emulator.revision + ")" : ""));
+		}
 
 		memoryBuffers = new LWJGLUtil();
 		renderPipe = new RenderPipe();
