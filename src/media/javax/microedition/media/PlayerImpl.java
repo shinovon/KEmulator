@@ -5,6 +5,7 @@ import emulator.Settings;
 import emulator.custom.ResourceManager;
 import emulator.media.EmulatorMIDI;
 import emulator.media.amr.AMRDecoder;
+import emulator.media.qcp.QCPDecoder;
 import emulator.media.tone.ToneControlImpl;
 import emulator.javazoom.jl.decoder.Header;
 import emulator.javazoom.jl.decoder.JavaLayerException;
@@ -129,6 +130,35 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			//throw new IOException("AMR realize error", e);
 		}
 	}
+
+    private void qcp(final InputStream inputStream) throws IOException {
+        controls = new Control[]{toneControl, volumeControl};
+        try {
+            final byte[] b;
+            b = QCPDecoder.decode(data = ResourceManager.getBytes(inputStream));
+            if (b == null) {
+                throw new MediaException("Cannot parse QCP data");
+            }
+            InputStream i = this.inputStream = new ByteArrayInputStream(b);
+            final AudioFormat audioFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    8000.0f,
+                    16,
+                    1,
+                    2,
+                    8000.0f,
+                    false
+            );
+            final AudioInputStream audioInputStream = new AudioInputStream(i, audioFormat, -1L);
+            final Clip clip = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioFormat));
+            clip.addLineListener(this);
+            clip.open(audioInputStream);
+            sequence = clip;
+        } catch (Throwable e) {
+            Emulator.getEmulator().getLogStream().println("QCP realize error: " + e);
+            sequence = null;
+        }
+    }
 
 	private void wav(InputStream inputStream) throws IOException {
 		controls = new Control[]{toneControl, volumeControl};
@@ -462,9 +492,12 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		realized = true;
 		if (inputStream != null) {
 			try {
-				if ("audio/amr".equals(contentType) || "audio/x-amr".equals(contentType)) {
-					amr(inputStream);
-				} else if ("audio/x-wav".equals(contentType) || "audio/wav".equals(contentType)) {
+                if ("audio/amr".equals(contentType) || "audio/x-amr".equals(contentType)) {
+                    amr(inputStream);
+                } else if ("audio/qcelp".equals(contentType) || "audio/vnd.qcelp".equals(contentType)
+                        || "audio/evrc".equals(contentType) || "audio/qcp".equals(contentType)) {
+                    qcp(inputStream);
+                } else if ("audio/x-wav".equals(contentType) || "audio/wav".equals(contentType)) {
 					wav(inputStream);
 				} else if ("audio/x-midi".equals(contentType) || "audio/midi".equals(contentType)) {
 					midi(inputStream);
@@ -490,10 +523,14 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						} catch (Exception e2) {
 							try {
 								amr(inputStream);
-							} catch (Exception e3) {
-								Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
-								sequence = null;
-							}
+                            } catch (Exception e3) {
+                                try {
+                                    qcp(inputStream);
+                                } catch (Exception e4) {
+                                    Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
+                                    sequence = null;
+                                }
+                            }
 						}
 					}
 				}
@@ -827,9 +864,14 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					contentType.equalsIgnoreCase("audio/wave") ||
 					contentType.equalsIgnoreCase("audio/x-wav")) {
 				ext = "wav";
-			} else if (contentType.equalsIgnoreCase("audio/amr")) {
-				ext = "amr";
-			} else if (contentType.equalsIgnoreCase("audio/x-mid") ||
+            } else if (contentType.equalsIgnoreCase("audio/amr")) {
+                ext = "amr";
+            } else if (contentType.equalsIgnoreCase("audio/qcelp") ||
+                    contentType.equalsIgnoreCase("audio/vnd.qcelp") ||
+                    contentType.equalsIgnoreCase("audio/evrc") ||
+                    contentType.equalsIgnoreCase("audio/qcp")) {
+                ext = "qcp";
+            } else if (contentType.equalsIgnoreCase("audio/x-mid") ||
 					contentType.equalsIgnoreCase("audio/mid") ||
 					contentType.equalsIgnoreCase("audio/midi")) {
 				ext = "mid";
