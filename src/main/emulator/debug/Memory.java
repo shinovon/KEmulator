@@ -544,7 +544,8 @@ public final class Memory {
 		} else if (o instanceof char[]) {
 			n = 16 + 2 * ((char[]) o).length;
 		} else {
-			boolean isArrayOfObjs = ClassTypes.isObject(clazz.getComponentType());
+			boolean isArrayOfObjs = ClassTypes.isObject(clazz.getComponentType())
+					|| clazz.getComponentType() == String.class;
 			if (o instanceof Object[]) {
 				Object[] oo = (Object[]) o;
 				for (int i = oo.length - 1; i >= 0; --i) {
@@ -560,8 +561,8 @@ public final class Memory {
 				}
 			} else {
 				for (int i = Array.getLength(o) - 1; i >= 0; --i) {
-					final Object value;
-					if ((value = Array.get(o, i)) != null && !isArrayOfObjs) {
+					final Object value = Array.get(o, i);
+					if (value != null && !isArrayOfObjs) {
 						Class cls = value.getClass();
 						n += this.size(cls, fields(cls), value);
 					} else if (value != null && value.getClass().isArray()) {
