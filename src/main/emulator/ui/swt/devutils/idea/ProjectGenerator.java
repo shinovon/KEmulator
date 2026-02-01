@@ -44,8 +44,11 @@ public class ProjectGenerator {
 
 		// code
 		createDirSilently(dir.resolve("META-INF"));
-		Files.write(dir.resolve("META-INF").resolve("MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
-		String midletCodePath = generateDummyMidlet(dir, midletClassName);
+		String midletCodePath = null;
+		if (midletClassName != null) { // completely new project
+			Files.write(dir.resolve("META-INF").resolve("MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
+			midletCodePath = generateDummyMidlet(dir, midletClassName);
+		} // on regeneration, this is skipped
 
 		// ide config
 		generateMiscXmls(dir, projectName);
@@ -54,7 +57,10 @@ public class ProjectGenerator {
 		generateBuildConfigs(dir, projectName, false);
 
 		// run configs
-		generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)}, new ClasspathEntry[0], false);
+		if (midletClassName != null)
+			generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)}, new ClasspathEntry[0], false);
+		else
+			restore(dir.toString()); // on recreation, we know nothing. Restore is good at understanding what we have.
 
 		return midletCodePath;
 	}
