@@ -113,6 +113,20 @@
         <define name="FORCE_FULLSCREEN" value="false"/>
     </preset>
 
+    <!-- Nokia N97 -->
+    <preset name="180x320 (half of 360x640 - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="180"/>
+        <define name="SCREEN_HEIGHT" value="320"/>
+        <define name="FORCE_FULLSCREEN" value="true"/>
+    </preset>
+
+    <!-- Nokia N97 -->
+    <preset name="320x180 (half of 640x360 - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="320"/>
+        <define name="SCREEN_HEIGHT" value="180"/>
+        <define name="FORCE_FULLSCREEN" value="true"/>
+    </preset>
+
     <!-- Sony Ericsson K800i -->
     <preset name="240x320 (COMMON - full screen)" layout="Nokia">
         <define name="SCREEN_WIDTH" value="240"/>
@@ -192,20 +206,6 @@
         <define name="FORCE_FULLSCREEN" value="false"/>
     </preset>
 
-    <!-- Nokia N97 -->
-    <preset name="180x320 (half of 360x640 - full screen)" layout="Nokia">
-        <define name="SCREEN_WIDTH" value="180"/>
-        <define name="SCREEN_HEIGHT" value="320"/>
-        <define name="FORCE_FULLSCREEN" value="true"/>
-    </preset>
-
-    <!-- Nokia N97 -->
-    <preset name="320x180 (half of 640x360 - full screen)" layout="Nokia">
-        <define name="SCREEN_WIDTH" value="320"/>
-        <define name="SCREEN_HEIGHT" value="180"/>
-        <define name="FORCE_FULLSCREEN" value="true"/>
-    </preset>
-
     <!-- Nokia N80 -->
     <preset name="352x416 (Nokia - full screen)" layout="Nokia">
         <define name="SCREEN_WIDTH" value="352"/>
@@ -269,7 +269,7 @@
     <!-- Motorola -->
 
     <!-- Motorola V60i -->
-    <preset name="96x64 (Motorola - fullscreen)" layout="Motorola">
+    <preset name="96x64 (Motorola - full screen)" layout="Motorola">
         <define name="SCREEN_WIDTH" value="96"/>
         <define name="SCREEN_HEIGHT" value="64"/>
         <define name="FORCE_FULLSCREEN" value="false"/>
