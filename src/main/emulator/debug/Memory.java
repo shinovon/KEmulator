@@ -528,20 +528,20 @@ public final class Memory {
 		n += 16;
 		if (o instanceof long[]) {
 			n = 16 + 8 * ((long[]) o).length;
+		} else if (o instanceof double[]) {
+			n = 16 + 8 * ((double[]) o).length;
 		} else if (o instanceof int[]) {
 			n = 16 + 4 * ((int[]) o).length;
+		} else if (o instanceof float[]) {
+			n = 16 + 4 * ((float[]) o).length;
 		} else if (o instanceof short[]) {
 			n = 16 + 2 * ((short[]) o).length;
-		} else if (o instanceof byte[]) {
+		} else if (o instanceof char[]) {
+			n = 16 + 2 * ((char[]) o).length;
+		} else  if (o instanceof byte[]) {
 			n = 16 + ((byte[]) o).length;
 		} else if (o instanceof boolean[]) {
 			n = 16 + ((boolean[]) o).length;
-		} else if (o instanceof double[]) {
-			n = 16 + 8 * ((double[]) o).length;
-		} else if (o instanceof float[]) {
-			n = 16 + 4 * ((float[]) o).length;
-		} else if (o instanceof char[]) {
-			n = 16 + 2 * ((char[]) o).length;
 		} else {
 			boolean isArrayOfObjs = ClassTypes.isObject(clazz.getComponentType())
 					|| clazz.getComponentType() == String.class;
