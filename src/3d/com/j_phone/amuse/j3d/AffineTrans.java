@@ -18,34 +18,17 @@ package com.j_phone.amuse.j3d;
 
 import ru.woesss.j2me.micro3d.MathUtil;
 
-public class AffineTrans {
-	public int m00, m01, m02, m03;
-	public int m10, m11, m12, m13;
-	public int m20, m21, m22, m23;
-
+public class AffineTrans extends com.jblend.graphics.j3d.AffineTrans {
 	public AffineTrans() {}
 
 	public AffineTrans(int[][] a) {
-		if (a == null) {
-			throw new NullPointerException();
-		}
-		if (a.length < 3) {
-			throw new IllegalArgumentException();
-		}
-		if (a[0].length < 4 || (a[1].length < 4) || (a[2].length < 4)) {
-			throw new IllegalArgumentException();
-		}
-		m00 = a[0][0]; m01 = a[0][1]; m02 = a[0][2]; m03 = a[0][3];
-		m10 = a[1][0]; m11 = a[1][1]; m12 = a[1][2]; m13 = a[1][3];
-		m20 = a[2][0]; m21 = a[2][1]; m22 = a[2][2]; m23 = a[2][3];
+		super(a);
 	}
 
 	AffineTrans(int m00, int m01, int m02, int m03,
 				int m10, int m11, int m12, int m13,
 				int m20, int m21, int m22, int m23) {
-		this.m00 = m00; this.m01 = m01; this.m02 = m02; this.m03 = m03;
-		this.m10 = m10; this.m11 = m11; this.m12 = m12; this.m13 = m13;
-		this.m20 = m20; this.m21 = m21; this.m22 = m22; this.m23 = m23;
+		super(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23);
 	}
 
 	public void multiply(AffineTrans a) {
