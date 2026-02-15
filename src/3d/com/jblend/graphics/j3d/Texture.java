@@ -23,7 +23,7 @@ import javax.microedition.lcdui.Image;
 import ru.woesss.j2me.micro3d.TextureImpl;
 
 public class Texture {
-	public final TextureImpl impl;
+	protected final TextureImpl impl;
 	final boolean isForModel;
 
 	public Texture(byte[] b, boolean isForModel) {

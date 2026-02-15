@@ -16,6 +16,8 @@
 
 package com.j_phone.amuse.j3d;
 
+import ru.woesss.j2me.micro3d.TextureImpl;
+
 import java.io.IOException;
 
 public class Texture extends com.jblend.graphics.j3d.Texture {
@@ -25,5 +27,9 @@ public class Texture extends com.jblend.graphics.j3d.Texture {
 
 	public Texture(String name) throws IOException {
 		super(name, true);
+	}
+
+	TextureImpl getImpl() {
+		return impl;
 	}
 }

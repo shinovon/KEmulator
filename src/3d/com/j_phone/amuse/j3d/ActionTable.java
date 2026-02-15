@@ -16,6 +16,8 @@
 
 package com.j_phone.amuse.j3d;
 
+import ru.woesss.j2me.micro3d.ActTableImpl;
+
 import java.io.IOException;
 
 public class ActionTable extends com.jblend.graphics.j3d.ActionTable {
@@ -25,5 +27,9 @@ public class ActionTable extends com.jblend.graphics.j3d.ActionTable {
 
 	public ActionTable(String name) throws IOException {
 		super(name);
+	}
+
+	ActTableImpl getImpl() {
+		return impl;
 	}
 }
