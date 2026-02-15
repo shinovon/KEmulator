@@ -21,7 +21,7 @@ import java.io.IOException;
 import ru.woesss.j2me.micro3d.ActTableImpl;
 
 public class ActionTable {
-	public final ActTableImpl impl;
+	protected final ActTableImpl impl;
 
 	public ActionTable(byte[] b) {
 		impl = new ActTableImpl(b);
