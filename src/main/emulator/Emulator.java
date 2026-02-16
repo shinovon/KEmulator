@@ -319,7 +319,6 @@ public class Emulator implements Runnable {
 				}
 				if (doja) {
 					Emulator.emulatorimpl.getLogStream().println("Running DoJa");
-					System.out.println(props);
 					if (Emulator.midletJar == null) {
 						String s = file.getName();
 						Emulator.midletJar = s.substring(0, s.length() - 1) + 'r';
