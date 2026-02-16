@@ -2456,6 +2456,7 @@ public final class EmulatorScreen implements
 		if (controlEvent.widget != shell)
 			return;
 		this.getWindowPos();
+		if (fullscreen) return;
 		if (((Log) Emulator.getEmulator().getLogStream()).isLogOpen()) {
 			final Shell logWindow = ((Log) Emulator.getEmulator().getLogStream()).getLogShell();
 			if (((Log) Emulator.getEmulator().getLogStream()).isAttachedToParent() && !logWindow.isDisposed()) {

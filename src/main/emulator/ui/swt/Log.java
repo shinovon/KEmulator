@@ -157,6 +157,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 	}
 
 	public final void controlMoved(final ControlEvent controlEvent) {
+		if (parentShell.isDisposed()) return;
 		if (Math.abs(this.parentShell.getLocation().x + this.parentShell.getSize().x - this.logShell.getLocation().x) < 10 && Math.abs(this.parentShell.getLocation().y - this.logShell.getLocation().y) < 20) {
 			this.logShell.setLocation(this.parentShell.getLocation().x + this.parentShell.getSize().x, this.parentShell.getLocation().y);
 			attachedToParent = true;
