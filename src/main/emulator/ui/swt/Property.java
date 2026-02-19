@@ -568,6 +568,8 @@ public final class Property implements IProperty, SelectionListener {
 				res = "Droid Sans Mono";
 			} else if (list.contains("Consolas")) {
 				res = "Consolas";
+			} else if (list.contains("SF Mono")) {
+				res = "SF Mono";
 			} else if (list.contains("Courier New")) {
 				res = "Courier New";
 			}
