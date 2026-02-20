@@ -169,6 +169,13 @@
         <define name="FORCE_FULLSCREEN" value="false"/>
     </preset>
 
+    <!-- Nokia E6 -->
+    <preset name="640x480 (COMMON - full screen)" layout="Nokia">
+        <define name="SCREEN_WIDTH" value="640"/>
+        <define name="SCREEN_HEIGHT" value="480"/>
+        <define name="FORCE_FULLSCREEN" value="false"/>
+    </preset>
+
     <!-- Sony Ericsson Xperia X1 -->
     <preset name="480x800 (COMMON - full screen)" layout="Nokia">
         <define name="SCREEN_WIDTH" value="480"/>
