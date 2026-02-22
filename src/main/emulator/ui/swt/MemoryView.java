@@ -603,7 +603,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			int r;
 			switch (objectSortColumn) {
 			case 0:
-				System.out.println("sort by references " + var1.paths.size() + " " + var2.paths.size());
 				r = var1.paths.size() - var2.paths.size();
 				break;
 			// TODO sort by values?
