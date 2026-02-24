@@ -13,14 +13,33 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.KeyFactory;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Properties;
 
 public class Updater {
 
 	private static final String URL = "https://nnproject.cc/kem/releases/";
 	private static final String UPDATER_URL = URL + "updater.jar";
+	private static final String PUBLIC =
+			"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtZlt6VdFb3lF0HxD88gs" +
+			"ToLdrBouEpR1t9fjTb0lpzk1VOgkNRkPkV3z5hfzOTa3qmpGrUGNXVZf8t+ULMv1" +
+			"1FuvmI/TAbAgLqjqtOufU3xLxdTP9p3KRiX+rQLfqCa4oq6+F0+DOtJkWgoFeuVW" +
+			"Z3eO0GxPhgR2XXcVhj1NFt2XhViI4dKJ4/7J1mMnH9sGaKQAFVLLo39afbCe5MzU" +
+			"/OIyWUDbWN7dhhCO+W8PGEFHd9ayQDLeV74SNYNLE6vGRf8J2whDDvr947htHIRE" +
+			"9iDBZgXZqpluZ9S9PHHOSTX/qmCaQj+AfYeXCGcfbM8LM4v60IBsrL7o2NAXWNca" +
+			"EKh3K8Vq/4TYLulSosDw/vvyB9Ion/mUaMn4P7yzYXk5/jO8et1UO4t6mKbBczj2" +
+			"Msj5IQh4yFH09P8gkdm+A0Z3s7gJrbV9oeS5iAKx/eTn3/vY0dEF/Ss6GV7BPeKu" +
+			"D/yOqeAmLdGeDVO9NuONOErjtFDO7Z151OHHH3+TetPgqP2r3Ciy/m1fB0dC167n" +
+			"LxE2j8GaFGolf+4dq2xmA5+cglLmEPOJDlbxWHDJ9EKo4FNDdvOxj/h6EclSIxPB" +
+			"ya602KEMLvcT3j5s41sf8evqJX5yQRDcz0Hc+iPoTJPhyCymdHY7xIEg0uuhJwix" +
+			"CnwVAeUoL4MXpCgytCqM2ysCAwEAAQ==";
 
 	public static final int STATE_INITIAL = 0;
 	public static final int STATE_BUSY = 1;
@@ -142,13 +161,29 @@ public class Updater {
 		System.exit(0);
 	}
 
-	private static void downloadUpdater() throws IOException {
+	private static void downloadUpdater() throws Exception {
+		Path tmp = Paths.get(Emulator.getAbsolutePath(), "updater.jar.tmp");
+		Path signature = Paths.get(Emulator.getAbsolutePath(), "updater.jar.sig");
+		download(UPDATER_URL, tmp);
+		download(UPDATER_URL + ".sig", signature);
+		try {
+			if (!verifyFile(tmp, signature)) {
+				Files.delete(tmp);
+				throw new IOException("Could not verify updater.jar signature");
+			}
+			Files.move(tmp, Paths.get(Emulator.getAbsolutePath(), "updater.jar"), StandardCopyOption.REPLACE_EXISTING);
+		} finally {
+			Files.delete(signature);
+		}
+	}
+
+	private static void download(String url, Path path) throws IOException {
 		ReadableByteChannel inChannel = null;
 		FileOutputStream fileStream = null;
 		FileChannel fileChannel = null;
 		try {
-			inChannel = Channels.newChannel(getHttpStream(UPDATER_URL));
-			fileStream = new FileOutputStream(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar");
+			inChannel = Channels.newChannel(getHttpStream(url));
+			fileStream = new FileOutputStream(path.toFile());
 
 			fileChannel = fileStream.getChannel();
 			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
@@ -172,5 +207,21 @@ public class Updater {
 			throw new IOException("No input stream");
 		}
 		return inputStream;
+	}
+
+	private static boolean verifyFile(Path file, Path signaturePath) throws Exception {
+		Signature sign = Signature.getInstance("SHA256withRSA");
+		sign.initVerify(KeyFactory.getInstance("RSA")
+				.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(PUBLIC))));
+
+		try (InputStream is = Files.newInputStream(file)) {
+			byte[] buffer = new byte[8192];
+			int len;
+			while ((len = is.read(buffer)) != -1) {
+				sign.update(buffer, 0, len);
+			}
+		}
+
+		return sign.verify(Base64.getDecoder().decode(Files.readAllBytes(signaturePath)));
 	}
 }

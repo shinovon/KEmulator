@@ -13,17 +13,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.KeyFactory;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.5";
+	private static final String VERSION = "0.6";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
-	
+	private static final String PUBLIC =
+			"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtZlt6VdFb3lF0HxD88gs" +
+			"ToLdrBouEpR1t9fjTb0lpzk1VOgkNRkPkV3z5hfzOTa3qmpGrUGNXVZf8t+ULMv1" +
+			"1FuvmI/TAbAgLqjqtOufU3xLxdTP9p3KRiX+rQLfqCa4oq6+F0+DOtJkWgoFeuVW" +
+			"Z3eO0GxPhgR2XXcVhj1NFt2XhViI4dKJ4/7J1mMnH9sGaKQAFVLLo39afbCe5MzU" +
+			"/OIyWUDbWN7dhhCO+W8PGEFHd9ayQDLeV74SNYNLE6vGRf8J2whDDvr947htHIRE" +
+			"9iDBZgXZqpluZ9S9PHHOSTX/qmCaQj+AfYeXCGcfbM8LM4v60IBsrL7o2NAXWNca" +
+			"EKh3K8Vq/4TYLulSosDw/vvyB9Ion/mUaMn4P7yzYXk5/jO8et1UO4t6mKbBczj2" +
+			"Msj5IQh4yFH09P8gkdm+A0Z3s7gJrbV9oeS5iAKx/eTn3/vY0dEF/Ss6GV7BPeKu" +
+			"D/yOqeAmLdGeDVO9NuONOErjtFDO7Z151OHHH3+TetPgqP2r3Ciy/m1fB0dC167n" +
+			"LxE2j8GaFGolf+4dq2xmA5+cglLmEPOJDlbxWHDJ9EKo4FNDdvOxj/h6EclSIxPB" +
+			"ya602KEMLvcT3j5s41sf8evqJX5yQRDcz0Hc+iPoTJPhyCymdHY7xIEg0uuhJwix" +
+			"CnwVAeUoL4MXpCgytCqM2ysCAwEAAQ==";
+
 	private static KEmulatorUpdater inst;
 
 	private static JLabel label;
@@ -137,94 +154,49 @@ public class KEmulatorUpdater implements Runnable {
 //					return;
 //				}
 				
-				if (!x64) {
-					state("Deleting 3d engines");
-					try {
-						Files.delete(kemulatorDir.resolve("m3g_lwjgl.jar"));
-					} catch (IOException ignored) {}
-					try {
-						Files.delete(kemulatorDir.resolve("m3g_swerve.jar"));
-					} catch (IOException ignored) {}
-					try {
-						Files.delete(kemulatorDir.resolve("micro3d_gl.jar"));
-					} catch (IOException ignored) {}
-					try {
-						Files.delete(kemulatorDir.resolve("micro3d_dll.jar"));
-					} catch (IOException ignored) {}
-				}
-				
 				try {
 					state("Downloading KEmulator.jar");
-					download(UPDATE_URL
+					update(UPDATE_URL
 							+ branch + "/" + type
-							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), kemulatorJarTmp);
-					Files.move(kemulatorJarTmp, kemulatorJar, StandardCopyOption.REPLACE_EXISTING);
+							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), "KEmulator.jar");
 				} catch (IOException e) {
 					fail("Failed to download KEmulator.jar", e);
 					return;
 				}
-				
-				Path tempZip = Files.createTempFile(null, ".zip");
+
 				try {
-					state("Downloading lang.zip");
-					download(UPDATE_URL + branch + "/lang.zip", tempZip);
+					updateExtract(UPDATE_URL + branch + "/lang.zip", "lang.zip", kemulatorDir);
 				} catch (IOException e) {
 					fail("Failed to download lang.zip", e);
 					return;
 				}
 				
-				try {
-					state("Extracting lang.zip");
-					extract(tempZip, kemulatorDir.resolve("lang"));
-				} catch (IOException e) {
-					fail("Failed to extract lang.zip", e);
-					return;
-				}
-				
 				if (!x64) {
 					try {
-						state("Downloading m3g_lwjgl.jar");
-						download(UPDATE_URL
+						update(UPDATE_URL
 								+ branch + "/" + type + "/m3g_lwjgl.jar",
-								kemulatorDir.resolve("m3g_lwjgl.jar"));
-	
-						state("Downloading m3g_swerve.jar");
-						download(UPDATE_URL
+								"m3g_lwjgl.jar");
+						update(UPDATE_URL
 								+ branch + "/" + type + "/m3g_swerve.jar",
-								kemulatorDir.resolve("m3g_swerve.jar"));
-	
-						state("Downloading micro3d_gl.jar");
-						download(UPDATE_URL
+								"m3g_swerve.jar");
+						update(UPDATE_URL
 								+ branch + "/" + type + "/micro3d_gl.jar",
-								kemulatorDir.resolve("micro3d_gl.jar"));
-	
-						state("Downloading micro3d_dll.jar");
-						download(UPDATE_URL
+								"micro3d_gl.jar");
+						update(UPDATE_URL
 								+ branch + "/" + type + "/micro3d_dll.jar",
-								kemulatorDir.resolve("micro3d_dll.jar"));
-
-						state("Downloading amrdecoder.dll");
-						download(UPDATE_URL
-										+ branch + "/" + type + "/amrdecoder.dll",
-								kemulatorDir.resolve("amrdecoder.dll"));
+								"micro3d_dll.jar");
+						update(UPDATE_URL
+								+ branch + "/" + type + "/amrdecoder.dll",
+								"amrdecoder.dll");
 					} catch (IOException e) {
 						fail("Failed to download libraries", e);
 						return;
 					}
 				} else {
 					try {
-						state("Downloading lwjgl.zip");
-						download(UPDATE_URL + branch + "/lwjgl.zip", tempZip);
+						updateExtract(UPDATE_URL + branch + "/lwjgl.zip", "lwjgl.zip", kemulatorDir);
 					} catch (IOException e) {
 						fail("Failed to download lwjgl.zip", e);
-						return;
-					}
-
-					try {
-						state("Extracting lwjgl.zip");
-						extract(tempZip, kemulatorDir);
-					} catch (IOException e) {
-						fail("Failed to extract lwjgl.zip", e);
 						return;
 					}
 				}
@@ -367,7 +339,7 @@ public class KEmulatorUpdater implements Runnable {
 	private static void exitDelay(long time) {
 		try {
 			Thread.sleep(time);
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 		System.exit(0);
 	}
 	
@@ -383,7 +355,7 @@ public class KEmulatorUpdater implements Runnable {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			exception.printStackTrace(new PrintStream(baos));
 			res = baos.toString();
-		} catch (Throwable t) {}
+		} catch (Throwable ignored) {}
 		
 		if (res == null) return;
 		log(res, true);
@@ -401,6 +373,36 @@ public class KEmulatorUpdater implements Runnable {
 			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
 		} catch (Throwable e) {
 			return 0;
+		}
+	}
+
+	static void update(String url, String name) throws Exception {
+		state("Downloading " + name);
+		Path dest = kemulatorDir.resolve(name);
+		Path tmp = kemulatorDir.resolve(name + ".tmp");
+		download(url, tmp);
+		state("Verifying " + name);
+		if (!verifyFile(tmp, getHttpBytes(url + ".sig"))) {
+			Files.delete(tmp);
+			throw new Exception("Could not verify " + name + " signature");
+		}
+		Files.move(tmp, dest, StandardCopyOption.REPLACE_EXISTING);
+	}
+
+	static void updateExtract(String url, String name, Path dir) throws Exception {
+		state("Downloading " + name);
+		Path tmp = Files.createTempFile(null, ".zip");
+		try {
+			download(url, tmp);
+			state("Verifying " + name);
+			if (!verifyFile(tmp, getHttpBytes(url + ".sig"))) {
+				Files.delete(tmp);
+				throw new Exception("Could not verify " + name + " signature");
+			}
+			state("Extracting " + name);
+			extract(tmp, dir);
+		} finally {
+			Files.delete(tmp);
 		}
 	}
 
@@ -446,12 +448,17 @@ public class KEmulatorUpdater implements Runnable {
 	}
 	
 	static InputStream getHttpStream(String url) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", "KEmulatorUpdater/" + VERSION);
-		connection.setRequestProperty("Accept-Encoding", "gzip");
-		int responseCode = connection.getResponseCode();
-		if (responseCode == 404) {
-			throw new FileNotFoundException(url);
+		HttpURLConnection connection;
+		while (true) {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setRequestProperty("User-Agent", "KEmulatorUpdater/" + VERSION);
+			connection.setRequestProperty("Accept-Encoding", "gzip");
+			int responseCode = connection.getResponseCode();
+			if (responseCode == 404) {
+				throw new FileNotFoundException(url);
+			}
+			if (responseCode == 301 || responseCode == 302) continue;
+			break;
 		}
 		InputStream inputStream = connection.getInputStream();
 		if (inputStream == null) {
@@ -462,6 +469,22 @@ public class KEmulatorUpdater implements Runnable {
 			return new GZIPInputStream(inputStream);
 		}
 		return inputStream;
+	}
+
+	private static boolean verifyFile(Path file, byte[] signature) throws Exception {
+		Signature sign = Signature.getInstance("SHA256withRSA");
+		sign.initVerify(KeyFactory.getInstance("RSA")
+				.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(PUBLIC))));
+
+		try (InputStream is = Files.newInputStream(file)) {
+			byte[] buffer = new byte[8192];
+			int len;
+			while ((len = is.read(buffer)) != -1) {
+				sign.update(buffer, 0, len);
+			}
+		}
+
+		return sign.verify(Base64.getDecoder().decode(signature));
 	}
 	
 	// zip
