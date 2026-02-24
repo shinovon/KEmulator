@@ -6,9 +6,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 final class VServConnectionWrapper implements HttpConnection {
+	private static int redirectCounter = 0;
 	private String url;
-	private ByteArrayOutputStream output;
-	private boolean userAgentSet;
 
 	public VServConnectionWrapper(String url) {
 		this.url = url;
@@ -55,16 +54,10 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final void setRequestProperty(final String s, final String s2) throws IOException {
-		if ("user-agent".equalsIgnoreCase(s)) {
-			userAgentSet = true;
-		}
 	}
 
 	public final int getResponseCode() throws IOException {
-//		if (output != null) {
-//			System.out.println("output: " + new String(output.toByteArray(), "UTF-8"));
-//		}
-		return url.startsWith("vserv:") ? 200 : 302;
+		return url.startsWith("vserv:") || redirectCounter > 2 ? 200 : 302;
 	}
 
 	public final String getResponseMessage() throws IOException {
@@ -85,6 +78,7 @@ final class VServConnectionWrapper implements HttpConnection {
 
 	public final String getHeaderField(final String s) throws IOException {
 		if ("location".equalsIgnoreCase(s)) {
+			redirectCounter++;
 			return "vserv:";
 		}
 		if ("X-VSERV-CONTEXT".equals(s)) {
@@ -137,6 +131,6 @@ final class VServConnectionWrapper implements HttpConnection {
 	}
 
 	public final OutputStream openOutputStream() throws IOException {
-		return output = new ByteArrayOutputStream();
+		return new ByteArrayOutputStream();
 	}
 }
