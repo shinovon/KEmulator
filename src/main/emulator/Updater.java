@@ -12,6 +12,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,8 +61,7 @@ public class Updater {
 			String s = URL
 					+ Settings.updateBranch
 					+ (revision ? "/version.mf" : "/version.txt");
-			InputStream inputStream = getHttpStream(s);
-			try {
+			try (InputStream inputStream = getHttpStream(s)) {
 				if (revision) {
 					Properties p = new Properties();
 					p.load(inputStream);
@@ -70,16 +70,14 @@ public class Updater {
 					state = Emulator.revision.equals(s) ?
 							STATE_UP_TO_DATE : STATE_UPDATE_AVAILABLE;
 				} else {
-					s = new String(ResourceManager.getBytes(inputStream), "UTF-8");
-					if (s.length() == 0) throw new IOException();
+					s = new String(ResourceManager.getBytes(inputStream), StandardCharsets.UTF_8);
+					if (s.isEmpty()) throw new IOException();
 
 					state = Integer.parseInt(s) > Emulator.numericVersion ?
 							STATE_UPDATE_AVAILABLE : STATE_UP_TO_DATE;
 				}
 
 				return state;
-			} finally {
-				inputStream.close();
 			}
 		} catch (Exception e) {
 			Emulator.getEmulator().getLogStream().println("Failed to check updates");
@@ -114,7 +112,7 @@ public class Updater {
 
 		ArrayList<String> cmd = new ArrayList<String>();
 		String javaHome = System.getProperty("java.home");
-		cmd.add(javaHome == null || javaHome.length() == 0 ? "java" : (javaHome + (!Utils.win ? "/bin/java" : "/bin/java.exe")));
+		cmd.add(javaHome == null || javaHome.isEmpty() ? "java" : (javaHome + (!Utils.win ? "/bin/java" : "/bin/java.exe")));
 		cmd.add("-cp");
 		cmd.add(Emulator.getAbsolutePath() + File.separatorChar + "updater.jar");
 
@@ -178,19 +176,10 @@ public class Updater {
 	}
 
 	private static void download(String url, Path path) throws IOException {
-		ReadableByteChannel inChannel = null;
-		FileOutputStream fileStream = null;
-		FileChannel fileChannel = null;
-		try {
-			inChannel = Channels.newChannel(getHttpStream(url));
-			fileStream = new FileOutputStream(path.toFile());
-
-			fileChannel = fileStream.getChannel();
+		try (ReadableByteChannel inChannel = Channels.newChannel(getHttpStream(url));
+			 FileOutputStream fileStream = new FileOutputStream(path.toFile());
+			 FileChannel fileChannel = fileStream.getChannel()) {
 			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
-		} finally {
-			if (inChannel != null) inChannel.close();
-			if (fileChannel != null) fileChannel.close();
-			if (fileStream != null) fileStream.close();
 		}
 	}
 

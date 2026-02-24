@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -116,20 +117,13 @@ public class KEmulatorUpdater implements Runnable {
 			Thread.sleep(1000);
 			
 			kemulatorJar = kemulatorDir.resolve("KEmulator.jar");
-			Path kemulatorJarTmp = kemulatorDir.resolve("KEmulator.jar.tmp");
-//			if (!(Files.exists(kemulatorJar))) {
-//				state("KEmulator.jar is missing");
-//				exitDelay(3000);
-//				return;
-//			}
 
 			update: {
 				// get latest version
 				state("Obtaining latest version info");
 				try {
 					if ("stable".equals(branch)) {
-						int latest = Integer.parseInt(
-								getHttpString(UPDATE_URL + branch + "/version.txt"));
+						int latest = Integer.parseInt(getHttpString(UPDATE_URL + branch + "/version.txt"));
 						if (latest == currentVersion) {
 							state("Already up to date!");
 							Thread.sleep(3000);
@@ -143,16 +137,6 @@ public class KEmulatorUpdater implements Runnable {
 					fail("Failed to get latest version info", e);
 					return;
 				}
-				
-//				state("Deleting KEmulator.jar");
-//				try {
-//					if (Files.exists(kemulatorJar)) {
-//						Files.delete(kemulatorJar);
-//					}
-//				} catch (IOException e) {
-//					fail("Failed to delete KEmulator.jar", e);
-//					return;
-//				}
 				
 				try {
 					state("Downloading KEmulator.jar");
@@ -173,21 +157,11 @@ public class KEmulatorUpdater implements Runnable {
 				
 				if (!x64) {
 					try {
-						update(UPDATE_URL
-								+ branch + "/" + type + "/m3g_lwjgl.jar",
-								"m3g_lwjgl.jar");
-						update(UPDATE_URL
-								+ branch + "/" + type + "/m3g_swerve.jar",
-								"m3g_swerve.jar");
-						update(UPDATE_URL
-								+ branch + "/" + type + "/micro3d_gl.jar",
-								"micro3d_gl.jar");
-						update(UPDATE_URL
-								+ branch + "/" + type + "/micro3d_dll.jar",
-								"micro3d_dll.jar");
-						update(UPDATE_URL
-								+ branch + "/" + type + "/amrdecoder.dll",
-								"amrdecoder.dll");
+						update(UPDATE_URL + branch + "/" + type + "/m3g_lwjgl.jar", "m3g_lwjgl.jar");
+						update(UPDATE_URL + branch + "/" + type + "/m3g_swerve.jar", "m3g_swerve.jar");
+						update(UPDATE_URL + branch + "/" + type + "/micro3d_gl.jar", "micro3d_gl.jar");
+						update(UPDATE_URL + branch + "/" + type + "/micro3d_dll.jar", "micro3d_dll.jar");
+						update(UPDATE_URL + branch + "/" + type + "/amrdecoder.dll", "amrdecoder.dll");
 					} catch (IOException e) {
 						fail("Failed to download libraries", e);
 						return;
@@ -410,31 +384,19 @@ public class KEmulatorUpdater implements Runnable {
 	// http utils
 	
 	static void download(String url, Path path) throws IOException {
-		ReadableByteChannel inChannel = null;
-		FileOutputStream fileStream = null;
-		FileChannel fileChannel = null;
-		try {
-			inChannel = Channels.newChannel(getHttpStream(url));
-			fileStream = new FileOutputStream(path.toFile());
-			
-			fileChannel = fileStream.getChannel();
+		try (ReadableByteChannel inChannel = Channels.newChannel(getHttpStream(url));
+			 FileOutputStream fileStream = new FileOutputStream(path.toFile());
+			 FileChannel fileChannel = fileStream.getChannel()) {
 			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
-		} finally {
-			if (inChannel != null) inChannel.close();
-			if (fileChannel != null) fileChannel.close();
-			if (fileStream != null) fileStream.close();
 		}
 	}
-	
+
 	static String getHttpString(String url) throws IOException {
-		return new String(getHttpBytes(url), "UTF-8");
+		return new String(getHttpBytes(url), StandardCharsets.UTF_8);
 	}
 	
 	static byte[] getHttpBytes(String url) throws IOException {
-		InputStream inputStream = null;
-		try {
-			inputStream = getHttpStream(url);
-			
+		try (InputStream inputStream = getHttpStream(url)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			byte[] buffer = new byte[16384];
 			int read;
@@ -442,8 +404,6 @@ public class KEmulatorUpdater implements Runnable {
 				baos.write(buffer, 0, read);
 			}
 			return baos.toByteArray();
-		} finally {
-			if (inputStream != null) inputStream.close();
 		}
 	}
 	
@@ -506,14 +466,10 @@ public class KEmulatorUpdater implements Runnable {
 						Files.createDirectory(path);
 					}
 				} else {
-					FileOutputStream fileStream = new FileOutputStream(path.toFile());
-					try {
+					try (FileOutputStream fileStream = new FileOutputStream(path.toFile())) {
 						fileStream.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-					} finally {
-						fileStream.close();
 					}
 				}
-				
 			}
 		} finally {
 			zipStream.close();
