@@ -195,12 +195,20 @@ public class Updater {
 	}
 
 	private static InputStream getHttpStream(String url) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", "KEmulator/" + Emulator.version);
-		connection.setUseCaches(false);
-		int responseCode = connection.getResponseCode();
-		if (responseCode == 404) {
-			throw new FileNotFoundException(url);
+		HttpURLConnection connection;
+		while (true) {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setRequestProperty("User-Agent", "KEmulator/" + Emulator.version);
+			connection.setUseCaches(false);
+			int responseCode = connection.getResponseCode();
+			if (responseCode == 404) {
+				throw new FileNotFoundException(url);
+			}
+			if (responseCode == 301 || responseCode == 302) {
+				url = connection.getHeaderField("Location");
+				continue;
+			}
+			break;
 		}
 		InputStream inputStream = connection.getInputStream();
 		if (inputStream == null) {

@@ -457,7 +457,10 @@ public class KEmulatorUpdater implements Runnable {
 			if (responseCode == 404) {
 				throw new FileNotFoundException(url);
 			}
-			if (responseCode == 301 || responseCode == 302) continue;
+			if (responseCode == 301 || responseCode == 302) {
+				url = connection.getHeaderField("Location");
+				continue;
+			}
 			break;
 		}
 		InputStream inputStream = connection.getInputStream();
