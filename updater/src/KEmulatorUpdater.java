@@ -25,7 +25,7 @@ import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.6";
+	private static final String VERSION = "0.7";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
 	private static final String PUBLIC =
@@ -45,6 +45,7 @@ public class KEmulatorUpdater implements Runnable {
 	private static KEmulatorUpdater inst;
 
 	private static JLabel label;
+	private static JProgressBar progressBar;
 
 //	private static StringBuilder log = new StringBuilder();
 
@@ -59,6 +60,9 @@ public class KEmulatorUpdater implements Runnable {
 	private static boolean installed;
 	private static String jar;
 	private static String jad;
+
+	private static int length;
+	private static int progress;
 
 	public static void main(String[] args) {
 		kemulatorDir = Paths.get(".");
@@ -205,8 +209,10 @@ public class KEmulatorUpdater implements Runnable {
 		frame.setBounds(100, 100, 320, 100);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-		JProgressBar progressBar = new JProgressBar();
+		progressBar = new JProgressBar();
 		progressBar.setPreferredSize(new Dimension(-1, 20));
+		progressBar.setMinimum(0);
+		progressBar.setMaximum(100);
 		progressBar.setIndeterminate(true);
 		frame.getContentPane().add(progressBar, BorderLayout.SOUTH);
 		
@@ -384,10 +390,44 @@ public class KEmulatorUpdater implements Runnable {
 	// http utils
 	
 	static void download(String url, Path path) throws IOException {
-		try (ReadableByteChannel inChannel = Channels.newChannel(getHttpStream(url));
-			 FileOutputStream fileStream = new FileOutputStream(path.toFile());
-			 FileChannel fileChannel = fileStream.getChannel()) {
-			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
+		if (progressBar != null) {
+			EventQueue.invokeLater(() -> {
+				progressBar.setValue(0);
+				progressBar.setIndeterminate(false);
+			});
+		}
+
+		length = -1;
+		progress = 0;
+
+		try (InputStream in = getHttpStream(url);
+			 FileOutputStream fileStream = new FileOutputStream(path.toFile())) {
+			if (progressBar == null) {
+				length = -1;
+			} else if (length == -1) {
+				EventQueue.invokeLater(() -> {
+					progressBar.setIndeterminate(true);
+				});
+			}
+
+			byte[] buffer = new byte[64 * 1024];
+			int read;
+			while ((read = in.read(buffer)) != -1) {
+				fileStream.write(buffer, 0, read);
+				if (length != -1) {
+					progress += read;
+					EventQueue.invokeLater(() -> {
+						progressBar.setValue(Math.min(100, progress * 100 / length));
+					});
+				}
+			}
+		} finally {
+			if (progressBar != null) {
+				EventQueue.invokeLater(() -> {
+					progressBar.setValue(100);
+					progressBar.setIndeterminate(true);
+				});
+			}
 		}
 	}
 
@@ -423,6 +463,7 @@ public class KEmulatorUpdater implements Runnable {
 			}
 			break;
 		}
+		length = connection.getContentLength();
 		InputStream inputStream = connection.getInputStream();
 		if (inputStream == null) {
 			throw new IOException("No input stream");
