@@ -28,6 +28,7 @@ public class Updater {
 
 	private static final String URL = "https://nnproject.cc/kem/releases/";
 	private static final String UPDATER_URL = URL + "updater.jar";
+	@SuppressWarnings("SpellCheckingInspection")
 	private static final String PUBLIC =
 			"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtZlt6VdFb3lF0HxD88gs" +
 			"ToLdrBouEpR1t9fjTb0lpzk1VOgkNRkPkV3z5hfzOTa3qmpGrUGNXVZf8t+ULMv1" +

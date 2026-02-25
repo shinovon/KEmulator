@@ -28,6 +28,7 @@ public class KEmulatorUpdater implements Runnable {
 	private static final String VERSION = "0.7";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
+	@SuppressWarnings("SpellCheckingInspection")
 	private static final String PUBLIC =
 			"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtZlt6VdFb3lF0HxD88gs" +
 			"ToLdrBouEpR1t9fjTb0lpzk1VOgkNRkPkV3z5hfzOTa3qmpGrUGNXVZf8t+ULMv1" +
@@ -229,7 +230,7 @@ public class KEmulatorUpdater implements Runnable {
 	}
 	
 	static void start() throws IOException {
-		ArrayList<String> cmd = new ArrayList<String>();
+		ArrayList<String> cmd = new ArrayList<>();
 		String os = System.getProperty("os.name").toLowerCase();
 		java: {
 			Path javaExe = kemulatorDir.resolve("jre").resolve("bin").resolve("java.exe");
@@ -301,7 +302,7 @@ public class KEmulatorUpdater implements Runnable {
 			cmd.add(jad);
 		}
 		
-		new ProcessBuilder(new String[0])
+		new ProcessBuilder()
 			.directory(kemulatorDir.toFile())
 			.command(cmd)
 			.start();
