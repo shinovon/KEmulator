@@ -37,7 +37,7 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrack() {
-		PhraseTrackImpl t = impl.createTrack();
+		PhraseTrackImpl t = impl.createTrack(-1);
 		return tracks[t.getID()] = new PhraseTrack(t);
 	}
 

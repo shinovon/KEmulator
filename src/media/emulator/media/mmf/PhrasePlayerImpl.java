@@ -39,15 +39,18 @@ public class PhrasePlayerImpl {
 		return inst;
 	}
 
-	public PhraseTrackImpl createTrack() {
-		int id = -1;
-		for (int i = 0; i < tracks.length; ++i) {
-			if (tracks[i] == null) {
-				id = i;
-				break;
-			}
-		}
+	public PhraseTrackImpl createTrack(int id) {
 		if (id == -1) {
+			for (int i = 0; i < tracks.length; ++i) {
+				if (tracks[i] == null) {
+					id = i;
+					break;
+				}
+			}
+			if (id == -1) {
+				throw new IllegalStateException();
+			}
+		} else if (tracks[id] != null) {
 			throw new IllegalStateException();
 		}
 		PhraseTrackImpl t = new PhraseTrackImpl(id, this);
@@ -55,18 +58,21 @@ public class PhrasePlayerImpl {
 		return t;
 	}
 
-	public AudioPhraseTrackImpl createAudioTrack() {
+	public AudioPhraseTrackImpl createAudioTrack(int id) {
 		if (audioTracks == null) {
 			throw new IllegalStateException();
 		}
-		int id = -1;
-		for (int i = 0; i < audioTracks.length; ++i) {
-			if (audioTracks[i] == null) {
-				id = i;
-				break;
-			}
-		}
 		if (id == -1) {
+			for (int i = 0; i < audioTracks.length; ++i) {
+				if (audioTracks[i] == null) {
+					id = i;
+					break;
+				}
+			}
+			if (id == -1) {
+				throw new IllegalStateException();
+			}
+		} else if (audioTracks[id] != null) {
 			throw new IllegalStateException();
 		}
 		AudioPhraseTrackImpl t = new AudioPhraseTrackImpl(id);

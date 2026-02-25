@@ -26,7 +26,7 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrack() {
-		PhraseTrackImpl impl = this.impl.createTrack();
+		PhraseTrackImpl impl = this.impl.createTrack(-1);
 		useFlag[impl.getID()] = true;
 		PhraseTrack t = tracks[impl.getID()] = new PhraseTrack(impl);
 		impl.setEventListener(t);
@@ -37,8 +37,15 @@ public class PhrasePlayer {
 		return trackCount;
 	}
 
-	public PhraseTrack getTrack(int id) {
-		return tracks[id];
+	public PhraseTrack getTrack(int track) {
+		if (track < 0 || track >= tracks.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		PhraseTrack t = tracks[track];
+		if (t == null) {
+			tracks[track] = t = new PhraseTrack(impl.createTrack(track));
+		}
+		return t;
 	}
 
 	public PhraseTrack getTrackPair() {

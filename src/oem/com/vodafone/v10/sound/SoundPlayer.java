@@ -25,14 +25,21 @@ public class SoundPlayer {
 	}
 
 	public SoundTrack getTrack() {
-		PhraseTrackImpl impl = this.impl.createTrack();
+		PhraseTrackImpl impl = this.impl.createTrack(-1);
 		SoundTrack t = tracks[impl.getID()] = new SoundTrack(impl);
 		impl.setEventListener(t);
 		return t;
 	}
 
-	public SoundTrack getTrack(int i) {
-		return tracks[i];
+	public SoundTrack getTrack(int track) {
+		if (track < 0 || track >= tracks.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		SoundTrack t = tracks[track];
+		if (t == null) {
+			tracks[track] = t = new SoundTrack(impl.createTrack(track));
+		}
+		return t;
 	}
 
 	public int getTrackCount() {

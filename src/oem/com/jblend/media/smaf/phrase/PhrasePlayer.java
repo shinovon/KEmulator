@@ -35,12 +35,12 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrack() {
-		PhraseTrackImpl t = impl.createTrack();
+		PhraseTrackImpl t = impl.createTrack(-1);
 		return tracks[t.getID()] = new PhraseTrack(t);
 	}
 
 	public AudioPhraseTrack getAudioTrack() {
-		AudioPhraseTrackImpl t = impl.createAudioTrack();
+		AudioPhraseTrackImpl t = impl.createAudioTrack(-1);
 		return audioTracks[t.getID()] = new AudioPhraseTrack(t);
 	}
 
@@ -53,11 +53,25 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrack(int track) {
-		return tracks[track];
+		if (track < 0 || track >= tracks.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		PhraseTrack t = tracks[track];
+		if (t == null) {
+			tracks[track] = t = new PhraseTrack(impl.createTrack(track));
+		}
+		return t;
 	}
 
 	public AudioPhraseTrack getAudioTrack(int track) {
-		return audioTracks[track];
+		if (track < 0 || track >= audioTracks.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		AudioPhraseTrack t = audioTracks[track];
+		if (t == null) {
+			audioTracks[track] = t = new AudioPhraseTrack(impl.createAudioTrack(track));
+		}
+		return t;
 	}
 
 	public void disposeTrack(PhraseTrack t) {
