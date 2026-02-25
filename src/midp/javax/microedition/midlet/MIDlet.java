@@ -52,7 +52,7 @@ public abstract class MIDlet {
 			if (url.startsWith("vlc.exe \"")) {
 				url = "vlc:" + url.substring(9, url.length() - 1);
 			}
-			String protocol = url.substring(0, url.indexOf(':') - 1);
+			String protocol = url.substring(0, url.indexOf(':'));
 			if (!"http".equals(protocol) && !"https".equals(protocol) && !"file".equals(protocol)
 					&& !"tel".equals(protocol) && !"mailto".equals(protocol)) {
 				if (Settings.hideEmulation || !"vlc".equals(protocol)) {
