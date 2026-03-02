@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/nokia" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/oem" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/3d" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/eclipse" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
