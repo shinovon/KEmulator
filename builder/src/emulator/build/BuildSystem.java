@@ -6,6 +6,7 @@ package emulator.build;
 import emulator.Emulator;
 import emulator.Utils;
 import emulator.ui.swt.devutils.ClasspathEntry;
+import emulator.ui.swt.devutils.ClasspathEntryType;
 import emulator.ui.swt.devutils.idea.ProjectConfigGenerator;
 import emulator.ui.swt.devutils.idea.ProjectGenerator;
 
@@ -265,12 +266,29 @@ public class BuildSystem {
 		// proguard merge & preverify & obfuscation
 
 		try {
-			String localConfig = ProjectConfigGenerator.buildLocalProguardConfig(projectRoot.toString(), projectName, classpath);
+			StringBuilder localConfig = new StringBuilder(ProjectConfigGenerator.buildLocalProguardConfig(projectRoot.toString(), projectName, classpath));
 			if (!obfuscate) {
-				localConfig += "-dontoptimize -dontshrink -dontobfuscate" + System.lineSeparator() +
-						"-keep class *" + System.lineSeparator();
+				localConfig.append("-dontoptimize -dontshrink -dontobfuscate").append(System.lineSeparator());
+				localConfig.append("-keep class *").append(System.lineSeparator());
 			}
-			Files.write(projectRoot.resolve("deployed").resolve("raw").resolve("build.cfg"), localConfig.getBytes(StandardCharsets.UTF_8));
+			ArrayList<String> inJars = new ArrayList<>();
+			inJars.add(projectRoot.resolve(workingJarName).toAbsolutePath().toString());
+			for (ClasspathEntry c : classpath) {
+				if (c.type != ClasspathEntryType.ExportedLibrary)
+					continue;
+				if (c.isLocalPath)
+					inJars.add(projectRoot.resolve(c.path).toString());
+				else
+					inJars.add(c.path);
+			}
+			for (String jar : inJars) {
+				localConfig.append("-injars \"");
+				localConfig.append(jar);
+				localConfig.append("\"");
+				localConfig.append(System.lineSeparator());
+			}
+			localConfig.append("-outjars \"").append(projectRoot.resolve("deployed").resolve(projectName + ".jar")).append("\"").append(System.lineSeparator());
+			Files.write(projectRoot.resolve("deployed").resolve("raw").resolve("build.cfg"), localConfig.toString().getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			System.out.println("Failed to generate proguard config");
 			e.printStackTrace();
