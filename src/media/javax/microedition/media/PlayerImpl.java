@@ -53,7 +53,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private InputStream inputStream;
 	private boolean realized;
 
-	private int maSound;
+	private int maSound = -1;
 	private int maFormat;
 	private static PlayerImpl maOwner;
 
@@ -325,9 +325,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				EmulatorMIDI.close(false);
 			}
 		} else if (sequence instanceof MaDll) {
-			if (maOwner == this && maSound != 0) {
+			if (maOwner == this && maSound != -1) {
 				((MaDll) sequence).close(maFormat, maSound);
-				maSound = 0;
+				maSound = -1;
 			}
 		}
 //		else if (sequence instanceof Clip) {
@@ -362,9 +362,9 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			} catch (MediaException ignored) {}
 		}
 		if (sequence instanceof MaDll) {
-			if (maOwner == this && maSound != 0) {
+			if (maOwner == this && maSound != -1) {
 				((MaDll) sequence).close(maFormat, maSound);
-				maSound = 0;
+				maSound = -1;
 			}
 		}
 //		if (sequence instanceof Clip) {
@@ -413,7 +413,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				return -1;
 			}
 		} else if (sequence instanceof MaDll) {
-			if (maOwner == this && maSound != 0) {
+			if (maOwner == this && maSound != -1) {
 				return ((MaDll) sequence).getLength(maFormat, maSound) * 1000L;
 			} else {
 				return TIME_UNKNOWN;
@@ -442,7 +442,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			return mediaTime = ((emulator.javazoom.jl.player.Player) sequence).getPosition() * 1000L;
 		}
 		if (sequence instanceof MaDll) {
-			if (maOwner == this && maSound != 0) {
+			if (maOwner == this && maSound != -1) {
 				return ((MaDll) sequence).getPosition(maFormat, maSound) * 1000L;
 			}
 		}
@@ -487,7 +487,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				throw new MediaException(e);
 			}
 		} else if (sequence instanceof MaDll) {
-			if (maOwner == this && maSound != 0) {
+			if (maOwner == this && maSound != -1) {
 				((MaDll) sequence).seek(maFormat, maSound, (int) (t / 1000L));
 			}
 		}
@@ -687,7 +687,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					if (maOwner != this) {
 						throw new MediaException("Player instance is no longer valid");
 					}
-					if (maSound == 0) {
+					if (maSound == -1) {
 						return;
 					}
 				}
@@ -723,7 +723,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			return;
 		}
 		if (sequence instanceof MaDll) {
-			if (maOwner == this && maSound != 0) {
+			if (maOwner == this && maSound != -1) {
 				try {
 					((MaDll) sequence).pause(maFormat, maSound);
 				} catch (Exception ignored) {}
@@ -919,7 +919,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			return;
 		}
 		if (sequence instanceof MaDll) {
-			if (maOwner == this && maSound != 0) {
+			if (maOwner == this && maSound != -1) {
 				((MaDll) sequence).setVolume(maFormat, maSound, n);
 			}
 		}

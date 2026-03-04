@@ -201,7 +201,7 @@ public class MaDll {
 		}
 	}
 
-	private Map<Integer, MaFormatInstance> formats = new HashMap<>();
+	private final Map<Integer, MaFormatInstance> formats = new HashMap<>();
 
 	private int EmuBuf;
 
@@ -316,9 +316,7 @@ public class MaDll {
 			initFormat(FORMAT_MMF);
 			success = true;
 		} finally {
-			if (!success) {
-				destroy();
-			}
+			if (!success) destroy();
 		}
 	}
 
@@ -454,6 +452,7 @@ public class MaDll {
 			}
 			((MaSound) library).MaSound_Delete(format.id);
 		}
+		formats.clear();
 
 		if (phraseInitialized) {
 			// TODO api may still refer to deallocated tracks
