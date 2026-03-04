@@ -1,5 +1,6 @@
-$v2.21.3 [2026.03.03]
+$v2.21.3 [2026.03.04]
 Improved automatic updates security
+Added MIDI playback with MA-3/MA-5 emulator option
 Added 640x480 device preset
 Fixed non-functional platformRequest
 Fixed SMAF phrase player

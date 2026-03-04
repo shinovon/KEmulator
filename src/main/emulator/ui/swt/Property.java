@@ -232,6 +232,7 @@ public final class Property implements IProperty, SelectionListener {
 
 	private int lastChangedFont;
 	private Button showAppSettingsBtn;
+	private Button maMidiCheck;
 
 	public Property() {
 		super();
@@ -858,6 +859,8 @@ public final class Property implements IProperty, SelectionListener {
 
 		Settings.storeCreatedImages = storeCreatedImagesBtn.getSelection();
 		Settings.showAppSettingsOnStart = showAppSettingsBtn.getSelection();
+
+		Settings.maMidi = maMidiCheck.getSelection();
 
 		this.updateProxy();
 	}
@@ -1744,6 +1747,11 @@ public final class Property implements IProperty, SelectionListener {
 		globalMidiCheck.setText(UILocale.get("OPTION_MEDIA_GLOBAL_MIDI", "Allow only one MIDI playback at time (reduces lag)"));
 		globalMidiCheck.setLayoutData(fillHor5);
 		globalMidiCheck.setSelection(Settings.oneMidiAtTime);
+
+		maMidiCheck = new Button(mediaGroup, SWT.CHECK);
+		maMidiCheck.setText("Use MaSmw emulator for MIDI playback (experimental)");
+		maMidiCheck.setLayoutData(fillHor5);
+		maMidiCheck.setSelection(Settings.maMidi);
 
 		vlcCheck = new Button(mediaGroup, SWT.CHECK);
 		vlcCheck.setText("Enable VLC Player");
