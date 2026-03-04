@@ -860,7 +860,7 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.storeCreatedImages = storeCreatedImagesBtn.getSelection();
 		Settings.showAppSettingsOnStart = showAppSettingsBtn.getSelection();
 
-		Settings.maMidi = maMidiCheck.getSelection();
+		if (maMidiCheck != null) Settings.maMidi = maMidiCheck.getSelection();
 
 		this.updateProxy();
 	}
@@ -1748,10 +1748,12 @@ public final class Property implements IProperty, SelectionListener {
 		globalMidiCheck.setLayoutData(fillHor5);
 		globalMidiCheck.setSelection(Settings.oneMidiAtTime);
 
-		maMidiCheck = new Button(mediaGroup, SWT.CHECK);
-		maMidiCheck.setText("Use MA-3/5 emulator for MIDI playback (experimental)");
-		maMidiCheck.setLayoutData(fillHor5);
-		maMidiCheck.setSelection(Settings.maMidi);
+		if (!Emulator.isX64()) {
+			maMidiCheck = new Button(mediaGroup, SWT.CHECK);
+			maMidiCheck.setText("Use MA-3/5 emulator for MIDI playback (experimental)");
+			maMidiCheck.setLayoutData(fillHor5);
+			maMidiCheck.setSelection(Settings.maMidi);
+		}
 
 		vlcCheck = new Button(mediaGroup, SWT.CHECK);
 		vlcCheck.setText("Enable VLC Player");

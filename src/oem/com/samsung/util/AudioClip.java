@@ -82,7 +82,7 @@ public class AudioClip {
 
 	public int getStatus() {
 		if (mmfSound != -1) {
-			int s = MMFPlayer.getMaDll().getStatus(mmfSound);
+			int s = MMFPlayer.getMaDll().getStatus(MaDll.FORMAT_MMF, mmfSound);
 			if (s == MaDll.STATE_PAUSED) {
 				return STATUS_PAUSE;
 			}
@@ -102,8 +102,8 @@ public class AudioClip {
 		if (this.type == TYPE_MMF) {
 			if (this.mmfInit) {
 				if (mmfSound != -1) {
-					if (MMFPlayer.getMaDll().getStatus(mmfSound) == MaDll.STATE_PLAYING) {
-						MMFPlayer.getMaDll().pause(mmfSound);
+					if (MMFPlayer.getMaDll().getStatus(MaDll.FORMAT_MMF, mmfSound) == MaDll.STATE_PLAYING) {
+						MMFPlayer.getMaDll().pause(MaDll.FORMAT_MMF, mmfSound);
 					}
 					return;
 				}
@@ -136,11 +136,11 @@ public class AudioClip {
 			if (this.mmfInit) {
 				try {
 					if (mmfSound == -1) {
-						mmfSound = MMFPlayer.getMaDll().load(data);
+						mmfSound = MMFPlayer.getMaDll().load(MaDll.FORMAT_MMF, data);
 					}
-					if (mmfSound != -1 && MMFPlayer.getMaDll().getStatus(mmfSound) == MaDll.STATE_READY) {
-						MMFPlayer.getMaDll().setVolume(mmfSound, (v * 100) / 5);
-						MMFPlayer.getMaDll().start(mmfSound, l);
+					if (mmfSound != -1 && MMFPlayer.getMaDll().getStatus(MaDll.FORMAT_MMF, mmfSound) == MaDll.STATE_READY) {
+						MMFPlayer.getMaDll().setVolume(MaDll.FORMAT_MMF, mmfSound, (v * 100) / 5);
+						MMFPlayer.getMaDll().start(MaDll.FORMAT_MMF, mmfSound, l);
 					}
 					return;
 				} catch (Exception e) {
@@ -164,7 +164,7 @@ public class AudioClip {
 	public void resume() {
 		if (this.type == TYPE_MMF) {
 			if (this.mmfInit) {
-				MMFPlayer.getMaDll().resume(mmfSound);
+				MMFPlayer.getMaDll().resume(MaDll.FORMAT_MMF, mmfSound);
 				return;
 			}
 			this.status = STATUS_PLAY;
@@ -180,8 +180,8 @@ public class AudioClip {
 	public void stop() {
 		if (this.type == TYPE_MMF) {
 			if (this.mmfInit) {
-				if (MMFPlayer.getMaDll().getStatus(mmfSound) < MaDll.STATE_PLAYING) {
-					MMFPlayer.getMaDll().stop(mmfSound);
+				if (MMFPlayer.getMaDll().getStatus(MaDll.FORMAT_MMF, mmfSound) < MaDll.STATE_PLAYING) {
+					MMFPlayer.getMaDll().stop(MaDll.FORMAT_MMF, mmfSound);
 				}
 				this.status = STATUS_STOP;
 				return;
@@ -206,7 +206,7 @@ public class AudioClip {
 	protected void finalize() {
 		if (mmfSound == -1) return;
 		try {
-			MMFPlayer.getMaDll().close(mmfSound);
+			MMFPlayer.getMaDll().close(MaDll.FORMAT_MMF, mmfSound);
 		} catch (Throwable ignored) {}
 	}
 

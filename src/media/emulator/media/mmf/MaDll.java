@@ -192,25 +192,36 @@ public class MaDll {
 
 	// region Sound
 
-	private final Map<Integer, Memory> sounds = new HashMap<>();
+	private static class MaFormatInstance {
+		final int id;
+		final Map<Integer, Memory> sounds = new HashMap<>();
+
+		MaFormatInstance(int id) {
+			this.id = id;
+		}
+	}
+
+	private Map<Integer, MaFormatInstance> formats = new HashMap<>();
 
 	private int EmuBuf;
-	private int instanceId = -1;
+
+	public static final int FORMAT_MMF = 1;
+	public static final int FORMAT_PHR = 2;
+	public static final int FORMAT_RMD = 3;
+	public static final int FORMAT_MID = 5;
+	public static final int FORMAT_WAV = 11;
 
 	public static final int STATE_READY = 3;
 	public static final int STATE_PLAYING = 4;
 	public static final int STATE_PAUSED = 5;
 
-	public synchronized void init(boolean midi) {
-		if (instanceId != -1) {
-			return;
-		}
-
+	public synchronized void init() {
 		if (EmuBuf != 0) {
 			Native.free(EmuBuf);
 			EmuBuf = 0;
 		}
 
+		boolean success = false;
 		try {
 			int r;
 			if (mode == MODE_MA3) {
@@ -244,10 +255,6 @@ public class MaDll {
 					throw new RuntimeException("MaSound_DeviceControl: " + r);
 				}
 			} else if (mode == MODE_MA7) {
-				if (midi) {
-					throw new RuntimeException("MIDI mode is not supported with MA-7");
-				}
-
 				Memory config = new Memory(72);
 				config.clear();
 
@@ -306,137 +313,146 @@ public class MaDll {
 					throw new RuntimeException("MaSound_Initialize: " + r);
 				}
 			}
-			if ((r = ((MaSound) library).MaSound_Create(midi ? 5 : 1)) < 0) {
-				throw new RuntimeException("MaSound_Create: " + r);
-			}
-			instanceId = r;
+			initFormat(FORMAT_MMF);
+			success = true;
 		} finally {
-			if (instanceId == -1) {
+			if (!success) {
 				destroy();
 			}
 		}
 	}
 
-	public synchronized int load(byte[] data) {
+	public synchronized void initFormat(int format) {
+		if (formats.containsKey(format)) return;
+
+		int r;
+		if ((r = ((MaSound) library).MaSound_Create(format)) < 0) {
+			throw new RuntimeException("MaSound_Create: " + r);
+		}
+		formats.put(format, new MaFormatInstance(r));
+	}
+
+	public synchronized int load(int format, byte[] data) {
+		int formatId = formats.get(format).id;
+
 		Memory ptr = new Memory(data.length);
 		ptr.write(0, data, 0, data.length);
 
 		int r;
-		if ((r = ((MaSound) library).MaSound_Load(instanceId, ptr, data.length, 0, 0, 0)) < 1) {
+		if ((r = ((MaSound) library).MaSound_Load(formatId, ptr, data.length, 0, 0, 0)) < 1) {
 			throw new RuntimeException("MaSound_Load: " + r);
 		}
 		int sound = r;
 
-		if ((r = ((MaSound) library).MaSound_Open(instanceId, sound, 0, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Open(formatId, sound, 0, 0)) != 0) {
 			throw new RuntimeException("MaSound_Open: " + r);
 		}
-		if ((r = ((MaSound) library).MaSound_Standby(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Standby(formatId, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Standby: " + r);
 		}
 
-		setVolume(sound, 127);
-		setPitch(sound, 0);
-		setTempo(sound, 100);
-		seek(sound, 0);
+		setVolume(formatId, sound, 127);
+		setPitch(formatId, sound, 0);
+		setTempo(formatId, sound, 100);
+		seek(formatId, sound, 0);
 
-		sounds.put(sound, ptr);
+		formats.get(format).sounds.put(sound, ptr);
 
 		return sound;
 	}
 
-	public synchronized void seek(int sound, int pos) {
+	public synchronized void seek(int format, int sound, int pos) {
 		int r;
-		if ((r = ((MaSound) library).MaSound_Seek(instanceId, sound, pos, 0, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Seek(formats.get(format).id, sound, pos, 0, 0)) != 0) {
 			throw new RuntimeException("MaSound_Seek: " + r);
 		}
 	}
 
 	// 0..127
-	public synchronized void setVolume(int sound, int volume) {
+	public synchronized void setVolume(int format, int sound, int volume) {
 		Memory p = new Memory(4);
 		p.setInt(0, volume);
 		int r;
-		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 0, p, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(formats.get(format).id, sound, 0, p, 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
 
 	// -12..+12
-	public synchronized void setPitch(int sound, int pitch) {
+	public synchronized void setPitch(int format, int sound, int pitch) {
 		Memory p = new Memory(4);
 		p.setInt(0, pitch);
 		int r;
-		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 2, p, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(formats.get(format).id, sound, 2, p, 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
 
 	// 70..130
-	public synchronized void setTempo(int sound, int tempo) {
+	public synchronized void setTempo(int format, int sound, int tempo) {
 		Memory p = new Memory(4);
 		p.setInt(0, tempo);
 		int r;
-		if ((r = ((MaSound) library).MaSound_Control(instanceId, sound, 1, p, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Control(formats.get(format).id, sound, 1, p, 0)) != 0) {
 			throw new RuntimeException("MaSound_Control: " + r);
 		}
 	}
 
-	public synchronized void start(int sound, int loops) {
+	public synchronized void start(int format, int sound, int loops) {
 		int r;
-		if ((r = ((MaSound) library).MaSound_Start(instanceId, sound, loops, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Start(formats.get(format).id, sound, loops, 0)) != 0) {
 			throw new RuntimeException("MaSound_Start: " + r);
 		}
 	}
 
-	public synchronized void stop(int sound) {
+	public synchronized void stop(int format, int sound) {
 		int r;
-		if ((r = ((MaSound) library).MaSound_Stop(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Stop(formats.get(format).id, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Stop: " + r);
 		}
 	}
 
-	public synchronized void pause(int sound) {
+	public synchronized void pause(int format, int sound) {
 		int r;
-		if ((r = ((MaSound) library).MaSound_Pause(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Pause(formats.get(format).id, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Pause: " + r);
 		}
 	}
 
-	public synchronized void resume(int sound) {
+	public synchronized void resume(int format, int sound) {
 		int r;
-		if ((r = ((MaSound) library).MaSound_Restart(instanceId, sound, 0)) != 0) {
+		if ((r = ((MaSound) library).MaSound_Restart(formats.get(format).id, sound, 0)) != 0) {
 			throw new RuntimeException("MaSound_Restart: " + r);
 		}
 	}
 
-	public synchronized int getStatus(int sound) {
-		return ((MaSound) library).MaSound_Control(instanceId, sound, 6, Pointer.NULL, 0);
+	public synchronized int getStatus(int format, int sound) {
+		return ((MaSound) library).MaSound_Control(formats.get(format).id, sound, 6, Pointer.NULL, 0);
 	}
 
-	public synchronized int getLength(int sound) {
-		return ((MaSound) library).MaSound_Control(instanceId, sound, 5, Pointer.NULL, 0);
+	public synchronized int getLength(int format, int sound) {
+		return ((MaSound) library).MaSound_Control(formats.get(format).id, sound, 5, Pointer.NULL, 0);
 	}
 
-	public synchronized int getPosition(int sound) {
-		return ((MaSound) library).MaSound_Control(instanceId, sound, 4, Pointer.NULL, 0);
+	public synchronized int getPosition(int format, int sound) {
+		return ((MaSound) library).MaSound_Control(formats.get(format).id, sound, 4, Pointer.NULL, 0);
 	}
 
-	public synchronized void close(int sound) {
-		((MaSound) library).MaSound_Stop(instanceId, sound, 0);
-		((MaSound) library).MaSound_Close(instanceId, sound, 0);
-		((MaSound) library).MaSound_Unload(instanceId, sound, 0);
-		sounds.remove(sound);
+	public synchronized void close(int format, int sound) {
+		((MaSound) library).MaSound_Stop(formats.get(format).id, sound, 0);
+		((MaSound) library).MaSound_Close(formats.get(format).id, sound, 0);
+		((MaSound) library).MaSound_Unload(formats.get(format).id, sound, 0);
+		formats.get(format).sounds.remove(sound);
 	}
 
 	public synchronized void destroy() {
-		for (Integer sound : sounds.keySet()) {
-			((MaSound) library).MaSound_Stop(instanceId, sound, 0);
-			((MaSound) library).MaSound_Close(instanceId, sound, 0);
-			((MaSound) library).MaSound_Unload(instanceId, sound, 0);
-		}
-		if (instanceId != -1) {
-			((MaSound) library).MaSound_Delete(instanceId);
-			instanceId = -1;
+		for (MaFormatInstance format : formats.values()) {
+			for (Integer sound : format.sounds.keySet()) {
+				((MaSound) library).MaSound_Stop(format.id, sound, 0);
+				((MaSound) library).MaSound_Close(format.id, sound, 0);
+				((MaSound) library).MaSound_Unload(format.id, sound, 0);
+			}
+			((MaSound) library).MaSound_Delete(format.id);
 		}
 
 		if (phraseInitialized) {
@@ -476,12 +492,14 @@ public class MaDll {
 			return;
 		}
 		try {
-			if (!sounds.isEmpty()) {
-				for (Integer id : sounds.keySet()) {
-					if (getStatus(id) == STATE_PLAYING) {
-						throw new RuntimeException();
+			for (Map.Entry<Integer, MaFormatInstance> entry : formats.entrySet()) {
+				if (!entry.getValue().sounds.isEmpty()) {
+					for (Integer id : entry.getValue().sounds.keySet()) {
+						if (getStatus(entry.getKey(), id) == STATE_PLAYING) {
+							throw new RuntimeException();
+						}
+						close(entry.getKey(), id);
 					}
-					close(id);
 				}
 			}
 		} catch (Exception ignored) {}

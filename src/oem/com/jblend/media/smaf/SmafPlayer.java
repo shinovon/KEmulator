@@ -93,7 +93,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		}
 		error = false;
 		if (sound != 0) {
-			MMFPlayer.getMaDll().close(sound);
+			MMFPlayer.getMaDll().close(MaDll.FORMAT_MMF, sound);
 			sound = 0;
 		}
 		this.data = data;
@@ -101,7 +101,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 			return;
 		}
 		try {
-			sound = MMFPlayer.getMaDll().load(data.data);
+			sound = MMFPlayer.getMaDll().load(MaDll.FORMAT_MMF, data.data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			error = true;
@@ -121,7 +121,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 //			throw new IllegalStateException();
 			return;
 		}
-		MMFPlayer.getMaDll().start(sound, count);
+		MMFPlayer.getMaDll().start(MaDll.FORMAT_MMF, sound, count);
 	}
 
 	public void stop() {
@@ -130,7 +130,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 //			throw new IllegalStateException();
 			return;
 		}
-		MMFPlayer.getMaDll().stop(sound);
+		MMFPlayer.getMaDll().stop(MaDll.FORMAT_MMF, sound);
 	}
 
 	public void pause() {
@@ -139,7 +139,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 //			throw new IllegalStateException();
 			return;
 		}
-		MMFPlayer.getMaDll().pause(sound);
+		MMFPlayer.getMaDll().pause(MaDll.FORMAT_MMF, sound);
 	}
 
 	public void resume() {
@@ -148,7 +148,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 //			throw new IllegalStateException();
 			return;
 		}
-		MMFPlayer.getMaDll().resume(sound);
+		MMFPlayer.getMaDll().resume(MaDll.FORMAT_MMF, sound);
 	}
 
 	public int getState() {
@@ -158,7 +158,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (data == null || sound == 0) {
 			return NO_DATA;
 		}
-		int status = MMFPlayer.getMaDll().getStatus(sound);
+		int status = MMFPlayer.getMaDll().getStatus(MaDll.FORMAT_MMF, sound);
 		if (status == MaDll.STATE_PAUSED) {
 			return PAUSED;
 		} else if (status == MaDll.STATE_PLAYING) {
@@ -191,7 +191,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (time < 0) {
 			throw new IllegalArgumentException();
 		}
-		MMFPlayer.getMaDll().seek(sound, time);
+		MMFPlayer.getMaDll().seek(MaDll.FORMAT_MMF, sound, time);
 	}
 
 	public void setPlayEnd(int pos) {
@@ -205,7 +205,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (speed < 70 || speed > 130) {
 			throw new IllegalArgumentException();
 		}
-		MMFPlayer.getMaDll().setTempo(sound, this.speed = speed);
+		MMFPlayer.getMaDll().setTempo(MaDll.FORMAT_MMF, sound, this.speed = speed);
 	}
 
 	public void setTranspose(int shift) {
@@ -215,7 +215,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (shift < -12 || shift > 12) {
 			throw new IllegalArgumentException();
 		}
-		MMFPlayer.getMaDll().setPitch(sound, this.transpose = shift);
+		MMFPlayer.getMaDll().setPitch(MaDll.FORMAT_MMF, sound, this.transpose = shift);
 	}
 
 	public void setVolume(int volume) {
@@ -225,14 +225,14 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (volume < 0 || volume > 127) {
 			throw new IllegalArgumentException();
 		}
-		MMFPlayer.getMaDll().setVolume(sound, this.volume = volume);
+		MMFPlayer.getMaDll().setVolume(MaDll.FORMAT_MMF, sound, this.volume = volume);
 	}
 
 	public int getCurrent() {
 		if (sound == 0) {
 			throw new IllegalStateException();
 		}
-		return MMFPlayer.getMaDll().getPosition(sound);
+		return MMFPlayer.getMaDll().getPosition(MaDll.FORMAT_MMF, sound);
 	}
 
 	// TODO events
@@ -256,7 +256,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 	protected void finalize() {
 		try {
 			if (sound != 0) {
-				MMFPlayer.getMaDll().close(sound);
+				MMFPlayer.getMaDll().close(MaDll.FORMAT_MMF, sound);
 				sound = 0;
 			}
 		} catch (Exception ignored) {}

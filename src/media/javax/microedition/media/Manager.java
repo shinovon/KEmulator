@@ -237,7 +237,6 @@ public class Manager {
 	static {
 		// KEmulator supported types
 		kemAudio = new Vector<String>();
-		kemAudio.add("audio/mid");
 		kemAudio.add("audio/midi");
 		kemAudio.add("audio/x-midi");
 		kemAudio.add("audio/wav");
@@ -247,6 +246,10 @@ public class Manager {
 		kemAudio.add("audio/x-amr");
 		kemAudio.add("audio/mpeg");
 		kemAudio.add("audio/mp3");
+		if (!Emulator.isX64()) {
+			kemAudio.add("audio/xmmf");
+			kemAudio.add("audio/x-smaf");
+		}
 		kemVideo = new Vector<String>();
 		// Supported types with libvlc
 		vlcAudio = new Vector<String>();

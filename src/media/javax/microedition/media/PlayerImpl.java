@@ -54,8 +54,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private boolean realized;
 
 	private int maSound;
+	private int maFormat;
 	private static PlayerImpl maOwner;
-	private boolean mmf;
 
 	private static final Vector<WavCache> wavCache = new Vector<WavCache>();
 
@@ -105,7 +105,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		this.inputStream = inputStream;
 	}
 
-	private void amr(final InputStream inputStream) throws IOException {
+	private void amr(final InputStream inputStream, boolean fail) throws IOException {
 		controls = new Control[]{toneControl, volumeControl};
 		try {
 			final byte[] b;
@@ -130,13 +130,14 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			clip.open(audioInputStream);
 			sequence = clip;
 		} catch (Throwable e) {
+			if (fail) throw new IOException();
 			Emulator.getEmulator().getLogStream().println("AMR realize error: " + e);
 			sequence = null;
 			//throw new IOException("AMR realize error", e);
 		}
 	}
 
-	private void wav(InputStream inputStream) throws IOException {
+	private void wav(InputStream inputStream, boolean fail) throws IOException {
 		controls = new Control[]{toneControl, volumeControl};
 		byte[] data;
 		WavCache key = null;
@@ -191,20 +192,22 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				}
 			}
 		} catch (Exception e) {
+			if (fail) throw new IOException();
 			Emulator.getEmulator().getLogStream().println("WAV realize error: " + e);
 			sequence = null;
 		}
 	}
 
-	private void midi(final InputStream inputStream) throws IOException {
+	private void midi(final InputStream inputStream, boolean fail) throws IOException {
 		byte[] data = ResourceManager.getBytes(inputStream);
 		if (Settings.enableMediaDump) this.data = data;
 
-		if (Settings.maMidi) {
+		if (!Emulator.isX64() && Settings.maMidi) {
 			ma: {
 				try {
 					if (!MMFPlayer.initialize(true)) throw new Exception();
 					MaDll ma = MMFPlayer.getMaDll();
+					ma.initFormat(MaDll.FORMAT_MID);
 					sequence = ma;
 
 					if (maOwner != null) {
@@ -212,7 +215,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						maOwner = null;
 					}
 
-					maSound = ma.load(data);
+					maSound = ma.load(maFormat = MaDll.FORMAT_MID, data);
 					maOwner = this;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -228,19 +231,23 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		try {
 			sequence = MidiSystem.getSequence(this.inputStream = new ByteArrayInputStream(data));
 		} catch (Exception e) {
+			if (fail) throw new IOException();
 			sequence = null;
 		}
 		midiControl = new MIDIControlImpl(this);
 		controls = new Control[]{toneControl, volumeControl, midiControl};
 	}
 
-	private void mmf(InputStream in) throws IOException {
-		mmf = true;
+	private void mmf(InputStream in, boolean fail) throws IOException {
 		byte[] data = ResourceManager.getBytes(in);
 		if (Settings.enableMediaDump) this.data = data;
+
+		maFormat = MaDll.FORMAT_MMF;
+
 		try {
 			if (!MMFPlayer.initialize(false)) throw new Exception();
 			MaDll ma = MMFPlayer.getMaDll();
+			ma.initFormat(MaDll.FORMAT_MMF);
 			sequence = ma;
 
 			if (maOwner != null) {
@@ -248,16 +255,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				maOwner = null;
 			}
 
-			maSound = ma.load(data);
+			maSound = ma.load(MaDll.FORMAT_MMF, data);
 			maOwner = this;
 		} catch (Exception e) {
+			if (fail) throw new IOException();
 			sequence = null;
 		}
 		controls = new Control[]{toneControl, volumeControl};
 	}
 
 	public void setMIDISequence(InputStream in) throws IOException {
-		midi(in);
+		midi(in, true);
 	}
 
 	public void addPlayerListener(final PlayerListener playerListener) throws IllegalStateException {
@@ -318,7 +326,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 		} else if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != 0) {
-				((MaDll) sequence).close(maSound);
+				((MaDll) sequence).close(maFormat, maSound);
 				maSound = 0;
 			}
 		}
@@ -355,7 +363,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 		if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != 0) {
-				((MaDll) sequence).close(maSound);
+				((MaDll) sequence).close(maFormat, maSound);
 				maSound = 0;
 			}
 		}
@@ -406,7 +414,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 		} else if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != 0) {
-				return ((MaDll) sequence).getLength(maSound) * 1000L;
+				return ((MaDll) sequence).getLength(maFormat, maSound) * 1000L;
 			} else {
 				return TIME_UNKNOWN;
 			}
@@ -435,7 +443,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 		if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != 0) {
-				return ((MaDll) sequence).getPosition(maSound) * 1000L;
+				return ((MaDll) sequence).getPosition(maFormat, maSound) * 1000L;
 			}
 		}
 		return TIME_UNKNOWN;
@@ -480,7 +488,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 		} else if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != 0) {
-				((MaDll) sequence).seek(maSound, (int) (t / 1000L));
+				((MaDll) sequence).seek(maFormat, maSound, (int) (t / 1000L));
 			}
 		}
 		return mediaTime = ms;
@@ -544,11 +552,13 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (inputStream != null) {
 			try {
 				if ("audio/amr".equals(contentType) || "audio/x-amr".equals(contentType)) {
-					amr(inputStream);
+					amr(inputStream, false);
 				} else if ("audio/x-wav".equals(contentType) || "audio/wav".equals(contentType)) {
-					wav(inputStream);
-				} else if ("audio/x-midi".equals(contentType) || "audio/midi".equals(contentType)) {
-					midi(inputStream);
+					wav(inputStream, false);
+				} else if ("audio/x-midi".equals(contentType) || "audio/midi".equals(contentType) || "audio/mid".equals(contentType)) {
+					midi(inputStream, false);
+				} else if ("audio/mmf".equals(contentType) || "application/x-smaf".equals(contentType)) {
+					mmf(inputStream, false);
 				} else if ("audio/mpeg".equals(contentType) || "audio/mp3".equals(contentType)) {
 					try {
 						InputStream i = inputStream;
@@ -564,13 +574,13 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					controls = new Control[]{volumeControl};
 				} else {
 					try {
-						midi(inputStream);
+						midi(inputStream, true);
 					} catch (Exception e) {
 						try {
-							wav(inputStream);
+							wav(inputStream, true);
 						} catch (Exception e2) {
 							try {
-								amr(inputStream);
+								amr(inputStream, true);
 							} catch (Exception e3) {
 								Emulator.getEmulator().getLogStream().println("*** unsupported sound format ***");
 								sequence = null;
@@ -715,7 +725,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != 0) {
 				try {
-					((MaDll) sequence).pause(maSound);
+					((MaDll) sequence).pause(maFormat, maSound);
 				} catch (Exception ignored) {}
 			}
 			return;
@@ -840,10 +850,10 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 						}
 					}
 				} else if (sequence instanceof MaDll) {
-					if (((MaDll) sequence).getStatus(maSound) == MaDll.STATE_PAUSED) {
-						((MaDll) sequence).resume(maSound);
+					if (((MaDll) sequence).getStatus(maFormat, maSound) == MaDll.STATE_PAUSED) {
+						((MaDll) sequence).resume(maFormat, maSound);
 					} else {
-						((MaDll) sequence).start(maSound, 1);
+						((MaDll) sequence).start(maFormat, maSound, 1);
 					}
 					if (b) {
 						notifyListeners(PlayerListener.STARTED, getMediaTime(), false);
@@ -851,7 +861,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					}
 					int status = 0;
 					while (maOwner == this && sequence != null
-							&& (status = ((MaDll) sequence).getStatus(maSound)) == MaDll.STATE_PLAYING) {
+							&& (status = ((MaDll) sequence).getStatus(maFormat, maSound)) == MaDll.STATE_PLAYING) {
 						Thread.sleep(10);
 					}
 					complete = maOwner == this && sequence != null && status == MaDll.STATE_READY;
@@ -910,7 +920,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 		if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != 0) {
-				((MaDll) sequence).setVolume(maSound, n);
+				((MaDll) sequence).setVolume(maFormat, maSound, n);
 			}
 		}
 	}
@@ -942,7 +952,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			ext = "wav";
 		} else */if (sequence instanceof emulator.javazoom.jl.player.Player) {
 			ext = "mp3";
-		} else if (mmf) {
+		} else if (maFormat == MaDll.FORMAT_MMF) {
 			ext = "mmf";
 		} else if (contentType != null) {
 			if (contentType.equalsIgnoreCase("audio/wav") ||
