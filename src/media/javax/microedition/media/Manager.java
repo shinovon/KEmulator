@@ -445,6 +445,9 @@ public class Manager {
 		if (url.endsWith(".wav")) {
 			return "audio/wav";
 		}
+		if (url.endsWith(".mmf")) {
+			return "audio/mmf";
+		}
 		return null;
 	}
 
