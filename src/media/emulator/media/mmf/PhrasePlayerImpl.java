@@ -17,7 +17,7 @@ public class PhrasePlayerImpl {
 		PhrasePlayerImpl inst = new PhrasePlayerImpl();
 
 		try {
-			if (!MMFPlayer.initialize()) {
+			if (!MMFPlayer.initialize(false)) {
 				throw new Exception();
 			}
 			MMFPlayer.getMaDll().phraseInitialize();

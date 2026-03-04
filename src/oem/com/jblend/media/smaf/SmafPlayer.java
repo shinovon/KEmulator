@@ -88,7 +88,7 @@ public class SmafPlayer extends MediaPlayer implements MediaImageOperator {
 		if (state == PLAYING || state == PAUSED) {
 			throw new IllegalStateException();
 		}
-		if (!MMFPlayer.initialize()) {
+		if (!MMFPlayer.initialize(false)) {
 			return;
 		}
 		error = false;

@@ -488,6 +488,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.ottDecoder = Integer.parseInt(properties.getProperty("OTTConverter", "2"));
 			Settings.enableVlc = Boolean.parseBoolean(properties.getProperty("EnableVlc", "true"));
 			Settings.soundfontPath = properties.getProperty("SoundfontPath", "");
+			Settings.maMidi = Boolean.parseBoolean(properties.getProperty("UseMaSmwForMIDI", "false"));
 
 			// jvm
 			Settings.xmx = Integer.parseInt(properties.getProperty("JVMHeap", "512"));
@@ -737,6 +738,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("OTTConverter", String.valueOf(Settings.ottDecoder));
 			properties.setProperty("EnableVlc", String.valueOf(Settings.enableVlc));
 			properties.setProperty("SoundfontPath", Settings.soundfontPath);
+			properties.setProperty("UseMaSmwForMIDI", String.valueOf(Settings.maMidi));
 
 			// jvm
 			properties.setProperty("JVMHeap", String.valueOf(Settings.xmx));

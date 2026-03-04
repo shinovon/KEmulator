@@ -201,7 +201,7 @@ public class MaDll {
 	public static final int STATE_PLAYING = 4;
 	public static final int STATE_PAUSED = 5;
 
-	public synchronized void init() {
+	public synchronized void init(boolean midi) {
 		if (EmuBuf != 0) {
 			Native.free(EmuBuf);
 			EmuBuf = 0;
@@ -239,6 +239,10 @@ public class MaDll {
 				throw new RuntimeException("MaSound_DeviceControl: " + r);
 			}
 		} else if (mode == MODE_MA7) {
+			if (midi) {
+				throw new RuntimeException("MIDI mode is not supported with MA-7");
+			}
+
 			Memory config = new Memory(72);
 			config.clear();
 
@@ -297,7 +301,7 @@ public class MaDll {
 				throw new RuntimeException("MaSound_Initialize: " + r);
 			}
 		}
-		if ((r = ((MaSound) library).MaSound_Create(1)) < 0) {
+		if ((r = ((MaSound) library).MaSound_Create(midi ? 5 : 1)) < 0) {
 			throw new RuntimeException("MaSound_Create: " + r);
 		}
 		instanceId = r;
@@ -308,7 +312,7 @@ public class MaDll {
 		ptr.write(0, data, 0, data.length);
 
 		int r;
-		if ((r = ((MaSound) library).MaSound_Load(instanceId, ptr, data.length, 1, 0, 0)) < 1) {
+		if ((r = ((MaSound) library).MaSound_Load(instanceId, ptr, data.length, 0, 0, 0)) < 1) {
 			throw new RuntimeException("MaSound_Load: " + r);
 		}
 		int sound = r;
@@ -397,6 +401,10 @@ public class MaDll {
 
 	public synchronized int getStatus(int sound) {
 		return ((MaSound) library).MaSound_Control(instanceId, sound, 6, Pointer.NULL, 0);
+	}
+
+	public synchronized int getLength(int sound) {
+		return ((MaSound) library).MaSound_Control(instanceId, sound, 5, Pointer.NULL, 0);
 	}
 
 	public synchronized int getPosition(int sound) {

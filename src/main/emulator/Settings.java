@@ -120,6 +120,7 @@ public final class Settings {
 	public static boolean oneMidiAtTime;
 	public static String vlcDir = "";
 	public static boolean playerBufferAll = false;
+	public static boolean maMidi;
 
 	// devutils
 	public static String ideaPath; // absolute path to idea binary

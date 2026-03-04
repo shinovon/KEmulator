@@ -7,9 +7,14 @@ import java.io.File;
 public class MMFPlayer {
 	private static boolean initialized;
 	private static MaDll maDll;
+	private static boolean midiMode;
 
-	public static boolean initialize() {
+	public static boolean initialize(boolean midi) {
 		if (MMFPlayer.initialized) {
+			if (midiMode != midi) {
+				Emulator.getEmulator().getLogStream().println("Cannot initialize MMF Player while it's active in different mode!");
+				return false;
+			}
 			return true;
 		}
 		if (Emulator.isX64()) {
@@ -31,7 +36,8 @@ public class MMFPlayer {
 			} else {
 				throw new Exception("No smw emulator found");
 			}
-			maDll.init();
+			maDll.init(midi);
+			midiMode = midi;
 			return MMFPlayer.initialized = true;
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -41,14 +47,9 @@ public class MMFPlayer {
 
 	public static void close() {
 		if (MMFPlayer.initialized) {
-			destroy();
+			if (maDll != null) maDll.destroy();
 			MMFPlayer.initialized = false;
 		}
-	}
-
-	public static void destroy() {
-		if (maDll == null) return;
-		maDll.destroy();
 	}
 
 	public static MaDll getMaDll() {
