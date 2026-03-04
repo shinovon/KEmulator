@@ -1749,7 +1749,7 @@ public final class Property implements IProperty, SelectionListener {
 		globalMidiCheck.setSelection(Settings.oneMidiAtTime);
 
 		maMidiCheck = new Button(mediaGroup, SWT.CHECK);
-		maMidiCheck.setText("Use MaSmw emulator for MIDI playback (experimental)");
+		maMidiCheck.setText("Use MA-3/5 emulator for MIDI playback (experimental)");
 		maMidiCheck.setLayoutData(fillHor5);
 		maMidiCheck.setSelection(Settings.maMidi);
 

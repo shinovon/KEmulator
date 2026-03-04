@@ -218,7 +218,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					e.printStackTrace();
 					sequence = null;
 
-					// revert to normal midi
+					// fallback to normal midi player
 					break ma;
 				}
 				controls = new Control[]{toneControl, volumeControl};

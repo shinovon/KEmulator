@@ -202,109 +202,119 @@ public class MaDll {
 	public static final int STATE_PAUSED = 5;
 
 	public synchronized void init(boolean midi) {
+		if (instanceId != -1) {
+			return;
+		}
+
 		if (EmuBuf != 0) {
 			Native.free(EmuBuf);
 			EmuBuf = 0;
 		}
 
-		int r;
-		if (mode == MODE_MA3) {
-			if ((r = ((MA3) library).MaSound_Initialize()) != 0) {
-				throw new RuntimeException("MaSound_Initialize: " + r);
-			}
-		} else if (mode == MODE_MA5) {
-			int emuP = EmuBuf = (int) Native.malloc(1024);
-			while ((emuP & 0xFF) != 0x81) {
-				emuP++;
-			}
-			if ((r = ((MA5) library).MaSound_EmuInitialize(48000, 2, emuP)) != 0) {
-				throw new RuntimeException("MaSound_EmuInitialize: " + r);
-			}
-			if ((r = ((MA5) library).MaSound_Initialize(0, EmuBuf, 0)) != 0) {
-				throw new RuntimeException("MaSound_Initialize: " + r);
-			}
-			if ((r = ((MA5) library).MaSound_DeviceControl(0x0D, 0, 0, 0)) != 0) {
-				throw new RuntimeException("MaSound_DeviceControl: " + r);
-			}
-			if ((r = ((MA5) library).MaSound_DeviceControl(0x05, 2, 0, 0)) != 0) {
-				throw new RuntimeException("MaSound_DeviceControl: " + r);
-			}
-			if ((r = ((MA5) library).MaSound_DeviceControl(0x06, 0, 0, 0)) != 0) {
-				throw new RuntimeException("MaSound_DeviceControl: " + r);
-			}
-			if ((r = ((MA5) library).MaSound_DeviceControl(0x08, 2, 0, 0)) != 0) {
-				throw new RuntimeException("MaSound_DeviceControl: " + r);
-			}
-			if ((r = ((MA5) library).MaSound_DeviceControl(0x09, 0, 0, 0)) != 0) {
-				throw new RuntimeException("MaSound_DeviceControl: " + r);
-			}
-		} else if (mode == MODE_MA7) {
-			if (midi) {
-				throw new RuntimeException("MIDI mode is not supported with MA-7");
-			}
+		try {
+			int r;
+			if (mode == MODE_MA3) {
+				if ((r = ((MA3) library).MaSound_Initialize()) != 0) {
+					throw new RuntimeException("MaSound_Initialize: " + r);
+				}
+			} else if (mode == MODE_MA5) {
+				int emuP = EmuBuf = (int) Native.malloc(1024);
+				while ((emuP & 0xFF) != 0x81) {
+					emuP++;
+				}
+				if ((r = ((MA5) library).MaSound_EmuInitialize(48000, 2, emuP)) != 0) {
+					throw new RuntimeException("MaSound_EmuInitialize: " + r);
+				}
+				if ((r = ((MA5) library).MaSound_Initialize(0, EmuBuf, 0)) != 0) {
+					throw new RuntimeException("MaSound_Initialize: " + r);
+				}
+				if ((r = ((MA5) library).MaSound_DeviceControl(0x0D, 0, 0, 0)) != 0) {
+					throw new RuntimeException("MaSound_DeviceControl: " + r);
+				}
+				if ((r = ((MA5) library).MaSound_DeviceControl(0x05, 2, 0, 0)) != 0) {
+					throw new RuntimeException("MaSound_DeviceControl: " + r);
+				}
+				if ((r = ((MA5) library).MaSound_DeviceControl(0x06, 0, 0, 0)) != 0) {
+					throw new RuntimeException("MaSound_DeviceControl: " + r);
+				}
+				if ((r = ((MA5) library).MaSound_DeviceControl(0x08, 2, 0, 0)) != 0) {
+					throw new RuntimeException("MaSound_DeviceControl: " + r);
+				}
+				if ((r = ((MA5) library).MaSound_DeviceControl(0x09, 0, 0, 0)) != 0) {
+					throw new RuntimeException("MaSound_DeviceControl: " + r);
+				}
+			} else if (mode == MODE_MA7) {
+				if (midi) {
+					throw new RuntimeException("MIDI mode is not supported with MA-7");
+				}
 
-			Memory config = new Memory(72);
-			config.clear();
+				Memory config = new Memory(72);
+				config.clear();
 
-			config.setInt(0, 2);
-			config.setInt(4, 44100); // sample rate, original uses 32000
-			config.setByte(8, (byte) 1);
-			config.setInt(12, 0);
-			config.setInt(16, 15);
-			config.setInt(20, 1);
-			config.setInt(24, 1);
-			config.setShort(28, (short) 120);
-			config.setShort(30, (short) 120);
-			config.setShort(32, (short) 120);
-			config.setShort(34, (short) 120);
-			config.setShort(36, (short) 240);
-			config.setShort(38, (short) 240);
-			config.setShort(40, (short) 240);
-			config.setShort(42, (short) 240);
-			config.setShort(44, (short) 12);
-			config.setShort(46, (short) 12);
-			config.setShort(48, (short) 12);
-			config.setShort(50, (short) 12);
-			config.setShort(52, (short) 16);
-			config.setShort(54, (short) 16);
-			config.setShort(56, (short) 24);
-			config.setShort(58, (short) 24);
-			config.setInt(60, 0);
-			config.setInt(64, 4096);
-			config.setByte(68, (byte) 1);
+				config.setInt(0, 2);
+				config.setInt(4, 44100); // sample rate, original uses 32000
+				config.setByte(8, (byte) 1);
+				config.setInt(12, 0);
+				config.setInt(16, 15);
+				config.setInt(20, 1);
+				config.setInt(24, 1);
+				config.setShort(28, (short) 120);
+				config.setShort(30, (short) 120);
+				config.setShort(32, (short) 120);
+				config.setShort(34, (short) 120);
+				config.setShort(36, (short) 240);
+				config.setShort(38, (short) 240);
+				config.setShort(40, (short) 240);
+				config.setShort(42, (short) 240);
+				config.setShort(44, (short) 12);
+				config.setShort(46, (short) 12);
+				config.setShort(48, (short) 12);
+				config.setShort(50, (short) 12);
+				config.setShort(52, (short) 16);
+				config.setShort(54, (short) 16);
+				config.setShort(56, (short) 24);
+				config.setShort(58, (short) 24);
+				config.setInt(60, 0);
+				config.setInt(64, 4096);
+				config.setByte(68, (byte) 1);
 
-			r = ((MA7) library).Mapi_EmuInitialize(0, config, null, null, null, 0);
-			if (r != 0) {
-				throw new RuntimeException("Mapi_EmuInitialize: " + r);
+				r = ((MA7) library).Mapi_EmuInitialize(0, config, null, null, null, 0);
+				if (r != 0) {
+					throw new RuntimeException("Mapi_EmuInitialize: " + r);
+				}
+
+				r = ((MA7) library).Mapi_Initialize();
+				if (r != 0) {
+					throw new RuntimeException("Mapi_Initialize: " + r);
+				}
+
+				// unmute
+				r = ((MA7) library).Mapi_DeviceControlEx(0x10000, 0, null);
+				if (r != 0) {
+					throw new RuntimeException("Mapi_DeviceControlEx: " + r);
+				}
+
+				// phrases only work in mode 2, it's in mode 1 by default
+				r = ((MA7) library).Mapi_SetMode(2);
+				if (r != 0) {
+					throw new RuntimeException("Mapi_SetMode: " + r);
+				}
+
+				// regular initialization steps
+				r = ((MA7) library).MaSound_Initialize();
+				if (r != 0) {
+					throw new RuntimeException("MaSound_Initialize: " + r);
+				}
 			}
-
-			r = ((MA7) library).Mapi_Initialize();
-			if (r != 0) {
-				throw new RuntimeException("Mapi_Initialize: " + r);
+			if ((r = ((MaSound) library).MaSound_Create(midi ? 5 : 1)) < 0) {
+				throw new RuntimeException("MaSound_Create: " + r);
 			}
-
-			// unmute
-			r = ((MA7) library).Mapi_DeviceControlEx(0x10000, 0, null);
-			if (r != 0) {
-				throw new RuntimeException("Mapi_DeviceControlEx: " + r);
-			}
-
-			// phrases only work in mode 2, it's in mode 1 by default
-			r = ((MA7) library).Mapi_SetMode(2);
-			if (r != 0) {
-				throw new RuntimeException("Mapi_SetMode: " + r);
-			}
-
-			// regular initialization steps
-			r = ((MA7) library).MaSound_Initialize();
-			if (r != 0) {
-				throw new RuntimeException("MaSound_Initialize: " + r);
+			instanceId = r;
+		} finally {
+			if (instanceId == -1) {
+				destroy();
 			}
 		}
-		if ((r = ((MaSound) library).MaSound_Create(midi ? 5 : 1)) < 0) {
-			throw new RuntimeException("MaSound_Create: " + r);
-		}
-		instanceId = r;
 	}
 
 	public synchronized int load(byte[] data) {
@@ -424,7 +434,10 @@ public class MaDll {
 			((MaSound) library).MaSound_Close(instanceId, sound, 0);
 			((MaSound) library).MaSound_Unload(instanceId, sound, 0);
 		}
-		((MaSound) library).MaSound_Delete(instanceId);
+		if (instanceId != -1) {
+			((MaSound) library).MaSound_Delete(instanceId);
+			instanceId = -1;
+		}
 
 		if (phraseInitialized) {
 			// TODO api may still refer to deallocated tracks
