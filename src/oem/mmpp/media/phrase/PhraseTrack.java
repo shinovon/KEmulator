@@ -99,8 +99,7 @@ public class PhraseTrack {
 	}
 
 	public int getPlayingTime() {
-		// TODO what does this mean?
-		return getPosition();
+		return impl.getLength();
 	}
 
 	public int getPosition() {
@@ -112,8 +111,7 @@ public class PhraseTrack {
 	}
 
 	public int getIsMaster() {
-		// TODO
-		return master != null ? 1 : 0;
+		return master != null ? 0 : 1;
 	}
 
 	public void setPhraseTrackListener(PhraseTrackListener listener) {
