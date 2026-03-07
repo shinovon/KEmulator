@@ -1114,9 +1114,12 @@ public class Emulator implements Runnable {
 		} catch (NullPointerException ignored) {}
 		try {
 			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
-			// something inside SWT libs setting this to X11 on dual-server systems.
-			// GTK is clever enough to decide itself, so clearing it
 			newKem.environment().remove("GDK_BACKEND");
+			newKem.environment().remove("WAYLAND_DISPLAY");
+			if (Utils.linux) {
+				// we now force x11 because SWT is broken on wayland
+				newKem.environment().put("GDK_BACKEND", "x11");
+			}
 			newKem.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();

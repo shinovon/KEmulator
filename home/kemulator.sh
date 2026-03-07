@@ -88,6 +88,6 @@ else
 	USER_JAR=$(realpath "$1")
 	cd "$KEM_DIR" || exit
 	shift
-	"$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" -jar "$USER_JAR" -s "$@"
+	WAYLAND_DISPLAY= GDK_BACKEND=x11 "$JAVA" "${ARGS[@]}" -jar "$KEM_JAR" -jar "$USER_JAR" -s "$@"
 	exit $?
 fi
