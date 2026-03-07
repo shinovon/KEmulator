@@ -107,6 +107,7 @@ public final class Settings {
 
 	public static boolean awtAntiAliasing;
 	public static boolean textAntiAliasing = true;
+	public static boolean lcduiSystemColors;
 
 	// media
 	public static boolean enableVlc = true;
@@ -129,5 +130,4 @@ public final class Settings {
 	public static String lastIdeaRepoPath = ""; // where last project was created
 
 	public static String deviceFile = "/res/presets.xml";
-
 }

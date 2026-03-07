@@ -8,6 +8,7 @@ import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.graphics2D.swt.ImageSWT;
+import emulator.lcdui.LCDUIUtils;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
@@ -861,6 +862,20 @@ public final class EmulatorScreen implements
 				} catch (Exception ignored) {}
 			}
 		});
+
+		if (Settings.lcduiSystemColors) {
+			LCDUIUtils.backgroundColor = getColor(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			LCDUIUtils.foregroundColor = getColor(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+			LCDUIUtils.highlightedForegroundColor = getColor(display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
+			LCDUIUtils.highlightedBackgroundColor = getColor(display.getSystemColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
+			LCDUIUtils.borderColor = getColor(display.getSystemColor(SWT.COLOR_WIDGET_BORDER));
+			LCDUIUtils.highlightedBorderColor = getColor(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
+			LCDUIUtils.gaugeColor = getColor(display.getSystemColor(SWT.COLOR_LINK_FOREGROUND));
+		}
+	}
+
+	private static int getColor(Color color) {
+		return (0xFF << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | (color.getBlue());
 	}
 
 	private void setFullscreen(boolean fullscreen) {
