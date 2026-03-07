@@ -30,12 +30,10 @@ public final class h {
 		try {
 			for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
 				final ClassNode classNode = new ClassNode();
-				synchronized (Emulator.zipFileLock) {
-					try (InputStream method592 = getClassStream((String) Emulator.jarClasses.get(i))) {
-						final ClassReader classReader = new ClassReader(method592);
-						classReader.accept((ClassVisitor) classNode, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
-					}
-				}
+                try (InputStream method592 = getClassStream((String) Emulator.jarClasses.get(i))) {
+                    final ClassReader classReader = new ClassReader(method592);
+                    classReader.accept((ClassVisitor) classNode, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+                }
 				for (Object o : classNode.methods) {
 					final MethodInfo methodInfo = new MethodInfo(classNode, (MethodNode) o);
 					h.methodProfiles.put(methodInfo.method704(), methodInfo);
@@ -59,12 +57,14 @@ public final class h {
 			}
 			return new FileInputStream(fileFromClassPath);
 		} else {
-			final ZipFile zipFile = Emulator.zipFile;
-			final ZipEntry entry = zipFile.getEntry(s.replace('.', '/') + ".class");
-			if (entry == null) {
-				return null;
-			}
-			return zipFile.getInputStream(entry);
+            synchronized (Emulator.zipFileLock) {
+                final ZipFile zipFile = Emulator.zipFile;
+                final ZipEntry entry = zipFile.getEntry(s.replace('.', '/') + ".class");
+                if (entry == null) {
+                    return null;
+                }
+                return zipFile.getInputStream(entry);
+            }
 		}
 	}
 
