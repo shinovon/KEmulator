@@ -50,15 +50,15 @@ public final class h {
 	}
 
 	private static InputStream getClassStream(final String s) throws IOException {
-		if (Emulator.midletJar == null) {
+		if (Emulator.midletJarPath == null) {
 			final File fileFromClassPath;
 			if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
 				return null;
 			}
 			return new FileInputStream(fileFromClassPath);
 		} else {
-            synchronized (Emulator.zipFileLock) {
-                final ZipFile zipFile = Emulator.zipFile;
+            synchronized (Emulator.jarFileLock) {
+                final ZipFile zipFile = Emulator.midletJar;
                 final ZipEntry entry = zipFile.getEntry(s.replace('.', '/') + ".class");
                 if (entry == null) {
                     return null;

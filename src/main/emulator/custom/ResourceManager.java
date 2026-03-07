@@ -18,12 +18,12 @@ public final class ResourceManager {
 		String name = s;
 		byte[] data;
 		try {
-			if (Emulator.midletJar != null) {
+			if (Emulator.midletJarPath != null) {
 				while (name.length() > 0 && name.startsWith("/")) {
 					name = name.substring(1);
 				}
-				synchronized (Emulator.zipFileLock) {
-					ZipFile zipFile = Emulator.zipFile;
+				synchronized (Emulator.jarFileLock) {
+					ZipFile zipFile = Emulator.midletJar;
 					ZipEntry entry;
 					if ((entry = zipFile.getEntry(name)) == null) {
 						// try again by searching entry ignoring case

@@ -69,7 +69,7 @@ public class ScratchPadConnection implements StreamConnection {
 			final int index = nextToken.indexOf(61);
 			hashtable.put(nextToken.substring(0, index).trim(), nextToken.substring(index + 1).trim());
 		}
-		final String midletJar = Emulator.midletJar;
+		final String midletJar = Emulator.midletJarPath;
 		String string = midletJar.substring(0, midletJar.length() - 4);
 		if (int1 != 0) {
 			string += int1;

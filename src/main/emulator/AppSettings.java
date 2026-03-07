@@ -171,7 +171,7 @@ public class AppSettings {
 
 		IEmulatorFrontend emulator = Emulator.getEmulator();
 		boolean screenDetected = true;
-		String jar = Emulator.midletJar;
+		String jar = Emulator.midletJarPath;
 		if (jar != null) {
 			jar = new File(jar).getName();
 		}
@@ -316,11 +316,11 @@ public class AppSettings {
 			s = "UEI";
 		} else if (Settings.globalSettings) {
 			s = "All";
-		} else if (Emulator.midletJar == null) {
+		} else if (Emulator.midletJarPath == null) {
 			s = "Classpath";
 		} else {
-			jarHash = getJarHash(Emulator.midletJar);
-			s = jarHash + ':' + Emulator.midletJar;
+			jarHash = getJarHash(Emulator.midletJarPath);
+			s = jarHash + ':' + Emulator.midletJarPath;
 		}
 		iniSection = s;
 
@@ -634,7 +634,7 @@ public class AppSettings {
 			try (BufferedReader reader = Files.newBufferedReader(midletsPath, StandardCharsets.UTF_8)) {
 				String line;
 				String hashPrefix = "[" + jarHash + ":";
-				String pathSuffix = ":" + Emulator.midletJar + "]";
+				String pathSuffix = ":" + Emulator.midletJarPath + "]";
 				for (;;) {
 					line = reader.readLine();
 					if (line == null) break;
@@ -646,7 +646,7 @@ public class AppSettings {
 								found = true;
 								break match;
 							}
-							if (uei || Emulator.midletJar == null) {
+							if (uei || Emulator.midletJarPath == null) {
 								break match;
 							}
 							if (line.startsWith(hashPrefix) || line.endsWith(pathSuffix)) {

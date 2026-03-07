@@ -50,7 +50,7 @@ public class Emulator implements Runnable {
 	private static KeyRecords record;
 	public static Vector jarLibrarys;
 	public static Vector<String> jarClasses;
-	public static String midletJar;
+	public static String midletJarPath;
 	public static String midletClassName;
 	public static String classPath;
 	public static String jadPath;
@@ -70,8 +70,8 @@ public class Emulator implements Runnable {
 
 	static int startWidth, startHeight;
 
-	public static ZipFile zipFile;
-	public static final Object zipFileLock = new Object();
+	public static ZipFile midletJar;
+	public static final Object jarFileLock = new Object();
 
 	private Emulator() {
 		super();
@@ -126,8 +126,8 @@ public class Emulator implements Runnable {
 	// not to be called manually
 	public static void shutdownHook() {
 		try {
-			synchronized (Emulator.zipFileLock) {
-				if (Emulator.zipFile != null) Emulator.zipFile.close();
+			synchronized (Emulator.jarFileLock) {
+				if (Emulator.midletJar != null) Emulator.midletJar.close();
 			}
 		} catch (Throwable ignored) {}
 		MMFPlayer.close();
@@ -215,11 +215,11 @@ public class Emulator implements Runnable {
 	}
 
 	private static void generateJad() {
-		if (Emulator.midletJar == null) {
+		if (Emulator.midletJarPath == null) {
 			return;
 		}
 		try {
-			final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad"), "UTF-8");
+			final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(Emulator.midletJarPath.substring(0, Emulator.midletJarPath.length() - 3) + "jad"), "UTF-8");
 			final Enumeration<Object> keys = (Emulator.emulatorimpl.getAppProperties()).keys();
 			while (keys.hasMoreElements()) {
 				final String s;
@@ -228,10 +228,10 @@ public class Emulator implements Runnable {
 				}
 			}
 			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-URL") == null) {
-				outputStreamWriter.write("MIDlet-Jar-URL: " + new File(Emulator.midletJar).getName() + "\r\n");
+				outputStreamWriter.write("MIDlet-Jar-URL: " + new File(Emulator.midletJarPath).getName() + "\r\n");
 			}
 			if (Emulator.emulatorimpl.getAppProperties().getProperty("MIDlet-Jar-Size") == null) {
-				outputStreamWriter.write("MIDlet-Jar-Size: " + new File(Emulator.midletJar).length() + "\r\n");
+				outputStreamWriter.write("MIDlet-Jar-Size: " + new File(Emulator.midletJarPath).length() + "\r\n");
 			}
 			outputStreamWriter.flush();
 			outputStreamWriter.close();
@@ -246,7 +246,7 @@ public class Emulator implements Runnable {
 		sb.append(platform.getTitleName()).append(' ').append(version);
 		if (s != null) {
 			sb.append(" - ").append(s);
-		} else if (midletJar != null && Emulator.emulatorimpl.getAppProperties() != null) {
+		} else if (midletJarPath != null && Emulator.emulatorimpl.getAppProperties() != null) {
 			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty(Emulator.doja ? "AppName" : "MIDlet-Name"));
 		}
 		if (AppSettings.uei) sb.append(" (UEI)");
@@ -282,8 +282,8 @@ public class Emulator implements Runnable {
 		File file;
 		if (Emulator.jadPath != null) {
 			file = new File(Emulator.jadPath);
-		} else if (Emulator.midletJar != null) {
-			file = new File(Emulator.midletJar.substring(0, Emulator.midletJar.length() - 3) + "jad");
+		} else if (Emulator.midletJarPath != null) {
+			file = new File(Emulator.midletJarPath.substring(0, Emulator.midletJarPath.length() - 3) + "jad");
 		} else {
 			return null;
 		}
@@ -295,14 +295,14 @@ public class Emulator implements Runnable {
 
 	public static boolean getJarClasses() throws Exception {
 		try {
-			if (Emulator.midletClassName == null || Emulator.midletJar != null) {
+			if (Emulator.midletClassName == null || Emulator.midletJarPath != null) {
 				Properties props = new Properties();
 				File file;
 				if (Emulator.jadPath != null) {
 					file = new File(Emulator.jadPath);
 				} else {
 					final StringBuffer sb = new StringBuffer();
-					file = new File(sb.append(Emulator.midletJar, 0, Emulator.midletJar.length() - 3).append("jad").toString());
+					file = new File(sb.append(Emulator.midletJarPath, 0, Emulator.midletJarPath.length() - 3).append("jad").toString());
 					if (!file.exists()) {
 						sb.setCharAt(sb.length() - 1, 'm');
 						file = new File(sb.toString());
@@ -319,15 +319,15 @@ public class Emulator implements Runnable {
 				}
 				if (doja) {
 					Emulator.emulatorimpl.getLogStream().println("Running DoJa");
-					if (Emulator.midletJar == null) {
+					if (Emulator.midletJarPath == null) {
 						String s = file.getName();
-						Emulator.midletJar = s.substring(0, s.length() - 1) + 'r';
+						Emulator.midletJarPath = s.substring(0, s.length() - 1) + 'r';
 					}
 				}
-				Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJar);
-				synchronized (zipFileLock) {
-					zipFile = new ZipFile(Emulator.midletJar);
-					final Enumeration entries = zipFile.getEntries();
+				Emulator.emulatorimpl.getLogStream().println("Get classes from " + Emulator.midletJarPath);
+				synchronized (jarFileLock) {
+					midletJar = new ZipFile(Emulator.midletJarPath);
+					final Enumeration entries = midletJar.getEntries();
 					while (entries.hasMoreElements()) {
 						final ZipEntry zipEntry;
 						if ((zipEntry = (ZipEntry) entries.nextElement()).getName().endsWith(".class")) {
@@ -338,14 +338,14 @@ public class Emulator implements Runnable {
 					}
 					if (props == null || !props.containsKey(doja ? "AppClass" : "MIDlet-1")) {
 						try {
-							final Attributes mainAttributes = zipFile.getManifest().getMainAttributes();
+							final Attributes mainAttributes = midletJar.getManifest().getMainAttributes();
 							for (final Map.Entry<Object, Object> entry : mainAttributes.entrySet()) {
 								props.put(entry.getKey().toString(), entry.getValue());
 							}
 							if (!props.containsKey(doja ? "AppClass" : "MIDlet-1")) throw new Exception();
 						} catch (Exception ex2) {
 							final InputStream inputStream;
-							(inputStream = zipFile.getInputStream(zipFile.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
+							(inputStream = midletJar.getInputStream(midletJar.getEntry("META-INF/MANIFEST.MF"))).skip(3L);
 							props.load(new InputStreamReader(inputStream, "UTF-8"));
 							inputStream.close();
 							final Enumeration<Object> keys2 = props.keys();
@@ -461,20 +461,20 @@ public class Emulator implements Runnable {
 	}
 
 	public static void setupMRUList() {
-		if (Emulator.midletJar == null && Settings.recentJars[0].trim().equalsIgnoreCase("")) {
+		if (Emulator.midletJarPath == null && Settings.recentJars[0].trim().equalsIgnoreCase("")) {
 			return;
 		}
 		if (Settings.recentJars[0].trim().equalsIgnoreCase("")) {
-			Settings.recentJars[0] = Emulator.midletJar;
+			Settings.recentJars[0] = Emulator.midletJarPath;
 			return;
 		}
-		if (Emulator.midletJar != null) {
+		if (Emulator.midletJarPath != null) {
 			for (int i = 4; i > 0; --i) {
 				if (Settings.recentJars[i].equalsIgnoreCase(Settings.recentJars[0])) {
 					Settings.recentJars[i] = Settings.recentJars[1];
 					Settings.recentJars[1] = Settings.recentJars[0];
-					if (!Settings.recentJars[0].equalsIgnoreCase(Emulator.midletJar)) {
-						Settings.recentJars[0] = Emulator.midletJar;
+					if (!Settings.recentJars[0].equalsIgnoreCase(Emulator.midletJarPath)) {
+						Settings.recentJars[0] = Emulator.midletJarPath;
 					}
 					return;
 				}
@@ -496,14 +496,14 @@ public class Emulator implements Runnable {
 		String[] array;
 		int n;
 		String midletJar;
-		if (Emulator.midletJar == null) {
+		if (Emulator.midletJarPath == null) {
 			array = Settings.recentJars;
 			n = 0;
 			midletJar = "";
 		} else {
 			array = Settings.recentJars;
 			n = 0;
-			midletJar = Emulator.midletJar;
+			midletJar = Emulator.midletJarPath;
 		}
 		array[n] = midletJar;
 	}
@@ -648,7 +648,7 @@ public class Emulator implements Runnable {
 			}
 			backgroundThread.start();
 
-			if (Emulator.midletClassName == null && Emulator.midletJar == null) {
+			if (Emulator.midletClassName == null && Emulator.midletJarPath == null) {
 				Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
 				Emulator.emulatorimpl.getScreen().runEmpty();
 				emulatorimpl.dispose();
@@ -709,7 +709,7 @@ public class Emulator implements Runnable {
 			setProperties();
 			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
 				RichPresence.rpcState = (AppSettings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-				RichPresence.rpcDetails = AppSettings.uei ? "UEI" : new File(midletJar).getName();
+				RichPresence.rpcDetails = AppSettings.uei ? "UEI" : new File(midletJarPath).getName();
 				RichPresence.updatePresence();
 			}
 			if (doja) {
@@ -763,13 +763,13 @@ public class Emulator implements Runnable {
 			String path = array[0];
 			if (path.endsWith(".jar")) {
 				try {
-					Emulator.midletJar = new File(path).getCanonicalPath();
+					Emulator.midletJarPath = new File(path).getCanonicalPath();
 				} catch (Exception e) {
-					Emulator.midletJar = path;
+					Emulator.midletJarPath = path;
 				}
 			} else {
 				Emulator.jadPath = path;
-				Emulator.midletJar = getMidletJarUrl(path);
+				Emulator.midletJarPath = getMidletJarUrl(path);
 			}
 			return true;
 		}
@@ -780,13 +780,13 @@ public class Emulator implements Runnable {
 			} else if (key.endsWith(".jar") || key.endsWith(".jad") || key.endsWith(".jam")) {
 				if (key.endsWith(".jar")) {
 					try {
-						Emulator.midletJar = new File(key).getCanonicalPath();
+						Emulator.midletJarPath = new File(key).getCanonicalPath();
 					} catch (Exception e) {
-						Emulator.midletJar = key;
+						Emulator.midletJarPath = key;
 					}
 				} else {
 					Emulator.jadPath = key;
-					Emulator.midletJar = getMidletJarUrl(key);
+					Emulator.midletJarPath = getMidletJarUrl(key);
 				}
 			}
 			String value = null;
@@ -825,9 +825,9 @@ public class Emulator implements Runnable {
 			} else if (value != null) {
 				if (key.equalsIgnoreCase("jar")) {
 					try {
-						Emulator.midletJar = new File(value).getCanonicalPath();
+						Emulator.midletJarPath = new File(value).getCanonicalPath();
 					} catch (Exception e) {
-						Emulator.midletJar = value;
+						Emulator.midletJarPath = value;
 					}
 				} else if (key.equalsIgnoreCase("midlet")) {
 					Emulator.midletClassName = array[i];

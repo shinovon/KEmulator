@@ -5,7 +5,6 @@ import com.samsung.util.AudioClip;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
-import org.apache.tools.zip.ZipFile;
 import sun.misc.Unsafe;
 
 import javax.microedition.lcdui.Image;
@@ -417,14 +416,14 @@ public final class Memory {
 			return bytecodeSize;
 		int n = 0;
 		try {
-			if (Emulator.midletJar != null) {
+			if (Emulator.midletJarPath != null) {
                 final Enumeration<String> elements = Emulator.jarClasses.elements();
                 while (elements.hasMoreElements()) {
                     final String s;
                     try {
                         if (!cls(s = elements.nextElement()).isInterface()) {
-                            synchronized (Emulator.zipFileLock) {
-                                n += (int) Emulator.zipFile.getEntry(s.replace('.', '/') + ".class").getSize();
+                            synchronized (Emulator.jarFileLock) {
+                                n += (int) Emulator.midletJar.getEntry(s.replace('.', '/') + ".class").getSize();
                             }
                         }
                     } catch (Throwable ignored) {}
