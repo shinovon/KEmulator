@@ -98,13 +98,13 @@ public final class ResourceManager {
 		}
 		try {
 			int available;
-			if ((available = inputStream.available()) <= 0) {
+			if ((available = inputStream.available()) < 128) {
 				available = 128;
 			}
 			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(available);
 			final byte[] array = new byte[available];
 			int read;
-			while ((read = inputStream.read(array)) > 0) {
+			while ((read = inputStream.read(array)) != -1) {
 				byteArrayOutputStream.write(array, 0, read);
 			}
 			final byte[] byteArray = byteArrayOutputStream.toByteArray();
@@ -120,12 +120,12 @@ public final class ResourceManager {
 			throw new IllegalArgumentException("input = null");
 		}
 		int available;
-		if ((available = i.available()) <= 0) {
+		if ((available = i.available()) < 128) {
 			available = 128;
 		}
 		final byte[] buf = new byte[available];
 		int read;
-		while ((read = i.read(buf)) > 0) {
+		while ((read = i.read(buf)) != -1) {
 			o.write(buf, 0, read);
 		}
 		i.close();
