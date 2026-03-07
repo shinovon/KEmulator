@@ -362,6 +362,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		shell.addControlListener(this);
 		shell.setData("TYPE", SHELL_TYPE);
 		updateColumnSizes();
+		shell.layout();
 		disposed = false;
 		visible = true;
 		display.asyncExec(this);
@@ -555,10 +556,11 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		treeLayout.grabExcessVerticalSpace = true;
 		treeLayout.verticalAlignment = 4;
 
-		tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
+		tree = new Tree(this.shell, SWT.FULL_SELECTION | SWT.BORDER);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 		tree.setLayoutData(treeLayout);
+
 		if (this.type != WatcherType.Profiler) {
 			tree.setToolTipText("Right click: open watcher\nDouble click: edit value");
 			tree.addMouseListener(new MouseAdapter() {
@@ -633,6 +635,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		hexDecSwitch.setText("HEX");
 		hexDecSwitch.setToolTipText("If checked, numbers will be shown in hexadecimal form.");
 		hexDecSwitch.addSelectionListener(this);
+		GridData gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		hexDecSwitch.setLayoutData(gd);
 	}
 
 	private void createExportBtn() {
