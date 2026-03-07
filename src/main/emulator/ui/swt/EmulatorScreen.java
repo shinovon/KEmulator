@@ -2478,6 +2478,12 @@ public final class EmulatorScreen implements
 				logWindow.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 			}
 		}
+		if (((SWTFrontend) Emulator.getEmulator()).getClassWatcher().isVisible()) {
+			final Shell watchShell = ((SWTFrontend) Emulator.getEmulator()).getClassWatcher().getShell();
+			if ((((SWTFrontend) Emulator.getEmulator()).getClassWatcher()).isAttachedToParent() && !watchShell.isDisposed()) {
+				watchShell.setLocation(this.shell.getLocation().x - watchShell.getSize().x, this.shell.getLocation().y);
+			}
+		}
 		if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
 			final Shell method329 = ((MessageConsole) Emulator.getEmulator().getMessage()).method480();
 			if (((MessageConsole) Emulator.getEmulator().getMessage()).method488() && !method329.isDisposed()) {

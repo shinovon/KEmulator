@@ -23,7 +23,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.*;
 
-public final class Watcher extends SelectionAdapter implements Runnable, DisposeListener, TreeListener {
+public final class Watcher extends SelectionAdapter implements Runnable, DisposeListener, TreeListener, ControlListener {
 	private Shell shell;
 	private Display display;
 	private Combo classCombo;
@@ -45,6 +45,8 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	private TreeColumn column2;
 	private TreeColumn column3;
 	private long lastShellResizeEvent;
+	private Shell parentShell;
+	private boolean attachedToParent;
 
 	public static final String SHELL_TYPE = "WATCHER";
 
@@ -350,12 +352,14 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	public final void open(final Shell parent) {
 		display = parent.getDisplay();
+		this.parentShell = parent;
 		createWidgets();
 		updateContent();
 		setInitialRect(parent);
 
 		shell.open();
 		shell.addDisposeListener(this);
+		shell.addControlListener(this);
 		shell.setData("TYPE", SHELL_TYPE);
 		updateColumnSizes();
 		disposed = false;
@@ -411,14 +415,12 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			}
 			default: {
 				// parent is main window
-				shell.setSize(WIDTH, HEIGHT);
-				if (parent.getSize().x < WIDTH + 100 || parent.getSize().y < HEIGHT + 100) {
-					shell.setLocation(parent.getLocation().x + parent.getSize().x + 10, parent.getLocation().y);
-					break;
+				if (parent.getSize().x < WIDTH || parent.getSize().y < HEIGHT) {
+					shell.setSize(WIDTH, HEIGHT);
+				} else {
+					shell.setSize(parent.getSize());
 				}
-				int x = parent.getLocation().x + parent.getSize().x - WIDTH;
-				int y = parent.getLocation().y + parent.getSize().y - HEIGHT;
-				shell.setLocation(x, y);
+				shell.setLocation(parent.getLocation().x - parent.getSize().x, parent.getLocation().y);
 				break;
 			}
 		}
@@ -755,5 +757,26 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
 		this.dispose();
+	}
+
+	public final void controlMoved(final ControlEvent controlEvent) {
+		if (parentShell == null || parentShell.isDisposed()) return;
+		if (Math.abs(this.parentShell.getLocation().x - shell.getSize().x - this.shell.getLocation().x) < 10 && Math.abs(this.parentShell.getLocation().y - this.shell.getLocation().y) < 20) {
+			shell.setLocation(this.parentShell.getLocation().x - this.shell.getSize().x, this.parentShell.getLocation().y);
+			attachedToParent = true;
+		} else {
+			attachedToParent = false;
+		}
+	}
+
+	public final void controlResized(final ControlEvent controlEvent) {
+	}
+
+	public Shell getShell() {
+		return shell;
+	}
+
+	public final boolean isAttachedToParent() {
+		return this.attachedToParent;
 	}
 }
