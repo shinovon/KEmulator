@@ -418,18 +418,18 @@ public final class Memory {
 		int n = 0;
 		try {
 			if (Emulator.midletJar != null) {
-				synchronized (Emulator.zipFileLock) {
-					ZipFile zipFile = Emulator.zipFile;
-					final Enumeration<String> elements = Emulator.jarClasses.elements();
-					while (elements.hasMoreElements()) {
-						final String s;
-						try {
-							if (!cls(s = elements.nextElement()).isInterface()) {
-								n += (int) zipFile.getEntry(s.replace('.', '/') + ".class").getSize();
-							}
-						} catch (Throwable ignored) {}
-					}
-				}
+                final Enumeration<String> elements = Emulator.jarClasses.elements();
+                while (elements.hasMoreElements()) {
+                    final String s;
+                    try {
+                        if (!cls(s = elements.nextElement()).isInterface()) {
+                            synchronized (Emulator.zipFileLock) {
+                                n += (int) Emulator.zipFile.getEntry(s.replace('.', '/') + ".class").getSize();
+                            }
+                        }
+                    } catch (Throwable ignored) {}
+                }
+
 			} else {
 				final Enumeration<String> elements2 = Emulator.jarClasses.elements();
 				while (elements2.hasMoreElements()) {
