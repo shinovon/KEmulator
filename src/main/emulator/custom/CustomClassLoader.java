@@ -96,20 +96,20 @@ public final class CustomClassLoader extends ClassLoader {
 	}
 
 	private byte[] load(String s) throws Exception {
-		synchronized (Emulator.zipFileLock) {
+		synchronized (Emulator.jarFileLock) {
 			InputStream inputStream;
-			if (Emulator.midletJar == null) {
+			if (Emulator.midletJarPath == null) {
 				final File fileFromClassPath;
 				if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
 					throw new ClassNotFoundException();
 				}
 				inputStream = new FileInputStream(fileFromClassPath);
 			} else {
-				final ZipEntry entry = Emulator.zipFile.getEntry(s.replace('.', '/') + ".class");
+				final ZipEntry entry = Emulator.midletJar.getEntry(s.replace('.', '/') + ".class");
 				if (entry == null) {
 					throw new ClassNotFoundException();
 				}
-				inputStream = Emulator.zipFile.getInputStream(entry);
+				inputStream = Emulator.midletJar.getInputStream(entry);
 			}
 
 			final ClassReader classReader = new ClassReader(inputStream);

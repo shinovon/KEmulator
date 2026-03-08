@@ -35,7 +35,7 @@ public final class KeyRecords {
 				if (!(file = new File(this.aString1156)).exists()) {
 					file.createNewFile();
 				}
-				(this.aPrintStream1157 = new PrintStream(new FileOutputStream(file))).println(Emulator.midletJar);
+				(this.aPrintStream1157 = new PrintStream(new FileOutputStream(file))).println(Emulator.midletJarPath);
 				this.aPrintStream1157.println(Settings.recordedRandomSeed);
 			} catch (Exception ex2) {
 				Emulator.getEmulator().getLogStream().println("5 " + ex2.toString());

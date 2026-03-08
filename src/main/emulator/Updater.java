@@ -144,9 +144,9 @@ public class Updater {
 			cmd.add("-jad");
 			cmd.add(Emulator.jadPath);
 		}
-		if (Emulator.midletJar != null) {
+		if (Emulator.midletJarPath != null) {
 			cmd.add("-jar");
-			cmd.add(Emulator.midletJar);
+			cmd.add(Emulator.midletJarPath);
 		}
 
 		Emulator.getEmulator().disposeSubWindows();
