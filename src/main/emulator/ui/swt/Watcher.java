@@ -164,9 +164,13 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 					}
 				}
 			} else {
-				new TreeItem(this.tree, 0).setText(0, (String) value);
+				final TreeItem treeItem = new TreeItem(this.tree, 0);
+				treeItem.setText(0, (String) value);
 				if (this.type == WatcherType.Instance) {
-					this.tree.getItem(i).setText(2, c.getCls().getComponentType().getName());
+					this.tree.getItem(i).setText(2, ClassTypes.getReadableClassName(c.getCls().getComponentType()));
+					if (c.getCls().getComponentType().isArray()) {
+						new TreeItem(treeItem, 0).setText(0, "");
+					}
 				}
 			}
 		}
@@ -222,7 +226,10 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				this.method301(c, (Field) field, item);
 				display.asyncExec(this);
 			} else {
-				// TODO
+				final String name = ClassTypes.getReadableClassName(c.getCls().getComponentType());
+				final Object method870 = Array.get(c.getInstance(), Integer.parseInt((String) field));
+				method305(method870, method303(method870, name.substring(0, name.length() - 2)), item);
+				display.asyncExec(this);
 			}
 			return;
 		}
@@ -301,7 +308,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				o = Array.get(o, index);
 			}
 		}
-		if (o != null && ClassTypes.isObject(clazz)) {
+		if (o != null && (ClassTypes.isObject(clazz) || clazz.isArray())) {
 			new Watcher(o).open(shell);
 		}
 	}
@@ -514,6 +521,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 					TreeItem item = this.tree.getItem(n++);
 					Object value = ClassTypes.getArrayValue(c.getInstance(), Integer.parseInt((String) field), hex);
 					item.setText(1, String.valueOf(value));
+					this.fillArraySubtree(Array.get(c.getInstance(), Integer.parseInt((String) field)), item);
 				}
 			}
 		} catch (Exception ignored) {

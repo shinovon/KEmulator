@@ -769,7 +769,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			return;
 		}
 		final Object value = ((ObjInstance) array[0].getData()).value;
-		if (value != null && emulator.debug.ClassTypes.isObject(value.getClass())) {
+		if (value != null && (ClassTypes.isObject(value.getClass()) || value.getClass().isArray())) {
 			new Watcher(value).open(shell);
 		}
 	}
