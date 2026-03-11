@@ -346,7 +346,13 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				parentItem = parentItem.getParentItem();
 			}
 			int n = parentItem.getParent().indexOf(parentItem);
-			Object o = ClassTypes.getFieldValue(c.getInstance(), (Field) c.getFields().get(n));
+			Object field = c.getFields().get(n);
+			Object o;
+			if (field instanceof Field) {
+				o = ClassTypes.getFieldValue(c.getInstance(), (Field) field);
+			} else {
+				o = Array.get(c.getInstance(), Integer.parseInt((String) field));
+			}
 			Object o2;
 			Label_0140:
 			while (true) {
