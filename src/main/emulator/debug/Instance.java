@@ -32,7 +32,7 @@ public final class Instance {
 		} else {
 			this.method880(this.aClass, s);
 		}
-		return this.fields.size() > 0;
+		return this.fields.size() != 0;
 	}
 
 	private void method880(final Class clazz, final String s) {

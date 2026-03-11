@@ -164,9 +164,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 					}
 				}
 			} else {
-				new TreeItem(this.tree, 0).setText(0, value.getClass().getName());
+				new TreeItem(this.tree, 0).setText(0, (String) value);
 				if (this.type == WatcherType.Instance) {
-					this.tree.getItem(i).setText(2, value.getClass().getName());
+					this.tree.getItem(i).setText(2, c.getCls().getComponentType().getName());
 				}
 			}
 		}
@@ -217,8 +217,13 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 		final Instance c = getWatched();
 		if (item.getParentItem() == null) {
-			this.method301(c, (Field) c.getFields().get(item.getParent().indexOf(item)), item);
-			display.asyncExec(this);
+			Object field = c.getFields().get(item.getParent().indexOf(item));
+			if (field instanceof Field) {
+				this.method301(c, (Field) field, item);
+				display.asyncExec(this);
+			} else {
+				// TODO
+			}
 			return;
 		}
 		TreeItem parentItem = item;
@@ -227,9 +232,17 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			stack.push(parentItem);
 			parentItem = parentItem.getParentItem();
 		}
-		final Field field = (Field) c.getFields().get(parentItem.getParent().indexOf(parentItem));
-		Object o = ClassTypes.getFieldValue(c.getInstance(), field);
-		final String method869 = ClassTypes.getReadableClassName(field.getType());
+		final Object field = c.getFields().get(parentItem.getParent().indexOf(parentItem));
+		Object o;
+		Class clazz;
+		if (field instanceof Field) {
+			o = ClassTypes.getFieldValue(c.getInstance(), (Field) field);
+			clazz = ((Field) field).getType();
+		} else {
+			o = Array.get(c.getInstance(), Integer.parseInt((String) field));
+			clazz = c.getCls().getComponentType();
+		}
+		final String method869 = ClassTypes.getReadableClassName(clazz);
 		String s = method303(o, method869.substring(0, method869.length() - 2));
 		String s2;
 		while (true) {
@@ -257,9 +270,14 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		Object o;
 		Class<?> clazz;
 		if (array[0].getParentItem() == null) {
-			final Field field = (Field) c.getFields().get(array[0].getParent().indexOf(array[0]));
-			o = ClassTypes.getFieldValue(c.getInstance(), field);
-			clazz = field.getType();
+			final Object field = c.getFields().get(array[0].getParent().indexOf(array[0]));
+			if (field instanceof Field) {
+				o = ClassTypes.getFieldValue(c.getInstance(), (Field) field);
+				clazz = ((Field) field).getType();
+			} else {
+				o = Array.get(c.getInstance(), Integer.parseInt((String) field));
+				clazz = c.getCls().getComponentType();
+			}
 		} else {
 			TreeItem parentItem = array[0];
 			final Stack stack = new Stack<TreeItem>();
@@ -267,7 +285,15 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				stack.push(parentItem);
 				parentItem = parentItem.getParentItem();
 			}
-			clazz = (o = ClassTypes.getFieldValue(c.getInstance(), (Field) c.getFields().get(parentItem.getParent().indexOf(parentItem)))).getClass().getComponentType();
+			Object field = c.getFields().get(parentItem.getParent().indexOf(parentItem));
+			if (field instanceof Field) {
+				o = ClassTypes.getFieldValue(c.getInstance(), (Field) field);
+				clazz = ((Field) field).getType().getComponentType();
+			} else {
+				o = Array.get(c.getInstance(), Integer.parseInt((String) field));
+				clazz = c.getCls().getComponentType();
+			}
+			if (o == null) return;
 			while (!stack.isEmpty()) {
 				final TreeItem treeItem = (TreeItem) stack.pop();
 				final int index = treeItem.getParentItem().indexOf(treeItem);
@@ -297,8 +323,14 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 		if (treeItem.getParentItem() == null) {
 			target = c.getInstance();
-			targetField = (Field) c.getFields().get(treeItem.getParent().indexOf(treeItem));
-			targetIndex = -1;
+			Object field = c.getFields().get(treeItem.getParent().indexOf(treeItem));
+			if (field instanceof Field) {
+				targetField = (Field) field;
+				targetIndex = -1;
+			} else {
+				targetField = null;
+				targetIndex = Integer.parseInt((String) field);
+			}
 		} else {
 			TreeItem parentItem = treeItem;
 			final Stack stack = new Stack<TreeItem>();
@@ -461,21 +493,28 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.updateInProgress = true;
 		final Instance c = getWatched();
 		int n = 0;
+		boolean hex = hexDecSwitch != null && hexDecSwitch.getSelection();
 		try {
 			if (Memory.getInstance().isNotInitialized(c.getCls())) {
 				this.updateInProgress = false;
 				return;
 			}
 			for (int i = 0; i < c.getFields().size(); ++i) {
-				final Field field = (Field) c.getFields().get(i);
+				final Object field = c.getFields().get(i);
 				if (this.disposed) {
 					this.updateInProgress = false;
 					return;
 				}
-				final String s = (!Modifier.isStatic(field.getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.method874(c.getInstance(), field, hexDecSwitch != null && hexDecSwitch.getSelection());
-				final TreeItem item;
-				(item = this.tree.getItem(n++)).setText(1, s);
-				this.fillArraySubtree(ClassTypes.getFieldValue(c.getInstance(), field), item);
+				if (field instanceof Field) {
+					final String s = (!Modifier.isStatic(((Field) field).getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.getFieldValue(c.getInstance(), (Field) field, hex);
+					final TreeItem item = this.tree.getItem(n++);
+					item.setText(1, s);
+					this.fillArraySubtree(ClassTypes.getFieldValue(c.getInstance(), (Field) field), item);
+				} else {
+					TreeItem item = this.tree.getItem(n++);
+					Object value = ClassTypes.getArrayValue(c.getInstance(), Integer.parseInt((String) field), hex);
+					item.setText(1, String.valueOf(value));
+				}
 			}
 		} catch (Exception ignored) {
 		}
