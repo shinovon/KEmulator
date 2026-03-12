@@ -60,6 +60,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private static final Vector<WavCache> wavCache = new Vector<WavCache>();
 
 	private WavCache cacheRef;
+	private SourceDataLine midiOutput;
 
 	public PlayerImpl() {
 		loopCount = 1;
@@ -900,18 +901,14 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (level != n) notifyListeners(PlayerListener.VOLUME_CHANGED, n, true);
 		level = n;
 		if (sequence == null) return;
-		final double n2 = n / 100.0;
 		if (sequence instanceof Clip) {
 			synchronized (sequence) {
-				try {
-					((FloatControl) ((Clip) sequence).getControl(FloatControl.Type.MASTER_GAIN))
-							.setValue((float) (Math.log((n2 == 0.0) ? 1.0E-4 : n2) / Math.log(10.0) * 20.0));
-				} catch (Exception ignored) {}
+				setVolume((Clip) sequence, n);
 			}
 			return;
 		}
 		if (sequence instanceof Sequence) {
-			// TODO midi volume
+			setVolume(midiOutput, n);
 			return;
 		}
 		if (sequence instanceof emulator.javazoom.jl.player.Player) {
@@ -923,6 +920,20 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				((MaDll) sequence).setVolume(maFormat, maSound, n);
 			}
 		}
+	}
+
+	private void setVolume(Line line, int volume) {
+		if (line == null) return;
+
+		try {
+			if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+				FloatControl c = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+				c.setValue((float) (Math.log((volume == 0) ? 1.0E-4 : (volume / 100.0f)) / Math.log(10.0) * 20.0));
+			} else if (line.isControlSupported(FloatControl.Type.VOLUME)) {
+				FloatControl c = (FloatControl) line.getControl(FloatControl.Type.VOLUME);
+				c.setValue((volume * c.getMaximum()) / 100.0f);
+			}
+		} catch (Exception ignored) {}
 	}
 
 	public TimeBase getTimeBase() {
@@ -987,10 +998,13 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (EmulatorMIDI.useExternalReceiver()) {
 			EmulatorMIDI.setupSequencer(midiSequencer);
 		} else {
-			midiSynthesizer = MidiSystem.getSynthesizer();
-			midiSynthesizer.open();
-			midiSynthesizer.loadAllInstruments(EmulatorMIDI.useCustomSoundfont() ?
-					EmulatorMIDI.soundbank : midiSynthesizer.getDefaultSoundbank());
+			SourceDataLine source = null;
+			try {
+				final AudioFormat audioFormat = new AudioFormat(44100.0F, 16, 2, true, false);
+				source = (SourceDataLine) AudioSystem.getLine(new DataLine.Info(SourceDataLine.class, audioFormat));
+				midiOutput = source;
+			} catch (Exception ignored) {}
+			midiSynthesizer = EmulatorMIDI.openSynthesizer(source);
 			midiSequencer.getTransmitter().setReceiver(midiSynthesizer.getReceiver());
 		}
 		midiSequencer.open();

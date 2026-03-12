@@ -1,11 +1,15 @@
 package emulator.media;
 
+import com.sun.media.sound.AudioSynthesizer;
 import emulator.Settings;
 
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerImpl;
 import javax.sound.midi.*;
+import javax.sound.sampled.SourceDataLine;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EmulatorMIDI {
 	public static Player currentPlayer;
@@ -65,9 +69,7 @@ public class EmulatorMIDI {
 			}
 		}
 		if (receiver == null) {
-			synthesizer = MidiSystem.getSynthesizer();
-			synthesizer.open();
-			synthesizer.loadAllInstruments(useCustomSoundfont() ? soundbank : synthesizer.getDefaultSoundbank());
+			synthesizer = openSynthesizer(null);
 			receiver = synthesizer.getReceiver();
 		}
 		if (sequencer == null) {
@@ -82,6 +84,23 @@ public class EmulatorMIDI {
 				}
 			});
 		}
+	}
+
+	public static Synthesizer openSynthesizer(SourceDataLine source) throws MidiUnavailableException {
+		Synthesizer synthesizer = MidiSystem.getSynthesizer();
+		open: {
+			try {
+				if (synthesizer instanceof AudioSynthesizer) {
+					Map<String, Object> properties = new HashMap<>();
+					properties.put("jitter correction", true);
+					((AudioSynthesizer) synthesizer).open(source, properties);
+					break open;
+				}
+			} catch (Exception ignored) {}
+			synthesizer.open();
+		}
+		synthesizer.loadAllInstruments(useCustomSoundfont() ? soundbank : synthesizer.getDefaultSoundbank());
+		return synthesizer;
 	}
 
 	public static void setSequence(Sequence sequence) throws InvalidMidiDataException, MidiUnavailableException {
