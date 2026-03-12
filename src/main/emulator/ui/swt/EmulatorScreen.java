@@ -770,6 +770,7 @@ public final class EmulatorScreen implements
 		leftSoftLabelText = label;
 		display.syncExec(() -> {
 			leftSoftLabel.setText(label);
+			shell.layout();
 		});
 	}
 
@@ -779,6 +780,7 @@ public final class EmulatorScreen implements
 		rightSoftLabelText = label;
 		display.syncExec(() -> {
 			rightSoftLabel.setText(label);
+			shell.layout();
 		});
 	}
 
