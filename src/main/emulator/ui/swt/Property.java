@@ -282,12 +282,12 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	public String getRmsFolderPath() {
-		String s = null;
+		String s = this.rmsFolder;
 		Label_0077:
 		{
 			StringBuffer sb;
 			String substring;
-			if ((s = this.rmsFolder).startsWith(".")) {
+			if (s.startsWith(".")) {
 				sb = new StringBuffer().append(Emulator.getUserPath());
 				substring = s.substring(1);
 			} else {
@@ -299,6 +299,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 			s = sb.append(substring).toString();
 		}
+		if (s.startsWith("file://")) s = s.substring(7);
 		final File file = new File(s);
 		if (!file.exists() || !file.isDirectory()) {
 			file.mkdirs();
@@ -342,7 +343,8 @@ public final class Property implements IProperty, SelectionListener {
 			if (monospaceFont == null) {
 				monospaceFont = pickFont(true);
 			}
-			this.rmsFolder = properties.getProperty("RMSFolder", "/rms");
+			this.rmsFolder = properties.getProperty("RMSFolder", "./rms");
+			if (rmsFolder.equals("/rms")) rmsFolder = "./rms";
 			this.fontSmallSize = Integer.parseInt(properties.getProperty("FontSmallSize", String.valueOf(12)));
 			this.fontMediumSize = Integer.parseInt(properties.getProperty("FontMediumSize", String.valueOf(14)));
 			this.fontLargeSize = Integer.parseInt(properties.getProperty("FontLargeSize", String.valueOf(16)));
@@ -511,7 +513,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 			this.defaultFont = "Tahoma";
 			this.monospaceFont = "Consolas";
-			this.rmsFolder = "/rms";
+			this.rmsFolder = "./rms";
 			EmulatorScreen.locX = Integer.MIN_VALUE;
 			EmulatorScreen.locY = Integer.MIN_VALUE;
 			Settings.autoGenJad = false;

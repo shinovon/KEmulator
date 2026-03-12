@@ -11,6 +11,7 @@ import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.factory.discovery.strategy.*;
+import uk.co.caprica.vlcj.support.version.LibVlcVersion;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
@@ -92,7 +93,11 @@ public class Manager {
 		}
 		if (contentType != null && contentType.startsWith("video/")) {
 			requireLibVlc();
-			if (s.startsWith("rtsp://") || s.startsWith("http://") || s.startsWith("https://") || s.startsWith("rtp://")) {
+			if (s.startsWith("http://") || s.startsWith("https://")) {
+				return new VLCPlayerImpl(s, contentType);
+//				return new VLCPlayerImpl(((InputConnection) Connector.open(s)).openInputStream(), contentType);
+			}
+			if (s.startsWith("rtsp://") || s.startsWith("rtp://")) {
 				return new VLCPlayerImpl(s, contentType);
 			}
 			if (s.startsWith("file:///")) {
@@ -448,6 +453,9 @@ public class Manager {
 		if (url.endsWith(".mmf")) {
 			return "audio/mmf";
 		}
+		if (url.endsWith(".m4a")) {
+			return "audio/m4a";
+		}
 		return null;
 	}
 
@@ -499,7 +507,8 @@ public class Manager {
 					@Override
 					public boolean supported() {
 						// TODO
-						return !Emulator.isX64() || RuntimeUtil.isWindows();
+//						return !Emulator.isX64() || RuntimeUtil.isWindows();
+						return true;
 					}
 
 					@Override
@@ -530,7 +539,7 @@ public class Manager {
 			boolean b = nd.discover();
 			libVlcState = b ? 1 : -1;
 			if (b) {
-				log("LibVlc loaded");
+				log("LibVlc loaded from " + nd.discoveredPath());
 				return;
 			}
 		} catch (Throwable e) {
