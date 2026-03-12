@@ -213,13 +213,17 @@ public class JavaSoundAudioDevice extends AudioDeviceBase
 
 	public void setVolume(int vol) {
 		volume = vol;
-        if (source != null && source.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+		if (source == null) return;
+        if (source.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
 			FloatControl c = (FloatControl)source.getControl(FloatControl.Type.MASTER_GAIN);
 			float f = vol / 100.0f;
 			c.setValue((float) (Math.log((f == 0.0) ? 1.0E-4 : f) / Math.log(10.0) * 20.0));
 			//float f = ((float) (c.getMaximum() * ((double)getVolume()/100d)) - (c.getMaximum() / 2))*2;
             //c.setValue(f);
-        }
+        } else  if (source.isControlSupported(FloatControl.Type.VOLUME)) {
+			FloatControl c = (FloatControl)source.getControl(FloatControl.Type.VOLUME);
+			c.setValue((vol * c.getMaximum()) / 100.0f);
+		}
 	}
 
 	public int getVolume() {
