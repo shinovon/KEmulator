@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.*;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Screen;
+import javax.swing.*;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -418,11 +419,14 @@ public final class EmulatorScreen implements
 					display.sleep();
 				}
 			}
-		} catch (Error e) {
-			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			CustomMethod.close();
+			try {
+				showMessage("KEmulator has crashed, please report this error message.", CustomMethod.getStackTrace(e));
+			} catch (Throwable t) {
+				JOptionPane.showMessageDialog(new JPanel(), "KEmulator has crashed, please report this error message.\n\n" + CustomMethod.getStackTrace(e));
+			}
 			System.exit(1);
 		}
 		this.pauseState = 0;
