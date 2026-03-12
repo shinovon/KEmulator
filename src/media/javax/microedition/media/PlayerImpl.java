@@ -1024,14 +1024,16 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	}
 
 	public String getReadableImplementationType() {
-		if(sequence == null)
+		if (sequence == null)
 			return "Empty player";
-		if(sequence instanceof Sequence)
+		if (sequence instanceof Sequence)
 			return "JVM MIDI";
-		if(sequence instanceof Clip)
+		if (sequence instanceof Clip)
 			return "JVM clip";
-		if(sequence instanceof emulator.javazoom.jl.player.Player)
+		if (sequence instanceof emulator.javazoom.jl.player.Player)
 			return "javazoom";
+		if (sequence instanceof MaDll)
+			return "SMAF";
 		return "MMAPI/unknown";
 	}
 
