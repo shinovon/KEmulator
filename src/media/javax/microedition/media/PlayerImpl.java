@@ -957,7 +957,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 
 	public String getExportName() {
 		String ext = "";
-		if (sequence instanceof Sequence || sequence instanceof MaDll) {
+		if (sequence instanceof Sequence || (sequence instanceof MaDll && maFormat == MaDll.FORMAT_MID)) {
 			ext = "mid";
 		} else /*if (sequence instanceof Clip) {
 			ext = "wav";
