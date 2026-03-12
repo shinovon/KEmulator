@@ -94,6 +94,7 @@ public class EmulatorMIDI {
 					Map<String, Object> properties = new HashMap<>();
 					properties.put("jitter correction", true);
 					properties.put("reverb", false);
+					properties.put("chorus", false);
 					((AudioSynthesizer) synthesizer).open(source, properties);
 					break open;
 				}
