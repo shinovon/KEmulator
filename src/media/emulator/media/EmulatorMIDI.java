@@ -93,6 +93,7 @@ public class EmulatorMIDI {
 				if (synthesizer instanceof AudioSynthesizer) {
 					Map<String, Object> properties = new HashMap<>();
 					properties.put("jitter correction", true);
+					properties.put("reverb", false);
 					((AudioSynthesizer) synthesizer).open(source, properties);
 					break open;
 				}
