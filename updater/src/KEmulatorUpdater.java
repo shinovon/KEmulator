@@ -25,7 +25,7 @@ import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.7";
+	private static final String VERSION = "0.8";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
 	@SuppressWarnings("SpellCheckingInspection")
@@ -64,6 +64,7 @@ public class KEmulatorUpdater implements Runnable {
 
 	private static int length;
 	private static int progress;
+	private static JFrame frame;
 
 	public static void main(String[] args) {
 		kemulatorDir = Paths.get(".");
@@ -205,7 +206,7 @@ public class KEmulatorUpdater implements Runnable {
 	 * @wbp.parser.entryPoint
 	 */
 	public void run() {
-		JFrame frame = new JFrame();
+		frame = new JFrame();
 		frame.setTitle("KEmulator Updater");
 		frame.setBounds(100, 100, 320, 100);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -314,6 +315,9 @@ public class KEmulatorUpdater implements Runnable {
 		if (exception != null) {
 			log(exception);
 		}
+		if (frame != null) {
+			JOptionPane.showMessageDialog(frame, message + "\n" + getExceptionString(exception), "Failed to update KEmulator", JOptionPane.ERROR_MESSAGE);
+		}
 		exitDelay(3000);
 	}
 
@@ -331,14 +335,7 @@ public class KEmulatorUpdater implements Runnable {
 	}
 	
 	static void log(Throwable exception) {
-		String res = null;
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			exception.printStackTrace(new PrintStream(baos));
-			res = baos.toString();
-		} catch (Throwable ignored) {}
-		
-		if (res == null) return;
+		String res = getExceptionString(exception);
 		log(res, true);
 	}
 	
@@ -347,6 +344,16 @@ public class KEmulatorUpdater implements Runnable {
 //		if (textArea == null) return;
 //		log.append(text).append('\n');
 //		if (show) textArea.setText(log.toString());
+	}
+
+	static String getExceptionString(Throwable exception) {
+		String res = "";
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			exception.printStackTrace(new PrintStream(baos));
+			res = baos.toString();
+		} catch (Throwable ignored) {}
+		return res;
 	}
 	
 	static int getJavaVersionMajor() {
