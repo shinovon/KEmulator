@@ -149,14 +149,14 @@ public class KEmulatorUpdater implements Runnable {
 					update(UPDATE_URL
 							+ branch + "/" + type
 							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), "KEmulator.jar");
-				} catch (IOException e) {
+				} catch (Exception e) {
 					fail("Failed to download KEmulator.jar", e);
 					return;
 				}
 
 				try {
 					updateExtract(UPDATE_URL + branch + "/lang.zip", "lang.zip", kemulatorDir);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					fail("Failed to download lang.zip", e);
 					return;
 				}
@@ -168,14 +168,14 @@ public class KEmulatorUpdater implements Runnable {
 						update(UPDATE_URL + branch + "/" + type + "/micro3d_gl.jar", "micro3d_gl.jar");
 						update(UPDATE_URL + branch + "/" + type + "/micro3d_dll.jar", "micro3d_dll.jar");
 						update(UPDATE_URL + branch + "/" + type + "/amrdecoder.dll", "amrdecoder.dll");
-					} catch (IOException e) {
+					} catch (Exception e) {
 						fail("Failed to download libraries", e);
 						return;
 					}
 				} else {
 					try {
 						updateExtract(UPDATE_URL + branch + "/lwjgl.zip", "lwjgl.zip", kemulatorDir);
-					} catch (IOException e) {
+					} catch (Exception e) {
 						fail("Failed to download lwjgl.zip", e);
 						return;
 					}
@@ -196,8 +196,7 @@ public class KEmulatorUpdater implements Runnable {
 				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			log(e);
+			fail("Unhandled exception", e);
 		}
 		exitDelay(3000);
 	}
@@ -315,9 +314,9 @@ public class KEmulatorUpdater implements Runnable {
 		if (exception != null) {
 			log(exception);
 		}
-		if (frame != null) {
-			JOptionPane.showMessageDialog(frame, message + "\n" + getExceptionString(exception), "Failed to update KEmulator", JOptionPane.ERROR_MESSAGE);
-		}
+		try {
+			JOptionPane.showMessageDialog(frame, message + (exception != null ? ("\n" + getExceptionString(exception)) : ""), "Failed to update KEmulator", JOptionPane.ERROR_MESSAGE);
+		} catch (Throwable ignored) {}
 		exitDelay(3000);
 	}
 
