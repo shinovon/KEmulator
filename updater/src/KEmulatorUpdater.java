@@ -454,6 +454,7 @@ public class KEmulatorUpdater implements Runnable {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setRequestProperty("User-Agent", "KEmulatorUpdater/" + VERSION);
 			connection.setRequestProperty("Accept-Encoding", "gzip");
+			connection.setUseCaches(false);
 			int responseCode = connection.getResponseCode();
 			if (responseCode == 404) {
 				throw new FileNotFoundException(url);
