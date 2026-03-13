@@ -981,8 +981,8 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				ext = "mp3";
 			}
 		}
-		if (ext.isEmpty()) return "audio" + hashCode();
-		return hashCode() + "." + ext;
+		String s = "audio" + System.currentTimeMillis();
+		return ext.isEmpty() ? s : (s + '.' + ext);
 	}
 
 	public void notifyCompleted() {

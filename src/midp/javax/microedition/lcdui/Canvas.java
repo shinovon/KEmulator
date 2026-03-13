@@ -10,10 +10,8 @@ import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.lcdui.LCDUIUtils;
 import emulator.ui.IScreen;
-import emulator.ui.swt.AppSettingsUI;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 public abstract class Canvas extends Displayable {

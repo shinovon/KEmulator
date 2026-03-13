@@ -2,7 +2,6 @@ package javax.microedition.rms;
 
 import emulator.Emulator;
 import emulator.ui.IEmulatorFrontend;
-import emulator.ui.swt.SWTFrontend;
 
 import java.io.*;
 import java.util.ArrayList;
