@@ -27,12 +27,13 @@ swt 4.20 / 4.7 (32-bit)
 asm 5.2
 lwjgl 3.3.6
 java-discord-rpc 2.0.1
-jinput
+jinput 2.0.5
 jna 5.7.0
 webcam-capture 0.3.12
 slf4j-api 1.7.2
 bridj 0.7.0
-vlcj 4.7.1
+vlcj 4.7.3
+opencore-amr 0.1.6
 
 $[Bug Report]
 GitHub: https://github.com/shinovon/KEmulator/issues
