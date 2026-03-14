@@ -4,6 +4,7 @@ Copyright (c) 2021-2026 Arman Jussupgaliyev
 package emulator.media.vlc;
 
 import emulator.Emulator;
+import emulator.Permission;
 import emulator.Settings;
 import emulator.graphics2D.awt.AWTImageUtils;
 import emulator.graphics2D.awt.ImageAWT;
@@ -323,6 +324,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (!prepared) {
 			synchronized (vlcLock) {
 				load();
+				if (mediaUrl.startsWith("v4l2:") || mediaUrl.startsWith("ddraw:")) {
+					Permission.checkPermission("media.camera");
+				}
 				try {
 					if (mediaCallback != null) {
 						if (!mediaPlayer.media().prepare(mediaCallback)) {

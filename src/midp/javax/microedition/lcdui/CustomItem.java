@@ -230,4 +230,18 @@ public abstract class CustomItem extends Item {
 	boolean isFocusable() {
 		return true;
 	}
+
+	public int getMinimumWidth() {
+		try {
+			return getMinContentWidth();
+		} catch (Exception ignored) {}
+		return 0;
+	}
+
+	public int getMinimumHeight() {
+		try {
+			return getMinContentHeight();
+		} catch (Exception ignored) {}
+		return 0;
+	}
 }

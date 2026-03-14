@@ -8,10 +8,8 @@ import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.ToneManager;
 import emulator.media.vlc.VLCPlayerImpl;
 import uk.co.caprica.vlcj.binding.LibC;
-import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.factory.discovery.strategy.*;
-import uk.co.caprica.vlcj.support.version.LibVlcVersion;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
@@ -63,9 +61,9 @@ public class Manager {
 			requireLibVlc();
 			return new VLCPlayerImpl(inputStream, s);
 		}
-//		if ("audio/amr-wb".equals(s) && isLibVlcSupported()) {
-//			return new VLCPlayerImpl(inputStream, s);
-//		}
+		if (s != null && Settings.enableVlc && isAudioContentTypeRequiresLibVlc(s)) {
+			return new VLCPlayerImpl(inputStream, s);
+		}
 		// buffer
 		boolean buf = Settings.playerBufferAll;
 		if (buf && !(inputStream instanceof ByteArrayInputStream))
@@ -91,7 +89,8 @@ public class Manager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (contentType != null && contentType.startsWith("video/")) {
+		if ((contentType != null && contentType.startsWith("video/"))
+				|| s.startsWith("rtsp://") || s.startsWith("rtp://")) {
 			requireLibVlc();
 			if (s.startsWith("http://") || s.startsWith("https://")) {
 				return new VLCPlayerImpl(s, contentType);
@@ -181,7 +180,8 @@ public class Manager {
 			contentType = getContentTypeFromLocation(src.getLocator());
 
 			log("getContentType(): " + contentType);
-			if (contentType != null && contentType.startsWith("video/")) {
+			if (contentType != null && (contentType.startsWith("video/")
+					|| (Settings.enableVlc && isAudioContentTypeRequiresLibVlc(contentType.toLowerCase())))) {
 				requireLibVlc();
 				player = new VLCPlayerImpl(locator, contentType, src);
 			} else {
@@ -226,6 +226,7 @@ public class Manager {
 	}
 
 	private static boolean isAudioContentTypeRequiresLibVlc(String c) {
+		c = c.toLowerCase();
 		for (String s : kemAudio) {
 			if (c.equals(s)) return false;
 		}
@@ -375,6 +376,9 @@ public class Manager {
 
 	private static String getContentTypeFromURL(String url) throws IOException {
 		// remove query
+		if (url.contains(";")) {
+			url = url.substring(0, url.indexOf(";"));
+		}
 		if (url.contains("?")) {
 			url = url.substring(0, url.indexOf("?"));
 		}
