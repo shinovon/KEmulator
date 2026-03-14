@@ -91,7 +91,12 @@ class Row {
 		return !item._hasLayout(Item.LAYOUT_NEWLINE_BEFORE)
 				&& !lastItem._hasLayout(Item.LAYOUT_NEWLINE_AFTER)
 				&& width != maxWidth
-				&& width + (item._hasLayout(Item.LAYOUT_SHRINK) ? item.getMinimumWidth() : item.getPreferredWidth()) < maxWidth;
+				&& (item instanceof StringItem
+						&& ((StringItem) item).getAppearanceMode() != Item.BUTTON
+						&& !item.isSizeLocked() && !item.hasLabel()
+						&& ((StringItem) item).getRowsCount() != 0 ?
+				(width + ((StringItem) item).getRowWidth(0) < maxWidth)
+				: (width + (item._hasLayout(Item.LAYOUT_SHRINK) ? item.getMinimumWidth() : item.getPreferredWidth()) < maxWidth));
 	}
 
 	boolean contains(Item item) {
