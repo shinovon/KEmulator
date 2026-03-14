@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024-2026 Arman Jussupgaliyev
+*/
 package emulator.media;
 
 import com.sun.media.sound.AudioSynthesizer;

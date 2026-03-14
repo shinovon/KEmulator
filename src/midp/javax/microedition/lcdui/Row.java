@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024-2026 Arman Jussupgaliyev
+*/
 package javax.microedition.lcdui;
 
 import java.util.ArrayList;

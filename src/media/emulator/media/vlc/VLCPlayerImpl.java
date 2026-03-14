@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2021-2026 Arman Jussupgaliyev
+*/
 package emulator.media.vlc;
 
 import emulator.Emulator;
@@ -89,7 +92,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		rateControl = new RateControlImpl(this);
 		stopTimeControl = new StopTimeControlImpl(this);
 		metaDataControl = new MetaDataControlImpl(this);
-		controls = new Control[]{videoControl, volumeControl, rateControl, stopTimeControl};
+		controls = new Control[]{videoControl, volumeControl, rateControl, stopTimeControl, metaDataControl};
 		this.timeBase = Manager.getSystemTimeBase();
 		if (Settings.enableMediaDump)
 			PlayerImpl.players.add(this);

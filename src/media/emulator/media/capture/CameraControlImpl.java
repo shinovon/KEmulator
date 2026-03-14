@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package emulator.media.capture;
 
 import javax.microedition.amms.control.camera.CameraControl;
