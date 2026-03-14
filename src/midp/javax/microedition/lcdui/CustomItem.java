@@ -214,7 +214,17 @@ public abstract class CustomItem extends Item {
 	protected boolean callTraverse(final int n) {
 		if (screen == null) return false;
 		if (this.anIntArray429 == null) return false;
-		return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
+		try {
+			return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
+		} catch (Exception ignored) {}
+		return false;
+	}
+
+	void _defocus() {
+		super._defocus();
+		try {
+			traverseOut();
+		} catch (Exception ignored) {}
 	}
 
 	boolean isFocusable() {

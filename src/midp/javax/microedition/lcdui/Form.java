@@ -144,8 +144,11 @@ public class Form extends Screen {
 		if (scrollTargetItem == null && scrollCurrentItem == null) {
 			scrollTargetItem = getFirstVisibleAndFocusableItem();
 		}
-		if (focusedItem != null && focusedItem instanceof CustomItem && ((CustomItem) focusedItem).callTraverse(key)) {
-			return;
+		if (focusedItem != null && focusedItem instanceof CustomItem) {
+			if (((CustomItem) focusedItem).callTraverse(key)) {
+				return;
+			}
+//			((CustomItem) focusedItem).traverseOut();
 		}
 		if (scrollCurrentItem != null && focusedItem == null) {
 			focusItem(scrollCurrentItem);
