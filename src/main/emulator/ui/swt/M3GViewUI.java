@@ -380,13 +380,68 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
 		(this.aMenuItem932 = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
 		this.aMenuItem932.setAccelerator(67);
-		this.aMenuItem932.addSelectionListener(new M3GViewCameraClipPlanesListener(this));
+		M3GViewUI aClass90_11671 = this;
+		this.aMenuItem932.addSelectionListener(new SelectionAdapter() {
+			private final M3GViewUI aClass90_1167 = aClass90_11671;
+
+			public final void widgetSelected(final SelectionEvent selectionEvent) {
+				final M3GViewCameraSetDialog class30;
+				(class30 = new M3GViewCameraSetDialog(method499(this.aClass90_1167), 1)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes"));
+				class30.method338(method503(this.aClass90_1167), method512(this.aClass90_1167));
+				class30.method340();
+				if (method500(this.aClass90_1167) == 0) {
+					if (class30.aFloat606 > 0.0f) {
+						method506(this.aClass90_1167, class30.aFloat606);
+					}
+					if (class30.aFloat608 > 0.0f) {
+						method513(this.aClass90_1167, class30.aFloat608);
+					}
+				} else {
+					method506(this.aClass90_1167, class30.aFloat606);
+					method513(this.aClass90_1167, class30.aFloat608);
+				}
+				method252(this.aClass90_1167);
+			}
+		});
 		(this.aMenuItem933 = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View") + "\tF");
 		this.aMenuItem933.setAccelerator(70);
-		this.aMenuItem933.addSelectionListener(new M3GViewCameraFOVListener(this));
+		M3GViewUI aClass90_6251 = this;
+		this.aMenuItem933.addSelectionListener(new SelectionAdapter() {
+			private final M3GViewUI aClass90_625 = aClass90_6251;
+
+			public final void widgetSelected(final SelectionEvent selectionEvent) {
+				final M3GViewCameraSetDialog class30;
+				(class30 = new M3GViewCameraSetDialog(method499(this.aClass90_625), 0)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View"));
+				class30.method337(method517(this.aClass90_625));
+				class30.method340();
+				if (class30.aFloat603 > 0.0f) {
+					if (method500(this.aClass90_625) == 0) {
+						if (class30.aFloat603 < 180.0f) {
+							method518(this.aClass90_625, class30.aFloat603);
+						}
+					} else {
+						method518(this.aClass90_625, class30.aFloat603);
+					}
+					method252(this.aClass90_625);
+				}
+			}
+		});
 		(this.aMenuItem934 = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position") + "\tP");
 		this.aMenuItem934.setAccelerator(80);
-		this.aMenuItem934.addSelectionListener(new M3GViewCameraPosListener(this));
+		M3GViewUI aClass90_13021 = this;
+		this.aMenuItem934.addSelectionListener(new SelectionAdapter() {
+			private final M3GViewUI aClass90_1302 = aClass90_13021;
+
+			public final void widgetSelected(final SelectionEvent selectionEvent) {
+				final M3GViewCameraSetDialog class30;
+				(class30 = new M3GViewCameraSetDialog(method499(this.aClass90_1302), 2)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position"));
+				class30.method339(method525(this.aClass90_1302), method532(this.aClass90_1302), method537(this.aClass90_1302));
+				class30.method340();
+				method526(this.aClass90_1302, class30.aFloat610);
+				method533(this.aClass90_1302, class30.aFloat612);
+				method538(this.aClass90_1302, class30.aFloat614);
+			}
+		});
 		new MenuItem(this.cameraMenu, 2);
 		(this.aMenuItem935 = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_RESET", "Reset Camera") + "\tR");
 		this.aMenuItem935.setAccelerator(82);

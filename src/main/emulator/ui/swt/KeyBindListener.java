@@ -6,11 +6,11 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Text;
 
-final class Class135 extends KeyAdapter {
-	private Text text;
-	private int i;
+final class KeyBindListener extends KeyAdapter {
+	private final Text text;
+	private final int i;
 
-	Class135(Text text, int i) {
+	KeyBindListener(Text text, int i) {
 		super();
 		this.text = text;
 		this.i = i;

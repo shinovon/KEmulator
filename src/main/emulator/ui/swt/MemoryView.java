@@ -318,13 +318,53 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			Comparator<ImageViewItem> comp;
 			switch (getSortingMethod()) {
 				case 0:
-					comp = new ImagesComparatorByOrder(this);
+					MemoryView mv2 = this;
+					comp = new Comparator<ImageViewItem>() {
+						private final MemoryView mv = mv2;
+						private final IdentityHashMap<Image, Integer> positions;
+
+						{
+							positions = new IdentityHashMap<>(MemoryView.allImages.size());
+							for (int i = 0; i < MemoryView.allImages.size(); i++) {
+								positions.put(MemoryView.allImages.get(i), i);
+							}
+						}
+
+						public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+							int index1 = positions.get(i1.drawable);
+							int index2 = positions.get(i2.drawable);
+							int n = index2 - index1;
+							return mv.getSortByAscending() ? n : -n;
+						}
+					};
 					break;
 				case 1:
-					comp = new ImagesComparatorBySize(this);
+					MemoryView mv1 = this;
+					comp = new Comparator<ImageViewItem>() {
+						private final MemoryView mv = mv1;
+
+						public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+							Image o1 = i1.drawable;
+							Image o2 = i2.drawable;
+							int size1 = o1.getWidth() * o1.getHeight();
+							int size2 = o2.getWidth() * o2.getHeight();
+							int n = size1 - size2;
+							return mv.getSortByAscending() ? n : -n;
+						}
+					};
 					break;
 				case 2:
-					comp = new ImagesComparatorByUsage(this);
+					MemoryView mv3 = this;
+					comp = new Comparator<ImageViewItem>() {
+						private final MemoryView mv = mv3;
+
+						public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+							Image o1 = i1.drawable;
+							Image o2 = i2.drawable;
+							int n = o1._getUsedCount() - o2._getUsedCount();
+							return mv.getSortByAscending() ? n : -n;
+						}
+					};
 					break;
 				default:
 					throw new IllegalArgumentException("Unsupported sort method");

@@ -1,6 +1,5 @@
 package emulator.ui.swt;
 
-import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import emulator.*;
 import emulator.custom.CustomMethod;
@@ -21,7 +20,6 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -1198,7 +1196,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText731 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText731.setLayoutData(layoutData20);
 		this.aText731.setText(KeyMapping.get(17));
-		this.aText731.addKeyListener(new Class135(aText731, 17));
+		this.aText731.addKeyListener(new KeyBindListener(aText731, 17));
 		aText731.addVerifyListener(verify);
 		
 		CLabel aCLabel744 = new CLabel(keyMapBindsComp, 0);
@@ -1208,7 +1206,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText735 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText735.setLayoutData(layoutData2);
 		this.aText735.setText(KeyMapping.get(18));
-		this.aText735.addKeyListener(new Class135(aText735, 18));
+		this.aText735.addKeyListener(new KeyBindListener(aText735, 18));
 		aText735.addVerifyListener(verify);
 		
 		CLabel aCLabel762 = new CLabel(keyMapBindsComp, 0);
@@ -1218,7 +1216,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText754 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText754.setLayoutData(layoutData16);
 		this.aText754.setText(KeyMapping.get(1));
-		this.aText754.addKeyListener(new Class135(aText754, 1));
+		this.aText754.addKeyListener(new KeyBindListener(aText754, 1));
 		aText754.addVerifyListener(verify);
 		
 		CLabel aCLabel765 = new CLabel(keyMapBindsComp, 0);
@@ -1228,7 +1226,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText757 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText757.setLayoutData(layoutData5);
 		this.aText757.setText(KeyMapping.get(2));
-		this.aText757.addKeyListener(new Class135(aText757, 2));
+		this.aText757.addKeyListener(new KeyBindListener(aText757, 2));
 		aText757.addVerifyListener(verify);
 		
 		CLabel aCLabel767 = new CLabel(keyMapBindsComp, 0);
@@ -1238,7 +1236,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText760 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText760.setLayoutData(layoutData15);
 		this.aText760.setText(KeyMapping.get(3));
-		this.aText760.addKeyListener(new Class135(aText760, 3));
+		this.aText760.addKeyListener(new KeyBindListener(aText760, 3));
 		aText760.addVerifyListener(verify);
 		
 		CLabel aCLabel769 = new CLabel(keyMapBindsComp, 0);
@@ -1248,7 +1246,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText763 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText763.setLayoutData(layoutData6);
 		this.aText763.setText(KeyMapping.get(4));
-		this.aText763.addKeyListener(new Class135(aText763, 4));
+		this.aText763.addKeyListener(new KeyBindListener(aText763, 4));
 		aText763.addVerifyListener(verify);
 		
 		CLabel aCLabel771 = new CLabel(keyMapBindsComp, 0);
@@ -1258,7 +1256,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText766 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText766.setLayoutData(layoutData14);
 		this.aText766.setText(KeyMapping.get(5));
-		this.aText766.addKeyListener(new Class135(aText766, 5));
+		this.aText766.addKeyListener(new KeyBindListener(aText766, 5));
 		aText766.addVerifyListener(verify);
 		
 		CLabel aCLabel773 = new CLabel(keyMapBindsComp, 0);
@@ -1268,7 +1266,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText768 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText768.setLayoutData(layoutData7);
 		this.aText768.setText(KeyMapping.get(6));
-		this.aText768.addKeyListener(new Class135(aText768, 6));
+		this.aText768.addKeyListener(new KeyBindListener(aText768, 6));
 		aText768.addVerifyListener(verify);
 		
 		CLabel aCLabel626 = new CLabel(keyMapBindsComp, 0);
@@ -1278,7 +1276,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText770 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText770.setLayoutData(layoutData13);
 		this.aText770.setText(KeyMapping.get(7));
-		this.aText770.addKeyListener(new Class135(aText770, 7));
+		this.aText770.addKeyListener(new KeyBindListener(aText770, 7));
 		aText770.addVerifyListener(verify);
 		
 		CLabel aCLabel628 = new CLabel(keyMapBindsComp, 0);
@@ -1288,7 +1286,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText772 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText772.setLayoutData(layoutData8);
 		this.aText772.setText(KeyMapping.get(8));
-		this.aText772.addKeyListener(new Class135(aText772, 8));
+		this.aText772.addKeyListener(new KeyBindListener(aText772, 8));
 		aText772.addVerifyListener(verify);
 		
 		CLabel aCLabel630 = new CLabel(keyMapBindsComp, 0);
@@ -1298,7 +1296,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText774 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText774.setLayoutData(layoutData12);
 		this.aText774.setText(KeyMapping.get(9));
-		this.aText774.addKeyListener(new Class135(aText774, 9));
+		this.aText774.addKeyListener(new KeyBindListener(aText774, 9));
 		aText774.addVerifyListener(verify);
 		
 		CLabel aCLabel632 = new CLabel(keyMapBindsComp, 0);
@@ -1309,7 +1307,7 @@ public final class Property implements IProperty, SelectionListener {
 		aText627.setEditable(true);
 		this.aText627.setLayoutData(layoutData9);
 		this.aText627.setText(KeyMapping.get(0));
-		this.aText627.addKeyListener(new Class135(aText627, 0));
+		this.aText627.addKeyListener(new KeyBindListener(aText627, 0));
 		aText627.addVerifyListener(verify);
 		
 		CLabel aCLabel634 = new CLabel(keyMapBindsComp, 0);
@@ -1319,7 +1317,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText629 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText629.setLayoutData(layoutData11);
 		this.aText629.setText(KeyMapping.get(10));
-		this.aText629.addKeyListener(new Class135(aText629, 10));
+		this.aText629.addKeyListener(new KeyBindListener(aText629, 10));
 		aText629.addVerifyListener(verify);
 		
 		CLabel aCLabel636 = new CLabel(keyMapBindsComp, 0);
@@ -1329,7 +1327,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText631 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText631.setLayoutData(layoutData10);
 		this.aText631.setText(KeyMapping.get(11));
-		this.aText631.addKeyListener(new Class135(aText631, 11));
+		this.aText631.addKeyListener(new KeyBindListener(aText631, 11));
 		aText631.addVerifyListener(verify);
 		
 		CLabel aCLabel747 = new CLabel(keyMapBindsComp, 0);
@@ -1338,7 +1336,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText739 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText739.setLayoutData(layoutData19);
 		this.aText739.setText(KeyMapping.get(14));
-		this.aText739.addKeyListener(new Class135(aText739, 14));
+		this.aText739.addKeyListener(new KeyBindListener(aText739, 14));
 		aText739.addVerifyListener(verify);
 		
 		CLabel aCLabel750 = new CLabel(keyMapBindsComp, 0);
@@ -1348,7 +1346,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText742 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText742.setLayoutData(layoutData3);
 		this.aText742.setText(KeyMapping.get(15));
-		this.aText742.addKeyListener(new Class135(aText742, 15));
+		this.aText742.addKeyListener(new KeyBindListener(aText742, 15));
 		aText742.addVerifyListener(verify);
 		
 		CLabel aCLabel753 = new CLabel(keyMapBindsComp, 0);
@@ -1358,7 +1356,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText745 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText745.setLayoutData(layoutData18);
 		this.aText745.setText(KeyMapping.get(12));
-		this.aText745.addKeyListener(new Class135(aText745, 12));
+		this.aText745.addKeyListener(new KeyBindListener(aText745, 12));
 		aText745.addVerifyListener(verify);
 		
 		CLabel aCLabel756 = new CLabel(keyMapBindsComp, 0);
@@ -1368,7 +1366,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText748 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText748.setLayoutData(layoutData4);
 		this.aText748.setText(KeyMapping.get(13));
-		this.aText748.addKeyListener(new Class135(aText748, 13));
+		this.aText748.addKeyListener(new KeyBindListener(aText748, 13));
 		aText748.addVerifyListener(verify);
 		
 		CLabel aCLabel759 = new CLabel(keyMapBindsComp, 0);
@@ -1378,7 +1376,7 @@ public final class Property implements IProperty, SelectionListener {
 		(this.aText751 = new Text(keyMapBindsComp, 2048)).setEditable(true);
 		this.aText751.setLayoutData(layoutData17);
 		this.aText751.setText(KeyMapping.get(16));
-		this.aText751.addKeyListener(new Class135(aText751, 16));
+		this.aText751.addKeyListener(new KeyBindListener(aText751, 16));
 		aText751.addVerifyListener(verify);
 		
 		this.aButton696 = new Button(keyMapBindsComp, 32);
@@ -1603,7 +1601,90 @@ public final class Property implements IProperty, SelectionListener {
 		if (this.controllerCombo == null || this.controllerCombo.isDisposed()) {
 			return false;
 		}
-		display.asyncExec(new Class193(this));
+		Property aClass38_14971 = this;
+		display.asyncExec(new Runnable() {
+			private final Property aClass38_1497 = aClass38_14971;
+
+			public final void run() {
+				int selectionIndex;
+				if ((selectionIndex = method376(this.aClass38_1497).getSelectionIndex()) == 0) {
+					return;
+				}
+				final String method749;
+				String string;
+				if (!(string = (method749 = Controllers.method749())).equalsIgnoreCase("LEFT")
+						&& !string.equalsIgnoreCase("RIGHT")
+						&& !string.equalsIgnoreCase("UP")
+						&& !string.equalsIgnoreCase("DOWN")
+						&& !string.startsWith("Axis")) {
+					string = "B_" + string;
+				}
+				--selectionIndex;
+				Text text;
+				if (method405(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 0, method749);
+					text = method405(this.aClass38_1497);
+				} else if (method380(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 1, method749);
+					text = method380(this.aClass38_1497);
+				} else if (method385(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 2, method749);
+					text = method385(this.aClass38_1497);
+				} else if (method388(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 3, method749);
+					text = method388(this.aClass38_1497);
+				} else if (method391(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 4, method749);
+					text = method391(this.aClass38_1497);
+				} else if (method394(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 5, method749);
+					text = method394(this.aClass38_1497);
+				} else if (method397(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 6, method749);
+					text = method397(this.aClass38_1497);
+				} else if (method399(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 7, method749);
+					text = method399(this.aClass38_1497);
+				} else if (method401(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 8, method749);
+					text = method401(this.aClass38_1497);
+				} else if (method403(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 9, method749);
+					text = method403(this.aClass38_1497);
+				} else if (method407(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 10, method749);
+					text = method407(this.aClass38_1497);
+				} else if (method409(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 11, method749);
+					text = method409(this.aClass38_1497);
+				} else if (method411(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 14, method749);
+					text = method411(this.aClass38_1497);
+				} else if (method413(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 15, method749);
+					text = method413(this.aClass38_1497);
+				} else if (method415(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 12, method749);
+					text = method415(this.aClass38_1497);
+				} else if (method417(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 13, method749);
+					text = method417(this.aClass38_1497);
+				} else if (method419(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 16, method749);
+					text = method419(this.aClass38_1497);
+				} else if (method366(this.aClass38_1497).isFocusControl()) {
+					Controllers.bind(selectionIndex, 17, method749);
+					text = method366(this.aClass38_1497);
+				} else {
+					if (!method377(this.aClass38_1497).isFocusControl()) {
+						return;
+					}
+					Controllers.bind(selectionIndex, 18, method749);
+					text = method377(this.aClass38_1497);
+				}
+				text.setText(string);
+			}
+		});
 		return true;
 	}
 
@@ -2708,7 +2789,21 @@ public final class Property implements IProperty, SelectionListener {
 				method352();
 			}
 		});
-		this.proxyTypeCombo.addModifyListener(new Class65(this));
+		Property aClass38_8311 = this;
+		this.proxyTypeCombo.addModifyListener(new ModifyListener() {
+			private final Property aClass38_831 = aClass38_8311;
+
+			public final void modifyText(final ModifyEvent modifyEvent) {
+				final boolean b = method383(this.aClass38_831).getSelectionIndex() != 0;
+				method423(this.aClass38_831).setEnabled(b);
+				method425(this.aClass38_831).setEnabled(b);
+				method427(this.aClass38_831).setEnabled(b);
+				method429(this.aClass38_831).setEnabled(b);
+				method431(this.aClass38_831).setEnabled(b);
+				method357(this.aClass38_831).setEnabled(b);
+				method395(this.aClass38_831);
+			}
+		});
 		this.proxyTypeCombo.select(Settings.proxyType);
 		new Label(networkProxyGroup, SWT.NONE);
 		new Label(networkProxyGroup, SWT.NONE);

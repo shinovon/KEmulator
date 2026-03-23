@@ -1910,7 +1910,21 @@ public final class EmulatorScreen implements
 
 	public void showCommandsList(final Vector<TargetedCommand> cmds, CommandsMenuPosition target, int tx, int ty) {
 		display.syncExec(() -> {
-			CommandsMenuListener listener = new CommandsMenuListener();
+			SelectionListener listener = new SelectionListener() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					Object d = e.widget.getData();
+					if (d instanceof TargetedCommand) {
+						((TargetedCommand) d).invoke();
+					} else {
+						throw new IllegalStateException();
+					}
+				}
+
+				@Override
+				public void widgetDefaultSelected(SelectionEvent selectionEvent) {
+				}
+			};
 			for (MenuItem mi : commandsMenu.getItems()) {
 				mi.dispose();
 			}
