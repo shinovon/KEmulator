@@ -7,13 +7,10 @@
       <module fileurl="file://$PROJECT_DIR$/win/KEmulator_win.iml" filepath="$PROJECT_DIR$/win/KEmulator_win.iml" />
       <module fileurl="file://$PROJECT_DIR$/x64/KEmulator_x64.iml" filepath="$PROJECT_DIR$/x64/KEmulator_x64.iml" />
       <module fileurl="file://$PROJECT_DIR$/builder/builder.iml" filepath="$PROJECT_DIR$/builder/builder.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lwjgl3-swt-platform/lwjgl3-swt-platform.iml" filepath="$PROJECT_DIR$/lwjgl3-swt-platform/lwjgl3-swt-platform.iml" />
       <module fileurl="file://$PROJECT_DIR$/m3g_lwjgl/m3g_lwjgl.iml" filepath="$PROJECT_DIR$/m3g_lwjgl/m3g_lwjgl.iml" />
-      <module fileurl="file://$PROJECT_DIR$/m3g_stub/m3g_stub.iml" filepath="$PROJECT_DIR$/m3g_stub/m3g_stub.iml" />
       <module fileurl="file://$PROJECT_DIR$/m3g_swerve/m3g_swerve.iml" filepath="$PROJECT_DIR$/m3g_swerve/m3g_swerve.iml" />
       <module fileurl="file://$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" filepath="$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" />
       <module fileurl="file://$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" filepath="$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" />
-      <module fileurl="file://$PROJECT_DIR$/micro3d_stub/micro3d_stub.iml" filepath="$PROJECT_DIR$/micro3d_stub/micro3d_stub.iml" />
       <module fileurl="file://$PROJECT_DIR$/updater/updater.iml" filepath="$PROJECT_DIR$/updater/updater.iml" />
     </modules>
   </component>
