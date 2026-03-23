@@ -271,6 +271,9 @@ public final class EmulatorScreen implements
 		if (parentShell == null || parentShell.isDisposed() || !parentShell.isVisible()) {
 			parentShell = this.shell;
 		}
+		if (parentShell == null || parentShell.isDisposed()) {
+			parentShell = null;
+		}
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(parentShell), true);
 		} catch (Throwable ignored) {
@@ -296,7 +299,7 @@ public final class EmulatorScreen implements
 		text.setText(detail);
 
 //		shell.pack();
-		Rectangle clientArea = this.shell.getMonitor().getClientArea();
+		Rectangle clientArea = shell.getMonitor().getClientArea();
 		Point size = shell.getSize();
 		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
 		shell.open();
@@ -370,6 +373,16 @@ public final class EmulatorScreen implements
 		}
 
 		shell.open();
+
+		if (Utils.win) {
+			Rectangle screenArea = display.getClientArea();
+			if (!screenArea.contains(shell.getLocation())) {
+				EmulatorScreen.locX = clientArea.x + (clientArea.width - shell.getSize().x) >> 1;
+				EmulatorScreen.locY = clientArea.y + (clientArea.height - shell.getSize().y) >> 1;
+				this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
+			}
+		}
+
 		shell.addDisposeListener(this);
 		shell.addControlListener(this); // added only here to avoid firing multiple times while setting shell up
 
@@ -422,10 +435,12 @@ public final class EmulatorScreen implements
 		} catch (Throwable e) {
 			e.printStackTrace();
 			CustomMethod.close();
-			shell.removeDisposeListener(this);
-			shell.removeControlListener(this);
-			shell.dispose();
 			try {
+				if (shell != null && !shell.isDisposed()) {
+					shell.removeDisposeListener(this);
+					shell.removeControlListener(this);
+					shell.dispose();
+				}
 				showMessage("KEmulator has crashed, please report this error message.", CustomMethod.getStackTrace(e));
 			} catch (Throwable t) {
 				JOptionPane.showMessageDialog(new JPanel(), "KEmulator has crashed, please report this error message.\n\n" + CustomMethod.getStackTrace(e));
@@ -1193,10 +1208,10 @@ public final class EmulatorScreen implements
 		final MenuItem menuItem7;
 		(menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_2D_ENGINE", "2D Engine"));
 		this.menu2dEngine = new Menu(this.shell, 4194308);
-		(this.awt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("AWT-Graphics");
+		(this.awt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("AWT");
 		this.awt2dMenuItem.setSelection(Settings.g2d == 1);
 		this.awt2dMenuItem.addSelectionListener(this);
-		(this.swt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("SWT-GDI+");
+		(this.swt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("SWT (Deprecated)");
 		this.swt2dMenuItem.setSelection(Settings.g2d == 0);
 		this.swt2dMenuItem.addSelectionListener(this);
 		menuItem7.setMenu(this.menu2dEngine);

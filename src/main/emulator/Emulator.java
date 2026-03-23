@@ -586,7 +586,7 @@ public class Emulator implements Runnable {
 		String arch = System.getProperty("os.arch");
 		if (!platform.isX64() && (!arch.contains("86") || !Utils.win)) {
 			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try multi-platform version instead.");
-			System.exit(0);
+			System.exit(1);
 			return;
 		}
 		try {
@@ -618,7 +618,7 @@ public class Emulator implements Runnable {
 			if (librariesException != null) {
 				librariesException.printStackTrace();
 				JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + librariesException.getMessage());
-				System.exit(0);
+				System.exit(1);
 				return;
 			}
 			
@@ -730,7 +730,11 @@ public class Emulator implements Runnable {
 			}
 			new Thread(new Emulator()).start();
 			Emulator.emulatorimpl.getScreen().runWithMidlet();
-		} catch (Throwable e) {
+		} catch (UnsatisfiedLinkError e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(new JPanel(), "Failed to load libraries: " + e.getMessage());
+			System.exit(1);
+		}  catch (Throwable e) {
 			e.printStackTrace();
 		}
 		try {
