@@ -639,8 +639,13 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	void setAutoUpdate(boolean enabled, int interval) {
 		if (autoUpdater != null) {
-			autoUpdater.stopThread();
-			autoUpdater = null;
+			if (!enabled) {
+				autoUpdater.stopThread();
+				autoUpdater = null;
+			} else {
+				autoUpdater.updateInterval = interval;
+			}
+			return;
 		}
 		if (enabled) {
 			if (interval < 10)
@@ -847,8 +852,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 		public void stopThread() {
 			shouldRun = false;
-			if (isAlive())
+			if (isAlive()) {
 				interrupt();
+//				join();
+			}
 		}
 	}
 }

@@ -917,7 +917,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		}
 		if (sequence instanceof MaDll) {
 			if (maOwner == this && maSound != -1) {
-				((MaDll) sequence).setVolume(maFormat, maSound, n);
+				((MaDll) sequence).setVolume(maFormat, maSound, (n * 127) / 100);
 			}
 		}
 	}

@@ -422,6 +422,9 @@ public final class EmulatorScreen implements
 		} catch (Throwable e) {
 			e.printStackTrace();
 			CustomMethod.close();
+			shell.removeDisposeListener(this);
+			shell.removeControlListener(this);
+			shell.dispose();
 			try {
 				showMessage("KEmulator has crashed, please report this error message.", CustomMethod.getStackTrace(e));
 			} catch (Throwable t) {
