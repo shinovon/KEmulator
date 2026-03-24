@@ -571,6 +571,8 @@ public final class Emulator3D implements IGraphics3D {
 			GL11.glDisable(GL_LIGHT0 + i);
 		}
 
+		GL11.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, memoryBuffers.getFloatBuffer(new float[] {0, 0, 0, 1}));
+
 		if (!useGL11() && capabilities.GL_ARB_color_buffer_float) {
 			ARBColorBufferFloat.glClampColorARB(
 					ARBColorBufferFloat.GL_CLAMP_VERTEX_COLOR_ARB,
