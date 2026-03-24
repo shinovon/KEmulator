@@ -699,7 +699,7 @@ public final class Emulator3D implements IGraphics3D {
 		setupFog(ap.getFog());
 	}
 
-	private static void setupPolygonMode(PolygonMode pm) {
+	private void setupPolygonMode(PolygonMode pm) {
 		if (pm == null) {
 			pm = new PolygonMode();
 		}
@@ -718,6 +718,7 @@ public final class Emulator3D implements IGraphics3D {
 		GL11.glFrontFace(pm.getWinding() == PolygonMode.WINDING_CW ? GL_CW : GL_CCW);
 		GL11.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, pm.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
 		GL11.glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, pm.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
+		GL11.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, memoryBuffers.getFloatBuffer(new float[] {0, 0, 0, 1}));
 
 		boolean persCorrect = pm.isPerspectiveCorrectionEnabled();
 		if (AppSettings.m3gForcePerspectiveCorrection) persCorrect = true;
