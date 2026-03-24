@@ -763,9 +763,11 @@ public class Emulator implements Runnable {
 		if (array.length < 1) {
 			return false;
 		}
-		if (array.length == 1 && (array[0].endsWith(".jar") || array[0].endsWith(".jad")) || array[0].endsWith(".jam")) {
+		if (array.length == 1 && (array[0].toLowerCase().endsWith(".jar")
+				|| array[0].toLowerCase().endsWith(".jad"))
+				|| array[0].toLowerCase().endsWith(".jam")) {
 			String path = array[0];
-			if (path.endsWith(".jar")) {
+			if (path.toLowerCase().endsWith(".jar")) {
 				try {
 					Emulator.midletJarPath = new File(path).getCanonicalPath();
 				} catch (Exception e) {
@@ -781,8 +783,10 @@ public class Emulator implements Runnable {
 			String key = array[i].trim();
 			if (key.startsWith("-")) {
 				key = key.substring(1).toLowerCase();
-			} else if (key.endsWith(".jar") || key.endsWith(".jad") || key.endsWith(".jam")) {
-				if (key.endsWith(".jar")) {
+			} else if (key.toLowerCase().endsWith(".jar")
+					|| key.toLowerCase().endsWith(".jad")
+					|| key.toLowerCase().endsWith(".jam")) {
+				if (key.toLowerCase().endsWith(".jar")) {
 					try {
 						Emulator.midletJarPath = new File(key).getCanonicalPath();
 					} catch (Exception e) {
