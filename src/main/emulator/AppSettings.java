@@ -629,7 +629,7 @@ public class AppSettings {
 			Path tempPath = null;
 			if (save) {
 				tempPath = midletsPath.getParent().resolve("midlets.ini.tmp");
-				writer = Files.newBufferedWriter(tempPath, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
+				writer = Files.newBufferedWriter(tempPath, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 			}
 			try (BufferedReader reader = Files.newBufferedReader(midletsPath, StandardCharsets.UTF_8)) {
 				String line;

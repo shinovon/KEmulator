@@ -107,7 +107,6 @@ public class KEmulatorUpdater implements Runnable {
 			
 			if (currentVersion == 0 || type == null) {
 				fail("Not enough arguments", null);
-				exitDelay(0);
 				return;
 			}
 			
@@ -185,7 +184,7 @@ public class KEmulatorUpdater implements Runnable {
 			}
 			
 			if (!runAfterDone) {
-				exitDelay(1000);
+				exitDelay(0, 1000);
 				return;
 			}
 			
@@ -193,12 +192,12 @@ public class KEmulatorUpdater implements Runnable {
 				start();
 			} catch (Exception e) {
 				fail("Failed to run KEmulator", e);
-				return;
 			}
 		} catch (Exception e) {
 			fail("Unhandled exception", e);
 		}
-		exitDelay(3000);
+		// should not reach here
+		exitDelay(0, 3000);
 	}
 
 	/**
@@ -317,14 +316,14 @@ public class KEmulatorUpdater implements Runnable {
 		try {
 			JOptionPane.showMessageDialog(frame, message + (exception != null ? ("\n" + getExceptionString(exception)) : ""), "Failed to update KEmulator", JOptionPane.ERROR_MESSAGE);
 		} catch (Throwable ignored) {}
-		exitDelay(3000);
+		exitDelay(1, 3000);
 	}
 
-	private static void exitDelay(long time) {
+	private static void exitDelay(int code, long time) {
 		try {
 			Thread.sleep(time);
 		} catch (Exception ignored) {}
-		System.exit(0);
+		System.exit(code);
 	}
 	
 	static void state(String message) {
