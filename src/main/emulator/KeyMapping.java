@@ -56,23 +56,23 @@ public final class KeyMapping {
 	public static int getArrowKeyFromDevice(final int n) {
 		int n2 = 0;
 		switch (n) {
-			case 1: {
+			case Canvas.UP: {
 				n2 = ((AppSettings.upKey != 0) ? AppSettings.upKey : Canvas.UP);
 				break;
 			}
-			case 6: {
+			case Canvas.DOWN: {
 				n2 = ((AppSettings.downKey != 0) ? AppSettings.downKey : Canvas.DOWN);
 				break;
 			}
-			case 2: {
+			case Canvas.LEFT: {
 				n2 = ((AppSettings.leftKey != 0) ? AppSettings.leftKey : Canvas.LEFT);
 				break;
 			}
-			case 5: {
+			case Canvas.RIGHT: {
 				n2 = ((AppSettings.rightKey != 0) ? AppSettings.rightKey : Canvas.RIGHT);
 				break;
 			}
-			case 8: {
+			case Canvas.FIRE: {
 				n2 = ((AppSettings.fireKey != 0) ? AppSettings.fireKey : Canvas.FIRE);
 				break;
 			}

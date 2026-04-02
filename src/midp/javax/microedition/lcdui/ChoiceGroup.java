@@ -288,7 +288,7 @@ public class ChoiceGroup
 		}
 	}
 
-	synchronized void _layout(Row row) {
+	void _layout(Row row) {
 		super._layout(row);
 		int n = 0;
 		if (this.label != null) {
