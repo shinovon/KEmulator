@@ -23,7 +23,6 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.win32.OS;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -1779,7 +1778,7 @@ public final class EmulatorScreen implements
 	private static void setWindowOnTop(final long handle, final boolean b) {
 		// TODO
 		try {
-			Class cls = OS.class;
+			Class cls = Class.forName("org.eclipse.swt.internal.win32.OS");
 			Method setWindowPos;
 			try {
 				setWindowPos = cls.getMethod("SetWindowPos", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
@@ -2048,7 +2047,7 @@ public final class EmulatorScreen implements
 	private static void OS_SetROP2(GC gc, int j) {
 		try {
 			long i = ReflectUtil.getHandle(gc);
-			Class<?> os = OS.class;
+			Class<?> os = Class.forName("org.eclipse.swt.internal.win32.OS");
 			Method m = null;
 			try {
 				m = os.getMethod("SetROP2", int.class, int.class);

@@ -3,8 +3,6 @@ Copyright (c) 2025 Arman Jussupgaliyev
 */
 package emulator.ui.swt;
 
-import com.sun.jna.platform.win32.User32;
-import emulator.Emulator;
 import emulator.ReflectUtil;
 import emulator.Utils;
 import org.eclipse.swt.widgets.Canvas;
@@ -16,6 +14,16 @@ public class Win32KeyboardPoller {
 
 	private EmulatorScreen screen;
 
+	private long lastPollTime;
+	boolean win = Utils.win;
+	private final boolean[] lastKeyboardButtonStates = new boolean[256];
+	private final boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
+	private final long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];
+	private final long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
+	private static Class win32OS;
+	private static Method win32OSGetKeyState;
+	private static Class user32;
+
 	public Win32KeyboardPoller(EmulatorScreen screen) {
 		this.screen = screen;
 		try {
@@ -25,17 +33,11 @@ public class Win32KeyboardPoller {
 			if (win32OSGetKeyState == null) {
 				win32OSGetKeyState = ReflectUtil.getMethod(win32OS, "GetAsyncKeyState", int.class);
 			}
+			if (user32 == null) {
+				user32 = Class.forName("com.sun.jna.platform.win32.User32");
+			}
 		} catch (Throwable ignored) {}
 	}
-
-	private long lastPollTime;
-	boolean win = Utils.win;
-	private final boolean[] lastKeyboardButtonStates = new boolean[256];
-	private final boolean[] keyboardButtonStates = new boolean[lastKeyboardButtonStates.length];
-	private final long[] keyboardButtonDownTimes = new long[keyboardButtonStates.length];
-	private final long[] keyboardButtonHoldTimes = new long[keyboardButtonStates.length];
-	private static Class win32OS;
-	private static Method win32OSGetKeyState;
 
 	public synchronized void pollKeyboard(Canvas canvas) {
 		if (!win || canvas == null || canvas.isDisposed()) return;
@@ -56,7 +58,7 @@ public class Win32KeyboardPoller {
 				if (win32OSGetKeyState != null) {
 					keyState = (Short) win32OSGetKeyState.invoke(null, i);
 				} else {
-					keyState = User32.INSTANCE.GetAsyncKeyState(i);
+					keyState = (short) user32.getMethod("GetAsyncKeyState", int.class).invoke(user32.getField("INSTANCE").get(null), i);
 				}
 				boolean pressed = active && ((keyState & 0x8000) == 0x8000 || ((keyState & 0x1) == 0x1));
 				if (!keyboardButtonStates[i]) {
