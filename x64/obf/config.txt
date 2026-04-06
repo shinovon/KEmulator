@@ -152,4 +152,4 @@
 -keep class * extends com.sun.jna.Callback { *; }
 
 -keep interface emulator.media.mmf.* { *; }
--keepclassmembers class emulator.media.mmf.MaDll { *** callback; }
+-keepclassmembers class emulator.media.mmf.MaDll { *** callback; *** audioPhraseCallback; }
