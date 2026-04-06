@@ -599,6 +599,7 @@ public class Emulator implements Runnable {
 			EmulatorMIDI.initDevices();
 			Emulator.commandLineArguments = args;
 			UILocale.initLocale();
+			System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 			for (String s : args) {
 				if ("-s".equals(s)) {
 					forked = true;

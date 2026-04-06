@@ -90,6 +90,9 @@ public final class HttpConnectionImpl implements HttpConnection {
 		if ("X-Online-Host".equalsIgnoreCase(s)) {
 			method134(s2);
 		}
+		if ("Connection".equalsIgnoreCase(s) || "Host".equalsIgnoreCase(s) || "Transfer-Encoding".equalsIgnoreCase(s)) {
+			return;
+		}
 		connection.setRequestProperty(s, s2);
 	}
 
