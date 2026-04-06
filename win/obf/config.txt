@@ -3,8 +3,8 @@
 
 -libraryjars 'C:\Progs\Java\jdk-1.8\jre\lib\rt.jar'
 #-libraryjars '..\..\natives\swt-win32-x86.jar'
--libraryjars '..\..\home\m3g_stub.jar'
--libraryjars '..\..\home\micro3d_stub.jar'
+-libraryjars '..\..\home\m3g_lwjgl.jar'
+-libraryjars '..\..\home\micro3d_gl.jar'
 
 -target 1.8
 -printmapping '.\mapping.txt'
