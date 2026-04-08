@@ -2074,11 +2074,11 @@ public final class EmulatorScreen implements
 	}
 
 	public void run() {
-		if (crashed) return;
 		paintPending = false;
 		if (this.pauseState != 1) {
 			return;
 		}
+		if (crashed || canvas == null || canvas.isDisposed()) return;
 		if (Settings.pollKeyboardOnRepaint) {
 			if (poller != null) poller.pollKeyboard(canvas);
 			Controllers.poll();
