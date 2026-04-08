@@ -931,6 +931,11 @@ public final class EmulatorScreen implements
 
 	private void changeFullscreen() {
 //		shell.setMenuBar(null);
+		if (infosEnabled) {
+			infosEnabled = false;
+			this.canvas.setCursor(new Cursor(display, 0));
+			((SWTFrontend) Emulator.getEmulator()).getInfos().dispose();
+		}
 		Shell tempShell = new Shell();
 		canvas.setParent(tempShell);
 		shell.removeDisposeListener(this);
