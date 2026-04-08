@@ -1,9 +1,14 @@
-$v2.21.4 [2026.03.12]
+$v2.21.4 [2026.04.08]
 Improved MIDI playback on default JRE synthesizer
 Implemented VolumeControl in MIDI player
-Added arrays support in Class Watcher
+Implemented arrays view in Class Watcher
+Improved VLC player
+Improved LCDUI layout
+Allowed using CORS headers in HttpConnection
 Fixed freeze on startup when MemoryView is enabled
-VLC player fixes
+Fixed M3G ambient light
+Fixed volume control on Linux
+Fixed soft key labels appearance on GTK
 
 $v2.21.3 [2026.03.04]
 Improved automatic updates security
