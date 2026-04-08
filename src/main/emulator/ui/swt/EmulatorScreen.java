@@ -197,6 +197,8 @@ public final class EmulatorScreen implements
 	private String leftSoftLabelText, rightSoftLabelText;
 	private Win32KeyboardPoller poller;
 
+	private boolean crashed;
+
 	public EmulatorScreen() {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		display = SWTFrontend.getDisplay();
@@ -432,6 +434,7 @@ public final class EmulatorScreen implements
 				}
 			}
 		} catch (Throwable e) {
+			crashed = true;
 			e.printStackTrace();
 			CustomMethod.close();
 			try {
@@ -2066,6 +2069,7 @@ public final class EmulatorScreen implements
 	}
 
 	public void run() {
+		if (crashed) return;
 		paintPending = false;
 		if (this.pauseState != 1) {
 			return;
