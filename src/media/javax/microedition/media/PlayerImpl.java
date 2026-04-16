@@ -799,6 +799,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 								false);
 						b = false;
 					}
+					setLevel(level);
 					midiPlaying = true;
 					if (!stopped)
 						synchronized (playLock) {
