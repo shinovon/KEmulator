@@ -1,5 +1,6 @@
 package emulator;
 
+import emulator.automation.worker.AutomationWorkerRuntime;
 import emulator.custom.CustomMethod;
 
 final class InvokeStartAppRunnable implements Runnable {
@@ -13,6 +14,7 @@ final class InvokeStartAppRunnable implements Runnable {
 		try {
 			Emulator.getMIDlet().invokeStartApp();
 			Emulator.getEmulator().getScreen().appStarted(first);
+			AutomationWorkerRuntime.onMidletStarted(first);
 		} catch (RuntimeException e) {
 			if (e.getCause() == null || !first) {
 				throw e;
