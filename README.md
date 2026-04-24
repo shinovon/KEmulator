@@ -7,6 +7,7 @@ Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 - [Webpage](https://nnproject.cc/kem)
 - [Discord server](https://discord.gg/ETvTpMehXV)
 - [Telegram channel](https://t.me/nnmidlets)
+- [CLI automation documentation](CliAutomation.md)
 
 ## Compatibility
 JRE:
