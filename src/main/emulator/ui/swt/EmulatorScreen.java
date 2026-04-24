@@ -847,7 +847,7 @@ public final class EmulatorScreen implements
 		try {
 			if (f == null) {
 				FontData fd = shell.getFont().getFontData()[0];
-				fd.height = (fd.height / -fd.data.lfHeight) * 12;
+				fd.height = adjustDialogFontHeight(fd, 12);
 				f = new Font(shell.getDisplay(), fd);
 			}
 			shell.setFont(f);
@@ -2071,6 +2071,18 @@ public final class EmulatorScreen implements
 
 	public float getZoom() {
 		return realZoom;
+	}
+
+	private static int adjustDialogFontHeight(FontData fd, int logicalHeight) {
+		try {
+			Object nativeData = fd.getClass().getField("data").get(fd);
+			int lfHeight = nativeData.getClass().getField("lfHeight").getInt(nativeData);
+			if (lfHeight != 0) {
+				return Math.round((fd.height / (float) -lfHeight) * logicalHeight);
+			}
+		} catch (Throwable ignored) {
+		}
+		return logicalHeight;
 	}
 
 	public void run() {

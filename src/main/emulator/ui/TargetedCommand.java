@@ -58,6 +58,32 @@ public class TargetedCommand {
 		return (item instanceof ChoiceGroup) && command == null;
 	}
 
+	public String targetSignature() {
+		StringBuilder signature = new StringBuilder();
+		if (screen != null) {
+			signature.append("screen:")
+					.append(screen.getClass().getName())
+					.append('@')
+					.append(System.identityHashCode(screen));
+		}
+		if (item != null) {
+			if (signature.length() > 0) {
+				signature.append('|');
+			}
+			signature.append("item:")
+					.append(item.getClass().getName())
+					.append('@')
+					.append(System.identityHashCode(item));
+		}
+		if (selectionIndex >= 0) {
+			if (signature.length() > 0) {
+				signature.append('|');
+			}
+			signature.append("selection:").append(selectionIndex);
+		}
+		return signature.toString();
+	}
+
 	public void invoke() {
 		if (command == null && item != null) {
 			((ChoiceGroup) item).setSelectedIndex(selectionIndex, true);
