@@ -175,7 +175,12 @@ public final class Memory {
 	}
 
 	public boolean isNotInitialized(Class cls) {
-		return unsafe != null && unsafe.shouldBeInitialized(cls);
+		try {
+			return unsafe != null && unsafe.shouldBeInitialized(cls);
+		} catch (Throwable ignored) {
+			// not available in 22+
+			return false;
+		}
 	}
 
 	private void collectObjects(final Class clazz, final Object o, final ReferencePath path, boolean vector) {
