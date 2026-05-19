@@ -1,6 +1,7 @@
 package emulator;
 
 import com.nttdocomo.ui.maker.IApplicationMIDlet;
+import emulator.automation.worker.AutomationWorkerRuntime;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
 import emulator.custom.ResourceManager;
@@ -701,7 +702,7 @@ public class Emulator implements Runnable {
 				AppSettings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 			} catch (Exception ignored) {}
 
-			if (AppSettings.load(false) == 0) {
+			if (AppSettings.load(false) == 0 && !AutomationWorkerRuntime.isEnabled()) {
 				Emulator.emulatorimpl.openAppSettings(true);
 			}
 			tryToSetDevice();
@@ -729,6 +730,7 @@ public class Emulator implements Runnable {
 				}
 				Emulator.eventQueue = new EventQueue();
 			}
+			AutomationWorkerRuntime.startIfEnabled();
 			new Thread(new Emulator()).start();
 			Emulator.emulatorimpl.getScreen().runWithMidlet();
 		} catch (UnsatisfiedLinkError e) {
@@ -826,6 +828,8 @@ public class Emulator implements Runnable {
 				updated = true;
 			} else if (key.equals("bridge")) {
 				bridge = true;
+			} else if (key.equals("automationworker")) {
+				AutomationWorkerRuntime.setEnabled(true);
 			} else if (key.equals("xray")) {
 				AppSettings.xrayView = true;
 				AppSettings.xrayBuffer = true;
@@ -865,6 +869,16 @@ public class Emulator implements Runnable {
 						EmulatorScreen.sizeH = -1;
 						Settings.resizeMode = ResizeMethod.Fit;
 					}
+				} else if (key.equalsIgnoreCase("automationport")) {
+					AutomationWorkerRuntime.setPort(Integer.parseInt(value));
+				} else if (key.equalsIgnoreCase("automationhost")) {
+					AutomationWorkerRuntime.setBindHost(value);
+				} else if (key.equalsIgnoreCase("automationcontrollerpid")) {
+					AutomationWorkerRuntime.setControllerPid(value);
+				} else if (key.equalsIgnoreCase("automationcontrollerstartms")) {
+					AutomationWorkerRuntime.setControllerStartTimeMillis(value);
+				} else if (key.equalsIgnoreCase("automationcontrollerstartticks")) {
+					AutomationWorkerRuntime.setControllerStartTicks(value);
 				} else if (key.equalsIgnoreCase("key")) {
 					KeyMapping.keyArg(value);
 				} else if (key.equals("new-project")) {

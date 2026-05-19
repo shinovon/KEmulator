@@ -874,7 +874,7 @@ public final class Property implements IProperty, SelectionListener {
 		try {
 			if (f == null) {
 				FontData fd = setsShell.getFont().getFontData()[0];
-				fd.height = (fd.height / -fd.data.lfHeight) * 12;
+				fd.height = adjustDialogFontHeight(fd, 12);
 				f = new Font(shell.getDisplay(), fd);
 			}
 
@@ -2449,6 +2449,18 @@ public final class Property implements IProperty, SelectionListener {
 			graphics3.drawString(this.aText633.getText(), 1, y3 >> 1);
 			this.aCanvas691.redraw();
 		}
+	}
+
+	private static int adjustDialogFontHeight(FontData fd, int logicalHeight) {
+		try {
+			Object nativeData = fd.getClass().getField("data").get(fd);
+			int lfHeight = nativeData.getClass().getField("lfHeight").getInt(nativeData);
+			if (lfHeight != 0) {
+				return Math.round((fd.height / (float) -lfHeight) * logicalHeight);
+			}
+		} catch (Throwable ignored) {
+		}
+		return logicalHeight;
 	}
 
 	private void setupRecordsComp() {
