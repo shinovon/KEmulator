@@ -132,11 +132,11 @@ public class AppSettingsUI {
 		shell.setSize(460, 420);
 		shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 
-		Composite scrolledComposite = new Composite(shell, SWT.NONE);
-		scrolledComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		Composite root = new Composite(shell, SWT.NONE);
+		root.setLayout(new FillLayout(SWT.HORIZONTAL));
+		root.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		Composite composite = new Composite(scrolledComposite, SWT.NONE);
+		Composite composite = new Composite(root, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
 
 		Composite composite_1 = new Composite(composite, SWT.NONE);
@@ -180,6 +180,7 @@ public class AppSettingsUI {
 		} catch (Exception ignored) {}
 
 		Canvas canvas = new Canvas(composite_2, SWT.NONE);
+		canvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		canvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
 				if (iconImage != null) {
@@ -207,7 +208,7 @@ public class AppSettingsUI {
 		lblNewLabel_2.setText("Version: " + Emulator.getEmulator().getAppProperty("MIDlet-Version"));
 
 		tabFolder = new CTabFolder(composite, SWT.BORDER | SWT.FLAT);
-		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
+//		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
 		tabFolder.setSimple(true);
 		tabFolder.setUnselectedCloseVisible(false);
 		tabFolder.setUnselectedImageVisible(false);
@@ -525,6 +526,7 @@ public class AppSettingsUI {
 		startAppOnResumeCheck.setText("Send startApp on resume");
 		startAppOnResumeCheck.setSelection(AppSettings.startAppOnResume);
 
+		composite_9.setSize(composite_9.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scrolledComposite_2.setContent(composite_9);
 		scrolledComposite_2.setMinSize(composite_9.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
@@ -637,6 +639,7 @@ public class AppSettingsUI {
 		mascotBackgroundFilterCheck.setText("Background filter");
 		mascotBackgroundFilterCheck.setSelection(AppSettings.mascotBackgroundFilter);
 
+		composite_8.setSize(composite_8.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scrolledComposite_1.setContent(composite_8);
 		scrolledComposite_1.setMinSize(composite_8.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 

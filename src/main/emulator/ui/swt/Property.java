@@ -967,7 +967,7 @@ public final class Property implements IProperty, SelectionListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.verticalAlignment = 2;
 		this.tabFolder = new CTabFolder(this.setsShell, SWT.BORDER | SWT.FLAT);
-		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
+//		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
 		this.tabFolder.setSimple(true);
 		tabFolder.setFont(f);
 		this.tabFolder.setMRUVisible(false);
