@@ -8,10 +8,10 @@ Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 - [Discord server](https://discord.gg/ETvTpMehXV)
 - [Telegram channel](https://t.me/nnmidlets)
 
-## Compatibility
+## Requirements
 JRE:
 - Java 8 by Oracle
-- OpenJDK 17-25
+- OpenJDK 17-21 (Will run on 22+, but debug tools work is not guaranteed)
 
 System:
 - Windows XP - 11 (x86, x86_64, arm64)
