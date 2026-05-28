@@ -20,14 +20,16 @@ System:
 - macOS 11 Big Sur (arm64)
 - Termux / Android, GTK3 (arm64)
 
-## Developing in IntelliJ IDEA
+## Building in IntelliJ IDEA
+
 ### Importing project
 - Install Ant plugin
 - Open repository root as project in IDEA
 ### Building
 - Build artifacts: `KEmulator_win`, `KEmulator_x64`, `m3g_lwjgl`, `m3g_swerve`, `micro3d_dll`, `micro3d_gl`
 
-## Developing in Eclipse IDE
+## Building in Eclipse IDE
+
 ### Importing project
 - Open `eclipse` directory as workspace in Eclipse IDE
 - File>Import...>General>Existing Projects into Workspace
@@ -41,6 +43,7 @@ System:
 - Select launch configuration, export destination, and click Finish
 
 ## Uses
+
 ### Libraries
 - [SWT](https://www.eclipse.org/swt/) 4.20 / 4.7
 - [LWJGL](https://github.com/LWJGL/lwjgl3) 3.3.6
