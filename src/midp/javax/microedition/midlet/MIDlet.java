@@ -33,7 +33,7 @@ public abstract class MIDlet {
 	public void notifyDestroyed() {
 		if (destroyed) return;
 		destroyed = true;
-		Emulator.getEmulator().getLogStream().println("Destroy stack trace:");
+		Emulator.getEmulator().getLogStream().println("Destroy stack trace (not an error):");
 		for (StackTraceElement e : new Exception().getStackTrace()) {
 			Emulator.getEmulator().getLogStream().println(e.toString());
 		}

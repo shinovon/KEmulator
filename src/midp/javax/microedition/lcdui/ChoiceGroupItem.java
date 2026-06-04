@@ -23,7 +23,7 @@ final class ChoiceGroupItem {
 		this.aBoolean424 = true;
 	}
 
-	protected final void method211(final Graphics graphics, final boolean b, int y) {
+	protected final void paint(final Graphics graphics, final boolean b, int y) {
 		graphics.setColor(LCDUIUtils.foregroundColor);
 		final boolean b2 = this.choice.choiceType == Choice.POPUP;
 		int anInt28 = y;
@@ -50,7 +50,7 @@ final class ChoiceGroupItem {
 			}
 	}
 
-	protected final void method212() {
+	protected final void layout() {
 		this.bounds[0] = 0;
 		this.bounds[1] = 0;
 		this.bounds[2] = this.choice.bounds[2];

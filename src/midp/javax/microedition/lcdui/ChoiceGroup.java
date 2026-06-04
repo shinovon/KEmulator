@@ -272,7 +272,7 @@ public class ChoiceGroup
 					while (j < this.items.size()) {
 						ChoiceGroupItem a2 = (ChoiceGroupItem) this.items.get(j);
 						if (a2.aBoolean424) {
-							a2.method211(g, this.focused && j == this.currentPos, y);
+							a2.paint(g, this.focused && j == this.currentPos, y);
 						}
 						++j;
 					}
@@ -280,7 +280,7 @@ public class ChoiceGroup
 				}
 				case POPUP: {
 					try {
-						((ChoiceGroupItem) this.items.get(this.currentSelect)).method211(g, this.focused, y);
+						((ChoiceGroupItem) this.items.get(this.currentSelect)).paint(g, this.focused, y);
 					} catch (Exception ignored) {
 					}
 				}
@@ -306,7 +306,7 @@ public class ChoiceGroup
 				int i = 0;
 				while (i < this.items.size()) {
 					ChoiceGroupItem a2 = (ChoiceGroupItem) this.items.get(i);
-					a2.method212();
+					a2.layout();
 					a2.bounds[Y] = n;
 					n += a2.bounds[H];
 					this.anIntArray179[i] = i;
@@ -318,8 +318,9 @@ public class ChoiceGroup
 				break;
 			}
 			case POPUP: {
+				if (size() == 0) break;
 				ChoiceGroupItem a2 = (ChoiceGroupItem) this.items.get(this.getSelectedIndex());
-				a2.method212();
+				a2.layout();
 				n += a2.bounds[H];
 				this.anIntArray179 = null;
 				this.popupY = n - a2.bounds[H];
