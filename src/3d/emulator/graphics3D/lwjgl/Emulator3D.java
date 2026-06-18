@@ -319,49 +319,56 @@ public final class Emulator3D implements IGraphics3D {
 
 						var9.set(x, y, var9.getWidth(), var9.getHeight(), data);
 					}
-				} else if (Settings.g2d == 0) {
-					buffer.rewind();
-					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-					for (int yy = 0; yy < height; yy++) {
-						int yWrite = swtBufferImage.height - 1 - yy;
-						int writePos = yWrite * swtBufferImage.width * 4;
-						int readPos = yy * width * 4;
-
-						buffer.position(readPos);
-						buffer.get(swtBufferImage.data, writePos, width * 4);
-					}
-
-					Image var12 = new Image(null, swtBufferImage);
-					((Graphics2DSWT) ((Graphics) this.target).getImpl()).gc().drawImage(
-							var12,
-							0, 0, width, height,
-							x, y, width, height
-					);
-					var12.dispose();
 				} else {
-					buffer.rewind();
-					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-					int[] data = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
-					IntBuffer ib = buffer.asIntBuffer();
+					Graphics target = (Graphics) this.target;
+					int tx = target.getTranslateX();
+					int ty = target.getTranslateY();
+					target.translate(-tx, -ty);
+					if (Settings.g2d == 0) {
+						buffer.rewind();
+						GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
-					for (int yy = 0; yy < height; yy++) {
-						int yWrite = yy;
-						if (!flip) yWrite = awtBufferImage.getHeight() - 1 - yWrite;
+						for (int yy = 0; yy < height; yy++) {
+							int yWrite = swtBufferImage.height - 1 - yy;
+							int writePos = yWrite * swtBufferImage.width * 4;
+							int readPos = yy * width * 4;
 
-						int writePos = yWrite * awtBufferImage.getWidth();
-						int readPos = yy * width;
+							buffer.position(readPos);
+							buffer.get(swtBufferImage.data, writePos, width * 4);
+						}
 
-						ib.position(readPos);
-						ib.get(data, writePos, width);
+						Image var12 = new Image(null, swtBufferImage);
+						((Graphics2DSWT) (target.getImpl())).gc().drawImage(
+								var12,
+								0, 0, width, height,
+								x, y, width, height
+						);
+						var12.dispose();
+					} else {
+						buffer.rewind();
+						GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+						int[] data = ((DataBufferInt) awtBufferImage.getRaster().getDataBuffer()).getData();
+						IntBuffer ib = buffer.asIntBuffer();
+
+						for (int yy = 0; yy < height; yy++) {
+							int yWrite = yy;
+							if (!flip) yWrite = awtBufferImage.getHeight() - 1 - yWrite;
+
+							int writePos = yWrite * awtBufferImage.getWidth();
+							int readPos = yy * width;
+
+							ib.position(readPos);
+							ib.get(data, writePos, width);
+						}
+
+						((Graphics2DAWT) (target.getImpl())).g().drawImage(
+								awtBufferImage,
+								x, y, x + width, y + height,
+								0, 0, width, height,
+								null
+						);
 					}
-
-					((Graphics2DAWT) ((Graphics) this.target).getImpl()).g().drawImage(
-							awtBufferImage,
-							x, y, x + width, y + height,
-							0, 0, width, height,
-							null
-					);
+					target.translate(tx, ty);
 				}
 			}
 		});

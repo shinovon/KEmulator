@@ -79,7 +79,7 @@ public class Graphics3D {
 
 			Graphics3D.target = target;
 			impl.bindTarget(g);
-			setViewport(g.getClipX(), g.getClipY(), g.getClipWidth(), g.getClipHeight());
+			setViewport(g.getClipX() + g.getTranslateX(), g.getClipY() + g.getTranslateY(), g.getClipWidth(), g.getClipHeight());
 
 			if (!overwrite) {
 				if (tempBgImage == null || tempBgImage.getWidth() != targetW || tempBgImage.getHeight() != targetH)
