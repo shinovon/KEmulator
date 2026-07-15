@@ -8,6 +8,27 @@ Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 - [Discord server](https://discord.gg/ETvTpMehXV)
 - [Telegram channel](https://t.me/nnmidlets)
 
+## Main changes from KEmulator 1.0.3
+
+- Active development and bug tracking
+- Fixed a lot of games based on bug reports
+- Cross-platform
+- Hardware accelerated 3D engine
+- Freely resizable window and fullscreen mode
+- Fixed keyboard controls
+- Improved lcdui implementation
+- Improved multimedia support
+- Improved debug tools (Memory View, Class Watcher, Profiler)
+- Returned M3G View from v0.9.8
+- Customizable MIDI soundfont
+- Fixed network connection issues
+- Mascot Capsule and SoftBank MEXA support
+- Limited DoJa profile support
+- Implemented NokiaUI 1.4
+- Support of obscure OEM APIs
+- Support of UEI integration with IDEs (Eclipse with MTJ, NetBeans, etc)
+- Tools for J2ME development with IntelliJ IDEA
+
 ## Requirements
 JRE:
 - Java 8 by Oracle
